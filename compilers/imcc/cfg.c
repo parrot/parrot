@@ -43,7 +43,7 @@ static void analyse_life_block(
         FUNC_MODIFIES(*r);
 
 static void analyse_life_symbol(
-    ARGIN(const struct _IMC_Unit *unit),
+    ARGIN(const IMC_Unit *unit),
     ARGMOD(SymReg* r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -204,7 +204,7 @@ RT #48260: Not yet documented!!!
 */
 
 void
-find_basic_blocks(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit), int first)
+find_basic_blocks(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int first)
 {
     Basic_block          *bb;
     Instruction          *ins;
@@ -350,11 +350,10 @@ between them.
 */
 
 void
-build_cfg(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
+build_cfg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     Basic_block *last = NULL;
-    unsigned int i;
-    int          changes;
+    int i, changes;
 
     IMCC_info(interp, 2, "build_cfg\n");
 
@@ -394,7 +393,7 @@ build_cfg(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
              * s. #25948
              */
             if (!bb->pred_list) {
-                unsigned int j;
+                int j;
 
                 for (j = i; j < unit->n_basic_blocks; j++) {
                     Basic_block * const b_bsr = unit->bb_list[j];
@@ -456,7 +455,7 @@ invok:
     /* Decouple unreachable blocks (not the first block, with no predecessors)
      * from the CFG */
     do {
-        unsigned int i;
+        int i;
         changes = 0;
 
         for (i = 1; i < unit->n_basic_blocks; i++) {
@@ -681,7 +680,7 @@ Counts and returns the number of edges in the specified IMC_Unit.
 
 PARROT_WARN_UNUSED_RESULT
 int
-edge_count(ARGIN(const struct _IMC_Unit *unit))
+edge_count(ARGIN(const IMC_Unit *unit))
 {
     Edge *e = unit->edge_list;
     int   i = 0;
@@ -707,7 +706,7 @@ IMC_Unit.
 */
 
 void
-life_analysis(PARROT_INTERP, ARGIN(const struct _IMC_Unit *unit))
+life_analysis(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 {
     SymReg  ** const reglist = unit->reglist;
     int              i;
@@ -730,9 +729,9 @@ Analyzes the lifetime for a given symbol.
 */
 
 static void
-analyse_life_symbol(ARGIN(const struct _IMC_Unit *unit), ARGMOD(SymReg* r))
+analyse_life_symbol(ARGIN(const IMC_Unit *unit), ARGMOD(SymReg* r))
 {
-    unsigned int i;
+    int i;
 
 #if IMC_TRACE_HIGH
     fprintf(stderr, "cfg.c: analyse_life_symbol(%s)\n", r->name);
@@ -792,13 +791,13 @@ Frees memory of the life analysis info structures.
 */
 
 void
-free_life_info(ARGIN(const struct _IMC_Unit *unit), ARGMOD(SymReg *r))
+free_life_info(ARGIN(const IMC_Unit *unit), ARGMOD(SymReg *r))
 {
 #if IMC_TRACE_HIGH
     fprintf(stderr, "free_life_into(%s)\n", r->name);
 #endif
     if (r->life_info) {
-        unsigned int i;
+        int i;
 
         for (i = 0; i < unit->n_basic_blocks; i++) {
             mem_sys_free(r->life_info[i]);
@@ -970,7 +969,7 @@ See gcc:flow.c compute_dominators
 */
 
 void
-compute_dominators(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
+compute_dominators(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
 #define USE_BFS 0
 
@@ -1107,7 +1106,7 @@ Dominance Algorithm", Cooper et al. (2001)
 */
 
 void
-compute_dominance_frontiers(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
+compute_dominance_frontiers(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     int i, b;
 
@@ -1194,7 +1193,7 @@ static void
 free_dominance_frontiers(ARGMOD(IMC_Unit *unit))
 {
     if (unit->dominance_frontiers) {
-        unsigned int i;
+        int i;
 
         for (i = 0; i < unit->n_basic_blocks; i++) {
             set_free(unit->dominance_frontiers[i]);
@@ -1222,7 +1221,7 @@ sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 
     Loop_info   *li;
     Loop_info  **loop_info = unit->loop_info;
-    unsigned int n_loops   = (unsigned int)unit->n_loops;
+    int          n_loops   = (int)unit->n_loops;
     int          i, j, changed;
 
     for (i = 0; i < n_loops; i++) {
@@ -1296,9 +1295,9 @@ of its dominators.
 */
 
 void
-find_loops(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
+find_loops(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    unsigned int i;
+    int i;
 
     IMCC_info(interp, 2, "find_loops\n");
 
@@ -1333,7 +1332,7 @@ transfers control directly to the header.
 
 PARROT_WARN_UNUSED_RESULT
 int
-natural_preheader(ARGIN(const struct _IMC_Unit *unit), ARGIN(const Loop_info* loop_info))
+natural_preheader(ARGIN(const IMC_Unit *unit), ARGIN(const Loop_info* loop_info))
 {
     Edge *edge;
     int   preheader = -1;

@@ -399,7 +399,7 @@ The instruction following ins is returned.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction *
-_delete_ins(ARGMOD(struct _IMC_Unit *unit), ARGIN(Instruction *ins))
+_delete_ins(ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
 {
     Instruction * const next = ins->next;
     Instruction * const prev = ins->prev;
@@ -432,7 +432,7 @@ The instruction following ins is returned.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction *
-delete_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD(Instruction *ins))
+delete_ins(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins))
 {
     Instruction * next = _delete_ins(unit, ins);
 
@@ -452,7 +452,7 @@ insert tmp after ins
 */
 
 void
-insert_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD_NULLOK(Instruction *ins),
+insert_ins(ARGMOD(IMC_Unit *unit), ARGMOD_NULLOK(Instruction *ins),
         ARGMOD(Instruction *tmp))
 {
     if (!ins) {
@@ -497,7 +497,7 @@ insert tmp before ins
 */
 
 void
-prepend_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD_NULLOK(Instruction *ins),
+prepend_ins(ARGMOD(IMC_Unit *unit), ARGMOD_NULLOK(Instruction *ins),
         ARGMOD(Instruction *tmp))
 {
     if (!ins) {
@@ -534,7 +534,7 @@ Substitute tmp for ins. Free ins if needs_freeing is true.
 */
 
 void
-subst_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD(Instruction *ins),
+subst_ins(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins),
           ARGMOD(Instruction *tmp), int needs_freeing)
 {
     Instruction * const prev = ins->prev;
@@ -573,7 +573,7 @@ initial position of ins.
 
 PARROT_CAN_RETURN_NULL
 Instruction *
-move_ins(ARGMOD(struct _IMC_Unit *unit), ARGMOD(Instruction *ins), ARGMOD(Instruction *to))
+move_ins(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins), ARGMOD(Instruction *to))
 {
     Instruction * const next = _delete_ins(unit, ins);
     insert_ins(unit, to, ins);
@@ -593,7 +593,7 @@ Emit a single instruction into the current unit buffer.
 
 PARROT_CAN_RETURN_NULL
 Instruction *
-emitb(PARROT_INTERP, ARGMOD_NULLOK(struct _IMC_Unit *unit), ARGIN_NULLOK(Instruction *i))
+emitb(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGIN_NULLOK(Instruction *i))
 {
 
     if (!unit || !i)
@@ -859,7 +859,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_API
 int
-emit_flush(PARROT_INTERP, ARGIN_NULLOK(void *param), ARGIN(struct _IMC_Unit *unit))
+emit_flush(PARROT_INTERP, ARGIN_NULLOK(void *param), ARGIN(IMC_Unit *unit))
 {
     Instruction * ins;
 

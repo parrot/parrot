@@ -329,7 +329,7 @@ Add the current namespace to a sub declaration.
 */
 
 void
-add_namespace(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
+add_namespace(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     SymReg * const ns = IMCC_INFO(interp)->cur_namespace;
 
@@ -1445,7 +1445,7 @@ Deletes all local symbols and clears life info from the given IMC_Unit.
 */
 
 void
-clear_locals(ARGIN_NULLOK(struct _IMC_Unit *unit))
+clear_locals(ARGIN_NULLOK(IMC_Unit *unit))
 {
     SymHash * const hsh = &unit->hash;
     int i;
