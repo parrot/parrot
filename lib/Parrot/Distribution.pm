@@ -700,7 +700,7 @@ sub perl_module_file_directories {
             > ),
         map( "lib/Parrot/$_" => qw<
             Config Configure Configure/Step Docs Docs/Section IO
-            OpLib OpTrans PIR Pmc2c Test
+            OpTrans PIR Pmc2c Test
             > ),
         ;
 }
