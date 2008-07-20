@@ -279,6 +279,19 @@ method instance_variable($/) {
     make $past;
 }
 
+method class_variable($/) {
+    our $?CLASS;
+    our $?BLOCK;
+    my $name := ~$/;
+    my $past := PAST::Var.new(  :name($name), :scope('package'), :viviself('Undef'), :node($/) );
+    my $block := $?CLASS[0];
+    unless $block.symbol(~$/) {
+        $block.symbol(~$name, :scope('package'));
+        $?BLOCK.symbol(~$name, :scope('package'));
+    }
+    make $past;
+}
+
 method local_variable($/) {
     our $?BLOCK;
     my $past := PAST::Var.new( :name(~$/), :node($/), :viviself('Undef') );

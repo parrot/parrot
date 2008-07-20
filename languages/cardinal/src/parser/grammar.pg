@@ -158,9 +158,10 @@ token variable {
 token varname {
     <!reserved_word>
     [ <global> {*}             #= global
+    | <class_variable> {*}     #= class_variable
     | <instance_variable> {*}  #= instance_variable
     | <local_variable> {*}     #= local_variable
-    | <constant_variable> {*}     #= constant_variable
+    | <constant_variable> {*}  #= constant_variable
     ]
 }
 

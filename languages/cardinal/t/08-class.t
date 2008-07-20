@@ -1,4 +1,4 @@
-puts '1..5'
+puts '1..7'
 
 class OkayOnCreate
     def initialize(a)
@@ -43,3 +43,22 @@ b.inc
 b.speak
 b.num = b.num + 1
 puts "ok ", b.num
+
+class StaticTester
+    def num()
+        @@num
+    end
+    def num=(var)
+        @@num = var
+    end
+    def speak()
+        puts "ok ", @@num
+    end
+end
+
+x = StaticTester.new()
+x.num = 6
+y = StaticTester.new()
+y.speak
+y.num = y.num + 1
+x.speak
