@@ -139,7 +139,11 @@ Create a new object having the same class as the invocant.
     cardinalmeta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
     $P0 = cardinalmeta.get_parrotclass(self)
     $P1 = $P0.'new'()
+    $P2 = $P1.'HOW'()
+    $I0 = $P2.can('initialize')
+    unless $I0, no_initialize
     $P2 = $P1.'initialize'(args :flat, named_args :named :flat)
+  no_initialize:
 
     .return ($P1)
 .end

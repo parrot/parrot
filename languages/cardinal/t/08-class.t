@@ -1,4 +1,4 @@
-puts '1..4'
+puts '1..5'
 
 class OkayOnCreate
     def initialize(a)
@@ -24,12 +24,22 @@ class OkaySayer
     def inc
         @num = @num + 1
     end
+
+    def num()
+        @num
+    end
+
+    def num=(val)
+        @num = val
+    end
 end
 
 b = OkaySayer.new(2)
 
-b.speak()
+b.speak
 b.setnum(3)
-b.speak()
-b.inc()
-b.speak()
+b.speak
+b.inc
+b.speak
+b.num = b.num + 1
+puts "ok ", b.num

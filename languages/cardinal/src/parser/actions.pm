@@ -156,6 +156,17 @@ method indexed_assignment($/) {
 
     make $past;
 }
+method member_assignment($/) {
+    my $rhs := $( $<rhs> );
+    my $primary := $( $<basic_primary> );
+
+    my $past := PAST::Op.new( :name(~$<key><ident> ~ '='), :pasttype('callmethod'), :node($/) );
+
+    $past.push( $primary );
+    $past.push( $rhs );
+
+    make $past;
+}
 method assignment($/) {
     my $lhs := $( $<mlhs> );
     our $?BLOCK;

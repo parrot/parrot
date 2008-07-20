@@ -4,12 +4,10 @@
 
 This is the grammar for cardinal written as a sequence of Perl 6 rules.
 
-Currently taken (partly) from:
+Originally taken (partly) from:
 http://www.math.hokudai.ac.jp/~gotoken/ruby/man/yacc.html
 
 and parse.y from the ruby source
-
-But adapted here and there; it's not entirely correct, it seems.
 
 =end overview
 
@@ -45,6 +43,7 @@ token basic_stmt {
     | <module> {*}          #= module
     | <begin_end> {*}       #= begin_end
     | <indexed_assignment> {*}      #= indexed_assignment
+    | <member_assignment> {*}      #= member_assignment
     | <assignment> {*}      #= assignment
     | <return_stmt> {*}     #= return_stmt
     | <expr> {*}            #= expr
@@ -88,6 +87,11 @@ rule end {
 
 token indexed_assignment {
     <basic_primary> '[' <key=arg> ']' <.ws> '=' <.ws> <rhs=arg>
+    {*}
+}
+
+token member_assignment {
+    <basic_primary> '.' <key=identifier> <.ws> '=' <.ws> <rhs=arg>
     {*}
 }
 
@@ -317,7 +321,7 @@ rule begin_end {
 }
 
 token fname {
-    <.identifier>
+    <.identifier> <[=!?]>?
 }
 
 rule array {
