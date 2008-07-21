@@ -1,6 +1,6 @@
 # $Id$
 
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 
 package URM::Test;
 
@@ -72,14 +72,14 @@ foreach my $meth (qw(is isnt like)) {
 
 1;
 
-my $urmc    = "$PConfig{perl} $FindBin::RealBin$PConfig{slash}..$PConfig{slash}urmc";
+my $urmc    = "$PConfig{perl} $FindBin::Bin$PConfig{slash}..$PConfig{slash}urmc";
 my $compile = "-c -s";
 my $run     = "-s";
 
 sub compile_test {
     my $file = shift;
 
-    my $ret = system("$urmc $compile $FindBin::RealBin$PConfig{slash}$file");
+    my $ret = system("$urmc $compile $FindBin::Bin$PConfig{slash}$file");
     if ($ret) {
         print STDERR "TEST FAILED: $file ($ret)\n";
         return;
@@ -89,7 +89,7 @@ sub compile_test {
 
 sub run_test {
     my ( $file, $expect ) = @_;
-    my $ret = `$urmc $run $FindBin::RealBin$PConfig{slash}$file`;
+    my $ret = `$urmc $run $FindBin::Bin$PConfig{slash}$file`;
     if ( !$ret ) {
         print STDERR "TEST FAILED: $file didn't return a value, Parrot crashed?\n";
         return;

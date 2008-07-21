@@ -18,7 +18,7 @@ Markus Thiessen - <marcus@cpan.org>
 
 use strict;
 use FindBin;
-use lib "$FindBin::RealBin/../../lib";
+use lib "$FindBin::Bin/../../lib";
 
 use Data::Dumper;
 use Getopt::Long;
@@ -30,7 +30,7 @@ $opti = 1; # more a debug flag
 
 # globals
 my ( $filename, $silent );
-my $parrot = "$FindBin::RealBin$PConfig{slash}..$PConfig{slash}..$PConfig{slash}parrot$PConfig{exe}";
+my $parrot = "$FindBin::Bin$PConfig{slash}..$PConfig{slash}..$PConfig{slash}parrot$PConfig{exe}";
 
 sub filename {
     my $arg = shift;
