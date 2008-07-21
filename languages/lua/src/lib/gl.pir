@@ -11,6 +11,9 @@ This file implements the OpenGL binding for Lua.
 
 See original on L<http://luagl.wikidot.com/>
 
+This implementation is based on a wrapper over OpenGL,
+see F<runtime/parrot/library/OpenGL.pir>.
+
 =over 4
 
 =cut
@@ -20,13 +23,19 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub '__onload' :anon :load
 #    print "__onload gl\n"
+
+    load_bytecode 'library/OpenGL.pbc'
+
     .const .Sub entry = 'luaopen_gl'
     set_hll_global 'luaopen_gl', entry
 .end
 
 .sub 'luaopen_gl'
-
 #    print "luaopen_gl\n"
+
+    # Import all OpenGL/GLU/GLUT functions
+    $P0 = get_global ['OpenGL'], '_export_all_functions'
+    $P0()
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = get_hll_global '_G'
@@ -1328,30 +1337,95 @@ See original on L<http://luagl.wikidot.com/>
     .return ($P0)
 .end
 
-=item C<gl.Accum ()>
+.const int ENUM_ERROR = -2
+
+.sub 'get_gl_enum' :anon
+    .param string str
+    .local pmc gl_str
+    gl_str = get_hll_global ['Lua::gl'], 'gl_str'
+    .local int ret
+    ret = 0
+    $P0 = split ',', str
+  L1:
+    unless $P0 goto L2
+    $S0 = shift $P0
+    upcase $S0
+    $I0 = exists gl_str[$S0]
+    if $I0 goto L3
+    .return (ENUM_ERROR)
+  L3:
+    $I0 = gl_str[$S0]
+    ret |= $I0
+    goto L1
+  L2:
+    .return (ret)
+.end
+
+
+=item C<gl.Accum (op, value)>
 
 =cut
 
 .sub 'Accum' :anon
+    .param pmc op :optional
+    .param pmc value :optional
     .param pmc extra :slurpy
+    $I0 = lua_isstring(op)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'gl.Accum'")
+  L1:
+    $I1 = get_gl_enum(op)
+    unless $I1 == ENUM_ERROR goto L2
+    lua_error("incorrect string argument to function 'gl.Accum'")
+  L2:
+    $I0 = lua_isnumber(value)
+    if $I0 goto L3
+    lua_error("incorrect argument to function 'gl.Accum'")
+  L3:
+    $N2 = value
+    glAccum($I1, $N2)
+    .return ()
 .end
 
 
-=item C<gl.AlphaFunc ()>
+=item C<gl.AlphaFunc (func, ref)>
 
 =cut
 
 .sub 'AlphaFunc' :anon
+    .param pmc func :optional
+    .param pmc ref :optional
     .param pmc extra :slurpy
+    $I0 = lua_isstring(func)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'gl.AlphaFunc'")
+  L1:
+    $I1 = get_gl_enum(func)
+    unless $I1 == ENUM_ERROR goto L2
+    lua_error("incorrect string argument to function 'gl.AlphaFunc'")
+  L2:
+    $I0 = lua_isnumber(ref)
+    if $I0 goto L3
+    lua_error("incorrect argument to function 'gl.AlphaFunc'")
+  L3:
+    $N2 = ref
+    glAlphaFunc($I1, $N2)
+    .return ()
 .end
 
 
-=item C<gl.AreTexturesResident ()>
+=item C<gl.AreTexturesResident (texturesArray)>
 
 =cut
 
 .sub 'AreTexturesResident' :anon
+    .param pmc texturesArray :optional
     .param pmc extra :slurpy
+    $I0 = lua_istable(texturesArray)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'gl.AreTexturesResident'")
+  L1:
+    not_implemented()
 .end
 
 
@@ -1361,6 +1435,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'ArrayElement' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1370,6 +1445,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Begin' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1379,6 +1455,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'BindTexture' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1388,6 +1465,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Bitmap' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1397,6 +1475,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'BlendFunc' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1406,6 +1485,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'CallList' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1415,6 +1495,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'CallLists' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1424,6 +1505,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Clear' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1433,6 +1515,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'ClearAccum' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1442,6 +1525,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'ClearColor' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1451,6 +1535,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'ClearDepth' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1460,6 +1545,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'ClearIndex' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1469,6 +1555,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'ClearStencil' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1478,6 +1565,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'ClipPlane' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1487,6 +1575,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Color' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1496,6 +1585,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'ColorMask' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1505,6 +1595,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'ColorMaterial' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1514,6 +1605,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'ColorPointer' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1523,6 +1615,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'CopyPixels' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1532,6 +1625,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'CopyTexImage' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1541,6 +1635,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'CopyTexSubImage' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1550,6 +1645,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'CullFace' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1559,6 +1655,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'DeleteLists' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1568,6 +1665,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'DeleteTextures' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1577,6 +1675,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'DepthFunc' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1586,6 +1685,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'DepthMask' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1595,6 +1695,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'DepthRange' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1604,6 +1705,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Disable' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1613,6 +1715,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'DisableClientState' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1622,6 +1725,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'DrawArrays' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1631,6 +1735,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'DrawBuffer' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1640,6 +1745,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'DrawElements' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1649,6 +1755,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'DrawPixels' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1658,6 +1765,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'EdgeFlag' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1667,6 +1775,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'EdgeFlagPointer' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1676,6 +1785,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Enable' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1685,6 +1795,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'EnableClientState' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1694,6 +1805,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'End' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1703,6 +1815,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'EndList' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1712,6 +1825,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'EvalCoord' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1721,6 +1835,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'EvalMesh' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1730,6 +1845,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'EvalPoint' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1739,6 +1855,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'FeedbackBuffer' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1748,6 +1865,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Finish' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1757,6 +1875,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Flush' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1766,6 +1885,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Fog' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1775,6 +1895,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'FrontFace' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1784,6 +1905,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Frustum' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1793,6 +1915,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'GenLists' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1802,6 +1925,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'GenTextures' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1811,6 +1935,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Get' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1820,6 +1945,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'GetArray' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1829,6 +1955,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'GetConst' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1838,6 +1965,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'GetClipPlane' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1847,6 +1975,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'GetError' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1856,6 +1985,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'GetLight' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1865,6 +1995,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'GetMap' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1874,6 +2005,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'GetMaterial' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1883,6 +2015,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'GetPixelMap' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1892,6 +2025,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'GetPointer' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1901,6 +2035,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'GetPolygonStipple' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1910,6 +2045,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'GetString' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1919,6 +2055,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'GetTexEnv' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1928,6 +2065,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'GetTexGen' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1937,6 +2075,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'GetTexImage' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1946,6 +2085,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'GetTexLevelParameter' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1955,6 +2095,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'GetTexParameter' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1964,6 +2105,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Hint' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1973,6 +2115,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Index' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1982,6 +2125,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'IndexMask' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -1991,6 +2135,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'IndexPointer' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2000,6 +2145,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'InitNames' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2009,6 +2155,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'IsEnabled' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2018,6 +2165,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'IsList' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2027,6 +2175,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'IsTexture' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2036,6 +2185,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Light' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2045,6 +2195,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'LightModel' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2054,6 +2205,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'LineStipple' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2063,6 +2215,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'LineWidth' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2072,6 +2225,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'ListBase' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2081,6 +2235,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'LoadIdentity' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2090,6 +2245,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'LoadMatrix' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2099,6 +2255,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'LoadName' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2108,6 +2265,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'LogicOp' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2117,6 +2275,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Map' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2126,6 +2285,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'MapGrid' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2135,6 +2295,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Material' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2144,6 +2305,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'MatrixMode' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2153,6 +2315,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'MultMatrix' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2162,6 +2325,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'NewList' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2171,6 +2335,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Normal' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2180,6 +2345,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'NormalPointer' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2189,6 +2355,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Ortho' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2198,6 +2365,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'PassThrough' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2207,6 +2375,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'PixelMap' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2216,6 +2385,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'PixelStore' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2225,6 +2395,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'PixelTransfer' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2234,6 +2405,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'PixelZoom' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2243,6 +2415,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'PointSize' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2252,6 +2425,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'PolygonMode' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2261,6 +2435,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'PolygonOffset' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2270,6 +2445,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'PolygonStipple' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2279,6 +2455,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'PopAttrib' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2288,6 +2465,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'PopClientAttrib' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2297,6 +2475,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'PopMatrix' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2306,6 +2485,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'PopName' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2315,6 +2495,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'PrioritizeTextures' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2324,6 +2505,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'PushAttrib' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2333,6 +2515,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'PushClientAttrib' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2342,6 +2525,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'PushMatrix' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2351,6 +2535,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'PushName' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2360,6 +2545,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'RasterPos' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2369,6 +2555,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'ReadBuffer' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2378,6 +2565,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'ReadPixels' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2387,6 +2575,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Rect' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2396,6 +2585,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'RenderMode' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2405,6 +2595,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Rotate' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2414,6 +2605,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Scale' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2423,6 +2615,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Scissor' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2432,6 +2625,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'SelectBuffer' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2441,6 +2635,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'ShadeModel' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2450,6 +2645,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'StencilFunc' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2459,6 +2655,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'StencilMask' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2468,6 +2665,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'StencilOp' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2477,6 +2675,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'TexCoord' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2486,6 +2685,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'TexCoordPointer' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2495,6 +2695,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'TexEnv' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2504,6 +2705,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'TexGen' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2513,6 +2715,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'TexImage' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2522,6 +2725,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'TexSubImage' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2531,6 +2735,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'TexParameter' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2540,6 +2745,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Translate' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2549,6 +2755,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Vertex' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2558,6 +2765,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'VertexPointer' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 
@@ -2567,6 +2775,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Viewport' :anon
     .param pmc extra :slurpy
+    not_implemented()
 .end
 
 

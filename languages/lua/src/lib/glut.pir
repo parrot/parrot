@@ -11,6 +11,9 @@ This file implements the GLUT binding for Lua.
 
 See original on L<http://luagl.wikidot.com/>
 
+This implementation is based on a wrapper over OpenGL,
+see F<runtime/parrot/library/OpenGL.pir>.
+
 =over 4
 
 =cut
@@ -20,13 +23,20 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub '__onload' :anon :load
 #    print "__onload glut\n"
+
+    load_bytecode 'library/OpenGL.pbc'
+    load_bytecode 'library/NCI/call_toolkit_init.pbc'
+
     .const .Sub entry = 'luaopen_glut'
     set_hll_global 'luaopen_glut', entry
 .end
 
 .sub 'luaopen_glut'
-
 #    print "luaopen_glut\n"
+
+    # Import all OpenGL/GLU/GLUT functions
+    $P0 = get_global ['OpenGL'], '_export_all_functions'
+    $P0()
 
     .local pmc _lua__GLOBAL
     _lua__GLOBAL = get_hll_global '_G'
@@ -99,30 +109,65 @@ See original on L<http://luagl.wikidot.com/>
 .end
 
 
-=item C<glut.CreateWindow ()>
+.include 'opengl_defines.pasm'
+
+=item C<glut.CreateWindow (title)>
 
 =cut
 
 .sub 'CreateWindow' :anon
+    .param pmc title :optional
     .param pmc extra :slurpy
+    $I0 = lua_isstring(title)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'glut.CreateWindow'")
+  L1:
+    $S1 = title
+    glutCreateWindow($S1)
 .end
 
 
-=item C<glut.DisplayFunc ()>
+=item C<glut.DisplayFunc (funcname)>
 
 =cut
 
 .sub 'DisplayFunc' :anon
+    .param pmc funcname :optional
     .param pmc extra :slurpy
+    $I0 = lua_isstring(funcname)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'glut.DisplayFunc'")
+  L1:
+    .local pmc _lua__GLOBAL
+    _lua__GLOBAL = get_hll_global '_G'
+    $P0 = _lua__GLOBAL[funcname]
+    $I0 = lua_isfunction($P0)
+    if $I0 goto L2
+    lua_error("Script error: cannot find ", funcname, " function.")
+  L2:
+    glutDisplayFunc($P0)
 .end
 
 
-=item C<glut.IdleFunc ()>
+=item C<glut.IdleFunc (funcname)>
 
 =cut
 
 .sub 'IdleFunc' :anon
+    .param pmc funcname :optional
     .param pmc extra :slurpy
+    $I0 = lua_isstring(funcname)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'glut.IdleFunc'")
+  L1:
+    .local pmc _lua__GLOBAL
+    _lua__GLOBAL = get_hll_global '_G'
+    $P0 = _lua__GLOBAL[funcname]
+    $I0 = lua_isfunction($P0)
+    if $I0 goto L2
+    lua_error("Script error: cannot find ", funcname, " function.")
+  L2:
+    glutIdleFunc($P0)
 .end
 
 
@@ -132,6 +177,13 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'Init' :anon
     .param pmc extra :slurpy
+    .local pmc argv
+    new argv, 'FixedStringArray'
+    set argv, 1
+    argv[0] = ''
+    .const .Sub glutInit = 'glutInit'
+    $P0 = get_global ['NCI'], 'call_toolkit_init'
+    $P0(glutInit, argv)
 .end
 
 
@@ -141,24 +193,52 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'InitDisplayMode' :anon
     .param pmc extra :slurpy
+    $I0 = .GL_RGBA | .GL_DOUBLE
+    glutInitDisplayMode($I0)
 .end
 
 
-=item C<glut.InitWindowSize ()>
+=item C<glut.InitWindowSize (width, height)>
 
 =cut
 
 .sub 'InitWindowSize' :anon
+    .param pmc width :optional
+    .param pmc height :optional
     .param pmc extra :slurpy
+    $I0 = lua_isnumber(width)
+    unless $I0 goto L1
+    $I0 = lua_isnumber(height)
+    unless $I0 goto L1
+    goto L2
+  L1:
+    lua_error("incorrect argument to function 'glut.InitWindowSize'")
+  L2:
+    $I1 = width
+    $I2 = height
+    glutInitWindowSize($I1, $I2)
 .end
 
 
-=item C<glut.KeyboardFunc ()>
+=item C<glut.KeyboardFunc (funcname)>
 
 =cut
 
 .sub 'KeyboardFunc' :anon
+    .param pmc funcname :optional
     .param pmc extra :slurpy
+    $I0 = lua_isstring(funcname)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'glut.KeyboardFunc'")
+  L1:
+    .local pmc _lua__GLOBAL
+    _lua__GLOBAL = get_hll_global '_G'
+    $P0 = _lua__GLOBAL[funcname]
+    $I0 = lua_isfunction($P0)
+    if $I0 goto L2
+    lua_error("Script error: cannot find ", funcname, " function.")
+  L2:
+    glutKeyboardFunc($P0)
 .end
 
 
@@ -168,6 +248,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'MainLoop' :anon
     .param pmc extra :slurpy
+    glutMainLoop()
 .end
 
 
@@ -177,15 +258,29 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'PostRedisplay' :anon
     .param pmc extra :slurpy
+    glutPostRedisplay()
 .end
 
 
-=item C<glut.ReshapeFunc ()>
+=item C<glut.ReshapeFunc (funcname)>
 
 =cut
 
 .sub 'ReshapeFunc' :anon
+    .param pmc funcname :optional
     .param pmc extra :slurpy
+    $I0 = lua_isstring(funcname)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'glut.ReshapeFunc'")
+  L1:
+    .local pmc _lua__GLOBAL
+    _lua__GLOBAL = get_hll_global '_G'
+    $P0 = _lua__GLOBAL[funcname]
+    $I0 = lua_isfunction($P0)
+    if $I0 goto L2
+    lua_error("Script error: cannot find ", funcname, " function.")
+  L2:
+    glutFunc($P0)
 .end
 
 
@@ -195,6 +290,7 @@ See original on L<http://luagl.wikidot.com/>
 
 .sub 'SwapBuffers' :anon
     .param pmc extra :slurpy
+    glutSwapBuffers()
 .end
 
 
