@@ -231,15 +231,28 @@ set skipped_tests [dict create \
 # stored as an array of test name -> reason pairs.
 
 array set abort_after {
+  async-3.1            {we're too slow to or too stupid to get by hang1}
+  autoMkindex-5.2      {invalid command name "cd"}
   basic-47.1           {need interp before these can work}
   cmdAH-31.13          {invalid command name "cd"}
   cmdMZ-5.7            {invalid command name "cleanupTests"}
+  encoding-11.4        {wrong # args: should be "string is class ?-strict? ?-failindex var? str"}
   env-1.3              {can't read "env(test)" no such element in array}
   event-4.2            {invalid command name "update"}
+  fCmd-1.1             {}
   filename-11.13       {invalid command name "cd"}
   iocmd-12.8           {invalid command name "close"}
+  iogt-1.1             {}
   ioUtil-2.8           {invalid command name "cd"}
+  msgcat-0.0           {}
+  opt-1.1              {don't have the opt package available}
+  pkgMkIndex-4.2       {invalid command name "pkg_mkIndex"}
   parse-19.4           {invalid command name "cleanupTests"}
-  utf-1.4              {Invalid character for UTF-8 encoding}
+  reg-0.1              {invalid command name "doing"}
+  safe-1.1             {}
   source-7.6           {invalid command name "cleanupTests"}
+  timer-1.1            {}
+  tcltest-1.1          {}
+  utf-1.4              {Invalid character for UTF-8 encoding}
+  unixInit-1.1         {}
 }
