@@ -344,13 +344,15 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
     goto scan_loop
 
 
-    .local int base, decnum
+    .local int base, decnum, max_digits, cnt_digit
   scan_octal:
     base = 8
+    max_digits = 3
     pos += 1     # octal digits come right after the '\'
     goto got_base
   scan_hex:
     base = 16
+    max_digits = 2
     pos += 2     # skip the 'x'
   got_base:
     ##  Handle hex and octal escapes.
@@ -359,8 +361,11 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
     ##  that follow to compute the decimal value of codepoints,
     ##  and add the codepoints to our literal.
     decnum = 0
+    cnt_digit = 1
     $S0 = substr target, pos, 1
   scan_xo_char_loop:
+    if cnt_digit > max_digits goto scan_xo_char_end
+    inc cnt_digit
     $S0 = substr target, pos, 1
     $I0 = index '0123456789abcdef0123456789ABCDEF', $S0
     if $I0 < 0 goto scan_xo_char_end

@@ -282,7 +282,7 @@ END_CODE
 ABC ABC
 END_EXPECTED
 
-language_output_is( 'Pipp', <<'END_CODE', <<"END_EXPECTED", 'hex escapes followed by a digit', todo => 'not implemented yet' );
+language_output_is( 'Pipp', <<'END_CODE', <<"END_EXPECTED", 'hex escapes followed by a digit' );
 <?php
 
 echo "A1B2C3 \x411\x422\x433", "\n";
@@ -292,7 +292,7 @@ END_CODE
 A1B2C3 A1B2C3
 END_EXPECTED
 
-language_output_is( 'Pipp', <<'END_CODE', <<"END_EXPECTED", 'octal escapes followed by a digit', todo => 'not implemented yet' );
+language_output_is( 'Pipp', <<'END_CODE', <<"END_EXPECTED", 'octal escapes followed by a digit' );
 <?php
 
 echo "A1B2C3 \1011\1022\1033", "\n";
