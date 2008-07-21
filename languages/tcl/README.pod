@@ -13,21 +13,22 @@ generate the file C<tcl.pbc> which can then be used to run tcl programs.
  ../../parrot tcl.pbc foo.tcl
 
 You can also generate a faux-executable with C<make tclsh>; You could then
-run examples with simply:
+run examples with, e.g.:
 
- ./tclsh
+ ./tclsh example/bench.tcl
 
 =head2 Interactive tclsh
 
-To run partcl interactively, type:
+To run partcl interactively, simply run the faux-executable with no args:
 
- make tclsh
+ ./tclsh
 
-in this directory.
+or, similarly, the parrot bytecode:
+ ../../parrot tcl.pbc
 
 =head2 Command line options
 
-partcl supports two command line options (that are B<not> standard Tcl):
+partcl supports two command line options, neither of which are standard Tcl.
 
 =over 4
 
@@ -47,9 +48,6 @@ Given this option, partcl will compile the tcl code to PIR, and output
 the PIR on STDOUT. This PIR can then be compiled to parrot bytecode, or
 run directly through parrot. (Works with C<-e>.).
 
-To pretty print the PIR that is generated, you can use the I<experimental>
-utility in C<../../tools/util/pirtidy.pl>.
-
 =back
 
 =head2 Examples
@@ -64,12 +62,14 @@ C<TEST_PROG_ARGS=-G make test>, which will disable parrot's garbage
 collection system. Send the results of both to the mailing list
 C<parrot-porters@perl.org>.
 
+To run the spec test suites, type C<make tcl-test>; This will check out
+the tests from tcl's CVS repository for the 8.5.2 release and run them.
+
+Note that the tests are I<fudged> slightly to use our version of [test]
+As soon as we can run tcltest.tcl natively, we will.
+
 =head2 Documentation
 
 See C<docs/> and C<TODO>
-
-=head2 Tcl Version
-
-We are targeting Tcl 8.5.1.
 
 =cut
