@@ -48,7 +48,7 @@ Given a PMC, get a TclDict from it, converting as needed.
 .sub toDict :multi(TclList)
   .param pmc list
 
-  $P0 = __listToDict(list)
+  $P0 = listToDict(list)
   copy list, $P0
 
   .return(list)

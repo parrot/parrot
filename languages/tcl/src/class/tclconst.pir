@@ -5,13 +5,13 @@
 
 =head1 TclConst
 
-=head2 __class_init
+=head2 class_init
 
 Define the attributes required for the class.
 
 =cut
 
-.sub __class_init :anon :load
+.sub class_init :anon :load
   $P0 = get_class 'String'
   $P1 = subclass $P0, 'TclConst'
 
@@ -266,7 +266,7 @@ Generate PIR code which can be used to generate our value
    .return compiler(argnum, self)
 .end
 
-=head2 _dump
+=head2 __dump
 
 This method enables Data::Dumper to work on us; shouldn't need it, because
 we're subclassing String...
