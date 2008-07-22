@@ -646,7 +646,8 @@ Parrot_fetch_arg_nci(PARROT_INTERP, ARGMOD(call_state *st))
     next_arg_sig(&st->dest);
 
     if (st->dest.sig & PARROT_ARG_SLURPY_ARRAY) {
-        PMC *slurped = pmc_new(interp, enum_class_ResizablePMCArray);
+        PMC *slurped = pmc_new(interp,
+                Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray));
 
         PARROT_ASSERT((st->dest.sig & PARROT_ARG_TYPE_MASK) == PARROT_ARG_PMC);
 
@@ -1359,7 +1360,8 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
 
     /* 2nd: Positional :slurpy */
     if (dest->sig & PARROT_ARG_SLURPY_ARRAY && !(dest->sig & PARROT_ARG_NAME)) {
-        PMC * const  array = pmc_new(interp, enum_class_ResizablePMCArray);
+        PMC * const  array = pmc_new(interp,
+                Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray));
         const INTVAL idx   = st->dest.u.op.pc[dest->i];
 
         PARROT_ASSERT(idx >= 0);
