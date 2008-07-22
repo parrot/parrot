@@ -255,4 +255,5 @@ array set abort_after {
   tcltest-1.1          {}
   utf-1.4              {Invalid character for UTF-8 encoding}
   unixInit-1.1         {}
+  winpipe-1.1          {}
 }
