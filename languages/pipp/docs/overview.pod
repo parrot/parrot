@@ -29,7 +29,7 @@ Currently there are three variants:
 
 =head1 Status
 
-18 out of 1292 tests in the PHP 5.3.0 test suite pass for the PCT variant.
+20 out of 1322 tests in the PHP 5.3.0 test suite pass for the PCT variant.
 
 =head1 Dependencies
 
