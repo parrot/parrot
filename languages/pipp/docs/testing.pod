@@ -26,9 +26,9 @@ Something like this worked for me under Linux.
 
   # build PHP 5.3
   cd ~/devel/PHP/
-  wget http://snaps.php.net/php5.3-200807061430.tar.gz
-  tar xvzf php5.3-200807061430.tar.gz
-  cd php5.3-200807061430/
+  wget http://snaps.php.net/php5.3-200807221230.tar.gz
+  tar xvzf php5.3-200807221230.tar.gz
+  cd php5.3-200807221230/
   ./configure
   make
 
