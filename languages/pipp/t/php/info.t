@@ -74,7 +74,7 @@ language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'phpversion()' );
   echo phpversion(), "\n";
 ?>
 CODE
-/^5\.2/
+/^5\.3/
 OUTPUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'phpversion("ctype")' );

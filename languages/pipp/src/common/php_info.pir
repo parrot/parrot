@@ -194,7 +194,7 @@ STILL INCOMPLETE (see get_module_version).
     .local int argc
     argc = args
     if argc goto L1
-    .RETURN_STRING('5.2 on Parrot')
+    .RETURN_STRING('5.3 on Parrot')
   L1:
     unless argc == 1 goto L2
     .local string ext
