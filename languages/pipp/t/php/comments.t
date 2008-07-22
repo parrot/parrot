@@ -61,7 +61,7 @@ CODE
 asdf
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'three // comments', todo => 'broken' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'three // comments' );
 <?php
 //
 //
@@ -82,7 +82,7 @@ CODE
 asdf
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'three # comments', todo => 'broken' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'three # comments' );
 <?php
 #
 #
@@ -103,7 +103,7 @@ CODE
 asdf
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'one # and two // comments', todo => 'broken' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'one # and two // comments' );
 <?php
 #
 //
