@@ -30,36 +30,51 @@ our $current = _get_revision();
 sub update {
     my $prev = _get_revision();
     my $revision = _analyze_sandbox();
-    if (defined ($prev) && ($revision ne $prev)) {
-        $revision = 'unknown' unless defined $revision;
-        eval {
-            open my $FH, ">", $cache;
-            print $FH "$revision\n";
-            close $FH;
-            $current = $revision;
-        };
+    $current = _handle_update( {
+        prev        => $prev,
+        revision    => $revision,
+        cache       => $cache,
+        current     => $current,
+    } );
+}
+
+sub _handle_update {
+    my $args = shift;
+    if (! defined $args->{revision}) {
+        $args->{revision} = 'unknown';
+        _print_to_cache($args->{cache}, $args->{revision});
+        return $args->{revision};
     }
+    else {
+        if (defined ($args->{prev}) && ($args->{revision} ne $args->{prev})) {
+            _print_to_cache($args->{cache}, $args->{revision});
+            return $args->{revision};
+        }
+        else {
+            return $args->{current};
+        }
+    }
+}
+
+sub _print_to_cache {
+    my ($cache, $revision) = @_;
+    open my $FH, ">", $cache
+        or die "Unable to open handle to $cache for writing: $!";
+    print $FH "$revision\n";
+    close $FH or die "Unable to close handle to $cache after writing: $!";
 }
 
 sub _get_revision {
     my $revision;
     if (-f $cache) {
-        eval {
-            open my $FH, "<", $cache;
-            chomp($revision = <$FH>);
-            close $FH;
-        };
-        return $revision unless $@;
+        open my $FH, "<", $cache
+            or die "Unable to open $cache for reading: $!";
+        chomp($revision = <$FH>);
+        close $FH or die "Unable to close $cache after reading: $!";
     }
-
-    $revision = _analyze_sandbox();
-
-    if (! -f $cache) {
-        eval {
-            open my $FH, ">", $cache;
-            print $FH "$revision\n";
-            close $FH;
-        };
+    else {
+        $revision = _analyze_sandbox();
+        _print_to_cache($cache, $revision);
     }
     return $revision;
 }

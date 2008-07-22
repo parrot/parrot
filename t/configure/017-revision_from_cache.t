@@ -20,6 +20,23 @@ use lib qw( lib );
 my $cwd = cwd();
 {
     my $rev = 16000;
+    my ($cache, $libdir) = setup_cache($rev, $cwd);
+    require Parrot::Revision;
+    no warnings 'once';
+    is($Parrot::Revision::current, $rev,
+        "Got expected revision number from cache");
+    use warnings;
+    unlink qq{$libdir/Parrot/Revision.pm}
+        or croak "Unable to delete file after testing";
+    ok( chdir $cwd, "Able to change back to starting directory");
+}
+
+pass("Completed all tests in $0");
+
+##### SUBROUTINES #####
+
+sub setup_cache {
+    my ($rev, $cwd) = @_;
     my $tdir = tempdir( CLEANUP => 1 );
     ok( chdir $tdir, "Changed to temporary directory for testing" );
     my $libdir = qq{$tdir/lib};
@@ -34,17 +51,8 @@ my $cwd = cwd();
         or croak "Unable to open $cache for writing";
     print $FH qq{$rev\n};
     close $FH or croak "Unable to close $cache after writing";
-    require Parrot::Revision;
-    no warnings 'once';
-    is($Parrot::Revision::current, $rev,
-        "Got expected revision number from cache");
-    use warnings;
-    unlink qq{$libdir/Parrot/Revision.pm}
-        or croak "Unable to delete file after testing";
-    ok( chdir $cwd, "Able to change back to starting directory");
+    return ($cache, $libdir);
 }
-
-pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
 
