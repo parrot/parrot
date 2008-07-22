@@ -18,7 +18,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
 # core Perl modules
-use Test::More     tests => 5;
+use Test::More     tests => 10;
 
 # Parrot modules
 use Parrot::Test;
@@ -51,9 +51,61 @@ CODE
 Hello, World!
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'three end of line comments', todo => 'broken' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'two // comments' );
 <?php
 //
+//
+echo "asdf\n";
+?>
+CODE
+asdf
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'three // comments', todo => 'broken' );
+<?php
+//
+//
+//
+echo "asdf\n";
+?>
+CODE
+asdf
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'two # comments' );
+<?php
+#
+#
+echo "asdf\n";
+?>
+CODE
+asdf
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'three # comments', todo => 'broken' );
+<?php
+#
+#
+#
+echo "asdf\n";
+?>
+CODE
+asdf
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'one # and one // comment' );
+<?php
+#
+//
+echo "asdf\n";
+?>
+CODE
+asdf
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'one # and two // comments', todo => 'broken' );
+<?php
+#
 //
 //
 echo "asdf\n";
