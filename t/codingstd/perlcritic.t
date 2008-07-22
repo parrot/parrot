@@ -19,7 +19,7 @@ if ($@) {
   give_up('Test::Perl::Critic');
 }
 
-my $minimum_version = 1.086;
+my $minimum_version = 1.090;
 if ($Perl::Critic::VERSION < $minimum_version) {
   give_up("Perl::Critic version $minimum_version");
 }
