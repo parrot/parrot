@@ -9,7 +9,7 @@ float4.pir - Benchmark different ways of filling a float4 struct
 
 =head1 DESCRIPTION
 
-This benchmark compares 4 different ways of defining and filling a float4
+This benchmark compares 5 different ways of defining and filling a float4
 structure (a common vector length, especially for graphics).
 
 =cut
@@ -73,6 +73,24 @@ structure (a common vector length, especially for graphics).
     .local num start, stop, elapsed
     .local pmc float4
     .local int i
+
+    # Time named struct elements treated as array
+    float4  = new 'ManagedStruct', named_struct
+    i       = count
+    start   = time
+
+  named_struct_array_loop:
+    float4[0] = start
+    float4[1] = start
+    float4[2] = start
+    float4[3] = start
+    dec i
+    if i goto named_struct_array_loop
+
+    stop    = time
+    elapsed = stop - start
+    print 'Array Struct: '
+    say elapsed
 
     # Time struct element per array element
     float4  = new 'ManagedStruct', struct
