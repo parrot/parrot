@@ -14,8 +14,8 @@
   argc = elements argv
   if argc == 0 goto bad_args
 
-  .local pmc __script, __call_level
-  __script        = get_root_global ['_tcl'], '__script'
+  .local pmc compileTcl, __call_level
+  compileTcl        = get_root_global ['_tcl'], 'compileTcl'
   __call_level    = get_root_global ['_tcl'], '__call_level'
 
   # save the old call level
@@ -56,7 +56,7 @@ save_chain_end:
   # if we get an exception, we have to reset the environment
   .local pmc retval
   push_eh restore_and_rethrow
-    $P0 = __script($S0)
+    $P0 = compileTcl($S0)
     retval = $P0()
   pop_eh
 

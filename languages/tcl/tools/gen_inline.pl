@@ -38,10 +38,10 @@ our %conversions = (
     # type     subroutine
     bool    => 'toBoolean',
     channel => '__channel',
-    expr    => '__expr',
+    expr    => 'compileExpr',
     int     => 'toInteger',
     list    => 'toList',
-    script  => '__script',
+    script  => 'compileTcl',
     var     => 'readVar',
 );
 

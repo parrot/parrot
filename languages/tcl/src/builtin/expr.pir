@@ -27,12 +27,12 @@ loop:
 end:
   arg = join ' ', raw_args
 
-  .local pmc __expr
-  __expr = get_root_global ['_tcl'], '__expr'
+  .local pmc compileExpr
+  compileExpr = get_root_global ['_tcl'], 'compileExpr'
 
   # make sure errors happen at runtime
   push_eh exception
-    ($P0, $S0) = __expr(arg, 'pir_only'=>1)
+    ($P0, $S0) = compileExpr(arg, 'pir_only'=>1)
   pop_eh
   pir = new 'CodeString'
   pir .= $P0

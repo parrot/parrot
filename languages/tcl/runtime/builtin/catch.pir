@@ -16,15 +16,15 @@
   $P0 = getinterp
   ns = $P0['namespace'; 1]
 
-  .local pmc __script
-  __script = get_root_global ['_tcl'], '__script'
+  .local pmc compileTcl
+  compileTcl = get_root_global ['_tcl'], 'compileTcl'
 
   if argc == 0 goto bad_args
   if argc  > 3 goto bad_args
 
   code = argv[0]
   push_eh non_ok
-    $P2 = __script(code, 'ns' => ns)
+    $P2 = compileTcl(code, 'ns' => ns)
     code_retval = $P2()
     retval = .CONTROL_OK
   pop_eh

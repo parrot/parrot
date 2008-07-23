@@ -17,16 +17,16 @@
   $P0 = getinterp
   ns  = $P0['namespace'; 1]
 
-  .local pmc toList, __script, setVar
+  .local pmc toList, compileTcl, setVar
   toList   = get_root_global ['_tcl'], 'toList'
-  __script = get_root_global ['_tcl'], '__script'
+  compileTcl = get_root_global ['_tcl'], 'compileTcl'
   setVar    = get_root_global ['_tcl'], 'setVar'
 
   .local pmc varLists, lists, command
   varLists = new 'TclList'
   lists    = new 'TclList'
   command  = pop argv
-  command  = __script(command, 'ns'=>ns)
+  command  = compileTcl(command, 'ns'=>ns)
 
   .local int iterations
   iterations = 0

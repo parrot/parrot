@@ -10,9 +10,9 @@
     if argc < 2 goto badargs
     if argc > 3 goto badargs
 
-    .local pmc __channel, __script
+    .local pmc __channel, compileTcl
     __channel = get_root_global ['_tcl'], '__channel'
-    __script  = get_root_global ['_tcl'], '__script'
+    compileTcl  = get_root_global ['_tcl'], 'compileTcl'
 
     .local pmc channel, script
     .local string event
@@ -32,7 +32,7 @@ readable:
 
     .local pmc script
     script = args[2]
-    script = __script(script)
+    script = compileTcl(script)
 
     .local pmc events
     events = get_root_global ['_tcl'], 'events'

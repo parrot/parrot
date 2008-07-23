@@ -261,11 +261,11 @@ bad_args:
   namespace .= "']"
 
 global_ns:
-  .local pmc __script, code
-  __script = get_root_global ['_tcl'], '__script'
+  .local pmc compileTcl, code
+  compileTcl = get_root_global ['_tcl'], 'compileTcl'
   code     = new 'CodeString'
   $S0 = join ' ', argv
-  ($S0, $S1) = __script($S0, 'pir_only'=>1)
+  ($S0, $S1) = compileTcl($S0, 'pir_only'=>1)
   $I0 = code.unique()
   code.emit(<<'END_PIR', namespace, $S0, $I0, $S1)
 .HLL 'tcl', 'tcl_group'

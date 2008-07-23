@@ -21,9 +21,9 @@ Create a PIR sub on the fly for this user defined proc.
   args      = argv[1]
   body      = argv[2]
 
-  .local pmc pir_compiler, __script, toList, __namespace
+  .local pmc pir_compiler, compileTcl, toList, __namespace
   pir_compiler = compreg 'PIR'
-  __script     = get_root_global ['_tcl'], '__script'
+  compileTcl     = get_root_global ['_tcl'], 'compileTcl'
   toList       = get_root_global ['_tcl'], 'toList'
   __namespace  = get_root_global ['_tcl'], '__namespace'
 
@@ -204,7 +204,7 @@ END_PIR
 
   # Save the parsed body.
   .local string parsed_body, body_reg
-  (parsed_body, body_reg) = __script(body, 'pir_only'=>1)
+  (parsed_body, body_reg) = compileTcl(body, 'pir_only'=>1)
 
   code .= parsed_body
 

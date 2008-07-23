@@ -24,9 +24,9 @@
   interp = getinterp
   ns = interp['namespace';1]
 
-  .local pmc __script, code
-  __script = get_root_global ['_tcl'], '__script'
-  code = __script ( file_contents, 'ns' => ns, 'bsnl' => 1)
+  .local pmc compileTcl, code
+  compileTcl = get_root_global ['_tcl'], 'compileTcl'
+  code = compileTcl ( file_contents, 'ns' => ns, 'bsnl' => 1)
 
   .return code()
 

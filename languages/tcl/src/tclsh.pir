@@ -42,8 +42,8 @@
   tcl_interactive = new 'Integer'
   store_global '$tcl_interactive', tcl_interactive
 
-  .local pmc __script
-  __script = get_root_global ['_tcl'], '__script'
+  .local pmc compileTcl
+  compileTcl = get_root_global ['_tcl'], 'compileTcl'
 
   .local pmc get_options
   get_options = new 'Getopt::Obj'
@@ -87,14 +87,14 @@ input_loop:
   $S0 = $P0
   $S0 .= "\n" # add back in the newline the prompt chomped
   input_line .= $S0
-  # could probably avoid calling __script 2x here...
+  # could probably avoid calling compileTcl 2x here...
   unless dump_only goto execute_line
   .local string _pir
-  _pir = __script(input_line, 'pir_only'=>1, 'bsnl'=>1)
+  _pir = compileTcl(input_line, 'pir_only'=>1, 'bsnl'=>1)
   say _pir
 execute_line:
   push_eh loop_error
-    $P2 = __script(input_line)
+    $P2 = compileTcl(input_line)
     retval = $P2()
   pop_eh
   # print out the result of the evaluation.
@@ -137,14 +137,14 @@ file:
   .set_tcl_argv()
   unless dump_only goto run_file
   push_eh file_error
-    ($S0,$I0) = __script(contents, 'pir_only'=>1, 'bsnl'=>1, 'wrapper'=>1)
+    ($S0,$I0) = compileTcl(contents, 'pir_only'=>1, 'bsnl'=>1, 'wrapper'=>1)
   pop_eh
   print $S0
   goto done
 
 run_file:
   push_eh file_error
-    $P2 = __script(contents, 'bsnl' => 1)
+    $P2 = compileTcl(contents, 'bsnl' => 1)
     $P2()
   pop_eh
   goto done
@@ -161,14 +161,14 @@ oneliner:
   .local string tcl_code
   tcl_code = opt['e']
   if dump_only goto oneliner_dump
-  $P3 = __script(tcl_code)
+  $P3 = compileTcl(tcl_code)
   push_eh file_error
     $P3()
   pop_eh
   goto done
 
 oneliner_dump:
-  ($S0,$I0) = __script(tcl_code, 'pir_only'=>1, 'bsnl'=>1, 'wrapper'=>1)
+  ($S0,$I0) = compileTcl(tcl_code, 'pir_only'=>1, 'bsnl'=>1, 'wrapper'=>1)
   print $S0
 
 done:
@@ -219,15 +219,15 @@ got_prompt:
   $S0 = level
   varname .= $S0
 
-  .local pmc __script
-  __script = get_root_global ['_tcl'], '__script'
+  .local pmc compileTcl
+  compileTcl = get_root_global ['_tcl'], 'compileTcl'
 
   # XXX Should trap the printed output here, and then display
   # it using the readilne prompt, like everything else.
   # XXX Should be testing this
   push_eh no_prompt
     $P0 = find_global varname
-    $P2 = __script($P0)
+    $P2 = compileTcl($P0)
     $P2()
   pop_eh
 

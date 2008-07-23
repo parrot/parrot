@@ -204,9 +204,9 @@ bad_args:
   options[1] = 'script'
   options[2] = 'value'
 
-  .local pmc select_option, __script, toBoolean
+  .local pmc select_option, compileTcl, toBoolean
   select_option  = get_root_global ['_tcl'], 'select_option'
-  __script  = get_root_global ['_tcl'], '__script'
+  compileTcl  = get_root_global ['_tcl'], 'compileTcl'
   toBoolean  = get_root_global ['_tcl'], 'toBoolean'
   .local pmc option
   option = shift argv
@@ -270,7 +270,7 @@ do_script_prelude:
   .local pmc retval
   retval = new 'TclDict'
   .local pmc body_proc
-  body_proc = __script(body)
+  body_proc = compileTcl(body)
 
   .local pmc check_key,check_value
 script_loop:
@@ -321,7 +321,7 @@ bad_args:
 
   .local pmc set, script
   set     = get_root_global ['_tcl'], 'setVar'
-  script  = get_root_global ['_tcl'], '__script'
+  script  = get_root_global ['_tcl'], 'compileTcl'
 
   .local pmc varNames
   .local string keyVar, valueVar
@@ -339,7 +339,7 @@ bad_args:
 
   .local pmc body,code
   body = shift argv
-  code = __script(body)
+  code = compileTcl(body)
 
   .local pmc iterator
   iterator = new 'Iterator', dictionary
@@ -903,7 +903,7 @@ key_loop:
 done_key_loop:
 # run the body of the script. save the return vaalue.
   .local pmc retval
-  $P1 = __script(body)
+  $P1 = compileTcl(body)
   retval = $P1()
 
 # go through the varnames, setting the appropriate keys to those values.
@@ -1028,7 +1028,7 @@ alias_keys:
   goto alias_keys
 done_alias:
   .local pmc retval
-  $P1 = __script(body)
+  $P1 = compileTcl(body)
   retval = $P1()
 
   iterator = new 'Iterator', dictionary

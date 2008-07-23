@@ -242,7 +242,7 @@ env_loop_done:
   set_hll_global 'colons', colons
 
   # register the TCL compiler.
-  $P1 = get_root_global ['_tcl'], '__script'
+  $P1 = get_root_global ['_tcl'], 'compileTcl'
   compreg 'TCL', $P1
 
   # Setup a global to keep a unique id for compiled subs.

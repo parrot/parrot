@@ -142,9 +142,9 @@ fallthrough:
   code = shift body
 body_match:
   if code == '-' goto fallthrough
-  .local pmc __script
-  __script = get_root_global ['_tcl'], '__script'
-  $P1 = __script(code)
+  .local pmc compileTcl
+  compileTcl = get_root_global ['_tcl'], 'compileTcl'
+  $P1 = compileTcl(code)
   .return $P1()
 
 extra_pattern:

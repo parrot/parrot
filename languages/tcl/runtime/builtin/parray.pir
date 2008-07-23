@@ -26,7 +26,7 @@
   $P99 = open $S0, '<'
   $S0 = $P99.'slurp'('')
 
-  script = get_root_global ['_tcl'], '__script'
+  script = get_root_global ['_tcl'], 'compileTcl'
 
   # compile to PIR and put the sub in place...
   $P1 = script($S0)

@@ -151,7 +151,7 @@ bad_args:
   .local pmc body
   body = argv[0]
   push_eh nope
-    $P1 = __script(body)
+    $P1 = compileTcl(body)
   pop_eh
   .return(1)
 

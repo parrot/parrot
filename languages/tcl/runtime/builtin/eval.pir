@@ -18,12 +18,12 @@
   $P0 = getinterp
   ns  = $P0['namespace'; 1]
 
-  .local pmc __script
-  __script = get_root_global ['_tcl'], '__script'
+  .local pmc compileTcl
+  compileTcl = get_root_global ['_tcl'], 'compileTcl'
 
   .local string code
   code = join ' ', argv
-  $P2  = __script(code, 'ns'=>ns)
+  $P2  = compileTcl(code, 'ns'=>ns)
   .return $P2()
 
 bad_args:

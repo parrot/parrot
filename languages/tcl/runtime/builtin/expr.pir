@@ -14,8 +14,8 @@
   .local int argc
   .local int looper
 
-  .local pmc __expr
-  __expr = get_root_global ['_tcl'], '__expr'
+  .local pmc compileExpr
+  compileExpr = get_root_global ['_tcl'], 'compileExpr'
 
   expr = ''
   looper = 0
@@ -29,7 +29,7 @@ loop_done:
   $P0 = getinterp
   ns  = $P0['namespace'; 1]
 
-  $P1 = __expr(expr, 'ns'=>ns)
+  $P1 = compileExpr(expr, 'ns'=>ns)
   $P2 = $P1()
   .return ($P2)
 

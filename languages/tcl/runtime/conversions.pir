@@ -283,13 +283,13 @@ bad_channel:
 
 .end
 
-=head2 _Tcl::__expr
+=head2 _Tcl::compileExpr
 
 Given an expression, return a subroutine, or optionally, the raw PIR
 
 =cut
 
-.sub __expr
+.sub compileExpr
     .param string expression
     .param int    pir_only :named('pir_only') :optional
     .param pmc    ns       :named('ns')       :optional
@@ -372,13 +372,13 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     tcl_error "empty expression\nin expression \"\""
 .end
 
-=head2 _Tcl::__script
+=head2 _Tcl::compileTcl
 
 Given a chunk of tcl code, return a subroutine.
 
 =cut
 
-.sub __script
+.sub compileTcl
     .param string code
     .param int    pir_only    :named('pir_only') :optional
     .param pmc    ns          :named('ns')       :optional
