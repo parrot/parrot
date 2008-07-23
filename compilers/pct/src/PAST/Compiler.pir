@@ -72,6 +72,7 @@ any value type.
     piropsig['n_shl']    = 'PP+'
     piropsig['n_shr']    = 'PP+'
     piropsig['n_sub']    = 'PP+'
+    piropsig['pow']      = 'NN+'
     piropsig['print']    = 'v*'
     piropsig['set']      = 'PP'
     set_global '%piropsig', piropsig
