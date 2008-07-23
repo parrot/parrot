@@ -11,6 +11,22 @@ print do { local $/; <DATA> };
 __END__
 #! parrot
 
+=head1 TITLE
+
+pbc_to_exe
+
+=head2 SYNOPSIS
+
+  pbc_to_exe my.pbc
+  => my.exe
+
+  pbc_to_exe my.pbc --install
+  => installable_my.exe
+
+Warning! With -install there must be no directory prefix in the first arg yet.
+
+=cut
+
 .include 'library/config.pir'
 
 .sub 'main' :main
@@ -54,7 +70,39 @@ __END__
     argc = args
 
     if argc == 2 goto proper_args
+    if argc == 3 goto check_install
     .return ()
+
+check_install:
+    .local string infile, install
+
+    $P0    = shift args
+    infile = shift args
+    install = shift args
+    if install == '--install' goto proper_install
+    .return ()
+
+proper_install:
+    .local string cfile, objfile, obj, exefile, exe
+
+    $P0    = '_config'()
+    obj    = $P0['o']
+    exe    = $P0['exe']
+
+    .local int infile_len
+    infile_len  = length infile
+    infile_len -= 3
+
+    cfile       = substr infile, 0, infile_len
+    cfile      .= 'c'
+
+    dec infile_len
+    objfile     = substr infile, 0, infile_len
+    exefile     = 'installable_'
+    exefile    .= objfile
+    exefile    .= exe
+    objfile    .= obj
+    .return(infile, cfile, objfile, exefile)
 
 proper_args:
     .local string infile, cfile, objfile, obj, exefile, exe
@@ -270,6 +318,7 @@ END_BODY
 .sub 'compile_file'
     .param string cfile
     .param string objfile
+    .param int install :optional
 
     $P0 = '_config'()
     .local string cc, ccflags, cc_o_out, osname, build_dir, slash
@@ -318,6 +367,7 @@ END_BODY
 .sub 'link_file'
     .param string objfile
     .param string exefile
+    .param int install :optional
 
     $P0 = '_config'()
     .local string cc, ld, link_dynamic, linkflags, ld_out, libparrot, libs, o
@@ -336,11 +386,17 @@ END_BODY
     slash        = $P0['slash']
     icushared    = $P0['icu_shared']
 
-    .local string config, pathquote
+    .local string config, pathquote, exeprefix
+    exeprefix = substr exefile, 0, 12
     config     = concat build_dir, slash
     config    .= 'src'
     config    .= slash
+    if exeprefix == 'installable_' goto config_install
     config    .= 'parrot_config'
+    goto config_cont
+ config_install:
+    config    .= 'install_config'
+ config_cont:
     config    .= o
     pathquote  = ''
     unless osname == 'MSWin32' goto not_windows
@@ -361,6 +417,8 @@ END_BODY
     link .= objfile
     link .= pathquote
     link .= ' '
+    link .= config
+    link .= ' '
     link .= rpath
     link .= ' '
     link .= libparrot
@@ -372,8 +430,6 @@ END_BODY
     link .= libs
     link .= ' '
     link .= icushared
-    link .= ' '
-    link .= config
 
     say link
     .local int status
