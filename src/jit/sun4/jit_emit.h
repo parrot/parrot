@@ -183,11 +183,11 @@
 
 /* op r[rs1], r[rs2], r[rd] */
 #  define emitm_logic_r(pc, op3, rs1, rs2, rd) \
-    emitm_3a(pc, 2, rd, op3, rs1, 0, rs2)
+    emitm_3a((pc), 2, (rd), (op3), (rs1), 0, (rs2))
 
 /* op r[rs1], simm13, r[rd] */
 #  define emitm_logic_i(pc, op3, rs1, simm13, rd) \
-    emitm_3b(pc, 2, rd, op3, rs1, simm13)
+    emitm_3b((pc), 2, (rd), (op3), (rs1), (simm13))
 
 #  define emitm_and_r(pc, rs1, rs2, rd)    emitm_logic_r((pc), 001, (rs1), (rs2), (rd))
 #  define emitm_andcc_r(pc, rs1, rs2, rd)  emitm_logic_r((pc), 021, (rs1), (rs2), (rd))
@@ -323,8 +323,8 @@
 
 #  define jit_emit_mov_rr_i(pc, dst, src) emitm_mov_r((pc), (src), (dst))
 #  define jit_emit_mov_rr_n(pc, dst, src) { \
-    emitm_fmovs(pc, src, dst); \
-    emitm_fmovs(pc, (src)+1, (dst)+1); }
+    emitm_fmovs((pc), (src), (dst)); \
+    emitm_fmovs((pc), (src)+1, (dst)+1); }
 
 /*
 void main(){
@@ -375,11 +375,11 @@ enum  {JIT_BRANCH, JIT_CALL30 };
 
 /* interp->code */
 #  define jit_emit_load_coderef(pc, reg) \
-    emitm_ld_i(jit_info->native_ptr, Parrot_jit_intrp, offsetof(Interp, code), reg); \
+    emitm_ld_i(jit_info->native_ptr, Parrot_jit_intrp, offsetof(Interp, code), (reg)); \
 
 /* Load op_map address */
 #  define jit_emit_load_op_map(pc, code) \
-    emitm_ld_i(jit_info->native_ptr, code,                                         \
+    emitm_ld_i(jit_info->native_ptr, (code),                                         \
         offsetof(PackFile_ByteCode, jit_info), XSR1);                       \
     emitm_ld_i(jit_info->native_ptr, XSR1,                                         \
       (offsetof(Parrot_jit_arena_t, op_map) + offsetof(Parrot_jit_info_t, arena)), \
@@ -387,7 +387,7 @@ enum  {JIT_BRANCH, JIT_CALL30 };
 
 /* Construct the starting address of the byte code (code start) */
 #  define jit_emit_load_code_start(pc, code) \
-    emitm_ld_i(jit_info->native_ptr, code, offsetof(PackFile_Segment, data), \
+    emitm_ld_i(jit_info->native_ptr, (code), offsetof(PackFile_Segment, data), \
                XSR1);
 
 /* Generate a jump to a bytecode address in reg_num
@@ -457,11 +457,11 @@ static void Parrot_jit_branch(Parrot_jit_info_t *jit_info, int branch, int cond,
 
 /* Generate branch on integer condition codes */
 #  define Parrot_jit_bicc(jit_info, cond, annul, disp) \
-        Parrot_jit_branch(jit_info, emitm_icc, cond, annul, disp)
+        Parrot_jit_branch((jit_info), emitm_icc, (cond), (annul), (disp))
 
 /* Generate branch on floating-point condition codes */
 #  define Parrot_jit_fbfcc(jit_info, cond, annul, disp) \
-        Parrot_jit_branch(jit_info, emitm_fcc, cond, annul, disp)
+        Parrot_jit_branch((jit_info), emitm_fcc, (cond), (annul), (disp))
 
 /* This function loads a value */
 static void jit_emit_load_i(Parrot_jit_info_t *jit_info,

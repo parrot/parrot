@@ -25,4 +25,6 @@ Otherwise I run the tests that were passed on the command line.
 
 =cut
 
-use Parrot::Test::Harness language => 'ook';
+use Parrot::Test::Harness
+    language => 'ook',
+    files     => [ 't/*.t' ];

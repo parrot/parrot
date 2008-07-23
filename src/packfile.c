@@ -352,7 +352,10 @@ PackFile_destroy(PARROT_INTERP, ARGMOD_NULLOK(PackFile *pf))
 #ifdef PARROT_HAS_HEADER_SYSMMAN
     if (pf->is_mmap_ped) {
         DECL_CONST_CAST;
-        munmap(PARROT_const_cast(opcode_t *, pf->src), pf->size);
+        /* Cast the result to void to avoid a warning with
+         * some not-so-standard mmap headers, see RT#56110
+         */
+        munmap((void *)PARROT_const_cast(opcode_t *, pf->src), pf->size);
     }
 #endif
 
@@ -879,7 +882,10 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     if (self->is_mmap_ped
     && (self->need_endianize || self->need_wordsize)) {
         DECL_CONST_CAST;
-        munmap(PARROT_const_cast(opcode_t *, self->src), self->size);
+        /* Cast the result to void to avoid a warning with
+         * some not-so-standard mmap headers, see RT#56110
+         */
+        munmap((void *)PARROT_const_cast(opcode_t *, self->src), self->size);
         self->is_mmap_ped = 0;
     }
 #endif

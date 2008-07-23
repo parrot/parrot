@@ -10,13 +10,17 @@ Parrot::Harness::Smoke - Subroutines used by F<t/harness> to generate smoke repo
 This package exports on request subroutines used by F<t/harness> to generate
 smoke reports.
 
-Currently, only one such subroutine is supported:
+Following subroutines are supported:
 
     generate_html_smoke_report (
         tests       => \@tests,
         args        => $args,
         file        => 'smoke.html',
     );
+
+    my %env_data = collect_test_environment_data();
+
+    send_archive_to_smolder( %env_data );
 
 =cut
 
@@ -30,6 +34,7 @@ use Parrot::Config qw/%PConfig/;
 use base qw( Exporter );
 our @EXPORT_OK = qw(
     generate_html_smoke_report
+    collect_test_environment_data
     send_archive_to_smolder
 );
 
@@ -41,39 +46,70 @@ my %SMOLDER_CONFIG = (
 );
 
 sub send_archive_to_smolder {
+    my %test_env_data = @_;
     eval { require LWP::UserAgent };
     if( $@ ) {
         die "\n" . ('-' x 55) . "\nCould not load LWP::UserAgent."
-            . "\nPlease install it if you want to send TAP archives smolder.\n"
+            . "\nPlease install it if you want to send TAP archives to Smolder.\n"
             . ('-' x 55) . "\n\n$@\n";
     }
 
-    # get the comments from svn
-    my @lines = grep { $_ =~ /URL|Revision|LastChanged/ } `svn info`;
-    push @lines, `$^X -v | grep -i 'this is perl'`;
-    chomp @lines;
-    my $comments = join("\n", @lines);
-
-    my $url = "$SMOLDER_CONFIG{server}/app/developer_projects/process_add_report/$SMOLDER_CONFIG{project_id}";
+    my $url = $SMOLDER_CONFIG{server}
+      . '/app/developer_projects/process_add_report/'
+      . $SMOLDER_CONFIG{project_id};
     my $ua = LWP::UserAgent->new();
+
+    # create our tags based off the test environment information
+    my $tags = join(',',
+        (map { $test_env_data{$_} } qw(Architecture Compiler Platform Version)),
+        'Perl ' . $test_env_data{'Perl Version'});
     my $response = $ua->post(
         $url,
         Content_Type => 'form-data',
         Content      => [
-            architecture => $PConfig{cpuarch},
-            platform     => $PConfig{osname},
-            comments     => $comments,
             username     => $SMOLDER_CONFIG{username},
             password     => $SMOLDER_CONFIG{password},
+            tags         => $tags,
             report_file  => ['parrot_test_run.tar.gz'],
         ]
     );
 
-    if ($response->code != 302) {
+    if ($response->code == 302) {
+        my ($report_id) = $response->content =~ /Reported #(\d+) added/i;
+        my $report_url = "$SMOLDER_CONFIG{server}/app/public_projects/report_details/$report_id";
+        my $project_url = $SMOLDER_CONFIG{server}
+          . '/app/public_projects/smoke_reports/'
+          . $SMOLDER_CONFIG{project_id};
+        print "Test report successfully sent to Smolder at\n$report_url"
+            . "\nYou can see other recent reports at\n$project_url.\n\n";
+    }
+    else {
         die "Could not upload report to Smolder at $SMOLDER_CONFIG{server}"
             . "\nHTTP CODE: " . $response->code . " ("
             .  $response->message . ")\n";
     }
+}
+
+sub collect_test_environment_data {
+    return (
+        'Architecture' => $PConfig{cpuarch},
+        'Compiler'     => _get_compiler_version(),
+        'DEVEL'        => $PConfig{DEVEL},
+        'Optimize'     => ($PConfig{optimize} || 'none'),
+        'Perl Version' => (sprintf('%vd', $^V) . " $PConfig{archname}"),
+        'Platform'     => $PConfig{osname},
+        'SVN Revision' => $PConfig{revision},
+        'Version'      => $PConfig{VERSION},
+    );
+}
+
+# this can be expanded to more than just GCC
+sub _get_compiler_version {
+    my $compiler = $PConfig{cc};
+    if($compiler eq 'gcc') {
+        $compiler .= " $PConfig{gccversion}";
+    }
+    return $compiler;
 }
 
 sub generate_html_smoke_report {

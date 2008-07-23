@@ -9,13 +9,13 @@ This is the grammar for ChitChat written as a sequence of Perl 6 rules.
 grammar ChitChat::Grammar is PCT::Grammar;
 
 token TOP {
-    <ws>
+    <.ws>
     [ | <exprs>
       | <methods>
       | '!'
     ]+
-    <ws>
-    [ $ || <panic: 'Syntax error'> ]
+    <.ws>
+    [ $ || <.panic: 'Syntax error'> ]
     {*}
 }
 
@@ -33,18 +33,20 @@ rule methods {
 
 rule method {
     <message> <pragma>? <temps>? <exprs>
+    {*}
 }
 
 token message {
-    | <id>
-    | <binsel> <.ws> <id>
-    | [<keysel> <.ws> <id>]+
+    | <id> {*}                      #= id
+    | <binsel> <.ws> <id> {*}       #= binsel
+    | [<keysel> <.ws> <id>]+ {*}    #= keysel
 }
 
 token pragma { '<' <keymsg> '>' }
 
 rule temps {
     '|' [<id> ]* '|'
+    {*}
 }
 
 token unit {
@@ -61,8 +63,8 @@ rule unaryexpr {
 }
 
 token primary {
-    | <!unaryexpr> <unit> {*}
-    | <unaryexpr> {*}
+    | <!unaryexpr> <unit> {*}   #= unit
+    | <unaryexpr> {*}           #= unaryexpr
 }
 
 rule exprs {
@@ -79,29 +81,30 @@ rule expr {
 }
 
 rule expr2 {
-    [ <msgexpr> [ ';' <cascade> ]* | <primary> ]
-    {*}
+    | <msgexpr> [ ';' <cascade> ]* {*}     #= msgexpr
+    | <primary> {*}                        #= primary
 }
 
 token msgexpr {
-    | <keyexpr>      {*}  #= keyexpr
     | <binexpr>      {*}  #= binexpr
+    | <keyexpr>      {*}  #= keyexpr
     | <unaryexpr>    {*}  #= unaryexpr
 }
 
 token cascade {
-    | <id>
-    | <binmsg>
-    | <keymsg>
+    | <id> {*}            #= id
+    | <binmsg> {*}        #= binmsg
+    | <keymsg> {*}        #= keymsg
 }
 
 rule binexpr {
-    <primary> <binmsg> [<binmsg> ]*
+    <primary> <binmsg>+
     {*}
 }
 
 rule binmsg {
     <binsel> <primary>
+    {*}
 }
 
 token binsel { <binchar>**{1..2} }
@@ -112,8 +115,8 @@ rule keyexpr {
 }
 
 token keyexpr2 {
-    | <!binexpr> <primary> {*}
-    | <binexpr> {*}
+    | <!binexpr> <primary> {*}      #= primary
+    | <binexpr> {*}                 #= binexpr
 }
 
 rule keymsg {
@@ -125,7 +128,7 @@ token keysel { <id> ':' }
 
 rule block {
     '[' [[':' <id>]* '|']? <temps>? <exprs> ']'
-
+    {*}
 }
 
 token arrayconstructor {
@@ -152,11 +155,19 @@ token bytearray {
 }
 
 rule array {
-    '(' [ <literal> | <array> | <bytearray> | <arraysym> ]* ')'
+    '(' <arrayelem>* ')'
+}
+
+rule arrayelem {
+    | <literal>       {*}  #= literal
+    | <array>         {*}  #= array
+    | <bytearray>     {*}  #= bytearray
+    | <arraysym>      {*}  #= arraysym
 }
 
 token number {
     [<.digit>+ 'r']? '-'? <.alnum>+ ['.' <.alnum>+]? [<exp> '-'? <dig>+]?
+    {*}
 }
 
 token string {

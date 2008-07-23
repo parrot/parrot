@@ -47,7 +47,7 @@ my $pkg = q{inter::progs};
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 
-$task        = $conf->steps->[3];
+$task        = $conf->steps->[-1];
 $step_name   = $task->step;
 
 $step = $step_name->new();

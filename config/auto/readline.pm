@@ -89,7 +89,7 @@ sub _handle_ncurses_need {
     my ($conf, $osname, $cc) = @_;
     if ( $osname =~ /mswin32/i ) {
         if ( $cc =~ /^gcc/i ) {
-            $conf->data->add( ' ', libs => '-lncuses' );
+            $conf->data->add( ' ', libs => '-lncurses' );
         }
         else {
             $conf->data->add( ' ', libs => 'ncurses.lib' );

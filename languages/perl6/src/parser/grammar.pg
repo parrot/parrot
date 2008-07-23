@@ -1,4 +1,4 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =begin Introduction
@@ -353,7 +353,7 @@ rule trait {
 
 rule trait_auxiliary {
     | $<sym>=[is] <name><postcircumfix>?
-    | $<sym>=[does] <role_name>
+    | $<sym>=[does] <name>['['<EXPR>']']?
     | $<sym>=[will] <ident> <block>
 }
 
@@ -361,8 +361,6 @@ rule trait_verb {
     | $<sym>=[of|returns] <typename>
     | $<sym>=[handles] <EXPR>
 }
-
-token role_name { <name> [ <?before '['> <postcircumfix> ]? }
 
 token capterm {
     '\\(' <capture> ')'
@@ -384,7 +382,19 @@ token signature {
 }
 
 token sigterm {
-    ':(' <signature> [ ')' || <.panic: "Missing right parenthesis in signature"> ]
+    ':(' 
+    {{
+        $P0 = new 'Integer'
+        $P0 = 1
+        set_global [ 'Perl6' ; 'Grammar' ; 'Actions' ], '$?SIG_BLOCK_NOT_NEEDED', $P0
+    }}
+    <signature>
+    {{
+        $P0 = new 'Integer'
+        $P0 = 0
+        set_global [ 'Perl6' ; 'Grammar' ; 'Actions' ], '$?SIG_BLOCK_NOT_NEEDED', $P0
+    }}
+    [ ')' || <.panic: "Missing right parenthesis in signature"> ]
     {*}
 }
 
@@ -431,7 +441,7 @@ rule default_value {
 }
 
 token param_var {
-    <sigil> <ident>
+    <sigil> <twigil>? <ident>
     {*}
 }
 
@@ -537,7 +547,7 @@ token term {
 
 ##  XXX: cheat until we get term:pi, term:rand, term:undef, etc.
 token named_0ary {
-    [pi|rand|undef] >>
+    [pi|rand|undef|nothing] >>
 }
 
 rule package_declarator {
@@ -551,13 +561,13 @@ rule package_declarator {
 
 
 rule package_def {
-    <name> <trait>* {*}                          #= open
+    <name>? <trait>* {*}                         #= open
     <package_block> {*}                          #= close
 }
 
 
 rule role_def {
-    <role_name> <trait>* {*}                     #= open
+    <name>['['<signature>']']? <trait>* {*}      #= open
     <package_block> {*}                          #= close
 }
 
@@ -594,7 +604,19 @@ rule enum_declarator {
 token declarator {
     [
     | <variable_declarator>
-    | '(' <signature> [ ')' || <.panic: "Missing right parenthsesis after signature"> ]
+    | '(' 
+      {{
+          $P0 = new 'Integer'
+          $P0 = 1
+          set_global [ 'Perl6' ; 'Grammar' ; 'Actions' ], '$?SIG_BLOCK_NOT_NEEDED', $P0
+      }}
+      <signature>
+      {{
+          $P0 = new 'Integer'
+          $P0 = 0
+          set_global [ 'Perl6' ; 'Grammar' ; 'Actions' ], '$?SIG_BLOCK_NOT_NEEDED', $P0
+      }}
+      [ ')' || <.panic: "Missing right parenthsesis after signature"> ]
     ]
     {*}
 }

@@ -564,16 +564,16 @@ var_arg_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
 
 =item C<Instruction * INS>
 
-Make an instruction.
+Makes an instruction.
 
-name ... op name
-fmt ... optional format
-regs ... SymReg **
-n ... # of params
-keyvec ... s. KEY_BIT()
-emit ... if true, append to instructions
+name   ... op name
+fmt    ... optional format
+regs   ... SymReg **
+n      ... number of params
+keyvec ... see KEY_BIT()
+emit   ... if true, append to instructions
 
-s. e.g. imc.c for usage
+see imc.c for usage
 
 =cut
 
@@ -728,9 +728,7 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         format[sizeof (format) - 1] = '\0';
     }
 
-#if 1
     IMCC_debug(interp, DEBUG_PARSER, "%s %s\t%s\n", name, format, fullname);
-#endif
 
     /* make the instruction */
     ins         = _mk_instruction(name, format, n, r, dirs);

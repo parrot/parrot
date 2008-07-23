@@ -32,7 +32,7 @@ my $conf = Parrot::Configure->new;
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 
-my $task        = $conf->steps->[0];
+my $task        = $conf->steps->[-1];
 my $step_name   = $task->step;
 
 my $step = $step_name->new();

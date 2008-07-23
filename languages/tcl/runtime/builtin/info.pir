@@ -214,7 +214,7 @@ bad_args:
 
 check_arg:
   # there's no default. is there even an arg?
-  $P3 = __list($P9)
+  $P3 = toList($P9)
   $P4 = new 'Iterator', $P3
 loop:
   unless $P4 goto not_argument
@@ -474,13 +474,13 @@ current_level:
   .return($I0)
 
 find_level:
-  .local pmc __integer, __call_level
-  __integer    = get_root_global ['_tcl'], '__integer'
+  .local pmc toInteger, __call_level
+  toInteger    = get_root_global ['_tcl'], 'toInteger'
   __call_level = get_root_global ['_tcl'], '__call_level'
 
   .local pmc level
   level = shift argv
-  level = __integer(level)
+  level = toInteger(level)
   if level >= 0 goto find_info_level
   level = __call_level(level)
   .return(level)

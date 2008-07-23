@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <malloc.h>
 #include <unistd.h>
+#include <string.h>
 #ifndef PAGE_SIZE
 #  define PAGE_SIZE getpagesize()
 #endif
@@ -40,7 +41,7 @@ int main(int argc, char *argv[])
     if (atoi(argv[1]))
         prot |= PROT_EXEC;
 
-    p = memalign(PAGE_SIZE, sizeof(code));
+    p = memalign(PAGE_SIZE, PAGE_SIZE);
     memcpy(p, code, sizeof(code));
 
     t  = (pf) p;

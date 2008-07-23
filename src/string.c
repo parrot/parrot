@@ -398,7 +398,8 @@ string_rep_compatible(SHIM_INTERP,
 
     /* a table could possibly simplify the logic */
     if (a->encoding == Parrot_utf8_encoding_ptr &&
-            b->charset == Parrot_ascii_charset_ptr) {
+            (b->charset == Parrot_ascii_charset_ptr ||
+             b->charset == Parrot_iso_8859_1_charset_ptr)) {
         if (a->strlen == a->bufused) {
             *e = Parrot_fixed_8_encoding_ptr;
             return Parrot_ascii_charset_ptr;
@@ -407,7 +408,8 @@ string_rep_compatible(SHIM_INTERP,
         return a->charset;
     }
     if (b->encoding == Parrot_utf8_encoding_ptr &&
-            a->charset == Parrot_ascii_charset_ptr) {
+            (a->charset == Parrot_ascii_charset_ptr ||
+             a->charset == Parrot_iso_8859_1_charset_ptr)) {
         if (b->strlen == b->bufused) {
             *e = Parrot_fixed_8_encoding_ptr;
             return a->charset;
@@ -626,6 +628,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 const_string(PARROT_INTERP, ARGIN(const char *buffer))
 {
+    DECL_CONST_CAST;
     STRING *s;
     Hash   *cstring_cache = (Hash *)interp->const_cstring_hash;
 
@@ -640,7 +643,8 @@ const_string(PARROT_INTERP, ARGIN(const char *buffer))
                        PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
                        PObj_external_FLAG|PObj_constant_FLAG);
 
-    parrot_hash_put(interp, cstring_cache, s, (void *)s);
+    parrot_hash_put(interp, cstring_cache,
+        PARROT_const_cast(char *, buffer), (void *)s);
 
     return s;
 }
@@ -1547,8 +1551,7 @@ string_bitwise_and(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
     return res;
 }
 
-
-#define BITWISE_OR_STRINGS(type1, type2, restype, s1, s2, res, maxlen, op) \
+#define BITWISE_XOR_STRINGS(type1, type2, restype, s1, s2, res, maxlen) \
 do { \
     const type1 *curr1   = NULL; \
     const type2 *curr2   = NULL; \
@@ -1558,21 +1561,56 @@ do { \
     size_t       _index; \
  \
     if (s1) { \
-        curr1   = (type1 *)s1->strstart; \
-        length1 = s1->strlen; \
+        curr1   = (type1 *)(s1)->strstart; \
+        length1 = (s1)->strlen; \
     } \
     if (s2) { \
-        curr2   = (type2 *)s2->strstart; \
-        length2 = s2->strlen; \
+        curr2   = (type2 *)(s2)->strstart; \
+        length2 = (s2)->strlen; \
     } \
  \
-    dp = (restype *)res->strstart; \
+    dp = (restype *)(res)->strstart; \
     _index = 0; \
  \
-    for (; _index < maxlen ; ++curr1, ++curr2, ++dp, ++_index) { \
+    for (; _index < (maxlen) ; ++curr1, ++curr2, ++dp, ++_index) { \
         if (_index < length1) { \
             if (_index < length2) \
-                *dp = *curr1 op *curr2; \
+                *dp = *curr1 ^ *curr2; \
+            else \
+                *dp = *curr1; \
+        } \
+        else if (_index < length2) { \
+            *dp = *curr2; \
+        } \
+    } \
+} while (0)
+
+
+#define BITWISE_OR_STRINGS(type1, type2, restype, s1, s2, res, maxlen) \
+do { \
+    const type1 *curr1   = NULL; \
+    const type2 *curr2   = NULL; \
+    size_t       length1 = 0; \
+    size_t       length2 = 0; \
+    restype     *dp; \
+    size_t       _index; \
+ \
+    if (s1) { \
+        curr1   = (type1 *)(s1)->strstart; \
+        length1 = (s1)->strlen; \
+    } \
+    if (s2) { \
+        curr2   = (type2 *)(s2)->strstart; \
+        length2 = (s2)->strlen; \
+    } \
+ \
+    dp = (restype *)(res)->strstart; \
+    _index = 0; \
+ \
+    for (; _index < (maxlen) ; ++curr1, ++curr2, ++dp, ++_index) { \
+        if (_index < length1) { \
+            if (_index < length2) \
+                *dp = *curr1 | *curr2; \
             else \
                 *dp = *curr1; \
         } \
@@ -1646,7 +1684,7 @@ string_bitwise_or(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
     make_writable(interp, &res, maxlen, enum_stringrep_one);
 
     BITWISE_OR_STRINGS(Parrot_UInt1, Parrot_UInt1, Parrot_UInt1,
-            s1, s2, res, maxlen, |);
+            s1, s2, res, maxlen);
     res->bufused = res->strlen = maxlen;
 
     if (dest)
@@ -1720,8 +1758,8 @@ string_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
 
     make_writable(interp, &res, maxlen, enum_stringrep_one);
 
-    BITWISE_OR_STRINGS(Parrot_UInt1, Parrot_UInt1, Parrot_UInt1,
-            s1, s2, res, maxlen, ^);
+    BITWISE_XOR_STRINGS(Parrot_UInt1, Parrot_UInt1, Parrot_UInt1,
+            s1, s2, res, maxlen);
     res->bufused = res->strlen = maxlen;
 
     if (dest)
@@ -1733,10 +1771,10 @@ string_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
 
 #define BITWISE_NOT_STRING(type, s, res) \
 do { \
-    if (s && res) { \
-        const type   *curr   = (type *)s->strstart; \
-        size_t        length = s->strlen; \
-        Parrot_UInt1 *dp     = (Parrot_UInt1 *)res->strstart; \
+    if ((s) && (res)) { \
+        const type   *curr   = (type *)(s)->strstart; \
+        size_t        length = (s)->strlen; \
+        Parrot_UInt1 *dp     = (Parrot_UInt1 *)(res)->strstart; \
  \
         for (; length ; --length, ++dp, ++curr) \
             *dp = 0xFF & ~ *curr; \
@@ -2966,6 +3004,31 @@ string_split(PARROT_INTERP, ARGIN(STRING *delim), ARGIN(STRING *str))
     return res;
 }
 
+
+/*
+
+=item C<PMC* Parrot_string_split>
+
+Split a string with a delimiter.
+Returns PMCNULL if the string or the delimiter is NULL,
+else is the same as string_split.
+
+=cut
+
+*/
+
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC*
+Parrot_string_split(PARROT_INTERP,
+    ARGIN_NULLOK(STRING *delim), ARGIN_NULLOK(STRING *str))
+{
+    if (! delim || ! str)
+        return PMCNULL;
+    else
+        return string_split(interp, delim, str);
+}
 
 /*
 

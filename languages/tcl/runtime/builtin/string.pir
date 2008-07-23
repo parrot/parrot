@@ -471,9 +471,9 @@ bad_match:
   the_string = argv[0]
   the_repeat = argv[1]
 
-  .local pmc __integer
-  __integer = get_root_global ['_tcl'], '__integer'
-  the_repeat = __integer(the_repeat)
+  .local pmc toInteger
+  toInteger = get_root_global ['_tcl'], 'toInteger'
+  the_repeat = toInteger(the_repeat)
 
   $I0 = the_repeat
   if $I0 <= 0 goto nothing
@@ -506,11 +506,11 @@ setup:
   .local pmc map_list
   .local int strpos,strlen,mappos,maplen,skiplen,mapstrlen,replacementstrlen
 
-  .local pmc __list
-  __list = get_root_global ['_tcl'], '__list'
+  .local pmc toList
+  toList = get_root_global ['_tcl'], 'toList'
 
   $P0 = argv[0]
-  map_list = __list($P0)
+  map_list = toList($P0)
   the_string = argv[1]
 
   maplen = map_list
@@ -631,6 +631,9 @@ bad_args:
 # RT#40770: doesn't respect the -strict or -failindex switches
 .sub 'is'
   .param pmc argv
+
+  .local pmc toNumber
+
   .local int argc
   argc = argv
 
@@ -724,9 +727,9 @@ digit_check:
   the_cclass = .CCLASS_NUMERIC
   goto cclass_check
 double_check:
-  $P1 = get_root_global ['_tcl'], '__number'
+  toNumber = get_root_global ['_tcl'], 'toNumber'
   push_eh nope
-    $P2 = $P1(the_string)
+    $P2 = toNumber(the_string)
   pop_eh
 
   $S0 = typeof $P2
@@ -746,18 +749,19 @@ graph_check:
   the_cclass = .CCLASS_GRAPHICAL
   goto cclass_check
 integer_check:
-  $P1 = get_root_global ['_tcl'], '__number'
+  toNumber = get_root_global ['_tcl'], 'toNumber'
   push_eh nope
-    $P2 = $P1(the_string)
+    $P2 = toNumber(the_string)
   pop_eh
 
   $S0 = typeof $P2
   if $S0 == 'TclInt' goto yep
   goto nope
 list_check:
-  $P1 = get_root_global ['_tcl'], '__list'
+  .local pmc toList
+  toList = get_root_global ['_tcl'], 'toList'
   push_eh nope
-    $P1(the_string)
+    toList(the_string)
   pop_eh
   goto yep
 lower_check:
@@ -1044,10 +1048,10 @@ arg_length:
   argc = elements argv
   if argc == 0 goto bad_args
 
-  .local pmc __integer
-  __integer = get_root_global ['_tcl'], '__integer'
+  .local pmc toInteger
+  toInteger = get_root_global ['_tcl'], 'toInteger'
   $S4  = shift argv
-  size = __integer($S4)
+  size = toInteger($S4)
   # "if -length is negative, it is ignored"
   if size < 0 goto args_processment
   $S1 = substr $S1, 0, size

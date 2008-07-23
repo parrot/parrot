@@ -507,6 +507,7 @@ print $JITCPU <<"EOC";
 /*
  * Local variables:
  *   c-file-style: "parrot"
+ *   buffer-read-only: t
  * End:
  * vim: expandtab shiftwidth=4:
  */
@@ -520,6 +521,7 @@ sub make_subs {
     return ( ( $ptr eq '&' ? '&' : '' ) . sprintf( $argmaps{ $type_to_arg{$type} }, $index ) );
 }
 
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

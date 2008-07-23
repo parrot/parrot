@@ -30,7 +30,7 @@ generated from F<src/vtable.tbl> by F<tools/build/pmc2c.pl>.
 
 /*
 
-=item C<static const char *caller(PARROT_INTERP, PMC *pmc)>
+=item C<static STRING *caller(PARROT_INTERP, PMC *pmc)>
 
 Returns a C string for the name of C<*pmc>.
 
@@ -38,11 +38,11 @@ Returns a C string for the name of C<*pmc>.
 
 */
 
-static const char *
+static STRING *
 caller(PARROT_INTERP, PMC *pmc /*NULLOK*/)
 {
     return pmc && pmc->vtable && pmc->vtable->whoami ?
-        VTABLE_name(interp, pmc)->strstart : "(null)";
+        VTABLE_name(interp, pmc) : CONST_STRING(interp, "(null)");
 }
 
 /*
@@ -61,7 +61,7 @@ static void
 cant_do_method(PARROT_INTERP, PMC *pmc /*NULLOK*/, const char *methname)
 {
     real_exception(interp, NULL, ILL_INHERIT,
-                       "%s() not implemented in class '%s'", methname,
+                       "%s() not implemented in class '%Ss'", methname,
                        caller(interp, pmc));
 }
 
@@ -296,7 +296,7 @@ With a null C<initializer>, calls C<init()>, else throws an exception.
             SELF.init();
         else
             real_exception(interp, NULL, ILL_INHERIT,
-                       "init_pmc() not implemented in class '%s'",
+                       "init_pmc() not implemented in class '%Ss'",
                        caller(interp, pmc));
     }
 
@@ -915,7 +915,7 @@ true (1) is returned; otherwise, false (0) is returned.
 
     VTABLE INTVAL isa_pmc(PMC *lookup) {
         /* RT #46665 - walk mro */
-        return !!parrot_hash_get_bucket(INTERP, SELF->vtable->isa_hash,
+        return parrot_hash_exists(INTERP, SELF->vtable->isa_hash,
                 (void *)VTABLE_get_string(interp, lookup));
     }
 
@@ -933,7 +933,7 @@ true (1) is returned; otherwise, false (0) is returned.
 
     VTABLE INTVAL isa(STRING *_class) {
         /* RT #46665 - walk mro */
-        return !!parrot_hash_get_bucket(INTERP, SELF->vtable->isa_hash,
+        return parrot_hash_exists(INTERP, SELF->vtable->isa_hash,
                     (void *)_class);
     }
 
@@ -994,11 +994,21 @@ Look for NCI methods and properties.
 
 */
     VTABLE PMC *get_class() {
-        /* Create a proxy */
-        INTVAL  type     = VTABLE_type(interp, SELF);
-        PMC    *type_num = pmc_new(interp, enum_class_Integer);
-        VTABLE_set_integer_native(interp, type_num, type);
-        return pmc_new_init(interp, enum_class_PMCProxy, type_num);
+        PMC *ns     = VTABLE_get_namespace(interp, SELF);
+        PMC *_class = PMCNULL;
+
+        if (!PMC_IS_NULL(ns))
+            _class = VTABLE_get_class(interp, ns);
+
+        if (PMC_IS_NULL(_class)) {
+            INTVAL type      = VTABLE_type(interp, SELF);
+            PMC   *type_num  = pmc_new(interp, enum_class_Integer);
+            VTABLE_set_integer_native(interp, type_num, type);
+            return pmc_new_init(interp, enum_class_PMCProxy, type_num);
+        }
+
+        return _class;
+
     }
 
     VTABLE PMC *get_attr_str(STRING *name) {

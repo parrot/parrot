@@ -67,11 +67,13 @@ print $OUT <<"EOC";
 /*
  * Local variables:
  *   c-file-style: "parrot"
+ *   buffer-read-only: t
  * End:
  * vim: expandtab shiftwidth=4:
  */
 EOC
 
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

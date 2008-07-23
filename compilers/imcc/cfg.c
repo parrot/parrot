@@ -11,11 +11,11 @@ compilers/imcc/cfg.c
 
 =head1 DESCRIPTION
 
-A basic block is the longest sequence of instructions that we are
-sure will be executed sequentially: no branches, no labels.
+A basic block is the longest sequence of instructions that we are sure will be
+executed sequentially: no branches, no labels.
 
-The control-flow graph is a directed graph that reflects the
-flow of execution between blocks.
+The control-flow graph is a directed graph that reflects the flow of execution
+between blocks.
 
 =head2 Functions
 
@@ -43,7 +43,7 @@ static void analyse_life_block(
         FUNC_MODIFIES(*r);
 
 static void analyse_life_symbol(
-    ARGIN(const struct _IMC_Unit *unit),
+    ARGIN(const IMC_Unit *unit),
     ARGMOD(SymReg* r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -158,7 +158,7 @@ static void sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 
 =item C<static int check_invoke_type>
 
-RT#48260: Not yet documented!!!
+Given an invoke-type instruction, returns the type of the invocation.
 
 =cut
 
@@ -166,84 +166,91 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 static int
-check_invoke_type(PARROT_INTERP, ARGIN(const IMC_Unit * unit), ARGIN(const Instruction *ins))
+check_invoke_type(PARROT_INTERP, ARGIN(const IMC_Unit    *unit),
+                                 ARGIN(const Instruction *ins))
 {
-    /*
-     * 1) pcc sub call or yield
-     */
+    /* 1) pcc sub call or yield */
     if (ins->type & (ITPCCSUB | ITPCCYIELD))
         return INVOKE_SUB_CALL;
+
     /*
      * inside another pcc_sub
      * 2) invoke = loop to begin
      */
-    if (unit->instructions->symregs[0] && unit->instructions->symregs[0]->pcc_sub)
+    if (unit->instructions->symregs[0]
+    &&  unit->instructions->symregs[0]->pcc_sub)
         return INVOKE_SUB_LOOP;
+
     /* 3) invoke P1 returns */
     if (ins->opsize == 2)
         return INVOKE_SUB_RET;
-    /* 4) other usage */
 
-    IMCC_INFO(interp)->dont_optimize = 1;  /* too complex to follow */
+    /* 4) other usage, too complex to follow */
+    IMCC_INFO(interp)->dont_optimize    = 1;
     IMCC_INFO(interp)->optimizer_level &= ~OPT_PASM;
+
     return INVOKE_SUB_OTHER;
 }
+
 
 /*
 
 =item C<void find_basic_blocks>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
 */
 
 void
-find_basic_blocks(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit), int first)
+find_basic_blocks(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int first)
 {
-    Basic_block *bb;
-    Instruction *ins;
+    Basic_block          *bb;
+    Instruction          *ins;
     const SymHash * const hsh = &unit->hash;
-    int nu = 0;
-    int i;
+    int                   nu  = 0;
+    int                   i;
 
     IMCC_info(interp, 2, "find_basic_blocks\n");
     init_basic_blocks(unit);
 
     for (i = 0; i < hsh->size; i++) {
         SymReg *r;
+
         for (r = hsh->data[i]; r; r = r->next) {
-            if (r && (r->type & VTADDRESS)) {
+            if (r->type & VTADDRESS)
                 r->last_ins = NULL;
-            }
         }
     }
 
-    /* RT#48280: Now the way to check for a sub is unit->type */
+    /* RT #48280: Now the way to check for a sub is unit->type */
     ins = unit->instructions;
+
     if (first && ins->type == ITLABEL && (ins->symregs[0]->type & VT_PCC_SUB)) {
         IMCC_debug(interp, DEBUG_CFG, "pcc_sub %s nparams %d\n",
                 ins->symregs[0]->name, ins->symregs[0]->pcc_sub->nargs);
         expand_pcc_sub(interp, unit, ins);
     }
+
     ins->index = i = 0;
 
-    bb = make_basic_block(unit, ins);
+    bb         = make_basic_block(unit, ins);
+
     if (ins->type & ITBRANCH) {
         SymReg * const addr = get_branch_reg(bb->end);
         if (addr)
             addr->last_ins = ins;
     }
-    for (ins = ins->next; ins; ins = ins->next) {
-        ins->index = ++i;
 
-        bb->end = ins;
+    for (ins = ins->next; ins; ins = ins->next) {
+        bb->end      = ins;
+        ins->index   = ++i;
         ins->bbindex = unit->n_basic_blocks - 1;
 
         if (ins->opnum == -1 && (ins->type & ITPCCSUB)) {
             if (first) {
-                /* RT#48280: Now the way to check for a sub is unit->type */
+                /* RT #48280: Now the way to check for a sub is unit->type */
                 if (ins->type & ITLABEL) {
                     expand_pcc_sub_ret(interp, unit, ins);
                     ins->type &= ~ITLABEL;
@@ -252,6 +259,7 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit), int first)
                     /* if this is a sub call expand it */
                     expand_pcc_sub_call(interp, unit, ins);
                 }
+
                 ins->type &= ~ITPCCSUB;
             }
         }
@@ -261,14 +269,14 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit), int first)
         }
 
         /* a LABEL starts a new basic block, but not, if we already have
-         * a new one (last was a branch)
-         */
+         * a new one (last was a branch) */
         if (nu)
             nu = 0;
-        else if ((ins->type & ITLABEL)) {
+        else if (ins->type & ITLABEL) {
             bb->end = ins->prev;
-            bb = make_basic_block(unit, ins);
+            bb      = make_basic_block(unit, ins);
         }
+
         /* a branch is the end of a basic block
          * so start a new one with the next instruction */
         if (ins->type & ITBRANCH) {
@@ -276,13 +284,14 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit), int first)
 
             if (addr)
                 addr->last_ins = ins;
-            /*
-             * ignore set_addr - no new basic block
-             */
+
+            /* ignore set_addr - no new basic block */
             if (STREQ(ins->opname, "set_addr"))
                 continue;
+
             if (ins->next)
                 bb = make_basic_block(unit, ins->next);
+
             nu = 1;
         }
     }
@@ -293,11 +302,12 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit), int first)
     }
 }
 
+
 /*
 
 =item C<static void bb_check_set_addr>
 
-RT#48260: Not yet documented!!!
+Looks for a C<set_addr> op in the current unit referring to the given label.
 
 =cut
 
@@ -310,83 +320,87 @@ bb_check_set_addr(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
     const Instruction *ins;
 
     for (ins = unit->instructions; ins; ins = ins->next) {
-        if ((ins->opnum == PARROT_OP_set_addr_p_ic) &&
-                STREQ(label->name, ins->symregs[1]->name)) {
+        if ((ins->opnum == PARROT_OP_set_addr_p_ic)
+        &&   STREQ(label->name, ins->symregs[1]->name)) {
             IMCC_debug(interp, DEBUG_CFG, "set_addr %s\n",
                     ins->symregs[1]->name);
 
-            /*
-             * connect this block with first and last block
-             */
+            /* connect this block with first and last block */
             bb_add_edge(unit, unit->bb_list[0], bb);
             bb_add_edge(unit, unit->bb_list[unit->n_basic_blocks - 1], bb);
+
             /* and mark the instruction as being kind of a branch */
             bb->start->type |= ITADDR;
+
             break;
         }
     }
 }
 
+
 /*
 
 =item C<void build_cfg>
 
-Once the basic blocks have been computed, build_cfg computes
-the dependencies between them.
+Once the basic blocks have been computed, build_cfg computes the dependencies
+between them.
 
 =cut
 
 */
 
 void
-build_cfg(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
+build_cfg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    unsigned int i;
-    int changes;
     Basic_block *last = NULL;
+    int i, changes;
 
     IMCC_info(interp, 2, "build_cfg\n");
+
     for (i = 0; i < unit->n_basic_blocks; i++) {
-        Edge *pred;
-        SymReg *addr;
         Basic_block * const bb = unit->bb_list[i];
+        Edge               *pred;
+        SymReg             *addr;
 
         /* if the block can fall-through */
         if (i > 0 && ! (last->end->type & IF_goto))
             bb_add_edge(unit, last, bb);
+
         /* check first ins, if label try to find a set_addr op */
-        if (bb->start->type & ITLABEL) {
+        if (bb->start->type & ITLABEL)
             bb_check_set_addr(interp, unit, bb, bb->start->symregs[0]);
-        }
+
         /* look if last instruction is a branch */
         addr = get_branch_reg(bb->end);
+
         if (addr)
             bb_findadd_edge(interp, unit, bb, addr);
         else if (STREQ(bb->start->opname, "invoke")
-              || STREQ(bb->start->opname, "invokecc")) {
-            if (check_invoke_type(interp, unit, bb->start) ==
-                    INVOKE_SUB_LOOP)
+             ||  STREQ(bb->start->opname, "invokecc")) {
+            if (check_invoke_type(interp, unit, bb->start) == INVOKE_SUB_LOOP)
                 bb_add_edge(unit, bb, unit->bb_list[0]);
         }
+
         if (STREQ(bb->end->opname, "ret")) {
-            Instruction * sub;
+            Instruction *sub;
             IMCC_debug(interp, DEBUG_CFG, "found ret in bb %d\n", i);
-            /* now go back, find labels and connect these with
-             * bsrs
-             */
+
+            /* now go back, find labels and connect these with bsrs */
+
             /* this doesn't work, if this is a local backward sub call
              * the bsr isn't chained yet so the pred_list is empty
              *
              * s. #25948
              */
             if (!bb->pred_list) {
-                unsigned int j;
+                int j;
 
                 for (j = i; j < unit->n_basic_blocks; j++) {
                     Basic_block * const b_bsr = unit->bb_list[j];
 
                     if (STREQ(b_bsr->end->opname, "bsr")) {
-                        addr = get_branch_reg(b_bsr->end);
+                        SymReg *addr = get_branch_reg(b_bsr->end);
+
                         if (addr)
                             bb_findadd_edge(interp, unit, b_bsr, addr);
                     }
@@ -396,54 +410,57 @@ build_cfg(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
 
             for (pred = bb->pred_list; pred; pred = pred->next) {
                 int found = 0;
+
                 if (STREQ(pred->from->end->opname, "bsr")) {
                     int j;
                     {
                         SymReg * const r = pred->from->end->symregs[0];
+                        sub              = pred->to->start;
 
-                        sub = pred->to->start;
                         if ((sub->type & ITLABEL)
-                        &&  STREQ(sub->symregs[0]->name, r->name))
+                        &&   STREQ(sub->symregs[0]->name, r->name))
                             found = 1;
                     }
 invok:
                     j = pred->from->index;
+
                     if (found) {
                         IMCC_debug(interp, DEBUG_CFG,
                                 "\tcalled from bb %d '%I'\n",
                                 j, pred->from->end);
+
                         for (; sub && sub != bb->end; sub = sub->next) {
                             unit->bb_list[sub->bbindex]->flag |= BB_IS_SUB;
                         }
-                        bb_add_edge(unit, bb,
-                                    unit->bb_list[j+1]);
-                        IMCC_debug(interp, DEBUG_CFG,
-                                   "\tand does saveall no\n");
+
+                        bb_add_edge(unit, bb, unit->bb_list[j + 1]);
+
+                        IMCC_debug(interp, DEBUG_CFG, "\tand does saveall no\n");
                     }
                 }
                 else if (STREQ(pred->from->end->opname, "invoke")) {
                     found = 1;
-                    sub = pred->to->start;
+                    sub   = pred->to->start;
                     goto invok;
                 }
+
                 if (!found)
-                    IMCC_debug(interp, DEBUG_CFG,
-                               "\tcalled from unknown!\n");
+                    IMCC_debug(interp, DEBUG_CFG, "\tcalled from unknown!\n");
             }
         }
 
         last = bb;
     }
 
-    /* Decouple unreachable blocks (not the first block, with no
-     * predecessors) from the CFG
-     */
+    /* Decouple unreachable blocks (not the first block, with no predecessors)
+     * from the CFG */
     do {
-        unsigned int i;
+        int i;
         changes = 0;
 
         for (i = 1; i < unit->n_basic_blocks; i++) {
             Basic_block * const bb = unit->bb_list[i];
+
             if (!bb->pred_list) {
                 /* Remove all successor edges of block bb */
                 while (bb->succ_list) {
@@ -460,11 +477,13 @@ invok:
         dump_cfg(unit);
 }
 
+
 /*
 
 =item C<static void bb_findadd_edge>
 
-find the placement of the label, and link the two nodes
+Finds the placement of the given label and links its containing block to the
+given basic block.
 
 =cut
 
@@ -474,26 +493,26 @@ static void
 bb_findadd_edge(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Basic_block *from),
         ARGIN(const SymReg *label))
 {
-    Instruction *ins;
+    Instruction         *ins;
     const SymReg * const r = find_sym(interp, label->name);
 
     if (r && (r->type & VTADDRESS) && r->first_ins)
-        bb_add_edge(unit, from,
-                unit->bb_list[r->first_ins->bbindex]);
+        bb_add_edge(unit, from, unit->bb_list[r->first_ins->bbindex]);
     else {
         IMCC_debug(interp, DEBUG_CFG, "register branch %I ", from->end);
-        /* RT#48282 is probably only ok, if the invoke is "near" the
-         *     set_addr ins
-         */
+        /* RT #48282 is probably only ok, if the invoke is "near" the
+         *     set_addr ins */
         for (ins = from->end; ins; ins = ins->prev) {
-            if ((ins->type & ITBRANCH) && STREQ(ins->opname, "set_addr") &&
-                    ins->symregs[1]->first_ins) {
-                bb_add_edge(unit, from, unit->
-                                bb_list[ins->symregs[1]->first_ins->bbindex]);
+            if ((ins->type & ITBRANCH)
+            &&   STREQ(ins->opname, "set_addr")
+            &&   ins->symregs[1]->first_ins) {
+                bb_add_edge(unit, from,
+                    unit-> bb_list[ins->symregs[1]->first_ins->bbindex]);
                 IMCC_debug(interp, DEBUG_CFG, "(%s) ", ins->symregs[1]->name);
                 break;
             }
         }
+
         IMCC_debug(interp, DEBUG_CFG, "\n");
     }
 }
@@ -503,7 +522,7 @@ bb_findadd_edge(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Basic_block *from),
 
 =item C<int blocks_are_connected>
 
-RT#48260: Not yet documented!!!
+Returns true or false whether the given blocks are linked.
 
 =cut
 
@@ -511,15 +530,19 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 int
-blocks_are_connected(ARGIN(const Basic_block *from), ARGIN(const Basic_block *to))
+blocks_are_connected(ARGIN(const Basic_block *from),
+                     ARGIN(const Basic_block *to))
 {
     const Edge *pred = to->pred_list;
 
     while (pred) {
+        /*already linked*/
         if (pred->from == from)
-            return 1; /*already linked*/
+            return 1;
+
         pred = pred->pred_next;
     }
+
     return 0;
 }
 
@@ -528,23 +551,22 @@ blocks_are_connected(ARGIN(const Basic_block *from), ARGIN(const Basic_block *to
 
 =item C<static void bb_add_edge>
 
-RT#48260: Not yet documented!!!
+Adds an edge between the two given blocks.
 
 =cut
 
 */
 
 static void
-bb_add_edge(ARGMOD(IMC_Unit *unit), ARGIN(Basic_block *from), ARGMOD(Basic_block *to))
+bb_add_edge(ARGMOD(IMC_Unit *unit), ARGIN(Basic_block  *from),
+                                    ARGMOD(Basic_block *to))
 {
     Edge *e;
     if (blocks_are_connected(from, to))
         return;
 
     /* we assume that the data is correct, and thus if the edge is not
-       on the predecessors of 'from', it won't be on the successors
-       of 'to'. */
-
+     * on the predecessors of 'from', it won't be on the successors of 'to' */
     e             = mem_allocate_typed(Edge);
 
     e->succ_next  = from->succ_list;
@@ -561,16 +583,17 @@ bb_add_edge(ARGMOD(IMC_Unit *unit), ARGIN(Basic_block *from), ARGMOD(Basic_block
     if (unit->edge_list == 0)
         unit->edge_list = e;
     else {
-        e->next = unit->edge_list;
+        e->next         = unit->edge_list;
         unit->edge_list = e;
     }
 }
+
 
 /*
 
 =item C<static void bb_remove_edge>
 
-RT#48260: Not yet documented!!!
+Removes the given edge from the graph.
 
 =cut
 
@@ -586,9 +609,8 @@ bb_remove_edge(ARGMOD(IMC_Unit *unit), ARGMOD(Edge *edge))
         Edge *prev;
 
         for (prev = edge->from->succ_list; prev; prev = prev->succ_next) {
-            if (prev->succ_next == edge) {
+            if (prev->succ_next == edge)
                 prev->succ_next = edge->succ_next;
-            }
         }
     }
 
@@ -599,9 +621,8 @@ bb_remove_edge(ARGMOD(IMC_Unit *unit), ARGMOD(Edge *edge))
         Edge *prev;
 
         for (prev = edge->to->pred_list; prev; prev = prev->pred_next) {
-            if (prev->pred_next == edge) {
+            if (prev->pred_next == edge)
                 prev->pred_next = edge->pred_next;
-            }
         }
     }
 
@@ -621,11 +642,12 @@ bb_remove_edge(ARGMOD(IMC_Unit *unit), ARGMOD(Edge *edge))
     }
 }
 
+
 /*
 
 =item C<static void free_edge>
 
-Free the memory of an IMC_Unit's edge list.
+Frees the memory of an IMC_Unit's edge list.
 
 =cut
 
@@ -641,14 +663,16 @@ free_edge(ARGMOD(IMC_Unit *unit))
         mem_sys_free(e);
         e = next;
     }
+
     unit->edge_list = NULL;
 }
+
 
 /*
 
 =item C<int edge_count>
 
-Count the number of edges in the specified IMC_Unit.
+Counts and returns the number of edges in the specified IMC_Unit.
 
 =cut
 
@@ -656,54 +680,58 @@ Count the number of edges in the specified IMC_Unit.
 
 PARROT_WARN_UNUSED_RESULT
 int
-edge_count(ARGIN(const struct _IMC_Unit *unit))
+edge_count(ARGIN(const IMC_Unit *unit))
 {
     Edge *e = unit->edge_list;
-    int i = 0;
+    int   i = 0;
 
     while (e) {
         i++;
         e = e->next;
     }
+
     return i;
 }
+
 
 /*
 
 =item C<void life_analysis>
 
-Driver routine to call analyse_life_symbol for each
-reglist in the specified IMC_Unit.
+This driver routine calls analyse_life_symbol for each reglist in the specified
+IMC_Unit.
 
 =cut
 
 */
 
 void
-life_analysis(PARROT_INTERP, ARGIN(const struct _IMC_Unit *unit))
+life_analysis(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 {
-    int i;
-    SymReg** const reglist = unit->reglist;
+    SymReg  ** const reglist = unit->reglist;
+    int              i;
 
     IMCC_info(interp, 2, "life_analysis\n");
+
     for (i = 0; i < unit->n_symbols; i++)
         analyse_life_symbol(unit, reglist[i]);
 }
+
 
 /*
 
 =item C<static void analyse_life_symbol>
 
-RT#48260: Not yet documented!!!
+Analyzes the lifetime for a given symbol.
 
 =cut
 
 */
 
 static void
-analyse_life_symbol(ARGIN(const struct _IMC_Unit *unit), ARGMOD(SymReg* r))
+analyse_life_symbol(ARGIN(const IMC_Unit *unit), ARGMOD(SymReg* r))
 {
-    unsigned int i;
+    int i;
 
 #if IMC_TRACE_HIGH
     fprintf(stderr, "cfg.c: analyse_life_symbol(%s)\n", r->name);
@@ -711,41 +739,38 @@ analyse_life_symbol(ARGIN(const struct _IMC_Unit *unit), ARGMOD(SymReg* r))
 
     if (r->life_info)
         free_life_info(unit, r);
-    r->life_info = mem_allocate_n_zeroed_typed(unit->n_basic_blocks, Life_range *);
+
+    r->life_info = mem_allocate_n_zeroed_typed(unit->n_basic_blocks,
+                                               Life_range *);
 
     /* First we make a pass to each block to gather the information
      * that can be obtained locally */
-
     for (i = 0; i < unit->n_basic_blocks; i++) {
         analyse_life_block(unit->bb_list[i], r);
     }
 
     /* Now we need to consider the relations between blocks */
-
     for (i = 0; i < unit->n_basic_blocks; i++) {
         if (r->life_info[i]->flags & LF_use) {
             const Instruction * const ins = unit->bb_list[i]->start;
 
-            /*
-             * if the previous instruction (the last of the previous block)
-             * was a sub call, and the symbol is live/use here, it needs
-             * allocation in the non-volatile register range
-             */
+            /* if the previous instruction (the last of the previous block) was
+             * a sub call, and the symbol is live/use here, it needs allocation
+             * in the non-volatile register range */
             if (ins->prev) {
                 const Instruction * const prev = ins->prev;
 
-                if ((prev->type & (ITPCCSUB|ITPCCYIELD)) &&
-                        prev->opnum != PARROT_OP_tailcall_p)
+                if ((prev->type  & (ITPCCSUB|ITPCCYIELD))
+                &&   prev->opnum != PARROT_OP_tailcall_p)
                     r->usage |= U_NON_VOLATILE;
-                else if (prev->opnum == PARROT_OP_invoke_p_p ||
-                         prev->opnum == PARROT_OP_invokecc_p)
+                else if (prev->opnum == PARROT_OP_invoke_p_p
+                     ||  prev->opnum == PARROT_OP_invokecc_p)
                     r->usage |= U_NON_VOLATILE;
                 else if (ins->type & ITADDR)
                     r->usage |= U_NON_VOLATILE;
             }
 
-            /* This block uses r, so it must be live at
-               the beginning */
+            /* This block uses r, so it must be live at the beginning */
             r->life_info[i]->flags |= LF_lv_in;
 
             /* propagate this info to every predecessor */
@@ -754,24 +779,25 @@ analyse_life_symbol(ARGIN(const struct _IMC_Unit *unit), ARGMOD(SymReg* r))
     }
 }
 
+
 /*
 
 =item C<void free_life_info>
 
-Free memory of the life analysis info structures.
+Frees memory of the life analysis info structures.
 
 =cut
 
 */
 
 void
-free_life_info(ARGIN(const struct _IMC_Unit *unit), ARGMOD(SymReg *r))
+free_life_info(ARGIN(const IMC_Unit *unit), ARGMOD(SymReg *r))
 {
 #if IMC_TRACE_HIGH
     fprintf(stderr, "free_life_into(%s)\n", r->name);
 #endif
     if (r->life_info) {
-        unsigned int i;
+        int i;
 
         for (i = 0; i < unit->n_basic_blocks; i++) {
             mem_sys_free(r->life_info[i]);
@@ -782,16 +808,15 @@ free_life_info(ARGIN(const struct _IMC_Unit *unit), ARGMOD(SymReg *r))
     }
 }
 
+
 /*
 
 =item C<static void analyse_life_block>
 
-analyse_life_block studies the state of the var r
-in the block bb.
+Studies the state of the var r in the block bb.
 
-Its job is to set the flags LF_use, or LF_read,
-and record the intervals inside the block where
-the var is alive.
+Its job is to set the flags LF_use, or LF_read, and record the intervals inside
+the block where the var is alive.
 
 =cut
 
@@ -800,20 +825,16 @@ the var is alive.
 static void
 analyse_life_block(ARGIN(const Basic_block* bb), ARGMOD(SymReg *r))
 {
-    Life_range* const l = make_life_range(r, bb->index);
+    Life_range  * const l        = make_life_range(r, bb->index);
+    Instruction         *special = NULL;
+    Instruction         *ins;
 
-    Instruction *special = NULL;
-    Instruction *ins;
-
-    for (ins = bb->start; ins ; ins = ins->next) {
+    for (ins = bb->start; ins; ins = ins->next) {
         int is_alias;
-        /*
-         * if we have a setp_ind opcode, it may write all PMC
-         * registers
-         */
-        if (ins->opnum == PARROT_OP_setp_ind_i_p && r->set == 'P') {
+
+        /* if we have a setp_ind opcode, it may write all PMC registers */
+        if (ins->opnum == PARROT_OP_setp_ind_i_p && r->set == 'P')
             r->usage |= U_NON_VOLATILE;
-        }
 
         /* restoreall and such */
         if (ins_writes2(ins, r->set))
@@ -827,35 +848,35 @@ analyse_life_block(ARGIN(const Basic_block* bb), ARGMOD(SymReg *r))
         is_alias = (ins->type & ITALIAS) && ins->symregs[0] == r;
 
         if (instruction_reads(ins, r) || is_alias) {
-            /* if instruction gets read after a special, consider
-             * the first read of this instruction, like if a write
-             * had happened at special, so that the reg doesn't pop into
-             * life */
+            /* if instruction gets read after a special, consider the first
+             * read of this instruction, like if a write had happened at
+             * special, so that the reg doesn't pop into life */
             if (! (l->flags & LF_def)) {
                 if (special) {
                     l->first_ins = special;
-                    l->flags |= LF_def;
-                    special = NULL;
+                    l->flags    |= LF_def;
+                    special      = NULL;
                 }
                 else {
                     /* we read before having written before, so the var was
                      * live at the beginning of the block */
                     l->first_ins = bb->start;
-                    l->flags |= LF_use;
+                    l->flags    |= LF_use;
                 }
             }
+
             l->last_ins = ins;
         }
 
         if (!is_alias && instruction_writes(ins, r)) {
-
             l->flags |= LF_def;
 
-            if (!l->first_ins) {
+            if (!l->first_ins)
                 l->first_ins = ins;
-            }
+
             l->last_ins = ins;
         }
+
         if (ins == bb->end)
             break;
     }
@@ -863,10 +884,8 @@ analyse_life_block(ARGIN(const Basic_block* bb), ARGMOD(SymReg *r))
     if (!l->last_ins)
         l->last_ins = l->first_ins;
 
-    /* l->last can later be extended if it turns out
-     * that another block needs the value resulting from this
-     * computation */
-
+    /* l->last can later be extended if it turns out that another block needs
+     * the value resulting from this computation */
 }
 
 
@@ -874,47 +893,48 @@ analyse_life_block(ARGIN(const Basic_block* bb), ARGMOD(SymReg *r))
 
 =item C<static void propagate_need>
 
-RT#48260: Not yet documented!!!
+Follows the uses of the given symbol through all of the basic blocks of the
+unit.
 
 =cut
 
 */
 
 static void
-propagate_need(ARGMOD(Basic_block *bb), ARGIN(const SymReg* r), int i)
+propagate_need(ARGMOD(Basic_block *bb), ARGIN(const SymReg *r), int i)
 {
-    Edge *edge;
+    Edge        *edge;
+    Life_range  *l;
     Basic_block *pred;
-    Life_range *l;
 
     /* every predecessor of a LF_lv_in block must be in LF_lv_out
-       and, unless itself is LV_def, this should be propagated to
-       its predecessors themselves */
+     * and, unless itself is LV_def, this should be propagated to its
+     * predecessors themselves */
 
-    for (edge=bb->pred_list; edge!=NULL; edge=edge->pred_next) {
+    for (edge = bb->pred_list; edge; edge = edge->pred_next) {
         pred = edge->from;
-        l = r->life_info[pred->index];
+        l    = r->life_info[pred->index];
 
         if (l->flags & LF_lv_out) {
             /* this node has already been visited. Ignore it */
         }
         else {
-            l->flags |= LF_lv_out;
+            l->flags   |= LF_lv_out;
             l->last_ins = pred->end;
 
             if (! (l->flags & LF_def)) {
-                l->flags |= LF_lv_in;
+                l->flags    |= LF_lv_in;
                 l->first_ins = pred->start;
                 l->last_ins  = pred->end;
+
                 /* we arrived at block 0
                  *
-                 * emit a warning if -w
-                 * looking at some perl6 examples, where this warning
-                 * is emitted, there seems always to be a code path
-                 * where the var is not initialized, so this might
-                 * even be correct :)
+                 * emit a warning if -w looking at some Perl 6 examples where
+                 * this warning is emitted, there seems always to be a code
+                 * path where the var is not initialized, so this might even be
+                 * correct :)
                  *
-                 * RT#48286 subroutines
+                 * RT #48286 subroutines
                  */
 #if 0
                 if (pred->index == 0) {
@@ -934,21 +954,22 @@ propagate_need(ARGMOD(Basic_block *bb), ARGIN(const SymReg* r), int i)
     }
 }
 
+
 /*
 
 =item C<void compute_dominators>
 
-Computes the dominators tree of the CFG.
-Basic block A dominates B, if each path to B passes through A
+Computes the dominators tree of the CFG.  Basic block A dominates B if each
+path to B passes through A
 
-s. gcc:flow.c compute_dominators
+See gcc:flow.c compute_dominators
 
 =cut
 
 */
 
 void
-compute_dominators(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
+compute_dominators(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
 #define USE_BFS 0
 
@@ -960,13 +981,13 @@ compute_dominators(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
     Set *visited;
 #endif
     int b, runner, wrong;
-    Set** dominators;
+    Set **dominators;
 
     const int n = unit->n_basic_blocks;
     IMCC_info(interp, 2, "compute_dominators\n");
 
     unit->idoms      = mem_allocate_n_zeroed_typed(n, int);
-    dominators       = mem_allocate_n_zeroed_typed(n, Set*);
+    dominators       = mem_allocate_n_zeroed_typed(n, Set *);
     unit->dominators = dominators;
 
     dominators[0]    = set_make(n);
@@ -993,6 +1014,7 @@ compute_dominators(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
         Edge *edge;
         for (edge = unit->bb_list[q[cur]]->succ_list;
                 edge; edge = edge->succ_next) {
+
             succ_index = edge->to->index;
             set_intersec_inplace(dominators[succ_index], dominators[q[cur]]);
             set_add(dominators[succ_index], succ_index);
@@ -1006,6 +1028,7 @@ compute_dominators(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
     }
 #else
     change = 1;
+
     while (change) {
         change = 0;
 
@@ -1070,46 +1093,50 @@ compute_dominators(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
 #endif
 }
 
+
 /*
 
 =item C<void compute_dominance_frontiers>
 
-Algorithm to find dominance frontiers described in paper
-"A Simple, Fast Dominance Algorithm", Cooper et al. (2001)
+Algorithm to find dominance frontiers described in paper "A Simple, Fast
+Dominance Algorithm", Cooper et al. (2001)
 
 =cut
 
 */
 
 void
-compute_dominance_frontiers(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
+compute_dominance_frontiers(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     int i, b;
 
-    const int n = unit->n_basic_blocks;
+    const int    n                   = unit->n_basic_blocks;
     Set ** const dominance_frontiers = unit->dominance_frontiers =
-        (Set **)malloc(sizeof (Set *) * n);
+        mem_allocate_n_typed(n, Set *);
 
     IMCC_info(interp, 2, "compute_dominance_frontiers\n");
 
-    dominance_frontiers[0] = set_make(n);
-    for (i = 1; i < n; i++) {
+    for (i = 0; i < n; i++) {
         dominance_frontiers[i] = set_make(n);
     }
 
     /* for all nodes, b */
     for (b = 1; b < n; b++) {
         const Edge *edge = unit->bb_list[b]->pred_list;
+
         /* if the number of predecessors of b >= 2 */
         if (edge && edge->pred_next) {
+
             /* for all predecessors, p, of b */
             for (; edge; edge = edge->pred_next) {
                 /* runner = p */
                 int runner = edge->from->index;
+
                 /* while runner != idoms[b] */
                 while (runner >= 0 && runner != unit->idoms[b]) {
                     /* add b to runner's dominance frontier set */
                     set_add(unit->dominance_frontiers[runner], b);
+
                     /* runner = idoms[runner] */
                     if (runner == 0)
                         runner = -1;
@@ -1124,11 +1151,12 @@ compute_dominance_frontiers(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
         dump_dominance_frontiers(unit);
 }
 
+
 /*
 
 =item C<static void free_dominators>
 
-RT#48260: Not yet documented!!!
+Frees the memory in the given unit related to all dominators.
 
 =cut
 
@@ -1138,7 +1166,7 @@ static void
 free_dominators(ARGMOD(IMC_Unit *unit))
 {
     if (unit->dominators) {
-        unsigned int i;
+        int i;
 
         for (i = 0; i < unit->n_basic_blocks; i++) {
             set_free(unit->dominators[i]);
@@ -1150,11 +1178,12 @@ free_dominators(ARGMOD(IMC_Unit *unit))
     }
 }
 
+
 /*
 
 =item C<static void free_dominance_frontiers>
 
-RT#48260: Not yet documented!!!
+Frees the memory in the given unit related to all dominance frontiers.
 
 =cut
 
@@ -1164,7 +1193,7 @@ static void
 free_dominance_frontiers(ARGMOD(IMC_Unit *unit))
 {
     if (unit->dominance_frontiers) {
-        unsigned int i;
+        int i;
 
         for (i = 0; i < unit->n_basic_blocks; i++) {
             set_free(unit->dominance_frontiers[i]);
@@ -1180,7 +1209,7 @@ free_dominance_frontiers(ARGMOD(IMC_Unit *unit))
 
 =item C<static void sort_loops>
 
-RT#48260: Not yet documented!!!
+Sorts the loops found in the CFG of the current unit.
 
 =cut
 
@@ -1189,15 +1218,15 @@ RT#48260: Not yet documented!!!
 static void
 sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 {
-    unsigned int i, j;
-    int          changed;
-    Loop_info   *li;
 
-    unsigned int n_loops  = (unsigned int)unit->n_loops;
+    Loop_info   *li;
     Loop_info  **loop_info = unit->loop_info;
+    int          n_loops   = (int)unit->n_loops;
+    int          i, j, changed;
 
     for (i = 0; i < n_loops; i++) {
         loop_info[i]->size = 0;
+
         for (j = 0; j < unit->n_basic_blocks; j++)
             if (set_contains(loop_info[i]->loop, j))
                 loop_info[i]->size++;
@@ -1207,6 +1236,7 @@ sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 
     while (changed) {
         changed = 0;
+
         for (i = 0; n_loops && i < n_loops - 1; i++)
             if (loop_info[i]->size < loop_info[i + 1]->size) {
                 li             = loop_info[i];
@@ -1216,59 +1246,64 @@ sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
             }
     }
 
-    /* set depth, it's incorrect til now, as it did depend on the
-     * order of finding loops */
+    /* set depth was incorrect until now, as it depended on the order of
+     * finding loops */
     for (i = 0; n_loops && i < n_loops - 1; i++) {
-        int first = -1, last = 0;
+        int first           = -1;
+        int last            = 0;
         loop_info[i]->depth = 1;
-        /* we could also take the depth of the first contained
-         * block, but below is a check, that a inner loop is fully
-         * contained in a outer loop
-         */
+
+        /* we could also take the depth of the first contained block, but below
+         * is a check, that a inner loop is fully contained in a outer loop */
         for (j = 0; j < unit->n_basic_blocks; j++)
             if (set_contains(loop_info[i+1]->loop, j)) {
                 if (first < 0)
                     first = j;
                 last = j;
             }
+
         for (j = i + 1; j < n_loops; j++) {
-            if (set_contains(loop_info[i]->loop, first) &&
-                    !set_contains(loop_info[i]->loop, last)) {
+            if (set_contains(loop_info[i]->loop, first)
+            && !set_contains(loop_info[i]->loop, last)) {
                 IMCC_debug(interp, DEBUG_CFG, "sort_loops",
                         "loop %d contains first but not"
                         "last of outer loop %d\n", j, i);
             }
-            if (set_contains(loop_info[i]->loop, last) &&
-                    !set_contains(loop_info[i]->loop, first)) {
+
+            if (set_contains(loop_info[i]->loop, last)
+            && !set_contains(loop_info[i]->loop, first)) {
                 IMCC_debug(interp, DEBUG_CFG, "sort_loops",
                         "loop %d contains last but not"
                         "first of outer loop %d\n", j, i);
             }
+
             loop_info[j]->depth = loop_info[i]->depth + 1;
         }
     }
 }
 
+
 /*
 
 =item C<void find_loops>
 
-Searches for loops in the CFG. We search for edges that
-go from a node to one of its dominators.
+Searches for loops in the CFG. We search for edges that go from a node to one
+of its dominators.
 
 =cut
 
 */
 
 void
-find_loops(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
+find_loops(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    unsigned int i;
+    int i;
 
     IMCC_info(interp, 2, "find_loops\n");
+
     for (i = 0; i < unit->n_basic_blocks; i++) {
         const Set * const dom = unit->dominators[i];
-        const Edge *edge;
+        const Edge       *edge;
 
         for (edge = unit->bb_list[i]->succ_list; edge; edge = edge->succ_next) {
             if (set_contains(dom, edge->to->index))
@@ -1281,14 +1316,15 @@ find_loops(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
         dump_loops(unit);
 }
 
+
 /*
 
 =item C<int natural_preheader>
 
-For loop_info, finds the natural preheader of the loop, if any, and returns
-its index, otherwise returns -1.  A natural preheader exists if there is
-only one predecessor to the loop header outside of the loop body, and if it
-always transfers control directly to the header.
+For loop_info, finds the natural preheader of the loop, if any, and returns its
+index, otherwise returns -1.  A natural preheader exists if there is only one
+predecessor to the loop header outside of the loop body, and if it always
+transfers control directly to the header.
 
 =cut
 
@@ -1296,18 +1332,19 @@ always transfers control directly to the header.
 
 PARROT_WARN_UNUSED_RESULT
 int
-natural_preheader(ARGIN(const struct _IMC_Unit *unit), ARGIN(const Loop_info* loop_info))
+natural_preheader(ARGIN(const IMC_Unit *unit), ARGIN(const Loop_info* loop_info))
 {
-    int preheader = -1;
-    Edge* edge;
+    Edge *edge;
+    int   preheader = -1;
 
     for (edge = unit->bb_list[loop_info->header]->pred_list;
-         edge; edge = edge->pred_next) {
+         edge;
+         edge = edge->pred_next) {
         if (!set_contains(loop_info->loop, edge->from->index)) {
-            if (preheader == -1 &&
-                unit->bb_list[edge->from->index]->succ_list->to->index
-                == loop_info->header &&
-                !unit->bb_list[edge->from->index]->succ_list->succ_next)
+            if (preheader == -1
+            &&  unit->bb_list[edge->from->index]->succ_list->to->index
+                == loop_info->header
+            && !unit->bb_list[edge->from->index]->succ_list->succ_next)
             {
                 preheader = unit->bb_list[edge->from->index]->index;
                 continue;
@@ -1317,14 +1354,16 @@ natural_preheader(ARGIN(const struct _IMC_Unit *unit), ARGIN(const Loop_info* lo
             }
         }
     }
+
     return preheader;
 }
+
 
 /*
 
 =item C<static void mark_loop>
 
-Increases the loop_depth of all the nodes in a loop
+Increases the loop_depth of all the nodes in a loop.
 
 =cut
 
@@ -1333,16 +1372,15 @@ Increases the loop_depth of all the nodes in a loop
 static void
 mark_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const Edge *e))
 {
-    Set *loop;
-    Set *exits;
+    Set         *loop;
+    Set         *exits;
+    Edge        *edge;
+    Loop_info  **loop_info;
     Basic_block *header = e->to;
     Basic_block *footer = e->from;
     Basic_block *enter  = 0;
 
-    unsigned int i;
-    Edge *edge;
-    int n_loops;
-    Loop_info ** loop_info;
+    int          i, n_loops;
 
     /* look from where loop was entered */
     for (i = 0, edge=header->pred_list; edge; edge=edge->pred_next)
@@ -1353,16 +1391,16 @@ mark_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const Edge *e))
 
     IMCC_debug(interp, DEBUG_CFG, "loop from %d to %d, entered from %d\n",
             footer->index, header->index, enter ? enter->index : -1);
-    if (i != 1) {
-        if (i==0) {
-            if (header->index)
-                IMCC_debug(interp, DEBUG_CFG, "\tdead code\n");
-            else
-                IMCC_debug(interp, DEBUG_CFG, "\tsub start\n");
-        }
+
+    if (i == 0) {
+        if (header->index)
+            IMCC_debug(interp, DEBUG_CFG, "\tdead code\n");
         else
-            IMCC_debug(interp, DEBUG_CFG,
-                    "\tcan't determine loop entry block (%d found)\n" , i);
+            IMCC_debug(interp, DEBUG_CFG, "\tsub start\n");
+    }
+    else if (i != 1) {
+        IMCC_debug(interp, DEBUG_CFG,
+                "\tcan't determine loop entry block (%d found)\n" , i);
     }
 
     loop = set_make(unit->n_basic_blocks);
@@ -1380,20 +1418,20 @@ mark_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const Edge *e))
 
     for (i = 1; i < unit->n_basic_blocks; i++) {
         if (set_contains(loop, i)) {
-            for (edge = unit->bb_list[i]->succ_list; edge;
+            for (edge = unit->bb_list[i]->succ_list;
+                 edge;
                  edge = edge->succ_next)
             {
-                if (!set_contains(loop, edge->to->index)) {
+                if (!set_contains(loop, edge->to->index))
                     set_add(exits, i);
-                }
             }
         }
     }
 
     /* now 'loop' contains the set of nodes inside the loop.  */
-    n_loops   = unit->n_loops;
-    loop_info = mem_realloc_n_typed(unit->loop_info, n_loops + 1, Loop_info *);
-
+    n_loops                       = unit->n_loops;
+    loop_info                     = mem_realloc_n_typed(unit->loop_info,
+                                        n_loops + 1, Loop_info *);
     loop_info[n_loops]            = mem_allocate_typed(Loop_info);
     loop_info[n_loops]->loop      = loop;
     loop_info[n_loops]->exits     = exits;
@@ -1405,11 +1443,12 @@ mark_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const Edge *e))
     unit->n_loops++;
 }
 
+
 /*
 
 =item C<static void free_loops>
 
-RT#48260: Not yet documented!!!
+Frees the memory associated with the loops in this unit.
 
 =cut
 
@@ -1432,31 +1471,32 @@ free_loops(ARGMOD(IMC_Unit *unit))
     unit->loop_info = 0;
 }
 
+
 /*
 
 =item C<void search_predecessors_not_in>
 
-RT#48260: Not yet documented!!!
+Searches for predecessor edges for this node not in the given set (and adds
+them).
 
 =cut
 
 */
 
 void
-search_predecessors_not_in(ARGIN(const Basic_block *node), ARGMOD(Set* s))
+search_predecessors_not_in(ARGIN(const Basic_block *node), ARGMOD(Set *s))
 {
    Edge *edge;
 
-   for (edge = node->pred_list; edge != NULL; edge = edge->pred_next) {
+   for (edge = node->pred_list; edge; edge = edge->pred_next) {
         Basic_block * const pred = edge->from;
 
-        if (! set_contains(s, pred->index)) {
+        if (!set_contains(s, pred->index)) {
            set_add(s, pred->index);
            pred->loop_depth++;
            search_predecessors_not_in(pred, s);
         }
    }
-
 }
 
 /*** Utility functions ***/
@@ -1465,7 +1505,7 @@ search_predecessors_not_in(ARGIN(const Basic_block *node), ARGMOD(Set* s))
 
 =item C<static void init_basic_blocks>
 
-RT#48260: Not yet documented!!!
+Initializes the basic blocks memory for this unit.
 
 =cut
 
@@ -1474,31 +1514,32 @@ RT#48260: Not yet documented!!!
 static void
 init_basic_blocks(ARGMOD(IMC_Unit *unit))
 {
-    if (unit->bb_list != NULL)
+    if (!unit->bb_list)
         clear_basic_blocks(unit);
-
-    unit->bb_list_size = 256;
-    unit->bb_list = mem_allocate_n_zeroed_typed(unit->bb_list_size, Basic_block *);
 
     unit->n_basic_blocks = 0;
     unit->edge_list      = NULL;
+    unit->bb_list_size   = 256;
+    unit->bb_list        = mem_allocate_n_zeroed_typed(unit->bb_list_size,
+                                                     Basic_block *);
 }
+
 
 /*
 
 =item C<void clear_basic_blocks>
 
-RT#48260: Not yet documented!!!
+Frees all of the blocks and CFG memory allocated for this unit.
 
 =cut
 
 */
 
 void
-clear_basic_blocks(ARGMOD(struct _IMC_Unit *unit))
+clear_basic_blocks(ARGMOD(IMC_Unit *unit))
 {
     if (unit->bb_list) {
-        unsigned int i;
+        int i;
 
         for (i = 0; i < unit->n_basic_blocks; i++)
             mem_sys_free(unit->bb_list[i]);
@@ -1513,11 +1554,12 @@ clear_basic_blocks(ARGMOD(struct _IMC_Unit *unit))
     free_loops(unit);
 }
 
+
 /*
 
 =item C<static Basic_block* make_basic_block>
 
-RT#48260: Not yet documented!!!
+Creates, initializes, and returns a new Basic_block.
 
 =cut
 
@@ -1526,10 +1568,11 @@ RT#48260: Not yet documented!!!
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static Basic_block*
-make_basic_block(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction* ins))
+make_basic_block(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins))
 {
-    int n;
     Basic_block * const bb = mem_allocate_typed(Basic_block);
+    int                 n  = unit->n_basic_blocks;
+
     PARROT_ASSERT(ins);
 
     bb->start      = ins;
@@ -1538,7 +1581,6 @@ make_basic_block(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction* ins))
     bb->pred_list  = NULL;
     bb->succ_list  = NULL;
 
-    n              = unit->n_basic_blocks;
     ins->bbindex   = n;
     bb->index      = n;
     bb->loop_depth = 0;
@@ -1554,11 +1596,12 @@ make_basic_block(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction* ins))
     return bb;
 }
 
+
 /*
 
 =item C<Life_range * make_life_range>
 
-RT#48260: Not yet documented!!!
+Creates and returns a Life_range for the given register at the specified index.
 
 =cut
 
@@ -1570,7 +1613,6 @@ Life_range *
 make_life_range(ARGMOD(SymReg *r), int idx)
 {
     Life_range * const l = mem_allocate_zeroed_typed(Life_range);
-
     r->life_info[idx]    = l;
 
     return l;

@@ -323,6 +323,34 @@ Returns the number of elements in the array.
 
 /*
 
+=item C<PMC *clone()>
+
+Returns the number of elements in the array.
+
+=cut
+
+*/
+
+    VTABLE PMC *clone() {
+        PMC * const dest   = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC_int_val(dest)  = PMC_int_val(SELF);
+        PMC_int_val2(dest) = PMC_int_val2(SELF);
+
+        if (PMC_data(SELF)) {
+            PMC_data(dest) = mem_sys_allocate(
+                    (PMC_int_val(dest)) / BITS_PER_CHAR + 1);
+            mem_sys_memcopy(PMC_data(dest), PMC_data(SELF),
+                    (PMC_int_val(dest)) / BITS_PER_CHAR + 1);
+        }
+        else
+            PMC_data(dest) = NULL;
+
+        PObj_active_destroy_SET(dest);
+        return dest;
+    }
+
+/*
+
 =back
 
 =head2 Freeze/thaw Interface

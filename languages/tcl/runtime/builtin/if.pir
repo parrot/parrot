@@ -90,9 +90,9 @@ arg_else:
 arg_end:
 
     # now we can do the actual evaluation
-    .local pmc __script, __boolean
+    .local pmc __script, toBoolean
     __script  = get_root_global ['_tcl'], '__script'
-    __boolean = get_root_global ['_tcl'], '__boolean'
+    toBoolean = get_root_global ['_tcl'], 'toBoolean'
 
     .local pmc    cond
     .local string code
@@ -102,7 +102,7 @@ arg_end:
 
 loop:
     $P1 = cond()
-    $I1 = __boolean($P1)
+    $I1 = toBoolean($P1)
     unless $I1 goto next
     $P0 = __script(code, 'ns'=>ns)
     .return $P0()

@@ -37,20 +37,28 @@ S03-junctions/misc.t
 S04-declarations/multiple.t
 S04-declarations/my.t
 S04-declarations/implicit-parameter.t           # pure
+S04-statements/do.t
+S04-statements/for.t
+S04-statements/given.t
 S04-statements/no-implicit-block.t
 S04-statements/repeat.t
+S04-statements/return.t
 S04-statements/terminator.t                     # pure
 S04-statements/try.t
 S04-statements/until.t                          # pure
 S04-statements/while.t
+S05-transliteration/trans.t
 S06-signature/mixed-placeholders.t              # pure
 S06-signature/named-parameters.t
 S06-signature/named-placeholders.t              # pure
 S06-signature/positional-placeholders.t         # pure
 S06-signature/slurpy-placeholders.t             # pure
+S12-class/anonymous.t                           # pure
 S12-class/attributes.t                          # pure
+S12-class/inheritance-class-methods.t
 S12-class/instantiate.t                         # pure
 S12-class/parent_attributes.t                   # pure
+S12-enums/as-role.t                             # pure
 S12-methods/calling_syntax.t                    # pure
 S12-role/attributes.t
 S12-role/composition.t                          # pure

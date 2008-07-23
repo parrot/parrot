@@ -1,12 +1,75 @@
 # $Id$
 
+New in August 2008 release
+- Tools
+  + parrot_debugger renamed from pdb
+- Implementation
+  + removed opcode getfd
+
 New in 0.6.4
+- Documentation
+  + removed a lot of old information from the FAQ
+  + improved function level documentation
+- Configuration
+  + removed the configuration item 'has_gnu_m4'
+  + refactored ICU-detection
 - Languages
+  + ChitChat
+    - improved the Smalltalk implementation
   + Pipp
-    - Renamed from Plumhead
-    - Support for a lot of builtin functions.
+    - renamed Plumhead to Pipp
+    - support for a lot of builtin functions.
     - Pipp now uses PHP specific data types.
-    - Converted from PCT with TGE to PCT with NQP actions
+    - converted from PCT with TGE to PCT with NQP actions
+    - improvements in the PCT variant by using optok parsing
+    - start of object support
+  + pir
+    - simple assignments work
+  + json
+    - added a PCT-based implementation of JSON parsing
+  + lolcode
+    - improved handling of symbols
+    - added support for block handling
+    - added support for globals
+  + Lua
+    - more tests
+  + Rakudo
+    - updated Range implementation
+    - added enums
+    - added generic type declarations (::T)
+    - added runtime mixing of roles with 'does' and 'but'
+    - fixed handling of implicit lexicals ($_, $!, and $/)
+    - fixed implicit method calls on $_
+    - improved complex math builtins, added Complex
+    - moved many builtins to class Any
+    - declaration of lists of variables now work
+    - improved test infrastructure
+    - 910 additional passing spec tests since last release
+    - more convergence with STD.pm grammar
+    - added named 0-ary parsing and ops
+- Compilers
+  + PCT:
+    - allowed subroutine and method names to be a PAST tree that produces the name
+    - Improved lexical handling
+- Tools
+  + pbc_disassemble renamed from disassemble
+- Implementation
+  + allowed .macro_const in PIR
+  + added the flag :lexid(...) for subroutines
+  + made multiple dispatch work for sub types
+  + fixed garbage collection bug related to the metadata attached to a PMC_EXT structure
+  + added a warning when using deprecated opcodes
+  + simplified the stacks implementation
+  + fixed C++ build
+  + improved closure and lexical support
+  + improved IMCC register allocator
+  + added cache for all runtime-constant strings, reducing memory usage
+- Miscellaneous
+  + improved OpenGL/GLU/GLUT bindings
+  + added a standard profile for Perl::Critic coding standard testing
+  + added support for smoke testing with Smolder
+  + enabled use of Test::Harness 3.0 if available, but don't require it for 'make test'
+  + added the executable 'parrot_config' to query Parrot configuration
 
 New in 0.6.3
 - Specification

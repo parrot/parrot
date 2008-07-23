@@ -4,14 +4,15 @@ library/Getopt/Obj.pir - parse long and short command line options
 
 =head1 SYNOPSIS
 
- .sub main :main
-     .param pmc argv
-     .local string prog_name
-     prog_name = shift argv
-     load_bytecode "Getopt/Obj.pir"
-     .local pmc getopts
-     getopts = new "Getopt::Obj"
-     getopts."notOptStop"(1)
+.sub main :main
+    .param pmc argv
+
+    .local string prog_name
+    prog_name = shift argv
+    load_bytecode "Getopt/Obj.pir"
+    .local pmc getopts
+    getopts = new "Getopt::Obj"
+    getopts."notOptStop"(1)
 
      # these two are identical, with the exception of the call to name
 
@@ -114,6 +115,7 @@ wanted.
 
 .sub get_options :method
     .param pmc argv
+
     .local pmc return, spec
     .local int i, j, argc
     .local string name, long, short, arg, key, val
@@ -469,10 +471,11 @@ return the name for the key.
 
 =cut
 
-# XXX should the name really ever be passed?
+# RT #56782 should the name really ever be passed?
 
 .sub "getNameForKey" :method
     .param string key
+
     .local int j, specslen
     .local pmc specs, spec
     .local string name, long, short
@@ -508,6 +511,7 @@ endfor:
 finish:
     null $S0
     null $P0
+
     .return ($S0, $P0)
 .end
 
@@ -526,6 +530,7 @@ later.  Or of course, it's not an argument at all and perhaps a filename.
 .sub "notOptStop" :method
     .param int val :optional
     .param int opt :opt_flag
+
     $P0 = getattribute self, "notOptStop"
     unless opt goto else_0
     # Setting
@@ -535,6 +540,7 @@ else_0:
     # Getting
     val = $P0
 endif_0:
+
     .return(val)
 .end
 
@@ -547,6 +553,7 @@ When a required argument is missing, throws an exception with the message
 
 .sub MissingRequired
     .param string arg
+
     $P0 = new 'Exception'
     $S0 = "Missing a required argument for option '"
     $S0 .= arg
@@ -610,6 +617,7 @@ long/short arguments instead of one of each.
 .sub name :method
     .param string val :optional
     .param int opt :opt_flag
+
     $P0 = getattribute self, "name"
     unless opt goto else
     # Setting
@@ -625,6 +633,7 @@ else:
     $P0 = getattribute self, "short"
     val = $P0
 endif:
+
     .return(val)
 .end
 
@@ -640,6 +649,7 @@ string set as the long.
 .sub "long" :method
     .param string val :optional
     .param int opt :opt_flag
+
     $P0 = getattribute self, "long"
     unless opt goto else_0
     # Setting
@@ -649,6 +659,7 @@ else_0:
     # Getting
     val = $P0
 endif_0:
+
     .return(val)
 .end
 
@@ -666,6 +677,7 @@ NOTE: There is no checking to ensure that short is only one character.
 .sub "short" :method
     .param string val :optional
     .param int opt :opt_flag
+
     $P0 = getattribute self, "short"
     unless opt goto else_0
     # Setting
@@ -675,6 +687,7 @@ else_0:
     # Getting
     val = $P0
 endif_0:
+
     .return(val)
 .end
 
@@ -685,7 +698,7 @@ endif_0:
 If val is given, set the type to that.  If val is not given, return the int set
 as the type.
 
-NOTE: It doesn't verify it's a corrent type.
+NOTE: It doesn't verify it's a correct type.
 
 =over 4
 
@@ -735,6 +748,7 @@ code.  There's no guarantees they won't be reassigned.
 .sub "type" :method
     .param string val :optional
     .param int opt :opt_flag
+
     $P0 = getattribute self, "type"
     unless opt goto else_0
     # Setting
@@ -744,6 +758,7 @@ else_0:
     # Getting
     val = $P0
 endif_0:
+
     .return(val)
 .end
 
@@ -760,6 +775,7 @@ C<-fbar>, C<-f> is set to C<bar>.  In C<-f bar> it is NOT set.
 .sub "optarg" :method
     .param int val :optional
     .param int opt :opt_flag
+
     $P0 = getattribute self, "optarg"
     unless opt goto else_0
     # Setting
@@ -769,6 +785,8 @@ else_0:
     # Getting
     val = $P0
 endif_0:
+
+
     .return(val)
 .end
 
@@ -801,10 +819,6 @@ For an arg to a short arg, e.g. -C -d, will put -d as the value for -C so long
 as -C is not a C<Boolean>.  Should it be an error?
 
 =back
-
-=head1 CAVEAT EMPTOR
-
-It's new, not well tested, etc...
 
 =head1 BUGS
 
@@ -842,8 +856,6 @@ F<t/library/getopt_obj.t>
 =head1 COPYRIGHT
 
 Copyright (C) 2006-2008, The Perl Foundation.
-This program is free software. It is subject to the same
-license as The Parrot Interpreter.
 
 =cut
 

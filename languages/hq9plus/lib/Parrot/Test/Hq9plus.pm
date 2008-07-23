@@ -51,8 +51,6 @@ sub get_test_prog {
         $lang_fn = File::Spec->catdir( '..', $lang_fn );
     }
 
-#43266: [TODO] Make the Parrot::Test::<lang> Perl5 modules less redundant
-#
     my $test_prog_args = $ENV{TEST_PROG_ARGS} || q{};
 
     return

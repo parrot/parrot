@@ -17,14 +17,14 @@
   value = pop argv
   dec argc
 
-  .local pmc __read, __list, __set
+  .local pmc __read, toList, __set
   __read = get_root_global ['_tcl'], '__read'
-  __list = get_root_global ['_tcl'], '__list'
+  toList = get_root_global ['_tcl'], 'toList'
   __set  = get_root_global ['_tcl'], '__set'
 
   .local pmc retval, list
   list = __read(name)
-  list = __list(list)
+  list = toList(list)
   retval = list
 
   # we removed the value, so this would be one now
@@ -36,7 +36,7 @@ lset:
 
   unless argc == 2 goto iterate
   $P0 = argv[1]
-  $P0 = __list($P0)
+  $P0 = toList($P0)
   $I0 = elements $P0
   if $I0 == 0 goto replace
 
@@ -48,7 +48,7 @@ outer_loop:
   inc outer_i
   if outer_i == argc goto done
   indices = argv[outer_i]
-  indices = __list(indices)
+  indices = toList(indices)
 
   $I0 = 0
   $I1 = elements indices
@@ -63,7 +63,7 @@ loop:
 
   prev = list
   list = list[$I2]
-  list = __list(list)
+  list = toList(list)
   prev[$I2] = list
 
   inc $I0

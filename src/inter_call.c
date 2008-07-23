@@ -157,14 +157,14 @@ static void too_many(PARROT_INTERP,
 #define PARROT_MAX(a, b) (((a)) > (b) ? (a) : (b))
 
 #define SAVE_OFF_REGS(orig, next, save) \
-        save.bp = orig.bp;\
-        save.bp_ps = orig.bp_ps;\
-        orig.bp = next.bp;\
-        orig.bp_ps = next.bp_ps;
+        (save).bp = (orig).bp;\
+        (save).bp_ps = (orig).bp_ps;\
+        (orig).bp = (next).bp;\
+        (orig).bp_ps = (next).bp_ps;
 
 #define RESTORE_REGS(orig, save) \
-        orig.bp = save.bp;\
-        orig.bp_ps = save.bp_ps;
+        (orig).bp = (save).bp;\
+        (orig).bp_ps = (save).bp_ps;
 
 
 /*
@@ -646,7 +646,8 @@ Parrot_fetch_arg_nci(PARROT_INTERP, ARGMOD(call_state *st))
     next_arg_sig(&st->dest);
 
     if (st->dest.sig & PARROT_ARG_SLURPY_ARRAY) {
-        PMC *slurped = pmc_new(interp, enum_class_ResizablePMCArray);
+        PMC *slurped = pmc_new(interp,
+                Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray));
 
         PARROT_ASSERT((st->dest.sig & PARROT_ARG_TYPE_MASK) == PARROT_ARG_PMC);
 
@@ -1359,7 +1360,8 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
 
     /* 2nd: Positional :slurpy */
     if (dest->sig & PARROT_ARG_SLURPY_ARRAY && !(dest->sig & PARROT_ARG_NAME)) {
-        PMC * const  array = pmc_new(interp, enum_class_ResizablePMCArray);
+        PMC * const  array = pmc_new(interp,
+                Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray));
         const INTVAL idx   = st->dest.u.op.pc[dest->i];
 
         PARROT_ASSERT(idx >= 0);
@@ -1830,6 +1832,8 @@ Signatures:
   f flatten
   n named
   s slurpy
+  o optional
+  p opt flag
 
   -> is the separator between args and results, similar to type theory notation.
 
@@ -1917,24 +1921,41 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
 
     /* first loop through signature to get sizing info */
     for (x = signature; *x != '\0'; x++) {
-        /* detect -> separator */
-        if (*x == '-') {
-            seen_arrow = 1 ;
-        }
-        else if (isupper((unsigned char)*x)) {
-             /* calculate needed length of arg and result sig FIAs */
-            arg_ret_cnt[seen_arrow]++;
-
-            /* calculate max reg types (INSP) needed in context */
-            switch (*x) {
-                case 'I': max_regs[seen_arrow * 4 + REGNO_INT]++; break;
-                case 'N': max_regs[seen_arrow * 4 + REGNO_NUM]++; break;
-                case 'S': max_regs[seen_arrow * 4 + REGNO_STR]++; break;
-                case 'P': max_regs[seen_arrow * 4 + REGNO_PMC]++; break;
-                default:
+        switch (*x) {
+            case '-':
+                /* detect -> separator */
+                seen_arrow = 1 ;
+                ++x;
+                if (*x != '>')
                     real_exception(interp, NULL, E_IndexError,
-                        "Parrot_PCCINVOKE: invalid reg type %c!", *x);
-            }
+                        "Parrot_PCCINVOKE: invalid signature separator %c!",
+                        *x);
+                break;
+            case 'I':
+                arg_ret_cnt[seen_arrow]++;
+                max_regs[seen_arrow * 4 + REGNO_INT]++;
+                break;
+            case 'N':
+                arg_ret_cnt[seen_arrow]++;
+                max_regs[seen_arrow * 4 + REGNO_NUM]++;
+                break;
+            case 'S':
+                arg_ret_cnt[seen_arrow]++;
+                max_regs[seen_arrow * 4 + REGNO_STR]++;
+                break;
+            case 'P':
+                arg_ret_cnt[seen_arrow]++;
+                max_regs[seen_arrow * 4 + REGNO_PMC]++;
+                break;
+            case 'f':
+            case 'n':
+            case 's':
+            case 'o':
+            case 'p':
+                break;
+            default:
+                real_exception(interp, NULL, E_IndexError,
+                    "Parrot_PCCINVOKE: invalid reg type %c!", *x);
         }
     }
 

@@ -122,11 +122,12 @@ proc diag {diagnostic} {
 # A placeholder that simulates the real tcltest's exported test proc.
 proc test {num description args} {
     global skipped_tests
+    global abort_after
     if {![info exists skipped_tests]} {
         # get listing of all the tests we can't run.
         source lib/skipped_tests.tcl
     }
-    global abort_after
+
     set full_desc "$num $description"
 
     set should_skip [dict filter $skipped_tests script {K V} {
@@ -163,7 +164,7 @@ proc test {num description args} {
 # when we shouldn't.
 
 proc testConstraint     {args} {return 0}
-proc temporaryDirectory {args} {return 0}
+proc temporaryDirectory {args} {return .}
 proc makeFile           {args} {return 0}
 proc removeFile         {args} {return 0}
 proc bytestring         {args} {return 0}
@@ -173,6 +174,7 @@ proc interpreter        {args} {return 0}
 proc interp             {args} {return 0}
 proc safeInterp         {args} {return 0}
 proc pid                {args} {return 0}
+proc auto_load          {args} {return 0}
 proc child              {args} {return 0}
 proc child-trusted      {args} {return 0}
 proc makeDirectory      {args} {return 0}
@@ -180,8 +182,20 @@ proc removeDirectory    {args} {return 0}
 proc testobj            {args} {return 0}
 proc testsetplatform    {args} {return 0}
 proc testevalex         {cmd}  { uplevel {*}$cmd }
+proc cleanupTests       {args} {return 0}
+proc PowerSet           {args} {return 0}
 
-namespace eval tcltest  {
+set auto_path {}
+
+namespace eval tcl {
+    set OptDescN 0
+}
+
+namespace eval tcltest {
     set verbose 0
-    proc temporaryDirectory {args} {return 0}
+    set testSingleFile 0 
+    set temporaryDirectory .
+    proc temporaryDirectory {args} {return .}
+    proc testConstraint     {args} {return 0}
+    proc test {args} {return [::test {*}$args]}
 } 

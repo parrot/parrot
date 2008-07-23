@@ -17,8 +17,8 @@
   $P0 = getinterp
   ns  = $P0['namespace'; 1]
 
-  .local pmc __list, __script, __set
-  __list   = get_root_global ['_tcl'], '__list'
+  .local pmc toList, __script, __set
+  toList   = get_root_global ['_tcl'], 'toList'
   __script = get_root_global ['_tcl'], '__script'
   __set    = get_root_global ['_tcl'], '__set'
 
@@ -37,9 +37,9 @@ arg_loop:
 
   .local pmc varList, list
   varList = shift iter
-  varList = __list(varList)
+  varList = toList(varList)
   list    = shift iter
-  list    = __list(list)
+  list    = toList(list)
 
   $I0 = elements varList
   if $I0 == 0 goto bad_varlist

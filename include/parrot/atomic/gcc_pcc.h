@@ -69,11 +69,11 @@ inline static long parrot_ppc_add(volatile long *val, long what)
 
 #  define PARROT_ATOMIC_PTR_CAS(result, a, expect, update) \
     do { \
-        if (parrot_ppc_cmpset(&(a).val, expect, update) == expect) { \
-            result = 1; \
+        if (parrot_ppc_cmpset(&(a).val, (expect), (update)) == (expect)) { \
+            (result) = 1; \
         } \
         else { \
-            result = 0; \
+            (result) = 0; \
         } \
     } while (0)
 
@@ -96,23 +96,23 @@ typedef struct Parrot_atomic_integer {
 #  define PARROT_ATOMIC_INT_CAS(result, a, expect, update) \
     do { \
         if (parrot_ppc_cmpset(\
-                (void * volatile *) &(a).val, (void *) expect, \
-                (void *) update) == (void *) expect) { \
-            result = 1; \
+                (void * volatile *) &(a).val, (void *) (expect), \
+                (void *) (update)) == (void *) (expect)) { \
+            (result) = 1; \
         } \
         else { \
-            result = 0; \
+            (result) = 0; \
         } \
     } while (0)
 
 #  define PARROT_ATOMIC_INT_INC(result, a) \
     do { \
-        result = parrot_ppc_add(&(a).val, 1); \
+        (result) = parrot_ppc_add(&(a).val, 1); \
     } while (0)
 
 #  define PARROT_ATOMIC_INT_DEC(result, a) \
     do { \
-        result = parrot_ppc_add(&(a).val, -1); \
+        (result) = parrot_ppc_add(&(a).val, -1); \
     } while (0)
 
 #endif /* PARROT_ATOMIC_GCC_PCC_H_GUARD */

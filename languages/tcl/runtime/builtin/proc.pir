@@ -21,10 +21,10 @@ Create a PIR sub on the fly for this user defined proc.
   args      = argv[1]
   body      = argv[2]
 
-  .local pmc pir_compiler, __script, __list, __namespace
+  .local pmc pir_compiler, __script, toList, __namespace
   pir_compiler = compreg 'PIR'
   __script     = get_root_global ['_tcl'], '__script'
-  __list       = get_root_global ['_tcl'], '__list'
+  toList       = get_root_global ['_tcl'], 'toList'
   __namespace  = get_root_global ['_tcl'], '__namespace'
 
   .local pmc code, args_code, defaults
@@ -76,11 +76,6 @@ create:
 .sub 'xxx' :anon
   .param pmc args :slurpy
   .include 'languages/tcl/src/returncodes.pasm'
-  .local pmc epoch, colons, split, unk, interactive :unique_reg
-  epoch  = get_root_global ['_tcl'], 'epoch'
-  colons = get_root_global ['_tcl'], 'colons'
-  split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
-  interactive = get_root_global ['tcl'], '$tcl_interactive'
 
   .local pmc call_chain, lexpad
   call_chain = get_root_global ['_tcl'], 'call_chain'
@@ -103,7 +98,7 @@ END_PIR
   .local pmc arg
   args_usage = ''
   args_info  = ''
-  args  = __list(args)
+  args  = toList(args)
   i     = 0
   elems = elements args
   min   = 0
@@ -118,7 +113,7 @@ END_PIR
 args_loop:
   if i == elems goto args_loop_done
   arg = args[i]
-  arg = __list(arg)
+  arg = toList(arg)
 
   $S0 = arg[0]
   args_info .= $S0

@@ -734,7 +734,7 @@ Adds the supplied PMC to the list of parents for the class.
         STRING * const parent_name  = VTABLE_get_string(interp, parent);
 
         /* get number of direct parents */
-        const int parent_count      = VTABLE_elements(interp, _class->parents);
+        int parent_count      = VTABLE_elements(interp, _class->parents);
 
         int index; /* loop iterator */
 
@@ -765,7 +765,23 @@ Adds the supplied PMC to the list of parents for the class.
                     "It may have been supplied by a role.",
                     VTABLE_get_string(interp, SELF), parent_name);
         }
+        /* Check is not self */
+        if (parent == SELF)
+            real_exception(interp, NULL, E_TypeError, "Can't be own parent");
 
+        /* Check that none of the parents is self */
+        parent_count = VTABLE_elements(interp,
+            PARROT_CLASS(parent)->all_parents);
+        for (index = 0; index < parent_count; index++) {
+            /* get the next parent */
+            PMC * const current_parent = VTABLE_get_pmc_keyed_int(interp,
+                PARROT_CLASS(parent)->all_parents, index);
+            if (current_parent == SELF)
+                real_exception(interp, NULL, E_TypeError,
+                    "Loop in class hierarchy: '%S' is an ancestor of '%S'.",
+                    VTABLE_get_string(interp, SELF),
+                    VTABLE_get_string(interp, parent));
+        }
 
         /* Add to the lists of our immediate parents and all parents. */
         VTABLE_push_pmc(interp, _class->parents, parent);

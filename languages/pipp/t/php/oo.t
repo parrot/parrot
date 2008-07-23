@@ -18,7 +18,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
 # core Perl modules
-use Test::More     tests => 2;
+use Test::More     tests => 3;
 
 # Parrot modules
 use Parrot::Test;
@@ -58,3 +58,27 @@ END_CODE
 The function bums() in class dings has been called.
 END_EXPECTED
 
+
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'using $this' );
+<?php
+
+class Foo {
+    
+    function bar() {
+        echo "The method bar() of class Foo has been called.\n";
+    }
+    
+    function baz() {
+        echo "The method baz() of class Foo has been called.\n";
+        $this->bar();
+    }
+}
+ 
+$foo = new Foo;
+$foo->baz();
+ 
+?>
+END_CODE
+The method baz() of class Foo has been called.
+The method bar() of class Foo has been called.
+END_EXPECTED

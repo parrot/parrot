@@ -22,19 +22,25 @@ package auto::jit;
 use strict;
 use warnings;
 
-
 use base qw(Parrot::Configure::Step);
-
 use Parrot::Configure::Utils qw(copy_if_diff);
 
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining architecture, OS and JIT capability};
+    $data{description} = q{Determining JIT capability};
     $data{result}      = q{};
     $data{jit_is_working} = {
         i386 => 1,
         ppc  => 1,
+    };
+    $data{jitbase_default} = 'src/jit';   # base path for jit sources
+    # jitcpuarch_platforms:  Those which should be examined for possibility of
+    # exec capability.
+    $data{jitcpuarch_platforms} = { map { $_ => 1 } qw( i386 ppc arm ) };
+    # execcapable_oses:  Those which should have exec capability.
+    $data{execcapable_oses} = { map { $_ => 1 }
+        qw( openbsd freebsd netbsd linux darwin cygwin MSWin32 )
     };
     return \%data;
 }
@@ -53,13 +59,101 @@ sub runstep {
     my $cpuarch     = $conf->data->get('cpuarch');
     my $osname      = $conf->data->get('osname');
 
-    my $jitbase  = 'src/jit';   # base path for jit sources
+    my $jitbase  = $self->{jitbase_default};   # base path for jit sources
 
     my $corejit = "$jitbase/$cpuarch/core.jit";
     print( qq{-e $corejit = },
         -e $corejit ? 'yes' : 'no', "\n" )
         if $verbose;
 
+    my $jitcapable =
+        $self->_check_jitcapability($corejit, $cpuarch, $osname);
+
+    my $jitarchname = "$cpuarch-$osname";
+    _handle_asm( {
+        conf        => $conf,
+        jitbase     => $jitbase,
+        cpuarch     => $cpuarch,
+        jitarchname => $jitarchname,
+    } );
+
+    # let developers override the default JIT capability
+    $jitcapable = $conf->options->get('jitcapable')
+        if defined $conf->options->get('jitcapable');
+
+    if (! $jitcapable) {
+        $conf->data->set(
+            jitarchname    => 'nojit',
+            jitcpuarch     => $cpuarch,
+            jitcpu         => $cpuarch,
+            jitosname      => $osname,
+            jitcapable     => 0,
+            execcapable    => 0,
+            cc_hasjit      => '',
+            TEMP_jit_o     => '',
+            TEMP_exec_h    => '',
+            TEMP_exec_o    => '',
+            TEMP_exec_dep  => '',
+        );
+        $self->set_result('no');
+        return 1;
+    }
+
+    my ( $jitcpuarch, $jitosname ) = split( /-/, $jitarchname );
+    $conf->data->set(
+        jitarchname => $jitarchname,
+        jitcpuarch  => $jitcpuarch,
+        jitcpu      => uc($jitcpuarch),
+        jitosname   => uc($jitosname),
+        jitcapable  => 1,
+        cc_hasjit   => " -DHAS_JIT -D\U$jitcpuarch",
+        TEMP_jit_o =>
+'$(SRC_DIR)/jit$(O) $(SRC_DIR)/jit_cpu$(O) $(SRC_DIR)/jit_debug$(O) $(SRC_DIR)/jit_debug_xcoff$(O)'
+    );
+
+    my $execcapable = $self->_first_probe_for_exec(
+        $jitcpuarch, $osname);
+    $execcapable = $conf->options->get('execcapable')
+        if defined $conf->options->get('execcapable');
+    _handle_execcapable($conf, $execcapable);
+
+    # test for executable malloced memory
+    if ( -e "config/auto/jit/test_exec_$osname.in" ) {
+        print " (has_exec_protect " if $verbose;
+        $conf->cc_gen("config/auto/jit/test_exec_$osname.in");
+        eval { $conf->cc_build(); };
+        if ($@) {
+            print " $@) " if $verbose;
+        }
+        else {
+            my $exec_protect_test = (
+                $conf->cc_run(0) !~ /ok/ && $conf->cc_run(1) =~ /ok/
+            );
+            _handle_exec_protect($conf, $exec_protect_test, $verbose);
+        }
+        $conf->cc_clean();
+    }
+
+    # RT #43146 use executable memory for this test if needed
+    #
+    # test for some instructions
+    if ( $jitcpuarch eq 'i386' ) {
+        $conf->cc_gen('config/auto/jit/test_c.in');
+        eval { $conf->cc_build(); };
+        unless ( $@ || $conf->cc_run() !~ /ok/ ) {
+            $conf->data->set( jit_i386 => 'fcomip' );
+        }
+        $conf->cc_clean();
+    }
+    $self->set_result('yes');
+    return 1;
+}
+
+#################### INTERNAL SUBROUTINES ####################
+
+sub _check_jitcapability {
+    my $self = shift;
+    my ($corejit, $cpuarch, $osname) = @_;
     my $jitcapable = 0;
     if ( -e $corejit ) {
 
@@ -78,110 +172,37 @@ sub runstep {
             $jitcapable = 0;
         }
     }
+    return $jitcapable;
+}
 
-    my $jitarchname = "$cpuarch-$osname";
-    my $sjit = "$jitbase/$cpuarch/$jitarchname.s";
-    my $asm = "$jitbase/$cpuarch/asm.s";
+sub _handle_asm {
+    my $arg = shift;
+    my $sjit = "$arg->{jitbase}/$arg->{cpuarch}/$arg->{jitarchname}.s";
+    my $asm = "$arg->{jitbase}/$arg->{cpuarch}/asm.s";
     if ( -e $sjit ) {
         copy_if_diff( $sjit, "src/asmfun.s" );
-        $conf->data->set( asmfun_o => 'src/asmfun$(O)' );
+        $arg->{conf}->data->set( asmfun_o => 'src/asmfun$(O)' );
     }
     elsif ( -e $asm ) {
         copy_if_diff( $asm, "src/asmfun.s" );
-        $conf->data->set( asmfun_o => 'src/asmfun$(O)' );
+        $arg->{conf}->data->set( asmfun_o => 'src/asmfun$(O)' );
     }
     else {
-        $conf->data->set( asmfun_o => '' );
+        $arg->{conf}->data->set( asmfun_o => '' );
     }
+}
 
-    # let developers override the default JIT capability
-    $jitcapable = $conf->options->get('jitcapable')
-        if defined $conf->options->get('jitcapable');
-
-    if ($jitcapable) {
-        my ( $jitcpuarch, $jitosname ) = split( /-/, $jitarchname );
-
-        $conf->data->set(
-            jitarchname => $jitarchname,
-            jitcpuarch  => $jitcpuarch,
-            jitcpu      => uc($jitcpuarch),
-            jitosname   => uc($jitosname),
-            jitcapable  => 1,
-            cc_hasjit   => " -DHAS_JIT -D\U$jitcpuarch",
-            TEMP_jit_o =>
-'$(SRC_DIR)/jit$(O) $(SRC_DIR)/jit_cpu$(O) $(SRC_DIR)/jit_debug$(O) $(SRC_DIR)/jit_debug_xcoff$(O)'
-        );
-
-        my $execcapable = 0;
-        if (   ( $jitcpuarch eq 'i386' )
-            || ( $jitcpuarch eq 'ppc' )
-            || ( $jitcpuarch eq 'arm' ) )
-        {
-            $execcapable = 1;
-            unless ( ( $osname eq 'openbsd' )
-                || (   $osname eq 'freebsd' )
-                || (   $osname eq 'netbsd' )
-                || (   $osname eq 'linux' )
-                || (   $osname eq 'darwin' )
-                || (   $osname eq 'cygwin' )
-                || (   $osname eq 'MSWin32' ) )
-            {
-                $execcapable = 0;
-            }
-        }
-        $execcapable = $conf->options->get('execcapable')
-            if defined $conf->options->get('execcapable');
-        _handle_execcapable($conf, $execcapable);
-
-        # test for executable malloced memory
-        if ( -e "config/auto/jit/test_exec_$osname.in" ) {
-            print " (has_exec_protect " if $verbose;
-            $conf->cc_gen("config/auto/jit/test_exec_$osname.in");
-            eval { $conf->cc_build(); };
-            if ($@) {
-                print " $@) " if $verbose;
-            }
-            else {
-                if ( $conf->cc_run(0) !~ /ok/ && $conf->cc_run(1) =~ /ok/ ) {
-                    $conf->data->set( has_exec_protect => 1 );
-                    print "yes) " if $verbose;
-                }
-                else {
-                    print "no) " if $verbose;
-                }
-            }
-            $conf->cc_clean();
-        }
-
-        # RT #43146 use executable memory for this test if needed
-        #
-        # test for some instructions
-        if ( $jitcpuarch eq 'i386' ) {
-            $conf->cc_gen('config/auto/jit/test_c.in');
-            eval { $conf->cc_build(); };
-            unless ( $@ || $conf->cc_run() !~ /ok/ ) {
-                $conf->data->set( jit_i386 => 'fcomip' );
-            }
-            $conf->cc_clean();
+sub _first_probe_for_exec {
+    my $self = shift;
+    my ($jitcpuarch, $osname) = @_;
+    my $execcapable = 0;
+    if ( $self->{jitcpuarch_platforms}->{$jitcpuarch} ) {
+        $execcapable = 1;
+        unless ( $self->{execcapable_oses}->{$osname} ) {
+            $execcapable = 0;
         }
     }
-    else {
-        $conf->data->set(
-            jitarchname    => 'nojit',
-            jitcpuarch     => $cpuarch,
-            jitcpu         => $cpuarch,
-            jitosname      => $osname,
-            jitcapable     => 0,
-            execcapable    => 0,
-            cc_hasjit      => '',
-            TEMP_jit_o     => '',
-            TEMP_exec_h    => '',
-            TEMP_exec_o    => '',
-            TEMP_exec_dep  => '',
-        );
-    }
-
-    return 1;
+    return $execcapable;
 }
 
 sub _handle_execcapable {
@@ -208,6 +229,17 @@ sub _handle_execcapable {
         );
     }
     return 1;
+}
+
+sub _handle_exec_protect {
+    my ($conf, $exec_protect_test, $verbose) = @_;
+    if ($exec_protect_test) {
+        $conf->data->set( has_exec_protect => 1 );
+        print "yes) " if $verbose;
+    }
+    else {
+        print "no) " if $verbose;
+    }
 }
 
 1;

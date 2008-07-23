@@ -12,9 +12,9 @@
   .local pmc results
   results = new 'TclList'
 
-  .local pmc __integer, __number
-  __integer = get_root_global [ '_tcl' ], '__integer'
-  __number  = get_root_global [ '_tcl' ], '__number'
+  .local pmc toInteger, toNumber
+  toInteger = get_root_global [ '_tcl' ], 'toInteger'
+  toNumber = get_root_global [ '_tcl' ], 'toNumber'
   .local pmc decimal
   decimal = get_root_global ['parrot'; 'TclExpr::Grammar'], 'decimal'
 
@@ -132,19 +132,19 @@ check_xpg3:
   if $S0 == '$' goto got_xpg3
   # We got a number, but it was the width.
   $S0 = match
-  width = __integer($S0)
+  width = toInteger($S0)
   goto got_width
 
 got_xpg3:
   $S0 = match
-  xpg3 = __integer($S0)
+  xpg3 = toInteger($S0)
 
 get_width:
   inc format_pos
   match = decimal(format, 'pos'=>format_pos, 'grammar'=>'TclExpr::Grammar')
   unless match goto got_width
   $S0 = match
-  width = __integer($S0)
+  width = toInteger($S0)
 
   $I0 = match.'from'()
   $I1 = match.'to'()
@@ -341,7 +341,7 @@ handle_hex:
 
 hex_width:
   input_pos += $I2
-  $P0 = __integer($S0, 'rawhex'=>1)
+  $P0 = toInteger($S0, 'rawhex'=>1)
   bsr set_val
   goto next
 
@@ -361,7 +361,7 @@ do_integer:
 
 integer_width:
   input_pos += $I2
-  $P0 = __integer($S0)
+  $P0 = toInteger($S0)
   bsr set_val
   goto next
 
@@ -374,7 +374,7 @@ handle_float:
   $I2 = $I0 - $I1
   input_pos += $I2
   $S0 = match
-  $P0 = __number($S0)
+  $P0 = toNumber($S0)
   $S1 = typeof $P0
   if $S1 == 'TclFloat' goto done_float
   $S0 = $S0 . '.0'

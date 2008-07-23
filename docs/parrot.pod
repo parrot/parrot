@@ -112,7 +112,7 @@ A beginner's guide to debugging the Parrot executable.
 
 =item F<debugger.pod>
 
-Documentation for C<pdb>, the Parrot debugger.
+Documentation for C<parrot_debugger>, the Parrot debugger.
 
 =back
 

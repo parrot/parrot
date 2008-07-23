@@ -127,8 +127,9 @@ escape sequences are processed.
 =item "double-quoted string constants"
 
 Are delimited by double-quotes (C<">). A C<"> inside a string must be escaped
-by C<\>.  Only 7-bit ASCII is accepted in string constants; to use characters
-outside that range, specify an encoding in the way below.
+by C<\>. The default encoding for a double-quoted string constant is 7-bit
+ASCII, other character sets and encodings must be marked explicitly using a
+charset or encoding flag.
 
 =item <<"heredoc",  <<'heredoc'
 
@@ -183,7 +184,7 @@ Inside double-quoted strings the following escape sequences are processed.
   \x{h..h}    1..8 hex digits
   \uhhhh      4 hex digits
   \Uhhhhhhhh  8 hex digits
-  \a, \b, \t, \n, \v, \f, \r, \e, \\
+  \a, \b, \t, \n, \v, \f, \r, \e, \\, \"
 
 =over 4
 
@@ -293,6 +294,9 @@ You can specify the root namespace by using empty brackets, such as:
     .namespace [ ]
 
 The brackets are not optional, although the string inside them is.
+
+{{ NOTE: currently the brackets *are* optional. TODO: make decision whether
+   we want the brackets optional. }}
 
 
 =item .pragma n_operators
@@ -436,17 +440,17 @@ For example, C<examples/shootout/revcomp.pir> contains the following (slightly
 abbreviated) definition:
 
     .sub tr_00_init :immediate
-	.local pmc tr_array
-	tr_array = new 'FixedIntegerArray'
-	tr_array = 256
-	## [code to initialize tr_array omitted.]
-	.return (tr_array)
+    .local pmc tr_array
+    tr_array = new 'FixedIntegerArray'
+    tr_array = 256
+    ## [code to initialize tr_array omitted.]
+    .return (tr_array)
     .end
 
-This code is run at compile time, and the returned C<tr_array> is stored 
+This code is run at compile time, and the returned C<tr_array> is stored
 in the bytecode file in place of the sub.  Other subs may then do:
 
-	.const .Sub tr_00 = 'tr_00_init'
+    .const .Sub tr_00 = 'tr_00_init'
 
 in order to fetch the constant.
 
@@ -492,9 +496,19 @@ v-table method a different name, use B<:vtable("...")>. For example, to have
 the method B<ToString> also be the v-table method B<get_string>), use
 B<:vtable("get_string")>.
 
+When the B<:vtable> flag is set, the object PMC cn be referred to with 
+C<self>, as with the B<:method> flag.
+
+
 =item :outer(subname)
 
 The marked C<.sub> is lexically nested within the sub known by B<subname>.
+
+=item :lexid( <string_constant> )
+
+Identifies the subroutine by the specified string.
+
+{{ TODO: explain purpose and details of this flag. }}
 
 =back
 
@@ -953,8 +967,7 @@ the following is not allowed:
 
 {{ NOTE: This is likely because the parsing of heredocs happens later than the
 preprocessing of macros. Might be nice if we could parse heredocs at the macro
-level, but not a high priority. compilers/pirc/new can do this, but there's a
-bug in the heredoc handling on Win32 XP using MSVS. }}
+level, but not a high priority. compilers/pirc/new can do this. }}
 
 Using braces, { }, allows you to span multiple lines for an argument.
 See runtime/parrot/include/hllmacros.pir for examples and possible usage.
@@ -986,8 +999,6 @@ This will expand the macro C<foo>, after which the input to the PIR parser is:
 which will result in the output:
 
  1234
-
-{{ NOTE: braced arguments does not work correctly yet in compilers/pirc/new }}
 
 =back
 

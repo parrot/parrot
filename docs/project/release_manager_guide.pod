@@ -9,13 +9,13 @@ To prepare a release:
 
 =item 0.
 
-Announce the new release to parrot-porters and to the IRC channel #parrot
+Announce the new release to parrot-porters@perl.org and to the IRC channel #parrot
 at least a couple days in advance. Ask whether there are any showstopping bugs.
 It's also good to ask for updates to F<NEWS>, F<CREDITS>, F<PLATFORMS>,
-F<RESPONSIBLE_PARTIES>, F<LANGUAGES_STATUS>, etc.
+F<RESPONSIBLE_PARTIES> and F<LANGUAGES_STATUS>.
 
-You might also select a name for your release (e.g., perhaps
-select a name from L<http://en.wikipedia.org/wiki/List_of_parrots>).
+You might also select a name for your release. For example, you could
+select a name from L<http://en.wikipedia.org/wiki/List_of_parrots>.
 
 =item 1.
 
@@ -26,7 +26,8 @@ Make sure you're up to date:
 You may want to ask the developer base to stop committing big changes;
 it will avoid complications.  Or you could create a release branch,
 make release-related changes there, and fold them back into the trunk
-once the release is done.  This process is explained in L<Appendix 1|"Appendix 1 - Releasing from a branch">.
+once the release is done. This process is explained in
+L<Appendix 1|"Appendix 1 - Releasing from a branch">.
 
 =item 2.
 
@@ -40,10 +41,13 @@ Increment the version number in the following files:
 F<VERSION>, F<parrot.spec>, F<MANIFEST.generated>, F<META.yml>,
 F<README>.
 
+Note: Sourc0 in parrot.spec might have to be adapted as well.
+
 Also update the version number, date, and your name in the
 the file: F<docs/parrothist.pod>.
 
-Update this file to remove the pending release you're in the middle of.
+Update this file, that is F<release_manager_guide.pod>,
+to remove the pending release you're in the middle of.
 
 =item b
 
@@ -65,20 +69,19 @@ fields that must be updated at each release:
 
 The date of the next release is in L<Appendix 2|"Appendix 2 - Upcoming releases">.
 
+=item C<bugday.date>
+
+Enter the date of the saturday before the next release.
+
 =item C<rt.tracking>
 
-Create a new ticket for the next release.  Change the URL fragment here to use
-that ticket's number.  Please use the release month in the ticket, and *don't*
-use the release number.  Releases are date-based, while release numbers are
-feature-based.  Project team members agree on the release number near the
+Create a new RT-ticket for the next release.
+Please use the release month in the ticket, and *do not*
+use the release number. Releases are date-based, while release numbers are
+feature-based. Project team members agree on the release number near the
 actual release, based on the features available in trunk at the time.
-
-=item C<rt.saved_search>
-
-Open the link to the previous value of this field.  Copy the resulting full
-URL, then change the ticket number in the C<DependedOnBy> parameter to the
-ticket for the next release.  Take the entire resulting URL to
-L<http://xrl.us/> and get a short URL.  Add that to this field.
+Mark the ticket for the next release as dependent on the current release. 
+Change the URL fragment in rt.tracking to use the number of the ticket for the next release.
 
 =item C<wiki.bugday>
 
@@ -92,34 +95,43 @@ Make sure F<RESPONSIBLE_PARTIES> is still accurate.
 
 =item e
 
-Configure parrot and run C<make distro_tests>, and either fix
-what those tests complain about, or fix them so they don't complain.
+Give yourself credit for the release in F<CREDITS>.
 
 =item f
 
-Run C<perl tools/dev/pbc_header.pl --upd t/native_pbc/*.pbc>
-to update version and fingerprint in the native tests.
-You may check with C<perl t/native_pbc/*.t>
+Configure parrot and run C<make distro_tests>, and either fix
+what those tests complain about, or fix them so they don't complain.
 
 =item g
+
+Run C<perl tools/dev/pbc_header.pl --upd t/native_pbc/*.pbc>
+to update version and fingerprint in the native tests.
+Please check with C<perl t/native_pbc/*.t>.
+
+NOTE: Due to frequent PBC changes, these tests are currently skipped.
+
+=item h
 
 Make sure everything works:
 
  $ make realclean
  $ perl Configure.pl --test ...
- $ make -s all world fulltest html 2>&1 | tee make_log.txt
- # Note that fulltest runs separate harnesses..
+ $ make world docs html 2>&1 | tee make_world_docs_html.log
+ $ make fulltest        2>&1 | tee make_fulltest.log
 
-It is not necessary to quiet all the codingstd tests for a release.
+Note that running 'make fulltest' takes a while and that separate harnesses
+are being run. It is not necessary to quiet all the codingstd tests for a release.
 
 =back
 
 =item 3.
 
+When all is well, then commit your changes:
+
+ svn diff | more
  svn commit
 
-Presuming everything goes well later, you'll need the revision number
-from this commit, write it down.
+Write down the revision number from this commit. You will need it later in step 7.
 
 =item 4.
 
@@ -140,10 +152,8 @@ Untar F<parrot-a.b.c.tar.gz> into another area.
 Make sure everything works:
 
  $ perl Configure.pl
- $ make world
- $ make fulltest
- $ make docs
- $ make html
+ $ make world docs html 2>&1 | tee make_world_docs_html.log
+ $ make fulltest        2>&1 | tee make_fulltest.log
 
 =item 7.
 
@@ -152,7 +162,7 @@ you're working in trunk, be sure to specify the revision number generated
 in step 3, above.
 
  $ export SVNPARROT=https://svn.perl.org/parrot
- $ svn copy -m"tagged release a.b.c" \
+ $ svn copy -m "tagged release a.b.c" \
    $SVNPARROT/trunk $SVNPARROT/tags/RELEASE_a_b_c
 
 See also L<Appendix 1|"Appendix 1 - Releasing from a branch"> below.
@@ -312,7 +322,6 @@ the 3rd Tuesday of each month. Version numbers for each release will be
 determined each month, and will depend on the features actually present in
 that release.
 
- - July 15th, 2008      - Bernhard Schmalhofer
  - August 19th, 2008    - Bob Rogers
  - September 16th, 2008 - Patrick R. Michaud
  - October 21st, 2008   - Jerry Gay

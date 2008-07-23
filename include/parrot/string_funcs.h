@@ -19,8 +19,7 @@
 
 /* Declarations of accessors */
 
-#define CSTRING_WITH_LEN(s) (s ""), (sizeof (s)-1)
-#define string_from_literal(i, s) string_from_cstring((i), CSTRING_WITH_LEN(s))
+#define string_from_literal(i, s) string_from_cstring((i), (s), (sizeof (s)-1))
 #define Parrot_unCOW_string(i, s) PObj_COW_TEST((s)) ? \
     Parrot_unmake_COW((i), (s)), (s) : (s)
 
@@ -84,6 +83,14 @@ INTVAL Parrot_string_is_cclass(PARROT_INTERP,
     UINTVAL offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
+
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC* Parrot_string_split(PARROT_INTERP,
+    ARGIN_NULLOK(STRING *delim),
+    ARGIN_NULLOK(STRING *str))
+        __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT

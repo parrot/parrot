@@ -91,9 +91,10 @@ Invokes the closure.
         opcode_t   *next      = SUPER(in_next);
         PMC        *outer_sub = sub->outer_sub;
 
-        if (sub->ctx->caller_ctx->current_sub == outer_sub) {
-            /* Being called from outer sub, in which case our outer is its
-             * context. */
+        if (! (PObj_get_FLAGS(SELF) & SUB_FLAG_NEWCLOSURE)
+                && sub->ctx->caller_ctx->current_sub == outer_sub) {
+            /* Autoclose sub being called from the :outer sub, in which case our
+             * outer is its context. */
             sub->outer_ctx = sub->ctx->outer_ctx = PMC_sub(outer_sub)->ctx;
         }
         else if (sub->outer_ctx) {

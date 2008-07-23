@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 
 =head1 NAME
 
@@ -294,6 +294,30 @@ ok 4 - overridden inspect_str method
 ok 5 - instantiated the class
 42
 ok 6 - Called non-overridden method, which called overridden vtable method
+OUT
+
+pir_output_is(<<'CODE', <<'OUT', 'get_class and typeof should return the same PMCProxy - RT #56816');
+.sub 'main' :main
+    $P0 = get_class 'Integer'
+    $P1 = new $P0
+    $P2 = typeof $P1
+
+    $I0 = issame $P0, $P2
+    say $I0                  # should be 1
+
+    $P3 = typeof $P1
+    $P4 = typeof $P1
+
+    $I0 = issame $P3, $P4
+    say $I0                  # should be 1
+    say $P3
+    say $P4
+.end
+CODE
+1
+1
+Integer
+Integer
 OUT
 
 # Local Variables:

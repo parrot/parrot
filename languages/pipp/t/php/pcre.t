@@ -30,7 +30,7 @@ use Parrot::Test;
 use Parrot::Config;
 
 if ( $PConfig{HAS_PCRE} ) {
-    plan tests => 7;
+    plan tests => 8;
 }
 else {
     plan skip_all => "no PCRE";
@@ -51,6 +51,14 @@ CODE
 2
 3
 4
+OUTPUT
+
+language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'version' );
+<?php
+  echo PCRE_VERSION;
+?>
+CODE
+/^\d\.\d/
 OUTPUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'preg_match()' );

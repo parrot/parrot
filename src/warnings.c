@@ -117,39 +117,6 @@ Parrot_warn(PARROT_INTERP, INTVAL warnclass,
 
 /*
 
-=item C<INTVAL Parrot_warn_s>
-
-The Parrot C<STRING> warning/error reporter.
-
-Returns 2 on error, 1 on success.
-
-C<message, ..> can be a C<Parrot_vsprintf_s()> format with arguments.
-
-=cut
-
-*/
-
-PARROT_API
-INTVAL
-Parrot_warn_s(NULLOK_INTERP, INTVAL warnclass,
-              ARGIN(STRING *message), ...)
-{
-    if (!interp || !PARROT_WARNINGS_test(interp, warnclass))
-        return 2;
-    else {
-        STRING *targ;
-        va_list args;
-
-        va_start(args, message);
-        targ = Parrot_vsprintf_s(interp, message, args);
-        va_end(args);
-
-        return print_warning(interp, targ);
-    }
-}
-
-/*
-
 =back
 
 =head1 SEE ALSO

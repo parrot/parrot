@@ -108,11 +108,11 @@ Returns true if the hash size is not zero.
 */
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
-        Hash       *hash = PARROT_ADDRREGISTRY(SELF)->hash;
-        HashBucket *b    = parrot_hash_get_bucket(INTERP, hash, key);
+        Hash   *hash  = PARROT_ADDRREGISTRY(SELF)->hash;
+        void   *value = parrot_hash_get(INTERP, hash, key);
 
-        if (b)
-            return (INTVAL)b->value;
+        if (value)
+            return (INTVAL)value;
 
         return 0;
     }
@@ -147,15 +147,14 @@ reaches 0, delete the entry.
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         Hash       * const hash = PARROT_ADDRREGISTRY(SELF)->hash;
-        HashBucket * const b    = parrot_hash_get_bucket(INTERP, hash, key);
+        void       *oldval      = parrot_hash_get(INTERP, hash, key);
+        long        newval      = 1;
+        UNUSED(value);
 
-        /* these casts look bad, but they avoid type punning warnings with -O */
-        if (b) {
-            long val = (long)b->value;
-            b->value = (void *)(++val);
-        }
-        else
-            parrot_hash_put(INTERP, hash, key, (void *)1);
+        if (oldval)
+            newval += (long)oldval;
+
+        parrot_hash_put(INTERP, hash, key, (void *)newval);
     }
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
@@ -164,17 +163,18 @@ reaches 0, delete the entry.
     }
 
     VTABLE void delete_keyed(PMC *key) {
-        Hash       * const hash = PARROT_ADDRREGISTRY(SELF)->hash;
-        HashBucket * const b    = parrot_hash_get_bucket(INTERP, hash, key);
+        Hash       * const hash  = PARROT_ADDRREGISTRY(SELF)->hash;
+        void              *value = parrot_hash_get(INTERP, hash, key);
 
         /* these casts look bad, but they avoid type punning warnings with -O */
-        if (b) {
-            long val = (long)b->value;
-
+        if (value) {
+            long val = (long)value;
             if (val == 1L)
                 parrot_hash_delete(INTERP, hash, key);
-            else
-                b->value = (void *)(--val);
+            else {
+                value = (void *)(--val);
+                parrot_hash_put(INTERP, hash, key, value);
+            }
         }
     }
 

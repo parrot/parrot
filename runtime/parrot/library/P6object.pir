@@ -164,11 +164,12 @@ Return a true value if the invocant 'isa' C<x>.
 =cut
 
 .sub 'isa' :method
+    .param pmc obj
     .param pmc x
 
     .local pmc parrotclass
     parrotclass = self.'get_parrotclass'(x)
-    $P0 = self.'WHAT'()
+    $P0 = obj.'WHAT'()
     $I0 = isa $P0, parrotclass
     .return ($I0)
 .end
@@ -180,9 +181,9 @@ Return a true value if the invocant 'can' C<x>.
 =cut
 
 .sub 'can' :method
+    .param pmc obj
     .param string x
-    .local pmc parrotclass
-    $P0 = self.'WHAT'()
+    $P0 = obj.'WHAT'()
     $I0 = can $P0, x
     .return ($I0)
 .end
@@ -359,8 +360,10 @@ or 'Object').
     ##  save the protoobject
     setattribute how, 'protoobject', protoobject
 
-    ##  store the long and short names in the protoobject
+    ##  store the long and short names in the protoobject; skip if anonymous
     .local pmc longname, shortname
+    $I0 = elements ns
+    if $I0 == 0 goto anonymous_class
     $S0 = join '::', ns
     longname = new 'String'
     longname = $S0
@@ -371,6 +374,14 @@ or 'Object').
     ##  store the protoobject in appropriate namespace
     $S0 = pop ns
     set_hll_global ns, $S0, protoobject
+    goto have_how
+
+    ##  anonymous classes have empty strings for shortname and longname
+  anonymous_class:
+    longname = new 'String'
+    shortname = new 'String'
+    setattribute how, 'longname', longname
+    setattribute how, 'shortname', shortname
 
   have_how:
     ##  map parrotclass to the metaobject
@@ -516,81 +527,6 @@ will be used in lieu of this one.)
     parrotclass = getattribute $P0, 'parrotclass'
     $P1 = new parrotclass
     .return ($P1)
-.end
-
-
-=item WHENCE()
-
-Returns the protoobject's autovivification closure.
-
-=cut
-
-.sub 'WHENCE' :method
-    .local pmc props, whence
-    props = getattribute self, '%!properties'
-    if null props goto ret_undef
-    whence = props['WHENCE']
-    if null whence goto ret_undef
-    .return (whence)
-  ret_undef:
-    whence = new 'Undef'
-    .return (whence)
-.end
-
-
-=item get_pmc_keyed(key)    (vtable method)
-
-Returns a proto-object with an autovivification closure attached to it.
-
-=cut
-
-.sub get_pmc_keyed :vtable :method
-    .param pmc what
-
-    # We'll build auto-vivification hash of values.
-    .local pmc WHENCE, key, val
-    WHENCE = new 'Hash'
-
-    # What is it?
-    $S0 = what.'WHAT'()
-    if $S0 == 'Pair' goto from_pair
-    if $S0 == 'List' goto from_list
-    'die'("Auto-vivification closure did not contain a Pair")
-
-  from_pair:
-    # Just a pair.
-    key = what.'key'()
-    val = what.'value'()
-    WHENCE[key] = val
-    goto done_whence
-
-  from_list:
-    # List.
-    .local pmc list_iter, cur_pair
-    list_iter = new 'Iterator', what
-  list_iter_loop:
-    unless list_iter goto done_whence
-    cur_pair = shift list_iter
-    key = cur_pair.'key'()
-    val = cur_pair.'value'()
-    WHENCE[key] = val
-    goto list_iter_loop
-  done_whence:
-
-    # Now create a clone of the protoobject.
-    .local pmc protoclass, res, props, tmp
-    protoclass = class self
-    res = new protoclass
-
-    # Attach the WHENCE property.
-    props = getattribute self, '%!properties'
-    unless null props goto have_props
-    props = new 'Hash'
-  have_props:
-    props['WHENCE'] = WHENCE
-    setattribute res, '%!properties', props
-
-    .return (res)
 .end
 
 

@@ -36,11 +36,11 @@ variable name, integer, channel, list, string, script, and expressions.
 our %conversions = (
 
     # type     subroutine
-    bool    => '__boolean',
+    bool    => 'toBoolean',
     channel => '__channel',
     expr    => '__expr',
-    int     => '__integer',
-    list    => '__list',
+    int     => 'toInteger',
+    list    => 'toList',
     script  => '__script',
     var     => '__read',
 );
@@ -123,7 +123,7 @@ sub parse_usage {
         $arg->{optional}  = !!$1;
         $arg->{option}    = !!$2;
         $arg->{name}      = $3;
-        $arg->{type}      = [ grep length, split( ':', $4 ) ];
+        $arg->{type}      = [ grep length, split( /:/, $4 ) ];
         $arg->{default}   = $5;
         $arg->{repeating} = $6 eq '+';
 
@@ -132,7 +132,7 @@ sub parse_usage {
 
         die "Optionals need to be optional.\n"
             if $arg->{option}
-            and not $arg->{optional};
+                and not $arg->{optional};
 
         push @results, $arg;
     }
@@ -258,7 +258,7 @@ sub inlined_arguments {
         $code .= emit( "  .local pmc a_${name}_%0", 'loop_num' );
 
         # do we need to use a default?
-        $code .= "  if argc < " . ( $i + 1 ) . " goto default_$name \n"
+        $code .= '  if argc < ' . ( $i + 1 ) . " goto default_$name \n"
             if $arg->{optional};
 
         # the actual thing to be compiled
@@ -278,7 +278,7 @@ sub inlined_arguments {
         if ( defined $arg->{default} ) {
             my $is_int = $arg->{type}[-1] eq 'int';
             my $type  = $is_int ? 'TclInt' : 'TclString';
-            my $quote = $is_int ? ''       : "'";
+            my $quote = $is_int ? ''       : q{'};
             my $default = $arg->{default};
 
             $code .= "  goto done_$name \n";
@@ -310,7 +310,7 @@ sub arguments {
         $code .= "  .local pmc a_$name \n";
 
         # do we need to use a default?
-        $code .= "  if argc < " . ( $i + 1 ) . " goto default_$name \n"
+        $code .= '  if argc < ' . ( $i + 1 ) . " goto default_$name \n"
             if $arg->{optional};
 
         # the actual thing to be compiled
@@ -328,7 +328,7 @@ sub arguments {
         if ( defined $arg->{default} ) {
             my $is_int = $arg->{type}[-1] eq 'int';
             my $type  = $is_int ? 'TclInt' : 'TclString';
-            my $quote = $is_int ? ''       : "'";
+            my $quote = $is_int ? ''       : q{'};
             my $default = $arg->{default};
 
             $code .= "  goto done_$name \n";
@@ -379,7 +379,7 @@ sub inlined_body {
 
         # rename labels
         if ( $line =~ /^\s* (\w+) \s* : \s*$/mx ) {
-            $code .= emit( $1 . "_%0:", 'loop_num' );
+            $code .= emit( $1 . '_%0:', 'loop_num' );
             next;
         }
 
@@ -389,7 +389,7 @@ sub inlined_body {
 
             $locals{$_} = 1 for @vars;
             $code .= inline("  .local $1 ");
-            $code .= emit( join( ',', map { $_ . "_%0" } @vars ), 'loop_num' );
+            $code .= emit( join( ',', map { $_ . '_%0' } @vars ), 'loop_num' );
 
             next;
         }
@@ -415,7 +415,7 @@ sub inlined_body {
                 $code .= emit( "temp = a_${name}_%0()", 'loop_num' );
 
                 # if that's all there is, remove it
-                $line        =~ s/^\s*a_${name}_%0\s*$//m
+                $line =~ s/^\s*a_${name}_%0\s*$//m
                     or $line =~ s/a_${name}_%0/temp/;
             }
         }
@@ -471,8 +471,8 @@ sub inlined_badargs {
 
     my $usage = create_usage(@args);
     my $code =
-          "bad_args: \n"
-        . "  .return(\"  tcl_error 'wrong # args: should be "
+        "bad_args: \n"
+        . q{  .return("  tcl_error 'wrong # args: should be }
         . "\\\"$cmd$usage\\\"' \\n\") \n";
 
     return $code;

@@ -217,11 +217,17 @@ Internal helper method to create a class.
 =cut
 
 .sub '!keyword_class'
-    .param string name
+    .param string name   :optional
+    .param int have_name :opt_flag
     .local pmc class, resolve_list, methods, iter
 
     # Create class.
+    if have_name goto named
+    class = new 'Class'
+    goto created
+  named:
     class = newclass name
+  created:
 
     # Set resolve list to include all methods of the class.
     methods = inspect class, 'methods'
@@ -290,7 +296,25 @@ Internal helper method to create a grammar.
     .return(grammar)
 .end
 
-=item !keyword_does(class, role_name)
+=item !keyword_enum(name)
+
+Internal helper method to create an enum class.
+
+=cut
+
+.sub '!keyword_enum'
+    .param pmc role
+    .local pmc class
+
+    # Create an anonymous class and attach the role.
+    class = new 'Class'
+    $P0 = get_class 'Any'
+    addparent class, $P0
+    "!keyword_does"(class, role)
+    .return(class)
+.end
+
+=item !keyword_does(class, role)
 
 Internal helper method to implement the functionality of the does keyword.
 

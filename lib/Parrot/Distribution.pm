@@ -471,6 +471,8 @@ sub get_perl_exemption_regexp {
     my $parrot_dir = $self->path();
     my @paths = map { File::Spec->catdir( $parrot_dir, File::Spec->canonpath($_) ) } qw{
         languages/regex/lib/Regex/Grammar.pm
+        languages/pipp/src/pct/actions.pm
+        languages/hq9plus/src/parser/actions.pm
         compilers/nqp/
         lib/Digest/Perl/
         lib/File/
@@ -698,7 +700,7 @@ sub perl_module_file_directories {
             > ),
         map( "lib/Parrot/$_" => qw<
             Config Configure Configure/Step Docs Docs/Section IO
-            OpLib OpTrans PIR Pmc2c Test
+            OpTrans PIR Pmc2c Test
             > ),
         ;
 }

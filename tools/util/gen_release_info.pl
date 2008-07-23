@@ -37,13 +37,13 @@ map {
     ##  ask subversion for info about the tag
     my $readme = $repo_url . '/' . $r->{$_}{tag};
     warn "retrieving info on $readme\n";
-    my $info = qx{ svn info $readme };
+    my $info = qx{ LANG=C svn info $readme };
 
-    ##  cull the interesting items
+    ##  pull the interesting items
     $info =~ m{Author: (\S+)} and $r->{$_}{author}   = $1;
     $info =~ m{Rev: (\S+)}    and $r->{$_}{revision} = $1;
     $info =~ m{Date: (\S+)}   and $r->{$_}{date}     = $1;
-} keys %$r;
+} keys %{ $r };
 
 
 ##  output info in csv format
@@ -53,7 +53,7 @@ print
         map { $r->{$n}{$_} || '' }
         qw{ tag number author revision date  }
     }
-    keys %$r;
+    sort keys %$r;
 
 # Local Variables:
 #   mode: cperl

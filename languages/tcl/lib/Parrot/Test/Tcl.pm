@@ -3,7 +3,11 @@ package Parrot::Test::Tcl;
 # Copyright (C) 2004-2007, The Perl Foundation.
 # $Id$
 
+use strict;
 use warnings;
+use vars qw($language);
+no strict qw(refs);
+
 use File::Basename;
 
 require Parrot::Test;
@@ -33,7 +37,7 @@ foreach my $func ( keys %language_test_map ) {
 
         my ( $self, $code, $output, $desc ) = @_;
 
-        $count = $self->{builder}->current_test + 1;
+        my $count = $self->{builder}->current_test + 1;
 
         $desc = $language unless $desc;
 
@@ -46,7 +50,7 @@ foreach my $func ( keys %language_test_map ) {
         #  languages/tcl
         #  languages/tcl/t
 
-        my $path_to_parrot = $INC{"Parrot/Config.pm"};
+        my $path_to_parrot = $INC{'Parrot/Config.pm'};
         $path_to_parrot =~ s:/lib/Parrot/Config.pm$::;
         my $dir_count = scalar( File::Spec->splitdir($path_to_parrot) );
         my $path_to_tcl;
@@ -66,8 +70,7 @@ foreach my $func ( keys %language_test_map ) {
         my $lang_f = Parrot::Test::per_test( '.tcl', $count );
         my $out_f  = Parrot::Test::per_test( '.out', $count );
 
-        $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
-        my $args = $TEST_PROG_ARGS;
+        my $args = $ENV{TEST_PROG_ARGS} || '';
 
         Parrot::Test::write_code_to_file( $code, $lang_f );
 
@@ -76,7 +79,7 @@ foreach my $func ( keys %language_test_map ) {
         my $pass      = 0;
 
         my $executable =
-              File::Spec->join( $path_to_parrot, $self->{parrot} )
+            File::Spec->join( $path_to_parrot, $self->{parrot} )
             . " $args "
             . File::Spec->join( $path_to_tcl, 'tcl.pbc' );
         if ( defined( $ENV{PARROT_TCLSH} ) ) {

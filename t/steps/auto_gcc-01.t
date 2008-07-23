@@ -30,7 +30,7 @@ my $pkg = q{auto::gcc};
 
 $conf->add_steps($pkg);
 $conf->options->set(%{$args});
-$task = $conf->steps->[2];
+$task = $conf->steps->[-1];
 $step_name   = $task->step;
 
 $step = $step_name->new();

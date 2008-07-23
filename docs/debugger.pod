@@ -7,39 +7,39 @@ docs/debugger.pod - The Parrot Debugger
 
 =head1 ABSTRACT
 
-This document describes F<pdb>, the Parrot Debugger.
+This document describes F<parrot_debugger>, the Parrot Debugger.
 
 =head1 DESCRIPTION
 
 Starting from version 0.0.6 Parrot has its own debugger, which is modeled after
-Perl's one. Its name is F<pdb>, and is an interactive environment that let you
-step through bytecode, set breakpoints, evaluate assembly instructions and peek
-at the interpreter status.
+Perl's one. Its name is F<parrot_debugger>, and is an interactive environment
+that let you step through bytecode, set breakpoints, evaluate assembly
+instructions and peek at the interpreter status.
 
 A good (well, at least some) knowledge of the Parrot internals is obviously
 required to read this document. Some familiarity with debugging principles is
 also mandatory beyond this point.
 
-=head1 BUILDING pdb
+=head1 BUILDING parrot_debugger
 
 The debugger is not built with Parrot, but you should make it with its specific
 target:
 
-  make pdb
+  make parrot_debugger
 
 (where C<make> is the same C<make> incarnation you used to build Parrot).
 
-If everything goes well, you should come up with a F<pdb> executable in the
-same directory as the Parrot program.
+If everything goes well, you should come up with a F<parrot_debugger>
+executable in the same directory as the Parrot program.
 
 =head1 THE DEBUGGER SHELL
 
 To start the debugger type:
 
-  pdb file.pbc
+  parrot_debugger file.pbc
 
-That is, F<pdb> takes exactly one argument, which is the Parrot bytecode that
-you're going to debug. F<pdb> will automatically load and disassemble the
+That is, F<parrot_debugger> takes exactly one argument, which is the Parrot bytecode that
+you're going to debug. F<parrot_debugger> will automatically load and disassemble the
 bytecode file for you.
 
 Note that you can't pass command line arguments to your program when you invoke
@@ -49,8 +49,8 @@ After the version banner, you'll see the friendly debugger prompt:
 
   (pdb)
 
-F<pdb> is ready to receive commands and give output. To list the available
-commands type 'h'. To quit the debugger type 'q'.
+F<parrot_debugger> is ready to receive commands and give output. To list the
+available commands type 'h'. To quit the debugger type 'q'.
 
 As with the Perl debugger, whenever it halts and shows you a line of code, it
 is always the line it's I<about> to execute, not the one that it has just
@@ -69,10 +69,10 @@ sensitive.
 
 A blank line always repeats the last command entered.
 
-Also note that at this point in its development, F<pdb> has very poor error
-checking on commands and their arguments, so type carefully or something bad
-will happen. Feel free to report bugs, or better yet patch the source code (see
-L</FILES> below).
+Also note that at this point in its development, F<parrot_debugger> has very
+poor error checking on commands and their arguments, so type carefully or
+something bad will happen. Feel free to report bugs, or better yet patch the
+source code (see L</FILES> below).
 
 =over 4
 

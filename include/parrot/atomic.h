@@ -41,7 +41,7 @@ typedef Parrot_atomic_integer {
 } Parrot_atomic_integer;
 
 #  define PARROT_ATOMIC_PTR_INIT(a)
-#  define PARROT_ATOMIC_PTR_GET(result, (a)) result = (a).val
+#  define PARROT_ATOMIC_PTR_GET(result, (a)) (result) = (a).val
 #  define PARROT_ATOMIC_PTR_SET(a, b) (a).val = (b)
 
 /* a is the Parrot_atomic.
@@ -53,30 +53,30 @@ typedef Parrot_atomic_integer {
 #  define PARROT_ATOMIC_PTR_CAS(result, a, expect, update) \
       do { \
           void * orig; \
-          PARROT_ATOMIC_PTR_GET(a, orig); \
-          if (expect == orig) { \
-              ATOMIC_SET(a, update); \
-              result = 1; \
+          PARROT_ATOMIC_PTR_GET((a), orig); \
+          if ((expect) == (orig)) { \
+              ATOMIC_SET((a), (update)); \
+              (result) = 1; \
           } \
           else { \
-              result = 0; \
+              (result) = 0; \
           } \
       } while (0)
 #  define PARROT_ATOMIC_PTR_DESTROY(a)
 #  define PARROT_ATOMIC_INT_INIT(a)
 #  define PARROT_ATOMIC_INT_DESTROY(a)
-#  define PARROT_ATOMIC_INT_GET(result, (a)) result = (a).val
+#  define PARROT_ATOMIC_INT_GET(result, (a)) (result) = (a).val
 #  define PARROT_ATOMIC_INT_SET(a, value)  (a).val = (value)
 #  define PARROT_ATOMIC_INT_CAS(result, a, expect, update) \
       do { \
           INTVAL orig; \
-          PARROT_ATOMIC_PTR_GET(a, orig); \
-          if (expect == orig) { \
-              ATOMIC_SET(a, update); \
-              result = 1; \
+          PARROT_ATOMIC_PTR_GET((a), (orig)); \
+          if ((expect) == (orig)) { \
+              ATOMIC_SET((a), (update)); \
+              (result) = 1; \
           } \
           else { \
-              result = 0; \
+              (result) = 0; \
           } \
       } while (0)
 #  define PARROT_ATOMIC_INT_INC(result, a) ((result) = ++(a).val)

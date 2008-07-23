@@ -2,13 +2,16 @@
 Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
+History:
+    Renamed from pdb.c in 2008.7.15
+
 =head1 NAME
 
-pdb - The Parrot debugger
+parrot_debugger - The Parrot debugger
 
 =head1 SYNOPSIS
 
- pdb programfile
+ parrot_debugger programfile
 
 =head1 DESCRIPTION
 
@@ -127,8 +130,8 @@ Parrot_debug().
 int
 main(int argc, char *argv[])
 {
-    Parrot_Interp     debugger = Parrot_new(NULL);
-    Parrot_Interp     interp   = Parrot_new(debugger);
+    Parrot_Interp     interp   = Parrot_new(NULL);
+    Parrot_Interp     debugger = Parrot_new(interp);
     PDB_t            *pdb      = mem_allocate_zeroed_typed(PDB_t);
     const char       *filename;
     char             *ext;
@@ -138,6 +141,7 @@ main(int argc, char *argv[])
 
     /* attach pdb structure */
     debugger->pdb    = pdb;
+    interp->pdb      = pdb;
     interp->debugger = debugger;
     pdb->debugee     = interp;
 
@@ -147,7 +151,7 @@ main(int argc, char *argv[])
     do_yylex_init(interp, &yyscanner);
 
     if (argc < 2) {
-        fprintf(stderr, "Usage: pdb programfile [program-options]\n");
+        fprintf(stderr, "Usage: parrot_debugger programfile [program-options]\n");
         Parrot_exit(interp, 1);
     }
 

@@ -183,16 +183,6 @@ typedef struct parrot_interp_t Interp;
 #  define LVALUE_CAST(type, val) (*((type *)&(val)))
 #endif /* __GCC__ */
 
-/*
- * assign to a void* in a way that produces compile-time warnings
- * if the type isn't what was expected.
- */
-#define VOIDPTR_ASSIGN(type, p, val) \
-    do { \
-        type _typed_ptr = (val); \
-        (p) = (val); \
-    } while (0)
-
 /* some SGI compilers have an offsetof()
  * definition that doesn't work for us. */
 #if defined(__sgi) && defined(_COMPILER_VERSION) && (_COMPILER_VERSION >= 400)
@@ -203,6 +193,8 @@ typedef struct parrot_interp_t Interp;
 /* work around warning:
  * cast discards qualifiers from pointer target type
  * for usage grep e.g. in string.c
+ * The casted to type must differ only in constness,
+ * to allow a stricter compiler check in C++ builds.
  */
 
 #ifndef __cplusplus

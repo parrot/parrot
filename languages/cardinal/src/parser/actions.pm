@@ -156,6 +156,17 @@ method indexed_assignment($/) {
 
     make $past;
 }
+method member_assignment($/) {
+    my $rhs := $( $<rhs> );
+    my $primary := $( $<basic_primary> );
+
+    my $past := PAST::Op.new( :name(~$<key><ident> ~ '='), :pasttype('callmethod'), :node($/) );
+
+    $past.push( $primary );
+    $past.push( $rhs );
+
+    make $past;
+}
 method assignment($/) {
     my $lhs := $( $<mlhs> );
     our $?BLOCK;
@@ -264,6 +275,19 @@ method instance_variable($/) {
 
         $block.symbol(~$name, :scope('attribute'));
         $?BLOCK.symbol(~$name, :scope('attribute'));
+    }
+    make $past;
+}
+
+method class_variable($/) {
+    our $?CLASS;
+    our $?BLOCK;
+    my $name := ~$/;
+    my $past := PAST::Var.new(  :name($name), :scope('package'), :viviself('Undef'), :node($/) );
+    my $block := $?CLASS[0];
+    unless $block.symbol(~$/) {
+        $block.symbol(~$name, :scope('package'));
+        $?BLOCK.symbol(~$name, :scope('package'));
     }
     make $past;
 }

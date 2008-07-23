@@ -35,20 +35,19 @@ typedef enum {
 
 /* &end_gen */
 
-#define PARROT_we_on(we, interp, flag) do { \
-    CONTEXT((interp))->we |= (flag); } while (0)
-#define PARROT_we_off(we, interp, flag) do { \
-    CONTEXT((interp))->we &= ~(flag); } while (0)
-#define PARROT_we_test(we, interp, flag)  \
-    (CONTEXT((interp))->we & (flag))
+#define PARROT_WARNINGS_on(interp, flag) do { \
+    CONTEXT((interp))->warns |= (flag); } while (0)
+#define PARROT_WARNINGS_off(interp, flag) do { \
+    CONTEXT((interp))->warns &= ~(flag); } while (0)
+#define PARROT_WARNINGS_test(interp, flag)  \
+    (CONTEXT((interp))->warns & (flag))
 
-#define PARROT_WARNINGS_on(interp, flag)   PARROT_we_on(warns, (interp), (flag))
-#define PARROT_WARNINGS_off(interp, flag)  PARROT_we_off(warns, (interp), (flag))
-#define PARROT_WARNINGS_test(interp, flag) PARROT_we_test(warns, (interp), (flag))
-
-#define PARROT_ERRORS_on(interp, flag)     PARROT_we_on(errors, (interp), (flag))
-#define PARROT_ERRORS_off(interp, flag)    PARROT_we_off(errors, (interp), (flag))
-#define PARROT_ERRORS_test(interp, flag)   PARROT_we_test(errors, (interp), (flag))
+#define PARROT_ERRORS_on(interp, flag) do { \
+    CONTEXT((interp))->errors |= (flag); } while (0)
+#define PARROT_ERRORS_off(interp, flag) do { \
+    CONTEXT((interp))->errors &= ~(flag); } while (0)
+#define PARROT_ERRORS_test(interp, flag)  \
+    (CONTEXT((interp))->errors & (flag))
 
 #if defined(PARROT_IN_CORE)
 
@@ -63,14 +62,6 @@ INTVAL Parrot_warn(PARROT_INTERP,
     ARGIN(const char *message),
     ...)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-PARROT_API
-INTVAL Parrot_warn_s(
-    NULLOK_INTERP,
-    INTVAL warnclass,
-    ARGIN(STRING *message),
-    ...)
         __attribute__nonnull__(3);
 
 PARROT_API

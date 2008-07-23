@@ -211,6 +211,33 @@ Returns the floating-point value of the element at index C<*key>.
 
 /*
 
+=item C<STRING *get_string()>
+
+Returns the Parrot string representation of the array.
+
+=cut
+
+*/
+
+    VTABLE STRING *get_string() {
+        INTVAL i, elems;
+        STRING *str = NULL;
+
+        elems = SELF.elements();
+        string_repeat(INTERP, CONST_STRING(INTERP, '0'), elems, &str);
+
+        for (i = 0; i < elems; i++) {
+            if (SELF.get_integer_keyed_int(i)) {
+                *(str->strstart+i) = '1';
+            }
+        }
+
+        return str;
+
+    }
+
+/*
+
 =item C<STRING *get_string_keyed_int(INTVAL key)>
 
 Returns the Parrot string value of the element at index C<key>.

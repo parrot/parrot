@@ -28,56 +28,56 @@ typedef struct Parrot_atomic_integer {
 #  define PARROT_ATOMIC_PTR_GET(result, a) \
     do { \
         LOCK((a).lock); \
-        result = (a).val; \
+        (result) = (a).val; \
         UNLOCK((a).lock); \
     } while (0)
 
 #  define PARROT_ATOMIC_INT_GET(result, a) \
     do { \
         LOCK((a).lock); \
-        result = (a).val; \
+        (result) = (a).val; \
         UNLOCK((a).lock); \
     } while (0)
 
 #  define PARROT_ATOMIC_PTR_SET(a, b) \
     do { \
         LOCK((a).lock); \
-        (a).val = b; \
+        (a).val = (b); \
         UNLOCK((a).lock); \
     } while (0)
 
 #  define PARROT_ATOMIC_INT_SET(a, b) \
     do { \
         LOCK((a).lock); \
-        (a).val = b; \
+        (a).val = (b); \
         UNLOCK((a).lock); \
     } while (0)
 
 #  define PARROT_ATOMIC_INT_INC(result, a) \
     do { \
         LOCK((a).lock); \
-        result = ++(a).val; \
+        (result) = ++(a).val; \
         UNLOCK((a).lock); \
     } while (0)
 
 #  define PARROT_ATOMIC_INT_DEC(result, a) \
     do { \
         LOCK((a).lock); \
-        result = --(a).val; \
+        (result) = --(a).val; \
         UNLOCK((a).lock); \
     } while (0)
 
 #  define PARROT_ATOMIC_PTR_CAS(result, a, expect, update) \
     do { \
         LOCK((a).lock); \
-        if ((a).val == expect) { \
+        if ((a).val == (expect)) { \
             void * orig = (a).val; \
-            (a).val = update; \
+            (a).val = (update); \
             UNUSED(orig) \
-            result = 1; \
+            (result) = 1; \
         } \
         else { \
-            result = 0; \
+            (result) = 0; \
         } \
         UNLOCK((a).lock); \
     } while (0)
@@ -85,14 +85,14 @@ typedef struct Parrot_atomic_integer {
 #  define PARROT_ATOMIC_INT_CAS(result, a, expect, update) \
     do { \
         LOCK((a).lock); \
-        if ((a).val == expect) { \
+        if ((a).val == (expect)) { \
             INTVAL orig = (a).val; \
-            (a).val = update; \
+            (a).val = (update); \
             UNUSED(orig) \
-            result = 1; \
+            (result) = 1; \
         } \
         else { \
-            result = 0; \
+            (result) = 0; \
         } \
         UNLOCK((a).lock); \
     } while (0)

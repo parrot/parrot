@@ -43,8 +43,8 @@ sub new {
             'Operations',
             '',
             $self->new_item(
-                'Ops to C Code Generation', 'lib/Parrot/OpsFile.pm',
-                'lib/Parrot/Op.pm',         'lib/Parrot/OpLib',
+                'Ops to C Code Generation',
+                'lib/Parrot/OpsFile.pm',    'lib/Parrot/Op.pm',
                 'lib/Parrot/OpTrans.pm',    'lib/Parrot/OpTrans'
             ),
         ),

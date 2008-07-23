@@ -133,9 +133,9 @@ bad_args:
   .local pmc elems
   elems = argv[0]
 
-  .local pmc __list
-  __list = get_root_global ['_tcl'], '__list'
-  elems  = __list(elems)
+  .local pmc toList
+  toList = get_root_global ['_tcl'], 'toList'
+  elems  = toList(elems)
 
 pre_loop:
   .local int count

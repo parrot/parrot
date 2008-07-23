@@ -56,11 +56,11 @@ get_body:
   if argc != 1 goto body_from_argv
 
 body_from_list:
-  .local pmc __list
-  __list = get_root_global ['_tcl'], '__list'
+  .local pmc toList
+  toList = get_root_global ['_tcl'], 'toList'
 
   $P0 = shift argv
-  body = __list($P0)
+  body = toList($P0)
   goto got_body
 
 body_from_argv:

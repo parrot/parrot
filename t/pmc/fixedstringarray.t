@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 
 =head1 NAME
 
@@ -350,6 +350,38 @@ CODE
 42
 43
 44
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw" );
+.sub 'main' :main
+    .local pmc fsa, it
+    .local string s
+
+    new fsa, 'FixedStringArray'
+    fsa = 5
+    fsa[0] = 42
+    fsa[1] = 43
+    fsa[2] = 44
+    fsa[3] = 99
+    fsa[4] = 101
+
+    s = freeze fsa
+    fsa = thaw s
+
+    it = iter fsa
+  loop:
+    unless it goto loop_end
+    s = shift it
+    say s
+    goto loop
+  loop_end:
+.end
+CODE
+42
+43
+44
+99
+101
 OUTPUT
 
 1;

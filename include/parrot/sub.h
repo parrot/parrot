@@ -36,6 +36,9 @@ typedef enum {
     SUB_FLAG_PF_IMMEDIATE = PObj_private6_FLAG,
     SUB_FLAG_PF_POSTCOMP  = PObj_private7_FLAG,
 
+    /* [temporary expedient.  -- rgr, 13-Jul-08.] */
+    SUB_FLAG_NEWCLOSURE   = SUB_FLAG_PF_IMMEDIATE,
+
     SUB_FLAG_PF_MASK      = 0xfa   /* anon ... postcomp, is_outer*/
 } sub_flags_enum;
 
@@ -98,7 +101,7 @@ typedef enum {
 #define Sub_comp_flag_CLEAR(flag, o) (Sub_comp_get_FLAGS(o) &= ~(UINTVAL)(SUB_COMP_FLAG_ ## flag))
 
 #define Sub_comp_flags_SETTO(o, f) Sub_comp_get_FLAGS(o) = (f)
-#define Sub_comp_flags_CLEARALL(o) Sub_comp_flags_SETTO(o, 0)
+#define Sub_comp_flags_CLEARALL(o) Sub_comp_flags_SETTO((o), 0)
 
 #define Sub_comp_INIT_TEST(o) Sub_comp_flag_TEST(PF_INIT, o)
 #define Sub_comp_INIT_SET(o) Sub_comp_flag_SET(PF_INIT, o)

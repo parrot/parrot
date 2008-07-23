@@ -274,11 +274,6 @@ global_ns:
 .pragma n_operators 1
 .sub compiled_tcl_sub_%2
   .include 'languages/tcl/src/returncodes.pasm'
-  .local pmc epoch, colons, split, unk, interactive :unique_reg
-  epoch  = get_root_global ['_tcl'], 'epoch'
-  colons = get_root_global ['_tcl'], 'colons'
-  split  = get_root_global ['parrot'; 'PGE::Util'], 'split'
-  interactive = get_root_global ['tcl'], '$tcl_interactive'
   %1
   .return(%3)
 .end

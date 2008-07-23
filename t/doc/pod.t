@@ -88,6 +88,8 @@ foreach my $file (@files) {
 
     # skip files with valid POD
     next if file_pod_ok($file);
+
+    # report whatever is not skipped
     push @failed, $file;
 }
 

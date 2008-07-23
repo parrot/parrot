@@ -15,6 +15,7 @@
 #ifndef PARROT_EXTEND_H_GUARD
 #define PARROT_EXTEND_H_GUARD
 
+#include <stdarg.h>
 #include "parrot/config.h"      /* PARROT_VERSION, PARROT_JIT_CAPABLE... */
 #include "parrot/interpreter.h" /* give us the interpreter flags */
 #include "parrot/warnings.h"    /* give us the warnings flags    */
@@ -34,8 +35,8 @@
    the stacktop was NULL, then set it to the address of the cached
    pointer, which is on the stack and as good a thing as any to use as
    an anchor */
-#define PARROT_CALLIN_START(x) void *oldtop = x->lo_var_ptr; \
-                               if (!oldtop) x->lo_var_ptr = &oldtop;
+#define PARROT_CALLIN_START(x) void *oldtop = (x)->lo_var_ptr; \
+                               if (!oldtop) (x)->lo_var_ptr = &oldtop;
 /* Put the stack top back, if what we cached was NULL. Otherwise we
    leave it alone and assume it's OK */
 #define PARROT_CALLIN_END(x)   if (!oldtop) (x)->lo_var_ptr = NULL;
@@ -117,15 +118,24 @@ Parrot_Int Parrot_call_sub_ret_int(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_API
+int Parrot_eprintf(NULLOK_INTERP, ARGIN(const char *s), ...)
+        __attribute__nonnull__(2);
+
+PARROT_API
 PARROT_WARN_UNUSED_RESULT
 Parrot_Language Parrot_find_language(SHIM_INTERP, SHIM(char *language));
 
 PARROT_API
-void Parrot_free_cstring(ARGIN_NULLOK(char *string));
+int Parrot_fprintf(PARROT_INTERP,
+    ARGIN(Parrot_PMC pio),
+    ARGIN(const char *s),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
-Parrot_PMC Parrot_get_dod_registry(PARROT_INTERP)
-        __attribute__nonnull__(1);
+void Parrot_free_cstring(ARGIN_NULLOK(char *string));
 
 PARROT_API
 Parrot_Int Parrot_get_intreg(PARROT_INTERP, Parrot_Int regnum)
@@ -360,6 +370,10 @@ Parrot_Int Parrot_PMC_typenum(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_API
+int Parrot_printf(NULLOK_INTERP, ARGIN(const char *s), ...)
+        __attribute__nonnull__(2);
+
+PARROT_API
 void Parrot_register_pmc(PARROT_INTERP, Parrot_PMC pmc)
         __attribute__nonnull__(1);
 
@@ -384,6 +398,15 @@ void Parrot_set_strreg(PARROT_INTERP,
 PARROT_API
 void Parrot_unregister_pmc(PARROT_INTERP, Parrot_PMC pmc)
         __attribute__nonnull__(1);
+
+PARROT_API
+int Parrot_vfprintf(PARROT_INTERP,
+    ARGIN(Parrot_PMC pio),
+    ARGIN(const char *s),
+    va_list args)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/extend.c */

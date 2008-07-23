@@ -47,13 +47,13 @@ providing a compreg-compatible method.
 .HLL '_Tcl', ''
 .namespace []
 
-.sub __load_macros :load :anon
+.sub load_macros :load :anon
   $P0 = compreg 'PIR'
   $P0 = $P0(".sub main\n.include 'languages/tcl/src/macros.pir'\n.end")
   $P0()
 .end
 
-.sub __prepare_lib :load :anon
+.sub prepare_lib :load :anon
 
   # Load any dependant libraries.
   load_bytecode 'Getopt/Obj.pbc'
@@ -262,7 +262,7 @@ env_loop_done:
 .HLL 'Tcl', ''
 .namespace []
 
-.sub __load_stdlib :load :anon
+.sub load_stdlib :load :anon
   .include 'iglobals.pasm'
   .local pmc interp
   interp = getinterp

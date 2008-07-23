@@ -221,12 +221,12 @@ void Parrot_gc_ims_init(PARROT_INTERP)
                 PObj_live_TEST(agg) && \
                 (PObj_get_FLAGS(agg) & PObj_custom_GC_FLAG) && \
                 !PObj_live_TEST(_new)) { \
-            Parrot_dod_ims_wb(interp, agg, _new); \
+            Parrot_dod_ims_wb((interp), (agg), (_new)); \
         } \
     } while (0)
 
 #  define GC_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key) \
-          GC_WRITE_BARRIER(interp, agg, old, _new)
+          GC_WRITE_BARRIER((interp), (agg), (old), (_new))
 #endif
 
 #if PARROT_GC_MS
@@ -242,7 +242,7 @@ void Parrot_gc_ims_init(PARROT_INTERP)
     gen_agg = PObj_to_GMSH(agg)->gen->gen_no; \
     gen_new = PObj_to_GMSH(_new)->gen->gen_no; \
     if (gen_agg < gen_new) \
-        parrot_gc_gms_wb(interp, agg, old, _new); \
+        parrot_gc_gms_wb((interp), (agg), (old), (_new)); \
 } while (0)
 
 #  define GC_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key) do { \
@@ -253,7 +253,7 @@ void Parrot_gc_ims_init(PARROT_INTERP)
     gen_new = PObj_to_GMSH(_new)->gen->gen_no; \
     gen_key = PObj_to_GMSH(new_key)->gen->gen_no; \
     if (gen_agg < gen_new || gen_agg < gen_key) \
-        parrot_gc_gms_wb_key(interp, agg, old, old_key, _new, new_key); \
+        parrot_gc_gms_wb_key((interp), (agg), (old), (old_key), (_new), (new_key)); \
 } while (0)
 
 #endif

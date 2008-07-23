@@ -25,8 +25,7 @@ t/library/p6object.t -- P6object tests
     test_namespace.'export_to'(curr_namespace, exports)
 
     ##  set our plan
-    .local int plan_tests
-    plan(107)
+    plan(110)
 
     ##  make sure we can load the P6object library
     push_eh load_failed
@@ -115,12 +114,20 @@ t/library/p6object.t -- P6object tests
     is($S0, 'ABC', 'typeof ABC proto eq "ABC"')
     $P0 = abcproto.'HOW'()
     isa_ok($P0, 'P6metaclass', 'ABC proto .HOW')
-    $I0 = $P0.'can'('foo')
-    ok($I0, "ABC.HOW.can('foo')")
-    $I0 = $P0.'can'('bar')
-    nok($I0, "ABC.HOW.can('bar')")
+    $I0 = $P0.'can'(abcproto, 'foo')
+    ok($I0, "ABC.HOW.can(ABC, 'foo')")
+    $I0 = $P0.'can'(abcproto, 'bar')
+    nok($I0, "ABC.HOW.can(ABC, 'bar')")
     $I0 = defined metaproto
     nok($I0, 'ABC proto undefined')
+
+    ##  create an anonymous class
+    $P0 = new 'Class'
+    $P1 = metaproto.'register'($P0)
+    isa_ok($P1, 'P6object', 'anonymous proto')
+    isa_ok($P1, 'P6protoobject', 'anonymous proto')
+    $S0 = $P1.'WHAT'()
+    is($S0, '', 'anonymous proto stringifies to empty string')
 
     ##  try the default .new method on ABC protoobject
     .local pmc abc

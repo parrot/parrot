@@ -28,6 +28,7 @@
 
 # please insert tab separated entries at the top of the list
 
+3.18	2008.07.16	bernhard	remove opcode getfd
 3.17    2008.06.26	jonathan	sub PMC freeze format changed
 3.16    2008.04.23	pmichaud	remove other user stack opcodes
 3.15    2008.04.22	pmichaud	remove saveall/restoreall opcodes

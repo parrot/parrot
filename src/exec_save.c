@@ -165,21 +165,21 @@ Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
 #  define sh_add(n, t, f, s, l, i, a, e) { \
     bzero(&sechdr, sizeof (Elf32_Ehdr)); \
     sechdr.sh_name = shste - shst; \
-    shste += sprintf(shste, "%s", n); \
+    shste += sprintf(shste, "%s", (n)); \
     shste++; \
-    sechdr.sh_type = t; \
-    sechdr.sh_flags = f; \
+    sechdr.sh_type = (t); \
+    sechdr.sh_flags = (f); \
     sechdr.sh_addr = 0; \
     sechdr.sh_offset = current_offset; \
-    sechdr.sh_size = s; \
-    sechdr.sh_link = l; \
-    sechdr.sh_info = i; \
-    sechdr.sh_addralign = a; \
-    sechdr.sh_entsize = e; \
+    sechdr.sh_size = (s); \
+    sechdr.sh_link = (l); \
+    sechdr.sh_info = (i); \
+    sechdr.sh_addralign = (a); \
+    sechdr.sh_entsize = (e); \
     save_struct(fp, &sechdr, sizeof (Elf32_Shdr)); \
-    current_offset += s; \
-    if (s % 4) \
-      current_offset += (4 - s % 4); \
+    current_offset += (s); \
+    if ((s) % 4) \
+      current_offset += (4 - (s) % 4); \
    }
 
 /* Sizeof the section header string table */

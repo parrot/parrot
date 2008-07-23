@@ -231,7 +231,7 @@ ENDRUN
 
 #ifdef FUNC_CORE
 #  define DEF_OP(op) \
-    interp->op_func[OP_ ## op] = op; \
+    interp->op_func[OP_ ## op] = (op); \
     interp->op_info[OP_ ## op] = #op
 #else
 #  define DEF_OP(op) \

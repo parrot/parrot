@@ -166,8 +166,7 @@ really a public API.
         const int   val_is_NS =
             value->vtable->base_type == enum_class_NameSpace;
         PMC        *new_tuple = NULL;
-        HashBucket *b         =
-            parrot_hash_get_bucket(INTERP, NS_HASH(SELF), key);
+        PMC * const old       = (PMC *)parrot_hash_get(INTERP, NS_HASH(SELF), key);
 
         /* If it's a sub... */
         if (!PMC_IS_NULL(value) && VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Sub"))) {
@@ -229,8 +228,8 @@ really a public API.
 
         /* If it's an NCI method */
         if (value->vtable->base_type == enum_class_NCI) {
-            Parrot_NameSpace * const nsinfo = PARROT_NAMESPACE(SELF);
-            PMC * const classobj = VTABLE_get_class(interp, SELF);
+            Parrot_NameSpace * const nsinfo   = PARROT_NAMESPACE(SELF);
+            PMC              * const classobj = VTABLE_get_class(interp, SELF);
 
             /* Insert it in class, if there is a class */
             if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
@@ -279,11 +278,9 @@ really a public API.
             }
         }
 
-        if (!b)
+        if (!old)
             SUPER(key, value);
         else {
-            PMC * const old = (PMC *)b->value;
-
             if ((old->vtable->base_type == enum_class_NameSpace) == val_is_NS) {
                 /* simple ns or simple var/sub changed */
                 SUPER(key, value);
@@ -316,18 +313,17 @@ really a public API.
             if (new_tuple) {
                 VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_ns, value);
                 VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_var_sub,
-                                         (PMC *)b->value);
-                b->value = new_tuple;
+                                         old);
+
+                parrot_hash_put(INTERP, NS_HASH(SELF), key, new_tuple);
                 /* distinction from a plain FPA, which doesn't extend the
-                 * namespace storage
-                 */
+                 * namespace storage */
             }
         }
         else if (new_tuple) {
-            VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_ns,
-                (PMC *)b->value);
+            VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_ns, old);
             VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_var_sub, value);
-            b->value = new_tuple;
+            parrot_hash_put(INTERP, NS_HASH(SELF), key, new_tuple);
         }
     }
 

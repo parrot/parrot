@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  29;
+use Test::More tests =>  35;
 use Carp;
 use Cwd;
 use lib qw( lib );
@@ -41,6 +41,8 @@ ok( defined $step, "$step_name constructor returned defined value" );
 isa_ok( $step, $step_name );
 
 
+########## _evaluate_cc_run() ##########
+
 my ($has_readline, $verbose);
 
 $verbose = undef;
@@ -64,6 +66,8 @@ $step->set_result(undef);
     $step->set_result(undef);
 }
 
+########## _handle_readline() ##########
+
 $has_readline = 0;
 ok(auto::readline::_handle_readline($conf, $has_readline),
     "_handle_readline() returned true value");
@@ -86,7 +90,56 @@ is($conf->data->get('HAS_READLINE'), 1,
 $conf->data->set( readline => undef );
 $conf->data->set( HAS_READLINE => undef );
 
-my ($libs, $ccflags, $linkflags);
+########## _handle_ncurses_need() ##########
+
+my ($osname, $cc);
+my ($libs, $newlibs);
+
+$libs = q{-lalpha};
+$osname = q{mswin32};
+$cc = q{gcc};
+$conf->data->set( libs => $libs );
+ok(auto::readline::_handle_ncurses_need($conf, $osname, $cc),
+    "_handle_ncurses_need() returned true value");
+$newlibs = $conf->data->get( 'libs' );
+like(
+    $newlibs,
+    qr/\s+-lncurses/,
+    "Value expected for $osname, $cc added to 'libs'"
+);
+$conf->data->set( libs => undef );
+
+$libs = q{-lalpha};
+$osname = q{mswin32};
+$cc = q{cc};
+$conf->data->set( libs => $libs );
+ok(auto::readline::_handle_ncurses_need($conf, $osname, $cc),
+    "_handle_ncurses_need() returned true value");
+$newlibs = $conf->data->get( 'libs' );
+like(
+    $newlibs,
+    qr/\s+ncurses\.lib/,
+    "Value expected for $osname, $cc added to 'libs'"
+);
+$conf->data->set( libs => undef );
+
+$libs = q{-lalpha};
+$osname = q{linux};
+$cc = q{gcc};
+$conf->data->set( libs => $libs );
+ok(auto::readline::_handle_ncurses_need($conf, $osname, $cc),
+    "_handle_ncurses_need() returned true value");
+$newlibs = $conf->data->get( 'libs' );
+like(
+    $newlibs,
+    qr/\s+-lncurses/,
+    "Value expected for $osname, $cc added to 'libs'"
+);
+$conf->data->set( libs => undef );
+
+########## _recheck_settings() ##########
+
+my ($ccflags, $linkflags);
 
 $libs = q{-lalpha};
 $ccflags = q{-Ibeta};

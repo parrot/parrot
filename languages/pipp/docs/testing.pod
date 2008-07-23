@@ -26,9 +26,9 @@ Something like this worked for me under Linux.
 
   # build PHP 5.3
   cd ~/devel/PHP/
-  wget http://snaps.php.net/php5.3-200807061430.tar.gz
-  tar xvzf php5.3-200807061430.tar.gz
-  cd php5.3-200807061430/
+  wget http://snaps.php.net/php5.3-200807221230.tar.gz
+  tar xvzf php5.3-200807221230.tar.gz
+  cd php5.3-200807221230/
   ./configure
   make
 
@@ -36,7 +36,8 @@ Something like this worked for me under Linux.
   export PARROT_HOME=/home/bernhard/devel/Parrot/trunk
   export TEST_PHP_EXECUTABLE=$PARROT_HOME/languages/pipp/pipp
   export TEST_PHP_CGI_EXECUTABLE=$PARROT_HOME/languages/pipp/pipp
-  export PIPP_VARIANT=phc
+  # export PIPP_VARIANT=pct
+  # export PIPP_VARIANT=phc
   export NO_INTERACTION=1
 
   # run the test-suite

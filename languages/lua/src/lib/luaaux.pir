@@ -404,6 +404,134 @@ with the string C<rep>.
 .end
 
 
+=item C<lua_isboolean (val)>
+
+Returns 1 if the value has type boolean, and 0 otherwise.
+
+=cut
+
+.sub 'lua_isboolean'
+    .param pmc val
+    .local int res
+    res = 0
+    if null val goto L1
+    res = isa val, 'LuaBoolean'
+  L1:
+    .return (res)
+.end
+
+
+=item C<lua_isfunction (val)>
+
+Returns 1 if the value is a function, and 0 otherwise.
+
+=cut
+
+.sub 'lua_isfunction'
+    .param pmc val
+    .local int res
+    res = 0
+    if null val goto L1
+    res = isa val, 'LuaClosure'
+    if res goto L1
+    res = isa val, 'LuaFunction'
+L1:
+    .return (res)
+.end
+
+
+=item C<lua_isnil (val)>
+
+Returns 1 if the value is nil, and 0 otherwise.
+
+=cut
+
+.sub 'lua_isnil'
+    .param pmc val
+    .local int res
+    res = 0
+    if null val goto L1
+    res = isa val, 'LuaNil'
+  L1:
+    .return (res)
+.end
+
+
+=item C<lua_isnumber (val)>
+
+Returns 1 if the value is a number or a string convertible to a number,
+and 0 otherwise.
+
+=cut
+
+.sub 'lua_isnumber'
+    .param pmc val
+    .local int res
+    res = 0
+    if null val goto L1
+    res = isa val, 'LuaNumber'
+    if res goto L1
+    $P0 = val.'tonumber'()
+    res = isa $P0, 'LuaNumber'
+L1:
+    .return (res)
+.end
+
+
+=item C<lua_isstring (val)>
+
+Returns 1 if the value is a string or a number (which is always convertible
+to a string), and 0 otherwise.
+
+=cut
+
+.sub 'lua_isstring'
+    .param pmc val
+    .local int res
+    res = 0
+    if null val goto L1
+    res = isa val, 'LuaString'
+    if res goto L1
+    res = isa val, 'LuaNumber'
+L1:
+    .return (res)
+.end
+
+
+=item C<lua_istable (val)>
+
+Returns 1 if the value is a table, and 0 otherwise.
+
+=cut
+
+.sub 'lua_istable'
+    .param pmc val
+    .local int res
+    res = 0
+    if null val goto L1
+    res = isa val, 'LuaTable'
+  L1:
+    .return (res)
+.end
+
+
+=item C<lua_isuserdata (val)>
+
+Returns 1 if the value is a userdata, and 0 otherwise.
+
+=cut
+
+.sub 'lua_isuserdata'
+    .param pmc val
+    .local int res
+    res = 0
+    if null val goto L1
+    res = isa val, 'LuaUserdata'
+  L1:
+    .return (res)
+.end
+
+
 =item C<lua_load (data, name)>
 
 This function only loads a chunk; it does not run it.

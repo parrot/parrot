@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#! perl
 
 # Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$

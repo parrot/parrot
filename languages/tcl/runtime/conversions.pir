@@ -1,19 +1,19 @@
 .HLL '_Tcl', ''
 .namespace []
 
-=head2 _Tcl::__list
+=head2 _Tcl::toList
 
 Given a PMC, get a list from it. If the PMC is a TclList,
 this is as simple as returning the list.
 
 =cut
 
-.sub __list :multi(TclList)
+.sub toList :multi(TclList)
   .param pmc list
   .return(list)
 .end
 
-.sub __list :multi(_)
+.sub toList :multi(_)
   .param pmc value
 
   $P0 = new 'TclString'
@@ -34,27 +34,27 @@ this is as simple as returning the list.
 
 .end
 
-=head2 _Tcl::__dict
+=head2 _Tcl::toDict
 
 Given a PMC, get a TclDict from it, converting as needed.
 
 =cut
 
-.sub __dict :multi(TclDict)
+.sub toDict :multi(TclDict)
   .param pmc dict
   .return(dict)
 .end
 
-.sub __dict :multi(TclList)
+.sub toDict :multi(TclList)
   .param pmc list
 
-  $P0 = __listToDict(list)
+  $P0 = listToDict(list)
   copy list, $P0
 
   .return(list)
 .end
 
-.sub __dict :multi(_)
+.sub toDict :multi(_)
   .param pmc value
 
   $P0 = __stringToDict(value)
@@ -64,23 +64,23 @@ Given a PMC, get a TclDict from it, converting as needed.
 .end
 
 
-=head2 _Tcl::__number
+=head2 _Tcl::toNumber
 
 Given a PMC, get a number from it.
 
 =cut
 
-.sub __number :multi(TclInt)
+.sub toNumber :multi(TclInt)
   .param pmc n
   .return(n)
 .end
 
-.sub __number :multi(TclFloat)
+.sub toNumber :multi(TclFloat)
   .param pmc n
   .return(n)
 .end
 
-.sub __number :multi(_)
+.sub toNumber :multi(_)
   .param pmc number
 
   .local string str
@@ -137,18 +137,18 @@ NaN:
   tcl_error $S1
 .end
 
-=head2 _Tcl::__integer
+=head2 _Tcl::toInteger
 
 Given a PMC, get an integer from it.
 
 =cut
 
-.sub __integer :multi(TclInt)
+.sub toInteger :multi(TclInt)
   .param pmc n
   .return(n)
 .end
 
-.sub __integer :multi(_)
+.sub toInteger :multi(_)
   .param pmc value
   .param pmc rawhex :named ('rawhex') :optional
   .param int has_rawhex               :opt_flag
@@ -162,7 +162,7 @@ normal:
   .local pmc integer
 
   push_eh not_integer_eh
-    integer = __number(value)
+    integer = toNumber(value)
   pop_eh
   $S0 = typeof integer
   if $S0 != 'TclInt' goto not_integer
@@ -187,6 +187,9 @@ not_integer_eh:
 
 =head2 _Tcl::__index
 
+Given a tcl string index and an List pmc, return the corresponding numeric
+index.
+
 =cut
 
 .sub __index
@@ -200,14 +203,14 @@ not_integer_eh:
   if $S0 == 'end+' goto after_end
 
   push_eh bad_index
-    $I0 = __integer(idx)
+    $I0 = toInteger(idx)
   pop_eh
   .return($I0)
 
 before_end:
   $S0 = substr idx, 4
   push_eh bad_index
-    $I0 = __integer($S0)
+    $I0 = toInteger($S0)
   pop_eh
 
   $I1 = elements list
@@ -218,7 +221,7 @@ before_end:
 after_end:
   $S0 = substr idx, 4
   push_eh bad_index
-    $I0 = __integer($S0)
+    $I0 = toInteger($S0)
   pop_eh
 
   $I1 = elements list
@@ -525,14 +528,14 @@ return:
   .return(ns_name)
 .end
 
-=head2 _Tcl::__boolean
+=head2 _Tcl::toBoolean
 
 Given a string, return its boolean value if it's a valid boolean. Otherwise,
 throw an exception.
 
 =cut
 
-.sub __boolean
+.sub toBoolean
     .param pmc value
 
     .local string lc
@@ -559,11 +562,8 @@ throw an exception.
     if lc == 'off'   goto false
     if lc == 'of'    goto false
 
-    .local pmc __number
-    __number = get_hll_global '__number'
-
     push_eh error
-      value = __number(value)
+      value = toNumber(value)
     pop_eh
     if value goto true
     goto false
@@ -597,11 +597,10 @@ was this a valid tcl-style level, or did we get this value as a default?
   defaulted = new 'Integer'
   defaulted = 0
 
-  .local pmc call_chain, __number
+  .local pmc call_chain
   .local int call_level
   call_chain = get_root_global ['_tcl'], 'call_chain'
   call_level = elements call_chain
-  __number   = get_root_global ['_tcl'], '__number'
   orig_level = new 'Integer'
   orig_level = call_level
 
@@ -613,13 +612,13 @@ get_absolute:
   $S1 = substr $S0, 0, 1, ''
   if $S1 != '#' goto get_integer
   push_eh default
-    parrot_level = __number($S0)
+    parrot_level = toNumber($S0)
   pop_eh
   goto bounds_check
 
 get_integer:
   push_eh default
-    parrot_level = __number(tcl_level)
+    parrot_level = toNumber(tcl_level)
   pop_eh
 
   if parrot_level < 0 goto default

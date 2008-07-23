@@ -15,11 +15,11 @@ src/grammar/expr/operators.pir - [expr] operator definitions.
 .sub 'prefix:+' :multi(String)
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     .return(a)
@@ -41,11 +41,11 @@ empty_string:
 .sub 'prefix:-' :multi(String)
     .param pmc a
 
-    .local pmc __number, __integer
-    __number  = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber  = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
     $S0 = typeof a
     if $S0 == "TclInt" goto is_int
@@ -79,11 +79,11 @@ empty_string:
 .sub 'prefix:~' :multi(String)
     .param pmc a
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
+      a = toNumber(a)
     pop_eh
 
     $S0 = typeof a
@@ -118,11 +118,11 @@ empty_string:
 .sub 'prefix:!' :multi(String)
     .param pmc a
 
-    .local pmc __boolean
-    __boolean = get_root_global ['_tcl'], '__boolean'
+    .local pmc toBoolean
+    toBoolean = get_root_global ['_tcl'], 'toBoolean'
 
     push_eh is_string
-      a = __boolean(a)
+      a = toBoolean(a)
     pop_eh
 
     $I0 = a
@@ -168,12 +168,12 @@ empty_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
-      b = __number(b)
+      a = toNumber(a)
+      b = toNumber(b)
     pop_eh
 
     if a == 0 goto zero
@@ -205,12 +205,12 @@ zero_with_neg:
     .param pmc a
     .param pmc b
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
-      b = __number(b)
+      a = toNumber(a)
+      b = toNumber(b)
       $P0 = new 'TclFloat'
       $P0 = mul a, b
     pop_eh
@@ -229,12 +229,12 @@ empty_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
-      b = __number(b)
+      a = toNumber(a)
+      b = toNumber(b)
     pop_eh
 
     if b == 0 goto divide_by_zero
@@ -264,12 +264,12 @@ empty_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
-      b = __number(b)
+      a = toNumber(a)
+      b = toNumber(b)
     pop_eh
 
     $I0 = isa a, 'TclFloat'
@@ -297,12 +297,12 @@ is_float:
     .param pmc a
     .param pmc b
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
-      b = __number(b)
+      a = toNumber(a)
+      b = toNumber(b)
       $P0 = new 'TclFloat'
       $P0 = a + b
     pop_eh
@@ -321,12 +321,12 @@ empty_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
-      b = __number(b)
+      a = toNumber(a)
+      b = toNumber(b)
       $P0 = new 'TclFloat'
       $P0 = a - b
     pop_eh
@@ -362,12 +362,12 @@ empty_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
-      b = __number(b)
+      a = toNumber(a)
+      b = toNumber(b)
     pop_eh
 
     $I0 = isa a, 'Float'
@@ -412,12 +412,12 @@ is_float:
     .param pmc a
     .param pmc b
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      a = __number(a)
-      b = __number(b)
+      a = toNumber(a)
+      b = toNumber(b)
     pop_eh
 
     $I0 = isa a, 'Float'
@@ -447,11 +447,11 @@ is_float:
     .param pmc a
     .param pmc b
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
     push_eh is_string
-      $P0 = __number(a)
-      $P1 = __number(b)
+      $P0 = toNumber(a)
+      $P1 = toNumber(b)
       $I0 = islt $P0, $P1
     pop_eh
     .return ($I0)
@@ -466,11 +466,11 @@ is_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
     push_eh is_string
-      $P0 = __number(a)
-      $P1 = __number(b)
+      $P0 = toNumber(a)
+      $P1 = toNumber(b)
       $I0 = isgt $P0, $P1
     pop_eh
     .return($I0)
@@ -485,12 +485,12 @@ is_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __number
-    __number = get_root_global ['_tcl'], '__number'
+    .local pmc toNumber
+    toNumber = get_root_global ['_tcl'], 'toNumber'
 
     push_eh is_string
-      $P0 = __number(a)
-      $P1 = __number(b)
+      $P0 = toNumber(a)
+      $P1 = toNumber(b)
       $I0 = isle $P0, $P1
     pop_eh
     .return($I0)
@@ -505,13 +505,13 @@ is_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __number
+    .local pmc toNumber
     $P0 = get_root_namespace
-    __number = $P0['_tcl'; '__number']
+    toNumber = $P0['_tcl'; 'toNumber']
 
     push_eh is_string
-      $P0 = __number(a)
-      $P1 = __number(b)
+      $P0 = toNumber(a)
+      $P1 = toNumber(b)
       $I0 = isge $P0, $P1
     pop_eh
     .return($I0)
@@ -526,13 +526,13 @@ is_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __number
+    .local pmc toNumber
     $P0 = get_root_namespace
-    __number = $P0['_tcl'; '__number']
+    toNumber = $P0['_tcl'; 'toNumber']
 
     push_eh is_string
-      $P0 = __number(a)
-      $P1 = __number(b)
+      $P0 = toNumber(a)
+      $P1 = toNumber(b)
       $I0 = iseq $P0, $P1
     pop_eh
     .return($I0)
@@ -549,13 +549,13 @@ is_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __number
+    .local pmc toNumber
     $P0 = get_root_namespace
-    __number = $P0['_tcl'; '__number']
+    toNumber = $P0['_tcl'; 'toNumber']
 
     push_eh is_string
-      $P0 = __number(a)
-      $P1 = __number(b)
+      $P0 = toNumber(a)
+      $P1 = toNumber(b)
       $I0 = isne $P0, $P1
     pop_eh
     .return($I0)
@@ -590,12 +590,12 @@ is_string:
   .param pmc a
   .param pmc b
 
-  .local pmc __integer
-  __integer = get_root_global ['_tcl'], '__integer'
+  .local pmc toInteger
+  toInteger = get_root_global ['_tcl'], 'toInteger'
 
   push_eh is_string
-    a = __integer(a)
-    b = __integer(b)
+    a = toInteger(a)
+    b = toInteger(b)
   pop_eh
 
   $I0 = a
@@ -616,11 +616,11 @@ empty_string:
   .param pmc a
   .param int b
 
-  .local pmc __integer
-  __integer = get_root_global ['_tcl'], '__integer'
+  .local pmc toInteger
+  toInteger = get_root_global ['_tcl'], 'toInteger'
 
   push_eh is_string
-    a = __integer(a)
+    a = toInteger(a)
   pop_eh
 
   $I0 = a
@@ -639,11 +639,11 @@ empty_string:
   .param int a
   .param pmc b
 
-  .local pmc __integer
-  __integer = get_root_global ['_tcl'], '__integer'
+  .local pmc toInteger
+  toInteger = get_root_global ['_tcl'], 'toInteger'
 
   push_eh is_string
-    b = __integer(b)
+    b = toInteger(b)
   pop_eh
 
   $I0 = b
@@ -662,11 +662,11 @@ empty_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __integer
-    __integer = get_root_global ['_tcl'], '__integer'
+    .local pmc toInteger
+    toInteger = get_root_global ['_tcl'], 'toInteger'
 
     push_eh is_string
-        b = __integer(b)
+        b = toInteger(b)
     pop_eh
     tcl_error "can't use floating-point value as operand of \"&\""
 
@@ -682,11 +682,11 @@ empty_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __integer
-    __integer = get_root_global ['_tcl'], '__integer'
+    .local pmc toInteger
+    toInteger = get_root_global ['_tcl'], 'toInteger'
 
     push_eh is_string
-        a = __integer(a)
+        a = toInteger(a)
     pop_eh
     tcl_error "can't use floating-point value as operand of \"&\""
 
@@ -719,12 +719,12 @@ empty_string:
   .param pmc a
   .param pmc b
 
-  .local pmc __integer
-  __integer = get_root_global ['_tcl'], '__integer'
+  .local pmc toInteger
+  toInteger = get_root_global ['_tcl'], 'toInteger'
 
   push_eh is_string
-    a = __integer(a)
-    b = __integer(b)
+    a = toInteger(a)
+    b = toInteger(b)
   pop_eh
 
   $I0 = a
@@ -745,11 +745,11 @@ empty_string:
   .param pmc a
   .param int b
 
-  .local pmc __integer
-  __integer = get_root_global ['_tcl'], '__integer'
+  .local pmc toInteger
+  toInteger = get_root_global ['_tcl'], 'toInteger'
 
   push_eh is_string
-    a = __integer(a)
+    a = toInteger(a)
   pop_eh
 
   $I0 = a
@@ -768,11 +768,11 @@ empty_string:
   .param int a
   .param pmc b
 
-  .local pmc __integer
-  __integer = get_root_global ['_tcl'], '__integer'
+  .local pmc toInteger
+  toInteger = get_root_global ['_tcl'], 'toInteger'
 
   push_eh is_string
-    b = __integer(b)
+    b = toInteger(b)
   pop_eh
 
   $I0 = b
@@ -791,11 +791,11 @@ empty_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __integer
-    __integer = get_root_global ['_tcl'], '__integer'
+    .local pmc toInteger
+    toInteger = get_root_global ['_tcl'], 'toInteger'
 
     push_eh is_string
-        b = __integer(b)
+        b = toInteger(b)
     pop_eh
     tcl_error "can't use floating-point value as operand of \"^\""
 
@@ -811,11 +811,11 @@ empty_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __integer
-    __integer = get_root_global ['_tcl'], '__integer'
+    .local pmc toInteger
+    toInteger = get_root_global ['_tcl'], 'toInteger'
 
     push_eh is_string
-        a = __integer(a)
+        a = toInteger(a)
     pop_eh
     tcl_error "can't use floating-point value as operand of \"^\""
 
@@ -848,12 +848,12 @@ empty_string:
   .param pmc a
   .param pmc b
 
-  .local pmc __integer
-  __integer = get_root_global ['_tcl'], '__integer'
+  .local pmc toInteger
+  toInteger = get_root_global ['_tcl'], 'toInteger'
 
   push_eh is_string
-    a = __integer(a)
-    b = __integer(b)
+    a = toInteger(a)
+    b = toInteger(b)
   pop_eh
 
   $I0 = a
@@ -874,11 +874,11 @@ empty_string:
   .param pmc a
   .param int b
 
-  .local pmc __integer
-  __integer = get_root_global ['_tcl'], '__integer'
+  .local pmc toInteger
+  toInteger = get_root_global ['_tcl'], 'toInteger'
 
   push_eh is_string
-    a = __integer(a)
+    a = toInteger(a)
   pop_eh
 
   $I0 = a
@@ -897,11 +897,11 @@ empty_string:
   .param int a
   .param pmc b
 
-  .local pmc __integer
-  __integer = get_root_global ['_tcl'], '__integer'
+  .local pmc toInteger
+  toInteger = get_root_global ['_tcl'], 'toInteger'
 
   push_eh is_string
-    b = __integer(b)
+    b = toInteger(b)
   pop_eh
 
   $I0 = b
@@ -920,11 +920,11 @@ empty_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __integer
-    __integer = get_root_global ['_tcl'], '__integer'
+    .local pmc toInteger
+    toInteger = get_root_global ['_tcl'], 'toInteger'
 
     push_eh is_string
-        b = __integer(b)
+        b = toInteger(b)
     pop_eh
     tcl_error "can't use floating-point value as operand of \"|\""
 
@@ -940,11 +940,11 @@ empty_string:
     .param pmc a
     .param pmc b
 
-    .local pmc __integer
-    __integer = get_root_global ['_tcl'], '__integer'
+    .local pmc toInteger
+    toInteger = get_root_global ['_tcl'], 'toInteger'
 
     push_eh is_string
-        a = __integer(a)
+        a = toInteger(a)
     pop_eh
     tcl_error "can't use floating-point value as operand of \"|\""
 
@@ -976,12 +976,12 @@ empty_string:
     .param pmc elem
     .param pmc list
 
-    .local pmc __list
+    .local pmc toList
     $P0 = get_root_namespace
-    __list = $P0['_tcl'; '__list']
+    toList = $P0['_tcl'; 'toList']
 
     .local pmc iter
-    list = __list(list)
+    list = toList(list)
     iter = new 'Iterator', list
 loop:
     unless iter goto false
@@ -999,12 +999,12 @@ false:
     .param pmc elem
     .param pmc list
 
-    .local pmc __list
+    .local pmc toList
     $P0 = get_root_namespace
-    __list = $P0['_tcl'; '__list']
+    toList = $P0['_tcl'; 'toList']
 
     .local pmc iter
-    list = __list(list)
+    list = toList(list)
     iter = new 'Iterator', list
 loop:
     unless iter goto true

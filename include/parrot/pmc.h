@@ -49,6 +49,9 @@ void Parrot_create_mro(PARROT_INTERP, INTVAL type)
         __attribute__nonnull__(1);
 
 PARROT_API
+INTVAL PMC_is_null(SHIM_INTERP, NULLOK(const PMC *pmc));
+
+PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * pmc_new(PARROT_INTERP, INTVAL base_type)

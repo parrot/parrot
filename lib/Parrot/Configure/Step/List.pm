@@ -39,7 +39,6 @@ my @steps = qw(
     auto::sizes
     auto::byteorder
     auto::va_ptr
-    auto::pack
     auto::format
     auto::isreg
     auto::arch

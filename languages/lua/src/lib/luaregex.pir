@@ -190,6 +190,7 @@ Francois Perrad
     $P0 = subclass 'PGE::Exp::CCShortcut', 'PGE::Exp::LuaCCShortcut'
     $P0 = subclass 'PGE::Exp::CGroup', 'PGE::Exp::LuaCGroup'
     $P0 = subclass 'PGE::Exp', 'PGE::Exp::LuaBalanced'
+    $P0 = subclass 'Hash', 'PGE::Cache'
 .end
 
 .namespace [ 'PGE::LuaRegex' ]
@@ -207,6 +208,14 @@ Francois Perrad
     target = adverbs['target']
     target = downcase target
 
+    unless target == '' goto no_cache
+    .local pmc cache
+    cache = get_hll_global ['PGE::LuaRegex'], 'cache_compile'
+    $P0 = cache[source]
+    if null $P0 goto no_cache
+    .return ($P0)
+  no_cache:
+
     .local pmc match
     match = luaregex(source)
     if target != 'parse' goto check
@@ -222,12 +231,14 @@ Francois Perrad
     .return ($P0)
 
   analyze:
-    .local pmc expr, pad
+    .local pmc expr, pad, code
     expr = match['expr']
     new pad, 'Hash'
     pad['subpats'] = 0
     expr = expr.'luaanalyze'(pad)
-    .return expr.'compile'(adverbs :flat :named)
+    code = expr.'compile'(adverbs :flat :named)
+    cache[source] = code
+    .return (code)
 .end
 
 
@@ -304,6 +315,10 @@ Francois Perrad
     optable.newtok('postfix:-', 'equiv'=>'postfix:*', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
 
     optable.newtok('infix:', 'looser'=>'postfix:*', 'right'=>1, 'nows'=>1, 'match'=>'PGE::Exp::Concat')
+
+    .local pmc cache, mt
+    new cache, 'PGE::Cache'
+    set_hll_global ['PGE::LuaRegex'], 'cache_compile', cache
 
     $P0 = get_hll_global ['PGE::LuaRegex'], 'compile_luaregex'
     compreg 'PGE::LuaRegex', $P0

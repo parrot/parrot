@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 9;
 
 use Parrot::Config;
 
@@ -75,6 +75,26 @@ ok 1
 ok 2
 OUT
 
+# test is_dir
+pir_error_output_like( <<"CODE", <<"OUT", "Test is_dir error" );
+.sub main :main
+        \$P1 = new 'File'
+
+        #make a filename that's long enough to cause lstat to fail
+        \$I0 = 1000
+loop:
+        \$S0 = concat \$S0, "1234567890"
+        \$I0 = \$I0 - 1
+        if \$I0 goto loop
+
+        \$I1 = \$P1."is_dir"(\$S0)
+
+        end
+.end
+CODE
+/^[\\w \t\r\n]+current instr\.:/
+OUT
+
 # test is_file
 pir_output_is( <<"CODE", <<"OUT", "Test is_file" );
 .sub main :main
@@ -104,6 +124,26 @@ ok2:
 CODE
 ok 1
 ok 2
+OUT
+
+# test is_file
+pir_error_output_like( <<"CODE", <<"OUT", "Test is_file error" );
+.sub main :main
+        \$P1 = new 'File'
+
+        #make a filename that's long enough to cause lstat to fail
+        \$I0 = 1000
+loop:
+        \$S0 = concat \$S0, "1234567890"
+        \$I0 = \$I0 - 1
+        if \$I0 goto loop
+
+        \$I1 = \$P1."is_file"(\$S0)
+
+        end
+.end
+CODE
+/^[\\w \t\r\n]+current instr\.:/
 OUT
 
 SKIP: {

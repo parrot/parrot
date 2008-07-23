@@ -9,13 +9,13 @@ A .Sub with attributes
 
 .cloneable()
 
-=head2 __class_init
+=head2 class_init
 
 Define the attributes required for the class.
 
 =cut
 
-.sub __class_init :anon :load
+.sub class_init :anon :load
 
   $P0 = get_class 'Sub'
   $P1 = subclass $P0, 'TclProc'

@@ -114,7 +114,7 @@ static UINTVAL validate(SHIM_INTERP, SHIM(STRING *source_string));
 #endif
 
 #define EXCEPTION(err, str) \
-    real_exception(interp, NULL, err, str)
+    real_exception(interp, NULL, (err), (str))
 
 /*
 

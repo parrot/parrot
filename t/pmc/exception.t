@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 36;
 
 =head1 NAME
 
@@ -834,6 +834,68 @@ CODE
 ok 1
 ok 2
 ok 3
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "taking a continuation promotes RetCs", todo => 'see RT#56458');
+## This test creates a continuation in a inner sub and re-invokes it later.  The
+## re-invocation signals an error, which is caught by an intermediate sub.
+## Returning from the "test" sub the second time failed in r28794; invoking
+## parrot with "-D80" shows clearly that the "test" context was being recycled
+## prematurely.  For some reason, it is necessary to signal the error in order
+## to expose the bug.
+.sub main :main
+	.local int redux
+	.local pmc cont
+	## debug 0x80
+	redux = 0
+	print "calling test\n"
+	cont = test()
+	print "back from test\n"
+	if redux goto done
+	redux = 1
+	print "calling cont\n"
+	cont()
+	print "never.\n"
+done:
+	print "done.\n"
+.end
+.sub test
+	## Push a handler around the foo() call.
+	push_eh handle_errs
+	print "  calling foo\n"
+	.local pmc cont
+	cont = foo()
+	pop_eh
+	print "  returning from test.\n"
+	.return (cont)
+handle_errs:
+	print "  test:  caught error\n"
+	.return (cont)
+.end
+.sub foo
+	## Take a continuation.
+	.local pmc cont
+	cont = new 'Continuation'
+	set_addr cont, over_there 
+	print "    returning from foo\n"
+	.return (cont)
+over_there:
+	print "    got over there.\n"
+	.local pmc ex
+	ex = new 'Exception'
+	throw ex
+.end
+CODE
+calling test
+  calling foo
+    returning from foo
+  returning from test.
+back from test
+calling cont
+    got over there.
+  test:  caught error
+back from test
+done.
 OUTPUT
 
 # Local Variables:

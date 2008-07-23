@@ -46,7 +46,7 @@ sub check_macro_args {
         $buf =~ s{ (?:
                        (?: ' (?: \\\\ | \\' | [^'] )* ' )  # remove ' string
                      | (?: " (?: \\\\ | \\" | [^"] )* " )  # remove " string
-                     | /\* .*? \*/                         # remove C comment
+                     | /\*[^@] .*? \*/                         # remove C comment
                    )
                 }{}gsx;
 
@@ -59,9 +59,33 @@ sub check_macro_args {
             # it's referenced in the definition.
             if ($definition ne "") {
                 foreach my $arg (split /\s*,\s*/, $args) {
+
                     # eliminate any properly formed usage of the macro arg
                     $definition =~ s/\Q($arg)//g;
                     $definition =~ s/\Q[$arg]//g;
+                    $definition =~ s/\Q<$arg>//g;
+
+                    # eliminate concatenations
+                    $definition =~ s/\Q$arg ##//g;
+                    $definition =~ s/\Q## $arg//g;
+
+                    # eliminate stringifications
+                    $definition =~ s/\Q#$arg//g;
+
+                    # eliminate args used as types
+                    $definition =~ s/\Q$arg\E[ ]+\*//g;
+
+                    # eliminate all function argument instrumentation macros
+                    next if $definition =~ m/\*@[\w ]+@\*/;
+
+                    # eliminate args used as function names
+                    # (this match is naive, but it catches the one place where
+                    # this is used)
+                    $definition =~ s/\Q$arg\E\([^)]*\)//g;
+
+                    # eliminate macros that deal with flags, since they're special
+                    next if $macro =~ m/(TEST|SET|CLEAR)$/;
+
                     # Any remaining usage must be improper
                     if ($definition =~ m/\b\Q$arg\E\b/) {
                         push (@defines, "$path: $macro has unwrapped arg: $arg\n");

@@ -65,6 +65,103 @@ can.
 
 /*
 
+=item C<int Parrot_vfprintf>
+
+Writes a C string format with a varargs list to a PIO.
+
+=item C<int Parrot_fprintf>
+
+Writes a C string format with varargs to a PIO.
+
+=item C<int Parrot_printf>
+
+Writes a C string format with varargs to C<stdout>.
+
+=item C<int Parrot_eprintf>
+
+Writes a C string format with varargs to C<stderr>.
+
+*/
+
+PARROT_API
+int
+Parrot_vfprintf(PARROT_INTERP, ARGIN(Parrot_PMC pio),
+        ARGIN(const char *s), va_list args)
+{
+    STRING * str;
+    INTVAL retval;
+
+    PARROT_CALLIN_START(interp);
+    str = Parrot_vsprintf_c(interp, s, args);
+    retval = PIO_putps(interp, pio, str);
+    PARROT_CALLIN_END(interp);
+
+    return retval;
+}
+
+PARROT_API
+int
+Parrot_fprintf(PARROT_INTERP, ARGIN(Parrot_PMC pio),
+        ARGIN(const char *s), ...)
+{
+    va_list args;
+    INTVAL retval;
+
+    va_start(args, s);
+    retval = Parrot_vfprintf(interp, pio, s, args);
+    va_end(args);
+
+    return retval;
+}
+
+PARROT_API
+int
+Parrot_printf(NULLOK_INTERP, ARGIN(const char *s), ...)
+{
+    va_list args;
+    INTVAL retval;
+    va_start(args, s);
+
+    if (interp) {
+        retval = Parrot_vfprintf(interp, PIO_STDOUT(interp), s, args);
+    }
+    else {
+        /* Be nice about this...
+         **   XXX BD Should this use the default PIO_STDOUT or something?
+         */
+        retval = vfprintf(stdout, s, args);
+    }
+    va_end(args);
+
+    return retval;
+}
+
+PARROT_API
+int
+Parrot_eprintf(NULLOK_INTERP, ARGIN(const char *s), ...)
+{
+    va_list args;
+    INTVAL retval;
+
+    va_start(args, s);
+
+    if (interp) {
+        retval = Parrot_vfprintf(interp, PIO_STDERR(interp), s, args);
+    }
+    else {
+        /* Be nice about this...
+         **   XXX BD Should this use the default PIO_STDOUT or something?
+         */
+        retval=vfprintf(stderr, s, args);
+    }
+
+    va_end(args);
+
+    return retval;
+}
+
+/*
+
 =item C<Parrot_String Parrot_PMC_get_string_intkey>
 
 Return the integer keyed string value of the passed-in PMC
@@ -1172,31 +1269,6 @@ Parrot_unregister_pmc(PARROT_INTERP, Parrot_PMC pmc)
     PARROT_CALLIN_START(interp);
     dod_unregister_pmc(interp, pmc);
     PARROT_CALLIN_END(interp);
-}
-
-/*
-
-=item C<Parrot_PMC Parrot_get_dod_registry>
-
-Return Parrot's internal DOD registry PMC.
-See also: F<src/pmc/addrregistry.pmc>.
-
-=cut
-
-*/
-
-PARROT_API
-Parrot_PMC
-Parrot_get_dod_registry(PARROT_INTERP)
-{
-    PMC *registry = interp->DOD_registry;
-    PARROT_CALLIN_START(interp);
-    if (!registry) {
-        registry = interp->DOD_registry =
-            pmc_new(interp, enum_class_AddrRegistry);
-    }
-    PARROT_CALLIN_END(interp);
-    return registry;
 }
 
 /*

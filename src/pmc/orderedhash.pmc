@@ -60,6 +60,7 @@ Marks the OrderedHash as live.
         if (!h)
             return;
 
+        /* RT #53890 - keys can be NULL on purpose; move to src/hash.c ? */
         for (i = h->mask; i >= 0; --i) {
             HashBucket *b = h->bi[i];
 
@@ -307,7 +308,7 @@ The created key = "\1idx".
             if (!b->key)
                 b->key = Parrot_sprintf_s(INTERP, fmt, idx);
 
-            b->value = val;
+            b->value     = val;
         }
     }
 
@@ -400,9 +401,9 @@ The created key = "\1idx".
         if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
             PMC        *item, *next;
             HashBucket *b;
-            Hash       * const h = (Hash *)PMC_struct_val(SELF);
-            INTVAL      idx = key_integer(INTERP, key);
-            const INTVAL n  = h->entries;
+            Hash       * const h   = (Hash *)PMC_struct_val(SELF);
+            INTVAL             idx = key_integer(INTERP, key);
+            const INTVAL       n   = h->entries;
 
             if (idx < 0)
                 idx += n;
@@ -458,7 +459,7 @@ The created key = "\1idx".
             if (idx < 0)
                 idx += n;
 
-            /* XXX non-existant is undefined - is this correct */
+            /* XXX non-existent is undefined - is this correct */
             if (idx < 0 || idx >= n)
                 return 0;
 
@@ -482,7 +483,7 @@ The created key = "\1idx".
     VTABLE INTVAL defined_keyed_int(INTVAL idx) {
         Hash * const h = (Hash *)PMC_struct_val(SELF);
         const INTVAL n = h->entries;
-        HashBucket *b;
+        HashBucket  *b;
 
         if (idx < 0)
             idx += n;
@@ -550,8 +551,8 @@ Deletes the key C<*key> from the hash.
         if (!b)
             return;
 
-        b->key   = NULL;
-        b->value = NULL;
+        b->key       = NULL;
+        b->value     = NULL;
     }
 
     VTABLE void delete_keyed_str(STRING *key) {
@@ -561,8 +562,8 @@ Deletes the key C<*key> from the hash.
         if (!b)
             return;
 
-        b->key   = NULL;
-        b->value = NULL;
+        b->key       = NULL;
+        b->value     = NULL;
     }
 
 /*

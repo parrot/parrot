@@ -177,7 +177,7 @@ newline or semicolon after an end keyword."
     "gc_debug" "gcd" "ge" "get_addr" "get_class" "get_global" "get_hll_global"
     "get_hll_namespace" "get_mro" "get_namespace" "get_params" "get_repr"
     "get_results" "get_root_global" "get_root_namespace" "getattribute"
-    "get_class" "getfd" "getinterp" "getprop" "getstderr" "getstdin"
+    "get_class" "getinterp" "getprop" "getstderr" "getstdin"
     "getstdout" "gmtime" "goto" "gt"
     "hash"
     "if" "if_null" "inc" "index" "infix" "inspect" "interpinfo" "invoke"
@@ -222,7 +222,7 @@ newline or semicolon after an end keyword."
 (defvar pir-dollar-register-regexp "\\$[INPS][0-9]+")
 
 (defvar pir-directives
-  '(":anon" ":flat" ":init" ":lex" ":load" ":main" ":method" ":multi"
+  '(":anon" ":flat" ":init" ":lex" ":lexid" ":load" ":main" ":method" ":multi"
     ":named" ":opt_count" ":opt_flag" ":optional" ":outer" ":postcomp"
     ":slurpy" ":unique_reg" ":vtable" ":wrap"))
 

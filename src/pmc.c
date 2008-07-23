@@ -46,6 +46,27 @@ PMC * PMCNULL;
 
 /*
 
+=item C<INTVAL PMC_is_null>
+
+Tests if the given pmc is null.
+
+=cut
+
+*/
+
+PARROT_API
+INTVAL
+PMC_is_null(SHIM_INTERP, NULLOK(const PMC *pmc))
+{
+#if PARROT_CATCH_NULL
+    return pmc == PMCNULL || pmc == NULL;
+#else
+    return pmc == NULL;
+#endif
+}
+
+/*
+
 =item C<PMC * pmc_new>
 
 Creates a new PMC of type C<base_type> (which is an index into the list of PMC
@@ -600,8 +621,7 @@ dod_register_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
     /* Better not trigger a DOD run with a potentially unanchored PMC */
     Parrot_block_GC_mark(interp);
 
-    if (!interp->DOD_registry)
-        interp->DOD_registry = pmc_new(interp, enum_class_AddrRegistry);
+    PARROT_ASSERT(interp->DOD_registry);
 
     VTABLE_set_pmc_keyed(interp, interp->DOD_registry, pmc, PMCNULL);
     Parrot_unblock_GC_mark(interp);
@@ -620,9 +640,7 @@ Unregisters the PMC from the interpreter's DOD registry.
 void
 dod_unregister_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
 {
-    /* XXX or signal exception? */
-    if (!interp->DOD_registry)
-        return;
+    PARROT_ASSERT(interp->DOD_registry);
 
     VTABLE_delete_keyed(interp, interp->DOD_registry, pmc);
 }

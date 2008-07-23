@@ -249,8 +249,7 @@ eof:
   .return($P0)
 
 has_readline:
-  $P0 = STDIN.'readline'(default_prompt)
-  .return ($P0)
+  .return STDIN.'readline'(default_prompt)
 .end
 
 

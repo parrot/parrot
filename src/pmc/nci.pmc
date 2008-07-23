@@ -260,16 +260,15 @@ Return the arity of the NCI (the number of arugments).
 */
     METHOD arity() {
         Parrot_NCI * const nci_info = PARROT_NCI(SELF);
+        INTVAL arity = 0;
 
-        if (nci_info && nci_info->func) {
-            INTVAL arity = nci_info->arity;
-            RETURN(INTVAL arity);
-        }
+        if (nci_info && nci_info->func)
+            arity = nci_info->arity;
         else
             real_exception(INTERP, NULL, INVALID_OPERATION,
                     "You cannot get the arity of an undefined NCI.");
 
-        RETURN(INTVAL 0);
+        RETURN(INTVAL arity);
     }
 }
 

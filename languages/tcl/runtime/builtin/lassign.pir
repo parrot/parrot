@@ -12,9 +12,9 @@
   .local pmc list
   list = shift argv
 
-  .local pmc __list
-  __list = get_root_global ['_tcl'], '__list'
-  list   = __list(list)
+  .local pmc toList
+  toList = get_root_global ['_tcl'], 'toList'
+  list   = toList(list)
 
   .local string varname
   .local pmc set, value

@@ -1268,7 +1268,7 @@ RT#48260: Not yet documented!!!
 #  define TRACE_FM(i, c, m, sub)
 #else
 #  define TRACE_FM(i, c, m, sub) \
-    debug_trace_find_meth(i, c, m, sub)
+    debug_trace_find_meth((i), (c), (m), (sub))
 
 static void
 debug_trace_find_meth(PARROT_INTERP, ARGIN(const PMC *_class),

@@ -1,13 +1,17 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
+
 package Parrot::Ops2pm::Utils;
+
 use strict;
 use warnings;
+use lib 'lib';
+
 use Cwd;
 use Data::Dumper ();
 use File::Path ();
 use File::Spec;
-use lib ("lib/");
+
 use Parrot::OpsFile;
 
 =head1 NAME
@@ -22,17 +26,18 @@ Parrot::Ops2pm::Utils - Methods holding functionality for F<tools/build/ops2pm.p
         argv            => [ @ARGV ],
         nolines         => $nolines_flag,
         renum           => $renum_flag,
-        moddir          => "lib/Parrot/OpLib",
-        module          => "core.pm",
-        inc_dir         => "include/parrot/oplib",
-        inc_f           => "ops.h",
-        script          => "tools/build/ops2pm.pl",
+        moddir          => 'lib/Parrot/OpLib',
+        module          => 'core.pm',
+        inc_dir         => 'include/parrot/oplib',
+        inc_f           => 'ops.h',
+        script          => 'tools/build/ops2pm.pl',
     } );
 
     $self->prepare_ops();
 
     if ($renum_flag) {
         $self->renum_op_map_file();
+
         exit 0;
     }
 
@@ -41,6 +46,7 @@ Parrot::Ops2pm::Utils - Methods holding functionality for F<tools/build/ops2pm.p
     $self->prepare_real_ops();
     $self->print_module();
     $self->print_h();
+
     exit 0;
 
 =cut
@@ -112,6 +118,7 @@ for F<make>'s call to F<tools/build/ops2pm.pl>.
 
 sub new {
     my ( $class, $argsref ) = @_;
+
     my @argv = @{ $argsref->{argv} };
     my $file = shift @argv;
     die "$argsref->{script}: Could not find ops file '$file'!\n"
@@ -120,6 +127,7 @@ sub new {
     $argsref->{argv} = \@argv;
     $argsref->{num_file}    = "src/ops/ops.num";
     $argsref->{skip_file}   = "src/ops/ops.skip";
+
     return bless $argsref, $class;
 }
 
@@ -155,6 +163,7 @@ to the object just created.  Experimental ops are marked as such.
 
 sub prepare_ops {
     my $self = shift;
+
     my $ops = Parrot::OpsFile->new( [ $self->{file} ], $self->{nolines} );
     die "$self->{script}: Could not read ops file '$self->{file}'!\n"
         unless defined $ops;
@@ -302,23 +311,21 @@ F<src/ops/ops.skip>.
 
 sub load_op_map_files {
     my $self      = shift;
+
     my $num_file  = $self->{num_file};
     my $skip_file = $self->{skip_file};
-
-    my ( $op, $name, $number, $prev );
-
     $self->{max_op_num} ||= 0;
 
-    open $op, '<', $num_file
+    open my $num_fh, '<', $num_file
         or die "Can't open $num_file: $!";
-    $prev = -1;
-    while (<$op>) {
+    my $prev = -1;
+    while (<$num_fh>) {
         chomp;
         s/#.*$//;
         s/\s*$//;
         s/^\s*//;
         next unless $_;
-        ( $name, $number ) = split( /\s+/, $_ );
+        my ( $name, $number ) = split( /\s+/, $_ );
         if ( $prev + 1 != $number ) {
             die "hole in ops.num before #$number";
         }
@@ -331,23 +338,24 @@ sub load_op_map_files {
             $self->{max_op_num} = $number;
         }
     }
-    undef $op;
+    close $num_fh;
 
-    open $op, '<', $skip_file
+    open my $skip_fh, '<', $skip_file
         or die "Can't open $skip_file: $!";
-    while (<$op>) {
+    while (<$skip_fh>) {
         chomp;
         s/#.*$//;
         s/\s*$//;
         s/^\s*//;
         next unless $_;
-        ($name) = split( /\s+/, $_ );
+        my ( $name ) = split m/\s+/, $_;
         if ( exists $self->{optable}->{$name} ) {
             die "skipped opcode is also in $num_file";
         }
         $self->{skiptable}->{$name} = 1;
     }
-    undef $op;
+    close $skip_fh;
+
     return 1;
 }
 
@@ -367,8 +375,8 @@ None.
 
 =item * Return Value
 
-None.  Internally, sets the C<ops> key of the object's data
-structure.
+Returns true value upon successful completion.  Internally, sets the C<ops>
+key of the object's data structure.
 
 =item * Comment
 
@@ -380,6 +388,7 @@ Will emit warnings under these circumstances:
 
 sub sort_ops {
     my $self = shift;
+
     for my $el ( @{ $self->{ops}->{OPS} } ) {
         if ( exists $self->{optable}->{ $el->full_name } ) {
             $el->{CODE} = $self->{optable}->{ $el->full_name };
@@ -401,6 +410,8 @@ sub sort_ops {
     }
     @{ $self->{ops}->{OPS} } =
         sort { $a->{CODE} <=> $b->{CODE} } ( @{ $self->{ops}->{OPS} } );
+
+    return 1;
 }
 
 =head2 C<prepare_real_ops()>
@@ -418,8 +429,8 @@ C<load_op_map_files()> above.)
 
 =item * Return Value
 
-None.  Internally, sets the C<real_ops> key of the object's
-data structure.
+Returns true value upon successful completion.  Internally, sets the
+C<real_ops> key of the object's data structure.
 
 =item * Comment
 
@@ -450,6 +461,8 @@ sub prepare_real_ops {
         ++$seq;
     }
     $self->{real_ops} = $real_ops;
+
+    return 1;
 }
 
 =head2 C<print_module()>
@@ -463,12 +476,12 @@ the C<real_ops> element -- to create F<lib/Parrot/OpLib/core.pm>.
 
 =item * Arguments
 
-None.  (Implicitly requires that the constructor have the
-following keys defined:  C<argv>, C<script>, C<moddir> and C<module>.)
+None.  (Implicitly requires that the constructor have the following keys
+defined:  C<argv>, C<script>, C<moddir> and C<module>.)
 
 =item * Return Value
 
-Returns true value upon success.
+Returns true value upon successful completion.
 
 =item * Comment
 
@@ -478,6 +491,7 @@ Returns true value upon success.
 
 sub print_module {
     my $self    = shift;
+
     my $cwd     = cwd();
     my $fulldir = File::Spec->catdir( $cwd, $self->{moddir} );
     if ( !-d $fulldir ) {
@@ -564,6 +578,7 @@ Returns true value upon success.
 
 sub print_h {
     my $self    = shift;
+
     my $cwd     = cwd();
     my $fulldir = File::Spec->catdir( $cwd, $self->{inc_dir} );
     if ( !-d $fulldir ) {
@@ -613,6 +628,7 @@ END_C
 /*
  * Local variables:
  *   c-file-style: "parrot"
+ *   buffer-read-only: t
  * End:
  * vim: expandtab shiftwidth=4:
  */
@@ -682,6 +698,7 @@ it in this package's methods.
 
 1;
 
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

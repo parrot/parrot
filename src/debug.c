@@ -8,8 +8,8 @@ src/debug.c - Parrot debugging
 
 =head1 DESCRIPTION
 
-This file implements Parrot debugging and is used by C<pdb>, the Parrot
-debugger, and the C<debug> ops.
+This file implements Parrot debugging and is used by C<parrot_debugger>,
+the Parrot debugger, and the C<debug> ops.
 
 =head2 Functions
 
@@ -22,6 +22,8 @@ debugger, and the C<debug> ops.
 #include <stdio.h>
 #include <stdlib.h>
 #include "parrot/parrot.h"
+#include "parrot/extend.h"
+#include "parrot/embed.h"
 #include "interp_guts.h"
 #include "parrot/oplib.h"
 #include "trace.h"
@@ -144,11 +146,6 @@ PARROT_CANNOT_RETURN_NULL
 static const char * skip_command(ARGIN(const char *str))
         __attribute__nonnull__(1);
 
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static const char * skip_ws(ARGIN(const char *str))
-        __attribute__nonnull__(1);
-
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -184,28 +181,6 @@ nextarg(ARGIN_NULLOK(const char *command))
     }
 
     return command;
-}
-
-/*
-
-=item C<static const char * skip_ws>
-
-Returns the pointer past any whitespace.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static const char *
-skip_ws(ARGIN(const char *str))
-{
-    /* as long as str is not NULL and it contains space, skip it */
-    while (*str && isspace((unsigned char) *str))
-        str++;
-
-    return str;
 }
 
 /*
@@ -423,20 +398,26 @@ debugger and then continue the normal execution of the program.
 
 */
 
+PARROT_API
 void
 Parrot_debugger_init(PARROT_INTERP)
 {
     PDB_t *pdb;
+    Parrot_Interp debugger;
 
     if (interp->pdb)
         return;
 
     pdb             = mem_allocate_zeroed_typed(PDB_t);
+    debugger        = Parrot_new(interp);
     interp->pdb     = pdb;
+    debugger->pdb   = pdb;
+    pdb->debugee    = interp;
     pdb->cur_opcode = interp->code->base.data;
     pdb->state     |= PDB_RUNNING;
 }
 
+PARROT_API
 void
 Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(STRING *filename))
 {
@@ -450,6 +431,7 @@ Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(STRING *filename))
     string_cstring_free(file);
 }
 
+PARROT_API
 void
 Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
 {
@@ -461,6 +443,11 @@ Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
 
     if (!(interp->pdb->state & PDB_BREAK)) {
         const char * command;
+        new_internal_exception(interp);
+        if (setjmp(interp->exceptions->destination)) {
+            fprintf(stderr, "Unhandled exception in debugger\n");
+            return;
+        }
 
         interp->pdb->state     |= PDB_BREAK;
         interp->pdb->state     |= PDB_STOPPED;
@@ -475,11 +462,12 @@ Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
         }
 
         /* RT #42378 this is not ok */
-        exit(EXIT_SUCCESS);
+        /*exit(EXIT_SUCCESS);*/
     }
-
-    interp->pdb->cur_opcode = (opcode_t *)cur_opcode + 1;
-    PDB_set_break(interp, NULL);
+    else {
+        interp->pdb->cur_opcode = (opcode_t *)cur_opcode + 1;
+        PDB_set_break(interp, NULL);
+    }
 }
 
 /*
@@ -493,13 +481,15 @@ first frees the old one and updates it with the current one.
 
 Also prints the next line to run if the program is still active.
 
-The user input can't be longer than 255 characters.
+The user input can't be longer than DEBUG_CMD_BUFFER_LENGTH characters.
 
 The input is saved in C<< pdb->cur_command >>.
 
 =cut
 
 */
+
+#define DEBUG_CMD_BUFFER_LENGTH 255
 
 void
 PDB_get_command(PARROT_INTERP)
@@ -526,21 +516,24 @@ PDB_get_command(PARROT_INTERP)
     if ((pdb->state & PDB_STOPPED) && (pdb->state & PDB_RUNNING)) {
         PDB_line_t *line = pdb->file->line;
 
-        while (pdb->cur_opcode != line->opcode)
-            line = line->next;
+        while (line && pdb->cur_opcode != line->opcode) {
+                line = line->next;
+        }
 
-        PIO_eprintf(interp, "%li  ", line->number);
-        c = pdb->file->source + line->source_offset;
+        if (line) {
+            PIO_eprintf(interp, "%li  ", line->number);
+            c = pdb->file->source + line->source_offset;
 
-        while (c && (*c != '\n'))
-            PIO_eprintf(interp, "%c", *(c++));
+            while (c && (*c != '\n'))
+                PIO_eprintf(interp, "%c", *(c++));
+        }
     }
 
     i = 0;
 
     /* RT #46109 who frees that */
-    /* need to allocate 256 chars as string is null-terminated i.e. 255 + 1*/
-    c = (char *)mem_sys_allocate(256);
+    /* need to allocate one more char as string is null-terminated */
+    c = (char *)mem_sys_allocate(DEBUG_CMD_BUFFER_LENGTH + 1);
 
     PIO_eprintf(interp, "\n(pdb) ");
 
@@ -549,8 +542,8 @@ PDB_get_command(PARROT_INTERP)
         ch = fgetc(stdin);
     } while (isspace((unsigned char)ch) && ch != '\n');
 
-    /* generate string (no more than 255 chars) */
-    while (ch != EOF && ch != '\n' && (i < 255)) {
+    /* generate string (no more than buffer length) */
+    while (ch != EOF && ch != '\n' && (i < DEBUG_CMD_BUFFER_LENGTH)) {
         c[i++] = (char)ch;
         ch     = fgetc(stdin);
     }
@@ -805,6 +798,13 @@ PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     debugee     = pdb->debugee;
 
     /* execute n ops */
+    new_internal_exception(debugee);
+    if (setjmp(debugee->exceptions->destination)) {
+        Parrot_eprintf(interp, "Unhandled exception while tracing\n");
+        pdb->state |= PDB_STOPPED;
+        return;
+    }
+
     for (; n && pdb->cur_opcode; n--) {
         trace_op(debugee,
                 debugee->code->base.data,
@@ -838,7 +838,7 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
 {
     PDB_condition_t *condition;
     int              i, reg_number;
-    char             str[255];
+    char             str[DEBUG_CMD_BUFFER_LENGTH + 1];
 
     /* Return if no more arguments */
     if (!(command && *command)) {
@@ -994,7 +994,7 @@ WRONG_REG:      PIO_eprintf(interp, "Register types don't agree\n");
         condition->type               |= PDB_cond_const;
     }
     else if (condition->type & PDB_cond_str) {
-        for (i = 1; ((command[i] != '"') && (i < 255)); i++)
+        for (i = 1; ((command[i] != '"') && (i < DEBUG_CMD_BUFFER_LENGTH)); i++)
             str[i - 1] = command[i];
         str[i - 1] = '\0';
         condition->value = string_make(interp,
@@ -1707,6 +1707,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
 
     /* Write the opcode name */
     const char * const p = full_name ? info->full_name : info->name;
+    PARROT_ASSERT(p);
     strcpy(dest, p);
     size += strlen(p);
 
@@ -2190,7 +2191,7 @@ void
 PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
 {
     FILE          *file;
-    char           f[255];
+    char           f[DEBUG_CMD_BUFFER_LENGTH + 1];
     int            i, c;
     PDB_file_t    *pfile;
     PDB_line_t    *pline;

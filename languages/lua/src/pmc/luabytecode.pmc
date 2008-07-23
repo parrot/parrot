@@ -81,7 +81,7 @@ static void _get_block(void* b, size_t size)
     fp += size;
 }
 
-static int _get_integer()
+static int _get_integer(void)
 {
     int x;
     memcpy(&x, fp, sizeof x);
@@ -89,7 +89,7 @@ static int _get_integer()
     return x;
 }
 
-static Instruction _get_instruction()
+static Instruction _get_instruction(void)
 {
     Instruction x;
     memcpy(&x, fp, sizeof x);
@@ -97,7 +97,7 @@ static Instruction _get_instruction()
     return x;
 }
 
-static double _get_number()
+static double _get_number(void)
 {
     double x;
     memcpy(&x, fp, sizeof x);

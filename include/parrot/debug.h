@@ -172,13 +172,16 @@ typedef struct PDB {
 /* HEADERIZER BEGIN: src/debug.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_API
 void Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_API
 void Parrot_debugger_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_API
 void Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(STRING *filename))
         __attribute__nonnull__(1);
 

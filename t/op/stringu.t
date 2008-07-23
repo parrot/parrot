@@ -385,9 +385,10 @@ CODE
 1102269
 OUTPUT
 
-    # Concatenate unicode: with iso-8859-1; RT #39930 if no icu
+    # Concatenate unicode: with iso-8859-1
+    # See RT #39930 for discussion
     pir_output_is(
-        <<'CODE', <<"OUTPUT", "Concat unicode with iso-8859-1", $PConfig{has_icu} ? () : ( todo => 'RT #39930' ) );
+        <<'CODE', <<"OUTPUT", "Concat unicode with iso-8859-1" );
 .sub main
     $S0 = unicode:"A"
     $S1 = ascii:"B"
@@ -410,7 +411,7 @@ OUTPUT
 CODE
 AB
 AB
-A\x00B\x00
+AB
 OUTPUT
 }
 

@@ -127,7 +127,7 @@ Marks the lexpad hash as live.
 
     INTVAL exists_keyed_str(STRING* name) {
         PMC *std_pad;
-        if (parrot_hash_get_bucket(interp, (Hash*) PMC_struct_val(SELF), name))
+        if (parrot_hash_exists(interp, (Hash*) PMC_struct_val(SELF), name))
             return 1;
         std_pad = PMC_pmc_val(SELF);
         if (std_pad)

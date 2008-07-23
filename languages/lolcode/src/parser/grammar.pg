@@ -9,9 +9,9 @@ This is the grammar for lolcode written as a sequence of Perl 6 rules.
 grammar lolcode::Grammar is PCT::Grammar;
 
 rule TOP {
-    ['HAI' <version> <statement_terminator>]?
+    ['HAI' <version> <.statement_terminator>]?
     <block>
-    ['KTHXBYE' <statement_terminator>]?
+    ['KTHXBYE' <.statement_terminator>]?
     [ $ || <panic: 'Syntax error'> ]
     {*}
 }
@@ -23,6 +23,7 @@ rule statement {
     | <assign>     {*}   #= assign
     | <function>   {*}   #= function
     | <ifthen>     {*}   #= ifthen
+    | <switch>     {*}   #= switch
     | <expression> {*}   #= expression
 }
 
@@ -45,7 +46,7 @@ rule assign {
 rule function {
     # $<parameters> is only getting the first parameter, not all of them
     # like I'd expect...
-    'HOW' 'DUZ' 'I' <variable> ['YR' $<parameters>=<variable> [ 'AN' 'YR' $<parameters>=<variable>]* ]?<statement_terminator>
+    'HOW' 'DUZ' 'I' <variable> ['YR' $<parameters>=<variable> [ 'AN' 'YR' $<parameters>=<variable>]* ]?<.statement_terminator>
     {*}                         #= params
     <block>
     'IF' 'U' 'SAY' 'SO'
@@ -53,16 +54,16 @@ rule function {
 }
 
 rule ifthen {
-    <expression> <statement_terminator>
-    'O' 'RLY?' <statement_terminator>
-    'YA' 'RLY' <statement_terminator>
+    <expression> <.statement_terminator>
+    'O' 'RLY?' <.statement_terminator>
+    'YA' 'RLY' <.statement_terminator>
     <block>
     [
-      'MEBBE' <expression> <statement_terminator>
+      'MEBBE' <expression> <.statement_terminator>
       <block>
     ]*
     [
-      'NO' 'WAI' <statement_terminator>
+      'NO' 'WAI' <.statement_terminator>
       $<else>=<block>
     ]?
     'OIC'
@@ -70,22 +71,21 @@ rule ifthen {
 }
 
 rule switch {
-    <expression> <statement_terminator>
-    'WTF?' <statement_terminator>
+    'WTF?' <.statement_terminator>
     [
-      'OMG' <value> <statement_terminator>
+      'OMG' <value> <.statement_terminator>
       <block>
     ]+
     [
-      'OMGWTF' <statement_terminator>
-      <block>
+      'OMGWTF' <.statement_terminator>
+      <else=block>
     ]?
-    'OIC'
+    'OIC' {*}
 }
 
 rule block {
     {*}                                          #= open
-    [<statement> <statement_terminator>]*
+    [<statement> <.statement_terminator>]*
     {*}                                          #= close
 }
 
@@ -115,7 +115,7 @@ token bang {
     '!' {*}
 }
 
-token operator { $<identifier>=(<.identifier> <.ws> 'OF') {*} }
+token operator { $<identifier>=(<.identifier> <.ws> 'OF'|'BOTH SAEM') {*} }
 token variable { <identifier> {*} }
 
 token identifier { <!keyword> <[a..zA..Z]> \w* }

@@ -4,28 +4,28 @@
 
 =head1 NAME
 
-t/tools/pdb.t - test the Parrot Debugger
+t/tools/parrot_debugger.t - test the Parrot Debugger
 
 =head1 SYNOPSIS
 
-    % prove t/tools/pdb.t
+    % prove t/tools/parrot_debugger.t
 
 
 =head1 DESCRIPTION
 
-Tests the C<pdb> tool by providing it with a number of source files,
-and running through it with various commands.
+Tests the C<parrot_debugger> tool by providing it with a number
+of source files, and running through it with various commands.
 
-We never actually check the *full* output of pdb.  We simply check
-several smaller components to avoid a test file that is far too
-unwieldy.
+We never actually check the *full* output of parrot_debugger. 
+We simply check several smaller components to avoid a test file
+that is far too unwieldy.
 
 
 =head1 REQUIREMENTS
 
-This test script requires you to build pdb, by typing "make pdb" (using
-a suitable make tool for your platform).  If this requirement has not
-been met, all tests will be skipped.
+This test script requires you to build parrot_debugger, by typing
+"make parrot_debugger" (using a suitable make tool for your platform).
+If this requirement has not been met, all tests will be skipped.
 
 =cut
 
@@ -41,10 +41,10 @@ use File::Spec;
 my $path_to_pdb;
 
 BEGIN {
-    $path_to_pdb = File::Spec->catfile( ".", "pdb" );
+    $path_to_pdb = File::Spec->catfile( ".", "parrot_debugger" );
     my $exefile = $path_to_pdb . $PConfig{exe};
     unless ( -f $exefile ) {
-        plan skip_all => "pdb hasn't been built";
+        plan skip_all => "parrot_debugger hasn't been built";
         exit(0);
     }
 }
@@ -76,8 +76,9 @@ BEGIN { plan tests => $tests; }
     ok(pdb_output_like(<<PASM, "pasm", 'r', "some output"), "running $file");
 
 Takes 4 arguments: a file to run, the filename-extension of the file
-(probably "pir" or "pasm"), the command or commands to provide to pdb as
-input, and a regex string to match within pdb's output.
+(probably "pir" or "pasm"), the command or commands to provide to
+parrot_debugger as input, and a regex string to match within
+parrot_debugger's output.
 
 =cut
 
@@ -108,8 +109,8 @@ sub pdb_output_like {
 
 =item
 
-Flesh it out.  This is a bare bones proof of concept.  Add tests for all of the
-commands.
+Flesh it out.  This is a bare bones proof of concept.
+Add tests for all of the commands.
 
 =back
 

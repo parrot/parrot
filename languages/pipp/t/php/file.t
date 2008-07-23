@@ -15,7 +15,7 @@ t/php/file.t - Standard Library file
 Tests PHP Standard Library file
 (implemented in F<languages/pipp/src/common/php_file.pir>).
 
-See L<http://www.php.net/manual/en/ref.file.php>.
+See L<http://www.php.net/manual/en/ref.filesystem.php>.
 
 =cut
 
@@ -43,6 +43,7 @@ OUTPUT
 
 unlink 'pipp/file.txt' if -f 'pipp/file.txt';
 open my $X, '>', 'pipp/file.txt';
+binmode $X, ':raw';
 print {$X} "line 1\n";
 print {$X} "line 2\n";
 print {$X} "line 3\n";

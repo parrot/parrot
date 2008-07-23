@@ -114,6 +114,15 @@ static int STRING_compare(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void
+parrot_mark_hash_keys(PARROT_INTERP, ARGIN(Hash *));
+
+static void
+parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *));
+
+static void
+parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *));
+
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -338,10 +347,24 @@ parrot_mark_hash(PARROT_INTERP, ARGIN(Hash *hash))
     ||  hash->key_type == Hash_key_type_PMC)
         mark_key = 1;
 
-    if (!mark_key && !mark_value)
-        return;
+    if (mark_key) {
+        if (mark_value)
+            parrot_mark_hash_both(interp, hash);
+        else
+            parrot_mark_hash_keys(interp, hash);
+    }
+    else {
+        if (mark_value)
+            parrot_mark_hash_values(interp, hash);
+    }
+}
 
-    entries = hash->entries;
+static void
+parrot_mark_hash_keys(PARROT_INTERP, ARGIN(Hash *hash))
+{
+    UINTVAL entries = hash->entries;
+    UINTVAL found   = 0;
+    INTVAL  i;
 
     for (i = hash->mask; i >= 0; --i) {
         HashBucket *bucket = hash->bi[i];
@@ -352,15 +375,59 @@ parrot_mark_hash(PARROT_INTERP, ARGIN(Hash *hash))
                         "Detected hash corruption at hash %p entries %d",
                         hash, (int)entries);
 
-            if (mark_key) {
-                PARROT_ASSERT(bucket->key);
-                pobject_lives(interp, (PObj *)bucket->key);
-            }
+            PARROT_ASSERT(bucket->key);
+            pobject_lives(interp, (PObj *)bucket->key);
 
-            if (mark_value) {
-                PARROT_ASSERT(bucket->value);
-                pobject_lives(interp, (PObj *)bucket->value);
-            }
+            bucket = bucket->next;
+        }
+    }
+}
+
+static void
+parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
+{
+    UINTVAL entries = hash->entries;
+    UINTVAL found   = 0;
+    INTVAL  i;
+
+    for (i = hash->mask; i >= 0; --i) {
+        HashBucket *bucket = hash->bi[i];
+
+        while (bucket) {
+            if (++found > entries)
+                real_exception(interp, NULL, 1,
+                        "Detected hash corruption at hash %p entries %d",
+                        hash, (int)entries);
+
+            PARROT_ASSERT(bucket->value);
+            pobject_lives(interp, (PObj *)bucket->value);
+
+            bucket = bucket->next;
+        }
+    }
+}
+
+static void
+parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *hash))
+{
+    UINTVAL entries = hash->entries;
+    UINTVAL found   = 0;
+    INTVAL  i;
+
+    for (i = hash->mask; i >= 0; --i) {
+        HashBucket *bucket = hash->bi[i];
+
+        while (bucket) {
+            if (++found > entries)
+                real_exception(interp, NULL, 1,
+                        "Detected hash corruption at hash %p entries %d",
+                        hash, (int)entries);
+
+            PARROT_ASSERT(bucket->key);
+            pobject_lives(interp, (PObj *)bucket->key);
+
+            PARROT_ASSERT(bucket->value);
+            pobject_lives(interp, (PObj *)bucket->value);
 
             bucket = bucket->next;
         }
