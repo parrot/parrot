@@ -304,6 +304,8 @@ devtest:
 	cd t && $(PERL) -e 'use Test::Harness qw($$verbose runtests) ; $$Test::Harness::verbose=1;runtests(glob("*.t"))' && cd ..
 
 CLEANERS = \
+tcl.c \
+tcl$(O) \
 tclsh@exe@ \
 tcl.pbc \
 runtime/builtins.pir \
