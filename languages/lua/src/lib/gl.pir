@@ -1361,6 +1361,74 @@ see F<runtime/parrot/library/OpenGL.pir>.
     .return (ret)
 .end
 
+.sub 'get_arrayb' :anon
+    .param pmc table
+    .local int n
+    n = table.'len'()
+    .local pmc a
+    new a, 'FixedBooleanArray'
+    set a, n
+    $I0 = 0
+    new $P0, 'LuaNumber'
+  L1:
+    unless $I0 < n goto L2
+    set $P0, $I0
+    inc $P0
+    $P1 = table[$P0]
+    $I1 = istrue $P1
+    a[$I0] = $I1
+    inc $I0
+    goto L1
+  L2:
+    .return (n, a)
+.end
+
+.sub 'get_arrayf' :anon
+    .param pmc table
+    .local int n
+    n = table.'len'()
+    .local pmc a
+    new a, 'FixedFloatArray'
+    set a, n
+    $I0 = 0
+    new $P0, 'LuaNumber'
+  L1:
+    unless $I0 < n goto L2
+    set $P0, $I0
+    inc $P0
+    $P1 = table[$P0]
+    $N1 = $P1
+    a[$I0] = $N1
+    inc $I0
+    goto L1
+  L2:
+    .return (n, a)
+.end
+
+.sub 'get_arrayi' :anon
+    .param pmc table
+    .local int n
+    n = table.'len'()
+    .local pmc a
+    new a, 'FixedIntegerArray'
+    set a, n
+    $I0 = 0
+    new $P0, 'LuaNumber'
+  L1:
+    unless $I0 < n goto L2
+    set $P0, $I0
+    inc $P0
+    $P1 = table[$P0]
+    $I1 = $P1
+    a[$I0] = $I1
+    inc $I0
+    goto L1
+  L2:
+    .return (n, a)
+.end
+
+.include 'opengl_defines.pasm'
+
 
 =item C<gl.Accum (op, value)>
 
@@ -1384,7 +1452,6 @@ see F<runtime/parrot/library/OpenGL.pir>.
   L3:
     $N2 = value
     glAccum($I1, $N2)
-    .return ()
 .end
 
 
@@ -1410,7 +1477,6 @@ see F<runtime/parrot/library/OpenGL.pir>.
   L3:
     $N2 = ref
     glAlphaFunc($I1, $N2)
-    .return ()
 .end
 
 
@@ -1429,23 +1495,38 @@ see F<runtime/parrot/library/OpenGL.pir>.
 .end
 
 
-=item C<gl.ArrayElement ()>
+=item C<gl.ArrayElement (i)>
 
 =cut
 
 .sub 'ArrayElement' :anon
+    .param pmc i :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_isnumber(i)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'gl.ArrayElement'")
+  L1:
+    $I1 = i
+    glArrayElement($I1)
 .end
 
 
-=item C<gl.Begin ()>
+=item C<gl.Begin (mode)>
 
 =cut
 
 .sub 'Begin' :anon
+    .param pmc mode :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_isstring(mode)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'gl.Begin'")
+  L1:
+    $I1 = get_gl_enum(mode)
+    unless $I1 == ENUM_ERROR goto L2
+    lua_error("incorrect string argument to function 'gl.Begin'")
+  L2:
+    glBegin($I1)
 .end
 
 
@@ -1469,43 +1550,82 @@ see F<runtime/parrot/library/OpenGL.pir>.
 .end
 
 
-=item C<gl.BlendFunc ()>
+=item C<gl.BlendFunc (sfactor, dfactor)>
 
 =cut
 
 .sub 'BlendFunc' :anon
+    .param pmc sfactor :optional
+    .param pmc dfactor :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_isstring(sfactor)
+    unless $I0 goto L1
+    $I0 = lua_isstring(dfactor)
+    unless $I0 goto L1
+    goto L2
+  L1:
+    lua_error("incorrect argument to function 'gl.BlendFunc'")
+  L2:
+    $I1 = get_gl_enum(sfactor)
+    if $I1 == ENUM_ERROR goto L3
+    $I2 = get_gl_enum(dfactor)
+    if $I2 == ENUM_ERROR goto L3
+    goto L4
+  L3:
+    lua_error("incorrect string argument to function 'gl.BlendFunc'")
+  L4:
+    glBlendFunc($I1, $I2)
 .end
 
 
-=item C<gl.CallList ()>
+=item C<gl.CallList (list)>
 
 =cut
 
 .sub 'CallList' :anon
+    .param pmc list :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_isnumber(list)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'gl.CallList'")
+  L1:
+    $I1 = list
+    glCallList($I1)
 .end
 
 
-=item C<gl.CallLists ()>
+=item C<gl.CallLists (listArray)>
 
 =cut
 
 .sub 'CallLists' :anon
+    .param pmc listArray :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_istable(listArray)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'gl.CallLists'")
+  L1:
+    ($I0, $P0) = get_arrayf(listArray)
+    glCallLists($I0, .GL_DOUBLE, $P0)
 .end
 
 
-=item C<gl.Clear ()>
+=item C<gl.Clear (mask)>
 
 =cut
 
 .sub 'Clear' :anon
+    .param pmc mask :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_isstring(mask)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'gl.Clear'")
+  L1:
+    $I1 = get_gl_enum(mask)
+    unless $I1 == ENUM_ERROR goto L2
+    lua_error("incorrect string argument to function 'gl.Clear'")
+  L2:
+    glClear($I1)
 .end
 
 
@@ -1519,13 +1639,33 @@ see F<runtime/parrot/library/OpenGL.pir>.
 .end
 
 
-=item C<gl.ClearColor ()>
+=item C<gl.ClearColor (red, green, blue, alpha)>
 
 =cut
 
 .sub 'ClearColor' :anon
+    .param pmc red :optional
+    .param pmc green :optional
+    .param pmc blue :optional
+    .param pmc alpha :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_isnumber(red)
+    unless $I0 goto L1
+    $I0 = lua_isnumber(green)
+    unless $I0 goto L1
+    $I0 = lua_isnumber(blue)
+    unless $I0 goto L1
+    $I0 = lua_isnumber(alpha)
+    unless $I0 goto L1
+    goto L2
+  L1:
+    lua_error("incorrect argument to function 'gl.ClearColor'")
+  L2:
+    $I1 = red
+    $I2 = green
+    $I3 = blue
+    $I4 = alpha
+    glClearColor($I1, $I2, $I3, $I4)
 .end
 
 
@@ -1569,13 +1709,57 @@ see F<runtime/parrot/library/OpenGL.pir>.
 .end
 
 
-=item C<gl.Color ()>
+=item C<gl.Color (red, green, blue [, alpha])>
+=item C<gl.Color (color)>
 
 =cut
 
 .sub 'Color' :anon
-    .param pmc extra :slurpy
-    not_implemented()
+    .param pmc vararg :slurpy
+    .local int num_args
+    num_args = elements vararg
+    unless num_args goto L1
+    $P1 = vararg[0]
+    $I0 = lua_istable($P1)
+    unless $I0 goto L1
+    (num_args, $P0) = get_arrayf($P1)
+    unless num_args > 4 goto L2
+    num_args = 4
+  L2:
+    unless num_args == 3 goto L3
+    glColor3dv($P0)
+    .return ()
+  L3:
+    unless num_args == 4 goto L4
+    glColor4dv($P0)
+  L4:
+    .return()
+  L1:
+    unless num_args > 4 goto L5
+    num_args = 4
+  L5:
+    $I0 = 0
+    new $P0, 'ResizableFloatArray'
+  L6:
+    unless $I0 < num_args goto L7
+    $P1 = shift vararg
+    $I1 = lua_isnumber($P1)
+    if $I1 goto L8
+    lua_error("incorrect argument to function 'gl.Color'")
+  L8:
+    $N1 = $P1
+    $P0[$I0] = $N1
+    inc $I0
+    goto L6
+  L7:
+    unless num_args == 3 goto L9
+    glColor3dv($P0)
+    .return ()
+  L9:
+    unless num_args == 4 goto L10
+    glColor4dv($P0)
+  L10:
+    .return()
 .end
 
 
@@ -1699,33 +1883,70 @@ see F<runtime/parrot/library/OpenGL.pir>.
 .end
 
 
-=item C<gl.Disable ()>
+=item C<gl.Disable (cap)>
 
 =cut
 
 .sub 'Disable' :anon
+    .param pmc cap :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_isstring(cap)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'gl.Disable'")
+  L1:
+    $I1 = get_gl_enum(cap)
+    unless $I1 == ENUM_ERROR goto L2
+    lua_error("incorrect string argument to function 'gl.Disable'")
+  L2:
+    glDisable($I1)
 .end
 
 
-=item C<gl.DisableClientState ()>
+=item C<gl.DisableClientState (array)>
 
 =cut
 
 .sub 'DisableClientState' :anon
+    .param pmc array :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_isstring(array)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'gl.DisableClientState'")
+  L1:
+    $I1 = get_gl_enum(array)
+    unless $I1 == ENUM_ERROR goto L2
+    lua_error("incorrect string argument to function 'gl.DisableClientState'")
+  L2:
+    glDisableClientState($I1)
 .end
 
 
-=item C<gl.DrawArrays ()>
+=item C<gl.DrawArrays (mode, first, count)>
 
 =cut
 
 .sub 'DrawArrays' :anon
+    .param pmc mode :optional
+    .param pmc first :optional
+    .param pmc count :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_isstring(mode)
+    unless $I0 goto L1
+    $I0 = lua_isnumber(first)
+    unless $I0 goto L1
+    $I0 = lua_isnumber(count)
+    unless $I0 goto L1
+    goto L2
+  L1:
+    lua_error("incorrect argument to function 'gl.DrawArrays'")
+  L2:
+    $I1 = get_gl_enum(mode)
+    unless $I1 == ENUM_ERROR goto L3
+    lua_error("incorrect string argument to function 'gl.DrawArrays'")
+  L3:
+    $I2 = first
+    $I3 = count
+    glDrawArrays($I1, $I2, $I3)
 .end
 
 
@@ -1739,13 +1960,28 @@ see F<runtime/parrot/library/OpenGL.pir>.
 .end
 
 
-=item C<gl.DrawElements ()>
+=item C<gl.DrawElements (mode, indicesArray)>
 
 =cut
 
 .sub 'DrawElements' :anon
+    .param pmc mode :optional
+    .param pmc indicesArray :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_isstring(mode)
+    unless $I0 goto L1
+    $I0 = lua_istable(indicesArray)
+    unless $I0 goto L1
+    goto L2
+  L1:
+    luaL_error("incorrect argument to function 'gl.DrawElements'")
+  L2:
+    $I1 = get_gl_enum(mode)
+    unless $I1 == ENUM_ERROR goto L3
+    lua_error("incorrect string argument to function 'gl.DrawElements'")
+  L3:
+    ($I2, $P2) = get_arrayi(indicesArray)
+    glDrawElements($I1, $I2, .GL_INT, $P2)
 .end
 
 
@@ -1779,23 +2015,41 @@ see F<runtime/parrot/library/OpenGL.pir>.
 .end
 
 
-=item C<gl.Enable ()>
+=item C<gl.Enable (cap)>
 
 =cut
 
 .sub 'Enable' :anon
+    .param pmc cap :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_isstring(cap)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'gl.Enable'")
+  L1:
+    $I1 = get_gl_enum(cap)
+    unless $I1 == ENUM_ERROR goto L2
+    lua_error("incorrect string argument to function 'gl.Enable'")
+  L2:
+    glEnable($I1)
 .end
 
 
-=item C<gl.EnableClientState ()>
+=item C<gl.EnableClientState (array)>
 
 =cut
 
 .sub 'EnableClientState' :anon
+    .param pmc mode :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_isstring(mode)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'gl.EnableClientState'")
+  L1:
+    $I1 = get_gl_enum(mode)
+    unless $I1 == ENUM_ERROR goto L2
+    lua_error("incorrect string argument to function 'gl.EnableClientState'")
+  L2:
+    glEnableClientState($I1)
 .end
 
 
@@ -1805,7 +2059,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 .sub 'End' :anon
     .param pmc extra :slurpy
-    not_implemented()
+    glEnd()
 .end
 
 
@@ -1815,7 +2069,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 .sub 'EndList' :anon
     .param pmc extra :slurpy
-    not_implemented()
+    glEndList()
 .end
 
 
@@ -1865,7 +2119,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 .sub 'Finish' :anon
     .param pmc extra :slurpy
-    not_implemented()
+    glFinish()
 .end
 
 
@@ -1875,7 +2129,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 .sub 'Flush' :anon
     .param pmc extra :slurpy
-    not_implemented()
+    glFlush()
 .end
 
 
@@ -2235,7 +2489,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 .sub 'LoadIdentity' :anon
     .param pmc extra :slurpy
-    not_implemented()
+    glLoadIdentity()
 .end
 
 
@@ -2299,13 +2553,22 @@ see F<runtime/parrot/library/OpenGL.pir>.
 .end
 
 
-=item C<gl.MatrixMode ()>
+=item C<gl.MatrixMode (mode)>
 
 =cut
 
 .sub 'MatrixMode' :anon
+    .param pmc mode :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_isstring(mode)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'gl.MatrixMode'")
+  L1:
+    $I1 = get_gl_enum(mode)
+    unless $I1 == ENUM_ERROR goto L2
+    lua_error("incorrect string argument to function 'gl.MatrixMode'")
+  L2:
+    glMatrixMode($I1)
 .end
 
 
@@ -2319,13 +2582,28 @@ see F<runtime/parrot/library/OpenGL.pir>.
 .end
 
 
-=item C<gl.NewList ()>
+=item C<gl.NewList (list, mode)>
 
 =cut
 
 .sub 'NewList' :anon
+    .param pmc list :optional
+    .param pmc mode :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_isnumber(list)
+    unless $I0 goto L1
+    $I0 = lua_isstring(mode)
+    unless $I0 goto L1
+    goto L2
+  L1:
+    lua_error("incorrect argument to function 'gl.NewList'")
+  L2:
+    $I1 = list
+    $I2 = get_gl_enum(mode)
+    unless $I2 == ENUM_ERROR goto L3
+    lua_error("incorrect string argument to function 'gl.NewList'")
+  L3:
+    glNewList($I1, $I2)
 .end
 
 
@@ -2349,13 +2627,41 @@ see F<runtime/parrot/library/OpenGL.pir>.
 .end
 
 
-=item C<gl.Ortho ()>
+=item C<gl.Ortho (left, right, bottom, top, zNear, zFar)>
 
 =cut
 
 .sub 'Ortho' :anon
+    .param pmc left :optional
+    .param pmc right :optional
+    .param pmc bottom :optional
+    .param pmc top :optional
+    .param pmc zNear :optional
+    .param pmc zFar :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_isnumber(left)
+    unless $I0 goto L1
+    $I0 = lua_isnumber(right)
+    unless $I0 goto L1
+    $I0 = lua_isnumber(bottom)
+    unless $I0 goto L1
+    $I0 = lua_isnumber(top)
+    unless $I0 goto L1
+    $I0 = lua_isnumber(zNear)
+    unless $I0 goto L1
+    $I0 = lua_isnumber(zFar)
+    unless $I0 goto L1
+    goto L2
+  L1:
+    lua_error("incorrect argument to function 'gl.Ortho'")
+  L2:
+    $I1 = left
+    $I2 = right
+    $I3 = bottom
+    $I4 = top
+    $I5 = zNear
+    $I6 = zFar
+    glOrtho($I1, $I2, $I3, $I4, $I5, $I6)
 .end
 
 
@@ -2455,7 +2761,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 .sub 'PopAttrib' :anon
     .param pmc extra :slurpy
-    not_implemented()
+    glPopAttrib()
 .end
 
 
@@ -2465,7 +2771,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 .sub 'PopClientAttrib' :anon
     .param pmc extra :slurpy
-    not_implemented()
+    glPopClientAttrib()
 .end
 
 
@@ -2475,7 +2781,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 .sub 'PopMatrix' :anon
     .param pmc extra :slurpy
-    not_implemented()
+    glPopMatrix()
 .end
 
 
@@ -2485,7 +2791,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 .sub 'PopName' :anon
     .param pmc extra :slurpy
-    not_implemented()
+    glPopName()
 .end
 
 
@@ -2525,7 +2831,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 .sub 'PushMatrix' :anon
     .param pmc extra :slurpy
-    not_implemented()
+    glPushMatrix()
 .end
 
 
@@ -2569,13 +2875,46 @@ see F<runtime/parrot/library/OpenGL.pir>.
 .end
 
 
-=item C<gl.Rect ()>
+=item C<gl.Rect (x1, y1, x2, y2)>
+=item C<gl.Rect (v1, v2)>
 
 =cut
 
 .sub 'Rect' :anon
-    .param pmc extra :slurpy
-    not_implemented()
+    .param pmc vararg :slurpy
+    .local int num_args
+    num_args = elements vararg
+    if num_args < 2 goto L1
+    $P1 = vararg[0]
+    $P2 = vararg[1]
+    $I0 = lua_istable($P1)
+    unless $I0 goto L1
+    $I0 = lua_istable($P2)
+    unless $I0 goto L1
+    ($I0, $P1) = get_arrayf($P1)
+    ($I0, $P2) = get_arrayf($P2)
+    glRectdv($P1, $P2)
+    .return ()
+  L1:
+    if num_args < 4 goto L2
+    $I0 = lua_isnumber($P1)
+    unless $I0 goto L2
+    $I0 = lua_isnumber($P2)
+    unless $I0 goto L2
+    $P3 = vararg[2]
+    $I0 = lua_isnumber($P3)
+    unless $I0 goto L2
+    $P4 = vararg[3]
+    $I0 = lua_isnumber($P4)
+    unless $I0 goto L2
+    $N1 = $P1
+    $N2 = $P2
+    $N3 = $P3
+    $N4 = $P4
+    glRectd($N1, $N2, $N3, $N4)
+    .return ()
+  L2:
+    lua_error("incorrect argument to function 'gl.Rect'")
 .end
 
 
@@ -2599,13 +2938,29 @@ see F<runtime/parrot/library/OpenGL.pir>.
 .end
 
 
-=item C<gl.Scale ()>
+=item C<gl.Scale (x, y, z)>
 
 =cut
 
 .sub 'Scale' :anon
+    .param pmc x :optional
+    .param pmc y :optional
+    .param pmc z :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_isnumber(x)
+    unless $I0 goto L1
+    $I0 = lua_isnumber(y)
+    unless $I0 goto L1
+    $I0 = lua_isnumber(z)
+    unless $I0 goto L1
+    goto L2
+  L1:
+    lua_error("incorrect argument to function 'gl.Scale'")
+  L2:
+    $N1 = x
+    $N2 = y
+    $N3 = z
+    glScaled($N1, $N2, $N3)
 .end
 
 
@@ -2739,23 +3094,82 @@ see F<runtime/parrot/library/OpenGL.pir>.
 .end
 
 
-=item C<gl.Translate ()>
+=item C<gl.Translate (x, y, z)>
 
 =cut
 
 .sub 'Translate' :anon
+    .param pmc x :optional
+    .param pmc y :optional
+    .param pmc z :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_isnumber(x)
+    unless $I0 goto L1
+    $I0 = lua_isnumber(y)
+    unless $I0 goto L1
+    $I0 = lua_isnumber(z)
+    unless $I0 goto L1
+    goto L2
+  L1:
+    lua_error("incorrect argument to function 'gl.Translate'")
+  L2:
+    $N1 = x
+    $N2 = y
+    $N3 = z
+    glTranslate($N1, $N2, $N3)
 .end
 
 
-=item C<gl.Vertex ()>
+=item C<gl.Vertex (x, y, [z, w])>
+=item C<gl.Vertex (v)>
 
 =cut
 
 .sub 'Vertex' :anon
-    .param pmc extra :slurpy
-    not_implemented()
+    .param pmc vararg :slurpy
+    .local int num_args
+    num_args = elements vararg
+    unless num_args == 0 goto L1
+    lua_error("incorrect argument to function 'gl.Vertex'")
+  L1:
+    $P1 = vararg[0]
+    $I0 = lua_istable($P1)
+    unless $I0 goto L2
+    (num_args, $P0) = get_arrayd($P1)
+    goto L3
+  L2:
+    unless num_args < 2 goto L4
+    lua_error("incorrect argument to function 'gl.Vertex'")
+  L4:
+    new $P0, 'ResizableFloatArray'
+    $I0 = 0
+  L5:
+    unless $I0 < num_args goto L3
+    $P1 = shift vararg
+    $I1 = lua_isnumber($P1)
+    if $I1 goto L6
+    lua_error("incorrect argument to function 'gl.Vertex'")
+  L6:
+    $N1 = $P1
+    $P0[$I0] = $N1
+    inc $I0
+    goto L5
+  L3:
+    unless num_args > 4 goto L7
+    num_args = 4
+  L7:
+    unless num_args == 2 goto L8
+    glVertex2dv($P0)
+    .return()
+  L8:
+    unless num_args == 3 goto L9
+    glVertex3dv($P0)
+    .return()
+  L9:
+    unless num_args == 4 goto L10
+    glVertex4dv($P0)
+  L10:
+    .return()
 .end
 
 
@@ -2769,13 +3183,33 @@ see F<runtime/parrot/library/OpenGL.pir>.
 .end
 
 
-=item C<gl.Viewport ()>
+=item C<gl.Viewport (x, y, width, height)>
 
 =cut
 
 .sub 'Viewport' :anon
+    .param pmc x :optional
+    .param pmc y :optional
+    .param pmc width :optional
+    .param pmc height :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_isnumber(x)
+    unless $I0 goto L1
+    $I0 = lua_isnumber(y)
+    unless $I0 goto L1
+    $I0 = lua_isnumber(width)
+    unless $I0 goto L1
+    $I0 = lua_isnumber(height)
+    unless $I0 goto L1
+    goto L2
+  L1:
+    lua_error("incorrect argument to function 'gl.Viewport'")
+  L2:
+    $I1 = x
+    $I2 = y
+    $I3 = width
+    $I4 = height
+    glViewport($I1, $I2, $I3, $I4)
 .end
 
 
