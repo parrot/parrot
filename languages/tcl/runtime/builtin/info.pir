@@ -183,8 +183,8 @@ bad_args:
   argname  = argv[1]
   varname  = argv[2]
 
-  .local pmc __set
-  __set = get_root_global ['_tcl'], '__set'
+  .local pmc setVar
+  setVar = get_root_global ['_tcl'], 'setVar'
 
   .local pmc __namespace
   __namespace = get_root_global ['_tcl'], '__namespace'
@@ -206,7 +206,7 @@ bad_args:
   $P3 = $P2[argname]
   if_null $P3, check_arg
   push_eh error_on_set
-    __set(varname, $P3)
+    setVar(varname, $P3)
   pop_eh
 
   # store in variable
@@ -232,7 +232,7 @@ not_argument:
 
 no_default:
   push_eh error_on_set
-    __set(varname, '')
+    setVar(varname, '')
   pop_eh
   .return (0)
 
@@ -356,10 +356,10 @@ bad_args:
   .local string varname
   varname = argv[0]
 
-  .local pmc __read, found_var
-  __read  = get_root_global ['_tcl'], '__read'
+  .local pmc readVar, found_var
+  readVar  = get_root_global ['_tcl'], 'readVar'
   push_eh not_found
-    found_var = __read(varname)
+    found_var = readVar(varname)
   pop_eh
   .return (1)
 

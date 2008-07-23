@@ -42,7 +42,7 @@ our %conversions = (
     int     => 'toInteger',
     list    => 'toList',
     script  => '__script',
-    var     => '__read',
+    var     => 'readVar',
 );
 
 my $file = open_tmt( shift @ARGV );

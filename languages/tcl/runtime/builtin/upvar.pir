@@ -30,10 +30,10 @@ skip:
 
   # for each othervar/myvar pair, created a mapping from
 
-  .local pmc __make, __set, __find_var
-  __make     = get_root_global ['_tcl'], '__make'
-  __set      = get_root_global ['_tcl'], '__set'
-  __find_var = get_root_global ['_tcl'], '__find_var'
+  .local pmc makeVar, setVar, findVar
+  makeVar     = get_root_global ['_tcl'], 'makeVar'
+  setVar      = get_root_global ['_tcl'], 'setVar'
+  findVar = get_root_global ['_tcl'], 'findVar'
 
   .local int counter, argc
   argc       = argv
@@ -49,7 +49,7 @@ loop:
   new_var = argv[counter]
 
   if new_call_level == 0 goto store_var
-  $P0 = __find_var(new_var, 'depth'=>1)
+  $P0 = findVar(new_var, 'depth'=>1)
   if null $P0 goto store_var
   $S0 = 'variable "'
   $S0 .= new_var
@@ -68,7 +68,7 @@ save_chain_loop:
   goto save_chain_loop
 save_chain_end:
 
-  $P1 = __make(old_var, 'depth'=>1)
+  $P1 = makeVar(old_var, 'depth'=>1)
 
   # restore the old level
   $I0 = 0

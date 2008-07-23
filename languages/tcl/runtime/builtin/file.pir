@@ -137,8 +137,8 @@ bad_args:
     $P2 = $P1.'stat'(file)
   pop_eh
 
-  .local pmc __set
-  __set = find_global '__set'
+  .local pmc setVar
+  setVar = find_global 'setVar'
 
   $P3 = new 'TclArray'
   $P1 = $P2[8]
@@ -172,7 +172,7 @@ bad_args:
   $P1 = $P2[4]
   $P3['uid'] = $P1
 
-  __set(varname, $P3)
+  setVar(varname, $P3)
 
   .return('')
 

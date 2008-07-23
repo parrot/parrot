@@ -72,8 +72,8 @@ bad_args:
     .local pmc ret
     ret = tcl_binary_scan value, formatString
 
-    .local pmc __set, variables, values
-    __set = get_root_global ['_tcl'], '__set'
+    .local pmc setVar, variables, values
+    setVar = get_root_global ['_tcl'], 'setVar'
     variables = new 'Iterator', argv
     values    = new 'Iterator', ret
 loop:
@@ -83,7 +83,7 @@ loop:
     .local pmc var, value
     var   = shift variables
     value = shift values
-    __set(var, value)
+    setVar(var, value)
 
     goto loop
 end:

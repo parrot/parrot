@@ -1,7 +1,7 @@
 .HLL '_Tcl', ''
 .namespace []
 
-=head2 _Tcl::__read
+=head2 _Tcl::readVar
 
 Read a variable from its name. It may be a scalar or an
 array.
@@ -13,7 +13,7 @@ other than the default, and multiple interpreters.
 
 =cut
 
-.sub __read
+.sub readVar
   .param string name
 
   .local pmc variable
@@ -39,7 +39,7 @@ array:
   inc char
   key = substr name, char, len
 
-  variable = __find_var(var)
+  variable = findVar(var)
   if null variable goto no_such_variable
 
   $I0 = does variable, 'hash'
@@ -64,7 +64,7 @@ cant_read_not_array:
   tcl_error $S0
 
 scalar:
-  variable = __find_var(name)
+  variable = findVar(name)
   if null variable goto no_such_variable
 
   $S0 = typeof variable
@@ -84,7 +84,7 @@ no_such_variable:
   tcl_error $S0
 .end
 
-=head2 _Tcl::__make
+=head2 _Tcl::makeVar
 
 Read a variable from its name. If it doesn't exist, create it. It may be a
 scalar or an array.
@@ -96,7 +96,7 @@ other than the default, and multiple interpreters.
 
 =cut
 
-.sub __make
+.sub makeVar
   .param string name
   .param int    depth :named('depth') :optional
 
@@ -123,11 +123,11 @@ array:
   inc char
   key = substr name, char, len
 
-  variable = __find_var(var, 'depth' => depth)
+  variable = findVar(var, 'depth' => depth)
   unless null variable goto check_is_hash
 
   variable = new 'TclArray'
-  variable = __store_var(var, variable, 'depth' => depth)
+  variable = storeVar(var, variable, 'depth' => depth)
 
 check_is_hash:
   $I0 = does variable, 'hash'
@@ -149,17 +149,17 @@ cant_read_not_array:
   tcl_error $S0
 
 scalar:
-  variable = __find_var(name, 'depth' => depth)
+  variable = findVar(name, 'depth' => depth)
   if null variable goto make_variable
   .return(variable)
 
 make_variable:
     variable = new 'Undef'
-    variable = __store_var(name, variable, 'depth' => depth)
+    variable = storeVar(name, variable, 'depth' => depth)
     .return(variable)
 .end
 
-=head2 _Tcl::__set
+=head2 _Tcl::setVar
 
 Set a variable by its name. It may be a scalar or an array.
 
@@ -170,7 +170,7 @@ other than the default, and multiple interpreters.
 
 =cut
 
-.sub __set
+.sub setVar
   .param string name
   .param pmc value
 
@@ -206,7 +206,7 @@ find_array:
 
   .local pmc array
   null array
-  array = __find_var(var)
+  array = findVar(var)
   if null array goto create_array
 
   $I0 = does array, 'hash'
@@ -215,7 +215,7 @@ find_array:
 
 create_array:
   array = new 'TclArray'
-  array = __store_var(var, array)
+  array = storeVar(var, array)
 
 set_array:
   variable = array[key]
@@ -236,13 +236,13 @@ cant_set_not_array:
   tcl_error $S0
 
 scalar:
-  $P0 = __find_var(name)
+  $P0 = findVar(name)
   if null $P0 goto create_scalar
   $S0 = typeof $P0
   if $S0 == 'TclArray' goto cant_set_array
 
 create_scalar:
-  __store_var(name, value)
+  storeVar(name, value)
   $P0 = clone value
   .return($P0)
 
@@ -253,15 +253,15 @@ cant_set_array:
   tcl_error $S0
 .end
 
-=head2 _Tcl::__find_var
+=head2 _Tcl::findVar
 
-Utility function used by __read and __set.
+Utility function used by readVar and setVar.
 
 Gets the actual variable from memory and returns it.
 
 =cut
 
-.sub __find_var
+.sub findVar
   .param string name
   .param int    isglobal :named('global') :optional
   .param int    depth    :named('depth')  :optional
@@ -349,15 +349,15 @@ found:
   .return(value)
 .end
 
-=head2 _Tcl::__store_var
+=head2 _Tcl::storeVar
 
-Utility function used by __read and __set.
+Utility function used by readVar and setVar.
 
 Sets the actual variable from memory.
 
 =cut
 
-.sub __store_var
+.sub storeVar
   .param string name
   .param pmc    value
   .param int    isglobal :named('global') :optional

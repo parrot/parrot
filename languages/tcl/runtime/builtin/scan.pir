@@ -73,15 +73,15 @@ done:
 
 
 assign_results:
-  .local pmc __set
-  __set = get_root_global ['_tcl'], '__set'
+  .local pmc setVar
+  setVar = get_root_global ['_tcl'], 'setVar'
   $I0 = 0
 var_loop:
   if $I0 >= argc goto var_loop_done
   $S0 = argv[$I0]
   $P0 = results[$I0]
   push_eh bad_var
-    __set($S0, $P0)
+    setVar($S0, $P0)
   pop_eh
   inc $I0
   goto var_loop

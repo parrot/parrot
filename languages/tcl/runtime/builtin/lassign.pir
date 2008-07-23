@@ -18,7 +18,7 @@
 
   .local string varname
   .local pmc set, value
-  set = get_root_global ['_tcl'], '__set'
+  set = get_root_global ['_tcl'], 'setVar'
 
 var_loop:
   varname = shift argv

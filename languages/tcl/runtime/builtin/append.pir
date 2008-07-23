@@ -14,7 +14,7 @@
   argc = argv
 
   .local pmc read
-  read = get_root_global ['_tcl'], '__read'
+  read = get_root_global ['_tcl'], 'readVar'
 
   .local string value
   .local int looper
@@ -48,7 +48,7 @@ loop:
 
 loop_done:
   .local pmc set
-  set = get_root_global ['_tcl'], '__set'
+  set = get_root_global ['_tcl'], 'setVar'
   .return set(name, value)
 
 getter:

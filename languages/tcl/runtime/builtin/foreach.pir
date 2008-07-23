@@ -17,10 +17,10 @@
   $P0 = getinterp
   ns  = $P0['namespace'; 1]
 
-  .local pmc toList, __script, __set
+  .local pmc toList, __script, setVar
   toList   = get_root_global ['_tcl'], 'toList'
   __script = get_root_global ['_tcl'], '__script'
-  __set    = get_root_global ['_tcl'], '__set'
+  setVar    = get_root_global ['_tcl'], 'setVar'
 
   .local pmc varLists, lists, command
   varLists = new 'TclList'
@@ -90,7 +90,7 @@ next_variable:
   value = shift list
   value = clone value
   push_eh couldnt_set
-    __set(varname, value)
+    setVar(varname, value)
   pop_eh
   goto next_variable
 
@@ -98,7 +98,7 @@ empty_var:
   value = new 'TclString'
   value = ''
   push_eh couldnt_set
-    __set(varname, value)
+    setVar(varname, value)
   pop_eh
   goto next_variable
 

@@ -17,13 +17,13 @@
   value = pop argv
   dec argc
 
-  .local pmc __read, toList, __set
-  __read = get_root_global ['_tcl'], '__read'
+  .local pmc readVar, toList, setVar
+  readVar = get_root_global ['_tcl'], 'readVar'
   toList = get_root_global ['_tcl'], 'toList'
-  __set  = get_root_global ['_tcl'], '__set'
+  setVar  = get_root_global ['_tcl'], 'setVar'
 
   .local pmc retval, list
-  list = __read(name)
+  list = readVar(name)
   list = toList(list)
   retval = list
 
@@ -71,7 +71,7 @@ loop:
 
 done:
   prev[$I2] = value
-  __set(name, retval)
+  setVar(name, retval)
   .return(retval)
 
 out_of_range:
@@ -81,7 +81,7 @@ wrong_args:
   tcl_error 'wrong # args: should be "lset listVar index ?index...? value"'
 
 replace:
-  .return __set(name, value)
+  .return setVar(name, value)
 .end
 
 # Local Variables:

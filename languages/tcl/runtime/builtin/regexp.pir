@@ -47,8 +47,8 @@ ready:
    argc = elements argv
    unless argc goto done
    .local string matchStr, matchVar
-   .local pmc __set
-   __set = get_root_global [ '_tcl' ], '__set'
+   .local pmc setVar
+   setVar = get_root_global [ '_tcl' ], 'setVar'
 
    matchVar = shift argv
 
@@ -63,7 +63,7 @@ ready:
    $I1 -= $I0
    matchStr = substr original_string, $I0, $I1
 
-   __set(matchVar, matchStr)
+   setVar(matchVar, matchStr)
 
    matches = match.'get_array'()
    .local string subMatchStr, subMatchVar
@@ -85,7 +85,7 @@ subMatches:
    subMatchStr = substr original_string, $I0, $I1
 
 set_it:
-   __set(subMatchVar,subMatchStr)
+   setVar(subMatchVar,subMatchStr)
 
 next_submatch:
   goto subMatches
@@ -100,7 +100,7 @@ matches_ind:
   dec $I1
   matchList[0] = $I0
   matchList[1] = $I1
-  __set(matchVar, matchList)
+  setVar(matchVar, matchList)
 
   matches = match.'get_array'()
 
@@ -126,7 +126,7 @@ subMatches_ind_loop:
    subMatchList[1] = $I1
 
 set_it_ind:
-   __set(subMatchVar,subMatchList)
+   setVar(subMatchVar,subMatchList)
 
 next_submatch_ind:
   goto subMatches_ind_loop

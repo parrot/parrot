@@ -19,7 +19,7 @@
   cnt = 1
 
   .local pmc read
-  read = get_root_global ['_tcl'], '__read'
+  read = get_root_global ['_tcl'], 'readVar'
   push_eh new_variable
     value = read(listname)
   pop_eh
@@ -42,7 +42,7 @@ loop:
   goto loop
 loop_done:
   .local pmc set
-  set = get_root_global ['_tcl'], '__set'
+  set = get_root_global ['_tcl'], 'setVar'
   .return set(listname, value)
 
 error:

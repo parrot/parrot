@@ -43,9 +43,9 @@ got_retval:
 
   # Store the caught value in a
 
-  .local pmc __set
-  __set = get_root_global ['_tcl'], '__set'
-  __set(varname,code_retval)
+  .local pmc setVar
+  setVar = get_root_global ['_tcl'], 'setVar'
+  setVar(varname,code_retval)
 
 handle_retval:
   # We need to convert the code

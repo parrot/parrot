@@ -68,8 +68,8 @@ no_args:
   if argc < 2 goto bad_args
 
   .local pmc read, set
-  read = get_root_global ['_tcl'], '__read'
-  set  = get_root_global ['_tcl'], '__set'
+  read = get_root_global ['_tcl'], 'readVar'
+  set  = get_root_global ['_tcl'], 'setVar'
 
   .local pmc dictionary, dict_name
   dict_name = shift argv
@@ -276,9 +276,9 @@ do_script_prelude:
 script_loop:
   unless iterator goto end_script_loop
   check_key = shift iterator
-  __set(keyVar,check_key)
+  setVar(keyVar,check_key)
   check_value = dictionary[check_key]
-  __set(valueVar,check_value)
+  setVar(valueVar,check_value)
   push_eh body_handler
     $P1 = body_proc()
   pop_eh
@@ -320,7 +320,7 @@ bad_args:
   if argc != 3 goto bad_args
 
   .local pmc set, script
-  set     = get_root_global ['_tcl'], '__set'
+  set     = get_root_global ['_tcl'], 'setVar'
   script  = get_root_global ['_tcl'], '__script'
 
   .local pmc varNames
@@ -346,10 +346,10 @@ bad_args:
 for_loop:
   unless iterator goto for_loop_done
   $P1 = shift iterator
-  __set(keyVar,   $P1)
+  setVar(keyVar,   $P1)
   $S1 = $P1
   $P2 = dictionary[$S1]
-  __set(valueVar, $P2)
+  setVar(valueVar, $P2)
 
   push_eh loop_handler
     code()
@@ -425,8 +425,8 @@ bad_args:
   if argc > 3 goto bad_args
 
   .local pmc read, set
-  read = get_root_global ['_tcl'], '__read'
-  set  = get_root_global ['_tcl'], '__set'
+  read = get_root_global ['_tcl'], 'readVar'
+  set  = get_root_global ['_tcl'], 'setVar'
 
   .local pmc dictionary, dict_name
   dict_name = shift argv
@@ -515,8 +515,8 @@ bad_args:
   if argc < 2 goto bad_args
 
   .local pmc read, set
-  read = get_root_global ['_tcl'], '__read'
-  set  = get_root_global ['_tcl'], '__set'
+  read = get_root_global ['_tcl'], 'readVar'
+  set  = get_root_global ['_tcl'], 'setVar'
 
   .local pmc dictionary, dict_name
   dict_name = shift argv
@@ -722,8 +722,8 @@ bad_args:
   if argc < 3 goto bad_args
 
   .local pmc read, set
-  read = get_root_global ['_tcl'], '__read'
-  set  = get_root_global ['_tcl'], '__set'
+  read = get_root_global ['_tcl'], 'readVar'
+  set  = get_root_global ['_tcl'], 'setVar'
 
   .local pmc dictionary, dict_name
   dict_name = shift argv
@@ -804,8 +804,8 @@ bad_args:
   if argc < 2 goto bad_args
 
   .local pmc read, set
-  read = get_root_global ['_tcl'], '__read'
-  set  = get_root_global ['_tcl'], '__set'
+  read = get_root_global ['_tcl'], 'readVar'
+  set  = get_root_global ['_tcl'], 'setVar'
 
   .local pmc dictionary, dict_name
   dict_name = shift argv
@@ -865,8 +865,8 @@ bad_args:
   if $I0 goto bad_args
 
   .local pmc read, set
-  read = get_root_global ['_tcl'], '__read'
-  set  = get_root_global ['_tcl'], '__set'
+  read = get_root_global ['_tcl'], 'readVar'
+  set  = get_root_global ['_tcl'], 'setVar'
 
   .local pmc dictionary, dict_name
   dict_name = shift argv
@@ -898,7 +898,7 @@ key_loop:
   $P2 = shift argv
   push varnames, $P2
   $P3 = dictionary[$P1]
-  __set($P2, $P3)
+  set($P2, $P3)
   goto key_loop
 done_key_loop:
 # run the body of the script. save the return vaalue.
@@ -914,7 +914,7 @@ set_loop:
   unless iter1 goto set_loop_done
   $P1 = shift iter1
   $P2 = shift iter2
-  $P3 = __read($P2)
+  $P3 = readVar($P2)
   dictionary[$P1] = $P3
   goto set_loop
 set_loop_done:
@@ -987,8 +987,8 @@ bad_args:
   if argc ==0  goto bad_args
 
   .local pmc read, set
-  read = get_root_global ['_tcl'], '__read'
-  set  = get_root_global ['_tcl'], '__set'
+  read = get_root_global ['_tcl'], 'readVar'
+  set  = get_root_global ['_tcl'], 'setVar'
 
   .local pmc dictionary, dict_name
   dict_name = shift argv
@@ -1024,7 +1024,7 @@ alias_keys:
   unless iterator goto done_alias
   $P1 = shift iterator
   $P2 = dictionary[$P1]
-  __set($P1,$P2)
+  set($P1,$P2)
   goto alias_keys
 done_alias:
   .local pmc retval
@@ -1035,7 +1035,7 @@ done_alias:
 update_keys:
   unless iterator goto done_update
   $P1 = shift iterator
-  $P2 = __read($P1)
+  $P2 = readVar($P1)
   dictionary[$P1] = $P2
   goto update_keys
 

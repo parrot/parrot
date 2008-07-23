@@ -104,9 +104,9 @@ transform pir (PAST::Var) {
     if $I0 goto array
 
     pir.emit(<<'END_PIR', ret, name)
-  .local pmc __read
-  __read = get_root_global ['_tcl'], '__read'
-  %0 = __read('%1')
+  .local pmc readVar
+  readVar = get_root_global ['_tcl'], 'readVar'
+  %0 = readVar('%1')
 END_PIR
     .return(pir)
 
@@ -118,12 +118,12 @@ array:
     pir .= $P0
     $S0 = index['ret']
     pir.emit(<<'END_PIR', ret, name, $S0)
-  .local pmc __read
-  __read = get_root_global ['_tcl'], '__read'
+  .local pmc readVar
+  readVar = get_root_global ['_tcl'], 'readVar'
   $S0 = %2
   $S0 = '%1(' . $S0
   $S0 = $S0 . ')'
-  %0 = __read($S0)
+  %0 = readVar($S0)
 END_PIR
     .return(pir)
 }
