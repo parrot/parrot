@@ -1,6 +1,9 @@
 .sub __ncurses_init :load
 
 loadlib $P1, 'libform'
+if $P1 goto has_lib
+loadlib $P1, 'cygform-8'
+has_lib:
 dlfunc $P2, $P1, 'new_field', 'piiiiii'
 store_global 'ncurses::new_field', $P2
 dlfunc $P2, $P1, 'dup_field', 'ppii'
@@ -119,7 +122,9 @@ dlfunc $P2, $P1, 'data_behind', 'lp'
 store_global 'ncurses::data_behind', $P2
 
 loadlib $P1, 'libncurses'
-
+if $P1 goto has_lib1
+loadlib $P1, 'cygncurses-8'
+has_lib1:
 dlfunc $P2, $P1, 'keybound', 'tii'
 store_global 'ncurses::keybound', $P2
 
