@@ -15,8 +15,8 @@
   .local int utf8
   utf8 = find_encoding 'utf8'
 
-  .local pmc __channel, io
-  __channel = get_root_global ['_tcl'], '__channel'
+  .local pmc getChannel, io
+  getChannel = get_root_global ['_tcl'], 'getChannel'
 
   if argc == 1 goto one_arg
   if argc == 2 goto two_arg
@@ -26,7 +26,7 @@ three_arg:
   if $S1 != '-nonewline' goto bad_option
 
   $S2 = argv[1]
-  io  = __channel($S2)
+  io  = getChannel($S2)
   $S3 = argv[2]
   $S3 = trans_encoding $S3, utf8
 
@@ -51,7 +51,7 @@ two_arg_nonewline:
   goto done
 
 two_arg_channel:
-  io = __channel($S2)
+  io = getChannel($S2)
 
   io.'say'($S3)
   goto done

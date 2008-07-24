@@ -29,13 +29,13 @@ node object.
 
 .namespace [ 'PAST' ]
 
-=item C<__onload()>
+=item C<onload()>
 
 Creates the C<PAST::*> classes.
 
 =cut
 
-.sub '__onload' :load
+.sub 'onload' :load :anon
     .local pmc base
     $P0 = get_class 'Hash'
     base = subclass $P0, 'PAST::Node'
@@ -66,7 +66,7 @@ Creates the C<PAST::*> classes.
 
 =over 4
 
-=item C<__init()>
+=item C<init()>
 
 Initializes a new C<PAST::Node> object.
 

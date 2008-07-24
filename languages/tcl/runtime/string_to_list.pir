@@ -53,7 +53,7 @@ odd_args:
   tcl_error 'missing value to go with key'
 .end
 
-.sub __stringToDict
+.sub stringToDict
   .param string str
 
   .local pmc list

@@ -11,9 +11,9 @@
     argc = elements argv
     if argc < 3 goto bad_args
 
-    .local pmc list, toList, retval, iterator, __index
+    .local pmc list, toList, retval, iterator, getIndex
     toList = get_root_global ['_tcl'], 'toList'
-    __index = get_root_global ['_tcl'], '__index'
+    getIndex = get_root_global ['_tcl'], 'getIndex'
     $P0 = shift argv
     list = toList($P0)
     list = clone list
@@ -23,9 +23,9 @@
 
     .local int first, last, count
     $S0 = shift argv
-    first = __index($S0,list)
+    first = getIndex($S0,list)
     $S0  = shift argv
-    last = __index($S0,list)
+    last = getIndex($S0,list)
 
     if size == 0   goto empty
     if last < size goto first_1

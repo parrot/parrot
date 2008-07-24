@@ -10,8 +10,8 @@
     if argc < 2 goto badargs
     if argc > 3 goto badargs
 
-    .local pmc __channel, compileTcl
-    __channel = get_root_global ['_tcl'], '__channel'
+    .local pmc getChannel, compileTcl
+    getChannel = get_root_global ['_tcl'], 'getChannel'
     compileTcl  = get_root_global ['_tcl'], 'compileTcl'
 
     .local pmc channel, script
@@ -26,7 +26,7 @@
     tcl_error $S0
 
 readable:
-    channel = __channel(channel)
+    channel = getChannel(channel)
 
     if argc == 2 goto readable_2
 
@@ -47,7 +47,7 @@ readable_2:
     .return('')
 
 writable:
-    channel = __channel(channel)
+    channel = getChannel(channel)
     .return('')
 
 badargs:

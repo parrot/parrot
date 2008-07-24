@@ -474,15 +474,15 @@ current_level:
   .return($I0)
 
 find_level:
-  .local pmc toInteger, __call_level
+  .local pmc toInteger, getCallLevel
   toInteger    = get_root_global ['_tcl'], 'toInteger'
-  __call_level = get_root_global ['_tcl'], '__call_level'
+  getCallLevel = get_root_global ['_tcl'], 'getCallLevel'
 
   .local pmc level
   level = shift argv
   level = toInteger(level)
   if level >= 0 goto find_info_level
-  level = __call_level(level)
+  level = getCallLevel(level)
   .return(level)
 
 find_info_level:

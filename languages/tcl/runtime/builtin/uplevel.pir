@@ -14,9 +14,9 @@
   argc = elements argv
   if argc == 0 goto bad_args
 
-  .local pmc compileTcl, __call_level
+  .local pmc compileTcl, getCallLevel
   compileTcl        = get_root_global ['_tcl'], 'compileTcl'
-  __call_level    = get_root_global ['_tcl'], '__call_level'
+  getCallLevel    = get_root_global ['_tcl'], 'getCallLevel'
 
   # save the old call level
   .local pmc call_chain
@@ -28,7 +28,7 @@
   new_call_level = argv[0]
 
   .local int defaulted
-  (new_call_level,defaulted) = __call_level(new_call_level)
+  (new_call_level,defaulted) = getCallLevel(new_call_level)
   if defaulted == 1 goto skip
 
   # if we only have a level, then we don't have a command to run!

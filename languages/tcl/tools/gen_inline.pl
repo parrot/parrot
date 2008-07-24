@@ -37,7 +37,7 @@ our %conversions = (
 
     # type     subroutine
     bool    => 'toBoolean',
-    channel => '__channel',
+    channel => 'getChannel',
     expr    => 'compileExpr',
     int     => 'toInteger',
     list    => 'toList',

@@ -82,7 +82,7 @@ got_readline_status:
   .local int level
   level = 1
 input_loop:
-  $P0 = __prompt(level, readlineInd)
+  $P0 = prompt(level, readlineInd)
   if null $P0 goto done
   $S0 = $P0
   $S0 .= "\n" # add back in the newline the prompt chomped
@@ -198,7 +198,7 @@ exit_exception:
   .rethrow()
 .end
 
-.sub __prompt
+.sub prompt
   .param int level
   .param int readlineInd
 

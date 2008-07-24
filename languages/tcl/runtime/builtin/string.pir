@@ -79,11 +79,11 @@ no_args:
   $I0 = 0
   if argc == 2 goto first_do
   $S3 = argv[2]
-  .local pmc __index
-  __index = get_root_global ['_tcl'], '__index'
-  $I0 = __index($S3,$S2)
+  .local pmc getIndex
+  getIndex = get_root_global ['_tcl'], 'getIndex'
+  $I0 = getIndex($S3,$S2)
   if $I0 >0 goto first_do
-  $I0 = 0 # XXX should this be done in __index?
+  $I0 = 0 # XXX should this be done in getIndex?
 
 first_do:
   .local int index_1
@@ -111,9 +111,9 @@ bad_args:
   if argc == 2 goto last_do
 
   $S3 = argv[2]
-  .local pmc __index
-  __index = get_root_global ['_tcl'], '__index'
-  $I1 = __index($S3,$S2)
+  .local pmc getIndex
+  getIndex = get_root_global ['_tcl'], 'getIndex'
+  $I1 = getIndex($S3,$S2)
 
   if $I1 > $I0 goto last_do
   $I0 = $I1
@@ -152,9 +152,9 @@ bad_args:
   if argc != 2 goto bad_index
   $S1 = argv[0]
   $S2 = argv[1]
-  .local pmc __index
-  __index = get_root_global ['_tcl'], '__index'
-  $I0 = __index($S2,$S1)
+  .local pmc getIndex
+  getIndex = get_root_global ['_tcl'], 'getIndex'
+  $I0 = getIndex($S2,$S1)
   index_1 = length $S1
   inc index_1
   if $I0 > index_1 goto index_null
@@ -191,17 +191,17 @@ done:
   $I3 = $I1
   if argc == 1 goto tolower_do
 
-  .local pmc __index
-  __index = get_root_global ['_tcl'], '__index'
+  .local pmc getIndex
+  getIndex = get_root_global ['_tcl'], 'getIndex'
 
   $S2 = argv[1]
-  $I2 = __index($S2, $S1)
+  $I2 = getIndex($S2, $S1)
   # if just the first is specified, the last is the same (tclsh says so)
   $I3 = $I2
   if argc == 2 goto tolower_do
 
   $S3 = argv[2]
-  $I3 = __index($S3, $S1)
+  $I3 = getIndex($S3, $S1)
 
 tolower_do:
   if $I2 > $I1  goto tolower_return
@@ -244,17 +244,17 @@ bad_args:
   $I3 = $I1
   if argc == 1 goto toupper_do
 
-  .local pmc __index
-  __index = get_root_global ['_tcl'], '__index'
+  .local pmc getIndex
+  getIndex = get_root_global ['_tcl'], 'getIndex'
 
   $S2 = argv[1]
-  $I2 = __index($S2, $S1)
+  $I2 = getIndex($S2, $S1)
   # if just the first is specified, the last is the same (tclsh says so)
   $I3 = $I2
   if argc == 2 goto toupper_do
 
   $S3 = argv[2]
-  $I3 = __index($S3, $S1)
+  $I3 = getIndex($S3, $S1)
 
 toupper_do:
   if $I2 > $I1  goto toupper_return
@@ -296,17 +296,17 @@ bad_args:
   $I3 = $I1
   if argc == 1 goto totitle_do
 
-  .local pmc __index
-  __index = get_root_global ['_tcl'], '__index'
+  .local pmc getIndex
+  getIndex = get_root_global ['_tcl'], 'getIndex'
 
   $S2 = argv[1]
-  $I2 = __index($S2, $S1)
+  $I2 = getIndex($S2, $S1)
   # if just the first is specified, the last is the same (tclsh says so)
   $I3 = $I2
   if argc == 2 goto totitle_do
 
   $S3 = argv[2]
-  $I3 = __index($S3, $S1)
+  $I3 = getIndex($S3, $S1)
 
 totitle_do:
   if $I2 > $I1  goto totitle_return
@@ -376,12 +376,12 @@ bad_length:
   last_index = length teh_string
   dec last_index
 
-  .local pmc __index
-  __index = get_root_global ['_tcl'], '__index'
+  .local pmc getIndex
+  getIndex = get_root_global ['_tcl'], 'getIndex'
 
   .local int first_i, last_i
-  first_i = __index(first_s, teh_string)
-  last_i  = __index(last_s, teh_string)
+  first_i = getIndex(first_s, teh_string)
+  last_i  = getIndex(last_s, teh_string)
 
   if first_i > last_i goto done
 
@@ -827,8 +827,8 @@ bad_args:
   .local int len
   .local pmc retval
 
-  .local pmc __index
-  __index = get_root_global ['_tcl'], '__index'
+  .local pmc getIndex
+  getIndex = get_root_global ['_tcl'], 'getIndex'
 
   argc = argv
   if argc > 4 goto bad_args
@@ -842,12 +842,12 @@ bad_args:
   $S4 = ''
 
   low_s = argv[1]
-  low = __index(low_s, the_string)
+  low = getIndex(low_s, the_string)
 
   if low >= string_len goto replace_done
 
   high_s = argv[2]
-  high = __index(high_s, the_string)
+  high = getIndex(high_s, the_string)
 
   if high < low goto replace_done
 
@@ -1091,9 +1091,9 @@ bad_args:
   str = argv[0]
   idx = argv[1]
 
-  .local pmc __index
-  __index = get_root_global ['_tcl'], '__index'
-  idx = __index(idx, str)
+  .local pmc getIndex
+  getIndex = get_root_global ['_tcl'], 'getIndex'
+  idx = getIndex(idx, str)
 
   $I0 = length str
   $I0 -= idx
@@ -1121,13 +1121,13 @@ bad_args:
   str = argv[0]
   idx = argv[1]
 
-  .local pmc __index
-  __index = get_root_global ['_tcl'], '__index'
-  idx = __index(idx, str)
+  .local pmc getIndex
+  getIndex = get_root_global ['_tcl'], 'getIndex'
+  idx = getIndex(idx, str)
 
   .local int pos
   pos = idx
-  # XXX should these checks be in __index itself?
+  # XXX should these checks be in getIndex itself?
   if pos >0 goto check_upper
   pos = 0
   goto pre_loop

@@ -22,11 +22,11 @@
   .local string position
   position = shift argv
 
-  .local pmc __index
-  __index = get_root_global ['_tcl'], '__index'
+  .local pmc getIndex
+  getIndex = get_root_global ['_tcl'], 'getIndex'
 
   .local int the_index
-  the_index = __index(position, the_list)
+  the_index = getIndex(position, the_list)
 
   $S0 = substr position, 0, 3
   if $S0 != 'end' goto next

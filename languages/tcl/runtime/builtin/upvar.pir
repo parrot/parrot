@@ -11,15 +11,15 @@
   argc = elements argv
   if argc < 2 goto bad_args
 
-  .local pmc __call_level, call_chain
+  .local pmc getCallLevel, call_chain
   .local int call_level
-  __call_level = get_root_global ['_tcl'], '__call_level'
+  getCallLevel = get_root_global ['_tcl'], 'getCallLevel'
   call_chain   = get_root_global ['_tcl'], 'call_chain'
   call_level   = elements call_chain
 
   .local int new_call_level, defaulted
   $P0 = argv[0]
-  (new_call_level,defaulted) = __call_level($P0)
+  (new_call_level,defaulted) = getCallLevel($P0)
   if defaulted == 1 goto skip
   $P1 = shift argv
   dec argc

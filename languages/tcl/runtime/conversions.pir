@@ -57,7 +57,7 @@ Given a PMC, get a TclDict from it, converting as needed.
 .sub toDict :multi(_)
   .param pmc value
 
-  $P0 = __stringToDict(value)
+  $P0 = stringToDict(value)
   copy value, $P0
 
   .return(value)
@@ -185,14 +185,14 @@ not_integer_eh:
   rethrow $P99 # preserves the invalid octal message.
 .end
 
-=head2 _Tcl::__index
+=head2 _Tcl::getIndex
 
 Given a tcl string index and an List pmc, return the corresponding numeric
 index.
 
 =cut
 
-.sub __index
+.sub getIndex
   .param string idx
   .param pmc    list
 
@@ -249,13 +249,13 @@ bad_index_done:
   tcl_error $S0
 .end
 
-=head2 _Tcl::__channel
+=head2 _Tcl::getChannel
 
 Given a string, return the appropriate channel.
 
 =cut
 
-.sub __channel
+.sub getChannel
   .param string channelID
 
   .local pmc channels
@@ -583,7 +583,7 @@ false:
     .return(0)
 .end
 
-=head2 _Tcl::__call_level
+=head2 _Tcl::getCallLevel
 
 Given a pmc containing the tcl-style call level, return an int-like pmc
 indicating the parrot-style level, and an integer with a boolean 0/1 -
@@ -591,7 +591,7 @@ was this a valid tcl-style level, or did we get this value as a default?
 
 =cut
 
-.sub __call_level
+.sub getCallLevel
   .param pmc tcl_level
   .local pmc parrot_level, defaulted, orig_level
   defaulted = new 'Integer'
