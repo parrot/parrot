@@ -34,27 +34,27 @@ pmclass TclDict
 
 =item C<STRING *get_string()>
 
-Returns the dict as a string
+Returns the dict as a string. Take advantage of the heavy lifting already present
+in TclList.
 
 =cut
 
 */
 
     VTABLE STRING* get_string() {
-        PMC *dictToString, *namespace;
-        STRING *_tcl_namespace, *sub;
+        PMC *list, *iterator;
+        STRING *key;
+        PMC *value;
+        list = pmc_new(INTERP, pmc_type(INTERP, CONST_STRING(INTERP, "TclList")));
+        iterator = VTABLE_get_iter(INTERP, list);
 
-        _tcl_namespace = string_from_cstring(INTERP, "_tcl", 4);
-        sub            = string_from_cstring(INTERP, "dictToString", 14);
-
-        namespace = INTERP->root_namespace;
-        namespace = VTABLE_get_pmc_keyed_str(INTERP, namespace, _tcl_namespace);
-        dictToString = VTABLE_get_pmc_keyed_str(INTERP, namespace, sub);
-
-        CONTEXT(interp)->constants =
-          PMC_sub(dictToString)->seg->const_table->constants;
-        return (STRING *)Parrot_runops_fromc_args(INTERP, dictToString, "SP", SELF);
-
+        while (VTABLE_get_bool(INTERP, iterator)) {
+                key = VTABLE_shift_string(INTERP, iterator);
+                VTABLE_push_string(INTERP, list, key);
+                value = VTABLE_get_pmc_keyed_str(INTERP, list, key);
+                VTABLE_push_string(INTERP, list, VTABLE_get_string(INTERP, value));
+        }
+        return VTABLE_get_string(INTERP, list);
     }
 }
 
