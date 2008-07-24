@@ -22,8 +22,10 @@ set todo_tests [dict create \
   } {stacktrace support} {
     apply-2.[2345] apply-5.1
     if-5.3    if-6.4
-  } {tcltest: need better [testevalex]} {
-    lset-2.2 lset-7.[12] lset-10.3 lset-13.[012] lset-14.[12]
+    set-[24].1
+  } {tcltest} {
+    lset-2.2 lset-7.[12] lset-10.3 lset-13.[012] lset-14.[12] # testevalex
+    set-5.1 # testset2 
   } {[apply]} {
     apply-[4678].*
   }
@@ -52,9 +54,8 @@ set skip_tests [dict create \
     namespace-47.2 namespace-47.4 namespace-47.6 namespace-46.5
     parse-9.1 parse-9.2 parse-10.14
     parseOld-10.14
-    proc-old-5.13 proc-old-5.16 proc-old-7.2  proc-old-7.11 proc-old-7.12 
+    proc-old-5.13 proc-old-5.16 proc-old-7.2  proc-old-7.11 proc-old-7.12
     proc-old-7.13 proc-old-7.14
-    set-2.1 set-4.1
     switch-4.1 switch-4.5
     while-4.3
     while-old-4.6
@@ -62,7 +63,7 @@ set skip_tests [dict create \
     subst-5.7
   } {[interp]} {
     basic-11.1 basic-12.1 basic-12.2 basic-13.1 basic-13.2 basic-24.1
-    basic-1.1 basic-10.1 basic-36.1          
+    basic-1.1 basic-10.1 basic-36.1
     namespace-8.7
   } {[file]} {
     cmdAH-2.2 cmdAH-2.3 cmdAH-2.4 cmdAH-2.5 cmdAH-2.6 cmdAH-2.6.1 cmdAH-2.6.2
@@ -84,8 +85,8 @@ set skip_tests [dict create \
     expr-old-32.51 expr-old-32.52 expr-old-32.53 expr-old-32.48 expr-old-32.49
     expr-old-32.50 expr-old-32.45
   } {[namespace code]} {
-    namespace-22.1 namespace-22.2 namespace-22.3 namespace-22.4 namespace-22.5 
-    namespace-22.6 
+    namespace-22.1 namespace-22.2 namespace-22.3 namespace-22.4 namespace-22.5
+    namespace-22.6
   } {[namespace delete]} {
     namespace-14.1
   } {[namespace export]} {
@@ -121,7 +122,7 @@ set skip_tests [dict create \
   } {[seek]} {
     iocmd-5.1 iocmd-5.2 iocmd-5.3 iocmd-5.4 iocmd-12.4
   } {[tell]} {
-    iocmd-6.1 iocmd-6.2 iocmd-6.3 
+    iocmd-6.1 iocmd-6.2 iocmd-6.3
   } {[fblocked]} {
     iocmd-10.1 iocmd-10.2 iocmd-10.3 iocmd-10.4 iocmd-10.5
   } {Inf support} {
@@ -130,7 +131,7 @@ set skip_tests [dict create \
     expr-41.1 expr-45.7
     expr-old-26.10b expr-old-34.11 expr-old-34.12b expr-old-34.11
     expr-old-34.10
-    scan-14.1 scan-14.2 
+    scan-14.1 scan-14.2
   } {NaN support} {
     expr-22.1 expr-22.3  expr-22.5 expr-22.7 expr-22.9 expr-45.8 expr-45.9
     expr-47.3
@@ -142,15 +143,15 @@ set skip_tests [dict create \
     filename-10.1 filename-10.2 filename-10.3 filename-10.3.1 filename-10.6
     filename-10.7 filename-10.8 filename-10.9 filename-10.10 filename-10.17
     filename-10.18 filename-10.19 filename-10.20 filename-10.21 filename-10.22
-    filename-10.23 filename-10.24 
+    filename-10.23 filename-10.24
   } {[testwordend]} {
-    parseOld-14.1 parseOld-14.2 parseOld-14.3 parseOld-14.4 parseOld-14.5 
+    parseOld-14.1 parseOld-14.2 parseOld-14.3 parseOld-14.4 parseOld-14.5
     parseOld-14.6 parseOld-14.7 parseOld-14.8 parseOld-14.9 parseOld-14.10
-    parseOld-14.11 parseOld-14.12 parseOld-14.13 parseOld-14.14 
-    parseOld-14.15 parseOld-14.16 parseOld-14.17 parseOld-14.18 
+    parseOld-14.11 parseOld-14.12 parseOld-14.13 parseOld-14.14
+    parseOld-14.15 parseOld-14.16 parseOld-14.17 parseOld-14.18
     parseOld-14.19 parseOld-14.20 parseOld-14.21
   } {[testdel]} {
-    rename-4.1 rename-4.2 rename-4.3 rename-4.4 rename-4.5 
+    rename-4.1 rename-4.2 rename-4.3 rename-4.4 rename-4.5
   } {[testchmod]} {
     cmdAH-18.3
   } {[testcmdtoken]} {
@@ -168,7 +169,7 @@ set skip_tests [dict create \
     expr-old-37.22 expr-old-37.22 expr-old-37.23 expr-old-37.24 expr-old-37.25
   } {[testexprdoubleobj]} {
     expr-39.17 expr-39.19 expr-39.20 expr-39.21 expr-39.22 expr-39.23
-    expr-39.24 expr-39.25 
+    expr-39.24 expr-39.25
   } {[testexprlongobj]} {
     expr-39.1 expr-39.2 expr-39.3 expr-39.4 expr-39.5 expr-39.6 expr-39.8
     expr-39.9 expr-39.11 expr-39.12 expr-39.14 expr-39.15
@@ -196,8 +197,8 @@ set skip_tests [dict create \
     parse-12.1 parse-12.2 parse-12.3 parse-12.4 parse-12.5 parse-12.9
     parse-12.10 parse-12.15 parse-12.16 parse-12.17 parse-12.19 parse-12.24
   } {[testupvar]} {
-    upvar-9.1 upvar-9.2 upvar-9.3 upvar-9.4 upvar-9.5 upvar-9.6 upvar-9.7 
-    var-3.3 var-3.4 var-3.4 
+    upvar-9.1 upvar-9.2 upvar-9.3 upvar-9.4 upvar-9.5 upvar-9.6 upvar-9.7
+    var-3.3 var-3.4 var-3.4
   } {[testgetvarfullname]} {
     var-4.1 var-4.2 var-4.3
   } {[testsetnoerr]} {
@@ -205,11 +206,11 @@ set skip_tests [dict create \
     var-9.1 var-9.11 var-9.12
   } {[testdoubleobj]} {
     execute-3.2 execute-3.8 execute-3.14 execute-3.20 execute-3.26 execute-3.32
-    execute-3.38 execute-3.44 execute-3.50 execute-3.56 execute-3.63 
+    execute-3.38 execute-3.44 execute-3.50 execute-3.56 execute-3.63
     execute-3.64 execute-3.73
   } {[testintobj]} {
     execute-3.1 execute-3.3 execute-3.7 execute-3.9 execute-3.13 execute-3.15
-    execute-3.19 execute-3.21 execute-3.25 execute-3.27 execute-3.31 
+    execute-3.19 execute-3.21 execute-3.25 execute-3.27 execute-3.31
     execute-3.33 execute-3.37 execute-3.39 execute-3.43 execute-3.45
     execute-3.49 execute-3.51 execute-3.55 execute-3.57 execute-3.61
     execute-3.62 execute-3.65 execute-3.66 execute-3.72 execute-3.74
@@ -237,7 +238,7 @@ set skip_tests [dict create \
     expr-old-32.39 expr-old-32.40 expr-old-36.11 expr-old-36.14 expr-old-34.15
     expr-old-34.16
   } {[bytestring]} {
-    parseOld-7.12 parseOld-7.13 parseOld-7.14 
+    parseOld-7.12 parseOld-7.13 parseOld-7.14
   } ]
 
 # Tests after which there is code (in or out of a test) which causes either

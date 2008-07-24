@@ -25,11 +25,11 @@ set very_bad_global_variable_test_num 0
 
 proc is {value expected {description ""} {special {}}}  {
     global very_bad_global_variable_test_num
-    incr  very_bad_global_variable_test_num 
-    
+    incr  very_bad_global_variable_test_num
+
     set num $very_bad_global_variable_test_num
     set type ""
-  
+
     if {[llength $special] == 2} {
         set type [string toupper [lindex $special 0]]
         if {$type eq "TODO"} {
@@ -46,7 +46,7 @@ proc is {value expected {description ""} {special {}}}  {
         if  {$description ne ""} {
             set description " - $description"
         }
-    } 
+    }
 
     if {$value eq $expected} {
         puts "ok $num$description"
@@ -70,7 +70,7 @@ proc eval_is {code expected {description ""} {special {}}}  {
         set boolean [string compare -nocase [lindex $special 0] skip]
         if {! $boolean} {
             global very_bad_global_variable_test_num
-            incr  very_bad_global_variable_test_num 
+            incr  very_bad_global_variable_test_num
             puts "ok $very_bad_global_variable_test_num # $special"
             return 1
         }
@@ -215,9 +215,10 @@ namespace eval tcl {
 
 namespace eval tcltest {
     set verbose 0
-    set testSingleFile 0 
+    set testSingleFile 0
     set temporaryDirectory .
     proc temporaryDirectory {args} {return .}
     proc testConstraint     {args} {return 0}
     proc test {args} {return [::test {*}$args]}
-} 
+    proc cleanupTests       {args} {return 0}
+}
