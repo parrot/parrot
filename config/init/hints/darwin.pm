@@ -20,7 +20,7 @@ sub runstep {
     # requested by command-line options and force a single, native
     # architecture to being the default build.
     my @flags = qw(ccflags linkflags ldflags ld_share_flags ld_load_flags);
-    my @arches = qw(i386 ppc ppc64 x86_64);
+    my @arches = qw(i386 ppc64 ppc x86_64);
 
     print "\nChecking for -arch flags not explicitly added:\n" if $verbose;
     for my $flag (@flags) {
