@@ -139,8 +139,14 @@ proc test {num description args} {
     set skip_reason [dict keys $should_skip]
 
     set should_todo [dict filter $todo_tests script {K V} {
-        set val [lsearch -exact $V $num]
-        expr {$val != -1}
+        set matched no
+        foreach element $V {
+          if {[string match $element $num]} {
+	    set matched yes
+	    break
+	  }
+	}
+        set matched
     }]
 
     set todo_reason [dict keys $should_todo]

@@ -1,28 +1,31 @@
 # skipped_tests - these are all the tests that the partcl implementation
 # not only cannot pass, but cannot compile, or causes a parrot segfault, etc.
+# must use exact test names.
 #
 # todo_tests - these are the tests that are known to fail because they
-# require a feature we haven't implemented yet. 
+# require a feature we haven't implemented yet. Can use globs to specify
+# a range of skippable tests.
 #
 # stored as a dictionary, with the reason as a key, and the list of tests
 # that require the feature (or cause the listed error) as values.
 
 set todo_tests [dict create \
   {list to string improvements} {
-    list-1.12 list-1.13 list-1.26
+    list-1.1[23] list-1.26
   } {parsing errors} {
-    list-1.15 list-1.16
+    list-1.1[56]
   } {[trace]} {
-    append-7.1     append-7.2     append-7.3     append-7.4     append-7.5
-    appendComp-7.1 appendComp-7.2 appendComp-7.3 appendComp-7.4 appendComp-7.5
-    appendComp-7.6 appendComp-7.7 appendComp-7.8 appendComp-7.9
+    append-7.[12345]
+    appendComp-7.[123456789]
     if-10.6
-    lset-1.3       lset-5.1       lset-5.2
+    lset-1.3 lset-5.[12]
   } {stacktrace support} {
-    if-5.3 if-6.4
+    apply-2.[2345] apply-5.1
+    if-5.3    if-6.4
   } {tcltest: need better [testevalex]} {
-    lset-2.2  lset-7.1  lset-7.2  lset-10.3  lset-13.0  lset-13.1  lset-13.2
-    lset-14.1 lset-14.2
+    lset-2.2 lset-7.[12] lset-10.3 lset-13.[012] lset-14.[12]
+  } {[apply]} {
+    apply-[4678].*
   }
 ]
 
@@ -36,7 +39,6 @@ set skip_tests [dict create \
     parse-18.9 parse-18.12
   } {[trace]} {
   } {stacktrace support} {
-    apply-2.2 apply-2.3 apply-2.4 apply-2.5 apply-5.1
     basic-46.1
     cmdMZ-return-2.10 cmdMZ-3.5 cmdMZ-5.7
     dict-14.12 dict-17.13
@@ -246,7 +248,6 @@ set skip_tests [dict create \
 # stored as an array of test name -> reason pairs.
 
 array set abort_after {
-  apply-2.1            {}
   assocd-1.1           {}
   async-1.1            {}
   autoMkindex-1.1      {}
