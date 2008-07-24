@@ -58,6 +58,10 @@ typedef struct Rect_Like {
     int w, h;
 } Rect_Like;
 
+typedef struct Opaque {
+    int x;
+} Opaque;
+
 /* Function declarations.
 
 *** If you add a new test function here,
@@ -98,6 +102,8 @@ PARROT_API void   nci_v(void);
 PARROT_API void   nci_vP(void *);
 PARROT_API void   nci_vpii(Outer *, int, int);
 PARROT_API void   nci_vv(void);
+PARROT_API void   nci_vVi(Opaque**, int);
+PARROT_API void   nci_vp(Opaque*);
 
 
 /* Declarations for callback tests */
@@ -1043,6 +1049,47 @@ nci_vv(void)
 {
     nci_dlvar_int *= 3;
 }
+
+/*
+
+=item C<PARROT_API void
+nci_vVi(Opaque**, int)>
+
+Test an NCI opaque struct out value.
+
+=cut
+
+*/
+
+PARROT_API void
+nci_vVi(Opaque **outOpaque, int x)
+{
+    static Opaque opaque;
+    opaque.x = x;
+    *outOpaque = &opaque;
+}
+
+/*
+
+=item C<PARROT_API int
+nci_vp(Opaque*)>
+
+Test that a previously generated opaque struct gets passed back
+to an NCI function correctly.
+
+=cut
+
+*/
+
+PARROT_API void
+nci_vp(Opaque *inOpaque)
+{
+    if (inOpaque)
+        printf("got %d\n", inOpaque->x);
+    else
+        printf("got null");
+}
+
 
 #ifdef TEST
 

@@ -82,6 +82,7 @@ my %proto_type = (
     B   => "void **",
     L   => "long *",
     T   => "char **",
+    V   => "void **",
     '@' => "PMC *",           # slurpy array
 );
 
@@ -186,6 +187,7 @@ my %sig_char = (
     N   => "N",
     B   => "S",
     v   => "v",
+    V   => "P",
     J   => "",
     '@' => '@',
 );
@@ -438,6 +440,11 @@ sub make_arg {
         push @{$temps_ref},          "PMC *t_$temp_num;";
         push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_P($reg_num);";
         return "PMC_data(t_$temp_num)";
+    };
+    /V/ && do {
+        push @{$temps_ref},          "PMC *t_$temp_num;";
+        push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_P($reg_num);";
+        return "(void**)&PMC_data(t_$temp_num)";
     };
     /i/ && do {
         push @{$temps_ref},          "int t_$temp_num;";
