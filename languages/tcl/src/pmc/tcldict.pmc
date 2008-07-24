@@ -34,24 +34,24 @@ pmclass TclDict
 
 =item C<STRING *get_string()>
 
-Returns the dict as a string. Take advantage of the heavy lifting already present
-in TclList.
+Returns the dict as a string. Take advantage of the heavy lifting already
+present in TclList.
 
 =cut
 
 */
 
     VTABLE STRING* get_string() {
-        PMC *list, *iterator;
+        PMC *list, *iterator, *value;
         STRING *key;
-        PMC *value;
+
         list = pmc_new(INTERP, pmc_type(INTERP, CONST_STRING(INTERP, "TclList")));
-        iterator = VTABLE_get_iter(INTERP, list);
+        iterator = SELF.get_iter();
 
         while (VTABLE_get_bool(INTERP, iterator)) {
                 key = VTABLE_shift_string(INTERP, iterator);
                 VTABLE_push_string(INTERP, list, key);
-                value = VTABLE_get_pmc_keyed_str(INTERP, list, key);
+                value = VTABLE_get_pmc_keyed_str(INTERP, SELF, key);
                 VTABLE_push_string(INTERP, list, VTABLE_get_string(INTERP, value));
         }
         return VTABLE_get_string(INTERP, list);
