@@ -63,7 +63,7 @@ no_match:
   error .= ' "'
   error .= choice
   error .= '": must be '
-  $S1 = __options_to_string(options)
+  $S1 = optionsToString(options)
   error .= $S1
   tcl_error error
 
@@ -73,8 +73,7 @@ ambiguous:
   error .= ' "'
   error .= choice
   error .= '": must be '
-  # $S1 = __options_to_string(partials)  # Now, I like this better...
-  $S1 = __options_to_string(options)
+  $S1 = optionsToString(options)
   error .= $S1
   tcl_error error
 .end
@@ -187,7 +186,7 @@ throw_error:
   $S1 .= ' "-'
   $S1 .= arg
   $S1 .= '": must be '
-  $S2 = __switches_to_string(switches)
+  $S2 = switchesToString(switches)
   $S1 .= $S2
   tcl_error $S1
 loop_next:
@@ -204,7 +203,7 @@ done:
   .return (results)
 .end
 
-.sub __options_to_string
+.sub optionsToString
   .param pmc options
 
   # uncomment this if folks start passing in un-ordered lists...
@@ -240,8 +239,8 @@ done:
   .return (error)
 .end
 
-# Similar to __option_to_string. Refactor??
-.sub __switches_to_string
+# Similar to optionsToString. Refactor??
+.sub switchesToString
   .param pmc switches
 
   # uncomment this if folks start passing in un-ordered lists...

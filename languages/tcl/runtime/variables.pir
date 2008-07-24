@@ -307,7 +307,7 @@ absolute_global:
   absolute = 1
 global_var:
   depth += 2
-  ns = __namespace(name, depth)
+  ns = splitNamespace(name, depth)
   $S0 = pop ns
   $S0 = '$' . $S0
 
@@ -393,7 +393,7 @@ lexical_is_null:
 
 global_var:
   depth += 2
-  ns = __namespace(name, depth)
+  ns = splitNamespace(name, depth)
   name = pop ns
   name = '$' . name
 

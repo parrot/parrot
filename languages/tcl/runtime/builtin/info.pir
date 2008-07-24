@@ -77,12 +77,12 @@ bad_subcommand:
   .local string procname
   procname = shift argv
 
-  .local pmc __namespace
-  __namespace = get_root_global ['_tcl'], '__namespace'
+  .local pmc splitNamespace
+  splitNamespace = get_root_global ['_tcl'], 'splitNamespace'
 
   .local pmc    ns
   .local string name
-  ns   = __namespace(procname)
+  ns   = splitNamespace(procname)
   name = pop ns
   name = '&' . name
 
@@ -116,12 +116,12 @@ bad_args:
   .local string procname
   procname = argv[0]
 
-  .local pmc __namespace
-  __namespace = get_root_global ['_tcl'], '__namespace'
+  .local pmc splitNamespace
+  splitNamespace = get_root_global ['_tcl'], 'splitNamespace'
 
   .local pmc    ns
   .local string name
-  ns   = __namespace(procname)
+  ns   = splitNamespace(procname)
   name = pop ns
   name = '&' . name
 
@@ -186,12 +186,12 @@ bad_args:
   .local pmc setVar
   setVar = get_root_global ['_tcl'], 'setVar'
 
-  .local pmc __namespace
-  __namespace = get_root_global ['_tcl'], '__namespace'
+  .local pmc splitNamespace
+  splitNamespace = get_root_global ['_tcl'], 'splitNamespace'
 
   .local pmc    ns
   .local string name
-  ns   = __namespace(procname)
+  ns   = splitNamespace(procname)
   name = pop ns
   name = '&' . name
 

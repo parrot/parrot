@@ -21,11 +21,11 @@ Create a PIR sub on the fly for this user defined proc.
   args      = argv[1]
   body      = argv[2]
 
-  .local pmc pir_compiler, compileTcl, toList, __namespace
+  .local pmc pir_compiler, compileTcl, toList, splitNamespace
   pir_compiler = compreg 'PIR'
   compileTcl     = get_root_global ['_tcl'], 'compileTcl'
   toList       = get_root_global ['_tcl'], 'toList'
-  __namespace  = get_root_global ['_tcl'], '__namespace'
+  splitNamespace  = get_root_global ['_tcl'], 'splitNamespace'
 
   .local pmc code, args_code, defaults
   .local string namespace
@@ -41,7 +41,7 @@ Create a PIR sub on the fly for this user defined proc.
 
   if full_name == '' goto create
 
-  ns   = __namespace(full_name, 1)
+  ns   = splitNamespace(full_name, 1)
   $I0  = elements ns
   if $I0 == 0 goto create
   name = pop ns

@@ -35,10 +35,10 @@
     astgrammar = new 'TclExpr::PAST::Grammar'
     pirgrammar = new 'TclExpr::PIR::Grammar'
 
-    .local pmc __namespace, ns
+    .local pmc splitNamespace, ns
     .local string namespace
-    __namespace = get_root_global ['_tcl'], '__namespace'
-    ns          = __namespace('', 2)
+    splitNamespace = get_root_global ['_tcl'], 'splitNamespace'
+    ns          = splitNamespace('', 2)
     namespace   = ''
     $I0 = elements ns
     if $I0 == 0 goto loop

@@ -475,13 +475,13 @@ END_PIR
     tcl_error $S0
 .end
 
-=head2 _Tcl::__namespace
+=head2 _Tcl::splitNamespace
 
 Given a string namespace, return an array of names.
 
 =cut
 
-.sub __namespace
+.sub splitNamespace
   .param string name
   .param int    depth     :optional
   .param int    has_depth :opt_flag

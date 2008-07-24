@@ -87,7 +87,7 @@ restore_chain_end:
 
   .local pmc ns
   .local string name
-  ns   = __namespace(new_var, 1)
+  ns   = splitNamespace(new_var, 1)
   name = pop ns
   name = '$' . name
 

@@ -76,9 +76,9 @@ no_args:
   argc = argv
   if argc goto bad_args
 
-  .local pmc ns, __namespace
-  __namespace = get_root_global ['_tcl'], '__namespace'
-  ns  = __namespace('')
+  .local pmc ns, splitNamespace
+  splitNamespace = get_root_global ['_tcl'], 'splitNamespace'
+  ns  = splitNamespace('')
   $S0 = join '::', ns
   $S0 = '::' . $S0
   .return($S0)
@@ -95,15 +95,15 @@ bad_args:
   # no arg delete does nothing
   if argc == 0 goto return
 
-  .local pmc __namespace, ns_root
-  __namespace = get_root_global ['_tcl'], '__namespace'
+  .local pmc splitNamespace, ns_root
+  splitNamespace = get_root_global ['_tcl'], 'splitNamespace'
   ns_root = get_root_namespace ['tcl']
 
   $I0 = 0
 delete_loop:
   if $I0 == argc goto return
   $S0 = argv[$I0]
-  $P0 = __namespace($S0)
+  $P0 = splitNamespace($S0)
   $I1 = 0
   $I2 = elements $P0
   dec $I2
@@ -245,11 +245,11 @@ bad_args:
   unshift $P0, 'namespace'
   unshift info_level, $P0
 
-  .local pmc ns, __namespace
-  __namespace = get_root_global ['_tcl'], '__namespace'
+  .local pmc ns, splitNamespace
+  splitNamespace = get_root_global ['_tcl'], 'splitNamespace'
 
   ns = shift argv
-  ns = __namespace(ns, 1)
+  ns = splitNamespace(ns, 1)
 
   .local string namespace
   namespace = ''
@@ -322,15 +322,15 @@ iterate:
   .local pmc list
   list = new 'TclList'
 
-  .local pmc __namespace, ns, ns_name
+  .local pmc splitNamespace, ns, ns_name
   .local string name
-  __namespace = get_root_global ['_tcl'], '__namespace'
+  splitNamespace = get_root_global ['_tcl'], 'splitNamespace'
   name = ''
   if argc == 0 goto getname
 
   name = argv[0]
 getname:
-  ns_name  = __namespace(name, 1)
+  ns_name  = splitNamespace(name, 1)
 
   unshift ns_name, 'tcl'
   ns = get_root_namespace ns_name
@@ -450,9 +450,9 @@ b_first:
   name = argv[0]
 
 get_parent:
-  .local pmc ns, __namespace
-  __namespace = get_root_global ['_tcl'], '__namespace'
-  ns  = __namespace(name)
+  .local pmc ns, splitNamespace
+  splitNamespace = get_root_global ['_tcl'], 'splitNamespace'
+  ns  = splitNamespace(name)
   if $S0 != '' goto no_pop
   # for when someone calls [namespace current] from ::
   push_eh current_in_root

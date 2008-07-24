@@ -11,10 +11,10 @@
     argc = elements argv
     if argc == 0 goto bad_args
 
-    .local pmc findVar, storeVar, __namespace
+    .local pmc findVar, storeVar, splitNamespace
     findVar  = get_root_global ['_tcl'], 'findVar'
     storeVar = get_root_global ['_tcl'], 'storeVar'
-    __namespace = get_root_global ['_tcl'], '__namespace'
+    splitNamespace = get_root_global ['_tcl'], 'splitNamespace'
 
     .local pmc iter, name, value, ns
     iter = new 'Iterator', argv
@@ -37,7 +37,7 @@ store:
     unless iter goto no_value
     value = shift iter
 
-    ns = __namespace(name)
+    ns = splitNamespace(name)
     $S0 = ns[-1]
     # store as a lexical *and* a global
     storeVar($S0, value)
@@ -45,7 +45,7 @@ store:
     goto loop
 
 no_value:
-    ns = __namespace(name)
+    ns = splitNamespace(name)
     $S0 = ns[-1]
     # if the variable exists, just insert it as a lexical
     # otherwise, create a new Undef and insert it as both lexical and global
