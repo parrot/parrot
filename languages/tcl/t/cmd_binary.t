@@ -10,7 +10,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 2 ; # was 14, skipping the last 12 tests.
+plan 14
 
 eval_is {binary} {wrong # args: should be "binary option ?arg arg ...?"} \
   {binary: no args}
@@ -18,23 +18,20 @@ eval_is {binary} {wrong # args: should be "binary option ?arg arg ...?"} \
 eval_is {binary foo} {bad option "foo": must be format or scan} \
   {binary: bad subcommand}
 
-
 # we test the default precision (which is special) elsewhere
 # so just set a precision to work around a bug
 set tcl_precision 17
 
-exit; # $d isn't getting set here, which kills the rest of the tests...
-
 binary scan [binary format dccc -1.3 6 7 8] dcc* d c c*
-is $d    -1.3  {binary: reversible d}
-is $c       6  {binary: reversible c}
-is ${c*} {7 8} {binary: scan [format cc] c*}
+is $d    -1.3  {binary: reversible d} {TODO borked}
+is $c       6  {binary: reversible c} {TODO borked}
+is ${c*} {7 8} {binary: scan [format cc] c*} {TODO borked}
 
 binary scan [binary format f -1.3] f f
-is $f -1.2999999523162842  {binary: reversible f}
+is $f -1.2999999523162842  {binary: reversible f} {TODO borked}
 
 binary scan [binary format n 9] n n
-is $n 9 {binary: reversible n}
+is $n 9 {binary: reversible n} {TODO borked}
 
 binary scan {foo bar} aa* first rest
 is [list $first $rest] {f {oo bar}} {binary: scan aa*}
@@ -51,4 +48,4 @@ is $c       0   {binary: format a4a, scan a3ca}
 is $string2 b   {binary: format a4a, scan a3ca}
 
 # segfault misc.
-is [proc a {} { binary scan \x80 d joe } ; a] {} {BOOM?}
+is [proc a {} { binary scan \x80 d joe } ; a] {0} {BOOM?} {TODO borked}
