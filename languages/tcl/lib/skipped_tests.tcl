@@ -1,11 +1,21 @@
 # skipped_tests - these are all the tests that the partcl implementation
-# cannot pass. Some of the tests cause harness failures (see RT#40716),
-# others simply require some functionality that we haven't implemented yet.
+# not only cannot pass, but cannot compile, or causes a parrot segfault, etc.
+#
+# todo_tests - these are the tests that are known to fail because they
+# require a feature we haven't implemented yet. 
 #
 # stored as a dictionary, with the reason as a key, and the list of tests
 # that require the feature (or cause the listed error) as values.
 
-set skipped_tests [dict create \
+set todo_tests [dict create \
+  {list to string improvements} {
+    list-1.12 list-1.13 list-1.26
+  } {parsing errors} {
+    list-1.15 list-1.16
+  }
+]
+
+set skip_tests [dict create \
   {[binary]} {
     string-5.14 string-5.15 string-5.16 string-12.21
     stringComp-5.14 stringComp-5.15 stringComp-5.16 stringComp-9.7

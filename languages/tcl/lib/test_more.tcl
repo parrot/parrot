@@ -121,29 +121,45 @@ proc diag {diagnostic} {
 
 # A placeholder that simulates the real tcltest's exported test proc.
 proc test {num description args} {
-    global skipped_tests
+    global skip_tests
+    global todo_tests
     global abort_after
-    if {![info exists skipped_tests]} {
+    if {![info exists skip_tests]} {
         # get listing of all the tests we can't run.
         source lib/skipped_tests.tcl
     }
 
     set full_desc "$num $description"
 
-    set should_skip [dict filter $skipped_tests script {K V} {
+    set should_skip [dict filter $skip_tests script {K V} {
         set val [lsearch -exact $V $num]
         expr {$val != -1}
     }]
 
-    set reason [dict keys $should_skip]
+    set skip_reason [dict keys $should_skip]
 
-    if {[string length $reason]} {
-        pass $full_desc [list SKIP $reason]
+    set should_todo [dict filter $todo_tests script {K V} {
+        set val [lsearch -exact $V $num]
+        expr {$val != -1}
+    }]
+
+    set todo_reason [dict keys $should_todo]
+
+    if {[string length $skip_reason]} {
+        pass $full_desc [list SKIP $skip_reason]
     } elseif {[llength $args] == 2} {
-        eval_is [lindex $args 0] [lindex $args 1] $full_desc
+        if {[string length $todo_reason]} {
+          eval_is [lindex $args 0] [lindex $args 1] $full_desc "TODO {$todo_reason}"
+	} else {
+          eval_is [lindex $args 0] [lindex $args 1] $full_desc
+	}
     } elseif {[llength $args] == 3} {
         # XXX : we're just skipping the constraint here...
-        eval_is [lindex $args 1] [lindex $args 2] $full_desc
+        if {[string length $todo_reason]} {
+          eval_is [lindex $args 1] [lindex $args 2] $full_desc "TODO {$todo_reason}"
+	} else {
+          eval_is [lindex $args 1] [lindex $args 2] $full_desc
+	}
     } else {
         # Skip test if too many or two few args.
         pass $full_desc [list SKIP {can't deal with this version of test yet}]
