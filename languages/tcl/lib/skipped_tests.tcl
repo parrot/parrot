@@ -12,6 +12,17 @@ set todo_tests [dict create \
     list-1.12 list-1.13 list-1.26
   } {parsing errors} {
     list-1.15 list-1.16
+  } {[trace]} {
+    append-7.1     append-7.2     append-7.3     append-7.4     append-7.5
+    appendComp-7.1 appendComp-7.2 appendComp-7.3 appendComp-7.4 appendComp-7.5
+    appendComp-7.6 appendComp-7.7 appendComp-7.8 appendComp-7.9
+    if-10.6
+    lset-1.3       lset-5.1       lset-5.2
+  } {stacktrace support} {
+    if-5.3 if-6.4
+  } {tcltest: need better [testevalex]} {
+    lset-2.2  lset-7.1  lset-7.2  lset-10.3  lset-13.0  lset-13.1  lset-13.2
+    lset-14.1 lset-14.2
   }
 ]
 
@@ -24,11 +35,6 @@ set skip_tests [dict create \
   } {[subst]} {
     parse-18.9 parse-18.12
   } {[trace]} {
-    append-7.1 append-7.2 append-7.3 append-7.4 append-7.5
-    appendComp-7.1 appendComp-7.2 appendComp-7.3 appendComp-7.4 appendComp-7.5
-    appendComp-7.6 appendComp-7.7 appendComp-7.8 appendComp-7.9
-    if-10.6
-    lset-1.3 lset-5.1 lset-5.2
   } {stacktrace support} {
     apply-2.2 apply-2.3 apply-2.4 apply-2.5 apply-5.1
     basic-46.1
@@ -37,7 +43,6 @@ set skip_tests [dict create \
     error-1.3 error-2.3 error-2.6 error-4.2 error-4.3 error-4.4
     eval-2.5
     iocmd-12.6
-    if-5.3 if-6.4
     incr-2.30 incr-2.31
     incr-old-2.4 incr-old-2.5
     misc-1.2
