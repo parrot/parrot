@@ -50,14 +50,19 @@ got_type_name:
 
 check_partial:
   $I1 = elements partials
-  if $I1 == 0 goto no_match
-  if $I1 >1 goto ambiguous
+  if type_name == 'subcommand' goto check_subcommand
+  if $I1 == 0 goto no_match_option
+  if $I1 >1 goto ambiguous_option
+  option = partials[0]
+
+check_subcommand:
+  if $I1 != 1 goto unknown_subcommand
   option = partials[0]
 
 got_match:
   .return (option)
 
-no_match:
+no_match_option:
   error = 'bad '
   error .= type_name
   error .= ' "'
@@ -67,8 +72,18 @@ no_match:
   error .= $S1
   tcl_error error
 
-ambiguous:
+ambiguous_option:
   error = 'ambiguous '
+  error .= type_name
+  error .= ' "'
+  error .= choice
+  error .= '": must be '
+  $S1 = optionsToString(options)
+  error .= $S1
+  tcl_error error
+
+unknown_subcommand:
+  error = 'unknown or ambiguous '
   error .= type_name
   error .= ' "'
   error .= choice
