@@ -88,7 +88,7 @@ set skipped_tests [dict create \
     namespace-27.2 namespace-27.3
   } {nested dictionaries} {
     dict-3.5 dict-3.6 dict-3.7 dict-3.8 dict-3.9 dict-3.10 dict-9.3 dict-9.4
-    dict-9.5 dict-15.3 dict-15.5 dict-16.4
+    dict-9.5 dict-15.3 dict-15.5 dict-16.4 dict-21.16
   } {support for the variable named ""} {
     var-6.3 var-7.12 var-12.1
   } {Cannot get character past end of string} {
