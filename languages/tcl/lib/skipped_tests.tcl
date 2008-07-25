@@ -25,10 +25,12 @@ set todo_tests [dict create \
     incr-2.3[01]
     incr-old-2.[45]
     set-[24].1
+    switch-4.[15]
     while-old-4.6
-  } {tcltest} {
-    lset-2.2 lset-7.[12] lset-10.3 lset-13.[012] lset-14.[12] # testevalex
-    set-5.1 # testset2 
+  } {tcltest - testevalex} {
+    lset-2.2 lset-7.[12] lset-10.3 lset-13.[012] lset-14.[12]
+  } {tcltest - testset2} {
+    set-5.1
   } {[apply]} {
     apply-[4678].*
   } {http://code.google.com/p/partcl/issues/detail?id=2} {
@@ -38,6 +40,7 @@ set todo_tests [dict create \
     subst-5.[89] subst-5.10
   } {better switch handling} {
     subst-7.[27]
+    switch-3.1[234]
   } {[incr] should autovivify} {
     incr-1.13 incr-1.26 incr-2.13 incr-2.26 incr-old-2.3
   } {[expr wide()]} {
@@ -46,7 +49,11 @@ set todo_tests [dict create \
 ]
 
 set skip_tests [dict create \
-  {[binary]} {
+  {RT #57260 - segfault} {
+    format-3.1 format-3.2
+  } BOOM {
+    namespace-7.7
+  } {[binary]} {
     string-5.14 string-5.15 string-5.16 string-12.21
     stringComp-5.14 stringComp-5.15 stringComp-5.16 stringComp-9.7
   } {[subst]} {
@@ -65,17 +72,12 @@ set skip_tests [dict create \
     parseOld-10.14
     proc-old-5.13 proc-old-5.16 proc-old-7.2  proc-old-7.11 proc-old-7.12
     proc-old-7.13 proc-old-7.14
-    switch-4.1 switch-4.5
   } {[interp]} {
     basic-11.1 basic-12.1 basic-12.2 basic-13.1 basic-13.2 basic-24.1
     basic-1.1 basic-10.1 basic-36.1
     namespace-8.7
   } {[file]} {
     cmdAH-2.2 cmdAH-2.3 cmdAH-2.4 cmdAH-2.5 cmdAH-2.6 cmdAH-2.6.1 cmdAH-2.6.2
-  } BOOM {
-    format-3.1 format-3.2
-    namespace-old-2.5 namespace-old-2.6 namespace-old-2.7 namespace-old-4.4
-    namespace-old-7.7
   } {[expr wide()]} {
     dict-11.1 dict-11.2 dict-11.3 dict-11.4 dict-11.5 dict-11.6 dict-11.7
     expr-23.24 expr-23.25 expr-23.26 expr-23.27 expr-23.28 expr-23.29
