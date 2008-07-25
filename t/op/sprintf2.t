@@ -1,6 +1,6 @@
 #!perl
 # Copyright (C) 2001-2008, The Perl Foundation.
-# $Id: sprintf2.t $
+# $Id$
 
 use strict;
 use warnings;
