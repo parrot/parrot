@@ -49,9 +49,7 @@ set todo_tests [dict create \
 ]
 
 set skip_tests [dict create \
-  {RT #57260 - segfault} {
-    format-3.1 format-3.2
-  } BOOM {
+  BOOM {
     namespace-7.7
   } {[binary]} {
     string-5.14 string-5.15 string-5.16 string-12.21
