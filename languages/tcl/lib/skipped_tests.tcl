@@ -21,13 +21,27 @@ set todo_tests [dict create \
     lset-1.3 lset-5.[12]
   } {stacktrace support} {
     apply-2.[2345] apply-5.1
-    if-5.3    if-6.4
+    if-5.3 if-6.4
+    incr-2.3[01]
+    incr-old-2.[45]
     set-[24].1
+    while-old-4.6
   } {tcltest} {
     lset-2.2 lset-7.[12] lset-10.3 lset-13.[012] lset-14.[12] # testevalex
     set-5.1 # testset2 
   } {[apply]} {
     apply-[4678].*
+  } {http://code.google.com/p/partcl/issues/detail?id=2} {
+    subst-5.7 subst-8.[123459] subst-10.[456] subst-10.[123] subst-11.[1236]
+    subst-12.[34]
+  } {[exec]} {
+    subst-5.[89] subst-5.10
+  } {better switch handling} {
+    subst-7.[27]
+  } {[incr] should autovivify} {
+    incr-1.13 incr-1.26 incr-2.13 incr-2.26 incr-old-2.3
+  } {[expr wide()]} {
+    incr-3.[12]
   }
 ]
 
@@ -35,11 +49,8 @@ set skip_tests [dict create \
   {[binary]} {
     string-5.14 string-5.15 string-5.16 string-12.21
     stringComp-5.14 stringComp-5.15 stringComp-5.16 stringComp-9.7
-  } {[exec]} {
-    subst-5.8 subst-5.9 subst-5.10
   } {[subst]} {
     parse-18.9 parse-18.12
-  } {[trace]} {
   } {stacktrace support} {
     basic-46.1
     cmdMZ-return-2.10 cmdMZ-3.5 cmdMZ-5.7
@@ -47,8 +58,6 @@ set skip_tests [dict create \
     error-1.3 error-2.3 error-2.6 error-4.2 error-4.3 error-4.4
     eval-2.5
     iocmd-12.6
-    incr-2.30 incr-2.31
-    incr-old-2.4 incr-old-2.5
     misc-1.2
     namespace-8.5 namespace-8.6 namespace-25.6 namespace-25.7 namespace-25.8
     namespace-47.2 namespace-47.4 namespace-47.6 namespace-46.5
@@ -57,10 +66,6 @@ set skip_tests [dict create \
     proc-old-5.13 proc-old-5.16 proc-old-7.2  proc-old-7.11 proc-old-7.12
     proc-old-7.13 proc-old-7.14
     switch-4.1 switch-4.5
-    while-4.3
-    while-old-4.6
-  } {http://code.google.com/p/partcl/issues/detail?id=2} {
-    subst-5.7
   } {[interp]} {
     basic-11.1 basic-12.1 basic-12.2 basic-13.1 basic-13.2 basic-24.1
     basic-1.1 basic-10.1 basic-36.1
