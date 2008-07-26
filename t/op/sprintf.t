@@ -351,6 +351,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
     skip_info[233] = 'harness needs support for * modifier'
     skip_info[234] = 'perl5-specific extension (%v...)'
     skip_info[235] = 'perl5-specific extension (%v...)'
+    skip_info[300] = 'harness needs support for * modifier'
 
     $S0 = 'perl5-specific test'
     $I0 = 238

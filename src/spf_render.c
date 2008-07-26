@@ -501,7 +501,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                             else {
                                 info.width = num;
                             }
-                            /* fall through */
+                            continue;
 
                         case '.':
                             info.phase = PHASE_PREC;

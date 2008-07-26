@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 4;
+use Parrot::Test;
 
 =head1 NAME
 
@@ -23,62 +23,33 @@ Executes sprintf tests that sprintf.t can't handle yet.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'positive length' );
-.sub main
-    $P0 = new 'ResizableIntegerArray'
-    push $P0, 4
-    push $P0, 12
-    $S0 = sprintf "<%*d>", $P0
-    say $S0
-.end
-CODE
-<  12>
-OUTPUT
+# [ 'format', [arguments], "expected output", 'description' ]
+my @tests = (
+  [ '<%*d>', [4,12], "<  12>\n", 'positive length' ],
+  [ '<%*d>', [-4,12], "<12  >\n", 'negative length' ],
+  [ '<%-*d>', [4,12], "<12  >\n", 'minus option, positive length' ],
+  [ '|%c|%0c|%-1c|%1c|%-6c|%6c|%*c|%*c|', [65,65,65,65,65,65,3,65,-4,65],
+    "|A|A|A|A|A     |     A|  A|A   |\n", 'misc w/ minus option' ],
+  [ '<%*s>', [4,'"hi"'], "<  hi>\n", 'string, positive length' ],
+  [ '<%*s>', [-4,'"hi"'], "<hi  >\n", 'string, negative length' ],
+  [ '<%-*s>', [4,'"hi"'], "<hi  >\n", 'string, minus flag' ],
+  [ '<%*.*f>', [7,2,123.456], "< 123.46>\n", 'float length&prec' ],
+  [ '<%*.*f>', [-7,2,123.456], "<123.46 >\n", 'float -length&prec' ],
+);
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'negative length' );
-.sub main
-    $P0 = new 'ResizableIntegerArray'
-    push $P0, -4
-    push $P0, 12
-    $S0 = sprintf "<%*d>", $P0
-    say $S0
-.end
-CODE
-<12  >
-OUTPUT
+plan tests => scalar @tests;
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'minus option, positive length' );
-.sub main
-    $P0 = new 'ResizableIntegerArray'
-    push $P0, 4
-    push $P0, 12
-    $S0 = sprintf "<%-*d>", $P0
-    say $S0
-.end
-CODE
-<12  >
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', 'misc w/ minus option' );
-.sub main
-    $P0 = new 'ResizableIntegerArray'
-    push $P0, 65
-    push $P0, 65
-    push $P0, 65
-    push $P0, 65
-    push $P0, 65
-    push $P0, 65
-    push $P0, 3
-    push $P0, 65
-    push $P0, -4
-    push $P0, 65
-
-    $S0 = sprintf "|%c|%0c|%-1c|%1c|%-6c|%6c|%*c|%*c|", $P0
-    say $S0
-.end
-CODE
-|A|A|A|A|A     |     A|  A|A   |
-OUTPUT
+foreach my $test (@tests) {
+  my $code = ".sub main\n"
+           . "  \$P0 = new 'ResizablePMCArray'\n";
+  foreach my $arg (@{$$test[1]}) {
+    $code .= "  push \$P0,$arg\n";
+  }
+  $code .= "  \$S0 = sprintf '$$test[0]', \$P0\n"
+        .  "  say \$S0\n"
+        .  ".end\n";
+  pir_output_is( $code, $$test[2], $$test[3] );
+}
 
 # Local Variables:
 #   mode: cperl
