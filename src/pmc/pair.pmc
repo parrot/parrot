@@ -19,14 +19,11 @@ A Pair PMC represents one key => value mapping like a one element hash.
 */
 
 #include "parrot/parrot.h"
-
-#define PObj_key_is_string_SET(p) \
-    PObj_get_FLAGS(p) |= PObj_private0_FLAG
-
-#define PObj_key_is_string_TEST(p) \
-    PObj_get_FLAGS(p) & PObj_private0_FLAG
+#include "pmc_pair.h"
 
 pmclass Pair need_ext {
+    ATTR PMC *key;
+    ATTR PMC *value;
 
 /*
 
@@ -43,8 +40,7 @@ Class method to construct an Integer according to passed arguments.
 */
 
     VTABLE void init() {
-        PMC_struct_val(SELF) = NULL;  /* key */
-        PMC_pmc_val(SELF)    = NULL;  /* value */
+        PMC_data(SELF) = mem_allocate_zeroed_typed(Parrot_Pair);
         PObj_custom_mark_SET(SELF);
     }
 
@@ -53,19 +49,20 @@ Class method to construct an Integer according to passed arguments.
 
         /* TODO -- really create this thing */
 #if 0
-        PMC * const _class = REG_PMC(interp, 2);
-        const int argcP = REG_INT(interp, 3);
-        const int argcS = REG_INT(interp, 2);
+        PMC * const  _class = REG_PMC(interp, 2);
+        Parrot_Pair *pair   = PARROT_PAIR(SELF);
+        const int    argcP  = REG_INT(interp, 3);
+        const int    argcS  = REG_INT(interp, 2);
 
         SELF = pmc_new(INTERP, _class->vtable->base_type);
         if (argcS == 1 && argcP == 1) {
-            PMC_struct_val(SELF) = REG_STR(interp, 5);
             PObj_key_is_string_SET(SELF);
-            PMC_pmc_val(SELF) = REG_PMC(interp, 5);
+            pair->key   = REG_STR(interp, 5);
+            pair->value = REG_PMC(interp, 5);
         }
         else if (argcP == 2) {
-            PMC_struct_val(SELF) = REG_PMC(interp, 5);
-            PMC_pmc_val(SELF) = REG_PMC(interp, 6);
+            pair->key   = REG_PMC(interp, 5);
+            pair->value = REG_PMC(interp, 6);
         }
         else
             real_exception(INTERP, NULL, E_ValueError,
@@ -84,11 +81,13 @@ Marks the hash as live.
 */
 
     VTABLE void mark() {
-        if (PMC_struct_val(SELF))
-            pobject_lives(INTERP, (PObj *)PMC_struct_val(SELF));
+        Parrot_Pair * const pair = PARROT_PAIR(SELF);
 
-        if (PMC_pmc_val(SELF))
-            pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
+        if (pair->key)
+            pobject_lives(INTERP, (PObj *)pair->key);
+
+        if (pair->value)
+            pobject_lives(INTERP, (PObj *)pair->value);
     }
 
 /*
@@ -102,13 +101,15 @@ Marks the hash as live.
 */
 
     VTABLE PMC *get_pmc_keyed_str(STRING *key) {
+        Parrot_Pair * const pair = PARROT_PAIR(SELF);
         /* check key ? */
-        return PMC_pmc_val(SELF);
+        return pair->value;
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
+        Parrot_Pair * const pair = PARROT_PAIR(SELF);
         /* check key ? */
-        return PMC_pmc_val(SELF);
+        return pair->value;
     }
 
 /*
@@ -128,25 +129,35 @@ Set the value of the Pair.
 */
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
-        if (PMC_struct_val(SELF))
+        Parrot_Pair * const pair = PARROT_PAIR(SELF);
+
+        if (pair->key)
             real_exception(INTERP, NULL, E_IndexError,
                     "attempt to set existing Pair key");
-        PMC_struct_val(SELF) = key;
-        PMC_pmc_val(SELF)    = value;
+
+        pair->key   = key;
+        pair->value = value;
     }
 
 
     VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
-        if (PMC_struct_val(SELF))
+        Parrot_Pair * const pair = PARROT_PAIR(SELF);
+        PMC                *key_pmc;
+
+        if (pair->key)
             real_exception(INTERP, NULL, E_IndexError,
                     "attempt to set existing Pair key");
-        PObj_key_is_string_SET(SELF);
-        PMC_struct_val(SELF) = key;
-        PMC_pmc_val(SELF)    = value;
+
+        key_pmc = pmc_new(interp, enum_class_String);
+        VTABLE_set_string_native(interp, key_pmc, key);
+
+        pair->key   = key_pmc;
+        pair->value = value;
     }
 
     VTABLE void assign_pmc(PMC *value) {
-        PMC_pmc_val(SELF) = value;
+        Parrot_Pair * const pair = PARROT_PAIR(SELF);
+        pair->value              = value;
     }
 
 /*
@@ -161,15 +172,15 @@ Sets this pair to hold the value of another.
 
     void set_pmc(PMC *pair) {
         if (pair->vtable->base_type == enum_class_Pair) {
-            PMC_struct_val(SELF) = PMC_struct_val(pair);
-            PMC_pmc_val(SELF)    = PMC_pmc_val(pair);
-            if (PObj_key_is_string_TEST(pair))
-                PObj_key_is_string_SET(SELF);
+            Parrot_Pair * const from = PARROT_PAIR(SELF);
+            Parrot_Pair * const to   = PARROT_PAIR(SELF);
+
+            to->key   = from->key;
+            to->value = from->value;
         }
-        else {
+        else
             real_exception(INTERP, NULL, INVALID_OPERATION,
                            "Can only set a pair to another pair.");
-        }
     }
 
 /*
@@ -185,40 +196,22 @@ Check if two Pairs hold the same keys and values.
 */
 
     VTABLE INTVAL is_equal(PMC *value) {
-        STRING *s1, *s2;
-        PMC *k1, *k2, *p1, *p2;
+        Parrot_Pair * const from = PARROT_PAIR(SELF);
+        Parrot_Pair * const to   = PARROT_PAIR(SELF);
+        PMC *p1, *p2;
+        PMC *k1, *k2;
 
         if (value->vtable->base_type != SELF->vtable->base_type)
             return 0;
 
-        s1 = (STRING *)PMC_struct_val(SELF);
-        s2 = (STRING *)PMC_struct_val(value);
-
-        if (PObj_key_is_string_TEST(SELF) && PObj_key_is_string_TEST(value)) {
-            if (string_equal(INTERP, s1, s2))
-                return 0;
-        }
-
-        if (PObj_key_is_string_TEST(SELF)) {
-            k1              = pmc_new(INTERP, enum_class_String);
-            PMC_str_val(k1) = (STRING *)PMC_struct_val(SELF);
-        }
-        else
-            k1 = (PMC *)PMC_struct_val(SELF);
-
-        if (PObj_key_is_string_TEST(value)) {
-            k2              = pmc_new(INTERP, enum_class_String);
-            PMC_str_val(k2) = (STRING *)PMC_struct_val(value);
-        }
-
-        else
-            k2 = (PMC *)PMC_struct_val(value);
+        k1 = from->key;
+        k2 = to->key;
 
         if (!mmd_dispatch_i_pp(INTERP, k1, k2, MMD_EQ))
             return 0;
 
-        p1 = PMC_pmc_val(SELF);
-        p2 = PMC_pmc_val(value);
+        p1 = from->value;
+        p2 = to->value;
 
         if (!p1 && !p2)
             return 1;
@@ -227,6 +220,7 @@ Check if two Pairs hold the same keys and values.
     }
 
 /*
+
 =item C<void visit(visit_info *info)>
 
 Used during archiving to visit the elements in the pair.
@@ -244,21 +238,14 @@ Used to unarchive the Pair.
 */
 
     VTABLE void visit(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
-        PMC **pos;
+        PMC               **pos;
+        Parrot_Pair * const pair     = PARROT_PAIR(SELF);
+        IMAGE_IO    * const io       = info->image_io;
+        DPOINTER   ** const temp_pos = (DPOINTER **)pair->key;
+        info->thaw_ptr               = (PMC **)temp_pos;
+        (info->visit_pmc_now)(INTERP, (PMC *)temp_pos, info);
 
-        VTABLE_push_integer(INTERP, io, PObj_key_is_string_TEST(SELF));
-
-        if (PObj_key_is_string_TEST(SELF)) {
-            VTABLE_push_string(INTERP, io, (STRING *)PMC_struct_val(SELF));
-        }
-        else {
-            DPOINTER ** const temp_pos = (DPOINTER **)PMC_struct_val(SELF);
-            info->thaw_ptr             = (PMC **)temp_pos;
-            (info->visit_pmc_now)(INTERP, (PMC *)temp_pos, info);
-        }
-
-        pos            = &PMC_pmc_val(SELF);
+        pos            = &pair->value;
         info->thaw_ptr = pos;
 
         (info->visit_pmc_now)(INTERP, *pos, info);
@@ -267,26 +254,21 @@ Used to unarchive the Pair.
     }
 
     VTABLE void freeze(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
+        Parrot_Pair * const pair = PARROT_PAIR(SELF);
+        IMAGE_IO    * const io   = info->image_io;
         SUPER(info);
-        VTABLE_push_integer(INTERP, io, PObj_key_is_string_TEST(SELF));
-
-        if (PObj_key_is_string_TEST(SELF))
-            VTABLE_push_string(INTERP, io, (STRING *)PMC_struct_val(SELF));
+        VTABLE_push_pmc(INTERP, io, pair->key);
+        VTABLE_push_pmc(INTERP, io, pair->value);
     }
 
     VTABLE void thaw(visit_info *info) {
-        IMAGE_IO * const io = info->image_io;
+        Parrot_Pair * const pair = PARROT_PAIR(SELF);
+        IMAGE_IO    * const io   = info->image_io;
 
         SUPER(info);
 
-        if (info->extra_flags == EXTRA_IS_NULL) {
-            const INTVAL flag = VTABLE_shift_integer(INTERP, io);
-            if (flag) {
-                PObj_key_is_string_SET(SELF);
-                PMC_struct_val(SELF) = VTABLE_shift_string(INTERP, io);
-            }
-        }
+        pair->key   = VTABLE_shift_pmc(interp, io);
+        pair->value = VTABLE_shift_pmc(interp, io);
     }
 /*
 
@@ -305,17 +287,8 @@ Return the key of the pair.
 */
 
     METHOD key() {
-        PMC *key;
-        if (PObj_key_is_string_TEST(SELF)) {
-            key = pmc_new(INTERP,
-                Parrot_get_ctx_HLL_type(INTERP, enum_class_String));
-
-            PMC_str_val(key) = (STRING *)PMC_struct_val(SELF);
-
-        }
-        else {
-            key = (PMC *)PMC_struct_val(SELF);
-        }
+        Parrot_Pair * const pair = PARROT_PAIR(SELF);
+        PMC                *key  = pair->key;
 
         RETURN(PMC *key);
     }
@@ -331,7 +304,8 @@ Return the value of the pair.
 */
 
     METHOD value() {
-        PMC *value = PMC_pmc_val(SELF);
+        Parrot_Pair * const pair  = PARROT_PAIR(SELF);
+        PMC         * const value = pair->value;
         RETURN(PMC *value);
     }
 
@@ -346,18 +320,14 @@ Return a tuple of (key, value) for the pair.
 */
 
     METHOD kv() {
-        PMC * const t = pmc_new(INTERP,
+        Parrot_Pair * const pair = PARROT_PAIR(SELF);
+        PMC         * const t    = pmc_new(INTERP,
             Parrot_get_ctx_HLL_type(INTERP, enum_class_FixedPMCArray));
 
         VTABLE_set_integer_native(INTERP, t, 2);
+        VTABLE_set_pmc_keyed_int(INTERP, t, 0, pair->key);
 
-        if (PObj_key_is_string_TEST(SELF))
-            VTABLE_set_string_keyed_int(INTERP, t, 0,
-                (STRING *)PMC_struct_val(SELF));
-        else
-            VTABLE_set_pmc_keyed_int(INTERP, t, 0, (PMC *)PMC_struct_val(SELF));
-
-        VTABLE_set_pmc_keyed_int(INTERP, t, 1, PMC_pmc_val(SELF));
+        VTABLE_set_pmc_keyed_int(INTERP, t, 1, pair->value);
         RETURN(PMC *t);
     }
 }
