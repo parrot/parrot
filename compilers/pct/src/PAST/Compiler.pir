@@ -614,6 +614,7 @@ Return the POST representation of a C<PAST::Block>.
     ##  handle 'return' exceptions
     $S0 = self.'uniquereg'('P')
     bpost.'push_pirop'('getattribute', $S0, 'exception', '"type"')
+    bpost.'push_pirop'('if_null', $S0, rethrowlabel)
     bpost.'push_pirop'('ne', $S0, .CONTROL_RETURN, rethrowlabel)
     bpost.'push_pirop'('getattribute', $S0, 'exception', '"payload"')
     bpost.'push_pirop'('return', $S0)
