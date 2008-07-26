@@ -879,7 +879,8 @@ $(LIBPARROT_STATIC) : $(O_FILES)
 $(LIBPARROT_SHARED) : $(O_FILES)
 	$(MKPATH) @blib_dir@
 	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) @ld_out@$@ @libparrot_soname@ \
-    $(O_FILES) $(C_LIBS) $(ICU_SHARED)
+#CONDITIONED_LINE(cygchkdll):		-Wl,--out-implib=blib/lib/libparrot.dll.a \
+		$(O_FILES) $(C_LIBS) $(ICU_SHARED)
 #CONDITIONED_LINE(libparrot_shared_alias):	( cd @blib_dir@ ; ln -sf @libparrot_shared@ @libparrot_shared_alias@ )
 
 

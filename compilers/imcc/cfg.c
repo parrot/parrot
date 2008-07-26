@@ -197,7 +197,8 @@ check_invoke_type(PARROT_INTERP, ARGIN(const IMC_Unit    *unit),
 
 =item C<void find_basic_blocks>
 
-RT #48260: Not yet documented!!!
+Finds all basic blocks in the given IMC_Unit, expanding PCC calls if first is
+true.
 
 =cut
 
