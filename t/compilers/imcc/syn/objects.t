@@ -347,12 +347,6 @@ pir_output_is( <<'CODE', <<'OUT', ":vtable implies self (see RT #47674)" );
 .sub bar :method
     print "called bar\n"
 .end
-
-# Local Variables:
-#   mode: pir
-#   fill-column: 100
-# End:
-# vim: expandtab shiftwidth=4: :ft=pir
 CODE
 called bar
 stringy thingy
