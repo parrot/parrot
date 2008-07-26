@@ -110,10 +110,18 @@ F<GLUT for Win32> (L<http://www.xmission.com/~nate/glut.html>)
  XXXX: No details yet
 
 
-=head3 cygwin
+=head3 Cygwin/w32api
 
- XXXX: No details yet
+The Cygwin/w32api for native opengl support
 
+F<-lglut32 -lglu32 -lopengl32>
+
+
+=head3 Cygwin/X
+
+Requires a X server.
+
+F<freeglut>, F<libglut-devel>
 
 =cut
 
@@ -159,15 +167,23 @@ sub runstep {
 
     my $osname = $conf->data->get_p5('OSNAME');
 
-    $self->_add_to_libs( {
-        conf            => $conf,
-        osname          => $osname,
-        cc              => $cc,
-        win32_gcc       => '-lglut32 -lglu32 -lopengl32',
-        win32_nongcc    => 'opengl32.lib glu32.lib glut32.lib',
-        darwin          => '-framework OpenGL -framework GLUT',
-        default         => '-lglut -lGLU -lGL',
-    } );
+    # Prefer Cygwin/w32api over Cygwin/X, but use X when DISPLAY is set
+    if ($^O eq 'cygwin' and $ENV{DISPLAY}) {
+	$self->_add_to_libs( {
+	    conf        => $conf,
+	    osname      => $osname,
+	    cc          => $cc,
+	    cygwin	=> '-lglut -L/usr/X11R6/lib -lGLU -lGL'
+    } ) } else {
+	$self->_add_to_libs( {
+	    conf            => $conf,
+            osname          => $osname,
+            cc              => $cc,
+            win32_gcc       => '-lglut32 -lglu32 -lopengl32',
+            win32_nongcc    => 'opengl32.lib glu32.lib glut32.lib',
+            darwin          => '-framework OpenGL -framework GLUT',
+            default         => '-lglut -lGLU -lGL',
+    } ) };
 
     # On OS X check the presence of the OpenGL headers in the standard
     # Fink/macports locations.
