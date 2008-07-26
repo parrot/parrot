@@ -679,6 +679,10 @@ Returns the result of calling C<type_keyed(key)> on the aggregate.
     VTABLE PMC *get_iter() {
         return SELF;
     }
+
+    METHOD set_key(PMC *key) {
+        PMC_struct_val(SELF) = key;
+    }
 }
 
 /*
