@@ -140,10 +140,11 @@ Make a clone of the iterator.
 */
 
     VTABLE PMC *clone() {
+        STRING     *name    = CONST_STRING(interp, "set_key");
         PMC * const key     = (PMC *)PMC_struct_val(SELF);
         PMC * const res     = pmc_new_init(INTERP, SELF->vtable->base_type,
                                            PMC_pmc_val(SELF));
-        PMC_struct_val(res) = VTABLE_clone(interp, key);
+        Parrot_PCCINVOKE(interp, res, name, "P->", VTABLE_clone(interp, key));
         return res;
     }
 
