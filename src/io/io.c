@@ -1044,7 +1044,8 @@ PIO_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD_NULLOK(STRING *s))
     || !VTABLE_isa(interp, pmc, CONST_STRING(interp, "ParrotIO")))
         real_exception(interp, NULL, PIO_ERROR, "Cannot put to non-PIO PMC");
 
-    PARROT_ASSERT(io);
+    if (!io)
+        real_exception(interp, NULL, PIO_ERROR, "Cannot put to a closed PIO handle");
 
     if (!s)
         return 0;
