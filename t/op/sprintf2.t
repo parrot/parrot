@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 =head1 NAME
 
@@ -59,6 +59,26 @@ CODE
 <12  >
 OUTPUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', 'misc w/ minus option' );
+.sub main
+    $P0 = new 'ResizableIntegerArray'
+    push $P0, 65
+    push $P0, 65
+    push $P0, 65
+    push $P0, 65
+    push $P0, 65
+    push $P0, 65
+    push $P0, 3
+    push $P0, 65
+    push $P0, -4
+    push $P0, 65
+
+    $S0 = sprintf "|%c|%0c|%-1c|%1c|%-6c|%6c|%*c|%*c|", $P0
+    say $S0
+.end
+CODE
+|A|A|A|A|A     |     A|  A|A   |
+OUTPUT
 
 # Local Variables:
 #   mode: cperl
