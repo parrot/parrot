@@ -3,6 +3,8 @@
 
   triangle.lua - Initialize GLUT and render a simple OpenGL animation
 
+  $ ./parrot languages/lua/lua.pbc languages/lua/demo/triangle.lua
+
 ]]
 
 require 'glut'

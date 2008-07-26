@@ -180,7 +180,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
     set argv, 1
     argv[0] = ''
     .const .Sub glutInit = 'glutInit'
-    $P0 = get_global ['NCI'], 'call_toolkit_init'
+    $P0 = get_hll_global ['NCI'], 'call_toolkit_init'
     $P0(glutInit, argv)
 .end
 
