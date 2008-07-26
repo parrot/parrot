@@ -23,18 +23,16 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 .sub '__onload' :anon :load
 #    print "__onload gl\n"
-
-    load_bytecode 'library/OpenGL.pbc'
-
     .const .Sub entry = 'luaopen_gl'
     set_hll_global 'luaopen_gl', entry
 .end
 
 .sub 'luaopen_gl'
 #    print "luaopen_gl\n"
+    load_bytecode 'OpenGL.pir'
 
     # Import all OpenGL/GLU/GLUT functions
-    $P0 = get_global ['OpenGL'], '_export_all_functions'
+    $P0 = get_hll_global ['OpenGL'], '_export_all_functions'
     $P0()
 
     .local pmc _lua__GLOBAL
