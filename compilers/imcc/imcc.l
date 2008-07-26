@@ -552,13 +552,14 @@ SP              [ ]
                 return VAR;
             }
 
-            if (IMCC_INFO(interp)->cur_unit &&
-                IMCC_INFO(interp)->cur_unit->instructions &&
-                (r = IMCC_INFO(interp)->cur_unit->instructions->symregs[0]) &&
-                r->pcc_sub)
+            if (IMCC_INFO(interp)->cur_unit
+            &&  IMCC_INFO(interp)->cur_unit->instructions
+            && (r = IMCC_INFO(interp)->cur_unit->instructions->symregs[0])
+            &&  r->pcc_sub)
             {
-                if ((r->pcc_sub->pragma & P_METHOD) &&
-                    !strcmp(yytext, "self")) {
+                if (((r->pcc_sub->pragma & P_METHOD)
+                ||   (IMCC_INFO(interp)->cur_unit->is_vtable_method))
+                &&   !strcmp(yytext, "self")) {
                     valp->sr = mk_ident(interp, "self", 'P');
                     IMCC_INFO(interp)->cur_unit->type |= IMC_HAS_SELF;
                     return VAR;

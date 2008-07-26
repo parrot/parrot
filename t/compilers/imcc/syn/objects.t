@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 
 ##############################
 # ".namespace" sanity
@@ -327,6 +327,35 @@ pir_output_is( <<'CODE', <<'OUT', "meth call syntax - reserved word" );
 CODE
 in meth
 done
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', ":vtable implies self (see RT #47674)" );
+.sub 'main' :main
+    $P1 = newclass "Foo"
+    $P2 = new "Foo"
+    $S1 = $P2
+    print $S1
+.end
+
+.namespace [ "Foo" ]
+
+.sub 'get_string' :vtable
+    self.'bar'()
+    .return ("stringy thingy\n")
+.end
+
+.sub bar :method
+    print "called bar\n"
+.end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4: :ft=pir
+CODE
+called bar
+stringy thingy
 OUT
 
 # Local Variables:
