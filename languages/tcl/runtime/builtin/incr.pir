@@ -11,12 +11,18 @@
   # get necessary conversion subs
   .local pmc toInteger
   toInteger = get_root_global ['_tcl'], 'toInteger'
-  .local pmc readVar
-  readVar = get_root_global ['_tcl'], 'readVar'
+  .local pmc makeVar
+  makeVar = get_root_global ['_tcl'], 'makeVar'
   .local pmc a_varName
   a_varName = argv[0]
-  a_varName = readVar(a_varName)
-  a_varName = toInteger(a_varName)
+  $P0 = makeVar(a_varName)
+  $S0 = typeof $P0
+  if $S0 != 'Undef' goto got_var
+  .local pmc setVar
+  setVar = get_root_global ['_tcl'], 'setVar'
+  $P0 = setVar(a_varName,0)
+got_var:
+  a_varName = toInteger($P0)
   .local pmc a_increment
   if argc < 2 goto default_increment
   a_increment = argv[1]

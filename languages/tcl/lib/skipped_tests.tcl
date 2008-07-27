@@ -74,8 +74,6 @@ set todo_tests [dict create \
   } {better switch handling} {
     subst-7.[27]
     switch-3.1[234]
-  } {[incr] should autovivify} {
-    incr-1.13 incr-1.26 incr-2.13 incr-2.26 incr-old-2.3
   } {[expr wide()]} {
     incr-3.[12]
   } {[unknown]} {
