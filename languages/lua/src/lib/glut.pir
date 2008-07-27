@@ -162,14 +162,21 @@ not LuaGL
     if $I0 goto L1
     lua_error("incorrect argument to function 'glut.DisplayFunc'")
   L1:
-    .local pmc _lua__GLOBAL
+    set_hll_global 'displayFunc.name', funcname
+    .const .Sub display = 'display'
+    glutDisplayFunc(display)
+.end
+
+.sub 'display' :anon
+    .local pmc _lua__GLOBAL, funcname
     _lua__GLOBAL = get_hll_global '_G'
+    funcname = get_hll_global 'displayFunc.name'
     $P0 = _lua__GLOBAL[funcname]
     $I0 = lua_isfunction($P0)
     if $I0 goto L2
     lua_error("Script error: cannot find ", funcname, " function.")
   L2:
-    glutDisplayFunc($P0)
+    $P0()
 .end
 
 
@@ -184,14 +191,21 @@ not LuaGL
     if $I0 goto L1
     lua_error("incorrect argument to function 'glut.IdleFunc'")
   L1:
-    .local pmc _lua__GLOBAL
+    set_hll_global 'idleFunc.name', funcname
+    .const .Sub idle = 'idle'
+    glutIdleFunc(idle)
+.end
+
+.sub 'idle' :anon
+    .local pmc _lua__GLOBAL, funcname
     _lua__GLOBAL = get_hll_global '_G'
+    funcname = get_hll_global 'idleFunc.name'
     $P0 = _lua__GLOBAL[funcname]
     $I0 = lua_isfunction($P0)
     if $I0 goto L2
     lua_error("Script error: cannot find ", funcname, " function.")
   L2:
-    glutIdleFunc($P0)
+    $P0()
 .end
 
 
@@ -253,14 +267,30 @@ not LuaGL
     if $I0 goto L1
     lua_error("incorrect argument to function 'glut.KeyboardFunc'")
   L1:
-    .local pmc _lua__GLOBAL
+    set_hll_global 'keyboardFunc.name', funcname
+    .const .Sub keyboard = 'keyboard'
+    glutKeyboardFunc(keyboard)
+.end
+
+.sub 'keyboard' :anon
+    .param int key
+    .param int x
+    .param int y
+    .local pmc _lua__GLOBAL, funcname
     _lua__GLOBAL = get_hll_global '_G'
+    funcname = get_hll_global 'keyboardFunc.name'
     $P0 = _lua__GLOBAL[funcname]
     $I0 = lua_isfunction($P0)
     if $I0 goto L2
     lua_error("Script error: cannot find ", funcname, " function.")
   L2:
-    glutKeyboardFunc($P0)
+    new $P1, 'LuaNumber'
+    set $P1, key
+    new $P2, 'LuaNumber'
+    set $P2, x
+    new $P3, 'LuaNumber'
+    set $P3, y
+    $P0($P1, $P2, $P3)
 .end
 
 
@@ -295,16 +325,28 @@ not LuaGL
     if $I0 goto L1
     lua_error("incorrect argument to function 'glut.ReshapeFunc'")
   L1:
-    .local pmc _lua__GLOBAL
+    set_hll_global 'reshapeFunc.name', funcname
+    .const .Sub reshape = 'reshape'
+    glutReshapeFunc(reshape)
+.end
+
+.sub 'reshape' :anon
+    .param int width
+    .param int height
+    .local pmc _lua__GLOBAL, funcname
     _lua__GLOBAL = get_hll_global '_G'
+    funcname = get_hll_global 'reshapeFunc.name'
     $P0 = _lua__GLOBAL[funcname]
     $I0 = lua_isfunction($P0)
     if $I0 goto L2
     lua_error("Script error: cannot find ", funcname, " function.")
   L2:
-    glutFunc($P0)
+    new $P1, 'LuaNumber'
+    set $P1, width
+    new $P2, 'LuaNumber'
+    set $P2, height
+    $P0($P1, $P2)
 .end
-
 
 =item C<glut.SwapBuffers ()>
 
