@@ -191,7 +191,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 .sub 'InitDisplayMode' :anon
     .param pmc extra :slurpy
-    $I0 = .GL_RGBA | .GL_DOUBLE
+    $I0 = .GLUT_RGBA | .GLUT_DOUBLE
     glutInitDisplayMode($I0)
 .end
 
