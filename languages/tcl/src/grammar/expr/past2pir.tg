@@ -208,9 +208,6 @@ transform pir (PAST::StaticCommand) {
     $P0  = shift iter
     name = $P0['value']
 
-    .local int has_expand
-    has_expand = 0
-
   iter_loop: 
     unless iter goto iter_done
     $P1 = shift iter
@@ -219,12 +216,9 @@ transform pir (PAST::StaticCommand) {
     push args, reg
     pir .= $P0
     $S0 = typeof $P1
-    if $S0 == 'PAST::Expand' goto iter_expand
+    if $S0 == 'PAST::Expand' goto iter_loop
     unless $S0 == 'PAST::Var' goto iter_loop
     pir.emit("    %0 = clone %0", reg)
-    goto iter_loop
-  iter_expand:
-    has_expand = 1
     goto iter_loop
   iter_done:
     .local string retval
@@ -237,22 +231,7 @@ transform pir (PAST::StaticCommand) {
 
     $P0 = shift children
     $S0 = $P0['value']
-    if has_expand goto dynamic
-    $P1 = get_root_global ['_tcl'; 'builtins'], $S0
-    if null $P1 goto dynamic
 
-    $P0 = $P1(retval, children,args)
-    if null $P0 goto dynamic
-
-    .local pmc epoch
-    epoch = get_root_global ['_tcl'], 'epoch'
-    $S0 = pir.unique('dynamic_')
-    pir.emit('  if epoch != %0 goto %1', epoch, $S0)
-    pir .= $P0
-    pir.emit('  goto %0', done_)
-    pir.emit('%0:', $S0)
-
-  dynamic:
     .local string ns
     ns  = ''
     $S0 = join ", ", args

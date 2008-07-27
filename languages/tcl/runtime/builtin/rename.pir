@@ -37,7 +37,7 @@
 delete_sub:
   delete ns[$S0]
 
-  if delete_only goto delete_builtin
+  if delete_only goto return
 
 add_sub:
   # Create the new sub
@@ -53,18 +53,7 @@ add_sub:
 
 set_new_sub:
   ns[$S0] = sub
-
-delete_builtin:
-  builtin = get_root_global ['_tcl'; 'builtins'], oldName
-  if null builtin goto return
-
-  $P0 = get_root_namespace ['_tcl'; 'builtins']
-  delete $P0[oldName]
-
   if delete_only goto return
-
-add_builtin:
-  set_root_global ['_tcl'; 'builtins'], newName, builtin
 
 return:
   .return('')

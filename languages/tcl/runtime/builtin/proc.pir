@@ -46,7 +46,7 @@ Create a PIR sub on the fly for this user defined proc.
   if $I0 == 0 goto create
   name = pop ns
 
-  if $I0 == 1 goto root
+  if $I0 == 1 goto create
   $P0 = get_hll_namespace ns
   if null $P0 goto unknown_namespace
 
@@ -54,22 +54,6 @@ Create a PIR sub on the fly for this user defined proc.
   namespace = "['" . namespace
   namespace .= "']"
   goto create
-
-root:
-  # check to see if this is inlinable
-  # if it is, we need to update the epoch
-  $S0 = name
-  $P1 = get_root_global ['_tcl'; 'builtins'], $S0
-  if null $P1 goto create
-
-  .local pmc epoch
-  epoch = get_root_global ['_tcl'], 'epoch'
-  inc epoch
-
-  # now we need to delete the helper sub
-  # so we don't try to inline anything else
-  $P1 = get_root_namespace ['_tcl'; 'builtins']
-  delete $P1[$S0]
 
 create:
   code.emit(<<'END_PIR', namespace, name)
