@@ -32,7 +32,7 @@ use Test::More;
 use Parrot::Config;
 use ExtUtils::Manifest qw(maniread);
 
-use vars qw(@failed);
+use vars qw(@failed_syntax @empty_description);
 
 BEGIN {
     eval 'use Pod::Find';
@@ -47,7 +47,7 @@ BEGIN {
     }
 }
 
-plan tests => 1;
+plan tests => 2;
 
 # RT#44437 this should really be using src_dir instead of build_dir but it
 # does not exist (yet)
@@ -87,17 +87,31 @@ foreach my $file (@files) {
     next if $file =~ m{t/tools/dev/searchops/samples\.pm};
 
     # skip files with valid POD
-    next if file_pod_ok($file);
+    if (file_pod_ok($file)) {
 
-    # report whatever is not skipped
-    push @failed, $file;
+        #check DESCRIPTION section on valid POD files
+        push @empty_description, $file if empty_description($file);
+
+    }
+    else {
+
+        # report whatever is not skipped
+        push @failed_syntax, $file;
+    }
 }
 
-my $bad_files = join( "\n", @failed );
-is( $bad_files, q{}, 'Pod syntax correct' );    # only ok if everything passed
+my $bad_syntax_files = join( "\n", @failed_syntax );
+my $empty_description_files = join( "\n", @empty_description);
+my $nempty_description = scalar( @empty_description );
+
+is( $bad_syntax_files, q{}, 'Pod syntax correct' );    # only ok if everything passed
+is( $empty_description_files, q{}, 'All Pod files have non-empty DESCRIPTION sections' );
 
 diag("You should use podchecker to check the failed files.\n")
-    if $bad_files;
+    if $bad_syntax_files;
+
+diag("Found $nempty_description files without DESCRIPTION sections.\n")
+    if $nempty_description;
 
 # Pulled from Test::Pod
 sub file_pod_ok {
@@ -108,6 +122,21 @@ sub file_pod_ok {
     $checker->parse_file($file);
 
     return !$checker->any_errata_seen;
+}
+
+sub empty_description {
+    my $file = shift;
+
+    use Pod::Simple::PullParser;
+    my $parser = Pod::Simple::PullParser->new;
+    $parser->set_source( $file );
+    my $description = $parser->get_description;
+
+    if ( $description =~ m{^\s*$}m ) {
+        return 1;
+    }
+
+    return 0;
 }
 
 # Local Variables:
