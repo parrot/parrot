@@ -55,7 +55,7 @@ Define the attributes required for the class.
 
 .end
 
-.sub set_string_native :vtable :method
+.sub set_string_native :vtable
   .param string value
 
   .local int value_length

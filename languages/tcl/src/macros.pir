@@ -90,7 +90,7 @@ Simplistic implementation of C<clone> vtable
 
 .macro cloneable ()
 
-.sub clone :vtable :method
+.sub clone :vtable
   .local pmc obj
   obj = new 'Undef'
   assign obj, self
