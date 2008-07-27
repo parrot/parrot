@@ -53,6 +53,11 @@ see F<runtime/parrot/library/OpenGL.pir>.
     set $P1, 'CreateWindow'
     _glut[$P1] = _glut_CreateWindow
 
+    .const .Sub _glut_DestroyWindow= 'DestroyWindow'
+    _glut_DestroyWindow.'setfenv'(_lua__GLOBAL)
+    set $P1, 'DestroyWindow'
+    _glut[$P1] = _glut_DestroyWindow
+
     .const .Sub _glut_DisplayFunc= 'DisplayFunc'
     _glut_DisplayFunc.'setfenv'(_lua__GLOBAL)
     set $P1, 'DisplayFunc'
@@ -121,7 +126,28 @@ see F<runtime/parrot/library/OpenGL.pir>.
     lua_error("incorrect argument to function 'glut.CreateWindow'")
   L1:
     $S1 = title
-    glutCreateWindow($S1)
+    $I0 = glutCreateWindow($S1)
+    new $P0, 'LuaNumber'
+    set $P0, $I0
+    .return ($P0)
+.end
+
+
+=item C<glut.DestroyWindow (window)>
+
+not LuaGL
+
+=cut
+
+.sub 'DestroyWindow' :anon
+    .param pmc window :optional
+    .param pmc extra :slurpy
+    $I0 = lua_isnumber(window)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'glut.DestroyWindow'")
+  L1:
+    $I1 = window
+    glutDestroyWindow($I1)
 .end
 
 

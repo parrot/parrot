@@ -10,9 +10,6 @@
 require 'glut'
 require 'gl'
 
-rotating = true
-prev_time = os.time()
-
 function Draw ()
     gl.Clear('COLOR_BUFFER_BIT,DEPTH_BUFFER_BIT')
     gl.Begin('TRIANGLES')
@@ -38,14 +35,16 @@ end
 
 function Keyboard (key)
     if key == 27 or key == 81 or key == 113 then
-	os.exit()
+	glut.DestroyWindow(glut_window)
     end
     rotating = not rotating
 end
 
+rotating = true
+prev_time = os.time()
 glut.Init()
 glut.InitDisplayMode()
-glut.CreateWindow('Test')
+glut_window = glut.CreateWindow('Test')
 glut.DisplayFunc('Draw')
 glut.IdleFunc('Idle')
 glut.KeyboardFunc('Keyboard')
