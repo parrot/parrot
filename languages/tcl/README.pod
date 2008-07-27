@@ -62,7 +62,7 @@ C<TEST_PROG_ARGS=-G make test>, which will disable parrot's garbage
 collection system. Send the results of both to the mailing list
 C<parrot-porters@perl.org>.
 
-To run the spec test suites, type C<make tcl-test>; This will check out
+To run the spec test suites, type C<make spectest>; This will check out
 the tests from tcl's CVS repository for the 8.5.3 release and run them.
 
 Note that the tests are I<fudged> slightly to use our version of [test]

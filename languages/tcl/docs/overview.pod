@@ -109,7 +109,7 @@ TODO tests, C<make devtest> instead. This is NOT the Tcl test suite.
 Occasional failures are suspected against svn-head; there should be no
 failures in a released version, however.
 
-To run the Tcl test suite, type C<make tcl-test>. This will checkout the
+To run the Tcl test suite, type C<make spectest>. This will checkout the
 appropriate CVS copy of the tests from the Tcl repository and run them.
 Warning, this will be slow.
 

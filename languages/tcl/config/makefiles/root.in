@@ -267,7 +267,7 @@ DYING_TCL_TESTS = \
   t_tcl/io.t \
   t_tcl/stringObj.t
 
-tcl-test: t_tcl tcl.pbc
+spectest: t_tcl tcl.pbc
     # For now, just test the ones that ``work'' with test_more
 	prove $(RUNNABLE_TCL_TESTS)
 t_tcl:

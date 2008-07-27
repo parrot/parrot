@@ -74,7 +74,7 @@ tcl-based version that generates TAP output. All new tests should be written
 using the tcl-based version. See C<t/cmd_expr.t> for an example.
 
 Our final goal will be to pass (most of) the tcl test suite: run
-C<make tcl-test> to checkout the latest version of of the tcl test suite
+C<make spectest> to checkout the latest version of of the tcl test suite
 and run it. Warning: slow...
 
 Long term goal is remove any tests in C<t/> that are testing things that are
