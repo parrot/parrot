@@ -307,7 +307,7 @@ INTVAL
 intlist_get(PARROT_INTERP, ARGMOD(IntList *list), INTVAL idx)
 {
     void * const ret = list_get(interp, (List *)list, idx, enum_type_INTVAL);
-    if (ret) 
+    if (ret)
         return *(INTVAL *)ret;
 
     return (INTVAL)0;
