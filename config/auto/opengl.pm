@@ -169,14 +169,16 @@ sub runstep {
 
     # Prefer Cygwin/w32api over Cygwin/X, but use X when DISPLAY is set
     if ($^O eq 'cygwin' and $ENV{DISPLAY}) {
-	$self->_add_to_libs( {
-	    conf        => $conf,
-	    osname      => $osname,
-	    cc          => $cc,
-	    cygwin	=> '-lglut -L/usr/X11R6/lib -lGLU -lGL'
-    } ) } else {
-	$self->_add_to_libs( {
-	    conf            => $conf,
+        $self->_add_to_libs( {
+            conf        => $conf,
+            osname      => $osname,
+            cc          => $cc,
+            cygwin      => '-lglut -L/usr/X11R6/lib -lGLU -lGL'
+        } )
+    }
+    else {
+        $self->_add_to_libs( {
+            conf            => $conf,
             osname          => $osname,
             cc              => $cc,
             win32_gcc       => '-lglut32 -lglu32 -lopengl32',
