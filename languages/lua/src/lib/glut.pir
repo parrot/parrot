@@ -176,9 +176,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 .sub 'Init' :anon
     .param pmc extra :slurpy
     .local pmc argv
-    new argv, 'FixedStringArray'
-    set argv, 1
-    argv[0] = ''
+    new argv, 'ResizableStringArray'
     .const .Sub glutInit = 'glutInit'
     $P0 = get_hll_global ['NCI'], 'call_toolkit_init'
     $P0(glutInit, argv)
