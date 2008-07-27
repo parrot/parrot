@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 
 =head1 NAME
 
@@ -166,6 +166,18 @@ info:
         ret
 CODE
 I need a shower.
+OUTPUT
+
+pasm_output_is( <<'CODE', <<'OUTPUT', "out of bounds" );
+    #shouldn't cause a segfault
+    new P0, 'IntList'
+    set P0, 1
+    set I0, P0[25]
+    set S0, "didn't segfault\n"
+    print S0
+    end
+CODE
+didn't segfault
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "direct access 2" );
