@@ -69,10 +69,6 @@ C<P6object> and C<P6metaclass>.
 .namespace ['P6object']
 
 .sub 'onload' :anon :init :load
-    ##  create the %!metaclass hash for parrotclass => metaclass mapping
-    $P0 = new 'Hash'
-    set_hll_global ['P6metaclass'], '%!metaclass', $P0
-
     $P0 = newclass 'P6protoobject'
 
     $P0 = newclass 'P6object'
@@ -98,16 +94,9 @@ Return the C<P6metaclass> of the invocant.
 =cut
 
 .sub 'HOW' :method
-    .local pmc parrotclass, mhash, how
-    mhash = get_hll_global ['P6metaclass'], '%!metaclass'
-    parrotclass = typeof self
-    $I0 = get_addr parrotclass
-    how = mhash[$I0]
-    unless null how goto end
-    $S0 = parrotclass
-    how = mhash[$S0]
-  end:
-    .return (how)
+    $P0 = typeof self
+    $P1 = getprop 'metaclass', $P0
+    .return ($P1)
 .end
 
 
@@ -266,10 +255,6 @@ or 'Object').
     parrotclass = self.'get_parrotclass'(parrotclass)
   have_parrotclass:
 
-    ##  get the mapping hash
-    .local pmc mhash
-    mhash = get_hll_global ['P6metaclass'], '%!metaclass'
-
     ##  add any needed parent classes
     .local pmc parentclass
     parentclass = options['parent']
@@ -353,12 +338,12 @@ or 'Object').
   method_end:
     goto override_loop
   override_end:
-  have_protoclass:
-    ##  register the protoclass in %!metaobject
-    $I0 = get_addr protoclass
-    mhash[$I0] = how
-    ##  save the protoobject
+  have_protoobject:
+    ##  save the protoobject into the metaclass
     setattribute how, 'protoobject', protoobject
+
+    ##  attach the metaclass object to the protoclass
+    setprop protoclass, 'metaclass', how
 
     ##  store the long and short names in the protoobject; skip if anonymous
     .local pmc longname, shortname
@@ -384,11 +369,8 @@ or 'Object').
     setattribute how, 'shortname', shortname
 
   have_how:
-    ##  map parrotclass to the metaobject
-    $I0 = get_addr parrotclass
-    mhash[$I0] = how
-    $S0 = parrotclass
-    mhash[$S0] = how
+    ##  attach the metaclass object to the parrotclass
+    setprop parrotclass, 'metaclass', how
 
     ##  return the protoobject
     .return (protoobject)
