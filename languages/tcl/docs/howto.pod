@@ -19,51 +19,9 @@ into an AST (in the form of a Tcl* object from lib/*). Once a section of code
 has been translated, the object's C<compile> method is invoked, which then
 generates PIR which can be compiled by parrot.
 
-The commands themselves have (well, some of them do) inline-able (compiled) 
-versions: These are located in C<src/builtin>, and all new development should go
-there. There are many runtime-only versions that exist in C<runtime/builtin>.
-In general, no new development should occur here. The inline-able versions are
-preferred, as they help avoid runtime dispatch.
-
-When writing inlined builtins, these are further subdivided into two variants
-at the moment: those generated automatically by running C<tools/gen_inline.pl>, 
-and those that are handwritten.
-
-Templates for inlined builtins look a lot like PIR (they are, for the most
-part) but they have a little bit of magic. The compiler takes care of argument
-handling and renames local variables and labels so they don't collide. Since
-we're using perl to generate the code, this is a one time cost at build time: at
-runtime, we are using PIR. (Which in turn generates PIR itself).
-
-Hand-rolled inlined builtins take three arguments: a TclCompiler, an
-array PMC with the raw arguments, and an array PMC with the registers
-of the compiled arguments. Your return value is simply the compiler
-object.  You should only use this method for generating builtins if a
-builtin cannot be defined using a template, and even then, extending
-the template parser is probably the right answer.
-
-This is as opposed to the interpreted style in C<runtime/builtin>, which takes
-a variable number of already compiled arguments at runtime. Our fallback method
-bundles these up, passing in a starting register of 0, and uses the resulting
-PIR to generate a .sub immediately and then invoke it. The runtime fallback
-is *always* going to be necessary for HLL interoperability.
-
-Remember, every argument to your builtin is potentially variable and may change
-at runtime. You can check the type of the object at compile time. However,
-if it's constant, then you can optimize: for example, we could optimize 
-[puts -nonewline "whee\n"] down to, basically, {say 'whee'}... however,
-we still have to be able to deal with [set a -nonewline; puts $a "whee\n"].
-So, your first pass should probably do no optimizations. If you see a potential
-for optimization, however, at least add an XXX comment so we can get back to
-it later. At this point, we'd rather spend time working on new features than
-making existing features faster.
-
-The results of calling the inlined code will be used by
-C<lib/tclcommand.pir>.  The inlined code is further wrapped in a
-protective conditional which will skip the inlined version if it can
-no longer be trusted (that is, if [proc] or [rename] has been
-invoked), and will fall back to the interpreted version as necessary.
-(And throw an exception if the command is not found at runtime.).
+The commands themselves are all dispatched at runtime. These are all written
+in PIR, and can be found, e.g. in F<runtime/builtins/while.pir>. These variants
+take a variable number of already compiled arguments at runtime. 
 
 =item speed
 

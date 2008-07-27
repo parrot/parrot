@@ -30,10 +30,7 @@ This file is used to load all the various commands, ops, etc. into
 the appropriate namespaces, as well as declare and register the TCL
 compiler for the C<compile> opcode.
 
-This file is actually built in several steps. First, all the templated commands
-(src/builtin/*.tmt) are converted to PIR. Next, runtime/builtins.pir is
-generated from all the pir files in src/builtin/ and runtime/builtin. This file
-is then included by tcllib.pir and compiled to tcllib.pbc.
+This file is then included by F<tcllib.pir> which is compiled to F<tcllib.pbc>.
 
 =item tcl.pbc
 
