@@ -124,11 +124,13 @@ wrong_args:
   .param pmc s2
 
   # check that they're actually integers.
-  # This points out that we should really be caching
-  # the integer value rather than recalculating on each compare.
+  # We recalculate this every time, but without smarter PMCs, we can't
+  # afford to change the string value of the given PMC.
   .local pmc toInteger
   toInteger = get_root_global ['_tcl'], 'toInteger'
   .local pmc i1,i2
+  s1 = clone s1
+  s2 = clone s2
   i1 = toInteger(s1)
   i2 = toInteger(s2)
   $I0 = cmp_num i1, i2
@@ -215,6 +217,8 @@ greater:
   # check that they're actually numbers
   .local pmc toNumber
   toNumber = get_root_global ['_tcl'], 'toNumber'
+  s1 = clone s1
+  s2 = clone s2
   s1 = toNumber(s1)
   s2 = toNumber(s2)
 

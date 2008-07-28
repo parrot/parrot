@@ -93,8 +93,6 @@ set todo_tests [dict create \
     cmdIL-1.1[1234] cmdIL-1.2[36] cmdIL-3.[23456] cmdIL-3.4.1 cmdIL-5.[234]
   } {[lsort -indices]} {
     cmdIL-1.27 cmdIL-1.28
-  } {[lsort] bug - don't modify the values you're sorting} {
-    cmdIL-3.1[19]
   } {[lsort -dictionary] - not sorting properly} {
     cmdIL-4.[145] cmdIL-4.1[27] cmdIL-4.2[089] cmdIL-4.3[0123]
   } {[lsort] misc} {
