@@ -10,7 +10,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 21
+plan 22
 
 is [lsort {}] {} {empty list}
 
@@ -79,3 +79,19 @@ eval_is {lsort -dictionary {a10 B1 abc ab b1 a1 ab a2}} \
 eval_is {
   lsort -real {4.28 5.65 6.20 7.66 7.6 2.4 8.5 0.4 7.6 6.3}
 } {0.4 2.4 4.28 5.65 6.20 6.3 7.6 7.6 7.66 8.5} {-real}
+
+proc sortByLen {a b} {
+  set sizeA [string length $a]
+  set sizeB [string length $b]
+  if {$sizeA < $sizeB} {
+    return -1
+  } elseif {$sizeB < $sizeA} {
+    return 1
+  } else {
+    return 0
+  }
+}
+
+eval_is {
+  lsort -command sortByLen [list 12345 {} 1234 1 12345678 123456 1234567]
+} {{} 1 1234 12345 123456 1234567 12345678} {-command option}

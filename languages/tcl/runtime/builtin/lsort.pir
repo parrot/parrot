@@ -33,7 +33,7 @@ chew_flag:
   if $P0 == '-integer' goto c_int
   if $P0 == '-real' goto c_real
   if $P0 == '-dictionary' goto c_dict
-  # RT#40749: command etc necessary
+  if $P0 == '-command' goto c_command
   branch bad_opt
 
 c_dict:
@@ -54,7 +54,12 @@ c_uniq:
 c_int:
   compare = get_root_global ['_tcl';'helpers';'lsort'], 'integer'
   branch chew_flag
-
+c_command:
+  .local string compareName
+  compareName = shift argv
+  $S0 = '&' . compareName
+  compare = find_global $S0
+  branch chew_flag
 
 got_list:
 
