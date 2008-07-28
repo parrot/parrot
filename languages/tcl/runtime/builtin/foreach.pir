@@ -89,17 +89,13 @@ next_variable:
   unless list goto empty_var
   value = shift list
   value = clone value
-  push_eh couldnt_set
-    setVar(varname, value)
-  pop_eh
+  setVar(varname, value)
   goto next_variable
 
 empty_var:
   value = new 'TclString'
   value = ''
-  push_eh couldnt_set
-    setVar(varname, value)
-  pop_eh
+  setVar(varname, value)
   goto next_variable
 
 execute_command:
@@ -118,12 +114,6 @@ handle_continue:
 
 done:
   .return('')
-
-couldnt_set:
-  $S0 =  "couldn't set loop variable: \""
-  $S0 .= varname
-  $S0 .= '"'
-  tcl_error $S0
 
 bad_args:
   tcl_error 'wrong # args: should be "foreach varList list ?varList list ...? command"'

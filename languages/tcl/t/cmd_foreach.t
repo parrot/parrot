@@ -28,8 +28,7 @@ eval_is {
     array set a {}
     foreach a {1 2 3 4} {puts $a}
 } {can't set "a": variable is array} \
-  {couldn't set loop variable} \
-  {TODO {new behavior in tcl 8.5.1}}
+  {couldn't set loop variable}
 
 unset -nocomplain a
 is [foreach a {1 2 3 4} {set a}] {} {return value}
