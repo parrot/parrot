@@ -174,9 +174,20 @@ not LuaGL
     $P0 = _lua__GLOBAL[funcname]
     $I0 = lua_isfunction($P0)
     if $I0 goto L2
-    lua_error("Script error: cannot find ", funcname, " function.")
+    printerr "Script error: cannot find "
+    printerr funcname
+    printerr " function.\n\n"
   L2:
+    push_eh _handler
     $P0()
+    .return ()
+  _handler:
+    .local pmc e
+    .local string s
+    .get_results (e, s)
+    printerr "Error running lua script:\n\n  "
+    printerr s
+    printerr " \n\n"
 .end
 
 
@@ -203,9 +214,20 @@ not LuaGL
     $P0 = _lua__GLOBAL[funcname]
     $I0 = lua_isfunction($P0)
     if $I0 goto L2
-    lua_error("Script error: cannot find ", funcname, " function.")
+    printerr "Script error: cannot find "
+    printerr funcname
+    printerr " function.\n\n"
   L2:
+    push_eh _handler
     $P0()
+    .return ()
+  _handler:
+    .local pmc e
+    .local string s
+    .get_results (e, s)
+    printerr "Error running lua script:\n\n  "
+    printerr s
+    printerr " \n\n"
 .end
 
 
@@ -282,7 +304,9 @@ not LuaGL
     $P0 = _lua__GLOBAL[funcname]
     $I0 = lua_isfunction($P0)
     if $I0 goto L2
-    lua_error("Script error: cannot find ", funcname, " function.")
+    printerr "Script error: cannot find "
+    printerr funcname
+    printerr " function.\n\n"
   L2:
     new $P1, 'LuaNumber'
     set $P1, key
@@ -290,7 +314,16 @@ not LuaGL
     set $P2, x
     new $P3, 'LuaNumber'
     set $P3, y
+    push_eh _handler
     $P0($P1, $P2, $P3)
+    .return ()
+  _handler:
+    .local pmc e
+    .local string s
+    .get_results (e, s)
+    printerr "Error running lua script:\n\n  "
+    printerr s
+    printerr " \n\n"
 .end
 
 
@@ -339,13 +372,24 @@ not LuaGL
     $P0 = _lua__GLOBAL[funcname]
     $I0 = lua_isfunction($P0)
     if $I0 goto L2
-    lua_error("Script error: cannot find ", funcname, " function.")
+    printerr "Script error: cannot find "
+    printerr funcname
+    printerr " function.\n\n"
   L2:
     new $P1, 'LuaNumber'
     set $P1, width
     new $P2, 'LuaNumber'
     set $P2, height
+    push_eh _handler
     $P0($P1, $P2)
+    .return ()
+  _handler:
+    .local pmc e
+    .local string s
+    .get_results (e, s)
+    printerr "Error running lua script:\n\n  "
+    printerr s
+    printerr " \n\n"
 .end
 
 =item C<glut.SwapBuffers ()>
