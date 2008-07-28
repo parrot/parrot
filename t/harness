@@ -107,7 +107,9 @@ if ($longopts->{html}) {
             exit;
         } else {
             $harness = TAP::Harness->new({
-                verbosity => $ENV{HARNESS_VERBOSE}, merge => 0
+                verbosity => $ENV{HARNESS_VERBOSE},
+                merge     => 0,
+                jobs      => $ENV{TEST_JOBS} || 1,
             });
         }
         $harness->runtests(@tests);
