@@ -57,7 +57,7 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
 
 .namespace ['Pipp::Grammar']
 
-# called from code in grammar.pg
+## called from code in grammar.pg
 .sub 'quote_expression' :method
     .param string flags
     .param pmc    options    :slurpy :named
@@ -219,6 +219,9 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
     .local string target
     (mob, pos, target) = self.'new'(self)
 
+    .local int dollar_is_literal
+    dollar_is_literal = 0
+
     .local string leadchar, escapes
     escapes = options['escapes']
     leadchar = substr target, pos, 1
@@ -228,8 +231,7 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
     if leadchar == '{' goto term_closure
   term_literal:
     mob.'to'(pos)
-    #_dumper(pos)
-    $P0 = mob.'quote_literal'(options)
+    $P0 = mob.'quote_literal'(options, dollar_is_literal)
     unless $P0 goto fail
     pos = $P0.'to'()
     mob['quote_literal'] = $P0
@@ -240,11 +242,14 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
   term_scalar:
     mob.'to'(pos)
     $P0 = mob.'var'('action'=>action)
-    unless $P0 goto term_literal
+    unless $P0 goto var_did_not_match
     pos = $P0.'to'()
     key = 'var'
     mob[key] = $P0
     goto succeed
+  var_did_not_match:
+    dollar_is_literal = 1
+    goto term_literal
 
   term_closure:
     mob.'to'(pos)
@@ -272,8 +277,7 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
 
 .sub 'quote_literal' :method
     .param pmc options
-
-    #_dumper( options )
+    .param int dollar_is_literal
 
     .local pmc mob
     .local int pos
@@ -308,8 +312,10 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
     litchar = substr target, pos, 1
     ##  if we've reached an escape char, we're done
     if litchar == '{' goto add_litchar
+    unless dollar_is_literal goto dollar_is_not_a_literal
+        if litchar == '$' goto add_litchar
+    dollar_is_not_a_literal:
     $I0 = index escapes, litchar
-    #_dumper( escapes )
     if $I0 >= 0 goto succeed
     ##  if this isn't an interpolation, add the char
     unless optq goto add_litchar
