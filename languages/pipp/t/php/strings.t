@@ -18,7 +18,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
 # core Perl modules
-use Test::More     tests => 19;
+use Test::More     tests => 21;
 
 # Parrot modules
 use Parrot::Test;
@@ -98,6 +98,20 @@ echo "$var1 $var2\n";
 END_CODE
 VAR1 VAR2
 END_EXPECTED
+
+SKIP: {
+    skip 'runaway process', 1;
+
+    language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'dollar followed by a space' );
+<?php
+ 
+echo ";$ ;", "\n";
+
+?>
+END_CODE
+;$ ;
+END_EXPECTED
+}
 
 language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'curly string interpolation, one var' );
 <?php
@@ -220,6 +234,18 @@ backslash and single quote: \'
 two backslashes and a single quote: \\'
 backslash and a dollar: \$dummy
 backslash and twiddles: \{INTERPOLATED}
+END_EXPECTED
+
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'curly quotes in double quoted string' );
+<?php
+
+echo ";{;", "\n";
+echo ";\{;", "\n";
+
+?>
+END_CODE
+;{;
+;\{;
 END_EXPECTED
 
 language_output_is( 'Pipp', <<'END_CODE', <<"END_EXPECTED", 'vertical tab, new in PHP 5.3' );
