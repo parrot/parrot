@@ -1425,6 +1425,47 @@ see F<runtime/parrot/library/OpenGL.pir>.
     .return (n, a)
 .end
 
+.sub 'get_array2f' :anon
+    .param pmc table
+    .local int n, size
+    n = table.'len'()
+    new $P0, 'LuaNumber'
+    set $P0, 1
+    $P1 = table[$P0]
+    $I0 = lua_istable($P1)
+    if $I0 goto L1
+    .return (-1)
+  L1:
+    size = $P1.'len'()
+    .local pmc a
+    new a, 'FixedFloatArray'
+    $I0 = n * size
+    set a, $I0
+    $I0 = 0
+    $I2 = 0
+  L2:
+    unless $I0 < n goto L3
+    inc $I0
+    set $P0, $I0
+    $P1 = table[$P0]
+    $I0 = lua_istable($P1)
+    if $I0 goto L4
+    .return (-1)
+  L4:
+    $I1 = 0
+    unless $I1 < size goto L5
+    inc $I1
+    set $P0, $I1
+    $P2 = $P1[$P0]
+    $N2 = $P2
+    a[$I2] = $N2
+    goto L4
+  L5:
+    goto L2
+  L3:
+    .return (n, size, a)
+.end
+
 .include 'opengl_defines.pasm'
 
 
@@ -3134,7 +3175,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
     $N1 = x
     $N2 = y
     $N3 = z
-    glTranslate($N1, $N2, $N3)
+    glTranslated($N1, $N2, $N3)
 .end
 
 
@@ -3191,13 +3232,24 @@ see F<runtime/parrot/library/OpenGL.pir>.
 .end
 
 
-=item C<gl.VertexPointer ()>
+=item C<gl.VertexPointer (vertexArray)>
+
+STILL INCOMPLETE
 
 =cut
 
 .sub 'VertexPointer' :anon
+    .param pmc vertexArray :optional
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = lua_istable(vertexArray)
+    if $I0 goto L1
+    lua_error("incorrect argument to function 'gl.VertexPointer'")
+  L1:
+    ($I1, $I2, $P3) = get_array2f(vertexArray)
+    unless $I1 == -1 goto L2
+    lua_error("incorrect argument to function 'gl.VertexPointer'")
+  L2:
+    glVertexPointer($I2, .GL_DOUBLE, 0, $P3)
 .end
 
 
