@@ -774,8 +774,8 @@ $(PARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) CFLAGS \
     lib/Parrot/OpLib/core.pm $(SRC_DIR)/parrot_config$(O) \
     $(MINIPARROT)
 	$(LINK) @ld_out@$@ \
-    $(SRC_DIR)/main$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC) \
-    $(SRC_DIR)/parrot_config$(O)
+	$(SRC_DIR)/main$(O) $(SRC_DIR)/parrot_config$(O) \
+	@rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC) \
 
 pbc_to_exe.pir : $(PARROT) tools/dev/pbc_to_exe_gen.pl
 	$(PERL) tools/dev/pbc_to_exe_gen.pl \
@@ -802,8 +802,8 @@ $(PERL6) : compilers $(PBC_TO_EXE)
 # TODO build the real miniparrot
 $(MINIPARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm $(SRC_DIR)/null_config$(O)
-	$(LINK) @ld_out@$@ $(SRC_DIR)/main$(O) \
-    @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) $(SRC_DIR)/null_config$(O)
+	$(LINK) @ld_out@$@ $(SRC_DIR)/main$(O) $(SRC_DIR)/null_config$(O) \
+	@rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
 $(INSTALLABLEPARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm $(SRC_DIR)/install_config$(O) \
