@@ -68,14 +68,13 @@ else {
 foreach my $file (@files) {
     $file = "$build_dir/$file";
 
-    # skip missing MANIFEST.generated files
-    next unless -e $file;
+    # skip missing MANIFEST.generated files ( -e )
+    # skip binary files (including .pbc files) ( -B )
+    # skip files that pass the -e test because they resolve the .exe variant
+    next unless -T $file;
 
     # Skip the book, because it uses extended O'Reilly-specific POD
     next if $file =~ m{docs/book/};
-
-    # skip binary files (including .pbc files)
-    next if -B $file;
 
     # skip files without POD
     next unless Pod::Find::contains_pod( $file, 0 );
