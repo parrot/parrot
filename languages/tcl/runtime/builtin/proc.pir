@@ -36,7 +36,7 @@ Create a PIR sub on the fly for this user defined proc.
 
   .local pmc ns
   .local string name
-  ns   = new 'ResizablePMCArray'
+  ns   = new 'TclList'
   name = ''
 
   if full_name == '' goto create

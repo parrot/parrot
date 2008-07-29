@@ -24,7 +24,7 @@ real top level namespace.
   subcommand_name = shift argv
 
   .local pmc options
-  options = new 'ResizablePMCArray'
+  options = new 'TclList'
   options[0] = 'children'
   options[1] = 'code'
   options[2] = 'current'
@@ -234,7 +234,7 @@ bad_args:
 
   .local pmc call_chain, temp_call_chain
   call_chain      = get_root_global ['_tcl'], 'call_chain'
-  temp_call_chain = new 'ResizablePMCArray'
+  temp_call_chain = new 'TclList'
   set_root_global ['_tcl'], 'call_chain', temp_call_chain
 
   .local pmc info_level

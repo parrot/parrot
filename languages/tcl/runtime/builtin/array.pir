@@ -21,7 +21,7 @@
   subcommand_name = shift argv
 
   .local pmc options
-  options = new 'ResizablePMCArray'
+  options = new 'TclList'
   options[0] = 'anymore'
   options[1] = 'donesearch'
   options[2] = 'exists'

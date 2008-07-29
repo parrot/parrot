@@ -7,7 +7,7 @@
   .param pmc argv :slurpy
 
   .local pmc options
-  options = new 'ResizablePMCArray'
+  options = new 'TclList'
   push options, 'all'
   push options, 'ascii'
   push options, 'decreasing'

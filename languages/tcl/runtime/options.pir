@@ -26,7 +26,7 @@ Defaults to 'option'.
 got_type_name:
 
   .local pmc partials
-  partials = new 'ResizablePMCArray'
+  partials = new 'TclList'
 
   # is there an exact match?
 
@@ -211,7 +211,7 @@ loop_done:
 
   # delete any processed switches from the argv
   if pos <= 0 goto done
-  $P1 = new 'ResizablePMCArray'
+  $P1 = new 'TclList'
   splice argv, $P1, 0, pos
 
 done:

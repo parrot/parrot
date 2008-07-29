@@ -18,7 +18,7 @@
   subcommand_name = shift argv
 
   .local pmc options
-  options = new 'ResizablePMCArray'
+  options = new 'TclList'
   push options, 'args'
   push options, 'body'
   push options, 'cmdcount'

@@ -16,7 +16,7 @@
   subcommand_name = shift argv
 
   .local pmc options
-  options = new 'ResizablePMCArray'
+  options = new 'TclList'
   options[0] = 'append'
   options[1] = 'create'
   options[2] = 'exists'
@@ -887,8 +887,8 @@ got_dict:
   body = pop argv
 
   .local pmc keys,varnames
-  keys = new 'ResizablePMCArray'
-  varnames = new 'ResizablePMCArray'
+  keys = new 'TclList'
+  varnames = new 'TclList'
   # get lists of both keys & varnames, setting the variables.
 key_loop:
   $I0 = elements argv

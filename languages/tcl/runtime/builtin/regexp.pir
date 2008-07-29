@@ -9,7 +9,7 @@
   if argc < 2 goto badargs
 
   .local pmc options
-  options = new 'ResizablePMCArray'
+  options = new 'TclList'
   push options, 'all'
   push options, 'about'
   push options, 'indices'

@@ -75,7 +75,7 @@ Initializes a new C<PAST::Node> object.
 .sub init :vtable
     $P0 = new 'String'
     $P1 = new 'Integer'
-    $P2 = new 'ResizablePMCArray'
+    $P2 = new 'TclList'
 
     setattribute self, '$.source',   $P0
     setattribute self, '$.pos',      $P1

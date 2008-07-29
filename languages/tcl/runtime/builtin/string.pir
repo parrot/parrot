@@ -16,7 +16,7 @@
   subcommand_name = shift argv
 
   .local pmc options
-  options = new 'ResizablePMCArray'
+  options = new 'TclList'
   push options, 'bytelength'
   push options, 'compare'
   push options, 'equal'
@@ -649,7 +649,7 @@ bad_args:
   the_string = argv[1]
 
   .local pmc options
-  options = new 'ResizablePMCArray'
+  options = new 'TclList'
   push options, 'alnum'
   push options, 'alpha'
   push options, 'ascii'

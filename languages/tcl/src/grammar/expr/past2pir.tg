@@ -133,7 +133,7 @@ transform pir (PAST::Op) {
     .local pmc return_register
  
     pir = new 'CodeString'
-    args = new 'ResizablePMCArray'
+    args = new 'TclList'
     iter = node.'child_iter'()
   iter_loop: 
     unless iter goto iter_done
@@ -168,7 +168,7 @@ transform pir (PAST::MathFunc) {
     .local pmc return_register
  
     pir  = new 'CodeString'
-    args = new 'ResizablePMCArray'
+    args = new 'TclList'
     iter = node.'child_iter'()
   iter_loop: 
     unless iter goto iter_done
@@ -200,7 +200,7 @@ transform pir (PAST::StaticCommand) {
     .local string reg
     
     pir  = new 'CodeString'
-    args = new 'ResizablePMCArray'
+    args = new 'TclList'
     children = node.'get_children'()
     iter = new 'Iterator', children
 
@@ -306,7 +306,7 @@ transform pir (PAST::DynamicCommand) {
     .local pmc args, children, iter, pir, reg
     
     pir  = new 'CodeString'
-    args = new 'ResizablePMCArray'
+    args = new 'TclList'
     children = node.'get_children'()
     iter = new 'Iterator', children
   iter_loop: 
