@@ -81,7 +81,7 @@ strip_loop:
   if c == size goto strip_end
   $P2 = $P1
   $P1 = $P0[c]
-  
+
   if $P1 != $P2 goto strip_loop
   delete $P0[c]
   dec c
