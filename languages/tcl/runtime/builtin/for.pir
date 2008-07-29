@@ -12,6 +12,7 @@
   compileTcl = get_root_global ['_tcl'], 'compileTcl'
   .local pmc compileExpr
   compileExpr = get_root_global ['_tcl'], 'compileExpr'
+
   .local pmc a_start
   a_start = argv[0]
   a_start = compileTcl(a_start)
@@ -24,23 +25,22 @@
   .local pmc a_command
   a_command = argv[3]
   a_command = compileTcl(a_command)
-  .local pmc R
   .local pmc temp
 
   .local pmc toBoolean
   toBoolean = get_root_global ['_tcl'], 'toBoolean'
-temp = a_start()
+  a_start()
+
 loop:
-temp = a_test()
-  $P0 = temp
-  $I0 = toBoolean($P0)
+  temp = a_test()
+  $I0 = toBoolean(temp)
   unless $I0 goto done
   push_eh command_exception
-temp = a_command()
+    a_command()
   pop_eh
 continue:
   push_eh next_exception
-temp = a_next()
+    a_next()
   pop_eh
   goto loop
 
@@ -58,9 +58,7 @@ next_exception:
   .rethrow()
 
 done:
-  R = new 'TclString'
-  R = ''
-  .return(R)
+  .return('')
 bad_args:
   tcl_error 'wrong # args: should be "for start test next command"'
 .end
