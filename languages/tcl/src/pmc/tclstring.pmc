@@ -16,7 +16,7 @@ pmclass TclString
     maps    String
 {
 
-    METHOD get_list(STRING* str) {
+    METHOD get_list(STRING* str :optional) {
         PMC*    retval = pmc_new(INTERP, pmc_type(INTERP, string_from_literal(INTERP, "TclList")));
         INTVAL  pos = -1;       /* we increment before we use it */
         INTVAL  len;            /* length of the string */
@@ -28,7 +28,7 @@ pmclass TclString
         INTVAL  depth;          /* keep track of nested {} pairs */
 
         if (! str)
-             RETURN(PMC *SELF);
+             str = SELF.get_string();
 
         /*
          * RT#48166 This prevents a segfault; retval gets claimed before it
