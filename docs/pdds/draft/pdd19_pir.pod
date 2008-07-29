@@ -505,22 +505,15 @@ I<subname>.
 
 =item :lexid( <string_constant> )
 
-Identifies the subroutine by the specified string.
-
-{{ TODO: explain purpose and details of this flag. }}
+Specifies a unique string identifier for the subroutine. This is useful for
+referring to a particular subroutine with C<:outer>, even though several
+subroutines in the file may have the same name (because they are multi, or in
+different namespaces).
 
 =back
 
 
 =head3 Directives used for Parrot calling conventions.
-
-{{ A bit of a radical idea, but now would be the time to decide on this:
-   Remove the whole "long-style" invocation syntax altogether.
-   Only allow the short version.
-   As PIR is typically being generated, and hopefully by PCT-based
-   compilers, there seems to be no real use for too much syntactic
-   sugar. Just a thought.
-}}
 
 =over 4
 
