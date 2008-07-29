@@ -29,9 +29,11 @@ set todo_tests [dict create \
   } {stacktrace support} {
     apply-2.[2345] apply-5.1
     cmdMZ-return-2.10 cmdMZ-5.7
+    eval-2.5
     if-5.3 if-6.4
     incr-2.3[01]
     incr-old-2.[45]
+    misc-1.2
     parse-9.[12] parseOld-10.14
     set-[24].1
     switch-4.[15]
@@ -106,6 +108,13 @@ set todo_tests [dict create \
     cmdMZ-return-2.[0123] cmdMZ-return-2.11 cmdMZ-return-3.*
   } {reset $errorCode} {
     cmdMZ-4.[12]
+  } {Inf support} {
+    scan-14.[12]
+  } {[scan]} {
+    scan-1.9 scan-3.[389] scan-4.8 scan-4.1[02345679] scan-4.2[3679]
+    scan-4.3[2345789] scan-4.40.[12] scan-4.4[03478] scan-4.5[0123589]
+    scan-4.6[012] scan-5.[123456789] scan-5.1[01234] scan-6.[12345678]
+    scan-7.[345] scan-8.1[0156] scan-10.2 scan-12.[45] scan-13.[56]
   }
 ]
 
@@ -120,9 +129,7 @@ set skip_tests [dict create \
     basic-46.1
     dict-14.12 dict-17.13
     error-1.3 error-2.3 error-2.6 error-4.2 error-4.3 error-4.4
-    eval-2.5
     iocmd-12.6
-    misc-1.2
     namespace-8.5 namespace-8.6 namespace-25.6 namespace-25.7 namespace-25.8
     namespace-47.2 namespace-47.4 namespace-47.6 namespace-46.5
     proc-old-5.13 proc-old-5.16 proc-old-7.2  proc-old-7.11 proc-old-7.12
@@ -193,7 +200,6 @@ set skip_tests [dict create \
     expr-41.1 expr-45.7
     expr-old-26.10b expr-old-34.11 expr-old-34.12b expr-old-34.11
     expr-old-34.10
-    scan-14.1 scan-14.2
   } {NaN support} {
     expr-22.1 expr-22.3  expr-22.5 expr-22.7 expr-22.9 expr-45.8 expr-45.9
     expr-47.3
@@ -280,6 +286,8 @@ set skip_tests [dict create \
 # stored as an array of test name -> reason pairs.
 
 array set abort_after {
+  misc-1.2 {300 nearly identical failing tests that require tcltest support}
+
   parseExpr-20.3 {src/string.c:1109: failed assertion 'src->encoding == Parrot_fixed_8_encoding_ptr'}
   assocd-1.1           {}
   async-1.1            {}
@@ -303,7 +311,6 @@ array set abort_after {
   link-1.1             {}
   macOSXFCmd-1.1       {}
   mathop-1.1           {}
-  misc-1.1             {}
   msgcat-0.0           {}
   obj-1.1              {}
   opt-1.1              {don't have the opt package available}
