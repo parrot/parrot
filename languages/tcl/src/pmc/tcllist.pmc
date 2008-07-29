@@ -203,8 +203,6 @@ An alias to assign_pmc to make other things happy before set_pmc is removed.
 
 Copy the contents of other to self.
 
-=back
-
 =cut
 
 */
@@ -257,6 +255,12 @@ Return a list version of ourself
       RETURN(PMC *SELF);
     }
 }
+
+/*
+
+=back
+
+*/
 
 /*
  * Local variables:
