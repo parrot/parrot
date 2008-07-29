@@ -12,7 +12,9 @@ Define the attributes required for the class.
 =cut
 
 .sub class_init :anon :load
-  $P0 = get_class 'TclString'
+  # While it is tempting to inherit directly from TclString, if we do that
+  # we lose the predefined MMD is_equal that works with the existing structure.
+  $P0 = get_class 'String'
   $P1 = subclass $P0, 'TclConst'
 
   $P0 = new 'Hash'
@@ -247,7 +249,7 @@ special:
 
 done:
   # Finally, delegate to our parent's set_string
-  $P0 = getattribute self, ['TclString'], 'proxy'
+  $P0 = getattribute self, ['String'], 'proxy'
   $P0 = value
 .end
 
