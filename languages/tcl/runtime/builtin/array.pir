@@ -403,7 +403,7 @@ check_end:
 
   iter = new 'Iterator', the_array
 
-  retval = new 'String'
+  retval = new 'TclString'
   retval = ''
 
 check_loop:

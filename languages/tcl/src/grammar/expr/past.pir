@@ -54,7 +54,7 @@ Creates the C<PAST::*> classes.
     $P0 = subclass base, 'PAST::Val'
     $P0 = subclass base, 'PAST::Var'
 
-    $P0 = new 'Integer'
+    $P0 = new 'TclInt'
     store_global 'TclExpr::PAST', '$!serno', $P0
 .end
 
@@ -73,8 +73,8 @@ Initializes a new C<PAST::Node> object.
 =cut
 
 .sub init :vtable
-    $P0 = new 'String'
-    $P1 = new 'Integer'
+    $P0 = new 'TclString'
+    $P1 = new 'TclInt'
     $P2 = new 'TclList'
 
     setattribute self, '$.source',   $P0

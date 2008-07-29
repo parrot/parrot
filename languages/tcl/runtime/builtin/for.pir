@@ -58,7 +58,7 @@ next_exception:
   .rethrow()
 
 done:
-  R = new 'String'
+  R = new 'TclString'
   R = ''
   .return(R)
 bad_args:

@@ -192,10 +192,10 @@ env_loop_done:
   # Global variable initialization
 
    #version info
-  $P0 = new 'String'
+  $P0 = new 'TclString'
   $P0 = '0.1'
   set_root_global ['tcl'], '$tcl_patchLevel', $P0
-  $P0 = new 'String'
+  $P0 = new 'TclString'
   $P0 = '0.1'
   set_root_global ['tcl'], '$tcl_version', $P0
 
@@ -218,7 +218,7 @@ env_loop_done:
   store_global 'channels', $P1
 
   # Setup the id # for channels..
-  $P1 = new 'Integer'
+  $P1 = new 'TclInt'
   $P1 = 1
   store_global 'next_channel_id', $P1
 
@@ -230,7 +230,7 @@ env_loop_done:
   # This counter: if the counter hasn't changed since it was compiled,
   # it's safe to use the inline version (if available)
   # Otherwise fallback to the interpreted version.
-  $P1 = new 'Integer'
+  $P1 = new 'TclInt'
   $P1 = 0
   store_global 'epoch', $P1
 
@@ -245,7 +245,7 @@ env_loop_done:
   compreg 'TCL', $P1
 
   # Setup a global to keep a unique id for compiled subs.
-  $P1 = new 'Integer'
+  $P1 = new 'TclInt'
   $P1 = 0
   store_global 'compiled_num', $P1
 

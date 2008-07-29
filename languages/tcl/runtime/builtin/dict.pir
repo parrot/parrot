@@ -107,7 +107,7 @@ loop:
   $S2 = value
   $S2 .= $S1
   .local pmc stringy
-  stringy = new 'String'
+  stringy = new 'TclString'
   stringy = $S2
   copy value, stringy
   goto loop

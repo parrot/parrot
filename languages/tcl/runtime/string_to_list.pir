@@ -25,7 +25,6 @@ loop:
   $S0 = typeof $P2
   if $S0 == 'TclConst'  goto is_string
   if $S0 == 'TclString'  goto is_string
-  if $S0 == 'String'  goto is_string
 is_list:
   $P2 = listToDict($P2)
   result[$S1] = $P2

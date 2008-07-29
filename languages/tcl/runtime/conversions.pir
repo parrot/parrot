@@ -594,14 +594,14 @@ was this a valid tcl-style level, or did we get this value as a default?
 .sub getCallLevel
   .param pmc tcl_level
   .local pmc parrot_level, defaulted, orig_level
-  defaulted = new 'Integer'
+  defaulted = new 'TclInt'
   defaulted = 0
 
   .local pmc call_chain
   .local int call_level
   call_chain = get_root_global ['_tcl'], 'call_chain'
   call_level = elements call_chain
-  orig_level = new 'Integer'
+  orig_level = new 'TclInt'
   orig_level = call_level
 
   .local int num_length
@@ -627,7 +627,7 @@ get_integer:
 
 default:
   defaulted = 1
-  parrot_level = new 'Integer'
+  parrot_level = new 'TclInt'
   parrot_level = orig_level - 1
   # fallthrough.
 
