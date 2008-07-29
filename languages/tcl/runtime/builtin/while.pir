@@ -1,3 +1,6 @@
+.HLL 'Tcl', 'tcl_group'
+.namespace []
+
 .sub '&while'
   .param pmc argv :slurpy
 
