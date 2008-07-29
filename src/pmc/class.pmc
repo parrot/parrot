@@ -486,7 +486,7 @@ arguments.  The class is attatched to the current HLL namespace.
     }
 
     VTABLE void init_pmc(PMC *init_data) {
-        PMC           *arg;
+        PMC           *arg, *ns_name;
         const INTVAL   arg_type = VTABLE_type(interp, init_data);
         STRING * const name_str = CONST_STRING(interp, "name");
 
@@ -497,10 +497,17 @@ arguments.  The class is attatched to the current HLL namespace.
         switch (arg_type) {
             case enum_class_String:
             case enum_class_Key:
-            case enum_class_NameSpace:
             case enum_class_ResizableStringArray:
                 arg = pmc_new(interp, enum_class_Hash);
                 VTABLE_set_pmc_keyed_str(interp, arg, name_str, init_data);
+                break;
+
+            case enum_class_NameSpace:
+                arg = pmc_new(interp, enum_class_Hash);
+                Parrot_PCCINVOKE(interp, init_data, CONST_STRING(interp, "get_name"),
+                    "->P", &ns_name);
+                VTABLE_shift_string(interp, ns_name); /* strip HLL name */
+                VTABLE_set_pmc_keyed_str(interp, arg, name_str, ns_name);
                 break;
 
             case enum_class_Hash:
