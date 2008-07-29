@@ -115,6 +115,8 @@ binary_scan_number_field(PARROT_INTERP, char field, char *binstr, int *_pos, int
             VTABLE_set_integer_native(interp, value, *n);
             pos += len;
             break;
+        default:
+            break;
     }
     (*_pos) = pos;
     return value;
@@ -399,6 +401,8 @@ binary_format_number_field(PARROT_INTERP, char field, STRING *binstr, PMC *value
             len    = sizeof (int)/sizeof (char);
             binstr = string_concat(interp, binstr, string_from_int(interp, n), 0);
             break;
+        default:
+            break;
     }
 
     return binstr;
@@ -460,6 +464,8 @@ binary_format_string_field(PARROT_INTERP, char field, STRING *binstr,
             /* pad with spaces if necessary */
             while (length-- > strlen)
                 binstr = string_concat(interp, binstr, string_from_cstring(interp, " ", 1), 0);
+            break;
+        default:
             break;
     }
 
@@ -537,6 +543,8 @@ STRING *ParTcl_binary_format(PARROT_INTERP, STRING *FORMAT, PMC *values)
                 binstr = binary_format_string(interp, field, binstr, value,
                                               format, &formatpos, formatlen);
                 break;
+        default:
+            break;
         }
     }
 

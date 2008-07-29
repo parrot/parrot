@@ -50,6 +50,8 @@ pmclass TclObject dynpmc group tcl_group {
             case enum_class_Float:
                 type = dynpmc_TclFloat;
                 break;
+            default:
+                break;
         }
         pmc_reuse(INTERP, SELF, type, 0);
     }

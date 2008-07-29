@@ -71,7 +71,8 @@ Returns the list as a string
                     case '}':
                         if (--count < 0) goto escape;
                         break;
-
+                    default:
+                        break;
                 }
                 pos++;
             }
