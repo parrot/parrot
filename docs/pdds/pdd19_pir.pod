@@ -361,11 +361,11 @@ This directive is useful in cases such as (pseudocode):
 All types of common language constructs such as if, for, while, repeat and
 such that have nested scopes, can use this directive.
 
-=item .endnamespace <identifier> [deprecated: See RT #48737]
+=item .endnamespace <identifier> [deprecated: RT #48737]
 
 Closes the scope block that was opened with .namespace <identifier>.
 
-=item .pragma n_operators [deprecated]
+=item .pragma n_operators [deprecated: RT #57438]
 
 Convert arithmethic infix operators to n_infix operations. The unary opcodes
 C<abs>, C<not>, C<bnot>, C<bnots>, and C<neg> are also changed to use a C<n_>
