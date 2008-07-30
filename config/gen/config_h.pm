@@ -29,19 +29,23 @@ sub _init {
     my %data;
     $data{description} = q{Generating C headers};
     $data{result}      = q{};
+    $data{templates}    = {
+        config_h    => 'config/gen/config_h/config_h.in',
+        feature_h   => 'config/gen/config_h/feature_h.in',
+    };
     return \%data;
 }
 
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    $conf->genfile('config/gen/config_h/config_h.in', 'include/parrot/config.h',
+    $conf->genfile($self->{templates}->{config_h}, 'include/parrot/config.h',
         comment_type      => '/*',
         ignore_pattern    => 'PARROT_CONFIG_DATE',
         conditioned_lines => 1
     );
 
-    $conf->genfile('config/gen/config_h/feature_h.in', 'include/parrot/feature.h',
+    $conf->genfile($self->{templates}->{feature_h}, 'include/parrot/feature.h',
         comment_type   => '/*',
         ignore_pattern => 'PARROT_CONFIG_DATE',
         feature_file   => 1
@@ -81,22 +85,7 @@ EOF
     my $osname = $conf->data->get_p5('OSNAME');
     print {$HH} "\n#define BUILD_OS_NAME \"$osname\"\n";
 
-    my $define = $conf->options->get('define');
-
-    if ($define) {
-        my @vals = split /,/, $define;
-        print {$HH} <<EOF;
-
-/*
- * defines from commandline
- */
-
-EOF
-        for (@vals) {
-            print {$HH} "#define PARROT_DEF_" . uc($_), " 1\n";
-        }
-
-    }
+    _handle_define_option($conf, $HH);
 
     print {$HH} <<EOF;
 
@@ -144,6 +133,25 @@ EOF
     move_if_diff( "$hh.tmp", $hh );
 
     return 1;
+}
+
+sub _handle_define_option {
+    my ($conf, $HH) = @_;
+    my $define = $conf->options->get('define');
+
+    if ($define) {
+        my @vals = split /,/, $define;
+        print {$HH} <<EOF;
+
+/*
+ * defines from commandline
+ */
+
+EOF
+        for my $v (@vals) {
+            print {$HH} "#define PARROT_DEF_" . uc($v), " 1\n";
+        }
+    }
 }
 
 1;

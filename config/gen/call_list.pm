@@ -31,11 +31,11 @@ use Parrot::Configure::Utils '_slurp';
 
 sub _init {
     my $self = shift;
-
-    return {
-        description  => q{Generating NCI signature list},
-        result       => q{},
-    }
+    my %data;
+    $data{description} = q{Generating NCI signature list};
+    $data{result} = q{};
+    $data{fragment_files} = [ sort glob 'config/gen/call_list/*.in' ];
+    return \%data;
 }
 
 my $text_file_coda = <<'CODA';
@@ -49,7 +49,6 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $combined_file  = 'src/call_list.txt';
-    my @fragment_files = sort glob 'config/gen/call_list/*.in';
 
     open my $combined, '>', $combined_file
         or die "Could not open '$combined_file' for write: $!";
@@ -57,7 +56,7 @@ sub runstep {
     # add read-only metadata for the generated file
     print {$combined} "# ex: set ro:\n";
 
-    foreach my $fragment_file (@fragment_files) {
+    foreach my $fragment_file ( @{ $self->{fragment_files} } ) {
         my $fragment =  _slurp($fragment_file);
            $fragment =~ s/^\s*\n//;
            $fragment =~ s/\s*$/\n\n/;

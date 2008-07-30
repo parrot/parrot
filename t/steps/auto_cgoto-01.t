@@ -5,14 +5,21 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  12;
+use Test::More tests =>  64;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
 use_ok('config::auto::cgoto');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::Configure::Test qw( test_step_thru_runstep);
+use Parrot::Configure::Test qw(
+    test_step_thru_runstep
+    rerun_defaults_for_testing
+    test_step_constructor_and_description
+);
+use IO::CaptureOutput qw( capture );
+
+########### --miniparrot  ###########
 
 my $args = process_options(
     {
@@ -23,25 +30,120 @@ my $args = process_options(
 
 my $conf = Parrot::Configure->new;
 
+my $serialized = $conf->pcfreeze();
+
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
-
 my $pkg = q{auto::cgoto};
-
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
-
-my ( $task, $step_name, $step);
-$task        = $conf->steps->[-1];
-$step_name   = $task->step;
-
-$step = $step_name->new();
-ok( defined $step, "$step_name constructor returned defined value" );
-isa_ok( $step, $step_name );
-ok( $step->description(), "$step_name has description" );
-
+my $step = test_step_constructor_and_description($conf);
 my $ret = $step->runstep($conf);
-ok( $ret, "$step_name runstep() returned true value" );
+ok( $ret, "runstep() returned true value" );
 is($step->result(), q{skipped}, "Expected result was set");
+
+$conf->replenish($serialized);
+
+########### regular ###########
+
+$args = process_options( {
+    argv => [ ],
+    mode => q{configure},
+} );
+rerun_defaults_for_testing($conf, $args );
+$conf->add_steps($pkg);
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+$ret = $step->runstep($conf);
+ok( $ret, "runstep() returned true value" );
+ok(defined($step->result()), "A result was defined");
+ok(defined($conf->data->get('TEMP_cg_h')), "An attribute has been defined");
+ok(defined($conf->data->get('TEMP_cg_c')), "An attribute has been defined");
+ok(defined($conf->data->get('TEMP_cg_o')), "An attribute has been defined");
+ok(defined($conf->data->get('TEMP_cg_r')), "An attribute has been defined");
+ok(defined($conf->data->get('cg_flag')), "An attribute has been defined");
+
+$conf->replenish($serialized);
+
+########### _probe_for_cgoto() ###########
+
+$args = process_options( {
+    argv => [ ],
+    mode => q{configure},
+} );
+rerun_defaults_for_testing($conf, $args );
+$conf->add_steps($pkg);
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+$conf->options->set(cgoto => 1);
+is(auto::cgoto::_probe_for_cgoto($conf), 1,
+    "Got expected return value");
+$conf->options->set(cgoto => 0);
+is(auto::cgoto::_probe_for_cgoto($conf), 0,
+    "Got expected return value");
+$conf->options->set(cgoto => undef);
+ok(defined(auto::cgoto::_probe_for_cgoto($conf)),
+    "Probe returned a defined value");
+
+########### _evaluate_cgoto() ###########
+
+$step->_evaluate_cgoto($conf, 1);
+ok($conf->data->get('TEMP_cg_h'), "An attribute was set to true value");
+ok($conf->data->get('TEMP_cg_c'), "An attribute was set to true value");
+ok($conf->data->get('TEMP_cg_o'), "An attribute was set to true value");
+ok($conf->data->get('TEMP_cg_r'), "An attribute was set to true value");
+ok($conf->data->get('cg_flag'), "An attribute was set to true value");
+is($step->result(), q{yes}, "Expected result was set");
+
+$step->_evaluate_cgoto($conf, 0);
+is($conf->data->get('TEMP_cg_h'), q{}, "An attribute was set to empty string");
+is($conf->data->get('TEMP_cg_c'), q{}, "An attribute was set to empty string");
+is($conf->data->get('TEMP_cg_o'), q{}, "An attribute was set to empty string");
+is($conf->data->get('TEMP_cg_r'), q{}, "An attribute was set to empty string");
+is($conf->data->get('cg_flag'), q{}, "An attribute was set to empty string");
+is($step->result(), q{no}, "Expected result was set");
+
+$conf->replenish($serialized);
+
+$args = process_options( {
+    argv => [ ],
+    mode => q{configure},
+} );
+rerun_defaults_for_testing($conf, $args );
+$conf->add_steps($pkg);
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+{
+    my $stdout;
+    capture(
+        sub { $step->_evaluate_cgoto($conf, 1) },
+        \$stdout
+    );
+    ok($conf->data->get('TEMP_cg_h'), "An attribute was set to true value");
+    ok($conf->data->get('TEMP_cg_c'), "An attribute was set to true value");
+    ok($conf->data->get('TEMP_cg_o'), "An attribute was set to true value");
+    ok($conf->data->get('TEMP_cg_r'), "An attribute was set to true value");
+    ok($conf->data->get('cg_flag'), "An attribute was set to true value");
+    is($step->result(), q{yes}, "Expected result was set");
+}
+
+{
+    my $stdout;
+    capture(
+        sub { $step->_evaluate_cgoto($conf, 0) },
+        \$stdout
+    );
+    is($conf->data->get('TEMP_cg_h'), q{},
+        "An attribute was set to empty string");
+    is($conf->data->get('TEMP_cg_c'), q{},
+        "An attribute was set to empty string");
+    is($conf->data->get('TEMP_cg_o'), q{},
+        "An attribute was set to empty string");
+    is($conf->data->get('TEMP_cg_r'), q{},
+        "An attribute was set to empty string");
+    is($conf->data->get('cg_flag'), q{},
+        "An attribute was set to empty string");
+    is($step->result(), q{no}, "Expected result was set");
+}
 
 
 pass("Completed all tests in $0");
@@ -50,7 +152,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-auto_cgoto-01.t - test config::auto::cgoto
+auto_cgoto-01.t - test auto::cgoto
 
 =head1 SYNOPSIS
 
@@ -60,7 +162,7 @@ auto_cgoto-01.t - test config::auto::cgoto
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::auto::cgoto.
+The tests in this file test auto::cgoto.
 
 =head1 AUTHOR
 

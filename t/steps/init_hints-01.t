@@ -5,16 +5,24 @@
 
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 26;
 use Carp;
-use Data::Dumper;
+use Cwd;
+use File::Path ();
+use File::Spec::Functions qw/catfile/;
+use File::Temp qw(tempdir);
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
 use_ok('config::init::hints');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::Configure::Test qw( test_step_thru_runstep);
+use Parrot::Configure::Test qw(
+    test_step_thru_runstep
+    test_step_constructor_and_description
+);
 use IO::CaptureOutput qw | capture |;
+
+########## --verbose ##########
 
 my $args = process_options(
     {
@@ -27,19 +35,14 @@ my $conf = Parrot::Configure->new;
 
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
 
-my ( $task, $step_name, $step, $ret );
 my $pkg = q{init::hints};
 
 $conf->add_steps($pkg);
+
+my $serialized = $conf->pcfreeze();
+
 $conf->options->set( %{$args} );
-
-$task        = $conf->steps->[-1];
-$step_name   = $task->step;
-
-$step = $step_name->new();
-ok( defined $step, "$step_name constructor returned defined value" );
-isa_ok( $step, $step_name );
-ok( $step->description(), "$step_name has description" );
+my $step = test_step_constructor_and_description($conf);
 
 # need to capture the --verbose output, because the fact that it does not end
 # in a newline confuses Test::Harness
@@ -48,7 +51,120 @@ ok( $step->description(), "$step_name has description" );
     my $stdout;
     capture ( sub {$rv = $step->runstep($conf)}, \$stdout);
     ok( $stdout, "verbose output:  hints were captured" );
-    ok( defined $rv, "$step_name runstep() returned defined value" );
+    ok( defined $rv, "runstep() returned defined value" );
+}
+
+$conf->replenish($serialized);
+
+########## --verbose; local hints directory ##########
+
+$args = process_options(
+    {
+        argv => [q{--verbose}],
+        mode => q{configure},
+    }
+);
+
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+
+my $cwd = cwd();
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    File::Path::mkpath(qq{$tdir/init/hints})
+        or croak "Unable to create directory for local hints";
+    my $localhints = qq{$tdir/init/hints/local.pm};
+    open my $FH, '>', $localhints
+        or croak "Unable to open temp file for writing";
+    print $FH <<END;
+package init::hints::local;
+use strict;
+sub runstep {
+    return 1;
+}
+1;
+END
+    close $FH or croak "Unable to close temp file after writing";
+    unshift( @INC, $tdir );
+
+    {
+     my $rv;
+     my $stdout;
+     capture ( sub {$rv = $step->runstep($conf)}, \$stdout);
+     ok( $stdout, "verbose output:  hints were captured" );
+     ok( defined $rv, "runstep() returned defined value" );
+    }
+    unlink $localhints or croak "Unable to delete $localhints";
+}
+
+$conf->replenish($serialized);
+
+########## --verbose; local hints directory; no runstep() in local hints ##########
+
+$args = process_options(
+    {
+        argv => [q{--verbose}],
+        mode => q{configure},
+    }
+);
+
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+
+$cwd = cwd();
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    File::Path::mkpath(qq{$tdir/init/hints})
+        or croak "Unable to create directory for local hints";
+    my $localhints = qq{$tdir/init/hints/local.pm};
+    open my $FH, '>', $localhints
+        or croak "Unable to open temp file for writing";
+    print $FH <<END;
+package init::hints::local;
+use strict;
+1;
+END
+    close $FH or croak "Unable to close temp file after writing";
+    unshift( @INC, $tdir );
+
+    {
+     my $rv;
+     my $stdout;
+     capture ( sub {$rv = $step->runstep($conf)}, \$stdout);
+     ok( $stdout, "verbose output:  hints were captured" );
+     ok( defined $rv, "runstep() returned defined value" );
+    }
+    unlink $localhints or croak "Unable to delete $localhints";
+}
+
+$conf->replenish($serialized);
+
+########## --verbose; imaginary OS ##########
+
+$args = process_options(
+    {
+        argv => [ q{--verbose} ],
+        mode => q{configure},
+    }
+);
+
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+{
+    my ($stdout, $stderr, $ret);
+    $conf->data->set_p5( OSNAME => q{imaginaryOS} );
+    my $osname = lc( $conf->data->get_p5( 'OSNAME' ) );
+    my $hints_file = catfile('config', 'init', 'hints', "$osname.pm");
+    capture (
+        sub { $ret = $step->runstep($conf); },
+        \$stdout,
+        \$stderr,
+    );;
+    like(
+        $stdout,
+        qr/No \Q$hints_file\E found/s,
+        "Got expected verbose output when no hints file found"
+    );
 }
 
 pass("Completed all tests in $0");
@@ -57,7 +173,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-init_hints-01.t - test config::init::hints
+init_hints-01.t - test init::hints
 
 =head1 SYNOPSIS
 
@@ -67,7 +183,7 @@ init_hints-01.t - test config::init::hints
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::init::hints.
+The tests in this file test init::hints.
 
 =head1 AUTHOR
 

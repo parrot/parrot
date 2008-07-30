@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  35;
+use Test::More tests =>  36;
 use Carp;
 use Cwd;
 use lib qw( lib );
@@ -13,7 +13,10 @@ use_ok('config::init::defaults');
 use_ok('config::auto::readline');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::Configure::Test qw( test_step_thru_runstep);
+use Parrot::Configure::Test qw(
+    test_step_thru_runstep
+    test_step_constructor_and_description
+);
 use IO::CaptureOutput qw| capture |;
 
 my $args = process_options(
@@ -31,15 +34,7 @@ my $pkg = q{auto::readline};
 
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
-
-my ( $task, $step_name, $step);
-$task        = $conf->steps->[-1];
-$step_name   = $task->step;
-
-$step = $step_name->new();
-ok( defined $step, "$step_name constructor returned defined value" );
-isa_ok( $step, $step_name );
-
+my $step = test_step_constructor_and_description($conf);
 
 ########## _evaluate_cc_run() ##########
 
@@ -181,7 +176,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-auto_readline-02.t - test config::auto::readline
+auto_readline-02.t - test auto::readline
 
 =head1 SYNOPSIS
 
@@ -191,7 +186,7 @@ auto_readline-02.t - test config::auto::readline
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::auto::readline.
+The tests in this file test auto::readline.
 
 =head1 AUTHOR
 

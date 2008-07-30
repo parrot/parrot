@@ -5,14 +5,20 @@
 
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 17;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
 use_ok('config::inter::charset');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::Configure::Test qw( test_step_thru_runstep);
+use Parrot::Configure::Test qw(
+    test_step_thru_runstep
+    test_step_constructor_and_description
+);
+use Tie::Filehandle::Preempt::Stdin;
+
+########## ask ##########
 
 my $args = process_options(
     {
@@ -28,23 +34,52 @@ test_step_thru_runstep( $conf, q{init::defaults}, $args );
 my $pkg = q{inter::charset};
 
 $conf->add_steps($pkg);
+
+my $serialized = $conf->pcfreeze();
+
 $conf->options->set( %{$args} );
+my $step = test_step_constructor_and_description($conf);
+{
+    open STDOUT, '>', "/dev/null" or croak "Unable to open to myout";
+    my $ret = $step->runstep($conf);
+    close STDOUT or croak "Unable to close after myout";
+    ok( $ret, "runstep() returned true value" );
+}
 
-my ( $task, $step_name, $step);
-$task        = $conf->steps->[-1];
-$step_name   = $task->step;
+$conf->replenish($serialized);
 
-$step = $step_name->new();
-ok( defined $step, "$step_name constructor returned defined value" );
-isa_ok( $step, $step_name );
-ok( $step->description(), "$step_name has description" );
+########## ask ##########
+
+$args = process_options(
+    {
+        argv => [ q{--ask} ],
+        mode => q{configure},
+    }
+);
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+
+my ( @prompts, $object );
+
+$conf->options->set('intval' => 'alpha');
+$conf->options->set('floatval' => 'beta');
+$conf->options->set('opcode' => 'gamma');
+@prompts = qw( delta epsilon zeta );
+
+$object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
+can_ok( 'Tie::Filehandle::Preempt::Stdin', ('READLINE') );
+isa_ok( $object, 'Tie::Filehandle::Preempt::Stdin' );
 
 {
     open STDOUT, '>', "/dev/null" or croak "Unable to open to myout";
     my $ret = $step->runstep($conf);
     close STDOUT or croak "Unable to close after myout";
-    ok( $ret, "$step_name runstep() returned true value" );
+    ok( $ret, "runstep() returned true value" );
 }
+
+undef $object;
+untie *STDIN;
+@prompts = ();
 
 pass("Completed all tests in $0");
 
@@ -52,7 +87,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-inter_charset-01.t - test config::inter::charset
+inter_charset-01.t - test inter::charset
 
 =head1 SYNOPSIS
 
@@ -62,7 +97,7 @@ inter_charset-01.t - test config::inter::charset
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::inter::charset.
+The tests in this file test inter::charset.
 
 =head1 AUTHOR
 

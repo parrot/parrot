@@ -5,14 +5,19 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  11;
+use Test::More tests =>  18;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
 use_ok('config::auto::alignptrs');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::Configure::Test qw( test_step_thru_runstep);
+use Parrot::Configure::Test qw(
+    test_step_thru_runstep
+    test_step_constructor_and_description
+);
+
+########## mock hpux ##########
 
 my $args = process_options(
     {
@@ -29,21 +34,54 @@ my $pkg = q{auto::alignptrs};
 
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
+my $step = test_step_constructor_and_description($conf);
 
-my ( $task, $step_name, $step);
-$task        = $conf->steps->[-1];
-$step_name   = $task->step;
+my $serialized = $conf->pcfreeze();
 
-$step = $step_name->new();
-ok( defined $step, "$step_name constructor returned defined value" );
-isa_ok( $step, $step_name );
+{
+    $conf->data->set_p5( OSNAME => 'hpux' );
+    my $ret = $step->runstep($conf);
+    ok( $ret, "runstep() returned true value" );
+    if ( $conf->data->get_p5('ccflags') !~ /DD64/ ) {
+        is($conf->data->get('ptr_alignment'), 4,
+            "Got expected pointer alignment for HP Unix");
+        is($step->result(), qq{for hpux:  4 bytes},
+            "Expected result was set");
+    } else {
+        pass("Cannot mock \%Config");
+        pass("Cannot mock \%Config");
+    }
+}
 
+$conf->replenish($serialized);
 
-my $align = 1;
-$conf->data->set('ptr_alignment' => $align);
-my $ret = $step->runstep($conf);
-ok( $ret, "$step_name runstep() returned true value" );
-is($step->result(), qq{configured:  $align byte}, "Expected result was set");
+########## _evaluate_ptr_alignment()  ##########
+
+my $align = 2;
+auto::alignptrs::_evaluate_ptr_alignment($conf, $align);
+is($conf->data->get( 'ptr_alignment' ), 2,
+    "Got expected pointer alignment");
+
+$conf->replenish($serialized);
+
+########## _evaluate_ptr_alignment()  ##########
+
+$align = undef;
+eval { auto::alignptrs::_evaluate_ptr_alignment($conf, $align); };
+like($@, qr/Can't determine alignment!/, #'
+    "Got expected 'die' message");
+
+$conf->replenish($serialized);
+
+########## _evaluate_results()  ##########
+
+my ($results, $try_align);
+is(auto::alignptrs::_evaluate_results(q{OK}, 2), 2,
+    "Got expected alignment");
+is(auto::alignptrs::_evaluate_results(q{OK align}, 2), undef,
+    "Got undef as expected");
+is(auto::alignptrs::_evaluate_results(q{foobar}, 2), undef,
+    "Got undef as expected");
 
 pass("Completed all tests in $0");
 
@@ -51,7 +89,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-auto_alignptrs-02.t - test config::auto::alignptrs
+auto_alignptrs-02.t - test auto::alignptrs
 
 =head1 SYNOPSIS
 
@@ -61,7 +99,7 @@ auto_alignptrs-02.t - test config::auto::alignptrs
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::auto::alignptrs.
+The tests in this file test auto::alignptrs.
 
 =head1 AUTHOR
 

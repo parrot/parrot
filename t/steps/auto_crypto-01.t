@@ -4,14 +4,21 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  13;
+use Test::More tests =>  41;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
 use_ok('config::auto::crypto');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::Configure::Test qw( test_step_thru_runstep);
+use Parrot::Configure::Test qw(
+    test_step_thru_runstep
+    rerun_defaults_for_testing
+    test_step_constructor_and_description
+);
+use IO::CaptureOutput qw( capture );
+
+########## --without-crypto ##########
 
 my $args = process_options(
     {
@@ -27,23 +34,159 @@ test_step_thru_runstep( $conf, q{init::defaults}, $args );
 my $pkg = q{auto::crypto};
 
 $conf->add_steps($pkg);
+
+my $serialized = $conf->pcfreeze();
+
 $conf->options->set( %{$args} );
-
-my ( $task, $step_name, $step);
-$task        = $conf->steps->[-1];
-$step_name   = $task->step;
-
-$step = $step_name->new();
-ok( defined $step, "$step_name constructor returned defined value" );
-isa_ok( $step, $step_name );
-ok( $step->description(), "$step_name has description" );
-
+my $step = test_step_constructor_and_description($conf);
 my $ret = $step->runstep($conf);
-ok( $ret, "$step_name runstep() returned true value" );
+ok( $ret, "runstep() returned true value" );
 is($conf->data->get('has_crypto'), 0,
     "Got expected value for 'has_crypto'");
 is($step->result(), q{no}, "Expected result was set");
 
+$conf->replenish($serialized);
+
+########## _add_to_libs() ##########
+
+$args = process_options( {
+    argv => [ ],
+    mode => q{configure},
+} );
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+# Mock different OS/compiler combinations.
+my ($osname, $cc, $initial_libs);
+$initial_libs = $conf->data->get('libs');
+$osname = 'mswin32';
+$cc = 'gcc';
+ok($step->_add_to_libs( {
+    conf            => $conf,
+    osname          => $osname,
+    cc              => $cc,
+    win32_nongcc    => 'libcrypto.lib',
+    default         => '-lcrypto',
+} ),
+   "_add_to_libs() returned true value");
+like($conf->data->get('libs'),
+    qr/-lcrypto/,
+    "'libs' attribute modified as expected");
+# Restore setting for next test
+$conf->data->set( libs => $initial_libs );
+
+$osname = 'mswin32';
+$cc = 'cc';
+ok($step->_add_to_libs( {
+    conf            => $conf,
+    osname          => $osname,
+    cc              => $cc,
+    win32_nongcc    => 'libcrypto.lib',
+    default         => '-lcrypto',
+} ),
+   "_add_to_libs() returned true value");
+like($conf->data->get('libs'),
+    qr/libcrypto.lib/,
+    "'libs' attribute modified as expected");
+# Restore setting for next test
+$conf->data->set( libs => $initial_libs );
+
+$osname = 'foobar';
+$cc = 'cc';
+ok($step->_add_to_libs( {
+    conf            => $conf,
+    osname          => $osname,
+    cc              => $cc,
+    win32_nongcc    => 'libcrypto.lib',
+    default         => '-lcrypto',
+} ),
+   "_add_to_libs() returned true value");
+like($conf->data->get('libs'),
+    qr/-lcrypto/,
+    "'libs' attribute modified as expected");
+# Restore setting for next test
+$conf->data->set( libs => $initial_libs );
+
+my ($libs, $ccflags, $linkflags, $verbose);
+
+$libs = q{-lalpha};
+$ccflags = q{-Ibeta};
+$linkflags = q{-Lgamma};
+$verbose = undef;
+$step->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
+like($conf->data->get('libs'), qr/$libs/,
+    "Got expected value for 'libs'");
+like($conf->data->get('ccflags'), qr/$ccflags/,
+    "Got expected value for 'ccflags'");
+like($conf->data->get('linkflags'), qr/$linkflags/,
+    "Got expected value for 'linkflags'");
+is($step->result, 'no', "Expected result was set");
+
+########## _recheck_settings() ##########
+
+{
+    my $stdout;
+    $libs = q{-lalpha};
+    $ccflags = q{-Ibeta};
+    $linkflags = q{-Lgamma};
+    $verbose = 1;
+    capture(
+        sub { $step->_recheck_settings(
+            $conf, $libs, $ccflags, $linkflags, $verbose); },
+        \$stdout,
+    );
+    like($conf->data->get('libs'), qr/$libs/,
+        "Got expected value for 'libs'");
+    like($conf->data->get('ccflags'), qr/$ccflags/,
+        "Got expected value for 'ccflags'");
+    like($conf->data->get('linkflags'), qr/$linkflags/,
+        "Got expected value for 'linkflags'");
+    is($step->result, 'no', "Expected result was set");
+    like($stdout, qr/\(no\)/, "Got expected verbose output");
+}
+
+$conf->replenish($serialized);
+
+########## --without-crypto; _evaluate_cc_run() ##########
+
+$args = process_options( {
+    argv => [ q{--without-crypto} ],
+    mode => q{configure},
+} );
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+my ($test, $has_crypto);
+$test = qq{OpenSSL 0.9.9z\n};
+$has_crypto = 0;
+$verbose = undef;
+$has_crypto = $step->_evaluate_cc_run($conf, $test, $has_crypto, $verbose);
+is($has_crypto, 1, "'has_crypto' set as expected");
+is($step->result(), 'yes, 0.9.9z', "Expected result was set");
+# Prepare for next test
+$step->set_result(undef);
+
+$test = qq{foobar};
+$has_crypto = 0;
+$verbose = undef;
+$has_crypto = $step->_evaluate_cc_run($conf, $test, $has_crypto, $verbose);
+is($has_crypto, 0, "'has_crypto' set as expected");
+ok(! defined $step->result(), "Result is undefined, as expected");
+
+{
+    my $stdout;
+    $test = qq{OpenSSL 0.9.9z\n};
+    $has_crypto = 0;
+    $verbose = 1;
+    capture(
+        sub { $has_crypto =
+            $step->_evaluate_cc_run($conf, $test, $has_crypto, $verbose); },
+        \$stdout,
+    );
+    is($has_crypto, 1, "'has_crypto' set as expected");
+    is($step->result(), 'yes, 0.9.9z', "Expected result was set");
+    like($stdout, qr/\(yes\)/, "Got expected verbose output");
+    # Prepare for next test
+    $step->set_result(undef);
+}
 
 pass("Completed all tests in $0");
 
@@ -51,7 +194,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-auto_crypto-01.t - test config::auto::crypto
+auto_crypto-01.t - test auto::crypto
 
 =head1 SYNOPSIS
 
@@ -61,8 +204,7 @@ auto_crypto-01.t - test config::auto::crypto
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test config::auto::crypto in the case where the
-C<--without-crypto> option is set.
+The tests in this file test auto::crypto.
 
 =head1 HISTORY
 

@@ -5,21 +5,25 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  13;
+use Test::More tests =>  31;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
 use_ok('config::auto::ctags');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::Configure::Test qw( test_step_thru_runstep);
-
-my $args = process_options(
-    {
-        argv => [ ],
-        mode => q{configure},
-    }
+use Parrot::Configure::Test qw(
+    test_step_thru_runstep
+    test_step_constructor_and_description
 );
+use IO::CaptureOutput qw( capture );
+
+########## regular ##########
+
+my $args = process_options( {
+    argv => [ ],
+    mode => q{configure},
+} );
 
 my $conf = Parrot::Configure->new;
 
@@ -28,26 +32,90 @@ test_step_thru_runstep( $conf, q{init::defaults}, $args );
 my $pkg = q{auto::ctags};
 
 $conf->add_steps($pkg);
+
+my $serialized = $conf->pcfreeze();
+
 $conf->options->set( %{$args} );
-
-my ( $task, $step_name, $step);
-$task        = $conf->steps->[-1];
-$step_name   = $task->step;
-
-$step = $step_name->new();
-ok( defined $step, "$step_name constructor returned defined value" );
-isa_ok( $step, $step_name );
-ok( $step->description(), "$step_name has description" );
-
+my $step = test_step_constructor_and_description($conf);
 my %possible_ctags = map {$_,1}
     qw( ctags exuberant-ctags ctags-exuberant exctags );
-
 my $ret = $step->runstep($conf);
-ok( $ret, "$step_name runstep() returned true value" );
+ok( $ret, "runstep() returned true value" );
 ok(defined($step->result()), "Result was defined");
 ok($possible_ctags{$conf->data->get('ctags')},
     "Acceptable value for 'ctags' attribute was set");
 
+$conf->replenish($serialized);
+
+########## --verbose ##########
+
+$args = process_options( {
+    argv => [ q{--verbose} ],
+    mode => q{configure},
+} );
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+{
+    my $stdout;
+    my $ret = capture(
+        sub { $step->runstep($conf) },
+        \$stdout
+    );
+    ok( $ret, "runstep() returned true value" );
+    is($step->result(), q{no}, "Got expected result");
+    is($conf->data->get('ctags'), 'ctags',
+        "Correct value for 'ctags' attribute was set");
+}
+
+$conf->replenish($serialized);
+
+########## _evaluate_ctags() ##########
+
+$args = process_options( {
+    argv => [ ],
+    mode => q{configure},
+} );
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+
+$conf->replenish($serialized);
+
+my $pseudo_ctags = q{alpha};
+$step->_evaluate_ctags($conf, $pseudo_ctags, 1);
+is($conf->data->get('ctags'), $pseudo_ctags,
+    "'ctags' attribute was set as expected");
+is($step->result(), q{yes}, "Got expected result");
+
+$conf->replenish($serialized);
+
+########## _probe_for_ctags_output() ##########
+
+$args = process_options( {
+    argv => [ ],
+    mode => q{configure},
+} );
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+ok(auto::ctags::_probe_for_ctags_output('Exuberant Ctags', 0),
+    "Probe returned true when output matched");
+ok(! auto::ctags::_probe_for_ctags_output('alpha', 0),
+    "Probe returned false when output matched");
+{
+    my $stdout;
+    my $rv = capture(
+        sub { auto::ctags::_probe_for_ctags_output('Exuberant Ctags', 1) },
+        \$stdout
+    );
+    ok($rv, "Probe returned true when output matched");
+}
+{
+    my $stdout;
+    my $rv = capture(
+        sub { auto::ctags::_probe_for_ctags_output('alpha', 1) },
+        \$stdout
+    );
+    ok(! $rv, "Probe returned false when output matched");
+}
 
 pass("Completed all tests in $0");
 
@@ -63,9 +131,7 @@ t/steps/auto_ctags-01.t - tests Parrot::Configure step auto::ctags
 
 =head1 DESCRIPTION
 
-Regression tests for the L<Parrot::Configure step auto::ctags> module.
-This file holds tests for Parrot::Configure step auto::ctags::runstep()
-(a non-exported subroutine).
+This file holds tests for auto::ctags.
 
 =head1 AUTHOR
 

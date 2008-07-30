@@ -33,20 +33,10 @@ use Parrot::Configure::Utils ':gen';
 
 sub _init {
     my $self = shift;
-
-    return
-        { description => q{Configuring languages},
-          result      => q{},
-        };
-}
-
-sub runstep {
-    my ( $self, $conf ) = @_;
-
-    $conf->genfile('config/gen/makefiles/languages.in' => 'languages/Makefile' );
-
-    my $languages = $conf->options->get('languages');
-    $languages = qq{
+    my %data;
+    $data{description} = q{Configuring languages};
+    $data{result} = q{};
+    $data{default_languages} = qq{
         APL abc
         befunge bf
         cardinal chitchat cola c99
@@ -64,7 +54,18 @@ sub runstep {
         unlambda urm
         WMLScript
         Zcode
-    } unless defined $languages;
+    };
+    $data{languages_source} = q{config/gen/makefiles/languages.in};
+    return \%data;
+}
+
+sub runstep {
+    my ( $self, $conf ) = @_;
+
+    $conf->genfile( $self->{languages_source} => 'languages/Makefile' );
+
+    my $languages = $conf->options->get('languages');
+    $languages = $self->{default_languages} unless defined $languages;
 
     foreach my $language ( split ' ', $languages ) {        # split ' ' splits on all whitespace
         my $langdir = "languages/$language";

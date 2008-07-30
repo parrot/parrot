@@ -46,7 +46,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-init_miniparrot-01.t - test config::init::miniparrot
+init_miniparrot-01.t - test init::miniparrot
 
 =head1 SYNOPSIS
 
@@ -56,7 +56,7 @@ init_miniparrot-01.t - test config::init::miniparrot
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::init::miniparrot.
+The tests in this file test init::miniparrot.
 
 =head1 AUTHOR
 

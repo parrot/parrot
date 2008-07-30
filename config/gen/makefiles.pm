@@ -26,50 +26,60 @@ sub _init {
     my %data;
     $data{description} = q{Generating makefiles and other build files};
     $data{result}      = q{};
+    $data{makefiles}   = {
+        'Makefile' => { SOURCE => 'config/gen/makefiles/root.in' },
+
+        'ext/Makefile' => {
+            SOURCE            => 'config/gen/makefiles/ext.in',
+            commentType       => '#',
+            replace_slashes   => 1,
+            conditioned_lines => 1,
+        },
+        'ext/Parrot-Embed/Makefile.PL' => {
+            SOURCE            => 'config/gen/makefiles/parrot_embed.in',
+            replace_slashes   => 0,
+            conditioned_lines => 1,
+        },
+
+        'compilers/nqp/Makefile'     =>
+            { SOURCE => 'config/gen/makefiles/nqp.in' },
+        'compilers/pct/Makefile'     =>
+            { SOURCE => 'config/gen/makefiles/pct.in' },
+        'compilers/pge/Makefile'     =>
+            { SOURCE => 'config/gen/makefiles/pge.in' },
+        'compilers/tge/Makefile'     =>
+            { SOURCE => 'config/gen/makefiles/tge.in' },
+        'compilers/bcg/Makefile'     =>
+            { SOURCE => 'config/gen/makefiles/bcg.in' },
+        'compilers/json/Makefile'    =>
+            { SOURCE => 'config/gen/makefiles/json.in' },
+        'compilers/pirc/Makefile'    =>
+            { SOURCE => 'config/gen/makefiles/pirc.in' },
+        'src/dynpmc/Makefile'        =>
+            { SOURCE => 'config/gen/makefiles/dynpmc.in' },
+        'src/dynoplibs/Makefile'     =>
+            { SOURCE => 'config/gen/makefiles/dynoplibs.in' },
+        'editor/Makefile'            =>
+            { SOURCE => 'config/gen/makefiles/editor.in' },
+
+        'tools/build/dynpmc.pl' => {
+            SOURCE            => 'config/gen/makefiles/dynpmc_pl.in',
+            comment_type      => '#',
+            replace_slashes   => 0,
+            conditioned_lines => 1,
+        },
+        'tools/build/dynoplibs.pl' => {
+            SOURCE            => 'config/gen/makefiles/dynoplibs_pl.in',
+            comment_type      => '#',
+            replace_slashes   => 0,
+            conditioned_lines => 1,
+        },
+        'parrot.pc'     => { SOURCE => 'config/gen/makefiles/parrot_pc.in' },
+        'docs/Makefile' => { SOURCE => 'config/gen/makefiles/docs.in' },
+    };
+    $data{CFLAGS_source} = 'config/gen/makefiles/CFLAGS.in';
     return \%data;
 }
-
-my %makefiles = (
-    'Makefile' => { SOURCE => 'config/gen/makefiles/root.in' },
-
-    'ext/Makefile' => {
-        SOURCE            => 'config/gen/makefiles/ext.in',
-        commentType       => '#',
-        replace_slashes   => 1,
-        conditioned_lines => 1,
-    },
-    'ext/Parrot-Embed/Makefile.PL' => {
-        SOURCE            => 'config/gen/makefiles/parrot_embed.in',
-        replace_slashes   => 0,
-        conditioned_lines => 1,
-    },
-
-    'compilers/nqp/Makefile'     => { SOURCE => 'config/gen/makefiles/nqp.in' },
-    'compilers/pct/Makefile'     => { SOURCE => 'config/gen/makefiles/pct.in' },
-    'compilers/pge/Makefile'     => { SOURCE => 'config/gen/makefiles/pge.in' },
-    'compilers/tge/Makefile'     => { SOURCE => 'config/gen/makefiles/tge.in' },
-    'compilers/bcg/Makefile'     => { SOURCE => 'config/gen/makefiles/bcg.in' },
-    'compilers/json/Makefile'    => { SOURCE => 'config/gen/makefiles/json.in' },
-    'compilers/pirc/Makefile'    => { SOURCE => 'config/gen/makefiles/pirc.in' },
-    'src/dynpmc/Makefile'        => { SOURCE => 'config/gen/makefiles/dynpmc.in' },
-    'src/dynoplibs/Makefile'     => { SOURCE => 'config/gen/makefiles/dynoplibs.in' },
-    'editor/Makefile'            => { SOURCE => 'config/gen/makefiles/editor.in' },
-
-    'tools/build/dynpmc.pl' => {
-        SOURCE            => 'config/gen/makefiles/dynpmc_pl.in',
-        comment_type      => '#',
-        replace_slashes   => 0,
-        conditioned_lines => 1,
-    },
-    'tools/build/dynoplibs.pl' => {
-        SOURCE            => 'config/gen/makefiles/dynoplibs_pl.in',
-        comment_type      => '#',
-        replace_slashes   => 0,
-        conditioned_lines => 1,
-    },
-    'parrot.pc'     => { SOURCE => 'config/gen/makefiles/parrot_pc.in' },
-    'docs/Makefile' => { SOURCE => 'config/gen/makefiles/docs.in' },
-);
 
 sub runstep {
     my ( $self, $conf ) = @_;
@@ -84,7 +94,7 @@ sub runstep {
 sub cflags {
     my ( $self, $conf ) = @_;
 
-    $conf->genfile('config/gen/makefiles/CFLAGS.in' => 'CFLAGS',
+    $conf->genfile( $self->{CFLAGS_source} => 'CFLAGS',
         comment_type                     => '#'
     );
 
@@ -113,10 +123,10 @@ sub makefiles {
     my @targets =
         defined $targets
         ? split ' ', $targets
-        : keys %makefiles;
+        : keys %{ $self->{makefiles} };
 
     foreach my $target (@targets) {
-        my $args   = $makefiles{$target};
+        my $args   = $self->{makefiles}->{$target};
         my $source = delete $args->{SOURCE};
 
         if ( $target ne 'docs/Makefile' ) {
@@ -132,7 +142,8 @@ sub makefiles {
                 my @ops = sort grep { !/^\./ && /\.ops$/ } readdir OPS;
                 closedir OPS;
 
-                my $pod = join " ", map { my $t = $_; $t =~ s/\.ops$/.pod/; "ops/$t" } @ops;
+                my $pod = join " " =>
+                    map { my $t = $_; $t =~ s/\.ops$/.pod/; "ops/$t" } @ops;
 
                 $conf->data->set( pod => $pod );
 

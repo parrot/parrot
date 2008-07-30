@@ -29,6 +29,11 @@ sub _init {
     my %data;
     $data{description} = q{Recording configuration data for later retrieval};
     $data{result}      = q{};
+    $data{templates}    = {
+        myconfig        => 'config/gen/config_pm/myconfig.in',
+        Config_pm       => 'config/gen/config_pm/Config_pm.in',
+        config_lib      => 'config/gen/config_pm/config_lib.in',
+    };
     return \%data;
 }
 
@@ -37,9 +42,9 @@ sub runstep {
 
     $conf->data->clean;
 
-    $conf->genfile('config/gen/config_pm/myconfig.in', 'myconfig' );
+    $conf->genfile($self->{templates}->{myconfig}, 'myconfig' );
 
-    open( my $IN, "<", "config/gen/config_pm/Config_pm.in" )
+    open( my $IN, "<", $self->{templates}->{Config_pm} )
         or die "Can't open Config_pm.in: $!";
 
     my $configdir = catdir(qw/lib Parrot Config/);
@@ -63,8 +68,8 @@ sub runstep {
     close $IN  or die "Can't close Config_pm.in: $!";
     close $OUT or die "Can't close Config.pm: $!";
 
-    my $template = "config/gen/config_pm/config_lib.in";
-    open( $IN,  "<", $template )         or die "Can't open '$template': $!";
+    my $template = $self->{templates}->{config_lib};
+    open( $IN,  "<", $template ) or die "Can't open '$template': $!";
     my $c_l_pasm = q{config_lib.pasm};
     $conf->append_configure_log($c_l_pasm);
     open( $OUT, ">", $c_l_pasm ) or die "Can't open $c_l_pasm: $!";

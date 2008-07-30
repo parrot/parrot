@@ -5,14 +5,21 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  12;
+use Test::More tests =>  30;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
 use_ok('config::auto::cpu');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::Configure::Test qw( test_step_thru_runstep);
+use Parrot::Configure::Test qw(
+    test_step_thru_runstep
+    rerun_defaults_for_testing
+    test_step_constructor_and_description
+);
+use IO::CaptureOutput qw( capture );
+
+########### --miniparrot ###########
 
 my $args = process_options(
     {
@@ -23,26 +30,62 @@ my $args = process_options(
 
 my $conf = Parrot::Configure->new;
 
+my $serialized = $conf->pcfreeze();
+
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
 
 my $pkg = q{auto::cpu};
 
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
-
-my ( $task, $step_name, $step);
-$task        = $conf->steps->[-1];
-$step_name   = $task->step;
-
-$step = $step_name->new();
-ok( defined $step, "$step_name constructor returned defined value" );
-isa_ok( $step, $step_name );
-ok( $step->description(), "$step_name has description" );
-
+my $step = test_step_constructor_and_description($conf);
 my $ret = $step->runstep($conf);
-ok( $ret, "$step_name runstep() returned true value" );
+ok( $ret, "runstep() returned true value" );
 is($step->result(), q{skipped}, "Got expected result");
 
+$conf->replenish($serialized);
+
+########### --verbose ###########
+
+$args = process_options( {
+    argv => [ q{--verbose} ],
+    mode => q{configure},
+} );
+rerun_defaults_for_testing($conf, $args );
+$conf->add_steps($pkg);
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+{
+    $conf->data->set('cpuarch' => 'foobar');
+    my ($ret, $stdout);
+    capture(
+        sub { $ret = $step->runstep($conf); },
+        \$stdout,
+    );
+    ok($ret, "runstep() returned true value" );
+    ok(! $step->result(), "Got (default) false result as expected");
+    like($stdout, qr/cpu hints = 'auto::cpu::foobar::auto'/s,
+        "Got expected verbose output");
+    like($stdout, qr/no cpu specific hints/s,
+        "Got expected verbose output");
+}
+
+$conf->replenish($serialized);
+
+########### mock cpuarch ###########
+
+$args = process_options( {
+    argv => [ ],
+    mode => q{configure},
+} );
+rerun_defaults_for_testing($conf, $args );
+$conf->add_steps($pkg);
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+$conf->data->set('cpuarch' => 'foobar');
+$ret = $step->runstep($conf);
+ok($ret, "runstep() returned true value" );
+ok(! $step->result(), "Got (default) false result as expected");
 
 pass("Completed all tests in $0");
 
@@ -50,7 +93,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-auto_cpu-01.t - test config::auto::cpu
+auto_cpu-01.t - test auto::cpu
 
 =head1 SYNOPSIS
 
@@ -60,8 +103,7 @@ auto_cpu-01.t - test config::auto::cpu
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test config::auto::cpu in the case where the
-C<--miniparrot> option has been provided to F<Configure.pl>.
+The tests in this file test auto::cpu.
 
 =head1 AUTHOR
 

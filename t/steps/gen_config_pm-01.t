@@ -5,40 +5,38 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  10;
+use Test::More qw(no_plan); # tests =>   9;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
 use_ok('config::gen::config_pm');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::Configure::Test qw( test_step_thru_runstep);
+use Parrot::Configure::Test qw(
+    test_step_thru_runstep
+    test_step_constructor_and_description
+);
 
-my $args = process_options( {
-    argv            => [],
-    mode            => q{configure},
-} );
+########## regular ##########
 
-my $conf = Parrot::Configure->new();
+my $args = process_options(
+    {
+        argv => [ ],
+        mode => q{configure},
+    }
+);
 
-test_step_thru_runstep($conf, q{init::defaults}, $args);
-
-my ($task, $step_name, $step, $ret);
+my $conf = Parrot::Configure->new;
 my $pkg = q{gen::config_pm};
-
 $conf->add_steps($pkg);
-$conf->options->set(%{$args});
-$task = $conf->steps->[-1];
-$step_name   = $task->step;
-
-$step = $step_name->new();
-ok(defined $step, "$step_name constructor returned defined value");
-isa_ok($step, $step_name);
-ok($step->description(), "$step_name has description");
-
-# Test of runstep() not yet ready for prime time.
-# ok($step->runstep($conf), "runstep() returned true value");
-
+$conf->options->set( %{$args} );
+my $step = test_step_constructor_and_description($conf);
+ok(-f $step->{templates}->{myconfig},
+    "Able to locate template for myconfig");
+ok(-f $step->{templates}->{Config_pm},
+    "Able to locate template for Config_pm");
+ok(-f $step->{templates}->{config_lib},
+    "Able to locate template for config_lib");
 
 pass("Completed all tests in $0");
 
@@ -46,7 +44,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-gen_config_pm-01.t - test config::gen::config_pm
+gen_config_pm-01.t - test gen::config_pm
 
 =head1 SYNOPSIS
 
@@ -56,7 +54,7 @@ gen_config_pm-01.t - test config::gen::config_pm
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::gen::config_pm.
+The tests in this file test gen::config_pm.
 
 =head1 AUTHOR
 

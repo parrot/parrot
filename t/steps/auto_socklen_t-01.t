@@ -5,14 +5,21 @@
 
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 21;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
 use_ok('config::auto::socklen_t');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::Configure::Test qw( test_step_thru_runstep);
+use Parrot::Configure::Test qw(
+    test_step_thru_runstep
+    rerun_defaults_for_testing
+    test_step_constructor_and_description
+);
+use IO::CaptureOutput qw| capture |;
+
+########### regular ###########
 
 my $args = process_options(
     {
@@ -28,20 +35,43 @@ test_step_thru_runstep( $conf, q{init::defaults}, $args );
 my $pkg = q{auto::socklen_t};
 
 $conf->add_steps($pkg);
+
+my $serialized = $conf->pcfreeze();
+
 $conf->options->set( %{$args} );
-
-my ( $task, $step_name, $step);
-$task        = $conf->steps->[-1];
-$step_name   = $task->step;
-
-$step = $step_name->new();
-ok( defined $step, "$step_name constructor returned defined value" );
-isa_ok( $step, $step_name );
-ok( $step->description(), "$step_name has description" );
-
+my $step = test_step_constructor_and_description($conf);
 my $ret = $step->runstep($conf);
-ok( $ret, "$step_name runstep() returned true value" );
+ok( $ret, "runstep() returned true value" );
 ok(defined($step->result()), "A result has been defiined");
+
+$conf->replenish($serialized);
+
+##### _evaluate_socklen_t() #####
+
+$args = process_options(
+    {
+        argv => [ ],
+        mode => q{configure},
+    }
+);
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+
+my $d_socklen_t;
+
+$d_socklen_t = q{alpha};
+ok($step->_evaluate_socklen_t($conf, $d_socklen_t),
+    "_evaluate_socklen_t() completed satisfactorily");
+is($step->result(), q{yes}, "Got expected result");
+is($conf->data->get('has_socklen_t'), 1,
+    "has_socklen_t set as expected");
+
+$d_socklen_t = undef;
+ok($step->_evaluate_socklen_t($conf, $d_socklen_t),
+    "_evaluate_socklen_t() completed satisfactorily");
+is($step->result(), q{no}, "Got expected result");
+is($conf->data->get('has_socklen_t'), 0,
+    "has_socklen_t set as expected");
 
 pass("Completed all tests in $0");
 
@@ -49,7 +79,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-auto_socklen_t-01.t - test config::auto::socklen_t
+auto_socklen_t-01.t - test auto::socklen_t
 
 =head1 SYNOPSIS
 
@@ -59,7 +89,7 @@ auto_socklen_t-01.t - test config::auto::socklen_t
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::auto::socklen_t.
+The tests in this file test auto::socklen_t.
 
 =head1 AUTHOR
 

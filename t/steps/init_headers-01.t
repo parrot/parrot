@@ -48,7 +48,7 @@ my $cwd = cwd();
     push @lines, q{include/parrot/phony.h    [main]include};
     untie @lines;
     my $ret = $step->runstep($conf);
-    ok( defined $ret, "$step_name runstep() returned defined value" );
+    ok( defined $ret, "runstep() returned defined value" );
     like( $conf->data->get(q{TEMP_nongen_headers}), qr{\$\(INC_DIR\)/phony\.h\\},
 qq{Header added to MANIFEST for testing purposes correctly detected in Parrot::Configure object data structure}
     );
@@ -65,7 +65,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-init_headers-01.t - test config::init::headers
+init_headers-01.t - test init::headers
 
 =head1 SYNOPSIS
 
@@ -75,7 +75,7 @@ init_headers-01.t - test config::init::headers
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::init::headers.
+The tests in this file test init::headers.
 
 =head1 AUTHOR
 

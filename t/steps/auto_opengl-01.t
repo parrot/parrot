@@ -5,14 +5,21 @@
 
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 47;
 use Carp;
 use lib qw( lib );
 use_ok('config::init::defaults');
 use_ok('config::auto::opengl');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::Configure::Test qw( test_step_thru_runstep);
+use Parrot::Configure::Test qw(
+    test_step_thru_runstep
+    rerun_defaults_for_testing
+    test_step_constructor_and_description
+);
+use IO::CaptureOutput qw| capture |;
+
+########## --without-opengl ##########
 
 my $args = process_options(
     {
@@ -22,26 +29,194 @@ my $args = process_options(
 );
 
 my $conf = Parrot::Configure->new;
+
+my $serialized = $conf->pcfreeze();
+
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
 
 my $pkg = q{auto::opengl};
 
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
-
-my ( $task, $step_name, $step);
-$task        = $conf->steps->[-1];
-$step_name   = $task->step;
-
-$step = $step_name->new();
-ok( defined $step, "$step_name constructor returned defined value" );
-isa_ok( $step, $step_name );
-ok( $step->description(), "$step_name has description" );
-
+my $step = test_step_constructor_and_description($conf);
 ok( $step->runstep($conf), "runstep() returned true value");
 is( $step->result(), 'no', "Got expected result" );
 is( $conf->data->get( 'has_opengl' ), 0,
     "Got expected value for 'has_opengl'");
+
+$conf->replenish($serialized);
+
+########## _add_to_libs() ##########
+
+$args = process_options(
+    {
+        argv => [ ],
+        mode => q{configure},
+    }
+);
+rerun_defaults_for_testing($conf, $args );
+$conf->add_steps($pkg);
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+
+# Mock OS/C-compiler combinations
+my ($osname, $cc, $initial_libs);
+$initial_libs = $conf->data->get('libs');
+$osname = 'mswin32';
+$cc = 'gcc';
+ok($step->_add_to_libs( {
+    conf            => $conf,
+    osname          => $osname,
+    cc              => $cc,
+    win32_gcc       => '-lglut32 -lglu32 -lopengl32',
+    win32_nongcc    => 'glut.lib glu.lib gl.lib',
+    darwin          => '-framework OpenGL -framework GLUT',
+    default         => '-lglut -lGLU -lGL',
+} ),
+   "_add_to_libs() returned true value");
+like($conf->data->get('libs'),
+    qr/-lglut32 -lglu32 -lopengl32/,
+    "'libs' attribute modified as expected");
+# Restore setting for next test
+$conf->data->set( libs => $initial_libs );
+
+$osname = 'mswin32';
+$cc = 'cc';
+$initial_libs = $conf->data->get('libs');
+ok($step->_add_to_libs( {
+    conf            => $conf,
+    osname          => $osname,
+    cc              => $cc,
+    win32_gcc       => '-lglut32 -lglu32 -lopengl32',
+    win32_nongcc    => 'glut.lib glu.lib gl.lib',
+    darwin          => '-framework OpenGL -framework GLUT',
+    default         => '-lglut -lGLU -lGL',
+} ),
+   "_add_to_libs() returned true value");
+like($conf->data->get('libs'),
+    qr/glut.lib glu.lib gl.lib/,
+    "'libs' attribute modified as expected");
+# Restore setting for next test
+$conf->data->set( libs => $initial_libs );
+
+$osname = 'darwin';
+$cc = 'cc';
+$initial_libs = $conf->data->get('libs');
+ok($step->_add_to_libs( {
+    conf            => $conf,
+    osname          => $osname,
+    cc              => $cc,
+    win32_gcc       => '-lglut32 -lglu32 -lopengl32',
+    win32_nongcc    => 'glut.lib glu.lib gl.lib',
+    darwin          => '-framework OpenGL -framework GLUT',
+    default         => '-lglut -lGLU -lGL',
+} ),
+   "_add_to_libs() returned true value");
+like($conf->data->get('libs'),
+    qr/-framework OpenGL -framework GLUT/,
+    "'libs' attribute modified as expected");
+# Restore setting for next test
+$conf->data->set( libs => $initial_libs );
+
+$osname = 'foobar';
+$cc = 'cc';
+$initial_libs = $conf->data->get('libs');
+ok($step->_add_to_libs( {
+    conf            => $conf,
+    osname          => $osname,
+    cc              => $cc,
+    win32_gcc       => '-lglut32 -lglu32 -lopengl32',
+    win32_nongcc    => 'glut.lib glu.lib gl.lib',
+    darwin          => '-framework OpenGL -framework GLUT',
+    default         => '-lglut -lGLU -lGL',
+} ),
+   "_add_to_libs() returned true value");
+like($conf->data->get('libs'),
+    qr/-lglut -lGLU -lGL/,
+    "'libs' attribute modified as expected");
+# Restore setting for next test
+$conf->data->set( libs => $initial_libs );
+
+$conf->replenish($serialized);
+
+########## --verbose; _evaluate_cc_run() ##########
+
+$args = process_options(
+    {
+        argv => [ q{--verbose} ],
+        mode => q{configure},
+    }
+);
+rerun_defaults_for_testing($conf, $args );
+$conf->add_steps($pkg);
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+
+my @try = qw( 4 freeglut );
+my $test = qq{$try[0] $try[1]\n};
+
+{
+    my ($stdout, $stderr);
+    my ($glut_api_version, $glut_brand);
+    capture(
+        sub { ($glut_api_version, $glut_brand) = $step->_evaluate_cc_run(
+            $test,
+            0,
+        ); },
+        \$stdout,
+        \$stderr,
+    );
+    is( $glut_api_version, $try[0],
+        "Got first expected return value for _evaluate_cc_run()." );
+    is( $glut_brand, $try[1],
+        "Got first expected return value for _evaluate_cc_run()." );
+    ok(! $stdout, "Nothing captured on STDOUT, as expected");
+}
+
+{
+    my ($stdout, $stderr);
+    my ($glut_api_version, $glut_brand);
+    capture(
+        sub { ($glut_api_version, $glut_brand) = $step->_evaluate_cc_run(
+            $test,
+            $conf->options->get( 'verbose' )
+        ); },
+        \$stdout,
+        \$stderr,
+    );
+    is( $glut_api_version, $try[0],
+        "Got first expected return value for _evaluate_cc_run()." );
+    is( $glut_brand, $try[1],
+        "Got first expected return value for _evaluate_cc_run()." );
+    like(
+        $stdout,
+        qr/yes, $glut_brand API version $glut_api_version/,
+        "Got expected verbose output for _evaluate_cc_run()"
+    );
+}
+
+########## _handle_glut() ##########
+
+{
+    my $glut_api_version = '4';
+    my $glut_brand = 'freeglut';
+    ok(auto::opengl::_handle_glut( $conf, $glut_api_version, $glut_brand ),
+        "_handle_glut() returned true value");
+    is( $conf->data->get( 'opengl' ),  'define',
+        "Got expected value for opengl");
+    is( $conf->data->get( 'has_opengl' ),  1,
+        "Got expected value for has_opengl");
+    is( $conf->data->get( 'HAS_OPENGL' ),  1,
+        "Got expected value for HAS_OPENGL");
+    is( $conf->data->get( 'glut' ),  'define',
+        "Got expected value for glut");
+    is( $conf->data->get( 'glut_brand' ),  $glut_brand,
+        "Got expected value for glut_brand");
+    is( $conf->data->get( 'has_glut' ),  $glut_api_version,
+        "Got expected value for has_glut");
+    is( $conf->data->get( 'HAS_GLUT' ),  $glut_api_version,
+        "Got expected value for HAS_GLUT");
+}
 
 pass("Completed all tests in $0");
 
@@ -49,7 +224,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-  auto_opengl-01.t - test config::auto::opengl
+  auto_opengl-01.t - test auto::opengl
 
 =head1 SYNOPSIS
 
@@ -59,8 +234,7 @@ pass("Completed all tests in $0");
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test configuration step class auto::opengl in the case
-where C<--without-opengl> has been requested on the command line.
+The tests in this file test configuration step class auto::opengl.
 
 =head1 AUTHOR
 

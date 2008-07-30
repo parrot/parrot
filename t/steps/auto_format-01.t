@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 16;
+use Test::More tests => 21;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -13,7 +13,12 @@ use_ok('config::auto::format');
 use Parrot::BuildUtil;
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use Parrot::Configure::Test qw( test_step_thru_runstep);
+use Parrot::Configure::Test qw(
+    test_step_thru_runstep
+    test_step_constructor_and_description
+);
+
+########## _set_intvalfmt() ##########
 
 my $args = process_options( {
     argv            => [],
@@ -29,15 +34,7 @@ my $pkg = q{auto::format};
 
 $conf->add_steps($pkg);
 $conf->options->set(%{$args});
-
-$task = $conf->steps->[-1];
-$step_name   = $task->step;
-
-$step = $step_name->new();
-ok(defined $step, "$step_name constructor returned defined value");
-isa_ok($step, $step_name);
-ok($step->description(), "$step_name has description");
-
+$step = test_step_constructor_and_description($conf);
 {
     $conf->data->set( iv => 'int' );
     auto::format::_set_intvalfmt($conf);
@@ -46,7 +43,6 @@ ok($step->description(), "$step_name has description");
     # reset for next test
     $conf->data->set( iv => undef );
 }
-
 {
     $conf->data->set( iv => 'long' );
     auto::format::_set_intvalfmt($conf);
@@ -55,7 +51,6 @@ ok($step->description(), "$step_name has description");
     # reset for next test
     $conf->data->set( iv => undef );
 }
-
 {
     $conf->data->set( iv => 'long int' );
     auto::format::_set_intvalfmt($conf);
@@ -64,7 +59,6 @@ ok($step->description(), "$step_name has description");
     # reset for next test
     $conf->data->set( iv => undef );
 }
-
 {
     $conf->data->set( iv => 'long long' );
     auto::format::_set_intvalfmt($conf);
@@ -73,7 +67,6 @@ ok($step->description(), "$step_name has description");
     # reset for next test
     $conf->data->set( iv => undef );
 }
-
 {
     $conf->data->set( iv => 'long long int' );
     auto::format::_set_intvalfmt($conf);
@@ -82,11 +75,47 @@ ok($step->description(), "$step_name has description");
     # reset for next test
     $conf->data->set( iv => undef );
 }
-
 {
     my $type = 'foobar';
     $conf->data->set( iv => $type );
     eval { auto::format::_set_intvalfmt($conf); };
+    like($@,
+        qr/Can't find a printf-style format specifier for type '$type'/, #'
+        "Got expected error message");
+}
+
+########## _set_floatvalfmt_nvsize() ##########
+
+{
+    $conf->data->set( nv => 'double' );
+    auto::format::_set_floatvalfmt_nvsize($conf);
+    is($conf->data->get( 'floatvalfmt' ), '%f',
+        "floatvalfmt set as expected");
+    is($conf->data->get( 'nvsize' ), $conf->data->get( 'doublesize' ),
+        "nvsize set as expected");
+    $conf->data->set(
+        nv          => undef,
+        floatvalfmt => undef,
+        nvsize      => undef,
+    );
+}
+{
+    $conf->data->set( nv => 'long double' );
+    auto::format::_set_floatvalfmt_nvsize($conf);
+    is($conf->data->get( 'floatvalfmt' ), '%Lf',
+        "floatvalfmt set as expected");
+    is($conf->data->get( 'nvsize' ), $conf->data->get( 'hugefloatvalsize' ),
+        "nvsize set as expected");
+    $conf->data->set(
+        nv          => undef,
+        floatvalfmt => undef,
+        nvsize      => undef,
+    );
+}
+{
+    my $type = 'foobar';
+    $conf->data->set( nv => 'foobar' );
+    eval { auto::format::_set_floatvalfmt_nvsize($conf); };
     like($@,
         qr/Can't find a printf-style format specifier for type '$type'/, #'
         "Got expected error message");
@@ -98,7 +127,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-auto_format-01.t - test config::auto::format
+auto_format-01.t - test auto::format
 
 =head1 SYNOPSIS
 
@@ -108,7 +137,7 @@ auto_format-01.t - test config::auto::format
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test subroutines exported by config::auto::format.
+The tests in this file test auto::format.
 
 =head1 AUTHOR
 
