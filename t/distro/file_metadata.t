@@ -86,7 +86,7 @@ TEST_MIME: {
     # find test files
     my $test_suffix = '.t';
     my @test_files  = grep { m/\Q$test_suffix\E$/ } @manifest_files;
-    my $test        = 'svn:mime-type';
+    my $test        = 'svn:mime-type for .t';
     my $expected    = 'text/plain';
     my @failed      = verify_attributes( $test, $expected, 0, $mime_types, \@test_files );
 
