@@ -224,18 +224,18 @@ subroutine.
 Declare a lexical variable that is an alias for a PMC register. For example,
 given this preamble:
 
-    .lex "$a", $P0
+    .lex '$a', $P0
     $P1 = new 'Integer'
 
     These two opcodes have an identical effect:
 
     $P0 = $P1
-    store_lex "$a", $P1
+    store_lex '$a', $P1
 
     And these two opcodes also have an identical effect:
 
     $P1 = $P0
-    $P1 = find_lex "$a"
+    $P1 = find_lex '$a'
 
 =item .const <type> <identifier> = <const>
 
@@ -283,12 +283,12 @@ You can specify the root namespace by using empty brackets, such as:
 
     .namespace [ ]
 
-The brackets are not optional, although the string inside them is.
+The brackets are not optional, although the key inside them is.
 
 {{ NOTE: currently the brackets *are* optional, so this is an
-implementation change. }}
+implementation change. See RT #48549}}
 
-=item .loadlib "lib_name"
+=item .loadlib 'lib_name'
 
 Load the given library at compile time, that is, as soon that line is
 parsed.  See also the C<loadlib> opcode, which does the same at run time.
@@ -296,19 +296,19 @@ parsed.  See also the C<loadlib> opcode, which does the same at run time.
 A library loaded this way is also available at runtime, as if it has been
 loaded again in C<:load>, so there is no need to call C<loadlib> at runtime.
 
-=item .HLL <hll_name>
+=item .HLL <hll_name> [unimplemented: RT #57426]
 
 Define the HLL for the current file. Takes one string constant, the name
 of the HLL.
 
-=item .HLL <hll_name>, <hll_lib> [deprecated]
+=item .HLL <hll_name>, <hll_lib> [deprecated: RT #57428]
 
 An old form of the .HLL directive that also loaded a shared lib for the
 HLL. Use C<.loadlib> instead.
 
-=item .HLL_map <core_type> = <user_type>
+=item .HLL_map <core_type> = <user_type> [unimplemented: RT #57430]
 
-{{ NOTE: the '=' used to be ','. }}
+=item .HLL_map <core_type>, <user_type> [deprecated: RT # 57432]
 
 Whenever Parrot has to create PMCs inside C code on behalf of the running
 user program, it consults the current type mapping for the executing HLL
@@ -320,7 +320,7 @@ For example, with this code snippet:
 
   .loadlib 'dynlexpad'
 
-  .HLL "Foo", ""
+  .HLL 'Foo'
   .HLL_map 'LexPad' = 'DynLexPad'
 
   .sub main :main
@@ -454,17 +454,17 @@ instruction from another file).
 As an example, suppose file C<main.pir> contains:
 
     .sub main
-        load_bytecode "foo.pir"
+        load_bytecode 'foo.pir'
     .end
 
 and the file C<foo.pir> contains:
 
     .sub foo :immediate
-        print "42"
+        print '42'
     .end
 
     .sub bar :postcomp
-        print "43"
+        print '43'
     .end
 
 Executing C<foo.pir> will run both C<foo> and C<bar>.  On the other hand,
@@ -475,8 +475,8 @@ C<foo> or C<bar>.
 =item :method
 
   .sub bar :method
-  .sub bar :method("foo")
-  
+  .sub bar :method('foo')
+
 The marked C<.sub> is a method, added as a method in the class that
 corresponds to the current namespace, and not stored in the namespace.
 In the method body, the object PMC can be referred to with C<self>.
@@ -487,15 +487,15 @@ that name instead of the C<.sub> name.
 =item :vtable
 
   .sub bar :vtable
-  .sub bar :vtable("foo")
+  .sub bar :vtable('foo')
 
 The marked C<.sub> overrides a vtable function, and is not stored in the
 namespace. By default, it overrides a vtable function with the same name
 as the C<.sub> name.  To override a different vtable function, use
-C<:vtable("...")>. For example, to have a C<.sub> named I<ToString> also
-be the vtable function C<get_string>), use C<:vtable("get_string")>.
+C<:vtable('...')>. For example, to have a C<.sub> named I<ToString> also
+be the vtable function C<get_string>), use C<:vtable('get_string')>.
 
-When the B<:vtable> flag is set, the object PMC can be referred to with 
+When the B<:vtable> flag is set, the object PMC can be referred to with
 C<self>, as with the B<:method> flag.
 
 =item :outer(subname)
@@ -583,15 +583,6 @@ of C<.local>, into which parameter(s) of the current subroutine should
 be stored. Available flags:
 C<:slurpy>, C<:named>, C<:optional>, C<:opt_flag> and C<:unique_reg>.
 
-=item .param <type> "<identifier>" => <identifier> [:<flag>]* [deprecate]
-
-{{ NOTE: if this is already implemented, deprecate, otherwise, just
-delete from spec.}}
-
-Define a named parameter. This is syntactic sugar for:
-
- .param <type> <identifier> :named("<identifier>")
-
 =back
 
 =head3 Parameter Passing and Getting Flags
@@ -609,8 +600,9 @@ is thrown, Parrot will execute the installed exception handler. In order to
 retrieve the thrown exception, use the C<.get_results> directive. This
 directive always takes 2 arguments: an exception object and a message string.
 
-{{ Wouldn't it be more useful to make this flexible, or at least only the
-exception object? The message can be retrieved from the exception object. }}
+{{ NOTE: Wouldn't it be more useful to make this flexible, or at least only
+the exception object? The message can be retrieved from the exception object.
+See RT #57436 }}
 
    push_eh handler
    ...
@@ -629,7 +621,7 @@ handler; only declarations (.lex, .local) may come first.
 
 Any PASM opcode is a valid PIR instruction. In addition, PIR defines some
 syntactic shortcuts. These are provided for ease of use by humans producing
-and maintaing PIR code.
+and maintaining PIR code.
 
 =over 4
 
@@ -741,7 +733,7 @@ assign C<substr> op with a length of 1. }}
 
 =item <var> = <opcode> <arguments>
 
-All opcodes can use this PIR syntactic sugar. The first argument for the
+Many opcodes can use this PIR syntactic sugar. The first argument for the
 opcode is placed before the C<=>, and all remaining arguments go after the
 opcode name. For example:
 
@@ -751,13 +743,12 @@ becomes:
 
   $P0 = new 'Type'
 
-=item global "string" = <var>
+Note that this only works for opcodes that have have a leading C<OUT>
+parameter. [this restriction unimplemented: RT #36283]
 
-{{ DEPRECATED: op store_global was deprecated }}
+=item global "string" = <var> [deprecated: RT #48016]
 
-=item <var> = global "string"
-
-{{ DEPRECATED: op find_global was deprecated }}
+=item <var> = global "string" [deprecated: RT #48018]
 
 =item ([<var1> [:<flag1> ...], ...]) = <var2>([<arg1> [:<flag2> ...], ...])
 
@@ -798,7 +789,7 @@ deprecated.
 
 =item .return <var>(args)
 
-=item .return <var>."somemethod"(args)
+=item .return <var>.'somemethod'(args)
 
 =item .return <var>.<var>(args)
 
@@ -838,7 +829,7 @@ the PIR compiler handles the following directives:
 
 =over 4
 
-=item * C<.include> "<filename>"
+=item * C<.include> '<filename>'
 
 The C<.include> directive takes a string argument that contains the
 name of the PIR file that is included. The contents of the included
