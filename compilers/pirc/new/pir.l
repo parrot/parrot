@@ -164,17 +164,6 @@ dupstrn(char const * const source, size_t num_chars) {
 }
 
 
-/* after each rule execute update_location() */
-#define YY_USER_ACTION  do {                                                \
-                            lexer_state *my_lexer = yyget_extra(yyscanner); \
-                            update_location(yyscanner, my_lexer);           \
-                        }                                                   \
-                        while(0);
-
-
-
-
-
 /*
 
 =item C<new_lexer>
@@ -188,7 +177,6 @@ new_lexer(char * const filename) {
     assert(lexer != NULL);
 
     lexer->filename      = filename;
-    lexer->line_nr       = 1;
     lexer->line_pos      = 1;
     lexer->parse_errors  = 0;
 
@@ -248,6 +236,9 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 %option header-file="pirlexer.h"
 
 %option nounput
+
+/* use flex' built-in capability for line counting */
+%option yylineno
 
 /* make the scanner re-entrant */
 %option reentrant

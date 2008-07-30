@@ -185,13 +185,13 @@ parser finds a syntax error.
 
 */
 int
-yyerror(yyscan_t yyscanner, lexer_state * const  lexer, char const * const message)
+yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message)
 {
     char const * const text = yyget_text(yyscanner);
     lexer->parse_errors++;
 
     fprintf(stderr, "\nError in file '%s' (line %d)\n%s ",
-            lexer->filename, lexer->line_nr, message);
+            lexer->filename, yyget_lineno(yyscanner), message);
 
     /* print current token if it's not a newline (or \r\n on windows) */
     /* the following should be fixed; the point is not to print the token if

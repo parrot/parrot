@@ -19,8 +19,6 @@ This is a complete rewrite of the parser for the PIR language.
 TODO:
 
  * rename TK_SYM_?REG to TK_?REG (as there's no longer PASM registers)
- * use a flex-generated line counter in the lexer instead of custom
-   code (this is in pir.l).
 
 =cut
 
