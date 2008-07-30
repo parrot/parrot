@@ -15,6 +15,13 @@ pir.y
 
 This is a complete rewrite of the parser for the PIR language.
 
+
+TODO:
+
+ * rename TK_SYM_?REG to TK_?REG (as there's no longer PASM registers)
+ * use a flex-generated line counter in the lexer instead of custom
+   code (this is in pir.l).
+
 =cut
 
 */
@@ -74,17 +81,15 @@ extern YY_DECL;
 /* some defines to prevent magic "1"s and "0"s in the code */
 #define GLOBALCONST     1
 
-#define IS_PASM_REG     1
-
 #define MAX_NUM_ERRORS  10
 
 
 %}
 
 %union {
-    double dval;
-    int    ival;
-    char  *sval;
+    double              dval;
+    int                 ival;
+    char               *sval;
     struct constant    *constval;
     struct instruction *instr;
     struct expression  *expr;
@@ -92,7 +97,7 @@ extern YY_DECL;
     struct argument    *argm;
     struct invocation  *invo;
 
-    void *fixme;
+    void               *fixme;
 }
 
 
@@ -133,10 +138,6 @@ extern YY_DECL;
        <sval> TK_STRINGC       "string constant"
        <ival> TK_INTC          "integer constant"
        <dval> TK_NUMC          "number constant"
-       <ival> TK_PASM_PREG     "PMC register"
-       <ival> TK_PASM_NREG     "Number register"
-       <ival> TK_PASM_SREG     "String register"
-       <ival> TK_PASM_IREG     "Integer register"
        <ival> TK_SYM_PREG      "Symbolic PMC register"
        <ival> TK_SYM_NREG      "Symbolic number register"
        <ival> TK_SYM_SREG      "Symbolic string register"
@@ -222,7 +223,6 @@ extern YY_DECL;
              invokable
              opt_ret_cont
              reg
-             pasm_reg
              target
              result_target
              long_result
@@ -779,17 +779,13 @@ method               : invokable
 invokable            : identifier
                             { $$ = target_from_ident($1); }
                      | TK_SYM_PREG
-                            { $$ = reg(PMC_TYPE, $1, !IS_PASM_REG); }
-                     | TK_PASM_PREG
-                            { $$ = reg(PMC_TYPE, $1, IS_PASM_REG); }
+                            { $$ = reg(PMC_TYPE, $1, 0); }
                      ;
 
 string_object        : TK_STRINGC
                             { $$ = target_from_string($1); }
                      | TK_SYM_SREG
-                            { $$ = reg(STRING_TYPE, $1, !IS_PASM_REG); }
-                     | TK_PASM_SREG
-                            { $$ = reg(STRING_TYPE, $1, IS_PASM_REG); }
+                            { $$ = reg(STRING_TYPE, $1, 0); }
                      ;
 
 
@@ -1042,17 +1038,10 @@ target      : reg            { $$ = $1; }
             | identifier     { $$ = new_target(UNKNOWN_TYPE, $1); }
             ;
 
-reg         : TK_SYM_PREG    { $$ = reg(PMC_TYPE, $1, !IS_PASM_REG); }
-            | TK_SYM_NREG    { $$ = reg(NUM_TYPE, $1, !IS_PASM_REG); }
-            | TK_SYM_IREG    { $$ = reg(INT_TYPE, $1, !IS_PASM_REG); }
-            | TK_SYM_SREG    { $$ = reg(STRING_TYPE, $1, !IS_PASM_REG); }
-            | pasm_reg
-            ;
-
-pasm_reg    : TK_PASM_PREG   { $$ = reg(PMC_TYPE, $1, IS_PASM_REG); }
-            | TK_PASM_NREG   { $$ = reg(NUM_TYPE, $1, IS_PASM_REG); }
-            | TK_PASM_IREG   { $$ = reg(INT_TYPE, $1, IS_PASM_REG); }
-            | TK_PASM_SREG   { $$ = reg(STRING_TYPE, $1, IS_PASM_REG); }
+reg         : TK_SYM_PREG    { $$ = reg(PMC_TYPE, $1, 0); }
+            | TK_SYM_NREG    { $$ = reg(NUM_TYPE, $1, 0); }
+            | TK_SYM_IREG    { $$ = reg(INT_TYPE, $1, 0); }
+            | TK_SYM_SREG    { $$ = reg(STRING_TYPE, $1, 0); }
             ;
 
 identifier  : TK_IDENT

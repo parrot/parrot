@@ -392,11 +392,6 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
                return TK_STRINGC;
              }
 
-"P"{DIGIT}+  { yylval->ival = atoi(yytext + 1); return TK_PASM_PREG; }
-"S"{DIGIT}+  { yylval->ival = atoi(yytext + 1); return TK_PASM_SREG; }
-"N"{DIGIT}+  { yylval->ival = atoi(yytext + 1); return TK_PASM_NREG; }
-"I"{DIGIT}+  { yylval->ival = atoi(yytext + 1); return TK_PASM_IREG; }
-
 "$P"{DIGIT}+  { yylval->ival = atoi(yytext + 2); return TK_SYM_PREG; }
 "$S"{DIGIT}+  { yylval->ival = atoi(yytext + 2); return TK_SYM_SREG; }
 "$N"{DIGIT}+  { yylval->ival = atoi(yytext + 2); return TK_SYM_NREG; }
