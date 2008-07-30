@@ -231,7 +231,6 @@ extern YY_DECL;
              opt_target_list
              opt_list
              target_list
-             param_def
              local_id
              local_id_list
 
@@ -366,24 +365,24 @@ loadlib          : ".loadlib" TK_STRINGC
 
 /* HLL stuff     */
 
-hll_specifier    : ".HLL" TK_STRINGC ',' TK_STRINGC
-                           { set_hll($2, $4); }
+hll_specifier    : ".HLL" TK_STRINGC
+                           { /*set_hll($2, $4);*/ }
                  ;
 
-hll_mapping      : ".HLL_map" TK_STRINGC ',' TK_STRINGC
+hll_mapping      : ".HLL_map" TK_STRINGC '=' TK_STRINGC
                            { set_hll_map($2, $4); }
                  ;
 
 
 /* Namespaces */
 
-namespace_decl   : ".namespace" opt_namespace_id
+namespace_decl   : ".namespace" '[' opt_namespace_id ']'
                  ;
 
 opt_namespace_id : /* empty */
                            { $$ = NULL; }
-                 | '[' namespace_id ']'
-                           { $$ = $2; }
+                 | namespace_id
+                           { $$ = $1; }
                  ;
 
 namespace_id     : TK_STRINGC
@@ -449,17 +448,13 @@ parameters       : /* empty */
                  | parameters parameter
                  ;
 
-parameter        : ".param" param_def param_flags "\n"
-                        { set_param_flag($2, $3);
+parameter        : ".param" type identifier param_flags "\n"
+                        { /* set_param_flag($2, $3);
                           IF_NAMED_PARAM_SET_ALIAS($2, $3);
+                          */
                         }
                  ;
 
-param_def        : type identifier
-                        { $$ = add_param(lexer, $1, $2); }
-                 | type TK_STRINGC "=>" identifier
-                        { $$ = add_param_named(lexer, $1, $4, $2); }
-                 ;
 
 /* Instructions */
 
