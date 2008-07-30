@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan); # tests =>  56;
+use Test::More tests =>  56;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -43,7 +43,7 @@ $conf->options->set( %{$args} );
 SKIP: {
     skip 'Tests not yet passing on Sun/Solaris',
     39
-    if $^O =~ m/sun|solaris/;
+    if $^O =~ m/sun|solaris/i;
 
 my $step = test_step_constructor_and_description($conf);
 
