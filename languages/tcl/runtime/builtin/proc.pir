@@ -1,10 +1,4 @@
-=head1 [proc]
-
-Create a PIR sub on the fly for this user defined proc.
-
-=cut
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&proc'

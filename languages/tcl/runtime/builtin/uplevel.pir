@@ -1,10 +1,4 @@
-###
-# [uplevel]
-
-# Pretty much a copy of 'eval' except for the call_level...
-# needs argument checking.
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&uplevel'

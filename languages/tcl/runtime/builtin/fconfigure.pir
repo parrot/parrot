@@ -1,14 +1,8 @@
-# RT#40704: Stub
-# help tcltest compile
-
-.HLL '_Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
-.sub 'fconfigure'
-  .param string retval
-  .param pmc    raw_args
-  .param pmc    argv
-
+.sub '&fconfigure'
+  .param pmc argv :slurpy
   .return('')
 .end
 

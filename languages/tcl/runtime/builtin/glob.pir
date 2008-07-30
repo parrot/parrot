@@ -1,14 +1,8 @@
-# RT#40702: Stub
-# help tcltest compile
-
-.HLL '_Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
-.sub 'glob'
-  .param string retval
-  .param pmc    raw_args
-  .param pmc    argv
-
+.sub '&glob'
+  .param pmc argv :slurpy
   .return('')
 .end
 

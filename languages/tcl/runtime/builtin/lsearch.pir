@@ -1,7 +1,5 @@
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
-
-# RT#40699: this is only a stub
 
 .sub '&lsearch'
   .param pmc argv :slurpy

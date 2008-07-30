@@ -1,10 +1,4 @@
-###
-# [eval]
-
-#
-# eval arg [... arg arg]
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&eval'

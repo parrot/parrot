@@ -1,14 +1,11 @@
-###
-# [global]
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&global'
   .param pmc argv :slurpy
 
   .local int argc
-  argc = argv
+  argc = elements argv
 
   if argc == 0 goto badargs
 

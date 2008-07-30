@@ -1,7 +1,4 @@
-###
-# [string]
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&string'
@@ -9,8 +6,9 @@
 
   .local pmc retval
 
-  $I3 = argv
-  unless $I3 goto no_args
+  .local int argc
+  argc = elements argv
+  unless argc goto no_args
 
   .local string subcommand_name
   subcommand_name = shift argv
@@ -71,7 +69,7 @@ no_args:
   .local int argc
   .local pmc retval
 
-  argc = argv
+  argc = elements argv
   if argc > 3 goto bad_args
   if argc < 2 goto bad_args
   $S1 = argv[0]
@@ -101,7 +99,7 @@ bad_args:
   .local int argc
   .local pmc retval
 
-  argc = argv
+  argc = elements argv
   if argc > 3 goto bad_args
   if argc < 2 goto bad_args
   $S1 = argv[0]
@@ -179,7 +177,7 @@ done:
   .local int argc
   .local pmc retval
 
-  argc = argv
+  argc = elements argv
   if argc > 3 goto bad_args
   if argc < 1 goto bad_args
 
@@ -232,7 +230,7 @@ bad_args:
   .local int argc
   .local pmc retval
 
-  argc = argv
+  argc = elements argv
   if argc > 3 goto bad_args
   if argc < 1 goto bad_args
 
@@ -284,7 +282,7 @@ bad_args:
   .local int argc
   .local pmc retval
 
-  argc = argv
+  argc = elements argv
   if argc > 3 goto bad_args
   if argc < 1 goto bad_args
 
@@ -334,7 +332,7 @@ bad_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc != 1 goto bad_length
   $S0 = argv[0]
   $I0 = bytelength $S0
@@ -348,7 +346,7 @@ bad_length:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc != 1 goto bad_length
 
   $S1 = argv[0]
@@ -408,7 +406,7 @@ bad_range:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
 
   .local int nocase
   nocase = 0
@@ -463,7 +461,7 @@ bad_match:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
 
   if argc != 2 goto bad_repeat
   .local string the_string
@@ -491,7 +489,7 @@ bad_repeat:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc == 0 goto bad_args
   if argc > 3 goto bad_args
   .local int nocase
@@ -572,7 +570,7 @@ bad_args:
 .sub 'equal'
   .param pmc argv
   .local int argc
-  argc = argv
+  argc = elements argv
 
   .local string a, b
   .local int length, nocase
@@ -596,7 +594,7 @@ got_nocase:
   nocase = 1
 gotten:
 
-  argc = argv
+  argc = elements argv
   if argc == 2 goto flags_done
   if argc < 2 goto bad_args
   branch flag_loop
@@ -635,7 +633,7 @@ bad_args:
   .local pmc toNumber
 
   .local int argc
-  argc = argv
+  argc = elements argv
 
   .local int strict
   strict = 0
@@ -830,7 +828,7 @@ bad_args:
   .local pmc getIndex
   getIndex = get_root_global ['_tcl'], 'getIndex'
 
-  argc = argv
+  argc = elements argv
   if argc > 4 goto bad_args
   if argc < 3 goto bad_args
 
@@ -882,7 +880,7 @@ bad_args:
   .local int argc
   .local pmc retval
 
-  argc = argv
+  argc = elements argv
   if argc > 2 goto bad_args
   if argc < 1 goto bad_args
 
@@ -921,7 +919,7 @@ bad_args:
   .local int argc
   .local pmc retval
 
-  argc = argv
+  argc = elements argv
   if argc > 2 goto bad_args
   if argc < 1 goto bad_args
 
@@ -961,7 +959,7 @@ bad_args:
   .local int argc
   .local pmc retval
 
-  argc = argv
+  argc = elements argv
   if argc > 2 goto bad_args
   if argc < 1 goto bad_args
 
@@ -1012,7 +1010,7 @@ bad_args:
   .local int size
 
   size = -1
-  argc = argv
+  argc = elements argv
 
   if argc < 1 goto bad_args
 
@@ -1020,7 +1018,7 @@ bad_args:
   $S1 = pop argv
 
 args_processment:
-  argc = argv
+  argc = elements argv
   if argc == 0 goto args_processed
   $S4 = shift argv
   if $S4 == '-nocase' goto arg_nocase

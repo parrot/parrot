@@ -1,14 +1,11 @@
-###
-# [source]
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&lindex'
   .param pmc argv :slurpy
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc < 1 goto bad_args
 
   .local pmc toList, getIndex

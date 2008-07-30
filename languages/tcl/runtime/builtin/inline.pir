@@ -1,18 +1,11 @@
-#
-# [inline <language> { code }]
-#
-# a partcl only command that should probably live in a loadable lib.
-#
-# Like eval, except that you must specify a registered compiler.
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&inline'
   .param pmc argv :slurpy
 
   .local int argc
-  argc = argv
+  argc = elements argv
 
   if argc != 2 goto bad_args
 

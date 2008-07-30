@@ -1,10 +1,4 @@
-=head1 [gets]
-
-read a line from a channel
-
-=cut
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&gets'

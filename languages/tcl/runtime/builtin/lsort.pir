@@ -1,8 +1,4 @@
-#
-# [lsort]
-#
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&lsort'
@@ -13,7 +9,7 @@
   .local pmc compare
   .local pmc sort
 
-  argc = argv
+  argc = elements argv
   if argc == 0 goto wrong_args
 
   compare = get_root_global ['_tcl';'helpers';'lsort'], 'ascii'

@@ -1,10 +1,4 @@
-###
-# [expr]
-
-#
-# expr arg [... arg arg]
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&expr'
@@ -19,7 +13,7 @@
 
   expr = ''
   looper = 0
-  argc = argv
+  argc = elements argv
   unless argc goto no_args
 
   expr = join ' ', argv

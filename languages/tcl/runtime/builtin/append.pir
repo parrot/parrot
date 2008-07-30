@@ -1,17 +1,11 @@
-###
-# [append]
-
-#
-# append var [...]
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&append'
   .param pmc argv :slurpy
 
   .local int argc
-  argc = argv
+  argc = elements argv
 
   .local pmc read
   read = get_root_global ['_tcl'], 'readVar'

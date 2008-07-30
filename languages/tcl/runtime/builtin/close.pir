@@ -1,7 +1,4 @@
-###
-# [close]
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&close'

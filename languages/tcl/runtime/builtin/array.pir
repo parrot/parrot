@@ -1,7 +1,4 @@
-###
-# [array]
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 #
@@ -13,7 +10,7 @@
   .param pmc argv :slurpy
 
   .local int argc
-  argc = argv
+  argc = elements argv
 
   if argc < 2 goto few_args  # subcommand *and* array name
 
@@ -90,7 +87,7 @@ few_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc goto bad_args
 
   .return (is_array)
@@ -106,7 +103,7 @@ bad_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc goto bad_args
 
   if is_array == 0 goto size_none
@@ -127,7 +124,7 @@ bad_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc != 1 goto bad_args
 
   .local pmc elems
@@ -199,7 +196,7 @@ odd_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc > 1 goto bad_args
 
   .local string match_str
@@ -263,7 +260,7 @@ not_array:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc > 1 goto bad_args
 
 
@@ -321,7 +318,7 @@ not_array:
   .local pmc retval
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc > 2 goto bad_args
 
   .local string mode, pattern

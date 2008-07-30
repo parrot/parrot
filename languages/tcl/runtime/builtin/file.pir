@@ -1,11 +1,11 @@
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&file'
   .param pmc argv :slurpy
 
   .local int argc
-  argc = argv
+  argc = elements argv
 
   if argc == 0 goto few_args
 
@@ -81,7 +81,7 @@ few_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc == 0 goto bad_args
 
   .local string dirsep
@@ -124,7 +124,7 @@ bad_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
 
   if argc != 2 goto bad_args
 
@@ -190,7 +190,7 @@ bad_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
 
   if argc != 1 goto bad_args
 
@@ -227,7 +227,7 @@ bad_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
 
   if argc != 1 goto bad_args
 
@@ -264,7 +264,7 @@ bad_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
 
   if argc != 1 goto bad_args
 
@@ -298,7 +298,7 @@ bad_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
 
   if argc != 1 goto bad_args
 
@@ -326,7 +326,7 @@ bad_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
 
   if argc != 1 goto bad_args
 
@@ -354,7 +354,7 @@ bad_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
 
   if argc != 1 goto bad_args
 

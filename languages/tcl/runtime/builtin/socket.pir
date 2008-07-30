@@ -1,10 +1,4 @@
-=head1 [socket]
-
-Sockets!
-
-=cut
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&socket'

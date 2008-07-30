@@ -1,17 +1,11 @@
-###
-# [format]
-
-#
-# format string arg arg arg
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&format'
   .param pmc argv :slurpy
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc == 0 goto noargs
 
   .local string format

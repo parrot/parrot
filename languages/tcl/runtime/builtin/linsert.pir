@@ -1,8 +1,4 @@
-#
-# [linsert]
-#
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&linsert'

@@ -9,7 +9,7 @@ real top level namespace.
 
 =cut
 
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&namespace'
@@ -17,8 +17,9 @@ real top level namespace.
 
   .local pmc retval
 
-  $I3 = argv
-  unless $I3 goto no_args
+  .local int argc
+  argc = elements argv
+  unless argc goto no_args
 
   .local string subcommand_name
   subcommand_name = shift argv
@@ -73,7 +74,7 @@ no_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc goto bad_args
 
   .local pmc ns, splitNamespace
@@ -127,7 +128,7 @@ return:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc != 1 goto bad_args
 
   .local pmc colons, split, name
@@ -173,7 +174,7 @@ bad_args:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc != 1 goto bad_args
 
   .local pmc p6r,match
@@ -200,7 +201,7 @@ WHOLE:
   .param pmc argv
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc != 1 goto bad_args
 
   .local pmc p6r,match
@@ -268,7 +269,7 @@ global_ns:
   ($S0, $S1) = compileTcl($S0, 'pir_only'=>1)
   $I0 = code.unique()
   code.emit(<<'END_PIR', namespace, $S0, $I0, $S1)
-.HLL 'tcl', 'tcl_group'
+.HLL 'tcl', ''
 .namespace %0
 # src/compiler.pir :: pir_compiler (2)
 .pragma n_operators 1

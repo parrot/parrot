@@ -1,14 +1,8 @@
-# RT#40700: Stub
-# help tcltest compile
-
-.HLL '_Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
-.sub 'auto_execok'
-  .param string retval
-  .param pmc    raw_args
-  .param pmc    argv
-
+.sub '&auto_execok'
+  .param pmc argv :slurpy
   .return('')
 .end
 

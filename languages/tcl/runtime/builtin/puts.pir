@@ -1,14 +1,11 @@
-###
-# [puts]
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&puts'
   .param pmc argv :slurpy
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc == 0 goto error
   if argc > 3 goto error
 

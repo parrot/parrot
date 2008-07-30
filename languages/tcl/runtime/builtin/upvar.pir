@@ -1,7 +1,4 @@
-###
-# [upvar]
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&upvar'
@@ -36,7 +33,7 @@ skip:
   findVar = get_root_global ['_tcl'], 'findVar'
 
   .local int counter, argc
-  argc       = argv
+  argc       = elements argv
   counter    = 0
   .local int difference
   difference = call_level - new_call_level

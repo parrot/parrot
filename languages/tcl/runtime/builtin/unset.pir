@@ -1,7 +1,4 @@
-###
-# [unset]
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&unset'

@@ -1,11 +1,11 @@
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&lassign'
   .param pmc argv :slurpy
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc < 2 goto bad_args
 
   .local pmc retval

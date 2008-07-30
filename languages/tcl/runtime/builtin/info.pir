@@ -1,10 +1,4 @@
-=head2 [incr]
-
- Provide introspection about the tcl interpreter. (And by extension, parrot.)
-
-=cut
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&info'
@@ -549,7 +543,7 @@ bad_args:
 .sub 'nameofexecutable'
   .param pmc argv
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc goto bad_args
   $P1 = get_root_global ['_tcl'], 'nameofexecutable'
   .return($P1)

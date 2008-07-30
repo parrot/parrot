@@ -1,14 +1,11 @@
-###
-# [rename]
-
-.HLL 'Tcl', 'tcl_group'
+.HLL 'Tcl', ''
 .namespace []
 
 .sub '&rename'
   .param pmc argv :slurpy
 
   .local int argc
-  argc = argv
+  argc = elements argv
   if argc != 2 goto bad_args
 
   .local string oldName, newName
