@@ -73,10 +73,10 @@
      TK_STRINGC = 289,
      TK_INTC = 290,
      TK_NUMC = 291,
-     TK_SYM_PREG = 292,
-     TK_SYM_NREG = 293,
-     TK_SYM_SREG = 294,
-     TK_SYM_IREG = 295,
+     TK_PREG = 292,
+     TK_NREG = 293,
+     TK_SREG = 294,
+     TK_IREG = 295,
      TK_PARROT_OP = 296,
      TK_INT = 297,
      TK_NUM = 298,
@@ -171,10 +171,10 @@
 #define TK_STRINGC 289
 #define TK_INTC 290
 #define TK_NUMC 291
-#define TK_SYM_PREG 292
-#define TK_SYM_NREG 293
-#define TK_SYM_SREG 294
-#define TK_SYM_IREG 295
+#define TK_PREG 292
+#define TK_NREG 293
+#define TK_SREG 294
+#define TK_IREG 295
 #define TK_PARROT_OP 296
 #define TK_INT 297
 #define TK_NUM 298
@@ -238,7 +238,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 89 "pir.y"
+#line 82 "pir.y"
 {
     double              dval;
     int                 ival;

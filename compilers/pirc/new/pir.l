@@ -101,35 +101,6 @@ void noprint(FILE *fp, char *format, ...) { }
 
 =over 4
 
-=item C<update_location>
-
-Update the line number. The yytext buffer is scanned for '\n'
-characters; for each one, the line number is incremented. It's done this
-way, because we can't increment it in the rule for matching newlines, as
-a set of consecutive newlines are matched together and a single newline
-token is returned.
-
-*/
-static void
-update_location(void *yyscanner, lexer_state * const lexer) {
-    char const *iter = yyget_text(yyscanner);
-    assert(lexer != NULL);
-
-    /* TODO: is yytext NULL terminated? */
-    while (*iter != '\0') {
-        if (*iter == '\n') {
-            ++lexer->line_nr;
-            lexer->line_pos = 1; /* reset column */
-        }
-        else {
-            ++lexer->line_pos;
-        }
-        iter++;
-    }
-}
-
-/*
-
 =item C<dupstr>
 
 The C89 standard does not define a strdup() in the C library,
@@ -383,10 +354,10 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
                return TK_STRINGC;
              }
 
-"$P"{DIGIT}+  { yylval->ival = atoi(yytext + 2); return TK_SYM_PREG; }
-"$S"{DIGIT}+  { yylval->ival = atoi(yytext + 2); return TK_SYM_SREG; }
-"$N"{DIGIT}+  { yylval->ival = atoi(yytext + 2); return TK_SYM_NREG; }
-"$I"{DIGIT}+  { yylval->ival = atoi(yytext + 2); return TK_SYM_IREG; }
+"$P"{DIGIT}+  { yylval->ival = atoi(yytext + 2); return TK_PREG; }
+"$S"{DIGIT}+  { yylval->ival = atoi(yytext + 2); return TK_SREG; }
+"$N"{DIGIT}+  { yylval->ival = atoi(yytext + 2); return TK_NREG; }
+"$I"{DIGIT}+  { yylval->ival = atoi(yytext + 2); return TK_IREG; }
 
 {IDENT}":"    { /* make the label Id available in the parser. remove the ":" first. */
                 yylval->sval = dupstrn(yytext, yyleng - 1);

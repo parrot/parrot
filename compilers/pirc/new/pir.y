@@ -15,11 +15,6 @@ pir.y
 
 This is a complete rewrite of the parser for the PIR language.
 
-
-TODO:
-
- * rename TK_SYM_?REG to TK_?REG (as there's no longer PASM registers)
-
 =cut
 
 */
@@ -99,48 +94,48 @@ extern YY_DECL;
 }
 
 
-%token <sval> TK_LABEL  "label"
-       TK_NL            "\n"
+%token <sval> TK_LABEL      "label"
+       TK_NL                "\n"
 
-%token TK_HLL           ".HLL"
-       TK_HLL_MAP       ".HLL_map"
-       TK_N_OPERATORS   "n_operators"
-       TK_PRAGMA        ".pragma"
-       TK_LOADLIB       ".loadlib"
+%token TK_HLL               ".HLL"
+       TK_HLL_MAP           ".HLL_map"
+       TK_N_OPERATORS       "n_operators"
+       TK_PRAGMA            ".pragma"
+       TK_LOADLIB           ".loadlib"
 
-%token TK_SUB           ".sub"
-       TK_END           ".end"
-       TK_PARAM         ".param"
-       TK_LEX           ".lex"
-       TK_LOCAL         ".local"
-       TK_NAMESPACE     ".namespace"
-       TK_INVOCANT      ".invocant"
-       TK_METH_CALL     ".meth_call"
-       TK_GLOBALCONST   ".globalconst"
-       TK_CONST         ".const"
-       TK_RETURN        ".return"
-       TK_YIELD         ".yield"
-       TK_BEGIN_YIELD   ".begin_yield"
-       TK_END_YIELD     ".end_yield"
-       TK_BEGIN_RETURN  ".begin_return"
-       TK_END_RETURN    ".end_return"
-       TK_BEGIN_CALL    ".begin_call"
-       TK_END_CALL      ".end_call"
-       TK_GET_RESULTS   ".get_results"
-       TK_CALL          ".call"
-       TK_ARG           ".arg"
-       TK_RESULT        ".result"
-       TK_NCI_CALL      ".nci_call"
+%token TK_SUB               ".sub"
+       TK_END               ".end"
+       TK_PARAM             ".param"
+       TK_LEX               ".lex"
+       TK_LOCAL             ".local"
+       TK_NAMESPACE         ".namespace"
+       TK_INVOCANT          ".invocant"
+       TK_METH_CALL         ".meth_call"
+       TK_GLOBALCONST       ".globalconst"
+       TK_CONST             ".const"
+       TK_RETURN            ".return"
+       TK_YIELD             ".yield"
+       TK_BEGIN_YIELD       ".begin_yield"
+       TK_END_YIELD         ".end_yield"
+       TK_BEGIN_RETURN      ".begin_return"
+       TK_END_RETURN        ".end_return"
+       TK_BEGIN_CALL        ".begin_call"
+       TK_END_CALL          ".end_call"
+       TK_GET_RESULTS       ".get_results"
+       TK_CALL              ".call"
+       TK_ARG               ".arg"
+       TK_RESULT            ".result"
+       TK_NCI_CALL          ".nci_call"
 
-%token <sval> TK_IDENT         "identifier"
-       <sval> TK_STRINGC       "string constant"
-       <ival> TK_INTC          "integer constant"
-       <dval> TK_NUMC          "number constant"
-       <ival> TK_SYM_PREG      "Symbolic PMC register"
-       <ival> TK_SYM_NREG      "Symbolic number register"
-       <ival> TK_SYM_SREG      "Symbolic string register"
-       <ival> TK_SYM_IREG      "Symbolic integer register"
-       <sval> TK_PARROT_OP     "parrot op"
+%token <sval> TK_IDENT      "identifier"
+       <sval> TK_STRINGC    "string constant"
+       <ival> TK_INTC       "integer constant"
+       <dval> TK_NUMC       "number constant"
+       <ival> TK_PREG       "Symbolic PMC register"
+       <ival> TK_NREG       "Symbolic number register"
+       <ival> TK_SREG       "Symbolic string register"
+       <ival> TK_IREG       "Symbolic integer register"
+       <sval> TK_PARROT_OP  "parrot instruction"
 
 %token TK_INT               "int"
        TK_NUM               "num"
@@ -776,13 +771,13 @@ method               : invokable
 
 invokable            : identifier
                             { $$ = target_from_ident($1); }
-                     | TK_SYM_PREG
+                     | TK_PREG
                             { $$ = reg(PMC_TYPE, $1, 0); }
                      ;
 
 string_object        : TK_STRINGC
                             { $$ = target_from_string($1); }
-                     | TK_SYM_SREG
+                     | TK_SREG
                             { $$ = reg(STRING_TYPE, $1, 0); }
                      ;
 
@@ -1036,10 +1031,10 @@ target      : reg            { $$ = $1; }
             | identifier     { $$ = new_target(UNKNOWN_TYPE, $1); }
             ;
 
-reg         : TK_SYM_PREG    { $$ = reg(PMC_TYPE, $1, 0); }
-            | TK_SYM_NREG    { $$ = reg(NUM_TYPE, $1, 0); }
-            | TK_SYM_IREG    { $$ = reg(INT_TYPE, $1, 0); }
-            | TK_SYM_SREG    { $$ = reg(STRING_TYPE, $1, 0); }
+reg         : TK_PREG    { $$ = reg(PMC_TYPE, $1, 0); }
+            | TK_NREG    { $$ = reg(NUM_TYPE, $1, 0); }
+            | TK_IREG    { $$ = reg(INT_TYPE, $1, 0); }
+            | TK_SREG    { $$ = reg(STRING_TYPE, $1, 0); }
             ;
 
 identifier  : TK_IDENT
