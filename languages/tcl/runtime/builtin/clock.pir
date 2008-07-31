@@ -13,16 +13,11 @@
   subcommand_name = shift argv
 
   .local pmc options
-  options = new 'TclList'
-  push options, 'add'
-  push options, 'clicks'
-  push options, 'format'
-  push options, 'microseconds'
-  push options, 'milliseconds'
-  push options, 'scan'
-  push options, 'seconds'
+  options = get_root_global ['_tcl'; 'helpers'; 'clock'], 'options'
+
   .local pmc select_option
   select_option  = get_root_global ['_tcl'], 'select_option'
+
   .local string canonical_subcommand
   canonical_subcommand = select_option(options, subcommand_name)
 
@@ -78,6 +73,20 @@ bad_args:
   .return ($I0)
 bad_args:
   tcl_error 'wrong # args: should be "clock seconds"'
+.end
+
+.sub 'anon' :anon :load
+  .local pmc options
+  options = new 'TclList'
+  push options, 'add'
+  push options, 'clicks'
+  push options, 'format'
+  push options, 'microseconds'
+  push options, 'milliseconds'
+  push options, 'scan'
+  push options, 'seconds'
+
+  set_root_global ['_tcl'; 'helpers'; 'clock'], 'options', options
 .end
 
 # Local Variables:

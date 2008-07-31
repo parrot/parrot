@@ -5,10 +5,7 @@
     .param pmc argv :slurpy
 
     .local pmc options
-    options = new 'TclList'
-    options[0] = 'nobackslashes'
-    options[1] = 'nocommands'
-    options[2] = 'novariables'
+    options = get_root_global ['_tcl'; 'helpers'; 'subst'], 'options'
 
     .local pmc select_switches, switches
     select_switches  = get_root_global ['_tcl'], 'select_switches'
@@ -126,6 +123,17 @@ badswitch:
     $S0 .= '": must be -nobackslashes, -nocommands, or -novariables'
     tcl_error $S0
 .end
+
+.sub 'anon' :anon :load
+    .local pmc options
+    options = new 'TclList'
+    options[0] = 'nobackslashes'
+    options[1] = 'nocommands'
+    options[2] = 'novariables'
+
+    set_root_global ['_tcl'; 'helpers'; 'subst'], 'options', options
+.end
+
 
 # Local Variables:
 #   mode: pir

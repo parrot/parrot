@@ -11,14 +11,7 @@
   .local string expression, target, subSpec, original_target
 
   .local pmc options
-  options = new 'TclList'
-  push options, 'all'
-  push options, 'nocase'
-  push options, 'expanded' # RT#40774: use tcl-regexps
-  push options, 'line'
-  push options, 'linestop'
-  push options, 'lineanchor'
-  push options, 'start'
+  options = get_root_global ['_tcl'; 'helpers'; 'regsub'], 'options'
 
   .local pmc select_switches, switches
   select_switches  = get_root_global ['_tcl'], 'select_switches'
@@ -120,7 +113,20 @@ match_failed:
 
 badargs:
   tcl_error 'wrong # args: should be "regsub ?switches? exp string subSpec ?varName?"'
+.end
 
+.sub 'anon' :anon :load
+  .local pmc options
+  options = new 'TclList'
+  push options, 'all'
+  push options, 'nocase'
+  push options, 'expanded' # RT#40774: use tcl-regexps
+  push options, 'line'
+  push options, 'linestop'
+  push options, 'lineanchor'
+  push options, 'start'
+
+  set_root_global ['_tcl'; 'helpers'; 'regsub'], 'options', options
 .end
 
 # Local Variables:

@@ -9,17 +9,7 @@
   if argc < 2 goto badargs
 
   .local pmc options
-  options = new 'TclList'
-  push options, 'all'
-  push options, 'about'
-  push options, 'indices'
-  push options, 'inline'
-  push options, 'expanded' # RT#40774: use tcl-regexps
-  push options, 'line'
-  push options, 'linestop'
-  push options, 'lineanchor'
-  push options, 'nocase'
-  push options, 'start'
+  options = get_root_global ['_tcl'; 'helpers'; 'regexp'], 'options'
 
   .local pmc select_switches, switches
   select_switches  = get_root_global ['_tcl'], 'select_switches'
@@ -138,6 +128,23 @@ done:
 badargs:
   tcl_error 'wrong # args: should be "regexp ?switches? exp string ?matchVar? ?subMatchVar subMatchVar ...?"'
 
+.end
+
+.sub 'anon' :anon :load
+  .local pmc options
+  options = new 'TclList'
+  push options, 'all'
+  push options, 'about'
+  push options, 'indices'
+  push options, 'inline'
+  push options, 'expanded' # RT#40774: use tcl-regexps
+  push options, 'line'
+  push options, 'linestop'
+  push options, 'lineanchor'
+  push options, 'nocase'
+  push options, 'start'
+
+  set_root_global ['_tcl'; 'helpers'; 'regexp'], 'options', options
 .end
 
 # Local Variables:

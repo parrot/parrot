@@ -5,24 +5,7 @@
   .param pmc argv :slurpy
 
   .local pmc options
-  options = new 'TclList'
-  push options, 'all'
-  push options, 'ascii'
-  push options, 'decreasing'
-  push options, 'dictionary'
-  push options, 'exact'
-  push options, 'glob'
-  push options, 'increasing'
-  push options, 'index'
-  push options, 'inline'
-  push options, 'integer'
-  push options, 'nocase'
-  push options, 'not'
-  push options, 'real'
-  push options, 'regexp'
-  push options, 'sorted'
-  push options, 'start'
-  push options, 'subindices'
+  options = get_root_global ['_tcl'; 'helpers'; 'lsearch'], 'options'
 
   .local pmc select_switches, switches
   select_switches  = get_root_global ['_tcl'], 'select_switches'
@@ -118,6 +101,31 @@ done:
 bad_args:
   tcl_error 'wrong # args: should be "lsearch ?options? list pattern"'
 .end
+
+.sub 'anon' :anon :load
+  .local pmc options
+  options = new 'TclList'
+  push options, 'all'
+  push options, 'ascii'
+  push options, 'decreasing'
+  push options, 'dictionary'
+  push options, 'exact'
+  push options, 'glob'
+  push options, 'increasing'
+  push options, 'index'
+  push options, 'inline'
+  push options, 'integer'
+  push options, 'nocase'
+  push options, 'not'
+  push options, 'real'
+  push options, 'regexp'
+  push options, 'sorted'
+  push options, 'start'
+  push options, 'subindices'
+
+  set_root_global ['_tcl'; 'helpers'; 'lsearch'], 'options', options
+.end
+
 
 # Local Variables:
 #   mode: pir

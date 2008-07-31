@@ -18,21 +18,11 @@
   subcommand_name = shift argv
 
   .local pmc options
-  options = new 'TclList'
-  options[0] = 'anymore'
-  options[1] = 'donesearch'
-  options[2] = 'exists'
-  options[3] = 'get'
-  options[4] = 'names'
-  options[5] = 'nextelement'
-  options[6] = 'set'
-  options[7] = 'size'
-  options[8] = 'startsearch'
-  options[9] = 'statistics'
-  options[10] = 'unset'
+  options = get_root_global ['_tcl'; 'helpers'; 'array'], 'options'
 
   .local pmc select_option
   select_option  = get_root_global ['_tcl'], 'select_option'
+
   .local string canonical_subcommand
   canonical_subcommand = select_option(options, subcommand_name)
 
@@ -449,6 +439,24 @@ check_loop:
 check_end:
 
   .return (retval)
+.end
+
+.sub 'anon' :load :anon
+  .local pmc options
+  options = new 'TclList'
+  options[0] = 'anymore'
+  options[1] = 'donesearch'
+  options[2] = 'exists'
+  options[3] = 'get'
+  options[4] = 'names'
+  options[5] = 'nextelement'
+  options[6] = 'set'
+  options[7] = 'size'
+  options[8] = 'startsearch'
+  options[9] = 'statistics'
+  options[10] = 'unset'
+  
+  set_root_global ['_tcl'; 'helpers'; 'array'], 'options', options
 .end
 
 # Local Variables:

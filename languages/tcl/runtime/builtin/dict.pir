@@ -6,36 +6,19 @@
 
   .local pmc retval
 
-  $I3 = argv
-  unless $I3 goto no_args
+  .local int argc
+  argc = elements argv
+  unless argc  goto no_args
 
   .local string subcommand_name
   subcommand_name = shift argv
 
   .local pmc options
-  options = new 'TclList'
-  options[0] = 'append'
-  options[1] = 'create'
-  options[2] = 'exists'
-  options[3] = 'filter'
-  options[4] = 'for'
-  options[5] = 'get'
-  options[6] = 'incr'
-  options[7] = 'info'
-  options[8] = 'keys'
-  options[9] = 'lappend'
-  options[10] = 'merge'
-  options[11] = 'remove'
-  options[12] = 'replace'
-  options[13] = 'set'
-  options[14] = 'size'
-  options[15] = 'unset'
-  options[16] = 'update'
-  options[17] = 'values'
-  options[18] = 'with'
+  options = get_root_global ['_tcl'; 'helpers'; 'dict'], 'options'
 
   .local pmc select_option
   select_option  = get_root_global ['_tcl'], 'select_option'
+
   .local string canonical_subcommand
   canonical_subcommand = select_option(options, subcommand_name, 'subcommand')
 
@@ -1049,7 +1032,31 @@ bad_args:
   tcl_error 'wrong # args: should be "dict with dictVar ?key ...? script"'
 .end
 
+.sub 'anon' :anon :load
+  .local pmc options
+  options = new 'TclList'
+  options[0] = 'append'
+  options[1] = 'create'
+  options[2] = 'exists'
+  options[3] = 'filter'
+  options[4] = 'for'
+  options[5] = 'get'
+  options[6] = 'incr'
+  options[7] = 'info'
+  options[8] = 'keys'
+  options[9] = 'lappend'
+  options[10] = 'merge'
+  options[11] = 'remove'
+  options[12] = 'replace'
+  options[13] = 'set'
+  options[14] = 'size'
+  options[15] = 'unset'
+  options[16] = 'update'
+  options[17] = 'values'
+  options[18] = 'with'
 
+  set_root_global ['_tcl'; 'helpers'; 'dict'], 'options', options
+.end
 
 # Local Variables:
 #   mode: pir

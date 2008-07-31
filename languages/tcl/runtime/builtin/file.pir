@@ -13,43 +13,11 @@
   subcommand_name = shift argv
 
   .local pmc options
-  options = new 'TclList'
-  push options, 'atime'
-  push options, 'attributes'
-  push options, 'channels'
-  push options, 'copy'
-  push options, 'delete'
-  push options, 'dirname'
-  push options, 'executable'
-  push options, 'exists'
-  push options, 'extension'
-  push options, 'isdirectory'
-  push options, 'isfile'
-  push options, 'join'
-  push options, 'link'
-  push options, 'lstat'
-  push options, 'mtime'
-  push options, 'mkdir'
-  push options, 'nativename'
-  push options, 'normalize'
-  push options, 'owned'
-  push options, 'pathtype'
-  push options, 'readable'
-  push options, 'readlink'
-  push options, 'rename'
-  push options, 'rootname'
-  push options, 'separator'
-  push options, 'size'
-  push options, 'split'
-  push options, 'stat'
-  push options, 'system'
-  push options, 'tail'
-  push options, 'type'
-  push options, 'volumes'
-  push options, 'writable'
+  options = get_root_global ['_tcl'; 'helpers'; 'file'], 'options'
 
   .local pmc select_option
   select_option  = get_root_global ['_tcl'], 'select_option'
+
   .local string canonical_subcommand
   canonical_subcommand = select_option(options, subcommand_name)
 
@@ -598,6 +566,46 @@ bad_args:
 
 bad_args:
   tcl_error 'wrong # args: should be "file volumes"'
+.end
+
+.sub 'anon' :anon :load
+  .local pmc options
+  options = new 'TclList'
+  push options, 'atime'
+  push options, 'attributes'
+  push options, 'channels'
+  push options, 'copy'
+  push options, 'delete'
+  push options, 'dirname'
+  push options, 'executable'
+  push options, 'exists'
+  push options, 'extension'
+  push options, 'isdirectory'
+  push options, 'isfile'
+  push options, 'join'
+  push options, 'link'
+  push options, 'lstat'
+  push options, 'mtime'
+  push options, 'mkdir'
+  push options, 'nativename'
+  push options, 'normalize'
+  push options, 'owned'
+  push options, 'pathtype'
+  push options, 'readable'
+  push options, 'readlink'
+  push options, 'rename'
+  push options, 'rootname'
+  push options, 'separator'
+  push options, 'size'
+  push options, 'split'
+  push options, 'stat'
+  push options, 'system'
+  push options, 'tail'
+  push options, 'type'
+  push options, 'volumes'
+  push options, 'writable'
+  
+  set_root_global ['_tcl'; 'helpers'; 'file'], 'options', options
 .end
 
 # Local Variables:

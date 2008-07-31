@@ -25,29 +25,11 @@ real top level namespace.
   subcommand_name = shift argv
 
   .local pmc options
-  options = new 'TclList'
-  options[0] = 'children'
-  options[1] = 'code'
-  options[2] = 'current'
-  options[3] = 'delete'
-  options[4] = 'ensemble'
-  options[5] = 'eval'
-  options[6] = 'exists'
-  options[7] = 'export'
-  options[8] = 'forget'
-  options[9] = 'import'
-  options[10] = 'inscope'
-  options[11] = 'origin'
-  options[12] = 'parent'
-  options[13] = 'path'
-  options[14] = 'qualifiers'
-  options[15] = 'tail'
-  options[16] = 'unknown'
-  options[17] = 'upvar'
-  options[18] = 'which'
+  options = get_root_global ['_tcl'; 'helpers'; 'namespace'], 'options'
 
   .local pmc select_option
   select_option  = get_root_global ['_tcl'], 'select_option'
+
   .local string canonical_subcommand
   canonical_subcommand = select_option(options, subcommand_name)
 
@@ -474,6 +456,32 @@ bad_args:
 # RT#40753: Stub
 .sub 'which'
   .return ('')
+.end
+
+.sub 'anon' :anon :load
+  .local pmc options
+  options = new 'TclList'
+  options[0] = 'children'
+  options[1] = 'code'
+  options[2] = 'current'
+  options[3] = 'delete'
+  options[4] = 'ensemble'
+  options[5] = 'eval'
+  options[6] = 'exists'
+  options[7] = 'export'
+  options[8] = 'forget'
+  options[9] = 'import'
+  options[10] = 'inscope'
+  options[11] = 'origin'
+  options[12] = 'parent'
+  options[13] = 'path'
+  options[14] = 'qualifiers'
+  options[15] = 'tail'
+  options[16] = 'unknown'
+  options[17] = 'upvar'
+  options[18] = 'which'
+
+  set_root_global ['_tcl'; 'helpers'; 'namespace'], 'options', options
 .end
 
 # Local Variables:

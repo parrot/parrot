@@ -14,35 +14,13 @@
   subcommand_name = shift argv
 
   .local pmc options
-  options = new 'TclList'
-  push options, 'bytelength'
-  push options, 'compare'
-  push options, 'equal'
-  push options, 'first'
-  push options, 'index'
-  push options, 'is'
-  push options, 'last'
-  push options, 'length'
-  push options, 'map'
-  push options, 'match'
-  push options, 'range'
-  push options, 'repeat'
-  push options, 'replace'
-  push options, 'reverse'
-  push options, 'tolower'
-  push options, 'toupper'
-  push options, 'totitle'
-  push options, 'trim'
-  push options, 'trimleft'
-  push options, 'trimright'
-  push options, 'wordend'
-  push options, 'wordstart'
+  options = get_root_global ['_tcl'; 'helpers'; 'string'], 'options'
 
   .local pmc select_option
   select_option  = get_root_global ['_tcl'], 'select_option'
+
   .local string canonical_subcommand
   canonical_subcommand = select_option(options, subcommand_name)
-
 
   .local pmc subcommand_proc
   null subcommand_proc
@@ -1154,6 +1132,36 @@ ret_val:
 bad_args:
   tcl_error 'wrong # args: should be "string wordstart string index"'
 .end
+
+.sub 'anon' :anon :load
+  .local pmc options
+  options = new 'TclList'
+  push options, 'bytelength'
+  push options, 'compare'
+  push options, 'equal'
+  push options, 'first'
+  push options, 'index'
+  push options, 'is'
+  push options, 'last'
+  push options, 'length'
+  push options, 'map'
+  push options, 'match'
+  push options, 'range'
+  push options, 'repeat'
+  push options, 'replace'
+  push options, 'reverse'
+  push options, 'tolower'
+  push options, 'toupper'
+  push options, 'totitle'
+  push options, 'trim'
+  push options, 'trimleft'
+  push options, 'trimright'
+  push options, 'wordend'
+  push options, 'wordstart'
+
+  set_root_global [ '_tcl'; 'helpers'; 'string' ], 'options', options
+.end
+
 
 # Local Variables:
 #   mode: pir

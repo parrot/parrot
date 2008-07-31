@@ -6,22 +6,19 @@
 
   .local pmc retval
 
-  $I3 = argv
-  unless $I3 goto no_args
+  .local int argc
+  argc = elements argv
+  unless argc goto no_args
 
   .local string subcommand_name
   subcommand_name = shift argv
 
   .local pmc options
-  options = new 'TclList'
-  push options, 'convertfrom'
-  push options, 'convertto'
-  push options, 'dirs'
-  push options, 'names'
-  push options, 'system'
+  options = get_root_global ['_tcl'; 'helpers'; 'encoding'], 'options'
 
   .local pmc select_option
   select_option  = get_root_global ['_tcl'], 'select_option'
+
   .local string canonical_subcommand
   canonical_subcommand = select_option(options, subcommand_name)
 
@@ -114,6 +111,18 @@ bad_args:
 
 bad_args:
   tcl_error 'wrong # args: should be "encoding system ?encoding?"'
+.end
+
+.sub 'anon' :anon :load
+  .local pmc options
+  options = new 'TclList'
+  push options, 'convertfrom'
+  push options, 'convertto'
+  push options, 'dirs'
+  push options, 'names'
+  push options, 'system'
+
+  set_root_global ['_tcl'; 'helpers'; 'encoding'], 'options', options
 .end
 
 # Local Variables:
