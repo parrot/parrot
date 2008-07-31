@@ -4,10 +4,9 @@
 .sub '&binary'
     .param pmc argv :slurpy
 
-    .local pmc retval
-
-    $I0 = elements argv
-    unless $I0 goto no_args
+    .local int argc
+    argc = elements argv
+    unless argc goto no_args
 
     .local string subcommand_name
     subcommand_name = shift argv
@@ -42,8 +41,6 @@ no_args:
     .param pmc argv
 
     .local int argc
-    .local pmc retval
-
     argc = elements argv
     unless argc goto bad_args
 
