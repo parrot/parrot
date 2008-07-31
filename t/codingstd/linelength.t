@@ -52,8 +52,8 @@ my %lang_is_checked = map { $_ => 1 } qw{
     tcl
 };
 
-# RT#44437 this should really be using src_dir instead of build_dir but it
-# doesn't exist (yet)
+# RT #44437 this should really be using src_dir instead of build_dir but it
+# does not exist (yet)
 my $build_dir = $PConfig{build_dir};
 my $manifest = maniread( File::Spec->catfile( $build_dir, 'MANIFEST' ) );
 
