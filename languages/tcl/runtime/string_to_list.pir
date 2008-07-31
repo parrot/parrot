@@ -22,9 +22,8 @@ loop:
   inc pos
   $P2 = list[pos]
   inc pos
-  $S0 = typeof $P2
-  if $S0 == 'TclConst'  goto is_string
-  if $S0 == 'TclString'  goto is_string
+  $I0 = isa $P2, 'String'
+  if $I0 goto is_string
 is_list:
   $P2 = listToDict($P2)
   result[$S1] = $P2

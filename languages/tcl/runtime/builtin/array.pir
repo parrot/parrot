@@ -46,8 +46,8 @@
 
   if_null the_array, array_no
 
-  $I99 = does the_array, 'hash'
-  if $I99==0 goto array_no
+  $I99 = does the_array, 'associative_array'
+  unless $I99 goto array_no
 
   is_array = 1
   goto scommand

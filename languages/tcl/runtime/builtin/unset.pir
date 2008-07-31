@@ -55,7 +55,7 @@ array:
 
   var = find_var(array_name)
   if null var goto no_such_var
-  $I0 = isa var, 'TclArray'
+  $I0 = does var, 'associative_array'
   unless $I0 goto variable_isnt_array
 
   $I0 = exists var[key]

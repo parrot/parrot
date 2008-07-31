@@ -20,7 +20,7 @@ pmclass TclArray
     need_ext
     dynpmc
     extends Hash
-    provides    hash
+    provides associative_array
     group   tcl_group
     hll     Tcl
     maps    Hash

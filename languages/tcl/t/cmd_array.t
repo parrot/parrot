@@ -22,7 +22,7 @@ eval_is {array exists}\
 
 eval_is {array bork foo}\
   {bad option "bork": must be anymore, donesearch, exists, get, names, nextelement, set, size, startsearch, statistics, or unset}\
-  {array, bad subcommand, bad arary}
+  {array, bad subcommand, bad array}
 
 eval_is {
  set b(c) 2
