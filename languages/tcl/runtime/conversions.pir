@@ -291,7 +291,6 @@ Given an expression, return a subroutine, or optionally, the raw PIR
 
 .sub compileExpr
     .param string expression
-    .param int    pir_only :named('pir_only') :optional
     .param pmc    ns       :named('ns')       :optional
     .param int    has_ns   :opt_flag
 
@@ -337,7 +336,6 @@ Given an expression, return a subroutine, or optionally, the raw PIR
 
     .local string ret
     ret = ast['ret']
-    if pir_only goto only_pir
 
     .local pmc pir
     pir = new 'CodeString'
@@ -352,9 +350,6 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     $P1 = compreg 'PIR'
     $P2 = $P1(pir)
     .return ($P2)
-
-  only_pir:
-    .return(result, ret)
 
   premature_end:
     $S0 = expression
