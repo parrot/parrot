@@ -604,7 +604,7 @@ bad_args:
   push options, 'type'
   push options, 'volumes'
   push options, 'writable'
-  
+
   set_root_global ['_tcl'; 'helpers'; 'file'], 'options', options
 .end
 

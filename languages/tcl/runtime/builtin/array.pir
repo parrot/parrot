@@ -455,7 +455,7 @@ check_end:
   options[8] = 'startsearch'
   options[9] = 'statistics'
   options[10] = 'unset'
-  
+
   set_root_global ['_tcl'; 'helpers'; 'array'], 'options', options
 .end
 

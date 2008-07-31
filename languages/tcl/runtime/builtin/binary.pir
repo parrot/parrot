@@ -13,7 +13,7 @@
     subcommand_name = shift argv
 
     .local pmc options
-    options = get_root_global ['_tcl'; 'helpers'; 'binary'], 'options' 
+    options = get_root_global ['_tcl'; 'helpers'; 'binary'], 'options'
 
     .local pmc select_option
     select_option  = get_root_global ['_tcl'], 'select_option'
