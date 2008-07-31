@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  31;
+use Test::More tests =>  33;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -80,11 +80,18 @@ $step = test_step_constructor_and_description($conf);
 
 $conf->replenish($serialized);
 
-my $pseudo_ctags = q{alpha};
+my $pseudo_ctags;
+$pseudo_ctags = q{alpha};
 $step->_evaluate_ctags($conf, $pseudo_ctags, 1);
 is($conf->data->get('ctags'), $pseudo_ctags,
     "'ctags' attribute was set as expected");
 is($step->result(), q{yes}, "Got expected result");
+
+$pseudo_ctags = q{alpha};
+$step->_evaluate_ctags($conf, $pseudo_ctags, 0);
+is($conf->data->get('ctags'), 'ctags',
+    "'ctags' attribute was set as expected");
+is($step->result(), q{no}, "Got expected result");
 
 $conf->replenish($serialized);
 
