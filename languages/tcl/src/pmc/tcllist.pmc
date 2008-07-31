@@ -253,15 +253,46 @@ Return a list version of ourself
 */
 
     METHOD get_list() {
-      RETURN(PMC *SELF);
+        RETURN(PMC *SELF);
     }
-}
+
+/*
+
+=item METHOD reverse
+
+Reverse ourselves.
+
+This algorithm is very generic and could easily be
+moved back into parrot core where we'd be happy to inherit it.
+
+=cut
+
+*/
+
+    METHOD reverse() {
+        INTVAL low  = 0;
+        INTVAL high = SELF.get_integer() - 1;
+        PMC*  swap;
+
+        while (low < high) {
+            swap = SELF.get_pmc_keyed_int(high);
+            SELF.set_pmc_keyed_int(high, SELF.get_pmc_keyed_int(low)) ;
+            SELF.set_pmc_keyed_int(low, swap);
+
+            low++;
+            high--;
+        }
+
+        RETURN(PMC *SELF);
+    }
 
 /*
 
 =back
 
 */
+
+}
 
 /*
  * Local variables:

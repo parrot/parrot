@@ -88,9 +88,8 @@ strip_end:
 skip_unique:
   unless decr goto ordered
 
-  .local pmc reverse
-  reverse = get_root_global ['_tcl'], 'reverse'
-  reverse($P0)
+  $P0 = clone $P0
+  $P0.'reverse'()
 
 ordered:
   .return ($P0)
