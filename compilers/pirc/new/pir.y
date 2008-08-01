@@ -204,7 +204,6 @@ extern YY_DECL;
              augmented_op
              rel_op
              identifier
-             if_null_type
              sub_id
              opt_paren_string
              paren_string
@@ -261,7 +260,7 @@ extern YY_DECL;
              arg_flag
              sub_flags
              sub_flag
-             if_type
+             if_unless
 
 %type <invo> long_invocation
              methodcall
@@ -315,6 +314,9 @@ extern YY_DECL;
  * The default rule ( $$ = $1; ) is not written explicitly, except if an
  * alternative of the rule has a different action.
  *
+ * Do not write embedded actions; instead, refactor the grammar by adding
+ * a new rule, so that the previously-embedded action becomes a 'normal'
+ * action.
  */
 
 /* Top-level rule */
@@ -387,11 +389,14 @@ namespace_id     : TK_STRINGC
 
 /* Sub definition */
 
-sub_def          : ".sub" sub_id     { new_subr(lexer, $2); }
-                    sub_flags "\n"   { set_sub_flag(lexer, $4); }
-                    parameters
-                    instructions
-                    ".end"
+sub_def          : sub_head sub_flags "\n"
+                   parameters
+                   instructions
+                   ".end"
+                 ;
+
+sub_head         : ".sub" sub_id
+                        { new_subr(lexer, $2); }
                  ;
 
 sub_id           : identifier
@@ -401,7 +406,7 @@ sub_id           : identifier
 sub_flags        : /* empty */
                         { $$ = 0; }
                  | sub_flags sub_flag
-                        { $$ |= $2; }
+                        { { set_sub_flag(lexer, $2); } }
                  ;
 
 sub_flag         : ":anon"
@@ -531,6 +536,7 @@ assignment_stat  : target assign_tail "\n"
  *
  *   which should be handled by <target> '=' <parrot_instruction> rule.
  *
+ * TODO: rewrite this whole assignment rule.
  ******************************************************************************/
 
 assign_tail       : augmented_op expression
@@ -591,47 +597,18 @@ keys              : expression
                          { $$ = add_key($1, $3); }
                   ;
 
-conditional_stat  : if_type condition then identifier "\n"
-                         { /* it was "unless", so "invert" the opcode */
-                           if ($1 > 0) {
-                              invert_instr(lexer);
-                           }
-                           add_operand(lexer, expr_from_ident($4));
-                         }
-                  | if_null_type expression then identifier "\n"
-                         { set_instr(lexer, $1);
-                           add_operand(lexer, $2);
-                           add_operand(lexer, expr_from_ident($4));
-                         }
+conditional_stat  : if_unless "null" expression "goto" identifier "\n"
+                  | if_unless expression then identifier "\n"
+                  | if_unless expression rel_op expression "goto" identifier "\n"
                   ;
 
-if_type           : "if"       { $$ = 0; /* no need to invert */ }
+if_unless         : "if"       { $$ = 0; /* no need to invert */ }
                   | "unless"   { $$ = 1; /* yes, invert opname */ }
-                  ;
-
-
-if_null_type      : "if" "null"
-                         { $$ = "if_null"; }
-                  | "unless" "null"
-                         { $$ = "unless_null"; }
                   ;
 
 then              : "goto" /* PIR mode */
                   | ','    /* PASM mode*/
                   ;
-
-
-condition         : expression
-                         { set_instr(lexer, "if");
-                           add_operand(lexer, $1);
-                         }
-                  | expression rel_op expression
-                         { set_instr(lexer, $2);
-                           add_operand(lexer, $1);
-                           add_operand(lexer, $3);
-                         }
-                  ;
-
 
 goto_stat         : "goto" identifier "\n"
                          { set_instr(lexer, "branch");
