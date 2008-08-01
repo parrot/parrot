@@ -126,7 +126,7 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} }
 
 {
     vdiag 'File';
-    my ( $fh, $fn ) = tempfile();
+    my ( $fh, $fn ) = tempfile( UNLINK => 1 );
     print $fh 'i am a file' and close $fh;
     my $f = File->new( filename => $fn );
     isa_ok( $f, 'File' );
@@ -149,7 +149,7 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} }
 
 {
 
-    # RT#46783: this should use a tempfile
+    # RT #46783: this should use a tempfile
     vdiag 'PodFile';
     my $fn = 'docs/pdds/pdd03_calling_conventions.pod';
 
@@ -167,12 +167,12 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} }
     my $tree = $p->parse;
     ok( $tree, 'parsed' );
 
-    # RT#46787: ->tree
+    # RT #46787: ->tree
 }
 
 {
 
-    # RT#46783: this should use a tempfile
+    # RT #46783: this should use a tempfile
     vdiag 'SpecFile';
     my $fn  = 'docs/pdds/pdd03_calling_conventions.pod';
     my $pre = 'pdd';
@@ -201,7 +201,7 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} }
 
 {
 
-    # RT#46783: this should use a tempfile
+    # RT #46783: this should use a tempfile
     vdiag 'SpecFiles';
     my $root = 'docs/pdds/';
     my $pre  = 'pdd';
@@ -220,12 +220,12 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} }
     ok( ( grep { $_->name eq 'pdd07_codingstd' } @{ $s->files } ),
         '->files contains a known spec file' );
 
-    # RT#46789: many more ->files tests
+    # RT #46789: many more ->files tests
 }
 
 {
 
-    # RT#46783: this should use a tempfile
+    # RT #46783: this should use a tempfile
     vdiag 'TestFile';
     my $fn = 't/util/smartlinks.t';
 
@@ -240,14 +240,14 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} }
     is( $t->path,      't/util/',    '->path returns file path' );
     is( $t->extension, '.t',         '->extension returns C<.pod>' );
 
-    # RT#46791: ->tests, ->smartlinks
+    # RT #46791: ->tests, ->smartlinks
 }
 
-# RT#46793: Test
-# RT#46795: TestInfo
-# RT#46797: SmartLinkServer
-# RT#46801: main
-# RT#46799: end-to-end testing
+# RT #46793: Test
+# RT #46795: TestInfo
+# RT #46797: SmartLinkServer
+# RT #46801: main
+# RT #46799: end-to-end testing
 
 # Local Variables:
 #   mode: cperl
