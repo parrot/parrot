@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -8,10 +8,7 @@ use File::Temp qw( tempdir );
 use Test::More tests => 10;
 use lib qw( ./lib ./t/tools/dev/searchops );
 use IO::CaptureOutput qw( capture );
-use Parrot::SearchOps qw(
-    search_all_ops_files
-    help
-);
+use Parrot::SearchOps qw( search_all_ops_files help );
 use samples qw( $core $debug $mangled $string );
 
 my %samples;
@@ -44,7 +41,7 @@ my $wrap_width = 70;
 my $opsdir = q{t/tools/dev/searchops};
 
 {
-    my $tdir = tempdir();
+    my $tdir = tempdir( CLEANUP => 1 );
     foreach my $g (keys %samples) {
         open my $IN, '>', qq{$tdir/$samples{$g}{file}}
             or die "Unable to open $samples{$g}{file} for writing";
@@ -72,7 +69,7 @@ my $opsdir = q{t/tools/dev/searchops};
 }
 
 {
-    my $tdir = tempdir();
+    my $tdir = tempdir( CLEANUP => 1 );
     foreach my $g (keys %samples) {
         open my $IN, '>', qq{$tdir/$samples{$g}{file}}
             or die "Unable to open $samples{$g}{file} for writing";
@@ -94,7 +91,7 @@ my $opsdir = q{t/tools/dev/searchops};
 }
 
 {
-    my $tdir = tempdir();
+    my $tdir = tempdir( CLEANUP => 1 );
     foreach my $g (keys %samples) {
         open my $IN, '>', qq{$tdir/$samples{$g}{file}}
             or die "Unable to open $samples{$g}{file} for writing";
@@ -123,7 +120,7 @@ my $opsdir = q{t/tools/dev/searchops};
 );
 
 {
-    my $tdir = tempdir();
+    my $tdir = tempdir( CLEANUP => 1 );
     foreach my $g (keys %samples) {
         open my $IN, '>', qq{$tdir/$samples{$g}{file}}
             or die "Unable to open $samples{$g}{file} for writing";
@@ -192,4 +189,3 @@ Test the Parrot::SearchOps C<usage()> and C<help()> functions.
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-
