@@ -184,7 +184,12 @@ CODE
 /^\d+/
 OUTPUT
 
-language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function os.time' );
+# Create a date/time for which mktime will return -1
+my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(-1);
+$mon += 1;
+$year += 1900;
+
+language_output_like( 'lua', << "CODE", << 'OUTPUT', 'function os.time' );
 print(os.time({
     sec = 0,
     min = 0,
@@ -196,16 +201,15 @@ print(os.time({
 }))
 
 -- os.time returns nil when C mktime returns -1
--- this test needs a out of range value on any platform
--- On 64bit systems the following date & time is the only
--- on that mktime will return -1 for.
+-- On 64bit systems there are no 'out of range' values, so we cheat
+-- and use a date/time that validly returns -1
 print(os.time({
-    sec = 59,
-    min = 59,
-    hour = 15,
-    day = 31,
-    month = 12,
-    year = 1969,
+    sec = $sec,
+    min = $min,
+    hour = $hour,
+    day = $mday,
+    month = $mon,
+    year = $year,
     isdst = false,
 }))
 CODE
