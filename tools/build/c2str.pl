@@ -148,10 +148,6 @@ HEADER
             die "Seen line $line before in $infile - can't continue";
         }
 
-        # RT #46909 maybe cope with escaped \"
-        my $cnt = tr/"/"/;
-        die "bogus $const_string at line $line" if $cnt % 2;
-
         my $str = extract_delimited;    # $_, '"';
         $str    = substr $str, 1, -1;
         ## print STDERR "** '$str' $line\n";
