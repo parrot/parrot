@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 # inter_yacc-01.t
 
@@ -65,10 +65,10 @@ $ret = $step->runstep($conf);
 ok( defined $ret, "runstep() returned defined value" );
 my $result_expected = q{user defined};
 is( $step->result(), $result_expected,
-    "Result was $result_expected because environmental variable was set" );
+    "Result was $result_expected because environment variable was set" );
 # re-set for next step
-$ENV{YACC} = undef;
-$step->set_result(q{});
+delete $ENV{YACC};
+$step->set_result('');
 
 $conf->replenish($serialized);
 
