@@ -459,7 +459,8 @@ again:
 
         /* check that fullname isn't NULL, just in case */
         if (!fullname)
-            real_exception(interp, NULL, 1, "Trying to open a NULL filename");
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                "Trying to open a NULL filename");
 
         fd = open(fullname, O_RDONLY | O_BINARY);
 
@@ -912,7 +913,7 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(char **argv))
                 PIO_eprintf(interp, "EXEC core");
                 break;
             default:
-                real_exception(interp, NULL, 1, "Unknown run core");
+                Parrot_ex_throw_from_c_args(interp, NULL, 1, "Unknown run core");
         }
 
         PIO_eprintf(interp, " ***\n");

@@ -104,14 +104,16 @@ next_range:
                 /* last range "start .." */
                 RVal_int(range->end) = VTABLE_elements(interp, agg) - 1;
                 if (PMC_data(key))
-                    real_exception(interp, NULL, 1, "Illegal range after start..");
+                    Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                        "Illegal range after start..");
             }
             else {
                 /* must have end in next key */
                 key = PMC_data_typed(key, PMC *);
 
                 if (!key)
-                    real_exception(interp, NULL, 1, "no end range specified");
+                    Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                        "no end range specified");
 
                 RVal_int(range->end) = key_integer(interp, key);
             }
@@ -133,11 +135,10 @@ range_end:
         return;
     }
     else {
-        if (PObj_get_FLAGS(key) & KEY_inf_slice_FLAG) {
-            real_exception(interp, NULL, 1,
-                               "unlimited slice range for hash "
-                               "not implemented");
-        }
+        if (PObj_get_FLAGS(key) & KEY_inf_slice_FLAG)
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+               "unlimited slice range for hash not implemented");
+
         range->type = enum_type_STRING;
 
         /*
@@ -159,7 +160,8 @@ range_end:
             key = PMC_data_typed(key, PMC *);
 
             if (!key)
-                real_exception(interp, NULL, 1, "no end range specified");
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "no end range specified");
 
             RVal_str(range->end) = key_string(interp, key);
         }
@@ -177,7 +179,8 @@ set_slice_next(PARROT_INTERP, PMC *self, PMC *agg)
     parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(self);
 
     if (!VALID_RANGE(r))
-        real_exception(interp, NULL, E_StopIteration, "StopIteration");
+        Parrot_ex_throw_from_c_args(interp, NULL, CONTROL_ERROR,
+            "StopIteration");
 
     if (r->type == enum_type_INTVAL) {
         RVal_int(r->cur) += RVal_int(r->step);
@@ -265,7 +268,8 @@ pmclass Slice need_ext extends Key {
     }
 
     VTABLE PMC *clone() {
-        real_exception(INTERP, NULL, E_NotImplementedError, "Unimplemented");
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+            "Unimplemented");
     }
 
 /*
@@ -286,7 +290,8 @@ Get the next string key from the current slice range.
         const parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(SELF);
 
         if (!VALID_RANGE(r))
-            real_exception(INTERP, NULL, E_StopIteration, "StopIteration");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, CONTROL_ERROR,
+                "StopIteration");
 
         return RVal_int(r->cur);
     }
@@ -314,8 +319,8 @@ This is used for implementing Pythons xrange()
         PMC *iter;
 
         if (f)
-            real_exception(INTERP, NULL, E_ValueError,
-                    "Slice: Unknown slice type");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Slice: Unknown slice type");
 
         iter                 = pmc_new_init(INTERP, enum_class_Iterator, SELF);
         PMC_struct_val(iter) = key;
@@ -394,8 +399,9 @@ advance to next position in the range, depending on what.
                 set_slice_next(INTERP, SELF, agg);
                 break;
             default:
-                real_exception(INTERP, NULL, E_NotImplementedError,
-                        "No backward iteration on slices yet");
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                    "No backward iteration on slices yet");
                 break;
         }
 

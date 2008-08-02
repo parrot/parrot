@@ -574,6 +574,7 @@ STR_FILES = \
     $(SRC_DIR)/builtin.str \
     $(SRC_DIR)/debug.str \
     $(SRC_DIR)/dynext.str \
+    $(SRC_DIR)/events.str \
     $(SRC_DIR)/exceptions.str \
     $(SRC_DIR)/global.str \
     $(SRC_DIR)/global_setup.str \
@@ -593,6 +594,7 @@ STR_FILES = \
     $(SRC_DIR)/spf_render.str \
     $(SRC_DIR)/spf_vtable.str \
     $(SRC_DIR)/sub.str \
+    $(SRC_DIR)/stacks.str \
     \
     $(CLASS_STR_FILES)
 

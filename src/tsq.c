@@ -382,7 +382,7 @@ void
 queue_destroy(ARGMOD(QUEUE *queue))
 {
     if (peek_entry(queue))
-        internal_exception(1, "Queue not empty on destroy");
+        exit_fatal(1, "Queue not empty on destroy");
 
     COND_DESTROY(queue->queue_condition);
     MUTEX_DESTROY(queue->queue_mutex);

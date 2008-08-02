@@ -75,15 +75,15 @@ NOSZARRAY:
 
     # For some we must read a load of array stuff. XXX TO DO
     if type != 0x14 goto NOARRAY
-    ex = new .Exception
-    ex["_message"] = "Array types not yet implemented."
+    ex = new 'Exception'
+    ex = "Array types not yet implemented."
     throw ex
 NOARRAY:
 
     # For some we must read an entire method signature. XXX TO DO
     if type != 0x1B goto NOFP
-    ex = new .Exception
-    ex["_message"] = "Function pointer types not yet implemented for arguments."
+    ex = new 'Exception'
+    ex = "Function pointer types not yet implemented for arguments."
     throw ex
 NOFP:
 
@@ -108,8 +108,8 @@ NOFP:
     # First token is always 6.
     t1 = signature.read_compressed()
     if t1 == 6 goto NORMAL
-    ex = new .Exception
-    ex["_message"] = "Expected a field signature, got something else."
+    ex = new 'Exception'
+    ex = "Expected a field signature, got something else."
     throw ex
 NORMAL:
 
@@ -135,15 +135,15 @@ NOSZARRAY:
 
     # For some we must read a load of array stuff. XXX TO DO
     if type != 0x14 goto NOARRAY
-    ex = new .Exception
-    ex["_message"] = "Array types not yet implemented."
+    ex = new 'Exception'
+    ex = "Array types not yet implemented."
     throw ex
 NOARRAY:
 
     # For some we must read an entire method signature. XXX TO DO
     if type != 0x1B goto NOFP
-    ex = new .Exception
-    ex["_message"] = "Function pointer types not yet implemented."
+    ex = new 'Exception'
+    ex = "Function pointer types not yet implemented."
     throw ex
 NOFP:
 
@@ -200,15 +200,15 @@ NOSZARRAY:
 
     # For some we must read a load of array stuff. XXX TO DO
     if type != 0x14 goto NOARRAY
-    ex = new .Exception
-    ex["_message"] = "Array types not yet implemented."
+    ex = new 'Exception'
+    ex = "Array types not yet implemented."
     throw ex
 NOARRAY:
 
     # For some we must read an entire method signature. XXX TO DO
     if type != 0x1B goto NOFP
-    ex = new .Exception
-    ex["_message"] = "Function pointer types not yet implemented for locals."
+    ex = new 'Exception'
+    ex = "Function pointer types not yet implemented for locals."
     throw ex
 NOFP:
 

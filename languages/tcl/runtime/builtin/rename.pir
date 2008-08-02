@@ -46,7 +46,7 @@ add_sub:
   $S0 = "can't rename to \""
   $S0 .= newName
   $S0 .= '": command already exists'
-  tcl_error $S0
+  die $S0
 
 set_new_sub:
   ns[$S0] = sub
@@ -61,16 +61,16 @@ doesnt_exist:
   $S0 = "can't rename \""
   $S0 .= oldName
   $S0 .= "\": command doesn't exist"
-  tcl_error $S0
+  die $S0
 
 cant_delete:
   $S0 = "can't delete \""
   $S0 .= oldName
   $S0 .= "\": command doesn't exist"
-  tcl_error $S0
+  die $S0
 
 bad_args:
-  tcl_error 'wrong # args: should be "rename oldName newName"'
+  die 'wrong # args: should be "rename oldName newName"'
 .end
 
 # Local Variables:

@@ -21,7 +21,7 @@ R  = new 'TclInt'
 R  = $I0
   .return(R)
 bad_args:
-  tcl_error 'wrong # args: should be "llength list"'
+  die 'wrong # args: should be "llength list"'
 .end
 
 

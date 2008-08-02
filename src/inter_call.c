@@ -359,9 +359,11 @@ static void
 start_flatten(PARROT_INTERP, ARGMOD(call_state *st), ARGIN(PMC *p_arg))
 {
     if (PARROT_ARG_NAME_ISSET(st->src.sig)) {
+
         /* src ought to be an hash */
         if (!VTABLE_does(interp, p_arg, CONST_STRING(interp, "hash")))
-            real_exception(interp, NULL, E_ValueError, "argument doesn't hash");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "argument doesn't hash");
 
         /* create key needed to iterate the hash */
         st->key              = pmc_new(interp, enum_class_Key);
@@ -373,7 +375,8 @@ start_flatten(PARROT_INTERP, ARGMOD(call_state *st), ARGIN(PMC *p_arg))
     else {
         /* src ought to be an array */
         if (!VTABLE_does(interp, p_arg, CONST_STRING(interp, "array")))
-            real_exception(interp, NULL, E_ValueError, "argument doesn't array");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    "argument doesn't array");
     }
 
     st->src.mode   |= CALL_STATE_FLATTEN;
@@ -624,7 +627,7 @@ Parrot_fetch_arg(PARROT_INTERP, ARGMOD(call_state *st))
         case CALL_STATE_SIG:
             return fetch_arg_sig(interp, st);
         default:
-            real_exception(interp, NULL, 1, "invalid call state mode");
+            Parrot_ex_throw_from_c_args(interp, NULL, 1, "invalid call state mode");
     }
 }
 
@@ -903,7 +906,7 @@ init_first_dest_named(PARROT_INTERP, ARGMOD(call_state *st))
     int i, n_named;
 
     if (st->dest.mode & CALL_STATE_SIG)
-        real_exception(interp, NULL, E_ValueError,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Can't call C function with named arguments");
 
     st->first_named = st->dest.i;
@@ -944,7 +947,8 @@ init_first_dest_named(PARROT_INTERP, ARGMOD(call_state *st))
     /* only 32/64 named args allowed;
      * uses UINTVAL as a bitfield to detect duplicates */
     if (n_named >= (int)(sizeof (UINTVAL) * 8))
-        real_exception(interp, NULL, E_ValueError, "Too many named arguments");
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Too many named arguments");
 
     st->named_done = 0;
 }
@@ -990,8 +994,9 @@ locate_named_named(PARROT_INTERP, ARGMOD(call_state *st))
 
             /* if bit is set we have a duplicate */
             if (st->named_done & (1 << n_named))
-                real_exception(interp, NULL, E_ValueError,
-                        "duplicate named argument - '%Ss' not expected", param);
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "duplicate named argument - '%Ss' not expected", param);
 
             st->named_done |= 1 << n_named;
             return 1;
@@ -1077,11 +1082,11 @@ too_few(PARROT_INTERP, ARGIN(const call_state *st), ARGIN(const char *action))
     const int min_expected_args = max_expected_args - st->optionals;
 
     if (st->n_actual_args < min_expected_args) {
-        real_exception(interp, NULL, E_ValueError,
-                "too few arguments passed (%d) - %s%d %s expected",
-                st->n_actual_args,
-                (min_expected_args < max_expected_args ? "at least " : ""),
-                min_expected_args, action);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "too few arguments passed (%d) - %s%d %s expected",
+            st->n_actual_args,
+            (min_expected_args < max_expected_args ? "at least " : ""),
+            min_expected_args, action);
     }
 }
 
@@ -1103,11 +1108,11 @@ too_many(PARROT_INTERP, ARGIN(const call_state *st), ARGIN(const char *action))
     const int min_expected_args = max_expected_args - st->optionals;
 
     if (st->n_actual_args > max_expected_args) {
-        real_exception(interp, NULL, E_ValueError,
-                "too many arguments passed (%d) - %s%d %s expected",
-                st->n_actual_args,
-                (min_expected_args < max_expected_args ? "at most " : ""),
-                max_expected_args, action);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "too many arguments passed (%d) - %s%d %s expected",
+            st->n_actual_args,
+            (min_expected_args < max_expected_args ? "at most " : ""),
+            max_expected_args, action);
     }
 }
 
@@ -1215,14 +1220,15 @@ check_named(PARROT_INTERP, ARGMOD(call_state *st))
                     ? st->dest.ctx->constants[idx]->u.string
                     : CTX_REG_STR(st->dest.ctx, idx);
 
-                real_exception(interp, NULL, E_ValueError,
-                        "too few arguments passed"
-                        " - missing required named arg '%Ss'", param);
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "too few arguments passed"
+                    " - missing required named arg '%Ss'", param);
             }
         }
         else
-            real_exception(interp, NULL, E_ValueError,
-                    "invalid arg type in named portion of args");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "invalid arg type in named portion of args");
     }
 }
 
@@ -1406,14 +1412,13 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
         src->used = 1;
 
         if (!st->name)
-            real_exception(interp, NULL, 0,
-                           "positional inside named args at position %i",
-                           st->src.i - n_named);
+            Parrot_ex_throw_from_c_args(interp, NULL, 0,
+               "positional inside named args at position %i",
+               st->src.i - n_named);
 
         if (!locate_named_named(interp, st))
-            real_exception(interp, NULL, E_ValueError,
-                           "too many named arguments"
-                           " - '%Ss' not expected", st->name);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "too many named arguments - '%Ss' not expected", st->name);
 
         n_named++;
 
@@ -1650,7 +1655,8 @@ set_retval_i(PARROT_INTERP, int sig_ret, ARGIN(parrot_context_t *ctx))
     call_state st;
 
     if (sig_ret != 'I')
-        real_exception(interp, NULL, E_ValueError, "return signature not 'I'");
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "return signature not 'I'");
 
     if (set_retval_util(interp, "I", ctx, &st))
         return UVal_int(st.val);
@@ -1676,7 +1682,8 @@ set_retval_f(PARROT_INTERP, int sig_ret, ARGIN(parrot_context_t *ctx))
     call_state st;
 
     if (sig_ret != 'N')
-        real_exception(interp, NULL, E_ValueError, "return signature not 'N'");
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "return signature not 'N'");
 
     if (set_retval_util(interp, "N", ctx, &st))
         return UVal_num(st.val);
@@ -1704,7 +1711,8 @@ set_retval_s(PARROT_INTERP, int sig_ret, ARGIN(parrot_context_t *ctx))
     call_state st;
 
     if (sig_ret != 'S')
-        real_exception(interp, NULL, E_ValueError, "return signature not 'S'");
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "return signature not 'S'");
 
     if (set_retval_util(interp, "S", ctx, &st))
         return UVal_str(st.val);
@@ -1732,7 +1740,8 @@ set_retval_p(PARROT_INTERP, int sig_ret, ARGIN(parrot_context_t *ctx))
     call_state st;
 
     if (sig_ret != 'P')
-        real_exception(interp, NULL, E_ValueError, "return signature not 'P'");
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "return signature not 'P'");
 
     if (set_retval_util(interp, "P", ctx, &st))
         return UVal_pmc(st.val);
@@ -1775,7 +1784,7 @@ commit_last_arg(PARROT_INTERP, int index, int cur,
         case PARROT_ARG_PMC :
             reg_offset = n_regs_used[seen_arrow * 4 + REGNO_PMC]++; break;
         default:
-            real_exception(interp, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Parrot_PCCINVOKE: invalid reg type");
     }
 
@@ -1798,7 +1807,8 @@ commit_last_arg(PARROT_INTERP, int index, int cur,
             case PARROT_ARG_PMC:
                 CTX_REG_PMC(ctx, reg_offset) = va_arg(*list, PMC *);    break;
             default:
-                real_exception(interp, NULL, E_IndexError,
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION,
                     "Parrot_PCCINVOKE: invalid reg type");
         }
     }
@@ -1913,7 +1923,7 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
 
     /* account for passing invocant in-band */
     if (!pmc)
-        real_exception(interp, NULL, 1,
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
             "NULL PMC passed into Parrot_PCCINVOKE");
 
     arg_ret_cnt[seen_arrow]++;
@@ -1927,7 +1937,8 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
                 seen_arrow = 1 ;
                 ++x;
                 if (*x != '>')
-                    real_exception(interp, NULL, E_IndexError,
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_OPERATION,
                         "Parrot_PCCINVOKE: invalid signature separator %c!",
                         *x);
                 break;
@@ -1954,7 +1965,8 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
             case 'p':
                 break;
             default:
-                real_exception(interp, NULL, E_IndexError,
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION,
                     "Parrot_PCCINVOKE: invalid reg type %c!", *x);
         }
     }
@@ -2036,8 +2048,9 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
                 case 'S': cur = PARROT_ARG_STRING;   break;
                 case 'P': cur = PARROT_ARG_PMC;      break;
                 default:
-                          real_exception(interp, NULL, E_IndexError,
-                                  "Parrot_PCCINVOKE: invalid reg type %c!", *x);
+                  Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Parrot_PCCINVOKE: invalid reg type %c!", *x);
             }
 
         }
@@ -2050,7 +2063,8 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
                 case 'o': cur |= PARROT_ARG_OPTIONAL;     break;
                 case 'p': cur |= PARROT_ARG_OPT_FLAG;     break;
                 default:
-                    real_exception(interp, NULL, E_IndexError,
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_OPERATION,
                         "Parrot_PCCINVOKE: invalid adverb type %c!", *x);
             }
         }
@@ -2080,8 +2094,8 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
     pccinvoke_meth               = VTABLE_find_method(interp, pmc, method_name);
 
     if (PMC_IS_NULL(pccinvoke_meth))
-        real_exception(interp, NULL, METH_NOT_FOUND, "Method '%Ss' not found",
-            method_name);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METH_NOT_FOUND,
+            "Method '%Ss' not found", method_name);
     else
         VTABLE_invoke(interp, pccinvoke_meth, NULL);
 
@@ -2118,7 +2132,8 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
                     }
                     break;
                 default:
-                    real_exception(interp, NULL, E_IndexError,
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_OPERATION,
                         "Parrot_PCCINVOKE: invalid reg type %c!", *x);
             }
         }

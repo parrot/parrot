@@ -96,7 +96,7 @@ ex:
 
 =item _register_dumper( id, sub )
 
-Registers a dumper for new PMC type. B<UNIMPLEMENTED>
+Registers a dumper for new PMC type. B<EXCEPTION_UNIMPLEMENTED>
 But see B<method __dump> below.
 
 =over 4

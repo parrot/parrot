@@ -115,7 +115,7 @@
     $S1 = substr $S1, pos, 1
     $S0 .= $S1
     $S0 .= "'"
-    $P0['_message'] = $S0
+    $P0 = $S0
     throw $P0
     .return ()
 .end

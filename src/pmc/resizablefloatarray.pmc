@@ -39,7 +39,7 @@ Returns the floating-point value of the element at index C<key>.
         FLOATVAL *data;
 
         if (key < 0)
-            real_exception(interp, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableFloatArray: index out of bounds!");
 
         if (key >= PMC_int_val(SELF))
@@ -64,7 +64,7 @@ C<value>.
         FLOATVAL *data;
 
         if (key < 0)
-            real_exception(interp, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableFloatArray: index out of bounds!");
 
         if (key >= PMC_int_val(SELF))
@@ -93,7 +93,7 @@ equal to three quarters of the old size).
 
     VTABLE void set_integer_native(INTVAL size) {
         if (size < 0)
-            real_exception(interp, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableFloatArray: Can't resize to negative value!");
 
         if (!PMC_data(SELF)) {
@@ -178,7 +178,7 @@ Removes and returns the last element in the array.
         INTVAL size = PMC_int_val(SELF);
 
         if (size == 0)
-            real_exception(interp, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableFloatArray: Can't pop from an empty array!");
 
         value = SELF.get_number_keyed_int(size-1);
@@ -200,7 +200,7 @@ Removes and returns an item from the start of the array.
         INTVAL size = PMC_int_val(SELF);
 
         if (size == 0)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableFloatArray: Can't shift from an empty array!");
 
         data              = (FLOATVAL *)PMC_data(SELF);

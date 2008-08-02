@@ -1,6 +1,6 @@
 # Aux. functions needed by the parser.  (For cleanliness)
 #
-# Copyright (C) 2003-2007, The Perl Foundation.
+# Copyright (C) 2003-2008, The Perl Foundation.
 # $Id$
 
 use vars qw( %usertypes );
@@ -1040,7 +1040,7 @@ NOTUSER
         }
         else {
             print CODE<<USERTYPE;
-        new P1, .Hash
+        new P1, 'Hash'
         P1["name"]= '$_->[0]'
         P1["type"]= "USER"
         bsr DIM_$_->[1]
@@ -1081,7 +1081,7 @@ NOTUSER
         }
         else {
             print CODE<<USER;
-        new P2, .Hash
+        new P2, 'Hash'
         P2["name"]= '$_->[0]'
         P2["type"]= "USER"
         P5= P6          # Remember where we were...
@@ -1123,7 +1123,7 @@ ANOTHERDIM:
         P1= P10[I25]
         P2= P1["USER"]
         bsr DIM_$type
-        P1 = new .Hash
+        P1 = new 'Hash'
         P1["_type"]= '$type'
         P1["type"]= "USER"
         P1["storage"]= P0

@@ -904,15 +904,6 @@ This function never returns.
     .param pmc f
     .param pmc vararg :slurpy
     push_eh _handler
-    .const .Sub _traceback = 'traceback'
-    $P0 = newclosure _traceback
-    pushaction $P0
-    .local pmc traceback
-    .lex 'traceback', traceback
-    new traceback, 'LuaString'
-    .local pmc where
-    .lex 'where', where
-    new where, 'LuaString'
     ($P0 :slurpy) = f(vararg :flat)
     .return (0, $P0)
   _handler:
@@ -925,29 +916,26 @@ This function never returns.
     if $I0 == .EXCEPT_EXIT goto L2
   L1:
     .local int lineno
-    $S1 = where
-    $S0 = $S1
+    .local string traceback, where
+    (traceback, where) = 'traceback'()
+    $S0 = where
     $S0 .= ' '
     $S0 .= msg
     $S0 .= "\n"
-    $S1 = traceback
-    $S0 .= $S1
+    $S0 .= traceback
     .return (1, $S0)
   L2:
     rethrow ex
 .end
 
-.sub 'traceback' :anon :outer(docall)
-    .param int flag
-    unless flag == 1 goto L1
-    new $P0, 'Lua'
-    $S0 = $P0.'traceback'(1)
-    $P1 = find_lex 'traceback'
-    set $P1, $S0
-    $S0 = $P0.'where'()
-    $P1 = find_lex 'where'
-    set $P1, $S0
-  L1:
+.sub 'traceback'
+    .local pmc obj
+    .local string traceback, where
+    new obj, 'Lua'
+    traceback = obj.'traceback'(1)
+    where = obj.'where'()
+
+    .return (traceback, where)
 .end
 
 

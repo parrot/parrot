@@ -133,8 +133,8 @@ Sets the pointer to the actual subroutine.
 */
 
     VTABLE void set_pointer(void *value) {
-        real_exception(INTERP, NULL, E_NotImplementedError,
-                "Don't set the address of a sub\nuse .Sub constants instead");
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            "Don't set the address of a sub\nuse .Sub constants instead");
     }
 
 /*
@@ -258,7 +258,7 @@ Invokes the subroutine.
 
         /* check recursion/call depth */
         if (++context->recursion_depth > INTERP->recursion_limit)
-            real_exception(INTERP, next, E_RuntimeError,
+            Parrot_ex_throw_from_c_args(INTERP, next, CONTROL_ERROR,
                     "maximum recursion depth exceeded");
 
         /* and copy set context variables */
@@ -365,10 +365,9 @@ Set SELF to the data in other.
             /* copy the name so it's a different string in memory */
             PMC_sub(SELF)->name = string_copy(INTERP, PMC_sub(SELF)->name);
         }
-        else {
-            real_exception(INTERP, NULL, E_TypeError,
-                           "Can't assign a non-Sub type to a Sub");
-        }
+        else
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Can't assign a non-Sub type to a Sub");
     }
 
 /*
@@ -700,7 +699,7 @@ The number of optional named arguments
             count_found = (INTVAL)sub->arg_info->named_slurpy;
         }
         else {
-            real_exception(interp, NULL, INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Unknown introspection value '%S'", what);
         }
 
@@ -772,7 +771,7 @@ slurpy arguments).
 
         if (!*kind || kind[1]) {
             string_cstring_free(kind);
-            real_exception(INTERP, NULL, E_ValueError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "illegal register kind '%Ss'", reg);
         }
 
@@ -780,7 +779,7 @@ slurpy arguments).
         string_cstring_free(kind);
 
         if (!p)
-            real_exception(INTERP, NULL, E_ValueError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "illegal register kind '%Ss'", reg);
 
         regs_used = sub->n_regs_used[p - types];

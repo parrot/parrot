@@ -96,7 +96,7 @@ sub compile {
                 Jako::Construct::Expression::Value::Identifier->compile2( $compiler, $self->block,
                 $ident, $sym->kind, $sym->scope, $sym->type );
 
-            $self->SYNTAX_ERROR( "Cannot interpolate '%s': symbol not found!", $ident )
+            $self->EXCEPTION_SYNTAX_ERROR( "Cannot interpolate '%s': symbol not found!", $ident )
                 unless $sym;
 
             if ( not UNIVERSAL::isa( $sym->type, 'Jako::Construct::Type::String' ) ) {

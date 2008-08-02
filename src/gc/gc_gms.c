@@ -493,7 +493,7 @@ static void
 gc_gms_add_free_object(PARROT_INTERP, SHIM(Small_Object_Pool *pool),
         SHIM(PObj *to_add))
 {
-    real_exception(interp, NULL, 1, "gms abuse");
+    Parrot_ex_throw_from_c_args(interp, NULL, 1, "gms abuse");
 }
 
 
@@ -791,8 +791,8 @@ gc_gms_find_gen(PARROT_INTERP, ARGIN(const Gc_gms_hdr *h), UINTVAL gen_no)
      *
      * TODO insert generation
      */
-    real_exception(interp, NULL, 1, "generation %d not found for hdr %p",
-            gen_no, h);
+    Parrot_ex_throw_from_c_args(interp, NULL, 1,
+        "generation %d not found for hdr %p", gen_no, h);
 }
 
 /*

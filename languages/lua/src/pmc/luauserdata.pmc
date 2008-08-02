@@ -283,12 +283,12 @@ MMD_LuaUserdata: {
                 }
             }
 #endif
-            real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to compare two userdata values");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+                "attempt to compare two userdata values");
         }
 MMD_DEFAULT: {
-            real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to compare userdata with %Ss",
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+                "attempt to compare userdata with %Ss",
                     VTABLE_name(INTERP, value));
         }
     }

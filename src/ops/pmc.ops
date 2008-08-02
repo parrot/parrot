@@ -60,7 +60,7 @@ to do with the intializer.  See PDD02 for more.
 
 op new(out PMC, in INT) {
   if ($2 <= 0 || $2 >= interp->n_vtable_max) {
-    real_exception(interp, 0, NO_CLASS,
+    Parrot_ex_throw_from_c_args(interp, 0, EXCEPTION_NO_CLASS,
                    "Illegal PMC enum (%d) in new", (int)$2);
   }
 
@@ -76,7 +76,7 @@ op new(out PMC, in INT) {
 
 op new(out PMC, in INT, in PMC) {
   if ($2 <= 0 || $2 >= interp->n_vtable_max) {
-    real_exception(interp, 0, NO_CLASS,
+    Parrot_ex_throw_from_c_args(interp, 0, EXCEPTION_NO_CLASS,
                    "Illegal PMC enum (%d) in new", (int)$2);
   }
   $1 = pmc_new_init(interp, $2, $3);
@@ -91,7 +91,7 @@ op new(out PMC, in STR) {
     else {
         const INTVAL type = pmc_type(interp, classname);
         if (type <= 0)
-            real_exception(interp, NULL, NO_CLASS,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", classname);
         $1 = pmc_new(interp, type);
     }
@@ -106,7 +106,7 @@ op new(out PMC, in STR, in PMC) {
     else {
         const INTVAL type = pmc_type(interp, classname);
         if (type <= 0)
-            real_exception(interp, NULL, NO_CLASS,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", classname);
         $1 = pmc_new_init(interp, type, $3);
     }
@@ -121,7 +121,7 @@ inline op new(out PMC, in PMC) :object_classes {
     else {
         const INTVAL type = pmc_type_p(interp, classname_key);
         if (type <= 0)
-            real_exception(interp, NULL, NO_CLASS,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", readable_name(interp, classname_key));
         $1 = pmc_new(interp, type);
     }
@@ -136,7 +136,7 @@ op new(out PMC, in PMC, in PMC) {
     else {
         const INTVAL type = pmc_type_p(interp, classname_key);
         if (type <= 0)
-            real_exception(interp, NULL, NO_CLASS,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", readable_name(interp, classname_key));
         $1 = pmc_new_init(interp, type, $3);
     }
@@ -286,7 +286,7 @@ op find_method(out PMC, invar PMC, in STR) :flow {
     opcode_t * const resume = expr NEXT();
     $1 = VTABLE_find_method(interp, $2, $3);
     if (PMC_IS_NULL($1) || !VTABLE_defined(interp, $1)) {
-        real_exception(interp, resume, METH_NOT_FOUND,
+        Parrot_ex_throw_from_c_args(interp, resume, EXCEPTION_METH_NOT_FOUND,
             "Method '%Ss' not found for invocant of class '%Ss'", $3,
             VTABLE_get_string(interp, VTABLE_get_class(interp, $2)));
     }

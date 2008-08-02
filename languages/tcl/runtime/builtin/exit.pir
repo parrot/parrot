@@ -26,7 +26,7 @@ got_returnCode:
     exit returnCode
 
 bad_args:
-    tcl_error 'wrong # args: should be "exit ?returnCode?"'
+    die 'wrong # args: should be "exit ?returnCode?"'
 .end
 
 # Local Variables:

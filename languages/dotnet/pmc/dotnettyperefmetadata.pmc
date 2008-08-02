@@ -28,7 +28,7 @@ pmclass DotNetTypeRefMetadata dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!c || !c->str_name)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetTypeRefMetadata PMC");
 
         return c->str_name;
@@ -68,7 +68,7 @@ pmclass DotNetTypeRefMetadata dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!c)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetTypeRefMetadata PMC");
 
         result = c->str_namespace;
@@ -84,7 +84,7 @@ pmclass DotNetTypeRefMetadata dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!c)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetTypeRefMetadata PMC");
 
         result = c->resolution_scope;

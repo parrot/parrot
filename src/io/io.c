@@ -180,9 +180,8 @@ PIO_dup(PARROT_INTERP, ARGIN(PMC *pmc))
         layer = interp->piodata->default_stack;
     }
 
-    if (newfd == (PIOHANDLE)-1) {
-        real_exception(interp, NULL, 1, "could not dup an fd");
-    }
+    if (newfd == (PIOHANDLE)-1)
+        Parrot_ex_throw_from_c_args(interp, NULL, 1, "could not dup an fd");
 
     newio = PIO_fdopen_down(interp, layer, newfd, io->flags);
     /* io could be null here but we still have
@@ -268,14 +267,11 @@ PIO_init(PARROT_INTERP)
     if (interp->piodata) {
         /* memsub system is up and running: */
         /* Init IO stacks and handles for interp instance.  */
-        if (PIO_init_stacks(interp) != 0) {
-            real_exception(interp, NULL, PIO_ERROR, "PIO init stacks failed.");
-        }
+        if (PIO_init_stacks(interp) != 0)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "PIO init stacks failed.");
 
-        /*
-         * see also #36677
-         *
-         */
+        /* see also RT #36677 */
         if (!_PIO_STDIN(interp)) {
             _PIO_STDIN(interp) = pmc_new(interp, enum_class_Undef);
         }
@@ -296,12 +292,15 @@ PIO_init(PARROT_INTERP)
 
     interp->piodata = mem_allocate_typed(ParrotIOData);
     if (interp->piodata == NULL)
-        real_exception(interp, NULL, PIO_ERROR, "PIO alloc piodata failure.");
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "PIO alloc piodata failure.");
     interp->piodata->default_stack = NULL;
-    interp->piodata->table = (PMC **)mem_sys_allocate_zeroed(PIO_NR_OPEN * sizeof (ParrotIO *));
-    if (interp->piodata->table == NULL)
-        real_exception(interp, NULL, PIO_ERROR, "PIO alloc table failure.");
+    interp->piodata->table         =
+        (PMC **)mem_sys_allocate_zeroed(PIO_NR_OPEN * sizeof (ParrotIO *));
 
+    if (!interp->piodata->table)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "PIO alloc table failure.");
 }
 
 /*
@@ -441,7 +440,7 @@ PIO_init_stacks(PARROT_INTERP)
                  * see also #36677
                 char buf[1024];
                 sprintf(buf, "Parrot IO: Failed init layer(%s).\n", p->name);
-                real_exception(interp, NULL, PIO_ERROR, buf);
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR, buf);
                 */
                 ;
             }
@@ -1042,10 +1041,12 @@ PIO_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD_NULLOK(STRING *s))
 
     if (PMC_IS_NULL(pmc)
     || !VTABLE_isa(interp, pmc, CONST_STRING(interp, "ParrotIO")))
-        real_exception(interp, NULL, PIO_ERROR, "Cannot put to non-PIO PMC");
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Cannot put to non-PIO PMC");
 
     if (!io)
-        real_exception(interp, NULL, PIO_ERROR, "Cannot put to a closed PIO handle");
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Cannot put to a closed PIO handle");
 
     if (!s)
         return 0;
@@ -1355,13 +1356,13 @@ INTVAL
 PIO_poll(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL which, INTVAL sec, INTVAL usec)
 {
     ParrotIOLayer *l;
-    ParrotIO *io;
+    ParrotIO      *io;
 
-    if (PMC_IS_NULL(pmc)) {
-        real_exception(interp, NULL, E_ValueError, "Can't poll NULL pmc");
-    }
+    if (PMC_IS_NULL(pmc))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Can't poll NULL pmc");
 
-    l = (ParrotIOLayer *)PMC_struct_val(pmc);
+    l  = (ParrotIOLayer *)PMC_struct_val(pmc);
     io = (ParrotIO *)PMC_data0(pmc);
     return PIO_poll_down(interp, l, io, which, sec, usec);
 }

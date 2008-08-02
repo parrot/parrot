@@ -93,7 +93,8 @@ Returns the current working directory.
         }
         else {
             const char * const errmsg = strerror(errno);
-            real_exception(interp, NULL, E_SystemError, errmsg);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
         }
     }
 
@@ -118,7 +119,8 @@ Changes the current working directory to the one specified by C<path>.
         string_cstring_free(cpath);
         if (error) {
             char *errmsg = strerror(errno);
-            real_exception(interp, NULL, E_SystemError, errmsg);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
         }
     }
 
@@ -141,7 +143,8 @@ C<path>.
         if (error) {
             const char * const errmsg = strerror(errno);
             string_cstring_free(cpath);
-            real_exception(interp, NULL, E_SystemError, errmsg);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
         }
 
         if (S_ISDIR(info.st_mode)) {
@@ -153,7 +156,8 @@ C<path>.
             string_cstring_free(cpath);
             if (error) {
                 const char * const errmsg = strerror(errno);
-                real_exception(interp, NULL, E_SystemError, errmsg);
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                    errmsg);
             }
         }
         else {
@@ -161,7 +165,8 @@ C<path>.
             string_cstring_free(cpath);
             if (error) {
                 const char * const errmsg = strerror(errno);
-                real_exception(interp, NULL, E_SystemError, errmsg);
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                    errmsg);
             }
         }
     }
@@ -188,7 +193,8 @@ Creates a directory specified by C<path> with mode C<mode>.
         string_cstring_free(cpath);
         if (error) {
             const char * const errmsg = strerror(errno);
-            real_exception(interp, NULL, E_SystemError, errmsg);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
         }
     }
 
@@ -226,7 +232,8 @@ Stats a file, and returns a 13 position array as in Perl:
 
         if (error) {
             const char * const errmsg = strerror(errno);
-            real_exception(interp, NULL, E_SystemError, errmsg);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
         }
         else {
             PMC * const array = pmc_new(interp, enum_class_FixedPMCArray);
@@ -290,7 +297,8 @@ Stats a file, and returns a 13 position array as in Perl:
 
         if (error) {
             const char * const errmsg = strerror(errno);
-            real_exception(interp, NULL, E_SystemError, errmsg);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
         }
         else {
             PMC * const array = pmc_new(interp, enum_class_FixedPMCArray);
@@ -336,10 +344,11 @@ Creates a symlink, where available
 
         if (error) {
             const char * const errmsg = strerror(errno);
-            real_exception(interp, NULL, E_SystemError, errmsg);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
         }
 #else
-        real_exception(interp, NULL, E_NotImplementedError,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Win32 does not support symlinks!");
 #endif
     }
@@ -365,10 +374,11 @@ Creates a hard link, where available(?)
 
         if (error) {
             const char * const errmsg = strerror(errno);
-            real_exception(interp, NULL, E_SystemError, errmsg);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
         }
 #else
-        real_exception(interp, NULL, E_NotImplementedError,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "Win32 is not POSIX. Need win32 developer!");
 #endif
     }
@@ -389,8 +399,9 @@ previous one).
         const INTVAL old = umask(mask);
         RETURN(INTVAL old);
 #else
-        real_exception(interp, NULL, E_NotImplementedError,
-                "Win32 is not POSIX. Need win32 developer!");
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_UNIMPLEMENTED,
+            "Win32 is not POSIX. Need Win32 developer!");
 #endif
     }
 
@@ -417,11 +428,12 @@ idea to do the same with parrot.
 
         if (error) {
             const char * const errmsg = strerror(errno);
-            real_exception(interp, NULL, E_SystemError, errmsg);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
         }
 #else
-        real_exception(interp, NULL, E_NotImplementedError,
-                "Win32 is not POSIX. Need win32 developer!");
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                "Win32 is not POSIX. Need Win32 developer!");
 #endif
     }
 
@@ -447,7 +459,8 @@ reads entries from a directory.
 
         if (!dir) {
             const char * const errmsg = strerror(errno);
-            real_exception(interp, NULL, E_SystemError, errmsg);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
         }
 
         array = pmc_new(interp, enum_class_ResizableStringArray);
@@ -461,7 +474,7 @@ reads entries from a directory.
 
         RETURN(PMC *array);
 #else
-        real_exception(interp, NULL, E_NotImplementedError,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "Win32 is not POSIX. Need Win32 developer!");
 #endif
     }
@@ -483,7 +496,8 @@ thrown.
 
         if (ret < 0) {
             const char * const errmsg = strerror(errno) ;
-            real_exception(interp, NULL, E_SystemError, "%s", errmsg);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                "%s", errmsg);
         }
     }
 

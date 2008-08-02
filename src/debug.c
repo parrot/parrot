@@ -424,7 +424,7 @@ Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(STRING *filename))
     char *file;
 
     if (!interp->pdb)
-        real_exception(interp, NULL, 0, "No debugger");
+        Parrot_ex_throw_from_c_args(interp, NULL, 0, "No debugger");
 
     file = string_to_cstring(interp, filename);
     PDB_load_source(interp, file);
@@ -436,15 +436,15 @@ void
 Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
 {
     if (!interp->pdb)
-        real_exception(interp, NULL, 0, "No debugger");
+        Parrot_ex_throw_from_c_args(interp, NULL, 0, "No debugger");
 
     if (!interp->pdb->file)
-        real_exception(interp, NULL, 0, "No file loaded to debug");
+        Parrot_ex_throw_from_c_args(interp, NULL, 0, "No file loaded to debug");
 
     if (!(interp->pdb->state & PDB_BREAK)) {
         const char * command;
-        new_internal_exception(interp);
-        if (setjmp(interp->exceptions->destination)) {
+        new_runloop_jump_point(interp);
+        if (setjmp(interp->current_runloop->resume)) {
             fprintf(stderr, "Unhandled exception in debugger\n");
             return;
         }
@@ -798,8 +798,8 @@ PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     debugee     = pdb->debugee;
 
     /* execute n ops */
-    new_internal_exception(debugee);
-    if (setjmp(debugee->exceptions->destination)) {
+    new_runloop_jump_point(debugee);
+    if (setjmp(debugee->current_runloop->resume)) {
         Parrot_eprintf(interp, "Unhandled exception while tracing\n");
         pdb->state |= PDB_STOPPED;
         return;
@@ -1105,7 +1105,8 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         skip_command(command);
     }
     else {
-        real_exception(interp, NULL, 1, "NULL command passed to PDB_set_break");
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            "NULL command passed to PDB_set_break");
     }
     condition = NULL;
 
@@ -1892,7 +1893,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
             dest[size++] = ']';
             break;
         default:
-            real_exception(interp, NULL, 1, "Unknown opcode type");
+            Parrot_ex_throw_from_c_args(interp, NULL, 1, "Unknown opcode type");
         }
 
         if (j != info->op_count - 1)

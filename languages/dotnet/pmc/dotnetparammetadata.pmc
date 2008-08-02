@@ -28,7 +28,7 @@ pmclass DotNetParamMetadata dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!p || !p->str_name)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetParamMetadata PMC");
 
         return p->str_name;
@@ -69,7 +69,7 @@ pmclass DotNetParamMetadata dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!p)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetParamMetadata PMC");
 
         result = (INTVAL)p->flags;
@@ -86,7 +86,7 @@ pmclass DotNetParamMetadata dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!p)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetParamMetadata PMC");
 
         result = (INTVAL)p->sequence;

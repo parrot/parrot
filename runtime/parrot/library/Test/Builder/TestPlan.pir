@@ -118,7 +118,7 @@ Test::Builder::NullPlan object, do not pass the hash.
   NO_EXPECTATION:
     .local pmc plan_exception
     plan_exception = new 'Exception'
-    set   plan_exception['_message'], 'Invalid or missing plan!'
+    plan_exception = 'Invalid or missing plan!'
     throw plan_exception
 
   SET_ATTRIBUTES:

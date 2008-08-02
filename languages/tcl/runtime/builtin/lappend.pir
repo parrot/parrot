@@ -43,7 +43,7 @@ loop_done:
   .return set(listname, value)
 
 error:
-  tcl_error 'wrong # args: should be "lappend varName ?value value ...?"'
+  die 'wrong # args: should be "lappend varName ?value value ...?"'
 
 .end
 

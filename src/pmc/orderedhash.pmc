@@ -98,16 +98,16 @@ Marks the OrderedHash as live.
             idx += n;
 
         if (idx < 0 || idx >= n)
-            real_exception(INTERP, NULL, KEY_NOT_FOUND,
-                    "OrderedHash: index out of bounds!");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
+                "OrderedHash: index out of bounds!");
 
         b = h->bs + idx;
 
         if (b->key)
             return (PMC *)b->value;
 
-        real_exception(INTERP, NULL, KEY_NOT_FOUND,
-                "OrderedHash: No such key");
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
+            "OrderedHash: No such key");
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
@@ -146,16 +146,16 @@ Marks the OrderedHash as live.
             idx += n;
 
         if (idx < 0 || idx >= n)
-            real_exception(INTERP, NULL, KEY_NOT_FOUND,
-                    "OrderedHash: index out of bounds!");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
+                "OrderedHash: index out of bounds!");
 
         b = h->bs + idx;
 
         if (b->key)
             return VTABLE_get_string(INTERP, (PMC *)b->value);
 
-        real_exception(INTERP, NULL, KEY_NOT_FOUND,
-                "OrderedHash: No such key");
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
+            "OrderedHash: No such key");
     }
 
     VTABLE STRING *get_string_keyed(PMC *key) {
@@ -194,16 +194,16 @@ Returns the integer value associated with C<key>.
             idx += n;
 
         if (idx < 0 || idx >= n)
-            real_exception(INTERP, NULL, OUT_OF_BOUNDS,
-                    "OrderedHash: index out of bounds!");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "OrderedHash: index out of bounds!");
 
         b = h->bs + idx;
 
         if (b->key)
             return VTABLE_get_integer(INTERP, (PMC *)b->value);
 
-        real_exception(INTERP, NULL, KEY_NOT_FOUND,
-                "OrderedHash: No such key");
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
+            "OrderedHash: No such key");
     }
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
@@ -244,16 +244,16 @@ Returns the floating-point value for the element at C<key>.
             idx += n;
 
         if (idx < 0 || idx >= n)
-            real_exception(INTERP, NULL, OUT_OF_BOUNDS,
-                    "OrderedHash: index out of bounds!");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "OrderedHash: index out of bounds!");
 
         b = h->bs + idx;
 
         if (b->key)
             return VTABLE_get_number(INTERP, (PMC *)b->value);
 
-        real_exception(INTERP, NULL, KEY_NOT_FOUND,
-                "OrderedHash: No such key");
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
+            "OrderedHash: No such key");
     }
 
     VTABLE FLOATVAL get_number_keyed(PMC *key) {
@@ -645,8 +645,9 @@ preserve key/value order.
                 }
                 break;
             default:
-                real_exception(interp, NULL, E_Exception,
-                        "unhandled visit action (%d)", info->what);
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "unhandled visit action (%d)", info->what);
         }
     }
 }

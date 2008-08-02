@@ -29,21 +29,21 @@
 compiler_error:
   get_results '0,0', $P1, $S1
   $S1 = 'compile error: ' . $S1
-  tcl_error $S1
+  die $S1
 
 runtime_error:
   get_results '0,0', $P1, $S1
   $S1 = 'runtime error: ' . $S1
-  tcl_error $S1
+  die $S1
 
 bad_args:
-  tcl_error 'wrong # args: should be "inline language code"'
+  die 'wrong # args: should be "inline language code"'
 
 fail:
   $S0 = 'invalid language "'
   $S0 .= language
   $S0 .= '" specified'
-  tcl_error $S0
+  die $S0
 .end
 
 # Local Variables:

@@ -21,8 +21,19 @@ where each chunk has room for one entry.
 
 #include "parrot/parrot.h"
 #include "parrot/stacks.h"
+#include "stacks.str"
 
 /* HEADERIZER HFILE: include/parrot/stacks.h */
+
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void run_cleanup_action(PARROT_INTERP, ARGIN(Stack_Entry_t *e))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
 
 /*
 
@@ -240,9 +251,9 @@ rotate_entries(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p), INTVAL num_entrie
         num_entries = -num_entries;
         depth = num_entries - 1;
 
-        if (stack_height(interp, stack) < (size_t)num_entries) {
-            real_exception(interp, NULL, ERROR_STACK_SHALLOW, "Stack too shallow!");
-        }
+        if (stack_height(interp, stack) < (size_t)num_entries)
+            Parrot_ex_throw_from_c_args(interp, NULL, ERROR_STACK_SHALLOW,
+                "Stack too shallow!");
 
         /* XXX Dereferencing stack_entry here is a cavalcade of danger */
         temp = *stack_entry(interp, stack, depth);
@@ -258,11 +269,13 @@ rotate_entries(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p), INTVAL num_entrie
         Stack_Entry_t temp;
         INTVAL depth = num_entries - 1;
 
-        if (stack_height(interp, stack) < (size_t)num_entries) {
-            real_exception(interp, NULL, ERROR_STACK_SHALLOW, "Stack too shallow!");
-        }
+        if (stack_height(interp, stack) < (size_t)num_entries)
+            Parrot_ex_throw_from_c_args(interp, NULL, ERROR_STACK_SHALLOW,
+                "Stack too shallow!");
+
         /* XXX Dereferencing stack_entry here is a cavalcade of danger */
         temp = *stack_entry(interp, stack, 0);
+
         for (i = 0; i < depth; i++) {
             *stack_entry(interp, stack, i) =
                 *stack_entry(interp, stack, i + 1);
@@ -338,8 +351,8 @@ stack_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
             UVal_pmc(entry->entry) = (PMC *)thing;
             break;
         default:
-            real_exception(interp, NULL, ERROR_BAD_STACK_TYPE,
-                    "Invalid Stack_Entry_type!");
+            Parrot_ex_throw_from_c_args(interp, NULL, ERROR_BAD_STACK_TYPE,
+                "Invalid Stack_Entry_type!");
     }
 }
 
@@ -363,7 +376,7 @@ stack_prepare_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
 
     /* the first entry (initial top) refers to itself */
     if (chunk == chunk->prev)
-        real_exception(interp, NULL, ERROR_STACK_EMPTY,
+        Parrot_ex_throw_from_c_args(interp, NULL, ERROR_STACK_EMPTY,
             "No entries on %s Stack!", chunk->name);
 
     *stack_p = chunk->prev;
@@ -390,10 +403,9 @@ stack_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
         (Stack_Entry_t *)stack_prepare_pop(interp, stack_p);
 
     /* Types of 0 mean we don't care */
-    if (type && entry->entry_type != type) {
-        real_exception(interp, NULL, ERROR_BAD_STACK_TYPE,
-                           "Wrong type on top of stack!\n");
-    }
+    if (type && entry->entry_type != type)
+        Parrot_ex_throw_from_c_args(interp, NULL, ERROR_BAD_STACK_TYPE,
+            "Wrong type on top of stack!\n");
 
     /* Cleanup routine? */
     if (entry->cleanup != STACK_CLEANUP_NULL)
@@ -414,8 +426,8 @@ stack_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
             *(PMC **)where     = UVal_pmc(entry->entry);
             break;
         default:
-            real_exception(interp, NULL, ERROR_BAD_STACK_TYPE,
-                               "Wrong type on top of stack!\n");
+            Parrot_ex_throw_from_c_args(interp, NULL, ERROR_BAD_STACK_TYPE,
+                "Wrong type on top of stack!\n");
         }
     }
 
@@ -521,9 +533,9 @@ Parrot_dump_dynamic_environment(PARROT_INTERP, ARGIN(Stack_Chunk_t *dynamic_env)
 
     while (dynamic_env->prev != dynamic_env) {
         const Stack_Entry_t * const e = stack_entry(interp, dynamic_env, 0);
-        if (! e) {
-            real_exception(interp, NULL, 1, "Control stack damaged");
-        }
+
+        if (! e)
+            Parrot_ex_throw_from_c_args(interp, NULL, 1, "Control stack damaged");
 
         PIO_eprintf(interp, "[%4d:  chunk %p entry %p "
                                  "type %d cleanup %p]\n",
@@ -547,6 +559,100 @@ Parrot_dump_dynamic_environment(PARROT_INTERP, ARGIN(Stack_Chunk_t *dynamic_env)
     PIO_eprintf(interp, "[%4d:  chunk %p %s base]\n",
                 height, dynamic_env, dynamic_env->name);
 }
+
+
+/*
+
+=item C<static void run_cleanup_action>
+
+Runs the sub PMC from the Stack_Entry_t pointer with an INTVAL arg of 0.  Used
+in C<Parrot_push_action>.
+
+=cut
+
+*/
+
+static void
+run_cleanup_action(PARROT_INTERP, ARGIN(Stack_Entry_t *e))
+{
+    /*
+     * this is called during normal stack_pop of the control
+     * stack - run the action subroutine with an INTVAL arg of 0
+     */
+    PMC * const sub = UVal_pmc(e->entry);
+    Parrot_runops_fromc_args(interp, sub, "vI", 0);
+}
+
+/*
+
+=item C<void Parrot_push_action>
+
+Pushes an action handler onto the dynamic environment.
+
+=cut
+
+*/
+
+PARROT_API
+void
+Parrot_push_action(PARROT_INTERP, ARGIN(PMC *sub))
+{
+    if (!VTABLE_isa(interp, sub, CONST_STRING(interp, "Sub")))
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            "Tried to push a non Sub PMC action");
+
+    stack_push(interp, &interp->dynamic_env, sub,
+               STACK_ENTRY_ACTION, run_cleanup_action);
+}
+
+/*
+
+=item C<void Parrot_push_mark>
+
+Push a cleanup mark onto the dynamic environment.
+
+=cut
+
+*/
+
+PARROT_API
+void
+Parrot_push_mark(PARROT_INTERP, INTVAL mark)
+{
+    stack_push(interp, &interp->dynamic_env, &mark,
+               STACK_ENTRY_MARK, STACK_CLEANUP_NULL);
+}
+
+/*
+
+=item C<void Parrot_pop_mark>
+
+Pop items off the dynamic environment up to the mark.
+
+=cut
+
+*/
+
+PARROT_API
+void
+Parrot_pop_mark(PARROT_INTERP, INTVAL mark)
+{
+    do {
+        const Stack_Entry_t * const e
+            = stack_entry(interp, interp->dynamic_env, 0);
+        if (!e)
+            Parrot_ex_throw_from_c_args(interp, NULL, 1, "Mark %ld not found.",
+                (long)mark);
+
+        (void)stack_pop(interp, &interp->dynamic_env,
+                        NULL, e->entry_type);
+        if (e->entry_type == STACK_ENTRY_MARK) {
+            if (UVal_int(e->entry) == mark)
+                return;
+        }
+    } while (1);
+}
+
 
 /*
 

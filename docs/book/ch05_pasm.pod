@@ -2494,7 +2494,7 @@ opcode. The system calls the installed exception handler only when an
 exception is thrown (perhaps because of code that does division by
 zero or attempts to retrieve a global that wasn't stored.)
 
-    newsub P20, .Exception_Handler, _handler
+    newsub P20, .ExceptionHandler, _handler
     set_eh P20                  # push handler on control stack
     null P10                    # set register to null
     find_global P10, "none"     # may throw exception
@@ -2545,9 +2545,9 @@ execution at the opcode immediately after the one that threw the
 exception. Other exceptions at the run-loop level are also generally
 resumable.
 
-  new P10, Exception            # create new Exception object
-  set P10["_message"], "I die"  # set message attribute
-  throw P10                     # throw it
+  new P10, 'Exception'    # create new Exception object
+  set P10, 'I die'        # set message attribute
+  throw P10               # throw it
 
 Exceptions are designed to work with the Parrot calling conventions.
 Since the return addresses of C<bsr> subroutine calls and exception
@@ -2594,7 +2594,7 @@ needs to handle from the OS, it converts that signal into an event and
 broadcasts it to all running threads. Each thread independently
 decides if it's interested in this signal and, if so, how to respond to it.
 
-    newsub P20, .Exception_Handler, _handler
+    newsub P20, .ExceptionHandler, _handler
     set_eh P20                  # establish signal handler
     print "send SIGINT:\n"
     sleep 2                     # press ^C after you saw start
@@ -2603,7 +2603,7 @@ decides if it's interested in this signal and, if so, how to respond to it.
   _handler:
     .include "signal.pasm"      # get signal definitions
     print "caught "
-    set I0, P5["_type"]         # if _type is negative, the ...
+    set I0, P5["type"]         # if _type is negative, the ...
     neg I0, I0                  # ... negated type is the signal
     ne I0, .SIGINT, nok
     print "SIGINT\n"

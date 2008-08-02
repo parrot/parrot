@@ -35,7 +35,7 @@
     .return(channel_id)
 
 bad_args:
-    tcl_error 'wrong # args: should be "socket ?-myaddr addr? ?-myport myport? ?-async? host port" or "socket -server command ?-myaddr addr? port"'
+    die 'wrong # args: should be "socket ?-myaddr addr? ?-myport myport? ?-async? host port" or "socket -server command ?-myaddr addr? port"'
 .end
 
 

@@ -169,7 +169,7 @@ be raised if i is outside that range.
 
   valueerror:
     $P0 = new 'Exception'
-    $P0['_message'] = "ValueError"
+    $P0 = "ValueError"
     throw $P0
 .end
 

@@ -62,7 +62,7 @@ bad_args:
   .return ('') # once all commands are implemented, remove this...
 
 few_args:
-  tcl_error 'wrong # args: should be "array option arrayName ?arg ...?"'
+  die 'wrong # args: should be "array option arrayName ?arg ...?"'
 
 .end
 
@@ -83,7 +83,7 @@ few_args:
   .return (is_array)
 
 bad_args:
-  tcl_error 'wrong # args: should be "array exists arrayName"'
+  die 'wrong # args: should be "array exists arrayName"'
 .end
 
 .sub 'size'
@@ -104,7 +104,7 @@ size_none:
   .return (0)
 
 bad_args:
-  tcl_error 'wrong # args: should be "array size arrayName"'
+  die 'wrong # args: should be "array size arrayName"'
 .end
 
 .sub 'set'
@@ -171,10 +171,10 @@ done:
   .return ('')
 
 bad_args:
-  tcl_error 'wrong # args: should be "array set arrayName list"'
+  die 'wrong # args: should be "array set arrayName list"'
 
 odd_args:
-  tcl_error 'list must have an even number of elements'
+  die 'list must have an even number of elements'
 .end
 
 
@@ -237,7 +237,7 @@ push_end:
   .return(retval)
 
 bad_args:
-  tcl_error 'wrong # args: should be "array get arrayName ?pattern?"'
+  die 'wrong # args: should be "array get arrayName ?pattern?"'
 
 not_array:
   .return ('')
@@ -293,7 +293,7 @@ push_end:
 
 
 bad_args:
-   tcl_error 'wrong # args: should be "array unset arrayName ?pattern?"'
+   die 'wrong # args: should be "array unset arrayName ?pattern?"'
 
 not_array:
    .return ('')
@@ -333,16 +333,16 @@ skip_args:
   .return match_proc(the_array, pattern)
 
 bad_args:
-  tcl_error 'wrong # args: should be "array names arrayName ?mode? ?pattern?"'
+  die 'wrong # args: should be "array names arrayName ?mode? ?pattern?"'
 
 bad_mode:
   $S0 = 'bad option "'
   $S0 .= mode
   $S0 .= '": must be -exact, -glob, or -regexp'
-  tcl_error $S0
+  die $S0
 
 not_array:
-  tcl_error '' # is this right? -Coke
+  die '' # is this right? -Coke
 .end
 
 .namespace [ 'helpers' ; 'array'; 'names_helper' ]

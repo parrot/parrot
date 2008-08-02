@@ -85,7 +85,7 @@ Raises an exception. Use C<init_pmc()>.
 */
 
     VTABLE void init() {
-        real_exception(INTERP, NULL, E_Exception,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Iterator init without aggregate");
     }
 
@@ -331,7 +331,7 @@ Reset the Iterator. C<value> must be one of
 
  ITERATE_FROM_START        ... Iterate from start
  ITERATE_FROM_START_KEYS   ... OrderedHash by keys
- ITERATE_FROM_END          ... Arrays and PerlString only
+ ITERATE_FROM_END          ... Arrays only
 
 =cut
 
@@ -340,7 +340,7 @@ Reset the Iterator. C<value> must be one of
     VTABLE void set_integer_native(INTVAL value) {
         PMC *key, *agg;
         if (value < ITERATE_FROM_START || value > ITERATE_FROM_END)
-            real_exception(INTERP, NULL, E_TypeError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "Illegal set_integer on iterator");
 
         /* reset iterator on aggregate */
@@ -489,7 +489,7 @@ See F<docs/pdds/pdd03_calling_conventions.pod>.
         }
         /* TODO function + sentinel */
         else if (REG_INT(interp, 3) == 2)
-            real_exception(INTERP, NULL, E_AssertionError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "Iterator: invoke 2 args");
 
         REG_INT(interp, 1) =
@@ -565,7 +565,8 @@ the next one.
         PMC        *ret;
 
         if (PMC_int_val(key) == -1)
-            real_exception(INTERP, NULL, E_StopIteration, "StopIteration");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "StopIteration");
 
         ret = VTABLE_get_pmc_keyed(INTERP, agg, key);
 

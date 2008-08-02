@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2007, The Perl Foundation.
+Copyright (C) 2004-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -168,7 +168,8 @@ Parrot_load_charset(PARROT_INTERP, ARGIN(const char *charsetname))
 {
     UNUSED(charsetname);
 
-    real_exception(interp, NULL, UNIMPLEMENTED, "Can't load charsets yet");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        "Can't load charsets yet");
 }
 
 /*

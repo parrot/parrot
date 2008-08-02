@@ -323,7 +323,7 @@ distribution (parrot/docs)
 
     .sub _ :main
         $P0 = new 'Exception'
-        $P0['_message'] = "The sky is falling!"
+        $P0 = "The sky is falling!"
         throw $P0
     .end
 

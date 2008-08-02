@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2007, The Perl Foundation.
+Copyright (C) 2004-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -162,7 +162,8 @@ const ENCODING *
 Parrot_load_encoding(PARROT_INTERP, ARGIN(const char *encodingname))
 {
     UNUSED(encodingname);
-    real_exception(interp, NULL, UNIMPLEMENTED, "Can't load encodings yet");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        "Can't load encodings yet");
 }
 
 /*

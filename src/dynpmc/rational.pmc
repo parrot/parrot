@@ -40,8 +40,8 @@ Currently C<rational.pmc> only has some C<static> functions for code sharing.
 #  define RT(x)
 #endif
 
-#define RAISE_EXCEPTION   real_exception(interp, NULL, E_LibraryNotLoadedError, \
-                                   "GNU Multiple Precision library not found.");
+#define RAISE_EXCEPTION   Parrot_ex_throw_from_c_args(interp, NULL, \
+    EXCEPTION_LIBRARY_NOT_LOADED, "GNU Multiple Precision library not found.");
 
 /*
 
@@ -438,7 +438,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
         }
         else {
             mpz_clear(q);
-            real_exception(INTERP, NULL, 1,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                 "Rational, get_integer(): Number is too big.");
         }
       #else
@@ -574,7 +574,7 @@ MMD_Rational: {
       #endif
         }
 MMD_DEFAULT: {
-    real_exception(INTERP, NULL, E_NotImplementedError,
+    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
         "Rational, add: Not implemented (yet).");
         }
     }
@@ -601,7 +601,7 @@ MMD_Rational: {
       #endif
         }
 MMD_DEFAULT: {
-    real_exception(INTERP, NULL, E_NotImplementedError,
+    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
         "Rational, i_add: Not implemented (yet).");
         }
     }
@@ -682,7 +682,7 @@ MMD_Rational: {
       #endif
         }
 MMD_DEFAULT: {
-    real_exception(INTERP, NULL, E_NotImplementedError,
+    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
         "Rational, subtract: Not implemented (yet).");
         }
     }
@@ -709,7 +709,7 @@ MMD_Rational: {
       #endif
         }
 MMD_DEFAULT: {
-    real_exception(INTERP, NULL, E_NotImplementedError,
+    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
         "Rational, i_subtract: Not implemented (yet).");
         }
     }
@@ -790,7 +790,7 @@ MMD_Rational: {
       #endif
         }
 MMD_DEFAULT: {
-        real_exception(INTERP, NULL, E_NotImplementedError,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
             "Rational, multiply: Not implemented (yet).");
         }
     }
@@ -817,7 +817,7 @@ MMD_Rational: {
       #endif
         }
 MMD_DEFAULT: {
-        real_exception(INTERP, NULL, E_NotImplementedError,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
             "Rational, i_multiply: Not implemented (yet).");
         }
     }
@@ -898,7 +898,7 @@ MMD_Rational: {
       #endif
         }
 MMD_DEFAULT: {
-        real_exception(INTERP, NULL, E_NotImplementedError,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
             "Rational, divide: Not implemented (yet).");
         }
     }
@@ -925,7 +925,7 @@ MMD_Rational: {
       #endif
         }
 MMD_DEFAULT: {
-        real_exception(INTERP, NULL, E_NotImplementedError,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
             "Rational, i_divide: Not implemented (yet).");
         }
     }
@@ -1065,7 +1065,7 @@ MMD_Integer: {
       }
 MMD_Float: {
       #ifdef PARROT_HAS_GMP
-        real_exception(INTERP, NULL, E_NotImplementedError,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
             "This is going to get implemented soon.");
       #else
         RAISE_EXCEPTION
@@ -1079,7 +1079,7 @@ MMD_Rational: {
       #endif
       }
 MMD_DEFAULT: {
-        real_exception(INTERP, NULL, E_NotImplementedError,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
             "cmp not implemented (yet).");
       }
     }
@@ -1108,10 +1108,10 @@ MMD_Integer: {
       #endif
       }
 MMD_Float: {
-        real_exception(INTERP, NULL, E_NotImplementedError,
-            "Equality to floats can not be checked because of limited machine accuracy.\n"
-             "Approximate the rational and check whether the difference to a value is lower\n"
-             "than an epsilon.");
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+            "Equality to floats can not be checked because of limited machine "
+            "accuracy.\nApproximate the rational and check whether the "
+            "difference to a value is lower\nthan an epsilon.");
       }
 MMD_Rational: {
       #ifdef PARROT_HAS_GMP
@@ -1121,7 +1121,8 @@ MMD_Rational: {
       #endif
       }
 MMD_DEFAULT: {
-        real_exception(INTERP, NULL, E_NotImplementedError, "is_equal not implemented (yet).");
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+            "is_equal not implemented (yet).");
       }
     }
 }

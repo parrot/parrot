@@ -179,7 +179,7 @@ Returns the floating-point value of the element at index C<key>.
         FLOATVAL *data;
 
         if (key < 0 || key >= PMC_int_val(SELF))
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "FixedFloatArray: index out of bounds!");
 
         data = (FLOATVAL *)PMC_data(SELF);
@@ -277,7 +277,7 @@ Resizes the array to C<size> elements.
 
     VTABLE void set_integer_native(INTVAL size) {
         if (PMC_int_val(SELF) || size < 1)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "FixedFloatArray: Can't resize!");
 
         PMC_int_val(SELF) = size;
@@ -328,7 +328,7 @@ C<value>.
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
         FLOATVAL *data;
         if (key < 0 || key >= PMC_int_val(SELF))
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "FixedFloatArray: index out of bounds!");
 
         data      = (FLOATVAL *)PMC_data(SELF);

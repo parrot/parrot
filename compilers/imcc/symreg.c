@@ -129,10 +129,10 @@ pop_namespace(PARROT_INTERP, ARGIN(const char *name))
     Namespace * const ns = _namespace;
 
     if (!ns)
-        IMCC_fataly(interp, E_SyntaxError, "pop() on empty namespace stack\n");
+        IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "pop() on empty namespace stack\n");
 
     if (name && !STREQ(name, ns->name))
-        IMCC_fataly(interp, E_SyntaxError, "tried to pop namespace(%s), "
+        IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "tried to pop namespace(%s), "
                 "but top of stack is namespace(%s)\n", name, ns->name);
 
     while (ns->idents) {
@@ -492,7 +492,7 @@ mk_pasm_reg(PARROT_INTERP, ARGIN(const char *name))
         r->color = atoi(name + 1);
 
         if (r->color < 0)
-            IMCC_fataly(interp, E_SyntaxError,
+            IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                 "register number out of range '%s'\n", name);
     }
 
@@ -613,8 +613,8 @@ mk_pmc_const_2(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *left),
     int     len;
 
     if (IMCC_INFO(interp)->state->pasm_file)
-        IMCC_fataly(interp, E_SyntaxError, "Ident as PMC constant %s\n",
-            left->name);
+        IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+            "Ident as PMC constant %s\n", left->name);
 
     r[0] = left;
 
@@ -671,7 +671,7 @@ mk_const_ident(PARROT_INTERP, ARGIN(const char *name), int t,
      */
     if (t == 'N' || t == 'I') {
         if (val->set == 'S')
-            IMCC_fataly(interp, E_TypeError, "bad const initialisation");
+            IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "bad const initialisation");
 
         /* Cast value to const type */
         val->set = t;
@@ -679,7 +679,7 @@ mk_const_ident(PARROT_INTERP, ARGIN(const char *name), int t,
 
     if (global) {
         if (t == 'P')
-            IMCC_fataly(interp, E_SyntaxError,
+            IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                     "global PMC constant not allowed");
 
         r = _mk_symreg(&IMCC_INFO(interp)->ghash, name, t);
@@ -830,10 +830,10 @@ _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int un
         /* we use this for labels/subs */
         if (uniq && r && r->type == VTADDRESS && r->lhs_use_count) {
             if (uniq == U_add_uniq_label)
-                IMCC_fataly(interp, E_SyntaxError,
+                IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                     "Label '%s' already defined\n", name);
             else if (uniq == U_add_uniq_sub)
-                IMCC_fataly(interp, E_SyntaxError,
+                IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                         "Subroutine '%s' already defined\n", name);
         }
 
@@ -1024,7 +1024,7 @@ link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
                       : &IMCC_INFO(interp)->ghash;
 
     if (nargs == 0)
-        IMCC_fataly(interp, E_SyntaxError, "link_keys: huh? no keys\n");
+        IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "link_keys: huh? no keys\n");
 
     /* short-circuit simple key unless we've been told not to */
     if (nargs == 1 && !force && !(keys[0]->type & VT_SLICE_BITS))

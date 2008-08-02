@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -134,7 +134,7 @@ SKIP: {
 _handler:
 .include "signal.pasm"
     print "catched "
-    set I0, P5["_type"]
+    set I0, P5["type"]
     neg I0, I0
     ne I0, .SIGHUP, nok
     print "SIGHUP\n"

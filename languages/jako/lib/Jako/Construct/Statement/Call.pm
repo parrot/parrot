@@ -61,7 +61,7 @@ sub compile {
 
     my $sym = $self->block->find_symbol($name);
 
-    $self->SYNTAX_ERROR( "Call to unknown sub '%s'.", $name ) unless $sym;
+    $self->EXCEPTION_SYNTAX_ERROR( "Call to unknown sub '%s'.", $name ) unless $sym;
 
     my %props = $sym->props;
 
@@ -69,7 +69,7 @@ sub compile {
 
     my @formal_args = $sym->args;
 
-    $self->SYNTAX_ERROR( "Wrong number of arguments (expected %d, got %d) in call to '%s'.",
+    $self->EXCEPTION_SYNTAX_ERROR( "Wrong number of arguments (expected %d, got %d) in call to '%s'.",
         scalar(@formal_args), scalar(@args), $name )
         unless @formal_args == @args;
 
@@ -79,7 +79,7 @@ sub compile {
 
         if ( UNIVERSAL::isa( $args[$i], 'Jako::Construct::Expression::Value::Identifier' ) ) {
             my $arg_sym = $self->block->find_symbol( $args[$i]->value );
-            $self->SYNTAX_ERROR( "Undefined identifier '%s'.", $args[$i]->value ) unless $arg_sym;
+            $self->EXCEPTION_SYNTAX_ERROR( "Undefined identifier '%s'.", $args[$i]->value ) unless $arg_sym;
             $actual_arg_type = $arg_sym->type;
         }
         else {

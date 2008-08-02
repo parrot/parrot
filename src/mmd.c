@@ -309,8 +309,9 @@ get_mmd_dispatch_type(PARROT_INTERP, INTVAL func_nr, INTVAL left_type,
         PMC        * const method = Parrot_MMD_search_default_infix(interp,
                                         meth_s, left_type, r);
         if (!method)
-            real_exception(interp, 0, 1, "MMD function %s not found "
-                    "for types (%d, %d)", meth_c, left_type, r);
+            Parrot_ex_throw_from_c_args(interp, 0, 1, "MMD function %s not found "
+                "for types (%d, %d)", meth_c, left_type, r);
+
 
         if (method->vtable->base_type == enum_class_NCI) {
             /* C function is at struct_val */
@@ -404,7 +405,7 @@ static void
 mmd_ensure_writable(PARROT_INTERP, INTVAL function, ARGIN_NULLOK(const PMC *pmc))
 {
     if (!PMC_IS_NULL(pmc) && (pmc->vtable->flags & VTABLE_IS_READONLY_FLAG))
-        real_exception(interp, 0, 1, "%s applied to read-only argument",
+        Parrot_ex_throw_from_c_args(interp, 0, 1, "%s applied to read-only argument",
             Parrot_MMD_method_name(interp, function));
 }
 
@@ -1184,8 +1185,8 @@ mmd_arg_tuple_inline(PARROT_INTERP, ARGIN(STRING *signature), va_list args)
                 break;
             }
             default:
-                real_exception(interp, NULL, 1,
-                        "Unknown signature type %d in mmd_arg_tuple", type);
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "Unknown signature type %d in mmd_arg_tuple", type);
                 break;
         }
 
@@ -1285,12 +1286,12 @@ mmd_arg_tuple_func(PARROT_INTERP)
                 break;
             }
             default:
-                real_exception(interp, NULL, 1,
-                        "Unknown signature type %d in mmd_arg_tuple", type);
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "Unknown signature type %d in mmd_arg_tuple", type);
                 break;
         }
-
     }
+
 
     return arg_tuple;
 }

@@ -130,27 +130,27 @@ else:
     .return $P0()
 
 extra_words_after_else:
-    tcl_error 'wrong # args: extra words after "else" clause in "if" command'
+    die 'wrong # args: extra words after "else" clause in "if" command'
 
 nothing:
     .return('')
 
 no_args:
-    tcl_error 'wrong # args: no expression after "if" argument'
+    die 'wrong # args: no expression after "if" argument'
 
 no_script:
     dec $I0
     $S0 = argv[$I0]
     $S0 = 'wrong # args: no script following "' . $S0
     $S0 = $S0 . '" argument'
-    tcl_error $S0
+    die $S0
 
 no_expression:
     dec $I0
     $S0 = argv[$I0]
     $S0 = 'wrong # args: no expression after "' . $S0
     $S0 = $S0 . '" argument'
-    tcl_error $S0
+    die $S0
 .end
 
 # Local Variables:

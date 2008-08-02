@@ -304,8 +304,8 @@ This does B<not> close the file.
         else {
             /* slurp open file */
             if (!PMC_data(SELF))
-                real_exception(interp, NULL, PIO_ERROR,
-                        "Cannot slurp from empty filehandle");
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                    "Cannot slurp from empty filehandle");
 
             result = NULL;
 
@@ -463,8 +463,8 @@ Set SELF to the data in other.
 
         }
         else {
-            real_exception(INTERP, NULL, E_TypeError,
-                           "Can't assign a non-IO type to an IO");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Can't assign a non-IO type to an IO");
         }
     }
 

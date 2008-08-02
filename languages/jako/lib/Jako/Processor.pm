@@ -285,7 +285,7 @@ sub require {
 
     #  DEBUG(0, "Requiring '$kind'");
 
-    $self->SYNTAX_ERROR(
+    $self->EXCEPTION_SYNTAX_ERROR(
         "Expected %s, but found '%s'.",
         @_ > 1 ? "one of (" . join( ", ", @_ ) . ")" : $_[0],
         $self->get(1)->text
@@ -413,10 +413,10 @@ sub PARSE_ERROR {
 }
 
 #
-# SYNTAX_ERROR()
+# EXCEPTION_SYNTAX_ERROR()
 #
 
-sub SYNTAX_ERROR {
+sub EXCEPTION_SYNTAX_ERROR {
     my ( $self, $format, @args ) = @_;
     $self->ERROR( 'Syntax', $format, @args );
 }

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -313,10 +313,10 @@ sub print_head {
 static INTVAL
 get_nci_I(PARROT_INTERP, ARGMOD(call_state *st), int n)
 {
-    if (n >= st->src.n) {
-        real_exception(interp, NULL, E_ValueError,
-                    "too few arguments passed to NCI function");
-    }
+    if (n >= st->src.n)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "too few arguments passed to NCI function");
+
     Parrot_fetch_arg_nci(interp, st);
 
     return UVal_int(st->val);
@@ -325,10 +325,10 @@ get_nci_I(PARROT_INTERP, ARGMOD(call_state *st), int n)
 static FLOATVAL
 get_nci_N(PARROT_INTERP, ARGMOD(call_state *st), int n)
 {
-    if (n >= st->src.n) {
-        real_exception(interp, NULL, E_ValueError,
-                    "too few arguments passed to NCI function");
-    }
+    if (n >= st->src.n)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "too few arguments passed to NCI function");
+
     Parrot_fetch_arg_nci(interp, st);
 
     return UVal_num(st->val);
@@ -340,10 +340,10 @@ static STRING*
 get_nci_S(PARROT_INTERP, ARGMOD(call_state *st), int n)
 {
     /* TODO or act like below? */
-    if (n >= st->src.n) {
-        real_exception(interp, NULL, E_ValueError,
-                    "too few arguments passed to NCI function");
-    }
+    if (n >= st->src.n)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "too few arguments passed to NCI function");
+
     Parrot_fetch_arg_nci(interp, st);
 
     return UVal_str(st->val);

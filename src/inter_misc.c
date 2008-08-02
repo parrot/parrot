@@ -286,8 +286,8 @@ interpinfo(PARROT_INTERP, INTVAL what)
             ret = interp->run_core;
             break;
         default:        /* or a warning only? */
-            real_exception(interp, NULL, UNIMPLEMENTED,
-                    "illegal argument in interpinfo");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                "illegal argument in interpinfo");
     }
     return ret;
 }
@@ -325,8 +325,8 @@ interpinfo_p(PARROT_INTERP, INTVAL what)
         case CURRENT_LEXPAD:
             return CONTEXT(interp)->lex_pad;
         default:        /* or a warning only? */
-            real_exception(interp, NULL, UNIMPLEMENTED,
-                    "illegal argument in interpinfo");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                "illegal argument in interpinfo");
     }
 }
 
@@ -388,7 +388,7 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
             }
 
         default:
-            real_exception(interp, NULL, UNIMPLEMENTED,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in interpinfo");
     } /* switch */
 }

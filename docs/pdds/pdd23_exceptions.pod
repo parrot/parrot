@@ -1,9 +1,6 @@
 # Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
-{{ NOTE: "rethrow", and "pushaction" are removed, and "die" is different }}
-{{ TODO: enable backtrace }}
-
 =head1 NAME
 
 docs/pdds/pdd23_exceptions.pod - Parrot Exceptions
@@ -72,35 +69,35 @@ stack.
 Throw an exception consisting of the given I<EXCEPTION> PMC.  Active exception
 handlers (if any) will be invoked with I<EXCEPTION> as the only parameter.
 
-Throwing an exception with C<throw> is a one-way trip (unless you have made
-other arrangements) because Parrot does not take a continuation after this
-opcode.  (But see B<throwcc> below.)
 
-Any type of PMC can be thrown as an exception.  However, if there's any chance
-of cross-language calls -- and in a Parrot environment, cross-language
-operations are kind of the point -- then you should be prepared to catch
-exception classes you would never have thrown yourself.
-
-That said, it is I<VERY STRONGLY RECOMMENDED> that any thrown PMC that can
-possibly escape your private sandbox should meet the minimal interface
-requirements of the C<parrot;exception> class, described below.
-
-=item B<throwcc I<EXCEPTION> [ , I<CONTINUATION> ]>
+=item B<throw I<EXCEPTION> [ , I<CONTINUATION> ]>
 
 Throw an exception consisting of the given I<EXCEPTION> PMC after taking
 a continuation at the next opcode.  When a I<CONTINUATION> is passed in,
 it will use that instead. Active exception handlers (if any) will be
 invoked with I<EXCEPTION> and the given continuation as parameters.
 
-Except for the continuation which is passed to exception handlers,
-C<throwcc> is just like C<throw>.  This opcode is useful for exceptions
-that are more like warnings or notices than errors.
+Any type of PMC can be thrown as an exception.  However, if there's any chance
+of cross-language calls -- and in a Parrot environment, cross-language
+operations are kind of the point -- then you should be prepared to catch
+exception classes you would never have thrown yourself.
 
-Exception handlers can resume execution immediately after the C<throwcc>
-opcode by executing the C<handled> opcode, and then invoking the given
-continuation which they receive as a parameter.  That continuation must be
-invoked with no parameters; in other words, C<throwcc> never returns a
-value.
+That said, it is recommended that any thrown PMC that can possibly escape your
+private sandbox should meet the minimal interface requirements of the
+C<parrot;exception> class, described below.
+
+Exception handlers can resume execution immediately after the C<throw> opcode
+by invoking the resume continuation which is stored in the exception object.
+That continuation must be invoked with no parameters; in other words, C<throw>
+never returns a value.
+
+=item B<rethrow I<EXCEPTION>>
+
+While handling an exception, rethrow the exception to the next handler. Aside
+from selecting a different handler, the behaviour of C<rethrow> is the same as
+C<throw>. Each successive call to C<rethrow> will select a different handler,
+until it exhausts the list of possible handlers. A rethrown exception that
+is not handled behaves the same as an unhandled C<throw>n exception.
 
 =item B<die [ I<MESSAGE> ]>
 
@@ -115,7 +112,8 @@ FILE." followed by a backtrace.
 If this exception is not handled, it results in Parrot returning an error
 indication and the stringification of I<MESSAGE> to its embedding environment.
 When running standalone, this means writing the stringification of I<MESSAGE>
-to standard error and executing the standard C function C<exit(EXIT_FAILURE)>.
+to standard error and executing the standard Parrot function C<Parrot_exit>, to
+shut down the interpreter cleanly.
 
 =item B<exit [ I<EXITCODE> ]>
 
@@ -125,12 +123,6 @@ which defaults to zero, as an Integer PMC.
 If not handled, this exception results in Parrot returning I<EXITCODE>
 as a status to its embedded environment, or when running standalone,
 to execute the C function C<exit(I<EXITCODE>)>.
-
-=item B<handled I<EXCEPTION>>
-
-While handling an exception, tell Parrot that the exception has been handled
-and should be removed from the stack of active exceptions.  This opcode is an
-exception handler's way of telling Parrot that it has handled the exception.
 
 =back
 
@@ -145,22 +137,12 @@ stack:
 
 Return the quantity of currently active exception handlers.
 
-=item B<get_eh I<index>>
-
-Return the exception handler at I<index>. The index is an offset from the top
-of the stack, with '0' being the top.
-
-=item B<get_all_eh>
-
-Return a resizable pmc array of all current exception handlers.
-
 =back
 
 
 =head2 Order of Operations in Exception Handling
 
-When B<throw> or B<throwcc> is called, for all active exception
-handlers, in LIFO order:
+When B<throw> is called, for all active exception handlers, in LIFO order:
 
 =over
 
@@ -169,38 +151,26 @@ Find the topmost exception handler.
 
 =item 2
 Push an exception record somewhere, presumably on the exception handler
-stack.  The exception record contains a pointer to an exception handler
+stack. The exception record contains a pointer to an exception handler
 block, an exception PMC, and (optionally) a continuation.
 
 =item 3
 Invoke the handler (note: this is still in the thrower's dynamic
 context).
 
-=back
-
-If the handler returns without calling C<handled>:
-
-=over
-
-=item 1
-Find the "exception handling in progress" record.
-
-=item 2
-Find the next exception handler.
-
-=item 3
-If the handler is found, invoke it.
-
-
 =item 4
+If the handler is C<rethrow>n, repeat steps 1-3 above, finding the next
+exception handler.
+
+=item 5
 If no handler is found, and the exception is non-fatal (such as a
 warning), and there is a continuation in the exception record (because
-the throwing opcode was C<throwcc>), invoke the continuation (resume
+the throwing opcode was C<throw>), invoke the continuation (resume
 execution). Whether to resume or die when an exception isn't handled is
 determined by the severity of the exception.
 
-=item 5
-Otherwise terminate program a la C<die>. 
+=item 6
+Otherwise terminate the program like C<die>. 
 
 =back
 
@@ -210,21 +180,6 @@ control to the embedding program and stores the unhandled exception so
 that it may be queried by the embedding program. The embedding program
 may choose to handle the exception and continue execution by invoking
 the exception's continuation.
-
-
-When the C<handled> opcode is called:
-
-=over
-
-=item 1
-Pop and destroy the exception record.
-
-=item 2
-If there was a continuation in the exception record, invoke the
-continuation.
-
-=back
-
 
 =head1 IMPLEMENTATION
 

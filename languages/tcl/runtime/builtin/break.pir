@@ -12,7 +12,7 @@
     tcl_break
 
 bad_args:
-    tcl_error 'wrong # args: should be "break"'
+    die 'wrong # args: should be "break"'
 .end
 
 # Local Variables:

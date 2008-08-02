@@ -20,7 +20,7 @@
 
     .return(eof)
 bad_args:
-    tcl_error 'wrong # args: should be "eof channelId"'
+    die 'wrong # args: should be "eof channelId"'
 .end
 
 # Local Variables:

@@ -18,7 +18,7 @@
 
   .return ($P0)
 bad_args:
-  tcl_error 'wrong # args: should be "lreverse list"'
+  die 'wrong # args: should be "lreverse list"'
 .end
 
 # Local Variables:

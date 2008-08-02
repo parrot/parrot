@@ -514,19 +514,19 @@ the_test(Parrot_Interp interp, opcode_t *cur_op, opcode_t *start)
     PackFile         *pf   = Parrot_readbc(interp, "temp.pbc");
     STRING           *name = const_string(interp, "_sub1");
     PMC              *sub;
-    Parrot_exception jb;
+    Parrot_runloop jump_point;
 
     Parrot_loadbc(interp, pf);
     sub = Parrot_find_global_cur(interp, name);
 
-    if (setjmp(jb.destination)) {
+    if (setjmp(jump_point.resume)) {
         Parrot_eprintf(interp, "caught\n");
     }
     else {
         /* pretend the EH was pushed by the sub call. */
         interp->current_runloop_id++;
 
-        push_new_c_exception_handler(interp, &jb);
+        Parrot_ex_add_c_handler(interp, &jump_point);
         Parrot_call_sub(interp, sub, "v");
     }
 

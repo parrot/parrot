@@ -299,7 +299,8 @@ Sets the value associated with C<key> to C<value>.
                     Parrot_cx_delete_task(INTERP, SELF);
                 break;
             default:
-                real_exception(INTERP, NULL, INVALID_OPERATION,
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
                     "Unknown timer type in Timer.set_integer_keyed_int: %d",
                     key);
         }
@@ -358,8 +359,10 @@ Sets the floating-point value associated with C<key> to C<value>.
                 core_struct->interval = value;
                 break;
             default:
-                real_exception(INTERP, NULL, INVALID_OPERATION,
-                    "Unknown timer attribute in Timer.set_number_keyed_int: %d", key);
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Unknown timer attribute in Timer.set_number_keyed_int: %d",
+                    key);
         }
     }
 }

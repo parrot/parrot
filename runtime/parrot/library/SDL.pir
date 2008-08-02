@@ -107,7 +107,7 @@ In fact, don't count on it sticking around.  It may not.  Then again, it might.
 
     # failed to load libSDL
     $P0 = new 'Exception'
-    $P0["_message"] = "libSDL not found!"
+    $P0 = "libSDL not found!"
     throw $P0
     branch OK
   OK_HINT1:
@@ -197,7 +197,7 @@ SDL::Image library anyway, which calls this for you.
 
     # failed to load libSDL
     $P0 = new 'Exception'
-    $P0["_message"] = "libSDL_image not found!"
+    $P0 = "libSDL_image not found!"
     throw $P0
     branch OK
   OK_HINT1:

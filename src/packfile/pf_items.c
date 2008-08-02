@@ -177,7 +177,7 @@ cvt_num12_num8_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     cvt_num12_num8(dest, src);
     /* TODO endianize */
-    internal_exception(1, "TODO cvt_num12_num8_be\n");
+    exit_fatal(1, "TODO cvt_num12_num8_be\n");
 }
 
 /*

@@ -158,9 +158,8 @@ static void ucs2_set_position(SHIM_INTERP,
 #  include <unicode/ustring.h>
 #endif
 
-#define UNIMPL real_exception(interp, NULL, UNIMPLEMENTED, "unimpl ucs2")
-
-
+#define UNIMPL Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, \
+    "unimpl ucs2")
 
 /*
 
@@ -181,13 +180,12 @@ to_encoding(PARROT_INTERP, ARGIN(STRING *src), ARGMOD(STRING *dest))
 {
     STRING * const result =
         Parrot_utf16_encoding_ptr->to_encoding(interp, src, dest);
-    /*
-     * conversion to utf16 downgrads to ucs-2 if possible - check result
-     */
-    if (result->encoding == Parrot_utf16_encoding_ptr) {
-        real_exception(interp, NULL, E_UnicodeError,
+
+    /* conversion to utf16 downgrads to ucs-2 if possible - check result */
+    if (result->encoding == Parrot_utf16_encoding_ptr)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
             "can't convert string with surrogates to ucs2");
-    }
+
     return result;
 }
 
@@ -208,8 +206,8 @@ get_codepoint(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
     UChar * const s = (UChar*) src->strstart;
     return s[offset];
 #else
-    real_exception(interp, NULL, E_LibraryNotLoadedError,
-            "no ICU lib loaded");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+        "no ICU lib loaded");
 #endif
 }
 
@@ -231,8 +229,8 @@ set_codepoint(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL codepoi
     s[offset] = codepoint;
 #else
     UNUSED(src);
-    real_exception(interp, NULL, E_LibraryNotLoadedError,
-            "no ICU lib loaded");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+        "no ICU lib loaded");
 #endif
 }
 
@@ -436,8 +434,8 @@ codepoints(PARROT_INTERP, ARGIN(STRING *src))
 #if PARROT_HAS_ICU
     return src->bufused / sizeof (UChar);
 #else
-    real_exception(interp, NULL, E_LibraryNotLoadedError,
-            "no ICU lib loaded");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+        "no ICU lib loaded");
 #endif
 }
 
@@ -538,15 +536,15 @@ static void
 iter_init(PARROT_INTERP, ARGIN(const STRING *src), ARGOUT(String_iter *iter))
 {
 #if PARROT_HAS_ICU
-    iter->str = src;
-    iter->bytepos = 0;
-    iter->charpos = 0;
+    iter->str             = src;
+    iter->bytepos         = 0;
+    iter->charpos         = 0;
     iter->get_and_advance = ucs2_decode_and_advance;
     iter->set_and_advance = ucs2_encode_and_advance;
-    iter->set_position =    ucs2_set_position;
+    iter->set_position    = ucs2_set_position;
 #else
-    real_exception(interp, NULL, E_LibraryNotLoadedError,
-            "no ICU lib loaded");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+        "no ICU lib loaded");
 #endif
 }
 

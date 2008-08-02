@@ -42,7 +42,7 @@ done:
   .return('')
 
 badargs:
-  tcl_error 'wrong # args: should be "global varName ?varName ...?"'
+  die 'wrong # args: should be "global varName ?varName ...?"'
 .end
 
 # Local Variables:

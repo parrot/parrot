@@ -28,9 +28,10 @@ this is as simple as returning the list.
   .return(value)
 
   # The PMC method only throws a regular exception, we need to tcl-ify it.
+  # XXX this may not be necessary anymore.
   convert_to_tcl_error:
     get_results '0,0', $P0, $S0
-    tcl_error $S0
+    die $S0
 
 .end
 
@@ -134,7 +135,7 @@ NaN:
   $S0 = number
   $S1 .= $S0
   $S1 .= '"'
-  tcl_error $S1
+  die $S1
 .end
 
 =head2 _Tcl::toInteger
@@ -176,7 +177,7 @@ not_integer:
   $S0 = 'expected integer but got "'
   $S0 .= $S1
   $S0 .= '"'
-  tcl_error $S0
+  die $S0
 
 not_integer_eh:
   get_results '0,0', $P99, $S99
@@ -246,7 +247,7 @@ bad_index:
   if $I0 != -1 goto bad_index_done # don't squawk on negative indices..
   $S0 .= $S1
 bad_index_done:
-  tcl_error $S0
+  die $S0
 .end
 
 =head2 _Tcl::getChannel
@@ -279,7 +280,7 @@ bad_channel:
   $S0 = 'can not find channel named "'
   $S0 .= channelID
   $S0 .= '"'
-  tcl_error $S0
+  die $S0
 
 .end
 
@@ -355,16 +356,16 @@ Given an expression, return a subroutine, or optionally, the raw PIR
     $S0 = expression
     $S0 = 'syntax error in expression "' . $S0
     $S0 = $S0 . '": premature end of expression'
-    tcl_error $S0
+    die $S0
 
   extra_tokens:
     $S0 = expression
     $S0 = 'syntax error in expression "' . $S0
     $S0 = $S0 . '": extra tokens at end of expression'
-    tcl_error $S0
+    die $S0
 
   empty:
-    tcl_error "empty expression\nin expression \"\""
+    die "empty expression\nin expression \"\""
 .end
 
 =head2 _Tcl::compileTcl
@@ -462,12 +463,12 @@ END_PIR
 
   premature_end:
     say code
-    tcl_error "program doesn't match grammar"
+    die "program doesn't match grammar"
 
   extra_tokens:
     $S0 = substr code, $I1
     $S0 = 'extra tokens at end of program: ' . $S0
-    tcl_error $S0
+    die $S0
 .end
 
 =head2 _Tcl::splitNamespace
@@ -567,7 +568,7 @@ error:
     $S0 = value
     $S0 = 'expected boolean value but got "' . $S0
     $S0 = $S0 . '"'
-    tcl_error $S0
+    die $S0
 
 number:
 
@@ -638,7 +639,7 @@ bad_level:
   $S0 = tcl_level
   $S0 = 'bad level "' . $S0
   $S0 = $S0 . '"'
-  tcl_error $S0
+  die $S0
 .end
 
 =head2 _Tcl::backslash_newline_subst

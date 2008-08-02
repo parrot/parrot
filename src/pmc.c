@@ -130,23 +130,23 @@ pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
     {
         /* First, is the destination a singleton? No joy for us there */
         if (new_vtable->flags & VTABLE_PMC_IS_SINGLETON)
-            real_exception(interp, NULL, ALLOCATION_ERROR,
-                               "Parrot VM: Can't turn to a singleton type!\n");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
+                "Parrot VM: Can't turn to a singleton type!\n");
 
         /* First, is the destination a constant? No joy for us there */
         if (new_vtable->flags & VTABLE_IS_CONST_FLAG)
-            real_exception(interp, NULL, ALLOCATION_ERROR,
-                               "Parrot VM: Can't turn to a constant type!\n");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
+                "Parrot VM: Can't turn to a constant type!\n");
 
         /* Is the source a singleton? */
         if (pmc->vtable->flags & VTABLE_PMC_IS_SINGLETON)
-            real_exception(interp, NULL, ALLOCATION_ERROR,
-                               "Parrot VM: Can't modify a singleton\n");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
+                "Parrot VM: Can't modify a singleton\n");
 
         /* Is the source constant? */
         if (pmc->vtable->flags & VTABLE_IS_CONST_FLAG)
-            real_exception(interp, NULL, ALLOCATION_ERROR,
-                               "Parrot VM: Can't modify a constant\n");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
+                "Parrot VM: Can't modify a constant\n");
     }
 
     /* Do we have an extension area? */
@@ -414,7 +414,7 @@ pmc_register(PARROT_INTERP, ARGIN(STRING *name))
         return type;
 
     if (type < enum_type_undef)
-        real_exception(interp, NULL, 1,
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
             "undefined type already exists - can't register PMC");
 
     classname_hash = interp->class_hash;

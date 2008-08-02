@@ -101,7 +101,7 @@ handler to care
                 VTABLE_get_integer_keyed_str(INTERP, data, CONST_STRING(INTERP, "priority"));
         }
         else {
-            real_exception(INTERP, NULL, INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "EventHandler initializer must be Sub or Hash");
         }
 

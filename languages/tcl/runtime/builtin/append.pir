@@ -49,7 +49,7 @@ getter:
   .return read(name)
 
 badargs:
-  tcl_error 'wrong # args: should be "append varName ?value value ...?"'
+  die 'wrong # args: should be "append varName ?value value ...?"'
 .end
 
 # Local Variables:

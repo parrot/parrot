@@ -111,11 +111,11 @@ EOC
             my $pmcname = $parent->name;
             my $ret     = gen_ret($ro_method);
             my $body    = <<EOC;
-    real_exception(interp, NULL, WRITE_TO_CONSTCLASS,
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_WRITE_TO_CONSTCLASS,
             "$vt_method_name() in read-only instance of $pmcname");
 EOC
 
-            # don't return after a real_exception
+            # don't return after a Parrot_ex_throw_from_c_args
             #      $body .= "    $ret\n" if $ret;
             $ro_method->body( Parrot::Pmc2c::Emitter->text($body) );
             $self->add_method($ro_method);

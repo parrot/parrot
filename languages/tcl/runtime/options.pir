@@ -70,7 +70,7 @@ no_match_option:
   error .= '": must be '
   $S1 = optionsToString(options)
   error .= $S1
-  tcl_error error
+  die error
 
 ambiguous_option:
   error = 'ambiguous '
@@ -80,7 +80,7 @@ ambiguous_option:
   error .= '": must be '
   $S1 = optionsToString(options)
   error .= $S1
-  tcl_error error
+  die error
 
 unknown_subcommand:
   error = 'unknown or ambiguous '
@@ -90,7 +90,8 @@ unknown_subcommand:
   error .= '": must be '
   $S1 = optionsToString(options)
   error .= $S1
-  tcl_error error
+  die error
+
 .end
 
 =head1 hash options = _Tcl::select_switches(array switches, array argv, ?endswitch:0?, ?catchbad:0?, ?name: 'switch'?)
@@ -203,7 +204,7 @@ throw_error:
   $S1 .= '": must be '
   $S2 = switchesToString(switches)
   $S1 .= $S2
-  tcl_error $S1
+  die $S1
 loop_next:
   inc pos
   goto loop

@@ -130,7 +130,7 @@ according to C<radix>.
     $S0 = "Invalid radix: "
     concat $S0, radix
     $P0 = new 'Exception'
-    $P0['_message'] = $S0
+    $P0 = $S0
     throw $P0
     .return (0, 0)
 .end
@@ -193,7 +193,7 @@ conversion.
     $S0 .= $S1
     $S0 .= "'"
     $P0 = new 'Exception'
-    $P0['_message'] = $S0
+    $P0 = $S0
     throw $P0
     .return ('', 0)
 .end

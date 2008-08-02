@@ -19,7 +19,7 @@
 
     .return('')
 bad_args:
-    tcl_error 'wrong # args: should be "flush channelId"'
+    die 'wrong # args: should be "flush channelId"'
 .end
 
 # Local Variables:

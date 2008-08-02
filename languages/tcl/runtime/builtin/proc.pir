@@ -175,7 +175,7 @@ done_args:
   goto ARGS_OK
 BAD_ARGS:
   $P0 = pop call_chain
-  tcl_error 'wrong # args: should be "%0%1"'
+  die 'wrong # args: should be "%0%1"'
 ARGS_OK:
   push_eh is_return
 END_PIR
@@ -204,9 +204,9 @@ is_return:
   .get_message($P0)
   .return ($P0)
 bad_continue:
-  tcl_error 'invoked "continue" outside of a loop'
+  die 'invoked "continue" outside of a loop'
 bad_break:
-  tcl_error 'invoked "break" outside of a loop'
+  die 'invoked "break" outside of a loop'
 not_return_nor_ok:
   .rethrow()
 .end
@@ -267,17 +267,17 @@ unknown_namespace:
   $S0 = "can't create procedure \""
   $S0 .= full_name
   $S0 .= '": unknown namespace'
-  tcl_error $S0
+  die $S0
 
 too_many_fields:
   $S0 = arg
   $S1 = 'too many fields in argument specifier "'
   $S1 .= $S0
   $S1 .= '"'
-  tcl_error $S1
+  die $S1
 
 error:
-  tcl_error 'wrong # args: should be "proc name args body"'
+  die 'wrong # args: should be "proc name args body"'
 .end
 
 # Local Variables:

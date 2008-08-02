@@ -267,7 +267,7 @@ sub parse {
 
             $self->INTERNAL_ERROR("Could not determine type.") unless defined $type;
 
-            $self->SYNTAX_ERROR( "Cannot declare constants of type '%s'.",
+            $self->EXCEPTION_SYNTAX_ERROR( "Cannot declare constants of type '%s'.",
                 $type )                   # TODO: This can happen later.
                 if ( $access eq 'const' and $type->isa("Jako::Construct::Type::PMC") );
 
@@ -291,7 +291,7 @@ sub parse {
 
             $self->require_semicolon;
 
-            $self->SYNTAX_ERROR(
+            $self->EXCEPTION_SYNTAX_ERROR(
                 "Cannot declare constant without assigning a value.") # TODO: This can happen later.
                 if ( $access eq 'const' and not defined $value );
 
@@ -548,7 +548,7 @@ sub parse {
             # seeing a close-brace.
             #
 
-            $self->SYNTAX_ERROR("Closing brace without open block.")
+            $self->EXCEPTION_SYNTAX_ERROR("Closing brace without open block.")
                 unless $self->block_depth();
 
             #
@@ -582,7 +582,7 @@ sub parse {
             }
             elsif ( $peer_block->kind eq 'continue' ) {
                 if ( defined $cont ) {
-                    $self->SYNTAX_ERROR("No more than one continue block allowed.");
+                    $self->EXCEPTION_SYNTAX_ERROR("No more than one continue block allowed.");
                 }
             }
 
@@ -600,7 +600,7 @@ sub parse {
             }
             elsif ( $peer_block->kind eq 'else' ) {
                 if ( defined $cont ) {
-                    $self->SYNTAX_ERROR("No more than one else block allowed.");
+                    $self->EXCEPTION_SYNTAX_ERROR("No more than one else block allowed.");
                 }
             }
 
@@ -1072,7 +1072,7 @@ sub parse {
         # TODO: Implement other stuff and put it before this.
         #
 
-        $self->SYNTAX_ERROR( "Don't know what to do with token '%s'.", $token->text );
+        $self->EXCEPTION_SYNTAX_ERROR( "Don't know what to do with token '%s'.", $token->text );
     }
 
     return $root;

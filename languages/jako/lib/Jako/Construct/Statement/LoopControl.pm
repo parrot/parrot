@@ -95,10 +95,10 @@ sub compile {
 
     unless ( defined $loop_block ) {
         if ( defined $name ) {
-            $self->SYNTAX_ERROR( "No loop '%s' in loop control.", $name );
+            $self->EXCEPTION_SYNTAX_ERROR( "No loop '%s' in loop control.", $name );
         }
         else {
-            $self->SYNTAX_ERROR("No loop active in loop control.");
+            $self->EXCEPTION_SYNTAX_ERROR("No loop active in loop control.");
         }
     }
 

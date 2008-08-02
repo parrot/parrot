@@ -112,7 +112,7 @@ module, L<runtime/parrot/library/Crow.pir>.
 
   agg_undefined:
     $P0 = new 'Exception'
-    $P0['_message'] = "cannot assign to Null PMC!"
+    $P0 = "cannot assign to Null PMC!"
     throw $P0
 .end
 

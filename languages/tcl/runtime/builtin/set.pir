@@ -37,7 +37,7 @@ end:
   R = clone R
   .return(R)
 bad_args:
-  tcl_error 'wrong # args: should be "set varName ?newValue?"'
+  die 'wrong # args: should be "set varName ?newValue?"'
 .end
 
 # Local Variables:

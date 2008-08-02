@@ -70,13 +70,13 @@ sub compile {
     my $right = $self->right;
 
     my $dest_sym = $block->find_symbol( $dest->value );
-    $self->SYNTAX_ERROR( "Assigning to unknown variable %s.", $dest->value ) unless $dest_sym;
+    $self->EXCEPTION_SYNTAX_ERROR( "Assigning to unknown variable %s.", $dest->value ) unless $dest_sym;
     my $dest_type = $dest_sym->type;
 
     my $left_type;
     if ( UNIVERSAL::isa( $left, 'Jako::Construct::Expression::Value::Identifier' ) ) {
         my $left_sym = $block->find_symbol( $left->value );
-        $self->SYNTAX_ERROR( "Expression involves unknown variable %s.", $left->value )
+        $self->EXCEPTION_SYNTAX_ERROR( "Expression involves unknown variable %s.", $left->value )
             unless $left_sym;
         $left_type = $left_sym->type;
     }
@@ -87,7 +87,7 @@ sub compile {
     my $right_type;
     if ( UNIVERSAL::isa( $right, 'Jako::Construct::Expression::Value::Identifier' ) ) {
         my $right_sym = $block->find_symbol( $right->value );
-        $self->SYNTAX_ERROR( "Expression involves unknown variable %s.", $right->value )
+        $self->EXCEPTION_SYNTAX_ERROR( "Expression involves unknown variable %s.", $right->value )
             unless $right_sym;
         $right_type = $right_sym->type;
     }
@@ -103,18 +103,18 @@ sub compile {
     $self->INTERNAL_ERROR("No type for left!")  unless defined $left_type;
     $self->INTERNAL_ERROR("No type for right!") unless defined $right_type;
 
-    $self->SYNTAX_ERROR("Can't do arithmetic on strings")
+    $self->EXCEPTION_SYNTAX_ERROR("Can't do arithmetic on strings")
         if UNIVERSAL::isa( $dest_type, 'Jako::Construct::Type::String' );
-    $self->SYNTAX_ERROR("Can't do arithmetic on strings")
+    $self->EXCEPTION_SYNTAX_ERROR("Can't do arithmetic on strings")
         if UNIVERSAL::isa( $left_type, 'Jako::Construct::Type::String' );
-    $self->SYNTAX_ERROR("Can't do arithmetic on strings")
+    $self->EXCEPTION_SYNTAX_ERROR("Can't do arithmetic on strings")
         if UNIVERSAL::isa( $right_type, 'Jako::Construct::Type::String' );
 
-    $self->SYNTAX_ERROR("Can't do arithmetic on PMCs")
+    $self->EXCEPTION_SYNTAX_ERROR("Can't do arithmetic on PMCs")
         if UNIVERSAL::isa( $dest_type, 'Jako::Construct::Type::PMC' );
-    $self->SYNTAX_ERROR("Can't do arithmetic on PMCs")
+    $self->EXCEPTION_SYNTAX_ERROR("Can't do arithmetic on PMCs")
         if UNIVERSAL::isa( $left_type, 'Jako::Construct::Type::PMC' );
-    $self->SYNTAX_ERROR("Can't do arithmetic on PMCs")
+    $self->EXCEPTION_SYNTAX_ERROR("Can't do arithmetic on PMCs")
         if UNIVERSAL::isa( $right_type, 'Jako::Construct::Type::PMC' );
 
     my $calc_type = $left_type;

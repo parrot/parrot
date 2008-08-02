@@ -60,8 +60,8 @@ NOT_RUNTIME:
     # then not bother with locals, the instruction translator etc.
     if abstract_check == 0 goto NOT_ABSTRACT
     pir_output = concat <<"PIR"
-$P0 = new .Exception
-$P0["_message"] = "Ooh, naughty! A non-abstract class didn't implement an abstract method!"
+$P0 = new 'Exception'
+$P0 = "Ooh, naughty! A non-abstract class didn't implement an abstract method!"
 throw $P0
 PIR
     goto METHOD_END
@@ -190,8 +190,8 @@ MMD_CLASS:
     dec class_id
     if class_type == 0 goto MMD_CLASS_DEF
     if class_type == 1 goto MMD_CLASS_REF
-    ex = new .Exception
-    ex["_message"] = "Unknown class type to build MMD signature for."
+    ex = new 'Exception'
+    ex = "Unknown class type to build MMD signature for."
     throw ex
 MMD_CLASS_DEF:
     classes = assembly.get_classes()
@@ -270,8 +270,8 @@ NOT_VARARG:
     # Ensure it's a local sig. XXX Right thing to do when it's not?
     sig_type = signature.read_uint8()
     if sig_type == 0x7 goto SIG_OK
-    ex = new .Exception
-    ex["_message"] = "Locals signature is not a locals signature."
+    ex = new 'Exception'
+    ex = "Locals signature is not a locals signature."
     throw ex
 SIG_OK:
 
@@ -477,8 +477,8 @@ PLOOP_END:
     dec class_id
     if class_type == 0 goto DEF
     if class_type == 1 goto REF
-    ex = new .Exception
-    ex["_message"] = "Unknown class type."
+    ex = new 'Exception'
+    ex = "Unknown class type."
     throw ex
 
     # A type in this file.

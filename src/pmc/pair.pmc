@@ -65,8 +65,9 @@ Class method to construct an Integer according to passed arguments.
             pair->value = REG_PMC(interp, 6);
         }
         else
-            real_exception(INTERP, NULL, E_ValueError,
-                    "wrong argument count for Pair creation");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "wrong argument count for Pair creation");
+
         return SELF;
 #endif
     }
@@ -132,8 +133,9 @@ Set the value of the Pair.
         Parrot_Pair * const pair = PARROT_PAIR(SELF);
 
         if (pair->key)
-            real_exception(INTERP, NULL, E_IndexError,
-                    "attempt to set existing Pair key");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "attempt to set existing Pair key");
+
 
         pair->key   = key;
         pair->value = value;
@@ -145,8 +147,9 @@ Set the value of the Pair.
         PMC                *key_pmc;
 
         if (pair->key)
-            real_exception(INTERP, NULL, E_IndexError,
-                    "attempt to set existing Pair key");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "attempt to set existing Pair key");
+
 
         key_pmc = pmc_new(interp, enum_class_String);
         VTABLE_set_string_native(interp, key_pmc, key);
@@ -179,8 +182,8 @@ Sets this pair to hold the value of another.
             to->value = from->value;
         }
         else
-            real_exception(INTERP, NULL, INVALID_OPERATION,
-                           "Can only set a pair to another pair.");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Can only set a pair to another pair.");
     }
 
 /*

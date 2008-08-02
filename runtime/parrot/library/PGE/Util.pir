@@ -78,7 +78,7 @@ of the match.
 
   throw_message:
     $P0 = new 'Exception'
-    $P0['_message'] = message
+    $P0 = message
     throw $P0
 
     mob.'to'(-3)

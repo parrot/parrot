@@ -112,7 +112,7 @@ match_failed:
   .return (original_target)
 
 badargs:
-  tcl_error 'wrong # args: should be "regsub ?switches? exp string subSpec ?varName?"'
+  die 'wrong # args: should be "regsub ?switches? exp string subSpec ?varName?"'
 .end
 
 .sub 'anon' :anon :load

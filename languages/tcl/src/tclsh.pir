@@ -153,7 +153,7 @@ badfile:
   $S0 = "couldn't read file \""
   $S0 = $S0 . filename
   $S0 = $S0 . '": no such file or directory'
-  tcl_error $S0
+  die $S0
 
 oneliner:
   .set_tcl_argv()

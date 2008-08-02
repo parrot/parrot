@@ -75,7 +75,7 @@ sub new {
     #
 
     if ( defined $sym ) {
-        $self->SYNTAX_ERROR(
+        $self->EXCEPTION_SYNTAX_ERROR(
             "Redeclaration of identifier '%s'. Previous declaration on line %d of file '%s'.",
             $name, $sym->line, $sym->file );
     }
@@ -153,13 +153,13 @@ sub compile {
             $fnlib = $props{fnlib}->value;    # TODO: We should make sure its a string, somewhere.
         }
         else {
-            $self->SYNTAX_ERROR(
+            $self->EXCEPTION_SYNTAX_ERROR(
                 "Sub declaration has no fnlib property, and parent block is not a module!")
                 unless $self->block->kind eq 'module';
 
             my %module_props = $self->block->props;
 
-            $self->SYNTAX_ERROR(
+            $self->EXCEPTION_SYNTAX_ERROR(
 "Sub declaration has no fnlib property, and parent module has no fnlib property either!"
             ) unless $module_props{fnlib};
 
@@ -268,13 +268,13 @@ sub sax {
             $fnlib = $props{fnlib}->value;    # TODO: We should make sure its a string, somewhere.
         }
         else {
-            $self->SYNTAX_ERROR(
+            $self->EXCEPTION_SYNTAX_ERROR(
                 "Sub declaration has no fnlib property, and parent block is not a module!")
                 unless $self->block->kind eq 'module';
 
             my %module_props = $self->block->props;
 
-            $self->SYNTAX_ERROR(
+            $self->EXCEPTION_SYNTAX_ERROR(
 "Sub declaration has no fnlib property, and parent module has no fnlib property either!"
             ) unless $module_props{fnlib};
 

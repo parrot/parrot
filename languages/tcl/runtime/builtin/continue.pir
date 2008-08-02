@@ -12,7 +12,7 @@
     tcl_continue
 
 bad_args:
-    tcl_error 'wrong # args: should be "continue"'
+    die 'wrong # args: should be "continue"'
 .end
 
 # Local Variables:

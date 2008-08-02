@@ -65,10 +65,10 @@ bad_option:
   $S3 = argv[2]
   $S0 .= $S3
   $S0 .= '": should be "nonewline"'
-  tcl_error $S0
+  die $S0
 
 error:
-  tcl_error 'wrong # args: should be "puts ?-nonewline? ?channelId? string"'
+  die 'wrong # args: should be "puts ?-nonewline? ?channelId? string"'
 
 done:
   .return('')

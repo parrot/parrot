@@ -9,6 +9,9 @@ use Parrot::Test tests => 6;
 
 # these tests are run with -O0 by TestCompiler and show
 # generated PASM code for various optimizations at level 0
+
+SKIP: {
+    skip("disabled graph coloring register allocator, RT #57028", 1);
 pir_2_pasm_like( <<'CODE', <<'OUT', "add_n_i_n" );
 .sub _ :anon
    add N0, I0, N1
@@ -20,6 +23,7 @@ CODE
   set (N\d+), I0
   mul N0, \2, N1/
 OUT
+}
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "sub_n_ic_n" );
@@ -38,6 +42,8 @@ _:
 OUT
 
 ##############################
+SKIP: {
+    skip("disabled graph coloring register allocator, RT #57028", 1);
 pir_2_pasm_like( <<'CODE', <<'OUT', "sub_n_i_n" );
 .sub _test
    sub N0, I0, N1
@@ -52,6 +58,7 @@ CODE
   set_returns
   returncc/
 OUT
+}
 
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "added return - end" );

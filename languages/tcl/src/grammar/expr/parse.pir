@@ -14,7 +14,7 @@ parse.pir - Parsing support subroutines for [expr]
     $S0 = 'expected integer but got "' . $S0
     $S0 = $S0 . '" (looks like invalid octal number)'
 
-    tcl_error $S0
+    die $S0
 .end
 
 .sub 'unknown_math_function'
@@ -25,7 +25,7 @@ parse.pir - Parsing support subroutines for [expr]
     $S0 = 'unknown math function "' . $S0
     $S0 = $S0 . '"'
 
-    tcl_error $S0
+    die $S0
 .end
 
 .sub 'error'
@@ -33,7 +33,7 @@ parse.pir - Parsing support subroutines for [expr]
     .param string msg
     .param pmc    adverbs :named :slurpy
 
-    tcl_error msg
+    die msg
 .end
 
 .sub 'syntax_error'
@@ -49,7 +49,7 @@ parse.pir - Parsing support subroutines for [expr]
     $S0 .= '": '
     $S0 .= msg
 
-    tcl_error $S0
+    die $S0
 .end
 
 .sub 'syntax_error_variable_or_function'

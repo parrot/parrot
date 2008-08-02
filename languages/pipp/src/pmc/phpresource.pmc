@@ -34,7 +34,7 @@ Raises an exception. Use C<init_pmc()>.
 
 */
     void init() {
-        real_exception(INTERP, NULL, E_Exception,
+        Parrot_throw_ex_from_c(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                        "PhpResource init without pmc");
     }
 

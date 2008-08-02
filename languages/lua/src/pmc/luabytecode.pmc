@@ -159,10 +159,10 @@ static void _load_header(Interp *interp, PMC *script)
     char header[LUAC_HEADERSIZE];
 
     _get_block(header, sizeof header);
-    if (memcmp(header, header_ref, sizeof header) != 0) {
-        real_exception(interp, NULL, ILL_INHERIT,
-            "bad header");
-    }
+
+    if (memcmp(header, header_ref, sizeof header) != 0)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ILL_INHERIT, "bad header");
+
 #if 1
     fp -= 8;
     VTABLE_set_attr_str(interp, script,
@@ -231,8 +231,7 @@ static PMC* _load_constant_list(Interp *interp)
             VTABLE_set_string_native(interp, k, _get_string(interp));
             break;
         default:
-            real_exception(interp, NULL, ILL_INHERIT,
-                "bad constant");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ILL_INHERIT, "bad constant");
         }
         VTABLE_set_pmc_keyed_int(interp, ret, i, k);
     }
@@ -385,7 +384,7 @@ Loads Lua 5.1 VM bytecode.
         INTVAL type = pmc_type(INTERP, const_string(INTERP, "Lua::Bytecode"));
 
         if (type <= 0)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "Lua::Bytecode not loaded");
 
         script = pmc_new(INTERP, type);

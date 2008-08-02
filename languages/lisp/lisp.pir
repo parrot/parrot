@@ -138,7 +138,7 @@ DEBUGGER:
     # TODO: is P5 still the exception ?
     e = P5
 
-    message = e["_message"]
+    message = e
 
     print "*** ERROR: "
     print message

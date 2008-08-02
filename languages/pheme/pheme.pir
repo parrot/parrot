@@ -48,8 +48,6 @@ Start compilation by passing any command line C<args> to the Pheme compiler.
 
 =cut
 
-.const int SEVERITY_SLOT = 2 # _severity
-
 .sub 'main' :anon :main
     .param pmc args
 
@@ -63,7 +61,7 @@ Start compilation by passing any command line C<args> to the Pheme compiler.
   exit_handler:
     .get_results($P0, $S0)
     .include 'except_severity.pasm'
-    $I0 = $P0[SEVERITY_SLOT]
+    $I0 = $P0
     if $I0 != .EXCEPT_EXIT goto rethrow_error
 
   done:

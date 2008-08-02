@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007, The Perl Foundation.
+Copyright (C) 2007-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -138,7 +138,7 @@ Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
             }
         }
         else {
-            real_exception(interp, NULL, INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Unknown task type '%Ss'.\n", type);
         }
 
@@ -229,11 +229,34 @@ PARROT_API
 void
 Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task))
 {
-    if (interp->scheduler)
-        VTABLE_push_pmc(interp, interp->scheduler, task);
-    else
-        real_exception(interp, NULL, INVALID_OPERATION,
-                "Scheduler was not initialized for this interpreter.\n");
+    if (!interp->scheduler)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Scheduler was not initialized for this interpreter.\n");
+
+    VTABLE_push_pmc(interp, interp->scheduler, task);
+}
+
+/*
+
+=item C<PMC * Parrot_cx_peek_task>
+
+Retrieve the the top task on the scheduler's task list, but don't remove it
+from the list.
+
+=cut
+
+*/
+
+PARROT_API
+PARROT_CAN_RETURN_NULL
+PMC *
+Parrot_cx_peek_task(PARROT_INTERP)
+{
+    if (!interp->scheduler)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Scheduler was not initialized for this interpreter.\n");
+
+    return VTABLE_pop_pmc(interp, interp->scheduler);
 }
 
 /*
@@ -365,8 +388,8 @@ Parrot_cx_delete_task(PARROT_INTERP, ARGIN(PMC *task))
         VTABLE_delete_keyed_int(interp, interp->scheduler, tid);
     }
     else
-        real_exception(interp, NULL, INVALID_OPERATION,
-                "Scheduler was not initialized for this interpreter.\n");
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Scheduler was not initialized for this interpreter.\n");
 }
 
 
@@ -417,11 +440,80 @@ Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)
 
     }
     else
-        real_exception(interp, NULL, INVALID_OPERATION,
-                "Scheduler was not initialized for this interpreter.\n");
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Scheduler was not initialized for this interpreter.\n");
 
     return PMCNULL;
 }
+
+/*
+
+=item C<void Parrot_cx_add_handler_local>
+
+Add a handler to the current context's list of handlers.
+
+=cut
+
+*/
+
+PARROT_API
+void
+Parrot_cx_add_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
+{
+    if (PMC_IS_NULL(CONTEXT(interp)->handlers))
+        CONTEXT(interp)->handlers = pmc_new(interp, enum_class_ResizablePMCArray);
+
+    VTABLE_unshift_pmc(interp, CONTEXT(interp)->handlers, handler);
+
+}
+
+/*
+
+=item C<void Parrot_cx_delete_handler_local>
+
+Remove the top task handler of a particular type from the context's list of
+handlers.
+
+=cut
+
+*/
+
+PARROT_API
+void
+Parrot_cx_delete_handler_local(PARROT_INTERP, ARGIN(STRING *handler_type))
+{
+    PMC *handlers  = CONTEXT(interp)->handlers;
+    INTVAL elements, index;
+
+    if (PMC_IS_NULL(handlers))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "No handler to delete.");
+
+    if (STRING_IS_NULL(handler_type) || STRING_IS_EMPTY(handler_type))
+        VTABLE_shift_pmc(interp, handlers);
+
+    /* Loop from newest handler to oldest handler. */
+    elements = VTABLE_elements(interp, handlers);
+    for (index = 0; index < elements; ++index) {
+        PMC *handler = VTABLE_get_pmc_keyed_int(interp, handlers, index);
+        if (!PMC_IS_NULL(handler)) {
+            if (string_equal(interp, handler_type, CONST_STRING(interp, "exception")) == 0
+                        && handler->vtable->base_type == enum_class_ExceptionHandler) {
+                VTABLE_set_pmc_keyed_int(interp, handlers, index, PMCNULL);
+                return;
+            }
+            else if (string_equal(interp, handler_type, CONST_STRING(interp, "event")) == 0
+                        && handler->vtable->base_type == enum_class_EventHandler) {
+                VTABLE_set_pmc_keyed_int(interp, handlers, index, PMCNULL);
+                return;
+           }
+        }
+    }
+
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        "No handler to delete.");
+}
+
 
 /*
 
@@ -437,13 +529,62 @@ PARROT_API
 void
 Parrot_cx_add_handler(PARROT_INTERP, ARGIN(PMC *handler))
 {
-    if (interp->scheduler)
-        Parrot_PCCINVOKE(interp, interp->scheduler,
-                CONST_STRING(interp, "add_handler"), "P->", handler);
-    else
-        real_exception(interp, NULL, INVALID_OPERATION,
-                "Scheduler was not initialized for this interpreter.\n");
-    return;
+    STRING *add_handler = CONST_STRING(interp, "add_handler");
+    if (!interp->scheduler)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Scheduler was not initialized for this interpreter.\n");
+
+    Parrot_PCCINVOKE(interp, interp->scheduler, add_handler, "P->", handler);
+}
+
+/*
+
+=item C<void Parrot_cx_delete_handler_typed>
+
+Remove the top task handler of a particular type from the scheduler's list of
+handlers.
+
+=cut
+
+*/
+
+PARROT_API
+void
+Parrot_cx_delete_handler_typed(PARROT_INTERP, ARGIN(STRING *handler_type))
+{
+    if (!interp->scheduler)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Scheduler was not initialized for this interpreter.\n");
+
+    Parrot_PCCINVOKE(interp, interp->scheduler,
+            CONST_STRING(interp, "delete_handler"), "S->", handler_type);
+}
+
+/*
+
+=item C<INTVAL Parrot_cx_count_handlers_typed>
+
+Count the number of active handlers of a particular type (event, exception) in
+the concurrency scheduler.
+
+=cut
+
+*/
+
+PARROT_API
+INTVAL
+Parrot_cx_count_handlers_typed(PARROT_INTERP, ARGIN(STRING *handler_type))
+{
+    INTVAL count = 0;
+
+    if (!interp->scheduler)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Scheduler was not initialized for this interpreter.\n");
+
+    Parrot_PCCINVOKE(interp, interp->scheduler,
+            CONST_STRING(interp, "count_handlers"), "S->I", handler_type, count);
+
+    return count;
 }
 
 /*
@@ -550,17 +691,91 @@ Parrot_cx_find_handler_for_task(PARROT_INTERP, ARGIN(PMC *task))
     fprintf(stderr, "searching for handler\n");
 #endif
 
-    if (interp->scheduler)
-        Parrot_PCCINVOKE(interp, interp->scheduler,
-                CONST_STRING(interp, "find_handler"), "P->P", task, &handler);
-    else
-        real_exception(interp, NULL, INVALID_OPERATION,
-                "Scheduler was not initialized for this interpreter.\n");
+    if (!interp->scheduler)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Scheduler was not initialized for this interpreter.\n");
+
+    Parrot_PCCINVOKE(interp, interp->scheduler,
+            CONST_STRING(interp, "find_handler"), "P->P", task, &handler);
 
 #if CX_DEBUG
     fprintf(stderr, "done searching for handler\n");
 #endif
+
     return handler;
+}
+
+/*
+
+=item C<PMC * Parrot_cx_find_handler_local>
+
+Retrieve a handler appropriate to a given task from the local context. If the
+context has no appropriate handler, returns PMCNULL.
+
+=cut
+
+*/
+
+PARROT_API
+PARROT_CAN_RETURN_NULL
+PMC *
+Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
+{
+    Parrot_Context *context;
+    PMC *iter = PMCNULL;
+
+    /* Exceptions store the handler iterator for rethrow, other kinds of
+     * tasks don't (though they could). */
+    if (task->vtable->base_type == enum_class_Exception &&
+            VTABLE_get_integer_keyed_str(interp, task,
+                CONST_STRING(interp, "handled")) == -1) {
+        iter    = VTABLE_get_attr_str(interp, task,
+                CONST_STRING(interp, "handler_iter"));
+        context = (Parrot_Context *)VTABLE_get_pointer(interp, task);
+    }
+    else {
+        context = CONTEXT(interp);
+        if (!PMC_IS_NULL(context->handlers))
+            iter = VTABLE_get_iter(interp, context->handlers);
+    }
+
+    while (context) {
+        /* Loop from newest handler to oldest handler. */
+        while (!PMC_IS_NULL(iter) && VTABLE_get_bool(interp, iter)) {
+            PMC *handler = VTABLE_shift_pmc(interp, iter);
+            INTVAL valid_handler = 0;
+
+            if (!PMC_IS_NULL(handler)) {
+                INTVAL valid_handler;
+                Parrot_PCCINVOKE(interp, handler, CONST_STRING(interp, "can_handle"),
+                        "P->I", task, &valid_handler);
+
+                if (valid_handler) {
+                    if (task->vtable->base_type == enum_class_Exception) {
+                        /* Store iterator and context for a later rethrow. */
+                        VTABLE_set_attr_str(interp, task,
+                                CONST_STRING(interp, "handler_iter"), iter);
+                        VTABLE_set_pointer(interp, task, context);
+
+                        /* Mark that this handler has been used before. */
+                        VTABLE_set_integer_native(interp, handler, 1);
+                    }
+                    return handler;
+                }
+            }
+        }
+
+        /* Continue the search in the next context up the chain. */
+        context = context->caller_ctx;
+        if (context && !PMC_IS_NULL(context->handlers))
+            iter = VTABLE_get_iter(interp, context->handlers);
+        else
+            iter = PMCNULL;
+    }
+
+    /* Reached the end of the context chain without finding a handler. */
+
+    return PMCNULL;
 }
 
 /*

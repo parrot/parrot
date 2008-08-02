@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -57,7 +57,8 @@ the next one.
         INTVAL i  = PMC_int_val(key);
 
         if (i == -1)
-            real_exception(INTERP, NULL, E_StopIteration, "StopIteration");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "StopIteration");
 
         item = VTABLE_shift_pmc(INTERP, iter);
         tupl = pmc_new(INTERP, enum_class_FixedPMCArray);

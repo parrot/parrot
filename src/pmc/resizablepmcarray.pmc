@@ -36,7 +36,7 @@ Resizes the array to C<size> elements.
 
     VTABLE void set_integer_native(INTVAL size) {
         if (size < 0)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizablePMCArray: Can't resize!");
 
         if (!PMC_data(SELF)) {
@@ -104,7 +104,7 @@ TODO: Check whether there is already an element that can be shifted
         FLOATVAL  value;
 
         if (0 == size)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizablePMCArray: Can't shift from an empty array!");
 
         item              = (PMC  **)PMC_data(SELF);
@@ -126,7 +126,7 @@ TODO: Check whether there is already an element that can be shifted
         INTVAL    value;
 
         if (0 == size)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizablePMCArray: Can't shift from an empty array!");
 
         item              = (PMC **)PMC_data(SELF);
@@ -146,7 +146,7 @@ TODO: Check whether there is already an element that can be shifted
         PMC   **item;
 
         if (0 == size)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizablePMCArray: Can't shift from an empty array!");
 
         item              = (PMC **)PMC_data(SELF);
@@ -166,7 +166,7 @@ TODO: Check whether there is already an element that can be shifted
         STRING  *value;
 
         if (0 == size)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizablePMCArray: Can't shift from an empty array!");
 
         item              = (PMC **)PMC_data(SELF);
@@ -199,7 +199,7 @@ Returns the PMC value of the element at index C<key>.
             key += PMC_int_val(SELF);
 
         if (key < 0)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "ResizablePMCArray: index out of bounds!");
 
         if (key >= PMC_int_val(SELF))
@@ -234,7 +234,7 @@ If key is a slice, do a splice as set that item.
             key += PMC_int_val(SELF);
 
         if (key < 0)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "ResizablePMCArray: index out of bounds!");
 
         if (key >= PMC_int_val(SELF))
@@ -401,7 +401,7 @@ Removes and returns the last element in the array.
         PMC     *data;
 
         if (0 == size)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizablePMCArray: Can't pop from an empty array!");
 
         data              = ((PMC **)PMC_data(SELF))[--size];
@@ -415,7 +415,7 @@ Removes and returns the last element in the array.
         PMC    *data;
 
         if (0 == size)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizablePMCArray: Can't pop from an empty array!");
 
         data              = ((PMC **)PMC_data(SELF))[--size];
@@ -429,7 +429,7 @@ Removes and returns the last element in the array.
         PMC   *data;
 
         if (0 == size)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizablePMCArray: Can't pop from an empty array!");
 
         data              = ((PMC **)PMC_data(SELF))[--size];
@@ -443,7 +443,7 @@ Removes and returns the last element in the array.
         PMC    *data;
 
         if (0 == size)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizablePMCArray: Can't pop from an empty array!");
 
         data              = ((PMC **)PMC_data(SELF))[--size];
@@ -696,7 +696,7 @@ everything via the VTABLE api.
             offset += length;
 
         if (offset < 0)
-            real_exception(INTERP, NULL, OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "illegal splice offset\n");
 
         /* shrink the array */

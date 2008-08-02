@@ -236,10 +236,8 @@ Copy the contents of other to self.
             pmc_reuse(INTERP, SELF, other->vtable->base_type, 0);
         }
         else
-        {
-            real_exception(INTERP, NULL, E_TypeError,
-                           "unable to assign self to TclList");
-        }
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "unable to assign self to TclList");
     }
 
 /*

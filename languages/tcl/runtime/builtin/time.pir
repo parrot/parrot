@@ -62,7 +62,7 @@ time_done:
 time_end:
   .return(R)
 bad_args:
-  tcl_error 'wrong # args: should be "time command ?count?"'
+  die 'wrong # args: should be "time command ?count?"'
 .end
 
 # Local Variables:

@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2007, The Perl Foundation.
+ * Copyright (C) 2004-2008, The Perl Foundation.
  */
 
 /*
@@ -70,7 +70,8 @@ RT#48260: Not yet documented!!!
 void
 Parrot_Exec_OS_Comman(Parrot_Interp interp, STRING *command)
 {
-  real_exception(interp, NULL, NOSPAWN, "Exec not implemented");
+  Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NOSPAWN,
+         "Exec not implemented");
 }
 
 /*

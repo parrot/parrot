@@ -50,7 +50,7 @@ pmclass DotNetEH dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!eh)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetEH PMC");
 
         result = (INTVAL)eh->try_offset;
@@ -66,7 +66,7 @@ pmclass DotNetEH dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!eh)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetEH PMC");
 
         result = (INTVAL)eh->try_length;
@@ -82,7 +82,7 @@ pmclass DotNetEH dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!eh)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetEH PMC");
 
         result = (INTVAL)eh->handler_offset;
@@ -98,7 +98,7 @@ pmclass DotNetEH dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!eh)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetEH PMC");
 
         result = (INTVAL)eh->handler_length;
@@ -114,7 +114,7 @@ pmclass DotNetEH dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!eh)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetEH PMC");
 
         result = (INTVAL)eh->flags;
@@ -130,7 +130,7 @@ pmclass DotNetEH dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!eh)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetEH PMC");
 
         result = (INTVAL)eh->class_type;
@@ -146,7 +146,7 @@ pmclass DotNetEH dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!eh)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetEH PMC");
 
         result = (INTVAL)eh->class_id;
@@ -162,7 +162,7 @@ pmclass DotNetEH dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!eh)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetEH PMC");
 
         result = (INTVAL)eh->filter_offset;

@@ -102,7 +102,7 @@ inline op pic_inline_sub__(inconst INT, invar PMC, invar PMC) :pic {
         }
         else {
             if (PARROT_ERRORS_test(interp, PARROT_ERRORS_OVERFLOW_FLAG)) {
-                real_exception(interp, NULL, ERR_OVERFLOW,
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ERR_OVERFLOW,
                         "Integer overflow");
             }
             /* #RT42354 preserve type system */
@@ -282,7 +282,7 @@ inline op pic_callr__(inconst PMC) :pic :flow {
                         ((opcode_t*)cur_opcode)[2 + i]);
                 break;
             default:
-                real_exception(interp, NULL, 1, "unhandled sig_bits");
+                Parrot_ex_throw_from_c_args(interp, NULL, 1, "unhandled sig_bits");
         }
     }
     /* set_args(); set_p_pc; get_results(1), x; invokecc_p */

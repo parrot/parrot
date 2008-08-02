@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2006-2007, The Perl Foundation.
+Copyright (C) 2006-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -55,15 +55,14 @@ string_set_data_directory(PARROT_INTERP, ARGIN(const char *dir))
        source code file isn't an issue.... (Don't want to get bitten by
        EBCDIC.) */
 
-    if (!u_isdigit(57) || (u_charDigitValue(57) != 9)) {
-            real_exception(interp, NULL, ICU_ERROR,
-                "string_set_data_directory: ICU data files not found"
-                "(apparently) for directory [%s]", dir);
-    }
+    if (!u_isdigit(57) || (u_charDigitValue(57) != 9))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ICU_ERROR,
+            "string_set_data_directory: ICU data files not found"
+            "(apparently) for directory [%s]", dir);
 #else
     UNUSED(dir);
 
-    real_exception(interp, NULL, ICU_ERROR,
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ICU_ERROR,
         "string_set_data_directory: parrot compiled without ICU support");
 #endif
 }
@@ -123,17 +122,21 @@ string_unescape_one(PARROT_INTERP, ARGMOD(UINTVAL *offset),
                         workchar += codepoint - 'A' + 10;
                     }
                     else {
-                        real_exception(interp, NULL, UNIMPLEMENTED,
-                                "Illegal escape sequence inside {}");
+                        Parrot_ex_throw_from_c_args(interp, NULL,
+                            EXCEPTION_UNIMPLEMENTED,
+                            "Illegal escape sequence inside {}");
                     }
                 }
                 if (*offset == len)
-                    real_exception(interp, NULL, UNIMPLEMENTED,
-                            "Illegal escape sequence no '}'");
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_UNIMPLEMENTED,
+                        "Illegal escape sequence no '}'");
             }
             else {
-                real_exception(interp, NULL, UNIMPLEMENTED, "Illegal escape sequence in");
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                    "Illegal escape sequence in");
             }
+
             ++*offset;
             if (*offset < len) {
                 workchar *= 16;
@@ -162,8 +165,10 @@ string_unescape_one(PARROT_INTERP, ARGMOD(UINTVAL *offset),
                 workchar = codepoint - 'A' + 1;
             }
             else {
-                real_exception(interp, NULL, UNIMPLEMENTED, "Illegal escape sequence");
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                    "Illegal escape sequence");
             }
+
             ++*offset;
             return workchar;
         case 'u':
@@ -182,14 +187,17 @@ string_unescape_one(PARROT_INTERP, ARGMOD(UINTVAL *offset),
                         workchar += codepoint - 'A' + 10;
                     }
                     else {
-                        real_exception(interp, NULL, UNIMPLEMENTED,
-                                "Illegal escape sequence in uxxx escape");
+                        Parrot_ex_throw_from_c_args(interp, NULL,
+                            EXCEPTION_UNIMPLEMENTED,
+                            "Illegal escape sequence in uxxx escape");
                     }
                 }
                 else {
-                    real_exception(interp, NULL, UNIMPLEMENTED,
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_UNIMPLEMENTED,
                         "Illegal escape sequence in uxxx escape - too short");
                 }
+
                 ++*offset;
             }
             return workchar;
@@ -209,14 +217,17 @@ string_unescape_one(PARROT_INTERP, ARGMOD(UINTVAL *offset),
                         workchar += codepoint - 'A' + 10;
                     }
                     else {
-                        real_exception(interp, NULL, UNIMPLEMENTED,
-                                "Illegal escape sequence in Uxxx escape");
+                        Parrot_ex_throw_from_c_args(interp, NULL,
+                            EXCEPTION_UNIMPLEMENTED,
+                            "Illegal escape sequence in Uxxx escape");
                     }
                 }
                 else {
-                    real_exception(interp, NULL, UNIMPLEMENTED,
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_UNIMPLEMENTED,
                         "Illegal escape sequence in uxxx escape - too short");
                 }
+
                 ++*offset;
             }
             return workchar;

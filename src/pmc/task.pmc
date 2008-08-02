@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -120,7 +120,7 @@ An interpreter in which to execute this task.
         Parrot_Task *core_struct;
 
         if (! VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Hash")))
-            real_exception(INTERP, NULL, INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Task initializer must be a Hash");
 
         core_struct = mem_allocate_zeroed_typed(Parrot_Task);

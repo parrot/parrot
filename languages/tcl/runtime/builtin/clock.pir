@@ -32,7 +32,7 @@ bad_args:
   .return ('') # once all commands are implemented, remove this...
 
 few_args:
-  tcl_error 'wrong # args: should be "clock subcommand ?argument ...?"'
+  die 'wrong # args: should be "clock subcommand ?argument ...?"'
 .end
 
 .HLL '_Tcl', ''
@@ -48,7 +48,7 @@ few_args:
   $I0 = $N0
   .return ($I0)
 bad_args:
-  tcl_error 'wrong # args: should be "clock microseconds"'
+  die 'wrong # args: should be "clock microseconds"'
 .end
 
 # XXX Need bignum support
@@ -61,7 +61,7 @@ bad_args:
   $I0 = $N0
   .return ($I0)
 bad_args:
-  tcl_error 'wrong # args: should be "clock milliseconds"'
+  die 'wrong # args: should be "clock milliseconds"'
 .end
 
 
@@ -72,7 +72,7 @@ bad_args:
   $I0 = time
   .return ($I0)
 bad_args:
-  tcl_error 'wrong # args: should be "clock seconds"'
+  die 'wrong # args: should be "clock seconds"'
 .end
 
 .sub 'anon' :anon :load

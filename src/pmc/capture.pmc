@@ -446,12 +446,11 @@ Set this capture to hold the value of another.
     void set_pmc(PMC *capture) {
         if (VTABLE_isa(INTERP, capture, CONST_STRING(INTERP, "Capture"))) {
             PARROT_CAPTURE(SELF)->array = PARROT_CAPTURE(capture)->array;
-            PARROT_CAPTURE(SELF)->hash = PARROT_CAPTURE(capture)->hash;
+            PARROT_CAPTURE(SELF)->hash  = PARROT_CAPTURE(capture)->hash;
         }
-        else {
-            real_exception(INTERP, NULL, INVALID_OPERATION,
-                           "Can only set a capture to another capture.");
-        }
+        else
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Can only set a capture to another capture.");
     }
 
 /*

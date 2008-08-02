@@ -1,12 +1,12 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 36;
+use Parrot::Test tests => 29;
 
 =head1 NAME
 
@@ -18,7 +18,7 @@ t/pmc/exception.t - Exception Handling
 
 =head1 DESCRIPTION
 
-Tests C<Exception> and C<Exception_Handler> PMCs.
+Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 =cut
 
@@ -37,7 +37,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "push_eh - pop_eh, PMC exception handler" );
 .sub main :main
-    $P0 = new "Exception_Handler"
+    $P0 = new "ExceptionHandler"
     set_addr $P0, _handler
     push_eh $P0
     print "ok 1\n"
@@ -70,7 +70,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw, PMC exception handler" );
     print "main\n"
-    new P20, "Exception_Handler"
+    new P20, "ExceptionHandler"
     set_addr P20, _handler
     push_eh P20
     new P30, 'Exception'
@@ -126,6 +126,11 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "exception attributes" );
     new P4, 'String'
     set P4, "additional payload"
     setattribute P1, 'payload', P4
+    new P5, 'Array'
+    set P5, 2
+    set P5[0], 'stacktrace line 1'
+    set P5[1], 'stacktrace line 2'
+    setattribute P1, 'stacktrace', P5
 
     throw P1
     print "not reached\n"
@@ -142,6 +147,13 @@ handler:
     getattribute P18, P0, 'payload'
     print P18
     print "\n"
+    getattribute P19, P0, 'stacktrace'
+    set P20, P19[0]
+    print P20
+    print "\n"
+    set P20, P19[1]
+    print P20
+    print "\n"
     null P5
     end
 
@@ -151,6 +163,8 @@ caught it
 just pining
 5
 additional payload
+stacktrace line 1
+stacktrace line 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "get_results - be sure registers are ok" );
@@ -316,7 +330,7 @@ _handler2:
     print "caught it in 2\n"
     print S0
     print "\n"
-    throw P5	# XXX rethrow?
+    rethrow P5
     end
 CODE
 main
@@ -346,18 +360,13 @@ pasm_output_is( <<'CODE', <<OUT, "die, error, severity" );
 _handler:
     get_results "0,0", P5, S0
     print "caught it\n"
-    set I0, P5["_type"]
-    print "error "
-    print I0
-    print "\n"
-    set I0, P5["_severity"]
+    set I0, P5['severity']
     print "severity "
     print I0
     print "\n"
     end
 CODE
 caught it
-error 100
 severity 3
 OUT
 
@@ -429,192 +438,6 @@ pasm_error_output_like( <<'CODE', <<'OUTPUT', "pushmark - pop wrong one" );
     end
 CODE
 /Mark 500 not found/
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "pushaction, throw" );
-    push_eh handler
-    print "ok 1\n"
-    .const .Sub P10 = "action"
-    pushaction P10
-    print "ok 2\n"
-    new P10, 'Exception'
-    throw P10
-    print "never\n"
-handler:
-    print "ok 3\n"
-    end
-.pcc_sub action:
-    get_params "0", I5
-    print "in action I5 = "
-    print I5
-    print "\n"
-    returncc
-CODE
-ok 1
-ok 2
-in action I5 = 1
-ok 3
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', 'cleanup global:  continuation' );
-.sub main :main
-    .local pmc outer, cont
-    outer = new 'String'
-    outer = "Outer value\n"
-    set_global ['Foo'; 'Bar'], "test", outer
-    new cont, 'Continuation'
-    set_addr cont, endcont
-    set_global ['Foo'; 'Bar'], "exit", cont
-    show_value()
-    test1()
-    print "skipped.\n"
-endcont:
-    show_value()
-.end
-.sub test1
-    .local pmc test1_binding, old_value, cleanup
-    .lex "old_value", old_value
-    test1_binding = new 'String'
-    test1_binding = "Inner value\n"
-    old_value = get_global ['Foo'; 'Bar'], "test"
-    .const .Sub test1_cleanup_sub = "test1_cleanup"
-    cleanup = newclosure test1_cleanup_sub
-    pushaction cleanup
-    set_global ['Foo'; 'Bar'], "test", test1_binding
-    show_value()
-    test2()
-    show_value()
-.end
-.sub test1_cleanup :outer(test1)
-    .local pmc old_value
-    print "[in test1_cleanup]\n"
-    find_lex old_value, "old_value"
-    set_global ['Foo'; 'Bar'], "test", old_value
-.end
-.sub test2
-    .local pmc test2_binding, exit
-    test2_binding = new 'String'
-    test2_binding = "Innerer value\n"
-    set_global ['Foo'; 'Bar'], "test", test2_binding
-    show_value()
-    exit = get_global ['Foo'; 'Bar'], "exit"
-    exit()
-.end
-.sub show_value
-    .local pmc value
-    value = get_global ['Foo'; 'Bar'], "test"
-    print value
-.end
-CODE
-Outer value
-Inner value
-Innerer value
-[in test1_cleanup]
-Outer value
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', 'cleanup global:  throw' );
-.sub main :main
-    .local pmc outer
-    outer = new 'String'
-    outer = "Outer value\n"
-    set_global ['Foo'; 'Bar'], "test", outer
-    push_eh eh
-    show_value()
-    test1()
-    print "skipped.\n"
-eh:
-    .local pmc exception
-    .get_results (exception, $S0)
-    print "Error: "
-    print exception
-    print "\n"
-last:
-    show_value()
-.end
-.sub test1
-    .local pmc test1_binding, old_value, cleanup
-    .lex "old_value", old_value
-    test1_binding = new 'String'
-    test1_binding = "Inner value\n"
-    old_value = get_global ['Foo'; 'Bar'], "test"
-    .const .Sub test1_cleanup_sub = "test1_cleanup"
-    cleanup = newclosure test1_cleanup_sub
-    pushaction cleanup
-    set_global ['Foo'; 'Bar'], "test", test1_binding
-    show_value()
-    test2()
-    show_value()
-.end
-.sub test1_cleanup :outer(test1)
-    .local pmc old_value
-    print "[in test1_cleanup]\n"
-    find_lex old_value, "old_value"
-    set_global ['Foo'; 'Bar'], "test", old_value
-.end
-.sub test2
-    .local pmc test2_binding, exit
-    test2_binding = new 'String'
-    test2_binding = "Innerer value\n"
-    set_global ['Foo'; 'Bar'], "test", test2_binding
-    show_value()
-    exit = new 'Exception'
-    new P2, 'String'
-    set P2, "something happened"
-    setattribute exit, "message", P2
-    throw exit
-.end
-.sub show_value
-    .local pmc value
-    value = get_global ['Foo'; 'Bar'], "test"
-    print value
-.end
-CODE
-Outer value
-Inner value
-Innerer value
-[in test1_cleanup]
-Error: something happened
-Outer value
-OUTPUT
-
-pir_error_output_like( <<'CODE', <<'OUTPUT', 'pop_eh out of context (1)' );
-.sub main :main
-    pushmark 1
-    pop_eh
-    print "no exceptions.\n"
-.end
-CODE
-/No exception to pop./
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', 'pop_eh out of context (2)' );
-.sub main :main
-    .local pmc outer, cont
-    push_eh handler
-    test1()
-    print "skipped.\n"
-    goto done
-handler:
-    .local pmc exception
-    .get_results (exception, $S0)
-    print "Error: "
-    print $S0
-    print "\n"
-done:
-    print "done.\n"
-.end
-.sub test1
-    .local pmc exit
-    print "[in test1]\n"
-    ## pop_eh is illegal here, and signals an exception.
-    pop_eh
-    print "[cleared]\n"
-.end
-CODE
-[in test1]
-Error: No exception to pop.
-done.
 OUTPUT
 
 # stringification is handled by a vtable method, which runs in a second
@@ -728,7 +551,7 @@ OUTPUT
 
 ## Regression test for r14697.  This probably won't be needed when PDD23 is
 ## fully implemented.
-pir_error_output_like( <<'CODE', <<'OUTPUT', "invoke handler in calling sub" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "invoke handler in calling sub", todo => "deprecate rethrow" );
 ## This tests that error handlers are out of scope when invoked (necessary for
 ## rethrow) when the error is signalled in another sub.
 .sub main :main
@@ -741,7 +564,7 @@ handler:
     print "in handler.\n"
     print $S0
     print "\n"
-    rethrow exception
+    #rethrow exception
 .end
 
 .sub broken
@@ -758,84 +581,8 @@ something broke
 current inst/
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "get_all_eh" );
-.sub main :main
-    push_eh _handler1
-    push_eh _handler2
-    print "ok 1\n"
-    $P0 = get_all_eh
-    $I0 = elements $P0
-    unless $I0 == 2 goto wrong_number
-    print "ok 2\n"
-    wrong_number:
-    pop_eh
-    pop_eh
-    print "ok 3\n"
-    end
-_handler1:
-    print "never printed\n"
-    end
-_handler2:
-    print "never printed\n"
-    end
-.end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "get_eh" );
-.sub main :main
-    push_eh _handler1
-    push_eh _handler2
-    print "ok 1\n"
-    $P0 = get_eh 0
-    pop_eh
-    pop_eh
-    print "ok 2\n"
-    $P0()
-    end
-_handler1:
-    print "not ok 3\n"
-    end
-_handler2:
-    print "ok 3\n"
-    end
-.end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "get_eh" );
-.sub main :main
-    push_eh _handler1
-    push_eh _handler2
-    print "ok 1\n"
-    $I0 = count_eh
-    if $I0 == 2 goto right_number
-        print "not "
-    right_number:
-    print "ok 2\n"
-    pop_eh
-    pop_eh
-    print "ok 3\n"
-    end
-_handler1:
-    print "first handler\n"
-    end
-_handler2:
-    print "second handler\n"
-    end
-.end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
-
+SKIP: {
+    skip("TODO test causes infinite loop in new exception implementation", 1);
 pir_output_is(<<'CODE', <<'OUTPUT', "taking a continuation promotes RetCs", todo => 'see RT#56458');
 ## This test creates a continuation in a inner sub and re-invokes it later.  The
 ## re-invocation signals an error, which is caught by an intermediate sub.
@@ -896,6 +643,27 @@ calling cont
   test:  caught error
 back from test
 done.
+OUTPUT
+}
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler" );
+.sub main :main
+    push_eh try
+    failure()
+    pop_eh
+    exit 0
+  try:
+    .get_results($P0,$S0)
+    $S1 = $P0['stacktrace']
+    $S1 .= "\n"
+    say $S1
+.end
+
+.sub failure
+    die 'what'
+.end
+CODE
+/No such string attribute/
 OUTPUT
 
 # Local Variables:

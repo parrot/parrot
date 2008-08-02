@@ -24,7 +24,7 @@ cd_it:
   .return  ($S0)
 
 bad_args:
-  tcl_error 'wrong # args: should be "cd ?dirName?"'
+  die 'wrong # args: should be "cd ?dirName?"'
 .end
 
 # Local Variables:

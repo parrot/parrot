@@ -23,6 +23,7 @@ dispatches these to one or all interpreters.
 
 #include "parrot/parrot.h"
 #include "parrot/events.h"
+#include "events.str"
 
 typedef struct pending_io_events {
     parrot_event **events;
@@ -349,7 +350,7 @@ init_events_first(PARROT_INTERP)
      * s. p6i: "event.c - of signals and pipes"
      */
     if (pipe(pipe_fds))
-        real_exception(interp, NULL, 1, "Couldn't create message pipe");
+        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Couldn't create message pipe");
 #endif
     /*
      * now set some sig handlers before any thread is started, so
@@ -741,7 +742,7 @@ Parrot_schedule_broadcast_qentry(ARGIN(struct QUEUE_ENTRY *entry))
         default:
             mem_sys_free(entry);
             mem_sys_free(event);
-            internal_exception(1, "Unknown event to broadcast");
+            exit_fatal(1, "Unknown event to broadcast");
             break;
     }
 }
@@ -899,7 +900,7 @@ io_thread(SHIM(void *data))
                              */
                             edebug((stderr, "msg arrived\n"));
                             if (read(PIPE_READ_FD, &buf, sizeof (buf)) != sizeof (buf))
-                                internal_exception(1,
+                                exit_fatal(1,
                                         "read error from msg pipe");
                             switch (buf.command) {
                                 case IO_THR_MSG_TERMINATE:
@@ -921,7 +922,7 @@ io_thread(SHIM(void *data))
                                     break;
                                     /* TODO */
                                 default:
-                                    internal_exception(1,
+                                    exit_fatal(1,
                                             "unhandled msg in pipe");
                                     break;
                             }
@@ -971,7 +972,7 @@ stop_io_thread(void)
     memset(&buf, 0, sizeof (buf));
     buf.command = IO_THR_MSG_TERMINATE;
     if (write(PIPE_WRITE_FD, &buf, sizeof (buf)) != sizeof (buf))
-        internal_exception(1, "msg pipe write failed");
+        exit_fatal(1, "msg pipe write failed");
 #endif
 }
 
@@ -1009,7 +1010,7 @@ Parrot_event_add_io_event(PARROT_INTERP,
     /* XXX Why isn't this entire function inside an ifndef WIN32? */
 #ifndef WIN32
     if (write(PIPE_WRITE_FD, &buf, sizeof (buf)) != sizeof (buf))
-        real_exception(interp, NULL, 1, "msg pipe write failed");
+        Parrot_ex_throw_from_c_args(interp, NULL, 1, "msg pipe write failed");
 #endif
 }
 
@@ -1123,7 +1124,7 @@ process_events(ARGMOD(QUEUE *event_q))
                 }
                 break;
             default:
-                internal_exception(1, "Unknown queue entry");
+                exit_fatal(1, "Unknown queue entry");
         }
         PARROT_ASSERT(event);
         if (event->type == EVENT_TYPE_NONE) {
@@ -1196,7 +1197,7 @@ event_thread(ARGMOD(void *data))
         else {
             /* we shouldn't get here probably
              */
-            internal_exception(1, "Spurious event");
+            exit_fatal(1, "Spurious event");
 
         }
         /*
@@ -1355,10 +1356,16 @@ event_to_exception(PARROT_INTERP, ARGIN(const parrot_event* event))
              * SIGINT is silent, if no exception handler is
              * installed: set severity to EXCEPT_exit
              */
-            do_exception(interp, EXCEPT_exit, exit_code);
+            {
+                PMC *exception = Parrot_ex_build_exception(interp,
+                        EXCEPT_exit, exit_code,
+                        CONST_STRING(interp, "Caught signal."));
+                Parrot_ex_throw_from_c(interp, exception);
+            }
             break;
         default:
-            do_exception(interp, EXCEPT_error, exit_code);
+            Parrot_ex_throw_from_c_args(interp, NULL, exit_code,
+                    "Caught signal.");
             break;
     }
 }

@@ -159,7 +159,7 @@ static Node* lua_next(PARROT_INTERP, const LuaHash *t, PMC *key)
     else {
         PMC **v = lua_get(interp, t, key);
         if (!v || ! *v)
-            real_exception(interp, NULL, 1, "invalid key to 'next'");
+            Parrot_ex_throw_from_c_args(interp, NULL, 1, "invalid key to 'next'");
 
         i = (int)(((const char *)v -
                    (const char *)(&t->node[0].val)) / sizeof (Node)) + 1;
@@ -191,7 +191,7 @@ static PMC** lua_set(PARROT_INTERP, LuaHash *t, PMC *key)
     Node *mp = mainposition(interp, t, key);
     Node *n  = mp;
     if (!mp)
-        real_exception(interp, NULL, 1, "table index is nil");
+        Parrot_ex_throw_from_c_args(interp, NULL, 1, "table index is nil");
 
     /* check whether `key' is somewhere in the chain */
     do {
@@ -261,7 +261,7 @@ static void setnodevector(PARROT_INTERP, LuaHash *t, int size)
     int i;
 
     if (size > MAX_INT)
-        real_exception(interp, NULL, 1, "table overflow");
+        Parrot_ex_throw_from_c_args(interp, NULL, 1, "table overflow");
 
     t->node      = mem_allocate_n_zeroed_typed(size, Node);
     t->size      = size;
@@ -667,11 +667,11 @@ MMD_LuaTable: {
                 }
             }
 #endif
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                     "attempt to compare two table values");
         }
 MMD_DEFAULT: {
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to compare table with %Ss",
                     VTABLE_name(INTERP, value));
         }

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2007, The Perl Foundation.
+Copyright (C) 2004-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -544,7 +544,8 @@ pass_mixed(PARROT_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
                 }
                 break;
             default:
-                real_exception(interp, NULL, 1, "bogus signature 0x%x", bits);
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "bogus signature 0x%x", bits);
                 break;
         }
     }
@@ -795,11 +796,13 @@ parrot_PIC_prederef(PARROT_INTERP, opcode_t op, ARGOUT(void **pc_pred), int core
                 type = pmc_type(interp, _class);
                 if (!type)
                     type = pmc_type(interp, _class);
+
                 if (type <= 0)
-                    real_exception(interp, NULL, NO_CLASS,
+                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NO_CLASS,
                             "Class '%Ss' not found", _class);
+
                 pc_pred[2] = (void*)type;
-                op = PARROT_OP_new_p_ic;
+                op         = PARROT_OP_new_p_ic;
             }
             break;
         case PARROT_OP_infix_ic_p_p:

@@ -172,8 +172,9 @@ Throws an exception.
             else
                 return VTABLE_get_pmc_keyed(INTERP, meth, key);
         }
-        real_exception(INTERP, NULL, ILL_INHERIT,
-                "attempt to index a %Ss value", SELF.name());
+
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+            "attempt to index a %Ss value", SELF.name());
     }
 
 /*
@@ -189,7 +190,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__newindex");
 
         if (!meth)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to index a %Ss value", SELF.name());
 
         if (dynpmc_LuaClosure  == PMC_type(meth)
@@ -216,7 +217,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__unm");
 
         if (!meth)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
 
         dest = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
@@ -231,7 +232,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__unm");
 
         if (!meth)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
 
         SELF = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
@@ -282,7 +283,7 @@ Throws an exception.
         PMC *retval;
 
         if (!meth)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to call a %Ss value", SELF.name());
 
             /* fix me */
@@ -340,7 +341,7 @@ Throws an exception.
     PMC* add(PMC *value, PMC *dest) {
         PMC *meth = find_meth(INTERP, SELF, "__add");
         if (!meth)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
 
         dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -355,7 +356,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__add");
 
         if (!meth)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
 
         SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -366,7 +367,7 @@ Throws an exception.
     PMC* subtract(PMC *value, PMC *dest) {
         PMC *meth = find_meth(INTERP, SELF, "__sub");
         if (!meth)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
 
         dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -380,7 +381,7 @@ Throws an exception.
     void i_subtract(PMC *value) {
         PMC *meth = find_meth(INTERP, SELF, "__sub");
         if (!meth)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
 
         SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -393,7 +394,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__mul");
 
         if (!meth)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
 
         dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -408,7 +409,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__mul");
 
         if (!meth)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
 
         SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -421,7 +422,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__div");
 
         if (!meth)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
 
         dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -436,7 +437,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__div");
 
         if (!meth)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
 
         SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -449,7 +450,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__mod");
 
         if (!meth)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
 
         dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -464,7 +465,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__mod");
 
         if (!meth)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
 
         SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -477,7 +478,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__pow");
 
         if (!meth)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
 
         dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -492,7 +493,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__pow");
 
         if (!meth)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
 
         SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -505,7 +506,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__concat");
 
         if (!meth)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to concatenate a %Ss value", SELF.name());
 
         dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -519,7 +520,7 @@ Throws an exception.
     void i_concatenate(PMC *value) {
         PMC *meth = find_meth(INTERP, SELF, "__concat");
         if (!meth)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to concatenate a %Ss value", SELF.name());
 
         SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -551,11 +552,11 @@ Throws an exception.
         STRING *val_name  = VTABLE_name(INTERP, value);
 
         if (string_compare(INTERP, self_name, val_name) != 0)
-            real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to compare %Ss with %Ss", self_name, val_name);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+                "attempt to compare %Ss with %Ss", self_name, val_name);
         else
-            real_exception(INTERP, NULL, ILL_INHERIT,
-                    "attempt to compare two %Ss values", self_name);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+                "attempt to compare two %Ss values", self_name);
     }
 
 /*
@@ -589,7 +590,7 @@ Throws an exception.
         PMC *retval;
 
         if (!meth)
-            real_exception(INTERP, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to get length of a %Ss value", SELF.name());
 
         retval = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);

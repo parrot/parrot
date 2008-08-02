@@ -23,7 +23,7 @@
 
     $S0 = 'bad event name "' . event
     $S0 .= '": must be readable or writable'
-    tcl_error $S0
+    die $S0
 
 readable:
     channel = getChannel(channel)
@@ -51,7 +51,7 @@ writable:
     .return('')
 
 badargs:
-    tcl_error 'wrong # args: should be "fileevent channelId event ?script?"'
+    die 'wrong # args: should be "fileevent channelId event ?script?"'
 .end
 
 # Local Variables:

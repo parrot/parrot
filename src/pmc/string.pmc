@@ -704,7 +704,7 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
         UINTVAL              i   = 0;
 
         if (base < 2 || base > 36)
-            real_exception(INTERP, NULL, E_ValueError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "invalid conversion to int - bad base %d", base);
 
         while (start < end) {
@@ -728,7 +728,7 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
         }
 
         if (start < end)
-            real_exception(INTERP, NULL, E_ValueError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "invalid conversion to int - bad char %c", *start);
 
         VTABLE_set_integer_native(INTERP, result, i);
@@ -773,7 +773,8 @@ Return length of the string.
             return iter;
         }
 
-        real_exception(INTERP, NULL, E_ValueError, "String: Unknown slice type");
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "String: Unknown slice type");
     }
 
     VTABLE PMC *get_iter() {
@@ -871,7 +872,7 @@ Translate ascii string C<src> with entries from C<trans_table>.
             RETURN(void);
 
         if (src->charset != Parrot_ascii_charset_ptr)
-            real_exception(interp, NULL, INVALID_ENCODING,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
                 "Can't translate non-ascii");
 
         p = (unsigned char *)src->strstart;
@@ -905,7 +906,7 @@ Reverse the ascii STRING C<src> in place.
             RETURN(void);
 
         if (src->charset != Parrot_ascii_charset_ptr)
-            real_exception(interp, NULL, INVALID_ENCODING,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
                 "Can't reverse non-ascii");
 
         p = (unsigned char *)src->strstart;
@@ -937,7 +938,7 @@ Checks if the ascii STRING C<str> is just an integer.
             RETURN(INTVAL 0);
 
         if (src->charset != Parrot_ascii_charset_ptr)
-            real_exception(interp, NULL, INVALID_ENCODING,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
                 "Can't is_integer non-ascii");
 
         i = 0;

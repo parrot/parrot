@@ -83,7 +83,7 @@ sub compile {
 
     my $sub_block = $block->find_block('sub');
 
-    $self->SYNTAX_ERROR("Cannot use 'return' outside of subroutine.")
+    $self->EXCEPTION_SYNTAX_ERROR("Cannot use 'return' outside of subroutine.")
         unless ( defined $sub_block );
 
     my $sub_name = $sub_block->name;
@@ -113,7 +113,7 @@ sub compile {
     #
 
     if ( defined $value ) {
-        $self->SYNTAX_ERROR("'return' with argument in subroutine that does not return a value.")
+        $self->EXCEPTION_SYNTAX_ERROR("'return' with argument in subroutine that does not return a value.")
             unless defined $return_type;
 
         my $arg_type = $value->type;

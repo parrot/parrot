@@ -77,7 +77,8 @@ ret_int(PARROT_INTERP, const HashEntry *e)
             break;
     }
 
-    real_exception(interp, NULL, E_IndexError, "SArray: Entry not an integer!");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            "SArray: Entry not an integer!");
 }
 
 /*
@@ -104,7 +105,8 @@ ret_num(PARROT_INTERP, const HashEntry *e)
             break;
     }
 
-    real_exception(interp, NULL, E_IndexError, "SArray: Entry not a number!");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+        "SArray: Entry not a number!");
 }
 
 /*
@@ -131,7 +133,8 @@ ret_string(PARROT_INTERP, const HashEntry *e)
             break;
     }
 
-    real_exception(interp, NULL, E_IndexError, "SArray: Entry not a string!");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+        "SArray: Entry not a string!");
 }
 
 /*
@@ -166,7 +169,8 @@ ret_pmc(PARROT_INTERP, const HashEntry *e)
         case enum_hash_pmc:
             return UVal_pmc(e->val);
         default:
-            real_exception(interp, NULL, E_IndexError, "SArray: Unknown entry!");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
+                "SArray: Unknown entry!");
     }
 }
 
@@ -190,7 +194,7 @@ shift_entry(PARROT_INTERP, PMC *self)
     HashEntry   *ret;
 
     if (start_index >= end_index)
-        real_exception(interp, NULL, OUT_OF_BOUNDS,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
             "SArray index out of bounds!");
 
     ret = (HashEntry *) PMC_data(self) + (2 + start_index++);
@@ -224,7 +228,7 @@ get_entry(PARROT_INTERP, PMC *self, INTVAL key)
     key += start_index;   /* lower bound if already shifted */
 
     if (key < start_index || key >= end_index)
-        real_exception(interp, NULL, OUT_OF_BOUNDS,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
             "SArray index out of bounds!");
 
     return (HashEntry *)PMC_data(self) + (2 + key);
@@ -625,7 +629,8 @@ Resizes the array to C<size> elements.
 
     VTABLE void set_integer_native(INTVAL size) {
         if (PMC_int_val(SELF))
-            real_exception(interp, NULL, E_IndexError, "SArray: Can't resize!");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    "SArray: Can't resize!");
 
         PMC_int_val(SELF) = size;
 
@@ -652,7 +657,8 @@ Sets the integer value of the element at index C<key> to C<value>.
         HashEntry *e;
 
         if (key < 0 || key >= PMC_int_val(SELF))
-            real_exception(interp, NULL, E_IndexError, "SArray index out of bounds!");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    "SArray index out of bounds!");
 
         e                = (HashEntry *)PMC_data(SELF) + (2 + key);
         e->type          = enum_hash_int;
@@ -678,7 +684,8 @@ Adds an element with integer value C<value> to the end of the array.
         INTVAL     nextix;
 
         if (!PMC_data(SELF))
-            real_exception(interp, NULL, E_IndexError, "SArray index out of bounds!");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    "SArray index out of bounds!");
 
         e      = (HashEntry *)PMC_data(SELF) + 1;
         nextix = UVal_int(e->val);
@@ -701,7 +708,8 @@ C<value>.
         HashEntry *e;
 
         if (key < 0 || key >= PMC_int_val(SELF))
-            real_exception(interp, NULL, E_IndexError, "SArray index out of bounds!");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    "SArray index out of bounds!");
 
         e                = (HashEntry *)PMC_data(SELF) + (2 + key);
         e->type          = enum_hash_num;
@@ -727,7 +735,8 @@ Adds an element with floating-point value C<value> to the end of the array.
         INTVAL     nextix;
 
         if (!PMC_data(SELF))
-            real_exception(interp, NULL, E_IndexError, "SArray index out of bounds!");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    "SArray index out of bounds!");
 
         e      = (HashEntry *) PMC_data(SELF) + 1;
         nextix = UVal_int(e->val);
@@ -749,7 +758,8 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
         HashEntry *e;
 
         if (key < 0 || key >= PMC_int_val(SELF))
-            real_exception(interp, NULL, E_IndexError, "SArray index out of bounds!");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    "SArray index out of bounds!");
 
         e                = (HashEntry *)PMC_data(SELF) + (2 + key);
         e->type          = enum_hash_string;
@@ -776,7 +786,7 @@ array.
         INTVAL     nextix;
 
         if (!PMC_data(SELF))
-            real_exception(interp, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "SArray index out of bounds!");
 
         e      = (HashEntry *)PMC_data(SELF) + 1;
@@ -799,7 +809,8 @@ Sets the PMC value of the element at index C<key> to C<*src>.
         HashEntry *e;
 
         if (key < 0 || key >= PMC_int_val(SELF))
-            real_exception(interp, NULL, E_IndexError, "SArray index out of bounds!");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    "SArray index out of bounds!");
 
         e       = (HashEntry *) PMC_data(SELF) + (2 + key);
         e->type = enum_hash_pmc;
@@ -827,7 +838,7 @@ Adds an element with PMC value C<*value> to the end of the array.
         INTVAL     nextix;
 
         if (!PMC_data(SELF))
-            real_exception(interp, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "SArray index out of bounds!");
 
         e      = (HashEntry *)PMC_data(SELF) + 1;

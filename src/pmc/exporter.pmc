@@ -182,10 +182,10 @@ Throws an exception if a non-NameSpace PMC is passed.
 
     METHOD source(PMC *src :optional, int got_src :opt_flag) {
         if (got_src) {
-            if (src->vtable->base_type != enum_class_NameSpace) {
-                real_exception(interp, NULL, 0,
+            if (src->vtable->base_type != enum_class_NameSpace)
+                Parrot_ex_throw_from_c_args(interp, NULL, 0,
                         "source must be a NameSpace PMC");
-            }
+
             SET_ATTR_ns_src(interp, SELF, src);
         }
         else {
@@ -211,10 +211,11 @@ Throws an exception if a non-NameSpace PMC is passed.
 
     METHOD destination(PMC *dest :optional, int got_dest :opt_flag) {
         if (got_dest) {
-            if (dest->vtable->base_type != enum_class_NameSpace) {
-                real_exception(interp, NULL, 0,
-                        "destination must be a NameSpace PMC");
-            }
+
+            if (dest->vtable->base_type != enum_class_NameSpace)
+                Parrot_ex_throw_from_c_args(interp, NULL, 0,
+                    "destination must be a NameSpace PMC");
+
             SET_ATTR_ns_dest(interp, SELF, dest);
         }
         else {
@@ -283,7 +284,7 @@ Throws an exception if an unknown PMC type is passed.
                     temp_globals = glb;
             }
             else {
-                real_exception(interp, NULL, 0,
+                Parrot_ex_throw_from_c_args(interp, NULL, 0,
                     "Invalid type %d in globals()", glb->vtable->base_type);
             }
 
@@ -339,11 +340,12 @@ Throws an exception upon error.
 
         GET_ATTR_ns_src(interp, SELF, ns_src);
         if (PMC_IS_NULL(ns_src))
-            real_exception(interp, NULL, 0, "source namespace not set");
+            Parrot_ex_throw_from_c_args(interp, NULL, 0, "source namespace not set");
 
         GET_ATTR_ns_dest(interp, SELF, ns_dest);
         if (PMC_IS_NULL(ns_dest))
-            real_exception(interp, NULL, 0, "destination namespace not set");
+            Parrot_ex_throw_from_c_args(interp, NULL, 0,
+                "destination namespace not set");
 
         GET_ATTR_globals(interp, SELF, ns_globals);
 

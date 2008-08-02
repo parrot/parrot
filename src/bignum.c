@@ -343,7 +343,7 @@ BN_create_context(PINTD_ INTVAL precision)
     result->extended = 1;
     result->flags = 0;
     result->traps = (BN_F_DIVISION_BY_ZERO  |
-                      BN_F_INVALID_OPERATION |
+                      BN_F_EXCEPTION_INVALID_OPERATION |
                       BN_F_OVERFLOW          |
                       BN_F_ROUNDED           |
                       BN_F_UNDERFLOW);
@@ -483,7 +483,7 @@ BN_set_verybig(PINTD_ BIGNUM* bn, BN_CONTEXT *context)
         massive = 1;
         break;
       default:
-        BN_EXCEPT(PINT_ BN_INVALID_OPERATION,
+        BN_EXCEPT(PINT_ BN_EXCEPTION_INVALID_OPERATION,
                   "Unknown rounding during overflow");
     }
     if (context->precision > 0 && massive) {
@@ -618,8 +618,8 @@ BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, const char *msg)
         break;
     case BN_CONVERSION_SYNTAX:
         /* string not conforming to numeric form */
-        context->flags |= BN_F_INVALID_OPERATION;
-        if (context->traps & (BN_F_INVALID_OPERATION)) {
+        context->flags |= BN_F_EXCEPTION_INVALID_OPERATION;
+        if (context->traps & (BN_F_EXCEPTION_INVALID_OPERATION)) {
             BN_EXCEPT(PINT_ except, msg);
         }
         break;
@@ -639,15 +639,15 @@ BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, const char *msg)
         break;
     case BN_DIVISION_IMPOSSIBLE:
         /* integer result of div-int or rem > precision */
-        context->flags |= BN_F_INVALID_OPERATION;
-        if (context->traps & (BN_F_INVALID_OPERATION)) {
+        context->flags |= BN_F_EXCEPTION_INVALID_OPERATION;
+        if (context->traps & (BN_F_EXCEPTION_INVALID_OPERATION)) {
             BN_EXCEPT(PINT_ except, msg);
         }
         break;
     case BN_DIVISION_UNDEFINED:
         /* div by zero with zero on top also */
-        context->flags |= BN_F_INVALID_OPERATION;
-        if (context->traps & (BN_F_INVALID_OPERATION)) {
+        context->flags |= BN_F_EXCEPTION_INVALID_OPERATION;
+        if (context->traps & (BN_F_EXCEPTION_INVALID_OPERATION)) {
             BN_EXCEPT(PINT_ except, msg);
         }
         break;
@@ -661,22 +661,22 @@ BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, const char *msg)
     case BN_INSUFFICIENT_STORAGE:
         /* not enough space to hold intermediate results */
         /* Often this will be raised directly (ie. fatally) */
-        context->flags |= BN_F_INVALID_OPERATION;
-        if (context->traps & (BN_F_INVALID_OPERATION)) {
+        context->flags |= BN_F_EXCEPTION_INVALID_OPERATION;
+        if (context->traps & (BN_F_EXCEPTION_INVALID_OPERATION)) {
             BN_EXCEPT(PINT_ except, msg);
         }
         break;
     case BN_INVALID_CONTEXT:
         /* context given was not valid (unknown round) */
-        context->flags |= BN_F_INVALID_OPERATION;
-        if (context->traps & (BN_F_INVALID_OPERATION)) {
+        context->flags |= BN_F_EXCEPTION_INVALID_OPERATION;
+        if (context->traps & (BN_F_EXCEPTION_INVALID_OPERATION)) {
             BN_EXCEPT(PINT_ except, msg);
         }
         break;
-    case BN_INVALID_OPERATION:
+    case BN_EXCEPTION_INVALID_OPERATION:
         /* operation which is not valid */
-        context->flags |= BN_F_INVALID_OPERATION;
-        if (context->traps & (BN_F_INVALID_OPERATION)) {
+        context->flags |= BN_F_EXCEPTION_INVALID_OPERATION;
+        if (context->traps & (BN_F_EXCEPTION_INVALID_OPERATION)) {
             BN_EXCEPT(PINT_ except, msg);
         }
         break;
@@ -709,7 +709,7 @@ BN_nonfatal(PINTD_ BN_CONTEXT *context, BN_EXCEPTIONS except, const char *msg)
         }
         break;
     default:
-        BN_EXCEPT(PINT_ BN_INVALID_OPERATION, "An unknown error occurred");
+        BN_EXCEPT(PINT_ BN_EXCEPTION_INVALID_OPERATION, "An unknown error occurred");
     }
 
 }
@@ -1276,7 +1276,7 @@ BN_round(PINTD_ BIGNUM *bn, BN_CONTEXT* context)
 {
     /* In exported version, must check for sNAN */
     if (bn->digits == 0 && am_sNAN(bn)) {
-        BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+        BN_nonfatal(PINT_ context, BN_EXCEPTION_INVALID_OPERATION,
                     "sNaN in round");
         BN_set_sNAN(PINT_ bn);
         return;
@@ -1414,7 +1414,7 @@ BN_iround(PINTD_ BIGNUM *bn, BN_CONTEXT* context)
             }
             return BN_round_down(PINT_ bn, context);
         }
-        BN_EXCEPT(PINT_ BN_INVALID_OPERATION, "Unknown rounding attempted");
+        BN_EXCEPT(PINT_ BN_EXCEPTION_INVALID_OPERATION, "Unknown rounding attempted");
     }
     return;
 }
@@ -1784,7 +1784,7 @@ BN_add(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context)
     if (one->digits == 0 || two->digits == 0) {
         if (am_NAN(one) || am_NAN(two)) {
             if (am_sNAN(one) || am_sNAN(two)) {
-                BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                BN_nonfatal(PINT_ context, BN_EXCEPTION_INVALID_OPERATION,
                             "sNAN in add");
             }
             BN_set_qNAN(PINT_ result);
@@ -1793,7 +1793,7 @@ BN_add(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two, BN_CONTEXT *context)
         /* Otherwise an infinity */
         if (am_INF(one) && am_INF(two)) {
             if (one->sign != two->sign) {
-                BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                BN_nonfatal(PINT_ context, BN_EXCEPTION_INVALID_OPERATION,
                             "addition of +Inf and -Inf");
                 BN_set_qNAN(PINT_ result);
                 return;
@@ -1970,7 +1970,7 @@ BN_subtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     if (one->digits == 0 || two->digits == 0) {
         if (am_NAN(one) || am_NAN(two)) {
             if (am_sNAN(one) || am_sNAN(two)) {
-                BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                BN_nonfatal(PINT_ context, BN_EXCEPTION_INVALID_OPERATION,
                             "sNAN in subtract");
             }
             BN_set_qNAN(PINT_ result);
@@ -1979,7 +1979,7 @@ BN_subtract(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
         /* Otherwise an infinity */
         if (am_INF(one) && am_INF(two)) {
             if (one->sign == two->sign) {
-                BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                BN_nonfatal(PINT_ context, BN_EXCEPTION_INVALID_OPERATION,
                             "subtraction of Inf and Inf");
                 BN_set_qNAN(PINT_ result);
                 return;
@@ -2190,7 +2190,7 @@ BN_plus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context)
 {
     /* Check for special values */
     if (one->digits ==0) {
-        if (am_sNAN(one)) BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+        if (am_sNAN(one)) BN_nonfatal(PINT_ context, BN_EXCEPTION_INVALID_OPERATION,
                                       "sNAN in plus");
         if (am_NAN(one)) {
             BN_set_qNAN(PINT_ result);
@@ -2226,7 +2226,7 @@ BN_minus(PINTD_ BIGNUM* result, BIGNUM *one, BN_CONTEXT *context)
 {
     /* Check for special values */
     if (one->digits ==0) {
-        if (am_sNAN(one)) BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+        if (am_sNAN(one)) BN_nonfatal(PINT_ context, BN_EXCEPTION_INVALID_OPERATION,
                                       "sNAN in minus");
         if (am_NAN(one)) {
             BN_set_qNAN(PINT_ result);
@@ -2274,7 +2274,7 @@ BN_compare(PINT_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
         /* NaN */
         if (am_NAN(one) || am_NAN(two)) {
             if (am_sNAN(one) || am_sNAN(two)) {
-                BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                BN_nonfatal(PINT_ context, BN_EXCEPTION_INVALID_OPERATION,
                             "NaN in compare");
             }
             BN_set_qNAN(PINT_ result);
@@ -2335,7 +2335,7 @@ BN_multiply(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     if (one->digits == 0 || two->digits == 0) {
         if (am_NAN(one) || am_NAN(two)) {
             if (am_sNAN(one) || am_sNAN(two)) {
-                BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                BN_nonfatal(PINT_ context, BN_EXCEPTION_INVALID_OPERATION,
                             "sNAN in multiply");
             }
             BN_set_qNAN(PINT_ result);
@@ -2344,7 +2344,7 @@ BN_multiply(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
         /* We've got at least one infinity */
         /* 0 * Inf => NaN */
         if (BN_is_zero(PINT_ one, context) || BN_is_zero(PINT_ two, context)) {
-            BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+            BN_nonfatal(PINT_ context, BN_EXCEPTION_INVALID_OPERATION,
                         "Attempt to multiply 0 and Infinity");
             BN_set_qNAN(PINT_ result);
             return;
@@ -2464,14 +2464,14 @@ BN_divide(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     if (one->digits == 0 || two->digits == 0) {
         if (am_NAN(one) || am_NAN(two)) {
             if (am_sNAN(one) || am_sNAN(two)) {
-                BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                BN_nonfatal(PINT_ context, BN_EXCEPTION_INVALID_OPERATION,
                             "sNAN in divide");
             }
             BN_set_qNAN(PINT_ result);
             return;
         }
         if (am_INF(one) && am_INF(two)) {
-            BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+            BN_nonfatal(PINT_ context, BN_EXCEPTION_INVALID_OPERATION,
                         "Inf / Inf in divide");
             BN_set_qNAN(PINT_ result);
             return;
@@ -2699,14 +2699,14 @@ BN_divide_integer(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     if (one->digits == 0 || two->digits == 0) {
         if (am_NAN(one) || am_NAN(two)) {
             if (am_sNAN(one) || am_sNAN(two)) {
-                BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                BN_nonfatal(PINT_ context, BN_EXCEPTION_INVALID_OPERATION,
                             "sNAN in divide-integer");
             }
             BN_set_qNAN(PINT_ result);
             return;
         }
         if (am_INF(one) && am_INF(two)) {
-            BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+            BN_nonfatal(PINT_ context, BN_EXCEPTION_INVALID_OPERATION,
                         "Inf / Inf in divide-integer");
             BN_set_qNAN(PINT_ result);
             return;
@@ -2807,7 +2807,7 @@ BN_remainder(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
     if (one->digits == 0 || two->digits == 0) {
         if (am_NAN(one) || am_NAN(two)) {
             if (am_sNAN(one) || am_sNAN(two)) {
-                BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+                BN_nonfatal(PINT_ context, BN_EXCEPTION_INVALID_OPERATION,
                             "sNAN in remainder");
             }
             BN_set_qNAN(PINT_ result);
@@ -2815,7 +2815,7 @@ BN_remainder(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
         }
         /* Infinities, first cover Inf rem x and Inf rem Inf */
         if (am_INF(one)) {
-            BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+            BN_nonfatal(PINT_ context, BN_EXCEPTION_INVALID_OPERATION,
                         "x rem Inf in remainder");
             BN_set_qNAN(PINT_ result);
             return;
@@ -2835,7 +2835,7 @@ BN_remainder(PINTD_ BIGNUM* result, BIGNUM *one, BIGNUM *two,
             BN_set_qNAN(PINT_ result);
             return;
         }
-        BN_nonfatal(PINT_ context, BN_INVALID_OPERATION,
+        BN_nonfatal(PINT_ context, BN_EXCEPTION_INVALID_OPERATION,
                     "x rem 0 in remainder");
         BN_set_qNAN(PINT_ result);
         return;

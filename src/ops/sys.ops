@@ -282,7 +282,7 @@ Sleep for $1 seconds.
 inline op sleep(in INT) :flow {
   opcode_t *next = expr NEXT();
   if ($1 < 0) {
-      real_exception(interp, next, NEG_SLEEP,
+      Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_NEG_SLEEP,
         "Cannot go back in time");
   }
   next = (opcode_t *)Parrot_cx_schedule_sleep(interp, (FLOATVAL) $1, next);
@@ -292,7 +292,7 @@ inline op sleep(in INT) :flow {
 inline op sleep(in NUM) :flow {
   opcode_t *next = expr NEXT();
   if ($1 < 0.0) {
-      real_exception(interp, next, NEG_SLEEP,
+      Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_NEG_SLEEP,
         "Cannot go back in time");
   }
   next = (opcode_t *)Parrot_cx_schedule_sleep(interp, $1, next);

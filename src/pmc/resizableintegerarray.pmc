@@ -39,7 +39,7 @@ Returns the integer value of the element at index C<key>.
         INTVAL *data;
 
         if (key < 0)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "ResizableIntegerArray: index out of bounds!");
 
         if (key >= PMC_int_val(SELF))
@@ -63,7 +63,7 @@ Sets the integer value of the element at index C<key> to C<value>.
         INTVAL *data;
 
         if (key < 0)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "ResizableIntegerArray: index out of bounds!");
 
         if (key >= PMC_int_val(SELF))
@@ -85,7 +85,7 @@ Resizes the array to C<size> elements.
 
     VTABLE void set_integer_native(INTVAL size) {
         if (size < 0)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableStringArray: Can't resize!");
 
         if (!PMC_data(SELF)) {
@@ -154,7 +154,7 @@ Removes and returns the last element in the array.
         INTVAL size = PMC_int_val(SELF);
 
         if (size == 0)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableIntegerArray: Can't pop from an empty array!");
 
         value = SELF.get_integer_keyed_int(size-1);
@@ -176,7 +176,7 @@ Removes and returns an item from the start of the array.
         INTVAL size = PMC_int_val(SELF);
 
         if (size == 0)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableIntegerArray: Can't shift from an empty array!");
 
         data  = (INTVAL *)PMC_data(SELF);

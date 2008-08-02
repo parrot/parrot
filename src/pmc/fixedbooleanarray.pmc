@@ -156,7 +156,7 @@ Returns the integer value of the element at index C<key>.
         const Parrot_UInt1 * const sd = PMC_data_typed(SELF, Parrot_UInt1 *);
 
         if (key < 0 || key >= PMC_int_val(SELF))
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "FixedBooleanArray: index out of bounds!");
 
         return (sd[key / BITS_PER_CHAR] & (1 << (key % BITS_PER_CHAR))) ? 1 : 0;
@@ -311,8 +311,8 @@ Resizes the array to C<size> elements.
 
     VTABLE void set_integer_native(INTVAL size) {
         if (PMC_int_val(SELF) || size < 1)
-            real_exception(INTERP, NULL, E_IndexError,
-                    "FixedBooleanArray: Can't resize!");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "FixedBooleanArray: Can't resize!");
 
         PMC_int_val(SELF)  = size;
         PMC_int_val2(SELF) = (size / BITS_PER_CHAR + 1) * BITS_PER_CHAR;
@@ -334,7 +334,7 @@ Sets the integer value of the element at index C<key> to C<value>.
         Parrot_UInt1 * const sd = PMC_data_typed(SELF, Parrot_UInt1 *);
 
         if (key < 0 || key >= PMC_int_val(SELF))
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "FixedBooleanArray: index out of bounds!");
 
         if (value)

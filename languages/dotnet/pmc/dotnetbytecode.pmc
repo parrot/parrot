@@ -55,7 +55,7 @@ pmclass DotNetBytecode dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetBytecode PMC");
 
         result = (INTVAL)bc->locals_signature;
@@ -71,7 +71,7 @@ pmclass DotNetBytecode dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetBytecode PMC");
 
         result = bc->init_locals_flag;
@@ -87,7 +87,7 @@ pmclass DotNetBytecode dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetBytecode PMC");
 
         result = bc->body_size;
@@ -103,7 +103,7 @@ pmclass DotNetBytecode dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetBytecode PMC");
 
         result = bc->cur_pos;
@@ -118,10 +118,10 @@ pmclass DotNetBytecode dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetBytecode PMC");
-        else
-            bc->cur_pos = pos;
+
+        bc->cur_pos = pos;
     }
 
 
@@ -133,7 +133,7 @@ pmclass DotNetBytecode dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetBytecode PMC");
 
         result = bc->eh;
@@ -149,12 +149,12 @@ pmclass DotNetBytecode dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetBytecode PMC");
 
         /* Ensure we won't read past the end. */
         if (bc->cur_pos >= bc->body_size)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Read past end of bytecode");
 
         /* Otherwise read the value. */
@@ -172,12 +172,12 @@ pmclass DotNetBytecode dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetBytecode PMC");
 
         /* Ensure we won't read past the end. */
         if (bc->cur_pos >= bc->body_size)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Read past end of bytecode");
 
         /* Otherwise read the value. */
@@ -196,12 +196,12 @@ pmclass DotNetBytecode dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetBytecode PMC");
 
         /* Ensure we won't read past the end. */
         if (bc->cur_pos + 1 >= bc->body_size)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Read past end of bytecode");
 
         /* Otherwise read the value. */
@@ -229,12 +229,12 @@ pmclass DotNetBytecode dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetBytecode PMC");
 
         /* Ensure we won't read past the end. */
         if (bc->cur_pos + 1 >= bc->body_size)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Read past end of bytecode");
 
         /* Otherwise read the value. */
@@ -262,12 +262,12 @@ pmclass DotNetBytecode dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetBytecode PMC");
 
         /* Ensure we won't read past the end. */
         if (bc->cur_pos + 3 >= bc->body_size)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Read past end of bytecode");
 
         /* Otherwise read the value. */
@@ -299,12 +299,12 @@ pmclass DotNetBytecode dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetBytecode PMC");
 
         /* Ensure we won't read past the end. */
         if (bc->cur_pos + 3 >= bc->body_size)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Read past end of bytecode");
 
         /* Otherwise read the value. */
@@ -336,12 +336,12 @@ pmclass DotNetBytecode dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetBytecode PMC");
 
         /* Ensure we won't read past the end. */
         if (bc->cur_pos + 3 >= bc->body_size)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Read past end of bytecode");
 
         /* Otherwise read the value. */
@@ -374,12 +374,12 @@ pmclass DotNetBytecode dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetBytecode PMC");
 
         /* Ensure we won't read past the end. */
         if (bc->cur_pos + 7 >= bc->body_size)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Read past end of bytecode");
 
         /* Otherwise read the value. */
@@ -413,12 +413,12 @@ pmclass DotNetBytecode dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetBytecode PMC");
 
         /* Ensure we won't read past the end. */
         if (bc->cur_pos + 3 >= bc->body_size)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Read past end of bytecode");
 
         /* Otherwise read the value. */
@@ -450,12 +450,12 @@ pmclass DotNetBytecode dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetBytecode PMC");
 
         /* Ensure we won't read past the end. */
         if (bc->cur_pos + 3 >= bc->body_size)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Read past end of bytecode");
 
         /* Otherwise read the value. */
@@ -487,12 +487,12 @@ pmclass DotNetBytecode dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetBytecode PMC");
 
         /* Ensure we won't read past the end. */
         if (bc->cur_pos + 3 >= bc->body_size)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Read past end of bytecode");
 
         /* Otherwise read the value. */
@@ -525,12 +525,12 @@ pmclass DotNetBytecode dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetBytecode PMC");
 
         /* Ensure we won't read past the end. */
         if (bc->cur_pos + 3 >= bc->body_size)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Read past end of bytecode");
 
         /* Otherwise read the value. */

@@ -1,4 +1,4 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =head1 Parrot::Pmc2c::Null Instance Methods
@@ -39,7 +39,8 @@ sub pre_method_gen {
 
         # don't return anything, ever
         my $output = <<EOC;
-    real_exception(interp, NULL, NULL_REG_ACCESS, "Null PMC access in $vt_method_name()");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NULL_REG_ACCESS,
+        "Null PMC access in $vt_method_name()");
 EOC
         $new_default_method->body( Parrot::Pmc2c::Emitter->text($output) );
         $self->add_method($new_default_method);

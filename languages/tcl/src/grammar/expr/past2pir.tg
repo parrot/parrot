@@ -295,7 +295,7 @@ END_PIR
     %0 = %0(%2)
     goto %4
 %3:
-    tcl_error 'invalid command name %1'
+    die 'invalid command name %1'
 %4:
 END_PIR
     node['ret'] = retval
@@ -359,7 +359,7 @@ transform pir (PAST::DynamicCommand) {
   %0  = %0(%2)
   goto %4
 %3:
-  tcl_error 'invalid command name %1'
+  die 'invalid command name %1'
 %4:
 END_PIR
     node['ret'] = retval

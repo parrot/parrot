@@ -22,6 +22,7 @@ Implements the core concurrency scheduler.
 #include "parrot/scheduler_private.h"
 
 pmclass Scheduler need_ext {
+
     ATTR INTVAL        id;         /* The scheduler's ID. */
     ATTR INTVAL        max_tid;    /* The highest assigned task ID. */
     ATTR INTVAL        pending;    /* A count of pending tasks (cached for fast
@@ -88,7 +89,7 @@ An C<Integer> representing the unique identifier for this scheduler.
         Parrot_Scheduler *core_struct;
 
         if (! VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Hash")))
-            real_exception(INTERP, NULL, INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Scheduler initializer must be a Hash");
 
         SELF.init();
@@ -135,7 +136,9 @@ current maximum, and a birthtime of the current time.
 
 
         SCHEDULER_cache_valid_CLEAR(SELF);
-        Parrot_cx_runloop_wake(core_struct->interp, SELF);
+
+        if (task->vtable->base_type != enum_class_Exception)
+            Parrot_cx_runloop_wake(core_struct->interp, SELF);
     }
 
 /*
@@ -382,7 +385,48 @@ Add a handler to the scheduler.
 
     METHOD add_handler(PMC *handler) {
         Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
-        VTABLE_push_pmc(INTERP, core_struct->handlers, handler);
+        VTABLE_unshift_pmc(INTERP, core_struct->handlers, handler);
+    }
+
+/*
+
+=item C<METHOD delete_handler(STRING *type :optional, INTVAL got_type :opt_flag)>
+
+Delete a handler from the scheduler.
+
+=cut
+
+*/
+
+    METHOD delete_handler(STRING *type :optional, INTVAL got_type :opt_flag) {
+        PMC *handlers;
+        INTVAL elements, index;
+
+        GET_ATTR_handlers(INTERP, SELF, handlers);
+        elements = VTABLE_elements(INTERP, handlers);
+
+        if (!got_type)
+            VTABLE_shift_pmc(INTERP, handlers);
+
+        /* Loop from newest handler to oldest handler. */
+        for (index = 0; index < elements; ++index) {
+            PMC *handler = VTABLE_get_pmc_keyed_int(INTERP, handlers, index);
+            if (!PMC_IS_NULL(handler)) {
+                if (string_equal(INTERP, type, CONST_STRING(INTERP, "exception")) == 0
+                            && handler->vtable->base_type == enum_class_ExceptionHandler) {
+                    VTABLE_set_pmc_keyed_int(INTERP, handlers, index, PMCNULL);
+                    RETURN(void);
+                }
+                else if (string_equal(INTERP, type, CONST_STRING(INTERP, "event")) == 0
+                            && handler->vtable->base_type == enum_class_EventHandler) {
+                    VTABLE_set_pmc_keyed_int(INTERP, handlers, index, PMCNULL);
+                    RETURN(void);
+               }
+            }
+        }
+
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "No handler to delete.");
     }
 
 /*
@@ -397,23 +441,81 @@ PMCNULL.
 */
 
     METHOD find_handler(PMC *task) {
-        Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
-        INTVAL elements = VTABLE_elements(INTERP, core_struct->handlers);
-        INTVAL counter;
+        PMC *iter;
 
-        for (counter = 0; counter < elements; ++counter) {
-            PMC *handler = VTABLE_get_pmc_keyed_int(interp,
-                    core_struct->handlers, counter);
+        /* Exceptions store the handler iterator for rethrow, other kinds of
+         * tasks don't (though they could). */
+        if (task->vtable->base_type == enum_class_Exception &&
+                VTABLE_get_integer_keyed_str(interp, task,
+                    CONST_STRING(interp, "handled")) == -1) {
+            iter = VTABLE_get_attr_str(interp, task,
+                    CONST_STRING(interp, "handler_iter"));
+        }
+        else {
+            PMC *handlers;
+            GET_ATTR_handlers(interp, SELF, handlers);
+            iter = VTABLE_get_iter(interp, handlers);
+
+            if (task->vtable->base_type == enum_class_Exception)
+                VTABLE_set_attr_str(interp, task,
+                        CONST_STRING(interp, "handler_iter"), iter);
+        }
+
+        /* Loop from newest handler to oldest handler. */
+        while (VTABLE_get_bool(interp, iter)) {
+            PMC *handler = VTABLE_shift_pmc(INTERP, iter);
+
             INTVAL valid_handler = 0;
             if (!PMC_IS_NULL(handler)) {
-                (INTVAL valid_handler) = PCCINVOKE(interp, handler, "can_handle", PMC *task);
+                (INTVAL valid_handler) = PCCINVOKE(INTERP, handler, "can_handle", PMC *task);
                 if (valid_handler) {
+                    if (task->vtable->base_type == enum_class_Exception)
+                        VTABLE_set_integer_native(interp, handler, 1);
                     RETURN(PMC *handler);
                 }
             }
+
         }
 
         RETURN(PMC *PMCNULL);
+    }
+
+
+/*
+
+=item C<METHOD count_handlers(STRING *type :optional, INTVAL got_type :opt_flag)>
+
+Return the number of handlers currently held by the scheduler. If a type
+argument is passed, only count handlers of that type (C<event>, C<exception>).
+If no type argument is passed, count all handlers.
+
+=cut
+
+*/
+
+    METHOD count_handlers(STRING *type :optional, INTVAL got_type :opt_flag) {
+        PMC *handlers;
+        INTVAL elements = VTABLE_elements(INTERP, handlers);
+        INTVAL index, count;
+
+        GET_ATTR_handlers(INTERP, SELF, handlers);
+
+        if (!got_type)
+                RETURN(INTVAL elements);
+
+        for (index = 0; index < elements; ++index) {
+            PMC *handler = VTABLE_get_pmc_keyed_int(INTERP, handlers, index);
+            if (!PMC_IS_NULL(handler)) {
+                    if (string_equal(INTERP, type, CONST_STRING(INTERP, "exception")) == 0
+                                    && handler->vtable->base_type == enum_class_ExceptionHandler)
+                        count++;
+                    else if (string_equal(INTERP, type, CONST_STRING(INTERP, "event")) == 0
+                                    && handler->vtable->base_type == enum_class_EventHandler)
+                        count++;
+            }
+        }
+
+        RETURN(INTVAL count);
     }
 
 

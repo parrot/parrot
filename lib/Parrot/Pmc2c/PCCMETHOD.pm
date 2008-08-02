@@ -412,9 +412,9 @@ $set_params
         _ccont = _caller_ctx->current_cont;
     }
     else {
-        /* there is no point calling real_exception here, because
+        /* there is no point calling Parrot_ex_throw_from_c_args here, because
            PDB_backtrace can't deal with a missing to_ctx either. */
-        internal_exception(1, "No caller_ctx for continuation \%p.", _ccont);
+        exit_fatal(1, "No caller_ctx for continuation \%p.", _ccont);
     }
 
     _ctx->current_cont            = _ret_cont;
@@ -465,9 +465,9 @@ END
 $method_returns
 
     if (! _caller_ctx) {
-        /* there is no point calling real_exception here, because
+        /* there is no point calling Parrot_ex_throw_from_c_args here, because
            PDB_backtrace can't deal with a missing to_ctx either. */
-        internal_exception(1, "No caller_ctx for continuation \%p.", _ccont);
+        exit_fatal(1, "No caller_ctx for continuation \%p.", _ccont);
     }
 
     interp->returns_signature = _return_sig;

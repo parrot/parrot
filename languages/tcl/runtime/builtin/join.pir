@@ -31,7 +31,7 @@ R  = new 'TclString'
 R  = $S0
   .return(R)
 bad_args:
-  tcl_error 'wrong # args: should be "join list ?joinString?"'
+  die 'wrong # args: should be "join list ?joinString?"'
 .end
 
 # Local Variables:

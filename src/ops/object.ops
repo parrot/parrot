@@ -65,10 +65,10 @@ op callmethodcc(invar PMC, in STR) :object_base :flow {
     PMC * const _class = VTABLE_get_class(interp, object);
 
     if (PMC_IS_NULL(_class))
-        real_exception(interp, next, METH_NOT_FOUND,
+        Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_METH_NOT_FOUND,
             "Method '%Ss' not found for non-object", meth);
     else
-        real_exception(interp, next, METH_NOT_FOUND,
+        Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_METH_NOT_FOUND,
             "Method '%Ss' not found for invocant of class '%Ss'", meth,
             VTABLE_get_string(interp, _class));
   }
@@ -106,7 +106,7 @@ op callmethod(invar PMC, in STR, invar PMC) :object_base :flow {
 
 
   if (PMC_IS_NULL(method_pmc)) {
-    real_exception(interp, next, METH_NOT_FOUND,
+    Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_METH_NOT_FOUND,
         "Method '%Ss' not found for invocant of class '%Ss'", meth,
         VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
   }
@@ -138,7 +138,7 @@ op tailcallmethod(invar PMC, in STR) :object_base :flow {
   opcode_t *dest;
 
   if (PMC_IS_NULL(method_pmc)) {
-    real_exception(interp, next, METH_NOT_FOUND,
+    Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_METH_NOT_FOUND,
         "Method '%Ss' not found for invocant of class '%Ss'", meth,
         VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
   }
@@ -266,8 +266,8 @@ inline op subclass(out PMC, in PMC) :object_classes :flow {
     opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
-      real_exception(interp, next, NO_CLASS,
-                  "Class '%Ss' doesn't exist", VTABLE_get_string(interp, $2));
+      Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_NO_CLASS,
+            "Class '%Ss' doesn't exist", VTABLE_get_string(interp, $2));
     }
     $1 = pmc_new(interp, enum_class_Class);
     VTABLE_add_parent(interp, $1, parent_class);
@@ -279,8 +279,8 @@ inline op subclass(out PMC, in PMC, in STR) :object_classes :flow {
     opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
-      real_exception(interp, next, NO_CLASS,
-                  "Class '%Ss' doesn't exist", VTABLE_get_string(interp, $2));
+      Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_NO_CLASS,
+            "Class '%Ss' doesn't exist", VTABLE_get_string(interp, $2));
     }
     $1 = Parrot_oo_newclass_from_str(interp, $3);
     VTABLE_add_parent(interp, $1, parent_class);
@@ -292,8 +292,8 @@ inline op subclass(out PMC, in PMC, in PMC) :object_classes :flow {
     opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
-      real_exception(interp, next, NO_CLASS,
-                  "Class '%Ss' doesn't exist", VTABLE_get_string(interp, $2));
+      Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_NO_CLASS,
+            "Class '%Ss' doesn't exist", VTABLE_get_string(interp, $2));
     }
     $1 = pmc_new_init(interp, enum_class_Class, $3);
     VTABLE_add_parent(interp, $1, parent_class);
@@ -318,8 +318,8 @@ op subclass(out PMC, in STR) :object_classes :flow {
     opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
-      real_exception(interp, next, NO_CLASS,
-                  "Class '%Ss' doesn't exist", $2);
+      Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_NO_CLASS,
+            "Class '%Ss' doesn't exist", $2);
     }
 
     $1 = pmc_new(interp, enum_class_Class);
@@ -332,8 +332,8 @@ op subclass(out PMC, in STR, in STR) :object_classes :flow {
     opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
-      real_exception(interp, next, NO_CLASS,
-                "Class '%Ss' doesn't exist", $2);
+      Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_NO_CLASS,
+            "Class '%Ss' doesn't exist", $2);
     }
 
     $1  = Parrot_oo_newclass_from_str(interp, $3);
@@ -346,8 +346,8 @@ op subclass(out PMC, in STR, in PMC) :object_classes :flow {
     opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
-      real_exception(interp, next, NO_CLASS,
-                "Class '%Ss' doesn't exist", $2);
+      Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_NO_CLASS,
+            "Class '%Ss' doesn't exist", $2);
     }
 
     $1 = pmc_new_init(interp, enum_class_Class, $3);
@@ -371,7 +371,8 @@ inline op getclass(out PMC, in STR) :object_classes :flow :deprecated {
     opcode_t * const next   = expr NEXT();
 
     if (PMC_IS_NULL(_class))
-        real_exception(interp, next, NO_CLASS, "Class '%Ss' doesn't exist", $2);
+        Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_NO_CLASS,
+            "Class '%Ss' doesn't exist", $2);
 
     $1 = _class;
 
@@ -384,7 +385,8 @@ inline op getclass(out PMC, in PMC) :object_classes :flow :deprecated {
 
   if (PMC_IS_NULL(_class)) {
     STRING * const name = readable_name(interp, $2);
-    real_exception(interp, next, NO_CLASS, "Class '%Ss' doesn't exist", name);
+    Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_NO_CLASS,
+        "Class '%Ss' doesn't exist", name);
   }
   else
     $1 = _class;
@@ -467,7 +469,7 @@ inline op addattribute(invar PMC, in STR) :object_classes {
     if (VTABLE_isa(interp, $1, class_name) || VTABLE_isa(interp, $1, role_name))
         VTABLE_add_attribute(interp, $1, $2, PMCNULL);
     else
-        real_exception(interp, NULL, INVALID_OPERATION,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Cannot add attribute to non-class");
 }
 
@@ -480,11 +482,13 @@ Remove attribute $2 from class $1, specified either by name or offset.
 =cut
 
 op removeattribute(invar PMC, in STR) :flow {
-    real_exception(interp, NULL, UNIMPLEMENTED, "removeattribute is not implemented");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        "removeattribute is not implemented");
 }
 
 op removeattribute(invar PMC, in INT) :flow {
-    real_exception(interp, NULL, UNIMPLEMENTED, "removeattribute is not implemented");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        "removeattribute is not implemented");
 }
 
 =item B<getattribute>(out PMC, invar PMC, in STR)

@@ -87,7 +87,8 @@ stat_common(PARROT_INTERP, struct stat *statbuf, INTVAL thing, int status)
 
     if (status == -1) {
         const char *err = strerror(errno);
-        real_exception(interp, NULL, E_IOError, "stat failed: %s", err);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "stat failed: %s", err);
     }
 
     switch (thing) {
@@ -137,10 +138,12 @@ stat_common(PARROT_INTERP, struct stat *statbuf, INTVAL thing, int status)
             result = statbuf->st_rdev;
             break;
         case STAT_PLATFORM_BLOCKSIZE:
-            real_exception(interp, NULL, 1, "STAT_PLATFORM_BLOCKSIZE not supported");
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "STAT_PLATFORM_BLOCKSIZE not supported");
             break;
         case STAT_PLATFORM_BLOCKS:
-            real_exception(interp, NULL, 1, "STAT_PLATFORM_BLOCKS not supported");
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "STAT_PLATFORM_BLOCKS not supported");
             break;
         default:
             break;

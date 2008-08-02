@@ -37,7 +37,7 @@ Functions are very similar to ops, so handle them similarly here.
     .return(b)
 
 is_string:
-    tcl_error "argument to math function didn't have numeric value"
+    die "argument to math function didn't have numeric value"
 .end
 
 .sub '&acos'
@@ -64,7 +64,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    tcl_error $S0
+    die $S0
 
 domain_error:
     $P0 = new 'TclList'
@@ -99,7 +99,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    tcl_error $S0
+    die $S0
 
 domain_error:
     $P0 = new 'TclList'
@@ -131,7 +131,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    tcl_error $S0
+    die $S0
 .end
 
 .sub '&bool'
@@ -161,7 +161,7 @@ is_string:
     .return (ret)
 
 is_string:
-    tcl_error "argument to math function didn't have numeric value"
+    die "argument to math function didn't have numeric value"
 .end
 
 .sub '&cos'
@@ -185,7 +185,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    tcl_error $S0
+    die $S0
 .end
 
 .sub '&cosh'
@@ -209,7 +209,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    tcl_error $S0
+    die $S0
 .end
 
 .sub '&double'
@@ -229,7 +229,7 @@ is_string:
     .return (ret)
 
 is_string:
-    tcl_error "argument to math function didn't have numeric value"
+    die "argument to math function didn't have numeric value"
 .end
 
 .sub '&entier'
@@ -251,7 +251,7 @@ is_string:
     $S0 = n
     $S0 = 'expected number but got "' . $S0
     $S0 .= '"'
-    tcl_error $S0
+    die $S0
 .end
 
 .sub '&exp'
@@ -275,7 +275,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    tcl_error $S0
+    die $S0
 .end
 
 .sub '&floor'
@@ -312,7 +312,7 @@ is_string:
     $S1 = a
     $S0 .= $S1
     $S0 .= '"'
-    tcl_error $S0
+    die $S0
 .end
 
 .sub '&int'
@@ -332,7 +332,7 @@ is_string:
     .return ($P0)
 
 is_string:
-    tcl_error "argument to math function didn't have numeric value"
+    die "argument to math function didn't have numeric value"
 .end
 
 .sub '&isqrt'
@@ -369,7 +369,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    tcl_error $S0
+    die $S0
 .end
 
 .sub '&log10'
@@ -403,7 +403,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    tcl_error $S0
+    die $S0
 .end
 
 .sub '&max'
@@ -461,7 +461,7 @@ neg:
     .return ($I0)
 
 is_string:
-    tcl_error "argument to math function didn't have numeric value"
+    die "argument to math function didn't have numeric value"
 .end
 
 .sub '&sin'
@@ -485,7 +485,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    tcl_error $S0
+    die $S0
 .end
 
 .sub '&sinh'
@@ -509,7 +509,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    tcl_error $S0
+    die $S0
 .end
 
 .sub '&sqrt'
@@ -542,7 +542,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    tcl_error $S0
+    die $S0
 .end
 
 .sub '&srand'
@@ -569,7 +569,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    tcl_error $S0
+    die $S0
 .end
 
 .sub '&tanh'
@@ -593,7 +593,7 @@ is_string:
     $S0 = a
     $S0 = 'expected floating-point number but got "' . $S0
     $S0 = $S0 . '"'
-    tcl_error $S0
+    die $S0
 .end
 
 # RT#40689: implement wide() - this is just int()
@@ -614,7 +614,7 @@ is_string:
     .return ($P0)
 
 is_string:
-    tcl_error "argument to math function didn't have numeric value"
+    die "argument to math function didn't have numeric value"
 .end
 
 =head2 Binary Functions
@@ -642,7 +642,7 @@ is_string:
     .return(ret)
 
 is_string:
-    tcl_error "argument to math function didn't have numeric value"
+    die "argument to math function didn't have numeric value"
 .end
 
 .sub '&fmod'
@@ -675,7 +675,7 @@ is_string:
     tcl_error $S0, $P0
 
 is_string:
-    tcl_error "argument to math function didn't have numeric value"
+    die "argument to math function didn't have numeric value"
 .end
 
 .sub '&hypot'
@@ -704,7 +704,7 @@ is_string:
     .return(ret)
 
 is_string:
-    tcl_error "argument to math function didn't have numeric value"
+    die "argument to math function didn't have numeric value"
 .end
 
 .sub '&pow'
@@ -727,7 +727,7 @@ is_string:
     .return($P0)
 
 is_string:
-    tcl_error "argument to math function didn't have numeric value"
+    die "argument to math function didn't have numeric value"
 .end
 
 # Local Variables:

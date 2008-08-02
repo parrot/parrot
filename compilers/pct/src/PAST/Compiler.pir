@@ -1215,7 +1215,7 @@ a return value.
 
     .local string exreg, extype
     exreg = self.'uniquereg'('P')
-    extype = concat exreg, "['_type']"
+    extype = concat exreg, "['type']"
     ops.'push_pirop'('new', exreg, '"Exception"')
     ops.'push_pirop'('set', extype, .CONTROL_RETURN)
 

@@ -28,7 +28,7 @@ stream:
   .return io.'readline'()
 
 bad_args:
-  tcl_error 'wrong # args: should be "gets channelId ?varName?"'
+  die 'wrong # args: should be "gets channelId ?varName?"'
 .end
 
 

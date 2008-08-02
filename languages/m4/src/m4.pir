@@ -174,75 +174,75 @@ NO_PREFIX_BUILTINS_FLAG:
 
   unimplemented_option = "traditional"
   is_defined = defined opt[unimplemented_option]
-  if is_defined goto UNIMPLEMENTED_OPTION
+  if is_defined goto EXCEPTION_UNIMPLEMENTED_OPTION
 
   unimplemented_option = "fatal-warnings"
   is_defined = defined opt[unimplemented_option]
-  if is_defined goto UNIMPLEMENTED_OPTION
+  if is_defined goto EXCEPTION_UNIMPLEMENTED_OPTION
 
   unimplemented_option = "debug"
   is_defined = defined opt[unimplemented_option]
-  if is_defined goto UNIMPLEMENTED_OPTION
+  if is_defined goto EXCEPTION_UNIMPLEMENTED_OPTION
 
   unimplemented_option = "arglength"
   is_defined = defined opt[unimplemented_option]
-  if is_defined goto UNIMPLEMENTED_OPTION
+  if is_defined goto EXCEPTION_UNIMPLEMENTED_OPTION
 
   unimplemented_option = "error-output"
   is_defined = defined opt[unimplemented_option]
-  if is_defined goto UNIMPLEMENTED_OPTION
+  if is_defined goto EXCEPTION_UNIMPLEMENTED_OPTION
 
   unimplemented_option = "include"
   is_defined = defined opt[unimplemented_option]
-  if is_defined goto UNIMPLEMENTED_OPTION
+  if is_defined goto EXCEPTION_UNIMPLEMENTED_OPTION
 
   unimplemented_option = "interactive"
   is_defined = defined opt[unimplemented_option]
-  if is_defined goto UNIMPLEMENTED_OPTION
+  if is_defined goto EXCEPTION_UNIMPLEMENTED_OPTION
 
   unimplemented_option = "synclines"
   is_defined = defined opt[unimplemented_option]
-  if is_defined goto UNIMPLEMENTED_OPTION
+  if is_defined goto EXCEPTION_UNIMPLEMENTED_OPTION
 
   unimplemented_option = "word-regexp"
   is_defined = defined opt[unimplemented_option]
-  if is_defined goto UNIMPLEMENTED_OPTION
+  if is_defined goto EXCEPTION_UNIMPLEMENTED_OPTION
 
   unimplemented_option = "hash-size"
   is_defined = defined opt[unimplemented_option]
-  if is_defined goto UNIMPLEMENTED_OPTION
+  if is_defined goto EXCEPTION_UNIMPLEMENTED_OPTION
 
   unimplemented_option = "quiet"
   is_defined = defined opt[unimplemented_option]
-  if is_defined goto UNIMPLEMENTED_OPTION
+  if is_defined goto EXCEPTION_UNIMPLEMENTED_OPTION
 
   unimplemented_option = "silent"
   is_defined = defined opt[unimplemented_option]
-  if is_defined goto UNIMPLEMENTED_OPTION
+  if is_defined goto EXCEPTION_UNIMPLEMENTED_OPTION
 
   unimplemented_option = "diversions"
   is_defined = defined opt[unimplemented_option]
-  if is_defined goto UNIMPLEMENTED_OPTION
+  if is_defined goto EXCEPTION_UNIMPLEMENTED_OPTION
 
   unimplemented_option = "define"
   is_defined = defined opt[unimplemented_option]
-  if is_defined goto UNIMPLEMENTED_OPTION
+  if is_defined goto EXCEPTION_UNIMPLEMENTED_OPTION
 
   unimplemented_option = "undefine"
   is_defined = defined opt[unimplemented_option]
-  if is_defined goto UNIMPLEMENTED_OPTION
+  if is_defined goto EXCEPTION_UNIMPLEMENTED_OPTION
 
   unimplemented_option = "trace"
   is_defined = defined opt[unimplemented_option]
-  if is_defined goto UNIMPLEMENTED_OPTION
+  if is_defined goto EXCEPTION_UNIMPLEMENTED_OPTION
 
-  goto NO_UNIMPLEMENTED_OPTION
-UNIMPLEMENTED_OPTION:
+  goto NO_EXCEPTION_UNIMPLEMENTED_OPTION
+EXCEPTION_UNIMPLEMENTED_OPTION:
     printerr "Sorry, the option '--"
     printerr unimplemented_option
     printerr "' is not implemented yet.\n"
     end
-NO_UNIMPLEMENTED_OPTION:
+NO_EXCEPTION_UNIMPLEMENTED_OPTION:
 
   # init of input structures, creates state['stack';'input']
   input_init( state )

@@ -62,7 +62,7 @@ matchrange_locate_keyed_int(Interp* interp, PMC* self, STRING *key)
     end = string_from_cstring(interp, "end", 3);
     if (0 == string_equal(interp, key, end))
         return &RANGE_END(self);
-    real_exception(interp, NULL, KEY_NOT_FOUND,
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_KEY_NOT_FOUND,
         "MatchRange: key is neither 'start' nor 'end'");
     return NULL;
 }
@@ -238,7 +238,8 @@ Set start or end depending on key
             case 1:
                 return RANGE_END(SELF);
             default:
-                real_exception(interp, NULL, 1, "MatchRange: key must be 0 or 1");
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "MatchRange: key must be 0 or 1");
         }
         return -2;
     }
@@ -252,7 +253,8 @@ Set start or end depending on key
                 RANGE_END(SELF) = v;
                 break;
             default:
-                real_exception(interp, NULL, 1, "MatchRange: key must be 0 or 1");
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "MatchRange: key must be 0 or 1");
         }
     }
 /*
@@ -274,7 +276,8 @@ for the same input string, but I won't worry about that for now.
             RANGE_END(SELF) = RANGE_END(value);
         }
         else {
-            real_exception(interp, NULL, 1, "MatchRange: cannot set from pmc");
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                "MatchRange: cannot set from pmc");
         }
     }
 
@@ -367,7 +370,7 @@ result in C<dest>.
             dest = pmc_new(interp,  MatchRange_type_id);
         if (RANGE_END(SELF) == -2) {
             if (RANGE_START(SELF) == -2) {
-                real_exception(interp, NULL, 1,
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
                     "MatchRange: cannot add to nonexistent range");
                 return NULL;
             }

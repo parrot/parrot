@@ -118,8 +118,8 @@ EH_LOOP_END:
 
     # If we didn't find the current finally block, we're shafted.
     if found >= 0 goto NOT_SHAFTED
-    ex = new .Exception
-    ex["_message"] = "Failed to find finally handler for an endfinally"
+    ex = new 'Exception'
+    ex = "Failed to find finally handler for an endfinally"
     throw ex
 NOT_SHAFTED:
 
@@ -151,8 +151,8 @@ NOT_SHAFTED:
     dec class_id
     if class_type == 2 goto DEF
     if class_type == 1 goto REF
-    ex = new .Exception
-    ex["_message"] = "Unknown class type."
+    ex = new 'Exception'
+    ex = "Unknown class type."
     throw ex
 
     # A type in this file.

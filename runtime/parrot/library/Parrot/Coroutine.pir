@@ -182,7 +182,7 @@ dead:
     ## Complain about attempted zombie creation.
     .local pmc error
     error = new 'Exception'
-    error['_message'] = "Can't reanimate a dead coroutine.\n"
+    error = "Can't reanimate a dead coroutine.\n"
     throw error
 .end
 

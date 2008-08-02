@@ -20,7 +20,7 @@ t/src/basic.t - Basics
 
 =head1 DESCRIPTION
 
-Tests C<printf> and C<internal_exception> functions.
+Tests C<printf> and C<exit_fatal> functions.
 
 =cut
 
@@ -38,14 +38,14 @@ CODE
 Hello, World!
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "direct internal_exception call" );
+c_output_is( <<'CODE', <<'OUTPUT', "direct exit_fatal call" );
     #include <parrot/parrot.h>
     #include <parrot/exceptions.h>
 
     int
     main(int argc, char* argv[])
     {
-         internal_exception(0, "Blow'd Up(tm)"); /* ' */
+         exit_fatal(0, "Blow'd Up(tm)"); /* ' */
     }
 CODE
 Blow'd Up(tm)

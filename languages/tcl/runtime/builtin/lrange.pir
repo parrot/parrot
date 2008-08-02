@@ -53,7 +53,7 @@ loop:
 end:
   .return(R)
 bad_args:
-  tcl_error 'wrong # args: should be "lrange list first last"'
+  die 'wrong # args: should be "lrange list first last"'
 .end
 
 # Local Variables:

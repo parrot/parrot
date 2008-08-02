@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -206,11 +206,12 @@ PIO_push_layer_str(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN_NULLOK(const STRING *ls
 
     string_cstring_free(cls);
     if (!l)
-        real_exception(interp, NULL, 1, "Layer not found");
+        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Layer not found");
 
     /* make private copy */
-    newlayer = PIO_base_new_layer(l);
+    newlayer         = PIO_base_new_layer(l);
     newlayer->flags |= PIO_L_LAYER_COPIED;
+
     PIO_push_layer(interp, pmc, newlayer);
 }
 

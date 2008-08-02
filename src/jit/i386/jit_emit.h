@@ -179,8 +179,9 @@ emit_sib(PARROT_INTERP, char *pc, int scale, int i, int base)
         case 8:
             scale_byte = emit_Scale_8;
             break;
-        default :
-            real_exception(interp, NULL, JIT_ERROR, "Invalid scale factor %d\n", scale);
+        default:
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
+                "Invalid scale factor %d\n", scale);
             return;
     }
 
@@ -191,10 +192,9 @@ emit_sib(PARROT_INTERP, char *pc, int scale, int i, int base)
 static char *
 emit_r_X(PARROT_INTERP, char *pc, int reg_opcode, int base, int i, int scale, long disp)
 {
-    if (i && !scale) {
-        real_exception(interp, NULL, JIT_ERROR,
-                            "emit_r_X passed invalid scale+index combo\n");
-    }
+    if (i && !scale)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
+            "emit_r_X passed invalid scale+index combo\n");
 
     if (base == emit_EBP) {
     /* modrm disp */
@@ -250,25 +250,22 @@ emit_shift_i_r(PARROT_INTERP, char *pc, int opcode, int imm, int reg)
         opcode = emit_b001;     /* -rol => 32 + ror */
         imm = -imm;
     }
-    if (imm == 0)
-    {
+
+    if (imm == 0) {
         /* noop */
     }
-    else if (imm == 1)
-    {
+    else if (imm == 1) {
         *(pc++) = (char) 0xd1;
         *(pc++) = (char) emit_alu_X_r(opcode,  reg);
     }
-    else if (imm > 1 && imm < 33)
-    {
+    else if (imm > 1 && imm < 33) {
         *(pc++) = (char) 0xc1;
         *(pc++) = (char) emit_alu_X_r(opcode,  reg);
         *(pc++) = (char)imm;
     }
-    else
-    {
-    real_exception(interp, NULL, JIT_ERROR,
-                            "emit_shift_i_r passed invalid shift\n");
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
+            "emit_shift_i_r passed invalid shift\n");
     }
 
     return pc;
@@ -291,7 +288,7 @@ emit_shift_i_m(PARROT_INTERP, char *pc, int opcode, int imm,
         *(pc++) = (char)imm;
     }
     else {
-        real_exception(interp, NULL, JIT_ERROR,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
             "emit_shift_i_m passed invalid shift\n");
     }
 
@@ -301,10 +298,9 @@ emit_shift_i_m(PARROT_INTERP, char *pc, int opcode, int imm,
 static char *
 emit_shift_r_r(PARROT_INTERP, char *pc, int opcode, int reg1, int reg2)
 {
-    if (reg1 != emit_ECX) {
-        real_exception(interp, NULL, JIT_ERROR,
+    if (reg1 != emit_ECX)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
             "emit_shift_r_r passed invalid register\n");
-    }
 
     *(pc++) = (char) 0xd3;
     *(pc++) = (char) emit_alu_X_r(opcode,  reg2);
@@ -316,10 +312,9 @@ static char *
 emit_shift_r_m(PARROT_INTERP, char *pc, int opcode, int reg,
                int base, int i, int scale, long disp)
 {
-    if (reg != emit_ECX) {
-        real_exception(interp, NULL, JIT_ERROR,
+    if (reg != emit_ECX)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
             "emit_shift_r_m passed invalid register\n");
-    }
 
     *(pc++) = (char) 0xd3;
     pc = emit_r_X(interp, pc, opcode,  base, i, scale, disp);
@@ -1706,7 +1701,7 @@ div_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r1)
     L1 = pc;
     emitm_jxs(pc, emitm_jnz, 0);
     emitm_pushl_i(pc, div_by_zero);
-    emitm_pushl_i(pc, E_ZeroDivisionError);
+    emitm_pushl_i(pc, EXCEPTION_DIV_BY_ZERO);
     emitm_pushl_i(pc, 0);    /* NULL */
     Parrot_jit_emit_get_INTERP(interp, pc, emit_ECX);
     emitm_pushl_r(pc, emit_ECX);
@@ -1745,7 +1740,7 @@ mod_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r)
     L1 = pc;
     emitm_jxs(pc, emitm_jnz, 0);
     emitm_pushl_i(pc, div_by_zero);
-    emitm_pushl_i(pc, E_ZeroDivisionError);
+    emitm_pushl_i(pc, EXCEPTION_DIV_BY_ZERO);
     emitm_pushl_i(pc, 0);    /* NULL */
     Parrot_jit_emit_get_INTERP(interp, pc, emit_ECX);
     emitm_pushl_r(pc, emit_ECX);
@@ -1937,9 +1932,9 @@ opt_div_rr(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int src, int is
         /* L2: */
         L2[1] = (char)(pc - L2 - 2);
     }
-    /* TODO real_exception */
+    /* TODO Parrot_ex_throw_from_c_args */
     emitm_pushl_i(pc, div_by_zero);
-    emitm_pushl_i(pc, E_ZeroDivisionError);
+    emitm_pushl_i(pc, EXCEPTION_DIV_BY_ZERO);
     emitm_pushl_i(pc, 0);    /* NULL */
     Parrot_jit_emit_get_INTERP(interp, pc, emit_ECX);
     emitm_pushl_r(pc, emit_ECX);
@@ -2230,7 +2225,7 @@ static void call_func(Parrot_jit_info_t *jit_info, void (*addr) (void))
 
 static void jit_emit_real_exception(Parrot_jit_info_t *jit_info)
 {
-    call_func(jit_info, (void (*) (void)) & real_exception);
+    call_func(jit_info, (void (*) (void)) & Parrot_ex_throw_from_c_args);
 }
 
 #if JIT_VTABLE_OPS
@@ -2538,9 +2533,9 @@ store:
                 break;
 
             default:
-                real_exception(interp, NULL, 1,
-                        "jit_vtable_n_op: unimp type %d, arg %d vtable %d",
-                        op_info->types[i - 1], i, nvtable);
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "jit_vtable_n_op: unimp type %d, arg %d vtable %d",
+                    op_info->types[i - 1], i, nvtable);
                 break;
         }
     }
@@ -2594,7 +2589,7 @@ Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
                     REG_OFFS_NUM(p1));
             break;
         default:
-            real_exception(interp, NULL, 1, "jit_vtable1r: ill LHS");
+            Parrot_ex_throw_from_c_args(interp, NULL, 1, "jit_vtable1r: ill LHS");
             break;
     }
 }
@@ -2754,11 +2749,14 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     PARROT_ASSERT(op_info->types[0] == PARROT_ARG_P);
     p1 = *(jit_info->cur_op + 1);
     i2 = *(jit_info->cur_op + 2);
-    if (i2 <= 0 || i2 >= interp->n_vtable_max) {
-        real_exception(interp, NULL, 1, "Illegal PMC enum (%d) in new", i2);
-    }
+
+    if (i2 <= 0 || i2 >= interp->n_vtable_max)
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            "Illegal PMC enum (%d) in new", i2);
+
     /* get interpreter */
     Parrot_jit_emit_get_INTERP(interp, jit_info->native_ptr, emit_ECX);
+
     /* push pmc enum and interpreter */
     emitm_pushl_i(jit_info->native_ptr, i2);
     emitm_pushl_r(jit_info->native_ptr, emit_ECX);
@@ -3042,7 +3040,8 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
             }
             break;
         default:
-            real_exception(interp, NULL, 1, "set_returns_jit - unknown typ");
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                "set_returns_jit - unknown typ");
             break;
     }
 }
@@ -3062,13 +3061,14 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
 
     reg_info = &jit_info->arch_info->regs[jit_info->code_type];
 
-    if (!recursive) {
-        /* create args array */
-        real_exception(interp, NULL, 1, "set_args_jit - can't do that yet ");
-    }
+    /* create args array */
+    if (!recursive)
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            "set_args_jit - can't do that yet ");
 
     constants = CONTEXT(interp)->constants;
-    sig_args = constants[CUR_OPCODE[1]]->u.key;
+    sig_args  = constants[CUR_OPCODE[1]]->u.key;
+
     if (!SIG_ELEMS(sig_args))
         return;
     params = jit_info->optimizer->sections->begin;
@@ -3148,7 +3148,8 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
                         &CONST(2 + i)->u.number);
                 break;
             default:
-                real_exception(interp, NULL, 1, "set_args_jit - unknown type");
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "set_args_jit - unknown type");
                 break;
         }
     }
@@ -3219,8 +3220,8 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info, PARROT_INTERP)
                     (long)fixup_ptr - 4;
                 break;
             default:
-                real_exception(interp, NULL, JIT_ERROR, "Unknown fixup type:%d\n",
-                    fixup->type);
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
+                    "Unknown fixup type:%d\n", fixup->type);
             break;
         }
         next = fixup->next;
@@ -3684,16 +3685,19 @@ count_regs(PARROT_INTERP, char *sig, char *sig_start)
     };
     int first_reg = 5;
     int i, found;
+
     /* char at sig is the type to look at */
-    for (found = -1, i = 0; i < 4; i++)
+    for (found = -1, i = 0; i < 4; i++) {
         if (strchr(typs[i], *sig)) {
             found = i;
             break;
         }
-    if (found == -1) {
-        real_exception(interp, NULL, 1,
-                "Parrot_jit_build_call_func: sig char not found\n");
     }
+
+    if (found == -1)
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            "Parrot_jit_build_call_func: sig char not found\n");
+
     for (--sig; sig > sig_start; --sig) {
         if (strchr(typs[found], *sig)) {
             ++first_reg;

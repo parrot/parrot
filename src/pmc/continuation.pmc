@@ -38,7 +38,7 @@ more information.
 
 
 /*
- * A Continuation (and RetContinuation, Exception_Handler) has in its
+ * A Continuation (and RetContinuation, ExceptionHandler) has in its
  * context a pointer to the register frame, which contains active objects.
  * Additionally ct->current_cont has the continuation of the caller.
  * To avoid deep recursion during marking of nested subroutines, we
@@ -86,9 +86,6 @@ Marks the continuation as live.
 
         if (cc->to_ctx)
             mark_context(INTERP, cc->to_ctx);
-
-        if (cc->dynamic_state)
-            mark_stack(INTERP, cc->dynamic_state);
     }
 
 /*
@@ -112,9 +109,6 @@ Destroys the continuation.
             }
 
 #endif
-            if (cc->dynamic_state)
-                cc->dynamic_state->refcount--;
-
             if (cc->from_ctx)
                 Parrot_free_context(interp, cc->from_ctx, 0);
 
@@ -139,11 +133,8 @@ Creates and returns a clone of the continuation.
 
         PObj_custom_mark_destroy_SETALL(ret);
         cc->runloop_id       = cc_self->runloop_id;
-        cc->dynamic_state    = cc_self->dynamic_state;
         PMC_struct_val(ret)  = cc;
         PMC_pmc_val(ret)     = PMC_pmc_val(SELF);
-
-        cc->dynamic_state->refcount++;
 
         return ret;
     }
@@ -168,8 +159,8 @@ Assign context.
 
 =item C<void set_pointer(void *value)>
 
-Sets the pointer to the return instruction.  Also captures the current
-dynamic state, and the descriptor address for any returned values.
+Sets the pointer to the return instruction.  Also captures the descriptor
+address for any returned values.
 
 =cut
 
@@ -179,14 +170,8 @@ dynamic state, and the descriptor address for any returned values.
         opcode_t    * const pos = (opcode_t *)value;
         Parrot_cont * const cc  = PMC_cont(SELF);
 
-        if (cc->dynamic_state)
-            cc->dynamic_state->refcount--;
-
         cc->address       = (opcode_t *)value;
-        cc->dynamic_state = INTERP->dynamic_env;
         cc->runloop_id    = INTERP->current_runloop_id;
-
-        cc->dynamic_state->refcount++;
 
         if (pos && (*pos == PARROT_OP_get_results_pc))
             cc->current_results = pos;
@@ -231,7 +216,7 @@ Returns whether the subroutine is defined.
 
 =item C<opcode_t *invoke(void *next)>
 
-Restores the "context" of the interpreter and returns the branch
+Restores the context of the interpreter and returns the branch
 destination to continue execution.
 
 =cut
@@ -240,12 +225,10 @@ destination to continue execution.
 
     VTABLE opcode_t *invoke(void *next) {
         Parrot_cont      *cc           = PMC_cont(SELF);
-        Stack_Chunk_t    *stack_target = cc->dynamic_state;
         parrot_context_t *from_ctx     = CONTEXT(interp);
         parrot_context_t *to_ctx       = cc->to_ctx;
         opcode_t         *pc           = cc->address;
 
-        Parrot_continuation_runloop_check(interp, SELF, cc);
         Parrot_continuation_check(interp, SELF, cc);
         Parrot_continuation_rewind_environment(interp, SELF, cc);
 

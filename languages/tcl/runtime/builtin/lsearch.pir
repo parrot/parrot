@@ -99,7 +99,7 @@ done:
   .return (result)
 
 bad_args:
-  tcl_error 'wrong # args: should be "lsearch ?options? list pattern"'
+  die 'wrong # args: should be "lsearch ?options? list pattern"'
 .end
 
 .sub 'anon' :anon :load

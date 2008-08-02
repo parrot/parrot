@@ -364,7 +364,7 @@ really a public API.
             }
         }
 
-        real_exception(INTERP, NULL, E_NameError,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
             "Invalid namespace key in set_pmc_keyed");
     }
 
@@ -404,7 +404,7 @@ really a public API.
             return ns;
         }
 
-        real_exception(INTERP, NULL, E_NameError,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
             "Invalid namespace key in get_pmc_keyed_str");
     }
 
@@ -490,7 +490,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
             return ns;
         }
 
-        real_exception(INTERP, NULL, E_NameError,
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
             "Invalid namespace key in get_pointer_keyed");
     }
 
@@ -536,7 +536,7 @@ an invalid type exception if C<namespace> is not a NameSpace PMC or subclass.
         STRING * const s_ns = CONST_STRING(INTERP, "NameSpace");
 
         if (!VTABLE_isa(INTERP, _namespace, s_ns))
-            real_exception(INTERP, NULL, E_TypeError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Invalid type %d in add_namespace()",
                 _namespace->vtable->base_type);
 
@@ -562,7 +562,7 @@ invalid type exception if C<sub> is not a Sub PMC or subclass.
 
         if (!VTABLE_isa(INTERP, sub, s_sub) &&
                 !VTABLE_isa(INTERP, sub, s_multisub))
-            real_exception(INTERP, NULL, E_TypeError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Invalid type %d in add_sub()", sub->vtable->base_type);
 
         VTABLE_set_pmc_keyed_str(INTERP, SELF, name, sub);
@@ -702,7 +702,7 @@ does not delete the PMC.
             RETURN(void);
 
         if (!VTABLE_isa(INTERP, ns, s_ns))
-            real_exception(INTERP, NULL, E_TypeError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Invalid type %d for '%Ss' in del_namespace()",
                 ns->vtable->base_type, name);
 
@@ -730,7 +730,7 @@ delete the PMC.
             RETURN(void);
 
         if (!VTABLE_isa(INTERP, sub, s_sub))
-            real_exception(INTERP, NULL, E_TypeError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Invalid type %d for '%Ss' in del_sub()",
                 sub->vtable->base_type, name);
 
@@ -804,12 +804,12 @@ NOTE: exporting 'default' set of items is not yet implemented.
         STRING * const s_array = CONST_STRING(interp, "array");
 
         if (PMC_IS_NULL(dest))
-            real_exception(interp, NULL, 0,
-                    "destination namespace not specified");
+            Parrot_ex_throw_from_c_args(interp, NULL, 0,
+                "destination namespace not specified");
 
         if (PMC_IS_NULL(what) || !VTABLE_elements(interp, what))
-            real_exception(interp, NULL, 0,
-                    "exporting default object set not yet implemented");
+            Parrot_ex_throw_from_c_args(interp, NULL, 0,
+                "exporting default object set not yet implemented");
 
         /* if "what" does "hash", we extract string key/value pairs,
          * lookup the object with the name specified in the key,
@@ -825,7 +825,7 @@ NOTE: exporting 'default' set of items is not yet implemented.
                 STRING * const src_name = VTABLE_shift_string(interp, iter);
 
                 if (STRING_IS_NULL(src_name) || STRING_IS_EMPTY(src_name))
-                    real_exception(interp, NULL, 0,
+                    Parrot_ex_throw_from_c_args(interp, NULL, 0,
                         "source object name not specified");
 
                 if (PMC_IS_NULL(VTABLE_get_pmc_keyed_str(interp, what, src_name))) {
@@ -840,7 +840,7 @@ NOTE: exporting 'default' set of items is not yet implemented.
                 object = VTABLE_get_pmc_keyed_str(interp, SELF, src_name);
 
                 if (PMC_IS_NULL(object))
-                    real_exception(interp, NULL, 0,
+                    Parrot_ex_throw_from_c_args(interp, NULL, 0,
                         "object '%Ss' not found in current namespace", src_name);
 
                 VTABLE_set_pmc_keyed_str(interp, dest, dest_name, object);
@@ -855,19 +855,20 @@ NOTE: exporting 'default' set of items is not yet implemented.
                 STRING * const name = VTABLE_get_string_keyed_int(interp, what, i);
 
                 if (STRING_IS_NULL(name) || STRING_IS_EMPTY(name))
-                    real_exception(interp, NULL, 0, "object name not specified");
+                    Parrot_ex_throw_from_c_args(interp, NULL, 0,
+                        "object name not specified");
 
                 object = VTABLE_get_pmc_keyed_str(interp, SELF, name);
 
                 if (PMC_IS_NULL(object))
-                    real_exception(interp, NULL, 0,
+                    Parrot_ex_throw_from_c_args(interp, NULL, 0,
                         "object '%Ss' not found in current namespace", name);
 
                 VTABLE_set_pmc_keyed_str(interp, dest, name, object);
             }
         }
         else
-            real_exception(interp, NULL, 0,
+            Parrot_ex_throw_from_c_args(interp, NULL, 0,
                 "can't handle argument of type %s", what->vtable->base_type);
     }
 

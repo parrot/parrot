@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2007, The Perl Foundation.
+Copyright (C) 2003-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -43,7 +43,7 @@ vtable_meth_not_found(PARROT_INTERP, PMC *pmc, const char *meth)
     else
         _class = pmc->vtable->whoami;
 
-    real_exception(interp, NULL, E_LookupError,
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_VTABLE_NOT_FOUND,
         "Can't find vtable method '%s' in class '%Ss'", meth, _class);
 }
 

@@ -197,7 +197,7 @@ shifted down.
         PMC *cont;
 
         if (!func)
-            real_exception(INTERP, NULL, INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "attempt to call NULL function");
 
         func(INTERP, SELF);
@@ -265,8 +265,8 @@ Return the arity of the NCI (the number of arugments).
         if (nci_info && nci_info->func)
             arity = nci_info->arity;
         else
-            real_exception(INTERP, NULL, INVALID_OPERATION,
-                    "You cannot get the arity of an undefined NCI.");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "You cannot get the arity of an undefined NCI.");
 
         RETURN(INTVAL arity);
     }

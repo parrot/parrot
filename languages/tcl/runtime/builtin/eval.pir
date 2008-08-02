@@ -21,7 +21,7 @@
   .return $P2()
 
 bad_args:
-  tcl_error 'wrong # args: should be "eval arg ?arg ...?"'
+  die 'wrong # args: should be "eval arg ?arg ...?"'
 .end
 
 # Local Variables:

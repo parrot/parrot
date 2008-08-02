@@ -47,7 +47,7 @@ while_loop_done:
   R = ''
   .return(R)
 bad_args:
-  tcl_error 'wrong # args: should be "while test command"'
+  die 'wrong # args: should be "while test command"'
 .end
 
 # Local Variables:

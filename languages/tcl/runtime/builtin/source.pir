@@ -31,10 +31,10 @@ badfile:
   $S0 = "couldn't read file \""
   $S0 .= filename
   $S0 .= '": no such file or directory'
-  tcl_error $S0
+  die $S0
 
 bad_args:
-  tcl_error 'wrong # args: should be "source fileName"'
+  die 'wrong # args: should be "source fileName"'
 .end
 
 # Local Variables:

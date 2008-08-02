@@ -688,12 +688,12 @@ PIRCODE
     # Emit unknown instruction code.
     $pir .= <<PIRCODE;
 INS_NOT_FOUND_ERROR:
-    ex = new Exception
-        err = "Attempt to translate unknown instruction (code "
+    ex = new 'Exception'
+        err    = "Attempt to translate unknown instruction (code "
         str_ic = cur_ic
-        err = concat str_ic
-        err = concat ")"
-    ex["_message"] = err
+        err    = concat str_ic
+        err    = concat ")"
+    ex = err
     throw ex
 
 PIRCODE

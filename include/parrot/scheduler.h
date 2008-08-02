@@ -24,9 +24,32 @@ void Parrot_cx_add_handler(PARROT_INTERP, ARGIN(PMC *handler))
         __attribute__nonnull__(2);
 
 PARROT_API
+void Parrot_cx_add_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
 void Parrot_cx_broadcast_message(PARROT_INTERP,
     ARGIN(STRING *messagetype),
     ARGIN_NULLOK(PMC *data))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
+INTVAL Parrot_cx_count_handlers_typed(PARROT_INTERP,
+    ARGIN(STRING *handler_type))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
+void Parrot_cx_delete_handler_local(PARROT_INTERP,
+    ARGIN(STRING *handler_type))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
+void Parrot_cx_delete_handler_typed(PARROT_INTERP,
+    ARGIN(STRING *handler_type))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -47,10 +70,21 @@ PMC * Parrot_cx_find_handler_for_task(PARROT_INTERP, ARGIN(PMC *task))
         __attribute__nonnull__(2);
 
 PARROT_API
+PARROT_CAN_RETURN_NULL
+PMC * Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
 void Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*scheduler);
+
+PARROT_API
+PARROT_CAN_RETURN_NULL
+PMC * Parrot_cx_peek_task(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_cx_request_suspend_for_gc(PARROT_INTERP)

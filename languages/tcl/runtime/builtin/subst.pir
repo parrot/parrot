@@ -115,13 +115,13 @@ done:
   .return (str)
 
 badargs:
-    tcl_error 'wrong # args: should be "subst ?-nobackslashes? ?-nocommands? ?-novariables? string"'
+    die 'wrong # args: should be "subst ?-nobackslashes? ?-nocommands? ?-novariables? string"'
 
 badswitch:
     $S0 = argv[0]
     $S0 = 'bad switch "' . $S0
     $S0 .= '": must be -nobackslashes, -nocommands, or -novariables'
-    tcl_error $S0
+    die $S0
 .end
 
 .sub 'anon' :anon :load

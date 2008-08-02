@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -288,10 +288,11 @@ trace_op_dump(PARROT_INTERP,
             *pc == PARROT_OP_get_params_pc ||
             *pc == PARROT_OP_set_returns_pc) {
         sig = interp->code->const_table->constants[pc[1]]->u.key;
-        if (!sig) {
-            real_exception(interp, NULL, 1,
-                    "NULL sig PMC detected in trace_op_dump");
-        }
+
+        if (!sig)
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                "NULL sig PMC detected in trace_op_dump");
+
         var_args = VTABLE_elements(interp, sig);
         n += var_args;
     }
@@ -306,10 +307,10 @@ trace_op_dump(PARROT_INTERP,
                 type = info->types[i - 1];
             }
             else {
-                if (!sig) {
-                    real_exception(interp, NULL, 1,
-                            "NULL sig PMC detected in trace_op_dump");
-                }
+                if (!sig)
+                    Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                        "NULL sig PMC detected in trace_op_dump");
+
                 type = SIG_ITEM(sig, i - 2) &
                     (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT);
             }
@@ -376,7 +377,8 @@ trace_op_dump(PARROT_INTERP,
                     more = 1;
                     break;
                 default:
-                    real_exception(interp, NULL, 1, "unhandled type in trace");
+                    Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                        "unhandled type in trace");
                     break;
             }
         }

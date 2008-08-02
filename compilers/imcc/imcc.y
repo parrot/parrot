@@ -281,7 +281,7 @@ mk_pmc_const(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *type),
 
     if (left->type == VTADDRESS) {      /* IDENTIFIER */
         if (IMCC_INFO(interp)->state->pasm_file) {
-            IMCC_fataly(interp, E_SyntaxError,
+            IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                         "Ident as PMC constant",
                         " %s\n", left->name);
         }
@@ -425,10 +425,10 @@ iINDEXSET(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *r0), ARGIN(SymReg
         IMCC_INFO(interp)->keyvec |= KEY_BIT(1);
         MK_I(interp, unit, "set %s[%s], %s", 3, r0, r1, r2);
     }
-    else {
-        IMCC_fataly(interp, E_SyntaxError,
+    else
+        IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
             "unsupported indexed set op\n");
-    }
+
     return NULL;
 }
 
@@ -492,7 +492,7 @@ IMCC_itcall_sub(PARROT_INTERP, ARGIN(SymReg *sub))
     IMCC_INFO(interp)->cur_call->pcc_sub->sub = sub;
     if (IMCC_INFO(interp)->cur_obj) {
         if (IMCC_INFO(interp)->cur_obj->set != 'P')
-            IMCC_fataly(interp, E_SyntaxError, "object isn't a PMC");
+            IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "object isn't a PMC");
         IMCC_INFO(interp)->cur_call->pcc_sub->object = IMCC_INFO(interp)->cur_obj;
         IMCC_INFO(interp)->cur_obj = NULL;
     }
@@ -510,7 +510,7 @@ begin_return_or_yield(PARROT_INTERP, int yield)
     char                name[128];
 
     if (!ins || !ins->symregs[0] || !(ins->symregs[0]->type & VT_PCC_SUB))
-        IMCC_fataly(interp, E_SyntaxError,
+        IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                     "yield or return directive outside pcc subroutine\n");
     if (yield)
        ins->symregs[0]->pcc_sub->calls_a_sub = 1 | ITPCCYIELD;
@@ -530,7 +530,7 @@ set_lexical(PARROT_INTERP, ARGMOD(SymReg *r), ARGIN(const char *name))
     r->usage |= U_LEXICAL;
 
     if (n == r->reg)
-        IMCC_fataly(interp, E_SyntaxError,
+        IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
             "register %s already declared as lexical %s", r->name, n->name);
 
     /* chain all names in r->reg */
@@ -589,7 +589,7 @@ static void
 adv_named_set(PARROT_INTERP, ARGIN(char *name))
 {
     if (IMCC_INFO(interp)->adv_named_id) {
-        IMCC_fataly(interp, E_SyntaxError,
+        IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                     "Named parameter with more than one name.\n");
     }
     IMCC_INFO(interp)->adv_named_id = name;
@@ -1483,7 +1483,8 @@ classname:
             * copied the string, so it's safe to use directly */
            if ((IMCC_INFO(interp)->cur_pmc_type = pmc_type(interp,
                string_from_cstring(interp, $1, 0))) <= 0) {
-               IMCC_fataly(interp, E_SyntaxError, "Unknown PMC type '%s'\n", $1);
+               IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+                    "Unknown PMC type '%s'\n", $1);
            }
          }
    ;
@@ -1644,7 +1645,7 @@ the_sub:
          {
            $$ = $1;
            if ($1->set != 'P')
-               IMCC_fataly(interp, E_SyntaxError, "Sub isn't a PMC");
+               IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "Sub isn't a PMC");
          }
    | target DOT sub_label_op   { IMCC_INFO(interp)->cur_obj = $1; $$ = $3; }
    | target DOT STRINGC
@@ -1961,7 +1962,7 @@ int yyerror(void *yyscanner, PARROT_INTERP, const char *s)
      * us. This means it may segfault. */
     const char * const chr = yyget_text((yyscan_t)yyscanner);
 
-    /* IMCC_fataly(interp, E_SyntaxError, s); */
+    /* IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, s); */
     /* --- This was called before, not sure if I should call some
            similar function that does not die like this one. */
 

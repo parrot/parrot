@@ -88,7 +88,8 @@ static void init_role_from_hash(PARROT_INTERP, PMC *self, PMC *info)
         if (!PMC_IS_NULL(_namespace))
             role->_namespace = _namespace;
         else
-            real_exception(interp, NULL, E_NameError, "Namespace not found");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
+                    "Namespace not found");
 
         /* Set a (string) name. */
         role->name = VTABLE_get_string_keyed_str(interp, info, name_str);
@@ -115,7 +116,8 @@ static void init_role_from_hash(PARROT_INTERP, PMC *self, PMC *info)
 
         /* If we get something null back it's an error; otherwise, store it. */
         if (PMC_IS_NULL(_namespace))
-            real_exception(interp, NULL, E_NameError, "Namespace not found");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
+                    "Namespace not found");
 
         role->_namespace = _namespace;
         /* Name is that of the most nested part of the namespace. */
@@ -324,7 +326,7 @@ Adds the given sub PMC as a method with the given name.
         /* If we have already added a method with this name... */
         if (VTABLE_exists_keyed_str(interp, role->methods, name)) {
             /* XXX Need to handle multi methods here. */
-            real_exception(interp, NULL, E_NotImplementedError,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Currently, adding multiple methods of the same name"
                 " is not supported.");
         }
@@ -406,7 +408,7 @@ composed into this role.
             found = role->roles;
         }
         else {
-            real_exception(interp, NULL, INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Unknown introspection value '%S'", what);
         }
 

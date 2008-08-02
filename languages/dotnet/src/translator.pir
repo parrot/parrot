@@ -341,8 +341,8 @@ PIR
     pir_output = concat internal_name
     pir_output = concat "\" goto INIT_OK\n"
     pir_output = concat <<"PIR"
-    $P1 = new .Exception
-    $P1["_message"] = "You can not instantiate an interface"
+    $P1 = new 'Exception'
+    $P1 = "You can not instantiate an interface"
     throw $P1
 INIT_OK:
 .end
@@ -363,8 +363,8 @@ PIR
     pir_output = concat internal_name
     pir_output = concat "\" goto INIT_OK\n"
     pir_output = concat <<"PIR"
-    $P1 = new .Exception
-    $P1["_message"] = "You can not instantiate an abstract class"
+    $P1 = new 'Exception'
+    $P1 = "You can not instantiate an abstract class"
     throw $P1
 INIT_OK:
 .end
@@ -412,8 +412,8 @@ MEND:
     pir_output = "    parent = get_class "
     if parent_type == 0 goto PARENT_DEF
     if parent_type == 1 goto PARENT_REF
-    ex = new .Exception
-    ex["_message"] = "Can not subclass a TypeSpec parent."
+    ex = new 'Exception'
+    ex = "Can not subclass a TypeSpec parent."
     throw ex
 
     # Parent may be a type in this file.
@@ -555,8 +555,8 @@ OBJ_TYPE:
     goto DONE_INIT
 
 VALUE_TYPE:
-    $P0 = new .Exception
-    $P0["_message"] = "Not doing nested value types yet!"
+    $P0 = new 'Exception'
+    $P0 = "Not doing nested value types yet!"
     throw $P0
     goto DONE_INIT
 

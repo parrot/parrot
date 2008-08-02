@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2007, The Perl Foundation.
+Copyright (C) 2004-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -95,20 +95,21 @@ internal_ns_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN_NULLOK(PMC *pmc_key)
         if (str_key)
             part = str_key;
         else if (n == max_intval) {
-            if (!pmc_key) {
-                real_exception(interp, NULL, 1,
-                        "Passing a NULL pmc_key into key_string()");
-            }
-            part = key_string(interp, pmc_key);
+            if (!pmc_key)
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "Passing a NULL pmc_key into key_string()");
+
+            part    = key_string(interp, pmc_key);
             pmc_key = key_next(interp, pmc_key);
-            if (! pmc_key)
+
+            if (!pmc_key)
                 n = i + 1;      /* now we know how big the key is */
         }
         else {
-            if (!pmc_key) {
-                real_exception(interp, NULL, 1,
-                        "Passed a NULL pmc_key into VTABLE_get_string_keyed_int");
-            }
+            if (!pmc_key)
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "Passed a NULL pmc_key into VTABLE_get_string_keyed_int");
+
             part = VTABLE_get_string_keyed_int(interp, pmc_key, i);
         }
 
@@ -621,8 +622,8 @@ Parrot_find_global_op(PARROT_INTERP, ARGIN(PMC *ns),
     PMC *res;
 
     if (!globalname)
-        real_exception(interp, next, E_NameError,
-                       "Tried to get null global");
+        Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_GLOBAL_NOT_FOUND,
+            "Tried to get null global");
 
     res = Parrot_find_global_n(interp, ns, globalname);
     if (!res)

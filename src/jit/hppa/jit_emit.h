@@ -663,7 +663,7 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info, PARROT_INTERP)
                 jit_emit_nop(fixup_ptr);
                 break;
             default:
-                internal_exception(JIT_ERROR, "Unknown fixup type:%d\n",
+                exit_fatal(EXCEPTION_JIT_ERROR, "Unknown fixup type:%d\n",
                                    fixup->type);
                 break;
         }

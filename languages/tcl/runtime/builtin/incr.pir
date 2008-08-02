@@ -39,7 +39,7 @@ a_varName += a_increment
 R = clone a_varName
   .return(R)
 bad_args:
-  tcl_error 'wrong # args: should be "incr varName ?increment?"'
+  die 'wrong # args: should be "incr varName ?increment?"'
 .end
 
 # Local Variables:

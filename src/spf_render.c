@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -831,9 +831,9 @@ Parrot_sprintf_format(PARROT_INTERP,
                                  * no?  */
                             }
                             else {
-                                real_exception(interp, NULL, INVALID_CHARACTER,
-                                                   "'%c' is not a valid "
-                                                   "sprintf format", ch);
+                                Parrot_ex_throw_from_c_args(interp, NULL,
+                                    EXCEPTION_INVALID_CHARACTER,
+                                    "'%c' is not a valid sprintf format", ch);
                             }
                         }
 

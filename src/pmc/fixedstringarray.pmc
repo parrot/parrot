@@ -255,7 +255,7 @@ Returns the Parrot string value of the element at index C<key>.
         STRING **data;
 
         if (key < 0 || key >= PMC_int_val(SELF))
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "FixedStringArray: index out of bounds!");
 
         data = (STRING **)PMC_data(SELF);
@@ -325,8 +325,8 @@ cause an exception to be thrown.
 
     VTABLE void set_integer_native(INTVAL size) {
         if (PMC_int_val(SELF) || size < 1)
-            real_exception(INTERP, NULL, E_IndexError,
-                    "FixedStringArray: Can't resize!");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "FixedStringArray: Can't resize!");
 
         PMC_int_val(SELF) = size;
         PMC_data(SELF)    = mem_sys_allocate_zeroed(size * sizeof (STRING*));
@@ -418,7 +418,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
         STRING **data;
 
         if (key < 0 || key >= PMC_int_val(SELF))
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "FixedStringArray: index out of bounds!");
 
         data      = (STRING **)PMC_data(SELF);

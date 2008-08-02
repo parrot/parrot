@@ -32,7 +32,7 @@ bad_subcommand:
   .return ('') # once all commands are implemented, remove this...
 
  bad_args:
-  tcl_error 'wrong # args: should be "info subcommand ?argument ...?"'
+  die 'wrong # args: should be "info subcommand ?argument ...?"'
 .end
 
 .HLL '_Tcl', ''
@@ -73,10 +73,10 @@ no_args:
   $S0 = '"'
   $S0 .= procname
   $S0 .= "\" isn't a procedure"
-  tcl_error $S0
+  die $S0
 
 bad_args:
-  tcl_error 'wrong # args: should be "info args procname"'
+  die 'wrong # args: should be "info args procname"'
 .end
 
 .sub 'body'
@@ -109,10 +109,10 @@ no_body:
   $S0 = '"'
   $S0 .= procname
   $S0 .= "\" isn't a procedure"
-  tcl_error $S0
+  die $S0
 
 bad_args:
-  tcl_error 'wrong # args: should be "info body procname"'
+  die 'wrong # args: should be "info body procname"'
 .end
 
 .sub 'complete'
@@ -139,7 +139,7 @@ fail:
   .return(0)
 
 bad_args:
-  tcl_error 'wrong # args: should be "info complete command"'
+  die 'wrong # args: should be "info complete command"'
 .end
 
 .sub 'default'
@@ -201,7 +201,7 @@ not_argument:
   $S0 .= "\" doesn't have an argument \""
   $S0 .= argname
   $S0 .= '"'
-  tcl_error $S0
+  die $S0
 
 no_default:
   push_eh error_on_set
@@ -213,17 +213,17 @@ error_on_set:
   $S0 = "couldn't store default value in variable \""
   $S0 .= varname
   $S0 .= '"'
-  tcl_error $S0
+  die $S0
 
 not_proc:
   $S0 = '"'
   $S0 .= procname
   $S0 .= "\" isn't a procedure"
-  tcl_error $S0
+  die $S0
 
 
 bad_args:
-  tcl_error 'wrong # args: should be "info default procname arg varname"'
+  die 'wrong # args: should be "info default procname arg varname"'
 .end
 
 
@@ -264,7 +264,7 @@ end:
   .return(retval)
 
 bad_args:
-  tcl_error 'wrong # args: should be "info functions ?pattern?"'
+  die 'wrong # args: should be "info functions ?pattern?"'
 .end
 
 .sub 'commands'
@@ -315,7 +315,7 @@ bad_args:
     .return(result)
 
   bad_args:
-    tcl_error 'wrong # args: should be "info commands ?pattern?"'
+    die 'wrong # args: should be "info commands ?pattern?"'
 
 .end
 
@@ -340,7 +340,7 @@ not_found:
   .return (0)
 
 bad_args:
-  tcl_error 'wrong # args: should be "info exists varName"'
+  die 'wrong # args: should be "info exists varName"'
 .end
 
 .sub 'tclversion'
@@ -355,7 +355,7 @@ bad_args:
   .return($P1)
 
 bad_args:
-  tcl_error 'wrong # args: should be "info tclversion"'
+  die 'wrong # args: should be "info tclversion"'
 
 .end
 
@@ -371,7 +371,7 @@ bad_args:
   .return($P1)
 
 bad_args:
-  tcl_error 'wrong # args: should be "info patchlevel"'
+  die 'wrong # args: should be "info patchlevel"'
 
 .end
 
@@ -387,7 +387,7 @@ bad_args:
   .return($P1)
 
 bad_args:
-  tcl_error 'wrong # args: should be "info library"'
+  die 'wrong # args: should be "info library"'
 
 .end
 
@@ -423,7 +423,7 @@ end:
   .return(retval)
 
 bad_args:
-  tcl_error 'wrong # args: should be "info vars ?pattern?"'
+  die 'wrong # args: should be "info vars ?pattern?"'
 
 get_globals:
   .return 'globals'(argv)
@@ -438,7 +438,7 @@ get_globals:
   if argc == 0 goto current_level
   if argc == 1 goto find_level
 
-  tcl_error 'wrong # args: should be "info level ?number?"'
+  die 'wrong # args: should be "info level ?number?"'
 
 current_level:
   .local pmc call_chain
@@ -502,7 +502,7 @@ end:
   .return(retval)
 
 bad_args:
-  tcl_error 'wrong # args: should be "info globals ?pattern?"'
+  die 'wrong # args: should be "info globals ?pattern?"'
 .end
 
 # RT#40739: stub
@@ -527,7 +527,7 @@ bad_args:
   $P1 = get_root_global ['_tcl'], 'nameofexecutable'
   .return($P1)
 bad_args:
-  tcl_error 'wrong # args: should be "info nameofexecutable"'
+  die 'wrong # args: should be "info nameofexecutable"'
 .end
 
 # RT#40742: stub

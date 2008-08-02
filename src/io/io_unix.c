@@ -400,7 +400,8 @@ PIO_unix_async(PARROT_INTERP, ARGMOD(ParrotIOLayer *layer), ARGMOD(ParrotIO *io)
         return fcntl(io->fd, F_SETFL, rflags);
     }
 #    else
-    real_exception(interp, NULL, PIO_NOT_IMPLEMENTED, "Async support not available");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_NOT_IMPLEMENTED,
+        "Async support not available");
 #    endif
     return -1;
 }
@@ -1185,7 +1186,8 @@ PIO_unix_pipe(PARROT_INTERP, SHIM(ParrotIOLayer *l), ARGIN(const char *cmd), int
     UNUSED(l);
     UNUSED(cmd);
     UNUSED(flags);
-    real_exception(interp, NULL, UNIMPLEMENTED, "pipe() unimplemented");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        "pipe() unimplemented");
 #  endif
     return NULL;
 }

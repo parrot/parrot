@@ -100,7 +100,7 @@ the C<_keyed> forms to throw an exception.
 
 =item Todo
 
-Need discussion on whether C<OUT_OF_BOUNDS> is a good exception for this, or
+Need discussion on whether C<EXCEPTION_OUT_OF_BOUNDS> is a good exception for this, or
 whether something else should be used. It's really a compiler screw-up, since
 code which indexes a non-aggregate shouldn't be generated.
 

@@ -191,8 +191,8 @@ inline op branch_cs(in STR) :base_loop :check_event :flow {
 
     if (!fe) {
         string_cstring_free(label);
-        real_exception(interp, NULL, 1, "branch_cs: fixup for '%Ss' not found",
-            $1);
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            "branch_cs: fixup for '%Ss' not found", $1);
     }
     else {
         interp->resume_offset = fe->offset;
@@ -229,6 +229,57 @@ inline op ret() :flow {
     goto POP();
 }
 
+########################################
+
+=item B<local_branch>(invar PMC, in LABEL)
+
+Go to the location specified by the label in $2. Push the current location onto
+the stack passed in $1 for later returning.
+
+=cut
+
+inline op local_branch(invar PMC, in LABEL) :base_core :check_event :flow {
+    INTVAL return_addr;
+    opcode_t *dest = expr NEXT();
+
+    if (PMC_IS_NULL($1) || $1->vtable->base_type != enum_class_ResizableIntegerArray)
+        Parrot_ex_throw_from_c_args(interp, dest, EXCEPTION_INVALID_OPERATION,
+            "Must pass a valid integer array to 'local_branch'");
+
+    return_addr = PTR2INTVAL(dest);
+    VTABLE_push_integer(interp, $1, return_addr);
+
+    goto OFFSET($2);
+}
+
+=item B<local_return>()
+
+Pop the location off the top of the call stack and go there.
+
+=cut
+
+inline op local_return(invar PMC) :flow {
+    INTVAL return_addr;
+    opcode_t *next;
+    opcode_t *dest = expr NEXT();
+
+    if (PMC_IS_NULL($1) || $1->vtable->base_type != enum_class_ResizableIntegerArray)
+        Parrot_ex_throw_from_c_args(interp, dest, EXCEPTION_INVALID_OPERATION,
+            "Must pass a valid integer array to 'local_return'");
+
+    return_addr = VTABLE_pop_integer(interp, $1);
+    next = INTVAL2PTR(opcode_t *, return_addr);
+
+    /* The return address must be within the current code segment. */
+    if (! ( next >= interp->code->base.data
+            && next < (interp->code->base.data + interp->code->base.size)) )
+        Parrot_ex_throw_from_c_args(interp, dest, EXCEPTION_INVALID_OPERATION,
+            "Address for 'local_return' must be within the current code segment");
+
+    goto ADDRESS(next);
+}
+
+
 
 ########################################
 
@@ -246,7 +297,6 @@ inline op jsr(in LABEL) :base_core :check_event :flow {
     loc = INTVAL2PTR(opcode_t *, $1);
     goto ADDRESS(loc);
 }
-
 
 ########################################
 
@@ -558,9 +608,9 @@ op set_returns(inconst PMC) :flow {
         /* else it's from runops_fromc */
         parrot_context_t * const caller_ctx = PMC_cont(ccont)->to_ctx;
         if (! caller_ctx) {
-            /* there is no point calling real_exception here, because
+            /* there is no point calling Parrot_ex_throw_from_c_args here, because
                PDB_backtrace can't deal with a missing to_ctx either. */
-            internal_exception(1, "No caller_ctx for continuation %p.", ccont);
+            exit_fatal(1, "No caller_ctx for continuation %p.", ccont);
         }
 
         src_indexes = interp->current_returns;
@@ -702,14 +752,9 @@ Pop the most recently placed exception off the handler stack.
 
 =item B<throw>(invar PMC)
 
-Throw the exception in $1.
+Throw the exception in $1 with current continuation.
 
-=item B<throwcc>(invar PMC)
-
-Throw the exception in $1 with current continuation. Identical to
-B<throw> in its one-argument form.
-
-=item B<throwcc>(invar PMC, invar PMC)
+=item B<throw>(invar PMC, invar PMC)
 
 Throw the exception in $1 with continuation from $2.
 
@@ -720,15 +765,6 @@ Only valid inside an exception handler. Rethrow the exception $1.
 =item B<count_eh>(out INT)
 
 Get a count of currently active exception handlers on the stack.
-
-=item B<get_eh>(out PMC, in INT)
-
-Return the exception handler at I<index>. The index is an offset from the top
-of the stack, with '0' being the top.
-
-=item B<get_all_eh>(out PMC)
-
-Return an array of all current exception handlers.
 
 =item B<die>(in STR)
 =item B<die>(in PMC)
@@ -764,70 +800,76 @@ return; C<1> means an exception has been raised.
 =cut
 
 inline op push_eh(inconst LABEL) {
-    PMC * const eh = pmc_new(interp, enum_class_Exception_Handler);
+    PMC * const eh = pmc_new(interp, enum_class_ExceptionHandler);
     VTABLE_set_pointer(interp, eh, CUR_OPCODE + $1);
-    push_exception(interp, eh);
+    Parrot_cx_add_handler_local(interp, eh);
 }
 
 inline op push_eh(invar PMC) {
-    push_exception(interp, $1);
+    Parrot_cx_add_handler_local(interp, $1);
 }
 
 inline op pop_eh() {
-    pop_exception(interp);
+    Parrot_cx_delete_handler_local(interp,
+            string_from_cstring(interp, "exception", 9));
 }
 
 inline op throw(invar PMC) :flow {
-    opcode_t * const ret = expr NEXT();
-    opcode_t * const dest = (opcode_t *)throw_exception(interp, $1, ret);
+    opcode_t * const ret  = expr NEXT();
+    opcode_t * const dest = Parrot_ex_throw_from_op(interp, $1, ret);
     goto ADDRESS(dest);
 }
 
-inline op throwcc(invar PMC) :flow {
-    opcode_t * const ret = expr NEXT();
-    opcode_t * const dest = (opcode_t *)throw_exception(interp, $1, ret);
-    goto ADDRESS(dest);
-}
-
-inline op throwcc(invar PMC, invar PMC) :flow {
-    opcode_t * const dest = (opcode_t *)throw_exception(interp, $1, $2);
+inline op throw(invar PMC, invar PMC) :flow {
+    opcode_t * const dest = Parrot_ex_throw_from_op(interp, $1, $2);
     goto ADDRESS(dest);
 }
 
 inline op rethrow(invar PMC) :flow {
-    opcode_t * const dest = (opcode_t *)rethrow_exception(interp, $1);
+    opcode_t * const dest = Parrot_ex_rethrow_from_op(interp, $1);
     goto ADDRESS(dest);
 }
 
 inline op count_eh(out INT) {
-    $1 = count_exception_handlers(interp);
+    $1 = Parrot_cx_count_handlers_typed(interp,
+            string_from_cstring(interp, "exception", 9));
 }
-
-inline op get_eh(out PMC, in INT) {
-    $1 = get_exception_handler(interp, $2);
-}
-
-inline op get_all_eh(out PMC) {
-    $1 = get_all_exception_handlers(interp);
-}
-
 
 inline op die(in STR) :flow {
-    do_str_exception(interp, $1);
+    PMC *exception = Parrot_ex_build_exception(interp, EXCEPT_error,
+            CONTROL_ERROR, $1);
+    opcode_t * const ret  = expr NEXT();
+    opcode_t * const dest = Parrot_ex_throw_from_op(interp, exception, ret);
+    goto ADDRESS(dest);
 }
 
 inline op die(in PMC) :flow {
-    do_pmc_exception(interp, $1);
+    opcode_t * const ret = expr NEXT();
+    STRING          *msg = PMC_IS_NULL($1)
+                         ? NULL : VTABLE_get_string(interp, $1);
+    PMC            *exception =
+        Parrot_ex_build_exception(interp, EXCEPT_error, CONTROL_ERROR, msg);
+    opcode_t       *dest = Parrot_ex_throw_from_op(interp, exception, ret);
+    goto ADDRESS(dest);
 }
 
 inline op die(in INT, in INT) :flow {
     if ($1 == EXCEPT_doomed)
         _exit($2);
-    do_exception(interp, $1, $2);
+    else {
+        PMC *exception        = Parrot_ex_build_exception(interp, $1, $2, NULL);
+        opcode_t * const ret  = expr NEXT();
+        opcode_t * const dest = Parrot_ex_throw_from_op(interp, exception, ret);
+        goto ADDRESS(dest);
+    }
 }
 
 inline op exit(in INT) :flow {
-    do_exception(interp, EXCEPT_exit, $1);
+    PMC      *exception   =
+        Parrot_ex_build_exception(interp, EXCEPT_exit, $1, NULL);
+    opcode_t * const ret  = expr NEXT();
+    opcode_t * const dest = Parrot_ex_throw_from_op(interp, exception, ret);
+    goto ADDRESS(dest);
 }
 
 inline op pushmark(in INT) {

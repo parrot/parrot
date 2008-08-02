@@ -150,20 +150,20 @@ static int _load_header(Interp *interp)
     UINTVAL CodeSize;
 
     VersionNumber = _get_uint8();
-    if (VersionNumber != 0x01) {
-        real_exception(interp, NULL, ILL_INHERIT,
+
+    if (VersionNumber != 0x01)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ILL_INHERIT,
             "incorrect version");
-        return -1;
-    }
+
     VTABLE_set_integer_keyed_str(interp, script,
         const_string(interp, "VersionNumber"), VersionNumber);
 
     CodeSize = _get_mb32();
-    if (CodeSize != _info_get()) {
-        real_exception(interp, NULL, ILL_INHERIT,
+
+    if (CodeSize != _info_get())
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ILL_INHERIT,
             "incorrect code size");
-        return -1;
-    }
+
     VTABLE_set_integer_keyed_str(interp, script,
         const_string(interp, "CodeSize"), CodeSize);
 
@@ -257,9 +257,8 @@ static int _load_constant_pool(Interp *interp)
             break;
         }
         default:
-            real_exception(interp, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ILL_INHERIT,
                 "invalid ConstantType (%u).", ConstantType);
-            return -1;
         }
         VTABLE_set_pmc_keyed_int(interp, Constants, idx, Constant);
     }
@@ -330,9 +329,8 @@ static int _load_pragma_pool(Interp *interp)
             break;
         }
         default:
-            real_exception(interp, NULL, ILL_INHERIT,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ILL_INHERIT,
                 "invalid PragmaType (%u).", PragmaType);
-            return -1;
         }
         VTABLE_set_pmc_keyed_int(interp, Pragmas, idx, Pragma);
     }
@@ -402,11 +400,9 @@ static int _load_function_pool(Interp *interp)
         VTABLE_set_pmc_keyed_int(interp, Functions, idx, Function);
     }
 
-    if (_info_get() != 0) {
-        real_exception(interp, NULL, ILL_INHERIT,
+    if (_info_get() != 0)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ILL_INHERIT,
             "incorrect size");
-        return -1;
-    }
 
     return 0;
 }

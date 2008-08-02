@@ -245,7 +245,7 @@ ERR:
     print $I0
     print ")!\n"
     $P0 = new 'Exception'
-    $P0["_message"] = "out of bounds!"
+    $P0 = "out of bounds!"
     throw $P0
 .end
 
@@ -270,7 +270,7 @@ ERR:
     print $I0
     print ")!\n"
     $P0 = new 'Exception'
-    $P0["_message"] = "out of bounds!"
+    $P0 = "out of bounds!"
     throw $P0
 .end
 

@@ -48,7 +48,7 @@ done:
   .return (result)
 
 odd_args:
-  tcl_error 'missing value to go with key'
+  die 'missing value to go with key'
 .end
 
 .sub stringToDict

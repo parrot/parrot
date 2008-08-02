@@ -41,7 +41,8 @@ pmclass TclInt
         INTVAL d = PMC_int_val(value);
 
         if (d == 0)
-            real_exception(INTERP, NULL, E_ZeroDivisionError, "divide by zero");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+                "divide by zero");
 
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
@@ -53,8 +54,8 @@ pmclass TclInt
         FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (d == 0.0)
-            real_exception(INTERP, NULL, E_ZeroDivisionError,
-                           "float division by zero");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+                "float division by zero");
 
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);

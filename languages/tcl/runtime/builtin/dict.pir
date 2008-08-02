@@ -33,7 +33,8 @@ bad_args:
   .return ('') # once all commands are implemented, remove this...
 
 no_args:
-  tcl_error 'wrong # args: should be "dict subcommand ?argument ...?"'
+  die 'wrong # args: should be "dict subcommand ?argument ...?"'
+
 .end
 
 .HLL '_Tcl', ''
@@ -101,10 +102,10 @@ cant_dict_array:
   $S1 = dict_name
   $S1 = "can't set \"" . $S1
   $S1 .= '": variable is array'
-  tcl_error $S1
+  die $S1
 
 bad_args:
-  tcl_error 'wrong # args: should be "dict append varName key ?value ...?"'
+  die 'wrong # args: should be "dict append varName key ?value ...?"'
 .end
 
 
@@ -132,7 +133,7 @@ loop_done:
   .return (retval)
 
 bad_args:
-  tcl_error 'wrong # args: should be "dict create ?key value ...?"'
+  die 'wrong # args: should be "dict create ?key value ...?"'
 
 .end
 
@@ -163,7 +164,7 @@ not_exist:
   .return (0)
 
 bad_args:
-  tcl_error 'wrong # args: should be "dict exists dictionary key ?key ...?"'
+  die 'wrong # args: should be "dict exists dictionary key ?key ...?"'
 
 .end
 
@@ -277,19 +278,19 @@ body_handler:
   .rethrow()
 
 bad_script_args:
-  tcl_error 'wrong # args: should be "dict filter dictionary script {keyVar valueVar} filterScript"'
+  die 'wrong # args: should be "dict filter dictionary script {keyVar valueVar} filterScript"'
 
 bad_list_size:
-  tcl_error 'must have exactly two variable names'
+  die 'must have exactly two variable names'
 
 missing_glob:
   $S1 = option
   $S1 = 'wrong # args: should be "dict filter dictionary ' . $S1
   $S1 .= ' globPattern"'
-  tcl_error $S1
+  die $S1
 
 bad_args:
-  tcl_error 'wrong # args: should be "dict filter dictionary filterType ..."'
+  die 'wrong # args: should be "dict filter dictionary filterType ..."'
 .end
 
 .sub 'for'
@@ -349,10 +350,10 @@ for_loop_done:
   .return('')
 
 bad_list_size:
-  tcl_error 'must have exactly two variable names'
+  die 'must have exactly two variable names'
 
 bad_args:
-  tcl_error 'wrong # args: should be "dict for {keyVar valueVar} dictionary script"'
+  die 'wrong # args: should be "dict for {keyVar valueVar} dictionary script"'
 
 .end
 
@@ -390,10 +391,10 @@ not_exist:
   $S1 = key
   $S1 = 'key "' . $S1
   $S1 .= '" not known in dictionary'
-  tcl_error $S1
+  die $S1
 
 bad_args:
-  tcl_error 'wrong # args: should be "dict get dictionary ?key key ...?"'
+  die 'wrong # args: should be "dict get dictionary ?key key ...?"'
 .end
 
 .sub 'incr'
@@ -459,10 +460,10 @@ cant_dict_array:
   $S1 = dict_name
   $S1 = "can't set \"" . $S1
   $S1 .= '": variable is array'
-  tcl_error $S1
+  die $S1
 
 bad_args:
-  tcl_error 'wrong # args: should be "dict incr varName key ?increment?"'
+  die 'wrong # args: should be "dict incr varName key ?increment?"'
 .end
 
 
@@ -483,7 +484,7 @@ bad_args:
   .return (dictionary)
 
 bad_args:
-  tcl_error 'wrong # args: should be "dict info dictionary"'
+  die 'wrong # args: should be "dict info dictionary"'
 
 .end
 
@@ -543,10 +544,10 @@ cant_dict_array:
   $S1 = dict_name
   $S1 = "can't set \"" . $S1
   $S1 .= '": variable is array'
-  tcl_error $S1
+  die $S1
 
 bad_args:
-  tcl_error 'wrong # args: should be "dict lappend varName key ?value ...?"'
+  die 'wrong # args: should be "dict lappend varName key ?value ...?"'
 .end
 
 .sub 'keys'
@@ -590,7 +591,7 @@ loop_done:
   .return (results)
 
 bad_args:
-  tcl_error 'wrong # args: should be "dict keys dictionary ?pattern?"'
+  die 'wrong # args: should be "dict keys dictionary ?pattern?"'
 .end
 
 
@@ -654,7 +655,7 @@ loop_done:
   .return (dictionary)
 
 bad_args:
-  tcl_error 'wrong # args: should be "dict remove dictionary ?key ...?"'
+  die 'wrong # args: should be "dict remove dictionary ?key ...?"'
 .end
 
 
@@ -688,10 +689,10 @@ loop_done:
   .return (dictionary)
 
 odd_args:
-  tcl_error 'missing value to go with key'
+  die 'missing value to go with key'
 
 bad_args:
-  tcl_error 'wrong # args: should be "dict replace dictionary ?key value ...?"'
+  die 'wrong # args: should be "dict replace dictionary ?key value ...?"'
 .end
 
 .sub 'set'
@@ -750,10 +751,10 @@ cant_dict_array:
   $S1 = dict_name
   $S1 = "can't set \"" . $S1
   $S1 .= '": variable is array'
-  tcl_error $S1
+  die $S1
 
 bad_args:
-  tcl_error 'wrong # args: should be "dict set varName key ?key ...? value"'
+  die 'wrong # args: should be "dict set varName key ?key ...? value"'
 .end
 
 .sub 'size'
@@ -772,7 +773,7 @@ bad_args:
   .return (size)
 
 bad_args:
-  tcl_error 'wrong # args: should be "dict size dictionary"'
+  die 'wrong # args: should be "dict size dictionary"'
 
 .end
 
@@ -823,16 +824,16 @@ not_exist:
   $S1 = key
   $S1 = 'key "' . $S1
   $S1 .= '" not known in dictionary'
-  tcl_error $S1
+  die $S1
 
 cant_dict_array:
   $S1 = dict_name
   $S1 = "can't set \"" . $S1
   $S1 .= '": variable is array'
-  tcl_error $S1
+  die $S1
 
 bad_args:
-  tcl_error 'wrong # args: should be "dict unset varName key ?key ...?"'
+  die 'wrong # args: should be "dict unset varName key ?key ...?"'
 .end
 
 .sub 'update'
@@ -906,10 +907,10 @@ cant_dict_array:
   $S1 = dict_name
   $S1 = "can't set \"" . $S1
   $S1 .= '": variable is array'
-  tcl_error $S1
+  die $S1
 
 bad_args:
-  tcl_error 'wrong # args: should be "dict update varName key varName ?key varName ...? script"'
+  die 'wrong # args: should be "dict update varName key varName ?key varName ...? script"'
 
 .end
 
@@ -956,7 +957,7 @@ loop_done:
   .return (results)
 
 bad_args:
-  tcl_error 'wrong # args: should be "dict values dictionary ?pattern?"'
+  die 'wrong # args: should be "dict values dictionary ?pattern?"'
 .end
 
 .sub 'with'
@@ -1026,10 +1027,10 @@ cant_dict_array:
   $S1 = dict_name
   $S1 = "can't set \"" . $S1
   $S1 .= '": variable is array'
-  tcl_error $S1
+  die $S1
 
 bad_args:
-  tcl_error 'wrong # args: should be "dict with dictVar ?key ...? script"'
+  die 'wrong # args: should be "dict with dictVar ?key ...? script"'
 .end
 
 .sub 'anon' :anon :load

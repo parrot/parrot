@@ -11,7 +11,7 @@
     .return('')
 
 badargs:
-    tcl_error 'wrong # args: should be "vwait name"'
+    die 'wrong # args: should be "vwait name"'
 .end
 
 # Local Variables:

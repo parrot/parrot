@@ -103,7 +103,7 @@
 ## throw an error that the sub isn't yet implemented
 .sub '_E_not_yet_implemented'
     new $P0, 'Exception'
-    $P0['_message']= 'not yet implemented'
+    $P0 = 'not yet implemented'
     throw $P0
 .end
 

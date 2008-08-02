@@ -55,13 +55,13 @@ bad_index:
   $S0 = "can't read \""
   $S0 .= name
   $S0 .= '": no such element in array'
-  tcl_error $S0
+  die $S0
 
 cant_read_not_array:
   $S0 =  "can't read \""
   $S0 .= name
   $S0 .= "\": variable isn't array"
-  tcl_error $S0
+  die $S0
 
 scalar:
   variable = findVar(name)
@@ -75,13 +75,13 @@ cant_read_array:
   $S0 = "can't read \""
   $S0 .= name
   $S0 .= '": variable is array'
-  tcl_error $S0
+  die $S0
 
 no_such_variable:
   $S0 = "can't read \""
   $S0 .= name
   $S0 .= '": no such variable'
-  tcl_error $S0
+  die $S0
 .end
 
 =head2 _Tcl::makeVar
@@ -146,7 +146,7 @@ cant_read_not_array:
   $S0 =  "can't read \""
   $S0 .= name
   $S0 .= "\": variable isn't array"
-  tcl_error $S0
+  die $S0
 
 scalar:
   variable = findVar(name, 'depth' => depth)
@@ -233,7 +233,7 @@ cant_set_not_array:
   $S0 =  "can't set \""
   $S0 .= name
   $S0 .= "\": variable isn't array"
-  tcl_error $S0
+  die $S0
 
 scalar:
   $P0 = findVar(name)
@@ -250,7 +250,7 @@ cant_set_array:
   $S0 =  "can't set \""
   $S0 .= name
   $S0 .= "\": variable is array"
-  tcl_error $S0
+  die $S0
 .end
 
 =head2 _Tcl::findVar

@@ -94,7 +94,7 @@ typedef enum {
     BN_F_LOST_DIGITS = 1,
     BN_F_DIVISION_BY_ZERO = 2,
     BN_F_INEXACT = 4,
-    BN_F_INVALID_OPERATION = 8,
+    BN_F_EXCEPTION_INVALID_OPERATION = 8,
     BN_F_OVERFLOW = 16,
     BN_F_ROUNDED = 32,
     BN_F_UNDERFLOW = 64
@@ -132,7 +132,7 @@ typedef enum {
     /* not enough space to hold intermediate results */
     BN_INVALID_CONTEXT,
     /* context given was not valid (unknown round) */
-    BN_INVALID_OPERATION,
+    BN_EXCEPTION_INVALID_OPERATION,
     /* operation which is not valid */
     BN_LOST_DIGITS,
     /* digits lost in rounding  */

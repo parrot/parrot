@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2007, The Perl Foundation.
+Copyright (C) 2004-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -114,7 +114,7 @@ static UINTVAL validate(SHIM_INTERP, SHIM(STRING *source_string));
 #endif
 
 #define EXCEPTION(err, str) \
-    real_exception(interp, NULL, (err), (str))
+    Parrot_ex_throw_from_c_args(interp, NULL, (err), (str))
 
 /*
 
@@ -153,7 +153,9 @@ to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
 
     if (conversion_func)
          return conversion_func(interp, src, dest);
-    real_exception(interp, NULL, UNIMPLEMENTED, "to_charset for binary not implemented");
+
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        "to_charset for binary not implemented");
 }
 
 /*
@@ -171,7 +173,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING*
 compose(PARROT_INTERP, SHIM(STRING *source_string))
 {
-    EXCEPTION(INVALID_CHARTYPE, "Can't compose binary data");
+    EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't compose binary data");
 }
 
 /*
@@ -189,7 +191,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING*
 decompose(PARROT_INTERP, SHIM(STRING *source_string))
 {
-    EXCEPTION(INVALID_CHARTYPE, "Can't decompose binary data");
+    EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't decompose binary data");
 }
 
 /*
@@ -205,7 +207,7 @@ RT#48260: Not yet documented!!!
 static void
 upcase(PARROT_INTERP, SHIM(STRING *source_string))
 {
-    EXCEPTION(INVALID_CHARTYPE, "Can't upcase binary data");
+    EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't upcase binary data");
 }
 
 /*
@@ -221,7 +223,7 @@ RT#48260: Not yet documented!!!
 static void
 downcase(PARROT_INTERP, SHIM(STRING *source_string))
 {
-    EXCEPTION(INVALID_CHARTYPE, "Can't downcase binary data");
+    EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't downcase binary data");
 }
 
 /*
@@ -237,7 +239,7 @@ RT#48260: Not yet documented!!!
 static void
 titlecase(PARROT_INTERP, SHIM(STRING *source_string))
 {
-    EXCEPTION(INVALID_CHARTYPE, "Can't titlecase binary data");
+    EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't titlecase binary data");
 }
 
 /*
@@ -253,7 +255,7 @@ RT#48260: Not yet documented!!!
 static void
 upcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 {
-    EXCEPTION(INVALID_CHARTYPE, "Can't upcase binary data");
+    EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't upcase binary data");
 }
 
 /*
@@ -269,7 +271,7 @@ RT#48260: Not yet documented!!!
 static void
 downcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 {
-    EXCEPTION(INVALID_CHARTYPE, "Can't downcase binary data");
+    EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't downcase binary data");
 }
 
 /*
@@ -285,7 +287,7 @@ RT#48260: Not yet documented!!!
 static void
 titlecase_first(PARROT_INTERP, SHIM(STRING *source_string))
 {
-    EXCEPTION(INVALID_CHARTYPE, "Can't titlecase binary data");
+    EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't titlecase binary data");
 }
 
 /*

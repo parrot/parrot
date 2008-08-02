@@ -60,7 +60,7 @@ next_exception:
 done:
   .return('')
 bad_args:
-  tcl_error 'wrong # args: should be "for start test next command"'
+  die 'wrong # args: should be "for start test next command"'
 .end
 
 # Local Variables:

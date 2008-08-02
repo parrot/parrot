@@ -390,7 +390,7 @@ The REX prefix, only emitted if using an extended register.
         } \
     }
 
-/* Test for zero, then call this, and it'll throw a real_exception if you try
+/* Test for zero, then call this; it'll call Parrot_ex_throw_from_c_args if you try
  * to divide by zero */
 #  define emit_div_check_zero(pc) { \
     char *sav_ptr; \
@@ -398,14 +398,14 @@ The REX prefix, only emitted if using an extended register.
     sav_ptr = (char *)((pc) - 1); \
     emit_mov_r_r((pc), RDI, INTERP); \
     emit_mov_r_i((pc), RSI, 0); \
-    emit_mov_r_i((pc), RDX, E_ZeroDivisionError); \
+    emit_mov_r_i((pc), RDX, EXCEPTION_DIV_BY_ZERO); \
     emit_mov_r_i((pc), RCX, div_by_zero); \
     /* We must explicitly zero out RAX, since RAX is used in calling
-     * conventions for va_arg functions, and real_exception is a va_arg
+     * conventions for va_arg functions, and Parrot_ex_throw_from_c_args is a va_arg
      * function */ \
     emit_xor_r_r((pc), RAX, RAX); \
     /* This assumes that jit_info is defined, if it's not, the code's not "consistent" */ \
-    call_func(jit_info, (void (*)(void)) real_exception); \
+    call_func(jit_info, (void (*)(void)) Parrot_ex_throw_from_c_args); \
     *sav_ptr = (char)((pc) - sav_ptr - 1); \
 }
 
@@ -1098,8 +1098,8 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                     (int)(long)fixup_ptr - 4;
                 break;
             default:
-                real_exception(interp, NULL, JIT_ERROR,
-                        "Unknown fixup type: %d\n", fixup->type);
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
+                    "Unknown fixup type: %d\n", fixup->type);
         }
         next = fixup->next;
         free(fixup);

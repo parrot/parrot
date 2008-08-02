@@ -75,7 +75,7 @@ restore_chain_end:
   ret
 
 bad_args:
-  tcl_error 'wrong # args: should be "uplevel ?level? command ?arg ...?"'
+  die 'wrong # args: should be "uplevel ?level? command ?arg ...?"'
 .end
 
 # Local Variables:

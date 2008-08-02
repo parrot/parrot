@@ -48,10 +48,10 @@ $output .= generate_bodies(@methods);
 # End of output.
 $output .= <<'PIR_OUT';
     # Generic unimplemented internal method body (throws exception).
-UNIMPLEMENTED:
+EXCEPTION_UNIMPLEMENTED:
     body = <<"PIR"
 $P0 = new .Exception
-$P0["_message"] = "System.NotImplementedException"
+$P0 = "System.NotImplementedException"
 $P1 = new "System.NotImplementedException"
 $P0["obj"] = $P1
 throw $P0
@@ -170,7 +170,7 @@ sub generate_lookup {
         foreach ( @{ $classes{$_} } ) {
             my $label =
                 $_->{'unimplemented'}
-                ? 'UNIMPLEMENTED'
+                ? 'EXCEPTION_UNIMPLEMENTED'
                 : "BODY_$_->{'class'}___$_->{'method'}";
             $label =~ s/\./_/g;
             $pir .= "if method_name == \"$_->{'method'}\" goto $label\n";
@@ -182,7 +182,7 @@ sub generate_lookup {
     $pir .= <<'PIR'
 FAIL:
     $P0 = new .Exception
-    $P0["_message"] = "No body supplied for built-in method"
+    $P0 = "No body supplied for built-in method"
     throw $P0
 PIR
 }

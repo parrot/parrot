@@ -662,7 +662,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "implicit :main with wrong # args."
   .param int op2
 .end
 CODE
-/argument count mismatch in main \(more than 1 param\)/
+/too few arguments passed \(1\) - 2 params expected/
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "explicit :main with wrong # args." );
@@ -671,7 +671,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "explicit :main with wrong # args."
   .param int op2
 .end
 CODE
-/argument count mismatch in main \(more than 1 param\)/
+/too few arguments passed \(1\) - 2 params expected/
 OUTPUT
 
 $temp = "temp.pir";

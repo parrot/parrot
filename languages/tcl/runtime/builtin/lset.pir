@@ -71,10 +71,10 @@ done:
   .return(retval)
 
 out_of_range:
-  tcl_error 'list index out of range'
+  die 'list index out of range'
 
 wrong_args:
-  tcl_error 'wrong # args: should be "lset listVar index ?index...? value"'
+  die 'wrong # args: should be "lset listVar index ?index...? value"'
 
 replace:
   .return setVar(name, value)

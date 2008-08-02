@@ -917,7 +917,8 @@ Parrot_STM_commit(PARROT_INTERP)
     STM_TRACE("commit");
 
     if (log->depth == 0)
-        real_exception(interp, NULL, 1, "stm_commit without transaction\n");
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            "stm_commit without transaction\n");
 
     PARROT_ASSERT(log->depth > 0);
 
@@ -965,7 +966,8 @@ Parrot_STM_abort(PARROT_INTERP)
     STM_TRACE_SAFE("abort");
 
     if (log->depth == 0)
-        real_exception(interp, NULL, 1, "stm_abort without transaction\n");
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            "stm_abort without transaction\n");
 
     PARROT_ASSERT(log->depth > 0);
 
@@ -1676,7 +1678,8 @@ Parrot_STM_begin_update(PARROT_INTERP, Parrot_STM_PMC_handle handle)
     const STM_tx_log * const log = Parrot_STM_tx_log_get(interp);
 
     if (log->depth == 0)
-        real_exception(interp, NULL, 1, "STM_begin_update outside transaction");
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            "STM_begin_update outside transaction");
 
     write = find_write_record(interp, handle, 0);
 
@@ -1700,8 +1703,10 @@ Parrot_STM_write(PARROT_INTERP, Parrot_STM_PMC_handle handle, ARGIN_NULLOK(PMC* 
     STM_write_record   *write;
     const STM_tx_log * const log = Parrot_STM_tx_log_get(interp);
 
-    if (log->depth == 0) /* error for now */
-        real_exception(interp, NULL, 1, "STM_write outside transaction");
+    /* error for now */
+    if (log->depth == 0)
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            "STM_write outside transaction");
 
     write        = find_write_record(interp, handle, 1);
     write->value = new_value;
@@ -1772,7 +1777,8 @@ Parrot_STM_replay_extracted(PARROT_INTERP, ARGMOD_NULLOK(void *saved_log_data))
         int i;
 
         if (log->depth == 0)
-            real_exception(interp, NULL, 1, "replay_extracted outside of transaction");
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                "replay_extracted outside of transaction");
 
         sublog = get_sublog(log, log->depth);
 

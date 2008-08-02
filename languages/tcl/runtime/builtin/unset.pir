@@ -68,14 +68,14 @@ variable_isnt_array:
   $S0 = "can't unset \""
   $S0 .= name
   $S0 .= "\": variable isn't array"
-  tcl_error $S0
+  die $S0
 
 no_such_element:
   if nocomplain goto next
   $S0 = "can't unset \""
   $S0 .= name
   $S0 .= '": no such element in array'
-  tcl_error $S0
+  die $S0
 
 scalar:
   var = find_var(name)
@@ -97,7 +97,7 @@ no_such_var:
   $S0 = "can't unset \""
   $S0 .= name
   $S0 .= '": no such variable'
-  tcl_error $S0
+  die $S0
 .end
 
 

@@ -96,7 +96,7 @@ empty_done:
   .return(results)
 
 bad_args:
-  tcl_error 'wrong # args: should be "split string ?splitChars?"'
+  die 'wrong # args: should be "split string ?splitChars?"'
 .end
 
 # Local Variables:

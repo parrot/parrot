@@ -15,7 +15,7 @@ R = new 'OS'
 R = R.'cwd'()
   .return(R)
 bad_args:
-  tcl_error 'wrong # args: should be "pwd"'
+  die 'wrong # args: should be "pwd"'
 .end
 
 # Local Variables:

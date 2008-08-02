@@ -137,9 +137,9 @@ EOA
 
     else {
         $decl .= <<"EOA";
-            real_exception(interp, NULL, INVALID_OPERATION, \\
-                            "Attributes of type '$attrtype' cannot be " \\
-                            "subclassed from a high-level PMC."); \\
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, \\
+                "Attributes of type '$attrtype' cannot be " \\
+                "subclassed from a high-level PMC."); \\
 EOA
     }
 
@@ -156,23 +156,23 @@ EOA
 
     if ($attrtype eq "INTVAL") {
         $decl .= <<"EOA";
-            PMC *attr_value = new_pmc(interp, enum_class_Integer); \\
-            VTABLE_set_integer(interp, attr_value, value); \\
+            PMC *attr_value = pmc_new(interp, enum_class_Integer); \\
+            VTABLE_set_integer_native(interp, attr_value, value); \\
             VTABLE_set_attr_str(interp, pmc, \\
                               const_string(interp, "$attrname"), attr_value); \\
 EOA
     }
     elsif ($attrtype eq "FLOATVAL") {
         $decl .= <<"EOA";
-            PMC *attr_value = new_pmc(interp, enum_class_Float); \\
-            VTABLE_set_number(interp, attr_value, value); \\
+            PMC *attr_value = pmc_new(interp, enum_class_Float); \\
+            VTABLE_set_number_native(interp, attr_value, value); \\
             VTABLE_set_attr_str(interp, pmc, \\
                               const_string(interp, "$attrname"), attr_value); \\
 EOA
     }
     elsif ($attrtype =~ "STRING") {
         $decl .= <<"EOA";
-            PMC *attr_value = new_pmc(interp, enum_class_String); \\
+            PMC *attr_value = pmc_new(interp, enum_class_String); \\
             VTABLE_set_string_native(interp, attr_value, value); \\
             VTABLE_set_attr_str(interp, pmc, \\
                               const_string(interp, "$attrname"), attr_value); \\
@@ -187,9 +187,9 @@ EOA
 
     else {
         $decl .= <<"EOA";
-            real_exception(interp, NULL, INVALID_OPERATION, \\
-                            "Attributes of type '$attrtype' cannot be " \\
-                            "subclassed from a high-level PMC."); \\
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, \\
+                "Attributes of type '$attrtype' cannot be " \\
+                "subclassed from a high-level PMC."); \\
 EOA
     }
 

@@ -41,7 +41,7 @@ splice_it:
   .return (the_list)
 
 wrong_args:
-  tcl_error 'wrong # args: should be "linsert list index element ?element ...?"'
+  die 'wrong # args: should be "linsert list index element ?element ...?"'
 
 .end
 

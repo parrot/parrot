@@ -229,7 +229,7 @@ Appends C<*value> to the key.
 
     void push_pmc(PMC *value) {
         if (value->vtable->base_type != enum_class_Key)
-            real_exception(interp, NULL, INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Can only push another Key onto a Key PMC.");
 
         key_append(INTERP, SELF, value);
@@ -347,7 +347,8 @@ PMC_int_val(-1) means end of iteration.
                 PMC_int_val(ret) = n - 1;
                 break;
             default:
-                real_exception(interp, NULL, INVALID_OPERATION,
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION,
                     "Unknown iterator type in Key.nextkey_keyed: %d", what);
         }
         return ret;
@@ -411,8 +412,8 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
                 VTABLE_push_string(INTERP, io, key_string(INTERP, SELF));
                 break;
             default:
-                real_exception(INTERP, NULL, E_KeyError,
-                        "Unsupported key type in Key.freeze");
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
+                    "Unsupported key type in Key.freeze");
                 break;
         }
     }
@@ -437,8 +438,8 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
                 PMC_str_val(SELF) = VTABLE_shift_string(INTERP, io);
                 break;
             default:
-                real_exception(INTERP, NULL, E_KeyError,
-                        "Unsupported key type in Key.thaw");
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
+                    "Unsupported key type in Key.thaw");
                 break;
         }
     }

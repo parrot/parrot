@@ -297,11 +297,11 @@ inline op readline(out STR, invar PMC) :base_io {
      * io stuff are methods
      */
     if (pio->vtable->base_type != enum_class_ParrotIO)
-        real_exception(interp, NULL, PIO_ERROR,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Cannot read line from empty filehandle");
     io = (ParrotIO *)PMC_data(pio);
     if (!io)
-        real_exception(interp, NULL, PIO_ERROR,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Cannot read line from empty filehandle");
 
     if (!(io->flags & PIO_F_LINEBUF))
@@ -389,17 +389,17 @@ INTVALS.
 
 op seek(invar PMC, in INT, in INT) :base_io {
   if ($1) {
-    if (PIO_seek(interp, $1, PIO_make_offset($2), $3) < 0) {
-      real_exception(interp, NULL, PIO_ERROR, "seek failed (32bit)");
-    }
+    if (PIO_seek(interp, $1, PIO_make_offset($2), $3) < 0)
+      Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "seek failed (32bit)");
   }
 }
 
 op seek(invar PMC, in INT, in INT, in INT) :base_io {
   if ($1) {
-    if (PIO_seek(interp, $1, PIO_make_offset32($2, $3), $4) < 0) {
-      real_exception(interp, NULL, PIO_ERROR, "seek failed (64bit)");
-    }
+    if (PIO_seek(interp, $1, PIO_make_offset32($2, $3), $4) < 0)
+      Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "seek failed (64bit)");
   }
 }
 

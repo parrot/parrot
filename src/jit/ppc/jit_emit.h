@@ -716,10 +716,10 @@ div_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)
     _emit_bc(pc, BNE, 0, 0, 0);
     jit_emit_mov_rr(pc, r3, r16); /* interp */
     jit_emit_mov_ri_i(pc, r4, 0);          /* NULL */
-    jit_emit_mov_ri_i(pc, r5, E_ZeroDivisionError);          /* type */
+    jit_emit_mov_ri_i(pc, r5, EXCEPTION_DIV_BY_ZERO);          /* type */
     jit_emit_mov_ri_i(pc, r6, div_by_zero);
     jit_info->native_ptr = pc;
-    jit_emit_call_func(pc, (void*) real_exception);
+    jit_emit_call_func(pc, (void*) Parrot_ex_throw_from_c);
     pc = jit_info->native_ptr;
     /* fixup above jump */
     sav_ptr = pc;
@@ -749,10 +749,10 @@ fdiv_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)
     _emit_bc(pc, BNE, 0, 0, 0);
     jit_emit_mov_rr(pc, r3, r16); /* interp */
     jit_emit_mov_ri_i(pc, r4, 0);          /* NULL */
-    jit_emit_mov_ri_i(pc, r5, E_ZeroDivisionError);          /* type */
+    jit_emit_mov_ri_i(pc, r5, EXCEPTION_DIV_BY_ZERO);          /* type */
     jit_emit_mov_ri_i(pc, r6, div_by_zero);
     jit_info->native_ptr = pc;
-    jit_emit_call_func(pc, (void*) real_exception);
+    jit_emit_call_func(pc, (void*) Parrot_ex_throw_from_c);
     pc = jit_info->native_ptr;
     /* fixup above jump */
     sav_ptr = pc;
@@ -952,7 +952,7 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
             }
             break;
         default:
-            internal_exception(1, "set_returns_jit - unknown type");
+            exit_fatal(1, "set_returns_jit - unknown type");
             break;
     }
 }
@@ -972,7 +972,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP, int recursive)
 
     if (!recursive) {
         /* create args array */
-        internal_exception(1, "set_args_jit - can't do that yet ");
+        exit_fatal(1, "set_args_jit - can't do that yet ");
     }
 
     constants = CONTEXT(interp)->constants;
@@ -1011,7 +1011,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP, int recursive)
                 jit_emit_mov_ri_i(NATIVECODE, params_map, CUR_OPCODE[2 + i]);
                 break;
             default:
-                internal_exception(1, "set_args_jit - unknown type");
+                exit_fatal(1, "set_args_jit - unknown type");
                 break;
         }
     }
@@ -1200,7 +1200,7 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                 break;
 
             default:
-                internal_exception(JIT_ERROR, "Unknown fixup type:%d\n",
+                exit_fatal(EXCEPTION_JIT_ERROR, "Unknown fixup type:%d\n",
                                    fixup->type);
                 break;
         }

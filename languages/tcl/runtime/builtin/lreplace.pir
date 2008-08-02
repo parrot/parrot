@@ -51,12 +51,12 @@ empty:
     .return(list)
 
 bad_args:
-    tcl_error 'wrong # args: should be "lreplace list first last ?element element ...?"'
+    die 'wrong # args: should be "lreplace list first last ?element element ...?"'
 
 doesnt_contain_elem:
     $S0 = first
     $S0 = "list doesn't contain element " . $S0
-    tcl_error $S0
+    die $S0
 .end
 
 # Local Variables:

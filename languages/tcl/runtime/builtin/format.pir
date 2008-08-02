@@ -18,7 +18,7 @@
   .return($S0)
 
 noargs:
-  tcl_error 'wrong # args: should be "format formatString ?arg arg ...?"'
+  die 'wrong # args: should be "format formatString ?arg arg ...?"'
 .end
 
 # Local Variables:

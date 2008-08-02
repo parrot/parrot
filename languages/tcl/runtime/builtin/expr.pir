@@ -28,7 +28,7 @@ loop_done:
   .return ($P2)
 
 no_args:
-  tcl_error 'wrong # args: should be "expr arg ?arg ...?"'
+  die 'wrong # args: should be "expr arg ?arg ...?"'
 .end
 
 # Local Variables:

@@ -42,10 +42,10 @@ done_access:
   .return(channel_id)
 
 file_error:
-  tcl_error 'unable to open specified file'
+  die 'unable to open specified file'
 
 error:
-  tcl_error 'wrong # args: should be "open fileName ?access? ?permissions?"'
+  die 'wrong # args: should be "open fileName ?access? ?permissions?"'
 .end
 
 # Local Variables:

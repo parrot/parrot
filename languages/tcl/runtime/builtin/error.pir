@@ -36,10 +36,10 @@ finish:
   $P1 = get_hll_global '$errorCode'
   assign $P1, errorCode
   $P0 = argv[0]
-  tcl_error $P0
+  die $P0
 
 badargs:
-  tcl_error 'wrong # args: should be "error message ?errorInfo? ?errorCode?"'
+  die 'wrong # args: should be "error message ?errorInfo? ?errorCode?"'
 .end
 
 # Local Variables:

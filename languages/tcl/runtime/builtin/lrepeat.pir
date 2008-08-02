@@ -42,10 +42,10 @@ OUTER_DONE:
   .return(retval)
 
 must_have_count:
-  tcl_error 'must have a count of at least 1'
+  die 'must have a count of at least 1'
 
 bad_args:
-  tcl_error 'wrong # args: should be "lrepeat positiveCount value ?value ...?"'
+  die 'wrong # args: should be "lrepeat positiveCount value ?value ...?"'
 .end
 
 # Local Variables:

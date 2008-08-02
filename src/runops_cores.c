@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2006, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -163,8 +163,8 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
     trace_op(interp, code_start, code_end, pc);
     while (pc) {
         if (pc < code_start || pc >= code_end)
-            real_exception(interp, NULL, 1,
-                    "attempt to access code outside of current code segment");
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                "attempt to access code outside of current code segment");
 
         CONTEXT(interp)->current_pc = pc;
 
@@ -213,8 +213,8 @@ runops_slow_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
     while (pc) {
         if (pc < code_start || pc >= code_end)
-            real_exception(interp, NULL, 1,
-                    "attempt to access code outside of current code segment");
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                "attempt to access code outside of current code segment");
 
         CONTEXT(interp)->current_pc = pc;
 
@@ -244,8 +244,8 @@ runops_gc_debug_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
     while (pc) {
         if (pc < code_start || pc >= code_end)
-            real_exception(interp, NULL, 1,
-                    "attempt to access code outside of current code segment");
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                "attempt to access code outside of current code segment");
 
         Parrot_do_dod_run(interp, 0);
         CONTEXT(interp)->current_pc = pc;

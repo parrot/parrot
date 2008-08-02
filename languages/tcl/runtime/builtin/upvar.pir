@@ -51,7 +51,7 @@ loop:
   $S0 = 'variable "'
   $S0 .= new_var
   $S0 .= '" already exists'
-  tcl_error $S0
+  die $S0
 
 store_var:
   .local pmc saved_call_chain
@@ -105,7 +105,7 @@ done:
   .return('')
 
 bad_args:
-  tcl_error 'wrong # args: should be "upvar ?level? otherVar localVar ?otherVar localVar ...?"'
+  die 'wrong # args: should be "upvar ?level? otherVar localVar ?otherVar localVar ...?"'
 .end
 
 

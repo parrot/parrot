@@ -116,10 +116,10 @@ done:
   .return('')
 
 bad_args:
-  tcl_error 'wrong # args: should be "foreach varList list ?varList list ...? command"'
+  die 'wrong # args: should be "foreach varList list ?varList list ...? command"'
 
 bad_varlist:
-  tcl_error 'foreach varlist is empty'
+  die 'foreach varlist is empty'
 .end
 
 # Local Variables:

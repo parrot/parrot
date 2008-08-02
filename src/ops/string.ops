@@ -134,7 +134,7 @@ The C<PMC> versions are MMD operations.
 
 inline op repeat(out STR, in STR, in INT) :base_mem {
     if ($3 < 0)
-        real_exception(interp, NULL, NEG_REPEAT,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NEG_REPEAT,
                 "Cannot repeat with negative arg");
     $1 = string_repeat(interp, $2, (UINTVAL)$3, NULL);
 }
@@ -366,7 +366,7 @@ inline op stringinfo(out INT, in STR, in INT) :base_core {
                 $1 = $2->strlen;
                 break;
             default:
-                real_exception(interp, NULL, 1,
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
                     "stringinfo: unknown info type: %d", $3);
         }
     }
@@ -494,7 +494,7 @@ op charsetname(out STR, in INT) :base_core {
 op find_charset(out INT, in STR) :base_core {
     const INTVAL n = Parrot_charset_number(interp, $2);
     if (n < 0)
-        real_exception(interp, NULL, 1,
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "charset '%Ss' not found", $2);
     $1 = n;
 }
@@ -547,7 +547,7 @@ op encodingname(out STR, in INT) :base_core {
 op find_encoding(out INT, in STR) :base_core {
     const INTVAL n = Parrot_encoding_number(interp, $2);
     if (n < 0)
-        real_exception(interp, NULL, 1,
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "encoding '%Ss' not found", $2);
     $1 = n;
 }

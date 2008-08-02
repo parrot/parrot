@@ -78,7 +78,7 @@ got_body:
   $S0 = body[-2]
   $S0 = 'no body specified for pattern "' . $S0
   $S0 = $S0 . '"'
-  tcl_error $S0
+  die $S0
 
 check_mode:
   .local string pattern, code
@@ -148,19 +148,19 @@ body_match:
   .return $P1()
 
 extra_pattern:
-  tcl_error 'extra switch pattern with no body'
+  die 'extra switch pattern with no body'
 
 bad_args:
-  tcl_error 'wrong # args: should be "switch ?switches? string pattern body ... ?default body?"'
+  die 'wrong # args: should be "switch ?switches? string pattern body ... ?default body?"'
 
 bad_args_with_curlies:
-  tcl_error 'wrong # args: should be "switch ?switches? string {pattern body ... ?default body?}"'
+  die 'wrong # args: should be "switch ?switches? string {pattern body ... ?default body?}"'
 
 bad_flag:
   $S1 = 'bad option "'
   $S1 .= $S0
   $S1 .= '": must be -exact, -glob, -indexvar, -matchvar, -nocase, -regexp, or --'
-  tcl_error $S1
+  die $S1
 .end
 
 # Local Variables:

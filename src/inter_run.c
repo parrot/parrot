@@ -78,39 +78,31 @@ runops(PARROT_INTERP, size_t offs)
      * run loops, e.g. if a delegate methods throws an exception
      */
 #if ! STACKED_EXCEPTIONS
-    if (!interp->exceptions)
+    if (!interp->current_runloop)
 #endif
     {
-        new_internal_exception(interp);
-        if (setjmp(interp->exceptions->destination)) {
-            /* an exception was thrown */
-            interp->current_runloop_level = our_runloop_level;
-            interp->current_runloop_id = our_runloop_id;
-#ifdef RUNLOOP_TRACE
-            fprintf(stderr, "[exception; back to loop %d, level %d]\n",
-                    our_runloop_id, our_runloop_level);
-#endif
-            offset = handle_exception(interp);
-            /* update profile for exception execution time */
-            if (interp->profile &&
-                    Interp_flags_TEST(interp, PARROT_PROFILE_FLAG)) {
-                RunProfile * const profile = interp->profile;
-                if (profile->cur_op == PARROT_PROF_EXCEPTION) {
-                    profile->data[PARROT_PROF_EXCEPTION].time +=
-                        Parrot_floatval_time() - profile->starttime;
-                }
+        new_runloop_jump_point(interp);
+        if (setjmp(interp->current_runloop->resume)) {
+            /* an exception was handled */
+            if (STACKED_EXCEPTIONS) {
+                free_runloop_jump_point(interp);
             }
+            interp->current_runloop_level = our_runloop_level - 1;
+            interp->current_runloop_id = old_runloop_id;
+
+#ifdef RUNLOOP_TRACE
+            fprintf(stderr, "[handled exception; back to loop %d, level %d]\n",
+                    interp->current_runloop_id, interp->current_runloop_level);
+#endif
+            return;
         }
     }
 
     runops_int(interp, offset);
 
-    /*
-     * pop off exception and put it onto the free list
-     * s. above
-     */
+    /* Remove the current runloop marker (put it on the free list). */
     if (STACKED_EXCEPTIONS) {
-        free_internal_exception(interp);
+        free_runloop_jump_point(interp);
     }
 #ifdef RUNLOOP_TRACE
     fprintf(stderr, "[exiting loop %d, level %d]\n",
@@ -118,13 +110,6 @@ runops(PARROT_INTERP, size_t offs)
 #endif
     interp->current_runloop_level = our_runloop_level - 1;
     interp->current_runloop_id = old_runloop_id;
-    /*
-     * not yet - this needs classifying of exceptions and handlers
-     * so that only an exit handler does catch this exception
-     */
-#if 0
-    do_exception(interp, EXCEPT_exit, 0);
-#endif
 }
 
 /*
@@ -160,8 +145,10 @@ Parrot_runops_fromc(PARROT_INTERP, ARGIN(PMC *sub))
      */
     dest = VTABLE_invoke(interp, sub, (void*) 1);
     if (!dest)
-        real_exception(interp, NULL, 1, "Subroutine returned a NULL address");
-    ctx = CONTEXT(interp);
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            "Subroutine returned a NULL address");
+
+    ctx    = CONTEXT(interp);
     offset = dest - interp->code->base.data;
     runops(interp, offset);
     return ctx;
@@ -194,9 +181,10 @@ runops_args(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj),
     interp->current_cont  = new_ret_continuation_pmc(interp, NULL);
     interp->current_object = obj;
     dest = VTABLE_invoke(interp, sub, NULL);
-    if (!dest) {
-        real_exception(interp, NULL, 1, "Subroutine returned a NULL address");
-    }
+    if (!dest)
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            "Subroutine returned a NULL address");
+
     if (PMC_IS_NULL(obj)) {
         /* skip over the return type */
         sig_p = sig + 1;
@@ -207,27 +195,30 @@ runops_args(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj),
     }
     else  {
         const size_t len = strlen(sig);
-        if (len > 8) {
-            real_exception(interp, NULL, 1, "too many arguments in runops_args");
-        }
+        if (len > 8)
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                "too many arguments in runops_args");
+
         new_sig[0] = 'O';
         strcpy(new_sig + 1, sig + 1);
         sig_p = new_sig;
     }
 
-    if (*sig_p && dest[0] == PARROT_OP_get_params_pc) {
+    if (*sig_p && (dest[0] == PARROT_OP_get_params_pc
+                || (sub->vtable->base_type == enum_class_ExceptionHandler
+                    && PMC_cont(sub)->current_results))) {
         dest = parrot_pass_args_fromc(interp, sig_p, dest, old_ctx, ap);
     }
     /*
      * main is now started with runops_args_fromc too
      * PASM subs usually don't have get_params
      * XXX we could check, if we are running main
-     else {
-     real_exception(interp, NULL, E_ValueError, "no get_params in sub");
-     }
+     else
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "no get_params in sub");
      */
 
-    ctx = CONTEXT(interp);
+    ctx    = CONTEXT(interp);
     offset = dest - interp->code->base.data;
     runops(interp, offset);
     return ctx;
@@ -257,12 +248,15 @@ Parrot_run_meth_fromc(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj), SH
     parrot_context_t *ctx;
     opcode_t offset, *dest;
 
-    interp->current_cont = new_ret_continuation_pmc(interp, NULL);
+    interp->current_cont   = new_ret_continuation_pmc(interp, NULL);
     interp->current_object = obj;
-    dest = VTABLE_invoke(interp, sub, (void*)1);
+    dest = VTABLE_invoke(interp, sub, (void *)1);
+
     if (!dest)
-        real_exception(interp, NULL, 1, "Subroutine returned a NULL address");
-    ctx = CONTEXT(interp);
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            "Subroutine returned a NULL address");
+
+    ctx    = CONTEXT(interp);
     offset = dest - interp->code->base.data;
     runops(interp, offset);
     return set_retval(interp, 0, ctx);
@@ -601,6 +595,101 @@ Parrot_run_meth_fromc_arglist_retf(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(
     parrot_context_t * const ctx = runops_args(interp, sub, obj, meth, sig, args);
     return set_retval_f(interp, *sig, ctx);
 }
+
+/*
+
+=back
+
+=head2 Helper Functions
+
+=over 4
+
+=item C<void new_runloop_jump_point>
+
+Create a new runloop jump point, either by allocating it or by
+getting one from the free list.
+
+=cut
+
+*/
+
+PARROT_API
+void
+new_runloop_jump_point(PARROT_INTERP)
+{
+    Parrot_runloop *jump_point;
+
+    if (interp->runloop_jmp_free_list) {
+        jump_point = interp->runloop_jmp_free_list;
+        interp->runloop_jmp_free_list = jump_point->prev;
+    }
+    else
+        jump_point = mem_allocate_typed(Parrot_runloop);
+
+    jump_point->prev = interp->current_runloop;
+    interp->current_runloop = jump_point;
+}
+
+/*
+
+=item C<void free_runloop_jump_point>
+
+Place runloop jump point back on the free list.
+
+=cut
+
+*/
+
+PARROT_API
+void
+free_runloop_jump_point(PARROT_INTERP)
+{
+    Parrot_runloop * const jump_point = interp->current_runloop;
+    interp->current_runloop = jump_point->prev;
+    jump_point->prev = interp->runloop_jmp_free_list;
+    interp->runloop_jmp_free_list = jump_point;
+}
+
+/*
+
+=item C<void destroy_runloop_jump_points>
+
+Destroys (and frees the memory of) the runloop jump point list and the
+associated free list for the specified interpreter.
+
+=cut
+
+*/
+
+void
+destroy_runloop_jump_points(PARROT_INTERP)
+{
+    really_destroy_runloop_jump_points(interp->current_runloop);
+    really_destroy_runloop_jump_points(interp->runloop_jmp_free_list);
+}
+
+/*
+
+=item C<void really_destroy_runloop_jump_points>
+
+Takes a pointer to a runloop jump point (which had better be the last one in
+the list). Walks back through the list, freeing the memory of each one, until
+it encounters NULL. Used by C<destroy_runloop_jump_points>.
+
+=cut
+
+*/
+
+void
+really_destroy_runloop_jump_points(ARGIN(Parrot_runloop *jump_point))
+{
+    while (jump_point != NULL) {
+        Parrot_runloop * const prev = jump_point->prev;
+        mem_sys_free(jump_point);
+        jump_point = prev;
+    }
+}
+
 
 /*
 

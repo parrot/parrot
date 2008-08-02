@@ -52,7 +52,7 @@ pmclass TclString
             peek_pos++;
             if (peek_pos >= len) {
                 Parrot_unregister_pmc(INTERP, retval);
-                real_exception(INTERP, NULL, 1, "unmatched open brace in list");
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "unmatched open brace in list");
             }
 
             character = string_ord(INTERP, str, peek_pos);
@@ -76,7 +76,7 @@ pmclass TclString
                         chunk_length, &follows_brace, 0);
 
                     Parrot_unregister_pmc(INTERP, retval);
-                    real_exception(INTERP, NULL, 1,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                             "list element in braces followed by \"%s\" instead of space",
                             string_to_cstring(INTERP, follows_brace));
                 }
@@ -104,7 +104,7 @@ pmclass TclString
           quote_loop:
             if (peek_pos >= len) {
                 Parrot_unregister_pmc(INTERP, retval);
-                real_exception(INTERP, NULL, 1, "unmatched open quote in list");
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "unmatched open quote in list");
             }
             character = string_ord(INTERP, str, peek_pos);
             if (character == '\\') {
@@ -156,7 +156,7 @@ pmclass TclString
             chunk_length = ws_pos - peek_pos;
             follows_quote = string_substr(INTERP, str, peek_pos, chunk_length, &follows_quote, 0);
             Parrot_unregister_pmc(INTERP, retval);
-            real_exception(INTERP, NULL, 1,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                     "list element in quotes followed by \"%s\" instead of space",
                     string_to_cstring(INTERP, follows_quote));
         }

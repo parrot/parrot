@@ -315,7 +315,7 @@ Returns the PMC value of the element at index C<key>.
         PMC **data;
 
         if (key < 0 || key >= PMC_int_val(SELF))
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 _("FixedPMCArray: index out of bounds!"));
 
         data = (PMC **)PMC_data(SELF);
@@ -364,7 +364,7 @@ array.
         PMC **data;
 
         if (PMC_int_val(SELF) && size)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     _("FixedPMCArray: Can't resize!"));
         if (!size)
             return;
@@ -386,7 +386,7 @@ array.
             return;
 
         if (!VTABLE_does(interp, value, CONST_STRING(interp, "array")))
-            real_exception(INTERP, NULL, E_TypeError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     _("Can't set self from this type"));
 
         if (PMC_data(SELF))
@@ -553,7 +553,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
         PMC **data;
 
         if (key < 0 || key >= PMC_int_val(SELF))
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 _("FixedPMCArray: index out of bounds!"));
 
         data      = (PMC**)PMC_data(SELF);
@@ -652,7 +652,8 @@ Return a new iterator for SELF.
             return iter;
         }
 
-        real_exception(INTERP, NULL, E_IndexError, _("Array: Unknown slice type"));
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                _("Array: Unknown slice type"));
     }
 
     VTABLE PMC *get_iter() {
@@ -684,7 +685,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
     VTABLE INTVAL exists_keyed_int(INTVAL key) {
         PMC **data;
         if (key < 0 || key >= PMC_int_val(SELF))
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 _("FixedPMCArray: index out of bounds!"));
 
         data = (PMC**)PMC_data(SELF);
@@ -712,7 +713,7 @@ of this array.
 
     void splice(PMC *value, INTVAL offset, INTVAL count) {
         if (count + offset > PMC_int_val(SELF))
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 _("FixedPMCArray: index out of bounds!"));
 
         for (count--; count >= 0; --count) {

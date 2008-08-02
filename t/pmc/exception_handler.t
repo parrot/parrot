@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-t/pmc/exception_handler.t - test Exception_Handler PMC
+t/pmc/exception_handler.t - test ExceptionHandler PMC
 
 =head1 SYNOPSIS
 
@@ -12,7 +12,7 @@ t/pmc/exception_handler.t - test Exception_Handler PMC
 
 =head1 DESCRIPTION
 
-Tests the Exception_Handler PMC.
+Tests the ExceptionHandler PMC.
 
 =cut
 
@@ -21,8 +21,8 @@ Tests the Exception_Handler PMC.
 
     plan(1)
 
-    new P0, 'Exception_Handler'
-    ok(1, 'Instantiated .Exception_Handler')
+    new P0, 'ExceptionHandler'
+    ok(1, 'Instantiated ExceptionHandler')
 .end
 
 # Local Variables:

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -215,18 +215,17 @@ Removes and returns the first element in the list.
 
     void splice(PMC *value, INTVAL offset, INTVAL count) {
         if (SELF->vtable->base_type != value->vtable->base_type)
-            real_exception(INTERP, NULL, E_TypeError,
-                    "Type mismatch in splice");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Type mismatch in splice");
 
         list_splice(INTERP, (List *)PMC_struct_val(SELF),
             (List *)PMC_struct_val(value), offset, count);
     }
 
     VTABLE PMC *slice(PMC *key, INTVAL f) {
-        if (f) {
-            real_exception(INTERP, NULL, E_IndexError,
+        if (f)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "IntList: Unknown slice type");
-        }
         else {
             PMC * const iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
             PMC_struct_val(iter) = key;

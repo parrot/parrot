@@ -488,7 +488,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many" );
     $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
-    set_args "0,0", $P0,77
+    set_args "0,0", $P0, 77
     invokecc $P1
 .end
 .sub foo
@@ -506,7 +506,7 @@ pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many - catch exceptio
     $P0 = new 'String'
     $P0 = "hello\n"
     find_name $P1, "foo"
-    set_args "0,0", $P0,77
+    set_args "0,0", $P0, 77
     invokecc $P1
 .end
 .sub foo
@@ -516,11 +516,14 @@ pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many - catch exceptio
     print "never\n"
 arg_handler:
     get_results "0,0", $P1, $S0
-    print "catched: "
+    print "caught: "
     print $S0
+#    $S1 = typeof $P1
+#    print "\nexception type: "
+#    print $S1
 .end
 CODE
-/^catched: too many arguments passed/
+/^caught: too many arguments passed/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "argc mismatch, optional" );

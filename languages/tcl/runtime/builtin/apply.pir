@@ -23,10 +23,10 @@ bad_lambda:
   $S0 = argv[0]
   $S0 = "can't interpret \"" . $S0
   $S0 = $S0 . "\" as a lambda expression"
-  tcl_error $S0
+  die $S0
 
 no_args:
-  tcl_error 'wrong # args: should be "apply lambdaExpr ?arg1 arg2 ...?"'
+  die 'wrong # args: should be "apply lambdaExpr ?arg1 arg2 ...?"'
 .end
 
 # Local Variables:

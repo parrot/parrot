@@ -214,6 +214,7 @@ typedef struct Parrot_cont {
     opcode_t *current_results;       /* ptr into code with get_results opcode
                                         full continuation only */
     int runloop_id;                  /* id of the creating runloop. */
+    int invoked;                     /* flag when a handler has been invoked. */
 } Parrot_cont;
 
 #define PMC_cont(pmc) ((Parrot_cont *)PMC_struct_val(pmc))

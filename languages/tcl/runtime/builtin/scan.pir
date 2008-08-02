@@ -92,7 +92,7 @@ bad_var:
   $S1 = "couldn't set variable \""
   $S1 .= $S0
   $S1 .= '"'
-  tcl_error $S1
+  die $S1
 
 return_list:
   .return(results)
@@ -101,9 +101,9 @@ aborted:
   .return('')
 
 too_many_vars:
-  tcl_error 'variable is not assigned by any conversion specifiers'
+  die 'variable is not assigned by any conversion specifiers'
 not_enough_vars:
-  tcl_error 'different numbers of variable names and field specifiers'
+  die 'different numbers of variable names and field specifiers'
 
 handle_percent:
   inc format_pos
@@ -287,7 +287,7 @@ range_loop_done:
   ret
 
 bad_class:
-  tcl_error 'unmatched [ in format string'
+  die 'unmatched [ in format string'
 
 handle_percent_literal:
   $S1 = substr input, input_pos, 1
@@ -308,9 +308,9 @@ handle_character:
   goto next
 
 bad_character_size:
-  tcl_error 'field size modifier may not be specified in %c conversion'
+  die 'field size modifier may not be specified in %c conversion'
 bad_character_width:
-  tcl_error 'field width may not be specified in %c conversion'
+  die 'field width may not be specified in %c conversion'
 
 handle_numchars:
   $P0 = new 'TclInt'
@@ -449,23 +449,23 @@ set_xpg3:
   $P1 = results[xpg3]
   $I0 = defined $P1
   if $I0 == 0 goto set_xpg3_ok
-  tcl_error 'variable is assigned by multiple "%n$" conversion specifiers'
+  die 'variable is assigned by multiple "%n$" conversion specifiers'
 set_xpg3_ok:
   results[xpg3] = $P0
 done_xpg3:
   ret
 
 cant_mix:
-  tcl_error 'cannot mix "%" and "%n$" conversion specifiers'
+  die 'cannot mix "%" and "%n$" conversion specifiers'
 
 bad_conversion:
   $S1 = 'bad scan conversion character "'
   $S1 .= $S0
   $S1 .= '"'
-  tcl_error $S1
+  die $S1
 
 bad_args:
-  tcl_error 'wrong # args: should be "scan string format ?varName varName ...?"'
+  die 'wrong # args: should be "scan string format ?varName varName ...?"'
 .end
 
 # Local Variables:

@@ -1,0 +1,184 @@
+/*
+Copyright (C) 2001-2008, The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/exceptionhandler.pmc - Exception Handler PMC
+
+=head1 DESCRIPTION
+
+When an exception handler is called, the exception object is passed as
+C<REG_PMC(interp, 5)>, the original contents of this register is in the
+exception object's C<_P5> attribute.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "parrot/oplib/ops.h"
+
+pmclass ExceptionHandler extends Continuation need_ext {
+
+/*
+
+=item C<void init()>
+
+Initializes the exception handler.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        Parrot_cont * const cc = new_continuation(INTERP, NULL);
+        PMC_struct_val(SELF) = cc;
+        cc->invoked = 0;
+        PMC_pmc_val(SELF)    = PMCNULL;
+
+        /* an exception handler has no separate context; it's only a snapshot
+         * of an "earlier" context, which is contained in the interpreter's
+         * context - the stacks can only be deeper in the interpreter - so no
+         * mark of context is needed */
+        PObj_active_destroy_SET(SELF);
+    }
+
+    /*
+     * can't reuse Continuation's destroy yet -
+     * RT#46703 fix ref_count handling for exception_handlers first
+     *
+     * An ExceptionHandler is kind of a limited Continuation
+     * (can only call 'up the stack').  Therefore we probably don't
+     * have to convert all RetContinuations to real Continuations
+     */
+
+    VTABLE void destroy() {
+        Parrot_cont * const cc = PMC_cont(SELF);
+
+        if (cc) {
+            mem_sys_free(cc);
+            PMC_struct_val(SELF) = NULL;
+        }
+    }
+
+    VTABLE PMC *clone() {
+        PMC * const result = SUPER();
+        PObj_custom_mark_CLEAR(result);
+        return result;
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL)>
+
+Mark whether the handler has been invoked.
+
+=cut
+
+*/
+
+    VTABLE void set_integer_native(INTVAL value) {
+        Parrot_cont * const cc = PMC_cont(SELF);
+        cc->invoked = value;
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Check whether the handler has been invoked.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        Parrot_cont * const cc = PMC_cont(SELF);
+        return cc->invoked;
+    }
+
+/*
+
+=item C<opcode_t *invoke(void *next)>
+
+Set up the environment for the exception handler to be invoked.
+
+=cut
+
+*/
+
+    VTABLE opcode_t *invoke(void *next) {
+        Parrot_cont      *cc           = PMC_cont(SELF);
+        parrot_context_t *from_ctx     = CONTEXT(interp);
+        parrot_context_t *to_ctx       = cc->to_ctx;
+        opcode_t         *pc           = cc->address;
+
+        Parrot_continuation_check(interp, SELF, cc);
+        Parrot_continuation_rewind_environment(interp, SELF, cc);
+
+        /* switch code segment if needed */
+        if (INTERP->code != cc->seg)
+            Parrot_switch_to_cs(INTERP, cc->seg, 1);
+
+        return pc;
+    }
+
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<METHOD can_handle(PMC *exception)>
+
+Report whether the exception handler can handle a particular type of exception.
+
+=cut
+
+*/
+
+    METHOD can_handle(PMC *exception) {
+
+        if (exception->vtable->base_type == enum_class_Exception
+                || VTABLE_isa(INTERP, exception, CONST_STRING(INTERP, "Exception"))) {
+
+            /* The exception handler has already been used before. */
+            if (VTABLE_get_integer(INTERP, SELF))
+                RETURN(INTVAL 0);
+
+            RETURN(INTVAL 1);
+        }
+
+        RETURN(INTVAL 0);
+    }
+
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

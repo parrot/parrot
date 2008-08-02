@@ -159,7 +159,7 @@ key_new_pmc(PARROT_INTERP, ARGIN(PMC *value))
     PMC * const key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
-    real_exception(interp, NULL, 1, "this is broken - see slice.pmc");
+    Parrot_ex_throw_from_c_args(interp, NULL, 1, "this is broken - see slice.pmc");
 }
 
 
@@ -272,7 +272,7 @@ key_set_pmc(PARROT_INTERP, ARGMOD(PMC *key), ARGIN(PMC *value))
      * XXX leo
      * what for is this indirection?
      */
-    real_exception(interp, NULL, 1, "this is broken - see slice.pmc");
+    Parrot_ex_throw_from_c_args(interp, NULL, 1, "this is broken - see slice.pmc");
 }
 
 
@@ -380,7 +380,8 @@ key_number(PARROT_INTERP, ARGIN(PMC *key))
         return VTABLE_get_number(interp, reg);
         }
     default:
-        real_exception(interp, NULL, INVALID_OPERATION, "Key not a number!\n");
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Key not a number!\n");
     }
 }
 

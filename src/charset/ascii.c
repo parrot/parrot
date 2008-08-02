@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2007, The Perl Foundation.
+Copyright (C) 2004-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -220,7 +220,7 @@ to_ascii(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
     for (offs = 0; offs < len; ++offs) {
         const UINTVAL c = iter.get_and_advance(interp, &iter);
         if (c >= 128)
-            real_exception(interp, NULL, LOSSY_CONVERSION,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LOSSY_CONVERSION,
                     "can't convert unicode string to ascii");
         *p++ = (unsigned char)c;
     }
@@ -581,9 +581,10 @@ ascii_cs_rindex(PARROT_INTERP, ARGIN(STRING *source_string),
         ARGIN(STRING *search_string), UINTVAL offset)
 {
     INTVAL retval;
-    if (source_string->charset != search_string->charset) {
-        real_exception(interp, NULL, UNIMPLEMENTED, "Cross-charset index not supported");
-    }
+
+    if (source_string->charset != search_string->charset)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+            "Cross-charset index not supported");
 
     PARROT_ASSERT(source_string->encoding == Parrot_fixed_8_encoding_ptr);
     retval = Parrot_byte_rindex(interp, source_string,

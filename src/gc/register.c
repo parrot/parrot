@@ -76,7 +76,7 @@ of all active continuations.
 [the code for this is incomplete; it had suffered some bit-rot and was
 getting in the way of maintaining the other case.  -- rgr, 4-Feb-06.]
 
-RT#46177 GC has to lower this threshold when collecting continuations.
+RT #46177 GC has to lower this threshold when collecting continuations.
 
  CHUNKED_CTX_MEM = 0
 
@@ -216,7 +216,7 @@ parrot_gc_context(PARROT_INTERP)
         return;
     LVALUE_CAST(char *, ctx.bp) = interp->ctx_mem.threshold -
         sizeof (parrot_regs_t);
-    /* RT#46187 */
+    /* RT #46187 */
 #else
     UNUSED(interp);
 #endif
@@ -226,7 +226,7 @@ parrot_gc_context(PARROT_INTERP)
 
 =item C<static void clear_regs>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -252,7 +252,7 @@ clear_regs(PARROT_INTERP, ARGMOD(parrot_context_t *ctx))
 
     if (Interp_debug_TEST(interp, PARROT_REG_DEBUG_FLAG)) {
         /* depending on -D40 we set int, num to garbage different garbage
-         * RT#46179 remove this code for parrot 1.0
+         * RT #46179 remove this code for parrot 1.0
          */
         for (i = 0; i < ctx->n_regs_used[REGNO_INT]; i++) {
             CTX_REG_INT(ctx, i) = -999;
@@ -275,7 +275,7 @@ clear_regs(PARROT_INTERP, ARGMOD(parrot_context_t *ctx))
 
 =item C<static void init_context>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -285,26 +285,27 @@ static void
 init_context(PARROT_INTERP, ARGMOD(parrot_context_t *ctx),
         ARGIN_NULLOK(const parrot_context_t *old))
 {
-    ctx->ref_count = 0;                 /* RT#46191 1 - Exceptions !!! */
-    ctx->current_results = NULL;
+    ctx->ref_count         = 0;    /* RT #46191 1 - Exceptions !!! */
+    ctx->current_results   = NULL;
     ctx->results_signature = NULL;
-    ctx->lex_pad = PMCNULL;
-    ctx->outer_ctx = NULL;
-    ctx->current_cont = NULL;
-    ctx->current_object = NULL; /* RT#46181 who clears it?  */
-    ctx->current_HLL = 0;
+    ctx->lex_pad           = PMCNULL;
+    ctx->outer_ctx         = NULL;
+    ctx->current_cont      = NULL;
+    ctx->current_object    = NULL; /* RT #46181 who clears it?  */
+    ctx->current_HLL       = 0;
+    ctx->handlers = PMCNULL;
 
     if (old) {
         /* some items should better be COW copied */
-        ctx->constants = old->constants;
-        ctx->warns = old->warns;
-        ctx->errors = old->errors;
-        ctx->trace_flags = old->trace_flags;
-        ctx->pred_offset = old->pred_offset;
-        ctx->current_HLL = old->current_HLL;
+        ctx->constants         = old->constants;
+        ctx->warns             = old->warns;
+        ctx->errors            = old->errors;
+        ctx->trace_flags       = old->trace_flags;
+        ctx->pred_offset       = old->pred_offset;
+        ctx->current_HLL       = old->current_HLL;
         ctx->current_namespace = old->current_namespace;
         /* end COW */
-        ctx->recursion_depth = old->recursion_depth;
+        ctx->recursion_depth   = old->recursion_depth;
     }
     /* other stuff is set inside Sub.invoke */
     clear_regs(interp, ctx);
@@ -431,7 +432,7 @@ Parrot_alloc_context(PARROT_INTERP, ARGMOD(INTVAL *number_regs_used))
     void *ptr, *p;
 
     /*
-     * RT#46185 (OPT) if we allocate a new context due to a self-recursive call
+     * RT #46185 (OPT) if we allocate a new context due to a self-recursive call
      *      create a specialized version that just uses caller's size
      */
     const size_t size_i = sizeof (INTVAL)   * number_regs_used[REGNO_INT];
@@ -557,7 +558,7 @@ Parrot_free_context(PARROT_INTERP, ARGMOD(struct Parrot_Context *ctxp), int re_u
                         : (char*)doomed->name->strstart));
             }
             else {
-                real_exception(interp, NULL, 1,
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
                         "NULL doomed sub detected in Parrot_free_context");
             }
         }
@@ -611,7 +612,7 @@ Parrot_set_context_threshold(SHIM_INTERP, SHIM(struct Parrot_Context *ctxp))
 
 =item C<void Parrot_clear_i>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -630,7 +631,7 @@ Parrot_clear_i(PARROT_INTERP)
 
 =item C<void Parrot_clear_s>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -649,7 +650,7 @@ Parrot_clear_s(PARROT_INTERP)
 
 =item C<void Parrot_clear_p>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -668,7 +669,7 @@ Parrot_clear_p(PARROT_INTERP)
 
 =item C<void Parrot_clear_n>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 

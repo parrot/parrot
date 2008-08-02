@@ -64,7 +64,7 @@ empty:
   .return('')
 
 bad_args:
-  tcl_error 'wrong # args: should be "lindex list ?index...?"'
+  die 'wrong # args: should be "lindex list ?index...?"'
 .end
 
 # Local Variables:

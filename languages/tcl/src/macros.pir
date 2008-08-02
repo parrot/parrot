@@ -36,7 +36,7 @@ RT#40687: return the stacktrace for the current exception
 =cut
 
 .macro get_stacktrace (output)
-  .output = exception[.VALUE_SLOT]
+  .output = exception['message']
   .output .= "\n"
 .endm
 
@@ -47,7 +47,7 @@ Get the simple string message for the current exception.
 =cut
 
 .macro get_message (output)
-  .output = exception[.VALUE_SLOT]
+  .output = exception["message"]
 .endm
 
 =head2 get_severity (OUT int level)
@@ -57,7 +57,7 @@ Get the severity level of the current exception.
 =cut
 
 .macro get_severity (output)
-  .output = exception[.SEVERITY_SLOT]
+  .output = exception["severity"]
 .endm
 
 =head2 get_return_code
@@ -71,7 +71,7 @@ normal parrot C<.return>
 .macro get_return_code (output)
    .output = -1
    push_eh .$bad_handler
-    .output = exception[.CODE_SLOT]
+    .output = exception["type"]
    pop_eh
 
 .label $bad_handler:

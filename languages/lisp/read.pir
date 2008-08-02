@@ -183,13 +183,12 @@ DONE:
 
 .sub _error
   .param string type                    # There's current no way to add more
-  .param string mesg                    # than just _message to the exception.
+  .param string mesg                    # than just a message to the exception.
 
   .local pmc e
 
   e = new 'Exception'
-
-  e["_message"] = mesg
+  e = mesg
 
   throw e
 .end

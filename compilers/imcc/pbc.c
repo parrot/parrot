@@ -1131,7 +1131,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), int offs, int end)
         else {
             const INTVAL type = pmc_type(interp, classname);
             if (type <= 0)
-                real_exception(interp, NULL, NO_CLASS,
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NO_CLASS,
                     "Class '%Ss' specified in :instanceof(...) not found", classname);
             sub_pmc = pmc_new(interp, type);
         }

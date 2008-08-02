@@ -101,7 +101,8 @@ Returns a true value (1) if the supplied path is a directory.
 
         if (error) {
             char *errmsg = strerror(errno);
-            real_exception(interp, NULL, E_SystemError, errmsg);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
         }
 
         if (S_ISDIR(info.st_mode))
@@ -132,7 +133,8 @@ Returns a true value (1) if the supplied path is a plain file.
 
         if (error) {
             char *errmsg = strerror(errno);
-            real_exception(interp, NULL, E_SystemError, errmsg);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
         }
 
         if (S_ISREG(info.st_mode))
@@ -165,7 +167,8 @@ Returns a true value (1) if the supplied path is a link.
 
         if (error) {
             char *errmsg = strerror(errno);
-            real_exception(interp, NULL, E_SystemError, errmsg);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
         }
 
         if (S_ISLNK(info.st_mode))
@@ -214,8 +217,8 @@ free to change or give me hints on how to change it. -- ambs
                     if (bytes_read) {
                         bytes_written = fwrite(buf, 1, bytes_read, target);
                         if (bytes_read != bytes_written) {
-                            real_exception(interp, NULL, E_SystemError,
-                                           "Error writting file");
+                            Parrot_ex_throw_from_c_args(interp, NULL,
+                                EXCEPTION_EXTERNAL_ERROR, "Error writing file");
                             break;
                         }
                     }
@@ -224,13 +227,15 @@ free to change or give me hints on how to change it. -- ambs
             }
             else {
                 char *errmsg = strerror(errno);
-                real_exception(interp, NULL, E_SystemError, errmsg);
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                    errmsg);
             }
             fclose(source);
         }
         else {
             char *errmsg = strerror(errno);
-            real_exception(interp, NULL, E_SystemError, errmsg);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
         }
 #undef CHUNK_SIZE
     }
@@ -255,7 +260,8 @@ Rename a file C<from> to the path C<to>.
 
         if (error) {
             char *errmsg = strerror(errno);
-            real_exception(interp, NULL, E_SystemError, errmsg);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                errmsg);
         }
     }
 }

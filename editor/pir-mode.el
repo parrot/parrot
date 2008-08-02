@@ -146,7 +146,7 @@ newline or semicolon after an end keyword."
 (defvar pir-PMC-keyword-symbols
   '("AddrRegistry" "Array" "BigInt" "Boolean" "Bound_NCI" "Capture"
     "Class" "Closure" "Compiler" "Complex" "Continuation" "Coroutine"
-    "Enumerate" "Env" "Eval" "Exception" "Exception_Handler"
+    "Enumerate" "Env" "Eval" "Exception" "ExceptionHandler"
     "Exporter" "File" "FixedBooleanArray" "FixedFloatArray"
     "FixedIntegerArray" "FixedPMCArray" "FixedStringArray" "Float"
     "Hash" "IntList" "Integer" "Iterator" "Key" "LexInfo" "LexPad"

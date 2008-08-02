@@ -126,7 +126,7 @@ done:
    .return ($I0)
 
 badargs:
-  tcl_error 'wrong # args: should be "regexp ?switches? exp string ?matchVar? ?subMatchVar subMatchVar ...?"'
+  die 'wrong # args: should be "regexp ?switches? exp string ?matchVar? ?subMatchVar subMatchVar ...?"'
 
 .end
 

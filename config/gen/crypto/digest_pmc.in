@@ -34,11 +34,12 @@ pmclass @md_name@
 */
     void init() {
 @md_guard@
-        @md_ctx@ *c     = mem_allocate_zeroed_typed(@md_ctx@);
+        @md_ctx@ *c    = mem_allocate_zeroed_typed(@md_ctx@);
         PMC_data(SELF) = c;
         PObj_active_destroy_SET(SELF);
 #else
-        real_exception(interp, NULL, ILL_INHERIT, "@md_name@ is disabled");
+        Parrot_ex_throw_from_c(interp, NULL, EXCEPTION_ILL_INHERIT,
+            "@md_name@ is disabled");
 #endif
     }
 

@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2007, The Perl Foundation.
+ * Copyright (C) 2004-2008, The Perl Foundation.
  */
 
 /*
@@ -42,9 +42,10 @@ Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)
     pid_t child;
     child = fork();
     /* Did we fail? */
-    if (-1 == child) {
-        real_exception(interp, NULL, NOSPAWN, "Can't spawn child process");
-    }
+    if (-1 == child)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NOSPAWN,
+            "Can't spawn child process");
+
     /* Are we the parent or child? */
     if (child) {
         /* parent */
@@ -84,14 +85,17 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
 {
     pid_t child;
     int len = VTABLE_elements(interp, cmdargs);
-    if (len == 0) {
-        real_exception(interp, NULL, NOSPAWN, "Empty argument array for execvp");
-    }
+
+    if (len == 0)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NOSPAWN,
+            "Empty argument array for execvp");
+
     child = fork();
     /* Did we fail? */
-    if (-1 == child) {
-        real_exception(interp, NULL, NOSPAWN, "Can't spawn child process");
-    }
+    if (-1 == child)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NOSPAWN,
+            "Can't spawn child process");
+
     /* Are we the parent or child? */
     if (child) {
         /* parent */
@@ -147,7 +151,8 @@ Parrot_Exec_OS_Command(Parrot_Interp interp, STRING *command)
 
     /* if we get here, something's horribly wrong... */
     if (status)
-        real_exception(interp, NULL, NOSPAWN, "Exec failed, code %i", status);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NOSPAWN,
+            "Exec failed, code %i", status);
 }
 
 /*

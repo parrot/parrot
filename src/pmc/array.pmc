@@ -49,7 +49,7 @@ static PMC *retval(PARROT_INTERP, void *ret) {
     PMC *value;
 
     if (ret == 0)
-        real_exception(interp, NULL, E_IndexError,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
             "Array index out of bounds!");
 
     /* XXX getting non existent value, exception or undef?
@@ -85,7 +85,7 @@ static PMC *Parrot_Array_set_pmc_ptr(PARROT_INTERP, List *list, INTVAL key) {
     PMC  *value;
 
     if (ret == 0)
-        real_exception(interp, NULL, E_IndexError,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
             "Array index out of bounds!");
 
     /* assign into a sparse or not yet set value */
@@ -705,7 +705,7 @@ Sets the PMC at element C<idx> to C<*src>.
         const INTVAL length = ((List *)PMC_data(SELF))->length;
 
         if (idx >= length || -idx > length)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "Array index out of bounds!");
 
         list_assign(INTERP, (List *)PMC_data(SELF), idx,
@@ -1010,7 +1010,7 @@ C<offset>.
 
     void splice(PMC *value, INTVAL offset, INTVAL count) {
         if (SELF->vtable->base_type != value->vtable->base_type)
-            real_exception(INTERP, NULL, E_TypeError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Type mismatch in splice");
 
         list_splice(INTERP, (List *)PMC_data(SELF),
@@ -1203,7 +1203,8 @@ Return a new iterator for SELF.
             return iter;
         }
 
-        real_exception(INTERP, NULL, E_TypeError, "Array: Unknown slice type");
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Array: Unknown slice type");
     }
 
     VTABLE PMC *get_iter() {
@@ -1287,8 +1288,8 @@ Recursively make the array read-only and shared.
 
         /* prevent infinite recursion */
         if (PObj_is_PMC_shared_TEST(SELF))
-            real_exception(INTERP, NULL, INVALID_OPERATION, "share_ro on "
-                           "something that already is shared");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                    "share_ro on something that already is shared");
 
         _true = pmc_new(INTERP, enum_class_Integer);
         VTABLE_set_integer_native(INTERP, _true, 1);

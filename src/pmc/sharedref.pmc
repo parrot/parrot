@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -122,7 +122,8 @@ Catch dereferencing. This would unshare the referred PMC.
     }
 
     VTABLE PMC *get_pmc() {
-        real_exception(INTERP, NULL, E_ReferenceError, "deref not allowed");
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            "deref not allowed");
     }
 
 /*

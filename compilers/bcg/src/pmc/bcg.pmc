@@ -83,7 +83,8 @@ This method starts the code generation phase.
             BCG_start_code_gen(bcg_info);
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                bcg_info->error_msg);
         }
         BCG_END_TRY;
     }
@@ -104,7 +105,8 @@ This method concludes the code generation phase.
             BCG_end_code_gen(bcg_info);
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                bcg_info->error_msg);
         }
         BCG_END_TRY;
 
@@ -131,7 +133,8 @@ This method is called to generate byte code for start subroutine.
             string_cstring_free(pragma_str);
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                bcg_info->error_msg);
         }
         BCG_END_TRY;
     }
@@ -153,7 +156,8 @@ This method is called to generate bytecode for end subroutine
             BCG_end_sub(bcg_info);
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                bcg_info->error_msg);
         }
         BCG_END_TRY;
     }
@@ -176,7 +180,8 @@ This method generates code for a subroutine call.
             string_cstring_free(name_str);
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                bcg_info->error_msg);
         }
         BCG_END_TRY;
     }
@@ -198,7 +203,8 @@ This method generated code for ending a subroutine call.
             BCG_end_call(bcg_info);
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                bcg_info->error_msg);
         }
         BCG_END_TRY;
     }
@@ -222,7 +228,8 @@ This method generates code for an opertion.
             string_cstring_free(op_name);
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                bcg_info->error_msg);
         }
         BCG_END_TRY;
     }
@@ -244,7 +251,8 @@ This method marks the end of an operation.
             BCG_end_op(bcg_info);
         }
         BCG_CATCH(BCG_EXCEPTION) {
-             real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                bcg_info->error_msg);
         }
         BCG_END_TRY;
     }
@@ -272,7 +280,8 @@ This method generates bytecode for a variable.
         }
         BCG_CATCH(BCG_EXCEPTION) {
             string_cstring_free(val_str);
-            real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                bcg_info->error_msg);
         }
         BCG_END_TRY;
 
@@ -303,7 +312,8 @@ This method generates bytecode for a constant.
         }
         BCG_CATCH(BCG_EXCEPTION) {
             string_cstring_free(name_str);
-            real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                bcg_info->error_msg);
         }
         BCG_END_TRY;
 
@@ -330,7 +340,8 @@ This method generates bytecode for label.
         }
         BCG_CATCH(BCG_EXCEPTION) {
             string_cstring_free(label_str);
-            real_exception(INTERP, NULL, E_Exception, bcg_info->error_msg);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                bcg_info->error_msg);
         }
         BCG_END_TRY;
 
@@ -362,7 +373,8 @@ get_data_type_from_cstring(Interp *interp, char *data_type)
         return 'S';
     }
 
-    real_exception(interp, NULL, E_Exception, "Invalid data type.");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        "Invalid data type.");
 }
 
 /*

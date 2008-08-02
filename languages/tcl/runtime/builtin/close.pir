@@ -31,10 +31,10 @@
     $S0 = 'can not find channel name "'
     $S0 .= channel_id
     $S0 .= '"'
-    tcl_error $S0
+    die $S0
 
   bad_args:
-    tcl_error 'wrong # args: should be "close channelId"'
+    die 'wrong # args: should be "close channelId"'
 
 .end
 

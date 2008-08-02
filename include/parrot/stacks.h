@@ -75,6 +75,19 @@ void Parrot_dump_dynamic_environment(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
+void Parrot_pop_mark(PARROT_INTERP, INTVAL mark)
+        __attribute__nonnull__(1);
+
+PARROT_API
+void Parrot_push_action(PARROT_INTERP, ARGIN(PMC *sub))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
+void Parrot_push_mark(PARROT_INTERP, INTVAL mark)
+        __attribute__nonnull__(1);
+
+PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 void * pop_dest(PARROT_INTERP)

@@ -117,7 +117,7 @@ Initializes a PMCProxy PMC.
 
         /* Ensure that it's a valid type number. */
         if (type_num > interp->n_vtable_max || type_num <= 0)
-            real_exception(interp, NULL, 1,
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "Attempt to create PMC Proxy for invalid type number!");
 
         /* Set up the object. */

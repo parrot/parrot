@@ -33,7 +33,7 @@ bad_args:
   .return ('') # once all commands are implemented, remove this...
 
 no_args:
-  tcl_error 'wrong # args: should be "encoding option ?arg ...?"'
+  die 'wrong # args: should be "encoding option ?arg ...?"'
 
 .end
 
@@ -53,7 +53,7 @@ no_args:
   .return('')
 
 bad_args:
-  tcl_error 'wrong # args: should be "encoding convertfrom ?encoding? data"'
+  die 'wrong # args: should be "encoding convertfrom ?encoding? data"'
 .end
 
 .sub 'convertto'
@@ -68,7 +68,7 @@ bad_args:
   .return('')
 
 bad_args:
-  tcl_error 'wrong # args: should be "encoding convertto ?encoding? data"'
+  die 'wrong # args: should be "encoding convertto ?encoding? data"'
 .end
 
 .sub 'dirs'
@@ -82,7 +82,7 @@ bad_args:
   .return('')
 
 bad_args:
-  tcl_error 'wrong # args: should be "encoding dirs ?directoryList?"'
+  die 'wrong # args: should be "encoding dirs ?directoryList?"'
 .end
 
 .sub 'names'
@@ -96,7 +96,7 @@ bad_args:
   .return('')
 
 bad_args:
-  tcl_error 'wrong # args: should be "encoding names"'
+  die 'wrong # args: should be "encoding names"'
 .end
 
 .sub 'system'
@@ -110,7 +110,7 @@ bad_args:
   .return('')
 
 bad_args:
-  tcl_error 'wrong # args: should be "encoding system ?encoding?"'
+  die 'wrong # args: should be "encoding system ?encoding?"'
 .end
 
 .sub 'anon' :anon :load

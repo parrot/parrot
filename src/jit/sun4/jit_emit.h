@@ -435,7 +435,7 @@ static void Parrot_jit_branch(Parrot_jit_info_t *jit_info, int branch, int cond,
                     jit_info->optimizer->cur_section->branch_target->load_size;
 
         if ((offset > emitm_branch_max) || (offset < emitm_branch_min))
-            internal_exception(JIT_ERROR,
+            exit_fatal(EXCEPTION_JIT_ERROR,
                            "Branches beyond 8 Megabytes not yet supported\n");
         offset /= 4;
         emitm_2b(jit_info->native_ptr, annul, cond, branch, offset);
@@ -522,7 +522,7 @@ static void jit_emit_load_i(Parrot_jit_info_t *jit_info,
             break;
 
         default:
-            internal_exception(JIT_ERROR,
+            exit_fatal(EXCEPTION_JIT_ERROR,
                                "Unsupported op parameter type %d\n",
                                op_type);
     }
@@ -565,7 +565,7 @@ static void jit_emit_store_i(Parrot_jit_info_t *jit_info,
             break;
 
         default:
-            internal_exception(JIT_ERROR,
+            exit_fatal(EXCEPTION_JIT_ERROR,
                             "Unsupported op parameter type %d\n", op_type);
     }
 }
@@ -613,7 +613,7 @@ static void jit_emit_load_n(Parrot_jit_info_t *jit_info,
             break;
 
         default:
-            internal_exception(JIT_ERROR,
+            exit_fatal(EXCEPTION_JIT_ERROR,
                             "Unsupported op parameter type %d\n", op_type);
     }
 }
@@ -643,7 +643,7 @@ static void jit_emit_store_n(Parrot_jit_info_t *jit_info,
             break;
 
         default:
-            internal_exception(JIT_ERROR,
+            exit_fatal(EXCEPTION_JIT_ERROR,
                             "Unsupported op parameter type %d\n", op_type);
     }
 }
@@ -676,7 +676,7 @@ void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info,
                 break;
 
             default:
-                internal_exception(JIT_ERROR, "Unknown fixup type:%d\n",
+                exit_fatal(EXCEPTION_JIT_ERROR, "Unknown fixup type:%d\n",
                     fixup->type);
             break;
         }
@@ -922,7 +922,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 emitm_ld_i(jit_info->native_ptr, XSR1, 0, emitm_o(rdx));
                 break;
             default:
-                internal_exception(1,
+                exit_fatal(1,
                         "jit_vtable_n_op: unimp type %d, arg %d vtable %d",
                         op_info->types[i - 1], i, nvtable);
                 break;
@@ -963,7 +963,7 @@ Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
                        Parrot_jit_regoff((int)&REG_NUM(interp, val), interp));
             break;
         default:
-            internal_exception(JIT_ERROR, "jit_vtable1r: ill LHS");
+            exit_fatal(EXCEPTION_JIT_ERROR, "jit_vtable1r: ill LHS");
     }
 }
 
@@ -1123,7 +1123,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     int i2 = *(jit_info->cur_op + 2);
 
     if (i2 <= 0 || i2 >= interp->n_vtable_max)
-        internal_exception(1, "Illegal PMC enum (%d) in new", i2);
+        exit_fatal(1, "Illegal PMC enum (%d) in new", i2);
 
     /* get "a" pmc first - calling function:  pmc_new_noinit(...) */
     /* PMC* pmc_new_noinit(PARROT_INTERP, INTVAL base_type) */

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2007, The Perl Foundation.
+Copyright (C) 2005-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -160,9 +160,9 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
 #  include <unicode/unorm.h>
 #endif
 #define EXCEPTION(err, str) \
-    real_exception(interp, NULL, (err), (str))
+    Parrot_ex_throw_from_c_args(interp, NULL, (err), (str))
 
-#define UNIMPL EXCEPTION(UNIMPLEMENTED, "unimplemented unicode")
+#define UNIMPL EXCEPTION(EXCEPTION_UNIMPLEMENTED, "unimplemented unicode")
 
 /*
 
@@ -294,8 +294,8 @@ compose(PARROT_INTERP, ARGIN(STRING *src))
     return dest;
 #else
     UNUSED(src);
-    real_exception(interp, NULL, E_LibraryNotLoadedError,
-            "no ICU lib loaded");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+        "no ICU lib loaded");
 #endif
 }
 
@@ -394,8 +394,8 @@ upcase(PARROT_INTERP, ARGIN(STRING *src))
     }
 #else
     UNUSED(src);
-    real_exception(interp, NULL, E_LibraryNotLoadedError,
-            "no ICU lib loaded");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+        "no ICU lib loaded");
 #endif
 }
 
@@ -452,8 +452,8 @@ u_strToLower(UChar *dest, int32_t destCapacity,
         src->encoding = Parrot_ucs2_encoding_ptr;
 #else
     UNUSED(src);
-    real_exception(interp, NULL, E_LibraryNotLoadedError,
-            "no ICU lib loaded");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+        "no ICU lib loaded");
 #endif
 }
 
@@ -511,8 +511,8 @@ u_strToTitle(UChar *dest, int32_t destCapacity,
         src->encoding = Parrot_ucs2_encoding_ptr;
 #else
     UNUSED(src);
-    real_exception(interp, NULL, E_LibraryNotLoadedError,
-            "no ICU lib loaded");
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+        "no ICU lib loaded");
 #endif
 }
 
@@ -720,9 +720,11 @@ u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
         if (codepoint >= 0x1b50 && codepoint <= 0x1b59) return 1;
         if (codepoint >= 0xff10 && codepoint <= 0xff19) return 1;
     }
+
     if (flags & ~(enum_cclass_whitespace | enum_cclass_numeric | enum_cclass_newline))
-        real_exception(interp, NULL, E_LibraryNotLoadedError,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
             "no ICU lib loaded");
+
     return 0;
 #endif
 }

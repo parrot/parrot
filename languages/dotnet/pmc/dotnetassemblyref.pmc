@@ -56,7 +56,7 @@ pmclass DotNetAssemblyRef dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!ar)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetAssemblyRef PMC");
 
         return ar->str_name;
@@ -71,7 +71,7 @@ pmclass DotNetAssemblyRef dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!ar)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetAssemblyRef PMC");
 
         result = (INTVAL)ar->version_major;
@@ -87,7 +87,7 @@ pmclass DotNetAssemblyRef dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!ar)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetAssemblyRef PMC");
 
         result = (INTVAL)ar->version_minor;
@@ -103,7 +103,7 @@ pmclass DotNetAssemblyRef dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!ar)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetAssemblyRef PMC");
 
         result = (INTVAL)ar->version_build;
@@ -119,7 +119,7 @@ pmclass DotNetAssemblyRef dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!ar)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetAssemblyRef PMC");
 
         result = (INTVAL)ar->version_revision;
@@ -135,7 +135,7 @@ pmclass DotNetAssemblyRef dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!ar)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetAssemblyRef PMC");
 
         result = (INTVAL)ar->flags;
@@ -151,7 +151,7 @@ pmclass DotNetAssemblyRef dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!ar)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetAssemblyRef PMC");
 
         result = (INTVAL)ar->public_key;
@@ -167,7 +167,7 @@ pmclass DotNetAssemblyRef dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!ar)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetAssemblyRef PMC");
 
         result = ar->str_culture;
@@ -183,7 +183,7 @@ pmclass DotNetAssemblyRef dynpmc group dotnet {
 
         /* Handle cases where we've an invalid PMC. */
         if (!ar)
-            real_exception(INTERP, NULL, E_StandardError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Invalid DotNetAssemblyRef PMC");
 
         result = (INTVAL)ar->hash_value;

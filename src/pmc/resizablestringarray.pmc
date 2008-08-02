@@ -42,7 +42,7 @@ Returns the Parrot string value of the element at index C<key>.
         if (key < 0) {
             INTVAL size = SELF.elements();
             if (key < -size)
-                real_exception(INTERP, NULL, E_IndexError,
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableStringArray: index out of bounds!");
             else
                 key += size;
@@ -75,7 +75,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
         if (key < 0) {
             INTVAL size = SELF.elements();
             if (key < -size)
-                real_exception(INTERP, NULL, E_IndexError,
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableStringArray: index out of bounds!");
             else
                 key += size;
@@ -120,7 +120,7 @@ Removes and returns the last element in the array.
         STRING *value;
 
         if (size == 0) {
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableStringArray: Can't pop from an empty array!");
         }
 
@@ -190,7 +190,7 @@ Resizes the array to C<size> elements.
 
     VTABLE void set_integer_native(INTVAL size) {
         if (size < 0)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableStringArray: Can't resize!");
 
         if (!PMC_data(SELF)) {
@@ -274,7 +274,7 @@ Removes and returns an item from the start of the array.
         STRING *value;
 
         if (size == 0)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableStringArray: Can't shift from an empty array!");
 
         value = SELF.get_string_keyed_int(0);
@@ -404,7 +404,7 @@ Removes and returns a String PMC from the start of the array.
         STRING *value;
 
         if (size == 0)
-            real_exception(INTERP, NULL, E_IndexError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableStringArray: Can't shift from an empty array!");
 
         value = SELF.get_string_keyed_int(0);
@@ -564,7 +564,7 @@ everything via the VTABLE api.
 
         if (value->vtable->base_type != SELF->vtable->base_type &&
                 value->vtable->base_type != enum_class_FixedStringArray)
-            real_exception(INTERP, NULL, E_TypeError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "ResizableStringArray: illegal type for splice!");
 
         length = VTABLE_elements(INTERP, SELF);
@@ -576,7 +576,7 @@ everything via the VTABLE api.
             offset += length;
 
         if (offset < 0)
-            real_exception(INTERP, NULL, OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "illegal splice offset\n");
 
         /* shrink the array */

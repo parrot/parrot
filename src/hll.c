@@ -347,7 +347,7 @@ Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
     const INTVAL n = VTABLE_elements(interp, hll_info);
 
     if (hll_id >= n)
-        real_exception(interp, NULL, E_ValueError,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
             "no such HLL ID (%vd)", hll_id);
 
     /* the type might already be registered in a non-conflicting way, in which
@@ -395,15 +395,15 @@ Parrot_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
         return core_type;
 
     if (hll_id < 0)
-        real_exception(interp, NULL, E_ValueError,
-                "no such HLL ID (%vd)", hll_id);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
+            "no such HLL ID (%vd)", hll_id);
 
     hll_info = interp->HLL_info;
     n        = VTABLE_elements(interp, hll_info);
 
     if (hll_id >= n)
-        real_exception(interp, NULL, E_ValueError,
-                "no such HLL ID (%vd)", hll_id);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
+            "no such HLL ID (%vd)", hll_id);
 
     START_READ_HLL_INFO(interp, hll_info);
     entry     = VTABLE_get_pmc_keyed_int(interp, hll_info, hll_id);

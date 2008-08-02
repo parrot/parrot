@@ -441,7 +441,8 @@ The easiest way is the perl-like
 You can also explicitly create an exception object and throw it:
 
     $P0 = new 'Exception'
-    $P0['_message'] = 'Eeek'
+    $P0 = 'something happened'
+    throw $P0
 
 =head2 How do I catch an exception in PIR?
 
@@ -471,13 +472,31 @@ Rethrow the exception if it has a severity of C<EXCEPT_EXIT>.
   ...
   handler:
     .get_results ($P0, $S0)
-    $I0 = $P0[2]
+    $I0 = $P0['severity']
     if $I0 == .EXCEPT_EXIT goto handle_exit
     say 'Exception caught!'
     ...
 
-  handle_exit
+  handle_exit:
     rethrow $P0 # let the next handler deal with it.
+
+Exception example:
+
+    push_eh handler
+    $P0 = new 'Exception'
+    $P0 = 'something happened'
+    throw $P0
+    pop_eh
+    exit 0
+
+  handler:
+    .local pmc exception
+    .local string message
+    .get_results (exception, message)
+    print 'Exception: '
+    print message
+    print "\n"
+    exit 1
 
 =head1 C Extensions
 

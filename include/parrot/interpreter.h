@@ -235,6 +235,7 @@ typedef struct Parrot_Context {
     INTVAL current_HLL;         /* see also src/hll.c */
     opcode_t *current_results;  /* ptr into code with get_results opcode */
     PMC *results_signature;     /* results signature pmc if it is non-const */
+    PMC *handlers;              /* local handlers for the context */
     /* deref the constants - we need it all the time */
     struct PackFile_Constant ** constants;
     /* code->prederefed.code - code->base.data in opcodes
@@ -292,6 +293,20 @@ typedef struct _context_mem {
 #endif
 
 } context_mem;
+
+/* Wrap the jump buffer in a struct, to make it a linked list. Jump buffers are
+ * used to resume execution at a point in the runloop where an exception
+ * handler can be run. Ultimately this information should be part of
+ * Parrot_Context, but at this point a new context isn't created for every
+ * runloop ID, so it still needs to be a separate stack for a while longer.*/
+
+typedef struct parrot_runloop_t {
+    Parrot_jump_buff resume;     /* jmp_buf */
+    struct parrot_runloop_t *prev; /* interpreter's runloop jump buffer stack */
+} parrot_runloop_t;
+
+typedef parrot_runloop_t Parrot_runloop;
+
 
 struct _handler_node_t; /* forward def - exit.h */
 
@@ -394,9 +409,8 @@ struct parrot_interp_t {
     struct _handler_node_t *exit_handler_list;/* exit.c */
     int sleeping;                             /* used during sleep in events */
 
-    struct parrot_exception_t *exceptions;    /* internal exception stack */
-    struct parrot_exception_t *exc_free_list; /* and free list */
-    PMC                      **exception_list;/* precreated exception objects */
+    struct parrot_runloop_t *current_runloop;   /* internal runloop jump point stack */
+    struct parrot_runloop_t *runloop_jmp_free_list; /* and free list */
 
     int current_runloop_level;                /* for reentering run loop */
     int current_runloop_id;
@@ -509,6 +523,14 @@ void Parrot_really_destroy(PARROT_INTERP,
 
 /* HEADERIZER BEGIN: src/inter_run.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_API
+void free_runloop_jump_point(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_API
+void new_runloop_jump_point(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_IGNORABLE_RESULT
@@ -680,6 +702,12 @@ INTVAL Parrot_runops_fromc_args_reti(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
+
+void destroy_runloop_jump_points(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+void really_destroy_runloop_jump_points(ARGIN(Parrot_runloop *jump_point))
+        __attribute__nonnull__(1);
 
 void runops(PARROT_INTERP, size_t offs)
         __attribute__nonnull__(1);

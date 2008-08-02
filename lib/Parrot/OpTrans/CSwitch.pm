@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2004, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -192,7 +192,8 @@ sub run_core_finish {
                 *(opcode_t*)cur_opcode = CORE_OPS_wrapper__;
                 continue;
             }
-            real_exception(interp, NULL, 1, "illegal opcode in switch core\\n");
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                "illegal opcode in switch core\\n");
             break;
         } /* switch */
 END_C

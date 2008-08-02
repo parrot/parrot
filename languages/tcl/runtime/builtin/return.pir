@@ -18,10 +18,10 @@
     if $S0 != '-code' goto bad_call
     if $S1 != 'error' goto bad_call
 
-    tcl_error $S2
+    die $S2
 
 bad_call:
-    tcl_error 'XXX: bad call to return'
+    die 'XXX: bad call to return'
 
 onearg:
     $P0 = argv[0]

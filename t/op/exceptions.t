@@ -1,12 +1,12 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 29;
 
 =head1 NAME
 
@@ -18,7 +18,7 @@ t/pmc/exception.t - Exception Handling
 
 =head1 DESCRIPTION
 
-Tests C<Exception> and C<Exception_Handler> PMCs.
+Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 =cut
 
@@ -36,7 +36,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh eh - pop_eh" );
-    new P29, 'Exception_Handler'
+    new P29, 'ExceptionHandler'
     push_eh P29
     print "ok 1\n"
     pop_eh
@@ -64,7 +64,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh eh - throw" );
     print "main\n"
-    new P29, 'Exception_Handler'
+    new P29, 'ExceptionHandler'
     set_addr P29, _handler
     push_eh P29
     new P30, 'Exception'
@@ -83,7 +83,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "get_results" );
     print "main\n"
     push_eh handler
     new P1, 'Exception'
-    set P1[0], "just pining"
+    set P1, "just pining"
     throw P1
     print "not reached\n"
     end
@@ -111,7 +111,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "get_results - be sure registers are ok" )
     new P0, 'Integer'
     push_eh handler
     new P1, 'Exception'
-    set P1[0], "just pining"
+    set P1, "just pining"
     throw P1
     print "not reached\n"
     end
@@ -131,7 +131,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', ".get_results() - PIR" );
     print "main\n"
     push_eh _handler
     new P1, 'Exception'
-    set P1[0], "just pining"
+    set P1, "just pining"
     throw P1
     print "not reached\n"
     end
@@ -159,7 +159,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw - message" );
     push_eh _handler
 
     new P30, 'Exception'
-    set P30["_message"], "something happend"
+    set P30, "something happend"
     throw P30
     print "not reached\n"
     end
@@ -177,7 +177,7 @@ OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler" );
     new P0, 'Exception'
-    set P0["_message"], "something happend"
+    set P0, "something happend"
     throw P0
     print "not reached\n"
     end
@@ -213,7 +213,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers" );
     push_eh _handler2
 
     new P30, 'Exception'
-    set P30["_message"], "something happend"
+    set P30, "something happend"
     throw P30
     print "not reached\n"
     end
@@ -241,7 +241,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers, throw next" );
     push_eh _handler2
 
     new P30, 'Exception'
-    set P30["_message"], "something happend"
+    set P30, "something happend"
     throw P30
     print "not reached\n"
     end
@@ -256,7 +256,7 @@ _handler2:
     print "caught it in 2\n"
     print S0
     print "\n"
-    throw P5	# XXX rethrow?
+    rethrow P5
     end
 CODE
 main
@@ -286,18 +286,13 @@ pasm_output_is( <<'CODE', <<OUT, "die, error, severity" );
 _handler:
     get_results "0,0", P5, S0
     print "caught it\n"
-    set I0, P5["_type"]
-    print "error "
-    print I0
-    print "\n"
-    set I0, P5["_severity"]
+    set I0, P5['severity']
     print "severity "
     print I0
     print "\n"
     end
 CODE
 caught it
-error 100
 severity 3
 OUT
 
@@ -337,196 +332,16 @@ caught it
 OUTPUT
 1;
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "pushmark" );
-    pushmark 10
-    print "ok 1\n"
-    popmark 10
-    print "ok 2\n"
-    end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "pushmark nested" );
-    pushmark 10
-    pushmark 11
-    print "ok 1\n"
-    popmark 11
-    popmark 10
-    print "ok 2\n"
-    end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "pushmark - pop wrong one" );
-    pushmark 10
-    print "ok 1\n"
-    popmark 500
-    print "never\n"
-    end
-CODE
-/Mark 500 not found/
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "pushaction, throw" );
-    push_eh handler
-    print "ok 1\n"
-    .const .Sub P10 = "action"
-    pushaction P10
-    print "ok 2\n"
-    new P10, 'Exception'
-    throw P10
-    print "never\n"
-handler:
-    print "ok 3\n"
-    end
-.pcc_sub action:
-    get_params "0", I5
-    print "in action I5 = "
-    print I5
-    print "\n"
-    returncc
-CODE
-ok 1
-ok 2
-in action I5 = 1
-ok 3
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', 'cleanup global:  continuation' );
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'pop_eh with no handler' );
 .sub main :main
-    .local pmc outer, cont
-    outer = new 'String'
-    outer = "Outer value\n"
-    set_global ['Foo'; 'Bar'], "test", outer
-    new cont, 'Continuation'
-    set_addr cont, endcont
-    set_global ['Foo'; 'Bar'], "exit", cont
-    show_value()
-    test1()
-    print "skipped.\n"
-endcont:
-    show_value()
-.end
-.sub test1
-    .local pmc test1_binding, old_value, cleanup
-    .lex "old_value", old_value
-    test1_binding = new 'String'
-    test1_binding = "Inner value\n"
-    old_value = get_global ['Foo'; 'Bar'], "test"
-    .const .Sub test1_cleanup_sub = "test1_cleanup"
-    cleanup = newclosure test1_cleanup_sub
-    pushaction cleanup
-    set_global ['Foo'; 'Bar'], "test", test1_binding
-    show_value()
-    test2()
-    show_value()
-.end
-.sub test1_cleanup :outer(test1)
-    .local pmc old_value
-    print "[in test1_cleanup]\n"
-    find_lex old_value, "old_value"
-    set_global ['Foo'; 'Bar'], "test", old_value
-.end
-.sub test2
-    .local pmc test2_binding, exit
-    test2_binding = new 'String'
-    test2_binding = "Innerer value\n"
-    set_global ['Foo'; 'Bar'], "test", test2_binding
-    show_value()
-    exit = get_global ['Foo'; 'Bar'], "exit"
-    exit()
-.end
-.sub show_value
-    .local pmc value
-    value = get_global ['Foo'; 'Bar'], "test"
-    print value
-.end
-CODE
-Outer value
-Inner value
-Innerer value
-[in test1_cleanup]
-Outer value
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', 'cleanup global:  throw' );
-.sub main :main
-    .local pmc outer
-    outer = new 'String'
-    outer = "Outer value\n"
-    set_global ['Foo'; 'Bar'], "test", outer
-    push_eh eh
-    show_value()
-    test1()
-    print "skipped.\n"
-eh:
-    .local pmc exception
-    .get_results (exception, $S0)
-    print "Error: "
-    print exception
-    print "\n"
-last:
-    show_value()
-.end
-.sub test1
-    .local pmc test1_binding, old_value, cleanup
-    .lex "old_value", old_value
-    test1_binding = new 'String'
-    test1_binding = "Inner value\n"
-    old_value = get_global ['Foo'; 'Bar'], "test"
-    .const .Sub test1_cleanup_sub = "test1_cleanup"
-    cleanup = newclosure test1_cleanup_sub
-    pushaction cleanup
-    set_global ['Foo'; 'Bar'], "test", test1_binding
-    show_value()
-    test2()
-    show_value()
-.end
-.sub test1_cleanup :outer(test1)
-    .local pmc old_value
-    print "[in test1_cleanup]\n"
-    find_lex old_value, "old_value"
-    set_global ['Foo'; 'Bar'], "test", old_value
-.end
-.sub test2
-    .local pmc test2_binding, exit
-    test2_binding = new 'String'
-    test2_binding = "Innerer value\n"
-    set_global ['Foo'; 'Bar'], "test", test2_binding
-    show_value()
-    exit = new 'Exception'
-    exit["_message"] = "something happened"
-    throw exit
-.end
-.sub show_value
-    .local pmc value
-    value = get_global ['Foo'; 'Bar'], "test"
-    print value
-.end
-CODE
-Outer value
-Inner value
-Innerer value
-[in test1_cleanup]
-Error: something happened
-Outer value
-OUTPUT
-
-pir_error_output_like( <<'CODE', <<'OUTPUT', 'pop_eh out of context (1)' );
-.sub main :main
-    pushmark 1
     pop_eh
     print "no exceptions.\n"
 .end
 CODE
-/No exception to pop./
+/No handler to delete./
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'pop_eh out of context (2)' );
+pir_output_is( <<'CODE', <<'OUTPUT', 'pop_eh out of context (2)');
 .sub main :main
     .local pmc outer, cont
     push_eh handler
@@ -551,7 +366,7 @@ done:
 .end
 CODE
 [in test1]
-Error: No exception to pop.
+Error: No handler to delete.
 done.
 OUTPUT
 
@@ -588,55 +403,15 @@ CODE
 caught
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "pushaction - throw in main" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "throw in main, no handler" );
 .sub main :main
     print "main\n"
-    .const .Sub at_exit = "exit_handler"
-    pushaction at_exit
     $P0 = new 'Exception'
     throw $P0
     .return()
 .end
-
-.sub exit_handler
-    .param int flag
-    print "at_exit, flag = "
-    say flag
-.end
 CODE
 /^main
-No exception handler/
-OUTPUT
-
-# exception handlers are still run in an inferior runloop, which messes up
-# nonlocal exit from within handlers.
-pir_output_like(
-    <<'CODE', <<'OUTPUT', "pushaction: error while handling error", todo => 'runloop shenanigans' );
-.sub main :main
-    push_eh h
-    print "main\n"
-    .const .Sub at_exit = "exit_handler"
-    pushaction at_exit
-    $P1 = new 'Exception'
-    throw $P1
-    print "never 1\n"
-h:
-    ## this is never actually reached, because exit_handler throws an unhandled
-    ## exception before the handler is entered.
-    print "in outer handler\n"
-.end
-
-.sub exit_handler :outer(main)
-    .param int flag
-    print "at_exit, flag = "
-    say flag
-    $P2 = new 'Exception'
-    throw $P2
-    print "never 2\n"
-.end
-CODE
-/^main
-at_exit, flag = 1
 No exception handler/
 OUTPUT
 
@@ -684,7 +459,7 @@ handler:
 
 .sub broken
     $P0 = new 'Exception'
-    $P0["_message"] = "something broke"
+    $P0 = "something broke"
     throw $P0
 .end
 CODE
@@ -710,6 +485,127 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', 'die_p' );
 .end
 CODE
 /We are dying pmc!/
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "resuming after exception handled - goto label" );
+.sub main :main
+    print "before calling setup_foo\n"
+    setup_foo()
+    print "after calling setup_foo\n"
+    end
+.end
+
+.sub setup_foo
+    print "in setup_foo\n"
+    newclass $P0, "Foo"
+    push_eh handler
+    newclass $P0, "Foo"
+    pop_eh
+resume:
+    print "running more code\n"
+    .return()
+handler:
+    print "in handler\n"
+    goto resume
+.end
+
+CODE
+before calling setup_foo
+in setup_foo
+in handler
+running more code
+after calling setup_foo
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "resuming after exception handled - return from cont" );
+.sub main :main
+    print "before calling setup_foo\n"
+    setup_foo()
+    print "after calling setup_foo\n"
+    end
+.end
+
+.sub setup_foo
+    print "in setup_foo\n"
+    newclass $P0, "Foo"
+    push_eh handler
+    newclass $P0, "Foo"
+    pop_eh
+resume:
+    print "never reached\n"
+handler:
+    print "in handler\n"
+    .return()
+.end
+CODE
+before calling setup_foo
+in setup_foo
+in handler
+after calling setup_foo
+OUTPUT
+
+
+pir_output_is( <<'CODE', <<'OUTPUT', "resuming after exception handled - return from cont" );
+# This test is a simplified version of PGE's grammar creation code.
+
+.sub main :main
+    $P1 = newclass 'FirstClass'
+    $P1 = newclass 'MakerClass'
+
+    $P0 = new 'String'
+    $P0 = 'Foo'
+    $P1 = newclass $P0
+
+    print "before compile\n"
+    compile($P0)
+    print "after compile\n"
+    end
+.end
+
+.sub compile
+    .param string classname
+    print "in compile subroutine\n"
+    $P0 = new 'FirstClass'
+    $P1 = $P0.'compile'(classname)
+    print "returned from handler\nException message: "
+    print $P1
+.end
+
+.namespace [ "FirstClass" ]
+.sub 'compile' :method
+    .param pmc name
+    print "in compile method\n"
+    $P1 = new 'String'
+    $P1 = "no exception\n"
+  make_grammar:
+    push_eh handler
+    $P0 = new 'MakerClass'
+    $P0.'make'(name)
+    pop_eh
+    .return($P1)
+  handler:
+    get_results "0,0", $P2, $S2
+    print "in handler\n"
+  .return ($P2)
+.end
+
+.namespace [ "MakerClass" ]
+.sub 'make' :method
+    .param pmc name
+    print "in make method\n"
+    $P0 = newclass name
+    print "after newclass, never reached\n"
+.end
+
+CODE
+before compile
+in compile subroutine
+in compile method
+in make method
+in handler
+returned from handler
+Exception message: Class Foo already registered!
+after compile
 OUTPUT
 
 # Local Variables:
