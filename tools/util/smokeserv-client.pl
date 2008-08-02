@@ -48,7 +48,7 @@ my %request = ( upload => 1, version => VERSION, smokes => [] );
 {
     debug "Sending data to smokeserver \"$smokeserv\"... ";
     my $ua = LWP::UserAgent->new;
-    $ua->agent( "pugs-smokeserv-client/" . VERSION );
+    $ua->agent( "parrot-smokeserv-client/" . VERSION );
     $ua->env_proxy;
 
     my $resp = $ua->post( $smokeserv => \%request );

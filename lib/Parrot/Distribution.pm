@@ -682,7 +682,6 @@ sub perl_module_file_directories {
             parrot_compiler/lib/Parrot/Test
             perl6/t/01-sanity
             pipp/lib/Parrot/Test pipp/lib/Parrot/Test/Pipp
-            pugs/t
             regex/lib
             scheme scheme/Scheme
             tcl/lib/Parrot/Test

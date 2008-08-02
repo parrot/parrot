@@ -1,6 +1,6 @@
 =head1 NAME
 
-smokeserv - Pugs Smoke Reports Server
+smokeserv - Parrot Smoke Reports Server
 
 =head1 DESCRIPTION
 

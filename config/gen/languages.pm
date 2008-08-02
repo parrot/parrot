@@ -47,7 +47,7 @@ sub _init {
         lazy-k lisp lolcode lua
         m4
         ook
-        parrot_compiler perl6 pheme PIR pipp pugs punie pynie
+        parrot_compiler perl6 pheme PIR pipp punie pynie
         regex
         scheme squaak
         tcl

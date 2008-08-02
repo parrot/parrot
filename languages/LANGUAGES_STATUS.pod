@@ -873,29 +873,6 @@ L<http://www.perlfoundation.org/parrot/index.cgi?javascript>
 =back
 
 
-=head2 Pugs
-
-=over 4
-
-=item Description
-
-Perl 6 compiler written in Perl 6 and Haskell with multiple backends
-
-=item Status
-
-Basic IO and control flow elements; mutable variables; assignment.
-
-=item Last verified with parrot version
-
-0.4.4
-
-=item Location
-
-L<http://pugscode.org/>
-
-=back
-
-
 =head2 Punie
 
 =over 4

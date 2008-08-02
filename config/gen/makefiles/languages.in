@@ -90,7 +90,7 @@ test-separate: all \
     lazy-k.test lisp.test lolcode.test lua.test \
     m4.test \
     ook.test \
-    parrot_compiler.test perl6.test pheme.test PIR.test pipp.test pugs.test punie.test pynie.test \
+    parrot_compiler.test perl6.test pheme.test PIR.test pipp.test punie.test pynie.test \
     regex.test \
     scheme.test squaak.test \
     tcl.test \
@@ -140,7 +140,7 @@ realclean: \
     lazy-k.realclean lisp.realclean lolcode.realclean lua.realclean \
     m4.realclean \
     ook.realclean \
-    parrot_compiler.realclean perl6.realclean pheme.realclean PIR.realclean pipp.realclean pugs.realclean punie.realclean pynie.realclean \
+    parrot_compiler.realclean perl6.realclean pheme.realclean PIR.realclean pipp.realclean punie.realclean pynie.realclean \
     regex.realclean \
     scheme.realclean squaak.realclean \
     tcl.realclean \
@@ -423,16 +423,6 @@ PIR.clean:
 	- $(MAKE) PIR clean
 PIR.realclean:
 	- $(MAKE) PIR realclean
-
-pugs : pugs.dummy
-pugs.dummy:
-	- $(MAKE) pugs
-pugs.test:
-	- $(MAKE) pugs test
-pugs.clean:
-	- $(MAKE) pugs clean
-pugs.realclean:
-	- $(MAKE) pugs realclean
 
 punie : punie.dummy
 punie.dummy:

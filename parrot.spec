@@ -30,8 +30,8 @@ Requires:       %{_libdir}/pkgconfig
 
 %description
 Parrot is a virtual machine designed to efficiently compile and execute
-bytecode for dynamic languages. Parrot is a target for the Perl 6 compiler, and
-is already usable as a backend for Pugs, as well as variety of other languages.
+bytecode for dynamic languages. Parrot is the target for Rakudo Perl 6,
+as well as variety of other languages.
 
 %description languages
 High-level languages which run on the Parrot virtual machine.

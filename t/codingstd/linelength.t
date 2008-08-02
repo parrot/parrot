@@ -46,7 +46,6 @@ my %lang_is_checked = map { $_ => 1 } qw{
     dotnet
     lua
     perl6
-    pugs
     python
     plumhead
     tcl

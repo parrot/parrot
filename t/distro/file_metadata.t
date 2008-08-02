@@ -61,7 +61,7 @@ VALID_MIME: {
         image/gif
         image/png
     ];
-    push @expected, 'text/plain; charset=UTF-8'; # used by pugs, primarily
+    push @expected, 'text/plain; charset=UTF-8';
 
     my $expected    = join '|', @expected, "";
     my $expected_re = qr{^(${expected})$};
