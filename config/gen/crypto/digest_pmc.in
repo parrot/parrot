@@ -38,7 +38,7 @@ pmclass @md_name@
         PMC_data(SELF) = c;
         PObj_active_destroy_SET(SELF);
 #else
-        Parrot_ex_throw_from_c(interp, NULL, EXCEPTION_ILL_INHERIT,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ILL_INHERIT,
             "@md_name@ is disabled");
 #endif
     }
