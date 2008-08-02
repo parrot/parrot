@@ -197,14 +197,16 @@ print(os.time({
 
 -- os.time returns nil when C mktime returns -1
 -- this test needs a out of range value on any platform
+-- On 64bit systems the following date & time is the only
+-- on that mktime will return -1 for.
 print(os.time({
-    sec = 0,
-    min = 0,
-    hour = 0,
-    day = 1,
-    month = 1,
-    year = 1000,
-    isdst = 0,
+    sec = 59,
+    min = 59,
+    hour = 15,
+    day = 31,
+    month = 12,
+    year = 1969,
+    isdst = false,
 }))
 CODE
 /^

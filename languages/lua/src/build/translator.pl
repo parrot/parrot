@@ -361,10 +361,12 @@ PIRCODE
 
     if ($rule->{format} =~ /sBx$/) {
         $pir .= "    arg_b = cur_ic >>> 14\n";
+        $pir .= "    arg_b &= 0x0003ffff\n";
         $pir .= "    arg_b -= 131071\n";
     }
     elsif ($rule->{format} =~ /Bx$/) {
         $pir .= "    arg_b = cur_ic >>> 14\n";
+        $pir .= "    arg_b &= 0x0003ffff\n";
     }
     elsif ($rule->{format} =~ /B/) {
         $pir .= "    arg_b = cur_ic >> 23\n";
@@ -433,11 +435,13 @@ PIRCODE
 
     if ($rule->{format} =~ /sBx$/) {
         $pir .= "    arg_b = cur_ic >>> 14\n";
+        $pir .= "    arg_b &= 0x0003ffff\n";
         $pir .= "    arg_b -= 131071\n";
         $pir .= "    push args, arg_b\n";
     }
     elsif ($rule->{format} =~ /Bx$/) {
         $pir .= "    arg_b = cur_ic >>> 14\n";
+        $pir .= "    arg_b &= 0x0003ffff\n";
         $pir .= "    push args, arg_b\n";
     }
     elsif ($rule->{format} =~ /B/) {
