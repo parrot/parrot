@@ -32,7 +32,10 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 =cut
 
 # Set up expected output for examples
-my $fact15 = eval 'use integer;' . join '*', (1 .. 15);
+my $fact15 = eval join '*', (1 .. 15);
+if ($PConfig{intvalsize} == 4) {
+    $fact15 = hex(substr(sprintf('%x',$fact15),-8,8));
+}
 
 my %expected = (
     'board.pir' => << 'END_EXPECTED',
