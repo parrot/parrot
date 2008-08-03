@@ -175,7 +175,7 @@ replacement syntax assumes the source text is on a single line.)
 
 =item makefile
 
-If set to a true value, this flag sets (unless overriden) C<comment_type>
+If set to a true value, this flag sets (unless overridden) C<comment_type>
 to '#', C<replace_slashes> to enabled, and C<conditioned_lines> to enabled.
 
 If the name of the file being generated ends in C<Makefile>, this option
@@ -183,10 +183,10 @@ defaults to true.
 
 =item conditioned_lines
 
-If conditioned_lines is true, then lines in the file that begin with:
-C<#CONDITIONED_LINE(var):> are skipped if the var condition is false. Lines
+If C<conditioned_lines> is true, then lines in the file that begin with:
+C<#CONDITIONED_LINE(var):> are skipped if the C<var> condition is false. Lines
 that begin with C<#INVERSE_CONDITIONED_LINE(var):> are skipped if
-the var condition is true.  For instance:
+the C<var> condition is true.  For instance:
 
   #CONDITIONED_LINE(win32): $(SRC_DIR)/atomic/gcc_x86$(O)
 
@@ -219,21 +219,21 @@ a very helpful option when writing Makefiles.
 
 =item expand_gmake_syntax
 
-If set to a true value, then certain types of gmake syntax will be expanded
+If set to a true value, then certain types of I<gmake> syntax will be expanded
 into their full equivalents. For example:
 
  $(wildcard PATTERN)
 
-Will be replaced I<at config time> with the list of files that match this
+Will be replaced B<at config time> with the list of files that match this
 pattern. Note! Be very careful when determining whether or not to disable
-this expansion during config time and letting gmake evaluate these: the
+this expansion during config time and letting I<gmake> evaluate these: the
 config system itself may change state of the filesystem, causing the
 directives to expand differently depending on when they're run. Another
 potential issue to consider there is that most makefiles, while generated
-from the root directory, are I<run> from a subdirectory. So relative path names
+from the root directory, are B<run> from a subdirectory. So relative path names
 become an issue.
 
-The gmake replacements are done repeatedly on a single line, so nested
+The I<gmake> replacements are done repeatedly on a single line, so nested
 syntax works ok.
 
 =over 4
