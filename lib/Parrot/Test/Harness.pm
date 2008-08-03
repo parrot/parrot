@@ -20,6 +20,7 @@ you want to use in a file called F<t/harness>:
 
   use Parrot::Test::Harness
       language  => 'eclectus',
+      verbosity => 1,
       exec      => [ 'petite', '--script' ],
       arguments => [ '--files' ],
       files     => [ 't/*.pl' ];
@@ -45,6 +46,9 @@ C<parrot>, calling the C<compiler> file as the first argument.
 This means that you can write your tests in your language itself and run them
 through your compiler itself.  If you can load PIR libraries from your
 language, you can even use the existing PIR testing tools.
+
+If the C<verbosity> argument pair is provided, it will pass it through to the TAP::Harness
+as is. This allows for extremely quiet or loud test output to be generated.
 
 =head1 AUTHOR
 
@@ -162,11 +166,12 @@ sub import {
     exit unless my @files = get_files(%options);
 
     if (eval { require TAP::Harness; 1 }) {
-        my %options =
+        my %opts =
               $options{exec}     ? ( exec => $options{exec} )
             : $options{compiler} ? ( exec => [ '../../parrot', './' . $options{compiler} ] )
             :                      ();
-        TAP::Harness->new( \%options )->runtests( @files );
+        $opts{verbosity} = $options{verbosity} ? $options{verbosity} : 0;
+        TAP::Harness->new( \%opts )->runtests( @files );
 
         return;
     }
