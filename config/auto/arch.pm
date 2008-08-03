@@ -59,7 +59,7 @@ sub runstep {
     # the above split fails because archname is "darwin-thread-multi-2level".
     if ( $cpuarch =~ /darwin/ ) {
         $osname = 'darwin';
-        if ( $conf->data->get('byteorder') == 1234 ) {
+         if ( $conf->data->get('byteorder') =~ /^1234/ ) {
             $cpuarch = 'i386';
         }
         else {
