@@ -64,9 +64,10 @@ $conf->add_steps( get_steps_list() );
 # from Parrot::Configure::Data
 $conf->options->set( %{$args} );
 
-# Run the actual steps
-# from Parrot::Configure
+# Log files created by Configure.pl in MANIFEST.configure.generated
 $conf->{active_configuration} = 1;
+
+# Run the actual steps from Parrot::Configure
 $conf->runsteps or exit(1);
 
 # build tests will only be run if you requested them
