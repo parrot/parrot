@@ -189,7 +189,7 @@ Like above with an extra encoding attached to the string. For example:
   set S0, utf8:unicode:"«"
 
 The encoding and charset are attached to the string constant, and
-adopted by any string containter the constant is assigned to.
+adopted by any string container the constant is assigned to.
 
 The standard escape sequences are honored within strings with an
 alternate encoding, so in the example above, you can include a
