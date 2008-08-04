@@ -440,15 +440,16 @@ transform fornum (PAST::Op) :language('PIR') {
     $P1 = $P0[2]
     e_step = tree.'get'('post', $P1)
     ops.'push'(e_step)
-    .local string var
+    .local string loc_v
     $P0 = node[0]
     $P0 = tree.'get'('post', $P0)
     $P1 = $P0.'pop'()
     ops.'push'($P0)
     $P1 = $P0.'pop'()
     $P0.'push'($P1)
-    var = $P1.'result'()
-    .local string limit, step
+    loc_v = $P1.'result'()
+    .local string var, limit, step
+    var = ops.'unique'('$P')
     limit = ops.'unique'('$P')
     step = ops.'unique'('$P')
     ops.'push_pirop'('inline', var, limit, step, e_var, e_limit, e_step, 'inline'=>'    (%0, %1, %2) = checkforloop(%3, %4, %5)')
@@ -470,6 +471,7 @@ transform fornum (PAST::Op) :language('PIR') {
     ops.'push_new'('POST::Label', 'result'=>orlabel)
     ops.'push_pirop'('lt', var, limit, endlabel)
     ops.'push_new'('POST::Label', 'result'=>blklabel)
+    ops.'push_pirop'('clone', loc_v, var)
     .local pmc blk
     $P0 = node[2]
     blk = tree.'get'('post', $P0)
