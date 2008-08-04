@@ -175,14 +175,9 @@ OUTPUT
 #       the sieve of of Eratosthenes programmed with coroutines
 #
 
-TODO:
-{
-    local $TODO = 'just one ?';
-
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'sieve.lua' ));
 $out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'sieve-output.txt' ));
 language_output_is( 'lua', $code, $out, 'sieve' );
-}
 
 #
 #   sort.lua

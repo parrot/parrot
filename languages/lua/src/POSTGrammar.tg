@@ -682,7 +682,9 @@ transform assignlist (PAST::Op) :language('PIR') {
     rpost = tree.'get'('post', $P0)
     ops.'push'(rpost)
     $S1 = rpost.'result'()
-    push tmp, $S1
+    $S2 = ops.'unique'('$P')
+    ops.'push_pirop'('clone', $S2, $S1)
+    push tmp, $S2
     if iter goto L1
     $I0 = rpost.'has_call_in_last_op'()
     unless $I0 goto L1

@@ -24,7 +24,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'global variable' );
@@ -130,6 +130,34 @@ CODE
 4
 4
 4
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'assignment list swap values.' );
+local n1 = 1
+local n2 = 2
+local n3 = 3
+local n4 = 4
+
+print(n1)
+print(n2)
+print(n3)
+print(n4)
+
+n1,n2,n3,n4 = n4,n3,n2,n1
+
+print(n1)
+print(n2)
+print(n3)
+print(n4)
+CODE
+1
+2
+3
+4
+4
+3
+2
+1
 OUT
 
 # Local Variables:
