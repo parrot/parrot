@@ -585,7 +585,7 @@ messages and in debug information.
     pir = $P1.'translate'()
     .local pmc pir_comp
     pir_comp = compreg 'PIR'
-    $P0 = pir_comp.'compile'(pir)
+    $P0 = pir_comp(pir)
     $P0 = $P0[1]
     .local pmc env
     env = get_hll_global '_G'
