@@ -475,7 +475,11 @@ PARROT_DATA PMC * PMCNULL;   /* Holds single Null PMC */
 #endif /* PARROT_CATCH_NULL */
 
 /* Maybe PMC_IS_NULL(interp, pmc) ? */
-#define PMC_IS_NULL(pmc) PMC_is_null(NULL, (pmc))
+#if PARROT_CATCH_NULL
+#  define PMC_IS_NULL(pmc) ((pmc) == PMCNULL || (pmc) == NULL)
+#else
+#  define PMC_IS_NULL(pmc) (pmc) == NULL
+#endif
 
 #define STRING_IS_NULL(s) ((s) == NULL)
 #define STRING_IS_EMPTY(s) !(int)(s)->strlen
@@ -870,6 +874,11 @@ typedef void * *(*native_func_t)(Parrot_Interp interp,
                                  void *start_code);
 
 #endif   /* PARROT_IN_CORE */
+
+#ifndef PMC_IS_NULL
+#  define PMC_IS_NULL(pmc) PMC_is_null(NULL, (pmc))
+#endif
+
 #endif   /* PARROT_INTERPRETER_H_GUARD */
 
 /*
