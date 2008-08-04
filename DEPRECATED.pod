@@ -139,10 +139,6 @@ through the concurrency scheduler.
 Is deprecated, replaced by the C<throw> opcode (the single argument form of
 'throwcc' was already identical to 'throw').
 
-=item * 'internal_exception' function [post 0.6.2]
-
-Is deprecated, replaced by the C<exit_fatal> function.
-
 =item * 'do_exception', 'do_str_exception', 'do_pmc_exception', 'create_exception' [post 0.6.2]
 
 Are deprecated.
