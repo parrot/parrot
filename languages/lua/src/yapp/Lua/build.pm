@@ -470,8 +470,14 @@ sub BuildAssigns {
             push @{ $expr->[1] }, $callop;
         }
         push @opcodes2, @{ $expr->[1] };
+        my $val = new_tmp( $parser, 'pmc' );
+        push @opcodes2, new CloneOp(
+            $parser,
+            'arg1'   => $expr->[0],
+            'result' => $val,
+        );
         my $assign = $var->[2];
-        $assign->configure( 'arg2' => $expr->[0] );
+        $assign->configure( 'arg2' => $val );
         push @opcodes3, $assign;
     }
     push @opcodes1, @opcodes2, @opcodes3;
