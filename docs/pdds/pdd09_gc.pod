@@ -161,6 +161,15 @@ there is not copying nor compacting.
 The primary GC model for PMCs, at least for the 1.0 release, will use a
 tri-color incremental marking scheme, combined with a concurrent sweep scheme.
 
+=head2 Terminology
+
+A GC run is composed of two distinct operations: Finding objects which are
+dead (the "trace" phase) and freeing dead objects for later reuse (the
+"sweep" phase). The sweep phase is also known as the collection phase. The
+trace phase is also known as the "mark phase" and less frequently as the
+"dead object detection" phase. The use of the term "dead object detection"
+and it's acronym DOD has been deprecated.
+
 =head2 Initial Marking
 
 Each PMC has a C<flags> member which, among other things, facilitates garbage
@@ -186,7 +195,7 @@ locations:
 
 =item Global stash
 
-=item System stack
+=item System stack and processor registers
 
 =item Current PMC register set
 
@@ -335,9 +344,9 @@ Each GC core provides a standard interface for interaction with the core.
 
 =head3 Initialization
 
-Each GC core declares an initialization routine, which is called from
-F<src/memory.c:mem_setup_allocator()> after creating C<arena_base> in the
-interpreter struct.
+Each GC core declares an initialization routine as a function pointer,
+which is installed in F<src/memory.c:mem_setup_allocator()> after
+creating C<arena_base> in the interpreter struct.
 
 =over 4
 
@@ -357,40 +366,66 @@ Each GC system declares 3 function pointers, stored in the Arenas structure.
 
 =over 4
 
+=item C<void (*init_gc_system) (Interp *)>
+
+Initialize the GC system. Install the additional function pointers into
+the Arenas structure, and prepare any private storage to be used by
+the GC in the Arenas->gc_private field.
+
 =item C<void (*do_gc_mark) (Interp *, int flags)>
 
 Trigger or perform a GC run. With an incremental GC core, this may only
-start/continue a partial mark phase, rather than marking the entire tree of
-live objects.
+start/continue a partial mark phase or sweep phase, rather than performing an
+entire run from start to finish. It may take several calls to C<do_gc_mark> in
+order to complete an entire incremental run.
 
-Flags is one of:
+For a concurrent collector, calls to this function may activate a concurrent
+collection thread or, if such a thread is already running, do nothing at all.
+
+The C<do_gc_mark> function is called from the C<Parrot_do_dod_run> function,
+and should not usually be called directly.
+
+C<flags> is one of:
 
 =over 4
 
+=item C<0>
+
+Run the GC normally, including the trace and the sweep phases, if applicable.
+Incremental GCs will likely only run one portion of the complete GC run, and
+repeated calls would be required for a complete run. A complete trace of all
+system areas is not required.
+
 =item GC_trace_normal | GC_trace_stack_FLAG
 
-Run a normal GC cycle. This is normally called by resource shortage in the
-buffer memory pools before a collection is run. The bit named
-C<GC_trace_stack_FLAG> indicates that the C-stack (and other system areas
-like the processor registers) have to be traced too.
+Run a normal GC trace cycle, at least. This is typically called when there
+is a resource shortage in the buffer memory pools before the sweep phase is
+run. The processor registers and any other system areas have to be traced too.
 
-The implementation might or might not actually run a full GC cycle. If an
-incremental GC system just finished the mark phase, it would do nothing.  OTOH
-if no objects are currently marked live, the implementation should run the
-mark phase, so that copying of dead objects is avoided.
+Behavior is determined by the GC implementation, and might or might not
+actually run a full GC cycle. If the system is an incremental GC, it might
+do nothing depending on the current state of the GC. In an incremental GC, if
+the GC is already past the trace phase it may opt to do nothing and return
+immediately. A copying collector may choose to run a mark phase if it hasn't
+yet, to prevent the unnecessary copying of dead objects later on.
 
 =item GC_lazy_FLAG
 
 Do a timely destruction run. The goal is either to detect all objects that
-need timely destruction or to do a full collection. In the former case the
-collection can be interrupted or postponed. This is called from the Parrot
-run-loop. No system areas have to be traced.
+need timely destruction or to do a full collection. This is called from the
+Parrot run-loop, typically when a lexical scope is exited and the local
+variables in that scope need to be cleaned up. Many types of PMC objects, such
+as line-buffered IO PMCs rely on this behavior for proper operation.
+
+No system areas have to be traced.
 
 =item GC_finish_FLAG
 
-Called during interpreter destruction. The GC subsystem must clear the live
-state of all objects and perform a sweep in the PMC header pool, so that
-destructors and finalizers get called.
+Finalize and destroy all living PMCs. This is called during interpreter
+destruction. The GC subsystem must clear the live state of all objects
+and perform a sweep in the PMC header pool, so that destructors and finalizers
+get called. PMCs which have custom destructors rely on this behavior for
+proper operation.
 
 =item GC_no_trace_volatile_roots
 
@@ -404,25 +439,25 @@ Called during interpreter destruction. Free used resources and memory pools.
 
 =item C<void (*init_pool) (Interp *, Small_Object_Pool *)>
 
-A function to initialize the given pool. This function should set the
-following object allocation functions for the given pool.
+Initialize the given pool. This function should set the following function
+pointers for use with the pool.
 
 =back
 
 =head3 Small_Object_Pool function pointers
 
 Each GC core defines 4 function pointers stored in the Small_Object_Pool
-structures.
+structures. These function pointers are used throughout Parrot to implement
+basic behaviors for the pool.
 
 =over 4
 
 =item C<PObj * (*get_free_object) (Interp *, Small_Object_Pool*)>
 
-Each header pool provides one function pointer to get a new object from that
-pool. It should return one free object from the given pool (removing it from
-the pool's free list). Object flags are returned clear, except flags that are
-used by the garbage collector itself.  If the pool is a buffer header pool,
-all other object memory is zeroed.
+Get a free object from the pool. This function returns one free object from
+the given pool and removes that object from the pool's free list. PObject flags
+are returned clear, except flags that are used by the garbage collector itself,
+if any. If the pool is a buffer header pool all other object memory is zeroed.
 
 =item C<void (*add_free_object) (Interp *, Small_Object_Pool *, PObj *);>
 
@@ -430,13 +465,16 @@ Add a freed object to the pool's free list.
 
 =item C<void (*alloc_objects) (Interp *, Small_Object_Pool *);>
 
-Initial allocation of objects for the pool.
+Allocate a new arena of objects for the pool. Initialize the new arena and add
+all new objects to the pool's free list. Some collectors implement a growth
+factor which increases the size of each new allocated arena.
 
 =item C<void (*more_objects) (Interp *, Small_Object_Pool *);>
 
 Reallocation for additional objects. It has the same signature as
 C<alloc_objects>, and in some GC cores the same function pointer is used for
-both. In some GC cores, C<more_objects> may do a GC run.
+both. In some GC cores, C<more_objects> may do a GC run in an attempt to free
+existing objects without having to allocate new ones.
 
 =back
 
