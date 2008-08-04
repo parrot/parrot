@@ -24,7 +24,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 use Test::More;
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'modulo' );
@@ -173,6 +173,22 @@ CODE
 26
 34
 37
+OUT
+
+language_output_is( 'lua', <<'CODE', <<'OUT', 'mix access to globals and logical and op' );
+some_global="global"
+
+-- access a global like print
+print("test")
+-- use "and" or "or" logical operation
+-- access a global in the second operand.
+-- make sure the second operand is not evaluated at runtime.
+out=false and some_global
+-- access another global like print
+print(out)
+CODE
+test
+false
 OUT
 
 # Local Variables:

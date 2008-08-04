@@ -312,6 +312,8 @@ transform and (PAST::Op) :language('PIR') {
     ops.'push_pirop'('clone', $S0, expr2)
     ops.'push_new'('POST::Label', 'result'=>endlabel)
     ops.'result'($S0)
+    null $P0
+    set_hll_global ['Lua::POST'], '$?environ', $P0
     .return (ops)
 }
 
