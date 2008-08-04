@@ -176,7 +176,7 @@ main(int argc, char *argv[])
         IMCC_INFO(interp)->state->file = filename;
 
         if (!(imc_yyin_set(fopen(filename, "r"), yyscanner)))    {
-            IMCC_fatal_standalone(interp, E_IOError,
+            IMCC_fatal_standalone(interp, EXCEPTION_PIO_ERROR,
                     "Error reading source file %s.\n",
                     filename);
         }
@@ -217,18 +217,15 @@ Adds a default exception handler to PDB.
 static void
 PDB_run_code(Parrot_Interp interp, int argc, char *argv[])
 {
-    Parrot_exception exp;
-
-    if (setjmp(exp.destination)) {
-        char *msg = string_to_cstring(interp, interp->exceptions->msg);
-        fprintf(stderr, "Caught exception: %s\n", msg);
-        string_cstring_free(msg);
+    new_runloop_jump_point(interp);
+    if (setjmp(interp->current_runloop->resume)) {
+        free_runloop_jump_point(interp);
+        fprintf(stderr, "Caught exception\n");
         return;
     }
 
-    push_new_c_exception_handler(interp, &exp);
-
     Parrot_runcode(interp, argc - 1, argv + 1);
+    free_runloop_jump_point(interp);
 }
 
 /*
