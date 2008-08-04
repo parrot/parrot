@@ -22,7 +22,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 22;
 use Test::More;
 use Parrot::Test::Lua;
 
@@ -41,7 +41,7 @@ OUT
 
 SKIP:
 {
-skip('only with an interpreter', 17) if ( $test_prog eq 'luac.pl'
+skip('only with an interpreter', 18) if ( $test_prog eq 'luac.pl'
                                        || $test_prog eq 'luap.pir'
                                        || $test_prog eq 'luac2pir.pir' );
 
@@ -61,6 +61,18 @@ close $X;
 language_output_is( 'lua', undef, << 'OUTPUT', 'file', params => "hello.lua"  );
 Hello World
 OUTPUT
+
+SKIP: {
+skip("need luac", 1) unless (`luac -v` =~ /^Lua 5\.1/);
+
+system("luac -o ../hello.luac ../hello.lua");
+
+language_output_is( 'lua', undef, << 'OUTPUT', 'bytecode translation', params => "hello.luac"  );
+Hello World
+OUTPUT
+
+unlink('../hello.luac') if ( -f '../hello.luac' );
+}
 
 language_output_is( 'lua', undef, << 'OUTPUT', 'redirect', params => "< hello.lua"  );
 Hello World
