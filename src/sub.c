@@ -367,7 +367,7 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(const parrot_context_t *ctx),
 
     /* set the namespace name and fullname of the sub */
     if (PMC_IS_NULL(sub->namespace_name)) {
-        info->nsname = string_from_literal(interp, "");
+        info->nsname   = CONST_STRING(interp, "");
         info->fullname = info->subname;
     }
     else {

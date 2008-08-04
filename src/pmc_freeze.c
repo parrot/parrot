@@ -32,6 +32,7 @@ C<STRING> with a vtable.
 */
 
 #include "parrot/parrot.h"
+#include "pmc_freeze.str"
 
 /* default.pmc thawing of properties */
 PARROT_API void
@@ -1623,15 +1624,14 @@ Allocate image to some estimated size.
 static void
 create_image(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGMOD(visit_info *info))
 {
-    INTVAL len;
-    if (!PMC_IS_NULL(pmc) && (VTABLE_does(interp, pmc,
-                string_from_literal(interp, "array")) ||
-        VTABLE_does(interp, pmc,
-                string_from_literal(interp, "hash")))) {
+    STRING *array = CONST_STRING(interp, "array");
+    STRING *hash  = CONST_STRING(interp, "hash");
+    INTVAL  len;
+
+    if (!PMC_IS_NULL(pmc) && (VTABLE_does(interp, pmc, array) ||
+        VTABLE_does(interp, pmc, hash))) {
         const INTVAL items = VTABLE_elements(interp, pmc);
-        /*
-         * TODO check e.g. first item of aggregate and estimate size
-         */
+        /* TODO check e.g. first item of aggregate and estimate size */
         len = items * FREEZE_BYTES_PER_ITEM;
     }
     else

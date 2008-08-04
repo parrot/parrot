@@ -2635,14 +2635,12 @@ Parrot_debug_pc_to_filename(PARROT_INTERP, ARGIN(const PackFile_Debug *debug), o
         {
             switch (debug->mappings[i]->mapping_type) {
                 case PF_DEBUGMAPPINGTYPE_NONE:
-                    return string_from_literal(interp,
-                        "(unknown file)");
+                    return CONST_STRING(interp, "(unknown file)");
                 case PF_DEBUGMAPPINGTYPE_FILENAME:
                     return PF_CONST(debug->code,
                         debug->mappings[i]->u.filename)->u.string;
                 case PF_DEBUGMAPPINGTYPE_SOURCESEG:
-                    return string_from_literal(interp,
-                        "(unknown file)");
+                    return CONST_STRING(interp, "(unknown file)");
                 default:
                     continue;
             }
@@ -2650,7 +2648,7 @@ Parrot_debug_pc_to_filename(PARROT_INTERP, ARGIN(const PackFile_Debug *debug), o
     }
 
     /* Otherwise, no mappings = no filename. */
-    return string_from_literal(interp, "(unknown file)");
+    return CONST_STRING(interp, "(unknown file)");
 }
 
 /*
