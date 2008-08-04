@@ -48,7 +48,7 @@ use Parrot::BuildUtil;
 }
 
 {
-    my $phony = q{foobar};
+    my $phony = $$;
     my $str;
     eval { $str = Parrot::BuildUtil::slurp_file($phony); };
     like(
