@@ -72,6 +72,7 @@ OUT
 language_output_is( 'lua', <<'CODE', <<'OUT', 'for 3, 5' );
 for i = 3, 5 do
     print(i)
+    i = i + 1
 end
 CODE
 3
