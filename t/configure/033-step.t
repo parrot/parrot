@@ -55,7 +55,7 @@ untie *STDIN;
 
 # file_checksum(), not exported
 
-$nonexistent = q{foobar};
+$nonexistent = $$;
 eval { my $sum = Parrot::Configure::Utils::file_checksum($nonexistent); };
 like(
     $@, qr/Can't open $nonexistent/,    #'
