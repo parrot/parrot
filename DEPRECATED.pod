@@ -110,6 +110,16 @@ a method name) is no longer supported.
 
 See RT #45859.
 
+=item * C<#line> [post 0.6.4]
+
+Will be replaced by C<.line> to be more consistent with other PIR syntax.
+
+See [RT#45857], [RT#43269], and [RT#47141].
+
+=item * C<.pragma n_operators> [post 0.6.4]
+
+See RT #57438.
+
 =item * C<<.namespace <identifier> >> syntax [post 0.5.1]
 
 See RT #48737.
