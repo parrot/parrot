@@ -1359,6 +1359,22 @@ see F<runtime/parrot/library/OpenGL.pir>.
     .return (ret)
 .end
 
+.sub 'get_str_gl_enum' :anon
+    .param int enum
+    .local pmc gl_str
+    gl_str = get_hll_global ['Lua::gl'], 'gl_str'
+    new $P0, 'Iterator', gl_str
+  L1:
+    unless $P0 goto L2
+    $P1 = shift $P0
+    $I0 = gl_str[$P1]
+    unless enum == $I0 goto L1
+    $S0 = $P1
+    .return ($S0)
+  L2:
+    .return ('')
+.end
+
 .sub 'get_arrayb' :anon
     .param pmc table
     .local int n
@@ -2268,7 +2284,16 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 .sub 'GetError' :anon
     .param pmc extra :slurpy
-    not_implemented()
+    $I0 = glGetError()
+    if $I0 goto L1
+    $S0 = 'NO_ERROR'
+    goto L2
+  L1:
+    $S0 = get_str_gl_enum($I0)
+  L2:
+    new $P0, 'LuaString'
+    set $P0, $S0
+    .return ($P0)
 .end
 
 
