@@ -25,14 +25,6 @@ warnings.
 
 =over 4
 
-=item * C<get_attr> [post 0.5.2]
-
-See RT #48583.
-
-=item * C<set_attr> [post 0.5.2]
-
-See RT #48585.
-
 =item * C<type_keyed> [post 0.5.2]
 
 See RT #48577.

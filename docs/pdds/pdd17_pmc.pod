@@ -1505,15 +1505,11 @@ Return a true value if the PMC C<does> (composes) or C<performs>
 
 =item get_attr
 
-  PMC* get_attr(INTERP, PMC* self, INTVAL idx) [deprecated: see RT #48583]
   PMC* get_attr_str(INTERP, PMC* self, STRING* idx)
 
 Retrieve an attribute value from the PMC (instance object).
 
 =item set_attr
-
-  void set_attr(INTERP, PMC* self, INTVAL idx, PMC* value)
-    [deprecated: See RT #48585]
 
   void set_attr_str(INTERP, PMC* self, STRING* idx, PMC* value)
 
