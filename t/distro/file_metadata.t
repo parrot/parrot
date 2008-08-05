@@ -86,18 +86,19 @@ TEST_MIME: {
     # find test files
     my $test_suffix = '.t';
     my @test_files  = grep { m/\Q$test_suffix\E$/ } @manifest_files;
-    my $test        = 'svn:mime-type for .t';
+    my $test        = 'svn:mime-type';
     my $expected    = 'text/plain';
     my @failed      = verify_attributes( $test, $expected, 0, $mime_types, \@test_files );
+    my $test_name   = "$test for .t files";
 
     if (@failed) {
         my $failure = join q{}, "Set $test with:\n",
             map { " $cmd ps $test '$expected' $_\n" } @failed;
         $failure = "git svn metadata $test incorrect for @failed" if -d '.git';
-        is( $failure, '', $test );
+        is( $failure, '', $test_name );
     }
     else {
-        pass($test);
+        pass($test_name);
     }
 }    # TEST_MIME
 
