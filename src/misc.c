@@ -246,11 +246,7 @@ Parrot_secret_snprintf(ARGOUT(char *buffer), const size_t len, ARGIN(const char 
     int retval;
     va_list ap;
     va_start(ap, format);
-#ifdef BLAHBLAHBLAH_WAS_A_CHECK_FOR_VNSNPRINTF
-    retval = vsnprintf(buffer, len, format, ap);
-#else
     retval = vsprintf(buffer, format, ap);
-#endif
     va_end(ap);
 
     return retval;
