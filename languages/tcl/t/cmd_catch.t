@@ -10,7 +10,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 11
+plan 12
 
 eval_is {
   catch {
@@ -78,3 +78,13 @@ eval_is {
   }
 } ok {catch should respect the namespace it is invoked in} \
 {TODO {needs fixing, used to work}}
+
+eval_is {
+  set a 3
+  catch {
+    set a 2
+    set a [
+  }
+  set a
+} 2 {execute code as soon as possible, don't wait until the end of the block} \
+{TODO {Still trying to compile the whole block first.}}
