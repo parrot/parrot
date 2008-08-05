@@ -103,7 +103,7 @@ register in the register set, C<$P42> may be stored in the zeroth PMC
 register, if it is the only register in the subroutine.
 
 {{DEPRECATION NOTE: PIR will no longer support the old PASM-style syntax
-for registers without dollar signs: C<In>, C<Sn>, C<Nn>, C<Pn>.}}
+for registers without dollar signs: C<In>, C<Sn>, C<Nn>, C<Pn>. RT#57638}}
 
 =head2 Constants
 
