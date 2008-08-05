@@ -241,9 +241,9 @@ Prints out the welcome string.
 static void
 PDB_printwelcome(void)
 {
-    fprintf(stderr, "Parrot Debugger 0.4.x\n");
-    fprintf(stderr, "\nPlease note: ");
-    fprintf(stderr, "the debugger is currently under reconstruction\n");
+    fprintf(stderr,
+        "Parrot " PARROT_VERSION " Debugger\n"
+        "\nPlease note: the debugger is currently under reconstruction\n");
 }
 
 /*
