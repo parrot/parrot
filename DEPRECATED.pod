@@ -17,8 +17,9 @@ warnings selectively with:
  .include 'include/warnings.pasm'
  warningson .PARROT_WARNINGS_DEPRECATED_FLAG
 
-And then receive runtime warnings if they are using any deprecated opcodes.  The C<-w>
-command line option for parrot can also be used to enable all warnings.
+And then receive runtime warnings if they are using any deprecated opcodes.
+The C<-w> command line option for parrot can also be used to enable all
+warnings.
 
 =head1 vtable entries
 
@@ -98,54 +99,6 @@ use the following syntax, which works for both PMCs and objects.
 =item * PMC union struct [post 0.5.0]
 
 See RT #48014. This will be removed once all core PMCs have been updated.
-
-=back
-
-=head1 Exceptions
-
-=over 4
-
-=item * 'push_exception' function [post 0.6.2]
-
-Is deprecated, replaced by C<Parrot_cx_add_handler> (a method call to
-C<add_handler> on the concurrency scheduler object).
-
-=item * 'pop_exception' function [post 0.6.2]
-
-Is deprecated, replaced by C<Parrot_cx_delete_handler_typed> (a method call to
-C<delete_handler> on the concurrency scheduler object).
-
-=item * 'count_exception_handlers' function [post 0.6.2]
-
-Is deprecated, replaced by C<Parrot_cx_count_handlers_typed> (a method call to
-C<count_handlers> on the concurrency scheduler object).
-
-=item * 'get_exception_handler' function and 'get_eh' opcode [post 0.6.2]
-
-Are deprecated, exception handler lookup by index is no longer supported.
-
-=item * 'get_all_exception_handlers' function and 'get_all_eh' opcode [post 0.6.2]
-
-Are deprecated, access to the exception handler list should be performed
-through the concurrency scheduler.
-
-=item * 'throwcc' opcode [post 0.6.2]
-
-Is deprecated, replaced by the C<throw> opcode (the single argument form of
-'throwcc' was already identical to 'throw').
-
-=item * 'do_exception', 'do_str_exception', 'do_pmc_exception', 'create_exception' [post 0.6.2]
-
-Are deprecated.
-
-=item * 'handle_exception' [post 0.6.2]
-
-Is deprecated, replaced by C<Parrot_ex_calc_handler_offset>.
-
-=item * 'rethrow_exception', 'rethrow_c_exception' [post 0.6.2]
-
-Are deprecated, replaced by C<Parrot_ex_rethrow_from_op> and
-C<Parrot_ex_rethrow_from_c>.
 
 =back
 
