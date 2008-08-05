@@ -98,6 +98,18 @@ See RT #48014. This will be removed once all core PMCs have been updated.
 
 =over 4
 
+=item * C<global> keyword [post 0.6.4]
+
+See RT #48016
+and RT #48018.
+
+=item * bare method names [post 0.6.4]
+
+C<foo.bar()>, where C<bar> is not a local identifier (thus indicating
+a method name) is no longer supported.
+
+See RT #45859.
+
 =item * C<<.namespace <identifier> >> syntax [post 0.5.1]
 
 See RT #48737.
