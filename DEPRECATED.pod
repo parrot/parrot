@@ -105,11 +105,6 @@ See RT #48014. This will be removed once all core PMCs have been updated.
 
 =over 4
 
-=item * Keyed access to exception attributes [post 0.5.1]
-
-See RT #48012. Attributes on exception objects will no longer be accessible
-by integer key, use C<getattribute> and C<setattribute> instead.
-
 =item * 'push_exception' function [post 0.6.2]
 
 Is deprecated, replaced by C<Parrot_cx_add_handler> (a method call to
