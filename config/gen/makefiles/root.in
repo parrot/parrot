@@ -2197,6 +2197,12 @@ tags-emacs: tags.emacs.dummy
         -I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK \
         $(CUR_DIR)
 
+# this works with an old etags (XEmacs 21.5*)
+tags-xemacs: tags.emacs.dummy
+	$(RM_F) TAGS
+	find $(CUR_DIR) \
+        -name \*.c -o -name \*.h -o -name \*.pmc -o -name \*.ops | etags -l c - -o TAGS
+
 tags.emacs.dummy:
 
 # vim ctags
