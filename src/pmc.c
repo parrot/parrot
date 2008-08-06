@@ -608,7 +608,7 @@ Parrot_create_mro(PARROT_INTERP, INTVAL type)
 
 =item C<void dod_register_pmc>
 
-Registers the PMC with the interpreter's DOD registery.
+Registers the PMC with the interpreter's DOD registry.
 
 =cut
 
