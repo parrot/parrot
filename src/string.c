@@ -1937,9 +1937,9 @@ rounding towards zero.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-string_to_int(SHIM_INTERP, ARGIN(const STRING *s))
+string_to_int(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 {
-    if(s == NULL)
+    if (s == NULL)
         return 0;
     {
         const char         *start     = s->strstart;

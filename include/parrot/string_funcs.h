@@ -474,8 +474,7 @@ char * string_to_cstring(SHIM_INTERP, ARGIN(const STRING *s))
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL string_to_int(SHIM_INTERP, ARGIN(const STRING *s))
-        __attribute__nonnull__(2);
+INTVAL string_to_int(SHIM_INTERP, ARGIN_NULLOK(const STRING *s));
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
