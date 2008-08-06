@@ -74,6 +74,11 @@ See F<languages/lua/lib/luaio.pir>.
     set $P1, '__tostring'
     _file[$P1] = _file__tostring
 
+    $P0 = get_hll_namespace ['io']
+    $P1 = get_namespace
+    $P2 = split ' ', 'aux_close aux_lines read_chars read_number read_line test_eof tofile tofilep'
+    $P0.'export_to'($P1, $P2)
+
     .return (_file)
 .end
 
@@ -88,10 +93,8 @@ are garbage collected, but that takes an unpredictable amount of time to happen.
 .sub 'close' :method :anon
     .param pmc extra :slurpy
     .local pmc res
-    $P0 = get_hll_global ['io'], 'tofile'
-    $P0(self)
-    $P0 = get_hll_global ['io'], 'aux_close'
-    (res :slurpy) = $P0(self)
+    tofile(self)
+    (res :slurpy) = aux_close(self)
     .return (res :flat)
 .end
 
@@ -106,8 +109,7 @@ Saves any written data to C<file>.
     .param pmc extra :slurpy
     .local pmc f
     .local pmc res
-    $P0 = get_hll_global ['io'], 'tofile'
-    f = $P0(self)
+    f = tofile(self)
     f.'flush'()
     new res, 'LuaBoolean'
     set res, 1
@@ -129,10 +131,8 @@ does not close the file when the loop ends.)
 
 .sub 'lines' :method :anon
     .param pmc extra :slurpy
-    $P0 = get_hll_global ['io'], 'tofile'
-    $P0(self)
-    $P0 = get_hll_global ['io'], 'aux_lines'
-    .return $P0(self, 0)
+    tofile(self)
+    .return aux_lines(self, 0)
 .end
 
 
@@ -177,12 +177,10 @@ empty string, or B<nil> on end of file.
     .param pmc formats :slurpy
     .local pmc res
     .local pmc f
-    $P0 = get_hll_global ['io'], 'tofile'
-    $P0(self)
+    tofile(self)
     f = getattribute self, 'data'
     if formats goto L1
-    $P0 = get_hll_global ['io'], 'read_line'
-    .return $P0(f)
+    .return read_line(f)
   L1:
     .local int narg
     .local int i
@@ -199,13 +197,11 @@ empty string, or B<nil> on end of file.
     .local int l
     l = format
     unless l == 0 goto L5
-    $P0 = get_hll_global ['io'], 'test_eof'
-    $P0 = $P0(f)
+    $P0 = test_eof(f)
     res[i] = $P0
     goto L6
   L5:
-    $P0 = get_hll_global ['io'], 'read_chars'
-    $P0 = $P0(f, l)
+    $P0 = read_chars(f, l)
     res[i] = $P0
     goto L6
   L4:
@@ -213,24 +209,21 @@ empty string, or B<nil> on end of file.
     $I0 = index $S0, '*n'
     unless $I0 == 0 goto L7
     # number
-    $P0 = get_hll_global ['io'], 'read_number'
-    $P0 = $P0(f)
+    $P0 = read_number(f)
     res[i] = $P0
     goto L6
   L7:
     $I0 = index $S0, '*l'
     unless $I0 == 0 goto L8
     # line
-    $P0 = get_hll_global ['io'], 'read_line'
-    $P0 = $P0(f)
+    $P0 = read_line(f)
     res[i] = $P0
     goto L6
   L8:
     $I0 = index $S0, '*a'
     unless $I0 == 0 goto L9
     # file
-    $P0 = get_hll_global ['io'], 'read_chars'
-    $P0 = $P0(f, 65535)
+    $P0 = read_chars(f, 65535)
     res[i] = $P0
     goto L6
   L9:
@@ -284,8 +277,7 @@ position to the end of the file, and returns its size.
     .param pmc extra :slurpy
     .local pmc f
     .local pmc res
-    $P0 = get_hll_global ['io'], 'tofile'
-    $P0(self)
+    tofile(self)
     $S1 = lua_optstring(1, whence, 'cur')
     $I1 = lua_checkoption(1, $S1, 'set cur end')
     $I2 = lua_optint(2, offset, 0)
@@ -334,8 +326,7 @@ NOT YET IMPLEMENTED.
     .local pmc mode
     .local pmc f
     .local pmc res
-    $P0 = get_hll_global ['io'], 'tofile'
-    $P0(self)
+    tofile(self)
     $S1 = lua_checkstring(1, mode)
     $I1 = lua_checkoption(1, $S1, 'no full line')
     $I2 = lua_optint(2, size, 512)     # LUAL_BUFFERSIZE
@@ -371,8 +362,7 @@ or C<string.format> before write.
     .local int argc
     .local int i
     .local pmc f
-    $P0 = get_hll_global ['io'], 'tofile'
-    $P0(self)
+    tofile(self)
     f = getattribute self, 'data'
     argc = argv
     i = 0
@@ -397,12 +387,10 @@ or C<string.format> before write.
 
 .sub '__gc' :method :anon
     .local pmc f
-    $P0 = get_hll_global ['io'], 'tofilep'
-    f = $P0(self)
+    f = tofilep(self)
     # ignore closed files
     if null f goto L1
-    $P0 = get_hll_global ['io'], 'aux_close'
-    $P0(self)
+    aux_close(self)
   L1:
     .return ()
 .end
@@ -411,8 +399,7 @@ or C<string.format> before write.
 .sub '__tostring' :method :anon
     .local pmc f
     .local pmc res
-    $P0 = get_hll_global ['io'], 'tofilep'
-    f = $P0(self)
+    f = tofilep(self)
     new res, 'LuaString'
     if f goto L1
     $S0 = "file (closed)"

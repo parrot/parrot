@@ -39,10 +39,6 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 .sub 'luaopen_io'
 #    print "init Lua I/O\n"
 
-    .local pmc _file
-    $P0 = get_hll_global ['io'; 'file'], 'createmeta'
-    _file = $P0()
-
     # create (private) environment (with fields IO_INPUT, IO_OUTPUT, __close)
     .local pmc _io_env
     .const .Sub _io_fclose = 'fclose'
@@ -116,6 +112,14 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 
     .const .Sub _readline = 'readline'
     _readline.'setfenv'(_io_env)
+
+    $P0 = get_hll_namespace ['io'; 'file']
+    $P1 = get_namespace
+    $P2 = split ' ', 'createmeta'
+    $P0.'export_to'($P1, $P2)
+
+    .local pmc _file
+    _file = createmeta()
 
     # create (and set) default files
     createstdfiles(_file, _io, _io_env)
