@@ -21,13 +21,8 @@ the Lua C<Userdata> type.
 
 #include "lua_private.h"
 
-typedef struct userdata_t {
-    PMC * val;
-    PMC * env;
-} userdata_t;
-
-#define u_val(pmc) (PMC_data_typed((pmc), userdata_t *))->val
-#define u_env(pmc) (PMC_data_typed((pmc), userdata_t *))->env
+#define u_val(pmc) (PARROT_LUAUSERDATA(pmc))->val
+#define u_env(pmc) (PARROT_LUAUSERDATA(pmc))->env
 
 static PMC* curr_func(PARROT_INTERP) {
     parrot_context_t *sub_ctx = CONTEXT(interp)->caller_ctx;
@@ -63,6 +58,9 @@ pmclass LuaUserdata
     group    lua_group
     hll      Lua {
 
+    ATTR PMC    *val;
+    ATTR PMC    *env;
+
 /*
 
 =item C<void init()>
@@ -73,8 +71,8 @@ Initializes the userdata.
 
 */
     void init() {
-        userdata_t *u      = mem_allocate_zeroed_typed(userdata_t);
-        PMC_data(SELF)     = u;
+        Parrot_LuaUserdata *u = mem_allocate_zeroed_typed(Parrot_LuaUserdata);
+        PMC_data(SELF) = u;
         u_env(SELF) = getcurrenv(INTERP);
         PMC_metadata(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -108,8 +106,8 @@ Call finalizer and free the userdata.
 
 */
     void destroy() {
-        userdata_t *u    = PMC_data_typed(SELF, userdata_t *);
-        PMC        *meth = find_meth(INTERP, SELF, "__gc");
+        Parrot_LuaUserdata *u = PARROT_LUAUSERDATA(SELF);
+        PMC *meth = find_meth(INTERP, SELF, "__gc");
 
         if (meth)
             (void)Parrot_runops_fromc_args(INTERP, meth, "vP", SELF);
