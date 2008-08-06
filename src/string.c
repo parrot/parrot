@@ -1939,43 +1939,47 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 string_to_int(SHIM_INTERP, ARGIN(const STRING *s))
 {
-    const char         *start     = s->strstart;
-    const char * const  end       = start + s->bufused;
-    int                 sign      = 1;
-    INTVAL              in_number = 0;
-    INTVAL              i         = 0;
+    if(s == NULL)
+        return 0;
+    {
+        const char         *start     = s->strstart;
+        const char * const  end       = start + s->bufused;
+        int                 sign      = 1;
+        INTVAL              in_number = 0;
+        INTVAL              i         = 0;
 
-    PARROT_ASSERT(s);
+        PARROT_ASSERT(s);
 
-    while (start < end) {
-        const unsigned char c = *start;
+        while (start < end) {
+            const unsigned char c = *start;
 
-        if (isdigit((unsigned char)c)) {
-            in_number = 1;
-            i         = i * 10 + (c - '0');
-        }
-        else if (!in_number) {
-            /* we've not yet seen any digits */
-            if (c == '-') {
-                sign      = -1;
+            if (isdigit((unsigned char)c)) {
                 in_number = 1;
+                i         = i * 10 + (c - '0');
             }
-            else if (c == '+')
-                in_number = 1;
-            else if (isspace((unsigned char)c))
-                ;
-            else
+            else if (!in_number) {
+                /* we've not yet seen any digits */
+                if (c == '-') {
+                    sign      = -1;
+                    in_number = 1;
+                }
+                else if (c == '+')
+                    in_number = 1;
+                else if (isspace((unsigned char)c))
+                    ;
+                else
+                    break;
+            }
+            else {
                 break;
+            }
+            ++start;
         }
-        else {
-            break;
-        }
-        ++start;
+
+        i *= sign;
+
+        return i;
     }
-
-    i *= sign;
-
-    return i;
 }
 
 
