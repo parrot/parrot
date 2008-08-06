@@ -1052,7 +1052,7 @@ $(SRC_DIR)/exec_start$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@
 
 $(SRC_DIR)/exec_save$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@
 
-$(SRC_DIR)/key$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/key$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/key.str
 
 $(SRC_DIR)/gc/smallobject$(O) : $(GENERAL_H_FILES)
 
