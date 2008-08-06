@@ -21,7 +21,7 @@ Use PMC BigFloat when available.
 =cut
 
 .HLL 'Lua', 'lua_group'
-.namespace [ 'Lua'; 'bc' ]
+.namespace [ 'bc' ]
 
 .sub '__onload' :anon :load
 #    print "__onload bc\n"
@@ -161,7 +161,7 @@ Use PMC BigFloat when available.
 
     new $P0, 'LuaNumber'
     set $P0, 0
-    set_hll_global ['Lua'; 'bc'], 'DIGITS', $P0
+    set_hll_global ['bc'], 'DIGITS', $P0
 
     .return (_bc)
 .end
@@ -236,7 +236,7 @@ Use PMC BigFloat when available.
     .param pmc extra :slurpy
     .local pmc res
     .local int DIGITS
-    $P0 = get_hll_global ['Lua'; 'bc'], 'DIGITS'
+    $P0 = get_hll_global ['bc'], 'DIGITS'
     res = clone $P0
     DIGITS = $P0
     $I1 = lua_optint(1, n, DIGITS)

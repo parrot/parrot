@@ -18,7 +18,7 @@ This implementation is based on F<runtime/parrot/library/uuid.pir>.
 =cut
 
 .HLL 'Lua', 'lua_group'
-.namespace [ 'Lua'; 'uuid' ]
+.namespace [ 'uuid' ]
 
 .sub '__onload' :anon :load
 #    print "__onload uuid\n"

@@ -19,7 +19,7 @@ see F<runtime/parrot/library/Math/Random/mt19937ar.pir>.
 =cut
 
 .HLL 'Lua', 'lua_group'
-.namespace [ 'Lua'; 'random' ]
+.namespace [ 'random' ]
 
 .sub '__onload' :anon :load
 #    print "__onload random\n"

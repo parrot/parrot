@@ -21,7 +21,7 @@ that can be used in bitwise operations, and the following functions:
 =cut
 
 .HLL 'Lua', 'lua_group'
-.namespace [ 'Lua'; 'bitlib' ]
+.namespace [ 'bitlib' ]
 
 .sub '__onload' :anon :load
 #    print "__onload bitlib\n"
@@ -112,14 +112,14 @@ that can be used in bitwise operations, and the following functions:
   L1:
     new $P0, 'Integer'
     set $P0, max
-    set_hll_global ['Lua'; 'bit'], 'BIT_MAX', $P0
+    set_hll_global ['bit'], 'BIT_MAX', $P0
     .return (bits)
 .end
 
 .macro MONADIC(op, a)
     .local pmc res
     .local int BIT_MAX
-    $P0 = get_hll_global ['Lua'; 'bit'], 'BIT_MAX'
+    $P0 = get_hll_global ['bit'], 'BIT_MAX'
     BIT_MAX = $P0
     $I1 = lua_checknumber(1, .a)
     .op $I0, $I1
@@ -132,7 +132,7 @@ that can be used in bitwise operations, and the following functions:
 .macro VARIADIC(op, a, vararg)
     .local pmc res
     .local int BIT_MAX
-    $P0 = get_hll_global ['Lua'; 'bit'], 'BIT_MAX'
+    $P0 = get_hll_global ['bit'], 'BIT_MAX'
     BIT_MAX = $P0
     $I1 = lua_checknumber(1, .a)
     .local int i
@@ -154,7 +154,7 @@ that can be used in bitwise operations, and the following functions:
 .macro LOGICAL_SHIFT(op, a, b)
     .local pmc res
     .local int BIT_MAX
-    $P0 = get_hll_global ['Lua'; 'bit'], 'BIT_MAX'
+    $P0 = get_hll_global ['bit'], 'BIT_MAX'
     BIT_MAX = $P0
     $I1 = lua_checknumber(1, .a)
     band $I1, BIT_MAX
@@ -169,7 +169,7 @@ that can be used in bitwise operations, and the following functions:
 .macro ARITHMETIC_SHIFT(op, a, b)
     .local pmc res
     .local int BIT_MAX
-    $P0 = get_hll_global ['Lua'; 'bit'], 'BIT_MAX'
+    $P0 = get_hll_global ['bit'], 'BIT_MAX'
     BIT_MAX = $P0
     $I1 = lua_checknumber(1, .a)
     $I2 = lua_checknumber(2, .b)
