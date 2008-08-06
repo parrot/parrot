@@ -141,56 +141,43 @@ close $X;
 
 my $stat;
 
-if ( $cygwin || $MSWin32 ) {
-
-    # Skip inode number
-    my @s = stat('xpto');
-    $stat = join( "\n", $s[0], @s[ 2 .. 10 ] ) . "\n";
-    pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
-.sub main :main
-        $P1 = new 'OS'
-        $S1 = "xpto"
-        $P2 = $P1."stat"($S1)
-
-        $I1 = 0
-loop:
-        $S1 = $P2[$I1]
-        print $S1
-        print "\n"
-        $I1 += 1
-        if $I1 == 1 goto inc
-        if $I1 == 11 goto done
-        goto loop
-inc:
-        $I1 += 1
-        goto loop
-
-done:
-        end
-.end
-CODE
+my $count = $MSWin32 ? 11 : 13;
+my @s = stat('xpto');
+if ( $cygwin ) {
+    # Mask inode number (fudge it)
+    $s[1] &= 0xffffffff;
 }
-else {
-    $stat = join( "\n", stat("xpto") ) . "\n";
+
+if ( $MSWin32 ) {
+    $stat = sprintf("0x%08x\n" x 11, @s);
     pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
 .sub main :main
         $P1 = new 'OS'
         $S1 = "xpto"
         $P2 = $P1."stat"($S1)
 
-        $I1 = 0
-loop:
-        $S1 = $P2[$I1]
-        print $S1
-        print "\n"
-        $I1 += 1
-        if $I1 == 13 goto done
-        goto loop
+        $S1 = repeat "0x%08x\n", 11
+        $S2 = sprintf $S1, $P2
+        print $S2
 done:
         end
 .end
 CODE
+} else {
+    $stat = sprintf("0x%08x\n" x 13, @s);
+    pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
+.sub main :main
+        $P1 = new 'OS'
+        $S1 = "xpto"
+        $P2 = $P1."stat"($S1)
 
+        $S1 = repeat "0x%08x\n", 13
+        $S2 = sprintf $S1, $P2
+        print $S2
+done:
+        end
+.end
+CODE
 }
 
 # test readdir
@@ -238,56 +225,25 @@ my $lstat;
 SKIP: {
     skip 'lstat not available on Win 32 yet', 1 if $MSWin32;
 
+    my @s = lstat('xpto');
     if ($cygwin) {
-
-        # Skip inode number
-        my @s = stat('xpto');
-        $stat = join( "\n", $s[0], @s[ 2 .. 12 ] ) . "\n";
-        pir_output_is( <<'CODE', $stat, "Test OS.lstat" );
+        # Mask inode number (fudge it)
+        $s[1] &= 0xffffffff;
+    }
+    $lstat = sprintf( "0x%08x\n" x 13, @s );
+    pir_output_is( <<'CODE', $lstat, "Test OS.lstat" );
 .sub main :main
         $P1 = new 'OS'
         $S1 = "xpto"
         $P2 = $P1."lstat"($S1)
 
-        $I1 = 0
-loop:
-        $S1 = $P2[$I1]
-        print $S1
-        print "\n"
-        $I1 += 1
-        if $I1 == 1 goto inc
-        if $I1 == 13 goto done
-        goto loop
-inc:
-        $I1 += 1
-        goto loop
+        $S1 = repeat "0x%08x\n", 13
+        $S2 = sprintf $S1, $P2
+        print $S2
 
-done:
         end
 .end
 CODE
-    }
-    else {
-        $lstat = join( "\n", lstat("xpto") ) . "\n";
-        pir_output_is( <<'CODE', $lstat, "Test OS.lstat" );
-.sub main :main
-        $P1 = new 'OS'
-        $S1 = "xpto"
-        $P2 = $P1."lstat"($S1)
-
-        $I1 = 0
-loop:
-        $S1 = $P2[$I1]
-        print $S1
-        print "\n"
-        $I1 += 1
-        if $I1 == 13 goto done
-        goto loop
-done:
-        end
-.end
-CODE
-    }
 }
 
 # Test remove on a file
