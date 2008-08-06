@@ -70,6 +70,11 @@ This implementation is based on F<runtime/parrot/library/MIME/Base64.pir>.
 #    set $P1, "_VERSION"
 #    _base64[$P1] = $P2
 
+    $P0 = get_hll_namespace ['MIME'; 'Base64']
+    $P1 = get_namespace
+    $P2 = split ' ', 'decode_base64 encode_base64'
+    $P0.'export_to'($P1, $P2)
+
     .return (_base64)
 .end
 
@@ -79,12 +84,11 @@ This implementation is based on F<runtime/parrot/library/MIME/Base64.pir>.
 =cut
 
 .sub 'decode' :anon
-    .param pmc s :optional
+    .param pmc str :optional
     .param pmc extra :slurpy
     .local pmc res
-    $S1 = lua_checkstring(1, s)
-    $P0 = get_hll_global ['MIME'; 'Base64'], 'decode_base64'
-    $S0 = $P0($S1)
+    $S1 = lua_checkstring(1, str)
+    $S0 = decode_base64($S1)
     new res, 'LuaString'
     set res, $S0
     .return (res)
@@ -96,12 +100,11 @@ This implementation is based on F<runtime/parrot/library/MIME/Base64.pir>.
 =cut
 
 .sub 'encode' :anon
-    .param pmc s :optional
+    .param pmc str :optional
     .param pmc extra :slurpy
     .local pmc res
-    $S1 = lua_checkstring(1, s)
-    $P0 = get_hll_global ['MIME'; 'Base64'], 'encode_base64'
-    $S0 = $P0($S1)
+    $S1 = lua_checkstring(1, str)
+    $S0 = encode_base64($S1)
     new res, 'LuaString'
     set res, $S0
     .return (res)

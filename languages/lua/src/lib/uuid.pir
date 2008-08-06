@@ -73,6 +73,11 @@ This implementation is based on F<runtime/parrot/library/uuid.pir>.
 #    set $P1, "_VERSION"
 #    _uuid[$P1] = $P2
 
+    $P0 = get_hll_namespace ['uuid']
+    $P1 = get_namespace
+    $P2 = split ' ', 'generate generate_random generate_time parse'
+    $P0.'export_to'($P1, $P2)
+
     .return (_uuid)
 .end
 
@@ -88,19 +93,17 @@ This implementation is based on F<runtime/parrot/library/uuid.pir>.
     $S1 = lua_optstring(1, str, '')
     $I0 = index $S1, 'r'
     unless $I0 == 0 goto L1
-    $S0 = 'generate_random'
+    $P0 = generate_random()
     goto L3
   L1:
     $I0 = index $S1, 't'
     unless $I0 == 0 goto L2
-    $S0 = 'generate_time'
+    $P0 = generate_time()
     goto L3
   L2:
-    $S0 = 'generate'
+    $P0 = generate()
   L3:
-    $P0 = get_hll_global ['uuid'], $S0
-    $P1 = $P0()
-    $S0 = $P1
+    $S0 = $P0
     new res, 'LuaString'
     set res, $S0
     .return (res)
@@ -116,8 +119,7 @@ This implementation is based on F<runtime/parrot/library/uuid.pir>.
     .param pmc extra :slurpy
     .local pmc res
     $S1 = lua_checkstring(1, str)
-    $P0 = get_hll_global ['uuid'], 'parse'
-    $I0 = $P0($S1)
+    $I0 = parse($S1)
     not $I0
     new res, 'LuaBoolean'
     set res, $I0
@@ -133,8 +135,7 @@ This implementation is based on F<runtime/parrot/library/uuid.pir>.
     .param pmc str :optional
     .param pmc extra :slurpy
     $S1 = lua_checkstring(1, str)
-    $P0 = get_hll_global ['uuid'], 'parse'
-    ($I0, $P1) = $P0($S1)
+    ($I0, $P1) = parse($S1)
     unless $I0 goto L1
     .return ()
   L1:
