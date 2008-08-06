@@ -976,8 +976,10 @@ Parrot_debug(NOTNULL(Parrot_Interp debugger), opcode_t * pc)
     PDB_init(debugger, NULL);
 
     /* disassemble needs this for now */
+    /*
     interp               = pdb->debugee;
     interp->pdb          = pdb;
+    */
     debugger->lo_var_ptr = interp->lo_var_ptr;
 
     PDB_disassemble(interp, NULL);

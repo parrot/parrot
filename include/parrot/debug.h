@@ -24,7 +24,8 @@ enum {
     PDB_RUNNING     = 1 << 2,
     PDB_STOPPED     = 1 << 3,
     PDB_BREAK       = 1 << 4, /* Set only from debug_break */
-    PDB_EXIT        = 1 << 5
+    PDB_EXIT        = 1 << 5,
+    PDB_ENTER       = 1 << 6
 };
 
 enum {
@@ -166,6 +167,7 @@ typedef struct PDB {
     opcode_t                *cur_opcode;
     int                     state;
     Interp                  *debugee;
+    unsigned long           tracing;
 } PDB_t;
 
 
@@ -182,8 +184,18 @@ void Parrot_debugger_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_API
+void Parrot_debugger_start(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
 void Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(STRING *filename))
         __attribute__nonnull__(1);
+
+PARROT_API
+void PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 long PDB_add_label(
     ARGMOD(PDB_file_t *file),
@@ -291,10 +303,6 @@ void PDB_init(PARROT_INTERP, SHIM(const char *command))
         __attribute__nonnull__(1);
 
 void PDB_list(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-void PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

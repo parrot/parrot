@@ -398,6 +398,7 @@ get_core_op_lib_init(PARROT_INTERP, int which)
         case PARROT_SLOW_CORE:
         case PARROT_FAST_CORE:
         case PARROT_GC_DEBUG_CORE:
+        case PARROT_DEBUGGER_CORE:
             init_func = PARROT_CORE_OPLIB_INIT;
             break;
         default:
@@ -917,6 +918,9 @@ runops_int(PARROT_INTERP, size_t offset)
                 break;
             case PARROT_GC_DEBUG_CORE:
                 core = runops_gc_debug_core;
+                break;
+            case PARROT_DEBUGGER_CORE:
+                core = runops_debugger_core;
                 break;
             default:
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
