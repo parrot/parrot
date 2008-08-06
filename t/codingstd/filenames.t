@@ -60,7 +60,13 @@ Paul Cochrane <paultcochrane at gmail dot com>
 
 my $DIST = Parrot::Distribution->new;
 my $manifest = maniread('MANIFEST');
-my @files = @ARGV ? @ARGV : sort keys %$manifest;
+my @files;
+if (@ARGV){
+    @files = @ARGV;
+} else {
+    # Give ports a little more leeway
+    @files = grep {! /^ports/} sort keys %$manifest;
+}
 my ( @multi_dots, @strange_chars, @too_long );
 
 foreach my $file ( @files ) {
