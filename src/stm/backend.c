@@ -193,7 +193,7 @@ static void * wait_for_version(PARROT_INTERP,
 
 =item C<void Parrot_STM_destroy>
 
-Free all resources associated with STM in the interpreter C<interp>.
+Frees all resources associated with STM in the interpreter C<interp>.
 
 =cut
 
@@ -220,7 +220,7 @@ Parrot_STM_destroy(PARROT_INTERP)
 
 =item C<Parrot_STM_PMC_handle Parrot_STM_alloc>
 
-Create a new handle that will wrap a STM-managed PMC. The initial value
+Creates a new handle that will wrap an STM-managed PMC. The initial value
 of the PMC will be a copy of C<pmc>.
 
 =cut
@@ -264,7 +264,7 @@ Parrot_STM_alloc(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 
 =item C<void Parrot_freeze_STM_PMC_handle>
 
-RT#48260: Not yet documented!!!
+Freezes an STM PMC by calling the "push_pmc" vtable method.
 
 =cut
 
@@ -281,7 +281,7 @@ Parrot_freeze_STM_PMC_handle(PARROT_INTERP, ARGMOD(IMAGE_IO *io),
 
 =item C<Parrot_STM_PMC_handle Parrot_thaw_STM_PMC_handle>
 
-RT#48260: Not yet documented!!!
+Thaws an STM PMC by calling the "shift_pmc" vtable method.
 
 =cut
 
@@ -299,7 +299,7 @@ Parrot_thaw_STM_PMC_handle(PARROT_INTERP, ARGIN(IMAGE_IO *io))
 
 =item C<static STM_write_record * get_write>
 
-RT#48260: Not yet documented!!!
+Retrieves the C<i>th write from C<log>.
 
 =cut
 
@@ -319,7 +319,7 @@ get_write(SHIM_INTERP, ARGIN(STM_tx_log *log), int i)
 
 =item C<static STM_read_record * get_read>
 
-RT#48260: Not yet documented!!!
+Retreives the C<i>th read from C<log>.
 
 =cut
 
@@ -345,7 +345,7 @@ get_read(SHIM_INTERP, ARGIN(STM_tx_log *log), int i)
 
 =item C<static STM_write_record * alloc_write>
 
-RT#48260: Not yet documented!!!
+Allocates a new STM write in C<log>.
 
 =cut
 
@@ -375,7 +375,7 @@ alloc_write(PARROT_INTERP, ARGMOD(STM_tx_log *log))
 
 =item C<static STM_read_record * alloc_read>
 
-RT#48260: Not yet documented!!!
+Allocates a new STM read in C<log>.
 
 =cut
 
@@ -443,7 +443,7 @@ is_version(ARGIN(const void *maybe_version))
 
 =item C<static STM_tx_log_sub * get_sublog>
 
-RT#48260: Not yet documented!!!
+Retrives the C<i>th sublog from C<log>.
 
 =cut
 
@@ -463,7 +463,9 @@ get_sublog(ARGIN(STM_tx_log *log), int i)
 
 =item C<static int is_aborted>
 
-RT#48260: Not yet documented!!!
+Determines whether any of the sublogs in C<log> are aborted. Checks the
+status of each sublog to determine if any have a status of
+C<STM_STATUS_ABORTED>.
 
 =cut
 
@@ -624,7 +626,8 @@ merge_transactions(PARROT_INTERP, ARGMOD(STM_tx_log *log),
 
 =item C<static PMC * force_sharing>
 
-RT#48260: Not yet documented!!!
+Creates a read-only shared PMC from C<pmc> by calling the C<share_ro>
+vtable method. If C<pmc> is null, returns C<PMCNULL>.
 
 =cut
 
@@ -1215,7 +1218,7 @@ Parrot_STM_mark_pmc_handle(PARROT_INTERP, Parrot_STM_PMC_handle handle)
 
     STM_TRACE_SAFE("mark handle %p", handle);
 
-    /* XXX FIXME is this enough? What about shared status? */
+    /* RT#57676: XXX FIXME is this enough? What about shared status? */
     pobject_lives(interp, (PObj*) handle);
 
     value = handle->value;
@@ -1293,6 +1296,7 @@ wait_for_version(PARROT_INTERP, ARGMOD(STM_tx_log *log), Parrot_STM_PMC_handle h
          * this means that if wait_len > num_threads, we have a deadlock
          *
          * This algorithm is borrowed from Ennals' implementation.
+         * RT#57678
          * FIXME XXX look for better alternative (esp. one that'll let
          *           us do non-spinlocking?)
          * FIXME XXX race in accessing n_interpreters?
@@ -1344,7 +1348,8 @@ wait_for_version(PARROT_INTERP, ARGMOD(STM_tx_log *log), Parrot_STM_PMC_handle h
         }
 
         /* simple heuristic, try to avoid waiting more then ten milliseconds */
-        /* TODO implement a real contention-manager interface for this instead */
+        /* RT#57678 TODO implement a real contention-manager interface
+           for this instead */
         if (wait_count > 2000 || Parrot_floatval_time() > start_wait + 0.01) {
             STM_TRACE("waited too long, aborting...\n");
             PARROT_ATOMIC_INT_SET(curlog->status, STM_STATUS_ABORTED);
@@ -1362,7 +1367,7 @@ wait_for_version(PARROT_INTERP, ARGMOD(STM_tx_log *log), Parrot_STM_PMC_handle h
              * while. */
             YIELD;
         }
-        /* XXX better spinning */
+        /* RT#57678 XXX better spinning */
     }
 
     PROFILE_WAIT(log, Parrot_floatval_time() - start_wait, wait_count);
@@ -1458,7 +1463,8 @@ Parrot_STM_read(PARROT_INTERP, Parrot_STM_PMC_handle handle)
 
 =item C<static int safe_to_clone>
 
-RT#48260: Not yet documented!!!
+Determines whether it is safe to clone the PMC C<original>. Returns C<1> if
+it is safe to clone it, returns C<0> otherwise.
 
 =cut
 
@@ -1481,7 +1487,9 @@ safe_to_clone(SHIM_INTERP, ARGIN(const PMC *original))
 
 =item C<static PMC * local_pmc_copy>
 
-RT#48260: Not yet documented!!!
+Creates a local copy of the PMC C<original>. If C<original> is C<PMCNULL>
+this function returns C<PMCNULL>. If the PMC is of type C<Undef>, it creates
+a new Undef PMC. Otherwise, it clones the PMC.
 
 =cut
 
@@ -1523,7 +1531,7 @@ PARROT_CANNOT_RETURN_NULL
 static STM_write_record *
 find_write_record(PARROT_INTERP, Parrot_STM_PMC_handle handle, int overwrite_p)
 {
-    /* FIXME check for read log or previous tx's write log */
+    /* RT#57680 FIXME check for read log or previous tx's write log */
     STM_tx_log_sub   *cursub;
     int               have_old_value = 0;
     PMC              *old_value      = NULL;
@@ -1535,7 +1543,7 @@ find_write_record(PARROT_INTERP, Parrot_STM_PMC_handle handle, int overwrite_p)
 
     STM_TRACE("finding write record for %p", handle);
 
-    /* XXX Looks like the log argument is useless */
+    /* RT#57680 XXX Looks like the log argument is useless */
     log      = Parrot_STM_tx_log_get(interp);
     PARROT_ASSERT(log->depth > 0);
 
@@ -1628,8 +1636,8 @@ find_write_record(PARROT_INTERP, Parrot_STM_PMC_handle handle, int overwrite_p)
         else {
             STM_TRACE("don't have old value");
             /* avoiding creating write records when we are actually aborted
-             * XXX in the future we will do this by throwing an exception to
-             * abort the transaction
+             * RT#57680 XXX in the future we will do this by throwing an
+             * exception to abort the transaction
              */
             if (!is_aborted(log)) {
                 do {
@@ -1906,7 +1914,8 @@ Parrot_STM_dump_profile(PARROT_INTERP)
 
 =item C<void Parrot_STM_merge_profile>
 
-RT#48260: Not yet documented!!!
+Merges the STM profile of interpreter C<s> into the STM profile of
+interpreter C<d>.
 
 =cut
 
