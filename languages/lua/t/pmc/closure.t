@@ -269,7 +269,7 @@ OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'from pir' );
 .HLL 'Lua', 'lua_group'
-.namespace [ 'Lua::basic' ]
+.namespace [ 'basic' ]
 .sub _main
     collectoff
     luaopen_basic()

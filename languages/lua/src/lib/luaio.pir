@@ -34,13 +34,13 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 =cut
 
 .HLL 'Lua', 'lua_group'
-.namespace [ 'Lua::io' ]
+.namespace [ 'io' ]
 
 .sub 'luaopen_io'
 #    print "init Lua I/O\n"
 
     .local pmc _file
-    $P0 = get_hll_global ['Lua::io::file'], 'createmeta'
+    $P0 = get_hll_global ['io'; 'file'], 'createmeta'
     _file = $P0()
 
     # create (private) environment (with fields IO_INPUT, IO_OUTPUT, __close)

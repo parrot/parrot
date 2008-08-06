@@ -14,6 +14,7 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 =cut
 
 .HLL 'Lua', 'lua_group'
+.namespace []
 
 
 =item C<lua_argerror (narg, extramsg, ...)>
@@ -701,23 +702,23 @@ Opens all standard Lua libraries.
 =cut
 
 .sub 'lua_openlibs'
-    $P0 = get_hll_global ['Lua::basic'], 'luaopen_basic'
+    $P0 = get_hll_global ['basic'], 'luaopen_basic'
     $P0()
-    $P0 = get_hll_global ['Lua::coroutine'], 'luaopen_coroutine'
+    $P0 = get_hll_global ['coroutine'], 'luaopen_coroutine'
     $P0()
-    $P0 = get_hll_global ['Lua::package'], 'luaopen_package'
+    $P0 = get_hll_global ['package'], 'luaopen_package'
     $P0()
-    $P0 = get_hll_global ['Lua::table'], 'luaopen_table'
+    $P0 = get_hll_global ['table'], 'luaopen_table'
     $P0()
-    $P0 = get_hll_global ['Lua::io'], 'luaopen_io'
+    $P0 = get_hll_global ['io'], 'luaopen_io'
     $P0()
-    $P0 = get_hll_global ['Lua::os'], 'luaopen_os'
+    $P0 = get_hll_global ['os'], 'luaopen_os'
     $P0()
-    $P0 = get_hll_global ['Lua::string'], 'luaopen_string'
+    $P0 = get_hll_global ['string'], 'luaopen_string'
     $P0()
-    $P0 = get_hll_global ['Lua::math'], 'luaopen_math'
+    $P0 = get_hll_global ['math'], 'luaopen_math'
     $P0()
-    $P0 = get_hll_global ['Lua::debug'], 'luaopen_debug'
+    $P0 = get_hll_global ['debug'], 'luaopen_debug'
     $P0()
     sweepon
     sweep 1
