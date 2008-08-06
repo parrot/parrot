@@ -460,7 +460,7 @@ Parrot_debugger_start(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
     if (interp->pdb->state & PDB_EXIT)
         Parrot_exit(interp, 0);
  }
- 
+
 PARROT_API
 void
 Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
