@@ -681,9 +681,9 @@ it encounters NULL. Used by C<destroy_runloop_jump_points>.
 */
 
 void
-really_destroy_runloop_jump_points(ARGIN(Parrot_runloop *jump_point))
+really_destroy_runloop_jump_points(ARGIN_NULLOK(Parrot_runloop *jump_point))
 {
-    while (jump_point != NULL) {
+    while (jump_point) {
         Parrot_runloop * const prev = jump_point->prev;
         mem_sys_free(jump_point);
         jump_point = prev;

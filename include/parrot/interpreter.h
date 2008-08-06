@@ -710,8 +710,8 @@ INTVAL Parrot_runops_fromc_args_reti(PARROT_INTERP,
 void destroy_runloop_jump_points(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void really_destroy_runloop_jump_points(ARGIN(Parrot_runloop *jump_point))
-        __attribute__nonnull__(1);
+void really_destroy_runloop_jump_points(
+    ARGIN_NULLOK(Parrot_runloop *jump_point));
 
 void runops(PARROT_INTERP, size_t offs)
         __attribute__nonnull__(1);
