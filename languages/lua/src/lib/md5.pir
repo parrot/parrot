@@ -19,7 +19,7 @@ see F<src/dynpmc/mdx.pmc>.
 =cut
 
 .HLL 'Lua', 'lua_group'
-.namespace [ 'Lua::md5'; 'Lua' ]
+.namespace [ 'Lua'; 'md5' ]
 
 .sub '__onload' :anon :load
 #    print "__onload md5\n"

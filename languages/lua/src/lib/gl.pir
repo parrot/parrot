@@ -19,7 +19,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 =cut
 
 .HLL 'Lua', 'lua_group'
-.namespace [ 'Lua::gl'; 'Lua' ]
+.namespace [ 'Lua'; 'gl' ]
 
 .sub '__onload' :anon :load
 #    print "__onload gl\n"

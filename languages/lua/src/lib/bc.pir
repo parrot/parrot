@@ -21,7 +21,7 @@ Use PMC BigFloat when available.
 =cut
 
 .HLL 'Lua', 'lua_group'
-.namespace [ 'Lua::bc'; 'Lua' ]
+.namespace [ 'Lua'; 'bc' ]
 
 .sub '__onload' :anon :load
 #    print "__onload bc\n"

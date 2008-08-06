@@ -18,7 +18,7 @@ See original on L<http://www.tecgraf.puc-rio.br/~lhf/ftp/lua/#lalarm/>
 =cut
 
 .HLL 'Lua', 'lua_group'
-.namespace [ 'Lua::alarm' ]
+.namespace [ 'Lua'; 'alarm' ]
 
 .sub '__onload' :anon :load
 #    print "__onload alarm\n"

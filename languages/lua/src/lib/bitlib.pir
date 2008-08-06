@@ -21,7 +21,7 @@ that can be used in bitwise operations, and the following functions:
 =cut
 
 .HLL 'Lua', 'lua_group'
-.namespace [ 'Lua::bitlib'; 'Lua' ]
+.namespace [ 'Lua'; 'bitlib' ]
 
 .sub '__onload' :anon :load
 #    print "__onload bitlib\n"
