@@ -8,9 +8,16 @@
 #include "pircompiler.h"
 #include "pircompunit.h"
 
+typedef struct symbol {
+    char          *name;
+    struct symbol *next;
+    pir_type       type;
+
+} symbol;
+
 void declare_local(struct lexer_state *lexer, pir_type type, target *list);
 
-target *find_symbol(struct lexer_state *lexer, char * const name);
+symbol *find_symbol(struct lexer_state *lexer, char * const name);
 
 #endif /* PARROT_PIR_PIRSYMBOL_H_GUARD */
 

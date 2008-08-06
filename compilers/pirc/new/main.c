@@ -193,11 +193,11 @@ yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const messag
     fprintf(stderr, "\nError in file '%s' (line %d)\n%s ",
             lexer->filename, yyget_lineno(yyscanner), message);
 
-    /* print current token if it's not a newline (or \r\n on windows) */
+    /* print current token if it's not a newline ("\r\n" on windows) */
     /* the following should be fixed; the point is not to print the token if
-     * it's a newline, that looks silly.
+     * it's a newline, that looks silly. XXX What's it on MacOS, "\r" ??
      */
-    if (strcmp(text, "\r\n") != 0 || strcmp(text, "\n") != 0) {
+    if (strcmp(text, "\r\n") != 0 && strcmp(text, "\n") != 0) {
         fprintf(stderr, "('%s')\n\n", text);
     }
     else {

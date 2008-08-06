@@ -15,6 +15,18 @@ pir.y
 
 This is a complete rewrite of the parser for the PIR language.
 
+Features are:
+
+=over 4
+
+=item * constant folding is implemented in the parser
+
+=item *
+
+=back
+
+
+
 =cut
 
 */
@@ -60,7 +72,7 @@ extern YY_DECL;
 #endif
 
 /* the lexer contains a special temp. field for this purpose. */
-#define STORE_NAMED_ALIAS(NAME)             lexer->temp_flag_arg1 = NAME
+#define STORE_NAMED_ALIAS(NAME)             do { lexer->temp_flag_arg1 = NAME; } while (0)
 
 #define IF_NAMED_ARG_SET_ALIAS(OBJ,EXPR)    if (TEST_FLAG(EXPR, ARG_FLAG_NAMED)) {       \
                                               set_arg_named(OBJ, lexer->temp_flag_arg1); \
@@ -131,10 +143,10 @@ extern YY_DECL;
        <sval> TK_STRINGC    "string constant"
        <ival> TK_INTC       "integer constant"
        <dval> TK_NUMC       "number constant"
-       <ival> TK_PREG       "Symbolic PMC register"
-       <ival> TK_NREG       "Symbolic number register"
-       <ival> TK_SREG       "Symbolic string register"
-       <ival> TK_IREG       "Symbolic integer register"
+       <ival> TK_PREG       "PMC register"
+       <ival> TK_NREG       "number register"
+       <ival> TK_SREG       "string register"
+       <ival> TK_IREG       "integer register"
        <sval> TK_PARROT_OP  "parrot instruction"
 
 %token TK_INT               "int"
@@ -207,7 +219,6 @@ extern YY_DECL;
              sub_id
              opt_paren_string
              paren_string
-             parrot_instruction
 
 %type <targ> sub
              method
@@ -216,6 +227,7 @@ extern YY_DECL;
              opt_ret_cont
              reg
              target
+             lex_target
              result_target
              long_result
              long_results
@@ -230,6 +242,7 @@ extern YY_DECL;
              short_arg
              arguments
              argument
+             arg
              opt_arguments_list
              arguments_list
              opt_yield_expressions
@@ -242,12 +255,12 @@ extern YY_DECL;
              long_arguments
              long_argument
 
-%type <expr> expression1
-             expression
+%type <expr> expression
              keylist
-             other_op_args
-             other_op_arg
+             op_args
+             op_arg
              keys
+             keyaccess
 
 %type <ival> has_unique_reg
              type
@@ -260,6 +273,7 @@ extern YY_DECL;
              arg_flag
              sub_flags
              sub_flag
+             sub_flag_with_arg
              if_unless
 
 %type <invo> long_invocation
@@ -273,13 +287,11 @@ extern YY_DECL;
 %type <constval> const_tail
                  constant
 
-%type <fixme> assign_tail
-              assign_expr
-              first_op_arg
-              long_invocation_stat
+%type <fixme> long_invocation_stat
               short_return_stat
               opt_namespace_id
               namespace_id
+
 
 
 /* needed for reentrancy */
@@ -311,12 +323,16 @@ extern YY_DECL;
  * 3: simple rules that have only single tokens as alternatives. See the operators
  *    for an example.
  *
- * The default rule ( $$ = $1; ) is not written explicitly, except if an
- * alternative of the rule has a different action.
+ * + The default rule ( $$ = $1; ) is not written explicitly, except if an
+ *   alternative of the rule has a different action.
  *
- * Do not write embedded actions; instead, refactor the grammar by adding
- * a new rule, so that the previously-embedded action becomes a 'normal'
- * action.
+ * + Do not write embedded actions; instead, refactor the grammar by adding
+ *   a new rule, so that the previously-embedded action becomes a 'normal'
+ *   action.
+ *
+ * + The grammar can be written in a more concise way. This, however, would
+ *   make it less readable; having a few rules more works great as self documenting
+ *   code.
  */
 
 /* Top-level rule */
@@ -328,263 +344,318 @@ extern YY_DECL;
 
 /* Top-level rules */
 
-TOP              : opt_nl
-                   pir_chunks
-                   opt_nl
-                 ;
+TOP               : opt_nl
+                    pir_chunks
+                    opt_nl
+                  ;
 
-opt_nl           : /* empty */
-                 | "\n"
-                 ;
+opt_nl            : /* empty */
+                  | "\n"
+                  ;
 
-pir_chunks       : pir_chunk
-                 | pir_chunks "\n" pir_chunk
-                 ;
+pir_chunks        : pir_chunk
+                  | pir_chunks "\n" pir_chunk
+                  ;
 
-pir_chunk        : sub_def
-                 | const_decl
-                 | namespace_decl
-                 | hll_specifier
-                 | hll_mapping
-                 | loadlib
-                 | pir_pragma
-                 ;
+pir_chunk         : sub_def
+                  | const_decl
+                  | namespace_decl
+                  | hll_specifier
+                  | hll_mapping
+                  | loadlib
+                  | pir_pragma
+                  ;
 
-pir_pragma       : ".pragma" "n_operators" TK_INTC
-                           { set_pragma(PRAGMA_N_OPERATORS, $3); }
-                 ;
+pir_pragma        : ".pragma" "n_operators" TK_INTC
+                            { set_pragma(PRAGMA_N_OPERATORS, $3); }
+                  ;
 
-loadlib          : ".loadlib" TK_STRINGC
-                           { load_library(lexer, $2); }
-                 ;
+loadlib           : ".loadlib" TK_STRINGC
+                            { load_library(lexer, $2); }
+                  ;
 
-/* HLL stuff     */
+/* HLL stuff      */
 
-hll_specifier    : ".HLL" TK_STRINGC
-                           { /*set_hll($2, $4);*/ }
-                 ;
+hll_specifier     : ".HLL" TK_STRINGC
+                            { set_hll($2); }
+                  ;
 
-hll_mapping      : ".HLL_map" TK_STRINGC '=' TK_STRINGC
-                           { set_hll_map($2, $4); }
-                 ;
+hll_mapping       : ".HLL_map" TK_STRINGC '=' TK_STRINGC
+                            { set_hll_map($2, $4); }
+                  ;
 
 
 /* Namespaces */
 
-namespace_decl   : ".namespace" '[' opt_namespace_id ']'
-                 ;
+namespace_decl    : ".namespace" '[' opt_namespace_id ']'
+                  ;
 
-opt_namespace_id : /* empty */
-                           { $$ = NULL; }
-                 | namespace_id
-                           { $$ = $1; }
-                 ;
+opt_namespace_id  : /* empty */
+                            { $$ = NULL; }
+                  | namespace_id
+                            { $$ = $1; }
+                  ;
 
-namespace_id     : TK_STRINGC
-                           { $$ = $1; }
-                 | namespace_id ';' TK_STRINGC
-                           { }
-                 ;
+namespace_id      : TK_STRINGC
+                            { $$ = $1; }
+                  | namespace_id ';' TK_STRINGC
+                            { }
+                  ;
 
 
 /* Sub definition */
 
-sub_def          : sub_head sub_flags "\n"
-                   parameters
-                   instructions
-                   ".end"
-                 ;
+sub_def           : sub_head sub_flags "\n"
+                    parameters
+                    instructions
+                    ".end"
+                  ;
 
-sub_head         : ".sub" sub_id
-                        { new_subr(lexer, $2); }
-                 ;
+sub_head          : ".sub" sub_id
+                         { new_subr(lexer, $2); }
+                  ;
 
-sub_id           : identifier
-                 | TK_STRINGC
-                 ;
+sub_id            : identifier
+                  | TK_STRINGC
+                  ;
 
-sub_flags        : /* empty */
-                        { $$ = 0; }
-                 | sub_flags sub_flag
-                        { { set_sub_flag(lexer, $2); } }
-                 ;
+sub_flags         : /* empty */
+                         { $$ = 0; }
+                  | sub_flags sub_flag
+                         { set_sub_flag(lexer, $2); }
+                  ;
 
-sub_flag         : ":anon"
-                        { $$ = SUB_FLAG_ANON;}
-                 | ":init"
-                        { $$ = SUB_FLAG_INIT; }
-                 | ":load"
-                        { $$ = SUB_FLAG_LOAD; }
-                 | ":main"
-                        { $$ = SUB_FLAG_MAIN; }
-                 | ":method"
-                        { $$ = SUB_FLAG_METHOD; }
-                 | ":lex"
-                        { $$ = SUB_FLAG_LEX; }
-                 | ":postcomp"
-                        { $$ = SUB_FLAG_POSTCOMP; }
-                 | ":immediate"
-                        { $$ = SUB_FLAG_IMMEDIATE; }
-                 | ":multi"
-                        { $$ = SUB_FLAG_MULTI; }
-                 | ":outer" '(' sub_id ')'
-                        { $$ = SUB_FLAG_OUTER;  set_sub_outer(lexer, $3); }
-                 | ":vtable" opt_paren_string
-                        { $$ = SUB_FLAG_VTABLE; set_sub_vtable(lexer, $2); }
-                 | ":lexid" paren_string
-                        { $$ = SUB_FLAG_LEXID; /* do something with this */ }
-                 ;
+sub_flag          : ":anon"
+                         { $$ = SUB_FLAG_ANON;}
+                  | ":init"
+                         { $$ = SUB_FLAG_INIT; }
+                  | ":load"
+                         { $$ = SUB_FLAG_LOAD; }
+                  | ":main"
+                         { $$ = SUB_FLAG_MAIN; }
+                  | ":method"
+                         { $$ = SUB_FLAG_METHOD; }
+                  | ":lex"
+                         { $$ = SUB_FLAG_LEX; }
+                  | ":postcomp"
+                         { $$ = SUB_FLAG_POSTCOMP; }
+                  | ":immediate"
+                         { $$ = SUB_FLAG_IMMEDIATE; }
+                  | ":multi"
+                         { $$ = SUB_FLAG_MULTI; }
+                  | sub_flag_with_arg
+                  ;
 
+sub_flag_with_arg : ":outer" '(' sub_id ')'
+                         { $$ = SUB_FLAG_OUTER;
+                           set_sub_outer(lexer, $3);
+                         }
+                  | ":vtable" opt_paren_string
+                         { $$ = SUB_FLAG_VTABLE;
+                           set_sub_vtable(lexer, $2);
+                         }
+                  | ":lexid" paren_string
+                         { $$ = SUB_FLAG_LEXID;
+                           set_sub_lexid(lexer, $2);
+                         }
+                  ;
 
-multi_type       : identifier
-                 | TK_STRINGC
-                 | keylist
-                 | type
-                 ;
+multi_type        : identifier
+                  | TK_STRINGC
+                  | keylist
+                  | type
+                  ;
 
-parameters       : /* empty */
-                 | parameters parameter
-                 ;
+parameters        : /* empty */
+                  | parameters parameter
+                  ;
 
-parameter        : ".param" type identifier param_flags "\n"
-                        { /* set_param_flag($2, $3);
-                          IF_NAMED_PARAM_SET_ALIAS($2, $3);
-                          */
-                        }
-                 ;
+parameter         : ".param" type identifier param_flags "\n"
+                         {
+                           declare_local(lexer, $2, new_local($3, 0));
+                         }
+                  ;
 
 
 /* Instructions */
 
 
-instructions     : /* empty */
-                 | instructions  { new_instr(lexer); }
-                   instruction
-                 ;
 
-
-instruction      : TK_LABEL "\n"
-                        { set_label(lexer, $1); }
-                 | TK_LABEL statement
-                        { set_label(lexer, $1); }
-                 | statement
-                 ;
-
-statement        : conditional_stat
-                 | goto_stat
-                 | local_decl
-                 | lex_decl
-                 | const_decl_stat
-                 | return_stat
-                 | yield_stat
-                 | invocation_stat
-                 | assignment_stat
-                 | parrot_stat
-                 | getresults_stat
-                 | null_stat
-                 | error_stat
-                 ;
-
-error_stat       : error "\n"
-                        { if (lexer->parse_errors > MAX_NUM_ERRORS) {
-                              fprintf(stderr, "Too many errors. Compilation aborted.\n");
-                              exit(EXIT_FAILURE); /* fix: bail out and free() all memory */
-                          }
-                          yyerrok;
-                        }
-                 ;
-
-null_stat        : "null" target "\n"
-                        { set_instr(lexer, "null");
-                          add_operand(lexer, expr_from_target($2));
-                        }
-                 | target '=' "null" "\n"
-                        { set_instr(lexer, "null");
-                          add_operand(lexer, expr_from_target($1));
-                        }
-                 ;
-
-getresults_stat  : ".get_results" opt_target_list "\n"
-                        { set_instr(lexer, "get_results");
-                          add_operand(lexer, expr_from_target($2));
-                        }
-                 ;
-
-parrot_stat      : parrot_instruction "\n"
-                 ;
-
-assignment_stat  : target assign_tail "\n"
-                        { add_first_operand(lexer, expr_from_target($1)); }
-                 ;
-
-/*******************************************************************************
- *
- *   possible assignment statements:
- *
- *   target += expression                  add target, expression
- *   target keylist '=' expression         set target keylist, expression
- *   target '=' unop expression            unop target, expression
- *   target '=' expression1                set target, expression1
- *   target '=' exprA binop exprB          binop target, exprA, exprB
- *   target '=' target1 keylist            set target, target1 keylist
- *   target '=' parrot_instruction         parrot_instr->instr target, parrot_instr->args
- *
- *   In all cases, target is the first operand.
- *   <expression1> is needed to prevent cases like this:
- *
- *       $P0 = getstdin
- *
- *   which should be handled by <target> '=' <parrot_instruction> rule.
- *
- * TODO: rewrite this whole assignment rule.
- ******************************************************************************/
-
-assign_tail       : augmented_op expression
-                           { assign(lexer, RHS_AUGMENT, $1, $2); }
-                  | keylist '=' expression
-                           { assign(lexer, RHS_SETKEYED, $1, $3); }
-                  | '=' assign_expr
-                           { /* nothing to do */ }
+instructions      : /* empty */
+                  | instructions instruction
                   ;
 
-assign_expr       : unop expression
-                           { assign(lexer, RHS_UNOP, $1, $2); }
-                  | expression1
-                           { assign(lexer, RHS_SIMPLE, $1); }
-                  | expression binop expression
-                           { assign(lexer, RHS_BINOP, $2, $1, $3); }
-                  | target keylist
-                           { assign(lexer, RHS_GETKEYED, $1, $2); }
-                  | parrot_instruction
-                           { /* nothing to do */ }
+instruction       : { new_instr(lexer); }
+                    instr
+                  ;
+
+instr             : TK_LABEL "\n"
+                         { set_label(lexer, $1); }
+                  | TK_LABEL statement
+                         { set_label(lexer, $1); }
+                  | statement
+                  ;
+
+statement         : conditional_stat
+                  | goto_stat
+                  | local_decl
+                  | lex_decl
+                  | const_decl_stat
+                  | return_stat
+                  | yield_stat
+                  | invocation_stat
+                  | assignment_stat
+                  | parrot_stat
+                  | getresults_stat
+                  | null_stat
+                  | error_stat
+                  ;
+
+error_stat        : error "\n"
+                         { if (lexer->parse_errors > MAX_NUM_ERRORS) {
+                               fprintf(stderr, "Too many errors. Compilation aborted.\n");
+                               exit(EXIT_FAILURE); /* fix: bail out and free() all memory */
+                           }
+                           yyerrok;
+                         }
+                  ;
+
+null_stat         : null_instr "\n"
+                  ;
+
+null_instr        : "null" target
+                         { set_instr(lexer, "null");
+                           push_operand(lexer, expr_from_target($2));
+                         }
+                  | target '=' "null"
+                         { set_instr(lexer, "null");
+                           push_operand(lexer, expr_from_target($1));
+                         }
+                  ;
+
+getresults_stat   : ".get_results" opt_target_list "\n"
+                         { set_instr(lexer, "get_results");
+                           push_operand(lexer, expr_from_target($2));
+                         }
+                  ;
+
+assignment_stat   : assignment "\n"
+                  ;
+
+assignment        : target '=' expression
+                         { set_instr(lexer, "set");
+                           add_operands(lexer, 2, expr_from_target($1), $3);
+                         }
+                  | target augmented_op expression
+                         { set_instr(lexer, $2);
+                           add_operands(lexer, 2, expr_from_target($1), $3);
+                         }
+                  | target '=' unop expression
+                         { set_instr(lexer, $3);
+                           add_operands(lexer, 2, expr_from_target($1), $4);
+                         }
+                  | target '=' binary_expr
+                         { unshift_operand(lexer, expr_from_target($1)); }
+                  | target keylist '=' expression
+                         { set_instr(lexer, "set");
+                           /* XXX fix key stuff */
+                         }
+                  | target '=' target keylist
+                         { set_instr(lexer, "set");
+                           /* XXX fix key stuff */
+                         }
+                  | target '=' parrot_instruction
+                         { unshift_operand(lexer, expr_from_target($1)); }
+                  ;
+
+/**
+
+implementation of constant folding IN the parser; this saves us a lot of back-end code
+which is crap to write. This is probably more efficient as well, as it is brute-force,
+straightforward, as opposed to a lot of conditional code. It does make the grammar a bit
+uglier, but oh well, still readable. Some refactoring would help (in the end).
+
+There's not so many combinations, as there's no such thing as a PMC constant literal,
+and there's only 1 binary operation for strings, so only {num, int} x {num, int}.
+
+XXX fix type of binop into integer, and use that in a switch statement to do the
+constant folding. Now binop is of type char *.
+
+**/
+
+binary_expr       : target binop expression
+                         { set_instr(lexer, $2);
+                           add_operands(lexer, 2, expr_from_target($1), $3);
+                         }
+                  | TK_INTC binop target
+                         { set_instr(lexer, $2);
+                           add_operands(lexer, 2, expr_from_const(new_const(INT_TYPE, NULL, $1)),
+                                                                  expr_from_target($3));
+                         }
+
+                  | TK_NUMC binop target
+                         { set_instr(lexer, $2);
+                           add_operands(lexer, 2, expr_from_const(new_const(NUM_TYPE, NULL, $1)),
+                                                                  expr_from_target($3));
+                         }
+
+                  | TK_STRINGC "." target
+                         { set_instr(lexer, "concat");
+                           add_operands(lexer, 2, expr_from_const(new_const(STRING_TYPE, NULL, $1)),
+                                                                  expr_from_target($3));
+                         }
+                  | TK_STRINGC "." TK_STRINGC
+                         {
+                           set_instr(lexer, "set");
+                           /* concatenate strings and add result as operand */
+                         }
+                  | TK_INTC binop TK_INTC
+                         { set_instr(lexer, "set");
+                           push_operand(lexer, expr_from_const(new_const(INT_TYPE, NULL, $1 + $3)));
+                         }
+
+                  | TK_NUMC binop TK_NUMC
+                         {
+                          set_instr(lexer, "set");
+                         }
+                  | TK_INTC binop TK_NUMC
+                         {
+                          set_instr(lexer, "set");
+                         }
+                  | TK_NUMC binop TK_INTC
+                         {
+                          set_instr(lexer, "set");
+                         }
                   ;
 
 
-parrot_instruction: TK_PARROT_OP         { set_instr(lexer, $1); }
-                    opt_parrot_op_args
+parrot_stat       : parrot_instruction "\n"
                   ;
 
-opt_parrot_op_args: /* empty */
-                  | parrot_op_args
+parrot_instruction: parrot_op opt_op_args
                   ;
 
-parrot_op_args    : first_op_arg other_op_args
+parrot_op         : TK_PARROT_OP
+                         { set_instr(lexer, $1); }
                   ;
 
-/* the first argument must be a normal expression */
-first_op_arg      : expression
-                         { add_operand(lexer, $1); }
+opt_op_args       : /* empty */
+                  | op_args
                   ;
 
-/* later arguments can be either an expression or a keylist. */
-other_op_args     : /* empty */
-                         { /* nothing to do */}
-                  | other_op_args ',' other_op_arg
-                         { add_operand(lexer, $3); }
+op_args           : op_arg
+                         { push_operand(lexer, $1); }
+                  | op_args ',' op_arg
+                         { push_operand(lexer, $3); }
                   ;
 
-other_op_arg      : expression
+op_arg            : expression
                   | keylist
+                  | keyaccess
+                  ;
+
+keyaccess         : target keylist
+                         { $$ = NULL; }
                   ;
 
 keylist           : '[' keys ']'
@@ -597,9 +668,37 @@ keys              : expression
                          { $$ = add_key($1, $3); }
                   ;
 
-conditional_stat  : if_unless "null" expression "goto" identifier "\n"
-                  | if_unless expression then identifier "\n"
-                  | if_unless expression rel_op expression "goto" identifier "\n"
+conditional_stat  : conditional_instr "\n"
+                  ;
+
+conditional_instr : if_unless "null" expression "goto" identifier
+                         { set_instr(lexer, $1 ? "unless_null" : "if_null");
+                           add_operands(lexer, 2, $3, expr_from_ident($5));
+                         }
+                  | if_unless target then identifier
+                         { set_instr(lexer, $1 ? "unless" : "if");
+                           add_operands(lexer, 2, expr_from_target($2), expr_from_ident($4));
+                         }
+                  | if_unless constant then identifier
+                         {
+                            /* do an unconditional jump if $2 is true/false */
+                         }
+                  /*
+                  | if_unless expression rel_op expression "goto" identifier
+                         { set_instr(lexer, $1 ? get_inverse($3) : $3);
+                           add_operands(lexer, 3, $2, $4, expr_from_ident($6));
+
+
+                         }
+                  */
+                  | if_unless condition "goto" identifier
+                  ;
+
+condition         : target rel_op expression
+                  | TK_INTC rel_op target
+                  | TK_NUMC rel_op target
+                  | TK_INTC rel_op TK_INTC
+                  | TK_NUMC rel_op TK_NUMC
                   ;
 
 if_unless         : "if"       { $$ = 0; /* no need to invert */ }
@@ -612,7 +711,7 @@ then              : "goto" /* PIR mode */
 
 goto_stat         : "goto" identifier "\n"
                          { set_instr(lexer, "branch");
-                           add_operand(lexer, expr_from_ident($2));
+                           push_operand(lexer, expr_from_ident($2));
                          }
                   ;
 
@@ -634,10 +733,25 @@ has_unique_reg    : /* empty */     { $$ = 0; }
                   | ":unique_reg"   { $$ = 1; }
                   ;
 
+lex_decl          : ".lex" TK_STRINGC ',' lex_target "\n"
+                         { /* check whether the target was declared, and if its type is PMC */
+                           if ($4 != NULL) {
+                               if ($4->type == PMC_TYPE)
+                                   set_lex_flag($4, $2);
+                               else
+                                   yyerror(yyscanner, lexer,
+                                           "2nd argument to .lex must be of type PMC");
+                           }
+                           else {
+                                yyerror(yyscanner, lexer, "target for .lex was not declared");
+                           }
+                         }
+                  ;
 
-
-lex_decl          : ".lex" TK_STRINGC ',' target "\n"
-                         { set_lex_flag($4, $2); }
+lex_target        : target
+                         { $$ = $1; }
+                  | TK_PARROT_OP
+                         { $$ = find_target(lexer, $1); }
                   ;
 
 /* Sub/method invocation */
@@ -710,11 +824,15 @@ long_result          : ".result" result_target "\n"
                              { $$ = NULL; }
                      ;
 
-short_invocation_stat: opt_target_list '=' simple_invocation "\n"
+short_invocation_stat: short_invocation "\n"
+                     ;
+
+
+short_invocation     : opt_target_list '=' simple_invocation
                              { set_invocation_results($3, $1); }
-                     | target '=' simple_invocation "\n"
+                     | target '=' simple_invocation
                              { set_invocation_results($3, $1); }
-                     | simple_invocation "\n"
+                     | simple_invocation
                              { set_invocation_results($1, NULL); }
                      ;
 
@@ -747,15 +865,27 @@ method               : invokable
                      ;
 
 invokable            : identifier
-                            { $$ = target_from_ident($1); }
+                            { symbol *sym = find_symbol(lexer, $1);
+                              /* if the symbol was found, its type must be a PMC;
+                               * else, if the symbol was not found, it's a global identifier
+                               * referring to some other sub. We don't check that during
+                               * the parsing phase.
+                               */
+                              if (sym && sym->type != PMC_TYPE) {
+                                  yyerror(yyscanner, lexer,
+                                          "invokable identifier must be of type PMC!");
+                              }
+
+                              $$ = target_from_ident(PMC_TYPE, $1);
+                            }
                      | TK_PREG
-                            { $$ = reg(PMC_TYPE, $1, 0); }
+                            { $$ = reg(PMC_TYPE, $1); }
                      ;
 
 string_object        : TK_STRINGC
                             { $$ = target_from_string($1); }
                      | TK_SREG
-                            { $$ = reg(STRING_TYPE, $1, 0); }
+                            { $$ = reg(STRING_TYPE, $1); }
                      ;
 
 
@@ -852,6 +982,15 @@ opt_arguments_list   : /* empty */
                               { $$ = $1; }
                      ;
 
+
+/**
+
+change semantic actions of arguments in such a way, that arg:expression puts the new
+argument object in place. Then, if there's a :named argument, the arg's name can
+be set immediately on that object, instead of through a temp. field and those ugly
+macros (IF_NAMED_ARG_SET_ALIAS etc.).
+
+**/
 arguments_list       : argument
                               { $$ = $1; }
                      | arguments_list ',' argument
@@ -862,19 +1001,22 @@ argument             : short_arg
                      | named_arg
                      ;
 
-named_arg            : TK_STRINGC "=>" expression
-                               { $$ = new_argument($3);
+named_arg            : TK_STRINGC "=>" arg
+                               { $$ = $3;
                                  set_arg_named($$, $1);
                                }
                      ;
 
-short_arg            : expression arg_flags
-                            { $$ = new_argument($1);
+short_arg            : arg arg_flags
+                            { $$ = $1;
                               set_arg_flag($$, $2);
                               IF_NAMED_ARG_SET_ALIAS($$, $2);
                             }
                      ;
 
+arg                  : expression
+                            { $$ = new_argument($1); }
+                     ;
 
 long_return_stat     : ".begin_return" "\n"
                        opt_return_expressions
@@ -951,12 +1093,18 @@ paren_string     : '(' TK_STRINGC ')'
                         { $$ = $2; }
                  ;
 
+const_decl_stat  : const_stat "\n"
+                 ;
+
+const_stat       : const_decl
+                 | globalconst_decl
+                 ;
+
 const_decl       : ".const" const_tail
                         { define_const(lexer, $2, !GLOBALCONST); }
                  ;
 
-const_decl_stat  : const_decl "\n"
-                 | ".globalconst" const_tail "\n"
+globalconst_decl : ".globalconst" const_tail
                         { define_const(lexer, $2, GLOBALCONST); }
                  ;
 
@@ -974,12 +1122,6 @@ const_tail       : "int" identifier '=' TK_INTC
 
 
 /* Expressions, variables and operators */
-
-/* expression1 is similar to expression, but it doesn't accept TK_PARROT_OP */
-expression1 : constant      { $$ = expr_from_const($1); }
-            | reg           { $$ = expr_from_target($1); }
-            | TK_IDENT      { $$ = expr_from_ident($1); }
-            ;
 
 expression  : target         { $$ = expr_from_target($1); }
             | constant       { $$ = expr_from_const($1); }
@@ -1005,13 +1147,19 @@ type        : "int"          { $$ = INT_TYPE; }
             ;
 
 target      : reg            { $$ = $1; }
-            | identifier     { $$ = new_target(UNKNOWN_TYPE, $1); }
+            | TK_IDENT       { /* find the symbol; if it's not there, emit an error */
+                               symbol *sym = find_symbol(lexer, $1);
+                               if (sym == NULL)
+                                   yyerror(yyscanner, lexer, "symbol not declared!");
+                               else
+                                   $$ = new_target(sym->type, $1);
+                             }
             ;
 
-reg         : TK_PREG    { $$ = reg(PMC_TYPE, $1, 0); }
-            | TK_NREG    { $$ = reg(NUM_TYPE, $1, 0); }
-            | TK_IREG    { $$ = reg(INT_TYPE, $1, 0); }
-            | TK_SREG    { $$ = reg(STRING_TYPE, $1, 0); }
+reg         : TK_PREG    { $$ = reg(PMC_TYPE, $1); }
+            | TK_NREG    { $$ = reg(NUM_TYPE, $1); }
+            | TK_IREG    { $$ = reg(INT_TYPE, $1); }
+            | TK_SREG    { $$ = reg(STRING_TYPE, $1); }
             ;
 
 identifier  : TK_IDENT

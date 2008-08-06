@@ -28,6 +28,10 @@
 
 #define out stderr
 
+/* the order of these letters match with the pir_type enumeration. */
+const char pir_register_types[5] = {'I', 'N', 'S', 'P', '?'};
+
+
 
 void *
 panic(char *msg) {
@@ -36,10 +40,11 @@ panic(char *msg) {
 }
 
 void
-parse_error(struct lexer_state *lexer, char *message, ...) {
+parse_error(struct lexer_state *lexer, int linenr, char *message, ...) {
     va_list arg_ptr;
     va_start(arg_ptr, message);
-    fprintf(stderr, "Parse error (line %d:%d): ", lexer->line_nr, lexer->line_pos);
+    /*fprintf(stderr, "Parse error (line %d): ", linenr);*/
+    fprintf(stderr, "Parse error: ");
     vfprintf(stderr, message, arg_ptr);
     va_end(arg_ptr);
     lexer->parse_errors++;
@@ -47,12 +52,17 @@ parse_error(struct lexer_state *lexer, char *message, ...) {
 
 target *
 find_target(struct lexer_state *lexer, char * const name) {
-    target *t = find_symbol(lexer, name);
+    symbol *s = find_symbol(lexer, name);
 
-    if (t == NULL) { /* not declared */
-        parse_error(lexer, "symbol '%s' was not declared\n", name);
+    if (s == NULL) { /* not declared */
+        parse_error(lexer, 0, "symbol '%s' was not declared\n", name);
+        return NULL;
     }
-    return t;
+    else {
+        target *t = new_target(s->type, name);
+        return t;
+    }
+
 }
 
 /*
@@ -76,6 +86,12 @@ void
 set_sub_vtable(struct lexer_state *lexer, char *vtablename) {
     lexer->subs->vtable_method = vtablename;
     SET_FLAG(lexer->subs->flags, SUB_FLAG_VTABLE);
+}
+
+
+void
+set_sub_lexid(struct lexer_state *lexer, char *lexid) {
+    lexer->subs->lex_id = lexid;
 }
 
 /*
@@ -107,7 +123,11 @@ new_subr(struct lexer_state *lexer, char *subname) {
     assert(newsub != NULL);
 
     /* set the sub fields */
-    newsub->sub_name = subname;
+    newsub->sub_name   = subname;
+
+    /* set default lexid */
+    newsub->lex_id     = subname;
+
     newsub->parameters = NULL;
     newsub->statements = NULL;
 
@@ -283,6 +303,17 @@ set_instr(struct lexer_state *lexer, char *opname, ...) {
     va_end(arg_ptr);
 }
 
+char *
+get_inverse(char *instr) {
+         if (strcmp(instr, "if") == 0) return "unless";
+    else if (strcmp(instr, "gt") == 0) return "le";
+    else if (strcmp(instr, "ge") == 0) return "lt";
+    else if (strcmp(instr, "le") == 0) return "gt";
+    else if (strcmp(instr, "lt") == 0) return "ge";
+    else if (strcmp(instr, "ne") == 0) return "eq";
+    else if (strcmp(instr, "eq") == 0) return "ne";
+    return "Invalid instruction in get_inverse()!";
+}
 /*
 Invert the current instruction. "if" becomes "unless", and all rel_op's are also inverted.
 
@@ -293,13 +324,7 @@ be the case anyway in the future, but for now, we'd like to pretty-print everyth
 void
 invert_instr(struct lexer_state *lexer) {
     char *instr = lexer->subs->statements->instr.ins->opname;
-    if (strcmp(instr, "if") == 0) instr = "unless"; /* it's never 'unless' by default. */
-    else if (strcmp(instr, "gt") == 0) instr = "le";
-    else if (strcmp(instr, "ge") == 0) instr = "lt";
-    else if (strcmp(instr, "le") == 0) instr = "gt";
-    else if (strcmp(instr, "lt") == 0) instr = "ge";
-    else if (strcmp(instr, "ne") == 0) instr = "eq";
-    else if (strcmp(instr, "eq") == 0) instr = "ne";
+    instr       = get_inverse(instr);
     /* and set the new instruction */
     lexer->subs->statements->instr.ins->opname = instr;
 }
@@ -378,6 +403,14 @@ same_types(expression *e1, expression *e2) {
     return 0;
 }
 
+expression *
+fold(constant *c1, char *op, constant *c2) {
+    expression *result = (expression *)malloc(sizeof (expression));
+
+
+    return result;
+}
+
 /* this sucks: */
 expression *
 fold_constants(char *opname, expression *left, expression *right) {
@@ -404,83 +437,6 @@ fold_constants(char *opname, expression *left, expression *right) {
 }
 
 
-void
-assign(struct lexer_state *lexer, rhs_type type, ...) {
-    va_list arg_ptr;
-
-    va_start(arg_ptr, type);
-
-    switch (type) {
-        case RHS_BINOP: {
-            /* x = a binop b -> binop x, a, b */
-            expression *left_op, *right_op;
-            /* get instruction */
-            char *opname = va_arg(arg_ptr, char *);
-            lexer->subs->statements->instr.ins = new_instruction(opname);
-            /* get 2 operands */
-            left_op  = va_arg(arg_ptr, expression *);
-            right_op = va_arg(arg_ptr, expression *);
-
-            /*
-            if (same_types(left_op, right_op)) {
-                left_op = fold_constants(opname, left_op, right_op);
-                add_operand(lexer, left_op);
-                lexer->subs->statements->instr.ins->opname = "set";
-            }
-            else*/
-            {
-
-                add_operand(lexer, left_op);
-                add_operand(lexer, right_op);
-            }
-            break;
-        }
-        case RHS_SIMPLE: {
-            /* x = y -> set x, y */
-            expression *operand = va_arg(arg_ptr, expression *);
-            lexer->subs->statements->instr.ins = new_instruction("set");
-            add_operand(lexer, operand);
-            break;
-        }
-        case RHS_UNOP: {
-            /* x = unop y -> unop x, y */
-            expression *operand;
-            char *opname = va_arg(arg_ptr, char *);
-            lexer->subs->statements->instr.ins = new_instruction(opname);
-            /* get 1 operand */
-            operand = va_arg(arg_ptr, expression *);
-            add_operand(lexer, operand);
-            break;
-        }
-        case RHS_GETKEYED:
-            /* x = x [1] -> set x, x[1] */
-            lexer->subs->statements->instr.ins = new_instruction("set");
-            break;
-        case RHS_SETKEYED: {
-            /* x[1] = 1 -> set x[1], 1 */
-            target *keylist;
-            lexer->subs->statements->instr.ins = new_instruction("set");
-            keylist = va_arg(arg_ptr, target *);
-            break;
-        }
-        case RHS_AUGMENT: {
-            /* get instruction */
-            expression *expr;
-            lexer->subs->statements->instr.ins = new_instruction(va_arg(arg_ptr, char *));
-            /* get 1 operand */
-            expr = va_arg(arg_ptr, expression *);
-            add_operand(lexer, expr);
-            break;
-        }
-        default:
-            fprintf(stderr, "Fatal error: unknown rhs type\n");
-            exit(EXIT_FAILURE);
-    }
-
-    va_end(arg_ptr);
-    puts("");
-
-}
 static expression *
 new_expr(expr_type type) {
     expression *expr = (expression *)calloc(1, sizeof (expression));
@@ -491,11 +447,9 @@ new_expr(expr_type type) {
 
 /* create a target node from a register */
 target *
-reg(int type, int regno, int is_pasm) {
+reg(int type, int regno) {
     target *t = new_target(type, NULL); /* no identifier */
     t->regno = regno;
-    if (is_pasm)
-        SET_FLAG(t->flags, TARGET_FLAG_IS_PASM_REG); /**/
     return t;
 }
 
@@ -584,8 +538,8 @@ target_from_string(char *str) {
 }
 
 target *
-target_from_ident(char *id) {
-    target *var = new_target(UNKNOWN_TYPE, id);
+target_from_ident(pir_type type, char *id) {
+    target *var = new_target(type, id);
     return var;
 
 }
@@ -602,7 +556,7 @@ set_pragma(int flag, int value) {
 }
 
 void
-set_hll(char *hll, char *lib) {
+set_hll(char *hll) {
     /* TODO */
 }
 
@@ -620,10 +574,12 @@ instruction.
 
 */
 void
-add_first_operand(struct lexer_state *lexer, expression *operand) {
+unshift_operand(struct lexer_state *lexer, expression *operand) {
     expression *last = lexer->subs->statements->instr.ins->operands;
     if (last) {
+        /* get the head of the list */
         expression *first = last->next;
+        /* squeeze operand in between */
         operand->next = first;
         last->next = operand;
     }
@@ -633,19 +589,38 @@ add_first_operand(struct lexer_state *lexer, expression *operand) {
 }
 
 void
-add_operand(struct lexer_state *lexer, expression *operand) {
+push_operand(struct lexer_state *lexer, expression *operand) {
     assert(lexer->subs->statements->instr.ins);
 
-    if (lexer->subs->statements->instr.ins->operands == NULL) {
+    if (lexer->subs->statements->instr.ins->operands == NULL) { /* empty list */
         lexer->subs->statements->instr.ins->operands = operand;
     }
-    else {
+    else { /* there's at least one other operand on the list */
         operand->next = lexer->subs->statements->instr.ins->operands->next;
         lexer->subs->statements->instr.ins->operands->next = operand;
-        lexer->subs->statements->instr.ins->operands = operand;
+        lexer->subs->statements->instr.ins->operands       = operand;
     }
 
 }
+
+/*
+
+Add C<count> operands to the current instruction.
+
+*/
+void
+add_operands(struct lexer_state *lexer, int count, ...) {
+    va_list arg_ptr;
+
+    va_start(arg_ptr, count);
+
+    assert(count > 0);
+    while (count--) {
+        push_operand(lexer, va_arg(arg_ptr, expression *));
+    }
+    va_end(arg_ptr);
+}
+
 
 expression *
 add_key(expression *key1, expression *key2) {
@@ -680,6 +655,8 @@ new_local(char *name, int has_unique_reg) {
 
 /* debug functions */
 
+
+
 void
 print_target(target *t) {
 
@@ -687,7 +664,8 @@ print_target(target *t) {
         printf("%s", t->name);
     }
     else {
-
+        char type = pir_register_types[t->type];
+        printf("$%c%d", type, t->regno);
     }
 }
 
@@ -817,15 +795,15 @@ print_invocation(invocation *inv) {
         case CALL_PCC:
             print_arguments("set_args", inv->arguments);
             print_targets("get_results", inv->results);
-            printf("   find_name P%d, '%s'\n", 0, inv->sub->name);
-            printf("   invokecc P%d", 0);
+            printf("   find_name $P%d, '%s'\n", 0, inv->sub->name);
+            printf("   invokecc $P%d", 0);
             break;
         case CALL_RET:
             print_arguments("set_returns", inv->arguments);
             printf("   returncc");
             break;
         case CALL_NCI:
-            printf("   invokecc P0");
+            printf("   invokecc $P0");
             break;
         case CALL_YIELD:
             print_arguments("set_returns", inv->arguments);
@@ -891,10 +869,7 @@ print_statement(subroutine *sub) {
 
 void
 print_subs(struct lexer_state *lexer) {
-    if (lexer->subs == NULL) {
-        return;
-    }
-    else {
+    if (lexer->subs != NULL) {
         /* set iterator to first item */
         subroutine *subiter = lexer->subs->next;
 

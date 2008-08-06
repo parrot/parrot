@@ -15,11 +15,11 @@
 
 /* the 4 parrot types */
 typedef enum pir_types {
-    INT_TYPE,
-    NUM_TYPE,
-    PMC_TYPE,
-    STRING_TYPE,
-    UNKNOWN_TYPE
+    INT_TYPE     = 0,
+    NUM_TYPE     = 1,
+    STRING_TYPE  = 2,
+    PMC_TYPE     = 3,
+    UNKNOWN_TYPE = 4  /* for uninitialized types */
 
 } pir_type;
 
@@ -31,16 +31,6 @@ typedef enum pir_pragmas {
 
 } pir_pragma;
 
-/* different types of rhs expressions */
-typedef enum rhs_types {
-    RHS_AUGMENT,
-    RHS_SETKEYED,
-    RHS_UNOP,
-    RHS_SIMPLE,
-    RHS_BINOP,
-    RHS_GETKEYED
-
-} rhs_type;
 
 /* selector values for the expression value union */
 typedef enum expr_types {
@@ -53,13 +43,12 @@ typedef enum expr_types {
 
 /* parameter flags */
 typedef enum target_flags {
-    TARGET_FLAG_NAMED       = 0x001,
-    TARGET_FLAG_SLURPY      = 0x002,
-    TARGET_FLAG_OPTIONAL    = 0x004,
-    TARGET_FLAG_OPT_FLAG    = 0x008,
-    TARGET_FLAG_UNIQUE_REG  = 0x010,
-    TARGET_FLAG_IS_PASM_REG = 0x020,
-    TARGET_FLAG_INVOCANT    = 0x040
+    TARGET_FLAG_NAMED       = 0x0001,
+    TARGET_FLAG_SLURPY      = 0x0002,
+    TARGET_FLAG_OPTIONAL    = 0x0004,
+    TARGET_FLAG_OPT_FLAG    = 0x0008,
+    TARGET_FLAG_UNIQUE_REG  = 0x0010,
+    TARGET_FLAG_INVOCANT    = 0x0020
 
 } target_flag;
 
@@ -73,18 +62,18 @@ typedef enum arg_flags {
 
 /* sub flags */
 typedef enum sub_flags {
-    SUB_FLAG_METHOD    = 0x001,
-    SUB_FLAG_INIT      = 0x002,
-    SUB_FLAG_LOAD      = 0x004,
-    SUB_FLAG_OUTER     = 0x008,
-    SUB_FLAG_MAIN      = 0x010,
-    SUB_FLAG_ANON      = 0x020,
-    SUB_FLAG_POSTCOMP  = 0x040,
-    SUB_FLAG_IMMEDIATE = 0x080,
-    SUB_FLAG_VTABLE    = 0x100,
-    SUB_FLAG_LEX       = 0x200,
-    SUB_FLAG_MULTI     = 0x400,
-    SUB_FLAG_LEXID     = 0x800
+    SUB_FLAG_METHOD    = 0x0001,
+    SUB_FLAG_INIT      = 0x0002,
+    SUB_FLAG_LOAD      = 0x0004,
+    SUB_FLAG_OUTER     = 0x0008,
+    SUB_FLAG_MAIN      = 0x0010,
+    SUB_FLAG_ANON      = 0x0020,
+    SUB_FLAG_POSTCOMP  = 0x0040,
+    SUB_FLAG_IMMEDIATE = 0x0080,
+    SUB_FLAG_VTABLE    = 0x0100,
+    SUB_FLAG_LEX       = 0x0200,
+    SUB_FLAG_MULTI     = 0x0400,
+    SUB_FLAG_LEXID     = 0x0800
 
 } sub_flag;
 
@@ -139,8 +128,6 @@ typedef struct constant {
 
 
 
-
-
 /* expressions are operands for parrot instructions.
 
 Maybe rename.
@@ -148,10 +135,10 @@ Maybe rename.
  */
 typedef struct expression {
     union __expression {
-        struct target *t;
-        constant      *c;
-        char          *id;
-        int           *i;
+        struct target  *t;
+        constant       *c;
+        char           *id;
+        int            *i;
     } expr;
 
     expr_type type;
@@ -264,28 +251,14 @@ typedef struct statement {
 } statement;
 
 
-/*
-#define DECLARE(type,itemtype)  typedef struct type##_block {    \
-                                    itemtype[type##_BLOCK_SIZE]; \
-                                    int count;                   \
-                                    struct type##_block *next;   \
-                                } type##_block
-
-
-
-
-DECLARE(param, sub_param);
-
-*/
-
 /* a sub */
 typedef struct subroutine {
-    char  *sub_name;
-    char  *outer_sub;
-    char  *vtable_method;
-    int    flags;
-    char **multi_types;
-
+    char      *sub_name;
+    char      *outer_sub;
+    char      *lex_id;
+    char      *vtable_method;
+    int        flags;
+    char     **multi_types;
 
     target    *parameters;
     statement *statements;
@@ -295,27 +268,14 @@ typedef struct subroutine {
 
 } subroutine;
 
-/*
-
-#define ADD_ITEM(type,block,newitem) if (block->count == type##_BLOCK_SIZE) { \
-                                   type##_block *newblock = (type##_block *)malloc(sizeof (type##_block));
-
-                               }                                        \
-                               else {                                   \
-                                   block->type##_items[block->count++] = newitem; \
-                               }
-
-
-ADD_ITEM(param,x);
-
-*/
-
 
 /* forward declaration */
 struct lexer_state;
 
 void set_sub_outer(struct lexer_state *lexer, char *outersub);
 void set_sub_vtable(struct lexer_state *lexer, char *vtablename);
+void set_sub_lexid(struct lexer_state *lexer, char *lexid);
+
 void new_subr(struct lexer_state *lexer, char *subname);
 
 void set_param_named(target *t, char *alias);
@@ -337,22 +297,23 @@ target *add_param(struct lexer_state *lexer, pir_type type, char *name);
 target *add_param_named(struct lexer_state *lexer, pir_type type, char *name, char *alias);
 
 target *add_target(struct lexer_state *lexer, target *t1, target *t);
+target *find_target(struct lexer_state *lexer, char *name);
 
 target *new_target(pir_type type, char *name);
-target *reg(int type, int regno, int is_pasm);
+target *reg(int type, int regno);
 
 
 invocation *invoke(struct lexer_state *lexer, invoke_type, ...);
 void set_invocation_type(invocation *inv, invoke_type type);
 
 target *target_from_string(char *str);
-target *target_from_ident(char *id);
+target *target_from_ident(pir_type type, char *id);
 
 
 
 void set_pragma(int which_one, int value);
 void load_library(struct lexer_state *lexer, char *library);
-void set_hll(char *hll, char *lib);
+void set_hll(char *hll);
 void set_hll_map(char *stdtype, char *hlltype);
 void set_sub_flag(struct lexer_state *lexer, sub_flag flag);
 
@@ -369,11 +330,14 @@ void set_invocation_args(invocation *inv, argument *args);
 void set_invocation_results(invocation *inv, target *results);
 
 void set_lex_flag(target *t, char *lexname);
+char *get_inverse(char *instr);
 void invert_instr(struct lexer_state *lexer);
-void assign(struct lexer_state *lexer, rhs_type type, ...);
 
-void add_first_operand(struct lexer_state *lexer, expression *operand);
-void add_operand(struct lexer_state *lexer, expression *operand);
+
+void unshift_operand(struct lexer_state *lexer, expression *operand);
+void push_operand(struct lexer_state *lexer, expression *operand);
+void add_operands(struct lexer_state *state, int count, ...);
+
 expression *add_key(expression *k1, expression *k2);
 
 target *add_local(target *list, target *local);

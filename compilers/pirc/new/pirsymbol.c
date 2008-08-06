@@ -6,6 +6,9 @@
 #include "pirsymbol.h"
 #include "pircompunit.h"
 #include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+#include <stdio.h>
 
 /*
 
@@ -25,6 +28,14 @@ Functions for handling symbols.
 
 */
 
+symbol *
+new_symbol(char *name) {
+    symbol *sym = (symbol *)malloc(sizeof (symbol));
+    sym->name = name;
+    sym->next = NULL;
+    return sym;
+}
+
 /*
 
 =item C<void
@@ -41,22 +52,56 @@ own symbol table).
 void
 declare_local(struct lexer_state *lexer, pir_type type, target *list)
 {
+    target *iter = list->next;
 
+    /* if iter == list, this means there's only one item, whose 'next' is
+     * itself (that's why it's only a single item list. In that case, just
+     * store the symbol.
+     */
+
+
+
+
+    if (iter == list) {
+        symbol *sym = new_symbol(iter->name);
+        sym->type = type;
+
+        lexer->symbols = sym;
+    }
+    else {
+        while (iter != list) {
+            symbol *sym = new_symbol(iter->name);
+            sym->type = type;
+
+            sym->next = lexer->symbols;
+            lexer->symbols = sym;
+
+            iter = iter->next;
+        }
+    }
 }
 
 /*
-=item C<target *
+=item C<symbol *
 find_symbol(struct lexer_state *lexer, char * const name)>
 
-Return the target node for the symbol or NULL if the symbol
+Return the node for the symbol or NULL if the symbol
 is not defined.
 
 =cut
 
 */
-target *
+symbol *
 find_symbol(struct lexer_state *lexer, char * const name)
 {
+    symbol *iter = lexer->symbols;
+    while (iter) {
+        /* printf("[%s] ", iter->name);
+        */
+        if (strcmp(iter->name, name) == 0)
+            return iter;
+        iter = iter->next;
+    }
     return NULL;
 }
 

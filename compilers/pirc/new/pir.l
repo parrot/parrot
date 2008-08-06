@@ -46,6 +46,7 @@ easier to maintain, and preferable.
 #include <assert.h>
 #include "pirparser.h"
 #include "pircompiler.h"
+#include "pirsymbol.h"
 
 /* Windows doesn't have <unistd.h> */
 #define YY_NO_UNISTD_H
@@ -148,9 +149,8 @@ new_lexer(char * const filename) {
     assert(lexer != NULL);
 
     lexer->filename      = filename;
-    lexer->line_pos      = 1;
     lexer->parse_errors  = 0;
-
+    lexer->symbols       = NULL;
     lexer->subs          = NULL;
     lexer->is_instr      = 0;
 
@@ -365,8 +365,30 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
               }
 
 {IDENT}       { /* make the Id or op available in the parser. */
+                lexer_state *lexer = yyget_extra(yyscanner);
                 yylval->sval = dupstr(yytext);
-                return is_parrot_op(yytext) ? TK_PARROT_OP : TK_IDENT;
+
+                /* if the id was declared as a local, it's returned as a TK_IDENT,
+                 * even if the id is an op; declared locals or constants "hide" ops.
+                 */
+                if (find_symbol(lexer, yytext))
+                    return TK_IDENT;
+
+                /* XXX check for "self" if the current sub is a method or vtable method */
+                if (strcmp(yytext, "self") == 0) {
+                    if (lexer->subs->flags & (SUB_FLAG_METHOD | SUB_FLAG_VTABLE))
+                        return TK_IDENT;
+                }
+
+
+                /* at this point it was no local or constant; check whether it's an op. */
+                if (is_parrot_op(yytext))
+                    return TK_PARROT_OP;
+
+                /* just an identifier; at this point it can be a label identifier or a
+                 * constant/local being defined.
+                 */
+                return TK_IDENT;
               }
 
 
@@ -398,13 +420,13 @@ is_parrot_op(char const * const spelling) {
     /* only these are currently recognized as a Parrot instruction */
     if (strcmp(spelling, "print") == 0)
         return 1;
-    if (strcmp(spelling, "null") == 0)
-        return 1;
     if (strcmp(spelling, "new") == 0)
         return 1;
     if (strcmp(spelling, "newclass") == 0)
         return 1;
     if (strcmp(spelling, "end") == 0)
+        return 1;
+    if (strcmp(spelling, "set") == 0)
         return 1;
     if (strcmp(spelling, "setline") == 0)
         return 1;
