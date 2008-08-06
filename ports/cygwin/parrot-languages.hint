@@ -1,0 +1,6 @@
+sdesc: "Various language implementions on Parrot"
+ldesc: "parrot-APL parrot-abc parrot-bf parrot-c99 parrot-cardinal parrot-chitchat 
+parrot-forth parrot-hq9plus parrot-lisp parrot-lolcode parrot-lua parrot-m4 parrot-ook 
+parrot-pheme parrot-pipp parrot-punie parrot-pynie parrot-squaak parrot-tcl"
+category: Interpreters
+requires: parrot
