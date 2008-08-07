@@ -830,6 +830,12 @@ name specified by the key. This is the only way to add another segment to the
 directory. If a segment of the given name already exists in the directory, it
 will be replaced with the supplied PMC.
 
+=head4 C<delete_keyed_str> (v-table)
+
+Removes the PackfileSegment PMC from the directory which has the name
+specified by the key.  This is the only way to remove a segment from the
+directory.
+
 
 =head3 RawSegment.pmc (isa PackfileSegment)
 
