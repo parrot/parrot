@@ -38,7 +38,7 @@ on the command line.
 * Support for multiple .c files pointing at the same .h file
 
 * Does NOT remove all blocks in the .h file, so if a .c file
-disappears, it's block is "orphaned" and will remain there.
+disappears, its block is "orphaned" and will remain there.
 
 =head1 COMMAND-LINE OPTIONS
 
