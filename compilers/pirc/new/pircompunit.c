@@ -762,8 +762,14 @@ print_invocation(invocation *inv) {
         case CALL_PCC:
             print_arguments("set_args", inv->arguments);
             print_targets("get_results", inv->results);
-            printf("   find_name $P%d, '%s'\n", 0, inv->sub->name);
-            printf("   invokecc $P%d", 0);
+
+            if (inv->sub->name != NULL) {
+                printf("   find_name $P%d, '%s'\n", 99, inv->sub->name);
+                printf("   invokecc $P%d", 99);
+            }
+            else
+                printf("   invokecc $P%d", inv->sub->regno);
+
             break;
         case CALL_RET:
             print_arguments("set_returns", inv->arguments);

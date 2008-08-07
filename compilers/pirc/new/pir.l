@@ -288,7 +288,6 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 
 "if"              { return TK_IF; }
 "goto"            { return TK_GOTO; }
-"n_operators"     { return TK_N_OPERATORS; }
 "unless"          { return TK_UNLESS; }
 "null"            { return TK_NULL; }
 
@@ -321,7 +320,6 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 ".end_call"       { return TK_END_CALL; }
 ".end_return"     { return TK_END_RETURN; }
 ".end_yield"      { return TK_END_YIELD; }
-".pragma"         { return TK_PRAGMA; }
 ".result"         { return TK_RESULT; }
 ".return"         { return TK_RETURN; }
 ".sub"            { return TK_SUB; }

@@ -21,8 +21,6 @@ Features are:
 
 =item * constant folding is implemented in the parser
 
-=item *
-
 =back
 
 
@@ -51,7 +49,9 @@ Features are:
 /* mathematical operator types */
 typedef enum pir_math_operators {
     OP_ADD,
+    OP_INC, /* special case for OP_ADD; must be 1 position after OP_ADD */
     OP_SUB,
+    OP_DEC, /* special case for OP_DEC; must be 1 position after OP_SUB */
     OP_DIV,
     OP_MUL,
     OP_MOD,
@@ -90,7 +90,9 @@ typedef enum pir_rel_operators {
 /* names of the binary operators */
 static char * const opnames[] = {
     "add",
+    "inc", /* use this when "add"ing 1 */
     "sub",
+    "dec", /* use this when "sub"ing 1 */
     "div",
     "mul",
     "mod",
@@ -195,8 +197,6 @@ extern YY_DECL;
 
 %token TK_HLL               ".HLL"
        TK_HLL_MAP           ".HLL_map"
-       TK_N_OPERATORS       "n_operators"
-       TK_PRAGMA            ".pragma"
        TK_LOADLIB           ".loadlib"
 
 %token TK_SUB               ".sub"
@@ -449,11 +449,6 @@ pir_chunk         : sub_def
                   | hll_specifier
                   | hll_mapping
                   | loadlib
-                  | pir_pragma
-                  ;
-
-pir_pragma        : ".pragma" "n_operators" TK_INTC
-                            { set_pragma(PRAGMA_N_OPERATORS, $3); }
                   ;
 
 loadlib           : ".loadlib" TK_STRINGC
@@ -597,6 +592,7 @@ statement         : conditional_stat
                   | error_stat
                   ;
 
+/* "error" is a built-in rule; used for trying to recover. */
 error_stat        : error "\n"
                          { if (lexer->parse_errors > MAX_NUM_ERRORS) {
                                fprintf(stderr, "Too many errors. Compilation aborted.\n");
@@ -649,11 +645,14 @@ assignment        : target '=' expression
                          {
                            set_instr(lexer, "set");
                            /* XXX fix key stuff */
+                           add_operands(lexer, 2, expr_from_target($1), $4);
+
                          }
                   | target '=' target keylist
                          {
                            set_instr(lexer, "set");
                            /* XXX fix key stuff */
+                           add_operands(lexer, 1, expr_from_target($1));
                          }
                   | target '=' parrot_instruction
                          { unshift_operand(lexer, expr_from_target($1)); }
@@ -662,10 +661,11 @@ assignment        : target '=' expression
 augmentive_expr   : augm_add_op TK_INTC
                          {
                            if ($2 == 1) { /* adding/subtracting 1? */
-                              if ($1 == OP_ADD)
-                                 set_instr(lexer, "inc");
-                              else if($1 == OP_SUB)
-                                 set_instr(lexer, "dec");
+                              /* "inc" is sorted right after "add";
+                               * "dec" is sorted right after "sub";
+                               * so select them by adding 1 to the index.
+                               */
+                              set_instr(lexer, opnames[$1 + 1]);
                            }
                            else {
                               set_instr(lexer, opnames[$1]);
@@ -780,7 +780,7 @@ op_arg            : expression
                   ;
 
 keyaccess         : target keylist
-                         { $$ = NULL; }
+                         { $$ = expr_from_target($1); /* XXX fix key stuff */ }
                   ;
 
 keylist           : '[' keys ']'
@@ -830,6 +830,10 @@ conditional_instr : if_unless "null" expression "goto" identifier
                          }
                   ;
 
+/* the condition rule returns -1 if the condition can't be evaluated yet, so
+ * it must be done during runtime. Otherwise, if the condition evaluates to
+ * "false", 0 is returned, and if true, 1 is returned.
+ */
 condition         : target rel_op expression
                          {
                            set_instr(lexer, opnames[$2]);
@@ -1411,6 +1415,7 @@ fold_i_i(int a, pir_math_operator op, int b) {
             break;
         case OP_DIV:
             if (b == 0)
+                /* XXX replace this by a call to parse_error or yyerror */
                 printf("cannot divide by 0!\n");
             else
                 result = a / b;
@@ -1434,6 +1439,7 @@ fold_i_i(int a, pir_math_operator op, int b) {
             result = pow(a, b);
             break;
         case OP_CONCAT:
+            /* XXX replace this by a call to parse_error or yyerror */
             printf("cannot concatenate operands of type 'int' and 'int'\n");
             break;
         case OP_LSR:
@@ -1482,21 +1488,21 @@ fold_i_i(int a, pir_math_operator op, int b) {
 static constant *
 fold_n_i(double a, pir_math_operator op, int b) {
     double result;
-    /* XXX */
+    /* XXX check out what binary ops work on operands of type (double, int)*/
     return new_const(NUM_TYPE, NULL, result);
 }
 
 static constant *
 fold_i_n(int a, pir_math_operator op, double b) {
     double result;
-    /* XXX */
+    /* XXX check out what binary ops work on operands of type (int, double)*/
     return new_const(NUM_TYPE, NULL, result);
 }
 
 static constant *
 fold_n_n(double a, pir_math_operator op, double b) {
     double result;
-    /* XXX */
+    /* XXX check out what binary ops work on operands of type (double, double)*/
     return new_const(NUM_TYPE, NULL, result);
 }
 
@@ -1538,6 +1544,7 @@ evaluate_n_n(double a, pir_rel_operator op, double b) {
 static int
 evaluate_s_s(char *a, pir_rel_operator op, char *b) {
     /* XXX todo: implement this */
+    /* for instance, "a" < "b" is true. */
     return 0;
 }
 
