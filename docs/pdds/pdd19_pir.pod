@@ -683,8 +683,7 @@ Binary logic operations C<&&> (AND), C<||> (OR) and C<~~> (XOR).
 Binary bitwise operations C<&> (bitwise AND), C<|> (bitwise OR) and C<~>
 (bitwise XOR).
 
-{{PROPOSAL: Change description to support logic operators (comparisons) as
-implemented (and working) in imcc.y. ANR: proposal not clear.}}
+Binary relational operations  C<E<lt>, E<lt>=, ==, != E<gt>= E<gt>>.
 
 =item <var1> <op>= <var2>
 
