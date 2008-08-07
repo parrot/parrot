@@ -188,6 +188,11 @@ void Parrot_debugger_start(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
         __attribute__nonnull__(2);
 
 PARROT_API
+void Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_API
 void PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
