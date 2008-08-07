@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -128,7 +128,8 @@ sub _get_programs {
         grep { $conf->data->get_p5('OSNAME') =~ /VMS|MSWin/ || !/^-l(c|gdbm(_compat)?|dbm|ndbm|db)$/ }
         split( q{ }, $libs );
     $libs = integrate( $libs, $conf->options->get('libs') );
-    $libs = prompt( "What libraries should your C compiler use?", $libs ) if $ask;
+    $libs = prompt( "What libraries should your C compiler use?", $libs )
+        if $ask;
     $conf->data->set( libs => $libs );
 
     $cxx = integrate( $conf->data->get('cxx'), $conf->options->get('cxx') );
@@ -170,7 +171,7 @@ sub _set_debug_and_warn {
 sub test_compiler {
     my ($conf, $cc) = @_;
 
-    open( my $out_fh, '>', 'test.c' ) or die "Unable to open 'test.c': $@\n";
+    open( my $out_fh, '>', "test_$$.c" ) or die "Unable to open 'test_$$.cb: $@\n";
     print {$out_fh} <<END_C;
 int main() {
     return 0;

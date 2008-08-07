@@ -38,15 +38,15 @@ use Parrot::Configure::Utils qw(
 
     $conf->cc_gen($source)
 
-Generates F<test.c> from the specified source file.
+Generates F<test_$$.c> from the specified source file.
 
 =cut
 
 sub cc_gen {
-    my $conf = shift;
+    my $conf   = shift;
     my $source = shift;
 
-    $conf->genfile( $source, "test.c" );
+    $conf->genfile( $source, "test_$$.c" );
 }
 
 =item C<cc_build()>
@@ -57,7 +57,7 @@ These items are used from current config settings:
 
   $cc, $ccflags, $ldout, $o, $link, $linkflags, $cc_exe_out, $exe, $libs
 
-Calls the compiler and linker on F<test.c>.
+Calls the compiler and linker on F<test_$$.c>.
 
 =cut
 
@@ -73,17 +73,20 @@ sub cc_build {
     my ( $cc, $ccflags, $ldout, $o, $link, $linkflags, $cc_exe_out, $exe, $libs ) =
         $conf->data->get(qw(cc ccflags ld_out o link linkflags cc_exe_out exe libs));
 
+    # unique test file name for parallel builds
+    my $test            = 'test_' . $$;
     my $compile_command = _build_compile_command( $cc, $ccflags, $cc_args );
-    my $compile_result = _run_command( $compile_command, 'test.cco', 'test.cco', $verbose )
-        and confess "C compiler failed (see test.cco)";
+    my $compile_result  = _run_command( $compile_command, "$test.cco", "$test.cco", $verbose );
+
     if ($compile_result) {
+        confess "C compiler failed (see $test.cco)";
         return $compile_result;
     }
 
     my $link_result =
-        _run_command( "$link $linkflags test$o $link_args ${cc_exe_out}test$exe  $libs",
-        'test.ldo', 'test.ldo', $verbose )
-        and confess "Linker failed (see test.ldo)";
+        _run_command( "$link $linkflags $test$o $link_args ${cc_exe_out}${test}${exe}  $libs",
+        "$test.ldo", "$test.ldo", $verbose )
+        and confess "Linker failed (see $test.ldo)";
     if ($link_result) {
         return $link_result;
     }
@@ -103,18 +106,19 @@ sub cc_run {
     my $exe      = $conf->data->get('exe');
     my $slash    = $conf->data->get('slash');
     my $verbose  = $conf->options->get('verbose');
-    my $test_exe = ".${slash}test${exe}";
+    my $test     = 'test_' . $$;
+    my $test_exe = ".${slash}${test}${exe}";
 
     my $run_error;
     if ( defined( $_[0] ) && length( $_[0] ) ) {
         local $" = ' ';
-        $run_error = _run_command( "$test_exe @_", './test.out', undef, $verbose );
+        $run_error = _run_command( "$test_exe @_", "./$test.out", undef, $verbose );
     }
     else {
-        $run_error = _run_command( "$test_exe", './test.out', undef, $verbose );
+        $run_error = _run_command( $test_exe, "./$test.out", undef, $verbose );
     }
 
-    my $output = _slurp('./test.out');
+    my $output = _slurp("./$test.out");
 
     return $output;
 }
@@ -133,16 +137,17 @@ sub cc_run_capture {
     my $exe     = $conf->data->get('exe');
     my $slash   = $conf->data->get('slash');
     my $verbose = $conf->options->get('verbose');
+    my $test    = 'test_' . $$;
 
     if ( defined( $_[0] ) && length( $_[0] ) ) {
         local $" = ' ';
-        _run_command( ".${slash}test${exe} @_", './test.out', './test.out', $verbose );
+        _run_command( ".${slash}$test${exe} @_", "./$test.out", "./$test.out", $verbose );
     }
     else {
-        _run_command( ".${slash}test${exe}", './test.out', './test.out', $verbose );
+        _run_command( ".${slash}$test${exe}", "./$test.out", "./$test.out", $verbose );
     }
 
-    my $output = _slurp('./test.out');
+    my $output = _slurp("./$test.out");
 
     return $output;
 }
@@ -157,7 +162,8 @@ Cleans up all files in the root folder that match the glob F<test.*>.
 
 sub cc_clean {    ## no critic Subroutines::RequireFinalReturn
     my $conf = shift;
-    unlink map "test$_", qw( .c .cco .ldo .out), $conf->data->get(qw( o exe ));
+    unlink map "test_${$}$_", qw( .c .cco .ldo .out),
+        $conf->data->get(qw( o exe ));
 }
 
 =item C<genfile()>
