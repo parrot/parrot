@@ -20,9 +20,12 @@ be fixed.
 PIRC is not finished yet. A lot of work is needed on the back-end
 before it can generate Parrot Byte Code files (PBC).
 
-Note that pirc/new refers to a Lex/Yacc based implementation, while
+Note that pirc/new refers to a Flex/Bison based implementation, while
 'pirc' refers to the hand-written recursive-descent implementation,
 to be found in pirc/src directory.
+
+Please note that the latter (in pirc/src) was an experiment, and is no
+longer maintained at this point. Your attention should thus go to pirc/new.
 
 The current set-up is a three-phase compiler:
 
@@ -113,7 +116,8 @@ HI
 
 =item * Reentrant
 
-The generated lexer and parser are fully re-entrant. (It does need to be tested, though).
+The generated lexer and parser are fully re-entrant, as far as I can tell.
+(It does need to be tested, though).
 
 =item * Comments!
 
@@ -155,6 +159,13 @@ When you want to run the heredoc pre-processor only, do this:
 When you want to pre-process the file only (heredoc + macro parsing), do this:
 
  $ ./pirc -E test.pir
+
+
+=head3 Attention!
+
+The current design does not allow any heredocs in .include-d files, because
+the .include directive is implemented in the second phase. This issue should
+be solved at some point.
 
 =head2 Cygwin processable lexer spec.
 
@@ -228,6 +239,8 @@ See also:
 =item * C<docs/imcc/syntax.pod> for a description of PIR syntax.
 
 =item * C<docs/imcc/> for more documentation about the PIR language.
+
+=item * C<docs/pdds/pdd19_pir.pod> for the PIR design document.
 
 =back
 
