@@ -44,58 +44,8 @@ See original on L<http://luaforge.net/projects/luafilesystem/>
     set $P1, 'lfs'
     _lua__GLOBAL[$P1] = _lfs
 
-    lua_register($P1, _lfs)
-
-    .const .Sub _lfs_attributes = 'attributes'
-    _lfs_attributes.'setfenv'(_lua__GLOBAL)
-    set $P1, 'attributes'
-    _lfs[$P1] = _lfs_attributes
-
-    .const .Sub _lfs_chdir = 'chdir'
-    _lfs_chdir.'setfenv'(_lua__GLOBAL)
-    set $P1, 'chdir'
-    _lfs[$P1] = _lfs_chdir
-
-    .const .Sub _lfs_currentdir = 'currentdir'
-    _lfs_currentdir.'setfenv'(_lua__GLOBAL)
-    set $P1, 'currentdir'
-    _lfs[$P1] = _lfs_currentdir
-
-    .const .Sub _lfs_dir = 'dir'
-    _lfs_dir.'setfenv'(_lua__GLOBAL)
-    set $P1, 'dir'
-    _lfs[$P1] = _lfs_dir
-
-    .const .Sub _lfs_lock = 'lock'
-    _lfs_lock.'setfenv'(_lua__GLOBAL)
-    set $P1, 'lock'
-    _lfs[$P1] = _lfs_lock
-
-    .const .Sub _lfs_mkdir = 'mkdir'
-    _lfs_mkdir.'setfenv'(_lua__GLOBAL)
-    set $P1, 'mkdir'
-    _lfs[$P1] = _lfs_mkdir
-
-    .const .Sub _lfs_rmdir = 'rmdir'
-    _lfs_rmdir.'setfenv'(_lua__GLOBAL)
-    set $P1, 'rmdir'
-    _lfs[$P1] = _lfs_rmdir
-
-    .const .Sub _lfs_symlinkattributes = 'symlinkattributes'
-    _lfs_symlinkattributes.'setfenv'(_lua__GLOBAL)
-    set $P1, 'symlinkattributes'
-    _lfs[$P1] = _lfs_symlinkattributes
-
-    .const .Sub _lfs_touch = 'touch'
-    _lfs_touch.'setfenv'(_lua__GLOBAL)
-    set $P1, 'touch'
-    _lfs[$P1] = _lfs_touch
-
-    .const .Sub _lfs_unlock = 'unlock'
-    _lfs_unlock.'setfenv'(_lua__GLOBAL)
-    set $P1, 'unlock'
-    _lfs[$P1] = _lfs_unlock
-
+    $P2 = split ' ', 'attributes chdir currentdir dir lock mkdir rmdir symlinkattributes touch unlock'
+    lua_register($P1, _lfs, $P2)
 
     new $P2, 'LuaString'
 
@@ -278,7 +228,7 @@ optimal file system I/O blocksize; (Unix only)
     .return (nil, msg)
 .endm
 
-.sub 'attributes' :anon
+.sub 'attributes'
     .param pmc filepath :optional
     .param pmc aname :optional
     .param pmc extra :slurpy
@@ -447,7 +397,7 @@ Returns C<true> in case of success or C<nil> plus an error string.
 
 =cut
 
-.sub 'chdir' :anon
+.sub 'chdir'
     .param pmc path :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -483,7 +433,7 @@ string.
 
 =cut
 
-.sub 'currentdir' :anon
+.sub 'currentdir'
     .param pmc extra :slurpy
     .local pmc res
     new $P0, 'OS'
@@ -513,7 +463,7 @@ when there is no more entries. Raises an error if C<path> is not a directory.
 
 =cut
 
-.sub 'dir' :anon
+.sub 'dir'
     .param pmc path :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -562,7 +512,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub 'lock' :anon
+.sub 'lock'
     .param pmc filehandle :optional
     .param pmc mode :optional
     .param pmc start :optional
@@ -585,7 +535,7 @@ C<nil> plus an error string.
 
 =cut
 
-.sub 'mkdir' :anon
+.sub 'mkdir'
     .param pmc dirname :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -619,7 +569,7 @@ C<nil> plus an error string.
 
 =cut
 
-.sub 'rmdir' :anon
+.sub 'rmdir'
     .param pmc dirname :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -650,7 +600,7 @@ the link itself (not the file it refers to).
 
 =cut
 
-.sub 'symlinkattributes' :anon
+.sub 'symlinkattributes'
     .param pmc filepath :optional
     .param pmc aname :optional
     .param pmc extra :slurpy
@@ -675,7 +625,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub 'touch' :anon
+.sub 'touch'
     .param pmc filepath :optional
     .param pmc atime :optional
     .param pmc mtime :optional
@@ -699,7 +649,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub 'unlock' :anon
+.sub 'unlock'
     .param pmc filehandle :optional
     .param pmc start :optional
     .param pmc length_ :optional

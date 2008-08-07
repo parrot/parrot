@@ -44,82 +44,14 @@ L<http://www.lua.org/manual/5.1/manual.html#5.4>.
     set $P1, 'string'
     _lua__GLOBAL[$P1] = _string
 
-    lua_register($P1, _string)
-
-    .const .Sub _string_byte = 'byte'
-    _string_byte.'setfenv'(_lua__GLOBAL)
-    set $P1, 'byte'
-    _string[$P1] = _string_byte
-
-    .const .Sub _string_char = 'char'
-    _string_char.'setfenv'(_lua__GLOBAL)
-    set $P1, 'char'
-    _string[$P1] = _string_char
-
-    .const .Sub _string_dump = 'dump'
-    _string_dump.'setfenv'(_lua__GLOBAL)
-    set $P1, 'dump'
-    _string[$P1] = _string_dump
-
-    .const .Sub _string_find = 'find'
-    _string_find.'setfenv'(_lua__GLOBAL)
-    set $P1, 'find'
-    _string[$P1] = _string_find
-
-    .const .Sub _string_format = 'format'
-    _string_format.'setfenv'(_lua__GLOBAL)
-    set $P1, 'format'
-    _string[$P1] = _string_format
-
-    .const .Sub _string_gmatch = 'gmatch'
-    _string_gmatch.'setfenv'(_lua__GLOBAL)
-    set $P1, 'gmatch'
-    _string[$P1] = _string_gmatch
+    $P2 = split ' ', 'byte char dump find format gmatch gsub len lower match rep reverse sub upper'
+    lua_register($P1, _string, $P2)
 
     # LUA_COMPAT_GFIND
+    set $P1, 'gmatch'
+    $P0 = _string[$P1]
     set $P1, 'gfind'
-    _string[$P1] = _string_gmatch
-
-    .const .Sub _string_gsub = 'gsub'
-    _string_gsub.'setfenv'(_lua__GLOBAL)
-    set $P1, 'gsub'
-    _string[$P1] = _string_gsub
-
-    .const .Sub _string_len = 'len'
-    _string_len.'setfenv'(_lua__GLOBAL)
-    set $P1, 'len'
-    _string[$P1] = _string_len
-
-    .const .Sub _string_lower = 'lower'
-    _string_lower.'setfenv'(_lua__GLOBAL)
-    set $P1, 'lower'
-    _string[$P1] = _string_lower
-
-    .const .Sub _string_match = 'match'
-    _string_match.'setfenv'(_lua__GLOBAL)
-    set $P1, 'match'
-    _string[$P1] = _string_match
-
-    .const .Sub _string_rep = 'rep'
-    _string_rep.'setfenv'(_lua__GLOBAL)
-    set $P1, 'rep'
-    _string[$P1] = _string_rep
-
-    .const .Sub _string_reverse = 'reverse'
-    _string_reverse.'setfenv'(_lua__GLOBAL)
-    set $P1, 'reverse'
-    _string[$P1] = _string_reverse
-
-    .const .Sub _string_sub = 'sub'
-    _string_sub.'setfenv'(_lua__GLOBAL)
-    set $P1, 'sub'
-    _string[$P1] = _string_sub
-
-    .const .Sub _string_upper = 'upper'
-    _string_upper.'setfenv'(_lua__GLOBAL)
-    set $P1, 'upper'
-    _string[$P1] = _string_upper
-
+    _string[$P1] = $P0
 
     .local pmc _lua_mt_string
     new _lua_mt_string, 'LuaTable'
@@ -158,7 +90,7 @@ Note that numerical codes are not necessarily portable across platforms.
 
 =cut
 
-.sub 'byte' :anon
+.sub 'byte'
     .param pmc s :optional
     .param pmc i :optional
     .param pmc j :optional
@@ -215,7 +147,7 @@ Note that numerical codes are not necessarily portable across platforms.
 
 =cut
 
-.sub 'char' :anon
+.sub 'char'
     .param pmc argv :slurpy
     .local pmc res
     .local int argc
@@ -252,7 +184,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub 'dump' :anon
+.sub 'dump'
     .param pmc function :optional
     .param pmc extra :slurpy
     lua_checktype(1, function, 'function')
@@ -276,7 +208,7 @@ are also returned, after the two indices.
 
 =cut
 
-.sub 'find' :anon
+.sub 'find'
     .param pmc argv :slurpy
     .return str_find_aux(1, argv :flat)
 .end
@@ -442,7 +374,7 @@ This function does not accept string values containing embedded zeros.
 
 =cut
 
-.sub 'format' :anon
+.sub 'format'
     .param pmc formatstring :optional
     .param pmc argv :slurpy
     .local string strfrmt
@@ -646,7 +578,7 @@ table:
 
 =cut
 
-.sub 'gmatch' :anon :lex
+.sub 'gmatch' :lex
     .param pmc s :optional
     .param pmc pattern :optional
     .param pmc extra :slurpy
@@ -709,7 +641,7 @@ is replaced.
 
 =cut
 
-.sub 'gsub' :anon
+.sub 'gsub'
     .param pmc s :optional
     .param pmc pat :optional
     .param pmc repl :optional
@@ -890,7 +822,7 @@ Embedded zeros are counted, so C<"a\000b\000c"> has length 5.
 
 =cut
 
-.sub 'len' :anon
+.sub 'len'
     .param pmc s :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -910,7 +842,7 @@ of what is an uppercase letter depends on the current locale.
 
 =cut
 
-.sub 'lower' :anon
+.sub 'lower'
     .param pmc s :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -932,7 +864,7 @@ start the search; its default value is 1 and may be negative.
 
 =cut
 
-.sub 'match' :anon
+.sub 'match'
     .param pmc argv :slurpy
     .return str_find_aux(0, argv :flat)
 .end
@@ -944,7 +876,7 @@ Returns a string that is the concatenation of C<n> copies of the string C<s>.
 
 =cut
 
-.sub 'rep' :anon
+.sub 'rep'
     .param pmc s :optional
     .param pmc n
     .param pmc extra :slurpy
@@ -967,7 +899,7 @@ Returns a string that is the string C<s> reversed.
 
 =cut
 
-.sub 'reverse' :anon
+.sub 'reverse'
     .param pmc s :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -1003,7 +935,7 @@ C<string.sub(s, -i)> returns a suffix of C<s> with length C<i>.
 
 =cut
 
-.sub 'sub' :anon
+.sub 'sub'
     .param pmc s :optional
     .param pmc i :optional
     .param pmc j :optional
@@ -1043,7 +975,7 @@ of what is a lowercase letter depends on the current locale.
 
 =cut
 
-.sub 'upper' :anon
+.sub 'upper'
     .param pmc s :optional
     .param pmc extra :slurpy
     .local pmc res

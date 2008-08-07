@@ -29,50 +29,9 @@ See F<languages/lua/lib/luaio.pir>.
     set $P1, '__index'
     _file[$P1] = _file
 
-    .const .Sub _file_close = 'close'
-    _file_close.'setfenv'(_lua__GLOBAL)
-    set $P1, 'close'
-    _file[$P1] = _file_close
-
-    .const .Sub _file_flush = 'flush'
-    _file_flush.'setfenv'(_lua__GLOBAL)
-    set $P1, 'flush'
-    _file[$P1] = _file_flush
-
-    .const .Sub _file_lines = 'lines'
-    _file_lines.'setfenv'(_lua__GLOBAL)
-    set $P1, 'lines'
-    _file[$P1] = _file_lines
-
-    .const .Sub _file_read = 'read'
-    _file_read.'setfenv'(_lua__GLOBAL)
-    set $P1, 'read'
-    _file[$P1] = _file_read
-
-    .const .Sub _file_seek = 'seek'
-    _file_seek.'setfenv'(_lua__GLOBAL)
-    set $P1, 'seek'
-    _file[$P1] = _file_seek
-
-    .const .Sub _file_setvbuf = 'setvbuf'
-    _file_setvbuf.'setfenv'(_lua__GLOBAL)
-    set $P1, 'setvbuf'
-    _file[$P1] = _file_setvbuf
-
-    .const .Sub _file_write = 'write'
-    _file_write.'setfenv'(_lua__GLOBAL)
-    set $P1, 'write'
-    _file[$P1] = _file_write
-
-    .const .Sub _file__gc = '__gc'
-    _file__gc.'setfenv'(_lua__GLOBAL)
-    set $P1, '__gc'
-    _file[$P1] = _file__gc
-
-    .const .Sub _file__tostring = '__tostring'
-    _file__tostring.'setfenv'(_lua__GLOBAL)
-    set $P1, '__tostring'
-    _file[$P1] = _file__tostring
+    $P2 = split ' ', 'close flush lines read seek setvbuf write __gc __tostring'
+    null $P0
+    lua_register($P0, _file, $P2)
 
     $P0 = get_hll_namespace ['io']
     $P1 = get_namespace
@@ -90,7 +49,7 @@ are garbage collected, but that takes an unpredictable amount of time to happen.
 
 =cut
 
-.sub 'close' :method :anon
+.sub 'close' :method
     .param pmc extra :slurpy
     .local pmc res
     tofile(self)
@@ -105,7 +64,7 @@ Saves any written data to C<file>.
 
 =cut
 
-.sub 'flush' :method :anon
+.sub 'flush' :method
     .param pmc extra :slurpy
     .local pmc f
     .local pmc res
@@ -129,7 +88,7 @@ does not close the file when the loop ends.)
 
 =cut
 
-.sub 'lines' :method :anon
+.sub 'lines' :method
     .param pmc extra :slurpy
     tofile(self)
     .return aux_lines(self, 0)
@@ -173,7 +132,7 @@ empty string, or B<nil> on end of file.
 
 =cut
 
-.sub 'read' :method :anon
+.sub 'read' :method
     .param pmc formats :slurpy
     .local pmc res
     .local pmc f
@@ -271,7 +230,7 @@ position to the end of the file, and returns its size.
 
 =cut
 
-.sub 'seek' :method :anon
+.sub 'seek' :method
     .param pmc whence :optional
     .param pmc offset :optional
     .param pmc extra :slurpy
@@ -319,7 +278,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub 'setvbuf' :method :anon
+.sub 'setvbuf' :method
     .param pmc mode :optional
     .param pmc size :optional
     .param pmc extra :slurpy
@@ -356,7 +315,7 @@ or C<string.format> before write.
 
 =cut
 
-.sub 'write' :method :anon
+.sub 'write' :method
     .param pmc argv :slurpy
     .local pmc res
     .local int argc
@@ -385,7 +344,7 @@ or C<string.format> before write.
 .end
 
 
-.sub '__gc' :method :anon
+.sub '__gc' :method
     .local pmc f
     f = tofilep(self)
     # ignore closed files
@@ -396,7 +355,7 @@ or C<string.format> before write.
 .end
 
 
-.sub '__tostring' :method :anon
+.sub '__tostring' :method
     .local pmc f
     .local pmc res
     f = tofilep(self)

@@ -46,67 +46,8 @@ see F<runtime/parrot/library/OpenGL.pir>.
     set $P1, 'glut'
     _lua__GLOBAL[$P1] = _glut
 
-    lua_register($P1, _glut)
-
-    .const .Sub _glut_CreateWindow= 'CreateWindow'
-    _glut_CreateWindow.'setfenv'(_lua__GLOBAL)
-    set $P1, 'CreateWindow'
-    _glut[$P1] = _glut_CreateWindow
-
-    .const .Sub _glut_DestroyWindow= 'DestroyWindow'
-    _glut_DestroyWindow.'setfenv'(_lua__GLOBAL)
-    set $P1, 'DestroyWindow'
-    _glut[$P1] = _glut_DestroyWindow
-
-    .const .Sub _glut_DisplayFunc= 'DisplayFunc'
-    _glut_DisplayFunc.'setfenv'(_lua__GLOBAL)
-    set $P1, 'DisplayFunc'
-    _glut[$P1] = _glut_DisplayFunc
-
-    .const .Sub _glut_IdleFunc= 'IdleFunc'
-    _glut_IdleFunc.'setfenv'(_lua__GLOBAL)
-    set $P1, 'IdleFunc'
-    _glut[$P1] = _glut_IdleFunc
-
-    .const .Sub _glut_Init= 'Init'
-    _glut_Init.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Init'
-    _glut[$P1] = _glut_Init
-
-    .const .Sub _glut_InitDisplayMode= 'InitDisplayMode'
-    _glut_InitDisplayMode.'setfenv'(_lua__GLOBAL)
-    set $P1, 'InitDisplayMode'
-    _glut[$P1] = _glut_InitDisplayMode
-
-    .const .Sub _glut_InitWindowSize= 'InitWindowSize'
-    _glut_InitWindowSize.'setfenv'(_lua__GLOBAL)
-    set $P1, 'InitWindowSize'
-    _glut[$P1] = _glut_InitWindowSize
-
-    .const .Sub _glut_KeyboardFunc= 'KeyboardFunc'
-    _glut_KeyboardFunc.'setfenv'(_lua__GLOBAL)
-    set $P1, 'KeyboardFunc'
-    _glut[$P1] = _glut_KeyboardFunc
-
-    .const .Sub _glut_MainLoop= 'MainLoop'
-    _glut_MainLoop.'setfenv'(_lua__GLOBAL)
-    set $P1, 'MainLoop'
-    _glut[$P1] = _glut_MainLoop
-
-    .const .Sub _glut_PostRedisplay= 'PostRedisplay'
-    _glut_PostRedisplay.'setfenv'(_lua__GLOBAL)
-    set $P1, 'PostRedisplay'
-    _glut[$P1] = _glut_PostRedisplay
-
-    .const .Sub _glut_ReshapeFunc= 'ReshapeFunc'
-    _glut_ReshapeFunc.'setfenv'(_lua__GLOBAL)
-    set $P1, 'ReshapeFunc'
-    _glut[$P1] = _glut_ReshapeFunc
-
-    .const .Sub _glut_SwapBuffers= 'SwapBuffers'
-    _glut_SwapBuffers.'setfenv'(_lua__GLOBAL)
-    set $P1, 'SwapBuffers'
-    _glut[$P1] = _glut_SwapBuffers
+    $P2 = split ' ', 'CreateWindow DestroyWindow DisplayFunc IdleFunc Init InitDisplayMode InitWindowSize KeyboardFunc MainLoop PostRedisplay ReshapeFunc SwapBuffers'
+    lua_register($P1, _glut, $P2)
 
     .return (_glut)
 .end
@@ -118,7 +59,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'CreateWindow' :anon
+.sub 'CreateWindow'
     .param pmc title :optional
     .param pmc extra :slurpy
     $I0 = lua_isstring(title)
@@ -139,7 +80,7 @@ not LuaGL
 
 =cut
 
-.sub 'DestroyWindow' :anon
+.sub 'DestroyWindow'
     .param pmc window :optional
     .param pmc extra :slurpy
     $I0 = lua_isnumber(window)
@@ -155,7 +96,7 @@ not LuaGL
 
 =cut
 
-.sub 'DisplayFunc' :anon
+.sub 'DisplayFunc'
     .param pmc funcname :optional
     .param pmc extra :slurpy
     $I0 = lua_isstring(funcname)
@@ -195,7 +136,7 @@ not LuaGL
 
 =cut
 
-.sub 'IdleFunc' :anon
+.sub 'IdleFunc'
     .param pmc funcname :optional
     .param pmc extra :slurpy
     $I0 = lua_isstring(funcname)
@@ -235,7 +176,7 @@ not LuaGL
 
 =cut
 
-.sub 'Init' :anon
+.sub 'Init'
     .param pmc extra :slurpy
     .local pmc argv
     new argv, 'ResizableStringArray'
@@ -249,7 +190,7 @@ not LuaGL
 
 =cut
 
-.sub 'InitDisplayMode' :anon
+.sub 'InitDisplayMode'
     .param pmc extra :slurpy
     $I0 = .GLUT_RGBA | .GLUT_DOUBLE
     glutInitDisplayMode($I0)
@@ -260,7 +201,7 @@ not LuaGL
 
 =cut
 
-.sub 'InitWindowSize' :anon
+.sub 'InitWindowSize'
     .param pmc width :optional
     .param pmc height :optional
     .param pmc extra :slurpy
@@ -282,7 +223,7 @@ not LuaGL
 
 =cut
 
-.sub 'KeyboardFunc' :anon
+.sub 'KeyboardFunc'
     .param pmc funcname :optional
     .param pmc extra :slurpy
     $I0 = lua_isstring(funcname)
@@ -331,7 +272,7 @@ not LuaGL
 
 =cut
 
-.sub 'MainLoop' :anon
+.sub 'MainLoop'
     .param pmc extra :slurpy
     glutMainLoop()
 .end
@@ -341,7 +282,7 @@ not LuaGL
 
 =cut
 
-.sub 'PostRedisplay' :anon
+.sub 'PostRedisplay'
     .param pmc extra :slurpy
     glutPostRedisplay()
 .end
@@ -351,7 +292,7 @@ not LuaGL
 
 =cut
 
-.sub 'ReshapeFunc' :anon
+.sub 'ReshapeFunc'
     .param pmc funcname :optional
     .param pmc extra :slurpy
     $I0 = lua_isstring(funcname)
@@ -396,7 +337,7 @@ not LuaGL
 
 =cut
 
-.sub 'SwapBuffers' :anon
+.sub 'SwapBuffers'
     .param pmc extra :slurpy
     glutSwapBuffers()
 .end

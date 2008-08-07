@@ -53,62 +53,8 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     set $P1, 'io'
     _lua__GLOBAL[$P1] = _io
 
-    lua_register($P1, _io)
-
-    .const .Sub _io_close = 'close'
-    _io_close.'setfenv'(_io_env)
-    set $P1, 'close'
-    _io[$P1] = _io_close
-
-    .const .Sub _io_flush = 'flush'
-    _io_flush.'setfenv'(_io_env)
-    set $P1, 'flush'
-    _io[$P1] = _io_flush
-
-    .const .Sub _io_input = 'input'
-    _io_input.'setfenv'(_io_env)
-    set $P1, 'input'
-    _io[$P1] = _io_input
-
-    .const .Sub _io_lines = 'lines'
-    _io_lines.'setfenv'(_io_env)
-    set $P1, 'lines'
-    _io[$P1] = _io_lines
-
-    .const .Sub _io_open = 'open'
-    _io_open.'setfenv'(_io_env)
-    set $P1, 'open'
-    _io[$P1] = _io_open
-
-    .const .Sub _io_output = 'output'
-    _io_output.'setfenv'(_io_env)
-    set $P1, 'output'
-    _io[$P1] = _io_output
-
-    .const .Sub _io_popen = 'popen'
-    _io_popen.'setfenv'(_io_env)
-    set $P1, 'popen'
-    _io[$P1] = _io_popen
-
-    .const .Sub _io_read = 'read'
-    _io_read.'setfenv'(_io_env)
-    set $P1, 'read'
-    _io[$P1] = _io_read
-
-    .const .Sub _io_tmpfile = 'tmpfile'
-    _io_tmpfile.'setfenv'(_io_env)
-    set $P1, 'tmpfile'
-    _io[$P1] = _io_tmpfile
-
-    .const .Sub _io_type = 'type'
-    _io_type.'setfenv'(_io_env)
-    set $P1, 'type'
-    _io[$P1] = _io_type
-
-    .const .Sub _io_write = 'write'
-    _io_write.'setfenv'(_io_env)
-    set $P1, 'write'
-    _io[$P1] = _io_write
+    $P2 = split ' ', 'close flush input lines open output popen read tmpfile type write readline'
+    lua_register($P1, _io, $P2, _io_env)
 
     .const .Sub _readline = 'readline'
     _readline.'setfenv'(_io_env)
@@ -388,7 +334,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     .return (res)
 .end
 
-.sub 'readline' :anon :lex :outer(aux_lines)
+.sub 'readline' :lex :outer(aux_lines)
     .local pmc file
     .local pmc f
     .local pmc res
@@ -412,7 +358,7 @@ file.
 
 =cut
 
-.sub 'close' :anon
+.sub 'close'
     .param pmc file
     .param pmc extra :slurpy
     .local pmc res
@@ -431,7 +377,7 @@ Equivalent to C<file:flush> over the default output file.
 
 =cut
 
-.sub 'flush' :anon
+.sub 'flush'
     .param pmc extra :slurpy
     .local pmc file
     .const .LuaString key = 'flush'
@@ -453,7 +399,7 @@ error code.
 
 =cut
 
-.sub 'input' :anon
+.sub 'input'
     .param pmc file :optional
     .param pmc extra :slurpy
     .local pmc f
@@ -498,7 +444,7 @@ input file. In this case it does not close the file when the loop ends.
 
 =cut
 
-.sub 'lines' :anon
+.sub 'lines'
     .param pmc filename :optional
     .param pmc extra :slurpy
     .local pmc file
@@ -561,7 +507,7 @@ in the standard C function C<fopen>.
 
 =cut
 
-.sub 'open' :anon
+.sub 'open'
     .param pmc filename :optional
     .param pmc mode :optional
     .param pmc extra :slurpy
@@ -593,7 +539,7 @@ Similar to C<io.input>, but operates over the default output file.
 
 =cut
 
-.sub 'output' :anon
+.sub 'output'
     .param pmc file :optional
     .param pmc extra :slurpy
     .local pmc f
@@ -629,7 +575,7 @@ This function is system dependent and is not available on all platforms.
 
 =cut
 
-.sub 'popen' :anon
+.sub 'popen'
     .param pmc prog :optional
     .param pmc mode :optional
     .param pmc extra :slurpy
@@ -661,7 +607,7 @@ Equivalent to C<io.input():read>.
 
 =cut
 
-.sub 'read' :anon
+.sub 'read'
     .param pmc argv :slurpy
     .local pmc file
     .const .LuaString key = 'read'
@@ -678,7 +624,7 @@ it is automatically removed when the program ends.
 
 =cut
 
-.sub 'tmpfile' :anon
+.sub 'tmpfile'
     .param pmc extra :slurpy
     .local pmc f
     .local pmc res
@@ -710,7 +656,7 @@ handle, and B<nil> if C<obj> is not a file handle.
 
 =cut
 
-.sub 'type' :anon
+.sub 'type'
     .param pmc obj :optional
     .param pmc extra :slurpy
     .local pmc mt
@@ -745,7 +691,7 @@ Equivalent to C<io.output():write>.
 
 =cut
 
-.sub 'write' :anon
+.sub 'write'
     .param pmc argv :slurpy
     .local pmc file
     .const .LuaString key = 'write'

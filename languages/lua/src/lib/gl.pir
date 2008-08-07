@@ -45,697 +45,8 @@ see F<runtime/parrot/library/OpenGL.pir>.
     set $P1, 'gl'
     _lua__GLOBAL[$P1] = _gl
 
-    lua_register($P1, _gl)
-
-    .const .Sub _gl_Accum= 'Accum'
-    _gl_Accum.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Accum'
-    _gl[$P1] = _gl_Accum
-
-    .const .Sub _gl_AlphaFunc= 'AlphaFunc'
-    _gl_AlphaFunc.'setfenv'(_lua__GLOBAL)
-    set $P1, 'AlphaFunc'
-    _gl[$P1] = _gl_AlphaFunc
-
-    .const .Sub _gl_AreTexturesResident= 'AreTexturesResident'
-    _gl_AreTexturesResident.'setfenv'(_lua__GLOBAL)
-    set $P1, 'AreTexturesResident'
-    _gl[$P1] = _gl_AreTexturesResident
-
-    .const .Sub _gl_ArrayElement= 'ArrayElement'
-    _gl_ArrayElement.'setfenv'(_lua__GLOBAL)
-    set $P1, 'ArrayElement'
-    _gl[$P1] = _gl_ArrayElement
-
-    .const .Sub _gl_Begin= 'Begin'
-    _gl_Begin.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Begin'
-    _gl[$P1] = _gl_Begin
-
-    .const .Sub _gl_BindTexture= 'BindTexture'
-    _gl_BindTexture.'setfenv'(_lua__GLOBAL)
-    set $P1, 'BindTexture'
-    _gl[$P1] = _gl_BindTexture
-
-    .const .Sub _gl_Bitmap= 'Bitmap'
-    _gl_Bitmap.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Bitmap'
-    _gl[$P1] = _gl_Bitmap
-
-    .const .Sub _gl_BlendFunc= 'BlendFunc'
-    _gl_BlendFunc.'setfenv'(_lua__GLOBAL)
-    set $P1, 'BlendFunc'
-    _gl[$P1] = _gl_BlendFunc
-
-    .const .Sub _gl_CallList= 'CallList'
-    _gl_CallList.'setfenv'(_lua__GLOBAL)
-    set $P1, 'CallList'
-    _gl[$P1] = _gl_CallList
-
-    .const .Sub _gl_CallLists= 'CallLists'
-    _gl_CallLists.'setfenv'(_lua__GLOBAL)
-    set $P1, 'CallLists'
-    _gl[$P1] = _gl_CallLists
-
-    .const .Sub _gl_Clear= 'Clear'
-    _gl_Clear.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Clear'
-    _gl[$P1] = _gl_Clear
-
-    .const .Sub _gl_ClearAccum= 'ClearAccum'
-    _gl_ClearAccum.'setfenv'(_lua__GLOBAL)
-    set $P1, 'ClearAccum'
-    _gl[$P1] = _gl_ClearAccum
-
-    .const .Sub _gl_ClearColor= 'ClearColor'
-    _gl_ClearColor.'setfenv'(_lua__GLOBAL)
-    set $P1, 'ClearColor'
-    _gl[$P1] = _gl_ClearColor
-
-    .const .Sub _gl_ClearDepth= 'ClearDepth'
-    _gl_ClearDepth.'setfenv'(_lua__GLOBAL)
-    set $P1, 'ClearDepth'
-    _gl[$P1] = _gl_ClearDepth
-
-    .const .Sub _gl_ClearIndex= 'ClearIndex'
-    _gl_ClearIndex.'setfenv'(_lua__GLOBAL)
-    set $P1, 'ClearIndex'
-    _gl[$P1] = _gl_ClearIndex
-
-    .const .Sub _gl_ClearStencil= 'ClearStencil'
-    _gl_ClearStencil.'setfenv'(_lua__GLOBAL)
-    set $P1, 'ClearStencil'
-    _gl[$P1] = _gl_ClearStencil
-
-    .const .Sub _gl_ClipPlane= 'ClipPlane'
-    _gl_ClipPlane.'setfenv'(_lua__GLOBAL)
-    set $P1, 'ClipPlane'
-    _gl[$P1] = _gl_ClipPlane
-
-    .const .Sub _gl_Color= 'Color'
-    _gl_Color.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Color'
-    _gl[$P1] = _gl_Color
-
-    .const .Sub _gl_ColorMask= 'ColorMask'
-    _gl_ColorMask.'setfenv'(_lua__GLOBAL)
-    set $P1, 'ColorMask'
-    _gl[$P1] = _gl_ColorMask
-
-    .const .Sub _gl_ColorMaterial= 'ColorMaterial'
-    _gl_ColorMaterial.'setfenv'(_lua__GLOBAL)
-    set $P1, 'ColorMaterial'
-    _gl[$P1] = _gl_ColorMaterial
-
-    .const .Sub _gl_ColorPointer= 'ColorPointer'
-    _gl_ColorPointer.'setfenv'(_lua__GLOBAL)
-    set $P1, 'ColorPointer'
-    _gl[$P1] = _gl_ColorPointer
-
-    .const .Sub _gl_CopyPixels= 'CopyPixels'
-    _gl_CopyPixels.'setfenv'(_lua__GLOBAL)
-    set $P1, 'CopyPixels'
-    _gl[$P1] = _gl_CopyPixels
-
-    .const .Sub _gl_CopyTexImage= 'CopyTexImage'
-    _gl_CopyTexImage.'setfenv'(_lua__GLOBAL)
-    set $P1, 'CopyTexImage'
-    _gl[$P1] = _gl_CopyTexImage
-
-    .const .Sub _gl_CopyTexSubImage= 'CopyTexSubImage'
-    _gl_CopyTexSubImage.'setfenv'(_lua__GLOBAL)
-    set $P1, 'CopyTexSubImage'
-    _gl[$P1] = _gl_CopyTexSubImage
-
-    .const .Sub _gl_CullFace= 'CullFace'
-    _gl_CullFace.'setfenv'(_lua__GLOBAL)
-    set $P1, 'CullFace'
-    _gl[$P1] = _gl_CullFace
-
-    .const .Sub _gl_DeleteLists= 'DeleteLists'
-    _gl_DeleteLists.'setfenv'(_lua__GLOBAL)
-    set $P1, 'DeleteLists'
-    _gl[$P1] = _gl_DeleteLists
-
-    .const .Sub _gl_DeleteTextures= 'DeleteTextures'
-    _gl_DeleteTextures.'setfenv'(_lua__GLOBAL)
-    set $P1, 'DeleteTextures'
-    _gl[$P1] = _gl_DeleteTextures
-
-    .const .Sub _gl_DepthFunc= 'DepthFunc'
-    _gl_DepthFunc.'setfenv'(_lua__GLOBAL)
-    set $P1, 'DepthFunc'
-    _gl[$P1] = _gl_DepthFunc
-
-    .const .Sub _gl_DepthMask= 'DepthMask'
-    _gl_DepthMask.'setfenv'(_lua__GLOBAL)
-    set $P1, 'DepthMask'
-    _gl[$P1] = _gl_DepthMask
-
-    .const .Sub _gl_DepthRange= 'DepthRange'
-    _gl_DepthRange.'setfenv'(_lua__GLOBAL)
-    set $P1, 'DepthRange'
-    _gl[$P1] = _gl_DepthRange
-
-    .const .Sub _gl_Disable= 'Disable'
-    _gl_Disable.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Disable'
-    _gl[$P1] = _gl_Disable
-
-    .const .Sub _gl_DisableClientState= 'DisableClientState'
-    _gl_DisableClientState.'setfenv'(_lua__GLOBAL)
-    set $P1, 'DisableClientState'
-    _gl[$P1] = _gl_DisableClientState
-
-    .const .Sub _gl_DrawArrays= 'DrawArrays'
-    _gl_DrawArrays.'setfenv'(_lua__GLOBAL)
-    set $P1, 'DrawArrays'
-    _gl[$P1] = _gl_DrawArrays
-
-    .const .Sub _gl_DrawBuffer= 'DrawBuffer'
-    _gl_DrawBuffer.'setfenv'(_lua__GLOBAL)
-    set $P1, 'DrawBuffer'
-    _gl[$P1] = _gl_DrawBuffer
-
-    .const .Sub _gl_DrawElements= 'DrawElements'
-    _gl_DrawElements.'setfenv'(_lua__GLOBAL)
-    set $P1, 'DrawElements'
-    _gl[$P1] = _gl_DrawElements
-
-    .const .Sub _gl_DrawPixels= 'DrawPixels'
-    _gl_DrawPixels.'setfenv'(_lua__GLOBAL)
-    set $P1, 'DrawPixels'
-    _gl[$P1] = _gl_DrawPixels
-
-    .const .Sub _gl_EdgeFlag= 'EdgeFlag'
-    _gl_EdgeFlag.'setfenv'(_lua__GLOBAL)
-    set $P1, 'EdgeFlag'
-    _gl[$P1] = _gl_EdgeFlag
-
-    .const .Sub _gl_EdgeFlagPointer= 'EdgeFlagPointer'
-    _gl_EdgeFlagPointer.'setfenv'(_lua__GLOBAL)
-    set $P1, 'EdgeFlagPointer'
-    _gl[$P1] = _gl_EdgeFlagPointer
-
-    .const .Sub _gl_Enable= 'Enable'
-    _gl_Enable.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Enable'
-    _gl[$P1] = _gl_Enable
-
-    .const .Sub _gl_EnableClientState= 'EnableClientState'
-    _gl_EnableClientState.'setfenv'(_lua__GLOBAL)
-    set $P1, 'EnableClientState'
-    _gl[$P1] = _gl_EnableClientState
-
-    .const .Sub _gl_End= 'End'
-    _gl_End.'setfenv'(_lua__GLOBAL)
-    set $P1, 'End'
-    _gl[$P1] = _gl_End
-
-    .const .Sub _gl_EndList= 'EndList'
-    _gl_EndList.'setfenv'(_lua__GLOBAL)
-    set $P1, 'EndList'
-    _gl[$P1] = _gl_EndList
-
-    .const .Sub _gl_EvalCoord= 'EvalCoord'
-    _gl_EvalCoord.'setfenv'(_lua__GLOBAL)
-    set $P1, 'EvalCoord'
-    _gl[$P1] = _gl_EvalCoord
-
-    .const .Sub _gl_EvalMesh= 'EvalMesh'
-    _gl_EvalMesh.'setfenv'(_lua__GLOBAL)
-    set $P1, 'EvalMesh'
-    _gl[$P1] = _gl_EvalMesh
-
-    .const .Sub _gl_EvalPoint= 'EvalPoint'
-    _gl_EvalPoint.'setfenv'(_lua__GLOBAL)
-    set $P1, 'EvalPoint'
-    _gl[$P1] = _gl_EvalPoint
-
-    .const .Sub _gl_FeedbackBuffer= 'FeedbackBuffer'
-    _gl_FeedbackBuffer.'setfenv'(_lua__GLOBAL)
-    set $P1, 'FeedbackBuffer'
-    _gl[$P1] = _gl_FeedbackBuffer
-
-    .const .Sub _gl_Finish= 'Finish'
-    _gl_Finish.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Finish'
-    _gl[$P1] = _gl_Finish
-
-    .const .Sub _gl_Flush= 'Flush'
-    _gl_Flush.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Flush'
-    _gl[$P1] = _gl_Flush
-
-    .const .Sub _gl_Fog= 'Fog'
-    _gl_Fog.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Fog'
-    _gl[$P1] = _gl_Fog
-
-    .const .Sub _gl_FrontFace= 'FrontFace'
-    _gl_FrontFace.'setfenv'(_lua__GLOBAL)
-    set $P1, 'FrontFace'
-    _gl[$P1] = _gl_FrontFace
-
-    .const .Sub _gl_Frustum= 'Frustum'
-    _gl_Frustum.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Frustum'
-    _gl[$P1] = _gl_Frustum
-
-    .const .Sub _gl_GenLists= 'GenLists'
-    _gl_GenLists.'setfenv'(_lua__GLOBAL)
-    set $P1, 'GenLists'
-    _gl[$P1] = _gl_GenLists
-
-    .const .Sub _gl_GenTextures= 'GenTextures'
-    _gl_GenTextures.'setfenv'(_lua__GLOBAL)
-    set $P1, 'GenTextures'
-    _gl[$P1] = _gl_GenTextures
-
-    .const .Sub _gl_Get= 'Get'
-    _gl_Get.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Get'
-    _gl[$P1] = _gl_Get
-
-    .const .Sub _gl_GetArray= 'GetArray'
-    _gl_GetArray.'setfenv'(_lua__GLOBAL)
-    set $P1, 'GetArray'
-    _gl[$P1] = _gl_GetArray
-
-    .const .Sub _gl_GetConst= 'GetConst'
-    _gl_GetConst.'setfenv'(_lua__GLOBAL)
-    set $P1, 'GetConst'
-    _gl[$P1] = _gl_GetConst
-
-    .const .Sub _gl_GetClipPlane= 'GetClipPlane'
-    _gl_GetClipPlane.'setfenv'(_lua__GLOBAL)
-    set $P1, 'GetClipPlane'
-    _gl[$P1] = _gl_GetClipPlane
-
-    .const .Sub _gl_GetError= 'GetError'
-    _gl_GetError.'setfenv'(_lua__GLOBAL)
-    set $P1, 'GetError'
-    _gl[$P1] = _gl_GetError
-
-    .const .Sub _gl_GetLight= 'GetLight'
-    _gl_GetLight.'setfenv'(_lua__GLOBAL)
-    set $P1, 'GetLight'
-    _gl[$P1] = _gl_GetLight
-
-    .const .Sub _gl_GetMap= 'GetMap'
-    _gl_GetMap.'setfenv'(_lua__GLOBAL)
-    set $P1, 'GetMap'
-    _gl[$P1] = _gl_GetMap
-
-    .const .Sub _gl_GetMaterial= 'GetMaterial'
-    _gl_GetMaterial.'setfenv'(_lua__GLOBAL)
-    set $P1, 'GetMaterial'
-    _gl[$P1] = _gl_GetMaterial
-
-    .const .Sub _gl_GetPixelMap= 'GetPixelMap'
-    _gl_GetPixelMap.'setfenv'(_lua__GLOBAL)
-    set $P1, 'GetPixelMap'
-    _gl[$P1] = _gl_GetPixelMap
-
-    .const .Sub _gl_GetPointer= 'GetPointer'
-    _gl_GetPointer.'setfenv'(_lua__GLOBAL)
-    set $P1, 'GetPointer'
-    _gl[$P1] = _gl_GetPointer
-
-    .const .Sub _gl_GetPolygonStipple= 'GetPolygonStipple'
-    _gl_GetPolygonStipple.'setfenv'(_lua__GLOBAL)
-    set $P1, 'GetPolygonStipple'
-    _gl[$P1] = _gl_GetPolygonStipple
-
-    .const .Sub _gl_GetString= 'GetString'
-    _gl_GetString.'setfenv'(_lua__GLOBAL)
-    set $P1, 'GetString'
-    _gl[$P1] = _gl_GetString
-
-    .const .Sub _gl_GetTexEnv= 'GetTexEnv'
-    _gl_GetTexEnv.'setfenv'(_lua__GLOBAL)
-    set $P1, 'GetTexEnv'
-    _gl[$P1] = _gl_GetTexEnv
-
-    .const .Sub _gl_GetTexGen= 'GetTexGen'
-    _gl_GetTexGen.'setfenv'(_lua__GLOBAL)
-    set $P1, 'GetTexGen'
-    _gl[$P1] = _gl_GetTexGen
-
-    .const .Sub _gl_GetTexImage= 'GetTexImage'
-    _gl_GetTexImage.'setfenv'(_lua__GLOBAL)
-    set $P1, 'GetTexImage'
-    _gl[$P1] = _gl_GetTexImage
-
-    .const .Sub _gl_GetTexLevelParameter= 'GetTexLevelParameter'
-    _gl_GetTexLevelParameter.'setfenv'(_lua__GLOBAL)
-    set $P1, 'GetTexLevelParameter'
-    _gl[$P1] = _gl_GetTexLevelParameter
-
-    .const .Sub _gl_GetTexParameter= 'GetTexParameter'
-    _gl_GetTexParameter.'setfenv'(_lua__GLOBAL)
-    set $P1, 'GetTexParameter'
-    _gl[$P1] = _gl_GetTexParameter
-
-    .const .Sub _gl_Hint= 'Hint'
-    _gl_Hint.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Hint'
-    _gl[$P1] = _gl_Hint
-
-    .const .Sub _gl_Index= 'Index'
-    _gl_Index.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Index'
-    _gl[$P1] = _gl_Index
-
-    .const .Sub _gl_IndexMask= 'IndexMask'
-    _gl_IndexMask.'setfenv'(_lua__GLOBAL)
-    set $P1, 'IndexMask'
-    _gl[$P1] = _gl_IndexMask
-
-    .const .Sub _gl_IndexPointer= 'IndexPointer'
-    _gl_IndexPointer.'setfenv'(_lua__GLOBAL)
-    set $P1, 'IndexPointer'
-    _gl[$P1] = _gl_IndexPointer
-
-    .const .Sub _gl_InitNames= 'InitNames'
-    _gl_InitNames.'setfenv'(_lua__GLOBAL)
-    set $P1, 'InitNames'
-    _gl[$P1] = _gl_InitNames
-
-    .const .Sub _gl_IsEnabled= 'IsEnabled'
-    _gl_IsEnabled.'setfenv'(_lua__GLOBAL)
-    set $P1, 'IsEnabled'
-    _gl[$P1] = _gl_IsEnabled
-
-    .const .Sub _gl_IsList= 'IsList'
-    _gl_IsList.'setfenv'(_lua__GLOBAL)
-    set $P1, 'IsList'
-    _gl[$P1] = _gl_IsList
-
-    .const .Sub _gl_IsTexture= 'IsTexture'
-    _gl_IsTexture.'setfenv'(_lua__GLOBAL)
-    set $P1, 'IsTexture'
-    _gl[$P1] = _gl_IsTexture
-
-    .const .Sub _gl_Light= 'Light'
-    _gl_Light.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Light'
-    _gl[$P1] = _gl_Light
-
-    .const .Sub _gl_LightModel= 'LightModel'
-    _gl_LightModel.'setfenv'(_lua__GLOBAL)
-    set $P1, 'LightModel'
-    _gl[$P1] = _gl_LightModel
-
-    .const .Sub _gl_LineStipple= 'LineStipple'
-    _gl_LineStipple.'setfenv'(_lua__GLOBAL)
-    set $P1, 'LineStipple'
-    _gl[$P1] = _gl_LineStipple
-
-    .const .Sub _gl_LineWidth= 'LineWidth'
-    _gl_LineWidth.'setfenv'(_lua__GLOBAL)
-    set $P1, 'LineWidth'
-    _gl[$P1] = _gl_LineWidth
-
-    .const .Sub _gl_ListBase= 'ListBase'
-    _gl_ListBase.'setfenv'(_lua__GLOBAL)
-    set $P1, 'ListBase'
-    _gl[$P1] = _gl_ListBase
-
-    .const .Sub _gl_LoadIdentity= 'LoadIdentity'
-    _gl_LoadIdentity.'setfenv'(_lua__GLOBAL)
-    set $P1, 'LoadIdentity'
-    _gl[$P1] = _gl_LoadIdentity
-
-    .const .Sub _gl_LoadMatrix= 'LoadMatrix'
-    _gl_LoadMatrix.'setfenv'(_lua__GLOBAL)
-    set $P1, 'LoadMatrix'
-    _gl[$P1] = _gl_LoadMatrix
-
-    .const .Sub _gl_LoadName= 'LoadName'
-    _gl_LoadName.'setfenv'(_lua__GLOBAL)
-    set $P1, 'LoadName'
-    _gl[$P1] = _gl_LoadName
-
-    .const .Sub _gl_LogicOp= 'LogicOp'
-    _gl_LogicOp.'setfenv'(_lua__GLOBAL)
-    set $P1, 'LogicOp'
-    _gl[$P1] = _gl_LogicOp
-
-    .const .Sub _gl_Map= 'Map'
-    _gl_Map.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Map'
-    _gl[$P1] = _gl_Map
-
-    .const .Sub _gl_MapGrid= 'MapGrid'
-    _gl_MapGrid.'setfenv'(_lua__GLOBAL)
-    set $P1, 'MapGrid'
-    _gl[$P1] = _gl_MapGrid
-
-    .const .Sub _gl_Material= 'Material'
-    _gl_Material.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Material'
-    _gl[$P1] = _gl_Material
-
-    .const .Sub _gl_MatrixMode= 'MatrixMode'
-    _gl_MatrixMode.'setfenv'(_lua__GLOBAL)
-    set $P1, 'MatrixMode'
-    _gl[$P1] = _gl_MatrixMode
-
-    .const .Sub _gl_MultMatrix= 'MultMatrix'
-    _gl_MultMatrix.'setfenv'(_lua__GLOBAL)
-    set $P1, 'MultMatrix'
-    _gl[$P1] = _gl_MultMatrix
-
-    .const .Sub _gl_NewList= 'NewList'
-    _gl_NewList.'setfenv'(_lua__GLOBAL)
-    set $P1, 'NewList'
-    _gl[$P1] = _gl_NewList
-
-    .const .Sub _gl_Normal= 'Normal'
-    _gl_Normal.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Normal'
-    _gl[$P1] = _gl_Normal
-
-    .const .Sub _gl_NormalPointer= 'NormalPointer'
-    _gl_NormalPointer.'setfenv'(_lua__GLOBAL)
-    set $P1, 'NormalPointer'
-    _gl[$P1] = _gl_NormalPointer
-
-    .const .Sub _gl_Ortho= 'Ortho'
-    _gl_Ortho.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Ortho'
-    _gl[$P1] = _gl_Ortho
-
-    .const .Sub _gl_PassThrough= 'PassThrough'
-    _gl_PassThrough.'setfenv'(_lua__GLOBAL)
-    set $P1, 'PassThrough'
-    _gl[$P1] = _gl_PassThrough
-
-    .const .Sub _gl_PixelMap= 'PixelMap'
-    _gl_PixelMap.'setfenv'(_lua__GLOBAL)
-    set $P1, 'PixelMap'
-    _gl[$P1] = _gl_PixelMap
-
-    .const .Sub _gl_PixelStore= 'PixelStore'
-    _gl_PixelStore.'setfenv'(_lua__GLOBAL)
-    set $P1, 'PixelStore'
-    _gl[$P1] = _gl_PixelStore
-
-    .const .Sub _gl_PixelTransfer= 'PixelTransfer'
-    _gl_PixelTransfer.'setfenv'(_lua__GLOBAL)
-    set $P1, 'PixelTransfer'
-    _gl[$P1] = _gl_PixelTransfer
-
-    .const .Sub _gl_PixelZoom= 'PixelZoom'
-    _gl_PixelZoom.'setfenv'(_lua__GLOBAL)
-    set $P1, 'PixelZoom'
-    _gl[$P1] = _gl_PixelZoom
-
-    .const .Sub _gl_PointSize= 'PointSize'
-    _gl_PointSize.'setfenv'(_lua__GLOBAL)
-    set $P1, 'PointSize'
-    _gl[$P1] = _gl_PointSize
-
-    .const .Sub _gl_PolygonMode= 'PolygonMode'
-    _gl_PolygonMode.'setfenv'(_lua__GLOBAL)
-    set $P1, 'PolygonMode'
-    _gl[$P1] = _gl_PolygonMode
-
-    .const .Sub _gl_PolygonOffset= 'PolygonOffset'
-    _gl_PolygonOffset.'setfenv'(_lua__GLOBAL)
-    set $P1, 'PolygonOffset'
-    _gl[$P1] = _gl_PolygonOffset
-
-    .const .Sub _gl_PolygonStipple= 'PolygonStipple'
-    _gl_PolygonStipple.'setfenv'(_lua__GLOBAL)
-    set $P1, 'PolygonStipple'
-    _gl[$P1] = _gl_PolygonStipple
-
-    .const .Sub _gl_PopAttrib= 'PopAttrib'
-    _gl_PopAttrib.'setfenv'(_lua__GLOBAL)
-    set $P1, 'PopAttrib'
-    _gl[$P1] = _gl_PopAttrib
-
-    .const .Sub _gl_PopClientAttrib= 'PopClientAttrib'
-    _gl_PopClientAttrib.'setfenv'(_lua__GLOBAL)
-    set $P1, 'PopClientAttrib'
-    _gl[$P1] = _gl_PopClientAttrib
-
-    .const .Sub _gl_PopMatrix= 'PopMatrix'
-    _gl_PopMatrix.'setfenv'(_lua__GLOBAL)
-    set $P1, 'PopMatrix'
-    _gl[$P1] = _gl_PopMatrix
-
-    .const .Sub _gl_PopName= 'PopName'
-    _gl_PopName.'setfenv'(_lua__GLOBAL)
-    set $P1, 'PopName'
-    _gl[$P1] = _gl_PopName
-
-    .const .Sub _gl_PrioritizeTextures= 'PrioritizeTextures'
-    _gl_PrioritizeTextures.'setfenv'(_lua__GLOBAL)
-    set $P1, 'PrioritizeTextures'
-    _gl[$P1] = _gl_PrioritizeTextures
-
-    .const .Sub _gl_PushAttrib= 'PushAttrib'
-    _gl_PushAttrib.'setfenv'(_lua__GLOBAL)
-    set $P1, 'PushAttrib'
-    _gl[$P1] = _gl_PushAttrib
-
-    .const .Sub _gl_PushClientAttrib= 'PushClientAttrib'
-    _gl_PushClientAttrib.'setfenv'(_lua__GLOBAL)
-    set $P1, 'PushClientAttrib'
-    _gl[$P1] = _gl_PushClientAttrib
-
-    .const .Sub _gl_PushMatrix= 'PushMatrix'
-    _gl_PushMatrix.'setfenv'(_lua__GLOBAL)
-    set $P1, 'PushMatrix'
-    _gl[$P1] = _gl_PushMatrix
-
-    .const .Sub _gl_PushName= 'PushName'
-    _gl_PushName.'setfenv'(_lua__GLOBAL)
-    set $P1, 'PushName'
-    _gl[$P1] = _gl_PushName
-
-    .const .Sub _gl_RasterPos= 'RasterPos'
-    _gl_RasterPos.'setfenv'(_lua__GLOBAL)
-    set $P1, 'RasterPos'
-    _gl[$P1] = _gl_RasterPos
-
-    .const .Sub _gl_ReadBuffer= 'ReadBuffer'
-    _gl_ReadBuffer.'setfenv'(_lua__GLOBAL)
-    set $P1, 'ReadBuffer'
-    _gl[$P1] = _gl_ReadBuffer
-
-    .const .Sub _gl_ReadPixels= 'ReadPixels'
-    _gl_ReadPixels.'setfenv'(_lua__GLOBAL)
-    set $P1, 'ReadPixels'
-    _gl[$P1] = _gl_ReadPixels
-
-    .const .Sub _gl_Rect= 'Rect'
-    _gl_Rect.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Rect'
-    _gl[$P1] = _gl_Rect
-
-    .const .Sub _gl_RenderMode= 'RenderMode'
-    _gl_RenderMode.'setfenv'(_lua__GLOBAL)
-    set $P1, 'RenderMode'
-    _gl[$P1] = _gl_RenderMode
-
-    .const .Sub _gl_Rotate= 'Rotate'
-    _gl_Rotate.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Rotate'
-    _gl[$P1] = _gl_Rotate
-
-    .const .Sub _gl_Scale= 'Scale'
-    _gl_Scale.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Scale'
-    _gl[$P1] = _gl_Scale
-
-    .const .Sub _gl_Scissor= 'Scissor'
-    _gl_Scissor.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Scissor'
-    _gl[$P1] = _gl_Scissor
-
-    .const .Sub _gl_SelectBuffer= 'SelectBuffer'
-    _gl_SelectBuffer.'setfenv'(_lua__GLOBAL)
-    set $P1, 'SelectBuffer'
-    _gl[$P1] = _gl_SelectBuffer
-
-    .const .Sub _gl_ShadeModel= 'ShadeModel'
-    _gl_ShadeModel.'setfenv'(_lua__GLOBAL)
-    set $P1, 'ShadeModel'
-    _gl[$P1] = _gl_ShadeModel
-
-    .const .Sub _gl_StencilFunc= 'StencilFunc'
-    _gl_StencilFunc.'setfenv'(_lua__GLOBAL)
-    set $P1, 'StencilFunc'
-    _gl[$P1] = _gl_StencilFunc
-
-    .const .Sub _gl_StencilMask= 'StencilMask'
-    _gl_StencilMask.'setfenv'(_lua__GLOBAL)
-    set $P1, 'StencilMask'
-    _gl[$P1] = _gl_StencilMask
-
-    .const .Sub _gl_StencilOp= 'StencilOp'
-    _gl_StencilOp.'setfenv'(_lua__GLOBAL)
-    set $P1, 'StencilOp'
-    _gl[$P1] = _gl_StencilOp
-
-    .const .Sub _gl_TexCoord= 'TexCoord'
-    _gl_TexCoord.'setfenv'(_lua__GLOBAL)
-    set $P1, 'TexCoord'
-    _gl[$P1] = _gl_TexCoord
-
-    .const .Sub _gl_TexCoordPointer= 'TexCoordPointer'
-    _gl_TexCoordPointer.'setfenv'(_lua__GLOBAL)
-    set $P1, 'TexCoordPointer'
-    _gl[$P1] = _gl_TexCoordPointer
-
-    .const .Sub _gl_TexEnv= 'TexEnv'
-    _gl_TexEnv.'setfenv'(_lua__GLOBAL)
-    set $P1, 'TexEnv'
-    _gl[$P1] = _gl_TexEnv
-
-    .const .Sub _gl_TexGen= 'TexGen'
-    _gl_TexGen.'setfenv'(_lua__GLOBAL)
-    set $P1, 'TexGen'
-    _gl[$P1] = _gl_TexGen
-
-    .const .Sub _gl_TexImage= 'TexImage'
-    _gl_TexImage.'setfenv'(_lua__GLOBAL)
-    set $P1, 'TexImage'
-    _gl[$P1] = _gl_TexImage
-
-    .const .Sub _gl_TexSubImage= 'TexSubImage'
-    _gl_TexSubImage.'setfenv'(_lua__GLOBAL)
-    set $P1, 'TexSubImage'
-    _gl[$P1] = _gl_TexSubImage
-
-    .const .Sub _gl_TexParameter= 'TexParameter'
-    _gl_TexParameter.'setfenv'(_lua__GLOBAL)
-    set $P1, 'TexParameter'
-    _gl[$P1] = _gl_TexParameter
-
-    .const .Sub _gl_Translate= 'Translate'
-    _gl_Translate.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Translate'
-    _gl[$P1] = _gl_Translate
-
-    .const .Sub _gl_Vertex= 'Vertex'
-    _gl_Vertex.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Vertex'
-    _gl[$P1] = _gl_Vertex
-
-    .const .Sub _gl_VertexPointer= 'VertexPointer'
-    _gl_VertexPointer.'setfenv'(_lua__GLOBAL)
-    set $P1, 'VertexPointer'
-    _gl[$P1] = _gl_VertexPointer
-
-    .const .Sub _gl_Viewport= 'Viewport'
-    _gl_Viewport.'setfenv'(_lua__GLOBAL)
-    set $P1, 'Viewport'
-    _gl[$P1] = _gl_Viewport
+    $P2 = split ' ', 'Accum AlphaFunc AreTexturesResident ArrayElement Begin BindTexture Bitmap BlendFunc CallList CallLists Clear ClearAccum ClearColor ClearDepth ClearIndex ClearStencil ClipPlane Color ColorMask ColorMaterial ColorPointer CopyPixels CopyTexImage CopyTexSubImage CullFace DeleteLists DeleteTextures DepthFunc DepthMask DepthRange Disable DisableClientState DrawArrays DrawBuffer DrawElements DrawPixels EdgeFlag EdgeFlagPointer Enable EnableClientState End EndList EvalCoord EvalMesh EvalPoint FeedbackBuffer Finish Flush Fog FrontFace Frustum GenLists GenTextures Get GetArray GetConst GetClipPlane GetError GetLight GetMap GetMaterial GetPixelMap GetPointer GetPolygonStipple GetString GetTexEnv GetTexGen GetTexImage GetTexLevelParameter GetTexParameter Hint Index IndexMask IndexPointer InitNames IsEnabled IsList IsTexture Light LightModel LineStipple LineWidth ListBase LoadIdentity LoadMatrix LoadName LogicOp Map MapGrid Material MatrixMode MultMatrix NewList Normal NormalPointer Ortho PassThrough PixelMap PixelStore PixelTransfer PixelZoom PointSize PolygonMode PolygonOffset PolygonStipple PopAttrib PopClientAttrib PopMatrix PopName PrioritizeTextures PushAttrib PushClientAttrib PushMatrix PushName RasterPos ReadBuffer ReadPixels Rect RenderMode Rotate Scale Scissor SelectBuffer ShadeModel StencilFunc StencilMask StencilOp TexCoord TexCoordPointer TexEnv TexGen TexImage TexSubImage TexParameter Translate Vertex VertexPointer Viewport'
+    lua_register($P1, _gl, $P2)
 
     $P0 = _gl_str()
     set_hll_global ['gl'], 'gl_str', $P0
@@ -1489,7 +800,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Accum' :anon
+.sub 'Accum'
     .param pmc op :optional
     .param pmc value :optional
     .param pmc extra :slurpy
@@ -1514,7 +825,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'AlphaFunc' :anon
+.sub 'AlphaFunc'
     .param pmc func :optional
     .param pmc ref :optional
     .param pmc extra :slurpy
@@ -1539,7 +850,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'AreTexturesResident' :anon
+.sub 'AreTexturesResident'
     .param pmc texturesArray :optional
     .param pmc extra :slurpy
     $I0 = lua_istable(texturesArray)
@@ -1554,7 +865,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'ArrayElement' :anon
+.sub 'ArrayElement'
     .param pmc i :optional
     .param pmc extra :slurpy
     $I0 = lua_isnumber(i)
@@ -1570,7 +881,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Begin' :anon
+.sub 'Begin'
     .param pmc mode :optional
     .param pmc extra :slurpy
     $I0 = lua_isstring(mode)
@@ -1589,7 +900,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'BindTexture' :anon
+.sub 'BindTexture'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -1599,7 +910,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Bitmap' :anon
+.sub 'Bitmap'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -1609,7 +920,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'BlendFunc' :anon
+.sub 'BlendFunc'
     .param pmc sfactor :optional
     .param pmc dfactor :optional
     .param pmc extra :slurpy
@@ -1637,7 +948,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'CallList' :anon
+.sub 'CallList'
     .param pmc list :optional
     .param pmc extra :slurpy
     $I0 = lua_isnumber(list)
@@ -1653,7 +964,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'CallLists' :anon
+.sub 'CallLists'
     .param pmc listArray :optional
     .param pmc extra :slurpy
     $I0 = lua_istable(listArray)
@@ -1669,7 +980,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Clear' :anon
+.sub 'Clear'
     .param pmc mask :optional
     .param pmc extra :slurpy
     $I0 = lua_isstring(mask)
@@ -1688,7 +999,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'ClearAccum' :anon
+.sub 'ClearAccum'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -1698,7 +1009,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'ClearColor' :anon
+.sub 'ClearColor'
     .param pmc red :optional
     .param pmc green :optional
     .param pmc blue :optional
@@ -1728,7 +1039,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'ClearDepth' :anon
+.sub 'ClearDepth'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -1738,7 +1049,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'ClearIndex' :anon
+.sub 'ClearIndex'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -1748,7 +1059,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'ClearStencil' :anon
+.sub 'ClearStencil'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -1758,7 +1069,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'ClipPlane' :anon
+.sub 'ClipPlane'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -1769,7 +1080,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Color' :anon
+.sub 'Color'
     .param pmc vararg :slurpy
     .local int num_args
     num_args = elements vararg
@@ -1822,7 +1133,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'ColorMask' :anon
+.sub 'ColorMask'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -1832,7 +1143,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'ColorMaterial' :anon
+.sub 'ColorMaterial'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -1842,7 +1153,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'ColorPointer' :anon
+.sub 'ColorPointer'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -1852,7 +1163,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'CopyPixels' :anon
+.sub 'CopyPixels'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -1862,7 +1173,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'CopyTexImage' :anon
+.sub 'CopyTexImage'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -1872,7 +1183,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'CopyTexSubImage' :anon
+.sub 'CopyTexSubImage'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -1882,7 +1193,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'CullFace' :anon
+.sub 'CullFace'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -1892,7 +1203,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'DeleteLists' :anon
+.sub 'DeleteLists'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -1902,7 +1213,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'DeleteTextures' :anon
+.sub 'DeleteTextures'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -1912,7 +1223,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'DepthFunc' :anon
+.sub 'DepthFunc'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -1922,7 +1233,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'DepthMask' :anon
+.sub 'DepthMask'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -1932,7 +1243,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'DepthRange' :anon
+.sub 'DepthRange'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -1942,7 +1253,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Disable' :anon
+.sub 'Disable'
     .param pmc cap :optional
     .param pmc extra :slurpy
     $I0 = lua_isstring(cap)
@@ -1961,7 +1272,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'DisableClientState' :anon
+.sub 'DisableClientState'
     .param pmc array :optional
     .param pmc extra :slurpy
     $I0 = lua_isstring(array)
@@ -1980,7 +1291,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'DrawArrays' :anon
+.sub 'DrawArrays'
     .param pmc mode :optional
     .param pmc first :optional
     .param pmc count :optional
@@ -2009,7 +1320,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'DrawBuffer' :anon
+.sub 'DrawBuffer'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2019,7 +1330,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'DrawElements' :anon
+.sub 'DrawElements'
     .param pmc mode :optional
     .param pmc indicesArray :optional
     .param pmc extra :slurpy
@@ -2044,7 +1355,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'DrawPixels' :anon
+.sub 'DrawPixels'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2054,7 +1365,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'EdgeFlag' :anon
+.sub 'EdgeFlag'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2064,7 +1375,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'EdgeFlagPointer' :anon
+.sub 'EdgeFlagPointer'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2074,7 +1385,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Enable' :anon
+.sub 'Enable'
     .param pmc cap :optional
     .param pmc extra :slurpy
     $I0 = lua_isstring(cap)
@@ -2093,7 +1404,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'EnableClientState' :anon
+.sub 'EnableClientState'
     .param pmc mode :optional
     .param pmc extra :slurpy
     $I0 = lua_isstring(mode)
@@ -2112,7 +1423,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'End' :anon
+.sub 'End'
     .param pmc extra :slurpy
     glEnd()
 .end
@@ -2122,7 +1433,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'EndList' :anon
+.sub 'EndList'
     .param pmc extra :slurpy
     glEndList()
 .end
@@ -2132,7 +1443,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'EvalCoord' :anon
+.sub 'EvalCoord'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2142,7 +1453,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'EvalMesh' :anon
+.sub 'EvalMesh'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2152,7 +1463,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'EvalPoint' :anon
+.sub 'EvalPoint'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2162,7 +1473,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'FeedbackBuffer' :anon
+.sub 'FeedbackBuffer'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2172,7 +1483,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Finish' :anon
+.sub 'Finish'
     .param pmc extra :slurpy
     glFinish()
 .end
@@ -2182,7 +1493,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Flush' :anon
+.sub 'Flush'
     .param pmc extra :slurpy
     glFlush()
 .end
@@ -2192,7 +1503,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Fog' :anon
+.sub 'Fog'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2202,7 +1513,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'FrontFace' :anon
+.sub 'FrontFace'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2212,7 +1523,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Frustum' :anon
+.sub 'Frustum'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2222,7 +1533,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'GenLists' :anon
+.sub 'GenLists'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2232,7 +1543,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'GenTextures' :anon
+.sub 'GenTextures'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2242,7 +1553,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Get' :anon
+.sub 'Get'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2252,7 +1563,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'GetArray' :anon
+.sub 'GetArray'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2262,7 +1573,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'GetConst' :anon
+.sub 'GetConst'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2272,7 +1583,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'GetClipPlane' :anon
+.sub 'GetClipPlane'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2282,7 +1593,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'GetError' :anon
+.sub 'GetError'
     .param pmc extra :slurpy
     $I0 = glGetError()
     if $I0 goto L1
@@ -2301,7 +1612,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'GetLight' :anon
+.sub 'GetLight'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2311,7 +1622,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'GetMap' :anon
+.sub 'GetMap'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2321,7 +1632,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'GetMaterial' :anon
+.sub 'GetMaterial'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2331,7 +1642,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'GetPixelMap' :anon
+.sub 'GetPixelMap'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2341,7 +1652,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'GetPointer' :anon
+.sub 'GetPointer'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2351,7 +1662,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'GetPolygonStipple' :anon
+.sub 'GetPolygonStipple'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2361,7 +1672,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'GetString' :anon
+.sub 'GetString'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2371,7 +1682,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'GetTexEnv' :anon
+.sub 'GetTexEnv'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2381,7 +1692,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'GetTexGen' :anon
+.sub 'GetTexGen'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2391,7 +1702,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'GetTexImage' :anon
+.sub 'GetTexImage'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2401,7 +1712,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'GetTexLevelParameter' :anon
+.sub 'GetTexLevelParameter'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2411,7 +1722,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'GetTexParameter' :anon
+.sub 'GetTexParameter'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2421,7 +1732,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Hint' :anon
+.sub 'Hint'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2431,7 +1742,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Index' :anon
+.sub 'Index'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2441,7 +1752,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'IndexMask' :anon
+.sub 'IndexMask'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2451,7 +1762,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'IndexPointer' :anon
+.sub 'IndexPointer'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2461,7 +1772,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'InitNames' :anon
+.sub 'InitNames'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2471,7 +1782,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'IsEnabled' :anon
+.sub 'IsEnabled'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2481,7 +1792,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'IsList' :anon
+.sub 'IsList'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2491,7 +1802,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'IsTexture' :anon
+.sub 'IsTexture'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2501,7 +1812,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Light' :anon
+.sub 'Light'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2511,7 +1822,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'LightModel' :anon
+.sub 'LightModel'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2521,7 +1832,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'LineStipple' :anon
+.sub 'LineStipple'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2531,7 +1842,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'LineWidth' :anon
+.sub 'LineWidth'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2541,7 +1852,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'ListBase' :anon
+.sub 'ListBase'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2551,7 +1862,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'LoadIdentity' :anon
+.sub 'LoadIdentity'
     .param pmc extra :slurpy
     glLoadIdentity()
 .end
@@ -2561,7 +1872,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'LoadMatrix' :anon
+.sub 'LoadMatrix'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2571,7 +1882,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'LoadName' :anon
+.sub 'LoadName'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2581,7 +1892,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'LogicOp' :anon
+.sub 'LogicOp'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2591,7 +1902,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Map' :anon
+.sub 'Map'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2601,7 +1912,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'MapGrid' :anon
+.sub 'MapGrid'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2611,7 +1922,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Material' :anon
+.sub 'Material'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2621,7 +1932,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'MatrixMode' :anon
+.sub 'MatrixMode'
     .param pmc mode :optional
     .param pmc extra :slurpy
     $I0 = lua_isstring(mode)
@@ -2640,7 +1951,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'MultMatrix' :anon
+.sub 'MultMatrix'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2650,7 +1961,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'NewList' :anon
+.sub 'NewList'
     .param pmc list :optional
     .param pmc mode :optional
     .param pmc extra :slurpy
@@ -2675,7 +1986,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Normal' :anon
+.sub 'Normal'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2685,7 +1996,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'NormalPointer' :anon
+.sub 'NormalPointer'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2695,7 +2006,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Ortho' :anon
+.sub 'Ortho'
     .param pmc left :optional
     .param pmc right :optional
     .param pmc bottom :optional
@@ -2733,7 +2044,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'PassThrough' :anon
+.sub 'PassThrough'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2743,7 +2054,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'PixelMap' :anon
+.sub 'PixelMap'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2753,7 +2064,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'PixelStore' :anon
+.sub 'PixelStore'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2763,7 +2074,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'PixelTransfer' :anon
+.sub 'PixelTransfer'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2773,7 +2084,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'PixelZoom' :anon
+.sub 'PixelZoom'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2783,7 +2094,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'PointSize' :anon
+.sub 'PointSize'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2793,7 +2104,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'PolygonMode' :anon
+.sub 'PolygonMode'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2803,7 +2114,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'PolygonOffset' :anon
+.sub 'PolygonOffset'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2813,7 +2124,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'PolygonStipple' :anon
+.sub 'PolygonStipple'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2823,7 +2134,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'PopAttrib' :anon
+.sub 'PopAttrib'
     .param pmc extra :slurpy
     glPopAttrib()
 .end
@@ -2833,7 +2144,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'PopClientAttrib' :anon
+.sub 'PopClientAttrib'
     .param pmc extra :slurpy
     glPopClientAttrib()
 .end
@@ -2843,7 +2154,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'PopMatrix' :anon
+.sub 'PopMatrix'
     .param pmc extra :slurpy
     glPopMatrix()
 .end
@@ -2853,7 +2164,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'PopName' :anon
+.sub 'PopName'
     .param pmc extra :slurpy
     glPopName()
 .end
@@ -2863,7 +2174,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'PrioritizeTextures' :anon
+.sub 'PrioritizeTextures'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2873,7 +2184,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'PushAttrib' :anon
+.sub 'PushAttrib'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2883,7 +2194,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'PushClientAttrib' :anon
+.sub 'PushClientAttrib'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2893,7 +2204,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'PushMatrix' :anon
+.sub 'PushMatrix'
     .param pmc extra :slurpy
     glPushMatrix()
 .end
@@ -2903,7 +2214,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'PushName' :anon
+.sub 'PushName'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2913,7 +2224,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'RasterPos' :anon
+.sub 'RasterPos'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2923,7 +2234,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'ReadBuffer' :anon
+.sub 'ReadBuffer'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2933,7 +2244,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'ReadPixels' :anon
+.sub 'ReadPixels'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2944,7 +2255,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Rect' :anon
+.sub 'Rect'
     .param pmc vararg :slurpy
     .local int num_args
     num_args = elements vararg
@@ -2986,7 +2297,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'RenderMode' :anon
+.sub 'RenderMode'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -2996,7 +2307,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Rotate' :anon
+.sub 'Rotate'
     .param pmc angle :optional
     .param pmc x :optional
     .param pmc y :optional
@@ -3026,7 +2337,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Scale' :anon
+.sub 'Scale'
     .param pmc x :optional
     .param pmc y :optional
     .param pmc z :optional
@@ -3052,7 +2363,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Scissor' :anon
+.sub 'Scissor'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -3062,7 +2373,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'SelectBuffer' :anon
+.sub 'SelectBuffer'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -3072,7 +2383,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'ShadeModel' :anon
+.sub 'ShadeModel'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -3082,7 +2393,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'StencilFunc' :anon
+.sub 'StencilFunc'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -3092,7 +2403,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'StencilMask' :anon
+.sub 'StencilMask'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -3102,7 +2413,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'StencilOp' :anon
+.sub 'StencilOp'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -3112,7 +2423,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'TexCoord' :anon
+.sub 'TexCoord'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -3122,7 +2433,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'TexCoordPointer' :anon
+.sub 'TexCoordPointer'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -3132,7 +2443,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'TexEnv' :anon
+.sub 'TexEnv'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -3142,7 +2453,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'TexGen' :anon
+.sub 'TexGen'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -3152,7 +2463,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'TexImage' :anon
+.sub 'TexImage'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -3162,7 +2473,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'TexSubImage' :anon
+.sub 'TexSubImage'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -3172,7 +2483,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'TexParameter' :anon
+.sub 'TexParameter'
     .param pmc extra :slurpy
     not_implemented()
 .end
@@ -3182,7 +2493,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Translate' :anon
+.sub 'Translate'
     .param pmc x :optional
     .param pmc y :optional
     .param pmc z :optional
@@ -3209,7 +2520,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.sub 'Vertex' :anon
+.sub 'Vertex'
     .param pmc vararg :slurpy
     .local int num_args
     num_args = elements vararg
@@ -3263,7 +2574,7 @@ STILL INCOMPLETE
 
 =cut
 
-.sub 'VertexPointer' :anon
+.sub 'VertexPointer'
     .param pmc vertexArray :optional
     .param pmc extra :slurpy
     $I0 = lua_istable(vertexArray)
@@ -3282,7 +2593,7 @@ STILL INCOMPLETE
 
 =cut
 
-.sub 'Viewport' :anon
+.sub 'Viewport'
     .param pmc x :optional
     .param pmc y :optional
     .param pmc width :optional

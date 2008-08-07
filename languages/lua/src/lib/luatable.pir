@@ -38,53 +38,9 @@ L<http://www.lua.org/manual/5.1/manual.html#5.5>.
     set $P1, 'table'
     _lua__GLOBAL[$P1] = _table
 
-    lua_register($P1, _table)
-
-    .const .Sub _table_concat = 'concat'
-    _table_concat.'setfenv'(_lua__GLOBAL)
-    set $P1, 'concat'
-    _table[$P1] = _table_concat
-
-    .const .Sub _table_foreach = 'foreach'
-    _table_foreach.'setfenv'(_lua__GLOBAL)
-    set $P1, 'foreach'
-    _table[$P1] = _table_foreach
-
-    .const .Sub _table_foreachi = 'foreachi'
-    _table_foreachi.'setfenv'(_lua__GLOBAL)
-    set $P1, 'foreachi'
-    _table[$P1] = _table_foreachi
-
     # LUA_COMPAT_GETN
-    .const .Sub _table_getn = 'getn'
-    _table_getn.'setfenv'(_lua__GLOBAL)
-    set $P1, 'getn'
-    _table[$P1] = _table_getn
-
-    .const .Sub _table_insert = 'insert'
-    _table_insert.'setfenv'(_lua__GLOBAL)
-    set $P1, 'insert'
-    _table[$P1] = _table_insert
-
-    .const .Sub _table_maxn = 'maxn'
-    _table_maxn.'setfenv'(_lua__GLOBAL)
-    set $P1, 'maxn'
-    _table[$P1] = _table_maxn
-
-    .const .Sub _table_remove = 'remove'
-    _table_remove.'setfenv'(_lua__GLOBAL)
-    set $P1, 'remove'
-    _table[$P1] = _table_remove
-
-    .const .Sub _table_setn = 'setn'
-    _table_setn.'setfenv'(_lua__GLOBAL)
-    set $P1, 'setn'
-    _table[$P1] = _table_setn
-
-    .const .Sub _table_sort = 'sort'
-    _table_sort.'setfenv'(_lua__GLOBAL)
-    set $P1, 'sort'
-    _table[$P1] = _table_sort
+    $P2 = split ' ', 'concat foreach foreachi getn insert maxn remove setn sort'
+    lua_register($P1, _table, $P2)
 
 .end
 
@@ -99,7 +55,7 @@ Returns C<table[i]..sep..table[i+1] ... sep..table[j]>. The default value for
 
 =cut
 
-.sub 'concat' :anon
+.sub 'concat'
     .param pmc table :optional
     .param pmc sep :optional
     .param pmc i :optional
@@ -153,7 +109,7 @@ B<DEPRECATED>
 
 =cut
 
-.sub 'foreach' :anon
+.sub 'foreach'
     .param pmc table :optional
     .param pmc f :optional
     .param pmc extra :slurpy
@@ -189,7 +145,7 @@ B<DEPRECATED>
 
 =cut
 
-.sub 'foreachi' :anon
+.sub 'foreachi'
     .param pmc table :optional
     .param pmc f :optional
     .param pmc extra :slurpy
@@ -225,7 +181,7 @@ B<DEPRECATED>
 
 =cut
 
-.sub 'getn' :anon
+.sub 'getn'
     .param pmc table :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -244,7 +200,7 @@ inserts C<x> at the end of table C<t>.
 
 =cut
 
-.sub 'insert' :anon
+.sub 'insert'
     .param pmc table :optional
     .param pmc arg2 :optional
     .param pmc arg3 :optional
@@ -289,7 +245,7 @@ does a linear traversal of the whole table.)
 
 =cut
 
-.sub 'maxn' :anon
+.sub 'maxn'
     .param pmc table :optional
     .param pmc extra :slurpy
     .local pmc idx
@@ -322,7 +278,7 @@ table C<t>.
 
 =cut
 
-.sub 'remove' :anon
+.sub 'remove'
     .param pmc table :optional
     .param pmc pos :optional
     .param pmc extra :slurpy
@@ -366,7 +322,7 @@ B<OBSOLETE>
 
 =cut
 
-.sub 'setn' :anon
+.sub 'setn'
     .param pmc table :optional
     .param pmc n :optional
     .param pmc extra :slurpy
@@ -389,7 +345,7 @@ the given order may have their relative positions changed by the sort.
 
 =cut
 
-.sub 'sort' :anon
+.sub 'sort'
     .param pmc table :optional
     .param pmc comp :optional
     .param pmc extra :slurpy

@@ -43,77 +43,8 @@ L<http://www.lua.org/manual/5.1/manual.html#5.9>.
     set $P1, 'debug'
     _lua__GLOBAL[$P1] = _debug
 
-    lua_register($P1, _debug)
-
-    .const .Sub _debug_debug = 'debug'
-    _debug_debug.'setfenv'(_lua__GLOBAL)
-    set $P1, 'debug'
-    _debug[$P1] = _debug_debug
-
-    .const .Sub _debug_getfenv = 'getfenv'
-    _debug_getfenv.'setfenv'(_lua__GLOBAL)
-    set $P1, 'getfenv'
-    _debug[$P1] = _debug_getfenv
-
-    .const .Sub _debug_gethook = 'gethook'
-    _debug_gethook.'setfenv'(_lua__GLOBAL)
-    set $P1, 'gethook'
-    _debug[$P1] = _debug_gethook
-
-    .const .Sub _debug_getinfo = 'getinfo'
-    _debug_getinfo.'setfenv'(_lua__GLOBAL)
-    set $P1, 'getinfo'
-    _debug[$P1] = _debug_getinfo
-
-    .const .Sub _debug_getlocal = 'getlocal'
-    _debug_getlocal.'setfenv'(_lua__GLOBAL)
-    set $P1, 'getlocal'
-    _debug[$P1] = _debug_getlocal
-
-    .const .Sub _debug_getmetatable = 'getmetatable'
-    _debug_getmetatable.'setfenv'(_lua__GLOBAL)
-    set $P1, 'getmetatable'
-    _debug[$P1] = _debug_getmetatable
-
-    .const .Sub _debug_getregistry = 'getregistry'
-    _debug_getregistry.'setfenv'(_lua__GLOBAL)
-    set $P1, 'getregistry'
-    _debug[$P1] = _debug_getregistry
-
-    .const .Sub _debug_getupvalue = 'getupvalue'
-    _debug_getupvalue.'setfenv'(_lua__GLOBAL)
-    set $P1, 'getupvalue'
-    _debug[$P1] = _debug_getupvalue
-
-    .const .Sub _debug_setfenv = 'setfenv'
-    _debug_setfenv.'setfenv'(_lua__GLOBAL)
-    set $P1, 'setfenv'
-    _debug[$P1] = _debug_setfenv
-
-    .const .Sub _debug_sethook = 'sethook'
-    _debug_sethook.'setfenv'(_lua__GLOBAL)
-    set $P1, 'sethook'
-    _debug[$P1] = _debug_sethook
-
-    .const .Sub _debug_setlocal = 'setlocal'
-    _debug_setlocal.'setfenv'(_lua__GLOBAL)
-    set $P1, 'setlocal'
-    _debug[$P1] = _debug_setlocal
-
-    .const .Sub _debug_setmetatable = 'setmetatable'
-    _debug_setmetatable.'setfenv'(_lua__GLOBAL)
-    set $P1, 'setmetatable'
-    _debug[$P1] = _debug_setmetatable
-
-    .const .Sub _debug_setupvalue = 'setupvalue'
-    _debug_setupvalue.'setfenv'(_lua__GLOBAL)
-    set $P1, 'setupvalue'
-    _debug[$P1] = _debug_setupvalue
-
-    .const .Sub _debug_traceback = 'traceback'
-    _debug_traceback.'setfenv'(_lua__GLOBAL)
-    set $P1, 'traceback'
-    _debug[$P1] = _debug_traceback
+    $P2 = split ' ', 'debug getfenv gethook getinfo getlocal getmetatable getregistry getupvalue setfenv sethook setlocal setmetatable setupvalue traceback'
+    lua_register($P1, _debug, $P2)
 
 .end
 
@@ -130,7 +61,7 @@ function, and so have no direct access to local variables.
 
 =cut
 
-.sub 'debug' :anon
+.sub 'debug'
     .param pmc extra :slurpy
     .local string buffer
     .local pmc stdin
@@ -167,7 +98,7 @@ Returns the environment of object C<o>.
 
 =cut
 
-.sub 'getfenv' :anon
+.sub 'getfenv'
     .param pmc o :optional
     .param pmc extra :slurpy
     .return lua_getfenv(o)
@@ -184,7 +115,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub 'gethook' :anon
+.sub 'gethook'
     not_implemented()
 .end
 
@@ -212,7 +143,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub 'getinfo' :anon
+.sub 'getinfo'
     not_implemented()
 .end
 
@@ -233,7 +164,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub 'getlocal' :anon
+.sub 'getlocal'
     not_implemented()
 .end
 
@@ -245,7 +176,7 @@ metatable.
 
 =cut
 
-.sub 'getmetatable' :anon
+.sub 'getmetatable'
     .param pmc obj :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -261,7 +192,7 @@ Returns the registry table.
 
 =cut
 
-.sub 'getregistry' :anon
+.sub 'getregistry'
     .param pmc extra :slurpy
     .local pmc res
     res = get_hll_global '_REGISTRY'
@@ -279,7 +210,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub 'getupvalue' :anon
+.sub 'getupvalue'
     not_implemented()
 .end
 
@@ -290,7 +221,7 @@ Sets the environment of the given C<object> to the given C<table>.
 
 =cut
 
-.sub 'setfenv' :anon
+.sub 'setfenv'
     .param pmc o :optional
     .param pmc table :optional
     .param pmc extra :slurpy
@@ -342,7 +273,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub 'sethook' :anon
+.sub 'sethook'
     not_implemented()
 .end
 
@@ -360,7 +291,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub 'setlocal' :anon
+.sub 'setlocal'
     not_implemented()
 .end
 
@@ -372,7 +303,7 @@ be B<nil>).
 
 =cut
 
-.sub 'setmetatable' :anon
+.sub 'setmetatable'
     .param pmc table :optional
     .param pmc metatable :optional
     .param pmc extra :slurpy
@@ -403,7 +334,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub 'setupvalue' :anon
+.sub 'setupvalue'
     not_implemented()
 .end
 
@@ -418,7 +349,7 @@ STILL INCOMPLETE (see traceback in lua.pmc).
 
 =cut
 
-.sub 'traceback' :anon
+.sub 'traceback'
     .param pmc message :optional
     .param pmc level :optional
     .param pmc extra :slurpy

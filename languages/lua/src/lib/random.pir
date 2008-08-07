@@ -47,44 +47,14 @@ see F<runtime/parrot/library/Math/Random/mt19937ar.pir>.
 
     set $P1, MYNAME
     _lua__GLOBAL[$P1] = _random
-    lua_register($P1, _random)
 
-    .const .Sub _random_clone = 'clone'
-    _random_clone.'setfenv'(_lua__GLOBAL)
-    set $P1, 'clone'
-    _random[$P1] = _random_clone
+    $P2 = split ' ', 'clone new seed tostring value valuei valuex'
+    lua_register($P1, _random, $P2)
 
-    .const .Sub _random_new = 'new'
-    _random_new.'setfenv'(_lua__GLOBAL)
-    set $P1, 'new'
-    _random[$P1] = _random_new
-
-    .const .Sub _random_seed = 'seed'
-    _random_seed.'setfenv'(_lua__GLOBAL)
-    set $P1, 'seed'
-    _random[$P1] = _random_seed
-
-    .const .Sub _random_tostring = 'tostring'
-    _random_tostring.'setfenv'(_lua__GLOBAL)
     set $P1, 'tostring'
-    _random[$P1] = _random_tostring
+    $P0 = _random[$P1]
     set $P1, '__tostring'
-    _random[$P1] = _random_tostring
-
-    .const .Sub _random_value = 'value'
-    _random_value.'setfenv'(_lua__GLOBAL)
-    set $P1, 'value'
-    _random[$P1] = _random_value
-
-    .const .Sub _random_valuei = 'valuei'
-    _random_valuei.'setfenv'(_lua__GLOBAL)
-    set $P1, 'valuei'
-    _random[$P1] = _random_valuei
-
-    .const .Sub _random_valuex = 'valuex'
-    _random_valuex.'setfenv'(_lua__GLOBAL)
-    set $P1, 'valuex'
-    _random[$P1] = _random_valuex
+    _random[$P1] = $P0
 
     new $P2, 'LuaString'
 
@@ -110,7 +80,7 @@ see F<runtime/parrot/library/Math/Random/mt19937ar.pir>.
 
 =cut
 
-.sub 'clone' :anon
+.sub 'clone'
     .param pmc c :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -127,7 +97,7 @@ see F<runtime/parrot/library/Math/Random/mt19937ar.pir>.
 
 =cut
 
-.sub 'new' :anon
+.sub 'new'
     .param pmc seed :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -145,7 +115,7 @@ see F<runtime/parrot/library/Math/Random/mt19937ar.pir>.
 
 =cut
 
-.sub 'seed' :anon
+.sub 'seed'
     .param pmc c :optional
     .param pmc seed :optional
     .param pmc extra :slurpy
@@ -159,7 +129,7 @@ see F<runtime/parrot/library/Math/Random/mt19937ar.pir>.
 
 =cut
 
-.sub 'tostring' :anon
+.sub 'tostring'
     .param pmc c :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -180,7 +150,7 @@ see F<runtime/parrot/library/Math/Random/mt19937ar.pir>.
 
 =cut
 
-.sub 'value' :anon
+.sub 'value'
     .param pmc c :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -196,7 +166,7 @@ see F<runtime/parrot/library/Math/Random/mt19937ar.pir>.
 
 =cut
 
-.sub 'valuei' :anon
+.sub 'valuei'
     .param pmc c :optional
     .param pmc a :optional
     .param pmc b :optional
@@ -227,7 +197,7 @@ see F<runtime/parrot/library/Math/Random/mt19937ar.pir>.
 
 =cut
 
-.sub 'valuex' :anon
+.sub 'valuex'
     .param pmc c :optional
     .param pmc extra :slurpy
     .local pmc res

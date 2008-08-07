@@ -50,99 +50,39 @@ Use PMC BigFloat when available.
 
     set $P1, MYNAME
     _lua__GLOBAL[$P1] = _bc
-    lua_register($P1, _bc)
 
-    .const .Sub _bc___eq = '__eq'
-    _bc___eq.'setfenv'(_lua__GLOBAL)
-    set $P1, '__eq'
-    _bc[$P1] = _bc___eq
+    $P2 = split ' ', 'digits tostring iszero isneg number compare __eq __lt add sub mul pow div mod sqrt __unm'
+    lua_register($P1, _bc, $P2)
 
-    .const .Sub _bc___lt = '__lt'
-    _bc___lt.'setfenv'(_lua__GLOBAL)
-    set $P1, '__lt'
-    _bc[$P1] = _bc___lt
-
-    .const .Sub _bc___unm = '__unm'
-    _bc___unm.'setfenv'(_lua__GLOBAL)
-    set $P1, '__unm'
-    _bc[$P1] = _bc___unm
-
-    .const .Sub _bc_add = 'add'
-    _bc_add.'setfenv'(_lua__GLOBAL)
     set $P1, 'add'
-    _bc[$P1] = _bc_add
+    $P0 = _bc[$P1]
     set $P1, '__add'
-    _bc[$P1] = _bc_add
+    _bc[$P1] = $P0
 
-    .const .Sub _bc_compare = 'compare'
-    _bc_compare.'setfenv'(_lua__GLOBAL)
-    set $P1, 'compare'
-    _bc[$P1] = _bc_compare
-
-    .const .Sub _bc_digits = 'digits'
-    _bc_digits.'setfenv'(_lua__GLOBAL)
-    set $P1, 'digits'
-    _bc[$P1] = _bc_digits
-
-    .const .Sub _bc_div = 'div'
-    _bc_div.'setfenv'(_lua__GLOBAL)
     set $P1, 'div'
-    _bc[$P1] = _bc_div
+    $P0 = _bc[$P1]
     set $P1, '__div'
-    _bc[$P1] = _bc_div
+    _bc[$P1] = $P0
 
-    .const .Sub _bc_isneg = 'isneg'
-    _bc_isneg.'setfenv'(_lua__GLOBAL)
-    set $P1, 'isneg'
-    _bc[$P1] = _bc_isneg
-
-    .const .Sub _bc_iszero = 'iszero'
-    _bc_iszero.'setfenv'(_lua__GLOBAL)
-    set $P1, 'iszero'
-    _bc[$P1] = _bc_iszero
-
-    .const .Sub _bc_mod = 'mod'
-    _bc_mod.'setfenv'(_lua__GLOBAL)
-    set $P1, 'mod'
-    _bc[$P1] = _bc_mod
-
-    .const .Sub _bc_mul = 'mul'
-    _bc_mul.'setfenv'(_lua__GLOBAL)
     set $P1, 'mul'
-    _bc[$P1] = _bc_mul
+    $P0 = _bc[$P1]
     set $P1, '__mul'
-    _bc[$P1] = _bc_mul
+    _bc[$P1] = $P0
 
-    .const .Sub _bc_number = 'number'
-    _bc_number.'setfenv'(_lua__GLOBAL)
-    set $P1, 'number'
-    _bc[$P1] = _bc_number
-
-    .const .Sub _bc_pow = 'pow'
-    _bc_pow.'setfenv'(_lua__GLOBAL)
     set $P1, 'pow'
-    _bc[$P1] = _bc_pow
+    $P0 = _bc[$P1]
     set $P1, '__pow'
-    _bc[$P1] = _bc_pow
+    _bc[$P1] = $P0
 
-    .const .Sub _bc_sqrt = 'sqrt'
-    _bc_sqrt.'setfenv'(_lua__GLOBAL)
-    set $P1, 'sqrt'
-    _bc[$P1] = _bc_sqrt
-
-    .const .Sub _bc_sub = 'sub'
-    _bc_sub.'setfenv'(_lua__GLOBAL)
     set $P1, 'sub'
-    _bc[$P1] = _bc_sub
+    $P0 = _bc[$P1]
     set $P1, '__sub'
-    _bc[$P1] = _bc_sub
+    _bc[$P1] = $P0
 
-    .const .Sub _bc_tostring = 'tostring'
-    _bc_tostring.'setfenv'(_lua__GLOBAL)
     set $P1, 'tostring'
-    _bc[$P1] = _bc_tostring
+    $P0 = _bc[$P1]
     set $P1, '__tostring'
-    _bc[$P1] = _bc_tostring
+    _bc[$P1] = $P0
 
     new $P2, 'LuaString'
 
@@ -231,7 +171,7 @@ Use PMC BigFloat when available.
 
 =cut
 
-.sub 'digits' :anon
+.sub 'digits'
     .param pmc n :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -249,7 +189,7 @@ Use PMC BigFloat when available.
 
 =cut
 
-.sub 'tostring' :anon
+.sub 'tostring'
     .param pmc x :optional
     .param pmc extra :slurpy
     $P1 = get(1, x)
@@ -265,7 +205,7 @@ Use PMC BigFloat when available.
 
 =cut
 
-.sub 'iszero' :anon
+.sub 'iszero'
     .param pmc x :optional
     .param pmc extra :slurpy
     $P1 = get(1, x)
@@ -281,7 +221,7 @@ Use PMC BigFloat when available.
 
 =cut
 
-.sub 'isneg' :anon
+.sub 'isneg'
     .param pmc x :optional
     .param pmc extra :slurpy
     $P1 = get(1, x)
@@ -300,7 +240,7 @@ Use PMC BigFloat when available.
 
 =cut
 
-.sub 'number' :anon
+.sub 'number'
     .param pmc x :optional
     .param pmc extra :slurpy
     .local pmc res, mt
@@ -315,7 +255,7 @@ Use PMC BigFloat when available.
 
 =cut
 
-.sub 'compare' :anon
+.sub 'compare'
     .param pmc x :optional
     .param pmc y :optional
     .param pmc extra :slurpy
@@ -333,7 +273,7 @@ Use PMC BigFloat when available.
 
 =cut
 
-.sub '__eq' :anon
+.sub '__eq'
     .param pmc x :optional
     .param pmc y :optional
     .param pmc extra :slurpy
@@ -345,7 +285,7 @@ Use PMC BigFloat when available.
 
 =cut
 
-.sub '__lt' :anon
+.sub '__lt'
     .param pmc x :optional
     .param pmc y :optional
     .param pmc extra :slurpy
@@ -357,7 +297,7 @@ Use PMC BigFloat when available.
 
 =cut
 
-.sub 'add' :anon
+.sub 'add'
     .param pmc x :optional
     .param pmc y :optional
     .param pmc extra :slurpy
@@ -369,7 +309,7 @@ Use PMC BigFloat when available.
 
 =cut
 
-.sub 'sub' :anon
+.sub 'sub'
     .param pmc x :optional
     .param pmc y :optional
     .param pmc extra :slurpy
@@ -381,7 +321,7 @@ Use PMC BigFloat when available.
 
 =cut
 
-.sub 'mul' :anon
+.sub 'mul'
     .param pmc x :optional
     .param pmc y :optional
     .param pmc extra :slurpy
@@ -393,7 +333,7 @@ Use PMC BigFloat when available.
 
 =cut
 
-.sub 'pow' :anon
+.sub 'pow'
     .param pmc x :optional
     .param pmc y :optional
     .param pmc extra :slurpy
@@ -405,7 +345,7 @@ Use PMC BigFloat when available.
 
 =cut
 
-.sub 'div' :anon
+.sub 'div'
     .param pmc x :optional
     .param pmc y :optional
     .param pmc extra :slurpy
@@ -417,7 +357,7 @@ Use PMC BigFloat when available.
 
 =cut
 
-.sub 'mod' :anon
+.sub 'mod'
     .param pmc x :optional
     .param pmc y :optional
     .param pmc extra :slurpy
@@ -429,7 +369,7 @@ Use PMC BigFloat when available.
 
 =cut
 
-.sub 'sqrt' :anon
+.sub 'sqrt'
     .param pmc x :optional
     .param pmc extra :slurpy
     .local pmc res, mt
@@ -451,7 +391,7 @@ Use PMC BigFloat when available.
 
 =cut
 
-.sub '__unm' :anon
+.sub '__unm'
     .param pmc x :optional
     .param pmc extra :slurpy
     .local pmc res, mt

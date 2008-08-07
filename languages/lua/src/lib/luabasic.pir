@@ -49,7 +49,8 @@ environments.)
     set $P1, '_G'
     _lua__GLOBAL[$P1] = _lua__GLOBAL
 
-    lua_register($P1, _lua__GLOBAL)
+    $P2 = split ' ', 'assert collectgarbage dofile error getfenv getmetatable ipairs load loadfile loadstring next pairs pcall print rawequal rawget rawset select setfenv setmetatable tonumber tostring type unpack xpcall'
+    lua_register($P1, _lua__GLOBAL, $P2)
 
 =item C<_VERSION>
 
@@ -63,141 +64,14 @@ interpreter version. The current contents of this variable is C<"Lua 5.1">.
     set $P1, '_VERSION'
     _lua__GLOBAL[$P1] = $P0
 
+.end
+
+
 =back
 
 =head2 Functions
 
 =over 4
-
-=cut
-
-    .const .Sub _lua_assert = 'assert'
-    _lua_assert.'setfenv'(_lua__GLOBAL)
-    set $P1, 'assert'
-    _lua__GLOBAL[$P1] = _lua_assert
-
-    .const .Sub _lua_collectgarbage = 'collectgarbage'
-    _lua_collectgarbage.'setfenv'(_lua__GLOBAL)
-    set $P1, 'collectgarbage'
-    _lua__GLOBAL[$P1] = _lua_collectgarbage
-
-    .const .Sub _lua_dofile = 'dofile'
-    _lua_dofile.'setfenv'(_lua__GLOBAL)
-    set $P1, 'dofile'
-    _lua__GLOBAL[$P1] = _lua_dofile
-
-    .const .Sub _lua_error = 'error'
-    _lua_error.'setfenv'(_lua__GLOBAL)
-    set $P1, 'error'
-    _lua__GLOBAL[$P1] = _lua_error
-
-    .const .Sub _lua_getfenv = 'getfenv'
-    _lua_getfenv.'setfenv'(_lua__GLOBAL)
-    set $P1, 'getfenv'
-    _lua__GLOBAL[$P1] = _lua_getfenv
-
-    .const .Sub _lua_getmetatable = 'getmetatable'
-    _lua_getmetatable.'setfenv'(_lua__GLOBAL)
-    set $P1, 'getmetatable'
-    _lua__GLOBAL[$P1] = _lua_getmetatable
-
-    .const .Sub _lua_ipairs = 'ipairs'
-    _lua_ipairs.'setfenv'(_lua__GLOBAL)
-    set $P1, 'ipairs'
-    _lua__GLOBAL[$P1] = _lua_ipairs
-
-    .const .Sub _lua_load = 'load'
-    _lua_load.'setfenv'(_lua__GLOBAL)
-    set $P1, 'load'
-    _lua__GLOBAL[$P1] = _lua_load
-
-    .const .Sub _lua_loadfile = 'loadfile'
-    _lua_loadfile.'setfenv'(_lua__GLOBAL)
-    set $P1, 'loadfile'
-    _lua__GLOBAL[$P1] = _lua_loadfile
-
-    .const .Sub _lua_loadstring = 'loadstring'
-    _lua_loadstring.'setfenv'(_lua__GLOBAL)
-    set $P1, 'loadstring'
-    _lua__GLOBAL[$P1] = _lua_loadstring
-
-    .const .Sub _lua_next = 'next'
-    _lua_next.'setfenv'(_lua__GLOBAL)
-    set $P1, 'next'
-    _lua__GLOBAL[$P1] = _lua_next
-
-    .const .Sub _lua_pairs = 'pairs'
-    _lua_pairs.'setfenv'(_lua__GLOBAL)
-    set $P1, 'pairs'
-    _lua__GLOBAL[$P1] = _lua_pairs
-
-    .const .Sub _lua_pcall = 'pcall'
-    _lua_pcall.'setfenv'(_lua__GLOBAL)
-    set $P1, 'pcall'
-    _lua__GLOBAL[$P1] = _lua_pcall
-
-    .const .Sub _lua_print = 'print'
-    _lua_print.'setfenv'(_lua__GLOBAL)
-    set $P1, 'print'
-    _lua__GLOBAL[$P1] = _lua_print
-
-    .const .Sub _lua_rawequal = 'rawequal'
-    _lua_rawequal.'setfenv'(_lua__GLOBAL)
-    set $P1, 'rawequal'
-    _lua__GLOBAL[$P1] = _lua_rawequal
-
-    .const .Sub _lua_rawget = 'rawget'
-    _lua_rawget.'setfenv'(_lua__GLOBAL)
-    set $P1, 'rawget'
-    _lua__GLOBAL[$P1] = _lua_rawget
-
-    .const .Sub _lua_rawset = 'rawset'
-    _lua_rawset.'setfenv'(_lua__GLOBAL)
-    set $P1, 'rawset'
-    _lua__GLOBAL[$P1] = _lua_rawset
-
-    .const .Sub _lua_select = 'select'
-    _lua_select.'setfenv'(_lua__GLOBAL)
-    set $P1, 'select'
-    _lua__GLOBAL[$P1] = _lua_select
-
-    .const .Sub _lua_setfenv = 'setfenv'
-    _lua_setfenv.'setfenv'(_lua__GLOBAL)
-    set $P1, 'setfenv'
-    _lua__GLOBAL[$P1] = _lua_setfenv
-
-    .const .Sub _lua_setmetatable = 'setmetatable'
-    _lua_setmetatable.'setfenv'(_lua__GLOBAL)
-    set $P1, 'setmetatable'
-    _lua__GLOBAL[$P1] = _lua_setmetatable
-
-    .const .Sub _lua_tonumber = 'tonumber'
-    _lua_tonumber.'setfenv'(_lua__GLOBAL)
-    set $P1, 'tonumber'
-    _lua__GLOBAL[$P1] = _lua_tonumber
-
-    .const .Sub _lua_tostring = 'tostring'
-    _lua_tostring.'setfenv'(_lua__GLOBAL)
-    set $P1, 'tostring'
-    _lua__GLOBAL[$P1] = _lua_tostring
-
-    .const .Sub _lua_type = 'type'
-    _lua_type.'setfenv'(_lua__GLOBAL)
-    set $P1, 'type'
-    _lua__GLOBAL[$P1] = _lua_type
-
-    .const .Sub _lua_unpack = 'unpack'
-    _lua_unpack.'setfenv'(_lua__GLOBAL)
-    set $P1, 'unpack'
-    _lua__GLOBAL[$P1] = _lua_unpack
-
-    .const .Sub _lua_xpcall = 'xpcall'
-    _lua_xpcall.'setfenv'(_lua__GLOBAL)
-    set $P1, 'xpcall'
-    _lua__GLOBAL[$P1] = _lua_xpcall
-
-.end
-
 
 =item C<assert (v [, message])>
 
@@ -207,7 +81,7 @@ message; when absent, it defaults to "assertion failed!"
 
 =cut
 
-.sub 'assert' :anon
+.sub 'assert'
     .param pmc v :optional
     .param pmc message :optional
     .param pmc extra :slurpy
@@ -265,7 +139,7 @@ STILL INCOMPLETE (see lua_gc).
 
 =cut
 
-.sub 'collectgarbage' :anon
+.sub 'collectgarbage'
     .param pmc opt :optional
     .param pmc arg :optional
     .param pmc extra :slurpy
@@ -297,7 +171,7 @@ protected mode).
 
 =cut
 
-.sub 'dofile' :anon
+.sub 'dofile'
     .param pmc filename :optional
     .param pmc extra :slurpy
     $S1 = lua_optstring(1, filename, '')
@@ -325,7 +199,7 @@ STILL INCOMPLETE.
 
 =cut
 
-.sub 'error' :anon
+.sub 'error'
     .param pmc message :optional
     .param pmc level :optional
     .param pmc extra :slurpy
@@ -347,7 +221,7 @@ default for C<f> is 1.
 
 =cut
 
-.sub 'getfenv' :anon
+.sub 'getfenv'
     .param pmc f :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -402,7 +276,7 @@ Otherwise, returns the metatable of the given object.
 
 =cut
 
-.sub 'getmetatable' :anon
+.sub 'getmetatable'
     .param pmc obj :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -435,7 +309,7 @@ See C<next> for the caveats of modifying the table during its traversal.
 
 =cut
 
-.sub 'ipairs' :anon
+.sub 'ipairs'
     .param pmc t :optional
     .param pmc i :optional
     .param pmc extra :slurpy
@@ -480,7 +354,7 @@ NOT YET IMPLEMENTED.
 
 =cut
 
-.sub 'load' :anon
+.sub 'load'
     .param pmc func :optional
     .param pmc chunkname :optional
     .param pmc extra :slurpy
@@ -511,7 +385,7 @@ standard input, if no file name is given.
 
 =cut
 
-.sub 'loadfile' :anon
+.sub 'loadfile'
     .param pmc filename :optional
     .param pmc extra :slurpy
     $S1 = lua_optstring(1, filename, '')
@@ -530,7 +404,7 @@ To load and run a given string, use the idiom
 
 =cut
 
-.sub 'loadstring' :anon
+.sub 'loadstring'
     .param pmc s :optional
     .param pmc chunkname :optional
     .param pmc extra :slurpy
@@ -564,7 +438,7 @@ existing fields. In particular, you may clear existing fields.
 
 =cut
 
-.sub 'next' :anon
+.sub 'next'
     .param pmc table :optional
     .param pmc idx :optional
     .param pmc extra :slurpy
@@ -590,7 +464,7 @@ See C<next> for the caveats of modifying the table during its traversal.
 
 =cut
 
-.sub 'pairs' :anon
+.sub 'pairs'
     .param pmc t :optional
     .param pmc extra :slurpy
     lua_checktype(1, t, 'table')
@@ -616,7 +490,7 @@ In case of any error, C<pcall> returns B<false> plus the error message.
 
 =cut
 
-.sub 'pcall' :anon
+.sub 'pcall'
     .param pmc f :optional
     .param pmc argv :slurpy
     .local pmc res
@@ -648,7 +522,7 @@ debugging. For formatted output, use C<string.format>.
 
 =cut
 
-.sub 'print' :anon
+.sub 'print'
     .param pmc argv :slurpy
     .local int argc
     .local int i
@@ -676,7 +550,7 @@ Returns a boolean.
 
 =cut
 
-.sub 'rawequal' :anon
+.sub 'rawequal'
     .param pmc v1 :optional
     .param pmc v2 :optional
     .param pmc extra :slurpy
@@ -695,7 +569,7 @@ C<table> must be a table; C<index> is any value different from B<nil>.
 
 =cut
 
-.sub 'rawget' :anon
+.sub 'rawget'
     .param pmc table :optional
     .param pmc idx :optional
     .param pmc extra :slurpy
@@ -717,7 +591,7 @@ This function returns C<table>.
 
 =cut
 
-.sub 'rawset' :anon
+.sub 'rawset'
     .param pmc table :optional
     .param pmc idx :optional
     .param pmc value :optional
@@ -738,7 +612,7 @@ total number of extra arguments it received.
 
 =cut
 
-.sub 'select' :anon
+.sub 'select'
     .param pmc idx :optional
     .param pmc argv :slurpy
     .local pmc res
@@ -797,7 +671,7 @@ STILL INCOMPLETE.
 
 =cut
 
-.sub 'setfenv' :anon
+.sub 'setfenv'
     .param pmc f :optional
     .param pmc table :optional
     .param pmc extra :slurpy
@@ -830,7 +704,7 @@ This function returns C<table>.
 
 =cut
 
-.sub 'setmetatable' :anon
+.sub 'setmetatable'
     .param pmc table :optional
     .param pmc metatable :optional
     .param pmc extra :slurpy
@@ -872,7 +746,7 @@ unsigned integers are accepted.
 
 =cut
 
-.sub 'tonumber' :anon
+.sub 'tonumber'
     .param pmc e :optional
     .param pmc base :optional
     .param pmc extra :slurpy
@@ -906,7 +780,7 @@ as its result.
 
 =cut
 
-.sub 'tostring' :anon
+.sub 'tostring'
     .param pmc e :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -925,7 +799,7 @@ C<"userdata">.
 
 =cut
 
-.sub 'type' :anon
+.sub 'type'
     .param pmc v :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -949,7 +823,7 @@ length operator.
 
 =cut
 
-.sub 'unpack' :anon
+.sub 'unpack'
     .param pmc list :optional
     .param pmc i :optional
     .param pmc j :optional
@@ -997,7 +871,7 @@ error, C<xpcall> returns false plus the result from C<err>.
 
 =cut
 
-.sub 'xpcall' :anon
+.sub 'xpcall'
     .param pmc f :optional
     .param pmc err_ :optional
     .param pmc extra :slurpy

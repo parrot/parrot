@@ -48,39 +48,14 @@ see F<src/dynpmc/mdx.pmc>.
 
     set $P1, MYNAME
     _lua__GLOBAL[$P1] = _md5
-    lua_register($P1, _md5)
 
-    .const .Sub _md5_clone = 'clone'
-    _md5_clone.'setfenv'(_lua__GLOBAL)
-    set $P1, 'clone'
-    _md5[$P1] = _md5_clone
+    $P2 = split ' ', 'clone digest new reset tostring update'
+    lua_register($P1, _md5, $P2)
 
-    .const .Sub _md5_digest = 'digest'
-    _md5_digest.'setfenv'(_lua__GLOBAL)
-    set $P1, 'digest'
-    _md5[$P1] = _md5_digest
-
-    .const .Sub _md5_new = 'new'
-    _md5_new.'setfenv'(_lua__GLOBAL)
-    set $P1, 'new'
-    _md5[$P1] = _md5_new
-
-    .const .Sub _md5_reset = 'reset'
-    _md5_reset.'setfenv'(_lua__GLOBAL)
-    set $P1, 'reset'
-    _md5[$P1] = _md5_reset
-
-    .const .Sub _md5_tostring = 'tostring'
-    _md5_tostring.'setfenv'(_lua__GLOBAL)
     set $P1, 'tostring'
-    _md5[$P1] = _md5_tostring
+    $P0 = _md5[$P1]
     set $P1, '__tostring'
-    _md5[$P1] = _md5_tostring
-
-    .const .Sub _md5_update = 'update'
-    _md5_update.'setfenv'(_lua__GLOBAL)
-    set $P1, 'update'
-    _md5[$P1] = _md5_update
+    _md5[$P1] = $P0
 
     new $P2, 'LuaString'
 
@@ -105,7 +80,7 @@ see F<src/dynpmc/mdx.pmc>.
 
 =cut
 
-.sub 'clone' :anon
+.sub 'clone'
     .param pmc c :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -122,7 +97,7 @@ see F<src/dynpmc/mdx.pmc>.
 
 =cut
 
-.sub 'digest' :anon
+.sub 'digest'
     .param pmc c :optional
     .param pmc raw :optional
     .param pmc extra :slurpy
@@ -167,7 +142,7 @@ see F<src/dynpmc/mdx.pmc>.
 
 =cut
 
-.sub 'new' :anon
+.sub 'new'
     .param pmc extra :slurpy
     .local pmc res
     new $P0, MYPMC
@@ -183,7 +158,7 @@ see F<src/dynpmc/mdx.pmc>.
 
 =cut
 
-.sub 'reset' :anon
+.sub 'reset'
     .param pmc c :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -197,7 +172,7 @@ see F<src/dynpmc/mdx.pmc>.
 
 =cut
 
-.sub 'tostring' :anon
+.sub 'tostring'
     .param pmc c :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -218,7 +193,7 @@ see F<src/dynpmc/mdx.pmc>.
 
 =cut
 
-.sub 'update' :anon
+.sub 'update'
     .param pmc c :optional
     .param pmc s :optional
     .param pmc extra :slurpy

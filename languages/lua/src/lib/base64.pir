@@ -43,17 +43,8 @@ This implementation is based on F<runtime/parrot/library/MIME/Base64.pir>.
     set $P1, MYNAME
     _lua__GLOBAL[$P1] = _base64
 
-    lua_register($P1, _base64)
-
-    .const .Sub _base64_decode = 'decode'
-    _base64_decode.'setfenv'(_lua__GLOBAL)
-    set $P1, 'decode'
-    _base64[$P1] = _base64_decode
-
-    .const .Sub _base64_encode = 'encode'
-    _base64_encode.'setfenv'(_lua__GLOBAL)
-    set $P1, 'encode'
-    _base64[$P1] = _base64_encode
+    $P2 = split ' ', 'decode encode'
+    lua_register($P1, _base64, $P2)
 
     new $P2, 'LuaString'
 
@@ -83,7 +74,7 @@ This implementation is based on F<runtime/parrot/library/MIME/Base64.pir>.
 
 =cut
 
-.sub 'decode' :anon
+.sub 'decode'
     .param pmc str :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -99,7 +90,7 @@ This implementation is based on F<runtime/parrot/library/MIME/Base64.pir>.
 
 =cut
 
-.sub 'encode' :anon
+.sub 'encode'
     .param pmc str :optional
     .param pmc extra :slurpy
     .local pmc res

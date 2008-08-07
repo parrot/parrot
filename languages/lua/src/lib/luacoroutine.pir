@@ -36,37 +36,8 @@ L<http://www.lua.org/manual/5.1/manual.html#5.2>.
     set $P1, 'coroutine'
     _lua__GLOBAL[$P1] = _coroutine
 
-    lua_register($P1, _coroutine)
-
-    .const .Sub _coroutine_create = 'create'
-    _coroutine_create.'setfenv'(_lua__GLOBAL)
-    set $P1, 'create'
-    _coroutine[$P1] = _coroutine_create
-
-    .const .Sub _coroutine_resume = 'resume'
-    _coroutine_resume.'setfenv'(_lua__GLOBAL)
-    set $P1, 'resume'
-    _coroutine[$P1] = _coroutine_resume
-
-    .const .Sub _coroutine_running = 'running'
-    _coroutine_running.'setfenv'(_lua__GLOBAL)
-    set $P1, 'running'
-    _coroutine[$P1] = _coroutine_running
-
-    .const .Sub _coroutine_status = 'status'
-    _coroutine_status.'setfenv'(_lua__GLOBAL)
-    set $P1, 'status'
-    _coroutine[$P1] = _coroutine_status
-
-    .const .Sub _coroutine_wrap = 'wrap'
-    _coroutine_wrap.'setfenv'(_lua__GLOBAL)
-    set $P1, 'wrap'
-    _coroutine[$P1] = _coroutine_wrap
-
-    .const .Sub _coroutine_yield = 'yield'
-    _coroutine_yield.'setfenv'(_lua__GLOBAL)
-    set $P1, 'yield'
-    _coroutine[$P1] = _coroutine_yield
+    $P2 = split ' ', 'create resume running status wrap yield'
+    lua_register($P1, _coroutine, $P2)
 
     new $P0, 'ResizablePMCArray'
     set_hll_global '_COROUTINE_STACK', $P0
@@ -86,7 +57,7 @@ Returns this new coroutine, an object with type C<"thread">.
 
 =cut
 
-.sub 'create' :anon
+.sub 'create'
     .param pmc f :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -114,7 +85,7 @@ C<resume> returns B<false> plus the error message.
 
 =cut
 
-.sub 'resume' :anon
+.sub 'resume'
     .param pmc co :optional
     .param pmc argv :slurpy
     .local pmc res
@@ -169,7 +140,7 @@ Returns the running coroutine, or B<nil> when called by the main thread.
 
 =cut
 
-.sub 'running' :anon
+.sub 'running'
     .param pmc extra :slurpy
     .local pmc co_stack
     .local pmc res
@@ -199,7 +170,7 @@ STILL INCOMPLETE.
 
 =cut
 
-.sub 'status' :anon
+.sub 'status'
     .param pmc co :optional
     .param pmc extra :slurpy
     .local pmc res
@@ -233,7 +204,7 @@ case of error, propagates the error.
 
 =cut
 
-.sub 'wrap' :anon :lex
+.sub 'wrap' :lex
     .param pmc f :optional
     .param pmc argv :slurpy
     .local pmc res
@@ -266,7 +237,7 @@ Any arguments to C<yield> are passed as extra results to C<resume>.
 
 =cut
 
-.sub 'yield' :anon
+.sub 'yield'
     .param pmc argv :slurpy
     .local pmc res
     .local pmc co

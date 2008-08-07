@@ -765,18 +765,38 @@ If this argument is absent or is B<nil>, returns C<def>. Otherwise, raises an er
 .end
 
 
-=item C<lua_register (libname, lib)>
+=item C<lua_register (libname, lib, names, env)>
 
 =cut
 
 .sub 'lua_register'
     .param pmc libname
     .param pmc lib
+    .param pmc names
+    .param pmc env :optional
+    if null libname goto L1
     .const .LuaString _loaded = '_LOADED'
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = get_hll_global '_REGISTRY'
     $P0 = _lua__REGISTRY[_loaded]
     $P0[libname] = lib
+  L1:
+    unless null env goto L2
+    env = get_hll_global '_G'
+  L2:
+    .local pmc interp, ns
+    interp = getinterp
+    ns = interp['namespace'; 1]
+    new $P1, 'LuaString'
+  L3:
+    unless names goto L4
+    $S0 = shift names
+    $P0 = ns[$S0]
+    $P0.'setfenv'(env)
+    set $P1, $S0
+    lib[$P1] = $P0
+    goto L3
+  L4:
 .end
 
 
