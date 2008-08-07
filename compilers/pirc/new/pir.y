@@ -679,6 +679,11 @@ augmentive_expr   : augm_add_op TK_INTC
                            push_operand(lexer, expr_from_const(
                                         new_const(NUM_TYPE, NULL, $2)));
                          }
+                  | augm_add_op target
+                         {
+                           set_instr(lexer, opnames[$1]);
+                           push_operand(lexer, expr_from_target($2));
+                         }
                   | augmented_op expression
                          {
                            set_instr(lexer, opnames[$1]);
