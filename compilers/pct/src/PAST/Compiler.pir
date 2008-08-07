@@ -1842,15 +1842,26 @@ attribute.
     .local int isdecl
     isdecl = node.'isdecl'()
 
+    .local pmc call_on, ops
+    call_on = node[0]
+    if null call_on goto use_self
+    call_on = self.'as_post'(call_on, 'rtype'=>'P')
+    ops = call_on
+    goto invocant_done
+  use_self:
+    call_on = new 'String'
+    call_on = 'self'
+    ops = $P0.'new'('node'=>node)
+  invocant_done:
+
     if bindpost goto attribute_bind
 
   attribute_post:
     if isdecl goto attribute_decl
-    .local pmc ops, fetchop, storeop
-    ops = $P0.'new'('node'=>node)
+    .local pmc fetchop, storeop
     $P0 = get_hll_global ['POST'], 'Op'
-    fetchop = $P0.'new'(ops, 'self', name, 'pirop'=>'getattribute')
-    storeop = $P0.'new'('self', name, ops, 'pirop'=>'setattribute')
+    fetchop = $P0.'new'(ops, call_on, name, 'pirop'=>'getattribute')
+    storeop = $P0.'new'(call_on, name, ops, 'pirop'=>'setattribute')
     .return self.'vivify'(node, ops, fetchop, storeop)
 
   attribute_decl:
@@ -1859,9 +1870,9 @@ attribute.
   attribute_bind:
     $P0 = get_hll_global ['POST'], 'Op'
     if isdecl goto attribute_bind_decl
-    .return $P0.'new'('self', name, bindpost, 'pirop'=>'setattribute', 'result'=>bindpost)
+    .return $P0.'new'(call_on, name, bindpost, 'pirop'=>'setattribute', 'result'=>bindpost)
   attribute_bind_decl:
-    .return $P0.'new'('self', name, bindpost, 'pirop'=>'setattribute', 'result'=>bindpost)
+    .return $P0.'new'(call_on, name, bindpost, 'pirop'=>'setattribute', 'result'=>bindpost)
 .end
 
 
