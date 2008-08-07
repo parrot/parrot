@@ -296,7 +296,6 @@ extern YY_DECL;
        TK_FLAG_INVOCANT     ":invocant"
 
 %type <sval> unop
-             augmented_op
              identifier
              sub_id
              opt_paren_string
@@ -360,6 +359,8 @@ extern YY_DECL;
              binop
              rel_op
              condition
+             augmented_op
+             augm_add_op
 
 %type <invo> long_invocation
              methodcall
@@ -635,11 +636,8 @@ assignment        : target '=' expression
                            set_instr(lexer, "set");
                            add_operands(lexer, 2, expr_from_target($1), $3);
                          }
-                  | target augmented_op expression
-                         {
-                           set_instr(lexer, $2);
-                           add_operands(lexer, 2, expr_from_target($1), $3);
-                         }
+                  | target augmentive_expr
+                         { unshift_operand(lexer, expr_from_target($1)); }
                   | target '=' unop expression
                          {
                            set_instr(lexer, $3);
@@ -661,6 +659,32 @@ assignment        : target '=' expression
                          { unshift_operand(lexer, expr_from_target($1)); }
                   ;
 
+augmentive_expr   : augm_add_op TK_INTC
+                         {
+                           if ($2 == 1) { /* adding/subtracting 1? */
+                              if ($1 == OP_ADD)
+                                 set_instr(lexer, "inc");
+                              else if($1 == OP_SUB)
+                                 set_instr(lexer, "dec");
+                           }
+                           else {
+                              set_instr(lexer, opnames[$1]);
+                              push_operand(lexer, expr_from_const(
+                                           new_const(INT_TYPE, NULL, $2)));
+                           }
+                         }
+                  | augm_add_op TK_NUMC
+                         {
+                           set_instr(lexer, opnames[$1]);
+                           push_operand(lexer, expr_from_const(
+                                        new_const(NUM_TYPE, NULL, $2)));
+                         }
+                  | augmented_op expression
+                         {
+                           set_instr(lexer, opnames[$1]);
+                           push_operand(lexer, $2);
+                         }
+                  ;
 /**
 
 implementation of constant folding IN the parser; this saves us a lot of back-end code
@@ -1338,22 +1362,27 @@ binop       : '+'            { $$ = OP_ADD; }
             | "!="           { $$ = OP_ISNE; }
             ;
 
-
-augmented_op: "+="         { $$ = "add"; }
-            | "-="         { $$ = "sub"; }
-            | "*="         { $$ = "mul"; }
-            | "%="         { $$ = "mod"; }
-            | "**="        { $$ = "pow"; }
-            | "/="         { $$ = "div"; }
-            | "//="        { $$ = "fdiv"; }
-            | "|="         { $$ = "bor"; }
-            | "&="         { $$ = "band" }
-            | "~="         { $$ = "bxor"; }
-            | ".="         { $$ = "concat"; }
-            | ">>="        { $$ = "shr"; }
-            | "<<="        { $$ = "shl"; }
-            | ">>>="       { $$ = "lsr"; }
+/* note that += and -= are separated, because when adding/subtracting 1,
+ * this is optimized by using the "inc"/"dec" instructions.
+ */
+augmented_op: "*="         { $$ = OP_MUL; }
+            | "%="         { $$ = OP_MOD; }
+            | "**="        { $$ = OP_POW; }
+            | "/="         { $$ = OP_DIV; }
+            | "//="        { $$ = OP_FDIV; }
+            | "|="         { $$ = OP_BOR; }
+            | "&="         { $$ = OP_BAND; }
+            | "~="         { $$ = OP_BXOR; }
+            | ".="         { $$ = OP_CONCAT; }
+            | ">>="        { $$ = OP_SHR; }
+            | "<<="        { $$ = OP_SHL; }
+            | ">>>="       { $$ = OP_LSR; }
             ;
+
+augm_add_op : "+="         { $$ = OP_ADD; }
+            | "-="         { $$ = OP_SUB; }
+            ;
+
 %%
 
 /* Constant folding routines.
