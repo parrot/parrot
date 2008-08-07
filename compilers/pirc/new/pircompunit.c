@@ -403,39 +403,6 @@ same_types(expression *e1, expression *e2) {
     return 0;
 }
 
-expression *
-fold(constant *c1, char *op, constant *c2) {
-    expression *result = (expression *)malloc(sizeof (expression));
-
-
-    return result;
-}
-
-/* this sucks: */
-expression *
-fold_constants(char *opname, expression *left, expression *right) {
-
-    switch (left->type) {
-        case INT_TYPE: {
-            int leftval = left->expr.c->val.ival;
-            int rightval = right->expr.c->val.ival;
-            if (strcmp(opname, "add") == 0) left->expr.c->val.ival = leftval + rightval;
-            else if (strcmp(opname, "sub") == 0) left->expr.c->val.ival = leftval - rightval;
-            /* other ops */
-            break;
-        }
-        case NUM_TYPE: {
-            double leftval = left->expr.c->val.nval;
-            double rightval = right->expr.c->val.nval;
-            if (strcmp(opname, "add") == 0) left->expr.c->val.nval = leftval + rightval;
-            else if (strcmp(opname, "sub") == 0) left->expr.c->val.nval = leftval - rightval;
-            break;
-        }
-    }
-
-    return left;
-}
-
 
 static expression *
 new_expr(expr_type type) {
