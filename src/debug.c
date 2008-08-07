@@ -379,21 +379,6 @@ parse_command(ARGIN(const char *command), ARGOUT(unsigned long *cmdP))
 
 Initializes the Parrot debugger, if it's not already initialized.
 
-=item C<void Parrot_debugger_load>
-
-Loads a Parrot source file for the current program.
-
-=item C<void Parrot_debugger_break>
-
-Breaks execution and drops into the debugger.  If we are already into the
-debugger and it is the first call, set a breakpoint.
-
-When you re run/continue the program being debugged it will pay no attention to
-the debug ops.
-
-RT #42377: clone the interpreter to allow people to play into the
-debugger and then continue the normal execution of the program.
-
 =cut
 
 */
@@ -410,11 +395,21 @@ Parrot_debugger_init(PARROT_INTERP)
         pdb->debugee    = interp;
     }
 
-    /*PDB_disassemble(interp, NULL);*/
+    /* PDB_disassemble(interp, NULL); */
 
     interp->pdb->cur_opcode = interp->code->base.data;
     interp->pdb->state     |= PDB_RUNNING;
 }
+
+/*
+
+=item C<void Parrot_debugger_load>
+
+Loads a Parrot source file for the current program.
+
+=cut
+
+*/
 
 PARROT_API
 void
@@ -430,18 +425,28 @@ Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(STRING *filename))
     string_cstring_free(file);
 }
 
+/*
+
+=item C<void Parrot_debugger_start>
+
+Start debugger.
+
+=cut
+
+*/
+
 PARROT_API
 void
 Parrot_debugger_start(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
 {
-    /*fprintf(stderr, "Parrot_debugger_start\n");*/
+    /* fprintf(stderr, "Parrot_debugger_start\n"); */
 
     if (!interp->pdb)
         Parrot_ex_throw_from_c_args(interp, NULL, 0, "No debugger");
 
     if (interp->pdb->state & PDB_ENTER) {
         if (!interp->pdb->file) {
-            /*PDB_disassemble(interp, NULL);*/
+            /* PDB_disassemble(interp, NULL); */
         }
         interp->pdb->state &= ~PDB_ENTER;
     }
@@ -459,7 +464,24 @@ Parrot_debugger_start(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
     }
     if (interp->pdb->state & PDB_EXIT)
         Parrot_exit(interp, 0);
- }
+}
+
+/*
+
+=item C<void Parrot_debugger_break>
+
+Breaks execution and drops into the debugger.  If we are already into the
+debugger and it is the first call, set a breakpoint.
+
+When you re run/continue the program being debugged it will pay no attention to
+the debug ops.
+
+RT #42377: clone the interpreter to allow people to play into the
+debugger and then continue the normal execution of the program.
+
+=cut
+
+*/
 
 PARROT_API
 void
@@ -492,7 +514,7 @@ Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
         }
 
         /* RT #42378 this is not ok */
-        /*exit(EXIT_SUCCESS);*/
+        /* exit(EXIT_SUCCESS); */
     }
     else {
         interp->pdb->cur_opcode = (opcode_t *)cur_opcode + 1;
