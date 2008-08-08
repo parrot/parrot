@@ -48,7 +48,15 @@ see F<runtime/parrot/library/Math/Random/mt19937ar.pir>.
     set $P1, MYNAME
     _lua__GLOBAL[$P1] = _random
 
-    $P2 = split ' ', 'clone new seed tostring value valuei valuex'
+    $P2 = split "\n", <<'LIST'
+clone
+new
+seed
+tostring
+value
+valuei
+valuex
+LIST
     lua_register($P1, _random, $P2)
 
     set $P1, 'tostring'

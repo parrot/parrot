@@ -791,6 +791,7 @@ If this argument is absent or is B<nil>, returns C<def>. Otherwise, raises an er
   L3:
     unless names goto L4
     $S0 = shift names
+    unless $S0 goto L3
     $P0 = ns[$S0]
     $P0.'setfenv'(env)
     set $P1, $S0

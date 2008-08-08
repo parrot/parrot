@@ -29,7 +29,17 @@ See F<languages/lua/lib/luaio.pir>.
     set $P1, '__index'
     _file[$P1] = _file
 
-    $P2 = split ' ', 'close flush lines read seek setvbuf write __gc __tostring'
+    $P2 = split "\n", <<'LIST'
+close
+flush
+lines
+read
+seek
+setvbuf
+write
+__gc
+__tostring
+LIST
     null $P0
     lua_register($P0, _file, $P2)
 

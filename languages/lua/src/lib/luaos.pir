@@ -33,7 +33,19 @@ L<http://www.lua.org/manual/5.1/manual.html#5.8>.
     set $P1, 'os'
     _lua__GLOBAL[$P1] = _os
 
-    $P2 = split ' ', 'clock date difftime execute exit getenv remove rename setlocale time tmpname'
+    $P2 = split "\n", <<'LIST'
+clock
+date
+difftime
+execute
+exit
+getenv
+remove
+rename
+setlocale
+time
+tmpname
+LIST
     lua_register($P1, _os, $P2)
 
 .end

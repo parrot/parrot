@@ -46,7 +46,20 @@ see F<runtime/parrot/library/OpenGL.pir>.
     set $P1, 'glut'
     _lua__GLOBAL[$P1] = _glut
 
-    $P2 = split ' ', 'CreateWindow DestroyWindow DisplayFunc IdleFunc Init InitDisplayMode InitWindowSize KeyboardFunc MainLoop PostRedisplay ReshapeFunc SwapBuffers'
+    $P2 = split "\n", <<'LIST'
+CreateWindow
+DestroyWindow
+DisplayFunc
+IdleFunc
+Init
+InitDisplayMode
+InitWindowSize
+KeyboardFunc
+MainLoop
+PostRedisplay
+ReshapeFunc
+SwapBuffers
+LIST
     lua_register($P1, _glut, $P2)
 
     .return (_glut)

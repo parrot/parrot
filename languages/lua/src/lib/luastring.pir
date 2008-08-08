@@ -44,7 +44,22 @@ L<http://www.lua.org/manual/5.1/manual.html#5.4>.
     set $P1, 'string'
     _lua__GLOBAL[$P1] = _string
 
-    $P2 = split ' ', 'byte char dump find format gmatch gsub len lower match rep reverse sub upper'
+    $P2 = split "\n", <<'LIST'
+byte
+char
+dump
+find
+format
+gmatch
+gsub
+len
+lower
+match
+rep
+reverse
+sub
+upper
+LIST
     lua_register($P1, _string, $P2)
 
     # LUA_COMPAT_GFIND

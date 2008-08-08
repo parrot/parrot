@@ -62,7 +62,33 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
     set $P1, 'math'
     _lua__GLOBAL[$P1] = _math
 
-    $P2 = split ' ', 'abs acos asin atan atan2 ceil cos deg exp floor fmod frexp ldexp log log10 max min modf pow rad random randomseed sin sqrt tan'
+    $P2 = split "\n", <<'LIST'
+abs
+acos
+asin
+atan
+atan2
+ceil
+cos
+deg
+exp
+floor
+fmod
+frexp
+ldexp
+log
+log10
+max
+min
+modf
+pow
+rad
+random
+randomseed
+sin
+sqrt
+tan
+LIST
     lua_register($P1, _math, $P2)
 
     # LUA_COMPAT_MOD

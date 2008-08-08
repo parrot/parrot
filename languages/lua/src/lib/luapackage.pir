@@ -32,7 +32,10 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
     set $P1, 'package'
     _lua__GLOBAL[$P1] = _package
 
-    $P2 = split ' ', 'loadlib seeall'
+    $P2 = split "\n", <<'LIST'
+loadlib
+seeall
+LIST
     lua_register($P1, _package, $P2)
 
     # LUA_COMPAT_LOADLIB
@@ -76,7 +79,10 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
     set $P1, 'preload'
     _package[$P1] = $P0
 
-    $P2 = split ' ', 'module require'
+    $P2 = split "\n", <<'LIST'
+module
+require
+LIST
     null $P0
     lua_register($P0, _lua__GLOBAL, $P2)
 

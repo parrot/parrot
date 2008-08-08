@@ -49,7 +49,33 @@ environments.)
     set $P1, '_G'
     _lua__GLOBAL[$P1] = _lua__GLOBAL
 
-    $P2 = split ' ', 'assert collectgarbage dofile error getfenv getmetatable ipairs load loadfile loadstring next pairs pcall print rawequal rawget rawset select setfenv setmetatable tonumber tostring type unpack xpcall'
+    $P2 = split "\n", <<'LIST'
+assert
+collectgarbage
+dofile
+error
+getfenv
+getmetatable
+ipairs
+load
+loadfile
+loadstring
+next
+pairs
+pcall
+print
+rawequal
+rawget
+rawset
+select
+setfenv
+setmetatable
+tonumber
+tostring
+type
+unpack
+xpcall
+LIST
     lua_register($P1, _lua__GLOBAL, $P2)
 
 =item C<_VERSION>

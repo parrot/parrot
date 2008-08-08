@@ -39,7 +39,17 @@ L<http://www.lua.org/manual/5.1/manual.html#5.5>.
     _lua__GLOBAL[$P1] = _table
 
     # LUA_COMPAT_GETN
-    $P2 = split ' ', 'concat foreach foreachi getn insert maxn remove setn sort'
+    $P2 = split "\n", <<'LIST'
+concat
+foreach
+foreachi
+getn
+insert
+maxn
+remove
+setn
+sort
+LIST
     lua_register($P1, _table, $P2)
 
 .end

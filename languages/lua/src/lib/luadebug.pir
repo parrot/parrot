@@ -43,7 +43,22 @@ L<http://www.lua.org/manual/5.1/manual.html#5.9>.
     set $P1, 'debug'
     _lua__GLOBAL[$P1] = _debug
 
-    $P2 = split ' ', 'debug getfenv gethook getinfo getlocal getmetatable getregistry getupvalue setfenv sethook setlocal setmetatable setupvalue traceback'
+    $P2 = split "\n", <<'LIST'
+debug
+getfenv
+gethook
+getinfo
+getlocal
+getmetatable
+getregistry
+getupvalue
+setfenv
+sethook
+setlocal
+setmetatable
+setupvalue
+traceback
+LIST
     lua_register($P1, _debug, $P2)
 
 .end

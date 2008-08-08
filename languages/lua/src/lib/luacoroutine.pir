@@ -36,7 +36,14 @@ L<http://www.lua.org/manual/5.1/manual.html#5.2>.
     set $P1, 'coroutine'
     _lua__GLOBAL[$P1] = _coroutine
 
-    $P2 = split ' ', 'create resume running status wrap yield'
+    $P2 = split "\n", <<'LIST'
+create
+resume
+running
+status
+wrap
+yield
+LIST
     lua_register($P1, _coroutine, $P2)
 
     new $P0, 'ResizablePMCArray'

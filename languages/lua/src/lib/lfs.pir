@@ -44,7 +44,18 @@ See original on L<http://luaforge.net/projects/luafilesystem/>
     set $P1, 'lfs'
     _lua__GLOBAL[$P1] = _lfs
 
-    $P2 = split ' ', 'attributes chdir currentdir dir lock mkdir rmdir symlinkattributes touch unlock'
+    $P2 = split "\n", <<'LIST'
+attributes
+chdir
+currentdir
+dir
+lock
+mkdir
+rmdir
+symlinkattributes
+touch
+unlock
+LIST
     lua_register($P1, _lfs, $P2)
 
     new $P2, 'LuaString'

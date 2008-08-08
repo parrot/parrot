@@ -41,7 +41,11 @@ This implementation is based on F<runtime/parrot/library/uuid.pir>.
     set $P1, 'uuid'
     _lua__GLOBAL[$P1] = _uuid
 
-    $P2 = split ' ', 'isvalid new'
+    $P2 = split "\n", <<'LIST'
+isvalid
+new
+time
+LIST
     lua_register($P1, _uuid, $P2)
 
     # ???

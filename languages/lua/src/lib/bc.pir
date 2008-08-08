@@ -51,7 +51,24 @@ Use PMC BigFloat when available.
     set $P1, MYNAME
     _lua__GLOBAL[$P1] = _bc
 
-    $P2 = split ' ', 'digits tostring iszero isneg number compare __eq __lt add sub mul pow div mod sqrt __unm'
+    $P2 = split "\n", <<'LIST'
+digits
+tostring
+iszero
+isneg
+number
+compare
+__eq
+__lt
+add
+sub
+mul
+pow
+div
+mod
+sqrt
+__unm
+LIST
     lua_register($P1, _bc, $P2)
 
     set $P1, 'add'

@@ -53,7 +53,20 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
     set $P1, 'io'
     _lua__GLOBAL[$P1] = _io
 
-    $P2 = split ' ', 'close flush input lines open output popen read tmpfile type write readline'
+    $P2 = split "\n", <<'LIST'
+close
+flush
+input
+lines
+open
+output
+popen
+read
+tmpfile
+type
+write
+readline
+LIST
     lua_register($P1, _io, $P2, _io_env)
 
     .const .Sub _readline = 'readline'

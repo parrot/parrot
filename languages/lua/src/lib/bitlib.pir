@@ -45,7 +45,16 @@ that can be used in bitwise operations, and the following functions:
     set $P1, MYNAME
     _lua__GLOBAL[$P1] = _bitlib
 
-    $P2 = split ' ', 'cast bnot band bor bxor lshift rshift arshift'
+    $P2 = split "\n", <<'LIST'
+cast
+bnot
+band
+bor
+bxor
+lshift
+rshift
+arshift
+LIST
     lua_register($P1, _bitlib, $P2)
 
     new $P2, 'LuaNumber'

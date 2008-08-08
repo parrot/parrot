@@ -49,7 +49,14 @@ see F<src/dynpmc/mdx.pmc>.
     set $P1, MYNAME
     _lua__GLOBAL[$P1] = _md5
 
-    $P2 = split ' ', 'clone digest new reset tostring update'
+    $P2 = split "\n", <<'LIST'
+clone
+digest
+new
+reset
+tostring
+update
+LIST
     lua_register($P1, _md5, $P2)
 
     set $P1, 'tostring'

@@ -43,7 +43,10 @@ This implementation is based on F<runtime/parrot/library/MIME/Base64.pir>.
     set $P1, MYNAME
     _lua__GLOBAL[$P1] = _base64
 
-    $P2 = split ' ', 'decode encode'
+    $P2 = split "\n", <<'LIST'
+decode
+encode
+LIST
     lua_register($P1, _base64, $P2)
 
     new $P2, 'LuaString'
