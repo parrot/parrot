@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2007, The Perl Foundation.
+ * Copyright (C) 2007-2008, The Perl Foundation.
  */
 
 /*
@@ -15,7 +15,6 @@
 
  */
 
-#include <stdio.h>
 #include "pircompunit.h"
 #include "pircompiler.h"
 #include "pirsymbol.h"
@@ -63,6 +62,11 @@ find_target(struct lexer_state *lexer, char * const name) {
         return t;
     }
 
+}
+
+void
+set_namespace(struct lexer_state *lexer, key *ns) {
+    lexer->current_ns = ns;
 }
 
 /*
@@ -128,6 +132,8 @@ new_subr(struct lexer_state *lexer, char *subname) {
     /* set default lexid */
     newsub->lex_id     = subname;
 
+    newsub->name_space = lexer->current_ns;
+
     newsub->parameters = NULL;
     newsub->statements = NULL;
 
@@ -169,6 +175,8 @@ new_target(pir_type type, char *name) {
     target *t = (target *)calloc(1, sizeof (target));
     t->type = type;
     t->name = name;
+    t->key  = NULL;
+
     t->next = t; /* circly linked list */
     return t;
 }
@@ -331,15 +339,13 @@ invert_instr(struct lexer_state *lexer) {
 
 /* constant constructors */
 
-constant *
-new_const(pir_type type, char *name, ...) {
-    va_list arg_ptr;
+static constant *
+create_const(pir_type type, char *name, va_list arg_ptr) {
     constant *c = (constant *)malloc(sizeof (constant));
     assert(c != NULL);
     c->name = name;
     c->type = type;
 
-    va_start(arg_ptr, name);
     switch (type) {
         case INT_TYPE:
             c->val.ival = va_arg(arg_ptr, int);
@@ -351,15 +357,53 @@ new_const(pir_type type, char *name, ...) {
         case STRING_TYPE:
             c->val.sval = va_arg(arg_ptr, char *);
             break;
-        default:
-            fprintf(stderr, "Fatal error: unknown constant type\n");
-            exit(EXIT_FAILURE);
+        case UNKNOWN_TYPE:
+            panic("unknown data type in create_const()");
+            break;
     }
+
+    return c;
+}
+
+/*
+
+=item C<new_named_const>
+
+Creates a new constant node of the given type, by the given name.
+Wrapper function for C<create_const>.
+
+=cut
+
+*/
+constant *
+new_named_const(pir_type type, char *name, ...) {
+    constant *c;
+    va_list arg_ptr;
+    va_start(arg_ptr, name);
+    c = create_const(type, name, arg_ptr);
     va_end(arg_ptr);
     return c;
 }
 
+/*
 
+=item C<new_const>
+
+Creates a new constant node of the given type.
+Wrapper function for C<create_const>
+
+=cut
+
+*/
+constant *
+new_const(pir_type type, ...) {
+    constant *c;
+    va_list arg_ptr;
+    va_start(arg_ptr, type);
+    c = create_const(type, NULL, arg_ptr);
+    va_end(arg_ptr);
+    return c;
+}
 
 
 void
@@ -500,15 +544,12 @@ invoke(struct lexer_state *lexer, invoke_type type, ...) {
 
 target *
 target_from_string(char *str) {
-    target *var = new_target(STRING_TYPE, str);
-    return var;
+    return new_target(STRING_TYPE, str);
 }
 
 target *
 target_from_ident(pir_type type, char *id) {
-    target *var = new_target(type, id);
-    return var;
-
+    return new_target(type, id);
 }
 
 
@@ -578,22 +619,64 @@ Add C<count> operands to the current instruction.
 void
 add_operands(struct lexer_state *lexer, int count, ...) {
     va_list arg_ptr;
+    int i;
 
     va_start(arg_ptr, count);
 
-    assert(count > 0);
-    while (count--) {
+    for (i = 0; i < count; i++)
         push_operand(lexer, va_arg(arg_ptr, expression *));
-    }
+
     va_end(arg_ptr);
 }
 
+/*
 
+=item C<expr_from_key(key *k)>
+
+Wraps the key C<k> in an C<expression> node and returns that.
+
+=cut
+
+*/
 expression *
-add_key(expression *key1, expression *key2) {
-    key2->next = key1->next;
-    key1->next = key2;
-    return key1;
+expr_from_key(key *k) {
+    expression *e = new_expr(EXPR_KEY);
+    e->expr.k = k;
+    return e;
+}
+
+key *
+new_key(expression *expr) {
+    key *k = (key *)malloc(sizeof (key));
+    assert(k != NULL);
+    k->expr = expr;
+    k->next = NULL;
+    return k;
+}
+
+
+void print_key(key *k);
+/*
+
+=item C<add_key(key *keylist, expression *exprkey)>
+
+Adds a new, nested key (in C<exprkey>) to the current key,
+pointed to by C<keylist>.
+
+=cut
+
+*/
+key *
+add_key(key *keylist, expression *exprkey) {
+    key *newkey = new_key(exprkey);
+    key *list = keylist;
+
+    while (keylist->next != NULL)
+        keylist = keylist->next;
+    keylist->next = newkey;
+
+    //print_key(list);
+    return list;
 }
 
 /*
@@ -623,10 +706,24 @@ new_local(char *name, int has_unique_reg) {
 /* debug functions */
 
 
+void
+print_key(key *k) {
+    printf("[");
+
+    if (k && k->expr) {
+        print_expr(k->expr);
+
+        while (k->next) {
+            k = k->next;
+            printf(";");
+            print_expr(k->expr);
+        }
+    }
+    printf("]");
+}
 
 void
 print_target(target *t) {
-
     if (t->name) {
         printf("%s", t->name);
     }
@@ -634,6 +731,8 @@ print_target(target *t) {
         char type = pir_register_types[t->type];
         printf("$%c%d", type, t->regno);
     }
+    if (t->key)
+        print_key(t->key);
 }
 
 void
@@ -651,11 +750,13 @@ print_constant(constant *c) {
         case PMC_TYPE:
             printf("\"%s\"", c->val.pval);
             break;
-        default:
-            printf("error: unknown constant type\n");
+        case UNKNOWN_TYPE:
+            printf("Unknown type detected! This is a bug!");
             break;
     }
 }
+
+
 
 void
 print_expr(expression *expr) {
@@ -669,8 +770,11 @@ print_expr(expression *expr) {
         case EXPR_IDENT:
             printf("%s", expr->expr.id);
             break;
-        default:
-            fprintf(stderr, "Fatal error: unknown expression type\n");
+        case EXPR_INT:
+            printf("%d", expr->expr.i);
+            break;
+        case EXPR_KEY:
+            print_key(expr->expr.k);
             break;
     }
 }
@@ -847,7 +951,10 @@ print_subs(struct lexer_state *lexer) {
         subroutine *subiter = lexer->subs->next;
 
         do {
-            printf(".pcc_sub %s:\n", subiter->sub_name);
+            printf(".namespace ");
+            print_key(subiter->name_space);
+
+            printf("\n.pcc_sub %s:\n", subiter->sub_name);
             print_targets("get_params", subiter->parameters);
             print_statement(subiter);
             subiter = subiter->next;
@@ -864,4 +971,5 @@ print_subs(struct lexer_state *lexer) {
  * End:
  * vim: expandtab shiftwidth=4:
  */
+
 

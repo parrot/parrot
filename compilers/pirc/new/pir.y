@@ -2,7 +2,7 @@
 
 /*
  * $Id$
- * Copyright (C) 2007, The Perl Foundation.
+ * Copyright (C) 2007-2008, The Perl Foundation.
  */
 
 /*
@@ -23,7 +23,15 @@ Features are:
 
 =back
 
-
+TODO:
+1. fix argument stuff related to the :named flag.
+2. fix parameter stuff
+3. clean up back-end a bit (refactor?)
+4. improve memory management (free it!)
+5. test
+LATER:
+6. write register allocator(s)
+7. generate a PBC
 
 =cut
 
@@ -157,6 +165,9 @@ extern YY_DECL;
 #  define YYLTYPE_IS_TRIVIAL 0
 #endif
 
+
+/* XXX Clean up this mess: */
+
 /* the lexer contains a special temp. field for this purpose. */
 #define STORE_NAMED_ALIAS(NAME)             do { lexer->temp_flag_arg1 = NAME; } while (0)
 
@@ -187,6 +198,7 @@ extern YY_DECL;
     struct target      *targ;
     struct argument    *argm;
     struct invocation  *invo;
+    struct key         *key;
 
     void               *fixme;
 }
@@ -337,11 +349,12 @@ extern YY_DECL;
              long_argument
 
 %type <expr> expression
-             keylist
              op_args
              op_arg
-             keys
              keyaccess
+
+%type <key>  keys
+             keylist
 
 %type <ival> has_unique_reg
              type
@@ -469,6 +482,7 @@ hll_mapping       : ".HLL_map" TK_STRINGC '=' TK_STRINGC
 /* Namespaces */
 
 namespace_decl    : ".namespace" '[' opt_namespace_id ']'
+                            { set_namespace(lexer, $3); }
                   ;
 
 opt_namespace_id  : /* empty */
@@ -478,9 +492,9 @@ opt_namespace_id  : /* empty */
                   ;
 
 namespace_id      : TK_STRINGC
-                            { $$ = $1; }
+                            { $$ = new_key(expr_from_const(new_const(STRING_TYPE, $1))); }
                   | namespace_id ';' TK_STRINGC
-                            { }
+                            { $$ = add_key($1, expr_from_const(new_const(STRING_TYPE, $3))); }
                   ;
 
 
@@ -641,18 +655,15 @@ assignment        : target '=' expression
                          }
                   | target '=' binary_expr
                          { unshift_operand(lexer, expr_from_target($1)); }
-                  | target keylist '=' expression
+                  | keyaccess '=' expression
                          {
                            set_instr(lexer, "set");
-                           /* XXX fix key stuff */
-                           add_operands(lexer, 2, expr_from_target($1), $4);
-
+                           add_operands(lexer, 2, $1, $3);
                          }
-                  | target '=' target keylist
+                  | target '=' keyaccess
                          {
                            set_instr(lexer, "set");
-                           /* XXX fix key stuff */
-                           add_operands(lexer, 1, expr_from_target($1));
+                           add_operands(lexer, 2, expr_from_target($1), $3);
                          }
                   | target '=' parrot_instruction
                          { unshift_operand(lexer, expr_from_target($1)); }
@@ -669,15 +680,13 @@ augmentive_expr   : augm_add_op TK_INTC
                            }
                            else {
                               set_instr(lexer, opnames[$1]);
-                              push_operand(lexer, expr_from_const(
-                                           new_const(INT_TYPE, NULL, $2)));
+                              push_operand(lexer, expr_from_const(new_const(INT_TYPE, $2)));
                            }
                          }
                   | augm_add_op TK_NUMC
                          {
                            set_instr(lexer, opnames[$1]);
-                           push_operand(lexer, expr_from_const(
-                                        new_const(NUM_TYPE, NULL, $2)));
+                           push_operand(lexer, expr_from_const(new_const(NUM_TYPE, $2)));
                          }
                   | augm_add_op target
                          {
@@ -710,25 +719,25 @@ binary_expr       : target binop expression
                   | TK_INTC binop target
                          {
                            set_instr(lexer, opnames[$2]);
-                           add_operands(lexer, 2, expr_from_const(new_const(INT_TYPE, NULL, $1)),
+                           add_operands(lexer, 2, expr_from_const(new_const(INT_TYPE, $1)),
                                                                   expr_from_target($3));
                          }
                   | TK_NUMC binop target
                          {
                            set_instr(lexer, opnames[$2]);
-                           add_operands(lexer, 2, expr_from_const(new_const(NUM_TYPE, NULL, $1)),
+                           add_operands(lexer, 2, expr_from_const(new_const(NUM_TYPE, $1)),
                                                                   expr_from_target($3));
                          }
                   | TK_STRINGC "." target
                          {
                            set_instr(lexer, "concat");
-                           add_operands(lexer, 2, expr_from_const(new_const(STRING_TYPE, NULL, $1)),
+                           add_operands(lexer, 2, expr_from_const(new_const(STRING_TYPE, $1)),
                                                                   expr_from_target($3));
                          }
                   | TK_STRINGC "." TK_STRINGC
                          {
                            set_instr(lexer, "set");
-                           push_operand(lexer, expr_from_const(new_const(STRING_TYPE, NULL,
+                           push_operand(lexer, expr_from_const(new_const(STRING_TYPE,
                                                                          concat_strings($1, $3))));
                          }
                   | TK_INTC binop TK_INTC
@@ -775,12 +784,18 @@ op_args           : op_arg
                   ;
 
 op_arg            : expression
+                         { $$ = $1; }
                   | keylist
+                         { $$ = expr_from_key($1); }
                   | keyaccess
+                         { $$ = $1; }
                   ;
 
 keyaccess         : target keylist
-                         { $$ = expr_from_target($1); /* XXX fix key stuff */ }
+                         {
+                            $1->key = $2;
+                            $$ = expr_from_target($1);
+                         }
                   ;
 
 keylist           : '[' keys ']'
@@ -788,7 +803,7 @@ keylist           : '[' keys ']'
                   ;
 
 keys              : expression
-                         { $$ = $1; }
+                         { $$ = new_key($1); }
                   | keys ';' expression
                          { $$ = add_key($1, $3); }
                   ;
@@ -844,7 +859,7 @@ condition         : target rel_op expression
                          {
                            set_instr(lexer, opnames[$2]);
                            add_operands(lexer, 2,
-                                        expr_from_const(new_const(INT_TYPE, NULL, $1)),
+                                        expr_from_const(new_const(INT_TYPE, $1)),
                                         expr_from_target($3));
                            $$ = -1;
                          }
@@ -852,7 +867,7 @@ condition         : target rel_op expression
                          {
                            set_instr(lexer, opnames[$2]);
                            add_operands(lexer, 2,
-                                        expr_from_const(new_const(NUM_TYPE, NULL, $1)),
+                                        expr_from_const(new_const(NUM_TYPE, $1)),
                                         expr_from_target($3));
                            $$ = -1;
                          }
@@ -1284,13 +1299,13 @@ globalconst_decl : ".globalconst" const_tail
                  ;
 
 const_tail       : "int" identifier '=' TK_INTC
-                        { $$ = new_const(INT_TYPE, $2, $4); }
+                        { $$ = new_named_const(INT_TYPE, $2, $4); }
                  | "num" identifier '=' TK_NUMC
-                        { $$ = new_const(NUM_TYPE, $2, $4); }
+                        { $$ = new_named_const(NUM_TYPE, $2, $4); }
                  | "pmc" identifier '=' TK_STRINGC
-                        { $$ = new_const(PMC_TYPE, $2, $4); }
+                        { $$ = new_named_const(PMC_TYPE, $2, $4); }
                  | "string" identifier '=' TK_STRINGC
-                        { $$ = new_const(STRING_TYPE, $2, $4); }
+                        { $$ = new_named_const(STRING_TYPE, $2, $4); }
                  ;
 
 
@@ -1302,9 +1317,9 @@ expression  : target         { $$ = expr_from_target($1); }
             | constant       { $$ = expr_from_const($1); }
             ;
 
-constant    : TK_STRINGC     { $$ = new_const(STRING_TYPE, NULL, $1); }
-            | TK_INTC        { $$ = new_const(INT_TYPE, NULL, $1); }
-            | TK_NUMC        { $$ = new_const(NUM_TYPE, NULL, $1); }
+constant    : TK_STRINGC     { $$ = new_const(STRING_TYPE, $1); }
+            | TK_INTC        { $$ = new_const(INT_TYPE, $1); }
+            | TK_NUMC        { $$ = new_const(NUM_TYPE, $1); }
             ;
 
 rel_op      : "!="           { $$ = OP_NE; }
@@ -1481,29 +1496,35 @@ fold_i_i(int a, pir_math_operator op, int b) {
         case OP_ISNE:
             result = (a != b);
             break;
+
+        /* OP_INC and OP_DEC are here only to keep the C compiler happy */
+        case OP_INC:
+        case OP_DEC:
+            printf("This should never happen!");
+            break;
     }
-    return new_const(INT_TYPE, NULL, result);
+    return new_const(INT_TYPE, result);
 }
 
 static constant *
 fold_n_i(double a, pir_math_operator op, int b) {
     double result;
     /* XXX check out what binary ops work on operands of type (double, int)*/
-    return new_const(NUM_TYPE, NULL, result);
+    return new_const(NUM_TYPE, result);
 }
 
 static constant *
 fold_i_n(int a, pir_math_operator op, double b) {
     double result;
     /* XXX check out what binary ops work on operands of type (int, double)*/
-    return new_const(NUM_TYPE, NULL, result);
+    return new_const(NUM_TYPE, result);
 }
 
 static constant *
 fold_n_n(double a, pir_math_operator op, double b) {
     double result;
     /* XXX check out what binary ops work on operands of type (double, double)*/
-    return new_const(NUM_TYPE, NULL, result);
+    return new_const(NUM_TYPE, result);
 }
 
 static int

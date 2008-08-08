@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2007, The Perl Foundation.
+ * Copyright (C) 2007-2008, The Perl Foundation.
  */
 
 /*
@@ -13,7 +13,9 @@
 #ifndef PARROT_PIR_PIRCOMPUNIT_H_GUARD
 #define PARROT_PIR_PIRCOMPUNIT_H_GUARD
 
-/* the 4 parrot types */
+/* the 4 parrot types; use explicit values, they are used to index an array,
+ * so this way we can be sure that works properly.
+ */
 typedef enum pir_types {
     INT_TYPE     = 0,
     NUM_TYPE     = 1,
@@ -23,13 +25,6 @@ typedef enum pir_types {
 
 } pir_type;
 
-/* pir pragmas; currently, PIR only has one. This is an
- * enum so future extensions are easy to add.
- */
-typedef enum pir_pragmas {
-    PRAGMA_N_OPERATORS,
-
-} pir_pragma;
 
 
 /* selector values for the expression value union */
@@ -37,7 +32,8 @@ typedef enum expr_types {
     EXPR_TARGET,
     EXPR_CONSTANT,
     EXPR_IDENT,
-    EXPR_INT
+    EXPR_INT,
+    EXPR_KEY
 
 } expr_type;
 
@@ -138,7 +134,9 @@ typedef struct expression {
         struct target  *t;
         constant       *c;
         char           *id;
-        int            *i;
+        int            i;
+        struct key     *k;
+
     } expr;
 
     expr_type type;
@@ -147,7 +145,10 @@ typedef struct expression {
 
 } expression;
 
-
+typedef struct key {
+    expression *expr;
+    struct key *next;
+} key;
 
 
 /* function parameter or function result, as in (x,y) = foo().
@@ -156,11 +157,13 @@ typedef struct expression {
  */
 typedef struct target {
     pir_type    type;
-    char       *name;  /* if this is a symbolic variable */
-    int         regno; /* if this is a symbolic register */
+    char       *name;  /* if this is a declared local */
+    int         regno; /* if this is a register */
     int         color; /* for register allocation */
     target_flag flags;
     char       *named_flag_arg;
+
+    struct key *key;
 
     struct target *next;
 
@@ -237,7 +240,7 @@ typedef enum statement_types {
 
 
 typedef struct statement {
-    char      *label;
+    char          *label;
     statement_type type;  /* indicates which field of the union is used */
 
     union __statement {
@@ -253,10 +256,11 @@ typedef struct statement {
 
 /* a sub */
 typedef struct subroutine {
-    char      *sub_name;
-    char      *outer_sub;
-    char      *lex_id;
-    char      *vtable_method;
+    key       *name_space;          /* this sub's namespace */
+    char      *sub_name;            /* this sub's name */
+    char      *outer_sub;           /* this sub's outer subroutine, if any */
+    char      *lex_id;              /* this sub's lex_id, if any */
+    char      *vtable_method;       /* name of vtable method that this sub's overriding, if any */
     int        flags;
     char     **multi_types;
 
@@ -272,6 +276,8 @@ typedef struct subroutine {
 /* forward declaration */
 struct lexer_state;
 
+void set_namespace(struct lexer_state *lexer, key *ns);
+
 void set_sub_outer(struct lexer_state *lexer, char *outersub);
 void set_sub_vtable(struct lexer_state *lexer, char *vtablename);
 void set_sub_lexid(struct lexer_state *lexer, char *lexid);
@@ -283,12 +289,13 @@ void add_instr(struct lexer_state *lexer, char *label, instruction *instr);
 
 void set_arg_flag(argument *arg, arg_flag flag);
 
-constant *new_const(pir_type type, char *name, ...);
-
+constant *new_named_const(pir_type type, char *name, ...);
+constant *new_const(pir_type type, ...);
 
 expression *expr_from_const(constant *c);
 expression *expr_from_target(target *t);
 expression *expr_from_ident(char *name);
+expression *expr_from_key(key *k);
 
 argument *new_argument(expression *expr);
 argument *add_arg(argument *arg1, argument *arg2);
@@ -309,7 +316,8 @@ void set_invocation_type(invocation *inv, invoke_type type);
 target *target_from_string(char *str);
 target *target_from_ident(pir_type type, char *id);
 
-
+key *new_key(expression *expr);
+key *add_key(key *keylist, expression *newkey);
 
 void set_pragma(int which_one, int value);
 void load_library(struct lexer_state *lexer, char *library);
@@ -337,8 +345,6 @@ void invert_instr(struct lexer_state *lexer);
 void unshift_operand(struct lexer_state *lexer, expression *operand);
 void push_operand(struct lexer_state *lexer, expression *operand);
 void add_operands(struct lexer_state *state, int count, ...);
-
-expression *add_key(expression *k1, expression *k2);
 
 target *add_local(target *list, target *local);
 target *new_local(char *name, int unique);

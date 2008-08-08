@@ -245,11 +245,12 @@ typedef union YYSTYPE
     struct target      *targ;
     struct argument    *argm;
     struct invocation  *invo;
+    struct key         *key;
 
     void               *fixme;
 }
 /* Line 1489 of yacc.c.  */
-#line 253 "pirparser.h"
+#line 254 "pirparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

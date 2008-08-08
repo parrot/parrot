@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2007, The Perl Foundation.
+ * Copyright (C) 2007-2008, The Perl Foundation.
  */
 #ifndef PARROT_PIR_PIRSYMBOL_H_GUARD
 #define PARROT_PIR_PIRSYMBOL_H_GUARD

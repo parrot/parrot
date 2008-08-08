@@ -14,9 +14,10 @@ typedef struct lexer_state {
     int                     parse_errors;
     char                   *filename;
     int                     is_instr; /* keeps track whether the parser is parsing an instruction */
-    subroutine             *subs;
+    subroutine             *subs; /* list of subs; always points to the current sub. */
 
-    struct symbol                 *symbols;
+    symbol                 *symbols;    /* keeps track of declared locals */
+    key                    *current_ns; /* keeps track of namespace */
 
     char *temp_flag_arg1;
     char *temp_flag_arg2;

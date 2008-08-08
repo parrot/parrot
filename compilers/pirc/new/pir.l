@@ -2,7 +2,7 @@
 
 /*
  * $Id$
- * Copyright (C) 2007, The Perl Foundation.
+ * Copyright (C) 2007-2008, The Perl Foundation.
  */
 
 /*
@@ -150,6 +150,7 @@ new_lexer(char * const filename) {
 
     lexer->filename      = filename;
     lexer->parse_errors  = 0;
+    lexer->current_ns    = NULL;
     lexer->symbols       = NULL;
     lexer->subs          = NULL;
     lexer->is_instr      = 0;
