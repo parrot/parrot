@@ -191,7 +191,7 @@ new_ret_continuation(PARROT_INTERP)
     Parrot_cont * const cc = mem_allocate_typed(Parrot_cont);
 
     cc->to_ctx          = CONTEXT(interp);
-    cc->from_ctx        = NULL;    /* filled in during a call */
+    cc->from_ctx        = CONTEXT(interp);    /* filled in during a call */
     cc->dynamic_state   = NULL;
     cc->runloop_id      = 0;
     cc->seg             = interp->code;

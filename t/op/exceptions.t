@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 29;
+use Parrot::Test tests => 30;
 
 =head1 NAME
 
@@ -606,6 +606,29 @@ in handler
 returned from handler
 Exception message: Class Foo already registered!
 after compile
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "Resumable exceptions" );
+.sub main :main
+    push_eh _handler
+    new $P1, 'Exception'
+    say 'Before throwing'
+    throw $P1
+    say 'After throwing'
+    end
+_handler:
+    .local pmc e
+    .local string s
+    .local pmc c
+    .get_results (e, s)
+    say 'In the exception handler'
+    c = e['retcont']
+    c()
+.end
+CODE
+Before throwing
+In the exception handler
+After throwing
 OUTPUT
 
 # Local Variables:
