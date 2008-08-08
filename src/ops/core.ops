@@ -816,8 +816,8 @@ inline op pop_eh() {
 
 inline op throw(invar PMC) :flow {
     opcode_t * const ret  = expr NEXT();
-    Parrot_cont * resume = new_ret_continuation_pmc(interp,ret);
-    VTABLE_set_attr_str(interp,$1,string_from_literal(interp,"retcont"),resume);
+    Parrot_cont * resume = new_ret_continuation_pmc(interp, ret);
+    VTABLE_set_attr_str(interp, $1, string_from_literal(interp, "retcont"), resume);
     opcode_t * const dest = Parrot_ex_throw_from_op(interp, $1, resume);
     goto ADDRESS(dest);
 }
