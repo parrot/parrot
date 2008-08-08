@@ -367,6 +367,8 @@ create_const(pir_type type, char *name, va_list arg_ptr) {
 
 /*
 
+=over 4
+
 =item C<new_named_const>
 
 Creates a new constant node of the given type, by the given name.
@@ -964,6 +966,12 @@ print_subs(struct lexer_state *lexer) {
 
 
 }
+
+/*
+
+=back
+
+*/
 
 /*
  * Local variables:
