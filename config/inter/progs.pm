@@ -171,7 +171,8 @@ sub _set_debug_and_warn {
 sub test_compiler {
     my ($conf, $cc) = @_;
 
-    open( my $out_fh, '>', "test_$$.c" ) or die "Unable to open 'test_$$.cb: $@\n";
+    open( my $out_fh, '>', "test_$$.c" )
+        or die "Unable to open 'test_$$.c': $@\n";
     print {$out_fh} <<END_C;
 int main() {
     return 0;
