@@ -125,7 +125,7 @@ sub get {
     return @$c{@_};
 }
 
-=item * C<set($key => $val, ...)>
+=item * C<< set($key => $val, ...) >>
 
 =over 4
 
@@ -171,7 +171,7 @@ sub set {
     return $self;
 }
 
-=item * C<add($delim, $key => $val, ...)>
+=item * C<< add($delim, $key => $val, ...) >>
 
 =over 4
 
@@ -588,7 +588,7 @@ sub get_p5 {
     return @$p5{@_};
 }
 
-=item * C<set_p5($key => $val, ...)>
+=item * C<< set_p5($key => $val, ...) >>
 
 =over 4
 
