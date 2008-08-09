@@ -445,13 +445,12 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * string_substr(PARROT_INTERP,
-    ARGIN(STRING *src),
+    ARGIN_NULLOK(STRING *src),
     INTVAL offset,
     INTVAL length,
     ARGOUT_NULLOK(STRING **d),
     int replace_dest)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
