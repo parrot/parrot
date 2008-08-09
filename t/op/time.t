@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 
 =head1 NAME
 
@@ -63,9 +63,6 @@ ok, (!= 1970) Grateful Dead not
 ok, (now>before) timelords need not apply
 OUTPUT
 
-SKIP: {
-    skip 'failling on win32' => 1 if $^O =~ m/win32/i;
-
 pasm_output_is( <<CODE, <<OUTPUT, "sleep" );
         print   "start\\n"
 
@@ -87,8 +84,6 @@ CODE
 start
 done
 OUTPUT
-
-}
 
 pasm_error_output_like( <<CODE, <<OUT , "sleep" );
         sleep   -1
@@ -121,6 +116,35 @@ $I1 = length $S0
 print $I1
 .end
 CODE
+
+pir_output_is(<<'CODE', <<OUTPUT, "time(FLOATVAL) vs time(INTVAL)");
+.sub main :main
+    .local int time_int
+    time time_int
+
+    .local num time_float
+    time time_float
+
+    # check if time_float is within [time_int - 5;time_int + 5]
+    .local int time_int_lower
+    time_int_lower = time_int - 5
+    if time_float < time_int_lower goto FAIL
+    .local int time_int_upper
+    time_int_upper = time_int + 5
+    if time_float > time_int_upper goto FAIL
+
+    print "ok\n"
+    goto END
+
+FAIL: print "not ok\n"
+    goto END
+
+END:
+.end
+CODE
+ok
+OUTPUT
+
 
 # Local Variables:
 #   mode: cperl

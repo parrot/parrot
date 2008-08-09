@@ -61,7 +61,8 @@ FLOATVAL
 Parrot_floatval_time(void)
 {
     SYSTEMTIME sysTime;
-    FILETIME fileTime;          /* 100ns == 1 */
+    /* 100 ns ticks since 1601-01-01 00:00:00 */
+    FILETIME fileTime;
     LARGE_INTEGER i;
 
     GetSystemTime(&sysTime);
@@ -69,7 +70,12 @@ Parrot_floatval_time(void)
     /* Documented as the way to get a 64 bit from a FILETIME. */
     memcpy(&i, &fileTime, sizeof (LARGE_INTEGER));
 
-    return (FLOATVAL)i.QuadPart / 10000000.0;   /*1e7 */
+    /* FILETIME uses 100ns steps since 1601-01-01 00:00:00 as epoch.
+     * We'd like 1 second steps since 1970-01-01 00:00:00.
+     * To get there, divide by 10,000,000 to get from 100ns steps to seconds.
+     * Then subtract the seconds between 1601 and 1970, i.e. 11,644,473,600.
+     */
+    return (FLOATVAL)i.QuadPart / 10000000.0 - 11644473600.0;
 }
 
 
