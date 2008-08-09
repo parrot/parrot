@@ -395,9 +395,9 @@ as an argument to C<date> and C<difftime>.
     $I0 = isa table, 'LuaNil'
     unless $I0 goto L2
   L1:
-    $I0 = time
+    $N0 = time
     new res, 'LuaNumber'
-    set res, $I0
+    set res, $N0
     .return (res)
   L2:
     lua_checktype(1, table, 'table')

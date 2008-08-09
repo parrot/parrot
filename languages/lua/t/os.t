@@ -175,13 +175,13 @@ OUTPUT
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function os.time' );
 print(os.time())
 CODE
-/^\d+/
+/^\d+(\.\d+)?$/
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function os.time' );
 print(os.time(nil))
 CODE
-/^\d+/
+/^\d+(\.\d+)?$/
 OUTPUT
 
 # Create a date/time for which mktime will return -1

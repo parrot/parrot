@@ -28,7 +28,7 @@ function Idle ()
     dt = now - prev_time
     prev_time = now
     if rotating and dt ~= 0 then
-        gl.Rotate(10*dt, 0, 1, 0)
+        gl.Rotate(360*dt, 0, 1, 0)
 	glut.PostRedisplay()
     end
 end
