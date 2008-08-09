@@ -348,8 +348,8 @@ static void
 _srand48(long seed)
 {
     last_rand[0] = SEED_LO;
-    last_rand[1] = (unsigned short)seed & 0xffff;
-    last_rand[2] = (unsigned short)(seed >> 16) & 0xffff;
+    last_rand[1] = (unsigned short)(seed & 0xffff);
+    last_rand[2] = (unsigned short)((seed >> 16) & 0xffff);
     /*
      * reinit a, c if changed by lcong48()
      */
