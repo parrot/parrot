@@ -1008,9 +1008,9 @@ Bad input: "C<test that the return from Foo is correct type>"
     .param string expected
     .local string diagnostic
 
-    diagnostic  = 'Received: '
+    diagnostic  = 'Have: '
     diagnostic .= received
-    diagnostic .= "\nExpected: "
+    diagnostic .= "\nWant: "
     diagnostic .= expected
 
     .return( diagnostic )

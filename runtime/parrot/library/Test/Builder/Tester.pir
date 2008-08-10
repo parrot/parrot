@@ -422,20 +422,20 @@ output or diagnostic output.
 
   REPORT_OUTPUT_MISMATCH:
     .local string diagnostic
-    diagnostic = "output mismatch\nexpected: "
-    concat diagnostic, expected_out_string
-    concat diagnostic, "\nreceived: "
+    diagnostic = "output mismatch\nhave: "
     concat diagnostic, received_out_string
+    concat diagnostic, "\nwant: "
+    concat diagnostic, expected_out_string
     concat diagnostic, "\n"
     test.'diag'( diagnostic )
 
     eq diag_matches, 1, RETURN
 
   REPORT_DIAG_MISMATCH:
-    diagnostic = "diagnostic mismatch\nexpected: '"
-    concat diagnostic, expected_diag_string
-    concat diagnostic, "'\nreceived: '"
+    diagnostic = "diagnostic mismatch\nhave: '"
     concat diagnostic, received_diag_string
+    concat diagnostic, "'\nwant: '"
+    concat diagnostic, expected_diag_string
     concat diagnostic, "'\n"
     test.'diag'( diagnostic )
 
