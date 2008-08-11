@@ -212,6 +212,18 @@ Adds an attribute with the given name to the class.
     $I0 = defined x
     .return ($I0)
 .end
+
+.sub 'lex_lookup'
+    .param string name
+    $P0 = find_name name
+    .return($P0)
+.end
+
+.sub 'lookup_class'
+    .param pmc item
+    $P0 = class item
+    .return($P0)
+.end
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

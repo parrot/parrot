@@ -10,4 +10,4 @@ def foo
     return [ 9, 6, 7 ]
 end
 
-foo()[1].upto(7) { |i| puts "ok ", i }
+foo[1].upto(7) { |i| puts "ok ", i }

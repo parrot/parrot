@@ -165,6 +165,10 @@ token varname {
     ]
 }
 
+token funcall {
+    <!reserved_word> <local_variable> <.before \s|'('> <.before <call_args>> {*}
+}
+
 token mrhs {
     <args> {*}
 }
@@ -182,6 +186,7 @@ proto 'infix:=' is precedence('1') is pasttype('copy') is lvalue(1)     { ... }
 
 token basic_primary {
     | <literal> {*}                         #= literal
+    | <funcall> {*}                         #= funcall
     | <variable> {*}                        #= variable
     | <array> {*}                           #= array
     | <ahash> {*}                           #= ahash

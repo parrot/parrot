@@ -56,9 +56,9 @@ class StaticTester
     end
 end
 
-x = StaticTester.new()
+x = StaticTester.new
 x.num = 6
-y = StaticTester.new()
+y = StaticTester.new
 y.speak
 y.num = y.num + 1
 x.speak

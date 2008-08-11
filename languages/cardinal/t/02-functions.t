@@ -21,7 +21,7 @@ def fib(n)
   end
 end
 
-first()
+first
 second(2)
 third(3,4)
 second fib(6) - 3;
