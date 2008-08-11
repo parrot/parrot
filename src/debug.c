@@ -27,7 +27,7 @@ the Parrot debugger, and the C<debug> ops.
 #include "interp_guts.h"
 #include "parrot/oplib.h"
 #include "trace.h"
-#include "parrot/debug.h"
+#include "parrot/debugger.h"
 #include "parrot/oplib/ops.h"
 #include "debug.str"
 
@@ -83,7 +83,7 @@ enum DebugCmd {
     debug_cmd_disassemble = 1903830
 };
 
-/* HEADERIZER HFILE: include/parrot/debug.h */
+/* HEADERIZER HFILE: include/parrot/debugger.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -3020,7 +3020,7 @@ GDB_B(PARROT_INTERP, ARGIN(const char *s)) {
 
 =head1 SEE ALSO
 
-F<include/parrot/debug.h>, F<src/pdb.c> and F<ops/debug.ops>.
+F<include/parrot/debugger.h>, F<src/pdb.c> and F<ops/debug.ops>.
 
 =head1 HISTORY
 

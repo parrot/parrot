@@ -144,7 +144,7 @@ typedef Parrot_Run_core_t Run_Cores;
 #include "parrot/op.h"
 #include "parrot/oplib.h"
 
-#include "parrot/debug.h"
+#include "parrot/debugger.h"
 #include "parrot/mmd.h"
 
 typedef struct warnings_t {

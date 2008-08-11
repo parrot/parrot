@@ -112,7 +112,7 @@ and C<debug_break> ops in F<ops/debug.ops>.
 #include "../compilers/imcc/imc.h"
 #include "../compilers/imcc/parser.h"
 #include "parrot/embed.h"
-#include "parrot/debug.h"
+#include "parrot/debugger.h"
 
 static void PDB_printwelcome(void);
 static void PDB_run_code(Parrot_Interp interp, int argc, char *argv[]);

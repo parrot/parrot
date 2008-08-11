@@ -302,7 +302,6 @@ typedef struct _hash Hash;
 #include "parrot/resources.h"
 #include "parrot/string_funcs.h"
 #include "parrot/misc.h"
-#include "parrot/debug.h"
 #include "parrot/sub.h"
 #include "parrot/inter_call.h"
 #include "parrot/key.h"

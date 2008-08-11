@@ -1078,7 +1078,7 @@ $(SRC_DIR)/core_pmcs$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/trace$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/debug$(O) : $(GENERAL_H_FILES) $(INC_DIR)/debug.h \
+$(SRC_DIR)/debug$(O) : $(GENERAL_H_FILES) $(INC_DIR)/debugger.h \
     $(SRC_DIR)/debug.str
 
 $(SRC_DIR)/sub$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/sub.str
@@ -1162,7 +1162,7 @@ $(SRC_DIR)/stacks$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/tsq$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/embed$(O) : $(GENERAL_H_FILES) $(INC_DIR)/debug.h
+$(SRC_DIR)/embed$(O) : $(GENERAL_H_FILES) $(INC_DIR)/debugger.h
 
 $(SRC_DIR)/dataypes$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/dataypes.c
 

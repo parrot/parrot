@@ -867,7 +867,7 @@ include/parrot/cclass.h                                     [main]include
 include/parrot/charset.h                                    [main]include
 include/parrot/compiler.h                                   [main]include
 include/parrot/datatypes.h                                  [main]include
-include/parrot/debug.h                                      [main]include
+include/parrot/debugger.h                                   [main]include
 include/parrot/dod.h                                        [main]include
 include/parrot/dynext.h                                     [main]include
 include/parrot/embed.h                                      [main]include
