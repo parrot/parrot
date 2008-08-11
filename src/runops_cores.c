@@ -209,7 +209,7 @@ runops_slow_core(PARROT_INTERP, ARGIN(opcode_t *pc))
         return runops_trace_core(interp, pc);
 #if 0
     if (interp->debugger && interp->debugger->pdb)
-        return Parrot_debug(interp->debugger, pc);
+        return Parrot_debug(interp, interp->debugger, pc);
 #endif
 
     while (pc) {

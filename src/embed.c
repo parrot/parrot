@@ -965,10 +965,9 @@ Runs the interpreter's bytecode in debugging mode.
 PARROT_API
 PARROT_CAN_RETURN_NULL
 opcode_t *
-Parrot_debug(NOTNULL(Parrot_Interp debugger), opcode_t * pc)
+Parrot_debug(PARROT_INTERP, NOTNULL(Parrot_Interp debugger), opcode_t * pc)
 {
     const char *command;
-    Interp     *interp;
     PDB_t      * const pdb = debugger->pdb;
 
     pdb->cur_opcode        = pc;
