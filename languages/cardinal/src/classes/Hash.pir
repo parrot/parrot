@@ -139,6 +139,25 @@ Run C<block> once for each item in C<self>, with the key and value passed as arg
   each_loop_end:
 .end
 
+.sub 'to_a' :method
+    .local pmc newlist
+    .local pmc item
+    .local pmc iter
+    newlist = new 'CardinalArray'
+    iter = new 'Iterator', self
+  each_loop:
+    unless iter goto each_loop_end
+    $P1 = shift iter
+    $P2 = iter[$P1]
+    item = new 'CardinalArray'
+    push item, $P1
+    push item, $P2
+    push newlist, item
+    goto each_loop
+  each_loop_end:
+    .return (newlist)
+.end
+
 
 ## FIXME:  Parrot currently requires us to write our own "clone" method.
 .sub 'clone' :vtable :method
