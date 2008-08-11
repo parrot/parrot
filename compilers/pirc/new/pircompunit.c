@@ -30,7 +30,16 @@
 /* the order of these letters match with the pir_type enumeration. */
 const char pir_register_types[5] = {'I', 'N', 'S', 'P', '?'};
 
+/*
 
+
+=head1 Functions
+
+=over 4
+
+=cut
+
+*/
 
 void *
 panic(char *msg) {
@@ -440,7 +449,6 @@ create_const(pir_type type, char *name, va_list arg_ptr) {
 
 /*
 
-=over 4
 
 =item C<new_named_const>
 
@@ -1047,9 +1055,12 @@ print_subs(struct lexer_state *lexer) {
 
 }
 
+
 /*
 
 =back
+
+=cut
 
 */
 
