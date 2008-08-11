@@ -527,42 +527,91 @@ Checks to see if the specified index or indices have been assigned to.  Returns 
 
 =cut
 
-.sub first :method
-    .param pmc test
-    .local pmc retv
-    .local pmc block
-    .local pmc block_res
-    .local pmc block_arg
-    .local int narg
+.sub first :method :multi(CardinalArray,_)
+    .param int count
+    .local pmc newlist
+    .local pmc item
+    .local int elems
     .local int i
 
-    narg = elements self
+    newlist = new 'CardinalArray'
+
+    elems = elements self
+    le count, elems, sufficient_elements
+    count = elems
+  sufficient_elements:
+
     i = 0
 
   loop:
-    if i == narg goto nomatch
-    block_arg = self[i]
+    if i == count goto done
+    item = self[i]
+    item = clone item
 
-    newclosure block, test
-    block_res = block(block_arg)
-
-    if block_res goto matched
+    push newlist, item
 
     inc i
     goto loop
-
-  matched:
-    retv = block_arg
-    goto done
-
-  nomatch:
-    retv = new 'Undef'
-    goto done
-
   done:
-    .return(retv)
+    .return(newlist)
 .end
 
+.sub first :method :multi(CardinalArray)
+    .local pmc item
+    $I0 = elements self
+    eq $I0, 0, empty
+    item = self[0]
+    .return (item)
+  empty:
+    item = new 'Undef'
+    .return (item)
+.end
+
+=item first(...)
+
+=cut
+
+.sub last :method :multi(CardinalArray,_)
+    .param int count
+    .local pmc newlist
+    .local pmc item
+    .local int elems
+    .local int i
+
+    newlist = new 'CardinalArray'
+
+    elems = elements self
+    count = elems - count
+    ge count, 0, sufficient_elements
+    count = 0
+  sufficient_elements:
+
+    i = elems - 1
+
+  loop:
+    lt i, count, done
+    item = self[i]
+    item = clone item
+
+    unshift newlist, item
+
+    dec i
+    goto loop
+  done:
+    .return(newlist)
+.end
+
+.sub last :method :multi(CardinalArray)
+    .local pmc item
+    $I0 = elements self
+    eq $I0, 0, empty
+    dec $I0
+    item = self[$I0]
+    .return (item)
+  empty:
+    item = new 'Undef'
+    .return (item)
+.end
 
 =item each(block)
 
