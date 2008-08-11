@@ -49,20 +49,6 @@ parse_error(struct lexer_state *lexer, int linenr, char *message, ...) {
     lexer->parse_errors++;
 }
 
-target *
-find_target(struct lexer_state *lexer, char * const name) {
-    symbol *s = find_symbol(lexer, name);
-
-    if (s == NULL) { /* not declared */
-        parse_error(lexer, 0, "symbol '%s' was not declared\n", name);
-        return NULL;
-    }
-    else {
-        target *t = new_target(s->type, name);
-        return t;
-    }
-
-}
 
 void
 set_namespace(struct lexer_state *lexer, key *ns) {
@@ -96,6 +82,7 @@ set_sub_vtable(struct lexer_state *lexer, char *vtablename) {
 void
 set_sub_lexid(struct lexer_state *lexer, char *lexid) {
     lexer->subs->lex_id = lexid;
+    SET_FLAG(lexer->subs->flags, SUB_FLAG_LEXID);
 }
 
 /*
@@ -109,7 +96,7 @@ set_sub_flag(struct lexer_state *lexer, sub_flag flag) {
     SET_FLAG(lexer->subs->flags, flag);
 
     /* if the sub is a method or a :vtable method, then also add a "self" parameter */
-    if (TEST_FLAG(flag, SUB_FLAG_VTABLE) || TEST_FLAG(flag, SUB_FLAG_METHOD)) {
+    if (TEST_FLAG(flag, (SUB_FLAG_VTABLE | SUB_FLAG_METHOD))) {
         add_param(lexer, PMC_TYPE, "self");
     }
 }
@@ -164,7 +151,34 @@ new_instr(struct lexer_state *lexer) {
         lexer->subs->statements->next = instr;
         lexer->subs->statements = instr;
     }
+}
 
+void
+set_curtarget(struct lexer_state *lexer, target *t) {
+    lexer->curtarget = t;
+}
+
+/*
+
+=item C<int
+targets_equal(target *t1, target *t2)>
+
+Returns true if C<t1> equals C<t2>, false otherwise.
+
+=cut
+
+*/
+int
+targets_equal(target *t1, target *t2) {
+    /* if t1 has a name, it must equal t2->name */
+    if (t1->name && t2->name && (0 == strcmp(t1->name, t2->name)))
+        return 1;
+
+    /* if there's no name, then types and register numbers must be equal */
+    if ((t1->type == t2->type) && (t1->regno == t2->regno))
+        return 1;
+
+    return 0;
 }
 
 /* Create a new target node. The node's next pointer is initialized to
@@ -178,6 +192,7 @@ new_target(pir_type type, char *name) {
     t->key  = NULL;
 
     t->next = t; /* circly linked list */
+
     return t;
 }
 
@@ -195,6 +210,7 @@ add_target(struct lexer_state *lexer, target *t1, target *t) {
     t->next = t1->next;
     t1->next = t;
     t1 = t;
+
     return t;
 }
 
@@ -203,6 +219,7 @@ add_param(struct lexer_state *lexer, pir_type type, char *name) {
     target *t = new_target(type, name);
 
     assert(lexer->subs);
+
     if (lexer->subs->parameters == NULL) {
         lexer->subs->parameters = t;
         t->next = t;
@@ -210,17 +227,31 @@ add_param(struct lexer_state *lexer, pir_type type, char *name) {
     else {
 
         assert(lexer->subs->parameters);
-        t->next = lexer->subs->parameters->next;
+        t->next                       = lexer->subs->parameters->next;
         lexer->subs->parameters->next = t;
-        lexer->subs->parameters = t;
+        lexer->subs->parameters       = t;
     }
+
+    /* set the parameter just added as curtarget */
+    lexer->curtarget = t;
+
+    /* add the parameter as a local symbol */
+    declare_local(lexer, type, new_local(name, 0));
+
     return t;
 
 }
 
+void
+set_alias(struct lexer_state *lexer, char *alias) {
+    assert(lexer->curtarget != NULL);
+    lexer->curtarget->named_flag_arg = alias;
+    SET_FLAG(lexer->curtarget->flags, TARGET_FLAG_NAMED);
+}
+
 target *
 add_param_named(struct lexer_state *lexer, pir_type type, char *name, char *alias) {
-    target *t = add_param(lexer, type, name);
+    target *t         = add_param(lexer, type, name);
     t->named_flag_arg = alias;
     SET_FLAG(t->flags, TARGET_FLAG_NAMED);
     return t;
@@ -241,6 +272,7 @@ set_param_flag(target *param, target_flag flag) {
 argument *
 new_argument(expression *expr) {
     argument *arg = (argument *)calloc(1, sizeof (argument));
+    assert(arg != NULL);
     arg->value = expr;
     arg->next  = arg;
     return arg;
@@ -259,7 +291,7 @@ add_arg(argument *arg1, argument *arg2) {
 
     arg2->next = arg1->next;
     arg1->next = arg2;
-    arg1 = arg2;
+    arg1       = arg2;
 
     return arg1;
 }
@@ -269,7 +301,7 @@ add_arg(argument *arg1, argument *arg2) {
 void
 set_arg_named(argument *arg, char *alias) {
     SET_FLAG(arg->flags, ARG_FLAG_NAMED);
-    arg->named_flag_arg = alias;
+    arg->alias = alias;
 }
 
 void
@@ -295,10 +327,32 @@ set_label(struct lexer_state *lexer, char *label) {
 static instruction *
 new_instruction(char *opname) {
     instruction *ins = (instruction *)calloc(1, sizeof (instruction));
+    assert(ins != NULL);
     ins->opname = opname;
     return ins;
 }
 
+/*
+
+TODO: use set-instr to pass operands too to make code shorter.
+
+maybe have different variants (wrappers), with names as "set_instrX" where
+X is the number of operands, saving the count argument for vararg functions.
+Or:
+
+ set_instr(lexer, "null %t", $1);
+
+where $1 is a target (%t).
+
+Other options then are:
+
+ %c   constant node
+ %e   expression node
+ %t   target node
+
+This might be a bit slower (for reading the % stuff).
+
+*/
 void
 set_instr(struct lexer_state *lexer, char *opname, ...) {
     va_list arg_ptr;
@@ -310,6 +364,25 @@ set_instr(struct lexer_state *lexer, char *opname, ...) {
 
     va_end(arg_ptr);
 }
+
+
+void
+set_instr0(struct lexer_state *lexer, char *opname, int count, ...) {
+    va_list arg_ptr;
+    int i;
+
+    lexer->subs->statements->instr.ins = new_instruction(opname);
+    lexer->subs->statements->type = STAT_TYPE_INSTRUCTION;
+
+    va_start(arg_ptr, count);
+
+    for (i = 0; i < count; i++)
+        push_operand(lexer, va_arg(arg_ptr, expression *));
+
+    va_end(arg_ptr);
+}
+
+
 
 char *
 get_inverse(char *instr) {
@@ -440,13 +513,6 @@ set_invocation_sub(struct lexer_state *lexer, target *sub) {
 void
 set_invocation_object(struct lexer_state *lexer, target *object) {
     lexer->subs->statements->instr.inv->object = object;
-}
-
-int
-same_types(expression *e1, expression *e2) {
-    if ((e1->type == e2->type) && (e1->type == INT_TYPE || e1->type == NUM_TYPE))
-        return 1;
-    return 0;
 }
 
 
@@ -673,11 +739,11 @@ add_key(key *keylist, expression *exprkey) {
     key *newkey = new_key(exprkey);
     key *list = keylist;
 
+    /* goto end of list */
     while (keylist->next != NULL)
         keylist = keylist->next;
     keylist->next = newkey;
 
-    //print_key(list);
     return list;
 }
 
@@ -700,7 +766,8 @@ add_local(target *list, target *local) {
 target *
 new_local(char *name, int has_unique_reg) {
     target *t = new_target(UNKNOWN_TYPE, name);
-    SET_FLAG(t->flags, TARGET_FLAG_UNIQUE_REG);
+    if (has_unique_reg)
+        SET_FLAG(t->flags, TARGET_FLAG_UNIQUE_REG);
     return t;
 }
 
@@ -733,6 +800,7 @@ print_target(target *t) {
         char type = pir_register_types[t->type];
         printf("$%c%d", type, t->regno);
     }
+    /* if the target has a key, print that too */
     if (t->key)
         print_key(t->key);
 }
@@ -806,7 +874,10 @@ print_arguments(char *opname, argument *args) {
             printf("   %s '", opname);
 
             do {
-                printf("0");
+                printf("%d", iter->flags);
+                if (iter->flags & ARG_FLAG_NAMED)
+                    printf("[%s]", iter->alias);
+
                 iter = iter->next;
                 if (iter != args->next) printf(",");
                 else printf("', ");
@@ -830,8 +901,10 @@ void
 print_instruction(instruction *ins) {
     assert(ins != NULL);
     if (ins->opname) {
+        if (strcmp(ins->opname, "nop") ==0 )
+            return;
         printf("   %s ", ins->opname);
-        print_expressions( ins->operands);
+        print_expressions(ins->operands);
         printf("\n");
     }
 }
@@ -839,10 +912,14 @@ print_instruction(instruction *ins) {
 void
 print_targets(char *opname, target *parameters) {
     if (parameters != NULL) {
+        /* get the first parameter: */
         target *iter = parameters->next;
         printf("   %s '", opname);
         do {
-            printf("0");
+            printf("%d", iter->flags);
+            if (iter->flags & TARGET_FLAG_NAMED)
+                printf("[%s]", iter->named_flag_arg);
+
             iter = iter->next;
             if (iter != parameters->next) printf(",");
             else printf("', ");
@@ -870,11 +947,11 @@ print_invocation(invocation *inv) {
             print_targets("get_results", inv->results);
 
             if (inv->sub->name != NULL) {
-                printf("   find_name $P%d, '%s'\n", 99, inv->sub->name);
-                printf("   invokecc $P%d", 99);
+                printf("   find_name P%d, '%s'\n", 99, inv->sub->name);
+                printf("   invokecc P%d", 99);
             }
             else
-                printf("   invokecc $P%d", inv->sub->regno);
+                printf("   invokecc P%d", inv->sub->regno);
 
             break;
         case CALL_RET:
@@ -882,7 +959,7 @@ print_invocation(invocation *inv) {
             printf("   returncc");
             break;
         case CALL_NCI:
-            printf("   invokecc $P0");
+            printf("   invokecc P%d", 99);
             break;
         case CALL_YIELD:
             print_arguments("set_returns", inv->arguments);
@@ -956,7 +1033,10 @@ print_subs(struct lexer_state *lexer) {
             printf(".namespace ");
             print_key(subiter->name_space);
 
-            printf("\n.pcc_sub %s:\n", subiter->sub_name);
+            printf("\n.pcc_sub ");
+            /* TODO: process sub flags */
+
+            printf("%s:\n", subiter->sub_name);
             print_targets("get_params", subiter->parameters);
             print_statement(subiter);
             subiter = subiter->next;

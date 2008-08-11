@@ -3,11 +3,11 @@
  * Copyright (C) 2007-2008, The Perl Foundation.
  */
 
+
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "pirparser.h"
 #include "pircompiler.h"
 
@@ -31,17 +31,18 @@ extern int yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * c
 
 
 =item C<void
-syntax_error(yyscan_t yyscanner, lexer_state *lexer, char *message)>
+syntax_error(yyscan_t yyscanner, char *message)>
 
 wrapper function for yyerror. This is useful, so that if yyerror's
 signature changes, calls to syntax_error in the lexer do not need
 to be updated.
 
 */
+
 void
-syntax_error(yyscan_t yyscanner, lexer_state *lexer, char *message)
+syntax_error(yyscan_t yyscanner, char const * const message)
 {
-    yyerror(yyscanner, lexer, message);
+    yyerror(yyscanner, yyget_extra(yyscanner), message);
 }
 
 /*
@@ -51,11 +52,12 @@ print_help(char const * const program_name)>
 
 Routine to print usage of this program.
 
+=cut
+
 */
 static void
 print_help(char const * const program_name)
 {
-
     fprintf(stderr, "Usage: %s [options] <file>\n", program_name);
     fprintf(stderr, "Options:\n\n");
     /*fprintf(stderr, "  -E        pre-process\n"); */
@@ -65,6 +67,30 @@ print_help(char const * const program_name)
                     "Currently only works in combination with '-E' option\n");
 }
 
+
+/*
+
+=item C<static FILE *
+open_file(char const * const filename, char const * const mode)>
+
+Function to open the file given by C<filename>, in the mode given by C<mode>
+Microsoft visual studio provides a "safer" variant of fopen(); this
+function hides the selection of the appropriate variant.
+
+=cut
+
+*/
+static FILE *
+open_file(char const * const filename, char const * const mode) {
+    FILE *fp = NULL;
+
+#ifdef _MSC_VER
+    fopen_s(&fp, filename, mode);
+#else
+    fp = fopen(filename, mode);
+#endif
+    return fp;
+}
 
 /*
 
@@ -134,7 +160,7 @@ main(int argc, char *argv[])
     }
     else {
         /* done handling arguments, open the file */
-        infile   = fopen(argv[0], "r");
+        infile   = open_file(argv[0], "r");
         filename = argv[0];
     }
 
@@ -188,7 +214,7 @@ int
 yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message)
 {
     char const * const text = yyget_text(yyscanner);
-    lexer->parse_errors++;
+    ++lexer->parse_errors;
 
     fprintf(stderr, "\nError in file '%s' (line %d)\n%s ",
             lexer->filename, yyget_lineno(yyscanner), message);

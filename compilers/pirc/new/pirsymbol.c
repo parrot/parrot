@@ -24,6 +24,11 @@ Functions for handling symbols.
 
 =over 4
 
+=item C<symbol *
+new_symbol(char *name)>
+
+Create a new symbol node, returns it after initialization.
+
 =cut
 
 */
@@ -31,8 +36,9 @@ Functions for handling symbols.
 symbol *
 new_symbol(char *name) {
     symbol *sym = (symbol *)malloc(sizeof (symbol));
-    sym->name = name;
-    sym->next = NULL;
+    assert(sym != NULL);
+    sym->name   = name;
+    sym->next   = NULL;
     return sym;
 }
 
@@ -58,26 +64,29 @@ declare_local(struct lexer_state *lexer, pir_type type, target *list)
      * itself (that's why it's only a single item list. In that case, just
      * store the symbol.
      */
-
-
-
-
     if (iter == list) {
-        symbol *sym = new_symbol(iter->name);
-        sym->type = type;
-
+        symbol *sym    = new_symbol(iter->name);
+        sym->next      = NULL;
+        sym->type      = type;
         lexer->symbols = sym;
     }
     else {
         while (iter != list) {
-            symbol *sym = new_symbol(iter->name);
-            sym->type = type;
+            symbol *sym    = new_symbol(iter->name);
+            sym->type      = type;
 
-            sym->next = lexer->symbols;
+            sym->next      = lexer->symbols;
             lexer->symbols = sym;
 
-            iter = iter->next;
+            iter           = iter->next;
         }
+    }
+
+    iter = list->next;
+    while (iter != list) {
+        printf("symbol %s\n", iter->name);
+        iter = iter->next;
+
     }
 }
 
@@ -96,8 +105,6 @@ find_symbol(struct lexer_state *lexer, char * const name)
 {
     symbol *iter = lexer->symbols;
     while (iter) {
-        /* printf("[%s] ", iter->name);
-        */
         if (strcmp(iter->name, name) == 0)
             return iter;
         iter = iter->next;

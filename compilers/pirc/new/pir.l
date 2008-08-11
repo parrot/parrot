@@ -64,7 +64,7 @@ extern char *yyget_text(yyscan_t yyscanner);
 /* declaration of yylex */
 extern int yylex(YYSTYPE *yylval, yyscan_t yyscanner);
 
-extern void syntax_error(yyscan_t yyscanner, lexer_state *lexer, char *message);
+extern void syntax_error(yyscan_t yyscanner, char *message);
 
 
 
@@ -153,7 +153,9 @@ new_lexer(char * const filename) {
     lexer->current_ns    = NULL;
     lexer->symbols       = NULL;
     lexer->subs          = NULL;
-    lexer->is_instr      = 0;
+
+    lexer->curtarget     = NULL;
+    lexer->curarg        = NULL;
 
     printdebug(stderr, "Constructing new lexer\n");
 
@@ -233,6 +235,8 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 
 {WS}             { /* ignore whitespace */ }
 
+#.*\n            { /* ignore line comments */ }
+
 {EOL}[\t\r\n ]*  { /* a set of continuous newlines yields a single newline token. */
                    return TK_NL;
                  }
@@ -271,6 +275,8 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 {WS}"."{WS} { /* if the dot is surrounded by whitespace, it's a concatenation operator */
               return TK_CONC;
             }
+".."        { return TK_CONC; }
+
 "."         { return '.'; }
 "="         { return '='; }
 ";"         { return ';'; }
@@ -363,22 +369,23 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
                 return TK_LABEL;
               }
 
+
+"set"         { return PARROT_SET; }
+"add"         { return PARROT_ADD; }
+"sub"         { return PARROT_SUB; }
+"mul"         { return PARROT_MUL; }
+"div"         { return PARROT_DIV; }
+"fdiv"        { return PARROT_FDIV; }
+
 {IDENT}       { /* make the Id or op available in the parser. */
                 lexer_state *lexer = yyget_extra(yyscanner);
-                yylval->sval = dupstr(yytext);
+                yylval->sval       = dupstr(yytext);
 
                 /* if the id was declared as a local, it's returned as a TK_IDENT,
                  * even if the id is an op; declared locals or constants "hide" ops.
                  */
                 if (find_symbol(lexer, yytext))
                     return TK_IDENT;
-
-                /* XXX check for "self" if the current sub is a method or vtable method */
-                if (strcmp(yytext, "self") == 0) {
-                    if (lexer->subs->flags & (SUB_FLAG_METHOD | SUB_FLAG_VTABLE))
-                        return TK_IDENT;
-                }
-
 
                 /* at this point it was no local or constant; check whether it's an op. */
                 if (is_parrot_op(yytext))
@@ -401,8 +408,7 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 
 
 .      { /* any character not covered in the rules above is an error. */
-         lexer_state *my_lexer = yyget_extra(yyscanner);
-         syntax_error(yyscanner, my_lexer, "Unexpected character");
+         syntax_error(yyscanner, "Unexpected character");
        }
 
 
@@ -414,23 +420,32 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 
 
 static int
-is_parrot_op(char const * const spelling) {
-
+is_parrot_op(char const * const spelling)
+{
     /* only these are currently recognized as a Parrot instruction */
-    if (strcmp(spelling, "print") == 0)
-        return 1;
-    if (strcmp(spelling, "new") == 0)
-        return 1;
-    if (strcmp(spelling, "newclass") == 0)
-        return 1;
-    if (strcmp(spelling, "end") == 0)
-        return 1;
-    if (strcmp(spelling, "set") == 0)
-        return 1;
-    if (strcmp(spelling, "setline") == 0)
-        return 1;
-    if (strcmp(spelling, "setfile") == 0)
-        return 1;
+    char const * ops[] = {
+        "print",
+        "new",
+        "newclass",
+        "end",
+        "set",
+        "find_global",
+        "setfile",
+        "setline",
+        "add",
+        "sub",
+        NULL
+    };
+
+
+    char const **iter = ops;
+
+    while (*iter != NULL) {
+        if (strcmp(spelling, *iter) == 0)
+            return 1;
+        iter++;
+    }
+
     return 0;
 }
 
