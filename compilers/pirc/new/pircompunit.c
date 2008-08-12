@@ -474,10 +474,41 @@ set_instr0(struct lexer_state *lexer, char *opname, int count, ...) {
 
 /*
 
-set_instrf
+=item C<void
+set_instrf(struct lexer_state *lexer, char *opname, char const * const format, ...)>
 
 Set the specified instruction, using the operands from the vararg list. The
-number and types of operands is specified by C<format>.
+number and types of operands is specified by C<format>. The type of the
+operands is specified by a '%' character followed by a character, which
+can be one of the following:
+
+=over 4
+
+=item I
+
+=item T
+
+=item E
+
+=item C
+
+=item i
+
+=item n
+
+=item s
+
+=back
+
+An example is:
+
+ set_instrf(lexer, "set", "%T%i", $1, $2);
+
+This sets the instruction named C<set>, which takes two operands:
+a target node (T) and an integer constant (i). C<$1> and C<$2>
+refer to the (non-)terminals used in a Yacc/Bison specification.
+
+=cut
 
 */
 void
@@ -499,22 +530,25 @@ set_instrf(struct lexer_state *lexer, char *opname, char const * const format, .
         assert(*(format + i) == '%');
         ++i;
         switch (*(format + i)) {
-            case 't':
+            case 'I': /* identifier */
+                expr = expr_from_ident(va_arg(arg_ptr, char *));
+                break;
+            case 'T': /* target */
                 expr = expr_from_target(va_arg(arg_ptr, target *));
                 break;
-            case 'e':
+            case 'E': /* expression */
                 expr = va_arg(arg_ptr, expression *);
                 break;
-            case 'c':
+            case 'C': /* constant */
                 expr = expr_from_const(va_arg(arg_ptr, constant *));
                 break;
-            case 'i':
+            case 'i': /* integer */
                 expr = expr_from_const(new_const(INT_TYPE, va_arg(arg_ptr, int)));
                 break;
-            case 'n':
+            case 'n': /* number */
                 expr = expr_from_const(new_const(NUM_TYPE, va_arg(arg_ptr, double)));
                 break;
-            case 's':
+            case 's': /* string */
                 expr = expr_from_const(new_const(STRING_TYPE, va_arg(arg_ptr, char *)));
                 break;
             default:
@@ -526,8 +560,17 @@ set_instrf(struct lexer_state *lexer, char *opname, char const * const format, .
     va_end(arg_ptr);
 }
 
+/*
 
+=item C<char *
+get_inverse(char *instr)>
 
+Returns the instruction with inversed semantics; for instance
+C<if> becomes C<unless>, C<greater-than> becomes C<less-or-equals>.
+
+=cut
+
+*/
 char *
 get_inverse(char *instr) {
          if (strcmp(instr, "if") == 0) return "unless";
@@ -539,11 +582,15 @@ get_inverse(char *instr) {
     else if (strcmp(instr, "eq") == 0) return "ne";
     return "Invalid instruction in get_inverse()!";
 }
-/*
-Invert the current instruction. "if" becomes "unless", and all rel_op's are also inverted.
 
-If we would code the opnames as integers, this would be more efficient. THis will
-be the case anyway in the future, but for now, we'd like to pretty-print everything.
+/*
+
+=item C<void
+invert_instr(struct lexer_state *lexer)>
+
+Invert the current instruction.
+
+=cut
 
 */
 void
