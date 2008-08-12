@@ -357,44 +357,6 @@ op subclass(out PMC, in STR, in PMC) :object_classes :flow {
 
 ###############################################################################
 
-=item B<getclass>(out PMC, in STR)
-
-=item B<getclass>(out PMC, in PMC)
-
-Find the PMC for a class, by name. Deprecated - works with the old class
-system.
-
-=cut
-
-inline op getclass(out PMC, in STR) :object_classes :flow :deprecated {
-    PMC      * const _class = Parrot_class_lookup(interp, $2);
-    opcode_t * const next   = expr NEXT();
-
-    if (PMC_IS_NULL(_class))
-        Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_NO_CLASS,
-            "Class '%Ss' doesn't exist", $2);
-
-    $1 = _class;
-
-  goto ADDRESS(next);
-}
-
-inline op getclass(out PMC, in PMC) :object_classes :flow :deprecated {
-  PMC      * const _class = Parrot_class_lookup_p(interp, $2);
-  opcode_t * const next   = expr NEXT();
-
-  if (PMC_IS_NULL(_class)) {
-    STRING * const name = readable_name(interp, $2);
-    Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_NO_CLASS,
-        "Class '%Ss' doesn't exist", name);
-  }
-  else
-    $1 = _class;
-  goto ADDRESS(next);
-}
-
-###############################################################################
-
 =item B<get_class>(out PMC, in STR)
 
 =item B<get_class>(out PMC, in PMC)

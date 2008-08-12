@@ -174,18 +174,56 @@ inline op print(in NUM) :base_io {
 
 op print(in STR) :base_io {
   STRING * const s = $1;
-  if (s && string_length(interp, s)) {
+  if (s && string_length(interp, s))
     PIO_putps(interp, _PIO_STDOUT(interp), s);
-  }
 }
 
 op print(invar PMC) :base_io {
   PMC * const p = $1;
   STRING * const s = (VTABLE_get_string(interp, p));
-  if (s) {
+  if (s)
     PIO_putps(interp, _PIO_STDOUT(interp), s);
-  }
 }
+
+=item B<say>(in INT)
+
+=item B<say>(in NUM)
+
+=item B<say>(invar PMC)
+
+=item B<say>(in STR)
+
+Print $1 to standard output with a trailing newline.
+
+=cut
+
+inline op say(in INT) :base_io {
+  PIO_printf(interp, INTVAL_FMT, (INTVAL)$1);
+  PIO_puts(interp, _PIO_STDOUT(interp), "\n");
+}
+
+inline op say(in NUM) :base_io {
+  PIO_printf(interp, "%f", (double)$1);
+  PIO_puts(interp, _PIO_STDOUT(interp), "\n");
+}
+
+op say(in STR) :base_io {
+  STRING * const s = $1;
+  if (s && string_length(interp, s))
+    PIO_putps(interp, _PIO_STDOUT(interp), s);
+  PIO_puts(interp, _PIO_STDOUT(interp), "\n");
+}
+
+op say(invar PMC) :base_io {
+  PMC * const p = $1;
+  STRING * const s = (VTABLE_get_string(interp, p));
+  if (s)
+    PIO_putps(interp, _PIO_STDOUT(interp), s);
+  PIO_puts(interp, _PIO_STDOUT(interp), "\n");
+}
+
+
+
 
 ##########################################
 

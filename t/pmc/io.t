@@ -873,7 +873,7 @@ EOS
     pio = open	"temp.file", ">"
     print pio, $S0
     close pio
-    cl = getclass 'ParrotIO'
+    cl = new 'ParrotIO'
     $S1 = cl.'slurp'('temp.file')
     if $S0 == $S1 goto ok
     print "not "

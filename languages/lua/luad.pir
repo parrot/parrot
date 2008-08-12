@@ -65,7 +65,7 @@ Francois Perrad.
     .param string filename
     .local pmc pio
     .local string content
-    pio = getclass 'ParrotIO'
+    pio = new 'ParrotIO'
     push_eh _handler
     content = pio.'slurp'(filename)
     if content goto L1

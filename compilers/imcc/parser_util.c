@@ -72,16 +72,6 @@ static int is_infix(ARGIN(const char *name), int n, ARGIN(SymReg **r))
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static Instruction * maybe_builtin(PARROT_INTERP,
-    ARGIN(const char *name),
-    ARGIN(SymReg * const *r),
-    int n)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const char * to_infix(PARROT_INTERP,
     ARGIN(const char *name),
@@ -292,86 +282,6 @@ check_op(PARROT_INTERP, ARGOUT(char *fullname), ARGIN(const char *name),
 
 /*
 
-=item C<static Instruction * maybe_builtin>
-
-TODO: Needs to be documented!!!
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static Instruction *
-maybe_builtin(PARROT_INTERP, ARGIN(const char *name),
-        ARGIN(SymReg * const *r), int n)
-{
-    char sig[16];
-    SymReg *sub, *meth, *rr[10];
-    Instruction *ins;
-    int i, bi, is_class_meth, first_arg, is_void;
-
-    PARROT_ASSERT(n < 15);
-
-    for (i = 0; i < n; ++i) {
-        sig[i] = (char)r[i]->set;
-        rr[i]  = r[i];
-    }
-
-    sig[i] = '\0';
-    bi     = Parrot_is_builtin(name, sig);
-
-    if (bi < 0)
-        return NULL;
-
-    /*
-     * create a method see imcc.y target = sub_call
-     * cos Px, Py  => Px = Py.cos()
-     */
-    is_class_meth = Parrot_builtin_is_class_method(bi);
-    is_void       = Parrot_builtin_is_void(bi);
-    meth          = mk_sub_address(interp, name);
-
-    /* ParrotIO.open() */
-    if (is_class_meth) {
-        const char * const ns = Parrot_builtin_get_c_namespace(bi);
-        SymReg * const ns_sym = mk_const(interp, ns, 'S');
-
-        ins                   = IMCC_create_itcall_label(interp);
-        sub                   = ins->symregs[0];
-
-        IMCC_itcall_sub(interp, meth);
-
-        sub->pcc_sub->object  = ns_sym;
-        first_arg             = 1;
-    }
-    /* method y = x."cos"() */
-    else {
-        ins                   = IMCC_create_itcall_label(interp);
-        sub                   = ins->symregs[0];
-
-        IMCC_itcall_sub(interp, meth);
-
-        sub->pcc_sub->object  = rr[is_void ? 0 : 1];
-        first_arg             = 2;
-    }
-
-    sub->pcc_sub->flags |= isNCI;
-
-    if (is_void)
-        first_arg--;
-
-    for (i = first_arg; i < n; ++i)
-        add_pcc_arg(sub, rr[i]);
-
-    if (!is_void)
-        add_pcc_result(sub, rr[0]);
-
-    return ins;
-}
-
-/*
-
 =item C<int is_op>
 
 Is instruction a parrot opcode?
@@ -388,8 +298,7 @@ is_op(PARROT_INTERP, ARGIN(const char *name))
         || interp->op_lib->op_code(name, 1) >= 0
         || ((name[0] == 'n' && name[1] == '_')
                 && (interp->op_lib->op_code(name + 2, 0) >= 0
-                   || interp->op_lib->op_code(name + 2, 1) >= 0))
-        || Parrot_is_builtin(name, NULL) >= 0;
+                   || interp->op_lib->op_code(name + 2, 1) >= 0));
 }
 
 /*
@@ -661,12 +570,6 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     }
     else
         strcpy(fullname, name);
-
-    if (op < 0 && emit) {
-        ins = maybe_builtin(interp, name, r, n);
-        if (ins)
-            return ins;
-    }
 
     if (op < 0)
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,

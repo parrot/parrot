@@ -1167,11 +1167,12 @@ loop:
     s = "atugcsATUGCS"
     .const .Sub tr_00 = 'tr_00_init'
     el = elements tr_00
-    print el
-    print "\n"
-    trans s, tr_00
-    print s
-    print "\n"
+    say el
+   
+    $P0 = new 'String'
+    $P0.'trans'(s, tr_00)
+
+    say s
 .end
 CODE
 256
@@ -1180,12 +1181,10 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "reverse P0 - reverse string" );
 .sub main :main
+  $S0 = 'torrap'
   $P0 = new 'String'
-  $P0 = "torrap"
-  reverse $P0
-  print $P0
-  print "\n"
-  end
+  $P0.'reverse'($S0)
+  say $S0
 .end
 CODE
 parrot
@@ -1195,37 +1194,23 @@ pir_output_is( <<'CODE', <<OUTPUT, "is_integer - check integer" );
 .sub main :main
   $P0 = new 'String'
 
-  $P0 = "543"
-  $I0 = is_integer $P0
-  print $I0
-  print "\n"
+  $I0 = $P0.'is_integer'('543')
+  say $I0
 
-  $P0 = "4.3"
-  $I0 = is_integer $P0
-  print $I0
-  print "\n"
+  $I0 = $P0.'is_integer'('4.3')
+  say $I0
 
-  $P0 = "foo"
-  $I0 = is_integer $P0
-  print $I0
-  print "\n"
+  $I0 = $P0.'is_integer'('foo')
+  say $I0
 
-  $P0 = "-1"
-  $I0 = is_integer $P0
-  print $I0
-  print "\n"
+  $I0 = $P0.'is_integer'('-1')
+  say $I0
 
-  $P0 = "+-1"
-  $I0 = is_integer $P0
-  print $I0
-  print "\n"
+  $I0 = $P0.'is_integer'('+-1')
+  say $I0
 
-  $P0 = "+1"
-  $I0 = is_integer $P0
-  print $I0
-  print "\n"
-
-  end
+  $I0 = $P0.'is_integer'('+1')
+  say $I0
 .end
 CODE
 1

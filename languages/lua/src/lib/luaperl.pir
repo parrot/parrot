@@ -72,7 +72,7 @@ It's a temporary work. Waiting for the real PIR compiler/interpreter.
     .param string filename
     .local pmc pio
     .local string content
-    pio = getclass 'ParrotIO'
+    pio = new 'ParrotIO'
     push_eh _handler
     content = pio.'slurp'(filename)
     if content goto L1
@@ -105,7 +105,7 @@ It's a temporary work. Waiting for the real PIR compiler/interpreter.
     .local string pir
     pir = load_script($S1)
     if pir goto L1
-    $P0 = getclass 'ParrotIO'
+    $P0 = new 'ParrotIO'
     $S0 = $P0.'slurp'(out)
     unlink(out)  # cleaning up the temporary file
     die $S0

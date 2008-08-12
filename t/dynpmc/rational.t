@@ -94,7 +94,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Set and get native float");
     say N1
   .end
 CODE
-11.1
+11.100000
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "Set and get native string");

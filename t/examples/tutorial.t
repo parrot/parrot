@@ -38,7 +38,7 @@ Colin Kuskie - <ckuskie@sterling.net>
 my %expected = (
     '01_temp_var.pir' => << 'END_EXPECTED',
 42
-3.14159
+3.141590
 Hello
 Ford
 END_EXPECTED

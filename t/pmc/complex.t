@@ -835,7 +835,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', "sqrt of complex numbers" );
 .macro DoIt(val)
     c = .val
-    c2 = sqrt c
+    c2 = c.'sqrt'()
     print c2
     print "\n"
 .endm

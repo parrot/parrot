@@ -861,7 +861,6 @@ include/parrot/atomic/fallback.h                            [main]include
 include/parrot/atomic/gcc_pcc.h                             [main]include
 include/parrot/atomic/gcc_x86.h                             [main]include
 include/parrot/atomic/sparc.h                               [main]include
-include/parrot/builtin.h                                    [main]include
 include/parrot/caches.h                                     [main]include
 include/parrot/cclass.h                                     [main]include
 include/parrot/charset.h                                    [main]include
@@ -2920,7 +2919,6 @@ src/atomic/gcc_x86.c                                        []
 src/atomic/sparc_v9.s                                       []
 src/bignum.c                                                []
 src/bignum.h                                                []
-src/builtin.c                                               []
 src/byteorder.c                                             []
 src/charset.c                                               []
 src/charset/ascii.c                                         []
@@ -3488,7 +3486,6 @@ t/pmc/bigint.t                                              []
 t/pmc/bignum.t                                              []
 t/pmc/boolean.t                                             []
 t/pmc/bound_nci.t                                           []
-t/pmc/builtin.t                                             []
 t/pmc/capture.t                                             []
 t/pmc/class.t                                               []
 t/pmc/closure.t                                             []

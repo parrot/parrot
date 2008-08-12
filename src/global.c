@@ -664,18 +664,11 @@ Parrot_find_name_op(PARROT_INTERP, ARGIN(STRING *name), SHIM(void *next))
 
     /* RT#46171 - walk up the scopes!  duh!! */
 
-    if (PMC_IS_NULL(g)) {
+    if (PMC_IS_NULL(g))
         g = Parrot_find_global_cur(interp, name);
 
-        if (PMC_IS_NULL(g)) {
-            g = Parrot_find_global_n(interp,
-                    Parrot_get_ctx_HLL_namespace(interp), name);
-
-            if (PMC_IS_NULL(g)) {
-                g = Parrot_find_builtin(interp, name);
-            }
-        }
-    }
+    if (PMC_IS_NULL(g))
+        g = Parrot_find_global_n(interp, Parrot_get_ctx_HLL_namespace(interp), name);
 
     if (PMC_IS_NULL(g))
         return PMCNULL;

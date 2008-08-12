@@ -370,7 +370,6 @@ INTERP_O_FILES = \
     $(OPS_DIR)/core_ops_switch$(O) \
     \
 #CONDITIONED_LINE(i386_has_gcc_cmpxchg):    $(SRC_DIR)/atomic/gcc_x86$(O) \
-    $(SRC_DIR)/builtin$(O) \
     $(SRC_DIR)/byteorder$(O) \
     $(SRC_DIR)/charset$(O) \
     $(SRC_DIR)/core_pmcs$(O) \
@@ -571,7 +570,6 @@ $(GEN_LIBRARY) : $(PARROT)
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl $< > $@
 
 STR_FILES = \
-    $(SRC_DIR)/builtin.str \
     $(SRC_DIR)/debug.str \
     $(SRC_DIR)/dynext.str \
     $(SRC_DIR)/events.str \
@@ -1143,8 +1141,6 @@ $(SRC_DIR)/pic$(O) : $(GENERAL_H_FILES)
 $(SRC_DIR)/pic_jit$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/mmd$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/mmd.str
-
-$(SRC_DIR)/builtin$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/builtin.str
 
 $(SRC_DIR)/packfile$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/packfile.str
 

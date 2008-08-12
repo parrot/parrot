@@ -67,10 +67,6 @@ See RT #48018. Replace usage with get_[hll,root]_global variants.
 
 See RT #47011.
 
-=item * C<getclass> [post 0.5.0]
-
-See RT #47972. Future use should use the C<get_class> opcode.
-
 =item * C<get_mro> [post 0.5.0]
 
 See RT #47976.

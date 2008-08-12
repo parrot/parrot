@@ -51,7 +51,7 @@ next_iter:
     # Get size of file
     size = stat file, .STAT_FILESIZE
     .local pmc pio, cl
-    cl = getclass "ParrotIO"
+    cl = new "ParrotIO"
     # slurp the file into memory
     pio = cl."open"(file, "<", "mmap")
     # pio = open file, "<"

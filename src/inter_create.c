@@ -236,9 +236,6 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     /* setup stdio PMCs */
     PIO_init(interp);
 
-    /* init builtin function struct */
-    Parrot_init_builtins(interp);
-
     /* init IMCC compiler */
     imcc_init(interp);
 

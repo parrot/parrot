@@ -21,7 +21,7 @@ err:
 .sub _read_file
     .param pmc conn
     .param string file
-    $P0 = getclass 'ParrotIO'
+    $P0 = new 'ParrotIO'
     $S0 = $P0.'slurp'(file)
     .return ($S0)
 .end

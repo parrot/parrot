@@ -628,7 +628,7 @@ pir_output_is( <<'CODE', <<'OUT', 'subclass should do what the parent does' );
 .end
 
 .sub 'does_pmc'
-    $P0 = getclass 'ResizablePMCArray'
+    $P0 = get_class 'ResizablePMCArray'
     $I0 = does $P0, 'array'
 
     if $I0 goto okay

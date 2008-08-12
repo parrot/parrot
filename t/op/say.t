@@ -44,7 +44,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'say with a literal number' );
     say 3.14
 .end
 CODE
-3.14
+3.140000
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'say with a temporary string register' );
@@ -71,7 +71,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'say with a temporary number register' );
     say $N2
 .end
 CODE
-1.414
+1.414000
 OUTPUT
 
 # Local Variables:

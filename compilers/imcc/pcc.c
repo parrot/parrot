@@ -672,16 +672,8 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
         if (recursive_tail_call(interp, unit, ins, sub))
             return;
 
-    if (sub->pcc_sub->object) {
+    if (sub->pcc_sub->object)
         meth_call = 1;
-        if (sub->pcc_sub->object->set == 'S') {
-            regs[0] = mk_temp_reg(interp, 'P');
-            regs[1] = sub->pcc_sub->object;
-            ins     = insINS(interp, unit, ins, "getclass", regs, 2);
-
-            sub->pcc_sub->object = regs[0];
-        }
-    }
 
     /*
      * See if we need to create a temporary sub object for the short
