@@ -59,8 +59,8 @@ sub pre_method_gen {
 
         if (cur_class->vtable->base_type == enum_class_PMCProxy) {
             /* Get the PMC instance and call the vtable method on that. */
-            PMC * const del_object =
-                VTABLE_get_attr_keyed(interp, SELF, cur_class, CONST_STRING_GEN(interp, "proxy"));
+            STRING * const proxy      = CONST_STRING_GEN(interp, "proxy");
+            PMC    * const del_object = VTABLE_get_attr_str(interp, SELF, proxy);
 
             if (!PMC_IS_NULL(del_object)) {
                 ${return}VTABLE_$vt_method_name(interp, del_object$args);
