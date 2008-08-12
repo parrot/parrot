@@ -315,7 +315,6 @@ typedef struct _hash Hash;
 #include "parrot/vtables.h"
 #include "parrot/mmd.h"
 #include "parrot/library.h"
-#include "parrot/builtin.h"
 #include "parrot/global.h"
 #include "parrot/stat.h"
 #include "parrot/slice.h"

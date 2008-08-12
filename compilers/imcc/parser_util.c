@@ -21,7 +21,6 @@
 #include "imc.h"
 #include "parrot/dynext.h"
 #include "parrot/embed.h"
-#include "parrot/builtin.h"
 #include "pbc.h"
 #include "parser.h"
 #include "optimizer.h"
