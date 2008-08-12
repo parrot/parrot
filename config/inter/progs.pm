@@ -98,7 +98,8 @@ sub _get_programs {
     $ld = prompt( "What program do you want to use to build shared libraries?", $ld ) if $ask;
     $conf->data->set( ld => $ld );
 
-    $ccflags = $conf->data->get('ccflags');
+    $ccflags = integrate( $conf->data->get('ccflags'),
+        $conf->options->get('ccflags') );
 
     # Remove some perl5-isms.
     $ccflags =~ s/-D((PERL|HAVE)_\w+\s*|USE_PERLIO)//g;
