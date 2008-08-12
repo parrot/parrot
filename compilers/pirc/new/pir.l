@@ -151,7 +151,6 @@ new_lexer(char * const filename) {
     lexer->filename      = filename;
     lexer->parse_errors  = 0;
     lexer->current_ns    = NULL;
-    lexer->symbols       = NULL;
     lexer->subs          = NULL;
 
     lexer->curtarget     = NULL;
@@ -377,15 +376,21 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 "div"         { return PARROT_DIV; }
 "fdiv"        { return PARROT_FDIV; }
 
-{IDENT}       { /* make the Id or op available in the parser. */
+{IDENT}       { /* identifier; can be a global (sub or const), local or parrot op */
                 lexer_state *lexer = yyget_extra(yyscanner);
-                yylval->sval       = dupstr(yytext);
+                symbol      *sym   = find_symbol(lexer, yytext);
 
-                /* if the id was declared as a local, it's returned as a TK_IDENT,
-                 * even if the id is an op; declared locals or constants "hide" ops.
+
+                /* if the id was declared as a local, return the pointer to the symbol
+                 * node. Note that .locals can "hide" opcodes.
                  */
-                if (find_symbol(lexer, yytext))
-                    return TK_IDENT;
+                if (sym != NULL) {
+                    yylval->sym = sym;
+                    return TK_SYMBOL;
+                }
+
+                /* at this point we need to duplicate the string */
+                yylval->sval = dupstr(yytext);
 
                 /* at this point it was no local or constant; check whether it's an op. */
                 if (is_parrot_op(yytext))

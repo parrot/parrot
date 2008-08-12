@@ -194,6 +194,7 @@ extern YY_DECL;
     struct argument    *argm;
     struct invocation  *invo;
     struct key         *key;
+    struct symbol      *sym;
 
     void               *fixme;
 }
@@ -238,6 +239,8 @@ extern YY_DECL;
        PARROT_FDIV          "fdiv"
 
 %token <sval> TK_IDENT      "identifier"
+       <sym> TK_SYMBOL     "symbol"
+
        <sval> TK_STRINGC    "string constant"
        <ival> TK_INTC       "integer constant"
        <dval> TK_NUMC       "number constant"
@@ -329,7 +332,8 @@ extern YY_DECL;
              opt_target_list
              opt_list
              target_list
-             local_id
+
+%type <sym>  local_id
              local_id_list
 
 %type <argm> named_arg
@@ -635,22 +639,13 @@ null_stat         : null_instr "\n"
                   ;
 
 null_instr        : "null" target
-                         {
-                           set_instr(lexer, "null");
-                           push_operand(lexer, expr_from_target($2));
-                         }
+                         { set_instrf(lexer, "null", "%t", $2); }
                   | target '=' "null"
-                         {
-                           set_instr(lexer, "null");
-                           push_operand(lexer, expr_from_target($1));
-                         }
+                         { set_instrf(lexer, "null", "%t", $1); }
                   ;
 
 getresults_stat   : ".get_results" opt_target_list "\n"
-                         {
-                           set_instr(lexer, "get_results");
-                           push_operand(lexer, expr_from_target($2));
-                         }
+                         { set_instrf(lexer, "get_results", "%t", $2); }
                   ;
 
 parrot_stat       : parrot_instruction "\n"
@@ -705,27 +700,18 @@ assignment_stat   : assignment "\n"
 assignment        : set_instruction
                   | target '=' TK_INTC
                          {
-                           if ($3 == 0) {  /* x = 0 -> null x */
-                               set_instr(lexer, "null");
-                               push_operand(lexer, expr_from_target($1));
-                           }
-                           else {
-                               set_instr(lexer, "set");
-                               add_operands(lexer, 2, expr_from_target($1),
-                                                      expr_from_const(new_const(INT_TYPE, $3)));
-                           }
+                           if ($3 == 0)   /* x = 0 -> null x */
+                               set_instrf(lexer, "null", "%t", $1);
+                           else
+                               set_instrf(lexer, "set", "%t%i", $1, $3);
                          }
                   | target '=' TK_NUMC
                          {
-                           if ($3 == 0.0) {  /* x = 0.0 -> null x */
-                               set_instr(lexer, "null");
-                               push_operand(lexer, expr_from_target($1));
-                           }
-                           else {
-                               set_instr(lexer, "set");
-                               add_operands(lexer, 2, expr_from_target($1),
-                                                      expr_from_const(new_const(NUM_TYPE, $3)));
-                           }
+                           if ($3 == 0.0)  /* x = 0.0 -> null x */
+                               set_instrf(lexer, "null", "%t", $1);
+                           else
+                               set_instrf(lexer, "set", "%t%n", $1, $3);
+
                          }
                   | target '=' TK_STRINGC
                          {
@@ -842,10 +828,13 @@ assignment        : set_instruction
                             }
                             else {
                                 /* x = y op ? */
+                                /*
                                 set_instr(lexer, opnames[$4]);
                                 add_operands(lexer, 3, expr_from_target($1),
                                                        expr_from_target($3),
                                                        expr_from_const(new_const(NUM_TYPE, $5)));
+                                                       */
+                                set_instrf(lexer, opnames[$4], "%t%t%n", $1, $3, $5);
                             }
 
                          }
@@ -879,6 +868,9 @@ assignment        : set_instruction
                          }
                   | target '=' keyaccess
                          {
+                             /* what to do with keyaccess/just a target? -- prob. yes.
+                             set_instrf(lexer, "set", "%t%k", $1, $3);
+                             */
                            set_instr(lexer, "set");
                            add_operands(lexer, 2, expr_from_target($1), $3);
                          }
@@ -1019,14 +1011,11 @@ set_instruction   : "set" target ',' keyaccess
                     }
                   | "set" target ',' TK_INTC
                     {
-                       if ($4 == 0) {
+                       if ($4 == 0)
                            /* set $I0, 0 -> null $I0 */
-                           set_instr(lexer, "null");
-                           push_operand(lexer, expr_from_target($2));
-                       }
-                       else {
-                           set_instr0(lexer, "set", 2, expr_from_target($2), expr_from_const(new_const(INT_TYPE, $4)));
-                       }
+                           set_instrf(lexer, "null", "%t", $2);
+                       else
+                           set_instrf(lexer, "set", "%t%i", $2, $4);
                     }
                   | "set" target ',' TK_NUMC
                     {
@@ -1291,9 +1280,12 @@ math_instruction  : math_op target ',' TK_INTC
                             }
                             else {
                                 /* add $N0, $N1, 1.0 */
+                                /*
                                 set_instr(lexer, opnames[$1]);
                                 add_operands(lexer, 3, expr_from_target($2), expr_from_target($4),
                                                        expr_from_const(new_const(NUM_TYPE, $6)));
+                                                       */
+                                set_instrf(lexer, opnames[$1], "%t%t%n", $2, $4, $6);
                             }
                         }
                         else {
@@ -1727,21 +1719,15 @@ method               : invokable
                      | string_object
                      ;
 
-invokable            : identifier
-                            {
-                              symbol *sym = find_symbol(lexer, $1);
-                              /* if the symbol was found, its type must be a PMC;
-                               * else, if the symbol was not found, it's a global identifier
-                               * referring to some other sub. We don't check that during
-                               * the parsing phase.
-                               */
-                              if (sym && sym->type != PMC_TYPE) {
+invokable            : TK_IDENT /* global identifiers, but not ops */
+                            { $$ = target_from_ident(PMC_TYPE, $1); }
+                     | TK_SYMBOL
+                            { /* local identifiers */
+                              if ($1->type != PMC_TYPE)
                                   yyerror(yyscanner, lexer,
-                                          "invokable identifier must be of type PMC!");
-                              }
-                              else { /* identifier is global; don't check now. */ }
+                                          "invokable identifier must be of type PMC");
 
-                              $$ = target_from_ident(PMC_TYPE, $1);
+                              $$ = new_target(PMC_TYPE, $1->name);
                             }
                      | TK_PREG
                             { $$ = reg(PMC_TYPE, $1); }
@@ -1995,7 +1981,10 @@ type        : "int"          { $$ = INT_TYPE; }
             | "string"       { $$ = STRING_TYPE; }
             ;
 
-/* helper rule to set the symbol's target node as the "current"; this is needed for setting flags etc. */
+/* helper rule to set the symbol's target node as the "current"; this is needed for
+ * setting flags etc. Instead of duplicating this code for each register type and
+ * also for symbols, use this extra rule to do it once.
+ */
 
 target      : symbol     { set_curtarget(lexer, $1);  }
             ;
@@ -2004,12 +1993,13 @@ symbol      : TK_PREG    { $$ = reg(PMC_TYPE, $1); }
             | TK_NREG    { $$ = reg(NUM_TYPE, $1); }
             | TK_IREG    { $$ = reg(INT_TYPE, $1); }
             | TK_SREG    { $$ = reg(STRING_TYPE, $1); }
-            | TK_IDENT   { /* find the symbol; if it's not there, emit an error */
-                           symbol *sym = find_symbol(lexer, $1);
-                           if (sym == NULL)
-                               yyerror(yyscanner, lexer, "symbol not declared!");
-                           else
-                               $$ = new_target(sym->type, $1);
+            | TK_SYMBOL  { $$ = new_target($1->type, $1->name);$$->color = $1->color; }
+            | TK_IDENT   { /* if an TK_IDENT was returned, that means the ID was not
+                            * declared; emit an error.
+                            */
+                           yyerror(yyscanner, lexer, "symbol not declared!");
+                           /* to prevent seg. faulting, always return something */
+                           $$ = new_target(UNKNOWN_TYPE, $1);
                          }
             ;
 

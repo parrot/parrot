@@ -12,10 +12,11 @@ typedef struct symbol {
     char          *name;
     struct symbol *next;
     pir_type       type;
+    int            color;
 
 } symbol;
 
-void declare_local(struct lexer_state *lexer, pir_type type, target *list);
+void declare_local(struct lexer_state *lexer, pir_type type, symbol *list);
 
 symbol *find_symbol(struct lexer_state *lexer, char * const name);
 

@@ -25,6 +25,8 @@
 #include <string.h>
 
 
+extern symbol *new_symbol(char *name, pir_type type);
+
 #define out stderr
 
 /* the order of these letters match with the pir_type enumeration. */
@@ -59,6 +61,34 @@ parse_error(struct lexer_state *lexer, int linenr, char *message, ...) {
 }
 
 
+/*
+
+experimental: reset the register numbers for all types.
+this is currently done before each sub.
+
+*/
+void
+reset_register_allocator(struct lexer_state *lexer) {
+    /* set register allocator to 0 */
+    lexer->curregister[INT_TYPE]    = 0;
+    lexer->curregister[NUM_TYPE]    = 0;
+    lexer->curregister[PMC_TYPE]    = 0;
+    lexer->curregister[STRING_TYPE] = 0;
+}
+
+
+/*
+
+=item C<void
+set_namespace(struct lexer_state *lexer, key *ns)>
+
+Set the current namespace in the lexer state, so that it is
+available when needed, i.e. when a new subroutine node is
+created.
+
+=cut
+
+*/
 void
 set_namespace(struct lexer_state *lexer, key *ns) {
     lexer->current_ns = ns;
@@ -66,8 +96,14 @@ set_namespace(struct lexer_state *lexer, key *ns) {
 
 /*
 
+=item C<void
+set_sub_outer(struct lexer_state *lexer, char *outersub)>
+
+
 Set the lexically enclosing sub for the current sub.
 Thus, set the :outer() argument to the current subroutine.
+
+=cut
 
 */
 void
@@ -78,7 +114,12 @@ set_sub_outer(struct lexer_state *lexer, char *outersub) {
 
 /*
 
+=item C<void
+set_sub_vtable(struct lexer_state *lexer, char *vtablename)>
+
 Set the :vtable() flag argument to the current subroutine.
+
+=cut
 
 */
 void
@@ -87,7 +128,14 @@ set_sub_vtable(struct lexer_state *lexer, char *vtablename) {
     SET_FLAG(lexer->subs->flags, SUB_FLAG_VTABLE);
 }
 
+/*
 
+=item C<void
+set_sub_lexid(struct lexer_state *lexer, char *lexid)>
+
+=cut
+
+*/
 void
 set_sub_lexid(struct lexer_state *lexer, char *lexid) {
     lexer->subs->lex_id = lexid;
@@ -96,7 +144,12 @@ set_sub_lexid(struct lexer_state *lexer, char *lexid) {
 
 /*
 
+=item C<void
+set_sub_flag(struct lexer_state *lexer, sub_flag flag)>
+
 Set a subroutine flag on the current sub.
+
+=cut
 
 */
 void
@@ -112,9 +165,14 @@ set_sub_flag(struct lexer_state *lexer, sub_flag flag) {
 
 /*
 
+=item C<void
+new_subr(struct lexer_state *lexer, char *subname)>
+
 Create a new subroutine node, and set it as the "current"
 subroutine, on which all other sub-related operations do
 their thing.
+
+=cut
 
 */
 void
@@ -132,7 +190,7 @@ new_subr(struct lexer_state *lexer, char *subname) {
 
     newsub->parameters = NULL;
     newsub->statements = NULL;
-
+    newsub->symbols    = NULL;
 
     if (lexer->subs == NULL) { /* no subroutine yet */
         lexer->subs  = newsub;
@@ -144,9 +202,21 @@ new_subr(struct lexer_state *lexer, char *subname) {
         lexer->subs->next = newsub;    /* set current sub's next to the new sub. */
         lexer->subs       = newsub; /* set pointer to current sub to this last added one */
     }
+
+    /* register allocator is reset for each sub */
+    reset_register_allocator(lexer);
 }
 
-/* constructor for an instruction */
+/*
+
+=item C<void
+new_instr(struct lexer_state *lexer)>
+
+constructor for an instruction
+
+=cut
+
+*/
 void
 new_instr(struct lexer_state *lexer) {
     statement *instr = (statement *)calloc(1, sizeof (statement));
@@ -184,15 +254,23 @@ targets_equal(target *t1, target *t2) {
         return 1;
 
     /* if there's no name, then types and register numbers must be equal */
-    if ((t1->type == t2->type) && (t1->regno == t2->regno))
+    /* XXX what to use: symbolic register, or actual register (color) ? */
+    if ((t1->type == t2->type) && (t1->regno == t2->regno) && (t1->color == t2->color))
         return 1;
 
     return 0;
 }
 
-/* Create a new target node. The node's next pointer is initialized to
-   itself.
- */
+/*
+
+=item C<target *
+new_target(pir_type type, char *name)>
+
+Create a new target node. The node's next pointer is initialized to itself.
+
+=cut
+
+*/
 target *
 new_target(pir_type type, char *name) {
     target *t = (target *)calloc(1, sizeof (target));
@@ -245,7 +323,8 @@ add_param(struct lexer_state *lexer, pir_type type, char *name) {
     lexer->curtarget = t;
 
     /* add the parameter as a local symbol */
-    declare_local(lexer, type, new_local(name, 0));
+    //declare_local(lexer, type, new_local(name, 0));
+    declare_local(lexer, type, new_symbol(name, 0));
 
     return t;
 
@@ -359,7 +438,9 @@ Other options then are:
  %e   expression node
  %t   target node
 
-This might be a bit slower (for reading the % stuff).
+This might be a bit slower (for reading the % stuff), but removes the current
+requirement that all operands must be expressions, which may be a waste of memory
+(and speed, because all target and other types of nodes must be wrapped in expression nodes *).
 
 */
 void
@@ -367,7 +448,7 @@ set_instr(struct lexer_state *lexer, char *opname, ...) {
     va_list arg_ptr;
 
     lexer->subs->statements->instr.ins = new_instruction(opname);
-    lexer->subs->statements->type = STAT_TYPE_INSTRUCTION;
+    lexer->subs->statements->type      = STAT_TYPE_INSTRUCTION;
 
     va_start(arg_ptr, opname);
 
@@ -381,13 +462,67 @@ set_instr0(struct lexer_state *lexer, char *opname, int count, ...) {
     int i;
 
     lexer->subs->statements->instr.ins = new_instruction(opname);
-    lexer->subs->statements->type = STAT_TYPE_INSTRUCTION;
+    lexer->subs->statements->type      = STAT_TYPE_INSTRUCTION;
 
     va_start(arg_ptr, count);
 
     for (i = 0; i < count; i++)
         push_operand(lexer, va_arg(arg_ptr, expression *));
 
+    va_end(arg_ptr);
+}
+
+/*
+
+set_instrf
+
+Set the specified instruction, using the operands from the vararg list. The
+number and types of operands is specified by C<format>.
+
+*/
+void
+set_instrf(struct lexer_state *lexer, char *opname, char const * const format, ...) {
+    va_list arg_ptr;
+    int i;
+    size_t format_length = strlen(format);
+
+    lexer->subs->statements->instr.ins = new_instruction(opname);
+    lexer->subs->statements->type      = STAT_TYPE_INSTRUCTION;
+
+    va_start(arg_ptr, format);
+
+    /* XXX is this printf's % symbol really useful? */
+    assert(format_length % 2 == 0);
+
+    for (i = 0; i < format_length; i++) {
+        expression *expr = NULL;
+        assert(*(format + i) == '%');
+        ++i;
+        switch (*(format + i)) {
+            case 't':
+                expr = expr_from_target(va_arg(arg_ptr, target *));
+                break;
+            case 'e':
+                expr = va_arg(arg_ptr, expression *);
+                break;
+            case 'c':
+                expr = expr_from_const(va_arg(arg_ptr, constant *));
+                break;
+            case 'i':
+                expr = expr_from_const(new_const(INT_TYPE, va_arg(arg_ptr, int)));
+                break;
+            case 'n':
+                expr = expr_from_const(new_const(NUM_TYPE, va_arg(arg_ptr, double)));
+                break;
+            case 's':
+                expr = expr_from_const(new_const(STRING_TYPE, va_arg(arg_ptr, char *)));
+                break;
+            default:
+                fprintf(stderr, "Fatal: unknown format specifier in set_instrf()");
+                break;
+        }
+        push_operand(lexer, expr);
+    }
     va_end(arg_ptr);
 }
 
@@ -757,26 +892,28 @@ add_key(key *keylist, expression *exprkey) {
 
 /*
 
-Add a target node to the list pointed to by list.
-The list is a circular linked list. C<list> points
-to the list I<tail>. Inserting is thus a constant
-time operation. The first node is list->next, also
-constant time.
 
 */
-target *
-add_local(target *list, target *local) {
+symbol *
+add_local(symbol *list, symbol *local)
+{
     local->next = list->next;
     list->next  = local;
     return list;
 }
 
-target *
-new_local(char *name, int has_unique_reg) {
-    target *t = new_target(UNKNOWN_TYPE, name);
-    if (has_unique_reg)
-        SET_FLAG(t->flags, TARGET_FLAG_UNIQUE_REG);
-    return t;
+
+
+symbol *
+new_local(char *name, int has_unique_reg)
+{
+    symbol *s;
+    s = new_symbol(name, UNKNOWN_TYPE);
+
+    //if (has_unique_reg)
+    //    SET_FLAG(t->flags, TARGET_FLAG_UNIQUE_REG);
+
+    return s;
 }
 
 
@@ -801,13 +938,18 @@ print_key(key *k) {
 
 void
 print_target(target *t) {
+
+    /* XXX experimental: don't print name, but the register.
     if (t->name) {
         printf("%s", t->name);
     }
-    else {
+    else
+    */
+    {
         char type = pir_register_types[t->type];
-        printf("$%c%d", type, t->regno);
+        printf("%c%d", type, t->color);
     }
+
     /* if the target has a key, print that too */
     if (t->key)
         print_key(t->key);

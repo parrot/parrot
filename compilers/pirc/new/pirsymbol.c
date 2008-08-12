@@ -24,6 +24,29 @@ Functions for handling symbols.
 
 =over 4
 
+=cut
+
+*/
+
+
+/*
+
+=item C<static int
+next_register(struct lexer_state *lexer)>
+
+Returns a new register of the specified type.
+This is the vanilla register allocator.
+
+=cut
+
+*/
+int
+next_register(struct lexer_state *lexer, pir_type type) {
+    return lexer->curregister[type]++;
+}
+
+/*
+
 =item C<symbol *
 new_symbol(char *name)>
 
@@ -34,10 +57,11 @@ Create a new symbol node, returns it after initialization.
 */
 
 symbol *
-new_symbol(char *name) {
+new_symbol(char *name, pir_type type) {
     symbol *sym = (symbol *)malloc(sizeof (symbol));
     assert(sym != NULL);
     sym->name   = name;
+    sym->type   = type;
     sym->next   = NULL;
     return sym;
 }
@@ -56,38 +80,38 @@ own symbol table).
 
 */
 void
-declare_local(struct lexer_state *lexer, pir_type type, target *list)
+declare_local(struct lexer_state *lexer, pir_type type, symbol *list)
 {
-    target *iter = list->next;
+    symbol *iter = list;
 
-    /* if iter == list, this means there's only one item, whose 'next' is
-     * itself (that's why it's only a single item list. In that case, just
-     * store the symbol.
-     */
-    if (iter == list) {
-        symbol *sym    = new_symbol(iter->name);
-        sym->next      = NULL;
-        sym->type      = type;
-        lexer->symbols = sym;
+    /* bad implementation, but best i can come up with now. */
+
+
+    while (iter != NULL) {
+        /* set the type on each symbol node */
+        iter->type  = type;
+        /* allocate a register for each */
+        iter->color = next_register(lexer, type);
+        /*
+        printf("local %s has register %d\n", iter->name, iter->color);
+        */
+        iter = iter->next;
+    }
+
+    if (lexer->subs->symbols == NULL) { /* no symbols yet */
+        lexer->subs->symbols = list;
     }
     else {
-        while (iter != list) {
-            symbol *sym    = new_symbol(iter->name);
-            sym->type      = type;
+        /* go to end of list */
+        iter = list;
+        while (iter->next != NULL)
+            iter = iter->next;
 
-            sym->next      = lexer->symbols;
-            lexer->symbols = sym;
-
-            iter           = iter->next;
-        }
+        /* link existing list on list->next, and set symbols list to this list */
+        iter->next = lexer->subs->symbols;
+        lexer->subs->symbols = list;
     }
 
-    iter = list->next;
-    while (iter != list) {
-        printf("symbol %s\n", iter->name);
-        iter = iter->next;
-
-    }
 }
 
 /*
@@ -103,7 +127,16 @@ is not defined.
 symbol *
 find_symbol(struct lexer_state *lexer, char * const name)
 {
-    symbol *iter = lexer->symbols;
+    symbol *iter;
+
+    /* check whether there's a subroutine in place; if not, the
+     * specified name is an identifier being parsed outside of a .sub.
+     */
+    if (lexer->subs)
+        iter = lexer->subs->symbols;
+    else
+        return NULL;
+
     while (iter) {
         if (strcmp(iter->name, name) == 0)
             return iter;

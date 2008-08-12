@@ -172,29 +172,6 @@ typedef struct target {
 void *panic(char *msg);
 
 
-/*
-#define type(obj)   obj->type
-#define name(obj)   obj->name
-#define flags(obj)  obj->flags
-#define color(obj)  obj->color
-#define next(obj)   obj->next
-*/
-/* I think it's best to unify target, argument, constant and expression into 1 node type */
-
-/*
-typedef struct object {
-    pir_type    type;
-    char       *name;
-    value_type  vtype;
-    value       val;
-    int         flags;
-    int         color;
-
-    struct object *next;
-
-} object;
-
-*/
 
 /* function arguments or return values, but a return value is just
  * an argument when invoking the return continuation.
@@ -258,6 +235,9 @@ typedef struct statement {
 } statement;
 
 
+/* forward declaration of struct symbol */
+struct symbol;
+
 /* a sub */
 typedef struct subroutine {
     key       *name_space;          /* this sub's namespace */
@@ -271,6 +251,7 @@ typedef struct subroutine {
     target    *parameters;
     statement *statements;
 
+    struct symbol     *symbols;
 
     struct subroutine *next;
 
@@ -335,7 +316,10 @@ void set_arg_named(argument *arg, char *alias);
 
 void new_instr(struct lexer_state *lexer);
 void set_label(struct lexer_state *lexer, char *label);
+
 void set_instr(struct lexer_state *lexer, char *opname, ...);
+void set_instr0(struct lexer_state *lexer, char *opname, int count, ...);
+void set_instrf(struct lexer_state *lexer, char *opname, char const * const format, ...);
 
 void define_const(struct lexer_state *lexer, constant *var, int is_globalconst);
 
@@ -351,8 +335,8 @@ void unshift_operand(struct lexer_state *lexer, expression *operand);
 void push_operand(struct lexer_state *lexer, expression *operand);
 void add_operands(struct lexer_state *state, int count, ...);
 
-target *add_local(target *list, target *local);
-target *new_local(char *name, int unique);
+struct symbol *add_local(struct symbol *list, struct symbol *local);
+struct symbol *new_local(char *name, int unique);
 
 int targets_equal(target *t1, target *t2);
 
