@@ -25,10 +25,10 @@ Regressions tests for configure steps that live under the config directory.
 =cut
 
 my @steps;
-sub wanted { $File::Find::name =~ m{^config\/(.*)\.pm\z}s &&
+sub wanted { $File::Find::name =~
+    m{^config\/(init|inter|auto|gen)\/(\w+)\.pm} &&
     do {
-        my $mod = $1;
-        my $class = join '::', ( split /\//, $mod );
+        my $class = join '::', ( $1, $2 );
         push @steps, $class;
     };
 }
