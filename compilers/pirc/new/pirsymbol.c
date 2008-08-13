@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <stdio.h>
 
+
 /*
 
 =head1 NAME
@@ -40,10 +41,12 @@ This is the vanilla register allocator.
 =cut
 
 */
-int
-next_register(struct lexer_state *lexer, pir_type type) {
+static int
+next_register(struct lexer_state *lexer, pir_type type)
+{
     return lexer->curregister[type]++;
 }
+
 
 /*
 
@@ -57,12 +60,14 @@ Create a new symbol node, returns it after initialization.
 */
 
 symbol *
-new_symbol(char *name, pir_type type) {
+new_symbol(char *name, pir_type type)
+{
     symbol *sym = (symbol *)malloc(sizeof (symbol));
     assert(sym != NULL);
     sym->name   = name;
     sym->type   = type;
     sym->next   = NULL;
+
     return sym;
 }
 
@@ -74,7 +79,9 @@ declare_local(struct lexer_state *lexer, pir_type type, target *list)>
 Declare the local variables in the list pointed to by C<list>, all of which
 are of the type C<type>. The variables are entered into the symbol table for
 the current subroutine that is being parsed (each subroutine must have its
-own symbol table).
+own symbol table). Each symbol will be allocated a (PASM) register; in
+other words, afer invoking this function, each of the symbol nodes in C<list>
+will have been given a PASM register.
 
 =cut
 
@@ -86,21 +93,18 @@ declare_local(struct lexer_state *lexer, pir_type type, symbol *list)
 
     /* bad implementation, but best i can come up with now. */
 
-
+    /* set the type on each symbol, and allocate a new register for each symbol */
     while (iter != NULL) {
-        /* set the type on each symbol node */
         iter->type  = type;
-        /* allocate a register for each */
         iter->color = next_register(lexer, type);
-        /*
-        printf("local %s has register %d\n", iter->name, iter->color);
-        */
         iter = iter->next;
     }
 
-    if (lexer->subs->symbols == NULL) { /* no symbols yet */
+    /* add the symbol to the symbol table, which is currently implemented
+     * as a linked list.
+     */
+    if (lexer->subs->symbols == NULL) /* no symbols yet */
         lexer->subs->symbols = list;
-    }
     else {
         /* go to end of list */
         iter = list;
@@ -144,6 +148,123 @@ find_symbol(struct lexer_state *lexer, char * const name)
     }
     return NULL;
 }
+
+/*
+
+=item C<static pir_reg *
+new_pir_reg(pir_type type, int regno)>
+
+Create a new PIR register node representing PIR/symbolic register
+identified by C<regno> and of type C<type>.
+
+=cut
+
+*/
+static pir_reg *
+new_pir_reg(pir_type type, int regno)
+{
+    pir_reg *r = (pir_reg *)malloc(sizeof (pir_reg));
+    assert(r != NULL);
+    r->type    = type;
+    r->regno   = regno;
+    r->next    = NULL;
+    return r;
+}
+
+/*
+
+=item C<pir_reg *
+find_register(struct lexer_state *lexer, pir_type type, int regno)>
+
+Find (symbolic) register no. C<regno> of type C<type>. If it's found,
+a pointer to it is returned, if not, null is returned.
+
+=cut
+
+*/
+static pir_reg *
+find_register(struct lexer_state *lexer, pir_type type, int regno) {
+    /* should do a binary search. fix later.
+     */
+    pir_reg *iter = lexer->subs->registers[type];
+    while (iter != NULL) {
+        if (iter->regno == regno)
+            return iter;
+
+        iter = iter->next;
+    }
+
+    return NULL;
+}
+
+
+/*
+
+=item C<static int
+use_register(struct lexer_state *lexer, pir_type type, int regno)>
+
+This function registers (no pun intended) register C<regno> of type
+C<type>; a new (PASM) register is allocated to it; each subsequent
+reference to register C<regno> of type C<type> can then find this
+register (and its allocated PASM register) through the C<find_register>
+function.
+
+The function returns the allocated PASM register.
+
+=cut
+
+*/
+static int
+use_register(struct lexer_state *lexer, pir_type type, int regno)
+{
+    pir_reg *reg = new_pir_reg(type, regno);
+    pir_reg *iter;
+
+    reg->color = next_register(lexer, type);
+
+    /* insert, as registers only increase, just insert at the beginning.
+     * searching must therefore look from high to low reg. numbers
+     */
+    iter = lexer->subs->registers[type];
+
+    if (iter == NULL) /* no registers here yet */
+        lexer->subs->registers[type] = reg;
+    else {
+        while (iter->next)
+            iter = iter->next;
+        iter->next = reg;
+    }
+
+    /* return newly allocated register */
+    return reg->color;
+}
+
+
+/*
+
+=item C<int
+color_reg(struct lexer_state *lexer, pir_type type, int regno)>
+
+Find register C<regno> of type C<type>; if it was used before in the
+current subroutine, a (pasm) register was already assigned to it, which
+is returned.
+
+If the register was not yet used, mark the register as being used,
+and a new (pasm) register is allocated to it, which is returned.
+
+=cut
+
+*/
+int
+color_reg(struct lexer_state *lexer, pir_type type, int regno)
+{
+    pir_reg *r = find_register(lexer, type, regno);
+    if (r)
+        return r->color;
+
+    return use_register(lexer, type, regno);
+}
+
 
 /*
 

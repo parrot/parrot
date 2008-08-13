@@ -205,7 +205,7 @@ typedef struct invocation {
 
 /* a parrot instruction */
 typedef struct instruction {
-    char       *opname;
+    char     const  *opname;
     expression *operands;
 
 } instruction;
@@ -240,18 +240,19 @@ struct symbol;
 
 /* a sub */
 typedef struct subroutine {
-    key       *name_space;          /* this sub's namespace */
-    char      *sub_name;            /* this sub's name */
-    char      *outer_sub;           /* this sub's outer subroutine, if any */
-    char      *lex_id;              /* this sub's lex_id, if any */
-    char      *vtable_method;       /* name of vtable method that this sub's overriding, if any */
-    int        flags;
-    char     **multi_types;
+    key               *name_space;    /* this sub's namespace */
+    char              *sub_name;      /* this sub's name */
+    char              *outer_sub;     /* this sub's outer subroutine, if any */
+    char              *lex_id;        /* this sub's lex_id, if any */
+    char              *vtable_method; /* name of vtable method that this sub's overriding, if any */
+    int                flags;         /* this sub's flags */
+    char             **multi_types;
 
-    target    *parameters;
-    statement *statements;
+    target            *parameters;    /* parameters of this sub */
+    statement         *statements;    /* statements of this sub */
 
-    struct symbol     *symbols;
+    struct symbol     *symbols;       /* symbol table for this subroutine */
+    struct pir_reg    *registers[4];  /* used PIR registers in this sub */
 
     struct subroutine *next;
 
@@ -261,20 +262,20 @@ typedef struct subroutine {
 /* forward declaration */
 struct lexer_state;
 
-void set_namespace(struct lexer_state *lexer, key *ns);
+void set_namespace(struct lexer_state *lexer, key * const ns);
 
-void set_sub_outer(struct lexer_state *lexer, char *outersub);
-void set_sub_vtable(struct lexer_state *lexer, char *vtablename);
-void set_sub_lexid(struct lexer_state *lexer, char *lexid);
+void set_sub_outer(struct lexer_state *lexer, char * const outersub);
+void set_sub_vtable(struct lexer_state *lexer, char * const vtablename);
+void set_sub_lexid(struct lexer_state *lexer, char * const lexid);
 
-void new_subr(struct lexer_state *lexer, char *subname);
+void new_subr(struct lexer_state *lexer, char * const subname);
 
 void set_param_named(target *t, char *alias);
 void add_instr(struct lexer_state *lexer, char *label, instruction *instr);
 
 void set_arg_flag(argument *arg, arg_flag flag);
 
-constant *new_named_const(pir_type type, char *name, ...);
+constant *new_named_const(pir_type type, char * const name, ...);
 constant *new_const(pir_type type, ...);
 
 expression *expr_from_const(constant *c);
@@ -285,15 +286,15 @@ expression *expr_from_key(key *k);
 argument *new_argument(expression *expr);
 argument *add_arg(argument *arg1, argument *arg2);
 
-target *add_param(struct lexer_state *lexer, pir_type type, char *name);
+target *add_param(struct lexer_state *lexer, pir_type type, char * const name);
 target *add_param_named(struct lexer_state *lexer, pir_type type, char *name, char *alias);
 void set_alias(struct lexer_state *lexer, char *alias);
 void set_curtarget(struct lexer_state *lexer, target *t);
 
 target *add_target(struct lexer_state *lexer, target *t1, target *t);
 
-target *new_target(pir_type type, char *name);
-target *reg(int type, int regno);
+target *new_target(pir_type type, char * const name);
+target *reg(struct lexer_state *lexer, int type, int regno);
 
 
 invocation *invoke(struct lexer_state *lexer, invoke_type, ...);
@@ -301,6 +302,7 @@ void set_invocation_type(invocation *inv, invoke_type type);
 
 target *target_from_string(char *str);
 target *target_from_ident(pir_type type, char *id);
+target *target_from_symbol(struct symbol * const sym);
 
 key *new_key(expression *expr);
 key *add_key(key *keylist, expression *newkey);
@@ -315,11 +317,10 @@ void set_param_flag(target *t, target_flag flag);
 void set_arg_named(argument *arg, char *alias);
 
 void new_instr(struct lexer_state *lexer);
-void set_label(struct lexer_state *lexer, char *label);
+void set_label(struct lexer_state *lexer, char * const label);
 
-void set_instr(struct lexer_state *lexer, char *opname, ...);
-void set_instr0(struct lexer_state *lexer, char *opname, int count, ...);
-void set_instrf(struct lexer_state *lexer, char *opname, char const * const format, ...);
+void set_instr(struct lexer_state *lexer, char const * const opname);
+void set_instrf(struct lexer_state *lexer, char const * const opname, char const * const format, ...);
 
 void define_const(struct lexer_state *lexer, constant *var, int is_globalconst);
 
@@ -327,18 +328,17 @@ void set_invocation_args(invocation *inv, argument *args);
 void set_invocation_results(invocation *inv, target *results);
 
 void set_lex_flag(target *t, char *lexname);
-char *get_inverse(char *instr);
+char const *get_inverse(char const * const instr);
 void invert_instr(struct lexer_state *lexer);
 
 
 void unshift_operand(struct lexer_state *lexer, expression *operand);
 void push_operand(struct lexer_state *lexer, expression *operand);
-void add_operands(struct lexer_state *state, int count, ...);
 
 struct symbol *add_local(struct symbol *list, struct symbol *local);
 struct symbol *new_local(char *name, int unique);
 
-int targets_equal(target *t1, target *t2);
+int targets_equal(target const * const t1, target const * const t2);
 
 void print_subs(struct lexer_state *lexer);
 

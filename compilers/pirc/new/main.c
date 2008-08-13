@@ -184,12 +184,12 @@ main(int argc, char *argv[])
 
     if (lexer->parse_errors == 0) {
         fprintf(stderr, "Parse successful!\n");
+        print_subs(lexer);
     }
-    else {
+    else
         fprintf(stderr, "There were %d errors\n", lexer->parse_errors);
-    }
 
-    print_subs(lexer);
+
 
     /* clean up after playing */
     yylex_destroy(yyscanner);
@@ -223,12 +223,10 @@ yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const messag
     /* the following should be fixed; the point is not to print the token if
      * it's a newline, that looks silly. XXX What's it on MacOS, "\r" ??
      */
-    if (strcmp(text, "\r\n") != 0 && strcmp(text, "\n") != 0) {
+    if (strcmp(text, "\r\n") != 0 && strcmp(text, "\n") != 0)
         fprintf(stderr, "('%s')\n\n", text);
-    }
-    else {
+    else
         fprintf(stderr, "\n\n");
-    }
 
     return 0;
 }
