@@ -395,9 +395,9 @@ Parrot_debugger_init(PARROT_INTERP)
         interp->pdb     = pdb;
         debugger->pdb   = pdb;
         pdb->debugee    = interp;
-	pdb->debugger   = debugger;
+        pdb->debugger   = debugger;
 
-	/* Allocate space for command line buffers, NUL terminated c strings */
+        /* Allocate space for command line buffers, NUL terminated c strings */
         pdb->cur_command = (char *)mem_sys_allocate(DEBUG_CMD_BUFFER_LENGTH + 1);
         pdb->last_command = (char *)mem_sys_allocate(DEBUG_CMD_BUFFER_LENGTH + 1);
     }
