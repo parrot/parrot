@@ -101,6 +101,18 @@ static size_t key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), size_t seed)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*s);
 
+static void parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *hash))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void parrot_mark_hash_keys(PARROT_INTERP, ARGIN(Hash *hash))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static int pointer_compare(SHIM_INTERP,
@@ -113,15 +125,6 @@ static int STRING_compare(PARROT_INTERP,
     ARGIN_NULLOK(const void *bucket_key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
-
-static void
-parrot_mark_hash_keys(PARROT_INTERP, ARGIN(Hash *));
-
-static void
-parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *));
-
-static void
-parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *));
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
