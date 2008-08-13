@@ -427,7 +427,7 @@ Parrot_debugger_destroy(PARROT_INTERP)
     PDB_t *pdb = interp->pdb;
     PARROT_ASSERT(pdb);
     PARROT_ASSERT(pdb->debugee == interp);
- 
+
     mem_sys_free(pdb->last_command);
     mem_sys_free(pdb->cur_command);
 
