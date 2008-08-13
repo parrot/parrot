@@ -31,6 +31,8 @@ the Parrot debugger, and the C<debug> ops.
 #include "parrot/oplib/ops.h"
 #include "debug.str"
 
+/* Length of command line buffers */
+#define DEBUG_CMD_BUFFER_LENGTH 255
 
 /* Not sure how we want to handle this sort of cross-project header */
 PARROT_API
@@ -393,12 +395,44 @@ Parrot_debugger_init(PARROT_INTERP)
         interp->pdb     = pdb;
         debugger->pdb   = pdb;
         pdb->debugee    = interp;
+
+	/* Allocate space for command line buffers, NUL terminated c strings */
+        pdb->cur_command = (char *)mem_sys_allocate(DEBUG_CMD_BUFFER_LENGTH + 1);
+        pdb->last_command = (char *)mem_sys_allocate(DEBUG_CMD_BUFFER_LENGTH + 1);
     }
 
     /* PDB_disassemble(interp, NULL); */
 
     interp->pdb->cur_opcode = interp->code->base.data;
     interp->pdb->state     |= PDB_RUNNING;
+}
+
+/*
+
+=item C<void Parrot_debugger_destroy>
+
+Destroy the current Parrot debugger instance.
+
+=cut
+
+*/
+
+PARROT_API
+void
+Parrot_debugger_destroy(PARROT_INTERP)
+{
+    /* Unfinished.
+       Free all debugger allocated resources.
+     */
+    PDB_t *pdb = interp->pdb;
+    PARROT_ASSERT(pdb);
+    PARROT_ASSERT(pdb->debugee == interp);
+ 
+    mem_sys_free(pdb->last_command);
+    mem_sys_free(pdb->cur_command);
+
+    mem_sys_free(pdb);
+    interp->pdb = NULL;
 }
 
 /*
@@ -541,8 +575,6 @@ The input is saved in C<< pdb->cur_command >>.
 
 */
 
-#define DEBUG_CMD_BUFFER_LENGTH 255
-
 void
 PDB_get_command(PARROT_INTERP)
 {
@@ -554,15 +586,8 @@ PDB_get_command(PARROT_INTERP)
     /* flush the buffered data */
     fflush(stdout);
 
-    /* not used any more */
-    if (pdb->last_command && *pdb->cur_command) {
-        mem_sys_free(pdb->last_command);
-        pdb->last_command = NULL;
-    }
-
     /* update the last command */
-    if (pdb->cur_command && *pdb->cur_command)
-        pdb->last_command = pdb->cur_command;
+    strcpy(pdb->last_command, pdb->cur_command);
 
     #if 0
     /* if the program is stopped and running show the next line to run */
@@ -585,9 +610,7 @@ PDB_get_command(PARROT_INTERP)
 
     i = 0;
 
-    /* RT #46109 who frees that */
-    /* need to allocate one more char as string is null-terminated */
-    c = (char *)mem_sys_allocate(DEBUG_CMD_BUFFER_LENGTH + 1);
+    c = pdb->cur_command;
 
     PIO_eprintf(interp, "\n(pdb) ");
 
@@ -606,8 +629,6 @@ PDB_get_command(PARROT_INTERP)
 
     if (ch == -1)
         strcpy(c, "quit");
-
-    pdb->cur_command = c;
 }
 
 /*
