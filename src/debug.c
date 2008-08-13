@@ -395,6 +395,7 @@ Parrot_debugger_init(PARROT_INTERP)
         interp->pdb     = pdb;
         debugger->pdb   = pdb;
         pdb->debugee    = interp;
+	pdb->debugger   = debugger;
 
 	/* Allocate space for command line buffers, NUL terminated c strings */
         pdb->cur_command = (char *)mem_sys_allocate(DEBUG_CMD_BUFFER_LENGTH + 1);
@@ -403,7 +404,6 @@ Parrot_debugger_init(PARROT_INTERP)
 
     /* PDB_disassemble(interp, NULL); */
 
-    interp->pdb->cur_opcode = interp->code->base.data;
     interp->pdb->state     |= PDB_RUNNING;
 }
 
@@ -477,6 +477,8 @@ Parrot_debugger_start(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
 
     if (!interp->pdb)
         Parrot_ex_throw_from_c_args(interp, NULL, 0, "No debugger");
+
+    interp->pdb->cur_opcode = interp->code->base.data;
 
     if (interp->pdb->state & PDB_ENTER) {
         if (!interp->pdb->file) {
@@ -586,6 +588,8 @@ PDB_get_command(PARROT_INTERP)
     /* flush the buffered data */
     fflush(stdout);
 
+    PARROT_ASSERT(pdb->last_command);
+    PARROT_ASSERT(pdb->cur_command);
     /* update the last command */
     strcpy(pdb->last_command, pdb->cur_command);
 

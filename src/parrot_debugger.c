@@ -132,19 +132,24 @@ int
 main(int argc, char *argv[])
 {
     Parrot_Interp     interp   = Parrot_new(NULL);
+
+    /*
     Parrot_Interp     debugger = Parrot_new(interp);
     PDB_t            *pdb      = mem_allocate_zeroed_typed(PDB_t);
+    */
+    PDB_t *pdb;
     const char       *filename;
     char             *ext;
     void             *yyscanner;
 
+    Parrot_debugger_init(interp);
+
+    pdb = interp->pdb;
+
     /*Parrot_set_config_hash();  TODO link with cfg */
 
     /* attach pdb structure */
-    debugger->pdb    = pdb;
-    interp->pdb      = pdb;
-    interp->debugger = debugger;
-    pdb->debugee     = interp;
+    interp->debugger = pdb->debugger;
     pdb->state       = PDB_ENTER;
 
     Parrot_block_GC_mark(interp);
