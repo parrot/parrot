@@ -27,8 +27,9 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 26;
 use Test::More;
+use Parrot::Config;
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.clock' );
 clk = os.clock()
@@ -184,12 +185,7 @@ CODE
 /^\d+(\.\d+)?$/
 OUTPUT
 
-# Create a date/time for which mktime will return -1
-my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(-1);
-$mon += 1;
-$year += 1900;
-
-language_output_like( 'lua', << "CODE", << 'OUTPUT', 'function os.time' );
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function os.time' );
 print(os.time({
     sec = 0,
     min = 0,
@@ -199,25 +195,30 @@ print(os.time({
     year = 2000,
     isdst = 0,
 }))
+CODE
+/^946\d+$/
+OUTPUT
 
--- os.time returns nil when C mktime returns -1
--- On 64bit systems there are no 'out of range' values, so we cheat
--- and use a date/time that validly returns -1
+SKIP:
+{
+    skip "skipped on 64bit platforms" => 1 if ( $PConfig{intvalsize} == 8 );
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function os.time -> nil' );
+-- os.time returns nil when C mktime returns < 0
+-- this test needs a out of range value on any platform
 print(os.time({
-    sec = $sec,
-    min = $min,
-    hour = $hour,
-    day = $mday,
-    month = $mon,
-    year = $year,
-    isdst = false,
+    sec = 0,
+    min = 0,
+    hour = 0,
+    day = 1,
+    month = 1,
+    year = 1000,
+    isdst = 0,
 }))
 CODE
-/^
-946\d+\n
-nil\n
-$/x
+/^nil$/
 OUTPUT
+}
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function os.time (missing field)' );
 print(os.time({}))
