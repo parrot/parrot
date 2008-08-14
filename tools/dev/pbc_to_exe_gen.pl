@@ -434,10 +434,36 @@ END_BODY
     say link
     .local int status
     status = spawnw link
-    unless status goto linked
+    unless status goto check_manifest
 
     die "linking failed"
 
+  check_manifest:
+    # Check if there is a MSVC app manifest
+    .local pmc file 
+    file = new 'File'
+    .local string manifest_file_name
+    manifest_file_name  = exefile
+    manifest_file_name .= '.manifest'
+    .local pmc manifest_exists
+    manifest_exists = file.'exists'( manifest_file_name )
+    unless manifest_exists goto linked 
+
+  embed_manifest:
+    # MSVC app manifest exists, embed it
+    .local string embed_manifest
+    embed_manifest  = 'mt.exe -manifest '
+    embed_manifest .= manifest_file_name
+    embed_manifest .= ' -outputresource:'
+    embed_manifest .= exefile
+    embed_manifest .= ';1'
+
+    say embed_manifest
+    .local int embed_manifest_status
+    embed_manifest_status = spawnw embed_manifest
+    unless embed_manifest_status goto linked 
+    die 'manifest embedding failed'
+ 
   linked:
     print "Linked: "
     say exefile
