@@ -499,7 +499,7 @@ method classdef($/,$key) {
 method functiondef($/) {
     my $past := $( $<comp_stmt> );
     my $name := $<fname>;
-    my $arity := $past[0]<arity>;
+    my $arity := +$past[0]<arity>;
     #my $args := $( $<argdecl> );
     #$past.push($args);
     $past.name(~$name);
@@ -512,7 +512,7 @@ method functiondef($/) {
     make $past;
 }
 
-method argdecl($/) {
+method block_signature($/) {
     my $params := PAST::Stmts.new( :node($/) );
     my $past := PAST::Block.new($params, :blocktype('declaration'));
     for $<identifier> {
@@ -600,20 +600,6 @@ method call_args($/) {
     else {
         make PAST::Op.new( :pasttype('call'), :node($/) );
     }
-}
-
-method do_args($/) {
-    my $params := PAST::Stmts.new( :node($/) );
-    my $past := PAST::Block.new($params, :blocktype('declaration'));
-    for $<identifier> {
-        my $parameter := $( $_ );
-        $past.symbol($parameter.name(), :scope('lexical'));
-        $parameter.scope('parameter');
-        $params.push($parameter);
-    }
-    $params.arity( +$<identifier> );
-    our $?BLOCK_SIGNATURED := $past;
-    make $past;
 }
 
 method args($/) {
