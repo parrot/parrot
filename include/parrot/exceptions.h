@@ -201,7 +201,6 @@ void do_panic(
 
 void Parrot_print_backtrace(void);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/exceptions.c */
 
 #define PANIC(interp, message) do_panic((interp), (message), __FILE__, __LINE__)
