@@ -99,6 +99,9 @@ enum DebugCmd {
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void debugger_cmdline(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 static void dump_string(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         __attribute__nonnull__(1);
 
@@ -384,6 +387,23 @@ parse_command(ARGIN(const char *command), ARGOUT(unsigned long *cmdP))
     return command;
 }
 
+static void
+debugger_cmdline(PARROT_INTERP)
+{
+    TRACEDEB_MSG("debugger_cmdline");
+
+    /*while (!(interp->pdb->state & PDB_EXIT)) {*/
+    while (interp->pdb->state & PDB_STOPPED) {
+        const char * command;
+        PDB_get_command(interp);
+        command = interp->pdb->cur_command;
+        if (command[0] == '\0')
+            command = interp->pdb->last_command;
+
+        PDB_run_command(interp, command);
+    }
+}
+
 /*
 
 =item C<void Parrot_debugger_init>
@@ -505,15 +525,8 @@ Parrot_debugger_start(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
 
     interp->pdb->state |= PDB_STOPPED;
 
-    while (interp->pdb->state & PDB_STOPPED) {
-        const char * command;
-        PDB_get_command(interp);
-        command = interp->pdb->cur_command;
-        if (command[0] == '\0')
-            command = interp->pdb->last_command;
+    debugger_cmdline(interp);
 
-        PDB_run_command(interp, command);
-    }
     if (interp->pdb->state & PDB_EXIT)
         Parrot_exit(interp, 0);
 }
@@ -561,11 +574,7 @@ Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
 
         PDB_set_break(interp, NULL);
 
-        while (!(interp->pdb->state & PDB_EXIT)) {
-            PDB_get_command(interp);
-            command = interp->pdb->cur_command;
-            PDB_run_command(interp, command);
-        }
+        debugger_cmdline(interp);
 
         /* RT #42378 this is not ok */
         /* exit(EXIT_SUCCESS); */
