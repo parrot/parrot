@@ -1,4 +1,4 @@
-puts "1..5"
+puts "1..6"
 
 def first
     puts "ok 1"
@@ -21,7 +21,14 @@ def fib(n)
   end
 end
 
+def blocks(n,&f)
+    f(n)
+end
+
 first
 second(2)
 third(3,4)
 second fib(6) - 3;
+blocks(6) do |i|
+    puts 'ok ', i
+end

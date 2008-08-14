@@ -139,10 +139,11 @@ token operation {
     <.identifier> ('!'|'?')?
 }
 
+#XXX UGLY!  Refactor into <args> maybe?
 token call_args {
-    | '()' {*}
-    | <args> {*}
-    | '(' <.ws> <args> <.ws> ')' {*}
+    | '()' [<.ws> <do_block>]? {*}
+    | <args> [<.ws> <do_block>]? {*}
+    | '(' <.ws> <args> <.ws> ')' [<.ws> <do_block>]? {*}
 }
 
 rule do_args {

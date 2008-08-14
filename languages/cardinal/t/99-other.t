@@ -1,4 +1,4 @@
-puts "1..7"
+puts "1..8"
 
 n = 5
 
@@ -11,3 +11,11 @@ def foo
 end
 
 foo[1].upto(7) { |i| puts "ok ", i }
+
+a = do |a,&f|
+    f(a)
+end
+
+a(8) do |i|
+    puts 'ok ', i
+end

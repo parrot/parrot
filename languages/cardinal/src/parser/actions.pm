@@ -526,9 +526,11 @@ method block_signature($/) {
     }
 
     if $<block_param> {
-
+        my $block := $( $<block_param>[0] );
+        $past.symbol($block.name(), :scope('lexical'));
+        $params.push($block);
     }
-    $params.arity( +$<identifier> );
+    $params.arity( +$<identifier> + +$<block_param> );
     our $?BLOCK_SIGNATURED := $past;
     make $past;
 }
@@ -542,7 +544,7 @@ method slurpy_param($/) {
 
 method block_param($/) {
     my $past := $( $<identifier> );
-    # XXX
+    $past.scope('parameter');
     make $past;
 }
 
@@ -594,12 +596,17 @@ method operation($/) {
 }
 
 method call_args($/) {
-    if ~$/ ne '()' {
-        make $( $<args> );
+    my $past;
+    if $<args> {
+        $past := $( $<args> );
     }
     else {
-        make PAST::Op.new( :pasttype('call'), :node($/) );
+        $past := PAST::Op.new( :pasttype('call'), :node($/) );
     }
+    if $<do_block> {
+        $past.push( $( $<do_block>[0] ) );
+    }
+    make $past;
 }
 
 method args($/) {
