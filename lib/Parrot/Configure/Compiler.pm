@@ -162,8 +162,10 @@ Cleans up all files in the root folder that match the glob F<test.*>.
 
 sub cc_clean {    ## no critic Subroutines::RequireFinalReturn
     my $conf = shift;
-    unlink map "test_${$}$_", qw( .c .cco .ldo .out),
-        $conf->data->get(qw( o exe ));
+    unlink map "test_${$}$_", qw( .c .cco .ldo .out ),
+        $conf->data->get(qw( o exe )),
+        # MSVC
+        qw( .exe.manifest .ilk .pdb );
 }
 
 =item C<genfile()>
