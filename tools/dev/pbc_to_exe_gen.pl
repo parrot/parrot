@@ -440,14 +440,14 @@ END_BODY
 
   check_manifest:
     # Check if there is a MSVC app manifest
-    .local pmc file 
+    .local pmc file
     file = new 'File'
     .local string manifest_file_name
     manifest_file_name  = exefile
     manifest_file_name .= '.manifest'
     .local pmc manifest_exists
     manifest_exists = file.'exists'( manifest_file_name )
-    unless manifest_exists goto linked 
+    unless manifest_exists goto linked
 
   embed_manifest:
     # MSVC app manifest exists, embed it
@@ -461,9 +461,9 @@ END_BODY
     say embed_manifest
     .local int embed_manifest_status
     embed_manifest_status = spawnw embed_manifest
-    unless embed_manifest_status goto linked 
+    unless embed_manifest_status goto linked
     die 'manifest embedding failed'
- 
+
   linked:
     print "Linked: "
     say exefile
