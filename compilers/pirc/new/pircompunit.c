@@ -49,6 +49,14 @@ panic(char *msg) {
     return NULL;
 }
 
+/*
+
+=item C<void
+parse_error(struct lexer_state *lexer, int linenr, char const * const message, ...)>
+
+=cut
+
+*/
 void
 parse_error(struct lexer_state *lexer, int linenr, char const * const message, ...) {
     va_list arg_ptr;
@@ -63,8 +71,15 @@ parse_error(struct lexer_state *lexer, int linenr, char const * const message, .
 
 /*
 
-experimental: reset the register numbers for all types.
-this is currently done before each sub.
+=item C<void
+reset_register_allocator(struct lexer_state *lexer)>
+
+Reset the register numbers for all types. After this
+function has been invoked, the next request for a new
+(PASM) register will start at register 0 again (for all
+types).
+
+=cut
 
 */
 void
@@ -238,6 +253,17 @@ new_instr(struct lexer_state *lexer) {
     }
 }
 
+/*
+
+=item C<void
+set_curtarget(struct lexer_state *lexer, target *t)>
+
+Sets the target C<t> as the current target in C<lexer> to
+make it accessible to other parse actions.
+
+=cut
+
+*/
 void
 set_curtarget(struct lexer_state *lexer, target *t) {
     lexer->curtarget = t;
@@ -326,6 +352,18 @@ add_target(struct lexer_state *lexer, target *t1, target *t) {
     return t;
 }
 
+/*
+
+=item C<target *
+add_param(struct lexer_state *lexer, pir_type type, char * const name)>
+
+Add a parameter of type C<type> and named C<name> to the current
+subroutine. The parameter will be declared as a local symbol in the
+current subroutine, and a new register is allocated for it.
+
+=cut
+
+*/
 target *
 add_param(struct lexer_state *lexer, pir_type type, char * const name) {
     target *t = new_target(type, name);
@@ -357,6 +395,17 @@ add_param(struct lexer_state *lexer, pir_type type, char * const name) {
 
 }
 
+/*
+
+=item C<void
+set_alias(struct lexer_state *lexer, char *alias)>
+
+Set the argument of the :named flag for the current target
+(parameter).
+
+=cut
+
+*/
 void
 set_alias(struct lexer_state *lexer, char *alias) {
     assert(lexer->curtarget != NULL);
@@ -364,6 +413,17 @@ set_alias(struct lexer_state *lexer, char *alias) {
     SET_FLAG(lexer->curtarget->flags, TARGET_FLAG_NAMED);
 }
 
+/*
+
+=item target *
+add_param_named(struct lexer_state *lexer, pir_type type, char *name, char *alias)>
+
+Add a named parameter to the current subroutine and set its alias; this is the
+argument to the C<:named> flag.
+
+=cut
+
+*/
 target *
 add_param_named(struct lexer_state *lexer, pir_type type, char *name, char *alias) {
     target *t         = add_param(lexer, type, name);
@@ -372,18 +432,48 @@ add_param_named(struct lexer_state *lexer, pir_type type, char *name, char *alia
     return t;
 }
 
+/*
 
+=item C<void
+set_param_named(target *t, char *alias)>
+
+Set the alias of the named parameter C<t>.
+
+=cut
+
+*/
 void
 set_param_named(target *t, char *alias) {
     SET_FLAG(t->flags, TARGET_FLAG_NAMED); /* should already be the case */
     t->named_flag_arg = alias;
 }
 
+/*
+
+=item C<void
+set_param_flag(target *param, target_flag flag)>
+
+Set the flag C<flag> on parameter C<param>. The actual value
+of C<flag> may encode several flags at a time.
+
+=cut
+
+*/
 void
 set_param_flag(target *param, target_flag flag) {
     SET_FLAG(param->flags, flag);
 }
 
+/*
+
+=item C<argument *
+new_argument(expression *expr)>
+
+Create a new argument node which wraps C<expr>.
+
+=cut
+
+*/
 argument *
 new_argument(expression *expr) {
     argument *arg = (argument *)calloc(1, sizeof (argument));
@@ -397,6 +487,10 @@ new_argument(expression *expr) {
 
 /*
 
+=item C<argument *
+add_arg(argument *arg1, argument *arg2)>
+
+=cut
 
 */
 argument *
