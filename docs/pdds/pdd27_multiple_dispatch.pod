@@ -29,18 +29,21 @@ called overloading.
 
 =over 4
 
-=item - Parrot supports multiple dispatch in opcodes and user-defined routines
+=item - Parrot supports multiple dispatch in opcodes and user-defined routines.
 
-=item - A single dispatch system supports MMD in both contexts
+=item - A single dispatch system supports MMD in both contexts.
 
 =item - For user-defined subroutines and methods, the dispatch system is
-pluggable, allowing users to swap in their own type-matching algorithms
+pluggable, allowing users to swap in their own type-matching algorithms.
 
 =item - For opcodes, the dispatch system is merely extensible, allowing users
-to define alternates with their own types
+to define alternates with their own types.
 
-=item Dispatch considers both low-level (register) types and high-level (PMC)
-types, as well as inherited and composed types
+=item - Dispatch considers both low-level (register) types and high-level (PMC)
+types, as well as inherited and composed types.
+
+=item - Dispatch does not consider argument values. HLLs with dispatch systems
+that do consider argument values will implement their own pluggable matching.
 
 =back
 
@@ -84,22 +87,44 @@ inherited from ResizablePMCArray.
 Add a Sub or NCI sub to the list of candidates. Throw an exception if the
 value passed in is anything other than a Sub or NCI sub.
 
-=item set_pmc_keyed_int
+=item set_pmc_keyed_int [deprecated]
 
 Add a Sub or NCI sub to the list of candidates at a particular position in the
 list. Throw an exception if the value passed in is anything other than a Sub
 or NCI sub.
 
+{{ NOTE: deprecated because MultiSub is no longer an array. }}
+
+=item get_pmc
+
+Return an array of matching candidates, sorted from best matching to worst
+matching, for the current call arguments.
+
+=item get_pmc_keyed
+
+Return an array of matching candidates, sorted from best matching to worst
+matching, for a passed in signature. The signature passed in is an array of
+PMCs, and the types are extracted from the types of the array elements.
+
+=item get_pmc_keyed_string
+
+Return an array of matching candidates, sorted from best matching to worst
+matching, for a passed in signature. The signature passed in is a string of
+space-delimited type names.
+
 =item invoke
 
-Invoke the best matching candidate for the current call arguments. This vtable
+Return a function pointer to the best matching candidate for the current call
+arguments, and set up the interpreter preparing for invocation. This vtable
 function calls C<Parrot_mmd_sort_candidate_list> from the public MMD API, but
 may be changed to call C<Parrot_mmd_invoke>.
 
-=item set_integer_keyed_int, set_number_keyed_int, set_string_keyed_int
+=item set_integer_keyed_int, set_number_keyed_int, set_string_keyed_int [deprecated]
 
 Throw an exception, as an integer, float, or string value is not a Sub or NCI
 sub. (Masks the vtable functions inherited from ResizablePMCArray.)
+
+{{NOTE: no longer needed, since not inheriting from ResizablePMCArray.}}
 
 =back
 
