@@ -34,6 +34,10 @@ N: Aldo Calpini
 D: Debugging tutorial
 D: Porting to PDA
 
+N: Alek Storm
+E: alek.storm@gmail.com
+D: Fixed object vtable method overrides in PIR
+
 N: Alex Gough
 D: bignum
 
@@ -64,14 +68,14 @@ D: Port PAST-pm test to PCT.
 N: Andrew Rodland
 D: vim syntax files and editor doc
 
+N: Andrew Sweger
+D: typo squisher
+E: yDNA@cpan.org
+
 N: Andrew Whitworth
 D: PDD09 Garbage Collector
 D: Documentation
 E: wknight8111@gmail.com
-
-N: Andrew Sweger
-D: typo squisher
-E: yDNA@cpan.org
 
 N: Andy Dougherty
 D: Config and building.
@@ -93,6 +97,7 @@ N: Arvindh Rajesh Tamilmani
 D: Buffered IO fix
 
 N: Ask Bjoern Hansen
+D: Keeps us running
 
 N: Audrey Tang
 D: Pugs, a Perl6->Parrot implementation.
@@ -320,6 +325,10 @@ D: PPC JIT patches, ICU support, string handling
 N: Jeff Goff
 D: Release pumpking for 0.0.5-0.0.8
 
+N: Jeff Horwitz
+E: jeff@smashing.org
+D: Various bug fixes and tests
+
 N: Jeffrey Dik
 D: Test system fixes
 
@@ -357,11 +366,16 @@ D: to PIR translator, some Rakudo stuff and various other patches
 E: jnthn@jnthn.net
 W: http://www.jnthn.net/
 
+N: Joseph Ryan
+D: PIR tests and fixes
+
 N: Jos Visser
 D: fortytwo opcode
 
-N: Joseph Ryan
-D: PIR tests and fixes
+N: Josh McAdams
+D: Allow git checkouts to pass some tests that require an svn checkout
+
+N: Josh Wilmes
 
 N: Joshua Gatcomb
 D: updated version of parrotbench.pl
@@ -373,8 +387,6 @@ D: mucking around with Configure
 
 N: Joshua Isom, a.k.a jisom
 D: Getopt/Obj.pir
-
-N: Josh Wilmes
 
 N: Juergen Boemmels
 D: Parrot I/O; macro stuff in assembler.
@@ -433,6 +445,10 @@ D: Cage cleaning, random bugfixes, report bugs
 E: mark@glines.org
 S: South Lake Tahoe, CA, USA
 
+N: Mark Grimes
+E: mgrimes@cpan.org
+D: Clean up some tests
+
 N: Markus Amsler
 D: httpd.imc, bugfixes
 
@@ -447,11 +463,11 @@ D: Run Tcl test suite in partcl, and add various partcl bits
 N: Matt Fowles
 D: Resizable*Array PMCs
 
-N: Mattia Barbon
-D: Win32 fixes, dynamic PMC creation and loading
-
 N: Matt Kennedy
 D: Some Env PMC method implementations and tests
+
+N: Mattia Barbon
+D: Win32 fixes, dynamic PMC creation and loading
 
 N: Melvin Smith
 D: Parrot core, various ops, IO, subs, continuations, COW stacks
@@ -460,11 +476,11 @@ E: melvin.smith@mindspring.com
 E: melvins@us.ibm.com
 S: Atlanta, GA
 
-N: Michael G. Schwern
-
 N: Michael Cartmell
 E: Michael.Cartmell@thomson.com
 D: README.win32 spelling patch
+
+N: Michael G. Schwern
 
 N: Michael Scott
 D: Getting Started Guide for Parrot, many doc fixes
@@ -508,6 +524,10 @@ D: Win32, FreeBSD build fixes
 N: Nikolay Ananiev
 D: Win32 build fix
 
+N: Norman Nunley
+D: Shaving a Ponie
+E: nnunley@gmail.com
+
 N: Nigelsandever
 D: Win32 patches
 
@@ -528,6 +548,10 @@ D: Rename 'pbc_to_c' to 'pbc_to_exe'
 N: Pancake
 D: Fixes for pdb, the Parrot debugger
 
+N: Pat Eyler
+D: Ruby recursive expression support.
+E: pat.eyler@gmail.com
+
 N: Patrick R. Michaud
 D: Parrot Grammar Engine
 D: Perl 6 pumpking
@@ -535,10 +559,6 @@ D: NQP, PCT, PAST, POST
 D: APL
 D: Pynie
 E: pmichaud@pobox.com
-
-N: Pat Eyler
-D: Ruby recursive expression support.
-E: pat.eyler@gmail.com
 
 N: Paul Cochrane
 D: Changing the newspaper in the parrot cage
@@ -624,12 +644,6 @@ D: Various code fixes and improvements
 N: Stéphane Peiry
 D: Lot of JIT/sun patches
 
-N: tene
-D: Cardinal, a Ruby compiler
-D: ChitChat, a Smalltalk compiler
-D: Minor Rakudo patches
-E: tene@allalone.org
-
 N: Sterling Hughes
 D: Questions for the FAQ
 
@@ -641,20 +655,26 @@ D: Release pumpking for 0.0.9-0.0.11
 E: steve@fink.com
 S: San Carlos, CA, USA
 
-N: Steve Peters
-D: Patch for unreferenced variable warnings on Win32
-
 N: Steven Schubiger
 D: refactored out t/pmc/pmc.t perl tests
 E: steven@accognoscere.org
 W: http://www.accognoscere.org
 S: Winterthur, Switzerland
 
+N: Steve Peters
+D: Patch for unreferenced variable warnings on Win32
+
 N: Stig Brautaset
 D: Patch to repair 'make clean'
 
 N: Stuart Jansen
 D: lolcode patches
+
+N: tene
+D: Cardinal, a Ruby compiler
+D: ChitChat, a Smalltalk compiler
+D: Minor Rakudo patches
+E: tene@allalone.org
 
 N: Thilo Planz
 D: partcl tests and inspiration
@@ -665,13 +685,13 @@ D: Fixes for VMS
 N: TOGoS
 D: Some FAQ questions and answers
 
-N: Tony Payne
-D: Example hanoi.pasm
-
 N: Tom Hughes
 
 E: tom@nekomimists.ddo.jp
 D: Nicer command line handling in ops2c.pl
+
+N: Tony Payne
+D: Example hanoi.pasm
 
 N: Uri Guttman
 D: Lot of general Parrot design hints
@@ -679,6 +699,10 @@ D: Lot of general Parrot design hints
 N: Vasily Chekalkin
 E: bacek@bacek.com
 D: Core and Rakudo patches
+
+N: Vishal Soni
+E: vishalrsoni@gmail.com
+D: Bug fixes in IMCC, ECMAScript
 
 N: Vladimir Lipsky
 D: Win32, IO fixes
@@ -692,26 +716,3 @@ N: Zach Lipton
 N: Zach Morgan
 E: zpmorgan@gmail.com
 D: Rakudo patch
-
-N: Norman Nunley
-D: Shaving a Ponie
-E: nnunley@gmail.com
-
-N: Vishal Soni
-E: vishalrsoni@gmail.com
-D: Bug fixes in IMCC, ECMAScript
-
-N: Alek Storm
-E: alek.storm@gmail.com
-D: Fixed object vtable method overrides in PIR
-
-N: Jeff Horwitz
-E: jeff@smashing.org
-D: Various bug fixes and tests
-
-N: Mark Grimes
-E: mgrimes@cpan.org
-D: Clean up some tests
-
-N: Josh McAdams
-D: Allow git checkouts to pass some tests that require an svn checkout
