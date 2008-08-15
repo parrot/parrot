@@ -1,11 +1,14 @@
 # $Id$
-
 # Just some notes, on what might be next:
 ---
-- Eliminate unneeded test modules
-- Turn commented out tests into proper TODO tests, or fix the problem
-- add --target option for the non-pct variants
-- Support for floating point numbers
-- Support for the superglobals  _POST and _GET
-- Implement var_dump()
-- distinguish between subs and keywords
+- Support for e.g. "{$a}"
+- Support for $php_errormessage
+- Support for ini setting 'display_errors'
+- Support for $argc and $argv
+- Support for static variables
+- Support for '==='
+- Support for 'for' loops
+- Support for 'while' loops
+- Support for 'switch'
+- Support for 'elsif'
+ 
