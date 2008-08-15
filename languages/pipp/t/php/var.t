@@ -25,37 +25,69 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 2;
+use Test::More     tests => 4;
 use Parrot::Test;
 
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'var_dump() with string key' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'var_dump() with string key' );
 <?php
 $foo['bar'] = 'asdf';
 echo $foo['bar'];
 echo "\n";
 var_dump( $foo );
-END_CODE
+CODE
 asdf
 array(1) {
   ["bar"]=>
   string(4) "asdf"
 }
-END_OUT
+OUTPUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'var_dump() with int key' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'var_dump() with int key' );
 <?php
 $twice[1] = 2;
 echo $twice[1];
 echo "\n";
 var_dump( $twice );
-END_CODE
+CODE
 2
 array(1) {
   [1]=>
   int(2)
 }
-END_OUT
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'increment' );
+<?php
+$a = 10;
+var_dump($a);
+var_dump(++$a);
+var_dump($a);
+var_dump($a++);
+var_dump($a);
+CODE
+int(10)
+int(11)
+int(11)
+int(11)
+int(12)
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'decrement' );
+<?php
+$a = 10;
+var_dump($a);
+var_dump(--$a);
+var_dump($a);
+var_dump($a--);
+var_dump($a);
+CODE
+int(10)
+int(9)
+int(9)
+int(9)
+int(8)
+OUTPUT
 
 # Local Variables:
 #   mode: cperl
