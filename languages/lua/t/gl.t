@@ -36,7 +36,7 @@ elsif ( !$PConfig{has_opengl} ) {
     plan skip_all => "OpenGL needed";
 }
 else {
-    plan tests => 1;
+    plan tests => 4;
 }
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'require' );
@@ -46,6 +46,30 @@ print "OpenGL"
 CODE
 OpenGL
 OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'bad type' );
+require 'gl'
+gl.Begin(nil)
+CODE
+/^[^:]+: [^:]+:\d+: incorrect argument to function 'gl.Begin'\nstack traceback:\n/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'bad value' );
+require 'gl'
+gl.Begin('BAD_VALUE')
+CODE
+/^[^:]+: [^:]+:\d+: incorrect string argument to function 'gl.Begin'\nstack traceback:\n/
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'Begin/End' );
+require 'gl'
+gl.Begin('TRIANGLES')
+gl.End()
+print "OpenGL"
+CODE
+OpenGL
+OUTPUT
+
 
 # Local Variables:
 #   mode: cperl

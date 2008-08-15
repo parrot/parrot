@@ -563,6 +563,22 @@ C<table> mutator.
 
 /*
 
+=item C<void set_pmc_keyed_str(STRING *key, PMC *value)>
+
+Need by NameSpace.export_to().
+
+=cut
+
+*/
+    VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
+        PMC * pmc_key = pmc_new(INTERP, dynpmc_LuaString);
+        VTABLE_set_string_native(INTERP, pmc_key, string_copy(INTERP, key));
+        value = VTABLE_clone(interp, value);
+        *lua_set(INTERP, PMC_hash(SELF), pmc_key) = value;
+    }
+
+/*
+
 =item C<INTVAL elements()>
 
 Returns the number of elements in the table.
