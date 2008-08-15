@@ -111,6 +111,9 @@ $step = test_step_constructor_and_description($conf);
     ok($conf->data->get('HAS_SNPRINTF'),
         "Got expected value");
 }
+
+$conf->cc_clean();
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
