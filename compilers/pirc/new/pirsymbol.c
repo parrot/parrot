@@ -253,7 +253,11 @@ and a new (pasm) register is allocated to it, which is returned.
 int
 color_reg(struct lexer_state *lexer, pir_type type, int regno) {
     pir_reg *reg = find_register(lexer, type, regno);
-    if (reg) /* was the register already used, then it was already colored by the register allocator. */
+
+    /* was the register already used, then it was already colored by
+     * the register allocator.
+     */
+    if (reg)
         return reg->color;
 
     /* we're still here, so the register was not used yet; do that now. */
