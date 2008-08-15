@@ -69,7 +69,6 @@ sub runstep {
                 D_SIGRTMAX => $2,
             );
         }
-
     }
     else {
         $self->_handle_error_case($conf, $libs, $verbose);

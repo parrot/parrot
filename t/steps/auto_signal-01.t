@@ -149,6 +149,8 @@ my $verbose = 1;
     like($stdout, qr/setitimer/s, "Got expected verbose output");
 }
 
+$conf->cc_clean();
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

@@ -145,6 +145,8 @@ $step = test_step_constructor_and_description($conf);
 
 } # End SKIP block for Sun/Solaris
 
+$conf->cc_clean();
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################

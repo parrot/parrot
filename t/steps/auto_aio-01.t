@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 31;
+use Test::More qw(no_plan); # tests => 31;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -115,7 +115,7 @@ $verbose = 1;
     is($step->result, q{no}, "Got expected 'no' result");
     like($stdout, qr/no/, "Got expected verbose output");
 }
-
+$conf->cc_clean();
 
 pass("Completed all tests in $0");
 

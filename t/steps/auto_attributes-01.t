@@ -46,6 +46,7 @@ my $step = test_step_constructor_and_description($conf);
         "'ccflags' excludes bogus attribute as expected"
     );
 }
+$conf->cc_clean();
 
 pass("Completed all tests in $0");
 
