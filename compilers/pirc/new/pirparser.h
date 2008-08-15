@@ -248,12 +248,12 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 185 "pir.y"
+#line 189 "pir.y"
 {
     double              dval;
     int                 ival;
     char               *sval;
-    struct constant    *constval;
+    struct constant    *cval;
     struct instruction *instr;
     struct expression  *expr;
     struct target      *targ;
@@ -261,11 +261,9 @@ typedef union YYSTYPE
     struct invocation  *invo;
     struct key         *key;
     struct symbol      *sym;
-
-    void               *fixme;
 }
 /* Line 1489 of yacc.c.  */
-#line 269 "pirparser.h"
+#line 267 "pirparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

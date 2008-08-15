@@ -190,7 +190,7 @@ extern YY_DECL;
     double              dval;
     int                 ival;
     char               *sval;
-    struct constant    *constval;
+    struct constant    *cval;
     struct instruction *instr;
     struct expression  *expr;
     struct target      *targ;
@@ -198,8 +198,6 @@ extern YY_DECL;
     struct invocation  *invo;
     struct key         *key;
     struct symbol      *sym;
-
-    void               *fixme;
 }
 
 
@@ -358,9 +356,12 @@ extern YY_DECL;
              long_argument
 
 %type <expr> expression
+             namespace_slice
 
 %type <key>  keys
              keylist
+             opt_namespace
+             namespace
 
 %type <ival> has_unique_reg
              type
@@ -386,15 +387,10 @@ extern YY_DECL;
              long_yield_stat
              long_return_stat
              short_yield_stat
+             short_return_stat
 
-%type <constval> const_tail
-                 constant
-
-%type <fixme> long_invocation_stat
-              short_return_stat
-              opt_namespace_id
-              namespace_id
-
+%type <cval> const_tail
+             constant
 
 
 /* needed for reentrancy */
@@ -478,20 +474,24 @@ hll_mapping       : ".HLL_map" TK_STRINGC '=' TK_STRINGC
 
 /* Namespaces */
 
-namespace_decl    : ".namespace" '[' opt_namespace_id ']'
+namespace_decl    : ".namespace" '[' opt_namespace ']'
                             { set_namespace(lexer, $3); }
                   ;
 
-opt_namespace_id  : /* empty */
+opt_namespace     : /* empty */
                             { $$ = NULL; }
-                  | namespace_id
+                  | namespace
                             { $$ = $1; }
                   ;
 
-namespace_id      : TK_STRINGC
-                            { $$ = new_key(expr_from_const(new_const(STRING_TYPE, $1))); }
-                  | namespace_id ';' TK_STRINGC
-                            { $$ = add_key($1, expr_from_const(new_const(STRING_TYPE, $3))); }
+namespace         : namespace_slice
+                            { $$ = new_key($1); }
+                  | namespace ';' namespace_slice
+                            { $$ = add_key($1, $3); }
+                  ;
+
+namespace_slice   : TK_STRINGC
+                            { expr_from_const(new_const(STRING_TYPE, $1)); }
                   ;
 
 

@@ -32,44 +32,43 @@ typedef enum expr_types {
     EXPR_TARGET,
     EXPR_CONSTANT,
     EXPR_IDENT,
-    EXPR_INT,
     EXPR_KEY
 
 } expr_type;
 
 /* parameter flags */
 typedef enum target_flags {
-    TARGET_FLAG_NAMED       = 0x0001,
-    TARGET_FLAG_SLURPY      = 0x0002,
-    TARGET_FLAG_OPTIONAL    = 0x0004,
-    TARGET_FLAG_OPT_FLAG    = 0x0008,
-    TARGET_FLAG_UNIQUE_REG  = 0x0010,
-    TARGET_FLAG_INVOCANT    = 0x0020
+    TARGET_FLAG_NAMED       = 0x01, /* named parameter or variable accepting return value */
+    TARGET_FLAG_SLURPY      = 0x02, /* slurpy parameter or variable accepting return value */
+    TARGET_FLAG_OPTIONAL    = 0x04, /* optional parameter */
+    TARGET_FLAG_OPT_FLAG    = 0x08, /* parameter to check whether the previous (optional) parameter was passed */
+    TARGET_FLAG_UNIQUE_REG  = 0x10, /* flag to tell register allocator to leave this poor target alone! */
+    TARGET_FLAG_INVOCANT    = 0x20  /* XXX for MDD; to be implemented according to PDD27 */
 
 } target_flag;
 
 /* argument flags */
 typedef enum arg_flags {
-    ARG_FLAG_NAMED = 0x001,
-    ARG_FLAG_FLAT  = 0x002
+    ARG_FLAG_NAMED = 0x001, /* argument is passed by name */
+    ARG_FLAG_FLAT  = 0x002  /* argument must be flattened */
 
 } arg_flag;
 
 
 /* sub flags */
 typedef enum sub_flags {
-    SUB_FLAG_METHOD    = 0x0001,
-    SUB_FLAG_INIT      = 0x0002,
-    SUB_FLAG_LOAD      = 0x0004,
-    SUB_FLAG_OUTER     = 0x0008,
-    SUB_FLAG_MAIN      = 0x0010,
-    SUB_FLAG_ANON      = 0x0020,
-    SUB_FLAG_POSTCOMP  = 0x0040,
-    SUB_FLAG_IMMEDIATE = 0x0080,
-    SUB_FLAG_VTABLE    = 0x0100,
-    SUB_FLAG_LEX       = 0x0200,
-    SUB_FLAG_MULTI     = 0x0400,
-    SUB_FLAG_LEXID     = 0x0800
+    SUB_FLAG_METHOD    = 0x001, /* the sub is a method */
+    SUB_FLAG_INIT      = 0x002, /* the sub is run before :main when starting up */
+    SUB_FLAG_LOAD      = 0x004, /* the sub is run when the bytecode is loaded */
+    SUB_FLAG_OUTER     = 0x008, /* the sub is lexically nested */
+    SUB_FLAG_MAIN      = 0x010, /* execution of the program will start at this sub */
+    SUB_FLAG_ANON      = 0x020, /* this sub is shy and will not be stored in the global namespace */
+    SUB_FLAG_POSTCOMP  = 0x040, /* this sub will be executed after compilation */
+    SUB_FLAG_IMMEDIATE = 0x080, /* similar to POSTCOMP above; check out PDD19 for difference */
+    SUB_FLAG_VTABLE    = 0x100, /* this sub overrides a vtable method */
+    SUB_FLAG_LEX       = 0x200, /* this sub needs a LexPad */
+    SUB_FLAG_MULTI     = 0x400, /* this sub is a multi method/sub */
+    SUB_FLAG_LEXID     = 0x800  /* this sub has a namespace-unaware identifier */
 
 } sub_flag;
 
@@ -106,86 +105,94 @@ typedef enum value_types {
 
 /* for representing constant values */
 typedef union value {
-        char  *sval;
-        double nval;
-        int    ival;
-        char  *pval;
-        int    rval;
+    char    *sval;
+    double   nval;
+    int      ival;
+    char    *pval;
+    int      rval;
 
 } value;
 
 /* constant definitions */
 typedef struct constant {
-    char    *name;
-    pir_type type;
-    value    val;
+    char    *name;     /* name of the constant, if declared as a constant */
+    pir_type type;     /* type of the constant */
+    value    val;      /* value of the constant */
 
 } constant;
 
 
 
-/* expressions are operands for parrot instructions.
-
-Maybe rename.
-
+/* The expression node is used as a wrapper to represent target nodes (like .param, .local
+ * and registers), constant nodes (either named or anonymous), XXX identifiers?? XXX,
+ * or key nodes, such as ["x";42].
  */
 typedef struct expression {
     union __expression {
         struct target  *t;
         constant       *c;
         char           *id;
-        int            i;
         struct key     *k;
 
     } expr;
 
-    expr_type type;
+    expr_type type;        /* selector for __expression */
 
     struct expression *next;
 
 } expression;
 
 typedef struct key {
-    expression *expr;
-    struct key *next;
+    expression *expr;      /* value of this key */
+
+    struct key *next;      /* in ["x";"y"], there's 2 key nodes; 1 for "x", 1 for "y", linked by "next" */
+
 } key;
 
 
-/* function parameter or function result, as in (x,y) = foo().
- * A result is just a parameter from the viewpoint of invoking a
- * return continuation.
+/* The target node represents a .local, .param or register that can receive a value,
+ * hence the name "target". When receiving arguments, it's a parameter, when receiving
+ * return values, it's a local variable (or register).
  */
 typedef struct target {
-    pir_type       type;
-    char          *name;  /* if this is a declared local */
-    int            regno; /* if this is a register */
-    int            color; /* for register allocation */
-    target_flag    flags;
-    char          *named_flag_arg;
-
-    struct key    *key;
+    pir_type       type;           /* type of this target. */
+    char          *name;           /* if this is a declared local */
+    int            regno;          /* if this is a register */
+    int            color;          /* for register allocation */
+    target_flag    flags;          /* flags like :slurpy etc. */
+    char          *named_flag_arg; /* if this is a named parameter, this is the alias */
+    char          *lex_name;       /* if this is a lexical, this field contains the name */
+    struct key    *key;            /* the key of this target, i.e. $P0[$P1], $P1 is key. */
 
     struct target *next;
 
 } target;
 
+
+
 void *panic(char *msg);
 
 
 
-/* function arguments or return values, but a return value is just
- * an argument when invoking the return continuation.
+/* The argument node is used to represent arguments or return values.
+ * the value field contains the actual value; furthermore it can have
+ * flags, such as :flatten and :named; if :named is set, it can have
+ * an alias, when the argument is passed (or returned) as a named
+ * parameter (or return value).
  */
 typedef struct argument {
     expression *value;
     int         flags;
     char       *alias;
 
-    struct argument *next;
+    struct argument *next;  /* points to the next argument */
 
 } argument;
 
-/* represents an invocation statement,or a return statement.
+/* The invocation node represents an invocation statement, or a
+ * return statement, but both have the same components; arguments
+ * can be passed into a function (parameters) or out of a function,
+ * which means they are return values.
  *
  * foo(1,2), (a,b) = foo(1,2), a = foo(1,2)
  *
@@ -195,24 +202,23 @@ typedef struct argument {
  */
 typedef struct invocation {
     invoke_type type;
-    target     *object;
-    target     *sub;
-    target     *retcc;
-    target     *results;
-    argument   *arguments;
+    target     *object;        /* invocant object, if any */
+    target     *sub;           /* invoked sub */
+    target     *retcc;         /* return continuation, if any */
+    target     *results;       /* targets that will receive return values */
+    argument   *arguments;     /* values passed into the sub, or return values */
 
 } invocation;
 
-/* a parrot instruction */
+/* the instruction node represents a single parrot instruction */
 typedef struct instruction {
-    char     const  *opname;
-    expression *operands;
+    char const  *opname;       /* name of the instruction, such as "print" and "set" */
+    expression  *operands;     /* operands like "$I0" and "42" in "set $I0, 42" */
 
 } instruction;
 
 
 /* a statement can be either a parrot instruction or function call */
-
 typedef enum statement_types {
     STAT_TYPE_INSTRUCTION,
     STAT_TYPE_INVOCATION
@@ -221,16 +227,16 @@ typedef enum statement_types {
 
 
 typedef struct statement {
-    char          *label;
-    statement_type type;  /* indicates which field of the union is used */
+    char          *label;    /* label for this statement, if any */
+    statement_type type;     /* union field selector for __statement */
 
     union __statement {
-        instruction *ins;
-        invocation  *inv;
+        instruction *ins;    /* this statement is an instruction ... */
+        invocation  *inv;    /* ... or an invocation. */
     }
     instr;
 
-    struct statement *next;
+    struct statement *next;  /* points to next statement */
 
 } statement;
 
@@ -281,7 +287,7 @@ constant *new_const(pir_type type, ...);
 expression *expr_from_const(constant *c);
 expression *expr_from_target(target *t);
 expression *expr_from_ident(char *name);
-expression *expr_from_key(key *k);
+expression *expr_from_key(key * const k);
 
 argument *new_argument(expression *expr);
 argument *add_arg(argument *arg1, argument *arg2);
@@ -294,18 +300,18 @@ void set_curtarget(struct lexer_state *lexer, target *t);
 target *add_target(struct lexer_state *lexer, target *t1, target *t);
 
 target *new_target(pir_type type, char * const name);
-target *reg(struct lexer_state *lexer, int type, int regno);
+target *reg(struct lexer_state *lexer, pir_type type, int regno);
 
 
 invocation *invoke(struct lexer_state *lexer, invoke_type, ...);
 void set_invocation_type(invocation *inv, invoke_type type);
 
-target *target_from_string(char *str);
-target *target_from_ident(pir_type type, char *id);
+target *target_from_string(char * const str);
+target *target_from_ident(pir_type type, char * const id);
 target *target_from_symbol(struct symbol * const sym);
 
-key *new_key(expression *expr);
-key *add_key(key *keylist, expression *newkey);
+key *new_key(expression * const expr);
+key *add_key(key *keylist, expression * const newkey);
 
 void set_pragma(int which_one, int value);
 void load_library(struct lexer_state *lexer, char *library);
@@ -325,7 +331,7 @@ void set_instrf(struct lexer_state *lexer, char const * const opname, char const
 void define_const(struct lexer_state *lexer, constant *var, int is_globalconst);
 
 void set_invocation_args(invocation *inv, argument *args);
-void set_invocation_results(invocation *inv, target *results);
+void set_invocation_results(invocation *inv, target * const results);
 
 void set_lex_flag(target *t, char *lexname);
 char const *get_inverse(char const * const instr);
@@ -335,7 +341,7 @@ void invert_instr(struct lexer_state *lexer);
 void unshift_operand(struct lexer_state *lexer, expression *operand);
 void push_operand(struct lexer_state *lexer, expression *operand);
 
-struct symbol *add_local(struct symbol *list, struct symbol *local);
+struct symbol *add_local(struct symbol * const list, struct symbol * const local);
 struct symbol *new_local(char *name, int unique);
 
 int targets_equal(target const * const t1, target const * const t2);

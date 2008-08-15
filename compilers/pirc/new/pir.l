@@ -435,6 +435,8 @@ is_parrot_op(char const * const spelling)
         "end",
         "set",
         "find_global",
+        "set_hll_global",
+        "get_hll_global",
         "setfile",
         "setline",
         "add",
