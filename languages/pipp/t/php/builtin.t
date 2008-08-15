@@ -25,7 +25,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 7;
+use Test::More     tests => 9;
 use Parrot::Test;
 
 
@@ -90,6 +90,22 @@ language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'strlen() too many arg' );
 ?>
 CODE
 /Wrong parameter count for strlen\(\)/
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'extension_loaded() returns FALSE, echo' );
+<?php
+  echo extension_loaded("asdf");
+?>
+CODE
+OUTPUT
+
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'extension_loaded() returns FALSE, var_dump' );
+<?php
+  var_dump( extension_loaded("asdf") );
+?>
+CODE
+bool(false)
 OUTPUT
 
 

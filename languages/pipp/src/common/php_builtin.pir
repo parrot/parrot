@@ -170,14 +170,13 @@ DUMMY IMPLEMENTATION.
 
 =item C<bool extension_loaded(string extension_name)>
 
-Returns true if the named extension is loaded
-
-NOT IMPLEMENTED.
+Returns true if the named extension is loaded.
+As currently no extensions are supported, this function always returns false.
 
 =cut
 
 .sub 'extension_loaded'
-    not_implemented()
+    .RETURN_BOOL(0)
 .end
 
 =item C<mixed func_get_arg(int arg_num)>

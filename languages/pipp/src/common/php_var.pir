@@ -157,6 +157,20 @@ not_a_hash:
 
 not_a_integer:
 
+    ne type_of_pmc, 'boolean', not_a_bool
+
+        print 'bool('
+        if a goto a_is_true
+            print 'false'
+            say ')'
+           .return()
+a_is_true:
+            print 'true'
+            say ')'
+           .return()
+
+not_a_bool:
+
     _dumper(a)
 
     .return()
