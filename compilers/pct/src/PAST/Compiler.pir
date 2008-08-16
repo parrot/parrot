@@ -619,7 +619,7 @@ Return the POST representation of a C<PAST::Block>.
     bpost.'push_pirop'('getattribute', $S0, 'exception', '"payload"')
     bpost.'push_pirop'('return', $S0)
     bpost.'push'(rethrowlabel)
-    bpost.'push_pirop'('throw', 'exception')
+    bpost.'push_pirop'('rethrow', 'exception')
     goto sub_done
   control_past:
     $P0 = self.'as_post'(ctrlpast, 'rtype'=>'*')
