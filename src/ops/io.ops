@@ -169,7 +169,7 @@ inline op print(in INT) :base_io {
 }
 
 inline op print(in NUM) :base_io {
-  PIO_printf(interp, "%f", (double)$1);
+  PIO_printf(interp, FLOATVAL_FMT, $1);
 }
 
 op print(in STR) :base_io {
@@ -198,13 +198,11 @@ Print $1 to standard output with a trailing newline.
 =cut
 
 inline op say(in INT) :base_io {
-  PIO_printf(interp, INTVAL_FMT, (INTVAL)$1);
-  PIO_puts(interp, _PIO_STDOUT(interp), "\n");
+  PIO_printf(interp, INTVAL_FMT "\n", (INTVAL)$1);
 }
 
 inline op say(in NUM) :base_io {
-  PIO_printf(interp, "%f", (double)$1);
-  PIO_puts(interp, _PIO_STDOUT(interp), "\n");
+  PIO_printf(interp, FLOATVAL_FMT "\n", $1);
 }
 
 op say(in STR) :base_io {
@@ -244,7 +242,7 @@ op printerr(in INT) :base_io {
 }
 
 op printerr(in NUM) :base_io {
-  PIO_eprintf(interp, "%f", (double)$1);
+  PIO_eprintf(interp, FLOATVAL_FMT, $1);
 }
 
 op printerr(in STR) :base_io {
@@ -283,7 +281,7 @@ op print(invar PMC, in INT) :base_io {
 
 op print(invar PMC, in NUM) :base_io {
   if ($1) {
-    STRING * const s = Parrot_sprintf_c(interp, "%f", (double)$2);
+    STRING * const s = Parrot_sprintf_c(interp, FLOATVAL_FMT, $2);
     PIO_putps(interp, $1, s);
   }
 }
