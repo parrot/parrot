@@ -175,6 +175,10 @@ Will have to be:
     print $S0
     substr $P0, 1, 2, "x"
 
+=item * mmdvtregister and mmdvtablefind opcodes [post 0.7.0]
+
+These opcodes are part of the old MMD system, now deprecated and to be removed
+when the branch is merged in after the release.
 
 =back
 
