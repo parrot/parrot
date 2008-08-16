@@ -1,9 +1,9 @@
-/* string.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+/* stat.h
+ *  Copyright (C) 2001-2008, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
- *     This is the api header for the string subsystem
+ *     This is the api header for abstracting stat calls
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
