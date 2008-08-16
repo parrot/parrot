@@ -1884,6 +1884,41 @@ attribute.
 .end
 
 
+.sub 'register' :method :multi(_, ['PAST::Var'])
+    .param pmc node
+    .param pmc bindpost
+
+    .local string name
+    name = node.'name'()
+
+    .local pmc ops
+    $P0 = get_hll_global ['POST'], 'Ops'
+    ops = $P0.'new'('result'=>name, 'node'=>node)
+
+    .local int isdecl
+    isdecl = node.'isdecl'()
+    unless isdecl goto decl_done
+    ops.'push_pirop'('.local pmc', ops)
+  decl_done:
+
+    if bindpost goto register_bind
+
+    .local pmc viviself, vivipost
+    viviself = node.'viviself'()
+    unless viviself goto end
+    vivipost = self.'as_post'(viviself, 'rtype'=>'P')
+    ops.'push'(vivipost)
+    ops.'push_pirop'('set', ops, vivipost)
+    goto end
+
+  register_bind:
+    ops.'push_pirop'('set', ops, bindpost)
+
+  end:
+    .return (ops)
+.end
+
+
 =back
 
 =head3 C<PAST::Val>
