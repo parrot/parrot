@@ -1519,8 +1519,16 @@ node with a 'pasttype' of inline.
     .local pmc ops
     ops = self.'post_children'(node, 'signature'=>'vP')
 
+    .local pmc inline_pmc
     .local string inline
-    inline = node.'inline'()
+    inline_pmc = node.'inline'()
+    $I0 = does inline_pmc, 'array'
+    if $I0 goto inline_array
+    inline = inline_pmc
+    goto have_inline
+  inline_array:
+    inline = join "\n", inline_pmc
+  have_inline:
 
     .local string result
     result = ''
