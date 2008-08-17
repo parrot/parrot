@@ -427,10 +427,6 @@ and perform a sweep in the PMC header pool, so that destructors and finalizers
 get called. PMCs which have custom destructors rely on this behavior for
 proper operation.
 
-=item GC_no_trace_volatile_roots
-
-Trace root set except volatile roots. That is skip e.g. registers.
-
 =back
 
 =item C<void (*finalize_gc_system) (Interp *)>
