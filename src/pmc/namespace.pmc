@@ -382,26 +382,26 @@ really a public API.
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        PMC    *ns = SELF;
+        PMC    *ns = SUPER(key);
 
-        if (key->vtable->base_type == enum_class_String)
-            return SELF.get_pmc_keyed_str(VTABLE_get_string(INTERP, key));
+        if (!PMC_IS_NULL(ns))
+            return ns;
+
+        ns = SELF;
 
         if (key->vtable->base_type == enum_class_Key) {
-            while (key) {
-                STRING * const part = key_string(INTERP, key);
-                key  = key_next(INTERP, key);
+            STRING * const part = key_string(INTERP, key);
+            key  = key_next(INTERP, key);
 
-                if (!key)
-                    return VTABLE_get_pmc_keyed_str(INTERP, ns, part);
+            if (!key)
+                return VTABLE_get_pmc_keyed_str(INTERP, ns, part);
 
-                ns = Parrot_get_namespace_keyed_str(INTERP, ns, part);
+            ns = Parrot_get_namespace_keyed_str(INTERP, ns, part);
 
-                if (PMC_IS_NULL(ns))
-                    return PMCNULL;
-            }
+            if (PMC_IS_NULL(ns))
+                return PMCNULL;
 
-            return ns;
+            return VTABLE_get_pmc_keyed(INTERP, ns, key);
         }
 
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_GLOBAL_NOT_FOUND,

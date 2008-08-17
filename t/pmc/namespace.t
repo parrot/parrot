@@ -1736,7 +1736,7 @@ CODE
 /Null PMC access in get_string()/
 OUT
 
-pir_output_is( <<'CODE', <<OUT, "RT #57668", todo => "iterate through a NameSpace PMC, RT #57668" );
+pir_output_is( <<'CODE', <<OUT, "iterate through a NameSpace PMC" );
 .namespace [ 'bar' ]
 
 .sub 'main' :main
