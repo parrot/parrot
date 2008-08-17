@@ -29,7 +29,8 @@ called overloading.
 
 =over 4
 
-=item - Parrot supports multiple dispatch in opcodes and user-defined routines.
+=item - Parrot supports multiple dispatch in opcodes and user-defined
+routines.
 
 =item - A single dispatch system supports MMD in both contexts.
 
@@ -39,8 +40,8 @@ pluggable, allowing users to swap in their own type-matching algorithms.
 =item - For opcodes, the dispatch system is merely extensible, allowing users
 to define alternates with their own types.
 
-=item - Dispatch considers both low-level (register) types and high-level (PMC)
-types, as well as inherited and composed types.
+=item - Dispatch considers both low-level (register) types and high-level
+(PMC) types, as well as inherited and composed types.
 
 =item - Dispatch does not consider argument values. HLLs with dispatch systems
 that do consider argument values will implement their own pluggable matching.
@@ -119,7 +120,8 @@ arguments, and set up the interpreter preparing for invocation. This vtable
 function calls C<Parrot_mmd_sort_candidate_list> from the public MMD API, but
 may be changed to call C<Parrot_mmd_invoke>.
 
-=item set_integer_keyed_int, set_number_keyed_int, set_string_keyed_int [deprecated]
+=item set_integer_keyed_int, set_number_keyed_int, set_string_keyed_int
+[deprecated]
 
 Throw an exception, as an integer, float, or string value is not a Sub or NCI
 sub. (Masks the vtable functions inherited from ResizablePMCArray.)

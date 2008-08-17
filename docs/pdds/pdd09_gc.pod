@@ -451,9 +451,10 @@ basic behaviors for the pool.
 =item C<PObj * (*get_free_object) (Interp *, Small_Object_Pool*)>
 
 Get a free object from the pool. This function returns one free object from
-the given pool and removes that object from the pool's free list. PObject flags
-are returned clear, except flags that are used by the garbage collector itself,
-if any. If the pool is a buffer header pool all other object memory is zeroed.
+the given pool and removes that object from the pool's free list. PObject
+flags are returned clear, except flags that are used by the garbage collector
+itself, if any. If the pool is a buffer header pool all other object memory
+is zeroed.
 
 =item C<void (*add_free_object) (Interp *, Small_Object_Pool *, PObj *);>
 
