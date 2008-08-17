@@ -6,7 +6,9 @@ New in 0.7.0 [r29473 through r30270]
 - Languages
   + Cardinal (Ruby):
   + Lua:
-    - [opengl4lua branch merge?]
+    - various language fixes
+    - refactor all libraries (namespace, method registration)
+    - add a OpenGL binding (still incomplete)
   + Pipp (PHP):
   + Pugs (Perl 6):
     - removed due to bit rot
