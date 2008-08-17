@@ -45,9 +45,14 @@ New in 0.7.0 [r29473 through r30270]
   + new concurrency implementation (see PDD25)
   + new "say" opcode
   + Exception PMC now captures a return continuation
+  + improved PMC encapsulation (Iterator, Key, Pair)
 - Tools
   + parrot_debugger renamed from pdb, numerous tweaks
 - Miscellaneous
+  + IMCC cleanups
+  + :vtable implies self in PIR
+  + modest core speed improvements
+  + Cygwin support improved
 
 New in 0.6.4
 - Documentation
