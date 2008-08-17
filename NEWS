@@ -1,10 +1,51 @@
 # $Id$
 
-New in August 2008 release
-- Tools
-  + parrot_debugger renamed from pdb
+New in 0.7.0 [r29473 through r30270]
+- Specification
+  + PDD27: add multisub lookup
+- Languages
+  + Cardinal (Ruby):
+  + Lua:
+    - [opengl4lua branch merge?]
+  + Pipp (PHP):
+  + Pugs (Perl 6):
+    - removed due to bit rot
+  + Rakudo (Perl 6):
+    - updated the Rakudo roadmap
+    - Perl 6 multi dispatch
+    - dispatch with slurpies
+    - class attributes ("my $.x")
+    - now up to 2196 passing tests
+  + Tcl:
+    - [lots]
+- Compilers
+  + PCT:
+    - :scope('register') for PAST::Var nodes
+  + PIRC:
+    - PIR registers now use the vanilla register allocator
+    - all PASM output now uses PASM registers
+    - all .locals and $registers are mapped
+- Configuration
+  + tests now clean up after themselves
+  + improved parallel test support
+  + ports/cygwin added
+  + Darwin problems fixed
+- Deprecations
+  + ".pragma n_operators" is deprecated
+  + old PASM register syntax (without "$") is deprecated
+  + bare (unquoted) method names are deprecated
+  + "#line" will be replaced with ".line"
+  + ".HLL_map" syntax will change
+  + ".loadlib" is now separate from ".HLL"
+  + mmdvtregister and mmdvtablefind opcodes are deprecated
+  + removed getfd, getclass opcodes, plus numeric get_attr and set_attr
 - Implementation
-  + removed opcode getfd
+  + new concurrency implementation (see PDD25)
+  + new "say" opcode
+  + Exception PMC now captures a return continuation
+- Tools
+  + parrot_debugger renamed from pdb, numerous tweaks
+- Miscellaneous
 
 New in 0.6.4
 - Documentation
