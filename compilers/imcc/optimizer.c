@@ -43,7 +43,7 @@ unused labels and dead_code_remove() to remove unreachable code
 cfg_optimize may be called multiple times during the construction of the
 CFG depending on whether or not it finds anything to optimize.
 
-RT#46277: subst_constants ... rewrite e.g. add_i_ic_ic -- where does this happen?
+RT #46277: subst_constants ... rewrite e.g. add_i_ic_ic -- where does this happen?
 
 optimizer
 ---------
@@ -52,7 +52,7 @@ runs with CFG and life info
 
 used_once ... deletes assignments, when LHS is unused
 loop_optimization ... pulls invariants out of loops
-RT#46279 e.g. constant_propagation
+RT #46279 e.g. constant_propagation
 
 post_optimizer: currently pcc_optimize in pcc.c
 ---------------
@@ -242,7 +242,7 @@ pre_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
     if (IMCC_INFO(interp)->optimizer_level & OPT_PRE) {
         IMCC_info(interp, 2, "pre_optimize\n");
-        /* RT#46281 integrate all in one pass */
+        /* RT #46281 integrate all in one pass */
         changed += strength_reduce(interp, unit);
         if (!IMCC_INFO(interp)->dont_optimize)
             changed += if_branch(interp, unit);
@@ -276,7 +276,7 @@ cfg_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
             return 1;
         if (branch_reorg(interp, unit))
             return 1;
-        /* RT#46283 cfg / loop detection breaks e.g. in t/compiler/5_3 */
+        /* RT #46283 cfg / loop detection breaks e.g. in t/compiler/5_3 */
         if (unused_label(interp, unit))
             return 1;
         if (dead_code_remove(interp, unit))
@@ -289,7 +289,7 @@ cfg_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 =item C<int optimize>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1154,8 +1154,8 @@ PARROT_WARN_UNUSED_RESULT
 static int
 branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    unsigned int i;
-    int          changed = 0;
+    int i;
+    int changed = 0;
 
     IMCC_info(interp, 2, "\tbranch_reorg\n");
     for (i = 0; i < unit->n_basic_blocks; i++) {
@@ -1169,13 +1169,13 @@ branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                 Instruction * const start = r->first_ins;
                 int found = 0;
                 for (edge = unit->bb_list[start->bbindex]->pred_list;
-                        edge; edge = edge->pred_next)
-                {
+                        edge; edge = edge->pred_next) {
                     if (edge->from->index == start->bbindex - 1) {
                         found = 1;
                         break;
                     }
                 }
+
                 /* if target block is not reached by falling into it
                  * from another block */
                 if (!found) {
@@ -1196,12 +1196,15 @@ branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                         start->prev->next = end->next;
                         if (end->next)
                             end->next->prev = start->prev;
-                        end->next = ins->next;
-                        ins->next = start;
+
+                        end->next   = ins->next;
+                        ins->next   = start;
                         start->prev = ins;
+
                         IMCC_debug(interp, DEBUG_OPT1,
                                 "found branch to reorganize '%s' %I\n",
                                 r->first_ins->symregs[0]->name, ins);
+
                         /* unconditional jump can be eliminated */
                         unit->ostat.deleted_ins++;
                         ins = delete_ins(unit, ins);
@@ -1211,6 +1214,7 @@ branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
             }
         }
     }
+
     return changed;
 }
 
@@ -1218,7 +1222,7 @@ branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 =item C<static int branch_cond_loop_swap>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1377,7 +1381,7 @@ branch_cond_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 =item C<static int unused_label>
 
-Removes unused labels. A label is unused if ... [RT#46287: finish this].
+Removes unused labels. A label is unused if ... [RT #46287: finish this].
 
 Returns TRUE if any optimizations were performed. Otherwise, returns
 FALSE.
@@ -1390,18 +1394,16 @@ PARROT_WARN_UNUSED_RESULT
 static int
 unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    int          used;
-    unsigned int i;
-    int          changed = 0;
+    int i, used;
+    int changed = 0;
 
     IMCC_info(interp, 2, "\tunused_label\n");
     for (i = 1; i < unit->n_basic_blocks; i++) {
         Instruction *ins = unit->bb_list[i]->start;
         if ((ins->type & ITLABEL) && *ins->symregs[0]->name != '_') {
             const SymReg * const lab = ins->symregs[0];
-            used = 0;
-            if (IMCC_INFO(interp)->has_compile)
-                used = 1;
+            used = IMCC_INFO(interp)->has_compile ? 1 : 0;
+
             if (!lab->first_ins)
                 continue;
 #if 1
@@ -1410,13 +1412,13 @@ unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 #else
             else {
                 Instruction *ins2;
-                int j;
-                SymReg * addr;
+                SymReg      *addr;
+                int          j;
+
                 for (j=0; unit->bb_list[j]; j++) {
                     /* a branch can be the first ins in a block
                      * (if prev ins was a label)
-                     * or the last ins in a block
-                     */
+                     * or the last ins in a block */
                     ins2 = unit->bb_list[j]->start;
                     if ((ins2->type & ITBRANCH) &&
                             (addr = get_branch_reg(ins2)) != 0) {
@@ -1454,7 +1456,7 @@ unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 =item C<static int dead_code_remove>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1463,7 +1465,7 @@ RT#48260: Not yet documented!!!
 static int
 dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    unsigned int i;
+    int i;
     int changed = 0;
     Instruction *ins, *last;
 
@@ -1531,7 +1533,7 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 =item C<static int used_once>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1568,7 +1570,7 @@ enum check_t { CHK_INV_NEW, CHK_INV_SET, CHK_CLONE };
 
 =item C<static int _is_ins_save>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1646,7 +1648,7 @@ _is_ins_save(ARGIN(const IMC_Unit *unit), ARGIN(const Instruction *check_ins),
                 return reason=4, 0;
             if (STREQ(ins->opname, "clone"))
                 return reason=4, 0;
-            /* indexed set/get ??? RT#46289, as index is ok */
+            /* indexed set/get ??? RT #46289, as index is ok */
             if (0 && STREQ(ins->opname, "set") && nregs != 2)
                 return reason=5, 0;
             /*
@@ -1670,7 +1672,7 @@ _is_ins_save(ARGIN(const IMC_Unit *unit), ARGIN(const Instruction *check_ins),
 
 =item C<static int is_ins_save>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1696,7 +1698,7 @@ is_ins_save(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGIN(const Instruction 
 
 =item C<int max_loop_depth>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1719,7 +1721,7 @@ max_loop_depth(ARGIN(const IMC_Unit *unit))
 
 =item C<int is_invariant>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1828,7 +1830,7 @@ move_ins_out(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
         insert_ins(unit, (*ins)->prev, tmp);
     }
     ostat.invariants_moved++;
-    /* RT#46291 CFG is changed here, which also means
+    /* RT #46291 CFG is changed here, which also means
      * that the life_info is wrong now
      * so, currently we calc CFG and life again */
     return 1;
@@ -1838,7 +1840,7 @@ move_ins_out(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
 
 =item C<int loop_one>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1876,7 +1878,7 @@ loop_one(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int bnr)
 
 =item C<int loop_optimization>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
