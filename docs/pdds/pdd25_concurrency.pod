@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-docs/pdds/draft/pdd25_concurrency.pod - Parrot Concurrency
+docs/pdds/pdd25_concurrency.pod - Parrot Concurrency
 
 =head1 ABSTRACT
 
