@@ -79,10 +79,15 @@ my $result = GetOptions( 'html'          => \$do_gen_html,
 # ecmascript           No t/harness
 # eclectus
 # forth                No t/harness
+# lua                  many test failures
 # perl6                test scripts are written in Perl 6, not Perl 5
 # pheme                test scripts are written in Scheme, not Perl 5
+# PIR                  many test failures
 # pynie                test scripts are written in PIR, not Perl 5
 # python               not maintained
+# scheme               many test failures
+# urm                  uses deprecated parrot features
+# Zcode                Method 'instantiate' not found for 'Zmachine'
 
 my @unified_testable_languages
     = defined $languages_list ?
@@ -94,16 +99,14 @@ my @unified_testable_languages
               dotnet
               hq9plus
               jako
-              lazy-k lisp lua
+              lazy-k lisp
               m4
               ook
-              parrot_compiler PIR pipp punie
+              parrot_compiler pipp punie
               regex
-              scheme
               tcl
-              unlambda urm
+              unlambda
               WMLScript
-              Zcode
             );
 my @harnesses
     = grep {-f $_}
