@@ -59,6 +59,7 @@ enum DebugCmd {
     debug_cmd_c           = 25500,
     debug_cmd_d           = 25755,
     debug_cmd_e           = 26010,
+    debug_cmd_f           = 26265,
     debug_cmd_h           = 26775,
     debug_cmd_i           = 27030,
     debug_cmd_l           = 27795,
@@ -766,6 +767,7 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
         return 0;
 
     switch ((enum DebugCmd)c) {
+        case debug_cmd_f:
         case debug_cmd_script_file:
             PDB_script_file(interp, command);
             break;
@@ -841,6 +843,9 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
         default:
             PIO_eprintf(interp,
                         "Undefined command: \"%s\".  Try \"help\".", original_command);
+#ifdef TRACE_DEBUGGER
+            fprintf(stderr, " (parse_command result: %li)", c);
+#endif
             return 1;
     }
     return 0;
