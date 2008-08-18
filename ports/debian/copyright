@@ -8,7 +8,7 @@ It was downloaded from http://parrotcode.org/
 
 Copyright for most of the code is held by:
 
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 
 Some files have a different copyright:
 
@@ -21,9 +21,6 @@ languages/regex/lib/Regex/Grammar.pm:
 
 languages/urm:
 2003 (c) by Marcus Thiesen
-
-lib/Digest/Perl/MD5.pm:
-Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All rights reserved.
 
 lib/Pod/:
 Copyright (c) 2001-2002 Sean M. Burke.  All rights reserved.

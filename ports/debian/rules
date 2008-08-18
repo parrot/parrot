@@ -25,9 +25,9 @@ build-stamp: configure-stamp
 	dh_testdir
 	$(MAKE) installable
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" docs/running.pod debian/parrot.1
-	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" parrot-config debian/parrot-config.1
+	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" parrot_config debian/parrot_config.1
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pdump.c debian/pdump.1
-	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/disassemble.c debian/disassemble.1
+	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pbc_disassemble.c debian/pbc_disassemble.1
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pdb.c debian/parrot-debugger.1
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pbc_info.c debian/pbc_info.1
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pbc_merge.c debian/pbc_merge.1
@@ -36,8 +36,8 @@ build-stamp: configure-stamp
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp debian/parrot.1 debian/parrot-config.1 debian/pdump.1 debian/disassemble.1 debian/parrot-debugger.1 debian/pbc_info.1 debian/pbc_merge.1 debian/libparrot$(SOVERSION).install src/nci_test.o src/main.o ext/Parrot-Embed/Makefile.PL languages/PIR/Makefile languages/perl5/Makefile languages/pynie/Makefile runtime/parrot/include/signal.pasm test.c test.ldo
-	-$(MAKE) realclean
+	rm -f build-stamp configure-stamp debian/parrot.1 debian/parrot_config.1 debian/pdump.1 debian/pbc_disassemble.1 debian/parrot-debugger.1 debian/pbc_info.1 debian/pbc_merge.1 debian/libparrot$(SOVERSION).install src/nci_test.o src/main.o ext/Parrot-Embed/Makefile.PL languages/PIR/Makefile languages/perl5/Makefile languages/pynie/Makefile runtime/parrot/include/signal.pasm test.c test.ldo
+	[ ! -f Makefile ] || $(MAKE) distclean
 	dh_clean 
 
 debian/libparrot$(SOVERSION).install: debian/libparrot.install VERSION
@@ -61,7 +61,7 @@ binary-indep: build install
 	dh_testdir -i 
 	dh_testroot -i
 	dh_installchangelogs -i ChangeLog
-	dh_installman -plibparrot-dev debian/parrot-config.1
+	dh_installman -plibparrot-dev debian/parrot_config.1
 	dh_installdocs -i
 	dh_link -plibparrot-dev usr/lib/libparrot.so.$(SOVERSION) usr/lib/libparrot.so
 	dh_compress -pparrot-doc -X.pod
@@ -77,7 +77,7 @@ binary-arch: build install
 	dh_testdir -a
 	dh_testroot -a
 	dh_installchangelogs -a ChangeLog
-	dh_installman -pparrot debian/parrot.1 debian/pdump.1 debian/disassemble.1 debian/parrot-debugger.1 debian/pbc_info.1 debian/pbc_merge.1
+	dh_installman -pparrot debian/parrot.1 debian/pdump.1 debian/pbc_disassemble.1 debian/parrot-debugger.1 debian/pbc_info.1 debian/pbc_merge.1
 	dh_installdocs -a
 	dh_strip -a
 	dh_compress -a

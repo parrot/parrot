@@ -34,7 +34,7 @@ Description: Virtual machine for dynamic languages
 Package: libparrot-dev
 Architecture: any
 Section: libdevel
-Depends: libparrot%SOVERSION% (= ${Source-Version}), parrot, libicu-dev
+Depends: libparrot%SOVERSION% (= ${binary:Version}), parrot, libicu-dev
 Description: Virtual machine for dynamic languages
  Parrot is a virtual machine designed to efficiently compile and execute
  bytecode for dynamic languages. Parrot currently hosts a variety of language
