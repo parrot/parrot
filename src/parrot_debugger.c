@@ -131,6 +131,7 @@ Parrot_debug().
 int
 main(int argc, char *argv[])
 {
+    int nextarg;
     Parrot_Interp     interp   = Parrot_new(NULL);
 
     /*
@@ -138,6 +139,7 @@ main(int argc, char *argv[])
     PDB_t            *pdb      = mem_allocate_zeroed_typed(PDB_t);
     */
     PDB_t *pdb;
+    const char       *scriptname = NULL;
     const char       *filename;
     char             *ext;
     void             *yyscanner;
@@ -162,7 +164,14 @@ main(int argc, char *argv[])
         Parrot_exit(interp, 1);
     }
 
-    filename = argv[1];
+    nextarg = 1;
+    if (strcmp(argv[nextarg], "--script") == 0)
+    {
+        scriptname = argv [++nextarg];
+        ++nextarg;
+    }
+
+    filename = argv[nextarg];
     ext      = strrchr(filename, '.');
 
     if (ext && STREQ(ext, ".pbc")) {
@@ -205,10 +214,13 @@ main(int argc, char *argv[])
     Parrot_unblock_GC_mark(interp);
     Parrot_unblock_GC_sweep(interp);
 
-    PDB_printwelcome();
+    if (scriptname)
+        PDB_script_file(interp, scriptname);
+    else
+        PDB_printwelcome();
 
     interp->run_core = PARROT_DEBUGGER_CORE;
-    PDB_run_code(interp, argc - 1, argv + 1);
+    PDB_run_code(interp, argc - nextarg, argv + nextarg);
 
 
     Parrot_exit(interp, 0);

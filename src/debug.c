@@ -32,7 +32,7 @@ the Parrot debugger, and the C<debug> ops.
 #include "debug.str"
 
 /* Hand switched debugger tracing */
-#define TRACE_DEBUGGER 1
+/*#define TRACE_DEBUGGER 1*/
 
 #ifdef TRACE_DEBUGGER
 #  define TRACEDEB_MSG(msg) fprintf(stderr, "%s\n", (msg))
@@ -709,15 +709,11 @@ Interprets the contents of a file as user input commands
 
 */
 
+PARROT_API
 void
 PDB_script_file(PARROT_INTERP, ARGIN(const char *command))
 {
-    char buf[1024];
-    const char *ptr = (const char *)&buf;
-    int line = 0;
     FILE *fd;
-
-    command = nextarg(command);
 
     /* If already executing a script, close it */
     close_script_file(interp);
@@ -769,6 +765,7 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
     switch ((enum DebugCmd)c) {
         case debug_cmd_f:
         case debug_cmd_script_file:
+            command = nextarg(command);
             PDB_script_file(interp, command);
             break;
         case debug_cmd_disassemble:

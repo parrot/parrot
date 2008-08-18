@@ -204,6 +204,11 @@ void PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_API
+void PDB_script_file(PARROT_INTERP, ARGIN(const char *command))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 long PDB_add_label(
     ARGMOD(PDB_file_t *file),
     ARGIN(const opcode_t *cur_opcode),
@@ -325,10 +330,6 @@ char PDB_program_end(PARROT_INTERP)
 
 PARROT_IGNORABLE_RESULT
 int PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-void PDB_script_file(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
