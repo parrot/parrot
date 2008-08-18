@@ -132,6 +132,7 @@ __DATA__
 --- out: 1 2 3 4 5 6
 
 === shape, characters
+--- todo
 --- APL: ⍴'AEIOU'
 --- out: 5
 
@@ -139,24 +140,29 @@ __DATA__
 --- APL: ⍴2.3
 
 === shape of shape of scalar
+--- todo
 --- APL: ⍴⍴2.3
 --- out: 0
 
 
 
 === shape, vector
+--- todo
 --- APL: ⍴⍳20
 --- out: 20
 
 === format, number
+--- todo
 --- APL: ⍴⍕23.2
 --- out: 4
 
 === format, vector
+--- todo
 --- APL: ⍴⍕⍳20
 --- out: 50
 
 === reshape, numeric vector (verify resulting shape)
+--- todo
 --- APL: ⍴2 3⍴⍳6
 --- out
 2 3
