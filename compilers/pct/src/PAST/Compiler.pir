@@ -38,6 +38,7 @@ any value type.
 
 .include "cclass.pasm"
 .include "except_types.pasm"
+.include "interpinfo.pasm"
 
 .namespace [ 'PAST::Compiler' ]
 
@@ -636,6 +637,20 @@ Return the POST representation of a C<PAST::Block>.
     bpost.'push'($P0)
 
   sub_done:
+    ##  generate any loadinit code for the sub
+    $I0 = exists node['loadinit']
+    unless $I0 goto loadinit_done
+    .local pmc lipast, lipost
+    lipast = node.'loadinit'()
+    lipost = self.'as_post'(lipast, 'rtype'=>'v')
+    $P0 = get_hll_global ['POST'], 'Sub'
+    lipost = $P0.'new'('outer'=>bpost, 'pirflags'=>':load :init')
+    lipost.'push_pirop'('.local pmc', 'block')
+    lipost.'push_pirop'('interpinfo', '$P20', .INTERPINFO_CURRENT_SUB)
+    lipost.'push_pirop'('callmethod', 'get_outer', '$P20', 'result'=>'block')
+    bpost.'push'(lipost)
+  loadinit_done:
+
     ##  restore previous outer scope and symtable
     set_global '$?SUB', outerpost
     setattribute self, '%!symtable', outersym
