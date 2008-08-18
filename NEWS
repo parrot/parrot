@@ -10,6 +10,10 @@ New in 0.7.0 [r29473 through r30270]
     - refactor all libraries (namespace, method registration)
     - add a OpenGL binding (still incomplete)
   + Pipp (PHP):
+    - Add support for while- and for-loops
+    - Add support for increment and decrement
+    - Designate PHP 5.3 as the reference implementation 
+    - Improve support for string literals
   + Pugs (Perl 6):
     - removed due to bit rot
   + Rakudo (Perl 6):
