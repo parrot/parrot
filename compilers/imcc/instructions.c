@@ -278,7 +278,7 @@ instruction_writes(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
         int i;
 
         /* but only if it isn't the get_results opcode of
-         * an exception_handler, which doesn't have
+         * an ExceptionHandler, which doesn't have
          * a call next
          */
         if (ins->next && (ins->next->type & ITPCCSUB))
