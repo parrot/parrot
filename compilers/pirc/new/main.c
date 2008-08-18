@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include "pirparser.h"
 #include "pircompiler.h"
 
@@ -29,23 +30,6 @@ extern int yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * c
 
 =over 4
 
-
-=item C<void
-syntax_error(yyscan_t yyscanner, char *message)>
-
-wrapper function for yyerror. This is useful, so that if yyerror's
-signature changes, calls to syntax_error in the lexer do not need
-to be updated.
-
-*/
-
-void
-syntax_error(yyscan_t yyscanner, char const * const message)
-{
-    yyerror(yyscanner, yyget_extra(yyscanner), message);
-}
-
-/*
 
 =item C<static void
 print_help(char const * const program_name)>
@@ -91,6 +75,16 @@ open_file(char const * const filename, char const * const mode) {
 #endif
     return fp;
 }
+
+/*
+static void
+print_data_sizes(void) {
+    printf("size of symbol: %u\n", sizeof(symbol));
+    printf("size of target: %u\n", sizeof(target));
+    printf("size of sub:    %u\n", sizeof(subroutine));
+    printf("size of stat:   %u\n", sizeof(statement));
+}
+*/
 
 /*
 
@@ -185,6 +179,8 @@ main(int argc, char *argv[])
     if (lexer->parse_errors == 0) {
         fprintf(stderr, "Parse successful!\n");
         print_subs(lexer);
+        check_unused_symbols(lexer);
+        free_subs(lexer);
     }
     else
         fprintf(stderr, "There were %d errors\n", lexer->parse_errors);
@@ -194,6 +190,8 @@ main(int argc, char *argv[])
     /* clean up after playing */
     yylex_destroy(yyscanner);
     free(lexer);
+
+    /*print_data_sizes();*/
 
     /* go home! */
     return 0;
@@ -211,13 +209,13 @@ parser finds a syntax error.
 
 */
 int
-yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message)
-{
+yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message) {
     char const * const text = yyget_text(yyscanner);
-    ++lexer->parse_errors;
 
-    fprintf(stderr, "\nError in file '%s' (line %d)\n%s ",
-            lexer->filename, yyget_lineno(yyscanner), message);
+    fprintf(stderr, "\nError in file '%s' (line %d)\n%s\n", lexer->filename, yyget_lineno(yyscanner),
+                    message);
+
+    ++lexer->parse_errors;
 
     /* print current token if it's not a newline ("\r\n" on windows) */
     /* the following should be fixed; the point is not to print the token if

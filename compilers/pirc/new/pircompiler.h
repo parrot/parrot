@@ -11,16 +11,18 @@
 
 /* store the "globals" of the lexer in a structure which is passed around. */
 typedef struct lexer_state {
-    int         parse_errors;
-    char       *filename;
-    subroutine *subs;       /* list of subs; always points to the current sub. */
+    int            parse_errors;
+    char          *filename;
+    subroutine    *subs;       /* list of subs; always points to the current sub. */
 
-    key        *current_ns; /* keeps track of namespace */
+    key           *current_ns; /* keeps track of namespace */
 
-    target     *curtarget;  /* provides access to the current target node being parsed, if any */
-    argument   *curarg;     /* provides access to the current argument node being parsed, if any */
+    target        *curtarget;  /* provides access to the current target node being parsed, if any */
+    argument      *curarg;     /* provides access to the current argument node being parsed, if any */
 
-    int         curregister[4]; /* for register allocation */
+    int            curregister[4]; /* for register allocation */
+    global_ident  *globals;
+    constant      *constants;  /* global constants */
 
 } lexer_state;
 
@@ -28,8 +30,6 @@ typedef struct lexer_state {
 /* constructor for a lexer_state object */
 lexer_state *new_lexer(char * const filename);
 
-
-void reset_register_allocator(struct lexer_state *lexer);
 
 #endif /* PARROT_PIR_PIRCOMPILER_H_GUARD */
 

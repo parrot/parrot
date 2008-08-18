@@ -67,12 +67,12 @@
      TK_ARG = 283,
      TK_RESULT = 284,
      TK_NCI_CALL = 285,
-     PARROT_SET = 286,
-     PARROT_ADD = 287,
-     PARROT_SUB = 288,
-     PARROT_MUL = 289,
-     PARROT_DIV = 290,
-     PARROT_FDIV = 291,
+     TK_PARROT_SET = 286,
+     TK_PARROT_ADD = 287,
+     TK_PARROT_SUB = 288,
+     TK_PARROT_MUL = 289,
+     TK_PARROT_DIV = 290,
+     TK_PARROT_FDIV = 291,
      TK_IDENT = 292,
      TK_SYMBOL = 293,
      TK_STRINGC = 294,
@@ -132,13 +132,14 @@
      TK_FLAG_POSTCOMP = 348,
      TK_FLAG_IMMEDIATE = 349,
      TK_FLAG_LEXID = 350,
-     TK_FLAG_UNIQUE_REG = 351,
-     TK_FLAG_NAMED = 352,
-     TK_FLAG_SLURPY = 353,
-     TK_FLAG_FLAT = 354,
-     TK_FLAG_OPTIONAL = 355,
-     TK_FLAG_OPT_FLAG = 356,
-     TK_FLAG_INVOCANT = 357
+     TK_INSTANCEOF = 351,
+     TK_FLAG_UNIQUE_REG = 352,
+     TK_FLAG_NAMED = 353,
+     TK_FLAG_SLURPY = 354,
+     TK_FLAG_FLAT = 355,
+     TK_FLAG_OPTIONAL = 356,
+     TK_FLAG_OPT_FLAG = 357,
+     TK_FLAG_INVOCANT = 358
    };
 #endif
 /* Tokens.  */
@@ -170,12 +171,12 @@
 #define TK_ARG 283
 #define TK_RESULT 284
 #define TK_NCI_CALL 285
-#define PARROT_SET 286
-#define PARROT_ADD 287
-#define PARROT_SUB 288
-#define PARROT_MUL 289
-#define PARROT_DIV 290
-#define PARROT_FDIV 291
+#define TK_PARROT_SET 286
+#define TK_PARROT_ADD 287
+#define TK_PARROT_SUB 288
+#define TK_PARROT_MUL 289
+#define TK_PARROT_DIV 290
+#define TK_PARROT_FDIV 291
 #define TK_IDENT 292
 #define TK_SYMBOL 293
 #define TK_STRINGC 294
@@ -235,20 +236,21 @@
 #define TK_FLAG_POSTCOMP 348
 #define TK_FLAG_IMMEDIATE 349
 #define TK_FLAG_LEXID 350
-#define TK_FLAG_UNIQUE_REG 351
-#define TK_FLAG_NAMED 352
-#define TK_FLAG_SLURPY 353
-#define TK_FLAG_FLAT 354
-#define TK_FLAG_OPTIONAL 355
-#define TK_FLAG_OPT_FLAG 356
-#define TK_FLAG_INVOCANT 357
+#define TK_INSTANCEOF 351
+#define TK_FLAG_UNIQUE_REG 352
+#define TK_FLAG_NAMED 353
+#define TK_FLAG_SLURPY 354
+#define TK_FLAG_FLAT 355
+#define TK_FLAG_OPTIONAL 356
+#define TK_FLAG_OPT_FLAG 357
+#define TK_FLAG_INVOCANT 358
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 189 "pir.y"
+#line 172 "pir.y"
 {
     double              dval;
     int                 ival;
@@ -260,10 +262,10 @@ typedef union YYSTYPE
     struct argument    *argm;
     struct invocation  *invo;
     struct key         *key;
-    struct symbol      *sym;
+    struct symbol      *symb;
 }
 /* Line 1489 of yacc.c.  */
-#line 267 "pirparser.h"
+#line 269 "pirparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

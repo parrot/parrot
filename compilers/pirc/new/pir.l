@@ -55,8 +55,8 @@ easier to maintain, and preferable.
 #define YY_EXTRA_TYPE  struct lexer_state *
 
 /* accessor methods for setting and getting the lexer_state */
-extern YY_EXTRA_TYPE  yyget_extra(yyscan_t scanner);
-extern void yyset_extra(YY_EXTRA_TYPE lexer , yyscan_t scanner);
+extern YY_EXTRA_TYPE yyget_extra(yyscan_t scanner);
+extern void yyset_extra(YY_EXTRA_TYPE lexer, yyscan_t scanner);
 
 /* accessor method to get yytext */
 extern char *yyget_text(yyscan_t yyscanner);
@@ -64,7 +64,8 @@ extern char *yyget_text(yyscan_t yyscanner);
 /* declaration of yylex */
 extern int yylex(YYSTYPE *yylval, yyscan_t yyscanner);
 
-extern void syntax_error(yyscan_t yyscanner, char *message);
+/* declaration of yyerror */
+extern void yyerror(yyscan_t yyscanner, lexer_state * const lexer, char *message);
 
 
 
@@ -109,6 +110,8 @@ so define our own strdup. Function names beginning with "str"
 are reserved (I think), so make it dupstr, as that is what it
 does: duplicate a string.
 
+=cut
+
 */
 static char *
 dupstr(char const * const source) {
@@ -124,6 +127,8 @@ dupstr(char const * const source) {
 
 See dupstr, except that this version takes the number of characters to be
 copied. Easy for copying a string except the quotes.
+
+=cut
 
 */
 static char *
@@ -142,19 +147,27 @@ dupstrn(char const * const source, size_t num_chars) {
 
 constructor for a lexer. It's very important to initialize all fields.
 
+=cut
+
 */
 lexer_state *
 new_lexer(char * const filename) {
     lexer_state *lexer   = (lexer_state *)malloc(sizeof (lexer_state));
     assert(lexer != NULL);
 
+    /* clear all fields */
+    memset(lexer, 0, sizeof (lexer_state));
+
     lexer->filename      = filename;
+    /*
     lexer->parse_errors  = 0;
     lexer->current_ns    = NULL;
     lexer->subs          = NULL;
-
     lexer->curtarget     = NULL;
     lexer->curarg        = NULL;
+    lexer->globals       = NULL;
+    lexer->constants     = NULL;
+    */
 
     printdebug(stderr, "Constructing new lexer\n");
 
@@ -297,6 +310,13 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 "unless"          { return TK_UNLESS; }
 "null"            { return TK_NULL; }
 
+"set"             { return TK_PARROT_SET; }
+"add"             { return TK_PARROT_ADD; }
+"sub"             { return TK_PARROT_SUB; }
+"mul"             { return TK_PARROT_MUL; }
+"div"             { return TK_PARROT_DIV; }
+"fdiv"            { return TK_PARROT_FDIV; }
+
 "int"             { return TK_INT; }
 "num"             { return TK_NUM; }
 "pmc"             { return TK_PMC; }
@@ -343,6 +363,7 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 ":vtable"     { return TK_FLAG_VTABLE; }
 ":multi"      { return TK_FLAG_MULTI; }
 ":lexid"      { return TK_FLAG_LEXID; }
+":instanceof" { return TK_INSTANCEOF; }
 
 ":unique_reg" { return TK_FLAG_UNIQUE_REG; }
 ":optional"   { return TK_FLAG_OPTIONAL; }
@@ -368,25 +389,39 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
                 return TK_LABEL;
               }
 
-
-"set"         { return PARROT_SET; }
-"add"         { return PARROT_ADD; }
-"sub"         { return PARROT_SUB; }
-"mul"         { return PARROT_MUL; }
-"div"         { return PARROT_DIV; }
-"fdiv"        { return PARROT_FDIV; }
-
 {IDENT}       { /* identifier; can be a global (sub or const), local or parrot op */
                 lexer_state *lexer = yyget_extra(yyscanner);
                 symbol      *sym   = find_symbol(lexer, yytext);
-
+                constant    *con;
 
                 /* if the id was declared as a local, return the pointer to the symbol
                  * node. Note that .locals can "hide" opcodes.
                  */
                 if (sym != NULL) {
-                    yylval->sym = sym;
+                    yylval->symb = sym;
                     return TK_SYMBOL;
+                }
+
+                /* maybe it was a declared .const; if that's the case, then that .const's
+                 * value is returned as if the literal constant was parsed.
+                 */
+                con = find_constant(lexer, yytext);
+                if (con != NULL) {
+                    switch (con->type) {
+                        case INT_TYPE:
+                            yylval->ival = con->val.ival;
+                            return TK_INTC;
+                        case NUM_TYPE:
+                            yylval->dval = con->val.nval;
+                            return TK_NUMC;
+                        case STRING_TYPE:
+                            yylval->sval = con->val.sval;
+                            return TK_STRINGC;
+                        case PMC_TYPE:
+                        case UNKNOWN_TYPE:
+                        default:
+                            fprintf(stderr, "invalid constant type!\n");
+                    }
                 }
 
                 /* at this point we need to duplicate the string */
@@ -413,7 +448,7 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 
 
 .      { /* any character not covered in the rules above is an error. */
-         syntax_error(yyscanner, "Unexpected character");
+         yyerror(yyscanner, yyget_extra(yyscanner), "Unexpected character");
        }
 
 
@@ -423,7 +458,18 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 
 %%
 
+/*
 
+=head1 AUX. FUNCTIONS
+
+=over 4
+
+=item C<static int
+is_parrot_op(char const * const spelling)>
+
+=cut
+
+*/
 static int
 is_parrot_op(char const * const spelling)
 {
@@ -455,6 +501,14 @@ is_parrot_op(char const * const spelling)
 
     return 0;
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 
 

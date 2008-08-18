@@ -24,7 +24,23 @@ keeping track of declared .local/.param identifiers, and for PIR registers.
 As such, a vanilla register allocator is implemented; for each declared identifier
 or PIR register, a new PASM register is allocated.
 
-=head2 Functions
+=head1 IMPLEMENTATION
+
+Currently, there's different lists for different types of symbols. Symbols
+representing C<.local> or C<.param> items are stored using the C<symbol> structure.
+
+PIR registers are stored using the C<pir_reg> structure.
+
+Global identifiers, representing subroutine names are stored in a separate list.
+
+Globally defined constants are stored in yet another separate list.
+
+It might be worthwhile to investigate the possibility to store all symbols in
+one data structure (for instance, a hashtable), using one C structure to
+describe the properties (possibly an enumeration of symbol types).
+
+
+=head1 FUNCTIONS
 
 =over 4
 
@@ -45,7 +61,7 @@ This is the vanilla register allocator.
 
 */
 static int
-next_register(struct lexer_state *lexer, pir_type type) {
+next_register(struct lexer_state * const lexer, pir_type type) {
     return lexer->curregister[type]++;
 }
 
@@ -60,15 +76,14 @@ Create a new symbol node, returns it after initialization.
 =cut
 
 */
-
 symbol *
-new_symbol(char *name, pir_type type) {
+new_symbol(char * const name, pir_type type) {
     symbol *sym = (symbol *)malloc(sizeof (symbol));
     assert(sym != NULL);
     sym->name   = name;
     sym->type   = type;
     sym->next   = NULL;
-
+    sym->used   = 0;
     return sym;
 }
 
@@ -79,7 +94,7 @@ declare_local(struct lexer_state *lexer, pir_type type, target *list)>
 
 Declare the local variables in the list pointed to by C<list>, all of which
 are of the type C<type>. The variables are entered into the symbol table for
-the current subroutine that is being parsed (each subroutine must have its
+the current subroutine that is being parsed (each subroutine has its
 own symbol table). Each symbol will be allocated a (PASM) register; in
 other words, afer invoking this function, each of the symbol nodes in C<list>
 will have been given a PASM register.
@@ -88,7 +103,7 @@ will have been given a PASM register.
 
 */
 void
-declare_local(struct lexer_state *lexer, pir_type type, symbol *list) {
+declare_local(struct lexer_state * const lexer, pir_type type, symbol *list) {
     symbol *iter = list;
 
     /* bad implementation, but best i can come up with now. */
@@ -119,30 +134,75 @@ declare_local(struct lexer_state *lexer, pir_type type, symbol *list) {
 }
 
 /*
+
+=item C<void
+check_unused_symbols(struct lexer_state *lexer)>
+
+Check all subroutines for unused symbols. If a symbol is declared but
+never used, a warning message is printed to C<stderr>.
+
+Unused symbols should be prevented, as they I<are> assigned a PASM register.
+Effectively, this is a waste of PASM registers; the subroutine could do
+with less.
+
+=cut
+
+*/
+void
+check_unused_symbols(struct lexer_state * const lexer) {
+    subroutine *subiter = lexer->subs->next;
+    do {
+        symbol *iter = lexer->subs->symbols;
+
+        while (iter) {
+            if (!iter->used) {
+                /* maybe only check for .locals, not .params. For now, disable this. */
+                /*
+                fprintf(stderr, "Warning: in sub '%s': symbol '%s' declared but not used\n",
+                        subiter->sub_name, iter->name);
+                */
+            }
+
+            iter = iter->next;
+        }
+
+        subiter = subiter->next;
+    }
+    while (subiter != lexer->subs);
+}
+
+/*
+
 =item C<symbol *
 find_symbol(struct lexer_state *lexer, char * const name)>
 
 Return the node for the symbol or NULL if the symbol
-is not defined.
+is not defined. If an attempt is made to find a symbol,
+we assume it is because the symbol will be I<used>; therefore,
+the C<used> flag is set.
 
 =cut
 
 */
 symbol *
-find_symbol(struct lexer_state *lexer, char * const name) {
+find_symbol(struct lexer_state * const lexer, char * const name) {
     symbol *iter;
-
     /* check whether there's a subroutine in place; if not, the
-     * specified name is an identifier being parsed outside of a .sub.
+     * specified name is an identifier being parsed outside of a .sub;
+     * in that case, NULL is returned.
      */
-    if (lexer->subs)
+    if (lexer->subs) /* then initialize iterator */
         iter = lexer->subs->symbols;
     else
         return NULL;
 
     while (iter) {
-        if (strcmp(iter->name, name) == 0)
+
+        if (strcmp(iter->name, name) == 0) {
+            iter->used = 1; /* mark this symbol as used */
             return iter;
+        }
+
         iter = iter->next;
     }
     return NULL;
@@ -181,7 +241,7 @@ a pointer to it is returned, if not, NULL is returned.
 
 */
 static pir_reg *
-find_register(struct lexer_state *lexer, pir_type type, int regno) {
+find_register(struct lexer_state * const lexer, pir_type type, int regno) {
     /* should do a binary search. fix later.
      */
     pir_reg *iter = lexer->subs->registers[type];
@@ -213,7 +273,7 @@ The function returns the allocated PASM register.
 
 */
 static int
-use_register(struct lexer_state *lexer, pir_type type, int regno) {
+use_register(struct lexer_state * const lexer, pir_type type, int regno) {
     pir_reg *reg, *iter;
 
     /* create a new node representing this PIR register */
@@ -224,9 +284,12 @@ use_register(struct lexer_state *lexer, pir_type type, int regno) {
     /* insert, as registers only increase, just insert at the beginning.
      * searching must therefore look from high to low reg. numbers
      */
-    iter = lexer->subs->registers[type];
+    iter       = lexer->subs->registers[type];
 
-    reg->next = lexer->subs->registers[type];
+    /* link this register into the list of "colored" registers; each of
+     * them has been assigned a unique PASM register.
+     */
+    reg->next  = lexer->subs->registers[type];
     lexer->subs->registers[type] = reg;
 
 
@@ -251,7 +314,7 @@ and a new (pasm) register is allocated to it, which is returned.
 
 */
 int
-color_reg(struct lexer_state *lexer, pir_type type, int regno) {
+color_reg(struct lexer_state * const lexer, pir_type type, int regno) {
     pir_reg *reg = find_register(lexer, type, regno);
 
     /* was the register already used, then it was already colored by
@@ -264,6 +327,115 @@ color_reg(struct lexer_state *lexer, pir_type type, int regno) {
     return use_register(lexer, type, regno);
 }
 
+
+/*
+
+=item C<static global_ident *
+new_global_ident(char * const name)>
+
+Constructor to create a new global_ident object.
+
+=cut
+
+*/
+static global_ident *
+new_global_ident(char * const name) {
+    global_ident *glob = (global_ident *)malloc(sizeof (global_ident));
+    assert(glob);
+    glob->name     = name;
+    glob->next     = NULL;
+    glob->const_nr = 0;
+    return glob;
+}
+
+/*
+
+=item C<void
+store_global_ident(struct lexer_state *lexer, char * const name)>
+
+Store the global identifier C<name>.
+
+=cut
+
+*/
+void
+store_global_ident(struct lexer_state * const lexer, char * const name) {
+    global_ident *glob = new_global_ident(name);
+
+    /* store the global in the lexer */
+    if (lexer->globals) {
+        glob->next     = lexer->globals;
+        lexer->globals = glob;
+    }
+    else
+        lexer->globals = glob;
+}
+
+/*
+
+=item C<global_ident *
+find_global_ident(struct lexer_state *lexer, char * const name)>
+
+Find the global identifier C<name>. If no such identifier was found,
+then NULL is returned.
+
+=cut
+
+*/
+global_ident *
+find_global_ident(struct lexer_state * const lexer, char * const name) {
+    global_ident *iter = lexer->globals;
+    while (iter) {
+        if (strcmp(iter->name, name) == 0)
+            return iter;
+        iter = iter->next;
+    }
+    return NULL;
+}
+
+/*
+
+=item C<void
+store_global_const(struct lexer_state *lexer, constant * const c)>
+
+Store the globally defined constant C<c> in the constant table.
+
+=cut
+
+*/
+void
+store_global_const(struct lexer_state * const lexer, constant * const c) {
+    if (lexer->constants) {
+        c->next = lexer->constants;
+        lexer->constants = c;
+    }
+    else {
+        lexer->constants = c;
+    }
+
+}
+
+/*
+
+=item C<constant *
+find_constant(struct lexer_state *lexer, char * const name)>
+
+Find a constant defined as C<name>. If no constant was defined by
+that name, then NULL is returned.
+
+=cut
+
+*/
+constant *
+find_constant(struct lexer_state * const lexer, char * const name) {
+    constant *iter = lexer->constants;
+    while (iter) {
+        if (strcmp(iter->name, name) == 0)
+            return iter;
+        iter = iter->next;
+    }
+    return NULL;
+}
 
 /*
 

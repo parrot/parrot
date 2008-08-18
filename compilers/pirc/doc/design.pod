@@ -5,6 +5,12 @@ design.pod - description PIRC's design.
 =head1 DESCRIPTION
 
 This document describes the design and implementation of PIRC, a PIR Compiler.
+This document describes the hand-written, recursive-descent implementation
+which can be found in F<compilers/pirc/src>. This implementation is currently
+not actively maintained, but kept here for potential future use.
+
+For a new implementation of PIR, you might want to look at F<compilers/pirc/new>,
+which is an implementation using Bison and Flex.
 
 =head1 OVERVIEW
 
