@@ -836,6 +836,10 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
             pdb->state |= PDB_EXIT;
             pdb->state &= ~PDB_STOPPED;
             break;
+        case debug_cmd_s:
+        case debug_cmd_stack:
+            PDB_backtrace(interp);
+            break;
         case (enum DebugCmd)0:
             if (pdb->last_command)
                 PDB_run_command(interp, pdb->last_command);
