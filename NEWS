@@ -27,6 +27,9 @@ New in 0.7.0 [r29473 through r30270]
     - PIR registers now use the vanilla register allocator
     - all PASM output now uses PASM registers
     - all .locals and $registers are mapped
+    - clean-up of grammar, back-end and documentation
+    - implemented constant folding
+    - implemented instruction selection
 - Configuration
   + tests now clean up after themselves
   + improved parallel test support
