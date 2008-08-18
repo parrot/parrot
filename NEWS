@@ -30,9 +30,8 @@ New in 0.7.0 [r29473 through r30270]
     - implement [lreverse], [lsort -command]
     - allow [incr] to autovivify
     - Update tclsh spec target to 8.5.3
-    - Fix bug in TclDict PMC, allowing ~200 more [dict] spec tests to pass.
-    - Update 'make spectest' fudging to more accurately reflect our current
-      state, preferentially using TODO instead of SKIP
+    - Fix bug in TclDict PMC, allowing ~200 more [dict] spec tests to pass
+    - Update 'make spectest' fudging, using TODO instead of SKIP if possible
 - Compilers
   + PCT:
     - :scope('register') for PAST::Var nodes
