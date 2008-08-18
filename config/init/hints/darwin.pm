@@ -18,13 +18,13 @@ sub runstep {
 
     my $verbose = $conf->options->get('verbose');
 
-    # %flags is the list of options that have -arch flags added to them
-    # implicitly through config/init/defaults.pm when using Apple's Perl
-    # 5.8 build to run Configure.pl (it's a multi-architecture build).
-    # This doesn't play nice with getting parrot to build on PPC systems
-    # and causes all sorts of fun issues with lipo and friends.  So, it's
-    # time to remove all -arch flags set in $conf->data and force a single,
-    # native architecture to being the default build.
+    # The hash referenced by $flagsref is the list of options that have -arch
+    # flags added to them implicitly through config/init/defaults.pm when
+    # using Apple's Perl 5.8 build to run Configure.pl (it's a
+    # multi-architecture build).  This doesn't play nice with getting parrot
+    # to build on PPC systems and causes all sorts of fun issues with lipo and
+    # friends.  So, it's time to remove all -arch flags set in $conf->data and
+    # force a single, native architecture to being the default build.
 
     my $flagsref = _strip_arch_flags($conf, $verbose);
 
