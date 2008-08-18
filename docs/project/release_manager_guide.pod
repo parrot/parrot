@@ -41,7 +41,7 @@ Increment the version number in the following files:
 F<VERSION>, F<parrot.spec>, F<MANIFEST.generated>, F<META.yml>,
 F<README>.
 
-Note: Sourc0 in parrot.spec might have to be adapted as well.
+Note: C<Source0> in parrot.spec might have to be adapted as well.
 
 Also update the version number, date, and your name in the
 the file: F<docs/parrothist.pod>.
@@ -119,8 +119,11 @@ Make sure everything works:
  $ make world docs html 2>&1 | tee make_world_docs_html.log
  $ make fulltest        2>&1 | tee make_fulltest.log
 
-Note that running 'make fulltest' takes a while and that separate harnesses
-are being run. It is not necessary to quiet all the codingstd tests for a release.
+Note that running "make fulltest" takes a while and that separate
+harnesses are being run.  Also, note that "make fulltest" includes
+"make codingstd_tests"; some of these are expected to fail, but the
+subset run by "make test" B<must> pass (see C<@developing_tests> in
+F<lib/Parrot/Harness/DefaultTests.pm>).
 
 =back
 
