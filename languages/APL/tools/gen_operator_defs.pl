@@ -131,7 +131,12 @@ END_PIR
     %t = $I1
 END_PIR
 
-    itable['monadic:*']      =  "    %t = exp %0"      # exp
+    itable['monadic:*']      =  <<'END_PIR'
+    $P1 = new 'Float'
+    $P1 = %0
+    %t = $P1.'exp'()
+END_PIR
+
     itable[unicode:"monadic:\x{d7}"] =  <<'END_PIR'
     $N1 = %0                   # monadic:\x{d7} (signum)
     $I1 = cmp_num $N1, 0.0
@@ -156,7 +161,11 @@ END_PIR
     %t = $I1
 END_PIR
 
-    itable[unicode:"monadic:\u235f"] =  "    %t = ln %0"
+    itable[unicode:"monadic:\u235f"] =  <<'END_PIR'
+    $P1 = new 'Float'
+    $P1 = %0
+    %t = $P1.'ln'()
+END_PIR
 
 
     itable[unicode:"monadic:\u25cb"] =  "    %t = %0 * 3.14159265358979323846"
