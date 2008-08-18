@@ -1,14 +1,13 @@
 # $Id$
 # Just some notes, on what might be next:
 ---
-- Support for e.g. "{$a}"
+- Support for multiple "{$a}"
 - Support for $php_errormessage
 - Support for ini setting 'display_errors'
 - Support for $argc and $argv
 - Support for static variables
 - Support for '==='
-- Support for 'for' loops
-- Support for 'while' loops
 - Support for 'switch'
 - Support for 'elsif'
+- Support for 'foreach'
  

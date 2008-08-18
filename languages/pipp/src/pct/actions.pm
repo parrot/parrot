@@ -207,6 +207,31 @@ method else_clause($/) {
     make $( $<block> );
 }
 
+method while_statement($/) {
+    my $cond  := $( $<expression> );
+    my $block := $( $<block> );
+
+    make PAST::Op.new( $cond,
+                       $block,
+                       :pasttype('while'),
+                       :node($/) );
+}
+
+method for_statement($/) {
+    my $init  := $( $<var_assign> );
+    my $cond  := $( $<expression>[0] );
+    my $work  := PAST::Stmts.new( $( $<block> ), $( $<expression>[1] ) );
+    
+    my $while := PAST::Op.new(
+                       $cond,
+                       $work,
+                       :pasttype('while'),
+                 );
+
+    make PAST::Stmts.new( $init, $while );
+}
+
+
 # Handle the operator precedence table.
 method expression($/, $key) {
     if ($key eq 'end') {

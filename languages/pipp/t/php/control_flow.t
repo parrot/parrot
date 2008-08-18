@@ -19,31 +19,31 @@ use lib "$FindBin::Bin/../../lib";
 
 use Parrot::Config (); 
 use Parrot::Test;
-use Test::More     tests => 10;
+use Test::More     tests => 13;
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'if, one statement in block' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'if, one statement in block' );
 <?php
 if (1)
 {
   echo "Hi\n";
 }
 ?>
-END_CODE
+CODE
 Hi
-END_EXPECTED
+OUTPUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'if, no statements in block' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'if, no statements in block' );
 <?php
 if (1)
 {
 }
 echo "Hi\n";
 ?>
-END_CODE
+CODE
 Hi
-END_EXPECTED
+OUTPUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'if, two statements in block' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'if, two statements in block' );
 <?php
 if (1)
 {
@@ -51,11 +51,11 @@ if (1)
   echo "\n";
 }
 ?>
-END_CODE
+CODE
 Hi
-END_EXPECTED
+OUTPUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'if/else taking if-branch' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'if/else taking if-branch' );
 <?php
 if (1)
 {
@@ -66,11 +66,11 @@ else
   echo "else block\n";
 }
 ?>
-END_CODE
+CODE
 if block
-END_EXPECTED
+OUTPUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'i/else taking else-branchf' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'i/else taking else-branchf' );
 <?php
 if (0)
 {
@@ -81,11 +81,11 @@ else
   echo "else block\n";
 }
 ?>
-END_CODE
+CODE
 else block
-END_EXPECTED
+OUTPUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED' . q{  }, 'positive int' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT' . q{  }, 'positive int' );
 <?php
 if (1) {
   ?>
@@ -93,11 +93,11 @@ if (1) {
   <?php
 }
 ?>
-END_CODE
+CODE
     Condition is true.
-END_EXPECTED
+OUTPUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'zero' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'zero' );
 <?php
 if (0) {
   ?>
@@ -106,11 +106,11 @@ if (0) {
 }
 ?>
 Condition is false.
-END_CODE
+CODE
 Condition is false.
-END_EXPECTED
+OUTPUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'string' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'string' );
 <?php
 if ( 'false' ) {
 ?>
@@ -118,11 +118,11 @@ The string 'false' is true.
 <?php
 }
 ?>
-END_CODE
+CODE
 The string 'false' is true.
-END_EXPECTED
+OUTPUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'string' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'string' );
 <?php
 if ( 'vrai' ) {
 ?>
@@ -136,12 +136,12 @@ The string 'vrai' is false.
 <?php
 }
 ?>
-END_CODE
+CODE
 The string 'vrai' is true.
-END_EXPECTED
+OUTPUT
 
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'string' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'string' );
 <?php
 if ( 0 ) {
 ?>
@@ -155,6 +155,60 @@ The integer 0 is false.
 <?php
 }
 ?>
-END_CODE
+CODE
 The integer 0 is false.
-END_EXPECTED
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'while loop' );
+<?php
+
+$count = 0;
+while ( $count < 10 ) { $count++; echo "round $count\n"; }
+CODE
+round 1
+round 2
+round 3
+round 4
+round 5
+round 6
+round 7
+round 8
+round 9
+round 10
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'while with negated expression' );
+<?php
+
+$count = 0;
+while ( ! ( $count >= 10 ) ) { $count++; echo "round $count\n"; }
+CODE
+round 1
+round 2
+round 3
+round 4
+round 5
+round 6
+round 7
+round 8
+round 9
+round 10
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'classic for-loop' );
+<?php
+
+$count = 0;
+for ( $count = 0; $count < 10; $count++ ) { echo "round $count\n"; }
+CODE
+round 0
+round 1
+round 2
+round 3
+round 4
+round 5
+round 6
+round 7
+round 8
+round 9
+OUTPUT
