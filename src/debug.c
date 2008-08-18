@@ -99,6 +99,9 @@ enum DebugCmd {
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void close_script_file(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 static void debugger_cmdline(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -404,6 +407,16 @@ debugger_cmdline(PARROT_INTERP)
     }
 }
 
+static void
+close_script_file(PARROT_INTERP)
+{
+    TRACEDEB_MSG("Closing debugger script file");
+    if (interp->pdb->script_file) {
+        fclose(interp->pdb->script_file);
+        interp->pdb->script_file = NULL;
+    }
+}
+
 /*
 
 =item C<void Parrot_debugger_init>
@@ -619,50 +632,70 @@ PDB_get_command(PARROT_INTERP)
 
     PARROT_ASSERT(pdb->last_command);
     PARROT_ASSERT(pdb->cur_command);
-    /* update the last command */
-    if (pdb->cur_command[0] != '\0')
-        strcpy(pdb->last_command, pdb->cur_command);
 
-    #if 0
-    /* if the program is stopped and running show the next line to run */
-    if ((pdb->state & PDB_STOPPED) && (pdb->state & PDB_RUNNING)) {
-        PDB_line_t *line = pdb->file->line;
+    if (interp->pdb->script_file) {
+        FILE *fd = interp->pdb->script_file;
+        char buf[DEBUG_CMD_BUFFER_LENGTH+1];
+        char *ptr = buf;
+        buf[0]='\0';
 
-        while (line && pdb->cur_opcode != line->opcode) {
-                line = line->next;
+        if (feof(fd)) {
+            close_script_file(interp);
+            return;
+        }
+        do {
+            fgets(buf, DEBUG_CMD_BUFFER_LENGTH, fd);
+
+            /* skip spaces */
+            for (ptr = (char *)&buf; *ptr && isspace((unsigned char)*ptr); ptr++);
+
+            /* avoid null blank and commented lines */
+            if (*buf == '\0' || *buf == '#')
+                continue;
+        } while (0);
+
+        buf[strlen(buf)-1]='\0';
+        /* RT #46117: handle command error and print out script line
+         *       PDB_run_command should return non-void value?
+         *       stop execution of script if fails
+         * RT #46115: avoid this verbose output? add -v flag? */
+        if (PDB_run_command(interp, buf)) {
+            IMCC_warning(interp, "script_file: "
+                "Error interpreting command (%s).\n",
+                buf);
+            close_script_file(interp);
+            return;
+        }
+        strcpy(pdb->cur_command, buf);
+    }
+    else {
+
+        /* update the last command */
+        if (pdb->cur_command[0] != '\0')
+            strcpy(pdb->last_command, pdb->cur_command);
+
+        i = 0;
+
+        c = pdb->cur_command;
+
+        PIO_eprintf(interp, "\n(pdb) ");
+
+        /* skip leading whitespace */
+        do {
+            ch = fgetc(stdin);
+        } while (isspace((unsigned char)ch) && ch != '\n');
+
+        /* generate string (no more than buffer length) */
+        while (ch != EOF && ch != '\n' && (i < DEBUG_CMD_BUFFER_LENGTH)) {
+            c[i++] = (char)ch;
+            ch     = fgetc(stdin);
         }
 
-        if (line) {
-            PIO_eprintf(interp, "%li  ", line->number);
-            c = pdb->file->source + line->source_offset;
+        c[i] = '\0';
 
-            while (c && (*c != '\n'))
-                PIO_eprintf(interp, "%c", *(c++));
-        }
+        if (ch == -1)
+            strcpy(c, "quit");
     }
-    #endif
-
-    i = 0;
-
-    c = pdb->cur_command;
-
-    PIO_eprintf(interp, "\n(pdb) ");
-
-    /* skip leading whitespace */
-    do {
-        ch = fgetc(stdin);
-    } while (isspace((unsigned char)ch) && ch != '\n');
-
-    /* generate string (no more than buffer length) */
-    while (ch != EOF && ch != '\n' && (i < DEBUG_CMD_BUFFER_LENGTH)) {
-        c[i++] = (char)ch;
-        ch     = fgetc(stdin);
-    }
-
-    c[i] = '\0';
-
-    if (ch == -1)
-        strcpy(c, "quit");
 }
 
 /*
@@ -685,6 +718,11 @@ PDB_script_file(PARROT_INTERP, ARGIN(const char *command))
 
     command = nextarg(command);
 
+    /* If already executing a script, close it */
+    close_script_file(interp);
+
+    TRACEDEB_MSG("Opening debugger script file");
+
     fd = fopen(command, "r");
     if (!fd) {
         IMCC_warning(interp, "script_file: "
@@ -692,32 +730,7 @@ PDB_script_file(PARROT_INTERP, ARGIN(const char *command))
             command);
         return;
     }
-
-    while (!feof(fd)) {
-        line++;
-        buf[0]='\0';
-        fgets(buf, 1024, fd);
-
-        /* skip spaces */
-        for (ptr = (char *)&buf; *ptr && isspace((unsigned char)*ptr); ptr++);
-
-        /* avoid null blank and commented lines */
-        if (*buf == '\0' || *buf == '#')
-            continue;
-
-        buf[strlen(buf)-1]='\0';
-        /* RT #46117: handle command error and print out script line
-         *       PDB_run_command should return non-void value?
-         *       stop execution of script if fails
-         * RT #46115: avoid this verbose output? add -v flag? */
-        if (PDB_run_command(interp, buf)) {
-            IMCC_warning(interp, "script_file: "
-                "Error interpreting command at line %d (%s).\n",
-                line, command);
-                break;
-        }
-    }
-    fclose(fd);
+    interp->pdb->script_file = fd;
 }
 
 /*

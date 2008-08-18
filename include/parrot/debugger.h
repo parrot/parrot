@@ -170,6 +170,7 @@ typedef struct PDB {
     Interp                  *debugee;
     Interp                  *debugger;
     unsigned long           tracing;
+    FILE                    *script_file;
 } PDB_t;
 
 
