@@ -28,7 +28,7 @@ These are all of the built-in classes that are directly callable, or
     Eval
   Continuation
     RetContinuation
-    Exception_Handler
+    ExceptionHandler
 
 By "invokable" we mean that they can be supplied as the first argument to the
 C<invoke>, C<invokecc>, or C<tailcall> instructions.  Generally speaking,
