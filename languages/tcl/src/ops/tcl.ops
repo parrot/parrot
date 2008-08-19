@@ -3,10 +3,6 @@
  * Copyright (C) 2006-2008, The Perl Foundation.
  */
 
-/*
-** tcl.ops
-*/
-
 #include "parrot/parrot.h"
 #include "parrot/string_funcs.h"
 #include "parrot/exceptions.h"
@@ -24,7 +20,7 @@ tcl.ops
 =head1 DESCRIPTION
 
 A dynamic opcode library for tcl on parrot that provides a few opcodes
-that simplify PIR generation for tclPIR generation for tcl
+that simplify PIR generation for tcl.
 
 BUGS: pull out the TCL_ constants, as well as the code slot(#9)
 
