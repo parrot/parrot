@@ -518,21 +518,27 @@ Return the POST representation of a C<PAST::Block>.
     blockpast = get_global '@?BLOCK'
     unshift blockpast, node
 
-    .local string name
+    .local string name, pirflags, blocktype
+    .local pmc ns
     name = node.'name'()
+    pirflags = node.'pirflags'()
+    blocktype = node.'blocktype'()
+    ns = node.'namespace'()
+
+    ##  handle anonymous blocks
     if name goto have_name
     name = self.'unique'('_block')
+    if ns goto have_name
+    pirflags = concat pirflags, ' :anon'
   have_name:
 
     ##  create a POST::Sub node for this block
-    .local string blocktype
-    blocktype = node.'blocktype'()
-    .local pmc ns, pirflags
-    ns = node.'namespace'()
-    pirflags = node.'pirflags'()
     .local pmc bpost
     $P0 = get_hll_global ['POST'], 'Sub'
-    bpost = $P0.'new'('node'=>node, 'name'=>name, 'blocktype'=>blocktype, 'namespace'=>ns, 'pirflags'=>pirflags)
+    bpost = $P0.'new'('node'=>node, 'name'=>name, 'blocktype'=>blocktype, 'namespace'=>ns)
+    unless pirflags goto pirflags_done
+    bpost.'pirflags'(pirflags)
+  pirflags_done:
 
     ##  determine the outer POST::Sub for the new one
     .local pmc outerpost
@@ -672,7 +678,10 @@ Return the POST representation of a C<PAST::Block>.
     $P0 = get_hll_global ['POST'], 'Ops'
     bpost = $P0.'new'(bpost, 'node'=>node, 'result'=>result)
     if ns goto block_decl_ns
-    bpost.'push_pirop'('get_global', result, name)
+    concat $S0, '.const .Sub ', result
+    concat $S0, ' = '
+    concat $S0, name
+    bpost.'push_pirop'($S0)
     goto block_done
   block_decl_ns:
     bpost.'push_pirop'('get_hll_global', result, ns, name)
