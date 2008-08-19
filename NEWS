@@ -33,6 +33,7 @@ New in 0.7.0 [r29473 through r30270]
     - anonymous classes
     - OO and metaclass improvements (.WHAT, .WHICH, .WHENCE)
     - additional builtin methods and subs
+    - improved make test targets and harness
   + Tcl:
     - implement [lreverse], [lsort -command]
     - allow [incr] to autovivify
