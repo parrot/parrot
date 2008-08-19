@@ -9,6 +9,10 @@ New in 0.7.0 [r29473 through r30270]
   + PDD27: add multisub lookup
 - Languages
   + Cardinal (Ruby):
+    - Class variables
+    - Parsing improvements
+    - Minor additions to class builtins
+    - Add support for block parameters to functions
   + Lua:
     - various language fixes
     - refactor all libraries (namespace, method registration)
