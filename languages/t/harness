@@ -83,7 +83,6 @@ my $result = GetOptions( 'html'          => \$do_gen_html,
 # pheme                test scripts are written in Scheme, not Perl 5
 # PIR                  many test failures
 # pynie                test scripts are written in PIR, not Perl 5
-# python               not maintained
 # scheme               many test failures
 # urm                  uses deprecated parrot features
 # Zcode                Method 'instantiate' not found for 'Zmachine'
