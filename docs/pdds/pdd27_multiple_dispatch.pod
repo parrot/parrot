@@ -110,8 +110,15 @@ PMCs, and the types are extracted from the types of the array elements.
 =item get_pmc_keyed_string
 
 Return an array of matching candidates, sorted from best matching to worst
-matching, for a passed in signature. The signature passed in is a string of
-space-delimited type names.
+matching, for a passed in signature. The signature passed in is a simple type
+string for the signature ('P' for PMC, 'I' for integer, 'N' for number, and 'S'
+for string).
+
+=item get_iter
+
+Return an iterator object of matching candidates, sorted from best matching to
+worst matching, for the current call arguments.
+
 
 =item invoke
 
@@ -127,6 +134,20 @@ Throw an exception, as an integer, float, or string value is not a Sub or NCI
 sub. (Masks the vtable functions inherited from ResizablePMCArray.)
 
 {{NOTE: no longer needed, since not inheriting from ResizablePMCArray.}}
+
+=back
+
+=head3 Methods
+
+
+=item get_iter
+
+Return an array of matching candidates, sorted from best matching to worst
+matching, for a passed in signature. If the signature passed in is an array of
+PMCs, the types are extracted from the types of the array elements. If the
+signature passed in is a simple type string for the signature ('P' for PMC, 'I'
+for integer, 'N' for number, and 'S' for string), the types are matched as
+simple types.
 
 =back
 
