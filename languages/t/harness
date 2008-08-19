@@ -46,7 +46,7 @@ For almost all languages you can do something like:
 
 =item Run a single test for more detailed output.
 
-    cd languages/tcl && prove t/joe_test.t
+    cd languages/tcl && prove -v t/cmd_lsort.t
 
 =back
 
