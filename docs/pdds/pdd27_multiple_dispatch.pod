@@ -139,6 +139,7 @@ sub. (Masks the vtable functions inherited from ResizablePMCArray.)
 
 =head3 Methods
 
+=over 4
 
 =item get_iter
 
