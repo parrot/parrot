@@ -636,7 +636,10 @@ Parrot_fetch_arg(PARROT_INTERP, ARGMOD(call_state *st))
 
 =item C<int Parrot_fetch_arg_nci>
 
-RT#48260: Not yet documented!!!
+Fetches the next argument from the call state and converts it to the proper
+data type for the call signature. If the next argument is a slurpy array,
+all the remaining arguments are slurped together into a ResizablePMCArray
+PMC which is then set as the PMC value of the call_state object.
 
 =cut
 
@@ -1043,7 +1046,9 @@ store_arg(ARGIN(const call_state *st), INTVAL idx)
 
 =item C<int Parrot_store_arg>
 
-RT#48260: Not yet documented!!!
+Stores the next function argument into the appropriate destination register.
+Calls C<store_arg> to do most of the work. Returns 0 if an attempt is made
+to store more values then there are in the signature. Returns 1 otherwise.
 
 =cut
 
