@@ -209,6 +209,9 @@ main(int argc, char *argv[])
 
         fclose(imc_yyin_get(yyscanner));
         PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
+
+        /* load the source for debugger list */
+        PDB_load_source(interp, filename);
     }
 
     Parrot_unblock_GC_mark(interp);

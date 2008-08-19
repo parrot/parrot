@@ -499,6 +499,8 @@ Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(STRING *filename))
 {
     char *file;
 
+    TRACEDEB_MSG("Parrot_debugger_load");
+
     if (!interp->pdb)
         Parrot_ex_throw_from_c_args(interp, NULL, 0, "No debugger");
 
@@ -1858,6 +1860,8 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
     /* Write the opcode name */
     const char * p = full_name ? info->full_name : info->name;
 
+    TRACEDEB_MSG("PDB_disassemble_op");
+
     if (! p)
         p= "**UNKNOWN**";
     strcpy(dest, p);
@@ -2156,6 +2160,8 @@ PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
     size_t space;  /* How much space do we have? */
     size_t size, alloced, n;
 
+    TRACEDEB_MSG("PDB_disassemble");
+
     pfile = mem_allocate_typed(PDB_file_t);
     pline = mem_allocate_typed(PDB_line_t);
 
@@ -2351,8 +2357,11 @@ PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
     PDB_file_t    *pfile;
     PDB_line_t    *pline;
     PDB_t         * const pdb = interp->pdb;
-    opcode_t      *pc         = pdb->cur_opcode;
+    opcode_t      *pc         = interp->code->base.data;
+
     unsigned long  size = 0;
+
+    TRACEDEB_MSG("PDB_load_source");
 
     /* If there was a file already loaded or the bytecode was
        disassembled, free it */
@@ -2382,6 +2391,9 @@ PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
     pfile->source = (char *)mem_sys_allocate(1024);
     pfile->line   = pline;
     pline->number = 1;
+
+    PARROT_ASSERT(interp->op_info_table);
+    PARROT_ASSERT(pc);
 
     while ((c = fgetc(file)) != EOF) {
         /* Grow it */
@@ -2417,6 +2429,8 @@ PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
 
     pdb->state |= PDB_SRC_LOADED;
     pdb->file   = pfile;
+
+    TRACEDEB_MSG("PDB_load_source finished");
 }
 
 /*
