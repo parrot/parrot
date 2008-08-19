@@ -275,6 +275,10 @@ do_prederef(void **pc_prederef, PARROT_INTERP, int type)
     opinfo = &interp->op_info_table[*pc];
 
     /* first arguments - PIC needs it */
+
+    /* check for RT#58044 */
+    PARROT_ASSERT(CONTEXT(interp)->n_regs_used);
+
     prederef_args(pc_prederef, interp, pc, opinfo);
 
     switch (type) {
