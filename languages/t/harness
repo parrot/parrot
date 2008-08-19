@@ -112,11 +112,13 @@ my @harnesses
               @unified_testable_languages;
 
 # Step 2: Get a listing of files from these harnesses.
+#
+# See L<Parrot::Test::Harness> for information regarding --master.
 
 my @tests;
 foreach my $harness (@harnesses) {
     my $perl = "$^X -I" . File::Spec->join(File::Spec->updir(), 'lib');
-    open(FILES, "$perl $harness --files |");
+    open(FILES, "$perl $harness --files --master |");
     push @tests, <FILES>;
     close(FILES);
 }
