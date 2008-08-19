@@ -1,28 +1,28 @@
 # $Id$
 
-New in 0.7.0 [r29473 through r30270]
+New in 0.7.0
+- Specification
+  + PDD27: add multisub lookup
 - Implementation
   + new concurrency implementation (see PDD25)
   + Exception PMC now captures a return continuation
   + improved PMC encapsulation (Iterator, Key, Pair)
-- Specification
-  + PDD27: add multisub lookup
 - Languages
   + Cardinal (Ruby):
-    - Class variables
-    - Parsing improvements
-    - Minor additions to class builtins
-    - Add support for block parameters to functions
+    - class variables
+    - parsing improvements
+    - minor additions to class builtins
+    - add support for block parameters to functions
   + Lua:
     - various language fixes
     - refactor all libraries (namespace, method registration)
     - add a OpenGL binding (still incomplete)
     - lost user back trace (see ppd25 & pushaction)
   + Pipp (PHP):
-    - Add support for while- and for-loops
-    - Add support for increment and decrement
-    - Designate PHP 5.3 as the reference implementation
-    - Improve support for string literals
+    - add support for while- and for-loops
+    - add support for increment and decrement
+    - designate PHP 5.3 as the reference implementation
+    - improve support for string literals
   + Pugs (Perl 6):
     - removed due to bit rot
   + Rakudo (Perl 6):
@@ -38,9 +38,9 @@ New in 0.7.0 [r29473 through r30270]
   + Tcl:
     - implement [lreverse], [lsort -command]
     - allow [incr] to autovivify
-    - Update tclsh spec target to 8.5.3
-    - Fix bug in TclDict PMC, allowing ~200 more [dict] spec tests to pass
-    - Update 'make spectest' fudging, using TODO instead of SKIP if possible
+    - update tclsh spec target to 8.5.3
+    - fix bug in TclDict PMC, allowing ~200 more [dict] spec tests to pass
+    - update 'make spectest' fudging, using TODO instead of SKIP if possible
 - Compilers
   + PCT:
     - :scope('register') for PAST::Var nodes

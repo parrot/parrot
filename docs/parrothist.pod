@@ -122,4 +122,6 @@ the strings?).
 
  Barney    0.6.4          2008-Jul-15     "St. Vincent Amazon"
 
+ Bob       0.7.0          2008-Aug-19     "Severe Macaw"
+
 =cut

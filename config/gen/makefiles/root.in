@@ -1483,7 +1483,7 @@ fulltest :
 	-@make@ src_tests
 	-@make@ run_tests
 	-@make@ perl_tests
-	-@make@ codingstd_tests
+	-@make@ codetest
 	-@make@ benchmark_tests
 	-@make@ doc_tests
 	-@make@ distro_tests

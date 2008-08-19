@@ -1,5 +1,5 @@
 Name:           parrot
-Version:        0.6.4
+Version:        0.7.0
 Release:        1%{?dist}
 Summary:        Parrot Virtual Machine
 License:        Artistic 2.0
