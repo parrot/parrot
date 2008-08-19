@@ -17,10 +17,11 @@ New in 0.7.0 [r29473 through r30270]
     - various language fixes
     - refactor all libraries (namespace, method registration)
     - add a OpenGL binding (still incomplete)
+    - lost user back trace (see ppd25 & pushaction)
   + Pipp (PHP):
     - Add support for while- and for-loops
     - Add support for increment and decrement
-    - Designate PHP 5.3 as the reference implementation 
+    - Designate PHP 5.3 as the reference implementation
     - Improve support for string literals
   + Pugs (Perl 6):
     - removed due to bit rot
