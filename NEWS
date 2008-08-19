@@ -21,11 +21,14 @@ New in 0.7.0 [r29473 through r30270]
   + Pugs (Perl 6):
     - removed due to bit rot
   + Rakudo (Perl 6):
+    - now over 2200 passing spectests
     - updated the Rakudo roadmap
     - Perl 6 multi dispatch
     - dispatch with slurpies
     - class attributes ("my $.x")
-    - now up to 2196 passing tests
+    - anonymous classes
+    - OO and metaclass improvements (.WHAT, .WHICH, .WHENCE)
+    - additional builtin methods and subs
   + Tcl:
     - implement [lreverse], [lsort -command]
     - allow [incr] to autovivify
@@ -35,6 +38,9 @@ New in 0.7.0 [r29473 through r30270]
 - Compilers
   + PCT:
     - :scope('register') for PAST::Var nodes
+    - allow invocant specification in attribute scope PAST::Var nodes
+    - correct ordering of sub generation from POST
+    - add 'loadinit' attribute to PAST::Block for block initialization
   + PIRC:
     - PIR registers now use the vanilla register allocator
     - all PASM output now uses PASM registers
