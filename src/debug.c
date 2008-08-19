@@ -406,6 +406,7 @@ debugger_cmdline(PARROT_INTERP)
 
         PDB_run_command(interp, command);
     }
+    TRACEDEB_MSG("debugger_cmdline finished");
 }
 
 static void
@@ -415,6 +416,9 @@ close_script_file(PARROT_INTERP)
     if (interp->pdb->script_file) {
         fclose(interp->pdb->script_file);
         interp->pdb->script_file = NULL;
+        interp->pdb->state|= PDB_STOPPED;
+        interp->pdb->last_command[0] = '\0';
+        interp->pdb->cur_command[0] = '\0';
     }
 }
 
@@ -640,14 +644,12 @@ PDB_get_command(PARROT_INTERP)
         FILE *fd = interp->pdb->script_file;
         char buf[DEBUG_CMD_BUFFER_LENGTH+1];
         char *ptr = buf;
-        buf[0]='\0';
 
-        if (feof(fd)) {
-            close_script_file(interp);
-            return;
-        }
         do {
-            fgets(buf, DEBUG_CMD_BUFFER_LENGTH, fd);
+            if (fgets(buf, DEBUG_CMD_BUFFER_LENGTH, fd) == NULL) {
+                close_script_file(interp);
+                return;
+            }
 
             /* skip spaces */
             for (ptr = (char *)&buf; *ptr && isspace((unsigned char)*ptr); ptr++);
@@ -657,7 +659,6 @@ PDB_get_command(PARROT_INTERP)
                 continue;
         } while (0);
 
-        buf[strlen(buf)-1]='\0';
         /* RT #46117: handle command error and print out script line
          *       PDB_run_command should return non-void value?
          *       stop execution of script if fails
@@ -669,7 +670,6 @@ PDB_get_command(PARROT_INTERP)
             close_script_file(interp);
             return;
         }
-        strcpy(pdb->cur_command, buf);
     }
     else {
 
@@ -717,6 +717,8 @@ PDB_script_file(PARROT_INTERP, ARGIN(const char *command))
 {
     FILE *fd;
 
+    TRACEDEB_MSG("PDB_script_file");
+
     /* If already executing a script, close it */
     close_script_file(interp);
 
@@ -730,6 +732,7 @@ PDB_script_file(PARROT_INTERP, ARGIN(const char *command))
         return;
     }
     interp->pdb->script_file = fd;
+    TRACEDEB_MSG("PDB_script_file finished");
 }
 
 /*
@@ -2078,7 +2081,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
                                      " :unused004",
                                      " :unused008",
                                      " :const",
-                                     " :flat",	/* should be :slurpy for args */
+                                     " :flat", /* should be :slurpy for args */
                                      " :unused040",
                                      " :optional",
                                      " :opt_flag",
