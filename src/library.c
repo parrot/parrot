@@ -223,7 +223,9 @@ get_search_paths(PARROT_INTERP, enum_lib_paths which)
 
 =item C<static int is_abs_path>
 
-RT#48260: Not yet documented!!!
+Determines whether a file name given by a fixed-8 or utf8 C<STRING> is an
+absolute file name. Returns C<1> if the filename is absolute, returns C<0>
+otherwise.
 
 =cut
 
@@ -244,7 +246,7 @@ is_abs_path(ARGIN(const STRING *file))
              (strncmp(file_name+1, ":\\", 2) == 0 ||
               strncmp(file_name+1, ":/",  2) == 0)))
 #else
-        if (file_name[0] == '/')     /* XXX  ../foo, ./bar */
+    if (file_name[0] == '/')     /* XXX  ../foo, ./bar */
 #endif
         {
             return 1;
@@ -287,7 +289,10 @@ cnv_to_win32_filesep(ARGMOD(STRING *path))
 
 =item C<static STRING* path_finalize>
 
-RT#48260: Not yet documented!!!
+Ensures the given STRING C<path> has a C-style NULL character at the end. The
+length of the string is not increased to account for this NULL, however. In
+WIN32 systems, the path separator is switched from the unix-style "/" to the
+Windows-style "\".
 
 =cut
 
@@ -409,7 +414,9 @@ static const char* load_ext_code[ LOAD_EXT_CODE_LAST + 1 ] = {
 
 =item C<static STRING* try_load_path>
 
-RT#48260: Not yet documented!!!
+Attempts to load a file with name C<path>. If the file is successfully located,
+the finalized name of the file is returned as a STRING. Otherwise, returns
+NULL.
 
 =cut
 
