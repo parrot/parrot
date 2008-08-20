@@ -45,9 +45,7 @@
 #define GC_trace_normal        (UINTVAL)(1 << 0)   /* the same */
 #define GC_lazy_FLAG           (UINTVAL)(1 << 1)   /* timely destruction run */
 #define GC_finish_FLAG         (UINTVAL)(1 << 2)   /* on Parrot exit: mark (almost) all PMCs dead and */
-                                                    /* garbage collect. */
-#define GC_no_trace_volatile_roots (UINTVAL)(1 << 3)
-            /* trace all but volatile root set, i.e. registers */
+                                                   /* garbage collect. */
 
 /* HEADERIZER BEGIN: src/gc/dod.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
