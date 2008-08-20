@@ -80,7 +80,7 @@ static void register_static_converters(PARROT_INTERP)
 
 =item C<CHARSET * Parrot_new_charset>
 
-RT#48260: Not yet documented!!!
+Allocates a new C<CHARSET> structure from the system.
 
 =cut
 
@@ -99,7 +99,8 @@ Parrot_new_charset(SHIM_INTERP)
 
 =item C<void Parrot_charsets_encodings_deinit>
 
-RT#48260: Not yet documented!!!
+Deinitializes (unloads) the charset system. Frees all charsets and the array
+that holds the charsets back to the system.
 
 =cut
 
@@ -127,7 +128,8 @@ Parrot_charsets_encodings_deinit(SHIM_INTERP)
 
 =item C<const CHARSET * Parrot_find_charset>
 
-RT#48260: Not yet documented!!!
+Searches through the list of charsets for the charset given by C<charsetname>.
+Returns the charset if it is found, NULL otherwise.
 
 =cut
 
@@ -154,7 +156,7 @@ Parrot_find_charset(SHIM_INTERP, ARGIN(const char *charsetname))
 
 =item C<CHARSET * Parrot_load_charset>
 
-RT#48260: Not yet documented!!!
+Throws an exception (Can't load charsets dynamically yet. RT#58184).
 
 =cut
 
@@ -226,7 +228,8 @@ Parrot_charset_number_of_str(SHIM_INTERP, ARGIN(const STRING *src))
 
 =item C<STRING* Parrot_charset_name>
 
-RT#48260: Not yet documented!!!
+Returns the name of the charset given by the INTVAL index
+C<number_of_charset>.
 
 =cut
 
@@ -247,7 +250,7 @@ Parrot_charset_name(SHIM_INTERP, INTVAL number_of_charset)
 
 =item C<const CHARSET * Parrot_get_charset>
 
-RT#48260: Not yet documented!!!
+Returns the charset given by the INTVAL index C<number_of_charset>.
 
 =cut
 
@@ -268,7 +271,8 @@ Parrot_get_charset(SHIM_INTERP, INTVAL number_of_charset)
 
 =item C<const char * Parrot_charset_c_name>
 
-RT#48260: Not yet documented!!!
+Returns a NULL-terminated C string with the name of the charset given by
+INTVAL index C<number_of_charset>.
 
 =cut
 
@@ -289,7 +293,9 @@ Parrot_charset_c_name(SHIM_INTERP, INTVAL number_of_charset)
 
 =item C<static INTVAL register_charset>
 
-RT#48260: Not yet documented!!!
+Adds a new charset C<charset> with name <charsetname> to the list of
+all charsets. Returns 0 and does nothing if a charset with that name
+already exists. Returns 1 otherwise.
 
 =cut
 
@@ -328,7 +334,12 @@ register_charset(PARROT_INTERP, ARGIN(const char *charsetname),
 
 =item C<static void register_static_converters>
 
-RT#48260: Not yet documented!!!
+Registers several standard converters between common charsets, including:
+
+    ISO 8859_1 -> ascii
+    ISO 8859_1 -> bin
+    ascii -> bin
+    ascii -> ISO 8859_1
 
 =cut
 
@@ -356,7 +367,16 @@ register_static_converters(PARROT_INTERP)
 
 =item C<INTVAL Parrot_register_charset>
 
-RT#48260: Not yet documented!!!
+Register a new charset C<charset> with name C<charsetname>. Charset may only
+be one of the 4 following names:
+
+    binary
+    iso-8859-1
+    unicode
+    ascii
+
+Attempts to register other charsets are ignored. Returns 0 if the registration
+failed, for any reason.
 
 =cut
 
@@ -398,7 +418,8 @@ Parrot_register_charset(PARROT_INTERP, ARGIN(const char *charsetname),
 
 =item C<void Parrot_charsets_encodings_init>
 
-RT#48260: Not yet documented!!!
+Creates the initial charsets and encodings, and registers the initial
+charset converters.
 
 =cut
 
@@ -436,7 +457,7 @@ Parrot_charsets_encodings_init(PARROT_INTERP)
 
 =item C<INTVAL Parrot_make_default_charset>
 
-RT#48260: Not yet documented!!!
+Sets the current default charset to C<charset> with name C<charsetname>.
 
 =cut
 
@@ -455,7 +476,7 @@ Parrot_make_default_charset(SHIM_INTERP, SHIM(const char *charsetname),
 
 =item C<const CHARSET * Parrot_default_charset>
 
-RT#48260: Not yet documented!!!
+Returns the default charset.
 
 =cut
 
@@ -474,7 +495,7 @@ Parrot_default_charset(SHIM_INTERP)
 
 =item C<charset_converter_t Parrot_find_charset_converter>
 
-RT#48260: Not yet documented!!!
+Finds a converter from charset C<lhs> to charset C<rhs>.
 
 =cut
 
@@ -509,7 +530,7 @@ Parrot_find_charset_converter(SHIM_INTERP,
 
 =item C<void Parrot_register_charset_converter>
 
-RT#48260: Not yet documented!!!
+Registers a converter C<func> from charset C<lhs> to C<rhs>.
 
 =cut
 
