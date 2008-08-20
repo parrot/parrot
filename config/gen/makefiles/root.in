@@ -907,6 +907,7 @@ $(PDB) : $(SRC_DIR)/parrot_debugger$(O) $(LIBPARROT)
 $(INSTALLABLEPDB) : $(SRC_DIR)/parrot_debugger$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/parrot_debugger$(O) \
+    $(SRC_DIR)/parrot_config$(O) \
     $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -manifest $@.manifest -outputresource:$@;1
 
