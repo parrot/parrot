@@ -324,7 +324,7 @@ PARROT_CAN_RETURN_NULL
 opcode_t *
 runops_debugger_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
-    fprintf(stderr, "Enter runops_debugger_core\n");
+    /*fprintf(stderr, "Enter runops_debugger_core\n");*/
 
     PARROT_ASSERT(interp->pdb);
 

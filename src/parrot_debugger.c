@@ -132,7 +132,7 @@ int
 main(int argc, char *argv[])
 {
     int nextarg;
-    Parrot_Interp     interp   = Parrot_new(NULL);
+    Parrot_Interp     interp;
 
     /*
     Parrot_Interp     debugger = Parrot_new(interp);
@@ -143,6 +143,12 @@ main(int argc, char *argv[])
     const char       *filename;
     char             *ext;
     void             *yyscanner;
+
+    Parrot_set_config_hash();
+
+    interp = Parrot_new(NULL);
+
+    Parrot_set_executable_name(interp, string_from_cstring(interp, argv[0], 0));
 
     Parrot_debugger_init(interp);
 
@@ -181,6 +187,7 @@ main(int argc, char *argv[])
             return 1;
 
         Parrot_loadbc(interp, pf);
+        PackFile_fixup_subs(interp, PBC_MAIN, NULL);
     }
     else {
         Parrot_PackFile pf        = PackFile_new(interp, 0);
@@ -247,7 +254,7 @@ PDB_run_code(Parrot_Interp interp, int argc, char *argv[])
         return;
     }
 
-    Parrot_runcode(interp, argc - 1, argv + 1);
+    Parrot_runcode(interp, argc, argv);
     free_runloop_jump_point(interp);
 }
 
