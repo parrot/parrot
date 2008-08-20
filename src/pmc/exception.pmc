@@ -57,7 +57,7 @@ pmclass Exception {
     ATTR FLOATVAL  birthtime;    /* The creation time stamp of the exception. */
     ATTR STRING   *message;      /* The exception message. */
     ATTR PMC      *payload;      /* The payload for the exception. */
-    ATTR PMC      *retcont;      /* The return continuation for the exception. */
+    ATTR PMC      *resume;       /* A continuation for resuming after handling the exception. */
     ATTR INTVAL    severity;     /* The severity of the exception. */
     ATTR INTVAL    type;         /* The type of the exception. */
     ATTR INTVAL    exit_code;    /* The exit code of the exception. */
@@ -94,7 +94,7 @@ Initializes the exception with default values.
         core_struct->handled    = 0;
         core_struct->message    = CONST_STRING(interp, "");
         core_struct->payload    = PMCNULL;
-        core_struct->retcont    = PMCNULL;
+        core_struct->resume     = PMCNULL;
         core_struct->stacktrace = PMCNULL;
         core_struct->handler_iter = PMCNULL;
     }
@@ -115,8 +115,8 @@ Mark any active exception data as live.
             pobject_lives(interp, (PObj *)core_struct->message);
         if (core_struct->payload)
             pobject_lives(interp, (PObj *)core_struct->payload);
-        if (core_struct->retcont)
-            pobject_lives(interp, (PObj *)core_struct->retcont);
+        if (core_struct->resume)
+            pobject_lives(interp, (PObj *)core_struct->resume);
         if (core_struct->stacktrace)
             pobject_lives(interp, (PObj *)core_struct->stacktrace);
         if (core_struct->handler_iter)
@@ -539,8 +539,8 @@ Retrieve an attribute value for the exception object.
         else if (string_equal(INTERP, name, CONST_STRING(INTERP, "payload")) == 0) {
                 GET_ATTR_payload(interp, SELF, value);
         }
-        else if (string_equal(INTERP, name, CONST_STRING(INTERP, "retcont")) == 0) {
-                GET_ATTR_retcont(interp, SELF, value);
+        else if (string_equal(INTERP, name, CONST_STRING(INTERP, "resume")) == 0) {
+                GET_ATTR_resume(interp, SELF, value);
         }
         else if (string_equal(INTERP, name, CONST_STRING(INTERP, "stacktrace")) == 0) {
                 GET_ATTR_stacktrace(interp, SELF, value);
@@ -591,8 +591,8 @@ Set an attribute value for the exception object.
         else if (string_equal(INTERP, name, CONST_STRING(INTERP, "payload")) == 0) {
             SET_ATTR_payload(interp, SELF, value);
         }
-        else if (string_equal(INTERP, name, CONST_STRING(INTERP, "retcont")) == 0) {
-            SET_ATTR_retcont(interp, SELF, value);
+        else if (string_equal(INTERP, name, CONST_STRING(INTERP, "resume")) == 0) {
+            SET_ATTR_resume(interp, SELF, value);
         }
         else if (string_equal(INTERP, name, CONST_STRING(INTERP, "stacktrace")) == 0) {
             SET_ATTR_stacktrace(interp, SELF, value);

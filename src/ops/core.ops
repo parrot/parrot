@@ -818,7 +818,7 @@ inline op throw(invar PMC) :flow {
     opcode_t * dest;
     opcode_t * const ret  = expr NEXT();
     PMC * resume = new_ret_continuation_pmc(interp, ret);
-    VTABLE_set_attr_str(interp, $1, const_string(interp, "retcont"), resume);
+    VTABLE_set_attr_str(interp, $1, const_string(interp, "resume"), resume);
     dest = Parrot_ex_throw_from_op(interp, $1, resume);
     goto ADDRESS(dest);
 }

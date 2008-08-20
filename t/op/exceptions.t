@@ -622,7 +622,7 @@ _handler:
     .local pmc c
     .get_results (e, s)
     say 'In the exception handler'
-    c = e['retcont']
+    c = e['resume']
     c()
 .end
 CODE
