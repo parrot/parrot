@@ -664,6 +664,12 @@ PDB_get_command(PARROT_INTERP)
          *       PDB_run_command should return non-void value?
          *       stop execution of script if fails
          * RT #46115: avoid this verbose output? add -v flag? */
+
+#ifdef TRACE_DEBUGGER
+        fprintf(stderr, "(script) %s\n", buf);
+#endif
+
+        #if 0
         if (PDB_run_command(interp, buf)) {
             IMCC_warning(interp, "script_file: "
                 "Error interpreting command (%s).\n",
@@ -671,6 +677,8 @@ PDB_get_command(PARROT_INTERP)
             close_script_file(interp);
             return;
         }
+        #endif
+	strcpy(pdb->cur_command, buf);
     }
     else {
 
@@ -854,8 +862,10 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
             PDB_backtrace(interp);
             break;
         case (enum DebugCmd)0:
+            /*
             if (pdb->last_command)
                 PDB_run_command(interp, pdb->last_command);
+            */
             break;
         default:
             PIO_eprintf(interp,
@@ -934,8 +944,10 @@ PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     TRACEDEB_MSG("PDB_trace");
 
     /* if debugger is not running yet, initialize */
+    /*
     if (!(pdb->state & PDB_RUNNING))
         PDB_init(interp, command);
+    */
 
     command = nextarg(command);
     /* if the number of ops to run is specified, convert to a long */
@@ -966,6 +978,8 @@ PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         (void)PDB_program_end(interp);
     pdb->state |= PDB_RUNNING;
     pdb->state &= ~PDB_STOPPED;
+
+    TRACEDEB_MSG("PDB_trace finished");
 }
 
 /*
