@@ -510,6 +510,13 @@ referring to a particular subroutine with C<:outer>, even though several
 subroutines in the file may have the same name (because they are multi, or in
 different namespaces).
 
+=item :instanceof( <string_constant> )
+
+The C<:instanceof> pragma is an experimental pragma that creates a sub as a
+PMC type other than 'Sub'.  However, as currently implemented it doesn't
+work well with C<:outer> or existing PMC types such as C<Closure>,
+C<Coroutine>, etc.
+
 =back
 
 
