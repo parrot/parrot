@@ -23,7 +23,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining your minimum pointer alignment};
+    $data{description} = q{Determine your minimum pointer alignment};
     $data{result}      = q{};
     return \%data;
 }

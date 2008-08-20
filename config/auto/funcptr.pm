@@ -24,7 +24,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Verifying that the compiler supports function pointer casts};
+    $data{description} = q{Does compiler support function pointer casts};
     $data{result}      = q{};
     return \%data;
 }

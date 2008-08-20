@@ -34,7 +34,7 @@ use Parrot::Configure::Utils ':gen';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Configuring languages};
+    $data{description} = q{Configure languages};
     $data{result} = q{};
     $data{default_languages} = qq{
         APL abc

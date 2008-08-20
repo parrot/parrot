@@ -24,7 +24,7 @@ use Parrot::Configure::Utils ':gen';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Moving platform files into place};
+    $data{description} = q{Move platform files into place};
     $data{result}      = q{};
     $data{platform_interface} = q{config/gen/platform/platform_interface.h};
     $data{coda} = <<'CODA';

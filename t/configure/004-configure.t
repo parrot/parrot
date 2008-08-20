@@ -91,7 +91,7 @@ REASON
     like(
         $@,
         qr/You cannot use --step until you have completed the full configure process/,
-"Got expected error message when using --step option and slurp() without prior completed configuration"
+"Got expected error message for --step option and slurp() without prior configuration"
     );
 }
 
@@ -109,7 +109,7 @@ REASON
     like(
         $@,
         qr/You cannot use --step until you have completed the full configure process/,
-"Got expected error message when using --step option and slurp_temp() without prior completed configuration"
+"Got expected error message for --step option and slurp_temp() without prior configuration"
     );
 }
 

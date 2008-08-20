@@ -29,7 +29,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Seeing if your configuration includes gettext};
+    $data{description} = q{Does your configuration include gettext};
     $data{result}      = q{};
     return \%data;
 }

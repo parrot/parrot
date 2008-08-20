@@ -35,7 +35,7 @@ use Parrot::BuildUtil;
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining Macports location on Darwin};
+    $data{description} = q{Determine Macports location on Darwin};
     $data{result}      = q{};
     my $optlocal = File::Spec->catdir( '/', 'opt', 'local' );
     $data{ports_root} = (defined $ENV{TEST_MACPORTS})

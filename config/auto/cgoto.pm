@@ -23,7 +23,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining whether your compiler supports computed goto};
+    $data{description} = q{Does your compiler support computed goto};
     $data{result}      = q{};
     return \%data;
 }

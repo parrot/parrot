@@ -25,7 +25,7 @@ use Parrot::BuildUtil;
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Detecting compiler attributes (-DHASATTRIBUTE_xxx)};
+    $data{description} = q{Detect compiler attributes};
     $data{result}      = q{};
     return \%data;
 }

@@ -24,7 +24,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining whether there is socklen_t};
+    $data{description} = q{Determine whether there is socklen_t};
     $data{result}      = q{};
     return \%data;
 }

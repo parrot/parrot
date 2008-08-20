@@ -24,7 +24,7 @@ use Parrot::Configure::Utils ':gen';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Generating core pmc list};
+    $data{description} = q{Generate core pmc list};
     $data{result}      = q{};
     return \%data;
 }

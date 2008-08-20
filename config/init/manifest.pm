@@ -26,7 +26,7 @@ use ExtUtils::Manifest qw(manicheck);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Checking MANIFEST};
+    $data{description} = q{Check MANIFEST};
     $data{result}      = q{};
     return \%data;
 }

@@ -26,7 +26,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     return {
-        description => 'Determining what pmc files should be compiled in',
+        description => 'Which pmc files should be compiled in',
         result      => '',
         PMC_PARENTS => {},
         srcpmc      => [ sort map { basename($_) } glob "./src/pmc/*.pmc" ],

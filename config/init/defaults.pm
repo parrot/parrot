@@ -29,7 +29,7 @@ use File::Spec;
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Setting up Configure's default values};
+    $data{description} = q{Set Configure's default values};
     $data{result}      = q{};
     return \%data;
 }

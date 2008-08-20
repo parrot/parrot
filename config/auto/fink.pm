@@ -26,7 +26,7 @@ use Parrot::BuildUtil;
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining Fink location on Darwin};
+    $data{description} = q{Determine Fink location on Darwin};
     $data{result}      = q{};
     # Per fink(8), this is location for Fink configuration file, presumably
     # regardless of where Fink itself is installed.

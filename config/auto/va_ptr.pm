@@ -24,8 +24,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} =
-        q{Test the type of va_ptr (this test is likely to segfault)};
+    $data{description} = q{Test the type of va_ptr};
     $data{result}      = q{};
     return \%data;
 }

@@ -72,8 +72,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-047-inter.t - test Parrot::Configure::_run_this_step() with regard to configuration steps that prompt for user input
-
+047-inter.t - test Parrot::Configure::_run_this_step()
 =head1 SYNOPSIS
 
     % prove t/configure/047-inter.t
@@ -81,6 +80,10 @@ pass("Completed all tests in $0");
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
+
+This file tests Parrot::Configure::_run_this_step() with regard to
+configuration steps that prompt for user input.
+
 
 =head1 AUTHOR
 

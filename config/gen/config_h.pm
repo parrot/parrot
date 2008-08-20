@@ -27,7 +27,7 @@ use Parrot::Configure::Utils ':gen';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Generating C headers};
+    $data{description} = q{Generate C headers};
     $data{result}      = q{};
     $data{templates}    = {
         config_h    => 'config/gen/config_h/config_h.in',

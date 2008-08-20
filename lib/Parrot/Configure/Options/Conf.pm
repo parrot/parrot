@@ -128,11 +128,13 @@ General Options:
    --version            Show version information
    --verbose            Output extra information
    --verbose=2          Output every setting change
-   --verbose-step=N     Set verbose for step N only
-   --verbose-step=regex Set verbose for step matching description
+   --verbose-step=init::step,auto::step,...
+                        Comma-delimited string of configuration steps
+                        providing verbose output
    --fatal              Failure of any configuration step will cause
                         Configure.pl to halt
-   --fatal-step         Comma-delimited string of configuration steps
+   --fatal-step=init::step,auto::step,...
+                        Comma-delimited string of configuration steps
                         which upon failure cause Configure.pl to halt
    --silent             Don't be verbose, interactive or fatal
    --nomanicheck        Don't check the MANIFEST

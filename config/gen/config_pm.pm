@@ -27,7 +27,7 @@ use File::Spec::Functions qw(catdir);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Recording configuration data for later retrieval};
+    $data{description} = q{Record configuration data for later retrieval};
     $data{result}      = q{};
     $data{templates}    = {
         myconfig        => 'config/gen/config_pm/myconfig.in',

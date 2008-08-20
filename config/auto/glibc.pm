@@ -24,7 +24,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Seeing if GNU libc is installed};
+    $data{description} = q{Is GNU libc installed};
     $data{result}      = q{};
     return \%data;
 }

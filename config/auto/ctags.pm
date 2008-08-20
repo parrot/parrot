@@ -27,7 +27,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining whether (exuberant) ctags is installed};
+    $data{description} = q{Is (exuberant) ctags installed};
     $data{result}      = q{};
     return \%data;
 }

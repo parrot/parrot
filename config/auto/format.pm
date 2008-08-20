@@ -24,7 +24,7 @@ use Parrot::Configure::Step;
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Figuring out what formats should be used for sprintf};
+    $data{description} = q{What formats should be used for sprintf};
     $data{result}      = q{};
     return \%data;
 }

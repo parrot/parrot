@@ -23,7 +23,7 @@ use base qw(Parrot::Configure::Step);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Loading platform and local hints files};
+    $data{description} = q{Load platform and local hints files};
     $data{result}      = q{};
     return \%data;
 }

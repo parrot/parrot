@@ -28,7 +28,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining whether perldoc is installed};
+    $data{description} = q{Is perldoc installed};
     $data{result}      = q{};
     return \%data;
 }

@@ -26,7 +26,7 @@ use Parrot::Configure::Utils ':inter', ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining what C compiler and linker to use};
+    $data{description} = q{Determine what C compiler and linker to use};
     $data{result}      = q{};
     return \%data;
 }

@@ -42,8 +42,6 @@ foreach my $k (@confsteps) {
 }
 is( $nontaskcount, 0, "Each step is a Parrot::Configure::Task object" );
 is( $confsteps[0]->step, $step, "'step' element of Parrot::Configure::Task struct identified" );
-#is( ref( $confsteps[0]->params ),
-#    'ARRAY', "'params' element of Parrot::Configure::Task struct is array ref" );
 ok( !ref( $confsteps[0]->object ),
     "'object' element of Parrot::Configure::Task struct is not yet a ref" );
 

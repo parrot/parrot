@@ -29,7 +29,7 @@ use Parrot::Configure::Utils ':inter';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining flags for building shared libraries};
+    $data{description} = q{Determine flags for building shared libraries};
     $data{result}      = q{};
     return \%data;
 }

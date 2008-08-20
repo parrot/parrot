@@ -24,7 +24,7 @@ use Parrot::Configure::Utils ':gen';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Generating makefiles and other build files};
+    $data{description} = q{Generate makefiles and other build files};
     $data{result}      = q{};
     $data{makefiles}   = {
         'Makefile' => { SOURCE => 'config/gen/makefiles/root.in' },

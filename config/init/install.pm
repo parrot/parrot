@@ -21,7 +21,7 @@ use base qw(Parrot::Configure::Step);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Setting up installation paths};
+    $data{description} = q{Set up installation paths};
     $data{result}      = q{};
     return \%data;
 }

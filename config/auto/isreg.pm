@@ -24,7 +24,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining if your C library has a working S_ISREG};
+    $data{description} = q{Does your C library have a working S_ISREG};
     $data{result}      = q{};
     return \%data;
 }

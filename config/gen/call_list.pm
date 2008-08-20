@@ -32,7 +32,7 @@ use Parrot::Configure::Utils '_slurp';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Generating NCI signature list};
+    $data{description} = q{Generate NCI signature list};
     $data{result} = q{};
     $data{fragment_files} = [ sort glob 'config/gen/call_list/*.in' ];
     return \%data;

@@ -31,7 +31,7 @@ use Parrot::BuildUtil;
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Detecting supported compiler warnings (-Wxxx)};
+    $data{description} = q{Detect supported compiler warnings};
     $data{result}      = q{};
 
     # potential addition? -fvisibility=hidden

@@ -21,7 +21,7 @@ use base qw(Parrot::Configure::Step);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Testing snprintf};
+    $data{description} = q{Test snprintf};
     $data{result}      = q{};
     return \%data;
 }

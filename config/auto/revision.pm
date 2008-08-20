@@ -24,7 +24,7 @@ use Parrot::Revision;
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining Parrot's revision};
+    $data{description} = q{Determine Parrot's revision};
     $data{result}      = q{};
     return \%data;
 }

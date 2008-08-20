@@ -26,7 +26,7 @@ use base qw(Parrot::Configure::Step);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Tweaking settings for miniparrot};
+    $data{description} = q{Tweak settings for miniparrot};
     $data{result}      = q{};
     return \%data;
 }

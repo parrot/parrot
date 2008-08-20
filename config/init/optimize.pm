@@ -22,7 +22,7 @@ use base qw(Parrot::Configure::Step);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Enabling optimization};
+    $data{description} = q{Enable optimization};
     $data{result}      = q{};
     return \%data;
 }

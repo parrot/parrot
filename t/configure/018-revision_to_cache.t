@@ -7,7 +7,8 @@ use strict;
 use warnings;
 
 use Test::More;
-plan( skip_all => "\nRelevant only when working in checkout from repository and during configuration" )
+plan( skip_all =>
+    "\nRelevant only when working in checkout from repository and during configuration" )
     unless (-e 'DEVELOPING' and ! -e 'Makefile');
 plan( tests =>  8 );
 use Carp;

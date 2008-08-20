@@ -28,7 +28,7 @@ use Parrot::Configure::Utils qw(copy_if_diff);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining JIT capability};
+    $data{description} = q{Determine JIT capability};
     $data{result}      = q{};
     $data{jit_is_working} = {
         i386 => 1,

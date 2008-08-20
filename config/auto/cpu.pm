@@ -25,7 +25,7 @@ use Carp;
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Generating CPU specific stuff};
+    $data{description} = q{Generate CPU specific stuff};
     $data{result}      = q{};
     return \%data;
 }

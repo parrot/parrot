@@ -24,7 +24,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining some signal stuff};
+    $data{description} = q{Determine some signal stuff};
     $data{result}      = q{};
     return \%data;
 }

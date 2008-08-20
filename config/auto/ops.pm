@@ -24,7 +24,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining what opcode files should be compiled in};
+    $data{description} = q{Which opcode files should be compiled in};
     $data{result}      = q{};
     return \%data;
 }

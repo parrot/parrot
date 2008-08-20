@@ -35,7 +35,7 @@ $conf->options->set( %{$args} );
     ok( !$@, "run_single_step() completed without error" );
     like(
         $stdout,
-        qr/Setting up Configure's default values.*done./s, #'
+        qr/$step.*done./s, #'
         "Got message expected upon running $step"
     );
 }

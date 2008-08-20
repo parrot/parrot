@@ -26,7 +26,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining whether libc has the backtrace* functions};
+    $data{description} = q{Does libc have the backtrace* functions};
     $data{result}      = q{};
     return \%data;
 }

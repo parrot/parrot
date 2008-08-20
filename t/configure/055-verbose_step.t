@@ -1,12 +1,12 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 008-verbose_step_number.t
+# 055-verbose_step.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 11;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
@@ -18,7 +18,7 @@ is( $|, 1, "output autoflush is set" );
 
 my $args = process_options(
     {
-        argv => [q{--verbose-step=1}],
+        argv => [q{--verbose-step=alpha::beta,init::manifest}],
         mode => q{configure},
     }
 );
@@ -28,8 +28,8 @@ my %args = %$args;
 my $conf = Parrot::Configure->new;
 ok( defined $conf, "Parrot::Configure->new() returned okay" );
 
-my $step        = q{init::foobar};
-my $description = 'Determining if your computer does foobar';
+my $step        = q{init::beta};
+my $description = 'Determining if your computer does beta';
 
 $conf->add_steps($step);
 my @confsteps = @{ $conf->steps };
@@ -49,17 +49,11 @@ $conf->options->set(%args);
 is( $conf->options->{c}->{debugging},
     1, "command-line option '--debugging' has been stored in object" );
 
-{
-    my $rv;
-    my $stdout;
-    capture ( sub {$rv    = $conf->runsteps}, \$stdout );
-    ok( $rv, "runsteps successfully ran $step" );
-    like(
-        $stdout,
-        qr/$description\.\.\..*done.*Setting Configuration Data.*verbose.*undef/s,
-        "Got message expected upon running $step"
-    );
-}
+eval { $conf->runsteps(); };
+like($@,
+    qr/Argument to 'verbose-step' option must be comma-delimited.*?steps/,
+    "Got expected error message for bad value to --verbose-step"
+);
 
 pass("Completed all tests in $0");
 
@@ -67,18 +61,18 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-008-verbose_step_number.t - test bad step failure case in Parrot::Configure
+055-verbose_step.t - test bad step failure case in Parrot::Configure
 
 =head1 SYNOPSIS
 
-    % prove t/configure/008-verbose_step_number.t
+    % prove t/configure/055-verbose_step.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
 The tests in this file examine what happens when you configure with the
-<--verbose-step> option set to C<1>.
+<--verbose-step> option and provide a bad value.
 
 =head1 AUTHOR
 

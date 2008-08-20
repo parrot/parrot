@@ -24,7 +24,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining if your compiler supports inline};
+    $data{description} = q{Does your compiler support inline};
     $data{result}      = q{};
     return \%data;
 }

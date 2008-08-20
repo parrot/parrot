@@ -25,7 +25,7 @@ use Parrot::Configure::Utils qw( :inter capture_output check_progs );
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining whether lex is installed};
+    $data{description} = q{Is lex installed};
     $data{result}      = q{};
     return \%data;
 }

@@ -24,7 +24,7 @@ use base qw(Parrot::Configure::Step);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining CPU architecture and OS};
+    $data{description} = q{Determine CPU architecture and OS};
     $data{result}      = q{};
     return \%data;
 }

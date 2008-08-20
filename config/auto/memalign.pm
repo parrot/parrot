@@ -24,7 +24,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining if your C library supports memalign};
+    $data{description} = q{Does your C library support memalign};
     $data{result}      = q{};
     return \%data;
 }

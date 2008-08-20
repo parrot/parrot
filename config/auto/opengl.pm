@@ -139,7 +139,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining if your platform supports OpenGL};
+    $data{description} = q{Does your platform support OpenGL};
     $data{result}      = q{};
     return \%data;
 }

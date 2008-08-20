@@ -24,7 +24,7 @@ use Parrot::Configure::Utils ':gen';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Generating Digest PMC files};
+    $data{description} = q{Generate Digest PMC files};
     $data{result}      = q{};
     $data{digest}      = {
         MD2         => {},

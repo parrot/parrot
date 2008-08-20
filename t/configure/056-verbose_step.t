@@ -1,12 +1,12 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 058-fatal_step.t
+# 056-verbose_step.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
@@ -16,10 +16,9 @@ use IO::CaptureOutput qw | capture |;
 $| = 1;
 is( $|, 1, "output autoflush is set" );
 
-my $s = 1;
 my $args = process_options(
     {
-        argv => [ qq{--fatal-step=$s} ],
+        argv => [q{--verbose-step=init::alpha}],
         mode => q{configure},
     }
 );
@@ -29,8 +28,8 @@ my %args = %$args;
 my $conf = Parrot::Configure->new;
 ok( defined $conf, "Parrot::Configure->new() returned okay" );
 
-my $step        = q{foo::zeta};
-my $description = 'Determining if your computer does zeta';
+my $step        = q{init::mu};
+my $description = 'Determining if your computer does mu';
 
 $conf->add_steps($step);
 my @confsteps = @{ $conf->steps };
@@ -50,11 +49,14 @@ $conf->options->set(%args);
 is( $conf->options->{c}->{debugging},
     1, "command-line option '--debugging' has been stored in object" );
 
-my $rv;
-my $stdout;
-capture ( sub { eval { $rv = $conf->runsteps; } }, \$stdout);
-like($@, qr/^Configuration step corresponding to $s is invalid/,
-    "Got expected error message when value to --fatal-step option was misspecified");
+{
+    my $rv;
+    my ($stdout, $stderr);
+    capture ( sub {$rv    = $conf->runsteps}, \$stdout, \$stderr );
+    ok( $rv, "runsteps successfully ran $step" );
+    like($stdout, qr/^\s*init::mu.*done\.\s*$/s,
+        "As expected, description is only standard output");
+}
 
 pass("Completed all tests in $0");
 
@@ -62,18 +64,19 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-058-fatal_step.t - test bad step failure case in Parrot::Configure
+056-verbose_step.t - test bad step failure case in Parrot::Configure
 
 =head1 SYNOPSIS
 
-    % prove t/configure/058-fatal_step.t
+    % prove t/configure/056-verbose_step.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file examine what happens when you misspecify the value for
-the C<--fatal-step> option.
+The tests in this file examine what happens when you configure with the
+<--verbose-step> option and provide a value for a step other than the step
+currently running.
 
 =head1 AUTHOR
 
@@ -91,4 +94,3 @@ Parrot::Configure, F<Configure.pl>.
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-

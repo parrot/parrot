@@ -54,7 +54,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining what allocator to use};
+    $data{description} = q{Determine allocator to use};
     $data{result}      = q{};
     return \%data;
 }

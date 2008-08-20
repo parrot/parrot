@@ -32,7 +32,7 @@ use Parrot::Configure::Utils qw(capture_output);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description}          = q{Determining whether ICU is installed};
+    $data{description}          = q{Is ICU installed};
     $data{result}               = q{};
     # The following key-value pairs are defined here rather than being buried
     # deep inside subroutines below.  Also, so that they can be overridden

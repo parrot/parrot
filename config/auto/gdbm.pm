@@ -29,7 +29,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining if your platform supports gdbm};
+    $data{description} = q{Does your platform support gdbm};
     $data{result}      = q{};
     return \%data;
 }

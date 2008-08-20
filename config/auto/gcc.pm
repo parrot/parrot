@@ -24,7 +24,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining if your C compiler is actually gcc};
+    $data{description} = q{Is your C compiler actually gcc};
     $data{result}      = q{};
     return \%data;
 }

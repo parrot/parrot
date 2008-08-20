@@ -56,7 +56,7 @@ is( $conf->options->{c}->{debugging},
     ok( $rv, "runsteps successfully ran $step" );
     like(
         $stdout,
-        qr/$description\.\.\..*done.*Setting Configuration Data.*verbose.*2/s,
+        qr/$description\.\.\..*Setting Configuration Data.*verbose.*2.*done/s,
         "Got message expected upon running $step"
     );
 }

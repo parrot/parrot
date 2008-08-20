@@ -22,7 +22,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Probing for C headers};
+    $data{description} = q{Probe for C headers};
     $data{result}      = q{};
     return \%data;
 }

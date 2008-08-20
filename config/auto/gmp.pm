@@ -32,7 +32,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determining if your platform supports GMP};
+    $data{description} = q{Does your platform support GMP};
     $data{result}      = q{};
     $data{cc_run_expected} =
 "6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151 0\n";

@@ -25,7 +25,7 @@ use Parrot::Configure::Utils ':inter';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determine if parrot should be linked against a shared library};
+    $data{description} = q{Should parrot link against a shared library};
     $data{result}      = q{};
     return \%data;
 }

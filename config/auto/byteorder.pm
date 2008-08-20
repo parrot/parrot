@@ -23,7 +23,7 @@ use base qw(Parrot::Configure::Step);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Computing native byteorder for Parrot's wordsize};
+    $data{description} = q{Compute native byteorder for wordsize};
     $data{result}      = q{};
     return \%data;
 }

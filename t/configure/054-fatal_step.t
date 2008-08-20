@@ -74,7 +74,8 @@ pass("Completed all tests in $0");
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file examine what happens when a valid value is specified for the C<--fatal-step> but a different configuration step is run.
+The tests in this file examine what happens when a valid value is specified
+for the C<--fatal-step> but a different configuration step is run.
 
 =head1 AUTHOR
 
