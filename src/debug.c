@@ -400,6 +400,7 @@ debugger_cmdline(PARROT_INTERP)
     /*while (!(interp->pdb->state & PDB_EXIT)) {*/
     while (interp->pdb->state & PDB_STOPPED) {
         const char * command;
+        interp->pdb->state &= ~PDB_TRACING;
         PDB_get_command(interp);
         command = interp->pdb->cur_command;
         if (command[0] == '\0')
@@ -967,6 +968,7 @@ PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     }
     pdb->tracing = n;
     pdb->debugee->run_core = PARROT_DEBUGGER_CORE;
+    pdb->state |= PDB_TRACING;
 
     /* Clear the following when done some testing */
 
