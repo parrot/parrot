@@ -392,6 +392,16 @@ parse_command(ARGIN(const char *command), ARGOUT(unsigned long *cmdP))
     return command;
 }
 
+/*
+
+=item C<static void debugger_cmdline>
+
+RT#48260: Not documented yet!
+
+=end
+
+*/
+
 static void
 debugger_cmdline(PARROT_INTERP)
 {
@@ -410,6 +420,16 @@ debugger_cmdline(PARROT_INTERP)
     }
     TRACEDEB_MSG("debugger_cmdline finished");
 }
+
+/*
+
+=item C<static void close_script_file>
+
+RT#48260
+
+=cut
+
+*/
 
 static void
 close_script_file(PARROT_INTERP)
