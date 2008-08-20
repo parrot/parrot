@@ -224,10 +224,9 @@ Update C</.htredirects> to point to the proper CPAN URL.
 
 =back
 
-If your name is Allison, Will, or chromatic, you will be able to commit these
-changes yourself; be sure to test locally in combust before pushing the update
-out.  Otherwise, make the changes in your working copy and send a patch to one
-of the anointed.
+If you have commit privs to the parrotcode repository, be sure to test
+locally in combust before committing.  Otherwise, make the changes
+in your working copy and send a patch to webmaster@parrotcode.org.
 
 =item 11.
 
