@@ -896,6 +896,9 @@ PDB_next(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 {
     unsigned long  n   = 1;
     PDB_t  * const pdb = interp->pdb;
+    Interp *debugee;
+
+    TRACEDEB_MSG("PDB_next");
 
     /* Init the program if it's not running */
     if (!(pdb->state & PDB_RUNNING))
@@ -908,6 +911,9 @@ PDB_next(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 
     /* Erase the stopped flag */
     pdb->state &= ~PDB_STOPPED;
+
+    /* Testing use of the debugger runloop */
+    #if 0
 
     /* Execute */
     for (; n && pdb->cur_opcode; n--)
@@ -923,6 +929,20 @@ PDB_next(PARROT_INTERP, ARGIN_NULLOK(const char *command))
      */
     if (!pdb->cur_opcode)
         (void)PDB_program_end(interp);
+    #endif
+
+    debugee     = pdb->debugee;
+
+    new_runloop_jump_point(debugee);
+    if (setjmp(debugee->current_runloop->resume)) {
+        Parrot_eprintf(interp, "Unhandled exception while tracing\n");
+        pdb->state |= PDB_STOPPED;
+        return;
+    }
+    pdb->tracing = n;
+    pdb->debugee->run_core = PARROT_DEBUGGER_CORE;
+
+    TRACEDEB_MSG("PDB_next finished");
 }
 
 /*
