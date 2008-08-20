@@ -194,7 +194,7 @@ out of a padded buffer.
 
 =item C<void fetch_buf_be_4>
 
-RT#48260: Not yet documented!!!
+Converts a 4-byte big-endian buffer C<b> into a little-endian C<rb>.
 
 =cut
 
@@ -217,7 +217,7 @@ fetch_buf_be_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 =item C<void fetch_buf_le_4>
 
-RT#48260: Not yet documented!!!
+Converts a 4-byte little-endian buffer C<b> into a big-endian buffer C<rb>.
 
 =cut
 
@@ -240,7 +240,7 @@ fetch_buf_le_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 =item C<void fetch_buf_be_8>
 
-RT#48260: Not yet documented!!!
+Converts an 8-byte big-endian buffer C<b> into a little-endian buffer C<rb>
 
 =cut
 
@@ -267,7 +267,7 @@ fetch_buf_be_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 =item C<void fetch_buf_le_8>
 
-RT#48260: Not yet documented!!!
+Converts an 8-byte little-endian buffer C<b> into a big-endian buffer C<rb>.
 
 =cut
 
@@ -294,7 +294,7 @@ fetch_buf_le_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 =item C<void fetch_buf_le_12>
 
-RT#48260: Not yet documented!!!
+Converts a 12-byte little-endian buffer C<b> into a big-endian buffer C<b>.
 
 =cut
 
@@ -325,7 +325,7 @@ fetch_buf_le_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 =item C<void fetch_buf_be_12>
 
-RT#48260: Not yet documented!!!
+Converts a 12-byte big-endian buffer C<b> into a little-endian buffer C<b>.
 
 =cut
 
@@ -356,7 +356,7 @@ fetch_buf_be_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 =item C<void fetch_buf_le_16>
 
-RT#48260: Not yet documented!!!
+Converts a 16-byte little-endian buffer C<b> into a big-endian buffer C<b>.
 
 =cut
 
@@ -391,7 +391,7 @@ fetch_buf_le_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 =item C<void fetch_buf_be_16>
 
-RT#48260: Not yet documented!!!
+Converts a 16-byte big-endian buffer C<b> into a little-endian buffer C<b>.
 
 =cut
 
