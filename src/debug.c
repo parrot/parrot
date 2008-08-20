@@ -678,7 +678,7 @@ PDB_get_command(PARROT_INTERP)
             return;
         }
         #endif
-	strcpy(pdb->cur_command, buf);
+        strcpy(pdb->cur_command, buf);
     }
     else {
 

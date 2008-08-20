@@ -340,7 +340,7 @@ runops_debugger_core(PARROT_INTERP, ARGIN(opcode_t *pc))
         if (interp->pdb->state & PDB_GCDEBUG)
             Parrot_do_dod_run(interp, 0);
 
-        if (interp->pdb->tracing) {
+        if (interp->pdb->state & PDB_TRACING) {
             trace_op(interp,
                     interp->code->base.data,
                     interp->code->base.data +
