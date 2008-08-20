@@ -92,7 +92,8 @@ enum DebugCmd {
     debug_cmd_script_file = 617610,
     debug_cmd_disable     = 772140,
     debug_cmd_continue    = 1053405,
-    debug_cmd_disassemble = 1903830
+    debug_cmd_disassemble = 1903830,
+    debug_cmd_gcdebug     = 779790
 };
 
 /* HEADERIZER HFILE: include/parrot/debugger.h */
@@ -828,6 +829,16 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
             break;
         case debug_cmd_info:
             PDB_info(interp);
+            break;
+        case debug_cmd_gcdebug:
+            if (pdb->state & PDB_GCDEBUG) {
+                TRACEDEB_MSG("Disabling gcdebug mode");
+                pdb->state &= ~PDB_GCDEBUG;
+            }
+            else {
+                TRACEDEB_MSG("Enabling gcdebug mode");
+                pdb->state |= PDB_GCDEBUG;
+            }
             break;
         case debug_cmd_h:
         case debug_cmd_help:
@@ -2816,6 +2827,12 @@ after the register type, all registers of that type are printed.\n");
             PIO_eprintf(interp,
                     "Print information about the current interpreter\n");
             break;
+        case debug_cmd_gcdebug:
+            PIO_eprintf(interp,
+"Toggle gcdebug mode.\n\n\
+In gcdebug mode a garbage collection cycle is run before each opcocde,\n\
+same as using the gcdebug core.\n");
+            break;
         case debug_cmd_quit:
             PIO_eprintf(interp, "Exit the debugger.\n");
             break;
@@ -2844,6 +2861,7 @@ List of commands:\n\
     print    (p) -- print the interpreter registers\n\
     stack    (s) -- examine the stack\n\
     info         -- print interpreter information\n\
+    gcdebug      -- toggle gcdebug mode\n\
     quit     (q) -- exit the debugger\n\
     help     (h) -- print this help\n\n\
 Type \"help\" followed by a command name for full documentation.\n\n");
