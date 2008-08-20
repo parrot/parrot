@@ -252,7 +252,7 @@ inline op local_branch(invar PMC, in LABEL) :base_core :check_event :flow {
     goto OFFSET($2);
 }
 
-=item B<local_return>()
+=item B<local_return>(invar PMC)
 
 Pop the location off the top of the call stack and go there.
 
