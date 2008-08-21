@@ -254,7 +254,11 @@ PDB_run_code(Parrot_Interp interp, int argc, char *argv[])
         return;
     }
 
-    Parrot_runcode(interp, argc, argv);
+    /* Loop to avoid exiting at program end */
+    do {
+        Parrot_runcode(interp, argc, argv);
+        interp->pdb->state |= PDB_STOPPED;
+    } while (! (interp->pdb->state & PDB_EXIT));
     free_runloop_jump_point(interp);
 }
 
