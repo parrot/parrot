@@ -237,14 +237,14 @@ static void dbg_run(PARROT_INTERP, ARGIN(const char * cmd)) /* HEADERIZER SKIP *
 static void dbg_script(PARROT_INTERP, ARGIN(const char * cmd)) /* HEADERIZER SKIP */
 {
     TRACEDEB_MSG("dbg_script");
- 
+
     PDB_script_file(interp, cmd);
 }
 
 static void dbg_stack(PARROT_INTERP, ARGIN(const char * cmd)) /* HEADERIZER SKIP */
 {
     TRACEDEB_MSG("dbg_stack");
- 
+
     PDB_backtrace(interp);
 }
 
@@ -336,7 +336,7 @@ of lines to display."
 If a number is specified with the command (e.g. \"next 5\"), then\n\
 execute that number of instructions, unless the program reaches a\n\
 breakpoint, or stops for some other reason.\n\n\
-If no number is specified, it defaults to 1."  
+If no number is specified, it defaults to 1."
     },
     cmd_print = {
         & PDB_print,
