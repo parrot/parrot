@@ -411,7 +411,7 @@ Parrot_default_encoding(SHIM_INTERP)
 =item C<encoding_converter_t Parrot_find_encoding_converter>
 
 Finds a converter from encoding C<rhs> to C<lhs>. Not yet implemented, so
-throws an exception. Currently returns NULL always.
+throws an exception.
 
 =cut
 
@@ -427,7 +427,6 @@ Parrot_find_encoding_converter(PARROT_INTERP, ARGIN(ENCODING *lhs), ARGIN(ENCODI
     /* XXX Apparently unwritten RT#58188 */
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
         "Can't find encoding converters yet.");
-    return NULL;
 }
 
 
