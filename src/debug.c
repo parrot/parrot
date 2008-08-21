@@ -398,7 +398,7 @@ parse_command(ARGIN(const char *command), ARGOUT(unsigned long *cmdP))
 
 RT#48260: Not documented yet!
 
-=end
+=cut
 
 */
 
