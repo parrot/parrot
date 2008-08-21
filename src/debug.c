@@ -702,7 +702,7 @@ PDB_get_command(PARROT_INTERP)
                 return;
             }
 
-            chop_newline (buf);
+            chop_newline(buf);
 
             /* skip spaces */
             for (ptr = buf; *ptr && isspace((unsigned char)*ptr); ptr++);
