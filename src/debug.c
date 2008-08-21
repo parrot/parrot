@@ -180,72 +180,166 @@ static const char * skip_command(ARGIN(const char *str))
  *  Command functions and help dispatch
  */
 
-typedef void (* debugger_func_t)(PARROT_INTERP, ARGIN(const char * cmd));
+typedef void (* debugger_func_t)(ARGIN(PDB_t * pdb), ARGIN(const char * cmd));
 
 
-static void dbg_echo(PARROT_INTERP, ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+static void dbg_break(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+{
+    TRACEDEB_MSG("dbg_break");
+
+    PDB_set_break(pdb->debugee, cmd);
+}
+
+static void dbg_continue(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+{
+    TRACEDEB_MSG("dbg_continue");
+
+    PDB_continue(pdb->debugee, cmd);
+}
+
+static void dbg_delete(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+{
+    TRACEDEB_MSG("dbg_delete");
+
+    PDB_delete_breakpoint(pdb->debugee, cmd);
+}
+
+static void dbg_disable(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+{
+    TRACEDEB_MSG("dbg_disable");
+
+    PDB_disable_breakpoint(pdb->debugee, cmd);
+}
+
+static void dbg_disassemble(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+{
+    TRACEDEB_MSG("dbg_disassemble");
+
+    PDB_disassemble(pdb->debugee, cmd);
+}
+
+static void dbg_echo(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
 {
     TRACEDEB_MSG("dbg_echo");
 
-    if (interp->pdb->state & PDB_ECHO) {
+    if (pdb->state & PDB_ECHO) {
         TRACEDEB_MSG("Disabling echo");
-        interp->pdb->state &= ~PDB_ECHO;
+        pdb->state &= ~PDB_ECHO;
     }
     else {
         TRACEDEB_MSG("Enabling echo");
-        interp->pdb->state |= PDB_ECHO;
+        pdb->state |= PDB_ECHO;
     }
 }
 
-static void dbg_gcdebug(PARROT_INTERP, ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+static void dbg_enable(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+{
+    PDB_enable_breakpoint(pdb->debugee, cmd);
+}
+
+static void dbg_eval(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+{
+    PDB_eval(pdb->debugee, cmd);
+}
+
+static void dbg_gcdebug(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
 {
     TRACEDEB_MSG("dbg_gcdebug");
 
-    if (interp->pdb->state & PDB_GCDEBUG) {
+    if (pdb->state & PDB_GCDEBUG) {
         TRACEDEB_MSG("Disabling gcdebug mode");
-        interp->pdb->state &= ~PDB_GCDEBUG;
+        pdb->state &= ~PDB_GCDEBUG;
     }
     else {
         TRACEDEB_MSG("Enabling gcdebug mode");
-        interp->pdb->state |= PDB_GCDEBUG;
+        pdb->state |= PDB_GCDEBUG;
     }
 }
 
-static void dbg_info(PARROT_INTERP, ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+static void dbg_help(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+{
+    TRACEDEB_MSG("dbg_help");
+
+    PDB_help(pdb->debugee, cmd);
+}
+
+static void dbg_info(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
 {
     TRACEDEB_MSG("dbg_info");
 
-    PDB_info(interp);
+    PDB_info(pdb->debugee);
 }
 
-static void dbg_quit(PARROT_INTERP, ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+static void dbg_list(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+{
+    TRACEDEB_MSG("dbg_list");
+
+    PDB_list(pdb->debugee, cmd);
+}
+
+static void dbg_load(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+{
+    TRACEDEB_MSG("dbg_load");
+
+    PDB_load_source(pdb->debugee, cmd);
+}
+
+static void dbg_next(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+{
+    TRACEDEB_MSG("dbg_next");
+
+    PDB_next(pdb->debugee, cmd);
+}
+
+static void dbg_print(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+{
+    TRACEDEB_MSG("dbg_print");
+
+    PDB_print(pdb->debugee, cmd);
+}
+
+static void dbg_quit(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
 {
     TRACEDEB_MSG("dbg_quit");
 
-    interp->pdb->state |= PDB_EXIT;
-    interp->pdb->state &= ~PDB_STOPPED;
+    pdb->state |= PDB_EXIT;
+    pdb->state &= ~PDB_STOPPED;
 }
 
-static void dbg_run(PARROT_INTERP, ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+static void dbg_run(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
 {
     TRACEDEB_MSG("dbg_run");
 
-    PDB_init(interp, cmd);
-    PDB_continue(interp, NULL);
+    PDB_init(pdb->debugee, cmd);
+    PDB_continue(pdb->debugee, NULL);
 }
 
-static void dbg_script(PARROT_INTERP, ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+static void dbg_script(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
 {
     TRACEDEB_MSG("dbg_script");
 
-    PDB_script_file(interp, cmd);
+    PDB_script_file(pdb->debugee, cmd);
 }
 
-static void dbg_stack(PARROT_INTERP, ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+static void dbg_stack(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
 {
     TRACEDEB_MSG("dbg_stack");
 
-    PDB_backtrace(interp);
+    PDB_backtrace(pdb->debugee);
+}
+
+static void dbg_trace(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+{
+    TRACEDEB_MSG("dbg_trace");
+
+    PDB_trace(pdb->debugee, cmd);
+}
+
+static void dbg_watch(ARGIN(PDB_t * pdb), ARGIN(const char * cmd)) /* HEADERIZER SKIP */
+{
+    TRACEDEB_MSG("dbg_watch");
+
+    PDB_watchpoint(pdb->debugee, cmd);
 }
 
 typedef struct DebuggerCmd_t {
@@ -255,7 +349,7 @@ typedef struct DebuggerCmd_t {
 
 static const DebuggerCmd
     cmd_break = {
-        & PDB_set_break,
+        & dbg_break,
 "Set a breakpoint at a given line number (which must be specified).\n\n\
 Optionally, specify a condition, in which case the breakpoint will only\n\
 activate if the condition is met. Conditions take the form:\n\n\
@@ -267,7 +361,7 @@ For example:\n\n\
 The command returns a number which is the breakpoint identifier."
     },
     cmd_continue = {
-        & PDB_continue,
+        & dbg_continue,
 "Continue the program execution.\n\n\
 Without arguments, the program runs until a breakpoint is found\n\
 (or until the program terminates for some other reason).\n\n\
@@ -276,21 +370,21 @@ If the program has terminated, then \"continue\" will do nothing;\n\
 use \"run\" to re-run the program."
     },
     cmd_delete = {
-        & PDB_delete_breakpoint,
+        & dbg_delete,
 "Delete a breakpoint.\n\n\
 The breakpoint to delete must be specified by its breakpoint number.\n\
 Deleted breakpoints are gone completely. If instead you want to\n\
 temporarily disable a breakpoint, use \"disable\"."
     },
     cmd_disable = {
-        & PDB_disable_breakpoint,
+        & dbg_disable,
 "Disable a breakpoint.\n\n\
 The breakpoint to disable must be specified by its breakpoint number.\n\
 Disabled breakpoints are not forgotten, but have no effect until re-enabled\n\
 with the \"enable\" command."
     },
     cmd_disassemble = {
-        & PDB_disassemble,
+        & dbg_disassemble,
 "Disassemble code"
     },
     cmd_echo = {
@@ -299,11 +393,11 @@ with the \"enable\" command."
 In echo mode the script commands are written to stderr before executing."
     },
     cmd_enable = {
-        & PDB_enable_breakpoint,
+        & dbg_enable,
 "Re-enable a disabled breakpoint."
     },
     cmd_eval = {
-        & PDB_eval,
+        & dbg_eval,
 "No documentation yet"
     },
     cmd_gcdebug = {
@@ -313,7 +407,7 @@ In gcdebug mode a garbage collection cycle is run before each opcocde,\n\
 same as using the gcdebug core."
     },
     cmd_help = {
-        & PDB_help,
+        & dbg_help,
 "Print a list of available commands."
     },
     cmd_info = {
@@ -321,17 +415,17 @@ same as using the gcdebug core."
 "Print information about the current interpreter"
     },
     cmd_list = {
-        & PDB_list,
+        & dbg_list,
 "List the source code.\n\n\
 Optionally specify the line number to begin the listing from and the number\n\
 of lines to display."
     },
     cmd_load = {
-        & PDB_load_source,
+        & dbg_load,
 "Load a source code file."
     },
     cmd_next = {
-        & PDB_next,
+        & dbg_next,
 "Execute a specified number of instructions.\n\n\
 If a number is specified with the command (e.g. \"next 5\"), then\n\
 execute that number of instructions, unless the program reaches a\n\
@@ -339,7 +433,7 @@ breakpoint, or stops for some other reason.\n\n\
 If no number is specified, it defaults to 1."
     },
     cmd_print = {
-        & PDB_print,
+        & dbg_print,
 "Print register: e.g. \"p i2\"\n\
 Note that the register type is case-insensitive. If no digits appear\n\
 after the register type, all registers of that type are printed."
@@ -365,13 +459,13 @@ Usage:\n\
 "Print a stack trace of the parrot VM"
     },
     cmd_trace = {
-        & PDB_trace,
+        & dbg_trace,
 "Similar to \"next\", but prints additional trace information.\n\
 This is the same as the information you get when running Parrot with\n\
 the -t option.\n"
     },
     cmd_watch = {
-        & PDB_watchpoint,
+        & dbg_watch,
 "Add a watchpoint"
     };
 
@@ -1090,7 +1184,7 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
 
     cmd= get_command(c);
     if (cmd) {
-        (* cmd->func)(interp, command);
+        (* cmd->func)(pdb, command);
         return 0;
     }
     else {
