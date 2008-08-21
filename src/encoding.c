@@ -56,7 +56,8 @@ static All_encodings *all_encodings;
 
 =item C<void parrot_init_encodings_2>
 
-RT#48260: Not yet documented!!!
+Helper function for initializing characterset encodings. Initializes the
+C<all_encodings> array.
 
 =cut
 
@@ -77,7 +78,7 @@ parrot_init_encodings_2(void)
 
 =item C<void parrot_deinit_encodings>
 
-RT#48260: Not yet documented!!!
+Deinitialize encodings and free all memory used by them.
 
 =cut
 
@@ -101,7 +102,7 @@ parrot_deinit_encodings(void)
 
 =item C<ENCODING * Parrot_new_encoding>
 
-RT#48260: Not yet documented!!!
+Allocates the memory for a new C<ENCODING> from the system.
 
 =cut
 
@@ -120,7 +121,8 @@ Parrot_new_encoding(SHIM_INTERP)
 
 =item C<const ENCODING * Parrot_find_encoding>
 
-RT#48260: Not yet documented!!!
+Finds an encoding with the name C<encodingname>. Returns the encoding
+if it is successfully found, returns NULL otherwise.
 
 =cut
 
@@ -145,7 +147,8 @@ Parrot_find_encoding(SHIM_INTERP, ARGIN(const char *encodingname))
 
 =item C<const ENCODING * Parrot_load_encoding>
 
-RT#48260: Not yet documented!!!
+Loads an encoding. Currently throws an exception because we cannot load
+encodings. See RT#58186.
 
 =cut
 
@@ -221,7 +224,8 @@ Parrot_encoding_number_of_str(SHIM_INTERP, ARGIN(const STRING *src))
 
 =item C<STRING* Parrot_encoding_name>
 
-RT#48260: Not yet documented!!!
+Returns the name of a character encoding based on the INTVAL index
+C<number_of_encoding> to the All_encodings array.
 
 =cut
 
@@ -242,7 +246,7 @@ Parrot_encoding_name(SHIM_INTERP, INTVAL number_of_encoding)
 
 =item C<const ENCODING* Parrot_get_encoding>
 
-RT#48260: Not yet documented!!!
+Returns the encoding given by the INTVAL index C<number_of_encoding>.
 
 =cut
 
@@ -263,7 +267,8 @@ Parrot_get_encoding(SHIM_INTERP, INTVAL number_of_encoding)
 
 =item C<const char * Parrot_encoding_c_name>
 
-RT#48260: Not yet documented!!!
+Returns the NULL-terminated C string representation of the encodings name
+given by the C<number_of_encoding>.
 
 =cut
 
@@ -284,7 +289,8 @@ Parrot_encoding_c_name(SHIM_INTERP, INTVAL number_of_encoding)
 
 =item C<static INTVAL register_encoding>
 
-RT#48260: Not yet documented!!!
+Registers a new character encoding C<encoding> with the given name
+C<encodingname>. Returns 1 if successful, returns 0 otherwise.
 
 =cut
 
@@ -322,7 +328,8 @@ register_encoding(PARROT_INTERP, ARGIN(const char *encodingname),
 
 =item C<INTVAL Parrot_register_encoding>
 
-RT#48260: Not yet documented!!!
+Registers a character encoding C<encoding> with name C<encodingname>.
+Only allows one of 4 possibilities: fixed_8, utf8, utf16, and ucs2.
 
 =cut
 
@@ -365,7 +372,7 @@ Parrot_register_encoding(PARROT_INTERP, ARGIN(const char *encodingname),
 
 =item C<INTVAL Parrot_make_default_encoding>
 
-RT#48260: Not yet documented!!!
+Sets the default encoding to C<encoding> with name C<encodingname>.
 
 =cut
 
@@ -384,7 +391,7 @@ Parrot_make_default_encoding(SHIM_INTERP, SHIM(const char *encodingname),
 
 =item C<const ENCODING * Parrot_default_encoding>
 
-RT#48260: Not yet documented!!!
+Gets the default encoding.
 
 =cut
 
@@ -403,7 +410,8 @@ Parrot_default_encoding(SHIM_INTERP)
 
 =item C<encoding_converter_t Parrot_find_encoding_converter>
 
-RT#48260: Not yet documented!!!
+Finds a converter from encoding C<rhs> to C<lhs>. Not yet implemented, so
+throws an exception. Currently returns NULL always.
 
 =cut
 
@@ -413,12 +421,12 @@ PARROT_API
 encoding_converter_t
 Parrot_find_encoding_converter(PARROT_INTERP, ARGIN(ENCODING *lhs), ARGIN(ENCODING *rhs))
 {
-    UNUSED(interp);
     UNUSED(lhs);
     UNUSED(rhs);
 
-    /* XXX Apparently unwritten */
-
+    /* XXX Apparently unwritten RT#58188 */
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        "Can't find encoding converters yet.");
     return NULL;
 }
 
