@@ -778,7 +778,7 @@ $(PARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) CFLAGS \
 	$(LINK) @ld_out@$@ \
 	$(SRC_DIR)/main$(O) $(SRC_DIR)/parrot_config$(O) \
 	@rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
-#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -manifest $@.manifest -outputresource:$@;1
+#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 pbc_to_exe.pir : $(PARROT) tools/dev/pbc_to_exe_gen.pl
 	$(PERL) tools/dev/pbc_to_exe_gen.pl \
@@ -807,7 +807,7 @@ $(MINIPARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm $(SRC_DIR)/null_config$(O)
 	$(LINK) @ld_out@$@ $(SRC_DIR)/main$(O) $(SRC_DIR)/null_config$(O) \
 	@rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
-#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -manifest $@.manifest -outputresource:$@;1
+#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(INSTALLABLEPARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm $(SRC_DIR)/install_config$(O) \
@@ -815,7 +815,7 @@ $(INSTALLABLEPARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/main$(O) \
     $(ALL_PARROT_LIBS) $(LINKFLAGS) $(SRC_DIR)/install_config$(O)
-#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -manifest $@.manifest -outputresource:$@;1
+#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(INC_DIR)/parrot.h : $(INC_DIR)/pbcversion.h $(INC_DIR)/vtable.h
 
@@ -879,7 +879,7 @@ PARROT_LIBS: \
 $(LIBPARROT_STATIC) : $(O_FILES)
 	$(MKPATH) @blib_dir@
 	$(AR_CR) @ar_out@$@ @ar_extra@ $(O_FILES)
-#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -manifest $@.manifest -outputresource:$@;2
+#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 	$(RANLIB) $@
 
 $(LIBPARROT_SHARED) : $(O_FILES)
@@ -887,7 +887,7 @@ $(LIBPARROT_SHARED) : $(O_FILES)
 	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) @ld_out@$@ @libparrot_soname@ \
 #CONDITIONED_LINE(cygchkdll):		-Wl,--out-implib=blib/lib/libparrot.dll.a \
 		$(O_FILES) $(C_LIBS) $(ICU_SHARED)
-#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -manifest $@.manifest -outputresource:$@;2
+#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #CONDITIONED_LINE(libparrot_shared_alias):	( cd @blib_dir@ ; ln -sf @libparrot_shared@ @libparrot_shared_alias@ )
 
 
@@ -902,14 +902,14 @@ $(PDB) : $(SRC_DIR)/parrot_debugger$(O) $(LIBPARROT)
     $(SRC_DIR)/parrot_debugger$(O) \
     $(SRC_DIR)/parrot_config$(O) \
     @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
-#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -manifest $@.manifest -outputresource:$@;1
+#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(INSTALLABLEPDB) : $(SRC_DIR)/parrot_debugger$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/parrot_debugger$(O) \
     $(SRC_DIR)/parrot_config$(O) \
     $(ALL_PARROT_LIBS) $(LINKFLAGS)
-#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -manifest $@.manifest -outputresource:$@;1
+#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 #
 # Parrot Disassembler
@@ -921,13 +921,13 @@ $(DIS) : $(SRC_DIR)/pbc_disassemble$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pbc_disassemble$(O) \
     @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
-#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -manifest $@.manifest -outputresource:$@;1
+#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(INSTALLABLEDIS) : $(SRC_DIR)/pbc_disassemble$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pbc_disassemble$(O) \
     $(ALL_PARROT_LIBS) $(LINKFLAGS)
-#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -manifest $@.manifest -outputresource:$@;1
+#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 #
 # Parrot Dump
@@ -937,7 +937,7 @@ $(PDUMP) : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pdump$(O) \
     $(SRC_DIR)/packdump$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
-#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -manifest $@.manifest -outputresource:$@;1
+#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(SRC_DIR)/pdump$(O) : $(GEN_HEADERS)
 
@@ -945,7 +945,7 @@ $(INSTALLABLEPDUMP) : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pdump$(O) \
     $(SRC_DIR)/packdump$(O) $(ALL_PARROT_LIBS) $(LINKFLAGS)
-#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -manifest $@.manifest -outputresource:$@;1
+#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 
 # pbc_info
@@ -953,7 +953,7 @@ $(PINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pbc_info$(O) \
     @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
-#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -manifest $@.manifest -outputresource:$@;1
+#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(SRC_DIR)/pbc_info$(O) : $(GEN_HEADERS)
 
@@ -961,7 +961,7 @@ $(INSTALLABLEPINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pbc_info$(O) \
     $(ALL_PARROT_LIBS) $(LINKFLAGS)
-#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -manifest $@.manifest -outputresource:$@;1
+#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 #
 # Parrot Bytecode File Merger
@@ -972,14 +972,14 @@ $(PBCMERGE) : $(SRC_DIR)/pbc_merge$(O) $(LIBPARROT) $(SRC_DIR)/parrot_config$(O)
     $(SRC_DIR)/pbc_merge$(O) \
     $(SRC_DIR)/parrot_config$(O) \
     @rpath_blib@ $(ALL_PARROT_LIBS) $(LINK_DYNAMIC) $(LINKFLAGS)
-#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -manifest $@.manifest -outputresource:$@;1
+#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(INSTALLABLEPBCMERGE) : $(SRC_DIR)/pbc_merge$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pbc_merge$(O) \
     $(SRC_DIR)/install_config$(O) \
     $(ALL_PARROT_LIBS) $(LINKFLAGS)
-#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -manifest $@.manifest -outputresource:$@;1
+#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 
 ###############################################################################

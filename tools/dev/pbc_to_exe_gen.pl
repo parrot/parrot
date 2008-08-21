@@ -452,7 +452,7 @@ END_BODY
   embed_manifest:
     # MSVC app manifest exists, embed it
     .local string embed_manifest
-    embed_manifest  = 'mt.exe -manifest '
+    embed_manifest  = 'mt.exe -nologo -manifest '
     embed_manifest .= manifest_file_name
     embed_manifest .= ' -outputresource:'
     embed_manifest .= exefile
