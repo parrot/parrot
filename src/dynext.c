@@ -296,7 +296,9 @@ get_path(PARROT_INTERP, ARGMOD(STRING *lib), ARGOUT(void **handle),
 
 =item C<PMC * Parrot_init_lib>
 
-RT#48260: Not yet documented!!!
+Initializes a new library. First, calls C<load_func> to load the library
+(if C<load_func> is provided) and then calls C<init_func>. Returns a
+ParrotLibrary PMC object that represents the initialized library.
 
 =cut
 
@@ -329,7 +331,9 @@ Parrot_init_lib(PARROT_INTERP,
 
 =item C<static PMC * run_init_lib>
 
-RT#48260: Not yet documented!!!
+Loads and Initializes a new library and returns a ParrotLibrary PMC.
+Takes the name of a library C<libname>, that is loaded with handle C<handle>.
+Calls the necessary initialization routines, if any.
 
 =cut
 
@@ -405,7 +409,9 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
 
 =item C<static STRING * clone_string_into>
 
-RT#48260: Not yet documented!!!
+Extracts a STRING value from PMC C<value> in interpreter C<s>. Copies that
+string into the pool of interpreter C<d> using the default encoding
+and charset.
 
 =cut
 
@@ -430,7 +436,7 @@ clone_string_into(ARGMOD(Interp *d), ARGIN(Interp *s), ARGIN(PMC *value))
 
 =item C<static PMC * make_string_pmc>
 
-RT#48260: Not yet documented!!!
+Converts a STRING C<string> into a String PMC.
 
 =cut
 
@@ -451,7 +457,8 @@ make_string_pmc(PARROT_INTERP, ARGIN(STRING *string))
 
 =item C<PMC * Parrot_clone_lib_into>
 
-RT#48260: Not yet documented!!!
+Clones a ParrotLibrary PMC C<lib_pmc> from interpreter C<s> into interpreter
+C<d>.
 
 =cut
 
