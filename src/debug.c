@@ -31,10 +31,13 @@ the Parrot debugger, and the C<debug> ops.
 #include "parrot/oplib/ops.h"
 #include "debug.str"
 
-/* Hand switched debugger tracing */
-/*#define TRACE_DEBUGGER 1*/
+/* Hand switched debugger tracing
+ * Set to 1 to enable tracing to stderr
+ * Set to 0 to disable
+ */
+#define TRACE_DEBUGGER 0
 
-#ifdef TRACE_DEBUGGER
+#if TRACE_DEBUGGER
 #  define TRACEDEB_MSG(msg) fprintf(stderr, "%s\n", (msg))
 #else
 #  define TRACEDEB_MSG(msg)
@@ -93,13 +96,18 @@ enum DebugCmd {
     debug_cmd_disable     = 772140,
     debug_cmd_continue    = 1053405,
     debug_cmd_disassemble = 1903830,
-    debug_cmd_gcdebug     = 779790
+    debug_cmd_gcdebug     = 779790,
+    debug_cmd_echo        = 276675
 };
 
 /* HEADERIZER HFILE: include/parrot/debugger.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void chop_newline(ARGMOD(char * buf))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(* buf);
 
 static void close_script_file(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -168,6 +176,24 @@ static const char * skip_command(ARGIN(const char *str))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+
+/*
+
+=item C<static void chop_newline>
+
+If the C string argument end with a newline, delete it.
+
+=cut
+
+*/
+
+static void
+chop_newline(ARGMOD(char * buf))
+{
+    int l = strlen(buf);
+    if (l > 0 && buf [l - 1] == '\n')
+        buf [l - 1] = '\0';
+}
 
 /*
 
@@ -676,20 +702,23 @@ PDB_get_command(PARROT_INTERP)
                 return;
             }
 
-            /* skip spaces */
-            for (ptr = (char *)&buf; *ptr && isspace((unsigned char)*ptr); ptr++);
+            chop_newline (buf);
 
-            /* avoid null blank and commented lines */
-            if (*buf == '\0' || *buf == '#')
-                continue;
-        } while (0);
+            /* skip spaces */
+            for (ptr = buf; *ptr && isspace((unsigned char)*ptr); ptr++);
+
+            /* skip blank and commented lines */
+       } while (*ptr == '\0' || *ptr == '#');
+
+        if (pdb->state & PDB_ECHO)
+            fprintf(stderr, "[%s]\n", buf);
 
         /* RT #46117: handle command error and print out script line
          *       PDB_run_command should return non-void value?
          *       stop execution of script if fails
          * RT #46115: avoid this verbose output? add -v flag? */
 
-#ifdef TRACE_DEBUGGER
+#if TRACE_DEBUGGER
         fprintf(stderr, "(script) %s\n", buf);
 #endif
 
@@ -872,6 +901,16 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
                 pdb->state |= PDB_GCDEBUG;
             }
             break;
+        case debug_cmd_echo:
+            if (pdb->state & PDB_ECHO) {
+                TRACEDEB_MSG("Disabling echo");
+                pdb->state &= ~PDB_ECHO;
+            }
+            else {
+                TRACEDEB_MSG("Enabling echo");
+                pdb->state |= PDB_ECHO;
+            }
+            break;
         case debug_cmd_h:
         case debug_cmd_help:
             PDB_help(interp, command);
@@ -894,7 +933,7 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
         default:
             PIO_eprintf(interp,
                         "Undefined command: \"%s\".  Try \"help\".", original_command);
-#ifdef TRACE_DEBUGGER
+#if TRACE_DEBUGGER
             fprintf(stderr, " (parse_command result: %li)", c);
 #endif
             return 1;
@@ -2892,6 +2931,11 @@ after the register type, all registers of that type are printed.\n");
 In gcdebug mode a garbage collection cycle is run before each opcocde,\n\
 same as using the gcdebug core.\n");
             break;
+        case debug_cmd_echo:
+            PIO_eprintf(interp,
+"Toggle echo mode.\n\n\
+In echo mode the script commands are written to stderr before executing.\n");
+            break;
         case debug_cmd_quit:
             PIO_eprintf(interp, "Exit the debugger.\n");
             break;
@@ -2908,6 +2952,7 @@ List of commands:\n\
     run      (r) -- run the program\n\
     break    (b) -- add a breakpoint\n\
     script   (f) -- interprets a file as user commands\n\
+    echo         -- toggle echo of script commands\n\
     watch    (w) -- add a watchpoint\n\
     delete   (d) -- delete a breakpoint\n\
     disable      -- disable a breakpoint\n\
