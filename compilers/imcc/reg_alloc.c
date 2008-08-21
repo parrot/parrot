@@ -835,7 +835,7 @@ static int
 interferes(PARROT_INTERP, ARGIN(const IMC_Unit *unit),
         ARGIN(const SymReg *r0), ARGIN(const SymReg *r1))
 {
-    int i;
+    unsigned int i;
 
     /* Registers don't interfere with themselves */
     if (r0 == r1)

@@ -38,7 +38,7 @@ typedef struct _IMC_Unit {
     Instruction      *last_ins;
     SymHash           hash;
     int               bb_list_size;
-    int               n_basic_blocks;
+    unsigned int      n_basic_blocks;
     Basic_block     **bb_list;
     Set             **dominators;
     int              *idoms;

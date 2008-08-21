@@ -354,7 +354,8 @@ void
 build_cfg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     Basic_block *last = NULL;
-    int i, changes;
+    unsigned int i;
+    int changes;
 
     IMCC_info(interp, 2, "build_cfg\n");
 
@@ -394,7 +395,7 @@ build_cfg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
              * s. #25948
              */
             if (!bb->pred_list) {
-                int j;
+                unsigned int j;
 
                 for (j = i; j < unit->n_basic_blocks; j++) {
                     Basic_block * const b_bsr = unit->bb_list[j];
@@ -456,7 +457,7 @@ invok:
     /* Decouple unreachable blocks (not the first block, with no predecessors)
      * from the CFG */
     do {
-        int i;
+        unsigned int i;
         changes = 0;
 
         for (i = 1; i < unit->n_basic_blocks; i++) {
@@ -732,7 +733,7 @@ Analyzes the lifetime for a given symbol.
 static void
 analyse_life_symbol(ARGIN(const IMC_Unit *unit), ARGMOD(SymReg* r))
 {
-    int i;
+    unsigned int i;
 
 #if IMC_TRACE_HIGH
     fprintf(stderr, "cfg.c: analyse_life_symbol(%s)\n", r->name);
@@ -798,7 +799,7 @@ free_life_info(ARGIN(const IMC_Unit *unit), ARGMOD(SymReg *r))
     fprintf(stderr, "free_life_into(%s)\n", r->name);
 #endif
     if (r->life_info) {
-        int i;
+        unsigned int i;
 
         for (i = 0; i < unit->n_basic_blocks; i++) {
             mem_sys_free(r->life_info[i]);
@@ -1167,7 +1168,7 @@ static void
 free_dominators(ARGMOD(IMC_Unit *unit))
 {
     if (unit->dominators) {
-        int i;
+        unsigned int i;
 
         for (i = 0; i < unit->n_basic_blocks; i++) {
             set_free(unit->dominators[i]);
@@ -1194,7 +1195,7 @@ static void
 free_dominance_frontiers(ARGMOD(IMC_Unit *unit))
 {
     if (unit->dominance_frontiers) {
-        int i;
+        unsigned int i;
 
         for (i = 0; i < unit->n_basic_blocks; i++) {
             set_free(unit->dominance_frontiers[i]);
@@ -1223,7 +1224,8 @@ sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
     Loop_info   *li;
     Loop_info  **loop_info = unit->loop_info;
     int          n_loops   = (int)unit->n_loops;
-    int          i, j, changed;
+    int          i, k, changed;
+    unsigned int j;
 
     for (i = 0; i < n_loops; i++) {
         loop_info[i]->size = 0;
@@ -1263,22 +1265,22 @@ sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
                 last = j;
             }
 
-        for (j = i + 1; j < n_loops; j++) {
+        for (k = i + 1; k < n_loops; k++) {
             if (set_contains(loop_info[i]->loop, first)
             && !set_contains(loop_info[i]->loop, last)) {
                 IMCC_debug(interp, DEBUG_CFG, "sort_loops",
                         "loop %d contains first but not"
-                        "last of outer loop %d\n", j, i);
+                        "last of outer loop %d\n", k, i);
             }
 
             if (set_contains(loop_info[i]->loop, last)
             && !set_contains(loop_info[i]->loop, first)) {
                 IMCC_debug(interp, DEBUG_CFG, "sort_loops",
                         "loop %d contains last but not"
-                        "first of outer loop %d\n", j, i);
+                        "first of outer loop %d\n", k, i);
             }
 
-            loop_info[j]->depth = loop_info[i]->depth + 1;
+            loop_info[k]->depth = loop_info[i]->depth + 1;
         }
     }
 }
@@ -1298,7 +1300,7 @@ of its dominators.
 void
 find_loops(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    int i;
+    unsigned int i;
 
     IMCC_info(interp, 2, "find_loops\n");
 
@@ -1381,7 +1383,8 @@ mark_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const Edge *e))
     Basic_block *footer = e->from;
     Basic_block *enter  = 0;
 
-    int          i, n_loops;
+    unsigned int i;
+    int n_loops;
 
     /* look from where loop was entered */
     for (i = 0, edge=header->pred_list; edge; edge=edge->pred_next)
@@ -1540,7 +1543,7 @@ void
 clear_basic_blocks(ARGMOD(IMC_Unit *unit))
 {
     if (unit->bb_list) {
-        int i;
+        unsigned int i;
 
         for (i = 0; i < unit->n_basic_blocks; i++)
             mem_sys_free(unit->bb_list[i]);
