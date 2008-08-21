@@ -50,7 +50,20 @@ Return the string 'NULL'.
 
 =cut
 
+=item C<STRING* serialize()>
+
+Return a representation of this PMC in the same format as PHP's serialize function.
+
+=cut
+
 */
+
+    METHOD STRING* serialize() {
+        STRING *serialized;
+        serialized = CONST_STRING(INTERP, "N;");
+        RETURN(STRING *serialized);
+    }
+
 
 /*
 

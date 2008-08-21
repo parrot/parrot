@@ -66,9 +66,20 @@ Return the string '1' or ''.
 
 =over 4
 
+=item C<STRING* serialize()>
+
+Return a representation of this boolean in the same format as PHP's serialize function.
+
 =cut
 
 */
+
+    METHOD STRING* serialize() {
+        STRING *serialized;
+        serialized = string_printf(INTERP, "b:%d;", VTABLE_get_integer(INTERP, SELF));
+        RETURN(STRING *serialized);
+    }
+
 
 /*
 

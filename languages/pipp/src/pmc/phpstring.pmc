@@ -162,7 +162,25 @@ Return the string 'string'.
         RETURN(PMC *retval);
     }
 
+/*
+
+=item C<STRING* serialize()>
+
+Return a representation of this string in the same format as PHP's serialize function.
+
+=cut
+
+*/
+    METHOD STRING* serialize() {
+        STRING *serialized;
+        serialized = string_printf(INTERP, "s:%d:\"%Ss\";", VTABLE_elements(INTERP, SELF),
+                VTABLE_get_string(INTERP, SELF));
+        RETURN(STRING *serialized);
+    }
+
+
 }
+
 
 /*
 

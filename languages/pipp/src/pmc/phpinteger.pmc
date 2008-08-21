@@ -67,6 +67,22 @@ Return the string 'integer'.
         RETURN(PMC *SELF);
     }
 
+/*
+
+=item C<STRING* serialize()>
+
+Return a representation of this integer in the same format as PHP's serialize function.
+
+=cut
+
+*/
+    METHOD STRING* serialize() {
+        STRING *serialized;
+        serialized = string_printf(INTERP, "i:%d;", VTABLE_get_integer(INTERP, SELF));
+        RETURN(STRING *serialized);
+    }
+
+
 }
 
 /*

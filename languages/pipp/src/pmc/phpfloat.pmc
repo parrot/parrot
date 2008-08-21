@@ -48,9 +48,29 @@ Return the string 'double'.
 
 =over 4
 
+=item C<STRING* serialize()>
+
+Return a representation of this float in the same format as PHP's serialize function.
+
 =cut
 
 */
+
+    METHOD STRING* serialize() {
+        STRING *serialized;
+        INTVAL zero_index = -1;
+
+        /* PHP's serialized floats stringify the exact value stored rather than
+         * just the significant digits.  */
+        serialized = string_printf(INTERP, "%.*f", 100, VTABLE_get_number(INTERP, SELF));
+        while (string_ord(INTERP, serialized, zero_index - 1) == '0')
+            zero_index--;
+
+        serialized = string_chopn(INTERP, serialized, 0 - zero_index);
+        serialized = string_printf(INTERP, "f:%Ss;", serialized);
+        RETURN(STRING *serialized);
+    }
+
 
 /*
 
