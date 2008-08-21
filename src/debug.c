@@ -396,7 +396,10 @@ parse_command(ARGIN(const char *command), ARGOUT(unsigned long *cmdP))
 
 =item C<static void debugger_cmdline>
 
-RT#48260: Not documented yet!
+Debugger command line.
+
+Gets and executes commands, looping until the debugger state
+is chnaged, either to exit or to start executing code.
 
 =cut
 
@@ -425,7 +428,7 @@ debugger_cmdline(PARROT_INTERP)
 
 =item C<static void close_script_file>
 
-RT#48260
+Close the script file, returning to command prompt mode.
 
 =cut
 
