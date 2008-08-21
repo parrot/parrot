@@ -34,7 +34,6 @@ sub _init {
     $data{description} = q{Detect supported compiler warnings};
     $data{result}      = q{};
 
-    # potential addition? -fvisibility=hidden
     # Please keep these sorted by flag name, such that "-Wno-foo" is
     # sorted as "-Wfoo", so we can turn off/on as needed.
     my @potential_warnings = qw(
