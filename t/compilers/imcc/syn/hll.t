@@ -12,7 +12,7 @@ use Parrot::Test tests => 2;
 pir_output_is( <<'CODE', <<'OUT', ".param :slurpy (using PMC)" );
 
 .HLL 'misc', ''
-.HLL_map 'ResizablePMCArray', 'ResizableStringArray'
+.HLL_map 'ResizablePMCArray' = 'ResizableStringArray'
 
 .sub main :main
   elm('a','b','c')
@@ -39,7 +39,7 @@ pir_output_is( <<'CODE', <<'OUT', ".param :slurpy (using object)" );
 .end
 
 .HLL 'misc', ''
-.HLL_map 'ResizablePMCArray', 'Stack'
+.HLL_map 'ResizablePMCArray' = 'Stack'
 
 .sub main :main
   elm('a','b','c')
