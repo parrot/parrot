@@ -1572,7 +1572,10 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     PDB_line_t       *line;
     long              i;
 
-    command = nextarg(command);
+    TRACEDEB_MSG("PDB_set_break");
+
+    /*command = nextarg(command);*/
+
     /* If no line number was specified, set it at the current line */
     if (command && *command) {
         const long ln = atol(command);
@@ -1613,7 +1616,7 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     newbreak = mem_allocate_typed(PDB_breakpoint_t);
 
     if (command) {
-        skip_command(command);
+        command = skip_command(command);
     }
     else {
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -1703,6 +1706,8 @@ PDB_continue(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 {
     PDB_t * const pdb = interp->pdb;
 
+    TRACEDEB_MSG("PDB_continue");
+
     /* Skip any breakpoint? */
     if (command && *command) {
         long ln;
@@ -1711,7 +1716,7 @@ PDB_continue(PARROT_INTERP, ARGIN_NULLOK(const char *command))
             return;
         }
 
-        command = nextarg(command);
+        /*command = nextarg(command);*/
         ln = atol(command);
         PDB_skip_breakpoint(interp, ln);
     }
@@ -1916,7 +1921,11 @@ Skip C<i> times all breakpoints.
 void
 PDB_skip_breakpoint(PARROT_INTERP, long i)
 {
-    interp->pdb->breakpoint_skip = i ? i-1 : i;
+#if TRACE_DEBUGGER
+        fprintf(stderr, "PDB_skip_breakpoint: %li\n", i);
+#endif
+
+    interp->pdb->breakpoint_skip = i;
 }
 
 /*
@@ -2029,6 +2038,28 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
 
 /*
 
+=item C<static PDB_breakpoint_t * current_breakpoint>>
+
+Returns a pointer to the breakpoint at the current position,
+or NULL if there is none.
+
+=cut
+
+*/
+
+static PDB_breakpoint_t * current_breakpoint(ARGIN(PDB_t * pdb)) /* HEADERIZER SKIP */
+{
+    PDB_breakpoint_t *breakpoint = pdb->breakpoint;
+    while (breakpoint) {
+        if (pdb->cur_opcode == breakpoint->pc)
+            break;
+        breakpoint = breakpoint->next;
+    }
+    return breakpoint;
+}
+
+/*
+
 =item C<char PDB_break>
 
 Returns true if we have to stop running.
@@ -2042,8 +2073,10 @@ char
 PDB_break(PARROT_INTERP)
 {
     PDB_t            * const pdb = interp->pdb;
-    PDB_breakpoint_t *breakpoint = pdb->breakpoint;
     PDB_condition_t  *watchpoint = pdb->watchpoint;
+    PDB_breakpoint_t *breakpoint;
+
+    TRACEDEB_MSG("PDB_break");
 
     /* Check the watchpoints first. */
     while (watchpoint) {
@@ -2065,28 +2098,28 @@ PDB_break(PARROT_INTERP)
         return 0;
     }
 
-    /* If we have to skip breakpoints, do so. */
-    if (pdb->breakpoint_skip) {
-        pdb->breakpoint_skip--;
-        return 0;
-    }
+    breakpoint = current_breakpoint(pdb);
+    if (breakpoint) {
+        /* If we have to skip breakpoints, do so. */
+        if (pdb->breakpoint_skip) {
+            TRACEDEB_MSG("PDB_break skipping");
+            pdb->breakpoint_skip--;
+            return 0;
+        }
 
-    while (breakpoint) {
-        /* if we are in a break point */
-        if (pdb->cur_opcode == breakpoint->pc) {
-            if (breakpoint->skip < 0)
+        if (breakpoint->skip < 0)
+            return 0;
+
+        /* Check if there is a condition for this breakpoint */
+        if ((breakpoint->condition) &&
+            (!PDB_check_condition(interp, breakpoint->condition)))
                 return 0;
 
-            /* Check if there is a condition for this breakpoint */
-            if ((breakpoint->condition) &&
-                (!PDB_check_condition(interp, breakpoint->condition)))
-                    return 0;
+        TRACEDEB_MSG("PDB_break stopping");
 
-            /* Add the STOPPED state and stop */
-            pdb->state |= PDB_STOPPED;
-            return 1;
-        }
-        breakpoint = breakpoint->next;
+        /* Add the STOPPED state and stop */
+        pdb->state |= PDB_STOPPED;
+        return 1;
     }
 
     return 0;

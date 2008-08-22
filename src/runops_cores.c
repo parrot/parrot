@@ -358,6 +358,11 @@ runops_debugger_core(PARROT_INTERP, ARGIN(opcode_t *pc))
         }
         else
         {
+            if (PDB_break(interp)) {
+                Parrot_debugger_start(interp, pc);
+                continue;
+            }
+
             if (interp->pdb->tracing) {
                 if (--interp->pdb->tracing == 0) {
                     Parrot_debugger_start(interp, pc);
