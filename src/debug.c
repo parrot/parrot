@@ -1569,48 +1569,60 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     PDB_breakpoint_t *newbreak;
     PDB_breakpoint_t *sbreak;
     PDB_condition_t  *condition;
-    PDB_line_t       *line;
-    long              i;
+    PDB_line_t       *line = NULL;
+    long              bp_id;
+    opcode_t         *breakpos = NULL;
+    long             ln = 0;
 
     TRACEDEB_MSG("PDB_set_break");
 
     /*command = nextarg(command);*/
 
-    /* If no line number was specified, set it at the current line */
-    if (command && *command) {
-        const long ln = atol(command);
-        int i;
+    if (command && *command)
+        ln = atol(command);
 
-        /* Move to the line where we will set the break point */
-        line = pdb->file->line;
+    /* If there is a source file use line number, else opcode position */
 
-        for (i = 1; ((i < ln) && (line->next)); i++)
-            line = line->next;
+    if (pdb->file) {
+        /* If no line number was specified, set it at the current line */
+        if (ln != 0) {
+            int i;
 
-        /* Abort if the line number provided doesn't exist */
-        if (!line->next) {
-            PIO_eprintf(interp,
-                "Can't set a breakpoint at line number %li\n", ln);
-            return;
-        }
-    }
-    else {
-        /* Get the line to set it */
-        line = pdb->file->line;
+            /* Move to the line where we will set the break point */
+            line = pdb->file->line;
 
-        while (line->opcode != pdb->cur_opcode) {
-            line = line->next;
-            if (!line) {
+            for (i = 1; ((i < ln) && (line->next)); i++)
+                line = line->next;
+
+            /* Abort if the line number provided doesn't exist */
+            if (!line->next) {
                 PIO_eprintf(interp,
-                   "No current line found and no line number specified\n");
+                    "Can't set a breakpoint at line number %li\n", ln);
                 return;
             }
         }
-    }
+        else {
+            /* Get the line to set it */
+            line = pdb->file->line;
 
-    /* Skip lines that are not related to an opcode */
-    while (!line->opcode)
-        line = line->next;
+            while (line->opcode != pdb->cur_opcode) {
+                line = line->next;
+                if (!line) {
+                    PIO_eprintf(interp,
+                       "No current line found and no line number specified\n");
+                    return;
+                }
+            }
+        }
+        /* Skip lines that are not related to an opcode */
+        while (!line->opcode)
+            line = line->next;
+
+        breakpos = line->opcode;
+    }
+    else {
+        breakpos = interp->code->base.data + ln;
+    }
 
     /* Allocate the new break point */
     newbreak = mem_allocate_typed(PDB_breakpoint_t);
@@ -1638,7 +1650,7 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         newbreak->condition = NULL;
 
     /* Set the address where to stop */
-    newbreak->pc   = line->opcode;
+    newbreak->pc   = breakpos;
 
     /* No next breakpoint */
     newbreak->next = NULL;
@@ -1647,7 +1659,7 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     newbreak->skip = 0;
 
     /* Add the breakpoint to the end of the list */
-    i      = 0;
+    bp_id = 0;
     sbreak = pdb->breakpoint;
 
     if (sbreak) {
@@ -1656,15 +1668,20 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 
         newbreak->prev = sbreak;
         sbreak->next   = newbreak;
-        i              = sbreak->next->id = sbreak->id + 1;
+        bp_id          = sbreak->next->id = sbreak->id + 1;
     }
     else {
         newbreak->prev  = NULL;
         pdb->breakpoint = newbreak;
-        i               = pdb->breakpoint->id = 0;
+        bp_id           = pdb->breakpoint->id = 0;
     }
 
-    PIO_eprintf(interp, "Breakpoint %li at line %li\n", i, line->number);
+    /* Show breakpoint position */
+
+    PIO_eprintf(interp, "Breakpoint %li at", bp_id);
+    if (line)
+        PIO_eprintf(interp, " line %li", line->number);
+    PIO_eprintf(interp, " pos %li\n", breakpos - interp->code->base.data);
 }
 
 /*
