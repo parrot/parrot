@@ -75,7 +75,7 @@ This function returns the quoted string.
 LOOP:
     if index >= str_len goto END
 
-    tmp = str[index]
+    substr tmp, str, index, 1
 
     ord test_char_ord, tmp
 
