@@ -1054,6 +1054,7 @@ to store more values then there are in the signature. Returns 1 otherwise.
 
 */
 
+PARROT_API
 int
 Parrot_store_arg(SHIM_INTERP, ARGIN(const call_state *st))
 {
