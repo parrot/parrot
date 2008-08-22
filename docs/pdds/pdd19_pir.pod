@@ -805,6 +805,9 @@ function or method call return values.
 Internally, the call stack doesn't increase because of a tail call, so
 you can write recursive functions and not have stack overflows.
 
+Whitespace surrounding the dot ('.') that separates the object from the
+method is not allowed.
+
 =back
 
 =head2 Assignment and Morphing
