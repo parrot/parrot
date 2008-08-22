@@ -130,7 +130,7 @@ whole thing may be taken out or refactored away at any moment.
     i = 0
 
 LOOP:
-    tmp = str[i]
+    substr tmp, str, i, 1
     inc i
     if i >= j goto FIN
 
@@ -139,7 +139,7 @@ LOOP:
     goto LOOP
 
 ESC:
-    tmp = str[i]
+    substr tmp, str, i, 1
     inc i
     eq tmp, "n", LF
     concat ret, tmp
