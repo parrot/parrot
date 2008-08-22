@@ -26,8 +26,11 @@ Tests the PhpArray PMC.
     basic_get_set()
     stack_and_queue_ops()
     index_increment()
-    int_string_convert()
+    int_string_conversions()
     autovivification_tests()
+    exists_delete_tests()
+    generic_iterator_tests()
+    php_iterator_tests()
 .end
 
 .sub basic_get_set
@@ -148,7 +151,7 @@ basic_set_get_ok:
 
     goto push_pop_ok
 
-push_pop_not_ok:    
+push_pop_not_ok:
     is_ok = 0
 
 push_pop_ok:
@@ -221,7 +224,7 @@ ii_end:
     ok(is_ok, "automatic index increment")
 .end
 
-.sub int_string_convert
+.sub int_string_conversions
     .local pmc p
     .local string s
     .local int is_ok
@@ -251,7 +254,7 @@ ii_end:
     p["one";2;3;"four";"five";6;7] = "magic"
     s = p["one";2;3;"four";"five";6;7]
     is_ok = s == "magic"
-    ok(is_ok, "desireable autovivification happen")
+    ok(is_ok, "desireable autovivification happens")
 
     p['foo'] = 'bix'
     i = exists p['foo';'bar';'buzzed']
@@ -259,7 +262,199 @@ ii_end:
     p['this';'element'] = 'does'
     i = elements p
     is_ok = i == 3
-    ok(is_ok, "unwanted autovivifications don't happen")
+    ok(is_ok, "unwanted autovivification doesn't happen")
+
+.end
+
+
+.sub exists_delete_tests
+    .local pmc p
+    .local int is_ok, i
+
+    p = new PhpArray
+    p['asf'] = 8
+    is_ok = exists p['asf']
+    ok(is_ok, "shallow string-keyed exists")
+
+    p[8] = 'asf'
+    is_ok = exists p[8]
+    ok(is_ok, "shallow int-keyed exists")
+
+    p['this';'thingy';9] = 'exists'
+    is_ok = exists p['this';'thingy';9]
+    ok(is_ok, "deep keyed exists")
+
+    delete p['asf']
+    i = exists p['asf']
+    is_ok = !i
+    ok(is_ok, "shallow string-keyed delete")
+
+    delete p[8]
+    i = exists p[8]
+    is_ok = !i
+    ok(is_ok, "shallow int-keyed delete")
+
+    delete p['this']
+    i = exists p['this';'thingy';9]
+    is_ok = !i
+    ok(is_ok, "deep keyed delete")
+
+.end
+
+.sub generic_iterator_tests
+    .local pmc p, it, val
+    .local string s, val_str
+    .local int is_ok
+
+    p = new PhpArray
+    p['asdf'] = 'im '
+    p[444444] = 'not in '
+    p[0]      = 'ur '
+    p[-1234]  = 'iterator '
+    p[-1233]  = 'ideradin '
+    p[-1235]  = 'ur '
+    p['y']    = 'valuze.'
+
+    #overwrite old values without changing the internal order
+    p[444444] = 'in '
+    p[-1234]  = 'iderayder '
+
+    it = iter p
+iter_loop1:
+    unless it goto iter_done1
+    val = shift it
+    val_str = p[val]
+    concat s, val_str
+    goto iter_loop1
+
+iter_done1:
+    is_ok = s == 'im in ur iderayder ideradin ur valuze.'
+    ok(is_ok, "basic iterator test")
+
+.end
+
+.sub php_iterator_tests
+    .local pmc p, it, val
+    .local string s, val_str
+    .local int is_ok
+
+    p = new PhpArray
+
+    p["skip"] = "/dev/null"
+    p[9]      = "Beware the Jabberwock"
+    p['nein'] = ", my son!\nT"
+    p['delete'] = "me"
+    p['-234'] = "he jaws that bite, the claws"
+    p[234]    = " that catch!"
+    p[0]      = "\n"
+    push p,     ", and shun\n"
+    p[999]    = "the unbeliever!11!! SHUUUNNN!!11!!" #whoops
+    p["abc"]  = "uhkashflkdfhsa"
+    p["9000"] = "The frumious "
+    p["wx"]   = "Bender"
+    p["o"]    = "snatch!"
+    push p,     "Beware the Jubjub bird"
+    push p,     "the end"
+
+    delete p['delete']
+
+    p.'next'()
+    p.'reset'()
+    p.'next'()
+    p.'next'()
+    it = iter p
+    p.'prev'()
+
+
+    val = shift it
+    val_str = p[val]
+    concat s, val_str
+    val = shift it
+    val_str = p[val]
+    concat s, val_str
+    p.'reset'()
+    p.'next'()
+    p.'next'()
+    p.'next'()
+    val = shift it
+    val_str = p[val]
+    concat s, val_str
+    p.'prev'()
+    p.'next'()
+    val = shift it
+    val_str = p[val]
+    concat s, val_str
+    val = shift it
+    val_str = p[val]
+    concat s, val_str
+    p.'end'()
+    p.'prev'()
+    val = shift it
+    val_str = p[val]
+    concat s, val_str
+    p.'prev'()
+    p.'prev'()
+    p.'prev'()
+    p.'prev'()
+    p.'prev'()
+    p.'prev'()
+    p.'prev'()
+    val = shift it
+    val_str = p[val]
+    concat s, val_str
+
+    p.'next'()
+    p.'next'()
+    val = shift it
+    val_str = p[val]
+    concat s, val_str
+
+    p['wx'] = 'Bander'
+    val = shift it
+    val_str = p[val]
+    concat s, val_str
+
+    val = shift it
+    val_str = p[val]
+    concat s, val_str
+
+    is_ok = s == "Beware the Jabberwock, my son!\nThe jaws that bite, the claws that catch!\nBeware the Jubjub bird, and shun\nThe frumious Bandersnatch!"
+    ok(is_ok, "iterator fun with next/prev/end/reset")
+
+    is_ok = 1
+    p = new PhpArray
+    p['a'] = "p['a']"
+    p['b'] = "p['b']"
+    p[3]   = "p[3]"
+
+    it = iter p
+    p.'end'()
+    val = shift it
+
+    if it goto not_done_but_should_be
+    goto done_and_should_be
+not_done_but_should_be:
+    is_ok = 0
+done_and_should_be:
+    ok(is_ok, "using next at inopportune times w/o an iter loop")
+
+    is_ok = 1
+    p.'reset'()
+    s = ""
+
+    it = iter p
+
+iter_test_loop:
+    unless it goto iter_test_done
+    val = shift it
+    p.'next'()
+    val_str = p[val]
+    concat s, val_str
+    goto iter_test_loop
+
+iter_test_done:
+    is_ok = s == "p['a']p[3]"
+    ok(is_ok, "using next at inopportune times in an iter loop")
 
 .end
 
