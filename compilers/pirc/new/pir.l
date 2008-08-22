@@ -287,9 +287,22 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 {WS}"."{WS} { /* if the dot is surrounded by whitespace, it's a concatenation operator */
               return TK_CONC;
             }
-".."        { return TK_CONC; }
 
-"."         { return '.'; }
+{WS}"."     { /* $P0 .$P1 means concatenation */
+              return TK_CONC;
+            }
+
+"."{WS}     { /* $P0. $P1 means concatenation */
+              return TK_CONC;
+            }
+
+"."         { /* at this point all dot-whitespace combinations have been covered;
+               * so we can be sure that the dot does not have any surrounding
+               * whitespace: that's the method-call dot, as in $P0.$P1().
+               */
+               return '.';
+            }
+
 "="         { return '='; }
 ";"         { return ';'; }
 
