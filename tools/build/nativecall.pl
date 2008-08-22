@@ -651,10 +651,17 @@ sub print_tail {
    signature for a C function we want to call and returns a pointer
    to a function that can call it. */
 void *
-build_call_func(PARROT_INTERP, SHIM(PMC *pmc_nci), NOTNULL(STRING *signature))
+build_call_func(PARROT_INTERP,
+#if defined(CAN_BUILD_CALL_FRAMES)
+PMC *pmc_nci,
+#else
+SHIM(PMC *pmc_nci),
+#endif
+NOTNULL(STRING *signature), NOTNULL(int *jitted))
 {
     char       *c;
     STRING     *ns, *message;
+    STRING     *jit_key_name;
     PMC        *b;
     PMC        *iglobals;
     PMC        *temp_pmc;
@@ -662,12 +669,6 @@ build_call_func(PARROT_INTERP, SHIM(PMC *pmc_nci), NOTNULL(STRING *signature))
 
     PMC        *HashPointer   = NULL;
 
-#if defined(CAN_BUILD_CALL_FRAMES)
-    /* Try if JIT code can build that signature. If yes, we are done */
-    void * const result = Parrot_jit_build_call_func(interp, pmc_nci, signature);
-    if (result)
-        return result;
-#endif
     /* And in here is the platform-independent way. Which is to say
        "here there be hacks" */
     signature_len = string_length(interp, signature);
@@ -695,6 +696,30 @@ build_call_func(PARROT_INTERP, SHIM(PMC *pmc_nci), NOTNULL(STRING *signature))
 $put_pointer
 
     }
+
+#if defined(CAN_BUILD_CALL_FRAMES)
+    /* Try if JIT code can build that signature. If yes, we are done */
+
+    jit_key_name = string_from_literal(interp, "_XJIT_");
+    jit_key_name = string_append(interp, jit_key_name, signature);
+    b = VTABLE_get_pmc_keyed_str(interp, HashPointer, jit_key_name);
+
+    if (b && b->vtable->base_type == enum_class_UnManagedStruct) {
+        *jitted = 1;
+        return F2DPTR(PMC_data(b));
+    }
+    else {
+        void * const result = Parrot_jit_build_call_func(interp, pmc_nci, signature);
+        if (result) {
+            *jitted = 1;
+            temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
+            PMC_data(temp_pmc) = (void*)result;
+            VTABLE_set_pmc_keyed_str(interp, HashPointer, jit_key_name, temp_pmc);
+            return result;
+        }
+    }
+
+#endif
 
     b = VTABLE_get_pmc_keyed_str(interp, HashPointer, signature);
 

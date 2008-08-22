@@ -41,6 +41,8 @@ sub _init {
             conditioned_lines => 1,
         },
 
+        'compilers/ncigen/Makefile'  =>
+            { SOURCE => 'compilers/ncigen/config/makefiles/ncigen.in' },
         'compilers/nqp/Makefile'     =>
             { SOURCE => 'config/gen/makefiles/nqp.in' },
         'compilers/pct/Makefile'     =>

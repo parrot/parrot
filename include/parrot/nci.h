@@ -15,7 +15,7 @@
 
 #include "parrot/parrot.h"
 
-void *build_call_func(PARROT_INTERP, SHIM(PMC *pmc_nci), NOTNULL(STRING *signature));
+void *build_call_func(PARROT_INTERP, SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), NOTNULL(int *jitted));
 
 #endif /* PARROT_NCI_H_GUARD */
 
