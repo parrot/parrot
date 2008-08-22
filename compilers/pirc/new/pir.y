@@ -644,7 +644,11 @@ op_arg            : expression
 
 keyaccess         : target keylist
                          {
-                           set_target_key($1, $2);
+                           if ($1->type != PMC_TYPE)
+                               yyerror(yyscanner, lexer, "indexed object is not of type PMC");
+                           else
+                              set_target_key($1, $2);
+
                            $$ = $1;
                          }
                   ;
