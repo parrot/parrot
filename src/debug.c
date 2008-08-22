@@ -1568,7 +1568,6 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     PDB_t            * const pdb      = interp->pdb;
     PDB_breakpoint_t *newbreak;
     PDB_breakpoint_t *sbreak;
-    PDB_condition_t  *condition;
     PDB_line_t       *line = NULL;
     long              bp_id;
     opcode_t         *breakpos = NULL;
@@ -1625,7 +1624,7 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     }
 
     /* Allocate the new break point */
-    newbreak = mem_allocate_typed(PDB_breakpoint_t);
+    newbreak = mem_allocate_zeroed_typed(PDB_breakpoint_t);
 
     if (command) {
         command = skip_command(command);
@@ -1634,20 +1633,13 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
             "NULL command passed to PDB_set_break");
     }
-    condition = NULL;
 
     /* if there is another argument to break, besides the line number,
      * it should be an 'if', so we call another handler. */
     if (command && *command) {
         skip_command(command);
-        if ((condition = PDB_cond(interp, command)))
-            newbreak->condition = condition;
+        newbreak->condition = PDB_cond(interp, command);
     }
-
-    /* If there are no other arguments, or if there isn't a valid condition,
-       then condition will be NULL */
-    if (!condition)
-        newbreak->condition = NULL;
 
     /* Set the address where to stop */
     newbreak->pc   = breakpos;
