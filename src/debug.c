@@ -1614,8 +1614,14 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
             }
         }
         /* Skip lines that are not related to an opcode */
-        while (!line->opcode)
+        while (line && !line->opcode)
             line = line->next;
+        /* Abort if the line number provided doesn't exist */
+        if (!line) {
+            PIO_eprintf(interp,
+                "Can't set a breakpoint at line number %li\n", ln);
+            return;
+        }
 
         breakpos = line->opcode;
     }
