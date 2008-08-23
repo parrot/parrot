@@ -298,16 +298,9 @@ tree.  The primary function of the node is given by its C<pasttype>,
 secondary functions may be given by the node's C<name>, C<pirop>,
 or other attributes.
 
-=head1 AUTHOR
-
-Patrick Michaud <pmichaud@pobox.com> is the author and maintainer.
-Please send patches and suggestions to the Parrot porters or
-Perl 6 compilers mailing lists.
 
 =head1 HISTORY
 
-2006-11-20  Patrick Michaud added first draft of POD documentation.
-2007-11-21  Re-implementation with pdd26 compliance, compiler toolkit
 
 =head1 COPYRIGHT
 
