@@ -863,6 +863,10 @@ length operator.
     $I0 = list.'len'()
     $I2 = lua_optint(2, i, 1)
     e = lua_optint(3, j, $I0)
+    unless $I2 > e goto L1
+    # empty range
+    .return ()
+  L1:
     n = e - $I2
     inc n
     new res, 'FixedPMCArray'
@@ -870,14 +874,14 @@ length operator.
     new index_, 'LuaNumber'
     set index_, $I2
     idx = 0
-  L1:
-    unless idx < n goto L2
+  L2:
+    unless idx < n goto L3
     $P0 = list.'rawget'(index_)
     res[idx] = $P0
     inc index_
     inc idx
-    goto L1
-  L2:
+    goto L2
+  L3:
     .return (res :flat)
 .end
 
