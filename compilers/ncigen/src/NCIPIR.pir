@@ -250,7 +250,7 @@ Return pir for an operation node.
   $I0 = node.'pointer_cnt'()
   iseq $I1, $I0, 1
   unless $I1, LL7
-    .return("S")
+    .return("t")
   LL7:
     .return("p")
 .end

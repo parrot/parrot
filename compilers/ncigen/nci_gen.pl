@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#! perl
 # Copyright (C) 2008, The Perl Foundation.
 # $Id$
 
@@ -14,11 +14,13 @@ use IPC::Run3;
 my $man = 0;
 my $help = 0;
 my $PARROT = "../../parrot";
-my $incpaths;
+my ($incpaths,$libname,$nsname);
 
-GetOptions('help|?' => \$help,
-            man     => \$man,
-            "I=s@"  => \$incpaths) or pod2usage(2);
+GetOptions('help|?'   => \$help,
+            man       => \$man,
+            libname   => \$libname,
+            nsname    => \$nsname,
+            "I=s@"    => \$incpaths) or pod2usage(2);
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 
@@ -49,12 +51,12 @@ sub execit {
 
 sub main {
   my $more_args = "";
-  unless ( $ARGV[0] ) {
-    $ARGV[0] = 't/spi.c' unless $ARGV[0];
-  }
-  #$more_args = "--target=parse --libname=fred --nsname=GO::Mojo";
-  $more_args = "--libname=fred --nsname=GO::Mojo";
+  $ARGV[0] = 't/spi.c' unless $ARGV[0];
+  $libname = "libexamplelib"      unless $libname;
+  $nsname  = "CLIB::examplelib"   unless $nsname;
 
+  #$more_args = "--target=parse --libname=fred --nsname=GO::Mojo";
+  $more_args = "--libname=$libname --nsname=$nsname";
   my $preproc_fn = cc_preprocess($ARGV[0]);
 
   my $parse_tree = dump_parse_tree($preproc_fn, $more_args);

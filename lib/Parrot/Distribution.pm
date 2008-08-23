@@ -474,6 +474,7 @@ sub get_perl_exemption_regexp {
         languages/pipp/src/pct/actions.pm
         languages/hq9plus/src/parser/actions.pm
         compilers/nqp/
+        compilers/ncigen/src/parser/actions.pm
         lib/Digest/Perl/
         lib/File/
         lib/IO/

@@ -143,7 +143,7 @@ sub ncigenit {
     wantarray ? return @results : return [ @results ];
 }
 
-sub testit() {
+sub testit {
     my ( $self, $method, $code, $cmd, $output, $exit_code, $count, $expected, $desc ) = @_;
     #print "$cmd, $exit_code, $count, $expected, $desc \n";
 
