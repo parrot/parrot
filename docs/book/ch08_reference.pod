@@ -3327,14 +3327,6 @@ Indexed access to a PMC and indexed assignment to a PMC.
 Access a one-character substring on a string, starting at a particular
 offset, or assign to that substring.
 
-=head2 addr
-
-X<addr instruction (PIR)>
-
-  R<DEST> = addr R<LABEL>
-
-Return the address of a label.
-
 =head2 call
 
 X<call instruction (PIR)>
