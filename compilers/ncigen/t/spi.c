@@ -6,6 +6,7 @@
  * Portions Copyright (c) 1996-2008, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  * Portions Copyright (C) 2008, The Perl Foundation.
+ * $Id$
  *
  * $PostgreSQL$
  *
