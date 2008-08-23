@@ -563,10 +563,12 @@ method assignment_stmt($/) {
     my $explist := $( $<expression_list> );
     my $past    := PAST::Stmts.new( :node($/) );
 
-    for @($lhs) {
-        my $rhs := $explist.shift();
-        $past.push( PAST::Op.new( $_, $rhs, :pasttype('bind'), :node($/) ) );
-    }
+# XXX For now, we'll only support single assignment.
+#    for @($lhs) {
+#        my $rhs := $explist.shift();
+#        $past.push( PAST::Op.new( $_, $rhs, :pasttype('bind'), :node($/) ) );
+#    }
+    $past := PAST::Op.new( $lhs.shift(), $explist, :pasttype('bind'), :node($/) );
 
     make $past;
 }
