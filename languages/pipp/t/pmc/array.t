@@ -21,7 +21,7 @@ Tests the PhpArray PMC.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(13)
+    plan(27)
 
     basic_get_set()
     stack_and_queue_ops()
@@ -31,6 +31,7 @@ Tests the PhpArray PMC.
     exists_delete_tests()
     generic_iterator_tests()
     php_iterator_tests()
+    php_array_func_tests()
 .end
 
 .sub basic_get_set
@@ -334,8 +335,8 @@ iter_done1:
 .end
 
 .sub php_iterator_tests
-    .local pmc p, it, val
-    .local string s, val_str
+    .local pmc p, it, val, pair
+    .local string s, val_str, s1, s2
     .local int is_ok
 
     p = new PhpArray
@@ -421,6 +422,7 @@ iter_done1:
     is_ok = s == "Beware the Jabberwock, my son!\nThe jaws that bite, the claws that catch!\nBeware the Jubjub bird, and shun\nThe frumious Bandersnatch!"
     ok(is_ok, "iterator fun with next/prev/end/reset")
 
+
     is_ok = 1
     p = new PhpArray
     p['a'] = "p['a']"
@@ -455,6 +457,111 @@ iter_test_loop:
 iter_test_done:
     is_ok = s == "p['a']p[3]"
     ok(is_ok, "using next at inopportune times in an iter loop")
+
+
+    s = ''
+    p = new PhpArray
+    push p, 'SKIP'
+    push p, 'I '
+    push p, 'SKIP'
+    push p, 'wish '
+    push p, 'SKIP'
+    push p, 'I '
+    push p, 'SKIP'
+    push p, 'were '
+    push p, 'SKIP'
+    push p, 'a '
+    push p, 'SKIP'
+    push p, 'jellyfish.'
+
+    it = iter p
+iter_skip_loop:
+    unless it goto iter_skip_done
+    p.'next'()
+    val_str = shift it
+    concat s, val_str
+    goto iter_skip_loop
+iter_skip_done:
+
+    is_ok = s == 'I wish I were a jellyfish.'
+    ok(is_ok, "using next in an iter loop")
+
+
+    is_ok = 1
+    p = new PhpArray
+    push p, "This "
+    push p, "is "
+    push p, "yet "
+    push p, "another "
+    push p, "iterator "
+    push p, "test."
+
+    pair = p.'each'()
+    is_ok = exists pair[0]
+    unless is_ok goto each_test_not_ok
+    is_ok = exists pair[1]
+    unless is_ok goto each_test_not_ok
+    is_ok = exists pair['key']
+    unless is_ok goto each_test_not_ok
+    is_ok = exists pair['value']
+    unless is_ok goto each_test_not_ok
+    s1 = pair[0]
+    s2 = pair['key']
+    unless s1 == s2 goto each_test_not_ok
+    s1 = pair[1]
+    s2 = pair['value']
+    unless s1 == s2 goto each_test_not_ok
+
+    goto each_test_ok
+each_test_not_ok:
+    is_ok = 0
+each_test_ok:
+    ok(is_ok, "each() behaves as expected")
+
+    is_ok = 1
+    s = ''
+    p.'reset'()
+each_iter_loop:
+    pair = p.'each'()
+    unless pair goto each_iter_end
+    val_str = pair['value']
+    concat s, val_str
+    goto each_iter_loop
+
+each_iter_end:
+    is_ok = s == "This is yet another iterator test."
+    ok(is_ok, "iterating using each")
+
+.end
+
+.sub php_array_func_tests
+    .local pmc p
+    .local string s
+    .local int is_ok
+
+    p = new PhpArray
+    p['pears']        = 'pear tree'
+    p['donuts']       = 'donut tree' #they're healthy if they grow on trees
+    p['cheezburgers'] = 'cheezburger tree' #DO WANT
+
+    s = p.'key'()
+    s = p.'key'() #make sure there are no side-effects
+    unless s == 'pears' goto current_and_key_not_ok
+    s = p.'current'()
+    s = p.'current'()
+    unless s == 'pear tree' goto current_and_key_not_ok
+
+    p.'next'()
+    s = p.'key'()
+    unless s == 'donuts' goto current_and_key_not_ok
+    s = p.'current'()
+    unless s == 'donut tree' goto current_and_key_not_ok
+
+    goto current_and_key_ok
+current_and_key_not_ok:
+    is_ok = 0
+current_and_key_ok:
+    ok(is_ok, "current() and key() work properly")
 
 .end
 
