@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use lib 'lib';
-use Parrot::Ops2pm::Utils;
+use Parrot::Ops2pm;
 use Parrot::Ops2pm::Auxiliary qw( Usage getoptions );
 
 my $flagref = getoptions();
@@ -16,7 +16,7 @@ if ( $flagref->{help} or !@ARGV ) {
     exit;
 }
 
-my $self = Parrot::Ops2pm::Utils->new(
+my $self = Parrot::Ops2pm->new(
     {
         argv    => [@ARGV],
         nolines => $flagref->{nolines},
@@ -30,12 +30,6 @@ my $self = Parrot::Ops2pm::Utils->new(
 );
 
 $self->prepare_ops();
-
-if ( $flagref->{renum} ) {
-    $self->renum_op_map_file();
-    exit 0;
-}
-
 $self->load_op_map_files();
 $self->sort_ops();
 $self->prepare_real_ops();
@@ -125,7 +119,7 @@ modified so that it doesn't need to concatenate separate ops files.
 
 =item F<tools/build/ops2c.pl>.
 
-=item F<lib/Parrot/Ops2pm/Utils.pm>.
+=item F<lib/Parrot/Ops2pm.pm>.
 
 =item F<lib/Parrot/Ops2pm/Auxiliary.pm>.
 

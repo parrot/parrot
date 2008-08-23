@@ -24,7 +24,7 @@ use Carp;
 use Cwd;
 use File::Copy;
 use File::Temp (qw| tempdir |);
-use_ok('Parrot::Ops2pm::Utils');
+use_ok('Parrot::Ops2pm');
 use lib ( "$main::topdir/t/tools/ops2cutils/testlib", "./lib" );
 use GenerateCore qw|
     generate_core
@@ -57,7 +57,7 @@ my $cwd = cwd();
     mkdir qq{$tdir/include};
     mkdir qq{$tdir/include/parrot};
 
-    my $o2p = Parrot::Ops2pm::Utils->new(
+    my $o2p = Parrot::Ops2pm->new(
         {
             argv   => [@opsfiles],
             script => "tools/build/ops2pm.pl",

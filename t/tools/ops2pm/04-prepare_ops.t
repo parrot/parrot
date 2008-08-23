@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 # 04-prepare_ops.t
 
@@ -19,13 +19,13 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 70;
+use Test::More qw(no_plan); # tests => 70;
 use Carp;
 use File::Copy;
 use File::Temp (qw| tempdir |);
 use IO::File;
 
-use_ok('Parrot::Ops2pm::Utils');
+use_ok('Parrot::Ops2pm::Base');
 use IO::CaptureOutput qw| capture |;
 
 ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
@@ -36,14 +36,14 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
         src/ops/core.ops
         src/ops/bit.ops
     );
-    my $self = Parrot::Ops2pm::Utils->new(
+    my $self = Parrot::Ops2pm::Base->new(
         {
             argv    => [@ARGV],
             script  => "tools/build/ops2pm.pl",
             nolines => undef,
         }
     );
-    isa_ok( $self, q{Parrot::Ops2pm::Utils} );
+    isa_ok( $self, q{Parrot::Ops2pm::Base} );
 
     ok( $self->prepare_ops, "prepare_ops() returned successfully" );
     ok( defined( $self->{ops} ), "'ops' key has been defined" );
@@ -68,14 +68,14 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
         src/ops/core.ops
         src/ops/bit.ops
     );
-    my $self = Parrot::Ops2pm::Utils->new(
+    my $self = Parrot::Ops2pm::Base->new(
         {
             argv    => [@ARGV],
             script  => "tools/build/ops2pm.pl",
             nolines => 1,
         }
     );
-    isa_ok( $self, q{Parrot::Ops2pm::Utils} );
+    isa_ok( $self, q{Parrot::Ops2pm::Base} );
 
     ok( $self->prepare_ops, "prepare_ops() returned successfully" );
     ok( defined( $self->{ops} ), "'ops' key has been defined" );
@@ -101,14 +101,14 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
         src/ops/bit.ops
         src/ops/bit.ops
     );
-    my $self = Parrot::Ops2pm::Utils->new(
+    my $self = Parrot::Ops2pm::Base->new(
         {
             argv    => [@ARGV],
             script  => "tools/build/ops2pm.pl",
             nolines => undef,
         }
     );
-    isa_ok( $self, q{Parrot::Ops2pm::Utils} );
+    isa_ok( $self, q{Parrot::Ops2pm::Base} );
 
     my ($stdout, $stderr);
     my $ret = capture(
@@ -143,14 +143,14 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
     my $phony = q{src/ops/sdifupasdufisduuapsdfi.ops};
     local @ARGV = ( "src/ops/core.ops", $phony );
 
-    my $self = Parrot::Ops2pm::Utils->new(
+    my $self = Parrot::Ops2pm::Base->new(
         {
             argv    => [@ARGV],
             script  => "tools/build/ops2pm.pl",
             nolines => undef,
         }
     );
-    isa_ok( $self, q{Parrot::Ops2pm::Utils} );
+    isa_ok( $self, q{Parrot::Ops2pm::Base} );
     eval { $self->prepare_ops; };
     like(
         $@,
@@ -166,14 +166,14 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
         src/ops/bit.ops
         src/ops/experimental.ops
     );
-    my $self = Parrot::Ops2pm::Utils->new(
+    my $self = Parrot::Ops2pm::Base->new(
         {
             argv    => [@ARGV],
             script  => "tools/build/ops2pm.pl",
             nolines => undef,
         }
     );
-    isa_ok( $self, q{Parrot::Ops2pm::Utils} );
+    isa_ok( $self, q{Parrot::Ops2pm::Base} );
 
     ok( $self->prepare_ops, "prepare_ops() returned successfully" );
     ok( defined( $self->{ops} ), "'ops' key has been defined" );
@@ -217,14 +217,14 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
         ok( copy( qq{$cwd/$num}, qq{$tdir/$num} ), "copied ops.num file" );
         my @opsfiles = glob("./src/ops/*.ops");
 
-        my $self = Parrot::Ops2pm::Utils->new(
+        my $self = Parrot::Ops2pm::Base->new(
             {
                 argv    => [@opsfiles],
                 script  => "tools/build/ops2pm.pl",
                 nolines => undef,
             }
         );
-        isa_ok( $self, q{Parrot::Ops2pm::Utils} );
+        isa_ok( $self, q{Parrot::Ops2pm::Base} );
 
         eval { $self->prepare_ops; };
         like( $@, qr/OPS invalid for.*?cmp\.ops/, "ops file with bad content correctly detected" );
@@ -239,21 +239,21 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-04-prepare_ops.t - test C<Parrot::Ops2pm::Utils::prepare_ops()>
+04-prepare_ops.t - test C<Parrot::Ops2pm::Base::prepare_ops()>
 
 =head1 SYNOPSIS
 
-    % prove t/tools/ops2pmutils/04-prepare_ops.t
+    % prove t/tools/ops2pm/04-prepare_ops.t
 
 =head1 DESCRIPTION
 
 The files in this directory test the publicly callable methods of
-F<lib/Parrot/Ops2pm/Utils.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.
+F<lib/Parrot/Ops2pm::Base.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.
 By doing so, they test the functionality of the F<ops2pm.pl> utility.
 That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
-F<04-prepare_ops.t> tests whether C<Parrot::Ops2pm::Utils::prepare_ops()>
+F<04-prepare_ops.t> tests whether C<Parrot::Ops2pm::Base::prepare_ops()>
 works properly.
 
 =head1 TODO
@@ -286,7 +286,7 @@ James E Keenan
 
 =head1 SEE ALSO
 
-Parrot::Ops2pm::Utils, F<ops2pm.pl>.
+Parrot::Ops2pm::Base, F<ops2pm.pl>.
 
 =cut
 

@@ -1,7 +1,7 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
-# 11-print_h.t
+# 07-no_ops_skip.t
 
 use strict;
 use warnings;
@@ -19,17 +19,19 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 23;
+use Test::More tests => 14;
 use Cwd;
 use File::Copy;
 use File::Temp (qw| tempdir |);
 
-use_ok('Parrot::Ops2pm::Utils');
+use_ok('Parrot::Ops2pm');
 
 use constant NUM_FILE  => "src/ops/ops.num";
 use constant SKIP_FILE => "src/ops/ops.skip";
 
 ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
+
+# fail to provide ops.skip file
 {
     local @ARGV = qw(
         src/ops/core.ops
@@ -46,40 +48,29 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
         }
         my $num  = NUM_FILE;
         my $skip = SKIP_FILE;
-        ok( copy( qq{$cwd/$num},  qq{$tdir/$num} ),  "copied ops.num file" );
-        ok( copy( qq{$cwd/$skip}, qq{$tdir/$skip} ), "copied ops.skip file" );
+        ok( copy( qq{$cwd/$num}, qq{$tdir/$num} ), "copied ops.num file" );
+
+        #        ok(copy(qq{$cwd/$skip}, qq{$tdir/$skip}), "copied ops.skip file");
         my @opsfiles = glob("./src/ops/*.ops");
 
-        my $self = Parrot::Ops2pm::Utils->new(
+        my $self = Parrot::Ops2pm->new(
             {
                 argv    => [@opsfiles],
                 script  => "tools/build/ops2pm.pl",
                 nolines => undef,
                 renum   => undef,
-                moddir  => "lib/Parrot/OpLib",
-                module  => "core.pm",
-                inc_dir => "include/parrot/oplib",
-                inc_f   => "ops.h",
             }
         );
-        isa_ok( $self, q{Parrot::Ops2pm::Utils} );
+        isa_ok( $self, q{Parrot::Ops2pm} );
 
         ok( $self->prepare_ops, "prepare_ops() returned successfully" );
         ok( defined( $self->{ops} ), "'ops' key has been defined" );
 
-        ok( $self->load_op_map_files(), "load_op_map_files() completed successfully" );
-        ok( -f $num,                    "ops.num located after renumbering" );
-        ok( -f $skip,                   "ops.skip located after renumbering" );
-
-        ok( $self->sort_ops(), "sort_ops returned successfully" );
-
-        ok( $self->prepare_real_ops(), "prepare_real_ops() returned successfully" );
-
-        ok( $self->print_module(), "print_module() returned true" );
-        ok( -f qq{$tdir/$self->{moddir}/$self->{module}}, "core.pm file written" );
-
-        ok( $self->print_h(), "print_h() returned true" );
-        ok( -f qq{$tdir/$self->{inc_dir}/$self->{inc_f}}, "$self->{inc_f} created" );
+        eval { $self->load_op_map_files(); };
+        like(
+            $@, qr|^Can't open.*src/ops/ops\.skip|,    #'
+            "Failure to prove ops.skip correctly detected"
+        );
 
         ok( chdir $cwd, 'changed back to starting directory after testing' );
     }
@@ -91,40 +82,22 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-11-print_h.t - test C<Parrot::Ops2pm::Utils::print_h()>
+07-no_ops_skip.t - test C<Parrot::Ops2pm::no_ops_skip()>
 
 =head1 SYNOPSIS
 
-    % prove t/tools/ops2pmutils/11-print_h.t
+    % prove t/tools/ops2pm/07-no_ops_skip.t
 
 =head1 DESCRIPTION
 
-The files in this directory test the publicly callable methods of
-F<lib/Parrot/Ops2pm/Utils.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.
+The files in this directory test the publicly callable subroutines of
+F<lib/Parrot/Ops2pm.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.
 By doing so, they test the functionality of the F<ops2pm.pl> utility.
 That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
-F<11-print_h.t> tests whether
-C<Parrot::Ops2pm::Utils::print_h()> works properly.
-
-=head1 TODO
-
-The following statements, branches and conditions in C<print_h()>
-are as yet uncovered:
-
-=over 4
-
-=item *
-
-Directory failure:  can it be provoked?
-
-  if ( !-d $fulldir ) {
-    File::Path::mkpath( $fulldir, 0, 0755 )
-      or die "$self->{script}: Could not mkdir $fulldir: $!!\n";
-  }
-
-=back
+F<07-no_ops_skip.t> tests what happens when there is no F<src/ops/ops.skip>
+available for C<load_op_map_files()> to evaluate.
 
 =head1 AUTHOR
 
@@ -132,7 +105,7 @@ James E Keenan
 
 =head1 SEE ALSO
 
-Parrot::Ops2pm::Utils, F<ops2pm.pl>.
+Parrot::Ops2pm, F<ops2pm.pl>.
 
 =cut
 

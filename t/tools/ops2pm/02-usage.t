@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 # 02-usage.t
 
@@ -71,16 +71,16 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-02-usage.t - test C<Parrot::Ops2pm::Utils::Usage()>
+02-usage.t - test C<Parrot::Ops2pm::Usage()>
 
 =head1 SYNOPSIS
 
-    % prove t/tools/ops2pmutils/02-usage.t
+    % prove t/tools/ops2pm/02-usage.t
 
 =head1 DESCRIPTION
 
 The files in this directory test the publicly callable subroutines of
-F<lib/Parrot/Ops2pm/Utils.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.
+F<lib/Parrot/Ops2pm.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.
 By doing so, they test the functionality of the F<ops2pm.pl> utility.
 That functionality has largely been extracted
 into the methods of F<Utils.pm>.

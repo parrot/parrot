@@ -23,7 +23,7 @@ our $skip = "src/ops/ops.skip";
 use Carp;
 use File::Copy;
 use lib ("./lib");
-use Parrot::Ops2pm::Utils;
+use Parrot::Ops2pm;
 
 
 sub generate_core {
@@ -47,7 +47,7 @@ sub generate_core {
     mkdir qq{$tdir/include/parrot};
     mkdir qq{$tdir/include/parrot/oplib};
 
-    my $o2p = Parrot::Ops2pm::Utils->new(
+    my $o2p = Parrot::Ops2pm->new(
         {
             argv   => [@opsfiles],
             script => "tools/build/ops2pm.pl",

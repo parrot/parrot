@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 # 00-qualify.t
 
@@ -8,7 +8,7 @@ use warnings;
 use Test::More tests => 11;
 use FindBin;
 use lib ( "$FindBin::Bin/../../../lib", );
-use_ok('Parrot::Ops2pm::Utils');
+use_ok('Parrot::Ops2pm');
 
 ok( -f "$FindBin::Bin/../../../Makefile",              "Makefile located" );
 ok( -f "$FindBin::Bin/../../../myconfig",              "myconfig located" );
@@ -29,7 +29,7 @@ my $message = <<END_OF_MESSAGE;
 
 
 The files in this directory test the publicly callable methods and
-subroutines of Parrot::Ops2pm::Utils and Parrot::Ops2pm::Auxiliary.
+subroutines of Parrot::Ops2pm and Parrot::Ops2pm::Auxiliary.
 By doing so, they test the functionality of the ops2pm.pl utility.
 
 Since ops2pm.pl is invoked only once during 'make' -- very near the
@@ -42,7 +42,7 @@ if run at that point in the build process, but if you have already
 executed 'make', some of these tests will necessarily fail. Hence, they
 should *not* be included in the set of tests run by 'make test'.
 
-In short, these are tests of Parrot::Ops2pm::Utils and
+In short, these are tests of Parrot::Ops2pm and
 Parrot::Ops2pm::Auxiliary but are *not* tests of Parrot itself.
 
 END_OF_MESSAGE
@@ -57,12 +57,12 @@ pass("Completed all tests in $0");
 
 =head1 SYNOPSIS
 
-    % prove t/tools/ops2pmutils/00-qualify.t
+    % prove t/tools/ops2pm/00-qualify.t
 
 =head1 DESCRIPTION
 
 The files in this directory test the publicly callable subroutines of
-F<lib/Parrot/Ops2pm/Utils.pm>and F<lib/Parrot/Ops2pm/Auxiliary.pm>.
+F<lib/Parrot/Ops2pm.pm>and F<lib/Parrot/Ops2pm/Auxiliary.pm>.
 By doing so, they test the functionality of the F<ops2pm.pl> utility.
 That functionality has largely been extracted
 into the methods of F<Utils.pm>.
@@ -84,7 +84,7 @@ James E Keenan
 
 =head1 SEE ALSO
 
-Parrot::Ops2pm::Utils, F<ops2pm.pl>.
+Parrot::Ops2pm, F<ops2pm.pl>.
 
 =cut
 

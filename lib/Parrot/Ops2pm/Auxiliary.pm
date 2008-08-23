@@ -48,7 +48,7 @@ Parrot::Ops2pm::Auxiliary - Non-method subroutines holding functionality for F<t
 Parrot::Ops2pm::Auxiliary provides subroutines called by F<tools/build/ops2pm.pl>, a
 program which is called at the very beginning of the Parrot F<make> process.
 This package is intended to hold subroutines used by that program I<other
-than> the object-oriented methods provided by Parrot::Ops2pm::Utils.
+than> the object-oriented methods provided by Parrot::Ops2pm.
 
 Extraction of the subroutines exported by this package from
 F<tools/build/ops2pm.pl> facilitates the testing of their functionality by the
@@ -109,7 +109,7 @@ Jim Keenan (refactoring code originally found in F<tools/build/ops2pm.pl>).
 
 =head1 SEE ALSO
 
-Parrot::Ops2pm::Utils.  F<tools/build/ops2pm.pl>.
+Parrot::Ops2pm.  F<tools/build/ops2pm.pl>.
 
 =cut
 

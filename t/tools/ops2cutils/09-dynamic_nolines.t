@@ -24,7 +24,7 @@ use Carp;
 use Cwd;
 use File::Copy;
 use File::Temp (qw| tempdir |);
-use_ok('Parrot::Ops2pm::Utils');
+use_ok('Parrot::Ops2pm');
 use lib ("$main::topdir/t/tools/ops2cutils/testlib");
 use GenerateCore qw|
     generate_core

@@ -1,7 +1,7 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
-# 09-prepare_real_ops.t
+# 10-print_module.t
 
 use strict;
 use warnings;
@@ -19,13 +19,13 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 38;
+use Test::More tests => 42;
 use Cwd;
 use File::Copy;
 use File::Temp (qw| tempdir |);
 use IO::File;
 
-use_ok('Parrot::Ops2pm::Utils');
+use_ok('Parrot::Ops2pm');
 
 use constant NUM_FILE  => "src/ops/ops.num";
 use constant SKIP_FILE => "src/ops/ops.skip";
@@ -51,15 +51,20 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
         ok( copy( qq{$cwd/$skip}, qq{$tdir/$skip} ), "copied ops.skip file" );
         my @opsfiles = glob("./src/ops/*.ops");
 
-        my $self = Parrot::Ops2pm::Utils->new(
+        my $self = Parrot::Ops2pm->new(
             {
                 argv    => [@opsfiles],
                 script  => "tools/build/ops2pm.pl",
                 nolines => undef,
                 renum   => undef,
+                moddir  => "lib/Parrot/OpLib",
+                module  => "core.pm",
+
+                #            inc_dir         => "include/parrot/oplib",
+                #            inc_f           => "ops.h",
             }
         );
-        isa_ok( $self, q{Parrot::Ops2pm::Utils} );
+        isa_ok( $self, q{Parrot::Ops2pm} );
 
         ok( $self->prepare_ops, "prepare_ops() returned successfully" );
         ok( defined( $self->{ops} ), "'ops' key has been defined" );
@@ -72,10 +77,16 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
 
         ok( $self->prepare_real_ops(), "prepare_real_ops() returned successfully" );
 
+        ok( $self->print_module(), "print_module() returned true" );
+        ok( -f qq{$tdir/$self->{moddir}/$self->{module}}, "core.pm file written" );
+
+        # Todo:  test characteristics of .pm file written
+
         ok( chdir $cwd, 'changed back to starting directory after testing' );
     }
 }
 
+# --no-lines command-line option
 {
     local @ARGV = qw(
         src/ops/core.ops
@@ -92,49 +103,24 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
         }
         my $num  = NUM_FILE;
         my $skip = SKIP_FILE;
-
-        #        ok(copy(qq{$cwd/$num}, qq{$tdir/$num}), "copied ops.num file");
-
-        my $realnum = qq{$tdir/$num};
-        my $tmpnum  = $realnum . q{.tmp};
-        ok( copy( qq{$cwd/$num}, $tmpnum ), "copied ops.num file to temporary file" );
-
-        my $fhin = IO::File->new();
-        ok( ( $fhin->open("<$tmpnum") ), "Able to open file for reading" );
-        my @outlines;
-        while ( defined( my $line = <$fhin> ) ) {
-            chomp $line;
-            next if $line =~ /^#/;
-            next if $line =~ /^\s*$/;
-            my ( $name, $number ) = split /\s+/, $line, 2;
-            push @outlines, [ $name, $number ];
-        }
-        ok( $fhin->close(), "Able to close file after reading" );
-        my $fhout = IO::File->new();
-        ok( ( $fhout->open(">$realnum") ), "Able to open file for writing" );
-        $fhout->print("$outlines[0]->[0]\t$outlines[0]->[1]\n");
-
-        # This misnumbering is not generating an error.
-        # Reversing the order generated "hole in" error from load_op_map_files().
-        $fhout->print("$outlines[2]->[0]\t$outlines[1]->[1]\n");
-        $fhout->print("$outlines[1]->[0]\t$outlines[2]->[1]\n");
-        for ( my $n = 3 ; $n <= $#outlines ; $n++ ) {
-            $fhout->print("$outlines[$n]->[0]\t$outlines[$n]->[1]\n");
-        }
-        ok( $fhout->close(), "Able to close file after writing" );
-
+        ok( copy( qq{$cwd/$num},  qq{$tdir/$num} ),  "copied ops.num file" );
         ok( copy( qq{$cwd/$skip}, qq{$tdir/$skip} ), "copied ops.skip file" );
         my @opsfiles = glob("./src/ops/*.ops");
 
-        my $self = Parrot::Ops2pm::Utils->new(
+        my $self = Parrot::Ops2pm->new(
             {
                 argv    => [@opsfiles],
                 script  => "tools/build/ops2pm.pl",
-                nolines => undef,
+                nolines => 1,
                 renum   => undef,
+                moddir  => "lib/Parrot/OpLib",
+                module  => "core.pm",
+
+                #            inc_dir         => "include/parrot/oplib",
+                #            inc_f           => "ops.h",
             }
         );
-        isa_ok( $self, q{Parrot::Ops2pm::Utils} );
+        isa_ok( $self, q{Parrot::Ops2pm} );
 
         ok( $self->prepare_ops, "prepare_ops() returned successfully" );
         ok( defined( $self->{ops} ), "'ops' key has been defined" );
@@ -145,10 +131,23 @@ ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
 
         ok( $self->sort_ops(), "sort_ops returned successfully" );
 
-        eval { $self->prepare_real_ops(); };
+        ok( $self->prepare_real_ops(), "prepare_real_ops() returned successfully" );
 
-        #        like($@, qr/number mismatch/,
-        #            "Number mismatch correctly detected");
+        ok( $self->print_module(), "print_module() returned true" );
+        ok( -f qq{$tdir/$self->{moddir}/$self->{module}}, "core.pm file written" );
+
+        my $fhin = IO::File->new();
+        ok( ( $fhin->open("<$tdir/$self->{moddir}/$self->{module}") ),
+            "Able to open file for reading" );
+        my $corepm;
+        {
+            local $/;
+            $corepm = <$fhin>;
+        }
+        ok( $fhin->close(), "Able to close file after reading" );
+        unlike( $corepm, qr/#line/, "No '#line' directives found in generated C code" );
+
+        # Todo:  more tests of characteristics of .pm file written
 
         ok( chdir $cwd, 'changed back to starting directory after testing' );
     }
@@ -160,39 +159,37 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-09-prepare_real_ops.t - test C<Parrot::Ops2pm::Utils::prepare_real_ops()>
+10-print_module.t - test C<Parrot::Ops2pm::print_module()>
 
 =head1 SYNOPSIS
 
-    % prove t/tools/ops2pmutils/09-prepare_real_ops.t
+    % prove t/tools/ops2pm/10-print_module.t
 
 =head1 DESCRIPTION
 
 The files in this directory test the publicly callable methods of
-F<lib/Parrot/Ops2pm/Utils.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.
+F<lib/Parrot/Ops2pm.pm> and F<lib/Parrot/Ops2pm/Auxiliary.pm>.
 By doing so, they test the functionality of the F<ops2pm.pl> utility.
 That functionality has largely been extracted
 into the methods of F<Utils.pm>.
 
-F<09-prepare_real_ops.t> tests whether
-C<Parrot::Ops2pm::Utils::prepare_real_ops()> works properly.
+F<10-print_module.t> tests whether
+C<Parrot::Ops2pm::print_module()> works properly.
 
 =head1 TODO
 
-The following statements, branches and conditions in C<prepare_real_ops()>
+The following statements, branches and conditions in C<print_module()>
 are as yet uncovered:
 
 =over 4
 
 =item *
 
-Can these two C<die> statements be provoked?
+Directory failure:  can it be provoked?
 
-  if ( $n != $el->{CODE} ) {
-    die "op $opname: number mismatch: ops.num $n vs. core.ops $el->{CODE}";
-  }
-  if ( $seq != $el->{CODE} ) {
-    die "op $opname: sequence mismatch: ops.num $seq vs. core.ops $el->{CODE}";
+  if ( !-d $fulldir ) {
+    File::Path::mkpath( $fulldir, 0, 0755 )
+      or die "$self->{script}: Could not mkdir $fulldir: $!!\n";
   }
 
 =back
@@ -203,7 +200,7 @@ James E Keenan
 
 =head1 SEE ALSO
 
-Parrot::Ops2pm::Utils, F<ops2pm.pl>.
+Parrot::Ops2pm, F<ops2pm.pl>.
 
 =cut
 
