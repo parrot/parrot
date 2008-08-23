@@ -1,6 +1,6 @@
 #! parrot
 # Copyright (C) 2007-2008, The Perl Foundation.
-# $Id: array.t 25819 2008-02-18 00:16:21Z coke $
+# $Id$
 
 =head1 NAME
 
