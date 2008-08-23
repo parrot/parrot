@@ -139,18 +139,18 @@ sub ispointer($/, $ast) {
         my $type_name := $l_ast.type();
         my $l_ast_name := $l_ast.name();
 
-        #FIXME struct or union typedef 
+        #FIXME struct or union typedef
         if ($l_ast.name() eq $type_name) {
             return 1;
         }
-        
+
         $l_ast := $decls{$type_name};
         unless $l_ast {
             #_dumper($decls);
             say("Parent " ~~ $l_ast_name ~~ " " ~~ $type_name ~~ " not defined");
             return 1;
         }
-    } while (1); 
+    } while (1);
 }
 
 sub settype($/, $ast) {
@@ -213,7 +213,7 @@ sub build_struct_or_union($/, $ast) {
             ispointer($declarator, $sm);
             $ast.push($sm);
         }
-    }    
+    }
 }
 
 sub setname($/, $ast) {

@@ -133,7 +133,7 @@ sub ncigenit {
             STDERR => $out_f
             );
     my $output = Parrot::Test::slurp_file($out_f);
-    
+
     unless ( $ENV{POSTMORTEM} ) {
         unlink $lang_f;
         unlink $out_f;

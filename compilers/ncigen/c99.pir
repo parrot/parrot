@@ -75,7 +75,7 @@ USAGE
 
     $P2 = $P0.'command_line'(args)
 .end
-    
+
 .namespace [ 'PCT::HLLCompiler' ]
 
 .sub 'nci_ast' :method

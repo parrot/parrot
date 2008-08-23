@@ -14,7 +14,7 @@ my $help = 0;
 my $PARROT = "../../parrot";
 my $incpaths;
 
-GetOptions('help|?' => \$help, 
+GetOptions('help|?' => \$help,
             man     => \$man,
             "I=s@"  => \$incpaths) or pod2usage(2);
 pod2usage(1) if $help;
