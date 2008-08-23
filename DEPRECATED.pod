@@ -180,6 +180,13 @@ Will have to be:
 These opcodes are part of the old MMD system, now deprecated and to be removed
 when the branch is merged in after the release.
 
+=item * C<addr> shortcut for C<set_addr> op [post 0.7.1]
+
+The C<addr> shortcut that is mapped to the C<set_addr> will no longer be
+supported. Instead, use the C<set_addr> directly.
+
+See RT#58238.
+
 =back
 
 =head1 Parrot Compiler tools
