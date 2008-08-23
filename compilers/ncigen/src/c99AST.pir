@@ -298,9 +298,6 @@ tree.  The primary function of the node is given by its C<pasttype>,
 secondary functions may be given by the node's C<name>, C<pirop>,
 or other attributes.
 
-=over 4
-=back
-
 =head1 AUTHOR
 
 Patrick Michaud <pmichaud@pobox.com> is the author and maintainer.
