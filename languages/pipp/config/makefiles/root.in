@@ -230,6 +230,14 @@ test-pct:
 test-pmc: pmc
 	- $(PERL) -I../../lib t/pmc/*t
 
+# this does not work yet
+test-pcc-testsuite: all t/pcc-testsuite
+	cd t/pcc-testsuite && svn up
+	cd t/pcc-testsuite && php dotest.php -d .
+
+t/pcc-testsuite:
+	svn co http:////code.roadsend.com//svn//pcc//trunk//pcc-testsuite t/pcc-testsuite
+
 clean: clean-common clean-pct clean-antlr3 clean-test
 
 clean-common: clean-pmc
