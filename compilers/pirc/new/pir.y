@@ -303,6 +303,7 @@ extern YY_DECL;
              opt_paren_string
              paren_string
              local_var_name
+             const_name
 
 %type <targ> sub
              method
@@ -1592,13 +1593,13 @@ globalconst_decl      : ".globalconst" const_tail
                             { /* XXX is .globalconst to be kept? */ }
                       ;
 
-const_tail            : "int" identifier '=' TK_INTC
+const_tail            : "int" const_name '=' TK_INTC
                             { $$ = new_named_const(INT_TYPE, $2, $4); }
-                      | "num" identifier '=' TK_NUMC
+                      | "num" const_name '=' TK_NUMC
                             { $$ = new_named_const(NUM_TYPE, $2, $4); }
-                      | "string" identifier '=' TK_STRINGC
+                      | "string" const_name '=' TK_STRINGC
                             { $$ = new_named_const(STRING_TYPE, $2, $4); }
-                      | "pmc" identifier '=' TK_STRINGC
+                      | "pmc" const_name '=' TK_STRINGC
                             { $$ = new_named_const(PMC_TYPE, $2, $4); }
                       /* this might be useful, for:
                          .const "Sub" foo = "foo" # make a Sub PMC of subr. "foo"
@@ -1606,12 +1607,16 @@ const_tail            : "int" identifier '=' TK_INTC
 
                         Is: .const pmc x = 'foo' any useful? Type of x is not clear.
 
-                      | TK_STRINGC identifier '=' constant
+                      | TK_STRINGC const_name '=' constant
                             { $$ = new_pmc_const($1, $2, $4); }
                       */
                       ;
 
-
+const_name            : identifier
+                            { $$ = $1; }
+                      | math_op
+                            { $$ = opnames[$1]; }
+                      ;
 
 
 /* Expressions, variables and operators */
