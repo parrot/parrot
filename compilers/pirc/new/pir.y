@@ -163,7 +163,7 @@ extern YY_DECL;
 #endif
 
 
-
+/* the parser aborts if there are more than 10 errors */
 #define MAX_NUM_ERRORS  10
 
 
@@ -455,9 +455,6 @@ hll_mapping       : ".HLL_map" TK_STRINGC '=' TK_STRINGC
                             { set_hll_map($2, $4); }
                   ;
 
-
-/* Namespaces */
-
 namespace_decl    : ".namespace" '[' opt_namespace ']'
                             { set_namespace(lexer, $3); }
                   ;
@@ -477,9 +474,6 @@ namespace         : namespace_slice
 namespace_slice   : TK_STRINGC
                             { $$ = expr_from_const(new_const(STRING_TYPE, $1)); }
                   ;
-
-
-/* Sub definition */
 
 sub_def           : sub_head sub_flags "\n"
                     parameters
@@ -565,6 +559,7 @@ instructions      : /* empty */
                   | instructions instruction
                   ;
 
+/* helper rule to create a new instruction node before the instruction is parsed */
 instruction       : { new_instr(lexer); }
                     instr
                   ;
@@ -644,10 +639,10 @@ op_arg            : expression
 
 keyaccess         : target keylist
                          {
-                           if ($1->type != PMC_TYPE)
-                               yyerror(yyscanner, lexer, "indexed object is not of type PMC");
-                           else
+                           if ($1->type == PMC_TYPE) /* only PMCs can be indexed */
                               set_target_key($1, $2);
+                           else
+                              yyerror(yyscanner, lexer, "indexed object is not of type PMC");
 
                            $$ = $1;
                          }
@@ -666,6 +661,47 @@ keys              : expression
 
 assignment_stat   : assignment "\n"
                   ;
+
+/*
+
+=head2 Constant folding and Instruction Selection
+
+Constant folding is implemented in the parser. This is done by writing
+many specific alternatives, instead of using C<general> rules that
+would match all input. This way, the parser's matching mechanism is
+used to select specific cases, for instance adding 2 integer numbers.
+
+Based on the values of the terminals, some instructions can be optimized
+by selecting more efficient equivalent instructions.
+
+The table below specifies how this is done. Terminals are numbered and
+referenced using YACC syntax ($1 for the first terminal, $2 for the
+second, etc.).
+
+
+ rule                                   | instruction         | condition
+ =================================================================================
+ target '=' {integer, number}           | set $1, $3          | $3 != 0
+                                        | null $1             | $3 == 0
+                                        |                     |
+ target '=' target                      | set $1, $3          | $1 != $3
+                                        | noop                | $1 == $3
+                                        |                     |
+ target '=' target binop {integer,      | $4 $1, $3, $5       | $1 != $3
+                          number}       | inc/dec $1          | $1 == $3, $5 == 1, $4 == {'+', '-'}
+                                        | noop                | $1 == $3, $5 == 0, $4 == {'+', '-'}
+                                        | null $1             | $1 == $3, $5 == 0, $4 == {'*'}
+                                        | error: divide by 0  | $1 == $3, $5 == 0, $4 == {'/', '//'}
+                                        | $4 $1, $5           | $1 == $3, $5 != {0, 1}
+                                        |                     |
+ target '=' target binop {string,       | $4 $1, $5           | $1 == $3
+                          target}       | $4 $1, $3, $5       | $1 != $3
+                                        |                     |
+
+
+=cut
+
+*/
 
 assignment        : set_instruction
                   | target '=' TK_INTC
@@ -819,7 +855,7 @@ binary_expr       : TK_INTC binop target
                          { set_instrf(lexer, "set", "%C", fold_n_i(yyscanner, $1, $2, $3)); }
                   ;
 
-
+/* all variants of the "set" opcode */
 set_instruction   : "set" target ',' keyaccess
                         { set_instrf(lexer, "set", "%T%T", $2, $4); }
                   | "set" keyaccess ',' expression
@@ -1210,9 +1246,9 @@ local_id          : local_var_name has_unique_reg
 local_var_name    : identifier
                         { $$ = $1; }
                   | TK_SYMBOL
-                        {
+                        { /* if a symbol was found, that means it was already declared */
                           yyerror(yyscanner, lexer, "local symbol already declared!");
-                          $$ = $1->name;
+                          $$ = $1->name; /* always return something to prevent seg. faults. */
                         }
                   ;
 
@@ -1222,7 +1258,7 @@ has_unique_reg    : /* empty */     { $$ = 0; }
 
 lex_decl          : ".lex" TK_STRINGC ',' target "\n"
                         {
-                          if ($4->type == PMC_TYPE)
+                          if ($4->type == PMC_TYPE) /* only PMCs can be stored as lexicals */
                               set_lex_flag($4, $2);
                           else
                               yyerror(yyscanner, lexer,
@@ -1686,7 +1722,7 @@ augm_add_op : "+="         { $$ = OP_ADD; }
 
 /*
 
-=head1 Constant folding routines.
+=head1 FUNCTIONS
 
 =over 4
 
@@ -2092,16 +2128,49 @@ fold_s_s(yyscan_t yyscanner, char *a, pir_math_operator op, char *b) {
     return NULL;
 }
 
+/*
+
+=item C<static int
+evaluate_i_i(int a, pir_rel_operator op, double b)>
+
+Compare C<a> with C<b> according to the relational operator C<op>.
+Wrapper for C<evaluate_n_n>, which takes arguments of type double.
+
+=cut
+
+*/
 static int
 evaluate_i_i(int a, pir_rel_operator op, int b) {
     return evaluate_n_n(a, op, b);
 }
 
+/*
+
+=item C<static int
+evaluate_n_i(int a, pir_rel_operator op, double b)>
+
+Compare C<a> with C<b> according to the relational operator C<op>.
+Wrapper for C<evaluate_n_n>, which takes arguments of type double.
+
+=cut
+
+*/
 static int
 evaluate_n_i(double a, pir_rel_operator op, int b) {
     return evaluate_n_n(a, op, b);
 }
 
+/*
+
+=item C<static int
+evaluate_i_n(int a, pir_rel_operator op, double b)>
+
+Compare C<a> with C<b> according to the relational operator C<op>.
+Wrapper for C<evaluate_n_n>, which takes arguments of type double.
+
+=cut
+
+*/
 static int
 evaluate_i_n(int a, pir_rel_operator op, double b) {
     return evaluate_n_n(a, op, b);
@@ -2138,6 +2207,19 @@ evaluate_n_n(double a, pir_rel_operator op, double b) {
     }
 }
 
+/*
+
+=item C<static int
+evaluate_s_s(char *a, pir_rel_operator op, char *b)>
+
+Compare string C<a> with string C<b> using the operator C<op>.
+The function uses C's C<strcmp> function. Based on that result,
+which can be -1 (smaller), 0 (equal) or 1 (larger), a boolean
+result is returned.
+
+=cut
+
+*/
 static int
 evaluate_s_s(char *a, pir_rel_operator op, char *b) {
     int result = strcmp(a, b);
