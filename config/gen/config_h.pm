@@ -40,13 +40,11 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     $conf->genfile($self->{templates}->{config_h}, 'include/parrot/config.h',
-        comment_type      => '/*',
         ignore_pattern    => 'PARROT_CONFIG_DATE',
         conditioned_lines => 1
     );
 
     $conf->genfile($self->{templates}->{feature_h}, 'include/parrot/feature.h',
-        comment_type   => '/*',
         ignore_pattern => 'PARROT_CONFIG_DATE',
         feature_file   => 1
     );

@@ -33,9 +33,9 @@ like(
     ok(
         $conf->genfile(
             $dummy   => 'CFLAGS',
-            makefile => 1,
+            file_type => 'makefile',
         ),
-        "genfile() returned true value with 'makefile' option"
+        "genfile() returned true value with 'file_type' option being set to 'makefile'"
     );
     unlink $dummy or croak "Unable to delete file after testing";
     chdir $cwd    or croak "Unable to change back to starting directory";
@@ -48,7 +48,7 @@ like(
     open my $IN, '>', $dummy or croak "Unable to open temp file for writing";
     print $IN qq{Hello world\n};
     close $IN or croak "Unable to close temp file";
-    eval { $conf->genfile(  $dummy => 'CFLAGS', makefile => 1, comment_type => q{<!--}, ); };
+    eval { $conf->genfile(  $dummy => 'CFLAGS', file_type => 'makefile', comment_type => q{<!--}, ); };
     like(
         $@,
         qr/^Unknown comment type/,
@@ -68,7 +68,7 @@ like(
     ok(
         $conf->genfile(
             $dummy       => 'CFLAGS',
-            makefile     => 1,
+            file_type    => 'makefile',
             feature_file => 0,
         ),
         "genfile() returned true value with false value for 'feature_file' option"

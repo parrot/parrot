@@ -28,13 +28,8 @@ sub _init {
     $data{result}      = q{};
     $data{makefiles}   = {
         'Makefile' => { SOURCE => 'config/gen/makefiles/root.in' },
+        'ext/Makefile' => { SOURCE => 'config/gen/makefiles/ext.in', },
 
-        'ext/Makefile' => {
-            SOURCE            => 'config/gen/makefiles/ext.in',
-            commentType       => '#',
-            replace_slashes   => 1,
-            conditioned_lines => 1,
-        },
         'ext/Parrot-Embed/Makefile.PL' => {
             SOURCE            => 'config/gen/makefiles/parrot_embed.in',
             replace_slashes   => 0,
@@ -66,13 +61,11 @@ sub _init {
 
         'tools/build/dynpmc.pl' => {
             SOURCE            => 'config/gen/makefiles/dynpmc_pl.in',
-            comment_type      => '#',
             replace_slashes   => 0,
             conditioned_lines => 1,
         },
         'tools/build/dynoplibs.pl' => {
             SOURCE            => 'config/gen/makefiles/dynoplibs_pl.in',
-            comment_type      => '#',
             replace_slashes   => 0,
             conditioned_lines => 1,
         },

@@ -77,10 +77,7 @@ sub runstep {
             ? '#if 0'
             : '#ifndef OPENSSL_NO_' . $md
         );
-        $conf->genfile(
-            $self->{digest_pmc_template} => "src/dynpmc/${file}.pmc",
-            comment_type                      => '/*',
-        );
+        $conf->genfile( $self->{digest_pmc_template} => "src/dynpmc/${file}.pmc" );
     }
 
     return 1;
