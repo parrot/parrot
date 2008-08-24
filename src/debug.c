@@ -529,6 +529,14 @@ static const DebuggerCmd * get_command(long cmdhash) /* HEADERIZER SKIP */
     }
 }
 
+
+static const char * skip_whitespace(ARGIN(const char *cmd)) /* HEADERIZER SKIP */
+{
+    while (isspace((unsigned char)*cmd))
+        ++cmd;
+    return cmd;
+}
+
 /*
 
 =item C<static void chop_newline>
@@ -573,8 +581,7 @@ nextarg(ARGIN_NULLOK(const char *command))
             command++;
 
         /* eat as much space as possible */
-        while (isspace((unsigned char) *command))
-            command++;
+        command = skip_whitespace(command);
     }
 
     return command;
@@ -602,10 +609,7 @@ skip_command(ARGIN(const char *str))
         str++;
 
     /* eat all space after that */
-    while (*str && isspace((unsigned char) *str))
-        str++;
-
-    return str;
+    return skip_whitespace(str);
 }
 
 /*
@@ -750,8 +754,7 @@ parse_command(ARGIN(const char *command), ARGOUT(unsigned long *cmdP))
     unsigned long c = 0;
 
     /* Skip leading whitespace. */
-    while (isspace((unsigned char) *command))
-        command++;
+    command = skip_whitespace(command);
 
     if (*command == '\0') {
         *cmdP = c;
@@ -1046,7 +1049,7 @@ PDB_get_command(PARROT_INTERP)
     if (interp->pdb->script_file) {
         FILE *fd = interp->pdb->script_file;
         char buf[DEBUG_CMD_BUFFER_LENGTH+1];
-        char *ptr = buf;
+        const char *ptr;
 
         do {
             if (fgets(buf, DEBUG_CMD_BUFFER_LENGTH, fd) == NULL) {
@@ -1057,7 +1060,7 @@ PDB_get_command(PARROT_INTERP)
             chop_newline(buf);
 
             /* skip spaces */
-            for (ptr = buf; *ptr && isspace((unsigned char)*ptr); ptr++);
+            ptr = skip_whitespace(buf);
 
             /* skip blank and commented lines */
        } while (*ptr == '\0' || *ptr == '#');
@@ -3147,8 +3150,7 @@ PDB_help(PARROT_INTERP, ARGIN(const char *command))
     const DebuggerCmd *cmd;
 
     /* Extract the command after leading whitespace (for error messages). */
-    while (*command && isspace((unsigned char)*command))
-        command++;
+    command = skip_whitespace(command);
     parse_command(command, &c);
 
     cmd = get_command(c);
