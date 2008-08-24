@@ -62,6 +62,7 @@ This is the vanilla register allocator.
 */
 static int
 next_register(struct lexer_state * const lexer, pir_type type) {
+    lexer->subs->regs_used[type]++;
     return lexer->curregister[type]++;
 }
 

@@ -241,20 +241,22 @@ new_subr(struct lexer_state *lexer, char * const subname) {
     newsub->symbols    = NULL;
     newsub->flags      = 0;
 
-    /* set all "register" tables to NULL */
-    for (index = 0; index < 4; index++)
-        newsub->registers[index] = NULL;
+    for (index = 0; index < 4; index++) {
+        newsub->registers[index] = NULL; /* set all "register" tables to NULL */
+        newsub->regs_used[index] = 0;    /* set all register counts to 0 */
+    }
 
     /* link the new sub node into the list of subroutines */
-    if (lexer->subs == NULL) { /* no subroutine yet */
+    if (lexer->subs == NULL) { /* no subroutine yet, this is the first one */
         lexer->subs  = newsub;
         newsub->next = newsub; /* set next field to itself, to make the list circular linked */
     }
     else { /* there is at least 1 other subroutine */
+
         /* lexer->subs points to "end of list", to the last added one */
         newsub->next      = lexer->subs->next; /* set newsub's next to the first item in the list */
         lexer->subs->next = newsub;    /* set current sub's next to the new sub. */
-        lexer->subs       = newsub; /* set pointer to current sub to this last added one */
+        lexer->subs       = newsub;    /* set pointer to current sub to this last added one */
     }
 
     /* store the subroutine identifier as a global label */
@@ -1912,6 +1914,12 @@ print_subs(struct lexer_state * const lexer) {
         subroutine *subiter = lexer->subs->next;
 
         do {
+
+            printf("# subroutine '%s' register usage\n", subiter->sub_name);
+            printf("#   int   : %d\n", subiter->regs_used[INT_TYPE]);
+            printf("#   num   : %d\n", subiter->regs_used[NUM_TYPE]);
+            printf("#   string: %d\n", subiter->regs_used[STRING_TYPE]);
+            printf("#   pmc   : %d\n", subiter->regs_used[PMC_TYPE]);
 
             printf(".namespace ");
             print_key(subiter->name_space);
