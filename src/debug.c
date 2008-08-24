@@ -537,6 +537,17 @@ static const char * skip_whitespace(ARGIN(const char *cmd)) /* HEADERIZER SKIP *
     return cmd;
 }
 
+static unsigned long get_ulong(ARGMOD(const char **cmd), unsigned long def) /* HEADERIZER SKIP */
+{
+    char *cmdnext;
+    unsigned long result = strtoul(* cmd, & cmdnext, 0);
+    if (cmdnext != * cmd)
+        * cmd = cmdnext;
+    else
+        result = def;
+    return result;
+}
+
 /*
 
 =item C<static void chop_newline>
@@ -1224,7 +1235,7 @@ Inits the program if needed, runs the next N >= 1 operations and stops.
 void
 PDB_next(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 {
-    unsigned long  n   = 1;
+    unsigned long  n;
     PDB_t  * const pdb = interp->pdb;
     Interp *debugee;
 
@@ -1234,11 +1245,8 @@ PDB_next(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     if (!(pdb->state & PDB_RUNNING))
         PDB_init(interp, command);
 
-    /*command = nextarg(command);*/
-
     /* Get the number of operations to execute if any */
-    if (command && isdigit((unsigned char) *command))
-        n = atol(command);
+    n = get_ulong(& command, 1);
 
     /* Erase the stopped flag */
     pdb->state &= ~PDB_STOPPED;
@@ -1289,7 +1297,7 @@ Execute the next N operations; if no number is specified, it defaults to 1.
 void
 PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 {
-    unsigned long  n   = 1;
+    unsigned long  n;
     PDB_t *  const pdb = interp->pdb;
     Interp        *debugee;
 
@@ -1301,11 +1309,8 @@ PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         PDB_init(interp, command);
     */
 
-    /*command = nextarg(command);*/
-
-    /* if the number of ops to run is specified, convert to a long */
-    if (command && isdigit((unsigned char) *command))
-        n = atol(command);
+    /* ge the number of ops to run, if specified */
+    n = get_ulong(& command, 1);
 
     /* clear the PDB_STOPPED flag, we'll be running n ops now */
     pdb->state &= ~PDB_STOPPED;
@@ -1574,21 +1579,18 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     PDB_line_t       *line = NULL;
     long              bp_id;
     opcode_t         *breakpos = NULL;
-    long             ln = 0;
+
+    unsigned long ln = get_ulong(& command, 0);
 
     TRACEDEB_MSG("PDB_set_break");
 
-    /*command = nextarg(command);*/
-
-    if (command && *command)
-        ln = atol(command);
 
     /* If there is a source file use line number, else opcode position */
 
     if (pdb->file) {
         /* If no line number was specified, set it at the current line */
         if (ln != 0) {
-            int i;
+            unsigned long i;
 
             /* Move to the line where we will set the break point */
             line = pdb->file->line;
@@ -1723,19 +1725,18 @@ void
 PDB_continue(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 {
     PDB_t * const pdb = interp->pdb;
+    unsigned long ln = 0;
 
     TRACEDEB_MSG("PDB_continue");
 
     /* Skip any breakpoint? */
-    if (command && *command) {
-        long ln;
+    if (command)
+        ln = get_ulong(& command, 0);
+    if (ln != 0) {
         if (!pdb->breakpoint) {
             PIO_eprintf(interp, "No breakpoints to skip\n");
             return;
         }
-
-        /*command = nextarg(command);*/
-        ln = atol(command);
         PDB_skip_breakpoint(interp, ln);
     }
 
