@@ -69,8 +69,6 @@ empty string.
     .param pmc i :optional
     .param pmc j :optional
     .param pmc extra :slurpy
-    .local pmc idx
-    .local pmc value
     .local string res
     .local int last
     $S2 = lua_optstring(2, sep, '')
@@ -79,18 +77,15 @@ empty string.
     $I0 = table.'len'()
     last = lua_optint(4, j, $I0)
     res = ''
-    new idx, 'LuaNumber'
   L1:
     unless $I3 < last goto L2
-    set idx, $I3
-    res = addfield(res, table, idx)
+    res = addfield(res, table, $I3)
     concat res, $S2
     inc $I3
     goto L1
   L2:
     unless $I3 == last goto L3
-    set idx, $I3
-    res = addfield(res, table, idx)
+    res = addfield(res, table, $I3)
   L3:
     new $P0, 'LuaString'
     set $P0, res
@@ -100,7 +95,10 @@ empty string.
 .sub 'addfield' :anon
     .param string b
     .param pmc table
-    .param pmc idx
+    .param int i
+    .local pmc idx
+    new idx, 'LuaNumber'
+    set idx, i
     .local pmc value
     value = table.'rawget'(idx)
     $I0 = isa value, 'LuaString'
@@ -108,7 +106,7 @@ empty string.
     $I0 = isa value, 'LuaNumber'
     if $I0 goto L1
     $S0 = typeof value
-    lua_error("invalid value (", $S0, ") at index ",idx," in table for 'concat'")
+    lua_error("invalid value (", $S0, ") at index ",i," in table for 'concat'")
   L1:
     $S0 = value
     concat b, $S0
