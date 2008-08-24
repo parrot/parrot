@@ -86,8 +86,6 @@ extern void yyerror(yyscan_t yyscanner, lexer_state * const lexer, char *message
  */
 static int is_parrot_op(char const * const spelling);
 
-
-
 #define DEBUG1
 /* think of a smarter way to do this; only print when DEBUG is defined */
 #ifdef DEBUG
@@ -323,12 +321,177 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 "unless"          { return TK_UNLESS; }
 "null"            { return TK_NULL; }
 
-"set"             { return TK_PARROT_SET; }
-"add"             { return TK_PARROT_ADD; }
-"sub"             { return TK_PARROT_SUB; }
-"mul"             { return TK_PARROT_MUL; }
-"div"             { return TK_PARROT_DIV; }
-"fdiv"            { return TK_PARROT_FDIV; }
+"set"             { lexer_state *lexer = yyget_extra(yyscanner);
+                    symbol *sym        = find_symbol(lexer, yytext);
+                    if (sym) {
+                        yylval->symb = sym;
+                        return TK_SYMBOL;
+                    }
+                    else {
+                        constant *con = find_constant(lexer, yytext);
+                        if (con != NULL) {
+                            switch (con->type) {
+                                case INT_TYPE:
+                                    yylval->ival = con->val.ival;
+                                    return TK_INTC;
+                                case NUM_TYPE:
+                                    yylval->dval = con->val.nval;
+                                    return TK_NUMC;
+                                case STRING_TYPE:
+                                    yylval->sval = con->val.sval;
+                                    return TK_STRINGC;
+                                case PMC_TYPE:
+                                case UNKNOWN_TYPE:
+                                default:
+                                    fprintf(stderr, "invalid constant type!\n");
+                            }
+                        }
+                    }
+                    return TK_PARROT_SET;
+                  }
+
+"add"             {
+                    lexer_state *lexer = yyget_extra(yyscanner);
+                    symbol *sym        = find_symbol(lexer, yytext);
+                    if (sym) {
+                        yylval->symb = sym;
+                        return TK_SYMBOL;
+                    }
+                    else {
+                        constant *con = find_constant(lexer, yytext);
+                        if (con != NULL) {
+                            switch (con->type) {
+                                case INT_TYPE:
+                                    yylval->ival = con->val.ival;
+                                    return TK_INTC;
+                                case NUM_TYPE:
+                                    yylval->dval = con->val.nval;
+                                    return TK_NUMC;
+                                case STRING_TYPE:
+                                    yylval->sval = con->val.sval;
+                                    return TK_STRINGC;
+                                case PMC_TYPE:
+                                case UNKNOWN_TYPE:
+                                default:
+                                    fprintf(stderr, "invalid constant type!\n");
+                            }
+                        }
+                    }
+                    return TK_PARROT_ADD;
+                  }
+
+"sub"             { lexer_state *lexer = yyget_extra(yyscanner);
+                    symbol *sym        = find_symbol(lexer, yytext);
+                    if (sym) {
+                        yylval->symb = sym;
+                        return TK_SYMBOL;
+                    }
+                    else {
+                        constant *con = find_constant(lexer, yytext);
+                        if (con != NULL) {
+                            switch (con->type) {
+                                case INT_TYPE:
+                                    yylval->ival = con->val.ival;
+                                    return TK_INTC;
+                                case NUM_TYPE:
+                                    yylval->dval = con->val.nval;
+                                    return TK_NUMC;
+                                case STRING_TYPE:
+                                    yylval->sval = con->val.sval;
+                                    return TK_STRINGC;
+                                case PMC_TYPE:
+                                case UNKNOWN_TYPE:
+                                default:
+                                    fprintf(stderr, "invalid constant type!\n");
+                            }
+                        }
+                    }
+                    return TK_PARROT_SUB;
+                  }
+"mul"             { lexer_state *lexer = yyget_extra(yyscanner);
+                    symbol *sym        = find_symbol(lexer, yytext);
+                    if (sym) {
+                        yylval->symb = sym;
+                        return TK_SYMBOL;
+                    }
+                    else {
+                        constant *con = find_constant(lexer, yytext);
+                        if (con != NULL) {
+                            switch (con->type) {
+                                case INT_TYPE:
+                                    yylval->ival = con->val.ival;
+                                    return TK_INTC;
+                                case NUM_TYPE:
+                                    yylval->dval = con->val.nval;
+                                    return TK_NUMC;
+                                case STRING_TYPE:
+                                    yylval->sval = con->val.sval;
+                                    return TK_STRINGC;
+                                case PMC_TYPE:
+                                case UNKNOWN_TYPE:
+                                default:
+                                    fprintf(stderr, "invalid constant type!\n");
+                            }
+                        }
+                    }
+                    return TK_PARROT_MUL;
+                  }
+"div"             { lexer_state *lexer = yyget_extra(yyscanner);
+                    symbol *sym        = find_symbol(lexer, yytext);
+                    if (sym) {
+                        yylval->symb = sym;
+                        return TK_SYMBOL;
+                    }
+                    else {
+                        constant *con = find_constant(lexer, yytext);
+                        if (con != NULL) {
+                            switch (con->type) {
+                                case INT_TYPE:
+                                    yylval->ival = con->val.ival;
+                                    return TK_INTC;
+                                case NUM_TYPE:
+                                    yylval->dval = con->val.nval;
+                                    return TK_NUMC;
+                                case STRING_TYPE:
+                                    yylval->sval = con->val.sval;
+                                    return TK_STRINGC;
+                                case PMC_TYPE:
+                                case UNKNOWN_TYPE:
+                                default:
+                                    fprintf(stderr, "invalid constant type!\n");
+                            }
+                        }
+                    }
+                    return TK_PARROT_DIV;
+                  }
+"fdiv"            { lexer_state *lexer = yyget_extra(yyscanner);
+                    symbol *sym        = find_symbol(lexer, yytext);
+                    if (sym) {
+                        yylval->symb = sym;
+                        return TK_SYMBOL;
+                    }
+                    else {
+                        constant *con = find_constant(lexer, yytext);
+                        if (con != NULL) {
+                            switch (con->type) {
+                                case INT_TYPE:
+                                    yylval->ival = con->val.ival;
+                                    return TK_INTC;
+                                case NUM_TYPE:
+                                    yylval->dval = con->val.nval;
+                                    return TK_NUMC;
+                                case STRING_TYPE:
+                                    yylval->sval = con->val.sval;
+                                    return TK_STRINGC;
+                                case PMC_TYPE:
+                                case UNKNOWN_TYPE:
+                                default:
+                                    fprintf(stderr, "invalid constant type!\n");
+                            }
+                        }
+                    }
+                    return TK_PARROT_FDIV;
+                  }
 
 "int"             { return TK_INT; }
 "num"             { return TK_NUM; }
@@ -471,6 +634,8 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 
 %%
 
+
+
 /*
 
 =head1 AUX. FUNCTIONS
@@ -514,6 +679,8 @@ is_parrot_op(char const * const spelling)
 
     return 0;
 }
+
+
 
 /*
 

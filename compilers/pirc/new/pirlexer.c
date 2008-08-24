@@ -811,20 +811,20 @@ static yyconst flex_int32_t yy_rule_can_match_eol[123] =
 
 static yyconst flex_int16_t yy_rule_linenum[122] =
     {   0,
-      248,  250,  252,  256,  257,  258,  259,  260,  261,  262,
-      263,  264,  265,  266,  267,  269,  270,  271,  272,  274,
-      275,  276,  277,  278,  279,  280,  281,  282,  283,  284,
-      285,  287,  291,  295,  299,  306,  307,  309,  310,  311,
-      312,  313,  314,  315,  316,  317,  318,  319,  321,  322,
-      323,  324,  326,  327,  328,  329,  330,  331,  333,  334,
-      335,  336,  338,  339,  340,  342,  343,  344,  345,  346,
-      347,  348,  349,  351,  352,  353,  354,  355,  356,  357,
-      358,  359,  360,  361,  362,  363,  364,  365,  367,  368,
-      369,  370,  371,  372,  373,  374,  375,  376,  377,  378,
+      246,  248,  250,  254,  255,  256,  257,  258,  259,  260,
+      261,  262,  263,  264,  265,  267,  268,  269,  270,  272,
+      273,  274,  275,  276,  277,  278,  279,  280,  281,  282,
+      283,  285,  289,  293,  297,  304,  305,  307,  308,  309,
+      310,  311,  312,  313,  314,  315,  316,  317,  319,  320,
+      321,  322,  324,  353,  383,  411,  439,  467,  496,  497,
+      498,  499,  501,  502,  503,  505,  506,  507,  508,  509,
+      510,  511,  512,  514,  515,  516,  517,  518,  519,  520,
+      521,  522,  523,  524,  525,  526,  527,  528,  530,  531,
+      532,  533,  534,  535,  536,  537,  538,  539,  540,  541,
 
-      379,  381,  382,  383,  384,  385,  386,  387,  390,  395,
-      396,  397,  398,  400,  405,  454,  455,  456,  457,  458,
-      463
+      542,  544,  545,  546,  547,  548,  549,  550,  553,  558,
+      559,  560,  561,  563,  568,  617,  618,  619,  620,  621,
+      626
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -922,8 +922,6 @@ extern void yyerror(yyscan_t yyscanner, lexer_state * const lexer, char *message
  * We define a dummy function for now; replace this later.
  */
 static int is_parrot_op(char const * const spelling);
-
-
 
 #define DEBUG1
 /* think of a smarter way to do this; only print when DEBUG is defined */
@@ -1031,7 +1029,7 @@ new_lexer(char * const filename) {
 /* make yywrap() always return true. */
 /* always show warnings if something's wrong with our spec. */
 /* create a scanner in debug mode */
-#line 1035 "pirlexer.c"
+#line 1033 "pirlexer.c"
 
 #define INITIAL 0
 
@@ -1320,11 +1318,11 @@ YY_DECL
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
 /* %% [7.0] user's declarations go here */
-#line 245 "pir.l"
+#line 243 "pir.l"
 
 
 
-#line 1328 "pirlexer.c"
+#line 1326 "pirlexer.c"
 
     yylval = yylval_param;
 
@@ -1450,187 +1448,187 @@ do_action:  /* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 248 "pir.l"
+#line 246 "pir.l"
 { /* ignore whitespace */ }
     YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 250 "pir.l"
+#line 248 "pir.l"
 { /* ignore line comments */ }
     YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 252 "pir.l"
+#line 250 "pir.l"
 { /* a set of continuous newlines yields a single newline token. */
                    return TK_NL;
                  }
     YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 256 "pir.l"
+#line 254 "pir.l"
 { return TK_ASSIGN_USHIFT; }
     YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 257 "pir.l"
+#line 255 "pir.l"
 { return TK_USHIFT; }
     YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 258 "pir.l"
+#line 256 "pir.l"
 { return TK_ASSIGN_RSHIFT; }
     YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 259 "pir.l"
+#line 257 "pir.l"
 { return TK_RSHIFT; }
     YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 260 "pir.l"
+#line 258 "pir.l"
 { return TK_LSHIFT; }
     YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 261 "pir.l"
+#line 259 "pir.l"
 { return TK_ARROW; }
     YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 262 "pir.l"
+#line 260 "pir.l"
 { return TK_EQ; }
     YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 263 "pir.l"
+#line 261 "pir.l"
 { return TK_NE; }
     YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 264 "pir.l"
+#line 262 "pir.l"
 { return TK_LE; }
     YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 265 "pir.l"
+#line 263 "pir.l"
 { return TK_GE; }
     YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 266 "pir.l"
+#line 264 "pir.l"
 { return TK_LT; }
     YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 267 "pir.l"
+#line 265 "pir.l"
 { return TK_GT; }
     YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 269 "pir.l"
+#line 267 "pir.l"
 { return TK_FDIV; }
     YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 270 "pir.l"
+#line 268 "pir.l"
 { return TK_AND; }
     YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 271 "pir.l"
+#line 269 "pir.l"
 { return TK_OR; }
     YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 272 "pir.l"
+#line 270 "pir.l"
 { return TK_XOR; }
     YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 274 "pir.l"
+#line 272 "pir.l"
 { return '+'; }
     YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 275 "pir.l"
+#line 273 "pir.l"
 { return '%'; }
     YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 276 "pir.l"
+#line 274 "pir.l"
 { return '*'; }
     YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 277 "pir.l"
+#line 275 "pir.l"
 { return '/'; }
     YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 278 "pir.l"
+#line 276 "pir.l"
 { return '!'; }
     YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 279 "pir.l"
+#line 277 "pir.l"
 { return '~'; }
     YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 280 "pir.l"
+#line 278 "pir.l"
 { return '-'; }
     YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 281 "pir.l"
+#line 279 "pir.l"
 { return '('; }
     YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 282 "pir.l"
+#line 280 "pir.l"
 { return ')'; }
     YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 283 "pir.l"
+#line 281 "pir.l"
 { return ','; }
     YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 284 "pir.l"
+#line 282 "pir.l"
 { return '['; }
     YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 285 "pir.l"
+#line 283 "pir.l"
 { return ']'; }
     YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 287 "pir.l"
+#line 285 "pir.l"
 { /* if the dot is surrounded by whitespace, it's a concatenation operator */
               return TK_CONC;
             }
     YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 291 "pir.l"
+#line 289 "pir.l"
 { /* $P0 .$P1 means concatenation */
               return TK_CONC;
             }
     YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 295 "pir.l"
+#line 293 "pir.l"
 { /* $P0. $P1 means concatenation */
               return TK_CONC;
             }
     YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 299 "pir.l"
+#line 297 "pir.l"
 { /* at this point all dot-whitespace combinations have been covered;
                * so we can be sure that the dot does not have any surrounding
                * whitespace: that's the method-call dot, as in $P0.$P1().
@@ -1640,372 +1638,535 @@ YY_RULE_SETUP
     YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 306 "pir.l"
+#line 304 "pir.l"
 { return '='; }
     YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 307 "pir.l"
+#line 305 "pir.l"
 { return ';'; }
     YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 309 "pir.l"
+#line 307 "pir.l"
 { return TK_ASSIGN_INC; }
     YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 310 "pir.l"
+#line 308 "pir.l"
 { return TK_ASSIGN_DEC; }
     YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 311 "pir.l"
+#line 309 "pir.l"
 { return TK_ASSIGN_DIV; }
     YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 312 "pir.l"
+#line 310 "pir.l"
 { return TK_ASSIGN_MUL; }
     YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 313 "pir.l"
+#line 311 "pir.l"
 { return TK_ASSIGN_MOD; }
     YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 314 "pir.l"
+#line 312 "pir.l"
 { return TK_ASSIGN_POW; }
     YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 315 "pir.l"
+#line 313 "pir.l"
 { return TK_ASSIGN_BOR; }
     YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 316 "pir.l"
+#line 314 "pir.l"
 { return TK_ASSIGN_BAND; }
     YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 317 "pir.l"
+#line 315 "pir.l"
 { return TK_ASSIGN_FDIV; }
     YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 318 "pir.l"
+#line 316 "pir.l"
 { return TK_ASSIGN_BNOT; }
     YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 319 "pir.l"
+#line 317 "pir.l"
 { return TK_ASSIGN_CONC; }
     YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 321 "pir.l"
+#line 319 "pir.l"
 { return TK_IF; }
     YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 322 "pir.l"
+#line 320 "pir.l"
 { return TK_GOTO; }
     YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 323 "pir.l"
+#line 321 "pir.l"
 { return TK_UNLESS; }
     YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 324 "pir.l"
+#line 322 "pir.l"
 { return TK_NULL; }
     YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 326 "pir.l"
-{ return TK_PARROT_SET; }
+#line 324 "pir.l"
+{ lexer_state *lexer = yyget_extra(yyscanner);
+                    symbol *sym        = find_symbol(lexer, yytext);
+                    if (sym) {
+                        yylval->symb = sym;
+                        return TK_SYMBOL;
+                    }
+                    else {
+                        constant *con = find_constant(lexer, yytext);
+                        if (con != NULL) {
+                            switch (con->type) {
+                                case INT_TYPE:
+                                    yylval->ival = con->val.ival;
+                                    return TK_INTC;
+                                case NUM_TYPE:
+                                    yylval->dval = con->val.nval;
+                                    return TK_NUMC;
+                                case STRING_TYPE:
+                                    yylval->sval = con->val.sval;
+                                    return TK_STRINGC;
+                                case PMC_TYPE:
+                                case UNKNOWN_TYPE:
+                                default:
+                                    fprintf(stderr, "invalid constant type!\n");
+                            }
+                        }
+                    }
+                    return TK_PARROT_SET;
+                  }
     YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 327 "pir.l"
-{ return TK_PARROT_ADD; }
+#line 353 "pir.l"
+{
+                    lexer_state *lexer = yyget_extra(yyscanner);
+                    symbol *sym        = find_symbol(lexer, yytext);
+                    if (sym) {
+                        yylval->symb = sym;
+                        return TK_SYMBOL;
+                    }
+                    else {
+                        constant *con = find_constant(lexer, yytext);
+                        if (con != NULL) {
+                            switch (con->type) {
+                                case INT_TYPE:
+                                    yylval->ival = con->val.ival;
+                                    return TK_INTC;
+                                case NUM_TYPE:
+                                    yylval->dval = con->val.nval;
+                                    return TK_NUMC;
+                                case STRING_TYPE:
+                                    yylval->sval = con->val.sval;
+                                    return TK_STRINGC;
+                                case PMC_TYPE:
+                                case UNKNOWN_TYPE:
+                                default:
+                                    fprintf(stderr, "invalid constant type!\n");
+                            }
+                        }
+                    }
+                    return TK_PARROT_ADD;
+                  }
     YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 328 "pir.l"
-{ return TK_PARROT_SUB; }
+#line 383 "pir.l"
+{ lexer_state *lexer = yyget_extra(yyscanner);
+                    symbol *sym        = find_symbol(lexer, yytext);
+                    if (sym) {
+                        yylval->symb = sym;
+                        return TK_SYMBOL;
+                    }
+                    else {
+                        constant *con = find_constant(lexer, yytext);
+                        if (con != NULL) {
+                            switch (con->type) {
+                                case INT_TYPE:
+                                    yylval->ival = con->val.ival;
+                                    return TK_INTC;
+                                case NUM_TYPE:
+                                    yylval->dval = con->val.nval;
+                                    return TK_NUMC;
+                                case STRING_TYPE:
+                                    yylval->sval = con->val.sval;
+                                    return TK_STRINGC;
+                                case PMC_TYPE:
+                                case UNKNOWN_TYPE:
+                                default:
+                                    fprintf(stderr, "invalid constant type!\n");
+                            }
+                        }
+                    }
+                    return TK_PARROT_SUB;
+                  }
     YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 329 "pir.l"
-{ return TK_PARROT_MUL; }
+#line 411 "pir.l"
+{ lexer_state *lexer = yyget_extra(yyscanner);
+                    symbol *sym        = find_symbol(lexer, yytext);
+                    if (sym) {
+                        yylval->symb = sym;
+                        return TK_SYMBOL;
+                    }
+                    else {
+                        constant *con = find_constant(lexer, yytext);
+                        if (con != NULL) {
+                            switch (con->type) {
+                                case INT_TYPE:
+                                    yylval->ival = con->val.ival;
+                                    return TK_INTC;
+                                case NUM_TYPE:
+                                    yylval->dval = con->val.nval;
+                                    return TK_NUMC;
+                                case STRING_TYPE:
+                                    yylval->sval = con->val.sval;
+                                    return TK_STRINGC;
+                                case PMC_TYPE:
+                                case UNKNOWN_TYPE:
+                                default:
+                                    fprintf(stderr, "invalid constant type!\n");
+                            }
+                        }
+                    }
+                    return TK_PARROT_MUL;
+                  }
     YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 330 "pir.l"
-{ return TK_PARROT_DIV; }
+#line 439 "pir.l"
+{ lexer_state *lexer = yyget_extra(yyscanner);
+                    symbol *sym        = find_symbol(lexer, yytext);
+                    if (sym) {
+                        yylval->symb = sym;
+                        return TK_SYMBOL;
+                    }
+                    else {
+                        constant *con = find_constant(lexer, yytext);
+                        if (con != NULL) {
+                            switch (con->type) {
+                                case INT_TYPE:
+                                    yylval->ival = con->val.ival;
+                                    return TK_INTC;
+                                case NUM_TYPE:
+                                    yylval->dval = con->val.nval;
+                                    return TK_NUMC;
+                                case STRING_TYPE:
+                                    yylval->sval = con->val.sval;
+                                    return TK_STRINGC;
+                                case PMC_TYPE:
+                                case UNKNOWN_TYPE:
+                                default:
+                                    fprintf(stderr, "invalid constant type!\n");
+                            }
+                        }
+                    }
+                    return TK_PARROT_DIV;
+                  }
     YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 331 "pir.l"
-{ return TK_PARROT_FDIV; }
+#line 467 "pir.l"
+{ lexer_state *lexer = yyget_extra(yyscanner);
+                    symbol *sym        = find_symbol(lexer, yytext);
+                    if (sym) {
+                        yylval->symb = sym;
+                        return TK_SYMBOL;
+                    }
+                    else {
+                        constant *con = find_constant(lexer, yytext);
+                        if (con != NULL) {
+                            switch (con->type) {
+                                case INT_TYPE:
+                                    yylval->ival = con->val.ival;
+                                    return TK_INTC;
+                                case NUM_TYPE:
+                                    yylval->dval = con->val.nval;
+                                    return TK_NUMC;
+                                case STRING_TYPE:
+                                    yylval->sval = con->val.sval;
+                                    return TK_STRINGC;
+                                case PMC_TYPE:
+                                case UNKNOWN_TYPE:
+                                default:
+                                    fprintf(stderr, "invalid constant type!\n");
+                            }
+                        }
+                    }
+                    return TK_PARROT_FDIV;
+                  }
     YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 333 "pir.l"
+#line 496 "pir.l"
 { return TK_INT; }
     YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 334 "pir.l"
+#line 497 "pir.l"
 { return TK_NUM; }
     YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 335 "pir.l"
+#line 498 "pir.l"
 { return TK_PMC; }
     YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 336 "pir.l"
+#line 499 "pir.l"
 { return TK_STRING; }
     YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 338 "pir.l"
+#line 501 "pir.l"
 { return TK_ARG; }
     YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 339 "pir.l"
+#line 502 "pir.l"
 { return TK_CONST; }
     YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 340 "pir.l"
+#line 503 "pir.l"
 { return TK_END; }
     YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 342 "pir.l"
+#line 505 "pir.l"
 { return TK_GET_RESULTS; }
     YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 343 "pir.l"
+#line 506 "pir.l"
 { return TK_GLOBALCONST; }
     YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 344 "pir.l"
+#line 507 "pir.l"
 { return TK_HLL; }
     YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 345 "pir.l"
+#line 508 "pir.l"
 { return TK_HLL_MAP; }
     YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 346 "pir.l"
+#line 509 "pir.l"
 { return TK_INVOCANT; }
     YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 347 "pir.l"
+#line 510 "pir.l"
 { return TK_LEX; }
     YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 348 "pir.l"
+#line 511 "pir.l"
 { return TK_LOADLIB; }
     YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 349 "pir.l"
+#line 512 "pir.l"
 { return TK_LOCAL; }
     YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 351 "pir.l"
+#line 514 "pir.l"
 { return TK_METH_CALL; }
     YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 352 "pir.l"
+#line 515 "pir.l"
 { return TK_NAMESPACE; }
     YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 353 "pir.l"
+#line 516 "pir.l"
 { return TK_NCI_CALL; }
     YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 354 "pir.l"
+#line 517 "pir.l"
 { return TK_PARAM; }
     YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 355 "pir.l"
+#line 518 "pir.l"
 { return TK_BEGIN_CALL; }
     YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 356 "pir.l"
+#line 519 "pir.l"
 { return TK_BEGIN_RETURN; }
     YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 357 "pir.l"
+#line 520 "pir.l"
 { return TK_BEGIN_YIELD; }
     YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 358 "pir.l"
+#line 521 "pir.l"
 { return TK_CALL; }
     YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 359 "pir.l"
+#line 522 "pir.l"
 { return TK_END_CALL; }
     YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 360 "pir.l"
+#line 523 "pir.l"
 { return TK_END_RETURN; }
     YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 361 "pir.l"
+#line 524 "pir.l"
 { return TK_END_YIELD; }
     YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 362 "pir.l"
+#line 525 "pir.l"
 { return TK_RESULT; }
     YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 363 "pir.l"
+#line 526 "pir.l"
 { return TK_RETURN; }
     YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 364 "pir.l"
+#line 527 "pir.l"
 { return TK_SUB; }
     YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 365 "pir.l"
+#line 528 "pir.l"
 { return TK_YIELD; }
     YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 367 "pir.l"
+#line 530 "pir.l"
 { return TK_FLAG_ANON; }
     YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 368 "pir.l"
+#line 531 "pir.l"
 { return TK_FLAG_INIT; }
     YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 369 "pir.l"
+#line 532 "pir.l"
 { return TK_FLAG_LOAD; }
     YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 370 "pir.l"
+#line 533 "pir.l"
 { return TK_FLAG_POSTCOMP; }
     YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 371 "pir.l"
+#line 534 "pir.l"
 { return TK_FLAG_IMMEDIATE; }
     YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 372 "pir.l"
+#line 535 "pir.l"
 { return TK_FLAG_MAIN; }
     YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 373 "pir.l"
+#line 536 "pir.l"
 { return TK_FLAG_METHOD; }
     YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 374 "pir.l"
+#line 537 "pir.l"
 { return TK_FLAG_LEX; }
     YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 375 "pir.l"
+#line 538 "pir.l"
 { return TK_FLAG_OUTER; }
     YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 376 "pir.l"
+#line 539 "pir.l"
 { return TK_FLAG_VTABLE; }
     YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 377 "pir.l"
+#line 540 "pir.l"
 { return TK_FLAG_MULTI; }
     YY_BREAK
 case 100:
 YY_RULE_SETUP
-#line 378 "pir.l"
+#line 541 "pir.l"
 { return TK_FLAG_LEXID; }
     YY_BREAK
 case 101:
 YY_RULE_SETUP
-#line 379 "pir.l"
+#line 542 "pir.l"
 { return TK_INSTANCEOF; }
     YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 381 "pir.l"
+#line 544 "pir.l"
 { return TK_FLAG_UNIQUE_REG; }
     YY_BREAK
 case 103:
 YY_RULE_SETUP
-#line 382 "pir.l"
+#line 545 "pir.l"
 { return TK_FLAG_OPTIONAL; }
     YY_BREAK
 case 104:
 YY_RULE_SETUP
-#line 383 "pir.l"
+#line 546 "pir.l"
 { return TK_FLAG_OPT_FLAG; }
     YY_BREAK
 case 105:
 YY_RULE_SETUP
-#line 384 "pir.l"
+#line 547 "pir.l"
 { return TK_FLAG_SLURPY; }
     YY_BREAK
 case 106:
 YY_RULE_SETUP
-#line 385 "pir.l"
+#line 548 "pir.l"
 { return TK_FLAG_NAMED; }
     YY_BREAK
 case 107:
 YY_RULE_SETUP
-#line 386 "pir.l"
+#line 549 "pir.l"
 { return TK_FLAG_FLAT; }
     YY_BREAK
 case 108:
 YY_RULE_SETUP
-#line 387 "pir.l"
+#line 550 "pir.l"
 { return TK_FLAG_INVOCANT; }
     YY_BREAK
 case 109:
 YY_RULE_SETUP
-#line 390 "pir.l"
+#line 553 "pir.l"
 { /* copy the string, remove the quotes. */
                yylval->sval = dupstrn(yytext + 1, yyleng - 2);
                return TK_STRINGC;
@@ -2013,27 +2174,27 @@ YY_RULE_SETUP
     YY_BREAK
 case 110:
 YY_RULE_SETUP
-#line 395 "pir.l"
+#line 558 "pir.l"
 { yylval->ival = atoi(yytext + 2); return TK_PREG; }
     YY_BREAK
 case 111:
 YY_RULE_SETUP
-#line 396 "pir.l"
+#line 559 "pir.l"
 { yylval->ival = atoi(yytext + 2); return TK_SREG; }
     YY_BREAK
 case 112:
 YY_RULE_SETUP
-#line 397 "pir.l"
+#line 560 "pir.l"
 { yylval->ival = atoi(yytext + 2); return TK_NREG; }
     YY_BREAK
 case 113:
 YY_RULE_SETUP
-#line 398 "pir.l"
+#line 561 "pir.l"
 { yylval->ival = atoi(yytext + 2); return TK_IREG; }
     YY_BREAK
 case 114:
 YY_RULE_SETUP
-#line 400 "pir.l"
+#line 563 "pir.l"
 { /* make the label Id available in the parser. remove the ":" first. */
                 yylval->sval = dupstrn(yytext, yyleng - 1);
                 return TK_LABEL;
@@ -2041,7 +2202,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 115:
 YY_RULE_SETUP
-#line 405 "pir.l"
+#line 568 "pir.l"
 { /* identifier; can be a global (sub or const), local or parrot op */
                 lexer_state *lexer = yyget_extra(yyscanner);
                 symbol      *sym   = find_symbol(lexer, yytext);
@@ -2092,48 +2253,48 @@ YY_RULE_SETUP
     YY_BREAK
 case 116:
 YY_RULE_SETUP
-#line 454 "pir.l"
+#line 617 "pir.l"
 { yylval->dval = atof(yytext); return TK_NUMC; }
     YY_BREAK
 case 117:
 YY_RULE_SETUP
-#line 455 "pir.l"
+#line 618 "pir.l"
 { yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 118:
 YY_RULE_SETUP
-#line 456 "pir.l"
+#line 619 "pir.l"
 { yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 119:
 YY_RULE_SETUP
-#line 457 "pir.l"
+#line 620 "pir.l"
 { yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 120:
 YY_RULE_SETUP
-#line 458 "pir.l"
+#line 621 "pir.l"
 { yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 121:
 YY_RULE_SETUP
-#line 463 "pir.l"
+#line 626 "pir.l"
 { /* any character not covered in the rules above is an error. */
          yyerror(yyscanner, yyget_extra(yyscanner), "Unexpected character");
        }
     YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 468 "pir.l"
+#line 631 "pir.l"
 { /* end of file, stop scanning. */
               yyterminate();
             }
     YY_BREAK
 case 122:
 YY_RULE_SETUP
-#line 472 "pir.l"
+#line 635 "pir.l"
 ECHO;
     YY_BREAK
-#line 2137 "pirlexer.c"
+#line 2298 "pirlexer.c"
 
     case YY_END_OF_BUFFER:
         {
@@ -3350,7 +3511,9 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 /* %ok-for-header */
 
-#line 472 "pir.l"
+#line 635 "pir.l"
+
+
 
 
 
@@ -3397,6 +3560,8 @@ is_parrot_op(char const * const spelling)
 
     return 0;
 }
+
+
 
 /*
 

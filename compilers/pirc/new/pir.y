@@ -1245,6 +1245,8 @@ local_id          : local_var_name has_unique_reg
 
 local_var_name    : identifier
                         { $$ = $1; }
+                  | math_op
+                        { $$ = opnames[$1]; }
                   | TK_SYMBOL
                         { /* if a symbol was found, that means it was already declared */
                           yyerror(yyscanner, lexer, "local symbol already declared!");
