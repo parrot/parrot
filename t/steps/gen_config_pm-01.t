@@ -5,10 +5,9 @@
 
 use strict;
 use warnings;
-use Test::More qw(no_plan); # tests =>   9;
+use Test::More tests =>   8;
 use Carp;
 use lib qw( lib t/configure/testlib );
-use_ok('config::init::defaults');
 use_ok('config::gen::config_pm');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
