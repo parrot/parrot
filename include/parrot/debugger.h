@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2007, The Perl Foundation
+ * Copyright (C) 2002-2008, The Perl Foundation
  */
 
 /*
@@ -139,7 +139,7 @@ typedef struct PDB_breakpoint *PDB_breakpoint_ptr;
 
 typedef struct PDB_breakpoint {
     opcode_t                *pc;
-    long                    id;
+    unsigned long           id;
     long                    skip;
     PDB_condition_t         *condition;
     PDB_breakpoint_ptr      prev;

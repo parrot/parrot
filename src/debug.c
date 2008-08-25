@@ -540,7 +540,7 @@ static const char * skip_whitespace(ARGIN(const char *cmd)) /* HEADERIZER SKIP *
 static unsigned long get_ulong(ARGMOD(const char **cmd), unsigned long def) /* HEADERIZER SKIP */
 {
     char *cmdnext;
-    unsigned long result = strtoul(* cmd, & cmdnext, 0);
+    unsigned long result = strtoul(skip_whitespace(* cmd), & cmdnext, 0);
     if (cmdnext != * cmd)
         * cmd = cmdnext;
     else
@@ -1575,7 +1575,7 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 {
     PDB_t            * const pdb      = interp->pdb;
     PDB_breakpoint_t *newbreak;
-    PDB_breakpoint_t *sbreak;
+    PDB_breakpoint_t **lbreak;
     PDB_line_t       *line = NULL;
     long              bp_id;
     opcode_t         *breakpos = NULL;
@@ -1662,29 +1662,22 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     newbreak->skip = 0;
 
     /* Add the breakpoint to the end of the list */
-    bp_id = 0;
-    sbreak = pdb->breakpoint;
-
-    if (sbreak) {
-        while (sbreak->next)
-            sbreak = sbreak->next;
-
-        newbreak->prev = sbreak;
-        sbreak->next   = newbreak;
-        bp_id          = sbreak->next->id = sbreak->id + 1;
+    bp_id = 1;
+    lbreak = & pdb->breakpoint;
+    while (*lbreak) {
+        bp_id = (*lbreak)->id + 1;
+        lbreak = & (*lbreak)->next;
     }
-    else {
-        newbreak->prev  = NULL;
-        pdb->breakpoint = newbreak;
-        bp_id           = pdb->breakpoint->id = 0;
-    }
+    newbreak->prev = *lbreak;
+    *lbreak = newbreak;
+    newbreak->id = bp_id;
 
     /* Show breakpoint position */
 
-    PIO_eprintf(interp, "Breakpoint %li at", bp_id);
+    PIO_eprintf(interp, "Breakpoint %li at", newbreak->id);
     if (line)
         PIO_eprintf(interp, " line %li", line->number);
-    PIO_eprintf(interp, " pos %li\n", breakpos - interp->code->base.data);
+    PIO_eprintf(interp, " pos %li\n", newbreak->pc - interp->code->base.data);
 }
 
 /*
@@ -1780,9 +1773,9 @@ PARROT_WARN_UNUSED_RESULT
 PDB_breakpoint_t *
 PDB_find_breakpoint(PARROT_INTERP, ARGIN(const char *command))
 {
-    command = nextarg(command);
-    if (isdigit((unsigned char) *command)) {
-        const long n = atol(command);
+    const char *oldcmd = command;
+    const unsigned long n = get_ulong(&command, 0);
+    if (command != oldcmd) {
         PDB_breakpoint_t *breakpoint = interp->pdb->breakpoint;
 
         while (breakpoint && breakpoint->id != n)
@@ -2924,7 +2917,7 @@ void
 PDB_list(PARROT_INTERP, ARGIN(const char *command))
 {
     char          *c;
-    long           line_number;
+    unsigned long  line_number;
     unsigned long  i;
     PDB_line_t    *line;
     PDB_t         *pdb = interp->pdb;
@@ -2935,27 +2928,12 @@ PDB_list(PARROT_INTERP, ARGIN(const char *command))
         return;
     }
 
-    /*command = nextarg(command);*/
-
     /* set the list line if provided */
-    if (isdigit((unsigned char) *command)) {
-        line_number = atol(command) - 1;
-        if (line_number < 0)
-            pdb->file->list_line = 0;
-        else
-            pdb->file->list_line = (unsigned long) line_number;
-
-        skip_command(command);
-    }
-    else {
-        pdb->file->list_line = 0;
-    }
+    line_number = get_ulong(&command, 0);
+    pdb->file->list_line = (unsigned long) line_number;
 
     /* set the number of lines to print */
-    if (isdigit((unsigned char) *command)) {
-        n = atol(command);
-        skip_command(command);
-    }
+    n = get_ulong(&command, 10);
 
     /* if n is zero, we simply return, as we don't have to print anything */
     if (n == 0)
