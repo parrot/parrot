@@ -524,6 +524,9 @@ static const DebuggerCmd * get_command(long cmdhash) /* HEADERIZER SKIP */
         case debug_cmd_trace:
         case debug_cmd_t:
             return & cmd_trace;
+        case debug_cmd_watch:
+        case debug_cmd_w:
+            return & cmd_watch;
         default:
             return NULL;
     }
