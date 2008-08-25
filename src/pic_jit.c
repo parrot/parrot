@@ -155,7 +155,9 @@ pic_test_func(PARROT_INTERP, SHIM(INTVAL *sig_bits), ARGOUT(void **args))
 
 =item C<static int jit_can_compile_sub>
 
-RT#48260: Not yet documented!!!
+Determines whether the given subroutine C<sub> can be JIT'd. Counts the
+number of registers used by the sub, and returns C<0> if more registers
+are used then JIT supports. Returns 1 if it does not use too many registers.
 
 =cut
 
@@ -196,7 +198,8 @@ jit_can_compile_sub(PARROT_INTERP, ARGIN(const PMC *sub))
 
 =item C<static int args_match_params>
 
-RT#48260: Not yet documented!!!
+Returns C<1> if the passed arguments match the subroutine's parameter list.
+Returns C<0> otherwise.
 
 =cut
 
@@ -244,7 +247,8 @@ args_match_params(ARGIN(const PMC *sig_args), ARGIN(const PackFile_ByteCode *seg
 
 =item C<static int returns_match_results>
 
-RT#48260: Not yet documented!!!
+Returns 1 if the return values match the returned results. Returns C<0>
+otherwise.
 
 =cut
 
