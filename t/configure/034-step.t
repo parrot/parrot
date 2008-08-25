@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 14;
 use Carp;
 use Cwd;
 use File::Temp 0.13 qw/ tempdir /;
@@ -208,6 +208,24 @@ END_DUMMY
             expand_gmake_syntax => 1,
         ),
         "genfile() did transformation of 'make' 'wildcard' as expected"
+    );
+    unlink $dummy or croak "Unable to delete file after testing";
+    chdir $cwd    or croak "Unable to change back to starting directory";
+}
+
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    chdir $tdir or croak "Unable to change to temporary directory";
+    my $dummy = 'dummy';
+    open my $IN, '>', $dummy or croak "Unable to open temp file for writing";
+    print $IN qq{Hello world\n};
+    close $IN or croak "Unable to close temp file";
+    my $file_type = q{foobar};
+    eval { $conf->genfile(  $dummy => 'CFLAGS', file_type => $file_type ); };
+    like(
+        $@,
+        qr/^Unknown file_type '$file_type'/,
+        "genfile() failed due to unrecognized file type with expected message"
     );
     unlink $dummy or croak "Unable to delete file after testing";
     chdir $cwd    or croak "Unable to change back to starting directory";
