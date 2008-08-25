@@ -148,7 +148,8 @@ PARROT_API char   nci_dlvar_cstring[] = "This is a C-string.\n";
 =item C<PARROT_API char
 nci_c(void)>
 
-RT#48260: Not yet documented!!!
+Returns the value of the variable C<nci_dlvar_char>, which is set to 22 by
+default.
 
 =cut
 
@@ -164,7 +165,7 @@ nci_c(void) {
 =item C<PARROT_API char
 nci_csc(short l1, char l2)>
 
-RT#48260: Not yet documented!!!
+Multiplies C<l1> and C<l2> together and returns the first byte of the result.
 
 =cut
 
@@ -181,7 +182,8 @@ nci_csc(short l1, char l2)
 =item C<PARROT_API double
 nci_d(void)>
 
-RT#48260: Not yet documented!!!
+Multiplies the current value of C<nci_dlvar_double> by 10.0, and returns
+the new value.
 
 =cut
 
@@ -200,7 +202,7 @@ nci_d(void)
 =item C<PARROT_API double
 nci_dd(double d)>
 
-RT#48260: Not yet documented!!!
+Returns the value C<d> multiplied by 2.0.
 
 =cut
 
@@ -217,7 +219,8 @@ nci_dd(double d)
 =item C<PARROT_API float
 nci_f(void)>
 
-RT#48260: Not yet documented!!!
+Multiplies the value C<nci_dlvar_float> by 10.0 and returns the new
+value.
 
 =cut
 
@@ -236,7 +239,7 @@ nci_f(void)
 =item C<PARROT_API float
 nci_fff(float l1, float l2)>
 
-RT#48260: Not yet documented!!!
+Returns the result of C<l1> / C<l2>.
 
 =cut
 
@@ -253,7 +256,7 @@ nci_fff(float l1, float l2)
 =item C<PARROT_API int
 nci_i(void)>
 
-RT#48260: Not yet documented!!!
+Returns the current value of <nci_dlvar_int>.
 
 =cut
 
@@ -270,7 +273,7 @@ nci_i(void)
 =item C<PARROT_API int
 nci_isc(short l1, char l2)>
 
-RT#48260: Not yet documented!!!
+Returns the int product of C<l1 * l2>.
 
 =cut
 
@@ -287,7 +290,7 @@ nci_isc(short l1, char l2)
 =item C<PARROT_API int
 nci_ip(void *p)>
 
-RT#48260: Not yet documented!!!
+Performs a series of operations on values stored at pointer C<p>.
 
 =cut
 
@@ -334,7 +337,7 @@ nci_it(void *p)
 =item C<PARROT_API long
 nci_l(void)>
 
-RT#48260: Not yet documented!!!
+Returns the value of C<nci_dlvar_long>.
 
 =cut
 
@@ -351,7 +354,7 @@ nci_l(void)
 =item C<PARROT_API int *
 nci_p(void)>
 
-RT#48260: Not yet documented!!!
+Returns the address of C<nci_dlvar_int>.
 
 =cut
 
@@ -368,7 +371,7 @@ nci_p(void)
 =item C<PARROT_API char *
 nci_t(void)>
 
-RT#48260: Not yet documented!!!
+Returns the value of C<nci_dlvar_cstring>.
 
 =cut
 
@@ -385,7 +388,8 @@ nci_t(void)
 =item C<PARROT_API char *
 nci_tb(void *p)>
 
-RT#48260: Not yet documented!!!
+Prints "xx worked", where "xx" is replaced with the first two character values
+of C<p>, in reverse order.
 
 =cut
 
@@ -407,7 +411,8 @@ nci_tb(void *p)
 =item C<PARROT_API char *
 nci_tt(void *p)>
 
-RT#48260: Not yet documented!!!
+Prints "xx worked", where "xx" is replaced with the first two character values
+of C<p>, in reverse order.
 
 =cut
 
@@ -429,7 +434,8 @@ nci_tt(void *p)
 =item C<PARROT_API char *
 nci_tB(void **p)>
 
-RT#48260: Not yet documented!!!
+Prints "xx done", where "xx" is replaced with the first two character values
+of C<p>, in reverse order.
 
 =cut
 
@@ -451,7 +457,7 @@ nci_tB(void **p)
 =item C<PARROT_API void *
 nci_pp(void *p)>
 
-RT#48260: Not yet documented!!!
+Returns the value C<p> directly.
 
 =cut
 
@@ -468,7 +474,7 @@ nci_pp(void *p)
 =item C<PARROT_API int
 nci_iiii(int i1, int i2, int i3)>
 
-RT#48260: Not yet documented!!!
+Prints three integers separated by whitespace to C<stderr>.
 
 =cut
 
@@ -488,7 +494,7 @@ nci_iiii(int i1, int i2, int i3)
 =item C<PARROT_API int
 nci_i4i(long * l, int i)>
 
-RT#48260: Not yet documented!!!
+Returns the product of C<*l> and C<i>, as an int.
 
 =cut
 
@@ -506,7 +512,8 @@ nci_i4i(long * l, int i)
 =item C<PARROT_API int
 nci_ii3(int a, int *bp)>
 
-RT#48260: Not yet documented!!!
+Multiplies C<a> and C<*bp> together and returns the result. Updates C<*bp>
+to the value  4711.
 
 =cut
 
@@ -526,7 +533,7 @@ nci_ii3(int a, int *bp)
 =item C<PARROT_API int
 call_back(const char *str)>
 
-RT#48260: Not yet documented!!!
+writes the string C<str> to stdout and returns the value 4711.
 
 =cut
 
@@ -546,7 +553,7 @@ call_back(const char *str)
 =item C<PARROT_API void *
 nci_pi(int test)>
 
-RT#48260: Not yet documented!!!
+Performs one from a series of tests, depending on the value given for C<test>.
 
 =cut
 
@@ -693,7 +700,7 @@ nci_pi(int test)
 =item C<PARROT_API short
 nci_s(void)>
 
-RT#48260: Not yet documented!!!
+Returns the value of C<nci_dlvar_short>.
 
 =cut
 
@@ -710,7 +717,7 @@ nci_s(void)
 =item C<PARROT_API short
 nci_ssc(short l1, char l2)>
 
-RT#48260: Not yet documented!!!
+Returns the product of C<l1 * l2>.
 
 =cut
 
@@ -727,7 +734,7 @@ nci_ssc(short l1, char l2)
 =item C<PARROT_API void
 nci_vP(void *pmc)>
 
-RT#48260: Not yet documented!!!
+Prints "ok" if C<PMC> is not null, prints "got null" otherwise.
 
 =cut
 
@@ -760,7 +767,8 @@ nci_vP(void *pmc)
 =item C<PARROT_API void
 nci_cb_C1(cb_C1_func cb, void* user_data)>
 
-RT#48260: Not yet documented!!!
+Calls C<cb> function with the string "result" and the given C<user_data>.
+No return value.
 
 =cut
 
@@ -781,7 +789,7 @@ nci_cb_C1(cb_C1_func cb, void* user_data)
 =item C<PARROT_API void
 nci_cb_C2(cb_C2_func cb, void* user_data)>
 
-RT#48260: Not yet documented!!!
+Calls the function C<cb> with the pointer C<user_data>. No return value.
 
 =cut
 
@@ -801,7 +809,7 @@ nci_cb_C2(cb_C2_func cb, void* user_data)
 =item C<PARROT_API void
 nci_cb_C3(cb_C3_func cb, void* user_data)>
 
-RT#48260: Not yet documented!!!
+Calls function C<cb> with data C<user_data>. No return value.
 
 =cut
 
@@ -823,7 +831,7 @@ nci_cb_C3(cb_C3_func cb, void* user_data)
 =item C<PARROT_API void
 nci_cb_D1(cb_D1_func cb, void* user_data)>
 
-RT#48260: Not yet documented!!!
+Calls function C<cb> with data C<user_data>. No return value.
 
 =cut
 
@@ -844,7 +852,7 @@ nci_cb_D1(cb_D1_func cb, void* user_data)
 =item C<PARROT_API void
 nci_cb_D2(cb_D2_func cb, void* user_data)>
 
-RT#48260: Not yet documented!!!
+Calls function C<cb> with data C<user_data>.
 
 =cut
 
@@ -864,7 +872,7 @@ nci_cb_D2(cb_D2_func cb, void* user_data)
 =item C<PARROT_API void
 nci_cb_D3(cb_D3_func cb, void* user_data)>
 
-RT#48260: Not yet documented!!!
+Calls function C<cb> with data C<user_data>.
 
 =cut
 
@@ -886,7 +894,7 @@ nci_cb_D3(cb_D3_func cb, void* user_data)
 =item C<PARROT_API void
 nci_cb_D4(cb_D4_func times_ten, void* user_data)>
 
-RT#48260: Not yet documented!!!
+Calls function C<times_ten> with data C<user_data> 10 times in a loop.
 
 =cut
 
@@ -910,7 +918,7 @@ nci_cb_D4(cb_D4_func times_ten, void* user_data)
 =item C<PARROT_API void
 nci_pip(int count, Rect_Like *rects)>
 
-RT#48260: Not yet documented!!!
+Prints a count integer and the coordinates of 4 rectangles.
 
 =cut
 
@@ -931,7 +939,7 @@ nci_pip(int count, Rect_Like *rects)
 =item C<PARROT_API int
 nci_i33(int *double_me, int *triple_me)>
 
-RT#48260: Not yet documented!!!
+Returns the result C<*double_me * 2 + *triple_me * 3>.
 
 =cut
 
@@ -951,7 +959,8 @@ nci_i33(int *double_me, int *triple_me)
 =item C<PARROT_API void
 nci_vpii(Outer *my_data, int my_x, int my_y)>
 
-RT#48260: Not yet documented!!!
+Updates data in structure pointer C<my_data> with the given data C<my_x> and
+C<my_y>.
 
 =cut
 
@@ -969,7 +978,8 @@ nci_vpii(Outer *my_data, int my_x, int my_y)
 =item C<PARROT_API void *
 nci_piiii(int alpha, int beta, int gamma, int delta)>
 
-RT#48260: Not yet documented!!!
+Stores 4 integer values into an array structure, and returns the address
+of that structure.
 
 =cut
 
@@ -1002,7 +1012,8 @@ nci_piiii(int alpha, int beta, int gamma, int delta)
 =item C<PARROT_API void *
 nci_pii(int fac1, int fac2)>
 
-RT#48260: Not yet documented!!!
+Returns the address of global variable C<nci_dlvar_int> whose value is set
+to the product of C<fac1 * fac2>.
 
 =cut
 
@@ -1021,7 +1032,7 @@ nci_pii(int fac1, int fac2)
 =item C<PARROT_API void
 nci_v(void)>
 
-RT#48260: Not yet documented!!!
+Multiplies the global variable C<nci_dlvar_int> times 10.
 
 =cut
 
@@ -1038,7 +1049,7 @@ nci_v(void)
 =item C<PARROT_API void
 nci_vv(void)>
 
-RT#48260: Not yet documented!!!
+Multiplies the global variable C<nci_dlvar_int> by 3.
 
 =cut
 
@@ -1101,7 +1112,7 @@ float f2 = 4.0;
 =item C<int
 main(void)>
 
-RT#48260: Not yet documented!!!
+Calls test functions C<nci_ssc> and C<nci_fff> and prints their results.
 
 =cut
 
