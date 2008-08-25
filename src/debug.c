@@ -1355,6 +1355,26 @@ PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     TRACEDEB_MSG("PDB_trace finished");
 }
 
+unsigned short condition_regtype(ARGIN(const char *cmd)) /* HEADERIZER SKIP */
+{
+    switch (*cmd) {
+        case 'i':
+        case 'I':
+            return PDB_cond_int;
+        case 'n':
+        case 'N':
+            return PDB_cond_num;
+        case 's':
+        case 'S':
+            return PDB_cond_str;
+        case 'p':
+        case 'P':
+            return PDB_cond_pmc;
+        default:
+            return 0;
+    }
+}
+
 /*
 
 =item C<PDB_condition_t * PDB_cond>
@@ -1384,31 +1404,12 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
     fprintf(stderr, "PDB_trace: '%s'\n", command);
 #endif
 
+    unsigned short cond_argleft = condition_regtype(command);
+
     /* Allocate new condition */
     condition = mem_allocate_typed(PDB_condition_t);
 
-    switch (*command) {
-        case 'i':
-        case 'I':
-            condition->type = PDB_cond_int;
-            break;
-        case 'n':
-        case 'N':
-            condition->type = PDB_cond_num;
-            break;
-        case 's':
-        case 'S':
-            condition->type = PDB_cond_str;
-            break;
-        case 'p':
-        case 'P':
-            condition->type = PDB_cond_pmc;
-            break;
-        default:
-            PIO_eprintf(interp->pdb->debugger, "First argument must be a register\n");
-            mem_sys_free(condition);
-            return NULL;
-    }
+    condition->type = cond_argleft;
 
     /* get the register number */
     auxcmd = ++command;
@@ -1469,31 +1470,13 @@ INV_COND:   PIO_eprintf(interp->pdb->debugger, "Invalid condition\n");
 
     if (isalpha((unsigned char)*command)) {
         /* It's a register - we first check that it's the correct type */
-        switch (*command) {
-            case 'i':
-            case 'I':
-                if (!(condition->type & PDB_cond_int))
-                    goto WRONG_REG;
-                break;
-            case 'n':
-            case 'N':
-                if (!(condition->type & PDB_cond_num))
-                    goto WRONG_REG;
-                break;
-            case 's':
-            case 'S':
-                if (!(condition->type & PDB_cond_str))
-                    goto WRONG_REG;
-                break;
-            case 'p':
-            case 'P':
-                if (!(condition->type & PDB_cond_pmc))
-                    goto WRONG_REG;
-                break;
-            default:
-WRONG_REG:      PIO_eprintf(interp->pdb->debugger, "Register types don't agree\n");
-                mem_sys_free(condition);
-                return NULL;
+
+        unsigned short cond_argright = condition_regtype(command);
+
+        if (cond_argright != cond_argleft) {
+            PIO_eprintf(interp->pdb->debugger, "Register types don't agree\n");
+            mem_sys_free(condition);
+            return NULL;
         }
 
         /* Now we check and store the register number */
