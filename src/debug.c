@@ -1365,6 +1365,10 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
         return NULL;
     }
 
+#if TRACE_DEBUGGER
+    fprintf(stderr, "PDB_trace: '%s'\n", command);
+#endif
+
     /* Allocate new condition */
     condition = mem_allocate_typed(PDB_condition_t);
 
@@ -1404,26 +1408,21 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
     if (condition->reg > 9)
         command++;
 
-    if (*command == ' ')
-        skip_command(command);
+    command = skip_whitespace(command);
 
     /* Now the condition */
     switch (*command) {
         case '>':
             if (*(command + 1) == '=')
                 condition->type |= PDB_cond_ge;
-            else if (*(command + 1) == ' ')
-                condition->type |= PDB_cond_gt;
             else
-                goto INV_COND;
+                condition->type |= PDB_cond_gt;
             break;
         case '<':
             if (*(command + 1) == '=')
                 condition->type |= PDB_cond_le;
-            else if (*(command + 1) == ' ')
-                condition->type |= PDB_cond_lt;
             else
-                goto INV_COND;
+                condition->type |= PDB_cond_lt;
             break;
         case '=':
             if (*(command + 1) == '=')
@@ -1449,8 +1448,7 @@ INV_COND:   PIO_eprintf(interp, "Invalid condition\n");
     else
         command++;
 
-    if (*command == ' ')
-        skip_command(command);
+    command = skip_whitespace(command);
 
     /* return if no more arguments */
     if (!(command && *command)) {
@@ -1516,8 +1514,11 @@ WRONG_REG:      PIO_eprintf(interp, "Register types don't agree\n");
         for (i = 1; ((command[i] != '"') && (i < DEBUG_CMD_BUFFER_LENGTH)); i++)
             str[i - 1] = command[i];
         str[i - 1] = '\0';
+#if TRACE_DEBUGGER
+        fprintf(stderr, "PDB_break: '%s'\n", str);
+#endif
         condition->value = string_make(interp,
-            str, i - 1, NULL, PObj_external_FLAG);
+            str, i - 1, NULL, 0);
         condition->type |= PDB_cond_const;
     }
     else if (condition->type & PDB_cond_pmc) {
@@ -1638,7 +1639,7 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     newbreak = mem_allocate_zeroed_typed(PDB_breakpoint_t);
 
     if (command) {
-        command = skip_command(command);
+        /*command = skip_command(command);*/
     }
     else {
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -1648,7 +1649,10 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     /* if there is another argument to break, besides the line number,
      * it should be an 'if', so we call another handler. */
     if (command && *command) {
-        skip_command(command);
+        command = skip_whitespace(command);
+        while (! isspace((unsigned char)*command))
+            ++command;
+        command = skip_whitespace(command);
         newbreak->condition = PDB_cond(interp, command);
     }
 
@@ -1976,6 +1980,8 @@ PARROT_WARN_UNUSED_RESULT
 char
 PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
 {
+    TRACEDEB_MSG("PDB_check_condition");
+
     if (condition->type & PDB_cond_int) {
         INTVAL   i,  j;
         /*
