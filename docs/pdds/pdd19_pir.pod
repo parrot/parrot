@@ -1270,10 +1270,6 @@ N/A
 
 N/A
 
-=head1 REFERENCES
-
-See C<docs/imcc/macros.pod>
-
 =cut
 
 __END__
