@@ -537,6 +537,17 @@ static const char * skip_whitespace(ARGIN(const char *cmd)) /* HEADERIZER SKIP *
     return cmd;
 }
 
+static unsigned long get_uint(ARGMOD(const char **cmd), unsigned int def) /* HEADERIZER SKIP */
+{
+    char *cmdnext;
+    unsigned int result = strtoul(skip_whitespace(* cmd), & cmdnext, 0);
+    if (cmdnext != * cmd)
+        * cmd = cmdnext;
+    else
+        result = def;
+    return result;
+}
+
 static unsigned long get_ulong(ARGMOD(const char **cmd), unsigned long def) /* HEADERIZER SKIP */
 {
     char *cmdnext;
@@ -1181,24 +1192,22 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
 {
     unsigned long c;
     PDB_t        * const pdb = interp->pdb;
-    const char   * const original_command = command;
     const DebuggerCmd *cmd;
+
+    /* keep a pointer to the command, in case we need to report an error */
+    /* get a number from what the user typed */
+    const char * cmdline = parse_command(command, &c);
 
     TRACEDEB_MSG("PDB_run_command");
 
-    /* keep a pointer to the command, in case we need to report an error */
-
-    /* get a number from what the user typed */
-    command = parse_command(original_command, &c);
-
-    if (command)
-        command = skip_command(command);
+    if (cmdline)
+        cmdline = skip_command(cmdline);
     else
         return 0;
 
     cmd= get_command(c);
     if (cmd) {
-        (* cmd->func)(pdb, command);
+        (* cmd->func)(pdb, cmdline);
         return 0;
     }
     else {
@@ -1211,7 +1220,7 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
         }
         else {
             PIO_eprintf(interp,
-                        "Undefined command: \"%s\".  Try \"help\".", original_command);
+                        "Undefined command: \"%s\".  Try \"help\".", command);
 #if TRACE_DEBUGGER
             fprintf(stderr, " (parse_command result: %li)", c);
 #endif
@@ -1357,6 +1366,7 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
 {
     PDB_condition_t *condition;
     int              i, reg_number;
+    const char * auxcmd;
     char             str[DEBUG_CMD_BUFFER_LENGTH + 1];
 
     /* Return if no more arguments */
@@ -1396,21 +1406,16 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
     }
 
     /* get the register number */
-    condition->reg = (unsigned char)atoi(++command);
-
-    /* the next argument might have no spaces between the register and the
-     * condition. */
-    command++;
-
-    /* RT #46121 Does /this/ have to do with the fact that PASM registers used to have
-     * maximum of 2 digits? If so, there should be a while loop, I think.
-     */
-    if (condition->reg > 9)
-        command++;
-
-    command = skip_whitespace(command);
+    auxcmd = ++command;
+    condition->reg = (unsigned char)get_uint(&command, 0);
+    if (auxcmd == command) {
+        PIO_eprintf(interp, "Invalid register\n");
+            mem_sys_free(condition);
+            return NULL;
+    }
 
     /* Now the condition */
+    command = skip_whitespace(command);
     switch (*command) {
         case '>':
             if (*(command + 1) == '=')
@@ -1487,7 +1492,13 @@ WRONG_REG:      PIO_eprintf(interp, "Register types don't agree\n");
         }
 
         /* Now we check and store the register number */
-        reg_number = (int)atoi(++command);
+        auxcmd = ++command;
+        reg_number = (int)get_uint(&command, 0);
+        if (auxcmd == command) {
+            PIO_eprintf(interp, "Invalid register\n");
+                mem_sys_free(condition);
+                return NULL;
+        }
 
         if (reg_number < 0) {
             PIO_eprintf(interp, "Out-of-bounds register\n");
@@ -3135,8 +3146,8 @@ PDB_help(PARROT_INTERP, ARGIN(const char *command))
     const DebuggerCmd *cmd;
 
     /* Extract the command after leading whitespace (for error messages). */
-    command = skip_whitespace(command);
-    parse_command(command, &c);
+    const char * cmdline = skip_whitespace(command);
+    parse_command(cmdline, &c);
 
     cmd = get_command(c);
     if (cmd) {
@@ -3172,7 +3183,7 @@ List of commands:\n\
 Type \"help\" followed by a command name for full documentation.\n\n");
         }
         else {
-            PIO_eprintf(interp, "Unknown command\n");
+            PIO_eprintf(interp, "Unknown command: %s\n", command);
         }
     }
 }
