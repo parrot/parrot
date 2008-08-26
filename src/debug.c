@@ -1081,8 +1081,11 @@ PDB_get_command(PARROT_INTERP)
                 close_script_file(interp);
                 return;
             }
-
+            ++pdb->script_line;
             chop_newline(buf);
+#if TRACE_DEBUGGER
+            fprintf(stderr, "script (%lu): '%s'\n", pdb->script_line, buf);
+#endif
 
             /* skip spaces */
             ptr = skip_whitespace(buf);
@@ -1091,26 +1094,12 @@ PDB_get_command(PARROT_INTERP)
        } while (*ptr == '\0' || *ptr == '#');
 
         if (pdb->state & PDB_ECHO)
-            Parrot_eprintf(pdb->debugger, "[%s]\n", buf);
-
-        /* RT #46117: handle command error and print out script line
-         *       PDB_run_command should return non-void value?
-         *       stop execution of script if fails
-         * RT #46115: avoid this verbose output? add -v flag? */
+            Parrot_eprintf(pdb->debugger, "[%lu %s]\n", pdb->script_line, buf);
 
 #if TRACE_DEBUGGER
         fprintf(stderr, "(script) %s\n", buf);
 #endif
 
-        #if 0
-        if (PDB_run_command(interp, buf)) {
-            IMCC_warning(interp, "script_file: "
-                "Error interpreting command (%s).\n",
-                buf);
-            close_script_file(interp);
-            return;
-        }
-        #endif
         strcpy(pdb->cur_command, buf);
     }
     else {
@@ -1174,6 +1163,7 @@ PDB_script_file(PARROT_INTERP, ARGIN(const char *command))
         return;
     }
     interp->pdb->script_file = fd;
+    interp->pdb->script_line = 0;
     TRACEDEB_MSG("PDB_script_file finished");
 }
 
@@ -1218,10 +1208,14 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
         }
         else {
             PIO_eprintf(pdb->debugger,
-                        "Undefined command: \"%s\".  Try \"help\".", command);
+                        "Undefined command: \"%s\"", command);
+            if (pdb->script_file)
+                PIO_eprintf(pdb->debugger, " in line %lu", pdb->script_line);
+            PIO_eprintf(pdb->debugger, ".  Try \"help\".");
 #if TRACE_DEBUGGER
             fprintf(stderr, " (parse_command result: %li)", c);
 #endif
+            close_script_file(interp);
             return 1;
         }
     }

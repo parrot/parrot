@@ -175,6 +175,7 @@ typedef struct PDB {
     Interp                  *debugger;
     unsigned long           tracing;
     FILE                    *script_file;
+    unsigned long           script_line;
 } PDB_t;
 
 
