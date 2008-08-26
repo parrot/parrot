@@ -24,6 +24,29 @@ data structure can be printed, which results in a PASM representation
 of the parsed PIR code. Through the symbol management, which is done
 in F<pirsymbol.c>, a vanilla register allocator is implemented.
 
+
+=head1 OPTIMIZATION
+
+Although at this point not as important as bytecode generation,
+PIRC might need an optimizing register allocator. For this to work,
+the following is needed:
+
+=over 4
+
+=item * an easy way to decide whether an instruction can jump; in that
+case this instruction marks the end of a C<basic block>. Such
+instructions are: C<invokecc>, C<branch>, C<get_results> etc.
+Labeled instructions must also be marked as such, as they can be jumped
+to, and indicate the start of a C<basic block>. Can this flow
+information be retrieved through a Parrot function?
+
+=item * once we know what the basic blocks are, a linear scan register
+allocation implementation can be implemented. This is more efficient than
+a graph coloring algorithm. (See C<Linear Scan Register Allocation> by
+Poletto and Sarkar).
+
+=back
+
 =cut
 
 */
@@ -484,6 +507,11 @@ add_param(struct lexer_state * const lexer, pir_type type, char * const name) {
     lexer->curtarget = t;
 
     declare_local(lexer, type, s);
+    /* parameters must always get a PASM register, even if they're not
+     * "used"; in the generated PASM instructions, they're always used
+     * (to store the incoming values). Therefore, allocate a new register
+     * at this point, not in symbol.c::find_symbol().
+     */
     t->color = next_register(lexer, type);
 
     return t;
@@ -722,7 +750,10 @@ set_instrf(struct lexer_state * const lexer,
 {
     va_list arg_ptr;
     int i;
-    size_t format_length = strlen(format);
+    size_t format_length;
+
+    assert(format);
+    format_length = strlen(format);
 
     lexer->subs->statements->instr.ins = new_instruction(opname);
     lexer->subs->statements->type      = STAT_TYPE_INSTRUCTION;
@@ -1789,6 +1820,13 @@ print_invocation(lexer_state * const lexer, invocation *inv) {
 
 
             if ((inv->sub->color == -1) && (target_name(inv->sub) != NULL)) {
+                /* XXX! this is a problem: a new register is allocated HERE,
+                but therefore it is counted too late for the sub's register usage
+                statistics (which is printed /before/ the sub is printed. If
+                the "print" functions are replaced by "emit" functions (to emit
+                bytecode), this register allocation should be done /before/ the
+                emit phase starts.
+                */
                 int reg            = next_register(lexer, PMC_TYPE);
                 global_ident *glob = find_global_ident(lexer, target_name(inv->sub));
 
