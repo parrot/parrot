@@ -870,12 +870,12 @@ Parrot_debugger_init(PARROT_INTERP)
     TRACEDEB_MSG("Parrot_debugger_init");
 
     if (! interp->pdb) {
-        PDB_t *pdb = mem_allocate_zeroed_typed(PDB_t);
-        Parrot_Interp debugger = Parrot_new(interp);
-        interp->pdb     = pdb;
-        debugger->pdb   = pdb;
-        pdb->debugee    = interp;
-        pdb->debugger   = debugger;
+        PDB_t          *pdb      = mem_allocate_zeroed_typed(PDB_t);
+        Parrot_Interp   debugger = Parrot_new(interp);
+        interp->pdb              = pdb;
+        debugger->pdb            = pdb;
+        pdb->debugee             = interp;
+        pdb->debugger            = debugger;
 
         /* Allocate space for command line buffers, NUL terminated c strings */
         pdb->cur_command = (char *)mem_sys_allocate(DEBUG_CMD_BUFFER_LENGTH + 1);
@@ -1390,9 +1390,10 @@ PDB_condition_t *
 PDB_cond(PARROT_INTERP, ARGIN(const char *command))
 {
     PDB_condition_t *condition;
-    int              i, reg_number;
-    const char * auxcmd;
+    const char      *auxcmd;
     char             str[DEBUG_CMD_BUFFER_LENGTH + 1];
+    unsigned short   cond_argleft;
+    int              i, reg_number;
 
     /* Return if no more arguments */
     if (!(command && *command)) {
@@ -1404,7 +1405,7 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
     fprintf(stderr, "PDB_trace: '%s'\n", command);
 #endif
 
-    unsigned short cond_argleft = condition_regtype(command);
+    cond_argleft = condition_regtype(command);
 
     /* Allocate new condition */
     condition = mem_allocate_typed(PDB_condition_t);
@@ -2591,25 +2592,19 @@ PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
 
     TRACEDEB_MSG("PDB_disassemble");
 
-    pfile = mem_allocate_typed(PDB_file_t);
-    pline = mem_allocate_typed(PDB_line_t);
+    pfile = mem_allocate_zeroed_typed(PDB_file_t);
+    pline = mem_allocate_zeroed_typed(PDB_line_t);
 
     /* If we already got a source, free it */
     if (pdb->file)
         PDB_free_file(interp);
 
-    pline->number        = 1;
-    pline->label         = NULL;
-    pfile->line          = pline;
-    pfile->label         = NULL;
-    pfile->size          = 0;
-    pfile->source        = (char *)mem_sys_allocate(default_size);
-    pfile->sourcefilename = NULL;
-    pfile->next = NULL;
-    pline->source_offset = 0;
+    pfile->line   = pline;
+    pline->number = 1;
+    pfile->source = (char *)mem_sys_allocate(default_size);
 
-    alloced              = space = default_size;
-    code_end             = pc + interp->code->base.size;
+    alloced       = space = default_size;
+    code_end      = pc + interp->code->base.size;
 
     while (pc != code_end) {
         /* Grow it early */
@@ -2730,14 +2725,14 @@ PDB_free_file(PARROT_INTERP)
 
     while (file) {
         /* Free all of the allocated line structures */
-        PDB_line_t *line = file->line;
+        PDB_line_t  *line = file->line;
         PDB_label_t *label;
         PDB_file_t  *nfile;
 
         while (line) {
             PDB_line_t * const nline = line->next;
             mem_sys_free(line);
-            line  = nline;
+            line = nline;
         }
 
         /* Free all of the allocated label structures */
@@ -2838,15 +2833,19 @@ PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
         if (c == '\n') {
             /* If the line has an opcode move to the next one,
                otherwise leave it with NULL to skip it. */
-            PDB_line_t *newline;
+            PDB_line_t *newline = mem_allocate_zeroed_typed(PDB_line_t);
+
             if (PDB_hasinstruction(pfile->source + pline->source_offset)) {
-                size_t n;
+                size_t n      = interp->op_info_table[*pc].op_count;
                 pline->opcode = pc;
-                n             = interp->op_info_table[*pc].op_count;
                 ADD_OP_VAR_PART(interp, interp->code, pc, n);
-                pc += n;
+                pc           += n;
+
+                /* don't walk off the end of the program into neverland */
+                if (pc >= interp->code->base.data + interp->code->base.size)
+                    return;
             }
-            newline              = mem_allocate_zeroed_typed(PDB_line_t);
+
             newline->number      = pline->number + 1;
             pline->next          = newline;
             pline                = newline;
