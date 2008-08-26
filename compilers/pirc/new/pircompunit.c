@@ -1789,16 +1789,17 @@ print_invocation(lexer_state * const lexer, invocation *inv) {
 
 
             if ((inv->sub->color == -1) && (target_name(inv->sub) != NULL)) {
-
+                int reg            = next_register(lexer, PMC_TYPE);
                 global_ident *glob = find_global_ident(lexer, target_name(inv->sub));
 
                 if (glob) {
-                    printf("   set_p_pc P%d, PMC_CONST(%d)\n", 99, glob->const_nr);
-                    printf("   invokecc_p P%d", 99);
+
+                    printf("   set_p_pc P%d, PMC_CONST(%d)\n", reg, glob->const_nr);
+                    printf("   invokecc_p P%d", reg);
                 }
                 else {
-                    printf("   find_sub_not_null_p_sc P%d, '%s'\n", 99, target_name(inv->sub));
-                    printf("   invokecc_p P%d", 99);
+                    printf("   find_sub_not_null_p_sc P%d, '%s'\n", reg, target_name(inv->sub));
+                    printf("   invokecc_p P%d", reg);
                 }
             }
             else /* $P42() */

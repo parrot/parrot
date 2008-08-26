@@ -1164,6 +1164,15 @@ math_instruction  : math_op target ',' TK_INTC
                         }
                   ;
 
+/* Because instruction selection is implemented in the parser, some instructions are
+ * handled in a special way: these are some math. operators and the C<set> opcode.
+ * These tokens must therefore be handled as separate tokens, which also means they
+ * must be handled as a possible alternative for identifiers (as opcode names are
+ * allowed as identifiers).
+ * Whenever a certain opcode is handled specially in the parser, it must be added
+ * to the C<special_op> rule.
+ */
+
 math_op           : "add"    { $$ = OP_ADD; }
                   | "sub"    { $$ = OP_SUB; }
                   | "mul"    { $$ = OP_MUL; }
