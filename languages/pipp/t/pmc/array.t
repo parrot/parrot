@@ -45,7 +45,7 @@ Tests the PhpArray PMC.
     .local string s
     .local num n
 
-    p = new PhpArray
+    p = new 'PhpArray'
     s = p
     i = s == 'Array'
     ok(i, "unkeyed get string returns 'Array'")
@@ -82,7 +82,7 @@ Tests the PhpArray PMC.
     is_ok = i == 9
     ok(is_ok, "basic string-keyed get and set")
 
-    extra_pmc = new FixedBooleanArray
+    extra_pmc = new 'FixedBooleanArray'
     extra_pmc = 6
     p['pmc'] = extra_pmc
     p['float'] = 1.12345678
@@ -101,7 +101,7 @@ Tests the PhpArray PMC.
     s = p['string']
     unless s == 'one' goto basic_set_get_not_ok
 
-    extra_pmc = new FixedBooleanArray
+    extra_pmc = new 'FixedBooleanArray'
     extra_pmc = 6
     p[0] = extra_pmc
     p[1] = 1.12345678
@@ -133,8 +133,8 @@ basic_set_get_ok:
     .local string s
     .local num n
 
-    p = new PhpArray
-    ar = new ResizableIntegerArray
+    p = new 'PhpArray'
+    ar = new 'ResizableIntegerArray'
     ar[0] = 1234321
     ar[6] = 9876543
 
@@ -163,7 +163,7 @@ push_pop_not_ok:
 push_pop_ok:
     ok(is_ok, "push/pop with various values")
 
-    p = new PhpArray
+    p = new 'PhpArray'
     is_ok = 1
 
     unshift p, "foo"
@@ -196,7 +196,7 @@ unshift_shift_ok:
     .local string s
     .local int i, is_ok
 
-    p = new PhpArray
+    p = new 'PhpArray'
     is_ok = 1
 
     p[-124] = 0 #next_index should be 0  (assign -124)
@@ -235,7 +235,7 @@ ii_end:
     .local string s
     .local int is_ok
 
-    p = new PhpArray
+    p = new 'PhpArray'
     p[1] = 'fo' #as in shizzle
     s = p['1']
     is_ok = s == 'fo'
@@ -255,7 +255,7 @@ ii_end:
     .local int i, is_ok
     .local string s
 
-    p = new PhpArray
+    p = new 'PhpArray'
 
     p["one";2;3;"four";"five";6;7] = "magic"
     s = p["one";2;3;"four";"five";6;7]
@@ -277,7 +277,7 @@ ii_end:
     .local pmc p
     .local int is_ok, i
 
-    p = new PhpArray
+    p = new 'PhpArray'
     p['asf'] = 8
     is_ok = exists p['asf']
     ok(is_ok, "shallow string-keyed exists")
@@ -312,7 +312,7 @@ ii_end:
     .local string s, val_str
     .local int is_ok
 
-    p = new PhpArray
+    p = new 'PhpArray'
     p['asdf'] = 'im '
     p[444444] = 'not in '
     p[0]      = 'ur '
@@ -344,7 +344,7 @@ iter_done1:
     .local string s, val_str, s1, s2
     .local int is_ok
 
-    p = new PhpArray
+    p = new 'PhpArray'
 
     p["skip"] = "/dev/null"
     p[9]      = "Beware the Jabberwock"
@@ -429,7 +429,7 @@ iter_done1:
 
 
     is_ok = 1
-    p = new PhpArray
+    p = new 'PhpArray'
     p['a'] = "p['a']"
     p['b'] = "p['b']"
     p[3]   = "p[3]"
@@ -465,7 +465,7 @@ iter_test_done:
 
 
     s = ''
-    p = new PhpArray
+    p = new 'PhpArray'
     push p, 'SKIP'
     push p, 'I '
     push p, 'SKIP'
@@ -493,7 +493,7 @@ iter_skip_done:
 
 
     is_ok = 1
-    p = new PhpArray
+    p = new 'PhpArray'
     push p, "This "
     push p, "is "
     push p, "yet "
@@ -544,7 +544,7 @@ each_iter_end:
     .local string s
     .local int is_ok
 
-    p = new PhpArray
+    p = new 'PhpArray'
     p['pears']        = 'pear tree'
     p['donuts']       = 'donut tree' #they're healthy if they grow on trees
     p['cheezburgers'] = 'cheezburger tree' #DO WANT
@@ -573,8 +573,8 @@ current_and_key_ok:
     .local pmc p1, p2
     .local int i, j, is_ok
 
-    p1 = new PhpArray
-    p2 = new PhpArray
+    p1 = new 'PhpArray'
+    p2 = new 'PhpArray'
     i = cmp p1, p2
     is_ok = i == 0
     ok(is_ok, "cmp empty phparrays")
@@ -629,8 +629,8 @@ current_and_key_ok:
     #if ($a > $b) echo "a > b\n"; if ($b > $a) echo "b > a\n";
     #if ($a < $b) echo "a < b\n"; if ($b < $a) echo "b < a\n";
 
-    p1 = new PhpArray
-    p2 = new PhpArray
+    p1 = new 'PhpArray'
+    p2 = new 'PhpArray'
     p1['a'] = 1
     p1['b'] = 2
     p2['b'] = 1
@@ -649,17 +649,17 @@ current_and_key_ok:
     .local pmc p2, p2a, p2b, p2c, p2d
     .local int is_ok, i, j
 
-    p1 = new PhpArray
-    p1a = new PhpArray #empty
-    p1b = new PhpArray
-    p1c = new PhpArray #empty
-    p1d = new PhpArray
+    p1 = new 'PhpArray'
+    p1a = new 'PhpArray' #empty
+    p1b = new 'PhpArray'
+    p1c = new 'PhpArray' #empty
+    p1d = new 'PhpArray'
 
-    p2 = new PhpArray
-    p2a = new PhpArray #empty
-    p2b = new PhpArray
-    p2c = new PhpArray #empty
-    p2d = new PhpArray
+    p2 = new 'PhpArray'
+    p2a = new 'PhpArray' #empty
+    p2b = new 'PhpArray'
+    p2c = new 'PhpArray' #empty
+    p2d = new 'PhpArray'
 
     p1['a'] = 1.2
     p1[2]   = 'c'
@@ -729,8 +729,8 @@ current_and_key_ok:
     .local pmc p1, p2
     .local int i, j, is_ok
 
-    p1 = new PhpArray
-    p2 = new PhpArray
+    p1 = new 'PhpArray'
+    p2 = new 'PhpArray'
     is_ok = p1 == p2
     ok(is_ok, "eq empty arrays")
 
@@ -780,17 +780,17 @@ current_and_key_ok:
     .local pmc p2, p2a, p2b, p2c, p2d
     .local int is_ok, i, j
 
-    p1 = new PhpArray
-    p1a = new PhpArray #empty
-    p1b = new PhpArray
-    p1c = new PhpArray #empty
-    p1d = new PhpArray
+    p1 = new 'PhpArray'
+    p1a = new 'PhpArray' #empty
+    p1b = new 'PhpArray'
+    p1c = new 'PhpArray' #empty
+    p1d = new 'PhpArray'
 
-    p2 = new PhpArray
-    p2a = new PhpArray #empty
-    p2b = new PhpArray
-    p2c = new PhpArray #empty
-    p2d = new PhpArray
+    p2 = new 'PhpArray'
+    p2a = new 'PhpArray' #empty
+    p2b = new 'PhpArray'
+    p2c = new 'PhpArray' #empty
+    p2d = new 'PhpArray'
 
     p1['a'] = 1.2
     p1[2]   = 'c'
