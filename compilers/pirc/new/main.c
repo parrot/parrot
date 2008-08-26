@@ -14,17 +14,16 @@
 
 
 /* use pthreads library to test thread safety.
- * TODO for proper testing: write output to a file instead of stdout;
- * otherwise output of different threads will be messed up.
- */
-
-
-#define TEST_THREAD_SAFETY
+   does not work currently on windows.
+*/
+#ifndef _MSC_VER
+#  define TEST_THREAD_SAFETY
+#endif
 
 
 #ifdef TEST_THREAD_SAFETY
 #  include <pthread.h>
-#  define NUM_THREADS 2
+#  define NUM_THREADS 20
 #endif
 
 

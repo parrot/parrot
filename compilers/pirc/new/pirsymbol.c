@@ -148,10 +148,6 @@ check_unused_symbols(struct lexer_state *lexer)>
 Check all subroutines for unused symbols. If a symbol is declared but
 never used, a warning message is printed to C<stderr>.
 
-Unused symbols should be prevented, as they I<are> assigned a PASM register.
-Effectively, this is a waste of PASM registers; the subroutine could do
-with less.
-
 =cut
 
 */
