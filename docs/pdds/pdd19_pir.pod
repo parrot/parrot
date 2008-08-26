@@ -63,6 +63,10 @@ identifiers.
 Opcode names are not reserved words in PIR, and may be used as variable names.
 For example, you can define a local variable named C<print>.  [See RT #24251]
 
+PIR keywords, on the other hand, I<are> reserved, and cannot be used as
+identifiers. Some opcode names (C<if>, C<unless>) are, in fact, PIR keywords,
+which therefore cannot be used as identifiers.
+
 {{ NOTE: The use of C<::> in identifiers is deprecated. [See RT #48735] }}
 
 =head3 Labels
