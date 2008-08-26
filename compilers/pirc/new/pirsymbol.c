@@ -62,7 +62,7 @@ This is the vanilla register allocator.
 */
 static int
 next_register(struct lexer_state * const lexer, pir_type type) {
-    lexer->subs->regs_used[type]++;
+    lexer->subs->regs_used[type]++; /* count number of registers used */
     return lexer->curregister[type]++;
 }
 
@@ -85,6 +85,7 @@ new_symbol(char * const name, pir_type type) {
     sym->type   = type;
     sym->next   = NULL;
     sym->used   = 0;
+    sym->color  = -1;
     return sym;
 }
 
@@ -109,10 +110,16 @@ declare_local(struct lexer_state * const lexer, pir_type type, symbol *list) {
 
     /* bad implementation, but best i can come up with now. */
 
-    /* set the type on each symbol, and allocate a new register for each symbol */
+    /* set the type on each symbol */
     while (iter != NULL) {
         iter->type  = type;
-        iter->color = next_register(lexer, type);
+
+        /* XXX do not allocate a register just yet; wait till the moment that
+         * the symbol is actually used; unused, declared symbols won't be
+         * given a PASM register.
+         */
+        /* iter->color = next_register(lexer, type); XXX test this. XXX*/
+
         iter        = iter->next;
     }
 
@@ -200,7 +207,16 @@ find_symbol(struct lexer_state * const lexer, char * const name) {
     while (iter) {
 
         if (strcmp(iter->name, name) == 0) {
-            iter->used = 1; /* mark this symbol as used */
+
+            /* if the symbol is not yet used, allocate a new PASM register, and
+             * set the used flag. XXX maybe remove 'used' flag and use iter->color == -1 ?
+             */
+            if (iter->used == 0) {
+                assert(iter->color == -1);
+                iter->color = next_register(lexer, iter->type);
+                iter->used = 1; /* mark this symbol as used */
+            }
+
             return iter;
         }
 
@@ -227,6 +243,7 @@ new_pir_reg(pir_type type, int regno) {
     r->type    = type;
     r->regno   = regno;
     r->next    = NULL;
+    r->color   = -1;
     return r;
 }
 
