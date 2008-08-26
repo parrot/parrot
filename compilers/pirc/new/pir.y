@@ -302,7 +302,7 @@ extern YY_DECL;
              opt_paren_string
              paren_string
              local_var_name
-             const_name
+             special_op
 
 %type <targ> sub
              method
@@ -1171,6 +1171,9 @@ math_op           : "add"    { $$ = OP_ADD; }
                   | "fdiv"   { $$ = OP_FDIV; }
                   ;
 
+special_op        : math_op  { $$ = opnames[$1]; }
+                  | "set"    { $$ = "set"; }
+                  ;
 
 conditional_stat  : conditional_instr "\n"
                   ;
@@ -1271,8 +1274,6 @@ local_id          : local_var_name has_unique_reg
 
 local_var_name    : identifier
                         { $$ = $1; }
-                  | math_op
-                        { $$ = opnames[$1]; }
                   | TK_SYMBOL
                         { /* if a symbol was found, that means it was already declared */
                           yyerror(yyscanner, lexer, "local symbol already declared!");
@@ -1618,13 +1619,13 @@ globalconst_decl      : ".globalconst" const_tail
                             { /* XXX is .globalconst to be kept? */ }
                       ;
 
-const_tail            : "int" const_name '=' TK_INTC
+const_tail            : "int" identifier '=' TK_INTC
                             { $$ = new_named_const(INT_TYPE, $2, $4); }
-                      | "num" const_name '=' TK_NUMC
+                      | "num" identifier '=' TK_NUMC
                             { $$ = new_named_const(NUM_TYPE, $2, $4); }
-                      | "string" const_name '=' TK_STRINGC
+                      | "string" identifier '=' TK_STRINGC
                             { $$ = new_named_const(STRING_TYPE, $2, $4); }
-                      | "pmc" const_name '=' TK_STRINGC
+                      | "pmc" identifier '=' TK_STRINGC
                             { $$ = new_named_const(PMC_TYPE, $2, $4); }
                       /* this might be useful, for:
                          .const "Sub" foo = "foo" # make a Sub PMC of subr. "foo"
@@ -1632,16 +1633,11 @@ const_tail            : "int" const_name '=' TK_INTC
 
                         Is: .const pmc x = 'foo' any useful? Type of x is not clear.
 
-                      | TK_STRINGC const_name '=' constant
+                      | TK_STRINGC identifier '=' constant
                             { $$ = new_pmc_const($1, $2, $4); }
                       */
                       ;
 
-const_name            : identifier
-                            { $$ = $1; }
-                      | math_op
-                            { $$ = opnames[$1]; }
-                      ;
 
 
 /* Expressions, variables and operators */
@@ -1694,6 +1690,7 @@ symbol      : TK_PREG    { $$ = reg(lexer, PMC_TYPE, $1);    }
 
 identifier  : TK_IDENT
             | TK_PARROT_OP
+            | special_op
             ;
 
 unop        : '-'            { $$ = "neg"; }

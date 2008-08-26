@@ -81,6 +81,8 @@ void store_global_const(struct lexer_state * const lexer, constant * const c);
 /* find a global .const symbol */
 constant *find_constant(struct lexer_state * const lexer, char * const name);
 
+int next_register(struct lexer_state * const lexer, pir_type type);
+
 #endif /* PARROT_PIR_PIRSYMBOL_H_GUARD */
 
 /*

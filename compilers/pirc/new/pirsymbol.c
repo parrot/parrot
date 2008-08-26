@@ -51,7 +51,7 @@ describe the properties (possibly an enumeration of symbol types).
 
 /*
 
-=item C<static int
+=item C<int
 next_register(struct lexer_state *lexer)>
 
 Returns a new register of the specified type.
@@ -60,7 +60,7 @@ This is the vanilla register allocator.
 =cut
 
 */
-static int
+int
 next_register(struct lexer_state * const lexer, pir_type type) {
     lexer->subs->regs_used[type]++; /* count number of registers used */
     return lexer->curregister[type]++;

@@ -483,12 +483,8 @@ add_param(struct lexer_state * const lexer, pir_type type, char * const name) {
     /* set the parameter just added as curtarget */
     lexer->curtarget = t;
 
-    /* add the parameter as a local symbol; note that s is an in-out parameter;
-     * it will be assigned a register (color) which is then set to the target
-     * node that we will return.
-     */
     declare_local(lexer, type, s);
-    t->color = s->color;
+    t->color = next_register(lexer, type);
 
     return t;
 

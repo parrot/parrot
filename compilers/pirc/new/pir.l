@@ -172,6 +172,50 @@ new_lexer(char * const filename) {
     return lexer;
 }
 
+
+/*
+
+=item C<int
+check_symbol(lexer_state * const lexer, char * const text, YYSTYPE *lval, int opcode)>
+
+Check whether there is a symbol declared by the name of C<text>; it may be
+a local symbol, a local or global constant (XXX: implement local constants).
+
+If C<text> is not the name of a symbol, then C<opcode> is returned.
+
+=cut
+
+*/
+int
+check_symbol(lexer_state * const lexer, char * const text, YYSTYPE *lval, int opcode) {
+    symbol *sym        = find_symbol(lexer, text);
+    if (sym) {
+        lval->symb = sym;
+        return TK_SYMBOL;
+    }
+    else {
+        constant *con = find_constant(lexer, text);
+        if (con != NULL) {
+            switch (con->type) {
+                case INT_TYPE:
+                    lval->ival = con->val.ival;
+                    return TK_INTC;
+                case NUM_TYPE:
+                    lval->dval = con->val.nval;
+                    return TK_NUMC;
+                case STRING_TYPE:
+                    lval->sval = con->val.sval;
+                    return TK_STRINGC;
+                case PMC_TYPE:
+                case UNKNOWN_TYPE:
+                default:
+                    fprintf(stderr, "invalid constant type!\n");
+            }
+        }
+    }
+    return opcode;
+}
+
 /*
 
 =back
@@ -321,177 +365,13 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 "unless"          { return TK_UNLESS; }
 "null"            { return TK_NULL; }
 
-"set"             { lexer_state *lexer = yyget_extra(yyscanner);
-                    symbol *sym        = find_symbol(lexer, yytext);
-                    if (sym) {
-                        yylval->symb = sym;
-                        return TK_SYMBOL;
-                    }
-                    else {
-                        constant *con = find_constant(lexer, yytext);
-                        if (con != NULL) {
-                            switch (con->type) {
-                                case INT_TYPE:
-                                    yylval->ival = con->val.ival;
-                                    return TK_INTC;
-                                case NUM_TYPE:
-                                    yylval->dval = con->val.nval;
-                                    return TK_NUMC;
-                                case STRING_TYPE:
-                                    yylval->sval = con->val.sval;
-                                    return TK_STRINGC;
-                                case PMC_TYPE:
-                                case UNKNOWN_TYPE:
-                                default:
-                                    fprintf(stderr, "invalid constant type!\n");
-                            }
-                        }
-                    }
-                    return TK_PARROT_SET;
-                  }
+"set"             { return check_symbol(yyget_extra(yyscanner), yytext, yylval, TK_PARROT_SET); }
+"add"             { return check_symbol(yyget_extra(yyscanner), yytext, yylval, TK_PARROT_ADD); }
+"sub"             { return check_symbol(yyget_extra(yyscanner), yytext, yylval, TK_PARROT_SUB); }
+"mul"             { return check_symbol(yyget_extra(yyscanner), yytext, yylval, TK_PARROT_MUL); }
+"div"             { return check_symbol(yyget_extra(yyscanner), yytext, yylval, TK_PARROT_DIV); }
+"fdiv"            { return check_symbol(yyget_extra(yyscanner), yytext, yylval, TK_PARROT_FDIV); }
 
-"add"             {
-                    lexer_state *lexer = yyget_extra(yyscanner);
-                    symbol *sym        = find_symbol(lexer, yytext);
-                    if (sym) {
-                        yylval->symb = sym;
-                        return TK_SYMBOL;
-                    }
-                    else {
-                        constant *con = find_constant(lexer, yytext);
-                        if (con != NULL) {
-                            switch (con->type) {
-                                case INT_TYPE:
-                                    yylval->ival = con->val.ival;
-                                    return TK_INTC;
-                                case NUM_TYPE:
-                                    yylval->dval = con->val.nval;
-                                    return TK_NUMC;
-                                case STRING_TYPE:
-                                    yylval->sval = con->val.sval;
-                                    return TK_STRINGC;
-                                case PMC_TYPE:
-                                case UNKNOWN_TYPE:
-                                default:
-                                    fprintf(stderr, "invalid constant type!\n");
-                            }
-                        }
-                    }
-                    return TK_PARROT_ADD;
-                  }
-
-"sub"             { lexer_state *lexer = yyget_extra(yyscanner);
-                    symbol *sym        = find_symbol(lexer, yytext);
-                    if (sym) {
-                        yylval->symb = sym;
-                        return TK_SYMBOL;
-                    }
-                    else {
-                        constant *con = find_constant(lexer, yytext);
-                        if (con != NULL) {
-                            switch (con->type) {
-                                case INT_TYPE:
-                                    yylval->ival = con->val.ival;
-                                    return TK_INTC;
-                                case NUM_TYPE:
-                                    yylval->dval = con->val.nval;
-                                    return TK_NUMC;
-                                case STRING_TYPE:
-                                    yylval->sval = con->val.sval;
-                                    return TK_STRINGC;
-                                case PMC_TYPE:
-                                case UNKNOWN_TYPE:
-                                default:
-                                    fprintf(stderr, "invalid constant type!\n");
-                            }
-                        }
-                    }
-                    return TK_PARROT_SUB;
-                  }
-"mul"             { lexer_state *lexer = yyget_extra(yyscanner);
-                    symbol *sym        = find_symbol(lexer, yytext);
-                    if (sym) {
-                        yylval->symb = sym;
-                        return TK_SYMBOL;
-                    }
-                    else {
-                        constant *con = find_constant(lexer, yytext);
-                        if (con != NULL) {
-                            switch (con->type) {
-                                case INT_TYPE:
-                                    yylval->ival = con->val.ival;
-                                    return TK_INTC;
-                                case NUM_TYPE:
-                                    yylval->dval = con->val.nval;
-                                    return TK_NUMC;
-                                case STRING_TYPE:
-                                    yylval->sval = con->val.sval;
-                                    return TK_STRINGC;
-                                case PMC_TYPE:
-                                case UNKNOWN_TYPE:
-                                default:
-                                    fprintf(stderr, "invalid constant type!\n");
-                            }
-                        }
-                    }
-                    return TK_PARROT_MUL;
-                  }
-"div"             { lexer_state *lexer = yyget_extra(yyscanner);
-                    symbol *sym        = find_symbol(lexer, yytext);
-                    if (sym) {
-                        yylval->symb = sym;
-                        return TK_SYMBOL;
-                    }
-                    else {
-                        constant *con = find_constant(lexer, yytext);
-                        if (con != NULL) {
-                            switch (con->type) {
-                                case INT_TYPE:
-                                    yylval->ival = con->val.ival;
-                                    return TK_INTC;
-                                case NUM_TYPE:
-                                    yylval->dval = con->val.nval;
-                                    return TK_NUMC;
-                                case STRING_TYPE:
-                                    yylval->sval = con->val.sval;
-                                    return TK_STRINGC;
-                                case PMC_TYPE:
-                                case UNKNOWN_TYPE:
-                                default:
-                                    fprintf(stderr, "invalid constant type!\n");
-                            }
-                        }
-                    }
-                    return TK_PARROT_DIV;
-                  }
-"fdiv"            { lexer_state *lexer = yyget_extra(yyscanner);
-                    symbol *sym        = find_symbol(lexer, yytext);
-                    if (sym) {
-                        yylval->symb = sym;
-                        return TK_SYMBOL;
-                    }
-                    else {
-                        constant *con = find_constant(lexer, yytext);
-                        if (con != NULL) {
-                            switch (con->type) {
-                                case INT_TYPE:
-                                    yylval->ival = con->val.ival;
-                                    return TK_INTC;
-                                case NUM_TYPE:
-                                    yylval->dval = con->val.nval;
-                                    return TK_NUMC;
-                                case STRING_TYPE:
-                                    yylval->sval = con->val.sval;
-                                    return TK_STRINGC;
-                                case PMC_TYPE:
-                                case UNKNOWN_TYPE:
-                                default:
-                                    fprintf(stderr, "invalid constant type!\n");
-                            }
-                        }
-                    }
-                    return TK_PARROT_FDIV;
-                  }
 
 "int"             { return TK_INT; }
 "num"             { return TK_NUM; }
