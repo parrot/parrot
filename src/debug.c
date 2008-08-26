@@ -2048,7 +2048,7 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
 
         return 0;
     }
-    else if (condition->type & PDB_cond_str) {
+    else if (condition->type & PDB_cond_pmc) {
         PMC *m = REG_PMC(interp, condition->reg);
         if (condition->type & PDB_cond_notnull)
             return ! PMC_IS_NULL(m);
