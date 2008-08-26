@@ -1975,14 +1975,17 @@ PARROT_WARN_UNUSED_RESULT
 char
 PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
 {
+    Parrot_Context *ctx = CONTEXT(interp);
+
     TRACEDEB_MSG("PDB_check_condition");
+
+    PARROT_ASSERT(ctx);
 
     if (condition->type & PDB_cond_int) {
         INTVAL   i,  j;
-        /*
-         * RT #46125 verify register is in range
-         */
-        i = REG_INT(interp, condition->reg);
+        if (condition->reg >= ctx->n_regs_used[REGNO_INT])
+            return 0;
+        i = CTX_REG_INT(ctx, condition->reg);
 
         if (condition->type & PDB_cond_const)
             j = *(INTVAL *)condition->value;
@@ -2002,7 +2005,9 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
     else if (condition->type & PDB_cond_num) {
         FLOATVAL k,  l;
 
-        k = REG_NUM(interp, condition->reg);
+        if (condition->reg >= ctx->n_regs_used[REGNO_NUM])
+            return 0;
+        k = CTX_REG_NUM(ctx, condition->reg);
 
         if (condition->type & PDB_cond_const)
             l = *(FLOATVAL *)condition->value;
@@ -2022,7 +2027,9 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
     else if (condition->type & PDB_cond_str) {
         STRING  *m, *n;
 
-        m = REG_STR(interp, condition->reg);
+        if (condition->reg >= ctx->n_regs_used[REGNO_STR])
+            return 0;
+        m = CTX_REG_STR(ctx, condition->reg);
 
         if (condition->type & PDB_cond_notnull)
             return ! STRING_IS_NULL(m);
@@ -2049,7 +2056,12 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
         return 0;
     }
     else if (condition->type & PDB_cond_pmc) {
-        PMC *m = REG_PMC(interp, condition->reg);
+        PMC *m;
+
+        if (condition->reg >= ctx->n_regs_used[REGNO_PMC])
+            return 0;
+        m = CTX_REG_PMC(ctx, condition->reg);
+
         if (condition->type & PDB_cond_notnull)
             return ! PMC_IS_NULL(m);
         return 0;
