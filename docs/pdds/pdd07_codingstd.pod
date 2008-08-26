@@ -987,13 +987,6 @@ C<lib/Parrot/Distribution.pm> (in either of the methods C<is_c_exemption()>
 or C<is_perl_exemption()>).  One can use wildcards in the list to exempt,
 for example, all files under a given directory.
 
-=head1 REFERENCES
-
-The section on coding style is based on Perl 5's L<Porting/patching.pod> by
-Daniel Grisinger. The section on naming conventions grew from some suggestions
-by Paolo Molaro <lupus@lettere.unipd.it>. Other snippets came from various
-P5Pers.
-
 =cut
 
 # Local Variables:
