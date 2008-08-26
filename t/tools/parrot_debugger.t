@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -10,15 +10,13 @@ t/tools/parrot_debugger.t - test the Parrot Debugger
 
     % prove t/tools/parrot_debugger.t
 
-
 =head1 DESCRIPTION
 
-Tests the C<parrot_debugger> tool by providing it with a number
-of source files, and running through it with various commands.
+Tests the C<parrot_debugger> tool by providing it with a number of source
+files, and running through it with various commands.
 
-We never actually check the *full* output of parrot_debugger. 
-We simply check several smaller components to avoid a test file
-that is far too unwieldy.
+We never actually check the I<full> output of parrot_debugger.  We simply check
+several smaller components to avoid a test file that is far too unwieldy.
 
 
 =head1 REQUIREMENTS
@@ -51,14 +49,14 @@ BEGIN {
 
 my $tests = 0;
 
-ok( pdb_output_like( <<PIR, "pir", "help", 'List of commands:' ), "help page" );
+pdb_output_like( <<PIR, "pir", "help", qr/List of commands:/, 'help page');
 .sub main :main
     \$N3 = 3.14159
     print \$N3
     print "\\n"
 .end
 PIR
-ok( pdb_output_like( <<PIR, "pir", "r", '3\.14159' ), "running the program" );
+pdb_output_like( <<PIR, "pir", "r", qr/3\.14159/, 'running the program');
 .sub main :main
     \$N3 = 3.14159
     print \$N3
@@ -73,7 +71,7 @@ BEGIN { plan tests => $tests; }
 
 =head2 pdb_output_like
 
-    ok(pdb_output_like(<<PASM, "pasm", 'r', "some output"), "running $file");
+    pdb_output_like(<<PASM, "pasm", 'r', "some output", "running $file");
 
 Takes 4 arguments: a file to run, the filename-extension of the file
 (probably "pir" or "pasm"), the command or commands to provide to
@@ -85,7 +83,7 @@ parrot_debugger's output.
 my $testno = 0;
 
 sub pdb_output_like {
-    my ( $file, $ext, $input, $check ) = @_;
+    my ( $file, $ext, $input, $check, $diag ) = @_;
     $testno++;
     my $codefn   = "$0.$testno.$ext";
     my $stdinfn  = "$0.$testno.stdin";
@@ -99,8 +97,11 @@ sub pdb_output_like {
     $f->close();
     system("$path_to_pdb $codefn <$stdinfn >$stdoutfn 2>&1");
     $f = IO::File->new($stdoutfn);
-    my $output = join( "", <$f> );
-    return $output =~ /$check/;
+
+    my $output = join( '', <$f> );
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    like( $output, $check, $diag );
 }
 
 =head1 TODO
