@@ -1348,7 +1348,7 @@ PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     TRACEDEB_MSG("PDB_trace finished");
 }
 
-unsigned short condition_regtype(ARGIN(const char *cmd)) /* HEADERIZER SKIP */
+static unsigned short condition_regtype(ARGIN(const char *cmd)) /* HEADERIZER SKIP */
 {
     switch (*cmd) {
         case 'i':
@@ -1394,6 +1394,7 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
         return NULL;
     }
 
+    command = skip_whitespace(command);
 #if TRACE_DEBUGGER
     fprintf(stderr, "PDB_trace: '%s'\n", command);
 #endif
@@ -1441,6 +1442,13 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
             else
                 goto INV_COND;
             break;
+        case '\0':
+            if (condition->type != PDB_cond_str && condition->type != PDB_cond_pmc) {
+                PIO_eprintf(interp->pdb->debugger, "Invalid null condition\n");
+                mem_sys_free(condition);
+            }
+            condition->type |= PDB_cond_notnull;
+            break;
         default:
 INV_COND:   PIO_eprintf(interp->pdb->debugger, "Invalid condition\n");
             mem_sys_free(condition);
@@ -1455,71 +1463,75 @@ INV_COND:   PIO_eprintf(interp->pdb->debugger, "Invalid condition\n");
 
     command = skip_whitespace(command);
 
-    /* return if no more arguments */
-    if (!(command && *command)) {
+    /* return if no notnull condition and no more arguments */
+    if (!(command && *command) && !(condition->type & PDB_cond_notnull)) {
         PIO_eprintf(interp->pdb->debugger, "Can't compare a register with nothing\n");
         mem_sys_free(condition);
         return NULL;
     }
 
-    if (isalpha((unsigned char)*command)) {
-        /* It's a register - we first check that it's the correct type */
+    if (!(condition->type & PDB_cond_notnull)) {
 
-        unsigned short cond_argright = condition_regtype(command);
+        if (isalpha((unsigned char)*command)) {
+            /* It's a register - we first check that it's the correct type */
 
-        if (cond_argright != cond_argleft) {
-            PIO_eprintf(interp->pdb->debugger, "Register types don't agree\n");
-            mem_sys_free(condition);
-            return NULL;
-        }
+            unsigned short cond_argright = condition_regtype(command);
 
-        /* Now we check and store the register number */
-        auxcmd = ++command;
-        reg_number = (int)get_uint(&command, 0);
-        if (auxcmd == command) {
-            PIO_eprintf(interp->pdb->debugger, "Invalid register\n");
+            if (cond_argright != cond_argleft) {
+                PIO_eprintf(interp->pdb->debugger, "Register types don't agree\n");
                 mem_sys_free(condition);
                 return NULL;
-        }
+            }
 
-        if (reg_number < 0) {
-            PIO_eprintf(interp->pdb->debugger, "Out-of-bounds register\n");
+            /* Now we check and store the register number */
+            auxcmd = ++command;
+            reg_number = (int)get_uint(&command, 0);
+            if (auxcmd == command) {
+                PIO_eprintf(interp->pdb->debugger, "Invalid register\n");
+                    mem_sys_free(condition);
+                    return NULL;
+            }
+
+            if (reg_number < 0) {
+                PIO_eprintf(interp->pdb->debugger, "Out-of-bounds register\n");
+                mem_sys_free(condition);
+                return NULL;
+            }
+
+            condition->value         = mem_allocate_typed(int);
+            *(int *)condition->value = reg_number;
+        }
+        /* If the first argument was an integer */
+        else if (condition->type & PDB_cond_int) {
+            /* This must be either an integer constant or register */
+            condition->value             = mem_allocate_typed(INTVAL);
+            *(INTVAL *)condition->value  = (INTVAL)atoi(command);
+            condition->type             |= PDB_cond_const;
+        }
+        else if (condition->type & PDB_cond_num) {
+            condition->value               = mem_allocate_typed(FLOATVAL);
+            *(FLOATVAL *)condition->value  = (FLOATVAL)atof(command);
+            condition->type               |= PDB_cond_const;
+        }
+        else if (condition->type & PDB_cond_str) {
+            for (i = 1; ((command[i] != '"') && (i < DEBUG_CMD_BUFFER_LENGTH)); i++)
+                str[i - 1] = command[i];
+            str[i - 1] = '\0';
+#if TRACE_DEBUGGER
+            fprintf(stderr, "PDB_break: '%s'\n", str);
+#endif
+            condition->value = string_make(interp,
+                str, i - 1, NULL, 0);
+            condition->type |= PDB_cond_const;
+        }
+        else if (condition->type & PDB_cond_pmc) {
+            /* RT #46123 Need to figure out what to do in this case.
+             * For the time being, we just bail. */
+            PIO_eprintf(interp->pdb->debugger, "Can't compare PMC with constant\n");
             mem_sys_free(condition);
             return NULL;
         }
 
-        condition->value         = mem_allocate_typed(int);
-        *(int *)condition->value = reg_number;
-    }
-    /* If the first argument was an integer */
-    else if (condition->type & PDB_cond_int) {
-        /* This must be either an integer constant or register */
-        condition->value             = mem_allocate_typed(INTVAL);
-        *(INTVAL *)condition->value  = (INTVAL)atoi(command);
-        condition->type             |= PDB_cond_const;
-    }
-    else if (condition->type & PDB_cond_num) {
-        condition->value               = mem_allocate_typed(FLOATVAL);
-        *(FLOATVAL *)condition->value  = (FLOATVAL)atof(command);
-        condition->type               |= PDB_cond_const;
-    }
-    else if (condition->type & PDB_cond_str) {
-        for (i = 1; ((command[i] != '"') && (i < DEBUG_CMD_BUFFER_LENGTH)); i++)
-            str[i - 1] = command[i];
-        str[i - 1] = '\0';
-#if TRACE_DEBUGGER
-        fprintf(stderr, "PDB_break: '%s'\n", str);
-#endif
-        condition->value = string_make(interp,
-            str, i - 1, NULL, 0);
-        condition->type |= PDB_cond_const;
-    }
-    else if (condition->type & PDB_cond_pmc) {
-        /* RT #46123 Need to figure out what to do in this case.
-         * For the time being, we just bail. */
-        PIO_eprintf(interp->pdb->debugger, "Can't compare PMC with constant\n");
-        mem_sys_free(condition);
-        return NULL;
     }
 
     /* We're not part of a list yet */
@@ -2022,6 +2034,9 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
 
         m = REG_STR(interp, condition->reg);
 
+        if (condition->type & PDB_cond_notnull)
+            return ! STRING_IS_NULL(m);
+
         if (condition->type & PDB_cond_const)
             n = (STRING *)condition->value;
         else
@@ -2043,8 +2058,14 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
 
         return 0;
     }
-
-    return 0;
+    else if (condition->type & PDB_cond_str) {
+        PMC *m = REG_PMC(interp, condition->reg);
+        if (condition->type & PDB_cond_notnull)
+            return ! PMC_IS_NULL(m);
+        return 0;
+    }
+    else
+        return 0;
 }
 
 /*
