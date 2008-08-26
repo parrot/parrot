@@ -1203,11 +1203,6 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
 
     TRACEDEB_MSG("PDB_run_command");
 
-    if (cmdline)
-        cmdline = skip_command(cmdline);
-    else
-        return 0;
-
     cmd= get_command(c);
     if (cmd) {
         (* cmd->func)(pdb, cmdline);
