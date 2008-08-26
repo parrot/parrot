@@ -27,7 +27,7 @@ typedef struct symbol {
     pir_type       type;  /* type of this symbol */
     int            color; /* allocated PASM register for this symbol */
     int            flags;
-    int            used;  /* flag to keep track whether the symbol is actually used */
+
     struct symbol *next;
 
 } symbol;
