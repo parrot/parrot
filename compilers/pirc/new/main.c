@@ -18,13 +18,13 @@
  * otherwise output of different threads will be messed up.
  */
 
-/*
+
 #define TEST_THREAD_SAFETY
-*/
+
 
 #ifdef TEST_THREAD_SAFETY
 #  include <pthread.h>
-#  define NUM_THREADS 1
+#  define NUM_THREADS 2
 #endif
 
 
@@ -106,6 +106,7 @@ typedef struct parser_args {
     int   flexdebug;
     FILE *infile;
     char *filename;
+    int   thr_id;
 
 } parser_args;
 
@@ -117,6 +118,7 @@ parse_file(void *a) {
     int          flexdebug = args->flexdebug;
     FILE        *infile    = args->infile;
     char        *filename  = args->filename;
+    int          thr_id    = args->thr_id;
 
     /* create a yyscan_t object */
     yylex_init(&yyscanner);
@@ -131,8 +133,16 @@ parse_file(void *a) {
     yyparse(yyscanner, lexer);
 
     if (lexer->parse_errors == 0) {
+        char outfile[20];
+        sprintf(outfile, "output_thr_%d", thr_id);
+        lexer->outfile = open_file(outfile, "w");
+        if (lexer->outfile == NULL)
+            fprintf(stderr, "Failed to open file %s\n", outfile);
+
         fprintf(stderr, "Parse successful!\n");
         print_subs(lexer);
+        fclose(lexer->outfile);
+
         check_unused_symbols(lexer);
         free_subs(lexer);
     }
@@ -236,6 +246,7 @@ main(int argc, char *argv[]) {
         args.flexdebug = flexdebug;
         args.infile    = infile;
         args.filename  = filename;
+        args.thr_id    = i;
 
         pthread_create(&threads[i], NULL, parse_file, &args);
 
@@ -267,6 +278,8 @@ main(int argc, char *argv[]) {
     args.flexdebug = flexdebug;
     args.infile    = infile;
     args.filename  = filename;
+    args.thr_id    = 0;
+
     parse_file(&args);
 }
 #endif

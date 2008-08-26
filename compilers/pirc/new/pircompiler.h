@@ -9,10 +9,14 @@
 #include "pirsymbol.h"
 #include "pircompunit.h"
 
+#include <stdio.h>
+
 /* store the "globals" of the lexer in a structure which is passed around. */
 typedef struct lexer_state {
     int            parse_errors;
     char          *filename;
+    FILE          *outfile;
+
     subroutine    *subs;       /* list of subs; always points to the current sub. */
 
     key           *current_ns; /* keeps track of namespace */

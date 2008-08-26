@@ -63,7 +63,11 @@ Poletto and Sarkar).
 
 
 
+/*
 #define out stderr
+*/
+
+#define out lexer->outfile
 
 /* the order of these letters match with the pir_type enumeration.
  * These are used for human-readable PASM output.
@@ -1320,7 +1324,7 @@ new_key(expression * const expr) {
 }
 
 
-void print_key(key *k);
+void print_key(lexer_state *lexer, key *k);
 /*
 
 =item C<add_key(key *keylist, expression *exprkey)>
@@ -1558,7 +1562,7 @@ get_signatured_opname(instruction *instr) {
 /* debug functions */
 
 /* prototype declaration */
-void print_expr(expression *e);
+void print_expr(lexer_state *lexer, expression *e);
 
 /*
 
@@ -1574,19 +1578,19 @@ and different key elements are separated by semicolons. Example:
 
 */
 void
-print_key(key *k) {
-    printf("[");
+print_key(lexer_state *lexer, key *k) {
+    fprintf(out, "[");
 
     if (k && k->expr) {
-        print_expr(k->expr);
+        print_expr(lexer, k->expr);
 
         while (k->next) {
             k = k->next;
-            printf(";");
-            print_expr(k->expr);
+            fprintf(out, ";");
+            print_expr(lexer, k->expr);
         }
     }
-    printf("]");
+    fprintf(out, "]");
 }
 
 /*
@@ -1603,12 +1607,12 @@ printed as well. Examples:
 
 */
 void
-print_target(target * const t) {
-    printf("%c%d", pir_register_types[t->type], t->color);
+print_target(lexer_state *lexer, target * const t) {
+    fprintf(out, "%c%d", pir_register_types[t->type], t->color);
 
     /* if the target has a key, print that too */
     if (t->key)
-        print_key(t->key);
+        print_key(lexer, t->key);
 }
 
 /*
@@ -1620,19 +1624,19 @@ print_constant(constant *c)>
 
 */
 void
-print_constant(constant *c) {
+print_constant(lexer_state *lexer, constant *c) {
     switch (c->type) {
         case INT_TYPE:
-            printf("%d", c->val.ival);
+            fprintf(out, "%d", c->val.ival);
             break;
         case NUM_TYPE:
-            printf("%f", c->val.nval);
+            fprintf(out, "%f", c->val.nval);
             break;
         case STRING_TYPE:
-            printf("\"%s\"", c->val.sval);
+            fprintf(out, "\"%s\"", c->val.sval);
             break;
         case PMC_TYPE:
-            printf("\"%s\"", c->val.pval);
+            fprintf(out, "\"%s\"", c->val.pval);
             break;
         case UNKNOWN_TYPE:
             printf("Unknown type detected! This is a bug!");
@@ -1649,19 +1653,19 @@ print_expr(expression *expr)>
 
 */
 void
-print_expr(expression *expr) {
+print_expr(lexer_state *lexer, expression *expr) {
     switch (expr->type) {
         case EXPR_TARGET:
-            print_target(expr->expr.t);
+            print_target(lexer, expr->expr.t);
             break;
         case EXPR_CONSTANT:
-            print_constant(expr->expr.c);
+            print_constant(lexer, expr->expr.c);
             break;
         case EXPR_IDENT:
-            printf("%s", expr->expr.id);
+            fprintf(out, "%s", expr->expr.id);
             break;
         case EXPR_KEY:
-            print_key(expr->expr.k);
+            print_key(lexer, expr->expr.k);
             break;
     }
 }
@@ -1678,14 +1682,14 @@ if C<expr> is not NULL. Expressions are separated by commas.
 
 */
 void
-print_expressions(expression * const expr) {
+print_expressions(lexer_state *lexer, expression * const expr) {
     if (expr) {
         expression *iter = expr->next;
 
         do {
-            print_expr(iter);
+            print_expr(lexer, iter);
             iter = iter->next;
-            if (iter != expr->next) printf(", ");
+            if (iter != expr->next) fprintf(out, ", ");
         }
         while (iter != expr->next);
     }
@@ -1701,41 +1705,41 @@ print_arguments(char *opname, argument *args)>
 
 */
 void
-print_arguments(char *opname, argument *args) {
+print_arguments(lexer_state *lexer, char *opname, argument *args) {
     if (args != NULL) {
         argument *iter = args->next;
         if (opname) {
-            printf("   %s '", opname);
+            fprintf(out, "   %s '", opname);
 
             do {
-                printf("%d", iter->flags);
+                fprintf(out, "%d", iter->flags);
                 if (iter->flags & ARG_FLAG_NAMED)
                     printf("[%s]", iter->alias);
 
                 iter = iter->next;
-                if (iter != args->next) printf(",");
-                else printf("', ");
+                if (iter != args->next) fprintf(out, ",");
+                else fprintf(out, "', ");
             }
             while (iter != args->next);
         }
 
         iter = args->next;
         do {
-            print_expr(iter->value);
+            print_expr(lexer, iter->value);
             iter = iter->next;
-            if (iter != args->next) printf(", ");
-            else printf("\n");
+            if (iter != args->next) fprintf(out, ", ");
+            else fprintf(out, "\n");
         }
         while (iter != args->next);
     }
     else
         /* printf("   %s_pc PMC_CONST(X)\n", opname); */
-        printf("   %s ''\n", opname);
+        fprintf(out, "   %s ''\n", opname);
 
 }
 
 void
-print_instruction(instruction *ins) {
+print_instruction(lexer_state *lexer, instruction *ins) {
     assert(ins != NULL);
     if (ins->opname) {
         if (strcmp(ins->opname, "nop") ==0 )
@@ -1743,20 +1747,20 @@ print_instruction(instruction *ins) {
         /*
         printf("   %s ", ins->opname);
         */
-        printf("   %s ", get_signatured_opname(ins));
-        print_expressions(ins->operands);
-        printf("\n");
+        fprintf(out, "   %s ", get_signatured_opname(ins));
+        print_expressions(lexer, ins->operands);
+        fprintf(out, "\n");
     }
 }
 
 void
-print_targets(char *opname, target *parameters) {
+print_targets(lexer_state *lexer, char *opname, target *parameters) {
     if (parameters != NULL) {
         /* get the first parameter: */
         target *iter = parameters->next;
-        printf("   %s '", opname);
+        fprintf(out, "   %s '", opname);
         do {
-            printf("%d", iter->flags);
+            fprintf(out, "%d", iter->flags);
 
             /*
             if (iter->flags & TARGET_FLAG_NAMED)
@@ -1771,10 +1775,10 @@ print_targets(char *opname, target *parameters) {
 
         iter = parameters->next;
         do {
-            print_target(iter);
+            print_target(lexer, iter);
             iter = iter->next;
-            if (iter != parameters->next) printf(", ");
-            else printf("\n");
+            if (iter != parameters->next) fprintf(out, ", ");
+            else fprintf(out, "\n");
         }
         while (iter != parameters->next);
     }
@@ -1815,8 +1819,8 @@ print_invocation(lexer_state * const lexer, invocation *inv) {
     switch (inv->type) {
 
         case CALL_PCC:
-            print_arguments("set_args", inv->arguments);
-            print_targets("get_results", inv->results);
+            print_arguments(lexer, "set_args", inv->arguments);
+            print_targets(lexer, "get_results", inv->results);
 
 
             if ((inv->sub->color == -1) && (target_name(inv->sub) != NULL)) {
@@ -1831,50 +1835,49 @@ print_invocation(lexer_state * const lexer, invocation *inv) {
                 global_ident *glob = find_global_ident(lexer, target_name(inv->sub));
 
                 if (glob) {
-
-                    printf("   set_p_pc P%d, PMC_CONST(%d)\n", reg, glob->const_nr);
-                    printf("   invokecc_p P%d", reg);
+                    fprintf(out, "   set_p_pc P%d, PMC_CONST(%d)\n", reg, glob->const_nr);
+                    fprintf(out, "   invokecc_p P%d", reg);
                 }
                 else {
-                    printf("   find_sub_not_null_p_sc P%d, '%s'\n", reg, target_name(inv->sub));
-                    printf("   invokecc_p P%d", reg);
+                    fprintf(out, "   find_sub_not_null_p_sc P%d, '%s'\n", reg, target_name(inv->sub));
+                    fprintf(out, "   invokecc_p P%d", reg);
                 }
             }
             else /* $P42() */
-                printf("   invokecc P%d", inv->sub->color);
+                fprintf(out, "   invokecc P%d", inv->sub->color);
 
 
             break;
         case CALL_RETURN:
-            print_arguments("set_returns", inv->arguments);
-            printf("   returncc");
+            print_arguments(lexer, "set_returns", inv->arguments);
+            fprintf(out, "   returncc");
             break;
         case CALL_NCI:
-            printf("   invokecc P%d", 99);
+            fprintf(out, "   invokecc P%d", 99);
             break;
         case CALL_YIELD:
-            print_arguments("set_returns", inv->arguments);
-            printf("   yield");
+            print_arguments(lexer, "set_returns", inv->arguments);
+            fprintf(out, "   yield");
             break;
         case CALL_TAILCALL:
-            print_arguments("set_args", inv->arguments);
-            printf("   tailcall");
+            print_arguments(lexer, "set_args", inv->arguments);
+            fprintf(out, "   tailcall");
             break;
         case CALL_METHOD:
-            print_arguments("set_args", inv->arguments);
-            print_targets("get_results", inv->results);
-            printf("   callmethodcc");
+            print_arguments(lexer, "set_args", inv->arguments);
+            print_targets(lexer, "get_results", inv->results);
+            fprintf(out, "   callmethodcc");
             break;
         case CALL_METHOD_TAILCALL:
-            print_arguments("set_args", inv->arguments);
-            printf("   tailcallmethod");
+            print_arguments(lexer, "set_args", inv->arguments);
+            fprintf(out, "   tailcallmethod");
             break;
         default:
             fprintf(stderr, "Unknown invocation type (%d)\n", inv->type);
             exit(EXIT_FAILURE);
     }
 
-    puts("");
+    fprintf(out, "\n");
 
 }
 
@@ -1886,15 +1889,15 @@ print_statement(lexer_state *lexer, subroutine *sub) {
         do {
             /* print label if there is one */
             if (statiter->label) {
-                printf(" %s:\n", statiter->label);
+                fprintf(out, " %s:\n", statiter->label);
             }
             switch (statiter->type) {
                 case STAT_TYPE_INSTRUCTION:
-                    if (statiter->instr.ins) /* XXX when is this false? */
-                        print_instruction(statiter->instr.ins);
+                    if (statiter->instr.ins) /* only a label, no instr. */
+                        print_instruction(lexer, statiter->instr.ins);
                     break;
                 case STAT_TYPE_INVOCATION:
-                    if (statiter->instr.inv) /* XXX is this ever false? */
+                    if (statiter->instr.inv) /* only a label */
                         print_invocation(lexer, statiter->instr.inv);
                     break;
                 default:
@@ -1910,10 +1913,10 @@ print_statement(lexer_state *lexer, subroutine *sub) {
      * flagged as :main, which has an "end" instruction at the end.
      */
     if (sub->flags & SUB_FLAG_MAIN)
-        printf("   end\n");
+        fprintf(out, "   end\n");
     else {
-        printf("   set_returns ''\n");
-        printf("   returncc\n");
+        fprintf(out, "   set_returns ''\n");
+        fprintf(out, "   returncc\n");
     }
 }
 
@@ -1950,29 +1953,29 @@ print_subs(struct lexer_state * const lexer) {
 
         do {
 
-            printf("# subroutine '%s' register usage\n", subiter->sub_name);
-            printf("#   int   : %d\n", subiter->regs_used[INT_TYPE]);
-            printf("#   num   : %d\n", subiter->regs_used[NUM_TYPE]);
-            printf("#   string: %d\n", subiter->regs_used[STRING_TYPE]);
-            printf("#   pmc   : %d\n", subiter->regs_used[PMC_TYPE]);
+            fprintf(out, "# subroutine '%s' register usage\n", subiter->sub_name);
+            fprintf(out, "#   int   : %d\n", subiter->regs_used[INT_TYPE]);
+            fprintf(out, "#   num   : %d\n", subiter->regs_used[NUM_TYPE]);
+            fprintf(out, "#   string: %d\n", subiter->regs_used[STRING_TYPE]);
+            fprintf(out, "#   pmc   : %d\n", subiter->regs_used[PMC_TYPE]);
 
-            printf(".namespace ");
-            print_key(subiter->name_space);
-            puts("");
+            fprintf(out, ".namespace ");
+            print_key(lexer, subiter->name_space);
+            fprintf(out, "\n");
 
             if (subiter->flags) {
-                printf("\n.pcc_sub ");
+                fprintf(out, "\n.pcc_sub ");
 
                 if (subiter->flags & SUB_FLAG_MAIN)
-                    printf(":main ");
+                    fprintf(out, ":main ");
                 if (subiter->flags & SUB_FLAG_METHOD)
-                    printf(":method ");
+                    fprintf(out, ":method ");
                     /* XXX and so on; check which ones are available in PASM mode. */
 
             }
 
-            printf("%s:\n", subiter->sub_name);
-            print_targets("get_params", subiter->parameters);
+            fprintf(out, "%s:\n", subiter->sub_name);
+            print_targets(lexer, "get_params", subiter->parameters);
             print_statement(lexer, subiter);
             subiter = subiter->next;
         }
