@@ -1386,6 +1386,8 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
     const char      *auxcmd;
     char             str[DEBUG_CMD_BUFFER_LENGTH + 1];
     unsigned short   cond_argleft;
+    unsigned short   cond_type;
+    unsigned char    regleft;
     int              i, reg_number;
 
     /* Return if no more arguments */
@@ -1401,17 +1403,11 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
 
     cond_argleft = condition_regtype(command);
 
-    /* Allocate new condition */
-    condition = mem_allocate_typed(PDB_condition_t);
-
-    condition->type = cond_argleft;
-
     /* get the register number */
     auxcmd = ++command;
-    condition->reg = (unsigned char)get_uint(&command, 0);
+    regleft = (unsigned char)get_uint(&command, 0);
     if (auxcmd == command) {
         PIO_eprintf(interp->pdb->debugger, "Invalid register\n");
-            mem_sys_free(condition);
             return NULL;
     }
 
@@ -1420,38 +1416,37 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
     switch (*command) {
         case '>':
             if (*(command + 1) == '=')
-                condition->type |= PDB_cond_ge;
+                cond_type = PDB_cond_ge;
             else
-                condition->type |= PDB_cond_gt;
+                cond_type = PDB_cond_gt;
             break;
         case '<':
             if (*(command + 1) == '=')
-                condition->type |= PDB_cond_le;
+                cond_type = PDB_cond_le;
             else
-                condition->type |= PDB_cond_lt;
+                cond_type = PDB_cond_lt;
             break;
         case '=':
             if (*(command + 1) == '=')
-                condition->type |= PDB_cond_eq;
+                cond_type = PDB_cond_eq;
             else
                 goto INV_COND;
             break;
         case '!':
             if (*(command + 1) == '=')
-                condition->type |= PDB_cond_ne;
+                cond_type = PDB_cond_ne;
             else
                 goto INV_COND;
             break;
         case '\0':
-            if (condition->type != PDB_cond_str && condition->type != PDB_cond_pmc) {
+            if (cond_argleft != PDB_cond_str && cond_argleft != PDB_cond_pmc) {
                 PIO_eprintf(interp->pdb->debugger, "Invalid null condition\n");
-                mem_sys_free(condition);
+                return NULL;
             }
-            condition->type |= PDB_cond_notnull;
+            cond_type = PDB_cond_notnull;
             break;
         default:
 INV_COND:   PIO_eprintf(interp->pdb->debugger, "Invalid condition\n");
-            mem_sys_free(condition);
             return NULL;
     }
 
@@ -1464,13 +1459,17 @@ INV_COND:   PIO_eprintf(interp->pdb->debugger, "Invalid condition\n");
     command = skip_whitespace(command);
 
     /* return if no notnull condition and no more arguments */
-    if (!(command && *command) && !(condition->type & PDB_cond_notnull)) {
+    if (!(command && *command) && (cond_type != PDB_cond_notnull)) {
         PIO_eprintf(interp->pdb->debugger, "Can't compare a register with nothing\n");
-        mem_sys_free(condition);
         return NULL;
     }
 
-    if (!(condition->type & PDB_cond_notnull)) {
+    /* Allocate new condition */
+    condition = mem_allocate_zeroed_typed(PDB_condition_t);
+
+    condition->type = cond_argleft | cond_type;
+
+    if (cond_type != PDB_cond_notnull) {
 
         if (isalpha((unsigned char)*command)) {
             /* It's a register - we first check that it's the correct type */
@@ -1533,9 +1532,6 @@ INV_COND:   PIO_eprintf(interp->pdb->debugger, "Invalid condition\n");
         }
 
     }
-
-    /* We're not part of a list yet */
-    condition->next = NULL;
 
     return condition;
 }
