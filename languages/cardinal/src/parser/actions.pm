@@ -241,7 +241,7 @@ method variable($/, $key) {
         $past := PAST::Op.new(:inline('%r = self'));
     }
     elsif $key eq 'nil' {
-        $/.panic('nil is not yet implemented');
+        $past := PAST::Var.new(:scope('package'), :name('nil'));
     }
     make $past;
 }

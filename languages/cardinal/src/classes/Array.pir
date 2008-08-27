@@ -341,57 +341,55 @@ done:
 
 =item delete()
 
-Deletes the given elements from the CardinalArray, replacing them with Undef.  Returns a CardinalArray of removed elements.
+Deletes the given element from the CardinalArray, replacing them with Undef.
+Returns the item if found, otherwise returns the result of running the block
+if passed, otherwise returns nil.
 
 =cut
 
 .sub delete :method
-    .param pmc indices :slurpy
-    .local pmc newelem
+    .param pmc item
+    .param pmc block :optional
+    .param int block_flag :opt_flag
+    .local pmc nil
     .local pmc elem
-    .local int last
-    .local pmc res
-    .local int ind
     .local int len
     .local int i
+    .local pmc return
+    .local pmc nil
 
-    newelem = undef()
-    res = new 'CardinalArray'
+    nil = new 'NilClass'
+    return = nil
 
-    # Index of the last element in the array
-    last = elements self
-    dec last
-
-    len = elements indices
+    len = elements self
     i = 0
 
   loop:
     if i == len goto done
 
-    ind = indices[i]
+    elem = self[i]
 
-    if ind == -1 goto endofarray
-    if ind == last goto endofarray
-    goto restofarray
 
-  endofarray:
-    # If we're at the end of the array, remove the element entirely
-    elem = pop self
-    res.push(elem)
-    goto next
-
-  restofarray:
-    # Replace the element with undef.
-    elem = self[ind]
-    res.push(elem)
-
-    self[ind] = newelem
-
-  next:
+    $I0 = elem == item
+    if $I0, found
     inc i
+
+    goto loop
+  found:
+    return = item
+    delete self[i]
+    dec len
     goto loop
   done:
-    .return(res)
+    $I0 = return == nil
+    if $I0, not_found
+    .return(return)
+  not_found:
+    if block_flag, have_block
+    .return(return)
+  have_block:
+    $P0 = block()
+    .return($P0)
 .end
 
 =item exists(INDEX)

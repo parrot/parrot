@@ -126,8 +126,8 @@ token methodcall {
 }
 
 rule do_block {
-    | 'do' <do_args> <.term>? <comp_stmt> 'end' {*}
-    | '{' <do_args> <.term>? <comp_stmt> '}' {*}
+    | 'do' <do_args>? <.term>? <.before <stmt>><comp_stmt> 'end' {*}
+    | '{' <do_args>? <.term>? <.before <stmt>><comp_stmt> '}' {*}
 }
 
 rule super_call {
@@ -142,7 +142,7 @@ token operation {
 #XXX UGLY!  Refactor into <args> maybe?
 token call_args {
     | '()' [<.ws> <do_block>]? {*}
-    | [ <.after \s> | <.before \s> ] <args> [<.ws> <do_block>]? {*}
+    | [ <.after \s|\)> | <.before \s> ] <args> [<.ws> <do_block>]? {*}
     | '(' <.ws> <args> <.ws> ')' [<.ws> <do_block>]? {*}
 }
 
