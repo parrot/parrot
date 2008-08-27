@@ -631,6 +631,12 @@ Run C<block> once for each item in C<self>, with the item passed as an arg.
 .end
 
 
+.sub 'at' :method
+    .param pmc i
+    $P0 = self[i]
+    .return($P0)
+.end
+
 .sub '[]' :method
     .param pmc i
     $P0 = self[i]
