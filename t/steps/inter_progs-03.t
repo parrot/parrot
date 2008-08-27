@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# inter_progs-01.t
+# inter_progs-03.t
 
 use strict;
 use warnings;
@@ -29,7 +29,7 @@ http://rt.perl.org/rt3/Ticket/Display.html?id=41168.
 
 =cut
 
-########## ask ##########
+########### ask ##########
 
 my $args = process_options(
     {
@@ -37,7 +37,6 @@ my $args = process_options(
         mode => q{configure},
     }
 );
-
 my $conf = Parrot::Configure->new;
 
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
@@ -70,7 +69,7 @@ foreach my $p (
 {
     push @prompts, $conf->data->get($p);
 }
-push @prompts, q{y};
+push @prompts, q{n};
 
 $object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
 can_ok( 'Tie::Filehandle::Preempt::Stdin', ('READLINE') );
@@ -94,17 +93,18 @@ ok( defined $conf, "Components of runstep() tested okay" );
 $object = undef;
 untie *STDIN;
 
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
 
 =head1 NAME
 
-inter_progs-01.t - test inter::progs
+inter_progs-03.t - test inter::progs
 
 =head1 SYNOPSIS
 
-    % prove t/steps/inter_progs-01.t
+    % prove t/steps/inter_progs-03.t
 
 =head1 DESCRIPTION
 

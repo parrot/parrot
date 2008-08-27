@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# inter_progs-01.t
+# inter_progs-02.t
 
 use strict;
 use warnings;
@@ -29,11 +29,11 @@ http://rt.perl.org/rt3/Ticket/Display.html?id=41168.
 
 =cut
 
-########## ask ##########
+########## ask; debugging 0  ##########
 
 my $args = process_options(
     {
-        argv => [q{--ask}],
+        argv => [ q{--ask}, q{--debugging=0} ],
         mode => q{configure},
     }
 );
@@ -100,11 +100,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-inter_progs-01.t - test inter::progs
+inter_progs-02.t - test inter::progs
 
 =head1 SYNOPSIS
 
-    % prove t/steps/inter_progs-01.t
+    % prove t/steps/inter_progs-02.t
 
 =head1 DESCRIPTION
 

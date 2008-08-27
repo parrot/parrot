@@ -1,12 +1,12 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# inter_progs-01.t
+# inter_progs-04.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 24;
+use Test::More tests => 23;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -70,26 +70,17 @@ foreach my $p (
 {
     push @prompts, $conf->data->get($p);
 }
-push @prompts, q{y};
+push @prompts, q{0};
 
 $object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
 can_ok( 'Tie::Filehandle::Preempt::Stdin', ('READLINE') );
 isa_ok( $object, 'Tie::Filehandle::Preempt::Stdin' );
 
+my $rv;
 capture( sub {
-    my $verbose = inter::progs::_get_verbose($conf);
-    my $ask = inter::progs::_prepare_for_interactivity($conf);
-    my $cc;
-    ($conf, $cc) = inter::progs::_get_programs($conf, $verbose, $ask);
-    $debug = inter::progs::_get_debug($conf, $ask);
-    $debug_validity = inter::progs::_is_debug_setting_valid($debug);
+    $rv = $step->runstep($conf);
 }, \$stdout);
-ok( defined $debug_validity, "'debug_validity' set as expected" );
-
-capture( sub {
-    $conf = inter::progs::_set_debug_and_warn($conf, $debug);
-}, \$stdout);
-ok( defined $conf, "Components of runstep() tested okay" );
+ok( ! defined $rv, "runstep returned undef as expected" );
 
 $object = undef;
 untie *STDIN;
@@ -100,11 +91,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-inter_progs-01.t - test inter::progs
+inter_progs-04.t - test inter::progs
 
 =head1 SYNOPSIS
 
-    % prove t/steps/inter_progs-01.t
+    % prove t/steps/inter_progs-04.t
 
 =head1 DESCRIPTION
 

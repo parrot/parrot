@@ -529,6 +529,8 @@ sub option_or_data {
 
 sub pcfreeze {
     my $conf = shift;
+    local $Storable::Deparse = 1;
+    local $Storable::Eval = 1;
     return nfreeze($conf);
 }
 
@@ -538,6 +540,8 @@ sub replenish {
     foreach my $k (keys %$conf) {
         delete $conf->{$k};
     }
+    local $Storable::Deparse = 1;
+    local $Storable::Eval = 1;
     my %gut = %{ thaw($serialized) };
     while ( my ($k, $v) = each %gut ) {
         $conf->{$k} = $v;
