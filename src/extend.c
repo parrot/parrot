@@ -964,7 +964,10 @@ Parrot_call_sub_ret_float(PARROT_INTERP, Parrot_PMC sub,
 
 =item C<void * Parrot_call_method>
 
-Call a parrot method for the given object.
+Call the parrot subroutine C<sub> as a method on PMC object C<obj>. The method
+should have the name C<method> as a Parrot_string, and should have a function
+signature C<signature>. Any arguments to the method can be passed at the end
+as a variadic argument list.
 
 =cut
 

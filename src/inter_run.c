@@ -535,7 +535,9 @@ Parrot_runops_fromc_arglist_retf(PARROT_INTERP, ARGIN(PMC *sub),
 
 =item C<void* Parrot_run_meth_fromc_arglist>
 
-RT#48260: Not yet documented!!!
+Calls the subroutine C<sub> as a method on object C<obj>. The method to be
+called is named C<meth>, has the function signature C<sig> and arguments
+C<args>. C<args> is a C variadic argument list created with C<va_start>.
 
 =cut
 
