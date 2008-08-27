@@ -142,7 +142,7 @@ token operation {
 #XXX UGLY!  Refactor into <args> maybe?
 token call_args {
     | '()' [<.ws> <do_block>]? {*}
-    | <args> [<.ws> <do_block>]? {*}
+    | [ <.after \s> | <.before \s> ] <args> [<.ws> <do_block>]? {*}
     | '(' <.ws> <args> <.ws> ')' [<.ws> <do_block>]? {*}
 }
 
@@ -397,7 +397,7 @@ token literal {
 }
 
 token float {
-    \d* '.' \d+
+    '-'? \d* '.' \d+
     {*}
 }
 
