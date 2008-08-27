@@ -222,8 +222,13 @@ Adds an attribute with the given name to the class.
 .sub 'lookup_class'
     .param pmc item
     $P0 = class item
+    if_null $P0, null_class
+    .return($P0)
+  null_class:
+    $P0 = new 'Undef'
     .return($P0)
 .end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

@@ -58,6 +58,16 @@ Clones the list.
     .return ($P0)
 .end
 
+=item clear()    (method)
+
+Removes all elements from the array.
+
+=cut
+
+.sub 'clear' :method
+    self = 0
+.end
+
 
 =item ACCEPTS(topic)
 
@@ -1024,6 +1034,13 @@ Returns the elements of LIST in the opposite order.
     .param pmc list :slurpy
 
     .return list.'first'(test)
+.end
+
+.sub 'infix:<<' :multi('CardinalArray',_)
+    .param pmc array
+    .param pmc item
+    push array, item
+    .return(array)
 .end
 
 ## TODO: join map reduce sort zip
