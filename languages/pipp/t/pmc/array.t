@@ -21,7 +21,7 @@ Tests the PhpArray PMC.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(69)
+    plan(71)
 
     basic_get_set()
     stack_and_queue_ops()
@@ -37,6 +37,7 @@ Tests the PhpArray PMC.
     deep_cmp_tests()
     shallow_equals_tests()
     deep_equals_tests()
+    assign_pmc_shallow_native()
 .end
 
 .sub basic_get_set
@@ -326,14 +327,14 @@ ii_end:
     p[-1234]  = 'iderayder '
 
     it = iter p
-iter_loop1:
-    unless it goto iter_done1
+iter_loop:
+    unless it goto iter_done
     val = shift it
     val_str = p[val]
     concat s, val_str
-    goto iter_loop1
+    goto iter_loop
 
-iter_done1:
+iter_done:
     is_ok = s == 'im in ur iderayder ideradin ur valuze.'
     ok(is_ok, "basic iterator test")
 
@@ -857,6 +858,47 @@ current_and_key_ok:
     is_ok = ! i
     ok(is_ok, "cmp deep vs deep, different again (b)")
 .end
+
+.sub assign_pmc_shallow_native
+    .local pmc p1, p2, it, p1_key, p1_val, p2_val
+    .local int is_ok, i, j
+
+    p1 = new 'PhpArray'
+    p2 = new 'PhpArray'
+
+    p1['abc'] = 123
+    p1['abq'] = 1.2
+    p1['abthing'] = 'some string'
+    p1[1] = 'a'
+    p1[0] = 1.9
+    p1[999] = 'foooo'
+
+    assign p2, p1
+
+    i = elements p1
+    is_ok = i == 6
+    ok(is_ok, "assigned pmc has correct element count")
+
+    
+    is_ok = 1
+    it = iter p1
+iter_loop:
+    unless it goto iter_done
+    unless is_ok goto iter_done
+    p1_key = shift it
+    is_ok = exists p2[p1_key]
+    unless is_ok goto iter_done
+    p2_val = p2[p1_key]
+    p1_val = p1[p1_key]
+    is_ok = p1_val == p2_val
+    unless is_ok goto iter_done
+
+    goto iter_loop
+iter_done:
+    ok(is_ok, "assigned pmc has correct key/value pairs")
+
+.end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
