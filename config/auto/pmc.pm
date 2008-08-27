@@ -222,15 +222,18 @@ END
     ( my $TEMP_pmc_classes_str = $TEMP_pmc_str ) =~ s/^| / src${slash}pmc${slash}/g;
     ( my $TEMP_pmc_classes_pmc = $pmc_list )     =~ s/^| / src${slash}pmc${slash}/g;
 
-    # Gather the actual names (with MixedCase) of all of the
-    # non-abstract built-in PMCs.
-    my @names;
+    # Gather the actual names (with MixedCase) of all of the non-abstract
+    # built-in PMCs in rough hierarchical order.
+    my %parents;
+
 PMC: for my $pmc_file ( split( /\s+/, $pmc_list ) ) {
         next if $pmc_file =~ /^const/;
-        my $name;
+
         open my $PMC, "<", "src/pmc/$pmc_file"
             or die "open src/pmc/$pmc_file: $!";
-        my $const;
+
+        my ($const, $name);
+
         while (<$PMC>) {
             if (/^pmclass (\w+)(.*)/) {
                 $name    = $1;
@@ -238,8 +241,25 @@ PMC: for my $pmc_file ( split( /\s+/, $pmc_list ) ) {
                 $decl .= <$PMC> until $decl =~ s/\{.*//;
 
                 $const = 1 if $decl =~ /\bconst_too\b/;
-                next PMC   if $decl =~ /\babstract\b/;
                 next PMC   if $decl =~ /\bextension\b/;
+
+                # the default PMC gets handled specially
+                last       if $name eq 'default';
+
+                my $parent = 'default';
+
+                if ($decl =~ /extends (\w+)/) {
+                    $parent = $1;
+                }
+
+                # set a marker not to initialize an abstract PMC
+                if ($decl =~ /\babstract\b/) {
+                    unshift @{ $parents{$name} }, '(abstract)';
+                }
+
+                # please note that normal and Const PMCs must be in this order
+                push @{ $parents{$parent} }, $name;
+                push @{ $parents{$parent} }, "Const$name" if $const;
 
                 last;
             }
@@ -249,11 +269,9 @@ PMC: for my $pmc_file ( split( /\s+/, $pmc_list ) ) {
 
         die "No pmclass declaration found in $pmc_file"
             unless defined $name;
-
-        # please note that normal and Const PMCs must be in this order
-        push @names, $name;
-        push @names, "Const$name" if $const;
     }
+
+    my @names = $self->order_pmcs_by_hierarchy( \%parents );
 
     $conf->data->set(
         pmc                  => $pmc_list,
@@ -266,6 +284,31 @@ PMC: for my $pmc_file ( split( /\s+/, $pmc_list ) ) {
     );
 
     return 1;
+}
+
+sub order_pmcs_by_hierarchy {
+    my ($self, $parents) = @_;
+
+    return $self->get_kids_for_parent( $parents, 'default' );
+}
+
+sub get_kids_for_parent {
+    my ($self, $parents, $parent) = @_;
+
+    my @kids;
+
+    for my $kid (@{ $parents->{$parent} }) {
+        # skip abstract PMCs
+        next if $kid eq '(abstract)';
+        push @kids, $kid unless exists $parents->{$kid}
+                                &&     $parents->{$kid}[0] eq '(abstract)';
+
+        # and avoid infinite loops
+        next if $kid eq $parent;
+        push @kids, $self->get_kids_for_parent($parents, $kid);
+    }
+
+    return @kids;
 }
 
 1;
