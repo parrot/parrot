@@ -875,7 +875,7 @@ current_and_key_ok:
 
     assign p2, p1
 
-    i = elements p1
+    i = elements p2
     is_ok = i == 6
     ok(is_ok, "assigned pmc has correct element count")
 
