@@ -32,11 +32,11 @@ Tests the PhpArray PMC.
     generic_iterator_tests()
     php_iterator_tests()
     php_array_func_tests()
-    shallow_cmp_tests()
+    cmp_shallow_native()
     um_wtf()
-    deep_cmp_tests()
-    shallow_equals_tests()
-    deep_equals_tests()
+    cmp_deep_native()
+    equals_shallow_native()
+    equals_deep_native()
     assign_pmc_shallow_native()
 .end
 
@@ -570,7 +570,7 @@ current_and_key_ok:
     ok(is_ok, "current() and key() work properly")
 .end
 
-.sub shallow_cmp_tests
+.sub cmp_shallow_native
     .local pmc p1, p2
     .local int i, j, is_ok
 
@@ -625,7 +625,7 @@ current_and_key_ok:
     .local pmc p1, p2
     .local int is_ok, i
 
-    #note: this is how Zend PHP works.  Try the following for fun:
+    #note: This is how Zend PHP works.  Try the following for fun:
     #$a['a'] = 1; $a['b'] = 2; $b['b'] = 1; $b['a'] = 2;
     #if ($a > $b) echo "a > b\n"; if ($b > $a) echo "b > a\n";
     #if ($a < $b) echo "a < b\n"; if ($b < $a) echo "b < a\n";
@@ -645,7 +645,7 @@ current_and_key_ok:
     ok(is_ok, "goofy cmp check, part 2")
 .end
 
-.sub deep_cmp_tests
+.sub cmp_deep_native
     .local pmc p1, p1a, p1b, p1c, p1d
     .local pmc p2, p2a, p2b, p2c, p2d
     .local int is_ok, i, j
@@ -726,7 +726,7 @@ current_and_key_ok:
     ok(is_ok, "cmp a deep array against itself")
 .end
 
-.sub shallow_equals_tests
+.sub equals_shallow_native
     .local pmc p1, p2
     .local int i, j, is_ok
 
@@ -776,7 +776,7 @@ current_and_key_ok:
 .end
 
 
-.sub deep_equals_tests
+.sub equals_deep_native
     .local pmc p1, p1a, p1b, p1c, p1d
     .local pmc p2, p2a, p2b, p2c, p2d
     .local int is_ok, i, j
