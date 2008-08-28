@@ -160,11 +160,9 @@ CODE
 4321
 OUTPUT
 
-# RT#46823: Rewrite these properly when we have exceptions
-
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
-        new P0, 'ResizablePMCArray'
-        set P0, 1
+    new P0, 'ResizablePMCArray'
+    set P0, 1
 
     set P0[1], -7
     print "ok 1\n"

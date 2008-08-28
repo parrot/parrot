@@ -149,23 +149,26 @@ ok 2
 ok 3
 OUTPUT
 
-# RT#46823: Rewrite these properly when we have exceptions
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
-        new P0, 'FixedPMCArray'
-        set P0, 1
+pasm_output_is( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
+    new P0, 'FixedPMCArray'
+    set P0, 1
 
+    push_eh caught
     set P0[1], -7
-
+    pop_eh
+    say "no exception"
+    end
+caught:
+    say "caught an exception"
     end
 CODE
-/FixedPMCArray: index out of bounds!
-current instr\.:/
+caught an exception
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
-        new P0, 'FixedPMCArray'
-        set P0, 1
+    new P0, 'FixedPMCArray'
+    set P0, 1
 
     set I0, P0[1]
     end

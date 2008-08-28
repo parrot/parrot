@@ -123,10 +123,8 @@ ok 2
 ok 3
 OUTPUT
 
-# RT#46823: Rewrite these properly when we have exceptions
-
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
-        new P0, 'ResizableBooleanArray'
+    new P0, 'ResizableBooleanArray'
 
     set P0[1], -7
     set I0, P0[1]
