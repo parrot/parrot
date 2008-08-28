@@ -21,7 +21,7 @@ Tests the PhpArray PMC.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(75)
+    plan(76)
 
     basic_get_set()
     stack_and_queue_ops()
@@ -40,6 +40,7 @@ Tests the PhpArray PMC.
     assign_pmc_shallow_native()
     assign_pmc_deep_native()
     add_pmc_shallow_native()
+    get_repr_deep()
 .end
 
 .sub basic_get_set
@@ -882,7 +883,6 @@ current_and_key_ok:
     is_ok = i == 6
     ok(is_ok, "assigned pmc has correct element count")
 
-    
     is_ok = 1
     it = iter p1
 iter_loop:
@@ -924,7 +924,7 @@ iter_done:
     i = elements p2
     is_ok = i == 7
     ok(is_ok, "assigned pmc has correct element count")
-    
+
     is_ok = 1
     it = iter p1
 iter_loop:
@@ -947,7 +947,7 @@ iter_done:
     .local pmc p1, p2, p3, it, val
     .local int is_ok, i, max
     .local string s, val_str
-    
+
     p1 = new 'PhpArray'
     p2 = new 'PhpArray'
 
@@ -1000,7 +1000,105 @@ add_loop_end:
     is_ok = s == 'add appears to be working correctly.'
     ok(is_ok, "add adds elements correctly")
 .end
-        
+
+.sub get_repr_deep
+    .local pmc p1
+    .local string is, should_be
+    .local int is_ok
+
+    p1 = new 'PhpArray'
+
+    p1['first']  = 1
+    #XXX: this gets rounded
+    p1['second'] = 99999.999
+    p1['third']  = "quux"
+    p1["\"\"quoted\" quote's quotes\""]  = "'more' \"quoted\" quotes"
+
+    p1['aa';'a'] = 987
+    #XXX: this gets rounded
+    p1['aa';'b'] = 3.31234242
+    p1['aa';'v'] = 'typo'
+
+    p1[11;1] = 'one'
+    p1[11;11] = 11
+    p1[11;111] = 111.111
+
+    p1[4] = 'are we there yet'
+    p1[5] = 'no'
+
+    p1[1] = 6
+    p1[2] = .666
+    p1[3] = 'seven'
+
+    p1[6] = 'are we there yet'
+    p1[7] = 'no'
+
+    p1['aaa';'a';1] = 'twas brillig'
+    p1['aaa';'a';'a'] = 0
+    p1[111;1;'a'] = 'generator'
+    p1[111;1;0]   = 65537
+
+    p1[8] = 'are we there yet'
+    p1[9] = 'yes'
+
+    is = get_repr p1
+    should_be = <<'SHOULD_BE'
+Array
+(
+    [first] => 1
+    [second] => 99999.999
+    [third] => quux
+    [""quoted" quote's quotes"] => 'more' "quoted" quotes
+    [aa] => Array
+        (
+            [a] => 987
+            [b] => 3.31234242
+            [v] => typo
+        )
+
+    [11] => Array
+        (
+            [1] => one
+            [11] => 11
+            [111] => 111.111
+        )
+
+    [4] => are we there yet
+    [5] => no
+    [1] => 6
+    [2] => 0.666
+    [3] => seven
+    [6] => are we there yet
+    [7] => no
+    [aaa] => Array
+        (
+            [a] => Array
+                (
+                    [1] => twas brillig
+                    [a] => 0
+                )
+
+        )
+
+    [111] => Array
+        (
+            [1] => Array
+                (
+                    [a] => generator
+                    [0] => 65537
+                )
+
+        )
+
+    [8] => are we there yet
+    [9] => yes
+)
+SHOULD_BE
+
+    is_ok = is == should_be
+    ok(is_ok, "get_repr output looks ok")
+
+.end
 
 # Local Variables:
 #   mode: pir
