@@ -167,8 +167,10 @@ EOC
     /* do class_init code */
     for (pass = 0; pass <= 1; ++pass) {
 EOC
-    while ( my ( $class, $info ) = each %classes ) {
-        next if $info->{flags}{no_init};
+
+    my @init_order = flatten_class_hierarchy( \%classes );
+
+    for my $class (@init_order) {
         $cout .= <<"EOC";
         Parrot_${class}_class_init(interp, type$class, pass);
 EOC
@@ -179,6 +181,59 @@ EOC
 }
 
 EOC
+}
+
+=item C<_flatten_class_hierarchy($classes)>
+
+Flattens and returns the given dynpmc hierarchy into a list where all parents
+appear before their children.  Internal use only.
+
+=cut
+
+sub flatten_class_hierarchy {
+    my $classes = shift;
+
+    my (@parents, @kids);
+
+    while ( my ( $class, $info ) = each %$classes ) {
+        next if $info->{flags}{no_init};
+
+        # assume it's a parent for now
+        push @parents, $class;
+
+        my @extends = keys %{ $info->{has_parent} };
+
+    PARENT:
+        for my $parent (@extends) {
+            next PARENT unless exists $classes->{$parent};
+
+            # this dynpmc extends another dynpmc in this group, so note it
+            pop  @parents;
+            push @kids, $class;
+            last PARENT;
+        }
+    }
+
+    # if there are no intra-group dependencies, return early
+    return @parents unless @kids;
+
+    # keep track of all unprocessed dependencies
+    my %parents_in_kids = map { $_ => 1 } @kids;
+
+    while (my $kid = shift @kids) {
+        my @kid_parents = keys %{ $classes->{$kid}{has_parent} };
+
+        # can't resolve; put at end of list
+        if (grep { exists $parents_in_kids{$_} } @kid_parents) {
+            push @kids, $kid;
+            next;
+        }
+
+        delete $parents_in_kids{$kid};
+        push @parents, $kid;
+    }
+
+    return @parents;
 }
 
 =item C<c_code_coda()>
