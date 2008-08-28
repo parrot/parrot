@@ -159,7 +159,20 @@ Parrot_runops_fromc(PARROT_INTERP, ARGIN(PMC *sub))
 
 =item C<static parrot_context_t * runops_args>
 
-RT#48260: Not yet documented!!!
+Calls the PMC subroutine C<sub> with optional name C<meth>. If PMC object
+C<obj> is provided, the call is treated as a method call on that object.
+The function has a function signature C<sig> and a variadic argument list
+C<ap>.
+
+Signatures are similar to NCI:
+
+    v ... void return
+    I ... INTVAL (not Interpreter)
+    N ... NUMVAL
+    S ... STRING*
+    P ... PMC*
+
+TODO: Update this list of possible signature elements.
 
 =cut
 
@@ -233,7 +246,7 @@ Run a method sub from C. The function arguments are
 already setup according to Parrot calling conventions, the C<sub> argument
 is an invocable C<Sub> PMC.
 
-If registers a PMC return values, it is returned.
+If a PMC return value is registered it is returned.
 
 =cut
 
@@ -269,14 +282,6 @@ Parrot_run_meth_fromc(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj), SH
 Run parrot ops, called from C code, function arguments are passed as
 C<va_args> according to the signature. The C<sub> argument is an
 invocable C<Sub> PMC.
-
-Signatures are similar to NCI:
-
-    v ... void return
-    I ... INTVAL (not Interpreter)
-    N ... NUMVAL
-    S ... STRING*
-    P ... PMC*
 
 =cut
 
@@ -345,7 +350,9 @@ Parrot_runops_fromc_args_event(PARROT_INTERP, ARGIN(PMC *sub),
 
 =item C<INTVAL Parrot_runops_fromc_args_reti>
 
-RT#48260: Not yet documented!!!
+Called from C code, runs a Parrot subroutine C<sub>. The subroutine has
+function signature C<sig> and a C variadic argument list. Returns an
+C<INTVAL>.
 
 =cut
 
@@ -370,7 +377,9 @@ Parrot_runops_fromc_args_reti(PARROT_INTERP, ARGIN(PMC *sub),
 
 =item C<FLOATVAL Parrot_runops_fromc_args_retf>
 
-RT#48260: Not yet documented!!!
+Called from C code, runs a Parrot subroutine C<sub>. The subroutine has
+function signature C<sig> and a C variadic argument list. Returns a
+C<FLOATVAL>.
 
 =cut
 
@@ -395,7 +404,9 @@ Parrot_runops_fromc_args_retf(PARROT_INTERP, ARGIN(PMC *sub),
 
 =item C<void* Parrot_run_meth_fromc_args>
 
-RT#48260: Not yet documented!!!
+Called from C code, runs a Parrot subroutine C<sub> as a method on object
+C<obj>. The subroutine has function signature C<sig> and a C variadic argument
+list.
 
 =cut
 
@@ -421,7 +432,9 @@ Parrot_run_meth_fromc_args(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj
 
 =item C<INTVAL Parrot_run_meth_fromc_args_reti>
 
-RT#48260: Not yet documented!!!
+Called from C code, runs a Parrot subroutine C<sub> as a method on object
+C<obj>. The subroutine has function signature C<sig> and a C variadic argument
+list. Returns an C<INTVAL>.
 
 =cut
 
@@ -446,7 +459,9 @@ Parrot_run_meth_fromc_args_reti(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC
 
 =item C<FLOATVAL Parrot_run_meth_fromc_args_retf>
 
-RT#48260: Not yet documented!!!
+Called from C code, runs a Parrot subroutine C<sub> as a method on object
+C<obj>. The subroutine has function signature C<sig> and a C variadic argument
+list C<args>. Returns a C<FLOATVAL>.
 
 =cut
 
@@ -471,7 +486,9 @@ Parrot_run_meth_fromc_args_retf(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC
 
 =item C<void * Parrot_runops_fromc_arglist>
 
-RT#48260: Not yet documented!!!
+Called from C code, runs a Parrot subroutine C<sub>.
+The subroutine has function signature C<sig> and a C C<va_list>
+argument list C<args>.
 
 =cut
 
@@ -493,7 +510,9 @@ Parrot_runops_fromc_arglist(PARROT_INTERP, ARGIN(PMC *sub),
 
 =item C<INTVAL Parrot_runops_fromc_arglist_reti>
 
-RT#48260: Not yet documented!!!
+Called from C code, runs a Parrot subroutine C<sub>.
+The subroutine has function signature C<sig> and a C C<va_list>
+argument list C<args>. Returns an C<INTVAL>.
 
 =cut
 
@@ -514,7 +533,9 @@ Parrot_runops_fromc_arglist_reti(PARROT_INTERP, ARGIN(PMC *sub),
 
 =item C<FLOATVAL Parrot_runops_fromc_arglist_retf>
 
-RT#48260: Not yet documented!!!
+Called from C code, runs a Parrot subroutine C<sub>.
+The subroutine has function signature C<sig> and a C C<va_list>
+argument list C<args>. Returns an C<FLOATVAL>.
 
 =cut
 
@@ -560,7 +581,10 @@ Parrot_run_meth_fromc_arglist(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *
 
 =item C<INTVAL Parrot_run_meth_fromc_arglist_reti>
 
-RT#48260: Not yet documented!!!
+Calls the subroutine C<sub> as a method on object C<obj>. The method to be
+called is named C<meth>, has the function signature C<sig> and arguments
+C<args>. C<args> is a C variadic argument list created with C<va_start>.
+Returns an C<INTVAL>.
 
 =cut
 
@@ -582,7 +606,10 @@ Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(
 
 =item C<FLOATVAL Parrot_run_meth_fromc_arglist_retf>
 
-RT#48260: Not yet documented!!!
+Calls the subroutine C<sub> as a method on object C<obj>. The method to be
+called is named C<meth>, has the function signature C<sig> and arguments
+C<args>. C<args> is a C variadic argument list created with C<va_start>.
+Returns a C<FLOATVAL>.
 
 =cut
 
