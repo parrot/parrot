@@ -81,6 +81,8 @@ Writes a C string format with varargs to C<stdout>.
 
 Writes a C string format with varargs to C<stderr>.
 
+=cut
+
 */
 
 PARROT_API
