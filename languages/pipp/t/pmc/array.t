@@ -21,7 +21,7 @@ Tests the PhpArray PMC.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(71)
+    plan(75)
 
     basic_get_set()
     stack_and_queue_ops()
@@ -38,6 +38,8 @@ Tests the PhpArray PMC.
     equals_shallow_native()
     equals_deep_native()
     assign_pmc_shallow_native()
+    assign_pmc_deep_native()
+    add_pmc_shallow_native()
 .end
 
 .sub basic_get_set
@@ -859,6 +861,7 @@ current_and_key_ok:
     ok(is_ok, "cmp deep vs deep, different again (b)")
 .end
 
+
 .sub assign_pmc_shallow_native
     .local pmc p1, p2, it, p1_key, p1_val, p2_val
     .local int is_ok, i, j
@@ -896,8 +899,108 @@ iter_loop:
     goto iter_loop
 iter_done:
     ok(is_ok, "assigned pmc has correct key/value pairs")
-
 .end
+
+
+.sub assign_pmc_deep_native
+    .local pmc p1, p2, it, p1_key, p1_val, p2_val
+    .local int is_ok, i, j
+
+    p1 = new 'PhpArray'
+    p2 = new 'PhpArray'
+
+    p1['a';'x';'w'] = 1234
+    p1['a';'x';'x'] = 1.24
+    p1['a';'x';'y'] = "1234"
+    p1['d';5] = 'qwerty'
+    p1['e';8] = 9.999
+    p1['f';19] = 4
+    p1['g'] = 7315
+    p1['h'] = 78.58
+    p1['i'] = "w"
+
+    assign p2, p1
+
+    i = elements p2
+    is_ok = i == 7
+    ok(is_ok, "assigned pmc has correct element count")
+    
+    is_ok = 1
+    it = iter p1
+iter_loop:
+    unless it goto iter_done
+    unless is_ok goto iter_done
+    p1_key = shift it
+    is_ok = exists p2[p1_key]
+    unless is_ok goto iter_done
+    p2_val = p2[p1_key]
+    p1_val = p1[p1_key]
+    is_ok = p1_val == p2_val
+    unless is_ok goto iter_done
+
+    goto iter_loop
+iter_done:
+    ok(is_ok, "assigned pmc has correct key/value pairs")
+.end
+
+.sub add_pmc_shallow_native
+    .local pmc p1, p2, p3, it, val
+    .local int is_ok, i, max
+    .local string s, val_str
+    
+    p1 = new 'PhpArray'
+    p2 = new 'PhpArray'
+
+    p1[0] = 'i_add '
+    p1[1] = 'appears '
+    p1[2] = 'to '
+    p1[3] = 'be '
+    p1[4] = 'working '
+    p2[4] = 'horribly broken and not at all working '
+    p2[5] = 'correctly'
+    p2[6] = '.'
+
+    p1 += p2
+    it = iter p1
+i_add_loop:
+    unless it goto i_add_loop_end
+    val = shift it
+    val_str = p1[val]
+    concat s, val_str
+    goto i_add_loop
+i_add_loop_end:
+
+    is_ok = s == 'i_add appears to be working correctly.'
+    ok(is_ok, "i_add adds elements correctly")
+
+
+    p1 = new 'PhpArray'
+    p2 = new 'PhpArray'
+    s = ''
+
+    p1[0] = 'add '
+    p1[1] = 'appears '
+    p1[2] = 'to '
+    p1[3] = 'be '
+    p1[4] = 'working '
+    p2[4] = 'horribly broken and not at all working '
+    p2[5] = 'correctly'
+    p2[6] = '.'
+
+    p3 = p1 + p2
+    it = iter p3
+add_loop:
+    unless it goto add_loop_end
+    val = shift it
+    val_str = p3[val]
+    concat s, val_str
+    goto add_loop
+add_loop_end:
+
+    is_ok = s == 'add appears to be working correctly.'
+    ok(is_ok, "add adds elements correctly")
+.end
+        
 
 # Local Variables:
 #   mode: pir
