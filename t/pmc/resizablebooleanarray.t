@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 23;
 
 =head1 NAME
 
@@ -121,6 +121,33 @@ CODE
 ok 1
 ok 2
 ok 3
+OUTPUT
+
+pasm_output_is( <<'CODE', <<'OUTPUT', "Setting negatively indexed elements" );
+    new P0, 'ResizableBooleanArray'
+
+    push_eh caught
+    set P0[-1], 1
+    pop_eh
+    print "no exception"
+    end
+caught:
+    say "caught an exception"
+    end    
+CODE
+caught an exception
+OUTPUT
+
+pasm_output_is( <<'CODE', <<'OUTPUT', "Getting negatively indexed elements" );
+    new P0, 'ResizableBooleanArray'
+    set P0, 1
+
+    set I0, P0[-1]
+    print "got "
+    say I0
+    end
+CODE
+got 0
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );

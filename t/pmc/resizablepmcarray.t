@@ -172,16 +172,22 @@ CODE
 ok 1
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "Setting -ve out-of-bounds elements" );
-        new P0, 'ResizablePMCArray'
-        set P0, 1
-        new P1, 'Integer'
-        set P1, 12345
+pasm_output_is( <<'CODE', <<'OUTPUT', "Setting negative out-of-bounds elements" );
+    new P0, 'ResizablePMCArray'
+    set P0, 1
+    new P1, 'Integer'
+    set P1, 1234
 
+    push_eh eh
     set P0[-10], P1
+    pop_eh
+    say "no ex"
+    end
+eh:
+    say "got an ex"    
     end
 CODE
-/ResizablePMCArray: index out of bounds!/
+got an ex
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
@@ -199,14 +205,20 @@ CODE
 ok 1
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "Getting -ve out-of-bounds elements" );
-        new P0, 'ResizablePMCArray'
-        set P0, 1
-        new P1, 'Integer'
+pasm_output_is( <<'CODE', <<'OUTPUT', "Getting negative out-of-bounds elements" );
+    new P0, 'ResizablePMCArray'
+    set P0, 1
+    new P1, 'Integer'
+    push_eh eh
     set P1, P0[-10]
+    pop_eh
+    say "no ex"
+    end
+eh:
+    say "got an ex"    
     end
 CODE
-/ResizablePMCArray: index out of bounds!/
+got an ex
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );

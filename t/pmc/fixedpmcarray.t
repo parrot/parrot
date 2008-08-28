@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use lib qw(lib . ../lib ../../lib);
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 21;
 use Test::More;
 
 =head1 NAME
@@ -149,6 +149,38 @@ ok 2
 ok 3
 OUTPUT
 
+pasm_output_is( <<'CODE', <<'OUTPUT', "Setting negatively indexed elements" );
+    new P0, 'FixedPMCArray'
+    set P0, 1
+
+    push_eh caught
+    set P0[-1], -7
+    pop_eh
+    say "no exception"
+    end
+caught:
+    say "caught an exception"
+    end
+CODE
+caught an exception
+OUTPUT
+
+pasm_output_is( <<'CODE', <<'OUTPUT', "Getting negatively indexed elements" );
+    new P0, 'FixedPMCArray'
+    set P0, 1
+
+    push_eh caught
+    set I0, P0[-1]
+    pop_eh
+    say "no exception"    
+    end
+caught:
+    say "caught an exception"
+    end
+CODE
+caught an exception
+OUTPUT
+
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
     new P0, 'FixedPMCArray'
@@ -166,15 +198,20 @@ CODE
 caught an exception
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
+pasm_output_is( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
     new P0, 'FixedPMCArray'
     set P0, 1
 
+    push_eh caught
     set I0, P0[1]
+    pop_eh
+    say "no exception"    
+    end
+caught:
+    say "caught an exception"
     end
 CODE
-/FixedPMCArray: index out of bounds!
-current instr\.:/
+caught an exception
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );

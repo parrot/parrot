@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 21;
 
 =head1 NAME
 
@@ -137,6 +137,38 @@ CODE
 ok 1
 ok 2
 ok 3
+OUTPUT
+
+pasm_output_is( <<'CODE', <<'OUTPUT', "Setting negatively indeded elements" );
+    new P0, 'ResizableFloatArray'
+    set P0, 1
+
+    push_eh caught
+    set P0[-1], -7
+    pop_eh
+    print "no exception\n"
+    end
+caught:
+    say "caught something"
+    end    
+CODE
+caught something
+OUTPUT
+
+pasm_output_is( <<'CODE', <<'OUTPUT', "Getting negatively indeded elements" );
+    new P0, 'ResizableFloatArray'
+    set P0, 1
+
+    push_eh caught
+    set I0, P0[-1]
+    pop_eh
+    say "no exception"
+    end
+caught:
+    say "caught an exception"
+    end    
+CODE
+caught an exception
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
