@@ -1,0 +1,213 @@
+# Copyright (C) 2008, The Perl Foundation.
+# $Id: pdd30_install.pod 30255 2008-08-23 12:15:46Z rurban $
+
+=head1 NAME
+
+docs/pdds/draft/pdd30_install.pod - Parrot Installation
+
+=head1 ABSTRACT
+
+This PDD defines Parrot's installation details. The goal is to provide binary
+packages, a working C<make install> for parrot, the installables, FHS compliant
+search paths for the installables and solving the problem of not accessing
+installed source-only files and the optimization of config bootstrapping
+if a frozen config_hash is already linked.
+
+=head1 VERSION
+
+$Revision: 30459 $
+
+=head1 SYNOPSIS
+
+ make install
+ make test-installable -C language/lang
+ make installable -C language/lang
+ make install -C language/lang DESTDIR=inst
+
+=head1 DESCRIPTION
+
+Parrot installation mechanisms are more powerful than perl5's.
+MANIFEST contains also the end location, tools/dev/install_files.pl is driven
+by this definition.
+The three runtime paths for "include", "library" for load_bytecode and "dynext"
+for loadlib should end up in the $prefix/lib/parrot paths.
+See #56996-fhs-runtime.patch
+
+Contrary to perl5, parrot and its language implementions on top of parrot may
+be installed as self-hosting single-file executables, with the help of merged
+pbc's and pbc2exe --install.
+
+Bootstrapping the config hash should not read a config file when the hash is
+already contained in the pmc or executable. See #57418 [TODO] optimize
+_config to omit .include "library/config.pir" on installables.
+
+The same problem is for every .include, .loadlib and .load_bytecode statement
+in installed files where the target is not installed. This could be solved with
+a module system or with pbc_merge removing not needed .load_bytecode statements.
+
+Test executables are binary different to installable executables because of
+this embedded config hash. Test executables contain config hash with
+the prefix to the build_dir, installables to the given prefix from Configure.pl.
+
+There are's also a long-standing conflict in building parrot with an already
+installed shared libparrot.so. See #39742-installed-conflict.patch which adds
+the blib/lib path to PATH resp. LD_RUN_PATH.
+
+=head1 DEFINITIONS
+
+An B<installable> is a pbc or exe which must not access the build_dir
+paths. The build_dir is not available in a binary package. This is solved by
+generating and linking a special F<install_config.fpmc>. Custom python modules
+have a similar packaging problem, which they haven't solved yet.
+
+B<build_dir> is the full path where parrot was built. It is defined in the
+config hash. When building from source build_dir is also the PARROT_RUNTIME prefix.
+
+B<DESTDIR> is the end location of the parrot tree in front of the prefix
+(/usr or /usr/local). This allows packaging by installing into a seperate
+install tree and do a tar cf there.
+
+The B<config hash> is the return value of the global function C<_config()>,
+generated in F<config_lib.pasm>, and either defined in F<library/config.pir>, or
+as frozen pmc embedded in the test executable (F<config.fpmc>), the installable
+executable (F<install_config.fpmc>) or empty for miniparrot (F<null_config.fpmc>).
+
+=head1 IMPLEMENTATION
+
+=head2 make install
+
+The parrot build system is optimized for building and testing in the
+build_dir, but not for building with an already installed parrot due to simple
+build system bugs, and not optimized to build and test installables, which should
+not access the libraries in the build_dir, but in the DESTDIR.
+
+The goal is to make install work for parrot, the utils, and all the languages.
+For parrot and its utils the install actions are defined in the main Makefile,
+for the languages the install actions should be defined in its Makefiles and
+is implemented in #56554-make-install-lang.patch.
+
+C<make install> currently does not work with an already installed shared
+libparrot.so on most platforms. There's a patch at #39742.
+
+make install actions for a language lang:
+
+ copy installables to DESTDIR/bin_dir as parrot-lang
+ optionally copy lang.pbc to DESTDIR/script_dir (/usr/lib/parrot/bin/ ?)
+ copy libraries to DESTDIR/lib_dir/parrot/dynext/
+ optionally copy pbc's to DESTDIR/lib_dir/parrot/library/ (only php_ext)
+ optionally copy include pasm and pirs to DESTDIR/lib_dir/parrot/include/ (not yet)
+ copy docs to DESTDIR/doc_dir/
+ generate a man(1) page and copy to DESTDIR/man_dir/
+ optionally generate html and copy to DESTDIR/html_dir/lang/
+
+=head2 make installable -C languages/lang
+
+This creates a pbc or exe linked to F<install_config.fpmc>, and this
+executable should not access the build_dir/runtime/parrot paths.
+
+A pbc may be optionally merged with F<install_config.fpmc>, an exe
+is just linked with C<pbc_to_exe --install>.
+
+=head2 make test-installable -C languages/lang
+
+B<Goal>: Test if the generated installable does not access the build_dir paths
+but does find older libraries, includes and dynext's in $prefix. DESTDIR is
+not known and may be optional. A simple test from C<make test> without any
+features from an external library is enough, because newer libraries are not
+installed yet at this stage.
+
+B<Implementation>: I<TODO>
+
+B<Problem>: C<make test-installable> should copy the make install files away, out
+of the build_dir, should temporarily rename build_dir, run a simple test, and
+remake the build_dir back. This will not be possible from a make run from
+within the build_dir. So renaming runtime will be it.
+
+This is fragile and similar for every language target, so it should be
+simplified by a make framework, like include F<Makefile.common> or
+extending the current automake-like framework.
+
+=head2 _config bootstrapping
+
+Bootstrapping the config hash should not read a config file when the hash is
+already contained in the pmc or executable.
+.include "library/config.pir" and .load_bytecode "config.pbc" should be
+omitted on installables if possible.
+
+=head2 Accessing not-installed files
+
+B<Problem:> Various pir files load source-only .pir, .pasm or compiler .pbc
+files, which are not installed in binary packages.
+This shows up when trying to run an installable with the build_dir removed or renamed.
+
+ $ parrot-forth.exe xx
+ "load_bytecode" couldn't find file 'languages/forth/tokenstream.pbc'
+ current instr.: ' init' pc 942 (forth.pir:9)
+ called from Sub 'main' pc 994 (forth.pir:40)
+
+ $ parrot-pheme.exe
+ "load_bytecode" couldn't find file 'compilers/tge/TGE/Rule.pbc'
+ current instr.: 'parrot;TGE;__onload' pc 19 (TGE.pir:94)
+ called from Sub 'parrot;Pheme::AST::Grammar;__onload' pc 7175 (languages/pheme/lib/ASTGrammar.pir:5)
+ called from Sub 'parrot;Pheme::Compiler;main' pc -1 ((unknown file):-1)
+
+ $ parrot-pipp
+ Parrot VM: Can't stat /usr/src/perl/parrot/parrot-0.7.0-1/build/languages/pipp/src/common/pipplib.pbc, code 2.
+ Unable to append PBC to the current directory
+ current instr.: 'parrot;Pipp;__onload' pc 47 (src/common/pipp.pir:92)
+ called from Sub 'parrot;Pipp;pipp' pc -1 ((unknown file):-1)
+
+B<Fix 1>: Install all deps.
+
+The simple forth and pipp problem could be solved by merging the missing pbc's
+to a single file F<forth.pbc> and generate from this the installable.
+
+The simple pheme problem could be solved by installing also all TGE
+and other compiler pbc's at the parrot/library/compilers path.
+
+The same problem is for every .include, .loadlib and .load_bytecode statement
+in installed files where the target is not installed.
+
+This could also be solved with a module system or with pbc_merge removing
+those statements.
+
+B<Fix 2>: Module system.
+
+Avoid already loaded pbc files.
+
+Source loading PIR statements like .loadlib and .load_bytecode should
+a) hash its arg and skip the file if already loaded (hash lookup)
+b) add .load*_once sisters as in php - .load_bytecode_once and .loadlib_once
+
+B<Fix 3>: pbc_merge fixups
+
+pbc_merge should patch up the bytecode (if possible) to omit
+loading .load_bytecode pbc-files which are being merged.
+
+B<Fix 4>: .include_bytecode
+
+Introduce a new op .include_bytecode, which works like .include, but
+on the bc level.
+
+=head1 ATTACHMENTS
+
+None.
+
+=head1 FOOTNOTES
+
+None.
+
+=head1 REFERENCES
+
+The mentioned patches against SVN HEAD are at
+http://code.google.com/p/cygwin-rurban/source/browse/trunk/release/parrot/patches
+The patches in the tickets are always too old.
+
+#nnnnn references tickets in http://rt.perl.org/rt3/Ticket/Display.html?id=nnnnn
+
+=cut
+
+__END__
+Local Variables:
+ fill-column:78
+End:
