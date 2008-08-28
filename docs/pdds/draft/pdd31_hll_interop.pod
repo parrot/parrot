@@ -41,6 +41,13 @@ that should be designed to require a minimum of translation.  In the general
 case, some translation may be required by both the calling language and the
 called language:
 
+{{ There seems to be an implied basic assumption here that language
+interoperability is the responsibility of the language implementor. It is not.
+We cannot require that language implementors design and implement their
+languages according to some global specification. Any interoperability
+infrastructure must be provide by Parrot, and must work for all languages.
+--allison }}
+
         |
 	|
         |                        Calling sub
@@ -70,7 +77,13 @@ into something more generic.
 
 {{ Of course, "stub" is really too close to "sub", so we should find a better
 word.  Doesn't the C community call these "bounce routines"?  Or something?
--- rgr, 31-Jul-08. }}
+-- rgr, 31-Jul-08. 
+
+The language will never provide a wrapper for its subs. For the most part,
+wrappers will be unnecessary. Where a wrapper is desired to make a library from
+some other language act more like a "native" library, the person who desires
+the native behavior can implement the wrapper and make it publically available.
+--allison }}
 
 {{ I am discovering that there are five different viewpoints here,
 corresponding to the five layers (including "plain Parrot") of the diagram
@@ -109,6 +122,8 @@ conventions and PMC classes possible.  Ideally, if an API uses only PMCs that
 are provided by a "bare Parrot" (i.e. one without any HLL runtime code), then
 it should be possible to use this API from any other language.
 
+{{ This is unnecessarily restrictive --allison }}
+
 =item *
 
 It is acceptable for languages to define subs for internal calling that are
@@ -116,6 +131,8 @@ not suitable for external calling.  Such subs should be marked as such, and
 other languages should respect those distinctions.  (Or, if they choose to
 call intra-language subs, they should be very sure they understand that
 language's calling conventions.
+
+{{ It's not possible to define a sub that can't be called externally --allison }}
 
 =back
 
@@ -139,12 +156,21 @@ subs means that the calling compiler just needs to load the PBC in order to
 access the module API (though it may need additional hints).  Of course, that
 also requires a PIR API for accessing this metainformation . . .
 
+{{ Exporting is very much a Perl idea, not much applicability for exporting
+outside of Perl. --allison}}
+
 Crazy idea:  This is more or less the same information (typing) required for
 multimethods.  If we encourage the export of multisubs, then the exporting
 language could provide multiple interfaces, and the calling compiler could
 query the set of methods for the one most suitable.
 
+{{ Proposal rejected, because we aren't going with "external" and "internal"
+subroutine variants, so it's not needed. --allison }}
+
 =head2 More namespace complexity?
+
+{{ Proposal rejected, because we aren't going with "external" and "internal"
+subroutine variants, so it's not needed. --allison }}
 
 It might be good to have some way for HLLs to define a separate external
 definition for a given sub (i.e. one that provides the wrapper) that can be
@@ -175,6 +201,10 @@ relationships, which must affect multimethod dispatch for Lisp generic
 functions, i.e. a method defined for C<VECTOR> must be considered when passed
 a string as a parameter.
 
+{{ Common Lisp (for example) will have its own set of type relationships,
+because it will have its own set of types. There will be no "remapping" of core
+types --allison }}
+
 The language that owns the multisub gets to define the type hierarchy and
 dispatch rules used when it gets called.  In order to handle objects from
 foreign languages, the "owning" language must decide where to graft the
@@ -184,9 +214,15 @@ to root language-specific object class hierarchies; that way, a language would
 only have to include C<Object> in order to incorporate objects from all other
 conforming languages.  -- rgr, 26-Aug-08. }}
 
+{{ The language that owns the multisub does get to define the dispatch rules
+for the multisub. But, it doesn't get to alter the type hierarchy of objects
+from other languages. --allison }}
+
 Note that common Parrot classes will in general appear in different places in
 different languages' dispatch hierarchies, so it is important to bear in mind
 which language "owns" the dispatch.
+
+{{ Absolutely not true. --allison }}
 
 =head1 DEFINITIONS
 
@@ -220,6 +256,10 @@ for scalar data, except in case of dire need.  To see with this is so, take
 the particular case of integer division, which differs significantly between
 languages.
 
+{{ No, this is completely backwards. Languages are heartily encouraged to
+create their own PMCs for any and all common variable types found in the
+language. --allison }}
+
 In Tcl, "the integer three divided by the integer five" produces the integer
 value 0.
 
@@ -235,12 +275,22 @@ bug, even if both those integers happen to come from Common Lisp.  Ditto for a
 floating-point result from Common Lisp code that happens to get two integers
 from Perl or Lua (or both!).
 
+{{ Not a bug, it's the expected result. Divide operations are multi-dispatched.
+If you pass two Common Lisp integers into a divide operation in Perl 5, it'll
+search for the best matching multi, and if it finds one for Common Lisp
+integers (an exact match), it'll run that and return a Common Lisp ratio.
+--allison }}
+
 Even though these languages all use "/" to represent division, they do not all
 mean the same thing by it, and similarly for most (if not all) other built-in
 arithmetic operators.  However, they pretty clearly B<do> mean the same thing
 by (e.g.) "the integer with value five," so there is no need to represent the
 inputs to these operations differently; they can all be represented by the
 same C<Integer> PMC class.
+
+{{ The whole point of having sets of PMCs in different languages is to handle
+the case where "it's an integer, but has a different division operation than
+other languages" --allison}}
 
 {{ Must also discuss morphing:  If some languages do it and other do not, then
 care must be taken at the boundaries.  -- rgr, 31-Jul-08. }}
@@ -252,6 +302,9 @@ primitive HLL scalar type, and so a new PMC class is required.  In this case,
 interoperability cannot be guaranteed, since it may not be possible to define
 behavior for such objects in other languages.  But the choice of a new PMC is
 forced, so we must make the best of it.
+
+{{ Yes, except this is the common case, and interoperability will still work
+--allison }}
 
 A good case in point is that of complex rational numbers in Common Lisp.  The
 C<Complex> type provided by Parrot assumes that its components are
@@ -278,6 +331,10 @@ exotic type, we should take care to use the most general possible class to
 specialize the other operands, in the hope that other exotics are subclasses
 of these.
 
+{{ It is perfectly fine for a Lisp arithmetic operator to return a RATIONAL
+subtype. Please don't define methods for a pile of operations that already have
+vtable functions --allison }}
+
 The other aspect is extending other languages' arithmetic to do something
 reasonable with our exotic types.  If we're lucky, Parrot will provide a basic
 multisub that takes care of most cases, and we just need to add method(s) to
@@ -287,9 +344,17 @@ the (hopefully more generic) component PMCs.  Doing so is still the
 responsibility of the language that defines the exotic class, since it is in
 charge of its internal representation.
 
+{{ The default multi for a common operation like division will call the PMC's
+C<get_number> vtable function, perform a standard division operation, and
+return a standard Integer/Number/BigNum. --allison }}
+
 {{ We can define multimethods on another language without loading it, can't
 we?  If not, then making this work may require negotiation between language
 implementors, if it is feasible at all.  -- rgr, 31-Jul-08. }}
+
+{{ I'm not sure what you mean by defining multimethods on another language.
+Perhaps you're asking if it's possible to declare a multisub for a type that
+doesn't exist yet?  --allison }}
 
 This brings us to a number of guidelines for defining language-specific
 arithmetic so as to maximize interoperability:
@@ -301,11 +366,16 @@ arithmetic so as to maximize interoperability:
 Define language-specific operations using multimethods (to avoid conflict with
 other languages).
 
+{{ Clarify? How would non-multi's conflict?  --allison }}
+
 =item 2.
 
 Define them on the highest (most general) possible PMC classes (in order that
 they continue to work if passed a subclass by a call from a different
 language).
+
+{{ Define them on the class that makes sense. There's no point in targeting any
+particular level of the inheritance hierarchy. --allison }}
 
 =item 3.
 
@@ -313,7 +383,13 @@ Don't define a language-specific PMC class unless there is clear need for a
 different internal representation.  (And even then, you might consider
 donating it to become part of the Parrot core.)
 
+{{ This is definitely not true. --allison }}
+
 =back
+
+{{ The fundamental rule is to implement your language in the way that makes the
+most sense for your language. Language implementors don't have to think about
+interoperability. --allison }}
 
 The rest of this section details exceptions and caveats in dealing with scalar
 data types.
@@ -328,6 +404,12 @@ that do not support "fuzzy" coercion . . .
 {{ This section is meant to answer Geoffrey's "What does Lisp do with a Perl 5
 Scalar?" question.  I gotta think about this more.  -- rgr, 29-Jul-08.  }}
 
+{{ The scalar decides when to morph, not the language. All the languages that
+have morphing scalars implement them in such a way that they know how to
+handle, for example, morphing when a string value is assigned to an integer
+scalar, and what to do if that value is later used as an integer again.
+--allison }}
+
 =head3 C<Complex> numbers
 
 Not all languages support complex numbers, so if an exported function requires
@@ -335,6 +417,10 @@ a complex argument, it should either throw a suitable error, or coerce an
 acceptable numeric argument.  In the latter case, be sure to advertise this in
 the documentation, so that callers without complex numbers can tell their
 compiler that acceptable numeric type.
+
+{{ All documentation for a library should state what argument types it accepts
+and what results it returns, there's nothing unique about complex numbers.
+--allison }}
 
 =head3 C<Ratio> numbers
 
@@ -345,6 +431,10 @@ error, or convert an acceptable numeric value.
 However, since ratios are rare (and it is rather eccentric for a program to
 insist on a ratio as a parameter), it is strongly advised to accept a floating
 point or integer value, and convert it in the wrapper.
+
+{{ All documentation for a library should state what argument types it accepts
+and what results it returns, there's nothing unique about ratios. --allison }}
+
 
     {{ Parrot does not support these yet, so this is not a current issue.  --
     rgr, 28-Jul-08. }}
@@ -361,6 +451,11 @@ the callee does this, the aggregate is effectively read-only.  (It is possible
 for the wrapper to stuff the changes back in the original structure by side
 effect, but this has its own set of problems.)
 
+{{ Mapping is generally discouraged, but I don't see any reason it would make
+the aggregate read-only. You can certainly convert a Python dictionary to a
+Perl hash, use it in your Perl code, and then either return it as a Perl hash,
+or convert it back to a Python dictionary. --allison }}
+
 In other words, if the mapping is not straightforward, it may not be possible.
 If the mapping C<is> straightforward it may not be necessary -- and an
 unnecessary mapping may limit use of the called module's API.
@@ -372,9 +467,13 @@ know how to do.  The choices are therefore to (a) treat them like black boxes
 in the other language, or (b) provide a separate functional or OO API (or
 both) for calling from other languages.
 
+{{ (a) is generally prefered --allison }}
+
 Several questions arise for languages with multiple representations for
 aggregate types.  Typically, this is because these types are more restricted
 in some fashion.  [finish.  -- rgr, 29-Jul-08.]
+
+{{ Not clear where you're going with this --allison }}
 
 =head2 Functional data types
 
@@ -382,6 +481,9 @@ In a sense, functional types (i.e. callable objects) are the easiest things to
 pass across languages, since they require no mapping at all.  On the other
 hand, if a language doesn't support functional arguments, then there is no
 hope of using an API written in another language that requires them.
+
+{{ Hmmm? They're just subs, how would they not be callable from another
+language? --allison }}
 
 =head2 Datum vs. object
 
@@ -397,6 +499,10 @@ a Scheme program if Scheme can't access any of the methods?  Similarly, what
 could Ruby do with a Scheme list when it can't even get to the Scheme C<car>
 function?
 
+{{ Except that Ruby would never even get a Scheme list in the first place if it
+hadn't loaded a Scheme library of some sort. And, being a list, the Scheme list
+would still support the standard vtable functions for lists. --allison }}
+
 {{ Methinks the right thing would be to define a common introspection API (a
 good thing in its own right).  Scheme and Ruby should each define their own
 implementation of the same in "plain Parrot semantics" terms, independently.
@@ -408,9 +514,14 @@ probably be even wierder.  In any case, it is important that the calling user
 not need anything out of the ordinary, from either language or the called
 module author.  -- rgr, 29-Jul-08. }}
 
+{{ There is a common introspection API, the 'inspect' vtable function. But what
+you're describing here isn't introspection, it's actually the standard vtable
+functions.  --allison }}
+
 =head3 Defining methods across language boundaries
 
-{{ Is the term "unimethod" acceptable here?  -- rgr, 29-Jul-08. }}
+{{ Is the term "unimethod" acceptable here?  -- rgr, 29-Jul-08.  They're just
+methods or subroutines, and it's just "single dispatch". --allison}}
 
 There will be cases where a module user wants to extend that module by
 defining a new method on an externally-defined class, or add a multimethod to
@@ -419,6 +530,10 @@ wholly to the external language, the calling language (i.e. the one adding the
 method) must use the semantics of the external language.  If the external
 language uses a significantly different metamodel, simply adding the
 C<:method> pragma may not cut it.
+
+{{ No, the C<:method> flag is always all you need to define a method. The class
+object you add the method to determines what it does with that method.
+--allison }}
 
 There are two cases:  (1) The calling language is adding a new method, which
 cannot therefore interfere with existing usage in the called language; and (2)
@@ -430,9 +545,19 @@ method as part of the foreign language, and provide B<both> glue layers (as
 necessary) around it.  It is therefore not expected that all compilers will
 provide a way to define methods on all foreign classes for all language pairs.
 
+{{ These should generally be handled by subclassing the parent language class,
+and adding your method to the subclass. Monkeypatching is certainly possible,
+but not encouraged. And, there really isn't any distinction between "treating
+the new method as part of the calling language" and "treat[ing] the new method
+as part of the foreign language". It's a method, you call it on an object, the
+class of the object determines how it's found and invoked. --allison }}
+
 Multimethods are easier; although the multisub does belong conceptually to one
 language (from whose namespace the caller must find the multisub), multis are
 more loosely coupled to their original language.
+
+{{ Well, the semantics of the language that defined the multisub also determine
+how it is found and invoked. --allison }}
 
 The cases for multimethods are similar, though:  (1) If the calling language
 method is specialized to classes that appear only in the calling module, then
@@ -441,10 +566,16 @@ language can choose to treat as internal.  (2) If the calling method is
 specialized only on Parrot or called-language classes, then the compiler
 should take care to make it generally usable.
 
+{{ Not sure what you mean here. --allison }}
+
 =head3 Subclassing across language boundaries
 
 {{ This is an important feature, but requires compatible metamodels.  -- rgr,
-29-Jul-08. }}
+29-Jul-08.
+
+Or Proxy PMCs, which is how we're currently handling inheritance across
+metamodel boundaries. --allison
+}}
 
 =head3 Method vs. multimethod
 
@@ -457,6 +588,11 @@ language, and a UM language can similarly treat a MM call as a normal function
 call.  (Which will require the normal "make the function look like a method"
 hack for obligate OO languages like Ruby.)  Defining methods across the
 boundary is harder, and may not be worth the trouble.  -- rgr, 29-Jul-08. }}
+
+{{ That's "multiple dispatch" and "single dispatch". In general, defining code
+in one language and injecting it into the namespace of another language isn't
+the primary focus of language interoperability. Using libraries from other
+languages is. --allison }}
 
 =cut
 
