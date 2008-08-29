@@ -19,7 +19,7 @@ use Parrot::Configure::Test qw(
 
 ########## --miniparrot ##########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [ q{--miniparrot} ],
         mode => q{configure},
@@ -46,7 +46,7 @@ $conf->replenish($serialized);
 
 ########## regular; singular ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ ],
         mode => q{configure},
@@ -66,7 +66,7 @@ $conf->replenish($serialized);
 
 ########## regular; plural ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ ],
         mode => q{configure},

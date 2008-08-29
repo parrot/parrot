@@ -20,7 +20,7 @@ use Parrot::Configure::Test qw(
 
 ########## ask; maintainer; $ENV{TEST_LEX} ##########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [ q{--ask}, q{--maintainer} ],
         mode => q{configure},

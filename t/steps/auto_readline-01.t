@@ -23,7 +23,7 @@ use IO::CaptureOutput qw | capture |;
 
 ########## _add_to_libs() ##########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [ ],
         mode => q{configure},

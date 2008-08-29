@@ -20,9 +20,7 @@ use_ok(
 );
 use_ok('Parrot::Configure::Options::Test');
 
-my ( $args, $opttest );
-
-$args = process_options(
+my ( $args, $step_list_ref ) = process_options(
     {
         argv => [q{--test}],
         mode => q{configure},
@@ -31,7 +29,7 @@ $args = process_options(
 ok( defined $args,
     "process_options() returned successfully when options were specified" );
 
-$opttest = Parrot::Configure::Options::Test->new($args);
+my $opttest = Parrot::Configure::Options::Test->new($args);
 ok( defined $opttest, "Constructor returned successfully" );
 
 # Running the actual pre- and post-configuration tests would be too

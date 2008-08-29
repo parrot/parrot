@@ -21,7 +21,7 @@ use IO::CaptureOutput qw( capture );
 
 ########### regular ###########
 
-my $args = process_options( {
+my ($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );
@@ -50,7 +50,7 @@ $conf->replenish($serialized);
 
 ########### --verbose  ###########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ q{--verbose} ],
         mode => q{configure},
@@ -78,7 +78,7 @@ $conf->replenish($serialized);
 
 ########### _handle_error_case() ###########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );
@@ -96,7 +96,7 @@ $conf->replenish($serialized);
 
 ########### _handle_error_case(); --verbose ###########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );

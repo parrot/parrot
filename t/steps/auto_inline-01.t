@@ -21,7 +21,7 @@ use IO::CaptureOutput qw( capture );
 
 ########### regular  ###########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [ ],
         mode => q{configure},
@@ -48,7 +48,7 @@ $conf->replenish($serialized);
 
 ########### --inline ###########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ q{--inline} ],
     mode => q{configure},
 } );
@@ -61,7 +61,7 @@ $conf->replenish($serialized);
 
 ########### _evaluate_inline() ###########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );
@@ -78,7 +78,7 @@ $conf->replenish($serialized);
 
 ########### _evaluate_inline() ###########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );
@@ -95,7 +95,7 @@ $conf->replenish($serialized);
 
 ########### _evaluate_inline(); --verbose ###########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ q{--verbose} ],
     mode => q{configure},
 } );
@@ -118,7 +118,7 @@ $conf->replenish($serialized);
 
 ########### _second_probe_for_inline(); _evaluate_inline() ###########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );

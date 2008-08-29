@@ -19,7 +19,7 @@ use Parrot::Configure::Test qw(
 
 ########## ops ##########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [ q{--ops=alpha} ],
         mode => q{configure},

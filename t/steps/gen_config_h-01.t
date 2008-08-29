@@ -22,7 +22,7 @@ use Parrot::Configure::Utils qw( _slurp );
 
 ########## regular ##########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [ ],
         mode => q{configure},
@@ -44,7 +44,7 @@ $conf->replenish($serialized);
 
 ########## --define; _handle_define_option() ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ q{--define=inet_aton} ],
     mode => q{configure},
 } );

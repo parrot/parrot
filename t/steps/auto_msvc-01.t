@@ -20,7 +20,7 @@ use IO::CaptureOutput qw| capture |;
 
 ########## Win32 ##########
 
-my $args = process_options( {
+my ($args, $step_list_ref) = process_options( {
     argv            => [],
     mode            => q{configure},
 } );
@@ -46,7 +46,7 @@ $conf->replenish($serialized);
 
 ########## _evaluate_msvc() ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [],
     mode            => q{configure},
 } );
@@ -63,7 +63,7 @@ $conf->replenish($serialized);
 
 ########## _evaluate_msvc() ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [],
     mode            => q{configure},
 } );
@@ -85,7 +85,7 @@ $conf->replenish($serialized);
 
 ########## _handle_not_msvc() ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [],
     mode            => q{configure},
 } );

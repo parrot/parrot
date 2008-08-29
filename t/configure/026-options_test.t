@@ -23,10 +23,8 @@ use_ok('Parrot::Configure::Options::Test::Prepare', qw|
     |
 );
 
-my ( $args, $opttest );
-
 ##### 1 #####
-$args = process_options(
+my ( $args, $step_list_ref ) = process_options(
     {
         argv => [],
         mode => q{configure},
@@ -35,7 +33,7 @@ $args = process_options(
 ok( defined $args,
     "process_options() returned successfully when no options were specified" );
 
-$opttest = Parrot::Configure::Options::Test->new($args);
+my $opttest = Parrot::Configure::Options::Test->new($args);
 ok( defined $opttest, "Constructor returned successfully" );
 
 {
@@ -59,7 +57,7 @@ ok( defined $opttest, "Constructor returned successfully" );
 }
 
 ##### 2 #####
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [q{--test=configure}],
         mode => q{configure},
@@ -72,7 +70,7 @@ $opttest = Parrot::Configure::Options::Test->new($args);
 ok( defined $opttest, "Constructor returned successfully" );
 
 ##### 3 #####
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [q{--test=build}],
         mode => q{configure},
@@ -86,7 +84,7 @@ ok( defined $opttest, "Constructor returned successfully" );
 
 ##### 4 #####
 my $badoption = q{foobar};
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [qq{--test=$badoption}],
         mode => q{configure},
@@ -103,7 +101,7 @@ like(
 );
 
 ##### 5 #####
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [],
         mode => q{configure},

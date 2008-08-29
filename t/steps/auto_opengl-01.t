@@ -21,7 +21,7 @@ use IO::CaptureOutput qw| capture |;
 
 ########## --without-opengl ##########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [ q{--without-opengl} ],
         mode => q{configure},
@@ -48,7 +48,7 @@ $conf->replenish($serialized);
 
 ########## _add_to_libs() ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ ],
         mode => q{configure},
@@ -141,7 +141,7 @@ $conf->replenish($serialized);
 
 ########## --verbose; _evaluate_cc_run() ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ q{--verbose} ],
         mode => q{configure},

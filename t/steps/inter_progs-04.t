@@ -31,7 +31,7 @@ http://rt.perl.org/rt3/Ticket/Display.html?id=41168.
 
 ########## ask ##########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [q{--ask}],
         mode => q{configure},

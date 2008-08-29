@@ -24,7 +24,7 @@ use IO::CaptureOutput qw | capture |;
 
 ########## --verbose ##########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [q{--verbose}],
         mode => q{configure},
@@ -58,7 +58,7 @@ $conf->replenish($serialized);
 
 ########## --verbose; local hints directory ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [q{--verbose}],
         mode => q{configure},
@@ -101,7 +101,7 @@ $conf->replenish($serialized);
 
 ########## --verbose; local hints directory; no runstep() in local hints ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [q{--verbose}],
         mode => q{configure},
@@ -141,7 +141,7 @@ $conf->replenish($serialized);
 
 ########## --verbose; imaginary OS ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ q{--verbose} ],
         mode => q{configure},

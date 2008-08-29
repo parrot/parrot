@@ -19,7 +19,7 @@ use Parrot::Configure::Test qw(
 
 ########## _set_intvalfmt() ##########
 
-my $args = process_options( {
+my ($args, $step_list_ref) = process_options( {
     argv            => [],
     mode            => q{configure},
 } );

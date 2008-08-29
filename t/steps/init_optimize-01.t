@@ -19,7 +19,7 @@ use IO::CaptureOutput qw | capture |;
 
 ########## no optimization (default) ##########
 
-my $args = process_options( {
+my ($args, $step_list_ref) = process_options( {
     argv => [],
     mode => q{configure},
 } );
@@ -43,7 +43,7 @@ $conf->replenish($serialized);
 
 ########## --optimize  ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [q{--optimize}],
     mode => q{configure},
 } );
@@ -56,7 +56,7 @@ $conf->replenish($serialized);
 
 ########## --verbose  ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [q{--verbose}],
     mode => q{configure},
 } );
@@ -74,7 +74,7 @@ $conf->replenish($serialized);
 
 ########## --optimize=O2  ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [q{--optimize=O2}],
     mode => q{configure},
 } );
@@ -87,7 +87,7 @@ $conf->replenish($serialized);
 
 ########## --optimize; gcc 3.3  ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [q{--optimize}],
     mode => q{configure},
 } );
@@ -101,7 +101,7 @@ $conf->replenish($serialized);
 
 ########## --optimize, --verbose; gcc 4.1 ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [q{--optimize}, q{--verbose}],
     mode => q{configure},
 } );

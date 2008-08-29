@@ -25,7 +25,7 @@ use IO::CaptureOutput qw( capture );
 
 ########## --without-icu ##########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [ q{--without-icu}  ],
         mode => q{configure},
@@ -459,7 +459,7 @@ $conf->replenish($serialized);
 
 ########## --without-icu; --icu-config=none ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ q{--without-icu}, q{--icu-config=none}  ],
     mode => q{configure},
 } );
@@ -488,7 +488,7 @@ $conf->replenish($serialized);
         capture_output( qw| icu-config --exists | ); };
     SKIP: {
         skip "icu-config not available", 9 if $stderr;
-        $args = process_options( {
+        ($args, $step_list_ref) = process_options( {
             argv => [
                 q{--icu-config=1},
                 q{--icuheaders=alpha},
@@ -520,7 +520,7 @@ $conf->replenish($serialized);
 
 ########## --verbose ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ q{--verbose} ],
     mode => q{configure},
 } );
@@ -580,7 +580,7 @@ $conf->replenish($serialized);
         capture_output( qw| icu-config --exists | ); };
     SKIP: {
         skip "icu-config not available", 10 if $stderr;
-        $args = process_options(
+        ($args, $step_list_ref) = process_options(
             {
                 argv => [ q{--icuheaders=alpha}, ],
                 mode => q{configure},
@@ -620,7 +620,7 @@ $conf->replenish($serialized);
         capture_output( qw| icu-config --exists | ); };
     SKIP: {
         skip "icu-config not available", 12 if $stderr;
-        $args = process_options( {
+        ($args, $step_list_ref) = process_options( {
             argv => [ q{--verbose}, ],
             mode => q{configure},
         } );

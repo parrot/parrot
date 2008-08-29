@@ -21,7 +21,7 @@ use IO::CaptureOutput qw| capture |;
 
 ########## --miniparrot ##########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [ q{--miniparrot} ],
         mode => q{configure},
@@ -47,7 +47,7 @@ $conf->replenish($serialized);
 
 ########## Darwin special case ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );
@@ -83,7 +83,7 @@ $conf->replenish($serialized);
 
 ########## --verbose ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ q{--verbose} ],
     mode => q{configure},
 } );
@@ -109,7 +109,7 @@ $conf->replenish($serialized);
 
 ########## mock architecture ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );
@@ -131,7 +131,7 @@ $conf->replenish($serialized);
 
 ########## mock darwin ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );
@@ -155,7 +155,7 @@ $conf->replenish($serialized);
 
 ########## mock darwin ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );
@@ -179,7 +179,7 @@ $conf->replenish($serialized);
 
 ########## mock win32 ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );
@@ -201,7 +201,7 @@ $conf->replenish($serialized);
 
 ########## mock win32 ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );
@@ -223,7 +223,7 @@ $conf->replenish($serialized);
 
 ########## mock cygwin ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );
@@ -245,7 +245,7 @@ $conf->replenish($serialized);
 
 ########## mock powerpc-linux ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );
@@ -267,7 +267,7 @@ $conf->replenish($serialized);
 
 ########## mock cygwin-i486 ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );

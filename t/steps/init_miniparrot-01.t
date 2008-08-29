@@ -14,7 +14,7 @@ use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [q{--miniparrot}],
         mode => q{configure},

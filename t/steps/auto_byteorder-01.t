@@ -18,7 +18,7 @@ use Parrot::Configure::Test qw(
 
 ########## _evaluate_byteorder() ##########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [ ],
         mode => q{configure},
@@ -47,7 +47,7 @@ $conf->replenish($serialized);
 
 ########## _evaluate_byteorder() ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ ],
         mode => q{configure},
@@ -75,7 +75,7 @@ $conf->replenish($serialized);
 
 ########## _evaluate_byteorder(); phony byte order ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ ],
         mode => q{configure},

@@ -16,7 +16,7 @@ use Tie::Filehandle::Preempt::Stdin;
 $| = 1;
 is( $|, 1, "output autoflush is set" );
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [ q{--ask} ],
         mode => q{configure},

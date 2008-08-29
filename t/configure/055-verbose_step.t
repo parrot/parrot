@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests =>  6;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
@@ -16,7 +16,7 @@ use IO::CaptureOutput qw | capture |;
 $| = 1;
 is( $|, 1, "output autoflush is set" );
 
-my $args = process_options(
+my ($args, $steps_list_ref) = process_options(
     {
         argv => [q{--verbose-step=alpha::beta,init::manifest}],
         mode => q{configure},
@@ -28,23 +28,7 @@ my %args = %$args;
 my $conf = Parrot::Configure->new;
 ok( defined $conf, "Parrot::Configure->new() returned okay" );
 
-my $step        = q{init::beta};
-my $description = 'Determining if your computer does beta';
-
-$conf->add_steps($step);
-my @confsteps = @{ $conf->steps };
-isnt( scalar @confsteps, 0,
-    "Parrot::Configure object 'steps' key holds non-empty array reference" );
-is( scalar @confsteps, 1, "Parrot::Configure object 'steps' key holds ref to 1-element array" );
-my $nontaskcount = 0;
-foreach my $k (@confsteps) {
-    $nontaskcount++ unless $k->isa("Parrot::Configure::Task");
-}
-is( $nontaskcount, 0, "Each step is a Parrot::Configure::Task object" );
-is( $confsteps[0]->step, $step, "'step' element of Parrot::Configure::Task struct identified" );
-ok( !ref( $confsteps[0]->object ),
-    "'object' element of Parrot::Configure::Task struct is not yet a ref" );
-
+$conf->add_steps( @{ $steps_list_ref } );
 $conf->options->set(%args);
 is( $conf->options->{c}->{debugging},
     1, "command-line option '--debugging' has been stored in object" );

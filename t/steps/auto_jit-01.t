@@ -23,7 +23,7 @@ use Parrot::Configure::Test qw(
 );
 use IO::CaptureOutput qw( capture );
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [ q{--miniparrot} ],
         mode => q{configure},
@@ -47,7 +47,7 @@ is($step->result(), q{skipped}, "Expected result was set");
 
 $conf->replenish($serialized);
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );
@@ -288,7 +288,7 @@ $conf->data->set( has_exec_protect => undef );
 
 $conf->replenish($serialized);
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ q{--jitcapable=0}, q{--verbose}  ],
     mode => q{configure},
 } );

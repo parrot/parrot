@@ -22,7 +22,7 @@ use IO::CaptureOutput qw | capture |;
 
 ########## regular  ##########
 
-my $args = process_options( {
+my ($args, $step_list_ref) = process_options( {
     argv            => [],
     mode            => q{configure},
 } );
@@ -77,7 +77,7 @@ $conf->replenish($serialized);
 
 ########## _evaluate_gcc(); --verbose ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [ q{--verbose} ],
     mode            => q{configure},
 } );
@@ -102,7 +102,7 @@ $conf->replenish($serialized);
 
 ########## _evaluate_gcc() ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [],
     mode            => q{configure},
 } );
@@ -123,7 +123,7 @@ $conf->replenish($serialized);
 
 ########## _evaluate_gcc(); --verbose ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [ q{--verbose} ],
     mode            => q{configure},
 } );
@@ -172,7 +172,7 @@ $conf->replenish($serialized);
 
 ########## _evaluate_gcc() ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [],
     mode            => q{configure},
 } );
@@ -199,7 +199,7 @@ $conf->replenish($serialized);
 
 ########## _evaluate_gcc(); --verbose ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [ q{--verbose} ],
     mode            => q{configure},
 } );
@@ -227,7 +227,7 @@ $conf->replenish($serialized);
 
 ########## _evaluate_gcc() ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [ ],
     mode            => q{configure},
 } );
@@ -247,7 +247,7 @@ $conf->replenish($serialized);
 
 ########## _evaluate_gcc(); maintaiiner; cage ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [ q{--maintainer}, q{--cage} ],
     mode            => q{configure},
 } );
@@ -269,7 +269,7 @@ $conf->replenish($serialized);
 
 ########## _evaluate_gcc(); --miniparrot ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [ q{--miniparrot} ],
     mode            => q{configure},
 } );
@@ -292,7 +292,7 @@ $conf->replenish($serialized);
 
 ########## _evaluate_gcc() ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [ ],
     mode            => q{configure},
 } );

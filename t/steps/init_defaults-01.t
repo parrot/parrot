@@ -23,7 +23,7 @@ use Parrot::Configure::Test qw(
 ########## no debugging; profile; m 32 ##########
 
 my $pkg  = q{init::defaults};
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [ q{--debugging=0}, q{--profile}, q{--m=32} ],
         mode => q{configure},
@@ -52,7 +52,7 @@ my $cwd = cwd();
         "Able to copy VERSION for testing" );
 
     my $pkg  = q{init::defaults};
-    my $args = process_options(
+    my ($args, $step_list_ref) = process_options(
         {
             argv => [],
             mode => q{configure},
@@ -73,7 +73,7 @@ $conf->replenish($serialized);
 
 ########## m 32 ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ q{--m=32} ],
         mode => q{configure},
@@ -112,7 +112,7 @@ $conf->replenish($serialized);
 
 ########## regular ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ ],
         mode => q{configure},

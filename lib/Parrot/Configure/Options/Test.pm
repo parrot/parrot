@@ -35,6 +35,7 @@ sub new {
         fatal
         fatal-step
         help
+        script
         silent
         verbose
         verbose-step

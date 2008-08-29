@@ -21,7 +21,7 @@ use Tie::Filehandle::Preempt::Stdin;
 
 ########## no ask; no other options ##########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [],
         mode => q{configure},
@@ -52,7 +52,7 @@ $conf->replenish($serialized);
 
 ########## no ask; parrot_is_shared ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ q{--parrot_is_shared} ],
         mode => q{configure},
@@ -71,7 +71,7 @@ $conf->replenish($serialized);
 
 ########## no ask; parrot_is_shared; has_dynamic_linking ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ q{--parrot_is_shared} ],
         mode => q{configure},
@@ -97,7 +97,7 @@ $conf->replenish($serialized);
 
 ########## no ask; parrot_is_shared; has_dynamic_linking; rpath ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ q{--parrot_is_shared} ],
         mode => q{configure},
@@ -124,7 +124,7 @@ $conf->replenish($serialized);
 
 ########## no ask; parrot_is_shared; has_dynamic_linking; rpath ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ q{--parrot_is_shared} ],
         mode => q{configure},
@@ -151,7 +151,7 @@ $conf->replenish($serialized);
 
 ########## no ask; libparrot_ldflags ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [],
         mode => q{configure},
@@ -173,7 +173,7 @@ $conf->replenish($serialized);
 
 ########## ask; no has_dynamic_linking ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ q{--ask} ],
         mode => q{configure},
@@ -197,7 +197,7 @@ $conf->replenish($serialized);
 
 ########## ask; parrot_is_shared; has_dynamic_linking ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ q{--ask}, q{--parrot_is_shared} ],
         mode => q{configure},
@@ -235,7 +235,7 @@ $conf->replenish($serialized);
 
 ########## ask; has_dynamic_linking ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ q{--ask} ],
         mode => q{configure},

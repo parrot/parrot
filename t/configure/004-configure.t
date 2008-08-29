@@ -22,7 +22,7 @@ is( $|, 1, "output autoflush is set" );
 
 my $CC        = "/usr/bin/gcc-3.3";
 my $localargv = [ qq{--cc=$CC}, ];
-my $args      = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         mode => q{configure},
         argv => $localargv,

@@ -21,7 +21,7 @@ my $cwd = cwd();
 {
     my $tdir  = tempdir( CLEANUP => 1 );
     my $tdir1 = tempdir( CLEANUP => 1 );
-    my $args  = process_options(
+    my ($args, $step_list_ref) = process_options(
         {
             argv => [
                 qq{--prefix=$tdir},         qq{--exec-prefix=$tdir},
@@ -62,7 +62,7 @@ my $cwd = cwd();
     my $tdir_orig = $tdir2;
     $tdir2 .= q{/};
     my $tdir3 = tempdir( CLEANUP => 1 );
-    $args  = process_options(
+    ($args, $step_list_ref) = process_options(
         {
             argv => [
                 qq{--prefix=$tdir2},         qq{--exec-prefix=$tdir2},

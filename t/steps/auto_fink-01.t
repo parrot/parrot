@@ -23,7 +23,7 @@ use IO::CaptureOutput qw( capture );
 
 ########## Darwin but no good Fink  ##########
 
-my $args = process_options( {
+my ($args, $step_list_ref) = process_options( {
     argv            => [],
     mode            => q{configure},
 } );
@@ -54,7 +54,7 @@ $conf->replenish($serialized);
 
 ########## not Darwin ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [],
     mode            => q{configure},
 } );
@@ -69,7 +69,7 @@ $conf->replenish($serialized);
 
 ########## no Fink ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [],
     mode            => q{configure},
 } );
@@ -88,7 +88,7 @@ $conf->replenish($serialized);
 
 ########## Darwin but defective Fink ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [],
     mode            => q{configure},
 } );
@@ -113,7 +113,7 @@ $conf->replenish($serialized);
 
 ########## Darwin but defective Fink ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [],
     mode            => q{configure},
 } );
@@ -138,7 +138,7 @@ $conf->replenish($serialized);
 
 ########## not Darwin; --verbose ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [ q{--verbose} ],
     mode            => q{configure},
 } );
@@ -164,7 +164,7 @@ $conf->replenish($serialized);
 
 ########## Darwin; --verbose; no Fink ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [ q{--verbose} ],
     mode            => q{configure},
 } );
@@ -192,7 +192,7 @@ $conf->replenish($serialized);
 
 ########## Darwin; --verbose; defective Fink ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [ q{--verbose} ],
     mode            => q{configure},
 } );
@@ -226,7 +226,7 @@ $conf->replenish($serialized);
 
 ########## Darwin; --verbose; defective Fink ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [ q{--verbose} ],
     mode            => q{configure},
 } );

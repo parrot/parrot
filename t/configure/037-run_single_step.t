@@ -13,7 +13,7 @@ use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use IO::CaptureOutput qw | capture |;
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [],
         mode => q{configure},
@@ -35,7 +35,9 @@ $conf->options->set( %{$args} );
     ok( !$@, "run_single_step() completed without error" );
     like(
         $stdout,
-        qr/$step.*done./s, #'
+#        qr/$step.*done./s, #'
+#        qr/Setting up Configure's default values/s, #'
+        qr/Set Configure's default values/s, #'
         "Got message expected upon running $step"
     );
 }

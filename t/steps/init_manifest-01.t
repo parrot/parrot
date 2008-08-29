@@ -19,7 +19,7 @@ use IO::CaptureOutput qw | capture |;
 ########## no manifest check ##########
 
 my $pkg  = q{init::manifest};
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [q{--nomanicheck}],
         mode => q{configure},
@@ -52,7 +52,7 @@ $conf->replenish($serialized);
 
 ########## mock missing files ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [],
         mode => q{configure},

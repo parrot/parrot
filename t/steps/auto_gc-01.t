@@ -19,7 +19,7 @@ use IO::CaptureOutput qw| capture |;
 
 ########### --verbose ###########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [ q{--verbose} ],
         mode => q{configure},
@@ -52,7 +52,7 @@ $conf->replenish($serialized);
 
 ########### --gc=gc ###########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ q{--gc=gc} ],
     mode => q{configure},
 } );
@@ -67,7 +67,7 @@ $conf->replenish($serialized);
 
 ########### --gc=libc ###########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ q{--gc=libc} ],
     mode => q{configure},
 } );
@@ -85,7 +85,7 @@ $conf->replenish($serialized);
 
 ########### --gc=libc ###########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ q{--gc=libc} ],
     mode => q{configure},
 } );
@@ -103,7 +103,7 @@ $conf->replenish($serialized);
 
 ########### --gc=malloc ###########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ q{--gc=malloc} ],
     mode => q{configure},
 } );
@@ -118,7 +118,7 @@ $conf->replenish($serialized);
 
 ########### --gc=malloc-trace ###########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ q{--gc=malloc-trace} ],
     mode => q{configure},
 } );

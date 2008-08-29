@@ -23,7 +23,7 @@ use IO::CaptureOutput qw( capture );
 
 ########## not Darwin ##########
 
-my $args = process_options( {
+my ($args, $step_list_ref) = process_options( {
     argv            => [],
     mode            => q{configure},
 } );
@@ -50,7 +50,7 @@ $conf->replenish($serialized);
 
 ########## Darwin but no Macports ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [],
     mode            => q{configure},
 } );
@@ -68,7 +68,7 @@ $conf->replenish($serialized);
 
 ########## Darwin with Macports ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [],
     mode            => q{configure},
 } );
@@ -100,7 +100,7 @@ $conf->replenish($serialized);
 
 ########## not Darwin; --verbose ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [ q{--verbose} ],
     mode            => q{configure},
 } );
@@ -125,7 +125,7 @@ $conf->replenish($serialized);
 
 ########## Darwin; --verbose; no Macports ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [ q{--verbose} ],
     mode            => q{configure},
 } );
@@ -151,7 +151,7 @@ $conf->replenish($serialized);
 
 ########## Darwin; defective Macports ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [ ],
     mode            => q{configure},
 } );
@@ -169,7 +169,7 @@ $conf->replenish($serialized);
 
 ########## Darwin; --verbose; defective Macports ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [ q{--verbose} ],
     mode            => q{configure},
 } );

@@ -23,7 +23,7 @@ use IO::CaptureOutput qw | capture |;
 
 ########## ask ##########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [q{--ask}],
         mode => q{configure},
@@ -54,7 +54,7 @@ $conf->replenish($serialized);
 
 $ENV{LEX} = 'foobar';
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ q{--ask}, q{--maintainer} ],
         mode => q{configure},
@@ -76,7 +76,7 @@ $conf->replenish($serialized);
 
 ########## ask; maintainer; lex=flex ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ q{--ask}, q{--maintainer}, q{--lex=flex} ],
         mode => q{configure},
@@ -103,7 +103,7 @@ $conf->replenish($serialized);
 
 ########## ask; maintainer ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ q{--ask}, q{--maintainer} ],
         mode => q{configure},

@@ -22,7 +22,7 @@ use IO::CaptureOutput qw | capture |;
 
 ########## ask; maintainer; prompt flex ##########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [ q{--ask}, q{--maintainer} ],
         mode => q{configure},

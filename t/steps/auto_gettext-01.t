@@ -20,7 +20,7 @@ use IO::CaptureOutput qw( capture );
 
 ########## --without-gettext ##########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [ q{--without-gettext} ],
         mode => q{configure},
@@ -47,7 +47,7 @@ $conf->replenish($serialized);
 
 ########## _add_to_libs() ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );
@@ -161,7 +161,7 @@ $conf->replenish($serialized);
 
 ########## --without-gettext; _handle_gettext() ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ q{--without-gettext} ],
     mode => q{configure},
 } );

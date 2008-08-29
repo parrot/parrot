@@ -20,7 +20,7 @@ use Tie::Filehandle::Preempt::Stdin;
 
 ########## ask ##########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [],
         mode => q{configure},
@@ -50,7 +50,7 @@ $conf->replenish($serialized);
 
 ########## ask ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ q{--ask} ],
         mode => q{configure},

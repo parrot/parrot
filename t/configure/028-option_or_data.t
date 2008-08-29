@@ -26,7 +26,7 @@ is( $|, 1, "output autoflush is set" );
 my $testopt    = q{bindir};
 my $testoptval = q{mybindir};
 my $localargv  = [];
-my $args       = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         mode => q{configure},
         argv => $localargv,

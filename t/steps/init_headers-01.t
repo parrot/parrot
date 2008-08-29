@@ -17,7 +17,7 @@ use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 
 my $pkg  = q{init::headers};
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [],
         mode => q{configure},

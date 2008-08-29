@@ -22,7 +22,7 @@ use Parrot::Configure::Test qw(
 
 ########## regular ##########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [ ],
         mode => q{configure},
@@ -49,7 +49,7 @@ $conf->replenish($serialized);
 
 ########## contains_pccmethod()  ##########
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ ],
         mode => q{configure},
@@ -150,7 +150,7 @@ default.pmc null.pmc env.pmc key.pmc random.pmc unmanagedstruct.pmc managedstruc
 );
 my $dummy_options = join q{ } => @dummy_options;
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ qq{--pmc=$dummy_options} ],
         mode => q{configure},
@@ -172,7 +172,7 @@ managedstruct.pmc delegate.pmc constexception.pmc vtablecache.pmc parrotio.pmc p
 );
 $dummy_options = join q{ } => @dummy_options;
 
-$args = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ qq{--pmc=$dummy_options} ],
         mode => q{configure},

@@ -21,7 +21,7 @@ use IO::CaptureOutput qw( capture );
 
 ########### --miniparrot  ###########
 
-my $args = process_options(
+my ($args, $step_list_ref) = process_options(
     {
         argv => [ q{--miniparrot} ],
         mode => q{configure},
@@ -45,7 +45,7 @@ $conf->replenish($serialized);
 
 ########### regular ###########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );
@@ -66,7 +66,7 @@ $conf->replenish($serialized);
 
 ########### _probe_for_cgoto() ###########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );
@@ -104,7 +104,7 @@ is($step->result(), q{no}, "Expected result was set");
 
 $conf->replenish($serialized);
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ ],
     mode => q{configure},
 } );

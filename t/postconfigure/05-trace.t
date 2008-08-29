@@ -17,6 +17,7 @@ else {
     plan skip_all => q{Tests irrelevant unless configuration completed with tracing requested};
 }
 use lib qw( lib );
+use Parrot::Config;
 use_ok('Parrot::Configure::Trace');
 $Storable::Eval = 1;
 use Parrot::Configure::Step::List qw( get_steps_list );
@@ -47,8 +48,9 @@ is( ref($steps), q{ARRAY}, "list_steps() correctly returned array ref" );
 # Sanity check!
 is_deeply(
     $steps,
-    [ get_steps_list() ],
-    "list_steps() returned same as Parrot::Configure::Step::List::get_steps_list()"
+#    [ get_steps_list() ],
+    $PConfig{configuration_steps},
+    "list_steps() returned same as \$Parrot::Config::PConfig{configuration_steps}"
 );
 
 my $index = $obj->index_steps();

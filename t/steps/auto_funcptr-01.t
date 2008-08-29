@@ -23,7 +23,7 @@ use IO::CaptureOutput qw( capture );
 
 ########### --jitcapable=0  ###########
 
-my $args = process_options( {
+my ($args, $step_list_ref) = process_options( {
     argv            => [ q{--jitcapable=0} ],
     mode            => q{configure},
 } );
@@ -46,7 +46,7 @@ $conf->replenish($serialized);
 
 ########### _cast_void_pointers_msg() ###########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [ ],
     mode            => q{configure},
 } );
@@ -80,7 +80,7 @@ $conf->replenish($serialized);
 
 ########### --verbose; _set_positive_result() ###########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv            => [ q{--verbose} ],
     mode            => q{configure},
 } );

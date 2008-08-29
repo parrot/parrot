@@ -32,7 +32,7 @@ http://rt.perl.org/rt3/Ticket/Display.html?id=43134.
 
 ########## --without-gdbm  ##########
 
-my $args = process_options( {
+my ($args, $step_list_ref) = process_options( {
     argv => [ q{--without-gdbm} ],
     mode => q{configure},
 } );
@@ -58,7 +58,7 @@ $conf->replenish($serialized);
 
 ########## --without-gdbm; _handle_darwin_for_fink() ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ q{--without-gdbm} ],
     mode => q{configure},
 } );
@@ -123,7 +123,7 @@ $conf->replenish($serialized);
 
 ########## --without-gdbm; _evaluate_cc_run() ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ q{--without-gdbm} ],
     mode => q{configure},
 } );
@@ -167,7 +167,7 @@ $conf->replenish($serialized);
 
 ########## --without-gdbm; _recheck_settings() ##########
 
-$args = process_options( {
+($args, $step_list_ref) = process_options( {
     argv => [ q{--without-gdbm} ],
     mode => q{configure},
 } );
