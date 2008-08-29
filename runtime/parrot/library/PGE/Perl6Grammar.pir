@@ -366,8 +366,7 @@ the output to the correct output file.
     goto trait_sub
   trait_arg:
     if trait == 'parsed' goto trait_sub
-    arg = concat "'", arg
-    arg = concat arg, "'"
+    arg = optable.'escape'(arg)
     goto trait_arg_done
   trait_sub:
     optable.emit("          $P0 = get_hll_global ['%0'], '%1'", namespace, arg)
@@ -382,7 +381,8 @@ the output to the correct output file.
     concat traitlist, arg
     goto trait_loop
   trait_end:
-    optable.emit("          optable.newtok('%0'%1)", name, traitlist)
+    name = optable.'escape'(name)
+    optable.emit("          optable.newtok(%0%1)", name, traitlist)
   .return ()
 .end
 
