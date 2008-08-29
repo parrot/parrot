@@ -63,8 +63,7 @@ identifiers.
 Opcode names are not reserved words in PIR, and may be used as variable names.
 For example, you can define a local variable named C<print>.  [See RT #24251]
 Note that by using an opcode name as a local variable name, the variable will
-I<hide> the opcode name, effectively making the opcode unusable. Opcode names
-used as subroutine identifiers, on the other hand, will I<hide> that opcode.
+I<hide> the opcode name, effectively making the opcode unusable.
 
 In contrast to opcode names, PIR keywords I<are> reserved, and cannot be used as
 identifiers. Some opcode names are, in fact, PIR keywords, which therefore
