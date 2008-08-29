@@ -113,20 +113,6 @@ INTVAL Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
         __attribute__nonnull__(2);
 
 PARROT_API
-void Parrot_instantiate_object(PARROT_INTERP, ARGMOD(PMC *object))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*object);
-
-PARROT_API
-void Parrot_instantiate_object_init(PARROT_INTERP,
-    ARGIN(PMC *object),
-    ARGIN(PMC *init))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_API
 void Parrot_invalidate_method_cache(PARROT_INTERP,
     ARGIN_NULLOK(STRING *_class),
     ARGIN(STRING *meth))
