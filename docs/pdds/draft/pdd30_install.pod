@@ -148,11 +148,13 @@ This shows up when trying to run an installable with the build_dir removed or re
  $ parrot-pheme.exe
  "load_bytecode" couldn't find file 'compilers/tge/TGE/Rule.pbc'
  current instr.: 'parrot;TGE;__onload' pc 19 (TGE.pir:94)
- called from Sub 'parrot;Pheme::AST::Grammar;__onload' pc 7175 (languages/pheme/lib/ASTGrammar.pir:5)
+ called from Sub 'parrot;Pheme::AST::Grammar;__onload' pc 7175
+    (languages/pheme/lib/ASTGrammar.pir:5)
  called from Sub 'parrot;Pheme::Compiler;main' pc -1 ((unknown file):-1)
 
  $ parrot-pipp
- Parrot VM: Can't stat /usr/src/perl/parrot/parrot-0.7.0-1/build/languages/pipp/src/common/pipplib.pbc, code 2.
+ Parrot VM: Can't stat
+    /usr/src/perl/parrot/parrot-0.7.0-1/build/languages/pipp/src/common/pipplib.pbc, code 2.
  Unable to append PBC to the current directory
  current instr.: 'parrot;Pipp;__onload' pc 47 (src/common/pipp.pir:92)
  called from Sub 'parrot;Pipp;pipp' pc -1 ((unknown file):-1)
