@@ -67,8 +67,14 @@ I<hide> the opcode name, effectively making the opcode unusable. Opcode names
 used as subroutine identifiers, on the other hand, will I<hide> that opcode.
 
 In contrast to opcode names, PIR keywords I<are> reserved, and cannot be used as
-identifiers. Some opcode names (C<if>, C<unless>) are, in fact, PIR keywords,
-which therefore cannot be used as identifiers.
+identifiers. Some opcode names are, in fact, PIR keywords, which therefore
+cannot be used as identifiers.
+
+The following are PIR keywords, and cannot be used as identifiers:
+
+ goto      if       int         null
+ num       pmc      string      unless
+
 
 {{ NOTE: The use of C<::> in identifiers is deprecated. [See RT #48735] }}
 
