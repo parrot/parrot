@@ -5,10 +5,9 @@
 
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests =>  8;
 use Carp;
 use lib qw( lib );
-use_ok('config::init::defaults');
 use_ok('config::gen::crypto');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
@@ -30,8 +29,6 @@ my $args = process_options(
 my $conf = Parrot::Configure->new;
 
 my $serialized = $conf->pcfreeze();
-
-test_step_thru_runstep( $conf, q{init::defaults}, $args );
 
 my $pkg = q{gen::crypto};
 $conf->add_steps($pkg);
