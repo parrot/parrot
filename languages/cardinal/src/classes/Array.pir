@@ -638,7 +638,21 @@ Run C<block> once for each item in C<self>, with the item passed as an arg.
   each_loop_end:
 .end
 
+=item size
 
+Retrieve the number of elements in C<self>
+
+=cut
+.sub 'size' :method
+     $I0 = elements self
+     .return($I0)
+.end
+
+=item at(index)
+
+Retrieve element from position C<index>.
+
+=cut
 .sub 'at' :method
     .param pmc i
     $P0 = self[i]
@@ -659,7 +673,27 @@ Run C<block> once for each item in C<self>, with the item passed as an arg.
 .end
 
 
+=item slice
 
+Retrieve the number of elements in C<self>
+
+=cut
+.sub 'slice' :method
+    .param int start
+    .param int end
+    .local pmc returnMe
+    returnMe = new 'CardinalArray'
+    $P0 = new 'Iterator', self
+    $I0 = start
+  each_loop:
+    unless $I0 <= end goto each_loop_end
+    $P1 = self[$I0]
+    inc $I0
+    push returnMe, $P1
+    goto each_loop
+  each_loop_end:
+  .return(returnMe)
+.end
 
 =back
 
