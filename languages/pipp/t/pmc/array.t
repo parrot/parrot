@@ -21,7 +21,7 @@ Tests the PhpArray PMC.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(76)
+    plan(78)
 
     basic_get_set()
     stack_and_queue_ops()
@@ -41,6 +41,8 @@ Tests the PhpArray PMC.
     assign_pmc_deep_native()
     add_pmc_shallow_native()
     get_repr_deep()
+    vanilla_freeze_thaw()
+    goofy_freeze_thaw()
 .end
 
 .sub basic_get_set
@@ -1005,12 +1007,14 @@ add_loop_end:
     .local pmc p1
     .local string is, should_be
     .local int is_ok
+    .local num n
 
     p1 = new 'PhpArray'
 
     p1['first']  = 1
     #XXX: this gets rounded
-    p1['second'] = 99999.999
+    n = 99999.999
+    p1['second'] = n
     p1['third']  = "quux"
     p1["\"\"quoted\" quote's quotes\""]  = "'more' \"quoted\" quotes"
 
@@ -1097,7 +1101,76 @@ SHOULD_BE
 
     is_ok = is == should_be
     ok(is_ok, "get_repr output looks ok")
+.end
 
+.sub vanilla_freeze_thaw
+
+    .local pmc p, thawed, it, key
+    .local string frozen, msg, s, expected
+
+    p = new 'PhpArray'
+    p[0] = "Freeze "
+    p[-234232] = "and "
+    push p, "thaw "
+    p['fooo'] = "seem "
+    p['bar'] = "to "
+    p[999] = "be "
+    p['google'] = 'doing '
+    p['what'] = 'what '
+    p[2] = 'they '
+    p[4] = 'should.'
+
+    frozen = freeze p
+    thawed = thaw frozen
+
+    it = iter thawed
+    msg = ''
+    expected = "Freeze and thaw seem to be doing what they should."
+iter_loop:
+    unless it goto iter_end
+    key = shift it
+    s = thawed[key]
+    concat msg, s
+    goto iter_loop
+iter_end:
+    is(msg, expected, msg)
+.end
+
+
+.sub goofy_freeze_thaw
+
+    .local pmc p, thawed, it, key
+    .local string frozen, msg, s, expected
+
+    p = new 'PhpArray'
+    p[-1] = "It is not true that "
+    p[0] = "Freeze "
+    p[-234232] = "and "
+    push p, "thaw "
+    p['fooo'] = "seem "
+    p['bar'] = "to "
+    p[999] = "be "
+    p['google'] = 'doing '
+    p['what'] = 'what '
+    p[2] = 'they '
+    p[4] = 'should.'
+
+    #make sure the position of internalPointer is stored correctly
+    p.'next'()
+    frozen = freeze p
+    thawed = thaw frozen
+
+    it = iter thawed
+    msg = ''
+    expected = "Freeze and thaw seem to be doing what they should."
+iter_loop:
+    unless it goto iter_end
+    key = shift it
+    s = thawed[key]
+    concat msg, s
+    goto iter_loop
+iter_end:
+    is(msg, expected, msg)
 .end
 
 # Local Variables:
