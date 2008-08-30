@@ -1,12 +1,6 @@
-#!perl
+#! parrot
 # Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 1;
 
 =head1 NAME
 
@@ -23,19 +17,27 @@ Tests the LexPad PMC.
 
 =cut
 
-pir_error_output_like( <<'CODE', <<'OUT', 'new' );
-.sub 'test' :main
-    new P0, 'LexPad'
-    print "ok 1\n"
+.sub main :main
+    .include 'include/test_more.pir'
+    plan(1)
+
+    new_test()
 .end
-CODE
-/Cannot create a LexPad PMC without an initializer
-current instr\.:.*/
-OUT
+
+.sub new_test
+    push_eh eh
+    $P0 = new 'LexPad'
+    pop_eh
+    ok(0, "shouldn't be able to create a LexPad without an initializer")
+    goto end
+eh:
+    ok(1, "can't create a LexPad without an initializer")    
+end:
+.end
 
 # Local Variables:
-#   mode: cperl
+#   mode: pir
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
