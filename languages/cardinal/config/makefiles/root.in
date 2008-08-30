@@ -103,6 +103,12 @@ help:
 test: all
 	$(PERL) t/harness
 
+arraytest: all
+	$(PERL) t/harness --tests-from-dir=array
+
+hashtest: all
+	$(PERL) t/harness --tests-from-dir=hash
+
 # this target has nothing to do
 testclean:
 
