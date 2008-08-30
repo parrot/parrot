@@ -1,12 +1,6 @@
-#!perl
+#! parrot
 # Copyright (C) 2006-2007, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 10;
 
 =head1 NAME
 
@@ -23,167 +17,150 @@ Tests the CodeString class directly.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'create a CodeString object' );
 .sub main :main
-    .local pmc code
-    code = new 'CodeString'
-    code = 'ok 1'
-    say code
-.end
-CODE
-ok 1
-OUTPUT
+    .include 'include/test_more.pir'
+    plan(17)
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'calls to unique' );
-.sub main :main
+    create_codestring()
+    calls_to_unique()
+    basic_emit()
+    emit_with_pos_args()
+    emit_with_percent_args()
+    emit_with_named_args()
+    emit_with_pos_and_named_args()
+    output_global_unique_num()
+    namespace_keys()
+    first_char_repl_regression()
+.end
+
+.sub create_codestring
     .local pmc code
+    .local string s
+    code = new 'CodeString'
+    code = 'ok'
+    s = code
+    is(s, "ok", "code string creation succeeded")
+.end
+
+.sub calls_to_unique
+    .local pmc code
+    .local string s
     code = new 'CodeString'
     $P1 = code.'unique'('ok ')
-    say $P1
+    s = $P1
+    is(s, "ok 10", "call to unique with name")
     $P1 = code.'unique'()
-    say $P1
+    s = $P1
+    is(s, "11", "call to unique with no params")
     $P1 = code.'unique'('$P')
-    say $P1
+    s = $P1
+    is(s, "$P12", "call to unique with reg name")
 .end
-CODE
-ok 10
-11
-$P12
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'basic emit' );
-.sub main :main
+.sub basic_emit
     .local pmc code
     code = new 'CodeString'
-    code.emit('  label:')
+    code.emit('label:')
     code.emit('    say "Hello, World"')
     code.emit('    $I0 = 1')
     code.emit('    $N0 = 0.1')
-    print code
-.end
-CODE
-  label:
+    is(code, <<'CODE', "code string looks fine")
+label:
     say "Hello, World"
     $I0 = 1
     $N0 = 0.1
-OUTPUT
+CODE
+.end
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'emit with pos args' );
-.sub main :main
+.sub emit_with_pos_args
     .local pmc code
     code = new 'CodeString'
-    code.emit('  label_%0:', 1234)
+    code.emit('label_%0:', 1234)
     code.emit('    say "%0, %1"', 'Hello', 'World')
     code.emit('    %0 = %2', '$I0', 24, 48)
-    print code
-.end
-CODE
-  label_1234:
+    is(code, <<'CODE', "code string with positional args looks fine")
+label_1234:
     say "Hello, World"
     $I0 = 48
-OUTPUT
+CODE
+.end
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'emit with %, args' );
-.sub main :main
+.sub emit_with_percent_args
     .local pmc code
     code = new 'CodeString'
-    code.emit('  label_%0:', 1234)
+    code.emit('label_%0:', 1234)
     code.emit('    say "%,"', 'Hello')
     code.emit('    say "%,"', 'Hello', 'World', 'of', 'Parrot')
-    print code
-.end
-CODE
-  label_1234:
+    is(code, <<'CODE', "code string with % args looks fine")
+label_1234:
     say "Hello"
     say "Hello, World, of, Parrot"
-OUTPUT
+CODE
+.end
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'emit with named args' );
-.sub main :main
+.sub emit_with_named_args
     .local pmc code
     code = new 'CodeString'
-    code.emit('  label_%a:', 'a'=>1234)
+    code.emit('label_%a:', 'a'=>1234)
     code.emit('    say "%b, %c"', 'b'=>'Hello', 'c'=>'World')
     code.emit('    say "%d"', 'b'=>'Hello', 'c'=>'World')
-    print code
-.end
-CODE
-  label_1234:
+    is(code, <<'CODE', "emit with named args looks fine")
+label_1234:
     say "Hello, World"
     say "%d"
-OUTPUT
+CODE
+.end
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'emit with pos + named args' );
-.sub main :main
+.sub emit_with_pos_and_named_args
     .local pmc code
     code = new 'CodeString'
-    code.emit('  label_%a:', 'a'=>1234)
+    code.emit('label_%a:', 'a'=>1234)
     code.emit('    %0 "%b, %c"', 'say', 'print', 'b'=>'H', 'c'=>'W')
     code.emit('    say "%,, %c"', 'alpha', 'beta', 'b'=>'H', 'c'=>'W')
-    print code
-.end
-CODE
-  label_1234:
+    is(code, <<'CODE', "emit with pos + named args")
+label_1234:
     say "H, W"
     say "alpha, beta, W"
-OUTPUT
+CODE
+.end
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'global unique #' );
-.sub main :main
+.sub output_global_unique_num
     .local pmc code1, code2
     code1 = new 'CodeString'
     code2 = new 'CodeString'
     .local string unique1, unique2
     unique1 = code1.'unique'()
     unique2 = code2.'unique'('$P')
-    say unique1
-    say unique2
+    is(unique1, "13", "global unique #1 looks ok")
+    is(unique2, "$P14", "global unique #2 looks ok")
 .end
-CODE
-10
-$P11
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'namespace keys' );
-.sub main :main
+.sub namespace_keys
     .local pmc code
     code = new 'CodeString'
     $S0 = code.'key'('abc')
-    say $S0
+    is($S0, '["abc"]', "unnested namespace key ok")
     $S0 = code.'key'('abc', 'def')
-    say $S0
+    is($S0, '["abc";"def"]', "nested namespace key ok")
     $P0 = split ' ', unicode:"abc def T\xe9st"
     $S0 = code.'key'($P0 :flat)
-    say $S0
+    is($S0, '["abc";"def";unicode:"T\x{e9}st"]', "flattened nested unicode ns key ok")
     $S0 = code.'key'($P0)
-    say $S0
+    is($S0, '["abc";"def";unicode:"T\x{e9}st"]', "nested unicode ns key ok")
     $S0 = code.'key'('_perl6', $P0)
-    say $S0
+    is($S0, '["_perl6";"abc";"def";unicode:"T\x{e9}st"]', "big ns key ok")
 .end
-CODE
-["abc"]
-["abc";"def"]
-["abc";"def";unicode:"T\x{e9}st"]
-["abc";"def";unicode:"T\x{e9}st"]
-["_perl6";"abc";"def";unicode:"T\x{e9}st"]
-OUTPUT
 
-
-pir_output_is( <<'CODE', <<'OUTPUT', 'regression on first char repl bug' );
-.sub main :main
+.sub first_char_repl_regression
     .local pmc code
     null $P0
     code = new 'CodeString'
     code.emit('new', 'n'=>$P0)
-    print code
+    is(code, "new\n", "regression on first char repl bug looks fine")
 .end
-CODE
-new
-OUTPUT
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir 
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
