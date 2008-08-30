@@ -17,7 +17,7 @@ end
 
 a = a.reverse
 unless a[0] != 6
-	a = a.reverse!
+	a.reverse!
 	a.each() do |i|
 	    puts 'ok ', i + 6
 	end

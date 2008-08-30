@@ -339,6 +339,35 @@ done:
     .return(res)
 .end
 
+=item reverse!()
+
+Reverses a list in place.  Destructive update.
+Returns self.
+
+=cut
+
+.sub 'reverse!' :method
+    .local int pos
+    .local int len
+    .local pmc tmp1
+    .local pmc tmp2
+    pos = elements self
+    len = pos
+    dec len
+    pos = pos / 2
+  loop:
+    if pos == 0 goto done
+    dec pos
+    tmp1 = self[pos]
+    $I0 = len-pos
+    tmp2 = self[$I0]
+    self[pos] = tmp2
+    self[$I0] = tmp1
+    goto loop
+  done:
+    .return(self)
+.end
+
 =item delete()
 
 Deletes the given element from the CardinalArray, replacing them with Undef.
