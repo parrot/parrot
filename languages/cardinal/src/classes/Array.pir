@@ -270,12 +270,12 @@ Treats the list as a stack, pushing ELEMENTS onto the end of the list.  Returns 
 
 =item join(SEPARATOR)
 
-Returns a string comprised of all of the list, separated by the string SEPARATOR.  Given an empty list, join returns the empty string.
+Returns a string comprised of all of the list, separated by the string SEPARATOR.  Given an empty list, join returns the empty string. SEPARATOR is an optional parameter
 
 =cut
 
 .sub 'join' :method
-    .param string sep
+    .param string sep :optional
     .local string res
     .local string tmp
     .local int len
@@ -638,19 +638,60 @@ Run C<block> once for each item in C<self>, with the item passed as an arg.
   each_loop_end:
 .end
 
+=item flatten
+
+ recursively flatten any inner arrays into a single outer array
+
+=cut
+.sub 'flatten' :method
+    .local pmc returnMe
+    .local pmc iterator
+    returnMe = new 'CardinalArray'
+    iterator = new 'Iterator', self
+  each_loop:
+    unless iterator goto each_loop_end
+    $P1 = shift iterator
+    #if $P1 is an array call flatten
+    $I0 = isa $P1, 'CardinalArray'
+    if $I0 goto inner_flatten
+    push returnMe, $P1
+    goto each_loop
+  inner_flatten:
+    $P2 = $P1.'flatten'()
+    $P3 = new 'Iterator', $P2
+    inner_loop:
+        unless $P3 goto each_loop
+        $P4 = shift $P3
+        push returnMe, $P4
+        goto inner_loop
+    goto each_loop
+  each_loop_end:
+  .return(returnMe)
+.end
+
 =item size
 
 Retrieve the number of elements in C<self>
 
 =cut
 .sub 'size' :method
-     $I0 = elements self
+     $I0 = self
+     .return($I0)
+.end
+
+=item length
+
+Retrieve the number of elements in C<self>
+
+=cut
+.sub 'length' :method
+     $I0 = self
      .return($I0)
 .end
 
 =item at(index)
 
-Retrieve element from position C<index>.
+    Retrieve element from position C<index>.
 
 =cut
 .sub 'at' :method
@@ -683,13 +724,12 @@ Retrieve the number of elements in C<self>
     .param int end
     .local pmc returnMe
     returnMe = new 'CardinalArray'
-    $P0 = new 'Iterator', self
     $I0 = start
   each_loop:
     unless $I0 <= end goto each_loop_end
-    $P1 = self[$I0]
+    $P0 = self[$I0]
     inc $I0
-    push returnMe, $P1
+    push returnMe, $P0
     goto each_loop
   each_loop_end:
   .return(returnMe)

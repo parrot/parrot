@@ -1,5 +1,7 @@
 puts "1..6" if 1
 
+# comments work!
+#
 puts "ok 1"
 
 puts "ok \

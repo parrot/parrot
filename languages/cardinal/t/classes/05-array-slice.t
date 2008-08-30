@@ -8,3 +8,5 @@ if b.size == 4
 	puts "ok 3" if b[2] == 3
 	puts "ok 4" if b[3] == 4
 end
+
+#puts "todo 5" if a.slice(100) == nil
