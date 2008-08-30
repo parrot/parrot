@@ -335,7 +335,10 @@ method funcall($/) {
 
 method constant_variable($/) {
     my @a;
-    my $past := PAST::Var.new( :name(~$/), :scope('package'), :node($/), :viviself('Undef'), :namespace( @a ) );
+    my $name := ~$/;
+    if $name eq 'Array' { $name := "CardinalArray"; }
+    elsif $name eq 'Hash' { $name := "CardinalHash"; }
+    my $past := PAST::Var.new( :name($name), :scope('package'), :node($/), :viviself('Undef'), :namespace( @a ) );
     make $past;
 }
 
