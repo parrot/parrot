@@ -36,7 +36,7 @@ $| = 1;    # $OUTPUT_AUTOFLUSH = 1;
 # from Parrot::Configure::Options
 my ($args, $steps_list_ref) = process_options(
     {
-        mode => ($ARGV[0] =~ /^--file=/)
+        mode => (defined $ARGV[0]  and $ARGV[0] =~ /^--file=/)
                     ? 'file'
                     : 'configure',
         argv => [@ARGV],
