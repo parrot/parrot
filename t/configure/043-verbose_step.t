@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 15;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
@@ -27,6 +27,7 @@ my %args = %$args;
 
 my $conf = Parrot::Configure->new;
 ok( defined $conf, "Parrot::Configure->new() returned okay" );
+my $serialized = $conf->pcfreeze();
 
 my $step        = q{init::beta};
 my $description = 'Determining if your computer does beta';
@@ -61,13 +62,55 @@ is( $conf->options->{c}->{debugging},
     );
 }
 
+$conf->replenish($serialized);
+
+#####  designate multiple steps as --verbose-step; one of them bad #####
+
+($args, $step_list_ref) = process_options(
+    {
+        argv => [q{--verbose-step=alpha::beta,init::manifest}],
+        mode => q{configure},
+    }
+);
+%args =  %{ $args };
+$conf->add_steps( @{ $step_list_ref } );
+$conf->options->set(%args);
+eval { $conf->runsteps(); };
+like($@,
+    qr/Argument to 'verbose-step' option must be comma-delimited.*?steps/,
+    "Got expected error message for bad value to --verbose-step"
+);
+
+$conf->replenish($serialized);
+
+##### designate one step as --verbose-step; valid step  #####
+
+($args, $step_list_ref) = process_options(
+    {
+        argv => [q{--verbose-step=init::mu}],
+        mode => q{configure},
+    }
+);
+%args =  %{ $args };
+my $step = q{init::mu};
+$conf->add_steps( $step );
+$conf->options->set(%args);
+{
+    my $rv;
+    my ($stdout, $stderr);
+    capture ( sub {$rv    = $conf->runsteps}, \$stdout, \$stderr );
+    ok( $rv, "runsteps successfully ran $step" );
+    like($stdout, qr/^\s*init::mu.*done\.\s*$/s,
+        "As expected, description is only standard output");
+}
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
 
 =head1 NAME
 
-043-verbose_step.t - test bad step failure case in Parrot::Configure
+043-verbose_step.t - test --verbose-step option to Configure.pl
 
 =head1 SYNOPSIS
 
@@ -77,8 +120,8 @@ pass("Completed all tests in $0");
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file examine what happens when you configure with the
-<--verbose-step> option set to the name of a configuration step.
+The tests in this file examine various cases involving the C<--verbose-step>
+option to Configure.pl
 
 =head1 AUTHOR
 
