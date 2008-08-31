@@ -223,6 +223,8 @@ These libraries are loaded dynamically with the Lua function C<require>.
 
 =item * Lua File System library F<languages/lua/src/lib/lfs.pir>
 
+=item * LPeg library F<languages/lua/src/lib/lpeg.pir>
+
 =item * md5 & sha1 library F<languages/lua/src/lib/md5.pir>
 
 =item * random library F<languages/lua/src/lib/random.pir>

@@ -109,6 +109,7 @@ all: \
  $(LIBPATH)/gl_binding.pbc \
  $(LIBPATH)/glut.pbc \
  $(LIBPATH)/lfs.pbc \
+ $(LIBPATH)/lpeg.pbc \
  $(LIBPATH)/md5.pbc \
  $(LIBPATH)/random.pbc \
  $(LIBPATH)/sha1.pbc \
@@ -219,6 +220,9 @@ $(LIBPATH)/glut.pbc: $(LIBPATH)/glut.pir
 
 $(LIBPATH)/lfs.pbc: $(LIBPATH)/lfs.pir
 	-$(PARROT) --output=$(LIBPATH)/lfs.pbc $(LIBPATH)/lfs.pir
+
+$(LIBPATH)/lpeg.pbc: $(LIBPATH)/lpeg.pir
+	-$(PARROT) --output=$(LIBPATH)/lpeg.pbc $(LIBPATH)/lpeg.pir
 
 $(LIBPATH)/md5.pbc: $(LIBPATH)/md5.pir
 	-$(PARROT) --output=$(LIBPATH)/md5.pbc $(LIBPATH)/md5.pir
