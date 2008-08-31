@@ -807,6 +807,9 @@ If this argument is absent or is B<nil>, returns C<def>. Otherwise, raises an er
     $S0 = shift names
     unless $S0 goto L3
     $P0 = ns[$S0]
+    unless null $P0 goto L5
+    lua_error("missing method ", $S0)
+  L5:
     $P0.'setfenv'(env)
     set $P1, $S0
     lib[$P1] = $P0
