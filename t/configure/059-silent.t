@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 13;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
@@ -27,6 +27,7 @@ my %args = %$args;
 
 my $conf = Parrot::Configure->new;
 ok( defined $conf, "Parrot::Configure->new() returned okay" );
+my $serialized = $conf->pcfreeze();
 
 my $step        = q{init::gamma};
 my $description = 'Determining if your computer does gamma';
@@ -57,6 +58,27 @@ like( $stderr,
 qr/step $step died during execution: Dying gamma just to see what happens/,
         "Got expected error message despite silent option");
 
+$conf->replenish($serialized);
+
+##### --silent option; valid step #####
+
+($args, $step_list_ref) = process_options(
+    {
+        argv => [ q{--silent} ],
+        mode => q{configure},
+    }
+);
+%args = %$args;
+$step        = q{init::lambda};
+$conf->add_steps($step);
+$conf->options->set(%args);
+{
+    my $rv;
+    my ($stdout);
+    capture ( sub { eval { $rv = $conf->runsteps; } }, \$stdout);
+    ok(! $stdout, "silent option worked");
+}
+
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
@@ -73,8 +95,8 @@ pass("Completed all tests in $0");
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file examine what happens when your configuration step dies
-during execution but the C<--silent> option has been set.
+The tests in this file examine various cases occurring while using the
+C<--silent> option.
 
 =head1 AUTHOR
 
