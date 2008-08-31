@@ -98,7 +98,7 @@ $conf->replenish($serialized);
 
 #####  misspecified value for --fatal-step  #####
 
-my ($args, $step_list_ref) = process_options(
+($args, $step_list_ref) = process_options(
     {
         argv => [ qw( --fatal-step=foo::zeta ) ],
         mode => q{configure},
