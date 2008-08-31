@@ -5,10 +5,9 @@
 
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests =>  6;
 use Carp;
 use lib qw( lib t/configure/testlib );
-use_ok('config::init::defaults');
 use_ok('config::auto::ops');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
@@ -27,8 +26,6 @@ my ($args, $step_list_ref) = process_options(
 );
 
 my $conf = Parrot::Configure->new;
-
-test_step_thru_runstep( $conf, q{init::defaults}, $args );
 
 my $pkg = q{auto::ops};
 
