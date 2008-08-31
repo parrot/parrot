@@ -92,7 +92,7 @@ $conf->replenish($serialized);
     }
 );
 %args =  %{ $args };
-my $step = q{init::mu};
+$step = q{init::mu};
 $conf->add_steps( $step );
 $conf->options->set(%args);
 {
