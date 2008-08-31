@@ -63,7 +63,7 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-060-silent.t - test what happens when the C<--silent> option is set
+059-silent.t - test what happens when the C<--silent> option is set
 
 =head1 SYNOPSIS
 
