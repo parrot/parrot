@@ -95,7 +95,7 @@ such as C<eval>, C<require>, and C<use>.
     goto inc_loop
   inc_end:
     $S0 = concat "Can't find ", basename
-    concat $S0, ' in @INC'
+    concat $S0, ' in $:'
     'die'($S0)
     .return (0)
 
