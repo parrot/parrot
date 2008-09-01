@@ -150,9 +150,14 @@ rule do_args {
     '|' <block_signature> '|'
 }
 
+rule sig_identifier {
+                      #XXX Should this be basic_primary or expr or what?
+    <identifier>[ '=' <default=basic_primary>]? {*}
+}
+
 rule block_signature {
     [
-    | <identifier> [',' <identifier>]* [',' <slurpy_param>]? [',' <block_param>]?
+    | <sig_identifier> [',' <sig_identifier>]* [',' <slurpy_param>]? [',' <block_param>]?
     | <slurpy_param> [',' <block_param>]?
     | <block_param>?
     ] {*}

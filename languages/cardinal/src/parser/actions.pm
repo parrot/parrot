@@ -519,10 +519,18 @@ method functiondef($/) {
     make $past;
 }
 
+method sig_identifier($/) {
+    my $past := $($<identifier>);
+    if +$<default> == 1 {
+        $past.viviself( $( $<default>[0] ) );
+    }
+    make $past;
+}
+
 method block_signature($/) {
     my $params := PAST::Stmts.new( :node($/) );
     my $past := PAST::Block.new($params, :blocktype('declaration'));
-    for $<identifier> {
+    for $<sig_identifier> {
         my $parameter := $( $_ );
         $past.symbol($parameter.name(), :scope('lexical'));
         $parameter.scope('parameter');
@@ -537,7 +545,7 @@ method block_signature($/) {
         $past.symbol($block.name(), :scope('lexical'));
         $params.push($block);
     }
-    $params.arity( +$<identifier> + +$<block_param> );
+    $params.arity( +$<sig_identifier> + +$<block_param> );
     our $?BLOCK_SIGNATURED := $past;
     make $past;
 }

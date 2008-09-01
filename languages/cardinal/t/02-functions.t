@@ -1,16 +1,18 @@
-puts "1..6"
+require 'test'
+
+plan 7
 
 def first
-    puts "ok 1"
+    ok 1
 end
 
 def second(n)
-    puts "ok ", n
+    is n%3, 2
 end
 
 def third(a,b)
-    second(a)
-    second(b)
+    ok a == 3
+    is b, 4
 end
 
 def fib(n)
@@ -25,10 +27,15 @@ def blocks(n,&f)
     f(n)
 end
 
+def defaults(n=7)
+    is n, 7
+end
+
 first
 second(2)
 third(3,4)
 second fib(6) - 3;
-blocks(6) do |i|
-    puts 'ok ', i
+blocks('foo') do |i|
+    is i, 'foo'
 end
+defaults()
