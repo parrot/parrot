@@ -255,7 +255,11 @@ method varname($/, $key) {
 }
 
 method global($/) {
-    make PAST::Var.new( :name(~$/), :scope('package'), :viviself('Undef'), :node($/) );
+    my @namespace;
+    our @?BLOCK;
+    my $toplevel := @?BLOCK[0];
+    $toplevel.symbol(~$/, :scope('package'), :namespace(@namespace));
+    make PAST::Var.new( :name(~$/), :scope('package'), :namespace(@namespace), :viviself('Undef'), :node($/) );
 }
 
 method instance_variable($/) {
