@@ -1,26 +1,27 @@
-puts '1..10'
-
-def okay (n) 
-    puts 'ok ', n
-end
+require 'test'
+plan 10
 
 a = [ 1, 2, 3, 4 ]
 
-okay a.first
-okay a.first(2).last
-okay a.last(2).first
-okay a.elems
+is a.first, 1
+is a.first(2).last, 2
+is a.last(2).first, 3
+is a.elems, 4
 
 a = [ 5, 6 ]
 
+n = 5
+
 a.each() do |i|
-    puts 'ok ', i
+    is i, n
+    n += 1
 end
 
 b = [ [ 7, 8 ], [ 9, 10 ] ]
 
 b.each() do |x|
     x.each() do |y|
-        puts 'ok ', y
+        is y, n
+        n += 1
     end
 end
