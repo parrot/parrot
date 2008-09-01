@@ -41,7 +41,7 @@ Return a CardinalString representing the Array.
 =cut
 
 .sub 'to_s' :method
-    $S0 = self.get_string()
+    $S0 = join '', self
     $P0 = new 'CardinalString'
     $P0 = $S0
     .return($P0)
@@ -121,6 +121,33 @@ Return the number of elements in the list.
     $I0 = elements self
     .return ($I0)
 .end
+
+=item include?(ELEMENT)
+
+Return true if self contains ELEMENT
+
+=cut
+.sub 'include?' :method
+    .param pmc args
+    .local pmc iter
+    iter = new 'Iterator', self
+  iter_loop:
+    unless iter goto done_f
+    $P0 = shift iter
+    eq $P0, args, done_t
+    goto iter_loop
+   done_f:
+        #$P0 = get_hll_global ['Bool'], 'False'
+        $P0 = new 'Boolean'
+        $P0 = 0
+        .return($P0)
+   done_t:
+        #$P0 = get_hll_global ['Bool'], 'True'
+        $P0 = new 'Boolean'
+        $P0 = 1
+        .return($P0)
+.end
+
 
 =item unshift(ELEMENTS)
 
@@ -663,6 +690,20 @@ Run C<block> once for each item in C<self>, with the item passed as an arg.
     unless $P0 goto each_loop_end
     $P1 = shift $P0
     block($P1)
+    goto each_loop
+  each_loop_end:
+.end
+
+.sub 'each_with_index' :method
+    .param pmc block
+    .local int len
+    len = elements self
+    $I0 = 0
+  each_loop:
+    if $I0 == len goto each_loop_end
+    $P0 = self[$I0]
+    block($P0,$I0)
+    inc $I0
     goto each_loop
   each_loop_end:
 .end

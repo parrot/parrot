@@ -71,7 +71,7 @@ token stmt_mod {
 }
 
 rule expr {
-    $<not>=['not']? <arg> [$<op>=['and'|'or'] <expr>]?
+    [$<not>=['!'|'not']]? <arg> [$<op>=['and'|'or'] <expr>]?
     {*}
 }
 

@@ -23,7 +23,8 @@ builtin functions for Ruby.
 
 .sub 'puts'
     .param pmc args            :slurpy
-    'print'(args :flat, "\n")
+    $S0 = join "\n", args
+    'print'($S0, "\n")
 .end
 
 # Local Variables:

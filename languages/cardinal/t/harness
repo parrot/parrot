@@ -16,11 +16,12 @@ my %harness_args = (
 GetOptions(
         'tests-from-dir=s' => \my $test_dir,
     );
-
+if ($test_dir) {
 my @files = grep m/^[^-]/, @ARGV;
 push @files, "t/$test_dir/*.t";
 
 $harness_args{files} = \@files;
+}
 
 eval 'use Parrot::Test::Harness %harness_args';
 

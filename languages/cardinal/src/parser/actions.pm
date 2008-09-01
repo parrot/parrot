@@ -100,7 +100,7 @@ method stmt_mod($/) {
 method expr($/) {
     my $past := $( $<arg> );
     if +$<not> {
-        $past := PAST::Op.new( $past, :pirop('not'), :node($/) );
+        $past := PAST::Op.new( $past, :pirop('n_not'), :node($/) );
     }
     if $<expr> {
         my $op;
