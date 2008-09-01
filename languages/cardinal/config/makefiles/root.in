@@ -50,6 +50,8 @@ BUILTINS_PIR = \
   src/classes/Integer.pir \
   src/classes/Array.pir \
   src/classes/Hash.pir \
+  src/builtins/globals.pir \
+  src/builtins/eval.pir \
 
 # PMCS = cardinal
 # PMC_SOURCES = $(PMC_DIR)/cardinal.pmc
