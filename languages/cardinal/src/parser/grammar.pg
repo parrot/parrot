@@ -438,7 +438,7 @@ proto 'infix:=' is precedence('1') is pasttype('copy') is lvalue(1)     { ... }
 proto 'prefix:defined?' is looser('infix:=') { ... }
 
 proto 'infix:+=' is equiv('infix:=')
-                 is pirop('add')        { ... }
+                 { ... }
 
 proto 'infix:-=' is equiv('infix:=')
                  is pirop('sub')        { ... }
@@ -506,8 +506,7 @@ proto 'infix:&' is tighter('infix:|')  { ... }
 proto infix:«<<»  is tighter('infix:&') { ... }
 proto infix:«>>»  is equiv(infix:«<<») { ... }
 
-proto 'infix:+' is tighter(infix:«<<»)
-                is pirop('n_add')       { ... }
+proto 'infix:+' is tighter(infix:«<<»)  { ... }
 
 proto 'infix:-' is equiv('infix:+')
                 is pirop('n_sub')       { ... }

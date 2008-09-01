@@ -44,6 +44,7 @@ BUILTINS_PIR = \
   src/builtins/guts.pir \
   src/builtins/say.pir \
   src/builtins/cmp.pir \
+  src/builtins/op.pir \
   src/classes/Object.pir \
   src/classes/NilClass.pir \
   src/classes/String.pir \
