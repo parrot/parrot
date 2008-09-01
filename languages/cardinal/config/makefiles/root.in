@@ -52,6 +52,7 @@ BUILTINS_PIR = \
   src/classes/Integer.pir \
   src/classes/Array.pir \
   src/classes/Hash.pir \
+  src/classes/Bool.pir \
   src/builtins/globals.pir \
   src/builtins/eval.pir \
 

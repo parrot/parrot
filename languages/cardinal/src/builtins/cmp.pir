@@ -17,13 +17,9 @@ Swiped from Rakudo.
 .sub 'prefix:?' :multi(_)
     .param pmc a
     if a goto a_true
-    $I0 = 0
-    .return ($I0)
     $P0 = get_hll_global ['Bool'], 'False'
     .return ($P0)
   a_true:
-    $I0 = 1
-    .return ($I0)
     $P0 = get_hll_global ['Bool'], 'True'
     .return ($P0)
 .end

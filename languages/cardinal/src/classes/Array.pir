@@ -237,14 +237,10 @@ Return true if self contains ELEMENT
     eq $P0, args, done_t
     goto iter_loop
    done_f:
-        #$P0 = get_hll_global ['Bool'], 'False'
-        $P0 = new 'Boolean'
-        $P0 = 0
+        $P0 = get_hll_global ['Bool'], 'False'
         .return($P0)
    done_t:
-        #$P0 = get_hll_global ['Bool'], 'True'
-        $P0 = new 'Boolean'
-        $P0 = 1
+        $P0 = get_hll_global ['Bool'], 'True'
         .return($P0)
 .end
 
