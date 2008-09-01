@@ -91,7 +91,7 @@ out-of-bounds test. Checks INT and PMC keys.
     goto end
 eh:
     ok(1, "exception caught")
-end:    
+end:
 .end
 
 
@@ -169,7 +169,7 @@ eh1:
 no_eh1:
     ok(1, "no ex thrown for out-of-bounds index")
 
-test2:    
+test2:
     rpa = 1
     push_eh eh2
     rpa[-10] = i
@@ -184,7 +184,7 @@ no_eh2:
 test3:
     rpa = 1
     push_eh eh3
-    i = rpa[10] 
+    i = rpa[10]
     pop_eh
     goto no_eh3
 eh3:
@@ -196,7 +196,7 @@ no_eh3:
 test4:
     rpa = 1
     push_eh eh4
-    i = rpa[-10] 
+    i = rpa[-10]
     pop_eh
     goto no_eh4
 eh4:
@@ -246,9 +246,9 @@ end:
      .fp_eq($N0, 2.5, OK1)
      ok(0, "set num via Key PMC, get num via int fails")
      goto NOK1
-OK1: 
+OK1:
      ok(1, "set num via Key PMC, get num via int fails")
-NOK1:     
+NOK1:
 
      set $S0, $P0[2]
      is($S0, "bleep", "set string via Key PMC, get string via int")
@@ -279,7 +279,7 @@ NOK1:
      .fp_eq($N0, 10.2, OK2)
      ok(0, "set num via int, get num via Key PMC")
      goto NOK2
-OK2: 
+OK2:
      ok(1, "set num via int, get num via Key PMC")
 NOK2:
 
@@ -906,10 +906,10 @@ end:
     .return ($I0)
 .end
 
-## don't forget to change the test plan
-#
-## Local Variables:
-##   mode: pir
-##   fill-column: 100
-## End:
-## vim: expandtab shiftwidth=4 ft=pir:
+# don't forget to change the test plan
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
