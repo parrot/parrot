@@ -30,6 +30,14 @@ src/builtins/op.pir - Cardinal ops
     .return ($P0)
 .end
 
+.sub 'infix:+' :multi(CardinalArray,CardinalArray)
+    .param pmc a
+    .param pmc b
+    $P0 = new 'CardinalArray'
+    $P0 = 'list'(a :flat, b :flat)
+    .return ($P0)
+.end
+
 .sub 'infix:+=' :multi(_,_)
     .param pmc a
     .param pmc b

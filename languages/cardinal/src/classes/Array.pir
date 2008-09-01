@@ -708,6 +708,42 @@ Run C<block> once for each item in C<self>, with the item passed as an arg.
   each_loop_end:
 .end
 
+=item collect(block)
+
+Run C<block> once for each item in C<self>, with the item passed as an arg.
+Creates a new Array containing the results and returns it.
+
+=cut
+
+.sub 'collect' :method
+    .param pmc block
+    .local pmc result
+    result = new 'CardinalArray'
+    $P0 = new 'Iterator', self
+  each_loop:
+    unless $P0 goto each_loop_end
+    $P1 = shift $P0
+    $P2 = block($P1)
+    result.push($P2)
+    goto each_loop
+  each_loop_end:
+    .return (result)
+.end
+
+.sub 'each_with_index' :method
+    .param pmc block
+    .local int len
+    len = elements self
+    $I0 = 0
+  each_loop:
+    if $I0 == len goto each_loop_end
+    $P0 = self[$I0]
+    block($P0,$I0)
+    inc $I0
+    goto each_loop
+  each_loop_end:
+.end
+
 =item flatten
 
  recursively flatten any inner arrays into a single outer array
