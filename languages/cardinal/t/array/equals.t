@@ -1,6 +1,7 @@
-puts "1..2"
+require 'test'
+plan 2
 
 a = [ 1, 2, 3 ]
 
-puts "ok 1" if a == [ 1, 2, 3 ]
-puts "ok 2" if a != [ 1, 2, 4 ]
+is a,[ 1, 2, 3 ]
+isnt a, [ 1, 2, 4 ]

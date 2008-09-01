@@ -53,6 +53,32 @@ src/builtins/op.pir - Cardinal ops
     .return (a)
 .end
 
+.sub 'infix:&' :multi(_,_)
+    .param int a
+    .param int b
+    $I0 = band a, b
+    .return ($I0)
+.end
+
+.sub 'infix:&' :multi(CardinalArray,CardinalArray)
+    .param pmc a
+    .param pmc b
+    .local pmc intersection
+    intersection = new 'CardinalArray'
+    .local pmc item
+    .local pmc it
+    it = iter a
+  loop:
+    unless it goto loop_end
+    item = shift it
+    $I0 = b.'include?'(item)
+    unless $I0, loop
+    intersection.push(item)
+    goto loop
+  loop_end:
+    .return (intersection)
+.end
+
 =back
 
 =cut

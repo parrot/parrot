@@ -35,11 +35,33 @@ Swiped from Rakudo.
     .return 'prefix:?'($I0)
 .end
 
+.sub 'infix:==' :multi(CardinalArray,CardinalArray)
+    .param pmc a
+    .param pmc b
+    .local int i
+    $I1 = a.elems()
+    $I2 = b.elems()
+    ne $I1, $I2, fail
+    i = 0
+  loop:
+    unless i < $I1 goto success
+    $P0 = a[i]
+    $P1 = b[i]
+    $I0 = 'infix:=='($P0,$P1)
+    inc i
+    if $I0 goto loop
+  fail:
+    .return (0)
+  success:
+    .return (1)
+.end
+
 
 .sub 'infix:!=' :multi(_,_)
-    .param num a
-    .param num b
-    $I0 = isne a, b
+    .param pmc a
+    .param pmc b
+    $I0 = 'infix:=='(a, b)
+    $I0 = not $I0
     .return 'prefix:?'($I0)
 .end
 

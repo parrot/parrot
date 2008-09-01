@@ -1,23 +1,17 @@
-puts "1..8"
-a = [ 6, 2, 1, 4, 3, 5 ]
+require 'test'
+plan 8
+
+a = [ 2, 1, 3 ]
 a = a.sort
 a.each_with_index() do |x, i|
-	if i != (x - 1) 
-		break
-	end
-	puts 'ok ', x
+    is i, x - 1, 'sort'
 end
-b = [ 5, 4, 2, 3, 1, 6 ]
+b = [ 6, 4, 5 ]
 b.sort!
 b.each_with_index() do |x, i|
-	if i != (x - 1) 
-		break
-	end
-	if i >= 3
-		puts 'ok ', x
-	end 
+    is i, x - 4, 'sort!'
 end
 c = [ 10, 9, 7, 5, 4, 3, 6, 2, 1, 8]
 c = c.sort { |x, y| x <=> y }
-puts "ok 7" if c[-4] == 7
-puts "ok 8" if c[-3] == 8
+is c[-4], 7, 'custom sort function'
+is c[-3], 8, 'custom sort function'

@@ -122,6 +122,106 @@ Return the number of elements in the list.
     .return ($I0)
 .end
 
+=item sort()
+
+Return a sorted copy of the list
+
+=cut
+
+.sub 'sort' :method
+    .param pmc by              :optional
+    .param int has_by          :opt_flag
+    if has_by goto have_by
+    by = get_hll_global 'infix:cmp'
+  have_by:
+
+    .local pmc list, fpa
+    .local int elems
+
+    list = self
+    elems = list.'elems'()
+    fpa = new 'FixedPMCArray'
+    fpa = elems
+
+    .local int i
+    i = 0
+  fpa_loop:
+    unless i < elems goto fpa_end
+    $P0 = list[i]
+    fpa[i] = $P0
+    inc i
+    goto fpa_loop
+  fpa_end:
+    fpa.'sort'(by)
+    .return 'list'(fpa :flat)
+.end
+
+.sub 'sort!' :method
+    .param pmc by              :optional
+    .param int has_by          :opt_flag
+    if has_by goto have_by
+    by = get_hll_global 'infix:cmp'
+  have_by:
+    $P0 = self.sort()
+    self = 0
+    self.append($P0)
+.end
+
+=item uniq(...)
+
+=cut
+
+# TODO Rewrite it. It's too naive.
+
+.sub uniq :method
+    .local pmc ulist
+    .local pmc key
+    .local pmc val
+    .local pmc uval
+    .local int len
+    .local int i
+    .local int ulen
+    .local int ui
+
+    ulist = new 'CardinalArray'
+    len = self.'elems'()
+    i = 0
+
+  loop:
+    if i == len goto done
+
+    val = self[i]
+
+    ui = 0
+    ulen = ulist.'elems'()
+    inner_loop:
+        if ui == ulen goto inner_loop_done
+
+        uval = ulist[ui]
+        if uval == val goto found
+
+        inc ui
+        goto inner_loop
+    inner_loop_done:
+
+    ulist.'push'(val)
+
+    found:
+
+    inc i
+    goto loop
+
+  done:
+    .return(ulist)
+.end
+
+.sub 'uniq!' :method
+    $P0 = self.uniq()
+    self = 0
+    self.append($P0)
+.end
+
+
 =item include?(ELEMENT)
 
 Return true if self contains ELEMENT
