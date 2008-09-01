@@ -203,6 +203,7 @@ token basic_primary {
     | <funcall> {*}                         #= funcall
     | <variable> {*}                        #= variable
     | <do_block> {*}                        #= do_block
+    | <warray> {*}                          #= warray
     | <array> {*}                           #= array
     | <ahash> {*}                           #= ahash
     | <pcomp_stmt> {*}                      #= pcomp_stmt
@@ -339,6 +340,11 @@ rule begin_end {
 
 token fname {
     <.identifier> <[=!?]>?
+}
+
+token warray {
+    '%w' <.before <[<[({]>> <quote_expression: :w :q>
+    {*}
 }
 
 rule array {

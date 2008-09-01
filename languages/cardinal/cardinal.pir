@@ -105,6 +105,7 @@ to the cardinal compiler.
 
 
 .include 'src/gen_grammar.pir'
+.include 'src/parser/quote_expression.pir'
 .include 'src/gen_actions.pir'
 
 

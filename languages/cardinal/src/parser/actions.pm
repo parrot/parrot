@@ -666,6 +666,10 @@ method pcomp_stmt($/) {
     make $( $<comp_stmt> );
 }
 
+method warray($/) {
+    make $( $<quote_expression> );
+}
+
 method array($/) {
     my $list;
     if $<args> {
@@ -715,6 +719,73 @@ method string($/) {
     make PAST::Val.new( :value( ~$<string_literal> ), :returns('CardinalString'), :node($/) );
 }
 
+method quote_expression($/, $key) {
+    my $past;
+    if $key eq 'quote_regex' {
+        our $?NS;
+        $past := PAST::Block.new(
+            $<quote_regex>,
+            :compiler('PGE::Perl6Regex'),
+            :namespace($?NS),
+            :blocktype('declaration'),
+            :node( $/ )
+        );
+    }
+    elsif $key eq 'quote_concat' {
+        if +$<quote_concat> == 1 {
+            $past := $( $<quote_concat>[0] );
+        }
+        else {
+            $past := PAST::Op.new(
+                :name('list'),
+                :pasttype('call'),
+                :node( $/ )
+            );
+            for $<quote_concat> {
+                $past.push( $($_) );
+            }
+        }
+    }
+    make $past;
+}
+
+
+method quote_concat($/) {
+    my $terms := +$<quote_term>;
+    my $count := 1;
+    my $past := $( $<quote_term>[0] );
+    while ($count != $terms) {
+        $past := PAST::Op.new(
+            $past,
+            $( $<quote_term>[$count] ),
+            :pirop('n_concat'),
+            :pasttype('pirop')
+        );
+        $count := $count + 1;
+    }
+    make $past;
+}
+
+
+method quote_term($/, $key) {
+    my $past;
+    if ($key eq 'literal') {
+        $past := PAST::Val.new(
+            :value( ~$<quote_literal> ),
+            :returns('CardinalString'), :node($/)
+        );
+    }
+    elsif ($key eq 'variable') {
+        $past := $( $<variable> );
+    }
+    elsif ($key eq 'circumfix') {
+        $past := $( $<circumfix> );
+        if $past.WHAT() eq 'Block' {
+            $past.blocktype('immediate');
+        }
+    }
+    make $past;
+}
 
 method arg($/, $key) {
     ## Handle the operator table

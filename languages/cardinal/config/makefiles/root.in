@@ -35,6 +35,7 @@ all: cardinal.pbc
 CARDINAL_GROUP = $(PMC_DIR)/cardinal_group$(LOAD_EXT)
 
 SOURCES = cardinal.pir \
+  src/parser/quote_expression.pir \
   src/gen_grammar.pir \
   src/gen_actions.pir \
   src/gen_builtins.pir \
