@@ -219,6 +219,8 @@ main(int argc, char *argv[])
 
         /* load the source for debugger list */
         PDB_load_source(interp, filename);
+
+        PackFile_fixup_subs(interp, PBC_MAIN, NULL);
     }
 
     Parrot_unblock_GC_mark(interp);
