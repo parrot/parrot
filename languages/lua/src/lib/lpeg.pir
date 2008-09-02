@@ -11,7 +11,7 @@ See original on L<http://www.inf.puc-rio.br/~roberto/lpeg.html>
 
 =head2 Introduction
 
-L<http://www.inf.puc-rio.br/~roberto/lpeg.html#intro>
+See on L<http://www.inf.puc-rio.br/~roberto/lpeg.html#intro>
 
 =head2 Functions
 
@@ -126,8 +126,8 @@ LIST
 
 The matching function. It attempts to match the given pattern against the
 subject string. If the match succeeds, returns the index in the subject of
-the first character after the match, or the values of captured values (if
-the pattern captured any value).
+the first character after the match, or the values of
+L<captured values|/Captures> (if the pattern captured any value).
 
 An optional numeric argument C<init> makes the match starts at that position
 in the subject string. As usual in Lua libraries, a negative value counts
@@ -138,7 +138,8 @@ mode; that is, it tries to match the pattern with a prefix of the given
 subject string (at position C<init>), not with an arbitrary substring of the
 subject. So, if we want to find a pattern anywhere in a string, we must
 either write a loop in Lua or write a pattern that matches anywhere.
-This second approach is easy and quite efficient; see examples.
+This second approach is easy and quite efficient;
+see L<examples|/"Some Examples">.
 
 NOT YET IMPLEMENTED.
 
@@ -252,7 +253,8 @@ operation (see below) applied over the absolute value of I<n>.
 * If the argument is a boolean, the result is a pattern that always succeeds
 or always fails (according to the boolean value), without consuming any input.
 
-* If the argument is a table, it is interpreted as a grammar (see Grammars).
+* If the argument is a table, it is interpreted as a grammar (see
+L</Grammars>).
 
 * If the argument is a function, returns a pattern equivalent to a match-time
 capture over the empty string.
@@ -320,7 +322,7 @@ NOT YET IMPLEMENTED.
 
 This operation creates a non-terminal (a I<variable>) for a grammar.
 The created non-terminal refers to the rule indexed by C<v> in the enclosing
-grammar. (See Grammars for details.)
+grammar. (See L</Grammars> for details.)
 
 NOT YET IMPLEMENTED.
 
