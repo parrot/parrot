@@ -240,7 +240,7 @@ Construct a relative path from the current dir to the parrot root dir.
 Construct a path for a temporary files.
 Takes C<$0> into account.
 
-=item C<pasm_fp_equality_macros()>
+=item C<pasm_fp_equality_macro()>
 
 Returns a PASM macro that can be used to test fp equality/inequality.
 
