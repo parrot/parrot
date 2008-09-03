@@ -413,6 +413,10 @@ method for_stmt($/) {
     make PAST::Op.new( $list, $body, :pasttype('for'), :node($/) );
 }
 
+method control_command($/,$key) {
+    $/.panic("next, break, and redo aren't implemented yet");
+}
+
 method module($/) {
     my $past := $( $<comp_stmt> );
     my $name := $( $<module_identifier> );

@@ -209,6 +209,7 @@ token basic_primary {
     | <array> {*}                           #= array
     | <pcomp_stmt> {*}                      #= pcomp_stmt
     | <scope_identifier> {*}                #= scope_identifier
+    | <control_command> {*}                 #= control_command
 }
 
 token primary {
@@ -237,11 +238,12 @@ token pcomp_stmt {
 
 rule if_stmt {
     'if' <expr> <.then>
-    <comp_stmt>
+    [<comp_stmt>
     ['elsif' <expr> <.then>
     <comp_stmt>]*
     <else>?
     'end'
+    |<panic: syntax error in if statement>]
     {*}
 }
 
@@ -284,6 +286,12 @@ rule rescue {
     # XXX check <args>
     ['rescue' <args> <.then> <comp_stmt>]+
     {*}
+}
+
+token control_command {
+    | 'next'  {*}                   #= next
+    | 'break' {*}                   #= break
+    | 'redo'  {*}                   #= redo
 }
 
 rule module {
@@ -424,7 +432,8 @@ token string {
 }
 
 token regex {
-    <.before '/'> <quote_expression: :regex>
+    <.before '/'> [<quote_expression: :regex> $<modifiers>=[<alpha>]*
+                  |<panic: problem parsing regex>]
     {*}
 }
 

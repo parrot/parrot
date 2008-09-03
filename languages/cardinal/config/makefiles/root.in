@@ -63,7 +63,7 @@ BUILTINS_PIR = \
 cardinal.pbc: $(PARROT) $(SOURCES)
 	$(PARROT) $(PARROT_ARGS) -o cardinal.pbc cardinal.pir
 
-test.pir: $(PARROT) test.rb src/parser/*
+test.pir: $(PARROT) test.rb cardinal.pbc
 	$(PARROT) $(PARROT_ARGS) cardinal.pbc --target=pir --output=test.pir test.rb
 
 src/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg
