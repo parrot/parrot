@@ -41,6 +41,10 @@ Press any key to exit.
 .const string f_XNextEvent = 'XNextEvent'
 .const string f_XDrawPoint = 'XDrawPoint'
 .const string f_XDrawLine = 'XDrawLine'
+.const string f_XKeysymToString = 'XKeysymToString'
+.const string f_XStringToKeysym = 'XStringToKeysym'
+.const string f_XKeycodeToKeysym = 'XKeycodeToKeysym'
+.const string f_XKeysymToKeycode = 'XKeysymToKeycode'
 
 # attributes used for xlib types
 .const string attr_Display = 'x_Display'
@@ -78,6 +82,10 @@ Press any key to exit.
 
     .local pmc DisplayName
     DisplayName = get_global ['xlib'], 'DisplayName'
+    .local pmc KeysymToString
+    KeysymToString = get_global ['xlib'], 'KeysymToString'
+    .local pmc StringToKeysym
+    StringToKeysym = get_global ['xlib'], 'StringToKeysym'
 
     .local string dname
     dname = DisplayName()
@@ -101,6 +109,14 @@ Press any key to exit.
 
     .local pmc rw
     rw = display.RootWindow()
+
+    print 'Escape-'
+    $I0 = StringToKeysym('Escape')
+    print $I0
+    print '-'
+    .local int codeEscape
+    codeEscape = display.KeysymToKeycode($I0)
+    say codeEscape
 
     .local pmc w
     w = display.CreateSimpleWindow(rw, 0, 0, 600, 400, 0, 0, white)
@@ -128,13 +144,27 @@ loop:
 
     $I1 = event.type()
 
-    eq $I1, KeyPress, finish
+    eq $I1, KeyPress, keypress
     eq $I1, KeyRelease, loop
     eq $I1, ButtonPress, press
     eq $I1, ButtonRelease, release
     eq $I1, MotionNotify, paint
     say $I1
     goto loop
+keypress:
+    $I0 = event.keycode()
+#    say 'Keypress'
+#    say $I0
+
+#    $I1 = display.KeycodeToKeysym($I0)
+#    say $I1
+#    $S0 = KeysymToString($I1)
+#    say $S0
+#    eq $S0, 'Escape', finish
+
+    eq $I0, codeEscape, finish
+    goto loop
+
 press:
     lastpx = event.x()
     lastpy = event.y()
@@ -147,14 +177,14 @@ release:
 
 paint:
     unless pressed goto loop
-    print $I1
-    print ': '
-    $I0 = event.serial()
-    print $I0
-    print ' '
-    $I0 = event.time()
-    print $I0
-    print ' '
+#    print $I1
+#    print ': '
+#    $I0 = event.serial()
+#    print $I0
+#    print ' '
+#    $I0 = event.time()
+#    print $I0
+#    print ' '
     px = event.x()
     print px
     print ' '
@@ -208,8 +238,12 @@ done:
     set_global xlib_handle, xlib
 # Create NCI functions
     .local pmc func
-    func = dlfunc xlib, f_XDisplayName, "tt"
+    func = dlfunc xlib, f_XDisplayName, 'tt'
     set_global f_XDisplayName, func
+    func = dlfunc xlib, f_XKeysymToString, 'ti'
+    set_global f_XKeysymToString, func
+    func = dlfunc xlib, f_XStringToKeysym, 'it'
+    set_global f_XStringToKeysym, func
     .return()
 failed:
     fail('No xlib')
@@ -231,6 +265,34 @@ getit:
     .local string dispname
     dispname = func(name)
     .return(dispname)
+.end
+
+#-----------------------------------------------------------------------
+.sub KeysymToString
+    .param int keysym
+
+    .local pmc xlib
+    xlib = get_global xlib_handle
+
+    .local pmc func
+    func = get_global f_XKeysymToString
+    .local string r
+    r = func(keysym)
+    .return(r)
+.end
+
+#-----------------------------------------------------------------------
+.sub StringToKeysym
+    .param string keystring
+
+    .local pmc xlib
+    xlib = get_global xlib_handle
+
+    .local pmc func
+    func = get_global f_XStringToKeysym
+    .local int keysym
+    keysym = func(keystring)
+    .return(keysym)
 .end
 
 ########################################################################
@@ -270,6 +332,8 @@ getit:
     createfunc(xlib, f_XRootWindow, 'ppi')
     createfunc(xlib, f_XCreateSimpleWindow, 'pppiiiiiii')
     createfunc(xlib, f_XNextEvent, 'ipp')
+    createfunc(xlib, f_XKeycodeToKeysym, 'ipii')
+    createfunc(xlib, f_XKeysymToKeycode, 'ipi')
 
 # Class initialization
     .local pmc Display
@@ -310,7 +374,7 @@ open_it:
     opendisplay = get_global f_XOpenDisplay
 
     .local pmc xdisplay
-    xdisplay = opendisplay("")
+    xdisplay = opendisplay('')
 
     .local pmc Display
     Display = find_global 'Display'
@@ -444,6 +508,32 @@ failed:
     .return($I0)
 .end
 
+#-----------------------------------------------------------------------
+.sub KeycodeToKeysym :method
+    .param int keysym
+
+    .local pmc func
+    func = get_global f_XKeycodeToKeysym
+    .local pmc disp
+    disp = getattribute self, attr_Display
+    .local int keycode
+    keycode = func(disp, keysym, 0)
+    .return(keycode)
+.end
+
+#-----------------------------------------------------------------------
+.sub KeysymToKeycode :method
+    .param int keysym
+
+    .local pmc func
+    func = get_global f_XKeysymToKeycode
+    .local pmc disp
+    disp = getattribute self, attr_Display
+    .local int keycode
+    keycode = func(disp, keysym)
+    .return(keycode)
+.end
+
 ########################################################################
 
 .namespace ['xlib';'Event']
@@ -494,7 +584,7 @@ failed:
 
     .local pmc arg
     arg = new 'FixedIntegerArray'
-    set arg, 33
+    set arg, 45
 
     .local int offs
     offs = 0
@@ -548,10 +638,30 @@ failed:
     arg[28] = 1
     arg[29] = offs
     add offs, intsize
-# filler
-    arg[30] = char_t
-    arg[31] = 128
+# x_root
+    arg[30] = int_t
+    arg[31] = 1
     arg[32] = offs
+    add offs, intsize
+# y_root
+    arg[33] = int_t
+    arg[34] = 1
+    arg[35] = offs
+    add offs, intsize
+# state
+    arg[36] = int_t
+    arg[37] = 1
+    arg[38] = offs
+    add offs, intsize
+# keycode
+    arg[39] = int_t
+    arg[40] = 1
+    arg[41] = offs
+    add offs, intsize
+# filler
+    arg[42] = char_t
+    arg[43] = 128
+    arg[44] = offs
 
     .local pmc xevent
     xevent = new 'ManagedStruct', arg
@@ -591,6 +701,13 @@ failed:
     .local pmc xevent
     xevent = getattribute self, 'xEvent'
     $I0 = xevent[9]
+    .return($I0)
+.end
+
+.sub keycode :method
+    .local pmc xevent
+    xevent = getattribute self, 'xEvent'
+    $I0 = xevent[13]
     .return($I0)
 .end
 
