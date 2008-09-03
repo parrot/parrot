@@ -30,7 +30,7 @@ PCT           = $(BUILD_DIR)/runtime/parrot/library/PCT.pbc
 
 PMC_DIR       = src/pmc
 
-all: cardinal.pbc
+all: cardinal.pbc test.pir
 
 CARDINAL_GROUP = $(PMC_DIR)/cardinal_group$(LOAD_EXT)
 
@@ -62,6 +62,9 @@ BUILTINS_PIR = \
 # the default target
 cardinal.pbc: $(PARROT) $(SOURCES)
 	$(PARROT) $(PARROT_ARGS) -o cardinal.pbc cardinal.pir
+
+test.pir: $(PARROT) cardinal.pbc test.rb
+	$(PARROT) $(PARROT_ARGS) cardinal.pbc --target=pir --output=test.pir test.rb
 
 src/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg
 	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \

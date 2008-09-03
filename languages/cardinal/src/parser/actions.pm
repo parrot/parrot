@@ -20,6 +20,7 @@ class cardinal::Grammar::Actions;
 method TOP($/) {
     my $past := $( $<comp_stmt> );
     $past.blocktype('declaration');
+    $past.pirflags(':load');
 
     our $?INIT;
         if defined( $?INIT ) {
