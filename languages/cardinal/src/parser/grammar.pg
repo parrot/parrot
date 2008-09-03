@@ -203,6 +203,7 @@ token basic_primary {
     | <funcall> {*}                         #= funcall
     | <variable> {*}                        #= variable
     | <ahash> {*}                           #= ahash
+    | <regex> {*}                           #= regex
     | <do_block> {*}                        #= do_block
     | <warray> {*}                          #= warray
     | <array> {*}                           #= array
@@ -419,6 +420,11 @@ token integer {
 
 token string {
     [ \' <string_literal: "'"> \' | \" <string_literal: '"'> \" ]
+    {*}
+}
+
+token regex {
+    <.before '/'> <quote_expression: :regex>
     {*}
 }
 

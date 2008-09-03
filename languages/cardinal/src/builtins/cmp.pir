@@ -101,6 +101,19 @@ Swiped from Rakudo.
     .return ($I0)
 .end
 
+.sub 'infix:=~'
+    .param pmc topic
+    .param pmc x
+    .return x(topic)
+.end
+
+.sub 'infix:!~'
+    .param pmc topic
+    .param pmc x
+    $P0 = x(topic)
+    $P0 = not $P0
+    .return ($P0)
+.end
 
 =back
 

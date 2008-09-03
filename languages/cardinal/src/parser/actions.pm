@@ -720,6 +720,10 @@ method string($/) {
     make PAST::Val.new( :value( ~$<string_literal> ), :returns('CardinalString'), :node($/) );
 }
 
+method regex($/) {
+    make $($<quote_expression>);
+}
+
 method quote_expression($/, $key) {
     my $past;
     if $key eq 'quote_regex' {
