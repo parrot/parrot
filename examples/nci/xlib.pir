@@ -40,6 +40,7 @@ Press any key to exit.
 .const string f_XStoreName = 'XStoreName'
 .const string f_XNextEvent = 'XNextEvent'
 .const string f_XDrawPoint = 'XDrawPoint'
+.const string f_XDrawLine = 'XDrawLine'
 
 # attributes used for xlib types
 .const string attr_Display = 'x_Display'
@@ -115,7 +116,13 @@ Press any key to exit.
     event = new ['xlib';'Event']
 
     .local int pressed
+    .local int px
+    .local int py
+    .local int lastpx
+    .local int lastpy
     pressed = 0
+    lastpx = 0
+    lastpy = 0
 loop:
     $I0 = display.NextEvent(event)
 
@@ -129,6 +136,9 @@ loop:
     say $I1
     goto loop
 press:
+    lastpx = event.x()
+    lastpy = event.y()
+    w.DrawPoint(lastpx, lastpy)
     pressed = 1
     goto loop
 release:
@@ -145,13 +155,22 @@ paint:
     $I0 = event.time()
     print $I0
     print ' '
-    $I0 = event.x()
-    print $I0
+    px = event.x()
+    print px
     print ' '
-    $I1 = event.y()
-    print $I1
+    py = event.y()
+    print py
     say ''
-    w.DrawPoint($I0, $I1)
+
+    eq lastpx, px, checky
+    goto draw
+checky:
+    eq lastpy, py, loop
+draw:
+    w.DrawLine(lastpx, lastpy, px, py)
+    lastpx = px
+    lastpy = py
+
     goto loop
 
 finish:
@@ -609,6 +628,7 @@ failed:
     createfunc(xlib, f_XUnmapWindow, 'ipp')
     createfunc(xlib, f_XStoreName, 'ippt')
     createfunc(xlib, f_XDrawPoint, 'ipppii')
+    createfunc(xlib, f_XDrawLine, 'ipppiiii')
 
 # Class initialization
     .local pmc Window
@@ -701,6 +721,28 @@ failed:
     .local pmc func
     func = get_global f_XDrawPoint
     $I0 = func(xdisp, xwin, gc, x, y)
+    .return($I0)
+.end
+
+#-----------------------------------------------------------------------
+.sub DrawLine :method
+    .param int x1
+    .param int y1
+    .param int x2
+    .param int y2
+
+    .local pmc disp
+    disp = getattribute self, attr_display
+    .local pmc xdisp
+    xdisp = self.getdisplay()
+    .local pmc gc
+    gc = disp.DefaultGC()
+    .local pmc xwin
+    xwin = getattribute self, attr_window
+
+    .local pmc func
+    func = get_global f_XDrawLine
+    $I0 = func(xdisp, xwin, gc, x1, y1, x2, y2)
     .return($I0)
 .end
 
