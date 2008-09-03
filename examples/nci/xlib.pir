@@ -110,13 +110,13 @@ Press any key to exit.
     .local pmc rw
     rw = display.RootWindow()
 
-    print 'Escape-'
+#    print 'Escape-'
     $I0 = StringToKeysym('Escape')
-    print $I0
-    print '-'
+#    print $I0
+#    print '-'
     .local int codeEscape
     codeEscape = display.KeysymToKeycode($I0)
-    say codeEscape
+#    say codeEscape
 
     .local pmc w
     w = display.CreateSimpleWindow(rw, 0, 0, 600, 400, 0, 0, white)
@@ -186,11 +186,11 @@ paint:
 #    print $I0
 #    print ' '
     px = event.x()
-    print px
-    print ' '
+#    print px
+#    print ' '
     py = event.y()
-    print py
-    say ''
+#    print py
+#    say ''
 
     eq lastpx, px, checky
     goto draw
@@ -204,6 +204,7 @@ draw:
     goto loop
 
 finish:
+    say 'Exiting'
     w.Unmap()
 
     display.close()
