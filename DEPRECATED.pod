@@ -45,6 +45,10 @@ See RT #48567.
 
 See RT #47011.
 
+=item * C<cmodulus> and variants [post 0.7.0]
+
+See RT #58550.
+
 =back
 
 =head1 Opcodes
