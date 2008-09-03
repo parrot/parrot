@@ -110,7 +110,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc ChangeLog CREDITS NEWS PBC_COMPAT PLATFORMS README
 %doc RESPONSIBLE_PARTIES TODO
 %doc docs examples
-%exclude %{_bindir}/parrot-config
+%exclude %{_bindir}/parrot_config
 %exclude %{_bindir}/perl6
 %{_bindir}/*
 %{_libdir}/parrot
@@ -125,13 +125,16 @@ rm -rf $RPM_BUILD_ROOT
 
 %files devel
 %defattr(-,root,root,-)
-%{_bindir}/parrot-config
+%{_bindir}/parrot_config
 %{_includedir}/parrot
 %{_libdir}/libparrot.so
 %{_libdir}/libparrot.a
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Wed Sep  3 2008 chromatic <chromatic@wgz.org> 0.7.0
+- install parrot_config (not parrot-config)
+
 * Tue Jun 17 2008 Nuno Carvalho <smash@cpan.org> 0.6.3
 - updated to 0.6.3
 
