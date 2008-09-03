@@ -26,7 +26,7 @@ token comp_stmt {
 }
 
 rule stmts {
-    <.term>?[ <stmt> [<.term>+ | <.before <end_block>> | $] ]* {*}
+    <.term>?[ <stmt> [<.term>+ | <.before <end_block>> | $ | <panic: unterminated statement>] ]* {*}
 }
 
 token term { \n | ';' }
@@ -202,10 +202,10 @@ token basic_primary {
     | <literal> {*}                         #= literal
     | <funcall> {*}                         #= funcall
     | <variable> {*}                        #= variable
+    | <ahash> {*}                           #= ahash
     | <do_block> {*}                        #= do_block
     | <warray> {*}                          #= warray
     | <array> {*}                           #= array
-    | <ahash> {*}                           #= ahash
     | <pcomp_stmt> {*}                      #= pcomp_stmt
     | <scope_identifier> {*}                #= scope_identifier
 }

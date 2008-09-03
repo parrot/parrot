@@ -1,20 +1,20 @@
-puts "1..5"
-a = { "a" => "ok ", "b" => 1}
+require 'test'
+plan 5
 
-puts a["a"], a["b"]
+a = { "a" => "ok", "b" => 1}
+
+is a["a"], "ok", "basic hash access"
 
 b = { }
 b['foo'] = 2
-b['bar'] = a['a']
 a['a'] = 'foo'
 
-puts b['bar'], b[a['a']]
+is b[a['a']], 2, "basic hash access"
 
-c = Hash.new('ok ')
-c['b'] = 3
+c = Hash.new('ok')
 
-puts c['a'], c['b']
+is c['a'], 'ok', "hash static default"
 
-d = Hash.new() { |hash, key| puts 'ok 4'; hash[key] = 5 }
+d = Hash.new() { |hash, key| pass "hash block default"; hash[key] = 5 }
 
-puts 'ok ', d['foo']
+is d['foo'], 5, "hash block default"
