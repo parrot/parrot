@@ -469,7 +469,7 @@ PINFO               = $(CUR_DIR)/pbc_info$(EXE)
 PBCMERGE            = $(CUR_DIR)/pbc_merge$(EXE)
 PDB                 = $(CUR_DIR)/parrot_debugger$(EXE)
 PBC_TO_EXE          = $(CUR_DIR)/pbc_to_exe$(EXE)
-PARROT_CONFIG       = $(CUR_DIR)/parrot-config$(EXE)
+PARROT_CONFIG       = $(CUR_DIR)/parrot_config$(EXE)
 
 # HLL Executables
 PERL6               = $(CUR_DIR)/perl6$(EXE)
@@ -481,6 +481,7 @@ INSTALLABLEPDUMP    = $(CUR_DIR)/installable_pdump$(EXE)
 INSTALLABLEPINFO    = $(CUR_DIR)/installable_pbc_info$(EXE)
 INSTALLABLEPBCMERGE = $(CUR_DIR)/installable_pbc_merge$(EXE)
 INSTALLABLEPDB      = $(CUR_DIR)/installable_parrot_debugger$(EXE)
+INSTALLABLECONFIG   = $(CUR_DIR)/installable_parrot_config$(EXE)
 
 # Libraries
 LIBPARROT_STATIC    = @blib_dir@/@libparrot_static@
@@ -758,7 +759,7 @@ world : all parrot_utils
 
 parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB) $(PBCMERGE) $(PBC_TO_EXE) $(PARROT_CONFIG)
 
-installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPINFO) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE)
+installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPINFO) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE) $(INSTALLABLECONFIG)
 
 
 flags_dummy :
@@ -891,6 +892,10 @@ $(LIBPARROT_SHARED) : $(O_FILES)
 #CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #CONDITIONED_LINE(libparrot_shared_alias):	( cd @blib_dir@ ; ln -sf @libparrot_shared@ @libparrot_shared_alias@ )
 
+
+$(INSTALLABLECONFIG) : $(SRC_DIR)/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_EXE)
+	$(PARROT) -o parrot_config.pbc tools/util/parrot-config.pir
+	$(PBC_TO_EXE) parrot_config.pbc --install
 
 #
 # Parrot Debugger
@@ -1658,6 +1663,7 @@ archclean: dynoplibs-clean dynpmc-clean dynext-clean
     $(INSTALLABLEPINFO) \
     $(INSTALLABLEPBCMERGE) \
     $(INSTALLABLEPDB) \
+    $(INSTALLABLECONFIG) \
     $(IMCC_DIR)/main$(O) \
     $(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
     $(SRC_DIR)/pbc_info$(O) $(PINFO) \
