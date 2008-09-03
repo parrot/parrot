@@ -67,7 +67,9 @@ Poletto and Sarkar).
 #define out stderr
 */
 
-#define out lexer->outfile
+//#define out lexer->outfile
+
+#define out stdout
 
 /* the order of these letters match with the pir_type enumeration.
  * These are used for human-readable PASM output.
@@ -841,6 +843,11 @@ invert_instr(struct lexer_state * const lexer) {
     instr       = get_inverse(instr);
     /* and set the new instruction */
     lexer->subs->statements->instr.ins->opname = instr;
+}
+
+char const *
+get_instr(struct lexer_state * const lexer) {
+    return lexer->subs->statements->instr.ins->opname;
 }
 
 /*

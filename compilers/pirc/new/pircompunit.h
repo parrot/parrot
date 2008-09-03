@@ -361,6 +361,8 @@ void set_instrf(struct lexer_state * const lxr, char const * const op, char cons
 void unshift_operand(struct lexer_state * const lexer, expression * const operand);
 void push_operand(struct lexer_state * const lexer, expression * const operand);
 
+char const * get_instr(struct lexer_state * const lexer);
+
 void set_lex_flag(target * const t, char * const lexname);
 char const *get_inverse(char const * const instr);
 void invert_instr(struct lexer_state * const lexer);

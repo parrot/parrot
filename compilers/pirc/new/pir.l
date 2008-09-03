@@ -81,10 +81,6 @@ extern void yyerror(yyscan_t yyscanner, lexer_state * const lexer, char *message
 
 
 
-/* Parrot can check out whether the specified text is the name of an op.
- * We define a dummy function for now; replace this later.
- */
-static int is_parrot_op(char const * const spelling);
 
 #define DEBUG1
 /* think of a smarter way to do this; only print when DEBUG is defined */
@@ -173,48 +169,6 @@ new_lexer(char * const filename) {
 }
 
 
-/*
-
-=item C<int
-check_symbol(lexer_state * const lexer, char * const text, YYSTYPE *lval, int opcode)>
-
-Check whether there is a symbol declared by the name of C<text>; it may be
-a local symbol, a local or global constant (XXX: implement local constants).
-
-If C<text> is not the name of a symbol, then C<opcode> is returned.
-
-=cut
-
-*/
-int
-check_symbol(lexer_state * const lexer, char * const text, YYSTYPE *lval, int opcode) {
-    symbol *sym        = find_symbol(lexer, text);
-    if (sym) {
-        lval->symb = sym;
-        return TK_SYMBOL;
-    }
-    else {
-        constant *con = find_constant(lexer, text);
-        if (con != NULL) {
-            switch (con->type) {
-                case INT_TYPE:
-                    lval->ival = con->val.ival;
-                    return TK_INTC;
-                case NUM_TYPE:
-                    lval->dval = con->val.nval;
-                    return TK_NUMC;
-                case STRING_TYPE:
-                    lval->sval = con->val.sval;
-                    return TK_STRINGC;
-                case PMC_TYPE:
-                case UNKNOWN_TYPE:
-                default:
-                    fprintf(stderr, "invalid constant type!\n");
-            }
-        }
-    }
-    return opcode;
-}
 
 /*
 
@@ -365,14 +319,6 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 "unless"          { return TK_UNLESS; }
 "null"            { return TK_NULL; }
 
-"set"             { return check_symbol(yyget_extra(yyscanner), yytext, yylval, TK_PARROT_SET); }
-"add"             { return check_symbol(yyget_extra(yyscanner), yytext, yylval, TK_PARROT_ADD); }
-"sub"             { return check_symbol(yyget_extra(yyscanner), yytext, yylval, TK_PARROT_SUB); }
-"mul"             { return check_symbol(yyget_extra(yyscanner), yytext, yylval, TK_PARROT_MUL); }
-"div"             { return check_symbol(yyget_extra(yyscanner), yytext, yylval, TK_PARROT_DIV); }
-"fdiv"            { return check_symbol(yyget_extra(yyscanner), yytext, yylval, TK_PARROT_FDIV); }
-
-
 "int"             { return TK_INT; }
 "num"             { return TK_NUM; }
 "pmc"             { return TK_PMC; }
@@ -446,50 +392,7 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
               }
 
 {IDENT}       { /* identifier; can be a global (sub or const), local or parrot op */
-                lexer_state *lexer = yyget_extra(yyscanner);
-                symbol      *sym   = find_symbol(lexer, yytext);
-                constant    *con;
-
-                /* if the id was declared as a local, return the pointer to the symbol
-                 * node. Note that .locals can "hide" opcodes.
-                 */
-                if (sym != NULL) {
-                    yylval->symb = sym;
-                    return TK_SYMBOL;
-                }
-
-                /* maybe it was a declared .const; if that's the case, then that .const's
-                 * value is returned as if the literal constant was parsed.
-                 */
-                con = find_constant(lexer, yytext);
-                if (con != NULL) {
-                    switch (con->type) {
-                        case INT_TYPE:
-                            yylval->ival = con->val.ival;
-                            return TK_INTC;
-                        case NUM_TYPE:
-                            yylval->dval = con->val.nval;
-                            return TK_NUMC;
-                        case STRING_TYPE:
-                            yylval->sval = con->val.sval;
-                            return TK_STRINGC;
-                        case PMC_TYPE:
-                        case UNKNOWN_TYPE:
-                        default:
-                            fprintf(stderr, "invalid constant type!\n");
-                    }
-                }
-
-                /* at this point we need to duplicate the string */
                 yylval->sval = dupstr(yytext);
-
-                /* at this point it was no local or constant; check whether it's an op. */
-                if (is_parrot_op(yytext))
-                    return TK_PARROT_OP;
-
-                /* just an identifier; at this point it can be a label identifier or a
-                 * constant/local being defined.
-                 */
                 return TK_IDENT;
               }
 
@@ -515,60 +418,6 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 %%
 
 
-
-/*
-
-=head1 AUX. FUNCTIONS
-
-=over 4
-
-=item C<static int
-is_parrot_op(char const * const spelling)>
-
-=cut
-
-*/
-static int
-is_parrot_op(char const * const spelling)
-{
-    /* only these are currently recognized as a Parrot instruction */
-    char const * ops[] = {
-        "print",
-        "new",
-        "newclass",
-        "end",
-        "set",
-        "find_global",
-        "set_hll_global",
-        "get_hll_global",
-        "setfile",
-        "setline",
-        "add",
-        "sub",
-        NULL
-    };
-
-
-    char const **iter = ops;
-
-    while (*iter != NULL) {
-        if (strcmp(spelling, *iter) == 0)
-            return 1;
-        iter++;
-    }
-
-    return 0;
-}
-
-
-
-/*
-
-=back
-
-=cut
-
-*/
 
 
 

@@ -23,7 +23,7 @@
 
 #ifdef TEST_THREAD_SAFETY
 #  include <pthread.h>
-#  define NUM_THREADS 20
+#  define NUM_THREADS 1
 #endif
 
 
