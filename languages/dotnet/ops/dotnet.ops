@@ -88,7 +88,10 @@ static opcode_t* dotnet_OverflowException(Parrot_Interp interp, opcode_t *ret)
     PMC *ex_pmc = pmc_new(interp, enum_class_Exception);
     VTABLE_set_string_native(interp, ex_pmc,
         string_from_literal(interp, "System.OverflowException"));
-    return (opcode_t *)throw_exception(interp, ex_pmc, ret);
+    VTABLE_set_integer_keyed_str(interp, ex_pmc,
+        "severity", EXCEPT_error);
+    Parrot_ex_throw_from_c(interp, ex_pmc);
+    return ret;
 }
 
 

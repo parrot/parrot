@@ -1848,7 +1848,7 @@ pmclass DotNetAssembly dynpmc group dotnet {
         free(filename);
 
         if (!in)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, E_IOError,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                 "Unable to open file %s", filename);
 
         /* Attempt to load the PE parts of the file; this locates the CLI
@@ -2184,12 +2184,9 @@ pmclass DotNetAssembly dynpmc group dotnet {
 
         /* If we don't have an assembly or nothing is loaded, throw an
            exception and leave. */
-        if (ass == NULL || ass->loaded == 0)
-        {
-            EXCEPTION_INVALID_OPERATION(INTERP, NULL, INVALID_OPERATION,
+        if (!ass || !ass->loaded)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "No .NET CLI file loaded");
-            RETURN(PMC *PMCNULL);
-        }
         else {
             PMC *result = VTABLE_get_pmc_keyed_int(INTERP, ass->methods,
                 ass->entry_point);
