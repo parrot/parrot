@@ -34,7 +34,7 @@ docs/pdds/draft/pdd08_keys.pod
 docs/pdds/draft/pdd06_pasm.pod
 docs/pdds/draft/pdd11_extending.pod
 docs/pdds/draft/pdd04_datatypes.pod
-docs/pdds/draft/pdd19_pir.pod
+docs/pdds/pdd19_pir.pod
 docs/pdds/draft/pdd05_opfunc.pod
 docs/pdds/draft/pdd01_overview.pod
 docs/pdds/pdd07_codingstd.pod

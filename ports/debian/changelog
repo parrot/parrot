@@ -1,3 +1,9 @@
+parrot (0.7.0-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Nuno Carvalho <mestre.smash@gmail.com>  Tue, 02 Sep 2008 13:05:31 +0100
+
 parrot (0.6.4-1) unstable; urgency=low
 
   * New upstream release

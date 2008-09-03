@@ -1,19 +1,3 @@
-docs/ops/cmp.pod
-docs/ops/set.pod
-docs/ops/pic.pod
-docs/ops/string.pod
-docs/ops/debug.pod
-docs/ops/io.pod
-docs/ops/bit.pod
-docs/ops/core.pod
-docs/ops/stm.pod
-docs/ops/object.pod
-docs/ops/sys.pod
-docs/ops/math.pod
-docs/ops/obscure.pod
-docs/ops/var.pod
-docs/ops/experimental.pod
-docs/ops/pmc.pod
 docs/submissions.pod
 docs/jit.pod
 docs/vtables.pod
@@ -22,7 +6,6 @@ docs/stm/internals.pod
 docs/stm/stm_frontend.pod
 docs/stm/thread-issues.pod
 docs/stm/howto.pod
-docs/Makefile
 docs/overview.pod
 docs/debug.pod
 docs/resources/up.gif
@@ -51,7 +34,6 @@ docs/pdds/draft/pdd08_keys.pod
 docs/pdds/draft/pdd06_pasm.pod
 docs/pdds/draft/pdd11_extending.pod
 docs/pdds/draft/pdd04_datatypes.pod
-docs/pdds/draft/pdd19_pir.pod
 docs/pdds/draft/pdd05_opfunc.pod
 docs/pdds/draft/pdd01_overview.pod
 docs/pdds/pdd07_codingstd.pod
@@ -60,6 +42,7 @@ docs/pdds/pdd13_bytecode.pod
 docs/pdds/pdd20_lexical_vars.pod
 docs/pdds/pdd15_object_metamodel.png
 docs/pdds/pdd23_exceptions.pod
+docs/pdds/pdd19_pir.pod
 docs/pdds/pdd21_namespaces.pod
 docs/pdds/pdd17_pmc.pod
 docs/pdds/pdd26_ast.pod
@@ -74,7 +57,6 @@ docs/project/pause_guide.pod
 docs/project/cage_cleaners_guide.pod
 docs/project/ticket_wrangler_guide.pod
 docs/project/debian_packaging_guide.pod
-docs/packfile-c.pod
 docs/memory_internals.pod
 docs/parrothist.pod
 docs/gettingstarted.pod
