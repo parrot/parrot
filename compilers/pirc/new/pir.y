@@ -620,7 +620,7 @@ opt_op_args       : op_args
                            */
                           char *instr = get_instr(lexer);
                           if (!is_parrot_op(instr))
-                             yyerror(yyscanner, lexer, "parrot opcode expected");
+                             yyerror(yyscanner, lexer, "'%s' is not a parrot instruction", instr);
                         }
                   | keylist_assignment
                   ;
@@ -1063,10 +1063,14 @@ methodcall           : pmc_object '.' method arguments
                              if (!TEST_FLAG($1->flags, TARGET_FLAG_IS_REG)) {
                                  symbol *sym = find_symbol(lexer, target_name($1));
                                  if (sym == NULL)
-                                     yyerror(yyscanner, lexer, "object '%s' not declared", target_name($1));
+                                     yyerror(yyscanner, lexer,
+                                             "object '%s' not declared",
+                                             target_name($1));
+
                                  else if (sym->type != PMC_TYPE)
-                                     yyerror(yyscanner, lexer, "cannot invoke method: "
-                                                               "'%s' is not of type 'pmc'", target_name($1));
+                                     yyerror(yyscanner, lexer,
+                                             "cannot invoke method: '%s' is not of type 'pmc'",
+                                             target_name($1));
                              }
 
                              $$ = invoke(lexer, CALL_METHOD, $1, $3);
@@ -1382,7 +1386,9 @@ symbol      : TK_PREG    { $$ = reg(lexer, PMC_TYPE, $1);    }
             | identifier { /* a symbol must have been declared; check that at this point. */
                            symbol *sym = find_symbol(lexer, $1);
                            if (sym == NULL) {
-                               yyerror(yyscanner, lexer, "symbol not declared");
+                               yyerror(yyscanner, lexer,
+                                       "symbol '%s' not declared", $1);
+
                                /* make sure sym is not NULL */
                                sym = new_symbol($1, UNKNOWN_TYPE);
                            }
