@@ -2065,21 +2065,22 @@ case 118:
 YY_RULE_SETUP
 #line 413 "pir.l"
 { /* any character not covered in the rules above is an error. */
-         yyerror(yyscanner, yyget_extra(yyscanner), "Unexpected character");
+         yyerror(yyscanner, yyget_extra(yyscanner),
+                 "Unexpected character: '%c'", yytext[0]);
        }
     YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 418 "pir.l"
+#line 419 "pir.l"
 { /* end of file, stop scanning. */
               yyterminate();
             }
     YY_BREAK
 case 119:
 YY_RULE_SETUP
-#line 422 "pir.l"
+#line 423 "pir.l"
 ECHO;
     YY_BREAK
-#line 2083 "pirlexer.c"
+#line 2084 "pirlexer.c"
 
     case YY_END_OF_BUFFER:
         {
@@ -3344,7 +3345,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 /* %ok-for-header */
 
-#line 422 "pir.l"
+#line 423 "pir.l"
 
 
 

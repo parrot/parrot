@@ -411,7 +411,8 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 
 
 .      { /* any character not covered in the rules above is an error. */
-         yyerror(yyscanner, yyget_extra(yyscanner), "Unexpected character");
+         yyerror(yyscanner, yyget_extra(yyscanner),
+                 "Unexpected character: '%c'", yytext[0]);
        }
 
 
