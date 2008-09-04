@@ -34,6 +34,7 @@ main(int argc, char *argv[])
     struct sigaction sa;
     int fd;
     int i = 42;
+    int cnt = 4;
 
     my_sig = atoi(argv[1]);
     printf("SIGRTMIN=%d SIGRTMAX=%d\n", SIGRTMIN, SIGRTMAX);
@@ -57,7 +58,7 @@ main(int argc, char *argv[])
 	die("sigaction err");
     if (aio_read(&a) < 0)
 	die("aio_read err");
-    while (!flag) {
+    while (--cnt && !flag) {
 	sleep(1);
     }
     if (flag != my_sig)
