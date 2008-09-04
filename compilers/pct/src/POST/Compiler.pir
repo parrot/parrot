@@ -231,14 +231,6 @@ the sub.
     outerpost = node.'outer'()
     if null outerpost goto pirflags_done
     unless outerpost goto pirflags_done
-    ##  FIXME: RT#47956
-    ##  PIR doesn't compile properly if :outer points to a sub
-    ##  with :init flags on it.
-    $I0 = index pirflags, ':init'
-    if $I0 >= 0 goto pirflags_done
-    $S0 = outerpost.'pirflags'()
-    $I0 = index $S0, ':init'
-    if $I0 >= 0 goto pirflags_done
     outername = outerpost.'lexid'()
     $S0 = code.'escape'(outername)
     pirflags = concat pirflags, ' :outer('
