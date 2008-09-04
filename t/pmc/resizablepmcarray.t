@@ -18,6 +18,7 @@ out-of-bounds test. Checks INT and PMC keys.
 =cut
 
 .sub main :main
+    .include 'include/fp_equality.pasm'
     .include 'include/test_more.pir'
 
     plan(118)
@@ -206,18 +207,6 @@ no_eh4:
     ok(0, "no ex thrown for negative index")
 end:
 .end
-
-
-.macro fp_eq (  J, K, L )
-    set $N10, .J
-    set $N11, .K
-    sub $N12, $N11, $N10
-    abs $N12, $N12
-    gt  $N12, 0.000001, .$FPEQNOK
-
-    branch  .L
-.label $FPEQNOK:
-.endm
 
 
 .sub set_keyed_get_keyed_tests

@@ -18,6 +18,7 @@ out-of-bounds test. Checks INT and PMC keys.
 =cut
 
 .sub main :main
+    .include 'include/fp_equality.pasm'
     .include 'include/test_more.pir'
     plan(24)
 
@@ -29,27 +30,6 @@ out-of-bounds test. Checks INT and PMC keys.
     what_is_truth()
     interface_check()
 .end
-
-.macro fp_eq (  J, K, L )
-    set $N10, .J
-    set $N11, .K
-    sub $N12, $N11, $N10
-    abs $N12, $N12
-    gt  $N12, 0.000001, .$FPEQNOK
-    branch  .L
-    .label $FPEQNOK:
-.endm
-
-.macro fp_ne(   J,K,L)
-    set $N10, .J
-    set $N11, .K
-    sub $N12, $N11, $N10
-    abs $N12, $N12
-    lt  $N12, 0.000001, .$FPNENOK
-    branch  .L
-    .label $FPNENOK:
-.endm
-
 
 .sub array_size_tests
     new $P0, 'FixedFloatArray'
