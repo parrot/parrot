@@ -572,6 +572,15 @@ failed:
     .local int timesize
     timesize = 4
 
+# If size of long is 8, assume that padding in the struct
+    eq longsize, 8, adjust8
+    goto doit
+adjust8:
+    intsize = 8
+    ptrsize = 8
+    timesize = 8
+
+doit:
     .local int char_t
     .local int int_t
     .local int long_t
@@ -587,78 +596,94 @@ failed:
     arg = new 'FixedIntegerArray'
     set arg, 45
 
+    say 'Event struct'
     .local int offs
     offs = 0
 # type
     arg[0] = int_t
     arg[1] = 1
     arg[2] = offs
+    say offs
     add offs, intsize
 #serial
     arg[3] = long_t
     arg[4] = 1
     arg[5] = offs
+    say offs
     add offs, longsize
 # send_event
     arg[6] = int_t
     arg[7] = 1
     arg[8] = offs
+    say offs
     add offs, intsize
 # display
     arg[9] = ptr_t
     arg[10] = 1
     arg[11] = offs
+    say offs
     add offs, ptrsize
 # window
     arg[12] = ptr_t
     arg[13] = 1
     arg[14] = offs
+    say offs
     add offs, ptrsize
 # root
     arg[15] = ptr_t
     arg[16] = 1
     arg[17] = offs
+    say offs
     add offs, ptrsize
 # subwindow
     arg[18] = ptr_t
     arg[19] = 1
     arg[20] = offs
+    say offs
     add offs, ptrsize
 # time
     arg[21] = time_t
     arg[22] = 1
     arg[23] = offs
+    say offs
     add offs, timesize
 # x
     arg[24] = int_t
     arg[25] = 1
     arg[26] = offs
+    say offs
     add offs, intsize
 # y
     arg[27] = int_t
     arg[28] = 1
     arg[29] = offs
+    say offs
     add offs, intsize
 # x_root
     arg[30] = int_t
     arg[31] = 1
     arg[32] = offs
+    say offs
     add offs, intsize
 # y_root
     arg[33] = int_t
     arg[34] = 1
     arg[35] = offs
+    say offs
     add offs, intsize
 # state
     arg[36] = int_t
     arg[37] = 1
     arg[38] = offs
+    say offs
     add offs, intsize
 # keycode
     arg[39] = int_t
     arg[40] = 1
     arg[41] = offs
+    say offs
     add offs, intsize
+    say offs
 # filler
     arg[42] = char_t
     arg[43] = 128
