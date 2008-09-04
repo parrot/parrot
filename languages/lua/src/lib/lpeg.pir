@@ -92,12 +92,179 @@ LIST
 .end
 
 
+# Virtual Machine's instructions
+.const int IAny = 0
+.const int IChar = 1
+.const int ISet = 2
+.const int IZSet = 3
+.const int ITestAny = 4
+.const int ITestChar = 5
+.const int ITestSet = 6
+.const int ITestZSet = 7
+.const int ISpan = 8
+.const int ISpanZ = 9
+.const int IRet = 10
+.const int IEnd = 11
+.const int IChoice = 12
+.const int IJmp = 13
+.const int ICall = 14
+.const int IOpenCall = 15
+.const int ICommit = 16
+.const int IPartialCommit = 17
+.const int IBackCommit = 18
+.const int IFailTwice = 19
+.const int IFail = 20
+.const int IGiveup = 21
+.const int IFunc = 22
+.const int IFullCapture = 23
+.const int IEmptyCapture = 24
+.const int IEmptyCaptureIdx = 25
+.const int IOpenCapture = 26
+.const int ICloseCapture = 27
+.const int ICloseRunTime = 28
+
+# kinds of captures
+.const int Cclose = 0
+.const int Cposition = 1
+.const int Cconst = 2
+.const int Cbackref = 3
+.const int C_arg = 4
+.const int Csimple = 5
+.const int Ctable = 6
+.const int Cfunction = 7
+.const int Cquery = 8
+.const int Cstring = 9
+.const int Csubst = 10
+.const int Caccum = 11
+.const int Cruntime = 12
+
+
+.sub 'newpatt' :anon
+    .param int n
+    .local pmc res
+    new $P0, 'lpeg::Pattern'
+    $I0 = n + 1
+    set $P0, $I0
+    .local pmc mt
+    mt = lua_getmetatable(PATTERN_T)
+    res = lua_newuserdata($P0, mt)
+    $P0.'setinst'(n, IEnd, 0)
+    .return (res, $P0)
+.end
+
+
+.sub 'newcharset' :anon
+    .local pmc res
+    (res, $P0) = newpatt() ###
+    .return (res, $P0)
+.end
+
+
+.sub 'any' :anon
+    .param int n
+    .param int extra
+    .param int offset
+    .local pmc res
+    $I0 = n - 1
+    $I0 /= 255
+    $I0 += extra
+    $I0 += 1
+    (res, $P0) = newpatt($I0)
+    $I1 = offset
+  L1:
+    unless n > 255 goto L2
+    $P0.'setinstaux'($I1, IAny, 0, 255)
+    inc $I1
+    n -= 255
+    goto L1
+  L2:
+    $P0.'setinstaux'($I1, IAny, 0, n)
+    inc $I1
+    .return (res, $P0, $I1)
+.end
+
+
 .sub 'getpatt' :anon
     .param int idx
     .param pmc patt
     .local pmc res
     .local int size
-    .return (res, size)
+    if null patt goto L_other
+  L_string:
+    $I0 = isa patt, 'LuaString'
+    unless $I0 goto L_number
+    .local string str
+    str = patt
+    .local int len
+    len = length str
+    (res, $P0) = newpatt(len)
+    $I0 = 0
+  L1:
+    unless $I0 < len goto L2
+    $S0 = substr str, $I0, 1
+    $P0.'setinstaux'($I0, IChar, 0, $S0)
+    inc $I0
+    goto L1
+  L_number:
+    $I0 = isa patt, 'LuaNumber'
+    unless $I0 goto L_boolean
+    .local int n
+    n = patt
+    unless n == 0 goto L3
+    (res, $P0) = newpatt(0) # empty pattern
+    goto L2
+  L3:
+    unless n > 0 goto L4
+    (res, $P0) = any(n, 0, 0)
+    goto L2
+  L4:
+    $I0 = - n
+    unless $I0 <= 255 goto L5
+    (res, $P0) = newpatt(2)
+    $P0.'setinstaux'(0, ITestAny, 2, $I0)
+    $P0.'setinst'(1, IFail, 0)
+    goto L2
+  L5:
+    .local int offset
+    $I0 -= 255
+    (res, $P0, offset) = any($I0, 3, 2)
+    $I1 = offset + 1
+    $P0.'setinstaux'(0, ITestAny, $I1, 255)
+    $P0.'setinstaux'(1, IFailTwice, offset, 255)
+    $P0.'setinst'(offset, IFailTwice, 0)
+    goto L2
+  L_boolean:
+    $I0 = isa patt, 'LuaBoolean'
+    unless $I0 goto L_table
+    $I0 = istrue patt
+    unless $I0 goto L6
+    (res, $P0) = newpatt(0) # empty pattern (always succeeds)
+    goto L2
+  L6:
+    (res, $P0) = newpatt(1)
+    $P0.'setinst'($I0, IFail, 0)
+    goto L2
+  L_table:
+    $I0 = isa patt, 'LuaTable'
+    unless $I0 goto L_function
+    (res, $P0) = fix(idx, patt)
+    goto L2
+  L_function:
+    $I0 = isa patt, 'LuaClosure'
+    if $I0 goto L7
+    $I0 = isa patt, 'LuaFunction'
+    unless $I0 goto L_other
+  L7:
+    (res, $P0) = newpatt(2)
+    $I0 = 0 # value2fenv(L, idx)
+    $P0.'setinstcap'(0, IOpenCapture, $I0, Cruntime, 0)
+    $P0.'setinstcap'(1, ICloseRunTime, 0, Cclose, 0)
+    goto L2
+  L_other:
+    $P0 = lua_checkudata(idx, patt, PATTERN_T)
+    res = patt
+  L2:
+    .return (res, $P0)
 .end
 
 
@@ -150,7 +317,7 @@ NOT YET IMPLEMENTED.
     .param pmc subject :optional
     .param pmc init :optional
     .param pmc extra :slurpy
-    $P1 = getpatt(1, pattern)
+    ($P1, $P0) = getpatt(1, pattern)
     $S2 = lua_checkstring(2, subject)
     $I3 = lua_optint(3, init, 1)
     not_implemented()
@@ -159,15 +326,16 @@ NOT YET IMPLEMENTED.
 
 =item C<lpeg.print (pattern)>
 
-NOT YET IMPLEMENTED.
+UNDOCUMENTED.
 
 =cut
 
 .sub 'print'
     .param pmc pattern :optional
     .param pmc extra :slurpy
-    $P1 = getpatt(1, pattern)
-    not_implemented()
+    ($P1, $P0) = getpatt(1, pattern)
+    $S0 = $P0
+    print $S0
 .end
 
 
@@ -314,6 +482,10 @@ NOT YET IMPLEMENTED.
     .param pmc extra :slurpy
     $S1 = lua_checkstring(1, str)
     $I1 = length $S1
+    unless $I1 == 1 goto L1
+    $P1 = getpatt(1, str)
+    .return ($P1)
+  L1:
     not_implemented()
 .end
 
@@ -331,7 +503,17 @@ NOT YET IMPLEMENTED.
 .sub 'V'
     .param pmc v :optional
     .param pmc extra :slurpy
-    not_implemented()
+    if null v goto L1
+    $I0 = isa v, 'LuaNil'
+    unless $I0 goto L2
+  L1:
+    lua_argerror(1, "non-nil value expected")
+  L2:
+    .local pmc res
+    (res, $P0) = newpatt(1)
+    $I0 = 0 # value2fenv
+    $P0.'setinst'(0, IOpenCall, $I0)
+    .return (res)
 .end
 
 
@@ -349,7 +531,8 @@ NOT YET IMPLEMENTED.
 
 .sub '__len' :method
     .param pmc patt
-    ($P1, $I1) = getpatt(1, patt)
+    ($P1, $P0) = getpatt(1, patt)
+    $I1 = $P0
     not_implemented()
 .end
 
@@ -540,26 +723,12 @@ what values are produced.
 
 =cut
 
-# kinds of captures
-.const int Cclose = 1
-.const int Cposition = 2
-.const int Cconst = 3
-.const int Cbackref = 4
-.const int C_arg = 5
-.const int Csimple = 6
-.const int Ctable = 7
-.const int Cfunction = 8
-.const int Cquery = 9
-.const int Cstring = 10
-.const int Csubst = 11
-.const int Caccum = 12
-.const int Cruntime = 13
-
 .sub 'capture_aux' :anon
     .param pmc patt
     .param int kind
     .param int labelidx
-    ($P1, $I1) = getpatt(1, patt)
+    ($P1, $P0) = getpatt(1, patt)
+    $I1 = $P0
     not_implemented()
 .end
 
@@ -818,9 +987,126 @@ NOT YET IMPLEMENTED.
     .param pmc patt :optional
     .param pmc func :optional
     .param pmc extra :slurpy
-    ($P1, $I1) = getpatt(1, patt)
+    ($P1, $P0) = getpatt(1, patt)
+    $I1 = $P0
     lua_checktype(2, func, 'function')
     not_implemented()
+.end
+
+
+.namespace [ 'lpeg::Pattern' ]
+
+.sub '__onload' :anon :load :init
+    $P0 = subclass 'FixedPMCArray', 'lpeg::Pattern'
+.end
+
+.sub 'get_string' :vtable :method
+    $S0 = "[]\n"
+    new $P0, 'Iterator', self
+    $I0 = 0
+    new $P1, 'FixedIntegerArray'
+    set $P1, 1
+  L1:
+    unless $P0 goto L2
+    $P2 = shift $P0
+    $P1[0] = $I0
+    $S1 = sprintf "%02d: ", $P1
+    concat $S0, $S1
+    $S2 = $P2
+    concat $S0, $S2
+    inc $I0
+    goto L1
+  L2:
+    .return ($S0)
+.end
+
+.sub 'setinstaux' :method
+    .param int i
+    .param int op
+    .param int offset
+    .param int aux
+    new $P0, 'lpeg::Instruction'
+    new $P1, 'Integer'
+    set $P1, op
+    setattribute $P0, 'code', $P1
+    new $P1, 'Integer'
+    set $P1, offset
+    setattribute $P0, 'offset', $P1
+    new $P1, 'Integer'
+    set $P1, aux
+    setattribute $P0, 'aux', $P1
+    self[i] = $P0
+.end
+
+.sub 'setinst' :method
+    .param int i
+    .param int op
+    .param int offset
+    self.'setinstaux'(i, op, offset, 0)
+.end
+
+.sub 'setinstcap' :method
+    .param int i
+    .param int op
+    .param int idx
+    .param int k
+    .param int n
+    $I0 = n << 4
+    $I0 |= k
+    self.'setinstaux'(i, op, idx, $I0)
+.end
+
+
+.namespace [ 'lpeg::Instruction' ]
+
+.sub '__onload' :anon :load :init
+    $P0 = newclass 'lpeg::Instruction'
+    addattribute $P0, 'code'
+    addattribute $P0, 'aux'
+    addattribute $P0, 'offset'
+    addattribute $P0, 'f'
+    addattribute $P0, 'buff'
+.end
+
+.const string names = <<'LIST'
+any
+char
+set
+zset
+testany
+testchar
+testset
+testzset
+span
+spanz
+ret
+end
+choice
+jmp
+call
+open_call
+commit
+partial_commit
+back_commit
+failtwice
+fail
+giveup
+func
+fullcapture
+emptycapture
+emptycaptureidx
+opencapture
+closecapture
+closeruntime
+LIST
+
+.sub 'get_string' :vtable :method
+    $P0 = split "\n", names
+    .local pmc code
+    code = getattribute self, 'code'
+    $S0 = $P0[code]
+    concat $S0, " \n"
+    .return ($S0)
 .end
 
 
