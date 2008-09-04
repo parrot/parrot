@@ -153,12 +153,18 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
         pobj_flag_dump(interp, (long)PObj_get_FLAGS(self->u.string));
         PIO_printf(interp, "        CHARSET  => %ld,\n",
                    self->u.string->charset);
+        i = self->u.string->bufused;
         PIO_printf(interp, "        SIZE     => %ld,\n",
-                   (long)self->u.string->bufused);
+                   (long)i);
         /* TODO: Won't do anything reasonable for most encodings */
-        PIO_printf(interp, "        DATA     => '%.*s'\n",
-                   (int)self->u.string->bufused,
-                   (char *)self->u.string->strstart);
+        if (i > 0) {
+            PIO_printf(interp, "        DATA     => '%.*s'\n",
+                       (int)i,
+                       (char *)self->u.string->strstart);
+        }
+        else {
+            PIO_printf(interp, "        DATA     => NULL\n");
+        }
         PIO_printf(interp, "    } ],\n");
         break;
 
