@@ -688,7 +688,7 @@ Create a new instruction node and set C<opname> as the instruction.
 
 */
 static instruction *
-new_instruction(char const *opname) {
+new_instruction(char *opname) {
     instruction *ins = (instruction *)calloc(1, sizeof (instruction));
     assert(ins != NULL);
     ins->opname = opname;
@@ -706,7 +706,7 @@ Sets the opname to the current instruction. No operands.
 
 */
 void
-set_instr(struct lexer_state * const lexer, char const * const opname) {
+set_instr(struct lexer_state * const lexer, char * const opname) {
     set_instrf(lexer, opname, "");
 }
 
@@ -751,7 +751,7 @@ refer to the (non-)terminals used in a Yacc/Bison specification.
 */
 void
 set_instrf(struct lexer_state * const lexer,
-           char const * const opname,
+           char * const opname,
            char const * const format, ...)
 {
     va_list arg_ptr;
@@ -815,8 +815,8 @@ C<if> becomes C<unless>, C<greater-than> becomes C<less-or-equals>.
 =cut
 
 */
-char const *
-get_inverse(char const * const instr) {
+char *
+get_inverse(char * const instr) {
          if (strcmp(instr, "if") == 0) return "unless";
     else if (strcmp(instr, "gt") == 0) return "le";
     else if (strcmp(instr, "ge") == 0) return "lt";
@@ -839,13 +839,13 @@ Invert the current instruction.
 */
 void
 invert_instr(struct lexer_state * const lexer) {
-    char const *instr = lexer->subs->statements->instr.ins->opname;
+    char *instr = lexer->subs->statements->instr.ins->opname;
     instr       = get_inverse(instr);
     /* and set the new instruction */
     lexer->subs->statements->instr.ins->opname = instr;
 }
 
-char const *
+char *
 get_instr(struct lexer_state * const lexer) {
     return lexer->subs->statements->instr.ins->opname;
 }
@@ -1031,6 +1031,7 @@ reg(struct lexer_state * const lexer, pir_type type, int regno) {
     target *t       = new_target(type, NULL); /* no identifier */
     target_regno(t) = regno;
     t->color        = color_reg(lexer, type, regno);
+    SET_FLAG(t->flags, TARGET_FLAG_IS_REG);
     return t;
 }
 

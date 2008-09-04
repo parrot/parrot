@@ -136,13 +136,15 @@ static int evaluate_i_n(int a, pir_rel_operator op, double b);
 static int evaluate_n_i(double a, pir_rel_operator op, int b);
 static int evaluate_s_s(char * const a, pir_rel_operator op, char * const b);
 static int evaluate_s(char * const s);
+static int evaluate_c(constant * const c);
 static char *concat_strings(char *a, char *b);
 
 /* Parrot can check out whether the specified text is the name of an op.
  * We define a dummy function for now; replace this later.
  */
 static int is_parrot_op(char const * const spelling);
-
+static void create_if_instr(yyscan_t yyscanner, lexer_state * const lexer, int invert, int hasnull,
+                            char * const name, char * const label);
 
 extern int yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message);
 
@@ -206,6 +208,8 @@ extern YY_DECL;
        TK_CONST             ".const"
        TK_RETURN            ".return"
        TK_YIELD             ".yield"
+       TK_SET_YIELD         ".set_yield"
+       TK_SET_RETURN        ".set_return"
        TK_BEGIN_YIELD       ".begin_yield"
        TK_END_YIELD         ".end_yield"
        TK_BEGIN_RETURN      ".begin_return"
@@ -214,9 +218,10 @@ extern YY_DECL;
        TK_END_CALL          ".end_call"
        TK_GET_RESULTS       ".get_results"
        TK_CALL              ".call"
-       TK_ARG               ".arg"
-       TK_RESULT            ".result"
+       TK_SET_ARG           ".set_arg"
+       TK_GET_RESULT        ".get_result"
        TK_NCI_CALL          ".nci_call"
+       TK_TAILCALL          ".tailcall"
 
 %token <sval> TK_LABEL      "label"
        <sval> TK_IDENT      "identifier"
@@ -318,9 +323,6 @@ extern YY_DECL;
 %type <symb> local_id
              local_id_list
 
-/*
-%type <targ> local_id local_id_list
-*/
 %type <argm> named_arg
              short_arg
              arguments
@@ -611,19 +613,19 @@ parrot_op         : TK_IDENT
                          { set_instr(lexer, $1); }
                   ;
 
-opt_op_args       : /* empty */
-                        {
-                          char const *instr = get_instr(lexer);
-                          if (!is_parrot_op(instr))
-                             yyerror(yyscanner, lexer, "parrot opcode expected");
-                        }
-                  | parrot_op_args
-                        {
-                          char const *instr = get_instr(lexer);
+opt_op_args       : op_args
+                        { /* when this rule is activated, the initial identifier must
+                           * be a parrot op. Check that, and if not, emit an error message.
+                           */
+                          char *instr = get_instr(lexer);
                           if (!is_parrot_op(instr))
                              yyerror(yyscanner, lexer, "parrot opcode expected");
                         }
                   | keylist_assignment
+                  ;
+
+op_args           : /* empty */
+                  | parrot_op_args
                   ;
 
 parrot_op_args    : op_arg
@@ -635,7 +637,7 @@ keylist_assignment: keylist '=' expression
                          /* the "instruction" that was set now appears to be
                           * an identifier; get the name, and check its type.
                           */
-                         char const *instr = get_instr(lexer);
+                         char * const instr = get_instr(lexer);
                          symbol *sym = find_symbol(lexer, instr);
                          target *obj;
 
@@ -643,14 +645,16 @@ keylist_assignment: keylist '=' expression
                             yyerror(yyscanner, lexer, "indexed object not declared");
                             sym = new_symbol(instr, PMC_TYPE);
                          }
-                         if (sym->type != PMC_TYPE)
+                         else if (sym->type != PMC_TYPE)
                             yyerror(yyscanner, lexer, "indexed object must be of type 'pmc'");
 
+                         /* convert the symbol into a target */
                          obj = target_from_symbol(sym);
 
-                         set_instr(lexer, "set");
-                         set_target_key(lexer->curtarget, $1);
-
+                         /* set the key on the target */
+                         set_target_key(obj, $1);
+                         /* indexed operation is a "set" opcode */
+                         set_instrf(lexer, "set", "%T%E", obj, $3);
                        }
                   ;
 
@@ -664,8 +668,21 @@ op_arg            : expression
 
 keyaccess         : pmc_object keylist
                          {
-                           set_target_key($1, $2);
-                           $$ = $1;
+                           if (TEST_FLAG($1->flags, TARGET_FLAG_IS_REG))
+                               $$ = $1;
+                           else {
+                               symbol *sym = find_symbol(lexer, target_name($1));
+                               if (sym == NULL)
+                                   yyerror(yyscanner, lexer, "indexed object not declared");
+                               else if (sym->type != PMC_TYPE)
+                                   yyerror(yyscanner, lexer, "indexed object must be of type 'pmc'");
+
+                               /* create a target node based on the symbol node; sym already has
+                                * a PASM register, so through this the target will get that too.
+                                */
+                               $$ = target_from_symbol(sym);
+                           }
+                           set_target_key($$, $2);
                          }
                   ;
 
@@ -727,13 +744,39 @@ and C<S> means C<string literal>.
 */
 
 assignment        : target '=' expression
+                        { set_instrf(lexer, "set", "%T%E", $1, $3); }
                   | target '=' binary_expr
+                        { unshift_operand(lexer, expr_from_target($1)); }
                   | target '=' keyaccess
+                        { set_instrf(lexer, "set", "%T%T", $1, $3); }
                   | target augmented_op expression
+                        { set_instrf(lexer, opnames[$2], "%T%E", $1, $3); }
                   | target augm_add_op expression
+                        { set_instrf(lexer, opnames[$2], "%T%E", $1, $3); }
                   | target '=' unop expression
-                  | keyword keylist_assignment
-                  | TK_PREG keylist_assignment
+                        { set_instrf(lexer, $3, "%T%E", $1, $4); }
+                  | keyword keylist '=' expression
+                        {
+                          symbol *sym = find_symbol(lexer, $1);
+                          target *t;
+
+                          if (sym == NULL) {
+                              yyerror(yyscanner, lexer, "indexed object not declared");
+                              sym = new_symbol($1, PMC_TYPE);
+                          }
+                          else if (sym->type != PMC_TYPE)
+                              yyerror(yyscanner, lexer, "indexed object must be of type 'pmc'");
+
+                          t = target_from_symbol(sym);
+                          set_target_key(t, $2);
+                          set_instrf(lexer, "set", "%T%E", $1, $4);
+                      }
+                  | TK_PREG keylist '=' expression
+                        {
+                          target *preg = reg(lexer, PMC_TYPE, $1);
+                          set_target_key(preg, $2);
+                          set_instrf(lexer, "set", "%T%E", preg, $4);
+                        }
                   ;
 
 
@@ -793,27 +836,61 @@ binary_expr       : TK_INTC binop target
 conditional_stat  : conditional_instr "\n"
                   ;
 
+
+/* In order to allow all keywords (data type names and words such as "if", "null", etc.
+ * a lot of special cases must be distinguished; this is necessary in order to
+ * do a correct parse and prevent shift/reduce conflicts.
+ */
 conditional_instr : if_unless "null" TK_IDENT "goto" identifier
+                        { create_if_instr(yyscanner, lexer, $1, 1, $3, $4); }
                   | if_unless "null" "int" "goto" identifier
+                        { create_if_instr(yyscanner, lexer, $1, 1, "int", $4); }
                   | if_unless "null" "num" "goto" identifier
+                        { create_if_instr(yyscanner, lexer, $1, 1, "num", $4); }
                   | if_unless "null" "pmc" "goto" identifier
+                        { create_if_instr(yyscanner, lexer, $1, 1, "pmc", $4); }
                   | if_unless "null" "string" "goto" identifier
+                        { create_if_instr(yyscanner, lexer, $1, 1, "string", $4); }
                   | if_unless "null" "if" "goto" identifier
+                        { create_if_instr(yyscanner, lexer, $1, 1, "if", $4); }
                   | if_unless "null" "unless" "goto" identifier
+                        { create_if_instr(yyscanner, lexer, $1, 1, "unless", $4); }
                   | if_unless "null" "goto" "goto" identifier
+                        { create_if_instr(yyscanner, lexer, $1, 1, "goto", $4); }
                   | if_unless "null" "null" "goto" identifier
+                        { create_if_instr(yyscanner, lexer, $1, 1, "null", $4); }
                   | if_unless constant then identifier
+                        {
+                          int istrue = evaluate_c($2);
+                          /* if "unless", invert the true-ness */
+                          istrue = $1 ? !istrue : istrue;
+                          if (istrue)
+                              set_instrf(lexer, "branch", "%I", $4);
+                          else
+                              set_instr(lexer, "noop");
+                        }
                   | if_unless TK_IDENT then identifier
+                        { create_if_instr(yyscanner, lexer, $1, 0, $2, $4); }
                   | if_unless "int" then identifier
+                        { create_if_instr(yyscanner, lexer, $1, 0, "int", $4); }
                   | if_unless "num" then identifier
+                        { create_if_instr(yyscanner, lexer, $1, 0, "num", $4); }
                   | if_unless "pmc" then identifier
+                        { create_if_instr(yyscanner, lexer, $1, 0, "pmc", $4); }
                   | if_unless "string" then identifier
+                        { create_if_instr(yyscanner, lexer, $1, 0, "string", $4); }
                   | if_unless "if" then identifier
+                        { create_if_instr(yyscanner, lexer, $1, 0, "if", $4); }
                   | if_unless "unless" then identifier
+                        { create_if_instr(yyscanner, lexer, $1, 0, "unless", $4); }
                   | if_unless "goto" "goto" identifier
-                  | if_unless "null" "goto" identifier
+                        { create_if_instr(yyscanner, lexer, $1, 0, "goto", $4); }
                   | if_unless "goto" ',' identifier
+                        { create_if_instr(yyscanner, lexer, $1, 0, "goto", $4); }
+                  | if_unless "null" "goto" identifier
+                        { create_if_instr(yyscanner, lexer, $1, 0, "null", $4); }
                   | if_unless "null" ',' identifier
+                        { create_if_instr(yyscanner, lexer, $1, 0, "null", $4); }
                   | if_unless condition "goto" identifier
                         {
                           if ($2 == -1) { /* -1 means the condition is evaluated during runtime */
@@ -830,7 +907,7 @@ conditional_instr : if_unless "null" TK_IDENT "goto" identifier
                              if ( (($2 == 0) && $1) || (($2 == 1) && !$1) )
                                 set_instrf(lexer, "branch", "%I", $4);
                              else
-                                set_instr(lexer, "nop");
+                                set_instr(lexer, "noop");
 
                           }
                         }
@@ -915,7 +992,7 @@ long_arguments       : long_argument
                             { $$ = add_arg($1, $2); }
                      ;
 
-long_argument        : ".arg" short_arg "\n"
+long_argument        : ".set_arg" short_arg "\n"
                             { $$ = $2; }
                      ;
 
@@ -946,7 +1023,7 @@ long_results         : long_result
                            { $$ = add_target(lexer, $1, $2); }
                      ;
 
-long_result          : ".result" result_target "\n"
+long_result          : ".get_result" result_target "\n"
                            { $$ = $2; }
                      | local_decl
                            { $$ = NULL; }
@@ -970,6 +1047,15 @@ simple_invocation    : subcall
 
 methodcall           : pmc_object '.' method arguments
                            {
+                             if (!TEST_FLAG($1->flags, TARGET_FLAG_IS_REG)) {
+                                 symbol *sym = find_symbol(lexer, target_name($1));
+                                 if (sym == NULL)
+                                     yyerror(yyscanner, lexer, "object in method call not declared");
+                                 else if (sym->type != PMC_TYPE)
+                                     yyerror(yyscanner, lexer, "cannot invoke a method on an "
+                                                               "object of a type other than 'pmc'");
+                             }
+
                              $$ = invoke(lexer, CALL_METHOD, $1, $3);
                              set_invocation_args($$, $4);
                            }
@@ -1013,16 +1099,23 @@ method               : identifier
                      ;
 
 pmc_object           : identifier
-                           {
+                           { /* XXX TODO: this check must be moved to each use of pmc_object;
+                                a normal foo(), where foo is a global sub label, is never
+                                declared; now this results in an error. Remove this check;
+                                these should be fixed up later, after all parsing is done.
+                              */
+                              /*
                              symbol *sym = find_symbol(lexer, $1);
 
                              if (sym == NULL) {
                                  yyerror(yyscanner, lexer, "object not declared");
                                  sym = new_symbol($1, PMC_TYPE);
                              }
-                             if (sym->type != PMC_TYPE)
+                             else if (sym->type != PMC_TYPE)
                                  yyerror(yyscanner, lexer, "object must be of type 'pmc'");
 
+                             $$ = target_from_symbol(sym);
+                             */
                              $$ = target_from_ident(PMC_TYPE, $1);
                            }
                      | TK_PREG
@@ -1087,8 +1180,11 @@ short_return_stat    : ".return" arguments "\n"
                               $$ = invoke(lexer, CALL_RETURN);
                               set_invocation_args($$, $2);
                             }
-                     | ".return" simple_invocation "\n"
-                            { set_invocation_type($2, ($2->type == CALL_METHOD)
+                     | ".tailcall" simple_invocation "\n"
+                            { /* was the invocation a method call? then it becomes a method tail call,
+                               * otherwise it's just a normal (sub) tail call.
+                               */
+                              set_invocation_type($2, ($2->type == CALL_METHOD)
                                                       ? CALL_METHOD_TAILCALL
                                                       : CALL_TAILCALL);
                             }
@@ -1165,7 +1261,7 @@ yield_expressions     : yield_expression
                       ;
 
 
-yield_expression      : ".yield" short_arg "\n"
+yield_expression      : ".set_yield" short_arg "\n"
                             { $$ = $2; }
                       ;
 
@@ -1181,7 +1277,7 @@ return_expressions    : return_expression
                             { $$ = add_arg($1, $2); }
                       ;
 
-return_expression     : ".return" short_arg "\n"
+return_expression     : ".set_return" short_arg "\n"
                             { $$ = $2; }
                       ;
 
@@ -1893,7 +1989,7 @@ evaluate_s_s(char * const a, pir_rel_operator op, char * const b) {
 /*
 
 =item C<static int
-evaluate_s(char *s)>
+evaluate_s(char * const s)>
 
 Evaluate a string in boolean context; if the string's length is 0, it's false.
 If the string equals "0", ".0", "0." or "0.0", it's false.
@@ -1914,6 +2010,35 @@ evaluate_s(char * const s) {
             return 1;
     }
     return 0;
+}
+
+/*
+
+=item C<static int
+evaluate_c(constant * const c)>
+
+Evaluate a constant node in boolean context; if the constant is numeric,
+it must be non-zero to be true; if it's a string, C<evaluate_s> is invoked
+to evaluate the string.
+
+=cut
+
+*/
+static int
+evaluate_c(constant * const c) {
+    switch (c->type) {
+        case INT_TYPE:
+            return (c->val.ival != 0);
+        case NUM_TYPE:
+            return (c->val.nval != 0);
+        case STRING_TYPE:
+            return evaluate_s(c->val.sval);
+        case PMC_TYPE:
+        case UNKNOWN_TYPE:
+            printf("impossible constant type");
+            break;
+    }
+    return 0; /* keep compiler happy; will never happen. */
 }
 
 /*
@@ -1978,6 +2103,44 @@ is_parrot_op(char const * const spelling)
     }
 
     return 0;
+}
+
+
+/*
+
+=item C<static void
+create_if_instr(yyscan_t yyscanner, lexer_state *lexer, int invert, int hasnull,
+                char * const name,
+                char * const label)>
+
+Create an C<if> or C<unless> instruction; if C<invert> is non-zero (true), the
+C<if> instruction is inverted, effectively becoming C<unless>.
+
+If C<hasnull> is non-zero (true), the C<if> instruction becomes C<if_null>; again,
+if C<invert> is non-zero, the instruction becomes C<unless_null>.
+
+C<name> is the name of the variable that is checked during this instruction
+
+=cut
+
+*/
+static void
+create_if_instr(yyscan_t yyscanner, lexer_state * const lexer, int invert, int hasnull,
+                char * const name,
+                char * const label)
+{
+    /* try to find the symbol; if it was declared it will be found; otherwise emit an error. */
+    symbol *sym = find_symbol(lexer, name);
+    if (sym == NULL) {
+        sym = new_symbol(name, UNKNOWN_TYPE);
+        yyerror(yyscanner, lexer, "symbol not declared'");
+    }
+    /* if there was a keyword "null", use the if/unless_null instruction variants. */
+    if (hasnull)
+        set_instrf(lexer, invert ? "unless_null" : "if_null", "%T%I", target_from_symbol(sym),
+                   label);
+    else
+        set_instrf(lexer, invert ? "unless" : "if", "%T%I", target_from_symbol(sym), label);
 }
 
 

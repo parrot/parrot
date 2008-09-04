@@ -324,7 +324,7 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 "pmc"             { return TK_PMC; }
 "string"          { return TK_STRING; }
 
-".arg"            { return TK_ARG; }
+".set_arg"        { return TK_SET_ARG; }
 ".const"          { return TK_CONST; }
 ".end"            { return TK_END; }
 
@@ -348,10 +348,13 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 ".end_call"       { return TK_END_CALL; }
 ".end_return"     { return TK_END_RETURN; }
 ".end_yield"      { return TK_END_YIELD; }
-".result"         { return TK_RESULT; }
+".get_result"     { return TK_GET_RESULT; }
 ".return"         { return TK_RETURN; }
 ".sub"            { return TK_SUB; }
 ".yield"          { return TK_YIELD; }
+".set_return"     { return TK_SET_RETURN; }
+".set_yield"      { return TK_SET_YIELD; }
+".tailcall"       { return TK_TAILCALL; }
 
 ":anon"       { return TK_FLAG_ANON; }
 ":init"       { return TK_FLAG_INIT; }

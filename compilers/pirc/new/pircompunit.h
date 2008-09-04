@@ -45,7 +45,10 @@ typedef enum target_flags {
                                          parameter was passed */
     TARGET_FLAG_UNIQUE_REG  = 1 << 4, /* flag to tell register allocator to leave this poor target
                                          alone! */
-    TARGET_FLAG_INVOCANT    = 1 << 5  /* XXX for MDD; to be implemented according to PDD27 */
+    TARGET_FLAG_INVOCANT    = 1 << 5, /* XXX for MDD; to be implemented according to PDD27 */
+
+    TARGET_FLAG_IS_REG      = 1 << 31 /* set if the target node represents a register; cleared if
+                                         it's a .local/.param. */
 
 } target_flag;
 
@@ -227,7 +230,7 @@ typedef struct invocation {
 
 /* the instruction node represents a single parrot instruction */
 typedef struct instruction {
-    char const  *opname;       /* name of the instruction, such as "print" and "set" */
+    char        *opname;       /* name of the instruction, such as "print" and "set" */
     expression  *operands;     /* operands like "$I0" and "42" in "set $I0, 42" */
 
 } instruction;
@@ -356,15 +359,15 @@ void set_sub_flag(struct lexer_state *lexer, sub_flag flag);
 /* constructor and functions for setting instruction fields */
 void new_instr(struct lexer_state *lexer);
 void set_label(struct lexer_state * const lexer, char * const label);
-void set_instr(struct lexer_state * const lexer, char const * const opname);
-void set_instrf(struct lexer_state * const lxr, char const * const op, char const * const fmt, ...);
+void set_instr(struct lexer_state * const lexer, char * const opname);
+void set_instrf(struct lexer_state * const lxr, char * const op, char const * const fmt, ...);
 void unshift_operand(struct lexer_state * const lexer, expression * const operand);
 void push_operand(struct lexer_state * const lexer, expression * const operand);
 
-char const * get_instr(struct lexer_state * const lexer);
+char * get_instr(struct lexer_state * const lexer);
 
 void set_lex_flag(target * const t, char * const lexname);
-char const *get_inverse(char const * const instr);
+char *get_inverse(char * const instr);
 void invert_instr(struct lexer_state * const lexer);
 
 /* local declaration functions */

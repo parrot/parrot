@@ -301,6 +301,8 @@ yyerror(yyscan_t yyscanner, lexer_state * const  lexer, char const * const messa
 Default parse error handling routine, that is invoked when the bison-generated
 parser finds a syntax error.
 
+=cut
+
 */
 int
 yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message) {
@@ -311,11 +313,8 @@ yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const messag
 
     ++lexer->parse_errors;
 
-    /* print current token if it's not a newline ("\r\n" on windows) */
-    /* the following should be fixed; the point is not to print the token if
-     * it's a newline, that looks silly. XXX What's it on MacOS, "\r" ??
-     */
-    if (strcmp(text, "\r\n") != 0 && strcmp(text, "\n") != 0)
+    /* print current token if it doesn't contain a newline token. */
+    if (!strstr(text, "\n"))
         fprintf(stderr, "('%s')\n\n", text);
     else
         fprintf(stderr, "\n\n");
