@@ -146,7 +146,8 @@ static int is_parrot_op(char const * const spelling);
 static void create_if_instr(yyscan_t yyscanner, lexer_state * const lexer, int invert, int hasnull,
                             char * const name, char * const label);
 
-extern int yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message);
+extern int yyerror(yyscan_t yyscanner, lexer_state * const lexer,
+                   char const * const message, ...);
 
 /* declare yylex() */
 extern YY_DECL;
@@ -642,11 +643,14 @@ keylist_assignment: keylist '=' expression
                          target *obj;
 
                          if (sym == NULL) {
-                            yyerror(yyscanner, lexer, "indexed object not declared");
+                            yyerror(yyscanner, lexer,
+                                    "indexed object '%s' not declared", instr);
                             sym = new_symbol(instr, PMC_TYPE);
                          }
                          else if (sym->type != PMC_TYPE)
-                            yyerror(yyscanner, lexer, "indexed object must be of type 'pmc'");
+                            yyerror(yyscanner, lexer,
+                                    "indexed object '%s' must be of type 'pmc'",
+                                    instr);
 
                          /* convert the symbol into a target */
                          obj = target_from_symbol(sym);
@@ -673,12 +677,19 @@ keyaccess         : pmc_object keylist
                            else {
                                symbol *sym = find_symbol(lexer, target_name($1));
                                if (sym == NULL)
-                                   yyerror(yyscanner, lexer, "indexed object not declared");
-                               else if (sym->type != PMC_TYPE)
-                                   yyerror(yyscanner, lexer, "indexed object must be of type 'pmc'");
+                                   yyerror(yyscanner, lexer,
+                                           "indexed object '%s' not declared",
+                                           target_name($1));
 
-                               /* create a target node based on the symbol node; sym already has
-                                * a PASM register, so through this the target will get that too.
+                               else if (sym->type != PMC_TYPE)
+                                   yyerror(yyscanner, lexer,
+                                           "indexed object '%s' "
+                                           "is not of type 'pmc'",
+                                           target_name($1));
+
+                               /* create a target node based on the symbol node;
+                                * sym already has a PASM register, so through
+                                * this the target will get that too.
                                 */
                                $$ = target_from_symbol(sym);
                            }
@@ -761,11 +772,13 @@ assignment        : target '=' expression
                           target *t;
 
                           if (sym == NULL) {
-                              yyerror(yyscanner, lexer, "indexed object not declared");
+                              yyerror(yyscanner, lexer,
+                                      "indexed object '%s' not declared", $1);
                               sym = new_symbol($1, PMC_TYPE);
                           }
                           else if (sym->type != PMC_TYPE)
-                              yyerror(yyscanner, lexer, "indexed object must be of type 'pmc'");
+                              yyerror(yyscanner, lexer,
+                                      "indexed object '%s' must be of type 'pmc'", $1);
 
                           t = target_from_symbol(sym);
                           set_target_key(t, $2);
@@ -1050,10 +1063,10 @@ methodcall           : pmc_object '.' method arguments
                              if (!TEST_FLAG($1->flags, TARGET_FLAG_IS_REG)) {
                                  symbol *sym = find_symbol(lexer, target_name($1));
                                  if (sym == NULL)
-                                     yyerror(yyscanner, lexer, "object in method call not declared");
+                                     yyerror(yyscanner, lexer, "object '%s' not declared", target_name($1));
                                  else if (sym->type != PMC_TYPE)
-                                     yyerror(yyscanner, lexer, "cannot invoke a method on an "
-                                                               "object of a type other than 'pmc'");
+                                     yyerror(yyscanner, lexer, "cannot invoke method: "
+                                                               "'%s' is not of type 'pmc'", target_name($1));
                              }
 
                              $$ = invoke(lexer, CALL_METHOD, $1, $3);
@@ -1079,14 +1092,17 @@ method               : identifier
                              symbol *sym = find_symbol(lexer, $1);
 
                              if (sym == NULL) {
-                                yyerror(yyscanner, lexer, "method identifier not declared");
+                                yyerror(yyscanner, lexer,
+                                        "method identifier '%s' not declared",
+                                        $1);
                                 /* make sure sym is not NULL; use a valid type to prevent
                                  * a type error below.
                                  */
                                 sym = new_symbol($1, PMC_TYPE);
                              }
                              if (sym->type != PMC_TYPE && sym->type != STRING_TYPE)
-                                 yyerror(yyscanner, lexer, "method identifier must be of type 'pmc' or 'string'");
+                                 yyerror(yyscanner, lexer,
+                                         "method '%s' must be of type 'pmc' or 'string'", $1);
 
                              $$ = target_from_symbol(sym);
                            }
@@ -1099,25 +1115,7 @@ method               : identifier
                      ;
 
 pmc_object           : identifier
-                           { /* XXX TODO: this check must be moved to each use of pmc_object;
-                                a normal foo(), where foo is a global sub label, is never
-                                declared; now this results in an error. Remove this check;
-                                these should be fixed up later, after all parsing is done.
-                              */
-                              /*
-                             symbol *sym = find_symbol(lexer, $1);
-
-                             if (sym == NULL) {
-                                 yyerror(yyscanner, lexer, "object not declared");
-                                 sym = new_symbol($1, PMC_TYPE);
-                             }
-                             else if (sym->type != PMC_TYPE)
-                                 yyerror(yyscanner, lexer, "object must be of type 'pmc'");
-
-                             $$ = target_from_symbol(sym);
-                             */
-                             $$ = target_from_ident(PMC_TYPE, $1);
-                           }
+                           { $$ = target_from_ident(PMC_TYPE, $1); }
                      | TK_PREG
                            { $$ = reg(lexer, PMC_TYPE, $1); }
 

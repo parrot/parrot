@@ -35,7 +35,8 @@
 #include "pirlexer.h"
 
 extern int yyparse(yyscan_t yyscanner, lexer_state * const lexer);
-extern int yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message);
+extern int yyerror(yyscan_t yyscanner, lexer_state * const lexer,
+                   char const * const message, ...);
 
 
 
@@ -296,7 +297,8 @@ main(int argc, char *argv[]) {
 /*
 
 =item C<int
-yyerror(yyscan_t yyscanner, lexer_state * const  lexer, char const * const message)>
+yyerror(yyscan_t yyscanner, lexer_state * const  lexer,
+        char const * const message, ...)>
 
 Default parse error handling routine, that is invoked when the bison-generated
 parser finds a syntax error.
@@ -305,17 +307,24 @@ parser finds a syntax error.
 
 */
 int
-yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message) {
+yyerror(yyscan_t yyscanner, lexer_state * const lexer,
+        char const * const message, ...)
+{
     char const * const text = yyget_text(yyscanner);
+    va_list arg_ptr;
 
-    fprintf(stderr, "\nError in file '%s' (line %d)\n%s\n", lexer->filename, yyget_lineno(yyscanner),
-                    message);
+    fprintf(stderr, "\nError in file '%s' (line %d)\n\n", lexer->filename,
+            yyget_lineno(yyscanner));
+
+    va_start(arg_ptr, message);
+    vfprintf(stderr, message, arg_ptr);
+    va_end(arg_ptr);
 
     ++lexer->parse_errors;
 
     /* print current token if it doesn't contain a newline token. */
     if (!strstr(text, "\n"))
-        fprintf(stderr, "('%s')\n\n", text);
+        fprintf(stderr, "\ncurrent token: '%s'\n\n", text);
     else
         fprintf(stderr, "\n\n");
 

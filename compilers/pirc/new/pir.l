@@ -65,7 +65,8 @@ extern char *yyget_text(yyscan_t yyscanner);
 extern int yylex(YYSTYPE *yylval, yyscan_t yyscanner);
 
 /* declaration of yyerror */
-extern void yyerror(yyscan_t yyscanner, lexer_state * const lexer, char *message);
+extern void yyerror(yyscan_t yyscanner, lexer_state * const lexer,
+                    char const * const message, ...);
 
 
 
