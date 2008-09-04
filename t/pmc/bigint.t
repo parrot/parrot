@@ -72,8 +72,6 @@ if ( $PConfig{gmp} ) {
     unlink $test;
 }
 
-my $fp_equality_macro = pasm_fp_equality_macro();
-
 pasm_output_is( <<'CODE', <<'OUT', "create" );
    new P0, 'BigInt'
    print "ok\n"
@@ -98,7 +96,7 @@ CODE
 OUT
 
 pasm_output_is( <<"CODE", <<'OUT', "set int, get double" );
-@{[ $fp_equality_macro ]}
+     .include 'include/fp_equality.pasm'
      new P0, 'BigInt'
      set P0, 999999
      set N1, P0

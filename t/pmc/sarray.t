@@ -22,8 +22,6 @@ Tests the C<SArray> PMC, which is used for parameter-passing.
 
 =cut
 
-my $fp_equality_macro = pasm_fp_equality_macro();
-
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting sarray size" );
     new P0, 'SArray'
     set I0, P0
@@ -457,7 +455,7 @@ CODE
 OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Access via Key PMC" );
-@{[ $fp_equality_macro ]}
+    .include 'include/fp_equality.pasm'
     new P0, 'SArray'
     set P0, 4
     set P0[0], 100
@@ -545,7 +543,7 @@ CODE
 OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Store PMC, get num" );
-@{[ $fp_equality_macro ]}
+    .include 'include/fp_equality.pasm'
     new P0, 'SArray'
     set P0, 2
     new P1, 'Integer'
@@ -636,7 +634,7 @@ CODE
 OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Store num, get PMC" );
-@{[ $fp_equality_macro ]}
+    .include 'include/fp_equality.pasm'
     new P0, 'SArray'
     set P0, 2
     set P0[0], 12.239

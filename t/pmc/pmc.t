@@ -26,8 +26,6 @@ Contains a lot of PMC related tests.
 
 my $max_pmc = scalar( keys(%pmc_types) ) + 1;
 
-my $fp_equality_macro = pasm_fp_equality_macro();
-
 pasm_output_is( <<'CODE', <<'OUTPUT', "newpmc" );
         print "starting\n"
         new P0, 'Integer'

@@ -23,8 +23,6 @@ number types.
 
 =cut
 
-my $fp_equality_macro = pasm_fp_equality_macro();
-
 #
 # Operations on a single INTVAL
 #

@@ -2888,6 +2888,7 @@ runtime/parrot/dynext/README                                [devel]doc
 runtime/parrot/include/DWIM.pir                             [devel]doc
 runtime/parrot/include/README                               [devel]doc
 runtime/parrot/include/hllmacros.pir                        [library]
+runtime/parrot/include/fp_equality.pasm                     [library]
 runtime/parrot/include/sockets.pasm                         [library]
 runtime/parrot/include/test_more.pir                        [library]
 runtime/parrot/library/CGI/QueryHash.pir                    [library]

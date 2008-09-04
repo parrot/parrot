@@ -22,7 +22,6 @@ Tests the C<String> PMC.
 
 =cut
 
-my $fp_equality_macro = pasm_fp_equality_macro();
 
 pasm_output_is( <<CODE, <<OUTPUT, "Set/get strings" );
         new P0, 'String'
@@ -116,7 +115,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "Setting numbers" );
-@{[ $fp_equality_macro ]}
+        .include 'include/fp_equality.pasm'
         new P0, 'String'
         set P0, "1"
         set N0, P0
