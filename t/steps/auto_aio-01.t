@@ -38,6 +38,11 @@ my $serialized = $conf->pcfreeze();
 
 $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
+
+SKIP: {
+    skip 'Config step auto::aio under revision',
+    21;
+
 my $ret = $step->runstep($conf);
 ok( $ret, "runstep() returned true value" );
 like(
@@ -115,6 +120,8 @@ $verbose = 1;
     is($step->result, q{no}, "Got expected 'no' result");
     like($stdout, qr/no/, "Got expected verbose output");
 }
+
+} # END SKIP BLOCK
 
 # Problem:  With no usage of config::init::defaults and with next line test_*
 # files created by probe are correctly cleaned up -- but at same time
