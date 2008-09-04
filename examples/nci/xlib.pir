@@ -571,14 +571,14 @@ failed:
     say ptrsize
     .local int timesize
     timesize = 4
+    .local int aligned
+    aligned = intsize
 
 # If size of long is 8, assume that padding in the struct
     eq longsize, 8, adjust8
     goto doit
 adjust8:
-    intsize = 8
-    ptrsize = 8
-    timesize = 8
+    aligned = 8
 
 doit:
     .local int char_t
@@ -604,7 +604,7 @@ doit:
     arg[1] = 1
     arg[2] = offs
     say offs
-    add offs, intsize
+    add offs, aligned
 #serial
     arg[3] = long_t
     arg[4] = 1
@@ -616,7 +616,7 @@ doit:
     arg[7] = 1
     arg[8] = offs
     say offs
-    add offs, intsize
+    add offs, aligned
 # display
     arg[9] = ptr_t
     arg[10] = 1
@@ -646,7 +646,7 @@ doit:
     arg[22] = 1
     arg[23] = offs
     say offs
-    add offs, timesize
+    add offs, aligned
 # x
     arg[24] = int_t
     arg[25] = 1
