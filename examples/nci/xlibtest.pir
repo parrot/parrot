@@ -9,18 +9,18 @@ xlibtest.pir - Test NCI with libX11
 
 This is an initial version, be careful and not expect too much.
 
-Compile xlib.pir to xlib.pbc before usage.
+Compile Xlib.pir to Xlib.pbc before usage.
 
 Press Escape key to exit.
 
 =cut
 
 
-.include 'xlibconstants.pir'
+.include 'Xlibconstants.pir'
 
 .sub main :main
 
-    load_bytecode 'xlib.pbc'
+    load_bytecode 'Xlib.pbc'
 
 # Initialize and print some information
 
