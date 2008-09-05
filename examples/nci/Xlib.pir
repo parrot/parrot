@@ -31,7 +31,7 @@ alignment.
 
 ########################################################################
 
-.namespace ['xlib']
+.namespace ['Xlib']
 
 # xlib handle
 .const string xlib_handle = 'xlib_handle'
@@ -93,7 +93,7 @@ done:
     $I0 = defined Display
     if $I0 goto done
 
-    Display = newclass ['xlib'; 'Display']
+    Display = newclass ['Xlib'; 'Display']
     addattribute Display, attr_XDisplay
     set_global 'Display_class', Display
 
@@ -121,7 +121,7 @@ done:
     $I0 = defined Event
     if $I0 goto done
 
-    Event = newclass ['xlib'; 'Event']
+    Event = newclass ['Xlib'; 'Event']
     addattribute Event, 'xEvent'
     set_global 'Event_class', Event
 done:
@@ -135,7 +135,7 @@ done:
     $I0 = defined Window
     if $I0 goto done
 
-    Window = newclass ['xlib'; 'Window']
+    Window = newclass ['Xlib'; 'Window']
     addattribute Window, attr_display
     addattribute Window, attr_XWindow
     set_global 'Window_class', Window
@@ -222,7 +222,7 @@ getit:
 
 ########################################################################
 
-.namespace ['xlib';'Display']
+.namespace ['Xlib';'Display']
 
 #-----------------------------------------------------------------------
 .sub createfunc
@@ -351,7 +351,7 @@ doit:
     arg [attr_XWindow] = new_window
 
     .local pmc window
-    window = new ['xlib';'Window'], arg
+    window = new ['Xlib';'Window'], arg
     .return(window)
 failed:
     fail("Can't create window")
@@ -399,7 +399,7 @@ failed:
 
 ########################################################################
 
-.namespace ['xlib';'Event']
+.namespace ['Xlib';'Event']
 
 #-----------------------------------------------------------------------
 .sub get_event_struct
@@ -607,7 +607,7 @@ done:
 
 ########################################################################
 
-.namespace ['xlib';'Window']
+.namespace ['Xlib';'Window']
 
 #-----------------------------------------------------------------------
 .sub getdisplay :method

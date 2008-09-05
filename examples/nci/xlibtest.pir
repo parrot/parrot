@@ -27,7 +27,7 @@ Press Escape key to exit.
     show_display_name()
 
     .local pmc openDisplay
-    openDisplay = get_global ['xlib'], 'OpenDisplay'
+    openDisplay = get_global ['Xlib'], 'OpenDisplay'
 
     .local pmc display
     display = openDisplay('')
@@ -66,9 +66,9 @@ Press Escape key to exit.
 # Get keycode of the Escape key to check in key press event
 
     .local pmc KeysymToString
-    KeysymToString = get_global ['xlib'], 'KeysymToString'
+    KeysymToString = get_global ['Xlib'], 'KeysymToString'
     .local pmc StringToKeysym
-    StringToKeysym = get_global ['xlib'], 'StringToKeysym'
+    StringToKeysym = get_global ['Xlib'], 'StringToKeysym'
 
 #    print 'Escape-'
     $I0 = StringToKeysym('Escape')
@@ -81,7 +81,7 @@ Press Escape key to exit.
 # Event loop
 
     .local pmc newEvent
-    newEvent = get_global ['xlib'], 'newEvent'
+    newEvent = get_global ['Xlib'], 'newEvent'
 
     .local pmc event
     event = newEvent()
@@ -172,7 +172,7 @@ finish:
 .sub show_display_name
     print 'DisplayName: "'
     .local pmc DisplayName
-    DisplayName = get_global ['xlib'], 'DisplayName'
+    DisplayName = get_global ['Xlib'], 'DisplayName'
     .local string dname
     dname = DisplayName()
     print dname
