@@ -505,8 +505,8 @@ sub make_arg {
     /t/ && do {
         push @{$temps_ref}, "char *t_$temp_num;";
         push @{$extra_preamble_ref},
-            "t_$temp_num = string_to_cstring(interp, GET_NCI_S($reg_num));";
-        push @{$extra_postamble_ref}, "string_cstring_free(t_$temp_num);";
+            "{STRING * s= GET_NCI_S($reg_num); t_$temp_num = s ? string_to_cstring(interp, s) : (char *) NULL;}";
+        push @{$extra_postamble_ref}, "do { if (t_$temp_num) string_cstring_free(t_$temp_num); } while (0);";
         return "t_$temp_num";
     };
     /b/ && do {
