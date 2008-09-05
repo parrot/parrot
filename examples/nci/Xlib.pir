@@ -89,7 +89,7 @@ done:
 #-----------------------------------------------------------------------
 .sub get_Display_class
     .local pmc Display
-    Display = find_global 'Display_class'
+    Display = get_global 'Display_class'
     $I0 = defined Display
     if $I0 goto done
 
@@ -117,7 +117,7 @@ done:
 #-----------------------------------------------------------------------
 .sub get_Event_class
     .local pmc Event
-    Event = find_global 'Event_class'
+    Event = get_global 'Event_class'
     $I0 = defined Event
     if $I0 goto done
 
@@ -131,7 +131,7 @@ done:
 #-----------------------------------------------------------------------
 .sub get_Window_class
     .local pmc Window
-    Window = find_global 'Window_class'
+    Window = get_global 'Window_class'
     $I0 = defined Window
     if $I0 goto done
 
