@@ -310,7 +310,8 @@ doit:
     func = get_xlib_function('XRootWindow', 'ppi')
     $P0 = getattribute self, attr_XDisplay
     .local pmc window
-    $P1 = func($P0, 0)
+    $I0 = self.DefaultScreen()
+    $P1 = func($P0, $I0)
 
     .local pmc arg
     arg = new 'Hash'
