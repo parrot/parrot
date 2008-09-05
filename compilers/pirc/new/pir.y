@@ -363,7 +363,7 @@ extern YY_DECL;
              rel_op
              condition
              augmented_op
-             augm_add_op
+
 
 
 %type <invo> long_invocation
@@ -754,26 +754,92 @@ and C<S> means C<string literal>.
 
 */
 
-assignment        : target '=' expression
-                        { set_instrf(lexer, "set", "%T%E", $1, $3); }
+args1: /* empty */
+     | args2
+     ;
+
+args2: op_arg
+     | args2 ',' op_arg
+     ;
+
+assignment        : target '=' TK_INTC
+                        {
+                          if ($3 == 0)
+                              set_instrf(lexer, "null", "%T", $1);
+                          else
+                              set_instrf(lexer, "set", "%T%i", $1, $3);
+                        }
+                  | target '=' TK_NUMC
+                        {
+                          if ($3 == 0.0)
+                              set_instrf(lexer, "null", "%T", $1);
+                          else
+                              set_instrf(lexer, "set", "%T%n", $1, $3);
+                        }
+                  | target '=' TK_STRINGC
+                        { set_instrf(lexer, "set", "%T%s", $1, $3); }
                   | target '=' binary_expr
                         { unshift_operand(lexer, expr_from_target($1)); }
-                  | target '=' keyaccess
-                        { set_instrf(lexer, "set", "%T%T", $1, $3); }
+                  | target '=' parrot_op args1 /* fix this mess */
+                        { set_instr(lexer, "set"); }
                   | target augmented_op expression
                         { set_instrf(lexer, opnames[$2], "%T%E", $1, $3); }
-                  | target augm_add_op expression
-                        { set_instrf(lexer, opnames[$2], "%T%E", $1, $3); }
+                  | target "+=" TK_INTC
+                        {
+                          if ($3 == 1)
+                              set_instrf(lexer, "inc", "%T", $1);
+                          else if ($3 == 0)
+                              set_instr(lexer, "noop");
+                          else
+                              set_instrf(lexer, "add", "%T%i", $1, $3);
+                        }
+                  | target "+=" TK_NUMC
+                        {
+                          if ($3 == 1.0)
+                              set_instrf(lexer, "inc", "%T", $1);
+                          else if ($3 == 0.0)
+                              set_instr(lexer, "noop");
+                          else
+                              set_instrf(lexer, "add", "%T%n", $1, $3);
+                        }
+                  | target "-=" TK_INTC
+                        {
+                          if ($3 == 1)
+                              set_instrf(lexer, "dec", "%T", $1);
+                          else if ($3 == 0)
+                              set_instr(lexer, "noop");
+                          else
+                              set_instrf(lexer, "sub", "%T%i", $1, $3);
+                        }
+                  | target "-=" TK_NUMC
+                        {
+                          if ($3 == 1.0)
+                              set_instrf(lexer, "dec", "%T", $1);
+                          else if ($3 == 0.0)
+                              set_instr(lexer, "noop");
+                          else
+                              set_instrf(lexer, "sub", "%T%n", $1, $3);
+                        }
+                  | target "+=" target
+                        { set_instrf(lexer, "add", "%T%T", $1, $3); }
+                  | target "-=" target
+                        { set_instrf(lexer, "sub", "%T%T", $1, $3); }
                   | target '=' unop expression
                         { set_instrf(lexer, $3, "%T%E", $1, $4); }
+                  | target '=' target binop target
+                        {
+                          if (targets_equal($1, $3))
+                              set_instrf(lexer, opnames[$4], "%T%T", $1, $5);
+                          else
+                              set_instrf(lexer, opnames[$4], "%T%T%T", $1, $3, $5);
+                        }
                   | keyword keylist '=' expression
                         {
                           symbol *sym = find_symbol(lexer, $1);
                           target *t;
 
                           if (sym == NULL) {
-                              yyerror(yyscanner, lexer,
-                                      "indexed object '%s' not declared", $1);
+                              yyerror(yyscanner, lexer, "indexed object '%s' not declared", $1);
                               sym = new_symbol($1, PMC_TYPE);
                           }
                           else if (sym->type != PMC_TYPE)
@@ -930,11 +996,36 @@ conditional_instr : if_unless "null" TK_IDENT "goto" identifier
  * it must be done during runtime. Otherwise, if the condition evaluates to
  * "false", 0 is returned, and if true, 1 is returned.
  */
-condition         : expression rel_op expression
+condition         : target rel_op expression
                         {
-                          set_instrf(lexer, opnames[$2], "%E%E", $1, $3);
+                          set_instrf(lexer, opnames[$2], "%T%E", $1, $3);
                           $$ = -1;  /* -1 indicates this is evaluated at runtime */
                         }
+                  | TK_INTC rel_op target
+                        {
+                          set_instrf(lexer, opnames[$2], "%i%T", $1, $3);
+                          $$ = -1;
+                        }
+                  | TK_NUMC rel_op target
+                        {
+                          set_instrf(lexer, opnames[$2], "%n%T", $1, $3);
+                          $$ = -1;
+                        }
+                  | TK_STRINGC rel_op target
+                        {
+                          set_instrf(lexer, opnames[$2], "%s%T", $1, $3);
+                          $$ = -1;
+                        }
+                  | TK_INTC rel_op TK_INTC
+                        { $$ = evaluate_i_i($1, $2, $3); }
+                  | TK_INTC rel_op TK_NUMC
+                        { $$ = evaluate_i_n($1, $2, $3); }
+                  | TK_NUMC rel_op TK_INTC
+                        { $$ = evaluate_n_i($1, $2, $3); }
+                  | TK_NUMC rel_op TK_NUMC
+                        { $$ = evaluate_n_n($1, $2, $3); }
+                  | TK_STRINGC rel_op TK_STRINGC
+                        { $$ = evaluate_s_s($1, $2, $3); }
                   ;
 
 if_unless         : "if"       { $$ = 0; /* no need to invert */ }
@@ -964,7 +1055,12 @@ local_id          : local_var_name has_unique_reg
                   ;
 
 local_var_name    : identifier
-                        { $$ = $1; }
+                        {
+                          symbol *sym = find_symbol(lexer, $1);
+                          if (sym)
+                              yyerror(yyscanner, lexer, "symbol '%s' is already declared", $1);
+                          $$ = $1;
+                        }
                   ;
 
 has_unique_reg    : /* empty */     { $$ = 0; }
@@ -972,7 +1068,20 @@ has_unique_reg    : /* empty */     { $$ = 0; }
                   ;
 
 lex_decl          : ".lex" TK_STRINGC ',' pmc_object "\n"
-                        { set_lex_flag($4, $2); }
+                        {
+                          if (!TEST_FLAG($4->flags, TARGET_FLAG_IS_REG)) {
+                              symbol *sym = find_symbol(lexer, target_name($4));
+                              if (sym == NULL) {
+                                  yyerror(yyscanner, lexer, "lexical '%s' is not declared",
+                                          target_name($4));
+                                  sym = new_symbol(target_name($4), PMC_TYPE);
+                              }
+                              else if (sym->type != PMC_TYPE)
+                                  yyerror(yyscanner, lexer, "lexical '%s' must be of type 'pmc'",
+                                          target_name($4));
+                          }
+                          set_lex_flag($4, $2);
+                        }
                   ;
 
 /* Sub/method invocation */
@@ -1457,10 +1566,6 @@ augmented_op: "*="         { $$ = OP_MUL; }
             | ">>="        { $$ = OP_SHR; }
             | "<<="        { $$ = OP_SHL; }
             | ">>>="       { $$ = OP_LSR; }
-            ;
-
-augm_add_op : "+="         { $$ = OP_ADD; }
-            | "-="         { $$ = OP_SUB; }
             ;
 
 %%
