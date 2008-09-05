@@ -22,55 +22,55 @@ Press any key to exit the program.
 
 =end pod
 
-use 'Xlib';
+use Xlib;
 
 say 'Hello';
 
 say 'Display: ', Xlib::DisplayName();
 
-my $display := Xlib::OpenDisplay('');
+my $display = Xlib::OpenDisplay('');
 
 say 'Default screen: ', $display.DefaultScreen();
 
 $display.hello();
 
-my $white := $display.WhitePixel(0);
-my $root := $display.RootWindow();
-my $window := $display.CreateSimpleWindow($root, 0, 0, 600, 400, 0, 0, $white);
+my $white  = $display.WhitePixel(0);
+my $root   = $display.RootWindow();
+my $window = $display.CreateSimpleWindow($root, 0, 0, 600, 400, 0, 0, $white);
 $window.StoreName("Hello, perl6");
 $window.SelectInput(79);
 $window.Map();
 
-my $event := Xlib::newEvent();
+my $event = Xlib::newEvent();
 
-my $type := 0;
+my $type = 0;
 
-my $x := 0;
-my $y := 0;
-my $lastx := 0;
-my $lasty := 0;
-my $pressed := 0;
+my $x = 0;
+my $y = 0;
+my $lastx = 0;
+my $lasty = 0;
+my $pressed = 0;
 
 while ($type != 2) {
     $display.NextEvent($event);
-    $type := $event.type();
+    $type = $event.type();
     if ($type == 4) {
-        $x := $event.x();
-        $y := $event.y();
+        $x = $event.x();
+        $y = $event.y();
         $window.DrawPoint($x, $y);
-	$lastx := $x;
-	$lasty := $y;
-	$pressed := 1;
+        $lastx = $x;
+        $lasty = $y;
+        $pressed = 1;
     }
     if ($type == 5) {
-        $pressed := 0;
+        $pressed = 0;
     }
     if ($type == 6 && $pressed) {
-        $x := $event.x();
-        $y := $event.y();
+        $x = $event.x();
+        $y = $event.y();
         $window.DrawLine($lastx, $lasty, $x, $y);
-	$lastx := $x;
-	$lasty := $y;
+        $lastx = $x;
+        $lasty = $y;
     }
 }
 
