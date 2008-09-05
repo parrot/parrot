@@ -1,22 +1,26 @@
 # Copyright (C) 2008, The Perl Foundation.
 # $Id$
 
-#=head1 TITLE
-#
-#xlibtest.p6 - A test of Xlib.pir usage from rakudo
-#
-#=head1 SYNOPSYS
-#
-#To run this file, execute the following command from the
-#current directory:
-#
-#../../perl6  xlibtest.p6
-#
-#(You must have the perl6 executable already builded).
-#
-#Press any key to exit the program.
-#
-#=cut
+use v6;
+
+=begin pod
+
+=head1 TITLE
+
+xlibtest.p6 - A test of Xlib.pir usage from rakudo
+
+=head1 SYNOPSYS
+
+To run this file, execute the following command from the
+current directory:
+
+../../perl6  xlibtest.p6
+
+(You must have the perl6 executable already builded).
+
+Press any key to exit the program.
+
+=end pod
 
 use 'Xlib';
 
