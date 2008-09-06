@@ -136,12 +136,12 @@ Marks the lexpad hash as live.
     }
 
     INTVAL exists_keyed(PMC* name) {
-        STRING *s = key_string(interp, name);
+        STRING *s = VTABLE_get_string(interp, name);
         return SELF.exists_keyed_str(s);
     }
 
     PMC* get_pmc_keyed(PMC* name) {
-        STRING *s = key_string(interp, name);
+        STRING *s = VTABLE_get_string(interp, name);
         return SELF.get_pmc_keyed_str(s);
     }
 
@@ -155,7 +155,7 @@ Marks the lexpad hash as live.
     }
 
     void set_pmc_keyed(PMC* name, PMC* value) {
-        STRING *s = key_string(interp, name);
+        STRING *s = VTABLE_get_string(interp, name);
         SELF.set_pmc_keyed_str(s, value);
     }
 

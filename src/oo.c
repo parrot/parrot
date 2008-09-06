@@ -469,7 +469,7 @@ readable_name(PARROT_INTERP, ARGIN(PMC *name))
     PARROT_ASSERT(name->vtable->base_type == enum_class_Key);
 
     while (name) {
-        VTABLE_push_string(interp, array, key_string(interp, name));
+        VTABLE_push_string(interp, array, VTABLE_get_string(interp, name));
         name = key_next(interp, name);
     }
 

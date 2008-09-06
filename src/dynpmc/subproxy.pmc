@@ -34,7 +34,7 @@ pmclass SubProxy dynpmc need_ext extends Sub {
             if (!key)
                 Parrot_ex_throw_from_c_args(interp, NULL, 1, "SubProxy: no key");
 
-            file = key_string(interp, key);
+            file = VTABLE_get_string(interp, key);
             if (!file)
                 Parrot_ex_throw_from_c_args(interp, NULL, 1, "SubProxy: no file");
 

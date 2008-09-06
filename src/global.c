@@ -97,9 +97,9 @@ internal_ns_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN_NULLOK(PMC *pmc_key)
         else if (n == max_intval) {
             if (!pmc_key)
                 Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "Passing a NULL pmc_key into key_string()");
+                    "Trying to use a NULL PMC as a key");
 
-            part    = key_string(interp, pmc_key);
+            part    = VTABLE_get_string(interp, pmc_key);
             pmc_key = key_next(interp, pmc_key);
 
             if (!pmc_key)
