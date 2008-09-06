@@ -47,12 +47,13 @@ sub runstep {
     my $libs    = $conf->data->get('libs');
     $conf->data->add( ' ', libs => '-lrt' );
 
-    my $errormsg = _first_probe_for_aio($conf);
+    my $errormsg = _first_probe_for_aio($conf, $verbose);
     if ( ! $errormsg ) {
-        my $test = $conf->cc_run(35);
+        my $test = $conf->cc_run(1);  # Use signal RTMIN + 1
 
         # if the test is failing with sigaction err
         # we should repeat it with a different signal number
+        # This is currently not implemented.
         if (
             $test =~ /SIGRTMIN=(\d+)\sSIGRTMAX=(\d+)\n
                 INFO=42\n
@@ -69,6 +70,9 @@ sub runstep {
                 D_SIGRTMAX => $2,
             );
         }
+        else {
+            $self->_handle_error_case($conf, $libs, $verbose);
+        }
     }
     else {
         $self->_handle_error_case($conf, $libs, $verbose);
@@ -79,6 +83,7 @@ sub runstep {
 
 sub _first_probe_for_aio {
     my $conf = shift;
+    my $verbose = shift;
     my $errormsg;
     $conf->cc_gen('config/auto/aio/aio.in');
     eval { $conf->cc_build(); };
@@ -88,7 +93,11 @@ sub _first_probe_for_aio {
 
 sub _handle_error_case {
     my ($self, $conf, $libs, $verbose) = @_;
-    $conf->data->set( libs => $libs );
+    $conf->data->set(
+        aio        => undef,
+        HAS_AIO    => 0,
+    );
+    $conf->data->set( libs => $libs );  # Restore old values
     print " (no) " if $verbose;
     $self->set_result('no');
 }

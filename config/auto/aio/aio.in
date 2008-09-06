@@ -23,7 +23,7 @@ sighandler(const int s, siginfo_t *i, void *x)
 {
     if (s == my_sig) {
 	flag = s;
-	retval =  *(int*)i->si_ptr;
+	retval =  *(int*)i->si_value.sival_ptr;
     }
 }
 
@@ -36,7 +36,13 @@ main(int argc, char *argv[])
     int i = 42;
     int cnt = 4;
 
-    my_sig = atoi(argv[1]);
+    /* For internal use, we usually use
+	   SIGRTMIN + argv[1].  
+       Usually, that's set to
+	   SIGRTMIN + 1
+       by the calling program.
+    */
+    my_sig = SIGRTMIN + atoi(argv[1]);
     printf("SIGRTMIN=%d SIGRTMAX=%d\n", SIGRTMIN, SIGRTMAX);
 
     fd = open("MANIFEST", O_RDONLY);
