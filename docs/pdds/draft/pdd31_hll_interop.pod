@@ -80,16 +80,16 @@ word.  Doesn't the C community call these "bounce routines"?  Or something?
 -- rgr, 31-Jul-08. 
 
 The language will never provide a wrapper for its subs. For the most part,
-wrappers will be unnecessary. Where a wrapper is desired to make a library from
-some other language act more like a "native" library, the person who desires
-the native behavior can implement the wrapper and make it publically available.
---allison }}
+wrappers will be unnecessary. Where a wrapper is desired to make a library
+from some other language act more like a "native" library, the person who
+desires the native behavior can implement the wrapper and make it publically
+available.  --allison }}
 
 {{ I am discovering that there are five different viewpoints here,
 corresponding to the five layers (including "plain Parrot") of the diagram
 above.  I need to make these viewpoints clearer, and describe the
-responsibilities of each of these parties to each other.  -- rgr,
-31-Jul-08. }}
+responsibilities of each of these parties to each other.  -- rgr, 31-Jul-08.
+}}
 
 Languages are free to implement the stub and wrapper layers (collectively
 called "glue") as they see fit.  In particular, they may be inlined in the
@@ -132,7 +132,8 @@ other languages should respect those distinctions.  (Or, if they choose to
 call intra-language subs, they should be very sure they understand that
 language's calling conventions.
 
-{{ It's not possible to define a sub that can't be called externally --allison }}
+{{ It's not possible to define a sub that can't be called externally
+--allison }}
 
 =back
 
@@ -202,8 +203,8 @@ functions, i.e. a method defined for C<VECTOR> must be considered when passed
 a string as a parameter.
 
 {{ Common Lisp (for example) will have its own set of type relationships,
-because it will have its own set of types. There will be no "remapping" of core
-types --allison }}
+because it will have its own set of types. There will be no "remapping" of
+core types --allison }}
 
 The language that owns the multisub gets to define the type hierarchy and
 dispatch rules used when it gets called.  In order to handle objects from
@@ -275,11 +276,11 @@ bug, even if both those integers happen to come from Common Lisp.  Ditto for a
 floating-point result from Common Lisp code that happens to get two integers
 from Perl or Lua (or both!).
 
-{{ Not a bug, it's the expected result. Divide operations are multi-dispatched.
-If you pass two Common Lisp integers into a divide operation in Perl 5, it'll
-search for the best matching multi, and if it finds one for Common Lisp
-integers (an exact match), it'll run that and return a Common Lisp ratio.
---allison }}
+{{ Not a bug, it's the expected result. Divide operations are
+multi-dispatched.  If you pass two Common Lisp integers into a divide
+operation in Perl 5, it'll search for the best matching multi, and if it finds
+one for Common Lisp integers (an exact match), it'll run that and return a
+Common Lisp ratio.  --allison }}
 
 Even though these languages all use "/" to represent division, they do not all
 mean the same thing by it, and similarly for most (if not all) other built-in
@@ -332,8 +333,8 @@ specialize the other operands, in the hope that other exotics are subclasses
 of these.
 
 {{ It is perfectly fine for a Lisp arithmetic operator to return a RATIONAL
-subtype. Please don't define methods for a pile of operations that already have
-vtable functions --allison }}
+subtype. Please don't define methods for a pile of operations that already
+have vtable functions --allison }}
 
 The other aspect is extending other languages' arithmetic to do something
 reasonable with our exotic types.  If we're lucky, Parrot will provide a basic
@@ -374,8 +375,8 @@ Define them on the highest (most general) possible PMC classes (in order that
 they continue to work if passed a subclass by a call from a different
 language).
 
-{{ Define them on the class that makes sense. There's no point in targeting any
-particular level of the inheritance hierarchy. --allison }}
+{{ Define them on the class that makes sense. There's no point in targeting
+any particular level of the inheritance hierarchy. --allison }}
 
 =item 3.
 
@@ -387,9 +388,9 @@ donating it to become part of the Parrot core.)
 
 =back
 
-{{ The fundamental rule is to implement your language in the way that makes the
-most sense for your language. Language implementors don't have to think about
-interoperability. --allison }}
+{{ The fundamental rule is to implement your language in the way that makes
+the most sense for your language. Language implementors don't have to think
+about interoperability. --allison }}
 
 The rest of this section details exceptions and caveats in dealing with scalar
 data types.
@@ -499,9 +500,9 @@ a Scheme program if Scheme can't access any of the methods?  Similarly, what
 could Ruby do with a Scheme list when it can't even get to the Scheme C<car>
 function?
 
-{{ Except that Ruby would never even get a Scheme list in the first place if it
-hadn't loaded a Scheme library of some sort. And, being a list, the Scheme list
-would still support the standard vtable functions for lists. --allison }}
+{{ Except that Ruby would never even get a Scheme list in the first place if
+it hadn't loaded a Scheme library of some sort. And, being a list, the Scheme
+list would still support the standard vtable functions for lists. --allison }}
 
 {{ Methinks the right thing would be to define a common introspection API (a
 good thing in its own right).  Scheme and Ruby should each define their own
@@ -514,9 +515,9 @@ probably be even wierder.  In any case, it is important that the calling user
 not need anything out of the ordinary, from either language or the called
 module author.  -- rgr, 29-Jul-08. }}
 
-{{ There is a common introspection API, the 'inspect' vtable function. But what
-you're describing here isn't introspection, it's actually the standard vtable
-functions.  --allison }}
+{{ There is a common introspection API, the 'inspect' vtable function. But
+what you're describing here isn't introspection, it's actually the standard
+vtable functions.  --allison }}
 
 =head3 Defining methods across language boundaries
 
@@ -531,8 +532,8 @@ method) must use the semantics of the external language.  If the external
 language uses a significantly different metamodel, simply adding the
 C<:method> pragma may not cut it.
 
-{{ No, the C<:method> flag is always all you need to define a method. The class
-object you add the method to determines what it does with that method.
+{{ No, the C<:method> flag is always all you need to define a method. The
+class object you add the method to determines what it does with that method.
 --allison }}
 
 There are two cases:  (1) The calling language is adding a new method, which
@@ -556,8 +557,8 @@ Multimethods are easier; although the multisub does belong conceptually to one
 language (from whose namespace the caller must find the multisub), multis are
 more loosely coupled to their original language.
 
-{{ Well, the semantics of the language that defined the multisub also determine
-how it is found and invoked. --allison }}
+{{ Well, the semantics of the language that defined the multisub also
+determine how it is found and invoked. --allison }}
 
 The cases for multimethods are similar, though:  (1) If the calling language
 method is specialized to classes that appear only in the calling module, then
@@ -593,6 +594,10 @@ boundary is harder, and may not be worth the trouble.  -- rgr, 29-Jul-08. }}
 in one language and injecting it into the namespace of another language isn't
 the primary focus of language interoperability. Using libraries from other
 languages is. --allison }}
+
+=head1 REFERENCES
+
+None.
 
 =cut
 
