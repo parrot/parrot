@@ -60,6 +60,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
 .const int TESTS = 308
 
 .sub main :main
+    load_bytecode 'config.pir'
     load_bytecode 'Test/Builder.pir'
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Dumper.pbc'
@@ -100,6 +101,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
     .local string data        # the data to format with the template
     .local string expected    # expected result of this test
     .local string description # user-facing description of the test
+    .local int    skip_it     # skip this test on this platform?
     .local string actual      # actual result of the test
 
     todo_tests = 'set_todo_info'()
@@ -146,7 +148,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
   parse_data:
     push_eh eh_bad_line
-    ( template, data, expected, description ) = parse_data( test_line )
+    ( template, data, expected, description, skip_it ) = parse_data( test_line )
     pop_eh
 
     # prepend test filename and line number to description
@@ -169,12 +171,16 @@ tag C<all> is allowed for todo tests that should fail on any system.
 #    expected = backslash_escape (expected)
 
     # Should this test be skipped?
+    $S0  = description
+    $S0 .= ' (skipped on this platform)'
+    if skip_it goto must_skip
     $I0 = exists skip_tests[test_name]
     unless $I0 goto not_skip
     $P0 = skip_tests[test_name]
     $I0 = exists $P0[local_test_number]
     unless $I0 goto not_skip
     $S0 = $P0[local_test_number]
+  must_skip:
     test.'skip'(1, $S0)
     goto loop
 
@@ -395,6 +401,8 @@ tag C<all> is allowed for todo tests that should fail on any system.
     .local string data        # the data to format with the template
     .local string expected    # expected result of this test
     .local string description # user-facing description of the test
+    .local int    skip_it     # skip this test on this platform
+                  skip_it = 0
 
     # NOTE: there can be multiple tabs between entries, so skip until
     # we have something.
@@ -427,12 +435,14 @@ tag C<all> is allowed for todo tests that should fail on any system.
     inc tab_number
     if description == '' goto get_description
 
+    ( description, skip_it ) = find_skip_in_description( description )
+
     # chop (description)
     # substr description, -1, 1, ''
 
   return:
   empty_expected:
-    .return ( template, data, expected, description )
+    .return ( template, data, expected, description, skip_it )
 
   no_desc:
     description = ''
@@ -442,6 +452,47 @@ tag C<all> is allowed for todo tests that should fail on any system.
       $P1 = new 'Exception'
       $P1[0] = 'invalid data format'
       throw $P1
+.end
+
+.sub 'find_skip_in_description'
+    .param string description
+
+    .local pmc parts
+    parts = split ' skip: ', description
+
+    $I0 = parts
+    if $I0 > 1 goto check_os
+    .return( description, 0 )
+
+  check_os:
+    description = shift parts
+
+    .local string skip_list
+    skip_list = shift parts
+
+    .local pmc skip_os
+    skip_os = split ' ', skip_list
+
+    .local pmc iter
+    iter = new 'Iterator', skip_os
+
+    .local pmc config
+    config = _config()
+
+    .local string osname
+    osname = config['osname']
+
+  iter_loop:
+    unless iter goto iter_end
+    .local string os_name
+    os_name = shift iter
+    eq os_name, osname, skip_it
+    goto iter_loop
+  iter_end:
+    .return( description, 0 )
+
+  skip_it:
+    .return( description, 1 )
 .end
 
 
