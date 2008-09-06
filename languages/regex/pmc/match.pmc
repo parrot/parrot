@@ -33,7 +33,7 @@ static STRING* make_hash_key(Interp* interp, PMC * key)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
         "Cannot use NULL key for Match!");
 
-    return key_string(interp, key);
+    return VTABLE_get_string(interp, key);
 }
 
 static STRING* match_range(Interp* interp, PMC* self, PMC* range)
