@@ -101,6 +101,40 @@ Initializes the exception with default values.
 
 /*
 
+=item C<void init_pmc()>
+
+Initializes the exception with supplied values.
+
+=cut
+
+*/
+
+    VTABLE void init_pmc(PMC *values) {
+        Parrot_Exception * const core_struct =
+            mem_allocate_zeroed_typed(Parrot_Exception);
+        INTVAL ishash = VTABLE_isa(interp, values, CONST_STRING(interp, 'Hash'));
+
+        /* Set flags for custom DOD mark and destroy. */
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
+
+        /* Set up the core struct and default values for the exception object. */
+        PMC_data(SELF)          = core_struct;
+        core_struct->severity   = ishash ?
+            VTABLE_get_integer_keyed_str(interp, values, CONST_STRING(interp, 'severity')) :
+            0;
+        core_struct->handled    = 0;
+        core_struct->message    = ishash ?
+            VTABLE_get_string_keyed_str(interp, values, CONST_STRING(interp, 'message')) :
+            VTABLE_get_string(interp, values);
+        core_struct->payload    = PMCNULL;
+        core_struct->resume     = PMCNULL;
+        core_struct->stacktrace = PMCNULL;
+        core_struct->handler_iter = PMCNULL;
+    }
+
+/*
+
 =item C<void mark()>
 
 Mark any active exception data as live.
