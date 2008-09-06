@@ -38,7 +38,7 @@ my $white  = $display.WhitePixel(0);
 my $root   = $display.RootWindow();
 my $window = $display.CreateSimpleWindow($root, 0, 0, 600, 400, 0, 0, $white);
 $window.StoreName("Hello, perl6");
-$window.SelectInput(32847);
+$window.SelectInput(163919);
 $window.Map();
 
 # Get Escape keycode
@@ -55,7 +55,7 @@ my $pressed = 0;
 my @listline;
 my @line;
 
-while ($type != 2) {
+while ($type != 17) {
     $display.NextEvent($event);
     $type = $event.type();
     if ($type == 4) {
@@ -83,9 +83,9 @@ while ($type != 2) {
         }
     }
     if ($type == 12) {
-        say 'Exposed. Lines: ', +@listline;
+        #say 'Exposed. Lines: ', +@listline;
         for @listline -> $l {
-            say 'Points ', $l.elems;
+            #say 'Points ', $l.elems;
             if ($l.elems  > 0) {
                 my $lx = $l[0];
                 my $ly = $l[1]; 
@@ -105,19 +105,18 @@ while ($type != 2) {
     }
     if ($type == 2) {
         my $code = $event.keycode();
-        if ($code != $code_escape) {
-            # A quick hack
-            $type = 0;
+        if ($code == $code_escape) {
+            $window.Unmap();
+            $window.Destroy();
         }
     }
     if ($type == 33) {
-        # A quick hack
-        $type = 2;
+        $window.Unmap();
+        $window.Destroy();
     }
 }
 
-$window.Unmap();
-$window.Destroy();
+$display.Close();
 
 say 'Bye';
 

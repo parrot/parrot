@@ -31,7 +31,7 @@ my $white := $display.WhitePixel(0);
 my $root := $display.RootWindow();
 my $window := $display.CreateSimpleWindow($root, 0, 0, 600, 400, 0, 0, $white);
 $window.StoreName("Hello, nqp");
-$window.SelectInput(79);
+$window.SelectInput(163919);
 $window.Map();
 
 my $event := Xlib::newEvent();
@@ -44,7 +44,7 @@ my $lastx := 0;
 my $lasty := 0;
 my $pressed := 0;
 
-while ($type != 2) {
+while ($type != 17) {
     $display.NextEvent($event);
     $type := $event.type();
     if ($type == 4) {
@@ -65,15 +65,20 @@ while ($type != 2) {
         $lastx := $x;
         $lasty := $y;
     }
+    if ($type == 2) {
+        $window.Unmap();
+        $window.Destroy();
+    }
     if ($type == 33) {
-        # A quick hack
-        $type := 2;
+        $window.Unmap();
+        $window.Destroy();
     }
 }
 
+$display.Close();
+
 say("Bye");
 
-$window.Unmap();
 
 #-----------------------------------------------------------------------
 # Local Variables:

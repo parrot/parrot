@@ -59,6 +59,7 @@ Press Escape key to exit.
     bor $I0, ButtonPressMask
     bor $I0, ButtonReleaseMask
     bor $I0, PointerMotionMask
+    bor $I0, StructureNotifyMask
     bor $I0, ExposureMask
     w.SelectInput($I0)
     w.StoreName('Hello, parrot')
@@ -107,8 +108,12 @@ loop:
     eq $I1, MotionNotify, paint
     eq $I1, Expose, expose
     eq $I1, ClientMessage, message
-    say $I1
+    eq $I1, DestroyNotify, finish
+
+    # Unhandled event type
+    #say $I1
     goto loop
+
 keypress:
     $I0 = event.keycode()
 #    say 'Keypress'
@@ -120,7 +125,9 @@ keypress:
 #    say $S0
 #    eq $S0, 'Escape', finish
 
-    eq $I0, codeEscape, finish
+    ne $I0, codeEscape, loop
+    w.Unmap()
+    w.Destroy()    
     goto loop
 
 press:
@@ -162,18 +169,18 @@ draw:
     goto loop
 
 expose:
-    say 'Exposed'
+    #say 'Exposed'
     goto loop
 
 message:
-    goto finish
+    w.Unmap()
+    w.Destroy()
+    goto loop
 
 # End. Close window and display, and exit.
 
 finish:
     say 'Exiting'
-    w.Unmap()
-    w.Destroy()
 
     display.Close()
 .end

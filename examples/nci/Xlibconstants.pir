@@ -20,6 +20,7 @@ Constants for xlib.pir
 .const int EnterWindowMask = 16
 .const int LeaveWindowMask = 32
 .const int PointerMotionMask = 64
+.const int StructureNotifyMask = 131072
 .const int ExposureMask = 32768
 
 # event types
@@ -29,6 +30,7 @@ Constants for xlib.pir
 .const int ButtonRelease = 5
 .const int MotionNotify = 6
 .const int Expose = 12
+.const int DestroyNotify = 17
 .const int ClientMessage = 33
 
 #-----------------------------------------------------------------------
