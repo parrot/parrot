@@ -170,7 +170,7 @@ execution). Whether to resume or die when an exception isn't handled is
 determined by the severity of the exception.
 
 =item 6
-Otherwise terminate the program like C<die>. 
+Otherwise terminate the program like C<die>.
 
 =back
 
@@ -365,10 +365,8 @@ resumable.
 
   $P0 = new 'String'
   $P0 = "something bad happened"
-  $P1 = new ['parrot';'exception'], $P0  # create new exception object
-  throw $P1                              # throw it
-
-{{ The above example doesn't work in r23568 -- see RT#48320. }}
+  $P1 = new 'Exception', $P0   # create new exception object
+  throw $P1                      # throw it
 
 =head1 ATTACHMENTS
 
