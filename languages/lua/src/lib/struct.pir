@@ -9,6 +9,8 @@ lib/struct.pir - struct library
 
 See original on L<http://www.inf.puc-rio.br/~roberto/struct/>
 
+NOT UNDER TEST
+
 This library offers basic facilities to convert Lua values to and from C structs.
 Its main functions are C<struct.pack>, which packs multiple Lua values into
 a struct-like string; and C<struct.unpack>, which unpacks multiple Lua values
@@ -264,12 +266,34 @@ LIST
     .return (toalign)
 .end
 
+.sub 'putinteger' :anon
+    .param string b
+    .param int narg
+    .param pmc arg
+    .param int endian
+    .param int size
+    $I1 = lua_checknumber(narg, arg)
+    not_implemented()
+    .return (b)
+.end
+
+.sub 'getinteger' :anon
+    .param string buff
+    .param int endian
+    .param int withsign
+    .param int size
+    not_implemented()
+    new $P0, 'LuaNumber'
+    .return ($P0)
+.end
+
+
 =item C<struct.pack (fmt, d1, d2, ...)>
 
 Returns a string containing the values C<d1>, C<d2>, ect. packed according
 to the format string C<fmt>.
 
-NOT YET IMPLEMENTED.
+STILL INCOMPLETE.
 
 =cut
 
@@ -277,7 +301,80 @@ NOT YET IMPLEMENTED.
     .param pmc fmt :optional
     .param pmc vararg :slurpy
     $S1 = lua_checkstring(1, fmt)
+    .local int endian
+    (endian, $S1) = getendianess($S1)
+    .local int align
+    (align, $S1) = getalign($S1)
+    .local int narg
+    narg = 2
+    .local int totalsize
+    totalsize = 0
+    .local string b
+    b = ''
+  L1:
+    unless $S1 != '' goto L2
+    .local string opt
+    opt = substr $S1, 0, 1
+    $S1 = substr $S1, 1
+    .local int size
+    (size, $S1) = optsize(opt, $S1)
+    .local int toalign
+    toalign = gettoalign(align, opt, size)
+  L3:
+    $I0 = toalign - 1
+    $I0 &= totalsize
+    unless $I0 != 0 goto L4
+    $S0 = chr 0
+    b .= $S0
+    inc totalsize
+    goto L3
+  L4:
+    if opt == ' ' goto L5 # ignore white spaces
+    $I0 = index 'bBhHlLiI', opt
+    if $I0 < 0 goto L6
+    $P2 = shift vararg
+    b = putinteger(b, narg, $P2, endian, size)
+    goto L5
+  L6:
+    unless opt == 'x' goto L7
+    dec narg # undo increment
+    $S0 = chr 0
+    b .= $S0
+    goto L5
+  L7:
+    $I0 = index 'fd', opt
+    if $I0 < 0 goto L8
     not_implemented()
+    goto L5
+  L8:
+    $I0 = index 'cs', opt
+    if $I0 < 0 goto L9
+    $P2 = shift vararg
+    $S2 = lua_checkstring(narg, $P2)
+    $I2 = length $S2
+    unless size == 0 goto L10
+    size = $I2
+  L10:
+    if $I2 >= size goto L11
+    lua_argerror(narg, "string too short")
+  L11:
+    b .= $S2
+    unless opt == 's' goto L12
+    $S0 = chr 0
+    b .= $S0
+    inc size
+  L12:
+    goto L5
+  L9:
+    lua_argerror(1, "invalid format option[", opt, "]")
+  L5:
+    totalsize += size
+    inc narg
+    goto L1
+  L2:
+    new $P0, 'LuaString'
+    set $P0, b
+    .return ($P0)
 .end
 
 
@@ -288,7 +385,7 @@ An optional C<i> marks where in C<s> to start reading (default is 1). After
 the read values, this function also returns the index in C<s> where it stopped
 reading, which is also where you should start to read the rest of the string.
 
-NOT YET IMPLEMENTED.
+STILL INCOMPLETE.
 
 =cut
 
@@ -301,7 +398,68 @@ NOT YET IMPLEMENTED.
     $S2 = lua_checkstring(2, data)
     $I2 = length $S2
     $I3 = lua_optint(3, pos, 1)
+    .local int endian, native
+    (endian, $S1, native) = getendianess($S1)
+    .local int align
+    (align, $S1) = getalign($S1)
+    .local pmc res
+    new res, 'ResizablePMCArray'
+  L1:
+    unless $S1 != '' goto L2
+    .local string opt
+    opt = substr $S1, 0, 1
+    $S1 = substr $S1, 1
+    .local int size
+    (size, $S1) = optsize(opt, $S1)
+    .local int toalign
+    toalign = gettoalign(align, opt, size)
+    $I0 = toalign - 1
+    $I3 += $I0
+    $I0 &= $I3
+    $I3 -= $I0
+    $I0 = $I3 + size
+    if $I0 <= $I2 goto L3
+    lua_argerror(2, "data string too short")
+  L3:
+    if opt == ' ' goto L4 # ignore white spaces
+    $I0 = index 'bBhHlLiI', opt
+    if $I0 < 0 goto L5
+    .local int withsign
+    withsign = is_cclass .CCLASS_LOWERCASE, opt, 0
+    $S0 = substr $S2, $I3
+    $P0 = getinteger($S0, endian, withsign, size)
+    push res, $P0
+    goto L4
+  L5:
+    if opt == 'x' goto L4
+    $I0 = index 'fd', opt
+    if $I0 < 0 goto L6
     not_implemented()
+    goto L4
+  L6:
+    unless opt == 'c' goto L7
+    unless size == 0 goto L8
+
+  L8:
+    $S0 = substr $S2, $I3, size
+    new $P0, 'LuaString'
+    set $P0, $S0
+    push res, $P0
+    goto L4
+  L7:
+    unless opt == 's' goto L9
+    not_implemented()
+    goto L4
+  L9:
+    lua_argerror(1, "invalid format option[", opt, "]")
+  L4:
+    $I3 += size
+    goto L1
+  L2:
+    inc $I3
+    new $P3, 'LuaNumber'
+    set $P3, $I3
+    .return (res :flat, $P3)
 .end
 
 
@@ -317,20 +475,20 @@ nor the option C<c0>.
     .param pmc fmt :optional
     .param pmc extra :slurpy
     $S1 = lua_checkstring(1, fmt)
-    .local pmc res
-    .local int align
     .local int totalsize
     totalsize = 0
     ($I0, $S1) = getendianess($S1)
+    .local int align
     (align, $S1) = getalign($S1)
   L1:
     unless $S1 != '' goto L2
-    $S0 = substr $S1, 0, 1
+    .local string opt
+    opt = substr $S1, 0, 1
     $S1 = substr $S1, 1
     .local int size
-    (size, $S1) = optsize($S0, $S1)
+    (size, $S1) = optsize(opt, $S1)
     .local int toalign
-    toalign = gettoalign(align, $S0, size)
+    toalign = gettoalign(align, opt, size)
     unless size == 0 goto L3
     lua_error("options `c0' - `s' have undefined sizes")
   L3:
@@ -341,9 +499,9 @@ nor the option C<c0>.
     totalsize += size
     goto L1
   L2:
-    new res, 'LuaNumber'
-    set res, totalsize
-    .return (res)
+    new $P0, 'LuaNumber'
+    set $P0, totalsize
+    .return ($P0)
 .end
 
 
