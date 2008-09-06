@@ -49,7 +49,7 @@ infrastructure must be provide by Parrot, and must work for all languages.
 --allison }}
 
         |
-	|
+        |
         |                        Calling sub
         |                             |
         |   Language X                |
@@ -60,13 +60,13 @@ infrastructure must be provide by Parrot, and must work for all languages.
           "plain Parrot"              |
                                       |
         +================             |
-        |		              V
-        |		        Called wrapper
+        |                              V
+        |                        Called wrapper
         |                             |
         |                             |
         |   Language Y                V
         |                         Called sub
-	|                
+        |                
 
 Where necessary, a language may need to provide a "wrapper" sub to interface
 external calls to the language's internal calling and data representation
@@ -176,11 +176,11 @@ It might be good to have some way for HLLs to define a separate external
 definition for a given sub (i.e. one that provides the wrapper) that can be
 done without too much namespace hair.  I.e.
 
-	.sub foo :extern
+        .sub foo :extern
 
 defines the version that is used by interlanguage calling, and
 
-	.sub foo
+        .sub foo
 
 defines the version that is seen by other code written in that language
 (i.e. via C<get_hll_global>).  If there is no plain C<foo>, the C<:extern>
