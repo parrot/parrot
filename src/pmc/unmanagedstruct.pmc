@@ -338,8 +338,12 @@ ret_string(PARROT_INTERP, char *p, int type)
 {
     if (type == enum_type_cstr) {
         char  *cstr = *(char **) p;
-        size_t len  = strlen(cstr);
-        return string_make(interp, cstr, len, "iso-8859-1", PObj_external_FLAG);
+        if (cstr) {
+            size_t len  = strlen(cstr);
+            return string_make(interp, cstr, len, "iso-8859-1", PObj_external_FLAG);
+        }
+        else
+            return NULL;
     }
 
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
