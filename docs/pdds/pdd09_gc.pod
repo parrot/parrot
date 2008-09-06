@@ -557,9 +557,9 @@ be locked independently and cannot be determined using this function.
 
 For PMCs and Buffers to be collected properly, you must set the appropriate
 flags on them. Directly manipulating these flags is not recommended because
-the exact values can be changed over time. A series of macros have been created
-in F<include/parrot/pobject.h> that set and check for these flags. Always use
-these provided macros when you need to test or set these flags.
+the exact values can be changed over time. A series of macros have been 
+created in F<include/parrot/pobject.h> that set and check for these flags.
+Always use these provided macros when you need to test or set these flags.
 
 =over 4
 

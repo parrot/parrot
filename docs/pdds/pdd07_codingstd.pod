@@ -987,6 +987,10 @@ C<lib/Parrot/Distribution.pm> (in either of the methods C<is_c_exemption()>
 or C<is_perl_exemption()>).  One can use wildcards in the list to exempt,
 for example, all files under a given directory.
 
+=head1 REFERENCES
+
+none
+
 =cut
 
 # Local Variables:
