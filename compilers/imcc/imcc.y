@@ -901,7 +901,14 @@ class_namespace:
    ;
 
 maybe_ns:
-     '[' keylist ']'           { $$ = $2; }
+     '[' keylist ']'
+        {
+            if (IMCC_INFO(interp)->in_slice)
+                IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+                    "Slice not allowed in namespace.");
+
+            $$ = $2;
+        }
    | '[' ']'                   { $$ = NULL; }
    |                           { $$ = NULL; }
    ;
