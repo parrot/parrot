@@ -97,7 +97,14 @@ while ($type != 2) {
             }
         }
     }
+    if ($type == 33) {
+        # A quick hack
+	$type = 2;
+    }
 }
+
+$window.Unmap();
+$window.Destroy();
 
 say 'Bye';
 

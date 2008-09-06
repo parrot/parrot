@@ -106,6 +106,7 @@ loop:
     eq $I1, ButtonRelease, release
     eq $I1, MotionNotify, paint
     eq $I1, Expose, expose
+    eq $I1, ClientMessage, message
     say $I1
     goto loop
 keypress:
@@ -163,6 +164,9 @@ draw:
 expose:
     say 'Exposed'
     goto loop
+
+message:
+    goto finish
 
 # End. Close window and display, and exit.
 

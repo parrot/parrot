@@ -29,6 +29,7 @@ Constants for xlib.pir
 .const int ButtonRelease = 5
 .const int MotionNotify = 6
 .const int Expose = 12
+.const int ClientMessage = 33
 
 #-----------------------------------------------------------------------
 # Local Variables:

@@ -702,6 +702,21 @@ done:
     xdisp = self.getdisplay()
     .local pmc xwin
     xwin = getattribute self, attr_XWindow
+
+# TESTING
+    .local pmc protocols
+    protocols = get_xlib_function('XSetWMProtocols', 'ipppi')
+    .local pmc disp
+    disp = getattribute self, attr_display
+    $I0 = disp.InternAtom('WM_DELETE_WINDOW')
+    $P0 = new 'ResizableIntegerArray'
+    $P0[0] = -91
+    $P0[1] = 1
+    $P0[2] = 0
+    $P1 = new 'ManagedStruct', $P0
+    $P1[0] = $I0
+    protocols(xdisp, xwin, $P1, 1)
+
     .local pmc func
     func = get_xlib_function('XSelectInput', 'ippi')
     $I0 = func(xdisp, xwin, mask)

@@ -10,7 +10,7 @@ xlibtest.pl - A test of Xlib.pir usage from nqp
 To run this file, execute the following command from the
 current directory:
 
-../../parrot ../../compilers/nqp/nqp.pbc xlibtest.pl
+../../parrot ../../compilers/nqp/nqp.pbc xlibtest.nqp
 
 Press any key to exit.
 
@@ -62,8 +62,12 @@ while ($type != 2) {
         $x := $event.x();
         $y := $event.y();
         $window.DrawLine($lastx, $lasty, $x, $y);
-    $lastx := $x;
-    $lasty := $y;
+        $lastx := $x;
+        $lasty := $y;
+    }
+    if ($type == 33) {
+        # A quick hack
+        $type := 2;
     }
 }
 
