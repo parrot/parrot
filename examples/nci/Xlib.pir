@@ -25,7 +25,12 @@ alignment.
 #-----------------------------------------------------------------------
 .sub fail
     .param string msg
-    say msg
+    new $P0, 'Exception'
+    new $P1, 'String'
+    set $P1, msg
+    setattribute $P0, 'message', $P1
+    throw $P0
+    # Just in case...
     exit 1
 .end
 
