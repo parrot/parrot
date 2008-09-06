@@ -127,7 +127,7 @@ keypress:
 
     ne $I0, codeEscape, loop
     w.Unmap()
-    w.Destroy()    
+    w.Destroy()
     goto loop
 
 press:
