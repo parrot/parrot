@@ -10,11 +10,11 @@ use Parrot::Test tests => 30;
 
 =head1 NAME
 
-t/pmc/exception.t - Exception Handling
+t/op/exceptions.t - Exception Handling
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/exception.t
+    % prove t/op/exceptions.t
 
 =head1 DESCRIPTION
 
