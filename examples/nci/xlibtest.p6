@@ -18,7 +18,7 @@ current directory:
 
 (You must have the perl6 executable already builded).
 
-Press any key to exit the program.
+Press Esc key to exit the program.
 
 =end pod
 
@@ -40,6 +40,10 @@ my $window = $display.CreateSimpleWindow($root, 0, 0, 600, 400, 0, 0, $white);
 $window.StoreName("Hello, perl6");
 $window.SelectInput(32847);
 $window.Map();
+
+# Get Escape keycode
+my $keysym = Xlib::StringToKeysym('Escape');
+my $code_escape = $display.KeysymToKeycode($keysym);
 
 my $event = Xlib::newEvent();
 
@@ -71,19 +75,21 @@ while ($type != 2) {
     if ($type == 6 && $pressed) {
         my $x = $event.x();
         my $y = $event.y();
-        $window.DrawLine($lastx, $lasty, $x, $y);
-        $lastx = $x;
-        $lasty = $y;
-        @line.push($x, $y);
+        if (($x != $lastx) || ($y != $lasty)) {
+            $window.DrawLine($lastx, $lasty, $x, $y);
+            $lastx = $x;
+            $lasty = $y;
+            @line.push($x, $y);
+        }
     }
     if ($type == 12) {
-        say 'Lines: ', +@listline;
+        say 'Exposed. Lines: ', +@listline;
         for @listline -> $l {
-            say 'Exposed ', $l.elems;
+            say 'Points ', $l.elems;
             if ($l.elems  > 0) {
                 my $lx = $l[0];
                 my $ly = $l[1]; 
-                say $lx, ' ', $ly;
+                #say $lx, ' ', $ly;
                 $window.DrawPoint($lx, $ly);
 
                 loop (my $i = 2; $i < $l.elems ; $i += 2) {
@@ -92,14 +98,21 @@ while ($type != 2) {
                     $window.DrawLine($lx, $ly, $x, $y);
                     $lx = $x;
                     $ly = $y;
-                    say $lx, ' ', $ly;
+                    #say $lx, ' ', $ly;
                 }
             }
         }
     }
+    if ($type == 2) {
+        my $code = $event.keycode();
+        if ($code != $code_escape) {
+            # A quick hack
+            $type = 0;
+        }
+    }
     if ($type == 33) {
         # A quick hack
-	$type = 2;
+        $type = 2;
     }
 }
 
