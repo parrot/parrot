@@ -51,9 +51,9 @@ while ($type != 2) {
         $x := $event.x();
         $y := $event.y();
         $window.DrawPoint($x, $y);
-	$lastx := $x;
-	$lasty := $y;
-	$pressed := 1;
+    $lastx := $x;
+    $lasty := $y;
+    $pressed := 1;
     }
     if ($type == 5) {
         $pressed := 0;
@@ -62,8 +62,8 @@ while ($type != 2) {
         $x := $event.x();
         $y := $event.y();
         $window.DrawLine($lastx, $lasty, $x, $y);
-	$lastx := $x;
-	$lasty := $y;
+    $lastx := $x;
+    $lasty := $y;
     }
 }
 
