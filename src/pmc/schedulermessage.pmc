@@ -74,6 +74,8 @@ An C<PMC> representing the data passed in this scheduler message.
 
 =back
 
+=cut
+
 */
 
     VTABLE void init_pmc(PMC *data) {
