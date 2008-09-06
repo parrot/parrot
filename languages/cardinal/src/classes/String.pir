@@ -521,6 +521,15 @@ Should replace vec with declared arrays of bit, uint2, uint4, etc.
  our CardinalArray multi Str::words ( Rule $matcher = /\S+/,  Str $input = $+_, Int $limit = inf )
  our CardinalArray multi Str::words ( Str $input : Rule $matcher = /\S+/, Int $limit = inf )
 
+=cut
+
+.sub 'infix:<<' :multi('CardinalString',_)
+    .param pmc s
+    .param pmc item
+    concat s, item
+    .return(s)
+.end
+
 =back
 
 =cut
