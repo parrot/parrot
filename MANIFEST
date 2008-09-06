@@ -679,11 +679,14 @@ examples/mops/mops.py                                       [main]doc
 examples/mops/mops.rb                                       [main]doc
 examples/mops/mops.scheme                                   [main]doc
 examples/namespace/namespace_dump.pir                       [main]doc
+examples/nci/Mysql.pir                                      [main]doc
 examples/nci/PQt.C                                          [main]doc
 examples/nci/QtHelloWorld.pasm                              [main]doc
 examples/nci/Xlib.pir                                       [main]doc
 examples/nci/Xlibconstants.pir                              [main]doc
 examples/nci/ls.pir                                         [main]doc
+examples/nci/mysqltest.p6                                   [main]doc
+examples/nci/mysqltest.pir                                  [main]doc
 examples/nci/sdl_blue_rectangle.pir                         [main]doc
 examples/nci/win32api.pir                                   [main]doc
 examples/nci/xlibtest.nqp                                   [main]doc
