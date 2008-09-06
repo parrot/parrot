@@ -45,8 +45,6 @@ my $event = Xlib::newEvent();
 
 my $type = 0;
 
-my $x = 0;
-my $y = 0;
 my $lastx = 0;
 my $lasty = 0;
 my $lx;
@@ -60,8 +58,8 @@ while ($type != 2) {
     $display.NextEvent($event);
     $type = $event.type();
     if ($type == 4) {
-        $x = $event.x();
-        $y = $event.y();
+        my $x = $event.x();
+        my $y = $event.y();
         $window.DrawPoint($x, $y);
         $lastx = $x;
         $lasty = $y;
@@ -74,16 +72,12 @@ while ($type != 2) {
         $pressed = 0;
     }
     if ($type == 6 && $pressed) {
-        $x = $event.x();
-        $y = $event.y();
+        my $x = $event.x();
+        my $y = $event.y();
         $window.DrawLine($lastx, $lasty, $x, $y);
         $lastx = $x;
         $lasty = $y;
-        {
-        my $x1 = $x; my $y1 = $y;
-        @line.push($x1);
-        @line.push($y1);
-        }
+        @line.push($x, $y);
     }
     if ($type == 12) {
         $m = +@listline;
@@ -97,8 +91,8 @@ while ($type != 2) {
                 $window.DrawPoint($lx, $ly);
 
                 loop (my $i = 2; $i < $l.elems ; $i += 2) {
-                    $x = $l[$i];
-                    $y = $l[$i+1]; 
+                    my $x = $l[$i];
+                    my $y = $l[$i+1]; 
                     $window.DrawLine($lx, $ly, $x, $y);
                     $lx = $x;
                     $ly = $y;
