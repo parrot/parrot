@@ -80,6 +80,10 @@ Press Escape key to exit.
     codeEscape = display.KeysymToKeycode($I0)
 #    say codeEscape
 
+    .local pmc listline
+    listline = new 'ResizablePMCArray'
+    .local pmc line
+
 # Event loop
 
     .local pmc newEvent
@@ -134,6 +138,10 @@ press:
     lastpx = event.x()
     lastpy = event.y()
     w.DrawPoint(lastpx, lastpy)
+    line = new 'ResizableIntegerArray'
+    push listline, line
+    push line, lastpx
+    push line, lastpy
     pressed = 1
     goto loop
 release:
@@ -165,11 +173,47 @@ draw:
     w.DrawLine(lastpx, lastpy, px, py)
     lastpx = px
     lastpy = py
+    push line, px
+    push line, py
 
     goto loop
 
 expose:
     #say 'Exposed'
+
+    $I0 = elements listline
+    #say $I0
+    unless $I0 goto loop
+    $I1 = 0
+nextline:
+    #print $I0
+    #print ' - '
+    #say $I1
+
+    eq $I1, $I0, loop
+    $P0 = listline[$I1]
+    inc $I1
+    $I2 = elements $P0
+    #say $I2
+    unless $I2 goto nextline
+
+    $I3 = 0
+    lastpx = $P0[$I3]
+    inc $I3
+    lastpy = $P0[$I3]
+    inc $I3
+    w.DrawPoint(lastpx, lastpy)
+nextpoint:
+    eq $I3, $I2, nextline
+    px = $P0[$I3]
+    inc $I3
+    py = $P0[$I3]
+    inc $I3
+    w.DrawLine(lastpx, lastpy, px, py)
+    lastpx = px
+    lastpy = py
+    goto nextpoint
+
     goto loop
 
 message:
