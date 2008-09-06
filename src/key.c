@@ -390,9 +390,8 @@ key_number(PARROT_INTERP, ARGIN(PMC *key))
 
 =item C<STRING * key_string>
 
-Translates a key value into a string.
-Takes an interpreter name and pointer to a key.
-Returns a string value corresponding to the key.
+Translates a key value into a string.  Takes an interpreter name and pointer to
+a key.  Returns a string value corresponding to the key.
 
 =cut
 

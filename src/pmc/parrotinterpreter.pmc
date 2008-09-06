@@ -388,7 +388,7 @@ Introspection interface. C<key> can be:
 
             if (nextkey && (PObj_get_FLAGS(nextkey) & KEY_string_FLAG)) {
                 key  = nextkey;
-                item = key_string(interp, key);
+                item = VTABLE_get_string(interp, key);
             }
         }
 

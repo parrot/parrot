@@ -67,7 +67,7 @@ Creates and returns a clone of the key.
                 case KEY_string_FLAG:
                 case KEY_string_FLAG | KEY_register_FLAG:
                     key_set_string(INTERP, dkey,
-                        string_copy(INTERP, key_string(INTERP, key)));
+                        string_copy(INTERP, VTABLE_get_string(INTERP, key)));
                     break;
                 case KEY_pmc_FLAG:
                 case KEY_pmc_FLAG | KEY_register_FLAG:
@@ -409,7 +409,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
                 break;
             case KEY_string_FLAG:
             case KEY_string_FLAG | KEY_register_FLAG:
-                VTABLE_push_string(INTERP, io, key_string(INTERP, SELF));
+                VTABLE_push_string(INTERP, io, VTABLE_get_string(INTERP, SELF));
                 break;
             default:
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,

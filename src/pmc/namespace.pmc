@@ -337,7 +337,7 @@ really a public API.
 
         if (key->vtable->base_type == enum_class_Key) {
             while (1) {
-                STRING * const part = key_string(INTERP, key);
+                STRING * const part = VTABLE_get_string(INTERP, key);
                 key  = key_next(INTERP, key);
 
                 if (!key) {
@@ -390,7 +390,7 @@ really a public API.
         ns = SELF;
 
         if (key->vtable->base_type == enum_class_Key) {
-            STRING * const part = key_string(INTERP, key);
+            STRING * const part = VTABLE_get_string(INTERP, key);
             key  = key_next(INTERP, key);
 
             if (!key)
@@ -457,7 +457,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
 
         if (key->vtable->base_type == enum_class_Key) {
             while (key) {
-                STRING * const part = key_string(INTERP, key);
+                STRING * const part = VTABLE_get_string(INTERP, key);
                 key  = key_next(INTERP, key);
 
                 if (!key)

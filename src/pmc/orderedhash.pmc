@@ -527,11 +527,11 @@ Deletes the key C<*key> from the hash.
         }
         else {
             if (next) {
-                PMC * const item = SELF.get_pmc_keyed_str(key_string(INTERP, key));
+                PMC * const item = SELF.get_pmc_keyed_str(VTABLE_get_string(INTERP, key));
                 VTABLE_delete_keyed(INTERP, item, next);
                 return;
             }
-            SELF.delete_keyed_str(key_string(INTERP, key));
+            SELF.delete_keyed_str(VTABLE_get_string(INTERP, key));
         }
     }
 

@@ -97,7 +97,7 @@ Return the LexInfo PMC, if any or a Null PMC.
     }
 
     VTABLE INTVAL exists_keyed(PMC *name) {
-        STRING * const s = key_string(INTERP, name);
+        STRING * const s = VTABLE_get_string(INTERP, name);
         return SELF.exists_keyed_str(s);
     }
 
@@ -117,7 +117,7 @@ Return the LexInfo PMC, if any or a Null PMC.
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *name) {
-        STRING * const s = key_string(INTERP, name);
+        STRING * const s = VTABLE_get_string(INTERP, name);
         return SELF.get_pmc_keyed_str(s);
     }
 
@@ -137,7 +137,7 @@ Return the LexInfo PMC, if any or a Null PMC.
     }
 
     VTABLE void set_pmc_keyed(PMC *name, PMC *value) {
-        STRING * const s = key_string(INTERP, name);
+        STRING * const s = VTABLE_get_string(INTERP, name);
         SELF.set_pmc_keyed_str(s, value);
     }
 
