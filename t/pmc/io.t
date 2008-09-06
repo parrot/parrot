@@ -28,6 +28,7 @@ sub file_content_is {
     local $/ = undef;    # slurp mode
     open my $FOO, '<', "temp.file";
 
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     is( <$FOO>, $content, $name );
 
     close $FOO;

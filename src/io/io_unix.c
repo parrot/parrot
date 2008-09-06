@@ -473,8 +473,11 @@ Closes C<*io>'s file descriptor.
 static INTVAL
 PIO_unix_close(SHIM_INTERP, SHIM(ParrotIOLayer *layer), ARGMOD(ParrotIO *io))
 {
-    if (io->fd >= 0)
+    /* BSD and Solaris need explicit fsync() */
+    if (io->fd >= 0) {
+        fsync(io->fd);
         close(io->fd);
+    }
     io->fd = -1;
     return 0;
 }
