@@ -38,7 +38,7 @@ my $white  = $display.WhitePixel(0);
 my $root   = $display.RootWindow();
 my $window = $display.CreateSimpleWindow($root, 0, 0, 600, 400, 0, 0, $white);
 $window.StoreName("Hello, perl6");
-$window.SelectInput(79);
+$window.SelectInput(32847);
 $window.Map();
 
 my $event = Xlib::newEvent();
@@ -49,7 +49,16 @@ my $x = 0;
 my $y = 0;
 my $lastx = 0;
 my $lasty = 0;
+my $lx;
+my $ly;
 my $pressed = 0;
+my $n;
+my $m;
+my $i;
+my $j;
+my @listline;
+my @line;
+my $l;
 
 while ($type != 2) {
     $display.NextEvent($event);
@@ -63,6 +72,9 @@ while ($type != 2) {
         $pressed = 1;
     }
     if ($type == 5) {
+        my @newline = @line;
+        @listline.push(\@newline);
+        @line = ();
         $pressed = 0;
     }
     if ($type == 6 && $pressed) {
@@ -71,6 +83,40 @@ while ($type != 2) {
         $window.DrawLine($lastx, $lasty, $x, $y);
         $lastx = $x;
         $lasty = $y;
+        {
+        my $x1 = $x; my $y1 = $y;
+        @line.push($x1);
+        @line.push($y1);
+        }
+    }
+    if ($type == 12) {
+        $m = +@listline;
+        say 'Lines: ', $m;
+        if ($m > 0) {
+            $j = 0;
+            while ($j < $m) {
+                $l = @listline[$j];
+                $n = $l.elems;
+                say 'Exposed ', $n;
+                if ($n > 0) {
+                    $lx = $l[0];
+                    $ly = $l[1]; 
+                    say $lx, ' ', $ly;
+                    $window.DrawPoint($lx, $ly);
+                    $i = 2;
+                    while ($i < $n) {
+                        $x = $l[$i];
+                        $y = $l[$i+1]; 
+                        $window.DrawLine($lx, $ly, $x, $y);
+                        $lx = $x;
+                        $ly = $y;
+                        say $lx, ' ', $ly;
+                        $i = $i + 2;
+                    }
+                }
+		++$j;
+            }
+        }
     }
 }
 

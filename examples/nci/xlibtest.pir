@@ -59,6 +59,7 @@ Press Escape key to exit.
     bor $I0, ButtonPressMask
     bor $I0, ButtonReleaseMask
     bor $I0, PointerMotionMask
+    bor $I0, ExposureMask
     w.SelectInput($I0)
     w.StoreName('Hello, parrot')
     w.Map()
@@ -104,6 +105,7 @@ loop:
     eq $I1, ButtonPress, press
     eq $I1, ButtonRelease, release
     eq $I1, MotionNotify, paint
+    eq $I1, Expose, expose
     say $I1
     goto loop
 keypress:
@@ -156,6 +158,10 @@ draw:
     lastpx = px
     lastpy = py
 
+    goto loop
+
+expose:
+    say 'Exposed'
     goto loop
 
 # End. Close window and display, and exit.

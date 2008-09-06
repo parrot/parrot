@@ -20,6 +20,7 @@ Constants for xlib.pir
 .const int EnterWindowMask = 16
 .const int LeaveWindowMask = 32
 .const int PointerMotionMask = 64
+.const int ExposureMask = 32768
 
 # event types
 .const int KeyPress = 2
@@ -27,6 +28,7 @@ Constants for xlib.pir
 .const int ButtonPress = 4
 .const int ButtonRelease = 5
 .const int MotionNotify = 6
+.const int Expose = 12
 
 #-----------------------------------------------------------------------
 # Local Variables:
