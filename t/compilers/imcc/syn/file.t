@@ -7,8 +7,9 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use File::Spec;
 use Test::More;
+use Cwd qw(cwd);
 use Parrot::Config;
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 
 =head1 NAME
 
@@ -42,6 +43,29 @@ pir_output_is( <<'CODE', <<'OUT', 'include pasm' );
     .include "temp.pasm"
     print .BAR
     print "\nafter\n"
+    end
+.end
+CODE
+before
+42
+after
+OUT
+unlink 'temp.pasm';
+
+##############################
+open $FOO, '>', "temp.pasm" or die "Can't write temp.pasm\n";
+print $FOO <<'ENDF';
+  .macro_const BAR 42
+ENDF
+close $FOO;
+my $temp_abs_path = cwd()."/temp.pasm";
+
+pir_output_is( <<"CODE", <<'OUT', 'include pasm (absolute path)' );
+.sub test :main
+    say "before"
+    .include '$temp_abs_path'
+    say .BAR
+    say "after"
     end
 .end
 CODE
