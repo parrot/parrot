@@ -47,10 +47,7 @@ my $type = 0;
 
 my $lastx = 0;
 my $lasty = 0;
-my $lx;
-my $ly;
 my $pressed = 0;
-my $m;
 my @listline;
 my @line;
 
@@ -80,13 +77,12 @@ while ($type != 2) {
         @line.push($x, $y);
     }
     if ($type == 12) {
-        $m = +@listline;
         say 'Lines: ', +@listline;
         for @listline -> $l {
             say 'Exposed ', $l.elems;
             if ($l.elems  > 0) {
-                $lx = $l[0];
-                $ly = $l[1]; 
+                my $lx = $l[0];
+                my $ly = $l[1]; 
                 say $lx, ' ', $ly;
                 $window.DrawPoint($lx, $ly);
 
