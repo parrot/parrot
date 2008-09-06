@@ -42,6 +42,8 @@ alignment.
 
 # attributes used for parrot objects
 .const string attr_display = 'obj_display'
+.const string attr_atoms = 'atoms'
+.const string attr_atom_names = 'atom_names'
 
 #-----------------------------------------------------------------------
 .sub get_xlib_handle
@@ -95,6 +97,8 @@ done:
 
     Display = newclass ['Xlib'; 'Display']
     addattribute Display, attr_XDisplay
+    addattribute Display, attr_atoms
+    addattribute Display, attr_atom_names
     set_global 'Display_class', Display
 
 # export functions to be used from Display methods
@@ -305,6 +309,65 @@ doit:
 .end
 
 #-----------------------------------------------------------------------
+.sub InternAtom :method
+    .param string name
+    .param int only_if_exists :optional
+
+#    say name
+#    say only_if_exists
+
+    .local int atom
+    .local pmc namestore
+    namestore = getattribute self, attr_atom_names
+    .local int has_store
+    has_store = defined namestore
+    unless has_store goto get_from_lib
+    atom = namestore[name]
+    if atom goto gotit
+get_from_lib:
+#    say 'Get Atom from lib'
+    .local pmc func
+    func = get_xlib_function('XInternAtom', 'ipti')
+    $P0 = getattribute self, attr_XDisplay
+    atom = func($P0, name, only_if_exists)
+    if has_store goto saveit
+    namestore = new 'Hash'
+    setattribute self, attr_atom_names, namestore
+saveit:
+    namestore[name] = atom
+gotit:
+#    say atom
+    .return(atom)
+.end
+
+#-----------------------------------------------------------------------
+.sub GetAtomName :method
+    .param int atom
+
+    .local string name
+    .local pmc atomstore
+    atomstore = getattribute self, attr_atoms
+    .local int has_store
+    has_store = defined atomstore
+    unless has_store goto get_from_lib
+    name = atomstore[atom]
+    if name goto gotit
+get_from_lib:
+#    say 'Get Atom name from lib'
+    .local pmc func
+    func = get_xlib_function('XGetAtomName', 'tpi')
+    $P0 = getattribute self, attr_XDisplay
+    name = func($P0, atom)
+    if has_store goto saveit
+    atomstore = new 'Hash'
+    setattribute self, attr_atoms, atomstore
+saveit:
+    atomstore[atom] = name
+gotit:
+    .return(name)
+.end
+
+#-----------------------------------------------------------------------
 .sub RootWindow :method
     .local pmc func
     func = get_xlib_function('XRootWindow', 'ppi')
@@ -416,13 +479,13 @@ failed:
     config_hash = interp[.IGLOBALS_CONFIG_HASH]
     .local int intsize
     intsize = config_hash['intsize']
-    say intsize
+#    say intsize
     .local int longsize
     longsize = config_hash['longsize']
-    say longsize
+#    say longsize
     .local int ptrsize
     ptrsize = config_hash['ptrsize']
-    say ptrsize
+#    say ptrsize
     .local int timesize
     timesize = 4
     .local int aligned
@@ -449,94 +512,94 @@ doit:
     arg = new 'FixedIntegerArray'
     set arg, 45
 
-    say 'Event struct'
+#    say 'Event struct'
     .local int offs
     offs = 0
 # type
     arg[0] = int_t
     arg[1] = 1
     arg[2] = offs
-    say offs
+#    say offs
     add offs, aligned
 #serial
     arg[3] = long_t
     arg[4] = 1
     arg[5] = offs
-    say offs
+#    say offs
     add offs, longsize
 # send_event
     arg[6] = int_t
     arg[7] = 1
     arg[8] = offs
-    say offs
+#    say offs
     add offs, aligned
 # display
     arg[9] = ptr_t
     arg[10] = 1
     arg[11] = offs
-    say offs
+#    say offs
     add offs, ptrsize
 # window
     arg[12] = ptr_t
     arg[13] = 1
     arg[14] = offs
-    say offs
+#    say offs
     add offs, ptrsize
 # root
     arg[15] = ptr_t
     arg[16] = 1
     arg[17] = offs
-    say offs
+#    say offs
     add offs, ptrsize
 # subwindow
     arg[18] = ptr_t
     arg[19] = 1
     arg[20] = offs
-    say offs
+#    say offs
     add offs, ptrsize
 # time
     arg[21] = time_t
     arg[22] = 1
     arg[23] = offs
-    say offs
+#    say offs
     add offs, aligned
 # x
     arg[24] = int_t
     arg[25] = 1
     arg[26] = offs
-    say offs
+#    say offs
     add offs, intsize
 # y
     arg[27] = int_t
     arg[28] = 1
     arg[29] = offs
-    say offs
+#    say offs
     add offs, intsize
 # x_root
     arg[30] = int_t
     arg[31] = 1
     arg[32] = offs
-    say offs
+#    say offs
     add offs, intsize
 # y_root
     arg[33] = int_t
     arg[34] = 1
     arg[35] = offs
-    say offs
+#    say offs
     add offs, intsize
 # state
     arg[36] = int_t
     arg[37] = 1
     arg[38] = offs
-    say offs
+#    say offs
     add offs, intsize
 # keycode
     arg[39] = int_t
     arg[40] = 1
     arg[41] = offs
-    say offs
+#    say offs
     add offs, intsize
-    say offs
+#    say offs
 # filler
     arg[42] = char_t
     arg[43] = 128
