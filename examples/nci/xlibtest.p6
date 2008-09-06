@@ -52,13 +52,9 @@ my $lasty = 0;
 my $lx;
 my $ly;
 my $pressed = 0;
-my $n;
 my $m;
-my $i;
-my $j;
 my @listline;
 my @line;
-my $l;
 
 while ($type != 2) {
     $display.NextEvent($event);
@@ -91,30 +87,23 @@ while ($type != 2) {
     }
     if ($type == 12) {
         $m = +@listline;
-        say 'Lines: ', $m;
-        if ($m > 0) {
-            $j = 0;
-            while ($j < $m) {
-                $l = @listline[$j];
-                $n = $l.elems;
-                say 'Exposed ', $n;
-                if ($n > 0) {
-                    $lx = $l[0];
-                    $ly = $l[1]; 
+        say 'Lines: ', +@listline;
+        for @listline -> $l {
+            say 'Exposed ', $l.elems;
+            if ($l.elems  > 0) {
+                $lx = $l[0];
+                $ly = $l[1]; 
+                say $lx, ' ', $ly;
+                $window.DrawPoint($lx, $ly);
+
+                loop (my $i = 2; $i < $l.elems ; $i += 2) {
+                    $x = $l[$i];
+                    $y = $l[$i+1]; 
+                    $window.DrawLine($lx, $ly, $x, $y);
+                    $lx = $x;
+                    $ly = $y;
                     say $lx, ' ', $ly;
-                    $window.DrawPoint($lx, $ly);
-                    $i = 2;
-                    while ($i < $n) {
-                        $x = $l[$i];
-                        $y = $l[$i+1]; 
-                        $window.DrawLine($lx, $ly, $x, $y);
-                        $lx = $x;
-                        $ly = $y;
-                        say $lx, ' ', $ly;
-                        $i = $i + 2;
-                    }
                 }
-		++$j;
             }
         }
     }
@@ -127,4 +116,4 @@ say 'Bye';
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4 ft=pir:
+# vim: expandtab shiftwidth=4 ft=perl6:
