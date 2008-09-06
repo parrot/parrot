@@ -397,7 +397,6 @@ a key.  Returns a string value corresponding to the key.
 
 */
 
-PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
