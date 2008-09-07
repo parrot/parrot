@@ -514,12 +514,12 @@ proto 'infix:==='     is equiv('infix:==') { ... }
 proto infix:«<=>» is equiv('infix:==') { ... }
 
 
-proto 'infix:«<=»' is tighter('infix:===') { ... }
-proto infix:«=>» is tighter('infix:===') { ... }
 proto infix:«>»  is tighter('infix:===') { ... }
 proto infix:«<»  is tighter('infix:===') { ... }
+proto infix:«<=»  is tighter('infix:===') { ... }
+proto infix:«>=» is tighter('infix:===') { ... }
 
-proto 'infix:|' is tighter('infix:«<=»')  { ... }
+proto 'infix:|' is tighter('infix:<=')  { ... }
 proto 'infix:^' is equiv('infix:|')  { ... }
 
 proto 'infix:&' is tighter('infix:|')  { ... }
