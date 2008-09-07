@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 =head1 NAME
 
@@ -64,7 +64,7 @@ PIR
      $P2 = $P1($S0)
      runinterp $P0, $P2
      say "nobody cares."
-	 end
+     end
  .end
 CODE
 help, i'm stuck inside an interpreter!
@@ -75,7 +75,7 @@ pir_output_is( <<'CODE', <<'OUT', 'accessing PMCs from nested interp' );
 .sub 'main' :main
      $S0 = <<'PIR'
  .sub 'main' :main
- 	$P0 = get_global 'some_string'
+     $P0 = get_global 'some_string'
     $P0 = 'Accessing globals from other interpreters.'
  .end
 PIR
@@ -86,12 +86,36 @@ PIR
      $P1 = compreg 'PIR'
      $P2 = $P1($S0)
      runinterp $P0, $P2
-	 $S1 = $P3
-	 say $S1
-	 end
+     $S1 = $P3
+     say $S1
+     end
  .end
 CODE
 Accessing globals from other interpreters.
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'setting HLL map dynamically' );
+.HLL 'Perl6', ''
+
+.sub 'main' :main
+    $P0 = get_class 'Integer'
+    $P1 = subclass $P0, 'MyInt'
+
+    $P2 = getinterp
+    $P2.'hll_map'($P0, $P1)
+
+    $P3 = 'foo'()
+    say $P3                 # "3\n"
+    $S0 = typeof $P3
+    say $S0                 # "MyInt"
+.end
+
+.sub 'foo'
+    .return (3)
+.end
+CODE
+3
+MyInt
 OUT
 
 # Local Variables:

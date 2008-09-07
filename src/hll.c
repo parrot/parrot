@@ -341,7 +341,7 @@ void
 Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
         INTVAL core_type, INTVAL hll_type)
 {
-    PMC  *entry, *type_hash;
+    PMC  *entry, *type_hash, *instantiated;
     Hash *hash;
     PMC  *hll_info = interp->HLL_info;
     const INTVAL n = VTABLE_elements(interp, hll_info);
@@ -357,6 +357,12 @@ Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
             return;
     }
 
+    /* Class PMC currently must be instantiated before HLL map registration
+     * works.  This is a workaround; see RT #58636 */
+    instantiated = pmc_new_noinit(interp, hll_type);
+    if (PObj_is_object_TEST(instantiated))
+        VTABLE_instantiate(interp, instantiated, PMCNULL);
+
     START_WRITE_HLL_INFO(interp, hll_info);
 
     entry     = VTABLE_get_pmc_keyed_int(interp, hll_info, hll_id);
@@ -367,7 +373,7 @@ Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
 
     hash      = (Hash *)PMC_struct_val(type_hash);
 
-    parrot_hash_put(interp, hash, (void*)core_type, (void*)hll_type);
+    parrot_hash_put(interp, hash, (void *)core_type, (void *)hll_type);
 
     END_WRITE_HLL_INFO(interp, hll_info);
 }
