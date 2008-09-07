@@ -340,7 +340,15 @@ ret_string(PARROT_INTERP, char *p, int type)
         char  *cstr = *(char **) p;
         if (cstr) {
             size_t len  = strlen(cstr);
-            return string_make(interp, cstr, len, "iso-8859-1", PObj_external_FLAG);
+            /* TODO
+               Can't assume that the C string is constant during the
+               life of the returned parrot string, so can't be
+               flagged as external in general.
+               If avoid the copy for speed reasons is a concern,
+               other type or flag must be added.
+               Need to provide some way to specify charset and encoding.
+             */
+            return string_make(interp, cstr, len, "iso-8859-1", 0);
         }
         else
             return NULL;
