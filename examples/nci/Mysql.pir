@@ -28,6 +28,10 @@ This is an initial version, be careful and not expect too much.
     mysqlclass = newclass ['Mysql']
     addattribute mysqlclass, 'mysql'
 
+    .local pmc stmtclass
+    stmtclass = newclass ['Mysql'; 'Statement']
+    addattribute stmtclass, 'stmt'
+
     .local pmc resultclass
     resultclass = newclass ['Mysql'; 'Result']
     addattribute resultclass, 'mysql'
@@ -46,10 +50,12 @@ This is an initial version, be careful and not expect too much.
     explist [0] = 'get_mysql_handle'
     explist [1] = 'get_mysql_function'
 
-    .local pmc ns, nsresult
+    .local pmc ns, nsresult, nsstmt
     ns = get_namespace
     nsresult = get_namespace ['Result']
     ns.export_to(nsresult, explist)
+    nsstmt = get_namespace ['Statement']
+    ns.export_to(nsstmt, explist)
 .end
 
 #-----------------------------------------------------------------------
@@ -213,6 +219,56 @@ done:
     .local pmc res
     res = new ['Mysql';'Result'], args
     .return(res)
+.end
+
+#-----------------------------------------------------------------------
+.sub prepare :method
+    .param string stmt_str
+
+    say stmt_str
+    .local pmc mysql
+    mysql = getattribute self, 'mysql'
+    .local pmc mysql_stmt_init
+    mysql_stmt_init = get_mysql_function('mysql_stmt_init', 'pp')
+    .local pmc stmt
+    stmt = mysql_stmt_init(mysql)
+    .local pmc mysql_stmt_prepare
+    mysql_stmt_prepare = get_mysql_function('mysql_stmt_prepare', 'ipti')
+    $I0 = bytelength stmt_str
+    $I1 = mysql_stmt_prepare(stmt, stmt_str, $I0)
+
+    .local pmc args
+    args = new 'Hash'
+    args['stmt'] = stmt
+    .local pmc stmtobj
+    stmtobj = new ['Mysql';'Statement'], args
+    .return(stmtobj)
+.end
+
+########################################################################
+
+.namespace ['Mysql';'Statement']
+
+#-----------------------------------------------------------------------
+.sub param_count :method
+    .local pmc stmt
+    stmt = getattribute self, 'stmt'
+    .local pmc mysql_stmt_param_count
+    mysql_stmt_param_count = get_mysql_function('mysql_stmt_param_count', 'lp')
+    $I0 = mysql_stmt_param_count(stmt)
+    .return($I0)
+.end
+
+#-----------------------------------------------------------------------
+.sub close :method
+    .local pmc stmt
+    stmt = getattribute self, 'stmt'
+    .local pmc mysql_stmt_close
+    mysql_stmt_close = get_mysql_function('mysql_stmt_close', 'ip')
+    $I0 = mysql_stmt_close(stmt)
+    null stmt
+    setattribute self, 'stmt', stmt
+    .return($I0)
 .end
 
 ########################################################################
