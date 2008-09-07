@@ -688,9 +688,9 @@ Finish thawing.
 */
 
     METHOD hll_map(PMC *core_type, PMC *hll_type) {
-        INTVAL core_type_id = VTABLE_type(INTERP,core_type);
-        INTVAL hll_type_id = VTABLE_type(INTERP,hll_type);
-        INTVAL hll_id = CONTEXT(interp)->current_HLL;
+        INTVAL core_type_id = VTABLE_type(INTERP, core_type);
+        INTVAL hll_type_id  = VTABLE_type(INTERP, hll_type);
+        INTVAL hll_id       = CONTEXT(interp)->current_HLL;
         Parrot_register_HLL_type(INTERP, hll_id, core_type_id, hll_type_id);
     }
 
