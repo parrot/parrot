@@ -963,6 +963,38 @@ Checks if the ascii STRING C<str> is just an integer.
         PObj_is_shared_SET(PMC_str_val(SELF));
         return ret;
     }
+
+/*
+
+=item C<INTEGER reverse_index(STRING *substring, INTVAL start)>
+
+Find last occurence of C<substring>, but not after the C<start> position.
+
+=cut
+
+*/
+
+    METHOD reverse_index(STRING *substring, INTVAL start) {
+        STRING * const src = VTABLE_get_string(INTERP, SELF);
+        UINTVAL len;
+        INTVAL res = -1;
+
+        if (start < 0)
+            RETURN(INTVAL res);
+
+        len = string_length(interp, src);
+        if (!len)
+            RETURN(INTVAL res);
+
+        if (start >= (INTVAL)len)
+            RETURN(INTVAL res);
+
+        if (!string_length(interp, substring))
+            RETURN(INTVAL res);
+
+        res = CHARSET_RINDEX(INTERP, src, substring, start);
+        RETURN(INTVAL res);
+    }
 }
 
 /*
