@@ -542,7 +542,9 @@ method block_signature($/) {
         $params.push($parameter);
     }
     if $<slurpy_param> {
-        $params.push( $( $<slurpy_param>[0] ) );
+        my $slurp := $( $<slurpy_param>[0] || $<slurpy_param> );
+        $past.symbol($slurp.name(), :scope('lexical'));
+        $params.push( $slurp );
     }
 
     if $<block_param> {
