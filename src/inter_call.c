@@ -1316,6 +1316,15 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
         /* if the src arg is named, we're done here */
         if (st->name) {
             /* but first, take care of any :optional arguments */
+
+            /*
+             * Workaround for several argument passing problems
+             * RT#54860 y otros
+             * Save current value while setting the optional
+             */
+            UnionVal old_value;
+            STRUCT_COPY(&old_value, &st->val);
+
             while (dest->sig & PARROT_ARG_OPTIONAL) {
                 null_val(st->dest.sig, st);
 
@@ -1330,6 +1339,10 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
                 dest->i++;
                 next_arg_sig(dest);
             }
+
+            /* Restore value */
+            STRUCT_COPY(&st->val, &old_value);
+
             break;
         }
 
