@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 
 =head1 NAME
 
@@ -55,6 +55,24 @@ pir_output_is( <<'CODE', <<OUT, "spawnw, _config" );
 CODE
 Hello, World!
 0
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', "conf_hash is read-only")
+.sub _test :main
+    .local pmc conf_hash
+    conf_hash = _config()
+    push_eh is_ro
+    conf_hash['foo'] = 'bar'
+    pop_eh
+    goto end
+is_ro:
+    say 'hash is read-only'
+end:    
+.end
+
+.include 'library/config.pir'
+CODE
+hash is read-only
 OUT
 
 # Local Variables:

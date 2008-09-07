@@ -64,12 +64,16 @@ undefined values) is undefined, and may be rather funky.
 
 ok1:
     .local string image
+    .local pmc one
     # If it gets above 64k, we've got bigger problems.
     read image, CONF, 60000
     close CONF
     .local pmc conf_hash
     thaw conf_hash, image
-    #  RT #56614 hash should probably be marked read-only...
+
+    one = new 'Integer'
+    one = 1
+    setprop conf_hash, '_ro', one
 
     .return( conf_hash )
 .end
