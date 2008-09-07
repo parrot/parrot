@@ -12,9 +12,9 @@
 #include "pirparser.h"
 #include "pircompiler.h"
 
-
 /* use pthreads library to test thread safety.
    does not work currently on windows.
+   The check for _MSC_VER is not correct but works for me.
 */
 #ifndef _MSC_VER
 #  define TEST_THREAD_SAFETY
@@ -33,10 +33,11 @@
 #endif
 
 #include "pirlexer.h"
+/* include this after "pirlexer.h", as C<yyscan_t> structure must be defined first
+ * which is done in "pirlexer.h"
+ */
+#include "piryy.h"
 
-extern int yyparse(yyscan_t yyscanner, lexer_state * const lexer);
-extern int yyerror(yyscan_t yyscanner, lexer_state * const lexer,
-                   char const * const message, ...);
 
 
 
@@ -114,6 +115,8 @@ void *
 parse_file(void *a) {
     yyscan_t     yyscanner;
     lexer_state *lexer     = NULL;
+
+    /* unpack the arguments from the structure parser_args */
     parser_args *args      = (parser_args *)a;
     int          flexdebug = args->flexdebug;
     FILE        *infile    = args->infile;
@@ -307,9 +310,7 @@ parser finds a syntax error.
 
 */
 int
-yyerror(yyscan_t yyscanner, lexer_state * const lexer,
-        char const * const message, ...)
-{
+yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message, ...) {
     char const * const text = yyget_text(yyscanner);
     va_list arg_ptr;
 

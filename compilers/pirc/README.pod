@@ -13,6 +13,18 @@ current default implementation (IMCC) is a bit of a pain, and it contains
 a lot of "XXX" and "TODO" and other kludge alerts. Furthermore, IMCC is
 not re-entrant, as it has a number of global variables.
 
+=head2 Compiling
+
+At this point I only know how to compile and link on Windows, using
+MSVC:
+
+ cl /c /I..\..\..\include *.c
+
+ link /nodefaultlib main.obj pircompunit.obj pirlexer.obj pirparser.obj \
+   pirsymbol.obj pircompiler.obj kernel32.lib msvcrt.lib ..\..\..\libparrot.lib
+
+A proper Makefile will be fixed soon.
+
 =head2 Overview
 
 The new Bison/Flex based implementation of the PIR compiler is designed

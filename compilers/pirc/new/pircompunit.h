@@ -187,11 +187,6 @@ typedef struct target {
 } target;
 
 
-
-void *panic(char *msg);
-
-
-
 /* The argument node is used to represent arguments or return values.
  * the value field contains the actual value; furthermore it can have
  * flags, such as :flatten and :named; if :named is set, it can have
@@ -294,10 +289,10 @@ struct lexer_state;
 void set_namespace(struct lexer_state * const lexer, key * const ns);
 
 /* various set functions to set the value of a subroutine flag */
-void set_sub_outer(struct lexer_state *lexer, char * const outersub);
-void set_sub_vtable(struct lexer_state *lexer, char * const vtablename);
-void set_sub_lexid(struct lexer_state *lexer, char * const lexid);
-void set_sub_instanceof(struct lexer_state *lexer, char * const classname);
+void set_sub_outer(struct lexer_state * const lexer, char * const outersub);
+void set_sub_vtable(struct lexer_state * const lexer, char * vtablename);
+void set_sub_lexid(struct lexer_state * const lexer, char * const lexid);
+void set_sub_instanceof(struct lexer_state * const lexer, char * const classname);
 
 /* install a new subroutine node */
 void new_subr(struct lexer_state *lexer, char * const subname);
@@ -364,7 +359,8 @@ void set_instrf(struct lexer_state * const lxr, char * const op, char const * co
 void unshift_operand(struct lexer_state * const lexer, expression * const operand);
 void push_operand(struct lexer_state * const lexer, expression * const operand);
 
-char * get_instr(struct lexer_state * const lexer);
+char *get_instr(struct lexer_state * const lexer);
+void get_operands(lexer_state *lexer, int n, ...);
 
 void set_lex_flag(target * const t, char * const lexname);
 char *get_inverse(char * const instr);
@@ -380,8 +376,13 @@ int targets_equal(target const * const t1, target const * const t2);
 /* funtion to reset the register allocator */
 void reset_register_allocator(struct lexer_state * const lexer);
 
+/* to check whether given name is a parrot opcode */
+int is_parrot_op(struct lexer_state * const lexer, char * const name);
+
 void print_subs(struct lexer_state * const lexer);
 void free_subs(struct lexer_state * const lexer);
+
+void panic(char * const message);
 
 #endif /* PARROT_PIR_PIRCOMPUNIT_H_GUARD */
 

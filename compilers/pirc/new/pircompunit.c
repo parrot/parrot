@@ -61,13 +61,12 @@ Poletto and Sarkar).
 #include <string.h>
 
 
-
-
 /*
 #define out stderr
 */
-
-//#define out lexer->outfile
+/*
+#define out lexer->outfile
+*/
 
 #define out stdout
 
@@ -88,15 +87,19 @@ static const char type_codes[5] = {'i', 'n', 's', 'p', '?'};
 
 =over 4
 
+
+=item C<void
+panic(char * const message)>
+
 =cut
 
 */
-
-void *
-panic(char *msg) {
-    printf("Uh oh! %s\n", msg);
-    return NULL;
+void
+panic(char * const message) {
+    fprintf(stderr, "Fatal: %s\n", message);
+    exit(EXIT_FAILURE);
 }
+
 
 /*
 
@@ -169,23 +172,43 @@ Thus, set the :outer() argument to the current subroutine.
 
 */
 void
-set_sub_outer(struct lexer_state *lexer, char * const outersub) {
+set_sub_outer(struct lexer_state * const lexer, char * const outersub) {
     lexer->subs->outer_sub = outersub;
     SET_FLAG(lexer->subs->flags, SUB_FLAG_OUTER);
 }
 
+#include "parrot/string_funcs.h"
 /*
 
 =item C<void
-set_sub_vtable(struct lexer_state *lexer, char *vtablename)>
+set_sub_vtable(struct lexer_state * const lexer, char *vtablename)>
 
-Set the :vtable() flag argument to the current subroutine.
+Set the :vtable() flag argument to the current subroutine. If C<vtablename>
+is NULL, the name of the current sub is taken to be the vtable method name.
+If the vtable method name (either specified or the current sub's name) is
+in fact not a vtable method, an error message is emitted.
 
 =cut
 
 */
 void
-set_sub_vtable(struct lexer_state *lexer, char * const vtablename) {
+set_sub_vtable(struct lexer_state * const lexer, char *vtablename) {
+    int vtable_index;
+
+    if (vtablename == NULL)  /* the sub's name I<is> the vtablename */
+        /* lexer->subs always points to the I<current> subroutine object */
+        vtablename = lexer->subs->sub_name;
+
+    /* get the index number of this vtable method */
+    vtable_index = Parrot_get_vtable_index(lexer->interp,
+                                           string_from_cstring(lexer->interp, vtablename,
+                                                               strlen(vtablename)));
+
+    /* now check whether the method name actually a vtable method */
+    if (vtable_index == -1)
+        pirerror(lexer, "'%s' is not a vtable method but was used with :vtable flag", vtablename);
+
+
     lexer->subs->vtable_method = vtablename;
     SET_FLAG(lexer->subs->flags, SUB_FLAG_VTABLE);
 }
@@ -199,7 +222,7 @@ set_sub_lexid(struct lexer_state *lexer, char *lexid)>
 
 */
 void
-set_sub_lexid(struct lexer_state *lexer, char * const lexid) {
+set_sub_lexid(struct lexer_state * const lexer, char * const lexid) {
     lexer->subs->lex_id = lexid;
     SET_FLAG(lexer->subs->flags, SUB_FLAG_LEXID);
 }
@@ -213,7 +236,7 @@ set_sub_instanceof(struct lexer_state *lexer, char * const classname)>
 
 */
 void
-set_sub_instanceof(struct lexer_state *lexer, char * const classname) {
+set_sub_instanceof(struct lexer_state * const lexer, char * const classname) {
     lexer->subs->instanceof = classname;
 }
 
@@ -766,7 +789,6 @@ set_instrf(struct lexer_state * const lexer,
 
     va_start(arg_ptr, format);
 
-    /* XXX is this printf's % symbol really useful? */
     assert(format_length % 2 == 0);
 
     for (i = 0; i < format_length; i++) {
@@ -796,7 +818,7 @@ set_instrf(struct lexer_state * const lexer,
                 expr = expr_from_const(new_const(STRING_TYPE, va_arg(arg_ptr, char *)));
                 break;
             default:
-                fprintf(stderr, "Fatal: unknown format specifier in set_instrf()");
+                panic("Fatal: unknown format specifier in set_instrf()");
                 break;
         }
         push_operand(lexer, expr);
@@ -824,7 +846,9 @@ get_inverse(char * const instr) {
     else if (strcmp(instr, "lt") == 0) return "ge";
     else if (strcmp(instr, "ne") == 0) return "eq";
     else if (strcmp(instr, "eq") == 0) return "ne";
-    return "Invalid instruction in get_inverse()!";
+
+    assert(0); /* this should never happen */
+    return NULL;
 }
 
 /*
@@ -848,6 +872,79 @@ invert_instr(struct lexer_state * const lexer) {
 char *
 get_instr(struct lexer_state * const lexer) {
     return lexer->subs->statements->instr.ins->opname;
+}
+
+/*
+
+=item C<expression *
+get_operand(struct lexer_state * const lexer, int n)>
+
+Get the C<n>th operand from the current instruction.
+
+=cut
+
+*/
+expression *
+get_operand(struct lexer_state * const lexer, int n) {
+    expression *operand = lexer->subs->statements->instr.ins->operands;
+
+    if (operand == NULL)
+        return NULL;
+
+    operand = operand->next;
+
+    while (--n) {
+        operand = operand->next;
+    }
+    return operand;
+}
+
+void
+get_operands(struct lexer_state * const lexer, int n, ...) {
+    int i;
+    va_list arg_ptr;
+    expression *iter = lexer->subs->statements->instr.ins->operands->next;
+
+    va_start(arg_ptr, n);
+
+    for (i = 0; i < n; i++) {
+        expression **eptr = va_arg(arg_ptr, expression **);
+        *eptr = iter;
+        iter = iter->next;
+    }
+    va_end(arg_ptr);
+}
+
+/*
+
+=item C<int
+get_operand_count(struct lexer_state * const lexer)>
+
+Returns the number of operands of the I<current> instruction.
+
+=cut
+
+*/
+int
+get_operand_count(struct lexer_state * const lexer) {
+    int count = 0;
+    expression *first, *operand;
+
+    /* if no operands, return 0 */
+    if (lexer->subs->statements->instr.ins->operands == NULL)
+        return 0;
+
+    /* initialize the first and the iterator */
+    first = operand = lexer->subs->statements->instr.ins->operands->next;
+
+    /* count the number of operands */
+    do {
+        count++;
+        operand = operand->next;
+    }
+    while (operand != first);
+
+    return count;
 }
 
 /*
@@ -1167,8 +1264,7 @@ invoke(struct lexer_state * const lexer, invoke_type type, ...) {
         case CALL_METHOD_TAILCALL:
             break;
         default:
-            fprintf(stderr, "Fatal error: unknown invoke_type\n");
-            exit(EXIT_FAILURE);
+            panic("Fatal error: unknown invoke_type");
     }
     va_end(arg_ptr);
 
@@ -1509,7 +1605,7 @@ For each operand, an underscore is added; then for the types
 int, num, string or pmc, an 'i', 'n', 's' or 'p' is added
 respectively. If the operand is a constant, a 'c' suffic is added.
 
-If the operand is a key of someting, a 'k' prefix is added.
+If the operand is a key of something, a 'k' prefix is added.
 
 =cut
 
@@ -1564,6 +1660,45 @@ get_signatured_opname(instruction *instr) {
     return fullname;
 }
 
+/*
+
+=item C<int
+is_parrot_op(lexer_state *lexer, char * const name)>
+
+Check whether C<name> is a parrot opcode. C<name> can be either the short
+or fullname of the opcode; for instance, C<print> is the short name, which
+has several full names, such as C<print_i>, C<print_s>, etc., depending on
+the arity and types of operands.
+
+=cut
+
+*/
+int
+is_parrot_op(lexer_state * const lexer, char * const name) {
+    return (lexer->interp->op_lib->op_code(name, 0) >= 0) /* check short name */
+           || (lexer->interp->op_lib->op_code(name, 1) >= 0); /* check long name */
+}
+
+/*
+
+=item C<int
+get_instr_opcode(lexer_state * const lexer, char * const fullname)>
+
+Get the opcode number for the instruction C<fullname>, which contains
+the signatured (full) name of the operation. For instance: print_ic
+is a signatured op; the C<_ic> is the signature indicating it will print
+an integer constant.
+
+This function assumes that C<fullname> is a valid instruction.
+(this function could be a macro for optimization)
+
+=cut
+
+*/
+int
+get_instr_opcode(lexer_state * const lexer, char * const fullname) {
+    return lexer->interp->op_lib->op_code(fullname, 1);
+}
 
 
 
@@ -1581,6 +1716,8 @@ Print the key C<k>. The total key is enclosed in square brackets,
 and different key elements are separated by semicolons. Example:
 
  ["hi";42]
+
+has two elements: C<"hi"> and C<42>.
 
 =cut
 
@@ -1647,7 +1784,7 @@ print_constant(lexer_state *lexer, constant *c) {
             fprintf(out, "\"%s\"", c->val.pval);
             break;
         case UNKNOWN_TYPE:
-            printf("Unknown type detected! This is a bug!");
+            panic("Unknown type detected in print_constant()");
             break;
     }
 }
@@ -1746,17 +1883,34 @@ print_arguments(lexer_state *lexer, char *opname, argument *args) {
 
 }
 
+
 void
 print_instruction(lexer_state *lexer, instruction *ins) {
     assert(ins != NULL);
     if (ins->opname) {
-        if (strcmp(ins->opname, "nop") ==0 )
+        char *fullname;
+
+        if (strcmp(ins->opname, "noop") ==0 )
             return;
-        /*
-        printf("   %s ", ins->opname);
-        */
-        fprintf(out, "   %s ", get_signatured_opname(ins));
-        print_expressions(lexer, ins->operands);
+
+        fullname = get_signatured_opname(ins);
+
+        if (!is_parrot_op(lexer, fullname)) {
+            pirerror(lexer, "'%s' is not a parrot opcode! "
+                     "Check the operands of this op.", fullname);
+        }
+        else {
+            int opcode;
+
+            /* fprintf(stderr, "   %s ", ins->opname);
+             */
+            fprintf(stderr, "   %s ", fullname);
+            opcode = get_instr_opcode(lexer, fullname);
+            print_expressions(lexer, ins->operands);
+            fprintf(stderr, " # op %d", opcode);
+        }
+
+
         fprintf(out, "\n");
     }
 }
@@ -1881,8 +2035,7 @@ print_invocation(lexer_state * const lexer, invocation *inv) {
             fprintf(out, "   tailcallmethod");
             break;
         default:
-            fprintf(stderr, "Unknown invocation type (%d)\n", inv->type);
-            exit(EXIT_FAILURE);
+            panic("Unknown invocation type in print_invocation()");
     }
 
     fprintf(out, "\n");
@@ -1909,8 +2062,7 @@ print_statement(lexer_state *lexer, subroutine *sub) {
                         print_invocation(lexer, statiter->instr.inv);
                     break;
                 default:
-                    fprintf(stderr, "Fatal error: unknown statement type\n");
-                    exit(EXIT_FAILURE);
+                    panic("Fatal error: unknown statement type\n");
             }
             statiter = statiter->next;
         }

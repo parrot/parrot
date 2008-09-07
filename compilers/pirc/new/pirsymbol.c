@@ -153,25 +153,29 @@ never used, a warning message is printed to C<stderr>.
 */
 void
 check_unused_symbols(struct lexer_state * const lexer) {
-    subroutine *subiter = lexer->subs->next;
+    subroutine *subiter = lexer->subs->next; /* start at first sub. */
+
+    puts("");
+
     do {
         symbol *iter = lexer->subs->symbols;
 
-        while (iter) {
+        while (iter) { /* iterate over all symbols in this sub */
             if (iter->color == -1) {
-                /* maybe only check for .locals, not .params. For now, disable this. */
-                /*
-                fprintf(stderr, "Warning: in sub '%s': symbol '%s' declared but not used\n",
-                        subiter->sub_name, iter->name);
-                */
-            }
+                /* parameters will always be assigned a PASM register as this is
+                 * necessary to receive the arguments. .locals will only get
+                 * a PASM register if they're actually used (not just declared)
+                 */
 
+             /*   fprintf(stderr, "Warning: in sub '%s': symbol '%s' declared but not used\n",
+                        subiter->sub_name, iter->name);
+*/
+            }
             iter = iter->next;
         }
-
         subiter = subiter->next;
     }
-    while (subiter != lexer->subs);
+    while (subiter != lexer->subs); /* iterate over all subs */
 }
 
 /*
@@ -200,16 +204,13 @@ find_symbol(struct lexer_state * const lexer, char * const name) {
         return NULL;
 
     while (iter) {
-
         if (strcmp(iter->name, name) == 0) {
-
             /* if the symbol is not yet used, allocate a new PASM register */
             if (iter->color == -1)
                 iter->color = next_register(lexer, iter->type);
 
             return iter;
         }
-
         iter = iter->next;
     }
     return NULL;
@@ -240,7 +241,7 @@ new_pir_reg(pir_type type, int regno) {
 /*
 
 =item C<pir_reg *
-find_register(struct lexer_state *lexer, pir_type type, int regno)>
+find_register(struct lexer_state * const lexer, pir_type type, int regno)>
 
 Find (symbolic) register no. C<regno> of type C<type>. If it's found,
 a pointer to it is returned, if not, NULL is returned.
@@ -267,7 +268,7 @@ find_register(struct lexer_state * const lexer, pir_type type, int regno) {
 /*
 
 =item C<static int
-use_register(struct lexer_state *lexer, pir_type type, int regno)>
+use_register(struct lexer_state * const lexer, pir_type type, int regno)>
 
 This function registers (no pun intended) register C<regno> of type
 C<type>; a new (PASM) register is allocated to it; each subsequent
@@ -285,19 +286,19 @@ use_register(struct lexer_state * const lexer, pir_type type, int regno) {
     pir_reg *reg, *iter;
 
     /* create a new node representing this PIR register */
-    reg        = new_pir_reg(type, regno);
+    reg = new_pir_reg(type, regno);
     /* get a new PASM register for this PIR register. */
     reg->color = next_register(lexer, type);
 
     /* insert, as registers only increase, just insert at the beginning.
      * searching must therefore look from high to low reg. numbers
      */
-    iter       = lexer->subs->registers[type];
+    iter = lexer->subs->registers[type];
 
     /* link this register into the list of "colored" registers; each of
      * them has been assigned a unique PASM register.
      */
-    reg->next                    = lexer->subs->registers[type];
+    reg->next = lexer->subs->registers[type];
     lexer->subs->registers[type] = reg;
 
 
@@ -359,7 +360,7 @@ new_global_ident(char * const name) {
 /*
 
 =item C<void
-store_global_ident(struct lexer_state *lexer, char * const name)>
+store_global_ident(struct lexer_state * const lexer, char * const name)>
 
 Store the global identifier C<name>.
 
@@ -413,14 +414,10 @@ Store the globally defined constant C<c> in the constant table.
 */
 void
 store_global_const(struct lexer_state * const lexer, constant * const c) {
-    if (lexer->constants) {
+    if (lexer->constants)
         c->next = lexer->constants;
-        lexer->constants = c;
-    }
-    else {
-        lexer->constants = c;
-    }
 
+    lexer->constants = c;
 }
 
 /*
