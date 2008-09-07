@@ -22,6 +22,8 @@ This is an initial version, be careful and not expect too much.
 #-----------------------------------------------------------------------
 .sub initialize :load :init :anon
 
+######## Class creation
+
     .local pmc mysqlclass
     mysqlclass = newclass ['Mysql']
     addattribute mysqlclass, 'mysql'
@@ -37,9 +39,13 @@ This is an initial version, be careful and not expect too much.
     rowclass = newclass ['Mysql';'Row']
     addattribute rowclass, 'data'
 
+######## Export common subs to class namespaces
+
     .local pmc explist
     explist = new 'ResizablePMCArray'
-    explist [0] = 'get_handle'
+    explist [0] = 'get_mysql_handle'
+    explist [1] = 'get_mysql_function'
+
     .local pmc ns, nsresult
     ns = get_namespace
     nsresult = get_namespace ['Result']
@@ -47,7 +53,7 @@ This is an initial version, be careful and not expect too much.
 .end
 
 #-----------------------------------------------------------------------
-.sub get_handle
+.sub get_mysql_handle
     .local pmc clientlib
     clientlib = get_global 'clientlib'
     $I0 = defined clientlib
@@ -64,17 +70,29 @@ haslib:
 .end
 
 #-----------------------------------------------------------------------
-.sub get_client_info
-    .local pmc clientlib
-    clientlib = get_handle()
+.sub get_mysql_function
+    .param string name
+    .param string signature
+
+    .local pmc handle
+    handle = get_mysql_handle()
     .local pmc func
-    func = get_global 'mysql_get_client_info'
+# Check if already stored
+    func = get_global name
     $I0 = defined func
-    if $I0 goto do_it
-    func = dlfunc clientlib, 'mysql_get_client_info', 'tv'
-    set_global 'mysql_get_client_info', func
-do_it:
-    $S0 = func()
+    if $I0 goto done
+# Get from library
+    func = dlfunc handle, name, signature
+# And store for later usage
+    set_global name, func
+done:
+    .return(func)
+.end
+
+#-----------------------------------------------------------------------
+.sub get_client_info
+    .local pmc func
+    func = get_mysql_function('mysql_get_client_info', 'tv')
     .return($S0)
 .end
 
@@ -87,14 +105,9 @@ do_it:
 
 #-----------------------------------------------------------------------
 .sub init :vtable
-    .local pmc clientlib
-    clientlib = get_handle()
     .local pmc mysql_init
-    mysql_init = get_global 'mysql_init'
-    $I0 = defined mysql_init
-    if $I0 goto do_init
-    mysql_init = dlfunc clientlib, 'mysql_init', 'pp'
-do_init:
+    mysql_init = get_mysql_function('mysql_init', 'pp')
+
     .local pmc mysql
     $P0 = null
     mysql = mysql_init($P0)
@@ -104,10 +117,8 @@ do_init:
 
 #-----------------------------------------------------------------------
 .sub error :method
-    .local pmc lib
-    lib = get_handle()
     .local pmc mysql_error
-    mysql_error = dlfunc lib, 'mysql_error', 'tp'
+    mysql_error = get_mysql_function('mysql_error', 'tp')
     .local pmc mysql
     mysql = getattribute self, 'mysql'
     $S0 = mysql_error(mysql)
@@ -121,10 +132,8 @@ do_init:
     .param string pass
     .param string database
 
-    .local pmc lib
-    lib = get_handle()
     .local pmc mysql_real_connect
-    mysql_real_connect = dlfunc lib, 'mysql_real_connect', 'ppttttiti'
+    mysql_real_connect = get_mysql_function('mysql_real_connect', 'ppttttiti')
     .local pmc mysql
     mysql = getattribute self, 'mysql'
     .local pmc result
@@ -143,10 +152,8 @@ good:
 .sub query :method
     .param string stmt
 
-    .local pmc lib
-    lib = get_handle()
     .local pmc mysql_query
-    mysql_query = dlfunc lib, 'mysql_query', 'ipt'
+    mysql_query = get_mysql_function('mysql_query', 'ipt')
     .local pmc mysql
     mysql = getattribute self, 'mysql'
     mysql_query(mysql, stmt)
@@ -160,10 +167,8 @@ done:
 
 #-----------------------------------------------------------------------
 .sub store_result :method
-    .local pmc lib
-    lib = get_handle()
     .local pmc mysql_store_result
-    mysql_store_result = dlfunc lib, 'mysql_store_result', 'pp'
+    mysql_store_result = get_mysql_function('mysql_store_result', 'pp')
     .local pmc mysql
     mysql = getattribute self, 'mysql'
     .local pmc r
@@ -181,10 +186,8 @@ done:
 
 #-----------------------------------------------------------------------
 .sub use_result :method
-    .local pmc lib
-    lib = get_handle()
     .local pmc mysql_use_result
-    mysql_use_result = dlfunc lib, 'mysql_use_result', 'pp'
+    mysql_use_result = get_mysql_function('mysql_use_result', 'pp')
     .local pmc mysql
     mysql = getattribute self, 'mysql'
     .local pmc r
@@ -211,10 +214,8 @@ done:
 
 #    say 'Result init'
 
-    .local pmc lib
-    lib = get_handle()
     .local pmc field_count
-    field_count = dlfunc lib, 'mysql_field_count', 'ip'
+    field_count = get_mysql_function('mysql_field_count', 'ip')
     .local pmc mysql
     mysql = getattribute self, 'mysql'
     .local int fields
@@ -243,10 +244,8 @@ nextcol:
 .sub destroy :vtable
     .local pmc r
     r = getattribute self, 'result'
-    .local pmc lib
-    lib = get_handle()
     .local pmc free_result
-    free_result = dlfunc lib, 'mysql_free_result', 'vp'
+    free_result = get_mysql_function('mysql_free_result', 'vp')
     free_result(r)
 .end
 
@@ -256,12 +255,9 @@ nextcol:
     .local pmc r
     r = getattribute self, 'result'
 
-    .local pmc lib
-    lib = get_handle()
-
     .local pmc res
     .local pmc fetch_row
-    fetch_row = dlfunc lib, 'mysql_fetch_row', 'pp'
+    fetch_row = get_mysql_function('mysql_fetch_row', 'pp')
     .local pmc row
     .local pmc rowres
     row = fetch_row(r)
