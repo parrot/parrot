@@ -183,7 +183,9 @@ the output to the correct output file.
     initpir.emit(<<'        CODE', namespace, inherit, $S0)
           ## namespace %0
           push_eh %2
-          $P0 = subclass '%1', '%0'
+          .local pmc p6meta
+          p6meta = get_hll_global 'P6metaclass'
+          p6meta.'new_class'('%0', 'parent'=>'%1')
           pop_eh
         %2:
         CODE
