@@ -167,6 +167,130 @@ good:
 .end
 
 #-----------------------------------------------------------------------
+.sub escape_string :method
+    .param string from
+# This is a quick and dirty implementation for initial testing
+# Escape all chars mentioned in mysql docs, ignoring charset
+# and encoding issues.
+
+    .local string to
+    clone to, from
+
+    .local int i
+    .local string escaped
+    .local string toescape
+    escaped = '\\'
+    i = 0
+nstep1:
+    i = index to, '\', i
+    eq i, -1, step2
+    $S0 = substr to, 0, i
+    inc i
+    $S1 = substr to, i
+    inc i
+    concat $S0, escaped
+    concat to, $S0, $S1
+    goto nstep1
+step2:
+    i = 0
+    escaped = "\'"
+nstep2:
+    i = index to, "'", i
+    eq i, -1, step3
+    $S0 = substr to, 0, i
+    inc i
+    $S1 = substr to, i
+    inc i
+    concat $S0, escaped
+    concat to, $S0, $S1
+    goto nstep2
+step3:
+    i = 0
+    escaped = '\"'
+nstep3:
+    i = index to, '"', i
+    eq i, -1, step4
+    $S0 = substr to, 0, i
+    inc i
+    $S1 = substr to, i
+    inc i
+    concat $S0, escaped
+    concat to, $S0, $S1
+    goto nstep3
+step4:
+    i = 0
+    escaped = "\\n"
+    toescape = chr 10
+    print '"'
+    print toescape
+    say '"'
+nstep4:
+    i = index to, toescape, i
+    eq i, -1, step5
+    $S0 = substr to, 0, i
+    inc i
+    $S1 = substr to, i
+    inc i
+    concat $S0, escaped
+    concat to, $S0, $S1
+    goto nstep4
+step5:
+    i = 0
+    escaped = "\\r"
+    toescape = chr 13
+    print '"'
+    print toescape
+    say '"'
+nstep5:
+    i = index to, toescape, i
+    eq i, -1, step6
+    $S0 = substr to, 0, i
+    inc i
+    $S1 = substr to, i
+    inc i
+    concat $S0, escaped
+    concat to, $S0, $S1
+    goto nstep5
+step6:
+    i = 0
+    escaped = "\\0"
+    toescape = chr 0
+    print '"'
+    print toescape
+    say '"'
+nstep6:
+    i = index to, toescape, i
+    eq i, -1, step7
+    $S0 = substr to, 0, i
+    inc i
+    $S1 = substr to, i
+    inc i
+    concat $S0, escaped
+    concat to, $S0, $S1
+    goto nstep6
+step7:
+    i = 0
+    escaped = "\\Z"
+    toescape = chr 26
+    print '"'
+    print toescape
+    say '"'
+nstep7:
+    i = index to, toescape, i
+    eq i, -1, step8
+    $S0 = substr to, 0, i
+    inc i
+    $S1 = substr to, i
+    inc i
+    concat $S0, escaped
+    concat to, $S0, $S1
+    goto nstep7
+step8:
+
+    .return(to)
+.end
+
+#-----------------------------------------------------------------------
 .sub query :method
     .param string stmt
 
