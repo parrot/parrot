@@ -9,7 +9,9 @@ xlibtest.pir - Test NCI with libX11
 
 This is an initial version, be careful and not expect too much.
 
-Compile Xlib.pir to Xlib.pbc before usage.
+Compile Xlib.pir to Xlib.pbc before usage:
+
+../../parrot -o Xlib.pbc Xlib.pir
 
 Press Escape key to exit.
 
