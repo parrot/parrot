@@ -969,14 +969,16 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
         /*
          * abs_i_ic ...
          */
-        if (n == 3 &&
-                r[1]->type & (VTCONST|VT_CONSTP) &&
-                STREQ(name, ops2[i])) {
-            found = 3;
-            snprintf(op, sizeof (op), "%s_%c_%c", name, tolower((unsigned char)r[0]->set),
-                    tolower((unsigned char)r[1]->set));
-            debug_fmt = "opt %s_x_xc => ";
-            break;
+        if (n == 3) {
+            PARROT_ASSERT(r[1]);
+            if (r[1]->type & (VTCONST|VT_CONSTP) &&
+                    STREQ(name, ops2[i])) {
+                found = 3;
+                snprintf(op, sizeof (op), "%s_%c_%c", name, tolower((unsigned char)r[0]->set),
+                        tolower((unsigned char)r[1]->set));
+                debug_fmt = "opt %s_x_xc => ";
+                break;
+            }
         }
     }
     for (i = 0; !found && i < N_ELEMENTS(ops3); i++) {
