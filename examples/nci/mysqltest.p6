@@ -55,8 +55,12 @@ while (defined $row) {
 say "-------Stored copy------";
 
 for @table_copy -> $rc {
-    for $rc -> $field {
-        print "'", $field, "',";
+    my $elems = $rc.elems();
+    my $i = 0;
+    while ($i < $elems) {
+        print "'", $rc[$i], "'";
+        ++$i;
+        if ($i < $elems) { print ", "; }
     }
     say '';
 }
