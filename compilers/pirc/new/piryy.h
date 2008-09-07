@@ -13,3 +13,11 @@
 int yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message, ...);
 
 #endif /* PARROT_PIR_PIRYY_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+
