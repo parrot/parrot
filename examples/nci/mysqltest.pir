@@ -21,7 +21,7 @@ Connection data and query are hard coded, edit the file to change.
 
 .sub main :main
 
-    load_bytecode 'Mysql.pir'
+    load_bytecode 'Mysql.pbc'
     .local pmc m
     m = new ['Mysql']
 
@@ -66,6 +66,8 @@ endrow:
     say "'"
     goto nextrow
 finish:
+
+    r.free()
 
 .end
 

@@ -54,6 +54,8 @@ while (defined $row) {
 
 say "-------Stored copy------";
 
+$r.free();
+
 for @table_copy -> $rc {
     my $elems = $rc.elems();
     my $i = 0;

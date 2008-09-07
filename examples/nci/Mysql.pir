@@ -53,6 +53,18 @@ This is an initial version, be careful and not expect too much.
 .end
 
 #-----------------------------------------------------------------------
+.sub fail
+    .param string msg
+    new $P0, 'Exception'
+    new $P1, 'String'
+    set $P1, msg
+    setattribute $P0, 'message', $P1
+    throw $P0
+    # Just in case...
+    exit 1
+.end
+
+#-----------------------------------------------------------------------
 .sub get_mysql_handle
     .local pmc clientlib
     clientlib = get_global 'clientlib'
@@ -61,8 +73,7 @@ This is an initial version, be careful and not expect too much.
     clientlib = loadlib 'libmysqlclient'
     $I0 = defined clientlib
     if $I0 goto libloaded
-    say 'mysql client library not found'
-    exit 1
+    fail('Cannot load mysql client lib')
 libloaded:
     set_global 'clientlib', clientlib
 haslib:
@@ -93,6 +104,7 @@ done:
 .sub get_client_info
     .local pmc func
     func = get_mysql_function('mysql_get_client_info', 'tv')
+    $S0 = func()
     .return($S0)
 .end
 
@@ -242,24 +254,36 @@ nextcol:
 
 #-----------------------------------------------------------------------
 .sub destroy :vtable
+    self.free()
+.end
+
+#-----------------------------------------------------------------------
+.sub free :method
     .local pmc r
     r = getattribute self, 'result'
+    $I0 = defined r
+    unless $I0 goto done
     .local pmc free_result
     free_result = get_mysql_function('mysql_free_result', 'vp')
     free_result(r)
+    null r
+    setattribute self, 'result', r
+done:
 .end
 
 #-----------------------------------------------------------------------
 .sub fetch_row :method
 
+    .local pmc rowres
     .local pmc r
     r = getattribute self, 'result'
+    $I0 = defined r
+    unless $I0 goto nomore
 
     .local pmc res
     .local pmc fetch_row
     fetch_row = get_mysql_function('mysql_fetch_row', 'pp')
     .local pmc row
-    .local pmc rowres
     row = fetch_row(r)
     $I0 = defined row
     unless $I0 goto nomore
