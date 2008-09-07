@@ -44,7 +44,7 @@ good:
     m.query('select * from hello;')
 
     .local pmc r
-    r = m.'result'()
+    r = m.'use_result'()
     .local pmc row
 nextrow:
     row = r.fetch_row()

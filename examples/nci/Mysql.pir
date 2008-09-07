@@ -159,7 +159,7 @@ done:
 .end
 
 #-----------------------------------------------------------------------
-.sub result :method
+.sub store_result :method
     .local pmc lib
     lib = get_handle()
     .local pmc mysql_store_result
@@ -168,6 +168,27 @@ done:
     mysql = getattribute self, 'mysql'
     .local pmc r
     r = mysql_store_result(mysql)
+
+    .local pmc args
+    args = new 'Hash'
+    args ['mysql'] = mysql
+    args ['result'] = r
+
+    .local pmc res
+    res = new ['Mysql';'Result'], args
+    .return(res)
+.end
+
+#-----------------------------------------------------------------------
+.sub use_result :method
+    .local pmc lib
+    lib = get_handle()
+    .local pmc mysql_use_result
+    mysql_use_result = dlfunc lib, 'mysql_use_result', 'pp'
+    .local pmc mysql
+    mysql = getattribute self, 'mysql'
+    .local pmc r
+    r = mysql_use_result(mysql)
 
     .local pmc args
     args = new 'Hash'

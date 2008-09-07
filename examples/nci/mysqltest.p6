@@ -32,19 +32,33 @@ $mysql.connect('localhost', 'parrot', 'baDworD', 'parrot');
 
 $mysql.query('select * from hello;');
 
-my $r = $mysql.result();
+my $r = $mysql.use_result();
+
+my @table_copy;
 
 my $row = $r.fetch_row();
 my $elems = $row.elems();
 while (defined $row) {
+    my @row_copy;
     my $i = 0;
     while ($i < $elems) {
         print "'", $row[$i], "'";
+	@row_copy.push($row[$i]);
         ++$i;
         if ($i < $elems) { print ", "; }
     }
     say '';
     $row := $r.fetch_row();
+    @table_copy.push(\@row_copy);
+}
+
+say "-------Stored copy------";
+
+for @table_copy -> $rc {
+    for $rc -> $field {
+        print "'", $field, "',";
+    }
+    say '';
 }
 
 #End
