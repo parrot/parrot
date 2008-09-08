@@ -691,27 +691,30 @@ method array($/) {
 }
 
 method ahash($/) {
-    my $hash;
-    if $<args> {
-        $hash := $( $<args>[0] );
-        $hash.name('hash');
+    my $hash := PAST::Op.new( :name('hash'), :node($/) );
+    if $<assocs> {
+        my $items := $( $<assocs>[0] );
+        for @($items) {
+            $hash.push( $_ );
+        }
     }
-    else {
-        $hash := PAST::Op.new( :name('hash'), :node($/) );
-    }
-
     make $hash;
 }
 
 method assocs($/) {
+    my $assoc := PAST::Stmts.new(:node($/));
     for $<assoc> {
-
+        my $item := $( $_ );
+        $assoc.push($item);
     }
-    # XXX
+    make $assoc;
 }
 
 method assoc($/) {
-    # XXX
+    my $past := PAST::Op.new(:name('list'), :node($/));
+    $past.push( $( $<arg>[0] ) );
+    $past.push( $( $<arg>[1] ) );
+    make $past;
 }
 
 method float($/) {

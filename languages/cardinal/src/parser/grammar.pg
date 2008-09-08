@@ -362,7 +362,7 @@ rule array {
 }
 
 rule ahash {
-    '{' [ [ <args> | <assocs> ] [',']? ]? '}'
+    '{' [ <assocs> [',']? ]? '}'
     {*}
 }
 
