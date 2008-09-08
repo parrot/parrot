@@ -964,13 +964,13 @@ The zip operator.
     i = 0
 
   setup_loop:
-    unless iterator, setup_loop_done 
+    unless iterator, setup_loop_done
     args_iter = new 'Iterator', args
     item = new 'CardinalArray'
     $P0 = shift iterator
     item.push($P0)
   inner_loop:
-    unless args_iter, inner_loop_done 
+    unless args_iter, inner_loop_done
     arg = shift args_iter
     $P0 = arg[i]
     unless null $P0 goto arg_not_null
