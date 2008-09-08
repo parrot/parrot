@@ -25,8 +25,8 @@ Swiped from Rakudo.
 .end
 
 .sub 'infix:==' :multi(_,_)
-    .param num a
-    .param num b
+    .param pmc a
+    .param pmc b
     $I0 = iseq a, b
     .return 'prefix:?'($I0)
 .end
@@ -63,32 +63,32 @@ Swiped from Rakudo.
 
 
 .sub 'infix:<' :multi(_,_)
-    .param num a
-    .param num b
+    .param pmc a
+    .param pmc b
     $I0 = islt a, b
     .return 'prefix:?'($I0)
 .end
 
 
 .sub 'infix:<=' :multi(_,_)
-    .param num a
-    .param num b
+    .param pmc a
+    .param pmc b
     $I0 = isle a, b
     .return 'prefix:?'($I0)
 .end
 
 
 .sub 'infix:>' :multi(_,_)
-    .param num a
-    .param num b
+    .param pmc a
+    .param pmc b
     $I0 = isgt a, b
     .return 'prefix:?'($I0)
 .end
 
 
 .sub 'infix:>=' :multi(_,_)
-    .param num a
-    .param num b
+    .param pmc a
+    .param pmc b
     $I0 = isge a, b
     .return 'prefix:?'($I0)
 .end
