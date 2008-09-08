@@ -45,9 +45,9 @@ Parrot and language implementions on top of Parrot may be installed as
 self-hosting single-file executables, with the help of merged pbc's and
 pbc2exe --install.
 
-Bootstrapping the configuration hash should not read a config file when the hash is
-already contained in the pmc or executable. See #57418 [TODO] optimize _config
-to omit .include "library/config.pir" on installables.
+Bootstrapping the configuration hash should not read a config file when the
+hash is already contained in the pmc or executable. See #57418 [TODO] optimize
+_config to omit .include "library/config.pir" on installables.
 
 The same problem is for every .include, .loadlib and .load_bytecode statement
 in installed files where the target is not installed. This could be solved
@@ -55,8 +55,9 @@ with a module system or with pbc_merge removing not needed .load_bytecode
 statements. {{NOTE: not clear on what you mean here.}}
 
 Test executables are binary different to installable executables because of
-this embedded configuration hash. Test executables contain configuration hash with the
-prefix to the build directory, installables to the given prefix from Configure.pl.
+this embedded configuration hash. Test executables contain configuration hash
+with the prefix to the build directory, installables to the given prefix from
+Configure.pl.
 
 {{NOTE: The executables that are tested should always be the same as the ones
 that are installed. Otherwise, subtle bugs can leak into the installed
@@ -68,9 +69,9 @@ the blib/lib path to PATH resp. LD_RUN_PATH.
 
 =head1 DEFINITIONS
 
-The B<build directory> is the full path where Parrot was built. It is defined in the
-configuration hash. When building from source build directory is also the PARROT_RUNTIME
-prefix.
+The B<build directory> is the full path where Parrot was built. It is defined
+in the configuration hash. When building from source build directory is also
+the PARROT_RUNTIME prefix.
 
 An B<installable> is a bytecode or executable file which must not access the
 build directory paths. The build directory is not available in a binary
@@ -84,11 +85,11 @@ location). Creating a virtual installation path like this simplifies packaging
 by installing into a separate install tree and creating a tarball from that
 tree.
 
-The B<configuration hash> is the return value of the global function C<_config()>,
-generated in F<config_lib.pasm>, and either defined in F<library/config.pir>,
-or as frozen PMC embedded in the test executable (F<config.fpmc>), the
-installable executable (F<install_config.fpmc>) or empty for miniparrot
-(F<null_config.fpmc>).
+The B<configuration hash> is the return value of the global function
+C<_config()>, generated in F<config_lib.pasm>, and either defined in
+F<library/config.pir>, or as frozen PMC embedded in the test executable
+(F<config.fpmc>), the installable executable (F<install_config.fpmc>) or empty
+for miniparrot (F<null_config.fpmc>).
 
 =head1 IMPLEMENTATION
 
@@ -164,10 +165,10 @@ enough, because newer libraries are not installed yet at this stage.
 B<Implementation>: I<TODO>
 
 B<Problem>: C<make test-installable> should copy the make install files away,
-out of the build directory, should temporarily rename the build directory, run a simple test,
-and remake the build directory back. This will not be possible from a make run from
-within the build directory. So renaming runtime will be it. {{Q: What do you
-mean by "renaming runtime"?}}
+out of the build directory, should temporarily rename the build directory, run
+a simple test, and remake the build directory back. This will not be possible
+from a make run from within the build directory. So renaming runtime will be
+it. {{Q: What do you mean by "renaming runtime"?}}
 
 This is fragile and similar for every language target, so it should be
 simplified by a make framework, like include F<Makefile.common> or
