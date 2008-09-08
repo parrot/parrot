@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 97;
+use Parrot::Test tests => 98;
 
 =head1 NAME
 
@@ -2484,6 +2484,32 @@ ok 2
 ok 3
 ok 4
 ok 5
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "named optional after :optional" );
+.sub main :main
+    foo()
+    foo(1 :named('y'))
+    $P0 = new 'Integer'
+    $P0 = 2
+    'foo'($P0 :named('y'))
+.end
+
+.sub foo
+    .param pmc x :optional
+    .param int has_x :opt_flag
+    .param pmc y :optional :named('y')
+    .param int has_y :opt_flag
+    if has_y goto have_y
+    y = new 'Integer'
+    y = 0
+have_y:
+    say y
+.end
+CODE
+0
+1
+2
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "arg mismatch with no params", todo=> 'RT #39844' );
