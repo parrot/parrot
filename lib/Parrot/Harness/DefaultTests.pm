@@ -80,14 +80,13 @@ our @EXPORT_OK = qw(
     t/compilers/json/*.t
     t/examples/*.t
     t/doc/*.t
-    t/codingstd/pdd_format.t
     t/distro/manifest.t
 );
 
 @developing_tests = ( 't/distro/file_metadata.t' );
 # Add in all t/codingstd except for a few skips.
 push @developing_tests,
-  grep { ! m/(c_function_docs|fixme|pdd_format|pod_todo)\.t$/ }
+  grep { ! m/(c_function_docs|fixme|pod_todo)\.t$/ }
   glob 't/codingstd/*.t';
 
 sub get_default_tests {
