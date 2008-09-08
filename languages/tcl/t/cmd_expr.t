@@ -231,7 +231,7 @@ is [expr abs(-1.0)]     1.0
 is [expr acos(0)]       1.5707963267948966 {} $TODO
 is [expr asin(1)]       1.5707963267948966 {} $TODO
 is [expr atan(1)]       0.7853981633974483
-is [expr atan2(4,5)]    0.6747409422235526
+is [expr atan2(4,5)]    0.6747409422235526 {0.6747409422235527 with cygwin}
 is [expr ceil(4.6)]     5.0
 is [expr ceil(-1.6)]   -1.0
 is [expr cos(0)]        1.0
@@ -268,9 +268,9 @@ is [expr abs("-1")]       1
 is [expr acos("0")]       1.5707963267948966 {} $TODO
 is [expr asin("1")]       1.5707963267948966 {} $TODO
 is [expr atan("1")]       0.7853981633974483
-is [expr atan2("4",5)]    0.6747409422235526
-is [expr atan2(4,"5")]    0.6747409422235526
-is [expr atan2("4","5")]  0.6747409422235526
+is [expr atan2("4",5)]    0.6747409422235526 {0.6747409422235527 with cygwin}
+is [expr atan2(4,"5")]    0.6747409422235526 {0.6747409422235527 with cygwin}
+is [expr atan2("4","5")]  0.6747409422235526 {0.6747409422235527 with cygwin}
 is [expr ceil("4.6")]     5.0
 is [expr ceil("-1.6")]   -1.0
 is [expr cos("0")]        1.0
