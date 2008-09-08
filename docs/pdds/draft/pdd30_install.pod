@@ -46,11 +46,11 @@ _config to omit .include "library/config.pir" on installables.
 The same problem is for every .include, .loadlib and load_bytecode statement
 in installed files where the target is not installed. If in doubt install
 the missing library by patching the installation code.
-Eg. C<load_bytecode 'languages/WMLScript/src/WMLScript.pbc'> should be replaced
-by C<load_bytecode 'WMLScript.pbc'> and F<WMLScript.pbc> should be installed
-to F<library>.
-For C<load_bytecode 'PGE/Text.pbc'> in some lua src we should take care, that this
-compiler pbc is really installed or if not merge it into the main F<lua.pbc>.
+Eg. C<load_bytecode 'languages/WMLScript/src/WMLScript.pbc'> should be
+replaced by C<load_bytecode 'WMLScript.pbc'> and F<WMLScript.pbc> should be
+installed to F<library>.  For C<load_bytecode 'PGE/Text.pbc'> in some lua
+src we should take care, that this compiler pbc is really installed or if
+not merge it into the main F<lua.pbc>.
 
 Test executables are binary different to installable executables because of
 this embedded configuration hash. Test executables contain configuration hash
@@ -241,8 +241,8 @@ installable.
 
 The simple Pheme problem could be solved by installing also all TGE and other
 compiler bytecode files at the F<parrot/library/compilers> path. Since TGE
-is not used elsewhere anymore, Pheme should be fixed to get rid of this. {{NOTE:
-commonly used libraries should be installed somewhere. -allison}}
+is not used elsewhere anymore, Pheme should be fixed to get rid of this.
+{{NOTE: commonly used libraries should be installed somewhere. -allison}}
 
 The same problem is for every .include, .loadlib and .load_bytecode statement
 in installed files where the target is not installed.
@@ -278,8 +278,8 @@ None.
 {{The mentioned single patches against SVN HEAD are at
 http://code.google.com/p/cygwin-rurban/source/browse/trunk/release/parrot/patches
 The patches in the tickets are always too old.
-The cygwin070patches branch contains all the mentioned fixes, so it is really a
-"make_install" branch.}}
+The cygwin070patches branch contains all the mentioned fixes, so it is really
+a "make_install" branch.}}
 
 #nnnnn references tickets in
 http://rt.perl.org/rt3/Ticket/Display.html?id=nnnnn
