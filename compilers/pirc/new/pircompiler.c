@@ -14,6 +14,10 @@
 
 /*
 
+=head1 FUNCTIONS
+
+=over
+
 =item C<lexer_state *
 new_lexer(char * const filename)>
 

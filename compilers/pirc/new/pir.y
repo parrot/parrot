@@ -182,6 +182,10 @@ static void create_if_instr(yyscan_t yyscanner, lexer_state * const lexer, int i
 
 /*
 
+=head1 FUNCTIONS
+
+=over
+
 =item C<static void
 do_strength_reduction(lexer_state * const lexer)>
 
@@ -795,6 +799,8 @@ assignment_stat   : assignment "\n"
                   ;
 
 /*
+
+=back
 
 =head1 INSTRUCTION SELECTION
 
