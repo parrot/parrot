@@ -80,6 +80,7 @@ our @EXPORT_OK = qw(
     t/compilers/json/*.t
     t/examples/*.t
     t/doc/*.t
+    t/codingstd/pdd_format.t
     t/distro/manifest.t
 );
 
