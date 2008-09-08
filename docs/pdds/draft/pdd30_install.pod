@@ -7,11 +7,12 @@ docs/pdds/draft/pdd30_install.pod - Parrot Installation
 
 =head1 ABSTRACT
 
-This PDD defines Parrot's installation details. The goal is to provide binary
-packages, a working C<make install> for parrot, the installables, FHS
-compliant search paths for the installables and solving the problem of not
-accessing installed source-only files and the optimization of config
-bootstrapping if a frozen config_hash is already linked.
+This PDD outlines Parrot's installation system. Parrot's installation system
+will provide binary packages, a working C<make install> target, compiled
+installables, and FHS compliant search paths for the installables. This
+document also aims to solve the current problem of accessing installed
+source-only files, and to allow the optimization of config bootstrapping if a
+frozen config_hash is already linked.
 
 =head1 VERSION
 
@@ -26,51 +27,66 @@ $Revision$
 
 =head1 DESCRIPTION
 
-Parrot installation mechanisms are more powerful than perl5's.  MANIFEST
-contains also the end location, tools/dev/install_files.pl is driven by this
+{{NOTE: Define Parrot's installation system without comparing it to other
+installation systems. I've edited many instances here. -allison}}
+
+Parrot's F<MANIFEST> will contain the installation path of all files.  The
+installation script F<tools/dev/install_files.pl> is driven by this
 definition.  The three runtime paths for "include", "library" for
-load_bytecode and "dynext" for loadlib should end up in the $prefix/lib/parrot
-paths.  See #56996-fhs-runtime.patch
+load_bytecode and "dynext" for loadlib should end up in the
+F<$prefix/lib/parrot> paths.  {{NOTE: See #56996-fhs-runtime.patch }}
 
-Contrary to perl5, parrot and its language implementions on top of parrot may
-be installed as self-hosting single-file executables, with the help of merged
-pbc's and pbc2exe --install.
+{{NOTE: I've edited this paragraph to what I think you meant. But, if this is
+what you meant, I don't agree. The installation paths will be completely
+different on MacOSX, Windows, and various Linux distributions, so the
+information can't be stored in the MANIFEST.}}
 
-Bootstrapping the config hash should not read a config file when the hash is
+Parrot and language implementions on top of Parrot may be installed as
+self-hosting single-file executables, with the help of merged pbc's and
+pbc2exe --install.
+
+Bootstrapping the configuration hash should not read a config file when the hash is
 already contained in the pmc or executable. See #57418 [TODO] optimize _config
 to omit .include "library/config.pir" on installables.
 
 The same problem is for every .include, .loadlib and .load_bytecode statement
 in installed files where the target is not installed. This could be solved
 with a module system or with pbc_merge removing not needed .load_bytecode
-statements.
+statements. {{NOTE: not clear on what you mean here.}}
 
 Test executables are binary different to installable executables because of
-this embedded config hash. Test executables contain config hash with the
-prefix to the build_dir, installables to the given prefix from Configure.pl.
+this embedded configuration hash. Test executables contain configuration hash with the
+prefix to the build directory, installables to the given prefix from Configure.pl.
 
-There are's also a long-standing conflict in building parrot with an already
+{{NOTE: The executables that are tested should always be the same as the ones
+that are installed. Otherwise, subtle bugs can leak into the installed
+executables which can never be caught by the tests. -allison}}
+
+There are's also a long-standing conflict in building Parrot with an already
 installed shared libparrot.so. See #39742-installed-conflict.patch which adds
 the blib/lib path to PATH resp. LD_RUN_PATH.
 
 =head1 DEFINITIONS
 
-An B<installable> is a pbc or exe which must not access the build_dir
-paths. The build_dir is not available in a binary package. This is solved by
-generating and linking a special F<install_config.fpmc>. Custom python modules
-have a similar packaging problem, which they haven't solved yet.
-
-B<build_dir> is the full path where parrot was built. It is defined in the
-config hash. When building from source build_dir is also the PARROT_RUNTIME
+The B<build directory> is the full path where Parrot was built. It is defined in the
+configuration hash. When building from source build directory is also the PARROT_RUNTIME
 prefix.
 
-B<DESTDIR> is the end location of the parrot tree in front of the prefix (/usr
-or /usr/local). This allows packaging by installing into a seperate install
-tree and do a tar cf there.
+An B<installable> is a bytecode or executable file which must not access the
+build directory paths. The build directory is not available in a binary
+package. This is solved by generating and linking a special
+F<install_config.fpmc>. Custom Python modules have a similar packaging
+problem, which they haven't solved yet.
 
-The B<config hash> is the return value of the global function C<_config()>,
+The B<destination directory> is the path of the installed Parrot tree after
+the prefix (F</usr>, F</usr/local>, or some other platform-specific or custom
+location). Creating a virtual installation path like this simplifies packaging
+by installing into a separate install tree and creating a tarball from that
+tree.
+
+The B<configuration hash> is the return value of the global function C<_config()>,
 generated in F<config_lib.pasm>, and either defined in F<library/config.pir>,
-or as frozen pmc embedded in the test executable (F<config.fpmc>), the
+or as frozen PMC embedded in the test executable (F<config.fpmc>), the
 installable executable (F<install_config.fpmc>) or empty for miniparrot
 (F<null_config.fpmc>).
 
@@ -78,69 +94,105 @@ installable executable (F<install_config.fpmc>) or empty for miniparrot
 
 =head2 make install
 
-The parrot build system is optimized for building and testing in the
-build_dir, but not for building with an already installed parrot due to simple
-build system bugs, and not optimized to build and test installables, which
-should not access the libraries in the build_dir, but in the DESTDIR.
+The Parrot build system is currently optimized for building and testing in the
+build directory, but not for building with an already installed Parrot. This
+is complicated by some simple build system bugs. It is also not optimized to
+build and test installables, which should not access libraries in the build
+directory, but in the destination directory.
 
-The goal is to make install work for parrot, the utils, and all the languages.
-For parrot and its utils the install actions are defined in the main Makefile,
-for the languages the install actions should be defined in its Makefiles and
-is implemented in #56554-make-install-lang.patch.
+The goal of this document is to make installation work for Parrot, its
+libraries and tools, and its languages. For Parrot and its libraries the
+install actions are defined in the main Makefile. For the languages the
+install actions are defined in the language's Makefile. {{ See an
+implementation of this in #56554-make-install-lang.patch.}}
 
 C<make install> currently does not work with an already installed shared
-libparrot.so on most platforms. There's a patch at #39742.
+libparrot.so on most platforms. {{See a patch for this in RT #39742.}}
 
-make install actions for a language lang:
+C<make install> actions for a language named "mylanguage":
 
- * copy installables to DESTDIR/bin_dir as parrot-lang
- * optionally copy lang.pbc to DESTDIR/script_dir (/usr/lib/parrot/bin/ ?)
- * copy libraries to DESTDIR/lib_dir/parrot/dynext/
- * optionally copy pbc's to DESTDIR/lib_dir/parrot/library/ (only php_ext)
- * optionally copy include pasm and pirs to
-   DESTDIR/lib_dir/parrot/include/ (not yet)
- * copy docs to DESTDIR/doc_dir/
- * generate a man(1) page and copy to DESTDIR/man_dir/
- * optionally generate html and copy to DESTDIR/html_dir/lang/
+{{NOTE: One general comment, we need to be careful not to install bytecode
+files in the same directories as executables. The C includes and the PIR
+includes also need to be separate.}}
 
-=head2 make installable -C languages/lang
+=over 4
 
-This creates a pbc or exe linked to F<install_config.fpmc>, and this
-executable should not access the build_dir/runtime/parrot paths.
+=item * Copy installables to the destination directory's F<bin> directory as
+F<parrot-mylanguage>.
 
-A pbc may be optionally merged with F<install_config.fpmc>, an exe is just
-linked with C<pbc_to_exe --install>.
+=item * Optionally copy the main language file F<mylanguage.pbc> to the
+destination directory's F<script> directory. (F</usr/lib/parrot/bin/> ?)
 
-=head2 make test-installable -C languages/lang
+=item * Copy libraries to the destination directory's F<lib> directory under
+F</parrot/dynext/>.
 
-B<Goal>: Test if the generated installable does not access the build_dir paths
-but does find older libraries, includes and dynext's in $prefix. DESTDIR is
-not known and may be optional. A simple test from C<make test> without any
-features from an external library is enough, because newer libraries are not
-installed yet at this stage.
+=item * Optionally copy PBC files to destination directory's F<lib> directory
+under F<parrot/library/> (only php_ext).
+
+{{NOTE: What do you mean by "only php_ext"? -allison}}
+
+=item * Optionally copy include PASM and PIR files to the destination
+directory's F<lib> directory under F<parrot/include/> (not yet).
+
+=item * Copy documentation files to destination directory's F<doc> directory.
+
+=item * Generate man(1) pages and copy to destination directory's F<man>
+directory.
+
+=item * Optionally generate HTML and copy to destination directory's F<html>
+directory, possibly under a language specific subdirectory.
+
+=back
+
+=head2 make installable -C languages/mylanguage
+
+This creates a bytecode or executable file linked to F<install_config.fpmc>,
+and this executable should not access the build directory's F<runtime/parrot>
+paths.
+
+A bytecode file may be optionally merged with F<install_config.fpmc>, an
+executable is just linked with C<pbc_to_exe --install>.
+
+=head2 make test-installable -C languages/mylanguage
+
+B<Goal>: Test if the generated installable does not access the build directory
+paths but does find older libraries, includes and dynext's in the F<$prefix>
+path. The destination directory is not known and may be optional. A simple
+test from C<make test> without any features from an external library is
+enough, because newer libraries are not installed yet at this stage.
 
 B<Implementation>: I<TODO>
 
 B<Problem>: C<make test-installable> should copy the make install files away,
-out of the build_dir, should temporarily rename build_dir, run a simple test,
-and remake the build_dir back. This will not be possible from a make run from
-within the build_dir. So renaming runtime will be it.
+out of the build directory, should temporarily rename the build directory, run a simple test,
+and remake the build directory back. This will not be possible from a make run from
+within the build directory. So renaming runtime will be it. {{Q: What do you
+mean by "renaming runtime"?}}
 
 This is fragile and similar for every language target, so it should be
 simplified by a make framework, like include F<Makefile.common> or
 extending the current automake-like framework.
 
-=head2 _config bootstrapping
+{{NOTE: If it's fragile, then we should find another solution that isn't
+fragile.}}
 
-Bootstrapping the config hash should not read a config file when the hash is
-already contained in the pmc or executable.  .include "library/config.pir" and
-.load_bytecode "config.pbc" should be omitted on installables if possible.
+=head2 Configuration bootstrapping
+
+Bootstrapping the configuration hash should not read a config file when the
+hash is already contained in the PMC or executable.  .include
+"library/config.pir" and .load_bytecode "config.pbc" should be omitted on
+installables if possible.
+
+{{NOTE: We need to step back and take a broader view here. Why is
+F<library/config.pir> currently included in the installables? It sounds like a
+hack to work around earlier limitations in the build system. This is an ideal
+opportunity to eliminate the hack. -allison}}
 
 =head2 Accessing not-installed files
 
-B<Problem:> Various pir files load source-only .pir, .pasm or compiler .pbc
+B<Problem:> Various PIR files load source-only PIR, PASM or compiler bytecode
 files, which are not installed in binary packages.  This shows up when trying
-to run an installable with the build_dir removed or renamed.
+to run an installable with the build directory removed or renamed.
 
  $ parrot-forth.exe xx
  "load_bytecode" couldn't find file 'languages/forth/tokenstream.pbc'
@@ -164,35 +216,53 @@ to run an installable with the build_dir removed or renamed.
 
 B<Fix 1>: Install all deps.
 
-The simple forth and pipp problem could be solved by merging the missing pbc's
-to a single file F<forth.pbc> and generate from this the installable.
+{{NOTE: This may be a sign that we need to rethink our language build
+strategy. Trying to glom everything into a single C executable is less than
+ideal. Especially since it causes problems for language interoperability if
+every language is running off its own independent executable. -allison}}
 
-The simple pheme problem could be solved by installing also all TGE
-and other compiler pbc's at the parrot/library/compilers path.
+The simple Forth and Pipp problem could be solved by merging the missing
+bytecode files to a single file F<forth.pbc> and generate from this the
+installable.
+
+The simple Pheme problem could be solved by installing also all TGE and other
+compiler bytecode files at the F<parrot/library/compilers> path. {{NOTE:
+commonly used libraries should be installed somewhere. -allison}}
 
 The same problem is for every .include, .loadlib and .load_bytecode statement
 in installed files where the target is not installed.
 
 This could also be solved with a module system or with pbc_merge removing
-those statements.
+those statements. {{NOTE: We don't want to be hacking up the bytecode as we
+merge it. -allison}}
 
 B<Fix 2>: Module system.
 
 Avoid already loaded pbc files.
 
-Source loading PIR statements like .loadlib and .load_bytecode should a) hash
-its arg and skip the file if already loaded (hash lookup) b) add .load*_once
-sisters as in php - .load_bytecode_once and .loadlib_once
+Source loading PIR statements like .loadlib and .load_bytecode should a) cache
+the file name and skip the file if it has already been loaded  b) add
+.load*_once sisters as in php - .load_bytecode_once and .loadlib_once
+
+{{NOTE: option (a) strongly preferred. -allison}}
 
 B<Fix 3>: pbc_merge fixups
 
 pbc_merge should patch up the bytecode (if possible) to omit
 loading .load_bytecode pbc-files which are being merged.
 
+{{NOTE: not desirable}}
+
 B<Fix 4>: .include_bytecode
 
 Introduce a new op .include_bytecode, which works like .include, but
-on the bc level.
+on the bytecode level.
+
+{{NOTE: How .include works is by copying the entire text of the include file
+into the destination file. This really isn't desirable, as it means absorbing
+memory for duplicate code instead of compiling it once and loading it as a
+library. And, it means an op that works like .include but for bytecode would
+be impossible. -allison}}
 
 =head1 ATTACHMENTS
 
