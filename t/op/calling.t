@@ -2463,6 +2463,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', "slurpy named after :optional" );
     foo($P0 :flat, 'abc' => 3)
     $P0 = new 'ResizablePMCArray'
     foo($P0 :flat, 'abc' => 4)
+    # Shorter version of RT#53926
+    $P0 = new 'Hash'
+    $P0['abc'] = 5
+    foo($P0 :named :flat)
 .end
 
 .sub foo
@@ -2479,6 +2483,7 @@ ok 1
 ok 2
 ok 3
 ok 4
+ok 5
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "arg mismatch with no params", todo=> 'RT #39844' );
