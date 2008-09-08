@@ -340,7 +340,7 @@ Parrot_cx_schedule_callback(PARROT_INTERP,
         ARGIN(PMC *user_data), ARGIN(char *ext_data))
 {
     PMC *callback = pmc_new(interp, enum_class_Task);
-    Parrot_Task * const task_struct = PARROT_TASK(callback);
+    Parrot_Task_attributes * const task_struct = PARROT_TASK(callback);
 
     task_struct->type    = CONST_STRING(interp, "callback");
     task_struct->data    = user_data;
@@ -410,7 +410,7 @@ PMC *
 Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)
 {
     if (interp->scheduler) {
-        Parrot_Scheduler * sched_struct = PARROT_SCHEDULER(interp->scheduler);
+        Parrot_Scheduler_attributes * sched_struct = PARROT_SCHEDULER(interp->scheduler);
         INTVAL num_tasks, index;
 
 #if CX_DEBUG
@@ -611,7 +611,7 @@ void
 Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), ARGIN_NULLOK(PMC *payload))
 {
     if (interp->scheduler) {
-        Parrot_Scheduler * sched_struct = PARROT_SCHEDULER(interp->scheduler);
+        Parrot_Scheduler_attributes * sched_struct = PARROT_SCHEDULER(interp->scheduler);
         PMC *message = pmc_new(interp, enum_class_SchedulerMessage);
         VTABLE_set_string_native(interp, message, messagetype);
         message = VTABLE_share_ro(interp, message);
@@ -791,7 +791,7 @@ Run the associated code block for a timer event, when the timer fires.
 void
 Parrot_cx_timer_invoke(PARROT_INTERP, ARGIN(PMC *timer))
 {
-    Parrot_Timer * const timer_struct = PARROT_TIMER(timer);
+    Parrot_Timer_attributes * const timer_struct = PARROT_TIMER(timer);
 #if CX_DEBUG
     fprintf(stderr, "current timer time: %f, %f\n",
                     timer_struct->birthtime + timer_struct->duration,
@@ -816,7 +816,7 @@ Run the associated code block for a callback event.
 void
 Parrot_cx_invoke_callback(PARROT_INTERP, ARGIN(PMC *callback))
 {
-    Parrot_Task * const task_struct = PARROT_TASK(callback);
+    Parrot_Task_attributes * const task_struct = PARROT_TASK(callback);
     if (!PMC_IS_NULL(task_struct->data)) {
         Parrot_run_callback(interp, task_struct->data,
                 task_struct->cb_data);
@@ -900,7 +900,7 @@ to become active tasks.
 static void
 scheduler_process_wait_list(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
-    Parrot_Scheduler * sched_struct = PARROT_SCHEDULER(scheduler);
+    Parrot_Scheduler_attributes * sched_struct = PARROT_SCHEDULER(scheduler);
     INTVAL num_tasks, index;
 
     /* Sweep the wait list for completed timers */
@@ -945,7 +945,7 @@ take appropriate action on any received.
 static void
 scheduler_process_messages(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
-    Parrot_Scheduler * sched_struct = PARROT_SCHEDULER(scheduler);
+    Parrot_Scheduler_attributes * sched_struct = PARROT_SCHEDULER(scheduler);
     PMC *message;
 
 #if CX_DEBUG

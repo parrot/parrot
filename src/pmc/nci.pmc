@@ -20,8 +20,8 @@ The vtable functions for the native C call functions.
 
 #include "parrot/parrot.h"
 
-void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI * const nci_info);
-void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI * const nci_info) {
+void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_info);
+void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_info) {
         unsigned int i;
         int j = 0;
         char * sig_c = string_to_cstring(interp, sig);
@@ -136,7 +136,7 @@ Initializes the NCI with a C<NULL> function pointer.
     VTABLE void init() {
         PMC_struct_val(SELF) = NULL;
         PMC_pmc_val(SELF)    = PMCNULL;
-        PMC_data(SELF)       = mem_allocate_zeroed_typed(Parrot_NCI);
+        PMC_data(SELF)       = mem_allocate_zeroed_typed(Parrot_NCI_attributes);
 
         /* Mark that we're not a raw NCI. */
         PObj_flag_CLEAR(private2, SELF);
@@ -160,7 +160,7 @@ Sets the specified function pointer and signature (C<*key>).
     }
 
     VTABLE void set_pointer_keyed_str(STRING *key, void *func) {
-        Parrot_NCI * const nci_info = PARROT_NCI(SELF);
+        Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         int jitted = 0;
 
         /* Store the original function and signature. */
@@ -186,7 +186,7 @@ Mark any referenced strings and PMCs.
 */
     VTABLE void mark() {
         if (PARROT_NCI(SELF)) {
-            Parrot_NCI * const nci_info = PARROT_NCI(SELF);
+            Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
 
             if (nci_info->signature)
                 pobject_lives(interp, (PObj*)nci_info->signature);
@@ -207,7 +207,7 @@ Destroys the NCI, freeing any allocated memory.
 
     VTABLE void destroy() {
         if (PMC_data(SELF)) {
-            Parrot_NCI * const nci_info = PARROT_NCI(SELF);
+            Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
 
             mem_sys_free(nci_info);
             PMC_data(SELF) = NULL;
@@ -225,13 +225,13 @@ Creates and returns a clone of the NCI.
 */
 
     VTABLE PMC *clone() {
-        Parrot_NCI * const nci_info_self = PARROT_NCI(SELF);
-        Parrot_NCI *nci_info_ret;
+        Parrot_NCI_attributes * const nci_info_self = PARROT_NCI(SELF);
+        Parrot_NCI_attributes *nci_info_ret;
 
         PMC * const ret     = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PMC_struct_val(ret) = PMC_struct_val(SELF);
         PMC_pmc_val(ret)    = PMCNULL;
-        PMC_data(ret)       = mem_allocate_zeroed_typed(Parrot_NCI);
+        PMC_data(ret)       = mem_allocate_zeroed_typed(Parrot_NCI_attributes);
         nci_info_ret        = PARROT_NCI(ret);
 
         /* FIXME if data is malloced (JIT/i386!) then we need
@@ -259,7 +259,7 @@ Returns whether the NCI is defined.
 */
 
     VTABLE INTVAL defined() {
-        Parrot_NCI * const nci_info = PARROT_NCI(SELF);
+        Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         return nci_info->func != NULL;
     }
 
@@ -276,7 +276,7 @@ shifted down.
 */
 
     VTABLE opcode_t *invoke(void *next) {
-        Parrot_NCI * const nci_info = PARROT_NCI(SELF);
+        Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
 
         typedef INTVAL (*nci_sub_t)(PARROT_INTERP, PMC *);
 
@@ -336,7 +336,7 @@ Returns the function pointer as an integer.
 */
 
     VTABLE INTVAL get_integer() {
-        Parrot_NCI * const nci_info = PARROT_NCI(SELF);
+        Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         return (INTVAL)nci_info->func;
     }
 
@@ -351,7 +351,7 @@ Returns the boolean value of the pointer.
 */
 
     VTABLE INTVAL get_bool() {
-        Parrot_NCI * const nci_info = PARROT_NCI(SELF);
+        Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         return (0 != (INTVAL)nci_info->func);
     }
 
@@ -365,7 +365,7 @@ Return the arity of the NCI (the number of arugments).
 
 */
     METHOD arity() {
-        Parrot_NCI * const nci_info = PARROT_NCI(SELF);
+        Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         INTVAL arity = 0;
 
         if (nci_info && nci_info->func)

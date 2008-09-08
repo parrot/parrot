@@ -48,7 +48,7 @@ Free structures.
 */
 
     VTABLE void init() {
-        Parrot_Capture *capture = mem_allocate_typed(Parrot_Capture);
+        Parrot_Capture_attributes *capture = mem_allocate_typed(Parrot_Capture_attributes);
         PMC_data(SELF)          = capture;
         capture->array          = NULL;
         capture->hash           = NULL;

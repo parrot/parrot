@@ -166,7 +166,7 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_oo_get_namespace(SHIM_INTERP, ARGIN(const PMC *classobj))
 {
-    Parrot_Class * const _class     = PARROT_CLASS(classobj);
+    Parrot_Class_attributes * const _class     = PARROT_CLASS(classobj);
     PMC          * const _namespace = _class->_namespace;
 
     if (PMC_IS_NULL(_namespace))
@@ -324,7 +324,7 @@ PMC *
 Parrot_oo_find_vtable_override_for_class(PARROT_INTERP,
         ARGIN(PMC *classobj), ARGIN(STRING *name))
 {
-    Parrot_Class *class_info;
+    Parrot_Class_attributes *class_info;
     PARROT_ASSERT(PObj_is_class_TEST(classobj));
 
     class_info = PARROT_CLASS(classobj);
@@ -349,7 +349,7 @@ PMC *
 Parrot_oo_find_vtable_override(PARROT_INTERP,
         ARGIN(PMC *classobj), ARGIN(STRING *name))
 {
-    Parrot_Class * const _class = PARROT_CLASS(classobj);
+    Parrot_Class_attributes * const _class = PARROT_CLASS(classobj);
 
     if (VTABLE_exists_keyed_str(interp, _class->parent_overrides, name))
         return VTABLE_get_pmc_keyed_str(interp, _class->parent_overrides, name);

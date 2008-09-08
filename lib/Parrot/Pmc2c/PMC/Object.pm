@@ -40,8 +40,8 @@ sub pre_method_gen {
         $superargs       =~ s/^,//;
 
         $new_default_method->body( Parrot::Pmc2c::Emitter->text(<<"EOC") );
-    Parrot_Object * const obj       = PARROT_OBJECT(pmc);
-    Parrot_Class  * const _class    = PARROT_CLASS(obj->_class);
+    Parrot_Object_attributes * const obj       = PARROT_OBJECT(pmc);
+    Parrot_Class_attributes  * const _class    = PARROT_CLASS(obj->_class);
     STRING        * const meth_name = CONST_STRING_GEN(interp, "$vt_method_name");
 
     /* Walk and search for the vtable method. */

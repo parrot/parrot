@@ -54,7 +54,7 @@ An empty Hash PMC is allocated during initialization.
 /* Takes a hash and initializes the role based on it. */
 static void init_role_from_hash(PARROT_INTERP, PMC *self, PMC *info)
 {
-    Parrot_Role * const role     = PARROT_ROLE(self);
+    Parrot_Role_attributes * const role     = PARROT_ROLE(self);
     STRING * const ns_string     = CONST_STRING(interp, "NameSpace");
     STRING * const name_str      = CONST_STRING(interp, "name");
     STRING * const namespace_str = CONST_STRING(interp, "namespace");
@@ -222,7 +222,7 @@ C<init_data>.
 */
 
     VTABLE void init() {
-        Parrot_Role * const role = mem_allocate_zeroed_typed(Parrot_Role);
+        Parrot_Role_attributes * const role = mem_allocate_zeroed_typed(Parrot_Role_attributes);
         PMC_data(SELF)        = role;
 
         /* Set flags for custom DOD mark and destroy. */
@@ -270,7 +270,7 @@ Mark referenced strings and PMCs in the structure as live.
 */
 
     VTABLE void mark() {
-        Parrot_Role * const role = PARROT_ROLE(SELF);
+        Parrot_Role_attributes * const role = PARROT_ROLE(SELF);
 
         if (role->name)
             pobject_lives(interp, (PObj *)role->name);
@@ -296,7 +296,7 @@ Enters the attribute in the C<attributes> array.
 */
 
     VTABLE void add_attribute(STRING *name, PMC *type) {
-        Parrot_Role * const role          = PARROT_ROLE(SELF);
+        Parrot_Role_attributes * const role          = PARROT_ROLE(SELF);
         PMC         * const new_attribute = pmc_new(interp, enum_class_Hash);
 
         /* Set name and type. */
@@ -321,7 +321,7 @@ Adds the given sub PMC as a method with the given name.
 */
 
     VTABLE void add_method(STRING *name, PMC *sub) {
-        Parrot_Role * const role = PARROT_ROLE(SELF);
+        Parrot_Role_attributes * const role = PARROT_ROLE(SELF);
 
         /* If we have already added a method with this name... */
         if (VTABLE_exists_keyed_str(interp, role->methods, name)) {
@@ -349,7 +349,7 @@ conflicts.
 */
 
     VTABLE void add_role(PMC *role) {
-        Parrot_Role * const this_role = PARROT_ROLE(SELF);
+        Parrot_Role_attributes * const this_role = PARROT_ROLE(SELF);
 
         /* Do the composition. */
         Parrot_ComposeRole(interp, role, PMCNULL, 0, PMCNULL, 0,
@@ -385,7 +385,7 @@ composed into this role.
 */
 
     VTABLE PMC *inspect_str(STRING *what) {
-        Parrot_Role * const role  = PARROT_ROLE(SELF);
+        Parrot_Role_attributes * const role  = PARROT_ROLE(SELF);
 
         /* What should we return? */
         PMC         *found;
@@ -467,7 +467,7 @@ Return the name of the role (without the HLL namespace).
 */
 
     VTABLE STRING *get_string() {
-        Parrot_Role * const role  = PARROT_ROLE(SELF);
+        Parrot_Role_attributes * const role  = PARROT_ROLE(SELF);
         PMC         * const _namespace = role->_namespace;
 
         if (!PMC_IS_NULL(_namespace)) {
@@ -498,7 +498,7 @@ Returns whether the class does the role with the given C<*rolename>.
 */
     INTVAL does(STRING *role_name)
     {
-        Parrot_Role * const role  = PARROT_ROLE(SELF);
+        Parrot_Role_attributes * const role  = PARROT_ROLE(SELF);
         INTVAL      i, count;
 
         if (string_equal(interp, role->name, role_name) == 0)
@@ -525,7 +525,7 @@ Returns whether the class does the givne C<*role>.
 */
     INTVAL does_pmc(PMC *role)
     {
-        Parrot_Role * const this_role  = PARROT_ROLE(SELF);
+        Parrot_Role_attributes * const this_role  = PARROT_ROLE(SELF);
         INTVAL      i, count;
 
         if (role == SELF)
@@ -566,7 +566,7 @@ Sets the name of the role, and updates the namespace accoringly.
 */
 
     METHOD name(STRING *name :optional, int got_name :opt_flag) {
-        Parrot_Role *role     = PARROT_ROLE(SELF);
+        Parrot_Role_attributes *role     = PARROT_ROLE(SELF);
         STRING      *ret_name = NULL;
 
         if (got_name) {
@@ -594,7 +594,7 @@ Gets the namespace associated with this role, if any.
 */
 
     METHOD get_namespace() {
-        Parrot_Role *role          = PARROT_ROLE(SELF);
+        Parrot_Role_attributes *role          = PARROT_ROLE(SELF);
         PMC         *ret_namespace = role->_namespace;
         RETURN(PMC *ret_namespace);
     }
@@ -699,7 +699,7 @@ Compose the given role into this one, using the given exclusions and aliases.
             int  got_exclude_method :opt_flag,
             PMC *alias_method       :optional :named("alias_method"),
             int  got_alias_method   :opt_flag) {
-        Parrot_Role *role_info = PARROT_ROLE(SELF);
+        Parrot_Role_attributes *role_info = PARROT_ROLE(SELF);
         STRING *s_name, *r_name;
 
         (STRING *s_name) = PCCINVOKE(interp, SELF, "name");

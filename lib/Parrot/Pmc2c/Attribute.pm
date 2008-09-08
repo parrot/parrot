@@ -57,7 +57,7 @@ sub generate_start {
     $h->emit(<<"EOH");
 
 /* $name PMC's underlying struct. */
-typedef struct Parrot_${name} {
+typedef struct Parrot_${name}_attributes {
 EOH
 
     return 1;
@@ -76,10 +76,10 @@ sub generate_end {
     my $ucname         = uc($name);
 
     $h->emit(<<"EOH");
-} Parrot_${name};
+} Parrot_${name}_attributes;
 
 /* Macro to access underlying structure of a $name PMC. */
-#define PARROT_${ucname}(o) ((Parrot_${name} *) PMC_data(o))
+#define PARROT_${ucname}(o) ((Parrot_${name}_attributes *) PMC_data(o))
 
 EOH
 
@@ -146,7 +146,7 @@ EOA
     $decl .= <<"EOA";
         } \\
         else \\
-            (dest) = ((Parrot_${pmcname} *)PMC_data(pmc))->$attrname; \\
+            (dest) = ((Parrot_${pmcname}_attributes *)PMC_data(pmc))->$attrname; \\
         }
 
 #define SETATTR_${pmcname}_${attrname}(interp, pmc, value) \\
@@ -196,7 +196,7 @@ EOA
     $decl .= <<"EOA";
         } \\
         else \\
-            ((Parrot_${pmcname} *)PMC_data(pmc))->$attrname = (value); \\
+            ((Parrot_${pmcname}_attributes *)PMC_data(pmc))->$attrname = (value); \\
     }
 
 EOA

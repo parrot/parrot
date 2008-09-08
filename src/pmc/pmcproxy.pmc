@@ -76,10 +76,10 @@ Initializes a PMCProxy PMC.
 */
 
     VTABLE void init() {
-        Parrot_Class * const _pmc          = mem_allocate_zeroed_typed(Parrot_Class);
-        PMC          * const new_attribute = pmc_new(interp, enum_class_Hash);
-        STRING       * const name          = CONST_STRING(interp, "proxy");
-        PMC_data(SELF)                     = _pmc;
+        Parrot_Class_attributes * const _pmc = mem_allocate_zeroed_typed(Parrot_Class_attributes);
+        PMC          * const new_attribute   = pmc_new(interp, enum_class_Hash);
+        STRING       * const name            = CONST_STRING(interp, "proxy");
+        PMC_data(SELF)                       = _pmc;
 
         /* Set flags for custom DOD mark and destroy. */
         PObj_custom_mark_SET(SELF);
@@ -113,7 +113,7 @@ Initializes a PMCProxy PMC.
 
     VTABLE void init_pmc(PMC *init_data) {
         const INTVAL type_num = VTABLE_get_integer(interp, init_data);
-        Parrot_Class *proxy_info;
+        Parrot_Class_attributes *proxy_info;
 
         /* Ensure that it's a valid type number. */
         if (type_num > interp->n_vtable_max || type_num <= 0)
@@ -155,7 +155,7 @@ Creates an instance of the PMC.
 
 */
     VTABLE PMC *instantiate(PMC *init) {
-        Parrot_Class * const _pmc = PARROT_CLASS(SELF);
+        Parrot_Class_attributes * const _pmc = PARROT_CLASS(SELF);
 
         if (!PMC_IS_NULL(init))
             return pmc_new_init(interp, _pmc->id, init);
@@ -188,7 +188,7 @@ Mark any referenced strings and PMCs in the structure as live.
 */
 
     VTABLE void mark() {
-        Parrot_Class * const _pmc = PARROT_CLASS(SELF);
+        Parrot_Class_attributes * const _pmc = PARROT_CLASS(SELF);
 
         if (_pmc->name)
             pobject_lives(interp, (PObj *)_pmc->name);
@@ -227,7 +227,7 @@ Returns whether the class is or inherits from C<*classname>.
 */
 
     VTABLE INTVAL isa_pmc(PMC *lookup) {
-        Parrot_Class * const _proxy = PARROT_CLASS(SELF);
+        Parrot_Class_attributes * const _proxy = PARROT_CLASS(SELF);
         INTVAL        i, num_classes;
         STRING       *classname;
         PMC          *classobj;
@@ -301,7 +301,7 @@ Returns whether the class does the role with the given C<*rolename>.
 */
 
     VTABLE INTVAL does(STRING *role_name) {
-        Parrot_Class *_class  = PARROT_CLASS(SELF);
+        Parrot_Class_attributes *_class  = PARROT_CLASS(SELF);
         INTVAL        id      = _class->id;
         PMC          *proxied = pmc_new_noinit(interp, id);
 
@@ -324,7 +324,7 @@ Returns the integer type of the class.
 
 
     VTABLE INTVAL type() {
-        const Parrot_Class * const _class = PARROT_CLASS(SELF);
+        const Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
         return _class->id;
     }
 
@@ -365,7 +365,7 @@ Gets the name of the PMC.
 
 */
     METHOD name() {
-        Parrot_Class * const _pmc     = PARROT_CLASS(SELF);
+        Parrot_Class_attributes * const _pmc     = PARROT_CLASS(SELF);
         STRING       * const ret_name = _pmc->name;
         RETURN(STRING *ret_name);
     }
@@ -380,7 +380,7 @@ Gets the namespace that this class is attached to.
 
 */
     METHOD get_namespace() {
-        Parrot_Class * const _pmc          = PARROT_CLASS(SELF);
+        Parrot_Class_attributes * const _pmc          = PARROT_CLASS(SELF);
         PMC          * const ret_namespace = _pmc->_namespace;
         RETURN(PMC *ret_namespace);
     }
@@ -459,7 +459,7 @@ Return the name of the low-level class (without the HLL namespace).
 */
 
     VTABLE STRING *get_string() {
-        Parrot_Class * const proxy_info = PARROT_CLASS(SELF);
+        Parrot_Class_attributes * const proxy_info = PARROT_CLASS(SELF);
 
         /* Copy the stored string name of the proxy. */
         return string_copy(interp, proxy_info->name);

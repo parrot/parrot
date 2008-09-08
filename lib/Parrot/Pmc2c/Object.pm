@@ -101,8 +101,8 @@ sub body {
     my $generated = <<EOC;
 $l
 $decl {
-    Parrot_Object * const obj    = PARROT_OBJECT(pmc);
-    Parrot_Class  * const _class = PARROT_CLASS(obj->_class);
+    Parrot_Object_attributes * const obj    = PARROT_OBJECT(pmc);
+    Parrot_Class_attributes  * const _class = PARROT_CLASS(obj->_class);
 
     /* Walk and search for the vtable method. */
     const int num_classes       = VTABLE_elements(interp, _class->all_parents);
@@ -124,7 +124,7 @@ EOC
     # since it's unsafe.
     if ( $meth !~ /get_pointer/ ) {
         $generated .= <<EOC;
-            const Parrot_Class * const class_info = PARROT_CLASS(cur_class);
+            const ParrotClass_attributes * const class_info = PARROT_CLASS(cur_class);
             if (VTABLE_exists_keyed_str(interp, class_info->vtable_overrides, CONST_STRING_GEN(interp, "$meth"))) {
                 /* Found it; call. */
                 PMC * const meth = VTABLE_get_pmc_keyed_str(interp,

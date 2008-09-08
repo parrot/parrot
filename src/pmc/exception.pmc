@@ -81,8 +81,8 @@ Initializes the exception with default values.
 */
 
     VTABLE void init() {
-        Parrot_Exception * const core_struct =
-            mem_allocate_zeroed_typed(Parrot_Exception);
+        Parrot_Exception_attributes * const core_struct =
+            mem_allocate_zeroed_typed(Parrot_Exception_attributes);
 
         /* Set flags for custom DOD mark and destroy. */
         PObj_custom_mark_SET(SELF);
@@ -110,8 +110,8 @@ Initializes the exception with supplied values.
 */
 
     VTABLE void init_pmc(PMC *values) {
-        Parrot_Exception * const core_struct =
-            mem_allocate_zeroed_typed(Parrot_Exception);
+        Parrot_Exception_attributes * const core_struct =
+            mem_allocate_zeroed_typed(Parrot_Exception_attributes);
         INTVAL ishash = VTABLE_isa(interp, values, CONST_STRING(interp, 'Hash'));
 
         /* Set flags for custom DOD mark and destroy. */
@@ -144,7 +144,7 @@ Mark any active exception data as live.
 */
 
     VTABLE void mark() {
-        Parrot_Exception * const core_struct = PARROT_EXCEPTION(SELF);
+        Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
         if (core_struct->message)
             pobject_lives(interp, (PObj *)core_struct->message);
         if (core_struct->payload)
@@ -168,7 +168,7 @@ Destroys the exception.
 */
 
     VTABLE void destroy() {
-        Parrot_Exception * const core_struct = PARROT_EXCEPTION(SELF);
+        Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
 
         if (core_struct)
             mem_sys_free(core_struct);
@@ -201,7 +201,7 @@ Returns the id of the exception.
 */
 
     VTABLE INTVAL get_integer() {
-        Parrot_Exception * const exception = PARROT_EXCEPTION(SELF);
+        Parrot_Exception_attributes * const exception = PARROT_EXCEPTION(SELF);
         return exception->id;
     }
 
@@ -472,7 +472,7 @@ Store a context for the handler iterator.
 */
 
     VTABLE void set_pointer(void *context) {
-        Parrot_Exception * const core_struct = PARROT_EXCEPTION(SELF);
+        Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
 
         /* contexts are refcounted; increment and decrement appropriately */
         if (core_struct->handler_ctx)
@@ -492,7 +492,7 @@ Retrieve a context stored for the handler iterator.
 */
 
     VTABLE void *get_pointer() {
-        Parrot_Exception * const core_struct = PARROT_EXCEPTION(SELF);
+        Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
         return core_struct->handler_ctx;
     }
 
@@ -654,7 +654,7 @@ Set this PMC as shared.
 
     VTABLE PMC *share_ro() {
         PMC *shared_self;
-        Parrot_Exception *shared_struct;
+        Parrot_Exception_attributes *shared_struct;
 
         if (PObj_is_PMC_shared_TEST(SELF))
             return SELF;

@@ -71,7 +71,7 @@ Initializes the userdata.
 
 */
     void init() {
-        Parrot_LuaUserdata *u = mem_allocate_zeroed_typed(Parrot_LuaUserdata);
+        Parrot_LuaUserdata_attributes *u = mem_allocate_zeroed_typed(Parrot_LuaUserdata_attributes);
         PMC_data(SELF) = u;
         u_env(SELF) = getcurrenv(INTERP);
         PMC_metadata(SELF) = NULL;
@@ -106,7 +106,7 @@ Call finalizer and free the userdata.
 
 */
     void destroy() {
-        Parrot_LuaUserdata *u = PARROT_LUAUSERDATA(SELF);
+        Parrot_LuaUserdata_attributes *u = PARROT_LUAUSERDATA(SELF);
         PMC *meth = find_meth(INTERP, SELF, "__gc");
 
         if (meth)

@@ -109,10 +109,10 @@ Initializes an Exporter PMC.
 */
 
     VTABLE void init() {
-        Parrot_Exporter *exp = NULL;
+        Parrot_Exporter_attributes *exp = NULL;
 
         /* Set up the object. */
-        exp                  = mem_allocate_zeroed_typed(Parrot_Exporter);
+        exp                  = mem_allocate_zeroed_typed(Parrot_Exporter_attributes);
         exp->ns_src          = PMCNULL;
         exp->ns_dest         = CONTEXT(interp)->current_namespace;
         exp->globals         = PMCNULL;
@@ -150,7 +150,7 @@ Mark referenced strings and PMCs in the structure as live.
 */
 
     VTABLE void mark() {
-        Parrot_Exporter *exp = PARROT_EXPORTER(SELF);
+        Parrot_Exporter_attributes *exp = PARROT_EXPORTER(SELF);
 
         if (exp->ns_src)
             pobject_lives(interp, (PObj *)exp->ns_src);

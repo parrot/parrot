@@ -72,7 +72,7 @@ other fields.
         SUPER();                                /* _struct_val := Hash */
         PMC_pmc_val(SELF)              = NULL;  /* parent */
         PMC_data(SELF)                 =
-                mem_allocate_zeroed_typed(Parrot_NameSpace);
+                mem_allocate_zeroed_typed(Parrot_NameSpace_attributes);
         PARROT_NAMESPACE(SELF)->vtable = PMCNULL;
         PARROT_NAMESPACE(SELF)->_class = PMCNULL;
     }
@@ -87,7 +87,7 @@ Marks the namespace as live.
 
 */
     VTABLE void mark() {
-        Parrot_NameSpace * const nsinfo = PARROT_NAMESPACE(SELF);
+        Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
         SUPER();
         if (PMC_pmc_val(SELF))
             pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
@@ -170,7 +170,7 @@ really a public API.
 
         /* If it's a sub... */
         if (!PMC_IS_NULL(value) && VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Sub"))) {
-            Parrot_NameSpace * const nsinfo   = PARROT_NAMESPACE(SELF);
+            Parrot_NameSpace_attributes * const nsinfo   = PARROT_NAMESPACE(SELF);
             PMC              *       vtable   = nsinfo->vtable;
             Parrot_sub       * const sub      = PMC_sub(value);
             PMC              * const classobj = VTABLE_get_class(interp, SELF);
@@ -228,7 +228,7 @@ really a public API.
 
         /* If it's an NCI method */
         if (value->vtable->base_type == enum_class_NCI) {
-            Parrot_NameSpace * const nsinfo   = PARROT_NAMESPACE(SELF);
+            Parrot_NameSpace_attributes * const nsinfo   = PARROT_NAMESPACE(SELF);
             PMC              * const classobj = VTABLE_get_class(interp, SELF);
 
             /* Insert it in class, if there is a class */
@@ -251,7 +251,7 @@ really a public API.
         if (value->vtable->base_type == enum_class_MultiSub) {
 
             if (VTABLE_elements(interp, value) > 0) {
-                Parrot_NameSpace * const nsinfo = PARROT_NAMESPACE(SELF);
+                Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
                 PMC * const classobj = VTABLE_get_class(interp, SELF);
 
                 /* Extract the first alternate and check if it is a method */
@@ -306,7 +306,7 @@ really a public API.
 
         if (val_is_NS) {
             /* TODO - this hack needs to go */
-            Parrot_NameSpace *nsinfo = PARROT_NAMESPACE(value);
+            Parrot_NameSpace_attributes *nsinfo = PARROT_NAMESPACE(value);
             PMC_pmc_val(value)       = SELF;  /* set parent */
             nsinfo->name             = key;   /* and name */
 
@@ -409,7 +409,7 @@ really a public API.
     }
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
-        Parrot_NameSpace * const nsinfo = PARROT_NAMESPACE(SELF);
+        Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
         PMC              * const vtable = nsinfo->vtable;
 
         if (PMC_IS_NULL(vtable))
@@ -505,7 +505,7 @@ Return the name of this namespace part.
 */
 
     VTABLE STRING *get_string() {
-        const Parrot_NameSpace * const nsinfo = PARROT_NAMESPACE(SELF);
+        const Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
         return nsinfo->name;
     }
 
@@ -602,7 +602,7 @@ Returns the name of the namespace as an array of strings.
         PMC *ns        = SELF;
 
         while (ns) {
-            Parrot_NameSpace *nsinfo = PARROT_NAMESPACE(ns);
+            Parrot_NameSpace_attributes *nsinfo = PARROT_NAMESPACE(ns);
             VTABLE_unshift_string(INTERP, ar, nsinfo->name);
             ns = PMC_pmc_val(ns);
         }
@@ -898,7 +898,7 @@ Returns the class or role PMC that is associated with this namespace.
 */
 
     METHOD get_class() {
-        Parrot_NameSpace * const nsinfo = PARROT_NAMESPACE(SELF);
+        Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
         PMC              *ret_class     = nsinfo->_class;
 
         if (PMC_IS_NULL(ret_class))
@@ -933,7 +933,7 @@ the namespace.
 */
 
     METHOD get_associated_methods() {
-        Parrot_NameSpace * const nsinfo      = PARROT_NAMESPACE(SELF);
+        Parrot_NameSpace_attributes * const nsinfo      = PARROT_NAMESPACE(SELF);
         PMC              * const ret_methods = nsinfo->methods;
 
         nsinfo->methods = PMCNULL;
@@ -953,7 +953,7 @@ from the namespace.
 */
 
     METHOD get_associated_vtable_methods() {
-        Parrot_NameSpace * const nsinfo      = PARROT_NAMESPACE(SELF);
+        Parrot_NameSpace_attributes * const nsinfo      = PARROT_NAMESPACE(SELF);
         PMC              * const ret_methods = nsinfo->vtable;
 
         nsinfo->vtable = PMCNULL;

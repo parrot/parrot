@@ -48,8 +48,8 @@ Initializes a concurrency scheduler object.
 */
 
     VTABLE void init() {
-        Parrot_Scheduler * const core_struct =
-            mem_allocate_zeroed_typed(Parrot_Scheduler);
+        Parrot_Scheduler_attributes * const core_struct =
+            mem_allocate_zeroed_typed(Parrot_Scheduler_attributes);
 
         /* Set flags for custom DOD mark and destroy. */
         PObj_custom_mark_SET(SELF);
@@ -89,7 +89,7 @@ An C<Integer> representing the unique identifier for this scheduler.
 
     VTABLE void init_pmc(PMC *data) {
         PMC              *elem;
-        Parrot_Scheduler *core_struct;
+        Parrot_Scheduler_attributes *core_struct;
 
         if (!VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Hash")))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -117,7 +117,7 @@ current maximum, and a birthtime of the current time.
 */
 
     void push_pmc(PMC *task) {
-        Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
+        Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
         STRING                  *task_id_str;
         INTVAL                   new_tid;
 
@@ -155,7 +155,7 @@ recalculates it before retrieving the next task.
 */
 
     VTABLE PMC *pop_pmc() {
-        Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
+        Parrot_Scheduler_attributes * core_struct = PARROT_SCHEDULER(SELF);
         PMC *task = PMCNULL;
 
         /* Pull the next valid task off the task list, skipping expired and
@@ -184,7 +184,7 @@ Retrieves the number of pending tasks in the scheduler's task list.
 */
 
     VTABLE INTVAL get_integer() {
-        Parrot_Scheduler * core_struct = PARROT_SCHEDULER(SELF);
+        Parrot_Scheduler_attributes * core_struct = PARROT_SCHEDULER(SELF);
         return VTABLE_elements(INTERP, core_struct->task_index);
     }
 
@@ -200,7 +200,7 @@ Removes the task with the given task ID from the task list.
 */
 
     VTABLE void delete_keyed_int(INTVAL key) {
-        Parrot_Scheduler *core_struct = PARROT_SCHEDULER(SELF);
+        Parrot_Scheduler_attributes *core_struct = PARROT_SCHEDULER(SELF);
         STRING           *task_id_str = string_from_int(INTERP, key);
         VTABLE_delete_keyed_str(INTERP, core_struct->task_list, task_id_str);
         SCHEDULER_cache_valid_CLEAR(SELF);
@@ -219,7 +219,7 @@ Sets this PMC as shared.
 
     VTABLE PMC *share_ro() {
         PMC              *shared_self;
-        Parrot_Scheduler *sched;
+        Parrot_Scheduler_attributes *sched;
 
         if (PObj_is_PMC_shared_TEST(SELF))
             return SELF;
@@ -247,7 +247,7 @@ Frees the scheduler's underlying struct.
 
 */
     VTABLE void destroy() {
-        Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
+        Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
         MUTEX_DESTROY(core_struct->msg_lock);
         mem_sys_free(core_struct);
     }
@@ -264,7 +264,7 @@ Marks any referenced strings and PMCs as live.
 */
     VTABLE void mark() {
         if (PARROT_SCHEDULER(SELF)) {
-            Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
+            Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
 
             if (core_struct->task_list)
                 pobject_lives(interp, (PObj *)core_struct->task_list);
@@ -293,7 +293,7 @@ C<*info> is the visit info (see F<include/parrot/pmc_freeze.h>).
 */
 
     VTABLE void visit(visit_info *info) {
-        Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
+        Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
         PMC **pos;
 
         /* 1) visit task list */
@@ -320,7 +320,7 @@ Archives the scheduler.
 
     VTABLE void freeze(visit_info *info) {
         IMAGE_IO *io = info->image_io;
-        Parrot_Scheduler * const core_struct = PARROT_SCHEDULER(SELF);
+        Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
 
         /* 1) freeze scheduler id */
         VTABLE_push_integer(INTERP, io, core_struct->id);
@@ -398,7 +398,7 @@ Adds a handler to the scheduler.
 */
 
     METHOD add_handler(PMC *handler) {
-        Parrot_Scheduler *core_struct = PARROT_SCHEDULER(SELF);
+        Parrot_Scheduler_attributes *core_struct = PARROT_SCHEDULER(SELF);
         VTABLE_unshift_pmc(INTERP, core_struct->handlers, handler);
     }
 

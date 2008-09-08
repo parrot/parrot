@@ -230,8 +230,9 @@ of a C<pmclass> or C<prole> declaration.
 
   ATTR <type> <name> [ :<modifier> ... ];
 
-This declaration is used to generate the data struct for the PMC (named
-"Parrot_<pmcname>_Data"). The data struct incorporates any attributes declared
+This declaration is used to generate the data struct for the PMC
+(named "Parrot_<pmcname>_attributes").
+The data struct incorporates any attributes declared
 in a composed role or inherited class. Composed attributes are inserted at the
 end of the generated struct. Inherited attributes are inserted at the top of
 the generated struct, so the struct members shared by the parent and child are
