@@ -549,6 +549,10 @@ D: Miscellaneous cleanup and PDD07-conformance
 N: Ovid
 D: Rename 'pbc_to_c' to 'pbc_to_exe'
 
+N: Paco Alguacil
+D: Building on various platorms
+E: paco.linux@gmail.com
+
 N: Pancake
 D: Fixes for pdb, the Parrot debugger
 
