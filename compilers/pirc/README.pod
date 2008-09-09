@@ -393,7 +393,8 @@ that'd be helpful:
 
 =item * how are labels represented, as addresses/offsets (just plain integers)?
 
-=item * related: how is a jump/goto/branch instruction implemented? Will this take a integer operand?
+=item * related: how is a jump/goto/branch instruction implemented?
+Will this take a integer operand?
 
 =item * how are named args/params handled/represented in bytecode?
 
