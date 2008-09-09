@@ -7,10 +7,16 @@ xlibtest.pl - A test of Xlib.pir usage from nqp
 
 =head1 SYNOPSYS
 
+This is an initial version, be careful and not expect too much.
+
+Compile Xlib.pir to Xlib.pbc before usage:
+
+    ../../parrot -o Xlib.pbc Xlib.pir
+
 To run this file, execute the following command from the
 current directory:
 
-../../parrot ../../compilers/nqp/nqp.pbc xlibtest.nqp
+    ../../parrot ../../compilers/nqp/nqp.pbc xlibtest.nqp
 
 Press any key to exit.
 
@@ -44,6 +50,9 @@ my $lastx := 0;
 my $lasty := 0;
 my $pressed := 0;
 
+my @points;
+my @lines;
+
 while ($type != 17) {
     $display.NextEvent($event);
     $type := $event.type();
@@ -51,6 +60,8 @@ while ($type != 17) {
         $x := $event.x();
         $y := $event.y();
         $window.DrawPoint($x, $y);
+        @points.push($x);
+        @points.push($y);
     $lastx := $x;
     $lasty := $y;
     $pressed := 1;
@@ -58,20 +69,38 @@ while ($type != 17) {
     if ($type == 5) {
         $pressed := 0;
     }
-    if ($type == 6 && $pressed) {
+    elsif ($type == 6 && $pressed) {
         $x := $event.x();
         $y := $event.y();
         $window.DrawLine($lastx, $lasty, $x, $y);
+        @lines.push($lastx);
+        @lines.push($lasty);
+        @lines.push($x);
+        @lines.push($y);
         $lastx := $x;
         $lasty := $y;
     }
-    if ($type == 2) {
+    elsif ($type == 2) {
         $window.Unmap();
         $window.Destroy();
     }
-    if ($type == 33) {
+    elsif ($type == 33) {
         $window.Unmap();
         $window.Destroy();
+    }
+    elsif $type == 12 {
+        say("Redrawing...");
+        my $i := 0;
+        while ($i < @points) {
+            $window.DrawPoint(@points[$i], @points[$i+1]);
+            $i :=  $i + 2;
+        }
+        $i := 0;
+        while ($i < @lines) {
+            $window.DrawLine(@lines[$i], @lines[$i+1],
+                             @lines[$i+2], @lines[$i+3]);
+            $i := $i + 4;
+        }
     }
 }
 
@@ -80,9 +109,4 @@ $display.Close();
 say("Bye");
 
 
-#-----------------------------------------------------------------------
-# Local Variables:
-#   mode: pir
-#   fill-column: 100
-# End:
-# vim: expandtab shiftwidth=4 ft=pir:
+# vim: expandtab shiftwidth=4 ft=perl6:
