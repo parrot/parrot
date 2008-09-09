@@ -180,7 +180,7 @@ pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - lexpad interop" )
     foo()
 .end
 .sub foo
-    .lex 'a', $P0               # statix lexical
+    .lex 'a', $P0               # static lexical
     $P0 = new 'String'
     $P0 = "ok 1\n"
     $P1 = find_lex 'a'
