@@ -12,6 +12,7 @@
 #include "pirparser.h"
 #include "pircompiler.h"
 
+
 /* use pthreads library to test thread safety.
    does not work currently on windows.
    The check for _MSC_VER is not correct but works for me.

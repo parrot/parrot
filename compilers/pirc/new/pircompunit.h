@@ -323,7 +323,7 @@ target *set_curtarget(struct lexer_state * const lexer, target * const t);
 argument *set_curarg(struct lexer_state * const lexer, argument * const arg);
 
 /* target constructors */
-target *add_target(struct lexer_state *lexer, target *t1, target * const t);
+target *add_target(struct lexer_state * const lexer, target *t1, target * const t);
 target *reg(struct lexer_state * const lexer, pir_type type, int regno);
 target *new_target(pir_type type, char * const name);
 
@@ -345,14 +345,13 @@ target *target_from_symbol(struct symbol * const sym);
 key *new_key(expression * const expr);
 key *add_key(key *keylist, expression * const newkey);
 
-void set_pragma(int which_one, int value);
 void load_library(struct lexer_state * const lexer, char * const library);
-void set_hll(char * const hll);
-void set_hll_map(char * const stdtype, char * const hlltype);
+void set_hll(struct lexer_state * const lexer, char * const hll);
+void set_hll_map(struct lexer_state * const lexer, char * const stdtype, char * const hlltype);
 void set_sub_flag(struct lexer_state *lexer, sub_flag flag);
 
 /* constructor and functions for setting instruction fields */
-void new_instr(struct lexer_state *lexer);
+void new_statement(struct lexer_state *lexer);
 void set_label(struct lexer_state * const lexer, char * const label);
 void set_instr(struct lexer_state * const lexer, char * const opname);
 void set_instrf(struct lexer_state * const lxr, char * const op, char const * const fmt, ...);
@@ -360,7 +359,16 @@ void unshift_operand(struct lexer_state * const lexer, expression * const operan
 void push_operand(struct lexer_state * const lexer, expression * const operand);
 
 char *get_instr(struct lexer_state * const lexer);
-void get_operands(lexer_state *lexer, int n, ...);
+void get_operands(struct lexer_state * const lexer, unsigned n, ...);
+expression *get_operand(struct lexer_state * const lexer, unsigned n);
+
+unsigned get_operand_count(struct lexer_state * const lexer);
+
+void update_instr(struct lexer_state * const lexer, char * const newop);
+
+void remove_operand(struct lexer_state * const lexer, unsigned index);
+void remove_all_operands(struct lexer_state * const lexer);
+
 
 void set_lex_flag(target * const t, char * const lexname);
 char *get_inverse(char * const instr);

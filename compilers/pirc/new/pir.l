@@ -45,7 +45,6 @@ easier to maintain, and preferable.
 #include <assert.h>
 #include "pirparser.h"
 #include "pircompiler.h"
-#include "pirsymbol.h"
 #include "piryy.h"
 
 
@@ -185,7 +184,7 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 /* always show warnings if something's wrong with our spec. */
 %option warn
 
-/* create a scanner in debug mode */
+/* create a scanner in debug mode; XXX remove this in production build. */
 %option debug
 
 
@@ -235,11 +234,15 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
                     return TK_CONC;
                   }
 
-{WS}"."           { /* $P0 .$P1 means concatenation */
+{WS}"."           { /* $P0 .$P1 means error; either space on both side or none at all. */
+                    yyerror(yyscanner, yyget_extra(yyscanner),
+                          "ambiguous '.'; must be enclosed in space on both sides or none at all.");
                     return TK_CONC;
                   }
 
-"."{WS}           { /* $P0. $P1 means concatenation */
+"."{WS}           { /* $P0. $P1 means error; see {WS}"." */
+                    yyerror(yyscanner, yyget_extra(yyscanner),
+                          "ambiguous '.'; must be enclosed in space on both sides or none at all.");
                     return TK_CONC;
                   }
 

@@ -1,7 +1,3 @@
-/*
- * $Id$
- * Copyright (C) 2008, The Perl Foundation.
- */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -14,9 +10,8 @@
 
 /*
 
-=head1 FUNCTIONS
+=over 4
 
-=over
 
 =item C<lexer_state *
 new_lexer(char * const filename)>
