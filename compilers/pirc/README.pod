@@ -370,19 +370,6 @@ when replacing IMCC with PIRC:
 
 =over 4
 
-=item * is_op
-
-PIRC needs a function to decide whether an identifier is an instruction. IMCC
-uses a function is_op that does this. For this to work, libparrot must be
-linked in, and I'm having trouble doing this.
-
-=item * instruction code
-
-The PIR compiler can already decide what variant of an instruction must be used;
-for instance, for C<set $I0, 42> the C<set_i_ic> variant must be selected.
-However, the actual opcode for an instruction must be retrieved, because these
-must be written to a PBC file.
-
 =item * PIR sub storage
 
 PIR subs are stored as PMC constants in the constant table, but it is not clear
@@ -396,6 +383,35 @@ There must be a proper bytecode API for PIRC to use.
 
 Flags such as C<:immediate> must be implemented; a sub that is marked with the
 C<:immediate> flag must be run immediately after compilation.
+
+=back
+
+At this moment, the following things are unclear to me; if anybody can answer these,
+that'd be helpful:
+
+=over 4
+
+=item * how are labels represented, as addresses/offsets (just plain integers)?
+
+=item * related: how is a jump/goto/branch instruction implemented? Will this take a integer operand?
+
+=item * how are named args/params handled/represented in bytecode?
+
+=back
+
+The following are some ideas for the near future:
+
+=over 4
+
+=item * simplify the instruction struct by removing the union, so that invocation struct objects
+are no longer stored there. Once completely parsed, a invocation struct should be converted into
+a stream of normal instructions. This way, they will also participate in the vanilla register
+allocator.
+
+=item * when parsing is done, we know the total number of instructions (or we can easily count this,
+by incrementing a counter in the instruction constructor). Then we can create an array, and convert
+the linked list of instructions into an array of instructions. This would allow to easily index
+this array and calculate offsets (labels etc.) and such.
 
 =back
 
