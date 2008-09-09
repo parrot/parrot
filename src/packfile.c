@@ -3742,12 +3742,16 @@ directory.
 
 PARROT_API
 void
-Parrot_load_bytecode(PARROT_INTERP, ARGIN(STRING *file_str))
+Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(STRING *file_str))
 {
     char *filename;
     STRING *wo_ext, *ext, *pbc, *path;
     enum_runtime_ft file_type;
     PMC *is_loaded_hash;
+
+    if (STRING_IS_NULL(file_str))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+            "\"load_bytecode\" no file name");
 
     parrot_split_path_ext(interp, file_str, &wo_ext, &ext);
     /* check if wo_ext is loaded */

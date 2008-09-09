@@ -596,9 +596,8 @@ void Parrot_destroy_constants(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_API
-void Parrot_load_bytecode(PARROT_INTERP, ARGIN(STRING *file_str))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+void Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(STRING *file_str))
+        __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
