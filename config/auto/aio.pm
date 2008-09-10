@@ -49,14 +49,13 @@ sub runstep {
 
     my $errormsg = _first_probe_for_aio($conf, $verbose);
     if ( ! $errormsg ) {
-        my $test = $conf->cc_run(1);  # Use signal RTMIN + 1
+        my $test = $conf->cc_run();
 
         # if the test is failing with sigaction err
         # we should repeat it with a different signal number
         # This is currently not implemented.
         if (
-            $test =~ /SIGRTMIN=(\d+)\sSIGRTMAX=(\d+)\n
-                INFO=42\n
+            $test =~ /INFO=42\n
                 ok/x
             )
         {
@@ -66,8 +65,6 @@ sub runstep {
             $conf->data->set(
                 aio        => 'define',
                 HAS_AIO    => 1,
-                D_SIGRTMIN => $1,
-                D_SIGRTMAX => $2,
             );
         }
         else {
