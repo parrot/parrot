@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 
 =head1 NAME
 
@@ -72,6 +72,18 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'say with a temporary number register' );
 .end
 CODE
 1.414000
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'say and print with a number register' );
+.sub main
+    $N0 = 3.14159
+    say $N0
+    print $N0
+    print "\n"
+.end
+CODE
+3.141590
+3.141590
 OUTPUT
 
 # Local Variables:
