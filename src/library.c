@@ -493,6 +493,32 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
 
 /*
 
+=item C<void Parrot_add_library_path>
+
+Add a path to the library searchpath of the given type.
+
+TODO:
+  - allow path to be a list of paths.
+
+=cut
+
+*/
+
+PARROT_API
+void
+Parrot_add_library_path(PARROT_INTERP, ARGIN(const char *path),
+        enum_runtime_ft which)
+{
+    PMC * const iglobals = interp->iglobals;
+    PMC * const lib_paths = VTABLE_get_pmc_keyed_int(interp, iglobals,
+        IGLOBALS_LIB_PATHS);
+    PMC * paths = VTABLE_get_pmc_keyed_int(interp, lib_paths, which);
+    STRING * const path_str = string_from_cstring(interp, path, 0);
+    VTABLE_push_string(interp, paths, path_str);
+}
+
+/*
+
 =item C<STRING* Parrot_locate_runtime_file_str>
 
 Locate the full path for C<file_name> and the given file type(s). If

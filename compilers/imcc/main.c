@@ -187,6 +187,8 @@ help(void)
     "  Options:\n"
     "    -h --help\n"
     "    -V --version\n"
+    "    -I add path to include search\n"
+    "    -L add path to library search\n"
     "   <Run core options>\n"
     "    -R --runcore CORE\n"
     "    -b --bounds-checks|--slow-core\n"
@@ -266,6 +268,8 @@ static struct longopt_opt_decl options[] = {
     { 'D', 'D', OPTION_optional_FLAG, { "--parrot-debug" } },
     { 'E', 'E', (OPTION_flags)0, { "--pre-process-only" } },
     { 'G', 'G', (OPTION_flags)0, { "--no-gc" } },
+    { 'I', 'I', OPTION_required_FLAG, { NULL } },
+    { 'L', 'L', OPTION_required_FLAG, { NULL } },
     { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
     { 'R', 'R', OPTION_required_FLAG, { "--runcore" } },
     { 'S', 'S', (OPTION_flags)0, { "--switched-core" } },
@@ -521,6 +525,14 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                 break;
             case OPT_DESTROY_FLAG:
                 SET_FLAG(PARROT_DESTROY_FLAG);
+                break;
+            case 'I':
+                Parrot_add_library_path(interp, opt.opt_arg,
+                    PARROT_LIB_PATH_INCLUDE);
+                break;
+            case 'L':
+                Parrot_add_library_path(interp, opt.opt_arg,
+                    PARROT_LIB_PATH_LIBRARY);
                 break;
             default:
                 Parrot_ex_throw_from_c_args(interp, NULL, 1,
