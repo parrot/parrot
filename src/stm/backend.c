@@ -1055,7 +1055,7 @@ for verifying that any outer transaction is invalid after calling this.
 (Not yet implemented. Right now just aborts.)
 
 returns true if we still need to wait, false if we're already done.
-assumes transcation is _not_ yet aborted.
+assumes transaction is _not_ yet aborted.
 
 =cut
 

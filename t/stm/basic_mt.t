@@ -214,7 +214,7 @@ OUTPUT
 
 }    #skip x86_64
 
-pir_output_is( <<'CODE', <<'OUTPUT', "wait + invalidate outer transcation" );
+pir_output_is( <<'CODE', <<'OUTPUT', "wait + invalidate outer transaction" );
 .const int N = 50
 .sub waiter
     .param pmc a
@@ -227,7 +227,7 @@ tx:
     print "okay\n"
     .return ()
 retry:
-    # we start a nested transcation here;
+    # we start a nested transaction here;
     # the only we we ill get out of this loop
     # is if stm_wait jumps to 'invalid'.
     stm_start
