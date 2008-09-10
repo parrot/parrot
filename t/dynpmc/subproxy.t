@@ -11,11 +11,11 @@ use Parrot::Config;
 
 =head1 NAME
 
-t/dynpmc/sub.t - test if Sub is overridable by .HLL_map
+t/dynpmc/subproxy.t - test if Sub is overridable by .HLL_map
 
 =head1 SYNOPSIS
 
-        % prove t/dynpmc/sub.t
+        % prove t/dynpmc/subproxy.t
 
 =head1 DESCRIPTION
 
