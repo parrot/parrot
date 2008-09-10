@@ -45,9 +45,15 @@ sub runstep {
 
     my $verbose = $conf->options->get('verbose');
     my $libs    = $conf->data->get('libs');
-    $conf->data->add( ' ', libs => '-lrt' );
 
     my $errormsg = _first_probe_for_aio($conf, $verbose);
+    if ($errormsg) {
+        # Linux, at least, needs to add -lrt to $libs.
+        print " (Trying again with -lrt) " if $verbose;
+        $conf->data->add( ' ', libs => '-lrt' );
+        $errormsg = _first_probe_for_aio($conf, $verbose);
+    }
+
     if ( ! $errormsg ) {
         my $test = $conf->cc_run();
 
