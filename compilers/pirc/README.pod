@@ -3,27 +3,58 @@
 
 =head1 NAME
 
-README.txt - Readme file for PIRC compiler, a fresh implementation of
-the PIR language using Bison and Flex.
+README.txt - Readme file for PIRC compiler.
 
 =head1 DESCRIPTION
 
-PIRC is a fresh implementation of the PIR language. Maintaining the
-current default implementation (IMCC) is a bit of a pain, and it contains
-a lot of "XXX" and "TODO" and other kludge alerts. Furthermore, IMCC is
-not re-entrant, as it has a number of global variables.
+PIRC is a fresh implementation of the PIR language using Bison and Flex.
+Its main features are:
 
-=head2 Compiling
+=over 4
 
-At this point I only know how to compile and link on Windows, using
-MSVC:
+=item * thread-safety, so it is reentrant.
+
+=item * instruction selection, implemented in the parser.
+
+=item * constant folding, implemented in the parser.
+
+=back
+
+=head2 Compiling and Running
+
+=head3 Windows using Microsoft Visual Studio
 
  cl /c /I..\..\..\include *.c
 
  link /nodefaultlib main.obj pircompunit.obj pirlexer.obj pirparser.obj \
    pirsymbol.obj pircompiler.obj kernel32.lib msvcrt.lib ..\..\..\libparrot.lib
 
-A proper Makefile will be fixed soon.
+When running PIRC, it needs the shared library C<libparrot>; an easy way to do
+this is copy C<libparrot.dll> in the Parrot root directory to C<compilers/pirc/new>.
+
+Running PIRC is as easy as:
+
+ pirc test.pir
+
+=head3 Linux using GCC
+
+ cc -c -I../../../include *.c
+
+ cc main.o pircompiler.o pircompunit.o pirlexer.o pirparser.o \
+     pirsymbol.o ../../../blib/lib/libparrot.so.X.Y.Z -o pirc
+
+where C<X>, C<Y> and C<Z> together represent the version of Parrot
+(for instance, at the time of writing this, the version is 0.7.0,
+so that X=0, Y=7 and Z=0.)
+
+When running PIRC, it needs the shared library C<libparrot>; in order to let
+PIRC find it, set the path as follows:
+
+ export LD_LIBRARY_PATH=<path to parrot>/parrot/blib/lib
+
+Running is as easy as:
+
+ ./pirc test.pir
 
 =head2 Overview
 
