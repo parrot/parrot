@@ -172,6 +172,8 @@ done:
 
     .local pmc xdisplay
     xdisplay = opendisplay(displayname)
+    $I0 = defined xdisplay
+    unless $I0 goto failed
 
     .local pmc Display
     Display = get_Display_class()
@@ -181,6 +183,8 @@ done:
     setattribute display, attr_XDisplay, xdisplay
 
     .return(display)
+failed:
+    fail('Cannot open display')
 .end
 
 #-----------------------------------------------------------------------
