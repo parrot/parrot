@@ -1,5 +1,13 @@
 # $Id$
 
+New in [placeholder 0.7.1]
+
+- Compilers
+  + PIRC:
+    - major refactoring to allow all PIR keywords as identifiers
+    - links to libparrot now, so all Parrot ops are recognized as such
+    - implemented .loadlib, .HLL_map, .HLL
+
 New in 0.7.0
 - Specification
   + PDD27: add multisub lookup
