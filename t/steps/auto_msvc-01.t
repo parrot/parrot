@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 44;
+use Test::More tests => 43;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -55,7 +55,7 @@ $step = test_step_constructor_and_description($conf);
 my $msvcref = { _MSC_VER => 1399 };
 ok($step->_evaluate_msvc($conf, $msvcref),
     "_evaluate_msvc returned true value");
-is($step->result, 'yes', "Got expected result");
+is($step->result, 'yes, 13.99', "Got expected result");
 is($conf->data->get('msvcversion'), '13.99',
     "Got expected msvc version string");
 
@@ -72,7 +72,7 @@ $step = test_step_constructor_and_description($conf);
 $msvcref = { _MSC_VER => 1400 };
 ok($step->_evaluate_msvc($conf, $msvcref),
     "_evaluate_msvc returned true value");
-is($step->result, 'yes', "Got expected result");
+is($step->result, 'yes, 14.0', "Got expected result");
 is($conf->data->get('msvcversion'), '14.0',
     "Got expected msvc version string");
 like(
@@ -147,7 +147,7 @@ $minor = 99;
 $verbose = undef;
 $msvcversion = $step->_compose_msvcversion($major, $minor, $verbose);
 is($msvcversion, '13.99', "Got expected MSVC version");
-is($step->result(), 'yes', "Got expected result");
+is($step->result(), 'yes, 13.99', "Got expected result");
 $step->set_result(undef);
 
 {
@@ -161,8 +161,7 @@ $step->set_result(undef);
         \$stdout,
     );
     is($msvcversion, '13.99', "Got expected MSVC version");
-    is($step->result(), 'yes', "Got expected result");
-    like($stdout, qr/yep:\s+$major\.$minor/, "Got expected verbose output");
+    is($step->result(), 'yes, 13.99', "Got expected result");
     $step->set_result(undef);
 }
 
