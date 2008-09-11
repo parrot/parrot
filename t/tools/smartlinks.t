@@ -149,7 +149,6 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} }
 
 {
 
-    # RT #46783: this should use a tempfile
     vdiag 'PodFile';
     my $fn = 'docs/pdds/pdd03_calling_conventions.pod';
 
@@ -172,7 +171,6 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} }
 
 {
 
-    # RT #46783: this should use a tempfile
     vdiag 'SpecFile';
     my $fn  = 'docs/pdds/pdd03_calling_conventions.pod';
     my $pre = 'pdd';
@@ -201,7 +199,6 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} }
 
 {
 
-    # RT #46783: this should use a tempfile
     vdiag 'SpecFiles';
     my $root = 'docs/pdds/';
     my $pre  = 'pdd';
@@ -225,7 +222,6 @@ sub vdiag(@) { &diag if $ENV{TEST_VERBOSE} }
 
 {
 
-    # RT #46783: this should use a tempfile
     vdiag 'TestFile';
     my $fn = 't/util/smartlinks.t';
 
