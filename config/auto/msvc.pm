@@ -104,8 +104,7 @@ sub _compose_msvcversion {
     my $self = shift;
     my ($major, $minor, $verbose) = @_;
     my $msvcversion = "$major.$minor";
-    print " (yep: $msvcversion )" if $verbose;
-    $self->set_result('yes');
+    $self->set_result("yes, $msvcversion");
     return $msvcversion;
 }
 
