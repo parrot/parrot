@@ -658,7 +658,7 @@ $conf->replenish($serialized);
                 "Got expected verbose output re --prefix");
             like($stdout, qr/icuheaders:  captured/s,
                 "Got expected verbose output re icuheaders");
-            like($stdout, qr/For icuheaders, found $icuheaders and $without/s,
+            like($stdout, qr/For icuheaders, found \Q$icuheaders\E and $without/s,
                 "Got expected verbose output re icuheaders");
         }
     }
