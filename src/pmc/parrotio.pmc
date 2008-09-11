@@ -307,7 +307,7 @@ This does B<not> close the file.
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                     "Cannot slurp from empty filehandle");
 
-            result = NULL;
+            result = string_make_empty(INTERP, enum_stringrep_one, 0);
 
             do {
                 STRING * const part = PIO_reads(INTERP, SELF, 4096);
