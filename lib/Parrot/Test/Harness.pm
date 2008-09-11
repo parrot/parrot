@@ -166,12 +166,13 @@ sub import {
     exit unless my @files = get_files(%options);
 
     if (eval { require TAP::Harness; 1 }) {
-        my %opts =
+        my %harness_options =
               $options{exec}     ? ( exec => $options{exec} )
             : $options{compiler} ? ( exec => [ '../../parrot', './' . $options{compiler} ] )
             :                      ();
-        $opts{verbosity} = $options{verbosity} ? $options{verbosity} : 0;
-        TAP::Harness->new( \%opts )->runtests( @files );
+        $harness_options{verbosity} = $options{verbosity} ? $options{verbosity} : 0;
+        $harness_options{jobs} = $ENV{TEST_JOBS} || $options{jobs} || 1;
+        TAP::Harness->new( \%harness_options )->runtests( @files );
 
         return;
     }
