@@ -33,7 +33,7 @@ Stolen from Rakudo
     .return 'infix:eq'(topic, self)
 .end
 
-=item
+=item chars()
 
 Returns the number of characters in C<self>
 
@@ -51,7 +51,7 @@ Returns the number of characters in C<self>
 .end
 
 
-=item
+=item concat()
 
 Adds given object to C<self>. Returns self
 
@@ -154,7 +154,7 @@ Returns a the characters in C<self> in revese order. Destructive update.
     .return(retv)
 .end
 
-=item
+=item downcase()
 
 Returns a copy of C<self> with all upper case letters converted to lower case
 
@@ -167,11 +167,12 @@ Returns a copy of C<self> with all upper case letters converted to lower case
     .return s.'lc'()
 .end
 
-=item
+=item upcase()
 
 Returns a copy of C<self> with all lower case letters converted to upper case
 
 =cut
+
 .sub upcase :method
     .local pmc s
     s = new 'CardinalString'
@@ -238,7 +239,7 @@ Returns a copy of C<self> with all lower case letters converted to upper case
     .return(retv)
 .end
 
-=item
+=item capitalize()
 
     Returns a copy of C<self> with the first character converted to uppercase and the remainder to lowercase.
 
@@ -357,7 +358,7 @@ Returns a copy of C<self> with all lower case letters converted to upper case
     .return(self)
 .end
 
-=item
+=item length()
 
  Return the number of characters in C<self>
 
@@ -368,7 +369,7 @@ Returns a copy of C<self> with all lower case letters converted to upper case
      .return($I0)
 .end
 
-=item
+=item '[]'
 
  subscript operator. Accepts [(-)? int], [(-)?int, (-)?int]
 
@@ -403,7 +404,7 @@ Returns a copy of C<self> with all lower case letters converted to upper case
         goto process
 .end
 
-=item
+=item '[]='
 
 Warning: Partial implementation. Look for TODO
 
@@ -481,7 +482,7 @@ Returns self
 
 
 
-=item lc
+=item lc()
 
  our Str multi Str::lc ( Str $string )
 
@@ -499,7 +500,7 @@ form, if uppercase.
 .end
 
 
-=item lcfirst
+=item lcfirst()
 
  our Str multi Str::lcfirst ( Str $string )
 
