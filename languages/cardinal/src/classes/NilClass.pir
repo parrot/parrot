@@ -9,6 +9,18 @@
     cardinalmeta.'register'('Undef', 'parent'=>nilproto, 'protoobject'=>nilproto)
 .end
 
+=item get_string()    (vtable method)
+
+Return the elements of the list concatenated.
+
+=cut
+
+.sub 'get_string' :vtable :method
+    $P0 = new 'CardinalString'
+    $P0 = 'nil'
+    .return($P0)
+.end
+
 .sub 'to_a' :method
     $P0 = new 'CardinalArray'
     .return ($P0)
@@ -16,7 +28,7 @@
 
 .sub 'to_s' :method
     $P0 = new 'CardinalString'
-    $P0 = 'nil'
+    $P0 = ''
     .return($P0)
 .end
 

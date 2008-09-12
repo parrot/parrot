@@ -21,6 +21,54 @@ src/builtins/op.pir - Cardinal ops
     .return ($P0)
 .end
 
+.sub 'infix:-' :multi(_,_)
+    .param num a
+    .param num b
+    $P0 = new 'CardinalInteger'
+    $N0 = sub a, b
+    $P0 = $N0
+    .return ($P0)
+.end
+
+.sub 'infix:-' :multi(CardinalArray,CardinalArray)
+    .param pmc a
+    .param pmc b
+    $P0 = new 'CardinalArray'
+    .local pmc iter
+    iter = new 'Iterator', a
+    $P3 = get_hll_global['Bool'], 'False'
+    iter_loop:
+        unless iter goto done
+        $P1 = shift iter
+        $P2 = b.'include?'($P1)
+        $I0 = 'infix:=='($P2, $P3)
+        eq $I0, 0, appendit
+        #eq $P2, $P3, appendit
+        goto iter_loop
+    appendit:
+        $P0.'push'($P1)
+        goto iter_loop
+    done:
+        .return($P0)
+.end
+
+.sub 'infix:*' :multi(_,_)
+    .param num a
+    .param num b
+    $P0 = new 'CardinalInteger'
+    $N0 = mul a, b
+    $P0 = $N0
+    .return ($P0)
+.end
+
+.sub 'infix:/' :multi(_,_)
+    .param num a
+    .param num b
+    $P0 = new 'CardinalInteger'
+    $N0 = div a, b
+    $P0 = $N0
+    .return ($P0)
+.end
 
 .sub 'infix:+' :multi(CardinalString,_)
     .param pmc a
@@ -78,6 +126,15 @@ src/builtins/op.pir - Cardinal ops
   loop_end:
     .return (intersection)
 .end
+
+.sub 'infix:*' :multi(CardinalString,CardinalInteger)
+    .param pmc a
+    .param pmc b
+    $P0 = new 'CardinalString'
+    $P0 = repeat a, b
+    .return ($P0)
+.end
+
 
 =back
 

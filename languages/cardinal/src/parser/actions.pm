@@ -343,6 +343,7 @@ method constant_variable($/) {
     my $name := ~$/;
     if $name eq 'Array' { $name := "CardinalArray"; }
     elsif $name eq 'Hash' { $name := "CardinalHash"; }
+    elsif $name eq 'String' { $name := "CardinalString"; }
     my $past := PAST::Var.new( :name($name), :scope('package'), :node($/), :viviself('Undef'), :namespace( @a ) );
     make $past;
 }
@@ -671,6 +672,10 @@ method literal($/, $key) {
 
 method pcomp_stmt($/) {
     make $( $<comp_stmt> );
+}
+
+method quote_string($/) {
+    make $( $<quote_expression> );
 }
 
 method warray($/) {

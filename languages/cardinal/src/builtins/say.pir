@@ -27,6 +27,12 @@ builtin functions for Ruby.
     'print'($S0, "\n")
 .end
 
+.sub 'p'
+    .param pmc args            :slurpy
+    $S0 = join "\n", args
+    'print'($S0, "\n")
+.end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

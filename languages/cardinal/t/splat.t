@@ -1,5 +1,5 @@
 require 'test'
-plan 12
+plan 15
 # 1.8 syntax does not test more elaborate 1.9 splat syntax
 
 def nosplat(first, rest)

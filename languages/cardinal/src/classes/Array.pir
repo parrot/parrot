@@ -433,6 +433,7 @@ Returns a string comprised of all of the list, separated by the string SEPARATOR
     concat res, tmp
 
   done:
+    $S0 = res
     .return(res)
 .end
 
@@ -987,7 +988,6 @@ The zip operator.
     .return (zipped)
 .end
 
-
 =back
 
 =head1 Functions
@@ -1044,7 +1044,7 @@ The zip operator.
 =cut
 
 .sub 'infix:Z'
-    .param pmc args :slurpy
+    .param pmc args # :slurpy
     .local int num_args
     num_args = elements args
 

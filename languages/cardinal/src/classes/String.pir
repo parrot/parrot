@@ -33,6 +33,12 @@ Stolen from Rakudo
     .return 'infix:eq'(topic, self)
 .end
 
+=item
+
+Returns the number of characters in C<self>
+
+=cut
+
 .sub 'chars' :method
     .local pmc retv
 
@@ -44,11 +50,62 @@ Stolen from Rakudo
     .return (retv)
 .end
 
+
+=item 
+
+Adds given object to C<self>. Returns self
+
+=cut
+
+.sub 'concat' :method
+    .param pmc item
+    concat self, item
+    .return(self)
+.end
+
+=item reverse()
+
+Returns a new CardinalString with the characters of C<self> in reverse order.
+
+=cut
+
 .sub 'reverse' :method
+    .local pmc res
+    .local int i
+    .local string str
+
+    res = new 'CardinalString'
+
+    str = self
+    i = length str
+    i -= 1
+    if i < 0 goto done
+
+    .local pmc elem
+loop:
+    if i < 0 goto done
+
+    elem = self.'[]'(i)
+    res.'concat'(elem)
+    i -= 1
+
+    goto loop
+
+done:
+    .return(res)
+.end
+
+=item reverse!()
+
+Returns a the characters in C<self> in revese order. Destructive update.
+
+=cut
+
+.sub 'reverse!' :method
     .local pmc retv
 
     retv = self.'split'('')
-    retv = retv.'reverse'()
+    retv = retv.'reverse!'()
     retv = retv.join('')
 
     .return(retv)
@@ -95,6 +152,31 @@ Stolen from Rakudo
     retv = tmps
 
     .return(retv)
+.end
+
+=item
+
+Returns a copy of C<self> with all upper case letters converted to lower case
+
+=cut
+
+.sub downcase :method
+    .local pmc s
+    s = new 'CardinalString'
+    s = self
+    .return s.'lc'()
+.end
+
+=item
+
+Returns a copy of C<self> with all lower case letters converted to upper case
+
+=cut
+.sub upcase :method
+    .local pmc s
+    s = new 'CardinalString'
+    s = self
+    .return s.'uc'()
 .end
 
 .sub uc :method
@@ -156,6 +238,12 @@ Stolen from Rakudo
     .return(retv)
 .end
 
+=item
+
+    Returns a copy of C<self> with the first character converted to uppercase and the remainder to lowercase.
+
+=cut
+
 .sub capitalize :method
     .local string tmps
     .local string fchr
@@ -173,27 +261,49 @@ Stolen from Rakudo
     .local int pos, is_ws, is_lc
     pos = 0
     goto first_char
-  next_grapheme:
-    if pos == len goto done
-    is_ws = is_cclass .CCLASS_WHITESPACE, tmps, pos
-    if is_ws goto ws
-  advance:
-    pos += 1
-    goto next_grapheme
-  ws:
-    pos += 1
+  #next_grapheme:
+  #  if pos == len goto done
+  #  is_ws = is_cclass .CCLASS_WHITESPACE, tmps, pos
+  #  if is_ws goto ws
+  #advance:
+  #  pos += 1
+  #  goto next_grapheme
+  #ws:
+  #  pos += 1
   first_char:
     is_lc = is_cclass .CCLASS_LOWERCASE, tmps, pos
-    unless is_lc goto advance
+    #unless is_lc goto advance
+    unless is_lc goto done
     $S1 = substr tmps, pos, 1
     upcase $S1
     substr tmps, pos, 1, $S1
     ## the length may have changed after replacement, so measure it again
     len = length tmps
-    goto advance
+    #goto advance
   done:
     retv = tmps
     .return (retv)
+.end
+
+.sub 'chomp' :method
+    .param string splitby :optional
+    .local string tmps
+    .local pmc retv
+
+    retv = new 'CardinalString'
+    $I0 = self.'chars'()
+    if $I0 == 0 goto done
+    dec $I0
+    $S0 = self[$I0]
+    if $S0 == "\n" goto chop
+    tmps = self
+    goto done
+  chop:
+    tmps = self.'chop'()
+    goto done
+  done:
+    retv = tmps
+    .return(retv)
 .end
 
 .sub 'chop' :method
@@ -211,6 +321,88 @@ Stolen from Rakudo
   done:
     retv = tmps
     .return(retv)
+.end
+
+=item
+
+ Return the number of characters in C<self>
+
+=cut
+
+.sub 'length' :method
+     $I0 = self.'chars'()
+     .return($I0)
+.end
+
+=item
+
+ subscript operator. Accepts [(-)? int], [(-)?int, (-)?int]
+
+=cut
+
+.sub '[]' :method
+    .param int start
+    .param int stop :optional
+    .local string tmp
+    .local int len
+
+    if stop <= 0 goto init_stop
+    process:
+        tmp = self
+        len = length tmp
+        if start >= len goto oob
+        if start >= 0 goto pos_access
+        if start < 0 goto neg_access
+        goto oob
+    neg_access:
+        substr $S0, tmp, start, stop
+        .return($S0)
+    pos_access:
+        substr $S0, tmp, start, stop
+        .return($S0)
+    oob:
+        # out of bounds, return nil
+        $P0 = new 'NilClass'
+        .return($P0)
+    init_stop:
+        stop = 1
+        goto process
+.end
+
+=item
+
+Warning: Partial implementation. Look for TODO
+
+=cut
+
+.sub '[]=' :method
+    .param int start
+    .param string replace_with
+    .local string tmp
+    .local int len
+    .local int stop
+
+    tmp = self
+    len = length tmp
+    stop = length replace_with
+
+    if start > len goto oob
+    if start >= len goto oob
+    if start >= 0 goto pos_access
+    if start < 0 goto neg_access
+    goto oob
+    neg_access:
+        substr $S0, tmp, start, stop, replace_with
+        self = tmp
+        .return()
+    pos_access:
+        substr $S0, tmp, start, stop, replace_with
+        self = tmp
+        .return()
+    oob:
+        say "oob, IndexException"
+        # TODO out of bounds, throw IndexException
+        .return()
 .end
 
 
@@ -252,6 +444,7 @@ Returns self
 .namespace []
 
 .include 'cclass.pasm'
+
 
 
 =item lc
@@ -490,10 +683,6 @@ as a property of the string.)  Otherwise a standard newline is removed.
 Note: Most users should just let their I/O handles autochomp instead.
 (Autochomping is the default.)
 
-=item length
-
-This word is banned in Cardinal.  You must specify units.
-
 =item index
 
 Needs to be in terms of StrPos, not Int.
@@ -535,6 +724,7 @@ Should replace vec with declared arrays of bit, uint2, uint4, etc.
 =cut
 
 # Local Variables:
+
 #   mode: pir
 #   fill-column: 100
 # End:
