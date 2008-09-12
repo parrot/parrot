@@ -73,7 +73,6 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 
     load_bytecode 'config.pbc'
 
-    load_bytecode 'config.pbc'
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Text.pbc'
     load_bytecode 'PGE/Util.pbc'
