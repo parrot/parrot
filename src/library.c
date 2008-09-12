@@ -202,7 +202,16 @@ parrot_init_library_paths(PARROT_INTERP)
 
 =item C<static PMC* get_search_paths>
 
-RT#48260: Not yet documented!!!
+Return lib_paths as array of StringArrays with library searchpaths and shared
+extension used for loading various files at runtime.
+The structure looks like this:
+
+  lib_paths = [
+    [ "runtime/parrot/include", ... ],   # paths for .include 'file'
+    [ "runtime/parrot/library", ... ],   # paths for load_bytecode
+    [ "runtime/parrot/dynext", ... ],    # paths for loadlib
+    [ ".so", ... ]                       # list of shared extensions
+  ]
 
 =cut
 
@@ -506,7 +515,8 @@ TODO:
 
 PARROT_API
 void
-Parrot_add_library_path(PARROT_INTERP, ARGIN(const char *path),
+Parrot_add_library_path(PARROT_INTERP, 
+        ARGIN(const char *path),
         enum_lib_paths which)
 {
     PMC * const iglobals = interp->iglobals;
