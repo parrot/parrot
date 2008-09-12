@@ -519,13 +519,13 @@ Parrot_add_library_path(PARROT_INTERP, ARGIN(const char *path),
 
 /*
 
-=item C<STRING* Parrot_locate_runtime_file_str>
+=item C<char* Parrot_locate_runtime_file>
 
 Locate the full path for C<file_name> and the given file type(s). If
 successful, returns a C-string allocated with C<string_to_cstring> or
 NULL otherwise.  Remember to free the string with C<string_cstring_free()>.
 
-=item C<Parrot_locate_runtime_file_str>
+=item C<STRING* Parrot_locate_runtime_file_str>
 
 Like above but use and return STRINGs. If successful, the returned STRING
 is 0-terminated so that C<result-E<gt>strstart> is usable as B<const char*>
@@ -594,16 +594,6 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, ARGMOD(STRING *file),
 
     return full_name;
 }
-
-/*
-
-=item C<char* Parrot_locate_runtime_file>
-
-RT#48260: Not yet documented!!!
-
-=cut
-
-*/
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
