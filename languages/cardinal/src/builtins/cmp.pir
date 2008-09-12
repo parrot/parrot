@@ -32,16 +32,11 @@ Swiped from Rakudo.
 .end
 
 .sub 'infix:==' :multi(Bool,Bool)
-    .param pmc a
-    .param pmc b
-    $P0 = 'prefix:?'(a)
-    $P1 = 'prefix:?'(b)
-    ne_str $P0, $P1, nope
-    goto yep
-    nope:
-        .return(1)
-    yep:
-        .return(0)
+    .param int a
+    .param int b
+    $I0 = a == b
+    $P0 = 'prefix:?'($I0)
+    .return ($P0)
 .end
 
 .sub 'infix:==' :multi(CardinalString,CardinalString)

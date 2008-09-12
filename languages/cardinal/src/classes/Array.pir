@@ -833,20 +833,6 @@ Creates a new Array containing the results and returns it.
     .return (result)
 .end
 
-.sub 'each_with_index' :method
-    .param pmc block
-    .local int len
-    len = elements self
-    $I0 = 0
-  each_loop:
-    if $I0 == len goto each_loop_end
-    $P0 = self[$I0]
-    block($P0,$I0)
-    inc $I0
-    goto each_loop
-  each_loop_end:
-.end
-
 =item flatten
 
  recursively flatten any inner arrays into a single outer array
