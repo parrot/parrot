@@ -63,19 +63,20 @@ F<$prefix/lib/parrot/library/WMLScript.pbc>.
 F<runtime/parrot/library/languages/WMLScript.pbc> =>
 F<$prefix/lib/parrot/library/languages/WMLScript.pbc>.
 
-ad 2. C<load_bytecode 'languages/WMLScript/src/WMLScript.pbc'> should be replaced
-by C<load_language 'WMLScript'> and F<WMLScript.pbc> should be installed
-to F<runtime/language/library/WMLScript.pbc> which ends up in 
+ad 2. C<load_bytecode 'languages/WMLScript/src/WMLScript.pbc'> should be
+replaced by C<load_language 'WMLScript'> and F<WMLScript.pbc> should be
+installed to F<runtime/language/library/WMLScript.pbc> which ends up in 
 F<$prefix/lib/parrot/language/library/WMLScript.pbc>. {{ ?? }}
 
 Bootstrapping the configuration hash should not read a config file when the
-hash is already contained in the pmc or executable. {{ See #57418 [TODO] optimize
-_config to omit .include "library/config.pir" on installables. }}
-The same problem is for every C<.include>, C<loadlib> and C<load_bytecode> statement
-in installed files where the target is not installed. If in doubt install
-the missing library by patching the installation code.
-For C<load_bytecode 'PGE/Text.pbc'> in some lua src we should take care, that this
-compiler pbc is really installed or if not merge it into the main F<lua.pbc>.
+hash is already contained in the pmc or executable. {{ See #57418 [TODO]
+optimize _config to omit .include "library/config.pir" on installables. }}
+The same problem is for every C<.include>, C<loadlib> and C<load_bytecode> 
+statement in installed files where the target is not installed. If in doubt
+install the missing library by patching the installation code.
+For C<load_bytecode 'PGE/Text.pbc'> in some lua src we should take care, that
+this compiler pbc is really installed or if not merge it into the main
+F<lua.pbc>.
 
 Test executables are binary different to installable executables because of
 this embedded configuration hash. Test executables contain configuration hash
@@ -87,7 +88,8 @@ executables which can never be caught by the tests.
 
 There are's also a long-standing conflict in building Parrot with an already
 installed shared libparrot.so. See #39742-installed-conflict.patch which adds
-the blib/lib path to PATH resp. LD_RUN_PATH to all parrot executable invocations.
+the blib/lib path to PATH resp. LD_RUN_PATH to all parrot executable
+invocations.
 
 =head1 DEPENDENCIES
 
@@ -125,8 +127,8 @@ for miniparrot (F<null_config.fpmc>).
 =head2 Layout 1 "A language pbc is simply a library"
 
 Rationale: A language pbc is not much more than a normal library, so it should
-go to the normal parrot library path. The library searchpath needs no extension 
-for languages.
+go to the normal parrot library path. The library searchpath needs no
+extension for languages.
 
 C<load_bytecode 'languages/WMLScript/src/WMLScript.pbc'> should be
 replaced by C<load_bytecode 'WMLScript'> and F<WMLScript.pbc> should be
@@ -212,51 +214,54 @@ Different platforms will also support different layouts.
 
 =over 4
 
-=item * bin_dir: Copy installables to the destination directory's F<bin> directory as
-F<parrot-mylanguage>.
+=item * bin_dir: Copy installables to the destination directory's F<bin>
+directory as F<parrot-mylanguage>.
 
-=item * script_dir: Optionally copy the main language file F<mylanguage.pbc> to the
-destination directory's F<script> directory. (F</usr/lib/parrot/bin/> ?)
+=item * script_dir: Optionally copy the main language file F<mylanguage.pbc>
+to the destination directory's F<script> directory.
+(F</usr/lib/parrot/bin/> ?)
 
-=item * dynext: Copy shared libraries (groups and ops) to the destination directory's
-F<lib> directory under F</parrot/dynext/>.
+=item * dynext: Copy shared libraries (groups and ops) to the destination
+directory's F<lib> directory under F</parrot/dynext/>.
 
 =item * lib_dir Variant 1: 
   Copy the main language library F<mylanguage.pbc> to the destination
   directory's F<lib> directory under F<parrot/library/> for HLL
-  interoperability. Also the other pbc's to a F<parrot/library/mylanguage> subdirectory.
-  C<load_bytecode "mylanguage"> should succeed.
+  interoperability. Also the other pbc's to a F<parrot/library/mylanguage>
+  subdirectory.  C<load_bytecode "mylanguage"> should succeed.
 
 =item * lib_dir Variant 1a:
   Copy the main language library F<mylanguage.pbc> to the destination
   directory's F<lib> directory under F<parrot/library/languages/> for HLL
-  interoperability. Also the other pbc's to a F<parrot/library/languages/mylanguage> 
-  subdirectory.
+  interoperability. Also the other pbc's to
+  a F<parrot/library/languages/mylanguage> subdirectory.
   C<load_bytecode "languages/mylanguage"> should succeed.
 
 =item * lib_dir Variant 3 or 3a:
   Copy the main language library F<mylanguage.pbc> to the destination
   directory's F<lib> directory under F<parrot/language/library/> for HLL
-  interoperability. Also the other pbc's to a F<parrot/language/library/mylanguage>
-  subdirectory.
+  interoperability. Also the other pbc's to a
+  F<parrot/language/library/mylanguage> subdirectory.
   C<load_language "mylanguage"> should succeed.
-  The mylanguage.pbc is resonsible to load the other "mylanguage/mylangspecial" pbc's.
+  The mylanguage.pbc is resonsible to load the other
+  "mylanguage/mylangspecial" pbc's.
 
-The subdirs are currently needed for C<forth> and C<WMLScript>, the other language pbc's 
-are F<php_*.pbc>, F<pipplib.pbc> and F<tcllib.pbc>.
+The subdirs are currently needed for C<forth> and C<WMLScript>,
+the other language pbc's are F<php_*.pbc>, F<pipplib.pbc> and F<tcllib.pbc>.
 
 =item * lib_dir: Optionally copy include PASM and PIR files to the destination
 directory's F<lib> directory under F<parrot/include/> I<(not yet)>.
 
-=item * doc_dir: Copy documentation files to a F<$doc_dir/languages/mylanguage/>
-subdirectory tree.
+=item * doc_dir: Copy documentation files to a
+F<$doc_dir/languages/mylanguage/> subdirectory tree.
 
 =item * man_dir: Generate man(1) pages and copy to destination directory's 
-F<$man_dir/man1/> directory. {{ what about man(2) and man(3) pages? info_dir ditto }}
+F<$man_dir/man1/> directory.
+{{ what about man(2) and man(3) pages? info_dir ditto }}
 
-=item * html_dir: Optionally generate HTML and copy to destination directory's F<html>
-directory, possibly under a language specific subdirectory. This should be
-selectable by a C<Configure> or C<make install> option.
+=item * html_dir: Optionally generate HTML and copy to destination directory's
+F<html> directory, possibly under a language specific subdirectory.
+This should be selectable by a C<Configure> or C<make install> option.
 
 =back
 
@@ -347,11 +352,11 @@ installable.
 
 The simple Pheme problem could be solved by installing also all TGE and other
 compiler bytecode files at the F<parrot/library/compilers> path. Since TGE
-is not used elsewhere anymore, Pheme should be fixed to get rid of this. {{NOTE:
-commonly used libraries should be installed somewhere. -allison}}
+is not used elsewhere anymore, Pheme should be fixed to get rid of this.
+{{NOTE: commonly used libraries should be installed somewhere. -allison}}
 
-The same problem is for every C<.include>, C<loadlib> and C<load_bytecode> statement
-in installed files where the target is not installed.
+The same problem is for every C<.include>, C<loadlib> and C<load_bytecode>
+statement in installed files where the target is not installed.
 
 B<Fix 2>: Module system.
 
@@ -359,25 +364,27 @@ Avoid already loaded pbc files.
 
 Source loading PIR statements like C<loadlib> and C<load_bytecode> should 
 
-a) cache the file name and skip the file if it has already been loaded (as in perl5)
+a) cache the file name and skip the file if it has already been loaded
+   (as in perl5)
 
-b) add load*_once sisters as in php - C<load_bytecode_once> and C<loadlib_once>.
-  This is not preferred. It might be added later on, but parrot core should not
-  rely on it.
+b) add load*_once sisters as in php - C<load_bytecode_once> and
+  C<loadlib_once>. This is not preferred. It might be added later on,
+  but parrot core should not rely on it.
 
 {{NOTE: option (a) strongly preferred. -allison}}
 
 B<Fix 3>: pbc_merge fixups
 
-pbc_merge could patch up the bytecode (if possible) to omit loading load_bytecode 
-pbc-files which are being merged, but hacking bytecode during pbc_merge is not desirable.
+pbc_merge could patch up the bytecode (if possible) to omit
+loading load_bytecode pbc-files which are being merged,
+but hacking bytecode during pbc_merge is not desirable.
 
 =head1 IMPLEMENTATION
 
 A new language is generated by F<tools/dev/mk_language_shell.pl>
 
-The makefiles are generated from a F<config/makefiles/root.in> template, which can
-make use of conditional platform and config logic, the forward slashes are
+The makefiles are generated from a F<config/makefiles/root.in> template, which
+can make use of conditional platform and config logic, the forward slashes are
 automatically converted to backslashes for MSWin32 and C<\n> is converted to
 C<\r\n> for MSWin32 nmake. See L<Parrot::Configure::Compiler>.
 
@@ -396,10 +403,12 @@ None.
 =head1 REFERENCES
 
 {{The mentioned single patches against SVN HEAD are at
-http://code.google.com/p/cygwin-rurban/source/browse/trunk/release/parrot/patches
+http://code.google.com/
+p/cygwin-rurban/source/browse/trunk/release/parrot/patches
 The patches in the tickets are always too old.
-The cygwin070patches branch contains all the mentioned fixes and language lib_dir 
-installation variant 1, so it is really a "make_install" branch.}}
+The cygwin070patches branch contains all the mentioned fixes
+and language lib_dir installation variant 1,
+so it is really a "make_install" branch.}}
 
 #nnnnn references tickets in
 http://rt.perl.org/rt3/Ticket/Display.html?id=nnnnn
