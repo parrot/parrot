@@ -515,7 +515,7 @@ TODO:
 
 PARROT_API
 void
-Parrot_add_library_path(PARROT_INTERP, 
+Parrot_add_library_path(PARROT_INTERP,
         ARGIN(const char *path),
         enum_lib_paths which)
 {
