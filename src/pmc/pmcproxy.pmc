@@ -302,8 +302,8 @@ Returns whether the class does the role with the given C<*rolename>.
 
     VTABLE INTVAL does(STRING *role_name) {
         Parrot_Class_attributes *_class  = PARROT_CLASS(SELF);
-        INTVAL        id      = _class->id;
-        PMC          *proxied = pmc_new_noinit(interp, id);
+        INTVAL                   id      = _class->id;
+        PMC                     *proxied = pmc_new(interp, id);
 
         if (VTABLE_does(interp, proxied, role_name))
             return 1;
