@@ -455,7 +455,7 @@ try_load_path(PARROT_INTERP, ARGMOD(STRING* path))
 
 guess extensions, so that the user can drop the extensions
 leaving it up to the build process/install whether or not
-a .pbc or a .pir file is used.
+a .pbc, .pasm, .past or a .pir file is used.
 
 =cut
 
@@ -471,8 +471,8 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
     int guess;
 
     /*
-      first try the path without guessing to ensure compatibility with
-      existing code.
+      first try the path without guessing the extension to ensure compatibility
+      with existing code.
      */
 
     with_ext = string_copy(interp, path);
