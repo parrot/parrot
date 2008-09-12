@@ -287,23 +287,52 @@ Returns a copy of C<self> with all lower case letters converted to upper case
 
 .sub 'chomp' :method
     .param string splitby :optional
+    .param int custom_split :opt_flag
     .local string tmps
     .local pmc retv
+    if custom_split goto have_split
+    splitby = "\n"
+  have_split:
 
     retv = new 'CardinalString'
     $I0 = self.'chars'()
     if $I0 == 0 goto done
-    dec $I0
-    $S0 = self[$I0]
-    if $S0 == "\n" goto chop
+    $I1 = length splitby
+    $I0 = $I0 - $I1
+    $S0 = substr self, $I0, $I1
+    if $S0 == splitby goto chop
     tmps = self
     goto done
   chop:
-    tmps = self.'chop'()
+    tmps = substr self, 0, $I0
     goto done
   done:
     retv = tmps
     .return(retv)
+.end
+
+.sub 'chomp!' :method
+    .param string splitby :optional
+    .param int custom_split :opt_flag
+    .local string tmps
+    if custom_split goto have_split
+    splitby = "\n"
+  have_split:
+
+    $I0 = self.'chars'()
+    if $I0 == 0 goto done
+    $I1 = length splitby
+    $I0 = $I0 - $I1
+    $S0 = substr self, $I0, $I1
+    if $S0 == splitby goto chop
+    tmps = self
+    goto done
+  chop:
+    tmps = substr self, 0, $I0
+    goto done
+  done:
+    self = tmps
+    .return(self)
 .end
 
 .sub 'chop' :method
@@ -313,14 +342,19 @@ Returns a copy of C<self> with all lower case letters converted to upper case
 
     retv = new 'CardinalString'
     tmps = self
-
-    len = length tmps
-    if len == 0 goto done
-    dec len
-    substr tmps,tmps, 0, len
-  done:
+    chopn tmps, 1
     retv = tmps
     .return(retv)
+.end
+
+.sub 'chop!' :method
+    .local string tmps
+    .local int len
+
+    tmps = self
+    chopn tmps, 1
+    self = tmps
+    .return(self)
 .end
 
 =item
