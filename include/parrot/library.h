@@ -39,7 +39,7 @@ typedef enum {
 PARROT_API
 void Parrot_add_library_path(PARROT_INTERP,
     ARGIN(const char *path),
-    enum_runtime_ft which)
+    enum_lib_paths which)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

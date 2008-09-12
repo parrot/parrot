@@ -507,7 +507,7 @@ TODO:
 PARROT_API
 void
 Parrot_add_library_path(PARROT_INTERP, ARGIN(const char *path),
-        enum_runtime_ft which)
+        enum_lib_paths which)
 {
     PMC * const iglobals = interp->iglobals;
     PMC * const lib_paths = VTABLE_get_pmc_keyed_int(interp, iglobals,
