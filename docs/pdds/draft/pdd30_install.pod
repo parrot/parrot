@@ -50,8 +50,8 @@ Accessing F</usr/runtime> is forbidden by the FHS.
 The Parrot and language implementions on top of Parrot may be installed as
 self-hosting single-file executables, with the help of merged pbc's and
 pbc2exe --install.
-The destination path for the language libraries is not decided yet, two 
-conflicting layouts 1. "a language pbc is a simple library" vs 
+The destination path for the language libraries is not decided yet, two
+conflicting layouts 1. "a language pbc is a simple library" vs
 2. "a language is special" are discussed.
 
 Eg. ad 1. C<load_bytecode 'languages/WMLScript/src/WMLScript.pbc'> should be
@@ -65,13 +65,13 @@ F<$prefix/lib/parrot/library/languages/WMLScript.pbc>.
 
 ad 2. C<load_bytecode 'languages/WMLScript/src/WMLScript.pbc'> should be
 replaced by C<load_language 'WMLScript'> and F<WMLScript.pbc> should be
-installed to F<runtime/language/library/WMLScript.pbc> which ends up in 
+installed to F<runtime/language/library/WMLScript.pbc> which ends up in
 F<$prefix/lib/parrot/language/library/WMLScript.pbc>. {{ ?? }}
 
 Bootstrapping the configuration hash should not read a config file when the
 hash is already contained in the pmc or executable. {{ See #57418 [TODO]
 optimize _config to omit .include "library/config.pir" on installables. }}
-The same problem is for every C<.include>, C<loadlib> and C<load_bytecode> 
+The same problem is for every C<.include>, C<loadlib> and C<load_bytecode>
 statement in installed files where the target is not installed. If in doubt
 install the missing library by patching the installation code.
 For C<load_bytecode 'PGE/Text.pbc'> in some lua src we should take care, that
@@ -121,8 +121,8 @@ tree.
 The B<configuration hash> is the return value of the global function
 C<_config()>, generated in F<config_lib.pasm>, and either defined in
 F<library/config.pir>, or as frozen PMC embedded in the test executable
-(F<config.fpmc>), the installable executable (F<install_config.fpmc>) or empty
-for miniparrot (F<null_config.fpmc>).
+(F<config.fpmc>), the installable executable (F<install_config.fpmc>) or
+empty for miniparrot (F<null_config.fpmc>).
 
 =head2 Layout 1 "A language pbc is simply a library"
 
@@ -143,9 +143,9 @@ Usage: C<load_bytecode 'WMLScript'> =C<gt>
 
 =head2 Layout 1, Variant a "Don't mix the libraries with the languages"
 
-Rationale: A language pbc is a library under the C<languages> namespace. 
+Rationale: A language pbc is a library under the C<languages> namespace.
 The library searchpath needs no extension for languages.
-C<load_bytecode 'languages/bla'> makes it clear that C<bla> is a 
+C<load_bytecode 'languages/bla'> makes it clear that C<bla> is a
 language, not a library.
 
 Usage: C<load_bytecode 'languages/WMLScript'> =C<gt>
@@ -160,12 +160,12 @@ have their distinct libraries seperate from parrot with seperate dynext,
 library, include.  parrot is just another language, with perl6 sharing the
 same namespace.
 
-This requires either a new opcode or method to able to override the library 
+This requires either a new opcode or method to able to override the library
 searchpath.
 
 C<load_bytecode 'languages/WMLScript/src/WMLScript.pbc'> should be replaced
 by C<load_language 'WMLScript'> and F<WMLScript.pbc> should be installed
-to F<runtime/languages/library/WMLScript.pbc> which ends up in 
+to F<runtime/languages/library/WMLScript.pbc> which ends up in
 F<$prefix/lib/parrot/languages/library/WMLScript.pbc>.
 
 Usage: C<load_language 'WMLScript'> =C<gt>
@@ -174,7 +174,7 @@ Usage: C<load_language 'WMLScript'> =C<gt>
      or Variant 2a:
        F<$prefix/lib/parrot/languages/WMLScript/library/WMLScript.pbc>.
 
-Note: We will not be able to get rid of /usr/lib/parrot here, so the 
+Note: We will not be able to get rid of /usr/lib/parrot here, so the
 runtime/parrot <=> /usr/lib/parrot mapping is not symetric anymore.
 
 =head2 make install
@@ -187,10 +187,10 @@ directory, but in the destination directory.
 
 The short-term goal of this document is to make installation work for Parrot,
 its libraries and tools, and its languages so that packagers can provide
-binary packages for parrot and its languages. 
+binary packages for parrot and its languages.
 
-The longer-term goal is a framework so that external libraries and languages 
-not within the current parrot source tree can also be properly built, tested 
+The longer-term goal is a framework so that external libraries and languages
+not within the current parrot source tree can also be properly built, tested
 and installed.
 
 We do not only support GNU make or Win32 nmake but also other platform make
@@ -224,7 +224,7 @@ to the destination directory's F<script> directory.
 =item * dynext: Copy shared libraries (groups and ops) to the destination
 directory's F<lib> directory under F</parrot/dynext/>.
 
-=item * lib_dir Variant 1: 
+=item * lib_dir Variant 1:
   Copy the main language library F<mylanguage.pbc> to the destination
   directory's F<lib> directory under F<parrot/library/> for HLL
   interoperability. Also the other pbc's to a F<parrot/library/mylanguage>
@@ -255,7 +255,7 @@ directory's F<lib> directory under F<parrot/include/> I<(not yet)>.
 =item * doc_dir: Copy documentation files to a
 F<$doc_dir/languages/mylanguage/> subdirectory tree.
 
-=item * man_dir: Generate man(1) pages and copy to destination directory's 
+=item * man_dir: Generate man(1) pages and copy to destination directory's
 F<$man_dir/man1/> directory.
 {{ what about man(2) and man(3) pages? info_dir ditto }}
 
@@ -301,8 +301,8 @@ Parrot 1.0 release.
 =head2 Configuration bootstrapping
 
 Bootstrapping the configuration hash should not read a config file when the
-hash is already contained in the PMC or executable.  
-C<.include "library/config.pir"> and C<load_bytecode "config.pbc"> should 
+hash is already contained in the PMC or executable.
+C<.include "library/config.pir"> and C<load_bytecode "config.pbc"> should
 be omitted on installables if possible.
 
 {{NOTE: We need to step back and take a broader view here. Why is
@@ -362,7 +362,7 @@ B<Fix 2>: Module system.
 
 Avoid already loaded pbc files.
 
-Source loading PIR statements like C<loadlib> and C<load_bytecode> should 
+Source loading PIR statements like C<loadlib> and C<load_bytecode> should
 
 a) cache the file name and skip the file if it has already been loaded
    (as in perl5)

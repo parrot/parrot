@@ -174,7 +174,7 @@ It is the external code's duty to create, manage, and destroy interpreters.
 
 C<Parrot_new( NULL )> returns an opaque pointer to a new interpreter:
 
-	Parrot_Interp Parrot_new(Parrot_Interp parent);
+  Parrot_Interp Parrot_new(Parrot_Interp parent);
 
 C<parent> can be NULL for the I<first> interpreter created.  All subsequent
 calls to this function should pass an existing interpreter.
@@ -184,7 +184,7 @@ detect this in the interface and give a warning?>
 
 C<Parrot_destroy ( interp )> destroys an interpreter and frees its resources.
 
-	void Parrot_destroy(Parrot_Interp);
+  void Parrot_destroy(Parrot_Interp);
 
 I<Note: It is not clear what happens if this interpreter has active children.>
 
@@ -194,10 +194,10 @@ Perhaps the most common case for working with code is loading it from an
 external file.  This may often be PBC, but it must also be possible to load
 code with any registered compiler.  This I<must> be a single-stage operation:
 
-	Parrot_PMC Parrot_load_bytecode( Parrot_Interp, const char *filepath );
+  Parrot_PMC Parrot_load_bytecode( Parrot_Interp, const char *filepath );
 
-	Parrot_PMC Parrot_load_hll_code( Parrot_Interp, const char *compiler,
-	                                                const char *filepath );
+  Parrot_PMC Parrot_load_hll_code( Parrot_Interp, const char *compiler,
+                                                  const char *filepath );
 
 The PMC returned will be the Sub PMC representing the entry point into the
 code.  That is, it will be the PMC representing the C<:main> subroutine, if
@@ -221,8 +221,8 @@ compiler named explicitly.>
 Compiling source code generated or read from the host application is also
 possible:
 
-	 Parrot_PMC Parrot_compile_string( Parrot_Interp, const char *compiler,
-                                                      const char *code );
+  Parrot_PMC Parrot_compile_string( Parrot_Interp, const char *compiler,
+                                                   const char *code );
 
 The potential return values are the same as for loading code from disk.
 

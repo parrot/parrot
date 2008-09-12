@@ -355,3 +355,10 @@ None. First version
 
 =back
 
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
+vim: expandtab shiftwidth=4:

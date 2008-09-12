@@ -66,7 +66,7 @@ infrastructure must be provide by Parrot, and must work for all languages.
         |                             |
         |   Language Y                V
         |                         Called sub
-        |                
+        |
 
 Where necessary, a language may need to provide a "wrapper" sub to interface
 external calls to the language's internal calling and data representation
@@ -77,7 +77,7 @@ into something more generic.
 
 {{ Of course, "stub" is really too close to "sub", so we should find a better
 word.  Doesn't the C community call these "bounce routines"?  Or something?
--- rgr, 31-Jul-08. 
+-- rgr, 31-Jul-08.
 
 The language will never provide a wrapper for its subs. For the most part,
 wrappers will be unnecessary. Where a wrapper is desired to make a library
@@ -605,3 +605,4 @@ __END__
 Local Variables:
   fill-column:78
 End:
+vim: expandtab shiftwidth=4:

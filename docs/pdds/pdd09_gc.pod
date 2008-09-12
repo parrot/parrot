@@ -557,7 +557,7 @@ be locked independently and cannot be determined using this function.
 
 For PMCs and Buffers to be collected properly, you must set the appropriate
 flags on them. Directly manipulating these flags is not recommended because
-the exact values can be changed over time. A series of macros have been 
+the exact values can be changed over time. A series of macros have been
 created in F<include/parrot/pobject.h> that set and check for these flags.
 Always use these provided macros when you need to test or set these flags.
 
@@ -645,3 +645,11 @@ http://www.mail-archive.com/perl6-all@perl.org/msg14072.html
 
 Semi-timely and ordered destruction:
 http://www.sidhe.org/~dan/blog/archives/000199.html
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
+vim: expandtab shiftwidth=4:

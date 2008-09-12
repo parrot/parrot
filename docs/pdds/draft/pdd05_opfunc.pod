@@ -32,7 +32,7 @@ Can assume a working interpreter
 
 =item *
 
-Must leave all interpreter registers the way they were found, unless the 
+Must leave all interpreter registers the way they were found, unless the
 opcode signature indicates otherwise
 
 =back
@@ -200,4 +200,10 @@ None. First version
 
 None. First version
 
+=cut
 
+__END__
+Local Variables:
+  fill-column:78
+End:
+vim: expandtab shiftwidth=4:

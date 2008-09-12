@@ -319,7 +319,7 @@ that encoding.
 What sort of string data is in the buffer, for example ASCII, EBCDIC, or
 Unicode.
 
-The charset structure specifies the character set (by index number and by 
+The charset structure specifies the character set (by index number and by
 name) and provides functions for transcoding to and from that character set.
 
 =item normalization

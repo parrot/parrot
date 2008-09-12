@@ -77,7 +77,7 @@ across an interpreter pool. An interpreter pool is a set of interpreter
 instances that share common resources: the memory pools, arenas, and
 global namespace--pretty much everything except what's in the
 interpreter structure itself. They're essentially threads in the OS
-sense. 
+sense.
 
 Another form of concurrency is between completely independent
 interpreter instances, each with their own memory pools, arenas,
@@ -152,7 +152,7 @@ This is the Perl 5 "iThreads" threading model. In this model no data is
 shared implicitly, and all sharing must be done on purpose and
 explicitly. It resembles the Unix
 fork-process-with-shared-memory-segment model, not a surprise as it was
-originally developed with emulation of Unix's fork system in mind. 
+originally developed with emulation of Unix's fork system in mind.
 
 =head3 Independent Concurrency
 
@@ -441,3 +441,4 @@ __END__
 Local Variables:
   fill-column:78
 End:
+vim: expandtab shiftwidth=4:

@@ -664,7 +664,7 @@ information requested (see F<runtime/parrot/include/stat.pasm>):
   7    STAT_CHANGETIME
            The last time the file metadata was changed.
   8    STAT_BACKUPTIME
-           The last time the file was backed up. 
+           The last time the file was backed up.
            (Currently just returns -1.)
   9    STAT_UID
            The user ID of the file.
@@ -808,7 +808,7 @@ string containing the received message.
 
 =item *
 
-C<send> sends a message string to a connected socket object. 
+C<send> sends a message string to a connected socket object.
 
 The asynchronous version takes an additional final PMC callback
 argument, and only returns a status object. When the send operation is
@@ -848,7 +848,7 @@ the socket object.
 =item *
 
 C<accept> accepts a new connection on a given socket object, and returns
-a newly created socket object for the connection. 
+a newly created socket object for the connection.
 
 The asynchronous version takes an additional final PMC callback
 argument, and only returns a status object. When the accept operation
@@ -883,14 +883,14 @@ of the call, -1 or a system error code if unsuccessful. Other I/O
 opcodes (such as C<accept>) have various different
 strategies for error notification, and others have no way of marking
 errors at all. We want to unify all I/O opcodes so they use a consistent
-strategy for error notification. 
+strategy for error notification.
 
 =head3 Synchronous operations
 
 Synchronous I/O operations return an integer status code indicating
 success or failure in addition to their ordinary return value(s). This
 approach has the advantage of being lightweight: returning a single
-additional integer is cheap. 
+additional integer is cheap.
 
 [Discuss: should synchronous operations take the same error handling
 strategy as asynchronous ones?]
@@ -989,3 +989,4 @@ __END__
 Local Variables:
   fill-column:78
 End:
+vim: expandtab shiftwidth=4:

@@ -111,7 +111,7 @@ PMCs, and the types are extracted from the types of the array elements.
 
 Return an array of matching candidates, sorted from best matching to worst
 matching, for a passed in signature. The signature passed in is a simple type
-string for the signature ('P' for PMC, 'I' for integer, 'N' for number, and 
+string for the signature ('P' for PMC, 'I' for integer, 'N' for number, and
 'S' for string).
 
 =item get_iter
@@ -146,7 +146,7 @@ sub. (Masks the vtable functions inherited from ResizablePMCArray.)
 Return an array of matching candidates, sorted from best matching to worst
 matching, for a passed in signature. If the signature passed in is an array of
 PMCs, the types are extracted from the types of the array elements. If the
-signature passed in is a simple type string for the signature ('P' for PMC, 
+signature passed in is a simple type string for the signature ('P' for PMC,
 'I' for integer, 'N' for number, and 'S' for string), the types are matched as
 simple types.
 

@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-docs/pdds/pdd07_codingstd.pod - Conventions and Guidelines for Parrot Source  
+docs/pdds/pdd07_codingstd.pod - Conventions and Guidelines for Parrot Source
 Code
 
 =head1 VERSION
@@ -511,7 +511,7 @@ The list of these ignore files can be set up with:
 
     svn propedit svn:ignore <PATH>
 
-In order to keep the two different checks synchronized, 
+In order to keep the two different checks synchronized,
 the MANIFEST and MANIFEST.SKIP files should be regenerated with:
 
     perl tools/dev/mk_manifest_and_skip.pl
@@ -993,7 +993,8 @@ none
 
 =cut
 
-# Local Variables:
-#   fill-column:78
-# End:
-# vim: expandtab shiftwidth=4:
+__END__
+Local Variables:
+  fill-column:78
+End:
+vim: expandtab shiftwidth=4:

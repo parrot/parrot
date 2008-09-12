@@ -273,7 +273,7 @@ other segments below are prefixed with this.
 =head3 Segment Padding
 
 All segments must have trailing zero (NULL) values appended so they are a
-multiple of 16 bytes in length. (This allows wordsize support of up to 
+multiple of 16 bytes in length. (This allows wordsize support of up to
 128 bits.)
 
 
@@ -682,7 +682,7 @@ will provide a programatic way to construct and walk packfiles, both for the
 Parrot internals and from programs running on the Parrot VM.
 
 {{ TODO... QUESTION: Will the CStruct PMC make it into Parrot? If so, we
-may want to change the interface of these PMCs to take advantage of it. 
+may want to change the interface of these PMCs to take advantage of it.
 ANSWER: Yes it will (most likely with a different name), but it needs to
 be prototyped first. Do you want to hold off on implementing the
 bytecode changes until it's available? I say go ahead and implement now,
@@ -702,7 +702,7 @@ to disk (that is, maps from PMCs to on-disk representation).
 =head4 C<set_string_native> (v-table)
 
 Takes a string containing an entire packfile in the on-disk format, attempts
-to unpack it into a tree of Packfile PMCs and sets this Packfile PMC to 
+to unpack it into a tree of Packfile PMCs and sets this Packfile PMC to
 represent the top of that tree (that is, maps from on-disk representation to a
 tree of PMCs).
 
@@ -865,7 +865,7 @@ specific type of segment.
 
 This PMC represents a constants table. It provides access to constants through
 the keyed integer interface (the interpreter may choose to access underlying
-structures directly to improve performance, however). 
+structures directly to improve performance, however).
 
 The table of constants can be added to using the keyed set methods; it will
 grow automatically.
@@ -992,7 +992,7 @@ types. Specifying an invalid type will result in an exception.
 =head3 PackfileAnnotations.pmc (isa PackfileSegment)
 
 This PMC represents the bytecode annotations table. The key ID to key name and
-key type mappings are stored in a separate PackfileAnnotationKeys PMC. Each 
+key type mappings are stored in a separate PackfileAnnotationKeys PMC. Each
 (offset, key, value) entry is represented by a PackfileAnnotation PMC. The
 following methods are implemented:
 
@@ -1118,3 +1118,4 @@ __END__
 Local Variables:
   fill-column:78
 End:
+vim: expandtab shiftwidth=4:

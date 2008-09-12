@@ -44,7 +44,7 @@ static analysis.
 
 Parrot's security infrastructure is not an independent, encapsulated
 subsystem.  It is a series of related features and functionality spread
-throughout the virtual machine. 
+throughout the virtual machine.
 
 =head2 Resource Quotas
 
@@ -54,7 +54,7 @@ in a managed environment such as a web, database, or game server where no one
 interpreter is allowed to consume too many resources and impact the system too
 badly. CPU time is managed by the runloop. The memory system handles memory
 quotas, the I/O system handles file open and pending I/O count quotas, and so
-on. 
+on.
 
 =head2 Privileges
 
@@ -238,3 +238,4 @@ __END__
 Local Variables:
   fill-column:78
 End:
+vim: expandtab shiftwidth=4:

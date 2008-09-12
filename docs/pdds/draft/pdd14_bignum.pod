@@ -11,7 +11,7 @@ docs/pdds/pdd14_bignum.pod - Big Numbers
 Future directions?}}
 
 This document describes the big number library, the functionality it provides
-and some internal details of interest to people making use of the library. 
+and some internal details of interest to people making use of the library.
 Some of the areas in which the big number library meet with the rest of Parrot
 are also discussed.
 
@@ -27,9 +27,9 @@ There are benefits in using the big number library to provide both values of
 effectively unlimited precision and a defined arithmetic, complete with
 rounding and exceptional conditions, for values which are otherwise easily
 represented using standard low-level types.  Both require the same range of
-operations but differ in the environment under which those operations occur. 
+operations but differ in the environment under which those operations occur.
 The effort required to produce a library which implements a decimal arithmetic
-is not much greater than that needed to provide a base-2 big number library. 
+is not much greater than that needed to provide a base-2 big number library.
 It is true that some trade-off in both space and speed is made but given the
 nature of dynamic languages, this should not present too great a burden.
 
@@ -106,7 +106,7 @@ more than I<precision> digits in their coefficients, with any extra digits
 accumulated during the calculation of the operation being truncated and
 rounded as required.
 
-A I<precision> of zero indicates that integer operations are to be performed. 
+A I<precision> of zero indicates that integer operations are to be performed.
 Arguments to operations are rounded so that they have no fractional part, and
 the result of all operations will be rounded to be integers.
 
@@ -420,3 +420,11 @@ Special values added, exception handling updated to suit EDA, more rounding
 types added, TODO added.  PDD number bagged.
 
 =back
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
+vim: expandtab shiftwidth=4:

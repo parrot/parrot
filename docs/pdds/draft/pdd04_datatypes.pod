@@ -14,7 +14,7 @@ specifications of the behavior of the datatypes. }}
 
 =head1 DESCRIPTION
 
-This PDD details the basic datatypes that the Parrot core knows how to deal 
+This PDD details the basic datatypes that the Parrot core knows how to deal
 with. Three of these (the integer, floating point and string datatypes)  have
 no additional semantics. The fourth datatype, the Parrot Magic Cookie (PMC)
 acts as the basis for all high level languages running on top of  Parrot; only
@@ -134,3 +134,10 @@ None. First version
 
 =back
 
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
+vim: expandtab shiftwidth=4:

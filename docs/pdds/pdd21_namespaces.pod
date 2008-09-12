@@ -308,7 +308,7 @@ The meaning of $P3 is compiler-specific.  The only universal legal value is
 Null, which requests a "normal" load.  The meaning of "normal" varies, but
 the ideal would be to perform only the minimal actions required.
 
-On failure, an exception is thrown.  
+On failure, an exception is thrown.
 
 =back
 
@@ -629,3 +629,4 @@ __END__
 Local Variables:
   fill-column:78
 End:
+vim: expandtab shiftwidth=4:
