@@ -9,6 +9,8 @@
     cardinalmeta.'register'('Undef', 'parent'=>nilproto, 'protoobject'=>nilproto)
 .end
 
+=over 4
+
 =item get_string()    (vtable method)
 
 Return the elements of the list concatenated.

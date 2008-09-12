@@ -51,7 +51,7 @@ Returns the number of characters in C<self>
 .end
 
 
-=item 
+=item
 
 Adds given object to C<self>. Returns self
 
@@ -724,7 +724,6 @@ Should replace vec with declared arrays of bit, uint2, uint4, etc.
 =cut
 
 # Local Variables:
-
 #   mode: pir
 #   fill-column: 100
 # End:
