@@ -643,6 +643,33 @@ C<languages/m4>
 =back
 
 
+=head2 Markdown
+
+=over 4
+
+=item Description
+
+Port of Markdown, see L<http://daringfireball.net/projects/markdown/>.
+
+=item Status
+
+Early stage.
+
+Based on PCT/NQP/PGE.
+
+Part of languages smoke testing.
+
+=item Last verified with parrot version
+
+0.7.0
+
+=item Location
+
+C<languages/markdown>
+
+=back
+
+
 =head2 miniperl
 
 =over 4
