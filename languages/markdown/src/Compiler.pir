@@ -9,6 +9,10 @@ Markdown::HTML::Compiler - MAST Compiler
 
 Markdown::HTML::Compiler implements a compiler for MAST nodes.
 
+=head1 METHODS
+
+=over
+
 =cut
 
 .namespace [ 'Markdown::HTML::Compiler' ]
@@ -106,7 +110,6 @@ Return generated HTML for all of its children.
     set code, $S0
     .return (code)
 .end
-
 
 =back
 
