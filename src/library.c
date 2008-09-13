@@ -8,7 +8,7 @@ src/library.c - Interface to Parrot's bytecode library
 
 =head1 DESCRIPTION
 
-This file contains a C function to access Parrot's bytecode library functions.
+This file contains C functions to access Parrot's bytecode library functions.
 
 =head2 Functions
 
@@ -407,7 +407,7 @@ path_concat(PARROT_INTERP, ARGMOD(STRING *l_path), ARGMOD(STRING *r_path))
     return join;
 }
 
-#define LOAD_EXT_CODE_LAST 3
+#define LOAD_EXT_CODE_LAST 2
 
 static const char* load_ext_code[ LOAD_EXT_CODE_LAST + 1 ] = {
     ".pbc",
@@ -415,7 +415,6 @@ static const char* load_ext_code[ LOAD_EXT_CODE_LAST + 1 ] = {
     /* source level files */
 
     ".pasm",
-    ".past",
     ".pir",
 };
 
@@ -453,9 +452,9 @@ try_load_path(PARROT_INTERP, ARGMOD(STRING* path))
 
 =item C<static STRING* try_bytecode_extensions>
 
-guess extensions, so that the user can drop the extensions
+Guess extensions, so that the user can drop the extensions
 leaving it up to the build process/install whether or not
-a .pbc, .pasm, .past or a .pir file is used.
+a .pbc, .pasm or a .pir file is used.
 
 =cut
 
@@ -471,7 +470,7 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
     int guess;
 
     /*
-      first try the path without guessing the extension to ensure compatibility
+      First try the path without guessing the extension to ensure compatibility
       with existing code.
      */
 
@@ -482,8 +481,8 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
         return result;
 
     /*
-      start guessing now. this version tries to find the lowest form of the
-      code, starting with bytecode and working up to PIR. note the atypical
+      Start guessing now. This version tries to find the lowest form of the
+      code, starting with bytecode and working up to PIR. Note the atypical
       loop control. This is so the array can easily be processed in reverse.
      */
 
