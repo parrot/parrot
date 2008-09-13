@@ -1,3 +1,4 @@
+# Copyright (C) 2008, The Perl Foundation.
 # $Id$
 
 =begin comments
@@ -14,74 +15,31 @@ value of the comment is passed as the second argument to the method.
 
 =end comments
 
+=cut
+
 class Markdown::Grammar::Actions;
 
 method TOP($/) {
-    my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ) );
-    for $<statement> {
+    my $past := Markdown::Document.new( :node( $/ ) );
+    for $<Block> {
         $past.push( $( $_ ) );
     }
     make $past;
 }
 
 
-method statement($/) {
-    my $past := PAST::Op.new( :name('say'), :pasttype('call'), :node( $/ ) );
-    for $<expression> {
-        $past.push( $( $_ ) );
-    }
-    make $past;
-}
-
-##  expression:
-##    This is one of the more complex transformations, because
-##    our grammar is using the operator precedence parser here.
-##    As each node in the expression tree is reduced by the
-##    parser, it invokes this method with the operator node as
-##    the match object and a $key of 'reduce'.  We then build
-##    a PAST::Op node using the information provided by the
-##    operator node.  (Any traits for the node are held in $<top>.)
-##    Finally, when the entire expression is parsed, this method
-##    is invoked with the expression in $<expr> and a $key of 'end'.
-method expression($/, $key) {
-    if ($key eq 'end') {
-        make $($<expr>);
-    }
-    else {
-        my $past := PAST::Op.new( :name($<type>),
-                                  :pasttype($<top><pasttype>),
-                                  :pirop($<top><pirop>),
-                                  :lvalue($<top><lvalue>),
-                                  :node($/)
-                                );
-        for @($/) {
-            $past.push( $($_) );
-        }
-        make $past;
-    }
-}
-
-
-##  term:
-##    Like 'statement' above, the $key has been set to let us know
-##    which term subrule was matched.
-method term($/, $key) {
+method Block($/, $key) {
     make $( $/{$key} );
 }
 
-
-method value($/, $key) {
-    make $( $/{$key} );
+method AtxHeading($/) {
+#    my $level := length ~$<AtxStart>;
+    my $level := ~$<AtxStart>;
+    make Markdown::Header.new( :level( $level ), :text( ~$<AtxInline> ) );
 }
 
-
-method integer($/) {
-    make PAST::Val.new( :value( ~$/ ), :returns('Integer'), :node($/) );
-}
-
-
-method quote($/) {
-    make PAST::Val.new( :value( $($<string_literal>) ), :node($/) );
+method Para($/) {
+    make Markdown::Para.new( :text( ~$<Inline> ) );
 }
 
 
@@ -91,4 +49,3 @@ method quote($/) {
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-

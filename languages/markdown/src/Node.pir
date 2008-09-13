@@ -1,0 +1,55 @@
+# Copyright (C) 2008, The Perl Foundation.
+# $Id $
+
+=head1 NAME
+
+MAST - Markdown abstract syntax tree
+
+=head1 DESCRIPTION
+
+This file implements the various abstract syntax tree nodes
+for Markdown.
+
+=cut
+
+.namespace [ 'Markdown::Node' ]
+
+.sub 'onload' :anon :load :init
+    .local pmc p6meta, base
+    p6meta = new 'P6metaclass'
+    base = p6meta.'new_class'('Markdown::Node', 'parent'=>'PAST::Node')
+
+    p6meta.'new_class'('Markdown::Document', 'parent'=>base)
+    p6meta.'new_class'('Markdown::Header', 'parent'=>base)
+    p6meta.'new_class'('Markdown::Para', 'parent'=>base)
+.end
+
+
+.sub 'text' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('text', value, has_value)
+.end
+
+
+.namespace [ 'Markdown::Header' ]
+
+.sub 'level' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .return self.'attr'('level', value, has_value)
+.end
+
+
+=head1 AUTHORS
+
+Francois Perrad
+
+=cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
+
