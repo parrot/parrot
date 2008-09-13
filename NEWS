@@ -16,6 +16,14 @@ New in [placeholder 0.7.1]
     - added 'fail' function
     - m/.../ regexes
     - run tests in parallel
+    - gather/take
+  + Cardinal (Ruby):
+    - 'require' and precompiled modules
+    - many new tests
+    - all Array tests pass
+    - regexes
+    - default arguments to functions
+    - new committer
 
 New in 0.7.0
 - Specification
