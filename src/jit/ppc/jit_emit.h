@@ -20,7 +20,7 @@
 
 #ifndef CACHELINESIZE
    /* TODO this should be determined by configure */
-#  if PARROT_EXEC_OS_AIX
+#  ifdef PARROT_EXEC_OS_AIX
      /* for POWER3 */
 #    define CACHELINESIZE 0x80
 #  else
@@ -680,7 +680,7 @@ jit_emit_bx(Parrot_jit_info_t *jit_info, char type, opcode_t disp)
     jit_emit_mtctr(jit_info->native_ptr, ISR1); \
     jit_emit_bctrl(jit_info->native_ptr)
 
-#if PARROT_EXEC_OS_AIX /* support AIX calling convention using compiler intermediary _ptrgl */
+#ifdef PARROT_EXEC_OS_AIX /* support AIX calling convention using compiler intermediary _ptrgl */
 #  define jit_emit_call_func(pc, addr) \
       jit_emit_mov_ri_i(jit_info->native_ptr, ISR1, (long)*((long*)(addr))); \
       jit_emit_mtctr(jit_info->native_ptr, ISR1); \
@@ -719,7 +719,7 @@ div_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)
     jit_emit_mov_ri_i(pc, r5, EXCEPTION_DIV_BY_ZERO);          /* type */
     jit_emit_mov_ri_i(pc, r6, div_by_zero);
     jit_info->native_ptr = pc;
-    jit_emit_call_func(pc, (void *)Parrot_ex_throw_from_c_args);
+    jit_emit_call_func(pc, Parrot_ex_throw_from_c_args);
     pc = jit_info->native_ptr;
     /* fixup above jump */
     sav_ptr = pc;
@@ -752,7 +752,7 @@ fdiv_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)
     jit_emit_mov_ri_i(pc, r5, EXCEPTION_DIV_BY_ZERO);          /* type */
     jit_emit_mov_ri_i(pc, r6, div_by_zero);
     jit_info->native_ptr = pc;
-    jit_emit_call_func(pc, (void*) Parrot_ex_throw_from_c);
+    jit_emit_call_func(pc, Parrot_ex_throw_from_c_args);
     pc = jit_info->native_ptr;
     /* fixup above jump */
     sav_ptr = pc;
@@ -892,6 +892,8 @@ jit_get_params_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP)
             case PARROT_ARG_FLOATVAL:
                 jit_emit_lwz(NATIVECODE, ISR1, 4 + i*4, r5);
                 jit_emit_lfd(jit_info->native_ptr, MAP(2+i), 0, ISR1);
+                break;
+            default:
                 break;
         }
     }
