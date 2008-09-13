@@ -526,6 +526,23 @@ will be used in lieu of this one.)
     $I0 = isa topicwhat, parrotclass
     if $I0 goto end
     $I0 = does topic, parrotclass
+    if $I0 goto end
+
+    # Here comes some special handling for Perl 6, that really shouldn't be in
+    # here; we'll figure out a way to let Perl 6 provide it's own ACCEPTS that
+    # does this or, better make it so we don't need to do this. The purpose is
+    # to make Any accept stuff that doesn't actually inherit from it, aside
+    # from Junction, and to make Perl6Object accept anything.
+    $S0 = parrotclass
+    if $S0 == 'Perl6Object' goto accept_anyway
+    if $S0 != 'Any' goto end
+    $S0 = topicwhat
+    if $S0 != 'Junction' goto accept_anyway
+    goto end
+
+  accept_anyway:
+    $I0 = 1
+
   end:
     .return ($I0)
 .end
