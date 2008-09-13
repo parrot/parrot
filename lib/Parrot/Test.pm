@@ -310,11 +310,25 @@ sub run_command {
         $key =~ m/^STD(OUT|ERR)$/
             or die "I don't know how to redirect '$key' yet!";
         $value = File::Spec->devnull()
-            if $value eq '/dev/null';
-    }
+            if $value eq '/dev/null'; # TODO filehandle `eq' string will fail
+    }                                 # on older perls
 
     my $out = $options{'STDOUT'} || '';
     my $err = $options{'STDERR'} || '';
+
+    local $ENV;
+    if ($PConfig{parrot_is_shared}) {
+        my $blib_path = File::Spec->catfile( $PConfig{build_dir}, 'blib', 'lib' );
+        if ($^O eq 'cygwin') {
+            $ENV{PATH} = $blib_path . ':' . $ENV{PATH};
+        }
+        elsif ($^O eq 'MSWin32') {
+            $ENV{PATH} = $blib_path . ';' . $ENV{PATH};
+        }
+        else {
+            $ENV{LD_RUN_PATH} = $blib_path;
+        }
+    }
 
     if ( $out and $err and $out eq $err ) {
         $err = "&STDOUT";
