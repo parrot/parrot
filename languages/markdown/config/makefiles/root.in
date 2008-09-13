@@ -10,7 +10,7 @@ BUILD_DIR     = @build_dir@
 ## Setup some commands
 LN_S          = @lns@
 PERL          = @perl@
-RM_RF         = @rm_rf@
+RM_F          = @rm_f@
 CP            = @cp@
 PARROT        = ../../parrot@exe@
 CAT           = $(PERL) -MExtUtils::Command -e cat
@@ -72,21 +72,25 @@ help:
 	@echo ""
 
 test: all
-	$(PERL) t/harness
+	cd .. && $(PERL) t/harness --languages=markdown
 
-# this target has nothing to do
+TEST_CLEANUPS = \
+  "t/*.html" \
+  "t/*.text"
+
 testclean:
+	$(RM_F) $(TEST_CLEANUPS)
 
-CLEANUPS = \
+GEN_CLEANUPS = \
   markdown.pbc \
   src/gen_grammar.pir \
   src/gen_actions.pir
 
 clean: testclean
-	$(RM_RF) $(CLEANUPS)
+	$(RM_F) $(GEN_CLEANUPS)
 
 realclean: clean
-	$(RM_RF) Makefile
+	$(RM_F) Makefile
 
 distclean: realclean
 

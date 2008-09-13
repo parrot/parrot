@@ -98,7 +98,7 @@ my @unified_testable_languages
               hq9plus
               jako
               lazy-k lisp lua
-              m4
+              m4 markdown
               ook
               parrot_compiler pipp punie
               regex
