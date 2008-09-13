@@ -45,7 +45,7 @@ sub _init {
         hq9plus
         jako json
         lazy-k lisp lolcode lua
-        m4
+        m4 markdown
         ook
         parrot_compiler perl6 pheme PIR pipp punie pynie
         regex
