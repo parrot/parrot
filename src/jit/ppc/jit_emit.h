@@ -719,7 +719,7 @@ div_rrr(Parrot_jit_info_t *jit_info, char D, char A, char B)
     jit_emit_mov_ri_i(pc, r5, EXCEPTION_DIV_BY_ZERO);          /* type */
     jit_emit_mov_ri_i(pc, r6, div_by_zero);
     jit_info->native_ptr = pc;
-    jit_emit_call_func(pc, (void*) Parrot_ex_throw_from_c);
+    jit_emit_call_func(pc, (void *)Parrot_ex_throw_from_c_args);
     pc = jit_info->native_ptr;
     /* fixup above jump */
     sav_ptr = pc;
