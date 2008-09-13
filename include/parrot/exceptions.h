@@ -87,7 +87,8 @@ typedef enum {
         CONTROL_OK,
         CONTROL_BREAK,
         CONTROL_CONTINUE,
-        CONTROL_ERROR
+        CONTROL_ERROR,
+        CONTROL_TAKE
 } exception_type_enum;
 
 /* &end_gen */
