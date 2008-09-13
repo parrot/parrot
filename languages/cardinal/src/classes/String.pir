@@ -27,6 +27,17 @@ Stolen from Rakudo
     cardinalmeta.'register'('CardinalString', 'parent'=>'CardinalObject', 'protoobject'=>strproto)
 .end
 
+.sub 'new' :method :multi(_)
+    $P0 = new 'CardinalString'
+    .return ($P0)
+.end
+
+.sub 'new' :method :multi(_,_)
+    .param pmc a
+    $P0 = new 'CardinalString'
+    $P0 = a
+    .return ($P0)
+.end
 
 .sub 'ACCEPTS' :method
     .param string topic
@@ -40,6 +51,22 @@ Returns the number of characters in C<self>
 =cut
 
 .sub 'chars' :method
+    .local pmc retv
+
+    retv = new 'CardinalInteger'
+    $S0  = self
+    $I0  = length $S0
+    retv = $I0
+
+    .return (retv)
+.end
+
+
+=item size()
+
+=cut
+
+.sub 'size' :method
     .local pmc retv
 
     retv = new 'CardinalInteger'
@@ -76,39 +103,27 @@ Returns a new CardinalString with the characters of C<self> in reverse order.
 
     res = new 'CardinalString'
 
-    str = self
-    i = length str
-    i -= 1
-    if i < 0 goto done
-
-    .local pmc elem
-loop:
-    if i < 0 goto done
-
-    elem = self.'[]'(i)
-    res.'concat'(elem)
-    i -= 1
-
-    goto loop
-
-done:
+    .local pmc iterator, item
+    iterator = new 'Iterator', self
+  each_loop:
+    unless iterator goto each_loop_done
+    item = shift iterator
+    res = concat item, res
+    goto each_loop
+  each_loop_done:
     .return(res)
 .end
 
 =item reverse!()
 
-Returns a the characters in C<self> in revese order. Destructive update.
+Returns the characters in C<self> in reverse order. Destructive update.
 
 =cut
 
 .sub 'reverse!' :method
-    .local pmc retv
-
-    retv = self.'split'('')
-    retv = retv.'reverse!'()
-    retv = retv.join('')
-
-    .return(retv)
+    $S0 = self.'reverse'()
+    self = $S0
+    .return(self)
 .end
 
 .sub split :method :multi('CardinalString')
@@ -375,7 +390,7 @@ Returns a copy of C<self> with all lower case letters converted to upper case
 
 =cut
 
-.sub '[]' :method
+.sub '[]' :method :vtable('get_pmc_keyed')
     .param int start
     .param int stop :optional
     .local string tmp
@@ -410,7 +425,7 @@ Warning: Partial implementation. Look for TODO
 
 =cut
 
-.sub '[]=' :method
+.sub '[]=' :method :vtable('set_pmc_keyed')
     .param int start
     .param string replace_with
     .local string tmp
@@ -440,6 +455,17 @@ Warning: Partial implementation. Look for TODO
         .return()
 .end
 
+.sub 'each_byte' :method
+    .param pmc block
+    .local pmc iterator, item
+    iterator = new 'Iterator', self
+  each_loop:
+    unless iterator goto each_loop_done
+    item = shift iterator
+    block(item)
+    goto each_loop
+  each_loop_done:
+.end
 
 =item perl()
 
