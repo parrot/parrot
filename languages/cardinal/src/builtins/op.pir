@@ -42,7 +42,7 @@ src/builtins/op.pir - Cardinal ops
         $P1 = shift iter
         $P2 = b.'include?'($P1)
         $I0 = 'infix:=='($P2, $P3)
-        eq $I0, 0, appendit
+        eq $I0, 1, appendit
         #eq $P2, $P3, appendit
         goto iter_loop
     appendit:
