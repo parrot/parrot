@@ -97,7 +97,7 @@ main(int argc, char *argv[])
 
 =head1 SEE ALSO
 
-F<src/pbc.c>, F<include/parrot/pbc.h>.
+F<src/packfile.c>, F<include/parrot/packfile.h>.
 
 =cut
 
