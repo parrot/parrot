@@ -79,8 +79,6 @@ Return generated HTML for all of its children.
     .param pmc node
     $S1 = node.'text'()
     $S2 = node.'level'()
-    $I2 = length $S2
-    $S2 = $I2
     .local pmc code
     new code, 'CodeString'
     $S0 = "<h"

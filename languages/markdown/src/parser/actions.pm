@@ -33,9 +33,10 @@ method Block($/, $key) {
 }
 
 method AtxHeading($/) {
-#    my $level := length ~$<AtxStart>;
-    my $level := ~$<AtxStart>;
-    make Markdown::Header.new( :level( $level ), :text( ~$<AtxInline> ) );
+    make Markdown::Header.new(
+        :level( ~$<AtxStart>.length() ),
+        :text( ~$<AtxInline> ),
+    );
 }
 
 method Para($/) {

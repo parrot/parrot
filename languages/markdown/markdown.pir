@@ -82,6 +82,7 @@ to the Markdown compiler.
 
 .include 'src/gen_grammar.pir'
 .include 'src/gen_actions.pir'
+.include 'src/gen_builtins.pir'
 .include 'src/Compiler.pir'
 .include 'src/Node.pir'
 
