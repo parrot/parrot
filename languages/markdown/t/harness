@@ -7,6 +7,10 @@ languages/markdown/t/harness - A harness for Parrot Markdown
 
 =head1 SYNOPSIS
 
+    cd languages && make markdown.test
+
+    cd languages && perl t/harness --languages=markdown
+
     cd languages && perl -I../lib -Imarkdown/t markdown/t/harness --files
 
     cd languages && perl -I../lib -Imarkdown/t markdown/t/harness
@@ -24,63 +28,25 @@ If I'm called with no args, I run the complete suite.
 Otherwise I run the tests that were passed on the command line.
 
 =cut
-
 use strict;
 use warnings;
-use lib '..';
+use 5.008;
 
-use Cwd();
-use Data::Dumper;
-use File::Spec;
-use Getopt::Long;
-use Test::Harness();
+use lib qw( . lib ../lib ../../lib ../../lib );
 
-my $language = 'markdown';
-
-my $opt_files;
-GetOptions(
-    'files' => \$opt_files,
-);
-
-if ( $opt_files ) {
-
-    # Only the Makefile in 'parrot/languages' uses --files
-    my $dir = File::Spec->catfile( $language, 't' );
-    push my @files, glob( File::Spec->catfile( $dir, '*.t' ) );
-    print join( "\n", @files );
-    print "\n" if scalar(@files);
-}
-else {
-    my @files;
-
-    if ( scalar(@ARGV) ) {
-
-        # Someone specified tests for me to run.
-        @files = grep { -f $_ } @ARGV;
-    }
-    else {
-        ( undef, undef, my $current_dir )
-            = File::Spec->splitpath( Cwd::getcwd() );
-        my $dir;
-        if ( $current_dir eq 'languages' ) {
-            $dir = File::Spec->catfile( $language, 't' );
-        }
-        elsif ( $current_dir eq $language ) {
-            $dir = 't';
-        }
-        if ($dir) {
-            @files = glob( File::Spec->catfile( $dir, '*.t' ) );
-        }
-    }
-
-    Test::Harness::runtests(@files) if scalar(@files);
-}
+use Parrot::Test::Harness language => 'markdown',
+                          compiler => 'markdown.pbc';
 
 =head1 HISTORY
 
-Mostly taken from F<languages/lua/t/harness>.
+Taken from F<languages/abc/t/harness>.
+
+The old, direct Test::Harness::runtests approach prints
+"unknown option --master".
 
 =head1 AUTHOR
+
+Reini Urban
 
 Francois Perrad
 
