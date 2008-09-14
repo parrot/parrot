@@ -195,6 +195,16 @@ supported. Instead, use the C<set_addr> directly.
 
 See RT#58238.
 
+=item * C<get_*_keyed_int> VTABLE methods change the size of Resizable*Arrays
+[post 0.7.1]
+
+The C<get_{String|PMC|Integer|Number|Boolean}_keyed_int> VTABLE methods
+increase the size of Resizable{String|PMC|Integer|Number|Boolean}Arrays when
+they're used to search for an element past the end of the array.  This behavior
+is deprecated and will be removed after the 0.7.1 release.
+
+See RT #52778.
+
 =back
 
 =head1 Parrot Compiler tools
