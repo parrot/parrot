@@ -20,7 +20,7 @@ LANGUAGES = \
     hq9plus \
     jako json \
     lazy-k lisp lolcode lua \
-    m4 \
+    m4 markdown \
     ook \
     parrot_compiler perl6 pheme PIR pipp punie pynie \
     regex \
@@ -363,6 +363,16 @@ m4.clean:
 	- $(MAKE) m4 clean
 m4.realclean:
 	- $(MAKE) m4 realclean
+
+markdown: markdown.dummy
+markdown.dummy:
+	- $(MAKE) markdown
+markdown.test:
+	- $(MAKE) markdown test
+markdown.clean:
+	- $(MAKE) markdown clean
+markdown.realclean:
+	- $(MAKE) markdown realclean
 
 ook : ook.dummy
 ook.dummy:
