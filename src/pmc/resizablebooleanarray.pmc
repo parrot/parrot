@@ -69,7 +69,7 @@ Returns the integer value of the element at index C<key>.
         offsetkey = key + PMC_int_val2(SELF);
 
         if (offsetkey >= PMC_int_val(SELF))
-            return 0;
+            SELF.set_integer_native(key+1);
 
         return SUPER(offsetkey);
     }
