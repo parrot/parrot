@@ -1,3 +1,4 @@
+#! perl
 # Copyright (C) 2008, The Perl Foundation.
 # $Id$
 
@@ -28,6 +29,7 @@ If I'm called with no args, I run the complete suite.
 Otherwise I run the tests that were passed on the command line.
 
 =cut
+
 use strict;
 use warnings;
 use 5.008;
@@ -36,21 +38,6 @@ use lib qw( . lib ../lib ../../lib ../../lib );
 
 use Parrot::Test::Harness language => 'markdown',
                           compiler => 'markdown.pbc';
-
-=head1 HISTORY
-
-Taken from F<languages/abc/t/harness>.
-
-The old, direct Test::Harness::runtests approach prints
-"unknown option --master".
-
-=head1 AUTHOR
-
-Reini Urban
-
-Francois Perrad
-
-=cut
 
 # Local Variables:
 #   mode: cperl
