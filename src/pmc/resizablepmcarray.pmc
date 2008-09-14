@@ -203,7 +203,7 @@ Returns the PMC value of the element at index C<key>.
                 "ResizablePMCArray: index out of bounds!");
 
         if (key >= PMC_int_val(SELF))
-            return PMCNULL;
+            SELF.set_integer_native(key+1);
 
         data = PMC_data_typed(SELF, PMC **);
 
