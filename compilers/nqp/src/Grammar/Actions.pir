@@ -401,6 +401,7 @@
   add_signature:
     $P0 = match['signature']
     $P0 = $P0[0]
+    if null $P0 goto param_end
     unless $P0 goto param_end
     .local pmc iter
     iter = new 'Iterator', $P0
