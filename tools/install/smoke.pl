@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 28;
+use Test::More tests => 29;
 
 =head1 NAME
 
@@ -160,6 +160,15 @@ ok($out eq "nil\n", "check lua");
 
 $out = `$parrot languages/m4/m4.pbc`;
 ok($out =~ /^Usage/, "check m4");
+
+$filename = 'test.text';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH "Hello, World!\n";
+close $FH;
+$out = `$parrot languages/markdown/markdown.pbc $filename`;
+ok($out eq "<p>Hello, World!</p>\n\n", "check markdown");
+unlink($filename);
 
 $out = `$parrot languages/ook/ook.pbc`;
 ok($out eq q{}, "check ook");
