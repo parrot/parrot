@@ -43,7 +43,7 @@ Returns the floating-point value of the element at index C<key>.
                     "ResizableFloatArray: index out of bounds!");
 
         if (key >= PMC_int_val(SELF))
-            SELF.set_integer_native(key+1);
+            return 0.0;
 
         data = (FLOATVAL *)PMC_data(SELF);
         return data[key];

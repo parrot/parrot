@@ -910,14 +910,16 @@ ok_3:
     print "nok 4 "
 
 ok_4:
-    i = rba2[5000]
-    if i == 1 goto ok_5
+    i = rba2[5000] #should be undefined, i.e. 0
+    if i == 0 goto ok_5
     print "nok 5 "
 
 ok_5:
-    i = pop rba2
-    if i == 1 goto ok_6
+    i = pop rba2 #same as previous
+    if i == 0 goto ok_6
     print "nok 6 "
+    $S0 = rba2
+    say $S0
     end
 
 ok_6:
@@ -969,13 +971,13 @@ ok_3:
     print "nok 4 "
 
 ok_4:
-    i = rba2[5000]
-    if i == 1 goto ok_5
+    i = rba2[5000] #should be undefined, i.e. 0
+    if i == 0 goto ok_5
     print "nok 5 "
 
 ok_5:
-    i = pop rba2
-    if i == 1 goto ok_6
+    i = pop rba2 #same as previous
+    if i == 0 goto ok_6
     print "nok 6 "
     end
 
