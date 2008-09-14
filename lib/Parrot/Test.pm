@@ -309,9 +309,10 @@ sub run_command {
     while ( my ( $key, $value ) = each %options ) {
         $key =~ m/^STD(OUT|ERR)$/
             or die "I don't know how to redirect '$key' yet!";
-        $value = File::Spec->devnull()
-            if $value eq '/dev/null'; # TODO filehandle `eq' string will fail
-    }                                 # on older perls
+        my $strvalue = "$value";        # filehandle `eq' string will fail
+        $value = File::Spec->devnull()  # on older perls, so stringify it
+            if $strvalue eq '/dev/null';
+    }
 
     my $out = $options{'STDOUT'} || '';
     my $err = $options{'STDERR'} || '';
@@ -330,7 +331,7 @@ sub run_command {
         }
     }
 
-    if ( $out and $err and $out eq $err ) {
+    if ( $out and $err and "$out" eq "$err" ) {
         $err = "&STDOUT";
     }
 

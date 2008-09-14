@@ -38,7 +38,9 @@ my $args = $ENV{TEST_PROG_ARGS} || '';
 Parrot::Test::run_command
   (
    qq{$parrot $args -o $out_f $tmppasm},
-   CD     => $path_to_parrot
+   CD     => $path_to_parrot,
+   STDOUT => $out_f,
+   STDERR => $out_f,
   );
 my $pbc = slurp_file($out_f);
 
