@@ -11,6 +11,7 @@ BUILD_DIR     = @build_dir@
 LN_S          = @lns@
 PERL          = @perl@
 RM_F          = @rm_f@
+RM_RF         = @rm_rf@
 CP            = @cp@
 PARROT        = ../../parrot@exe@
 CAT           = $(PERL) -MExtUtils::Command -e cat
@@ -81,11 +82,21 @@ help:
 test: all
 	cd .. && $(PERL) t/harness --languages=markdown
 
+spectest: all t/MarkdownTest_1.0
+	cd .. && $(PERL) t/harness --languages=markdown
+
+t/MarkdownTest_1.0.zip:
+	cd t && perl -MLWP::Simple -e "getstore(q{http:////daringfireball.net//projects//downloads//MarkdownTest_1.0.zip}, q{MarkdownTest_1.0.zip});"
+
+t/MarkdownTest_1.0: t/MarkdownTest_1.0.zip
+	cd t && perl -MArchive::Zip -e "Archive::Zip->new(q{MarkdownTest_1.0.zip})->extractTree();"
+
 TEST_CLEANUPS = \
   "t/*.html" \
   "t/*.text"
 
 testclean:
+	$(RM_RF) t/MarkdownTest_1.0
 	$(RM_F) $(TEST_CLEANUPS)
 
 GEN_CLEANUPS = \
@@ -97,7 +108,7 @@ clean: testclean
 	$(RM_F) $(GEN_CLEANUPS)
 
 realclean: clean
-	$(RM_F) Makefile
+	$(RM_F) Makefile t/MarkdownTest_1.0.zip
 
 distclean: realclean
 
