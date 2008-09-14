@@ -27,12 +27,19 @@ Implements an instance of a class.
 static INTVAL
 get_attrib_index(PARROT_INTERP, PMC *self, STRING *name)
 {
-    Parrot_Class_attributes * const _class = PARROT_CLASS(self);
-    int                  num_classes, i;
+    Parrot_Class_attributes * const _class  = PARROT_CLASS(self);
+    INTVAL                          cur_hll = CONTEXT(interp)->current_HLL;
+    int                             num_classes, i;
+
+    CONTEXT(interp)->current_HLL = 0;
 
     /* First see if we can find it in the cache. */
-    if (VTABLE_exists_keyed_str(interp, _class->attrib_cache, name))
-        return VTABLE_get_integer_keyed_str(interp, _class->attrib_cache, name);
+    if (VTABLE_exists_keyed_str(interp, _class->attrib_cache, name)) {
+        INTVAL retval =
+            VTABLE_get_integer_keyed_str(interp, _class->attrib_cache, name);
+        CONTEXT(interp)->current_HLL = cur_hll;
+        return retval;
+    }
 
     /* No hit. We need to walk up the list of parents to try and find the
      * attribute. */
@@ -55,10 +62,12 @@ get_attrib_index(PARROT_INTERP, PMC *self, STRING *name)
             VTABLE_set_integer_keyed_str(interp, _class->attrib_cache, name,
                 index);
 
+            CONTEXT(interp)->current_HLL = cur_hll;
             return index;
         }
     }
 
+    CONTEXT(interp)->current_HLL = cur_hll;
     return -1;
 }
 

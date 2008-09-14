@@ -1038,8 +1038,12 @@ Creates a new PMC object of the type of the class and calls init().
         if (!_class->instantiated) {
             /* Check that we have all methods listed in resolve list. */
             const int resolve_count = VTABLE_elements(interp, _class->resolve_method);
-            INTVAL mro_length;
-            int i;
+            INTVAL    cur_hll       = CONTEXT(interp)->current_HLL;
+            INTVAL    mro_length;
+            int       i;
+
+            /* don't use HLL mappings for internal-only data */
+            CONTEXT(interp)->current_HLL = 0;
 
             for (i = 0; i < resolve_count; i++) {
                 STRING * const check_meth =
@@ -1075,6 +1079,8 @@ Creates a new PMC object of the type of the class and calls init().
                     break;
                 }
             }
+
+            CONTEXT(interp)->current_HLL = cur_hll;
         }
 
         /* Set instantiated flag. */
