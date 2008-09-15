@@ -1,7 +1,7 @@
 =head1 OVERVIEW
 
 This is a from-scratch implementation, based primarily on the Tcl man page(s),
-and the cvs-current test suite for Tcl (8.5.1)
+and the cvs-current test suite for Tcl.
 
 Another interesting project would have been to modify the Tcl source and have
 it generate Parrot directly. Many people smarter than I am have declared this
