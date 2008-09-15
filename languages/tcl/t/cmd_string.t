@@ -10,7 +10,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 136
+plan 139
 
 # arg checking
 eval_is {string} \
@@ -293,3 +293,6 @@ is [string is double no]  0 {string is double}
 is [string is double .]   0 {string is double}
 is [string is double +2.] 1 {string is double}
 is [string is double -2.] 1 {string is double}
+is [string is double {}]  1 {empty string always works...}
+is [string is double -strict {}]  0 {except in strict mode}
+eval_is {string is double -monkeys uncle} {bad option "-monkeys": must be -strict or -failindex} {bad [string is] option}

@@ -604,7 +604,6 @@ bad_args:
 .end
 
 
-# RT#40770: doesn't respect the -strict or -failindex switches
 .sub 'is'
   .param pmc argv
 
@@ -620,38 +619,62 @@ bad_args:
 
   .local int the_cclass
 
-  .local string class,the_string
-  class = argv[0]
-  the_string = argv[1]
+  .local string class
+  class = shift argv
 
-  .local pmc options
-  options = new 'TclList'
-  push options, 'alnum'
-  push options, 'alpha'
-  push options, 'ascii'
-  push options, 'control'
-  push options, 'boolean'
-  push options, 'digit'
-  push options, 'double'
-  push options, 'false'
-  push options, 'graph'
-  push options, 'integer'
-  push options, 'list'
-  push options, 'lower'
-  push options, 'print'
-  push options, 'punct'
-  push options, 'space'
-  push options, 'true'
-  push options, 'upper'
-  push options, 'wideinteger'
-  push options, 'wordchar'
-  push options, 'xdigit'
+  .local pmc classes
+  classes = new 'TclList'
+  push classes, 'alnum'
+  push classes, 'alpha'
+  push classes, 'ascii'
+  push classes, 'control'
+  push classes, 'boolean'
+  push classes, 'digit'
+  push classes, 'double'
+  push classes, 'false'
+  push classes, 'graph'
+  push classes, 'integer'
+  push classes, 'list'
+  push classes, 'lower'
+  push classes, 'print'
+  push classes, 'punct'
+  push classes, 'space'
+  push classes, 'true'
+  push classes, 'upper'
+  push classes, 'wideinteger'
+  push classes, 'wordchar'
+  push classes, 'xdigit'
 
   .local pmc select_option
   select_option  = get_root_global ['_tcl'], 'select_option'
-  class = select_option(options, class, 'class')
+  class = select_option(classes, class, 'class')
 
-  # RT#40771: Mdiep will probably want to change this to a hash-dispatch
+  .local int strict
+  strict = 0
+
+  argc = argv
+  if argc == 1 goto no_opts
+
+  .local pmc options
+  options = new  'TclList'
+  push options, 'strict'
+  push options, 'failindex'
+
+  .local pmc select_switches, switches
+  select_switches  = get_root_global ['_tcl'], 'select_switches'
+  switches = select_switches(options, argv, 'catchbad' => 1, 'name'=>'option')
+
+  strict = exists options['strict']
+
+no_opts:
+  .local string the_string
+  the_string = shift argv
+
+  if the_string != '' goto not_empty
+  $I0 = not strict
+  .return ($I0)
+
+not_empty:
   if class == 'alnum' goto alnum_check
   if class == 'alpha' goto alpha_check
   if class == 'ascii' goto ascii_check
