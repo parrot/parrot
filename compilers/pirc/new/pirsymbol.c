@@ -84,7 +84,8 @@ void
 init_symbol_table(struct lexer_state * const lexer) {
     PMC *symtable = pmc_new(lexer->interp, enum_class_Hash);
     PMC *dummy = pmc_new(lexer->interp, enum_class_Integer);
-    VTABLE_set_pmc_keyed_str(lexer->interp, symtable, string_from_cstring(lexer->interp, "hi", 2), dummy);
+    VTABLE_set_pmc_keyed_str(lexer->interp, symtable,
+    string_from_cstring(lexer->interp, "hi", 2), dummy);
 }
 */
 /* end experimental code */
