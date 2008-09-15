@@ -121,11 +121,11 @@ to customize the error message slightly.
 .sub select_switches
   .param pmc switches
   .param pmc argv
-  .param int endswitch :optional
+  .param int endswitch :named('endswitch') :optional
   .param int has_ends  :opt_flag
-  .param int catchbad  :optional
+  .param int catchbad  :named('catchbad') :optional
   .param int has_catch :opt_flag
-  .param string name   :optional
+  .param string name   :named('name') :optional
   .param int has_name  :opt_flag
 
   if has_ends goto check_catch
@@ -275,12 +275,15 @@ done:
     $S1 = switches[ii]
     error .= '-'
     error .= $S1
-    if ii == penultimate goto add_or
+    if ii == penultimate goto add_comma_or
     if ii == ultimate goto loop_out_next
     error .= ', '
     goto loop_out_next
+  add_comma_or:
+    if penultimate == 0 goto add_or
+    error .= ','
   add_or:
-    error .= ', or '
+    error .= ' or '
   loop_out_next:
     inc ii
     goto loop_out
