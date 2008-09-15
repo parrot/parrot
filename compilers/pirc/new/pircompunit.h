@@ -36,7 +36,7 @@ typedef enum expr_types {
 
 } expr_type;
 
-/* parameter flags */
+/* target flags */
 typedef enum target_flags {
     TARGET_FLAG_NAMED       = 1 << 0, /* named parameter or variable accepting return value */
     TARGET_FLAG_SLURPY      = 1 << 1, /* slurpy parameter or variable accepting return value */
@@ -47,6 +47,11 @@ typedef enum target_flags {
                                          alone! */
     TARGET_FLAG_INVOCANT    = 1 << 5, /* XXX for MDD; to be implemented according to PDD27 */
 
+    /* abuse this enum for these pir compiler internal flags; by adding them here, they can
+     * be encoded in the same flag member variable of the target struct, preventing the need
+     * for another structure field. As soon as there is a need for 32 target flags, these
+     * flags must be encoded into a different flag member.
+     */
     TARGET_FLAG_IS_REG      = 1 << 31 /* set if the target node represents a register; cleared if
                                          it's a .local/.param. */
 
@@ -176,7 +181,7 @@ typedef struct target {
         int        regno;          /* if this is a register */
     } u;
 
-    int            color;          /* for register allocation */
+    int            color;          /* for register allocation; -1 means no reg. allocated. */
     target_flag    flags;          /* flags like :slurpy etc. */
     char          *alias;          /* if this is a named parameter, this is the alias */
     char          *lex_name;       /* if this is a lexical, this field contains the name */
@@ -214,43 +219,28 @@ typedef struct argument {
  * .return foo(), .return foo.bar(), .return x :flat
  */
 typedef struct invocation {
-    invoke_type type;
-    target     *object;        /* invocant object, if any */
-    target     *sub;           /* invoked sub */
-    target     *retcc;         /* return continuation, if any */
-    target     *results;       /* targets that will receive return values */
-    argument   *arguments;     /* values passed into the sub, or return values */
+    invoke_type   type;
+    target       *object;        /* invocant object, if any */
+    target       *sub;           /* invoked sub */
+    target       *retcc;         /* return continuation, if any */
+    target       *results;       /* targets that will receive return values */
+    argument     *arguments;     /* values passed into the sub, or return values */
 
 } invocation;
 
 /* the instruction node represents a single parrot instruction */
 typedef struct instruction {
-    char        *opname;       /* name of the instruction, such as "print" and "set" */
-    expression  *operands;     /* operands like "$I0" and "42" in "set $I0, 42" */
+    char         *opname;       /* name of the instruction, such as "print" and "set" */
+    expression   *operands;     /* operands like "$I0" and "42" in "set $I0, 42" */
 
 } instruction;
 
 
-/* a statement can be either a parrot instruction or function call */
-typedef enum statement_types {
-    STAT_TYPE_INSTRUCTION,
-    STAT_TYPE_INVOCATION
 
-} statement_type;
-
-/* The statement structure represents a PIR statement. This can be a single Parrot
- * instruction or an invocation/return statement.
- */
+/* The statement structure represents a PIR statement. */
 typedef struct statement {
-    char          *label;      /* label for this statement, if any */
-    statement_type type;       /* union field selector for __statement */
-
-    union __statement {
-        instruction *ins;      /* this statement is an instruction ... */
-        invocation  *inv;      /* ... or an invocation. */
-    }
-    instr;
-
+    char             *label;   /* label for this statement, if any */
+    instruction      *ins;
     struct statement *next;    /* points to next statement */
 
 } statement;
@@ -268,6 +258,8 @@ typedef struct subroutine {
     char              *vtable_method; /* name of vtable method that this sub's overriding, if any */
     char              *instanceof;    /* XXX document this XXX */
     int                flags;         /* this sub's flags */
+
+    /* XXX the whole multi stuff must be implemented */
     char             **multi_types;   /* data types of parameters if this is a multi sub */
 
     target            *parameters;    /* parameters of this sub */
@@ -275,7 +267,7 @@ typedef struct subroutine {
 
     struct symbol     *symbols;       /* symbol table for this subroutine */
     struct pir_reg    *registers[4];  /* used PIR registers in this sub (1 list for each type) */
-    int                regs_used[4];  /* number of PASM registers allocated for this sub */
+    unsigned           regs_used[4];  /* number of PASM registers allocated for this sub */
 
     struct subroutine *next;
 
@@ -317,14 +309,14 @@ argument *add_arg(argument *arg1, argument * const arg2);
 
 target *add_param(struct lexer_state * const lexer, pir_type type, char * const name);
 target *set_param_alias(struct lexer_state * const lexer, char * const alias);
-target *set_param_flag(target * const t, target_flag flag);
+target *set_param_flag(struct lexer_state * const lexer, target * const t, target_flag flag);
 
 target *set_curtarget(struct lexer_state * const lexer, target * const t);
 argument *set_curarg(struct lexer_state * const lexer, argument * const arg);
 
 /* target constructors */
 target *add_target(struct lexer_state * const lexer, target *t1, target * const t);
-target *reg(struct lexer_state * const lexer, pir_type type, int regno);
+target *new_reg(struct lexer_state * const lexer, pir_type type, int regno);
 target *new_target(pir_type type, char * const name);
 
 /* set a key on a target node */
@@ -348,10 +340,9 @@ key *add_key(key *keylist, expression * const newkey);
 void load_library(struct lexer_state * const lexer, char * const library);
 void set_hll(struct lexer_state * const lexer, char * const hll);
 void set_hll_map(struct lexer_state * const lexer, char * const stdtype, char * const hlltype);
-void set_sub_flag(struct lexer_state *lexer, sub_flag flag);
+void set_sub_flag(struct lexer_state * const lexer, sub_flag flag);
 
 /* constructor and functions for setting instruction fields */
-void new_statement(struct lexer_state *lexer);
 void set_label(struct lexer_state * const lexer, char * const label);
 void set_instr(struct lexer_state * const lexer, char * const opname);
 void set_instrf(struct lexer_state * const lxr, char * const op, char const * const fmt, ...);

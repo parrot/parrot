@@ -809,19 +809,19 @@ static yyconst flex_int32_t yy_rule_can_match_eol[120] =
 
 static yyconst flex_int16_t yy_rule_linenum[119] =
     {   0,
-      194,  196,  198,  202,  203,  204,  205,  206,  207,  208,
-      209,  210,  211,  212,  213,  215,  216,  217,  218,  220,
-      221,  222,  223,  224,  225,  226,  227,  228,  229,  230,
-      231,  233,  237,  243,  249,  256,  257,  259,  260,  261,
-      262,  263,  264,  265,  266,  267,  268,  269,  271,  272,
-      273,  274,  276,  277,  278,  279,  281,  282,  283,  285,
-      286,  287,  288,  289,  290,  291,  292,  294,  295,  296,
-      297,  298,  299,  300,  301,  302,  303,  304,  305,  306,
-      307,  308,  309,  310,  311,  313,  314,  315,  316,  317,
-      318,  319,  320,  321,  322,  323,  324,  325,  327,  328,
+      196,  198,  200,  204,  205,  206,  207,  208,  209,  210,
+      211,  212,  213,  214,  215,  217,  218,  219,  220,  222,
+      223,  224,  225,  226,  227,  228,  229,  230,  231,  232,
+      233,  235,  239,  245,  251,  258,  259,  261,  262,  263,
+      264,  265,  266,  267,  268,  269,  270,  271,  273,  274,
+      275,  276,  278,  279,  280,  281,  283,  284,  285,  287,
+      288,  289,  290,  291,  292,  293,  294,  296,  297,  298,
+      299,  300,  301,  302,  303,  304,  305,  306,  307,  308,
+      309,  310,  311,  312,  313,  315,  316,  317,  318,  319,
+      320,  321,  322,  323,  324,  325,  326,  327,  329,  330,
 
-      329,  330,  331,  332,  333,  336,  341,  342,  343,  344,
-      346,  351,  356,  357,  358,  359,  360,  363
+      331,  332,  333,  334,  335,  338,  343,  344,  345,  346,
+      348,  353,  358,  359,  360,  361,  362,  365
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -882,8 +882,6 @@ easier to maintain, and preferable.
 #include "piryy.h"
 
 
-/* Windows doesn't have <unistd.h> */
-#define YY_NO_UNISTD_H
 
 /* define the type of the extra field in the yyscan_t object that is passed around;
  * this is the lexer_state structure, defined in "pircompiler.h"
@@ -897,6 +895,10 @@ extern void          yyset_extra(YY_EXTRA_TYPE lexer,yyscan_t scanner);
 
 
 
+/* Windows doesn't have <unistd.h> */
+#ifndef YY_NO_UNISTD_H
+#  define YY_NO_UNISTD_H
+#endif
 
 /* keep MSVC happy */
 #ifndef YY_MAIN
@@ -974,7 +976,7 @@ dupstrn(char const * const source, size_t num_chars) {
 /* make yywrap() always return true. */
 /* always show warnings if something's wrong with our spec. */
 /* create a scanner in debug mode; XXX remove this in production build. */
-#line 978 "pirlexer.c"
+#line 980 "pirlexer.c"
 
 #define INITIAL 0
 
@@ -1263,11 +1265,11 @@ YY_DECL
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
 /* %% [7.0] user's declarations go here */
-#line 191 "pir.l"
+#line 193 "pir.l"
 
 
 
-#line 1271 "pirlexer.c"
+#line 1273 "pirlexer.c"
 
     yylval = yylval_param;
 
@@ -1393,173 +1395,173 @@ do_action:  /* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 194 "pir.l"
+#line 196 "pir.l"
 { /* ignore whitespace */ }
     YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 196 "pir.l"
+#line 198 "pir.l"
 { /* ignore line comments */ }
     YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 198 "pir.l"
+#line 200 "pir.l"
 { /* a set of continuous newlines yields a single newline token. */
                     return TK_NL;
                   }
     YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 202 "pir.l"
+#line 204 "pir.l"
 { return TK_ASSIGN_USHIFT; }
     YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 203 "pir.l"
+#line 205 "pir.l"
 { return TK_USHIFT; }
     YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 204 "pir.l"
+#line 206 "pir.l"
 { return TK_ASSIGN_RSHIFT; }
     YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 205 "pir.l"
+#line 207 "pir.l"
 { return TK_RSHIFT; }
     YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 206 "pir.l"
+#line 208 "pir.l"
 { return TK_LSHIFT; }
     YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 207 "pir.l"
+#line 209 "pir.l"
 { return TK_ARROW; }
     YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 208 "pir.l"
+#line 210 "pir.l"
 { return TK_EQ; }
     YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 209 "pir.l"
+#line 211 "pir.l"
 { return TK_NE; }
     YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 210 "pir.l"
+#line 212 "pir.l"
 { return TK_LE; }
     YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 211 "pir.l"
+#line 213 "pir.l"
 { return TK_GE; }
     YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 212 "pir.l"
+#line 214 "pir.l"
 { return TK_LT; }
     YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 213 "pir.l"
+#line 215 "pir.l"
 { return TK_GT; }
     YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 215 "pir.l"
+#line 217 "pir.l"
 { return TK_FDIV; }
     YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 216 "pir.l"
+#line 218 "pir.l"
 { return TK_AND; }
     YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 217 "pir.l"
+#line 219 "pir.l"
 { return TK_OR; }
     YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 218 "pir.l"
+#line 220 "pir.l"
 { return TK_XOR; }
     YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 220 "pir.l"
+#line 222 "pir.l"
 { return '+'; }
     YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 221 "pir.l"
+#line 223 "pir.l"
 { return '%'; }
     YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 222 "pir.l"
+#line 224 "pir.l"
 { return '*'; }
     YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 223 "pir.l"
+#line 225 "pir.l"
 { return '/'; }
     YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 224 "pir.l"
+#line 226 "pir.l"
 { return '!'; }
     YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 225 "pir.l"
+#line 227 "pir.l"
 { return '~'; }
     YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 226 "pir.l"
+#line 228 "pir.l"
 { return '-'; }
     YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 227 "pir.l"
+#line 229 "pir.l"
 { return '('; }
     YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 228 "pir.l"
+#line 230 "pir.l"
 { return ')'; }
     YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 229 "pir.l"
+#line 231 "pir.l"
 { return ','; }
     YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 230 "pir.l"
+#line 232 "pir.l"
 { return '['; }
     YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 231 "pir.l"
+#line 233 "pir.l"
 { return ']'; }
     YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 233 "pir.l"
+#line 235 "pir.l"
 { /* if the dot is surrounded by whitespace, it's a concatenation operator */
                     return TK_CONC;
                   }
     YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 237 "pir.l"
+#line 239 "pir.l"
 { /* $P0 .$P1 means error; either space on both side or none at all. */
                     yyerror(yyscanner, yyget_extra(yyscanner),
                           "ambiguous '.'; must be enclosed in space on both sides or none at all.");
@@ -1568,7 +1570,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 243 "pir.l"
+#line 245 "pir.l"
 { /* $P0. $P1 means error; see {WS}"." */
                     yyerror(yyscanner, yyget_extra(yyscanner),
                           "ambiguous '.'; must be enclosed in space on both sides or none at all.");
@@ -1577,7 +1579,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 249 "pir.l"
+#line 251 "pir.l"
 { /* at this point all dot-whitespace combinations have been covered;
                      * so we can be sure that the dot does not have any surrounding
                      * whitespace: that's the method-call dot, as in $P0.$P1().
@@ -1587,357 +1589,357 @@ YY_RULE_SETUP
     YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 256 "pir.l"
+#line 258 "pir.l"
 { return '='; }
     YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 257 "pir.l"
+#line 259 "pir.l"
 { return ';'; }
     YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 259 "pir.l"
+#line 261 "pir.l"
 { return TK_ASSIGN_INC; }
     YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 260 "pir.l"
+#line 262 "pir.l"
 { return TK_ASSIGN_DEC; }
     YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 261 "pir.l"
+#line 263 "pir.l"
 { return TK_ASSIGN_DIV; }
     YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 262 "pir.l"
+#line 264 "pir.l"
 { return TK_ASSIGN_MUL; }
     YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 263 "pir.l"
+#line 265 "pir.l"
 { return TK_ASSIGN_MOD; }
     YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 264 "pir.l"
+#line 266 "pir.l"
 { return TK_ASSIGN_POW; }
     YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 265 "pir.l"
+#line 267 "pir.l"
 { return TK_ASSIGN_BOR; }
     YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 266 "pir.l"
+#line 268 "pir.l"
 { return TK_ASSIGN_BAND; }
     YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 267 "pir.l"
+#line 269 "pir.l"
 { return TK_ASSIGN_FDIV; }
     YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 268 "pir.l"
+#line 270 "pir.l"
 { return TK_ASSIGN_BNOT; }
     YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 269 "pir.l"
+#line 271 "pir.l"
 { return TK_ASSIGN_CONC; }
     YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 271 "pir.l"
+#line 273 "pir.l"
 { return TK_IF; }
     YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 272 "pir.l"
+#line 274 "pir.l"
 { return TK_GOTO; }
     YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 273 "pir.l"
+#line 275 "pir.l"
 { return TK_UNLESS; }
     YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 274 "pir.l"
+#line 276 "pir.l"
 { return TK_NULL; }
     YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 276 "pir.l"
+#line 278 "pir.l"
 { return TK_INT; }
     YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 277 "pir.l"
+#line 279 "pir.l"
 { return TK_NUM; }
     YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 278 "pir.l"
+#line 280 "pir.l"
 { return TK_PMC; }
     YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 279 "pir.l"
+#line 281 "pir.l"
 { return TK_STRING; }
     YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 281 "pir.l"
+#line 283 "pir.l"
 { return TK_SET_ARG; }
     YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 282 "pir.l"
+#line 284 "pir.l"
 { return TK_CONST; }
     YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 283 "pir.l"
+#line 285 "pir.l"
 { return TK_END; }
     YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 285 "pir.l"
+#line 287 "pir.l"
 { return TK_GET_RESULTS; }
     YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 286 "pir.l"
+#line 288 "pir.l"
 { return TK_GLOBALCONST; }
     YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 287 "pir.l"
+#line 289 "pir.l"
 { return TK_HLL; }
     YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 288 "pir.l"
+#line 290 "pir.l"
 { return TK_HLL_MAP; }
     YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 289 "pir.l"
+#line 291 "pir.l"
 { return TK_INVOCANT; }
     YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 290 "pir.l"
+#line 292 "pir.l"
 { return TK_LEX; }
     YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 291 "pir.l"
+#line 293 "pir.l"
 { return TK_LOADLIB; }
     YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 292 "pir.l"
+#line 294 "pir.l"
 { return TK_LOCAL; }
     YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 294 "pir.l"
+#line 296 "pir.l"
 { return TK_METH_CALL; }
     YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 295 "pir.l"
+#line 297 "pir.l"
 { return TK_NAMESPACE; }
     YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 296 "pir.l"
+#line 298 "pir.l"
 { return TK_NCI_CALL; }
     YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 297 "pir.l"
+#line 299 "pir.l"
 { return TK_PARAM; }
     YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 298 "pir.l"
+#line 300 "pir.l"
 { return TK_BEGIN_CALL; }
     YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 299 "pir.l"
+#line 301 "pir.l"
 { return TK_BEGIN_RETURN; }
     YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 300 "pir.l"
+#line 302 "pir.l"
 { return TK_BEGIN_YIELD; }
     YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 301 "pir.l"
+#line 303 "pir.l"
 { return TK_CALL; }
     YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 302 "pir.l"
+#line 304 "pir.l"
 { return TK_END_CALL; }
     YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 303 "pir.l"
+#line 305 "pir.l"
 { return TK_END_RETURN; }
     YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 304 "pir.l"
+#line 306 "pir.l"
 { return TK_END_YIELD; }
     YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 305 "pir.l"
+#line 307 "pir.l"
 { return TK_GET_RESULT; }
     YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 306 "pir.l"
+#line 308 "pir.l"
 { return TK_RETURN; }
     YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 307 "pir.l"
+#line 309 "pir.l"
 { return TK_SUB; }
     YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 308 "pir.l"
+#line 310 "pir.l"
 { return TK_YIELD; }
     YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 309 "pir.l"
+#line 311 "pir.l"
 { return TK_SET_RETURN; }
     YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 310 "pir.l"
+#line 312 "pir.l"
 { return TK_SET_YIELD; }
     YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 311 "pir.l"
+#line 313 "pir.l"
 { return TK_TAILCALL; }
     YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 313 "pir.l"
+#line 315 "pir.l"
 { return TK_FLAG_ANON; }
     YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 314 "pir.l"
+#line 316 "pir.l"
 { return TK_FLAG_INIT; }
     YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 315 "pir.l"
+#line 317 "pir.l"
 { return TK_FLAG_LOAD; }
     YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 316 "pir.l"
+#line 318 "pir.l"
 { return TK_FLAG_POSTCOMP; }
     YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 317 "pir.l"
+#line 319 "pir.l"
 { return TK_FLAG_IMMEDIATE; }
     YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 318 "pir.l"
+#line 320 "pir.l"
 { return TK_FLAG_MAIN; }
     YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 319 "pir.l"
+#line 321 "pir.l"
 { return TK_FLAG_METHOD; }
     YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 320 "pir.l"
+#line 322 "pir.l"
 { return TK_FLAG_LEX; }
     YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 321 "pir.l"
+#line 323 "pir.l"
 { return TK_FLAG_OUTER; }
     YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 322 "pir.l"
+#line 324 "pir.l"
 { return TK_FLAG_VTABLE; }
     YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 323 "pir.l"
+#line 325 "pir.l"
 { return TK_FLAG_MULTI; }
     YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 324 "pir.l"
+#line 326 "pir.l"
 { return TK_FLAG_LEXID; }
     YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 325 "pir.l"
+#line 327 "pir.l"
 { return TK_INSTANCEOF; }
     YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 327 "pir.l"
+#line 329 "pir.l"
 { return TK_FLAG_UNIQUE_REG; }
     YY_BREAK
 case 100:
 YY_RULE_SETUP
-#line 328 "pir.l"
+#line 330 "pir.l"
 { return TK_FLAG_OPTIONAL; }
     YY_BREAK
 case 101:
 YY_RULE_SETUP
-#line 329 "pir.l"
+#line 331 "pir.l"
 { return TK_FLAG_OPT_FLAG; }
     YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 330 "pir.l"
+#line 332 "pir.l"
 { return TK_FLAG_SLURPY; }
     YY_BREAK
 case 103:
 YY_RULE_SETUP
-#line 331 "pir.l"
+#line 333 "pir.l"
 { return TK_FLAG_NAMED; }
     YY_BREAK
 case 104:
 YY_RULE_SETUP
-#line 332 "pir.l"
+#line 334 "pir.l"
 { return TK_FLAG_FLAT; }
     YY_BREAK
 case 105:
 YY_RULE_SETUP
-#line 333 "pir.l"
+#line 335 "pir.l"
 { return TK_FLAG_INVOCANT; }
     YY_BREAK
 case 106:
 YY_RULE_SETUP
-#line 336 "pir.l"
+#line 338 "pir.l"
 { /* copy the string, remove the quotes. */
                     yylval->sval = dupstrn(yytext + 1, yyleng - 2);
                     return TK_STRINGC;
@@ -1945,27 +1947,27 @@ YY_RULE_SETUP
     YY_BREAK
 case 107:
 YY_RULE_SETUP
-#line 341 "pir.l"
+#line 343 "pir.l"
 { yylval->ival = atoi(yytext + 2); return TK_PREG; }
     YY_BREAK
 case 108:
 YY_RULE_SETUP
-#line 342 "pir.l"
+#line 344 "pir.l"
 { yylval->ival = atoi(yytext + 2); return TK_SREG; }
     YY_BREAK
 case 109:
 YY_RULE_SETUP
-#line 343 "pir.l"
+#line 345 "pir.l"
 { yylval->ival = atoi(yytext + 2); return TK_NREG; }
     YY_BREAK
 case 110:
 YY_RULE_SETUP
-#line 344 "pir.l"
+#line 346 "pir.l"
 { yylval->ival = atoi(yytext + 2); return TK_IREG; }
     YY_BREAK
 case 111:
 YY_RULE_SETUP
-#line 346 "pir.l"
+#line 348 "pir.l"
 { /* make the label Id available in the parser. remove the ":" first. */
                     yylval->sval = dupstrn(yytext, yyleng - 1);
                     return TK_LABEL;
@@ -1973,7 +1975,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 112:
 YY_RULE_SETUP
-#line 351 "pir.l"
+#line 353 "pir.l"
 { /* identifier; can be a global (sub or const), local or parrot op */
                     yylval->sval = dupstr(yytext);
                     return TK_IDENT;
@@ -1981,48 +1983,48 @@ YY_RULE_SETUP
     YY_BREAK
 case 113:
 YY_RULE_SETUP
-#line 356 "pir.l"
+#line 358 "pir.l"
 { yylval->dval = atof(yytext); return TK_NUMC; }
     YY_BREAK
 case 114:
 YY_RULE_SETUP
-#line 357 "pir.l"
+#line 359 "pir.l"
 { yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 115:
 YY_RULE_SETUP
-#line 358 "pir.l"
+#line 360 "pir.l"
 { yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 116:
 YY_RULE_SETUP
-#line 359 "pir.l"
+#line 361 "pir.l"
 { yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 117:
 YY_RULE_SETUP
-#line 360 "pir.l"
+#line 362 "pir.l"
 { yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 118:
 YY_RULE_SETUP
-#line 363 "pir.l"
+#line 365 "pir.l"
 { /* any character not covered in the rules above is an error. */
               yyerror(yyscanner, yyget_extra(yyscanner), "unexpected character: '%c'", yytext[0]);
             }
     YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 367 "pir.l"
+#line 369 "pir.l"
 { /* end of file, stop scanning. */
               yyterminate();
             }
     YY_BREAK
 case 119:
 YY_RULE_SETUP
-#line 371 "pir.l"
+#line 373 "pir.l"
 ECHO;
     YY_BREAK
-#line 2026 "pirlexer.c"
+#line 2028 "pirlexer.c"
 
     case YY_END_OF_BUFFER:
         {
@@ -3239,7 +3241,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 /* %ok-for-header */
 
-#line 371 "pir.l"
+#line 373 "pir.l"
 
 
 

@@ -210,7 +210,7 @@ are:
 
  $P0[1] = 42           --> set_p_kic_ic # kic = key integer constant
  $I0 = $P0["hi"]       --> set_i_p_kc   # kc = key constant from constant table
- $P1 = new "Hash"      --> set_p_sc     # sc = string constant
+ $P1 = new "Hash"      --> new_p_sc     # sc = string constant
 
 =head3 Constant folding
 

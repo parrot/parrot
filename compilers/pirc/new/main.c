@@ -221,9 +221,11 @@ main(int argc, char *argv[]) {
         argc--;
     }
 
-
-
-
+/* The following code is to test thread safety. If TEST_THREAD_SAFETY
+ * is false, no threads are started; only the main thread will do
+ * a parse.
+ * For thread safety testing, the pthreads library is used.
+ */
 #ifdef TEST_THREAD_SAFETY
 {
     pthread_t threads[NUM_THREADS];
@@ -279,6 +281,7 @@ main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    /* pack all args for parse_file() */
     args.flexdebug = flexdebug;
     args.infile    = infile;
     args.filename  = filename;
@@ -289,10 +292,6 @@ main(int argc, char *argv[]) {
 #endif
 
 
-
-    /*print_data_sizes();*/
-
-    /* go home! */
     return 0;
 }
 
@@ -301,8 +300,7 @@ main(int argc, char *argv[]) {
 /*
 
 =item C<int
-yyerror(yyscan_t yyscanner, lexer_state * const  lexer,
-        char const * const message, ...)>
+yyerror(yyscan_t yyscanner, lexer_state * const  lexer, char const * const message, ...)>
 
 Default parse error handling routine, that is invoked when the bison-generated
 parser finds a syntax error.
@@ -312,11 +310,10 @@ parser finds a syntax error.
 */
 int
 yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message, ...) {
-    char const * const text = yyget_text(yyscanner);
+    char const * const current_token = yyget_text(yyscanner);
     va_list arg_ptr;
 
-    fprintf(stderr, "\nError in file '%s' (line %d)\n\n", lexer->filename,
-            yyget_lineno(yyscanner));
+    fprintf(stderr, "\nError in file '%s' (line %d)\n\n", lexer->filename, yyget_lineno(yyscanner));
 
     va_start(arg_ptr, message);
     vfprintf(stderr, message, arg_ptr);
@@ -325,10 +322,10 @@ yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const messag
     ++lexer->parse_errors;
 
     /* print current token if it doesn't contain a newline token. */
-    if (!strstr(text, "\n"))
-        fprintf(stderr, "\ncurrent token: '%s'\n\n", text);
-    else
-        fprintf(stderr, "\n\n");
+    if (!strstr(current_token, "\n"))
+        fprintf(stderr, "\ncurrent token: '%s'", current_token);
+
+    fprintf(stderr, "\n\n");
 
     return 0;
 }

@@ -48,8 +48,6 @@ easier to maintain, and preferable.
 #include "piryy.h"
 
 
-/* Windows doesn't have <unistd.h> */
-#define YY_NO_UNISTD_H
 
 /* define the type of the extra field in the yyscan_t object that is passed around;
  * this is the lexer_state structure, defined in "pircompiler.h"
@@ -63,6 +61,10 @@ extern void          yyset_extra(YY_EXTRA_TYPE lexer, yyscan_t scanner);
 
 
 
+/* Windows doesn't have <unistd.h> */
+#ifndef YY_NO_UNISTD_H
+#  define YY_NO_UNISTD_H
+#endif
 
 /* keep MSVC happy */
 #ifndef YY_MAIN
