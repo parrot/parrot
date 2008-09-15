@@ -67,7 +67,7 @@ F<$prefix/lib/parrot/library/WMLScript.pbc>.
 C<load_bytecode 'languages/WMLScript/WMLScript.pbc'> =>
   F<languages/WMLScript/WMLScript.pbc>  or 
     F<runtime/parrot/library/languages/WMLScript/WMLScript.pbc> =>
-  F<$prefix/lib/parrot/library/languages/WMLScript.pbc>.
+  F<$prefix/lib/parrot/library/languages/WMLScript/WMLScript.pbc>.
 
 ad 2. C<load_bytecode 'languages/WMLScript/src/WMLScript.pbc'> should be
 replaced by C<load_language 'WMLScript'> and F<WMLScript.pbc> should be
@@ -441,5 +441,5 @@ http://rt.perl.org/rt3/Ticket/Display.html?id=nnnnn
 
 __END__
 Local Variables:
- fill-column:76
+ fill-column:78
 End:
