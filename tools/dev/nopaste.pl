@@ -14,7 +14,7 @@ use Getopt::Std;
 my $server  = 'nopaste.snit.ch';
 my $url     = "http://$server:8001/paste";
 my $opt     = {
-    c => undef,                                  # channel
+    c => '#parrot',                              # channel
     n => getlogin || getpwuid($<) || 'someone',  # name
     t => undef,                                  # title
 };
@@ -58,7 +58,7 @@ nopaste.pl - paste the contents of a file via $server
   nopaste.pl -t "TITLE" [ -c CHANNEL ] [ -n NAME ] [ FILENAME ]
 
     TITLE     the title of the paste
-    CHANNEL   the irc channel (defaults to undef)
+    CHANNEL   the irc channel (defaults to #parrot)
     NAME      the username (defaults to username or 'someone')
     FILENAME  the name of the file to paste (defaults to STDIN)
 USAGE
