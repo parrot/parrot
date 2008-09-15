@@ -110,6 +110,7 @@ all: \
  $(LIBPATH)/glut.pbc \
  $(LIBPATH)/lfs.pbc \
  $(LIBPATH)/lpeg.pbc \
+ $(LIBPATH)/markdown.pbc \
  $(LIBPATH)/md5.pbc \
  $(LIBPATH)/random.pbc \
  $(LIBPATH)/sha1.pbc \
@@ -224,6 +225,9 @@ $(LIBPATH)/lfs.pbc: $(LIBPATH)/lfs.pir
 
 $(LIBPATH)/lpeg.pbc: $(LIBPATH)/lpeg.pir
 	-$(PARROT) --output=$(LIBPATH)/lpeg.pbc $(LIBPATH)/lpeg.pir
+
+$(LIBPATH)/markdown.pbc: $(LIBPATH)/markdown.pir
+	-$(PARROT) --output=$(LIBPATH)/markdown.pbc $(LIBPATH)/markdown.pir
 
 $(LIBPATH)/md5.pbc: $(LIBPATH)/md5.pir
 	-$(PARROT) --output=$(LIBPATH)/md5.pbc $(LIBPATH)/md5.pir
