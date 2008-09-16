@@ -289,6 +289,92 @@ This is the same rule, except now it passes two arguments to it's
 action method: the match object and the name of the person who
 got matched.
 
+=head2 Warning: Left Recursion
+
+Getting into all the nitty-gritty theory behind parsers is well beyond
+the scope of this book. However, there is one potential pitfall that
+developers should be made aware of that is not immediately obvious.
+Like functions in ordinary procedural or functional languages, the
+methods in the PGE parser grammar can call themselves recursively.
+Consider the following rules derived in part from the grammar for the
+C programming language:
+
+ rule if_statement {
+    'if' <condition> '{' <statement>* '}' <else_block>?
+ }
+
+ rule statement {
+    <if_statement> | <expression>
+ }
+
+ rule else_block {
+    'else' '{' <statements>* '}'
+ }
+
+Notice that an C<if_statement> can contain a list of C<statement>s, and
+that each statement may itself be an C<if_statement>? This is called
+I<recursion> X<Recursion>, and is part of where the "Recursive Descent"
+algorithm gets it's name from.
+
+Now, let's look at a more direct example of a comma-separated list of
+integer digits to form an array. We can define this recursively as
+follows:
+
+ rule list {
+     <list> ',' <digit> | <digit>
+ }
+
+The intention is that if there is only one digit, we match the second
+option in the alternation, and if there are more digits we can match
+them recursively in the first alternation. However, take a close look
+at the insideous result. The recursive descent parser enters the C<list>
+rule. It's first option is to enter the list rule again, so it does.
+Recursive descent is a depth-first algorithm, and it will continue to
+descent down a particular path until it finds a successful match or a
+match failure. In this case, it matches C<list> and then it matches
+C<list> again, then it matches C<list> again, and so on and so forth.
+What we have created is an infinite loop pattern called I<left recursion>.
+
+Left recursion is caused when the left-most item of the left-most
+alternation is a recursion. The rule above can be easily resolved
+by writing:
+
+ rule list {
+    <digit> | <list> ',' <digit>
+ }
+
+Or even
+
+ rule list {
+    <digit> ',' <list> | <digit>
+ }
+
+Both of these two options make sure the left-most item in our rule is not
+a recursion, therefore preventing left recursion.
+
+Here is a more tricky example where the left recursion is hidden from
+view:
+
+ rule term {
+    <expression> '*' <term> | <digit>
+ }
+
+ rule expression {
+    <term> '+' <expression> | <term>
+ }
+
+This is a very limited subset of mathematical equations that we might like
+to write, and even in this small subset we have this same problem: To
+match a C<term>, the parser first tries to match an C<expression>, which
+in turn matches a C<term> and then an C<expression> ...
+
+Left recursion is not the only problem you can run into with a recursive
+descent grammar, but it's one that's likely going to come up relatively
+often for new language designers, and one that is not always likely to
+generate useful error messages.
+
+=head2 Operator Precidence Parser
+
 =head1 Actions and NQP
 
 =head2 NQP Basics
