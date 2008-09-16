@@ -1595,14 +1595,14 @@ identifier  : TK_IDENT
             | keyword
             ;
 
-keyword     : "if"          { $$ = "if"; }
-            | "unless"      { $$ = "unless"; }
-            | "goto"        { $$ = "goto"; }
-            | "int"         { $$ = "int"; }
-            | "num"         { $$ = "num"; }
-            | "string"      { $$ = "string"; }
-            | "pmc"         { $$ = "pmc"; }
-            | "null"        { $$ = "null"; }
+keyword     : "if"          { $$ = dupstr(lexer, "if"); }
+            | "unless"      { $$ = dupstr(lexer, "unless"); }
+            | "goto"        { $$ = dupstr(lexer, "goto"); }
+            | "int"         { $$ = dupstr(lexer, "int"); }
+            | "num"         { $$ = dupstr(lexer, "num"); }
+            | "string"      { $$ = dupstr(lexer, "string"); }
+            | "pmc"         { $$ = dupstr(lexer, "pmc"); }
+            | "null"        { $$ = dupstr(lexer, "null"); }
             ;
 
 unop        : '-'            { $$ = "neg"; }

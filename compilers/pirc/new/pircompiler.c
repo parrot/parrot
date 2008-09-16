@@ -42,6 +42,9 @@ new_lexer(char * const filename) {
         exit(EXIT_FAILURE);
     }
 
+    /* create a hashtable to store all strings */
+    lexer->obj_cache.str_cache = pmc_new(lexer->interp, enum_class_Hash);
+
     return lexer;
 }
 
@@ -71,6 +74,176 @@ pirerror(lexer_state * const lexer, char const * const message, ...) {
     ++lexer->parse_errors;
 }
 
+/*
+
+=item C<char *
+dupstr(char const * const source)>
+
+The C89 standard does not define a strdup() in the C library,
+so define our own strdup. Function names beginning with "str"
+are reserved, so make it dupstr, as that is what it
+does: duplicate a string.
+
+=cut
+
+*/
+char *
+dupstr(lexer_state * const lexer, char * source) {
+    return dupstrn(lexer, source, strlen(source));
+}
+
+static void
+store_string(lexer_state * const lexer, char * const str) {
+
+}
+
+static char *
+find_string(lexer_state * const lexer) {
+    return NULL;
+}
+
+/*
+
+=item C<char *
+dupstrn(char const * const source, size_t num_chars)>
+
+See dupstr, except that this version takes the number of characters to be
+copied. Easy for copying a string except the quotes, for instance.
+
+=cut
+
+*/
+char *
+dupstrn(lexer_state * const lexer, char * source, size_t num_chars) {
+    char *result = find_string(lexer);
+
+    if (result == NULL) { /* not found */
+        result = (char *)calloc(num_chars + 1, sizeof (char));
+        assert(result);
+        /* only copy num_chars characters */
+        strncpy(result, source, num_chars);
+        /* cache the string */
+        store_string(lexer, result);
+    }
+
+    return result;
+}
+
+
+/***** routine to free memory *****/
+
+void
+free_key(key *k) {
+    free(k);
+    k = NULL;
+}
+
+void
+free_constant(constant *c) {
+    free(c);
+    c = NULL;
+}
+
+void
+free_target(target *t) {
+    if (t->key)
+        free_key(t->key);
+
+    if (t->alias)
+        free(t->alias);
+
+    if (t->lex_name)
+        free(t->lex_name);
+
+    free(t);
+    t = NULL;
+}
+
+void
+free_expression(expression *expr) {
+    switch (expr->type) {
+        case EXPR_TARGET:
+            free_target(expr->expr.t);
+            break;
+        case EXPR_CONSTANT:
+            free_constant(expr->expr.c);
+            break;
+        case EXPR_KEY:
+            free_key(expr->expr.k);
+            break;
+        default:
+            break;
+    }
+}
+
+void
+free_operands(expression *expr) {
+    expression *iter = expr;
+
+    do {
+        expression *temp = iter;
+        iter = iter->next;
+
+        free_expression(iter);
+        free(temp);
+    }
+    while (iter != expr);
+
+    expr = NULL;
+}
+
+
+void
+free_statements(statement *instr) {
+    statement *iter = instr;
+    do {
+        statement *temp = iter;
+        iter = iter->next;
+
+        free_operands(iter->ins->operands);
+        free(temp);
+    }
+    while (iter != instr);
+
+    instr = NULL;
+}
+
+/*
+
+=item C<void
+release_resources(lexer_state *lexer)>
+
+=cut
+
+*/
+void
+release_resources(lexer_state *lexer) {
+    subroutine *iter = lexer->subs;
+
+    if (iter) {
+        do {
+            subroutine *temp = iter;
+            iter = iter->next;
+            /* free the symbols in this subroutine */
+            free_symbols(iter->symbols);
+
+            /* free instructions in this subroutine */
+            free_statements(iter->statements);
+
+            /* free this subroutine itself */
+            free(temp);
+        }
+        while (iter != lexer->subs);
+    }
+
+
+    Parrot_destroy(lexer->interp);
+
+    /* finally, free the lexer itself */
+    free(lexer);
+
+    lexer = NULL;
+}
 
 /*
 

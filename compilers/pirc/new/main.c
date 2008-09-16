@@ -40,8 +40,6 @@
 #include "piryy.h"
 
 
-
-
 /*
 
 =head1 FUNCTIONS
@@ -112,6 +110,14 @@ typedef struct parser_args {
 
 } parser_args;
 
+
+/*
+
+This will be the proper declaration after testing for thread-safety:
+
+void parse_file(int flexdebug, FILE *infile, char * const filename)
+
+*/
 void *
 parse_file(void *a) {
     yyscan_t     yyscanner;
@@ -153,16 +159,20 @@ parse_file(void *a) {
     else
         fprintf(stderr, "There were %d errors\n", lexer->parse_errors);
 
-
     fclose(infile);
 
+
+
     /* clean up after playing */
+    release_resources(lexer);
     yylex_destroy(yyscanner);
-    free(lexer);
 
     return NULL;
 
 }
+
+
+
 /*
 
 =item C<int main(int argc, char *argv[])>
@@ -182,6 +192,7 @@ main(int argc, char *argv[]) {
     /* skip program name */
     argc--;
     argv++;
+
 
     /* very basic argument handling; I'm too lazy to check out
      * the standard funtion for that, right now. This is a TODO. */
@@ -290,7 +301,6 @@ main(int argc, char *argv[]) {
     parse_file(&args);
 }
 #endif
-
 
     return 0;
 }

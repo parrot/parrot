@@ -1112,15 +1112,26 @@ new_const(pir_type type, ...) {
 /*
 
 =item C<static invocation *
-new_invocation(void)>
+new_invocation(lexer_state * const lexer)>
+
+Returns a pointer to a new invocation object. In the current implementation,
+there can only be one invocation object at any time. For that reason, the
+lexer structure has a cache, containing such an invocation object. This way,
+it can be reused over and over again, preventing the need to allocate new
+invocation objects.
+
+This function clears the invocation object, and returns a pointer to it.
 
 =cut
 
 */
 static invocation *
-new_invocation(void) {
+new_invocation(lexer_state * const lexer) {
+    /*
     invocation *inv = (invocation *)malloc(sizeof (invocation));
     assert(inv);
+    */
+    invocation *inv = &lexer->obj_cache.inv_cache;
     /* clear all fields */
     memset(inv, 0, sizeof (invocation));
 
@@ -1282,7 +1293,7 @@ invocation *
 invoke(struct lexer_state * const lexer, invoke_type type, ...) {
     va_list arg_ptr;
 
-    invocation *inv = new_invocation();
+    invocation *inv = new_invocation(lexer);
     inv->type       = type;
 
     va_start(arg_ptr, type);
@@ -1821,10 +1832,15 @@ This function assumes that C<fullname> is a valid instruction.
 =cut
 
 */
+
+#define get_instr_opcode(LEXER,NAME)   LEXER->interp->op_lib->op_code(NAME, 1)
+
+/*
 int
 get_instr_opcode(lexer_state * const lexer, char * const fullname) {
     return lexer->interp->op_lib->op_code(fullname, 1);
 }
+*/
 
 
 
@@ -2164,6 +2180,8 @@ generate_unique_pir_reg(lexer_state * const lexer, pir_type type) {
     return new_reg(lexer, type, --lexer->pir_reg_generator);
 }
 
+
+
 /*
 
 =item C<void
@@ -2175,7 +2193,7 @@ Convert an C<invocation> structure into a series of instructions.
 
 */
 void
-convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
+convert_inv_to_instr(lexer_state * const lexer, invocation * inv) {
 
     switch (inv->type) {
         case CALL_PCC:
@@ -2268,7 +2286,9 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
             panic("Unknown invocation type in convert_inv_to_instr()");
             break;
     }
+
 }
+
 
 
 void

@@ -77,17 +77,22 @@ next_register(struct lexer_state * const lexer, pir_type type) {
 
 
 /* experimental code */
-/*
+
 #include "parrot/parrot.h"
 
 void
 init_symbol_table(struct lexer_state * const lexer) {
     PMC *symtable = pmc_new(lexer->interp, enum_class_Hash);
-    PMC *dummy = pmc_new(lexer->interp, enum_class_Integer);
+    PMC *dummy = pmc_new(lexer->interp, enum_class_ResizablePMCArray);
+    symbol *sym = new_symbol("hi", PMC_TYPE);
+    symbol *test;
     VTABLE_set_pmc_keyed_str(lexer->interp, symtable,
     string_from_cstring(lexer->interp, "hi", 2), dummy);
+    VTABLE_push_pmc(lexer->interp, dummy, (PMC *)sym);
+    test = (symbol *)VTABLE_pop_pmc(lexer->interp, dummy);
+    printf("name: %s\n", test->name);
 }
-*/
+
 /* end experimental code */
 
 /*
@@ -451,6 +456,36 @@ find_constant(struct lexer_state * const lexer, char * const name) {
         iter = iter->next;
     }
     return NULL;
+}
+
+
+
+/*
+
+=item C<void
+free_symbols(symbol *sym)>
+
+Free the list of symbols pointed to by C<sym>.
+
+=cut
+
+*/
+void
+free_symbols(symbol *sym) {
+    symbol *iter = sym;
+
+    assert(iter);
+
+    do {
+        symbol *temp = iter;
+        iter = iter->next;
+
+        free(temp->name);
+        free(temp);
+    }
+    while (iter);
+
+    sym = NULL;
 }
 
 /*
