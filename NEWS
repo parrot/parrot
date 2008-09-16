@@ -1,25 +1,21 @@
 # $Id$
 
-New in [placeholder 0.7.1]
-
+New in 0.7.1
 - Implementation
   + Add -I and -L command line options
   + Support for null strings in NCI calls
-- Compilers
-  + PIRC:
-    - major refactoring to allow all PIR keywords as identifiers
-    - links to libparrot now, so all Parrot ops are recognized as such
-    - implemented .loadlib, .HLL_map, .HLL
 - Languages
   + Rakudo (Perl 6)
-    - Precompiled modules
-    - Precompiled scripts
+    - now over 3300 passing spectests
+    - precompiled modules
+    - precompiled scripts
     - Support for @*INC and %*INC varialbes
     - additional builtin methods and subs
-    - added 'fail' function
+    - added 'fail' function, warnings on use of undefined values
     - m/.../ regexes
     - run tests in parallel
     - gather/take
+    - Perl6MultiSub
   + Cardinal (Ruby):
     - 'require' and precompiled modules
     - many new tests
@@ -27,6 +23,11 @@ New in [placeholder 0.7.1]
     - regexes
     - default arguments to functions
     - new committer
+- Compilers
+  + PIRC:
+    - major refactoring to allow all PIR keywords as identifiers
+    - links to libparrot now, so all Parrot ops are recognized as such
+    - implemented .loadlib, .HLL_map, .HLL
 - Miscellaneous
   + Add Xlib and Mysql modules and test programs to NCI examples
 
