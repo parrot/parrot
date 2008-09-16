@@ -492,7 +492,9 @@ endrow:
     args = new 'Hash'
     args ['data'] = res
     rowres = new ['Mysql';'Row'], args
+    .return(rowres)
 nomore:
+    rowres = new 'Undef'
     .return(rowres)
 .end
 
