@@ -536,6 +536,13 @@ nomore:
     .return($P0)
 .end
 
+.sub get :method
+    .param int n
+
+    $P0 = self[n]
+    .return($P0)
+.end
+
 .sub elems :method
     .local pmc data
     data = getattribute self, 'data'
