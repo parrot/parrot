@@ -64,27 +64,17 @@ replacing the stack with that execution context of the invocable pmc.
 Pop the most recently pushed exception handler off the exception handler
 stack.
 
-=item B<throw I<EXCEPTION>>
-
-Throw an exception consisting of the given I<EXCEPTION> PMC.  Active exception
-handlers (if any) will be invoked with I<EXCEPTION> as the only parameter.
-
-
 =item B<throw I<EXCEPTION> [ , I<CONTINUATION> ]>
 
-Throw an exception consisting of the given I<EXCEPTION> PMC after taking
-a continuation at the next opcode.  When a I<CONTINUATION> is passed in,
-it will use that instead. Active exception handlers (if any) will be
-invoked with I<EXCEPTION> and the given continuation as parameters.
+Throw an exception consisting of the given I<EXCEPTION> PMC, after taking a
+continuation at the next opcode. When a I<CONTINUATION> is passed in, it will
+use that instead of generating a new continuation. Active exception handlers
+(if any) will be invoked with I<EXCEPTION> as the only parameter, and the
+return continuation stored within that exception object.
 
-Any type of PMC can be thrown as an exception.  However, if there's any chance
-of cross-language calls -- and in a Parrot environment, cross-language
-operations are kind of the point -- then you should be prepared to catch
-exception classes you would never have thrown yourself.
-
-That said, it is recommended that any thrown PMC that can possibly escape your
-private sandbox should meet the minimal interface requirements of the
-C<parrot;exception> class, described below.
+PMCs other than Parrot's Exception PMC may also be thrown, but they must
+support the interface of an Exception PMC. An HLL may implement throwing any
+arbitrary type of PMC, by storing that PMC as the payload of an Exception PMC.
 
 Exception handlers can resume execution immediately after the C<throw> opcode
 by invoking the resume continuation which is stored in the exception object.
