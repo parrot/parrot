@@ -117,7 +117,7 @@ clean: \
     jako.clean json.clean \
     lisp.clean \
     lolcode.clean lua.clean \
-    m4.clean \
+    m4.clean markdown.clean \
     ook.clean \
     parrot_compiler.clean perl6.clean pheme.clean PIR.clean pipp.clean punie.clean pynie.clean \
     regex.clean \
@@ -138,7 +138,7 @@ realclean: \
     hq9plus.realclean \
     jako.realclean json.realclean \
     lazy-k.realclean lisp.realclean lolcode.realclean lua.realclean \
-    m4.realclean \
+    m4.realclean markdown.realclean \
     ook.realclean \
     parrot_compiler.realclean perl6.realclean pheme.realclean PIR.realclean pipp.realclean punie.realclean pynie.realclean \
     regex.realclean \
