@@ -2,6 +2,9 @@
 
 New in [placeholder 0.7.1]
 
+- Implementation
+  + Add -I and -L command line options
+  + Support for null strings in NCI calls
 - Compilers
   + PIRC:
     - major refactoring to allow all PIR keywords as identifiers
@@ -24,6 +27,8 @@ New in [placeholder 0.7.1]
     - regexes
     - default arguments to functions
     - new committer
+- Miscellaneous
+  + Add Xlib and Mysql modules and test programs to NCI examples
 
 New in 0.7.0
 - Specification
