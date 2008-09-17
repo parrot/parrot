@@ -205,6 +205,35 @@ is deprecated and will be removed after the 0.7.1 release.
 
 See RT #52778.
 
+=item * C<.return> in tailcall context [post 0.7.2]
+
+The C<.return> directive in a tailcall context will be replaced by the more
+explicit C<.tailcall> directive.
+
+See RT #58974.
+
+=item * C<.return> in C<.begin_return> / C<.end_return> [post 0.7.2]
+
+The C<.return> directive in a C<.begin_return> sequence will be replaced by
+the C<.set_return> directive. Likewise, C<.yield> in a C<.begin_yield>
+sequence will be replaced by C<.set_yield>.
+
+See RT #58980.
+
+=item * C<.arg> will become C<.set_arg> [post 0.7.2]
+
+In a C<.begin_call> sequence, the C<.arg> directive will be replaced by
+C<.set_arg>.
+
+See RT #58976.
+
+=item * C<.result> will become C<.get_result> [post 0.7.2]
+
+In a C<.begin_call> sequence, the C<.result> direcive will be replaced by
+the more descriptive C<.get_result>.
+
+See RT #58978.
+
 =back
 
 =head1 Parrot Compiler tools
