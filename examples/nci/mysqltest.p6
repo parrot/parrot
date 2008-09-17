@@ -33,11 +33,12 @@ $mysql.connect('localhost', 'parrot', 'baDworD', 'parrot');
 $mysql.query('select * from hello;');
 
 my $r = $mysql.use_result();
+my $elems = $r.field_count();
 
 my @table_copy;
 
 my $row = $r.fetch_row();
-my $elems = $row.elems();
+#my $elems = $row.elems();
 while (defined $row) {
     my @row_copy;
     my $i = 0;

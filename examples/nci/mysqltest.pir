@@ -46,12 +46,13 @@ good:
     .local pmc r
     r = m.'use_result'()
     .local pmc row
+    .local int n
+    n = r.'field_count'()
 nextrow:
     row = r.fetch_row()
     $I0 = defined row
     unless $I0 goto finish
-    .local int n
-    n = row
+    #n = row
     $I0 = 0
     print "'"
 nextcol:

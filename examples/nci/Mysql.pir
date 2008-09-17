@@ -452,6 +452,17 @@ done:
 .end
 
 #-----------------------------------------------------------------------
+.sub field_count :method
+    .local pmc field_count
+    field_count = get_mysql_function('mysql_field_count', 'ip')
+    .local pmc mysql
+    mysql = getattribute self, 'mysql'
+    .local int fields
+    fields = field_count(mysql)
+    .return(fields)
+.end
+
+#-----------------------------------------------------------------------
 .sub fetch_row :method
 
     .local pmc rowres
