@@ -209,8 +209,9 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
         ARGIN_NULLOK(SymReg * const *args), ARGIN_NULLOK(const int *arg_flags))
 {
     int i, flags;
-    char buf[1024], s[16];
+    char s[16];
     SymReg ** const regs  = mem_allocate_n_zeroed_typed(n + 1, SymReg *);
+    char    * buf         = mem_allocate_n_typed(5*n+1, char *);
 
     strcpy(buf, "\"(");
     for (i = 0; i < n; i++) {
@@ -260,6 +261,7 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
     ins     = insINS(interp, unit, ins, op_name, regs, n + 1);
 
     mem_sys_free(regs);
+    mem_sys_free(buf);
     return ins;
 }
 
