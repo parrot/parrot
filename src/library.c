@@ -663,6 +663,45 @@ Parrot_get_runtime_prefix(PARROT_INTERP)
 
 /*
 
+=item C<char* Parrot_get_runtime_path>
+
+Return a string for the runtime prefix.
+
+=cut
+
+*/
+
+PARROT_API
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_get_runtime_path(PARROT_INTERP)
+{
+    int     free_it;
+    char * const env = Parrot_getenv("PARROT_RUNTIME", &free_it);
+    STRING *result;
+
+    if (env)
+    {
+        result = string_from_cstring(interp, env, 0);
+        if (free_it)
+             free(env);
+    }
+    else {
+        PMC    * const config_hash =
+            VTABLE_get_pmc_keyed_int(interp, interp->iglobals, (INTVAL) IGLOBALS_CONFIG_HASH);
+
+        if (VTABLE_elements(interp, config_hash)) {
+            STRING * const key = CONST_STRING(interp, "prefix");
+            result = VTABLE_get_string_keyed_str(interp, config_hash, key);
+        }
+        else
+            result = CONST_STRING(interp, ".");
+    }
+    return result;
+}
+
+/*
+
 =item C<STRING * parrot_split_path_ext>
 
 Split the pathstring C<in> into <path><filestem><ext>. Return the

@@ -446,13 +446,9 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                 exit(EX_USAGE);
                 break;
             case OPT_RUNTIME_PREFIX:
-                {
-                char *prefix = Parrot_get_runtime_prefix(interp);
-                printf("%s\n", prefix);
-                free(prefix);
+                PIO_printf(interp, "%Ss\n",
+                    Parrot_get_runtime_path(interp));
                 exit(EXIT_SUCCESS);
-                }
-                break;
             case 'V':
                 Parrot_version(interp);
                 break;
