@@ -2,17 +2,22 @@
 
 New in 0.7.1
 - Implementation
-  + Add -I and -L command line options
-  + Support for null strings in NCI calls
+  + add -I and -L command line options
+  + support for null strings in NCI calls
+  + preliminary support for resumable exceptions
+  + add '.hll_map' method for dynamic HLL type mapping
+  + more parrot_debugger fixes
+  + remove obsolete '.past' extension
 - Languages
   + Rakudo (Perl 6)
     - now over 3300 passing spectests
     - precompiled modules
-    - precompiled scripts
+    - precompiled scripts  (--target=pir can now be executed standalone)
     - Support for @*INC and %*INC varialbes
     - additional builtin methods and subs
     - added 'fail' function, warnings on use of undefined values
     - m/.../ regexes
+    - qq, qw, q quoting forms
     - run tests in parallel
     - gather/take
     - Perl6MultiSub
@@ -24,12 +29,15 @@ New in 0.7.1
     - default arguments to functions
     - new committer
 - Compilers
+  + PCT:
+    - add :loadinit attribute for PAST::Block
   + PIRC:
     - major refactoring to allow all PIR keywords as identifiers
     - links to libparrot now, so all Parrot ops are recognized as such
     - implemented .loadlib, .HLL_map, .HLL
 - Miscellaneous
-  + Add Xlib and Mysql modules and test programs to NCI examples
+  + add Xlib and Mysql modules and test programs to NCI examples
+  + many updates and cleanups to PDD documents
 
 New in 0.7.0
 - Specification
