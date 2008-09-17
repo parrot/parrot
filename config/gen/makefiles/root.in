@@ -790,9 +790,9 @@ $(PBC_TO_EXE) : pbc_to_exe.pir $(PARROT)
 	$(PARROT) -o pbc_to_exe.pbc pbc_to_exe.pir
 	$(PARROT) pbc_to_exe.pir pbc_to_exe.pbc
 
-$(PARROT_CONFIG) : tools/util/parrot-config.pir $(PARROT)
+$(PARROT_CONFIG) : tools/util/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc tools/util/parrot-config.pir
-	$(PARROT) pbc_to_exe.pir parrot_config.pbc
+	$(PARROT) pbc_to_exe.pbc parrot_config.pbc
 
 # HLL Executable targets
 #CONDITIONED_LINE(win32):perl6 : $(PERL6)
