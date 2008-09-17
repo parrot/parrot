@@ -23,7 +23,6 @@ Tests the Exporter PMC.
 =cut
 
 # L<PDD17/Exporter PMC>
-# RT#46857 fix smartlinks once this is specced
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
     $P0 = new 'Exporter'

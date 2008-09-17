@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 35;
+use Test::More tests => 33;
 use File::Spec;
 
 =head1 NAME
@@ -77,10 +77,6 @@ for my $dir (@old_directory_list) {
 
     my $perl_exemption_regexp = $d->get_perl_exemption_regexp();
     ok( $perl_exemption_regexp, 'Got perl exemption regexp' );
-
-    my $exempted_file = Parrot::IO::File->new('../../lib/SmartLink.pm');
-    ok( $d->is_perl_exemption($exempted_file), 'SmartLink.pm is exempted' );
-    like( $exempted_file->path(), $perl_exemption_regexp, 'SmartLink.pm is matched' );
 
     # we are in 't/perl'
     {

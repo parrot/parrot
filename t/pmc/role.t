@@ -17,7 +17,6 @@ Tests the Role PMC.
 =cut
 
 # L<PDD15/Role PMC API>
-# TODO fix smartlinks once this is specced
 
 .sub main :main
     .include 'include/test_more.pir'
