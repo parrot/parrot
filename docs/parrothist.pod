@@ -124,4 +124,6 @@ the strings?).
 
  Bob       0.7.0          2008-Aug-19     "Severe Macaw"
 
+ Patrick   0.7.1          2008-Sep-16     "Manu Aloha"
+
 =cut
