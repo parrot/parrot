@@ -80,6 +80,24 @@ Parrot_sleep(unsigned int seconds)
 
 /*
 
+=item C<void
+Parrot_usleep(unsigned int microseconds)>
+
+Sleep for at least the specified number of microseconds (millionths of a
+second).
+
+=cut
+
+*/
+
+void
+Parrot_usleep(unsigned int microseconds)
+{
+    usleep(microseconds);
+}
+
+/*
+
 =item C<struct tm *
 Parrot_gmtime_r(const time_t *t, struct tm *tm)>
 

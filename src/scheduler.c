@@ -872,7 +872,13 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
     MUTEX_DESTROY(lock);
 #else
     /* A more primitive, platform-specific, non-threaded form of sleep. */
-    Parrot_sleep((UINTVAL) ceil(time));
+    if (time > 1000) {
+        /* prevent integer overflow when converting to microseconds */
+        int seconds = floor(time);
+        Parrot_sleep(seconds);
+        time -= seconds;
+    }
+    Parrot_usleep((UINTVAL) time*1000000);
 #endif
     return next;
 }

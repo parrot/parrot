@@ -14,6 +14,7 @@
 ** I/O:
 */
 
+
 /*
 ** Math:
 */
@@ -72,6 +73,7 @@ extern Parrot_memcpy_func_t Parrot_memcpy_aligned_mmx;
 */
 
 void Parrot_sleep(unsigned int seconds);
+void Parrot_usleep(unsigned int microseconds);
 INTVAL Parrot_intval_time(void);
 FLOATVAL Parrot_floatval_time(void);
 struct tm * Parrot_gmtime_r(const time_t *, struct tm *);
