@@ -115,9 +115,11 @@ set todo_tests [dict create \
     scan-4.3[2345789] scan-4.40.[12] scan-4.4[03478] scan-4.5[0123589]
     scan-4.6[012] scan-5.[123456789] scan-5.1[01234] scan-6.[12345678]
     scan-7.[345] scan-8.1[0156] scan-10.2 scan-12.[45] scan-13.[56]
+  } {misc util} {
+    util-3.[135] util-3.5.1 util-4.[123] util-5.1[45]
+    util-5.3[78] util-5.4[01345]
   }
 ]
-
 
 set skip_tests [dict create \
   BOOM {
@@ -253,8 +255,6 @@ set skip_tests [dict create \
     execute-3.33 execute-3.37 execute-3.39 execute-3.43 execute-3.45
     execute-3.49 execute-3.51 execute-3.55 execute-3.57 execute-3.61
     execute-3.62 execute-3.65 execute-3.66 execute-3.72 execute-3.74
-  } {[testdstring]} {
-    util-8.2 util-8.3 util-8.4 util-8.5 util-8.6
   } {[teststringobj]} {
     execute-3.4 execute-3.5 execute-3.6 execute-3.10 execute-3.11 execute-3.12
     execute-3.16 execute-3.17 execute-3.18 execute-3.22 execute-3.23
