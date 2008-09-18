@@ -1234,7 +1234,7 @@ located in C<languages/ruby>.
 
 Simple functional language.
 A quickly abandoned attempt.
-See L<http://www.acooke.org/andrew/writing/parrot/sfl.html>
+See L<http://web.archive.org/web/20070911102734/http://www.acooke.org/andrew/writing/parrot/sfl.html>
 
 =head2 Span
 
