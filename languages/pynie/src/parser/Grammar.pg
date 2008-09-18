@@ -225,7 +225,7 @@ rule lambda_form {
 token simple_stmt {
     | <assert_stmt> {*}                          #= assert_stmt
     | <assignment_stmt> {*}                      #= assignment_stmt
-    | <augmented_assignment_stmt>
+    | <augmented_assignment_stmt> {*}            #= augmented_assignment_stmt
     | <expression_stmt> {*}                      #= expression_stmt
     | <pass_stmt> {*}                            #= pass_stmt
     | <del_stmt> {*}                             #= del_stmt
@@ -254,7 +254,10 @@ rule assignment_stmt {
     {*}
 }
 
-rule augmented_assignment_stmt { <target> <augop> <expression_list> }
+rule augmented_assignment_stmt {
+    <target> <augop> <expression>
+    {*}
+}
 
 rule target_list {
     <target> [ ',' <target> ]* ','?
@@ -504,7 +507,17 @@ rule testlist {
 }
 
 token augop {
-    $<op>=['+='|'-='|'*='|'/='|'\%='|'**='|'>>='|'<<='|'&='|'^='|'|=']
+    | '+='  {*}         #= add
+    | '-='  {*}         #= sub
+    | '*='  {*}         #= mul
+    | '/='  {*}         #= div
+    | '\%=' {*}         #= mod
+#    | '**=' {*}         #= pow
+    | '>>=' {*}         #= shr
+    | '<<=' {*}         #= shl
+    | '&='  {*}         #= band
+    | '^='  {*}         #= bxor
+    | '|='  {*}         #= bor
 }
 
 rule primary {

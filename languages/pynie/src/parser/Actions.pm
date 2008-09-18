@@ -573,6 +573,17 @@ method assignment_stmt($/) {
     make $past;
 }
 
+method augop($/, $key) {
+    make PAST::Op.new( :pirop($key), :node($/) );
+}
+
+method augmented_assignment_stmt($/) {
+    my $past := $($<augop>);
+    $past.push( $($<target>) );
+    $past.push( $($<expression>) );
+    make $past;
+}
+
 method target_list($/) {
     my $past := PAST::VarList.new( :node($/) );
     for $<target> {
