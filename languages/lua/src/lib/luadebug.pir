@@ -97,9 +97,10 @@ function, and so have no direct access to local variables.
     $P0()
     goto L1
   _handler:
-    .local pmc e
+    .local pmc e, c
     .local string msg
-    .get_results (e, msg)
+    .get_results (e, c)
+    msg = e
     printerr msg
     printerr "\n"
     goto L1

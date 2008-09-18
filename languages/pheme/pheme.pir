@@ -59,7 +59,7 @@ Start compilation by passing any command line C<args> to the Pheme compiler.
     goto done
 
   exit_handler:
-    .get_results($P0, $S0)
+    .get_results($P0, $P2)
     .include 'except_severity.pasm'
     $I0 = $P0
     if $I0 != .EXCEPT_EXIT goto rethrow_error

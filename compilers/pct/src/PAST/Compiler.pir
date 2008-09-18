@@ -613,7 +613,7 @@ Return the POST representation of a C<PAST::Block>.
     unless ctrlpast goto sub_done
     bpost.'push'(ctrllabel)
     bpost.'push_pirop'('.local pmc exception')
-    bpost.'push_pirop'('.get_results (exception, $S10)')
+    bpost.'push_pirop'('.get_results (exception, $P11)')
     $I0 = isa ctrlpast, 'PAST::Node'
     if $I0 goto control_past
     if ctrlpast == 'return_pir' goto control_return

@@ -27,12 +27,14 @@
 
 # First pass at RT#40748
 compiler_error:
-  get_results '0,0', $P1, $S1
+  get_results '0,0', $P1, $P2
+  $S1 = $P1
   $S1 = 'compile error: ' . $S1
   die $S1
 
 runtime_error:
-  get_results '0,0', $P1, $S1
+  get_results '0,0', $P1, $P2
+  $S1 = $P1
   $S1 = 'runtime error: ' . $S1
   die $S1
 

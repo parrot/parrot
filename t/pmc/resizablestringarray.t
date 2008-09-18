@@ -1276,10 +1276,11 @@ err_2:
     pop_eh
     goto still_ok
 
-    .local pmc exception
+    .local pmc exception, continuation
     .local string message
 bad_type:
-    .get_results (exception, message)
+    .get_results (exception, continuation)
+    message = exception
 still_ok:
     like(message, 'illegal\ type\ for\ splice', "splice with a different type")
 .end

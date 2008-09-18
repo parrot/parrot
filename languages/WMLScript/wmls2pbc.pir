@@ -54,9 +54,10 @@ Francois Perrad.
     save_pbc(pbc_out, filename)
     end
   _handler:
-    .local pmc e
+    .local pmc e, c
     .local string s
-    .get_results (e, s)
+    .get_results (e, c)
+    s = e
     print s
     print "\n"
   L1:

@@ -168,7 +168,7 @@ LIST
     res = lua_newuserdata($P0, mt)
     .return (res)
   _handler:
-    .get_results ($P0, $S0)
+    .get_results ($P0, $P1)
     new res, 'LuaNil'
     .return (res)
 .endm
@@ -398,7 +398,7 @@ LIST
     res = lua_newuserdata($P0, mt)
     .return (res)
   _handler:
-    .get_results ($P0, $S0)
+    .get_results ($P0, $P1)
     new res, 'LuaNil'
     .return (res)
 .end

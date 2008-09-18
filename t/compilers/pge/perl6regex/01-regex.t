@@ -271,9 +271,10 @@ Description of the test.
     print "'\n"
 
   thrown:
-    .local pmc exception
+    .local pmc exception, continuation
     .local string message
-    get_results '0,0', exception, message
+    get_results '0,0', exception, continuation
+    message = exception
     say message
     # remove /'s
     $S0 = substr result, 0, 1

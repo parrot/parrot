@@ -48,9 +48,10 @@ Francois Perrad.
     script.dump()
     end
   _handler:
-    .local pmc e
+    .local pmc e, c
     .local string msg
-    .get_results (e, msg)
+    .get_results (e, c)
+    msg = e
     print msg
     print "\n"
   L1:

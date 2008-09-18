@@ -199,9 +199,9 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
 
     /* Set up the continuation context of the handler in the interpreter. */
     if (PMC_cont(handler)->current_results)
-        address = pass_exception_args(interp, "PS", address,
+        address = pass_exception_args(interp, "PP", address,
                 CONTEXT(interp), exception,
-                VTABLE_get_string(interp, exception));
+                dest);
 
     if (PObj_get_FLAGS(handler) & SUB_FLAG_C_HANDLER) {
         /* it's a C exception handler */

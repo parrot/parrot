@@ -300,9 +300,10 @@ describing the error.
   _handler:
     .local pmc nil
     .local pmc msg
-    .local pmc e
+    .local pmc e, c
     .local string s
-    .get_results (e, s)
+    .get_results (e, c)
+    s = e
     concat $S0, ': '
     concat $S0, s
     new nil, 'LuaNil'
@@ -336,9 +337,10 @@ fails, it returns B<nil>, plus a string describing the error.
   _handler:
     .local pmc nil
     .local pmc msg
-    .local pmc e
+    .local pmc e, c
     .local string s
-    .get_results (e, s)
+    .get_results (e, c)
+    s = e
     concat $S0, ': '
     concat $S0, s
     new nil, 'LuaNil'

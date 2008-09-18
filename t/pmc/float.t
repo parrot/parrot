@@ -145,7 +145,8 @@ pir_output_is( <<'CODE', <<OUTPUT, "divide by zero" );
     print "fail\n"
     pop_eh
 OK:
-    get_results '0,0', $P0, $S0
+    get_results '0,0', $P0, $P1
+    $S0 = $P0
     print "ok\n"
     print $S0
     print "\n"

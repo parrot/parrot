@@ -528,10 +528,11 @@ In case of any error, C<pcall> returns B<false> plus the error message.
     set status, 1
     .return (status, res :flat)
   _handler:
-    .local pmc e
+    .local pmc e, c
     .local string s
     .local pmc msg
-    .get_results (e, s)
+    .get_results (e, c)
+    s = e
     set status, 0
     new msg, 'LuaString'
     set msg, s

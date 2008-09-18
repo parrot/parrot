@@ -552,7 +552,7 @@ NOT_TRY_START:
 
     # Emit code to get the .NET exception object and check if it's of the type that
     # is accepted.
-    gen_pir = concat ".get_results (cur_exception, $S1000000)\n"
+    gen_pir = concat ".get_results (cur_exception, $P1000002)\n"
     gen_pir = concat "$P1000001 = cur_exception[\"obj\"]\n"
     class_type = eh.get_class_type()
     class_id = eh.get_class_id()
@@ -611,7 +611,7 @@ NOT_TYPED_EH_START:
 
     # Emit code to get and stash the .NET exception object, then put a jump
     # label.
-    gen_pir = concat ".get_results (cur_exception, $S1000000)\nsaved_ehs["
+    gen_pir = concat ".get_results (cur_exception, $P1000002)\nsaved_ehs["
     tmp = i
     gen_pir = concat tmp
     gen_pir = concat "] = cur_exception\nFINALLY_"

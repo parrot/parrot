@@ -544,7 +544,8 @@ specifies the encoding to use for the input (e.g., "utf8").
     say $P0
     goto interactive_loop
   interactive_trap:
-    get_results '0,0', $P0, $S0
+    get_results '0,0', $P0, $P1
+    $S0 = $P0
     if $S0 == '' goto have_newline
     $S1 = substr $S0, -1, 1
     $I0 = is_cclass .CCLASS_NEWLINE, $S1, 0

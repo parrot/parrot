@@ -88,7 +88,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "get_results" );
     print "not reached\n"
     end
 handler:
-    get_results "0,0", P0, S0
+    get_results "0,0", P0, P1
+    set S0, P0
     print "caught it\n"
     typeof S1, P0
     print S1
@@ -116,7 +117,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "get_results - be sure registers are ok" )
     print "not reached\n"
     end
 handler:
-    get_results "0,0", P1, S0
+    get_results "0,0", P1, P2
     inc P0
     print "ok\n"
     end
@@ -137,8 +138,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', ".get_results() - PIR" );
     end
 _handler:
     .local pmc e
+    .local pmc c
     .local string s
-    .get_results (e, s)
+    .get_results (e, c)
+    s = e
     print "caught it\n"
     typeof S1, e
     print S1
@@ -164,7 +167,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw - message" );
     print "not reached\n"
     end
 _handler:
-    get_results "0,0", P5, S0
+    get_results "0,0", P5, P6
+    set S0, P5
     print "caught it\n"
     print S0
     print "\n"
@@ -218,13 +222,15 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers" );
     print "not reached\n"
     end
 _handler1:
-    get_results "0,0", P5, S0
+    get_results "0,0", P5, P6
+    set S0, P5
     print "caught it in 1\n"
     print S0
     print "\n"
     end
 _handler2:
-    get_results "0,0", P0, S0
+    get_results "0,0", P0, P6
+    set S0, P0
     print "caught it in 2\n"
     print S0
     print "\n"
@@ -246,13 +252,15 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers, throw next" );
     print "not reached\n"
     end
 _handler1:
-    get_results "0,0", P5, S0
+    get_results "0,0", P5, P6
+    set S0, P5
     print "caught it in 1\n"
     print S0
     print "\n"
     end
 _handler2:
-    get_results "0,0", P5, S0
+    get_results "0,0", P5, P6
+    set S0, P5
     print "caught it in 2\n"
     print S0
     print "\n"
@@ -284,7 +292,7 @@ pasm_output_is( <<'CODE', <<OUT, "die, error, severity" );
     print "not reached\n"
     end
 _handler:
-    get_results "0,0", P5, S0
+    get_results "0,0", P5, P6
     print "caught it\n"
     set I0, P5['severity']
     print "severity "
@@ -350,7 +358,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'pop_eh out of context (2)');
     goto done
 handler:
     .local pmc exception
-    .get_results (exception, $S0)
+    .get_results (exception,$P0)
+    $S0 = exception
     print "Error: "
     print $S0
     print "\n"
@@ -450,7 +459,8 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "invoke handler in calling sub" );
     print "not reached.\n"
 handler:
     .local pmc exception
-    .get_results (exception, $S0)
+    .get_results (exception,$P0)
+    $S0 = exception
     print "in handler.\n"
     print $S0
     print "\n"
@@ -584,7 +594,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "resuming after exception handled - return 
     pop_eh
     .return($P1)
   handler:
-    get_results "0,0", $P2, $S2
+    get_results "0,0", $P2, $P3
     print "in handler\n"
   .return ($P2)
 .end
@@ -620,9 +630,9 @@ _handler:
     .local pmc e
     .local string s
     .local pmc c
-    .get_results (e, s)
+    .get_results (e, c)
+    s = e
     say 'In the exception handler'
-    c = e['resume']
     c()
 .end
 CODE
