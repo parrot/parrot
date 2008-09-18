@@ -211,15 +211,17 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
     int i, flags;
     char s[16];
     SymReg ** const regs  = mem_allocate_n_zeroed_typed(n + 1, SymReg *);
+
     /* Assumptions:
-     * Flags has no more than 3 hex digits
-     * Plus 0x and , gives 6 char for arg
-     * 4 more for: "( , )", and
-     * 1 more for C string 0 delimiter
-     * Last item has no , but we can forget that to avoid
-     * to have to check for 0 args.
+     * The created string is in the format "\"(0x10,0x10,0x10)\"".
+     * Flags has no more than 4 hex digits (currently the largest defined flag
+     * in include/parrot/enums.h is PARROT_ARG_NAME (0x200), but this could
+     * change in the future.)
+     * Adding "0x" and "," gives a max of 7 chars for each arg.
+     * 5 more for: "\"(" and ")\"\0" .
+     * Last item has no "," but we can ignore it.
      */
-    unsigned int bufsize = 6 * n + 5;
+    unsigned int bufsize = 7 * n + 5;
     char * buf = mem_allocate_n_typed(bufsize, char);
 
     strcpy(buf, "\"(");
