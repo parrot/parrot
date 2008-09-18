@@ -43,6 +43,7 @@ alignment.
 
 # attributes used for xlib types
 .const string attr_XDisplay = 'x_Display'
+.const string attr_XDrawable = 'x_Drawable'
 .const string attr_XWindow = 'x_Window'
 
 # attributes used for parrot objects
@@ -138,15 +139,44 @@ done:
 .end
 
 #-----------------------------------------------------------------------
+.sub get_Drawable_class
+    .local pmc Drawable
+    Drawable = get_global 'Drawable_class'
+    $I0 = defined Drawable
+    if $I0 goto done
+
+    Drawable = newclass ['Xlib'; 'Drawable']
+    addattribute Drawable, attr_display
+    addattribute Drawable, attr_XWindow
+
+    set_global 'Drawable_class', Drawable
+
+# export functions to be used from Drawable methods
+    .local pmc nsmain, ns
+    nsmain = get_namespace
+    ns = get_namespace ['Drawable']
+    .local pmc explist
+    explist = new 'ResizablePMCArray'
+    explist[0] = 'get_xlib_handle'
+    explist[1] = 'get_xlib_function'
+    nsmain.export_to(ns, explist)
+
+done:
+    .return(Drawable)
+.end
+
+#-----------------------------------------------------------------------
 .sub get_Window_class
     .local pmc Window
     Window = get_global 'Window_class'
     $I0 = defined Window
     if $I0 goto done
 
-    Window = newclass ['Xlib'; 'Window']
-    addattribute Window, attr_display
-    addattribute Window, attr_XWindow
+    .local pmc Drawable
+    Drawable = get_Drawable_class()
+    Window = subclass Drawable, ['Xlib'; 'Window']
+#    addattribute Window, attr_display
+#    addattribute Window, attr_XWindow
     set_global 'Window_class', Window
 
 # export functions to be used from Window methods
@@ -680,6 +710,52 @@ done:
 
 ########################################################################
 
+.namespace ['Xlib';'Drawable']
+
+#-----------------------------------------------------------------------
+.sub DrawPoint :method
+    .param int x
+    .param int y
+
+    .local pmc disp
+    disp = getattribute self, attr_display
+    .local pmc xdisp
+    xdisp = self.getdisplay()
+    .local pmc gc
+    gc = disp.DefaultGC()
+    .local pmc xwin
+    xwin = getattribute self, attr_XWindow
+
+    .local pmc func
+    func = get_xlib_function('XDrawPoint', 'ipppii')
+    $I0 = func(xdisp, xwin, gc, x, y)
+    .return($I0)
+.end
+
+#-----------------------------------------------------------------------
+.sub DrawLine :method
+    .param int x1
+    .param int y1
+    .param int x2
+    .param int y2
+
+    .local pmc disp
+    disp = getattribute self, attr_display
+    .local pmc xdisp
+    xdisp = self.getdisplay()
+    .local pmc gc
+    gc = disp.DefaultGC()
+    .local pmc xwin
+    xwin = getattribute self, attr_XWindow
+
+    .local pmc func
+    func = get_xlib_function('XDrawLine', 'ipppiiii')
+    $I0 = func(xdisp, xwin, gc, x1, y1, x2, y2)
+    .return($I0)
+.end
+
+########################################################################
+
 .namespace ['Xlib';'Window']
 
 #-----------------------------------------------------------------------
@@ -770,48 +846,6 @@ done:
     $I0 = func(xdisp, xwin, name)
     .return($I0)
     .end
-
-#-----------------------------------------------------------------------
-.sub DrawPoint :method
-    .param int x
-    .param int y
-
-    .local pmc disp
-    disp = getattribute self, attr_display
-    .local pmc xdisp
-    xdisp = self.getdisplay()
-    .local pmc gc
-    gc = disp.DefaultGC()
-    .local pmc xwin
-    xwin = getattribute self, attr_XWindow
-
-    .local pmc func
-    func = get_xlib_function('XDrawPoint', 'ipppii')
-    $I0 = func(xdisp, xwin, gc, x, y)
-    .return($I0)
-.end
-
-#-----------------------------------------------------------------------
-.sub DrawLine :method
-    .param int x1
-    .param int y1
-    .param int x2
-    .param int y2
-
-    .local pmc disp
-    disp = getattribute self, attr_display
-    .local pmc xdisp
-    xdisp = self.getdisplay()
-    .local pmc gc
-    gc = disp.DefaultGC()
-    .local pmc xwin
-    xwin = getattribute self, attr_XWindow
-
-    .local pmc func
-    func = get_xlib_function('XDrawLine', 'ipppiiii')
-    $I0 = func(xdisp, xwin, gc, x1, y1, x2, y2)
-    .return($I0)
-.end
 
 #-----------------------------------------------------------------------
 # Local Variables:
