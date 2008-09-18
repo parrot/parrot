@@ -79,10 +79,9 @@ Francois Perrad.
     entry(params :flat)
     end
   _handler:
-    .local pmc e, c
+    .local pmc e
     .local string s
-    .get_results (e, c)
-    s = e
+    .get_results (e, s)
     print s
     print "\n"
   L1:

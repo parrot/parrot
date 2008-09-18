@@ -455,13 +455,12 @@ C<pop_eh>.
     pop_eh
     ... # ok
 
-An exception handler is called with two arguments: the exception and the
-return continuation to resume execution.
+An exception handler is called with two arguments: the exception and its
+extracted message for your convenience.
 
   handler: # exception
-    .get_results ($P0, $P1)
+    .get_results ($P0, $S0)
     print 'Exception caught:'
-    $S0 = $P0['message']
     say $S0
     ...
 
@@ -472,7 +471,7 @@ Rethrow the exception if it has a severity of C<EXCEPT_EXIT>.
   .include 'except_severity.pasm'
   ...
   handler:
-    .get_results ($P0, $P1)
+    .get_results ($P0, $S0)
     $I0 = $P0['severity']
     if $I0 == .EXCEPT_EXIT goto handle_exit
     say 'Exception caught!'
@@ -491,10 +490,9 @@ Exception example:
     exit 0
 
   handler:
-    .local pmc exception, return
+    .local pmc exception
     .local string message
-    .get_results (exception, return)
-    message = exception['message']
+    .get_results (exception, message)
     print 'Exception: '
     print message
     print "\n"

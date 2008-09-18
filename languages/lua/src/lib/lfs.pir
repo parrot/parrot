@@ -423,10 +423,9 @@ Returns C<true> in case of success or C<nil> plus an error string.
   _handler:
     .local pmc nil
     .local pmc msg
-    .local pmc e, c
+    .local pmc e
     .local string s
-    .get_results (e, c)
-    s = e
+    .get_results (e, s)
     new nil, 'LuaNil'
     new msg, 'LuaString'
     $S0 = concat "Unable to change working directory to '", $S0
@@ -457,10 +456,9 @@ string.
   _handler:
     .local pmc nil
     .local pmc msg
-    .local pmc e, c
+    .local pmc e
     .local string s
-    .get_results (e, c)
-    s = e
+    .get_results (e, s)
     new nil, 'LuaNil'
     new msg, 'LuaString'
     set msg, s
@@ -490,10 +488,9 @@ when there is no more entries. Raises an error if C<path> is not a directory.
     res = newclosure dir_aux
     .return (res)
   _handler:
-    .local pmc e, c
+    .local pmc e
     .local string s
-    .get_results (e, c)
-    s = e
+    .get_results (e, s)
     lua_error("cannot open ", $S0, ": ", s)
 .end
 
@@ -564,10 +561,9 @@ C<nil> plus an error string.
   _handler:
     .local pmc nil
     .local pmc msg
-    .local pmc e, c
+    .local pmc e
     .local string s
-    .get_results (e, c)
-    s = e
+    .get_results (e, s)
     new nil, 'LuaNil'
     new msg, 'LuaString'
     set msg, s
@@ -598,10 +594,9 @@ C<nil> plus an error string.
   _handler:
     .local pmc nil
     .local pmc msg
-    .local pmc e, c
+    .local pmc e
     .local string s
-    .get_results (e, c)
-    s = e
+    .get_results (e, s)
     new nil, 'LuaNil'
     new msg, 'LuaString'
     set msg, s

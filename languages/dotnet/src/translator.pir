@@ -10,7 +10,7 @@
     .param int standalone
     .param int trace
     .local string pir_output, src, summary, tmp, emsg
-    .local pmc assembly, classes, class_order, type, e, entry_meth, entry_class, c
+    .local pmc assembly, classes, class_order, type, e, entry_meth, entry_class
     .local int is_dll, i, max_class, class_id, total_types, done_types
 
     # Instantiate a new assembly class.
@@ -167,8 +167,7 @@ RESUME:
     inc i
     goto CLOOP
 trans_failure_handler:
-    .get_results (e, c)
-    emsg = e
+    .get_results (e, emsg)
     # Emit trace message.
     unless trace goto NOTRACE
     printerr "  **FAILED** ("

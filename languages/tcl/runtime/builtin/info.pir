@@ -129,8 +129,7 @@ bad_args:
   .return(1)
 
 nope:
-  get_results '0,0', $P0, $P1
-  $S0 = $P0
+  get_results '0,0', $P0, $S0
   if $S0 == 'missing close-brace'   goto fail
   if $S0 == 'missing close-bracket' goto fail
   if $S0 == 'missing "'             goto fail

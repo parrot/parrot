@@ -239,7 +239,7 @@ method catch($/) {
    my $exid := $( $<identifier> );
    ##  Add a catch node to the try op that captures the
    ##  exception object into the declared identifier. Thanks to Rakudo for this trick.
-   my $catchpir := "    .get_results (%r, $P0)\n    store_lex '" ~ $exid.name() ~ "', %r";
+   my $catchpir := "    .get_results (%r, $S0)\n    store_lex '" ~ $exid.name() ~ "', %r";
    $past.unshift( PAST::Op.new( :inline( $catchpir ) ) );
    make $past;
 }

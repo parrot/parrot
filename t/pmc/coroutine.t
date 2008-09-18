@@ -237,7 +237,7 @@ lp:
     print "done\n"
     end
 _catchm:
-    get_results '0, 0' , P5, P1
+    get_results '0, 0' , P5, S0
     print "catch main\n"
     end
 
@@ -251,7 +251,7 @@ corolp:
     get_global P17, S0
     branch corolp
 _catchc:
-    get_results '0, 0' , P5, P1
+    get_results '0, 0' , P5, S0
     print "catch coro\n"
     rethrow P5
     end

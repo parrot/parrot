@@ -66,17 +66,18 @@ stack.
 
 =item B<throw I<EXCEPTION> [ , I<CONTINUATION> ]>
 
-Throw the given I<EXCEPTION> PMC to the active exception handlers.
-If a I<CONTINUATION> is not passed in, throw will take a new one at
-the next opcode.  Active exception handlers (if any) will be
-invoked with I<EXCEPTION> and the given continuation as parameters.
+Throw an exception consisting of the given I<EXCEPTION> PMC, after taking a
+continuation at the next opcode. When a I<CONTINUATION> is passed in, it will
+use that instead of generating a new continuation. Active exception handlers
+(if any) will be invoked with I<EXCEPTION> as the only parameter, and the
+return continuation stored within that exception object.
 
 PMCs other than Parrot's Exception PMC may also be thrown, but they must
 support the interface of an Exception PMC. An HLL may implement throwing any
 arbitrary type of PMC, by storing that PMC as the payload of an Exception PMC.
 
 Exception handlers can resume execution immediately after the C<throw> opcode
-by invoking the resume continuation which is passed in as the second argument.
+by invoking the resume continuation which is stored in the exception object.
 That continuation must be invoked with no parameters; in other words, C<throw>
 never returns a value.
 

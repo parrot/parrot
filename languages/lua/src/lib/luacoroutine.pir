@@ -134,10 +134,9 @@ C<resume> returns B<false> plus the error message.
     (res :slurpy) = $P0.'resume'(argv :flat)
     .return (1, res :flat)
   _handler:
-    .local pmc e, c
+    .local pmc e
     .local string s
-    .get_results (e, c)
-    s = c
+    .get_results (e, s)
     $P0 = pop co_stack
     .return (0, s)
 .end
