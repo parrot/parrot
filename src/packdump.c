@@ -156,15 +156,9 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
         i = self->u.string->bufused;
         PIO_printf(interp, "        SIZE     => %ld,\n",
                    (long)i);
-        /* TODO: Won't do anything reasonable for most encodings */
-        if (i > 0) {
-            PIO_printf(interp, "        DATA     => '%.*s'\n",
-                       (int)i,
-                       (char *)self->u.string->strstart);
-        }
-        else {
-            PIO_printf(interp, "        DATA     => NULL\n");
-        }
+
+        PIO_printf(interp, "        DATA     => \"%Ss\"\n",
+                       string_escape_string(interp, self->u.string));
         PIO_printf(interp, "    } ],\n");
         break;
 
