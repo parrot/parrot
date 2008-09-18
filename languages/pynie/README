@@ -90,11 +90,14 @@ One can also provide the "target" option to the compiler:
     $P1 = $P0($S0, 'target'=>'POST')     # get OST
     $P1 = $P0($S0, 'target'=>'PIR')      # get PIR
 
+=head1 Submitting Bugs/Patches
+
+Patches/bugs/suggestions can be sent to <http://launchpad.net/pynie>.
+
 =head1 AUTHOR
 
 Patrick Michaud <pmichaud@pobox.com> is the current author and
-maintainer.  Patches and suggestions can be sent to
-<parrotbug@parrotcode.org>.
+maintainer.
 
 =cut
 
