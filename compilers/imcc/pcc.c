@@ -211,7 +211,16 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
     int i, flags;
     char s[16];
     SymReg ** const regs  = mem_allocate_n_zeroed_typed(n + 1, SymReg *);
-    char    * buf         = mem_allocate_n_typed(5*n+1, char *);
+    /* Assumptions:
+     * Flags has no more than 3 hex digits
+     * Plus 0x and , gives 6 char for arg
+     * 4 more for: "( , )", and
+     * 1 more for C string 0 delimiter
+     * Last item has no , but we can forget that to avoid
+     * to have to check for 0 args.
+     */
+    unsigned int bufsize = 6 * n + 5;
+    char * buf = mem_allocate_n_typed(bufsize, char);
 
     strcpy(buf, "\"(");
     for (i = 0; i < n; i++) {
@@ -252,7 +261,8 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
 
         if (i < n - 1)
             strcat(s, ",");
-        strcat(buf, s);         /* XXX check avail len */
+        PARROT_ASSERT(strlen(buf) + strlen(s) < bufsize);
+        strcat(buf, s);
     }
 
     strcat(buf, ")\"");

@@ -1323,7 +1323,7 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
              * Save current value while setting the optional
              */
             UnionVal old_value;
-            STRUCT_COPY(&old_value, &st->val);
+            old_value = st->val;
 
             while (dest->sig & PARROT_ARG_OPTIONAL) {
                 null_val(st->dest.sig, st);
@@ -1341,7 +1341,7 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
             }
 
             /* Restore value */
-            STRUCT_COPY(&st->val, &old_value);
+            st->val = old_value;
 
             break;
         }

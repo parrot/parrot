@@ -687,11 +687,11 @@ Returns whether the hash is the same as C<*other>.
     }
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        const Hash * const hash = (Hash *)PMC_struct_val(SELF);
+        Hash * const hash = (Hash *)PMC_struct_val(SELF);
 
         /* check if we really have Hash_key_type_int */
         if (hash->key_type == Hash_key_type_int)
-            parrot_hash_put(INTERP, hash, key, value);
+            parrot_hash_put(INTERP, hash, (void *)key, (void *)value);
         else {
             SUPER(key, value);
         }
