@@ -119,8 +119,8 @@ precedence parser, when you ask it nicely>which should be very familar
 to users of the Perl 5 module C<Parse::RecDescent>. In fact, both were
 originally designed by the same developer, Damian Conway. Recursive
 Descent, for those who get into the algorithmic details, is a top-down
-parsing algorithm, unlike the top-down LALR algorithm used in parser-
-generators like yacc and Bison. Most programmers won't notice the
+parsing algorithm, unlike the bottom-up LALR algorithm used in parser-
+generators like Yacc and Bison. Most programmers won't notice the
 difference between the two for most applications, although there are
 some specific places where the behavior will be different.
 
