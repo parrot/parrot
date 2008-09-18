@@ -415,6 +415,83 @@ generate useful error messages.
 
 =head2 Operator Precidence Parser
 
+Places where there are lots of little tokens in a statement, and where
+there are lots of possible options that a top-down parser will have to
+attempt can become relatively inefficient using PCT's recursive descent
+parser. Specifically, mathematical expressions are very open-ended and
+have forms that are difficult to anticipate. Consider the expression:
+
+ a + b * c + d
+
+The recursive descent parser is going to have to recognize through
+significant trial and error how this statement should be parsed. For tasks
+like this, recursive descent parsers are not ideal, although a type of
+bottom-up parser called an I<operator precidence>
+X<Parser, Operator precidence> parser is. Operator precidence parsers
+work similarly to more versatile bottom-up parsers such as Lex or Yacc, but
+are optimized for use with expressions and equations. The "things" in an
+equation are split into two subtypes: I<terms> and I<operators>. Operators
+themselves are split into a number of types including postfix (C<-a>),
+suffix (C<i++>), infix (C<x + y>), circumfix (C<[z]>), postcircumix
+(C<a[b]>), and list (C<1, 2, 3>). Each operator gets it's own precidence
+number that specifies how closely it binds to the terms. In the example above,
+the expression is parsed
+
+ a + (b * c) + d
+
+This is because the C<*> operator has a higher precidence and therefore binds
+more tightly then the C<+> operator.
+
+To switch from the top-down recursive descent parser to the bottom-up
+operator precidence parser, a rule must be defined that is an C<optable>
+X<Parser, optable>:
+
+ rule expression is optable { ... }
+
+The C<...> ellipses aren't an editorial shortcut, it's the perl 6 operator
+that is used to define a function signature. The C<...> indicates that
+this is just a signature and that the actual guts of it will be filled in
+somewhere else. In this case, that "somewhere else" is in the definition of
+the optable role.
+
+== Protofunction Definitions ==
+
+Protofunctions are used to define operators in the optable in the same way that
+rules and tokens are used throughout the rest of the grammar. A proto is a way
+of saying that the rule is overridable dynamically, and that it might be defined
+somewhere else. In this case, PCT takes information from the proto declaration
+and fills in the details for us. On another note, this also means that the HLL
+itself can modify it's own grammar at run time, by overriding the proto definitions
+for it's operator table. Some languages call this process "operator overloading".
+
+A proto is defined like this, taking some of our grammar rules above:
+
+ 'proto' <proto_name> [ 'is' <property> ] '{' '...' '}'
+
+The name of the operator, listed as C<< <proto_name> >> above, contains both a
+location part and an identifier part. The location is one of the places where the
+operator can be located, such as infix, postfix, prefix, circumfix, and
+postcircumfix. The name of the operator is the symbol used for the operator in
+any of the quotes that Perl6 understands:
+
+ proto infix:<+>                  # a + b
+ proto postfix:'--'               # i--
+ proto circumfix:«<>»             # <x>
+
+The C<is> X<Parser, is> keyword defines a property of the rule. Some examples of
+this are:
+
+ is precidence(1)     # Specifies an exact precidence
+ is equiv('+')        # Has the same precidence as the "+" operator
+ is assoc('right')    # Right associative. May also be "left" or "list"
+ is pirop('add')      # Operands are passed to the PIR operator "and"
+ is subname('mySub')  # Operands are passed to the function "mySub"
+ is pasttyle('if')    # Operands are passed as children to an "if" PAST node in
+                      # the parse tree
+ is parsed(&myRule)   # The token is parsed and identified using the rule
+                      # "myRule" from the top-down parser
+   
+
 =head1 Actions and NQP
 
 =head2 NQP Basics
