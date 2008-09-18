@@ -72,6 +72,32 @@ Parrot Abstract Syntax Tree (PAST).
 
 =head2 C<make_language_shell.pl>
 
+The Parrot repository contains a number of helpful utilities for doing
+some common development and building tasks with Parrot. These utlities
+are all currently written in Perl 5, although in future releases the
+majority will likely be built in Perl 6 and run on Parrot directly. This
+is a bootstrapping problem that the developers have not tackled yet.
+
+One of the tools of use to new compiler designers and language implementers
+is C<make_language_shell.pl>. C<make_language_shell.pl> is a tool for
+automatically creating all the necessary stub files for creating a new
+compiler for Parrot. It generates the driver file, parser grammar and
+actions files, builtin functions stub file, makefile, and test harness.
+All of these are demonstrative stubs and wil obviously need to be
+edited furiously or even completely overwritten, but they give a good idea
+of what is needed to start on development of the compiler.
+
+C<make_language_shell.pl> is designed to be run from within the Parrot
+repository file structure. It creates a subfolder in C</languages/>
+with the name of your new language implementation. Typically a new
+implementation of an existing language is not simply named after the
+language, but is given some other descriptive name to let users know it
+is only one implementation available. Consider the way Perl 5 distributions
+are named things like "Active Perl" or "Strawberry Perl", or how Python
+distributions might be "IronPython" or "VPython". If, on the other hand,
+you are implementing an entirely new language, you don't need to give it
+a fancy distribution name.
+
 =head2 Parsing Fundamentals
 
 Compilers typically consist of three components: The lexical analyzer,
@@ -101,6 +127,20 @@ where bottom-up methods are more efficient. We'll discuss both, and the
 methods for switching between the two, throughout this chapter.
 
 =head1 Driver Programs
+
+The driver program for the new compiler must create instances of the
+various necessary classes that run the parser. It must also include
+the standard function libraries, create global variables, and handle
+commandline options. Most commandline options are handled by PCT, but
+there are some behaviors that the driver program will want to
+override.
+
+PCT programs can, by default, be run in two ways: Interactive mode,
+which is run one statement at a time in the console, and file mode which
+loads and runs an entire file. For interactive mode, it is necessary
+to specify information about the prompt that's used and the environment
+that's expected. Help and error messages need to be written for the user
+too. 
 
 =head2 C<HLLCompiler> class
 
