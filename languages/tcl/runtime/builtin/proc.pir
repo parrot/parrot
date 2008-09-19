@@ -18,8 +18,8 @@
   .local pmc pir_compiler, compileTcl, toList, splitNamespace
   pir_compiler = compreg 'PIR'
   compileTcl     = get_root_global ['_tcl'], 'compileTcl'
-  toList       = get_root_global ['_tcl'], 'toList'
-  splitNamespace  = get_root_global ['_tcl'], 'splitNamespace'
+  toList         = get_root_global ['_tcl'], 'toList'
+  splitNamespace = get_root_global ['_tcl'], 'splitNamespace'
 
   .local pmc code, args_code, defaults
   .local string namespace
@@ -50,7 +50,7 @@
   goto create
 
 create:
-  code.emit(<<'END_PIR', namespace, name)
+  code.emit(<<'END_PIR', name)
 .sub 'xxx' :anon
   .param pmc args :slurpy
   .include 'languages/tcl/src/returncodes.pasm'
@@ -64,7 +64,7 @@ create:
   info_level = get_root_global ['_tcl'], 'info_level'
   $P0 = new 'TclList'
   assign $P0, args
-  unshift $P0, '%1'
+  unshift $P0, '%0'
   unshift info_level, $P0
 END_PIR
 
