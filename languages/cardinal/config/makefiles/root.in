@@ -7,6 +7,7 @@ PARROT_ARGS =
 BUILD_DIR     = @build_dir@
 LOAD_EXT      = @load_ext@
 O             = @o@
+EXE           = @exe@
 
 ## Setup some commands
 LN_S          = @lns@
@@ -17,6 +18,7 @@ PARROT        = ../../parrot@exe@
 CAT           = $(PERL) -MExtUtils::Command -e cat
 BUILD_DYNPMC  = $(PERL) $(BUILD_DIR)/tools/build/dynpmc.pl
 RECONFIGURE   = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
+PBC_TO_EXE    = $(BUILD_DIR)\pbc_to_exe$(EXE)
 #CONDITIONED_LINE(darwin):
 #CONDITIONED_LINE(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
 #CONDITIONED_LINE(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
@@ -58,6 +60,14 @@ BUILTINS_PIR = \
 
 # PMCS = cardinal
 # PMC_SOURCES = $(PMC_DIR)/cardinal.pmc
+
+# targets for building a standalone cardinal.
+# (We're not quite ready to make this a default target.)
+cardinal$(EXE): cardinal.pbc
+	$(PBC_TO_EXE) cardinal.pbc
+
+installable_cardinal$(EXE): cardinal.pbc
+	$(PBC_TO_EXE) cardinal.pbc --install
 
 # the default target
 cardinal.pbc: $(PARROT) $(SOURCES)
@@ -122,6 +132,10 @@ testclean:
 
 CLEANUPS = \
   cardinal.pbc \
+  cardinal.c \
+  cardinal$(O) \
+  cardinal$(EXE) \
+  installable_cardinal$(EXE) \
   src/gen_grammar.pir \
   src/gen_actions.pir \
   src/gen_builtins.pir \
