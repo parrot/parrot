@@ -283,6 +283,12 @@ rule call {
 
 rule attributeref {
     '.' <identifier>
+    {*}
+}
+
+rule methodcall {
+    '.' <identifier> <call>
+    {*}
 }
 
 rule subscription {
@@ -528,7 +534,8 @@ rule primary {
 }
 
 rule postop {
-    #| <attributeref>
+    | <methodcall> {*}         #= methodcall
+    | <attributeref> {*}       #= attributeref
     | <subscription> {*}       #= subscription
     #| <slicing>
     | <call> {*}               #= call

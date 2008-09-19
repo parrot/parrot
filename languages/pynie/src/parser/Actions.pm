@@ -535,6 +535,20 @@ method call($/, $key) {
     }
 }
 
+method attributeref($/) {
+    my $attr := $($<identifier>);
+    $attr.scope('attribute');
+    make $attr;
+}
+
+method methodcall($/) {
+    my $attrname := $($<identifier>).name();
+    my $call := $($<call>);
+    $call.pasttype('callmethod');
+    $call.name($attrname);
+    make $call;
+}
+
 method subscription($/) {
     make PAST::Var.new( $( $<tuple_or_scalar> ), :scope('keyed'));
 }
