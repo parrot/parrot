@@ -7,7 +7,7 @@ Z<CHP-5>
 X<Parrot Assembly Language;;(see PASM)>
 X<PASM (Parrot assembly language)>
 Parrot assembly (PASM) is an assembly language written for Parrot's
-virtual CPU.  PASM is an interesting language with a mix of mix of
+virtual CPU.  PASM is an interesting language with a mix of
 features. As an assembly language it is decidedly low-level with many such
 aspects: flow control based on branches and jumps; and direct manipulation
 of values in the software registers and on the stacks.  Basic register
@@ -17,6 +17,14 @@ per processor cycle.> On the other hand, because it's designed to
 implement dynamic high-level languages, it has support for many advanced
 features such as lexical and global variables, objects, garbage collection,
 continuations, coroutines, and much more.
+
+Some people may ask why we have PASM at all, especially with PIR which
+has much nicer syntax. The answer is that PASM, like all assembly languages
+has a one-to-one correspondence with the underlying Parrot Bytecode (PBC).
+This makes it easy to translate from PBC to human-readable PASM code in
+a disassembler program. PIR code is basically just a thin wrapper over
+PASM, and you can write PASM code seamlessly in PIR files. It's always
+around, and it's good to be familiar with it.
 
 =head1 Basics
 
