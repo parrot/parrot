@@ -427,6 +427,7 @@ method module($/) {
     my $name := $( $<module_identifier> );
     $past.namespace( $name.name() );
     $past.blocktype('declaration');
+    $past.pirflags(':load :init');
     make $past;
 }
 
