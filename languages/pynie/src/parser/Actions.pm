@@ -346,6 +346,21 @@ method raise_stmt($/) {
     make $past;
 }
 
+method try_stmt($/, $key) {
+    make $( $/{$key} );
+}
+
+method try1_stmt($/) {
+    # XXX implement except params, else, finally
+    my $try := $($<try>);
+    my $handler := $($<except>);
+    my $past := PAST::Op.new( $try,
+                              $handler,
+                              :pasttype('try'),
+                              :node($/) );
+    make $past;
+}
+
 method simple_stmt($/, $key) {
     make $( $/{$key} );
 }
