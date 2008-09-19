@@ -4,5 +4,92 @@
 
 Z<CHP-9>
 
+=head1 Parrot HLL Environment
+
+In the earliest days Parrot was designed to be the single-purpose backend
+for the Perl 6 language. It quickly blossomed beyond that, and now has a
+much grander purpose: to host all dynamic languages, and to host them
+together on a single platform. If we look back through the history of
+dynamic programming languages, they've had a more difficult time
+interoperating with each other then compiled languages have because
+compiled languages operate at the same machine-code level and typically
+can make use of the same application binary interface (ABI). With the
+right compiler settings, programs written in Visual Basic and interoperate
+with programs written in C N<On some systems anyway>, which can call
+functions written in C++, in Ada, Fortran, and Pascal. To try to mix
+two common dynamic languages, like Perl and Python, or Ruby and PHP, you
+would need to custom write some kind of "glue" function to try to include
+an interpreter object from one language as a library for another language,
+and then write code to try and get the parser for one to interact nicely
+with the parser for the other. It's a nightmare, frankly, and you don't
+see it happen too often.
+
+In Parrot, the situation is different because high level languages (HLL)
+are almost all written with the PCT tools, and are compiled to the same
+PIR and PBC code. Once compiled into PBC, a library written in any HLL
+language can be loaded and called by any other HLL N<Well, any HLL which
+supports loading libraries>. A language can have a syntax to include
+code snippets from other languages inline in the same file. We can write
+a binding for a popular library such as opengl or xlib once, and include
+that library into any language that needs it. Compare this to the current
+situation where a library like Gtk2 needs to have bindings for every
+language that wants to use it.In short, Parrot should make interoperation
+easier for everybody.
+
+This chapter is going to talk about HLLs, the way they operate, and the
+way they interoperate on Parrot.
+
+=head2 HLLs on Parrot
+
+=head2 Fakecutables
+
+=head2 Compiler Objects
+
+=head2 HLL Namespaces
+
+=head2 HLL Mapping
+
+=head2 Interoperability Guidelines
+
+=head3 Libraries and APIs
+
+As a thought experiment, imagine a library written in Common Lisp that
+uses Common Lisp data types. We like this library, so we want to include
+it in our Ruby project and call the functions from Ruby. Immediately
+we might think about writing a wrapper to convert parameters from Ruby
+types into Common Lisp types, and then to convert the Common Lisp return
+values back into Ruby types. This seems sane, and it would probably even
+work well. Now, expand this to all the languages on Parrot. We would need
+wrappers or converters to allow every pair of languages to communicate,
+which requires C<N^2> libraries to make it work! As the number of languages
+hosted on the platform increases, this clearly becomes an untennable
+solution.
+
+So, what do we do? How do we make very different languages like Common
+Lisp, Ruby, Scheme, PHP, Perl and Python to interoperate with each other
+at the data level? There are two ways:
+
+=over 4
+
+=item* VTable methods
+
+VTable methods are the standard interface for PMC data types, and all PMCs
+have them. If the PMCs were written properly to satisfy this interface
+all the necessary information from those PMCs. Operate on the PMCs at the
+VTable level, and we can safely ignore the implementation details of them.
+
+=item* Class Methods
+
+If a library returns data in a particular format, the library reuser should
+know, understand, and make use of that format. Classes written in other
+languages will have a whole set of documented methods to be interfaced with
+and the reuser of those classes should use those methods. This only works,
+of course, in HLLs that allow object orientation and classes and methods,
+so for languages that don't have this the vtable interface should be used
+instead.
+
+=back
+
+=head3 Mixing and Matching Datatypes
 
 =cut
