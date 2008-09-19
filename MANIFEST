@@ -442,7 +442,8 @@ docs/book/ch05_pasm.pod                                     [main]doc
 docs/book/ch06_testing.pod                                  [main]doc
 docs/book/ch07_architecture.pod                             [main]doc
 docs/book/ch08_pct.pod                                      [main]doc
-docs/book/ch09_reference.pod                                [main]doc
+docs/book/ch09_hll.pod                                      [main]doc
+docs/book/ch10_reference.pod                                [main]doc
 docs/book/figs/p6e_0801.png                                 [main]doc
 docs/compiler_faq.pod                                       [devel]doc
 docs/configuration.pod                                      [devel]doc
