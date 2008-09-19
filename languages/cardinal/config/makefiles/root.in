@@ -133,6 +133,8 @@ testclean:
 CLEANUPS = \
   cardinal.pbc \
   cardinal.c \
+  *.manifest \
+  *.pdb \
   cardinal$(O) \
   cardinal$(EXE) \
   installable_cardinal$(EXE) \
