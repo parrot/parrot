@@ -259,10 +259,8 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
             default :                               break;
         }
 
-        snprintf(s, sizeof (s), "0x%.4x", flags);
 
-        if (i < n - 1)
-            strcat(s, ",");
+        snprintf(s, sizeof (s), "0x%.4x,", flags);
         if (bufpos+strlen("0xffff,") >= bufsize)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERNAL_PANIC,
                     "arg string is longer than allocated buffer");
@@ -270,7 +268,10 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
         bufpos += strlen("0xffff,");
     }
 
-    strcat(buf, ")\"");
+    /* Backtrack over the ending comma if this is a non-empty list. */
+    if (bufpos != strlen("\"("))
+        bufpos--;
+    strcpy(buf+bufpos, ")\"");
 
     regs[0] = mk_const(interp, buf, 'S');
     ins     = insINS(interp, unit, ins, op_name, regs, n + 1);
