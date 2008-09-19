@@ -41,6 +41,7 @@ proc is {value expected {description ""} {special {}}}  {
             }
         }
         set special_reason [concat {*}[lindex $special 1]]
+        set description [regsub -all # $description {\#}]
         set description " - $description # $type $special_reason"
     } else {
         if  {$description ne ""} {
