@@ -303,8 +303,12 @@ method class_variable($/) {
 
 method local_variable($/) {
     our $?BLOCK;
-    my $past := PAST::Var.new( :name(~$/), :node($/), :viviself('Undef') );
-    if $?BLOCK.symbol($<ident>) {
+    my $past := PAST::Var.new( :name(~$<ident>), :node($/), :viviself('Undef') );
+    if +$<ns> {
+        $past.scope('package');
+        $past.namespace(~$<ns>[0]);
+    }
+    elsif $?BLOCK.symbol($<ident>) {
         my $scope := '' ~ $?BLOCK.symbol($<ident>)<scope>;
         $past.scope(~$scope);
     }

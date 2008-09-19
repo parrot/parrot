@@ -120,7 +120,7 @@ token member_variable {
 }
 
 token methodcall {
-    $<dot>=['.'|'::']
+    $<dot>='.'
     <operation> <call_args>? <do_block>?
     {*}
 }
@@ -407,7 +407,7 @@ token class_variable {
 }
 
 token local_variable {
-    <before <[a..z_]>> <ident>
+    [<ns=ident> '::']* <before <[a..z_]>> <ident>
     {*}
 }
 
