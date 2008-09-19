@@ -42,6 +42,8 @@ typedef struct lexer_state {
     int            curregister[4]; /* for register allocation */
     int            pir_reg_generator; /* for unique PIR register allocator, for temp. PIR regs. */
 
+    unsigned       instr_counter;  /* to assign an index to each instruction */
+
     global_ident  *globals;        /* global identifiers */
     constant      *constants;      /* global constants */
 

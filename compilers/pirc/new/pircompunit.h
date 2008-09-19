@@ -64,6 +64,13 @@ typedef enum arg_flags {
 
 } arg_flag;
 
+/* instruction flags */
+typedef enum instr_flags {
+    INSTR_FLAG_BRANCH   = 1 << 0,  /* unconditional branch instruction */
+    INSTR_FLAG_IFUNLESS = 1 << 1,  /* conditional branch instruction */
+    INSTR_FLAG_ISXX     = 1 << 2   /* isXX variant of conditional branch instruction */
+
+} instr_flag;
 
 /* sub flags */
 typedef enum sub_flags {
@@ -124,7 +131,7 @@ typedef union value {
 
 } value;
 
-/* constant definitions */
+/* literal constants, possibly named */
 typedef struct constant {
     char    *name;     /* name of the constant, if declared as a constant */
     pir_type type;     /* type of the constant */
@@ -219,35 +226,31 @@ typedef struct argument {
  * .return foo(), .return foo.bar(), .return x :flat
  */
 typedef struct invocation {
-    invoke_type   type;
-    target       *object;        /* invocant object, if any */
-    target       *sub;           /* invoked sub */
-    target       *retcc;         /* return continuation, if any */
-    target       *results;       /* targets that will receive return values */
-    argument     *arguments;     /* values passed into the sub, or return values */
+    invoke_type         type;
+    target             *object;        /* invocant object, if any */
+    target             *sub;           /* invoked sub */
+    target             *retcc;         /* return continuation, if any */
+    target             *results;       /* targets that will receive return values */
+    argument           *arguments;     /* values passed into the sub, or return values */
 
 } invocation;
 
 /* the instruction node represents a single parrot instruction */
 typedef struct instruction {
-    char         *opname;       /* name of the instruction, such as "print" and "set" */
-    expression   *operands;     /* operands like "$I0" and "42" in "set $I0, 42" */
+    unsigned            offset;       /* sequence number of this instruction */
+    char               *label;        /* label of this instruction */
+    char               *opname;       /* name of the instruction, such as "print" and "set" */
+    expression         *operands;     /* operands like "$I0" and "42" in "set $I0, 42" */
+    int                 flags;
 
+    struct instruction *next;
 } instruction;
 
 
 
-/* The statement structure represents a PIR statement. */
-typedef struct statement {
-    char             *label;   /* label for this statement, if any */
-    instruction      *ins;
-    struct statement *next;    /* points to next statement */
-
-} statement;
-
-
-/* forward declaration of struct symbol */
+/* forward declaration of structs */
 struct symbol;
+struct label;
 
 /* a sub */
 typedef struct subroutine {
@@ -263,13 +266,15 @@ typedef struct subroutine {
     char             **multi_types;   /* data types of parameters if this is a multi sub */
 
     target            *parameters;    /* parameters of this sub */
-    statement         *statements;    /* statements of this sub */
+    instruction       *statements;    /* statements of this sub */
 
     struct symbol     *symbols;       /* symbol table for this subroutine */
     struct pir_reg    *registers[4];  /* used PIR registers in this sub (1 list for each type) */
     unsigned           regs_used[4];  /* number of PASM registers allocated for this sub */
 
-    struct subroutine *next;
+    struct label      *labels;        /* local labels */
+
+    struct subroutine *next;          /* pointer to next subroutine in the list */
 
 } subroutine;
 

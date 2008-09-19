@@ -458,6 +458,59 @@ find_constant(struct lexer_state * const lexer, char * const name) {
     return NULL;
 }
 
+static label *
+new_label(char * const name, unsigned offset) {
+    label *l = (label *)malloc(sizeof (label));
+    l->name   = name;
+    l->offset = offset;
+    l->next   = NULL;
+    return l;
+}
+
+/*
+
+=item C<void
+store_label(struct lexer_state * const lexer, char * const labelname, unsigned offset)>
+
+=cut
+
+*/
+void
+store_label(struct lexer_state * const lexer, char * const labelname, unsigned offset) {
+    label *l = new_label(labelname, offset);
+
+    printf("storing label '%s' with offset %u\n", labelname, offset);
+    l->next = lexer->subs->labels;
+    lexer->subs->labels = l;
+}
+
+/*
+
+=item C<unsigned
+find_label(struct lexer_state * const lexer, char * const labelname)>
+
+Find the offset for label C<labelname>. If C<labelname> was not defined as
+a label, an error is emitted, otherwise, the offset of that label is returned.
+
+=cut
+
+*/
+unsigned
+find_label(struct lexer_state * const lexer, char * const labelname) {
+    label *iter = lexer->subs->labels;
+
+    while (iter) {
+        if (strcmp(iter->name, labelname) == 0)
+            return iter->offset;
+        iter = iter->next;
+    }
+
+    /* no label found, emit an error message. */
+    pirerror(lexer, "in sub '%s': cannot find offset for label '%s'",
+             lexer->subs->sub_name, labelname);
+
+    return 0;
+}
 
 
 /*
@@ -470,11 +523,13 @@ Free the list of symbols pointed to by C<sym>.
 =cut
 
 */
+
 void
 free_symbols(symbol *sym) {
     symbol *iter = sym;
 
-    assert(iter);
+    if (iter == NULL)
+        return;
 
     do {
         symbol *temp = iter;
@@ -487,6 +542,7 @@ free_symbols(symbol *sym) {
 
     sym = NULL;
 }
+
 
 /*
 

@@ -516,9 +516,13 @@ namespace_slice   : TK_STRINGC
                   ;
 
 sub_def           : sub_head sub_flags "\n"
-                    parameters
+                    parameter_list
                     instructions
-                    ".end"
+                    sub_end
+                  ;
+
+sub_end           : ".end"
+                         { close_sub(lexer); }
                   ;
 
 sub_head          : ".sub" sub_id
@@ -566,6 +570,10 @@ multi_type        : identifier
                   | keylist
                   ;
 
+parameter_list    : parameters
+                         { generate_get_params(lexer); }
+                  ;
+
 parameters        : /* empty */
                   | parameters parameter
                   ;
@@ -603,9 +611,7 @@ instructions      : /* empty */
                   | instructions instruction
                   ;
 
-instruction       : TK_LABEL "\n"
-                         { set_label(lexer, $1); }
-                  | TK_LABEL statement
+instruction       : TK_LABEL statement
                          { set_label(lexer, $1); }
                   | statement
                   ;
@@ -621,7 +627,13 @@ statement         : conditional_stat
                   | parrot_stat
                   | getresults_stat
                   | null_stat
+                  | empty_stat
                   | error_stat
+                  ;
+
+/* make sure a new instruction node is created; call set_instr() for that. */
+empty_stat        : "\n"
+                        { set_instr(lexer, NULL); }
                   ;
 
 /* "error" is a built-in rule; used for trying to recover. */
@@ -1015,8 +1027,10 @@ conditional_instr : if_unless "null" TK_IDENT "goto" identifier
                           int istrue = evaluate_c($2);
                           /* if "unless", invert the true-ness */
                           istrue = $1 ? !istrue : istrue;
-                          if (istrue)
+                          if (istrue) {
                               set_instrf(lexer, "branch", "%I", $4);
+                              set_instr_flag(lexer, INSTR_FLAG_BRANCH);
+                          }
                           else
                               set_instr(lexer, "noop");
                         }
@@ -1049,14 +1063,18 @@ conditional_instr : if_unless "null" TK_IDENT "goto" identifier
                                  invert_instr(lexer);
 
                              push_operand(lexer, expr_from_ident($4));
+
+                             set_instr_flag(lexer, INSTR_FLAG_ISXX);
                           }
                           else { /* evaluation during compile time */
                              /* if the result was false but the instr. was "unless", or,
                               * if the result was true and the instr. was "if",
                               * do an unconditional jump.
                               */
-                             if ( (($2 == 0) && $1) || (($2 == 1) && !$1) )
+                             if ( (($2 == 0) && $1) || (($2 == 1) && !$1) ) {
                                 set_instrf(lexer, "branch", "%I", $4);
+                                set_instr_flag(lexer, INSTR_FLAG_BRANCH);
+                             }
                              else
                                 set_instr(lexer, "noop");
 
@@ -1109,7 +1127,10 @@ then              : "goto" /* PIR mode */
                   ;
 
 goto_stat         : "goto" identifier "\n"
-                        { set_instrf(lexer, "branch", "%I", $2); }
+                        {
+                          set_instrf(lexer, "branch", "%I", $2);
+                          set_instr_flag(lexer, INSTR_FLAG_BRANCH);
+                        }
                   ;
 
 local_decl        : ".local" type local_id_list "\n"
@@ -2329,8 +2350,9 @@ create_if_instr(yyscan_t yyscanner, lexer_state * const lexer, int invert, int h
     /* try to find the symbol; if it was declared it will be found; otherwise emit an error. */
     symbol *sym = find_symbol(lexer, name);
     if (sym == NULL) {
-        sym = new_symbol(name, UNKNOWN_TYPE);
         yyerror(yyscanner, lexer, "symbol '%s' not declared'", name);
+        /* create a dummy symbol so we can continue without segfaulting. */
+        sym = new_symbol(name, UNKNOWN_TYPE);
     }
     /* if there was a keyword "null", use the if/unless_null instruction variants. */
     if (hasnull)
@@ -2338,6 +2360,9 @@ create_if_instr(yyscan_t yyscanner, lexer_state * const lexer, int invert, int h
                    label);
     else
         set_instrf(lexer, invert ? "unless" : "if", "%T%I", target_from_symbol(sym), label);
+
+    /* set a flag on this instruction */
+    set_instr_flag(lexer, INSTR_FLAG_IFUNLESS);
 }
 
 /*

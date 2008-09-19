@@ -192,7 +192,7 @@ free_operands(expression *expr) {
     expr = NULL;
 }
 
-
+/*
 void
 free_statements(statement *instr) {
     statement *iter = instr;
@@ -207,6 +207,7 @@ free_statements(statement *instr) {
 
     instr = NULL;
 }
+*/
 
 /*
 
@@ -220,6 +221,8 @@ void
 release_resources(lexer_state *lexer) {
     subroutine *iter = lexer->subs;
 
+    return;
+
     if (iter) {
         do {
             subroutine *temp = iter;
@@ -228,7 +231,9 @@ release_resources(lexer_state *lexer) {
             free_symbols(iter->symbols);
 
             /* free instructions in this subroutine */
+          /*
             free_statements(iter->statements);
+            */
 
             /* free this subroutine itself */
             free(temp);
