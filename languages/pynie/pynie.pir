@@ -52,6 +52,7 @@ to the Pynie compiler.
 .include 'src/gen_actions.pir'
 .include 'src/parser/indent.pir'
 
+.include 'src/builtins/funcs.pir'
 .include 'src/builtins/io.pir'
 .include 'src/builtins/lists.pir'
 .include 'src/builtins/oper.pir'
