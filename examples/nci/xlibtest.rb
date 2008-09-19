@@ -1,3 +1,14 @@
+# xlibtest.rb - A test of Xlib.pir usage from cardinal
+# 
+# To run this file, execute the following command from the
+# current directory:
+# 
+# ../../parrot ../../languages/cardinal/cardinal.pbc  xlibtest.rb
+# 
+# (You must have the cardinal pbc already builded).
+# 
+# Press Esc key to exit the program.
+# 
 # Parsing is very slow.  Give it a minute to start up.
 require 'Xlib'
 
