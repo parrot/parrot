@@ -425,9 +425,9 @@ method or_test($/) {
     my $past := $( $<and_test>[$count] );
     while $count != 0 {
         $count := $count - 1;
-        my $past := PAST::Op.new( $($<and_test>[$count]),
+        $past := PAST::Op.new( $($<and_test>[$count]),
                                   $past,
-                                  :pasttype('if') );
+                                  :pasttype('unless') );
     }
     make $past;
 }
@@ -437,9 +437,9 @@ method and_test($/) {
     my $past := $( $<not_test>[$count] );
     while $count != 0 {
         $count := $count - 1;
-        my $past := PAST::Op.new( $($<not_test>[$count]),
+        $past := PAST::Op.new( $($<not_test>[$count]),
                                   $past,
-                                  :pasttype('unless') );
+                                  :pasttype('if') );
     }
     make $past;
 }
