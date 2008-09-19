@@ -19,36 +19,69 @@ rule TOP {
 
 rule Block {
     <BlankLine>* [
-        | <AtxHeading> {*}      #= AtxHeading
+        | <Heading> {*}         #= Heading
         | <Para> {*}            #= Para
     ]
 }
 
 rule Para {
-    <Inline> \n
-    {*}
-}
-
-rule AtxHeading {
-    <AtxStart> <AtxInline> \n
+    <Inline> <.NewLine>
     {*}
 }
 
 token AtxInline { \N* }
 
-token AtxStart {
-    | '######'
-    | '#####'
-    | '####'
-    | '###'
-    | '##'
-    | '#'
+token AtxStart { '######' | '#####' | '####' | '###' | '##' | '#' }
+
+rule AtxHeading {
+    <AtxStart> <AtxInline> <.NewLine>
+    {*}
+}
+
+rule SetextHeading {
+    | <SetextHeading1> {*}      #= SetextHeading1
+    | <SetextHeading2> {*}      #= SetextHeading2
+}
+
+token SetextHeading1 {
+    <!EndLine> <Inline> <.NewLine> '===' '='* <.NewLine>
+    {*}
+}
+
+token SetextHeading2 {
+    <!EndLine> <Inline> <.NewLine> '---' '-'* <.NewLine>
+    {*}
+}
+
+rule Heading {
+    | <AtxHeading> {*}          #= AtxHeading
+    | <SetextHeading> {*}       #= SetextHeading
 }
 
 token Inline { \N* }
 
+rule EndLine { TerminalLine | NormalEndline }
+
+token NormalEndline {
+    <Sp> <Newline> <!BlankLine> <!AtxStart>
+}
+
+token TerminalEndline { <Sp> <Newline> <Eof> }
+
 rule BlankLine { \n }
 
-token ws { <Spacechar>* }
+token Eof { $ }
 
-token Spacechar { ' ' | '\t' }
+token Spacechar { ' ' | \t }
+
+token NonspaceChar { <!SpaceChar> <!Newline> . }
+
+token NewLine { \n }
+
+token Sp { <Spacechar>* }
+
+token ws { <Sp> }
+
+token NonindentSpace { '   ' | '  ' | ' ' | '' }
+
+token Indent { \t | '    ' }

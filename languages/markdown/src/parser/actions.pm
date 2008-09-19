@@ -32,10 +32,32 @@ method Block($/, $key) {
     make $( $/{$key} );
 }
 
+method Heading($/, $key) {
+    make $( $/{$key} );
+}
+
+method SetextHeading($/, $key) {
+    make $( $/{$key} );
+}
+
 method AtxHeading($/) {
-    make Markdown::Header.new(
+    make Markdown::Title.new(
         :level( ~$<AtxStart>.length() ),
         :text( ~$<AtxInline> ),
+    );
+}
+
+method SetextHeading1($/) {
+    make Markdown::Title.new(
+        :level( 1 ),
+        :text( ~$<Inline> ),
+    );
+}
+
+method SetextHeading2($/) {
+    make Markdown::Title.new(
+        :level( 2 ),
+        :text( ~$<Inline> ),
     );
 }
 

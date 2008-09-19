@@ -20,7 +20,7 @@ for Markdown.
     base = p6meta.'new_class'('Markdown::Node', 'parent'=>'PAST::Node')
 
     p6meta.'new_class'('Markdown::Document', 'parent'=>base)
-    p6meta.'new_class'('Markdown::Header', 'parent'=>base)
+    p6meta.'new_class'('Markdown::Title', 'parent'=>base)
     p6meta.'new_class'('Markdown::Para', 'parent'=>base)
 .end
 
@@ -32,7 +32,7 @@ for Markdown.
 .end
 
 
-.namespace [ 'Markdown::Header' ]
+.namespace [ 'Markdown::Title' ]
 
 .sub 'level' :method
     .param pmc value           :optional

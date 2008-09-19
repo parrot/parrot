@@ -71,11 +71,11 @@ Return generated HTML for all of its children.
 .end
 
 
-=item html(Markdown::Header node)
+=item html(Markdown::Title node)
 
 =cut
 
-.sub 'html' :method :multi(_,['Markdown::Header'])
+.sub 'html' :method :multi(_,['Markdown::Title'])
     .param pmc node
     $S1 = node.'text'()
     $S2 = node.'level'()
