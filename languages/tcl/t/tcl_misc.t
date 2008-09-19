@@ -195,22 +195,14 @@ ok
 OUT
 
 {
-
-    # Note - we need to keep the path around for windows
-    my $path = $ENV{PATH};
-    local undef %ENV;
-    $ENV{PATH}   = $path;
     $ENV{cow}    = 'moo';
     $ENV{pig}    = 'oink';
     $ENV{cowpig} = 'moink';
 
     language_output_is( "tcl", <<'TCL', <<"OUT", "reading environment variables" );
-  parray env
+  puts "$env(cow) $env(pig) $env(cowpig)"
 TCL
-env(PATH)   = $path
-env(cow)    = moo
-env(cowpig) = moink
-env(pig)    = oink
+moo oink moink
 OUT
 }
 
