@@ -448,7 +448,7 @@ method and_test($/) {
 method not_test($/) {
     my $past := $( $<in_test> );
     for $<nots> {
-        $past := PAST::Op.new( $past, :pirop('not'), :node($/) );
+        $past := PAST::Op.new( $past, :pirop('not II'), :node($/) );
     }
     make $past;
 }
