@@ -7,13 +7,14 @@ PARROT_ARGS =
 BUILD_DIR     = @build_dir@
 LOAD_EXT      = @load_ext@
 O             = @o@
+EXE           = @exe@
 
 ## Setup some commands
 LN_S          = @lns@
 PERL          = @perl@
 RM_RF         = @rm_rf@
 CP            = @cp@
-PARROT        = ../../parrot@exe@
+PARROT        = ../../parrot$(EXE)
 CAT           = $(PERL) -MExtUtils::Command -e cat
 BUILD_DYNPMC  = $(PERL) $(BUILD_DIR)/tools/build/dynpmc.pl
 RECONFIGURE   = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
@@ -27,7 +28,7 @@ PGE_LIBRARY   = $(BUILD_DIR)/runtime/parrot/library/PGE
 PERL6GRAMMAR  = $(PGE_LIBRARY)/Perl6Grammar.pbc
 NQP           = $(BUILD_DIR)/compilers/nqp/nqp.pbc
 PCT           = $(BUILD_DIR)/runtime/parrot/library/PCT.pbc
-PBC_TO_EXE    = $(BUILD_DIR)/pbc_to_exe@exe@
+PBC_TO_EXE    = $(BUILD_DIR)/pbc_to_exe$(EXE)
 
 PMC_DIR       = src/pmc
 
@@ -51,8 +52,11 @@ BUILTINS_PIR = \
 # PMCS = lolcode
 # PMC_SOURCES = $(PMC_DIR)/lolcode.pmc
 
-lolcode@exe@: lolcode.pbc
+lolcode$(EXE): lolcode.pbc
 	$(PBC_TO_EXE) lolcode.pbc
+
+installable_lolcode$(EXE): lolcode.pbc
+	$(PBC_TO_EXE) lolcode.pbc --install
 
 # the default target
 lolcode.pbc: $(PARROT) $(SOURCES)
@@ -107,9 +111,14 @@ test: all
 testclean:
 
 CLEANUPS = \
-  lolcode@exe@ \
-  lolcode.c \
   lolcode.pbc \
+  lolcode.c \
+  lolcode.ilk \
+  *.manifest \
+  *.pdb \
+  lolcode$(O) \
+  lolcode$(EXE) \
+  installable_lolcode$(EXE) \
   src/gen_grammar.pir \
   src/gen_actions.pir \
   src/gen_builtins.pir \
