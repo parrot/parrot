@@ -19,6 +19,7 @@ rule TOP {
 
 rule Block {
     <BlankLine>* [
+        | <HorizontalRule> {*}  #= HorizontalRule
         | <Heading> {*}         #= Heading
         | <Para> {*}            #= Para
     ]
@@ -56,6 +57,16 @@ token SetextHeading2 {
 rule Heading {
     | <AtxHeading> {*}          #= AtxHeading
     | <SetextHeading> {*}       #= SetextHeading
+}
+
+token HorizontalRule {
+    <.NonindentSpace> [
+        | '*' <.Sp> '*' <.Sp> '*' [ <.Sp> '*' ]*
+        | '-' <.Sp> '-' <.Sp> '-' [ <.Sp> '-' ]*
+        | '_' <.Sp> '_' <.Sp> '_' [ <.Sp> '_' ]*
+    ]
+    <.Sp> <.NewLine> <.BlankLine>+
+    {*}
 }
 
 token Inline { \N* }

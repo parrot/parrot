@@ -20,6 +20,7 @@ for Markdown.
     base = p6meta.'new_class'('Markdown::Node', 'parent'=>'PAST::Node')
 
     p6meta.'new_class'('Markdown::Document', 'parent'=>base)
+    p6meta.'new_class'('Markdown::HorizontalRule', 'parent'=>base)
     p6meta.'new_class'('Markdown::Title', 'parent'=>base)
     p6meta.'new_class'('Markdown::Para', 'parent'=>base)
 .end

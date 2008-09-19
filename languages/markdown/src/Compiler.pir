@@ -71,6 +71,19 @@ Return generated HTML for all of its children.
 .end
 
 
+=item html(Markdown::HorizontalRule node)
+
+=cut
+
+.sub 'html' :method :multi(_,['Markdown::HorizontalRule'])
+    .param pmc node
+    .local pmc code
+    new code, 'CodeString'
+    set code, "<hr />\n\n"
+    .return (code)
+.end
+
+
 =item html(Markdown::Title node)
 
 =cut

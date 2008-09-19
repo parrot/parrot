@@ -4,15 +4,11 @@
 
 =head1 NAME
 
-t/examples.t - some Markdown examples
+t/10-heading.t - Markdown heading
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Imarkdown/t markdown/t/00-sanity.t
-
-=head1 DESCRIPTION
-
-First tests in order to check infrastructure.
+    % perl -I../lib -Imarkdown/t markdown/t/10-heading.t
 
 =cut
 

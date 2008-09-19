@@ -65,6 +65,10 @@ method Para($/) {
     make Markdown::Para.new( :text( ~$<Inline> ) );
 }
 
+method HorizontalRule($/) {
+    make Markdown::HorizontalRule.new();
+}
+
 
 # Local Variables:
 #   mode: cperl
