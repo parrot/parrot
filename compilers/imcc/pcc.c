@@ -212,19 +212,19 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
     char s[16];
     SymReg ** const regs  = mem_allocate_n_zeroed_typed(n + 1, SymReg *);
 
-    /* Assumptions:
-     * The created string is in the format "\"(0x10,0x10,0x10)\"".
-     * Flags has no more than 4 hex digits (currently the largest defined flag
-     * in include/parrot/enums.h is PARROT_ARG_NAME (0x200), but this could
-     * change in the future.)
-     * Adding "0x" and "," gives a max of 7 chars for each arg.
-     * 5 more for: "\"(" and ")\"\0" .
-     * Last item has no "," but we can ignore it.
+    /* Notes:
+     * The created string is in the format "\"(0x0010,0x0220,0x0010)\"".
+     * flags always has exactly 4 hex digits.
+     * The hex number at the end of the list has no "," but we can safely
+     * ignore this.  The terminal "0" in strlen should be a "\0", but has to be
+     * non-null to avoid confusing strlen().
      */
-    unsigned int bufsize = 7 * n + 5;
-    char * buf = mem_allocate_n_typed(bufsize, char);
+    unsigned int  bufpos  = 0;
+    unsigned int  bufsize = strlen("\"(") + (strlen("0xffff,") * n) + strlen(")\"0");
+    char         *buf     = mem_allocate_n_typed(bufsize, char);
 
     strcpy(buf, "\"(");
+    bufpos += strlen("\"(");
     for (i = 0; i < n; i++) {
         SymReg *arg = args[i];
 
@@ -259,12 +259,15 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
             default :                               break;
         }
 
-        snprintf(s, sizeof (s), "0x%x", flags);
+        snprintf(s, sizeof (s), "0x%.4x", flags);
 
         if (i < n - 1)
             strcat(s, ",");
-        PARROT_ASSERT(strlen(buf) + strlen(s) < bufsize);
-        strcat(buf, s);
+        if (bufpos+strlen("0xffff,") >= bufsize)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERNAL_PANIC,
+                    "arg string is longer than allocated buffer");
+        strncpy(buf+bufpos, s, strlen("0xffff,"));
+        bufpos += strlen("0xffff,");
     }
 
     strcat(buf, ")\"");
