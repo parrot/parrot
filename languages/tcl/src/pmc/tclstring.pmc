@@ -52,7 +52,8 @@ pmclass TclString
             peek_pos++;
             if (peek_pos >= len) {
                 Parrot_unregister_pmc(INTERP, retval);
-                Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "unmatched open brace in list");
+                Parrot_ex_throw_from_c_args(INTERP, NULL, CONTROL_ERROR,
+                    "unmatched open brace in list");
             }
 
             character = string_ord(INTERP, str, peek_pos);

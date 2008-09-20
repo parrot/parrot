@@ -19,20 +19,11 @@ this is as simple as returning the list.
   $P0 = new 'TclString'
   $S0 = value
 
-  push_eh convert_to_tcl_error
-    $P0 = $P0.'get_list'($S0)
-  pop_eh
+  $P0 = $P0.'get_list'($S0)
 
   copy value, $P0
 
   .return(value)
-
-  # The PMC method only throws a regular exception, we need to tcl-ify it.
-  # XXX this may not be necessary anymore.
-  convert_to_tcl_error:
-    get_results '0,0', $P0, $S0
-    die $S0
-
 .end
 
 =head2 _Tcl::toDict
