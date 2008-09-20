@@ -90,7 +90,7 @@ Return generated HTML for all of its children.
 
 .sub 'html' :method :multi(_,['Markdown::Title'])
     .param pmc node
-    $S1 = node.'text'()
+    $S1 = self.'html_children'(node)
     $S2 = node.'level'()
     .local pmc code
     new code, 'CodeString'
@@ -112,13 +112,38 @@ Return generated HTML for all of its children.
 
 .sub 'html' :method :multi(_,['Markdown::Para'])
     .param pmc node
-    $S1 = node.'text'()
+    $S1 = self.'html_children'(node)
     .local pmc code
     new code, 'CodeString'
     $S0 = "<p>"
     $S0 .= $S1
     $S0 .= "</p>\n\n"
     set code, $S0
+    .return (code)
+.end
+
+=item html(Markdown::Word node)
+
+=cut
+
+.sub 'html' :method :multi(_,['Markdown::Word'])
+    .param pmc node
+    $S1 = node.'text'()
+    .local pmc code
+    new code, 'CodeString'
+    set code, $S1
+    .return (code)
+.end
+
+=item html(Markdown::Space node)
+
+=cut
+
+.sub 'html' :method :multi(_,['Markdown::Space'])
+    .param pmc node
+    .local pmc code
+    new code, 'CodeString'
+    set code, ' '
     .return (code)
 .end
 

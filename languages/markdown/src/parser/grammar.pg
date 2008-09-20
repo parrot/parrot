@@ -11,50 +11,55 @@ This is the grammar for Markdown written as a sequence of Perl 6 rules.
 
 grammar Markdown::Grammar is PCT::Grammar;
 
-rule TOP {
-    ^ <Block>* <BlankLine>*
-    [ $ || <panic: 'Syntax error'> ]
+token TOP {
+    ^ <Block>*
     {*}
 }
 
-rule Block {
-    <BlankLine>* [
+token Block {
+    <.BlankLine>* [
         | <HorizontalRule> {*}  #= HorizontalRule
         | <Heading> {*}         #= Heading
         | <Para> {*}            #= Para
     ]
 }
 
-rule Para {
-    <Inline> <.NewLine>
+token Para {
+    <.NonindentSpace> <Inlines> <.BlankLine>+
     {*}
 }
 
-token AtxInline { \N* }
+token AtxInline {
+    <!Newline> <!_AtxEnd> <Inline> {*}
+}
+
+token _AtxEnd {
+    <.Sp> '#'* <.Sp> <.Newline>
+}
 
 token AtxStart { '######' | '#####' | '####' | '###' | '##' | '#' }
 
-rule AtxHeading {
-    <AtxStart> <AtxInline> <.NewLine>
+token AtxHeading {
+    <AtxStart> <.Sp> <AtxInline>+ <._AtxEnd>
     {*}
 }
 
-rule SetextHeading {
+token SetextHeading {
     | <SetextHeading1> {*}      #= SetextHeading1
     | <SetextHeading2> {*}      #= SetextHeading2
 }
 
 token SetextHeading1 {
-    <!EndLine> <Inline> <.NewLine> '===' '='* <.NewLine>
+    <!Endline> <Inline>+ <.Newline> '===' '='* <.Newline>
     {*}
 }
 
 token SetextHeading2 {
-    <!EndLine> <Inline> <.NewLine> '---' '-'* <.NewLine>
+    <!Endline> <Inline>+ <.Newline> '---' '-'* <.Newline>
     {*}
 }
 
-rule Heading {
+token Heading {
     | <AtxHeading> {*}          #= AtxHeading
     | <SetextHeading> {*}       #= SetextHeading
 }
@@ -65,13 +70,33 @@ token HorizontalRule {
         | '-' <.Sp> '-' <.Sp> '-' [ <.Sp> '-' ]*
         | '_' <.Sp> '_' <.Sp> '_' [ <.Sp> '_' ]*
     ]
-    <.Sp> <.NewLine> <.BlankLine>+
+    <.Sp> <.Newline> <.BlankLine>+
     {*}
 }
 
-token Inline { \N* }
+token Inlines {
+    [
+    | <!Endline> <Inline>
+    | <?Endline> <Inline>
+    ]+
+    <.Endline>?
+}
 
-rule EndLine { TerminalLine | NormalEndline }
+token Inline {
+    | <Str> {*}                 #= Str
+    | <Endline> {*}             #= Endline
+    | <Space> {*}               #= Space
+}
+
+token Space {
+    <Spacechar>+ {*}
+}
+
+token Str {
+    <NormalChar>+ {*}
+}
+
+token Endline { TerminalLine | NormalEndline }
 
 token NormalEndline {
     <Sp> <Newline> <!BlankLine> <!AtxStart>
@@ -87,11 +112,15 @@ token Spacechar { ' ' | \t }
 
 token NonspaceChar { <!SpaceChar> <!Newline> . }
 
-token NewLine { \n }
+token Newline { \n }
 
 token Sp { <Spacechar>* }
 
 token ws { <Sp> }
+
+token SpecialChar { '*' | '_' | '`' | '&' | '[' | ']' | '<' | '!' | '\\' }
+
+token NormalChar { <!SpecialChar> <!Spacechar> <!Newline> . }
 
 token NonindentSpace { '   ' | '  ' | ' ' | '' }
 

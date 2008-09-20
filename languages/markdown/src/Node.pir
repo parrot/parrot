@@ -23,6 +23,8 @@ for Markdown.
     p6meta.'new_class'('Markdown::HorizontalRule', 'parent'=>base)
     p6meta.'new_class'('Markdown::Title', 'parent'=>base)
     p6meta.'new_class'('Markdown::Para', 'parent'=>base)
+    p6meta.'new_class'('Markdown::Word', 'parent'=>base)
+    p6meta.'new_class'('Markdown::Space', 'parent'=>base)
 .end
 
 
