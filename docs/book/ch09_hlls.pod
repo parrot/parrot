@@ -43,6 +43,15 @@ way they interoperate on Parrot.
 
 =head2 Fakecutables
 
+It's possible to turn compilers created with PCT into stand-alone
+executables that run without the Parrot executable. To do this, the
+compiler bytecode is linked together with a small driver program in
+C and the Parrot library, C<libparrot> X<libparrot>. These programs
+have been given a special name by the Parrot development community:
+I<fakecutables> X<fakecutables>. They're called fake because the PBC
+is not converted to native machine code like in a normal binary
+executable file, but instead is left in original PBC format.
+
 =head2 Compiler Objects
 
 =head2 HLL Namespaces
@@ -92,4 +101,55 @@ instead.
 
 =head3 Mixing and Matching Datatypes
 
+=head2 Linking and Embedding
+
+Not strictly a topic about HLLs and their interoperation, but it's important
+for us to also mention another interesting aspect of Parrot: Linking and
+embedding. We've touched on one related topic above, that of creating
+the compiler fakecutables. The fakecutables contain a link to C<libparrot>,
+which contains all the necessary guts of Parrot. When the fakecutable is
+executed, a small driver program loads the PBC data into libparrot through
+it's API functions. The Parrot executable is just one small example of how
+Parrot's functionality can be implemented, and we will talk about a few other
+ways here too.
+
+=head3 Embedding Parrot
+
+C<libparrot> is a library that can be statically or dynamically linked
+to any other executable program that wants to use it. This linking process
+is known as I<embedding parrot>, and is a great way to interoperate
+
+=head3 Creating and Interoperating Interpreters
+
+Parrot's executable, which is the interface which most users are going
+to be familiar with uses a single interpreter structure to perform a
+single execution task. However, this isn't the only supported structural
+model that Parrot supports. In fact, the interpreter structure is not a
+singleton, and multiple interpreters can be created by a single program.
+This allows separate tasks to be run in separate environments, which can
+be very helpful if we are writing programs and libraries in multiple
+languages. Interpreters can communicate and share data between each other,
+and can run independently from others in the same process.
+
+=head3 Small, Toy, and Domain-Specific Languages
+
+How many programs are out there with some sort of scripting capability?
+You can probably name a few off the top of your head with at least some
+amount of scripting or text-based commands. In developing programs like
+this, typically it's necessary to write a custom parser for the input
+commands, and a custom execution engine to make the instructions do what
+they are intended to do. Instead of doing all this, why not embed an
+instance of Parrot in the program, and let Parrot handle the parsing
+and executing details?
+
+Small scripting components which are not useful in a general sense like
+most programming languages, and are typically limited to use in very
+specific environments (such as within a single program) are called
+I<Domain-Specific Languages> (DSL). DSLs are a very popular topic because
+a DSL allows developers to create a custom language that makes dealing
+with a given problem space or data set very easy. Parrot and it's suite
+of compiler tools in turn make creating the DSLs very easy. It's all
+about ease of use.
+
+=head3 Parrot API
 =cut
