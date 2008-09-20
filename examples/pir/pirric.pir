@@ -57,11 +57,16 @@
     set_global 'program', program
 
     $I0 = args
-    le $I0, 1, start
+    gt $I0, 1, read_args
+    $I0 = 0
+    goto start
+
+read_args:
     .local string filename
     filename = args[1]
-    say filename
+    #say filename
     load_program(filename)
+    $I0 = 1
 
 start:
     runloop($I0)
@@ -119,7 +124,7 @@ nextline:
     line = readlinebas(file)
     unless line goto eof
 
-    say line
+    #say line
 
     tokenizeline = newTokenizer(line)
     token = tokenizeline.get()
@@ -283,7 +288,6 @@ fail:
     .param pmc tokenizer
     .param pmc token :optional
 
-    .local pmc args
     .local pmc arg
 
     $I0 = defined token
@@ -296,9 +300,9 @@ check:
     eq token, '(', parenexp
 
     $I0 = isa token, 'Literal'
-    if $I0 goto done
+    if $I0 goto isliteral
     $I0 = isa token, 'Integer'
-    if $I0 goto done
+    if $I0 goto isinteger
     $I0 = isa token, 'String'
     unless $I0 goto fail
 
@@ -308,11 +312,14 @@ check:
 
     eq $S0, 'NEW', new_op
     eq $S0, 'SIN', func_sin
+    eq $S0, 'SQR', func_sqr
 
-    $P1 = get_global $S0
-    unless_null $P1, getvar
+    #say $S0
+    .local pmc var
+    var = get_global $S0
+    unless_null var, getvar
 
-    $P0 = get_namespace token
+    $P0 = get_namespace $P1
     $I0 = defined $P0
     if $I0 goto spaced
     SyntaxError()
@@ -329,7 +336,14 @@ spaced:
 
     .return($P2)
 
+isliteral:
+    .return(token)
+
+isinteger:
+    .return(token)
+
 getargs:
+    .local pmc args
     args = get_args(tokenizer)
     $I0 = defined args
     unless $I0 goto emptyargs
@@ -341,14 +355,11 @@ emptyargs:
     .return($P3)
 
 getvar:
-    #say token
-    assign token, $P1
-    $P1 = tokenizer.get()
-    eq $P1, '.', dotted
+    $P2 = tokenizer.get()
+    eq $P2, '.', dotted
     tokenizer.back()
-done:
-    #say token
-    .return(token)
+    .return(var)
+
 new_op:
     $P1 = tokenizer.get()
     $I0 = defined $P1
@@ -366,31 +377,34 @@ new_op:
 
 getit:
     $S1 = $P1
+    #print "NEW: "
+    #say $S1
 
     $P1 = new $S1
     .return($P1)
 dotted:
-    $P2 = tokenizer.get()
     $P3 = tokenizer.get()
-    eq $P3, '(', methodcall
+    $P4 = tokenizer.get()
+    eq $P4, '(', methodcall
     tokenizer.back()
 
-    $S1 = $P2
-    $P1 = getattribute token, $S1
-    .return($P1)
+    $S1 = $P3
+    $P5 = getattribute token, $S1
+    .return($P5)
 
 methodcall:
-    $S2 = $P2
+    $S2 = $P3
     #say $S2
 
-    args = get_args(tokenizer)
-    $I0 = defined args
+    .local pmc methargs
+    methargs = get_args(tokenizer)
+    $I0 = defined methargs
     unless $I0 goto memptyargs
-    $P2 = token.$S2(args :flat)
-    .return($P2)
+    $P5 = var.$S2(methargs :flat)
+    .return($P5)
 
 memptyargs:
-    $P2 = token.$S2()
+    $P2 = var.$S2()
     .return($P2)
 
 parenexp:
@@ -403,14 +417,54 @@ func_sin:
     null $P1
     $P1 = tokenizer.get()
     ne $P1, '(', fail
+    null $P5
     $P5 = evaluate(tokenizer)
     null $P1
     $P1 = tokenizer.get()
     ne $P1, ')', fail
-    say $P5
+    #say $P5
+
+    $I0 = isa $P5, 'Integer'
+    #print 'Integer: '
+    #say $I0
+    unless $I0 goto do_sin
+    $I0 = $P5
+    null $P5
+    $P5 = new 'Float'
+    $N0 = $I0
+    $P5 = $N0
+do_sin:
     $P9 = $P5.sin()
+
     #say $P9
     .return($P9)
+
+func_sqr:
+    null $P1
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    null $P5
+    $P5 = evaluate(tokenizer)
+    null $P1
+    $P1 = tokenizer.get()
+    ne $P1, ')', fail
+    #say $P5
+
+    $I0 = isa $P5, 'Integer'
+    #print 'Integer: '
+    #say $I0
+    unless $I0 goto do_sqr
+    $I0 = $P5
+    null $P5
+    $P5 = new 'Float'
+    $N0 = $I0
+    $P5 = $N0
+do_sqr:
+    $P9 = $P5.sqrt()
+
+    #say $P9
+    .return($P9)
+
 fail:
     SyntaxError()
 .end
@@ -432,17 +486,24 @@ doequal:
     $P2 = eval_base(tokenizer)
     clone $P3, $P0
     $I0 = iseq $P3, $P2
+    null $P0
+    $P0 = new 'Integer'
     set $P0, $I0
     goto more
 doless:
     $P2 = eval_base(tokenizer)
     clone $P3, $P0
     $I0 = islt $P3, $P2
+    null $P0
+    $P0 = new 'Integer'
     set $P0, $I0
     goto more
 dogreat:
     $P2 = eval_base(tokenizer)
-    $I0 = isgt $P0, $P2
+    clone $P3, $P0
+    $I0 = isgt $P3, $P2
+    null $P0
+    $P0 = new 'Integer'
     set $P0, $I0
     goto more
 .end
@@ -505,6 +566,10 @@ dosub:
     .param pmc token :optional
 
     $P0 = eval_add(tokenizer, token)
+#    $I0 = isa $P0, 'Integer'
+#    unless $I0 goto done
+#    say '<Integer'
+#done:
     .return($P0)
 .end
 
@@ -1013,7 +1078,7 @@ endline:
     .local pmc text
     .local pmc lines
 
-    say 'Program.init'
+    # say 'Program.init'
 
     text = new 'Hash'
     lines = new 'ResizableIntegerArray'
