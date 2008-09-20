@@ -18,6 +18,7 @@ token TOP {
 
 token Block {
     <.BlankLine>* [
+        | <BlockQuote> {*}      #= BlockQuote
         | <HorizontalRule> {*}  #= HorizontalRule
         | <Heading> {*}         #= Heading
         | <Para> {*}            #= Para
@@ -63,6 +64,22 @@ token Heading {
     | <AtxHeading> {*}          #= AtxHeading
     | <SetextHeading> {*}       #= SetextHeading
 }
+
+token BlockQuote {
+    <BlockQuoteRaw>
+    {*}
+}
+
+token BlockQuoteRaw {
+    [
+        <._Chevron> ' '? <Line>
+        [ <!_Chevron> <!BlankLine> <Line> ]*
+        <.BlankLine>*
+    ]+
+    {*}
+}
+
+token _Chevron { '>' }
 
 token HorizontalRule {
     <.NonindentSpace> [
@@ -125,3 +142,13 @@ token NormalChar { <!SpecialChar> <!Spacechar> <!Newline> . }
 token NonindentSpace { '   ' | '  ' | ' ' | '' }
 
 token Indent { \t | '    ' }
+
+token Line { <RawLine> {*} }
+
+token RawLine {
+    [
+    | (\N*) <.Newline>
+    | (.+) <.Eof>
+    ]
+    {*}
+}

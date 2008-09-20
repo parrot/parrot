@@ -27,9 +27,16 @@ method TOP($/) {
     make $mast;
 }
 
-
 method Block($/, $key) {
     make $( $/{$key} );
+}
+
+method Para($/) {
+    my $mast := Markdown::Para.new();
+    for $<Inlines><Inline> {
+        $mast.push( $( $_ ) );
+    }
+    make $mast;
 }
 
 method Heading($/, $key) {
@@ -72,12 +79,24 @@ method SetextHeading2($/) {
     make $mast;
 }
 
-method Para($/) {
-    my $mast := Markdown::Para.new();
-    for $<Inlines><Inline> {
+method BlockQuote($/) {
+    make $( $<BlockQuoteRaw> );
+}
+
+method BlockQuoteRaw($/) {
+    my $mast := Markdown::BlockQuote.new();
+    for $<Line> {
         $mast.push( $( $_ ) );
     }
     make $mast;
+}
+
+method Line($/) {
+    make $( $<RawLine> );
+}
+
+method RawLine($/) {
+    make Markdown::Line.new( :text( $/[0] ) );
 }
 
 method HorizontalRule($/) {

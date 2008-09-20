@@ -122,6 +122,38 @@ Return generated HTML for all of its children.
     .return (code)
 .end
 
+=item html(Markdown::BlockQuote node)
+
+=cut
+
+.sub 'html' :method :multi(_,['Markdown::BlockQuote'])
+    .param pmc node
+    $S1 = self.'html_children'(node)
+    .local pmc code
+    new code, 'CodeString'
+    $S0 = "<blockquote>\n"
+    $S0 .= $S1
+    $S0 .= "</blockquote>\n\n"
+    set code, $S0
+    .return (code)
+.end
+
+=item html(Markdown::Line node)
+
+=cut
+
+.sub 'html' :method :multi(_,['Markdown::Line'])
+    .param pmc node
+    $S1 = node.'text'()
+    .local pmc code
+    new code, 'CodeString'
+    $S0 = "  <p>"
+    $S0 .= $S1
+    $S0 .= "</p>\n"
+    set code, $S0
+    .return (code)
+.end
+
 =item html(Markdown::Word node)
 
 =cut
