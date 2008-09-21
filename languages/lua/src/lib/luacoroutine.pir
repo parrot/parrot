@@ -136,7 +136,8 @@ C<resume> returns B<false> plus the error message.
   _handler:
     .local pmc e
     .local string s
-    .get_results (e, s)
+    .get_results (e)
+    s = c
     $P0 = pop co_stack
     .return (0, s)
 .end

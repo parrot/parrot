@@ -52,7 +52,8 @@ Francois Perrad.
   _handler:
     .local pmc e
     .local string s
-    .get_results (e, s)
+    .get_results (e)
+    s = e
     print s
     print "\n"
   L1:

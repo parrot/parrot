@@ -515,7 +515,8 @@ pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many - catch exceptio
     print $P0
     print "never\n"
 arg_handler:
-    get_results "0,0", $P1, $S0
+    get_results "0", $P1
+    $S0 = $P1
     print "caught: "
     print $S0
 #    $S1 = typeof $P1

@@ -1279,7 +1279,8 @@ err_2:
     .local pmc exception
     .local string message
 bad_type:
-    .get_results (exception, message)
+    .get_results (exception)
+    message = exception
 still_ok:
     like(message, 'illegal\ type\ for\ splice', "splice with a different type")
 .end

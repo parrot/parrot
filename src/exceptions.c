@@ -199,9 +199,8 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
 
     /* Set up the continuation context of the handler in the interpreter. */
     if (PMC_cont(handler)->current_results)
-        address = pass_exception_args(interp, "PS", address,
-                CONTEXT(interp), exception,
-                VTABLE_get_string(interp, exception));
+        address = pass_exception_args(interp, "P", address,
+                CONTEXT(interp), exception);
 
     if (PObj_get_FLAGS(handler) & SUB_FLAG_C_HANDLER) {
         /* it's a C exception handler */
@@ -257,7 +256,6 @@ void
 Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 {
     PMC * const        handler      = find_exception_handler(interp, exception);
-    STRING            *msg          = VTABLE_get_string(interp, exception);
     RunProfile * const profile      = interp->profile;
     Parrot_runloop    *return_point = interp->current_runloop;
 
@@ -275,6 +273,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     if (Interp_debug_TEST(interp, PARROT_BACKTRACE_DEBUG_FLAG)) {
         int exitcode = VTABLE_get_integer_keyed_str(interp, exception,
                 CONST_STRING(interp, "exit_code"));
+        STRING *msg = VTABLE_get_string(interp, exception);
         PIO_eprintf(interp,
             "Parrot_ex_throw_from_c (severity:%d error:%d): %Ss\n",
             EXCEPT_error, exitcode, msg);
@@ -289,7 +288,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     }
 
     /* Run the handler. */
-    Parrot_runops_fromc_args(interp, handler, "vPS", exception, msg);
+    Parrot_runops_fromc_args(interp, handler, "vP", exception);
 
     /* After handling a C exception, you don't want to resume at the point
      * where the C exception was thrown, you want to resume the next outer

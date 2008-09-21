@@ -15,8 +15,7 @@ Preamble for any tcl-related exception handler.
 
 .macro catch ()
   .local pmc exception
-  .local string exception_message_unused_XXX
-  get_results '0,0', exception, exception_message_unused_XXX
+  get_results '0', exception
 .endm
 
 =head2 rethrow ()

@@ -273,7 +273,8 @@ Description of the test.
   thrown:
     .local pmc exception
     .local string message
-    get_results '0,0', exception, message
+    get_results '0', exception
+    message = exception
     say message
     # remove /'s
     $S0 = substr result, 0, 1

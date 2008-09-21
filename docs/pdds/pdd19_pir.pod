@@ -617,24 +617,29 @@ C<:slurpy>, C<:optional>, C<:opt_flag>, and C<:flat>.
 Using the C<push_eh> op you can install an exception handler. If an exception
 is thrown, Parrot will execute the installed exception handler. In order to
 retrieve the thrown exception, use the C<.get_results> directive. This
-directive always takes 2 arguments: an exception object and a message string.
-
-{{ NOTE: Wouldn't it be more useful to make this flexible, or at least only
-the exception object? The message can be retrieved from the exception object.
-See RT #57436 }}
+directive always takes one argument: an exception object.
 
    push_eh handler
    ...
  handler:
    .local pmc exception
-   .local string message
-   .get_results (exception, message)
+   .get_results (exception)
    ...
 
 This is syntactic sugar for the C<get_results> op, but any flags set on the
 targets will be handled automatically by the PIR compiler.
 The C<.get_results> directive must be the first instruction of the exception
 handler; only declarations (.lex, .local) may come first.
+
+To resume execution after handling the exception, just invoke the continuation
+stored in the exception.
+
+   ...
+   .get_results(exception)
+   ...
+   continuation = exception['resume']
+   continuation()
+   ...
 
 =head2 Syntactic Sugar
 

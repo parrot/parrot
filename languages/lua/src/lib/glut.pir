@@ -138,7 +138,8 @@ not LuaGL
   _handler:
     .local pmc e
     .local string s
-    .get_results (e, s)
+    .get_results (e)
+    s = e
     printerr "Error running lua script:\n\n  "
     printerr s
     printerr " \n\n"
@@ -178,7 +179,8 @@ not LuaGL
   _handler:
     .local pmc e
     .local string s
-    .get_results (e, s)
+    .get_results (e)
+    s = e
     printerr "Error running lua script:\n\n  "
     printerr s
     printerr " \n\n"
@@ -274,7 +276,8 @@ not LuaGL
   _handler:
     .local pmc e
     .local string s
-    .get_results (e, s)
+    .get_results (e)
+    s = e
     printerr "Error running lua script:\n\n  "
     printerr s
     printerr " \n\n"
@@ -340,7 +343,8 @@ not LuaGL
   _handler:
     .local pmc e
     .local string s
-    .get_results (e, s)
+    .get_results (e)
+    s = e
     printerr "Error running lua script:\n\n  "
     printerr s
     printerr " \n\n"

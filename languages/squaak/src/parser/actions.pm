@@ -163,7 +163,7 @@ method try_statement($/) {
 
     ## generate instruction to retrieve the exception objct (and the exception message,
     ## that is passed automatically in PIR, this is stored into $S0 (but not used).
-    my $pir := "    .get_results (%r, $S0)\n"
+    my $pir := "    .get_results (%r)\n"
              ~ "    store_lex '" ~ $exc.name() ~ "', %r";
 
     $catch.unshift( PAST::Op.new( :inline($pir), :node($/) ) );

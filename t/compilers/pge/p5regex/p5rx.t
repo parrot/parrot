@@ -255,7 +255,8 @@ Column 6, if present, contains a description of what is being tested.
   thrown:
     .local pmc exception
     .local string message
-    get_results '0,0', exception, message
+    get_results '0', exception
+    message = exception
     # remove /'s
     # $S0 = substr result, 0, 1
     # if $S0 != '/' goto bad_error

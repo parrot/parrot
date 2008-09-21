@@ -531,7 +531,8 @@ In case of any error, C<pcall> returns B<false> plus the error message.
     .local pmc e
     .local string s
     .local pmc msg
-    .get_results (e, s)
+    .get_results (e)
+    s = e
     set status, 0
     new msg, 'LuaString'
     set msg, s

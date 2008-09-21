@@ -585,7 +585,8 @@ messages and in debug information.
     $P0.'setfenv'(env)
     .return ($P0)
   _handler:
-    .get_results ($P0, $S0)
+    .get_results ($P0)
+    $S0 = $P0
     null $P0
     .return ($P0, $S0)
 .end
@@ -607,7 +608,8 @@ messages and in debug information.
     $P0.'setfenv'(env)
     .return ($P0)
   _handler:
-    .get_results ($P0, $S0)
+    .get_results ($P0)
+    $S0 = $P0
     null $P0
     .return ($P0, $S0)
 .end
@@ -948,7 +950,8 @@ This function never returns.
   _handler:
     .local pmc ex
     .local string msg
-    .get_results (ex, msg)
+    .get_results (ex)
+    msg = ex
     $P0 = getattribute ex, 'severity'
     if null $P0 goto L1
     $I0 = $P0

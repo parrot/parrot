@@ -99,7 +99,8 @@ function, and so have no direct access to local variables.
   _handler:
     .local pmc e
     .local string msg
-    .get_results (e, msg)
+    .get_results (e)
+    msg = e
     printerr msg
     printerr "\n"
     goto L1

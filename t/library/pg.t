@@ -229,7 +229,8 @@ EOT
 no_pg:	
     .local pmc ex
     .local string msg
-    .get_results(ex, msg)
+    .get_results(ex)
+    msg = ex
     test.'skip'(N_TESTS)
     test.'finish'()
 .end

@@ -842,7 +842,10 @@ inline op die(in STR) :flow {
     PMC *exception = Parrot_ex_build_exception(interp, EXCEPT_error,
             CONTROL_ERROR, $1);
     opcode_t * const ret  = expr NEXT();
-    opcode_t * const dest = Parrot_ex_throw_from_op(interp, exception, ret);
+    PMC * resume = new_ret_continuation_pmc(interp, ret);
+    VTABLE_set_attr_str(interp, exception,
+                        const_string(interp, "resume"), resume);
+    opcode_t * const dest = Parrot_ex_throw_from_op(interp, exception, resume);
     goto ADDRESS(dest);
 }
 
@@ -852,7 +855,10 @@ inline op die(in PMC) :flow {
                          ? NULL : VTABLE_get_string(interp, $1);
     PMC            *exception =
         Parrot_ex_build_exception(interp, EXCEPT_error, CONTROL_ERROR, msg);
-    opcode_t       *dest = Parrot_ex_throw_from_op(interp, exception, ret);
+    PMC * resume = new_ret_continuation_pmc(interp, ret);
+    VTABLE_set_attr_str(interp, exception,
+                        const_string(interp, "resume"), resume);
+    opcode_t       *dest = Parrot_ex_throw_from_op(interp, exception, resume);
     goto ADDRESS(dest);
 }
 
@@ -862,7 +868,8 @@ inline op die(in INT, in INT) :flow {
     else {
         PMC *exception        = Parrot_ex_build_exception(interp, $1, $2, NULL);
         opcode_t * const ret  = expr NEXT();
-        opcode_t * const dest = Parrot_ex_throw_from_op(interp, exception, ret);
+        PMC * resume = new_ret_continuation_pmc(interp, ret);
+        opcode_t * const dest = Parrot_ex_throw_from_op(interp, exception, resume);
         goto ADDRESS(dest);
     }
 }
@@ -871,7 +878,10 @@ inline op exit(in INT) :flow {
     PMC      *exception   =
         Parrot_ex_build_exception(interp, EXCEPT_exit, $1, NULL);
     opcode_t * const ret  = expr NEXT();
-    opcode_t * const dest = Parrot_ex_throw_from_op(interp, exception, ret);
+    PMC * resume = new_ret_continuation_pmc(interp, ret);
+    VTABLE_set_attr_str(interp, exception,
+                        const_string(interp, "resume"), resume);
+    opcode_t * const dest = Parrot_ex_throw_from_op(interp, exception, resume);
     goto ADDRESS(dest);
 }
 

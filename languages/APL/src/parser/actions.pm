@@ -18,7 +18,7 @@ value of the comment is passed as the second argument to the method.
 class APL::Grammar::Actions;
 
 method TOP($/) {
-    my $catchpir := "    get_results '0,0', $P0, $S0\n    print $S0\n    exit 1\n";
+    my $catchpir := "    get_results '0', $P0\n    $S0 = $P0\n    print $S0\n    exit 1\n";
     my $past := PAST::Op.new( $( $<statement_list> ),
                               PAST::Op.new( :inline( $catchpir) ),
                               :pasttype('try'),
