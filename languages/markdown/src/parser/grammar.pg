@@ -258,7 +258,7 @@ token StrongUI {
     {*}
 }
 
-rule BlankLine { \n }
+token BlankLine { <.Sp> <.Newline> }
 
 token Eof { $ }
 
@@ -269,8 +269,6 @@ token NonspaceChar { <!SpaceChar> <!Newline> . }
 token Newline { \n }
 
 token Sp { <Spacechar>* }
-
-token ws { <Sp> }
 
 token SpecialChar { '*' | '_' | '`' | '&' | '[' | ']' | '<' | '!' | '\\' }
 
