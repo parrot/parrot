@@ -206,6 +206,24 @@ Add and integer to the start of the array.
         mem_sys_memmove(data + 1, data, size * sizeof (INTVAL));
         data[0] = value;
     }
+
+/*
+
+=item C<void delete_keyed_int(INTVAL key)>
+
+Removes the element at C<key>.
+
+=cut
+
+*/
+
+    VTABLE void delete_keyed_int(INTVAL key) {
+        INTVAL size = PMC_int_val(SELF);
+        INTVAL *data = (INTVAL *)PMC_data(SELF);
+        mem_sys_memmove(data + key, data + key + 1, (size - key - 1) * sizeof (INTVAL));
+        SELF.set_integer_native(size - 1);
+    }
+
 /*
 
 =item C<PMC *clone()>
