@@ -839,17 +839,19 @@ inline op count_eh(out INT) {
 }
 
 inline op die(in STR) :flow {
+    opcode_t * dest;
     PMC *exception = Parrot_ex_build_exception(interp, EXCEPT_error,
             CONTROL_ERROR, $1);
     opcode_t * const ret  = expr NEXT();
     PMC * resume = new_ret_continuation_pmc(interp, ret);
     VTABLE_set_attr_str(interp, exception,
                         const_string(interp, "resume"), resume);
-    opcode_t * const dest = Parrot_ex_throw_from_op(interp, exception, resume);
+    dest = Parrot_ex_throw_from_op(interp, exception, resume);
     goto ADDRESS(dest);
 }
 
 inline op die(in PMC) :flow {
+    opcode_t *dest;
     opcode_t * const ret = expr NEXT();
     STRING          *msg = PMC_IS_NULL($1)
                          ? NULL : VTABLE_get_string(interp, $1);
@@ -858,7 +860,7 @@ inline op die(in PMC) :flow {
     PMC * resume = new_ret_continuation_pmc(interp, ret);
     VTABLE_set_attr_str(interp, exception,
                         const_string(interp, "resume"), resume);
-    opcode_t       *dest = Parrot_ex_throw_from_op(interp, exception, resume);
+    dest = Parrot_ex_throw_from_op(interp, exception, resume);
     goto ADDRESS(dest);
 }
 
@@ -875,13 +877,14 @@ inline op die(in INT, in INT) :flow {
 }
 
 inline op exit(in INT) :flow {
+    opcode_t * dest;
     PMC      *exception   =
         Parrot_ex_build_exception(interp, EXCEPT_exit, $1, NULL);
     opcode_t * const ret  = expr NEXT();
     PMC * resume = new_ret_continuation_pmc(interp, ret);
     VTABLE_set_attr_str(interp, exception,
                         const_string(interp, "resume"), resume);
-    opcode_t * const dest = Parrot_ex_throw_from_op(interp, exception, resume);
+    dest = Parrot_ex_throw_from_op(interp, exception, resume);
     goto ADDRESS(dest);
 }
 
