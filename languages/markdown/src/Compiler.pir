@@ -128,12 +128,70 @@ Return generated HTML for all of its children.
 
 .sub 'html' :method :multi(_,['Markdown::BlockQuote'])
     .param pmc node
-    $S1 = self.'html_children'(node)
     .local pmc code
     new code, 'CodeString'
     $S0 = "<blockquote>\n"
+    set code, $S0
+    .local pmc iter
+    iter = node.'iterator'()
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc cpast
+    cpast = shift iter
+    $P0 = self.'html'(cpast)
+    code .= "  <p>"
+    code .= $P0
+    code .= "</p>\n"
+    goto iter_loop
+  iter_end:
+    code .= "</blockquote>\n\n"
+    .return (code)
+.end
+
+=item html(Markdown::ItemizedList node)
+
+=cut
+
+.sub 'html' :method :multi(_,['Markdown::ItemizedList'])
+    .param pmc node
+    $S1 = self.'html_children'(node)
+    .local pmc code
+    new code, 'CodeString'
+    $S0 = "<ul>\n"
     $S0 .= $S1
-    $S0 .= "</blockquote>\n\n"
+    $S0 .= "</ul>\n\n"
+    set code, $S0
+    .return (code)
+.end
+
+=item html(Markdown::OrderedList node)
+
+=cut
+
+.sub 'html' :method :multi(_,['Markdown::OrderedList'])
+    .param pmc node
+    $S1 = self.'html_children'(node)
+    .local pmc code
+    new code, 'CodeString'
+    $S0 = "<ol>\n"
+    $S0 .= $S1
+    $S0 .= "</ol>\n\n"
+    set code, $S0
+    .return (code)
+.end
+
+=item html(Markdown::ListItem node)
+
+=cut
+
+.sub 'html' :method :multi(_,['Markdown::ListItem'])
+    .param pmc node
+    $S1 = self.'html_children'(node)
+    .local pmc code
+    new code, 'CodeString'
+    $S0 = "<li>"
+    $S0 .= $S1
+    $S0 .= "</li>\n"
     set code, $S0
     .return (code)
 .end
@@ -147,10 +205,7 @@ Return generated HTML for all of its children.
     $S1 = node.'text'()
     .local pmc code
     new code, 'CodeString'
-    $S0 = "  <p>"
-    $S0 .= $S1
-    $S0 .= "</p>\n"
-    set code, $S0
+    set code, $S1
     .return (code)
 .end
 

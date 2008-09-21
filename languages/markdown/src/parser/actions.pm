@@ -103,6 +103,67 @@ method HorizontalRule($/) {
     make Markdown::HorizontalRule.new();
 }
 
+method BulletList($/, $key) {
+    make $( $/{$key} );
+}
+
+method BulletListTight($/) {
+    my $mast := Markdown::ItemizedList.new();
+    for $<BulletListItem> {
+        $mast.push( $( $_ ) );
+    }
+    make $mast;
+}
+
+method BulletListLoose($/) {
+    my $mast := Markdown::ItemizedList.new();
+    for $<BulletListItem> {
+        $mast.push( $( $_ ) );
+    }
+    make $mast;
+}
+
+method BulletListItem($/) {
+    make $( $<ListItem> );
+}
+
+method ListItem($/) {
+    my $mast := Markdown::ListItem.new();
+    $mast.push( $( $<ListBlock> ) );
+    for $<ListContinuationBlock> {
+        $mast.push( $( $_ ) );
+    }
+    make $mast;
+}
+
+method ListBlock($/) {
+    make $( $<Line> );
+}
+
+method OrderedList($/, $key) {
+    make $( $/{$key} );
+}
+
+method OrderedListTight($/) {
+    my $mast := Markdown::OrderedList.new();
+    for $<OrderedListItem> {
+        $mast.push( $( $_ ) );
+    }
+    make $mast;
+}
+
+method OrderedListLoose($/) {
+    my $mast := Markdown::OrderedList.new();
+    for $<OrderedListItem> {
+        $mast.push( $( $_ ) );
+    }
+    make $mast;
+}
+
+method OrderedListItem($/) {
+    make $( $<ListItem> );
+}
+
 method Str($/) {
     make Markdown::Word.new( :text( $/.text() ) );
 }

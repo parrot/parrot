@@ -21,6 +21,8 @@ token Block {
         | <BlockQuote> {*}      #= BlockQuote
         | <HorizontalRule> {*}  #= HorizontalRule
         | <Heading> {*}         #= Heading
+        | <OrderedList> {*}     #= OrderedList
+        | <BulletList> {*}      #= BulletList
         | <Para> {*}            #= Para
     ]
 }
@@ -91,10 +93,85 @@ token HorizontalRule {
     {*}
 }
 
+token Bullet {
+    <.NonindentSpace> [ '+' | '*' | '-' ] <.Spacechar>+
+}
+
+token BulletList {
+    | <BulletListTight> {*}     #= BulletListTight
+    | <BulletListLoose> {*}     #= BulletListLoose
+}
+
+token BulletListTight {
+    <BulletListItem>+ <.BlankLine>* <!BulletListLoose>
+    {*}
+}
+
+token BulletListLoose {
+    [
+        <BulletListItem> <.BlankLine>*
+    ]+
+    {*}
+}
+
+token BulletListItem {
+    <!HorizontalRule> <?Bullet> <ListItem>
+    {*}
+}
+
+token ListItem {
+    [ <.Bullet> | <.Enumerator> ] <ListBlock> <ListContinuationBlock>*
+    {*}
+}
+
+token ListBlock {
+    <Line> <ListBlockLine>*
+    {*}
+}
+
+token ListContinuationBlock {
+    <BlankLine>* [ <.Indent> <ListBlock> ]+
+    {*}
+}
+
+token Enumerator {
+    <.NonindentSpace> \d+ '.' <.Spacechar>+
+}
+
+token OrderedList {
+    | <OrderedListTight> {*}    #= OrderedListTight
+    | <OrderedListLoose> {*}    #= OrderedListLoose
+}
+
+token OrderedListTight {
+    <OrderedListItem>+ <.BlankLine>* <!OrderedListLoose>
+    {*}
+}
+
+token OrderedListLoose {
+    [
+        <OrderedListItem> <.BlankLine>*
+    ]+
+    {*}
+}
+
+token OrderedListItem {
+    <!HorizontalRule> <?Enumerator> <ListItem>
+    {*}
+}
+
+token ListBlockLine {
+    <!_ListItem> <!BlankLine> <OptionallyIndentedLine>
+}
+
+token _ListItem {
+    <.Indent>? [ <BulletListItem> | <OrderedListItem> ]
+}
+
 token Inlines {
     [
     | <!Endline> <Inline>
-    | <?Endline> <Inline>
+    | <.Endline> <Inline>
     ]+
     <.Endline>?
 }
@@ -142,6 +219,10 @@ token NormalChar { <!SpecialChar> <!Spacechar> <!Newline> . }
 token NonindentSpace { '   ' | '  ' | ' ' | '' }
 
 token Indent { \t | '    ' }
+
+token IndentedLine { <.Indent> <Line> }
+
+token OptionallyIndentedLine { <.Indent>? <Line> }
 
 token Line { <RawLine> {*} }
 
