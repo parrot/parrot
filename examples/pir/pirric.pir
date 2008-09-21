@@ -1,9 +1,32 @@
 # Copyright (C) 2008, The Perl Foundation.
 # $Id$
+#
 # pirric.pir
 # A rudimentary old style Basic interpreter for parrot
-# This is proof of concept version, don't blame for redundant code
+# This is a proof of concept version, don't blame for redundant code
 # and other ugliness
+#
+# Only one instruction per line.
+#
+# Instuctions implemented:
+# - Flow control: GOTO, GOSUB, RETURN, RUN, END, EXIT
+# - Conditional: IF (without ELSE)
+# - Programming: LIST, LOAD, SAVE
+# - Debugging: TRON, TROFF
+# - Input/Output: PRINT
+# - Miscellaneous: REM
+# - Variables: varname = expression
+# - Access to parrot modules: LOAD "module name" , B
+#
+# Expressions:
+# - Operators: + - * / < > = unary-
+# - Predefined functions: COS, SIN, SQR, LEN, LEFT$, RIGHT$
+# - Parenthesis
+# - Special functions: NEW "Class name"
+# - Calls to methods in foreign objects
+# - Calls to functions in foreign namespaces
+
+#-----------------------------------------------------------------------
 
 .include 'iterator.pasm'
 .include 'except_severity.pasm'
@@ -12,7 +35,7 @@
 #-----------------------------------------------------------------------
 .sub init :load :init
     .local pmc func
-    func = get_global ['Tokenizer'], 'new'
+    func = get_global ['Tokenizer'], 'newTokenizer'
     set_global 'newTokenizer', func
 
     .local pmc cl
@@ -26,6 +49,18 @@
     progclass = newclass ['Program']
     addattribute progclass, 'text'
     addattribute progclass, 'lines'
+
+    .local pmc runnerclass
+    runnerclass = newclass ['Runner']
+    addattribute runnerclass, 'program'
+    addattribute runnerclass, 'vars'
+    addattribute runnerclass, 'stack'
+    addattribute runnerclass, 'tron'
+
+    .local pmc jumpclass
+    jumpclass = newclass ['Jump']
+    addattribute jumpclass, 'jumptype'
+    addattribute jumpclass, 'jumpline'
 
     $P0 = get_class 'String'
     cl = newclass 'Literal'
@@ -41,14 +76,18 @@
     keywords = new 'Hash'
     setkeyword(keywords, 'END')
     setkeyword(keywords, 'EXIT')
+    setkeyword(keywords, 'GOSUB')
     setkeyword(keywords, 'GOTO')
     setkeyword(keywords, 'IF')
     setkeyword(keywords, 'LIST')
     setkeyword(keywords, 'LOAD')
     setkeyword(keywords, 'PRINT')
     setkeyword(keywords, 'REM')
+    setkeyword(keywords, 'RETURN')
     setkeyword(keywords, 'RUN')
     setkeyword(keywords, 'SAVE')
+    setkeyword(keywords, 'TROFF')
+    setkeyword(keywords, 'TRON')
     set_global 'keywords', keywords
 
     .local pmc program
@@ -56,20 +95,33 @@
 
     set_global 'program', program
 
+    .local pmc runner
+    runner = new ['Runner']
+    setattribute runner, 'program', program
+
     $I0 = args
-    gt $I0, 1, read_args
-    $I0 = 0
+    $I1 = 1
+read_args:
+    le $I0, $I1, no_prog
+    .local string arg
+    arg = args[$I1]
+    if arg == '-t' goto opt_tron
+
+    #say arg
+    program.load(arg)
+
+    $I0 = 1
     goto start
 
-read_args:
-    .local string filename
-    filename = args[1]
-    #say filename
-    load_program(filename)
-    $I0 = 1
+opt_tron:
+    runner.trace(1)
+    inc $I1
+    goto read_args
 
+no_prog:
+    $I0 = 0
 start:
-    runloop($I0)
+    runner.runloop($I0)
 .end
 
 #-----------------------------------------------------------------------
@@ -79,8 +131,9 @@ start:
 
     .local string funcname
     funcname = concat 'func_', key
+
     .local pmc func
-    func = get_global funcname
+    func = get_global ['Runner'], funcname
     $I0 = defined func
     if $I0 goto good
     say 'No func!'
@@ -90,10 +143,43 @@ good:
 .end
 
 #-----------------------------------------------------------------------
+.sub FatalError
+    .param string msg
+
+    .local pmc excep
+    excep = new 'Exception'
+    .local pmc aux
+    aux = new 'String'
+    aux = msg
+    setattribute excep, 'message', aux
+    aux = new 'Integer'
+    aux = .EXCEPT_FATAL
+    setattribute excep, 'severity', aux
+    throw excep
+.end
+
+#-----------------------------------------------------------------------
+.sub SyntaxError
+    .local pmc excep
+    excep = new 'Exception'
+    .local pmc aux
+    aux = new 'String'
+    aux = 'Syntax error'
+    setattribute excep, 'message', aux
+    aux = new 'Integer'
+    aux = .EXCEPT_ERROR
+    setattribute excep, 'severity', aux
+    throw excep
+.end
+
+#-----------------------------------------------------------------------
 .sub readlinebas
     .param pmc file
+
     .local string line
+
     line = readline file
+
     $I1 = length line
 checkline:
     if $I1 < 1 goto done
@@ -106,150 +192,66 @@ done:
     .return(line)
 .end
 
+########################################################################
+
+.namespace ['Runner']
+
 #-----------------------------------------------------------------------
-.sub load_program
-    .param string filename
-
-    .local pmc file
-    .local string line
-    .local pmc tokenizeline
-    .local pmc token
-    .local int linenum
-    .local pmc program
-
-    program = get_global 'program'
-
-    open file, filename, '<'
-nextline:
-    line = readlinebas(file)
-    unless line goto eof
-
-    #say line
-
-    tokenizeline = newTokenizer(line)
-    token = tokenizeline.get()
-    linenum = token
-    unless linenum goto fail
-    line = tokenizeline.getall()
-    program.storeline(linenum, line)
-
-    goto nextline
-
-eof:
-    close file
-    .return()
-
-fail:
-    SyntaxError()
+.sub init :vtable
+    $P0 = new 'Integer'
+    $P0 = 0
+    setattribute self, 'tron', $P0
+    $P1 = new 'ResizablePMCArray'
+    setattribute self, 'stack', $P1
 .end
 
 #-----------------------------------------------------------------------
-.sub save_program
-    .param string filename
+.sub trace :method
+    .param int level
 
-    .local pmc file
-    .local pmc program
-
-    open file, filename, '>'
-
-    program = get_global 'program'
-    $P0 = program.begin()
-next:
-    unless $P0, finish
-    shift $S0, $P0
-    $S1 = program [$S0]
-    print file, $S0
-    print file, ' '
-    print file, $S1
-    print file, "\n"
-    goto next
-finish:
-    close file
+    $P0 = getattribute self, 'tron'
+    $P0 = level
 .end
 
 #-----------------------------------------------------------------------
-.sub interactive
-    .local pmc stdin
-    stdin = getstdin
-
-    .local string line
-reinit:
-    say 'Ready'
-    line = readlinebas(stdin)
-
-    .local pmc tokenizer
-    .local pmc ptoken
-
-    tokenizer = newTokenizer(line)
-    ptoken = tokenizer.get()
-    $I0 = isa ptoken, 'Integer'
-    if $I0 goto storeline
-
-    execute(tokenizer, ptoken)
-
-    goto done
-
-storeline:
-    line = tokenizer.getall()
-    $I0 = ptoken
-    .local pmc program
-    program = get_global "program"
-
-    program.storeline($I0, line)
-done:
-.end
-
-#-----------------------------------------------------------------------
-.sub execute
+.sub get_1_arg :method
     .param pmc tokenizer
-    .param pmc token :optional
-    .param int has :opt_flag
 
-    if has goto check
-    token = tokenizer.get()
-check:
-    unless token goto next
+    .local pmc arg
 
-    .local string key
-    key = token
-    upcase key
-
-    .local pmc keywords
-    keywords = get_global 'keywords'
-    $I0 = keywords
-    .local pmc func
-    func = keywords [key]
-    $I0 = defined func
-    if $I0 goto exec
-
-    .local pmc op
-    op = tokenizer.get()
-    eq op, '=', assign
-    goto fail
-assign:
-    $S0 = key
-
-    .local pmc value
-    value = evaluate(tokenizer)
-
-#    $P3 = get_global $S0
-#    $I0 = defined $P3
-#    if $I0 goto set_it
-    set_global $S0, value
-    goto next
-#set_it:
-#    assign $P3, value
-#    goto next
-
+    arg = self.evaluate(tokenizer)
+    $P0 = tokenizer.get()
+    $I0 = defined $P0
+    unless $I0 goto fail
+    ne $P0, ')', fail
+    .return(arg)
 fail:
     SyntaxError()
-exec:
-    func(tokenizer)
-next:
 .end
 
 #-----------------------------------------------------------------------
-.sub get_args
+.sub get_2_args :method
+    .param pmc tokenizer
+
+    .local pmc arg1, arg2
+
+    arg1 = self.evaluate(tokenizer)
+    $P0 = tokenizer.get()
+    $I0 = defined $P0
+    unless $I0 goto fail
+    ne $P0, ',', fail
+    arg2 = self.evaluate(tokenizer)
+    $P0 = tokenizer.get()
+    $I0 = defined $P0
+    unless $I0 goto fail
+    ne $P0, ')', fail
+    .return(arg1, arg2)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
+.sub get_args :method
     .param pmc tokenizer
 
     .local pmc args
@@ -263,7 +265,7 @@ next:
     unless $I0 goto fail
     eq token, ')', empty
     null arg
-    arg = evaluate(tokenizer, token)
+    arg = self.evaluate(tokenizer, token)
 nextarg:
     push args, arg
     null arg
@@ -272,7 +274,7 @@ nextarg:
     unless $I0 goto fail
     eq delim, ')', endargs
     ne delim, ',', fail
-    arg = evaluate(tokenizer)
+    arg = self.evaluate(tokenizer)
     goto nextarg
 endargs:
     .return(args)
@@ -284,11 +286,12 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub eval_base
+.sub eval_base :method
     .param pmc tokenizer
     .param pmc token :optional
 
     .local pmc arg
+    .local pmc args
 
     $I0 = defined token
     if $I0 goto check
@@ -298,11 +301,14 @@ check:
     unless $I0 goto fail
 
     eq token, '(', parenexp
+    eq token, '-', unaryminus
 
     $I0 = isa token, 'Literal'
     if $I0 goto isliteral
     $I0 = isa token, 'Integer'
     if $I0 goto isinteger
+    $I0 = isa token, 'Float'
+    if $I0 goto isfloat
     $I0 = isa token, 'String'
     unless $I0 goto fail
 
@@ -310,19 +316,34 @@ check:
     upcase $S0
     #print $S0
 
+# Some predefined functions:
     eq $S0, 'NEW', new_op
+    eq $S0, 'COS', func_cos
     eq $S0, 'SIN', func_sin
     eq $S0, 'SQR', func_sqr
+    eq $S0, 'LEN', func_len
+    eq $S0, 'LEFT$', func_left
+    eq $S0, 'RIGHT$', func_right
 
     #say $S0
     .local pmc var
-    var = get_global $S0
+    var = get_hll_global $S0
     unless_null var, getvar
 
-    $P0 = get_namespace $P1
+    $P0 = get_namespace token
     $I0 = defined $P0
     if $I0 goto spaced
-    SyntaxError()
+
+    $P1 = tokenizer.get()
+    $S1 = $P1
+    ne $S1, '(', fail
+    $S0 = token
+    #say $S0
+    var = get_hll_global $S0
+    if_null var, fail
+    args = self.get_args(tokenizer)
+    $P9 = var(args)
+    .return($P9)
 spaced:
     $P1 = tokenizer.get()
     ne $P1, '.', fail
@@ -342,9 +363,11 @@ isliteral:
 isinteger:
     .return(token)
 
+isfloat:
+    .return(token)
+
 getargs:
-    .local pmc args
-    args = get_args(tokenizer)
+    args = self.get_args(tokenizer)
     $I0 = defined args
     unless $I0 goto emptyargs
 endargs:
@@ -397,7 +420,7 @@ methodcall:
     #say $S2
 
     .local pmc methargs
-    methargs = get_args(tokenizer)
+    methargs = self.get_args(tokenizer)
     $I0 = defined methargs
     unless $I0 goto memptyargs
     $P5 = var.$S2(methargs :flat)
@@ -407,22 +430,94 @@ memptyargs:
     $P2 = var.$S2()
     .return($P2)
 
+unaryminus:
+    $P1 = self.eval_base(tokenizer)
+    $P2 = clone $P1
+    $P2 = 0
+    $P2 = $P2 - $P1
+    .return($P2)
+
 parenexp:
-    $P1 = evaluate(tokenizer)
+    $P1 = self.evaluate(tokenizer)
     token = tokenizer.get()
     ne token, ')', fail
     .return($P1)
+
+func_len:
+    null $P1
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    null $P5
+    $P5 = self.get_1_arg(tokenizer)
+
+    $S5 = $P5
+    $I0 = length $S5
+    $P6 = new 'Integer'
+    $P6 = $I0
+    .return($P6)
+
+func_left:
+    null $P1
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    null $P5
+    null $P6
+    ($P5, $P6) = self.get_2_args(tokenizer)
+
+    $S0 = $P5
+    $I0 = $P6
+    $S1 = substr $S0, 0, $I0
+    $P7 = new 'String'
+    $P7 = $S1
+    .return($P7)
+
+func_right:
+    null $P1
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    null $P5
+    null $P6
+    ($P5, $P6) = self.get_2_args(tokenizer)
+
+    $S0 = $P5
+    $I0 = $P6
+    $I1 = $S0
+    $I0 = $I1 - $I0
+    $S1 = substr $S0, $I0
+    $P7 = new 'String'
+    $P7 = $S1
+    .return($P7)
+
+func_cos:
+    null $P1
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    null $P5
+    $P5 = self.get_1_arg(tokenizer)
+    $I0 = isa $P5, 'Integer'
+    #print 'Integer: '
+    #say $I0
+    unless $I0 goto do_cos
+    $I0 = $P5
+    null $P5
+    $P5 = new 'Float'
+    $N0 = $I0
+    $P5 = $N0
+do_cos:
+    $P9 = $P5.cos()
+    .return($P9)
 
 func_sin:
     null $P1
     $P1 = tokenizer.get()
     ne $P1, '(', fail
     null $P5
-    $P5 = evaluate(tokenizer)
-    null $P1
-    $P1 = tokenizer.get()
-    ne $P1, ')', fail
-    #say $P5
+#    $P5 = self.evaluate(tokenizer)
+#    null $P1
+#    $P1 = tokenizer.get()
+#    ne $P1, ')', fail
+#    #say $P5
+    $P5 = self.get_1_arg(tokenizer)
 
     $I0 = isa $P5, 'Integer'
     #print 'Integer: '
@@ -444,7 +539,7 @@ func_sqr:
     $P1 = tokenizer.get()
     ne $P1, '(', fail
     null $P5
-    $P5 = evaluate(tokenizer)
+    $P5 = self.evaluate(tokenizer)
     null $P1
     $P1 = tokenizer.get()
     ne $P1, ')', fail
@@ -470,11 +565,11 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub eval_comp
+.sub eval_comp :method
     .param pmc tokenizer
     .param pmc token :optional
 
-    $P0 = eval_base(tokenizer, token)
+    $P0 = self.eval_base(tokenizer, token)
 more:
     $P1 = tokenizer.get()
     eq $P1, '=', doequal
@@ -483,7 +578,7 @@ more:
     tokenizer.back()
     .return($P0)
 doequal:
-    $P2 = eval_base(tokenizer)
+    $P2 = self.eval_base(tokenizer)
     clone $P3, $P0
     $I0 = iseq $P3, $P2
     null $P0
@@ -491,7 +586,7 @@ doequal:
     set $P0, $I0
     goto more
 doless:
-    $P2 = eval_base(tokenizer)
+    $P2 = self.eval_base(tokenizer)
     clone $P3, $P0
     $I0 = islt $P3, $P2
     null $P0
@@ -499,7 +594,7 @@ doless:
     set $P0, $I0
     goto more
 dogreat:
-    $P2 = eval_base(tokenizer)
+    $P2 = self.eval_base(tokenizer)
     clone $P3, $P0
     $I0 = isgt $P3, $P2
     null $P0
@@ -509,11 +604,11 @@ dogreat:
 .end
 
 #-----------------------------------------------------------------------
-.sub eval_mul
+.sub eval_mul :method
     .param pmc tokenizer
     .param pmc token :optional
 
-    $P0 = eval_comp(tokenizer, token)
+    $P0 = self.eval_comp(tokenizer, token)
 more:
     $P1 = tokenizer.get()
     eq $P1, '*', domul
@@ -521,13 +616,13 @@ more:
     tokenizer.back()
     .return($P0)
 domul:
-    $P2 = eval_comp(tokenizer)
+    $P2 = self.eval_comp(tokenizer)
     $P3 = clone $P0
     mul $P3, $P2
     set $P0, $P3
     goto more
 dodiv:
-    $P2 = eval_comp(tokenizer)
+    $P2 = self.eval_comp(tokenizer)
     $P3 = clone $P0
     div $P3, $P2
     set $P0, $P3
@@ -535,25 +630,40 @@ dodiv:
 .end
 
 #-----------------------------------------------------------------------
-.sub eval_add
+.sub eval_add :method
     .param pmc tokenizer
     .param pmc token
 
-    $P0 = eval_mul(tokenizer, token)
+    $P0 = self.eval_mul(tokenizer, token)
 more:
     $P1 = tokenizer.get()
     eq $P1, '+', doadd
     eq $P1, '-', dosub
     tokenizer.back()
     .return($P0)
+
 doadd:
-    $P2 = eval_mul(tokenizer)
+    $P2 = self.eval_mul(tokenizer)
     clone $P3, $P0
+
+    $I3 = isa $P3, 'String'
+    if $I3 goto str_add
+    $I2 = isa $P2, 'String'
+    if $I2 goto str_add
+
     add $P3, $P2
     set $P0, $P3
     goto more
+str_add:
+    $S0 = $P3
+    $S1 = $P2
+    $S3 = concat $S0, $S1
+    $P3 = $S3
+    set $P0, $P3
+    goto more
+
 dosub:
-    $P2 = eval_mul(tokenizer)
+    $P2 = self.eval_mul(tokenizer)
     clone $P3, $P0
     sub $P3, $P2
     set $P0, $P3
@@ -561,11 +671,11 @@ dosub:
 .end
 
 #-----------------------------------------------------------------------
-.sub evaluate
+.sub evaluate :method
     .param pmc tokenizer
     .param pmc token :optional
 
-    $P0 = eval_add(tokenizer, token)
+    $P0 = self.eval_add(tokenizer, token)
 #    $I0 = isa $P0, 'Integer'
 #    unless $I0 goto done
 #    say '<Integer'
@@ -574,27 +684,251 @@ dosub:
 .end
 
 #-----------------------------------------------------------------------
+.sub runloop :method
+    .param int start :optional
 
-.sub func_END
+    .local pmc program
+    .local pmc iter
+    .local pmc tron
+    .local string curline
+
+#    program = get_global 'program'
+    program = getattribute self, 'program'
+    tron = getattribute self, 'tron'
+
+    iter = program.begin()
+
+    push_eh handle_excep
+
+    null curline
+
+    unless start goto next
+    shift curline, iter
+
+next:
+    if curline goto runit
+    self.interactive()
+    goto next
+
+runit:
+    unless tron goto executeline
+    print '['
+    print curline
+    print ']'
+
+executeline:
+    $S1 = program [curline]
+
+    .local pmc tokenizer
+    tokenizer = newTokenizer($S1)
+    self.execute(tokenizer)
+    unless iter goto endprog
+    shift curline, iter
+    goto next
+endprog:
+    null curline
+    goto next
+
+handle_excep:
+    .local pmc excep
+    .get_results(excep)
+
+    $P1 = getattribute excep, 'severity'
+    $I1 = $P1
+    eq $I1, .EXCEPT_EXIT, finish
+handle_it:
+    $P1 = getattribute excep, 'payload'
+    $I1 = defined $P1
+    unless $I1 goto unhandled
+    $I1 = isa $P1, 'Jump'
+    unless $I1 goto unhandled
+    $P2 = getattribute $P1, 'jumpline'
+    $I1 = $P2
+    eq $I1, -1, prog_end
+
+    $S2 = curline
+    .local int target
+    target = $P2
+
+    iter = program.begin()
+
+    .local string fline
+findline:
+    unless iter, noline
+    shift fline, iter
+    eq target, 0, handled_done
+    $I0 = fline
+    gt $I0, target, noline
+    lt $I0, target, findline
+
+handled_done:
+    curline = fline
+    $P3 = getattribute $P1, 'jumptype'
+    $I1 = defined $P3
+    unless $I1 goto handled_jump
+    eq $P3, 1, handle_gosub
+    eq $P3, 2, handle_return
+    goto handled_jump
+
+handle_gosub:
+    .local pmc stack
+    stack = getattribute self, 'stack'
+    push stack, $S2
+    goto handled_jump
+
+handle_return:
+    shift curline, iter
+
+handled_jump:
+    push_eh handle_excep
+    goto runit
+noline:
+    print 'Line does not exist'
+    unless curline goto endmsg
+    print ' in '
+    print curline
+endmsg:
+    say ''
+    null curline
+    push_eh handle_excep
+    goto next
+
+prog_end:
+    null curline
+    push_eh handle_excep
+    goto next
+
+unhandled:
+    $P1 = getattribute excep, 'message'
+    say $P1
+    null curline
+    push_eh handle_excep
+    goto next
+
+finish:
+.end
+
+#-----------------------------------------------------------------------
+.sub interactive :method
+    .local pmc stdin
+    stdin = getstdin
+
+    .local string line
+reinit:
+    say 'Ready'
+    line = readlinebas(stdin)
+
+    .local pmc tokenizer
+    .local pmc ptoken
+
+    tokenizer = newTokenizer(line)
+    ptoken = tokenizer.get()
+    $I0 = isa ptoken, 'Integer'
+    if $I0 goto storeit
+
+    self.execute(tokenizer, ptoken)
+
+    goto done
+
+storeit:
+    .local pmc program
+    program = getattribute self, "program"
+    $I0 = ptoken
+    line = tokenizer.getall()
+    $I1 = length line
+    unless $I1 goto deleteit
+
+    program.storeline($I0, line)
+    goto done
+
+deleteit:
+    program.deleteline($I0)
+
+done:
+.end
+
+#-----------------------------------------------------------------------
+.sub execute :method
+    .param pmc tokenizer
+    .param pmc token :optional
+    .param int has :opt_flag
+
+    if has goto check
+    token = tokenizer.get()
+check:
+    unless token goto next
+
+    .local string key
+    key = token
+    unless key == '?' goto findkey
+    key = 'PRINT'
+
+findkey:
+    upcase key
+    .local pmc keywords
+    keywords = get_hll_global 'keywords'
+    $I0 = keywords
+    .local pmc func
+    func = keywords [key]
+    $I0 = defined func
+    if $I0 goto exec
+
+    .local pmc op
+    op = tokenizer.get()
+    eq op, '=', assign
+    goto fail
+assign:
+    $S0 = key
+
+    .local pmc value
+    value = self.evaluate(tokenizer)
+
+#    $P3 = get_global $S0
+#    $I0 = defined $P3
+#    if $I0 goto set_it
+    set_hll_global $S0, value
+    goto next
+#set_it:
+#    assign $P3, value
+#    goto next
+
+fail:
+    SyntaxError()
+exec:
+    self.func(tokenizer)
+next:
+.end
+
+#-----------------------------------------------------------------------
+.sub func_END :method
+    .param pmc tokenizer
+
     .local pmc excep
     excep = new 'Exception'
     .local pmc aux
     aux = new 'Integer'
-    aux = 2
+    aux = .EXCEPT_NORMAL
     setattribute excep, 'severity', aux
+
     .local pmc line
-    line = new 'Integer'
-    line = -1
+    line = new 'Jump'
+    $P0 = new 'Integer'
+    $P0 = -1
+    setattribute line, 'jumpline', $P0
+
     setattribute excep, 'payload', line
     throw excep
 .end
 
-.sub func_EXIT
+.sub func_EXIT :method
+    .param pmc tokenizer
+
     exit 0
 .end
 
-.sub func_GOTO
+.sub func_GOTO :method
     .param pmc tokenizer
+
     .local pmc arg
     arg = tokenizer.get()
     $I0 = defined arg
@@ -605,23 +939,61 @@ dosub:
     excep = new 'Exception'
     .local pmc aux
     aux = new 'Integer'
-    aux = 2
+    aux = .EXCEPT_NORMAL
     setattribute excep, 'severity', aux
     .local pmc line
-    line = new 'Integer'
-    line = $I0
+    line = new 'Jump'
+    $P0 = new 'Integer'
+    $P0 = $I0
+    setattribute line, 'jumpline', $P0
     setattribute excep, 'payload', line
     throw excep
 fail:
     SyntaxError()
 .end
 
-.sub func_IF
+.sub func_GOSUB :method
     .param pmc tokenizer
+
+    .local pmc arg
+    arg = tokenizer.get()
+    $I0 = defined arg
+    unless $I0 goto fail
+    $I0 = arg
+
+    .local pmc excep
+    excep = new 'Exception'
+    .local pmc aux
+    aux = new 'Integer'
+    aux = .EXCEPT_NORMAL
+    setattribute excep, 'severity', aux
+    aux = new 'Integer'
+    aux = 0
+    setattribute excep, 'type', aux
+
+    .local pmc line
+    line = new 'Jump'
+    $P0 = new 'Integer'
+    $P0 = $I0
+    setattribute line, 'jumpline', $P0
+    $P1 = new 'Integer'
+    $P1 = 1
+    setattribute line, 'jumptype', $P1
+
+    setattribute excep, 'payload', line
+
+    throw excep
+fail:
+    SyntaxError()
+.end
+
+.sub func_IF :method
+    .param pmc tokenizer
+
     .local pmc arg
     .local pmc token
 
-    arg = evaluate(tokenizer)
+    arg = self.evaluate(tokenizer)
     token = tokenizer.get()
     $I0 = defined token
     unless $I0 goto fail
@@ -633,16 +1005,18 @@ fail:
     unless $I0 goto is_false
     $I0 = arg
     unless $I0 goto is_false
-    execute(tokenizer)
+    self.execute(tokenizer)
 is_false:
     .return()
 fail:
     SyntaxError()
 .end
 
-.sub func_LIST
+.sub func_LIST :method
+    .param pmc tokenizer
+
     .local pmc program
-    program = get_global 'program'
+    program = getattribute self, 'program'
 
 #    $P0 = program.begin()
 #next:
@@ -662,7 +1036,7 @@ fail:
     .local int i, n, linenum
     .local string content
     n = lines
-    say n
+#    say n
     i = 0
 nextline:
     ge i, n, finish
@@ -676,10 +1050,11 @@ nextline:
 finish:
 .end
 
-.sub func_LOAD
+.sub func_LOAD :method
     .param pmc tokenizer
+
     .local pmc arg
-    arg = evaluate(tokenizer)
+    arg = self.evaluate(tokenizer)
     $P1 = tokenizer.get()
     $I1 = defined $P1
     unless $I1 goto notype
@@ -695,16 +1070,17 @@ finish:
     load_bytecode $S1
     .return()
 notype:
+    .local pmc program
+    program = getattribute self, 'program'
     .local string filename
-
     filename = arg
-    load_program(filename)
+    program.load(filename)
 
     .local pmc excep
     excep = new 'Exception'
     .local pmc aux
     aux = new 'Integer'
-    aux = 2
+    aux = .EXCEPT_NORMAL
     setattribute excep, 'severity', aux
     .local pmc line
     line = new 'Integer'
@@ -716,27 +1092,9 @@ fail:
     SyntaxError()
 .end
 
-.sub func_SAVE
+.sub func_PRINT :method
     .param pmc tokenizer
-    .local pmc arg
-    arg = evaluate(tokenizer)
-    $P1 = tokenizer.get()
-    $I1 = defined $P1
-    if $I1 goto fail
 
-    .local string filename
-
-    filename = arg
-    save_program(filename)
-
-    .return()
-
-fail:
-    SyntaxError()
-.end
-
-.sub func_PRINT
-    .param pmc tokenizer
     .local pmc arg
 
     arg = tokenizer.get()
@@ -744,7 +1102,7 @@ fail:
     unless $I0 goto endline
 
 item:
-    arg = evaluate(tokenizer, arg)
+    arg = self.evaluate(tokenizer, arg)
 print_it:
     print arg
     arg = tokenizer.get()
@@ -768,121 +1126,87 @@ nextitem:
     if $I0 goto item
 .end
 
-.sub func_REM
+.sub func_REM :method
+    .param pmc tokenizer
+
     # Do nothing
 .end
 
-.sub func_RUN
+.sub func_RETURN :method
+    .param pmc tokenizer
+
+    .local pmc stack
+    stack = getattribute self, 'stack'
+    $P0 = pop stack
+
     .local pmc excep
     excep = new 'Exception'
     .local pmc aux
     aux = new 'Integer'
-    aux = 2
+    aux = .EXCEPT_NORMAL
     setattribute excep, 'severity', aux
     .local pmc line
-    line = new 'Integer'
-    line = 0
+    line = new 'Jump'
+    $P1 = new 'Integer'
+    $P1 = 2
+    setattribute line, 'jumpline', $P0
+    setattribute line, 'jumptype', $P1
+    setattribute excep, 'payload', line
+
+    throw excep
+fail:
+    SyntaxError()
+.end
+
+.sub func_RUN :method
+    .param pmc tokenizer
+
+    .local pmc excep
+    excep = new 'Exception'
+    .local pmc aux
+    aux = new 'Integer'
+    aux = .EXCEPT_NORMAL
+    setattribute excep, 'severity', aux
+    .local pmc line
+    line = new 'Jump'
+    $P0 = new 'Integer'
+    $P0 = 0
+    setattribute line, 'jumpline', $P0
     setattribute excep, 'payload', line
     throw excep
 .end
 
-#-----------------------------------------------------------------------
-.sub runloop
-    .param int start :optional
+.sub func_SAVE :method
+    .param pmc tokenizer
 
-    .local pmc program
-    .local pmc iter
-    program = get_global 'program'
-
-    iter = program.begin()
-
-    push_eh handle_excep
-
-    null $S0
-
-    unless start goto next
-    shift $S0, iter
-
-next:
-    if $S0 goto runit
-    interactive()
-    goto next
-
-runit:
-    $S1 = program [$S0]
-
-    .local pmc tokenizer
-    tokenizer = newTokenizer($S1)
-    execute(tokenizer)
-    unless iter goto endprog
-    shift $S0, iter
-    goto next
-endprog:
-    null $S0
-    goto next
-
-handle_excep:
-    .local pmc excep
-    .local string msg
-    .get_results(excep, msg)
-    $P1 = getattribute excep, 'severity'
-    $I1 = $P1
-    eq $I1, .EXCEPT_EXIT, finish
-handle_it:
-    $P1 = getattribute excep, 'payload'
+    .local pmc arg
+    arg = self.evaluate(tokenizer)
+    $P1 = tokenizer.get()
     $I1 = defined $P1
-    unless $I1 goto unhandled
-    $I1 = $P1
-    eq $I1, -1, prog_end
-    .local int target
-    target = $P1
+    if $I1 goto fail
 
-    iter = program.begin()
+    .local string filename
+    filename = arg
+    .local pmc program
+    program = getattribute self, 'program'
+    program.save(filename)
 
-findline:
-    unless iter, noline
-    shift $S0, iter
-    eq target, 0, handled_done
-    $I0 = $S0
-    gt $I0, target, noline
-    lt $I0, target, findline
-handled_done:
-    push_eh handle_excep
-    goto runit
-noline:
-    say 'Line does not exist'
-    null $S0
-    push_eh handle_excep
-    goto next
+    .return()
 
-prog_end:
-    null $S0
-    push_eh handle_excep
-    goto next
-
-unhandled:
-    $P1 = getattribute excep, 'message'
-    say $P1
-    null $S0
-    push_eh handle_excep
-    goto next
-
-finish:
+fail:
+    SyntaxError()
 .end
 
-#-----------------------------------------------------------------------
+.sub func_TROFF :method
+    .param pmc tokenizer
 
-.sub SyntaxError
-    .local pmc excep
-    excep = new 'Exception'
-    .local pmc aux
-    aux = new 'String'
-    aux = 'Syntax error'
-    setattribute excep, 'message', aux
-    aux = new 'Integer'
-    aux = 2
-    setattribute excep, 'severity', aux
-    throw excep
+    self.trace(0)
+.end
+
+.sub func_TRON :method
+    .param pmc tokenizer
+
+    self.trace(1)
 .end
 
 ########################################################################
@@ -890,7 +1214,7 @@ finish:
 .namespace [ 'Tokenizer' ]
 
 #-----------------------------------------------------------------------
-.sub 'new'
+.sub 'newTokenizer'
     .param string line
     .local pmc tkn
     .local pmc l
@@ -952,6 +1276,7 @@ loop:
     eq c, '>', operator
     eq c, '(', operator
     eq c, ')', operator
+    eq c, '?', operator
 
     eq c, '"', str
     $I0 = ord c
@@ -959,28 +1284,55 @@ loop:
     gt $I0, $I1, nextchar
     $I1 = ord '0'
     lt $I0, $I1, nextchar
-    objres = new 'Integer'
-    .local int value
-    sub $I0, $I1
-    value = $I0
+
+# Number
+    .local string snum
+    snum = ''
+
+    concat snum, c
     #say value
 nextnum:
     ge i, l, endnum
     c = substr line, i, 1
+    eq c, '.', floatnum
     $I0 = ord c
     $I1 = ord '9'
     gt $I0, $I1, endnum
     $I1 = ord '0'
     lt $I0, $I1, endnum
     inc i
-    sub $I0, $I1
-    #say $I0
-    mul value, 10
-    add value, $I0
+
+    concat snum, c
     #say value
     goto nextnum
 endnum:
+    .local int value
+    value = snum
+    objres = new 'Integer'
     objres = value
+    goto doit
+
+floatnum:
+    concat snum, c
+    inc i
+nextfloat:
+    ge i, l, endfloat
+    c = substr line, i, 1
+    $I0 = ord c
+    $I1 = ord '9'
+    gt $I0, $I1, endfloat
+    $I1 = ord '0'
+    lt $I0, $I1, endfloat
+    inc i
+    concat snum, c
+    goto nextfloat
+
+endfloat:
+    .local num floatvalue
+    #say snum
+    floatvalue = snum
+    objres = new 'Float'
+    objres = floatvalue
     goto doit
 
 operator:
@@ -1145,6 +1497,96 @@ storenum:
     lines [i] = linenum
 storeline:
     text [linenum] = line
+.end
+
+#-----------------------------------------------------------------------
+.sub deleteline :method
+    .param int linenum
+    .local pmc text, lines
+    .local int n, i, j, curnum
+    text = getattribute self, 'text'
+    lines = getattribute self, 'lines'
+    n = lines
+    i = 0
+next:
+    ge i, n, notexist
+    curnum = lines [i]
+    ge curnum, linenum, foundnum
+    inc i
+    goto next
+foundnum:
+    gt i, n, notexist
+    delete text[linenum]
+    delete lines[i]
+    .return()
+notexist:
+
+.end
+
+#-----------------------------------------------------------------------
+.sub load :method
+    .param string filename
+
+    .local pmc file
+    .local string line
+    .local pmc tokenizeline
+    .local pmc token
+    .local int linenum
+    .local int linecount
+
+    say filename
+    open file, filename, '<'
+
+    linecount = 0
+nextline:
+    line = readlinebas(file)
+    unless line goto eof
+    unless linecount == 0 goto enterline
+    $S0 = substr line, 0, 1
+    if $S0 == '#' goto nextline
+enterline:
+    inc linecount
+    tokenizeline = newTokenizer(line)
+    token = tokenizeline.get()
+    linenum = token
+    unless linenum goto fail
+    line = tokenizeline.getall()
+    self.storeline(linenum, line)
+    goto nextline
+
+eof:
+    close file
+    $I0 = self.elements()
+    unless $I0 == linecount goto fatal
+    .return()
+
+fail:
+    SyntaxError()
+fatal:
+    FatalError('Incorrect count when loading file')
+.end
+
+#-----------------------------------------------------------------------
+.sub save :method
+    .param string filename
+
+    .local pmc file
+    .local pmc program
+
+    open file, filename, '>'
+
+    $P0 = self.begin()
+next:
+    unless $P0, finish
+    shift $S0, $P0
+    $S1 = self [$S0]
+    print file, $S0
+    print file, ' '
+    print file, $S1
+    print file, "\n"
+    goto next
+finish:
+    close file
 .end
 
 ########################################################################
