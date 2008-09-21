@@ -164,6 +164,32 @@ method OrderedListItem($/) {
     make $( $<ListItem> );
 }
 
+method Emph($/, $key) {
+    make $( $/{$key} );
+}
+
+method EmphStar($/) {
+    my $mast := Markdown::Emphasis.new();
+    for $<Inline> {
+        $mast.push( $( $_ ) );
+    }
+    $mast.push( $( $<OneStarClose><Inline> ) );
+    make $mast;
+}
+
+method Strong($/, $key) {
+    make $( $/{$key} );
+}
+
+method StrongStar($/) {
+    my $mast := Markdown::Strong.new();
+    for $<Inline> {
+        $mast.push( $( $_ ) );
+    }
+    $mast.push( $( $<TwoStarClose><Inline> ) );
+    make $mast;
+}
+
 method Str($/) {
     make Markdown::Word.new( :text( $/.text() ) );
 }

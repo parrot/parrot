@@ -21,6 +21,7 @@ for Markdown.
 
     p6meta.'new_class'('Markdown::BlockQuote', 'parent'=>base)
     p6meta.'new_class'('Markdown::Document', 'parent'=>base)
+    p6meta.'new_class'('Markdown::Emphasis', 'parent'=>base)
     p6meta.'new_class'('Markdown::HorizontalRule', 'parent'=>base)
     p6meta.'new_class'('Markdown::ItemizedList', 'parent'=>base)
     p6meta.'new_class'('Markdown::Line', 'parent'=>base)
@@ -28,6 +29,7 @@ for Markdown.
     p6meta.'new_class'('Markdown::OrderedList', 'parent'=>base)
     p6meta.'new_class'('Markdown::Para', 'parent'=>base)
     p6meta.'new_class'('Markdown::Space', 'parent'=>base)
+    p6meta.'new_class'('Markdown::Strong', 'parent'=>base)
     p6meta.'new_class'('Markdown::Title', 'parent'=>base)
     p6meta.'new_class'('Markdown::Word', 'parent'=>base)
 .end

@@ -196,6 +196,38 @@ Return generated HTML for all of its children.
     .return (code)
 .end
 
+=item html(Markdown::Emphasis node)
+
+=cut
+
+.sub 'html' :method :multi(_,['Markdown::Emphasis'])
+    .param pmc node
+    $S1 = self.'html_children'(node)
+    .local pmc code
+    new code, 'CodeString'
+    $S0 = "<em>"
+    $S0 .= $S1
+    $S0 .= "</em>"
+    set code, $S0
+    .return (code)
+.end
+
+=item html(Markdown::Strong node)
+
+=cut
+
+.sub 'html' :method :multi(_,['Markdown::Strong'])
+    .param pmc node
+    $S1 = self.'html_children'(node)
+    .local pmc code
+    new code, 'CodeString'
+    $S0 = "<strong>"
+    $S0 .= $S1
+    $S0 .= "</strong>"
+    set code, $S0
+    .return (code)
+.end
+
 =item html(Markdown::Line node)
 
 =cut

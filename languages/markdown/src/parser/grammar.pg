@@ -180,6 +180,8 @@ token Inline {
     | <Str> {*}                 #= Str
     | <Endline> {*}             #= Endline
     | <Space> {*}               #= Space
+    | <Strong> {*}              #= Strong
+    | <Emph> {*}                #= Emph
 }
 
 token Space {
@@ -197,6 +199,41 @@ token NormalEndline {
 }
 
 token TerminalEndline { <Sp> <Newline> <Eof> }
+
+# This keeps the parser from getting bogged down on long strings of '*' or '_',
+# or strings of '*' or '_' with space on each side:
+token StarLine {
+    | '****' '*'*
+    | <.Spacechar> '*'+ <?Spacechar>
+}
+
+token Emph {
+    | <EmphStar> {*}            #= EmphStar
+#    | <EmphUI> {*}              #= EmphUI
+}
+
+token OneStarOpen { <!StarLine> '*' <!Spacechar> <!Newline> }
+
+token OneStarClose { <!Spacechar> <!Newline> <Inline> <!StrongStar> '*' }
+
+token EmphStar {
+    <.OneStarOpen> [ <!OneStarClose> <Inline> ]* <OneStarClose>
+    {*}
+}
+
+token Strong {
+    | <StrongStar> {*}          #= StrongStar
+#    | <StrongUI> {*}            #= StrongUI
+}
+
+token TwoStarOpen { <!StarLine> '**' <!Spacechar> <!Newline> }
+
+token TwoStarClose { <!Spacechar> <!Newline> <Inline> <!StrongStar> '**' }
+
+token StrongStar {
+    <.TwoStarOpen> [ <!TwoStarClose> <Inline> ]* <TwoStarClose>
+    {*}
+}
 
 rule BlankLine { \n }
 
