@@ -177,6 +177,15 @@ method EmphStar($/) {
     make $mast;
 }
 
+method EmphUI($/) {
+    my $mast := Markdown::Emphasis.new();
+    for $<Inline> {
+        $mast.push( $( $_ ) );
+    }
+    $mast.push( $( $<OneUIClose><Inline> ) );
+    make $mast;
+}
+
 method Strong($/, $key) {
     make $( $/{$key} );
 }
@@ -187,6 +196,15 @@ method StrongStar($/) {
         $mast.push( $( $_ ) );
     }
     $mast.push( $( $<TwoStarClose><Inline> ) );
+    make $mast;
+}
+
+method StrongUI($/) {
+    my $mast := Markdown::Strong.new();
+    for $<Inline> {
+        $mast.push( $( $_ ) );
+    }
+    $mast.push( $( $<TwoUIClose><Inline> ) );
     make $mast;
 }
 

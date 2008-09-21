@@ -207,9 +207,14 @@ token StarLine {
     | <.Spacechar> '*'+ <?Spacechar>
 }
 
+token UILine {
+    | '____' '_'*
+    | <.Spacechar> '_'+ <?Spacechar>
+}
+
 token Emph {
     | <EmphStar> {*}            #= EmphStar
-#    | <EmphUI> {*}              #= EmphUI
+    | <EmphUI> {*}              #= EmphUI
 }
 
 token OneStarOpen { <!StarLine> '*' <!Spacechar> <!Newline> }
@@ -221,17 +226,35 @@ token EmphStar {
     {*}
 }
 
+token OneUIOpen { <!UILine> '_' <!Spacechar> <!Newline> }
+
+token OneUIClose { <!Spacechar> <!Newline> <Inline> <!StrongUI> '_' <!Alphanumeric> }
+
+token EmphUI {
+    <.OneUIOpen> [ <!OneUIClose> <Inline> ]* <OneUIClose>
+    {*}
+}
+
 token Strong {
     | <StrongStar> {*}          #= StrongStar
-#    | <StrongUI> {*}            #= StrongUI
+    | <StrongUI> {*}            #= StrongUI
 }
 
 token TwoStarOpen { <!StarLine> '**' <!Spacechar> <!Newline> }
 
-token TwoStarClose { <!Spacechar> <!Newline> <Inline> <!StrongStar> '**' }
+token TwoStarClose { <!Spacechar> <!Newline> <Inline> '**' }
 
 token StrongStar {
     <.TwoStarOpen> [ <!TwoStarClose> <Inline> ]* <TwoStarClose>
+    {*}
+}
+
+token TwoUIOpen { <!UILine> '__' <!Spacechar> <!Newline> }
+
+token TwoUIClose { <!Spacechar> <!Newline> <Inline> '__' <!Alphanumeric> }
+
+token StrongUI {
+    <.TwoUIOpen> [ <!TwoUIClose> <Inline> ]* <TwoUIClose>
     {*}
 }
 
@@ -252,6 +275,8 @@ token ws { <Sp> }
 token SpecialChar { '*' | '_' | '`' | '&' | '[' | ']' | '<' | '!' | '\\' }
 
 token NormalChar { <!SpecialChar> <!Spacechar> <!Newline> . }
+
+token Alphanumeric { \w }
 
 token NonindentSpace { '   ' | '  ' | ' ' | '' }
 
