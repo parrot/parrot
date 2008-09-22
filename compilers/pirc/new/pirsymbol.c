@@ -22,7 +22,10 @@ compilers/pirc/new/pirsymbol.c
 Functions for symbol management. The symbol data structure is used I<only> for
 keeping track of declared .local/.param identifiers, and for PIR registers.
 As such, a vanilla register allocator is implemented; for each declared identifier
-or PIR register, a new PASM register is allocated.
+or PIR register, a new PASM register is allocated. This happens immediately on
+declaring a C<.param> (as a parameter will I<always> be used for receiving arguments)
+and C<.local> symbols will be assigned a PASM register as soon as they're used for
+the first time.
 
 =head1 IMPLEMENTATION
 
@@ -71,7 +74,7 @@ This is the vanilla register allocator.
 */
 int
 next_register(struct lexer_state * const lexer, pir_type type) {
-    lexer->subs->regs_used[type]++; /* count number of registers used */
+    CURRENT_SUB(lexer)->regs_used[type]++; /* count number of registers used */
     return lexer->curregister[type]++;
 }
 
@@ -146,8 +149,8 @@ declare_local(struct lexer_state * const lexer, pir_type type, symbol *list) {
     /* add the symbol to the symbol table, which is currently implemented
      * as a linked list.
      */
-    if (lexer->subs->symbols == NULL) /* no symbols yet */
-        lexer->subs->symbols = list;
+    if (CURRENT_SUB(lexer)->symbols == NULL) /* no symbols yet */
+        CURRENT_SUB(lexer)->symbols = list;
     else {
         /* go to end of list */
         iter = list;
@@ -155,8 +158,8 @@ declare_local(struct lexer_state * const lexer, pir_type type, symbol *list) {
             iter = iter->next;
 
         /* link existing list on list->next, and set symbols list to this list */
-        iter->next           = lexer->subs->symbols;
-        lexer->subs->symbols = list;
+        iter->next = CURRENT_SUB(lexer)->symbols;
+        CURRENT_SUB(lexer)->symbols = list;
     }
 
 }
@@ -179,7 +182,7 @@ check_unused_symbols(struct lexer_state * const lexer) {
     puts("");
 
     do {
-        symbol *iter = lexer->subs->symbols;
+        symbol *iter = CURRENT_SUB(lexer)->symbols;
 
         while (iter) { /* iterate over all symbols in this sub */
             if (iter->color == -1) {
@@ -220,12 +223,12 @@ find_symbol(struct lexer_state * const lexer, char * const name) {
      * in that case, NULL is returned.
      */
     if (lexer->subs) /* then initialize iterator */
-        iter = lexer->subs->symbols;
+        iter = CURRENT_SUB(lexer)->symbols;
     else
         return NULL;
 
     while (iter) {
-        if (strcmp(iter->name, name) == 0) {
+        if (STREQ(iter->name, name)) {
             /* if the symbol is not yet used, allocate a new PASM register */
             if (iter->color == -1)
                 iter->color = next_register(lexer, iter->type);
@@ -274,7 +277,7 @@ static pir_reg *
 find_register(struct lexer_state * const lexer, pir_type type, int regno) {
     /* should do a binary search. fix later.
      */
-    pir_reg *iter = lexer->subs->registers[type];
+    pir_reg *iter = CURRENT_SUB(lexer)->registers[type];
     while (iter != NULL) {
         if (iter->regno == regno)
             return iter;
@@ -314,8 +317,8 @@ use_register(struct lexer_state * const lexer, pir_type type, int regno) {
     /* link this register into the list of "colored" registers; each of
      * them has been assigned a unique PASM register.
      */
-    reg->next = lexer->subs->registers[type];
-    lexer->subs->registers[type] = reg;
+    reg->next = CURRENT_SUB(lexer)->registers[type];
+    CURRENT_SUB(lexer)->registers[type] = reg;
 
 
     /* return newly allocated register */
@@ -387,13 +390,10 @@ void
 store_global_ident(struct lexer_state * const lexer, char * const name) {
     global_ident *glob = new_global_ident(name);
 
+    fprintf(stderr, "storing global label %s\n", name);
     /* store the global in the lexer */
-    if (lexer->globals) {
-        glob->next     = lexer->globals;
-        lexer->globals = glob;
-    }
-    else
-        lexer->globals = glob;
+    glob->next     = lexer->globals;
+    lexer->globals = glob;
 }
 
 /*
@@ -410,9 +410,12 @@ then NULL is returned.
 global_ident *
 find_global_ident(struct lexer_state * const lexer, char * const name) {
     global_ident *iter = lexer->globals;
+    fprintf(stderr, "finding global label %s\n", name);
     while (iter) {
-        if (strcmp(iter->name, name) == 0)
+        if (STREQ(iter->name, name)) {
+            printf("found\n");
             return iter;
+        }
         iter = iter->next;
     }
     return NULL;
@@ -451,16 +454,29 @@ constant *
 find_constant(struct lexer_state * const lexer, char * const name) {
     constant *iter = lexer->constants;
     while (iter) {
-        if (strcmp(iter->name, name) == 0)
+        if (STREQ(iter->name, name))
             return iter;
         iter = iter->next;
     }
     return NULL;
 }
 
+/*
+
+=item C<static label *
+new_label(char * const name, unsigned offset)>
+
+Constructor for a label. Create a new label structure, fill out the details
+and return it. C<name> is the name of the label; C<offset> is its current
+location in the source to which any branching instruction can jump to.
+
+=cut
+
+*/
 static label *
 new_label(char * const name, unsigned offset) {
     label *l = (label *)malloc(sizeof (label));
+    assert(l);
     l->name   = name;
     l->offset = offset;
     l->next   = NULL;
@@ -470,24 +486,23 @@ new_label(char * const name, unsigned offset) {
 /*
 
 =item C<void
-store_label(struct lexer_state * const lexer, char * const labelname, unsigned offset)>
+store_local_label(struct lexer_state * const lexer, char * const labelname, unsigned offset)>
 
 =cut
 
 */
 void
-store_label(struct lexer_state * const lexer, char * const labelname, unsigned offset) {
+store_local_label(struct lexer_state * const lexer, char * const labelname, unsigned offset) {
     label *l = new_label(labelname, offset);
 
-    printf("storing label '%s' with offset %u\n", labelname, offset);
-    l->next = lexer->subs->labels;
-    lexer->subs->labels = l;
+    l->next = CURRENT_SUB(lexer)->labels;
+    CURRENT_SUB(lexer)->labels = l;
 }
 
 /*
 
 =item C<unsigned
-find_label(struct lexer_state * const lexer, char * const labelname)>
+find_local_label(struct lexer_state * const lexer, char * const labelname)>
 
 Find the offset for label C<labelname>. If C<labelname> was not defined as
 a label, an error is emitted, otherwise, the offset of that label is returned.
@@ -496,18 +511,18 @@ a label, an error is emitted, otherwise, the offset of that label is returned.
 
 */
 unsigned
-find_label(struct lexer_state * const lexer, char * const labelname) {
-    label *iter = lexer->subs->labels;
+find_local_label(struct lexer_state * const lexer, char * const labelname) {
+    label *iter = CURRENT_SUB(lexer)->labels;
 
     while (iter) {
-        if (strcmp(iter->name, labelname) == 0)
+        if (STREQ(iter->name, labelname))
             return iter->offset;
         iter = iter->next;
     }
 
     /* no label found, emit an error message. */
     pirerror(lexer, "in sub '%s': cannot find offset for label '%s'",
-             lexer->subs->sub_name, labelname);
+             CURRENT_SUB(lexer)->sub_name, labelname);
 
     return 0;
 }

@@ -65,6 +65,11 @@ TODO:
 #include "pircompunit.h"
 #include "pirsymbol.h"
 
+/* Note: the following sequence of #defines and #includes must be kept in this order.
+ * Do not make changes to this; the sequence is important in order to be compilable.
+ */
+
+/**** Begin of Sequence. ****/
 
 /* prevent inclusion of <unistd.h> on windows */
 #define YY_NO_UNISTD_H
@@ -79,6 +84,7 @@ TODO:
 /* declare yylex(); do this I<after> including "pirlexer.h" */
 extern YY_DECL;
 
+/**** End of Sequence. ****/
 
 
 /* Enumeration of mathematical operator types; these are used to index the opnames array. */
@@ -182,6 +188,7 @@ static void create_if_instr(yyscan_t yyscanner, lexer_state * const lexer, int i
 static void do_strength_reduction(lexer_state * const lexer);
 static int check_value(constant * const c, int val);
 
+static void check_first_arg_direction(yyscan_t yyscanner, char * const opname);
 
 /* enable debugging of generated parser */
 #define YYDEBUG         1
@@ -798,8 +805,10 @@ assignment        : target '=' TK_INTC
                               if (!is_parrot_op(lexer, $3))
                                   yyerror(yyscanner, lexer, "'%s' is neither a declared symbol "
                                                             "nor a parrot opcode", $3);
-                              else /* handle it as an op */
+                              else { /* handle it as an op */
                                   unshift_operand(lexer, expr_from_target($1));
+                                  check_first_arg_direction(yyscanner, $3);
+                              }
                           }
                           else /* handle it as a symbol */
                               set_instrf(lexer, "set", "%T%T", $1, target_from_symbol(sym));
@@ -812,7 +821,9 @@ assignment        : target '=' TK_INTC
                           else {
                               unshift_operand(lexer, $4);
                               unshift_operand(lexer, expr_from_target($1));
+                              check_first_arg_direction(yyscanner, $3);
                               do_strength_reduction(lexer);
+
                           }
                         }
                   | target '=' parrot_op expression
@@ -821,6 +832,7 @@ assignment        : target '=' TK_INTC
                               yyerror(yyscanner, lexer, "'%s' is not a parrot op", $3);
                           else {
                               set_instrf(lexer, $3, "%T%E", $1, $4);
+                              check_first_arg_direction(yyscanner, $3);
                               do_strength_reduction(lexer);
                           }
                         }
@@ -845,12 +857,15 @@ assignment        : target '=' TK_INTC
                           t = target_from_symbol(sym);
                           set_target_key(t, $4);
                           set_instrf(lexer, "set", "%T%T", $1, t);
-
+                          /* No need to check first arg's direction; this grammar rule is
+                           * only used for keyed acces.
+                           */
                         }
                   | target '=' parrot_op keylist ',' parrot_op_args
                         {
                           unshift_operand(lexer, expr_from_key($4));
                           unshift_operand(lexer, expr_from_target($1));
+                          check_first_arg_direction(yyscanner, $3);
                         }
                   | target '=' keyword keylist
                         {
@@ -1677,6 +1692,7 @@ augmented_op: "*="         { $$ = OP_MUL; }
 
 #include <math.h>
 #include <assert.h>
+#include "parrot/oplib/ops.h"
 
 /*
 
@@ -2173,13 +2189,15 @@ Compare string C<a> with string C<b> using the operator C<op>.
 The function uses C's C<strcmp> function. Based on that result,
 which can be -1 (smaller), 0 (equal) or 1 (larger), a boolean
 result is returned.
+Note that C<strcmp()> should not be replaced by the C<STREQ> macro used throughout
+Parrot source code; this function uses the result of C<strcmp()>.
 
 =cut
 
 */
 static int
 evaluate_s_s(char * const a, pir_rel_operator op, char * const b) {
-    int result = strcmp(a, b);
+    int result = strcmp(a, b); /* do /not/ use STREQ; we're interested in the result. */
 
     switch (op) {
         case OP_NE:
@@ -2218,17 +2236,16 @@ evaluate_s(char * const s) {
     if (strlen_s > 0) {
         if (strlen_s <= 3) { /* if strlen > 3, (max. nr of characters to represent "0")
                                 no need to do expensive string comparison; it must be true. */
-            if ((strcmp(s, "0") == 0) || (strcmp(s, ".0") == 0)
-                || (strcmp(s, "0.") == 0) || (strcmp(s, "0.0") == 0)) {
+            if (STREQ(s, "0") || STREQ(s, ".0") || STREQ(s, "0.") || STREQ(s, "0.0"))
                 return 0;
-            }
             else  /* short string but not equal to "0.0" or a variant */
                 return 1;
         }
         else /* strlen > 3, so does not contain "0.0" or a variant */
             return 1;
     }
-    return 0; /* strlen is not larger than 0 */
+    else
+        return 0; /* strlen is not larger than 0 */
 }
 
 /*
@@ -2284,46 +2301,6 @@ concat_strings(char *a, char *b) {
     return newstr;
 }
 
-/*
-
-=item C<static int
-is_parrot_op(lexer_state * const lexer, char const * const spelling)>
-
-=cut
-
-*/
-/*
-static int
-is_parrot_op(lexer_state * const lexer, char const * const spelling)
-{
-    char const * ops[] = {
-        "print",
-        "new",
-        "newclass",
-        "end",
-        "set",
-        "find_global",
-        "set_hll_global",
-        "get_hll_global",
-        "setfile",
-        "setline",
-        "add",
-        "sub",
-        NULL
-    };
-
-
-    char const **iter = ops;
-
-    while (*iter != NULL) {
-        if (strcmp(spelling, *iter) == 0)
-            return 1;
-        iter++;
-    }
-
-    return 0;
-}
-*/
 
 /*
 
@@ -2423,23 +2400,113 @@ do_strength_reduction(lexer_state * const lexer) {
     char * const instr         = get_instr(lexer);
     int          op            = -1;
     int          num_operands;
-    expression  *arg1, *arg2;
+    expression  *arg1          = NULL;
+    expression  *arg2          = NULL;
+
+    int opcode = CURRENT_INSTRUCTION(lexer)->opcode;
+
+    assert(opcode >= 0);
+
+/*
+    fprintf(stderr, "do_strength_reduction()\n");
+
+    */
+    /* note that the signature is not correct at this point; opcode may point to any variant
+     * of the op; we don't know the actual signature of this op; this will be calculated later;
+     * therefore, all variants must be considered. */
+
+    switch (opcode) {
+        case PARROT_OP_add_i_i:
+        case PARROT_OP_add_i_ic:
+        case PARROT_OP_add_n_n:
+        case PARROT_OP_add_n_nc:
+        case PARROT_OP_add_i_i_i:
+        case PARROT_OP_add_i_ic_i:
+        case PARROT_OP_add_i_i_ic:
+        case PARROT_OP_add_n_n_n:
+        case PARROT_OP_add_n_nc_n:
+        case PARROT_OP_add_n_n_nc:
+            op = OP_ADD;
+            break;
+        case PARROT_OP_div_i_i:
+        case PARROT_OP_div_i_ic:
+        case PARROT_OP_div_n_n:
+        case PARROT_OP_div_n_nc:
+        case PARROT_OP_div_i_i_i:
+        case PARROT_OP_div_i_ic_i:
+        case PARROT_OP_div_i_i_ic:
+        case PARROT_OP_div_i_ic_ic:
+        case PARROT_OP_div_n_n_n:
+        case PARROT_OP_div_n_nc_n:
+        case PARROT_OP_div_n_n_nc:
+        case PARROT_OP_div_n_nc_nc:
+            op = OP_DIV;
+            break;
+        case PARROT_OP_mul_i_i:
+        case PARROT_OP_mul_i_ic:
+        case PARROT_OP_mul_n_n:
+        case PARROT_OP_mul_n_nc:
+        case PARROT_OP_mul_i_i_i:
+        case PARROT_OP_mul_i_ic_i:
+        case PARROT_OP_mul_i_i_ic:
+        case PARROT_OP_mul_n_n_n:
+        case PARROT_OP_mul_n_nc_n:
+        case PARROT_OP_mul_n_n_nc:
+            op = OP_MUL;
+            break;
+        case PARROT_OP_fdiv_i_i:
+        case PARROT_OP_fdiv_i_ic:
+        case PARROT_OP_fdiv_n_n:
+        case PARROT_OP_fdiv_n_nc:
+        case PARROT_OP_fdiv_i_i_i:
+        case PARROT_OP_fdiv_i_ic_i:
+        case PARROT_OP_fdiv_i_i_ic:
+        case PARROT_OP_fdiv_n_n_n:
+        case PARROT_OP_fdiv_n_nc_n:
+        case PARROT_OP_fdiv_n_n_nc:
+            op = OP_FDIV;
+            break;
+        case PARROT_OP_sub_i_i:
+        case PARROT_OP_sub_i_ic:
+        case PARROT_OP_sub_n_n:
+        case PARROT_OP_sub_n_nc:
+        case PARROT_OP_sub_i_i_i:
+        case PARROT_OP_sub_i_ic_i:
+        case PARROT_OP_sub_i_i_ic:
+        case PARROT_OP_sub_n_n_n:
+        case PARROT_OP_sub_n_nc_n:
+        case PARROT_OP_sub_n_n_nc:
+            op = OP_SUB;
+            break;
+        default:
+            return;
+    }
+
 
     /* if the instruction is "add", "sub", "mul", "div" or "fdiv", do continue... */
-    if (strcmp(instr, "add") == 0)
+
+/*
+    if (STREQ(instr, "add"))
         op = OP_ADD;
-    else if (strcmp(instr, "sub") == 0)
+    else if (STREQ(instr, "sub"))
         op = OP_SUB;
-    else if (strcmp(instr, "mul") == 0)
+    else if (STREQ(instr, "mul"))
         op = OP_MUL;
-    else if (strcmp(instr, "div") == 0)
+    else if (STREQ(instr, "div"))
         op = OP_DIV;
-    else if (strcmp(instr, "fdiv") == 0)
+    else if (STREQ(instr, "fdiv"))
         op = OP_FDIV;
     else
         return;
 
+*/
+
     num_operands = get_operand_count(lexer);
+
+    /*
+    fprintf(stderr, "num_operands: %d\n", num_operands);
+    */
+
     if (num_operands > 2) {
         /* get the operands */
         expression *op1, *op2;
@@ -2448,10 +2515,14 @@ do_strength_reduction(lexer_state * const lexer) {
         /* check whether operands are in fact targets */
         if ((op1->type == EXPR_TARGET) && (op2->type == EXPR_TARGET)) {
 
+            /*
+            fprintf(stderr, "op1->type == EXPR_TARGET && op2->type == EXPR_TARGET\n");
+            */
+
             /* check whether targets are equal */
             if (targets_equal(op1->expr.t, op2->expr.t)) {
                 /* in that case, remove the second one */
-                remove_operand(lexer, 2);
+                op1->next = op2->next;
                 free(op2);
                 --num_operands;
             }
@@ -2459,10 +2530,17 @@ do_strength_reduction(lexer_state * const lexer) {
     }
 
     /* don't even try to change "add $I0, 1" into "inc $I0" if number of operands is not 2 */
-    if (num_operands != 2)
+    if (num_operands != 2) {
+        /*
+        fprintf(stderr, "num_operands != 2\n");
+        */
         return;
+    }
 
-    arg1 = arg2 = NULL;
+    /*
+    fprintf(stderr, "num_operands == 2\n");
+    */
+
     get_operands(lexer, 2, &arg1, &arg2);
     assert(arg1);
     assert(arg2);
@@ -2471,23 +2549,27 @@ do_strength_reduction(lexer_state * const lexer) {
         case OP_ADD:
         case OP_SUB:
             if (arg2->type == EXPR_CONSTANT) {
-                if (check_value(arg2->expr.c, 0)) {
+                if (check_value(arg2->expr.c, 0)) { /* add $I0, 0  --> <delete> */
                     update_instr(lexer, "noop");
                     remove_all_operands(lexer);
                 }
-                else if (check_value(arg2->expr.c, 1)) {
+                else if (check_value(arg2->expr.c, 1)) { /* add $I0, 1 --> inc $I0 */
                     update_instr(lexer, opnames[op + 1]);
-                    remove_operand(lexer, 2);
+
+                    arg1->next = arg2->next;
+                    /*free(arg2);*/
                 }
             }
             break;
         case OP_MUL:
             if (arg2->type == EXPR_CONSTANT) {
-                if (check_value(arg2->expr.c, 0)) {
+                if (check_value(arg2->expr.c, 0)) {  /* mul $I0, 0 --> null $I0 */
                     update_instr(lexer, "null");
-                    remove_operand(lexer, 2);
+
+                    arg1->next = arg2->next;
+                  /*  free(arg2); */
                 }
-                else if (check_value(arg2->expr.c, 1)) {
+                else if (check_value(arg2->expr.c, 1)) { /* mul $I0, 1 --> <delete> */
                     update_instr(lexer, "noop");
                     remove_all_operands(lexer);
                 }
@@ -2496,9 +2578,9 @@ do_strength_reduction(lexer_state * const lexer) {
         case OP_DIV:
         case OP_FDIV:
             if (arg2->type == EXPR_CONSTANT) {
-                if (check_value(arg2->expr.c, 0))
+                if (check_value(arg2->expr.c, 0)) /* div $I0, 0 --> error */
                     pirerror(lexer, "cannot divide by 0");
-                else if (check_value(arg2->expr.c, 1)) {
+                else if (check_value(arg2->expr.c, 1)) { /* div $I0, 1 --> <delete> */
                     update_instr(lexer, "noop");
                     remove_all_operands(lexer);
                 }
@@ -2507,9 +2589,49 @@ do_strength_reduction(lexer_state * const lexer) {
         default:
             break;
     }
+
+    fprintf(stderr, "do_strength_reduction() done\n");
 }
 
+/*
 
+=item C<static void
+check_first_arg_direction(yyscan_t yyscanner, char * const opname)>
+
+This function checks the first argument's  direction of the op C<opname>.
+If the direction is not C<OUT>, a syntax error is emitted. This function assumes
+that C<opname> is a valid parrot op. This check is done to complain about
+valid PIR syntax that is undesirable, such as:
+
+ $S0 = print
+
+which is another way of writing:
+
+ print $S0
+
+As the first argument C<$S0> is an C<IN> argument, the sugared version should
+not be allowed.
+
+=cut
+
+*/
+static void
+check_first_arg_direction(yyscan_t yyscanner, char * const opname) {
+    int dir_first_arg;
+    lexer_state * const lexer = yyget_extra(yyscanner);
+
+    assert(CURRENT_INSTRUCTION(lexer)->opinfo);
+
+    /* get the direction of the first argument */
+    dir_first_arg = CURRENT_INSTRUCTION(lexer)->opinfo->dirs[0];
+
+    /* direction cannot be IN or INOUT */
+    if (dir_first_arg != PARROT_ARGDIR_OUT)
+        yyerror(yyscanner, lexer, "cannot write first arg of op '%s' as a target "
+                                  "(direction of argument is not OUT).", opname);
+
+
+}
 
 /*
 

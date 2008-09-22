@@ -94,11 +94,40 @@ dupstr(lexer_state * const lexer, char * source) {
 
 static void
 store_string(lexer_state * const lexer, char * const str) {
+    /*
+    PMC *symtable = pmc_new(lexer->interp, enum_class_Hash);
+    PMC *dummy = pmc_new(lexer->interp, enum_class_ResizablePMCArray);
+    symbol *sym = new_symbol("hi", PMC_TYPE);
+    symbol *test;
+    VTABLE_set_pmc_keyed_str(lexer->interp, symtable,
+    string_from_cstring(lexer->interp, "hi", 2), dummy);
+    VTABLE_push_pmc(lexer->interp, dummy, (PMC *)sym);
+    test = (symbol *)VTABLE_pop_pmc(lexer->interp, dummy);
+    printf("name: %s\n", test->name);
+    */
+    /*
+    PMC *yesh = pmc_new(lexer->interp, enum_class_Integer);
+
+    STRING *s = string_from_cstring(lexer->interp, str, strlen(str));
+    if (lexer->obj_cache.str_cache == NULL)
+        lexer->obj_cache.str_cache = pmc_new(lexer->interp, enum_class_Hash);
+    VTABLE_set_pmc_keyed_str(lexer->interp, lexer->obj_cache.str_cache, s, (PMC *)s);
+    */
 
 }
 
 static char *
-find_string(lexer_state * const lexer) {
+find_string(lexer_state * const lexer, char * const str) {
+
+    /* this doesn't seem to work :-/ probably implement own hash. lean and mean.
+    PMC *dummy = VTABLE_get_pmc_keyed_str(lexer->interp, lexer->obj_cache.str_cache,
+                                        string_from_cstring(lexer->interp, str, strlen(str)));
+    if (dummy) {
+        STRING *ret = (STRING *)dummy;
+        char *s = string_to_cstring(lexer->interp, ret);
+        printf("finding string: [%s]\n", s);
+        return s;
+    }*/
     return NULL;
 }
 
@@ -115,7 +144,7 @@ copied. Easy for copying a string except the quotes, for instance.
 */
 char *
 dupstrn(lexer_state * const lexer, char * source, size_t num_chars) {
-    char *result = find_string(lexer);
+    char *result = find_string(lexer, source);
 
     if (result == NULL) { /* not found */
         result = (char *)calloc(num_chars + 1, sizeof (char));

@@ -242,6 +242,10 @@ typedef struct instruction {
     char               *opname;       /* name of the instruction, such as "print" and "set" */
     expression         *operands;     /* operands like "$I0" and "42" in "set $I0, 42" */
     int                 flags;
+    struct op_info_t   *opinfo;       /* pointer to the op_info containing this op's meta data */
+    int                 opcode;       /* the opcode of one of this op's family members, not
+                                         necessarily the right opcode. May indicate "add_i_i"
+                                         while the opname is "add_i_ic". */
 
     struct instruction *next;
 } instruction;
@@ -278,6 +282,9 @@ typedef struct subroutine {
 
 } subroutine;
 
+/* make code a bit more readable */
+#define CURRENT_SUB(L)          L->subs
+#define CURRENT_INSTRUCTION(L)  L->subs->statements
 
 /* forward declaration */
 struct lexer_state;

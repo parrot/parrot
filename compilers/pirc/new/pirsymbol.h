@@ -92,8 +92,8 @@ constant *find_constant(struct lexer_state * const lexer, char * const name);
 /* get a new PASM register of the specified type */
 int next_register(struct lexer_state * const lexer, pir_type type);
 
-void store_label(struct lexer_state * const lexer, char * const label, unsigned offset);
-unsigned find_label(struct lexer_state * const lexer, char * const label);
+void store_local_label(struct lexer_state * const lexer, char * const label, unsigned offset);
+unsigned find_local_label(struct lexer_state * const lexer, char * const label);
 
 #endif /* PARROT_PIR_PIRSYMBOL_H_GUARD */
 
