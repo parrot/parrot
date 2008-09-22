@@ -1,0 +1,7 @@
+=pod
+
+=head0 PIR Standard Library
+
+Z<CHP-6>
+
+=cut
