@@ -353,17 +353,29 @@ PIO_unix_open(PARROT_INTERP, ARGIN(ParrotIOLayer *layer),
     }
 
     if (fd >= 0) {
+        struct stat buf;
+        if (fstat(fd, &buf) == -1) {
+            close(fd);
+            return NULL;
+        }
+        if ((buf.st_mode & S_IFMT) == S_IFDIR) {
+            close(fd);
+            errno = EISDIR;
+            return NULL;
+        }
         /* Set generic flag here if is a terminal then
          * higher layers can know how to setup buffering.
          * STDIN, STDOUT, STDERR would be in this case
          * so we would setup linebuffering.
          */
-        ParrotIO *io;
         if (PIO_unix_isatty(fd))
             flags |= PIO_F_CONSOLE;
-        io = PIO_new(interp, type, flags, mode);
-        io->fd = fd;
-        return io;
+
+        { /* Scope for io */
+            ParrotIO *io = PIO_new(interp, type, flags, mode);
+            io->fd = fd;
+            return io;
+        }
     }
     return NULL;
 }
