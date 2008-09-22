@@ -2,9 +2,9 @@
 
 Z<CHP-4>
 
-=head1 Subroutines
+=head0 Subroutines
 
-Z<CHP-4-SECT-1>
+Z<CHP-4>
 
 X<PIR (Parrot intermediate representation);subroutines>
 X<subroutines;in PIR>
@@ -20,9 +20,9 @@ This is a language designed to implement other languages, and every
 language does subroutine calls a little differently. What's needed is
 a set of building blocks and tools, not a single prepackaged solution.
 
-=head2 Parrot Calling Conventions
+=head1 Parrot Calling Conventions
 
-Z<CHP-4-SECT-1.1>
+Z<CHP-4-SECT-1>
 
 X<PIR (Parrot intermediate representation);subroutines;Parrot calling conventions>
 X<subroutines;Parrot calling conventions;in PIR>
@@ -33,6 +33,8 @@ arguments and return values are passed in a predefined set of Parrot
 registers. The calling conventions use the Continuation Passing Style
 X<Continuation Passing Style (CPS)>X<CPS (Continuation Passing Style)>
 to pass control to subroutines and back again.
+
+=head2 Subroutines
 
 X<PIR (Parrot intermediate representation);subroutine calls>
 The fact that the Parrot calling conventions are clearly defined also
@@ -76,6 +78,8 @@ not only invokes the subroutine in C<P0>, but also generates a new
 return continuation in C<P1>. The called subroutine invokes this
 continuation to return control to the caller.
 
+=head2 Expanded Syntax
+
 The single line subroutine call is incredibly convenient, but it isn't
 always flexible enough. So PIR also has a more verbose call syntax
 that is still more convenient than manual calls. This example pulls
@@ -99,6 +103,8 @@ in the calling conventions. The C<.arg> directive sets up arguments to
 the call. The C<.call> directive saves top register frames, calls
 the subroutine, and restores the top registers. The C<.result>
 directive retrieves return values from the call.
+
+=head2 Subroutine Declarations
 
 X<.param directive>
 In addition to syntax for subroutine calls, PIR provides syntax for
@@ -170,7 +176,9 @@ look at the details of how the PIR code translates to PASM:
 
   $ parrot -o- factorial.pir
 
-=head2 Compilation Units Revisited
+=head1 Lexical Subroutines
+
+=head1 Compilation Units Revisited
 
 Z<CHP-4-SECT-1.2>
 
@@ -245,7 +253,7 @@ up your code. Parrot does it already.
 
 =head2 PASM Subroutines
 
-Z<CHP-4-SECT-1.4>
+Z<CHP-4-SECT-1.1>
 
 X<subroutines;PASM>
 X<PASM (Parrot assembly language);subroutines>
@@ -280,7 +288,7 @@ in Parrot.
 
 =head2 Namespaces
 
-Z<CHP-4-SECT-2.1>
+Z<CHP-4-SECT-2>
 
 X<Namespaces>
 X<.namespace>
@@ -323,10 +331,9 @@ global variables from it using the following functions:
 In the examples above, of course, C<$S0> contains the string name of the
 global variable or function from the namespace to find.
 
-
 =head2 Method Syntax
 
-Z<CHP-4-SECT-2.2>
+Z<CHP-4-SECT-2>
 
 Now that we've discussed namespaces, we can start to discuss
 object-oriented programming and method calls. The basic syntax is
@@ -381,6 +388,12 @@ You can pass multiple arguments to a method and retrieve multiple
 return values just like a single line subroutine call:
 
   (res1, res2) = obj."method"(arg1, arg2)
+
+=head2 VTABLE Methods
+
+=head1 Coroutines
+
+=head1 Multiple Dispatch
 
 
 =cut
