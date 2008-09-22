@@ -20,7 +20,7 @@
 #
 # Expressions:
 # - Operators: + - * / < > = unary-
-# - Predefined functions: COS, SIN, SQR, LEN, LEFT$, RIGHT$
+# - Predefined functions: COMPLEX, COS, SIN, SQR, LEN, LEFT$, RIGHT$
 # - Parenthesis
 # - Special functions: NEW "Class name"
 # - Calls to methods in foreign objects
@@ -318,6 +318,7 @@ check:
 
 # Some predefined functions:
     eq $S0, 'NEW', new_op
+    eq $S0, 'COMPLEX', func_complex
     eq $S0, 'COS', func_cos
     eq $S0, 'SIN', func_sin
     eq $S0, 'SQR', func_sqr
@@ -486,6 +487,20 @@ func_right:
     $S1 = substr $S0, $I0
     $P7 = new 'String'
     $P7 = $S1
+    .return($P7)
+
+func_complex:
+    null $P1
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    null $P5
+    null $P6
+    ($P5, $P6) = self.get_2_args(tokenizer)
+    $P7 = new 'Complex'
+    $N5 = $P5
+    $N6 = $P6
+    $P7[0] = $N5
+    $P7[1] = $N6
     .return($P7)
 
 func_cos:
