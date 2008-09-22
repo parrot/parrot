@@ -1,6 +1,21 @@
+=pod
+
+=head0 Testing and Debugging
+
+Z<CHP-6>
+
+Programming languages and the virtual machines on which they run are just
+one small part of the total programming ecosystem. Programmers require not
+just development tools, but also maintenance and management tools. Critical
+to development and maintenance of code are comprehensive testing tools and
+code debugging tools. Luckily, Parrot supports both. This chapter is going
+to discuss the testing frameworks available for HLLs written on Parrot,
+and the Parrot debugger which can be used for live debugging of software
+written in any of the HLLs that Parrot supports.
+
 =head1 Writing Tests
 
-Z<CHP-9-SECT-13>
+Z<CHP-6-SECT-1>
 
 X<testing Parrot>
 Parrot is volunteer-driven, and contributions from new users are always
@@ -100,5 +115,9 @@ operations and the interactions between opcodes. If the test program
 is complex or obscure, it helps to add comments. Tests should be
 self-contained to make it easy to identify where and why a test is
 failing.
+
+=head1 The Parrot Debugger
+
+Z<CHP-6-SECT-2>
 
 =cut

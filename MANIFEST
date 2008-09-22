@@ -439,7 +439,7 @@ docs/book/ch02_getting_started.pod                          [main]doc
 docs/book/ch03_pir_basics.pod                               [main]doc
 docs/book/ch04_pir_subroutines.pod                          [main]doc
 docs/book/ch05_pasm.pod                                     [main]doc
-docs/book/ch06_testing.pod                                  [main]doc
+docs/book/ch06_testing_and_debugging.pod                    [main]doc
 docs/book/ch07_architecture.pod                             [main]doc
 docs/book/ch08_pct.pod                                      [main]doc
 docs/book/ch09_hlls.pod                                     [main]doc
