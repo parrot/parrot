@@ -50,7 +50,8 @@
   goto create
 
 create:
-  code.emit(<<'END_PIR', name)
+  code.emit(<<'END_PIR', name, namespace)
+.namespace %1
 .sub 'xxx' :anon
   .param pmc args :slurpy
   .include 'languages/tcl/src/returncodes.pasm'

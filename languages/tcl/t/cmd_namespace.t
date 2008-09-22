@@ -10,7 +10,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 39
+plan 40
 
 eval_is {namespace} \
   {wrong # args: should be "namespace subcommand ?arg ...?"} \
@@ -126,6 +126,16 @@ is [namespace parent ""]                   {} {namespace parent: ::}
 is [namespace parent foo]                  :: {namespace parent: ::foo (explicit)}
 is [namespace eval foo {namespace parent}] :: {namespace parent: ::foo (implicit)}
 
+namespace eval perl6 {
+  proc passthrough {val} {
+    return $val
+  }
+  proc pi {} {
+    passthrough 3
+  }
+}
+is [perl6::pi] 3 \
+  {do procs in namespace default to that namespace when looking for commands?}
 
 # we can't do this test until all the file commands work
 # ([file delete] in particular)
