@@ -14,9 +14,11 @@ Its main features are:
 
 =item * thread-safety, so it is reentrant.
 
-=item * instruction selection, implemented in the parser.
+=item * strength reduction, implemented in the parser.
 
 =item * constant folding, implemented in the parser.
+
+=item * checks for proper use of op arguments in PIR syntax (disallowing, e.g.: $S0 = print)
 
 =back
 
@@ -422,11 +424,6 @@ that'd be helpful:
 
 =over 4
 
-=item * how are labels represented, as addresses/offsets (just plain integers)?
-
-=item * related: how is a jump/goto/branch instruction implemented?
-Will this take a integer operand?
-
 =item * how are named args/params handled/represented in bytecode?
 
 =back
@@ -434,11 +431,6 @@ Will this take a integer operand?
 The following are some ideas for the near future:
 
 =over 4
-
-=item * simplify the instruction struct by removing the union, so that invocation struct objects
-are no longer stored there. Once completely parsed, a invocation struct should be converted into
-a stream of normal instructions. This way, they will also participate in the vanilla register
-allocator.
 
 =item * when parsing is done, we know the total number of instructions (or we can easily count this,
 by incrementing a counter in the instruction constructor). Then we can create an array, and convert
