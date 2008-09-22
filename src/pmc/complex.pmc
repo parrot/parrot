@@ -1743,17 +1743,18 @@ MMD_DEFAULT: {
              }
     }
 
-    /* sqrt(x) = exp(ln(x)/2) */
     METHOD sqrt() {
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC *e;
-
-        (PMC *d) = PCCINVOKE(INTERP, SELF, "ln");
-        RE(d) *= 0.5;
-        IM(d) *= 0.5;
-
-        (PMC *e) = PCCINVOKE(INTERP, d, "exp");
-        RETURN(PMC *e);
+        PMC *result = pmc_new(INTERP, SELF->vtable->base_type);
+        FLOATVAL absval = SELF.get_number();
+        FLOATVAL sx = RE(SELF);
+        FLOATVAL sy = IM(SELF);
+        FLOATVAL rx = sqrt((absval + sx) / 2);
+        FLOATVAL ry = sqrt((absval - sx) / 2);
+        if (sy < 0)
+            ry = -ry;
+        RE(result) = rx;
+        IM(result) = ry;
+        RETURN(PMC *result);
     }
 
 }
