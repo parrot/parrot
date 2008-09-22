@@ -12,6 +12,16 @@
   .local string slash
   slash = config['slash']
 
+  # strip off the leading :: if present.
+  # XXX This is a big hack.
+
+  $I0 = length cmd
+  if $I0 < 3 goto filename
+  $S0 = substr cmd, 0, 2
+  if $S0 != '::' goto filename
+  substr cmd, 0, 2, ''
+
+filename:
   $S0 = tcl_library
   $S0 .= slash
   $S0 .= cmd

@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 use Test::More;
 
 # verify interaction with auto_load...
@@ -19,6 +19,14 @@ OUT
 
 language_output_is( "tcl", <<'TCL', <<OUT, "body available after auto_load" );
  auto_load parray
+ info body ::parray
+ puts ok
+TCL
+ok
+OUT
+
+language_output_is( "tcl", <<'TCL', <<OUT, "body available after auto_load of FQ name" );
+ auto_load ::parray
  info body ::parray
  puts ok
 TCL
