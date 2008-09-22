@@ -7,6 +7,9 @@
 # loading it for every partcl invocation.
 #
 
+#
+# XXX Perhaps replace most of the guts here with a call to auto_load?
+#
 .sub '&parray'
   .param pmc args :slurpy
 

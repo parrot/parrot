@@ -7,8 +7,23 @@ use strict;
 use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 8;
 use Test::More;
+
+# verify interaction with auto_load...
+language_output_is( "tcl", <<'TCL', <<OUT, "body not loaded by default" );
+ info body ::parray
+TCL
+"::parray" isn't a procedure
+OUT
+
+language_output_is( "tcl", <<'TCL', <<OUT, "body available after auto_load" );
+ auto_load parray
+ info body ::parray
+ puts ok
+TCL
+ok
+OUT
 
 language_output_is( "tcl", <<'TCL', <<OUT, "no args" );
  parray
