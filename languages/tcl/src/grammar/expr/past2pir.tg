@@ -359,7 +359,11 @@ transform pir (PAST::DynamicCommand) {
   %0  = %0(%2)
   goto %4
 %3:
-  die 'invalid command name %1'
+  .local string invalid_command
+  invalid_command = 'invalid command name "'
+  invalid_command .= $S0
+  invalid_command .= '"'
+  die invalid_command
 %4:
 END_PIR
     node['ret'] = retval

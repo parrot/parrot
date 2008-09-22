@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use lib qw(tcl/lib ./lib ../lib ../../lib ../../../lib);
 
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 34;
 use Test::More;
 
 language_output_is( 'tcl', <<'TCL', <<'OUT', 'multiple foreaches. seems to need puts to trigger.' );
@@ -267,6 +267,15 @@ hello world
 hello world
 OUT
 }
+
+language_output_is('tcl', <<'TCL', <<'OUT', 'failure to find a dynamic command');
+proc Default {{verify {boom}}} {
+    [$verify]
+}
+Default
+TCL
+invalid command name "boom"
+OUT
 
 # Local Variables:
 #   mode: cperl
