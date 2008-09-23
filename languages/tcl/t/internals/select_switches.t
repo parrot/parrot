@@ -277,7 +277,7 @@ check_25:
 eh_30: 
     get_results '0', $P2
 check_30:
-    is($S2, 'bad switch "-fail": must be -good0 or -good1', message)
+    is($P2, 'bad switch "-fail": must be -good0 or -good1', message)
 
 .end
 
