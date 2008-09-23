@@ -60,14 +60,6 @@ static PMC * find_method_direct_1(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC* find_vtable_meth_ns(PARROT_INTERP,
-    ARGIN(PMC *ns),
-    INTVAL vtable_index)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
 static PMC* get_init_meth(PARROT_INTERP,
     ARGIN(PMC *_class),
     ARGIN(STRING *prop_str),
@@ -402,7 +394,7 @@ Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
         const INTVAL       mid    = (low + high) / 2;
         const char * const meth_c = Parrot_vtable_slot_names[mid];
 
-        /* RT#45965 slot_names still have __ in front */
+        /* RT #45965 slot_names still have __ in front */
         const INTVAL cmp = strcmp(name_c, meth_c + 2);
 
         if (cmp == 0) {
@@ -423,30 +415,11 @@ Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
 
 /*
 
-=item C<static PMC* find_vtable_meth_ns>
-
-Return Sub PMC if a method with the vtable name exists in ns
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC*
-find_vtable_meth_ns(PARROT_INTERP, ARGIN(PMC *ns), INTVAL vtable_index)
-{
-    return VTABLE_get_pmc_keyed_int(interp, ns, vtable_index);
-}
-
-
-/*
-
 =item C<STRING* readable_name>
 
 Given a String or Key PMC return the STRING* representation
 
-RT#45967 this function, key_set_to_string, and the key PMC get_repr should be
+RT #45967 this function, key_set_to_string, and the key PMC get_repr should be
 consolidated
 
 =cut
@@ -508,7 +481,7 @@ Parrot_MMD_method_name(SHIM_INTERP, INTVAL idx)
 
 Return the MMD function number for method name or -1 on failure.
 
-RT#45973 allow dynamic expansion at runtime.
+RT #45973 allow dynamic expansion at runtime.
 
 =cut
 
@@ -674,7 +647,7 @@ Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name))
 
 =item C<static PMC* get_init_meth>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -721,7 +694,7 @@ get_init_meth(PARROT_INTERP, ARGIN(PMC *_class),
 =item C<PMC * Parrot_remove_parent>
 
 This currently does nothing but return C<PMCNULL>.
-RT#50646
+RT #50646
 
 =cut
 
@@ -803,7 +776,7 @@ init_object_cache(PARROT_INTERP)
 
 =item C<void destroy_object_cache>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -830,7 +803,7 @@ destroy_object_cache(PARROT_INTERP)
 
 =item C<static void invalidate_type_caches>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -867,7 +840,7 @@ invalidate_type_caches(PARROT_INTERP, UINTVAL type)
 
 =item C<static void invalidate_all_caches>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -923,7 +896,7 @@ Parrot_invalidate_method_cache(PARROT_INTERP, ARGIN_NULLOK(STRING *_class), ARGI
 
 /*
  * quick'n'dirty method cache
- * RT#45987: use a hash if method_name is not constant
+ * RT #45987: use a hash if method_name is not constant
  *       i.e. from obj.$Sreg(args)
  *       If this hash is implemented mark it during DOD
  */
@@ -1047,7 +1020,7 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
 
 =item C<static void debug_trace_find_meth>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1099,7 +1072,7 @@ debug_trace_find_meth(PARROT_INTERP, ARGIN(const PMC *_class),
 
 =item C<static PMC * find_method_direct_1>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1142,7 +1115,7 @@ find_method_direct_1(PARROT_INTERP, ARGIN(PMC *_class),
 
 =item C<static PMC* C3_merge>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1378,7 +1351,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
         /* If we weren't excluded... */
         if (!excluded) {
             /* Is there a method with this name already in the class?
-             * RT#45999 multi-method handling. */
+             * RT #45999 multi-method handling. */
 
             if (VTABLE_exists_keyed_str(interp, methods_hash, method_name))
                 /* Conflicts with something already in the class. */
@@ -1410,7 +1383,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
                 alias, method_name);
 
             /* Is there a method with this name already in the class?
-             * RT#45999: multi-method handling. */
+             * RT #45999: multi-method handling. */
             if (VTABLE_exists_keyed_str(interp, methods_hash, alias_name))
                 /* Conflicts with something already in the class. */
                 Parrot_ex_throw_from_c_args(interp, NULL,
