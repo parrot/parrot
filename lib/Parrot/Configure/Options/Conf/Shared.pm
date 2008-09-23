@@ -68,12 +68,12 @@ our @shared_valid_options = qw{
     verbose
     verbose-step
     version
-    without-gdbm
-    without-opengl
-    without-pcre
     without-crypto
+    without-gdbm
     without-gettext
     without-gmp
+    without-opengl
+    without-pcre
     without-icu
     yacc
 };
