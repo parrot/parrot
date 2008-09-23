@@ -466,7 +466,7 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
 
     METHOD atan2(PMC *val) {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        PMC_num_val(d) = atan2(SELF.get_number(), PMC_num_val(val));
+        PMC_num_val(d) = atan2(SELF.get_number(), VTABLE_get_number(INTERP, val));
         RETURN(PMC *d);
     }
 

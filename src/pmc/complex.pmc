@@ -328,7 +328,7 @@ C<complex> object according to 2.1. Built-in Functions.
             PMC * const arg = REG_PMC(interp, 5);
 
             if (arg->vtable->base_type == enum_class_String)
-                VTABLE_set_string_native(INTERP, res, PMC_str_val(arg));
+                VTABLE_set_string_native(INTERP, res, VTABLE_get_string(interp, arg));
             else
                 RE(res) = VTABLE_get_number(INTERP, arg);
         }
