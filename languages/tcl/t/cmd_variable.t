@@ -67,5 +67,4 @@ proc ::lib::test {} {
   variable foo
   set foo
 }
-eval_is {::lib::test} 7 {variable using current namespace} \
-  {TODO {used to work, fix this}}
+eval_is {::lib::test} 7 {variable using current namespace}
