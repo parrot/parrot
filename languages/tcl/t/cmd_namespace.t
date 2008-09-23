@@ -10,7 +10,7 @@ use Tcl::Test; #\
 __DATA__
 
 source lib/test_more.tcl
-plan 40
+plan 41
 
 eval_is {namespace} \
   {wrong # args: should be "namespace subcommand ?arg ...?"} \
@@ -136,6 +136,12 @@ namespace eval perl6 {
 }
 is [perl6::pi] 3 \
   {do procs in namespace default to that namespace when looking for commands?}
+
+namespace eval perl6 {
+  namespace export pi
+}
+namespace import perl6::pi
+eval_is {pi} 3 {simple import test} {TODO {need this to run .test files}}
 
 # we can't do this test until all the file commands work
 # ([file delete] in particular)
