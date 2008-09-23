@@ -158,6 +158,10 @@ N: Chip Salzenberg
 D: Pumpking (0.4.6 - ... ) and demagogue
 E: chip@pobox.com
 
+N: Chris Davaz
+D: Rakudo builtins
+E: cdavaz@gmail.com
+
 N: Chris Dolan
 D: TAP language author, and Parrot Bug fixes
 E: cdolan@cpan.org
