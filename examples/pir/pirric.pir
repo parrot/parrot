@@ -208,6 +208,8 @@ done:
     setattribute self, 'tron', $P0
     $P1 = new 'ResizablePMCArray'
     setattribute self, 'stack', $P1
+    $P2 = new 'Hash'
+    setattribute self, 'vars', $P2
 .end
 
 #-----------------------------------------------------------------------
@@ -297,6 +299,8 @@ fail:
 
     .local pmc arg
     .local pmc args
+    .local pmc vars
+    vars = getattribute self, 'vars'
 
     $I0 = defined token
     if $I0 goto check
@@ -334,7 +338,9 @@ check:
 
     #say $S0
     .local pmc var
-    var = get_hll_global $S0
+    #var = get_hll_global $S0
+    var = vars[$S0]
+
     unless_null var, getvar
 
     $P0 = get_namespace token
@@ -923,7 +929,12 @@ assign:
 #    $P3 = get_global $S0
 #    $I0 = defined $P3
 #    if $I0 goto set_it
-    set_hll_global $S0, value
+
+    #set_hll_global $S0, value
+    .local pmc vars
+    vars = getattribute self, 'vars'
+    vars[$S0] = value
+
     goto next
 #set_it:
 #    assign $P3, value
