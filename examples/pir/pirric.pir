@@ -6,6 +6,8 @@
 # This is a proof of concept version, don't blame for redundant code
 # and other ugliness
 #
+# pirric is PIR Retro basIC
+#
 # Only one instruction per line.
 #
 # Instuctions implemented:
@@ -18,9 +20,12 @@
 # - Variables: varname = expression
 # - Access to parrot modules: LOAD "module name" , B
 #
+# Shorthands:
+# - ? -> PRINT
+#
 # Expressions:
 # - Operators: + - * / < > = unary-
-# - Predefined functions: COMPLEX, COS, SIN, SQR, LEN, LEFT$, RIGHT$
+# - Predefined functions: COMPLEX, COS, SIN, SQR, LEN, LEFT$, RIGHT$, MID$
 # - Parenthesis
 # - Special functions: NEW "Class name"
 # - Calls to methods in foreign objects
@@ -325,6 +330,7 @@ check:
     eq $S0, 'LEN', func_len
     eq $S0, 'LEFT$', func_left
     eq $S0, 'RIGHT$', func_right
+    eq $S0, 'MID$', func_mid
 
     #say $S0
     .local pmc var
@@ -489,6 +495,28 @@ func_right:
     $P7 = $S1
     .return($P7)
 
+func_mid:
+    null $P1
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    $P5 = self.get_args(tokenizer)
+    $I0 = $P5
+    lt $I0, 2, fail
+    gt $I0, 3, fail
+    $S0 = $P5[0]
+    $I1 = $P5[1]
+    dec $I1
+    lt $I0, 3, mid_nolen
+    $I2 = $P5[2]
+    $S1 = substr $S0, $I1, $I2
+    goto mid_result
+mid_nolen:
+    $S1 = substr $S0, $I1
+mid_result:
+    $P7 = new 'String'
+    $P7 = $S1
+    .return($P7)
+
 func_complex:
     null $P1
     $P1 = tokenizer.get()
@@ -527,13 +555,7 @@ func_sin:
     $P1 = tokenizer.get()
     ne $P1, '(', fail
     null $P5
-#    $P5 = self.evaluate(tokenizer)
-#    null $P1
-#    $P1 = tokenizer.get()
-#    ne $P1, ')', fail
-#    #say $P5
     $P5 = self.get_1_arg(tokenizer)
-
     $I0 = isa $P5, 'Integer'
     #print 'Integer: '
     #say $I0
