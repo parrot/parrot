@@ -141,7 +141,7 @@ namespace eval perl6 {
   namespace export pi
 }
 namespace import perl6::pi
-eval_is {pi} 3 {simple import test} {TODO {need this to run .test files}}
+eval_is {pi} 3 {simple import test}
 
 # we can't do this test until all the file commands work
 # ([file delete] in particular)

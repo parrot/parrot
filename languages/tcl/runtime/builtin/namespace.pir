@@ -407,6 +407,72 @@ b_first:
 .end
 
 .sub 'import'
+  .param pmc argv
+  .local int argc
+  argc = argv
+  if argc == 0 goto done
+  # ignore -force for now (assume it)
+  $S0 = argv[0]
+  if $S0 != '-force' goto done_args
+  $P0 = shift argv
+done_args:
+  .local pmc splitNamespace
+  splitNamespace  = get_root_global ['_tcl'], 'splitNamespace'
+
+  .local pmc globber
+  globber = compreg 'Tcl::Glob'
+
+  .local pmc ns_root
+  ns_root = get_root_namespace ['tcl']
+
+  .local pmc iterator
+  iterator = iter argv
+begin_argv:
+  unless iterator goto done_argv
+  $P0 = shift iterator
+
+  .local pmc ns
+  ns = splitNamespace($P0)
+
+  .local string pattern
+  pattern = pop ns
+  pattern = '&' . pattern # all our public procs are prefixed with &
+
+  .local pmc namespace
+  namespace = ns_root
+
+  .local pmc ns_iterator
+  ns_iterator = iter ns
+begin_ns_walk:
+  unless ns_iterator goto done_ns_walk
+  $S0 = shift ns_iterator
+  namespace = namespace[$S0]
+
+  goto begin_ns_walk
+done_ns_walk:
+
+  .local pmc rule, match
+  rule = globber.'compile'(pattern)
+
+  ns_iterator = iter namespace
+  .local string proc_name
+begin_ns_loop:
+  unless ns_iterator goto end_ns_loop
+  proc_name = shift ns_iterator
+
+  match = rule(proc_name)
+  unless match goto begin_ns_loop
+
+  $P1 = namespace[proc_name]
+  ns_root[proc_name] = $P1 # XXX Always imports to main, not current namespace
+
+  goto begin_ns_loop
+end_ns_loop:
+
+  goto begin_argv
+done_argv:
+
+done:
   .return ('')
 .end
 
