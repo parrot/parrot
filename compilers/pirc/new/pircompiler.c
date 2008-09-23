@@ -12,10 +12,30 @@
 #include "pircompiler.h"
 #include "parrot/parrot.h"
 
+/* initial size of a hashtable */
+#define HASHTABLE_SIZE_INIT     113
+
 /*
 
 =over 4
 
+=item C<static void
+init_hashtable(hashtable * table, unsigned size)>
+
+Initialize the hashtable C<table> with space for C<size> buckets.
+
+=cut
+
+*/
+static void
+init_hashtable(hashtable * table, unsigned size) {
+    table->contents  = (bucket **)calloc(size, sizeof (bucket *));
+    assert(table);
+    table->size      = size;
+    table->obj_count = 0;
+}
+
+/*
 
 =item C<lexer_state *
 new_lexer(char * const filename)>
@@ -37,13 +57,11 @@ new_lexer(char * const filename) {
     lexer->filename = filename;
     lexer->interp   = Parrot_new(NULL);
 
-    if (!lexer->interp) {
-        fprintf(stderr, "Failed to create a Parrot interpreter structure.\n");
-        exit(EXIT_FAILURE);
-    }
+    if (!lexer->interp)
+        panic("Failed to create a Parrot interpreter structure.");
 
     /* create a hashtable to store all strings */
-    lexer->obj_cache.str_cache = pmc_new(lexer->interp, enum_class_Hash);
+    init_hashtable(&lexer->strings, HASHTABLE_SIZE_INIT);
 
     return lexer;
 }
@@ -74,10 +92,113 @@ pirerror(lexer_state * const lexer, char const * const message, ...) {
     ++lexer->parse_errors;
 }
 
+
+/*
+
+=item C<static bucket *
+new_bucket(void)>
+
+Constructor for a bucket object.
+
+=cut
+
+*/
+static bucket *
+new_bucket(void) {
+    bucket *buck = (bucket *)malloc(sizeof (bucket));
+    assert(buck);
+    memset(buck, 0, sizeof (bucket));
+    return buck;
+}
+
+/*
+
+=item C<static void
+store_string(lexer_state * const lexer, char * const str)>
+
+Store the string C<str> in a hashtable; whenever this string is needed, a pointer
+to the same physical string is returned, preventing allocating different buffers
+for the same string. This is especially useful for ops, as most ops in a typical
+program will be used many times.
+
+=cut
+
+*/
+static void
+store_string(lexer_state * const lexer, char * const str) {
+    unsigned long hash = get_hashcode(str) % lexer->strings.size;
+    bucket *b          = new_bucket();
+    bucket_string(b)   = str;
+    b->next = lexer->strings.contents[hash];
+    lexer->strings.contents[hash] = b;
+}
+
+/*
+
+=item C<static char *
+find_string(lexer_state * const lexer, char * const str)>
+
+Find the string C<str> in the lexer's string hashtable. If the string was found,
+then a pointer to that buffer is returned. So, whenever for instance the string
+"print" is used, the string will only be stored in memory once, and a pointer to
+that buffer will be returned.
+
+=cut
+
+*/
+static char *
+find_string(lexer_state * const lexer, char * const str) {
+    unsigned long hash = get_hashcode(str) % lexer->strings.size;
+    bucket *b          = lexer->strings.contents[hash];
+
+    if (b == NULL) /* no bucket at this hash position; return NULL */
+        return NULL;
+
+    do {
+        /* loop through the buckets to see if this is the string */
+        if (STREQ(bucket_string(b), str))
+            return bucket_string(b); /* if so, return a pointer to the actual string. */
+
+        b = b->next;
+    }
+    while (b); /* if there's no more buckets, we'll return NULL in the end */
+
+    return NULL;
+}
+
 /*
 
 =item C<char *
-dupstr(char const * const source)>
+dupstrn(lexer_state * const lexer, char const * const source, size_t slen)>
+
+See dupstr, except that this version takes the number of characters to be
+copied. Easy for copying a string except the quotes, for instance.
+
+=cut
+
+*/
+char *
+dupstrn(lexer_state * const lexer, char * const source, size_t slen) {
+    char *result = find_string(lexer, source);
+    /* make sure the string is terminated in time */
+    source[slen] = '\0';
+
+    if (result == NULL) { /* not found */
+        result = (char *)calloc(slen + 1, sizeof (char));
+        assert(result);
+        /* only copy num_chars characters */
+        strncpy(result, source, slen);
+        /* cache the string */
+        store_string(lexer, result);
+    }
+
+    return result;
+}
+
+/*
+
+=item C<char *
+dupstr(lexer_state * const lexer, char const * const source)>
 
 The C89 standard does not define a strdup() in the C library,
 so define our own strdup. Function names beginning with "str"
@@ -88,74 +209,8 @@ does: duplicate a string.
 
 */
 char *
-dupstr(lexer_state * const lexer, char * source) {
+dupstr(lexer_state * const lexer, char * const source) {
     return dupstrn(lexer, source, strlen(source));
-}
-
-static void
-store_string(lexer_state * const lexer, char * const str) {
-    /*
-    PMC *symtable = pmc_new(lexer->interp, enum_class_Hash);
-    PMC *dummy = pmc_new(lexer->interp, enum_class_ResizablePMCArray);
-    symbol *sym = new_symbol("hi", PMC_TYPE);
-    symbol *test;
-    VTABLE_set_pmc_keyed_str(lexer->interp, symtable,
-    string_from_cstring(lexer->interp, "hi", 2), dummy);
-    VTABLE_push_pmc(lexer->interp, dummy, (PMC *)sym);
-    test = (symbol *)VTABLE_pop_pmc(lexer->interp, dummy);
-    printf("name: %s\n", test->name);
-    */
-    /*
-    PMC *yesh = pmc_new(lexer->interp, enum_class_Integer);
-
-    STRING *s = string_from_cstring(lexer->interp, str, strlen(str));
-    if (lexer->obj_cache.str_cache == NULL)
-        lexer->obj_cache.str_cache = pmc_new(lexer->interp, enum_class_Hash);
-    VTABLE_set_pmc_keyed_str(lexer->interp, lexer->obj_cache.str_cache, s, (PMC *)s);
-    */
-
-}
-
-static char *
-find_string(lexer_state * const lexer, char * const str) {
-
-    /* this doesn't seem to work :-/ probably implement own hash. lean and mean.
-    PMC *dummy = VTABLE_get_pmc_keyed_str(lexer->interp, lexer->obj_cache.str_cache,
-                                        string_from_cstring(lexer->interp, str, strlen(str)));
-    if (dummy) {
-        STRING *ret = (STRING *)dummy;
-        char *s = string_to_cstring(lexer->interp, ret);
-        printf("finding string: [%s]\n", s);
-        return s;
-    }*/
-    return NULL;
-}
-
-/*
-
-=item C<char *
-dupstrn(char const * const source, size_t num_chars)>
-
-See dupstr, except that this version takes the number of characters to be
-copied. Easy for copying a string except the quotes, for instance.
-
-=cut
-
-*/
-char *
-dupstrn(lexer_state * const lexer, char * source, size_t num_chars) {
-    char *result = find_string(lexer, source);
-
-    if (result == NULL) { /* not found */
-        result = (char *)calloc(num_chars + 1, sizeof (char));
-        assert(result);
-        /* only copy num_chars characters */
-        strncpy(result, source, num_chars);
-        /* cache the string */
-        store_string(lexer, result);
-    }
-
-    return result;
 }
 
 

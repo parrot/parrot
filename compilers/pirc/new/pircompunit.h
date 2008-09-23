@@ -258,27 +258,27 @@ struct label;
 
 /* a sub */
 typedef struct subroutine {
-    key               *name_space;    /* this sub's namespace */
-    char              *sub_name;      /* this sub's name */
-    char              *outer_sub;     /* this sub's outer subroutine, if any */
-    char              *lex_id;        /* this sub's lex_id, if any */
-    char              *vtable_method; /* name of vtable method that this sub's overriding, if any */
-    char              *instanceof;    /* XXX document this XXX */
-    int                flags;         /* this sub's flags */
+    key                *name_space;    /* this sub's namespace */
+    char               *sub_name;      /* this sub's name */
+    char               *outer_sub;     /* this sub's outer subroutine, if any */
+    char               *lex_id;        /* this sub's lex_id, if any */
+    char               *vtable_method; /* name of vtable method that this sub's overriding if any */
+    char               *instanceof;    /* XXX document this XXX */
+    int                 flags;         /* this sub's flags */
 
     /* XXX the whole multi stuff must be implemented */
-    char             **multi_types;   /* data types of parameters if this is a multi sub */
+    char              **multi_types;   /* data types of parameters if this is a multi sub */
 
-    target            *parameters;    /* parameters of this sub */
-    instruction       *statements;    /* statements of this sub */
+    target             *parameters;    /* parameters of this sub */
+    instruction        *statements;    /* statements of this sub */
 
-    struct symbol     *symbols;       /* symbol table for this subroutine */
-    struct pir_reg    *registers[4];  /* used PIR registers in this sub (1 list for each type) */
-    unsigned           regs_used[4];  /* number of PASM registers allocated for this sub */
+    struct symbol      *symbols;       /* symbol table for this subroutine */
+    struct pir_reg     *registers[4];  /* used PIR registers in this sub (1 list for each type) */
+    unsigned            regs_used[4];  /* number of PASM registers allocated for this sub */
 
-    struct label      *labels;        /* local labels */
+    struct local_label *labels;        /* local labels */
 
-    struct subroutine *next;          /* pointer to next subroutine in the list */
+    struct subroutine  *next;          /* pointer to next subroutine in the list */
 
 } subroutine;
 

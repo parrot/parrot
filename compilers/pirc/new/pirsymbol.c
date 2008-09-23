@@ -79,24 +79,27 @@ next_register(struct lexer_state * const lexer, pir_type type) {
 }
 
 
-/* experimental code */
+/*
 
-#include "parrot/parrot.h"
+=item C<static unsigned
+get_hashcode(char * const str)>
 
-void
-init_symbol_table(struct lexer_state * const lexer) {
-    PMC *symtable = pmc_new(lexer->interp, enum_class_Hash);
-    PMC *dummy = pmc_new(lexer->interp, enum_class_ResizablePMCArray);
-    symbol *sym = new_symbol("hi", PMC_TYPE);
-    symbol *test;
-    VTABLE_set_pmc_keyed_str(lexer->interp, symtable,
-    string_from_cstring(lexer->interp, "hi", 2), dummy);
-    VTABLE_push_pmc(lexer->interp, dummy, (PMC *)sym);
-    test = (symbol *)VTABLE_pop_pmc(lexer->interp, dummy);
-    printf("name: %s\n", test->name);
+Calculate the hash code for the string C<str>.
+This code is taken from IMCC.
+
+=cut
+
+*/
+unsigned
+get_hashcode(char * const str) {
+    unsigned long  key = 0;
+    char const    *s;
+
+    for (s = str; *s ; s++)
+        key = key * 65599 + *s;
+
+    return key;
 }
-
-/* end experimental code */
 
 /*
 
@@ -135,12 +138,10 @@ will have been given a PASM register.
 
 */
 void
-declare_local(struct lexer_state * const lexer, pir_type type, symbol *list) {
+declare_local(struct lexer_state * const lexer, pir_type type, symbol * const list) {
     symbol *iter = list;
 
-    /* bad implementation, but best i can come up with now. */
-
-    /* set the type on each symbol */
+    /* go through the list and set the type on each symbol */
     while (iter != NULL) {
         iter->type  = type;
         iter        = iter->next;
@@ -346,7 +347,7 @@ color_reg(struct lexer_state * const lexer, pir_type type, int regno) {
     pir_reg *reg = find_register(lexer, type, regno);
 
     /* was the register already used, then it was already colored by
-     * the register allocator.
+     * the register allocator; in that case that PASM register is returned.
      */
     if (reg)
         return reg->color;
@@ -358,17 +359,17 @@ color_reg(struct lexer_state * const lexer, pir_type type, int regno) {
 
 /*
 
-=item C<static global_ident *
-new_global_ident(char * const name)>
+=item C<static global_label *
+new_global_label(char * const name)>
 
-Constructor to create a new global_ident object.
+Constructor to create a new global_label object.
 
 =cut
 
 */
-static global_ident *
-new_global_ident(char * const name) {
-    global_ident *glob = (global_ident *)malloc(sizeof (global_ident));
+static global_label *
+new_global_label(char * const name) {
+    global_label *glob = (global_label *)malloc(sizeof (global_label));
     assert(glob);
     glob->name     = name;
     glob->next     = NULL;
@@ -379,7 +380,7 @@ new_global_ident(char * const name) {
 /*
 
 =item C<void
-store_global_ident(struct lexer_state * const lexer, char * const name)>
+store_global_label(struct lexer_state * const lexer, char * const name)>
 
 Store the global identifier C<name>.
 
@@ -387,10 +388,12 @@ Store the global identifier C<name>.
 
 */
 void
-store_global_ident(struct lexer_state * const lexer, char * const name) {
-    global_ident *glob = new_global_ident(name);
+store_global_label(struct lexer_state * const lexer, char * const name) {
+    global_label *glob = new_global_label(name);
 
+    /*
     fprintf(stderr, "storing global label %s\n", name);
+    */
     /* store the global in the lexer */
     glob->next     = lexer->globals;
     lexer->globals = glob;
@@ -398,8 +401,8 @@ store_global_ident(struct lexer_state * const lexer, char * const name) {
 
 /*
 
-=item C<global_ident *
-find_global_ident(struct lexer_state *lexer, char * const name)>
+=item C<global_label *
+find_global_label(struct lexer_state *lexer, char * const name)>
 
 Find the global identifier C<name>. If no such identifier was found,
 then NULL is returned.
@@ -407,15 +410,15 @@ then NULL is returned.
 =cut
 
 */
-global_ident *
-find_global_ident(struct lexer_state * const lexer, char * const name) {
-    global_ident *iter = lexer->globals;
+global_label *
+find_global_label(struct lexer_state * const lexer, char * const name) {
+    global_label *iter = lexer->globals;
+    /*
     fprintf(stderr, "finding global label %s\n", name);
+    */
     while (iter) {
-        if (STREQ(iter->name, name)) {
-            printf("found\n");
+        if (STREQ(iter->name, name))
             return iter;
-        }
         iter = iter->next;
     }
     return NULL;
@@ -433,9 +436,8 @@ Store the globally defined constant C<c> in the constant table.
 */
 void
 store_global_const(struct lexer_state * const lexer, constant * const c) {
-    if (lexer->constants)
-        c->next = lexer->constants;
-
+    /* store at the beginning of the list */
+    c->next = lexer->constants;
     lexer->constants = c;
 }
 
@@ -473,9 +475,9 @@ location in the source to which any branching instruction can jump to.
 =cut
 
 */
-static label *
-new_label(char * const name, unsigned offset) {
-    label *l = (label *)malloc(sizeof (label));
+static local_label *
+new_local_label(char * const name, unsigned offset) {
+    local_label *l = (local_label *)malloc(sizeof (local_label));
     assert(l);
     l->name   = name;
     l->offset = offset;
@@ -493,7 +495,7 @@ store_local_label(struct lexer_state * const lexer, char * const labelname, unsi
 */
 void
 store_local_label(struct lexer_state * const lexer, char * const labelname, unsigned offset) {
-    label *l = new_label(labelname, offset);
+    local_label *l = new_local_label(labelname, offset);
 
     l->next = CURRENT_SUB(lexer)->labels;
     CURRENT_SUB(lexer)->labels = l;
@@ -512,7 +514,7 @@ a label, an error is emitted, otherwise, the offset of that label is returned.
 */
 unsigned
 find_local_label(struct lexer_state * const lexer, char * const labelname) {
-    label *iter = CURRENT_SUB(lexer)->labels;
+    local_label *iter = CURRENT_SUB(lexer)->labels;
 
     while (iter) {
         if (STREQ(iter->name, labelname))

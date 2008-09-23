@@ -23,7 +23,6 @@
 /* a cache stores can store objects to reuse; for now, only for invocation objects */
 typedef struct cache {
     invocation inv_cache;
-    PMC *str_cache;
 
 } cache;
 
@@ -47,12 +46,13 @@ typedef struct lexer_state {
 
     unsigned       instr_counter;  /* to assign an index to each instruction */
 
-    global_ident  *globals;        /* global identifiers */
+    global_label  *globals;        /* global identifiers */
     constant      *constants;      /* global constants */
 
     Interp        *interp;         /* parrot interpreter */
 
     cache          obj_cache;      /* cache for all sorts of objects to save memory allocations */
+    hashtable      strings;        /* hashtable containing pointers to all parsed strings */
 
 } lexer_state;
 
@@ -65,8 +65,9 @@ void pirerror(lexer_state * const lexer, char const * const message, ...);
 
 void release_resources(lexer_state *lexer);
 
-char *dupstr(lexer_state * const lexer, char * str);
-char *dupstrn(lexer_state * const lexer, char * str, size_t numchars);
+char *dupstr(lexer_state * const lexer, char * const str);
+
+char *dupstrn(lexer_state * const lexer, char * const str, size_t numchars);
 
 #endif /* PARROT_PIR_PIRCOMPILER_H_GUARD */
 

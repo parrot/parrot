@@ -33,12 +33,11 @@ the following is needed:
 
 =over 4
 
-=item * an easy way to decide whether an instruction can jump; in that
-case this instruction marks the end of a C<basic block>. Such
-instructions are: C<invokecc>, C<branch>, C<get_results> etc.
-Labeled instructions must also be marked as such, as they can be jumped
-to, and indicate the start of a C<basic block>. Can this flow
-information be retrieved through a Parrot function?
+=item * create a datastructure that stores basic blocks; a basic block
+is a block of instructions that will always be executed consecutively;
+no jumps to or from within this block will be done, except of course
+to the first instruction in the block, and from the last instruction
+in the block. Registers within such a block can safely be reorganized.
 
 =item * once we know what the basic blocks are, a linear scan register
 allocation implementation can be implemented. This is more efficient than
@@ -318,7 +317,7 @@ new_subr(struct lexer_state *lexer, char * const subname) {
     }
 
     /* store the subroutine identifier as a global label */
-    store_global_ident(lexer, subname);
+    store_global_label(lexer, subname);
 
     /* vanilla register allocator is reset for each sub */
     reset_register_allocator(lexer);
@@ -372,15 +371,25 @@ new_statement(struct lexer_state * const lexer, char * const opname) {
      */
     instr->offset = lexer->instr_counter++;
 
+    /*
     if (CURRENT_INSTRUCTION(lexer) == NULL) {
         CURRENT_INSTRUCTION(lexer) = instr;
-        instr->next = instr; /* set next field to itself, to make the list circular linked */
+        instr->next = instr;
     }
-    else { /* there is at least 1 other instruction */
+    else {
         instr->next = CURRENT_INSTRUCTION(lexer)->next;
         CURRENT_INSTRUCTION(lexer)->next = instr;
         CURRENT_INSTRUCTION(lexer)       = instr;
     }
+    */
+
+    if (CURRENT_INSTRUCTION(lexer) == NULL)
+        instr->next = instr;
+    else {
+        instr->next = CURRENT_INSTRUCTION(lexer)->next;
+        CURRENT_INSTRUCTION(lexer)->next = instr;
+    }
+    CURRENT_INSTRUCTION(lexer) = instr;
 }
 
 /*
@@ -443,15 +452,7 @@ int
 targets_equal(target const * const left, target const * const right) {
     /* if left has a name, it must equal right->name */
 
-    /*
-    fprintf(stderr, "targets_equal()\n");
-    */
     if (TEST_FLAG(left->flags, TARGET_FLAG_IS_REG) && TEST_FLAG(right->flags, TARGET_FLAG_IS_REG)) {
-     /*
-     printf("targets_equal():\n");
-     printf("left type: %d, reg: %d, color: %d\n", left->type, target_regno(left), left->color);
-     printf("right type: %d, reg: %d, color: %d\n", right->type, target_regno(right), right->color);
-     */
         if ((left->type == right->type)
         &&  (target_regno(left) == target_regno(right)
         &&  (left->color == right->color)))
@@ -461,14 +462,7 @@ targets_equal(target const * const left, target const * const right) {
     else {
         if (target_name(left) && target_name(right) && STREQ(target_name(left), target_name(right)))
             return TRUE;
-
     }
-
-
-    /* if there's no name, then types and register numbers must be equal */
-      /*
-    fprintf(stderr, "targets_equal(): false\n");
-    */
     return FALSE;
 }
 
@@ -1798,7 +1792,7 @@ write_signature(expression * const iter, char *instr_writer) {
                 *instr_writer++ = '_';
                 *instr_writer++ = 'k';
                 if ((iter->expr.t->key->expr->type == EXPR_TARGET)
-                     && (iter->expr.t->key->expr->expr.t->type == PMC_TYPE)) {
+                    && (iter->expr.t->key->expr->expr.t->type == PMC_TYPE)) {
                     /* the key is a target, and its type is a PMC. In that case, do not
                      * print the signature; 'kp' is not valid.
                      */
@@ -1811,10 +1805,7 @@ write_signature(expression * const iter, char *instr_writer) {
             *instr_writer++ = type_codes[iter->expr.c->type];
             *instr_writer++ = 'c';
             break;
-        case EXPR_IDENT:
-         /* is this type needed anymore? I think at this point you can
-          * assume it's a label a.k.a. address a.k.a. integer constant
-          */
+        case EXPR_IDENT: /* used for labels; these will be converted to (i)nteger (c)onstants*/
             *instr_writer++ = 'i';
             *instr_writer++ = 'c';
             break;
@@ -2281,6 +2272,15 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv)>
 
 Convert an C<invocation> structure into a series of instructions.
 
+XXX Problem: this function is executed during parse-time, if the AST is not
+complete yet, and not all subs are parsed yet; meaning that not all .sub
+labels are stored as global labels, which means that some the wrong instruction
+is generated (to find the sub during runtime).
+
+TODO: somehow mark the instruction as 'patch-back': after the parse all
+'patch-backs' must be checked whether they can be fixed; if not, then that's ok,
+but at least it saves runtime cycles if it can.
+
 =cut
 
 */
@@ -2302,9 +2302,9 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * inv) {
             }
             else { /* find the global label in the current file, or find it during runtime */
                 target *sub        = generate_unique_pir_reg(lexer, PMC_TYPE);
-                global_ident *glob = find_global_ident(lexer, target_name(inv->sub));
+                global_label *glob = find_global_label(lexer, target_name(inv->sub));
 
-                if (glob) { /* find it during compile-time */
+                if (glob) { /* find it during compile-time XXX S. TODO above. XXXX*/
                     /* XXX fix pmc const stuff */
                     set_instrf(lexer, "set", "%T%i", sub, glob->const_nr);
                     set_instrf(lexer, "invokecc", "%T", sub);
