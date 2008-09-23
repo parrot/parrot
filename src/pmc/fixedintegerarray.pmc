@@ -194,7 +194,7 @@ fixed sized array).
 
 */
     VTABLE INTVAL get_bool() {
-        const INTVAL size = SELF.elements();
+        const INTVAL size = SELF.get_integer();
         return (INTVAL)(size != 0);
     }
 
@@ -207,7 +207,7 @@ fixed sized array).
 */
 
     VTABLE INTVAL elements() {
-        return PMC_int_val(SELF);
+        return SELF.get_integer();
     }
 
 /*
@@ -221,7 +221,7 @@ Returns the number of elements in the array.
 */
 
     VTABLE INTVAL get_integer() {
-        return SELF.elements();
+        return PMC_int_val(SELF);
     }
 
 
@@ -320,7 +320,7 @@ Returns the Parrot string representation C<key>.
 
     VTABLE STRING *get_repr() {
         STRING *res    = CONST_STRING(INTERP, "[ ");
-        const INTVAL n = VTABLE_elements(INTERP, SELF);
+        const INTVAL n = SELF.get_integer();
         INTVAL  j;
 
         for (j = 0; j < n; ++j) {
@@ -570,7 +570,7 @@ Used to unarchive the array.
 
         SUPER(info);
 
-        n  = VTABLE_elements(INTERP, SELF);
+        n  = SELF.get_integer();
         VTABLE_push_integer(INTERP, io, n);
         ar = (INTVAL *)PMC_data(SELF);
 
