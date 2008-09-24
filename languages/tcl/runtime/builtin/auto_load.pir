@@ -34,7 +34,7 @@ filename:
   script = get_root_global ['_tcl'], 'compileTcl'
 
   # compile to PIR and put the sub in place...
-  $P1 = script($S0)
+  $P1 = script($S0, 'bsnl'=>1)
   $P1()
 
   .return('')
