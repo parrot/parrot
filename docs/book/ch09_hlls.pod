@@ -1,10 +1,10 @@
 =pod
 
-=head0 HLLs and Interoperation
+=head1 HLLs and Interoperation
 
 Z<CHP-9>
 
-=head1 Parrot HLL Environment
+=head2 Parrot HLL Environment
 
 In the earliest days Parrot was designed to be the single-purpose backend
 for the Perl 6 language. It quickly blossomed beyond that, and now has a
@@ -41,7 +41,9 @@ way they interoperate on Parrot.
 
 =head2 HLLs on Parrot
 
-=head2 Fakecutables
+=head2 Working with HLLs
+
+=head3 Fakecutables
 
 It's possible to turn compilers created with PCT into stand-alone
 executables that run without the Parrot executable. To do this, the
@@ -52,9 +54,20 @@ I<fakecutables> X<fakecutables>. They're called fake because the PBC
 is not converted to native machine code like in a normal binary
 executable file, but instead is left in original PBC format.
 
-=head2 Compiler Objects
+=head3 Compiler Objects
 
 =head2 HLL Namespaces
+
+Let's take a closer look at namespaces then we have in previous chapters.
+Namespaces, as we mentioned before can be nested to an arbitrary depth
+starting with the root namespace. In practice, the root namespace is
+not used often, and is typically left for use by the Parrot internals.
+Directly beneth the root namespace are the X<HLL Namespaces> HLL
+Namespaces, named after the HLLs that the application software is written
+in. HLL namespaces are all lower-case, such as "perl6", or "cardinal",
+or "pynie". By sticking to this convention, multiple HLL compilers can
+operate on Parrot simultaneously while staying completely oblivious to
+each other.
 
 =head2 HLL Mapping
 

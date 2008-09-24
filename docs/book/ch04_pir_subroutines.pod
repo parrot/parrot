@@ -490,6 +490,63 @@ return values just like a single line subroutine call:
 
 =head3 VTABLE Methods
 
+PMCs all subscribe to a common interface of functions called X<VTable methods>
+VTable methods. Every PMC implements the same set of methods, which perform
+very specific low level tasks on the PMC. VTables are used, for instance,
+to set and retrieve data from the PMCs, to invoke the PMC (if it's a subroutine)
+or to perform low-level arithmetic operations on the PMC. VTable methods are
+rarely called directly from PIR code, but are instead called internally to
+implement specific opcodes. For instance, the C<invoke> opcode calls the
+C<invoke> VTable method of the subroutine PMC, while the C<inc> opcode on a PMC
+calls the C<increment> VTable method on that PMC. What VTable method overrides
+do, in essence, is to allow the programmer to change the very way that Parrot
+accesses PMC data in the most fundamental way.
+
+PMCs, as we will look at more closely in later chapters, are typically
+implemented using X<PMC Script> PMC Script, a layer of syntax and macros
+over ordinary C code. A X<PMC Compiler> PMC compiler program converts the PMC
+files into C code for compilation as part of the ordinary build process. However,
+VTable methods can be written I<and overwritten> in PIR using the C<:vtable>
+flag. This technique is used most commonly when subclassing an existing PMC
+class in your PIR code to create a new data type with custom access methods.
+
+VTable methods are declared with the C<:vtable> flag:
+
+  .sub 'set_integer' :vtable
+      #set the integer value of the PMC here
+  .end
+
+in which case the subroutine must have the same name as the vtable method it
+is intended to implement. However, if you would like to name the function
+something different but still use it as a VTable method, you could add
+an additional specification to the flag:
+
+  .sub 'MySetInteger' :vtable('set_integer')
+      #set the integer value of the PMC here
+  .end
+
+VTable functions are often given the C<:method> flag also, so that they can
+be used as methods in addition to VTable methods. This means we can have
+the following:
+
+  .namespace [ "MyClass" ]
+  
+  .sub 'ToString' :vtable('get_string') :method
+      $S0 = "hello!"
+      .return($S0)
+  .end
+  
+  .namespace [ "OtherClass" ]
+  
+  .local pmc myclass = new "MyClass"
+  say myclass                # Say converts to string internally
+  S0 = myclass               # Convert to a string, store in S0
+  S0 = myclass.'ToString'()  # The same
+
+Inside a VTable method definition, the C<self> local variable contains the
+PMC on which the VTable method is invoked.
+   
+
 =head2 Coroutines
 
 Coroutines are similar to subroutines except that they have an internal
