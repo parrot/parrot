@@ -1233,6 +1233,7 @@ works to expand your knowledge with the Parrot documentation and
 source.
 
 =cut
+
 ##########################################################################
 #                              PSEUDOPOD LEGEND
 #
@@ -1312,4 +1313,9 @@ source.
 #
 #  For more information on PSEUDOPOD, write to tools@oreilly.com
 ##########################################################################
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:
 
