@@ -2,7 +2,7 @@
 
 Z<CHP-4>
 
-=head0 Subroutines
+=head1 Subroutines
 
 Z<CHP-4>
 
@@ -20,7 +20,7 @@ This is a language designed to implement other languages, and every
 language does subroutine calls a little differently. What's needed is
 a set of building blocks and tools, not a single prepackaged solution.
 
-=head1 Parrot Calling Conventions
+=head2 Parrot Calling Conventions
 
 Z<CHP-4-SECT-1>
 
@@ -34,7 +34,7 @@ registers. The calling conventions use the Continuation Passing Style
 X<Continuation Passing Style (CPS)>X<CPS (Continuation Passing Style)>
 to pass control to subroutines and back again.
 
-=head2 Subroutines
+=head3 Subroutines
 
 X<PIR (Parrot intermediate representation);subroutine calls>
 The fact that the Parrot calling conventions are clearly defined also
@@ -78,7 +78,7 @@ not only invokes the subroutine in C<P0>, but also generates a new
 return continuation in C<P1>. The called subroutine invokes this
 continuation to return control to the caller.
 
-=head2 Expanded Syntax
+=head3 Expanded Subroutine Syntax
 
 The single line subroutine call is incredibly convenient, but it isn't
 always flexible enough. So PIR also has a more verbose call syntax
@@ -104,7 +104,7 @@ the call. The C<.call> directive saves top register frames, calls
 the subroutine, and restores the top registers. The C<.result>
 directive retrieves return values from the call.
 
-=head2 Subroutine Declarations
+=head3 Subroutine Declarations
 
 X<.param directive>
 In addition to syntax for subroutine calls, PIR provides syntax for
@@ -176,9 +176,107 @@ look at the details of how the PIR code translates to PASM:
 
   $ parrot -o- factorial.pir
 
-=head1 Lexical Subroutines
+=head2 Continuation Passing Style
 
-=head1 Compilation Units Revisited
+Continuations are snapshots, a frozen image of the current execution
+state of the VM. Once we have a continuation, we can invoke it to
+return to the point where the continuation was first created. It's
+like a magical timewarp that allows the developer to arbitrarily move
+control flow back to any previous point in the program, if they want
+C<there's actually no magic involved, just a lot of interesting ideas
+and involved code>. 
+
+Continuations are not a new concept, they've been boggling the minds
+of Lisp and Scheme programmers for many years. However, despite all
+their power and flexibility, they haven't been well-utilized in most
+modern programming languages or in their underlying libraries and
+virtual machines. Parrot aims to change that: In Parrot, almost every
+control flow manipulation, including all subroutine, method, and
+coroutine calls, are performed using continuations. This mechanism
+is mostly hidden from developers who build applications on top of
+Parrot. The power and flexibility is available if people want to use
+it, but it's hidden behind more familiar constucts if not.
+
+Doing all sorts of flow control using continuations is called
+X<Continuation Passing Style;CPS> Continuation Passing Style (CPS).
+CPS allows parrot to offer all sorts of neat features, such as tail-call
+optimizations and lexical subroutines. 
+
+=head3 Creating and Using Continuations
+
+  
+=head2 Lexical Subroutines
+
+X<Lexical Subroutines>
+As we've mentioned above, Parrot offers support for lexical subroutines.
+What this means is that we can define a subroutine by name inside a
+larger subroutine, and our "inner" subroutine is only visible and callable
+from the "outer" subroutine. Plus, the "inner" subroutine inherits all the
+lexical variables from the outer subroutine, but is able to define it's
+own lexical variables that cannot be seen or modified by the outer subroutine.
+
+=head3 Scope and HLLs
+
+Let us diverge for a minute and start looking forward at the idea of X<High
+Level Languages;HLL> High Level Languages (HLLs) such as Perl, Python, and
+Ruby. All of these languages allow nested scopes, or blocks within blocks
+that can have their own lexical variables. Let's look back at the C programming
+language, where this kind of construct is not uncommon:
+
+  {
+      int x = 0;
+      int y = 1;
+      {
+          int z = 2;
+          // x, y, and z are all visible here
+      }
+      // only x and y are visible here
+  {
+
+The code above illustrates this idea perfectly without having to get into a
+detailed and convoluted example: In the inner block, we define the variable
+C<z> which is only visible inside that block. The outer block has no
+knowledge of C<z> at all. However, the inner block does have access to the
+variables C<x> and C<y>.
+
+=head3 PIR Scoping
+
+In PIR, there is only one structure that supports scoping like this: the
+subroutine N<and objects that inherit from subroutines, such as methods,
+coroutines, and multisubs, which we will discuss later>. There are no blocks
+in PIR that have their own scope, we have only subroutines. Fortunately,
+we can use lexical subroutines to simulate this behavior that HLLs require:
+
+  .sub 'MyOuter'
+      .lex int x
+      .lex int y
+      'MyInner'()
+      # only x and y are visible here
+  .end
+  
+  .sub 'MyInner' :outer('MyOuter')
+      .lex int z
+      #x, y, and z are all visible here
+  .end
+
+=head3 Declaring and Using Nested Subroutines
+
+As we have seen above, we can declare a new subroutine to be a nested inner
+subroutine of an existing outer subroutine using the C<:outer> flag. The
+outer flag is used to specify the name of the outer subroutine. Where there
+may be multiple subroutines with the same name N<such is the case with
+multisubs, which we will discuss soon>, we can use the C<:lexid> flag on the
+outer subroutine to give it a different--and unique--name that the lexical
+subroutines can reference in their C<:outer> declarations. Within lexical
+subroutines, the C<.lex> command defines a local variable that follows these
+scoping rules. 
+
+Sound confusing? It's not so bad. The basics are that we use C<:outer> to
+define a lexically-scoped subroutine, and we use C<.lex> to define lexically
+scoped variables in those subroutines. It's only when things start getting
+crazy with multisubs that we need to worry about any more details then that.
+
+=head2 Compilation Units Revisited
 
 Z<CHP-4-SECT-1.2>
 
@@ -251,7 +349,7 @@ up your code. Parrot does it already.
 =end sidebar
 
 
-=head2 PASM Subroutines
+=head3 PASM Subroutines
 
 Z<CHP-4-SECT-1.1>
 
@@ -273,7 +371,7 @@ entry labels inside C<.emit> blocks have to be global labels:
       ret
   .eom
 
-=head1 Methods
+=head2 Methods
 
 Z<CHP-4-SECT-2>
 
@@ -286,7 +384,7 @@ object-oriented programming. These calls follow the Parrot
 calling conventions as well. First we want to discuss I<namespaces>
 in Parrot.
 
-=head2 Namespaces
+=head3 Namespaces
 
 Z<CHP-4-SECT-2>
 
@@ -331,7 +429,7 @@ global variables from it using the following functions:
 In the examples above, of course, C<$S0> contains the string name of the
 global variable or function from the namespace to find.
 
-=head2 Method Syntax
+=head3 Method Syntax
 
 Z<CHP-4-SECT-2>
 
@@ -389,12 +487,62 @@ return values just like a single line subroutine call:
 
   (res1, res2) = obj."method"(arg1, arg2)
 
-=head2 VTABLE Methods
+=head3 VTABLE Methods
 
-=head1 Coroutines
+=head2 Coroutines
 
-=head1 Multiple Dispatch
+Coroutines are similar to subroutines except that they have an internal
+notion of I<state>. Coroutines, in addition to performing a normal
+C<.return> to return control flow back to the caller and destroy the
+lexical environment of the subroutine, may also perform a
+C<.yield>. C<.yield> returns a value to the caller like C<.return> can,
+but it does not destroy the lexical state of the coroutine. The next time
+the coroutine is called, it continues execution from the point of the
+last C<.yield>, not at the beginning of the coroutine.
 
+Coroutines, in essence, allow the programmer to manually simulate multiple
+threads of concurrent execution, something that is normally handled
+automatically and invisible at the hardware level.
+
+=head3 Defining Coroutines
+
+Coroutines are defined like any ordinary subroutine. They do not require
+any special flag or any special syntax to mark them as being a
+coroutine. However, what sets them apart is the use of the C<.yield>
+directive. C<.yield> plays several roles:
+
+=over 4
+
+=item* Identifies coroutines
+
+When Parrot sees a yield, it knows to create a coroutine PMC object
+instead of a Subroutine one.
+
+=item* Creates a continuation
+
+Continuations, as we will see in more detail later, allow us to continue
+execution at the point of the continuation later. It's like a snapshot of
+the current execution environment. C<.yield> creates a continuation in
+the coroutine and stores the continuation object in the coroutine object
+or later resuming from the point of the C<.yield>.
+
+=item* Returns a value
+
+C<.yield> can return a value N<or many values, or no values> to the caller
+It is basically the same as a C<.return> in this regard.
+
+=back
+
+=head2 Multiple Dispatch
+
+Multiple dispatch is when there are multiple subroutines in a single
+namespace with the same name. These functions must differ, however, in
+their parameter list, or "signature". All subs with the same name get
+put into a single PMC called a MultiSub. The MultiSub is like a list
+of subroutines. When the multisub is invoked, the MultiSub PMC object
+searches through the list of subroutines and searches for the one with
+the closest matching signature. The best match is the sub that gets
+invoked.
 
 =cut
 
