@@ -95,6 +95,19 @@
     setkeyword(keywords, 'TRON')
     set_global 'keywords', keywords
 
+    .local pmc predefs
+    predefs = new 'Hash'
+    setpredef(predefs, "NEW", "new")
+    setpredef(predefs, "LEN", "len")
+    setpredef(predefs, "LEFT$", "left")
+    setpredef(predefs, "RIGHT$", "right")
+    setpredef(predefs, "MID$", "mid")
+    setpredef(predefs, "COMPLEX", "complex")
+    setpredef(predefs, "SIN", "sin")
+    setpredef(predefs, "COS", "cos")
+    setpredef(predefs, "SQR", "sqr")
+    set_global 'predefs', predefs
+
     .local pmc program
     program = new ['Program']
 
@@ -145,6 +158,26 @@ start:
     exit 1
 good:
     keywords [key] = func
+.end
+
+#-----------------------------------------------------------------------
+.sub setpredef
+    .param pmc predefs
+    .param string key
+    .param string name
+
+    .local string funcname
+    funcname = concat 'predef_', name
+
+    .local pmc func
+    func = get_global ['Runner'], funcname
+    $I0 = defined func
+    if $I0 goto good
+    print funcname
+    say ': no func!'
+    exit 1
+good:
+    predefs [key] = func
 .end
 
 #-----------------------------------------------------------------------
@@ -293,6 +326,202 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
+.sub predef_new :method
+    .param pmc tokenizer
+
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    $P1 = self.get_1_arg(tokenizer)
+    $S1 = $P1
+    #print "NEW: "
+    #say $S1
+
+    $P2 = new $S1
+    .return($P2)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
+.sub predef_len :method
+    .param pmc tokenizer
+
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    null $P5
+    $P5 = self.get_1_arg(tokenizer)
+
+    $S5 = $P5
+    $I0 = length $S5
+    $P6 = new 'Integer'
+    $P6 = $I0
+    .return($P6)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
+.sub predef_left :method
+    .param pmc tokenizer
+
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    null $P5
+    null $P6
+    ($P5, $P6) = self.get_2_args(tokenizer)
+
+    $S0 = $P5
+    $I0 = $P6
+    $S1 = substr $S0, 0, $I0
+    $P7 = new 'String'
+    $P7 = $S1
+    .return($P7)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
+.sub predef_right :method
+    .param pmc tokenizer
+
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    null $P5
+    null $P6
+    ($P5, $P6) = self.get_2_args(tokenizer)
+
+    $S0 = $P5
+    $I0 = $P6
+    $I1 = $S0
+    $I0 = $I1 - $I0
+    $S1 = substr $S0, $I0
+    $P7 = new 'String'
+    $P7 = $S1
+    .return($P7)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
+.sub predef_mid :method
+    .param pmc tokenizer
+
+    $P0 = tokenizer.get()
+    ne $P0, '(', fail
+    $P1 = self.get_args(tokenizer)
+    $I0 = $P1
+    lt $I0, 2, fail
+    gt $I0, 3, fail
+    $S0 = $P1[0]
+    $I1 = $P1[1]
+    dec $I1
+    lt $I0, 3, mid_nolen
+    $I2 = $P1[2]
+    $S1 = substr $S0, $I1, $I2
+    goto mid_result
+mid_nolen:
+    $S1 = substr $S0, $I1
+mid_result:
+    $P2 = new 'String'
+    $P2 = $S1
+    .return($P2)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
+.sub predef_complex :method
+    .param pmc tokenizer
+
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    null $P5
+    null $P6
+    ($P5, $P6) = self.get_2_args(tokenizer)
+    $P7 = new 'Complex'
+    $N5 = $P5
+    $N6 = $P6
+    $P7[0] = $N5
+    $P7[1] = $N6
+    .return($P7)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
+.sub predef_sin :method
+    .param pmc tokenizer
+
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    null $P5
+    $P5 = self.get_1_arg(tokenizer)
+    $I0 = isa $P5, 'Integer'
+    unless $I0 goto do_sin
+    $I0 = $P5
+    null $P5
+    $P5 = new 'Float'
+    $N0 = $I0
+    $P5 = $N0
+do_sin:
+    $P9 = $P5.sin()
+    .return($P9)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
+.sub predef_cos :method
+    .param pmc tokenizer
+
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    null $P5
+    $P5 = self.get_1_arg(tokenizer)
+    $I0 = isa $P5, 'Integer'
+    #print 'Integer: '
+    #say $I0
+    unless $I0 goto do_cos
+    $I0 = $P5
+    null $P5
+    $P5 = new 'Float'
+    $N0 = $I0
+    $P5 = $N0
+do_cos:
+    $P9 = $P5.cos()
+    .return($P9)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
+.sub predef_sqr :method
+    .param pmc tokenizer
+
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    null $P5
+    $P5 = self.evaluate(tokenizer)
+    null $P1
+    $P1 = tokenizer.get()
+    ne $P1, ')', fail
+    #say $P5
+
+    $I0 = isa $P5, 'Integer'
+    unless $I0 goto do_sqr
+    $I0 = $P5
+    null $P5
+    $P5 = new 'Float'
+    $N0 = $I0
+    $P5 = $N0
+do_sqr:
+    $P9 = $P5.sqrt()
+    .return($P9)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
 .sub eval_base :method
     .param pmc tokenizer
     .param pmc token :optional
@@ -326,15 +555,17 @@ check:
     #print $S0
 
 # Some predefined functions:
-    eq $S0, 'NEW', new_op
-    eq $S0, 'COMPLEX', func_complex
-    eq $S0, 'COS', func_cos
-    eq $S0, 'SIN', func_sin
-    eq $S0, 'SQR', func_sqr
-    eq $S0, 'LEN', func_len
-    eq $S0, 'LEFT$', func_left
-    eq $S0, 'RIGHT$', func_right
-    eq $S0, 'MID$', func_mid
+    .local pmc predefs
+    predefs = get_hll_global 'predefs'
+    .local pmc func
+    func = predefs[$S0]
+    $I0 = defined func
+    unless $I0 goto no_predef
+
+    $P0 = self.func(tokenizer)
+    .return($P0)
+
+no_predef:
 
     #say $S0
     .local pmc var
@@ -396,28 +627,6 @@ getvar:
     tokenizer.back()
     .return(var)
 
-new_op:
-    $P1 = tokenizer.get()
-    $I0 = defined $P1
-    unless $I0 goto fail
-    $I0 = isa $P1, 'Literal'
-    if $I0 goto getit
-    $I0 = isa $P1, 'String'
-    unless $I0 goto fail
-    $S0 = $P1
-    upcase $S0
-    $P1 = get_global $S0
-    $I0 = defined $P1
-    if $I0 goto getit
-    goto fail
-
-getit:
-    $S1 = $P1
-    #print "NEW: "
-    #say $S1
-
-    $P1 = new $S1
-    .return($P1)
 dotted:
     $P3 = tokenizer.get()
     $P4 = tokenizer.get()
@@ -455,153 +664,6 @@ parenexp:
     token = tokenizer.get()
     ne token, ')', fail
     .return($P1)
-
-func_len:
-    null $P1
-    $P1 = tokenizer.get()
-    ne $P1, '(', fail
-    null $P5
-    $P5 = self.get_1_arg(tokenizer)
-
-    $S5 = $P5
-    $I0 = length $S5
-    $P6 = new 'Integer'
-    $P6 = $I0
-    .return($P6)
-
-func_left:
-    null $P1
-    $P1 = tokenizer.get()
-    ne $P1, '(', fail
-    null $P5
-    null $P6
-    ($P5, $P6) = self.get_2_args(tokenizer)
-
-    $S0 = $P5
-    $I0 = $P6
-    $S1 = substr $S0, 0, $I0
-    $P7 = new 'String'
-    $P7 = $S1
-    .return($P7)
-
-func_right:
-    null $P1
-    $P1 = tokenizer.get()
-    ne $P1, '(', fail
-    null $P5
-    null $P6
-    ($P5, $P6) = self.get_2_args(tokenizer)
-
-    $S0 = $P5
-    $I0 = $P6
-    $I1 = $S0
-    $I0 = $I1 - $I0
-    $S1 = substr $S0, $I0
-    $P7 = new 'String'
-    $P7 = $S1
-    .return($P7)
-
-func_mid:
-    null $P1
-    $P1 = tokenizer.get()
-    ne $P1, '(', fail
-    $P5 = self.get_args(tokenizer)
-    $I0 = $P5
-    lt $I0, 2, fail
-    gt $I0, 3, fail
-    $S0 = $P5[0]
-    $I1 = $P5[1]
-    dec $I1
-    lt $I0, 3, mid_nolen
-    $I2 = $P5[2]
-    $S1 = substr $S0, $I1, $I2
-    goto mid_result
-mid_nolen:
-    $S1 = substr $S0, $I1
-mid_result:
-    $P7 = new 'String'
-    $P7 = $S1
-    .return($P7)
-
-func_complex:
-    null $P1
-    $P1 = tokenizer.get()
-    ne $P1, '(', fail
-    null $P5
-    null $P6
-    ($P5, $P6) = self.get_2_args(tokenizer)
-    $P7 = new 'Complex'
-    $N5 = $P5
-    $N6 = $P6
-    $P7[0] = $N5
-    $P7[1] = $N6
-    .return($P7)
-
-func_cos:
-    null $P1
-    $P1 = tokenizer.get()
-    ne $P1, '(', fail
-    null $P5
-    $P5 = self.get_1_arg(tokenizer)
-    $I0 = isa $P5, 'Integer'
-    #print 'Integer: '
-    #say $I0
-    unless $I0 goto do_cos
-    $I0 = $P5
-    null $P5
-    $P5 = new 'Float'
-    $N0 = $I0
-    $P5 = $N0
-do_cos:
-    $P9 = $P5.cos()
-    .return($P9)
-
-func_sin:
-    null $P1
-    $P1 = tokenizer.get()
-    ne $P1, '(', fail
-    null $P5
-    $P5 = self.get_1_arg(tokenizer)
-    $I0 = isa $P5, 'Integer'
-    #print 'Integer: '
-    #say $I0
-    unless $I0 goto do_sin
-    $I0 = $P5
-    null $P5
-    $P5 = new 'Float'
-    $N0 = $I0
-    $P5 = $N0
-do_sin:
-    $P9 = $P5.sin()
-
-    #say $P9
-    .return($P9)
-
-func_sqr:
-    null $P1
-    $P1 = tokenizer.get()
-    ne $P1, '(', fail
-    null $P5
-    $P5 = self.evaluate(tokenizer)
-    null $P1
-    $P1 = tokenizer.get()
-    ne $P1, ')', fail
-    #say $P5
-
-    $I0 = isa $P5, 'Integer'
-    #print 'Integer: '
-    #say $I0
-    unless $I0 goto do_sqr
-    $I0 = $P5
-    null $P5
-    $P5 = new 'Float'
-    $N0 = $I0
-    $P5 = $N0
-do_sqr:
-    $P9 = $P5.sqrt()
-
-    #say $P9
-    .return($P9)
 
 fail:
     SyntaxError()

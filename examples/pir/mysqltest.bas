@@ -10,7 +10,7 @@
 70 rem +----------------------------------------------------------------------+
 80 rem
 100 load "Mysql.pbc",b
-110 my = new "Mysql"
+110 my = new("Mysql")
 120 a = my.connect("localhost","parrot","baDworD","parrot")
 130 q = my.query("select * from hello")
 140 result = my.use_result()
