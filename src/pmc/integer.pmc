@@ -415,7 +415,7 @@ MMD_Complex: {
     }
 MMD_DEFAULT: {
     VTABLE_set_number_native(INTERP, SELF,
-        PMC_int_val(SELF) + VTABLE_get_number(INTERP, value));
+        SELF.get_integer() + VTABLE_get_number(INTERP, value));
     }
 }
 
