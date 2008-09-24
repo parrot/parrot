@@ -107,6 +107,8 @@ rule boolean {
     <.wb>
 }
 
+token exprws { \s* } # used in a manual override of optable ws in code
+
 rule nested { '(' <expression> ')' }
 
 token number { <scientific> | <float> | <integer> }

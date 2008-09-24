@@ -248,7 +248,6 @@ env_loop_done:
   $P1 = new 'TclInt'
   $P1 = 0
   store_global 'compiled_num', $P1
-
 .end
 
 .HLL 'parrot', ''
@@ -271,6 +270,16 @@ env_loop_done:
   slash = $P1['slash']
   $P2 = $P1['slash']
   set_root_global ['_tcl'], 'slash', $P2
+.end
+
+.HLL 'parrot', ''
+.namespace []
+
+# Override whitespace parsing in expression's optable
+.sub hack_grammar :load :anon
+  $P0 = get_hll_global ['TclExpr::Grammar'], '$optable'
+  $P1 = get_hll_global ['TclExpr::Grammar'], 'exprws'
+  setattribute $P0, '&!ws', $P1
 .end
 
 # Local Variables:

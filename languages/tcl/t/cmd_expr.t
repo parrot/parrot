@@ -393,5 +393,5 @@ eval_is {expr -2147483648} -2147483648 {expr-46.17} $TODO
 eval_is {expr 9223372036854775808} 9223372036854775808 {expr-46.19} $TODO
 
 eval_is {expr {(!
-0)}} 1 {newline in parenthetical expressions ok} {TODO {needed for tcltest}}
+0)}} 1 {newline in parenthetical expressions ok}
 
