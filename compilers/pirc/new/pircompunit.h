@@ -168,7 +168,6 @@ typedef struct key {
 
     struct key *next;      /* in ["x";"y"], there's 2 key nodes; 1 for "x", 1 for "y",
                               linked by "next" */
-
 } key;
 
 
@@ -250,7 +249,40 @@ typedef struct instruction {
     struct instruction *next;
 } instruction;
 
+/* initial size of a hashtable; note that this is a prime number.
+ * XXX how to define next prime number, for when we want to resize the hashtable?
+ * maybe implement a simple algorithm; shouldn't happen too often anyway.
+ */
+#define HASHTABLE_SIZE_INIT     113
 
+
+/* a hashtable bucket for storing something */
+typedef struct bucket {
+    union __bucket_union {
+        char                *str;
+        struct symbol       *sym;
+        struct local_label  *loc;
+        struct global_label *glob;
+        struct constant     *cons;
+    } u;
+
+    struct bucket *next;
+
+} bucket;
+
+/* accessors for the bucket union */
+#define bucket_string(B)    B->u.str
+#define bucket_symbol(B)    B->u.sym
+#define bucket_local(B)     B->u.loc
+#define bucket_global(B)    B->u.glob
+#define bucket_constant(B)  B->u.cons
+
+typedef struct hashtable {
+    bucket   **contents;
+    unsigned   size;
+    unsigned   obj_count;
+
+} hashtable;
 
 /* forward declaration of structs */
 struct symbol;
@@ -272,7 +304,8 @@ typedef struct subroutine {
     target             *parameters;    /* parameters of this sub */
     instruction        *statements;    /* statements of this sub */
 
-    struct symbol      *symbols;       /* symbol table for this subroutine */
+    hashtable           symbols;
+
     struct pir_reg     *registers[4];  /* used PIR registers in this sub (1 list for each type) */
     unsigned            regs_used[4];  /* number of PASM registers allocated for this sub */
 
@@ -282,7 +315,7 @@ typedef struct subroutine {
 
 } subroutine;
 
-/* make code a bit more readable */
+/* accessors for current sub and current instruction; makes code a bit more readable */
 #define CURRENT_SUB(L)          L->subs
 #define CURRENT_INSTRUCTION(L)  L->subs->statements
 
@@ -392,6 +425,8 @@ int is_parrot_op(struct lexer_state * const lexer, char * const name);
 
 void print_subs(struct lexer_state * const lexer);
 void free_subs(struct lexer_state * const lexer);
+
+bucket *get_bucket(table, hash);
 
 void panic(char * const message);
 

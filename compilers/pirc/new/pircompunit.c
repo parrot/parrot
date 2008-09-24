@@ -295,8 +295,9 @@ new_subr(struct lexer_state *lexer, char * const subname) {
 
     newsub->parameters = NULL;
     newsub->statements = NULL;
-    newsub->symbols    = NULL;
     newsub->flags      = 0;
+
+    init_hashtable(&newsub->symbols, HASHTABLE_SIZE_INIT);
 
     for (index = 0; index < 4; index++) {
         newsub->registers[index] = NULL; /* set all "register" tables to NULL */
@@ -2382,7 +2383,7 @@ Surely, the ops are defined with a :flow flag or whatever. Use this!
 */
 static void
 fixup_local_labels(lexer_state * const lexer) {
-    instruction *iter = lexer->subs->statements;
+    instruction *iter = CURRENT_SUB(lexer)->statements;
 
     /* if there's no instruction in the current sub, then do nothing. */
     if (iter == NULL)

@@ -58,33 +58,7 @@ typedef struct local_label {
 
 } local_label;
 
-/* a hashtable bucket for storing something */
-typedef struct bucket {
-    union __bucket_union {
-        char         *str;
-        symbol       *sym;
-        local_label  *loc;
-        global_label *glob;
-        constant     *cons;
-    } u;
 
-    struct bucket *next;
-
-} bucket;
-
-/* accessors for the bucket union */
-#define bucket_string(B)    B->u.str
-#define bucket_symbol(B)    B->u.sym
-#define bucket_local(B)     B->u.loc
-#define bucket_global(B)    B->u.glob
-#define bucket_constant(B)  B->u.cons
-
-typedef struct hashtable {
-    bucket   **contents;
-    unsigned   size;
-    unsigned   obj_count;
-
-} hashtable;
 
 /* symbol constructor */
 symbol *new_symbol(char * const name, pir_type type);
@@ -108,10 +82,10 @@ void store_global_label(struct lexer_state * const lexer, char * const name);
 global_label *find_global_label(struct lexer_state * const lexer, char * const name);
 
 /* store a global .const symbol */
-void store_global_const(struct lexer_state * const lexer, constant * const c);
+void store_global_constant(struct lexer_state * const lexer, constant * const c);
 
 /* find a global .const symbol */
-constant *find_constant(struct lexer_state * const lexer, char * const name);
+constant *find_global_constant(struct lexer_state * const lexer, char * const name);
 
 /* get a new PASM register of the specified type */
 int next_register(struct lexer_state * const lexer, pir_type type);
@@ -119,7 +93,7 @@ int next_register(struct lexer_state * const lexer, pir_type type);
 void store_local_label(struct lexer_state * const lexer, char * const label, unsigned offset);
 unsigned find_local_label(struct lexer_state * const lexer, char * const label);
 
-unsigned get_hashcode(char * const str);
+unsigned get_hashcode(char * const str, unsigned num_buckets);
 
 #endif /* PARROT_PIR_PIRSYMBOL_H_GUARD */
 

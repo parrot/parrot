@@ -3677,7 +3677,7 @@ yyreduce:
 
   case 259:
 #line 1545 "pir.y"
-    { store_global_const(lexer, (yyvsp[(2) - (2)].cval)); ;}
+    { store_global_constant(lexer, (yyvsp[(2) - (2)].cval)); ;}
     break;
 
   case 260:

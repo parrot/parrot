@@ -46,12 +46,11 @@ typedef struct lexer_state {
 
     unsigned       instr_counter;  /* to assign an index to each instruction */
 
-    global_label  *globals;        /* global identifiers */
-    constant      *constants;      /* global constants */
-
     Interp        *interp;         /* parrot interpreter */
 
     cache          obj_cache;      /* cache for all sorts of objects to save memory allocations */
+    hashtable      constants;
+    hashtable      globals;
     hashtable      strings;        /* hashtable containing pointers to all parsed strings */
 
 } lexer_state;
@@ -68,6 +67,8 @@ void release_resources(lexer_state *lexer);
 char *dupstr(lexer_state * const lexer, char * const str);
 
 char *dupstrn(lexer_state * const lexer, char * const str, size_t numchars);
+
+bucket *new_bucket(void);
 
 #endif /* PARROT_PIR_PIRCOMPILER_H_GUARD */
 

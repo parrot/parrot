@@ -1542,7 +1542,7 @@ const_stat            : const_decl
                       ;
 
 const_decl            : ".const" const_tail
-                            { store_global_const(lexer, $2); }
+                            { store_global_constant(lexer, $2); }
                       ;
 
 globalconst_decl      : ".globalconst" const_tail

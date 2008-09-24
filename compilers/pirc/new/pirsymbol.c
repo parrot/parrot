@@ -38,19 +38,6 @@ Global identifiers, representing subroutine names are stored in a separate list.
 
 Globally defined constants are stored in yet another separate list.
 
-It might be worthwhile to investigate the possibility to store all symbols in
-one data structure (for instance, a hashtable), using one C structure to
-describe the properties (possibly an enumeration of symbol types).
-
-Furthermore, instead of lists of objects, it might be worthwhile to use
-Parrot built-in PMCs for storing stuff, such as Hash and Array objects.
-I wouldn't go as far as making target, symbol, expression, constant etc.
-PMCs as well, as this might become expensive (w.r.t. CPU cycles) to
-handle. However, in order to use a ResizablePMCArray, you need to store
-PMC objects as opposed to normal C struct objects. On the other hand, it
-would make memory management extremely easy as we can just let everything
-to the Garbage Collector.
-
 
 =head1 FUNCTIONS
 
@@ -82,7 +69,7 @@ next_register(struct lexer_state * const lexer, pir_type type) {
 /*
 
 =item C<static unsigned
-get_hashcode(char * const str)>
+get_hashcode(char * const str, unsigned num_buckets)>
 
 Calculate the hash code for the string C<str>.
 This code is taken from IMCC.
@@ -91,14 +78,45 @@ This code is taken from IMCC.
 
 */
 unsigned
-get_hashcode(char * const str) {
+get_hashcode(char * const str, unsigned num_buckets) {
     unsigned long  key = 0;
     char const    *s;
 
     for (s = str; *s ; s++)
         key = key * 65599 + *s;
 
-    return key;
+    return key % num_buckets;
+}
+
+/*
+
+=item C<void
+store_bucket(hashtable * const table, bucket * const buck, unsigned long hash)>
+
+Store the bucket C<buck> in the hashtable C<table> at index C<hash>.
+
+=cut
+
+*/
+void
+store_bucket(hashtable * const table, bucket * const buck, unsigned long hash) {
+    buck->next = table->contents[hash];
+    table->contents[hash] = buck;
+}
+
+/*
+
+=item C<bucket *
+get_bucket(hashtable * const table, unsigned long hash)>
+
+Return the bucket at hash index C<hash> from the hashtable C<table>.
+
+=cut
+
+*/
+bucket *
+get_bucket(hashtable * const table, unsigned long hash) {
+    return table->contents[hash];
 }
 
 /*
@@ -139,28 +157,18 @@ will have been given a PASM register.
 */
 void
 declare_local(struct lexer_state * const lexer, pir_type type, symbol * const list) {
-    symbol *iter = list;
+    symbol    *iter  = list;
+    hashtable *table = &CURRENT_SUB(lexer)->symbols;
 
-    /* go through the list and set the type on each symbol */
+    /* store all symbols in the list and set the type on each symbol. */
     while (iter != NULL) {
+        unsigned long hash = get_hashcode(iter->name, table->size);
+        bucket *b          = new_bucket();
+        bucket_symbol(b)   = iter;
+        store_bucket(table, b, hash);
+
         iter->type  = type;
         iter        = iter->next;
-    }
-
-    /* add the symbol to the symbol table, which is currently implemented
-     * as a linked list.
-     */
-    if (CURRENT_SUB(lexer)->symbols == NULL) /* no symbols yet */
-        CURRENT_SUB(lexer)->symbols = list;
-    else {
-        /* go to end of list */
-        iter = list;
-        while (iter->next != NULL)
-            iter = iter->next;
-
-        /* link existing list on list->next, and set symbols list to this list */
-        iter->next = CURRENT_SUB(lexer)->symbols;
-        CURRENT_SUB(lexer)->symbols = list;
     }
 
 }
@@ -183,24 +191,23 @@ check_unused_symbols(struct lexer_state * const lexer) {
     puts("");
 
     do {
-        symbol *iter = CURRENT_SUB(lexer)->symbols;
+        hashtable *symbols = &CURRENT_SUB(lexer)->symbols;
 
-        while (iter) { /* iterate over all symbols in this sub */
-            if (iter->color == -1) {
-                /* parameters will always be assigned a PASM register as this is
-                 * necessary to receive the arguments. .locals will only get
-                 * a PASM register if they're actually used (not just declared)
-                 */
+        unsigned i;
+        for (i = 0; i < symbols->size; i++) {
+            bucket *b = get_bucket(symbols, i);
+            while (b) {
+                if (bucket_symbol(b)->color == -1)
+                    fprintf(stderr, "Warning: in sub '%s': symbol '%s' declared but not used\n",
+                                    subiter->sub_name, bucket_symbol(b)->name);
 
-                fprintf(stderr, "Warning: in sub '%s': symbol '%s' declared but not used\n",
-                        subiter->sub_name, iter->name);
-
+                b = b->next;
             }
-            iter = iter->next;
+
         }
         subiter = subiter->next;
     }
-    while (subiter != lexer->subs); /* iterate over all subs */
+    while (subiter != lexer->subs->next); /* iterate over all subs */
 }
 
 /*
@@ -210,33 +217,27 @@ find_symbol(struct lexer_state *lexer, char * const name)>
 
 Return the node for the symbol or NULL if the symbol
 is not defined. If an attempt is made to find a symbol,
-we assume it is because the symbol will be I<used>; therefore,
-the C<used> flag is set.
+we assume it is because the symbol will be used; therefore,
+allocate a PASM register for it.
 
 =cut
 
 */
 symbol *
 find_symbol(struct lexer_state * const lexer, char * const name) {
-    symbol *iter;
-    /* check whether there's a subroutine in place; if not, the
-     * specified name is an identifier being parsed outside of a .sub;
-     * in that case, NULL is returned.
-     */
-    if (lexer->subs) /* then initialize iterator */
-        iter = CURRENT_SUB(lexer)->symbols;
-    else
-        return NULL;
+    hashtable    *table    = &CURRENT_SUB(lexer)->symbols;
+    unsigned long hashcode = get_hashcode(name, table->size);
+    bucket       *buck     = get_bucket(table, hashcode);
 
-    while (iter) {
-        if (STREQ(iter->name, name)) {
-            /* if the symbol is not yet used, allocate a new PASM register */
-            if (iter->color == -1)
-                iter->color = next_register(lexer, iter->type);
+    while (buck) {
+        if (STREQ(bucket_symbol(buck)->name, name)) {
+            if (bucket_symbol(buck)->color == -1) /* no PASM register assigned yet */
+                bucket_symbol(buck)->color = next_register(lexer, bucket_symbol(buck)->type);
 
-            return iter;
+            return bucket_symbol(buck);
         }
-        iter = iter->next;
+
+        buck = buck->next;
     }
     return NULL;
 }
@@ -283,6 +284,11 @@ find_register(struct lexer_state * const lexer, pir_type type, int regno) {
         if (iter->regno == regno)
             return iter;
 
+        /*
+        if (iter->regno > regno)
+            return NULL;
+        */
+
         iter = iter->next;
     }
 
@@ -318,9 +324,28 @@ use_register(struct lexer_state * const lexer, pir_type type, int regno) {
     /* link this register into the list of "colored" registers; each of
      * them has been assigned a unique PASM register.
      */
+
     reg->next = CURRENT_SUB(lexer)->registers[type];
     CURRENT_SUB(lexer)->registers[type] = reg;
 
+    /* test this better: sort pir_regs on descending regno */
+    /**
+    do {
+        pir_reg *iter;
+        iter = CURRENT_SUB(lexer)->registers[type];
+        if (iter) {
+            while (iter->next && iter->regno > reg->regno)
+                iter = iter->next;
+
+            reg->next = iter->next;
+            iter->next = reg;
+        }
+        else {
+            CURRENT_SUB(lexer)->registers[type] = reg;
+        }
+    }
+    while (0);
+    **/
 
     /* return newly allocated register */
     return reg->color;
@@ -389,15 +414,13 @@ Store the global identifier C<name>.
 */
 void
 store_global_label(struct lexer_state * const lexer, char * const name) {
-    global_label *glob = new_global_label(name);
-
-    /*
-    fprintf(stderr, "storing global label %s\n", name);
-    */
-    /* store the global in the lexer */
-    glob->next     = lexer->globals;
-    lexer->globals = glob;
+    hashtable    *table = &lexer->globals;
+    unsigned long hash  = get_hashcode(name, table->size);
+    bucket *b           = new_bucket();
+    bucket_global(b)    = new_global_label(name);
+    store_bucket(table, b, hash);
 }
+
 
 /*
 
@@ -412,14 +435,15 @@ then NULL is returned.
 */
 global_label *
 find_global_label(struct lexer_state * const lexer, char * const name) {
-    global_label *iter = lexer->globals;
-    /*
-    fprintf(stderr, "finding global label %s\n", name);
-    */
-    while (iter) {
-        if (STREQ(iter->name, name))
-            return iter;
-        iter = iter->next;
+    hashtable    *table    = &lexer->globals;
+    unsigned long hashcode = get_hashcode(name, table->size);
+    bucket *b              = get_bucket(table, hashcode);
+
+    while (b) {
+        if (STREQ(bucket_global(b)->name, name))
+            return bucket_global(b);
+
+        b = b->next;
     }
     return NULL;
 }
@@ -427,7 +451,7 @@ find_global_label(struct lexer_state * const lexer, char * const name) {
 /*
 
 =item C<void
-store_global_const(struct lexer_state *lexer, constant * const c)>
+store_global_constant(struct lexer_state *lexer, constant * const c)>
 
 Store the globally defined constant C<c> in the constant table.
 
@@ -435,16 +459,18 @@ Store the globally defined constant C<c> in the constant table.
 
 */
 void
-store_global_const(struct lexer_state * const lexer, constant * const c) {
-    /* store at the beginning of the list */
-    c->next = lexer->constants;
-    lexer->constants = c;
+store_global_constant(struct lexer_state * const lexer, constant * const c) {
+    hashtable    *table = &lexer->constants;
+    unsigned long hash  = get_hashcode(c->name, table->size);
+    bucket *b           = new_bucket();
+    bucket_constant(b)  = c;
+    store_bucket(table, b, hash);
 }
 
 /*
 
 =item C<constant *
-find_constant(struct lexer_state *lexer, char * const name)>
+find_global_constant(struct lexer_state *lexer, char * const name)>
 
 Find a constant defined as C<name>. If no constant was defined by
 that name, then NULL is returned.
@@ -453,13 +479,18 @@ that name, then NULL is returned.
 
 */
 constant *
-find_constant(struct lexer_state * const lexer, char * const name) {
-    constant *iter = lexer->constants;
-    while (iter) {
-        if (STREQ(iter->name, name))
-            return iter;
-        iter = iter->next;
+find_global_constant(struct lexer_state * const lexer, char * const name) {
+    hashtable    *table    = &lexer->constants;
+    unsigned long hashcode = get_hashcode(name, table->size);
+    bucket *b              = get_bucket(table, hashcode);
+
+    while (b) {
+        if (STREQ(bucket_constant(b)->name, name))
+            return bucket_constant(b);
+
+        b = b->next;
     }
+
     return NULL;
 }
 

@@ -12,14 +12,12 @@
 #include "pircompiler.h"
 #include "parrot/parrot.h"
 
-/* initial size of a hashtable */
-#define HASHTABLE_SIZE_INIT     113
 
 /*
 
 =over 4
 
-=item C<static void
+=item C<void
 init_hashtable(hashtable * table, unsigned size)>
 
 Initialize the hashtable C<table> with space for C<size> buckets.
@@ -27,7 +25,7 @@ Initialize the hashtable C<table> with space for C<size> buckets.
 =cut
 
 */
-static void
+void
 init_hashtable(hashtable * table, unsigned size) {
     table->contents  = (bucket **)calloc(size, sizeof (bucket *));
     assert(table);
@@ -62,6 +60,9 @@ new_lexer(char * const filename) {
 
     /* create a hashtable to store all strings */
     init_hashtable(&lexer->strings, HASHTABLE_SIZE_INIT);
+
+    init_hashtable(&lexer->globals, HASHTABLE_SIZE_INIT);
+    init_hashtable(&lexer->constants, HASHTABLE_SIZE_INIT);
 
     return lexer;
 }
@@ -103,7 +104,7 @@ Constructor for a bucket object.
 =cut
 
 */
-static bucket *
+bucket *
 new_bucket(void) {
     bucket *buck = (bucket *)malloc(sizeof (bucket));
     assert(buck);
@@ -126,11 +127,11 @@ program will be used many times.
 */
 static void
 store_string(lexer_state * const lexer, char * const str) {
-    unsigned long hash = get_hashcode(str) % lexer->strings.size;
-    bucket *b          = new_bucket();
-    bucket_string(b)   = str;
-    b->next = lexer->strings.contents[hash];
-    lexer->strings.contents[hash] = b;
+    hashtable    *table = &lexer->strings;
+    unsigned long hash  = get_hashcode(str, table->size);
+    bucket *b           = new_bucket();
+    bucket_string(b)    = str;
+    store_bucket(table, b, hash);
 }
 
 /*
@@ -148,20 +149,17 @@ that buffer will be returned.
 */
 static char *
 find_string(lexer_state * const lexer, char * const str) {
-    unsigned long hash = get_hashcode(str) % lexer->strings.size;
-    bucket *b          = lexer->strings.contents[hash];
+    hashtable    *table = &lexer->strings;
+    unsigned long hash  = get_hashcode(str, table->size);
+    bucket *b           = get_bucket(table, hash);
 
-    if (b == NULL) /* no bucket at this hash position; return NULL */
-        return NULL;
-
-    do {
+    while (b) {
         /* loop through the buckets to see if this is the string */
         if (STREQ(bucket_string(b), str))
             return bucket_string(b); /* if so, return a pointer to the actual string. */
 
         b = b->next;
     }
-    while (b); /* if there's no more buckets, we'll return NULL in the end */
 
     return NULL;
 }
