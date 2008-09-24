@@ -405,6 +405,7 @@ examples:
     .namespace [ ]               # The root namespace
     .namespace [ "Foo" ]         # The namespace "Foo"
     .namespace [ "Foo" ; "Bar" ] # Namespace Foo::Bar
+    .namespace                   # WRONG! The [] are needed
 
 Using semicolons, namespaces can be nested to any arbitrary depth. Namespaces
 are special types of PMC, so we can access them and manipulate them just
@@ -543,6 +544,27 @@ of subroutines. When the multisub is invoked, the MultiSub PMC object
 searches through the list of subroutines and searches for the one with
 the closest matching signature. The best match is the sub that gets
 invoked.
+
+=head3 Defining MultiSubs
+
+MultiSubs are subroutines with the C<:multi> flag applied to them.
+MultiSubs (also called "Multis") must all differ from one another in
+the number and/or type of arguments passed to the function. Having
+two multisubs with the same function signature could result in a
+parsing error, or the later function could overwrite the former one
+in the multi. 
+
+Multisubs are defined like this:
+
+  .sub 'MyMulti' :multi
+      # does whatever a MyMulti does
+  .end
+
+Multis belong to a specific namespace. Functions in different namespaces
+with the same name do not conflict with each other N<this is one of the
+reasons for having multisubs in the first place!>. It's only when
+multiple functions in a single namespace need to have the same name that
+a multi is used.
 
 =cut
 
