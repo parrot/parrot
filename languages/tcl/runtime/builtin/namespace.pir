@@ -480,8 +480,12 @@ done:
   .return ('')
 .end
 
+#XXX complete hack to get tcltest working...
 .sub 'origin'
-  .return ('')
+  .param pmc argv
+  $S0 = shift argv
+  $S0 = "::tcltest::" . $S0
+  .return ($S0)
 .end
 
 .sub 'parent'
