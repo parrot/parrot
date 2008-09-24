@@ -1,6 +1,6 @@
 =pod
 
-=head0 Parrot Intermediate Representation
+=head1 Parrot Intermediate Representation
 
 Z<CHP-3>
 
@@ -34,7 +34,7 @@ sources for information. The test suite in F<imcc/t> shows examples of
 proper working code as it should be. These are all good starting points
 for digging deeper into the PIR syntax and functionality.
 
-=head1 Statements
+=head2 Statements
 
 Z<CHP-10-SECT-1>
 
@@ -64,7 +64,7 @@ operators:
 
 We will get into all of these in more detail as we go.
 
-=head1 Variables and Constants
+=head2 Variables and Constants
 
 Z<CHP-10-SECT-2>
 
@@ -75,7 +75,7 @@ Literal constants in PIR are the same as constants in PASM. Integers
 and floating-point numbers are numeric literals and strings are
 enclosed in quotes. PIR strings use the same escape sequences as PASM.
 
-=head2 Parrot Registers
+=head3 Parrot Registers
 
 Z<CHP-10-SECT-2.1>
 
@@ -99,7 +99,7 @@ the pool of allocated registers too large.> Of course, as with any
 memory management situation, fewer allocations translates directly
 to improved performance.
 
-=head2 Temporary Registers
+=head3 Temporary Registers
 
 Z<CHP-10-SECT-2.2>
 
@@ -198,9 +198,9 @@ to see resulting PASM on I<stdout>.
 You'll find more details on these options and many others in
 A<CHP-11-SECT-4>"Parrot Command-Line Options" in Chapter 11.
 
-=head2 Named Variables
+=head3 Named Variables
 
-Z<CHP-10-SECT-2.3>
+Z<CHP-10-SECT-2>
 
 X<named variables (PIR)>
 X<PIR (Parrot intermediate representation);named variables>
@@ -260,7 +260,7 @@ C<new>:
   hello = "Hello, Polly.\n"
   print hello
 
-=head2 Named Constants
+=head3 Named Constants
 
 Z<CHP-10-SECT-2.4>
 
@@ -283,7 +283,7 @@ but have to be declared beforehand:
   .const string mouse = "Mouse"     # string constant
   .const num pi = 3.14159           # floating point constant
 
-=head2 Register Spilling
+=head3 Register Spilling
 
 Z<CHP-10-SECT-2.5>
 
@@ -341,7 +341,7 @@ if two variables have the same score Parrot may assign registers based
 on the hashed value of the variable name. Parrot randomizes the seed
 to the hash function to guarantee you never get a consistent order.
 
-=head1 Symbol Operators
+=head2 Symbol Operators
 
 Z<CHP-10-SECT-3>
 
@@ -388,7 +388,7 @@ A complete list of PIR operators is available in A<CHP-11>Chapter 11.
 We'll discuss the comparison operators in A<CHP-10-SECT-3>"Symbol
 Operators" later in this chapter.
 
-=head1 Labels
+=head2 Labels
 
 Z<CHP-10-SECT-4>
 
@@ -460,7 +460,7 @@ This code prints out "Hello, Polly." but not "Polly want a cracker?":
 The A<CHP-10-SECT-6>"Subroutines" section later in this chapter goes
 into much more detail about compilation units and their uses.
 
-=head1 Flow Control
+=head2 Flow Control
 
 Z<CHP-10-SECT-5>
 
@@ -584,6 +584,10 @@ executes.
 
 Any high-level flow control construct can be built from conditional
 and unconditional branches.
+
+Fortunately, libraries of macros have been developed that can implement
+more familiar syntax for many of these control structures. We will discuss
+these libraries in more detail in A<CHP-6> "PIR Standard Library".
 
 =cut
 
