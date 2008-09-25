@@ -88,6 +88,7 @@ sub _init {
         -Wbad-function-cast
         -Wc++-compat
         -Wdeclaration-after-statement
+        -Werror=declaration-after-statement
         -Wimplicit-function-declaration
         -Wimplicit-int
         -Wmain
