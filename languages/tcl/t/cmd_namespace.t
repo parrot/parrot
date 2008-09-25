@@ -30,16 +30,16 @@ eval_is {namespace children what?} \
   {namespace children: unknown namespace} \
   {TODO {new behavior in 8.5.1}}
 
-is [namespace children]        {::tcltest ::tcl} {namespace children: no args}
-is [namespace children ::]     {::tcltest ::tcl} {namespace children: ::}
-is [namespace children :: *c*] {::tcltest ::tcl} {namespace children: matched pattern}
+is [namespace children]        {::tcl} {namespace children: no args}
+is [namespace children ::]     {::tcl} {namespace children: ::}
+is [namespace children :: *c*] {::tcl} {namespace children: matched pattern}
 is [namespace children :: a]   {}    {namespace children: unmatched pattern}
 
 namespace eval bob {}
 namespace eval Bob {}
 namespace eval audreyt { namespace eval Matt {} }
 
-is [namespace children ::] {::audreyt ::Bob ::bob ::tcltest ::tcl} \
+is [namespace children ::] {::audreyt ::Bob ::bob ::tcl} \
   {namespace children: ordering}
 is [namespace children ::audreyt] ::audreyt::Matt  {namespace chlidren: nested}
 is [namespace eval ::audreyt {namespace children}] ::audreyt::Matt \
