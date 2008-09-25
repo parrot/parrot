@@ -2069,9 +2069,9 @@ proc tcltest::test {name description args} {
 	    || $scriptFailure)} {
 	if {$testLevel == 1} {
 	    incr numTests(Passed)
-	    if {[IsVerbose pass]} {
+	    #if {[IsVerbose pass]} {
 		puts [outputChannel] "++++ $name PASSED"
-	    }
+	    #}
 	}
 	incr testLevel -1
 	return
@@ -3373,3 +3373,13 @@ namespace eval tcltest {
 
     package provide [namespace tail [namespace current]] $Version
 }
+
+################################################################################
+# XXX partcl hacks - goal is to eventually remove these and run tcltest
+# natively. Any code in this section is NOT part of the original tcltest.tcl
+# library file but was specifically added for partcl;
+
+proc ::tcltest::outputChannel {} {
+  return stdout
+}
+################################################################################
