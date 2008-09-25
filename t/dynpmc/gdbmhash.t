@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -15,7 +15,7 @@ t/dynpmc/gdbmhash.t - test the GDBMHash PMC
 
 =head1 SYNOPSIS
 
-        % perl -Ilib t/dynpmc/gdbmhash.t
+    % prove t/dynpmc/gdbmhash.t
 
 =head1 DESCRIPTION
 
@@ -420,10 +420,10 @@ pir_output_is( $new_hash_1 . << 'CODE', << 'OUTPUT', "set FLOATVAL with a PMC ke
     print "\n"
 .end
 CODE
--1101.2
--1101.2
--1101.2
--1101.2
+-1101.2005
+-1101.2005
+-1101.2005
+-1101.2005
 OUTPUT
 unlink('gdbm_hash_1');
 

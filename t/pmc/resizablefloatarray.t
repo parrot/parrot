@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -466,7 +466,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "shift float" );
     print "\n"
 .end
 CODE
-2 10.100000 1 20.200000 0
+2 10.1 1 20.2 0
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "unshift float" );
@@ -486,7 +486,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "unshift float" );
     print "\n"
 .end
 CODE
-2 20.200000 10.100000
+2 20.2 10.1
 OUTPUT
 
 # Local Variables:

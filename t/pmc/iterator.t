@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -530,7 +530,7 @@ Iterator exists_keyed_int 3: 1
 Iterator exists_keyed_int 28: 0
 Iterator defined_keyed_int 3: 1
 Iterator defined_keyed_int -1278: 0
-Iterator shift_float: -8.800000
+Iterator shift_float: -8.8
 Iterator get_integer: 7
 OUTPUT
 

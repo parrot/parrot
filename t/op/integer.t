@@ -14,7 +14,7 @@ t/op/integer.t - Integer Registers
 
 =head1 SYNOPSIS
 
-        % prove t/op/integer.t
+    % prove t/op/integer.t
 
 =head1 DESCRIPTION
 
@@ -1052,9 +1052,9 @@ pasm_output_is( <<CODE, <<OUTPUT, "set_n_i" );
         print   "\\n"
         end
 CODE
-0.000000
-2147483647.000000
--2147483648.000000
+0
+2147483647
+-2147483648
 OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "cleari" );

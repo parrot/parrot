@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -741,14 +741,14 @@ Before freezing:
 ResizablePMCArray
 3
 1
-2.720000
+2.72
 three.14
 
 After freeze/thaw:
 ResizablePMCArray
 3
 1
-2.720000
+2.72
 three.14
 OUTPUT
 

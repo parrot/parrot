@@ -263,7 +263,7 @@ pir_output_is( <<'CODE', <<'OUT', "x = sin" );
     end
 .end
 CODE
-0.000000
+0
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "x = can" );

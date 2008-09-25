@@ -292,7 +292,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "open & print" );
        print S1
        end
 CODE
--122.200000FooBar
+-122.2FooBar
 OUTPUT
 
 open $FOO, '>', "temp.file";    # Clobber previous contents
@@ -497,7 +497,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', 'printerr' );
        end
 CODE
 10
-1.000000
+1
 foo
 This is a test
 OUTPUT

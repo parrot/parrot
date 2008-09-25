@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -44,7 +44,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'say with a literal number' );
     say 3.14
 .end
 CODE
-3.140000
+3.14
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'say with a temporary string register' );
@@ -71,7 +71,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'say with a temporary number register' );
     say $N2
 .end
 CODE
-1.414000
+1.414
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'say and print with a number register' );
@@ -82,8 +82,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'say and print with a number register' );
     print "\n"
 .end
 CODE
-3.141590
-3.141590
+3.14159
+3.14159
 OUTPUT
 
 # Local Variables:

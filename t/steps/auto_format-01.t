@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2008, The Perl Foundation.
 # $Id$
 # auto_format-01.t
 
@@ -86,7 +86,7 @@ $step = test_step_constructor_and_description($conf);
 {
     $conf->data->set( nv => 'double' );
     auto::format::_set_floatvalfmt_nvsize($conf);
-    is($conf->data->get( 'floatvalfmt' ), '%f',
+    is($conf->data->get( 'floatvalfmt' ), '%.15g',
         "floatvalfmt set as expected");
     is($conf->data->get( 'nvsize' ), $conf->data->get( 'doublesize' ),
         "nvsize set as expected");

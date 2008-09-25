@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -98,7 +98,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "delegate set_number_native" );
     print "\n"
     returncc
 CODE
-47.110000
+47.11
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "delegate get_number" );
@@ -114,7 +114,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "delegate get_number" );
     set_returns "0", N5
     returncc
 CODE
-47.110000
+47.11
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "delegate assign_pmc" );

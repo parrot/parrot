@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -204,12 +204,12 @@ pasm_output_is( <<'CODE', <<OUTPUT, "turn a native number into its negative" );
         print "\n"
         end
 CODE
--0.000000
-0.000000
+-0
+0
 -123.456789
 123.456789
--0.000000
-0.000000
+-0
+0
 -123.456789
 123.456789
 OUTPUT
@@ -255,14 +255,14 @@ pasm_output_is( <<'CODE', <<OUTPUT, "take the absolute of a native number" );
         print "\n"
         end
 CODE
-0.000000
-0.000000
-123.456789
-123.456789
-0.000000
-0.000000
-123.456789
-123.456789
+0
+0
+123.45678901
+123.45678901
+0
+0
+123.45678901
+123.45678901
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "ceil of a native number" );
@@ -320,13 +320,13 @@ pasm_output_is( <<'CODE', <<OUTPUT, "ceil of a native number" );
        print "\n"
        end
 CODE
-0.000000
-124.000000
--123.000000
-0.000000
-0.000000
-124.000000
--123.000000
+0
+124
+-123
+0
+0
+124
+-123
 0
 0
 124
@@ -388,13 +388,13 @@ pasm_output_is( <<'CODE', <<OUTPUT, "floor of a native number" );
        print "\n"
        end
 CODE
-0.000000
-123.000000
--124.000000
-0.000000
-0.000000
-123.000000
--124.000000
+0
+123
+-124
+0
+0
+123
+-124
 0
 0
 123
@@ -418,9 +418,9 @@ pasm_output_is( <<'CODE', <<OUTPUT, "add native integer to native number" );
         print "\n"
         end
 CODE
-3876.877000
-3876.877000
-7876.877000
+3876.877
+3876.877
+7876.877
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "subtract native integer from native number" );
@@ -437,9 +437,9 @@ pasm_output_is( <<'CODE', <<OUTPUT, "subtract native integer from native number"
         print "\n"
         end
 CODE
--4123.123000
--4123.123000
--8123.123000
+-4123.123
+-4123.123
+-8123.123
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "multiply native number with native integer" );
@@ -456,9 +456,9 @@ pasm_output_is( <<'CODE', <<OUTPUT, "multiply native number with native integer"
         print "\n"
         end
 CODE
--492492.000000
--492492.000000
-984984.000000
+-492492
+-492492
+984984
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "divide native number by native integer" );
@@ -482,11 +482,11 @@ pasm_output_is( <<'CODE', <<OUTPUT, "divide native number by native integer" );
         print "\n"
         end
 CODE
--0.030781
--0.030781
--0.030781
-1.000000
-100.000000
+-0.03078075
+-0.03078075
+-0.03078075
+1
+100
 OUTPUT
 
 #
@@ -503,8 +503,8 @@ pasm_output_is( <<'CODE', <<OUTPUT, "add native number to native number" );
         print "\n"
         end
 CODE
-3877.123000
-3877.123000
+3877.123
+3877.123
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "subtract native number from native number" );
@@ -518,8 +518,8 @@ pasm_output_is( <<'CODE', <<OUTPUT, "subtract native number from native number" 
         print "\n"
         end
 CODE
--4123.369000
--4123.369000
+-4123.369
+-4123.369
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "multiply native number with native number" );
@@ -548,8 +548,8 @@ pasm_output_is( <<'CODE', <<OUTPUT, "divide native number by native number" );
         print "\n"
         end
 CODE
--0.030779
--0.030779
+-0.0307788571002883
+-0.0307788571002883
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "lcm_I_I_I" );

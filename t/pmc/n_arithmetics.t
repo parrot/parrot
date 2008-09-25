@@ -93,7 +93,7 @@ various combinations of Parrot integer and number types.
     n_abs P1, P0
     is( P1, 1234567890, 'abs of negative' )
 .end
- 
+
 ###
 ### first arg is Integer, second arg is Integer
 ###
@@ -148,7 +148,7 @@ various combinations of Parrot integer and number types.
     P0 = n_sub P0, 11
     is( P2, 3989, 'subtract constant from Integer and assign to Int arg' )
 .end
- 
+
 .sub multiply_integer_by_integer
     P0 = new 'Integer'
     set P0, 4000
@@ -180,9 +180,9 @@ various combinations of Parrot integer and number types.
     is( P3, -32.5203, 'divide Integer by Integer in assignment' )
     ## check dividing by constants.
     P2 = n_div P0, 11
-    is( P2, 363.636, 'divide Integer by constant' )
+    is( P2, 363.6363636363636364, 'divide Integer by constant' )
     P0 = n_div P0, 11
-    is( P0, 363.636, 'divide Integer by constant and assign to Int arg' )
+    is( P0, 363.6363636363636364, 'divide Integer by constant and assign to Int arg' )
 .end
 
 ###
@@ -203,7 +203,7 @@ various combinations of Parrot integer and number types.
     n_neg P1, P0
     is( P1, 123.4567890, 'neg of negavite Float is positive' )
 .end
- 
+
 .sub take_the_absolute_value_of_a_float
     P0 = new 'Integer'
     set P0, 0
@@ -246,7 +246,7 @@ various combinations of Parrot integer and number types.
     P1 = n_add P1, P10
     is( P1, 7876.877, 'add Float and Int and assign to Float arg' )
 .end
- 
+
 .sub subtract_integer_from_float
     P10 = new 'Integer'
     set P10, 4000
@@ -270,7 +270,7 @@ various combinations of Parrot integer and number types.
     P1 = n_sub P1, P10
     is( P1, -8123.123, 'subtract Float from Int and assign to Float arg' )
 .end
- 
+
 .sub multiply_float_by_integer
     P10 = new 'Integer'
     set P10, 4000
@@ -294,17 +294,17 @@ various combinations of Parrot integer and number types.
     P1 = n_mul P1, -2
     is( P1, 984984, 'multiply Float by const int and assign to Float arg' )
 .end
- 
+
 .sub divide_float_by_integer
     P10 = new 'Integer'
     set P10, 4000
     P0 = new 'Float'
     set P0, -123.123
     n_div P1, P0, P10
-    is( P1, -0.0307808, 'divide Float by Int' )
+    is( P1, -0.03078075, 'divide Float by Int' )
     P30 = P1
     P1 = n_div P0, P10
-    is( P1, -0.0307808, 'divide Float by Int in assignment' )
+    is( P1, -0.03078075, 'divide Float by Int in assignment' )
     ## check that we are not reusing P1.
     ne_addr P30, P1, not_broken
     ok( 0, 'not reusing P1' )
@@ -346,7 +346,7 @@ various combinations of Parrot integer and number types.
   not_broken__done:
     ##
 .end
-# 
+#
 ## This tests n_infix_ic_p_p_nc for n_add, n_sub, n_mul, and n_div.  Note that
 ## there is no n_infix_ic_p_nc_p op; the PMC argument always comes first.
 .sub add_sub_mul_div_of_float_with_constants
@@ -359,11 +359,11 @@ various combinations of Parrot integer and number types.
     P2 = n_add P0, 6.78
     is( P2,  4007.03, 'add pos Float to constant Float' )
     P2 = n_mul P1, 6.78
-    is( P2, -834.774, 'multily Float by constant Float' )
+    is( P2, -834.77394, 'multiply Float by constant Float' )
     P2 = n_div P0, 6.78
     is( P2,  590.007, 'divide Float by constant Float' )
 .end
- 
+
 .sub subtract_float_from_float
     P0 = new 'Float'
     set P0, 4000.246
@@ -385,7 +385,7 @@ various combinations of Parrot integer and number types.
   not_broken__done:
     ##
 .end
- 
+
 .sub multiply_float_by_float
     P0 = new 'Float'
     set P0, 400.0246
@@ -394,10 +394,10 @@ various combinations of Parrot integer and number types.
     P2 = new 'Float'
     set P2, 6.66
     n_mul P2, P0, P1
-    is( P2, -49252.229, 'multiply Float from Float' )
+    is( P2, -49252.2288258, 'multiply Float from Float' )
     P30 = P2
     P2 = n_mul P0, P1
-    is( P2, -49252.229, 'muliply Float from Float in assignment' )
+    is( P2, -49252.2288258, 'muliply Float from Float in assignment' )
     ## check that we are not reusing P2.
     ne_addr P30, P2, not_broken
     ok( 0, 'not reusing P2' )
@@ -407,7 +407,7 @@ various combinations of Parrot integer and number types.
   not_broken__done:
     ##
 .end
- 
+
 .sub divide_float_by_float
     P0 = new 'Float'
     set P0, 4000.246
@@ -416,7 +416,7 @@ various combinations of Parrot integer and number types.
     P2 = new 'Float'
     set P2, 6.66
     n_div P2, P1, P0
-    is( P2, -0.0307789, 'divide neg Float by pos Float' )
+    is( P2, -0.0307788571002883, 'divide neg Float by pos Float' )
     P30 = P2
     P2 = n_div P0, P1
     is( P2, -32.4898, 'divide pos Float by neg Float in assignment' )
@@ -437,7 +437,7 @@ various combinations of Parrot integer and number types.
     is( P0, 1, 'add constant to new (unassigned) PMC' )
     eq_addr P0, P1, nok
       ok( 1, 'variables have different addresses' )
-      .return() 
+      .return()
   nok:
     ok( 0, 'variables have different addresses' )
 .end

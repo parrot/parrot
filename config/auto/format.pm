@@ -67,7 +67,7 @@ sub _set_floatvalfmt_nvsize {
     $nvsize = $floatsize;
     if ( $nv eq "double" ) {
         $nvsize   = $doublesize;
-        $nvformat = "%f";
+        $nvformat = "%.15g";
     }
     elsif ( $nv eq "long double" ) {
 

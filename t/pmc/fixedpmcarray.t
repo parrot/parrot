@@ -501,18 +501,18 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Multi keys" );
 CODE
 set_integer_keyed, get_integer_keyed: 128
 set_integer_keyed, get_pmc_keyed: 128
-set_integer_keyed, get_number_keyed: 128.000000
+set_integer_keyed, get_number_keyed: 128
 set_integer_keyed, get_string_keyed: 128
 set_number_keyed, get_pmc_keyed: 128.128
-set_number_keyed, get_number_keyed: 128.128000
+set_number_keyed, get_number_keyed: 128.128
 set_number_keyed, get_string_keyed: 128.128
 set_pmc_keyed, get_integer_keyed: 256
 set_pmc_keyed, get_pmc_keyed: 256
-set_pmc_keyed, get_number_keyed: 256.000000
+set_pmc_keyed, get_number_keyed: 256
 set_pmc_keyed, get_string_keyed: 256
 set_integer_keyed, get_integer_keyed: 128
 set_integer_keyed, get_pmc_keyed: 128
-set_integer_keyed, get_number_keyed: 128.000000
+set_integer_keyed, get_number_keyed: 128
 set_integer_keyed, get_string_keyed: 128
 OUTPUT
 

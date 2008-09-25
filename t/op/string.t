@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -1593,7 +1593,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', 'num to string' );
     end
 CODE
 80.43
--1.11111
+-1.111111
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'string to int' );

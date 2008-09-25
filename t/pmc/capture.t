@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -149,16 +149,16 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Basic capture tests" );
 
 CODE
 12
-7 six 5.500000 4
-7 six 5.500000 4
+7 six 5.5 4
+7 six 5.5 4
 8
-11 ten 9.500000 8
+11 ten 9.5 8
 4
 3
 two
 1.5
 0
-15 fourteen 13.500000 12
+15 fourteen 13.5 12
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "defined, delete, exists" );

@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -100,7 +100,7 @@ pir_output_is( <<'CODE', <<'OUT', "Explicit large register: N, PIR" );
   print "\n"
 .end
 CODE
-3.800000
+3.8
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "Explicit large register: I, PIR" );
@@ -137,7 +137,7 @@ pasm_output_is( <<'CODE', <<'OUT', "Explicit large register: N, PASM" );
   print "\n"
   end
 CODE
-3.800000
+3.8
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "Explicit large register: I, PASM" );

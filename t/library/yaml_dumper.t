@@ -7,7 +7,7 @@ use warnings;
 use lib qw( lib );
 
 use Test::More;
-use Parrot::Test 'no_plan';#tests => 26;
+use Parrot::Test tests => 26;
 
 =head1 NAME
 
@@ -834,7 +834,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping Float PMC" );
 CODE
 ---
 {
-    "Float" : !Float [ 12345.7 ],
+    "Float" : !Float [ 12345.678 ],
 }
 OUTPUT
 

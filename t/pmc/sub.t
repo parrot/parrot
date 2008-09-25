@@ -1034,7 +1034,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "immediate code as const" );
     print "\n"
 .end
 CODE
-3.14159
+3.14159265358979
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "immediate code as const - obj" );

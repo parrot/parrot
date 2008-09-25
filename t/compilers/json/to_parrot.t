@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -112,7 +112,7 @@ OUT
 json_dump_is( <<'JSON', <<'OUT', 'number int exp' );
 1e+11
 JSON
-"JSON" => 1e+11
+"JSON" => 100000000000
 OUT
 
 json_dump_is( <<'JSON', <<'OUT', 'number int exp' );
@@ -124,7 +124,7 @@ OUT
 json_dump_is( <<'JSON', <<'OUT', 'number int exp minus' );
 -1e+11
 JSON
-"JSON" => -1e+11
+"JSON" => -100000000000
 OUT
 
 json_dump_is( <<'JSON', <<'OUT', 'number int exp minus' );
@@ -136,13 +136,13 @@ OUT
 json_dump_is( <<'JSON', <<'OUT', 'number int frac exp' );
 3.14e+10
 JSON
-"JSON" => 3.14e+10
+"JSON" => 31400000000
 OUT
 
 json_dump_is( <<'JSON', <<'OUT', 'number int frac exp minus' );
 -3.14e+10
 JSON
-"JSON" => -3.14e+10
+"JSON" => -31400000000
 OUT
 
 json_dump_is( <<'JSON', <<'OUT', 'null' );
@@ -676,7 +676,7 @@ JSON
 ]
 OUT
 
-# RT#44443 Need many more tests, exercising all aspects of http://www.json.org/
+# RT #44443 Need many more tests, exercising all aspects of http://www.json.org/
 
 sub json_dump_is {
     my ( $code, $dumped, $reason, %args ) = @_;
@@ -685,6 +685,7 @@ sub json_dump_is {
     $code =~ s{("|\\)}{\\$1}g;
     $code =~ s{\n}{\\n}g;
 
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     return pir_output_is( <<"END_PIR", $dumped, $reason, %args );
 
 .sub test :main

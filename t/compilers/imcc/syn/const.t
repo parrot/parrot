@@ -155,7 +155,7 @@ pasm_output_is( <<'CODE', <<'OUT', "const I/N mismatch" );
     end
 CODE
 2
-2.000000
+2
 ok
 OUT
 
@@ -172,7 +172,7 @@ pir_output_is( <<'CODE', <<'OUT', "const I/N mismatch 2" );
 .end
 CODE
 2
-2.000000
+2
 ok
 ok 2
 OUT
@@ -571,7 +571,7 @@ pir_output_is( <<'CODE', <<'OUT', ".const in mixed opcodes" );
     print "\n"
 .end
 CODE
-10.000000
+10
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "RT # 34991" );
@@ -588,7 +588,7 @@ pir_output_is( <<'CODE', <<'OUT', "RT # 34991" );
     end
 .end
 CODE
-108.000000
+108
 12
 OUT
 

@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -768,7 +768,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping Float PMC" );
 .end
 .include "library/dumper.pir"
 CODE
-"Float:" => 12345.7
+"Float:" => 12345.678
 OUTPUT
 
 # no. 18

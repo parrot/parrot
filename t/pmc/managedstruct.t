@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -61,11 +61,17 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
     set $P0[0;1], 14.2
     set $P0[1], 14.3
     set $N0, $P0[0;0]
-    is($N0, "14.1", "stored float has correct value")
+    sub $N1, $N0, 14.1
+    cmp $I0, $N1, 0.000001
+    ok($I0, "stored float has correct value")
     set $N0, $P0[0;1]
-    is($N0, "14.2", "stored float has correct value")
+    sub $N1, $N0, 14.2
+    cmp $I0, $N1, 0.000001
+    ok($I0, "stored float has correct value")
     set $N0, $P0[1]
-    is($N0, "14.3", "stored float has correct value")
+    sub $N1, $N0, 14.3
+    cmp $I0, $N1, 0.000001
+    ok($I0, "stored float has correct value")
 
 
     #element access - char, short

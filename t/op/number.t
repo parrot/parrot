@@ -14,7 +14,7 @@ t/op/number.t - Number Registers
 
 =head1 SYNOPSIS
 
-        % prove t/op/number.t
+    % prove t/op/number.t
 
 =head1 DESCRIPTION
 
@@ -104,32 +104,32 @@ pasm_output_is( <<CODE, <<OUTPUT, "set_n_nc" );
         print   "\\n"
         end
 CODE
-1.000000
-4.000000
-16.000000
-64.000000
-256.000000
-1024.000000
-4096.000000
-16384.000000
-65536.000000
-262144.000000
-1048576.000000
-4194304.000000
-16777216.000000
-67108864.000000
-268435456.000000
-1073741824.000000
-4294967296.000000
-17179869184.000000
-68719476736.000000
-274877906944.000000
-1099511627776.000000
-4398046511104.000000
-17592186044416.000000
-70368744177664.000000
-281474976710656.000000
-1125899906842620.000000
+1
+4
+16
+64
+256
+1024
+4096
+16384
+65536
+262144
+1048576
+4194304
+16777216
+67108864
+268435456
+1073741824
+4294967296
+17179869184
+68719476736
+274877906944
+1099511627776
+4398046511104
+17592186044416
+70368744177664
+281474976710656
+1.12589990684262e+15
 OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "set_n" );
@@ -139,7 +139,7 @@ pasm_output_is( <<CODE, <<OUTPUT, "set_n" );
         print   "\\n"
         end
 CODE
-42.000000
+42
 OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "add_n_n_n" );
@@ -157,9 +157,9 @@ pasm_output_is( <<CODE, <<OUTPUT, "add_n_n_n" );
         print   "\\n"
         end
 CODE
-2.000000
-3.000000
-6.000000
+2
+3
+6
 OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "add_n_n" );
@@ -178,9 +178,9 @@ pasm_output_is( <<CODE, <<OUTPUT, "add_n_n" );
         print   "\\n"
         end
 CODE
-2.000000
-3.000000
-6.000000
+2
+3
+6
 OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "sub_n_n_n" );
@@ -191,7 +191,7 @@ pasm_output_is( <<CODE, <<OUTPUT, "sub_n_n_n" );
         print   "\\n"
         end
 CODE
-420042.000000
+420042
 OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "sub_n_n" );
@@ -206,8 +206,8 @@ pasm_output_is( <<CODE, <<OUTPUT, "sub_n_n" );
         print   "\\n"
         end
 CODE
-420042.000000
-0.000000
+420042
+0
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "abs(n, i|ic|n|nc)" );
@@ -242,14 +242,14 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "abs(n, i|ic|n|nc)" );
         print "\n"
         end
 CODE
-1.000000
-1.000000
-1.000000
-1.000000
-1.000000
-1.000000
-1.000000
-1.000000
+1
+1
+1
+1
+1
+1
+1
+1
 OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "mul_i" );
@@ -265,7 +265,7 @@ pasm_output_is( <<CODE, <<OUTPUT, "mul_i" );
         print   "\\n"
         end
 CODE
-256.000000
+256
 OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "div_i" );
@@ -288,9 +288,9 @@ pasm_output_is( <<CODE, <<OUTPUT, "div_i" );
         print   "\\n"
         end
 CODE
-5.000000
-3.500000
--2.250000
+5
+3.5
+-2.25
 OUTPUT
 
 pasm_output_like( <<CODE, <<OUTPUT, "mod_n" );
@@ -332,12 +332,12 @@ pasm_output_like( <<CODE, <<OUTPUT, "mod_n" );
 
         end
 CODE
-/5\.000000
--?0\.000000
-2\.000000
--1\.000000
-1\.000000
--2\.000000
+/5\
+-?0\
+2\
+-1\
+1\
+-2\
 /
 OUTPUT
 
@@ -350,7 +350,7 @@ pasm_output_is( <<CODE, <<OUTPUT, "cmod_n" );
 
         end
 CODE
-2.000000
+2
 OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "eq_n_ic" );
@@ -383,7 +383,7 @@ OUTPUT
 pasm_output_is( <<CODE, <<OUTPUT, "eq_nc_ic" );
         set     N0, 1.000001
 
-        eq      N0, 1.000000, ERROR
+        eq      N0, 1, ERROR
         branch  ONE
         print   "bad\\n"
 
@@ -778,8 +778,8 @@ pasm_output_is( <<CODE, <<OUTPUT, "inc_n" );
         print   "\\n"
         end
 CODE
-1.000000
-5.000000
+1
+5
 OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "dec_n" );
@@ -797,8 +797,8 @@ pasm_output_is( <<CODE, <<OUTPUT, "dec_n" );
         print   "\\n"
         end
 CODE
--1.000000
--5.000000
+-1
+-5
 OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "set_i_n" );
@@ -892,7 +892,7 @@ pasm_output_is( <<CODE, <<OUTPUT, "clearn" );
         print   "\\n"
         end
 CODE
-0.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.0000000.000000
+00000000000000000000000000000000
 OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "neg_n" );
@@ -903,7 +903,7 @@ pasm_output_is( <<CODE, <<OUTPUT, "neg_n" );
     print "\\n"
     end
 CODE
--3.000000
+-3
 OUTPUT
 
 pasm_output_like( <<CODE, <<OUTPUT, "neg 0.0" );
@@ -913,7 +913,7 @@ pasm_output_like( <<CODE, <<OUTPUT, "neg 0.0" );
     print "\\n"
     end
 CODE
-/-?0\.0+/
+/-?0\$/
 OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "mul_n_n" );
@@ -924,7 +924,7 @@ pasm_output_is( <<CODE, <<OUTPUT, "mul_n_n" );
     print "\\n"
     end
 CODE
-12.000000
+12
 OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "fact_n_i" );
@@ -946,10 +946,10 @@ pasm_output_is( <<CODE, <<OUTPUT, "fact_n_i" );
     print "\\n"
     end
 CODE
-6.000000
-39916800.000000
-1.000000
-1.000000
+6
+39916800
+1
+1
 OUTPUT
 
 pasm_output_is( <<CODE, <<OUTPUT, "fact_n_ic" );
@@ -967,10 +967,10 @@ pasm_output_is( <<CODE, <<OUTPUT, "fact_n_ic" );
     print "\\n"
     end
 CODE
-6.000000
-39916800.000000
-1.000000
-1.000000
+6
+39916800
+1
+1
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "exchange" );
@@ -988,9 +988,9 @@ pasm_output_is( <<'CODE', <<OUTPUT, "exchange" );
     print "\n"
     end
 CODE
-9.876540
-1.234560
--100.200300
+9.87654
+1.23456
+-100.2003
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "op_n_nc_nc" );
@@ -1002,8 +1002,8 @@ pasm_output_is( <<'CODE', <<OUTPUT, "op_n_nc_nc" );
     print "\n"
     end
 CODE
-5.000000
--2.000000
+5
+-2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "lt_nc_nc_ic" );
@@ -1047,11 +1047,11 @@ pasm_output_is( <<'CODE', <<OUTPUT, "string -> num" );
 
     end
 CODE
-1.000000
-12.000000
--2.450000
-2500.000000
-0.000000
+1
+12
+-2.45
+2500
+0
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "null" );
@@ -1065,8 +1065,8 @@ pasm_output_is( <<'CODE', <<OUTPUT, "null" );
 
     end
 CODE
-12.500000
-0.000000
+12.5
+0
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, ".dig parsing" );
@@ -1075,7 +1075,7 @@ pasm_output_is( <<'CODE', <<OUTPUT, ".dig parsing" );
    print "\n"
    end
 CODE
-0.500000
+0.5
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "sqrt_n_n" );
@@ -1088,8 +1088,8 @@ pasm_output_is( <<'CODE', <<OUTPUT, "sqrt_n_n" );
         print "\n"
         end
 CODE
-1.414214
-1.414214
+1.4142135623731
+1.41421356237309
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, "div_n_n by zero" );

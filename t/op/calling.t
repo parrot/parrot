@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -15,7 +15,7 @@ t/op/calling.t - Parrot Calling Conventions
 
 =head1 SYNOPSIS
 
-        % prove t/op/calling.t
+    % prove t/op/calling.t
 
 =head1 DESCRIPTION
 
@@ -180,13 +180,13 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "all together now" );
 CODE
 42
 77
-4.500000
-2.300000
+4.5
+2.3
 ok 1
 ok 2
 101
 88
-5.500000
+5.5
 ok 3
 ok 4
 OUTPUT
@@ -429,7 +429,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - fetch" );
     returncc
 .end
 CODE
-hello 42 again 47.110000
+hello 42 again 47.11
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too few" );
@@ -834,7 +834,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "type conversion - native" );
 .end
 CODE
 42 42 42
-42.000000 42.000000 42.200000
+42 42 42.2
 42 42 42.2
 OUTPUT
 

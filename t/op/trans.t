@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -15,7 +15,7 @@ t/op/trans.t - Transcendental Mathematical Ops
 
 =head1 SYNOPSIS
 
-        % prove t/op/trans.t
+    % prove t/op/trans.t
 
 =head1 DESCRIPTION
 
@@ -642,18 +642,18 @@ pasm_output_is( <<'CODE', <<OUTPUT, "pow_n_n_ic" );
     pow N1, N0, -5
     end
 CODE
-1.000000
-2.000000
-4.000000
-8.000000
-16.000000
-32.000000
-64.000000
-128.000000
-0.500000
-0.250000
-0.125000
-0.062500
+1
+2
+4
+8
+16
+32
+64
+128
+0.5
+0.25
+0.125
+0.0625
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "pow_n_n_i" );
@@ -712,18 +712,18 @@ pasm_output_is( <<'CODE', <<OUTPUT, "pow_n_n_i" );
     print "\n"
     end
 CODE
-1.000000
-2.000000
-4.000000
-8.000000
-16.000000
-32.000000
-64.000000
-0.500000
-0.250000
-0.125000
-0.062500
-0.031250
+1
+2
+4
+8
+16
+32
+64
+0.5
+0.25
+0.125
+0.0625
+0.03125
 0.015625
 OUTPUT
 

@@ -2079,7 +2079,7 @@ string_from_num(PARROT_INTERP, FLOATVAL f)
     /* Too damn hard--hand it off to Parrot_sprintf, which'll probably
        use the system sprintf anyway, but has gigantic buffers that are
        awfully hard to overflow. */
-    return Parrot_sprintf_c(interp, "%vg", f);
+    return Parrot_sprintf_c(interp, FLOATVAL_FMT, f);
 }
 
 

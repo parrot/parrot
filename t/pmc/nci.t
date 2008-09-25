@@ -197,12 +197,12 @@ NOT_LOADED:
 .end
 CODE
 libnci_test was successfully loaded
--55555.555550
--555555.555500
--5555555.555000
--55555555.550000
--555555555.500000
--5555555555.000000
+-55555.55555
+-555555.5555
+-5555555.555
+-55555555.55
+-555555555.5
+-5555555555
 OUTPUT
 
     pir_output_is( << 'CODE', << 'OUTPUT', "nci_f and nci_dlvar_float" );
@@ -259,12 +259,12 @@ NOT_LOADED:
 .end
 CODE
 libnci_test was successfully loaded
--333.000000
--3330.000000
--33300.000000
--333000.000000
--3330000.000000
--33300000.000000
+-333
+-3330
+-33300
+-333000
+-3330000
+-33300000
 OUTPUT
 
     pir_output_is( << 'CODE', << "OUTPUT", "nci_l - return a long in an INTEGER register" );
@@ -487,7 +487,7 @@ NOT_LOADED:
 .end
 CODE
 libnci_test was successfully loaded
--8.256000
+-8.256
 OUTPUT
 
     pir_output_is( << 'CODE', << "OUTPUT", "get_string()" );
@@ -883,9 +883,9 @@ OUTPUT
   print "\n"
   end
 CODE
-42.000000
-100.000000
-47.110000
+42
+100
+47.11
 OUTPUT
 
     pasm_output_like( <<'CODE', <<'OUTPUT', "nci_pi - align" );
@@ -1002,7 +1002,7 @@ CODE
 10
 100
 77
-200.000000
+200
 OUTPUT
 
     pasm_output_is( <<'CODE', <<'OUTPUT', "nci_pi - nested struct * w named access" );
