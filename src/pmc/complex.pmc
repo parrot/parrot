@@ -24,8 +24,8 @@ but those starting with => are the ones used
 
 #include "parrot/parrot.h"
 
-#define RE(obj) (((FLOATVAL*)PMC_struct_val(obj))[0])
-#define IM(obj) (((FLOATVAL*)PMC_struct_val(obj))[1])
+#define RE(obj) (PARROT_COMPLEX(obj)->re)
+#define IM(obj) (PARROT_COMPLEX(obj)->im)
 
 /*
 
@@ -213,19 +213,20 @@ representing the real and imaginary parts of the complex number.
 static FLOATVAL*
 complex_locate_keyed_num(PARROT_INTERP, PMC *self, STRING *key) {
     /* do imag first since real can be read much faster anyway */
-    STRING *imag = string_from_cstring(interp, "imag", 4);
-    STRING *real;
+    STRING *imag = CONST_STRING(interp, "imag");
 
-    if (0 == string_equal(interp, key, imag))
-        return &IM(self);
-
-    real = string_from_cstring(interp, "real", 4);
-
-    if (0 == string_equal(interp, key, real))
-        return &RE(self);
-
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-        "Complex: key is neither 'real' or 'imag'");
+    if (0 == string_equal(interp, key, imag)) {
+        return &PARROT_COMPLEX(self)->im;
+    }
+    else {
+        STRING *real = CONST_STRING(interp, "real");
+        if (0 == string_equal(interp, key, real))
+            return &PARROT_COMPLEX(self)->re;
+        else
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION,
+                "Complex: key is neither 'real' or 'imag'");
+    }
 }
 
 static void
@@ -251,7 +252,10 @@ complex_check_divide_zero(PARROT_INTERP, PMC *value) {
 }
 
 
-pmclass Complex {
+pmclass Complex need_ext {
+
+    ATTR FLOATVAL re;
+    ATTR FLOATVAL im;
 
 /*
 
@@ -372,10 +376,7 @@ Creates an identical copy of the complex number.
 
     VTABLE void init() {
         /* XXX should check if mem_sys_allocate failed */
-        FLOATVAL *data       =
-            (FLOATVAL *)mem_sys_allocate(2 * sizeof (FLOATVAL));
-        PMC_struct_val(SELF) = data;
-
+        PMC_data(SELF) = mem_allocate_typed(Parrot_Complex_attributes);
         RE(SELF) = IM(SELF) = 0.0;
 
         PObj_active_destroy_SET(SELF);
@@ -387,17 +388,15 @@ Creates an identical copy of the complex number.
     }
 
     VTABLE void destroy() {
-        mem_sys_free(PMC_struct_val(SELF));
-        PMC_struct_val(SELF) = NULL;
+        mem_sys_free(PMC_data(SELF));
+        PMC_data(SELF) = NULL;
     }
 
     VTABLE PMC *clone() {
-        PMC           *dest  = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        FLOATVAL      *data  =
-            (FLOATVAL *)mem_sys_allocate(2 * sizeof (FLOATVAL));
-        PMC_struct_val(dest) = data;
-        RE(dest)             = RE(SELF);
-        IM(dest)             = IM(SELF);
+        PMC *dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC_data(dest) = mem_allocate_typed(Parrot_Complex_attributes);
+        RE(dest) = RE(SELF);
+        IM(dest) = IM(SELF);
 
         PObj_active_destroy_SET(dest);
         return dest;
