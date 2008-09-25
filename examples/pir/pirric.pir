@@ -12,7 +12,8 @@
 #
 # Instuctions implemented:
 # - Flow control: GOTO, GOSUB, RETURN, RUN, END, EXIT
-# - Conditional: IF (without ELSE)
+# - Conditional: IF/ELSE
+# - Loop: FOR/NEXT
 # - Programming: LIST, LOAD, SAVE
 # - Debugging: TRON, TROFF
 # - Input/Output: PRINT
@@ -1282,7 +1283,32 @@ fail:
     $I0 = arg
     unless $I0 goto is_false
     self.execute(tokenizer)
+    goto finish
+
 is_false:
+    .local int level
+    level = 1
+# Search for ELSE, taking nested IF into account
+nextitem:
+    $P0 = tokenizer.get ()
+    $I0 = defined $P0
+    unless $I0 goto finish
+    $I0 = isa $P0, 'String'
+    unless $I0 goto nextitem
+    $S0 = $P0
+    upcase $S0
+    eq $S0, 'ELSE', is_else
+    eq $S0, 'IF', is_if
+    goto nextitem
+is_if:
+    inc level
+    goto nextitem
+is_else:
+    dec level
+    if level > 0 goto nextitem
+    self.execute(tokenizer)
+
+finish:
     .return()
 fail:
     SyntaxError()
@@ -1293,18 +1319,6 @@ fail:
 
     .local pmc program
     program = getattribute self, 'program'
-
-#    $P0 = program.begin()
-#next:
-#    unless $P0, finish
-#    shift $S0, $P0
-#    $S1 = program [$S0]
-#    $I1 = length $S1
-#    unless $I1 goto next
-#    print $S0
-#    print ' '
-#    say $S1
-#    goto next
 
     .local pmc lines, text
     lines = getattribute program, 'lines'
@@ -1418,6 +1432,9 @@ endloop:
     unless $I0 goto endline
 
 item:
+    $S0 = arg
+    upcase $S0
+    eq $S0, 'ELSE', endline
     arg = self.evaluate(tokenizer, arg)
 print_it:
     print arg
@@ -1426,6 +1443,9 @@ print_it:
     unless $I0 goto endline
     eq arg, ';', nextitem
     eq arg, ',', comma
+    $S0 = arg
+    upcase $S0
+    eq $S0, 'ELSE', endline
     SyntaxError()
 comma:
     print "\t"
@@ -1439,7 +1459,12 @@ endline:
 nextitem:
     arg = tokenizer.get()
     $I0 = defined arg
-    if $I0 goto item
+    unless $I0 goto finish
+    $S0 = arg
+    upcase $S0
+    eq $S0, 'ELSE', finish
+    goto item
+finish:
 .end
 
 .sub func_REM :method
