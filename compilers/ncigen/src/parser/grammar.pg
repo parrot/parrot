@@ -128,6 +128,7 @@ token builtin_type {
     | 'short'
     | 'int'
     | 'long' <.ws> 'long' <.ws> 'int' >>
+    | 'long' <.ws> 'long' >>
     | 'long' <.ws> 'int' >>
     | 'long' <.ws> 'double' >>
     | 'long'

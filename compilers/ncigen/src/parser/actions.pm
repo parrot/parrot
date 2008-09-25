@@ -159,7 +159,7 @@ sub ispointer($/, $ast) {
 
         $lookup_ast := $decls{$type_name};
         unless $lookup_ast {
-            say("Parent " ~~ $lookup_ast_name ~~ " " ~~ $type_name ~~ " not defined");
+            #say("Parent " ~~ $lookup_ast_name ~~ " " ~~ $type_name ~~ " not defined");
             return 1;
         }
         if $lookup_ast.pointer() {
