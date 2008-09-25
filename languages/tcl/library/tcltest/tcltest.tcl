@@ -2069,9 +2069,9 @@ proc tcltest::test {name description args} {
 	    || $scriptFailure)} {
 	if {$testLevel == 1} {
 	    incr numTests(Passed)
-	    #if {[IsVerbose pass]} {
+	    if {[IsVerbose pass]} {
 		puts [outputChannel] "++++ $name PASSED"
-	    #}
+	    }
 	}
 	incr testLevel -1
 	return
