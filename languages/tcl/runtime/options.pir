@@ -171,7 +171,11 @@ loop:
   if pos >= argv_len goto loop_done
   arg = argv[pos]
   $S1 = substr arg, 0, 1, ''
+  # args must start with -
   if $S1 != '-' goto loop_done
+  # and not have any whitespace.
+  $I1 = index arg, ' '
+  if $I1 != -1 goto loop_done
   unless endswitch goto loop_2
   if arg == '-' goto handle_endswitch # already ate one -
 loop_2:
