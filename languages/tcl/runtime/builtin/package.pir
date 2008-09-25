@@ -14,7 +14,7 @@
 
     .local string subcommand, package_name
     subcommand = shift args
-    if subcommand != 'require' goto bad_subcommand
+    if subcommand != 'require' goto check_present
     package_name = shift args
     if package_name != 'tcltest' goto bad_subcommand
     # XXX ignoring optional 3rd arg...
@@ -43,9 +43,18 @@
     $P1 = script($S0, 'bsnl'=>1)
     $P1()
 
+
+
     # for now, fail (& succeed) silently
 bad_subcommand:
    .return ('')
+
+check_present:
+   if subcommand != 'present' goto bad_subcommand
+   $S0 = shift args
+   $S0 = 'package ' . $S0
+   $S0 .= ' is not present'
+   die $S0
 .end
 
 # Local Variables:
