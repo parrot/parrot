@@ -1,5 +1,10 @@
 # $Id$
 
+New in October 2008 release
+- Languages
+  + partcl (Tcl 8.5.4)
+    - 'make spectest' now uses tcltest.tcl to run *.test files directly
+
 New in 0.7.1
 - Implementation
   + add -I and -L command line options
