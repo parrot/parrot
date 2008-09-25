@@ -64,6 +64,9 @@
     addattribute runnerclass, 'stack'
     addattribute runnerclass, 'tron'
 
+    .local pmc endclass
+    endclass = newclass ['End']
+
     .local pmc jumpclass
     jumpclass = newclass ['Jump']
     addattribute jumpclass, 'jumptype'
@@ -87,11 +90,6 @@
     cl = newclass 'Literal'
     addparent cl, $P0
     set_global 'Literal', cl
-.end
-
-#-----------------------------------------------------------------------
-.sub main :main
-    .param pmc args
 
     .local pmc keywords
     keywords = new 'Hash'
@@ -131,6 +129,12 @@
     setpredef(predefs, "ATAN", "atan")
     setpredef(predefs, "SQR", "sqr")
     set_global 'predefs', predefs
+
+.end
+
+#-----------------------------------------------------------------------
+.sub main :main
+    .param pmc args
 
     .local pmc program
     program = new ['Program']
@@ -984,6 +988,8 @@ handle_it:
     if $I1 goto handle_stop
     $I1 = isa $P1, 'Cont'
     if $I1 goto handle_cont
+    $I1 = isa $P1, 'End'
+    if $I1 goto prog_end
     goto unhandled
 
 handle_stop:
@@ -1172,43 +1178,36 @@ next:
 .end
 
 #-----------------------------------------------------------------------
+.sub throw_jump
+    .param pmc payload
+
+    .local pmc excep, severity
+    excep = new 'Exception'
+    severity = new 'Integer'
+    severity= .EXCEPT_NORMAL
+    setattribute excep, 'severity', severity
+    setattribute excep, 'payload', payload
+    throw excep
+.end
+
+#-----------------------------------------------------------------------
 .sub func_CONT :method
     .param pmc tokenizer
 
-    .local pmc excep
-    excep = new 'Exception'
-    .local pmc aux
-    aux = new 'Integer'
-    aux = .EXCEPT_NORMAL
-    setattribute excep, 'severity', aux
-
-    .local pmc line
-    line = new 'Cont'
-    $P1 = new 'Integer'
-    $P1 = 2
-    setattribute line, 'jumptype', $P1
-    setattribute excep, 'payload', line
-    throw excep
+    .local pmc cont
+    cont = new 'Cont'
+    $P0 = new 'Integer'
+    $P0 = 2
+    setattribute cont, 'jumptype', $P0
+    throw_jump(cont)
 .end
 
 .sub func_END :method
     .param pmc tokenizer
 
-    .local pmc excep
-    excep = new 'Exception'
-    .local pmc aux
-    aux = new 'Integer'
-    aux = .EXCEPT_NORMAL
-    setattribute excep, 'severity', aux
-
-    .local pmc line
-    line = new 'Jump'
-    $P0 = new 'Integer'
-    $P0 = -1
-    setattribute line, 'jumpline', $P0
-
-    setattribute excep, 'payload', line
-    throw excep
+    .local pmc end
+    end = new 'End'
+    throw_jump(end)
 .end
 
 .sub func_EXIT :method
@@ -1272,19 +1271,13 @@ fail:
     unless $I0 goto fail
     $I0 = arg
 
-    .local pmc excep
-    excep = new 'Exception'
-    .local pmc aux
-    aux = new 'Integer'
-    aux = .EXCEPT_NORMAL
-    setattribute excep, 'severity', aux
     .local pmc line
     line = new 'Jump'
     $P0 = new 'Integer'
     $P0 = $I0
     setattribute line, 'jumpline', $P0
-    setattribute excep, 'payload', line
-    throw excep
+    throw_jump(line)
+
 fail:
     SyntaxError()
 .end
@@ -1298,16 +1291,6 @@ fail:
     unless $I0 goto fail
     $I0 = arg
 
-    .local pmc excep
-    excep = new 'Exception'
-    .local pmc aux
-    aux = new 'Integer'
-    aux = .EXCEPT_NORMAL
-    setattribute excep, 'severity', aux
-    aux = new 'Integer'
-    aux = 0
-    setattribute excep, 'type', aux
-
     .local pmc line
     line = new 'Jump'
     $P0 = new 'Integer'
@@ -1316,10 +1299,8 @@ fail:
     $P1 = new 'Integer'
     $P1 = 1
     setattribute line, 'jumptype', $P1
+    throw_jump(line)
 
-    setattribute excep, 'payload', line
-
-    throw excep
 fail:
     SyntaxError()
 .end
@@ -1420,23 +1401,16 @@ finish:
     load_bytecode $S1
     .return()
 notype:
-    .local pmc program
-    program = getattribute self, 'program'
+    .local pmc newprogram
+    newprogram = new ['Program']
     .local string filename
     filename = arg
-    program.load(filename)
+    newprogram.load(filename)
+    setattribute self, 'program', newprogram
 
-    .local pmc excep
-    excep = new 'Exception'
-    .local pmc aux
-    aux = new 'Integer'
-    aux = .EXCEPT_NORMAL
-    setattribute excep, 'severity', aux
-    .local pmc line
-    line = new 'Integer'
-    line = -1
-    setattribute excep, 'payload', line
-    throw excep
+    .local pmc end
+    end = new 'End'
+    throw_jump(end)
 
 fail:
     SyntaxError()
@@ -1460,12 +1434,6 @@ fail:
     .local pmc jumpline
     jumpline = getattribute for, 'jumpline'
 
-    .local pmc excep
-    excep = new 'Exception'
-    .local pmc aux
-    aux = new 'Integer'
-    aux = .EXCEPT_NORMAL
-    setattribute excep, 'severity', aux
     .local pmc line
     line = new 'Jump'
     $P0 = new 'Integer'
@@ -1474,8 +1442,7 @@ fail:
     $P1 = new 'Integer'
     $P1 = 2
     setattribute line, 'jumptype', $P1
-    setattribute excep, 'payload', line
-    throw excep
+    throw_jump(line)
 
     .return()
 endloop:
@@ -1540,21 +1507,14 @@ finish:
     stack = getattribute self, 'stack'
     $P0 = pop stack
 
-    .local pmc excep
-    excep = new 'Exception'
-    .local pmc aux
-    aux = new 'Integer'
-    aux = .EXCEPT_NORMAL
-    setattribute excep, 'severity', aux
     .local pmc line
     line = new 'Jump'
     $P1 = new 'Integer'
     $P1 = 2
     setattribute line, 'jumpline', $P0
     setattribute line, 'jumptype', $P1
-    setattribute excep, 'payload', line
+    throw_jump(line)
 
-    throw excep
 fail:
     SyntaxError()
 .end
@@ -1562,19 +1522,12 @@ fail:
 .sub func_RUN :method
     .param pmc tokenizer
 
-    .local pmc excep
-    excep = new 'Exception'
-    .local pmc aux
-    aux = new 'Integer'
-    aux = .EXCEPT_NORMAL
-    setattribute excep, 'severity', aux
     .local pmc line
     line = new 'Jump'
     $P0 = new 'Integer'
     $P0 = 0
     setattribute line, 'jumpline', $P0
-    setattribute excep, 'payload', line
-    throw excep
+    throw_jump(line)
 .end
 
 .sub func_SAVE :method
@@ -1601,17 +1554,9 @@ fail:
 .sub func_STOP :method
     .param pmc tokenizer
 
-    .local pmc excep
-    excep = new 'Exception'
-    .local pmc aux
-    aux = new 'Integer'
-    aux = .EXCEPT_NORMAL
-    setattribute excep, 'severity', aux
-
     .local pmc line
     line = new 'Stop'
-    setattribute excep, 'payload', line
-    throw excep
+    throw_jump(line)
 .end
 
 .sub func_TROFF :method
