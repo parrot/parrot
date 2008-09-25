@@ -81,7 +81,6 @@ sub run_tests {
     foreach my $file (@files) {
       $file =~ m{/(\w+).test$};
       my $basename = $1;
-      warn "checking $basename?";
       if (exists $skipfiles{$basename}) {
         print "Skipping $file: $skipfiles{$basename}\n";
 	next;
