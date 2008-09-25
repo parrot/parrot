@@ -11,7 +11,7 @@
 # Only one instruction per line.
 #
 # Instuctions implemented:
-# - Flow control: GOTO, GOSUB, RETURN, RUN, END, EXIT
+# - Flow control: GOTO, GOSUB, RETURN, RUN, END, STOP, CONT, EXIT
 # - Conditional: IF/ELSE
 # - Loop: FOR/NEXT
 # - Programming: LIST, LOAD, SAVE
@@ -69,6 +69,13 @@
     addattribute jumpclass, 'jumptype'
     addattribute jumpclass, 'jumpline'
 
+    .local pmc stopclass
+    stopclass = newclass ['Stop']
+
+    .local pmc contclass
+    stopclass = newclass ['Cont']
+    addattribute stopclass, 'jumptype'
+
     .local pmc forclass
     forclass = newclass ['For']
     addattribute forclass, 'jumpline'
@@ -88,6 +95,7 @@
 
     .local pmc keywords
     keywords = new 'Hash'
+    setkeyword(keywords, 'CONT')
     setkeyword(keywords, 'END')
     setkeyword(keywords, 'EXIT')
     setkeyword(keywords, 'FOR')
@@ -102,6 +110,7 @@
     setkeyword(keywords, 'RETURN')
     setkeyword(keywords, 'RUN')
     setkeyword(keywords, 'SAVE')
+    setkeyword(keywords, 'STOP')
     setkeyword(keywords, 'TROFF')
     setkeyword(keywords, 'TRON')
     set_global 'keywords', keywords
@@ -913,7 +922,10 @@ dosub:
     .local pmc tron
     .local string curline
     .local pmc pcurline
+    .local int target
+    .local int stopline
 
+    stopline = 0
     pcurline = new 'String'
     setattribute self, 'curline', pcurline
 
@@ -967,15 +979,43 @@ handle_it:
     $I1 = defined $P1
     unless $I1 goto unhandled
     $I1 = isa $P1, 'Jump'
-    unless $I1 goto unhandled
+    if $I1 goto handle_jump
+    $I1 = isa $P1, 'Stop'
+    if $I1 goto handle_stop
+    $I1 = isa $P1, 'Cont'
+    if $I1 goto handle_cont
+    goto unhandled
+
+handle_stop:
+    print 'Stopped'
+    unless curline goto end_stop
+    print ' in '
+    print curline
+end_stop:
+    say ''
+    stopline = curline
+    null curline
+    push_eh handle_excep
+    goto next
+
+handle_cont:
+    unless stopline goto cannot_cont
+    target = stopline
+    curline = ''
+    goto do_jump
+cannot_cont:
+    print 'Cannot CONTinue'
+    goto linenum_msg
+
+handle_jump:
     $P2 = getattribute $P1, 'jumpline'
     $I1 = $P2
     eq $I1, -1, prog_end
 
     $S2 = curline
-    .local int target
     target = $P2
 
+do_jump:
     iter = program.begin()
 
     .local string fline
@@ -1010,6 +1050,7 @@ handled_jump:
     goto runit
 noline:
     print 'Line does not exist'
+linenum_msg:
     unless curline goto endmsg
     print ' in '
     print curline
@@ -1131,6 +1172,25 @@ next:
 .end
 
 #-----------------------------------------------------------------------
+.sub func_CONT :method
+    .param pmc tokenizer
+
+    .local pmc excep
+    excep = new 'Exception'
+    .local pmc aux
+    aux = new 'Integer'
+    aux = .EXCEPT_NORMAL
+    setattribute excep, 'severity', aux
+
+    .local pmc line
+    line = new 'Cont'
+    $P1 = new 'Integer'
+    $P1 = 2
+    setattribute line, 'jumptype', $P1
+    setattribute excep, 'payload', line
+    throw excep
+.end
+
 .sub func_END :method
     .param pmc tokenizer
 
@@ -1536,6 +1596,22 @@ fail:
 
 fail:
     SyntaxError()
+.end
+
+.sub func_STOP :method
+    .param pmc tokenizer
+
+    .local pmc excep
+    excep = new 'Exception'
+    .local pmc aux
+    aux = new 'Integer'
+    aux = .EXCEPT_NORMAL
+    setattribute excep, 'severity', aux
+
+    .local pmc line
+    line = new 'Stop'
+    setattribute excep, 'payload', line
+    throw excep
 .end
 
 .sub func_TROFF :method
