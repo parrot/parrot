@@ -3379,7 +3379,6 @@ namespace eval tcltest {
 # natively. Any code in this section is NOT part of the original tcltest.tcl
 # library file but was specifically added for partcl;
 
-proc ::tcltest::outputChannel {} {
-  return stdout
-}
+proc ::tcltest::outputChannel {} { return stdout }
+proc ::tcltest::errorChannel  {} { return stderr }
 ################################################################################
