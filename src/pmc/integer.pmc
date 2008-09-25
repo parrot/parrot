@@ -1185,9 +1185,9 @@ MMD_Float: {
         }
 MMD_DEFAULT: {
             /* int or undef */
-            const INTVAL diff = SELF.get_integer()
-                - VTABLE_get_integer(INTERP, value);
-            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+            const INTVAL selfval = SELF.get_integer();
+            const INTVAL other = VTABLE_get_integer(INTERP, value);
+            return selfval > other ? 1 : selfval < other ? -1 : 0;
         }
 }
 
