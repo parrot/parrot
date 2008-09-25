@@ -88,6 +88,12 @@ static void resize_symhash(ARGMOD(SymHash *hsh))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*hsh);
 
+static
+int
+int_overflows(const SymReg *r)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*r);
+
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -722,11 +728,42 @@ _mk_const(ARGMOD(SymHash *hsh), ARGIN(const char *name), int t)
         r->type |= VT_ENCODED;
     }
 
+    /* autopromote big ints to floats; fallout from RT #53908 */
+    if (t == 'I') {
+        if (int_overflows(r))
+            r->set = 'N';
+    }
+
     r->use_count++;
 
     return r;
 }
 
+static
+int
+int_overflows(const SymReg *r)
+{
+    INTVAL i;
+    errno = 0;
+
+    if (r->type & VT_CONSTP)
+        r = r->reg;
+
+    if (r->name[0] == '0' && (r->name[1] == 'x' || r->name[1] == 'X')) {
+        i = strtoul(r->name + 2, 0, 16);
+    }
+
+    else if (r->name[0] == '0' && (r->name[1] == 'O' || r->name[1] == 'o'))
+        i = strtoul(r->name + 2, 0, 8);
+
+    else if (r->name[0] == '0' && (r->name[1] == 'b' || r->name[1] == 'B'))
+        i = strtoul(r->name + 2, 0, 2);
+
+    else
+        i = strtol(r->name, 0, 10);
+
+    return errno ? 1 : 0;
+}
 
 /*
 
