@@ -1,4 +1,4 @@
-./nci_gen is currently written to run on Linux, feel free to add portability if you wish
+./nci_gen.pl is currently written to run on Linux, feel free to add portability if you wish
 
 EXAMPLES:
 perl ./nci_gen.pl postgres/spi.h          - SUCCESSFUL
