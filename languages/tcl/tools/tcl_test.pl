@@ -34,6 +34,13 @@ each individual C<.test> file.
 
 =cut
 
+# When testing, avoid these files for now.
+my %skipfiles = (
+  'binary' => 'Parrot assertion',
+  'clock'  => 'not implemented, memory hog',
+  'case'   => 'not implemented',
+);
+
 main();
 
 ##
@@ -65,12 +72,20 @@ sub checkout_tests {
 ##
 ## run_tests(@globs)
 ##
-## Run the tests.
+## Run the tests...
 ##
+
 sub run_tests {
     my (@files) = glob File::Spec->catfile( $DIR, '*.test' );
 
     foreach my $file (@files) {
+      $file =~ m{/(\w+).test$};
+      my $basename = $1;
+      warn "checking $basename?";
+      if (exists $skipfiles{$basename}) {
+        print "Skipping $file: $skipfiles{$basename}\n";
+	next;
+      }
       my $cmd = "../../parrot tcl.pbc $file";
       print "$cmd\n";
       system $cmd;
