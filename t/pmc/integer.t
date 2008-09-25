@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 
 =head1 NAME
 
@@ -472,23 +472,49 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', 'cmp functions for subclasses' );
 .sub main :main
     $P0 = subclass 'Integer', 'Int'
- 
+
     $P1 = new 'Int'
     $P1 = 1
     $P2 = new 'Int'
     $P2 = 2
 
     $I0 = cmp $P1, $P2
-    say $I0 
+    say $I0
     $I0 = cmp $P1, $P1
-    say $I0 
+    say $I0
     $I0 = cmp $P2, $P1
-    say $I0 
+    say $I0
 .end
 CODE
 -1
 0
 1
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'cmp for Integers more than 2^31 apart, RT #59336' );
+.sub 'main' :main
+    $P0 = new 'Integer'
+    $P0 = 2147483600
+
+  test_10:
+    print $P0
+    print " is"
+    if $P0 > -10 goto skip_10
+    print " not"
+  skip_10:
+    say " greater than -10"
+
+  test_1000:
+    print $P0
+    print " is"
+    if $P0 > -1000 goto skip_1000
+    print " not"
+  skip_1000:
+    say " greater than -1000"
+.end
+CODE
+2147483600 is greater than -10
+2147483600 is greater than -1000
 OUTPUT
 
 # Local Variables:
