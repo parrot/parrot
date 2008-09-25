@@ -58,6 +58,7 @@
     .local pmc runnerclass
     runnerclass = newclass ['Runner']
     addattribute runnerclass, 'program'
+    addattribute runnerclass, 'curline'
     addattribute runnerclass, 'vars'
     addattribute runnerclass, 'stack'
     addattribute runnerclass, 'tron'
@@ -66,6 +67,13 @@
     jumpclass = newclass ['Jump']
     addattribute jumpclass, 'jumptype'
     addattribute jumpclass, 'jumpline'
+
+    .local pmc forclass
+    forclass = newclass ['For']
+    addattribute forclass, 'jumpline'
+    addattribute forclass, 'controlvar'
+    addattribute forclass, 'increment'
+    addattribute forclass, 'limit'
 
     $P0 = get_class 'String'
     cl = newclass 'Literal'
@@ -81,11 +89,13 @@
     keywords = new 'Hash'
     setkeyword(keywords, 'END')
     setkeyword(keywords, 'EXIT')
+    setkeyword(keywords, 'FOR')
     setkeyword(keywords, 'GOSUB')
     setkeyword(keywords, 'GOTO')
     setkeyword(keywords, 'IF')
     setkeyword(keywords, 'LIST')
     setkeyword(keywords, 'LOAD')
+    setkeyword(keywords, 'NEXT')
     setkeyword(keywords, 'PRINT')
     setkeyword(keywords, 'REM')
     setkeyword(keywords, 'RETURN')
@@ -105,6 +115,10 @@
     setpredef(predefs, "COMPLEX", "complex")
     setpredef(predefs, "SIN", "sin")
     setpredef(predefs, "COS", "cos")
+    setpredef(predefs, "TAN", "tan")
+    setpredef(predefs, "ASIN", "asin")
+    setpredef(predefs, "ACOS", "acos")
+    setpredef(predefs, "ATAN", "atan")
     setpredef(predefs, "SQR", "sqr")
     set_global 'predefs', predefs
 
@@ -243,6 +257,13 @@ done:
     setattribute self, 'stack', $P1
     $P2 = new 'Hash'
     setattribute self, 'vars', $P2
+.end
+
+#-----------------------------------------------------------------------
+.sub getcurline :method
+    $P0 = getattribute self, 'curline'
+    $S0 = $P0
+    .return($S0)
 .end
 
 #-----------------------------------------------------------------------
@@ -489,6 +510,100 @@ fail:
     $P5 = $N0
 do_cos:
     $P9 = $P5.cos()
+    .return($P9)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
+.sub predef_tan :method
+    .param pmc tokenizer
+
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    null $P5
+    $P5 = self.get_1_arg(tokenizer)
+    $I0 = isa $P5, 'Integer'
+    #print 'Integer: '
+    #say $I0
+    unless $I0 goto do_tan
+    $I0 = $P5
+    null $P5
+    $P5 = new 'Float'
+    $N0 = $I0
+    $P5 = $N0
+do_tan:
+    $P9 = $P5.tan()
+    .return($P9)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
+.sub predef_asin :method
+    .param pmc tokenizer
+
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    null $P5
+    $P5 = self.get_1_arg(tokenizer)
+    $I0 = isa $P5, 'Integer'
+    unless $I0 goto do_asin
+    $I0 = $P5
+    null $P5
+    $P5 = new 'Float'
+    $N0 = $I0
+    $P5 = $N0
+do_asin:
+    $P9 = $P5.asin()
+    .return($P9)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
+.sub predef_acos :method
+    .param pmc tokenizer
+
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    null $P5
+    $P5 = self.get_1_arg(tokenizer)
+    $I0 = isa $P5, 'Integer'
+    #print 'Integer: '
+    #say $I0
+    unless $I0 goto do_acos
+    $I0 = $P5
+    null $P5
+    $P5 = new 'Float'
+    $N0 = $I0
+    $P5 = $N0
+do_acos:
+    $P9 = $P5.acos()
+    .return($P9)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
+.sub predef_atan :method
+    .param pmc tokenizer
+
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    null $P5
+    $P5 = self.get_1_arg(tokenizer)
+    $I0 = isa $P5, 'Integer'
+    #print 'Integer: '
+    #say $I0
+    unless $I0 goto do_atan
+    $I0 = $P5
+    null $P5
+    $P5 = new 'Float'
+    $N0 = $I0
+    $P5 = $N0
+do_atan:
+    $P9 = $P5.atan()
     .return($P9)
 fail:
     SyntaxError()
@@ -796,6 +911,10 @@ dosub:
     .local pmc iter
     .local pmc tron
     .local string curline
+    .local pmc pcurline
+
+    pcurline = new 'String'
+    setattribute self, 'curline', pcurline
 
 #    program = get_global 'program'
     program = getattribute self, 'program'
@@ -816,6 +935,7 @@ next:
     goto next
 
 runit:
+    pcurline = curline
     unless tron goto executeline
     print '['
     print curline
@@ -1036,6 +1156,52 @@ next:
     exit 0
 .end
 
+.sub func_FOR :method
+    .param pmc tokenizer
+
+    .local pmc pvar
+    pvar = tokenizer.get()
+    .local string var
+    var = pvar
+    upcase var
+    $P0 = tokenizer.get()
+    ne $P0, '=', fail
+    .local pmc value
+    value = self.evaluate(tokenizer)
+    $P0 = tokenizer.get()
+    $S0 = $P0
+    upcase $S0
+    ne $S0, 'TO', fail
+
+    .local pmc limit
+    limit = self.evaluate(tokenizer)
+    .local pmc increment
+    increment = new 'Integer'
+    increment = 1
+
+    .local pmc for
+    for = new 'For'
+    .local pmc line
+    line = self.getcurline()
+    setattribute for, 'jumpline', line
+    setattribute for, 'increment', increment
+    setattribute for, 'limit', limit
+
+    .local pmc vars, controlvar
+    vars = getattribute self, 'vars'
+    vars[var] = value
+    controlvar = vars[var]
+    setattribute for, 'controlvar', controlvar
+
+    .local pmc stack
+    stack = getattribute self, 'stack'
+    push stack, for
+
+    .return()
+fail:
+    SyntaxError()
+.end
+
 .sub func_GOTO :method
     .param pmc tokenizer
 
@@ -1200,6 +1366,46 @@ notype:
 
 fail:
     SyntaxError()
+.end
+
+.sub func_NEXT :method
+    .param pmc tokenizer
+
+    .local pmc stack
+    stack = getattribute self, 'stack'
+    $I0 = stack
+    dec $I0
+    .local pmc for
+    for = stack[$I0]
+    .local pmc controlvar, increment, limit
+    controlvar = getattribute for, 'controlvar'
+    increment = getattribute for, 'increment'
+    limit = getattribute for, 'limit'
+    controlvar = controlvar + increment
+    gt controlvar, limit, endloop
+    .local pmc jumpline
+    jumpline = getattribute for, 'jumpline'
+
+    .local pmc excep
+    excep = new 'Exception'
+    .local pmc aux
+    aux = new 'Integer'
+    aux = .EXCEPT_NORMAL
+    setattribute excep, 'severity', aux
+    .local pmc line
+    line = new 'Jump'
+    $P0 = new 'Integer'
+    $P0 = jumpline
+    setattribute line, 'jumpline', $P0
+    $P1 = new 'Integer'
+    $P1 = 2
+    setattribute line, 'jumptype', $P1
+    setattribute excep, 'payload', line
+    throw excep
+
+    .return()
+endloop:
+    $P0 = pop stack
 .end
 
 .sub func_PRINT :method

@@ -22,11 +22,9 @@
 1030 print "Rows: "; rows
 1040 end
 1100 rows = rows + 1
-1140 i=0
-1160 print "'"; row.get(i); "'";
-1170 i=i+1
-1180 if i = e then goto 2000
-1210 print ", ";
-1220 goto 1160
+1140 for i= 1 to e
+1160 print "'"; row.get(i - 1); "'";
+1180 if i < e then print ", ";
+1190 next
 2000 print
 2010 goto 1010
