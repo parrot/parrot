@@ -130,6 +130,9 @@ open_file:
 
 file:
   filename = shift argv
+  $P0 = new 'TclString'
+  $P0 = filename
+  set_root_global ['_tcl'], '$script', $P0
   .local string contents
   $P99 = open filename, '<'
   contents = $P99.'slurp'('')

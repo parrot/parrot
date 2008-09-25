@@ -506,10 +506,10 @@ bad_args:
   die 'wrong # args: should be "info globals ?pattern?"'
 .end
 
-# RT#40739: stub
 .sub 'script'
   .param pmc argv
-  .return(0)
+  $P0 = get_root_global ['_tcl'], '$script'
+  .return($P0)
 .end
 
 # RT#40740: stub
