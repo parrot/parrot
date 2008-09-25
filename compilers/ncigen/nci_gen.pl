@@ -1,4 +1,4 @@
-#! perl
+#!/usr/bin/perl
 # Copyright (C) 2008, The Perl Foundation.
 # $Id$
 
@@ -37,7 +37,7 @@ sub cc_preprocess {
   return $ofile;
 }
 
-sub dump_parse_tree {
+sub gen_NCI_signatures {
   my ( $file, $more_args ) = @_;
   return execit("make; $PARROT c99.pbc $more_args $file");
 }
@@ -59,10 +59,9 @@ sub main {
   $more_args = "--libname=$libname --nsname=$nsname";
   my $preproc_fn = cc_preprocess($ARGV[0]);
 
-  my $parse_tree = dump_parse_tree($preproc_fn, $more_args);
+  my $nci_sigs = gen_NCI_signatures($preproc_fn, $more_args);
   unlink($preproc_fn);
-  print $parse_tree;
-  print "$preproc_fn\n";
+  print $nci_sigs;
 }
 
 main();

@@ -93,7 +93,7 @@ method declaration($/) {
         my $name := setname($declarator, $ast);
         $decls{ $name } := $ast;
         ispointer($declarator, $ast);
-        if $C99DEBUG { _dumper($ast); }
+        #if $C99DEBUG { _dumper($ast); }
         #say($name);
     }
     #elsif ($type eq "VarDecl") {
@@ -105,7 +105,7 @@ method declaration($/) {
             my $name := setname($_, $l_ast);
             $decls{ $name } := $l_ast;
             ispointer($_, $l_ast);
-            if $C99DEBUG { _dumper($l_ast); }
+            #if $C99DEBUG { _dumper($l_ast); }
             #say($name);
         }
     }
@@ -117,40 +117,60 @@ method declaration($/) {
     make $decls;
 }
 
+sub countpointer($/) {
+    if $<pointer> {
+        return countpointer($<pointer>) + 1;
+    }
+    else {
+        return 0;
+    }
+}
+
 sub ispointer($/, $ast) {
     if $/ {
         if $<declarator><pointer> {
             $ast.pointer(1);
+            $ast.pointer_cnt(countpointer($<declarator><pointer>));
         }
     }
 
-    my $l_ast := $ast;
+    my $lookup_ast := $ast;
     repeat {
-        if $l_ast.pointer() {
+=begin comment
+        if $lookup_ast.pointer() {
             $ast.pointer(1);
             my $pc := +$ast.pointer_cnt();
             $pc++;
             $ast.pointer_cnt($pc);
         }
-        if $l_ast.builtin_type() {
-            $ast.primitive_type(~($l_ast.type()));
+=end comment
+
+        if $lookup_ast.builtin_type() {
+            $ast.primitive_type(~($lookup_ast.type()));
             return 1;
         }
-        my $type_name := $l_ast.type();
-        my $l_ast_name := $l_ast.name();
+        my $type_name := $lookup_ast.type();
+        my $lookup_ast_name := $lookup_ast.name();
 
         #FIXME struct or union typedef
-        if ($l_ast.name() eq $type_name) {
+        if ($lookup_ast.name() eq $type_name) {
             return 1;
         }
 
-        $l_ast := $decls{$type_name};
-        unless $l_ast {
-            #_dumper($decls);
-            say("Parent " ~~ $l_ast_name ~~ " " ~~ $type_name ~~ " not defined");
+        $lookup_ast := $decls{$type_name};
+        unless $lookup_ast {
+            _dumper($decls);
+            say("Parent " ~~ $lookup_ast_name ~~ " " ~~ $type_name ~~ " not defined");
             return 1;
         }
+        if $lookup_ast.pointer() {
+            $ast.pointer(1);
+            my $pc := +$ast.pointer_cnt();
+            $pc := $pc + $lookup_ast.pointer_cnt();
+            $ast.pointer_cnt($pc);
+        }
     } while (1);
+    #_dumper($ast);
 }
 
 sub settype($/, $ast) {

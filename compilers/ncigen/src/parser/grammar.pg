@@ -73,6 +73,11 @@ rule declaration_specifiers {
     <repeatable_declaration_specifiers>*
     {*}
 }
+#rule declaration_specifiers_orig { [ <storage_class_specifier> | <type_specifier> | <type_qualifier> | <function_specifier> ]+ {*} }
+#rule declaration_specifiers { [ <declaration_specifiers_inside> ]+ {*} }
+#rule declaration_specifiers_inside { [ <storage_class_specifier> | <type_specifier> | <type_qualifier> | <function_specifier> ] {{ _dumper(match) }} }
+token builtin_type_specifier { 'void' | 'char' | 'short' | 'int' | 'long' | 'float' | 'double' | 'signed' | 'unsigned' | '_Bool' | '_Complex' | '_Imaginary' }
+
 
 rule repeatable_declaration_specifiers {
     [
@@ -104,6 +109,7 @@ rule storage_class_specifier {
 }
 
 rule type_specifier {
+    #| <builtin_type_specifier>
     | <builtin_type>
     | $<type>=[ 'struct' | 'union' ] <struct_or_union_specifier>
     | 'enum' <enum_specifier>
@@ -111,6 +117,7 @@ rule type_specifier {
 }
 
 token builtin_type {
+  [
     [
       $<signed>=[ 'signed' | 'unsigned' ] <.ws> 
     ]?
@@ -131,6 +138,9 @@ token builtin_type {
     | '_Imaginary'
     ]
     >>
+  | 'unsigned'
+  | 'signed'
+  ]
 }
 
 rule struct_or_union_specifier {
@@ -232,6 +242,7 @@ rule gcc_attr {
     | '__format_arg__' '(' <digit>+ ')'
     | '__nonnull__' '(' <digit_list_plus> ')'
     | '__mode__' '(' <gcc_attr_mode> ')'
+    | '__sentinel__' '(' <digit>+ ')'
     | '__malloc__'
     | '__pure__'
     | '__warn_unused_result__'
@@ -322,6 +333,7 @@ rule direct_abstract_declarator {
     [
     | '(' <abstract_declarator> ')'
     | '[' <assignment_expression>? ']'
+    | '[' '*' ']'
     | '(' <parameter_type_list> ')'
     ]
     <direct_abstract_declarator_1>*
