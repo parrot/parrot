@@ -77,7 +77,7 @@ pmclass TclString
                         chunk_length, &follows_brace, 0);
 
                     Parrot_unregister_pmc(INTERP, retval);
-		    Parrot_ex_throw_from_c_args(INTERP, NULL, CONTROL_ERROR,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, CONTROL_ERROR,
                             "list element in braces followed by \"%s\" instead of space",
                             string_to_cstring(INTERP, follows_brace));
                 }
@@ -105,8 +105,8 @@ pmclass TclString
           quote_loop:
             if (peek_pos >= len) {
                 Parrot_unregister_pmc(INTERP, retval);
-		Parrot_ex_throw_from_c_args(INTERP, NULL, CONTROL_ERROR,
-                	"unmatched open quote in list");
+                Parrot_ex_throw_from_c_args(INTERP, NULL, CONTROL_ERROR,
+                    "unmatched open quote in list");
             }
             character = string_ord(INTERP, str, peek_pos);
             if (character == '\\') {
