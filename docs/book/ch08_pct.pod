@@ -1,6 +1,6 @@
 =pod
 
-=head0 PCT: Parrot Compiler Tools
+=head1 PCT: Parrot Compiler Tools
 
 Z<CHP-8>
 
@@ -26,7 +26,7 @@ interesting note, this means that the Perl 6 compiler is itself
 being written in Perl 6, a mind-boggling process known as
 C<bootstrapping>.
 
-=head1 PCT Overview
+=head2 PCT Overview
 
 PCT is a collection of classes which handle the creation of a
 compiler and driver program for a high-level language. The
@@ -36,7 +36,7 @@ building the parser and lexical analyzer. Creating a new HLL compiler
 is as easy as subclassing these three entities with methods specific
 to that high-level language.
 
-=head2 Grammars and Action Files
+=head3 Grammars and Action Files
 
 Creating a compiler using PCT requires three basic files, plus any
 additional files needed to implement the languages logic and library:
@@ -70,7 +70,7 @@ Parrot Abstract Syntax Tree (PAST).
 
 =back
 
-=head2 C<make_language_shell.pl>
+=head3 C<make_language_shell.pl>
 
 The Parrot repository contains a number of helpful utilities for doing
 some common development and building tasks with Parrot. These utlities
@@ -98,7 +98,7 @@ distributions might be "IronPython" or "VPython". If, on the other hand,
 you are implementing an entirely new language, you don't need to give it
 a fancy distribution name.
 
-=head2 Parsing Fundamentals
+=head3 Parsing Fundamentals
 
 Compilers typically consist of three components: The lexical analyzer,
 the parser, and the code generator C<This is an oversimplification, 
@@ -131,7 +131,7 @@ I<operator precidence> parser, for things like mathematical expressions
 where bottom-up methods are more efficient. We'll discuss both, and the
 methods for switching between the two, throughout this chapter.
 
-=head1 Driver Programs
+=head2 Driver Programs
 
 The driver program for the new compiler must create instances of the
 various necessary classes that run the parser. It must also include
@@ -147,10 +147,10 @@ to specify information about the prompt that's used and the environment
 that's expected. Help and error messages need to be written for the user
 too. 
 
-=head2 C<HLLCompiler> class
+=head3 C<HLLCompiler> class
 
 
-=head1 Parrot Grammar Engine
+=head2 Parrot Grammar Engine
 
 The Parrot Grammar Engine X<Parrot Grammar Engine;PGE> is an
 implementation of the Perl 6 grammar syntax in Parrot. The grammar
@@ -169,7 +169,7 @@ generators like Yacc and Bison. Most programmers won't notice the
 difference between the two for most applications, although there are
 some specific places where the behavior will be different.
 
-=head2 Rules and Actions
+=head3 Rules and Actions
 
 A recursive descent parser, like the one used in PGE, is a top-down
 parser. This means it attempts to start at the highest-level rule and
@@ -206,7 +206,7 @@ When a rule matches a sequence of input tokens, an associated method
 in NQP is called to convert that match into an AST node. This node
 is then inserted into the I<parse tree>.
 
-=head2 Basic Rules
+=head3 Basic Rules
 
 Let's start off with a simple rule:
 
@@ -282,7 +282,7 @@ I<quantifiers>, and allow an item in the rule to match a variable
 number of times. These aren't the only quantifiers, but they are the
 most common. We will talk about other quantifiers later on.
 
-=head2 Calling Actions
+=head3 Calling Actions
 
 We haven't covered actions yet, but it's still important now to talk
 about how we will call them when we are ready. We call an action
@@ -306,7 +306,7 @@ name and after the first name. When the rule tries to match the last
 name, it fails because no last name is provided, and the third action
 method call is never made.
 
-=head2 Alternations and Keys
+=head3 Alternations and Keys
 
 In addition to sub-rules, groups, and quantifiers, we also are able to
 take alternations between options that are either-or. The vertical bar
@@ -334,7 +334,7 @@ This is the same rule, except now it passes two arguments to it's
 action method: the match object and the name of the person who
 got matched.
 
-=head2 Warning: Left Recursion
+=head3 Warning: Left Recursion
 
 Getting into all the nitty-gritty theory behind parsers is well beyond
 the scope of this book. However, there is one potential pitfall that
@@ -418,7 +418,7 @@ descent grammar, but it's one that's likely going to come up relatively
 often for new language designers, and one that is not always likely to
 generate useful error messages.
 
-=head2 Operator Precidence Parser
+=head3 Operator Precidence Parser
 
 Places where there are lots of little tokens in a statement, and where
 there are lots of possible options that a top-down parser will have to
@@ -459,7 +459,7 @@ this is just a signature and that the actual guts of it will be filled in
 somewhere else. In this case, that "somewhere else" is in the definition of
 the optable role.
 
-=head2 Protofunction Definitions
+=head3 Protofunction Definitions
 
 Protofunctions are used to define operators in the optable in the same way that
 rules and tokens are used throughout the rest of the grammar. A proto is a way
@@ -544,7 +544,7 @@ built in, and it's only necessary to override for those data types with
 special needs. This example was only a demonstration of the flexibility
 of the method.
 
-=head1 Actions and NQP
+=head2 Actions and NQP
 
 Protofunction signatures aren't the only way to apply functions to rules
 matched by the parser. In fact, they might be the most primative because
@@ -560,7 +560,7 @@ bare minimum. NQP also happens to be a Perl 6 subset that's not entirely
 dissimilar from Perl 5, so Perl 5 programmers should not be too lost when
 writing NQP.
 
-=head2 NQP Basics
+=head3 NQP Basics
 
 Like Perl, NQP uses sigils to differentiate different types of variables.
 The C<$> sigil is used for scalars, C<@> is used for arrays, and C<%> is
@@ -603,7 +603,7 @@ It's also possible to assign a list in I<scalar context> as follows:
 Remember how we said NQP was a bare-bones subset of Perl 6? If NQP had too
 many features, people would use it instead of Perl 6!
 
-=head2 Calling Actions From Rules
+=head3 Calling Actions From Rules
 
 When talking about grammar rules, we discussed the funny little C<{*}>
 symbol that calls an action. The action in question is an NQP method
@@ -640,7 +640,7 @@ The key is just a string that contains whatever text is on the line after
 the C<#=> symbol. If we don't have a C<#=> we don't use a C<$key> in our
 method.
 
-=head2 The Match Object C<$/>
+=head3 The Match Object C<$/>
 
 The match object C<$/> may have a funny-looking name, but it's a data
 structure that's all business. It's both a hash and an array. Plus,
@@ -678,7 +678,7 @@ using the C<$( )> operator:
 
  $($<vowel>) == 3
 
-=head2 Inline PIR
+=head3 Inline PIR
 
 Now that we know what the match object is, we can talk about the inline
 PIR functionality. In a PGE rule, we can use the C<{{ }}> double curly
@@ -687,7 +687,7 @@ PIR code can be executed to affect the operation of the parser. We can
 access the variable C<$/> directly in the grammar without having to
 jump into NQP, and actually examine and affect the values in it.
 
-=head2 PAST Nodes
+=head3 PAST Nodes
 
 The job of NQP is to make abstract syntax trees, and the PCT implementation
 of syntax trees is implemented in the PAST class. There are many different
@@ -696,7 +696,7 @@ particular program construct. These constructs are relatively common and
 simple, but there are powerful levels of configuration that allow complicated
 programming structures to be represented.
 
-=head2 Making Trees
+=head3 Making Trees
 
 Every action has the ability to create a PAST node that represents that
 action N<and additional PAST nodes, that are children of that node>. Calling

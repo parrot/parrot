@@ -1,9 +1,64 @@
 =pod
 
-=head0 Opcodes and Runcores
+=head1 Opcodes and Runcores
 
 Z<CHP-11>
 
+The smallest executable component is not the compilation unit or even the subroutine,
+but is in fact the opcode. Opcodes in PASM, like opcodes in other assembly languages,
+are individual instructions that implement low-level operations in Parrot N<In the
+world of microprocessors, the word "opcode" typically refers to the numeric identifier
+for each instructions. The human-readable word used in the associated assembly language
+is called the "mnemonic". An assembler, among other tasks, is responsble for converting
+mnemonics into opcodes for execution. In Parrot, instead of referring to an instruction
+by different names depending on what form it's in, we just call them all "opcodes">. Of
+course the list of things that qualify as "low-level" in Parrot can be pretty advanced
+compared to the functionality supplied by regular assembly language opcodes.
+
+Before we talk about opcodes, we have to a little bit of talking about the various
+runcores that invoke them.
+
+=head2 Runcores
+
+During execution, the runcore is like the heart of Parrot. The runcore controls calling
+the various opcodes with the correct data, and making sure that program flow moves
+properly. Some runcores, such as the I<precomputed C goto runcore> are optimized for
+speed and don't perform many tasks beyond finding and dispatching opcodes. Other runcores,
+such as the I<GC-Debug>, I<debug> and I<profiling> runcores help with typical software
+maintenance and analysis tasks. Different runcores, because of the way they are structured,
+require the opcodes to be compiled into different forms. Because of this, understanding
+opcodes first requires an understanding of the Parrot runcores.
+
+=head3 Types of Runcores
+
+Parrot has multiple runcores. Some are useful for particular maintenance tasks, some are
+only available as optimizations in certain compilers, some are intended for general use,
+and some are just interesing flights of fancy with no practical benefits.
+
+=over 4
+
+=item*
+
+=item*
+
+=item*
+
+=back
+
+=head2 Writing Opcodes
+
+Writing Opcodes, like writing PMCs, is done in a C-like language which is later
+compiled into C code by the X<opcode compiler> opcode compiler. The opcode script
+represents a thin overlay on top of ordinary C code: All valid C code is valid
+Opcode script. There are a few neat additions that make writing Opcodes easier.
+
+=head3 Opcode Parameters
+
+=head3 Opcode Control Flow
+
+=head2 The Opcode Compiler 
+
+=head2 Opcode Multiple Dispatch
 
 ##########################################################################
 #                              PSEUDOPOD LEGEND

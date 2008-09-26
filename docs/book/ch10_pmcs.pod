@@ -1,8 +1,55 @@
 =pod
 
-=head0 PMCs
+=head1 PMCs
 
 Z<CHP-10>
+
+PMCs are one of the four fundamental data types in Parrot, and definitely one
+of the most useful. A PMC can contain a single scalar value (integer, floating
+point number, string), an array of values, a subroutine, a namespace, or an
+entire list of other data types as well. PMCs are the basis for all higher
+order data types in Parrot, and are flexible enough to be used for any
+purpose that an HLL needs.
+
+All the common PMC types are included in the Parrot repository and built directy
+into libparrot and the parrot executable. However, the system is not rigid; new
+PMC types can be defined externally and loaded into Parrot at a later time. In
+this way, HLLs and libraries and applications can add new data types to Parrot
+at the C code level, which helps to ensure speed and efficiency. PMCs loaded
+this way are called X<dynamic PMCs;dynpmcs> Dynamic PMCs or I<dynpmcs>.
+
+=head2 PIR Classes
+
+It's worth a quick diversion here to talk about the difference between a pure
+PIR class object, and a PMC. Even though classes written in PIR can inherit from
+an existing PMC type, they aren't all their own type of PMC. In fact, classes
+written in PIR are all of the Object PMC type. In order to add a new fundamental
+PMC type to Parrot, it needs to be written in C N<well, a superset of C anyway>
+and it needs to be compiled using the X<PMC compiler> PMC compiler.
+
+=head2 Writing PMCs
+
+In the strictest sense, PMCs are written in C and are compiled by your local
+C compiler into machine code for linking with libparrot or the parrot
+executable. However, Parrot's build process makes use of a special PMC compiler
+program that converts PMCs defined in a special C-like script to ordinary
+C code. The PMC compiler adds all the necessary boiler plate code and installs
+the PMC type into Parrot for use. The PMC script is like a macro superset
+N<although the functionality is a litte bit more involved then is available
+in the normal C preprocessor> over the C language. All valid C is valid in
+PMC scripts, but there are also a few additions that help to make common tasks
+a little easier.
+
+=head3 C<pmclass> Definitions
+
+=head3 VTABLE interface parameters
+
+=head3 C<INTERP>, C<SUPER>, C<SELF>, and C<STATICSELF>
+
+=head2 Dynpmcs
+
+=head3 Loading dynpmcs
+
 
 
 

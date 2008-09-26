@@ -14,4 +14,8 @@ chapters listed here may not directly correspond to the filenames in this folder
 11) PMCs
 12) Opcodes and Runcores
 13) NCI (proposed, if there is enough material about using NCI to warrant a chapter)
-14) Reference  
+14) Reference 
+
+Top-level headings in each chapter are level1 headings. All sub-headings in the chapter
+are level 2 and below. All pages in the book should contain the VIM suffix (which is
+a codingstd for all of the Parrot repo) and the Pseudopod cheatsheet.
