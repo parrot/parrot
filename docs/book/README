@@ -1,0 +1,17 @@
+The book will have the following chapters. Note that the number and order of intended
+chapters listed here may not directly correspond to the filenames in this folder:
+
+ 1) Overview
+ 2) Getting Started
+ 3) PIR Basics
+ 4) PIR Subroutines
+ 5) PASM
+ 6) Standard Library
+ 7) Testing and Debugging
+ 8) Parrot Architecture
+ 9) Parrot Compiler Tools
+10) High-Level Languages
+11) PMCs
+12) Opcodes and Runcores
+13) NCI (proposed, if there is enough material about using NCI to warrant a chapter)
+14) Reference  

@@ -444,7 +444,9 @@ docs/book/ch06_testing_and_debugging.pod                    [main]doc
 docs/book/ch07_architecture.pod                             [main]doc
 docs/book/ch08_pct.pod                                      [main]doc
 docs/book/ch09_hlls.pod                                     [main]doc
+docs/book/ch10_pmcs.pod                                     [main]doc
 docs/book/ch10_reference.pod                                [main]doc
+docs/book/ch11_opcodes.pod                                  [main]doc
 docs/book/figs/p6e_0801.png                                 [main]doc
 docs/compiler_faq.pod                                       [devel]doc
 docs/configuration.pod                                      [devel]doc
