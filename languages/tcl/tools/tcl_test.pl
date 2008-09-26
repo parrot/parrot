@@ -45,7 +45,6 @@ my %skipfiles = (
   'chanio' => 'unable to open file',
   'clock'  => 'not implemented, memory hog',
   'cmdAH'  => 'expected boolean value but got ""',
-  'cmdIL'  => 'bad option "-1"',
   'cmdAZ'  =>'bad option "-1"',
   'cmdInfo' => 'all skipped',
   'config' => 'all failed',
