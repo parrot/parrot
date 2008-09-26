@@ -135,7 +135,7 @@ Accessor for the C<astgrammar> attribute.
 
 =item commandline_banner([string value])
 
-Set the command-line banner for this compiler to C<value>.  
+Set the command-line banner for this compiler to C<value>.
 The banner is displayed at the beginning of interactive mode.
 
 =item commandline_prompt([string value])
