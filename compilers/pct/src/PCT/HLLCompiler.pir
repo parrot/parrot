@@ -135,15 +135,14 @@ Accessor for the C<astgrammar> attribute.
 
 =item commandline_banner([string value])
 
-Set the string in $S0 as a commandline prompt on the compiler in $P0.  The
-prompt is the text that is shown on the commandline before a command is entered
-when the compiler is started in interactive mode.
+Set the command-line banner for this compiler to C<value>.  
+The banner is displayed at the beginning of interactive mode.
 
 =item commandline_prompt([string value])
 
-Set the string in $S0 as a commandline banner on the compiler in $P0.  The
-banner is the first text that is shown when the com‐ piler is started in
-interactive mode. This can be used for a copyright notice or other information.
+Set the command-line prompt for this compiler to C<value>.
+The prompt is displayed in interactive mode at each point where
+the compiler is ready for code to be compiled and executed.
 
 =cut
 
@@ -514,24 +513,23 @@ specifies the encoding to use for the input (e.g., "utf8").
   interactive_loop:
     .local pmc code
     unless stdin goto interactive_end
-    ##  FIXME:  we have to avoid stdin.'readline'() when readline
-    ##  libraries aren't present (RT #41103)
 
-    # for each input line, print the prompt
+    .local string prompt
+    prompt = '> '
     $P0 = self.'commandline_prompt'()
-    printerr $P0
+    $I0 = defined $P0
+    unless $I0 goto have_prompt
+    prompt = $P0
+  have_prompt:
 
-    if has_readline < 0 goto no_readline
-    code = stdin.'readline'('> ')
+    ##  display a prompt ourselves if readline isn't present
+    if has_readline != -1 goto interactive_read
+    printerr prompt
+  interactive_read:
+    code = stdin.'readline'(prompt)
     if null code goto interactive_end
-    concat code, "\n"
-    goto have_code
-  no_readline:
-    $S0 = readline stdin
-    code = new 'String'
-    code = $S0
-  have_code:
     unless code goto interactive_loop
+    concat code, "\n"
     push_eh interactive_trap
     $P0 = self.'eval'(code, adverbs :flat :named)
     pop_eh
