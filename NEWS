@@ -2,6 +2,8 @@
 
 New in October 2008 release
 - Languages
+  + Markdown : new lightweight markup language
+    - start implementation with PCT/NQP
   + partcl (Tcl 8.5.4)
     - 'make spectest' now uses tcltest.tcl to run *.test files directly
 
