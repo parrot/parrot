@@ -279,10 +279,8 @@ their thing.
 */
 void
 new_subr(struct lexer_state *lexer, char * const subname) {
-    subroutine *newsub = (subroutine *)malloc(sizeof (subroutine));
+    subroutine *newsub = mem_allocate_zeroed_typed(subroutine);
     int index;
-
-    assert(newsub != NULL);
 
     /* set the sub fields */
     newsub->sub_name   = subname;
@@ -298,6 +296,7 @@ new_subr(struct lexer_state *lexer, char * const subname) {
     newsub->flags      = 0;
 
     init_hashtable(&newsub->symbols, HASHTABLE_SIZE_INIT);
+    init_hashtable(&newsub->labels, HASHTABLE_SIZE_INIT);
 
     for (index = 0; index < 4; index++) {
         newsub->registers[index] = NULL; /* set all "register" tables to NULL */
@@ -306,16 +305,14 @@ new_subr(struct lexer_state *lexer, char * const subname) {
 
     /* link the new sub node into the list of subroutines */
     if (CURRENT_SUB(lexer) == NULL) { /* no subroutine yet, this is the first one */
-        CURRENT_SUB(lexer) = newsub;
         newsub->next       = newsub; /* set next field to itself, making the list circular linked */
     }
     else { /* there is at least 1 other subroutine */
-
         /* lexer->subs points to "end of list", to the last added one */
         newsub->next             = CURRENT_SUB(lexer)->next; /* set newsub's next to the first item in the list */
         CURRENT_SUB(lexer)->next = newsub;    /* set current sub's next to the new sub. */
-        CURRENT_SUB(lexer)       = newsub;    /* set pointer to current sub to this last added one */
     }
+    CURRENT_SUB(lexer) = newsub;
 
     /* store the subroutine identifier as a global label */
     store_global_label(lexer, subname);
@@ -341,11 +338,9 @@ Create a new instruction node and set C<opname> as the instruction.
 */
 static instruction *
 new_instruction(char * const opname) {
-    instruction *ins = (instruction *)malloc(sizeof (instruction));
-    assert(ins != NULL);
-    memset(ins, 0, sizeof (instruction));
-    ins->opname = opname;
-    ins->opcode = -1; /* make sure this field is properly initialized;
+    instruction *ins = mem_allocate_zeroed_typed(instruction);
+    ins->opname      = opname;
+    ins->opcode      = -1; /* make sure this field is properly initialized;
                          it must be >= 0 before being used */
     return ins;
 }
@@ -371,18 +366,6 @@ new_statement(struct lexer_state * const lexer, char * const opname) {
      * calculate offsets for label branches.
      */
     instr->offset = lexer->instr_counter++;
-
-    /*
-    if (CURRENT_INSTRUCTION(lexer) == NULL) {
-        CURRENT_INSTRUCTION(lexer) = instr;
-        instr->next = instr;
-    }
-    else {
-        instr->next = CURRENT_INSTRUCTION(lexer)->next;
-        CURRENT_INSTRUCTION(lexer)->next = instr;
-        CURRENT_INSTRUCTION(lexer)       = instr;
-    }
-    */
 
     if (CURRENT_INSTRUCTION(lexer) == NULL)
         instr->next = instr;
@@ -479,8 +462,7 @@ Create a new target node. The node's next pointer is initialized to itself.
 */
 target *
 new_target(pir_type type, char * const name) {
-    target *t       = (target *)malloc(sizeof (target));
-    memset(t, 0, sizeof (target));
+    target *t       = mem_allocate_zeroed_typed(target);
     t->type         = type;
     t->key          = NULL;
     t->color        = -1;         /* -1 means no PASM register assigned yet */
@@ -662,9 +644,7 @@ Create a new argument node which wraps C<expr>.
 */
 argument *
 new_argument(expression * const expr) {
-    argument *arg = (argument *)malloc(sizeof (argument));
-    assert(arg != NULL);
-    memset(arg, 0, sizeof (argument));
+    argument *arg = mem_allocate_zeroed_typed(argument);
     arg->value    = expr;
     arg->next     = arg;
     return arg;
@@ -1121,11 +1101,10 @@ appropriate type from C<arg_ptr>.
 */
 static constant *
 create_const(pir_type type, char * const name, va_list arg_ptr) {
-    constant *c = (constant *)malloc(sizeof (constant));
-    assert(c != NULL);
-    c->name = name;
-    c->type = type;
-    c->next = NULL;
+    constant *c = mem_allocate_zeroed_typed(constant);
+    c->name     = name;
+    c->type     = type;
+    c->next     = NULL;
 
     switch (type) {
         case INT_TYPE:
@@ -1234,8 +1213,7 @@ expression node is returned.
 */
 static expression *
 new_expr(expr_type type) {
-    expression *expr = (expression *)calloc(1, sizeof (expression));
-    assert(expr);
+    expression *expr = mem_allocate_zeroed_typed(expression);
     expr->type       = type;
     expr->next       = expr;
     return expr;
@@ -1649,8 +1627,7 @@ Wraps the expression C<expr> in a key node and returns that.
 */
 key *
 new_key(expression * const expr) {
-    key *k  = (key *)malloc(sizeof (key));
-    assert(k != NULL);
+    key *k  = mem_allocate_zeroed_typed(key);
     k->expr = expr;
     k->next = NULL;
     return k;
@@ -1869,8 +1846,7 @@ get_signatured_opname(instruction * const instr) {
     }
 
     /* now we know how long the fullname will be, allocate enough memory. */
-    fullname = (char *)calloc(fullname_length, sizeof (char));
-    assert(fullname);
+    fullname = (char *)mem_sys_allocate_zeroed(fullname_length * sizeof (char));
 
     /* copy the short name into fullname buffer, and set instr_writer to
      * the character after that.
@@ -2139,7 +2115,7 @@ print_instruction(lexer_state *lexer, instruction *ins) {
             || STREQ(ins->opname, "get_params")
             || STREQ(ins->opname, "set_returns"))
         {
-            fullname = (char *)calloc(strlen(ins->opname) + 4, sizeof (char));
+            fullname = (char *)mem_sys_allocate_zeroed(strlen(ins->opname) + 4 * sizeof (char));
             assert(fullname);
             sprintf(fullname, "%s_pc", ins->opname);
         }
@@ -2563,7 +2539,7 @@ free_subs(lexer_state * const lexer) {
         do {
             subroutine *temp = iter;
             iter = iter->next;
-            free(temp);
+            mem_sys_free(temp);
         }
         while (iter != lexer->subs->next);
     }

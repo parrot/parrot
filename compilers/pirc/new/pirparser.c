@@ -4870,12 +4870,12 @@ of the old strings. The new string is returned.
 static char *
 concat_strings(char *a, char *b) {
     int strlen_a = strlen(a);
-    char *newstr = (char *)calloc(strlen_a + strlen(b) + 1, sizeof (char));
+    char *newstr = (char *)mem_sys_allocate_zeroed((strlen_a + strlen(b) + 1) * sizeof (char));
     assert(newstr != NULL);
     strcpy(newstr, a);
     strcpy(newstr + strlen_a, b);
-    free(a);
-    free(b);
+    mem_sys_free(a);
+    mem_sys_free(b);
     a = b = NULL;
     return newstr;
 }
@@ -5168,8 +5168,9 @@ do_strength_reduction(lexer_state * const lexer) {
         default:
             break;
     }
-
+    /*
     fprintf(stderr, "do_strength_reduction() done\n");
+    */
 }
 
 /*

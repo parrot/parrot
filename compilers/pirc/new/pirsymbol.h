@@ -46,7 +46,6 @@ typedef struct pir_reg {
 typedef struct global_label {
     char                *name;
     int                  const_nr;
-    struct global_label *next;
 
 } global_label;
 
@@ -54,7 +53,6 @@ typedef struct global_label {
 typedef struct local_label {
     char               *name;
     unsigned            offset;
-    struct local_label *next;
 
 } local_label;
 

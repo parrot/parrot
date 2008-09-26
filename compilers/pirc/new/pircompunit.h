@@ -305,11 +305,10 @@ typedef struct subroutine {
     instruction        *statements;    /* statements of this sub */
 
     hashtable           symbols;
+    hashtable           labels;        /* local labels */
 
     struct pir_reg     *registers[4];  /* used PIR registers in this sub (1 list for each type) */
     unsigned            regs_used[4];  /* number of PASM registers allocated for this sub */
-
-    struct local_label *labels;        /* local labels */
 
     struct subroutine  *next;          /* pointer to next subroutine in the list */
 

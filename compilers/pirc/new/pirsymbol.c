@@ -131,8 +131,7 @@ Create a new symbol node, returns it after initialization.
 */
 symbol *
 new_symbol(char * const name, pir_type type) {
-    symbol *sym = (symbol *)malloc(sizeof (symbol));
-    assert(sym != NULL);
+    symbol *sym = mem_allocate_zeroed_typed(symbol);
     sym->name   = name;
     sym->type   = type;
     sym->next   = NULL;
@@ -255,8 +254,7 @@ identified by C<regno> and of type C<type>.
 */
 static pir_reg *
 new_pir_reg(pir_type type, int regno) {
-    pir_reg *r = (pir_reg *)malloc(sizeof (pir_reg));
-    assert(r != NULL);
+    pir_reg *r = mem_allocate_zeroed_typed(pir_reg);
     r->type    = type;
     r->regno   = regno;
     r->next    = NULL;
@@ -394,11 +392,9 @@ Constructor to create a new global_label object.
 */
 static global_label *
 new_global_label(char * const name) {
-    global_label *glob = (global_label *)malloc(sizeof (global_label));
-    assert(glob);
-    glob->name     = name;
-    glob->next     = NULL;
-    glob->const_nr = 0;
+    global_label *glob = mem_allocate_zeroed_typed(global_label);
+    glob->name         = name;
+    glob->const_nr     = 0;
     return glob;
 }
 
@@ -508,11 +504,9 @@ location in the source to which any branching instruction can jump to.
 */
 static local_label *
 new_local_label(char * const name, unsigned offset) {
-    local_label *l = (local_label *)malloc(sizeof (local_label));
-    assert(l);
-    l->name   = name;
-    l->offset = offset;
-    l->next   = NULL;
+    local_label *l = mem_allocate_zeroed_typed(local_label);
+    l->name        = name;
+    l->offset      = offset;
     return l;
 }
 
@@ -526,10 +520,12 @@ store_local_label(struct lexer_state * const lexer, char * const labelname, unsi
 */
 void
 store_local_label(struct lexer_state * const lexer, char * const labelname, unsigned offset) {
-    local_label *l = new_local_label(labelname, offset);
-
-    l->next = CURRENT_SUB(lexer)->labels;
-    CURRENT_SUB(lexer)->labels = l;
+    local_label  *l     = new_local_label(labelname, offset);
+    hashtable    *table = &CURRENT_SUB(lexer)->labels;
+    unsigned long hash  = get_hashcode(labelname, table->size);
+    bucket *b           = new_bucket();
+    bucket_local(b)     = l;
+    store_bucket(table, b, hash);
 }
 
 /*
@@ -545,12 +541,14 @@ a label, an error is emitted, otherwise, the offset of that label is returned.
 */
 unsigned
 find_local_label(struct lexer_state * const lexer, char * const labelname) {
-    local_label *iter = CURRENT_SUB(lexer)->labels;
+    hashtable    *table    = &CURRENT_SUB(lexer)->labels;
+    unsigned long hashcode = get_hashcode(labelname, table->size);
+    bucket *b              = get_bucket(table, hashcode);
 
-    while (iter) {
-        if (STREQ(iter->name, labelname))
-            return iter->offset;
-        iter = iter->next;
+    while (b) {
+        if (STREQ(bucket_local(b)->name, labelname))
+            return bucket_local(b)->offset;
+        b = b->next;
     }
 
     /* no label found, emit an error message. */

@@ -27,8 +27,7 @@ Initialize the hashtable C<table> with space for C<size> buckets.
 */
 void
 init_hashtable(hashtable * table, unsigned size) {
-    table->contents  = (bucket **)calloc(size, sizeof (bucket *));
-    assert(table);
+    table->contents  = (bucket **)mem_sys_allocate_zeroed(size * sizeof (bucket *));
     table->size      = size;
     table->obj_count = 0;
 }
@@ -46,14 +45,9 @@ a Parrot interpreter structure.
 */
 lexer_state *
 new_lexer(char * const filename) {
-    lexer_state *lexer   = (lexer_state *)malloc(sizeof (lexer_state));
-    assert(lexer != NULL);
-
-    /* clear all fields */
-    memset(lexer, 0, sizeof (lexer_state));
-
-    lexer->filename = filename;
-    lexer->interp   = Parrot_new(NULL);
+    lexer_state *lexer = mem_allocate_zeroed_typed(lexer_state);
+    lexer->filename    = filename;
+    lexer->interp      = Parrot_new(NULL);
 
     if (!lexer->interp)
         panic("Failed to create a Parrot interpreter structure.");
@@ -106,9 +100,7 @@ Constructor for a bucket object.
 */
 bucket *
 new_bucket(void) {
-    bucket *buck = (bucket *)malloc(sizeof (bucket));
-    assert(buck);
-    memset(buck, 0, sizeof (bucket));
+    bucket *buck = mem_allocate_zeroed_typed(bucket);
     return buck;
 }
 
@@ -182,8 +174,7 @@ dupstrn(lexer_state * const lexer, char * const source, size_t slen) {
     source[slen] = '\0';
 
     if (result == NULL) { /* not found */
-        result = (char *)calloc(slen + 1, sizeof (char));
-        assert(result);
+        result = (char *)mem_sys_allocate_zeroed(slen + 1 * sizeof (char));
         /* only copy num_chars characters */
         strncpy(result, source, slen);
         /* cache the string */
@@ -216,13 +207,13 @@ dupstr(lexer_state * const lexer, char * const source) {
 
 void
 free_key(key *k) {
-    free(k);
+    mem_sys_free(k);
     k = NULL;
 }
 
 void
 free_constant(constant *c) {
-    free(c);
+    mem_sys_free(c);
     c = NULL;
 }
 
@@ -232,12 +223,12 @@ free_target(target *t) {
         free_key(t->key);
 
     if (t->alias)
-        free(t->alias);
+        mem_sys_free(t->alias);
 
     if (t->lex_name)
-        free(t->lex_name);
+        mem_sys_free(t->lex_name);
 
-    free(t);
+    mem_sys_free(t);
     t = NULL;
 }
 
@@ -267,29 +258,46 @@ free_operands(expression *expr) {
         iter = iter->next;
 
         free_expression(iter);
-        free(temp);
+        mem_sys_free(temp);
     }
     while (iter != expr);
 
     expr = NULL;
 }
 
-/*
-void
-free_statements(statement *instr) {
-    statement *iter = instr;
-    do {
-        statement *temp = iter;
-        iter = iter->next;
 
-        free_operands(iter->ins->operands);
-        free(temp);
+void
+free_statements(instruction *instr) {
+    instruction *iter = instr;
+    do {
+        instruction *temp = iter;
+        iter              = iter->next;
+
+        free_operands(iter->operands);
+        mem_sys_free(temp);
     }
     while (iter != instr);
 
     instr = NULL;
 }
-*/
+
+void
+destroy_hashtable(hashtable *table) {
+    unsigned i;
+    for (i = 0; i < table->size; i++) {
+        bucket *iter = table->contents[i];
+        while (iter) {
+            bucket *temp = iter;
+            iter = iter->next;
+
+            /* does it mattter what field of the union is freed? */
+            mem_sys_free(temp->u.str);
+
+            mem_sys_free(temp);
+        }
+    }
+    mem_sys_free(table);
+}
 
 /*
 
@@ -303,7 +311,7 @@ void
 release_resources(lexer_state *lexer) {
     subroutine *iter = lexer->subs;
 
-    return;
+
 
     if (iter) {
         do {
@@ -313,12 +321,12 @@ release_resources(lexer_state *lexer) {
             free_symbols(iter->symbols);
 
             /* free instructions in this subroutine */
-          /*
+
             free_statements(iter->statements);
-            */
+
 
             /* free this subroutine itself */
-            free(temp);
+            mem_sys_free(temp);
         }
         while (iter != lexer->subs);
     }
@@ -326,10 +334,38 @@ release_resources(lexer_state *lexer) {
 
     Parrot_destroy(lexer->interp);
 
+    destroy_hashtable(&lexer->constants);
+    destroy_hashtable(&lexer->globals);
+    destroy_hashtable(&lexer->strings);
+
     /* finally, free the lexer itself */
-    free(lexer);
+    mem_sys_free(lexer);
 
     lexer = NULL;
+}
+
+
+typedef struct allocated_mem_ptrs {
+    void *ptrs[128];
+    unsigned i;
+    struct allocated_mem_ptrs *next;
+
+} allocated_mem_ptrs;
+
+
+#define pir_mem_allocate_typed(type)    (type *)pir_mem_allocate(sizeof (type))
+
+static void
+register_ptr(lexer_state *lexer, void *ptr) {
+    allocated_mem_ptrs ptrs;
+    ptrs.ptrs[ptrs.i++] = ptr;
+}
+
+void *
+pir_mem_allocate(lexer_state *lexer, size_t numbytes) {
+    void *ptr = mem_sys_allocate_zeroed(numbytes);
+    register_ptr(lexer, ptr);
+    return ptr;
 }
 
 /*
