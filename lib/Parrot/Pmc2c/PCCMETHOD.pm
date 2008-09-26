@@ -282,9 +282,11 @@ sub parse_p_args_string {
         die "invalid PCC arg '$x': did you forget to specify a type?\n"
              unless defined $name;
 
-        if ($name =~ /[\**]?(\"?\w+\"?)/) {
+print "<$name>";
+        if ($name =~ /\**([a-zA-Z_]\w*)/) {
             $name = $1;
         }
+print "<$name>$/";
 
         my $arg = {
             type  => convert_type_string_to_reg_type($type),
