@@ -161,7 +161,7 @@ sub run_tests {
       my $basename = $1;
       if (exists $skipfiles{$basename}) {
         print "Skipping $file: $skipfiles{$basename}\n";
-	next;
+        next;
       }
       my $cmd = "../../parrot tcl.pbc $file";
       print "$cmd\n";
