@@ -56,13 +56,22 @@ our $PMC2C = "$PERL $PATHQUOTE" . q[@build_dir@@slash@tools@slash@build@slash@pm
 sub compile_cmd {
     my ($target, $source) = @_;
 
+    my $dynpmc_include;
+    if (defined $ENV{DYNPMC_INCLUDE} )
+    {
+        $dynpmc_include = $ENV{DYNPMC_INCLUDE};
+        $dynpmc_include =~ s/,/$PATHQUOTE -I$PATHQUOTE/g;
+        $dynpmc_include = "-I" . $PATHQUOTE . $dynpmc_include . $PATHQUOTE . " ";
+    }
+
+
     # XXX Reference to BGC - need long term solution for passing in include paths
     return
         "$CC " .
         '@cc_o_out@' . $target . " " .
         "-I" . $PATHQUOTE . '@build_dir@@slash@include' . $PATHQUOTE . " " .
         "-I" . $PATHQUOTE . '@build_dir@@slash@src@slash@pmc' . $PATHQUOTE . " " .
-        "-I" . $PATHQUOTE . '@build_dir@@slash@compilers@slash@bcg@slash@include' . $PATHQUOTE . " " .
+        $dynpmc_include . " " .
         "$CFLAGS " .
         $source;
 };
@@ -138,7 +147,7 @@ elsif ($mode eq 'compile') {
         compile("$group", "lib-$group")
           or die "compile $group.c failed ($?)\n";
     }
-} 
+}
 elsif ($mode eq 'linklibs') {
     my ($group_files, $group_libs, $pmc_group, $pmc_libs) =
         gather_groups_and_libs(@pmcs);
@@ -152,7 +161,7 @@ elsif ($mode eq 'linklibs') {
     # Link non-grouped PMCs individually
     my @ungrouped_pmcs = grep { ! exists $pmc_group->{$_} } @pmcs;
     partial_link($_, $pmc_libs->{$_}, [ $_ ] ) foreach (@ungrouped_pmcs);
-} 
+}
 elsif ($mode eq 'copy') {
     # Copy *.so -> destination, where destination is the first
     # argument, given as --destination=DIRECTORY
@@ -225,7 +234,7 @@ sub modtime {
 
     if (defined $ago) {
         return $NOW - $ago;
-    } 
+    }
     else {
         return;
     }

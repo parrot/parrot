@@ -7,12 +7,12 @@ O		        = @o@
 LOAD_EXT	    = @load_ext@
 CC         	    = @cc@
 CC_INC     	    = @cc_inc@ -I@build_dir@/include
-C_LIBS     	    = @libs@ 
+C_LIBS     	    = @libs@
 CC_SHARED  	    = @cc_shared@
 CFLAGS     	    = $(CC_INC) @ccflags@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ $(CC_SHARED)
 LINK_DYNAMIC  	= @link_dynamic@
 LINK       	    = @link@
-LINKFLAGS  	    = @linkflags@ @link_debug@ @ld_debug@ 
+LINKFLAGS  	    = @linkflags@ @link_debug@ @ld_debug@
 LD         	    = @ld@
 #CONDITIONED_LINE(win32):LDFLAGS = @ldflags@ @ld_debug@ $(LIBPARROT)
 #INVERSE_CONDITIONED_LINE(win32):LDFLAGS = @ldflags@ @ld_debug@ -L@build_dir@/blib/lib/ -lparrot
@@ -22,6 +22,7 @@ BUILD_PMC   	= $(PERL) @build_dir@/tools/build/dynpmc.pl
 SRC_PMC_DIR	    = src/pmc
 DEST_PMC_DIR	= @build_dir@/runtime/parrot/dynext
 PMC_GROUP       = $(DEST_PMC_DIR)/bcg_group$(LOAD_EXT)
+DYNPMC_INCLUDE  = @build_dir@/compilers/bcg/include,@build_dir@/compilers/bcg/include,@build_dir@/compilers/bcg/include
 LIB_BCG         = @build_dir@/blib/lib/libbcg$(SHARE_EXT)
 SRC_DIR         = src
 INCLUDE_DIR     = include
@@ -75,7 +76,7 @@ $(LIB_BCG): $(BCG_O_FILES)
 	
 pmcs: $(LIB_BCG)
 	@cd $(SRC_PMC_DIR) && $(BUILD_PMC) generate $(PMCS)
-	@cd $(SRC_PMC_DIR) && $(BUILD_PMC) compile $(PMCS)
+	@cd $(SRC_PMC_DIR) && DYNPMC_INCLUDE=$(DYNPMC_INCLUDE) $(BUILD_PMC) compile $(PMCS)
 	@cd $(SRC_PMC_DIR) && $(BUILD_PMC) linklibs $(PMCS)
 	@cd $(SRC_PMC_DIR) && $(BUILD_PMC) copy "--destination=$(DEST_PMC_DIR)" \
 		 $(PMCS)
@@ -91,7 +92,7 @@ test: all
 #
 # Clean Targets
 #
-testclean: 
+testclean:
 	$(RM_F) t/*.pir
 
 clean: testclean
