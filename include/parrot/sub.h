@@ -117,7 +117,7 @@ typedef enum {
  * maximum sub recursion depth
  */
 
-#define RECURSION_LIMIT 1000
+#define RECURSION_LIMIT 1248
 
 
 /*
