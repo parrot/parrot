@@ -20,6 +20,7 @@ for Markdown.
     base = p6meta.'new_class'('Markdown::Node', 'parent'=>'PAST::Node')
 
     p6meta.'new_class'('Markdown::BlockQuote', 'parent'=>base)
+    p6meta.'new_class'('Markdown::Code', 'parent'=>base)
     p6meta.'new_class'('Markdown::Document', 'parent'=>base)
     p6meta.'new_class'('Markdown::Emphasis', 'parent'=>base)
     p6meta.'new_class'('Markdown::HorizontalRule', 'parent'=>base)
@@ -50,12 +51,6 @@ for Markdown.
     .return self.'attr'('level', value, has_value)
 .end
 
-
-=head1 AUTHORS
-
-Francois Perrad
-
-=cut
 
 # Local Variables:
 #   mode: pir

@@ -228,6 +228,22 @@ Return generated HTML for all of its children.
     .return (code)
 .end
 
+=item html(Markdown::Code node)
+
+=cut
+
+.sub 'html' :method :multi(_,['Markdown::Code'])
+    .param pmc node
+    $S1 = node.'text'()
+    .local pmc code
+    new code, 'CodeString'
+    $S0 = "<code>"
+    $S0 .= $S1
+    $S0 .= "</code>"
+    set code, $S0
+    .return (code)
+.end
+
 =item html(Markdown::Line node)
 
 =cut
@@ -267,10 +283,6 @@ Return generated HTML for all of its children.
 .end
 
 =back
-
-=head1 AUTHORS
-
-Francois Perrad
 
 =cut
 
