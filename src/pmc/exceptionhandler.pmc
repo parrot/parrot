@@ -184,7 +184,8 @@ Report whether the exception handler can handle a particular type of exception.
     METHOD can_handle(PMC *exception) {
         Parrot_ExceptionHandler_attributes * const core_struct =
                     PARROT_EXCEPTIONHANDLER(SELF);
-        INTVAL severity = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
+        INTVAL severity =
+            VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
 
         if (exception->vtable->base_type == enum_class_Exception
                 || VTABLE_isa(INTERP, exception, CONST_STRING(INTERP, "Exception"))) {
@@ -198,13 +199,13 @@ Report whether the exception handler can handle a particular type of exception.
 
             if (core_struct->handled_types != PMCNULL) {
                 INTVAL elems = VTABLE_elements(interp, core_struct->handled_types);
-                INTVAL type = VTABLE_get_integer_keyed_str(interp, 
+                INTVAL type = VTABLE_get_integer_keyed_str(interp,
                         exception,
-                        CONST_STRING(interp,"type"));
+                        CONST_STRING(interp, "type"));
                 INTVAL i;
                 for (i = 0; i < elems; i++) {
                     INTVAL handled_type = VTABLE_get_integer_keyed_int(interp,
-                            core_struct->handled_types,i);
+                            core_struct->handled_types, i);
                     if (handled_type == type)
                         RETURN(INTVAL 1);
                 }
@@ -272,8 +273,8 @@ Set the exception types that the ExceptionHandler will handle.
     METHOD handle_types(PMC *types :slurpy) {
         Parrot_ExceptionHandler_attributes * const core_struct =
                     PARROT_EXCEPTIONHANDLER(SELF);
-        core_struct->handled_types = 
-            VTABLE_elements(interp,types) > 0
+        core_struct->handled_types =
+            VTABLE_elements(interp, types) > 0
                 ? types
                 : PMCNULL;
     }
