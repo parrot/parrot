@@ -6,6 +6,11 @@ New in October 2008 release
     - start implementation with PCT/NQP
   + partcl (Tcl 8.5.4)
     - 'make spectest' now uses tcltest.tcl to run *.test files directly
+  + Rakudo (Perl 6)
+    - split() works with regexes
+    - implemented Str.comb
+    - ord() and chr() builtins
+    - improved parsing of literal numbers
 
 New in 0.7.1
 - Implementation
