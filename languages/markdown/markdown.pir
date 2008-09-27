@@ -118,10 +118,6 @@ L<http://en.wikipedia.org/wiki/Markdown>
 
 L<http://en.wikipedia.org/wiki/Lightweight_markup_language>
 
-=head1 AUTHORS
-
-Francois Perrad
-
 =cut
 
 # Local Variables:

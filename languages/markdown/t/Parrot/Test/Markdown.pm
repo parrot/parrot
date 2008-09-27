@@ -100,10 +100,6 @@ foreach my $func ( keys %language_test_map ) {
 
 Mostly taken from F<languages/lua/t/Parrot/Test/Lua.pm>.
 
-=head1 AUTHOR
-
-Francois Perrad
-
 =cut
 
 1;
