@@ -18,10 +18,6 @@ C<function(params, ...)>.
 
 wmlsd, wmls2pir, wmls2pbc
 
-=head1 AUTHOR
-
-Francois Perrad.
-
 =cut
 
 .loadlib 'wmls_ops'

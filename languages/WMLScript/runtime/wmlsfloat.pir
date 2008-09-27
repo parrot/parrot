@@ -356,13 +356,6 @@ precision floating-point value: 1.17549435e-38.
 .end
 
 
-=head1 AUTHORS
-
-Francois Perrad.
-
-=cut
-
-
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

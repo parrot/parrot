@@ -206,10 +206,6 @@ inline op isne(out PMC, invar PMC, invar PMC) {
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad.
-
 =cut
 
 /*

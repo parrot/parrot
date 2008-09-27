@@ -108,10 +108,6 @@ Mostly taken from F<languages/bc/lib/Parrot/Test/Bc.pm>.
 
 F<languages/tcl/lib/Parrot/Test/Tcl.pm>, F<languages/m4/lib/Parrot/Test/M4.pm>, F<languages/lua/t/Parrot/Test/lua.pm>
 
-=head1 AUTHOR
-
-Francois Perrad
-
 =cut
 
 1;

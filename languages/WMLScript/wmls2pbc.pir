@@ -17,10 +17,6 @@ B<wmls2pbc> translates a WMLScript bytecode file to Parrot PBC.
 
 wmlsd, wmls2pir, wmlsi
 
-=head1 AUTHOR
-
-Francois Perrad.
-
 =cut
 
 .loadlib 'wmls_ops'

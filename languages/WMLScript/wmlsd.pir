@@ -17,10 +17,6 @@ B<wmlsd> disassembles binary form of WMLScript file.
 
 wmls2pir, wmls2pbc, wmlsi
 
-=head1 AUTHOR
-
-Francois Perrad.
-
 =cut
 
 .loadlib 'wmls_ops'

@@ -194,10 +194,6 @@ helper for CALL_URL* opcodes.
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad.
-
 =cut
 
 

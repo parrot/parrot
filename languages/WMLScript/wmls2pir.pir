@@ -17,10 +17,6 @@ B<wmls2pir> translates a WMLScript bytecode file to Parrot PIR.
 
 wmlsd, wmls2pbc, wmlsi
 
-=head1 AUTHOR
-
-Francois Perrad.
-
 =cut
 
 .loadlib 'wmls_ops'
