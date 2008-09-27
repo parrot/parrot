@@ -28,6 +28,17 @@ Markdown::HTML::Compiler implements a compiler for MAST nodes.
     .return self.'html'(past)
 .end
 
+.sub 'xml_escape' :anon
+    .param string str
+    $P0 = split '&', str
+    str = join '&amp;', $P0
+    $P0 = split '<', str
+    str = join '&lt;', $P0
+    $P0 = split '>', str
+    str = join '&gt;', $P0
+    .return (str)
+.end
+
 =item html_children(node)
 
 Return generated HTML for all of its children.
@@ -235,6 +246,7 @@ Return generated HTML for all of its children.
 .sub 'html' :method :multi(_,['Markdown::Code'])
     .param pmc node
     $S1 = node.'text'()
+    $S1 = xml_escape($S1)
     .local pmc code
     new code, 'CodeString'
     $S0 = "<code>"
@@ -251,6 +263,7 @@ Return generated HTML for all of its children.
 .sub 'html' :method :multi(_,['Markdown::Line'])
     .param pmc node
     $S1 = node.'text'()
+    $S1 = xml_escape($S1)
     .local pmc code
     new code, 'CodeString'
     set code, $S1
@@ -264,6 +277,7 @@ Return generated HTML for all of its children.
 .sub 'html' :method :multi(_,['Markdown::Word'])
     .param pmc node
     $S1 = node.'text'()
+    $S1 = xml_escape($S1)
     .local pmc code
     new code, 'CodeString'
     set code, $S1

@@ -17,7 +17,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 6;
 use Test::More;
 
 language_output_is( 'markdown', <<'CODE', <<'OUT', 'code' );
@@ -60,6 +60,23 @@ CODE
 
 OUT
 
+language_output_is( 'markdown', <<'CODE', <<'OUT', 'HTML tag' );
+
+Please don't use any `<blink>` tags.
+
+CODE
+<p>Please don't use any <code>&lt;blink&gt;</code> tags.</p>
+
+OUT
+
+language_output_is( 'markdown', <<'CODE', <<'OUT', 'HTML entity' );
+
+`&#8212;` is the decimal-encoded equivalent of `&mdash;`.
+
+CODE
+<p><code>&amp;#8212;</code> is the decimal-encoded equivalent of <code>&amp;mdash;</code>.</p>
+
+OUT
 
 # Local Variables:
 #   mode: cperl
