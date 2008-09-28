@@ -8,7 +8,10 @@ EXE           = @exe@
 # Set up directories
 BUILD_DIR     = @build_dir@
 LIBRARY_DIR   = $(BUILD_DIR)/runtime/parrot/library
+INCLUDE_DIR   = $(BUILD_DIR)/include
 PMCDIR        = src/pmc
+PIPPDIR       = $(BUILD_DIR)/languages/pipp
+HASHDIR       = $(PIPPDIR)/src
 PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
 
 # Set up commands
@@ -20,6 +23,8 @@ PMCBUILD      = $(PERL) @build_dir@/tools/build/dynpmc.pl
 NQP           = $(BUILD_DIR)/compilers/nqp/nqp.pbc
 PCT           = $(BUILD_DIR)/runtime/parrot/library/PCT.pbc
 PBC_TO_EXE    = $(BUILD_DIR)/pbc_to_exe$(EXE)
+CC            = @cc@
+CCFLAGS       = @ccflags@
 
 PMCS = \
  php \
@@ -40,6 +45,10 @@ PMC_SOURCES = \
  $(PMCDIR)/phpresource.pmc \
  $(PMCDIR)/phpstring.pmc \
  $(PMCDIR)/phpundef.pmc
+
+HASH = $(HASHDIR)/pipp_hash.c
+
+HASH_FILES = $(HASHDIR)/pipp_hash$(O)
 
 PHP_GROUP=$(PMCDIR)/php_group$(LOAD_EXT)
 
@@ -196,6 +205,9 @@ src/pct/gen_actions.pir: $(NQP) $(PCT) src/pct/actions.pm
 	$(PARROT) $(NQP) --output=src/pct/gen_actions.pir \
   --target=pir src/pct/actions.pm
 
+hash:
+	$(CC) $(CCFLAGS) -I$(INCLUDE_DIR) $(HASH) -c -o $(HASH_FILES)
+
 pipp.pbc: \
     src/common/pipp.pir \
     src/pct/gen_grammar.pir \
@@ -205,10 +217,10 @@ pipp.pbc: \
 
 pmc: $(PHP_GROUP)
 
-$(PHP_GROUP): $(PARROT) $(PMC_SOURCES)
+$(PHP_GROUP): $(PARROT) $(SRC) $(PMC_SOURCES) hash
 	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
-	@cd $(PMCDIR) && $(PMCBUILD) compile $(PMCS)
-	@cd $(PMCDIR) && $(PMCBUILD) linklibs $(PMCS)
+	@cd $(PMCDIR) && DYNPMC_INCLUDE=$(PIPPDIR) $(PMCBUILD) compile $(PMCS)
+	@cd $(PMCDIR) && DYNPMC_LINK=$(HASH_FILES) $(PMCBUILD) linklibs $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) copy "--destination=$(PARROT_DYNEXT)" $(PMCS)
 
 test:     all test-pct
@@ -227,7 +239,7 @@ test-antlr3:
 test-pct:
 	- cd .. && $(PERL) -I../lib -I pipp/lib pipp/t/harness --with-pct
 
-test-pmc: pmc
+test-pmc: hash pmc
 	- $(PERL) -I../../lib t/pmc/*t
 
 # this does not work yet
@@ -238,7 +250,7 @@ test-pcc-testsuite: all t/pcc-testsuite
 t/pcc-testsuite:
 	svn co http:////code.roadsend.com//svn//pcc//trunk//pcc-testsuite t/pcc-testsuite
 
-clean: clean-common clean-pct clean-antlr3 clean-test
+clean: clean-common clean-pct clean-antlr3 clean-test clean-hash
 
 clean-common: clean-pmc
 	$(RM_F) \
@@ -270,6 +282,9 @@ clean-test:
   t/pmc/*.pir \
   pipp_phc_ast.xml pipp_phc_past.xml pipp_phc_past.nqp pipp_phc_past.pir \
   pipp_antlr_past.nqp  pipp_antlr_past.pir
+
+clean-hash:
+	$(RM_F) "$(HASHDIR)/pipp_hash$(O)"
 
 realclean: clean
 	$(RM_F) Makefile

@@ -8,7 +8,7 @@ src/pmc/phparray.pmc - PHP Array
 
 =head1 DESCRIPTION
 
-=head2 Methods
+=head2 VTABLE functions
 
 =over 4
 
@@ -17,6 +17,7 @@ src/pmc/phparray.pmc - PHP Array
 */
 
 #include "php_private.h"
+#include "src/pipp_hash.h"
 
 pmclass PhpArray
     extends  Hash
@@ -28,6 +29,22 @@ pmclass PhpArray
     maps     Array
     maps     Hash {
 
+/*
+
+=item C<void INIT()>
+
+Intialize thie PhpArray
+
+=cut
+
+*/
+    void init() {
+        PippHashTable *ht;
+
+        PObj_custom_mark_destroy_SETALL(SELF);
+        PMC_struct_val(SELF) = (PippHashTable*)PippHash_create(INTERP, 4);
+        ht = PMC_struct_val(SELF);
+    }
 /*
 
 =item C<STRING* name()>
@@ -43,9 +60,22 @@ Return the string 'array'.
 
 /*
 
+=item C<STRING* get_string()>
+
+Return the string 'Array'.
+
+=cut
+
+*/
+    STRING* get_string() {
+        return const_string(INTERP, "Array");
+    }
+
+/*
+
 =back
 
-=head2 non-Vtable Methods
+=head2 Methods
 
 =over 4
 
@@ -58,18 +88,6 @@ Return the string 'array'.
         RETURN(PMC *SELF);
     }
 
-/*
-
-=back
-
-=head2 Specific Methods
-
-=over 4
-
-=cut
-
-*/
-
 }
 
 /*
@@ -78,6 +96,7 @@ Return the string 'array'.
 
 =head1 AUTHORS
 
+Christoph Otto.
 Francois Perrad.
 
 =cut
