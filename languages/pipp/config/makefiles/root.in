@@ -25,6 +25,7 @@ PCT           = $(BUILD_DIR)/runtime/parrot/library/PCT.pbc
 PBC_TO_EXE    = $(BUILD_DIR)/pbc_to_exe$(EXE)
 CC            = @cc@
 CCFLAGS       = @ccflags@
+TOUCH         = @touch@
 
 PMCS = \
  php \
@@ -207,9 +208,6 @@ src/pct/gen_actions.pir: $(NQP) $(PCT) src/pct/actions.pm
 	$(PARROT) $(NQP) --output=src/pct/gen_actions.pir \
   --target=pir src/pct/actions.pm
 
-$(HASH_OBJS): $(HASH_SOURCES) $(HASH_H)
-	$(CC) $(CCFLAGS) -I$(INCLUDE_DIR) $(HASH_SOURCES) -c -o $(HASH_OBJS)
-
 pipp.pbc: \
     src/common/pipp.pir \
     src/pct/gen_grammar.pir \
@@ -218,6 +216,12 @@ pipp.pbc: \
 	$(PARROT) -o pipp.pbc src/common/pipp.pir
 
 pmc: $(HASH_OBJS) $(PHP_GROUP)
+
+$(HASH_OBJS): $(HASH_SOURCES) $(HASH_H) 
+	#Any change to the hash code means phparray needs to be relinked too.
+	#Recompiling is close enough for now.
+	$(TOUCH) $(PMCDIR)/phparray.pmc
+	$(CC) $(CCFLAGS) -I$(INCLUDE_DIR) $(HASH_SOURCES) -c -o $(HASH_OBJS)
 
 $(PHP_GROUP): $(PARROT) $(PMC_SOURCES)
 	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
