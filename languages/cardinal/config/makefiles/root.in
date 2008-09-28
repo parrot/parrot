@@ -45,6 +45,7 @@ SOURCES = cardinal.pir \
 
 BUILTINS_PIR = \
   src/builtins/guts.pir \
+  src/builtins/control.pir \
   src/builtins/say.pir \
   src/builtins/cmp.pir \
   src/builtins/op.pir \
