@@ -190,14 +190,14 @@ Report whether the exception handler can handle a particular type of exception.
         if (exception->vtable->base_type == enum_class_Exception
                 || VTABLE_isa(INTERP, exception, CONST_STRING(INTERP, "Exception"))) {
 
-            if (severity < core_struct->min_severity)
+            if (severity < core_struct->min_severity) {
                 RETURN(INTVAL 0);
-
-            if (core_struct->max_severity > 0
-                    && severity > core_struct->max_severity)
+            }
+            else if (core_struct->max_severity > 0
+                    && severity > core_struct->max_severity) {
                 RETURN(INTVAL 0);
-
-            if (core_struct->handled_types != PMCNULL) {
+            }
+            else if (core_struct->handled_types != PMCNULL) {
                 INTVAL elems = VTABLE_elements(interp, core_struct->handled_types);
                 INTVAL type = VTABLE_get_integer_keyed_str(interp,
                         exception,
@@ -213,10 +213,12 @@ Report whether the exception handler can handle a particular type of exception.
             }
 
             /* The exception handler has already been used before. */
-            if (VTABLE_get_integer(INTERP, SELF))
+            else if (VTABLE_get_integer(INTERP, SELF)) {
                 RETURN(INTVAL 0);
-
-            RETURN(INTVAL 1);
+            }
+            else {
+                RETURN(INTVAL 1);
+            }
         }
 
         RETURN(INTVAL 0);
