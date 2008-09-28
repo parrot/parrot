@@ -7,7 +7,7 @@ plan(7);
 my %h;
 
 %h<a> := 1;
-say("ok 1 # hash assignment with numeric value doesn't barf");
+say("ok 1 # hash assignment with numeric value works");
 
 say('ok ', %h<a> + 1, ' # hash access to numeric value');
 
@@ -19,9 +19,9 @@ say('ok ', %h{1}, ' # numeric hash access');
 
 say('ok ', %h<1> + 1, ' # numbers stringify');
 
-%h{'b'} := 'ok 6 # single quoted curly braces work';
+%h{'b'} := 'ok 6 # curly braces and single quotes work';
 say(%h{'b'});
 
-%h{"foo"} := "ok 7 # double quoted curly braces work";
+%h{"foo"} := "ok 7 # curly braces and double quotes work";
 say(%h{"foo"});
 

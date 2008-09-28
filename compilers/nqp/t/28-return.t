@@ -1,6 +1,6 @@
 #!./parrot nqp.pbc
 
-# while, until statements
+# implicit and explicit returns from subs
 
 plan(3);
 

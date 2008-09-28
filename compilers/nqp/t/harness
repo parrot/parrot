@@ -3,6 +3,6 @@
 # $Id$
 
 use FindBin;
-use lib qw( . lib ../lib ../../lib ../../lib );
+use lib qw( . lib ../lib ../../lib ../../../lib );
 use Parrot::Test::Harness language => 'nqp', compiler => 'nqp.pbc';
 

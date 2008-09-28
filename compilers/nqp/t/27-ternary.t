@@ -1,6 +1,6 @@
 #!./parrot nqp.pbc
 
-# check literals
+# the ternary ?? !! operator
 
 plan(8);
 

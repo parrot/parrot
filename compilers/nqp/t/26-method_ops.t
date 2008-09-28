@@ -1,4 +1,4 @@
-#!./parrot
+#!./parrot nqp.pbc
 
 # method ops (just method calls for now)
 
