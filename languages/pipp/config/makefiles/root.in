@@ -294,3 +294,8 @@ clean-hash:
 
 realclean: clean
 	$(RM_F) Makefile
+
+# Local variables:
+# mode: makefile
+# ex: ft=make
+# End:
