@@ -31,9 +31,9 @@ pmclass PhpArray
 
 /*
 
-=item C<void INIT()>
+=item C<void init()>
 
-Intialize thie PhpArray
+Intialize this PHPArray.
 
 =cut
 
@@ -42,8 +42,22 @@ Intialize thie PhpArray
         PippHashTable *ht;
 
         PObj_custom_mark_destroy_SETALL(SELF);
-        PMC_struct_val(SELF) = (PippHashTable*)PippHash_create(INTERP, 4);
-        ht = PMC_struct_val(SELF);
+        PMC_struct_val(SELF) = (PippHashTable*)pipp_hash_create(INTERP, 4);
+        ht = (PippHashTable*) PMC_struct_val(SELF);
+    }
+/*
+
+=item C<void destroy()>
+
+Destroy this PHPArray.
+
+=cut
+
+*/
+    void destroy() {
+        PippHashTable *ht;
+        ht = (PippHashTable*) PMC_struct_val(SELF);
+        pipp_hash_destroy(INTERP, ht);
     }
 /*
 
@@ -84,8 +98,24 @@ Return the string 'Array'.
 =cut
 
 */
-    METHOD PMC* to_number() {
+    METHOD to_number() {
         RETURN(PMC *SELF);
+    }
+
+/*
+
+=item C<void sanity_check()>
+
+Check if everything about the PippHashTable looks sane.  If anything looks
+broken, the code will throw an exception.
+
+=cut
+
+*/
+    METHOD sanity_check() {
+        PippHashTable *ht;
+        ht = (PippHashTable*) PMC_struct_val(SELF);
+        pipp_hash_sanity_check(INTERP, ht);
     }
 
 }
@@ -96,8 +126,8 @@ Return the string 'Array'.
 
 =head1 AUTHORS
 
-Christoph Otto.
-Francois Perrad.
+Christoph Otto
+Francois Perrad
 
 =cut
 

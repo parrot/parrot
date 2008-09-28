@@ -217,9 +217,9 @@ pipp.pbc: \
 
 pmc: $(HASH_OBJS) $(PHP_GROUP)
 
+#Any change to the hash code means phparray needs to be relinked too.
+#Recompiling is close enough for now.
 $(HASH_OBJS): $(HASH_SOURCES) $(HASH_H) 
-	#Any change to the hash code means phparray needs to be relinked too.
-	#Recompiling is close enough for now.
 	$(TOUCH) $(PMCDIR)/phparray.pmc
 	$(CC) $(CCFLAGS) -I$(INCLUDE_DIR) $(HASH_SOURCES) -c -o $(HASH_OBJS)
 
