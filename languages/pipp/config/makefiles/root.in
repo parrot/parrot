@@ -46,9 +46,11 @@ PMC_SOURCES = \
  $(PMCDIR)/phpstring.pmc \
  $(PMCDIR)/phpundef.pmc
 
-HASH = $(HASHDIR)/pipp_hash.c
+HASH_SOURCES = $(HASHDIR)/pipp_hash.c
 
-HASH_FILES = $(HASHDIR)/pipp_hash$(O)
+HASH_H = $(HASHDIR)/pipp_hash.h
+
+HASH_OBJS = $(HASHDIR)/pipp_hash$(O)
 
 PHP_GROUP=$(PMCDIR)/php_group$(LOAD_EXT)
 
@@ -205,8 +207,8 @@ src/pct/gen_actions.pir: $(NQP) $(PCT) src/pct/actions.pm
 	$(PARROT) $(NQP) --output=src/pct/gen_actions.pir \
   --target=pir src/pct/actions.pm
 
-hash:
-	$(CC) $(CCFLAGS) -I$(INCLUDE_DIR) $(HASH) -c -o $(HASH_FILES)
+$(HASH_OBJS): $(HASH_SOURCES) $(HASH_H)
+	$(CC) $(CCFLAGS) -I$(INCLUDE_DIR) $(HASH_SOURCES) -c -o $(HASH_OBJS)
 
 pipp.pbc: \
     src/common/pipp.pir \
@@ -215,12 +217,12 @@ pipp.pbc: \
     src/pct/quote_expression.pir
 	$(PARROT) -o pipp.pbc src/common/pipp.pir
 
-pmc: $(PHP_GROUP)
+pmc: $(HASH_OBJS) $(PHP_GROUP)
 
-$(PHP_GROUP): $(PARROT) $(SRC) $(PMC_SOURCES) hash
+$(PHP_GROUP): $(PARROT) $(PMC_SOURCES)
 	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
 	@cd $(PMCDIR) && DYNPMC_INCLUDE=$(PIPPDIR) $(PMCBUILD) compile $(PMCS)
-	@cd $(PMCDIR) && DYNPMC_LINK=$(HASH_FILES) $(PMCBUILD) linklibs $(PMCS)
+	@cd $(PMCDIR) && DYNPMC_LINK=$(HASH_OBJS) $(PMCBUILD) linklibs $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) copy "--destination=$(PARROT_DYNEXT)" $(PMCS)
 
 test:     all test-pct
