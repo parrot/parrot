@@ -594,7 +594,11 @@ Return the POST representation of a C<PAST::Block>.
     ctrllabel = $P0.'new'('result'=>$S0)
     $S0 = concat $S0, '_rethrow'
     rethrowlabel = $P0.'new'('result'=>$S0)
-    bpost.'push_pirop'('push_eh', ctrllabel)
+    $S0 = self.'uniquereg'('P')
+    bpost.'push_pirop'('new', $S0, "'ExceptionHandler'")
+    bpost.'push_pirop'('set_addr', $S0, ctrllabel)
+    bpost.'push_pirop'('callmethod', 'handle_types', $S0, .CONTROL_RETURN)
+    bpost.'push_pirop'('push_eh', $S0)
 
   children_past:
     ##  all children but last are void context, last returns anything
@@ -621,9 +625,6 @@ Return the POST representation of a C<PAST::Block>.
   control_return:
     ##  handle 'return' exceptions
     $S0 = self.'uniquereg'('P')
-    bpost.'push_pirop'('getattribute', $S0, 'exception', '"type"')
-    bpost.'push_pirop'('if_null', $S0, rethrowlabel)
-    bpost.'push_pirop'('ne', $S0, .CONTROL_RETURN, rethrowlabel)
     bpost.'push_pirop'('getattribute', $S0, 'exception', '"payload"')
     bpost.'push_pirop'('return', $S0)
     bpost.'push'(rethrowlabel)
