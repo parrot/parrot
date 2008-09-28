@@ -40,14 +40,13 @@ Initializes the exception handler.
 */
 
     VTABLE void init() {
-        Parrot_cont * const cc = new_continuation(INTERP, NULL);
-        PMC_struct_val(SELF) = cc;
         Parrot_ExceptionHandler_attributes * const core_struct =
             mem_allocate_zeroed_typed(Parrot_ExceptionHandler_attributes);
-        cc->invoked = 0;
-        PMC_pmc_val(SELF)    = PMCNULL;
+        Parrot_cont * const cc = new_continuation(INTERP, NULL);
 
-
+        PMC_struct_val(SELF)       = cc;
+        cc->invoked                = 0;
+        PMC_pmc_val(SELF)          = PMCNULL;
         PMC_data(SELF)             = core_struct;
         core_struct->min_severity  = 0;
         core_struct->max_severity  = 0;
@@ -240,7 +239,9 @@ Set or get the minimum severity of the exception handler.
         if (have_severity)
             core_struct->min_severity = severity;
         else
-            return core_struct->min_severity;
+            severity = core_struct->min_severity;
+
+        RETURN(INTVAL severity);
     }
 
 /*
@@ -259,7 +260,9 @@ Set or get the maximum severity of the exception handler.
         if (have_severity)
             core_struct->max_severity = severity;
         else
-            return core_struct->max_severity;
+            severity = core_struct->max_severity;
+
+        RETURN(INTVAL severity);
     }
 
 /*
