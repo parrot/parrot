@@ -134,7 +134,7 @@ CODE
 /^maximum recursion depth exceeded
 current instr\.: 'main' pc (\d+|-1) \(.*?:(\d+|-1)\)
 called from Sub 'main' pc (\d+|-1) \(.*?:(\d+|-1)\)
-\.\.\. call repeated 1000 times/
+\.\.\. call repeated \d+ times/
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - recursion 2" );
