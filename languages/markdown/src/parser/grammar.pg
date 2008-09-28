@@ -183,6 +183,7 @@ token Inline {
     | <Strong> {*}              #= Strong
     | <Emph> {*}                #= Emph
     | <Code> {*}                #= Code
+    | <EscapedChar> {*}         #= EscapedChar
 }
 
 token Space {
@@ -191,6 +192,11 @@ token Space {
 
 token Str {
     <NormalChar>+ {*}
+}
+
+token EscapedChar {
+    '\\' <!Newline> (.)
+    {*}
 }
 
 token Endline { TerminalLine | NormalEndline }
@@ -266,11 +272,11 @@ token Ticks4 { '````' }
 token Ticks5 { '`````' }
 
 token Code {
-    | <.Ticks1> <.Sp> <_Code1> <.Sp> <.Ticks1> {*}      #= _Code1
-    | <.Ticks2> <.Sp> <_Code2> <.Sp> <.Ticks2> {*}      #= _Code2
-    | <.Ticks3> <.Sp> <_Code3> <.Sp> <.Ticks3> {*}      #= _Code3
-    | <.Ticks4> <.Sp> <_Code4> <.Sp> <.Ticks4> {*}      #= _Code4
-    | <.Ticks5> <.Sp> <_Code5> <.Sp> <.Ticks5> {*}      #= _Code5
+    | <.Ticks1> <.Sp> (<_Code1>) <.Sp> <.Ticks1> {*}
+    | <.Ticks2> <.Sp> (<_Code2>) <.Sp> <.Ticks2> {*}
+    | <.Ticks3> <.Sp> (<_Code3>) <.Sp> <.Ticks3> {*}
+    | <.Ticks4> <.Sp> (<_Code4>) <.Sp> <.Ticks4> {*}
+    | <.Ticks5> <.Sp> (<_Code5>) <.Sp> <.Ticks5> {*}
 }
 
 token _Sp_Ticks1 { <Sp> <Ticks1> }

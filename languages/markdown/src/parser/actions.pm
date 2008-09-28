@@ -208,12 +208,16 @@ method StrongUI($/) {
     make $mast;
 }
 
-method Code($/, $key) {
-    make Markdown::Code.new( :text( $/{$key}.text() ) );
+method Code($/) {
+    make Markdown::Code.new( :text( $/[0].text() ) );
 }
 
 method Str($/) {
     make Markdown::Word.new( :text( $/.text() ) );
+}
+
+method EscapedChar($/) {
+    make Markdown::Word.new( :text( $/[0].text() ) );
 }
 
 method Space($/) {
