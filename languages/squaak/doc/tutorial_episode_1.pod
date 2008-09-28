@@ -84,7 +84,7 @@ Most notable are:
 
 =item * classes and objects
 
-=item * exceptional control statements such as break and return
+=item * control flow statements such as break and return
 
 =item * advanced control statements such as switch
 
@@ -127,15 +127,15 @@ actions in a Yacc/Bison input file.
 For this tutorial, it is assumed you have successfully compiled parrot
 (and maybe even run the test suite). If you browse through the languages
 directory in the Parrot source tree, you'll find a number of language
-implementations. Most of them are not complete yet; some are actively
-maintained actively and others aren't. If, after reading this tutorial,
-you feel like contributing to one of these languages, you can check out the
-mailing list or join IRC (see the references section for details).
+implementations. Most of them are not complete yet; some are maintained
+actively and others aren't. If, after reading this tutorial, you feel like
+contributing to one of these languages, you can check out the mailing list or
+join IRC (see the references section for details).
 
 The languages subdirectory is the right spot to put our language implementation.
 Parrot comes with a special shell script to generate the necessary files for a
 language implementation. In order to generate these files for our language,
-type (assuming you're in parrot's root directory):
+type (assuming you're in Parrot's root directory):
 
  $ perl tools/dev/mk_language_shell.pl Squaak languages/squaak
 
@@ -145,7 +145,7 @@ name. The last config step is to create the Makefile for your new language:
 
  $  perl Configure.pl --languages=squaak
 
-After this, go to this directory and type:
+After this, go to the directory languages/squaak and type:
 
  $ make test
 
