@@ -212,12 +212,16 @@ method Code($/) {
     make Markdown::Code.new( :text( $/[0].text() ) );
 }
 
-method Str($/) {
-    make Markdown::Word.new( :text( $/.text() ) );
-}
-
 method EscapedChar($/) {
     make Markdown::Word.new( :text( $/[0].text() ) );
+}
+
+method Entity($/) {
+    make Markdown::Entity.new( :text( $/.text() ) );
+}
+
+method Str($/) {
+    make Markdown::Word.new( :text( $/.text() ) );
 }
 
 method Space($/) {

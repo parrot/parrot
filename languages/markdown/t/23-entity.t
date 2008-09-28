@@ -4,11 +4,11 @@
 
 =head1 NAME
 
-t/22-escape.t - Markdown escapes
+t/23-entity.t - Markdown entities
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Imarkdown/t markdown/t/22-escape.t
+    % perl -I../lib -Imarkdown/t markdown/t/23-entity.t
 
 =cut
 
@@ -20,23 +20,25 @@ use lib "$FindBin::Bin";
 use Parrot::Test tests => 2;
 use Test::More;
 
-language_output_is( 'markdown', <<'CODE', <<'OUT', 'asterisk' );
+language_output_is( 'markdown', <<'CODE', <<'OUT', 'CharEntity' );
 
-\*literal astericks\*
+4 &lt; 5
 
 CODE
-<p>*literal astericks*</p>
+<p>4 &lt; 5</p>
 
 OUT
 
-language_output_is( 'markdown', <<'CODE', <<'OUT', 'dot' );
+language_output_is( 'markdown', <<'CODE', <<'OUT', 'HexEntity' );
 
-1986\. What a great season.
+20 &#x20ac;.
 
 CODE
-<p>1986. What a great season.</p>
+<p>20 &#x20ac;.</p>
 
 OUT
+
+
 
 # Local Variables:
 #   mode: cperl

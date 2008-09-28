@@ -183,6 +183,7 @@ token Inline {
     | <Strong> {*}              #= Strong
     | <Emph> {*}                #= Emph
     | <Code> {*}                #= Code
+    | <Entity> {*}              #= Entity
     | <EscapedChar> {*}         #= EscapedChar
 }
 
@@ -197,6 +198,12 @@ token Str {
 token EscapedChar {
     '\\' <!Newline> (.)
     {*}
+}
+
+token Entity {
+    | <HexEntity> {*}
+    | <DecEntity> {*}
+    | <CharEntity> {*}
 }
 
 token Endline { TerminalLine | NormalEndline }
@@ -342,6 +349,12 @@ token SpecialChar { '*' | '_' | '`' | '&' | '[' | ']' | '<' | '!' | '\\' }
 token NormalChar { <!SpecialChar> <!Spacechar> <!Newline> . }
 
 token Alphanumeric { \w }
+
+token HexEntity { '&#' <[Xx]> <[0..9a..fA..F]>+ ';' }
+
+token DecEntity { '&#' <[0..9]>+ ';'}
+
+token CharEntity { '&' <[A..Za..z0..9]>+ ';' }
 
 token NonindentSpace { '   ' | '  ' | ' ' | '' }
 

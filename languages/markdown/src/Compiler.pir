@@ -256,6 +256,19 @@ Return generated HTML for all of its children.
     .return (code)
 .end
 
+=item html(Markdown::Entity node)
+
+=cut
+
+.sub 'html' :method :multi(_,['Markdown::Entity'])
+    .param pmc node
+    $S1 = node.'text'()
+    .local pmc code
+    new code, 'CodeString'
+    set code, $S1
+    .return (code)
+.end
+
 =item html(Markdown::Line node)
 
 =cut
