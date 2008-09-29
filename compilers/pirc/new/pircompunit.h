@@ -226,8 +226,8 @@ typedef struct argument {
  */
 typedef struct invocation {
     invoke_type         type;
-    target             *object;        /* invocant object, if any */
-    target             *sub;           /* invoked sub */
+    expression         *method;        /* method */
+    target             *sub;           /* invoked sub, or the object on which method is invoked */
     target             *retcc;         /* return continuation, if any */
     target             *results;       /* targets that will receive return values */
     argument           *arguments;     /* values passed into the sub, or return values */

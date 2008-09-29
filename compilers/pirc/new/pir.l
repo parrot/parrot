@@ -139,7 +139,7 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 
 {WS}              { /* ignore whitespace */ }
 
-#.*\n             { /* ignore line comments */ }
+[#].*{EOL}{WS}*   { /* ignore line comments */ }
 
 {EOL}[\t\r\n ]*   { /* a set of continuous newlines yields a single newline token. */
                     return TK_NL;

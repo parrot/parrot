@@ -1368,8 +1368,8 @@ invoke(struct lexer_state * const lexer, invoke_type type, ...) {
             inv->sub   = va_arg(arg_ptr, target *);
             break;
         case CALL_METHOD: /* $P0.$P1() */
-            inv->object = va_arg(arg_ptr, target *);
             inv->sub    = va_arg(arg_ptr, target *);
+            inv->method = va_arg(arg_ptr, expression *);
             break;
         case CALL_RETURN:   /* no extra args */
         case CALL_YIELD: /* no extra args */
@@ -1775,8 +1775,20 @@ write_signature(expression * const iter, char *instr_writer) {
                      * print the signature; 'kp' is not valid.
                      */
                 }
-                else
+                else {
+                    /*
                     instr_writer = write_signature(iter->expr.t->key->expr, instr_writer);
+                    */
+                    switch (iter->expr.t->key->expr->type) {
+                        case EXPR_CONSTANT:
+                            *instr_writer++ = 'c';
+                            break;
+                        default:
+                            fprintf(stderr, "write_signature: non-constant key\n");
+                            instr_writer = write_signature(iter->expr.t->key->expr, instr_writer);
+                            break;
+                    }
+                }
             }
             break;
         case EXPR_CONSTANT:
@@ -1789,7 +1801,19 @@ write_signature(expression * const iter, char *instr_writer) {
             break;
         case EXPR_KEY:
             *instr_writer++ = 'k';
+            /*
             instr_writer    = write_signature(iter->expr.k->expr, instr_writer);
+            */
+            switch (iter->expr.k->expr->type) {
+                case EXPR_CONSTANT:
+                   *instr_writer++ = 'c';
+                   break;
+                default:
+                    fprintf(stderr, "write_signature: non-constant key\n");
+                    instr_writer = write_signature(iter->expr.k->expr, instr_writer);
+                    break;
+            }
+
             break;
     }
     return instr_writer;
@@ -2123,7 +2147,8 @@ print_instruction(lexer_state *lexer, instruction *ins) {
             fullname = get_signatured_opname(ins);
 
         if (!is_parrot_signatured_op(lexer, fullname))
-            pirerror(lexer, "'%s' is not a parrot opcode! Check the operands of this op", fullname);
+            pirerror(lexer, "'%s' is not a signatured parrot opcode! Check the operands of this op",
+                     fullname);
         else {
             int opcode;
 
@@ -2316,11 +2341,14 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * inv) {
         case CALL_METHOD:
             set_instr(lexer, "set_args");
             arguments_to_operands(lexer, inv->arguments);
+            /* in a methodcall, the invocant object is passed as the first argument */
+            unshift_operand(lexer, expr_from_target(inv->sub));
 
             set_instr(lexer, "get_results");
             targets_to_operands(lexer, inv->results);
 
-            set_instr(lexer, "callmethodcc");
+            set_instrf(lexer, "callmethodcc", "%T%E", inv->sub, inv->method);
+
             break;
         case CALL_METHOD_TAILCALL:
             set_instr(lexer, "set_args");
