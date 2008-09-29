@@ -104,7 +104,8 @@ typedef struct pipp_bucket {
     PMC                * value;
     STRING             * key;
     INTVAL               hashValue;
-    INTVAL               key_is_int;
+    INTVAL               keyIsInt;
+    INTVAL               keyInt;
 } PippBucket;
 
 typedef struct pipp_hash_table {
@@ -118,6 +119,18 @@ typedef struct pipp_hash_table {
     INTVAL        nextIndex;
 } PippHashTable;
 
+/* Yay for the semipredicate problem. */
+typedef struct pipp_is_int {
+    INTVAL intval;
+    char   isInt;
+} PippIsInt;
+
+typedef enum {
+    START,
+    INT,
+    REJECT,
+    ACCEPT
+} PippIntParserState;
 
 PippHashTable* pipp_hash_create(PARROT_INTERP, UINTVAL size);
 void           pipp_hash_destroy(PARROT_INTERP, PippHashTable *ht);
@@ -134,6 +147,8 @@ PMC*           pipp_hash_get(PARROT_INTERP, PippHashTable *ht, STRING *key);
 PippBucket*    pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *value);
 INTVAL         pipp_hash_find(PARROT_INTERP, PippHashTable *ht, STRING *key);
 void           pipp_hash_delete(PARROT_INTERP, PippHashTable *ht, STRING *key);
+
+PippIsInt*     pipp_hash_get_intval(PARROT_INTERP, STRING *key);
 
 #endif /* PARROT_PIPP_HASH_H_GUARD */
 

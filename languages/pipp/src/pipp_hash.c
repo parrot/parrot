@@ -119,6 +119,7 @@ void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
     UINTVAL     count_tbl_fw, count_tbl_bk, count_bkt_ord, element_count, i;
     PippBucket *curr_bkt, *cmp_bkt;
     STRING     *curr_key;
+    PippIsInt  *isInt;
 
     element_count = ht->elementCount;
 
@@ -171,9 +172,21 @@ void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
                 "PHPArray corruption: Bucket order count is different "
                 "from ht->elementCount.");
 
+    /* Make sure buckets with keyIsInt are sane. */
+    dprintf("Checking that cached keyInt values are consistent...\n");
+    curr_bkt = ht->tableHead;
+    while (element_count && (curr_bkt = curr_bkt->tableNext)) {
+        isInt = pipp_hash_get_intval(interp, curr_bkt->key);
+        if (isInt->isInt != curr_bkt->keyIsInt)
+            Parrot_ex_throw_from_c_args(interp, NULL, -1, "PHPArray corruption: "
+                    "A key is confused about if it's an int");
+        if (curr_bkt->keyIsInt && curr_bkt->keyInt != isInt->intval)
+            Parrot_ex_throw_from_c_args(interp, NULL, -1, "PHPArray corruption: "
+                    "An int key has an incorrect value cached.");
+    }
+
     /*Look for duplicate keys using a naive n^2 algorithm.  Performance isn't a
-     *big concern, since this code won't be called very often.
-     */
+     *big concern, since this code won't be called very often.  */
     dprintf("looking for duplicate keys...\n");
     if (ht->elementCount) {
         curr_bkt = ht->tableHead;
@@ -223,16 +236,21 @@ Numbering is done according to insertion order.
 
 void pipp_hash_renumber(PARROT_INTERP, PippHashTable *ht) {
 
-    INTVAL curr_index = 0;
+    INTVAL curr_idx = 0;
     PippBucket *bkt;
 
     for (bkt = ht->tableHead; bkt != NULL; bkt = bkt->tableNext) {
-        if (bkt->key_is_int) {
-            bkt->key = string_from_int(interp, curr_index);
-            curr_index++;
+        if (bkt->keyIsInt) {
+            bkt->key     = string_from_int(interp, curr_idx);
+            bkt->keyInt = curr_idx;
+            curr_idx++;
         }
     }
-    ht->nextIndex = curr_index;
+    ht->nextIndex = curr_idx;
+
+    /* If any indicies have changed, we need to rehash. */
+    if (curr_idx)
+        pipp_hash_rehash(interp, ht);
 }
 
 /*
@@ -248,12 +266,12 @@ This is used when a PippHash grows and has its hashMask changed.
 
 void pipp_hash_rehash(PARROT_INTERP, PippHashTable *ht) {
 
-    INTVAL index;
+    INTVAL bucket_idx;
     PippBucket *bkt;
 
     for (bkt = ht->tableHead; bkt != NULL; bkt = bkt->tableNext) {
-        index = bkt->hashValue & ht->hashMask;
-        BUCKET_LIST_PREPEND(bkt, ht->buckets[index]);
+        bucket_idx = bkt->hashValue & ht->hashMask;
+        BUCKET_LIST_PREPEND(bkt, ht->buckets[bucket_idx]);
     }
 }
 
@@ -273,9 +291,8 @@ void pipp_hash_resize(PARROT_INTERP, PippHashTable *ht, INTVAL new_size) {
 
     NEXT_POW_2(new_size);
     ht->capacity = new_size;
-    ht->buckets = mem_realloc_n_typed(ht->buckets, new_size, PippBucket*);
+    ht->buckets  = mem_realloc_n_typed(ht->buckets, new_size, PippBucket*);
     ht->hashMask = new_size - 1;
-
 }
 
 /*
@@ -300,7 +317,7 @@ PippBucket* pipp_hash_get_bucket(PARROT_INTERP, PippHashTable *ht, STRING *key){
     PippBucket *bucket;
 
     key_hash = string_hash(interp, key, PIPP_HASH_SEED);
-    bucket = ht->buckets[key_hash & ht->hashMask];
+    bucket   = ht->buckets[key_hash & ht->hashMask];
 
     while (bucket != NULL && !string_equal(interp, bucket->key, key))
         bucket = bucket->bucketNext;
@@ -329,6 +346,150 @@ PMC* pipp_hash_get(PARROT_INTERP, PippHashTable *ht, STRING *key) {
     return PMCNULL;
 }
 
+/*
+
+=item C<PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *value)>
+
+Store C<value>, indexed by C<key>, in the hash.  Return the bucket where
+C<value> was stored.
+
+=cut
+
+*/
+
+PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *value) {
+    PippIsInt  *isInt;
+    PippBucket *first_bucket, *curr_bucket;
+    INTVAL      key_hash, bucket_idx;
+
+    key_hash     = string_hash(interp, key, PIPP_HASH_SEED);
+    bucket_idx   = key_hash & ht->hashMask;
+    curr_bucket  = ht->buckets[bucket_idx];
+    first_bucket = curr_bucket;
+    isInt        = pipp_hash_get_intval(interp, key);
+
+    /* if buckets[i] is empty or the item was not found
+     *   create a new bucket
+     * else
+     *   replace the values in the existing bucket
+     */
+    while (curr_bucket != NULL && !string_equal(interp, curr_bucket->key, key))
+        curr_bucket = curr_bucket->bucketNext;
+    if (curr_bucket == NULL) {
+
+        first_bucket = mem_allocate_zeroed_typed(PippBucket);
+
+        first_bucket->key       = key;
+        first_bucket->value     = value;
+        first_bucket->hashValue = key_hash;
+        first_bucket->keyIsInt  = isInt->isInt;
+
+        if (first_bucket->keyIsInt)
+            first_bucket->keyInt = isInt->intval;
+
+        BUCKET_LIST_PREPEND(first_bucket, ht->buckets[bucket_idx]);
+        TABLE_LIST_APPEND(first_bucket, ht);
+        curr_bucket = first_bucket;
+    }
+    else {
+        curr_bucket->key       = key;
+        curr_bucket->value     = value;
+        curr_bucket->hashValue = key_hash;
+        curr_bucket->keyIsInt  = isInt->isInt;
+
+        if (curr_bucket->keyIsInt)
+            curr_bucket->keyInt = isInt->intval;
+    }
+
+    mem_sys_free(isInt);
+    return curr_bucket;
+}
+
+/*
+
+=back
+
+=head2 Miscellaneous Helper Functions
+
+=over 4
+
+=item C<PippIsInt* pipp_hash_get_intval(PARROT_INTERP, STRING *s)>
+
+If C<s> looks like an INTVAL (i.e. /^[-]?[1-9][0-9]*$/) and doesn't cause an
+overflow, return a PippIsInt where C<p->intval> contains the INTVAL and
+C<p->isInt> is true.  Otherwise, return a PippIsInt where C<p->isInt> is false
+and C<p->intval> is undefined.
+
+=cut
+
+*/
+
+PippIsInt* pipp_hash_get_intval(PARROT_INTERP, STRING *key) {
+    PippIsInt *isInt;
+    INTVAL     overflow_check, state;
+    UINTVAL    key_len, curr_idx, curr_char, negate;
+
+    isInt    = mem_allocate_zeroed_typed(PippIsInt);
+    key_len  = string_length(interp, key);
+    curr_idx     = 0;
+    isInt->isInt = 1;
+
+    state = START;
+    while (curr_idx < key_len) {
+        curr_char = string_index(interp, key, curr_idx);
+        switch (state) {
+            case START:
+                if (curr_char == '-') {
+                    negate = 1;
+                    state  = INT;
+                }
+                else if (curr_char == '0' && key_len == 1) {
+                    isInt->intval = 0;
+                    isInt->isInt  = 1;
+                    return isInt;
+                }
+                else if (curr_char >= '1' && curr_char <= '9') {
+                    isInt->intval = curr_char - '0';
+                    state         = INT;
+                }
+                else
+                    state = REJECT;
+                break;
+
+            case INT:
+                if (curr_char >= '0' && curr_char <= '9') {
+                    overflow_check  = isInt->intval;
+                    overflow_check *= 10;
+                    overflow_check += (curr_char - '0');
+                    if (overflow_check > isInt->intval)
+                        isInt->intval = overflow_check;
+                    else
+                        state = REJECT;
+                }
+                else
+                    state = REJECT;
+                break;
+
+            case ACCEPT:
+                isInt->isInt = 1;
+                return isInt;
+
+            case REJECT:
+            default:
+                isInt->isInt = 0;
+                return isInt;
+
+        }
+        curr_idx++;
+    }
+    if (state == REJECT) {
+        isInt->isInt = 0;
+        return isInt;
+    }
+    if (negate)
+        isInt->intval = 0 - isInt->intval;
+    return isInt;
+}
 
 
 /*

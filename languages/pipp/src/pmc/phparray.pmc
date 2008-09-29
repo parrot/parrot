@@ -118,6 +118,33 @@ broken, the code will throw an exception.
         pipp_hash_sanity_check(INTERP, ht);
     }
 
+    /* This is just some trivial code to remind me which test cases need to be
+     * covered.  Once the actual PHPArray tests are closer to usable, I'll make
+     * sure they cover this code and remove this method. */
+    METHOD test_string() {
+        PippIsInt *i;
+
+        i = pipp_hash_get_intval(interp, const_string(INTERP, "00"));
+        dprintf("'00' => (%d)'%d'\n", i->isInt, i->intval);
+        i = pipp_hash_get_intval(interp, const_string(INTERP, "-0"));
+        dprintf("'-0' => (%d)'%d'\n", i->isInt, i->intval);
+        i = pipp_hash_get_intval(interp, const_string(INTERP, "04"));
+        dprintf("'04' => (%d)'%d'\n", i->isInt, i->intval);
+        i = pipp_hash_get_intval(interp, const_string(INTERP, "0"));
+        dprintf("'0' => (%d)'%d'\n", i->isInt, i->intval);
+        i = pipp_hash_get_intval(interp, const_string(INTERP, "-1"));
+        dprintf("'-1' => (%d)'%d'\n", i->isInt, i->intval);
+        i = pipp_hash_get_intval(interp, const_string(INTERP, "99999999999999999999999"));
+        dprintf("'99999999999999999999999' => (%d)'%d'\n", i->isInt, i->intval);
+        i = pipp_hash_get_intval(interp, const_string(INTERP, "-7"));
+        dprintf("'-7' => (%d)'%d'\n", i->isInt, i->intval);
+        i = pipp_hash_get_intval(interp, const_string(INTERP, "7"));
+        dprintf("'7' => (%d)'%d'\n", i->isInt, i->intval);
+        i = pipp_hash_get_intval(interp, const_string(INTERP, "100"));
+        dprintf("'100' => (%d)'%d'\n", i->isInt, i->intval);
+
+    }
+
 }
 
 /*
