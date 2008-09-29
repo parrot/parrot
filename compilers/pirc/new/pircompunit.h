@@ -425,8 +425,6 @@ int is_parrot_op(struct lexer_state * const lexer, char * const name);
 void print_subs(struct lexer_state * const lexer);
 void free_subs(struct lexer_state * const lexer);
 
-bucket *get_bucket(table, hash);
-
 void panic(char * const message);
 
 #endif /* PARROT_PIR_PIRCOMPUNIT_H_GUARD */

@@ -93,6 +93,9 @@ unsigned find_local_label(struct lexer_state * const lexer, char * const label);
 
 unsigned get_hashcode(char * const str, unsigned num_buckets);
 
+bucket *get_bucket(hashtable * const table, unsigned hash);
+
+
 #endif /* PARROT_PIR_PIRSYMBOL_H_GUARD */
 
 /*
