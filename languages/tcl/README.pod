@@ -65,11 +65,8 @@ C<parrot-porters@perl.org>.
 To run the spec test suites, type C<make spectest>; This will check out
 the tests from tcl's CVS repository for the 8.5.4 release and run them.
 
-Note that the tests are I<fudged> slightly to use our version of [test]
-As soon as we can run tcltest.tcl natively, we will.
-
 =head2 Documentation
 
-See C<docs/> and C<TODO>
+See C<docs/> and C<TODO>. Project website at: http://code.google.com/p/partcl/
 
 =cut
