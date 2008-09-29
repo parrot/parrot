@@ -13,7 +13,7 @@ A hashtable contains an array of bucket indexes. Buckets are nodes in a
 linked list, each containing a C<void *> key and value. During hash
 creation, the type of the value can be set.  All keys are stored as STRINGs.
 
-=head2 Functions
+=head2 Initialization and Finalization Functions
 
 =over 4
 
@@ -39,14 +39,7 @@ PippHashTable* pipp_hash_create(PARROT_INTERP, UINTVAL size) {
     PippHashTable *ht;
 
     real_size = size;
-    /* find the highest power of 2 where x >= size */
-    real_size--;
-    real_size = (real_size >> 1)  | real_size;
-    real_size = (real_size >> 2)  | real_size;
-    real_size = (real_size >> 4)  | real_size;
-    real_size = (real_size >> 8)  | real_size;
-    real_size = (real_size >> 16) | real_size;
-    real_size++;
+    NEXT_POW_2(real_size);
 
     ht = mem_allocate_zeroed_typed(PippHashTable);
 
@@ -63,7 +56,7 @@ PippHashTable* pipp_hash_create(PARROT_INTERP, UINTVAL size) {
 
 /*
 
-=item C<void pipp_hash_destroy(INTERP, PippHashTable* ht)
+=item C<void pipp_hash_destroy(INTERP, PippHashTable *ht)>
 
 Non-recursively free all memory used by this PippHash.
 
@@ -105,6 +98,12 @@ void pipp_hash_empty(PARROT_INTERP, PippHashTable *ht) {
 }
 
 /*
+
+=back
+
+=head2 Debugging Functions
+
+=over 4
 
 =item C<void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht)>
 
@@ -204,6 +203,141 @@ void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
     }
     dprintf("All sanity checks passed.\n");
 }
+
+/*
+
+=back
+
+=head2 Miscellaneous Housekeeping Functions
+
+=over 4
+
+=item C<void pipp_hash_renumber(INTERP, PippHashTable *ht)>
+
+Renumber all numerically-indexed elements of this PippHash, starting from 0.
+Numbering is done according to insertion order.
+
+=cut
+
+*/
+
+void pipp_hash_renumber(PARROT_INTERP, PippHashTable *ht) {
+
+    INTVAL curr_index = 0;
+    PippBucket *bkt;
+
+    for (bkt = ht->tableHead; bkt != NULL; bkt = bkt->tableNext) {
+        if (bkt->key_is_int) {
+            bkt->key = string_from_int(interp, curr_index);
+            curr_index++;
+        }
+    }
+    ht->nextIndex = curr_index;
+}
+
+/*
+
+=item C<void pipp_hash_rehash(INTERP, PippHashTable *ht)>
+
+Recalculate the hash of each element, potentially placing it in another bucket.
+This is used when a PippHash grows and has its hashMask changed.
+
+=cut
+
+*/
+
+void pipp_hash_rehash(PARROT_INTERP, PippHashTable *ht) {
+
+    INTVAL index;
+    PippBucket *bkt;
+
+    for (bkt = ht->tableHead; bkt != NULL; bkt = bkt->tableNext) {
+        index = bkt->hashValue & ht->hashMask;
+        BUCKET_LIST_PREPEND(bkt, ht->buckets[index]);
+    }
+}
+
+
+/*
+
+=item C<void pipp_hash_resize(INTERP, PippHashTable *ht, INTVAL resize)>
+
+Increase the capacity and number of buckets of this PippHash.  It's a very good
+idea to rehash after resizing.
+
+=cut
+
+*/
+
+void pipp_hash_resize(PARROT_INTERP, PippHashTable *ht, INTVAL new_size) {
+    
+    NEXT_POW_2(new_size);
+    ht->capacity = new_size;
+    ht->buckets = mem_realloc_n_typed(ht->buckets, new_size, PippBucket*);
+    ht->hashMask = new_size - 1;
+
+}
+
+/*
+
+=back
+
+=head2 Hash Manipulation Functions
+
+=over 4
+
+=item C<PippBucket* pipp_hash_get_bucket(INTERP, PippHashTable *ht, STRING *key)>
+
+If there is a bucket with a the key C<key>, return a pointer to it.  Otherwise
+return NULL.
+
+=cut
+
+*/
+
+PippBucket* pipp_hash_get_bucket(PARROT_INTERP, PippHashTable *ht, STRING *key){
+    INTVAL key_hash, bucket_idx;
+    PippBucket *bucket;
+
+    key_hash = string_hash(interp, key, PIPP_HASH_SEED);
+    bucket = ht->buckets[key_hash & ht->hashMask];
+    
+    while (bucket != NULL && !string_equal(interp, bucket->key, key))
+        bucket = bucket->bucketNext;
+    if (bucket)
+        return bucket;
+    return NULL;
+}
+
+/*
+
+=item C<PMC* pipp_hash_get(PARROT_INTERP, PippHashTable *ht, STRING *key)>
+
+If there is a bucket with a the key C<key>, return the value of that bucket.
+Otherwise return NULL.
+
+=cut
+
+*/
+
+PMC* pipp_hash_get(PARROT_INTERP, PippHashTable *ht, STRING *key) {
+    PippBucket *bucket;
+
+    bucket = pipp_hash_get_bucket(interp, ht, key);
+    if (bucket)
+        return bucket->value;
+    return PMCNULL;
+}
+
+
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
