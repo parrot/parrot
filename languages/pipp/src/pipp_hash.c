@@ -270,7 +270,7 @@ idea to rehash after resizing.
 */
 
 void pipp_hash_resize(PARROT_INTERP, PippHashTable *ht, INTVAL new_size) {
-    
+
     NEXT_POW_2(new_size);
     ht->capacity = new_size;
     ht->buckets = mem_realloc_n_typed(ht->buckets, new_size, PippBucket*);
@@ -301,7 +301,7 @@ PippBucket* pipp_hash_get_bucket(PARROT_INTERP, PippHashTable *ht, STRING *key){
 
     key_hash = string_hash(interp, key, PIPP_HASH_SEED);
     bucket = ht->buckets[key_hash & ht->hashMask];
-    
+
     while (bucket != NULL && !string_equal(interp, bucket->key, key))
         bucket = bucket->bucketNext;
     if (bucket)
