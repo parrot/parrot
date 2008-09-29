@@ -25,9 +25,9 @@
 # - ? -> PRINT
 #
 # Expressions:
-# - Operators: + - * / < > = unary-
+# - Operators: + - * / < > = unary+ unary- MOD
 # - Predefined numeric functions: COMPLEX, SQR, EXP, LN, COS, SIN, TAN, ASIN, ACOS, ATAN
-# - Predefined string functions: LEN, LEFT$, RIGHT$, MID$
+# - Predefined string functions: CHR$, ASC, LEN, LEFT$, RIGHT$, MID$
 # - Parenthesis
 # - Special functions: NEW "Class name"
 # - Calls to methods in foreign objects
@@ -117,6 +117,8 @@
     .local pmc predefs
     predefs = new 'Hash'
     setpredef(predefs, "NEW", "new")
+    setpredef(predefs, "CHR$", "chr")
+    setpredef(predefs, "ASC", "asc")
     setpredef(predefs, "LEN", "len")
     setpredef(predefs, "LEFT$", "left")
     setpredef(predefs, "RIGHT$", "right")
@@ -405,6 +407,42 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
+.sub predef_chr :method
+    .param pmc tokenizer
+
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    $P2 = self.get_1_arg(tokenizer)
+
+    $I0 = $P2
+    $S0 = chr $I0
+    $I1 = find_encoding 'utf8'
+    trans_encoding $S0, $I1
+    $P3 = new 'String'
+    $P3 = $S0
+    .return($P3)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
+.sub predef_asc :method
+    .param pmc tokenizer
+
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    $P2 = self.get_1_arg(tokenizer)
+
+    $S0 = $P2
+    $I0 = ord $S0
+    $P3 = new 'Integer'
+    $P3 = $I0
+    .return($P3)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
 .sub predef_len :method
     .param pmc tokenizer
 
@@ -645,7 +683,6 @@ check:
     unless $I0 goto fail
 
     eq token, '(', parenexp
-    eq token, '-', unaryminus
 
     $I0 = isa token, 'Literal'
     if $I0 goto isliteral
@@ -758,13 +795,6 @@ memptyargs:
     $P2 = var.$S2()
     .return($P2)
 
-unaryminus:
-    $P1 = self.eval_base(tokenizer)
-    $P2 = clone $P1
-    $P2 = 0
-    $P2 = $P2 - $P1
-    .return($P2)
-
 parenexp:
     $P1 = self.evaluate(tokenizer)
     token = tokenizer.get()
@@ -776,42 +806,50 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub eval_comp :method
+.sub eval_mod :method
     .param pmc tokenizer
     .param pmc token :optional
-
     $P0 = self.eval_base(tokenizer, token)
 more:
     $P1 = tokenizer.get()
-    eq $P1, '=', doequal
-    eq $P1, '<', doless
-    eq $P1, '>', dogreat
+    eq $P1, 'MOD', domod
     tokenizer.back()
     .return($P0)
-doequal:
+domod:
     $P2 = self.eval_base(tokenizer)
-    clone $P3, $P0
-    $I0 = iseq $P3, $P2
-    null $P0
-    $P0 = new 'Integer'
-    set $P0, $I0
+    $P3 = clone $P0
+    mod $P3, $P2
+    set $P0, $P3
     goto more
-doless:
-    $P2 = self.eval_base(tokenizer)
-    clone $P3, $P0
-    $I0 = islt $P3, $P2
-    null $P0
-    $P0 = new 'Integer'
-    set $P0, $I0
-    goto more
-dogreat:
-    $P2 = self.eval_base(tokenizer)
-    clone $P3, $P0
-    $I0 = isgt $P3, $P2
-    null $P0
-    $P0 = new 'Integer'
-    set $P0, $I0
-    goto more
+.end
+
+#-----------------------------------------------------------------------
+.sub eval_unary :method
+    .param pmc tokenizer
+    .param pmc token :optional
+
+    $I0 = defined token
+    if $I0 goto check
+    token = tokenizer.get()
+check:
+    $I0 = defined token
+    unless $I0 goto fail
+
+    eq token, '-', unaryminus
+    eq token, '+', unaryplus
+    $P0 = self.eval_mod(tokenizer, token)
+    .return($P0)
+unaryplus:
+    $P0 = self.eval_unary(tokenizer)
+    .return($P0)
+unaryminus:
+    $P0 = self.eval_unary(tokenizer)
+    $P1 = clone $P0
+    $P1 = 0
+    $P1 = $P1 - $P0
+    .return($P1)
+fail:
+    SyntaxError()
 .end
 
 #-----------------------------------------------------------------------
@@ -819,7 +857,7 @@ dogreat:
     .param pmc tokenizer
     .param pmc token :optional
 
-    $P0 = self.eval_comp(tokenizer, token)
+    $P0 = self.eval_unary(tokenizer, token)
 more:
     $P1 = tokenizer.get()
     eq $P1, '*', domul
@@ -827,13 +865,13 @@ more:
     tokenizer.back()
     .return($P0)
 domul:
-    $P2 = self.eval_comp(tokenizer)
+    $P2 = self.eval_unary(tokenizer)
     $P3 = clone $P0
     mul $P3, $P2
     set $P0, $P3
     goto more
 dodiv:
-    $P2 = self.eval_comp(tokenizer)
+    $P2 = self.eval_unary(tokenizer)
     $P3 = clone $P0
     div $P3, $P2
     set $P0, $P3
@@ -843,7 +881,7 @@ dodiv:
 #-----------------------------------------------------------------------
 .sub eval_add :method
     .param pmc tokenizer
-    .param pmc token
+    .param pmc token :optional
 
     $P0 = self.eval_mul(tokenizer, token)
 more:
@@ -882,11 +920,50 @@ dosub:
 .end
 
 #-----------------------------------------------------------------------
-.sub evaluate :method
+.sub eval_comp :method
     .param pmc tokenizer
     .param pmc token :optional
 
     $P0 = self.eval_add(tokenizer, token)
+more:
+    $P1 = tokenizer.get()
+    eq $P1, '=', doequal
+    eq $P1, '<', doless
+    eq $P1, '>', dogreat
+    tokenizer.back()
+    .return($P0)
+doequal:
+    $P2 = self.eval_add(tokenizer)
+    clone $P3, $P0
+    $I0 = iseq $P3, $P2
+    null $P0
+    $P0 = new 'Integer'
+    set $P0, $I0
+    goto more
+doless:
+    $P2 = self.eval_add(tokenizer)
+    clone $P3, $P0
+    $I0 = islt $P3, $P2
+    null $P0
+    $P0 = new 'Integer'
+    set $P0, $I0
+    goto more
+dogreat:
+    $P2 = self.eval_add(tokenizer)
+    clone $P3, $P0
+    $I0 = isgt $P3, $P2
+    null $P0
+    $P0 = new 'Integer'
+    set $P0, $I0
+    goto more
+.end
+
+#-----------------------------------------------------------------------
+.sub evaluate :method
+    .param pmc tokenizer
+    .param pmc token :optional
+
+    $P0 = self.eval_comp(tokenizer, token)
 #    $I0 = isa $P0, 'Integer'
 #    unless $I0 goto done
 #    say '<Integer'
