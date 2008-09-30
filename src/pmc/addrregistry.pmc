@@ -58,7 +58,7 @@ Free hash structure.
         parrot_new_pmc_hash_x(SELF, enum_type_int, Hash_key_type_PMC,
                               int_compare, key_hash_int);
 
-        registry            = (Hash*)PMC_struct_val(SELF);
+        registry            = (Hash *)PMC_struct_val(SELF);
 
         /* this hack can go away when parrot_new_pmc_hash_x behaves */
         addr_registry->hash = registry;
@@ -70,6 +70,7 @@ Free hash structure.
             Parrot_AddrRegistry_attributes * const registry = PARROT_ADDRREGISTRY(SELF);
 
             parrot_hash_destroy(INTERP, registry->hash);
+            mem_sys_free(registry);
             PMC_data(SELF) = NULL;
         }
     }
