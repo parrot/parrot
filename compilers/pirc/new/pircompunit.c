@@ -2163,14 +2163,14 @@ print_instruction(lexer_state * const lexer, instruction *ins) {
         else {
             int opcode;
 
-            /* fprintf(stderr, "   %s ", ins->opname);
+            /* fprintf(out, "   %s ", ins->opname);
              */
-            fprintf(stderr, "%u   %s ", ins->offset, fullname);
+            fprintf(out, "%u   %s ", ins->offset, fullname);
             opcode = get_instr_opcode(lexer, fullname);
 
             print_expressions(lexer, ins->operands);
 
-            fprintf(stderr, " # op %d", opcode);
+            fprintf(out, " # op %d", opcode);
         }
 
 
