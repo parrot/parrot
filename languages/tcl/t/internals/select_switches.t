@@ -32,7 +32,7 @@ builtins.
 
     load_bytecode 'languages/tcl/runtime/tcllib.pir'
 
-    plan(31)
+    plan(32)
     .local string message
 
     # 1
@@ -300,6 +300,29 @@ check_30:
 eh_31: 
     get_results '0', $P2
 check_31:
+    is($P2, '', message)
+
+    # 32
+    options = new 'TclList'
+    options[0] = 'good0'
+    options[1] = 'good1'
+
+    argv = new 'TclList'
+    argv[0] = '-1'
+    argv[1] = 'bag_o_donuts'
+    message='negative integer is not a switch'
+
+    push_eh eh_32
+      $P1 = select_switches(options, argv, 0, 1)
+    pop_eh
+
+    $P2 = new 'TclString'
+    $P2 = ''
+    goto check_32 
+
+eh_32: 
+    get_results '0', $P2
+check_32:
     is($P2, '', message)
 
 

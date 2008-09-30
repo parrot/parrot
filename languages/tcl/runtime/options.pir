@@ -128,8 +128,12 @@ to customize the error message slightly.
   .param string name   :named('name') :optional
   .param int has_name  :opt_flag
 
+  .local pmc toNumber
+  toNumber = get_root_global [ '_tcl' ], 'toNumber'
+
   if has_ends goto check_catch
   endswitch = 0
+
 
 check_catch:
   if has_catch goto check_name
@@ -176,6 +180,12 @@ loop:
   # and not have any whitespace.
   $I1 = index arg, ' '
   if $I1 != -1 goto loop_done
+  # and not be a number
+  push_eh not_num
+    toNumber(arg)
+  pop_eh
+  goto loop_done # was a number
+not_num:
   unless endswitch goto loop_2
   if arg == '-' goto handle_endswitch # already ate one -
 loop_2:
