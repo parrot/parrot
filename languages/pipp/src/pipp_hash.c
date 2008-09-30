@@ -368,13 +368,13 @@ PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *va
     first_bucket = curr_bucket;
     isInt        = pipp_hash_get_intval(interp, key);
 
-    /* if buckets[i] is empty or the item was not found
-     *   create a new bucket
-     * else
-     *   replace the values in the existing bucket
-     */
+    /* If buckets[i] is empty or the item was not found create a new bucket.
+     * Otherwise replace the values in the existing bucket.  */
+
     while (curr_bucket != NULL && !string_equal(interp, curr_bucket->key, key))
         curr_bucket = curr_bucket->bucketNext;
+
+    /* If buckets[i] is empty or the key isn't there ... */
     if (curr_bucket == NULL) {
 
         first_bucket = mem_allocate_zeroed_typed(PippBucket);
@@ -391,6 +391,7 @@ PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *va
         TABLE_LIST_APPEND(first_bucket, ht);
         curr_bucket = first_bucket;
     }
+    /* Replace the contents of an existing bucket. */
     else {
         curr_bucket->key       = key;
         curr_bucket->value     = value;
@@ -407,6 +408,45 @@ PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *va
 
 /*
 
+=item C<PippBucket* pipp_hash_find(INTERP, PippHashTable *ht, STRING *key)>
+
+If there is a bucket with a the key C<key>, return 1.  Otherwise return 0.
+
+=cut
+
+*/
+
+INTVAL pipp_hash_find(PARROT_INTERP, PippHashTable *ht, STRING *key){
+    return pipp_hash_get_bucket(interp, ht, key) != NULL;
+}
+
+/*
+
+=item C<void pipp_hash_delete(INTERP, PippHashTable *ht, STRING *key)>
+
+If there's a bucket in this hash with the key C<key>, it is deleted.  If
+there's no matching bucket, nothing happens.
+
+=cut
+
+*/
+
+void pipp_hash_delete(PARROT_INTERP, PippHashTable *ht, STRING *key){
+    PippBucket *b;
+    INTVAL      bucket_idx;
+
+    b = pipp_hash_get_bucket(interp, ht, key);
+
+    if (b != NULL) {
+        bucket_idx = ht->hashMask & b->hashValue;
+        TABLE_LIST_DELETE(b, ht);
+        BUCKET_LIST_DELETE(b, ht->buckets[bucket_idx]);
+        mem_sys_free(b);
+    }
+}
+
+/*
+
 =back
 
 =head2 Miscellaneous Helper Functions
@@ -415,7 +455,7 @@ PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *va
 
 =item C<PippIsInt* pipp_hash_get_intval(PARROT_INTERP, STRING *s)>
 
-If C<s> looks like an INTVAL (i.e. /^[-]?[1-9][0-9]*$/) and doesn't cause an
+If C<s> looks like an INTVAL (i.e. /^([-]?[1-9][0-9]|0)*$/) and doesn't cause an
 overflow, return a PippIsInt where C<p->intval> contains the INTVAL and
 C<p->isInt> is true.  Otherwise, return a PippIsInt where C<p->isInt> is false
 and C<p->intval> is undefined.
@@ -435,6 +475,7 @@ PippIsInt* pipp_hash_get_intval(PARROT_INTERP, STRING *key) {
     isInt->isInt = 1;
 
     state = START;
+    /* This is basically equivalient to matching against /^([-]?[1-9][0-9]*|0)$/ */
     while (curr_idx < key_len) {
         curr_char = string_index(interp, key, curr_idx);
         switch (state) {
