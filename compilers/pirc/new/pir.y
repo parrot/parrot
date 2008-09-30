@@ -384,6 +384,7 @@ static void check_first_arg_direction(yyscan_t yyscanner, char * const opname);
 %type <expr> expression
              namespace_slice
              method
+             op_arg_expr
 
 %type <key>  keys
              keylist
@@ -818,21 +819,23 @@ keylist_assignment: keylist '=' expression
                        }
                   ;
 
-op_arg            : constant
-                         { push_operand(lexer, expr_from_const(lexer, $1)); }
-                  | identifier
-                         { /* this is either a LABEL or a symbol; in the latter case, the type
-                            * will be filled in later. */
-                           push_operand(lexer, expr_from_target(lexer,
-                                        new_target(lexer, UNKNOWN_TYPE, $1)));
-
-                         }
-                  | reg
-                         { push_operand(lexer, expr_from_target(lexer, $1)); }
+op_arg            : op_arg_expr
+                         { push_operand(lexer, $1); }
                   | keylist
                          { push_operand(lexer, expr_from_key(lexer, $1)); }
                   | keyaccess
                          { push_operand(lexer, expr_from_target(lexer, $1)); }
+                  ;
+
+op_arg_expr       : constant
+                         { $$ = expr_from_const(lexer, $1); }
+                  | identifier
+                         { /* this is either a LABEL or a symbol; in the latter case, the type
+                            * will be filled in later. */
+                           $$ = expr_from_target(lexer, new_target(lexer, UNKNOWN_TYPE, $1));
+                         }
+                  | reg
+                         { $$ = expr_from_target(lexer, $1); }
                   ;
 
 keyaccess         : pmc_object keylist
@@ -909,14 +912,14 @@ assignment        : target '=' TK_INTC
                                   check_first_arg_direction(yyscanner, $3);
                               }
                           }
-                          else /* handle it as a symbol */
+                          else { /* handle it as a symbol */
                               update_instr(lexer, "set");
                               unshift_operand(lexer, expr_from_target(lexer,
-                                                                      target_from_symbol(lexer,
-                                                                                         sym)));
+                                                     target_from_symbol(lexer, sym)));
                               unshift_operand(lexer, expr_from_target(lexer, $1));
+                          }
                         }
-                  | target '=' parrot_op expression ',' parrot_op_args
+                  | target '=' parrot_op op_arg_expr ',' parrot_op_args
                         {
                           if (!is_parrot_op(lexer, $3))
                               yyerror(yyscanner, lexer, "'%s' is not a parrot op", $3);
@@ -928,7 +931,7 @@ assignment        : target '=' TK_INTC
                               do_strength_reduction(lexer);
                           }
                         }
-                  | target '=' parrot_op expression
+                  | target '=' parrot_op op_arg_expr
                         {
                           if (!is_parrot_op(lexer, $3))
                               yyerror(yyscanner, lexer, "'%s' is not a parrot op", $3);
@@ -2771,6 +2774,8 @@ check_first_arg_direction(yyscan_t yyscanner, char * const opname) {
     int dir_first_arg;
     lexer_state * const lexer = yyget_extra(yyscanner);
 
+    PARROT_ASSERT(CURRENT_INSTRUCTION(lexer));
+
     PARROT_ASSERT(CURRENT_INSTRUCTION(lexer)->opinfo);
 
     /* op_count also counts the instruction itself, so must be at least 2 */
@@ -2783,7 +2788,6 @@ check_first_arg_direction(yyscan_t yyscanner, char * const opname) {
     if (dir_first_arg == PARROT_ARGDIR_IN)
         yyerror(yyscanner, lexer, "cannot write first arg of op '%s' as a target "
                                   "(direction of argument is IN).", opname);
-
 
 }
 
