@@ -16,6 +16,8 @@ NOTE: most functions are not implemented yet, only stubs are supplied.
 
 =cut
 
+.namespace []
+
 =item abs(x)
 
 Return the absolute value of a number. The argument may be a plain or
@@ -760,6 +762,10 @@ sequence (string, tuple or list) or a mapping (dictionary).
 
 .sub 'len'
     .param pmc s
+    $I0 = elements s
+    $P0 = new 'Integer'
+    $P0 = $I0
+    .return ($P0)
 .end
 
 
@@ -776,6 +782,8 @@ empty list, [].
 
 .sub 'list'
     .param pmc sequence :optional
+    $P0 = 'listmaker'(sequence :flat)
+    .return ($P0)
 .end
 
 =item locals()
@@ -1067,6 +1075,26 @@ step must not be zero (or else ValueError is raised). Example:
 =cut
 
 .sub 'range'
+     .param pmc stop
+      # XXX start, step
+
+     .local int stopn
+     .local pmc lst
+     .local pmc tmp
+
+     $I0 = 0
+     lst = new 'ResizablePMCArray'
+     stopn = stop
+loop:
+     unless $I0 < stopn goto done
+     tmp = new 'Integer'
+     tmp = $I0
+     lst.push(tmp)
+
+     inc $I0
+     goto loop
+done:
+     .return (lst)
 .end
 
 
@@ -1349,6 +1377,13 @@ printable string. If no argument is given, returns the empty string, ''.
 
 .sub 'str'
     .param pmc obj :optional
+    .param int has_obj :opt_flag
+    $P0 = new 'String'
+    unless has_obj goto done
+    $S0 = obj
+    $P0 = $S0
+done:
+    .return ($P0)
 .end
 
 =item sum(sequence[, start])

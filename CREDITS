@@ -315,6 +315,9 @@ D: Binary GCD / LCM
 N: Ion Alexandru Morega
 D: string.pmc, complex.pmc
 
+N: isop
+D: various Pynie patches
+
 N: James E Keenan (Jim)
 D: Testing of configuration and build tools
 W: http://thenceforward.net/parrot/
