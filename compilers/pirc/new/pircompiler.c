@@ -308,7 +308,7 @@ release_resources(lexer_state *lexer) {
         allocated_mem_ptrs *temp = iter;
         unsigned i;
 
-        for (i = 0; i < iter->allocs_in_this_block; i++) {
+        for (i = 0; i < iter->allocs_in_this_block; i++)
             mem_sys_free(iter->ptrs[i]);
 
         iter = iter->next;
