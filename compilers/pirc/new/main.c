@@ -159,7 +159,9 @@ parse_file(void *a) {
             check_unused_symbols(lexer);
 
     }
-    else
+
+    /* there may have been errors during the instruction generation, check again here. */
+    if (lexer->parse_errors > 0)
         fprintf(stderr, "There were %d errors\n", lexer->parse_errors);
 
     fclose(infile);
