@@ -813,7 +813,7 @@ create_hash(PARROT_DATA_TYPE val_type, Hash_key_type hkey_type,
     hash->entry_type = val_type;
     hash->key_type   = hkey_type;
 
-    /* TODO randomize */
+    /* RT #59472 - randomize */
     hash->seed = 3793;
 
     PARROT_ASSERT(INITIAL_BUCKETS % 4 == 0);
