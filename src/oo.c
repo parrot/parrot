@@ -58,18 +58,6 @@ static PMC * find_method_direct_1(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC* get_init_meth(PARROT_INTERP,
-    ARGIN(PMC *_class),
-    ARGIN(STRING *prop_str),
-    ARGOUT(STRING **meth_str))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*meth_str);
-
 static void invalidate_all_caches(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -640,53 +628,6 @@ Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name))
     UNLOCK_INTERPRETER(interp);
 
     return type;
-}
-
-
-/*
-
-=item C<static PMC* get_init_meth>
-
-RT #48260: Not yet documented!!!
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC*
-get_init_meth(PARROT_INTERP, ARGIN(PMC *_class),
-        ARGIN(STRING *prop_str), ARGOUT(STRING **meth_str))
-{
-    STRING     *meth;
-    HashBucket *b;
-    PMC        *props, *ns, *method;
-
-    *meth_str = NULL;
-#if 0
-    PMC * const prop = VTABLE_getprop(interp, _class, prop_str);
-    if (!VTABLE_defined(interp, prop))
-        return PMCNULL;
-    meth = VTABLE_get_string(interp, prop);
-#else
-    props = PMC_metadata(_class);
-    if (!props)
-        return PMCNULL;
-
-    b = parrot_hash_get_bucket(interp,
-                (Hash*) PMC_struct_val(props), prop_str);
-    if (!b)
-        return PMCNULL;
-
-    meth = PMC_str_val((PMC*) b->value);
-#endif
-
-    *meth_str = meth;
-    ns        = VTABLE_get_namespace(interp, _class);
-    method    = VTABLE_get_pmc_keyed_str(interp, ns, meth);
-
-    return method;
 }
 
 /*
