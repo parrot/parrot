@@ -465,24 +465,25 @@ and C<p->intval> is undefined.
 */
 
 PippIsInt* pipp_hash_get_intval(PARROT_INTERP, STRING *key) {
-    PippIsInt *isInt;
-    INTVAL     overflow_check, state;
-    UINTVAL    key_len, curr_idx, curr_char, negate;
+    PippIsInt          *isInt;
+    INTVAL              overflow_check;
+    UINTVAL             key_len, curr_idx, curr_char, negate;
+    PippIntParserState  state;
 
     isInt    = mem_allocate_zeroed_typed(PippIsInt);
     key_len  = string_length(interp, key);
     curr_idx     = 0;
     isInt->isInt = 1;
 
-    state = START;
+    state = PIPS_START;
     /* This is basically equivalient to matching against /^([-]?[1-9][0-9]*|0)$/ */
     while (curr_idx < key_len) {
         curr_char = string_index(interp, key, curr_idx);
         switch (state) {
-            case START:
+            case PIPS_START:
                 if (curr_char == '-') {
                     negate = 1;
-                    state  = INT;
+                    state  = PIPS_INT_CHAR;
                 }
                 else if (curr_char == '0' && key_len == 1) {
                     isInt->intval = 0;
@@ -491,13 +492,13 @@ PippIsInt* pipp_hash_get_intval(PARROT_INTERP, STRING *key) {
                 }
                 else if (curr_char >= '1' && curr_char <= '9') {
                     isInt->intval = curr_char - '0';
-                    state         = INT;
+                    state         = PIPS_INT_CHAR;
                 }
                 else
-                    state = REJECT;
+                    state = PIPS_REJECT;
                 break;
 
-            case INT:
+            case PIPS_INT_CHAR:
                 if (curr_char >= '0' && curr_char <= '9') {
                     overflow_check  = isInt->intval;
                     overflow_check *= 10;
@@ -505,17 +506,17 @@ PippIsInt* pipp_hash_get_intval(PARROT_INTERP, STRING *key) {
                     if (overflow_check > isInt->intval)
                         isInt->intval = overflow_check;
                     else
-                        state = REJECT;
+                        state = PIPS_REJECT;
                 }
                 else
-                    state = REJECT;
+                    state = PIPS_REJECT;
                 break;
 
-            case ACCEPT:
+            case PIPS_ACCEPT:
                 isInt->isInt = 1;
                 return isInt;
 
-            case REJECT:
+            case PIPS_REJECT:
             default:
                 isInt->isInt = 0;
                 return isInt;
@@ -523,7 +524,7 @@ PippIsInt* pipp_hash_get_intval(PARROT_INTERP, STRING *key) {
         }
         curr_idx++;
     }
-    if (state == REJECT) {
+    if (state == PIPS_REJECT) {
         isInt->isInt = 0;
         return isInt;
     }

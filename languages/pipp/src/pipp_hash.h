@@ -86,6 +86,7 @@ $Id$
         (b)->bucketNext->bucketPrev = (b)->bucketPrev; \
 
 /* find the highest power of 2 where p >= i */
+/* XXX: should have one more iteration on 64-bit systems */
 #define NEXT_POW_2(i) \
     (i)--;\
     (i) = ((i) >> 1)  | (i);\
@@ -126,10 +127,10 @@ typedef struct pipp_is_int {
 } PippIsInt;
 
 typedef enum {
-    START,
-    INT,
-    REJECT,
-    ACCEPT
+    PIPS_START,
+    PIPS_INT_CHAR,
+    PIPS_REJECT,
+    PIPS_ACCEPT
 } PippIntParserState;
 
 PippHashTable* pipp_hash_create(PARROT_INTERP, UINTVAL size);
