@@ -5350,12 +5350,12 @@ check_op_args_for_symbols(yyscan_t yyscanner, lexer_state * const lexer) {
      */
 
     PARROT_ASSERT(opcount >= 0);
-
+/*
     num_operands = get_operand_count(lexer);
     if (num_operands > opcount)
         yyerror(yyscanner, lexer, "too many arguments for op '%s'; %d expected, but %u specified.",
                                   CURRENT_INSTRUCTION(lexer)->opname, opcount, num_operands);
-
+*/
     /* opinfo may point to a different but similar instruction's info;
      * for instance:
      *
