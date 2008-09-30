@@ -59,7 +59,7 @@ typedef struct local_label {
 
 
 /* symbol constructor */
-symbol *new_symbol(char * const name, pir_type type);
+symbol *new_symbol(struct lexer_state * const lexer, char * const name, pir_type type);
 
 /* to enter a symbol in the symbol table */
 void declare_local(struct lexer_state * const lexer, pir_type type, symbol * const list);

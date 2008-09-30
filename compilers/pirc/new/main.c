@@ -5,7 +5,6 @@
 
 
 #include <string.h>
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -63,6 +62,7 @@ print_help(char const * const program_name)
     /*fprintf(stderr, "  -E        pre-process\n"); */
     fprintf(stderr, "  -d        show debug messages of parser\n");
     fprintf(stderr, "  -h        show this help message\n");
+    fprintf(stderr, "  -W        show warning messages\n");
     fprintf(stderr, "  -o <file> write output to the specified file. "
                     "Currently only works in combination with '-E' option\n");
 }
@@ -107,6 +107,7 @@ typedef struct parser_args {
     FILE *infile;
     char *filename;
     int   thr_id;
+    int   warnings;
 
 } parser_args;
 
@@ -129,6 +130,7 @@ parse_file(void *a) {
     FILE        *infile    = args->infile;
     char        *filename  = args->filename;
     int          thr_id    = args->thr_id;
+    int          warnings  = args->warnings;
 
     /* create a yyscan_t object */
     yylex_init(&yyscanner);
@@ -137,7 +139,7 @@ parse_file(void *a) {
     /* set the input file */
     yyset_in(infile, yyscanner);
     /* set the extra parameter in the yyscan_t structure */
-    lexer = new_lexer(filename);
+    lexer = new_lexer(filename, warnings);
     yyset_extra(lexer, yyscanner);
     /* go parse */
     yyparse(yyscanner, lexer);
@@ -153,8 +155,9 @@ parse_file(void *a) {
         print_subs(lexer);
         fclose(lexer->outfile);
 
-        check_unused_symbols(lexer);
-        free_subs(lexer);
+        if (warnings)
+            check_unused_symbols(lexer);
+
     }
     else
         fprintf(stderr, "There were %d errors\n", lexer->parse_errors);
@@ -186,6 +189,7 @@ int
 main(int argc, char *argv[]) {
     char const * const program_name = argv[0];
     int                flexdebug    = 0;
+    int                warningson   = 0;
     char              *filename     = NULL;
     char              *outputfile   = NULL;
 
@@ -222,6 +226,9 @@ main(int argc, char *argv[]) {
                     fprintf(stderr, "Missing argument for option '-o'\n");
                     exit(EXIT_FAILURE);
                 }
+                break;
+            case 'W':
+                warningson = 1;
                 break;
             default:
                 fprintf(stderr, "Unknown option: '%c'\n", argv[0][1]);
@@ -264,6 +271,7 @@ main(int argc, char *argv[]) {
         args.infile    = infile;
         args.filename  = filename;
         args.thr_id    = i;
+        args.warnings  = warningson;
 
         pthread_create(&threads[i], NULL, parse_file, &args);
 
@@ -297,6 +305,7 @@ main(int argc, char *argv[]) {
     args.infile    = infile;
     args.filename  = filename;
     args.thr_id    = 0;
+    args.warnings  = warningson;
 
     parse_file(&args);
 }

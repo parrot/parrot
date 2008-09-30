@@ -7,7 +7,6 @@
 #include "pircompunit.h"
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <stdio.h>
 
 
@@ -130,8 +129,8 @@ Create a new symbol node, returns it after initialization.
 
 */
 symbol *
-new_symbol(char * const name, pir_type type) {
-    symbol *sym = mem_allocate_zeroed_typed(symbol);
+new_symbol(lexer_state * const lexer, char * const name, pir_type type) {
+    symbol *sym = pir_mem_allocate_zeroed_typed(lexer, symbol);
     sym->name   = name;
     sym->type   = type;
     sym->next   = NULL;
@@ -162,7 +161,7 @@ declare_local(struct lexer_state * const lexer, pir_type type, symbol * const li
     /* store all symbols in the list and set the type on each symbol. */
     while (iter != NULL) {
         unsigned long hash = get_hashcode(iter->name, table->size);
-        bucket *b          = new_bucket();
+        bucket *b          = new_bucket(lexer);
         bucket_symbol(b)   = iter;
         store_bucket(table, b, hash);
 
@@ -253,8 +252,8 @@ identified by C<regno> and of type C<type>.
 
 */
 static pir_reg *
-new_pir_reg(pir_type type, int regno) {
-    pir_reg *r = mem_allocate_zeroed_typed(pir_reg);
+new_pir_reg(lexer_state * const lexer, pir_type type, int regno) {
+    pir_reg *r = pir_mem_allocate_zeroed_typed(lexer, pir_reg);
     r->type    = type;
     r->regno   = regno;
     r->next    = NULL;
@@ -315,7 +314,7 @@ use_register(struct lexer_state * const lexer, pir_type type, int regno) {
     pir_reg *reg;
 
     /* create a new node representing this PIR register */
-    reg = new_pir_reg(type, regno);
+    reg = new_pir_reg(lexer, type, regno);
     /* get a new PASM register for this PIR register. */
     reg->color = next_register(lexer, type);
 
@@ -391,8 +390,8 @@ Constructor to create a new global_label object.
 
 */
 static global_label *
-new_global_label(char * const name) {
-    global_label *glob = mem_allocate_zeroed_typed(global_label);
+new_global_label(lexer_state * const lexer, char * const name) {
+    global_label *glob = pir_mem_allocate_zeroed_typed(lexer, global_label);
     glob->name         = name;
     glob->const_nr     = 0;
     return glob;
@@ -412,8 +411,8 @@ void
 store_global_label(struct lexer_state * const lexer, char * const name) {
     hashtable    *table = &lexer->globals;
     unsigned long hash  = get_hashcode(name, table->size);
-    bucket *b           = new_bucket();
-    bucket_global(b)    = new_global_label(name);
+    bucket *b           = new_bucket(lexer);
+    bucket_global(b)    = new_global_label(lexer, name);
     store_bucket(table, b, hash);
 }
 
@@ -458,7 +457,7 @@ void
 store_global_constant(struct lexer_state * const lexer, constant * const c) {
     hashtable    *table = &lexer->constants;
     unsigned long hash  = get_hashcode(c->name, table->size);
-    bucket *b           = new_bucket();
+    bucket *b           = new_bucket(lexer);
     bucket_constant(b)  = c;
     store_bucket(table, b, hash);
 }
@@ -503,8 +502,8 @@ location in the source to which any branching instruction can jump to.
 
 */
 static local_label *
-new_local_label(char * const name, unsigned offset) {
-    local_label *l = mem_allocate_zeroed_typed(local_label);
+new_local_label(lexer_state * const lexer, char * const name, unsigned offset) {
+    local_label *l = pir_mem_allocate_zeroed_typed(lexer, local_label);
     l->name        = name;
     l->offset      = offset;
     return l;
@@ -520,10 +519,10 @@ store_local_label(struct lexer_state * const lexer, char * const labelname, unsi
 */
 void
 store_local_label(struct lexer_state * const lexer, char * const labelname, unsigned offset) {
-    local_label  *l     = new_local_label(labelname, offset);
+    local_label  *l     = new_local_label(lexer, labelname, offset);
     hashtable    *table = &CURRENT_SUB(lexer)->labels;
     unsigned long hash  = get_hashcode(labelname, table->size);
-    bucket *b           = new_bucket();
+    bucket *b           = new_bucket(lexer);
     bucket_local(b)     = l;
     store_bucket(table, b, hash);
 }
@@ -558,36 +557,6 @@ find_local_label(struct lexer_state * const lexer, char * const labelname) {
     return 0;
 }
 
-
-/*
-
-=item C<void
-free_symbols(symbol *sym)>
-
-Free the list of symbols pointed to by C<sym>.
-
-=cut
-
-*/
-
-void
-free_symbols(symbol *sym) {
-    symbol *iter = sym;
-
-    if (iter == NULL)
-        return;
-
-    do {
-        symbol *temp = iter;
-        iter = iter->next;
-
-        free(temp->name);
-        free(temp);
-    }
-    while (iter);
-
-    sym = NULL;
-}
 
 
 /*

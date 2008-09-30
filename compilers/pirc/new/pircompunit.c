@@ -52,8 +52,6 @@ Poletto and Sarkar).
 
 =item * calculate offsets for global (sub) labels.
 
-=item * free memory in the right places.
-
 =item * fix local label offset calculation: make this work for all :flow (PARROT_JUMP_RELATIVE) ops.
 
 =item * generate PackFiles (PBC).
@@ -67,7 +65,6 @@ Poletto and Sarkar).
 #include "pircompunit.h"
 #include "pircompiler.h"
 #include "pirsymbol.h"
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -108,17 +105,17 @@ static const char type_codes[5] = {'i', 'n', 's', 'p', '?'};
 
 
 =item C<void
-panic(char * const message)>
+panic(lexer_state * lexer, char * const message)>
 
 Function to emit a final last cry that something's wrong and exit.
-XXX Needs to free resources.
 
 =cut
 
 */
 void
-panic(char * const message) {
+panic(lexer_state * lexer, char * const message) {
     fprintf(stderr, "Fatal: %s\n", message);
+    release_resources(lexer);
     exit(EXIT_FAILURE);
 }
 
@@ -279,7 +276,7 @@ their thing.
 */
 void
 new_subr(struct lexer_state *lexer, char * const subname) {
-    subroutine *newsub = mem_allocate_zeroed_typed(subroutine);
+    subroutine *newsub = pir_mem_allocate_zeroed_typed(lexer, subroutine);
     int index;
 
     /* set the sub fields */
@@ -295,8 +292,8 @@ new_subr(struct lexer_state *lexer, char * const subname) {
     newsub->statements = NULL;
     newsub->flags      = 0;
 
-    init_hashtable(&newsub->symbols, HASHTABLE_SIZE_INIT);
-    init_hashtable(&newsub->labels, HASHTABLE_SIZE_INIT);
+    init_hashtable(lexer, &newsub->symbols, HASHTABLE_SIZE_INIT);
+    init_hashtable(lexer, &newsub->labels, HASHTABLE_SIZE_INIT);
 
     for (index = 0; index < 4; index++) {
         newsub->registers[index] = NULL; /* set all "register" tables to NULL */
@@ -320,11 +317,10 @@ new_subr(struct lexer_state *lexer, char * const subname) {
     /* vanilla register allocator is reset for each sub */
     reset_register_allocator(lexer);
 
-    /* reset the instruction counter for each new sub */
-    /*
-    lexer->instr_counter = 0;
-    */
+
 }
+
+
 
 /*
 
@@ -337,8 +333,8 @@ Create a new instruction node and set C<opname> as the instruction.
 
 */
 static instruction *
-new_instruction(char * const opname) {
-    instruction *ins = mem_allocate_zeroed_typed(instruction);
+new_instruction(lexer_state * const lexer, char * const opname) {
+    instruction *ins = pir_mem_allocate_zeroed_typed(lexer, instruction);
     ins->opname      = opname;
     ins->opcode      = -1; /* make sure this field is properly initialized;
                          it must be >= 0 before being used */
@@ -359,8 +355,7 @@ into the current subroutine's statements list.
 */
 static void
 new_statement(struct lexer_state * const lexer, char * const opname) {
-    instruction *instr = new_instruction(opname);
-    assert(instr);
+    instruction *instr = new_instruction(lexer, opname);
 
     /* within a subroutine, each instruction has a sequence number to be able to
      * calculate offsets for label branches.
@@ -434,19 +429,26 @@ equals C<right>'s (PASM) register number.
 */
 int
 targets_equal(target const * const left, target const * const right) {
-    /* if left has a name, it must equal right->name */
 
-    if (TEST_FLAG(left->flags, TARGET_FLAG_IS_REG) && TEST_FLAG(right->flags, TARGET_FLAG_IS_REG)) {
-        if ((left->type == right->type)
-        &&  (target_regno(left) == target_regno(right)
-        &&  (left->color == right->color)))
-            return TRUE;
+    if (TEST_FLAG(left->flags, TARGET_FLAG_IS_REG)) {      /* if left is a reg */
+        if (TEST_FLAG(right->flags, TARGET_FLAG_IS_REG)) { /* then right must be a reg */
+            if ((left->type == right->type)                /* types must match */
+            &&  (target_regno(left) == target_regno(right) /* PIR regno must match */
+            &&  (left->color == right->color)))            /* PASM regno must match */
+                return TRUE;
+        }
+        else /* left is a reg, right is not */
+            return FALSE;
 
     }
-    else {
-        if (target_name(left) && target_name(right) && STREQ(target_name(left), target_name(right)))
+    else { /* left is not a reg */
+
+        if (!TEST_FLAG(right->flags, TARGET_FLAG_IS_REG)  /* right must not be a reg */
+        && (target_name(left) && target_name(right)       /* both must have a name */
+        && STREQ(target_name(left), target_name(right)))) /* and they must be equal */
             return TRUE;
     }
+
     return FALSE;
 }
 
@@ -461,8 +463,8 @@ Create a new target node. The node's next pointer is initialized to itself.
 
 */
 target *
-new_target(pir_type type, char * const name) {
-    target *t       = mem_allocate_zeroed_typed(target);
+new_target(lexer_state * const lexer, pir_type type, char * const name) {
+    target *t       = pir_mem_allocate_zeroed_typed(lexer, target);
     t->type         = type;
     t->key          = NULL;
     t->color        = -1;         /* -1 means no PASM register assigned yet */
@@ -497,7 +499,7 @@ set_target_key(target * const t, key * const k) {
 /*
 
 =item C<target *
-target_from_symbol(symbol * const sym)>
+target_from_symbol(lexer_state * const lexer, symbol * const sym)>
 
 Convert a symbol node into a target node.
 
@@ -505,8 +507,8 @@ Convert a symbol node into a target node.
 
 */
 target *
-target_from_symbol(symbol * const sym) {
-    target *t = new_target(sym->type, sym->name);
+target_from_symbol(lexer_state * const lexer, symbol * const sym) {
+    target *t = new_target(lexer, sym->type, sym->name);
     t->color  = sym->color; /* copy the allocaled register */
     t->flags  = sym->flags; /* copy the flags */
     return t;
@@ -526,8 +528,8 @@ circular linked.
 */
 target *
 add_target(struct lexer_state * const lexer, target *last, target * const t) {
-    assert(last);
-    assert(t);
+    PARROT_ASSERT(last);
+    PARROT_ASSERT(t);
 
     t->next    = last->next; /* points to first */
     last->next = t;
@@ -550,10 +552,10 @@ current subroutine, and a new register is allocated for it.
 */
 target *
 add_param(struct lexer_state * const lexer, pir_type type, char * const name) {
-    target *targ = new_target(type, name);
-    symbol *sym  = new_symbol(name, type);
+    target *targ = new_target(lexer, type, name);
+    symbol *sym  = new_symbol(lexer, name, type);
 
-    assert(lexer->subs);
+    PARROT_ASSERT(CURRENT_SUB(lexer));
 
     if (CURRENT_SUB(lexer)->parameters == NULL) {
         CURRENT_SUB(lexer)->parameters = targ;
@@ -599,7 +601,7 @@ Set the argument of the :named flag for the current target
 */
 target *
 set_param_alias(struct lexer_state * const lexer, char * const alias) {
-    assert(lexer->curtarget != NULL);
+    PARROT_ASSERT(lexer->curtarget != NULL);
     lexer->curtarget->alias = alias;
     SET_FLAG(lexer->curtarget->flags, TARGET_FLAG_NAMED);
     return lexer->curtarget;
@@ -643,8 +645,8 @@ Create a new argument node which wraps C<expr>.
 
 */
 argument *
-new_argument(expression * const expr) {
-    argument *arg = mem_allocate_zeroed_typed(argument);
+new_argument(lexer_state * const lexer, expression * const expr) {
+    argument *arg = pir_mem_allocate_zeroed_typed(lexer, argument);
     arg->value    = expr;
     arg->next     = arg;
     return arg;
@@ -669,8 +671,8 @@ element of the list) is updated, and returned.
 */
 argument *
 add_arg(argument *arg1, argument * const arg2) {
-    assert(arg1);
-    assert(arg2);
+    PARROT_ASSERT(arg1);
+    PARROT_ASSERT(arg2);
 
     arg2->next = arg1->next; /* arg2->next is last one, must point to first item */
     arg1->next = arg2;
@@ -711,7 +713,7 @@ The argument on which the alias is set is returned.
 */
 argument *
 set_arg_alias(struct lexer_state * const lexer, char * const alias) {
-    assert(lexer->curarg != NULL);
+    PARROT_ASSERT(lexer->curarg != NULL);
     lexer->curarg->alias = alias;
     SET_FLAG(lexer->curarg->flags, ARG_FLAG_NAMED);
     return lexer->curarg;
@@ -749,7 +751,9 @@ Set the label C<label> on the current instruction.
 void
 set_label(struct lexer_state * const lexer, char * const labelname) {
     instruction *instr = CURRENT_INSTRUCTION(lexer);
-    assert(instr);
+
+    PARROT_ASSERT(instr);
+
     instr->label = labelname;
 
     /* if there is no instruction, then the label has the same index as the first
@@ -805,7 +809,7 @@ Update the current instruction; the new opname is given by C<newop>.
 */
 void
 update_instr(struct lexer_state * const lexer, char * const newop) {
-    assert(CURRENT_INSTRUCTION(lexer));
+    PARROT_ASSERT(CURRENT_INSTRUCTION(lexer));
     CURRENT_INSTRUCTION(lexer)->opname = newop;
 }
 
@@ -854,9 +858,9 @@ set_instrf(struct lexer_state * const lexer, char * const opname, char const * c
     unsigned i;             /* loop iterator */
     size_t   format_length; /* length of the format string. */
 
-    assert(format);
+    PARROT_ASSERT(format);
     format_length = strlen(format);
-    assert(format_length % 2 == 0);
+    PARROT_ASSERT(format_length % 2 == 0);
 
 
     /* create a new instruction node */
@@ -868,33 +872,33 @@ set_instrf(struct lexer_state * const lexer, char * const opname, char const * c
     for (i = 0; i < format_length; i++) {
         expression *expr = NULL;
         /* make sure the format letter is preceded by a '%' */
-        assert(*(format + i) == '%');
+        PARROT_ASSERT(*(format + i) == '%');
         ++i;
 
         switch (*(format + i)) {
             case 'I': /* identifier */
-                expr = expr_from_ident(va_arg(arg_ptr, char *));
+                expr = expr_from_ident(lexer, va_arg(arg_ptr, char *));
                 break;
             case 'T': /* target */
-                expr = expr_from_target(va_arg(arg_ptr, target *));
+                expr = expr_from_target(lexer, va_arg(arg_ptr, target *));
                 break;
             case 'E': /* expression */
                 expr = va_arg(arg_ptr, expression *);
                 break;
             case 'C': /* constant */
-                expr = expr_from_const(va_arg(arg_ptr, constant *));
+                expr = expr_from_const(lexer, va_arg(arg_ptr, constant *));
                 break;
             case 'i': /* integer */
-                expr = expr_from_const(new_const(INT_TYPE, va_arg(arg_ptr, int)));
+                expr = expr_from_const(lexer, new_const(lexer, INT_TYPE, va_arg(arg_ptr, int)));
                 break;
             case 'n': /* number */
-                expr = expr_from_const(new_const(NUM_TYPE, va_arg(arg_ptr, double)));
+                expr = expr_from_const(lexer, new_const(lexer, NUM_TYPE, va_arg(arg_ptr, double)));
                 break;
             case 's': /* string */
-                expr = expr_from_const(new_const(STRING_TYPE, va_arg(arg_ptr, char *)));
+                expr = expr_from_const(lexer, new_const(lexer, STRING_TYPE, va_arg(arg_ptr, char *)));
                 break;
             default:
-                panic("unknown format specifier in set_instrf()");
+                panic(lexer, "unknown format specifier in set_instrf()");
                 break;
         }
         push_operand(lexer, expr);
@@ -915,7 +919,7 @@ encode different flags.
 */
 void
 set_instr_flag(lexer_state * const lexer, instr_flag flag) {
-    assert(CURRENT_INSTRUCTION(lexer));
+    PARROT_ASSERT(CURRENT_INSTRUCTION(lexer));
     SET_FLAG(CURRENT_INSTRUCTION(lexer)->flags, flag);
 }
 
@@ -940,7 +944,7 @@ get_inverse(char * const instr) {
     else if (STREQ(instr, "ne")) return "eq";
     else if (STREQ(instr, "eq")) return "ne";
 
-    assert(0); /* this should never happen */
+    PARROT_ASSERT(0); /* this should never happen */
     return NULL;
 }
 
@@ -959,7 +963,7 @@ void
 invert_instr(struct lexer_state * const lexer) {
     instruction * const ins = CURRENT_INSTRUCTION(lexer);
     char *instr;
-    assert(ins);
+    PARROT_ASSERT(ins);
 
     instr = ins->opname;
     instr = get_inverse(instr);
@@ -991,7 +995,7 @@ get_instr(struct lexer_state * const lexer) {
 /*
 
 =item C<expression *
-get_operand(struct lexer_state * const lexer, unsigned n)>
+get_operand(struct lexer_state * const lexer, short n)>
 
 Get the C<n>th operand from the current instruction. If there are no
 operands, NULL is returned. Because the operands are stored in a
@@ -1003,18 +1007,25 @@ there are 4 operands, and you request the 5th, then it will return
 
 */
 expression *
-get_operand(struct lexer_state * const lexer, unsigned n) {
+get_operand(struct lexer_state * const lexer, short n) {
     expression *operand = CURRENT_INSTRUCTION(lexer)->operands;
 
     if (operand == NULL)
         return NULL;
 
+
     /* initialize the iterator */
     operand = operand->next;
 
+    PARROT_ASSERT(n >= 0);
+
     /* go to the nth operand and return that one. */
-    while (--n)
+    while (--n > 0) {
         operand = operand->next;
+
+    }
+
+    PARROT_ASSERT(operand);
 
     return operand;
 }
@@ -1100,8 +1111,8 @@ appropriate type from C<arg_ptr>.
 
 */
 static constant *
-create_const(pir_type type, char * const name, va_list arg_ptr) {
-    constant *c = mem_allocate_zeroed_typed(constant);
+create_const(lexer_state * lexer, pir_type type, char * const name, va_list arg_ptr) {
+    constant *c = pir_mem_allocate_zeroed_typed(lexer, constant);
     c->name     = name;
     c->type     = type;
     c->next     = NULL;
@@ -1118,7 +1129,7 @@ create_const(pir_type type, char * const name, va_list arg_ptr) {
             c->val.sval = va_arg(arg_ptr, char *);
             break;
         case UNKNOWN_TYPE:
-            panic("unknown data type in create_const()");
+            panic(lexer, "unknown data type in create_const()");
             break;
     }
 
@@ -1138,11 +1149,11 @@ Wrapper function for C<create_const>.
 
 */
 constant *
-new_named_const(pir_type type, char * const name, ...) {
+new_named_const(lexer_state * lexer, pir_type type, char * const name, ...) {
     constant *c;
     va_list arg_ptr;
     va_start(arg_ptr, name);
-    c = create_const(type, name, arg_ptr);
+    c = create_const(lexer, type, name, arg_ptr);
     va_end(arg_ptr);
     return c;
 }
@@ -1159,11 +1170,11 @@ Wrapper function for C<create_const>
 
 */
 constant *
-new_const(pir_type type, ...) {
+new_const(lexer_state *lexer, pir_type type, ...) {
     constant *c;
     va_list arg_ptr;
     va_start(arg_ptr, type);
-    c = create_const(type, NULL, arg_ptr);
+    c = create_const(lexer, type, NULL, arg_ptr);
     va_end(arg_ptr);
     return c;
 }
@@ -1188,7 +1199,7 @@ static invocation *
 new_invocation(lexer_state * const lexer) {
     /*
     invocation *inv = (invocation *)malloc(sizeof (invocation));
-    assert(inv);
+    PARROT_ASSERT(inv);
     */
     /* optimization: return the address of the cached object */
     invocation *inv = &lexer->obj_cache.inv_cache;
@@ -1212,8 +1223,8 @@ expression node is returned.
 
 */
 static expression *
-new_expr(expr_type type) {
-    expression *expr = mem_allocate_zeroed_typed(expression);
+new_expr(lexer_state * const lexer, expr_type type) {
+    expression *expr = pir_mem_allocate_zeroed_typed(lexer, expression);
     expr->type       = type;
     expr->next       = expr;
     return expr;
@@ -1231,7 +1242,7 @@ Create a C<target> node from a register. Returns the newly created register.
 */
 target *
 new_reg(struct lexer_state * const lexer, pir_type type, int regno) {
-    target *t       = new_target(type, NULL); /* no identifier */
+    target *t       = new_target(lexer, type, NULL); /* no identifier */
     target_regno(t) = regno;
     t->color        = color_reg(lexer, type, regno);
     /* set a flag on this target node saying it's a register */
@@ -1250,8 +1261,8 @@ convert a target to an expression node
 
 */
 expression *
-expr_from_target(target * const t) {
-    expression *e = new_expr(EXPR_TARGET);
+expr_from_target(lexer_state * const lexer, target * const t) {
+    expression *e = new_expr(lexer, EXPR_TARGET);
     e->expr.t     = t;
     return e;
 }
@@ -1268,8 +1279,8 @@ created expression node.
 
 */
 expression *
-expr_from_const(constant * const c) {
-    expression *e = new_expr(EXPR_CONSTANT);
+expr_from_const(lexer_state * const lexer, constant * const c) {
+    expression *e = new_expr(lexer, EXPR_CONSTANT);
     e->expr.c     = c;
     return e;
 }
@@ -1285,8 +1296,8 @@ Convert a ident to an expression node and returns it.
 
 */
 expression *
-expr_from_ident(char * const id) {
-    expression *e = new_expr(EXPR_IDENT);
+expr_from_ident(lexer_state * const lexer, char * const id) {
+    expression *e = new_expr(lexer, EXPR_IDENT);
     e->expr.id    = id;
     return e;
 }
@@ -1377,7 +1388,7 @@ invoke(struct lexer_state * const lexer, invoke_type type, ...) {
         case CALL_METHOD_TAILCALL:
             break;
         default:
-            panic("unknown invoke_type");
+            panic(lexer, "unknown invoke_type");
     }
     va_end(arg_ptr);
 
@@ -1397,8 +1408,8 @@ Create a target node from the string C<str>.
 
 */
 target *
-target_from_string(char * const str) {
-    return new_target(STRING_TYPE, str);
+target_from_string(lexer_state * const lexer, char * const str) {
+    return new_target(lexer, STRING_TYPE, str);
 }
 
 /*
@@ -1412,8 +1423,8 @@ Wrap the identifier C<id> of type C<type> in a target node.
 
 */
 target *
-target_from_ident(pir_type type, char * const id) {
-    return new_target(type, id);
+target_from_ident(lexer_state * const lexer, pir_type type, char * const id) {
+    return new_target(lexer, type, id);
 }
 
 
@@ -1530,7 +1541,7 @@ Add an operand at the end of the list of operands of the current instruction.
 */
 void
 push_operand(struct lexer_state * const lexer, expression * const operand) {
-    assert(lexer->subs->statements);
+    PARROT_ASSERT(lexer->subs->statements);
 
     if (CURRENT_INSTRUCTION(lexer)->operands == NULL) { /* empty list */
         CURRENT_INSTRUCTION(lexer)->operands = operand;
@@ -1562,7 +1573,7 @@ remove_operand(struct lexer_state * const lexer, unsigned index) {
     fprintf(stderr, "remove_operand()\n");
 
     if (CURRENT_INSTRUCTION(lexer)->operands == NULL)
-        panic("tried to remove non-existing operand");
+        panic(lexer, "tried to remove non-existing operand");
     else {
         expression *first = CURRENT_INSTRUCTION(lexer)->operands->next;
 
@@ -1609,8 +1620,8 @@ Wraps the key C<k> in an C<expression> node and returns that.
 
 */
 expression *
-expr_from_key(key * const k) {
-    expression *e = new_expr(EXPR_KEY);
+expr_from_key(lexer_state * const lexer, key * const k) {
+    expression *e = new_expr(lexer, EXPR_KEY);
     e->expr.k     = k;
     return e;
 }
@@ -1626,8 +1637,8 @@ Wraps the expression C<expr> in a key node and returns that.
 
 */
 key *
-new_key(expression * const expr) {
-    key *k  = mem_allocate_zeroed_typed(key);
+new_key(lexer_state * const lexer, expression * const expr) {
+    key *k  = pir_mem_allocate_zeroed_typed(lexer, key);
     k->expr = expr;
     k->next = NULL;
     return k;
@@ -1648,8 +1659,8 @@ pointed to by C<keylist>.
 
 */
 key *
-add_key(key *keylist, expression * const exprkey) {
-    key *newkey = new_key(exprkey);
+add_key(lexer_state * const lexer, key *keylist, expression * const exprkey) {
+    key *newkey = new_key(lexer, exprkey);
     key *list   = keylist;
 
     /* goto end of list */
@@ -1692,8 +1703,8 @@ The newly created symbol node is returned.
 
 */
 symbol *
-new_local(char * const name, int has_unique_reg){
-    symbol *s = new_symbol(name, UNKNOWN_TYPE);
+new_local(lexer_state * const lexer, char * const name, int has_unique_reg){
+    symbol *s = new_symbol(lexer, name, UNKNOWN_TYPE);
 
     if (has_unique_reg)
         SET_FLAG(s->flags, TARGET_FLAG_UNIQUE_REG);
@@ -1843,7 +1854,7 @@ If the operand is a key of something, a 'k' prefix is added.
 
 */
 char *
-get_signatured_opname(instruction * const instr) {
+get_signatured_opname(lexer_state * const lexer, instruction * const instr) {
     size_t      fullname_length;
     char       *fullname;
     char       *instr_writer;
@@ -1870,7 +1881,7 @@ get_signatured_opname(instruction * const instr) {
     }
 
     /* now we know how long the fullname will be, allocate enough memory. */
-    fullname = (char *)mem_sys_allocate_zeroed(fullname_length * sizeof (char));
+    fullname = (char *)pir_mem_allocate_zeroed(lexer, fullname_length * sizeof (char));
 
     /* copy the short name into fullname buffer, and set instr_writer to
      * the character after that.
@@ -2056,7 +2067,7 @@ print_constant(lexer_state *lexer, constant *c) {
             fprintf(out, "\"%s\"", c->val.pval);
             break;
         case UNKNOWN_TYPE:
-            panic("Unknown type detected in print_constant()");
+            panic(lexer, "Unknown type detected in print_constant()");
             break;
     }
 }
@@ -2115,8 +2126,8 @@ print_expressions(lexer_state *lexer, expression * const expr) {
 }
 
 void
-print_instruction(lexer_state *lexer, instruction *ins) {
-    assert(ins != NULL);
+print_instruction(lexer_state * const lexer, instruction *ins) {
+    PARROT_ASSERT(ins != NULL);
 
     if (ins->label)
         fprintf(out, "%u %s:\n", ins->offset, ins->label);
@@ -2139,12 +2150,12 @@ print_instruction(lexer_state *lexer, instruction *ins) {
             || STREQ(ins->opname, "get_params")
             || STREQ(ins->opname, "set_returns"))
         {
-            fullname = (char *)mem_sys_allocate_zeroed(strlen(ins->opname) + 4 * sizeof (char));
-            assert(fullname);
+            fullname = (char *)pir_mem_allocate_zeroed(lexer, strlen(ins->opname) + 4 * sizeof (char));
+            PARROT_ASSERT(fullname);
             sprintf(fullname, "%s_pc", ins->opname);
         }
         else
-            fullname = get_signatured_opname(ins);
+            fullname = get_signatured_opname(lexer, ins);
 
         if (!is_parrot_signatured_op(lexer, fullname))
             pirerror(lexer, "'%s' is not a signatured parrot opcode! Check the operands of this op",
@@ -2185,7 +2196,7 @@ arguments_to_operands(lexer_state * const lexer, argument * const args) {
     argument *argiter;
 
     if (args == NULL) {
-        push_operand(lexer, expr_from_const(new_const(PMC_TYPE, "")));
+        push_operand(lexer, expr_from_const(lexer, new_const(lexer, PMC_TYPE, "")));
         return;
     }
 
@@ -2216,7 +2227,7 @@ targets_to_operands(lexer_state * const lexer, target * const targets) {
     target *iter;
 
     if (targets == NULL) {
-        push_operand(lexer, expr_from_const(new_const(PMC_TYPE, "")));
+        push_operand(lexer, expr_from_const(lexer, new_const(lexer, PMC_TYPE, "")));
         return;
     }
 
@@ -2224,7 +2235,7 @@ targets_to_operands(lexer_state * const lexer, target * const targets) {
 
     do {
         iter = iter->next;
-        push_operand(lexer, expr_from_target(iter));
+        push_operand(lexer, expr_from_target(lexer, iter));
     }
     while (iter != targets);
 }
@@ -2342,7 +2353,7 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * inv) {
             set_instr(lexer, "set_args");
             arguments_to_operands(lexer, inv->arguments);
             /* in a methodcall, the invocant object is passed as the first argument */
-            unshift_operand(lexer, expr_from_target(inv->sub));
+            unshift_operand(lexer, expr_from_target(lexer, inv->sub));
 
             set_instr(lexer, "get_results");
             targets_to_operands(lexer, inv->results);
@@ -2357,7 +2368,7 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * inv) {
             set_instr(lexer, "tailcallmethod");
             break;
         default:
-            panic("Unknown invocation type in convert_inv_to_instr()");
+            panic(lexer, "Unknown invocation type in convert_inv_to_instr()");
             break;
     }
 
@@ -2427,9 +2438,9 @@ fixup_local_labels(lexer_state * const lexer) {
             /* a label is stored as an identifier in an expression node.
              * make sure this is the case (otherwise it's a bug).
              */
-            assert(label->type == EXPR_IDENT);
+            PARROT_ASSERT(label->type == EXPR_IDENT);
             /* change the operand into a constant; adjust the expression type. */
-            label->expr.c = new_const(INT_TYPE, offset - curr_instr);
+            label->expr.c = new_const(lexer, INT_TYPE, offset - curr_instr);
             label->type   = EXPR_CONSTANT;
         }
 
@@ -2558,20 +2569,6 @@ print_subs(struct lexer_state * const lexer) {
     }
 }
 
-
-void
-free_subs(lexer_state * const lexer) {
-    if (lexer->subs != NULL) {
-        subroutine *iter = lexer->subs->next;
-
-        do {
-            subroutine *temp = iter;
-            iter = iter->next;
-            mem_sys_free(temp);
-        }
-        while (iter != lexer->subs->next);
-    }
-}
 
 
 /*

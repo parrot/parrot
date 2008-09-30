@@ -338,17 +338,17 @@ argument *set_arg_flag(argument * const arg, arg_flag flag);
 argument *set_arg_alias(struct lexer_state * const lexer, char * const alias);
 
 /* constructors for constant nodes */
-constant *new_named_const(pir_type type, char * const name, ...);
-constant *new_const(pir_type type, ...);
+constant *new_named_const(struct lexer_state * lexer, pir_type type, char * const name, ...);
+constant *new_const(struct lexer_state * lexer, pir_type type, ...);
 
 /* conversion functions, each wrapping its argument in an expression node */
-expression *expr_from_const(constant * const c);
-expression *expr_from_target(target * const t);
-expression *expr_from_ident(char * const name);
-expression *expr_from_key(key * const k);
+expression *expr_from_const(struct lexer_state * const lexer, constant * const c);
+expression *expr_from_target(struct lexer_state * const lexer, target * const t);
+expression *expr_from_ident(struct lexer_state * const lexer, char * const name);
+expression *expr_from_key(struct lexer_state * const lexer, key * const k);
 
 /* functions for argument node creation and storing */
-argument *new_argument(expression * const expr);
+argument *new_argument(struct lexer_state * const lexer, expression * const expr);
 argument *add_arg(argument *arg1, argument * const arg2);
 
 target *add_param(struct lexer_state * const lexer, pir_type type, char * const name);
@@ -361,7 +361,7 @@ argument *set_curarg(struct lexer_state * const lexer, argument * const arg);
 /* target constructors */
 target *add_target(struct lexer_state * const lexer, target *t1, target * const t);
 target *new_reg(struct lexer_state * const lexer, pir_type type, int regno);
-target *new_target(pir_type type, char * const name);
+target *new_target(struct lexer_state * const lexer, pir_type type, char * const name);
 
 /* set a key on a target node */
 void set_target_key(target * const t, key * const k);
@@ -373,13 +373,13 @@ void set_invocation_args(invocation * const inv, argument * const args);
 void set_invocation_results(invocation * const inv, target * const results);
 
 /* conversion functions that wrap their arguments into a target node */
-target *target_from_string(char * const str);
-target *target_from_ident(pir_type type, char * const id);
-target *target_from_symbol(struct symbol * const sym);
+target *target_from_string(struct lexer_state * const lexer, char * const str);
+target *target_from_ident(struct lexer_state * const lexer, pir_type type, char * const id);
+target *target_from_symbol(struct lexer_state * const lexer, struct symbol * const sym);
 
 /* management functions for key nodes */
-key *new_key(expression * const expr);
-key *add_key(key *keylist, expression * const newkey);
+key *new_key(struct lexer_state * const lexer, expression * const expr);
+key *add_key(struct lexer_state * const lexer, key *keylist, expression * const newkey);
 
 void load_library(struct lexer_state * const lexer, char * const library);
 void set_hll(struct lexer_state * const lexer, char * const hll);
@@ -395,7 +395,7 @@ void push_operand(struct lexer_state * const lexer, expression * const operand);
 
 char *get_instr(struct lexer_state * const lexer);
 void get_operands(struct lexer_state * const lexer, unsigned n, ...);
-expression *get_operand(struct lexer_state * const lexer, unsigned n);
+expression *get_operand(struct lexer_state * const lexer, short n);
 
 unsigned get_operand_count(struct lexer_state * const lexer);
 
@@ -411,7 +411,7 @@ void invert_instr(struct lexer_state * const lexer);
 
 /* local declaration functions */
 struct symbol *add_local(struct symbol * const list, struct symbol * const local);
-struct symbol *new_local(char * const name, int unique);
+struct symbol *new_local(struct lexer_state * const lexer, char * const name, int unique);
 
 /* compare two target nodes */
 int targets_equal(target const * const t1, target const * const t2);
@@ -425,7 +425,7 @@ int is_parrot_op(struct lexer_state * const lexer, char * const name);
 void print_subs(struct lexer_state * const lexer);
 void free_subs(struct lexer_state * const lexer);
 
-void panic(char * const message);
+void panic(struct lexer_state * lexer, char * const message);
 
 #endif /* PARROT_PIR_PIRCOMPUNIT_H_GUARD */
 

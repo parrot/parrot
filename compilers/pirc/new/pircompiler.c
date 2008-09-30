@@ -5,17 +5,89 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <assert.h>
 #include <string.h>
 #include <stdarg.h>
 
 #include "pircompiler.h"
 #include "parrot/parrot.h"
 
+/* XXX count memory, so we can check out mem. savings of string reuse */
+static int totalmem = 0;
+
+
 
 /*
 
 =over 4
+
+=item C<static allocated_mem_ptrs *
+new_mem_ptrs_block(void)>
+
+Create a new C<allocated_mem_ptrs> block; all pointers to allocated memory
+within pirc are stored in such blocks. One block has space for a number of
+pointers; if the block is full, a new block must be created and linked into
+the list of blocks.
+
+=cut
+
+*/
+static allocated_mem_ptrs *
+new_mem_ptrs_block(void) {
+    return mem_allocate_zeroed_typed(allocated_mem_ptrs);
+}
+
+/*
+
+=item C<static void
+register_ptr(lexer_state *lexer, void *ptr)>
+
+Store the pointer C<ptr> in a datastructure; whenever C<release_resources()>
+is invoked, C<ptr> will be freed through C<mem_sys_free()>.
+
+=cut
+
+*/
+static void
+register_ptr(lexer_state *lexer, void *ptr) {
+    allocated_mem_ptrs *ptrs = lexer->mem_allocations;
+
+    PARROT_ASSERT(ptrs);
+
+    if (ptrs->allocs_in_this_block == NUM_MEM_ALLOCS_PER_BLOCK) {
+        allocated_mem_ptrs *newblock = new_mem_ptrs_block();
+        newblock->next               = ptrs;
+        lexer->mem_allocations       = newblock;
+        ptrs                         = newblock;
+    }
+
+    /* store the pointer in the current block */
+    ptrs->ptrs[ptrs->allocs_in_this_block++] = ptr;
+}
+
+/*
+
+=item C<void *
+pir_mem_allocate_zeroed(lexer_state * const lexer, size_t numbytes)>
+
+Memory allocation function for all PIR internal functions. Memory is allocated
+through Parrot's allocation functions, but the pointer to the allocated memory
+is stored in a data structure; this way, freeing all memory can be done by just
+iterating over these pointers and freeing them.
+
+=cut
+
+*/
+void *
+pir_mem_allocate_zeroed(lexer_state * const lexer, size_t numbytes) {
+    void *ptr = mem_sys_allocate_zeroed(numbytes);
+
+    totalmem += numbytes;
+
+    register_ptr(lexer, ptr);
+    return ptr;
+}
+
+/*
 
 =item C<void
 init_hashtable(hashtable * table, unsigned size)>
@@ -26,8 +98,8 @@ Initialize the hashtable C<table> with space for C<size> buckets.
 
 */
 void
-init_hashtable(hashtable * table, unsigned size) {
-    table->contents  = (bucket **)mem_sys_allocate_zeroed(size * sizeof (bucket *));
+init_hashtable(lexer_state * const lexer, hashtable * table, unsigned size) {
+    table->contents  = (bucket **)pir_mem_allocate_zeroed(lexer, size * sizeof (bucket *));
     table->size      = size;
     table->obj_count = 0;
 }
@@ -44,19 +116,24 @@ a Parrot interpreter structure.
 
 */
 lexer_state *
-new_lexer(char * const filename) {
-    lexer_state *lexer = mem_allocate_zeroed_typed(lexer_state);
-    lexer->filename    = filename;
-    lexer->interp      = Parrot_new(NULL);
+new_lexer(char * const filename, int flags) {
+    lexer_state *lexer     = mem_allocate_zeroed_typed(lexer_state);
+    lexer->filename        = filename;
+    lexer->interp          = Parrot_new(NULL);
+    lexer->flags           = flags;
+    lexer->mem_allocations = new_mem_ptrs_block();
 
     if (!lexer->interp)
-        panic("Failed to create a Parrot interpreter structure.");
+        panic(lexer, "Failed to create a Parrot interpreter structure.");
 
     /* create a hashtable to store all strings */
-    init_hashtable(&lexer->strings, HASHTABLE_SIZE_INIT);
+    init_hashtable(lexer, &lexer->strings, HASHTABLE_SIZE_INIT);
+    /* create a hashtable for storing global labels */
+    init_hashtable(lexer, &lexer->globals, HASHTABLE_SIZE_INIT);
+    /* create a hashtable for storing .const declarations */
+    init_hashtable(lexer, &lexer->constants, HASHTABLE_SIZE_INIT);
 
-    init_hashtable(&lexer->globals, HASHTABLE_SIZE_INIT);
-    init_hashtable(&lexer->constants, HASHTABLE_SIZE_INIT);
+
 
     return lexer;
 }
@@ -99,9 +176,8 @@ Constructor for a bucket object.
 
 */
 bucket *
-new_bucket(void) {
-    bucket *buck = mem_allocate_zeroed_typed(bucket);
-    return buck;
+new_bucket(lexer_state * const lexer) {
+    return pir_mem_allocate_zeroed_typed(lexer, bucket);
 }
 
 /*
@@ -121,7 +197,7 @@ static void
 store_string(lexer_state * const lexer, char * const str) {
     hashtable    *table = &lexer->strings;
     unsigned long hash  = get_hashcode(str, table->size);
-    bucket *b           = new_bucket();
+    bucket *b           = new_bucket(lexer);
     bucket_string(b)    = str;
     store_bucket(table, b, hash);
 }
@@ -164,6 +240,8 @@ dupstrn(lexer_state * const lexer, char const * const source, size_t slen)>
 See dupstr, except that this version takes the number of characters to be
 copied. Easy for copying a string except the quotes, for instance.
 
+XXX maybe make this a runtime (commandline) option? Might be slightly slower.
+
 =cut
 
 */
@@ -174,7 +252,7 @@ dupstrn(lexer_state * const lexer, char * const source, size_t slen) {
     source[slen] = '\0';
 
     if (result == NULL) { /* not found */
-        result = (char *)mem_sys_allocate_zeroed(slen + 1 * sizeof (char));
+        result = (char *)pir_mem_allocate_zeroed(lexer, slen + 1 * sizeof (char));
         /* only copy num_chars characters */
         strncpy(result, source, slen);
         /* cache the string */
@@ -202,141 +280,40 @@ dupstr(lexer_state * const lexer, char * const source) {
     return dupstrn(lexer, source, strlen(source));
 }
 
-
-/***** routine to free memory *****/
-
-void
-free_key(key *k) {
-    mem_sys_free(k);
-    k = NULL;
-}
-
-void
-free_constant(constant *c) {
-    mem_sys_free(c);
-    c = NULL;
-}
-
-void
-free_target(target *t) {
-    if (t->key)
-        free_key(t->key);
-
-    if (t->alias)
-        mem_sys_free(t->alias);
-
-    if (t->lex_name)
-        mem_sys_free(t->lex_name);
-
-    mem_sys_free(t);
-    t = NULL;
-}
-
-void
-free_expression(expression *expr) {
-    switch (expr->type) {
-        case EXPR_TARGET:
-            free_target(expr->expr.t);
-            break;
-        case EXPR_CONSTANT:
-            free_constant(expr->expr.c);
-            break;
-        case EXPR_KEY:
-            free_key(expr->expr.k);
-            break;
-        default:
-            break;
-    }
-}
-
-void
-free_operands(expression *expr) {
-    expression *iter = expr;
-
-    do {
-        expression *temp = iter;
-        iter = iter->next;
-
-        free_expression(iter);
-        mem_sys_free(temp);
-    }
-    while (iter != expr);
-
-    expr = NULL;
-}
-
-
-void
-free_statements(instruction *instr) {
-    instruction *iter = instr;
-    do {
-        instruction *temp = iter;
-        iter              = iter->next;
-
-        free_operands(iter->operands);
-        mem_sys_free(temp);
-    }
-    while (iter != instr);
-
-    instr = NULL;
-}
-
-void
-destroy_hashtable(hashtable *table) {
-    unsigned i;
-    for (i = 0; i < table->size; i++) {
-        bucket *iter = table->contents[i];
-        while (iter) {
-            bucket *temp = iter;
-            iter = iter->next;
-
-            /* does it mattter what field of the union is freed? */
-            mem_sys_free(temp->u.str);
-
-            mem_sys_free(temp);
-        }
-    }
-    mem_sys_free(table);
-}
-
 /*
 
 =item C<void
 release_resources(lexer_state *lexer)>
+
+Release all resources pointed to by C<lexer>.
+Free all memory that was allocated through C<pir_mem_allocate_zeroed()>.
+Call the destructor on the Parrot Interpreter, and free C<lexer> itself.
 
 =cut
 
 */
 void
 release_resources(lexer_state *lexer) {
-    subroutine *iter = lexer->subs;
+    allocated_mem_ptrs *iter;
 
 
-
-    if (iter) {
-        do {
-            subroutine *temp = iter;
-            iter = iter->next;
-            /* free the symbols in this subroutine */
-            free_symbols(iter->symbols);
-
-            /* free instructions in this subroutine */
-
-            free_statements(iter->statements);
-
-
-            /* free this subroutine itself */
-            mem_sys_free(temp);
-        }
-        while (iter != lexer->subs);
-    }
-
+    fprintf(stderr, "Total nr of bytes allocated: %d\n", totalmem);
 
     Parrot_destroy(lexer->interp);
 
-    destroy_hashtable(&lexer->constants);
-    destroy_hashtable(&lexer->globals);
-    destroy_hashtable(&lexer->strings);
+    iter = lexer->mem_allocations;
+
+    while (iter) {
+        allocated_mem_ptrs *temp = iter;
+        unsigned i;
+
+        for (i = 0; i < iter->allocs_in_this_block; i++)
+            mem_sys_free(lexer);
+
+        iter = iter->next;
+        /* free the current pointer block itself */
+        mem_sys_free(iter);
+    }
 
     /* finally, free the lexer itself */
     mem_sys_free(lexer);
@@ -345,28 +322,9 @@ release_resources(lexer_state *lexer) {
 }
 
 
-typedef struct allocated_mem_ptrs {
-    void *ptrs[128];
-    unsigned i;
-    struct allocated_mem_ptrs *next;
-
-} allocated_mem_ptrs;
 
 
-#define pir_mem_allocate_typed(type)    (type *)pir_mem_allocate(sizeof (type))
 
-static void
-register_ptr(lexer_state *lexer, void *ptr) {
-    allocated_mem_ptrs ptrs;
-    ptrs.ptrs[ptrs.i++] = ptr;
-}
-
-void *
-pir_mem_allocate(lexer_state *lexer, size_t numbytes) {
-    void *ptr = mem_sys_allocate_zeroed(numbytes);
-    register_ptr(lexer, ptr);
-    return ptr;
-}
 
 /*
 
