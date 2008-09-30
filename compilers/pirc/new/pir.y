@@ -188,6 +188,9 @@ static int check_value(constant * const c, int val);
 
 static void check_first_arg_direction(yyscan_t yyscanner, char * const opname);
 
+static void check_op_args_for_symbols(yyscan_t yyscanner, lexer_state * const lexer);
+
+
 /* enable debugging of generated parser */
 #define YYDEBUG         1
 
@@ -686,88 +689,7 @@ opt_op_args       : op_args
                                * If any identifiers are used, they must be either a symbol, or
                                * a declared symbol.
                                */
-
-                              /* XXX the same trick must be done for <target> = <parrotop> ...
-                               * rules.
-                               */
-
-                              struct op_info_t * const opinfo = CURRENT_INSTRUCTION(lexer)->opinfo;
-                              short i;
-
-                              PARROT_ASSERT(opinfo);
-
-                              /* for each operand, check whether it's a LABEL operand; if it is,
-                               * then it must be an EXPR_TARGET; LABELs are stored in the
-                               * "id" field of the "expr" union, so copy the target's name into
-                               * the "id" field; also, update the union selector (expr->type).
-                               * If, however, the operand is NOT a LABEL, but it is a target node,
-                               * then make sure the target represents a declared symbol. Otherwise,
-                               * emit an error. If the symbol is found, copy its type and PASM
-                               * register into the target node. (usually that's done in the symbol
-                               * rule, but for PASM-style instructions this is not done.)
-                               */
-
-                              PARROT_ASSERT(opinfo->op_count >= 1);
-
-                              /* opinfo may point to a different but similar instruction's info;
-                               * for instance:
-                               *
-                               *   lt_i_i_ic, lt_ic_i_ic, lt_ic_ic_ic
-                               *
-                               * are all similar instructions, but different (signatures.
-                               * This is ok, because we only want to know if an operand is a label;
-                               * similar instructions have all the same number of operands.
-                               * (alternatively, if this were not ok, then this check must
-                               * be done after the full opname was retrieved).
-                               */
-                              for (i = 0; i < opinfo->op_count - 1; i++) {
-                                  expression *operand = get_operand(lexer, i + 1);
-
-                                  PARROT_ASSERT(operand);
-
-                                  if (opinfo->labels[i]) { /* operand i is a LABEL */
-
-                                      PARROT_ASSERT(operand->type == EXPR_TARGET);
-                                      /* copy the target's name into the expr.id field of the
-                                       * union, which is used for label identifiers.
-                                       * the expression's type (union selector) must be updated!
-                                       */
-                                      operand->expr.id = target_name(operand->expr.t);
-                                      operand->type    = EXPR_IDENT;
-                                  }
-                                  else { /* operand i is not a LABEL operand */
-
-                                      if (operand->type == EXPR_TARGET) { /* if it is a target... */
-
-
-                                         if (!TEST_FLAG(operand->expr.t->flags,
-                                                        TARGET_FLAG_IS_REG))
-                                         {
-                                             /* ...and not a register, then it must be a
-                                              * declared symbol.
-                                              */
-                                             symbol *sym = find_symbol(lexer,
-                                                                     target_name(operand->expr.t));
-
-                                             if (sym == NULL) /* symbol not found */
-                                                 yyerror(yyscanner, lexer,
-                                                         "symbol '%s' is not declared",
-                                                         target_name(operand->expr.t));
-
-                                             else {
-                                                /* copy the type from the symbol */
-                                                operand->expr.t->type  = sym->type;
-                                                /* copy the PASM register from the symbol */
-                                                operand->expr.t->color = sym->color;
-                                             }
-
-                                         } /* else it's a reg */
-
-                                      } /* else it's not a EXPR_TARGET */
-
-                                  }
-
-                              } /* for loop */
+                              check_op_args_for_symbols(yyscanner, lexer);
 
                               do_strength_reduction(lexer);
                           }
@@ -927,6 +849,8 @@ assignment        : target '=' TK_INTC
                               /* the instruction is already set in parrot_op rule */
                               unshift_operand(lexer, $4);
                               unshift_operand(lexer, expr_from_target(lexer, $1));
+
+                              check_op_args_for_symbols(yyscanner, lexer);
                               check_first_arg_direction(yyscanner, $3);
                               do_strength_reduction(lexer);
                           }
@@ -939,6 +863,8 @@ assignment        : target '=' TK_INTC
                               /* the instruction is already set in parrot_op rule */
                               unshift_operand(lexer, $4);
                               unshift_operand(lexer, expr_from_target(lexer, $1));
+
+                              check_op_args_for_symbols(yyscanner, lexer);
                               check_first_arg_direction(yyscanner, $3);
                               do_strength_reduction(lexer);
                           }
@@ -983,6 +909,7 @@ assignment        : target '=' TK_INTC
                         {
                           unshift_operand(lexer, expr_from_key(lexer, $4));
                           unshift_operand(lexer, expr_from_target(lexer, $1));
+                          check_op_args_for_symbols(yyscanner, lexer);
                           check_first_arg_direction(yyscanner, $3);
                         }
                   | target '=' keyword keylist
@@ -2788,6 +2715,89 @@ check_first_arg_direction(yyscan_t yyscanner, char * const opname) {
     if (dir_first_arg == PARROT_ARGDIR_IN)
         yyerror(yyscanner, lexer, "cannot write first arg of op '%s' as a target "
                                   "(direction of argument is IN).", opname);
+
+}
+
+
+static void
+check_op_args_for_symbols(yyscan_t yyscanner, lexer_state * const lexer) {
+    struct op_info_t * const opinfo = CURRENT_INSTRUCTION(lexer)->opinfo;
+    short i;
+
+    PARROT_ASSERT(opinfo);
+
+    /* for each operand, check whether it's a LABEL operand; if it is,
+     * then it must be an EXPR_TARGET; LABELs are stored in the
+     * "id" field of the "expr" union, so copy the target's name into
+     * the "id" field; also, update the union selector (expr->type).
+     * If, however, the operand is NOT a LABEL, but it is a target node,
+     * then make sure the target represents a declared symbol. Otherwise,
+     * emit an error. If the symbol is found, copy its type and PASM
+     * register into the target node. (usually that's done in the symbol
+     * rule, but for PASM-style instructions this is not done.)
+     */
+
+    PARROT_ASSERT(opinfo->op_count >= 1);
+
+    /* opinfo may point to a different but similar instruction's info;
+     * for instance:
+     *
+     *   lt_i_i_ic, lt_ic_i_ic, lt_ic_ic_ic
+     *
+     * are all similar instructions, but different (signatures.
+     * This is ok, because we only want to know if an operand is a label;
+     * similar instructions have all the same number of operands.
+     * (alternatively, if this were not ok, then this check must
+     * be done after the full opname was retrieved).
+     */
+    for (i = 0; i < opinfo->op_count - 1; i++) {
+        expression *operand = get_operand(lexer, i + 1);
+
+        PARROT_ASSERT(operand);
+
+        if (opinfo->labels[i]) { /* operand i is a LABEL */
+
+            PARROT_ASSERT(operand->type == EXPR_TARGET);
+            /* copy the target's name into the expr.id field of the
+             * union, which is used for label identifiers.
+             * the expression's type (union selector) must be updated!
+             */
+            operand->expr.id = target_name(operand->expr.t);
+            operand->type    = EXPR_IDENT;
+        }
+        else { /* operand i is not a LABEL operand */
+
+            if (operand->type == EXPR_TARGET) { /* if it is a target... */
+
+
+               if (!TEST_FLAG(operand->expr.t->flags,
+                              TARGET_FLAG_IS_REG))
+               {
+                   /* ...and not a register, then it must be a
+                    * declared symbol.
+                    */
+                   symbol *sym = find_symbol(lexer,
+                                           target_name(operand->expr.t));
+
+                   if (sym == NULL) /* symbol not found */
+                       yyerror(yyscanner, lexer,
+                               "symbol '%s' is not declared",
+                               target_name(operand->expr.t));
+
+                   else {
+                      /* copy the type from the symbol */
+                      operand->expr.t->type  = sym->type;
+                      /* copy the PASM register from the symbol */
+                      operand->expr.t->color = sym->color;
+                   }
+
+               } /* else it's a reg */
+
+            } /* else it's not a EXPR_TARGET */
+
+        }
+
+    } /* for loop */
 
 }
 
