@@ -296,6 +296,7 @@ void
 release_resources(lexer_state *lexer) {
     allocated_mem_ptrs *iter;
 
+    return;
 
     fprintf(stderr, "Total nr of bytes allocated: %d\n", totalmem);
 
@@ -307,8 +308,8 @@ release_resources(lexer_state *lexer) {
         allocated_mem_ptrs *temp = iter;
         unsigned i;
 
-        for (i = 0; i < iter->allocs_in_this_block; i++)
-            mem_sys_free(lexer);
+        for (i = 0; i < iter->allocs_in_this_block; i++) {
+            mem_sys_free(iter->ptrs[i]);
 
         iter = iter->next;
         /* free the current pointer block itself */
