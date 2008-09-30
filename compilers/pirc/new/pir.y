@@ -857,6 +857,7 @@ assignment        : target '=' TK_INTC
                         }
                   | target '=' parrot_op op_arg_expr
                         {
+                          fprintf(stderr , "target = parrotop opargexpr\n");
                           if (!is_parrot_op(lexer, $3))
                               yyerror(yyscanner, lexer, "'%s' is not a parrot op", $3);
                           else {
@@ -2719,12 +2720,30 @@ check_first_arg_direction(yyscan_t yyscanner, char * const opname) {
 }
 
 
+/*
+
+=item C<static void
+check_op_args_for_symbols(yyscan_t yyscanner, lexer_state * const lexer)>
+
+Check the arguments of the current instruction. First, the number of expected arguments
+is checked against the specified number of arguments. Then, for each argument, if the
+particular argument should not be a label (instructions can take LABEL operands), and
+if the argument is a target node, then the argument must be a declared symbol. If it
+is not, an error message is given.
+
+=cut
+
+*/
 static void
 check_op_args_for_symbols(yyscan_t yyscanner, lexer_state * const lexer) {
     struct op_info_t * const opinfo = CURRENT_INSTRUCTION(lexer)->opinfo;
     short i;
+    short opcount;
+    unsigned num_operands;
 
     PARROT_ASSERT(opinfo);
+
+    opcount = opinfo->op_count - 1; /* according to op.h, opcount also counts the op itself. */
 
     /* for each operand, check whether it's a LABEL operand; if it is,
      * then it must be an EXPR_TARGET; LABELs are stored in the
@@ -2737,7 +2756,12 @@ check_op_args_for_symbols(yyscan_t yyscanner, lexer_state * const lexer) {
      * rule, but for PASM-style instructions this is not done.)
      */
 
-    PARROT_ASSERT(opinfo->op_count >= 1);
+    PARROT_ASSERT(opcount >= 0);
+
+    num_operands = get_operand_count(lexer);
+    if (num_operands > opcount)
+        yyerror(yyscanner, lexer, "too many arguments for op '%s'; %d expected, but %u specified.",
+                                  CURRENT_INSTRUCTION(lexer)->opname, opcount, num_operands);
 
     /* opinfo may point to a different but similar instruction's info;
      * for instance:
@@ -2750,12 +2774,17 @@ check_op_args_for_symbols(yyscan_t yyscanner, lexer_state * const lexer) {
      * (alternatively, if this were not ok, then this check must
      * be done after the full opname was retrieved).
      */
-    for (i = 0; i < opinfo->op_count - 1; i++) {
+    for (i = 0; i < opcount; i++) {
         expression *operand = get_operand(lexer, i + 1);
 
         PARROT_ASSERT(operand);
 
         if (opinfo->labels[i]) { /* operand i is a LABEL */
+
+            /*
+            fprintf(stderr, "opinfo->labels[%d] == 1\n target name: %s\n", i,
+            target_name(operand->expr.t));
+            */
 
             PARROT_ASSERT(operand->type == EXPR_TARGET);
             /* copy the target's name into the expr.id field of the
@@ -2766,6 +2795,10 @@ check_op_args_for_symbols(yyscan_t yyscanner, lexer_state * const lexer) {
             operand->type    = EXPR_IDENT;
         }
         else { /* operand i is not a LABEL operand */
+
+        /*
+            fprintf(stderr, "opinfo->labels[%d] == 0\n", i);
+            */
 
             if (operand->type == EXPR_TARGET) { /* if it is a target... */
 
