@@ -663,7 +663,7 @@ Parrot_get_runtime_prefix(PARROT_INTERP)
 
 /*
 
-=item C<char* Parrot_get_runtime_path>
+=item C<STRING * Parrot_get_runtime_path>
 
 Return a string for the runtime prefix.
 
