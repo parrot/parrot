@@ -535,7 +535,7 @@ Parrot_dump_dynamic_environment(PARROT_INTERP, ARGIN(Stack_Chunk_t *dynamic_env)
         const Stack_Entry_t * const e = stack_entry(interp, dynamic_env, 0);
 
         if (! e)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1, "Control stack damaged");
+            Parrot_ex_throw_from_c_args(interp, NULL, 1, "Dynamic environment stack damaged");
 
         PIO_eprintf(interp, "[%4d:  chunk %p entry %p "
                                  "type %d cleanup %p]\n",
