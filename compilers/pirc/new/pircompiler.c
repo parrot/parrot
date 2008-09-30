@@ -296,8 +296,6 @@ void
 release_resources(lexer_state *lexer) {
     allocated_mem_ptrs *iter;
 
-    return;
-
     fprintf(stderr, "Total nr of bytes allocated: %d\n", totalmem);
 
     Parrot_destroy(lexer->interp);
