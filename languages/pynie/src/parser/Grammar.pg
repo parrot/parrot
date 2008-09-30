@@ -58,7 +58,7 @@ token stmt_list {
 token compound_stmt {
     | <if_stmt> {*}                              #= if_stmt
     | <while_stmt> {*}                           #= while_stmt
-    | <for_stmt>
+    | <for_stmt> {*}                             #= for_stmt
     | <try_stmt> {*}                             #= try_stmt
     | <with_stmt>
     | <funcdef> {*}                              #= funcdef
@@ -79,8 +79,10 @@ rule while_stmt {
 }
 
 rule for_stmt {
-    'for' <target_list> 'in' <expression_list> ':' <suite>
-    [ 'else' ':' <suite> ]?
+    'for' <target> 'in' <expression_list> ':' <suite>
+#    'for' <target_list> 'in' <expression_list> ':' <suite>
+#    [ 'else' ':' <suite> ]?
+    {*}
 }
 
 rule try_stmt {

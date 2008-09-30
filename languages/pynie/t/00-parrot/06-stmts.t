@@ -1,6 +1,6 @@
 #!./parrot pynie.pbc
 
-print '1..7'
+print '1..12'
 
 # if
 
@@ -24,4 +24,50 @@ while 0:
 else:
     print 'ok 7'
 
+# for
 
+lst = [ 1,2,3,4 ]
+n = 0
+ok = 1
+for i in lst:
+    n += 1
+    if i != n: ok = 0
+if ok: print 'ok 8'
+else: print 'nok 8'
+
+n = 0
+ok = 1
+for i in [ 1,2,3,4 ]:
+    n += 1
+    if i != n: ok = 0
+if ok: print 'ok 9'
+else: print 'nok 9'
+
+n = 0
+ok = 1
+for i in 1,2,3,4:
+    n += 1
+    if i != n: ok = 0
+if ok: print 'ok 10'
+else: print 'nok 10'
+
+# nested fors
+lst = [ ]
+for i in range(3):
+    # XXX ResizablePMCArray has a 'push' method, use list.append
+    for j in range(3):
+        lst.push((i + 1) * (j + 1))
+ok = 1
+lst2 = [ 1, 2, 3,  2, 4, 6,  3, 6, 9 ]
+for i in range(9):
+    if lst[i] != lst2[i]: ok = 0
+if ok: print 'ok 11'
+else: print 'nok 11'
+
+# multiple iterators
+#ok = 0
+#for i, j in ( (0, 0), (1, 2), (2, 4) ):
+#    if j == i * 2: ok += 1
+#if ok == 3: print 'ok 12'
+#else: print 'nok 12'
+print 'not ok 12  # TODO implement multiple iterators'
