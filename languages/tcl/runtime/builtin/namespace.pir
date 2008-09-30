@@ -447,6 +447,7 @@ begin_ns_walk:
   unless ns_iterator goto done_ns_walk
   $S0 = shift ns_iterator
   namespace = namespace[$S0]
+  if null namespace goto end_ns_loop
 
   goto begin_ns_walk
 done_ns_walk:
