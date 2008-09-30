@@ -49,6 +49,8 @@
  */
 #define IMCC_INTERNAL_CHAR '@'
 
+typedef struct _IMC_Unit IMC_Unit;
+
 #include "symreg.h"
 #include "instructions.h"
 #include "sets.h"

@@ -32,7 +32,7 @@ struct imcc_ostat {
     int used_once;
 } ;
 
-typedef struct _IMC_Unit {
+struct _IMC_Unit {
     INTVAL            type;
     Instruction      *instructions;
     Instruction      *last_ins;
@@ -70,7 +70,7 @@ typedef struct _IMC_Unit {
     SymReg           *lexid;            /* Unique lexical scope id */
 
     struct            imcc_ostat ostat;
-} IMC_Unit;
+};
 
 
 /* HEADERIZER BEGIN: compilers/imcc/unit.c */

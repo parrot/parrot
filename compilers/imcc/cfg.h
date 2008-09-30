@@ -59,48 +59,45 @@ int blocks_are_connected(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void build_cfg(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
+void build_cfg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-void clear_basic_blocks(ARGMOD(struct _IMC_Unit *unit))
+void clear_basic_blocks(ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*unit);
 
-void compute_dominance_frontiers(PARROT_INTERP,
-    ARGMOD(struct _IMC_Unit *unit))
+void compute_dominance_frontiers(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-void compute_dominators(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
+void compute_dominators(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
 PARROT_WARN_UNUSED_RESULT
-int edge_count(ARGIN(const struct _IMC_Unit *unit))
+int edge_count(ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1);
 
-void find_basic_blocks(PARROT_INTERP,
-    ARGMOD(struct _IMC_Unit *unit),
-    int first)
+void find_basic_blocks(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int first)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-void find_loops(PARROT_INTERP, ARGMOD(struct _IMC_Unit *unit))
+void find_loops(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-void free_life_info(ARGIN(const struct _IMC_Unit *unit), ARGMOD(SymReg *r))
+void free_life_info(ARGIN(const IMC_Unit *unit), ARGMOD(SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*r);
 
-void life_analysis(PARROT_INTERP, ARGIN(const struct _IMC_Unit *unit))
+void life_analysis(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -112,17 +109,17 @@ Life_range * make_life_range(ARGMOD(SymReg *r), int idx)
 
 PARROT_WARN_UNUSED_RESULT
 int natural_preheader(
-    ARGIN(const struct _IMC_Unit *unit),
+    ARGIN(const IMC_Unit *unit),
     ARGIN(const Loop_info* loop_info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void search_predecessors_not_in(
     ARGIN(const Basic_block *node),
-    ARGMOD(Set* s))
+    ARGMOD(Set *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(* s);
+        FUNC_MODIFIES(*s);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/cfg.c */

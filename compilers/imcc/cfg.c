@@ -88,7 +88,7 @@ static void bb_remove_edge(ARGMOD(IMC_Unit *unit), ARGMOD(Edge *edge))
 
 PARROT_WARN_UNUSED_RESULT
 static int check_invoke_type(PARROT_INTERP,
-    ARGIN(const IMC_Unit * unit),
+    ARGIN(const IMC_Unit *unit),
     ARGIN(const Instruction *ins))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -118,11 +118,11 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static Basic_block* make_basic_block(
     ARGMOD(IMC_Unit *unit),
-    ARGMOD(Instruction* ins))
+    ARGMOD(Instruction *ins))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit)
-        FUNC_MODIFIES(* ins);
+        FUNC_MODIFIES(*ins);
 
 static void mark_loop(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),
@@ -134,7 +134,7 @@ static void mark_loop(PARROT_INTERP,
 
 static void propagate_need(
     ARGMOD(Basic_block *bb),
-    ARGIN(const SymReg* r),
+    ARGIN(const SymReg *r),
     int i)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

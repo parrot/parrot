@@ -103,7 +103,7 @@ int emit_close(PARROT_INTERP, ARGIN_NULLOK(void *param))
 PARROT_API
 int emit_flush(PARROT_INTERP,
     ARGIN_NULLOK(void *param),
-    ARGIN(struct _IMC_Unit *unit))
+    ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -113,9 +113,7 @@ int emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(void *param))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-Instruction * _delete_ins(
-    ARGMOD(struct _IMC_Unit *unit),
-    ARGIN(Instruction *ins))
+Instruction * _delete_ins(ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
@@ -134,9 +132,7 @@ Instruction * _mk_instruction(
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-Instruction * delete_ins(
-    ARGMOD(struct _IMC_Unit *unit),
-    ARGMOD(Instruction *ins))
+Instruction * delete_ins(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit)
@@ -144,7 +140,7 @@ Instruction * delete_ins(
 
 PARROT_CAN_RETURN_NULL
 Instruction * emitb(PARROT_INTERP,
-    ARGMOD_NULLOK(struct _IMC_Unit *unit),
+    ARGMOD_NULLOK(IMC_Unit *unit),
     ARGIN_NULLOK(Instruction *i))
         __attribute__nonnull__(1);
 
@@ -175,7 +171,7 @@ int ins_writes2(ARGIN(const Instruction *ins), int t)
         __attribute__nonnull__(1);
 
 void insert_ins(
-    ARGMOD(struct _IMC_Unit *unit),
+    ARGMOD(IMC_Unit *unit),
     ARGMOD_NULLOK(Instruction *ins),
     ARGMOD(Instruction *tmp))
         __attribute__nonnull__(1)
@@ -195,7 +191,7 @@ int instruction_writes(
 
 PARROT_CAN_RETURN_NULL
 Instruction * move_ins(
-    ARGMOD(struct _IMC_Unit *unit),
+    ARGMOD(IMC_Unit *unit),
     ARGMOD(Instruction *ins),
     ARGMOD(Instruction *to))
         __attribute__nonnull__(1)
@@ -206,7 +202,7 @@ Instruction * move_ins(
         FUNC_MODIFIES(*to);
 
 void prepend_ins(
-    ARGMOD(struct _IMC_Unit *unit),
+    ARGMOD(IMC_Unit *unit),
     ARGMOD_NULLOK(Instruction *ins),
     ARGMOD(Instruction *tmp))
         __attribute__nonnull__(1)
@@ -215,7 +211,7 @@ void prepend_ins(
         FUNC_MODIFIES(*tmp);
 
 void subst_ins(
-    ARGMOD(struct _IMC_Unit *unit),
+    ARGMOD(IMC_Unit *unit),
     ARGMOD(Instruction *ins),
     ARGMOD(Instruction *tmp),
     int needs_freeing)

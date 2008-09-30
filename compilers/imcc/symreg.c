@@ -88,12 +88,6 @@ static void resize_symhash(ARGMOD(SymHash *hsh))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*hsh);
 
-static
-int
-int_overflows(const SymReg *r)
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*r);
-
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
