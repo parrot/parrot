@@ -35,88 +35,25 @@ each individual C<.test> file.
 =cut
 
 # When testing, avoid these files for now.
-my %skipfiles = (
-  'assocd' => 'all skipped',
-  'async'  => 'expected boolean value but got ""',
-  'autoMkindex' => 'unable to open file',
-  'basic' => "can't delete 'run'",
-  'binary' => 'Parrot assertion',
-  'case'   => 'not implemented',
-  'chanio' => 'unable to open file',
-  'clock'  => 'not implemented, memory hog',
-  'cmdAH'  => 'expected boolean value but got ""',
-  'cmdAZ'  =>'bad option "-1"',
-  'cmdInfo' => 'all skipped',
-  'config' => 'all failed',
-  'dcall' => 'all skipped',
-  'dict' => 'maximum recursion depth exceeded',
-  'dstring' => 'expected boolean value but got ""',
-  'encoding' => 'wrong # args: should be "string is class  ...',
-  'expr'   => 'really slow, memory hog',
-  'env' => 'unable to open file',
-  'exec' => 'unable to open file',
-  'fCmd' => 'expected boolean value but got ""',
-  'fileName' => 'expected boolean value but got ""',
-  'fileSystem' => 'unable to open file',
-  'history' => 'expected boolean value but got ""',
-  'http' => 'cannot start http server',
-  'httpold' => 'unable to open file',
-  'indexObj' => 'all skipped',
-  'info' => "can't read variable",
-  'init' => 'all failed',
-  'interp' => 'wrong # args: should be "interp"',
-  'io' => 'unable to open file',
-  'iocmd' => 'unable to open file',
-  'iogt' => 'unable to open file',
-  'link' => 'all skipped',
-  'list' => 'unmatched open quote in list',
-  'lset' => 'all skipped',
-  'macOSXFCmd' => 'expected boolean value but got ""',
-  'macOSXLoad' => 'expected boolean value but got ""',
-  'main' => 'all skipped or failed',
-  'mathop' => 'Null PMC access...',
-  'misc' => 'only passed 1/301',
-  'msgcat' => 'unable to open file',
-  'namespace-old' => 'memory hog',
-  'namespace' => 'wrong # args...',
-  'obj' => 'expected boolean value but got ""',
-  'opt' => "can't read variable",
-  'parse' => 'parsefail',
-  'parseExpr' => 'memory hog',
-  'pid' => 'all skipped or failed',
-  'pkg' => 'no tests?',
-  'pkgMkIndex' => 'unable to open file',
-  'platform' => 'all skipped or failed',
-  'reg' => 'memory hog',
-  'regexp' => 'memory hog',
-  'regexpComp' => 'memory hog',
-  'registry' => 'expected boolean value but got ""',
-  'result' => 'all skipped or failed',
-  'safe' => "can't read variable",
-  'socket' =>  'expected boolean value but got ""',
-  'source' => 'all failed',
-  'stack' =>  'expected boolean value but got ""',
-  'string' => 'Invalid character for UTF-8 encoding',
-  'stringObj' => 'Null PMC access...',
-  'subst' => 'unmatched open brace in list',
-  'tcltest' => 'unable to open file',
-  'thread' =>  'expected boolean value but got ""',
-  'timer' => 'invalid command name "x"',
-  'tm' => 'all failed',
-  'trace' => "can't read variable",
-  'unixFCmd' =>  'expected boolean value but got ""',
-  'unixFile' => "can't read directory",
-  'unixInit' => 'all skipped',
-  'unixNotfy' => 'all skipped',
-  'unload' => 'invalid command name "child"',
-  'util' => 'memory hog',
-  'winConsole' => 'all skipped',
-  'winDde' => 'expected boolean value but got ""',
-  'winFCmd' => 'expected boolean value but got ""',
-  'winFile' => 'expected boolean value but got ""',
-  'winNotify' => 'all skipped',
-  'winPipe' => 'expected boolean value but got ""',
-  'winTime' => 'all skipped',
+my @skipfiles = qw(
+  assocd async autoMkindex
+  basic binary
+  case chanio clock cmdAH cmdMZ cmdInfo config
+  dcall dict dstring
+  encoding expr env exec
+  fCmd fileName fileSystem
+  history http httpold
+  indexObj info init interp io iocmd iogt
+  link list lset
+  macOSXFCmd macOSXLoad main mathop misc msgcat
+  namespace-old namespace
+  obj opt
+  parse parseExpr pid pkg pkgMkIndex platform
+  reg regexp regexpComp registry result
+  safe socket source stack string stringObj subst
+  tcltest thread timer tm trace
+  unixFCmd unixFile unixInit unixNotfy unload util
+  winConsole winDde winFCmd winFile winNotify winPipe winTime
 );
 
 main();
@@ -155,12 +92,13 @@ sub checkout_tests {
 
 sub run_tests {
     my (@files) = glob File::Spec->catfile( $DIR, '*.test' );
+    my $url = 'http://code.google.com/p/partcl/wiki/SpecTestStatus';
 
     foreach my $file (@files) {
       $file =~ m{/(\w+).test$};
       my $basename = $1;
-      if (exists $skipfiles{$basename}) {
-        print "Skipping $file: $skipfiles{$basename}\n";
+      if (grep {$_ eq $basename} @skipfiles) {
+        print "Skipping $file: see $url\n";
         next;
       }
       my $cmd = "../../parrot tcl.pbc $file";
