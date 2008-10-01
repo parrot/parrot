@@ -747,6 +747,154 @@ C<i_key>.
 
 /*
 
+=item C<INTVAL exists_keyed(PMC *key)>
+
+Return non-zero if an element keyed by C<key> exists.
+
+=cut
+
+*/
+    INTVAL exists_keyed(PMC *key) {
+        PMC    *next_key, *box;
+        STRING *s_key;
+
+        dprintf("calling exists_keyed\n");
+        /* peel off the next key */
+        next_key = key_next(INTERP, key);
+        s_key    = VTABLE_get_string(INTERP, key);
+
+        /* if there isn't one (i.e. key is null) */
+        if (next_key == NULL) {
+            /* dispatch to exists_keyed_str */
+            return SELF.exists_keyed_str(s_key);
+        }
+
+        /* get the box where the thing should be stored */
+        box = SELF.get_pmc_keyed_str(s_key);
+        if (PMC_IS_NULL(box))
+            return (INTVAL)0;
+
+        /* recurse into that box */
+        return VTABLE_exists_keyed(INTERP, box, next_key);
+    }
+
+/*
+
+=item C<INTVAL exists_keyed_str(STRING *s_key)>
+
+Return non-zero if an element keyed by C<s_key> exists.
+
+=cut
+
+*/
+    INTVAL exists_keyed_str(STRING *s_key){
+        PMC           *p_val;
+        PippHashTable *ht;
+
+        dprintf("calling exists_keyed_str\n");
+        ht = (PippHashTable*)PMC_struct_val(SELF);
+        return pipp_hash_find(INTERP, ht, s_key);
+    }
+
+/*
+
+=item C<INTVAL exists_keyed_int(INTVAL i_key)>
+
+Return non-zero if an element keyed by C<i_key> exists.
+
+=cut
+
+*/
+    INTVAL exists_keyed_int(INTVAL i_key){
+        PMC           *p_val;
+        STRING        *s_key;
+        PippHashTable *ht;
+
+        dprintf("calling exists_keyed_int\n");
+        ht = (PippHashTable*)PMC_struct_val(SELF);
+        s_key = string_from_int(INTERP, i_key);
+        return pipp_hash_find(INTERP, ht, s_key);
+    }
+
+/*
+
+=item C<void delete_keyed(PMC *key)>
+
+If an element in this PHPArray is keyed by C<key>, delete it.  Otherwise do
+nothing.
+
+=cut
+
+*/
+    void delete_keyed(PMC *key) {
+        PMC    *next_key, *box;
+        STRING *s_key;
+
+        dprintf("calling delete_keyed\n");
+        /* peel off the next key */
+        next_key = key_next(INTERP, key);
+        s_key    = VTABLE_get_string(INTERP, key);
+
+        /* if there isn't one (i.e. key is null) */
+        if (next_key == NULL) {
+            /* dispatch to delete_keyed_str */
+            SELF.delete_keyed_str(s_key);
+            return;
+        }
+
+        /* get the box where the thing should be stored */
+        box = SELF.get_pmc_keyed_str(s_key);
+        if (PMC_IS_NULL(box))
+            return;
+
+        /* recurse into that box */
+        VTABLE_delete_keyed(INTERP, box, next_key);
+        return;
+    }
+
+/*
+
+=item C<void delete_keyed_str(STRING *s_key)>
+
+If an element in this PHPArray is keyed by C<key>, delete it.  Otherwise do
+nothing.
+
+=cut
+
+*/
+    void delete_keyed_str(STRING *s_key){
+        PMC           *p_val;
+        PippHashTable *ht;
+
+        dprintf("calling delete_keyed_str\n");
+        ht = (PippHashTable*)PMC_struct_val(SELF);
+        pipp_hash_delete(INTERP, ht, s_key);
+    }
+
+/*
+
+=item C<void delete_keyed_int(INTVAL i_key)>
+
+If an element in this PHPArray is keyed by C<key>, delete it.  Otherwise do
+nothing.
+
+=cut
+
+*/
+    void delete_keyed_int(INTVAL i_key){
+        PMC           *p_val;
+        STRING        *s_key;
+        PippHashTable *ht;
+
+        dprintf("calling delete_keyed_int\n");
+        ht = (PippHashTable*)PMC_struct_val(SELF);
+        s_key = string_from_int(INTERP, i_key);
+        pipp_hash_delete(INTERP, ht, s_key);
+        return;
+    }
+
+/*
+
 =item C<STRING* name()>
 
 Return the string 'array'.

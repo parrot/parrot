@@ -21,14 +21,14 @@ Tests the PhpArray PMC.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(8)
+    plan(16)
 
     basic_get_set()
     #stack_and_queue_ops()
     #index_increment()
     int_string_conversions()
-    #autovivification_tests()
-    #exists_delete_tests()
+    autovivification_tests()
+    exists_delete_tests()
     #generic_iterator_tests()
     #php_iterator_tests()
     #php_array_func_tests()
