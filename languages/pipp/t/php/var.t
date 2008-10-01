@@ -29,7 +29,11 @@ use Test::More     tests => 4;
 use Parrot::Test;
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'var_dump() with string key' );
+SKIP:
+{
+    skip 'excessive memory usage', 2;
+
+    language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'var_dump() with string key', skip => 'excessive memory usage' );
 <?php
 $foo['bar'] = 'asdf';
 echo $foo['bar'];
@@ -43,7 +47,7 @@ array(1) {
 }
 OUTPUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'var_dump() with int key' );
+    language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'var_dump() with int key', skip => 'excessive memory usage' );
 <?php
 $twice[1] = 2;
 echo $twice[1];
@@ -56,6 +60,7 @@ array(1) {
   int(2)
 }
 OUTPUT
+}
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'increment' );
 <?php
