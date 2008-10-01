@@ -134,11 +134,8 @@
     setpredef(predefs, "TAN", "tan")
     setpredef(predefs, "TANH", "tanh")
     setpredef(predefs, "ASIN", "asin")
-    setpredef(predefs, "ASINH", "asinh")
     setpredef(predefs, "ACOS", "acos")
-    setpredef(predefs, "ACOSH", "acosh")
     setpredef(predefs, "ATAN", "atan")
-    setpredef(predefs, "ATANH", "atanh")
     setpredef(predefs, "SQR", "sqr")
     set_global 'predefs', predefs
 
