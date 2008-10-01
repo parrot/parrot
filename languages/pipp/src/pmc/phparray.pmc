@@ -921,6 +921,21 @@ Return the string 'Array'.
 
 /*
 
+=item C<INTVAL get_bool()>
+
+Return 1 if this PHPArray has 1 or more elements.
+
+=cut
+
+*/
+    INTVAL get_bool() {
+        PippHashTable *ht;
+        ht = (PippHashTable *)PMC_struct_val(SELF);
+        return ht->elementCount > 0;
+    }
+
+/*
+
 =back
 
 =head2 Methods
