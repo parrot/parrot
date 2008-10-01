@@ -188,7 +188,7 @@ static int check_value(constant * const c, int val);
 
 static void check_first_arg_direction(yyscan_t yyscanner, char * const opname);
 
-static void check_op_args_for_symbols(yyscan_t yyscanner, lexer_state * const lexer);
+static int check_op_args_for_symbols(yyscan_t yyscanner, lexer_state * const lexer);
 
 
 /* enable debugging of generated parser */
@@ -681,21 +681,10 @@ parrot_op         : TK_IDENT
 
 opt_op_args       : op_args
                         { /* when this rule is activated, the initial identifier must
-                           * be a parrot op. Check that, and if not, emit an error message.
+                           * be a parrot op.
                            */
-                          char * const instr = get_instr(lexer);
-                          if (is_parrot_op(lexer, instr)) {
-                              /* it's a parrot op; now check for any used symbols as operands.
-                               * If any identifiers are used, they must be either a symbol, or
-                               * a declared symbol.
-                               */
-                              check_op_args_for_symbols(yyscanner, lexer);
-
+                          if (check_op_args_for_symbols(yyscanner, lexer))
                               do_strength_reduction(lexer);
-                          }
-                          else
-                              yyerror(yyscanner, lexer, "'%s' is not a parrot instruction", instr);
-
                         }
                   | keylist_assignment
                   ;
@@ -713,7 +702,7 @@ keylist_assignment: keylist '=' expression
                          /* the "instruction" that was set now appears to be
                           * an identifier; get the name, and check its type.
                           */
-                         char * const instr = get_instr(lexer);
+                         char * const instr = CURRENT_INSTRUCTION(lexer)->opname;
                          symbol *sym        = find_symbol(lexer, instr);
                          target *obj;
 
@@ -843,29 +832,24 @@ assignment        : target '=' TK_INTC
                         }
                   | target '=' parrot_op op_arg_expr ',' parrot_op_args
                         {
-                          if (!is_parrot_op(lexer, $3))
-                              yyerror(yyscanner, lexer, "'%s' is not a parrot op", $3);
-                          else {
-                              /* the instruction is already set in parrot_op rule */
-                              unshift_operand(lexer, $4);
-                              unshift_operand(lexer, expr_from_target(lexer, $1));
+                          /* the instruction is already set in parrot_op rule */
+                          unshift_operand(lexer, $4);
+                          unshift_operand(lexer, expr_from_target(lexer, $1));
 
-                              check_op_args_for_symbols(yyscanner, lexer);
+                          if (check_op_args_for_symbols(yyscanner, lexer)) {
                               check_first_arg_direction(yyscanner, $3);
                               do_strength_reduction(lexer);
                           }
+
                         }
                   | target '=' parrot_op op_arg_expr
                         {
-                          fprintf(stderr , "target = parrotop opargexpr\n");
-                          if (!is_parrot_op(lexer, $3))
-                              yyerror(yyscanner, lexer, "'%s' is not a parrot op", $3);
-                          else {
-                              /* the instruction is already set in parrot_op rule */
-                              unshift_operand(lexer, $4);
-                              unshift_operand(lexer, expr_from_target(lexer, $1));
+                          /* the instruction is already set in parrot_op rule */
+                          unshift_operand(lexer, $4);
+                          unshift_operand(lexer, expr_from_target(lexer, $1));
 
-                              check_op_args_for_symbols(yyscanner, lexer);
+                          /* if checking op args is successful, do other checks */
+                          if (check_op_args_for_symbols(yyscanner, lexer)) {
                               check_first_arg_direction(yyscanner, $3);
                               do_strength_reduction(lexer);
                           }
@@ -910,8 +894,8 @@ assignment        : target '=' TK_INTC
                         {
                           unshift_operand(lexer, expr_from_key(lexer, $4));
                           unshift_operand(lexer, expr_from_target(lexer, $1));
-                          check_op_args_for_symbols(yyscanner, lexer);
-                          check_first_arg_direction(yyscanner, $3);
+                          if (check_op_args_for_symbols(yyscanner, lexer))
+                              check_first_arg_direction(yyscanner, $3);
                         }
                   | target '=' keyword keylist
                         {
@@ -2480,7 +2464,7 @@ becomes:
 */
 static void
 do_strength_reduction(lexer_state * const lexer) {
-    char * const instr         = get_instr(lexer);
+    char * const instr         = CURRENT_INSTRUCTION(lexer)->opname;
     int          op            = -1;
     int          num_operands;
     expression  *arg1          = NULL;
@@ -2488,20 +2472,10 @@ do_strength_reduction(lexer_state * const lexer) {
 
     int opcode = CURRENT_INSTRUCTION(lexer)->opcode;
 
-    PARROT_ASSERT(opcode >= 0);
-
-/*
-    fprintf(stderr, "do_strength_reduction()\n");
-*/
-
-    /* note that the signature is not correct at this point; opcode may point to any variant
-     * of the op; we don't know the actual signature of this op; this will be calculated later;
-     * therefore, all variants must be considered. */
-
     switch (opcode) {
-        case PARROT_OP_add_i_i:
+/*        case PARROT_OP_add_i_i: */
         case PARROT_OP_add_i_ic:
-        case PARROT_OP_add_n_n:
+/*        case PARROT_OP_add_n_n: */
         case PARROT_OP_add_n_nc:
         case PARROT_OP_add_i_i_i:
         case PARROT_OP_add_i_ic_i:
@@ -2511,9 +2485,9 @@ do_strength_reduction(lexer_state * const lexer) {
         case PARROT_OP_add_n_n_nc:
             op = OP_ADD;
             break;
-        case PARROT_OP_div_i_i:
+/*        case PARROT_OP_div_i_i: */
         case PARROT_OP_div_i_ic:
-        case PARROT_OP_div_n_n:
+/*        case PARROT_OP_div_n_n: */
         case PARROT_OP_div_n_nc:
         case PARROT_OP_div_i_i_i:
         case PARROT_OP_div_i_ic_i:
@@ -2525,9 +2499,9 @@ do_strength_reduction(lexer_state * const lexer) {
         case PARROT_OP_div_n_nc_nc:
             op = OP_DIV;
             break;
-        case PARROT_OP_mul_i_i:
+/*        case PARROT_OP_mul_i_i: */
         case PARROT_OP_mul_i_ic:
-        case PARROT_OP_mul_n_n:
+/*        case PARROT_OP_mul_n_n: */
         case PARROT_OP_mul_n_nc:
         case PARROT_OP_mul_i_i_i:
         case PARROT_OP_mul_i_ic_i:
@@ -2537,9 +2511,9 @@ do_strength_reduction(lexer_state * const lexer) {
         case PARROT_OP_mul_n_n_nc:
             op = OP_MUL;
             break;
-        case PARROT_OP_fdiv_i_i:
+/*        case PARROT_OP_fdiv_i_i: */
         case PARROT_OP_fdiv_i_ic:
-        case PARROT_OP_fdiv_n_n:
+/*        case PARROT_OP_fdiv_n_n: */
         case PARROT_OP_fdiv_n_nc:
         case PARROT_OP_fdiv_i_i_i:
         case PARROT_OP_fdiv_i_ic_i:
@@ -2549,9 +2523,9 @@ do_strength_reduction(lexer_state * const lexer) {
         case PARROT_OP_fdiv_n_n_nc:
             op = OP_FDIV;
             break;
-        case PARROT_OP_sub_i_i:
+/*        case PARROT_OP_sub_i_i: */
         case PARROT_OP_sub_i_ic:
-        case PARROT_OP_sub_n_n:
+/*        case PARROT_OP_sub_n_n: */
         case PARROT_OP_sub_n_nc:
         case PARROT_OP_sub_i_i_i:
         case PARROT_OP_sub_i_ic_i:
@@ -2587,10 +2561,8 @@ do_strength_reduction(lexer_state * const lexer) {
 
     num_operands = get_operand_count(lexer);
 
-    /*
-    fprintf(stderr, "num_operands: %d\n", num_operands);
-    */
 
+    /* try to convert a OP X, Y, Z into OP X, Z, iff X == Z */
     if (num_operands > 2) {
         /* get the operands */
         expression *op1, *op2;
@@ -2598,10 +2570,6 @@ do_strength_reduction(lexer_state * const lexer) {
 
         /* check whether operands are in fact targets */
         if ((op1->type == EXPR_TARGET) && (op2->type == EXPR_TARGET)) {
-
-            /*
-            fprintf(stderr, "op1->type == EXPR_TARGET && op2->type == EXPR_TARGET\n");
-            */
 
             /* check whether targets are equal */
             if (targets_equal(op1->expr.t, op2->expr.t)) {
@@ -2628,6 +2596,9 @@ do_strength_reduction(lexer_state * const lexer) {
     PARROT_ASSERT(arg1);
     PARROT_ASSERT(arg2);
 
+    /* XXX TODO: remove a lot of this code; we know the correct signature, so we know exactly
+     * what's in each operand; including if it's a constant. If it is, do our little trick.
+     */
     switch (op) {
         case OP_ADD:
         case OP_SUB:
@@ -2638,7 +2609,6 @@ do_strength_reduction(lexer_state * const lexer) {
                 }
                 else if (check_value(arg2->expr.c, 1)) { /* add $I0, 1 --> inc $I0 */
                     update_instr(lexer, opnames[op + 1]);
-
                     arg1->next = arg2->next;
                 }
             }
@@ -2670,9 +2640,6 @@ do_strength_reduction(lexer_state * const lexer) {
         default:
             break;
     }
-    /*
-    fprintf(stderr, "do_strength_reduction() done\n");
-    */
 }
 
 /*
@@ -2719,7 +2686,7 @@ check_first_arg_direction(yyscan_t yyscanner, char * const opname) {
 
 }
 
-
+char *get_signatured_opname(lexer_state * const lexer, instruction * const instr);
 /*
 
 =item C<static void
@@ -2731,107 +2698,103 @@ particular argument should not be a label (instructions can take LABEL operands)
 if the argument is a target node, then the argument must be a declared symbol. If it
 is not, an error message is given.
 
+If there are errors, FALSE is returned; if successful, TRUE is returned.
+
 =cut
 
 */
-static void
+static int
 check_op_args_for_symbols(yyscan_t yyscanner, lexer_state * const lexer) {
-    struct op_info_t * const opinfo = CURRENT_INSTRUCTION(lexer)->opinfo;
-    short i;
-    short opcount;
+    struct   op_info_t * opinfo;
+    short    i;
+    short    opcount;
     unsigned num_operands;
+    char    *fullopname;
+    int      opcode;
+    int      label_bitmask = 0; /* an int is at least 32 bits;
+                                 * an op cannot have more than 8 operands, as defined in
+                                 * include/parrot/op.h:18, so an int is good enough for
+                                 * a bit mask to cover all operands.
+                                 */
+
+    /* iterate over all operands to set the type and PASM register on all target nodes, if any */
+    num_operands = get_operand_count(lexer);
+    for (i = 0; i < num_operands; i++) {
+        expression *operand = get_operand(lexer, i + 1);
+        if (operand->type == EXPR_TARGET) { /* if it is a target... */
+
+            if (!TEST_FLAG(operand->expr.t->flags, TARGET_FLAG_IS_REG)) { /* not a register */
+                symbol *sym = find_symbol(lexer, target_name(operand->expr.t));
+
+                if (sym) { /* copy the type and PASM register from the symbol */
+                    operand->expr.t->type  = sym->type;
+                    operand->expr.t->color = sym->color;
+                }
+                else { /* it's not a declared symbol; for now assume it's a label */
+                    if (operand->type == EXPR_TARGET) {
+                        /* if it's not a register (otherwise, no need to check) */
+                        if (!TEST_FLAG(operand->expr.t->flags, TARGET_FLAG_IS_REG)) {
+                            /* convert the target to an identifier */
+                            operand->expr.id = target_name(operand->expr.t);
+                            operand->type    = EXPR_IDENT;
+
+                            /* set a bit in the bitmask indicating it is assumed to be a label;
+                             * this prevents us doing a symbol lookup in the second loop; a
+                             * bitmask is faster. Note that i starts at 0, hence the "+ 1".
+                             */
+                            SET_BIT(label_bitmask, BIT(i + 1));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    /* now we know all types of the arguments, compute the full opname */
+    fullopname = get_signatured_opname(lexer, CURRENT_INSTRUCTION(lexer));
+
+    opcode     = lexer->interp->op_lib->op_code(fullopname, 1);
+
+    if (opcode < 0) {
+        yyerror(yyscanner, lexer, "'%s' is not a Parrot op", fullopname);
+        return FALSE;
+    }
+
+    /* get the opinfo for this instruction */
+    opinfo = &lexer->interp->op_info_table[opcode];
 
     PARROT_ASSERT(opinfo);
 
+    /* set the opcode and opinfo in the current instruction node */
+    CURRENT_INSTRUCTION(lexer)->opcode = opcode;
+    CURRENT_INSTRUCTION(lexer)->opinfo = opinfo;
+/*
+    CURRENT_INSTRUCTION(lexer)->opname = fullopname;
+    */
+
     opcount = opinfo->op_count - 1; /* according to op.h, opcount also counts the op itself. */
 
-    /* for each operand, check whether it's a LABEL operand; if it is,
-     * then it must be an EXPR_TARGET; LABELs are stored in the
-     * "id" field of the "expr" union, so copy the target's name into
-     * the "id" field; also, update the union selector (expr->type).
-     * If, however, the operand is NOT a LABEL, but it is a target node,
-     * then make sure the target represents a declared symbol. Otherwise,
-     * emit an error. If the symbol is found, copy its type and PASM
-     * register into the target node. (usually that's done in the symbol
-     * rule, but for PASM-style instructions this is not done.)
-     */
-
     PARROT_ASSERT(opcount >= 0);
-/*
-    num_operands = get_operand_count(lexer);
-    if (num_operands > opcount)
-        yyerror(yyscanner, lexer, "too many arguments for op '%s'; %d expected, but %u specified.",
-                                  CURRENT_INSTRUCTION(lexer)->opname, opcount, num_operands);
-*/
-    /* opinfo may point to a different but similar instruction's info;
-     * for instance:
-     *
-     *   lt_i_i_ic, lt_ic_i_ic, lt_ic_ic_ic
-     *
-     * are all similar instructions, but different (signatures.
-     * This is ok, because we only want to know if an operand is a label;
-     * similar instructions have all the same number of operands.
-     * (alternatively, if this were not ok, then this check must
-     * be done after the full opname was retrieved).
-     */
+
     for (i = 0; i < opcount; i++) {
         expression *operand = get_operand(lexer, i + 1);
 
         PARROT_ASSERT(operand);
 
-        if (opinfo->labels[i]) { /* operand i is a LABEL */
-
-            /*
-            fprintf(stderr, "opinfo->labels[%d] == 1\n target name: %s\n", i,
-            target_name(operand->expr.t));
-            */
-
-            PARROT_ASSERT(operand->type == EXPR_TARGET);
-            /* copy the target's name into the expr.id field of the
-             * union, which is used for label identifiers.
-             * the expression's type (union selector) must be updated!
-             */
-            operand->expr.id = target_name(operand->expr.t);
-            operand->type    = EXPR_IDENT;
+        if (opinfo->labels[i] == 0) { /* operand i is NOT a LABEL */
+             /* test the bitmask; if we expected this operand was a label, but now we found out
+              * through opinfo that it's not supposed to be a label at this position, so emit
+              * an error.
+              */
+             if (TEST_BIT(label_bitmask, BIT(i + 1))) {
+                 PARROT_ASSERT(operand->type == EXPR_IDENT);
+                 yyerror(yyscanner, lexer, "symbol '%s' is not declared", operand->expr.id);
+                 return FALSE;
+             }
         }
-        else { /* operand i is not a LABEL operand */
-
-        /*
-            fprintf(stderr, "opinfo->labels[%d] == 0\n", i);
-            */
-
-            if (operand->type == EXPR_TARGET) { /* if it is a target... */
-
-
-               if (!TEST_FLAG(operand->expr.t->flags,
-                              TARGET_FLAG_IS_REG))
-               {
-                   /* ...and not a register, then it must be a
-                    * declared symbol.
-                    */
-                   symbol *sym = find_symbol(lexer,
-                                           target_name(operand->expr.t));
-
-                   if (sym == NULL) /* symbol not found */
-                       yyerror(yyscanner, lexer,
-                               "symbol '%s' is not declared",
-                               target_name(operand->expr.t));
-
-                   else {
-                      /* copy the type from the symbol */
-                      operand->expr.t->type  = sym->type;
-                      /* copy the PASM register from the symbol */
-                      operand->expr.t->color = sym->color;
-                   }
-
-               } /* else it's a reg */
-
-            } /* else it's not a EXPR_TARGET */
-
-        }
-
-    } /* for loop */
-
+    }
+    return TRUE;
 }
 
 /*

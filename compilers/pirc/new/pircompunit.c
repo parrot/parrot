@@ -78,9 +78,6 @@ Poletto and Sarkar).
 
 
 /*
-#define out stderr
-*/
-/*
 #define out lexer->outfile
 */
 
@@ -89,13 +86,15 @@ Poletto and Sarkar).
 /* the order of these letters match with the pir_type enumeration.
  * These are used for human-readable PASM output.
  */
-static const char pir_register_types[5] = {'I', 'N', 'S', 'P', '?'};
+static char const pir_register_types[5] = {'I', 'N', 'S', 'P', '?'};
 
 /* the order of these letters match with the pir_type enumeration.
  * These are used for generating the full opname (set I0, 10 -> set_i_ic).
  */
-static const char type_codes[5] = {'i', 'n', 's', 'p', '?'};
+static char const type_codes[5] = {'i', 'n', 's', 'p', '?'};
 
+
+static unsigned const prime_numbers[] = {113 /* think of more primes */ };
 
 /*
 
@@ -971,26 +970,6 @@ invert_instr(struct lexer_state * const lexer) {
     ins->opname = instr;
 }
 
-/*
-
-=item C<char *
-get_instr(struct lexer_state * const lexer)>
-
-Retrieve the current operation. If no current instruction is in place,
-then NULL is returned.
-
-=cut
-
-*/
-char *
-get_instr(struct lexer_state * const lexer) {
-    instruction *ins = CURRENT_INSTRUCTION(lexer);
-    /* make sure there's an instruction in place. */
-    if (ins == NULL)
-        return NULL;
-
-    return ins->opname;
-}
 
 /*
 
@@ -1557,44 +1536,6 @@ push_operand(struct lexer_state * const lexer, expression * const operand) {
 /*
 
 =item C<void
-remove_operand(struct lexer_state * const lexer, unsigned index)>
-
-Remove the operand in position C<index>.
-
-
-=cut
-
-*/
-/*
-void
-remove_operand(struct lexer_state * const lexer, unsigned index) {
-    expression *iter1, *iter2;
-
-    fprintf(stderr, "remove_operand()\n");
-
-    if (CURRENT_INSTRUCTION(lexer)->operands == NULL)
-        panic(lexer, "tried to remove non-existing operand");
-    else {
-        expression *first = CURRENT_INSTRUCTION(lexer)->operands->next;
-
-        iter1 = first;
-        iter2 = first->next;
-
-        while (--index) {
-
-            iter1 = iter2;
-            iter2 = iter2->next;
-        }
-        iter1->next = iter2->next;
-        CURRENT_INSTRUCTION(lexer)->operands = iter1;
-    }
-    fprintf(stderr, "remove_operand() done\n");
-}
-*/
-
-/*
-
-=item C<void
 remove_all_operands(struct lexer_state * const lexer)>
 
 Remove all operands of the current instruction.
@@ -1604,7 +1545,6 @@ Remove all operands of the current instruction.
 */
 void
 remove_all_operands(struct lexer_state * const lexer) {
-    /* XXX free memory of operands */
     CURRENT_INSTRUCTION(lexer)->operands = NULL;
 }
 
@@ -1711,9 +1651,6 @@ new_local(lexer_state * const lexer, char * const name, int has_unique_reg){
 
     return s;
 }
-
-
-
 
 
 /*
@@ -1912,12 +1849,6 @@ or fullname of the opcode; for instance, C<print> is the short name, which
 has several full names, such as C<print_i>, C<print_s>, etc., depending on
 the arity and types of operands.
 
-If C<name> is in fact a parrot opcode, a pointer to the op's op_info structure
-containing the op's meta-data is cached in the current instruction. Note that,
-as we don't know the signature of the op at this point, the op_info structure
-may in fact point to the I<wrong> op_info structure (of a different variant),
-but at least we know for sure it's the right family of ops (add_i_i, add_i_n, etc.)
-
 =cut
 
 */
@@ -1929,12 +1860,8 @@ is_parrot_op(lexer_state * const lexer, char * const name) {
     if (opcode < 0)
         opcode = lexer->interp->op_lib->op_code(name, 1); /* check long name */
 
-    /* if it is an opcode, store a pointer to the op's op_info in the current instruction */
-    if (opcode >= 0) {
-        CURRENT_INSTRUCTION(lexer)->opinfo = &lexer->interp->op_info_table[opcode];
-        CURRENT_INSTRUCTION(lexer)->opcode = opcode;
+    if (opcode >= 0)
         return TRUE;
-    }
     else
         return FALSE;
 
@@ -2138,6 +2065,13 @@ print_instruction(lexer_state * const lexer, instruction *ins) {
         if (STREQ(ins->opname, "noop"))
             return;
 
+/**********
+TODO: remove the whole  generation of a signatured op here;
+this should all be done during the parse, as some instructions are converted
+into full-signatured ops anyway. This should be made generic, so that this code
+can be removed.
+
+***********/
         /* XXX handle these PCC ops more graciously */
         /*
         if (   opcode == PARROT_OP_set_args_pc
@@ -2150,7 +2084,8 @@ print_instruction(lexer_state * const lexer, instruction *ins) {
             || STREQ(ins->opname, "get_params")
             || STREQ(ins->opname, "set_returns"))
         {
-            fullname = (char *)pir_mem_allocate_zeroed(lexer, strlen(ins->opname) + 4 * sizeof (char));
+            fullname = (char *)pir_mem_allocate_zeroed(lexer, strlen(ins->opname)
+                                                              + 4 * sizeof (char));
             PARROT_ASSERT(fullname);
             sprintf(fullname, "%s_pc", ins->opname);
         }

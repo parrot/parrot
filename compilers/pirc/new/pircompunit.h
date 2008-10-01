@@ -113,6 +113,14 @@ typedef enum invoke_types {
 #define CLEAR_FLAG(obj,flag)    obj &= ~flag
 #define TEST_FLAG(obj,flag)     (obj & flag)
 
+/* macros to set the i-th bit */
+#define BIT(i)          (1 << (i))
+#define SET_BIT(M,B)    SET_FLAG(M,B)
+#define TEST_BIT(M,B)   TEST_FLAG(M,B)
+#define CLEAR_BIT(M,B)  CLEAR_FLAG(M,B)
+
+#define NOT(X)          !(X)
+
 /* selector for the value union */
 typedef enum value_types {
     INT_VAL,
@@ -133,10 +141,9 @@ typedef union value {
 
 /* literal constants, possibly named */
 typedef struct constant {
-    char    *name;     /* name of the constant, if declared as a constant */
-    pir_type type;     /* type of the constant */
-    value    val;      /* value of the constant */
-
+    char            *name;     /* name of the constant, if declared as a constant */
+    pir_type         type;     /* type of the constant */
+    value            val;      /* value of the constant */
     struct constant *next;
 
 } constant;
@@ -148,7 +155,7 @@ typedef struct constant {
  * or key nodes, such as ["x";42].
  */
 typedef struct expression {
-    union __expression {
+    union __expression_union {
         struct target  *t;
         constant       *c;
         char           *id;
@@ -156,7 +163,7 @@ typedef struct expression {
 
     } expr;
 
-    expr_type type;        /* selector for __expression */
+    expr_type          type;  /* selector for __expression_union */
 
     struct expression *next;
 
@@ -165,7 +172,6 @@ typedef struct expression {
 /* The key node is used to represent a key expression */
 typedef struct key {
     expression *expr;      /* value of this key */
-
     struct key *next;      /* in ["x";"y"], there's 2 key nodes; 1 for "x", 1 for "y",
                               linked by "next" */
 } key;
@@ -240,11 +246,9 @@ typedef struct instruction {
     char               *label;        /* label of this instruction */
     char               *opname;       /* name of the instruction, such as "print" and "set" */
     expression         *operands;     /* operands like "$I0" and "42" in "set $I0, 42" */
-    int                 flags;
+    int                 flags;        /* XXX used for checking if this op jumps */
     struct op_info_t   *opinfo;       /* pointer to the op_info containing this op's meta data */
-    int                 opcode;       /* the opcode of one of this op's family members, not
-                                         necessarily the right opcode. May indicate "add_i_i"
-                                         while the opname is "add_i_ic". */
+    int                 opcode;       /* the opcode of one of this op */
 
     struct instruction *next;
 } instruction;
@@ -254,7 +258,6 @@ typedef struct instruction {
  * maybe implement a simple algorithm; shouldn't happen too often anyway.
  */
 #define HASHTABLE_SIZE_INIT     113
-
 
 /* a hashtable bucket for storing something */
 typedef struct bucket {
@@ -266,7 +269,7 @@ typedef struct bucket {
         struct constant     *cons;
     } u;
 
-    struct bucket *next;
+    struct bucket *next; /* link to next bucket, in case of hash clash */
 
 } bucket;
 
@@ -393,7 +396,6 @@ void set_instrf(struct lexer_state * const lxr, char * const op, char const * co
 void unshift_operand(struct lexer_state * const lexer, expression * const operand);
 void push_operand(struct lexer_state * const lexer, expression * const operand);
 
-char *get_instr(struct lexer_state * const lexer);
 void get_operands(struct lexer_state * const lexer, unsigned n, ...);
 expression *get_operand(struct lexer_state * const lexer, short n);
 
