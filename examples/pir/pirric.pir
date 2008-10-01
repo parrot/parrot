@@ -26,7 +26,7 @@
 #
 # Expressions:
 # - Operators: + - * / < > = unary+ unary- MOD
-# - Predefined numeric functions: COMPLEX, SQR, EXP, LN, COS, SIN, TAN, ASIN, ACOS, ATAN
+# - Predefined numeric functions: COMPLEX, SQR, EXP, LN, SIN, COS, TAN, ASIN, ACOS, ATAN, SINH, COSH, TANH
 # - Predefined string functions: CHR$, ASC, LEN, LEFT$, RIGHT$, MID$
 # - Parenthesis
 # - Special functions: NEW "Class name"
@@ -37,6 +37,7 @@
 
 .include 'iterator.pasm'
 .include 'except_severity.pasm'
+.include 'except_types.pasm'
 .include 'cclass.pasm'
 
 #-----------------------------------------------------------------------
@@ -127,11 +128,17 @@
     setpredef(predefs, "EXP", "exp")
     setpredef(predefs, "LN", "ln")
     setpredef(predefs, "SIN", "sin")
+    setpredef(predefs, "SINH", "sinh")
     setpredef(predefs, "COS", "cos")
+    setpredef(predefs, "COSH", "cosh")
     setpredef(predefs, "TAN", "tan")
+    setpredef(predefs, "TANH", "tanh")
     setpredef(predefs, "ASIN", "asin")
+    setpredef(predefs, "ASINH", "asinh")
     setpredef(predefs, "ACOS", "acos")
+    setpredef(predefs, "ACOSH", "acosh")
     setpredef(predefs, "ATAN", "atan")
+    setpredef(predefs, "ATANH", "atanh")
     setpredef(predefs, "SQR", "sqr")
     set_global 'predefs', predefs
 
@@ -588,6 +595,19 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
+.sub predef_sinh :method
+    .param pmc tokenizer
+
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    $P2 = self.get_numeric_arg(tokenizer)
+    $P3 = $P2.sinh()
+    .return($P3)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
 .sub predef_cos :method
     .param pmc tokenizer
 
@@ -601,6 +621,19 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
+.sub predef_cosh :method
+    .param pmc tokenizer
+
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    $P2 = self.get_numeric_arg(tokenizer)
+    $P3 = $P2.cosh()
+    .return($P3)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
 .sub predef_tan :method
     .param pmc tokenizer
 
@@ -608,6 +641,19 @@ fail:
     ne $P1, '(', fail
     $P2 = self.get_numeric_arg(tokenizer)
     $P3 = $P2.tan()
+    .return($P3)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
+.sub predef_tanh :method
+    .param pmc tokenizer
+
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    $P2 = self.get_numeric_arg(tokenizer)
+    $P3 = $P2.tanh()
     .return($P3)
 fail:
     SyntaxError()
@@ -1026,12 +1072,15 @@ endprog:
     goto next
 
 handle_excep:
-    .local pmc excep
+    .local pmc excep, type, severity
+    .local int itype, iseverity
     .get_results(excep)
 
-    $P1 = getattribute excep, 'severity'
-    $I1 = $P1
-    eq $I1, .EXCEPT_EXIT, finish
+    type = getattribute excep, 'type'
+    itype = type
+    severity = getattribute excep, 'severity'
+    iseverity = severity
+    eq iseverity, .EXCEPT_EXIT, finish
 handle_it:
     $P1 = getattribute excep, 'payload'
     $I1 = defined $P1
@@ -1234,12 +1283,20 @@ next:
 #-----------------------------------------------------------------------
 .sub throw_jump
     .param pmc payload
+    .param int type :optional
+    .param int has_type :opt_flag
 
-    .local pmc excep, severity
+    .local pmc excep, ex_severity
     excep = new 'Exception'
-    severity = new 'Integer'
-    severity= .EXCEPT_NORMAL
-    setattribute excep, 'severity', severity
+    ex_severity = new 'Integer'
+    ex_severity= .EXCEPT_NORMAL
+    unless has_type goto setattrs
+    .local pmc ex_type
+    ex_type = new 'Integer'
+    ex_type = type
+    setattribute excep, 'type', ex_type
+setattrs:
+    setattribute excep, 'severity', ex_severity
     setattribute excep, 'payload', payload
     throw excep
 .end
@@ -1567,7 +1624,7 @@ finish:
     $P1 = 2
     setattribute line, 'jumpline', $P0
     setattribute line, 'jumptype', $P1
-    throw_jump(line)
+    throw_jump(line, .CONTROL_RETURN)
 
 fail:
     SyntaxError()
