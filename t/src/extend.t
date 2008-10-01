@@ -26,7 +26,7 @@ Tests the extension API.
 
 =cut
 
-c_output_is( <<'CODE', <<'OUTPUT', "set/get_intreg" );
+c_output_is( <<'CODE', <<'OUTPUT', 'set/get_intreg' );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -56,7 +56,7 @@ CODE
 42
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "set/get_numreg" );
+c_output_is( <<'CODE', <<'OUTPUT', 'set/get_numreg' );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -86,7 +86,7 @@ CODE
 2.5
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "Parrot_new_string" );
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_new_string' );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -112,7 +112,7 @@ CODE
 Test
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "set/get_strreg" );
+c_output_is( <<'CODE', <<'OUTPUT', 'set/get_strreg' );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -142,7 +142,7 @@ CODE
 Test
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "PMC_set/get_intval" );
+c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_intval' );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -174,7 +174,7 @@ CODE
 101010
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "PMC_set/get_intval_intkey" );
+c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_intval_intkey' );
 
 #include <stdio.h>
 #include "parrot/parrot.h"
@@ -214,7 +214,7 @@ CODE
 12345
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "set/get_pmcreg" );
+c_output_is( <<'CODE', <<'OUTPUT', 'set/get_pmcreg' );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -252,7 +252,7 @@ CODE
 -123
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "PMC_set/get_numval" );
+c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_numval' );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -285,7 +285,7 @@ CODE
 3.1415927
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "PMC_set/get_string" );
+c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_string' );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -318,7 +318,7 @@ CODE
 Pumpking
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "PMC_set/get_cstring" );
+c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_cstring' );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -352,7 +352,7 @@ CODE
 Wibble
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "PMC_set/get_cstringn" );
+c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_cstringn' );
 
 #include <stdio.h>
 #include "parrot/embed.h"
@@ -410,7 +410,7 @@ close $S;
 # compile to pbc
 system(".$PConfig{slash}parrot$PConfig{exe} -o $temp.pbc $temp.pasm");
 
-c_output_is( <<'CODE', <<'OUTPUT', "call a parrot sub" );
+c_output_is( <<'CODE', <<'OUTPUT', 'call a parrot sub' );
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
@@ -483,7 +483,7 @@ close $S;
 unlink "$temp.pbc";
 system(".$PConfig{slash}parrot$PConfig{exe} -o $temp.pbc $temp.pasm");
 
-c_output_is( <<'CODE', <<'OUTPUT', "call a parrot sub, catch exception" );
+c_output_is( <<'CODE', <<'OUTPUT', 'call a parrot sub, catch exception' );
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
@@ -582,7 +582,7 @@ close $S;
 unlink "$temp.pbc";
 system(".$PConfig{slash}parrot$PConfig{exe} -o $temp.pbc $temp.pir");
 
-c_output_is( <<'CODE', <<'OUTPUT', "eval code through a parrot sub - #39669" );
+c_output_is( <<'CODE', <<'OUTPUT', 'eval code through a parrot sub - #39669' );
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
@@ -618,7 +618,7 @@ CODE
 Hello from foo!
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "compile string in a fresh interp - #39986" );
+c_output_is( <<'CODE', <<'OUTPUT', 'compile string in a fresh interp - #39986' );
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
@@ -663,7 +663,7 @@ CODE
 Hello from foo!
 OUTPUT
 
-c_output_is( <<"CODE", <<'OUTPUT', "call multi sub from C - #41511", todo => 'RT #41511' );
+c_output_is( <<"CODE", <<'OUTPUT', 'call multi sub from C - #41511', todo => 'RT #41511' );
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
 #include <parrot/extend.h>
@@ -695,7 +695,7 @@ CODE
 Result is 300.
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "multiple Parrot_new/Parrot_exit cycles" );
+c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_new/Parrot_exit cycles' );
 
 #include <stdio.h>
 #include "parrot/parrot.h"
