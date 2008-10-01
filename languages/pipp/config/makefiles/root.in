@@ -219,14 +219,17 @@ pmc: $(HASH_OBJS) $(PHP_GROUP)
 
 #Any change to the hash code means phparray needs to be relinked too.
 #Recompiling is close enough for now.
-$(HASH_OBJS): $(HASH_SOURCES) $(HASH_H) 
+$(HASH_OBJS): $(HASH_SOURCES) $(HASH_H)
 	$(TOUCH) $(PMCDIR)/phparray.pmc
 	$(CC) $(CCFLAGS) -I$(INCLUDE_DIR) $(HASH_SOURCES) -c -o $(HASH_OBJS)
 
+export DYNPMC_INCLUDE=$(PIPPDIR)
+export DYNPMC_LINK=$(HASH_OBJS)
+
 $(PHP_GROUP): $(PARROT) $(PMC_SOURCES)
 	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
-	@cd $(PMCDIR) && DYNPMC_INCLUDE=$(PIPPDIR) $(PMCBUILD) compile $(PMCS)
-	@cd $(PMCDIR) && DYNPMC_LINK=$(HASH_OBJS) $(PMCBUILD) linklibs $(PMCS)
+	@cd $(PMCDIR) && $(PMCBUILD) compile $(PMCS)
+	@cd $(PMCDIR) && $(PMCBUILD) linklibs $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) copy "--destination=$(PARROT_DYNEXT)" $(PMCS)
 
 test:     all test-pct
