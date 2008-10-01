@@ -53,6 +53,14 @@ src/builtins/control.pir - Cardinal Control functions
     continuation()
 .end
 
+.sub 'next'
+    .local pmc e
+    e = new 'Exception'
+    e['type'] = .CONTROL_LOOP_NEXT
+    e['severity'] = .EXCEPT_NORMAL
+    throw e
+.end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

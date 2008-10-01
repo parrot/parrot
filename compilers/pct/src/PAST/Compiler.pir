@@ -1126,24 +1126,33 @@ by C<node>.
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
 
-    .local pmc looplabel, endlabel
+    .local pmc looplabel, nextlabel, endlabel, undeflabel
     $P0 = get_hll_global ['POST'], 'Label'
     $S0 = self.'unique'('for_')
     looplabel = $P0.'new'('result'=>$S0)
-    $S0 = concat $S0, '_end'
-    endlabel = $P0.'new'('result'=>$S0)
+    $S1 = concat $S0, '_next'
+    nextlabel = $P0.'new'('result'=>$S1)
+    $S2 = concat $S0, '_end'
+    endlabel = $P0.'new'('result'=>$S2)
+    $S3 = concat $S0, '_undef_iter'
+    undeflabel = $P0.'new'('result'=>$S3)
 
     .local pmc collpast, collpost
     collpast = node[0]
     collpost = self.'as_post'(collpast, 'rtype'=>'P')
     ops.'push'(collpost)
 
-    .local string iter
+    .local string iter, next_handler
     iter = self.'uniquereg'('P')
     ops.'result'(iter)
     $S0 = self.'uniquereg'('I')
     ops.'push_pirop'('defined', $S0, collpost)
-    ops.'push_pirop'('unless', $S0, endlabel)
+    ops.'push_pirop'('unless', $S0, undeflabel)
+    next_handler = self.'uniquereg'('P')
+    ops.'push_pirop'('new', next_handler, "'ExceptionHandler'")
+    ops.'push_pirop'('set_addr', next_handler, nextlabel)
+    ops.'push_pirop'('callmethod', 'handle_types', next_handler, .CONTROL_LOOP_NEXT)
+    ops.'push_pirop'('push_eh', next_handler)
     ops.'push_pirop'('iter', iter, collpost)
     ops.'push'(looplabel)
     ops.'push_pirop'('unless', iter, endlabel)
@@ -1184,7 +1193,14 @@ by C<node>.
     ops.'push'(subpost)
     ops.'push_pirop'('call', subpost, arglist :flat)
     ops.'push_pirop'('goto', looplabel)
+    ops.'push'(nextlabel)
+    ops.'push_pirop'('.local pmc exception')
+    ops.'push_pirop'('.get_results (exception)')
+    ops.'push_pirop'('set', next_handler, 0)
+    ops.'push_pirop'('goto', looplabel)
     ops.'push'(endlabel)
+    ops.'push_pirop'('pop_eh')
+    ops.'push'(undeflabel)
     .return (ops)
 .end
 

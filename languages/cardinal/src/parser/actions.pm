@@ -419,7 +419,10 @@ method for_stmt($/) {
 }
 
 method control_command($/,$key) {
-    $/.panic("next, break, and redo aren't implemented yet");
+    make PAST::Op.new(
+            :pasttype('call'),
+            :name(~$/),
+        );
 }
 
 method module($/) {
