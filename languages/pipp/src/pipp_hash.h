@@ -35,42 +35,42 @@ $Id$
 
 #define BUCKET_LIST_PREPEND(b, list) \
     if ((list) == NULL) {                 \
-                (list) = (b);                       \
-                (b)->bucketNext = NULL;           \
-                (b)->bucketPrev = NULL;           \
-            }                                   \
+        (list) = (b);                       \
+        (b)->bucketNext = NULL;           \
+        (b)->bucketPrev = NULL;           \
+    }                                   \
     else {                              \
-                (list)->bucketPrev = (b);           \
-                (b)->bucketNext = (list);           \
-                (b)->bucketPrev = NULL;           \
-                (list) = (b);                       \
-            }
+        (list)->bucketPrev = (b);           \
+        (b)->bucketNext = (list);           \
+        (b)->bucketPrev = NULL;           \
+        (list) = (b);                       \
+    }
 
 #define TABLE_LIST_PREPEND(b, list)  \
-        if ((list)->tableHead == NULL) {      \
-                    (list)->internalPointer = (b);      \
-                    (list)->tableHead = (b);            \
-                    (list)->tableTail = (b);            \
-                }                                   \
+    if ((list)->tableHead == NULL) {      \
+        (list)->internalPointer = (b);      \
+        (list)->tableHead = (b);            \
+        (list)->tableTail = (b);            \
+    }                                   \
     else {                              \
-                (list)->tableHead->tablePrev = (b); \
-                (b)->tableNext = (list)->tableHead; \
-                (b)->tablePrev = NULL;            \
-                (list)->tableHead = (b);            \
-            }
+        (list)->tableHead->tablePrev = (b); \
+        (b)->tableNext = (list)->tableHead; \
+        (b)->tablePrev = NULL;            \
+        (list)->tableHead = (b);            \
+    }
 
 #define TABLE_LIST_APPEND(b, list)   \
-        if ((list)->tableHead == NULL) {      \
-                    (list)->internalPointer = (b);      \
-                    (list)->tableHead = (b);            \
-                    (list)->tableTail = (b);            \
-                }                                   \
+    if ((list)->tableHead == NULL) {      \
+        (list)->internalPointer = (b);      \
+        (list)->tableHead = (b);            \
+        (list)->tableTail = (b);            \
+    }                                   \
     else {                              \
-                (list)->tableTail->tableNext = (b); \
-                (b)->tablePrev = (list)->tableTail; \
-                (b)->tableNext = NULL;            \
-                (list)->tableTail = (b);            \
-            }
+        (list)->tableTail->tableNext = (b); \
+        (b)->tablePrev = (list)->tableTail; \
+        (b)->tableNext = NULL;            \
+        (list)->tableTail = (b);            \
+    }
 
 #define TABLE_LIST_DELETE(b, list)  \
         (list)->internalPointer = (b)->tableNext;      \
@@ -154,6 +154,11 @@ PMC*           pipp_hash_get(PARROT_INTERP, PippHashTable *ht, STRING *key);
 PippBucket*    pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *value);
 INTVAL         pipp_hash_find(PARROT_INTERP, PippHashTable *ht, STRING *key);
 void           pipp_hash_delete(PARROT_INTERP, PippHashTable *ht, STRING *key);
+
+PippBucket*    pipp_hash_push(PARROT_INTERP, PippHashTable *ht, PMC *p_val);
+PMC*           pipp_hash_pop(PARROT_INTERP, PippHashTable *ht);
+PMC*           pipp_hash_shift(PARROT_INTERP, PippHashTable *ht);
+PippBucket*    pipp_hash_unshift(PARROT_INTERP, PippHashTable *ht, PMC *p_val);
 
 PippIsInt*     pipp_hash_get_intval(PARROT_INTERP, STRING *key);
 

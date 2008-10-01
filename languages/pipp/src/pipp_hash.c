@@ -109,7 +109,7 @@ void pipp_hash_empty(PARROT_INTERP, PippHashTable *ht) {
 =item C<void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht)>
 
 Iterate through the PippHash, making sure that everything's sane.  This
-function is intended only for internal debugging.  If anything's goofy, a
+function is intended only for internal debugging.  If anything's goofy, an
 exception with a descriptive message is thrown.
 
 =cut
@@ -117,7 +117,9 @@ exception with a descriptive message is thrown.
 */
 
 void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
-    UINTVAL     count_tbl_fw, count_tbl_bk, count_bkt_ord, element_count, i;
+    UINTVAL     count_tbl_fw, count_tbl_bk, count_bkt_ord, element_count, i,
+                expected_bucket;
+    INTVAL      max_index, expected_next_index;
     PippBucket *curr_bkt, *cmp_bkt;
     STRING     *curr_key;
     PippIsInt  *isInt;
@@ -137,7 +139,7 @@ void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
                 ht->elementCount, ht->capacity);
 
     /* Iterate by bucket order. */
-    dprintf("checking element count by bucket order...\n");
+    dprintf("checking element count and hash/bucket consistenct by bucket order...\n");
     count_bkt_ord = 0;
     for (i = 0; i < ht->capacity; i++) {
         dprintf("starting bucket #%d\n", i);
@@ -146,6 +148,14 @@ void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
             dprintf("bucket #%d has a pair mapping '%Ss'=>'%Ss'\n", i,
                     curr_bkt->key, VTABLE_get_string(interp, curr_bkt->value));
             dprintf("next bucket from 0x%X lives at 0x%X\n", curr_bkt, curr_bkt->bucketNext);
+            if (curr_bkt == curr_bkt->bucketNext)
+                Parrot_ex_throw_from_c_args(interp, NULL, -1,
+                        "PHPArray corruption: curr_bkt == curr_bkt->bucketNext");
+            expected_bucket = curr_bkt->hashValue & ht->hashMask;
+            if (i != expected_bucket)
+                Parrot_ex_throw_from_c_args(interp, NULL, -1,
+                        "PHPArray corruption: Bucket in list #%d should be in "
+                        "list #%d.", i, expected_bucket);
             curr_bkt = curr_bkt->bucketNext;
             count_bkt_ord++;
         }
@@ -165,6 +175,10 @@ void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
         dprintf("found pair mapping '%Ss' => '%Ss'\n", curr_bkt->key,
                 VTABLE_get_string(interp, curr_bkt->value));
         count_tbl_fw++;
+        if (curr_bkt == curr_bkt->tableNext)
+            Parrot_ex_throw_from_c_args(interp, NULL, -1,
+                    "PHPArray corruption: curr_bkt == curr_bkt->tableNext");
+
         curr_bkt = curr_bkt->tableNext;
     }
 
@@ -174,6 +188,9 @@ void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
     while (element_count && (curr_bkt != NULL)) {
         dprintf("found pair mapping '%Ss' => '%Ss'\n", curr_bkt->key,
                 VTABLE_get_string(interp, curr_bkt->value));
+        if (curr_bkt == curr_bkt->tablePrev)
+            Parrot_ex_throw_from_c_args(interp, NULL, -1,
+                    "PHPArray corruption: curr_bkt == curr_bkt->tablePrev");
         count_tbl_bk++;
         curr_bkt = curr_bkt->tablePrev;
     }
@@ -189,17 +206,30 @@ void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
                 "from ht->elementCount (%d).", count_tbl_fw, element_count);
 
     /* Make sure buckets with keyIsInt are sane. */
-    dprintf("Checking that cached keyInt values are consistent...\n");
+    dprintf("Checking that cached keyInt values and nextIndex are consistent...\n");
     curr_bkt = ht->tableHead;
+    max_index = -1;
     while (element_count && (curr_bkt = curr_bkt->tableNext)) {
         isInt = pipp_hash_get_intval(interp, curr_bkt->key);
         if (isInt->isInt != curr_bkt->keyIsInt)
             Parrot_ex_throw_from_c_args(interp, NULL, -1, "PHPArray corruption: "
-                    "A key is confused about if it's an int");
+                    "A key is confused about if it's an int.");
         if (curr_bkt->keyIsInt && curr_bkt->keyInt != isInt->intval)
             Parrot_ex_throw_from_c_args(interp, NULL, -1, "PHPArray corruption: "
-                    "An int key has an incorrect value cached.");
+                    "An int key ('%Ss') has an incorrect value (%d != %d) cached.",
+                    curr_bkt->key, curr_bkt->keyInt, isInt->intval);
+        if (isInt->isInt && isInt->intval > max_index)
+            max_index = isInt->intval;
     }
+        /* nextIndex doesn't change when an element is deleted, so it's not
+         * possible to predict exactly what it should be for a known set of
+         * indicies. */
+    if (ht->nextIndex < max_index+1)
+        Parrot_ex_throw_from_c_args(interp, NULL, -1, "PHPArray corruption: "
+                "ht->nextIndex is %d but shouldn't be less than %d.", ht->nextIndex,
+                max_index+1);
+    dprintf("ht->nextIndex is %d, which looks plausible\n", ht->nextIndex);
+
 
     /*Look for duplicate keys using a exhaustive n^2 algorithm.  Performance
      * isn't a big concern, since this code won't be called very often.  */
@@ -259,7 +289,8 @@ void pipp_hash_renumber(PARROT_INTERP, PippHashTable *ht) {
 
     for (bkt = ht->tableHead; bkt != NULL; bkt = bkt->tableNext) {
         if (bkt->keyIsInt) {
-            bkt->key     = string_from_int(interp, curr_idx);
+            dprintf("renumbering from %d to %d\n", bkt->keyInt, curr_idx);
+            bkt->key    = string_from_int(interp, curr_idx);
             bkt->keyInt = curr_idx;
             curr_idx++;
         }
@@ -284,9 +315,11 @@ This is used when a PippHash grows and has its hashMask changed.
 
 void pipp_hash_rehash(PARROT_INTERP, PippHashTable *ht) {
 
-    INTVAL bucket_idx;
+    UINTVAL bucket_idx;
     PippBucket *bkt;
 
+    for (bucket_idx = 0; bucket_idx < ht->capacity; bucket_idx++)
+        ht->buckets[bucket_idx] = NULL;
     for (bkt = ht->tableHead; bkt != NULL; bkt = bkt->tableNext) {
         bucket_idx = bkt->hashValue & ht->hashMask;
         BUCKET_LIST_PREPEND(bkt, ht->buckets[bucket_idx]);
@@ -368,16 +401,16 @@ PMC* pipp_hash_get(PARROT_INTERP, PippHashTable *ht, STRING *key) {
 
 /*
 
-=item C<PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *value)>
+=item C<PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *p_val)>
 
-Store C<value>, indexed by C<key>, in the hash.  Return the bucket where
-C<value> was stored.
+Store C<p_val>, indexed by C<key>, in the hash.  Return the bucket where
+C<p_val> was stored.
 
 =cut
 
 */
 
-PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *value) {
+PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *p_val) {
     PippIsInt  *isInt;
     PippBucket *first_bucket, *curr_bucket;
     INTVAL      key_hash, bucket_idx;
@@ -388,8 +421,8 @@ PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *va
     first_bucket = curr_bucket;
     isInt        = pipp_hash_get_intval(interp, key);
 
-    dprintf("pipp_hash_put called: key is '%Ss', value stringifies to '%Ss'\n",
-            key, VTABLE_get_string(interp, value));
+    dprintf("pipp_hash_put called: key is '%Ss', p_val stringifies to '%Ss'\n",
+            key, VTABLE_get_string(interp, p_val));
 
     /* Find the right bucket for the key. */
     while (curr_bucket != NULL &&
@@ -409,7 +442,7 @@ PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *va
         first_bucket = mem_allocate_zeroed_typed(PippBucket);
 
         first_bucket->key       = key;
-        first_bucket->value     = value;
+        first_bucket->value     = p_val;
         first_bucket->hashValue = key_hash;
         first_bucket->keyIsInt  = isInt->isInt;
 
@@ -426,13 +459,16 @@ PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *va
         dprintf("overwriting old value (%Ss) in an existing bucket with hash %X\n",
                 VTABLE_get_string(interp, curr_bucket->value), key_hash);
         curr_bucket->key       = key;
-        curr_bucket->value     = value;
+        curr_bucket->value     = p_val;
         curr_bucket->hashValue = key_hash;
         curr_bucket->keyIsInt  = isInt->isInt;
 
         if (curr_bucket->keyIsInt)
             curr_bucket->keyInt = isInt->intval;
     }
+
+    if (isInt->isInt && isInt->intval >= ht->nextIndex)
+        ht->nextIndex = isInt->intval + 1;
 
     mem_sys_free(isInt);
     return curr_bucket;
@@ -480,6 +516,157 @@ void pipp_hash_delete(PARROT_INTERP, PippHashTable *ht, STRING *key){
 
 /*
 
+=over 4
+
+=head2 Deque Functions
+
+=back
+
+=item C<PippBucket* pipp_hash_push(PARROT_INTERP, PippHashTable *ht, PMC *p_val)>
+
+Append a bucket with C<p_val> to the PippHash.  Its index will be determined by
+the value of ht->nextIndex.
+
+=cut
+
+*/
+
+PippBucket* pipp_hash_push(PARROT_INTERP, PippHashTable *ht, PMC *p_val){
+    STRING     *s_key;
+    PippBucket *bkt;
+    INTVAL      key_hash, bucket_idx;
+
+    if (ht->capacity <= ht->elementCount+1) {
+        dprintf("time to grow...\n");
+        pipp_hash_resize(interp, ht, ht->capacity * 2);
+    }
+
+    s_key    = string_from_int(interp, ht->nextIndex);
+    key_hash = string_hash(interp, s_key, PIPP_HASH_SEED);
+    bkt      = mem_allocate_zeroed_typed(PippBucket);
+
+    bkt->key       = s_key;
+    bkt->value     = p_val;
+    bkt->hashValue = key_hash;
+    bkt->keyIsInt  = 1;
+    bkt->keyInt    = ht->nextIndex;
+
+    bucket_idx = bkt->hashValue & ht->hashMask;
+
+    BUCKET_LIST_PREPEND(bkt, ht->buckets[bucket_idx]);
+    TABLE_LIST_APPEND(bkt, ht);
+    ht->elementCount++;
+    ht->nextIndex++;
+    dprintf("pushed a value: key is '%Ss', keyInt is %d\n", s_key, bkt->keyInt)
+
+    return bkt;
+}
+
+/*
+
+=item C<PMC* pipp_hash_pop(PARROT_INTERP, PippHashTable *ht)
+
+Delete the element at the end of this hash, returning its value;
+
+=cut
+
+*/
+
+PMC* pipp_hash_pop(PARROT_INTERP, PippHashTable *ht) {
+    INTVAL bl_hash, bucket_idx;
+    PippBucket *bucket;
+    PMC        *p_val;
+
+    if (ht->elementCount == 0)
+        return PMCNULL;
+
+    bucket  = ht->tableTail;
+    p_val   = bucket->value;
+    bl_hash = bucket->hashValue & ht->hashMask;
+
+    TABLE_LIST_DELETE(bucket, ht);
+    BUCKET_LIST_DELETE(bucket, ht->buckets[bl_hash]);
+    mem_sys_free(bucket);
+    ht->elementCount--;
+
+    return p_val;
+}
+
+/*
+
+=item C<PippBucket* pipp_hash_unshift(PARROT_INTERP, PippHashTable *ht, PMC *p_val)>
+
+Prepend a bucket with C<p_val> to the PippHash.  Its index will be 0 and all
+other numerically indexed elements will be renumbered according to insertion
+order.  Unshifting also points internalPointer at the first element.
+
+=cut
+
+*/
+
+PippBucket* pipp_hash_unshift(PARROT_INTERP, PippHashTable *ht, PMC *p_val){
+    STRING     *s_key;
+    PippBucket *bkt;
+    INTVAL      key_hash, bucket_idx;
+
+    if (ht->capacity <= ht->elementCount+1) {
+        dprintf("time to grow...\n");
+        pipp_hash_resize(interp, ht, ht->capacity * 2);
+    }
+
+    s_key    = string_from_int(interp, 0);
+    key_hash = string_hash(interp, s_key, PIPP_HASH_SEED);
+    bkt      = mem_allocate_zeroed_typed(PippBucket);
+
+    bkt->key       = s_key;
+    bkt->value     = p_val;
+    bkt->hashValue = key_hash;
+    bkt->keyIsInt  = 1;
+    bkt->keyInt    = 0;
+
+    bucket_idx = bkt->hashValue & ht->hashMask;
+
+    BUCKET_LIST_PREPEND(bkt, ht->buckets[bucket_idx]);
+    TABLE_LIST_PREPEND(bkt, ht);
+    ht->elementCount++;
+    pipp_hash_renumber(interp, ht);
+    dprintf("unshifted a value: key is '%Ss', keyInt is %d\n", s_key, bkt->keyInt)
+
+    return bkt;
+}
+
+/*
+
+=item C<PMC* pipp_hash_shift(PARROT_INTERP, PippHashTable *ht)
+
+Delete the element at the beginning of this hash, returning its value;
+
+=cut
+
+*/
+
+PMC* pipp_hash_shift(PARROT_INTERP, PippHashTable *ht) {
+    INTVAL bl_hash, bucket_idx;
+    PippBucket *bucket;
+    PMC        *p_val;
+
+    if (ht->elementCount == 0)
+        return PMCNULL;
+
+    bucket  = ht->tableHead;
+    p_val   = bucket->value;
+    bl_hash = bucket->hashValue & ht->hashMask;
+
+    TABLE_LIST_DELETE(bucket, ht);
+    BUCKET_LIST_DELETE(bucket, ht->buckets[bl_hash]);
+    mem_sys_free(bucket);
+    ht->elementCount--;
+
+    return p_val;
+}
+
+/*
+
 =back
 
 =head2 Miscellaneous Helper Functions
@@ -505,6 +692,7 @@ PippIsInt* pipp_hash_get_intval(PARROT_INTERP, STRING *key) {
 
     isInt    = mem_allocate_zeroed_typed(PippIsInt);
     key_len  = string_length(interp, key);
+    negate       = 0;
     curr_idx     = 0;
     isInt->isInt = 1;
 

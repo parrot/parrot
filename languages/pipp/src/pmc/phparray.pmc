@@ -895,6 +895,290 @@ nothing.
 
 /*
 
+=item C<void push_integer(INTVAL i)>
+
+Add an integer with the value C<i> to the end of this PHPArray.
+
+=cut
+
+*/
+    void push_integer(INTVAL i_val) {
+        PMC *p_val;
+        PippHashTable *ht = (PippHashTable*)PMC_struct_val(SELF);
+
+        p_val = pmc_new(INTERP, enum_class_Integer);
+        VTABLE_set_integer_native(INTERP, p_val, i_val);
+        pipp_hash_push(INTERP, ht, p_val);
+    }
+
+/*
+
+=item C<void push_pmc(PMC *p_val)>
+
+Add a PMC with the value C<p_val> to the end of this PHPArray.
+
+=cut
+
+*/
+    void push_pmc(PMC *p_val) {
+        PippHashTable *ht = (PippHashTable*)PMC_struct_val(SELF);
+        pipp_hash_push(INTERP, ht, p_val);
+    }
+
+/*
+
+=item C<void push_string(STRING *s_val)>
+
+Add a STRING with the value C<s_val> to the end of this PHPArray.
+
+=cut
+
+*/
+    void push_string(STRING *s_val) {
+        PMC *p_val;
+        PippHashTable *ht = (PippHashTable*)PMC_struct_val(SELF);
+
+        p_val = pmc_new(INTERP, enum_class_String);
+        VTABLE_set_string_native(INTERP, p_val, s_val);
+        pipp_hash_push(INTERP, ht, p_val);
+    }
+
+/*
+
+=item C<void push_float(FLOATVAL f_val)>
+
+Add a FLOATVAL with the value C<f_val> to the end of this PHPArray.
+
+=cut
+
+*/
+    void push_float(FLOATVAL f_val) {
+        PMC *p_val;
+        PippHashTable *ht = (PippHashTable*)PMC_struct_val(SELF);
+
+        p_val = pmc_new(INTERP, enum_class_Float);
+        VTABLE_set_number_native(INTERP, p_val, f_val);
+        pipp_hash_push(INTERP, ht, p_val);
+    }
+
+/*
+
+=item C<INTVAL pop_integer()>
+
+Delete the element at the end of this PHPArray, returning its value as an INTVAL.
+
+=cut
+
+*/
+    INTVAL pop_integer() {
+        PippHashTable *ht;
+        PMC           *p_val;
+
+        ht = (PippHashTable*)PMC_struct_val(SELF);
+        p_val = pipp_hash_pop(INTERP, ht);
+        return VTABLE_get_integer(INTERP, p_val);
+    }
+
+/*
+
+=item C<PMC* pop_pmc()>
+
+Delete the element at the end of this PHPArray, returning its value as a PMC.
+
+=cut
+
+*/
+    PMC *pop_pmc() {
+        PippHashTable *ht;
+
+        ht = (PippHashTable*)PMC_struct_val(SELF);
+        return pipp_hash_pop(INTERP, ht);
+    }
+
+/*
+
+=item C<STRING* pop_string()>
+
+Delete the element at the end of this PHPArray, returning its value as a STRING.
+
+=cut
+
+*/
+    STRING *pop_string() {
+        PippHashTable *ht;
+        PMC           *p_val;
+
+        ht = (PippHashTable*)PMC_struct_val(SELF);
+        p_val = pipp_hash_pop(INTERP, ht);
+        return VTABLE_get_string(INTERP, p_val);
+    }
+
+/*
+
+=item C<FLOATVAL pop_float()>
+
+Delete the element at the end of this PHPArray, returning its value as a FLOATVAL.
+
+=cut
+
+*/
+    FLOATVAL pop_float() {
+        PippHashTable *ht;
+        PMC           *p_val;
+
+        ht = (PippHashTable*)PMC_struct_val(SELF);
+        p_val = pipp_hash_pop(INTERP, ht);
+        return VTABLE_get_number(INTERP, p_val);
+    }
+
+/*
+
+=item C<void unshift_integer(INTVAL i_val)>
+
+Add an integer with the value C<i_val> to the beginning of this PHPArray.
+C<i_val> will be keyed by the INTVAL 0 and all other numerically indexed
+elements will be renumbered according to insertion order.
+
+=cut
+
+*/
+    void unshift_integer(INTVAL i_val) {
+        PMC *p_val;
+        PippHashTable *ht = (PippHashTable*)PMC_struct_val(SELF);
+
+        p_val = pmc_new(INTERP, enum_class_Integer);
+        VTABLE_set_integer_native(INTERP, p_val, i_val);
+        pipp_hash_unshift(INTERP, ht, p_val);
+    }
+
+/*
+
+=item C<void unshift_pmc(PMC *p_val)>
+
+Add a PMC with the value C<p_val> to the beginning of this PHPArray.  C<p_val>
+will be keyed by the INTVAL 0 and all other numerically indexed elements will
+be renumbered according to insertion order.
+
+=cut
+
+*/
+    void unshift_pmc(PMC *p_val) {
+        PippHashTable *ht = (PippHashTable*)PMC_struct_val(SELF);
+        pipp_hash_unshift(INTERP, ht, p_val);
+    }
+
+/*
+
+=item C<void unshift_string(STRING *s_val)>
+
+Add a STRING with the value C<s_val> to the beginning of this PHPArray.
+C<s_val> will be keyed by the INTVAL 0 and all other numerically indexed
+elements will be renumbered according to insertion order.
+
+=cut
+
+*/
+    void unshift_string(STRING *s_val) {
+        PMC *p_val;
+        PippHashTable *ht = (PippHashTable*)PMC_struct_val(SELF);
+
+        p_val = pmc_new(INTERP, enum_class_String);
+        VTABLE_set_string_native(INTERP, p_val, s_val);
+        pipp_hash_unshift(INTERP, ht, p_val);
+    }
+
+/*
+
+=item C<void unshift_float(FLOATVAL f_val)>
+
+Add a FLOATVAL with the value C<f_val> to the beginning of this PHPArray.
+C<f_val> will be keyed by the INTVAL 0 and all other numerically indexed
+elements will be renumbered according to insertion order.
+
+=cut
+
+*/
+    void unshift_float(FLOATVAL f_val) {
+        PMC *p_val;
+        PippHashTable *ht = (PippHashTable*)PMC_struct_val(SELF);
+
+        p_val = pmc_new(INTERP, enum_class_Float);
+        VTABLE_set_number_native(INTERP, p_val, f_val);
+        pipp_hash_unshift(INTERP, ht, p_val);
+    }
+
+/*
+
+=item C<INTVAL shift_integer()>
+
+Delete the element at the beginning of this PHPArray, returning its value as an INTVAL.
+
+=cut
+
+*/
+    INTVAL shift_integer() {
+        PippHashTable *ht;
+        PMC           *p_val;
+
+        ht = (PippHashTable*)PMC_struct_val(SELF);
+        p_val = pipp_hash_shift(INTERP, ht);
+        return VTABLE_get_integer(INTERP, p_val);
+    }
+
+/*
+
+=item C<PMC* shift_pmc()>
+
+Delete the element at the beginning of this PHPArray, returning its value as a PMC.
+
+=cut
+
+*/
+    PMC *shift_pmc() {
+        PippHashTable *ht;
+
+        ht = (PippHashTable*)PMC_struct_val(SELF);
+        return pipp_hash_shift(INTERP, ht);
+    }
+
+/*
+
+=item C<STRING* shift_string()>
+
+Delete the element at the beginning of this PHPArray, returning its value as a STRING.
+
+=cut
+
+*/
+    STRING *shift_string() {
+        PippHashTable *ht;
+        PMC           *p_val;
+
+        ht = (PippHashTable*)PMC_struct_val(SELF);
+        p_val = pipp_hash_shift(INTERP, ht);
+        return VTABLE_get_string(INTERP, p_val);
+    }
+
+/*
+
+=item C<FLOATVAL shift_float()>
+
+Delete the element at the beginning of this PHPArray, returning its value as a FLOATVAL.
+
+=cut
+
+*/
+    FLOATVAL shift_float() {
+        PippHashTable *ht;
+        PMC           *p_val;
+
+        ht = (PippHashTable*)PMC_struct_val(SELF);
+        p_val = pipp_hash_shift(INTERP, ht);
+        return VTABLE_get_number(INTERP, p_val);
+    }
+
+/*
+
 =item C<STRING* name()>
 
 Return the string 'array'.
@@ -930,7 +1214,7 @@ Return 1 if this PHPArray has 1 or more elements.
 */
     INTVAL get_bool() {
         PippHashTable *ht;
-        ht = (PippHashTable *)PMC_struct_val(SELF);
+        ht = (PippHashTable*) PMC_struct_val(SELF);
         return ht->elementCount > 0;
     }
 

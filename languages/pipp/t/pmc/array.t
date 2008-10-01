@@ -21,10 +21,10 @@ Tests the PhpArray PMC.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(16)
+    plan(18)
 
     basic_get_set()
-    #stack_and_queue_ops()
+    stack_and_queue_ops()
     #index_increment()
     int_string_conversions()
     autovivification_tests()
