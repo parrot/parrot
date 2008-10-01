@@ -139,7 +139,7 @@ void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
                 ht->elementCount, ht->capacity);
 
     /* Iterate by bucket order. */
-    dprintf("checking element count and hash/bucket consistenct by bucket order...\n");
+    dprintf("checking element count and hash/bucket consistency by bucket order...\n");
     count_bkt_ord = 0;
     for (i = 0; i < ht->capacity; i++) {
         dprintf("starting bucket #%d\n", i);
@@ -516,11 +516,11 @@ void pipp_hash_delete(PARROT_INTERP, PippHashTable *ht, STRING *key){
 
 /*
 
-=over 4
+=back
 
 =head2 Deque Functions
 
-=back
+=over 4
 
 =item C<PippBucket* pipp_hash_push(PARROT_INTERP, PippHashTable *ht, PMC *p_val)>
 
@@ -564,7 +564,7 @@ PippBucket* pipp_hash_push(PARROT_INTERP, PippHashTable *ht, PMC *p_val){
 
 /*
 
-=item C<PMC* pipp_hash_pop(PARROT_INTERP, PippHashTable *ht)
+=item C<PMC* pipp_hash_pop(PARROT_INTERP, PippHashTable *ht)>
 
 Delete the element at the end of this hash, returning its value;
 
@@ -637,7 +637,7 @@ PippBucket* pipp_hash_unshift(PARROT_INTERP, PippHashTable *ht, PMC *p_val){
 
 /*
 
-=item C<PMC* pipp_hash_shift(PARROT_INTERP, PippHashTable *ht)
+=item C<PMC* pipp_hash_shift(PARROT_INTERP, PippHashTable *ht)>
 
 Delete the element at the beginning of this hash, returning its value;
 
