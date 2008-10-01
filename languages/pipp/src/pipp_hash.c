@@ -38,6 +38,7 @@ PippHashTable* pipp_hash_create(PARROT_INTERP, UINTVAL size) {
     UINTVAL        real_size;
     PippHashTable *ht;
 
+    dprintf("pipp_hash_create called with size = %d\n", size);
     real_size = size;
     NEXT_POW_2(real_size);
 
@@ -124,53 +125,68 @@ void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
     element_count = ht->elementCount;
 
     /* Check that ht->buckets points to a valid location. */
-    dprintf("checking that buckets looks sane...\n");
+    dprintf("  ****SANITY CHECK****\n");
     if (ht->buckets == NULL && ht->capacity != 0)
         Parrot_ex_throw_from_c_args(interp, NULL, -1,
-                "PHPArray corruption: buckets is null in a non-empty hash");
+                "PHPArray corruption: buckets is null in a non-0 capacity hash");
 
     /* Check that capacity < elementCount and that elementCount is accurate. */
     if (ht->capacity <= ht->elementCount && ht->elementCount)
         Parrot_ex_throw_from_c_args(interp, NULL, -1,
-                "PHPArray corruption: element count >= capacity");
-
-    /* Iterate through the table forward and backwards. */
-    dprintf("checking element count by table order...\n");
-    curr_bkt = ht->tableHead;
-    count_tbl_fw = 0;
-    while (element_count && (curr_bkt = curr_bkt->tableNext))
-        count_tbl_fw++;
-
-    curr_bkt = ht->tableTail;
-    count_tbl_bk = 0;
-    while (element_count && (curr_bkt = curr_bkt->tablePrev))
-        count_tbl_bk++;
-
-    if (count_tbl_fw != count_tbl_bk)
-        Parrot_ex_throw_from_c_args(interp, NULL, -1,
-                "PHPArray corruption: Backwards table order count"
-                " is different from forward table order count.");
-    if (count_tbl_fw != element_count)
-        Parrot_ex_throw_from_c_args(interp, NULL, -1,
-                "PHPArray corruption: Table order count is different "
-                "from ht->elementCount.");
+                "PHPArray corruption: element count (%d) >= capacity (%d)",
+                ht->elementCount, ht->capacity);
 
     /* Iterate by bucket order. */
     dprintf("checking element count by bucket order...\n");
     count_bkt_ord = 0;
     for (i = 0; i < ht->capacity; i++) {
+        dprintf("starting bucket #%d\n", i);
         curr_bkt = ht->buckets[i];
         while (curr_bkt) {
+            dprintf("bucket #%d has a pair mapping '%Ss'=>'%Ss'\n", i,
+                    curr_bkt->key, VTABLE_get_string(interp, curr_bkt->value));
+            dprintf("next bucket from 0x%X lives at 0x%X\n", curr_bkt, curr_bkt->bucketNext);
             curr_bkt = curr_bkt->bucketNext;
             count_bkt_ord++;
-            dprintf("found a pair in bucket #%d\n", i);
         }
+        dprintf("done with bucket #%d\n", i);
     }
 
     if (count_bkt_ord != element_count)
         Parrot_ex_throw_from_c_args(interp, NULL, -1,
-                "PHPArray corruption: Bucket order count is different "
-                "from ht->elementCount.");
+                "PHPArray corruption: Bucket order count (%d) is different from"
+                " ht->elementCount (%d).", count_bkt_ord, element_count);
+
+    /* Iterate through the table forward and backwards. */
+    dprintf("checking element count by table order (forwards)...\n");
+    curr_bkt = ht->tableHead;
+    count_tbl_fw = 0;
+    while (element_count && curr_bkt != NULL) {
+        dprintf("found pair mapping '%Ss' => '%Ss'\n", curr_bkt->key,
+                VTABLE_get_string(interp, curr_bkt->value));
+        count_tbl_fw++;
+        curr_bkt = curr_bkt->tableNext;
+    }
+
+    dprintf("checking element count by table order (backwards)...\n");
+    curr_bkt = ht->tableTail;
+    count_tbl_bk = 0;
+    while (element_count && (curr_bkt != NULL)) {
+        dprintf("found pair mapping '%Ss' => '%Ss'\n", curr_bkt->key,
+                VTABLE_get_string(interp, curr_bkt->value));
+        count_tbl_bk++;
+        curr_bkt = curr_bkt->tablePrev;
+    }
+
+    if (count_tbl_fw != count_tbl_bk)
+        Parrot_ex_throw_from_c_args(interp, NULL, -1,
+                "PHPArray corruption: Backwards table order count "
+                "(%d) is different from forward table order count (%d).",
+                count_tbl_bk, count_tbl_fw);
+    if (count_tbl_fw != element_count)
+        Parrot_ex_throw_from_c_args(interp, NULL, -1,
+                "PHPArray corruption: Table order count (%d) is different "
+                "from ht->elementCount (%d).", count_tbl_fw, element_count);
 
     /* Make sure buckets with keyIsInt are sane. */
     dprintf("Checking that cached keyInt values are consistent...\n");
@@ -185,22 +201,24 @@ void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
                     "An int key has an incorrect value cached.");
     }
 
-    /*Look for duplicate keys using a naive n^2 algorithm.  Performance isn't a
-     *big concern, since this code won't be called very often.  */
+    /*Look for duplicate keys using a exhaustive n^2 algorithm.  Performance
+     * isn't a big concern, since this code won't be called very often.  */
     dprintf("looking for duplicate keys...\n");
     if (ht->elementCount) {
         curr_bkt = ht->tableHead;
-        curr_key = curr_bkt->key;
         while (curr_bkt != ht->tableTail) {
+            curr_key = curr_bkt->key;
             cmp_bkt = curr_bkt->tableNext;
             while (cmp_bkt != NULL) {
-                if (string_equal(interp, curr_bkt->key, cmp_bkt->key))
+                dprintf("'%Ss' vs '%Ss'... ", curr_key, cmp_bkt->key);
+                if (!string_compare(interp, curr_key, cmp_bkt->key))
                     Parrot_ex_throw_from_c_args(interp, NULL, -1,
                             "PHPArray corruption: PHPArray contains duplicate keys.");
                 cmp_bkt = cmp_bkt->tableNext;
             }
             curr_bkt = curr_bkt->tableNext;
         }
+        dprintf("\n");
     }
 
     /* check that internalPointer is sane */
@@ -214,7 +232,7 @@ void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
                     "PHPArray corruption: ht->internalPointer doesn't point to "
                     "an element of this PHPArray.");
     }
-    dprintf("All sanity checks passed.\n");
+    dprintf("  ****SANITY CHECK FINISHED****\n");
 }
 
 /*
@@ -280,8 +298,8 @@ void pipp_hash_rehash(PARROT_INTERP, PippHashTable *ht) {
 
 =item C<void pipp_hash_resize(INTERP, PippHashTable *ht, INTVAL resize)>
 
-Increase the capacity and number of buckets of this PippHash.  It's a very good
-idea to rehash after resizing.
+Increase the capacity and number of buckets of this PippHash.  Resizing implies
+rehashing.
 
 =cut
 
@@ -291,8 +309,9 @@ void pipp_hash_resize(PARROT_INTERP, PippHashTable *ht, INTVAL new_size) {
 
     NEXT_POW_2(new_size);
     ht->capacity = new_size;
-    ht->buckets  = mem_realloc_n_typed(ht->buckets, new_size, PippBucket*);
+    ht->buckets  = mem_allocate_n_zeroed_typed(new_size, PippBucket*);
     ht->hashMask = new_size - 1;
+    pipp_hash_rehash(interp, ht);
 }
 
 /*
@@ -319,7 +338,7 @@ PippBucket* pipp_hash_get_bucket(PARROT_INTERP, PippHashTable *ht, STRING *key){
     key_hash = string_hash(interp, key, PIPP_HASH_SEED);
     bucket   = ht->buckets[key_hash & ht->hashMask];
 
-    while (bucket != NULL && !string_equal(interp, bucket->key, key))
+    while (bucket != NULL && string_compare(interp, bucket->key, key))
         bucket = bucket->bucketNext;
     if (bucket)
         return bucket;
@@ -343,6 +362,7 @@ PMC* pipp_hash_get(PARROT_INTERP, PippHashTable *ht, STRING *key) {
     bucket = pipp_hash_get_bucket(interp, ht, key);
     if (bucket)
         return bucket->value;
+    dprintf("pipp_hash_get is returning null\n");
     return PMCNULL;
 }
 
@@ -368,15 +388,24 @@ PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *va
     first_bucket = curr_bucket;
     isInt        = pipp_hash_get_intval(interp, key);
 
-    /* If buckets[i] is empty or the item was not found create a new bucket.
-     * Otherwise replace the values in the existing bucket.  */
+    dprintf("pipp_hash_put called: key is '%Ss', value stringifies to '%Ss'\n",
+            key, VTABLE_get_string(interp, value));
 
-    while (curr_bucket != NULL && !string_equal(interp, curr_bucket->key, key))
+    /* Find the right bucket for the key. */
+    while (curr_bucket != NULL &&
+           string_compare(interp, curr_bucket->key, key)) {
+        dprintf("looking for the right bucket: '%Ss' != '%Ss'\n", curr_bucket->key, key);
         curr_bucket = curr_bucket->bucketNext;
+    }
 
-    /* If buckets[i] is empty or the key isn't there ... */
+    /* If buckets[i] is empty or the key isn't there, make a new bucket. */
     if (curr_bucket == NULL) {
 
+        dprintf("storing value in a new bucket with hash %X\n", key_hash);
+        if (ht->capacity <= ht->elementCount+1) {
+            dprintf("time to grow...\n");
+            pipp_hash_resize(interp, ht, ht->capacity * 2);
+        }
         first_bucket = mem_allocate_zeroed_typed(PippBucket);
 
         first_bucket->key       = key;
@@ -390,9 +419,12 @@ PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *va
         BUCKET_LIST_PREPEND(first_bucket, ht->buckets[bucket_idx]);
         TABLE_LIST_APPEND(first_bucket, ht);
         curr_bucket = first_bucket;
+        ht->elementCount++;
     }
-    /* Replace the contents of an existing bucket. */
+    /* Otherwise replace the contents of an existing bucket. */
     else {
+        dprintf("overwriting old value (%Ss) in an existing bucket with hash %X\n",
+                VTABLE_get_string(interp, curr_bucket->value), key_hash);
         curr_bucket->key       = key;
         curr_bucket->value     = value;
         curr_bucket->hashValue = key_hash;
@@ -442,6 +474,7 @@ void pipp_hash_delete(PARROT_INTERP, PippHashTable *ht, STRING *key){
         TABLE_LIST_DELETE(b, ht);
         BUCKET_LIST_DELETE(b, ht->buckets[bucket_idx]);
         mem_sys_free(b);
+        ht->elementCount--;
     }
 }
 

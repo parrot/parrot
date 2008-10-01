@@ -27,6 +27,12 @@ $Id$
 #  define dprintf(...)
 #endif
 
+#define NOT_IMPLEMENTED_YET() Parrot_ex_throw_from_c_args(interp, NULL, \
+        EXCEPTION_INTERNAL_NOT_IMPLEMENTED, "This function hasn't been"\
+        " implemented yet")
+
+#define PMC_type(pmc) ((pmc)->vtable->base_type)
+
 #define BUCKET_LIST_PREPEND(b, list) \
     if ((list) == NULL) {                 \
                 (list) = (b);                       \

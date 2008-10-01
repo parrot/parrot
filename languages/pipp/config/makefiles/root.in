@@ -245,8 +245,8 @@ test-antlr3:
 test-pct:
 	- cd .. && $(PERL) -I../lib -I pipp/lib pipp/t/harness --with-pct
 
-test-pmc: hash pmc
-	- $(PERL) -I../../lib t/pmc/*t
+test-pmc: pmc
+	@cd ../.. && $(PERL) -I/lib languages/pipp/t/pmc/array.t
 
 # this does not work yet
 test-pcc-testsuite: all t/pcc-testsuite
