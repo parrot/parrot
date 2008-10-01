@@ -56,7 +56,7 @@ our $PMC2C = "$PERL $PATHQUOTE" . q[@build_dir@@slash@tools@slash@build@slash@pm
 sub compile_cmd {
     my ($target, $source) = @_;
 
-    my $dynpmc_include;
+    my $dynpmc_include = '';
     if (defined $ENV{DYNPMC_INCLUDE} )
     {
         $dynpmc_include = $ENV{DYNPMC_INCLUDE};
