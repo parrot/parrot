@@ -1706,7 +1706,7 @@ MMD_Complex: {
                  PMC *l = pmc_new(INTERP, SELF->vtable->base_type);
                  PMC *log;
 
-                 if (dest)
+                 if (!PMC_IS_NULL(dest))
                      VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
                  else
                      dest = pmc_new(INTERP, SELF->vtable->base_type);
@@ -1727,7 +1727,7 @@ MMD_DEFAULT: {
                  PMC *l = pmc_new(INTERP, SELF->vtable->base_type);
                  PMC *log;
 
-                 if (dest)
+                 if (!PMC_IS_NULL(dest))
                      VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
                  else
                      dest = pmc_new(INTERP, SELF->vtable->base_type);
