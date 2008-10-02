@@ -11,7 +11,7 @@ config\gen\platform\win32\time.c
 
 =head1 DESCRIPTION
 
-RT#48264
+Provides access to system time functions for Win32 platforms.
 
 =head2 Functions
 
@@ -27,7 +27,7 @@ RT#48264
 
 =item C<INTVAL Parrot_intval_time(void)>
 
-RT#48260: Not yet documented!!!
+Returns the current time as an INTVAL
 
 =cut
 
@@ -51,7 +51,7 @@ Parrot_intval_time(void)
 
 =item C<FLOATVAL Parrot_floatval_time(void)>
 
-RT#48260: Not yet documented!!!
+Returns the current time as a FLOATVAL.
 
 =cut
 
@@ -83,7 +83,7 @@ Parrot_floatval_time(void)
 
 =item C<void Parrot_sleep(unsigned int seconds)>
 
-RT#48260: Not yet documented!!!
+Sleeps for C<seconds> seconds.
 
 =cut
 
@@ -116,7 +116,7 @@ Parrot_usleep(unsigned int microseconds)
 
 =item C<struct tm * Parrot_gmtime_r(const time_t *t, struct tm *tm)>
 
-RT#48260: Not yet documented!!!
+Returns a C<time_t> structure for the current Greenwich Mean Time.
 
 =cut
 
@@ -133,7 +133,7 @@ Parrot_gmtime_r(const time_t *t, struct tm *tm)
 
 =item C<struct tm * Parrot_localtime_r(const time_t *t, struct tm *tm)>
 
-RT#48260: Not yet documented!!!
+Returns a C<time_t> struct for the current local time.
 
 =cut
 
@@ -150,7 +150,8 @@ Parrot_localtime_r(const time_t *t, struct tm *tm)
 
 =item C<char* Parrot_asctime_r(const struct tm *tm, char *buffer)>
 
-RT#48260: Not yet documented!!!
+Returns an ASCII representation of the C<struct tm>. Puts it in the
+character array C<buffer>.
 
 =cut
 
