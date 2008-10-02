@@ -1136,8 +1136,12 @@ compute_dominance_frontiers(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
                 /* while runner != idoms[b] */
                 while (runner >= 0 && runner != unit->idoms[b]) {
-                    /* add b to runner's dominance frontier set */
-                    set_add(unit->dominance_frontiers[runner], b);
+                    if (set_contains(unit->dominance_frontiers[runner], b))
+                        /* we've already gone down this path once before */
+                        runner = 0;
+                    else
+                        /* add b to runner's dominance frontier set */
+                        set_add(unit->dominance_frontiers[runner], b);
 
                     /* runner = idoms[runner] */
                     if (runner == 0)
