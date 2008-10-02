@@ -21,10 +21,11 @@ well.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(147)
+    plan(148)
 
     initial_hash_tests()
     more_than_one_hash()
+    null_key()
     hash_keys_with_nulls_in_them()
     nearly_the_same_hash_keys()
     the_same_hash_keys()
@@ -112,6 +113,21 @@ well.
 
     is( $I0, 1, 'two hashes: lookup Int from hash via Str' )
     is( $I1, 2, 'two hashes: lookup Int from hash via Str in second' )
+.end
+
+.sub null_key
+    # See RT#59542
+    new $P0, 'Hash'
+    $P0['yum'] = 5
+    null $S0
+    push_eh catched
+    $I0 = 0
+    $P1 = $P0[$S0]
+    goto check
+catched:
+    $I0 = 1
+check:
+    is( $I0, 1, 'using null string as key throws' )
 .end
  
 .sub hash_keys_with_nulls_in_them

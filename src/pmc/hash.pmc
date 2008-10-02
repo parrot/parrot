@@ -88,8 +88,14 @@ static STRING
     if (!key)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Hash: Cannot use NULL key");
-
-    return key_string(interp, key);
+    else {
+        STRING *keystr = key_string(interp, key);
+        if (STRING_IS_NULL(keystr))
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_UNEXPECTED_NULL, "Hash: Cannot use NULL STRING key");
+        else
+            return keystr;
+    }
 }
 
 /* Albeit the Hash PMC doesn't use PMC_data, it needs the next_for_GC pointer
