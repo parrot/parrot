@@ -128,26 +128,36 @@ read/write mode and create an IO object in $1.
 
 inline op open(out PMC, in STR, in STR) :filesys_open {
     /* These char * need to go away soon */
-    char * const path = string_to_cstring(interp, $2);
-    char * const mode = string_to_cstring(interp, $3);
+    if (STRING_IS_NULL($2) || STRING_IS_NULL($3)) {
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_UNEXPECTED_NULL, "Invalid open");
+    }
+    else {
+        char * const path = string_to_cstring(interp, $2);
+        char * const mode = string_to_cstring(interp, $3);
 
-    $1 = PIO_open(interp, NULL, path, mode);
+        $1 = PIO_open(interp, NULL, path, mode);
 
-    string_cstring_free(mode);
-    string_cstring_free(path);
-
-    if (!$1 || !PMC_struct_val($1))
-        $1 = pmc_new(interp, enum_class_Undef);
+        string_cstring_free(mode);
+        string_cstring_free(path);
+        PARROT_ASSERT(! PMC_IS_NULL($1));
+    }
 }
 
 inline op open(out PMC, in STR) :filesys_open {
     /* These char * need to go away soon */
-    char * const path = string_to_cstring(interp, $2);
+    if (STRING_IS_NULL($2)) {
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_UNEXPECTED_NULL, "Invalid open");
+    }
+    else {
+        char * const path = string_to_cstring(interp, $2);
 
-    $1 = PIO_open(interp, NULL, path, "+<");
-    string_cstring_free(path);
-    if (!$1)
-        $1 = pmc_new(interp, enum_class_Undef);
+        $1 = PIO_open(interp, NULL, path, "+<");
+
+        string_cstring_free(path);
+        PARROT_ASSERT(! PMC_IS_NULL($1));
+    }
 }
 
 ########################################
