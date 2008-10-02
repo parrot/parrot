@@ -2099,16 +2099,18 @@ PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 char *
-string_to_cstring(SHIM_INTERP, ARGIN(const STRING *s))
+string_to_cstring(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
-    char *p;
-
-    PARROT_ASSERT(s);
-
-    p = (char *)mem_sys_allocate(s->bufused + 1);
-    memcpy(p, s->strstart, s->bufused);
-    p[s->bufused] = '\0';
-    return p;
+    if (! s) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Can't convert NULL string");
+    }
+    else {
+        char *p = (char *)mem_sys_allocate(s->bufused + 1);
+        memcpy(p, s->strstart, s->bufused);
+        p[s->bufused] = '\0';
+        return p;
+    }
 }
 
 

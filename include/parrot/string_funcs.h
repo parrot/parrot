@@ -468,8 +468,8 @@ void string_titlecase_inplace(PARROT_INTERP, ARGMOD(STRING *s))
 PARROT_API
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-char * string_to_cstring(SHIM_INTERP, ARGIN(const STRING *s))
-        __attribute__nonnull__(2);
+char * string_to_cstring(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
+        __attribute__nonnull__(1);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
