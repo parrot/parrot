@@ -183,13 +183,13 @@ static char *concat_strings(lexer_state * lexer, char *a, char *b);
 static void create_if_instr(yyscan_t yyscanner, lexer_state * const lexer, int invert,
                             int hasnull, char * const name, char * const label);
 
-static void do_strength_reduction(lexer_state * const lexer);
+static void do_strength_reduction(yyscan_t yyscanner);
 static int check_value(constant * const c, int val);
 
 static void check_first_arg_direction(yyscan_t yyscanner, char * const opname);
 
-static int check_op_args_for_symbols(yyscan_t yyscanner, lexer_state * const lexer);
-
+static int check_op_args_for_symbols(yyscan_t yyscanner);
+static int get_opinfo(yyscan_t yyscanner);
 
 /* enable debugging of generated parser */
 #define YYDEBUG         1
@@ -626,7 +626,8 @@ instruction       : TK_LABEL statement
                   | statement
                   ;
 
-statement         : conditional_stat
+statement         : parrot_stat
+                  | conditional_stat
                   | goto_stat
                   | local_decl
                   | lex_decl
@@ -634,7 +635,6 @@ statement         : conditional_stat
                   | return_stat
                   | invocation_stat
                   | assignment_stat
-                  | parrot_stat
                   | getresults_stat
                   | null_stat
                   | empty_stat
@@ -657,17 +657,24 @@ error_stat        : error "\n"
                   ;
 
 null_stat         : "null" target "\n"
-                         { set_instrf(lexer, "null", "%T", $2); }
+                         {
+                           set_instrf(lexer, "null", "%T", $2);
+                           get_opinfo(yyscanner);
+                         }
                   ;
 
 getresults_stat   : ".get_results" opt_target_list "\n"
-                         { set_instrf(lexer, "get_results", "%T", $2); }
+                         {
+                           set_instrf(lexer, "get_results", "%T", $2);
+                           get_opinfo(yyscanner);
+                         }
                   ;
 
 parrot_stat       : parrot_instruction "\n"
                   ;
 
 parrot_instruction: parrot_op opt_op_args
+                  | parrot_op_assign
                   ;
 
 parrot_op         : TK_IDENT
@@ -683,8 +690,8 @@ opt_op_args       : op_args
                         { /* when this rule is activated, the initial identifier must
                            * be a parrot op.
                            */
-                          if (check_op_args_for_symbols(yyscanner, lexer))
-                              do_strength_reduction(lexer);
+                          if (check_op_args_for_symbols(yyscanner))
+                              do_strength_reduction(yyscanner);
                         }
                   | keylist_assignment
                   ;
@@ -727,6 +734,8 @@ keylist_assignment: keylist '=' expression
                          update_instr(lexer, "set");
                          unshift_operand(lexer, $3);
                          unshift_operand(lexer, expr_from_target(lexer, obj));
+
+                         get_opinfo(yyscanner);
                        }
                   ;
 
@@ -789,8 +798,45 @@ keys              : expression
                          { $$ = add_key(lexer, $1, $3); }
                   ;
 
+/* The rule parrot_op_assign has alternatives that all include a parrot_op;
+ * these alternatives all call the check_op_args_for_symbols() function.
+ * Note the first two similar rules; they need separation as shown, to prevent
+ * reduce conflicts when compiling (by Bison) this parser specification.
+ */
+parrot_op_assign  : target '=' parrot_op op_arg_expr ',' parrot_op_args
+                        {
+                          /* the instruction is already set in parrot_op rule */
+                          unshift_operand(lexer, $4);
+                          unshift_operand(lexer, expr_from_target(lexer, $1));
+
+                          if (check_op_args_for_symbols(yyscanner)) {
+                              check_first_arg_direction(yyscanner, $3);
+                              do_strength_reduction(yyscanner);
+                          }
+                        }
+                  | target '=' parrot_op op_arg_expr
+                        {
+                          /* the instruction is already set in parrot_op rule */
+                          unshift_operand(lexer, $4);
+                          unshift_operand(lexer, expr_from_target(lexer, $1));
+
+                          /* if checking op args is successful, do other checks */
+                          if (check_op_args_for_symbols(yyscanner)) {
+                              check_first_arg_direction(yyscanner, $3);
+                              do_strength_reduction(yyscanner);
+                          }
+                        }
+                  | target '=' parrot_op keylist ',' parrot_op_args
+                        {
+                          unshift_operand(lexer, expr_from_key(lexer, $4));
+                          unshift_operand(lexer, expr_from_target(lexer, $1));
+                          if (check_op_args_for_symbols(yyscanner))
+                              check_first_arg_direction(yyscanner, $3);
+                        }
+                  ;
 
 assignment_stat   : assignment "\n"
+                        { get_opinfo(yyscanner); }
                   ;
 
 assignment        : target '=' TK_INTC
@@ -830,30 +876,6 @@ assignment        : target '=' TK_INTC
                               unshift_operand(lexer, expr_from_target(lexer, $1));
                           }
                         }
-                  | target '=' parrot_op op_arg_expr ',' parrot_op_args
-                        {
-                          /* the instruction is already set in parrot_op rule */
-                          unshift_operand(lexer, $4);
-                          unshift_operand(lexer, expr_from_target(lexer, $1));
-
-                          if (check_op_args_for_symbols(yyscanner, lexer)) {
-                              check_first_arg_direction(yyscanner, $3);
-                              do_strength_reduction(lexer);
-                          }
-
-                        }
-                  | target '=' parrot_op op_arg_expr
-                        {
-                          /* the instruction is already set in parrot_op rule */
-                          unshift_operand(lexer, $4);
-                          unshift_operand(lexer, expr_from_target(lexer, $1));
-
-                          /* if checking op args is successful, do other checks */
-                          if (check_op_args_for_symbols(yyscanner, lexer)) {
-                              check_first_arg_direction(yyscanner, $3);
-                              do_strength_reduction(lexer);
-                          }
-                        }
                   | target '=' parrot_op keylist
                         {
                           /*   $P0 = foo ["bar"]
@@ -878,24 +900,18 @@ assignment        : target '=' TK_INTC
                               /* create a symbol node anyway, so we can continue with instr. gen. */
                               sym = new_symbol(lexer, $3, PMC_TYPE);
                           }
-                          /* at this point, sym is not NULL, even if there was an error */
-                          if (sym->type != PMC_TYPE)
-                              yyerror(yyscanner, lexer,
-                                      "indexed object '%s' must be of type 'pmc'", $3);
+                          else {
+                              /* at this point, sym is not NULL, even if there was an error */
+                              if (sym->type != PMC_TYPE)
+                                  yyerror(yyscanner, lexer,
+                                          "indexed object '%s' must be of type 'pmc'", $3);
 
-                          t = target_from_symbol(lexer, sym);
-                          set_target_key(t, $4);
-                          set_instrf(lexer, "set", "%T%T", $1, t);
-                          /* No need to check first arg's direction;
-                           * this grammar rule is only used for keyed acces.
-                           */
-                        }
-                  | target '=' parrot_op keylist ',' parrot_op_args
-                        {
-                          unshift_operand(lexer, expr_from_key(lexer, $4));
-                          unshift_operand(lexer, expr_from_target(lexer, $1));
-                          if (check_op_args_for_symbols(yyscanner, lexer))
-                              check_first_arg_direction(yyscanner, $3);
+                              t = target_from_symbol(lexer, sym);
+                              set_target_key(t, $4);
+                              update_instr(lexer, "set");
+                              unshift_operand(lexer, expr_from_target(lexer, t));
+                              unshift_operand(lexer, expr_from_target(lexer, $1));
+                          }
                         }
                   | target '=' keyword keylist
                         {
@@ -1042,6 +1058,7 @@ binary_expr       : TK_INTC binop target
 
 
 conditional_stat  : conditional_instr "\n"
+                        { get_opinfo(yyscanner); }
                   ;
 
 
@@ -1202,6 +1219,7 @@ goto_stat         : "goto" identifier "\n"
                         {
                           set_instrf(lexer, "branch", "%I", $2);
                           set_instr_flag(lexer, INSTR_FLAG_BRANCH);
+                          get_opinfo(yyscanner);
                         }
                   ;
 
@@ -1699,14 +1717,14 @@ identifier  : TK_IDENT
             | keyword
             ;
 
-keyword     : "if"          { $$ = dupstr(lexer, "if"); }
-            | "unless"      { $$ = dupstr(lexer, "unless"); }
-            | "goto"        { $$ = dupstr(lexer, "goto"); }
-            | "int"         { $$ = dupstr(lexer, "int"); }
-            | "num"         { $$ = dupstr(lexer, "num"); }
-            | "string"      { $$ = dupstr(lexer, "string"); }
-            | "pmc"         { $$ = dupstr(lexer, "pmc"); }
-            | "null"        { $$ = dupstr(lexer, "null"); }
+keyword     : "if"          { $$ = "if"; }
+            | "unless"      { $$ = "unless"; }
+            | "goto"        { $$ = "goto"; }
+            | "int"         { $$ = "int"; }
+            | "num"         { $$ = "num"; }
+            | "string"      { $$ = "string"; }
+            | "pmc"         { $$ = "pmc"; }
+            | "null"        { $$ = "null"; }
             ;
 
 unop        : '-'            { $$ = "neg"; }
@@ -2350,14 +2368,13 @@ evaluate_c(lexer_state * lexer, constant * const c) {
 =item C<static char *
 concat_strings(char *a, char *b)>
 
-Concatenates two strings into a new buffer; frees all memory
-of the old strings. The new string is returned.
+Concatenates two strings into a new buffer. The new string is returned.
 
 =cut
 
 */
 static char *
-concat_strings(lexer_state * lexer, char *a, char *b) {
+concat_strings(lexer_state * lexer, char * a, char * b) {
     int strlen_a = strlen(a);
     char *newstr = (char *)pir_mem_allocate_zeroed(lexer, (strlen_a + strlen(b) + 1)
                                                           * sizeof (char));
@@ -2435,10 +2452,38 @@ check_value(constant * const c, int val) {
     return 0;
 }
 
+
+static void
+reduce_strength(yyscan_t yyscanner, int newop) {
+    lexer_state * const lexer = yyget_extra(yyscanner);
+    instruction * instr = CURRENT_INSTRUCTION(lexer);
+
+    /* based on the signatures, we know for sure that the
+     * first and second operands are targets.
+     */
+
+    /* get the operands */
+    expression *op1, *op2;
+    get_operands(lexer, 2, &op1, &op2);
+
+    /* check whether targets are equal */
+    if (targets_equal(op1->expr.t, op2->expr.t)) {
+        /* in that case, remove the second one */
+        op1->next = op2->next;
+    }
+
+    instr->opinfo = &lexer->interp->op_info_table[newop];
+    /* opinfo->full_name is a const char * ... */
+    instr->opname = (char *)instr->opinfo->full_name;
+    instr->opcode = newop;
+
+
+}
+
 /*
 
 =item C<static void
-do_strength_reduction(lexer_state * const lexer)>
+do_strength_reduction(yyscan_t yyscanner)>
 
 Implement strength reduction for the math operators C<add>, C<sub>, C<mul>, C<div> and C<fdiv>.
 If the current instruction is any of these, then the first two operands are checked; if both
@@ -2463,102 +2508,161 @@ becomes:
 
 */
 static void
-do_strength_reduction(lexer_state * const lexer) {
+do_strength_reduction(yyscan_t yyscanner) {
+    lexer_state * const lexer  = yyget_extra(yyscanner);
     char * const instr         = CURRENT_INSTRUCTION(lexer)->opname;
     int          op            = -1;
     int          num_operands;
     expression  *arg1          = NULL;
     expression  *arg2          = NULL;
 
-    int opcode = CURRENT_INSTRUCTION(lexer)->opcode;
-
-    switch (opcode) {
-/*        case PARROT_OP_add_i_i: */
-        case PARROT_OP_add_i_ic:
-/*        case PARROT_OP_add_n_n: */
-        case PARROT_OP_add_n_nc:
+    /* all interesting opcodes with three operands */
+    switch (CURRENT_INSTRUCTION(lexer)->opcode) {
         case PARROT_OP_add_i_i_i:
-        case PARROT_OP_add_i_ic_i:
+            reduce_strength(yyscanner, PARROT_OP_add_i_i);
+            break;
         case PARROT_OP_add_i_i_ic:
+            reduce_strength(yyscanner, PARROT_OP_add_i_ic);
+            break;
         case PARROT_OP_add_n_n_n:
-        case PARROT_OP_add_n_nc_n:
+            reduce_strength(yyscanner, PARROT_OP_add_n_n);
+            break;
         case PARROT_OP_add_n_n_nc:
+            reduce_strength(yyscanner, PARROT_OP_add_n_nc);
+            break;
+
+        case PARROT_OP_div_i_i_i:
+            reduce_strength(yyscanner, PARROT_OP_div_i_i);
+            break;
+        case PARROT_OP_div_i_i_ic:
+            reduce_strength(yyscanner, PARROT_OP_div_i_ic);
+            break;
+        case PARROT_OP_div_n_n_n:
+            reduce_strength(yyscanner, PARROT_OP_div_n_n);
+            break;
+        case PARROT_OP_div_n_n_nc:
+            reduce_strength(yyscanner, PARROT_OP_div_n_nc);
+            break;
+
+        case PARROT_OP_mul_i_i_i:
+            reduce_strength(yyscanner, PARROT_OP_mul_i_i);
+            break;
+        case PARROT_OP_mul_i_i_ic:
+            reduce_strength(yyscanner, PARROT_OP_mul_i_ic);
+            break;
+        case PARROT_OP_mul_n_n_n:
+            reduce_strength(yyscanner, PARROT_OP_mul_n_n);
+            break;
+        case PARROT_OP_mul_n_n_nc:
+            reduce_strength(yyscanner, PARROT_OP_mul_n_nc);
+            break;
+
+        case PARROT_OP_fdiv_i_i_i:
+            reduce_strength(yyscanner, PARROT_OP_fdiv_i_i);
+            break;
+        case PARROT_OP_fdiv_i_i_ic:
+            reduce_strength(yyscanner, PARROT_OP_fdiv_i_ic);
+            break;
+        case PARROT_OP_fdiv_n_n_n:
+            reduce_strength(yyscanner, PARROT_OP_fdiv_n_n);
+            break;
+        case PARROT_OP_fdiv_n_n_nc:
+            reduce_strength(yyscanner, PARROT_OP_fdiv_n_nc);
+            break;
+
+        case PARROT_OP_sub_i_i_i:
+            reduce_strength(yyscanner, PARROT_OP_sub_i_i);
+            break;
+        case PARROT_OP_sub_i_i_ic:
+            reduce_strength(yyscanner, PARROT_OP_sub_i_ic);
+            break;
+        case PARROT_OP_sub_n_n_n:
+            reduce_strength(yyscanner, PARROT_OP_sub_n_n);
+            break;
+        case PARROT_OP_sub_n_n_nc:
+            reduce_strength(yyscanner, PARROT_OP_sub_n_nc);
+            break;
+        default:
+            return;
+    }
+
+    get_operands(lexer, 2, &arg1, &arg2);
+
+    switch (CURRENT_INSTRUCTION(lexer)->opcode) {
+        case PARROT_OP_add_i_ic:
+            if (check_value(arg2->expr.c, 1)) {
+                CURRENT_INSTRUCTION(lexer)->opcode = PARROT_OP_inc_i;
+                arg1->next = arg2->next;
+            }
+            else if (check_value(arg2->expr.c, 0)) {
+                CURRENT_INSTRUCTION(lexer)->opcode = PARROT_OP_noop;
+
+            }
+        case PARROT_OP_add_n_nc:
+
+
+        case PARROT_OP_div_i_ic:
+        case PARROT_OP_div_n_nc:
+
+        case PARROT_OP_mul_i_ic:
+        case PARROT_OP_mul_n_nc:
+
+        case PARROT_OP_fdiv_i_ic:
+        case PARROT_OP_fdiv_n_nc:
+
+        case PARROT_OP_sub_i_ic:
+        case PARROT_OP_sub_n_nc:
+
+        default:
+            return;
+    }
+
+    return;
+
+    /* XXX what to do with these variants: ?
+    switch (opcode) {
+
+
+        case PARROT_OP_add_i_ic_i:
+        case PARROT_OP_add_n_nc_n:
+
             op = OP_ADD;
             break;
-/*        case PARROT_OP_div_i_i: */
-        case PARROT_OP_div_i_ic:
-/*        case PARROT_OP_div_n_n: */
-        case PARROT_OP_div_n_nc:
-        case PARROT_OP_div_i_i_i:
+
+
         case PARROT_OP_div_i_ic_i:
-        case PARROT_OP_div_i_i_ic:
         case PARROT_OP_div_i_ic_ic:
-        case PARROT_OP_div_n_n_n:
+
         case PARROT_OP_div_n_nc_n:
-        case PARROT_OP_div_n_n_nc:
         case PARROT_OP_div_n_nc_nc:
             op = OP_DIV;
             break;
-/*        case PARROT_OP_mul_i_i: */
-        case PARROT_OP_mul_i_ic:
-/*        case PARROT_OP_mul_n_n: */
-        case PARROT_OP_mul_n_nc:
-        case PARROT_OP_mul_i_i_i:
+
+
         case PARROT_OP_mul_i_ic_i:
-        case PARROT_OP_mul_i_i_ic:
-        case PARROT_OP_mul_n_n_n:
         case PARROT_OP_mul_n_nc_n:
-        case PARROT_OP_mul_n_n_nc:
+
             op = OP_MUL;
             break;
-/*        case PARROT_OP_fdiv_i_i: */
-        case PARROT_OP_fdiv_i_ic:
-/*        case PARROT_OP_fdiv_n_n: */
-        case PARROT_OP_fdiv_n_nc:
-        case PARROT_OP_fdiv_i_i_i:
-        case PARROT_OP_fdiv_i_ic_i:
-        case PARROT_OP_fdiv_i_i_ic:
-        case PARROT_OP_fdiv_n_n_n:
+
+
         case PARROT_OP_fdiv_n_nc_n:
-        case PARROT_OP_fdiv_n_n_nc:
+        case PARROT_OP_fdiv_i_ic_i:
+
             op = OP_FDIV;
             break;
-/*        case PARROT_OP_sub_i_i: */
-        case PARROT_OP_sub_i_ic:
-/*        case PARROT_OP_sub_n_n: */
-        case PARROT_OP_sub_n_nc:
-        case PARROT_OP_sub_i_i_i:
+
         case PARROT_OP_sub_i_ic_i:
-        case PARROT_OP_sub_i_i_ic:
-        case PARROT_OP_sub_n_n_n:
         case PARROT_OP_sub_n_nc_n:
-        case PARROT_OP_sub_n_n_nc:
             op = OP_SUB;
             break;
         default:
             return;
     }
 
+    */
 
-    /* if the instruction is "add", "sub", "mul", "div" or "fdiv", do continue... */
-
-/*
-    if (STREQ(instr, "add"))
-        op = OP_ADD;
-    else if (STREQ(instr, "sub"))
-        op = OP_SUB;
-    else if (STREQ(instr, "mul"))
-        op = OP_MUL;
-    else if (STREQ(instr, "div"))
-        op = OP_DIV;
-    else if (STREQ(instr, "fdiv"))
-        op = OP_FDIV;
-    else {
-        return;
-    }
-*/
-
-
+    /* clean up the rest of this function */
     num_operands = get_operand_count(lexer);
 
 
@@ -2687,10 +2791,47 @@ check_first_arg_direction(yyscan_t yyscanner, char * const opname) {
 }
 
 char *get_signatured_opname(lexer_state * const lexer, instruction * const instr);
+
+/*
+
+=item C<static int
+get_opinfo(yyscan_t yyscanner)>
+
+
+
+=cut
+
+*/
+static int
+get_opinfo(yyscan_t yyscanner) {
+    lexer_state * const lexer = yyget_extra(yyscanner);
+
+    instruction * const instr = CURRENT_INSTRUCTION(lexer);
+
+    char * const fullopname   = get_signatured_opname(lexer, instr);
+
+    /* find the numeric opcode for the signatured op. */
+    int opcode = lexer->interp->op_lib->op_code(fullopname, 1);
+
+    /* if the op does not exist, emit an error message */
+    if (opcode < 0) {
+        yyerror(yyscanner, lexer, "'%s' is not a parrot op", fullopname);
+        return FALSE;
+    }
+
+    /* store the opinfo, signatured opnmae and opcde in the current instruction */
+    instr->opinfo = &lexer->interp->op_info_table[opcode];
+    instr->opname = fullopname;
+    instr->opcode = opcode;
+
+    return TRUE;
+
+}
+
 /*
 
 =item C<static void
-check_op_args_for_symbols(yyscan_t yyscanner, lexer_state * const lexer)>
+check_op_args_for_symbols(yyscan_t yyscanner)>
 
 Check the arguments of the current instruction. First, the number of expected arguments
 is checked against the specified number of arguments. Then, for each argument, if the
@@ -2704,13 +2845,15 @@ If there are errors, FALSE is returned; if successful, TRUE is returned.
 
 */
 static int
-check_op_args_for_symbols(yyscan_t yyscanner, lexer_state * const lexer) {
+check_op_args_for_symbols(yyscan_t yyscanner) {
+    lexer_state * const lexer = yyget_extra(yyscanner);
     struct   op_info_t * opinfo;
     short    i;
     short    opcount;
     unsigned num_operands;
     char    *fullopname;
     int      opcode;
+    int      result;
     int      label_bitmask = 0; /* an int is at least 32 bits;
                                  * an op cannot have more than 8 operands, as defined in
                                  * include/parrot/op.h:18, so an int is good enough for
@@ -2751,27 +2894,16 @@ check_op_args_for_symbols(yyscan_t yyscanner, lexer_state * const lexer) {
     }
 
 
-    /* now we know all types of the arguments, compute the full opname */
-    fullopname = get_signatured_opname(lexer, CURRENT_INSTRUCTION(lexer));
+    /* make sure the current instruction gets a pointer to the relevant opinfo entry */
+    result = get_opinfo(yyscanner);
 
-    opcode     = lexer->interp->op_lib->op_code(fullopname, 1);
-
-    if (opcode < 0) {
-        yyerror(yyscanner, lexer, "'%s' is not a Parrot op", fullopname);
+    /* if failure, return false */
+    if (result == FALSE)
         return FALSE;
-    }
 
-    /* get the opinfo for this instruction */
-    opinfo = &lexer->interp->op_info_table[opcode];
+    opinfo = CURRENT_INSTRUCTION(lexer)->opinfo;
 
     PARROT_ASSERT(opinfo);
-
-    /* set the opcode and opinfo in the current instruction node */
-    CURRENT_INSTRUCTION(lexer)->opcode = opcode;
-    CURRENT_INSTRUCTION(lexer)->opinfo = opinfo;
-/*
-    CURRENT_INSTRUCTION(lexer)->opname = fullopname;
-    */
 
     opcount = opinfo->op_count - 1; /* according to op.h, opcount also counts the op itself. */
 

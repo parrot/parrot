@@ -1883,6 +1883,8 @@ is_parrot_signatured_op(lexer_state * const lexer, char * const name) {
     return (lexer->interp->op_lib->op_code(name, 1) >= 0);
 }
 
+
+
 /*
 
 =item C<int
@@ -2079,6 +2081,7 @@ can be removed.
                 || opcode == PARROT_OP_get_params_pc
                 || opcode == PARROT_OP_set_returns_pc)
                 */
+                /*
         if (   STREQ(ins->opname, "set_args")
             || STREQ(ins->opname, "get_results")
             || STREQ(ins->opname, "get_params")
@@ -2090,23 +2093,27 @@ can be removed.
             sprintf(fullname, "%s_pc", ins->opname);
         }
         else
-            fullname = get_signatured_opname(lexer, ins);
+            fullname = ins->opname; //get_signatured_opname(lexer, ins);
 
-        if (!is_parrot_signatured_op(lexer, fullname))
+        if (!is_parrot_signatured_op(lexer, ins-))
             pirerror(lexer, "'%s' is not a signatured parrot opcode! Check the operands of this op",
                      fullname);
         else {
             int opcode;
-
+                  */
             /* fprintf(out, "   %s ", ins->opname);
              */
-            fprintf(out, "%u   %s ", ins->offset, fullname);
+            fprintf(out, "%u   %s ", ins->offset, ins->opname);
+            /*
             opcode = get_instr_opcode(lexer, fullname);
+            */
 
             print_expressions(lexer, ins->operands);
 
-            fprintf(out, " # op %d", opcode);
+            fprintf(out, " # op %d", ins->opcode);
+        /*
         }
+        */
 
 
         fprintf(out, "\n");
@@ -2213,6 +2220,7 @@ generate_get_params(lexer_state * const lexer) {
     set_instr(lexer, "get_params");
 }
 
+
 /*
 
 =item C<void
@@ -2228,6 +2236,12 @@ is generated (to find the sub during runtime).
 TODO: somehow mark the instruction as 'patch-back': after the parse all
 'patch-backs' must be checked whether they can be fixed; if not, then that's ok,
 but at least it saves runtime cycles if it can.
+
+XXX FIXME TOO: these instructions need calls to get_opinfo() in the parser,
+so they participate in getting their full op name, and opinfo pointer.
+Only then can they be emitted. Maybe, as these are special instructions anyway,
+handle them specially, as many of them are var-args-ops, meaning that not all
+of their operands should be processed.
 
 =cut
 
