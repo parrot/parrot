@@ -11,7 +11,7 @@ config\gen\platform\win32\misc.c
 
 =head1 DESCRIPTION
 
-RT#48264
+Miscellaneous helper functions that are specific to Win32.
 
 =head2 Functions
 
@@ -25,7 +25,8 @@ RT#48264
 
 =item C<void Parrot_platform_init_code(void)>
 
-RT#48260: Not yet documented!!!
+Initialize Parrot for the Win32 platform. Turns off ugly crash dialog
+boxes on Win32.
 
 =cut
 
