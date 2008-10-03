@@ -25,7 +25,7 @@ Tests the PhpArray PMC.
 
     basic_get_set()
     stack_and_queue_ops()
-    #index_increment()
+    index_increment()
     int_string_conversions()
     autovivification_tests()
     exists_delete_tests()

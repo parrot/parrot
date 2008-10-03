@@ -20,10 +20,10 @@ src/pmc/phparray.pmc - PHP Array
 #include "src/pipp_hash.h"
 
 pmclass PhpArray
-    extends  Hash
     provides hash
     provides array
     dynpmc
+    need_ext
     group    php_group
     hll      PHP
     maps     Array
@@ -460,9 +460,14 @@ C<key>.
         STRING *s_key;
 
         dprintf("calling get_integer_keyed\n");
+        if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_hash_iterator_FLAGS)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                    "You can't use an int as an Iterator key.");
+
         /* peel off the next key */
         next_key = key_next(INTERP, key);
         s_key    = VTABLE_get_string(INTERP, key);
+        dprintf("next key is '%Ss'\n", s_key);
 
         /* if there isn't one (i.e. key is null) */
         if (next_key == NULL) {
@@ -532,10 +537,23 @@ C<key>.
 
 */
     PMC *get_pmc_keyed(PMC *key) {
-        PMC    *next_key, *box;
-        STRING *s_key;
+        PMC           *next_key, *box;
+        STRING        *s_key;
+        PippHashTable *ht;
 
         dprintf("calling get_pmc_keyed\n");
+        /* deal with Iterator stuff */
+        if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_hash_iterator_FLAGS) {
+
+            ht                  = (PippHashTable*) PMC_struct_val(SELF);
+            s_key               = ht->internalPointer->key;
+            ht->internalPointer = ht->internalPointer->tableNext;
+            next_key            = pmc_new(INTERP, enum_class_String);
+
+            VTABLE_set_string_native(INTERP, next_key, s_key);
+            return next_key;
+        }
+
         /* peel off the next key */
         next_key = key_next(INTERP, key);
         s_key    = VTABLE_get_string(INTERP, key);
@@ -604,24 +622,40 @@ C<key>.
 
 */
     STRING *get_string_keyed(PMC *key) {
-        PMC    *next_key, *box;
-        STRING *s_key;
+        PMC           *next_key, *box;
+        STRING        *s_key;
+        PippHashTable *ht;
 
         dprintf("calling get_string_keyed\n");
+        /* deal with Iterator stuff */
+        if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_hash_iterator_FLAGS) {
+
+            dprintf("doing iterator stuff\n");
+            ht                  = (PippHashTable*) PMC_struct_val(SELF);
+            s_key               = ht->internalPointer->key;
+            ht->internalPointer = ht->internalPointer->tableNext;
+
+            return s_key;
+        }
+
         /* peel off the next key */
         next_key = key_next(INTERP, key);
         s_key    = VTABLE_get_string(INTERP, key);
+        dprintf("next key is '%Ss'\n", s_key);
 
         /* if there isn't one (i.e. key is null) */
         if (next_key == NULL) {
             /* dispatch to get_string_keyed_str */
+            dprintf("there is no next key\n");
             return SELF.get_string_keyed_str(s_key);
         }
 
         /* get the box where the thing should be stored */
         box = SELF.get_pmc_keyed_str(s_key);
-        if (PMC_IS_NULL(box))
+        if (PMC_IS_NULL(box)) {
+            dprintf("next box is null\n");
             return (INTVAL)0;
+        }
 
         /* recurse into that box */
         return VTABLE_get_string_keyed(INTERP, box, next_key);
@@ -684,6 +718,9 @@ C<key>.
         STRING *s_key;
 
         dprintf("calling get_number_keyed\n");
+        if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_hash_iterator_FLAGS)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                    "You can't use a float as an Iterator key.");
         /* peel off the next key */
         next_key = key_next(INTERP, key);
         s_key    = VTABLE_get_string(INTERP, key);
@@ -1216,6 +1253,153 @@ Return 1 if this PHPArray has 1 or more elements.
         PippHashTable *ht;
         ht = (PippHashTable*) PMC_struct_val(SELF);
         return ht->elementCount > 0;
+    }
+
+
+/*
+
+=item C<void visit(visit_info *info()>
+
+Freeze or thaw the contents of this PHPArray.
+
+=cut
+
+*/
+    void visit(visit_info *info) {
+        info->container = SELF;
+        pipp_hash_visit(INTERP, (PippHashTable*) PMC_struct_val(SELF), info);
+        SUPER(info);
+    }
+
+/*
+
+=item C<void freeze(visit_info *info()>
+
+After C<visit()> has been called during the freeze process, this VTABLE function
+is used to add additional information about the PHPArray to the visit_info
+struct.
+
+=cut
+
+*/
+    void freeze(visit_info *info) {
+        PippHashTable *ht;
+        PippBucket    *bkt;
+        IMAGE_IO      *io;
+        UINTVAL        ip_pos;
+
+        SUPER(info);
+        ht = (PippHashTable*)PMC_struct_val(SELF);
+        io = info->image_io;
+        VTABLE_push_integer(INTERP, io, ht->nextIndex);
+        VTABLE_push_integer(INTERP, io, ht->capacity);
+        VTABLE_push_integer(INTERP, io, ht->elementCount);
+
+        if (ht->internalPointer == NULL) {
+            VTABLE_push_integer(INTERP, io, -1);
+        }
+        else {
+            ip_pos = 0;
+            for (bkt = ht->tableHead; bkt != ht->internalPointer; bkt = bkt->tableNext)
+                ip_pos++;
+            VTABLE_push_integer(INTERP, io, ip_pos);
+        }
+    }
+
+/*
+
+=item C<void thaw(visit_info *info()>
+
+Before C<visit()> is called during the thaw process, this VTABLE function is used
+to initialize the empty PHPArray.
+
+=cut
+
+*/
+    void thaw(visit_info *info) {
+        PippHashTable *ht;
+        IMAGE_IO      *io;
+        INTVAL         next_index, ip_pos;
+        UINTVAL        capacity, element_count;
+
+        SUPER(info);
+        io = info->image_io;
+        next_index    = VTABLE_shift_integer(INTERP, io);
+        capacity      = VTABLE_shift_integer(INTERP, io);
+        element_count = VTABLE_shift_integer(INTERP, io);
+        ip_pos        = VTABLE_shift_integer(INTERP, io);
+
+        ht = (PippHashTable*)PMC_struct_val(SELF);
+        pipp_hash_resize(INTERP, ht, capacity);
+
+        ht->elementCount  = element_count;
+        ht->nextIndex     = next_index;
+        info->extra_flags = ip_pos; /* used during thawfinish */
+    }
+
+/*
+
+=item C<void thawfinish(visit_info *info()>
+
+After C<visit()> is called during the thaw process, this VTABLE function is
+used to make any changes to the newly thawed PHPArray which could not be made
+during the thaw process.
+
+=cut
+
+*/
+    void thawfinish(visit_info *info) {
+        PippHashTable *ht;
+        INTVAL         ip_pos;
+
+        ht = (PippHashTable*)PMC_struct_val(SELF);
+        ip_pos = info->extra_flags;
+
+        if (ip_pos == -1)
+            ht->internalPointer = NULL;
+        else
+            for (ht->internalPointer = ht->tableHead; ip_pos > 0; ip_pos--)
+                ht->internalPointer = ht->internalPointer->tableNext;
+    }
+
+/*
+
+=item C<PMC *get_iter()>
+
+Return an Iterator over this PHPArray.  When using an Iterator over PHPArrays,
+it is a very good idea to use the C<iter> opcode as follows:
+
+ $P0 = new 'PhpArray'
+ $P1 = iter $P0
+
+This ensures that the Iterator and the PHPArray's internal pointer stay in
+sync.  Using an Iterator and a PHPArray any other way may lead to mysterious
+failures.
+
+=cut
+
+*/
+    PMC *get_iter(){
+        PMC           *iter, *key;
+        PippHashTable *ht;
+        PippBucket    *bkt;
+
+        ht                   = (PippHashTable*)PMC_struct_val(SELF);
+        iter                 = pmc_new_init(INTERP, enum_class_Iterator, SELF);
+        key                  = pmc_new(INTERP, enum_class_Key);
+        PObj_get_FLAGS(key) |= KEY_hash_iterator_FLAGS;
+        PMC_struct_val(iter) = key;
+        PMC_int_val(key)     = ht->elementCount ? 0 : -1;
+        ht->iter = iter;
+
+        /* Get the Iterator and ht->internalPointer in sync. */
+        bkt = ht->tableHead;
+        while (bkt != ht->internalPointer) {
+            VTABLE_nextkey_keyed(INTERP, (PMC*)PMC_struct_val(iter), SELF, ITERATE_GET_NEXT);
+            bkt = bkt->tableNext;
+        }
+
+        return iter;
     }
 
 /*

@@ -118,7 +118,7 @@ exception with a descriptive message is thrown.
 
 void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
     UINTVAL     count_tbl_fw, count_tbl_bk, count_bkt_ord, element_count, i,
-                expected_bucket;
+                expected_bucket, ip_pos;
     INTVAL      max_index, expected_next_index;
     PippBucket *curr_bkt, *cmp_bkt;
     STRING     *curr_key;
@@ -255,13 +255,19 @@ void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
     dprintf("checking that ht->internalPointer points to something in this PHPArray...\n");
     if (ht->internalPointer != NULL) {
         curr_bkt = ht->tableHead;
-        while (curr_bkt != NULL && curr_bkt != ht->internalPointer)
+        ip_pos = 0;
+        while (curr_bkt != NULL && curr_bkt != ht->internalPointer) {
             curr_bkt = curr_bkt->tableNext;
+            ip_pos++;
+        }
         if (curr_bkt != ht->internalPointer)
             Parrot_ex_throw_from_c_args(interp, NULL, -1,
                     "PHPArray corruption: ht->internalPointer doesn't point to "
                     "an element of this PHPArray.");
+        dprintf("internalPointer points at position #%d\n", ip_pos);
     }
+    else
+        dprintf("internalPointer is NULL, which is just fine\n");
     dprintf("  ****SANITY CHECK FINISHED****\n");
 }
 
@@ -370,6 +376,7 @@ PippBucket* pipp_hash_get_bucket(PARROT_INTERP, PippHashTable *ht, STRING *key){
 
     key_hash = string_hash(interp, key, PIPP_HASH_SEED);
     bucket   = ht->buckets[key_hash & ht->hashMask];
+    dprintf("pipp_hash_get_bucket called with key '%Ss'\n", key);
 
     while (bucket != NULL && string_compare(interp, bucket->key, key))
         bucket = bucket->bucketNext;
@@ -421,8 +428,13 @@ PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *p_
     first_bucket = curr_bucket;
     isInt        = pipp_hash_get_intval(interp, key);
 
-    dprintf("pipp_hash_put called: key is '%Ss', p_val stringifies to '%Ss'\n",
-            key, VTABLE_get_string(interp, p_val));
+    if (PMC_IS_NULL(p_val)) {
+        dprintf("pipp_hash_put called: key is '%Ss', p_val is null\n", key);
+    }
+    else {
+        dprintf("pipp_hash_put called: key is '%Ss', p_val stringifies to '%Ss'\n",
+                key, VTABLE_get_string(interp, p_val));
+    }
 
     /* Find the right bucket for the key. */
     while (curr_bucket != NULL &&
@@ -525,7 +537,8 @@ void pipp_hash_delete(PARROT_INTERP, PippHashTable *ht, STRING *key){
 =item C<PippBucket* pipp_hash_push(PARROT_INTERP, PippHashTable *ht, PMC *p_val)>
 
 Append a bucket with C<p_val> to the PippHash.  Its index will be determined by
-the value of ht->nextIndex.
+the value of ht->nextIndex.  Pushing onto a PippHash does *not* affect
+internalPointer.
 
 =cut
 
@@ -566,7 +579,9 @@ PippBucket* pipp_hash_push(PARROT_INTERP, PippHashTable *ht, PMC *p_val){
 
 =item C<PMC* pipp_hash_pop(PARROT_INTERP, PippHashTable *ht)>
 
-Delete the element at the end of this hash, returning its value;
+Delete the element at the end of this hash, returning its value.  Popping from
+a PippHash also resets internalPointer to point at the first element of the
+array.
 
 =cut
 
@@ -588,6 +603,7 @@ PMC* pipp_hash_pop(PARROT_INTERP, PippHashTable *ht) {
     BUCKET_LIST_DELETE(bucket, ht->buckets[bl_hash]);
     mem_sys_free(bucket);
     ht->elementCount--;
+    ht->internalPointer = ht->tableHead;
 
     return p_val;
 }
@@ -630,6 +646,7 @@ PippBucket* pipp_hash_unshift(PARROT_INTERP, PippHashTable *ht, PMC *p_val){
     TABLE_LIST_PREPEND(bkt, ht);
     ht->elementCount++;
     pipp_hash_renumber(interp, ht);
+    ht->internalPointer = ht->tableHead;
     dprintf("unshifted a value: key is '%Ss', keyInt is %d\n", s_key, bkt->keyInt)
 
     return bkt;
@@ -639,7 +656,9 @@ PippBucket* pipp_hash_unshift(PARROT_INTERP, PippHashTable *ht, PMC *p_val){
 
 =item C<PMC* pipp_hash_shift(PARROT_INTERP, PippHashTable *ht)>
 
-Delete the element at the beginning of this hash, returning its value;
+Delete the element at the beginning of this hash, returning its value.  This
+also resets internalPointer to point at the first element of the resulting
+hash.
 
 =cut
 
@@ -661,9 +680,96 @@ PMC* pipp_hash_shift(PARROT_INTERP, PippHashTable *ht) {
     BUCKET_LIST_DELETE(bucket, ht->buckets[bl_hash]);
     mem_sys_free(bucket);
     ht->elementCount--;
+    ht->internalPointer = ht->tableHead;
 
     return p_val;
 }
+
+/*
+
+=back
+
+=head2 Freeze/Thaw Helper Functions
+
+=over 4
+
+=item C<void pipp_hash_visit(PARROT_INTERP, PippHashTable *ht, visit_info *info)>
+
+Dispatch a call to VTABLE_visit to the appropriate internal function.
+
+=cut
+
+*/
+
+void pipp_hash_visit(PARROT_INTERP, PippHashTable *ht, visit_info *info) {
+    switch (info->what) {
+        case VISIT_THAW_NORMAL:
+        case VISIT_THAW_CONSTANTS:
+            dprintf("pipp_hash_visit is dispatching to pipp_hash_thaw\n");
+            pipp_hash_thaw(interp, ht, info);
+            break;
+        case VISIT_FREEZE_NORMAL:
+        case VISIT_FREEZE_AT_DESTRUCT:
+            dprintf("pipp_hash_visit is dispatching to pipp_hash_freeze\n");
+            pipp_hash_freeze(interp, ht, info);
+            break;
+        default:
+            Parrot_ex_throw_from_c_args(interp, NULL, 1, "unimplemented visit mode");
+            break;
+    }
+}
+
+/*
+
+=item C<void pipp_hash_freeze(PARROT_INTERP, PippHashTable *ht, visit_info *info)>
+
+Do most of the actual work of serializing this PippHash into C<info>.
+
+=cut
+
+*/
+
+void pipp_hash_freeze(PARROT_INTERP, PippHashTable *ht, visit_info *info) {
+    PippBucket *bkt;
+    for (bkt = ht->tableHead; bkt != NULL; bkt = bkt->tableNext) {
+        VTABLE_push_string(interp, info->image_io, bkt->key);
+        (info->visit_pmc_now)(interp, bkt->value, info);
+    }
+}
+
+
+/*
+
+=item C<void pipp_hash_thaw(PARROT_INTERP, PippHashTable *ht, visit_info *info)>
+
+Unserialize this PippHash into C<info>.
+
+=cut
+
+*/
+
+void pipp_hash_thaw(PARROT_INTERP, PippHashTable *ht, visit_info *info) {
+    UINTVAL     i, element_count;
+    STRING     *s_key;
+    IMAGE_IO   *io;
+    PippBucket *bkt;
+
+    io = info->image_io;
+    element_count = ht->elementCount;
+
+    for (i = 0; i < element_count; i++) {
+        s_key = VTABLE_shift_string(interp, io);
+        bkt = pipp_hash_put(interp, ht, s_key, PMCNULL);
+        /* XXX: This is hackey.  Find a better way.  It may at some point in
+         * the future be a good idea to use a more minimal version of
+         * pipp_hash_put here, but that'd be a premature optimization at this
+         * point.*/
+        ht->elementCount--;
+        info->thaw_ptr = &bkt->value;
+        (info->visit_pmc_now)(interp, PMCNULL, info);
+    }
+}
+
 
 /*
 

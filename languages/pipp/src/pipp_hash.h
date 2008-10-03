@@ -120,6 +120,7 @@ typedef struct pipp_hash_table {
     PippBucket *  tableHead;
     PippBucket *  tableTail;
     PippBucket *  internalPointer;
+    PMC        *  iter;
     UINTVAL       elementCount;
     UINTVAL       capacity;
     UINTVAL       hashMask;
@@ -159,6 +160,10 @@ PippBucket*    pipp_hash_push(PARROT_INTERP, PippHashTable *ht, PMC *p_val);
 PMC*           pipp_hash_pop(PARROT_INTERP, PippHashTable *ht);
 PMC*           pipp_hash_shift(PARROT_INTERP, PippHashTable *ht);
 PippBucket*    pipp_hash_unshift(PARROT_INTERP, PippHashTable *ht, PMC *p_val);
+
+void           pipp_hash_visit(PARROT_INTERP, PippHashTable *ht, visit_info *info);
+void           pipp_hash_freeze(PARROT_INTERP, PippHashTable *ht, visit_info *info);
+void           pipp_hash_thaw(PARROT_INTERP, PippHashTable *ht, visit_info *info);
 
 PippIsInt*     pipp_hash_get_intval(PARROT_INTERP, STRING *key);
 
