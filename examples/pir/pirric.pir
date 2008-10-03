@@ -29,7 +29,7 @@
 # - Predefined numeric functions: COMPLEX, SQR, EXP, LN, SIN, COS, TAN, ASIN, ACOS, ATAN, SINH, COSH, TANH
 # - Predefined string functions: CHR$, ASC, LEN, LEFT$, RIGHT$, MID$
 # - Parenthesis
-# - Special functions: NEW "Class name"
+# - Special functions: NEW, ISA
 # - Calls to methods in foreign objects
 # - Calls to functions in foreign namespaces
 
@@ -118,6 +118,7 @@
     .local pmc predefs
     predefs = new 'Hash'
     setpredef(predefs, "NEW", "new")
+    setpredef(predefs, "ISA", "isa")
     setpredef(predefs, "CHR$", "chr")
     setpredef(predefs, "ASC", "asc")
     setpredef(predefs, "LEN", "len")
@@ -406,6 +407,21 @@ fail:
 
     $P2 = new $S1
     .return($P2)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
+.sub predef_isa :method
+    .param pmc tokenizer
+
+    $P1 = tokenizer.get()
+    ne $P1, '(', fail
+    ($P1, $P2) = self.get_2_args(tokenizer)
+    $I0 = isa $P1, $P2
+    $P0 = new 'Integer'
+    $P0 = $I0
+    .return($P0)
 fail:
     SyntaxError()
 .end
