@@ -1,4 +1,4 @@
-#! perl
+#! ../../parrot
 # Copyright (C) 2008, The Perl Foundation.
 # $Id$
 
@@ -16,41 +16,31 @@ Tests C<PhpBoolean> PMC.
 
 =cut
 
-use strict;
-use warnings;
-
-use FindBin;
-use lib "$FindBin::Bin/../../lib";
-
-use Test::More   tests => 1;
-use Parrot::Test;
-
-pir_output_is( << 'CODE', << 'OUTPUT', "stringification" );
-.loadlib 'php_group'
+.HLL "PHP", "php_group"
 
 .sub 'main' :main
-    .local pmc true
+    .include "include/test_more.pir"
+    plan(2)
+
+    truth_tests()
+.end
+
+.sub truth_tests
+    .local pmc true, false
+
     true = new 'PhpBoolean'
     true = 1
-   
-    .local pmc false
+
     false = new 'PhpBoolean'
     false = 0
 
-    $S0 = true
-    say $S0
-    $S0 = false
-    say $S0
-
+    is(true, 1, "true PhpBoolean is 1")
+    is(false, "", "false PhpBoolean is empty")
 .end
-CODE
-1
-
-OUTPUT
 
 # Local Variables:
-#   mode: cperl
+#   mode: pir
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
