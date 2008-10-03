@@ -202,31 +202,49 @@ features, just be sure to say the same thing in both text and HTML versions.
 
 =item 10.
 
-Update the website. The svn repository for the website is at
-L<https://svn.perl.org/perl.org/docs/live/parrotcode>.
+Update the website. You will need an account on L<http://www.parrot.org>.
 
 =over 4
 
 =item a
 
-Add the release announcement to news/[year]/Parrot-[release].html.
-There's some additional stuff needed at the top of the file; use one of the
+Add a new page for the release announcement with "Create content" -> "Story".
+There's some additional stuff needed at the top of the page; use one of the
 old announcements as a guide.
+
+The "<!--break-->" line marks the end of the text that will appear on the
+front page.
 
 =item b
 
-Update the top-level C<index.html> page.  (The old mini-announcement may be
-commented out).
+Set the "News" category to "Releases".
+
+Add tags to the page for significant changes in this release (e.g. "rakudo" for
+significant Rakudo language updates, or "gc" for significant garbage collection
+subsystem updates).
 
 =item c
 
-Update C</.htredirects> to point to the proper CPAN URL.
+Under "URL path settings" uncheck "Automatic alias" and set the path to
+news/[year]/Parrot-[release number].
+
+=item d
+
+Under "Publishing options" make sure "Published" and "Promoted to front page"
+are checked.
+
+=item e
+
+Send an email to webmaster@parrotcode.org requesting that they update the
+C</.htredirects> file for release/devel to point to the proper CPAN URL. [This
+step will change in the near future.]
 
 =back
 
-If you have commit privs to the parrotcode repository, be sure to test
-locally in combust before committing.  Otherwise, make the changes
-in your working copy and send a patch to webmaster@parrotcode.org.
+Preview the new page, and submit it.
+
+(The old release announcement may be edited to uncheck "Promoted to front page"
+to keep the main page fresh.)
 
 =item 11.
 
