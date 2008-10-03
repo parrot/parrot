@@ -2454,30 +2454,121 @@ check_value(constant * const c, int val) {
 
 
 static void
-reduce_strength(yyscan_t yyscanner, int newop) {
+update_op(lexer_state * const lexer, instruction * const instr, int newop) {
+    instr->opinfo = &lexer->interp->op_info_table[newop];
+    /* opinfo->full_name is a const char * ... */
+    instr->opname = (char *)instr->opinfo->full_name;
+    instr->opcode = newop;
+}
+
+
+static void
+reduce_strength(yyscan_t yyscanner, int newop, int op2_index) {
     lexer_state * const lexer = yyget_extra(yyscanner);
     instruction * instr = CURRENT_INSTRUCTION(lexer);
-
     /* based on the signatures, we know for sure that the
      * first and second operands are targets.
      */
 
     /* get the operands */
     expression *op1, *op2;
-    get_operands(lexer, 2, &op1, &op2);
+
+    get_operands(lexer, BIT(0) | BIT(op2_index), &op1, &op2);
 
     /* check whether targets are equal */
     if (targets_equal(op1->expr.t, op2->expr.t)) {
+        fprintf(stderr, "operand 1 and operand at position %d are equal\n", op2_index);
+        update_op(lexer, instr, newop);
         /* in that case, remove the second one */
-        op1->next = op2->next;
+        if (op2_index == 2)
+            op2->next = op1;
+        else
+            op1->next = op2->next;
     }
 
-    instr->opinfo = &lexer->interp->op_info_table[newop];
-    /* opinfo->full_name is a const char * ... */
-    instr->opname = (char *)instr->opinfo->full_name;
-    instr->opcode = newop;
+
+}
 
 
+/*
+
+
+Given the 3-operand version of a Parrot math opcode, get the
+strength-reduced version with 2 operands. This is a low-level,
+"dirty-job-but-someone-has-to-do-it" function, so other higher
+level functions don't get cluttered.
+
+If a 2-operand version is specified, then that is returned.
+
+The second parameter C<second_op_index> will be assigned the index
+of the second target parameter, if any. So, in case of
+PARROT_OP_add_i_ic_i, this will be 2, as that's the second target
+(start counting from 0).
+
+
+*/
+static int
+convert_3_to_2_args(int opcode, int *second_op_index) {
+    *second_op_index = 1; /* count from 0 */
+    switch (opcode) {
+        case PARROT_OP_add_i_i:
+        case PARROT_OP_add_i_i_i:
+            return PARROT_OP_add_i_i;
+
+        case PARROT_OP_add_i_ic:
+        case PARROT_OP_add_i_i_ic:
+            return PARROT_OP_add_i_ic;
+
+        case PARROT_OP_add_n_n_n:
+            return PARROT_OP_add_n_n;
+        case PARROT_OP_add_n_n_nc:
+            return PARROT_OP_add_n_nc;
+
+        case PARROT_OP_add_i_ic_i:
+            *second_op_index = 2;
+            return PARROT_OP_add_i_ic;
+
+        case PARROT_OP_add_n_nc_n:
+            *second_op_index = 2;
+            return PARROT_OP_add_n_nc;
+
+        case PARROT_OP_div_i_i_i:
+            return PARROT_OP_div_i_i;
+        case PARROT_OP_div_i_i_ic:
+            return PARROT_OP_div_i_ic;
+        case PARROT_OP_div_n_n_n:
+            return PARROT_OP_div_n_n;
+        case PARROT_OP_div_n_n_nc:
+            return PARROT_OP_div_n_nc;
+
+        case PARROT_OP_mul_i_i_i:
+            return PARROT_OP_mul_i_i;
+        case PARROT_OP_mul_i_i_ic:
+            return PARROT_OP_mul_i_ic;
+        case PARROT_OP_mul_n_n_n:
+            return PARROT_OP_mul_n_n;
+        case PARROT_OP_mul_n_n_nc:
+            return PARROT_OP_mul_n_nc;
+
+        case PARROT_OP_fdiv_i_i_i:
+            return PARROT_OP_fdiv_i_i;
+        case PARROT_OP_fdiv_i_i_ic:
+            return PARROT_OP_fdiv_i_ic;
+        case PARROT_OP_fdiv_n_n_n:
+            return PARROT_OP_fdiv_n_n;
+        case PARROT_OP_fdiv_n_n_nc:
+            return PARROT_OP_fdiv_n_nc;
+
+        case PARROT_OP_sub_i_i_i:
+            return PARROT_OP_sub_i_i;
+        case PARROT_OP_sub_i_i_ic:
+            return PARROT_OP_sub_i_ic;
+        case PARROT_OP_sub_n_n_n:
+            return PARROT_OP_sub_n_n;
+        case PARROT_OP_sub_n_n_nc:
+            return PARROT_OP_sub_n_nc;
+    }
+    return -1;
 }
 
 /*
@@ -2509,110 +2600,101 @@ becomes:
 */
 static void
 do_strength_reduction(yyscan_t yyscanner) {
-    lexer_state * const lexer  = yyget_extra(yyscanner);
-    char * const instr         = CURRENT_INSTRUCTION(lexer)->opname;
-    int          op            = -1;
+    lexer_state *lexer = yyget_extra(yyscanner);
+    instruction *instr = CURRENT_INSTRUCTION(lexer);
     int          num_operands;
     expression  *arg1          = NULL;
     expression  *arg2          = NULL;
+    expression  *args[3];
+    int newop;
+    int second_op_index;
 
-    /* all interesting opcodes with three operands */
-    switch (CURRENT_INSTRUCTION(lexer)->opcode) {
-        case PARROT_OP_add_i_i_i:
-            reduce_strength(yyscanner, PARROT_OP_add_i_i);
-            break;
-        case PARROT_OP_add_i_i_ic:
-            reduce_strength(yyscanner, PARROT_OP_add_i_ic);
-            break;
-        case PARROT_OP_add_n_n_n:
-            reduce_strength(yyscanner, PARROT_OP_add_n_n);
-            break;
-        case PARROT_OP_add_n_n_nc:
-            reduce_strength(yyscanner, PARROT_OP_add_n_nc);
-            break;
+    newop = convert_3_to_2_args(instr->opcode, &second_op_index);
 
-        case PARROT_OP_div_i_i_i:
-            reduce_strength(yyscanner, PARROT_OP_div_i_i);
-            break;
-        case PARROT_OP_div_i_i_ic:
-            reduce_strength(yyscanner, PARROT_OP_div_i_ic);
-            break;
-        case PARROT_OP_div_n_n_n:
-            reduce_strength(yyscanner, PARROT_OP_div_n_n);
-            break;
-        case PARROT_OP_div_n_n_nc:
-            reduce_strength(yyscanner, PARROT_OP_div_n_nc);
-            break;
+    /* if it's not a Parrot math op, stop here. */
+    if (newop == -1) {
 
-        case PARROT_OP_mul_i_i_i:
-            reduce_strength(yyscanner, PARROT_OP_mul_i_i);
-            break;
-        case PARROT_OP_mul_i_i_ic:
-            reduce_strength(yyscanner, PARROT_OP_mul_i_ic);
-            break;
-        case PARROT_OP_mul_n_n_n:
-            reduce_strength(yyscanner, PARROT_OP_mul_n_n);
-            break;
-        case PARROT_OP_mul_n_n_nc:
-            reduce_strength(yyscanner, PARROT_OP_mul_n_nc);
-            break;
-
-        case PARROT_OP_fdiv_i_i_i:
-            reduce_strength(yyscanner, PARROT_OP_fdiv_i_i);
-            break;
-        case PARROT_OP_fdiv_i_i_ic:
-            reduce_strength(yyscanner, PARROT_OP_fdiv_i_ic);
-            break;
-        case PARROT_OP_fdiv_n_n_n:
-            reduce_strength(yyscanner, PARROT_OP_fdiv_n_n);
-            break;
-        case PARROT_OP_fdiv_n_n_nc:
-            reduce_strength(yyscanner, PARROT_OP_fdiv_n_nc);
-            break;
-
-        case PARROT_OP_sub_i_i_i:
-            reduce_strength(yyscanner, PARROT_OP_sub_i_i);
-            break;
-        case PARROT_OP_sub_i_i_ic:
-            reduce_strength(yyscanner, PARROT_OP_sub_i_ic);
-            break;
-        case PARROT_OP_sub_n_n_n:
-            reduce_strength(yyscanner, PARROT_OP_sub_n_n);
-            break;
-        case PARROT_OP_sub_n_n_nc:
-            reduce_strength(yyscanner, PARROT_OP_sub_n_nc);
-            break;
-        default:
-            return;
+        return;
     }
 
-    get_operands(lexer, 2, &arg1, &arg2);
+    /* if there's more than 2 operands, do strength reduction. op_count also
+     * counts the operand itself, so compare with 3, not 2.
+     */
+    if (instr->opinfo->op_count > 3)
+        reduce_strength(yyscanner, newop, second_op_index);
 
-    switch (CURRENT_INSTRUCTION(lexer)->opcode) {
+    /* get the arguments 1 and 2. */
+    get_operands(lexer, BIT(0) | BIT(1), &arg1, &arg2);
+
+
+    /*
+    fprintf(stderr, "arg1: %d\n", arg1->expr.c->val.ival);
+    fprintf(stderr, "arg2: %d\n", arg2->expr.c->val.ival);
+    */
+
+    switch (instr->opcode) {
         case PARROT_OP_add_i_ic:
             if (check_value(arg2->expr.c, 1)) {
-                CURRENT_INSTRUCTION(lexer)->opcode = PARROT_OP_inc_i;
-                arg1->next = arg2->next;
+                update_op(lexer, instr, PARROT_OP_inc_i);
+                if (second_op_index == 2)
+                    arg1->next = arg1;
+                else
+                    arg1->next = arg2->next;
             }
             else if (check_value(arg2->expr.c, 0)) {
-                CURRENT_INSTRUCTION(lexer)->opcode = PARROT_OP_noop;
-
+                instr->opcode = PARROT_OP_noop; /* clear this one */
             }
+            break;
         case PARROT_OP_add_n_nc:
-
-
+            if (check_value(arg2->expr.c, 1)) {
+                update_op(lexer, instr, PARROT_OP_inc_n);
+                arg1->next = arg2->next;
+            }
+            else if (check_value(arg2->expr.c, 0))
+                update_op(lexer, instr, PARROT_OP_noop); /* clear this one */
+            break;
         case PARROT_OP_div_i_ic:
         case PARROT_OP_div_n_nc:
-
-        case PARROT_OP_mul_i_ic:
-        case PARROT_OP_mul_n_nc:
-
         case PARROT_OP_fdiv_i_ic:
         case PARROT_OP_fdiv_n_nc:
+            if (check_value(arg2->expr.c, 1))  /* div $I0, 1 --> noop */
+                update_op(lexer, instr, PARROT_OP_noop);
+            else if (check_value(arg2->expr.c, 0))  /* div $I0, 0 --> error */
+                yyerror(yyscanner, lexer, "cannot divide by 0");
+            break;
+        case PARROT_OP_mul_i_ic:
+            if (check_value(arg2->expr.c, 1))  /* mul $I0, 1 --> noop */
+                update_op(lexer, instr, PARROT_OP_noop);
+            else if (check_value(arg2->expr.c, 0)) { /* mul $I0, 0 --> null $I0 */
+                update_op(lexer, instr, PARROT_OP_null_i);
+                arg1->next = arg2->next;
+            }
+            break;
+        case PARROT_OP_mul_n_nc:
+            if (check_value(arg2->expr.c, 1)) { /* mul $I0, 1 --> noop */
+                update_op(lexer, instr, PARROT_OP_noop);
+            }
+            else if (check_value(arg2->expr.c, 0)) { /* mul $I0, 0 --> null $I0 */
+                update_op(lexer, instr, PARROT_OP_null_n);
+            }
+            break;
 
         case PARROT_OP_sub_i_ic:
+            if (check_value(arg2->expr.c, 1)) { /* sub $I0, 1 --> dec $I0 */
+                update_op(lexer, instr, PARROT_OP_dec_i);
+            }
+            else if (check_value(arg2->expr.c, 0)) { /* sub $I0, 0 --> noop */
+                update_op(lexer, instr, PARROT_OP_noop);
+            }
+            break;
         case PARROT_OP_sub_n_nc:
-
+            if (check_value(arg2->expr.c, 1)) { /* sub $N0, 1 --> dec $N0 */
+                update_op(lexer, instr, PARROT_OP_dec_n);
+                arg1->next = arg2->next;
+            }
+            else if (check_value(arg2->expr.c, 0))  /* sub $I0, 0 --> noop */
+                update_op(lexer, instr, PARROT_OP_noop);
+            break;
         default:
             return;
     }
@@ -2661,89 +2743,6 @@ do_strength_reduction(yyscan_t yyscanner) {
     }
 
     */
-
-    /* clean up the rest of this function */
-    num_operands = get_operand_count(lexer);
-
-
-    /* try to convert a OP X, Y, Z into OP X, Z, iff X == Z */
-    if (num_operands > 2) {
-        /* get the operands */
-        expression *op1, *op2;
-        get_operands(lexer, 2, &op1, &op2);
-
-        /* check whether operands are in fact targets */
-        if ((op1->type == EXPR_TARGET) && (op2->type == EXPR_TARGET)) {
-
-            /* check whether targets are equal */
-            if (targets_equal(op1->expr.t, op2->expr.t)) {
-                /* in that case, remove the second one */
-                op1->next = op2->next;
-                --num_operands;
-            }
-        }
-    }
-
-    /* don't even try to change "add $I0, 1" into "inc $I0" if number of operands is not 2 */
-    if (num_operands != 2) {
-        /*
-        fprintf(stderr, "num_operands != 2\n");
-        */
-        return;
-    }
-
-    /*
-    fprintf(stderr, "num_operands == 2\n");
-    */
-
-    get_operands(lexer, 2, &arg1, &arg2);
-    PARROT_ASSERT(arg1);
-    PARROT_ASSERT(arg2);
-
-    /* XXX TODO: remove a lot of this code; we know the correct signature, so we know exactly
-     * what's in each operand; including if it's a constant. If it is, do our little trick.
-     */
-    switch (op) {
-        case OP_ADD:
-        case OP_SUB:
-            if (arg2->type == EXPR_CONSTANT) {
-                if (check_value(arg2->expr.c, 0)) { /* add $I0, 0  --> <delete> */
-                    update_instr(lexer, "noop");
-                    remove_all_operands(lexer);
-                }
-                else if (check_value(arg2->expr.c, 1)) { /* add $I0, 1 --> inc $I0 */
-                    update_instr(lexer, opnames[op + 1]);
-                    arg1->next = arg2->next;
-                }
-            }
-            break;
-        case OP_MUL:
-            if (arg2->type == EXPR_CONSTANT) {
-                if (check_value(arg2->expr.c, 0)) {  /* mul $I0, 0 --> null $I0 */
-                    update_instr(lexer, "null");
-
-                    arg1->next = arg2->next;
-                }
-                else if (check_value(arg2->expr.c, 1)) { /* mul $I0, 1 --> <delete> */
-                    update_instr(lexer, "noop");
-                    remove_all_operands(lexer);
-                }
-            }
-            break;
-        case OP_DIV:
-        case OP_FDIV:
-            if (arg2->type == EXPR_CONSTANT) {
-                if (check_value(arg2->expr.c, 0)) /* div $I0, 0 --> error */
-                    pirerror(lexer, "cannot divide by 0");
-                else if (check_value(arg2->expr.c, 1)) { /* div $I0, 1 --> <delete> */
-                    update_instr(lexer, "noop");
-                    remove_all_operands(lexer);
-                }
-            }
-            break;
-        default:
-            break;
-    }
 }
 
 /*
@@ -2808,10 +2807,16 @@ get_opinfo(yyscan_t yyscanner) {
 
     instruction * const instr = CURRENT_INSTRUCTION(lexer);
 
-    char * const fullopname   = get_signatured_opname(lexer, instr);
+    char * fullopname   = get_signatured_opname(lexer, instr);
+    int opcode;
+
+    /*
+    if (STREQ(fullopname, "add_i_ic_ic"))
+        fullopname = "set_i_ic";
+    */
 
     /* find the numeric opcode for the signatured op. */
-    int opcode = lexer->interp->op_lib->op_code(fullopname, 1);
+    opcode = lexer->interp->op_lib->op_code(fullopname, 1);
 
     /* if the op does not exist, emit an error message */
     if (opcode < 0) {
@@ -2820,9 +2825,12 @@ get_opinfo(yyscan_t yyscanner) {
     }
 
     /* store the opinfo, signatured opnmae and opcde in the current instruction */
+    /*
     instr->opinfo = &lexer->interp->op_info_table[opcode];
     instr->opname = fullopname;
     instr->opcode = opcode;
+    */
+    update_op(lexer, instr, opcode);
 
     return TRUE;
 
@@ -2863,7 +2871,7 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
     /* iterate over all operands to set the type and PASM register on all target nodes, if any */
     num_operands = get_operand_count(lexer);
     for (i = 0; i < num_operands; i++) {
-        expression *operand = get_operand(lexer, i + 1);
+        expression *operand = get_operand(lexer, i + 1); /* get_operand counts from 1 */
         if (operand->type == EXPR_TARGET) { /* if it is a target... */
 
             if (!TEST_FLAG(operand->expr.t->flags, TARGET_FLAG_IS_REG)) { /* not a register */
@@ -2883,9 +2891,9 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
 
                             /* set a bit in the bitmask indicating it is assumed to be a label;
                              * this prevents us doing a symbol lookup in the second loop; a
-                             * bitmask is faster. Note that i starts at 0, hence the "+ 1".
+                             * bitmask is faster.
                              */
-                            SET_BIT(label_bitmask, BIT(i + 1));
+                            SET_BIT(label_bitmask, BIT(i));
                         }
                     }
                 }
@@ -2910,7 +2918,7 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
     PARROT_ASSERT(opcount >= 0);
 
     for (i = 0; i < opcount; i++) {
-        expression *operand = get_operand(lexer, i + 1);
+        expression *operand = get_operand(lexer, i + 1); /* get_operand starts counting at 1 */
 
         PARROT_ASSERT(operand);
 
@@ -2919,7 +2927,7 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
               * through opinfo that it's not supposed to be a label at this position, so emit
               * an error.
               */
-             if (TEST_BIT(label_bitmask, BIT(i + 1))) {
+             if (TEST_BIT(label_bitmask, BIT(i))) {
                  PARROT_ASSERT(operand->type == EXPR_IDENT);
                  yyerror(yyscanner, lexer, "symbol '%s' is not declared", operand->expr.id);
                  return FALSE;

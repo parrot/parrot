@@ -396,7 +396,7 @@ void set_instrf(struct lexer_state * const lxr, char * const op, char const * co
 void unshift_operand(struct lexer_state * const lexer, expression * const operand);
 void push_operand(struct lexer_state * const lexer, expression * const operand);
 
-void get_operands(struct lexer_state * const lexer, unsigned n, ...);
+void get_operands(struct lexer_state * const lexer, int bitmask, ...);
 expression *get_operand(struct lexer_state * const lexer, short n);
 
 unsigned get_operand_count(struct lexer_state * const lexer);

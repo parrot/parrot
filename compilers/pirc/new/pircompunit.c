@@ -982,6 +982,8 @@ circular linked list, it is impossible to "run out"; for instance, if
 there are 4 operands, and you request the 5th, then it will return
 5 % 4 = the first operand.
 
+Counting operands is done from 1 (not 0).
+
 =cut
 
 */
@@ -1009,41 +1011,58 @@ get_operand(struct lexer_state * const lexer, short n) {
     return operand;
 }
 
+
 /*
 
 =item C<void
-get_operands(struct lexer_state * const lexer, unsigned n, ...)>
+get_operands(lexer_state * const lexer, int bitmask, ...)>
 
-Get the first C<n> operands of the current instruction. Retrieval
-is done by reference (pointers) through I<out> parameters.
+Get operands from the current instruction. C<bitmask> indicates which operands
+are requested; if the C<i>th bit is set, the C<i>th operand is returned in a
+vararg.
+
+There must be as many varargs, as there are bits set in C<bitmask>.
 
 =cut
 
 */
 void
-get_operands(struct lexer_state * const lexer, unsigned n, ...) {
-    unsigned    i;
-    va_list     arg_ptr;
-    expression *iter = CURRENT_INSTRUCTION(lexer)->operands;
+get_operands(lexer_state * const lexer, int bitmask, ...) {
+    instruction *instr = CURRENT_INSTRUCTION(lexer);
+    int numargs        = instr->opinfo->op_count;
+    expression *iter   = instr->operands;
+    int i;
+    va_list arg_ptr;
 
-    /* make sure there are operands */
-    if (iter == NULL)
-        return;
 
-    /* set the iterator to the first one operand */
-    iter = CURRENT_INSTRUCTION(lexer)->operands->next;
+    PARROT_ASSERT(iter);
+    iter = iter->next;
 
-    va_start(arg_ptr, n);
+    /*
+    printf("bitmask: %d\n", bitmask);
+    */
+    va_start(arg_ptr, bitmask);
 
-    for (i = 0; i < n; i++) {
-        /* get the pointer to the passed in pointer */
-        expression **eptr = va_arg(arg_ptr, expression **);
-        /* set operand to the passed in pointer */
-        *eptr = iter;
-        /* go to the next operand */
+    for (i = 0; i < BIT(numargs - 1); i++) {
+        /* if this argument was requested, store it in the vararg OUT parameters. */
+        if (TEST_BIT(bitmask, BIT(i))) {
+
+            expression **arg = va_arg(arg_ptr, expression **);
+            *arg = iter;
+        }
+        /*
+        fprintf(stderr, "iter->val = %d\n",  iter->expr.c->val.ival);
+        */
+
         iter = iter->next;
     }
+
     va_end(arg_ptr);
+    /*
+    puts("");
+    fprintf(stderr, "ptrs[i]->expr.c->val.ival = %d\n", 0, ptrs[0]->expr.c->val.ival);
+    fprintf(stderr, "ptrs[i]->expr.c->val.ival = %d\n", 1, ptrs[1]->expr.c->val.ival);
+    */
 }
 
 /*
