@@ -19,7 +19,7 @@ use lib "$FindBin::Bin/../../lib";
 
 use Parrot::Config (); 
 use Parrot::Test;
-use Test::More     tests => 13;
+use Test::More     tests => 14;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'if, one statement in block' );
 <?php
@@ -200,6 +200,27 @@ language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'classic for-loop' );
 
 $count = 0;
 for ( $count = 0; $count < 10; $count++ ) { echo "round $count\n"; }
+CODE
+round 0
+round 1
+round 2
+round 3
+round 4
+round 5
+round 6
+round 7
+round 8
+round 9
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'for-loop with HTML-block' );
+<?php
+
+$count = 0;
+for ( $count = 0; $count < 10; $count++ ) { ?>round <?php echo $count
+?>
+
+<?php } ?>
 CODE
 round 0
 round 1
