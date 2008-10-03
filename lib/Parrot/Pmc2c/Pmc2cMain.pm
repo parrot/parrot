@@ -3,7 +3,7 @@
 package Parrot::Pmc2c::Pmc2cMain;
 use strict;
 use warnings;
-use Storable ();
+use Storable 2.13;
 use Parrot::PMC ();
 use Parrot::Pmc2c::VTable ();
 use Parrot::Pmc2c::Dumper;
