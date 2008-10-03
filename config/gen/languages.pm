@@ -76,7 +76,7 @@ sub runstep {
         }
         elsif ( $language eq 'c99' ) {
             $conf->genfile("$langdir/config/makefiles/root.in"     => "$langdir/Makefile");
-            $conf->genfile("$langdir/config/makefiles/cpp.in"      => "$langdir/src/cpp//Makefile");
+            $conf->genfile("$langdir/config/makefiles/cpp.in"      => "$langdir/src/cpp/Makefile");
         }
         elsif ( $language eq 'tcl' ) {
             # tcl has more than one Makefile
