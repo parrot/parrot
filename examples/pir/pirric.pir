@@ -1597,7 +1597,7 @@ fail:
     controlvar = getattribute for, 'controlvar'
     increment = getattribute for, 'increment'
     limit = getattribute for, 'limit'
-    controlvar = controlvar + increment
+    add controlvar, increment
     gt controlvar, limit, endloop
     .local pmc jumpline
     jumpline = getattribute for, 'jumpline'
