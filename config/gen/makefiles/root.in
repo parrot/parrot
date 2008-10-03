@@ -1870,6 +1870,7 @@ bsdlint : $(PARROT)
 	rm -f *.ln
 	$(LINT) $(CC_INC) "-Isrc/pmc" $(BSD_LINT_FLAGS) $(BSD_LINT_EXCLUSIONS) $(LINTABLE_CFILES)
 
+# For checking with splint see also http://www.perlfoundation.org/parrot/index.cgi?splint
 # Splint: http://splint.org
 SPLINT = splint
 
