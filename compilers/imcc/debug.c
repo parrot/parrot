@@ -31,7 +31,8 @@ handle info/error/warning messages from imcc
 
 =item C<void IMCC_fatal>
 
-RT#48260: Not yet documented!!!
+Prints out a fatal error message from IMCC and throws an
+IMCC_FATAL_EXCEPTION.
 
 =cut
 
@@ -54,7 +55,7 @@ IMCC_fatal(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
 
 =item C<void IMCC_fataly>
 
-RT#48260: Not yet documented!!!
+Throws an IMCC_FATALY_EXCEPTION.
 
 =cut
 
@@ -77,7 +78,8 @@ IMCC_fataly(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
 
 =item C<void IMCC_fatal_standalone>
 
-RT#48260: Not yet documented!!!
+Prints an error message from IMCC and exits Parrot. This is not a
+recoverable exception but a forced exit.
 
 =cut
 
@@ -100,7 +102,8 @@ IMCC_fatal_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
 
 =item C<void IMCC_fataly_standalone>
 
-RT#48260: Not yet documented!!!
+Prints an error message and exits Parrot. This is not a recoverable
+error.
 
 =cut
 
@@ -126,7 +129,8 @@ IMCC_fataly_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
 
 =item C<void IMCC_warning>
 
-RT#48260: Not yet documented!!!
+Prints a warning message, but does not throw an exception and does not
+cause Parrot to exit.
 
 =cut
 
@@ -149,7 +153,8 @@ IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...)
 
 =item C<void IMCC_info>
 
-RT#48260: Not yet documented!!!
+Prints some information, if the level of the information is higher
+then IMCC's verbose mode.
 
 =cut
 
@@ -173,7 +178,7 @@ IMCC_info(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
 
 =item C<void IMCC_debug>
 
-RT#48260: Not yet documented!!!
+Prints a debug message, if IMCC's debug mode is turned on.
 
 =cut
 
@@ -196,7 +201,7 @@ IMCC_debug(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
 
 =item C<void dump_instructions>
 
-RT#48260: Not yet documented!!!
+Dumps the current instruction status of IMCC
 
 =cut
 
@@ -236,7 +241,7 @@ dump_instructions(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 
 =item C<void dump_cfg>
 
-RT#48260: Not yet documented!!!
+Dumps the current IMCC config data.
 
 =cut
 
@@ -275,7 +280,7 @@ dump_cfg(ARGIN(const IMC_Unit *unit))
 
 =item C<void dump_loops>
 
-RT#48260: Not yet documented!!!
+Dumps the current loops in the IMC_Unit C<unit>.
 
 =cut
 
@@ -321,7 +326,7 @@ dump_loops(ARGIN(const IMC_Unit *unit))
 
 =item C<void dump_labels>
 
-RT#48260: Not yet documented!!!
+Dumps the list of labels in IMC_Unit C<unit>.
 
 =cut
 
@@ -354,7 +359,7 @@ dump_labels(ARGIN(const IMC_Unit *unit))
 
 =item C<void dump_symreg>
 
-RT#48260: Not yet documented!!!
+Dumps a list of the symbolic registers in IMC_Unit C<unit>
 
 =cut
 
@@ -399,7 +404,8 @@ dump_symreg(ARGIN(const IMC_Unit *unit))
 
 =item C<void dump_liveness_status>
 
-RT#48260: Not yet documented!!!
+Dumps the list of registers in the current IMC_Unit that need to be
+allocated.
 
 =cut
 
@@ -426,7 +432,7 @@ dump_liveness_status(ARGIN(const IMC_Unit *unit))
 
 =item C<void dump_liveness_status_var>
 
-RT#48260: Not yet documented!!!
+Dumps the state of SymReg C<r> in IMC_Unit C<unit>.
 
 =cut
 
@@ -474,7 +480,7 @@ dump_liveness_status_var(ARGIN(const IMC_Unit *unit), ARGIN(const SymReg* r))
 
 =item C<void dump_interference_graph>
 
-RT#48260: Not yet documented!!!
+Dumps the interference graph for the current IMC_Unit C<unit>
 
 =cut
 
@@ -513,7 +519,7 @@ dump_interference_graph(ARGIN(const IMC_Unit *unit))
 
 =item C<void dump_dominators>
 
-RT#48260: Not yet documented!!!
+Dumps the current list of dominators for the current IMC_Unit C<unit>.
 
 =cut
 
@@ -546,7 +552,8 @@ dump_dominators(ARGIN(const IMC_Unit *unit))
 
 =item C<void dump_dominance_frontiers>
 
-RT#48260: Not yet documented!!!
+
+Dumps the list of dominance frontiers for the current IMC_Unit C<unit>.
 
 =cut
 
