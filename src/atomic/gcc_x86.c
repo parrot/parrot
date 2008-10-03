@@ -36,7 +36,9 @@ assembly suppport.
 
 =item C<void * parrot_i386_cmpxchg>
 
-RT#48260: Not yet documented!!!
+The CMPXCHG assembly instruction is a single cycle x86 instruction
+that compares C<expect> and C<update>. If they are equal, sets
+C<expect> to C<update>. Otherwise sets C<update> to C<ptr>.
 
 =cut
 
@@ -67,7 +69,10 @@ parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
 
 =item C<long parrot_i386_xadd>
 
-RT#48260: Not yet documented!!!
+C<xadd> is an x86 instruction that performs the following operation:
+Temporary = C<result>;
+C<result> = C<result> + C<l>;
+C<l> = C<result>;
 
 =cut
 
