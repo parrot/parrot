@@ -42,6 +42,7 @@
 
 #-----------------------------------------------------------------------
 .sub init :load :init
+
     .local pmc func
     func = get_global ['Tokenizer'], 'newTokenizer'
     set_global 'newTokenizer', func
@@ -65,28 +66,6 @@
     addattribute runnerclass, 'vars'
     addattribute runnerclass, 'stack'
     addattribute runnerclass, 'tron'
-
-    .local pmc endclass
-    endclass = newclass ['End']
-
-    .local pmc jumpclass
-    jumpclass = newclass ['Jump']
-    addattribute jumpclass, 'jumptype'
-    addattribute jumpclass, 'jumpline'
-
-    .local pmc stopclass
-    stopclass = newclass ['Stop']
-
-    .local pmc contclass
-    stopclass = newclass ['Cont']
-    addattribute stopclass, 'jumptype'
-
-    .local pmc forclass
-    forclass = newclass ['For']
-    addattribute forclass, 'jumpline'
-    addattribute forclass, 'controlvar'
-    addattribute forclass, 'increment'
-    addattribute forclass, 'limit'
 
     $P0 = get_class 'String'
     cl = newclass 'Literal'
@@ -140,6 +119,39 @@
     setpredef(predefs, "SQR", "sqr")
     set_global 'predefs', predefs
 
+# Create classes for control flow exceptions
+
+    .local pmc pircontrol
+    pircontrol = newclass ['pircontrol']
+
+    .local pmc basejump
+    basejump = subclass pircontrol, ['basejump']
+    addattribute basejump, 'jumpline'
+
+    .local pmc endclass
+    endclass = subclass pircontrol, ['End']
+
+    .local pmc returnclass
+    returnclass = subclass pircontrol, ['Return']
+
+    .local pmc nextclass
+    nextclass = subclass basejump, ['Next']
+
+    .local pmc jumpclass
+    jumpclass = subclass basejump, ['Jump']
+    addattribute jumpclass, 'jumptype'
+
+    .local pmc stopclass
+    stopclass = subclass pircontrol, ['Stop']
+
+    .local pmc contclass
+    stopclass = subclass pircontrol,['Cont']
+
+    .local pmc forclass
+    forclass = subclass basejump, ['For']
+    addattribute forclass, 'controlvar'
+    addattribute forclass, 'increment'
+    addattribute forclass, 'limit'
 .end
 
 #-----------------------------------------------------------------------
@@ -148,8 +160,6 @@
 
     .local pmc program
     program = new ['Program']
-
-    set_global 'program', program
 
     .local pmc runner
     runner = new ['Runner']
@@ -1031,30 +1041,56 @@ dogreat:
 .end
 
 #-----------------------------------------------------------------------
+.sub findline :method
+    .param int linenum
+
+    .local pmc program
+    program = getattribute self, 'program'
+    .local pmc iter
+    iter = program.begin()
+
+    .local int fline
+nextline:
+    unless iter goto noline
+    shift fline, iter
+    gt fline, linenum, noline
+    lt fline, linenum, nextline
+    .return(iter)
+noline:
+    null iter
+    .return(iter)
+.end
+
+#-----------------------------------------------------------------------
 .sub runloop :method
     .param int start :optional
 
     .local pmc program
+    .local pmc stack
     .local pmc iter
     .local pmc tron
-    .local string curline
+    .local pmc pircontrol
+    .local int stopline
+    .local int curline
     .local pmc pcurline
     .local int target
-    .local int stopline
 
-    stopline = 0
-    pcurline = new 'String'
-    setattribute self, 'curline', pcurline
+    pircontrol = get_class ['pircontrol']
 
-#    program = get_global 'program'
     program = getattribute self, 'program'
+    stack = getattribute self, 'stack'
+
     tron = getattribute self, 'tron'
+    stopline = 0
+
+    pcurline = new 'Integer'
+    setattribute self, 'curline', pcurline
 
     iter = program.begin()
 
     push_eh handle_excep
 
-    null curline
+    curline = 0
 
     unless start goto next
     shift curline, iter
@@ -1072,6 +1108,7 @@ runit:
     print ']'
 
 executeline:
+    program = getattribute self, 'program'
     $S1 = program [curline]
 
     .local pmc tokenizer
@@ -1081,32 +1118,40 @@ executeline:
     shift curline, iter
     goto next
 endprog:
-    null curline
+    curline = 0
     goto next
 
 handle_excep:
     .local pmc excep, type, severity
-    .local int itype, iseverity
+    .local int itype
     .get_results(excep)
 
     type = getattribute excep, 'type'
     itype = type
     severity = getattribute excep, 'severity'
-    iseverity = severity
-    eq iseverity, .EXCEPT_EXIT, finish
-handle_it:
+    eq severity, .EXCEPT_EXIT, finish
+
+    eq itype, .CONTROL_RETURN, handle_return
+
     $P1 = getattribute excep, 'payload'
     $I1 = defined $P1
     unless $I1 goto unhandled
+    $I1 = isa $P1, pircontrol
+    unless $I1 goto unhandled
+
     $I1 = isa $P1, 'Jump'
     if $I1 goto handle_jump
+    $I1 = isa $P1, 'Next'
+    if $I1 goto handle_next
+    $I1 = isa $P1, 'Return'
+    if $I1 goto handle_return
     $I1 = isa $P1, 'Stop'
     if $I1 goto handle_stop
     $I1 = isa $P1, 'Cont'
     if $I1 goto handle_cont
     $I1 = isa $P1, 'End'
     if $I1 goto prog_end
-    goto unhandled
+    FatalError('Unhandled control type')
 
 handle_stop:
     print 'Stopped'
@@ -1116,15 +1161,17 @@ handle_stop:
 end_stop:
     say ''
     stopline = curline
-    null curline
+    curline = 0
     push_eh handle_excep
     goto next
 
 handle_cont:
     unless stopline goto cannot_cont
-    target = stopline
-    curline = ''
-    goto do_jump
+    iter = self.findline(stopline)
+    shift curline, iter
+    stopline = 0
+    push_eh handle_excep
+    goto next
 cannot_cont:
     print 'Cannot CONTinue'
     goto linenum_msg
@@ -1132,65 +1179,69 @@ cannot_cont:
 handle_jump:
     $P2 = getattribute $P1, 'jumpline'
     $I1 = $P2
+    eq $I1, 0, prog_end
     eq $I1, -1, prog_end
 
     $S2 = curline
     target = $P2
 
 do_jump:
-    iter = program.begin()
+    iter = self.findline(target)
+    if_null iter, noline
+    curline = target
 
-    .local string fline
-findline:
-    unless iter, noline
-    shift fline, iter
-    eq target, 0, handled_done
-    $I0 = fline
-    gt $I0, target, noline
-    lt $I0, target, findline
-
-handled_done:
-    curline = fline
     $P3 = getattribute $P1, 'jumptype'
     $I1 = defined $P3
     unless $I1 goto handled_jump
     eq $P3, 1, handle_gosub
-    eq $P3, 2, handle_return
     goto handled_jump
 
 handle_gosub:
-    .local pmc stack
-    stack = getattribute self, 'stack'
     push stack, $S2
     goto handled_jump
 
-handle_return:
-    shift curline, iter
+handle_next:
+    $P2 = getattribute $P1, 'jumpline'
+    $I1 = $P2
+    iter = self.findline($I1)
+    curline = shift iter
 
 handled_jump:
     push_eh handle_excep
     goto runit
-noline:
-    print 'Line does not exist'
-linenum_msg:
-    unless curline goto endmsg
-    print ' in '
-    print curline
-endmsg:
-    say ''
-    null curline
+
+handle_return:
+    .local pmc stack
+    stack = getattribute self, 'stack'
+    $P0 = pop stack
+    curline = $P0
+    iter = self.findline(curline)
+    curline = shift iter
+    #say curline
     push_eh handle_excep
     goto next
 
 prog_end:
-    null curline
+    curline = 0
+    null iter
     push_eh handle_excep
     goto next
 
 unhandled:
     $P1 = getattribute excep, 'message'
     say $P1
-    null curline
+    goto linenum_msg
+
+noline:
+    print 'Line does not exist'
+
+linenum_msg:
+    unless curline goto endmsg
+    print ' in '
+    print curline
+endmsg:
+    say ''
+    curline = 0
     push_eh handle_excep
     goto next
 
@@ -1201,39 +1252,37 @@ finish:
 .sub interactive :method
     .local pmc stdin
     stdin = getstdin
-
+    .local pmc program
+    program = getattribute self, "program"
     .local string line
-reinit:
+
     say 'Ready'
+reinit:
     line = readlinebas(stdin)
 
     .local pmc tokenizer
-    .local pmc ptoken
+    .local pmc token
 
     tokenizer = newTokenizer(line)
-    ptoken = tokenizer.get()
-    $I0 = isa ptoken, 'Integer'
-    if $I0 goto storeit
+    token = tokenizer.get()
+    $I0 = isa token, 'Integer'
+    unless $I0 goto execute
 
-    self.execute(tokenizer, ptoken)
-
-    goto done
-
-storeit:
-    .local pmc program
-    program = getattribute self, "program"
-    $I0 = ptoken
+# Have line number: if has content store it, else delete
+    $I0 = token
     line = tokenizer.getall()
     $I1 = length line
     unless $I1 goto deleteit
 
     program.storeline($I0, line)
-    goto done
+    goto reinit
 
 deleteit:
     program.deleteline($I0)
+    goto reinit
 
-done:
+execute:
+    self.execute(tokenizer, token)
 .end
 
 #-----------------------------------------------------------------------
@@ -1272,19 +1321,11 @@ assign:
     .local pmc value
     value = self.evaluate(tokenizer)
 
-#    $P3 = get_global $S0
-#    $I0 = defined $P3
-#    if $I0 goto set_it
-
-    #set_hll_global $S0, value
     .local pmc vars
     vars = getattribute self, 'vars'
     vars[$S0] = value
 
     goto next
-#set_it:
-#    assign $P3, value
-#    goto next
 
 fail:
     SyntaxError()
@@ -1294,7 +1335,7 @@ next:
 .end
 
 #-----------------------------------------------------------------------
-.sub throw_jump
+.sub throw_typed
     .param pmc payload
     .param int type :optional
     .param int has_type :opt_flag
@@ -1315,15 +1356,24 @@ setattrs:
 .end
 
 #-----------------------------------------------------------------------
+.sub throw_jump
+    .param pmc payload
+    .param int jumpline
+
+    $P0 = new 'Integer'
+    $P0 = jumpline
+    setattribute payload, 'jumpline', $P0
+
+    throw_typed(payload)
+.end
+
+#-----------------------------------------------------------------------
 .sub func_CONT :method
     .param pmc tokenizer
 
     .local pmc cont
     cont = new 'Cont'
-    $P0 = new 'Integer'
-    $P0 = 2
-    setattribute cont, 'jumptype', $P0
-    throw_jump(cont)
+    throw_typed(cont)
 .end
 
 .sub func_END :method
@@ -1331,7 +1381,7 @@ setattrs:
 
     .local pmc end
     end = new 'End'
-    throw_jump(end)
+    throw_typed(end)
 .end
 
 .sub func_EXIT :method
@@ -1397,10 +1447,7 @@ fail:
 
     .local pmc line
     line = new 'Jump'
-    $P0 = new 'Integer'
-    $P0 = $I0
-    setattribute line, 'jumpline', $P0
-    throw_jump(line)
+    throw_jump(line, $I0)
 
 fail:
     SyntaxError()
@@ -1417,13 +1464,10 @@ fail:
 
     .local pmc line
     line = new 'Jump'
-    $P0 = new 'Integer'
-    $P0 = $I0
-    setattribute line, 'jumpline', $P0
     $P1 = new 'Integer'
     $P1 = 1
     setattribute line, 'jumptype', $P1
-    throw_jump(line)
+    throw_jump(line, $I0)
 
 fail:
     SyntaxError()
@@ -1525,7 +1569,7 @@ finish:
     load_bytecode $S1
     .return()
 notype:
-    .local pmc newprogram
+    .local pmc program, newprogram
     newprogram = new ['Program']
     .local string filename
     filename = arg
@@ -1534,7 +1578,7 @@ notype:
 
     .local pmc end
     end = new 'End'
-    throw_jump(end)
+    throw_typed(end)
 
 fail:
     SyntaxError()
@@ -1559,14 +1603,8 @@ fail:
     jumpline = getattribute for, 'jumpline'
 
     .local pmc line
-    line = new 'Jump'
-    $P0 = new 'Integer'
-    $P0 = jumpline
-    setattribute line, 'jumpline', $P0
-    $P1 = new 'Integer'
-    $P1 = 2
-    setattribute line, 'jumptype', $P1
-    throw_jump(line)
+    line = new 'Next'
+    throw_jump(line,jumpline)
 
     .return()
 endloop:
@@ -1627,17 +1665,9 @@ finish:
 .sub func_RETURN :method
     .param pmc tokenizer
 
-    .local pmc stack
-    stack = getattribute self, 'stack'
-    $P0 = pop stack
-
     .local pmc line
-    line = new 'Jump'
-    $P1 = new 'Integer'
-    $P1 = 2
-    setattribute line, 'jumpline', $P0
-    setattribute line, 'jumptype', $P1
-    throw_jump(line, .CONTROL_RETURN)
+    line = new 'Return'
+    throw_typed(line, .CONTROL_RETURN)
 
 fail:
     SyntaxError()
@@ -1646,12 +1676,17 @@ fail:
 .sub func_RUN :method
     .param pmc tokenizer
 
+    .local pmc program, iter
+    program = getattribute self, 'program'
+    iter = program.begin()
+    .local int numline
+    numline = 0
+    unless iter goto doit
+    numline = shift iter
+doit:
     .local pmc line
     line = new 'Jump'
-    $P0 = new 'Integer'
-    $P0 = 0
-    setattribute line, 'jumpline', $P0
-    throw_jump(line)
+    throw_jump(line, numline)
 .end
 
 .sub func_SAVE :method
@@ -1680,7 +1715,7 @@ fail:
 
     .local pmc line
     line = new 'Stop'
-    throw_jump(line)
+    throw_typed(line)
 .end
 
 .sub func_TROFF :method
@@ -2020,7 +2055,8 @@ notexist:
     .local int linenum
     .local int linecount
 
-    say filename
+    #say filename
+
     open file, filename, '<'
 
     linecount = 0
