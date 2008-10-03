@@ -129,7 +129,9 @@ static int w_special[1+4*3];
 
 =item C<void imcc_init_tables>
 
-RT#48260: Not yet documented!!!
+Initializes IMCC's table of opcodes, based on the list maintained
+by the Parrot interpreter. Stores the results in global variable
+C<w_special>.
 
 =cut
 
@@ -257,7 +259,8 @@ instruction_reads(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
 
 =item C<int instruction_writes>
 
-RT#48260: Not yet documented!!!
+Determines whether the instruction C<ins> writes to the SymReg C<r>.
+Returns 1 if it does, 0 if not.
 
 =cut
 
@@ -296,7 +299,7 @@ instruction_writes(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
         ins = ins->prev;
         /* can't used pcc_sub->ret due to bug #38406
          * it seems that all sub SymRegs are shared
-         * and point to the most recemt pcc_sub
+         * and point to the most recent pcc_sub
          * structure
          */
         while (ins && ins->opnum != PARROT_OP_get_results_pc)
@@ -445,7 +448,8 @@ delete_ins(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins))
 
 =item C<void insert_ins>
 
-insert tmp after ins
+Insert Instruction C<tmp> in the execution flow after Instruction
+C<ins>.
 
 =cut
 
@@ -490,7 +494,8 @@ insert_ins(ARGMOD(IMC_Unit *unit), ARGMOD_NULLOK(Instruction *ins),
 
 =item C<void prepend_ins>
 
-insert tmp before ins
+Insert Instruction C<tmp> into the execution flow before
+Instruction C<ins>.
 
 =cut
 
@@ -527,7 +532,8 @@ prepend_ins(ARGMOD(IMC_Unit *unit), ARGMOD_NULLOK(Instruction *ins),
 
 =item C<void subst_ins>
 
-Substitute tmp for ins. Free ins if needs_freeing is true.
+Substitute Instruction C<tmp> for Instruction C<ins>.
+Free C<ins> if C<needs_freeing> is true.
 
 =cut
 
@@ -760,7 +766,7 @@ static char *output;
 
 =item C<static int e_file_open>
 
-RT#48260: Not yet documented!!!
+Prints a me
 
 =cut
 
@@ -830,7 +836,8 @@ e_file_emit(PARROT_INTERP,
 
 =item C<int emit_open>
 
-RT#48260: Not yet documented!!!
+Opens the emitter function C<open> of the given C<type>. Passes
+the C<param> to the open function.
 
 =cut
 
@@ -851,7 +858,8 @@ emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(void *param))
 
 =item C<int emit_flush>
 
-RT#48260: Not yet documented!!!
+Flushes the emitter by emitting all the instructions in the current
+IMC_Unit C<unit>.
 
 =cut
 
@@ -881,7 +889,7 @@ emit_flush(PARROT_INTERP, ARGIN_NULLOK(void *param), ARGIN(IMC_Unit *unit))
 
 =item C<int emit_close>
 
-RT#48260: Not yet documented!!!
+Closes the given emitter.
 
 =cut
 
