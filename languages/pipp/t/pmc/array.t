@@ -21,7 +21,7 @@ Tests the PhpArray PMC.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(18)
+    plan(25)
 
     basic_get_set()
     stack_and_queue_ops()
@@ -29,7 +29,8 @@ Tests the PhpArray PMC.
     int_string_conversions()
     autovivification_tests()
     exists_delete_tests()
-    #generic_iterator_tests()
+    generic_iterator_tests_string_key()
+    generic_iterator_tests_pmc_key()
     #php_iterator_tests()
     #php_array_func_tests()
     #cmp_shallow_native()
@@ -41,7 +42,7 @@ Tests the PhpArray PMC.
     #assign_pmc_deep_native()
     #add_pmc_shallow_native()
     #get_repr_deep()
-    #vanilla_freeze_thaw()
+    vanilla_freeze_thaw()
     #goofy_freeze_thaw()
 .end
 
@@ -257,16 +258,41 @@ ii_end:
 
 
 .sub autovivification_tests
-    .local pmc p
-    .local int i, is_ok
-    .local string s
+    .local pmc p_av, p
+    .local int i_av, i, is_ok
+    .local string s, s_av
+    .local num n_av
 
     p = new 'PhpArray'
 
     p["one";2;3;"four";"five";6;7] = "magic"
-    s = p["one";2;3;"four";"five";6;7]
-    is_ok = s == "magic"
-    ok(is_ok, "desireable autovivification happens")
+    s_av = p["one";2;3;"four";"five";6;7]
+    is_ok = s_av == "magic"
+    ok(is_ok, "desireable autovivification happens (string)")
+
+    p = new 'PhpArray'
+
+    p["one";2;3;"four";"five";6;7] = 86
+    i_av = p["one";2;3;"four";"five";6;7]
+    is_ok = i_av == 86
+    ok(is_ok, "desireable autovivification happens (int)")
+
+    p = new 'PhpArray'
+    p_av = new 'String'
+    p_av = "whiskey"
+
+    p["one";2;3;"four";"five";6;7] = p_av
+    p_av = p["one";2;3;"four";"five";6;7]
+    s = p_av
+    is_ok = s == "whiskey"
+    ok(is_ok, "desireable autovivification happens (pmc)")
+
+    p = new 'PhpArray'
+
+    p["one";2;3;"four";"five";6;7] = 1.001
+    n_av = p["one";2;3;"four";"five";6;7]
+    is_ok = n_av == 1.001
+    ok(is_ok, "desireable autovivification happens (float)")
 
     p['foo'] = 'bix'
     i = exists p['foo';'bar';'buzzed']
@@ -313,7 +339,39 @@ ii_end:
 
 .end
 
-.sub generic_iterator_tests
+.sub generic_iterator_tests_string_key
+    .local pmc p, it
+    .local string s, val_str
+    .local int is_ok
+
+    p = new 'PhpArray'
+    p['asdf'] = 'im '
+    p[444444] = 'not in '
+    p[0]      = 'ur '
+    p[-1234]  = 'iterator '
+    p[-1233]  = 'ideradin '
+    p[-1235]  = 'ur '
+    p['y']    = 'valuze.'
+
+    #overwrite old values without changing the internal order
+    p[444444] = 'in '
+    p[-1234]  = 'iderayder '
+
+    it = iter p
+iter_loop:
+    unless it goto iter_done
+    val_str = shift it
+    val_str = p[val_str]
+    concat s, val_str
+    goto iter_loop
+
+iter_done:
+    is_ok = s == 'im in ur iderayder ideradin ur valuze.'
+    ok(is_ok, "basic iterator test (string key)")
+
+.end
+
+.sub generic_iterator_tests_pmc_key
     .local pmc p, it, val
     .local string s, val_str
     .local int is_ok
@@ -341,7 +399,7 @@ iter_loop:
 
 iter_done:
     is_ok = s == 'im in ur iderayder ideradin ur valuze.'
-    ok(is_ok, "basic iterator test")
+    ok(is_ok, "basic iterator test (pmc_key)")
 
 .end
 

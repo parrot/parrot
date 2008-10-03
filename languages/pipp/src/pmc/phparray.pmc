@@ -549,8 +549,14 @@ C<key>.
             s_key               = ht->internalPointer->key;
             ht->internalPointer = ht->internalPointer->tableNext;
             next_key            = pmc_new(INTERP, enum_class_String);
-
             VTABLE_set_string_native(INTERP, next_key, s_key);
+
+            /* manually tell the Iterator that it's done */
+            if (ht->internalPointer == NULL) {
+                PMC *iter = ht->iter;
+                PMC *key  = (PMC*) PMC_struct_val(iter);
+                PMC_int_val(key) = -1;
+            }
             return next_key;
         }
 
@@ -635,6 +641,12 @@ C<key>.
             s_key               = ht->internalPointer->key;
             ht->internalPointer = ht->internalPointer->tableNext;
 
+            /* manually tell the Iterator that it's done */
+            if (ht->internalPointer == NULL) {
+                PMC *iter = ht->iter;
+                PMC *key  = (PMC*) PMC_struct_val(iter);
+                PMC_int_val(key) = -1;
+            }
             return s_key;
         }
 
@@ -1395,7 +1407,7 @@ failures.
         /* Get the Iterator and ht->internalPointer in sync. */
         bkt = ht->tableHead;
         while (bkt != ht->internalPointer) {
-            VTABLE_nextkey_keyed(INTERP, (PMC*)PMC_struct_val(iter), SELF, ITERATE_GET_NEXT);
+            VTABLE_nextkey_keyed(INTERP, key, SELF, ITERATE_GET_NEXT);
             bkt = bkt->tableNext;
         }
 

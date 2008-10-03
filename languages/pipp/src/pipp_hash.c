@@ -328,6 +328,8 @@ void pipp_hash_rehash(PARROT_INTERP, PippHashTable *ht) {
         ht->buckets[bucket_idx] = NULL;
     for (bkt = ht->tableHead; bkt != NULL; bkt = bkt->tableNext) {
         bucket_idx = bkt->hashValue & ht->hashMask;
+        dprintf("putting item with key '%Ss' in bucket #%d\n", bkt->key,
+                bucket_idx);
         BUCKET_LIST_PREPEND(bkt, ht->buckets[bucket_idx]);
     }
 }
@@ -376,7 +378,8 @@ PippBucket* pipp_hash_get_bucket(PARROT_INTERP, PippHashTable *ht, STRING *key){
 
     key_hash = string_hash(interp, key, PIPP_HASH_SEED);
     bucket   = ht->buckets[key_hash & ht->hashMask];
-    dprintf("pipp_hash_get_bucket called with key '%Ss'\n", key);
+    dprintf("pipp_hash_get_bucket called with key '%Ss', made hash 0x%X\n",
+            key, key_hash);
 
     while (bucket != NULL && string_compare(interp, bucket->key, key))
         bucket = bucket->bucketNext;
@@ -429,11 +432,13 @@ PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *p_
     isInt        = pipp_hash_get_intval(interp, key);
 
     if (PMC_IS_NULL(p_val)) {
-        dprintf("pipp_hash_put called: key is '%Ss', p_val is null\n", key);
+        dprintf("pipp_hash_put called: key is '%Ss', p_val is null, hash is "
+                "0x%X\n", key, key_hash);
     }
     else {
-        dprintf("pipp_hash_put called: key is '%Ss', p_val stringifies to '%Ss'\n",
-                key, VTABLE_get_string(interp, p_val));
+        dprintf("pipp_hash_put called: key is '%Ss', p_val stringifies to "
+                "'%Ss', hash is 0x%X\n", key, VTABLE_get_string(interp, p_val),
+                key_hash);
     }
 
     /* Find the right bucket for the key. */
@@ -447,10 +452,6 @@ PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *p_
     if (curr_bucket == NULL) {
 
         dprintf("storing value in a new bucket with hash %X\n", key_hash);
-        if (ht->capacity <= ht->elementCount+1) {
-            dprintf("time to grow...\n");
-            pipp_hash_resize(interp, ht, ht->capacity * 2);
-        }
         first_bucket = mem_allocate_zeroed_typed(PippBucket);
 
         first_bucket->key       = key;
@@ -465,6 +466,11 @@ PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *p_
         TABLE_LIST_APPEND(first_bucket, ht);
         curr_bucket = first_bucket;
         ht->elementCount++;
+
+        if (ht->capacity <= ht->elementCount+1) {
+            dprintf("time to grow...\n");
+            pipp_hash_resize(interp, ht, ht->capacity * 2);
+        }
     }
     /* Otherwise replace the contents of an existing bucket. */
     else {
@@ -570,7 +576,8 @@ PippBucket* pipp_hash_push(PARROT_INTERP, PippHashTable *ht, PMC *p_val){
     TABLE_LIST_APPEND(bkt, ht);
     ht->elementCount++;
     ht->nextIndex++;
-    dprintf("pushed a value: key is '%Ss', keyInt is %d\n", s_key, bkt->keyInt)
+    dprintf("pushed a value: key is '%Ss', keyInt is %d, hash is 0x%X\n",
+            s_key, bkt->keyInt, key_hash)
 
     return bkt;
 }
@@ -647,7 +654,8 @@ PippBucket* pipp_hash_unshift(PARROT_INTERP, PippHashTable *ht, PMC *p_val){
     ht->elementCount++;
     pipp_hash_renumber(interp, ht);
     ht->internalPointer = ht->tableHead;
-    dprintf("unshifted a value: key is '%Ss', keyInt is %d\n", s_key, bkt->keyInt)
+    dprintf("unshifted a value: key is '%Ss', keyInt is %d, hash is 0x%X\n",
+            s_key, bkt->keyInt, key_hash)
 
     return bkt;
 }
