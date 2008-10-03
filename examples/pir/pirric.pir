@@ -1155,15 +1155,7 @@ handle_excep:
 
 handle_stop:
     print 'Stopped'
-    unless curline goto end_stop
-    print ' in '
-    print curline
-end_stop:
-    say ''
-    stopline = curline
-    curline = 0
-    push_eh handle_excep
-    goto next
+    goto linenum_msg
 
 handle_cont:
     unless stopline goto cannot_cont
@@ -1229,7 +1221,7 @@ prog_end:
 
 unhandled:
     $P1 = getattribute excep, 'message'
-    say $P1
+    print $P1
     goto linenum_msg
 
 noline:
@@ -1409,10 +1401,20 @@ setattrs:
 
     .local pmc limit
     limit = self.evaluate(tokenizer)
+
     .local pmc increment
+    $P0 = tokenizer.get()
+    $I0 = defined $P0
+    unless $I0 goto default_step
+    $S0 = $P0
+    upcase $S0
+    ne $S0, 'STEP', fail
+    increment = self.evaluate(tokenizer)
+    goto prepare
+default_step:
     increment = new 'Integer'
     increment = 1
-
+prepare:
     .local pmc for
     for = new 'For'
     .local pmc line
@@ -1598,7 +1600,12 @@ fail:
     increment = getattribute for, 'increment'
     limit = getattribute for, 'limit'
     add controlvar, increment
+    lt increment, 0, negstep
     gt controlvar, limit, endloop
+    goto jump
+negstep:
+    lt controlvar, limit, endloop
+jump:
     .local pmc jumpline
     jumpline = getattribute for, 'jumpline'
 
