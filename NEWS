@@ -1,6 +1,9 @@
 # $Id$
 
 New in October 2008 release
+- Implementation
+  + float precision expanded to 15 significant digits from 6
+  + large integers autopromoted in PIR so as not to lose precision
 - Languages
   + Markdown : new lightweight markup language
     - start implementation with PCT/NQP
