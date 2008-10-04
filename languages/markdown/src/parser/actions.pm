@@ -220,6 +220,10 @@ method Entity($/) {
     make Markdown::Entity.new( :text( $/.text() ) );
 }
 
+method Symbol($/) {
+    make Markdown::Word.new( :text( $/.text() ) );
+}
+
 method Str($/) {
     make Markdown::Word.new( :text( $/.text() ) );
 }

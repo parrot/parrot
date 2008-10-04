@@ -17,7 +17,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 use Test::More;
 
 language_output_is( 'markdown', <<'CODE', <<'OUT', 'asterisk' );
@@ -35,6 +35,15 @@ language_output_is( 'markdown', <<'CODE', <<'OUT', 'dot' );
 
 CODE
 <p>1986. What a great season.</p>
+
+OUT
+
+language_output_is( 'markdown', <<'CODE', <<'OUT', 'symbol (not escaped)' );
+
+Hello, World!
+
+CODE
+<p>Hello, World!</p>
 
 OUT
 

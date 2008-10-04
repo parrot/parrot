@@ -185,6 +185,7 @@ token Inline {
     | <Code> {*}                #= Code
     | <Entity> {*}              #= Entity
     | <EscapedChar> {*}         #= EscapedChar
+    | <Symbol> {*}              #= Symbol
 }
 
 token Space {
@@ -213,6 +214,10 @@ token NormalEndline {
 }
 
 token TerminalEndline { <Sp> <Newline> <Eof> }
+
+token Symbol {
+    <SpecialChar> {*}
+}
 
 # This keeps the parser from getting bogged down on long strings of '*' or '_',
 # or strings of '*' or '_' with space on each side:
