@@ -21,7 +21,7 @@ Tests the PhpArray PMC.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(29)
+    plan(50)
 
     basic_get_set()
     stack_and_queue_ops()
@@ -36,10 +36,10 @@ Tests the PhpArray PMC.
     #cmp_shallow_native()
     #um_wtf()
     #cmp_deep_native()
-    #equals_shallow_native()
-    #equals_deep_native()
+    equals_shallow_native()
+    equals_deep_native()
     assign_pmc_shallow_native()
-    #assign_pmc_deep_native()
+    assign_pmc_deep_native()
     add_pmc_shallow_native()
     #get_repr_deep()
     vanilla_freeze_thaw()

@@ -25,7 +25,7 @@ creation, the type of the value can be set.  All keys are stored as STRINGs.
 
 /*
 
-=item C<PippHashTable* pipp_hash_create(INTERP, size)>
+=item C<PippHashTable* pipp_hash_create(PARROT_INTERP, UINTVAL size)>
 
 Create and initialize a new PippHash with at least C<size> buckets.
 
@@ -57,7 +57,7 @@ PippHashTable* pipp_hash_create(PARROT_INTERP, UINTVAL size) {
 
 /*
 
-=item C<void pipp_hash_destroy(INTERP, PippHashTable *ht)>
+=item C<void pipp_hash_destroy(PARROT_INTERP, PippHashTable *ht)>
 
 Non-recursively free all memory used by this PippHash.
 
@@ -279,7 +279,7 @@ void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
 
 =over 4
 
-=item C<void pipp_hash_renumber(INTERP, PippHashTable *ht)>
+=item C<void pipp_hash_renumber(PARROT_INTERP, PippHashTable *ht)>
 
 Renumber all numerically-indexed elements of this PippHash, starting from 0.
 Numbering is done according to insertion order.
@@ -310,7 +310,7 @@ void pipp_hash_renumber(PARROT_INTERP, PippHashTable *ht) {
 
 /*
 
-=item C<void pipp_hash_rehash(INTERP, PippHashTable *ht)>
+=item C<void pipp_hash_rehash(PARROT_INTERP, PippHashTable *ht)>
 
 Recalculate the hash of each element, potentially placing it in another bucket.
 This is used when a PippHash grows and has its hashMask changed.
@@ -337,7 +337,7 @@ void pipp_hash_rehash(PARROT_INTERP, PippHashTable *ht) {
 
 /*
 
-=item C<void pipp_hash_resize(INTERP, PippHashTable *ht, INTVAL resize)>
+=item C<void pipp_hash_resize(PARROT_INTERP, PippHashTable *ht, INTVAL new_size)>
 
 Increase the capacity and number of buckets of this PippHash.  Resizing implies
 rehashing.
@@ -363,7 +363,7 @@ void pipp_hash_resize(PARROT_INTERP, PippHashTable *ht, INTVAL new_size) {
 
 =over 4
 
-=item C<PippBucket* pipp_hash_get_bucket(INTERP, PippHashTable *ht, STRING *key)>
+=item C<PippBucket* pipp_hash_get_bucket(PARROT_INTERP, PippHashTable *ht, STRING *key)>
 
 If there is a bucket with a the key C<key>, return a pointer to it.  Otherwise
 return NULL.
@@ -378,13 +378,16 @@ PippBucket* pipp_hash_get_bucket(PARROT_INTERP, PippHashTable *ht, STRING *key){
 
     key_hash = string_hash(interp, key, PIPP_HASH_SEED);
     bucket   = ht->buckets[key_hash & ht->hashMask];
-    dprintf("pipp_hash_get_bucket called with key '%Ss', made hash 0x%X\n",
+    dprintf("pipp_hash_get_bucket called with key '%Ss', has hash 0x%X\n",
             key, key_hash);
 
     while (bucket != NULL && string_compare(interp, bucket->key, key))
         bucket = bucket->bucketNext;
-    if (bucket)
+    if (bucket) {
+        dprintf("found bucket with key '%Ss'\n", bucket->key);
         return bucket;
+    }
+    dprintf("bucket not found\n");
     return NULL;
 }
 
@@ -494,7 +497,7 @@ PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *p_
 
 /*
 
-=item C<PippBucket* pipp_hash_find(INTERP, PippHashTable *ht, STRING *key)>
+=item C<PippBucket* pipp_hash_find(PARROT_INTERP, PippHashTable *ht, STRING *key)>
 
 If there is a bucket with a the key C<key>, return 1.  Otherwise return 0.
 
@@ -508,7 +511,7 @@ INTVAL pipp_hash_find(PARROT_INTERP, PippHashTable *ht, STRING *key){
 
 /*
 
-=item C<void pipp_hash_delete(INTERP, PippHashTable *ht, STRING *key)>
+=item C<void pipp_hash_delete(PARROT_INTERP, PippHashTable *ht, STRING *key)>
 
 If there's a bucket in this hash with the key C<key>, it is deleted.  If
 there's no matching bucket, nothing happens.
@@ -787,7 +790,7 @@ void pipp_hash_thaw(PARROT_INTERP, PippHashTable *ht, visit_info *info) {
 
 =over 4
 
-=item C<PippIsInt* pipp_hash_get_intval(PARROT_INTERP, STRING *s)>
+=item C<PippIsInt* pipp_hash_get_intval(PARROT_INTERP, STRING *key)>
 
 If C<s> looks like an INTVAL (i.e. /^([-]?[1-9][0-9]|0)*$/) and doesn't cause an
 overflow, return a PippIsInt where C<p->intval> contains the INTVAL and
