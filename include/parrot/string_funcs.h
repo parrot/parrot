@@ -284,7 +284,7 @@ STRING * string_from_num(PARROT_INTERP, FLOATVAL f)
 
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
-STRING * string_grow(PARROT_INTERP, ARGMOD(STRING *s), INTVAL addlen)
+STRING * string_grow(PARROT_INTERP, ARGMOD(STRING *s), UINTVAL addlen)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*s);
@@ -355,7 +355,7 @@ STRING * string_make_empty(PARROT_INTERP,
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
-INTVAL string_max_bytes(SHIM_INTERP, ARGIN(const STRING *s), INTVAL nchars)
+INTVAL string_max_bytes(SHIM_INTERP, ARGIN(const STRING *s), UINTVAL nchars)
         __attribute__nonnull__(2);
 
 PARROT_API
