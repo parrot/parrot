@@ -40,7 +40,7 @@ sub runstep {
     );
 
     if ($without) {
-        $conf->data->set( has_pcre => 0 );
+        $conf->data->set( HAS_PCRE => 0 );
         $self->set_result('no');
         return 1;
     }
