@@ -495,12 +495,12 @@ Parrot_print_backtrace(void)
 /*#  define BACKTRACE_VERBOSE */
     /* stolen from http://www.delorie.com/gnu/docs/glibc/libc_665.html */
     void *array[BACKTRACE_DEPTH];
-    size_t i;
+    int i;
 
-    const size_t size = backtrace(array, BACKTRACE_DEPTH);
+    const int size = backtrace(array, BACKTRACE_DEPTH);
 
     fprintf(stderr,
-            "Backtrace - Obtained %zd stack frames (max trace depth is %d).\n",
+            "Backtrace - Obtained %d stack frames (max trace depth is %d).\n",
             size, BACKTRACE_DEPTH);
 #  ifndef BACKTRACE_VERBOSE
     for (i = 0; i < size; i++) {
