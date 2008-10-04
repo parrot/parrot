@@ -135,7 +135,8 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
 
 =item C<STRING * ascii_get_graphemes>
 
-RT#48260: Not yet documented!!!
+Retrieves the graphemes for the STRING C<source_string>, starting at
+C<offset> and ending at C<offset + count>.
 
 =cut
 
@@ -154,7 +155,8 @@ ascii_get_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
 
 =item C<static void set_graphemes>
 
-RT#48260: Not yet documented!!!
+Sets the graphemes for C<source_string>, starting at C<offset>. Replace
+C<replace_count> graphemes with those from STRING C<insert_string>.
 
 =cut
 
@@ -173,7 +175,9 @@ set_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
 
 =item C<STRING * ascii_get_graphemes_inplace>
 
-RT#48260: Not yet documented!!!
+Retrieves the graphemes in place for ascii STRING C<source_string>,
+starting at C<offset>. Retrieves C<count> graphemes and puts them
+into C<dest_string>.
 
 =cut
 
@@ -193,7 +197,8 @@ ascii_get_graphemes_inplace(PARROT_INTERP, ARGIN(STRING *source_string),
 
 =item C<static STRING * to_ascii>
 
-RT#48260: Not yet documented!!!
+Attempts to convert STRING C<src> to ASCII in STRING C<dest>. Throws
+an exception if unconvertable UNICODE characters are involved.
 
 =cut
 
@@ -235,7 +240,7 @@ to_ascii(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
 
 =item C<static STRING * to_unicode>
 
-RT#48260: Not yet documented!!!
+Converts the ASCII STRING C<src> to UNICODE STRING C<dest>.
 
 =cut
 
@@ -262,7 +267,7 @@ to_unicode(PARROT_INTERP, ARGMOD(STRING *src), ARGMOD_NULLOK(STRING *dest))
 
 =item C<static STRING * to_charset>
 
-RT#48260: Not yet documented!!!
+Converts STRING C<src> to ASCII charset STRING C<dest>.
 
 =cut
 
@@ -288,7 +293,8 @@ to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
 
 =item C<static STRING* compose>
 
-RT#48260: Not yet documented!!!
+Can't compose ASCII strings, so performs a string copy on it and
+returns the new string.
 
 =cut
 
@@ -306,7 +312,8 @@ compose(PARROT_INTERP, ARGIN(STRING *src))
 
 =item C<static STRING* decompose>
 
-RT#48260: Not yet documented!!!
+Can't decompose ASCII, so we perform a string copy instead and return
+a pointer to the new string.
 
 =cut
 
@@ -323,7 +330,7 @@ decompose(PARROT_INTERP, ARGMOD(STRING *src))
 
 =item C<static void upcase>
 
-RT#48260: Not yet documented!!!
+Converts the STRING C<source_string> to all uppercase.
 
 =cut
 
@@ -348,7 +355,7 @@ upcase(SHIM_INTERP, ARGIN(STRING *source_string))
 
 =item C<static void downcase>
 
-RT#48260: Not yet documented!!!
+Converts the STRING C<source_string> to all lower-case.
 
 =cut
 
@@ -373,7 +380,9 @@ downcase(SHIM_INTERP, ARGIN(STRING *source_string))
 
 =item C<static void titlecase>
 
-RT#48260: Not yet documented!!!
+Converts the STRING given by C<source_string> to title case, where
+the first character is upper case and all the rest of the characters
+are lower-case.
 
 =cut
 
@@ -399,7 +408,8 @@ titlecase(SHIM_INTERP, ARGIN(STRING *source_string))
 
 =item C<static void upcase_first>
 
-RT#48260: Not yet documented!!!
+Sets the first character in the STRING C<source_string> to upper case,
+but doesn't modify the rest of the string.
 
 =cut
 
@@ -418,7 +428,8 @@ upcase_first(SHIM_INTERP, ARGIN(STRING *source_string))
 
 =item C<static void downcase_first>
 
-RT#48260: Not yet documented!!!
+Sets the first character of the STRING C<source_string> to lowercase,
+but doesn't modify the rest of the characters.
 
 =cut
 
@@ -437,7 +448,8 @@ downcase_first(SHIM_INTERP, ARGIN(STRING *source_string))
 
 =item C<static void titlecase_first>
 
-RT#48260: Not yet documented!!!
+Converts the first letter of STRING C<source_string> to upper case,
+but doesn't modify the rest of the string.
 
 =cut
 
@@ -456,7 +468,8 @@ titlecase_first(SHIM_INTERP, ARGMOD(STRING *source_string))
 
 =item C<INTVAL ascii_compare>
 
-RT#48260: Not yet documented!!!
+Compares two strings as ASCII strings. If STRING C<lhs> > C<rhs>, returns
+1. If C<lhs> == C<rhs> returns 0. If STRING C<lhs> < C<rhs>, returns  -1.
 
 =cut
 
@@ -500,7 +513,10 @@ ascii_compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
 
 =item C<INTVAL mixed_cs_index>
 
-RT#48260: Not yet documented!!!
+Searches for the first instance of STRING C<search> in STRING C<src>.
+returns the position where the substring is found if it is indeed found.
+Returns -1 otherwise. Operates on different types of strings, not just
+ASCII.
 
 =cut
 
@@ -508,7 +524,8 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-mixed_cs_index(PARROT_INTERP, ARGIN(STRING *src), ARGIN(STRING *search), UINTVAL offs)
+mixed_cs_index(PARROT_INTERP, ARGIN(STRING *src), ARGIN(STRING *search),
+    UINTVAL offs)
 {
     String_iter src_iter, search_iter;
     UINTVAL len;
@@ -543,7 +560,9 @@ mixed_cs_index(PARROT_INTERP, ARGIN(STRING *src), ARGIN(STRING *search), UINTVAL
 
 =item C<INTVAL ascii_cs_index>
 
-RT#48260: Not yet documented!!!
+Searches for the first instance of STRING C<search> in STRING C<src>.
+returns the position where the substring is found if it is indeed found.
+Returns -1 otherwise.
 
 =cut
 
@@ -569,7 +588,8 @@ ascii_cs_index(PARROT_INTERP, ARGIN(STRING *source_string),
 
 =item C<INTVAL ascii_cs_rindex>
 
-RT#48260: Not yet documented!!!
+Searches for the last instance of STRING C<search_string> in STRING
+C<source_string>. Starts searching at C<offset>.
 
 =cut
 
@@ -596,7 +616,8 @@ ascii_cs_rindex(PARROT_INTERP, ARGIN(STRING *source_string),
 
 =item C<static UINTVAL validate>
 
-RT#48260: Not yet documented!!!
+Verifies that the given string is valid ASCII. Returns 1 if it is ASCII,
+returns 0 otherwise.
 
 =cut
 
@@ -622,7 +643,8 @@ validate(PARROT_INTERP, ARGIN(STRING *src))
 
 =item C<static STRING * string_from_codepoint>
 
-RT#48260: Not yet documented!!!
+Creates a new STRING object from a single codepoint C<codepoint>. Returns
+the new STRING.
 
 =cut
 
@@ -726,7 +748,8 @@ find_not_cclass(PARROT_INTERP, INTVAL flags, ARGIN(STRING *source_string),
 
 =item C<size_t ascii_compute_hash>
 
-RT#48260: Not yet documented!!!
+Computes the hash of STRING C<source_string> starting with seed value
+C<seed>.
 
 =cut
 
@@ -752,7 +775,8 @@ ascii_compute_hash(SHIM_INTERP, ARGIN(const STRING *source_string), size_t seed)
 
 =item C<const CHARSET * Parrot_charset_ascii_init>
 
-RT#48260: Not yet documented!!!
+Initialize the ASCII charset but registering all the necessary
+function pointers and settings.
 
 =cut
 
@@ -799,7 +823,7 @@ Parrot_charset_ascii_init(PARROT_INTERP)
 
 =item C<STRING * charset_cvt_ascii_to_binary>
 
-RT#48260: Not yet documented!!!
+Converts an ASCII STRING C<src> to a binary STRING C<dest>.
 
 =cut
 
@@ -829,7 +853,7 @@ charset_cvt_ascii_to_binary(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRI
 
 =item C<STRING * charset_cvt_ascii_to_iso_8859_1>
 
-RT#48260: Not yet documented!!!
+Converts ASCII STRING C<src> to ISO8859-1 STRING C<dest>.
 
 =cut
 
@@ -837,7 +861,8 @@ RT#48260: Not yet documented!!!
 
 PARROT_CANNOT_RETURN_NULL
 STRING *
-charset_cvt_ascii_to_iso_8859_1(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
+charset_cvt_ascii_to_iso_8859_1(PARROT_INTERP, ARGIN(STRING *src),
+    ARGIN_NULLOK(STRING *dest))
 {
     if (dest) {
         UINTVAL offs;
