@@ -2114,7 +2114,7 @@ fatal:
     .param int has_file :opt_flag
 
     if has_file goto do_list
-    file = getstdin
+    file = getstdout
 do_list:
     gt start, stop, finish
     .local pmc lines, text
