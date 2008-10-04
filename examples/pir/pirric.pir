@@ -96,27 +96,27 @@
 
     .local pmc predefs
     predefs = new 'Hash'
-    setpredef(predefs, "NEW", "new")
-    setpredef(predefs, "ISA", "isa")
-    setpredef(predefs, "CHR$", "chr")
-    setpredef(predefs, "ASC", "asc")
-    setpredef(predefs, "LEN", "len")
-    setpredef(predefs, "LEFT$", "left")
-    setpredef(predefs, "RIGHT$", "right")
-    setpredef(predefs, "MID$", "mid")
-    setpredef(predefs, "COMPLEX", "complex")
-    setpredef(predefs, "EXP", "exp")
-    setpredef(predefs, "LN", "ln")
-    setpredef(predefs, "SIN", "sin")
-    setpredef(predefs, "SINH", "sinh")
-    setpredef(predefs, "COS", "cos")
-    setpredef(predefs, "COSH", "cosh")
-    setpredef(predefs, "TAN", "tan")
-    setpredef(predefs, "TANH", "tanh")
-    setpredef(predefs, "ASIN", "asin")
-    setpredef(predefs, "ACOS", "acos")
-    setpredef(predefs, "ATAN", "atan")
-    setpredef(predefs, "SQR", "sqr")
+    setpredef(predefs, 'NEW', 'new')
+    setpredef(predefs, 'ISA', 'isa')
+    setpredef(predefs, 'CHR$', 'chr')
+    setpredef(predefs, 'ASC', 'asc')
+    setpredef(predefs, 'LEN', 'len')
+    setpredef(predefs, 'LEFT$', 'left')
+    setpredef(predefs, 'RIGHT$', 'right')
+    setpredef(predefs, 'MID$', 'mid')
+    setpredef(predefs, 'COMPLEX', 'complex')
+    setpredef(predefs, 'EXP', 'exp')
+    setpredef(predefs, 'LN', 'ln')
+    setpredef(predefs, 'SIN', 'sin')
+    setpredef(predefs, 'SINH', 'sinh')
+    setpredef(predefs, 'COS', 'cos')
+    setpredef(predefs, 'COSH', 'cosh')
+    setpredef(predefs, 'TAN', 'tan')
+    setpredef(predefs, 'TANH', 'tanh')
+    setpredef(predefs, 'ASIN', 'asin')
+    setpredef(predefs, 'ACOS', 'acos')
+    setpredef(predefs, 'ATAN', 'atan')
+    setpredef(predefs, 'SQR', 'sqr')
     set_global 'predefs', predefs
 
 # Create classes for control flow exceptions
@@ -294,6 +294,13 @@ done:
 .end
 
 #-----------------------------------------------------------------------
+.sub setprogram :method
+    .param pmc program
+
+    setattribute self, 'program', program
+.end
+
+#-----------------------------------------------------------------------
 .sub getcurline :method
     $P0 = getattribute self, 'curline'
     $S0 = $P0
@@ -412,7 +419,7 @@ fail:
     ne $P1, '(', fail
     $P1 = self.get_1_arg(tokenizer)
     $S1 = $P1
-    #print "NEW: "
+    #print 'NEW: '
     #say $S1
 
     $P2 = new $S1
@@ -1245,7 +1252,7 @@ finish:
     .local pmc stdin
     stdin = getstdin
     .local pmc program
-    program = getattribute self, "program"
+    program = getattribute self, 'program'
     .local string line
 
     say 'Ready'
@@ -1487,7 +1494,7 @@ fail:
     unless $I0 goto fail
     $S0 = token
     upcase $S0
-    ne $S0, "THEN", fail
+    ne $S0, 'THEN', fail
 
     $I0 = defined arg
     unless $I0 goto is_false
@@ -1530,25 +1537,8 @@ fail:
 
     .local pmc program
     program = getattribute self, 'program'
+    program.list(0, 0)
 
-    .local pmc lines, text
-    lines = getattribute program, 'lines'
-    text = getattribute program, 'text'
-    .local int i, n, linenum
-    .local string content
-    n = lines
-#    say n
-    i = 0
-nextline:
-    ge i, n, finish
-    linenum = lines [i]
-    content = text [linenum]
-    print linenum
-    print ' '
-    say content
-    inc i
-    goto nextline
-finish:
 .end
 
 .sub func_LOAD :method
@@ -1875,8 +1865,8 @@ nextchar:
     eq c, "\n", endtoken
     eq c, '"', endtoken
     eq c, '.', endtoken
-    eq c, ",", endtoken
-    eq c, ";", endtoken
+    eq c, ',', endtoken
+    eq c, ';', endtoken
     eq c, '=', endtoken
     eq c, '+', endtoken
     eq c, '-', endtoken
@@ -1897,7 +1887,14 @@ str:
     ge i, l, endstr
     c = substr line, i, 1
     inc i
-    eq c, '"', endstr
+    eq c, '"', checkquote
+    concat result, c
+    goto str
+checkquote:
+    ge i, l, endstr
+    c = substr line, i, 1
+    ne c, '"', endstr
+    inc i
     concat result, c
     goto str
 endstr:
@@ -2104,18 +2101,47 @@ fatal:
 
     open file, filename, '>'
 
-    $P0 = self.begin()
-next:
-    unless $P0, finish
-    shift $S0, $P0
-    $S1 = self [$S0]
-    print file, $S0
-    print file, ' '
-    print file, $S1
-    print file, "\n"
-    goto next
-finish:
+    self.list(0, 0, file)
+
     close file
+.end
+
+#-----------------------------------------------------------------------
+.sub list :method
+    .param int start
+    .param int stop
+    .param pmc file :optional
+    .param int has_file :opt_flag
+
+    if has_file goto do_list
+    file = getstdin
+do_list:
+    gt start, stop, finish
+    .local pmc lines, text
+    lines = getattribute self, 'lines'
+    text = getattribute self, 'text'
+
+    .local int i, n, linenum
+    .local string content
+    n = lines
+#    say n
+    i = 0
+nextline:
+    ge i, n, finish
+    linenum = lines [i]
+    lt linenum, start, skip
+    unless stop > 0 goto list_it
+    gt linenum, stop, finish
+list_it:
+    content = text [linenum]
+    print file, linenum
+    print file, ' '
+    print file, content
+    print file, "\n"
+skip:
+    inc i
+    goto nextline
+finish:
 .end
 
 ########################################################################
