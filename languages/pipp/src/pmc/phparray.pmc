@@ -1490,7 +1490,9 @@ PHPArray, just make a clone.
             }
         }
         else
-            Parrot_ex_throw_from_c_args(INTERP, 0, -1, "no can do");
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_PARROT_USAGE_ERROR, "can't assign a non-aggregate"
+                    " PMC to a PhpArray");
     }
 /*
 
@@ -1552,7 +1554,9 @@ C<src> and C<SELF>, the value from C<SELF> will be used.
             }
         }
         else
-            Parrot_ex_throw_from_c_args(INTERP, 0, 1, "nope");
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_PARROT_USAGE_ERROR, "can't add a non-aggregate "
+                    "PMC to a PhpArray");
     }
 
 /*
