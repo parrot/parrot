@@ -368,17 +368,19 @@ Dumps a list of the symbolic registers in IMC_Unit C<unit>
 void
 dump_symreg(ARGIN(const IMC_Unit *unit))
 {
-    int i;
-    SymReg** const reglist = unit->reglist;
+    unsigned int i;
+    SymReg ** const reglist = unit->reglist;
 
     if (!reglist)
         return;
+
     fprintf(stderr,
             "\nSymbols:"
             "\n----------------------------------------------\n");
     fprintf(stderr, "name\tfirst\tlast\t1.blk\t-blk\tset col     \t"
             "used\tlhs_use\tregp\tus flgs\n"
             "----------------------------------------------\n");
+
     for (i = 0; i < unit->n_symbols; i++) {
         const SymReg * const r = reglist[i];
         if (!REG_NEEDS_ALLOC(r))
@@ -414,17 +416,18 @@ allocated.
 void
 dump_liveness_status(ARGIN(const IMC_Unit *unit))
 {
-    int i;
-    SymReg** const reglist = unit->reglist;
+    unsigned int i;
+    SymReg ** const reglist = unit->reglist;
 
     fprintf(stderr, "\nSymbols:\n--------------------------------------\n");
+
     for (i = 0; i < unit->n_symbols; i++) {
         const SymReg * const r = reglist[i];
         if (REG_NEEDS_ALLOC(r))
             dump_liveness_status_var(unit, r);
     }
-    fprintf(stderr, "\n");
 
+    fprintf(stderr, "\n");
 }
 
 

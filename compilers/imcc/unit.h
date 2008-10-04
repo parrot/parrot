@@ -50,7 +50,7 @@ struct _IMC_Unit {
     /* register allocation */
     unsigned int     *interference_graph;
     SymReg          **reglist;
-    int               n_symbols;
+    unsigned int      n_symbols;
     int               max_color;
     struct _IMC_Unit *prev;
     struct _IMC_Unit *next;
@@ -58,9 +58,9 @@ struct _IMC_Unit {
     SymReg           *_namespace;
     int               pasm_file;
     const char       *file;
-    int               n_vars_used[4]; /* INSP in PIR */
-    int               n_regs_used[4]; /* INSP in PBC */
-    int               first_avail[4]; /* INSP */
+    int               n_vars_used[4];   /* INSP in PIR */
+    int               n_regs_used[4];   /* INSP in PBC */
+    int               first_avail[4];   /* INSP */
     SymReg           *outer;
     PMC              *sub_pmc;          /* this sub */
     int               is_vtable_method; /* 1 if a v-table method */

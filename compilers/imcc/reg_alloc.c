@@ -368,7 +368,8 @@ free_reglist(ARGMOD(IMC_Unit *unit))
     }
 
     if (unit->reglist) {
-        int i;
+        unsigned int i;
+
         for (i = 0; i < unit->n_symbols; i++)
             free_life_info(unit, unit->reglist[i]);
 
@@ -648,7 +649,7 @@ significantly
 static void
 rebuild_reglist(ARGMOD(IMC_Unit *unit))
 {
-    int i, count, unused;
+    unsigned int i, count, unused;
     static const char types[] = "INSP";
 
     for (i = count = unused = 0; i < unit->n_symbols; i++) {
@@ -749,7 +750,7 @@ compute_du_chain(ARGMOD(IMC_Unit *unit))
 {
     Instruction *ins        = unit->instructions;
     Instruction *lastbranch = NULL;
-    int i;
+    unsigned int i;
 
     /* Compute last branch in this procedure, update instruction index */
     for (i = 0; ins; ins = ins->next) {
@@ -924,7 +925,7 @@ find available color for register #x in available colors
 static int
 ig_find_color(ARGIN(const IMC_Unit *unit), ARGIN(const char *avail))
 {
-    int c;
+    unsigned int c;
 
     for (c = 0; c < unit->n_symbols; c++)
         if (avail[c])
@@ -951,7 +952,7 @@ If we run out of colors, then we need to spill the top node.
 static int
 try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 {
-    int             x;
+    unsigned int    i;
     char           *avail;
     unsigned int   *graph   = unit->interference_graph;
     SymReg ** const reglist = unit->reglist;
@@ -967,9 +968,9 @@ try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 
     avail = mem_allocate_n_typed(n, char);
 
-    for (x = 0; x < unit->n_symbols; ++x) {
+    for (i = 0; i < unit->n_symbols; ++i) {
         int     already_allocated, color;
-        SymReg *r = reglist[x];
+        SymReg *r = reglist[i];
         int     t = -1;
 
         if (r->color >= 0)
@@ -990,7 +991,7 @@ try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 
         /* don't even consider these regs */
         memset(avail, 1, n);
-        map_colors(unit, x, graph, avail, r->set, already_allocated);
+        map_colors(unit, i, graph, avail, r->set, already_allocated);
         color = ig_find_color(unit, avail);
 
         if (color == -1)

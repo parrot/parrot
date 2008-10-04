@@ -711,7 +711,7 @@ void
 life_analysis(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 {
     SymReg  ** const reglist = unit->reglist;
-    int              i;
+    unsigned int     i;
 
     IMCC_info(interp, 2, "life_analysis\n");
 
@@ -1339,7 +1339,7 @@ transfers control directly to the header.
 
 PARROT_WARN_UNUSED_RESULT
 int
-natural_preheader(ARGIN(const IMC_Unit *unit), ARGIN(const Loop_info* loop_info))
+natural_preheader(ARGIN(const IMC_Unit *unit), ARGIN(const Loop_info *loop_info))
 {
     Edge *edge;
     int   preheader = -1;

@@ -34,13 +34,13 @@ EXTERN enum block_enum_flags_t {
 
 
 typedef struct _loop_info {
-    Set * loop;     /* loop set containg bb's */
-    Set * exits;    /* blocks that exit the loop */
-    int depth;      /* depth of this loop */
-    int n_entries;  /* nr of entries to this loop */
-    int header;     /* header block of loop */
-    int preheader;  /* preheader block of loop, if 1 entry point */
-    int size;       /* no of blocks in loop */
+    Set         *loop;       /* loop set containg bb's */
+    Set         *exits;      /* blocks that exit the loop */
+    int          depth;      /* depth of this loop */
+    unsigned int n_entries;  /* nr of entries to this loop */
+    unsigned int header;     /* header block of loop */
+    unsigned int preheader;  /* preheader block of loop, if 1 entry point */
+    unsigned int size;       /* no of blocks in loop */
 } Loop_info;
 
 
