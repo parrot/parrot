@@ -188,18 +188,18 @@ pir_output_like( <<'CODE', '/3\.14/', 'macro_const num in PIR' );
 .end
 CODE
 
-open my $FOO, '>', 'macro.tempfile';
+open my $FOO, '>', "macro.tempfile_$$";
 print $FOO <<'ENDF';
   set S0, "Betelgeuse\n"
 ENDF
 close $FOO;
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'basic include macro' );
-.include "macro.tempfile"
+pasm_output_is( <<"CODE", <<'OUTPUT', 'basic include macro' );
+.include "macro.tempfile_$$"
   print S0
 
   set S0, "Rigel"
-.include "macro.tempfile"
+.include "macro.tempfile_$$"
   print S0
   end
 CODE
@@ -207,7 +207,7 @@ Betelgeuse
 Betelgeuse
 OUTPUT
 
-open $FOO, '>', 'macro.tempfile';    # Clobber previous
+open $FOO, '>', "macro.tempfile_$$";    # Clobber previous
 print $FOO <<'ENDF';
 .macro multiply(A,B)
     new P0, 'Float'
@@ -220,17 +220,17 @@ print $FOO <<'ENDF';
 ENDF
 close $FOO;
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'include a file defining a macro' );
-.include "macro.tempfile"
+pasm_output_is( <<"CODE", <<'OUTPUT', 'include a file defining a macro' );
+.include "macro.tempfile_$$"
  .multiply(12,13)
  print P2
- print "\n"
+ print "\\n"
  end
 CODE
 156
 OUTPUT
 
-unlink('macro.tempfile');
+unlink("macro.tempfile_$$");
 
 pir_output_is( <<'CODE', <<'OUTPUT', '.newid' );
 .sub test :main
