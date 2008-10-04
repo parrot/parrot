@@ -1416,6 +1416,147 @@ failures.
 
 /*
 
+=item C<PMC* clone()>
+
+Return a deep clone of this PHPArray.
+
+=cut
+
+*/
+    PMC *clone() {
+        PMC           *cloned_pmc, *cloned_value;
+        STRING        *cloned_key;
+        PippHashTable *orig_ht, *cloned_ht;
+        PippBucket    *bkt;
+
+        cloned_pmc = pmc_new(INTERP, PMC_type(SELF));
+        cloned_ht  = (PippHashTable*) PMC_struct_val(cloned_pmc);
+        orig_ht    = (PippHashTable*) PMC_struct_val(SELF);
+        pipp_hash_create(INTERP, orig_ht->capacity);
+
+        for (bkt = orig_ht->tableHead; bkt != NULL; bkt = bkt->tableNext) {
+            cloned_key   = string_copy(INTERP, bkt->key);
+            cloned_value = VTABLE_clone(INTERP, bkt->value);
+            pipp_hash_put(INTERP, cloned_ht, cloned_key, cloned_value);
+        }
+        return cloned_pmc;
+    }
+
+
+/*
+
+=item C<void assign_pmc(PMC *src)>
+
+If C<src> is an aggregate PMC (i.e. one that does hash and/or array), use an
+Iterator to copy each key/value pair into this PHPArray.  If C<src> is a
+PHPArray, just make a clone.
+
+=cut
+
+*/
+    void assign_pmc(PMC *src) {
+        PMC           *iter, *key, *value_copy;
+        PippHashTable *my_ht, *src_ht;
+        PippBucket    *bkt;
+        STRING        *key_copy;
+
+        my_ht  = (PippHashTable*) PMC_struct_val(SELF);
+
+        if (PMC_type(src) == PMC_type(SELF)) {
+
+            src_ht = (PippHashTable*)PMC_struct_val(src);
+            pipp_hash_empty(INTERP, my_ht);
+            pipp_hash_resize(INTERP, my_ht, src_ht->elementCount);
+
+            for (bkt = src_ht->tableHead; bkt != NULL; bkt = bkt->tableNext) {
+                key_copy   = string_copy(INTERP,  bkt->key);
+                value_copy = VTABLE_clone(INTERP, bkt->value);
+                pipp_hash_put(INTERP, my_ht, key_copy, value_copy);
+            }
+        }
+        else if (VTABLE_does(INTERP, src, CONST_STRING(INTERP, "array")) ||
+                 VTABLE_does(INTERP, src, CONST_STRING(INTERP, "hash"))) {
+
+            iter = VTABLE_get_iter(INTERP, src);
+            pipp_hash_empty(INTERP, my_ht);
+            pipp_hash_resize(INTERP, my_ht, VTABLE_elements(INTERP, src));
+
+            while(VTABLE_get_bool(INTERP, iter)) {
+                key        = VTABLE_shift_pmc(INTERP, iter);
+                value_copy = VTABLE_get_pmc_keyed(INTERP, src, key);
+                key_copy   = VTABLE_get_string(INTERP, key);
+
+                pipp_hash_put(INTERP, my_ht, key_copy, value_copy);
+            }
+        }
+        else
+            Parrot_ex_throw_from_c_args(INTERP, 0, -1, "no can do");
+    }
+/*
+
+=item C<PMC* add(PMC *src, PMC *dest)>
+
+Copy all key/value pairs in C<SELF> and C<src> into C<dest>.  All values in
+C<dest> are deleted.  If the same key is in both C<src> and C<SELF>, the value
+from C<SELF> will be used.
+
+=cut
+
+*/
+    PMC *add(PMC *src, PMC *dest) {
+        dest = SELF.clone();
+        mmd_dispatch_i_pp(INTERP, dest, src, MMD_I_ADD);
+        return dest;
+    }
+/*
+
+=item C<PMC* i_add(PMC *src)>
+
+Copy all key/value pairs from C<src> into C<SELF>.  If the same key is in both
+C<src> and C<SELF>, the value from C<SELF> will be used.
+
+=cut
+
+*/
+    void i_add(PMC *src) {
+        PippHashTable *src_ht, *my_ht;
+        PippBucket    *bkt;
+        STRING        *key_copy;
+        PMC           *key, *value_copy, *iter;
+
+        src_ht = (PippHashTable*)PMC_struct_val(src);
+        my_ht  = (PippHashTable*)PMC_struct_val(SELF);
+
+        if (PMC_type(SELF) == PMC_type(src)) {
+            for (bkt = src_ht->tableHead; bkt != NULL; bkt = bkt->tableNext) {
+                key_copy   = string_copy(INTERP, bkt->key);
+                value_copy = VTABLE_clone(INTERP, bkt->value);
+                /* TODO: This isn't especially efficient. */
+                if (!pipp_hash_find(INTERP, my_ht, key_copy))
+                    pipp_hash_put(INTERP, my_ht, key_copy, value_copy);
+            }
+        }
+        else if (VTABLE_does(INTERP, src, CONST_STRING(INTERP, "array")) ||
+                VTABLE_does(INTERP, src, CONST_STRING(INTERP, "hash"))) {
+
+            iter = VTABLE_get_iter(INTERP, src);
+            pipp_hash_empty(INTERP, my_ht);
+            pipp_hash_resize(INTERP, my_ht, VTABLE_elements(INTERP, src));
+
+            while(VTABLE_get_bool(INTERP, iter)) {
+                key        = VTABLE_shift_pmc(INTERP, iter);
+                value_copy = VTABLE_get_pmc_keyed(INTERP, src, key);
+                key_copy   = VTABLE_get_string(INTERP, key);
+
+                pipp_hash_put(INTERP, my_ht, key_copy, value_copy);
+            }
+        }
+        else
+            Parrot_ex_throw_from_c_args(INTERP, 0, 1, "nope");
+    }
+
+/*
+
 =back
 
 =head2 Methods
