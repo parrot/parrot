@@ -17,7 +17,7 @@
 # - Programming: LIST, LOAD, SAVE
 # - Debugging: TRON, TROFF
 # - Input/Output: PRINT
-# - Miscellaneous: REM
+# - Miscellaneous: REM, CLEAR, ERROR
 # - Variables: varname = expression
 # - Access to parrot modules: LOAD "module name" , B
 #
@@ -78,6 +78,7 @@
     setkeyword(keywords, 'CONT')
     setkeyword(keywords, 'END')
     setkeyword(keywords, 'EXIT')
+    setkeyword(keywords, 'ERROR')
     setkeyword(keywords, 'FOR')
     setkeyword(keywords, 'GOSUB')
     setkeyword(keywords, 'GOTO')
@@ -242,6 +243,22 @@ good:
     aux = new 'Integer'
     aux = .EXCEPT_FATAL
     setattribute excep, 'severity', aux
+    throw excep
+.end
+
+#-----------------------------------------------------------------------
+.sub UserError
+    .param string msg
+
+    .local pmc excep, message, severity
+    message = new 'String'
+    message = 'ERROR: '
+    concat message, msg
+    severity = new 'Integer'
+    severity = .EXCEPT_ERROR
+    excep = new 'Exception'
+    setattribute excep, 'message', message
+    setattribute excep, 'severity', severity
     throw excep
 .end
 
@@ -1433,6 +1450,16 @@ setattrs:
     .param pmc tokenizer
 
     exit 0
+.end
+
+.sub func_ERROR :method
+    .param pmc tokenizer
+
+    .local pmc arg
+    arg = self.evaluate(tokenizer)
+    .local string msg
+    msg = arg
+    UserError(msg)
 .end
 
 .sub func_FOR :method
