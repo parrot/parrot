@@ -335,8 +335,8 @@ Dumps the list of labels in IMC_Unit C<unit>.
 void
 dump_labels(ARGIN(const IMC_Unit *unit))
 {
-    int i;
     const SymHash * const hsh = &unit->hash;
+    unsigned int          i;
 
     fprintf(stderr, "Labels\n");
     fprintf(stderr, "name\tpos\tlast ref\n"

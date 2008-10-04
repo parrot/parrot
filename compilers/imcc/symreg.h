@@ -88,8 +88,8 @@ typedef struct _SymReg {
 
 typedef struct _SymHash {
     SymReg **data;
-    int      size;
-    int      entries;
+    unsigned int size;
+    unsigned int entries;
 } SymHash;
 
 /* namespaces */

@@ -1198,11 +1198,11 @@ Resizes a symbol hash table.
 static void
 resize_symhash(ARGMOD(SymHash *hsh))
 {
-    const int new_size = hsh->size << 1; /* new size is twice as large */
-    int       n_next   = 16;
-    SymReg  **next_r   = mem_allocate_n_zeroed_typed(n_next, SymReg *);
-    SymHash   nh;                        /* new symbol table */
-    int       i;
+    const int    new_size = hsh->size << 1; /* new size is twice as large */
+    int          n_next   = 16;
+    SymReg     **next_r   = mem_allocate_n_zeroed_typed(n_next, SymReg *);
+    SymHash      nh;                        /* new symbol table */
+    unsigned int i;
 
     nh.data = mem_allocate_n_zeroed_typed(new_size, SymReg *);
 
@@ -1416,7 +1416,7 @@ Frees all memory of the symbols in the specified hash table.
 void
 clear_sym_hash(ARGMOD(SymHash *hsh))
 {
-    int i;
+    unsigned int i;
 
     if (!hsh->data)
         return;
@@ -1453,7 +1453,7 @@ Prints all identifiers in the specified hash table to stderr.
 void
 debug_dump_sym_hash(ARGIN(const SymHash *hsh))
 {
-    int i;
+    unsigned int i;
 
     for (i = 0; i < hsh->size; i++) {
         const SymReg *p = hsh->data[i];
@@ -1479,10 +1479,11 @@ void
 clear_locals(ARGIN_NULLOK(IMC_Unit *unit))
 {
     SymHash * const hsh = &unit->hash;
-    int i;
+    unsigned int    i;
 
     for (i = 0; i < hsh->size; i++) {
         SymReg *p;
+
         for (p = hsh->data[i]; p;) {
             SymReg * const next = p->next;
 
