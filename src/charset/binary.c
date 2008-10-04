@@ -120,7 +120,9 @@ static UINTVAL validate(SHIM_INTERP, SHIM(STRING *source_string));
 
 =item C<static void set_graphemes>
 
-RT#48260: Not yet documented!!!
+Sets the graphemes for STRING C<source_string>, starting at offset
+C<offset>. Replaces C<replace_count> graphemes from STRING
+C<insert_string>.
 
 =cut
 
@@ -138,7 +140,8 @@ set_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
 
 =item C<static STRING* to_charset>
 
-RT#48260: Not yet documented!!!
+Converts the STRING C<src> to STRING C<dest> in binary mode. Throws
+an exception if a suitable conversion function is not found.
 
 =cut
 
@@ -162,7 +165,7 @@ to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
 
 =item C<static STRING* compose>
 
-RT#48260: Not yet documented!!!
+Throws an exception because we cannot compose a binary string.
 
 =cut
 
@@ -180,7 +183,7 @@ compose(PARROT_INTERP, SHIM(STRING *source_string))
 
 =item C<static STRING* decompose>
 
-RT#48260: Not yet documented!!!
+Throws an exception because we cannot decompose a binary string.
 
 =cut
 
@@ -198,7 +201,8 @@ decompose(PARROT_INTERP, SHIM(STRING *source_string))
 
 =item C<static void upcase>
 
-RT#48260: Not yet documented!!!
+Throws an exception because we cannot convert a binary string to
+upper case.
 
 =cut
 
@@ -214,7 +218,8 @@ upcase(PARROT_INTERP, SHIM(STRING *source_string))
 
 =item C<static void downcase>
 
-RT#48260: Not yet documented!!!
+Throws an exception because we cannot convert a binary string to
+lower-case.
 
 =cut
 
@@ -230,7 +235,8 @@ downcase(PARROT_INTERP, SHIM(STRING *source_string))
 
 =item C<static void titlecase>
 
-RT#48260: Not yet documented!!!
+Throws an exception because we cannot convert a binary string to
+title case.
 
 =cut
 
@@ -246,7 +252,8 @@ titlecase(PARROT_INTERP, SHIM(STRING *source_string))
 
 =item C<static void upcase_first>
 
-RT#48260: Not yet documented!!!
+Throws an exception because we cannot set the first "character" of the
+binary string to uppercase.
 
 =cut
 
@@ -262,7 +269,8 @@ upcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 
 =item C<static void downcase_first>
 
-RT#48260: Not yet documented!!!
+Throws an exception because we cannot set the first "character"
+of the binary string to lowercase.
 
 =cut
 
@@ -278,7 +286,8 @@ downcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 
 =item C<static void titlecase_first>
 
-RT#48260: Not yet documented!!!
+Throws an exception because we can't convert the first "character"
+of binary data to title case.
 
 =cut
 
@@ -294,7 +303,7 @@ titlecase_first(PARROT_INTERP, SHIM(STRING *source_string))
 
 =item C<static INTVAL compare>
 
-RT#48260: Not yet documented!!!
+Returns 0. We can't directly compare two binary buffers (yet).
 
 =cut
 
@@ -310,7 +319,8 @@ compare(SHIM_INTERP, SHIM(const STRING *lhs), SHIM(const STRING *rhs))
 
 =item C<static INTVAL cs_index>
 
-RT#48260: Not yet documented!!!
+Returns -1. It makes no sense to try and search for a substring in
+raw binary data.
 
 =cut
 
@@ -327,7 +337,8 @@ cs_index(SHIM_INTERP, SHIM(STRING *source_string),
 
 =item C<static INTVAL cs_rindex>
 
-RT#48260: Not yet documented!!!
+Returns -1. It makes no sense to search for the last substring match
+in raw binary data.
 
 =cut
 
@@ -344,7 +355,7 @@ cs_rindex(SHIM_INTERP, SHIM(STRING *source_string),
 
 =item C<static UINTVAL validate>
 
-RT#48260: Not yet documented!!!
+Returns 1. All sequential data is valid binary data.
 
 =cut
 
@@ -433,7 +444,8 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 
 =item C<const CHARSET * Parrot_charset_binary_init>
 
-RT#48260: Not yet documented!!!
+Initialize the binary charset, including function pointers and
+settings.
 
 =cut
 
