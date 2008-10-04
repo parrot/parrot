@@ -17,7 +17,8 @@
 # - Programming: LIST, LOAD, SAVE
 # - Debugging: TRON, TROFF
 # - Input/Output: PRINT
-# - Miscellaneous: REM, CLEAR, ERROR
+# - Error control: ERROR, ON ERROR GOTO, ON ERROR EXIT
+# - Miscellaneous: REM, CLEAR
 # - Variables: varname = expression
 # - Access to parrot modules: LOAD "module name" , B
 #
@@ -41,6 +42,12 @@
 .include 'cclass.pasm'
 
 #-----------------------------------------------------------------------
+
+.const int PIRRIC_ERROR_NORMAL = 0
+.const int PIRRIC_ERROR_EXIT = 1
+.const int PIRRIC_ERROR_GOTO = 2
+
+#-----------------------------------------------------------------------
 .sub init :load :init
 
     .local pmc func
@@ -62,6 +69,9 @@
     .local pmc runnerclass
     runnerclass = newclass ['Runner']
     addattribute runnerclass, 'program'
+    addattribute runnerclass, 'exitcode'
+    addattribute runnerclass, 'errormode'
+    addattribute runnerclass, 'errorvalue'
     addattribute runnerclass, 'curline'
     addattribute runnerclass, 'vars'
     addattribute runnerclass, 'stack'
@@ -86,6 +96,7 @@
     setkeyword(keywords, 'LIST')
     setkeyword(keywords, 'LOAD')
     setkeyword(keywords, 'NEXT')
+    setkeyword(keywords, 'ON')
     setkeyword(keywords, 'PRINT')
     setkeyword(keywords, 'REM')
     setkeyword(keywords, 'RETURN')
@@ -132,6 +143,9 @@
 
     .local pmc endclass
     endclass = subclass pircontrol, ['End']
+
+    .local pmc exitclass
+    exitclass = subclass pircontrol, ['Exit']
 
     .local pmc returnclass
     returnclass = subclass pircontrol, ['Return']
@@ -189,7 +203,8 @@ opt_tron:
 no_prog:
     $I0 = 0
 start:
-    runner.runloop($I0)
+    $I1 = runner.runloop($I0)
+    exit $I1
 .end
 
 #-----------------------------------------------------------------------
@@ -321,6 +336,13 @@ done:
     setattribute self, 'tron', $P0
     $P1 = new 'ResizablePMCArray'
     setattribute self, 'stack', $P1
+    $P2 = new 'Integer'
+    $P2 = PIRRIC_ERROR_NORMAL
+    setattribute self, 'errormode', $P2
+    $P3 = new 'Integer'
+    setattribute self, 'errorvalue', $P3
+    $P4 = new 'Integer'
+    setattribute self, 'exitcode', $P4
 
     self.clear_vars()
 .end
@@ -333,6 +355,48 @@ done:
 .end
 
 #-----------------------------------------------------------------------
+.sub get_var :method
+    .param string varname
+
+    .local pmc vars, var
+    vars = getattribute self, 'vars'
+    upcase varname
+    var = vars[varname]
+    .return(var)
+.end
+
+#-----------------------------------------------------------------------
+.sub set_var :method
+    .param string varname
+    .param pmc value
+
+    .local pmc vars, var
+    vars = getattribute self, 'vars'
+    upcase varname
+    vars[varname] = value
+.end
+
+#-----------------------------------------------------------------------
+.sub set_error_exit :method
+    .param int code
+
+    $P0 = getattribute self, 'errormode'
+    $P0 = PIRRIC_ERROR_EXIT
+    $P1 = getattribute self, 'errorvalue'
+    $P1 = code
+.end
+
+#-----------------------------------------------------------------------
+.sub set_error_goto :method
+    .param int code
+
+    $P0 = getattribute self, 'errormode'
+    $P0 = PIRRIC_ERROR_GOTO
+    $P1 = getattribute self, 'errorvalue'
+    $P1 = code
+.end
+
+#-----------------------------------------------------------------------
 .sub clear_all :method
     .local pmc stack
 
@@ -342,7 +406,7 @@ done:
 .end
 
 #-----------------------------------------------------------------------
-.sub setprogram :method
+.sub set_program :method
     .param pmc program
 
     setattribute self, 'program', program
@@ -796,8 +860,6 @@ fail:
 
     .local pmc arg
     .local pmc args
-    .local pmc vars
-    vars = getattribute self, 'vars'
 
     $I0 = defined token
     if $I0 goto check
@@ -836,8 +898,7 @@ no_predef:
 
     #say $S0
     .local pmc var
-    #var = get_hll_global $S0
-    var = vars[$S0]
+    var = self.get_var($S0)
 
     unless_null var, getvar
 
@@ -1210,6 +1271,8 @@ handle_excep:
     if $I1 goto handle_cont
     $I1 = isa $P1, 'End'
     if $I1 goto prog_end
+    $I1 = isa $P1, 'Exit'
+    if $I1 goto finish
     FatalError('Unhandled control type')
 
 handle_stop:
@@ -1284,9 +1347,29 @@ prog_end:
     goto next
 
 unhandled:
+    $P3 = getattribute self, 'errormode'
+    $I0 = $P3
+    eq $I0, PIRRIC_ERROR_GOTO, goto_error
+    ne $I0, PIRRIC_ERROR_NORMAL, exit_error
     $P1 = getattribute excep, 'message'
     print $P1
     goto linenum_msg
+exit_error:
+    $P4 = getattribute self, 'errorvalue'
+    $I0 = $P4
+    $P5 = getattribute self, 'exitcode'
+    $P5 = $I0
+    goto finish
+goto_error:
+    $P4 = getattribute self, 'errorvalue'
+    $I1 = PIRRIC_ERROR_NORMAL
+    $P3 = $I1
+    $I0 = $P4
+    iter = self.findline($I0)
+    if_null iter, noline
+    curline = $I0
+    push_eh handle_excep
+    goto runit
 
 noline:
     print 'Line does not exist'
@@ -1302,6 +1385,9 @@ endmsg:
     goto next
 
 finish:
+    $P9 = getattribute self, 'exitcode'
+    $I0 = $P9
+    .return($I0)
 .end
 
 #-----------------------------------------------------------------------
@@ -1376,10 +1462,7 @@ assign:
 
     .local pmc value
     value = self.evaluate(tokenizer)
-
-    .local pmc vars
-    vars = getattribute self, 'vars'
-    vars[$S0] = value
+    self.set_var($S0, value)
 
     goto next
 
@@ -1449,7 +1532,9 @@ setattrs:
 .sub func_EXIT :method
     .param pmc tokenizer
 
-    exit 0
+    .local pmc ex_exit
+    ex_exit = new 'Exit'
+    throw_typed(ex_exit)
 .end
 
 .sub func_ERROR :method
@@ -1679,6 +1764,37 @@ jump:
     .return()
 endloop:
     $P0 = pop stack
+.end
+
+.sub func_ON :method
+    .param pmc tokenizer
+
+    .local pmc token
+    token = tokenizer.get()
+    $S0 = token
+    upcase $S0
+    if $S0 == 'ERROR' goto on_error
+    goto fail
+on_error:
+    token = tokenizer.get()
+    $S0 = token
+    upcase $S0
+    if $S0 == 'GOTO' goto on_error_goto
+    if $S0 == 'EXIT' goto on_error_exit
+    goto fail
+on_error_exit:
+    $P0 = self.evaluate(tokenizer)
+    $I0 = $P0
+    self.set_error_exit($I0)
+    goto finish
+on_error_goto:
+    $P0 = self.evaluate(tokenizer)
+    $I0 = $P0
+    self.set_error_goto($I0)
+    goto finish
+fail:
+    SyntaxError()
+finish:
 .end
 
 .sub func_PRINT :method
