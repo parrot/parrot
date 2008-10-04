@@ -211,7 +211,7 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int first)
     Instruction          *ins;
     const SymHash * const hsh = &unit->hash;
     int                   nu  = 0;
-    int                   i;
+    unsigned int          i;
 
     IMCC_info(interp, 2, "find_basic_blocks\n");
     init_basic_blocks(unit);
@@ -985,14 +985,14 @@ compute_dominators(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     int b, runner, wrong;
     Set **dominators;
 
-    const int n = unit->n_basic_blocks;
+    const unsigned int n = unit->n_basic_blocks;
     IMCC_info(interp, 2, "compute_dominators\n");
 
-    unit->idoms      = mem_allocate_n_zeroed_typed(n, int);
-    dominators       = mem_allocate_n_zeroed_typed(n, Set *);
-    unit->dominators = dominators;
+    unit->idoms          = mem_allocate_n_zeroed_typed(n, int);
+    dominators           = mem_allocate_n_zeroed_typed(n, Set *);
+    unit->dominators     = dominators;
 
-    dominators[0]    = set_make(n);
+    dominators[0]        = set_make(n);
     set_add(dominators[0], 0);
 
     for (i = n - 1; i; --i) {
@@ -1398,7 +1398,7 @@ mark_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const Edge *e))
         }
 
     IMCC_debug(interp, DEBUG_CFG, "loop from %d to %d, entered from %d\n",
-            footer->index, header->index, enter ? enter->index : -1);
+            footer->index, header->index, enter ? (int)enter->index : -1);
 
     if (i == 0) {
         if (header->index)

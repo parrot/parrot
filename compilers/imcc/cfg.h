@@ -12,22 +12,20 @@
 
 typedef struct _edge {
     struct _basic_block *from;
-    struct _edge *pred_next;
-
     struct _basic_block *to;
-    struct _edge *succ_next;
-    struct _edge *next;
+    struct _edge        *pred_next;
+    struct _edge        *succ_next;
+    struct _edge        *next;
 } Edge;
-
 
 typedef struct _basic_block {
     Instruction *start;         /* First instruction in basic block */
     Instruction *end;           /* Last  instruction in basic block */
-    Edge *pred_list;
-    Edge *succ_list;
-    int loop_depth;
-    int index;                  /*on bb_list*/
-    int flag;
+    Edge        *pred_list;
+    Edge        *succ_list;
+    int          loop_depth;
+    unsigned int index;         /* on bb_list*/
+    int          flag;
 } Basic_block;
 
 EXTERN enum block_enum_flags_t {
