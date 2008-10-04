@@ -26,11 +26,11 @@ enum INSTYPE {    /*instruction type can be   */
 typedef struct _Instruction {
     char        *opname;   /* opstring w/o params */
     char        *format;   /* printf style format string for params   */
+    int          keys;     /* bitmask of keys used in this instruction */
     unsigned int flags;    /* how the instruction affects each of the values */
     unsigned int type;     /* 16 bit register branches, + ITxxx */
-    int          keys;     /* bitmask of keys used in this instruction */
-    int          index;    /* index on instructions[] */
-    int          bbindex;  /* number of basic block containing instruction */
+    unsigned int index;    /* index on instructions[] */
+    unsigned int bbindex;  /* number of basic block containing instruction */
 
     struct _Instruction *prev;
     struct _Instruction *next;

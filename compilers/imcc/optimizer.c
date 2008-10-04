@@ -1469,9 +1469,10 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
             continue;
         /* this block isn't entered from anywhere */
         if (!bb->pred_list) {
-            const int bbi = bb->index;
+            const unsigned int bbi = bb->index;
             IMCC_debug(interp, DEBUG_OPT1,
                        "found dead block %d\n", bb->index);
+
             for (ins = bb->start; ins && ins->bbindex == bbi;) {
                 IMCC_debug(interp, DEBUG_OPT1,
                         "\tins deleted (dead block) %I\n", ins);

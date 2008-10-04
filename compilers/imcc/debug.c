@@ -348,8 +348,8 @@ dump_labels(ARGIN(const IMC_Unit *unit))
             if (r && (r->type & VTADDRESS))
                 fprintf(stderr, "%s\t%d\t%d\n",
                         r->name,
-                        r->first_ins ? r->first_ins->index : -1,
-                        r->last_ins ? r->last_ins->index : -1);
+                        r->first_ins ? (int)r->first_ins->index : -1,
+                        r->last_ins  ? (int)r->last_ins->index  : -1);
         }
     }
     fprintf(stderr, "\n");
