@@ -727,6 +727,7 @@ examples/pge/grammars/PatchGrammar.pg                       [main]doc
 examples/pge/simple.pir                                     [main]doc
 examples/pir/circle.pir                                     [main]doc
 examples/pir/euclid.pir                                     [main]doc
+examples/pir/genprog.bas                                    [main]doc
 examples/pir/hanoi.pir                                      [main]doc
 examples/pir/hello-dwim.pir                                 [main]doc
 examples/pir/io.pir                                         [main]doc
