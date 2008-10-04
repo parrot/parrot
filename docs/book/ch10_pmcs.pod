@@ -40,11 +40,99 @@ in the normal C preprocessor> over the C language. All valid C is valid in
 PMC scripts, but there are also a few additions that help to make common tasks
 a little easier.
 
+The PMC script was born of conflicting necessities. The internals of Parrot
+are all written according to the ISO C89 standard for maximum portability.
+However, PIR and languages that are built on top of Parrot are typically
+object-oriented (or have some OO capabilities). PMCs are like classes,
+they have data and methods, and they can inherit from parent PMCs.
+
+C is low-level and portable, which is desirable. But Parrot needed some
+support for OO features that C doesn't have, and the C preprocessor
+can't support directly. To support the necessary features, and to make
+the task of writing PMCs just a little bit easier, the Parrot developers
+created a PMC compiler program that takes a special PMC script and converts
+it into standard ISO C89.
+
+=head3 PMC Files
+
+PMC files have a C<.pmc> file extension.
+
 =head3 C<pmclass> Definitions
 
-=head3 VTABLE interface parameters
+A PMC file can contain a PMC class definition and any other helper functions
+or data structure definitions that are needed to support the PMC. To define
+a PMC class in the PMC file, you use the C<pmclass> statement. Everything
+outside the C<pmclass> definition will be ignored by the PMC compiler.
+Inside the C<pmclass> defintion are going to be all the VTABLE and METHOD
+declarations for the PMC.
+
+A standard definition can contain a number of parts. Here's a pseudo-grammar
+for them:
+
+  pmclass CLASSNAME [extends PARENT]? [provides INTERFACE] [FLAGS]* {
+  
+      /* VTABLE and METHODs defined here. */
+  
+  }
+
+The C<extends> keyword is optional, but allows us to specify that this
+PMC class is a subtype of the given type. If we have an C<extends>
+in the definition, we can use the C<SUPER> keyword throughout the PMC
+file to refer to the parent type.
+
+The C<FLAGS> are a series of flags that can be specified to determine
+how the PMC behaves and how it's constructed internally. The C<need_ext>
+flag assigns a special C<PMC_EXT> data structure to the PMC structure
+internally. C<PMC_EXT> is necessary to handle data sharing between threads
+or interpreters, storing attributes in the PMC, and a few other uses as
+well. The C<singleton> flag means that there can only be one instantiated
+object of this class.
+
+The C<provides> keyword is used to show that the PMC provides certain
+standard interfaces. For instance, you can specify C<provides array>
+and then Parrot will enable us to write things like C<$P0[2]> in PIR
+code to access the PMC using integer indices. C<provides hash> means
+that we can use string and PMC keys to access values in the PMC.
 
 =head3 C<INTERP>, C<SUPER>, C<SELF>, and C<STATICSELF>
+
+=head3 PMC Compiler
+
+=head2 Custom Data Structures
+
+=head2 VTABLE Function Definitions
+
+=head3 VTABLE Functions Parameters
+
+VTABLE functions are defined just like ordinary C functions, almost. Here's
+a normal definition for a VTABLE method:
+
+  VTABLE VTABLENAME (PARAMETERS) {
+    /* ordinary C here, almost */
+  }
+
+You can't just name your VTABLE functions anything you want. There is a
+predefined list of VTABLE function names, and you must name it exactly
+the same as the one you are trying to implement. The PARAMETERS list
+is pretty particular as well: Each VTABLE function type has a specific
+parameter list that must be implemented exactly or else the compiler
+will throw a warning.
+
+=head2 Methods
+
+VTABLES are standard, but they're rigid. They need to have the exact name
+that Parrot expects, and they need to have the exact function signature
+that Parrot expects too. VTABLES are responsible for the low-level basic
+access operations that all data types need to implement. However, to get
+more out of your PMCs, we need a more flexible want to interact with them.
+
+Enter methods, which are ways to extend the functionality of your PMC
+in ways that the PMC needs. Methods allow the developer to add all sorts
+of arbitrary functionality to a PMC that the VTABLE functions themselves
+cannot define.
+
+
+
 
 =head2 Dynpmcs
 
