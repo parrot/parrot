@@ -5,7 +5,7 @@ HOMEPAGE="http://www.parrotcode.org/"
 #SRC_URI=$(lwp-request -m HEAD -x -e "http://www.parrotcode.org/release/devel" 2>&1 | \
 #	    grep "/authors/id" | tail -n1 | perl -ane 'print $F[2]')
 # or:
-SRC_URI=${SRC_URI:-"http://search.cpan.org/CPAN/authors/id/R/RG/RGRJR/parrot-${PV}.tar.gz"}
+SRC_URI=${SRC_URI:-"http://search.cpan.org/CPAN/authors/id/P/M/PMIC/parrot-${PV}.tar.gz"}
 # SRC_URI="http://search.cpan.org/dist/${PN}/${PN}-${PV}.tar.gz"
 # SRC_DIR="parrot-${PV}"
 LICENSE="Artistic2"
@@ -16,12 +16,12 @@ PKG_NAMES="${PN} lib${PN}0 lib${PN}-devel ${PN}-perl6 ${PN}-languages"
 PKG_HINTS="${PKG_NAMES}"
 
 parrot_exists_check() {
-  #/usr/lib/libparrot.dll.a /usr/local/lib/libparrot.dll.a \
   for d in /usr/local/lib/parrot /usr/local/include/parrot \
-	   /usr/include/parrot /usr/lib/parrot
+	   /usr/include/parrot /usr/lib/parrot \
+	   /usr/lib/libparrot.dll.a /usr/local/lib/libparrot.dll.a
   do
     if [ -e $d ]; then
-      echo "Building with $d is not yet supported! Remove or rename first"
+      echo "Testing with $d is not yet supported! Remove or rename first"
       exit
     fi
   done
@@ -30,9 +30,6 @@ parrot_exists_check() {
 src_compile() {
   cd ${B}
   parrot_exists_check
-  oldpath=$PATH
-  PATH=${B}/blib/lib:$PATH
-  export PATH
 
   test -e Configure.pl || lndirs
   test -e config_lib.pasm && make realclean
@@ -40,7 +37,7 @@ src_compile() {
   # stable by irc:#parrot
   lang_stable="abc cardinal eclectus lolcode lua perl6 pipp punie pynie squaak"
   # 100% ok by make smoke
-  lang_alltests_ok="bf lazy-k lazy-k regex unlambda"
+  lang_alltests_ok="bf lazy-k regex unlambda"
   perl Configure.pl --prefix=/usr --optimize --mandir=/usr/share/man 
   # -Ddoc_dir=/usr/share/doc/${P} needs to be patched for cygwin. 
   # cygwin-1.7 will have this changed.
@@ -58,6 +55,7 @@ src_compile() {
      [perl #56554] [TODO]  make install -C languages
      [perl #58034] [TODO]  config_args
      [perl #56996] [TODO]  FHS runtime paths
+     [perl #57548] [TODO]  CONDITIONED_LINE_enh
 EOF
 
   # Build executables for the other languages.
@@ -65,23 +63,16 @@ EOF
 
   cygmake -C editor
 
-  PATH=$oldpath
-  export PATH
 }
 
 src_check () {
   cd ${B}
   parrot_exists_check
-  oldpath=$PATH
-  PATH=${B}/blib/lib:$PATH
-  export PATH
 
   cygtest
-  cygmake test -C languages/perl6
+  cygmake test spectest_regression -C languages/perl6
   cygmake languages-smoke
 
-  PATH=$oldpath
-  export PATH
 }
 
 src_install () {
@@ -91,7 +82,7 @@ src_install () {
   mkdir -p $man1
 
   # already in core now
-  PATH=${B}/blib/lib:$PATH make reallyinstall DESTDIR=${D} DOC_DIR="/usr/share/doc/${P}"
+  make reallyinstall DESTDIR=${D} DOC_DIR="/usr/share/doc/${P}"
 
   #cygmake installable_perl6.exe -C languages/perl6
   rm $man1/parrot-perl6.1
@@ -124,11 +115,11 @@ src_install () {
   doins myconfig VERSION parrotbug
 
   exeinto /usr/bin
-  doexe parrot_config.exe blib/lib/cygparrot${DLLVER}.dll
+  doexe parrot_config.exe cygparrot${DLLVER}.dll
   #cp languages/perl6/installable_perl6.exe ${D}/usr/bin/perl6.exe
 
   insinto /usr/lib
-  doins blib/lib/libparrot.dll.a
+  doins libparrot.dll.a
 
   insinto /usr/lib/parrot/library
   doins runtime/parrot/library/config.pir
@@ -187,6 +178,9 @@ src_install () {
   done
   # not yet ready
   rm $man1/parrot-forth.1
+  cd $man1
+  for f in *.1; do gzip $f; done
+  cd ${B}
 }
 
 # parrot
