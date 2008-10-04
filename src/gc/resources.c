@@ -262,7 +262,10 @@ mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool))
 
 =item C<static const char* buffer_location>
 
-RT#48260: Not yet documented!!!
+Recturns a constant string representing the location of the given
+PObj C<b> in one of the PMC registers. If the PMC is not located
+in one of the PMC registers of the current context, returns the
+string C<"???">.
 
 =cut
 
@@ -294,8 +297,7 @@ buffer_location(PARROT_INTERP, ARGIN(const PObj *b))
 
 =item C<static void debug_print_buf>
 
-RT#48260: Not yet documented!!!
-
+Prints a debug statement with information about the given PObj C<b>.
 =cut
 
 */
@@ -568,7 +570,9 @@ Parrot_go_collect(PARROT_INTERP)
 
 =item C<static size_t aligned_size>
 
-RT#48260: Not yet documented!!!
+Determines the size of Buffer C<buffer> which has nominal length C<len>.
+The actual size in RAM of the Buffer might be different because of
+alignment issues.
 
 =cut
 
@@ -592,7 +596,9 @@ aligned_size(ARGIN(const Buffer *buffer), size_t len)
 
 =item C<static char * aligned_mem>
 
-RT#48260: Not yet documented!!!
+Returns a pointer to the aligned allocated storage for Buffer C<buffer>,
+which might not be the same as the pointer to C<buffeR> because of
+memory alignment.
 
 =cut
 
@@ -618,7 +624,8 @@ aligned_mem(ARGIN(const Buffer *buffer), ARGIN(char *mem))
 
 =item C<static size_t aligned_string_size>
 
-RT#48260: Not yet documented!!!
+Determines the size of a string of length C<len> in RAM, accounting for
+alignment.
 
 =cut
 
