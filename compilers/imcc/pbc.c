@@ -1820,9 +1820,9 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
     if (ins == unit->instructions) {
         int ins_size;
 
-        const int oldsize   = get_old_size(interp, &ins_line);
-        const int code_size = get_codesize(interp, unit, &ins_size);
-        const int bytes     = (oldsize + code_size) * sizeof (opcode_t);
+        const int    oldsize   = get_old_size(interp, &ins_line);
+        const int    code_size = get_codesize(interp, unit, &ins_size);
+        const size_t bytes     = (oldsize + code_size) * sizeof (opcode_t);
 
         IMCC_debug(interp, DEBUG_PBC, "code_size(ops) %d  oldsize %d\n",
                 code_size, oldsize);
@@ -1841,7 +1841,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
             mem_sys_realloc(interp->code->base.data, bytes);
 
         interp->code->pic_index->data = (opcode_t *)
-            mem_sys_realloc(interp->code->pic_index->data, bytes/2);
+            mem_sys_realloc(interp->code->pic_index->data, bytes / 2);
 
         interp->code->base.size       = oldsize + code_size;
         interp->code->pic_index->size = (oldsize + code_size) / 2;

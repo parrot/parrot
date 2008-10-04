@@ -957,7 +957,7 @@ try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
     SymReg ** const reglist = unit->reglist;
 
     /* unit->n_symbols should be an upper limit of needed colors */
-    int n = unit->n_symbols;
+    size_t n = unit->n_symbols;
 
     if (unit->max_color >= n)
         n = unit->max_color + 1;

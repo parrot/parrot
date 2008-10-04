@@ -160,8 +160,8 @@ Raises a fatal error if the two Sets have different lengths.
 int
 set_equal(ARGIN(const Set *s1), ARGIN(const Set *s2))
 {
-    int mask;
-    const int bytes = s1->length / 8;
+    int          mask;
+    const size_t bytes = s1->length / 8;
 
     if (s1->length != s2->length)
         fatal(1, "set_equal", "Sets don't have the same length\n");

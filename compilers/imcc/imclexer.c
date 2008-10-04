@@ -4015,8 +4015,7 @@ YY_RULE_SETUP
         /* Save the string we want to mark the end of the heredoc and snip
            off newline and quote. */
         if (IMCC_INFO(interp)->frames->heredoc_rest)
-            IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
-            "nested heredoc not supported");
+            IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "nested heredoc not supported");
         IMCC_INFO(interp)->heredoc_end = str_dup(yytext + 3);
         IMCC_INFO(interp)->heredoc_end[strlen(IMCC_INFO(interp)->heredoc_end) - 1] = 0;
 
@@ -4040,7 +4039,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 129:
 YY_RULE_SETUP
-#line 626 "compilers/imcc/imcc.l"
+#line 625 "compilers/imcc/imcc.l"
 {
         /* charset:"..." */
         valp->s = str_dup(yytext);
@@ -4051,7 +4050,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 130:
 YY_RULE_SETUP
-#line 634 "compilers/imcc/imcc.l"
+#line 633 "compilers/imcc/imcc.l"
 {
         if (valp) (valp)->s = yytext;
         if (IMCC_INFO(interp)->state->pasm_file)
@@ -4062,7 +4061,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 131:
 YY_RULE_SETUP
-#line 642 "compilers/imcc/imcc.l"
+#line 641 "compilers/imcc/imcc.l"
 {
         if (valp) (valp)->s = yytext;
         if (IMCC_INFO(interp)->state->pasm_file)
@@ -4073,7 +4072,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 132:
 YY_RULE_SETUP
-#line 650 "compilers/imcc/imcc.l"
+#line 649 "compilers/imcc/imcc.l"
 {
         if (valp) (valp)->s = yytext;
         if (IMCC_INFO(interp)->state->pasm_file)
@@ -4084,7 +4083,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 133:
 YY_RULE_SETUP
-#line 658 "compilers/imcc/imcc.l"
+#line 657 "compilers/imcc/imcc.l"
 {
         if (valp) (valp)->s = yytext;
         if (IMCC_INFO(interp)->state->pasm_file)
@@ -4095,7 +4094,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 134:
 YY_RULE_SETUP
-#line 666 "compilers/imcc/imcc.l"
+#line 665 "compilers/imcc/imcc.l"
 {
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
             "'%s' is not a valid register name", yytext);
@@ -4103,19 +4102,19 @@ YY_RULE_SETUP
 	YY_BREAK
 case 135:
 YY_RULE_SETUP
-#line 672 "compilers/imcc/imcc.l"
+#line 671 "compilers/imcc/imcc.l"
 /* skip */;
 	YY_BREAK
 case 136:
 YY_RULE_SETUP
-#line 674 "compilers/imcc/imcc.l"
+#line 673 "compilers/imcc/imcc.l"
 {
         /* catch all except for state macro */
         return yytext[0];
     }
 	YY_BREAK
 case YY_STATE_EOF(emit):
-#line 679 "compilers/imcc/imcc.l"
+#line 678 "compilers/imcc/imcc.l"
 {
         BEGIN(INITIAL);
 
@@ -4128,18 +4127,18 @@ case YY_STATE_EOF(emit):
     }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 690 "compilers/imcc/imcc.l"
+#line 689 "compilers/imcc/imcc.l"
 yyterminate();
 	YY_BREAK
 case 137:
 YY_RULE_SETUP
-#line 692 "compilers/imcc/imcc.l"
+#line 691 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, ENDM);
 	YY_BREAK
 case 138:
 /* rule 138 can match eol */
 YY_RULE_SETUP
-#line 694 "compilers/imcc/imcc.l"
+#line 693 "compilers/imcc/imcc.l"
 {
         IMCC_INFO(interp)->line++;
         DUP_AND_RET(valp, '\n');
@@ -4147,12 +4146,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 139:
 YY_RULE_SETUP
-#line 699 "compilers/imcc/imcc.l"
+#line 698 "compilers/imcc/imcc.l"
 return LABEL;
 	YY_BREAK
 case 140:
 YY_RULE_SETUP
-#line 701 "compilers/imcc/imcc.l"
+#line 700 "compilers/imcc/imcc.l"
 {
 
         if (yylex(valp,yyscanner,interp) != LABEL)
@@ -4178,7 +4177,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 141:
 YY_RULE_SETUP
-#line 724 "compilers/imcc/imcc.l"
+#line 723 "compilers/imcc/imcc.l"
 {
         if (valp) {
             const size_t len = strlen(IMCC_INFO(interp)->cur_macro_name) + yyleng + 12;
@@ -4195,39 +4194,39 @@ YY_RULE_SETUP
 	YY_BREAK
 case 142:
 YY_RULE_SETUP
-#line 738 "compilers/imcc/imcc.l"
+#line 737 "compilers/imcc/imcc.l"
 /* skip leading ws */;
 	YY_BREAK
 case 143:
 YY_RULE_SETUP
-#line 739 "compilers/imcc/imcc.l"
+#line 738 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, ' ');
 	YY_BREAK
 case 144:
 YY_RULE_SETUP
-#line 740 "compilers/imcc/imcc.l"
+#line 739 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, IDENTIFIER);
 	YY_BREAK
 case 145:
 YY_RULE_SETUP
-#line 741 "compilers/imcc/imcc.l"
+#line 740 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, MACRO);
 	YY_BREAK
 case 146:
 YY_RULE_SETUP
-#line 742 "compilers/imcc/imcc.l"
+#line 741 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, yytext[0]);
 	YY_BREAK
 case YY_STATE_EOF(macro):
-#line 743 "compilers/imcc/imcc.l"
+#line 742 "compilers/imcc/imcc.l"
 yyterminate();
 	YY_BREAK
 case 147:
 YY_RULE_SETUP
-#line 745 "compilers/imcc/imcc.l"
+#line 744 "compilers/imcc/imcc.l"
 ECHO;
 	YY_BREAK
-#line 4231 "compilers/imcc/imclexer.c"
+#line 4230 "compilers/imcc/imclexer.c"
 case YY_STATE_EOF(pod):
 case YY_STATE_EOF(cmt1):
 case YY_STATE_EOF(cmt2):
@@ -5429,7 +5428,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 745 "compilers/imcc/imcc.l"
+#line 744 "compilers/imcc/imcc.l"
 
 
 
@@ -5587,7 +5586,7 @@ read_params(YYSTYPE *valp, PARROT_INTERP, params_t *params,
              ARGIN(const char *macro_name), int need_id, void *yyscanner)
 {
     YYSTYPE  val;
-    int      len      = 0;
+    size_t   len      = 0;
     char    *current  = str_dup("");
     yyguts_t *yyg     = (yyguts_t *)yyscanner;
     int      c        = yylex_skip(&val, interp, " \n", yyscanner);
@@ -5611,7 +5610,7 @@ read_params(YYSTYPE *valp, PARROT_INTERP, params_t *params,
         else if (c == ',') {
             if (params->num_param == MAX_PARAM)
                 IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
-                            "More then %d params in '%s'",
+                            "More than %d params in '%s'",
                             MAX_PARAM, macro_name);
 
             params->name[params->num_param++] = current;
@@ -5660,8 +5659,8 @@ read_macro(YYSTYPE *valp, PARROT_INTERP, void *yyscanner)
     params_t  params;
     yyguts_t * const yyg  = (yyguts_t *)yyscanner;
     int       start_cond  = YY_START;
-    int       buffer_size = 0;
-    int       buffer_used = 0;
+    size_t    buffer_size = 0;
+    size_t    buffer_used = 0;
 
     BEGIN(macro);
 
@@ -5908,7 +5907,7 @@ include_file(PARROT_INTERP, char *file_name, void *yyscanner)
     FILE *file;
 
     if (!s || !(file = fopen(s, "r")))
-        IMCC_fataly(interp, EXCEPTION_PIO_ERROR, strerror(errno));
+        IMCC_fataly(interp, EXCEPTION_EXTERNAL_ERROR, strerror(errno));
 
     mem_sys_free(s);
     frame->s.file   = file_name;

@@ -897,7 +897,7 @@ read_params(YYSTYPE *valp, PARROT_INTERP, params_t *params,
              ARGIN(const char *macro_name), int need_id, void *yyscanner)
 {
     YYSTYPE  val;
-    int      len      = 0;
+    size_t   len      = 0;
     char    *current  = str_dup("");
     yyguts_t *yyg     = (yyguts_t *)yyscanner;
     int      c        = yylex_skip(&val, interp, " \n", yyscanner);
@@ -970,8 +970,8 @@ read_macro(YYSTYPE *valp, PARROT_INTERP, void *yyscanner)
     params_t  params;
     yyguts_t * const yyg  = (yyguts_t *)yyscanner;
     int       start_cond  = YY_START;
-    int       buffer_size = 0;
-    int       buffer_used = 0;
+    size_t    buffer_size = 0;
+    size_t    buffer_used = 0;
 
     BEGIN(macro);
 

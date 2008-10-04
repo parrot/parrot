@@ -1508,7 +1508,7 @@ imcc_vfprintf(PARROT_INTERP, ARGMOD(FILE *fd), ARGIN(const char *format), va_lis
     for (;;) {
         const char *cp = fmt;
         int         ch = 0;
-        int         n;
+        size_t      n;
 
         for (n = 0; (ch = *fmt) && ch != '%'; fmt++, n++);
 

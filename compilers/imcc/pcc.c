@@ -71,7 +71,7 @@ PARROT_CANNOT_RETURN_NULL
 static Instruction * move_regs(PARROT_INTERP,
     ARGIN(IMC_Unit *unit),
     ARGIN(Instruction *ins),
-    int n,
+    size_t n,
     ARGIN(SymReg **dest),
     ARGIN(SymReg **src))
         __attribute__nonnull__(1)
@@ -518,11 +518,11 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static Instruction *
 move_regs(PARROT_INTERP, ARGIN(IMC_Unit *unit), ARGIN(Instruction *ins),
-        int n, ARGIN(SymReg **dest), ARGIN(SymReg **src))
+        size_t n, ARGIN(SymReg **dest), ARGIN(SymReg **src))
 {
     unsigned char *move_list;
     move_info_t    move_info;
-    int            i;
+    unsigned int   i;
 
     if (!n)
         return ins;
@@ -538,7 +538,8 @@ move_regs(PARROT_INTERP, ARGIN(IMC_Unit *unit), ARGIN(Instruction *ins),
 
     for (i = 0; i < 2 * n; ++i) {
         const SymReg * const ri = i < n ? dest[i] : src[i - n];
-        int j;
+        unsigned int         j;
+
         for (j = 0; j < i; ++j) {
             const SymReg * const rj = j < n ? dest[j] : src[j - n];
             if (ri == rj) {
