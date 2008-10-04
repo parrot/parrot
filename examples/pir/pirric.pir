@@ -74,6 +74,7 @@
 
     .local pmc keywords
     keywords = new 'Hash'
+    setkeyword(keywords, 'CLEAR')
     setkeyword(keywords, 'CONT')
     setkeyword(keywords, 'END')
     setkeyword(keywords, 'EXIT')
@@ -259,6 +260,20 @@ good:
 .end
 
 #-----------------------------------------------------------------------
+.sub VarNotDefined
+    .local pmc excep
+    excep = new 'Exception'
+    .local pmc aux
+    aux = new 'String'
+    aux = 'Variable not found'
+    setattribute excep, 'message', aux
+    aux = new 'Integer'
+    aux = .EXCEPT_ERROR
+    setattribute excep, 'severity', aux
+    throw excep
+.end
+
+#-----------------------------------------------------------------------
 .sub readlinebas
     .param pmc file
 
@@ -289,8 +304,24 @@ done:
     setattribute self, 'tron', $P0
     $P1 = new 'ResizablePMCArray'
     setattribute self, 'stack', $P1
-    $P2 = new 'Hash'
-    setattribute self, 'vars', $P2
+
+    self.clear_vars()
+.end
+
+#-----------------------------------------------------------------------
+.sub clear_vars :method
+    .local pmc vars
+    vars = new 'Hash'
+    setattribute self, 'vars', vars
+.end
+
+#-----------------------------------------------------------------------
+.sub clear_all :method
+    .local pmc stack
+
+    self.clear_vars()
+    stack = getattribute self, 'stack'
+    stack = 0
 .end
 
 #-----------------------------------------------------------------------
@@ -799,7 +830,8 @@ no_predef:
 
     $P1 = tokenizer.get()
     $S1 = $P1
-    ne $S1, '(', fail
+    ne $S1, '(', var_not_defined
+
     $S0 = token
     #say $S0
     var = get_hll_global $S0
@@ -876,6 +908,9 @@ parenexp:
     token = tokenizer.get()
     ne token, ')', fail
     .return($P1)
+
+var_not_defined:
+    VarNotDefined()
 
 fail:
     SyntaxError()
@@ -1212,6 +1247,8 @@ handled_jump:
 handle_return:
     .local pmc stack
     stack = getattribute self, 'stack'
+    $I0 = stack
+    unless $I0 goto no_gosub
     $P0 = pop stack
     curline = $P0
     iter = self.findline(curline)
@@ -1219,6 +1256,9 @@ handle_return:
     #say curline
     push_eh handle_excep
     goto next
+no_gosub:
+    print 'RETURN without GOSUB'
+    goto linenum_msg
 
 prog_end:
     curline = 0
@@ -1367,6 +1407,12 @@ setattrs:
 .end
 
 #-----------------------------------------------------------------------
+.sub func_CLEAR :method
+    .param pmc tokenizer
+
+    self.clear_all()
+.end
+
 .sub func_CONT :method
     .param pmc tokenizer
 
@@ -1673,6 +1719,7 @@ fail:
 .sub func_RUN :method
     .param pmc tokenizer
 
+    self.clear_all()
     .local pmc program, iter
     program = getattribute self, 'program'
     iter = program.begin()
