@@ -275,11 +275,15 @@ env_loop_done:
 .HLL 'parrot', ''
 .namespace []
 
-# Override whitespace parsing in expression's optable
 .sub hack_grammar :load :anon
+  # Override whitespace parsing in expression's optable
   $P0 = get_hll_global ['TclExpr::Grammar'], '$optable'
   $P1 = get_hll_global ['TclExpr::Grammar'], 'exprws'
   setattribute $P0, '&!ws', $P1
+
+  #  Override recursion limit
+  $P0 = getinterp
+  $P0.'recursion_limit'(10000)
 .end
 
 # Local Variables:
