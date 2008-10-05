@@ -189,7 +189,7 @@ sub new {
                 'sources' => [ 'spf_render', 'spf_vtable', 'utils' ]
             ),
         ),
-        $self->new_group( 'Multi-methods', '', $self->c_pair_item( '', 'mmd' ), ),
+        $self->new_group( 'Multi-methods', '', $self->c_pair_item( '', 'multidispatch' ), ),
         $self->new_group( 'Extensions',    '', $self->c_pair_item( '', 'extend' ), ),
         $self->new_group(
             'JIT', '',
