@@ -21,7 +21,7 @@ Tests the PhpArray PMC.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(50)
+    plan(73)
 
     basic_get_set()
     stack_and_queue_ops()
@@ -33,9 +33,9 @@ Tests the PhpArray PMC.
     generic_iterator_tests_pmc_key()
     #php_iterator_tests()
     #php_array_func_tests()
-    #cmp_shallow_native()
-    #um_wtf()
-    #cmp_deep_native()
+    cmp_shallow_native()
+    cmp_order_test()
+    cmp_deep_native()
     equals_shallow_native()
     equals_deep_native()
     assign_pmc_shallow_native()
@@ -684,7 +684,7 @@ current_and_key_ok:
     ok(is_ok, "cmp similar phparrays again (b)")
 .end
 
-.sub um_wtf
+.sub cmp_order_test
     .local pmc p1, p2
     .local int is_ok, i
 

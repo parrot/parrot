@@ -50,14 +50,16 @@ Intialize this PHPArray.
 Initialize this PHPArray with the passed-in PMC C<p>.  If C<p> is a PHPArray,
 its contents are copied directly.  If C<p> is a PMC that provides a hash or
 array interface, its contents are copied via the appropriate VTABLE functions.
-If C<p> provides an integer interface, the new PMC will be empty, but will have
-at least the specified capacity.
+In any other case, an exception will be thrown.
 
 =cut
 
 */
     VTABLE void init_pmc(PMC *p) {
-        NOT_IMPLEMENTED_YET();
+        if (PMC_IS_NULL(p))
+            SELF.init();
+        else
+            SELF.assign_pmc(p);
     }
 
 /*
@@ -92,6 +94,7 @@ Recursively mark this PHPArray and all its contents as live.
 
         for (b = ht->tableHead; b != NULL; b = b->tableNext) {
             pobject_lives(INTERP, (PObj*)b->key);
+            pobject_lives(INTERP, (PObj*)b->value);
         }
     }
 
@@ -1593,6 +1596,9 @@ non-comparable PHPArrays.
         if (PMC_type(SELF) == PMC_type(other)) {
 
             PippHashTable *other_ht = (PippHashTable *)PMC_struct_val(other);
+
+            if (SELF == other)
+                return 0;
 
             if (my_ht->elementCount != other_ht->elementCount)
                 return my_ht->elementCount > other_ht->elementCount ? 1 : -1;
