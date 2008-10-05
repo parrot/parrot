@@ -93,8 +93,8 @@ Recursively mark this PHPArray and all its contents as live.
         PippHashTable *ht = (PippHashTable *)PMC_struct_val(SELF);
 
         for (b = ht->tableHead; b != NULL; b = b->tableNext) {
-            pobject_lives(INTERP, (PObj*)b->key);
-            pobject_lives(INTERP, (PObj*)b->value);
+            pobject_lives(INTERP, (PObj *)b->key);
+            pobject_lives(INTERP, (PObj *)b->value);
         }
     }
 
@@ -523,7 +523,7 @@ C<key>.
             /* Tell the Iterator that it's done iterating. */
             if (ht->internalPointer == NULL) {
                 PMC *iter = ht->iter;
-                PMC *key  = (PMC*)PMC_struct_val(iter);
+                PMC *key  = (PMC *)PMC_struct_val(iter);
                 PMC_int_val(key) = -1;
             }
             return next_key;
@@ -1448,7 +1448,7 @@ from C<SELF> will be used.
     VTABLE PMC *add(PMC *src, PMC *dest) {
 
         dest = SELF.clone();
-        mmd_dispatch_i_pp(INTERP, dest, src, MMD_I_ADD);
+        VTABLE_i_add(INTERP, dest, src);
 
         return dest;
     }
@@ -1611,7 +1611,7 @@ non-comparable PHPArrays.
                 if (other_bkt == NULL)
                     Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "non-comparable PhpArrays");
 
-                cmp = mmd_dispatch_i_pp(INTERP, my_bkt->value, other_bkt->value, MMD_CMP);
+                cmp = VTABLE_cmp(INTERP, my_bkt->value, other_bkt->value);
 
                 if (cmp)
                     return cmp;
@@ -1637,7 +1637,7 @@ non-comparable PHPArrays.
                             VTABLE_name(INTERP, other));
 
                 other_value = VTABLE_get_pmc_keyed_str(INTERP, other, other_key);
-                cmp         = mmd_dispatch_i_pp(INTERP, my_bkt->value, other_value, MMD_CMP);
+                cmp = VTABLE_cmp(INTERP, my_bkt->value, other_value);
 
                 if (cmp != 0)
                     return cmp;
