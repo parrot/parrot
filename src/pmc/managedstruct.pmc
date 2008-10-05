@@ -87,12 +87,13 @@ Destroys the struct, freeing the allocated memory.
             PMC_int_val(SELF) = 0;
         }
         else if (value && !PMC_data(SELF)) {
-            PMC_data(SELF)    = mem_sys_allocate_zeroed(value);
+            PMC_data(SELF)    = mem_sys_allocate_zeroed((size_t)value);
             PMC_int_val(SELF) = value;
         }
         else if (value && PMC_data(SELF)) {
             if (PMC_int_val(SELF) != value) {
-                PMC_data(SELF)    = mem_sys_realloc(PMC_data(SELF), value);
+                PMC_data(SELF)    = mem_sys_realloc(PMC_data(SELF),
+                                        (size_t)value);
                 PMC_int_val(SELF) = value;
             }
         }
