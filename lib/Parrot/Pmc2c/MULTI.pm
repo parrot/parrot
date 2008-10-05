@@ -77,7 +77,7 @@ sub rewrite_multi_sub {
         # Pass standard parameter types unmodified.
         # All other param types are rewritten as PMCs.
         if ($type eq 'STRING' or $type eq 'PMC' or $type eq 'INTVAL') {
-            ($sig_char) = split '', $type; # short signature takes first character of name
+            $sig_char = substr($type, 0, 1); # short signature takes first character of name
             push @new_params, $param;
         }
         elsif ($type eq 'FLOATVAL') {

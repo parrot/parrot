@@ -964,7 +964,8 @@ MULTI PMC *pow(Integer value, PMC *dest) {
 
 MULTI PMC *pow(DEFAULT value, PMC *dest) {
     PMC * const auxval = pmc_new(INTERP, VTABLE_type(INTERP, value));
-    VTABLE_set_number_native(INTERP, auxval, (FLOATVAL) SELF.get_integer());
+    FLOATVAL selfval = SELF.get_integer();
+    VTABLE_set_number_native(INTERP, auxval, selfval);
     return VTABLE_pow(INTERP, auxval, value, dest);
 }
 
