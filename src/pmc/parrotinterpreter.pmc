@@ -160,7 +160,7 @@ create_interp(PMC *self, Parrot_Interp parent)
     if (self->vtable->base_type == enum_class_ParrotThread)
         flag = PARROT_IS_THREAD;
 
-    new_interp     = make_interpreter(parent, flag);
+    new_interp     = make_interpreter(parent, (INTVAL)flag);
     PMC_data(self) = new_interp;
 
     VTABLE_set_pmc_keyed_int(new_interp, new_interp->iglobals,
@@ -318,8 +318,8 @@ Runs the interpreter's byte code.
          * possibly clone of share the arguments r/o args can be passed as is */
 
         /* calculate offset and run */
-        runops(new_interp, (opcode_t *)PMC_struct_val(SELF) -
-            (opcode_t *)interp->code->base.data);
+        runops(new_interp, (size_t)((opcode_t *)PMC_struct_val(SELF) -
+            (opcode_t *)interp->code->base.data));
 
         return (opcode_t *)next;
     }
