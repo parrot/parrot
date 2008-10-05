@@ -846,17 +846,60 @@ pir_output_is( <<'CODE', <<OUTPUT, "regression test for integer overflow with 'p
     i1 = new 'Integer'
     i2 = new 'Integer'
     i1 = 2
-    i2 = 30
-    r = pow i1, i2
-    say r
-    i2 = 31
+    i2 = 1
+next:
     null r
     r = pow i1, i2
-    say r
+    $S0 = r
+    say $S0
+    inc i2
+# XXX: this must be extended to at least 64 bit range
+# when sure that the result is not floating point.
+# In the meantime, make sure it overflows nicely
+# on 32 bit.
+    unless i2 > 40 goto next
 .end
 CODE
+2
+4
+8
+16
+32
+64
+128
+256
+512
+1024
+2048
+4096
+8192
+16384
+32768
+65536
+131072
+262144
+524288
+1048576
+2097152
+4194304
+8388608
+16777216
+33554432
+67108864
+134217728
+268435456
+536870912
 1073741824
 2147483648
+4294967296
+8589934592
+17179869184
+34359738368
+68719476736
+137438953472
+274877906944
+549755813888
+1099511627776
 OUTPUT
 
 # Local Variables:
