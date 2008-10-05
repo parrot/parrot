@@ -34,6 +34,8 @@ sub runstep {
 
     _set_intvalfmt($conf);
 
+    _set_intvalmaxmin($conf);
+
     _set_floatvalfmt_nvsize($conf);
 
     return 1;
@@ -57,6 +59,34 @@ sub _set_intvalfmt {
         die qq{Configure.pl:  Can't find a printf-style format specifier for type '$iv'\n};
     }
     $conf->data->set( intvalfmt   => $ivformat );
+}
+
+# This is unrelated to format, may be moved to other place later
+sub _set_intvalmaxmin {
+    my $conf = shift;
+    my $ivmin;
+    my $ivmax;
+    my $iv = $conf->data->get(qw(iv));
+
+    if ( $iv eq "int" ) {
+        $ivmin = 'INT_MIN';
+        $ivmax = 'INT_MAX';
+    }
+    elsif ( ( $iv eq "long" ) || ( $iv eq "long int" ) ) {
+        $ivmin = 'LONG_MIN';
+        $ivmax = 'LONG_MAX';
+    }
+    elsif ( ( $iv eq "long long" ) || ( $iv eq "long long int" ) ) {
+        # The assumption is that a compiler that have the long long type
+	# also provides his limit macros.
+        $ivmax = 'LLONG_MIN';
+        $ivmin = 'LLONG_MAX';
+    }
+    else {
+        die qq{Configure.pl:  Can't find limits for type '$iv'\n};
+    }
+    $conf->data->set( intvalmin   => $ivmin );
+    $conf->data->set( intvalmax   => $ivmax );
 }
 
 sub _set_floatvalfmt_nvsize {

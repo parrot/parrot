@@ -43,6 +43,9 @@ typedef unsigned @int4_t@       Parrot_UInt4;
 typedef @float4_t@              Parrot_Float4;
 typedef @float8_t@              Parrot_Float8;
 
+#define PARROT_INTVAL_MIN              @intvalmin@
+#define PARROT_INTVAL_MAX              @intvalmax@
+
 /* Temporary until we find a way to make it work in the right place. */
 struct PackFile;      typedef struct PackFile * Parrot_PackFile;
 
