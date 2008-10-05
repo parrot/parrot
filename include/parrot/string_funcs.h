@@ -499,15 +499,12 @@ void string_unpin(PARROT_INTERP, ARGMOD(STRING *s))
 PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
-STRING * string_upcase(PARROT_INTERP, ARGIN(const STRING *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+STRING * string_upcase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
+        __attribute__nonnull__(1);
 
 PARROT_API
-void string_upcase_inplace(PARROT_INTERP, ARGMOD(STRING *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*s);
+void string_upcase_inplace(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL

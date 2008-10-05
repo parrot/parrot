@@ -2524,12 +2524,18 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
 STRING *
-string_upcase(PARROT_INTERP, ARGIN(const STRING *s))
+string_upcase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
-    DECL_CONST_CAST;
-    STRING * const dest = string_copy(interp, PARROT_const_cast(STRING *, s));
-    string_upcase_inplace(interp, dest);
-    return dest;
+    if (STRING_IS_NULL(s)) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Can't upcase NULL string");
+    }
+    else {
+        DECL_CONST_CAST;
+        STRING * const dest = string_copy(interp, PARROT_const_cast(STRING *, s));
+        string_upcase_inplace(interp, dest);
+        return dest;
+    }
 }
 
 
@@ -2545,10 +2551,16 @@ Converts the specified Parrot string to upper case.
 
 PARROT_API
 void
-string_upcase_inplace(PARROT_INTERP, ARGMOD(STRING *s))
+string_upcase_inplace(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
 {
-    Parrot_unmake_COW(interp, s);
-    CHARSET_UPCASE(interp, s);
+    if (STRING_IS_NULL(s)) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Can't upcase NULL string");
+    }
+    else {
+        Parrot_unmake_COW(interp, s);
+        CHARSET_UPCASE(interp, s);
+    }
 }
 
 
