@@ -30,6 +30,7 @@
 # - Predefined numeric functions: COMPLEX, SQR, EXP, LN, SIN, COS, TAN, ASIN, ACOS, ATAN, SINH, COSH, TANH
 # - Predefined string functions: CHR$, ASC, LEN, LEFT$, RIGHT$, MID$
 # - Parenthesis
+# - Indexing with [ ]
 # - Special functions: NEW, ISA
 # - Calls to methods in foreign objects
 # - Calls to functions in foreign namespaces
@@ -1000,6 +1001,7 @@ fail:
     .param pmc token :optional
 
     $P0 = self.eval_base(tokenizer, token)
+again:
     $P1 = tokenizer.get()
     eq $P1, '[', keyit
     tokenizer.back()
@@ -1007,9 +1009,20 @@ fail:
 keyit:
     $P2 = self.evaluate(tokenizer)
     $P1 = tokenizer.get()
-    ne $P1, ']', fail
+    eq $P1, ']', last
+    ne $P1, ',', fail
     $P3 = $P0 [$P2]
-    .return($P3)
+    null $P2
+    null $P0
+    $P0 = $P3
+    null $P3
+    goto keyit
+last:
+    $P3 = $P0 [$P2]
+    null $P0
+    $P0 = $P3
+    null $P3
+    goto again
 fail:
     SyntaxError()
 .end
@@ -1476,16 +1489,34 @@ findkey:
     .local pmc op
     op = tokenizer.get()
     eq op, '=', assign
+    eq op, '[', keyed
     goto fail
 assign:
-    $S0 = key
-
     .local pmc value
     value = self.evaluate(tokenizer)
-    self.set_var($S0, value)
+    self.set_var(key, value)
 
     goto next
-
+keyed:
+    .local pmc obj, index, auxobj
+    obj = self.get_var(key)
+keyed_next:
+    index = self.evaluate(tokenizer)
+    op = tokenizer.get()
+    eq op, ']', last
+    ne op, ',', fail
+    auxobj = obj[index]
+    null index
+    null obj
+    obj = auxobj
+    null auxobj
+    goto keyed_next
+last:
+    op = tokenizer.get()
+    ne op, '=', fail
+    value = self.evaluate(tokenizer)
+    obj[index] = value
+    goto next
 fail:
     SyntaxError()
 exec:
