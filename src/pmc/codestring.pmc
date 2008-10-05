@@ -8,21 +8,19 @@ src/pmc/codestring.pmc - CodeString PMC Class
 
 =head1 DESCRIPTION
 
-C<CodeString> is a class intended to simplify the process of
-emitting code strings.  Ideally this will eventually
-become a form of "CodeBuffer" that is more efficient
-than string concatenation, but for now it works well
-enough for me.
+C<CodeString> is a class intended to simplify the process of emitting code
+strings.  Ideally this will eventually become a form of "CodeBuffer" that is
+more efficient than string concatenation, but for now it works well enough for
+me.
 
-The primary method for C<CodeString> objects is C<emit>,
-which appends a line (or lines) of code to the string
-according to a format parameter.  The line can contain
-substitution markers (ala printf) that indicate where
-other parameters to the call should be placed.
+The primary method for C<CodeString> objects is C<emit>, which appends a line
+(or lines) of code to the string according to a format parameter.  The line can
+contain substitution markers (ala printf) that indicate where other parameters
+to the call should be placed.
 
-Note that C<CodeString> is just a subclass of Parrot's
-native C<String> class, so it's easy to combine CodeString
-objects with other strings outside of the C<emit> method.
+Note that C<CodeString> is just a subclass of Parrot's native C<String> class,
+so it's easy to combine CodeString objects with other strings outside of the
+C<emit> method.
 
 =head2 Methods
 
@@ -62,13 +60,13 @@ A newline is automatically added to the end of the fmt.
 */
 
   METHOD emit(STRING *fmt, PMC *args :slurpy, PMC *hash :slurpy :named) {
-    INTVAL pos          = 0;
-    INTVAL replen       = 0;
     STRING *percent     = CONST_STRING(INTERP, "%");
     STRING *comma       = CONST_STRING(INTERP, ",");
     STRING *comma_space = CONST_STRING(INTERP, ", ");
     STRING *newline     = CONST_STRING(INTERP, "\n");
     STRING *key, *repl, *S0, *S1;
+    INTVAL pos          = 0;
+    INTVAL replen       = 0;
     INTVAL I0, I1;
 
     fmt = Parrot_make_COW_reference(INTERP, fmt);
@@ -83,7 +81,8 @@ A newline is automatically added to the end of the fmt.
         if (VTABLE_exists_keyed_str(INTERP, hash, key)) {
             repl = VTABLE_get_string_keyed_str(INTERP, hash, key);
         }
-        else if (Parrot_string_is_cclass(INTERP, enum_cclass_numeric, fmt, pos+1)) {
+        else if (Parrot_string_is_cclass(INTERP, enum_cclass_numeric, fmt,
+                (UINTVAL)pos + 1)) {
             I0   = string_to_int(INTERP, key);
             repl = VTABLE_get_string_keyed_int(INTERP, args, I0);
         }
