@@ -118,10 +118,10 @@ Resizes the array to C<size> elements.
 
     VTABLE void set_integer_native(INTVAL size) {
         /* Size respects any existing head position offset from unshift */
-        INTVAL newsize = size + PMC_int_val2(SELF);
-        INTVAL oldsize = PMC_int_val(SELF);
+        size_t newsize = size + PMC_int_val2(SELF);
+        size_t oldsize = PMC_int_val(SELF);
 
-        INTVAL new_bytesize, old_bytesize;
+        size_t new_bytesize, old_bytesize;
 
         /* We are already at the requested size. Yay */
         if (newsize == oldsize)
@@ -148,7 +148,7 @@ Resizes the array to C<size> elements.
             Parrot_UInt1 * old_store = PMC_data_typed(SELF, Parrot_UInt1 *);
             Parrot_UInt1 * new_store =
                 (Parrot_UInt1 *)mem_sys_allocate_zeroed(newsize);
-            INTVAL         copy_size =
+            size_t         copy_size =
                 new_bytesize < old_bytesize ? new_bytesize : old_bytesize;
 
             /* Replace old array with new array, and free old array */
@@ -215,7 +215,7 @@ beginning.
             Parrot_UInt1 * const sdOld = PMC_data_typed(SELF, Parrot_UInt1 *);
 
             /* Allocate an extra allocation unit of space in new array */
-            INTVAL oldmemsize, newmemsize;
+            size_t oldmemsize, newmemsize;
             Parrot_UInt1 *sdNew = NULL;
             newmemsize          = ROUND_BYTES(PMC_int_val(SELF) + MIN_ALLOC);
             sdNew               =
@@ -270,11 +270,11 @@ Removes and returns the first element.
          * size, size this thing down */
         if (PMC_int_val2(SELF) >= MIN_ALLOC) {
             /* Allocate one allocation unit less of space in new array */
-            INTVAL newmemsize;
-            Parrot_UInt1 *sdNew = NULL;
-            Parrot_UInt1 *sdOld = NULL;
-            newmemsize          = ROUND_BYTES(PMC_int_val(SELF) - MIN_ALLOC);
-            sdNew               =
+            Parrot_UInt1 *sdNew      = NULL;
+            Parrot_UInt1 *sdOld      = NULL;
+            size_t        newmemsize = ROUND_BYTES(PMC_int_val(SELF)
+                                            - MIN_ALLOC);
+            sdNew                    =
                 (Parrot_UInt1 *)mem_sys_allocate_zeroed(newmemsize);
 
             /* Copy contents of old array to new array, move the head position
@@ -332,15 +332,16 @@ Returns a copy of the array.
 */
 
     VTABLE PMC *clone() {
-        PMC * const dest   = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC_int_val(dest)  = PMC_int_val(SELF);
-        PMC_int_val2(dest) = PMC_int_val2(SELF);
+        PMC * const dest      = pmc_new(INTERP, SELF->vtable->base_type);
+        size_t      dest_size = PMC_int_val(SELF);
+
+        PMC_int_val(dest)     = dest_size;
+        PMC_int_val2(dest)    = PMC_int_val2(SELF);
 
         if (PMC_data(SELF)) {
-            PMC_data(dest) = mem_sys_allocate(
-                    (PMC_int_val(dest)) / BITS_PER_CHAR + 1);
-            mem_sys_memcopy(PMC_data(dest), PMC_data(SELF),
-                    (PMC_int_val(dest)) / BITS_PER_CHAR + 1);
+            size_t dest_size_in_bits = dest_size / BITS_PER_CHAR + 1;
+            PMC_data(dest) = mem_sys_allocate(dest_size_in_bits);
+            mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), dest_size_in_bits);
         }
         else
             PMC_data(dest) = NULL;
@@ -372,9 +373,9 @@ Used to archive the string.
             and use it during thaw?
         */
 
-        IMAGE_IO * const io   = info->image_io;
-        const INTVAL     size = ROUND_BYTES(PMC_int_val(SELF));
         STRING           *s;
+        IMAGE_IO * const  io   = info->image_io;
+        const size_t      size = ROUND_BYTES(PMC_int_val(SELF));
 
         VTABLE_push_integer(INTERP, io, PMC_int_val2(SELF));
         VTABLE_push_integer(INTERP, io, PMC_int_val(SELF));
