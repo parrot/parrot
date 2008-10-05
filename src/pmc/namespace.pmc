@@ -180,7 +180,7 @@ really a public API.
                 if (string_str_index(interp, key,
                     CONST_STRING(interp, "__"), 0) == 0) {
                     STRING * const meth_name = string_substr(interp, key, 2,
-                        string_length(interp, key) - 2, NULL, 0);
+                        (INTVAL)(string_length(interp, key) - 2), NULL, 0);
                     sub->vtable_index        =
                         Parrot_get_vtable_index(interp, meth_name);
                 }

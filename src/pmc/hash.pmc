@@ -1095,7 +1095,7 @@ Used to archive the hash.
 
         SUPER(info);
         VTABLE_push_integer(INTERP, io, VTABLE_elements(INTERP, SELF));
-        VTABLE_push_integer(INTERP, io, hash->key_type);
+        VTABLE_push_integer(INTERP, io, (INTVAL)hash->key_type);
         VTABLE_push_integer(INTERP, io, hash->entry_type);
     }
 
