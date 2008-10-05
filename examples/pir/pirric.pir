@@ -26,7 +26,7 @@
 # - ? -> PRINT
 #
 # Expressions:
-# - Operators: + - * / < > = unary+ unary- MOD
+# - Operators: + - * / < > = unary+ unary- MOD ^
 # - Predefined numeric functions: COMPLEX, SQR, EXP, LN, SIN, COS, TAN, ASIN, ACOS, ATAN, SINH, COSH, TANH
 # - Predefined string functions: CHR$, ASC, LEN, LEFT$, RIGHT$, MID$
 # - Parenthesis
@@ -1028,17 +1028,37 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
+.sub eval_pow :method
+    .param pmc tokenizer
+    .param pmc token :optional
+
+    $P0 = self.eval_base_1(tokenizer, token)
+more:
+    $P1 = tokenizer.get()
+    eq $P1, '^', dopow
+    tokenizer.back()
+    .return($P0)
+dopow:
+    $P2 = self.eval_unary(tokenizer)
+    null $P3
+    $P3 = pow $P0, $P2
+    set $P0, $P3
+    null $P2
+    goto more
+.end
+
+#-----------------------------------------------------------------------
 .sub eval_mod :method
     .param pmc tokenizer
     .param pmc token :optional
-    $P0 = self.eval_base_1(tokenizer, token)
+    $P0 = self.eval_pow(tokenizer, token)
 more:
     $P1 = tokenizer.get()
     eq $P1, 'MOD', domod
     tokenizer.back()
     .return($P0)
 domod:
-    $P2 = self.eval_base_1(tokenizer)
+    $P2 = self.eval_pow(tokenizer)
     $P3 = clone $P0
     mod $P3, $P2
     set $P0, $P3
@@ -2038,6 +2058,7 @@ loop:
     eq c, '-', operator
     eq c, '*', operator
     eq c, '/', operator
+    eq c, '^', operator
     eq c, '<', operator
     eq c, '>', operator
     eq c, '(', operator
@@ -2122,6 +2143,7 @@ nextchar:
     eq c, '-', endtoken
     eq c, '*', endtoken
     eq c, '/', endtoken
+    eq c, '^', endtoken
     eq c, '<', endtoken
     eq c, '>', endtoken
     eq c, '(', endtoken
