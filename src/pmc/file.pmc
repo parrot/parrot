@@ -209,8 +209,8 @@ free to change or give me hints on how to change it. -- ambs
             string_cstring_free(cto);
 
             if (target) {
-                char buf[CHUNK_SIZE];
-                int bytes_read, bytes_written;
+                char   buf[CHUNK_SIZE];
+                size_t bytes_read, bytes_written;
 
                 while (!feof(source)) {
                     bytes_read = fread(buf, 1, CHUNK_SIZE, source);
