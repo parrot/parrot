@@ -101,7 +101,7 @@ method stmt_mod($/) {
 method expr($/) {
     my $past := $( $<arg> );
     if +$<not> {
-        $past := PAST::Op.new( $past, :pirop('n_not'), :node($/) );
+        $past := PAST::Op.new( $past, :pirop('not'), :node($/) );
     }
     if $<expr> {
         my $op;
@@ -785,7 +785,7 @@ method quote_concat($/) {
         $past := PAST::Op.new(
             $past,
             $( $<quote_term>[$count] ),
-            :pirop('n_concat'),
+            :pirop('concat'),
             :pasttype('pirop')
         );
         $count := $count + 1;
