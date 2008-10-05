@@ -91,9 +91,10 @@ Creates and returns a copy of the array.
         PMC_int_val2(dest) = PMC_int_val2(SELF);
 
         if (PMC_data(SELF)) {
-            PMC_data(dest) = mem_sys_allocate(PMC_int_val2(SELF) / BITS_PER_CHAR);
-            mem_sys_memcopy(PMC_data(dest),
-                        PMC_data(SELF), PMC_int_val2(SELF) / BITS_PER_CHAR);
+            const size_t size_in_bytes = PMC_int_val2(SELF) / BITS_PER_CHAR;
+            PMC_data(dest)             = mem_sys_allocate(size_in_bytes);
+
+            mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), size_in_bytes);
         }
         else
             PMC_data(dest) = NULL;
@@ -220,16 +221,15 @@ Returns the Parrot string representation of the array.
 */
 
     VTABLE STRING *get_string() {
-        INTVAL i, elems;
-        STRING *str = NULL;
+        STRING *str   = NULL;
+        UINTVAL elems = SELF.elements();
+        UINTVAL i;
 
-        elems = SELF.elements();
         string_repeat(INTERP, CONST_STRING(INTERP, '0'), elems, &str);
 
         for (i = 0; i < elems; i++) {
-            if (SELF.get_integer_keyed_int(i)) {
+            if (SELF.get_integer_keyed_int((INTVAL)i))
                 *(str->strstart+i) = '1';
-            }
         }
 
         return str;
@@ -310,14 +310,16 @@ Resizes the array to C<size> elements.
 */
 
     VTABLE void set_integer_native(INTVAL size) {
+        size_t size_in_bytes;
+
         if (PMC_int_val(SELF) || size < 1)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "FixedBooleanArray: Can't resize!");
 
+        size_in_bytes      = size / BITS_PER_CHAR + 1;
         PMC_int_val(SELF)  = size;
-        PMC_int_val2(SELF) = (size / BITS_PER_CHAR + 1) * BITS_PER_CHAR;
-        PMC_data(SELF)     =
-            mem_sys_allocate_zeroed(PMC_int_val2(SELF) / BITS_PER_CHAR);
+        PMC_int_val2(SELF) = size_in_bytes * BITS_PER_CHAR;
+        PMC_data(SELF)     = mem_sys_allocate_zeroed(size_in_bytes);
     }
 
 /*
@@ -491,7 +493,7 @@ Used to archive the string.
         IMAGE_IO * const io = info->image_io;
         STRING   * const s  = string_from_cstring(INTERP,
                                 PMC_data_typed(SELF, char *),
-                                PMC_int_val2(SELF) / BITS_PER_CHAR);
+                                (UINTVAL)(PMC_int_val2(SELF) / BITS_PER_CHAR));
 
         VTABLE_push_integer(INTERP, io, PMC_int_val(SELF));
         VTABLE_push_string(INTERP, io, s);
@@ -534,7 +536,7 @@ sets them all to false.
 
     METHOD fill(INTVAL fill) {
         Parrot_UInt1 * const sd = PMC_data_typed(SELF, Parrot_UInt1 *);
-        const INTVAL         j  = PMC_int_val(SELF) / BITS_PER_CHAR + 1;
+        const size_t         j  = PMC_int_val(SELF) / BITS_PER_CHAR + 1;
 
         if (fill)
             memset(sd, 0xff, j);
