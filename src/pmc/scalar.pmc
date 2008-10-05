@@ -693,7 +693,7 @@ the result in C<dest>.
                 "float cmodulus by zero");
 
         VTABLE_set_number_native(INTERP, SELF,
-                fmod(SELF.get_number() , value));
+                fmod(SELF.get_number(), (double)value));
     }
 
     VTABLE void i_cmodulus_float(FLOATVAL value) {
@@ -752,7 +752,7 @@ Calculates modulus inplace
             dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
-                floatval_mod(SELF.get_number(), value));
+                floatval_mod(SELF.get_number(), (FLOATVAL)value));
         return dest;
     }
 
@@ -777,7 +777,7 @@ Calculates modulus inplace
                 "float modulus by zero");
 
         VTABLE_set_number_native(INTERP, SELF,
-                floatval_mod(SELF.get_number() , d));
+                floatval_mod(SELF.get_number(), d));
     }
 
     VTABLE void i_modulus_int(INTVAL value) {
@@ -786,7 +786,7 @@ Calculates modulus inplace
                 "float modulus by zero");
 
         VTABLE_set_number_native(INTERP, SELF,
-                floatval_mod(SELF.get_number() , value));
+                floatval_mod(SELF.get_number(), (FLOATVAL)value));
     }
 
     VTABLE void i_modulus_float(FLOATVAL value) {
@@ -836,7 +836,7 @@ Calculates pow inplace
             dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
-                pow(SELF.get_number(), value));
+                pow(SELF.get_number(), (double)value));
 
         return dest;
     }
@@ -859,7 +859,7 @@ Calculates pow inplace
 
     VTABLE void i_pow_int(INTVAL value) {
         VTABLE_set_number_native(INTERP, SELF,
-                pow(SELF.get_number(), value));
+                pow(SELF.get_number(), (float)value));
     }
 
     VTABLE void i_pow_float(FLOATVAL value) {

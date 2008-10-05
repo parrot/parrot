@@ -113,9 +113,9 @@ bigint_add_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC *dest) {
 static void
 bigint_add_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
     if (value < 0)
-        mpz_sub_ui(BN(dest), BN(self), -value);
+        mpz_sub_ui(BN(dest), BN(self), (unsigned long int)-value);
     else
-        mpz_add_ui(BN(dest), BN(self), value);
+        mpz_add_ui(BN(dest), BN(self), (unsigned long int)value);
 }
 
 static void
@@ -126,9 +126,9 @@ bigint_sub_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC *dest) {
 static void
 bigint_sub_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
     if (value < 0)
-        mpz_add_ui(BN(dest), BN(self), -value);
+        mpz_add_ui(BN(dest), BN(self), (unsigned long int)-value);
     else
-        mpz_sub_ui(BN(dest), BN(self), value);
+        mpz_sub_ui(BN(dest), BN(self), (unsigned long int)value);
 }
 
 static void
@@ -143,7 +143,7 @@ bigint_mul_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
 
 static void
 bigint_pow_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
-    mpz_pow_ui(BN(dest), BN(self), value);
+    mpz_pow_ui(BN(dest), BN(self), (unsigned long int)value);
 }
 
 static void
@@ -174,11 +174,11 @@ bigint_div_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
 
     /* this is mpz_fdiv_q */
     if (value < 0) {
-        mpz_div_ui(BN(dest), BN(self), -value);
+        mpz_div_ui(BN(dest), BN(self), (unsigned long int)-value);
         mpz_neg(BN(dest), BN(dest));
     }
     else
-        mpz_div_ui(BN(dest), BN(self), value);
+        mpz_div_ui(BN(dest), BN(self), (unsigned long int)value);
 }
 
 static void
@@ -192,11 +192,11 @@ bigint_fdiv_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
     int_check_divide_zero(interp, value);
 
     if (value < 0) {
-        mpz_fdiv_q_ui(BN(dest), BN(self), -value);
+        mpz_fdiv_q_ui(BN(dest), BN(self), (unsigned long int)-value);
         mpz_neg(BN(dest), BN(dest));
     }
     else
-        mpz_fdiv_q_ui(BN(dest), BN(self), value);
+        mpz_fdiv_q_ui(BN(dest), BN(self), (unsigned long int)value);
 }
 
 static void
@@ -210,10 +210,10 @@ bigint_mod_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
     int_check_divide_zero(interp, value);
 
     if (value < 0) {
-        mpz_mod_ui(BN(dest), BN(self), -value);
+        mpz_mod_ui(BN(dest), BN(self), (unsigned long int)-value);
     }
     else
-        mpz_mod_ui(BN(dest), BN(self), value);
+        mpz_mod_ui(BN(dest), BN(self), (unsigned long int)value);
 }
 
 static INTVAL
@@ -245,9 +245,9 @@ bigint_bitwise_shl_bigint_int(PARROT_INTERP, PMC *self,
     /* The third args to mpz_mul_2exp and mpz_tdiv_q_2exp are unsigned, so we
        need to do something sensible with negative values. */
     if (value >= 0)
-        mpz_mul_2exp(BN(dest), BN(self), value);
+        mpz_mul_2exp(BN(dest), BN(self), (unsigned long int)value);
     else
-        mpz_tdiv_q_2exp(BN(dest), BN(self), -value);
+        mpz_tdiv_q_2exp(BN(dest), BN(self), (unsigned long int)-value);
 }
 
 static void
@@ -257,9 +257,9 @@ bigint_bitwise_shr_bigint_int(PARROT_INTERP, PMC *self,
     /* The third args to mpz_mul_2exp and mpz_tdiv_q_2exp are unsigned, so we
        need to do something sensible with negative values. */
     if (value >= 0)
-        mpz_tdiv_q_2exp(BN(dest), BN(self), value);
+        mpz_tdiv_q_2exp(BN(dest), BN(self), (unsigned long int)value);
     else
-        mpz_mul_2exp(BN(dest), BN(self), -value);
+        mpz_mul_2exp(BN(dest), BN(self), (unsigned long int)-value);
 }
 
 #else /* ifdef PARROT_HAS_GMP */

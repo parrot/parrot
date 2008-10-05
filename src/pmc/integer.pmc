@@ -899,6 +899,7 @@ MMD_DEFAULT: {
 
 VTABLE PMC *cmodulus_float(FLOATVAL value, PMC *dest) {
     FLOATVAL f;
+    INTVAL   self_val;
 
     if (FLOAT_IS_ZERO(value))
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
@@ -907,7 +908,10 @@ VTABLE PMC *cmodulus_float(FLOATVAL value, PMC *dest) {
     if (!dest)
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
-    f = fmod(SELF.get_integer(), value);
+    /* make the cast explicit, in two steps to satisfy picky compilers */
+    self_val = SELF.get_integer();
+    f        = fmod((FLOATVAL)self_val, value);
+
     VTABLE_set_integer_native(INTERP, dest, (INTVAL)f);
 
     return dest;
@@ -952,12 +956,16 @@ VTABLE void i_cmodulus_int(INTVAL value) {
 
 VTABLE void i_cmodulus_float(FLOATVAL value) {
     FLOATVAL f;
+    INTVAL   self_val;
 
     if (FLOAT_IS_ZERO(value))
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
             "int cmodulus by zero");
 
-    f = fmod(SELF.get_integer(), value);
+    /* make the cast explicit, in two steps to satisfy picky compilers */
+    self_val = SELF.get_integer();
+    f        = fmod((FLOATVAL)self_val, value);
+
     VTABLE_set_integer_native(INTERP, SELF, (INTVAL)f);
 }
 
