@@ -584,9 +584,7 @@ MULTI PMC *multiply(Integer value, PMC *dest) {
 }
 
 MULTI PMC *multiply(Complex value, PMC *dest) {
-    Parrot_ex_throw_from_c_args(INTERP, NULL,
-        EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-        "RT #46629 mul<Integer, Complex>");
+    return VTABLE_multiply(INTERP, value, SELF, dest);
 }
 
 MULTI PMC *multiply(BigInt value, PMC *dest) {
@@ -648,9 +646,7 @@ MULTI void i_multiply(BigInt value) {
 }
 
 MULTI void i_multiply(Complex value) {
-    Parrot_ex_throw_from_c_args(INTERP, NULL,
-        EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "RT #46629 i_mul<Integer, Complex>");
+    VTABLE_multiply(INTERP, value, SELF, SELF);
 }
 
 MULTI void i_multiply(DEFAULT value) {

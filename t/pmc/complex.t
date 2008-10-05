@@ -318,6 +318,10 @@ pasm_output_is( << 'CODE', << 'OUTPUT', "multiply" );
     mul P1, P0, P3
     print P1
     print "\n"
+
+    mul P1, P3, P0
+    print P1
+    print "\n"
     end
 CODE
 -5+12i
@@ -328,6 +332,7 @@ CODE
 1-1i
 2-2i
 1-1i
+10+10i
 10+10i
 OUTPUT
 
