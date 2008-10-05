@@ -995,17 +995,37 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
+.sub eval_base_1 :method
+    .param pmc tokenizer
+    .param pmc token :optional
+
+    $P0 = self.eval_base(tokenizer, token)
+    $P1 = tokenizer.get()
+    eq $P1, '[', keyit
+    tokenizer.back()
+    .return($P0)
+keyit:
+    $P2 = self.evaluate(tokenizer)
+    $P1 = tokenizer.get()
+    ne $P1, ']', fail
+    $P3 = $P0 [$P2]
+    .return($P3)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
 .sub eval_mod :method
     .param pmc tokenizer
     .param pmc token :optional
-    $P0 = self.eval_base(tokenizer, token)
+    $P0 = self.eval_base_1(tokenizer, token)
 more:
     $P1 = tokenizer.get()
     eq $P1, 'MOD', domod
     tokenizer.back()
     .return($P0)
 domod:
-    $P2 = self.eval_base(tokenizer)
+    $P2 = self.eval_base_1(tokenizer)
     $P3 = clone $P0
     mod $P3, $P2
     set $P0, $P3
@@ -1592,7 +1612,9 @@ prepare:
     vars = getattribute self, 'vars'
     vars[var] = value
     controlvar = vars[var]
-    setattribute for, 'controlvar', controlvar
+    $P0 = new 'String'
+    $P0 = var
+    setattribute for, 'controlvar', $P0
 
     .local pmc stack
     stack = getattribute self, 'stack'
@@ -1743,16 +1765,21 @@ fail:
     dec $I0
     .local pmc for
     for = stack[$I0]
-    .local pmc controlvar, increment, limit
+    .local pmc controlvar, varvalue, increment, limit
     controlvar = getattribute for, 'controlvar'
+    varvalue = self.get_var(controlvar)
     increment = getattribute for, 'increment'
     limit = getattribute for, 'limit'
-    add controlvar, increment
+
+    $P0 = clone varvalue
+    add $P0, increment
+    self.set_var(controlvar, $P0)
+
     lt increment, 0, negstep
-    gt controlvar, limit, endloop
+    gt $P0, limit, endloop
     goto jump
 negstep:
-    lt controlvar, limit, endloop
+    lt $P0, limit, endloop
 jump:
     .local pmc jumpline
     jumpline = getattribute for, 'jumpline'
@@ -1984,6 +2011,8 @@ loop:
     eq c, '>', operator
     eq c, '(', operator
     eq c, ')', operator
+    eq c, '[', operator
+    eq c, ']', operator
     eq c, '?', operator
 
     eq c, '"', str
@@ -2066,6 +2095,8 @@ nextchar:
     eq c, '>', endtoken
     eq c, '(', endtoken
     eq c, ')', endtoken
+    eq c, '[', endtoken
+    eq c, ']', endtoken
     inc i
     goto nextchar
 endtoken:
