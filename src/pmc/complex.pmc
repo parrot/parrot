@@ -484,8 +484,14 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        STRING * const s = VTABLE_get_string(INTERP, key);
-        return SELF.get_pmc_keyed_str(s);
+        if (VTABLE_isa(interp, key, CONST_STRING(interp, "Integer"))) {
+            INTVAL i = VTABLE_get_integer(interp, key);
+            return SELF.get_pmc_keyed_int(i);
+        }
+        else {
+            STRING * const s = VTABLE_get_string(INTERP, key);
+            return SELF.get_pmc_keyed_str(s);
+        }
     }
 
     VTABLE PMC *get_pmc_keyed_str(STRING *key) {
@@ -631,8 +637,14 @@ to C<value>.
     }
 
     VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
-        STRING *s = VTABLE_get_string(INTERP, key);
-        SELF.set_number_keyed_str(s, value);
+        if (VTABLE_isa(interp, key, CONST_STRING(interp, "Integer"))) {
+            INTVAL i = VTABLE_get_integer(interp, key);
+            SELF.set_number_keyed_int(i, value);
+        }
+        else {
+            STRING *s = VTABLE_get_string(INTERP, key);
+            SELF.set_number_keyed_str(s, value);
+        }
     }
 
     VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) {
