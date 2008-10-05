@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 27;
 
 =head1 NAME
 
@@ -838,6 +838,25 @@ ok 1
 ok 2
 ok 3
 ok 4
+OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, "regression test for integer overflow with 'pow'" );
+.sub main
+    .local pmc i1, i2, r
+    i1 = new 'Integer'
+    i2 = new 'Integer'
+    i1 = 2
+    i2 = 30
+    r = pow i1, i2
+    say r
+    i2 = 31
+    null r
+    r = pow i1, i2
+    say r
+.end
+CODE
+1073741824
+2147483648
 OUTPUT
 
 # Local Variables:
