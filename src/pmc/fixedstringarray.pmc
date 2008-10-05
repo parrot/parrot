@@ -77,7 +77,7 @@ Creates and returns a copy of the array.
 
         if (PMC_data(SELF)) {
             const INTVAL size     = PMC_int_val(SELF);
-            const INTVAL mem_size = size * sizeof (STRING *);
+            const size_t mem_size = size * sizeof (STRING *);
 
             PMC_int_val(dest)     = size;
             PMC_data(dest)        = mem_sys_allocate(mem_size);
