@@ -956,9 +956,16 @@ RT #46631 Complex and BigInt rhs.
 =cut
 
 */
-VTABLE PMC *pow(PMC *value, PMC *dest) {
+
+MULTI PMC *pow(Integer value, PMC *dest) {
     const INTVAL v = VTABLE_get_integer(INTERP, value);
     return STATICSELF.pow_int(v, dest);
+}
+
+MULTI PMC *pow(DEFAULT value, PMC *dest) {
+    PMC * const auxval = pmc_new(INTERP, VTABLE_type(INTERP, value));
+    VTABLE_set_number_native(INTERP, auxval, (FLOATVAL) SELF.get_integer());
+    return VTABLE_pow(INTERP, auxval, value, dest);
 }
 
 VTABLE PMC *pow_int(INTVAL b, PMC *dest) {
@@ -1001,7 +1008,7 @@ VTABLE PMC *pow_int(INTVAL b, PMC *dest) {
 }
 
 VTABLE void i_pow(PMC *value) {
-    STATICSELF.pow(value, SELF);
+    SELF.pow(value, SELF);
 }
 
 VTABLE void i_pow_int(INTVAL value) {
