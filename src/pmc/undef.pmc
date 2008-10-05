@@ -235,13 +235,12 @@ Returns 1 if the C<*value> is an Undef PMC, 0 otherwise.
 
 */
 
-    VTABLE INTVAL is_equal(PMC *value) {
-        MMD_Undef: {
-            return 1;
-        }
-        MMD_DEFAULT: {
-            return 0;
-        }
+    MULTI INTVAL is_equal(Undef value) {
+        return 1;
+    }
+
+    MULTI INTVAL is_equal(DEFAULT value) {
+        return 0;
     }
 }
 

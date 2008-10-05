@@ -6,6 +6,7 @@ use warnings;
 use constant VTABLE_ENTRY => 'VTABLE_ENTRY';
 use constant VTABLE       => 'VTABLE';
 use constant NON_VTABLE   => 'NON_VTABLE';
+use constant MULTI        => 'MULTI';
 use Parrot::Pmc2c::UtilFunctions qw(count_newlines args_from_parameter_list passable_args_from_parameter_list);
 
 sub new {
@@ -67,6 +68,13 @@ sub is_mmd {
 
     return 1 if $self->{mmd_name};
     return 1 if $self->mmds and scalar @{ $self->mmds };
+    return 0;
+}
+
+sub is_multi {
+    my ($self) = @_;
+
+    return 1 if $self->{MULTI};
     return 0;
 }
 

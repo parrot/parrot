@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2003-2007, The Perl Foundation.
+ * Copyright (C) 2003-2008, The Perl Foundation.
  */
 
 /*
@@ -14,19 +14,18 @@ pmclass Foo dynpmc provides scalar extends Integer {
         return 42;
     }
 
-    PMC* subtract(PMC* value, PMC* dest) {
-MMD_Integer: {
+    MULTI PMC* subtract(Integer value, PMC *dest) {
         if (!dest)
             dest = pmc_new(interp, SELF->vtable->base_type);
         VTABLE_set_integer_native(interp, dest, 144);
         return dest;
-        }
-MMD_DEFAULT: {
+    }
+
+    MULTI PMC* subtract(DEFAULT value, PMC *dest) {
         if (!dest)
             dest = pmc_new(interp, SELF->vtable->base_type);
         VTABLE_set_integer_native(interp, dest, 244);
         return dest;
-        }
     }
 }
 

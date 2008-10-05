@@ -313,7 +313,7 @@ typedef struct _hash Hash;
 #include "parrot/longopt.h"
 #include "parrot/oo.h"
 #include "parrot/vtables.h"
-#include "parrot/mmd.h"
+#include "parrot/multidispatch.h"
 #include "parrot/library.h"
 #include "parrot/global.h"
 #include "parrot/stat.h"

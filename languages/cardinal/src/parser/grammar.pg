@@ -495,7 +495,7 @@ proto 'ternary:? :' is tighter('infix:=')
 
 proto 'infix:..' is tighter('ternary:? :') 
                 is parsed(&primary)     { ... }
-                 #is pirop('n_add')      { ... }
+                 #is pirop('add')      { ... }
 
 proto 'infix:...' is equiv('infix:...') { ... }
 
@@ -530,16 +530,16 @@ proto infix:«>>»  is equiv(infix:«<<») { ... }
 proto 'infix:+' is tighter(infix:«<<»)  { ... }
 
 proto 'infix:-' is equiv('infix:+') { ... }
-                #is pirop('n_sub')       { ... }
+                #is pirop('sub')       { ... }
 
 proto 'infix:*' is tighter('infix:+') { ... }
-                #is pirop('n_mul')       { ... }
+                #is pirop('mul')       { ... }
 
 proto 'infix:/' is equiv('infix:*')  { ... }
-                #is pirop('n_div')       { ... }
+                #is pirop('div')       { ... }
 
 proto 'infix:%' is equiv('infix:*')
-                is pirop('n_mod')       { ... }
+                is pirop('mod')       { ... }
 
 #proto 'prefix:+' is tighter('infix:*')  { ... }
 #proto 'prefix:-' is equiv('prefix:+')  { ... }

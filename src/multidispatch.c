@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/mmd.c - Multimethod dispatch for binary opcode functions
+src/multidispatch.c - Multimethod dispatch for binary opcode functions
 
 =head1 SYNOPSIS
 
@@ -42,11 +42,11 @@ not highest type in table.
 
 #include "parrot/compiler.h"
 #include "parrot/parrot.h"
-#include "parrot/mmd.h"
+#include "parrot/multidispatch.h"
 #include "parrot/oplib/ops.h"
-#include "mmd.str"
+#include "multidispatch.str"
 
-/* HEADERIZER HFILE: include/parrot/mmd.h */
+/* HEADERIZER HFILE: include/parrot/multidispatch.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -55,23 +55,21 @@ static INTVAL distance_cmp(SHIM_INTERP, INTVAL a, INTVAL b);
 static void dump_mmd(PARROT_INTERP, INTVAL function)
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static funcptr_t get_mmd_dispatcher(PARROT_INTERP,
-    ARGIN(PMC *left),
-    ARGIN(PMC *right),
-    INTVAL function,
-    ARGOUT(int *is_pmc))
+static void mmd_add_multi_global(PARROT_INTERP,
+    ARGIN(STRING *sub_name),
+    ARGIN(PMC *sub_obj))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+static void mmd_add_multi_to_namespace(PARROT_INTERP,
+    ARGIN(STRING *ns_name),
+    ARGIN(STRING *sub_name),
+    ARGIN(PMC *sub_obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(5)
-        FUNC_MODIFIES(*is_pmc);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PMC* mmd_arg_tuple_func(PARROT_INTERP)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(4);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -81,31 +79,23 @@ static PMC* mmd_arg_tuple_inline(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void mmd_create_builtin_multi_meth(PARROT_INTERP,
-    ARGIN(PMC *ns),
-    INTVAL type,
-    ARGIN(const MMD_init *entry))
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static PMC* mmd_build_type_tuple_from_long_sig(PARROT_INTERP,
+    ARGIN(STRING *long_sig))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(2);
 
-static void mmd_create_builtin_multi_meth_2(PARROT_INTERP,
-    ARGIN(PMC *ns),
-    INTVAL func_nr,
-    INTVAL type,
-    INTVAL right,
-    funcptr_t func_ptr)
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static PMC* mmd_build_type_tuple_from_type_list(PARROT_INTERP,
+    ARGIN(PMC *type_list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC* mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_CANNOT_RETURN_NULL
-static PMC * mmd_deref(PARROT_INTERP, ARGIN(PMC *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -116,48 +106,58 @@ static UINTVAL mmd_distance(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void mmd_ensure_writable(PARROT_INTERP,
-    INTVAL function,
-    ARGIN_NULLOK(const PMC *pmc))
-        __attribute__nonnull__(1);
-
 static void mmd_expand_x(PARROT_INTERP, INTVAL func_nr, INTVAL new_x)
         __attribute__nonnull__(1);
 
 static void mmd_expand_y(PARROT_INTERP, INTVAL func_nr, INTVAL new_y)
         __attribute__nonnull__(1);
 
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC* mmd_get_ns(PARROT_INTERP)
-        __attribute__nonnull__(1);
+static void mmd_search_by_sig_obj(PARROT_INTERP,
+    ARGIN(STRING *name),
+    ARGIN(PMC *sig_obj),
+    ARGIN(PMC *candidates))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
-PARROT_WARN_UNUSED_RESULT
-static int mmd_is_hidden(PARROT_INTERP, ARGIN(PMC *multi), ARGIN(PMC *cl))
+static void mmd_search_global(PARROT_INTERP,
+    ARGIN(STRING *name),
+    ARGIN(PMC *cl))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_CANNOT_RETURN_NULL
+static int mmd_search_local(PARROT_INTERP,
+    ARGIN(STRING *name),
+    ARGIN(PMC *candidates))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 PARROT_WARN_UNUSED_RESULT
-static PMC* mmd_make_ns(PARROT_INTERP)
+PARROT_CANNOT_RETURN_NULL
+static PMC* Parrot_mmd_arg_tuple_func(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static int mmd_maybe_candidate(PARROT_INTERP,
+PARROT_CANNOT_RETURN_NULL
+static PMC * Parrot_mmd_deref(PARROT_INTERP, ARGIN(PMC *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void Parrot_mmd_ensure_writable(PARROT_INTERP,
+    INTVAL function,
+    ARGIN_NULLOK(const PMC *pmc))
+        __attribute__nonnull__(1);
+
+static int Parrot_mmd_maybe_candidate(PARROT_INTERP,
     ARGIN(PMC *pmc),
     ARGIN(PMC *cl))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void mmd_search_builtin(PARROT_INTERP,
-    ARGIN(STRING *meth),
-    ARGIN(PMC *cl))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-static void mmd_search_classes(PARROT_INTERP,
+static void Parrot_mmd_search_classes(PARROT_INTERP,
     ARGIN(STRING *meth),
     ARGIN(PMC *arg_tuple),
     ARGIN(PMC *cl),
@@ -167,16 +167,9 @@ static void mmd_search_classes(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-static int mmd_search_cur_namespace(PARROT_INTERP,
-    ARGIN(STRING *meth),
-    ARGIN(PMC *cl))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PMC* mmd_search_default(PARROT_INTERP,
+static PMC* Parrot_mmd_search_default(PARROT_INTERP,
     ARGIN(STRING *meth),
     ARGIN(PMC *arg_tuple))
         __attribute__nonnull__(1)
@@ -185,11 +178,11 @@ static PMC* mmd_search_default(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PMC* mmd_search_scopes(PARROT_INTERP, ARGIN(STRING *meth))
+static PMC* Parrot_mmd_search_scopes(PARROT_INTERP, ARGIN(STRING *meth))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void mmd_sort_candidates(PARROT_INTERP,
+static void Parrot_mmd_sort_candidates(PARROT_INTERP,
     ARGIN(PMC *arg_tuple),
     ARGIN(PMC *cl))
         __attribute__nonnull__(1)
@@ -317,13 +310,13 @@ get_mmd_dispatch_type(PARROT_INTERP, INTVAL func_nr, INTVAL left_type,
             /* C function is at struct_val */
             func    = D2FPTR(PMC_struct_val(method));
             *is_pmc = 0;
-            mmd_register(interp, func_nr, left_type, r,
+            Parrot_mmd_register(interp, func_nr, left_type, r,
                     (funcptr_t)PMC_struct_val(method));
         }
         else {
             *is_pmc = 1;
             func    = D2FPTR(method);
-            mmd_register_sub(interp, func_nr, left_type, r, method);
+            Parrot_mmd_register_sub(interp, func_nr, left_type, r, method);
         }
 
         return func;
@@ -347,33 +340,52 @@ get_mmd_dispatch_type(PARROT_INTERP, INTVAL func_nr, INTVAL left_type,
 
 /*
 
-=item C<static funcptr_t get_mmd_dispatcher>
+=item C<PMC* Parrot_mmd_find_multi_from_sig_obj>
 
-RT #48260: Not yet documented!!!
+Collect a list of possible candidates for a given sub name and call signature.
+Rank the possible candidates by Manhattan Distance, and return the best
+matching candidate. The candidate list is cached in the CallSignature object,
+to allow for iterating through it.
+
+Currently this only looks in the global "MULTI" namespace.
 
 =cut
 
 */
 
+PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static funcptr_t
-get_mmd_dispatcher(PARROT_INTERP, ARGIN(PMC *left), ARGIN(PMC *right),
-        INTVAL function, ARGOUT(int *is_pmc))
+PMC*
+Parrot_mmd_find_multi_from_sig_obj(PARROT_INTERP, ARGIN(STRING *name), ARGIN(PMC *invoke_sig))
 {
-    const UINTVAL left_type  = VTABLE_type(interp, left);
-    const UINTVAL right_type = VTABLE_type(interp, right);
-    return get_mmd_dispatch_type(interp, function, left_type, right_type,
-            is_pmc);
-}
+    PMC *candidate_list = pmc_new(interp, enum_class_ResizablePMCArray);
 
+    mmd_search_by_sig_obj(interp, name, invoke_sig, candidate_list);
+    mmd_search_global(interp, name, candidate_list);
+
+    candidate_list = Parrot_mmd_sort_manhattan_by_sig_pmc(interp, candidate_list, invoke_sig);
+
+    if (PMC_IS_NULL(candidate_list))
+        return PMCNULL;
+
+#if MMD_DEBUG
+    fprintf(stderr, "there were '%d' elements in the candidate_list\n",
+            (int) VTABLE_elements(interp, candidate_list));
+#endif
+
+    return VTABLE_get_pmc_keyed_int(interp, candidate_list, 0);
+
+}
 
 /*
 
-=item C<static PMC * mmd_deref>
+=item C<static PMC * Parrot_mmd_deref>
 
 If C<value> is a reference-like PMC, dereference it so we can make an MMD
 call on the 'real' value.
+
+{{**DEPRECATE**}}
 
 =cut
 
@@ -381,7 +393,7 @@ call on the 'real' value.
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
-mmd_deref(PARROT_INTERP, ARGIN(PMC *value))
+Parrot_mmd_deref(PARROT_INTERP, ARGIN(PMC *value))
 {
     if (!PObj_is_object_TEST(value)
     &&  VTABLE_type(interp, value) != value->vtable->base_type)
@@ -393,36 +405,31 @@ mmd_deref(PARROT_INTERP, ARGIN(PMC *value))
 
 /*
 
-=item C<static void mmd_ensure_writable>
+=item C<static void Parrot_mmd_ensure_writable>
 
 Make sure C<pmc> is writable enough for C<function>.
+
+{{**DEPRECATE**}}
 
 =cut
 
 */
 
 static void
-mmd_ensure_writable(PARROT_INTERP, INTVAL function, ARGIN_NULLOK(const PMC *pmc))
+Parrot_mmd_ensure_writable(PARROT_INTERP, INTVAL function, ARGIN_NULLOK(const PMC *pmc))
 {
     if (!PMC_IS_NULL(pmc) && (pmc->vtable->flags & VTABLE_IS_READONLY_FLAG))
         Parrot_ex_throw_from_c_args(interp, 0, 1, "%s applied to read-only argument",
             Parrot_MMD_method_name(interp, function));
 }
 
-
 /*
 
-=item C<PMC* mmd_dispatch_p_ppp>
+=item C<PMC* Parrot_build_sig_object_from_varargs>
 
-Dispatch to a multimethod that returns a PMC. C<left>, C<right>, and
-C<dest> are all PMC pointers, while C<func_num> is the MMD table that
-should be used to do the dispatching.
-If the C<dest> pointer is NULL, it dispatches two a two-argument function
-that returns a new C<dest> always.
-
-The MMD system will figure out which function should be called based on
-the types of C<left> and C<right> and call it, passing in C<left>,
-C<right>, and possibly C<dest> like any other binary vtable function.
+Take a varargs list, and convert it into a CallSignature PMC. The CallSignature
+stores the original short signature string, and an array of integer types to
+pass on to the multiple dispatch search.
 
 =cut
 
@@ -432,36 +439,123 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC*
-mmd_dispatch_p_ppp(PARROT_INTERP, ARGIN(PMC *left), ARGIN(PMC *right),
-        ARGIN_NULLOK(PMC *dest), INTVAL func_nr)
+Parrot_build_sig_object_from_varargs(PARROT_INTERP, ARGIN(const char *sig), va_list args)
 {
-    mmd_f_p_ppp real_function;
-    int         is_pmc;
+    INTVAL i;
+    INTVAL in_return_sig    = 0;
+    PMC   *returns          = PMCNULL;
+    PMC   *call_object      = pmc_new(interp, enum_class_CallSignature);
+    PMC * const type_tuple  = pmc_new(interp, enum_class_FixedIntegerArray);
+    STRING *string_sig      = const_string(interp, sig);
+    const INTVAL sig_len    = string_length(interp, string_sig);
 
-    left  = mmd_deref(interp, left);
-    right = mmd_deref(interp, right);
+    /* Protect call signature object from collection. */
+    dod_register_pmc(interp, call_object);
 
-    real_function = (mmd_f_p_ppp)get_mmd_dispatcher(interp,
-            left, right, func_nr, &is_pmc);
+    if (!sig_len)
+        return call_object;
 
-    if (is_pmc) {
-        PMC * const sub = (PMC*)real_function;
-        if (dest)
-            return Parrot_runops_fromc_args(interp, sub, "PPPP",
-                    left, right, dest);
-        else
-            return Parrot_runops_fromc_args(interp, sub, "PPP", left, right);
+    VTABLE_set_integer_native(interp, type_tuple, sig_len);
+    VTABLE_set_pmc(interp, call_object, type_tuple);
+
+    VTABLE_set_string_native(interp, call_object, string_sig);
+
+    for (i = 0; i < sig_len; ++i) {
+        INTVAL type = string_index(interp, string_sig, i);
+
+        /* Only create the returns array if it's needed */
+        if (in_return_sig && PMC_IS_NULL(returns)) {
+            returns = pmc_new(interp, enum_class_ResizablePMCArray);
+            VTABLE_set_attr_str(interp, call_object,
+                    CONST_STRING(interp, "results"), returns);
+        }
+
+        if (in_return_sig) {
+            STRING *signature = CONST_STRING(interp, "signature");
+            /* Returns store the original passed-in pointer, so they can pass
+             * the result back to the caller. */
+            PMC *val_pointer = pmc_new(interp, enum_class_CPointer);
+            VTABLE_push_pmc(interp, returns, val_pointer);
+
+            switch (type) {
+                case 'I':
+                    VTABLE_set_pointer(interp, val_pointer, (void *) va_arg(args, INTVAL*));
+                    VTABLE_set_string_keyed_str(interp, val_pointer,
+                        signature, CONST_STRING(interp, "I"));
+                    break;
+                case 'N':
+                    VTABLE_set_pointer(interp, val_pointer, (void *) va_arg(args, FLOATVAL*));
+                    VTABLE_set_string_keyed_str(interp, val_pointer,
+                        signature, CONST_STRING(interp, "N"));
+                    break;
+                case 'S':
+                    VTABLE_set_pointer(interp, val_pointer, (void *) va_arg(args, STRING**));
+                    VTABLE_set_string_keyed_str(interp, val_pointer,
+                        signature, CONST_STRING(interp, "S"));
+                    break;
+                case 'P':
+                    VTABLE_set_pointer(interp, val_pointer, (void *) va_arg(args, PMC**));
+                    VTABLE_set_string_keyed_str(interp, val_pointer,
+                        signature, CONST_STRING(interp, "P"));
+                    break;
+                default:
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_OPERATION,
+                        "Multiple Dispatch: invalid argument type %c!", type);
+             }
+        }
+        else {
+            /* Regular arguments just set the value */
+            switch (type) {
+                case 'I':
+                    VTABLE_push_integer(interp, call_object, va_arg(args, INTVAL));
+                    VTABLE_set_integer_keyed_int(interp, type_tuple,
+                            i, enum_type_INTVAL);
+                    break;
+                case 'N':
+                    VTABLE_set_integer_keyed_int(interp, type_tuple,
+                            i, enum_type_FLOATVAL);
+                    break;
+                case 'S':
+                    VTABLE_push_string(interp, call_object, va_arg(args, STRING *));
+                    VTABLE_set_integer_keyed_int(interp, type_tuple,
+                            i, enum_type_STRING);
+                    break;
+                case 'P':
+                {
+                    PMC *pmc_arg = va_arg(args, PMC *);
+                    if (!PMC_IS_NULL(pmc_arg))
+                        VTABLE_set_integer_keyed_int(interp, type_tuple, i,
+                                VTABLE_type(interp, pmc_arg));
+
+                    VTABLE_push_pmc(interp, call_object, pmc_arg);
+                    break;
+                }
+                case '-':
+                    i++; /* skip '>' */
+                    in_return_sig = 1;
+                    break;
+                default:
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_OPERATION,
+                        "Multiple Dispatch: invalid argument type %c!", type);
+            }
+        }
     }
 
-    return (*real_function)(interp, left, right, dest);
+    return call_object;
 }
-
 
 /*
 
-=item C<PMC* mmd_dispatch_p_pip>
+=item C<void Parrot_mmd_multi_dispatch_from_c_args>
 
-Like C<mmd_dispatch_p_ppp>, right argument is a native INTVAL.
+Dispatch to a MultiSub, from a variable-sized list of C arguments. The multiple
+dispatch system will figure out which sub should be called based on the types
+of the arguments passed in.
+
+Return arguments must be passed as a reference to the PMC, string, number, or
+integer, so the result can be set.
 
 =cut
 
@@ -469,280 +563,36 @@ Like C<mmd_dispatch_p_ppp>, right argument is a native INTVAL.
 
 PARROT_API
 PARROT_CAN_RETURN_NULL
-PMC*
-mmd_dispatch_p_pip(PARROT_INTERP,
-        ARGIN(PMC *left), INTVAL right, ARGIN_NULLOK(PMC *dest), INTVAL func_nr)
-{
-    int         is_pmc;
-    UINTVAL     left_type;
-    mmd_f_p_pip real_function;
-
-    left      = mmd_deref(interp, left);
-    left_type = VTABLE_type(interp, left);
-
-    real_function =
-        (mmd_f_p_pip)get_mmd_dispatch_type(interp, func_nr, left_type,
-                                           enum_type_INTVAL, &is_pmc);
-
-    if (is_pmc) {
-        PMC * const sub = (PMC *)real_function;
-        if (dest)
-            return Parrot_runops_fromc_args(interp, sub, "PPIP",
-                    left, right, dest);
-        else
-            return Parrot_runops_fromc_args(interp, sub, "PPI", left, right);
-    }
-
-    return (*real_function)(interp, left, right, dest);
-}
-
-
-/*
-
-=item C<PMC* mmd_dispatch_p_pnp>
-
-Like C<mmd_dispatch_p_ppp>, right argument is a native FLOATVAL.
-
-=cut
-
-*/
-
-PARROT_API
-PARROT_CAN_RETURN_NULL
-PMC*
-mmd_dispatch_p_pnp(PARROT_INTERP,
-        ARGIN(PMC *left), FLOATVAL right, ARGIN_NULLOK(PMC *dest), INTVAL func_nr)
-{
-    mmd_f_p_pnp real_function;
-    int         is_pmc;
-    UINTVAL     left_type;
-
-    left          = mmd_deref(interp, left);
-    left_type     = VTABLE_type(interp, left);
-
-    real_function = (mmd_f_p_pnp)get_mmd_dispatch_type(interp,
-            func_nr, left_type, enum_type_FLOATVAL, &is_pmc);
-
-    if (is_pmc) {
-        PMC * const sub = (PMC*)real_function;
-        if (dest)
-            return Parrot_runops_fromc_args(interp, sub, "PPNP",
-                    left, right, dest);
-        else
-            return Parrot_runops_fromc_args(interp, sub, "PPN", left, right);
-    }
-
-    return (*real_function)(interp, left, right, dest);
-}
-
-
-/*
-
-=item C<PMC* mmd_dispatch_p_psp>
-
-Like C<mmd_dispatch_p_ppp>, right argument is a native STRING *.
-
-=cut
-
-*/
-
-PARROT_API
-PARROT_CAN_RETURN_NULL
-PMC*
-mmd_dispatch_p_psp(PARROT_INTERP, ARGIN(PMC *left), ARGIN(STRING *right),
-        ARGIN_NULLOK(PMC *dest), INTVAL func_nr)
-{
-    int               is_pmc;
-    const UINTVAL     left_type     = VTABLE_type(interp, left);
-    const mmd_f_p_psp real_function =
-        (mmd_f_p_psp)get_mmd_dispatch_type(interp,
-            func_nr, left_type, enum_type_STRING, &is_pmc);
-
-    if (is_pmc) {
-        PMC * const sub = (PMC*)real_function;
-        if (dest)
-            return Parrot_runops_fromc_args(interp, sub, "PPSP",
-                    left, right, dest);
-        else
-            return Parrot_runops_fromc_args(interp, sub, "PPS", left, right);
-    }
-
-    return (*real_function)(interp, left, right, dest);
-}
-
-
-/*
-
-=item C<void mmd_dispatch_v_pp>
-
-Inplace dispatch function for C<< left <op=> right >>.
-
-=cut
-
-*/
-
-PARROT_API
 void
-mmd_dispatch_v_pp(PARROT_INTERP,
-        ARGIN(PMC *left), ARGIN(PMC *right), INTVAL func_nr)
+Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
+        ARGIN(const char *name), ARGIN(const char *sig), ...)
 {
-    mmd_f_v_pp real_function;
-    int        is_pmc;
+    PMC *sig_object, *sub;
 
-    left  = mmd_deref(interp, left);
-    right = mmd_deref(interp, right);
+    va_list args;
+    va_start(args, sig);
+    sig_object = Parrot_build_sig_object_from_varargs(interp, sig, args);
+    va_end(args);
 
-    mmd_ensure_writable(interp, func_nr, left);
+    /* remove leading "__" from old-style MMD name */
+    if (name[0] == '_' && name[1] == '_')
+        name += 2;
 
-    real_function = (mmd_f_v_pp)get_mmd_dispatcher(interp,
-            left, right, func_nr, &is_pmc);
+    sub = Parrot_mmd_find_multi_from_sig_obj(interp, const_string(interp, name), sig_object);
 
-    if (is_pmc) {
-        PMC * const sub = (PMC*)real_function;
-        Parrot_runops_fromc_args(interp, sub, "vPP", left, right);
-    }
+    if (PMC_IS_NULL(sub))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METH_NOT_FOUND,
+                "Multiple Dispatch: No suitable candidate found for '%s',"
+                " with signature '%s'", name, sig);
 
-    (*real_function)(interp, left, right);
-}
+#if MMD_DEBUG
+    fprintf(stderr, "candidate found for '%s', with signature '%s'\n", name, sig);
+    fprintf(stderr, "type of candidate found: %s\n",
+            string_to_cstring(interp, VTABLE_name(interp, sub)));
+#endif
 
-
-/*
-
-=item C<void mmd_dispatch_v_pi>
-
-Inplace dispatch function for C<< left <op=> right >>.
-
-=cut
-
-*/
-
-PARROT_API
-void
-mmd_dispatch_v_pi(PARROT_INTERP,
-        ARGIN(PMC *left), INTVAL right, INTVAL func_nr)
-{
-    int        is_pmc;
-    UINTVAL    left_type;
-    mmd_f_v_pi real_function;
-
-    left = mmd_deref(interp, left);
-    mmd_ensure_writable(interp, func_nr, left);
-
-    left_type     = VTABLE_type(interp, left);
-    real_function = (mmd_f_v_pi)get_mmd_dispatch_type(interp,
-            func_nr, left_type, enum_type_INTVAL, &is_pmc);
-
-    if (is_pmc) {
-        PMC * const sub = (PMC *)real_function;
-        Parrot_runops_fromc_args(interp, sub, "vPI", left, right);
-    }
-
-    (*real_function)(interp, left, right);
-}
-
-
-/*
-
-=item C<void mmd_dispatch_v_pn>
-
-Inplace dispatch function for C<< left <op=> right >>.
-
-=cut
-
-*/
-
-PARROT_API
-void
-mmd_dispatch_v_pn(PARROT_INTERP,
-        ARGIN(PMC *left), FLOATVAL right, INTVAL func_nr)
-{
-    int        is_pmc;
-    UINTVAL    left_type;
-    mmd_f_v_pn real_function;
-
-    left = mmd_deref(interp, left);
-    mmd_ensure_writable(interp, func_nr, left);
-
-    left_type     = VTABLE_type(interp, left);
-    real_function = (mmd_f_v_pn)get_mmd_dispatch_type(interp,
-            func_nr, left_type, enum_type_FLOATVAL, &is_pmc);
-
-    if (is_pmc) {
-        PMC * const sub = (PMC *)real_function;
-        Parrot_runops_fromc_args(interp, sub, "vPN", left, right);
-    }
-
-    (*real_function)(interp, left, right);
-}
-
-
-/*
-
-=item C<void mmd_dispatch_v_ps>
-
-Inplace dispatch function for C<< left <op=> right >>.
-
-=cut
-
-*/
-
-PARROT_API
-void
-mmd_dispatch_v_ps(PARROT_INTERP,
-        ARGIN(PMC *left), ARGIN(STRING *right), INTVAL func_nr)
-{
-    int        is_pmc;
-    UINTVAL    left_type;
-    mmd_f_v_ps real_function;
-
-    left = mmd_deref(interp, left);
-    mmd_ensure_writable(interp, func_nr, left);
-
-    left_type     = VTABLE_type(interp, left);
-    real_function = (mmd_f_v_ps)get_mmd_dispatch_type(interp,
-            func_nr, left_type, enum_type_STRING, &is_pmc);
-
-    if (is_pmc) {
-        PMC * const sub = (PMC *)real_function;
-        Parrot_runops_fromc_args(interp, sub, "vPS", left, right);
-    }
-
-    (*real_function)(interp, left, right);
-}
-
-
-/*
-
-=item C<INTVAL mmd_dispatch_i_pp>
-
-Like C<mmd_dispatch_p_ppp()>, only it returns an C<INTVAL>. This is used
-by MMD compare functions.
-
-=cut
-
-*/
-
-PARROT_API
-INTVAL
-mmd_dispatch_i_pp(PARROT_INTERP,
-        ARGIN(PMC *left), ARGIN(PMC *right), INTVAL func_nr)
-{
-    int        is_pmc;
-    mmd_f_i_pp real_function;
-
-    left  = mmd_deref(interp, left);
-    right = mmd_deref(interp, right);
-
-    real_function = (mmd_f_i_pp)get_mmd_dispatcher(interp,
-            left, right, func_nr, &is_pmc);
-
-    if (is_pmc) {
-        PMC * const sub = (PMC *)real_function;
-        return Parrot_runops_fromc_args_reti(interp, sub, "IPP",
-                left, right);
-    }
-
-    return (*real_function)(interp, left, right);
+    Parrot_pcc_invoke_sub_from_sig_object(interp, sub, sig_object);
+    dod_unregister_pmc(interp, sig_object);
 }
 
 
@@ -755,13 +605,15 @@ of. C<func_num> is the number of the new function. C<function> is ignored.
 
 RT #45941 change this to a MMD register interface that takes a function *name*.
 
+{{**DEPRECATE**}}
+
 =cut
 
 */
 
 PARROT_API
 void
-mmd_add_function(PARROT_INTERP, INTVAL func_nr, SHIM(funcptr_t function))
+Parrot_mmd_add_function(PARROT_INTERP, INTVAL func_nr, SHIM(funcptr_t function))
 {
     /* XXX Something looks wrong here.  n_binop_mmd_funcs gets incremented,
      * but the function doesn't get saved */
@@ -787,6 +639,8 @@ mmd_add_function(PARROT_INTERP, INTVAL func_nr, SHIM(funcptr_t function))
 =item C<static void mmd_expand_x>
 
 Expands the function table in the X dimension to include C<new_x>.
+
+{{**DEPRECATE**}}
 
 =cut
 
@@ -848,6 +702,8 @@ mmd_expand_x(PARROT_INTERP, INTVAL func_nr, INTVAL new_x)
 
 Expands the function table in the Y direction.
 
+{{**DEPRECATE**}}
+
 =cut
 
 */
@@ -897,13 +753,15 @@ installed when it's needed.
 The function table must exist, but if it is too small, it will
 automatically be expanded.
 
+{{**DEPRECATE**}}
+
 =cut
 
 */
 
 PARROT_API
 void
-mmd_add_by_class(PARROT_INTERP,
+Parrot_mmd_add_by_class(PARROT_INTERP,
              INTVAL functype,
              ARGIN(STRING *left_class), ARGIN(STRING *right_class),
              NULLOK(funcptr_t funcptr))
@@ -917,14 +775,14 @@ mmd_add_by_class(PARROT_INTERP,
     if (right_type == enum_type_undef)
         right_type = pmc_register(interp, right_class);
 
-    mmd_register(interp, functype, left_type, right_type, funcptr);
+    Parrot_mmd_register(interp, functype, left_type, right_type, funcptr);
 
 }
 
 
 /*
 
-=item C<void mmd_register>
+=item C<void Parrot_mmd_register>
 
 Register a function C<funcptr> for MMD function table C<func_num> for classes
 C<left_type> and C<right_type>. The left and right types are C<INTVAL>s that
@@ -946,13 +804,15 @@ searching, as it assumes that all PMC types have no parent type. This
 can be considered a bug, and will be resolved at some point in the
 future.
 
+{{**DEPRECATE**}}
+
 =cut
 
 */
 
 PARROT_API
 void
-mmd_register(PARROT_INTERP, INTVAL func_nr, INTVAL left_type, INTVAL right_type,
+Parrot_mmd_register(PARROT_INTERP, INTVAL func_nr, INTVAL left_type, INTVAL right_type,
              NULLOK(funcptr_t funcptr))
 {
 
@@ -984,9 +844,11 @@ mmd_register(PARROT_INTERP, INTVAL func_nr, INTVAL left_type, INTVAL right_type,
 
 /*
 
-=item C<void mmd_register_sub>
+=item C<void Parrot_mmd_register_sub>
 
 RT #48260: Not yet documented!!!
+
+{{**DEPRECATE**}}
 
 =cut
 
@@ -994,17 +856,17 @@ RT #48260: Not yet documented!!!
 
 PARROT_API
 void
-mmd_register_sub(PARROT_INTERP, INTVAL func_nr,
+Parrot_mmd_register_sub(PARROT_INTERP, INTVAL func_nr,
              INTVAL left_type, INTVAL right_type, ARGIN(const PMC *sub))
 {
     /* returned from mmdvt_find */
     if (sub->vtable->base_type == enum_class_NCI) {
-        mmd_register(interp, func_nr, left_type, right_type,
+        Parrot_mmd_register(interp, func_nr, left_type, right_type,
                 D2FPTR(PMC_struct_val(sub)));
     }
     else {
         PMC * const fake = (PMC *)((UINTVAL) sub | 1);
-        mmd_register(interp, func_nr, left_type, right_type, D2FPTR(fake));
+        Parrot_mmd_register(interp, func_nr, left_type, right_type, D2FPTR(fake));
     }
 }
 
@@ -1015,13 +877,15 @@ mmd_register_sub(PARROT_INTERP, INTVAL func_nr,
 
 Frees all the memory allocated used the MMD subsystem.
 
+{{**DEPRECATE**}}
+
 =cut
 
 */
 
 PARROT_API
 void
-mmd_destroy(PARROT_INTERP)
+Parrot_mmd_destroy(PARROT_INTERP)
 {
     if (interp->n_binop_mmd_funcs) {
         UINTVAL i;
@@ -1039,11 +903,12 @@ mmd_destroy(PARROT_INTERP)
 
 /*
 
-=item C<PMC * mmd_vtfind>
+=item C<PMC * Parrot_mmd_find_multi_from_long_sig>
 
-Return an MMD PMC function for the given data types. The return result is
-either a Sub PMC (for PASM MMD functions) or a NCI PMC holding the
-C function pointer in PMC_struct_val.
+Find the best candidate multi for a given sub name and signature. The signature
+is a string containing a comma-delimited list of type names.
+
+Currently only searches the global MULTI namespace.
 
 =cut
 
@@ -1053,21 +918,28 @@ PARROT_API
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-mmd_vtfind(PARROT_INTERP, INTVAL func_nr, INTVAL left, INTVAL right)
+Parrot_mmd_find_multi_from_long_sig(PARROT_INTERP, ARGIN(STRING *name),
+        ARGIN(STRING *long_sig))
 {
-    int             is_pmc;
-    const funcptr_t func = get_mmd_dispatch_type(interp,
-            func_nr, left, right, &is_pmc);
-    PMC            *f;
+    PMC *type_tuple, *candidate_list;
+    PMC * const namespace = Parrot_make_namespace_keyed_str(
+            interp, interp->root_namespace,
+            CONST_STRING(interp, "MULTI"));
+    PMC *multi_sub = Parrot_get_global(interp, namespace, name);
 
-    /* RT #45945 if is_pmc == 2 a Bound_NCI is returned, which actually should
-     * be filled with one of the wrapper functions */
-    if (func && is_pmc)
-        return (PMC *)F2DPTR(func);
+    if (PMC_IS_NULL(multi_sub))
+        return PMCNULL;
 
-    f                 = pmc_new(interp, enum_class_NCI);
-    VTABLE_set_pointer(interp, f, F2DPTR(func));
-    return f;
+    type_tuple = mmd_build_type_tuple_from_long_sig(interp, long_sig);
+
+    candidate_list = VTABLE_clone(interp, multi_sub);
+
+    Parrot_mmd_sort_candidates(interp, type_tuple, candidate_list);
+
+    if (PMC_IS_NULL(candidate_list))
+        return PMCNULL;
+
+    return VTABLE_get_pmc_keyed_int(interp, candidate_list, 0);
 }
 
 
@@ -1076,6 +948,8 @@ mmd_vtfind(PARROT_INTERP, INTVAL func_nr, INTVAL left, INTVAL right)
 =item C<PMC * Parrot_MMD_search_default_infix>
 
 RT #48260: Not yet documented!!!
+
+{{**DEPRECATE**}}
 
 =cut
 
@@ -1094,16 +968,16 @@ Parrot_MMD_search_default_infix(PARROT_INTERP, ARGIN(STRING *meth),
     VTABLE_set_integer_keyed_int(interp, arg_tuple, 0, left_type);
     VTABLE_set_integer_keyed_int(interp, arg_tuple, 1, right_type);
 
-    return mmd_search_default(interp, meth, arg_tuple);
+    return Parrot_mmd_search_default(interp, meth, arg_tuple);
 }
 
 
 /*
 
-=item C<PMC * Parrot_mmd_sort_candidate_list>
+=item C<PMC * Parrot_mmd_sort_manhattan_by_sig_pmc>
 
-Given an array PMC (usually a MultiSub) sort the mmd candidates by their
-manhatten distance to the current args.
+Given an array PMC (usually a MultiSub) and a CallSignature PMC sort the mmd
+candidates by their manhattan distance to the signature args.
 
 =cut
 
@@ -1113,7 +987,44 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
-Parrot_mmd_sort_candidate_list(PARROT_INTERP, ARGIN(PMC *candidates))
+Parrot_mmd_sort_manhattan_by_sig_pmc(PARROT_INTERP, ARGIN(PMC *candidates),
+        ARGIN(PMC* invoke_sig))
+{
+    PMC   *arg_tuple = VTABLE_get_pmc(interp, invoke_sig);
+    INTVAL n = VTABLE_elements(interp, candidates);
+
+    if (!n)
+        return PMCNULL;
+
+    candidates = VTABLE_clone(interp, candidates);
+
+    Parrot_mmd_sort_candidates(interp, arg_tuple, candidates);
+
+    /* if there aren't any variants that match the current args, we could end
+       up with an empty list */
+    n = VTABLE_elements(interp, candidates);
+
+    if (!n)
+        return PMCNULL;
+
+    return candidates;
+}
+
+/*
+
+=item C<PMC * Parrot_mmd_sort_manhattan>
+
+Given an array PMC (usually a MultiSub) sort the mmd candidates by their
+manhatten distance to the current args.
+
+=cut
+
+*/
+PARROT_API
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC *
+Parrot_mmd_sort_manhattan(PARROT_INTERP, ARGIN(PMC *candidates))
 {
     PMC   *arg_tuple;
     INTVAL n = VTABLE_elements(interp, candidates);
@@ -1121,10 +1032,10 @@ Parrot_mmd_sort_candidate_list(PARROT_INTERP, ARGIN(PMC *candidates))
     if (!n)
         return PMCNULL;
 
-    arg_tuple  = mmd_arg_tuple_func(interp);
+    arg_tuple  = Parrot_mmd_arg_tuple_func(interp);
     candidates = VTABLE_clone(interp, candidates);
 
-    mmd_sort_candidates(interp, arg_tuple, candidates);
+    Parrot_mmd_sort_candidates(interp, arg_tuple, candidates);
 
     /* if there aren't any variants that match the current args, we could end
        up with an empty list */
@@ -1143,6 +1054,8 @@ Parrot_mmd_sort_candidate_list(PARROT_INTERP, ARGIN(PMC *candidates))
 
 Return a list of argument types. PMC arguments are specified as function
 arguments.
+
+{{**DEPRECATE** Not actually called anywhere.}}
 
 =cut
 */
@@ -1197,9 +1110,9 @@ mmd_arg_tuple_inline(PARROT_INTERP, ARGIN(STRING *signature), va_list args)
 
 /*
 
-=item C<static PMC* mmd_arg_tuple_func>
+=item C<static PMC* Parrot_mmd_arg_tuple_func>
 
-Return a list of argument types. PMC arguments are take from registers
+Return a list of argument types. PMC arguments are taken from registers
 according to calling conventions.
 
 =cut
@@ -1209,7 +1122,7 @@ according to calling conventions.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC*
-mmd_arg_tuple_func(PARROT_INTERP)
+Parrot_mmd_arg_tuple_func(PARROT_INTERP)
 {
     INTVAL sig_len, i, type;
     PMC                *arg;
@@ -1266,7 +1179,12 @@ mmd_arg_tuple_func(PARROT_INTERP)
                     arg = constants[idx]->u.key;
                 else
                     arg = REG_PMC(interp, idx);
-                type = VTABLE_type(interp, arg);
+
+                if (PMC_IS_NULL(arg))
+                    type = enum_type_PMC;
+                else
+                    type = VTABLE_type(interp, arg);
+
                 VTABLE_push_integer(interp, arg_tuple, type);
                 }
                 break;
@@ -1299,11 +1217,13 @@ mmd_arg_tuple_func(PARROT_INTERP)
 
 /*
 
-=item C<static PMC* mmd_search_default>
+=item C<static PMC* Parrot_mmd_search_default>
 
 Default implementation of MMD search. Search scopes for candidates, walk the
 class hierarchy, sort all candidates by their Manhattan distance, and return
 result
+
+{{**DEPRECATE?? **}}
 
 =cut
 
@@ -1312,10 +1232,10 @@ result
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC*
-mmd_search_default(PARROT_INTERP, ARGIN(STRING *meth), ARGIN(PMC *arg_tuple))
+Parrot_mmd_search_default(PARROT_INTERP, ARGIN(STRING *meth), ARGIN(PMC *arg_tuple))
 {
     /* 2) create a list of matching functions */
-    PMC * const candidate_list = mmd_search_scopes(interp, meth);
+    PMC * const candidate_list = Parrot_mmd_search_scopes(interp, meth);
 
     /*
      * 3) if list is empty fail
@@ -1336,7 +1256,7 @@ mmd_search_default(PARROT_INTERP, ARGIN(STRING *meth), ARGIN(PMC *arg_tuple))
      *    the first arguments MRO, add all MultiSubs and plain methods,
      *    where the first argument matches
      */
-    mmd_search_classes(interp, meth, arg_tuple, candidate_list, 0);
+    Parrot_mmd_search_classes(interp, meth, arg_tuple, candidate_list, 0);
     n = VTABLE_elements(interp, candidate_list);
     if (!n)
         return NULL;
@@ -1344,7 +1264,7 @@ mmd_search_default(PARROT_INTERP, ARGIN(STRING *meth), ARGIN(PMC *arg_tuple))
     /* 5) sort the list */
 
     if (n > 1)
-        mmd_sort_candidates(interp, arg_tuple, candidate_list);
+        Parrot_mmd_sort_candidates(interp, arg_tuple, candidate_list);
 
     n = VTABLE_elements(interp, candidate_list);
 
@@ -1358,7 +1278,7 @@ mmd_search_default(PARROT_INTERP, ARGIN(STRING *meth), ARGIN(PMC *arg_tuple))
 
 /*
 
-=item C<static void mmd_search_classes>
+=item C<static void Parrot_mmd_search_classes>
 
 Search all the classes in all MultiSubs of the candidates C<cl> and return
 a list of all candidates. C<start_at_parent> is 0 to start at the class itself
@@ -1369,7 +1289,7 @@ or 1 to search from the first parent class.
 */
 
 static void
-mmd_search_classes(PARROT_INTERP, ARGIN(STRING *meth),
+Parrot_mmd_search_classes(PARROT_INTERP, ARGIN(STRING *meth),
         ARGIN(PMC *arg_tuple), ARGIN(PMC *cl), INTVAL start_at_parent)
 {
     INTVAL type1;
@@ -1402,11 +1322,10 @@ mmd_search_classes(PARROT_INTERP, ARGIN(STRING *meth),
 
             if (!PMC_IS_NULL(methodobj)) {
                 /*
-                 * mmd_is_hidden would consider all previous candidates
                  * RT #45949 pass current n so that only candidates from this
                  *     mro are used?
                  */
-                if (mmd_maybe_candidate(interp, methodobj, cl))
+                if (Parrot_mmd_maybe_candidate(interp, methodobj, cl))
                     break;
             }
         }
@@ -1444,12 +1363,75 @@ distance_cmp(SHIM_INTERP, INTVAL a, INTVAL b)
     return da > db ? 1 : da < db ? -1 : 0;
 }
 
+/*
+
+=item C<static PMC* mmd_build_type_tuple_from_type_list>
+
+Construct a FixedIntegerArray of type numbers from an array of
+type names. Used for multiple dispatch.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static PMC*
+mmd_build_type_tuple_from_type_list(PARROT_INTERP, ARGIN(PMC *type_list))
+{
+    INTVAL i, param_count;
+    PMC *multi_sig = constant_pmc_new(interp, enum_class_FixedIntegerArray);
+
+    param_count = VTABLE_elements(interp, type_list);
+    VTABLE_set_integer_native(interp, multi_sig, param_count);
+
+    for (i = 0; i < param_count; i++) {
+        INTVAL type;
+        STRING *type_name = VTABLE_get_string_keyed_int(interp, type_list, i);
+        if (string_equal(interp, type_name, CONST_STRING(interp, "DEFAULT"))==0)
+            type = enum_type_PMC;
+        else if (string_equal(interp, type_name, CONST_STRING(interp, "STRING"))==0)
+            type = enum_type_STRING;
+        else if (string_equal(interp, type_name, CONST_STRING(interp, "INTVAL"))==0)
+            type = enum_type_INTVAL;
+        else if (string_equal(interp, type_name, CONST_STRING(interp, "FLOATVAL"))==0)
+            type = enum_type_FLOATVAL;
+        else
+            type = pmc_type(interp, type_name);
+
+        VTABLE_set_integer_keyed_int(interp, multi_sig, i, type);
+    }
+    return multi_sig;
+}
+
+/*
+
+=item C<static PMC* mmd_build_type_tuple_from_long_sig>
+
+Construct a FixedIntegerArray of type numbers from a comma-delimited string of
+type names. Used for multiple dispatch.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static PMC*
+mmd_build_type_tuple_from_long_sig(PARROT_INTERP, ARGIN(STRING *long_sig))
+{
+    PMC *type_list = string_split(interp, CONST_STRING(interp, ","), long_sig);
+
+    return mmd_build_type_tuple_from_type_list(interp, type_list);
+}
 
 /*
 
 =item C<static PMC* mmd_cvt_to_types>
 
 RT #48260: Not yet documented!!!
+
+{{**DEPRECATE**}}
 
 =cut
 
@@ -1527,7 +1509,6 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
     }
     else
         return MMD_BIG_DISTANCE;
-
     n    = VTABLE_elements(interp, multi_sig);
     args = VTABLE_elements(interp, arg_tuple);
 
@@ -1617,7 +1598,7 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
 
 /*
 
-=item C<static void mmd_sort_candidates>
+=item C<static void Parrot_mmd_sort_candidates>
 
 Sort the candidate list C<cl> by Manhattan Distance
 
@@ -1626,7 +1607,7 @@ Sort the candidate list C<cl> by Manhattan Distance
 */
 
 static void
-mmd_sort_candidates(PARROT_INTERP, ARGIN(PMC *arg_tuple), ARGIN(PMC *cl))
+Parrot_mmd_sort_candidates(PARROT_INTERP, ARGIN(PMC *arg_tuple), ARGIN(PMC *cl))
 {
     INTVAL  i;
     PMC    *nci;
@@ -1686,7 +1667,7 @@ mmd_sort_candidates(PARROT_INTERP, ARGIN(PMC *arg_tuple), ARGIN(PMC *cl))
 
 /*
 
-=item C<static PMC* mmd_search_scopes>
+=item C<static PMC* Parrot_mmd_search_scopes>
 
 Search all scopes for MMD candidates matching the arguments given in
 C<arg_tuple>.
@@ -1698,44 +1679,16 @@ C<arg_tuple>.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC*
-mmd_search_scopes(PARROT_INTERP, ARGIN(STRING *meth))
+Parrot_mmd_search_scopes(PARROT_INTERP, ARGIN(STRING *meth))
 {
     PMC * const candidates = pmc_new(interp, enum_class_ResizablePMCArray);
 
-    const int stop         = mmd_search_cur_namespace(interp, meth, candidates);
+    const int stop         = mmd_search_local(interp, meth, candidates);
 
     if (!stop)
-        mmd_search_builtin(interp, meth, candidates);
+        mmd_search_global(interp, meth, candidates);
 
     return candidates;
-}
-
-
-/*
-
-=item C<static int mmd_is_hidden>
-
-Check if the given multi sub is hidden by any inner multi sub (already in
-the candidate list C<cl>.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static int
-mmd_is_hidden(PARROT_INTERP, ARGIN(PMC *multi), ARGIN(PMC *cl))
-{
-    /*
-     * if the candidate list already has the a sub with the same
-     * signature (long name), the outer multi is hidden
-     *
-     * RT #45957
-     */
-    UNUSED(interp);
-    UNUSED(multi);
-    UNUSED(cl);
-    return 0;
 }
 
 
@@ -1754,7 +1707,7 @@ to continue searching outer scopes.
 */
 
 static int
-mmd_maybe_candidate(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *cl))
+Parrot_mmd_maybe_candidate(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *cl))
 {
     INTVAL i, n;
 
@@ -1778,9 +1731,7 @@ mmd_maybe_candidate(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *cl))
 
     for (i = 0; i < n; ++i) {
         PMC * const multi_sub = VTABLE_get_pmc_keyed_int(interp, pmc, i);
-
-        if (!mmd_is_hidden(interp, multi_sub, cl))
-            VTABLE_push_pmc(interp, cl, multi_sub);
+        VTABLE_push_pmc(interp, cl, multi_sub);
     }
 
     return 0;
@@ -1789,7 +1740,7 @@ mmd_maybe_candidate(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *cl))
 
 /*
 
-=item C<static int mmd_search_cur_namespace>
+=item C<static int mmd_search_local>
 
 Search the current package namespace for matching candidates. Return
 TRUE if the MMD search should stop.
@@ -1799,230 +1750,138 @@ TRUE if the MMD search should stop.
 */
 
 static int
-mmd_search_cur_namespace(PARROT_INTERP, ARGIN(STRING *meth), ARGIN(PMC *cl))
+mmd_search_local(PARROT_INTERP, ARGIN(STRING *name), ARGIN(PMC *candidates))
 {
-    PMC * const pmc = Parrot_find_global_cur(interp, meth);
+    PMC * const multi_sub = Parrot_find_global_cur(interp, name);
 
-    return pmc && mmd_maybe_candidate(interp, pmc, cl);
+    return multi_sub && Parrot_mmd_maybe_candidate(interp, multi_sub, candidates);
 }
-
 
 /*
 
-=item C<static PMC* mmd_get_ns>
+=item C<static void mmd_search_by_sig_obj>
 
-RT #48260: Not yet documented!!!
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC*
-mmd_get_ns(PARROT_INTERP)
-{
-    STRING * const ns_name = CONST_STRING(interp, "__parrot_core");
-    return Parrot_get_namespace_keyed_str(interp, interp->root_namespace,
-                                          ns_name);
-}
-
-
-/*
-
-=item C<static PMC* mmd_make_ns>
-
-RT #48260: Not yet documented!!!
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC*
-mmd_make_ns(PARROT_INTERP)
-{
-    STRING * const ns_name = CONST_STRING(interp, "__parrot_core");
-    return Parrot_make_namespace_keyed_str(interp, interp->root_namespace,
-                                           ns_name);
-}
-
-
-/*
-
-=item C<static void mmd_search_builtin>
-
-Search the builtin namespace for matching candidates. This is the last
-search in all the namespaces.
+Search the namespace of the first argument to the sub call for matching
+candidates.
 
 =cut
 
 */
 
 static void
-mmd_search_builtin(PARROT_INTERP, ARGIN(STRING *meth), ARGIN(PMC *cl))
+mmd_search_by_sig_obj(PARROT_INTERP, ARGIN(STRING *name),
+        ARGIN(PMC *sig_obj), ARGIN(PMC *candidates))
 {
-    PMC * const ns  = mmd_get_ns(interp);
-    PMC * const pmc = Parrot_find_global_n(interp, ns, meth);
+    PMC *namespace, *multi_sub;
+    PMC *first_arg = VTABLE_get_pmc_keyed_int(interp, sig_obj, 0);
 
-    if (pmc)
-        mmd_maybe_candidate(interp, pmc, cl);
+    if (PMC_IS_NULL(first_arg))
+        return;
+
+    namespace = VTABLE_get_namespace(interp, first_arg);
+
+    if (PMC_IS_NULL(namespace))
+        return;
+
+    multi_sub = Parrot_get_global(interp, namespace, name);
+
+    if (PMC_IS_NULL(multi_sub))
+        return;
+
+    Parrot_mmd_maybe_candidate(interp, multi_sub, candidates);
 }
 
 
 /*
 
-=item C<void mmd_create_builtin_multi_stub>
+=item C<static void mmd_search_global>
 
-RT #48260: Not yet documented!!!
-
-=cut
-
-*/
-
-void
-mmd_create_builtin_multi_stub(PARROT_INTERP, ARGIN(PMC *ns), INTVAL func_nr)
-{
-    const char * name    = Parrot_MMD_method_name(interp, func_nr);
-
-    /* create in constant pool */
-    STRING     * const s = const_string(interp, name);
-    PMC        * multi   = constant_pmc_new(interp, enum_class_MultiSub);
-
-    VTABLE_set_pmc_keyed_str(interp, ns, s, multi);
-}
-
-
-/*
-
-=item C<static void mmd_create_builtin_multi_meth_2>
-
-RT #48260: Not yet documented!!!
+Search the builtin namespace for matching candidates.
 
 =cut
 
 */
 
 static void
-mmd_create_builtin_multi_meth_2(PARROT_INTERP, ARGIN(PMC *ns),
-        INTVAL func_nr, INTVAL type, INTVAL right, funcptr_t func_ptr)
+mmd_search_global(PARROT_INTERP, ARGIN(STRING *name), ARGIN(PMC *cl))
 {
-    const char *short_name;
-    char signature[6], val_sig;
-    STRING *meth_name;
-    PMC *method, *multi, *_class, *multi_sig;
+    PMC *multi_sub;
+    PMC * const namespace = Parrot_get_namespace_keyed_str(
+            interp, interp->root_namespace,
+            CONST_STRING(interp, "MULTI"));
 
-    PARROT_ASSERT(type != enum_class_Null
-               && type != enum_class_delegate
-               && type != enum_class_Ref
-               && type != enum_class_SharedRef
-               && type != enum_class_deleg_pmc
-               && type != enum_class_Class
-               && type != enum_class_Object);
+    multi_sub = Parrot_get_global(interp, namespace, name);
 
-    short_name = Parrot_MMD_method_name(interp, func_nr);
+    if (PMC_IS_NULL(multi_sub))
+        return;
 
-    /* _int, _float, _str are just native variants of the base multi */
-    val_sig = 'P';
+    Parrot_mmd_maybe_candidate(interp, multi_sub, cl);
+}
 
-    if (right == enum_type_INTVAL)
-        val_sig = 'I';
-    else if (right == enum_type_STRING)
-        val_sig = 'S';
-    else if (right == enum_type_FLOATVAL)
-        val_sig = 'N';
 
-    /* create NCI method in left class */
-    strcpy(signature, "PJP.P");
-    signature[3] = val_sig;
+/*
 
-    if (func_nr >= MMD_EQ && func_nr <= MMD_STRCMP) {
-        signature[0] = 'I';
-        signature[4] = '\0';
-    }
+=item C<static void mmd_add_multi_global>
 
-    /* implace infix like __i_add don't return a result */
-    if (memcmp(short_name, "__i_", 4) == 0)
-        signature[0] = 'v';
+Create a MultiSub, or add a variant to an existing MultiSub. The MultiSub is
+stored in the global MULTI namespace.
 
-    meth_name = const_string(interp, short_name);
-    _class    = interp->vtables[type]->pmc_class;
-    method    = Parrot_find_method_direct(interp, _class, meth_name);
+=cut
 
-    if (PMC_IS_NULL(method)) {
-        /* first method */
-        method = constant_pmc_new(interp, enum_class_NCI);
-        VTABLE_set_pointer_keyed_str(interp, method,
-                const_string(interp, signature),
-                F2DPTR(func_ptr));
-        VTABLE_add_method(interp, _class, meth_name, method);
-    }
-    else {
-        /* multiple methods with that same name */
-        if (method->vtable->base_type == enum_class_NCI) {
-            /* convert first to a multi */
-            multi = constant_pmc_new(interp, enum_class_MultiSub);
-            VTABLE_add_method(interp, _class, meth_name, multi);
-            VTABLE_push_pmc(interp, multi, method);
+*/
+
+static void
+mmd_add_multi_global(PARROT_INTERP, ARGIN(STRING *sub_name), ARGIN(PMC *sub_obj))
+{
+        PMC * const namespace = Parrot_make_namespace_keyed_str(
+            interp, interp->root_namespace,
+            CONST_STRING(interp, "MULTI"));
+        PMC *multi_sub = Parrot_get_global(interp, namespace, sub_name);
+
+        if (PMC_IS_NULL(multi_sub)) {
+            multi_sub = constant_pmc_new(interp, enum_class_MultiSub);
+            Parrot_set_global(interp, namespace, sub_name, multi_sub);
         }
-        else {
-            PARROT_ASSERT(method->vtable->base_type == enum_class_MultiSub);
-            multi = method;
-        }
-        method = constant_pmc_new(interp, enum_class_NCI);
-        VTABLE_set_pointer_keyed_str(interp, method,
-                const_string(interp, signature),
-                F2DPTR(func_ptr));
-        VTABLE_push_pmc(interp, multi, method);
-    }
 
-    /* mark MMD */
-    PObj_get_FLAGS(method) |= PObj_private0_FLAG;
-
-    /* attach the multi_signature array to PMC_pmc_val */
-    multi_sig = constant_pmc_new(interp, enum_class_FixedIntegerArray);
-
-    VTABLE_set_integer_native(interp,    multi_sig, 2);
-    VTABLE_set_integer_keyed_int(interp, multi_sig, 0, type);
-    VTABLE_set_integer_keyed_int(interp, multi_sig, 1, right);
-
-    PMC_pmc_val(method) = multi_sig;
-
-    /*
-     * push method onto core multi_sub
-     * RT #45961 cache the namespace
-     */
-    multi = Parrot_find_global_n(interp, ns, meth_name);
-    PARROT_ASSERT(multi);
-    VTABLE_push_pmc(interp, multi, method);
+        PARROT_ASSERT(multi_sub->vtable->base_type == enum_class_MultiSub);
+        VTABLE_push_pmc(interp, multi_sub, sub_obj);
 }
-
 
 /*
 
-=item C<static void mmd_create_builtin_multi_meth>
+=item C<static void mmd_add_multi_to_namespace>
 
-RT #48260: Not yet documented!!!
+Create a MultiSub, or add a variant to an existing MultiSub. The MultiSub is
+added as a method to a class.
 
 =cut
 
 */
 
 static void
-mmd_create_builtin_multi_meth(PARROT_INTERP, ARGIN(PMC *ns), INTVAL type,
-        ARGIN(const MMD_init *entry))
+mmd_add_multi_to_namespace(PARROT_INTERP, ARGIN(STRING *ns_name),
+            ARGIN(STRING *sub_name), ARGIN(PMC *sub_obj))
 {
-    mmd_create_builtin_multi_meth_2(interp, ns,
-            entry->func_nr, type, entry->right, entry->func_ptr);
-}
+        PMC * const hll_ns    = VTABLE_get_pmc_keyed_int(interp,
+                interp->HLL_namespace, CONTEXT(interp)->current_HLL);
+        PMC * const namespace = Parrot_make_namespace_keyed_str(interp, hll_ns, ns_name);
+        PMC *multi_sub = Parrot_get_global(interp, namespace, sub_name);
 
+        if (PMC_IS_NULL(multi_sub)) {
+            multi_sub = constant_pmc_new(interp, enum_class_MultiSub);
+            Parrot_set_global(interp, namespace, sub_name, multi_sub);
+        }
+
+        PARROT_ASSERT(multi_sub->vtable->base_type == enum_class_MultiSub);
+        VTABLE_push_pmc(interp, multi_sub, sub_obj);
+}
 
 /*
 
-=item C<void Parrot_mmd_register_table>
+=item C<void Parrot_mmd_add_multi_from_long_sig>
 
-Register MMD functions for this PMC type.
+Create a MultiSub, or add a variant to an existing MultiSub. The MultiSub is
+stored in the global MULTI namespace.
 
 =cut
 
@@ -2030,34 +1889,93 @@ Register MMD functions for this PMC type.
 
 PARROT_API
 void
-Parrot_mmd_register_table(PARROT_INTERP, INTVAL type,
-        ARGIN(const MMD_init *mmd_table), INTVAL n)
+Parrot_mmd_add_multi_from_long_sig(PARROT_INTERP,
+        ARGIN(STRING *sub_name), ARGIN(STRING *long_sig),
+        ARGIN(PMC *sub_obj))
 {
-    MMD_table * const table = interp->binop_mmd_funcs;
-    PMC       * const ns    = mmd_make_ns(interp);
-    INTVAL            i;
+        PMC *type_list = string_split(interp, CONST_STRING(interp, ","), long_sig);
+        STRING *namespace_name = VTABLE_get_string_keyed_int(interp, type_list, 0);
 
-    if ((INTVAL)table->x < type && type < enum_class_core_max) {
+        /* Attach a type tuple array to the sub for multi dispatch */
+        PMC *multi_sig = mmd_build_type_tuple_from_type_list(interp, type_list);
 
-        /* pre-allocate the function table */
-        for (i = MMD_USER_FIRST - 1; i >= 0; i--) {
-            mmd_register(interp, i, enum_class_core_max - 1,
-                    enum_class_core_max - 1, NULL);
-
-            /* create a MultiSub stub */
-            mmd_create_builtin_multi_stub(interp, ns, i);
+        if (sub_obj->vtable->base_type == enum_class_NCI) {
+            PMC_pmc_val(sub_obj) = multi_sig;
         }
-    }
+        else if (VTABLE_isa(interp, sub_obj, CONST_STRING(interp, "Sub"))
+             ||  VTABLE_isa(interp, sub_obj, CONST_STRING(interp, "Closure"))) {
+            PMC_sub(sub_obj)->multi_signature = multi_sig;
+        }
 
-    /* register default mmds for this type */
-    for (i = 0; i < n; ++i) {
+        mmd_add_multi_to_namespace(interp, namespace_name, sub_name, sub_obj);
+        mmd_add_multi_global(interp, sub_name, sub_obj);
+}
+
+/*
+
+=item C<void Parrot_mmd_add_multi_from_c_args>
+
+Create a MultiSub, or add a variant to an existing MultiSub. The MultiSub is
+stored in the specified namespace.
+
+=cut
+
+*/
+
+PARROT_API
+void
+Parrot_mmd_add_multi_from_c_args(PARROT_INTERP, ARGIN(STRING *sub_name),
+        ARGIN(STRING *short_sig), ARGIN(STRING *long_sig),
+        ARGIN(funcptr_t multi_func_ptr))
+{
+        PMC *multi_sig;
+        PMC *type_list = string_split(interp, CONST_STRING(interp, ","), long_sig);
+        STRING *namespace_name = VTABLE_get_string_keyed_int(interp, type_list, 0);
+
+        /* Create an NCI sub for the C function */
+        PMC *sub_obj = constant_pmc_new(interp, enum_class_NCI);
+        VTABLE_set_pointer_keyed_str(interp, sub_obj,
+                short_sig, F2DPTR(multi_func_ptr));
+
+        /* Attach a type tuple array to the NCI sub for multi dispatch */
+        multi_sig = mmd_build_type_tuple_from_long_sig(interp, long_sig);
+        PMC_pmc_val(sub_obj) = multi_sig;
+
+        mmd_add_multi_to_namespace(interp, namespace_name, sub_name, sub_obj);
+        mmd_add_multi_global(interp, sub_name, sub_obj);
+}
+
+/*
+
+=item C<void Parrot_mmd_add_multi_list_from_c_args>
+
+Create a collection of multiple dispatch subs from a C structure of
+information. Iterate through the list of details passed in. For each entry
+create a MultiSub or add a variant to an existing MultiSub. MultiSubs are
+created in the global 'MULTI' namespace in the Parrot HLL.
+
+Typically used to create all the multiple dispatch routines
+declared in a PMC from the PMC's class initialization function.
+
+=cut
+
+*/
+
+PARROT_API
+void
+Parrot_mmd_add_multi_list_from_c_args(PARROT_INTERP,
+        ARGIN(const multi_func_list *mmd_info), INTVAL elements)
+{
+    INTVAL i;
+    for (i = 0; i < elements; ++i) {
 #ifdef PARROT_HAS_ALIGNED_FUNCPTR
-        PARROT_ASSERT((PTR2UINTVAL(mmd_table[i].func_ptr) & 3) == 0);
+        PARROT_ASSERT((PTR2UINTVAL(mmd_info[i].func_ptr) & 3) == 0);
 #endif
-        mmd_register(interp,
-                mmd_table[i].func_nr, type,
-                mmd_table[i].right, mmd_table[i].func_ptr);
-        mmd_create_builtin_multi_meth(interp, ns, type, mmd_table + i);
+        Parrot_mmd_add_multi_from_c_args(interp,
+                mmd_info[i].multi_name,
+                mmd_info[i].short_sig,
+                mmd_info[i].full_sig,
+                mmd_info[i].func_ptr);
     }
 }
 
@@ -2069,6 +1987,8 @@ Parrot_mmd_register_table(PARROT_INTERP, INTVAL type,
 Rebuild the static MMD_table for the given class type and MMD function
 number. If C<type> is negative all classes are rebuilt. If C<func_nr> is
 negative all MMD functions are rebuilt.
+
+{{**DEPRECATE**}}
 
 =cut
 
@@ -2106,7 +2026,7 @@ Parrot_mmd_rebuild_table(PARROT_INTERP, INTVAL type, INTVAL func_nr)
 
 =head1 SEE ALSO
 
-F<include/parrot/mmd.h>,
+F<include/parrot/multidispatch.h>,
 F<http://svn.perl.org/perl6/doc/trunk/design/apo/A12.pod>,
 F<http://svn.perl.org/perl6/doc/trunk/design/syn/S12.pod>
 

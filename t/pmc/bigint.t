@@ -591,35 +591,35 @@ pir_output_is( <<'CODE', <<'OUTPUT', "pi() generator" );
     b1 = 4
 forever:
     .local pmc p, q
-    p = n_mul k, k
-    q = n_mul k, 2
+    p = mul k, k
+    q = mul k, 2
     inc q
     inc k
     .local pmc ta, tb, ta1, tb1
     ta = clone a1
     tb = clone b1
-    $P0 = n_mul p, a
-    $P1 = n_mul q, a1
-    ta1 =  n_add $P0, $P1
-    $P2 = n_mul p, b
-    $P3 = n_mul q, b1
-    tb1 =  n_add $P2, $P3
+    $P0 = mul p, a
+    $P1 = mul q, a1
+    ta1 =  add $P0, $P1
+    $P2 = mul p, b
+    $P3 = mul q, b1
+    tb1 =  add $P2, $P3
     a = ta
     b = tb
     a1 = ta1
     b1 = tb1
     .local pmc d, d1
-    d = n_fdiv a, b
-    d1 = n_fdiv a1, b1
+    d = fdiv a, b
+    d1 = fdiv a1, b1
 yield_loop:
     unless d == d1 goto end_yield
     .yield(d)
-    $P4 = n_mod a, b
-    a = n_mul $P4, 10
-    $P5 = n_mod a1, b1
-    a1 = n_mul $P5, 10
-    d = n_fdiv a, b
-    d1 = n_fdiv a1, b1
+    $P4 = mod a, b
+    a = mul $P4, 10
+    $P5 = mod a1, b1
+    a1 = mul $P5, 10
+    d = fdiv a, b
+    d1 = fdiv a1, b1
     goto yield_loop
 end_yield:
     goto forever
@@ -848,7 +848,7 @@ pir_error_output_like( <<'CODE', <<'OUT', "shl_int throws an error when promotio
    ## then by 60 bits.
    $P1 = 60
    $P0 = 1000001
-   n_shl $P3, $P0, $P1
+   shl $P3, $P0, $P1
    $S2 = typeof $P3
    print $S2
    print ' '
@@ -869,7 +869,7 @@ pir_output_is( <<'CODE', <<'OUT', "shl_int by 64 bits also promotes to Bigint" )
    set $P0, 1000001
    new $P1, 'Integer'
    set $P1, 64
-   n_shl $P2, $P0, $P1
+   shl $P2, $P0, $P1
    $S2 = typeof $P2
    print $S2
    print ' '

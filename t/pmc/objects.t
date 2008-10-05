@@ -946,7 +946,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods" )
 .end
 
 .namespace ["MyInt"]
-.sub __add :multi(MyInt, MyInt)
+.sub add :multi(MyInt, MyInt)
    .param pmc self
    .param pmc right
    .param pmc dest
@@ -1367,7 +1367,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PMC as classes - overridden mmd methods" )
 .end
 
 .namespace ["MyInt"]
-.sub __add :multi(MyInt, MyInt)
+.sub add :multi(MyInt, MyInt)
    .param pmc self
    .param pmc right
    .param pmc dest

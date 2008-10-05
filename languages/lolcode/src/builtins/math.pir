@@ -1,28 +1,28 @@
 .sub 'SUM OF'
     .param pmc x
     .param pmc y
-    $P0 = n_add x, y
+    $P0 = add x, y
     .return ($P0)
 .end
 
 .sub 'DIFF OF'
     .param pmc x
     .param pmc y
-    $P0 = n_sub x, y
+    $P0 = sub x, y
     .return ($P0)
 .end
 
 .sub 'PRODUKT OF'
     .param pmc x
     .param pmc y
-    $P0 = n_mul x, y
+    $P0 = mul x, y
     .return ($P0)
 .end
 
 .sub 'QUOSHUNT OF'
     .param pmc x
     .param pmc y
-    $P0 = n_div x, y
+    $P0 = div x, y
     .return ($P0)
 .end
 

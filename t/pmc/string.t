@@ -292,32 +292,32 @@ zzz
 
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "n_repeat" );
+pasm_output_is( <<'CODE', <<OUTPUT, "repeat" );
     new P0, 'String'
     set P0, "x"
     new P1, 'Integer'
     set P1, 12
-    n_repeat P2, P0, P1
+    repeat P2, P0, P1
         print P2
         print "\n"
 
         set P0, "y"
         new P1, 'Float'
         set P1, 6.5
-        n_repeat P3, P0, P1
+        repeat P3, P0, P1
         print P3
         print "\n"
 
         set P0, "z"
         new P1, 'String'
         set P1, "3"
-        n_repeat P4, P0, P1
+        repeat P4, P0, P1
         print P4
         print "\n"
 
         set P0, "a"
         new P1, 'Undef'
-        n_repeat P5, P0, P1
+        repeat P5, P0, P1
         print P5
         print "\n"
 
@@ -348,16 +348,16 @@ xxxxxxxxxxxx
 zazaza
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "n_repeat_int" );
+pasm_output_is( <<'CODE', <<OUTPUT, "repeat_int" );
     new P0, 'String'
     set P0, "x"
     set I1, 12
-    n_repeat P2, P0, I1
+    repeat P2, P0, I1
         print P2
         print "\n"
 
         set P0, "za"
-        n_repeat P3, P0, 3
+        repeat P3, P0, 3
         print P3
         print "\n"
     end
@@ -458,10 +458,10 @@ bar
 str
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "n_concat" );
+pasm_output_is( <<'CODE', <<OUTPUT, "concat" );
     new P0, 'String'
     set P0, "foo"
-    n_concat    P1, P0, P0
+    concat    P1, P0, P0
 
     print   P0
     print "\n"
@@ -470,7 +470,7 @@ pasm_output_is( <<'CODE', <<OUTPUT, "n_concat" );
 
     new P0, 'String'
     set P0, "foo"
-    n_concat P2, P0, "bar"
+    concat P2, P0, "bar"
 
     print   P0
     print "\n"

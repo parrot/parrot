@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 19;
 
 =head1 NAME
 
@@ -314,32 +314,54 @@ ok 3
 ok 4
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "n_<oper>" );
+pasm_output_is( <<'CODE', <<'OUT', "add" );
+   new P0, 'Integer'
+   set P0, 5
+   new P1, 'Integer'
+   set P1, 10
+   new P2, 'Integer'
+   add P2, P0, P1
+   set S0, P2
+   print S0
+   print "\n"
+   set P0, "20"
+   set P1, "30"
+   add P2, P1, P0
+   set S0, P2
+   print S0
+   print "\n"
+   end
+CODE
+15
+50
+OUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "<oper>" );
 .sub main :main
     $P0 = new 'Integer'
     $P1 = new 'Integer'
     set $P0, 6
     set $P1, 2
 
-    n_add $P2, $P0, $P1
+    add $P2, $P0, $P1
     print $P2
     print "\n"
-    $P2 = n_add $P0, $P1
+    $P2 = add $P0, $P1
     print $P2
     print "\n"
-    n_sub $P2, $P0, $P1
+    sub $P2, $P0, $P1
     print $P2
     print "\n"
-    n_mul $P2, $P0, $P1
+    mul $P2, $P0, $P1
     print $P2
     print "\n"
-    n_div $P2, $P0, $P1
+    div $P2, $P0, $P1
     print $P2
     print "\n"
-    n_mod $P2, $P0, $P1
+    mod $P2, $P0, $P1
     print $P2
     print "\n"
-    n_pow $P2, $P0, $P1
+    pow $P2, $P0, $P1
     print $P2
     print "\n"
 .end

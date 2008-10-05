@@ -79,7 +79,7 @@ pir_output_is( $library . <<'CODE', <<'OUTPUT', "Integer set read-only can be re
     print "\n"
 
     $P0 = foo
-    n_add foo, foo, foo
+    add foo, foo, foo
     print foo
     print "\n"
 

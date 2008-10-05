@@ -158,8 +158,8 @@ sub find_methods {
 
         ((?:PARROT_\w+\s+)+)? # decorators
 
-        # vtable|method marker
-        (?:(VTABLE|METHOD)\s+)?
+        # vtable, method, or multi marker
+        (?:(VTABLE|METHOD|MULTI)\s+)?
 
         ((?:\w+\s*?\**\s*)?\w+) # method name (includes return type)
         \s*
@@ -226,6 +226,10 @@ sub find_methods {
             $pmc->set_flag('need_fia_header');
         }
 
+        if ( $marker and $marker =~ /MULTI/ ) {
+            Parrot::Pmc2c::MULTI::rewrite_multi_sub( $method, $pmc );
+        }
+
         # PCCINVOKE needs FixedIntegerArray header
         $pmc->set_flag('need_fia_header') if $methodblock =~ /PCCINVOKE/;
 
@@ -235,13 +239,20 @@ sub find_methods {
         }
         else {
 
-            # Name-mangle NCI methods to avoid conflict with vtable methods.
-            if ( $marker and $marker !~ /VTABLE/ ) {
-                $method->type(Parrot::Pmc2c::Method::NON_VTABLE);
-                $method->name("nci_$methodname");
-                $method->symbol($methodname);
+            # Name-mangle NCI and multi methods to avoid conflict with vtable methods.
+            if ( $marker) {
+                if ( $marker =~ /MULTI/ ) {
+                    $method->type(Parrot::Pmc2c::Method::MULTI);
+                    $method->symbol($methodname);
+                }
+                elsif ( $marker !~ /VTABLE/ ) {
+                    $method->type(Parrot::Pmc2c::Method::NON_VTABLE);
+                    $method->name("nci_$methodname");
+                    $method->symbol($methodname);
+                }
             }
 
+            # To be deprecated
             parse_mmds( $method, $filename, $lineno )
                 if $methodblock =~ /\bMMD_(\w+):/;
 

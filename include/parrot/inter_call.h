@@ -175,6 +175,23 @@ void parrot_pass_args(PARROT_INTERP,
         FUNC_MODIFIES(*dest_indexes);
 
 PARROT_API
+void Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP,
+    ARGIN(PMC *sub_obj),
+    ARGIN(const char *sig),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_API
+void Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP,
+    ARGIN(PMC *sub_obj),
+    ARGIN(PMC *sig_obj))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_API
 void Parrot_PCCINVOKE(PARROT_INTERP,
     ARGIN(PMC* pmc),
     ARGMOD(STRING *method_name),

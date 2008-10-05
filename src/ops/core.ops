@@ -605,7 +605,7 @@ op set_returns(inconst PMC) :flow {
     ccont = ctx->current_cont;
 
     if (PMC_cont(ccont)->address) {
-        /* else it's from runops_fromc */
+        /* Call is from runops_fromc */
         parrot_context_t * const caller_ctx = PMC_cont(ccont)->to_ctx;
         if (! caller_ctx) {
             /* there is no point calling Parrot_ex_throw_from_c_args here, because
@@ -620,6 +620,11 @@ op set_returns(inconst PMC) :flow {
         interp->current_args = NULL;
 
         parrot_pass_args(interp, ctx, caller_ctx, src_indexes, dest_indexes, PARROT_PASS_RESULTS);
+    }
+    else if (ctx->caller_ctx->results_signature) {
+    /* We have a dynamic result signature, from pcc_invoke */
+        parrot_pass_args(interp, ctx, ctx->caller_ctx, interp->current_returns,
+                ctx->caller_ctx->current_results, PARROT_PASS_RESULTS);
     }
     argc = SIG_ELEMS(signature);
     goto OFFSET(argc + 2);

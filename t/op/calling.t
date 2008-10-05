@@ -1647,7 +1647,7 @@ L3:
         if arg1 != 3 goto L3
         $P58 = arg1
         $P59 = arg1
-        $P57 = n_mul $P58, $P59
+        $P57 = mul $P58, $P59
         set_args '(0)', $P57
         tailcall $P41
 L3:

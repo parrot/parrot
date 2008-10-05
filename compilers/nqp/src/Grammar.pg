@@ -402,27 +402,27 @@ proto prefix:<?> is equiv(prefix:<+>)
 
 ## Multiplicative operators
 proto infix:<*> is looser(prefix:<+>)
-    is pirop('n_mul')
+    is pirop('mul')
     { ... }
 proto infix:</> is equiv(infix:<*>)
-    is pirop('n_div')
+    is pirop('div')
     { ... }
 proto infix:<%> is equiv(infix:<*>)
-    is pirop('n_mod')
+    is pirop('mod')
     { ... }
 
 
 ## Additive operators
 proto infix:<+> is looser(infix:<*>)
-    is pirop('n_add')
+    is pirop('add')
     { ... }
 proto infix:<-> is equiv(infix:<+>)
-    is pirop('n_sub')
+    is pirop('sub')
     { ... }
 
 ## Concatenation operators
 proto infix:<~> is looser(infix:<+>)
-    is pirop('n_concat')
+    is pirop('concat')
     { ... }
 
 ## Comparison operators

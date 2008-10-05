@@ -56,11 +56,11 @@ a method will write a value based on the signature of the method,
 and if it would, then the check 
 C<<(pmc->vtable->flags & VTABLE_IS_READONLY_FLAG)>> is performed to see
 if the object is unsafe to write. (This is implemented by calls to
-C<mmd_ensure_writable> in C<mmd.c>.) For other methods, C<find_method>
-is overriden in the read-only variant to check the "write" property
-on the method that would be returned. (See also C<Parrot_mark_method_writes>
-in C<inter_misc.c>.) If it is set, then C<PMCNULL> is returned, 
-making the method lookup fail. 
+C<mmd_ensure_writable> in C<multidispatch.c>.) For other methods, 
+C<find_method> is overriden in the read-only variant to check the "write" 
+property on the method that would be returned. (See also 
+C<Parrot_mark_method_writes> in C<inter_misc.c>.) If it is set, then 
+C<PMCNULL> is returned, making the method lookup fail. 
 
 C<.pmc> files may mark vtable and NCI methods with the annotations
 C<:read> and C<:write> to override the default notion of whether or

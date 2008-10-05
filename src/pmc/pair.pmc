@@ -203,6 +203,7 @@ Check if two Pairs hold the same keys and values.
         Parrot_Pair_attributes * const to   = PARROT_PAIR(SELF);
         PMC *p1, *p2;
         PMC *k1, *k2;
+        INTVAL result;
 
         if (value->vtable->base_type != SELF->vtable->base_type)
             return 0;
@@ -210,7 +211,9 @@ Check if two Pairs hold the same keys and values.
         k1 = from->key;
         k2 = to->key;
 
-        if (!mmd_dispatch_i_pp(INTERP, k1, k2, MMD_EQ))
+        Parrot_mmd_multi_dispatch_from_c_args(INTERP, "is_equal",
+            "PP->I", k1, k2, &result);
+        if (!result)
             return 0;
 
         p1 = from->value;

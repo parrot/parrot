@@ -39,8 +39,8 @@ rule pmc_op {
 | prophash            <arg_hack> #
 | freeze              <arg_hack> #
 | thaw                <arg_hack> #
-| mmdvtregister       <arg_hack> #
-| mmdvtfind           <arg_hack> #
+| add_multi           <arg_hack> #
+| find_multi          <arg_hack> #
 | register            <arg_hack> #
 | unregister          <arg_hack> #
 | hash                <arg_hack> #

@@ -66,25 +66,6 @@ static void * imcc_compile_file(PARROT_INTERP,
         FUNC_MODIFIES(*error_message);
 
 PARROT_WARN_UNUSED_RESULT
-static int is_infix(ARGIN(const char *name), int n, ARGIN(SymReg **r))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static const char * to_infix(PARROT_INTERP,
-    ARGIN(const char *name),
-    ARGMOD(SymReg **r),
-    ARGMOD(int *n),
-    int mmd_op)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*r)
-        FUNC_MODIFIES(*n);
-
-PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static const char * try_rev_cmp(ARGIN(const char *name), ARGMOD(SymReg **r))
         __attribute__nonnull__(1)
@@ -302,131 +283,6 @@ is_op(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<static const char * to_infix>
-
-sub x, y, z  => infix .MMD_SUBTRACT, x, y, z
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static const char *
-to_infix(PARROT_INTERP, ARGIN(const char *name), ARGMOD(SymReg **r),
-        ARGMOD(int *n), int mmd_op)
-{
-    SymReg *mmd;
-    int is_n;
-
-    PARROT_ASSERT(*n >= 2);
-
-    is_n = (IMCC_INFO(interp)->state->pragmas & PR_N_OPERATORS) ||
-        (name[0] == 'n' && name[1] == '_') ||
-        (mmd_op == MMD_LOR || mmd_op == MMD_LAND || mmd_op == MMD_LXOR);
-
-    if (*n == 3 && r[0] == r[1] && !is_n) {       /* cvt to inplace */
-        char buf[10];
-        snprintf(buf, sizeof (buf), "%d", mmd_op + 1);  /* XXX */
-        mmd = mk_const(interp, buf, 'I');
-    }
-    else {
-        char buf[10];
-        int i;
-        for (i = *n; i > 0; --i)
-            r[i] = r[i - 1];
-
-        snprintf(buf, sizeof (buf), "%d", *n == 2 ? (mmd_op + 1) : mmd_op);  /* XXX */
-        mmd = mk_const(interp, buf, 'I');
-        (*n)++;
-    }
-
-    r[0] = mmd;
-
-    if (is_n && *n == 4)
-        return "n_infix";
-    else
-        return "infix";
-}
-
-/*
-
-=item C<static int is_infix>
-
-TODO: Needs to be documented!!!
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static int
-is_infix(ARGIN(const char *name), int n, ARGIN(SymReg **r))
-{
-    if (n < 2 || r[0]->set != 'P')
-        return -1;
-
-    /* TODO use a generic Parrot interface function,
-     *      which handles user infix extensions too
-     */
-    if (STREQ(name, "add"))
-        return MMD_ADD;
-    if (STREQ(name, "sub"))
-        return MMD_SUBTRACT;
-    if (STREQ(name, "mul"))
-        return MMD_MULTIPLY;
-    if (STREQ(name, "div"))
-        return MMD_DIVIDE;
-    if (STREQ(name, "fdiv"))
-        return MMD_FLOOR_DIVIDE;
-    if (STREQ(name, "mod"))
-        return MMD_MOD;
-    if (STREQ(name, "cmod"))
-        return MMD_CMOD;
-    if (STREQ(name, "pow"))
-        return MMD_POW;
-
-    if (STREQ(name, "bor"))
-        return MMD_BOR;
-    if (STREQ(name, "band"))
-        return MMD_BAND;
-    if (STREQ(name, "bxor"))
-        return MMD_BXOR;
-    if (STREQ(name, "bors"))
-        return MMD_SOR;
-    if (STREQ(name, "bands"))
-        return MMD_SAND;
-    if (STREQ(name, "bxors"))
-        return MMD_SXOR;
-
-    if (STREQ(name, "shl"))
-        return MMD_BSL;
-    if (STREQ(name, "shr"))
-        return MMD_BSR;
-    if (STREQ(name, "lsr"))
-        return MMD_LSR;
-
-    if (STREQ(name, "concat"))
-        return MMD_CONCAT;
-    if (STREQ(name, "repeat"))
-        return MMD_REPEAT;
-
-    if (STREQ(name, "or"))
-        return MMD_LOR;
-    if (STREQ(name, "and"))
-        return MMD_LAND;
-    if (STREQ(name, "xor"))
-        return MMD_LXOR;
-
-    /* now try n_<op> */
-    if (name[0] == 'n' && name[1] == '_')
-        return is_infix(name + 2, n, r);
-
-    return -1;
-}
-
-/*
-
 =item C<static Instruction * var_arg_ins>
 
 TODO: Needs to be documented!!!
@@ -505,13 +361,7 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     ||  (STREQ(name, "set_returns")))
         return var_arg_ins(interp, unit, name, r, n, emit);
 
-    op = is_infix(name, n, r);
-
-    if (op >= 0) {
-        /* sub x, y, z  => infix .MMD_SUBTRACT, x, y, z */
-        name = to_infix(interp, name, r, &n, op);
-    }
-    else if ((IMCC_INFO(interp)->state->pragmas & PR_N_OPERATORS)
+    if ((IMCC_INFO(interp)->state->pragmas & PR_N_OPERATORS)
          && ((STREQ(name, "abs"))
          ||  (STREQ(name, "neg"))
          ||  (STREQ(name, "not"))

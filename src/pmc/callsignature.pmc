@@ -1,0 +1,213 @@
+/*
+Copyright (C) 2008, The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/callsignature.pmc - CallSignature PMC
+
+=head1 DESCRIPTION
+
+The CallSignature PMC is used to store the argument list and argument meta
+information for a multiple dispatch call.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+#define CAPTURE_DATA_SIZE   2
+#define CAPTURE_array_CREATE(i, obj) \
+    if (!PARROT_CAPTURE(obj)->array) \
+        PARROT_CAPTURE(obj)->array = pmc_new((i), enum_class_ResizablePMCArray);
+#define CAPTURE_hash_CREATE(i, obj) \
+    if (!PARROT_CAPTURE(obj)->hash) \
+        PARROT_CAPTURE(obj)->hash = pmc_new((i), enum_class_Hash);
+
+pmclass CallSignature extends Capture need_ext provides array provides hash {
+    ATTR PMC    *array;      /* Positional arguments */
+    ATTR PMC    *hash;       /* Named arguments */
+    ATTR PMC    *returns;    /* Result PMCs, if they were passed with the call */
+    ATTR PMC    *type_tuple; /* Cached argument types for multiple dispatch */
+    ATTR STRING *short_sig;  /* Simple string signature args & returns */
+
+/*
+
+=item C<void init()>
+
+Initializes a newly created CallSignature object.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        Parrot_CallSignature_attributes *sig_struct =
+            mem_allocate_typed(Parrot_CallSignature_attributes);
+        PMC_data(SELF)         = sig_struct;
+        sig_struct->short_sig  = NULL;
+        sig_struct->type_tuple = PMCNULL;
+        sig_struct->returns    = PMCNULL;
+        sig_struct->array      = NULL;
+        sig_struct->hash       = NULL;
+        PMC_int_val(SELF)      = CAPTURE_DATA_SIZE;
+        PObj_active_destroy_SET(SELF);
+        PObj_data_is_PMC_array_SET(SELF);
+        PObj_custom_mark_SET(SELF);
+    }
+
+/*
+
+=item C<void set_string_native(STRING *value)>
+
+Sets the short signature for the CallSignature.
+
+=cut
+
+*/
+
+    VTABLE void set_string_native(STRING *value) {
+        Parrot_CallSignature_attributes * const sig_struct = PARROT_CALLSIGNATURE(SELF);
+        sig_struct->short_sig = value;
+    }
+
+/*
+
+=item C<STRING *get_string()>
+
+Returns the short signature for the CallSignature.
+
+=cut
+
+*/
+
+    VTABLE STRING *get_string() {
+        Parrot_CallSignature_attributes * const sig_struct = PARROT_CALLSIGNATURE(SELF);
+        return sig_struct->short_sig;
+    }
+
+/*
+
+=item C<void set_pmc(PMC *value)>
+
+Sets a fixed-size array of integer types (a type tuple) for the CallSignature.
+
+=cut
+
+*/
+
+    VTABLE void set_pmc(PMC *value) {
+        Parrot_CallSignature_attributes * const sig_struct = PARROT_CALLSIGNATURE(SELF);
+        sig_struct->type_tuple = value;
+    }
+
+/*
+
+=item C<PMC *get_pmc()>
+
+Returns a fixed-size array of integer types (a type tuple) for the
+CallSignature.
+
+=cut
+
+*/
+
+    VTABLE PMC *get_pmc() {
+        Parrot_CallSignature_attributes * const sig_struct = PARROT_CALLSIGNATURE(SELF);
+        return sig_struct->type_tuple;
+    }
+
+/*
+
+=item C<void set_attr_str(STRING *key, PMC *value)>
+
+Set a PMC value for an attribute by string name.
+
+=over
+
+=item returns
+
+Stores the return signature, an array of PMCs.
+
+=back
+
+=cut
+
+*/
+
+    VTABLE void set_attr_str(STRING *key, PMC *value) {
+        Parrot_CallSignature_attributes * const sig_struct = PARROT_CALLSIGNATURE(SELF);
+        sig_struct->returns = value;
+    }
+
+/*
+
+=item C<PMC *get_attr_str(STRING *key)>
+
+Get a PMC value for an attribute by string name.
+
+=over
+
+=item returns
+
+Retrieves the return signature, an array of PMCs.
+
+=back
+
+=cut
+
+*/
+
+    VTABLE PMC *get_attr_str(STRING *key) {
+        Parrot_CallSignature_attributes * const sig_struct = PARROT_CALLSIGNATURE(SELF);
+        return sig_struct->returns;
+    }
+
+/*
+
+=item C<void mark()>
+
+Mark any referenced strings and PMCs.
+
+=cut
+
+*/
+    VTABLE void mark() {
+        if (PARROT_CALLSIGNATURE(SELF)) {
+            Parrot_CallSignature_attributes * const attrs = PARROT_CALLSIGNATURE(SELF);
+
+            if (attrs->array)
+                pobject_lives(interp, (PObj*)attrs->array);
+            if (attrs->hash)
+                pobject_lives(interp, (PObj*)attrs->hash);
+            if (attrs->returns)
+                pobject_lives(interp, (PObj*)attrs->returns);
+            if (attrs->type_tuple)
+                pobject_lives(interp, (PObj*)attrs->type_tuple);
+            if (attrs->short_sig)
+                pobject_lives(interp, (PObj*)attrs->short_sig);
+        }
+    }
+
+
+/*
+
+=back
+
+=cut
+
+*/
+
+} /* end pmclass */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

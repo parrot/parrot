@@ -219,8 +219,7 @@ Set C<dest> to the negated value of C<SELF>.
     VTABLE PMC *neg(PMC *dest) {
         const FLOATVAL a = -SELF.get_number();
 
-        if (!dest)
-            dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest, a);
         return dest;
@@ -241,22 +240,20 @@ The C<==> operation.
 
 */
 
-    VTABLE INTVAL is_equal(PMC *value) {
-MMD_Float: {
+    MULTI INTVAL is_equal(Float value) {
         return (INTVAL)(SELF.get_number() == VTABLE_get_number(INTERP, value));
-        }
-MMD_DEFAULT: {
-        return (INTVAL)(SELF.get_number() == VTABLE_get_number(INTERP, value));
-        }
     }
 
-    VTABLE INTVAL is_equal_num(PMC *value) {
-MMD_Float: {
+    MULTI INTVAL is_equal(DEFAULT *value) {
         return (INTVAL)(SELF.get_number() == VTABLE_get_number(INTERP, value));
-        }
-MMD_DEFAULT: {
+    }
+
+    MULTI INTVAL is_equal_num(Float value) {
         return (INTVAL)(SELF.get_number() == VTABLE_get_number(INTERP, value));
-        }
+    }
+
+    MULTI INTVAL is_equal_num(DEFAULT value) {
+        return (INTVAL)(SELF.get_number() == VTABLE_get_number(INTERP, value));
     }
 
 /*
@@ -269,16 +266,15 @@ The C<cmp> operation.
 
 */
 
-    VTABLE INTVAL cmp(PMC *value) {
-MMD_Float: {
-            const FLOATVAL diff = SELF.get_number() - VTABLE_get_number(INTERP, value);
-            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
-        }
-MMD_DEFAULT: {
-            const FLOATVAL diff =
+    MULTI INTVAL cmp(Float value) {
+        const FLOATVAL diff = SELF.get_number() - VTABLE_get_number(INTERP, value);
+        return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+    }
+
+    MULTI INTVAL cmp(DEFAULT value) {
+        const FLOATVAL diff =
                 SELF.get_number() - VTABLE_get_number(INTERP, value);
-            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
-        }
+        return diff > 0 ? 1 : diff < 0 ? -1 : 0;
     }
 
 /*
@@ -291,16 +287,15 @@ Returns the result of comparing the number with C<*value>.
 
 */
 
-    VTABLE INTVAL cmp_num(PMC *value) {
-MMD_Float: {
-            const FLOATVAL diff = SELF.get_number() - VTABLE_get_number(INTERP, value);
-            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
-        }
-MMD_DEFAULT: {
-            const FLOATVAL diff =
+    MULTI INTVAL cmp_num(Float value) {
+        const FLOATVAL diff = SELF.get_number() - VTABLE_get_number(INTERP, value);
+        return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+    }
+
+    MULTI INTVAL cmp_num(DEFAULT value) {
+        const FLOATVAL diff =
                 SELF.get_number() - VTABLE_get_number(INTERP, value);
-            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
-        }
+        return diff > 0 ? 1 : diff < 0 ? -1 : 0;
     }
 
 /*
@@ -345,8 +340,7 @@ Sets C<dest> to the absolute value of SELF.
     VTABLE PMC *absolute(PMC *dest) {
         const FLOATVAL a = fabs(SELF.get_number());
 
-        if (!dest)
-            dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest, a);
         return dest;

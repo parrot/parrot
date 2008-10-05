@@ -41,7 +41,7 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 my %expected = (
     'namespace_dump.pir' => << 'END_EXPECTED',
 /^parrot.*
-^__parrot_core/sm
+^MULTI\s=>\sMULTI/sm
 END_EXPECTED
 );
 

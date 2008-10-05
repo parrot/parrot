@@ -178,32 +178,32 @@ end:
     new $P2, 'Integer'
     new $P1, 'Ref', $P2
     set $P1, 10
-    add $P1, $P1, $P1
-    is($P2, 20, "add ref,ref,ref is ok")
+    add $P1, $P1
+    is($P2, 20, "add ref,ref is ok")
 
     new $P3, 'Integer'
     new $P2, 'Integer'
     new $P1, 'Ref', $P2
     set $P3, 12
     set $P1, 10
-    add $P1, $P1, $P3
-    is($P2, 22, "add ref,ref,int is ok")
+    add $P1, $P3
+    is($P2, 22, "add ref,int is ok")
 
     new $P3, 'Integer'
     new $P2, 'Integer'
     new $P1, 'Ref', $P2
     set $P3, 12
     set $P1, 10
-    add $P1, $P3, $P1
-    is($P2, 22, "add ref,int,ref is ok")
+    add $P4, $P3, $P1
+    is($P4, 22, "add dest,int,ref is ok")
 
     new $P3, 'Integer'
     new $P2, 'Integer'
     new $P1, 'Ref', $P2
     set $P3, 12
     set $P1, 10
-    add $P1, $P3, $P3
-    is($P2, 24, "add ref,int,int is ok")
+    add $P4, $P1, $P3
+    is($P4, 22, "add dest,ref,int is ok")
 .end
 
 # Local Variables:

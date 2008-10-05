@@ -444,6 +444,8 @@ readable_name(PARROT_INTERP, ARGIN(PMC *name))
 
 Return the method name for the given MMD enum.
 
+{{**DEPRECATE**}}
+
 =cut
 
 */
@@ -470,6 +472,8 @@ Parrot_MMD_method_name(SHIM_INTERP, INTVAL idx)
 Return the MMD function number for method name or -1 on failure.
 
 RT #45973 allow dynamic expansion at runtime.
+
+{{**DEPRECATE**}}
 
 =cut
 

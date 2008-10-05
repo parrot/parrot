@@ -70,6 +70,7 @@ ex:
     null i
     $I2 = lev * 4
     spac = repeat " ", $I2
+
 loop:
     print spac
     $P0 = multi[i]

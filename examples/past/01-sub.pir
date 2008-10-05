@@ -60,7 +60,7 @@ roughly represents following Perl 6 code:
     $P1 = new 'PAST::Val'
     $P1.'init'( 'value' => '1', 'returns' => 'Integer')
     $P2 = new 'PAST::Op'
-    $P2.'init'( $P0, $P1, 'name' => 'infix:+', 'pirop' => 'n_add')
+    $P2.'init'( $P0, $P1, 'name' => 'infix:+', 'pirop' => 'add')
     $P3 = new 'PAST::Var'
     $P3.'init'( 'name' => '$b', 'viviself' => 'Undef', 'isdecl' => 1 )
     $P4 = new 'PAST::Op'

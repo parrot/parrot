@@ -5,7 +5,7 @@
 .include "mmd.pasm"
    .local pmc my_mul
    my_mul = global "my_mul"
-   mmdvtregister .MMD_MULTIPLY, .Integer, .Integer, my_mul
+   add_multi .MMD_MULTIPLY, .Integer, .Integer, my_mul
    .local int i
    .local pmc r
    .local pmc a

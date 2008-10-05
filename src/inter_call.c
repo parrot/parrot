@@ -62,6 +62,25 @@ static void commit_last_arg(PARROT_INTERP,
         FUNC_MODIFIES(*indexes)
         FUNC_MODIFIES(*ctx);
 
+static void commit_last_arg_sig_object(PARROT_INTERP,
+    int index,
+    int cur,
+    ARGMOD(opcode_t *n_regs_used),
+    int seen_arrow,
+    ARGIN(PMC * const *sigs),
+    ARGMOD(opcode_t **indexes),
+    ARGMOD(parrot_context_t *ctx),
+    ARGIN(PMC *sig_obj))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(6)
+        __attribute__nonnull__(7)
+        __attribute__nonnull__(8)
+        __attribute__nonnull__(9)
+        FUNC_MODIFIES(*n_regs_used)
+        FUNC_MODIFIES(*indexes)
+        FUNC_MODIFIES(*ctx);
+
 static void convert_arg_from_int(PARROT_INTERP, ARGMOD(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -149,6 +168,43 @@ static void too_many(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+static parrot_context_t * count_signature_elements(PARROT_INTERP,
+    ARGIN(const char* signature),
+    ARGMOD(PMC* args_sig),
+    ARGMOD(PMC* results_sig),
+    int flag)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
+
+static void set_context_sig_returns(PARROT_INTERP,
+    ARGMOD(parrot_context_t *ctx),
+    ARGMOD(opcode_t **indexes),
+    ARGIN(const char *ret_x),
+    ARGMOD(void* l),
+    int flag)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
+static const char *set_context_sig_params(PARROT_INTERP,
+    ARGIN(const char *signature),
+    ARGMOD(INTVAL *n_regs_used),
+    ARGMOD(PMC **sigs),
+    ARGMOD(opcode_t **indexes),
+    ARGMOD(parrot_context_t *ctx),
+    ARGMOD(PMC *sig_obj))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        __attribute__nonnull__(6)
+        __attribute__nonnull__(7);
+
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -221,7 +277,15 @@ Parrot_init_ret_nci(PARROT_INTERP, ARGOUT(call_state *st), ARGIN(const char *sig
 
     /* TODO simplify all */
     Parrot_init_arg_sig(interp, CONTEXT(interp), sig, NULL, &st->src);
-    Parrot_init_arg_op(interp, ctx, ctx->current_results, &st->dest);
+
+    /* Non-constant signatures are stored in ctx->results_signature instead of
+     * in the constants table. */
+    if (ctx->results_signature)
+        Parrot_init_arg_indexes_and_sig_pmc(interp, ctx,
+                ctx->current_results, ctx->results_signature, &st->dest);
+    else
+        Parrot_init_arg_op(interp, ctx, ctx->current_results, &st->dest);
+
 }
 
 
@@ -442,7 +506,6 @@ Fetches the next argument from the signature in the given call state.
 
 */
 
-/* Fetch an argument from C code */
 static int
 fetch_arg_sig(PARROT_INTERP, ARGMOD(call_state *st))
 {
@@ -558,14 +621,15 @@ fetch_arg_op(PARROT_INTERP, ARGMOD(call_state *st))
 
 =item C<int Parrot_fetch_arg>
 
-RT#48260: Not yet documented!!!
+Fetches an argument from the current call state object. Retrieves the
+next argument in the parameter list, or the next argument in a flattened
+array, if given. If the parameter is a named object, fetches both the
+name and the value.
 
 =cut
 
 */
 
-/* Fetch a new argument.
- */
 PARROT_API
 int
 Parrot_fetch_arg(PARROT_INTERP, ARGMOD(call_state *st))
@@ -676,7 +740,6 @@ Parrot_fetch_arg_nci(PARROT_INTERP, ARGMOD(call_state *st))
     return 1;
 }
 
-
 /*
 
 =item C<static void convert_arg_from_int>
@@ -711,7 +774,6 @@ convert_arg_from_int(PARROT_INTERP, ARGMOD(call_state *st))
             break;
     }
 }
-
 
 /*
 
@@ -817,8 +879,8 @@ convert_arg_from_pmc(PARROT_INTERP, ARGMOD(call_state *st))
 
 =item C<static void check_for_opt_flag>
 
-Processes the next argument, if it has the optional flag set.  Otherwise moves
-on.
+Processes the next argument, if it has the optional flag set.
+Otherwise moves on.
 
 =cut
 
@@ -1267,7 +1329,9 @@ init_call_stats(ARGMOD(call_state *st))
 
 =item C<void Parrot_process_args>
 
-RT#48260: Not yet documented!!!
+Gets args for the current function call and puts them into position.
+First it gets the positional non-slurpy parameters, then the positional
+slurpy parameters, and finally the named parameters.
 
 =cut
 
@@ -1403,7 +1467,7 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
 
             src->used = 1;
 
-            /* we have to convert to a PMC to we can put it in the PMC array */
+            /* we have to convert to a PMC so we can put it in the PMC array */
             dest->sig |= PARROT_ARG_PMC;
             Parrot_convert_arg(interp, st);
 
@@ -1591,7 +1655,8 @@ parrot_pass_args_fromc(PARROT_INTERP, ARGIN(const char *sig),
 
 =item C<static int set_retval_util>
 
-RT#48260: Not yet documented!!!
+Adds the current return parameter to the current context, and fetches
+the next return parameter from the call state object.
 
 =cut
 
@@ -1773,7 +1838,7 @@ set_retval_p(PARROT_INTERP, int sig_ret, ARGIN(parrot_context_t *ctx))
 
 =item C<static void commit_last_arg>
 
-Called by Parrot_PCCINVOKE when it reaches the end of each arg in the arg
+Called by C<Parrot_PCCINVOKE> when it reaches the end of each arg in the arg
 signature.  See C<Parrot_PCCINVOKE> for signature syntax.
 
 =cut
@@ -1833,132 +1898,56 @@ commit_last_arg(PARROT_INTERP, int index, int cur,
     }
 }
 
-
 /*
 
-=item C<void Parrot_PCCINVOKE>
+=item C<count_signature_elements>
 
-pmc is the invocant.
-
-method_name is the method_name used in the find_method VTABLE call
-
-signature is a string describing the Parrot calling conventions for
-Parrot_PCCINVOKE.  ... variable args contains the IN arguments followed by the
-OUT results variables.  You must pass the address_of(&) the OUT results of
-course.
-
-Signatures:
-  uppercase letters repesent each arg and denote its types
-
-  I INTVAL
-  N FLOATVAL
-  S STRING *
-  P PMC *
-
-  lowercase letters are adverb modifiers to the preceeding uppercase arg
-  identifier
-
-  f flatten
-  n named
-  s slurpy
-  o optional
-  p opt flag
-
-  -> is the separator between args and results, similar to type theory notation.
-
-  Named args require two arg slots. The first is the name, the second the arg.
-
-Example signature:
-
-  "SnIPf->INPs"
-
-  The args to the method invocation are
-    a named INTVAL:  SnI
-    a flattened PMC:  Pf
-
-  The results of the method invocation are
-    a INTVAL: I
-    a FLOATVAL: N
-    a slurpy PMC: Ps
-
-invokes a PMC method
+Counts the number of each type of register in a signature object. Returns
+the total number of parameter arguments, the total number of result
+arguments, and the number of each type needed for register allocation.
+Adds the necessary registers to a new context and returns the context.
 
 =cut
 
 */
 
-PARROT_API
-void
-Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
-        ARGIN(const char *signature), ...)
+static parrot_context_t *
+count_signature_elements(PARROT_INTERP, ARGIN(const char* signature),
+    ARGMOD(PMC * args_sig), ARGMOD(PMC * results_sig), int flag)
 {
-#define PCC_ARG_MAX 1024
+    const char  *x;
+    unsigned int seen_arrow  = 0;
+
+    /*Count of number of each type of arg and result, INSP->INSP */
+    int          max_regs[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
     /* variables from PCCINVOKE impl in PCCMETHOD.pm */
     /* args INSP, returns INSP */
-    INTVAL n_regs_used[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    INTVAL n_regs_used[]     = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
-    /* Each of these is 8K. Do we want 16K on the stack? */
-    opcode_t arg_indexes[PCC_ARG_MAX];
-    opcode_t result_indexes[PCC_ARG_MAX];
+    /* # of args, # of results */
+    int arg_ret_cnt[2]       = { 0, 0 };
 
-    PMC * const args_sig    = pmc_new(interp, enum_class_FixedIntegerArray);
-    PMC * const results_sig = pmc_new(interp, enum_class_FixedIntegerArray);
-    PMC * const ret_cont    = new_ret_continuation_pmc(interp, NULL);
+    /* Increment these values if we are not calling from a CallSignature
+       PMC */
+    if (flag) {
+        arg_ret_cnt[seen_arrow]++;
+        max_regs[REGNO_PMC]++;
+    }
 
-    parrot_context_t *ctx;
-    PMC              *pccinvoke_meth;
-
-    opcode_t         *save_current_args;
-    PMC              *save_args_signature;
-    PMC              *save_current_object;
-
-    /* temporary state vars for building PCC index and PCC signature arrays. */
-
-    /* arg_indexes, result_indexes */
-    opcode_t *indexes[2];
-
-    /* args_sig, results_sig */
-    PMC *sigs[2];
-
-    /* # of arg args, # of result args */
-    int arg_ret_cnt[2] = { 0, 0 };
-
-    /* INSP args, INSP results */
-    int         max_regs[8]    = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    int         seen_arrow     = 0;
-
-    const char *x;
-    const char *ret_x  = NULL;
-    int         index  = -1;
-    int         cur    =  0;
-
-    va_list list;
-    va_start(list, signature);
-
-    indexes[0] = arg_indexes;
-    indexes[1] = result_indexes;
-    sigs[0]    = args_sig;
-    sigs[1]    = results_sig;
-
-    /* account for passing invocant in-band */
-    if (!pmc)
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-            "NULL PMC passed into Parrot_PCCINVOKE");
-
-    arg_ret_cnt[seen_arrow]++;
-    max_regs[REGNO_PMC]++;
-
-    /* first loop through signature to get sizing info */
+    /* Loop through the signature string to count the number of each
+       type of object required. We need to know so we can allocate
+       an appropriate number of registers for it. */
     for (x = signature; *x != '\0'; x++) {
         switch (*x) {
             case '-':
                 /* detect -> separator */
-                seen_arrow = 1 ;
+                seen_arrow = 1;
                 ++x;
                 if (*x != '>')
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION,
-                        "Parrot_PCCINVOKE: invalid signature separator %c!",
+                        "PCCINVOKE: invalid signature separator %c!",
                         *x);
                 break;
             case 'I':
@@ -2003,18 +1992,431 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
     if (arg_ret_cnt[1] > 0)
         VTABLE_set_integer_native(interp, results_sig, arg_ret_cnt[1]);
 
-    ctx = Parrot_push_context(interp, n_regs_used);
+    return Parrot_push_context(interp, n_regs_used);
+}
 
-    /* reset n_regs_used for reuse reused during arg index allocation step */
-    n_regs_used[0] = 0;
-    n_regs_used[1] = 0;
-    n_regs_used[2] = 0;
-    n_regs_used[3] = 0;
+/*
+
+=item C<static void commit_last_arg_sig_object>
+
+Called by Parrot_pcc_invoke_sub_from_sig_object when it reaches the end of each arg
+in the arg signature.  See C<Parrot_pcc_invoke_sub_from_sig_object> for signature
+syntax.
+
+=cut
+
+*/
+
+static void
+commit_last_arg_sig_object(PARROT_INTERP, int index, int cur,
+    ARGMOD(opcode_t *n_regs_used), int seen_arrow, ARGIN(PMC * const *sigs),
+    ARGMOD(opcode_t **indexes), ARGMOD(parrot_context_t *ctx),
+    ARGIN(PMC *sig_obj))
+{
+    int reg_offset = 0;
+
+    /* calculate arg's register offset */
+    switch (cur & PARROT_ARG_TYPE_MASK) { /* calc reg offset */
+        case PARROT_ARG_INTVAL:
+            reg_offset = n_regs_used[seen_arrow * 4 + REGNO_INT]++; break;
+        case PARROT_ARG_FLOATVAL:
+            reg_offset = n_regs_used[seen_arrow * 4 + REGNO_NUM]++; break;
+        case PARROT_ARG_STRING:
+            reg_offset = n_regs_used[seen_arrow * 4 + REGNO_STR]++; break;
+        case PARROT_ARG_PMC :
+            reg_offset = n_regs_used[seen_arrow * 4 + REGNO_PMC]++; break;
+        default:
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Parrot_PCCINVOKE: invalid reg type");
+    }
+
+    /* set the register offset into the index int[] */
+    indexes[seen_arrow][index] = reg_offset;
+
+    /* set the PARROT_ARG_FLAGS into the signature FIA */
+    VTABLE_set_integer_keyed_int(interp, sigs[seen_arrow], index, cur);
+
+    /* perform the arg accessor function, assigning the arg to its
+     * corresponding register */
+    if (!seen_arrow) {
+        switch (cur & PARROT_ARG_TYPE_MASK) {
+            case PARROT_ARG_INTVAL:
+                CTX_REG_INT(ctx, reg_offset) = VTABLE_get_integer_keyed_int(interp, sig_obj, index);
+                break;
+            case PARROT_ARG_FLOATVAL:
+                CTX_REG_NUM(ctx, reg_offset) = VTABLE_get_number_keyed_int(interp, sig_obj, index);
+                break;
+            case PARROT_ARG_STRING:
+                CTX_REG_STR(ctx, reg_offset) = VTABLE_get_string_keyed_int(interp, sig_obj, index);
+                break;
+            case PARROT_ARG_PMC:
+                CTX_REG_PMC(ctx, reg_offset) = VTABLE_get_pmc_keyed_int(interp, sig_obj, index);
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Parrot_pcc_invoke_sub_from_sig_object: invalid reg type");
+        }
+    }
+}
+
+/*
+
+=item C<set_context_sig_returns>
+
+Sets the subroutine return arguments in the context C<ctx>. Takes a
+pointer to the return signature C<ret_x> and a list of return parameters
+C<l>. If C<flag> is 1, C<l> is treated as a PMC array of return
+parameters. If C<flag> is 0, C<l> is treated instead as a va_list
+of variadic C arguments.
+
+To unify this function, C<Parrot_PCCINVOKE> needs to be changed to
+convert the va_list of input arguments into a signature object, and the
+results list from that object needs to be passed to this function
+instead of the va_list itself.
+
+=cut
+
+*/
+
+static void
+set_context_sig_returns(PARROT_INTERP, ARGMOD(parrot_context_t *ctx),
+    ARGMOD(opcode_t **indexes), ARGIN(const char *ret_x), ARGMOD(void* l),
+    int flag)
+{
+    unsigned int index = 0;
+    unsigned int seen_arrow = 1;
+    const char *x;
+
+    /* We have two different implementations of this for Parrot_PCCINVOKE
+       and Parrot_occ_sub_invoke_from_sig_object. Eventually these two
+       will be combined, but for now we switch between them with a flag */
+    if (flag == 1) {
+
+        /* result_accessors perform the arg accessor function,
+         * assigning the corresponding registers to the result variables */
+        PMC * result_list = (PMC *)l;
+        for (x = ret_x; x && *x; x++) {
+            PMC *result_item = VTABLE_get_pmc_keyed_int(interp, result_list, index);
+            if (isupper((unsigned char)*x)) {
+                switch (*x) {
+                    case 'I':
+                        {
+                        VTABLE_set_integer_native(interp, result_item,
+                                CTX_REG_INT(ctx, indexes[seen_arrow][index]));
+                        }
+                        break;
+                    case 'N':
+                        {
+                        VTABLE_set_number_native(interp, result_item,
+                                CTX_REG_NUM(ctx, indexes[seen_arrow][index]));
+                        }
+                        break;
+                    case 'S':
+                        {
+                        VTABLE_set_string_native(interp, result_item,
+                                CTX_REG_STR(ctx, indexes[seen_arrow][index]));
+                        }
+                        break;
+                    case 'P':
+                        {
+                        VTABLE_set_pmc(interp, result_item,
+                                CTX_REG_PMC(ctx, indexes[seen_arrow][index]));
+                        }
+                        break;
+                    default:
+                        Parrot_ex_throw_from_c_args(interp, NULL,
+                            EXCEPTION_INVALID_OPERATION,
+                            "Parrot_pcc_invoke_sub_from_sig_object: invalid reg type %c!", *x);
+                }
+            }
+        }
+    }
+    else {
+        /* result_accessors perform the arg accessor function,
+         * assigning the corresponding registers to the result variables */
+        va_list list = (va_list)l;
+        for (x = ret_x; x && *x; x++) {
+            if (isupper((unsigned char)*x)) {
+                switch (*x) {
+                    case 'I':
+                        {
+                        INTVAL * const tmpINTVAL = va_arg(list, INTVAL*);
+                        *tmpINTVAL = CTX_REG_INT(ctx, indexes[seen_arrow][index]);
+                        }
+                        break;
+                    case 'N':
+                        {
+                        FLOATVAL * const tmpFLOATVAL = va_arg(list, FLOATVAL*);
+                        *tmpFLOATVAL = CTX_REG_NUM(ctx, indexes[seen_arrow][index]);
+                        }
+                        break;
+                    case 'S':
+                        {
+                        STRING ** const tmpSTRING = va_arg(list, STRING**);
+                        *tmpSTRING = CTX_REG_STR(ctx, indexes[seen_arrow][index]);
+                        }
+                        break;
+                    case 'P':
+                        {
+                        PMC ** const tmpPMC = va_arg(list, PMC**);
+                        *tmpPMC = CTX_REG_PMC(ctx, indexes[seen_arrow][index]);
+                        }
+                        break;
+                    default:
+                        Parrot_ex_throw_from_c_args(interp, NULL,
+                            EXCEPTION_INVALID_OPERATION,
+                            "Parrot_PCCINVOKE: invalid reg type %c!", *x);
+                }
+            }
+        }
+    }
+    Parrot_pop_context(interp);
+}
+
+/*
+
+=item C<set_context_sig_params>
+
+Sets the subroutine arguments in the C<ctx> context, according to the
+signature string C<signature>. Currently this function is only called
+from C<Parrot_pcc_invoke_sub_from_sig_object>, but eventually when
+things are unified enough it should be called from C<Parrot_PCCINVOKE>
+as well. The only difference currently between the two implementations
+are the calls to C<commit_last_arg_sig_object> and C<commit_last_arg>.
+
+=cut
+
+*/
+
+static const char *
+set_context_sig_params(PARROT_INTERP, ARGIN(const char *signature),
+    ARGMOD(INTVAL *n_regs_used), ARGMOD(PMC **sigs),
+    ARGMOD(opcode_t **indexes), ARGMOD(parrot_context_t *ctx),
+    ARGMOD(PMC *sig_obj))
+{
+    /* second loop through signature to build all index and arg_flag
+     * loop also assigns args(up to the ->) to registers */
+    int index      = -1;
+    int seen_arrow =  0;
+    int cur        =  0;
+    const char *ret_x = 0;
+    const char *x;
+
+    for (x = signature; *x != '\0'; x++) {
+        /* detect -> separator */
+        if (*x == '-') {
+
+            /* skip '>' */
+            x++;
+
+            /* allows us to jump directly to the result signature portion
+             * during results assignment */
+            ret_x = x;
+
+            /* save off pointer to results */
+            ret_x++;
+
+            if (index >= 0)
+                commit_last_arg_sig_object(interp, index, cur, n_regs_used,
+                    seen_arrow, sigs, indexes, ctx, sig_obj);
+
+            /* reset parsing state so we can now handle results */
+            seen_arrow =  1;
+            index      = -1;
+
+            /* reset n_regs_used for reuse during result index allocation */
+            n_regs_used[0] = 0;
+            n_regs_used[1] = 0;
+            n_regs_used[2] = 0;
+            n_regs_used[3] = 0;
+        }
+        /* parse arg type */
+        else if (isupper((unsigned char)*x)) {
+            if (index >= 0)
+                commit_last_arg_sig_object(interp, index, cur, n_regs_used, seen_arrow,
+                    sigs, indexes, ctx, sig_obj);
+
+            index++;
+
+            switch (*x) {
+                case 'I': cur = PARROT_ARG_INTVAL;   break;
+                case 'N': cur = PARROT_ARG_FLOATVAL; break;
+                case 'S': cur = PARROT_ARG_STRING;   break;
+                case 'P': cur = PARROT_ARG_PMC;      break;
+                default:
+                  Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Parrot_pcc_invoke_sub_from_sig_object: invalid reg type %c!", *x);
+            }
+
+        }
+        /* parse arg adverbs */
+        else if (islower((unsigned char)*x)) {
+            switch (*x) {
+                case 'n': cur |= PARROT_ARG_NAME;         break;
+                case 'f': cur |= PARROT_ARG_FLATTEN;      break;
+                case 's': cur |= PARROT_ARG_SLURPY_ARRAY; break;
+                case 'o': cur |= PARROT_ARG_OPTIONAL;     break;
+                case 'p': cur |= PARROT_ARG_OPT_FLAG;     break;
+                default:
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_OPERATION,
+                        "Parrot_pcc_invoke_sub_from_sig_object: invalid adverb type %c!", *x);
+            }
+        }
+    }
+
+    if (index >= 0)
+        commit_last_arg_sig_object(interp, index, cur, n_regs_used, seen_arrow, sigs,
+            indexes, ctx, sig_obj);
+
+    interp->current_args   = indexes[0];
+    interp->args_signature = sigs[0];
+    ctx->current_results   = indexes[1];
+    ctx->results_signature = sigs[1];
+    return ret_x;
+}
+
+/*
+
+=item C<void Parrot_pcc_invoke_sub_from_c_args>
+
+Follows the same conventions as C<Parrot_PCCINVOKE>, but the subroutine object
+to invoke is passed as an argument rather than looked up by name. The signature
+string and call arguments are converted to a CallSignature PMC.
+
+=cut
+
+*/
+
+PARROT_API
+void
+Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP, ARGIN(PMC *sub_obj),
+        ARGIN(const char *sig), ...)
+{
+    PMC *sig_obj;
+    va_list args;
+    va_start(args, sig);
+    sig_obj = Parrot_build_sig_object_from_varargs(interp, sig, args);
+    va_end(args);
+
+    Parrot_pcc_invoke_sub_from_sig_object(interp, sub_obj, sig_obj);
+    dod_unregister_pmc(interp, sig_obj);
+}
+
+/*
+
+=item C<void Parrot_PCCINVOKE>
+
+C<pmc> is the invocant.
+
+C<method_name> is the same C<method_name> used in the C<find_method>
+VTABLE call
+
+C<signature> is a C string describing the Parrot calling conventions for
+Parrot_PCCINVOKE.  ... variable args contains the IN arguments followed
+by the OUT results variables.  You must pass the address_of(&) the OUT
+results, of course.
+
+Signatures:
+  uppercase letters repesent each arg and denote its types
+
+  I INTVAL
+  N FLOATVAL
+  S STRING *
+  P PMC *
+
+  lowercase letters are adverb modifiers to the preceeding uppercase arg
+  identifier
+
+  f flatten
+  n named
+  s slurpy
+  o optional
+  p opt flag
+
+  -> is the separator between args and results, similar to type theory
+  notation.
+
+  Named args require two arg slots. The first is the name, the second the arg.
+
+Example signature:
+
+  "SnIPf->INPs"
+
+  The args to the method invocation are
+    a named INTVAL:  SnI
+    a flattened PMC:  Pf
+
+  The results of the method invocation are
+    a INTVAL: I
+    a FLOATVAL: N
+    a slurpy PMC: Ps
+
+invokes a PMC method
+
+=cut
+
+*/
+
+PARROT_API
+void
+Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
+        ARGIN(const char *signature), ...)
+{
+#define PCC_ARG_MAX 1024
+    /* variables from PCCINVOKE impl in PCCMETHOD.pm */
+    /* args INSP, returns INSP */
+    INTVAL n_regs_used[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    /* Each of these is 8K. Do we want 16K on the stack? */
+    opcode_t arg_indexes[PCC_ARG_MAX];
+    opcode_t result_indexes[PCC_ARG_MAX];
+
+    PMC * const args_sig    = pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC * const results_sig = pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC * const ret_cont    = new_ret_continuation_pmc(interp, NULL);
+
+    parrot_context_t *ctx;              /* The newly created context */
+    PMC              *pccinvoke_meth;
+
+    opcode_t         *save_current_args;
+    PMC              *save_args_signature;
+    PMC              *save_current_object;
+
+    /* temporary state vars for building PCC index and PCC signature arrays. */
+
+    /* arg_indexes, result_indexes */
+    opcode_t   *indexes[2];
+
+    /* args_sig, results_sig */
+    PMC        *sigs[2];
+
+    int         seen_arrow = 0;
+
+    const char *x;
+    const char *ret_x = NULL;
+    int         index = -1;
+    int         cur   =  0;
+
+    va_list list;
+    va_start(list, signature);
+
+    indexes[0] = arg_indexes;
+    indexes[1] = result_indexes;
+    sigs[0]    = args_sig;
+    sigs[1]    = results_sig;
+
+    /* account for passing invocant in-band */
+    if (!pmc)
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            "NULL PMC passed into Parrot_PCCINVOKE");
+
+    ctx = count_signature_elements(interp, signature, args_sig, results_sig, 1);
 
     /* second loop through signature to build all index and arg_flag
      * loop also assigns args(up to the ->) to registers */
-    index      = -1;
-    seen_arrow =  0;
 
     /* account for passing invocant in-band */
     indexes[0][0] = 0;
@@ -2022,7 +2424,7 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
     VTABLE_set_integer_keyed_int(interp, sigs[0], 0, PARROT_ARG_PMC);
     CTX_REG_PMC(ctx, 0) = pmc;
 
-    n_regs_used[seen_arrow * 4 + REGNO_PMC]++;
+    n_regs_used[REGNO_PMC]++;
     index = 0;
 
     for (x = signature; *x != '\0'; x++) {
@@ -2118,51 +2520,113 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
     else
         VTABLE_invoke(interp, pccinvoke_meth, NULL);
 
-    /* result_accessors perform the arg accessor function,
-     * assigning the corresponding registers to the result variables */
-    index      = 0;
-    seen_arrow = 1;
-
-    for (x = ret_x; x && *x; x++) {
-        if (isupper((unsigned char)*x)) {
-            switch (*x) {
-                case 'I':
-                    {
-                    INTVAL * const tmpINTVAL = va_arg(list, INTVAL*);
-                    *tmpINTVAL = CTX_REG_INT(ctx, indexes[seen_arrow][index]);
-                    }
-                    break;
-                case 'N':
-                    {
-                    FLOATVAL * const tmpFLOATVAL = va_arg(list, FLOATVAL*);
-                    *tmpFLOATVAL = CTX_REG_NUM(ctx, indexes[seen_arrow][index]);
-                    }
-                    break;
-                case 'S':
-                    {
-                    STRING ** const tmpSTRING = va_arg(list, STRING**);
-                    *tmpSTRING = CTX_REG_STR(ctx, indexes[seen_arrow][index]);
-                    }
-                    break;
-                case 'P':
-                    {
-                    PMC ** const tmpPMC = va_arg(list, PMC**);
-                    *tmpPMC = CTX_REG_PMC(ctx, indexes[seen_arrow][index]);
-                    }
-                    break;
-                default:
-                    Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_OPERATION,
-                        "Parrot_PCCINVOKE: invalid reg type %c!", *x);
-            }
-        }
-    }
-
+    set_context_sig_returns(interp, ctx, indexes, ret_x, list, 0);
     PObj_live_CLEAR(args_sig);
     PObj_live_CLEAR(results_sig);
+    interp->current_args   = save_current_args;
+    interp->args_signature = save_args_signature;
+    interp->current_object = save_current_object;
+    va_end(list);
+}
 
-    Parrot_pop_context(interp);
+/*
 
+=item C<void Parrot_pcc_invoke_sub_from_sig_object>
+
+Follows the same conventions as C<Parrot_PCCINVOKE>, but the subroutine object
+to invoke is passed as an argument rather than looked up by name, and the
+signature string and call arguments are passed in a CallSignature PMC.
+
+=cut
+
+*/
+
+PARROT_API
+void
+Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
+        ARGIN(PMC *sig_obj))
+{
+#define PCC_ARG_MAX 1024
+    /* variables from PCCINVOKE impl in PCCMETHOD.pm */
+    /* args INSP, returns INSP */
+    INTVAL n_regs_used[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    /* Each of these is 8K. Do we want 16K on the stack? */
+    opcode_t arg_indexes[PCC_ARG_MAX];
+    opcode_t result_indexes[PCC_ARG_MAX];
+
+    /* create the signature string, and the various PMCs that are needed to
+       store all the parameters and parameter counts. */
+    const char *signature   = string_to_cstring(interp, VTABLE_get_string(interp, sig_obj));
+    PMC * const args_sig    = pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC * const results_sig = pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC * const ret_cont    = new_ret_continuation_pmc(interp, NULL);
+    PMC * const result_list = VTABLE_get_attr_str(interp, sig_obj,
+            CONST_STRING(interp, "results"));
+
+    parrot_context_t *ctx;
+    opcode_t         *dest;
+    opcode_t         *save_current_args;
+    PMC              *save_args_signature;
+    PMC              *save_current_object;
+
+    /* temporary state vars for building PCC index and PCC signature arrays. */
+
+    /* arg_indexes, result_indexes */
+    opcode_t *indexes[2];
+
+    /* args_sig, results_sig */
+    PMC *sigs[2];
+    int         seen_arrow     = 0;
+
+    const char *x;
+    const char *ret_x  = NULL;
+    int         index  = -1;
+    int         cur    =  0;
+
+    indexes[0] = arg_indexes;
+    indexes[1] = result_indexes;
+    sigs[0]    = args_sig;
+    sigs[1]    = results_sig;
+
+    /* Count the number of objects of each type that need to be allocated by
+       the caller to perform this function call */
+    ctx = count_signature_elements(interp, signature, args_sig, results_sig, 0);
+
+    /* code from PCCINVOKE impl in PCCMETHOD.pm */
+    /* Save the current values of the interpreter arguments so that additional
+       child sub calls don't kill our call stack. */
+    save_current_args      = interp->current_args;
+    save_args_signature    = interp->args_signature;
+    save_current_object    = interp->current_object;
+
+    /* Set the function input parameters in the context structure, and return the
+       offset in the signature where the return params start. */
+    ret_x = set_context_sig_params(interp, signature, n_regs_used, sigs, indexes, ctx, sig_obj);
+
+    /* Set up the context object for the function invokation */
+    interp->current_object       = PMCNULL;
+    interp->current_cont         = NEED_CONTINUATION;
+    ctx->current_cont            = ret_cont;
+    PMC_cont(ret_cont)->from_ctx = ctx;
+    ctx->ref_count++;
+
+    /* Invoke the function */
+    dest = VTABLE_invoke(interp, sub_obj, NULL);
+
+    /* PIR Subs need runops to run their opcodes. */
+    if (sub_obj->vtable->base_type == enum_class_Sub) {
+        opcode_t offset;
+        offset = dest - interp->code->base.data;
+        runops(interp, offset);
+    }
+
+    /* Set the return values from the subroutine's context into the
+       caller's context */
+
+    set_context_sig_returns(interp, ctx, indexes, ret_x, result_list, 1);
+    PObj_live_CLEAR(args_sig);
+    PObj_live_CLEAR(results_sig);
     interp->current_args   = save_current_args;
     interp->args_signature = save_args_signature;
     interp->current_object = save_current_object;

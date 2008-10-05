@@ -323,6 +323,16 @@ sub vtable_method_does_write {
     return $self->vtable->attrs($methodname)->{write};
 }
 
+sub vtable_method_does_multi {
+    my ( $self, $methodname ) = @_;
+
+    return 1 if ($methodname =~ m/^
+                (?:i_)?
+                (?:add|subtract|multiply|divide|floor_divide|modulus)
+                (?:_int|_float)?
+              $/x);
+}
+
 sub super_method {
     my ( $self, $vt_meth, $super_pmc ) = @_;
     if ($super_pmc) {

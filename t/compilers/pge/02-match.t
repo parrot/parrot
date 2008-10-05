@@ -36,7 +36,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'concat on a Match object (rt#39135)' );
     $P3 = new 'String'
     $P3 = 'hello '
 
-    $P4 = n_concat $P3, $P2
+    $P4 = concat $P3, $P2
     say $P4              # hello world
 .end
 

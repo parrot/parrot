@@ -39,7 +39,7 @@ sub pre_method_gen {
         my $superargs    = $args;
         $superargs       =~ s/^,//;
 
-        $new_default_method->body( Parrot::Pmc2c::Emitter->text(<<"EOC") );
+        my $method_body_text = <<"EOC";
     Parrot_Object_attributes * const obj       = PARROT_OBJECT(pmc);
     Parrot_Class_attributes  * const _class    = PARROT_CLASS(obj->_class);
     STRING        * const meth_name = CONST_STRING_GEN(interp, "$vt_method_name");
@@ -56,7 +56,12 @@ sub pre_method_gen {
             ${return}Parrot_run_meth_fromc_args$ret_suffix(interp, meth, pmc, meth_name, "$sig"$args);
             $void_return
         }
+        /* method name is $vt_method_name */
+EOC
 
+        # Multiply dispatched math opcodes shouldn't be invoked on a proxy object.
+        unless ($self->vtable_method_does_multi($vt_method_name)) {
+            $method_body_text .= <<"EOC";
         if (cur_class->vtable->base_type == enum_class_PMCProxy) {
             /* Get the PMC instance and call the vtable method on that. */
             STRING * const proxy      = CONST_STRING_GEN(interp, "proxy");
@@ -67,10 +72,15 @@ sub pre_method_gen {
                 $void_return
             }
         }
+EOC
+        }
+
+        $method_body_text .= <<"EOC";
     }
     ${return}SUPER($superargs);
     $void_return
 EOC
+        $new_default_method->body( Parrot::Pmc2c::Emitter->text($method_body_text) );
         $self->add_method($new_default_method);
     }
     return 1;

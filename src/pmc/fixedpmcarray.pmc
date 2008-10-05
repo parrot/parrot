@@ -621,7 +621,7 @@ The C<==> operation. Compares two array to hold equal elements.
             ||  item2->vtable->base_type == enum_class_Null)
                 return 0;
 
-            if (!mmd_dispatch_i_pp(INTERP, item1, item2, MMD_EQ))
+            if (!VTABLE_is_equal(interp, item1, item2))
                 return 0;
         }
 

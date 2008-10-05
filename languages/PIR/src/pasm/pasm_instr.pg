@@ -137,8 +137,8 @@ token pasm_instruction {
 | n_abs             
 | mul               
 | mod               
-| mmdvtregister     
-| mmdvtfind         
+| add_multi     
+| find_multi         
 | lt_str            
 | lt_num            
 | lt_addr           

@@ -408,7 +408,7 @@ INTERP_O_FILES = \
     $(SRC_DIR)/list$(O) \
     $(SRC_DIR)/longopt$(O) \
     $(SRC_DIR)/misc$(O) \
-    $(SRC_DIR)/mmd$(O) \
+    $(SRC_DIR)/multidispatch$(O) \
     $(SRC_DIR)/nci$(O) \
     $(SRC_DIR)/oo$(O) \
     $(SRC_DIR)/packfile$(O) \
@@ -586,7 +586,7 @@ STR_FILES = \
     $(SRC_DIR)/io/io.str \
     $(SRC_DIR)/key.str \
     $(SRC_DIR)/library.str \
-    $(SRC_DIR)/mmd.str \
+    $(SRC_DIR)/multidispatch.str \
     $(SRC_DIR)/nci.str \
     $(SRC_DIR)/packfile.str \
     $(SRC_DIR)/pmc.str \
@@ -1162,7 +1162,7 @@ $(SRC_DIR)/pic$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/pic_jit$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/mmd$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/mmd.str
+$(SRC_DIR)/multidispatch$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/multidispatch.str
 
 $(SRC_DIR)/packfile$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/packfile.str
 

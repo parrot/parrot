@@ -25,7 +25,7 @@
             [1] => PMC 'PAST::Op'  {
                 <name> => "infix:+"
                 <pasttype> => undef
-                <pirop> => "n_add"
+                <pirop> => "add"
                 <lvalue> => undef
                 <source> => "+"
                 <pos> => 2
@@ -72,7 +72,7 @@
 
     .local pmc op_add
     op_add = new 'PAST::Op'
-    op_add.init( val_4, val_1, 'name' => 'infix:+', 'pirop' => 'n_add' )
+    op_add.init( val_4, val_1, 'name' => 'infix:+', 'pirop' => 'add' )
 
     .local pmc var_last
     var_last = new 'PAST::Var'

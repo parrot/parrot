@@ -734,51 +734,57 @@ and C<value>.
 
 =item C<INTVAL is_equal(PMC *value)>
 
-Returns whether the PMC is equal to C<*value>.
+Default fallback. Performs a multiple dispatch call for 'is_equal'.
 
 =cut
 
 */
 
     VTABLE INTVAL is_equal(PMC *value) {
-        return (SELF->vtable         == value->vtable
-            &&  PMC_struct_val(SELF) == PMC_struct_val(value)
-            &&  PMC_data(SELF)       == PMC_data(value));
+        INTVAL retval;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "is_equal", "PP->I", SELF, value, &retval);
+
+        return retval;
     }
 
 /*
 
 =item C<INTVAL is_equal_num(PMC *value)>
 
-Returns whether the PMC is numerically equal to C<*value>.
+Default fallback. Performs a multiple dispatch call for 'is_equal_num'.
 
 =cut
 
 */
 
     VTABLE INTVAL is_equal_num(PMC *value) {
-        return (VTABLE_get_number(INTERP, SELF) ==
-                VTABLE_get_number(INTERP, value));
+        INTVAL retval;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "is_equal_num", "PP->I", SELF, value, &retval);
+
+        return retval;
     }
 
 /*
 
-=item C<INTVAL is_equal_str(PMC *value)>
+=item C<INTVAL is_equal_string(PMC *value)>
 
-Returns whether the PMC is numerically equal to C<*value>.
+Default fallback. Performs a multiple dispatch call for 'is_equal'.
 
 =cut
 
 */
 
-    VTABLE INTVAL is_equal_str(PMC *value) {
-        return (0 == string_equal(INTERP, VTABLE_get_string(INTERP, SELF),
-                                          VTABLE_get_string(INTERP, value)));
+    VTABLE INTVAL is_equal_string(PMC *value) {
+        INTVAL retval;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "is_equal_string", "PP->I", SELF, value, &retval);
+
+        return retval;
     }
 
 /*
-
-
 
 =item C<INTVAL exists_keyed_int(INTVAL key)>
 
@@ -1171,6 +1177,1493 @@ Does nothing.
         /* default - no action */
     }
 
+/*
+
+=item C<PMC *add(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'add'.
+
+=cut
+
+*/
+
+    VTABLE PMC *add(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "add", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *add_int(INTVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'add_int'.
+
+=cut
+
+*/
+
+    VTABLE PMC *add_int(INTVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "add_int", "PIP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *add_float(FLOATVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'add_float'.
+
+=cut
+
+*/
+
+    VTABLE PMC *add_float(FLOATVAL value, PMC *dest) {
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+
+        VTABLE_set_number_native(INTERP, dest,
+                SELF.get_number() + value);
+        return dest;
+    }
+
+/*
+
+=item C<void i_add(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_add'.
+
+=cut
+
+*/
+
+    VTABLE void i_add(PMC *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_add", "PP", SELF, value);
+    }
+
+/*
+
+=item C<void i_add_int(INTVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_add_int'.
+
+=cut
+
+*/
+
+    VTABLE void i_add_int(INTVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_add_int", "PI", SELF, value);
+    }
+
+/*
+
+=item C<void i_add_float(FLOATVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_add_float'.
+
+=cut
+
+*/
+
+    VTABLE void i_add_float(FLOATVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_add_float", "PN", SELF, value);
+    }
+
+/*
+
+=item C<PMC *subtract(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'subtract'.
+
+=cut
+
+*/
+
+    VTABLE PMC *subtract(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "subtract", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *subtract_int(INTVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'subtract_int'.
+
+=cut
+
+*/
+
+    VTABLE PMC *subtract_int(INTVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "subtract_int", "PIP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *subtract_float(FLOATVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'subtract_float'.
+
+=cut
+
+*/
+
+    VTABLE PMC *subtract_float(FLOATVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "subtract_float", "PNP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<void i_subtract(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_subtract'.
+
+=cut
+
+*/
+
+    VTABLE void i_subtract(PMC *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_subtract", "PP", SELF, value);
+    }
+
+/*
+
+=item C<void i_subtract_int(INTVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_subtract_int'.
+
+=cut
+
+*/
+
+    VTABLE void i_subtract_int(INTVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_subtract_int", "PI", SELF, value);
+    }
+
+/*
+
+=item C<void i_subtract_float(FLOATVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_subtract_float'.
+
+=cut
+
+*/
+
+    VTABLE void i_subtract_float(FLOATVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_subtract_float", "PN", SELF, value);
+    }
+
+/*
+
+=item C<PMC *multiply(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'multiply'.
+
+=cut
+
+*/
+
+    VTABLE PMC *multiply(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "multiply", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *multiply_int(INTVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'multiply_int'.
+
+=cut
+
+*/
+
+    VTABLE PMC *multiply_int(INTVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "multiply_int", "PIP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *multiply_float(FLOATVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'multiply_float'.
+
+=cut
+
+*/
+
+    VTABLE PMC *multiply_float(FLOATVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "multiply_float", "PNP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<void i_multiply(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_multiply'.
+
+=cut
+
+*/
+
+    VTABLE void i_multiply(PMC *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_multiply", "PP", SELF, value);
+    }
+
+/*
+
+=item C<void i_multiply_int(INTVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_multiply_int'.
+
+=cut
+
+*/
+
+    VTABLE void i_multiply_int(INTVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_multiply_int", "PI", SELF, value);
+    }
+
+/*
+
+=item C<void i_multiply_float(FLOATVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_multiply_float'.
+
+=cut
+
+*/
+
+    VTABLE void i_multiply_float(FLOATVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_multiply_float", "PN", SELF, value);
+    }
+
+/*
+
+=item C<PMC *divide(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'divide'.
+
+=cut
+
+*/
+
+    VTABLE PMC *divide(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "divide", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *divide_int(INTVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'divide_int'.
+
+=cut
+
+*/
+
+    VTABLE PMC *divide_int(INTVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "divide_int", "PIP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *divide_float(FLOATVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'divide_float'.
+
+=cut
+
+*/
+
+    VTABLE PMC *divide_float(FLOATVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "divide_float", "PNP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<void i_divide(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_divide'.
+
+=cut
+
+*/
+
+    VTABLE void i_divide(PMC *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_divide", "PP", SELF, value);
+    }
+
+/*
+
+=item C<void i_divide_int(INTVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_divide_int'.
+
+=cut
+
+*/
+
+    VTABLE void i_divide_int(INTVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_divide_int", "PI", SELF, value);
+    }
+
+/*
+
+=item C<void i_divide_float(FLOATVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_divide_float'.
+
+=cut
+
+*/
+
+    VTABLE void i_divide_float(FLOATVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_divide_float", "PN", SELF, value);
+    }
+
+/*
+
+=item C<PMC *floor_divide(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'floor_divide'.
+
+=cut
+
+*/
+
+    VTABLE PMC *floor_divide(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "floor_divide", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *floor_divide_int(INTVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'floor_divide_int'.
+
+=cut
+
+*/
+
+    VTABLE PMC *floor_divide_int(INTVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "floor_divide_int", "PIP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *floor_divide_float(FLOATVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'floor_divide_float'.
+
+=cut
+
+*/
+
+    VTABLE PMC *floor_divide_float(FLOATVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "floor_divide_float", "PNP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<void i_floor_divide(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_floor_divide'.
+
+=cut
+
+*/
+
+    VTABLE void i_floor_divide(PMC *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_floor_divide", "PP", SELF, value);
+    }
+
+/*
+
+=item C<void i_floor_divide_int(INTVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_floor_divide_int'.
+
+=cut
+
+*/
+
+    VTABLE void i_floor_divide_int(INTVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_floor_divide_int", "PI", SELF, value);
+    }
+
+/*
+
+=item C<void i_floor_divide_float(FLOATVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_floor_divide_float'.
+
+=cut
+
+*/
+
+    VTABLE void i_floor_divide_float(FLOATVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_floor_divide_float", "PN", SELF, value);
+    }
+
+/*
+
+=item C<PMC *modulus(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'modulus'.
+
+=cut
+
+*/
+
+    VTABLE PMC *modulus(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "modulus", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *modulus_int(INTVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'modulus_int'.
+
+=cut
+
+*/
+
+    VTABLE PMC *modulus_int(INTVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "modulus_int", "PIP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *modulus_float(FLOATVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'modulus_float'.
+
+=cut
+
+*/
+
+    VTABLE PMC *modulus_float(FLOATVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "modulus_float", "PNP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<void i_modulus(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_modulus'.
+
+=cut
+
+*/
+
+    VTABLE void i_modulus(PMC *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_modulus", "PP", SELF, value);
+    }
+
+/*
+
+=item C<void i_modulus_int(INTVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_modulus_int'.
+
+=cut
+
+*/
+
+    VTABLE void i_modulus_int(INTVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_modulus_int", "PI", SELF, value);
+    }
+
+/*
+
+=item C<void i_modulus_float(FLOATVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_modulus_float'.
+
+=cut
+
+*/
+
+    VTABLE void i_modulus_float(FLOATVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_modulus_float", "PN", SELF, value);
+    }
+
+/*
+
+=item C<PMC *pow(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'pow'.
+
+=cut
+
+*/
+
+    VTABLE PMC *pow(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "pow", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *pow_int(INTVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'pow_int'.
+
+=cut
+
+*/
+
+    VTABLE PMC *pow_int(INTVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "pow_int", "PIP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *pow_float(FLOATVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'pow_float'.
+
+=cut
+
+*/
+
+    VTABLE PMC *pow_float(FLOATVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "pow_float", "PNP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<void i_pow(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_pow'.
+
+=cut
+
+*/
+
+    VTABLE void i_pow(PMC *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_pow", "PP", SELF, value);
+    }
+
+/*
+
+=item C<void i_pow_int(INTVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_pow_int'.
+
+=cut
+
+*/
+
+    VTABLE void i_pow_int(INTVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_pow_int", "PI", SELF, value);
+    }
+
+/*
+
+=item C<void i_pow_float(FLOATVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_pow_float'.
+
+=cut
+
+*/
+
+    VTABLE void i_pow_float(FLOATVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_pow_float", "PN", SELF, value);
+    }
+
+/*
+
+=item C<PMC *bitwise_or(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'bitwise_or'.
+
+=cut
+
+*/
+
+    VTABLE PMC *bitwise_or(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "bitwise_or", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *bitwise_or_int(INTVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'bitwise_or_int'.
+
+=cut
+
+*/
+
+    VTABLE PMC *bitwise_or_int(INTVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "bitwise_or_int", "PIP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<void i_bitwise_or(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_bitwise_or'.
+
+=cut
+
+*/
+
+    VTABLE void i_bitwise_or(PMC *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_bitwise_or", "PP", SELF, value);
+    }
+
+/*
+
+=item C<void i_bitwise_or_int(INTVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_bitwise_or_int'.
+
+=cut
+
+*/
+
+    VTABLE void i_bitwise_or_int(INTVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_bitwise_or_int", "PI", SELF, value);
+    }
+
+/*
+
+=item C<PMC *bitwise_and(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'bitwise_and'.
+
+=cut
+
+*/
+
+    VTABLE PMC *bitwise_and(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "bitwise_and", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *bitwise_and_int(INTVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'bitwise_and_int'.
+
+=cut
+
+*/
+
+    VTABLE PMC *bitwise_and_int(INTVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "bitwise_and_int", "PIP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<void i_bitwise_and(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_bitwise_and'.
+
+=cut
+
+*/
+
+    VTABLE void i_bitwise_and(PMC *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_bitwise_and", "PP", SELF, value);
+    }
+
+/*
+
+=item C<void i_bitwise_and_int(INTVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_bitwise_and_int'.
+
+=cut
+
+*/
+
+    VTABLE void i_bitwise_and_int(INTVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_bitwise_and_int", "PI", SELF, value);
+    }
+
+/*
+
+=item C<PMC *bitwise_xor(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'bitwise_xor'.
+
+=cut
+
+*/
+
+    VTABLE PMC *bitwise_xor(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "bitwise_xor", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *bitwise_xor_int(INTVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'bitwise_xor_int'.
+
+=cut
+
+*/
+
+    VTABLE PMC *bitwise_xor_int(INTVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "bitwise_xor_int", "PIP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<void i_bitwise_xor(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_bitwise_xor'.
+
+=cut
+
+*/
+
+    VTABLE void i_bitwise_xor(PMC *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_bitwise_xor", "PP", SELF, value);
+    }
+
+/*
+
+=item C<void i_bitwise_xor_int(INTVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_bitwise_xor_int'.
+
+=cut
+
+*/
+
+    VTABLE void i_bitwise_xor_int(INTVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_bitwise_xor_int", "PI", SELF, value);
+    }
+
+/*
+
+=item C<PMC *bitwise_ors(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'bitwise_ors'.
+
+=cut
+
+*/
+
+    VTABLE PMC *bitwise_ors(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "bitwise_ors", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *bitwise_ors_str(STRING *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'bitwise_ors_str'.
+
+=cut
+
+*/
+
+    VTABLE PMC *bitwise_ors_str(STRING *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "bitwise_ors_str", "PSP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<void i_bitwise_ors(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_bitwise_ors'.
+
+=cut
+
+*/
+
+    VTABLE void i_bitwise_ors(PMC *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_bitwise_ors", "PP", SELF, value);
+    }
+
+/*
+
+=item C<void i_bitwise_ors_str(STRING *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_bitwise_ors_str'.
+
+=cut
+
+*/
+
+    VTABLE void i_bitwise_ors_str(STRING *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_bitwise_ors_str", "PS", SELF, value);
+    }
+
+/*
+
+=item C<PMC *bitwise_ands(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'bitwise_ands'.
+
+=cut
+
+*/
+
+    VTABLE PMC *bitwise_ands(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "bitwise_ands", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *bitwise_ands_str(STRING *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'bitwise_ands_str'.
+
+=cut
+
+*/
+
+    VTABLE PMC *bitwise_ands_str(STRING *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "bitwise_ands_str", "PSP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<void i_bitwise_ands(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_bitwise_ands'.
+
+=cut
+
+*/
+
+    VTABLE void i_bitwise_ands(PMC *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_bitwise_ands", "PP", SELF, value);
+    }
+
+/*
+
+=item C<void i_bitwise_ands_str(STRING *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_bitwise_ands_str'.
+
+=cut
+
+*/
+
+    VTABLE void i_bitwise_ands_str(STRING *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_bitwise_ands_str", "PS", SELF, value);
+    }
+
+/*
+
+=item C<PMC *bitwise_xors(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'bitwise_xors'.
+
+=cut
+
+*/
+
+    VTABLE PMC *bitwise_xors(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "bitwise_xors", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *bitwise_xors_str(STRING *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'bitwise_xors_str'.
+
+=cut
+
+*/
+
+    VTABLE PMC *bitwise_xors_str(STRING *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "bitwise_xors_str", "PSP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<void i_bitwise_xors(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_bitwise_xors'.
+
+=cut
+
+*/
+
+    VTABLE void i_bitwise_xors(PMC *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_bitwise_xors", "PP", SELF, value);
+    }
+
+/*
+
+=item C<void i_bitwise_xors_str(STRING *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_bitwise_xors_str'.
+
+=cut
+
+*/
+
+    VTABLE void i_bitwise_xors_str(STRING *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_bitwise_xors_str", "PS", SELF, value);
+    }
+
+/*
+
+=item C<PMC *bitwise_shl(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'bitwise_shl'.
+
+=cut
+
+*/
+
+    VTABLE PMC *bitwise_shl(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "bitwise_shl", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *bitwise_shl_int(INTVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'bitwise_shl_int'.
+
+=cut
+
+*/
+
+    VTABLE PMC *bitwise_shl_int(INTVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "bitwise_shl_int", "PIP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<void i_bitwise_shl(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_bitwise_shl'.
+
+=cut
+
+*/
+
+    VTABLE void i_bitwise_shl(PMC *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_bitwise_shl", "PP", SELF, value);
+    }
+
+/*
+
+=item C<void i_bitwise_shl_int(INTVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_bitwise_shl_int'.
+
+=cut
+
+*/
+
+    VTABLE void i_bitwise_shl_int(INTVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_bitwise_shl_int", "PI", SELF, value);
+    }
+
+/*
+
+=item C<PMC *bitwise_shr(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'bitwise_shr'.
+
+=cut
+
+*/
+
+    VTABLE PMC *bitwise_shr(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "bitwise_shr", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *bitwise_shr_int(INTVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'bitwise_shr_int'.
+
+=cut
+
+*/
+
+    VTABLE PMC *bitwise_shr_int(INTVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "bitwise_shr_int", "PIP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<void i_bitwise_shr(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_bitwise_shr'.
+
+=cut
+
+*/
+
+    VTABLE void i_bitwise_shr(PMC *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_bitwise_shr", "PP", SELF, value);
+    }
+
+/*
+
+=item C<void i_bitwise_shr_int(INTVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_bitwise_shr_int'.
+
+=cut
+
+*/
+
+    VTABLE void i_bitwise_shr_int(INTVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_bitwise_shr_int", "PI", SELF, value);
+    }
+
+/*
+
+=item C<PMC *bitwise_lsr(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'bitwise_lsr'.
+
+=cut
+
+*/
+
+    VTABLE PMC *bitwise_lsr(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "bitwise_lsr", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *bitwise_lsr_int(INTVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'bitwise_lsr_int'.
+
+=cut
+
+*/
+
+    VTABLE PMC *bitwise_lsr_int(INTVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "bitwise_lsr_int", "PIP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<void i_bitwise_lsr(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_bitwise_lsr'.
+
+=cut
+
+*/
+
+    VTABLE void i_bitwise_lsr(PMC *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_bitwise_lsr", "PP", SELF, value);
+    }
+
+/*
+
+=item C<void i_bitwise_lsr_int(INTVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_bitwise_lsr_int'.
+
+=cut
+
+*/
+
+    VTABLE void i_bitwise_lsr_int(INTVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_bitwise_lsr_int", "PI", SELF, value);
+    }
+
+/*
+
+=item C<INTVAL cmp(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'cmp'.
+
+=cut
+
+*/
+
+    VTABLE INTVAL cmp(PMC *value) {
+        INTVAL retval;
+
+        /* Don't multidispatch if you've got two pointers to the same PMC. They
+         * are equal. */
+        if (SELF == value)
+            return 0;
+
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "cmp", "PP->I", SELF, value, &retval);
+
+        return retval;
+    }
+
+/*
+
+=item C<INTVAL cmp_num(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'cmp_num'.
+
+=cut
+
+*/
+
+    VTABLE INTVAL cmp_num(PMC *value) {
+        INTVAL retval;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "cmp_num", "PP->I", SELF, value, &retval);
+
+        return retval;
+    }
+
+/*
+
+=item C<INTVAL cmp_string(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'cmp_string'.
+
+=cut
+
+*/
+
+    VTABLE INTVAL cmp_string(PMC *value) {
+        INTVAL retval;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "cmp_string", "PP->I", SELF, value, &retval);
+
+        return retval;
+    }
+
+/*
+
+=item C<PMC *logical_or(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'logical_or'.
+
+=cut
+
+*/
+
+    VTABLE PMC *logical_or(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "logical_or", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *logical_and(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'logical_and'.
+
+=cut
+
+*/
+
+    VTABLE PMC *logical_and(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "logical_and", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *logical_xor(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'logical_xor'.
+
+=cut
+
+*/
+
+    VTABLE PMC *logical_xor(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "logical_xor", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *concatenate(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'concatenate'.
+
+=cut
+
+*/
+
+    VTABLE PMC *concatenate(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "concatenate", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *concatenate_str(STRING *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'concatenate_str'.
+
+=cut
+
+*/
+
+    VTABLE PMC *concatenate_str(STRING *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "concatenate_str", "PSP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<void i_concatenate(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_concatenate'.
+
+=cut
+
+*/
+
+    VTABLE void i_concatenate(PMC *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_concatenate", "PP", SELF, value);
+    }
+
+/*
+
+=item C<void i_concatenate_str(STRING *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_concatenate_str'.
+
+=cut
+
+*/
+
+    VTABLE void i_concatenate_str(STRING *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_concatenate_str", "PS", SELF, value);
+    }
+
+/*
+
+=item C<PMC *repeat(PMC *value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'repeat'.
+
+=cut
+
+*/
+
+    VTABLE PMC *repeat(PMC *value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "repeat", "PPP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<PMC *repeat_int(INTVAL value, PMC *dest)>
+
+Default fallback. Performs a multiple dispatch call for 'repeat_int'.
+
+=cut
+
+*/
+
+    VTABLE PMC *repeat_int(INTVAL value, PMC *dest) {
+        PMC *result = PMCNULL;
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "repeat_int", "PIP->P", SELF, value, dest, &result);
+        return result;
+    }
+
+/*
+
+=item C<void i_repeat(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_repeat'.
+
+=cut
+
+*/
+
+    VTABLE void i_repeat(PMC *value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_repeat", "PP", SELF, value);
+    }
+
+/*
+
+=item C<void i_repeat_int(INTVAL value)>
+
+Default fallback. Performs a multiple dispatch call for 'i_repeat_int'.
+
+=cut
+
+*/
+
+    VTABLE void i_repeat_int(INTVAL value) {
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "i_repeat_int", "PI", SELF, value);
+    }
 }
 
 /*

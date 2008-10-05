@@ -60,7 +60,7 @@ pmclass MultiSub extends ResizablePMCArray need_ext provides array {
     }
 
     VTABLE opcode_t *invoke(void *next) {
-        PMC * const list = Parrot_mmd_sort_candidate_list(interp, SELF);
+        PMC * const list = Parrot_mmd_sort_manhattan(interp, SELF);
         PMC *func;
 
         if (PMC_IS_NULL(list))
@@ -68,6 +68,61 @@ pmclass MultiSub extends ResizablePMCArray need_ext provides array {
 
         func = VTABLE_get_pmc_keyed_int(interp, list, 0);
         return VTABLE_invoke(INTERP, func, next);
+    }
+
+    VTABLE PMC *get_iter() {
+        PMC * const list = Parrot_mmd_sort_manhattan(INTERP, SELF);
+
+        if (PMC_IS_NULL(list))
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
+        return SUPER();
+    }
+
+    VTABLE PMC *get_pmc() {
+        PMC *list = Parrot_mmd_sort_manhattan(INTERP, SELF);
+
+        if (PMC_IS_NULL(list))
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
+        return list;
+    }
+
+    /* I don't really know how to implement these if they need something
+       special, so I'll sort the sub list and defer processing to the
+       ResizablePMCArray's VTABLE methods of the same names. Hopefully we
+       don't need anything beyond that. */
+    VTABLE PMC *get_pmc_keyed(PMC *key) {
+        PMC *list = Parrot_mmd_sort_manhattan(INTERP, SELF);
+        if (PMC_IS_NULL(list))
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
+        return SUPER(key);
+    }
+
+    VTABLE PMC *get_pmc_keyed_string(STRING *s) {
+        PMC *list = Parrot_mmd_sort_manhattan(INTERP, SELF);
+        if (PMC_IS_NULL(list))
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
+        return SUPER(s);
+    }
+
+    /* get_iter method should take one of two inputs: either an array of
+       arguments, or a string with a whitespace delimited function signature
+       (N, I, S, P). It should sort the argument list according to closeness
+       to this input argument list and return an iterator over that list. */
+
+    METHOD PMC *get_iter(PMC *args) {
+        STRING * const _array  = CONST_STRING(interp, "Array");
+        STRING * const _string = CONST_STRING(interp, "String");
+
+        if (VTABLE_isa(INTERP, args, _array)){
+            /* TODO: What goes here? */
+        }
+        else if (VTABLE_isa(INTERP, args, _string)) {
+            STRING * const s = VTABLE_get_string(INTERP, args);
+            /* TODO: What goes here? */
+        }
+        else
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    "attempt to call get_iter method with invalid arg type.\n");
     }
 }
 
@@ -77,7 +132,7 @@ pmclass MultiSub extends ResizablePMCArray need_ext provides array {
 
 =head1 SEE ALSO
 
-F<src/mmd.c>,
+F<src/multidispatch.c>,
 F<$perl6/doc/trunk/design/apo/A12.pod>,
 F<$perl6/doc/trunk/design/syn/S12.pod>
 

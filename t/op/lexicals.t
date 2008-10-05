@@ -991,7 +991,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'package-scoped closure 3 - autoclose' );
     .lex '$y', y
     .local pmc x
     x = find_lex '$x'
-    $P0 = n_add x, y
+    $P0 = add x, y
     .return ($P0)
 .end
 

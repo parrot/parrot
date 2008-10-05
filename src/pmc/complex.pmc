@@ -677,29 +677,28 @@ Adds C<value> to the complex number, placing the result in C<dest>.
 
 */
 
-    VTABLE PMC *add(PMC *value, PMC *dest) {
-MMD_Complex: {
-            if (dest)
-                VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-            else
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
+    MULTI PMC *add(Complex value, PMC *dest) {
+        if (dest)
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
 
-            RE(dest) = RE(SELF) + RE(value);
-            IM(dest) = IM(SELF) + IM(value);
+        RE(dest) = RE(SELF) + RE(value);
+        IM(dest) = IM(SELF) + IM(value);
 
-            return dest;
-        }
-MMD_DEFAULT: {
-            if (dest)
-                VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-            else
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
+        return dest;
+    }
 
-            RE(dest) = RE(SELF) + VTABLE_get_number(INTERP, value);
-            IM(dest) = IM(SELF);
+    MULTI PMC *add(DEFAULT value, PMC *dest) {
+        if (dest)
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
 
-            return dest;
-        }
+        RE(dest) = RE(SELF) + VTABLE_get_number(INTERP, value);
+        IM(dest) = IM(SELF);
+
+        return dest;
     }
 
     VTABLE PMC *add_int(INTVAL value, PMC *dest) {
@@ -727,14 +726,13 @@ MMD_DEFAULT: {
         return dest;
     }
 
-    VTABLE void i_add(PMC *value) {
-MMD_Complex: {
-            RE(SELF) += RE(value);
-            IM(SELF) += IM(value);
-        }
-MMD_DEFAULT: {
-            RE(SELF) += VTABLE_get_number(INTERP, value);
-        }
+    MULTI void i_add(Complex value) {
+        RE(SELF) += RE(value);
+        IM(SELF) += IM(value);
+    }
+
+    MULTI void i_add(DEFAULT value) {
+        RE(SELF) += VTABLE_get_number(INTERP, value);
     }
 
     VTABLE void i_add_int(INTVAL value) {
@@ -759,29 +757,28 @@ Subtracts C<value> from the complex number, placing the result in C<dest>.
 
 */
 
-    VTABLE PMC *subtract(PMC *value, PMC *dest) {
-MMD_Complex: {
-            if (dest)
-                VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-            else
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
+    MULTI PMC *subtract(Complex value, PMC *dest) {
+        if (dest)
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
 
-            RE(dest) = RE(SELF) - RE(value);
-            IM(dest) = IM(SELF) - IM(value);
+        RE(dest) = RE(SELF) - RE(value);
+        IM(dest) = IM(SELF) - IM(value);
 
-            return dest;
-        }
-MMD_DEFAULT: {
-            if (dest)
-                VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-            else
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
+        return dest;
+    }
 
-            RE(dest) = RE(SELF) - VTABLE_get_number(INTERP, value);
-            IM(dest) = IM(SELF);
+    MULTI PMC *subtract(DEFAULT value, PMC *dest) {
+        if (dest)
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
 
-            return dest;
-        }
+        RE(dest) = RE(SELF) - VTABLE_get_number(INTERP, value);
+        IM(dest) = IM(SELF);
+
+        return dest;
     }
 
     VTABLE PMC *subtract_int(INTVAL value, PMC *dest) {
@@ -808,14 +805,13 @@ MMD_DEFAULT: {
         return dest;
     }
 
-    VTABLE void i_subtract(PMC *value) {
-MMD_Complex: {
-            RE(SELF) -= RE(value);
-            IM(SELF) -= IM(value);
-        }
-MMD_DEFAULT: {
-            RE(SELF) -= VTABLE_get_number(INTERP, value);
-        }
+    MULTI void i_subtract(Complex value) {
+        RE(SELF) -= RE(value);
+        IM(SELF) -= IM(value);
+    }
+
+    MULTI void i_subtract(DEFAULT value) {
+        RE(SELF) -= VTABLE_get_number(INTERP, value);
     }
 
     VTABLE void i_subtract_int(INTVAL value) {
@@ -855,33 +851,32 @@ Multiplies the complex number SELF inplace with C<value>.
   (a+bi)(c+di)=(ac-bd)+i(ad+bc)
 
 */
-    VTABLE PMC *multiply(PMC *value, PMC *dest) {
-MMD_Complex: {
-            FLOATVAL re = RE(SELF) * RE(value) - IM(SELF) * IM(value);
-            FLOATVAL im = IM(SELF) * RE(value) + RE(SELF) * IM(value);
-            if (dest)
-                VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-            else
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
+    MULTI PMC *multiply(Complex value, PMC *dest) {
+        FLOATVAL re = RE(SELF) * RE(value) - IM(SELF) * IM(value);
+        FLOATVAL im = IM(SELF) * RE(value) + RE(SELF) * IM(value);
+        if (dest)
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
 
-            RE(dest) = re;
-            IM(dest) = im;
+        RE(dest) = re;
+        IM(dest) = im;
 
-            return dest;
-        }
-MMD_DEFAULT: {
-            FLOATVAL re = RE(SELF) * VTABLE_get_number(INTERP, value);
-            FLOATVAL im = IM(SELF) * VTABLE_get_number(INTERP, value);
-            if (dest)
-                VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-            else
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
+        return dest;
+    }
 
-            RE(dest) = re;
-            IM(dest) = im;
+    MULTI PMC *multiply(DEFAULT value, PMC *dest) {
+        FLOATVAL re = RE(SELF) * VTABLE_get_number(INTERP, value);
+        FLOATVAL im = IM(SELF) * VTABLE_get_number(INTERP, value);
+        if (dest)
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
 
-            return dest;
-        }
+        RE(dest) = re;
+        IM(dest) = im;
+
+        return dest;
     }
 
     VTABLE PMC *multiply_int(INTVAL value, PMC *dest) {
@@ -908,17 +903,16 @@ MMD_DEFAULT: {
         return dest;
     }
 
-    VTABLE void i_multiply(PMC *value) {
-MMD_Complex: {
-            FLOATVAL re = RE(SELF) * RE(value) - IM(SELF) * IM(value);
-            FLOATVAL im = IM(SELF) * RE(value) + RE(SELF) * IM(value);
-            RE(SELF)    = re;
-            IM(SELF)    = im;
-        }
-MMD_DEFAULT: {
-            RE(SELF) *= VTABLE_get_number(INTERP, value);
-            IM(SELF) *= VTABLE_get_number(INTERP, value);
-        }
+    MULTI void i_multiply(Complex value) {
+        FLOATVAL re = RE(SELF) * RE(value) - IM(SELF) * IM(value);
+        FLOATVAL im = IM(SELF) * RE(value) + RE(SELF) * IM(value);
+        RE(SELF)    = re;
+        IM(SELF)    = im;
+    }
+
+    MULTI void i_multiply(DEFAULT value) {
+        RE(SELF) *= VTABLE_get_number(INTERP, value);
+        IM(SELF) *= VTABLE_get_number(INTERP, value);
     }
 
     VTABLE void i_multiply_int(INTVAL value) {
@@ -961,45 +955,44 @@ http://docs.sun.com/source/806-3568/ncg_goldberg.html
 
 */
 
-    VTABLE PMC *divide(PMC *value, PMC *dest) {
-MMD_Complex: {
-            FLOATVAL mod, re, im;
+    MULTI PMC *divide(Complex value, PMC *dest) {
+        FLOATVAL mod, re, im;
 
-            complex_check_divide_zero(INTERP, value);
-            if (dest)
-                VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-            else
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
+        complex_check_divide_zero(INTERP, value);
+        if (dest)
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
 
-            /* a little speed optimisation: cache an intermediate number;
-                I'm not sure the compiler does this */
+        /* a little speed optimisation: cache an intermediate number;
+            I'm not sure the compiler does this */
 
-            if (IM(SELF) == 0.0 && IM(value) == 0.0) {
-                RE(dest) = RE(SELF) / RE(value);
-                IM(dest) = 0.0;
-                return dest;
-            }
-            mod      = (RE(value) * RE(value) + IM(value) * IM(value));
-            re       = (RE(SELF)  * RE(value) + IM(SELF)  * IM(value)) / mod;
-            im       = (IM(SELF)  * RE(value) - RE(SELF)  * IM(value)) / mod;
-            RE(dest) = re;
-            IM(dest) = im;
-
+        if (IM(SELF) == 0.0 && IM(value) == 0.0) {
+            RE(dest) = RE(SELF) / RE(value);
+            IM(dest) = 0.0;
             return dest;
         }
-MMD_DEFAULT: {
-            FLOATVAL d = VTABLE_get_number(INTERP, value);
-            float_check_divide_zero(INTERP, d);
-            if (dest)
-                VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-            else
-                dest = pmc_new(INTERP, SELF->vtable->base_type);
+        mod      = (RE(value) * RE(value) + IM(value) * IM(value));
+        re       = (RE(SELF)  * RE(value) + IM(SELF)  * IM(value)) / mod;
+        im       = (IM(SELF)  * RE(value) - RE(SELF)  * IM(value)) / mod;
+        RE(dest) = re;
+        IM(dest) = im;
 
-            RE(dest) = RE(SELF) / d;
-            IM(dest) = IM(SELF) / d;
+        return dest;
+    }
 
-            return dest;
-        }
+    MULTI PMC *divide(DEFAULT value, PMC *dest) {
+        FLOATVAL d = VTABLE_get_number(INTERP, value);
+        float_check_divide_zero(INTERP, d);
+        if (dest)
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
+
+        RE(dest) = RE(SELF) / d;
+        IM(dest) = IM(SELF) / d;
+
+        return dest;
     }
 
     VTABLE PMC *divide_int(INTVAL value, PMC *dest) {
@@ -1028,32 +1021,31 @@ MMD_DEFAULT: {
         return dest;
     }
 
-    VTABLE void i_divide(PMC *value) {
-MMD_Complex: {
-            FLOATVAL mod, re, im;
+    MULTI void i_divide(Complex value) {
+        FLOATVAL mod, re, im;
 
-            complex_check_divide_zero(INTERP, value);
-            if (IM(SELF) == 0.0 && IM(value) == 0.0) {
-                RE(SELF) = RE(SELF) / RE(value);
-                IM(SELF) = 0.0;
-            }
-            else {
-                /* a little speed optimisation: cache an intermediate number;
-                   I'm not sure the compiler does this */
+        complex_check_divide_zero(INTERP, value);
+        if (IM(SELF) == 0.0 && IM(value) == 0.0) {
+            RE(SELF) = RE(SELF) / RE(value);
+            IM(SELF) = 0.0;
+        }
+        else {
+            /* a little speed optimisation: cache an intermediate number;
+               I'm not sure the compiler does this */
 
-                mod      = (RE(value) * RE(value) + IM(value) * IM(value));
-                re       = (RE(SELF)  * RE(value) + IM(SELF)  * IM(value)) / mod;
-                im       = (IM(SELF)  * RE(value) - RE(SELF)  * IM(value)) / mod;
-                RE(SELF) = re;
-                IM(SELF) = im;
-            }
+            mod      = (RE(value) * RE(value) + IM(value) * IM(value));
+            re       = (RE(SELF)  * RE(value) + IM(SELF)  * IM(value)) / mod;
+            im       = (IM(SELF)  * RE(value) - RE(SELF)  * IM(value)) / mod;
+            RE(SELF) = re;
+            IM(SELF) = im;
         }
-MMD_DEFAULT: {
-            FLOATVAL d = VTABLE_get_number(INTERP, value);
-            float_check_divide_zero(INTERP, d);
-            RE(SELF) /= d;
-            IM(SELF) /= d;
-        }
+    }
+
+    MULTI void i_divide(DEFAULT value) {
+        FLOATVAL d = VTABLE_get_number(INTERP, value);
+        float_check_divide_zero(INTERP, d);
+        RE(SELF) /= d;
+        IM(SELF) /= d;
     }
 
     VTABLE void i_divide_int(INTVAL value) {
@@ -1081,10 +1073,7 @@ Set C<dest> to the negated value of C<SELF>.
 */
 
     VTABLE PMC *neg(PMC *dest) {
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-        else
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         RE(dest) = -RE(SELF);
         IM(dest) = -IM(SELF);
@@ -1107,16 +1096,15 @@ Compares the complex number with C<value> and returns true if they are equal.
 
 */
 
-    VTABLE INTVAL is_equal(PMC *value) {
-MMD_Complex: {
-            return (INTVAL)(RE(SELF) == RE(value) && IM(SELF) == IM(value));
-        }
-MMD_DEFAULT: {
-            if (IM(SELF) != 0.0)
-                return (INTVAL)0;
+    MULTI INTVAL is_equal(Complex value) {
+        return (INTVAL)(RE(SELF) == RE(value) && IM(SELF) == IM(value));
+    }
 
-            return (RE(SELF) == VTABLE_get_number(INTERP, value));
-        }
+    MULTI INTVAL is_equal(DEFAULT value) {
+        if (IM(SELF) != 0.0)
+            return (INTVAL)0;
+
+        return (RE(SELF) == VTABLE_get_number(INTERP, value));
     }
 
 /*
@@ -1146,9 +1134,8 @@ Sets C<dest> to the absolute value of SELF that is the distance from (0.0).
     VTABLE PMC *absolute(PMC *dest) {
         FLOATVAL d = sqrt(RE(SELF)*RE(SELF) + IM(SELF)*IM(SELF));
 
-        if (!dest)
-            dest = pmc_new(INTERP,
-                Parrot_get_ctx_HLL_type(INTERP, enum_class_Float));
+        dest = pmc_new(INTERP,
+            Parrot_get_ctx_HLL_type(INTERP, enum_class_Float));
 
         VTABLE_set_number_native(INTERP, dest, d);
         return dest;
@@ -1318,7 +1305,7 @@ Returns C<FUNC>(SELF).
         (PMC *d) = PCCINVOKE(INTERP, SELF, "sin");
         (PMC *e) = PCCINVOKE(INTERP, SELF, "cos");
 
-        Parrot_Complex_i_divide_Complex(INTERP, d, e);
+        Parrot_Complex_multi_i_divide_Complex(INTERP, d, e);
 
         RETURN(PMC *d);
     }
@@ -1329,7 +1316,7 @@ Returns C<FUNC>(SELF).
         (PMC *d) = PCCINVOKE(INTERP, SELF, "cos");
         (PMC *e) = PCCINVOKE(INTERP, SELF, "sin");
 
-        Parrot_Complex_i_divide_Complex(INTERP, d, e);
+        Parrot_Complex_multi_i_divide_Complex(INTERP, d, e);
 
         RETURN(PMC *d);
     }
@@ -1341,7 +1328,7 @@ Returns C<FUNC>(SELF).
         IM(d)  = 0.0;
         (PMC *e) = PCCINVOKE(INTERP, SELF, "cos");
 
-        Parrot_Complex_i_divide_Complex(INTERP, d, e);
+        Parrot_Complex_multi_i_divide_Complex(INTERP, d, e);
 
         RETURN(PMC *d);
     }
@@ -1353,7 +1340,7 @@ Returns C<FUNC>(SELF).
         IM(d)  = 0.0;
         (PMC *e) = PCCINVOKE(INTERP, SELF, "sin");
 
-        Parrot_Complex_i_divide_Complex(INTERP, d, e);
+        Parrot_Complex_multi_i_divide_Complex(INTERP, d, e);
 
         RETURN(PMC *d);
     }
@@ -1395,7 +1382,7 @@ Returns the inverse function of SELF.
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
         PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
 
-        e      = Parrot_Complex_multiply_Complex(INTERP, SELF, SELF, e);
+        e      = Parrot_Complex_multi_multiply_Complex_PMC(INTERP, SELF, SELF, e);
         RE(e)  = 1.0 - RE(e);
         IM(e)  = -IM(e);
 
@@ -1414,7 +1401,7 @@ Returns the inverse function of SELF.
         PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
         PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
 
-        e      = Parrot_Complex_multiply_Complex(INTERP, SELF, SELF, e);
+        e      = Parrot_Complex_multi_multiply_Complex_PMC(INTERP, SELF, SELF, e);
         RE(e)  = 1.0 - RE(e);
         IM(e)  = -IM(e);
 
@@ -1440,7 +1427,7 @@ Returns the inverse function of SELF.
         RE(e)       = -re;
         IM(e)       = 1 - im;
 
-        Parrot_Complex_i_divide_Complex(INTERP, d, e);
+        Parrot_Complex_multi_i_divide_Complex(INTERP, d, e);
 
         (PMC *d) = PCCINVOKE(INTERP, d, "ln");
         RE(e)       = (IM(d) ? IM(d) : -0.0) / -2.0;
@@ -1540,7 +1527,7 @@ tanh(z) = sinh(z) / cosh(z)
         (PMC *d) = PCCINVOKE(INTERP, SELF, "sinh");
         (PMC *e) = PCCINVOKE(INTERP, SELF, "cosh");
 
-        Parrot_Complex_i_divide_Complex(INTERP, d, e);
+        Parrot_Complex_multi_i_divide_Complex(INTERP, d, e);
 
         RETURN(PMC *d);
     }
@@ -1712,45 +1699,44 @@ x ^ y = exp(y * ln x))
 
 */
 
-    VTABLE PMC *pow(PMC *value, PMC *dest) {
-MMD_Complex: {
-                 PMC *l = pmc_new(INTERP, SELF->vtable->base_type);
-                 PMC *log;
+    MULTI PMC *pow(Complex value, PMC *dest) {
+        PMC *l = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *log;
 
-                 if (!PMC_IS_NULL(dest))
-                     VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-                 else
-                     dest = pmc_new(INTERP, SELF->vtable->base_type);
+        if (!PMC_IS_NULL(dest))
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
 
 
-                 Parrot_PCCINVOKE(interp, SELF, CONST_STRING(interp, "ln"),
-                         "->P", &log);
+        Parrot_PCCINVOKE(interp, SELF, CONST_STRING(interp, "ln"),
+                    "->P", &log);
 
-                 l = Parrot_Complex_multiply_Complex(INTERP,
-                        log, value, l);
+        l = Parrot_Complex_multi_multiply_Complex_PMC(INTERP,
+                    log, value, l);
 
-                 Parrot_PCCINVOKE(interp, l, CONST_STRING(interp, "exp"),
-                         "->P", &dest);
+        Parrot_PCCINVOKE(interp, l, CONST_STRING(interp, "exp"),
+                    "->P", &dest);
 
-                 return dest;
-             }
-MMD_DEFAULT: {
-                 PMC *l = pmc_new(INTERP, SELF->vtable->base_type);
-                 PMC *log;
+        return dest;
+    }
 
-                 if (!PMC_IS_NULL(dest))
-                     VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-                 else
-                     dest = pmc_new(INTERP, SELF->vtable->base_type);
+    MULTI PMC *pow(DEFAULT value, PMC *dest) {
+        PMC *l = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *log;
 
-                 Parrot_PCCINVOKE(interp, SELF, CONST_STRING(interp, "ln"),
-                         "->P", &log);
-                 l = Parrot_Complex_multiply(INTERP, log, value, l);
-                 Parrot_PCCINVOKE(interp, l, CONST_STRING(interp, "exp"),
-                         "->P", &dest);
+        if (!PMC_IS_NULL(dest))
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
 
-                 return dest;
-             }
+        Parrot_PCCINVOKE(interp, SELF, CONST_STRING(interp, "ln"),
+                     "->P", &log);
+        l = Parrot_Complex_multi_multiply_DEFAULT_PMC(INTERP, log, value, l);
+        Parrot_PCCINVOKE(interp, l, CONST_STRING(interp, "exp"),
+                     "->P", &dest);
+
+        return dest;
     }
 
     METHOD sqrt() {

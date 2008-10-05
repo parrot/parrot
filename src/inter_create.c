@@ -174,7 +174,7 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     interp->binop_mmd_funcs = NULL;
 
     /* Go and init the MMD tables */
-    mmd_add_function(interp, MMD_USER_FIRST - 1, (funcptr_t)NULL);
+    Parrot_mmd_add_function(interp, MMD_USER_FIRST - 1, (funcptr_t)NULL);
 
     /* create caches structure */
     init_object_cache(interp);
@@ -455,7 +455,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
         /* free vtables */
         parrot_free_vtables(interp);
-        mmd_destroy(interp);
+        Parrot_mmd_destroy(interp);
 
         MUTEX_DESTROY(interpreter_array_mutex);
         mem_sys_free(interp);

@@ -481,7 +481,7 @@ docs/imcc/operation.pod                                     [main]doc
 docs/intro.pod                                              [main]doc
 docs/jit.pod                                                [main]doc
 docs/memory_internals.pod                                   [main]doc
-docs/mmd.pod                                                [main]doc
+docs/multidispatch.pod                                      [main]doc
 docs/native_exec.pod                                        [main]doc
 docs/optable.pod                                            [main]doc
 docs/overview.pod                                           [main]doc
@@ -935,7 +935,7 @@ include/parrot/list.h                                       [main]include
 include/parrot/longopt.h                                    [main]include
 include/parrot/memory.h                                     [main]include
 include/parrot/misc.h                                       [main]include
-include/parrot/mmd.h                                        [main]include
+include/parrot/multidispatch.h                              [main]include
 include/parrot/nci.h                                        [main]include
 include/parrot/oo.h                                         [main]include
 include/parrot/oo_private.h                                 [main]include
@@ -2896,6 +2896,7 @@ lib/Parrot/Pmc2c/ComposedMethod.pm                          [devel]
 lib/Parrot/Pmc2c/Dumper.pm                                  [devel]
 lib/Parrot/Pmc2c/Emitter.pm                                 [devel]
 lib/Parrot/Pmc2c/Library.pm                                 [devel]
+lib/Parrot/Pmc2c/MULTI.pm                                   [devel]
 lib/Parrot/Pmc2c/Method.pm                                  [devel]
 lib/Parrot/Pmc2c/MethodEmitter.pm                           [devel]
 lib/Parrot/Pmc2c/Object.pm                                  [devel]
@@ -3179,7 +3180,7 @@ src/main.c                                                  []
 src/malloc-trace.c                                          []
 src/malloc.c                                                []
 src/misc.c                                                  []
-src/mmd.c                                                   []
+src/multidispatch.c                                         []
 src/nci_test.c                                              []
 src/oo.c                                                    []
 src/ops/bit.ops                                             []
@@ -3217,6 +3218,7 @@ src/pmc/array.pmc                                           []
 src/pmc/bigint.pmc                                          []
 src/pmc/boolean.pmc                                         []
 src/pmc/bound_nci.pmc                                       []
+src/pmc/callsignature.pmc                                   []
 src/pmc/capture.pmc                                         []
 src/pmc/class.pmc                                           []
 src/pmc/closure.pmc                                         []
@@ -3653,8 +3655,8 @@ t/pmc/key.t                                                 []
 t/pmc/lexinfo.t                                             []
 t/pmc/lexpad.t                                              []
 t/pmc/managedstruct.t                                       []
-t/pmc/mmd.t                                                 []
 t/pmc/multiarray.t                                          []
+t/pmc/multidispatch.t                                       []
 t/pmc/multisub.t                                            []
 t/pmc/n_arithmetics.t                                       []
 t/pmc/namespace.t                                           []

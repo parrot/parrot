@@ -1,0 +1,436 @@
+/*
+Copyright (C) 2008, The Perl Foundation.
+$Id: pointer.pmc 26309 2008-03-11 09:50:21Z allison $
+
+=head1 NAME
+
+src/pmc/cpointer.pmc - CPointer
+
+=head1 DESCRIPTION
+
+The CPointer PMC creates a PMC abstraction for a typed C pointer. It is
+particularly used by the C<CallSignature> PMC, for the return values of a
+C-level PCC invocation using a C<CallSignature> to pass the arguments and fetch
+the results.
+
+=head2 Attributes
+
+A CPointer PMC has two attributes:
+
+=over 4
+
+=item pointer
+
+A C<void *> pointer to an integer, number, string, or PMC.
+
+=item sig
+
+A string signature for the pointer. The possible signature values follow the
+standard defined for PCC.
+
+  I   a Parrot integer (INTVAL)
+  N   a Parrot number  (FLOATVAL)
+  S   a Parrot string  (STRING *)
+  P   a Parrot object  (PMC *)
+
+=back
+
+
+=head2 Vtable Functions
+
+These are the vtable functions for the CPointer class.
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass CPointer need_ext {
+    ATTR void   *pointer; /* The stored pointer. */
+    ATTR STRING *sig;     /* A string signature for the pointer. */
+
+/*
+
+=item C<void init()>
+
+Initializes the pointer object.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        Parrot_CPointer_attributes *pdata_struct =
+            mem_allocate_typed(Parrot_CPointer_attributes);
+        PMC_data(SELF) = pdata_struct;
+
+        pdata_struct->pointer = NULL;
+        pdata_struct->sig = NULL;
+
+        PObj_custom_mark_SET(SELF);
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the signature as live. Also marks a STRING or PMC pointed to by the
+pointer.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+
+        if (data->sig)
+            pobject_lives(interp, (PObj *)data->sig);
+
+        if (data->pointer) {
+            if (string_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
+                PMC **pmc_pointer = (PMC **) data->pointer;
+                PARROT_ASSERT(*pmc_pointer); 
+                pobject_lives(interp, (PObj *) *pmc_pointer); 
+            }
+            else if (string_equal(interp, data->sig, CONST_STRING(interp, "S")) == 0) {
+                STRING **str_pointer = (STRING **) data->pointer;
+                PARROT_ASSERT(*str_pointer);
+                pobject_lives(interp, (PObj *) *str_pointer);
+            }
+        }
+    }
+
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a clone of the pointer.
+
+=cut
+
+*/
+
+    VTABLE PMC *clone() {
+        PMC * const dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PObj_custom_mark_SET(dest);
+        PMC_data(dest) = PMC_data(SELF);
+        return dest;
+    }
+
+/*
+
+=item C<void *get_pointer()>
+
+Returns the pointer.
+
+=cut
+
+*/
+
+    VTABLE void *get_pointer() {
+        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+        return data->pointer;
+    }
+
+/*
+
+=item C<void set_pointer(void *)>
+
+Sets the pointer.
+
+=cut
+
+*/
+
+    VTABLE void set_pointer(void *value) {
+        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+        data->pointer = value;
+    }
+
+/*
+
+=item C<STRING *get_string_keyed_str(STRING *key)>
+
+Returns the string signature.
+
+=cut
+
+*/
+
+    VTABLE STRING *get_string_keyed_str(STRING *key) {
+        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+        return data->sig;
+    }
+
+/*
+
+=item C<void set_string_keyed_str(STRING *key, STRING *value)>
+
+Sets the string signature.
+
+=cut
+
+*/
+
+    VTABLE void set_string_keyed_str(STRING *key, STRING *value) {
+        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+        data->sig = value;
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the integer value that the pointer points to (if the pointer is to an
+integer or PMC).
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+
+        if (string_equal(interp, data->sig, CONST_STRING(interp, "I")) == 0) {
+            INTVAL *int_pointer = (INTVAL *) data->pointer;
+            return *int_pointer;
+        }
+        else if (string_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
+            PMC **pmc_pointer = (PMC **) data->pointer;
+            return VTABLE_get_integer(interp, *pmc_pointer);
+        }
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Unable to fetch integer value, the pointer is not an integer");
+
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL value)>
+
+Sets the integer value that the pointer points to (if the pointer is to an
+integer or PMC).
+
+=cut
+
+*/
+
+    VTABLE void set_integer_native(INTVAL value) {
+        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+
+        if (string_equal(interp, data->sig, CONST_STRING(interp, "I")) == 0) {
+            INTVAL *int_pointer = (INTVAL *) data->pointer;
+            *int_pointer = value;
+        }
+        else if (string_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
+            PMC **pmc_pointer = (PMC **) data->pointer;
+            VTABLE_set_integer_native(interp, *pmc_pointer, value);
+        }
+        else {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    "Unable to set integer value, the pointer is not an integer");
+        }
+    }
+
+/*
+
+=item C<FLOATVAL get_number()>
+
+Returns the floating point value that the pointer points to (if the pointer is
+to a number or PMC).
+
+=cut
+
+*/
+
+    VTABLE FLOATVAL get_number() {
+        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+
+        if (string_equal(interp, data->sig, CONST_STRING(interp, "N")) == 0) {
+            FLOATVAL *num_pointer = (FLOATVAL *) data->pointer;
+            return *num_pointer;
+        }
+        else if (string_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
+            PMC **pmc_pointer = (PMC **) data->pointer;
+            return VTABLE_get_number(interp, *pmc_pointer);
+        }
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Unable to fetch number value, the pointer is not a number");
+    }
+
+/*
+
+=item C<void set_number_native(FLOATVAL value)>
+
+Sets the floating point value that the pointer points to (if the pointer is
+to a number or PMC).
+
+=cut
+
+*/
+
+    VTABLE void set_number_native(FLOATVAL value) {
+        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+
+        if (string_equal(interp, data->sig, CONST_STRING(interp, "N")) == 0) {
+            FLOATVAL *num_pointer = (FLOATVAL *) data->pointer;
+            *num_pointer = value;
+        }
+        else if (string_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
+            PMC **pmc_pointer = (PMC **) data->pointer;
+            VTABLE_set_number_native(interp, *pmc_pointer, value);
+        }
+        else {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    "Unable to set number value, the pointer is not a number");
+        }
+    }
+
+/*
+
+=item C<STRING *get_string()>
+
+Returns the Parrot string value that the pointer points to (if the pointer is
+to a string or PMC).
+
+=cut
+
+*/
+
+    VTABLE STRING *get_string() {
+        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+
+        if (string_equal(interp, data->sig, CONST_STRING(interp, "S")) == 0) {
+            STRING **str_pointer = (STRING **) data->pointer;
+            return *str_pointer;
+        }
+        else if (string_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
+            PMC **pmc_pointer = (PMC **) data->pointer;
+            return VTABLE_get_string(interp, *pmc_pointer);
+        }
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Unable to fetch string value, the pointer is not a string");
+    }
+
+/*
+
+=item C<void set_string_native(STRING *value)>
+
+Sets the Parrot string value that the pointer points to (if the pointer is
+to a string or PMC).
+
+=cut
+
+*/
+
+    VTABLE void set_string_native(STRING *value) {
+        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+
+        if (string_equal(interp, data->sig, CONST_STRING(interp, "S")) == 0) {
+            STRING **str_pointer = (STRING **) data->pointer;
+            *str_pointer = value;
+        }
+        else if (string_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
+            PMC **pmc_pointer = (PMC **) data->pointer;
+            VTABLE_set_string_native(interp, *pmc_pointer, value);
+        }
+        else {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    "Unable to set string value, the pointer is not a string");
+        }
+    }
+
+/*
+
+=item C<PMC *get_pmc()>
+
+Returns the PMC value that the pointer points to (if the pointer is to a PMC).
+
+=cut
+
+*/
+
+    VTABLE PMC *get_pmc() {
+        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+
+        if (string_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
+            PMC **pmc_pointer = (PMC **) data->pointer;
+            return *pmc_pointer;
+        }
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Unable to fetch PMC value, the pointer is not a PMC");
+    }
+
+/*
+
+=item C<void set_pmc(PMC *value)>
+
+Sets the PMC value that the pointer points to (if the pointer is to a PMC).
+
+=cut
+
+*/
+
+    VTABLE void set_pmc(PMC *value) {
+        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+
+        if (string_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
+            PMC **pmc_pointer = (PMC **) data->pointer;
+            *pmc_pointer = value;
+        }
+        else {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    "Unable to set PMC value, the pointer is not a PMC");
+        }
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns whether the pointer is not C<NULL>.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_bool() {
+        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+        return (INTVAL)(data->pointer != NULL);
+    }
+
+/*
+
+=item C<INTVAL is_same(PMC *pmc2)>
+
+Returns whether the pointer has the same value as C<*pmc2>.
+
+=cut
+
+*/
+
+    VTABLE INTVAL is_same(PMC *pmc2) {
+        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+        return (INTVAL)(SELF->vtable  == pmc2->vtable &&
+                        data->pointer == VTABLE_get_pointer(interp, pmc2));
+    }
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
