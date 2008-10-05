@@ -44,17 +44,16 @@ use C<j> instead of C<i>.
 
 static void
 complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value) {
-    INTVAL first_num_length, second_num_length;
+    char   *str               = string_to_cstring(interp, value);
+    char   *t                 = str;
+    char   *first_num_offset  = str;
+    char   *second_num_offset = NULL;
     STRING *S;
 
-    char  *str               = string_to_cstring(interp, value);
-    char  *t                 = str;
-    char  *first_num_offset  = str;
-    char  *second_num_offset = NULL;
-
-    INTVAL i                 = 0;
-    INTVAL first_num_minus   = 0;
-    INTVAL second_num_minus  = 0;
+    INTVAL  i                 = 0;
+    INTVAL  first_num_minus   = 0;
+    INTVAL  second_num_minus  = 0;
+    UINTVAL first_num_length, second_num_length;
 
     /* walk the string and identify the real and imaginary parts */
 
@@ -594,7 +593,7 @@ part to C<0.0>
     }
 
     VTABLE void set_integer_native(INTVAL value) {
-        SELF.set_number_native(value);
+        SELF.set_number_native((FLOATVAL)value);
     }
 
     VTABLE void set_number_native(FLOATVAL value) {
@@ -624,11 +623,11 @@ to C<value>.
 */
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
-        SELF.set_number_keyed(key, value);
+        SELF.set_number_keyed(key, (FLOATVAL)value);
     }
 
     VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
-        SELF.set_number_keyed_str(key, value);
+        SELF.set_number_keyed_str(key, (FLOATVAL)value);
     }
 
     VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
@@ -1412,7 +1411,7 @@ Returns the inverse function of SELF.
         IM(d) -= RE(SELF);
 
         (PMC *e) = PCCINVOKE(INTERP, d, "ln");
-        RE(d)  = IM(e) + 2.0 * atan(1);
+        RE(d)  = IM(e) + 2.0 * atan(1.0);
         IM(d)  = RE(e) ? -RE(e) : 0.0;
 
         RETURN(PMC *d);
