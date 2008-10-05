@@ -21,7 +21,12 @@ token TOP {
 
 token newline { [ <.ws> \n ]+ }
 
-token ws { \h* [ '#' \N* ]? }
+token ws {
+    [ ^^
+      [ \h* '#' \N* ]? ]
+    ||
+    [ \h*   [ '#' \N* ]? ]
+}
 
 token file_input {
     ^ [ <.newline> | <statement> ]*

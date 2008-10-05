@@ -1,6 +1,6 @@
 #!./parrot pynie.pbc
 
-print '1..12'
+print '1..13'
 
 # if
 
@@ -71,3 +71,11 @@ else: print 'nok 11'
 #if ok == 3: print 'ok 12'
 #else: print 'nok 12'
 print 'not ok 12  # TODO implement multiple iterators'
+
+# nested scopes
+i = 4
+if 0:
+    if 0: pass
+    i = 2
+if i == 2: print 'nok 13'
+else: print 'ok 13'

@@ -47,14 +47,16 @@ src/parser/indent.pir - Helper parsing function for Python indents
     ##  determine the number of spaces on the line
     $I0 = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
     $I0 -= pos
-    ##  if larger than current indent level, succed and create a new level
+    ##  if larger than current indent level, succeed and create a new level
     .local pmc indents
     indents = get_global '@!indents'
     $I1 = indents[-1]
     unless $I0 > $I1 goto fail
   succeed:
     push indents, $I0
-    mob.'to'(pos)
+    .local int to
+    to = pos + $I0
+    mob.'to'(to)
   fail:
     .return (mob)
 .end
@@ -104,7 +106,9 @@ src/parser/indent.pir - Helper parsing function for Python indents
     $I1 = indents[-1]
     if $I0 != $I1 goto fail
   succeed:
-    mob.'to'(pos)
+    .local int to
+    to = pos + $I0
+    mob.'to'(to)
   fail:
     .return (mob)
 .end

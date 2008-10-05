@@ -38,7 +38,8 @@ SOURCES = pynie.pir \
   src/builtins/io.pir \
   src/builtins/lists.pir \
   src/builtins/oper.pir \
-  src/builtins/funcs.pir
+  src/builtins/funcs.pir \
+  src/parser/indent.pir
 
 # the default target
 pynie.pbc: $(PARROT) $(PERL6GRAMMAR) $(NQP) $(PCT) $(SOURCES)
