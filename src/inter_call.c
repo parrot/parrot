@@ -101,6 +101,18 @@ static void convert_arg_from_str(PARROT_INTERP, ARGMOD(call_state *st))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*st);
 
+static parrot_context_t * count_signature_elements(PARROT_INTERP,
+    ARGIN(const char* signature),
+    ARGMOD(PMC * args_sig),
+    ARGMOD(PMC * results_sig),
+    int flag)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(* args_sig)
+        FUNC_MODIFIES(* results_sig);
+
 static int fetch_arg_op(PARROT_INTERP, ARGMOD(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -132,6 +144,54 @@ static void next_arg_sig(ARGMOD(call_state_item *sti))
 static void null_val(int sig, ARGMOD(call_state *st))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*st);
+
+static const char * set_context_sig_params(PARROT_INTERP,
+    ARGIN(const char *signature),
+    ARGMOD(INTVAL *n_regs_used),
+    ARGMOD(PMC **sigs),
+    ARGMOD(opcode_t **indexes),
+    ARGMOD(parrot_context_t *ctx),
+    ARGMOD(PMC *sig_obj))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        __attribute__nonnull__(6)
+        __attribute__nonnull__(7)
+        FUNC_MODIFIES(*n_regs_used)
+        FUNC_MODIFIES(*sigs)
+        FUNC_MODIFIES(*indexes)
+        FUNC_MODIFIES(*ctx)
+        FUNC_MODIFIES(*sig_obj);
+
+static void set_context_sig_returns(PARROT_INTERP,
+    ARGMOD(parrot_context_t *ctx),
+    ARGMOD(opcode_t **indexes),
+    ARGIN(const char *ret_x),
+    ARGMOD(PMC *result_list))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*ctx)
+        FUNC_MODIFIES(*indexes)
+        FUNC_MODIFIES(*result_list);
+
+static void set_context_sig_returns_varargs(PARROT_INTERP,
+    ARGMOD(parrot_context_t *ctx),
+    ARGMOD(opcode_t **indexes),
+    ARGIN(const char *ret_x),
+    ARGMOD(va_list returns))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*ctx)
+        FUNC_MODIFIES(*indexes)
+        FUNC_MODIFIES(returns);
 
 static int set_retval_util(PARROT_INTERP,
     ARGIN(const char *sig),
@@ -167,43 +227,6 @@ static void too_many(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
-
-static parrot_context_t * count_signature_elements(PARROT_INTERP,
-    ARGIN(const char* signature),
-    ARGMOD(PMC* args_sig),
-    ARGMOD(PMC* results_sig),
-    int flag)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
-
-static void set_context_sig_returns(PARROT_INTERP,
-    ARGMOD(parrot_context_t *ctx),
-    ARGMOD(opcode_t **indexes),
-    ARGIN(const char *ret_x),
-    ARGMOD(void* l),
-    int flag)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
-
-static const char *set_context_sig_params(PARROT_INTERP,
-    ARGIN(const char *signature),
-    ARGMOD(INTVAL *n_regs_used),
-    ARGMOD(PMC **sigs),
-    ARGMOD(opcode_t **indexes),
-    ARGMOD(parrot_context_t *ctx),
-    ARGMOD(PMC *sig_obj))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
-        __attribute__nonnull__(6)
-        __attribute__nonnull__(7);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -1900,7 +1923,7 @@ commit_last_arg(PARROT_INTERP, int index, int cur,
 
 /*
 
-=item C<count_signature_elements>
+=item C<static parrot_context_t * count_signature_elements>
 
 Counts the number of each type of register in a signature object. Returns
 the total number of parameter arguments, the total number of result
@@ -2062,18 +2085,10 @@ commit_last_arg_sig_object(PARROT_INTERP, int index, int cur,
 
 /*
 
-=item C<set_context_sig_returns>
+=item C<static void set_context_sig_returns>
 
-Sets the subroutine return arguments in the context C<ctx>. Takes a
-pointer to the return signature C<ret_x> and a list of return parameters
-C<l>. If C<flag> is 1, C<l> is treated as a PMC array of return
-parameters. If C<flag> is 0, C<l> is treated instead as a va_list
-of variadic C arguments.
-
-To unify this function, C<Parrot_PCCINVOKE> needs to be changed to
-convert the va_list of input arguments into a signature object, and the
-results list from that object needs to be passed to this function
-instead of the va_list itself.
+Sets the subroutine return arguments in the context C<ctx>. Takes a C string
+for the return signature C<ret_x> and a list of return parameters C<result_list>.
 
 =cut
 
@@ -2081,93 +2096,110 @@ instead of the va_list itself.
 
 static void
 set_context_sig_returns(PARROT_INTERP, ARGMOD(parrot_context_t *ctx),
-    ARGMOD(opcode_t **indexes), ARGIN(const char *ret_x), ARGMOD(void* l),
-    int flag)
+    ARGMOD(opcode_t **indexes), ARGIN(const char *ret_x), ARGMOD(PMC *result_list))
 {
     unsigned int index = 0;
     unsigned int seen_arrow = 1;
     const char *x;
 
-    /* We have two different implementations of this for Parrot_PCCINVOKE
-       and Parrot_occ_sub_invoke_from_sig_object. Eventually these two
-       will be combined, but for now we switch between them with a flag */
-    if (flag == 1) {
-
-        /* result_accessors perform the arg accessor function,
-         * assigning the corresponding registers to the result variables */
-        PMC * result_list = (PMC *)l;
-        for (x = ret_x; x && *x; x++) {
-            PMC *result_item = VTABLE_get_pmc_keyed_int(interp, result_list, index);
-            if (isupper((unsigned char)*x)) {
-                switch (*x) {
-                    case 'I':
-                        {
-                        VTABLE_set_integer_native(interp, result_item,
-                                CTX_REG_INT(ctx, indexes[seen_arrow][index]));
-                        }
-                        break;
-                    case 'N':
-                        {
-                        VTABLE_set_number_native(interp, result_item,
-                                CTX_REG_NUM(ctx, indexes[seen_arrow][index]));
-                        }
-                        break;
-                    case 'S':
-                        {
-                        VTABLE_set_string_native(interp, result_item,
-                                CTX_REG_STR(ctx, indexes[seen_arrow][index]));
-                        }
-                        break;
-                    case 'P':
-                        {
-                        VTABLE_set_pmc(interp, result_item,
-                                CTX_REG_PMC(ctx, indexes[seen_arrow][index]));
-                        }
-                        break;
-                    default:
-                        Parrot_ex_throw_from_c_args(interp, NULL,
-                            EXCEPTION_INVALID_OPERATION,
-                            "Parrot_pcc_invoke_sub_from_sig_object: invalid reg type %c!", *x);
-                }
+    /* result_accessors perform the arg accessor function,
+     * assigning the corresponding registers to the result variables */
+    for (x = ret_x; x && *x; x++) {
+        PMC *result_item = VTABLE_get_pmc_keyed_int(interp, result_list, index);
+        if (isupper((unsigned char)*x)) {
+            switch (*x) {
+                case 'I':
+                    {
+                    VTABLE_set_integer_native(interp, result_item,
+                            CTX_REG_INT(ctx, indexes[seen_arrow][index]));
+                    }
+                    break;
+                case 'N':
+                    {
+                    VTABLE_set_number_native(interp, result_item,
+                            CTX_REG_NUM(ctx, indexes[seen_arrow][index]));
+                    }
+                    break;
+                case 'S':
+                    {
+                    VTABLE_set_string_native(interp, result_item,
+                            CTX_REG_STR(ctx, indexes[seen_arrow][index]));
+                    }
+                    break;
+                case 'P':
+                    {
+                    VTABLE_set_pmc(interp, result_item,
+                            CTX_REG_PMC(ctx, indexes[seen_arrow][index]));
+                    }
+                    break;
+                default:
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_OPERATION,
+                        "Parrot_pcc_invoke_sub_from_sig_object: invalid reg type %c!", *x);
             }
         }
     }
-    else {
-        /* result_accessors perform the arg accessor function,
-         * assigning the corresponding registers to the result variables */
-        va_list list = (va_list)l;
-        for (x = ret_x; x && *x; x++) {
-            if (isupper((unsigned char)*x)) {
-                switch (*x) {
-                    case 'I':
-                        {
-                        INTVAL * const tmpINTVAL = va_arg(list, INTVAL*);
-                        *tmpINTVAL = CTX_REG_INT(ctx, indexes[seen_arrow][index]);
-                        }
-                        break;
-                    case 'N':
-                        {
-                        FLOATVAL * const tmpFLOATVAL = va_arg(list, FLOATVAL*);
-                        *tmpFLOATVAL = CTX_REG_NUM(ctx, indexes[seen_arrow][index]);
-                        }
-                        break;
-                    case 'S':
-                        {
-                        STRING ** const tmpSTRING = va_arg(list, STRING**);
-                        *tmpSTRING = CTX_REG_STR(ctx, indexes[seen_arrow][index]);
-                        }
-                        break;
-                    case 'P':
-                        {
-                        PMC ** const tmpPMC = va_arg(list, PMC**);
-                        *tmpPMC = CTX_REG_PMC(ctx, indexes[seen_arrow][index]);
-                        }
-                        break;
-                    default:
-                        Parrot_ex_throw_from_c_args(interp, NULL,
-                            EXCEPTION_INVALID_OPERATION,
-                            "Parrot_PCCINVOKE: invalid reg type %c!", *x);
-                }
+
+    Parrot_pop_context(interp);
+}
+
+/*
+
+=item C<static void set_context_sig_returns_varargs>
+
+Sets the subroutine return arguments in the context C<ctx>. Takes a C string
+for the return signature C<ret_x> and a varargs list of return parameters C<returns>.
+
+To unify this function with C<set_context_sig_returns>, C<Parrot_PCCINVOKE>
+needs to be changed to convert the va_list of input arguments into a signature
+object, and the results list from that object needs to be passed to this
+function instead of the va_list itself.
+
+=cut
+
+*/
+
+static void
+set_context_sig_returns_varargs(PARROT_INTERP, ARGMOD(parrot_context_t *ctx),
+    ARGMOD(opcode_t **indexes), ARGIN(const char *ret_x), ARGMOD(va_list returns))
+{
+    unsigned int index = 0;
+    unsigned int seen_arrow = 1;
+    const char *x;
+
+    /* result_accessors perform the arg accessor function,
+     * assigning the corresponding registers to the result variables */
+    for (x = ret_x; x && *x; x++) {
+        if (isupper((unsigned char)*x)) {
+            switch (*x) {
+                case 'I':
+                    {
+                    INTVAL * const tmpINTVAL = va_arg(returns, INTVAL*);
+                    *tmpINTVAL = CTX_REG_INT(ctx, indexes[seen_arrow][index]);
+                    }
+                    break;
+                case 'N':
+                    {
+                    FLOATVAL * const tmpFLOATVAL = va_arg(returns, FLOATVAL*);
+                    *tmpFLOATVAL = CTX_REG_NUM(ctx, indexes[seen_arrow][index]);
+                    }
+                    break;
+                case 'S':
+                    {
+                    STRING ** const tmpSTRING = va_arg(returns, STRING**);
+                    *tmpSTRING = CTX_REG_STR(ctx, indexes[seen_arrow][index]);
+                    }
+                    break;
+                case 'P':
+                    {
+                    PMC ** const tmpPMC = va_arg(returns, PMC**);
+                    *tmpPMC = CTX_REG_PMC(ctx, indexes[seen_arrow][index]);
+                    }
+                    break;
+                default:
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_OPERATION,
+                        "Parrot_PCCINVOKE: invalid reg type %c!", *x);
             }
         }
     }
@@ -2176,7 +2208,7 @@ set_context_sig_returns(PARROT_INTERP, ARGMOD(parrot_context_t *ctx),
 
 /*
 
-=item C<set_context_sig_params>
+=item C<static const char * set_context_sig_params>
 
 Sets the subroutine arguments in the C<ctx> context, according to the
 signature string C<signature>. Currently this function is only called
@@ -2520,7 +2552,7 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
     else
         VTABLE_invoke(interp, pccinvoke_meth, NULL);
 
-    set_context_sig_returns(interp, ctx, indexes, ret_x, list, 0);
+    set_context_sig_returns_varargs(interp, ctx, indexes, ret_x, list);
     PObj_live_CLEAR(args_sig);
     PObj_live_CLEAR(results_sig);
     interp->current_args   = save_current_args;
@@ -2624,7 +2656,7 @@ Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     /* Set the return values from the subroutine's context into the
        caller's context */
 
-    set_context_sig_returns(interp, ctx, indexes, ret_x, result_list, 1);
+    set_context_sig_returns(interp, ctx, indexes, ret_x, result_list);
     PObj_live_CLEAR(args_sig);
     PObj_live_CLEAR(results_sig);
     interp->current_args   = save_current_args;
