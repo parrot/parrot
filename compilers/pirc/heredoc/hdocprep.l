@@ -359,8 +359,10 @@ LINECOMMENT    [#].*{EOL}
                              PARROT_ASSERT(state->delimiter);
 
                              strncpy(state->delimiter, yytext + 3, yyleng - 4);
+                             state->delimiter[yyleng - 4] = '\0';
 
                              state->heredoc = dupstr("");
+
 
                              BEGIN(SAVELINE2);
                            }
@@ -373,9 +375,18 @@ LINECOMMENT    [#].*{EOL}
                          PARROT_ASSERT(state->delimiter);
 
                          strncpy(state->delimiter, yytext + 3, yyleng - 4);
+                         state->delimiter[yyleng - 4] = '\0';
+
+                         /*
+                         state->delimiter = dupstr(state->delimiter);
+                         */
+
 
                          state->heredoc = dupstr("");
 
+/*
+                         fprintf(stderr, "intial Q string: [%s]\n", state->delimiter);
+*/
                          BEGIN(SAVELINE);
                         }
 
@@ -386,7 +397,15 @@ LINECOMMENT    [#].*{EOL}
 
                          PARROT_ASSERT(state->linebuffer != NULL);
 
-                         state->linebuffer = dupstr(yytext);
+                         state->linebuffer = (char *)mem_sys_allocate((strlen(yytext) + 1) * sizeof (char));
+
+                         strcpy(state->linebuffer, yytext);
+                         state->linebuffer = dupstr(state->linebuffer);
+
+                         /*
+                         fprintf(stderr, "saveline eol: [%s]\n", state->linebuffer);
+                         dupstr(yytext);
+                         */
 
                          BEGIN(HEREDOC);
                        }
@@ -398,7 +417,11 @@ LINECOMMENT    [#].*{EOL}
                           */
                          global_state *state = yyget_extra(yyscanner);
 
-                         state->linebuffer = dupstr(yytext);
+                         /*state->linebuffer = dupstr(yytext);
+                         */
+                         state->linebuffer = (char *)mem_sys_allocate((yyleng + 1) * sizeof (char));
+                         strcpy(state->linebuffer, yytext);
+                         state->linebuffer = dupstr(state->linebuffer);
 
                          yy_switch_to_buffer(state->file_buffer, yyscanner);
 
@@ -411,18 +434,19 @@ LINECOMMENT    [#].*{EOL}
                          global_state *state = yyget_extra(yyscanner);
 
                          int           len   = strlen(state->heredoc);
+                         char *temp;
+
+                         /*fprintf(stderr, "heredoc eol: len so far is: %d\n", len);
+                         */
 
                          /* length of heredoc + 1 for NULL character + 2 for escaped '\n' */
-                         char         *temp  = (char *)mem_sys_allocate((len + 3) * sizeof (char));
+                         temp  = (char *)mem_sys_allocate((len + 4) * sizeof (char));
 
-                         strcpy(temp, state->heredoc);
 
-                         state->heredoc      = temp;
+                         sprintf(temp, "%s\\n%c", state->heredoc, '\0');
+                         state->heredoc = temp;
 
-                         PARROT_ASSERT(state->heredoc != NULL);
 
-                         /* translate "\n" to a "\" and "n" character */
-                         strcpy(state->heredoc + len, "\\n");
                        }
 
 <HEREDOC>.*        { /* scan heredoc string contents */
@@ -445,7 +469,8 @@ LINECOMMENT    [#].*{EOL}
 
                             PARROT_ASSERT(state->heredoc != NULL);
 
-                            mem_sys_free(state->heredoc);
+                           /* mem_sys_free(state->heredoc);
+                            */
 
                             state->heredoc = dupstr("");
 
@@ -462,7 +487,12 @@ LINECOMMENT    [#].*{EOL}
                          }
                          else {
                             /* save this heredoc string line */
-                            char * const thisline = dupstr(yytext);
+                            char * const thisline = (char *)mem_sys_allocate((yyleng + 1)
+                                                                             * sizeof (char));
+                            strcpy(thisline, yytext);
+                          /* thisline[yyleng] = '\0';
+                          */
+
 
                             state->heredoc = strcat(state->heredoc, thisline);
                          }
