@@ -148,7 +148,10 @@ typedef struct constant {
 
 } constant;
 
-
+#define CONST_INTVAL(c) c->val.ival
+#define CONST_NUMVAL(c) c->val.nval
+#define CONST_PMCVAL(c) c->val.pval
+#define CONST_STRVAL(c) c->val.sval
 
 /* The expression node is used as a wrapper to represent target nodes (like .param, .local
  * and registers), constant nodes (either named or anonymous), XXX identifiers?? XXX,
@@ -168,6 +171,9 @@ typedef struct expression {
     struct expression *next;
 
 } expression;
+
+#define EXPR_CONST_INTVAL(e)    CONST_INTVAL(e->expr.c)
+#define EXPR_CONST_NUMVAL(e)    CONST_NUMVAL(e->expr.c)
 
 /* The key node is used to represent a key expression */
 typedef struct key {
@@ -280,6 +286,7 @@ typedef struct bucket {
 #define bucket_global(B)    B->u.glob
 #define bucket_constant(B)  B->u.cons
 
+/* hashtable structure */
 typedef struct hashtable {
     bucket   **contents;
     unsigned   size;
@@ -341,8 +348,8 @@ argument *set_arg_flag(argument * const arg, arg_flag flag);
 argument *set_arg_alias(struct lexer_state * const lexer, char * const alias);
 
 /* constructors for constant nodes */
-constant *new_named_const(struct lexer_state * lexer, pir_type type, char * const name, ...);
-constant *new_const(struct lexer_state * lexer, pir_type type, ...);
+constant *new_named_const(struct lexer_state * const lexer, pir_type type, char * const name, ...);
+constant *new_const(struct lexer_state * const lexer, pir_type type, ...);
 
 /* conversion functions, each wrapping its argument in an expression node */
 expression *expr_from_const(struct lexer_state * const lexer, constant * const c);
@@ -398,10 +405,10 @@ void push_operand(struct lexer_state * const lexer, expression * const operand);
 
 void get_operands(struct lexer_state * const lexer, int bitmask, ...);
 expression *get_operand(struct lexer_state * const lexer, short n);
-
 unsigned get_operand_count(struct lexer_state * const lexer);
 
 void update_instr(struct lexer_state * const lexer, char * const newop);
+void update_op(struct lexer_state * const lexer, instruction * const instr, int newop);
 
 void remove_operand(struct lexer_state * const lexer, unsigned index);
 void remove_all_operands(struct lexer_state * const lexer);
@@ -424,7 +431,6 @@ void reset_register_allocator(struct lexer_state * const lexer);
 /* to check whether given name is a parrot opcode */
 int is_parrot_op(struct lexer_state * const lexer, char * const name);
 
-void print_subs(struct lexer_state * const lexer);
 void free_subs(struct lexer_state * const lexer);
 
 void panic(struct lexer_state * lexer, char * const message);

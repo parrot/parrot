@@ -58,6 +58,9 @@ TODO:
 #include <stdlib.h>
 #include <string.h>
 
+#include <math.h>
+#include "parrot/oplib/ops.h"
+
 #include "pirparser.h"
 #include "pircompiler.h"
 #include "pircompunit.h"
@@ -176,9 +179,9 @@ static int evaluate_n_i(double a, pir_rel_operator op, int b);
 static int evaluate_s_s(char * const a, pir_rel_operator op, char * const b);
 
 static int evaluate_s(char * const s);
-static int evaluate_c(lexer_state * lexer, constant * const c);
+static int evaluate_c(lexer_state * const lexer, constant * const c);
 
-static char *concat_strings(lexer_state * lexer, char *a, char *b);
+static char *concat_strings(lexer_state * const lexer, char *a, char *b);
 
 static void create_if_instr(yyscan_t yyscanner, lexer_state * const lexer, int invert,
                             int hasnull, char * const name, char * const label);
@@ -190,6 +193,8 @@ static void check_first_arg_direction(yyscan_t yyscanner, char * const opname);
 
 static int check_op_args_for_symbols(yyscan_t yyscanner);
 static int get_opinfo(yyscan_t yyscanner);
+
+
 
 /* enable debugging of generated parser */
 #define YYDEBUG         1
@@ -209,8 +214,13 @@ static int get_opinfo(yyscan_t yyscanner);
 
 
 /* the parser aborts if there are more than 10 errors */
-#define MAX_NUM_ERRORS  10
+#define MAX_NUM_ERRORS          10
 
+#define COMPUTE_DURING_RUNTIME  -1
+
+#define DONT_INVERT_OPNAME      0
+
+#define NEED_INVERT_OPNAME      1
 
 %}
 
@@ -473,6 +483,7 @@ static int get_opinfo(yyscan_t yyscanner);
 TOP               : opt_nl
                     pir_chunks
                     opt_nl
+                        { fixup_global_labels(lexer); }
                   ;
 
 opt_nl            : /* empty */
@@ -581,7 +592,11 @@ multi_type        : identifier
                   ;
 
 parameter_list    : parameters
-                         { generate_get_params(lexer); }
+                         { /* XXX */
+                           /* generate_get_params(lexer); */
+                           set_instr(lexer, "get_params");
+                           update_op(lexer, CURRENT_INSTRUCTION(lexer), PARROT_OP_get_params_pc);
+                         }
                   ;
 
 parameters        : /* empty */
@@ -608,7 +623,10 @@ param_flag        : target_flag
                   ;
 
 invocant_param    : ":invocant" '(' multi_type ')'
-                         { $$ = TARGET_FLAG_INVOCANT; /* XXX handle multi_type */}
+                         { $$ = TARGET_FLAG_INVOCANT;
+                           /* XXX handle multi_type */
+
+                         }
                   ;
 
 unique_reg_flag   : ":unique_reg"
@@ -742,9 +760,10 @@ keylist_assignment: keylist '=' expression
 op_arg            : op_arg_expr
                          { push_operand(lexer, $1); }
                   | keylist
+                              /* XXX a keylist should become a PMC constant; I think we should
+                               * build the key constant here. XXX check out how. --kjs
+                               */
                          { push_operand(lexer, expr_from_key(lexer, $1)); }
-                  | keyaccess
-                         { push_operand(lexer, expr_from_target(lexer, $1)); }
                   ;
 
 op_arg_expr       : constant
@@ -755,6 +774,8 @@ op_arg_expr       : constant
                            $$ = expr_from_target(lexer, new_target(lexer, UNKNOWN_TYPE, $1));
                          }
                   | reg
+                         { $$ = expr_from_target(lexer, $1); }
+                  | keyaccess
                          { $$ = expr_from_target(lexer, $1); }
                   ;
 
@@ -827,7 +848,7 @@ parrot_op_assign  : target '=' parrot_op op_arg_expr ',' parrot_op_args
                           }
                         }
                   | target '=' parrot_op keylist ',' parrot_op_args
-                        {
+                        { /* XXX create a PMC const for $4 */
                           unshift_operand(lexer, expr_from_key(lexer, $4));
                           unshift_operand(lexer, expr_from_target(lexer, $1));
                           if (check_op_args_for_symbols(yyscanner))
@@ -1127,8 +1148,8 @@ conditional_instr : if_unless "null" TK_IDENT "goto" identifier
                         { create_if_instr(yyscanner, lexer, $1, 0, "null", $4); }
                   | if_unless condition "goto" identifier
                         {
-                          if ($2 == -1) { /* -1 means the condition is evaluated during runtime */
-                             if ($1) /* "unless"? if so, invert the instruction. */
+                          if ($2 == COMPUTE_DURING_RUNTIME) {
+                             if ($1 == NEED_INVERT_OPNAME) /* "unless" */
                                  invert_instr(lexer);
 
                              push_operand(lexer, expr_from_ident(lexer, $4));
@@ -1140,20 +1161,21 @@ conditional_instr : if_unless "null" TK_IDENT "goto" identifier
                               * if the result was true and the instr. was "if",
                               * do an unconditional jump.
                               */
-                             if ( (($2 == 0) && $1) || (($2 == 1) && !$1) ) {
+                             if (($2 == FALSE && $1 == NEED_INVERT_OPNAME)/* unless false -> jump */
+                             ||  ($2 == TRUE  && $1 == DONT_INVERT_OPNAME)) {  /* if true -> jump */
                                 set_instrf(lexer, "branch", "%I", $4);
                                 set_instr_flag(lexer, INSTR_FLAG_BRANCH);
                              }
-                             else
+                             else                       /* if false, unless true --> do nothing */
                                 set_instr(lexer, "noop");
 
                           }
                         }
                   ;
 
-/* the condition rule returns -1 if the condition can't be evaluated yet, so
- * it must be done during runtime. Otherwise, if the condition evaluates to
- * "false", 0 is returned, and if true, 1 is returned.
+/* the condition rule returns COMPUTE_DURING_RUNTIME (-1) if the condition can't be evaluated yet,
+ * so it must be done during runtime. Otherwise, if the condition evaluates to
+ * "false", FALSE (0) is returned, and if true, TRUE (1) is returned.
  */
 condition         : target rel_op expression
                         {
@@ -1167,7 +1189,7 @@ condition         : target rel_op expression
                           else
                               set_instrf(lexer, opnames[$2], "%T%E", $1, $3);
 
-                          $$ = -1;  /* -1 indicates this is evaluated at runtime */
+                          $$ = COMPUTE_DURING_RUNTIME;  /* indicates this is evaluated at runtime */
                         }
                   | TK_INTC rel_op target
                         {
@@ -1175,7 +1197,7 @@ condition         : target rel_op expression
                               set_instrf(lexer, opnames[$2 + 1], "%T%i", $3, $1);
                           else
                               set_instrf(lexer, opnames[$2], "%i%T", $1, $3);
-                          $$ = -1;
+                          $$ = COMPUTE_DURING_RUNTIME;
                         }
                   | TK_NUMC rel_op target
                         {
@@ -1184,7 +1206,7 @@ condition         : target rel_op expression
                           else
                               set_instrf(lexer, opnames[$2], "%n%T", $1, $3);
 
-                          $$ = -1;
+                          $$ = COMPUTE_DURING_RUNTIME;
                         }
                   | TK_STRINGC rel_op target
                         {
@@ -1193,7 +1215,7 @@ condition         : target rel_op expression
                           else
                               set_instrf(lexer, opnames[$2], "%s%T", $1, $3);
 
-                          $$ = -1;
+                          $$ = COMPUTE_DURING_RUNTIME;
                         }
                   | TK_INTC rel_op TK_INTC
                         { $$ = evaluate_i_i($1, $2, $3); }
@@ -1207,8 +1229,8 @@ condition         : target rel_op expression
                         { $$ = evaluate_s_s($1, $2, $3); }
                   ;
 
-if_unless         : "if"       { $$ = 0; /* no need to invert */ }
-                  | "unless"   { $$ = 1; /* yes, invert opname */ }
+if_unless         : "if"       { $$ = DONT_INVERT_OPNAME; /* no need to invert */ }
+                  | "unless"   { $$ = NEED_INVERT_OPNAME; /* yes, invert opname */ }
                   ;
 
 then              : "goto" /* PIR mode */
@@ -1489,7 +1511,8 @@ short_return_stat    : ".return" arguments "\n"
                               $$ = invoke(lexer, CALL_RETURN);
                               set_invocation_args($$, $2);
                             }
-                     | ".tailcall" simple_invocation "\n"
+                     /* XXX replace this .return with .tailcall; for testing, keep it .return. */
+                     | ".return" simple_invocation "\n"
                             { /* was the invocation a method call? then it becomes a method tail
                                * call, otherwise it's just a normal (sub) tail call.
                                */
@@ -1776,8 +1799,6 @@ augmented_op: "*="         { $$ = OP_MUL; }
 
 %%
 
-#include <math.h>
-#include "parrot/oplib/ops.h"
 
 /*
 
@@ -1794,6 +1815,8 @@ containing the result value. Both C<a> and C<b> are integer values.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static constant *
 fold_i_i(yyscan_t yyscanner, int a, pir_math_operator op, int b) {
     int result;
@@ -1894,6 +1917,8 @@ Same as C<fold_i_i>, except C<a> is of type double.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static constant *
 fold_n_i(yyscan_t yyscanner, double a, pir_math_operator op, int b) {
     double result;
@@ -1975,6 +2000,8 @@ Same as C<fold_i_i>, except C<b> is of type double.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static constant *
 fold_i_n(yyscan_t yyscanner, int a, pir_math_operator op, double b) {
     double result;
@@ -2057,6 +2084,8 @@ Same as C<fold_i_i>, except that both C<a> and C<b> are of type double.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static constant *
 fold_n_n(yyscan_t yyscanner, double a, pir_math_operator op, double b) {
     double result;
@@ -2142,8 +2171,10 @@ other operators will result in an error.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static constant *
-fold_s_s(yyscan_t yyscanner, char *a, pir_math_operator op, char *b) {
+fold_s_s(yyscan_t yyscanner, NOTNULL(char *a), pir_math_operator op, NOTNULL(char *b)) {
     switch (op) {
         case OP_CONCAT: {
             lexer_state *lexer = yyget_extra(yyscanner);
@@ -2198,6 +2229,7 @@ Wrapper for C<evaluate_n_n>, which takes arguments of type double.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
 static int
 evaluate_i_i(int a, pir_rel_operator op, int b) {
     return evaluate_n_n(a, op, b);
@@ -2214,6 +2246,7 @@ Wrapper for C<evaluate_n_n>, which takes arguments of type double.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
 static int
 evaluate_n_i(double a, pir_rel_operator op, int b) {
     return evaluate_n_n(a, op, b);
@@ -2230,6 +2263,7 @@ Wrapper for C<evaluate_n_n>, which takes arguments of type double.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
 static int
 evaluate_i_n(int a, pir_rel_operator op, double b) {
     return evaluate_n_n(a, op, b);
@@ -2246,6 +2280,7 @@ C<op> can be C<<!=>>, C<<==>>, C<< < >>, C<< <= >>, C<< > >> or C<< >= >>.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
 static int
 evaluate_n_n(double a, pir_rel_operator op, double b) {
     switch (op) {
@@ -2281,8 +2316,9 @@ Parrot source code; this function uses the result of C<strcmp()>.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
 static int
-evaluate_s_s(char * const a, pir_rel_operator op, char * const b) {
+evaluate_s_s(NOTNULL(char * const a), pir_rel_operator op, NOTNULL(char * const b)) {
     int result = strcmp(a, b); /* do /not/ use STREQ; we're interested in the result. */
 
     switch (op) {
@@ -2315,8 +2351,9 @@ Otherwise, it's true.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
 static int
-evaluate_s(char * const s) {
+evaluate_s(NOTNULL(char * const s)) {
     int strlen_s = strlen(s);
 
     if (strlen_s > 0) {
@@ -2337,7 +2374,7 @@ evaluate_s(char * const s) {
 /*
 
 =item C<static int
-evaluate_c(constant * const c)>
+evaluate_c(lexer_state * const lexer, constant * const c)>
 
 Evaluate a constant node in boolean context; if the constant is numeric,
 it must be non-zero to be true; if it's a string, C<evaluate_s> is invoked
@@ -2346,8 +2383,9 @@ to evaluate the string.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
 static int
-evaluate_c(lexer_state * lexer, constant * const c) {
+evaluate_c(NOTNULL(lexer_state * const lexer), NOTNULL(constant * const c)) {
     switch (c->type) {
         case INT_TYPE:
             return (c->val.ival != 0);
@@ -2366,19 +2404,20 @@ evaluate_c(lexer_state * lexer, constant * const c) {
 /*
 
 =item C<static char *
-concat_strings(char *a, char *b)>
+concat_strings(lexer_state * const lexer, char *a, char *b)>
 
 Concatenates two strings into a new buffer. The new string is returned.
 
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static char *
-concat_strings(lexer_state * lexer, char * a, char * b) {
+concat_strings(NOTNULL(lexer_state * const lexer), NOTNULL(char * a), NOTNULL(char * b)) {
     int strlen_a = strlen(a);
     char *newstr = (char *)pir_mem_allocate_zeroed(lexer, (strlen_a + strlen(b) + 1)
                                                           * sizeof (char));
-    PARROT_ASSERT(newstr != NULL);
     strcpy(newstr, a);
     strcpy(newstr + strlen_a, b);
     a = b = NULL;
@@ -2404,9 +2443,9 @@ C<name> is the name of the variable that is checked during this instruction
 
 */
 static void
-create_if_instr(yyscan_t yyscanner, lexer_state * const lexer, int invert, int hasnull,
-                char * const name,
-                char * const label)
+create_if_instr(yyscan_t yyscanner, NOTNULL(lexer_state * const lexer), int invert, int hasnull,
+                NOTNULL(char * const name),
+                NOTNULL(char * const label))
 {
     /* try to find the symbol; if it was declared it will be found; otherwise emit an error. */
     symbol *sym = find_symbol(lexer, name);
@@ -2439,8 +2478,9 @@ false otherwise. If the constant is not numeric, it returns always false.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
 static int
-check_value(constant * const c, int val) {
+check_value(NOTNULL(constant * const c), int val) {
     switch(c->type) {
         case INT_TYPE:
             return (c->val.ival == val);
@@ -2453,31 +2493,49 @@ check_value(constant * const c, int val) {
 }
 
 
-static void
-update_op(lexer_state * const lexer, instruction * const instr, int newop) {
-    instr->opinfo = &lexer->interp->op_info_table[newop];
-    /* opinfo->full_name is a const char * ... */
-    instr->opname = (char *)instr->opinfo->full_name;
-    instr->opcode = newop;
-}
+/*
+
+=item C<static void
+reduce_strength(yyscan_t yyscanner, int newop, int op2_index)>
+
+Do the actual strength reduction; the current op will be replaced by C<newop>.
+The operands at position 1 and C<op2_index> will be retrieved. C<op2_index> indicates
+the position of the second operand that must be retrieved.
+
+When the current instruction is:
+
+ add_i_i_ic
+
+then C<op2_index> will be 1, indicating the second operand must be retrieved.
+When the current instruction is:
+
+ add_i_ic_i
+
+then C<op2_index> will be 2, so that the two operands represented by target nodes
+are retrieved (the operands indicated as C<i>, as opposed by C<ic>.)
+
+Then, if the two operands (which are target nodes) are equal, then one of them can
+be removed, so that the direction of the first operand will change from OUT to INOUT.
 
 
+=cut
+
+*/
 static void
 reduce_strength(yyscan_t yyscanner, int newop, int op2_index) {
     lexer_state * const lexer = yyget_extra(yyscanner);
-    instruction * instr = CURRENT_INSTRUCTION(lexer);
-    /* based on the signatures, we know for sure that the
-     * first and second operands are targets.
-     */
+    instruction *       instr = CURRENT_INSTRUCTION(lexer);
+    /* based on the signatures, we know for sure that the first and second operands are targets. */
 
     /* get the operands */
     expression *op1, *op2;
+
+    PARROT_ASSERT(op2_index == 1 || op2_index == 2); /* count from 0, so 2nd or 3rd operand. */
 
     get_operands(lexer, BIT(0) | BIT(op2_index), &op1, &op2);
 
     /* check whether targets are equal */
     if (targets_equal(op1->expr.t, op2->expr.t)) {
-        fprintf(stderr, "operand 1 and operand at position %d are equal\n", op2_index);
         update_op(lexer, instr, newop);
         /* in that case, remove the second one */
         if (op2_index == 2)
@@ -2492,23 +2550,25 @@ reduce_strength(yyscan_t yyscanner, int newop, int op2_index) {
 
 /*
 
+=item C<static int
+convert_3_to_2_args(int opcode, int *second_op_index)>
 
-Given the 3-operand version of a Parrot math opcode, get the
+Given the 3-operand version of a Parrot math op (in the parameter C<opcode>), get the
 strength-reduced version with 2 operands. This is a low-level,
-"dirty-job-but-someone-has-to-do-it" function, so other higher
-level functions don't get cluttered.
+"dirty-job-but-someone-has-to-do-it" function, so other higher level functions
+don't get cluttered. If a 2-operand version is specified, then that version is returned.
 
-If a 2-operand version is specified, then that is returned.
+The second parameter C<second_op_index> will be assigned the index of the second target
+parameter, if any (note this is an I<out> parameter, as it is passed by address).
+So, in case of C<PARROT_OP_add_i_ic_i>, this will be 2, as that's the second target
+(start counting from 0). In case of C<PARROT_OP_add_i_i_ic>, it's 1.
 
-The second parameter C<second_op_index> will be assigned the index
-of the second target parameter, if any. So, in case of
-PARROT_OP_add_i_ic_i, this will be 2, as that's the second target
-(start counting from 0).
-
+=cut
 
 */
+PARROT_WARN_UNUSED_RESULT
 static int
-convert_3_to_2_args(int opcode, int *second_op_index) {
+convert_3_to_2_args(int opcode, NOTNULL(int *second_op_index)) {
     *second_op_index = 1; /* count from 0 */
     switch (opcode) {
         case PARROT_OP_add_i_i:
@@ -2541,6 +2601,20 @@ convert_3_to_2_args(int opcode, int *second_op_index) {
         case PARROT_OP_div_n_n_nc:
             return PARROT_OP_div_n_nc;
 
+        case PARROT_OP_div_i_ic_i:
+            *second_op_index = 2;
+            return PARROT_OP_div_i_ic;
+        case PARROT_OP_div_n_nc_n:
+            *second_op_index = 2;
+            return PARROT_OP_div_n_nc;
+
+        /* shouldn't these be constant-folded? XXX Why do these ops exist?
+        case PARROT_OP_div_i_ic_ic:
+            return PARROT_OP_div_i_ic_ic;
+        case PARROT_OP_div_n_nc_nc:
+        */
+
+
         case PARROT_OP_mul_i_i_i:
             return PARROT_OP_mul_i_i;
         case PARROT_OP_mul_i_i_ic:
@@ -2548,6 +2622,13 @@ convert_3_to_2_args(int opcode, int *second_op_index) {
         case PARROT_OP_mul_n_n_n:
             return PARROT_OP_mul_n_n;
         case PARROT_OP_mul_n_n_nc:
+            return PARROT_OP_mul_n_nc;
+
+        case PARROT_OP_mul_i_ic_i:
+            *second_op_index = 2;
+            return PARROT_OP_mul_i_ic;
+        case PARROT_OP_mul_n_nc_n:
+            *second_op_index = 2;
             return PARROT_OP_mul_n_nc;
 
         case PARROT_OP_fdiv_i_i_i:
@@ -2559,6 +2640,13 @@ convert_3_to_2_args(int opcode, int *second_op_index) {
         case PARROT_OP_fdiv_n_n_nc:
             return PARROT_OP_fdiv_n_nc;
 
+        case PARROT_OP_fdiv_n_nc_n:
+            *second_op_index = 2;
+            return PARROT_OP_fdiv_n_nc;
+        case PARROT_OP_fdiv_i_ic_i:
+            *second_op_index = 2;
+            return PARROT_OP_fdiv_i_ic;
+
         case PARROT_OP_sub_i_i_i:
             return PARROT_OP_sub_i_i;
         case PARROT_OP_sub_i_i_ic:
@@ -2566,6 +2654,13 @@ convert_3_to_2_args(int opcode, int *second_op_index) {
         case PARROT_OP_sub_n_n_n:
             return PARROT_OP_sub_n_n;
         case PARROT_OP_sub_n_n_nc:
+            return PARROT_OP_sub_n_nc;
+
+        case PARROT_OP_sub_i_ic_i:
+            *second_op_index = 2;
+            return PARROT_OP_sub_i_ic;
+        case PARROT_OP_sub_n_nc_n:
+            *second_op_index = 2;
             return PARROT_OP_sub_n_nc;
     }
     return -1;
@@ -2601,21 +2696,24 @@ becomes:
 static void
 do_strength_reduction(yyscan_t yyscanner) {
     lexer_state *lexer = yyget_extra(yyscanner);
-    instruction *instr = CURRENT_INSTRUCTION(lexer);
+    instruction *instr;
+    expression  *arg1;
+    expression  *arg2;
+    int          newop;
+    int          second_op_index;
     int          num_operands;
-    expression  *arg1          = NULL;
-    expression  *arg2          = NULL;
-    expression  *args[3];
-    int newop;
-    int second_op_index;
+
+    /* don't do strength reduction if a "don't do" flag was set */
+    if (TEST_FLAG(lexer->flags, LEXER_FLAG_NOSTRENGTHREDUCTION))
+      return;
+
+    instr = CURRENT_INSTRUCTION(lexer);
 
     newop = convert_3_to_2_args(instr->opcode, &second_op_index);
 
-    /* if it's not a Parrot math op, stop here. */
-    if (newop == -1) {
-
+    /* if it's not a parrot math op, don't do strength reduction. */
+    if (newop == -1)
         return;
-    }
 
     /* if there's more than 2 operands, do strength reduction. op_count also
      * counts the operand itself, so compare with 3, not 2.
@@ -2623,14 +2721,11 @@ do_strength_reduction(yyscan_t yyscanner) {
     if (instr->opinfo->op_count > 3)
         reduce_strength(yyscanner, newop, second_op_index);
 
-    /* get the arguments 1 and 2. */
+    /* Now, try to simplify instruction even more. add_i_ic can become inc_i if
+     * the second operand is 1, for instance. The instruction can be removed if
+     * the second operand is 0.
+     */
     get_operands(lexer, BIT(0) | BIT(1), &arg1, &arg2);
-
-
-    /*
-    fprintf(stderr, "arg1: %d\n", arg1->expr.c->val.ival);
-    fprintf(stderr, "arg2: %d\n", arg2->expr.c->val.ival);
-    */
 
     switch (instr->opcode) {
         case PARROT_OP_add_i_ic:
@@ -2696,53 +2791,10 @@ do_strength_reduction(yyscan_t yyscanner) {
                 update_op(lexer, instr, PARROT_OP_noop);
             break;
         default:
-            return;
+            break;
     }
 
-    return;
 
-    /* XXX what to do with these variants: ?
-    switch (opcode) {
-
-
-        case PARROT_OP_add_i_ic_i:
-        case PARROT_OP_add_n_nc_n:
-
-            op = OP_ADD;
-            break;
-
-
-        case PARROT_OP_div_i_ic_i:
-        case PARROT_OP_div_i_ic_ic:
-
-        case PARROT_OP_div_n_nc_n:
-        case PARROT_OP_div_n_nc_nc:
-            op = OP_DIV;
-            break;
-
-
-        case PARROT_OP_mul_i_ic_i:
-        case PARROT_OP_mul_n_nc_n:
-
-            op = OP_MUL;
-            break;
-
-
-        case PARROT_OP_fdiv_n_nc_n:
-        case PARROT_OP_fdiv_i_ic_i:
-
-            op = OP_FDIV;
-            break;
-
-        case PARROT_OP_sub_i_ic_i:
-        case PARROT_OP_sub_n_nc_n:
-            op = OP_SUB;
-            break;
-        default:
-            return;
-    }
-
-    */
 }
 
 /*
@@ -2768,7 +2820,7 @@ not be allowed.
 
 */
 static void
-check_first_arg_direction(yyscan_t yyscanner, char * const opname) {
+check_first_arg_direction(yyscan_t yyscanner, NOTNULL(char * const opname)) {
     int dir_first_arg;
     lexer_state * const lexer = yyget_extra(yyscanner);
 
@@ -2789,50 +2841,431 @@ check_first_arg_direction(yyscan_t yyscanner, char * const opname) {
 
 }
 
-char *get_signatured_opname(lexer_state * const lexer, instruction * const instr);
+
+
+
+/*
+
+=item C<static int
+get_signature_length(expression * const e)>
+
+Calculate the length of the signature for one operand; an operand is separated
+from the instruction name or another operand through '_', which must also
+be counted.
+
+ set $I0, 42  --> set_i_ic
+
+therefore, for $I0 (a target), return 1 for the type, 1 for the '_', and whatever
+is needed for a key, if any, as in this example:
+
+ set $P0[1] = "hi"  --> set_p_kic_sc
+
+$P0 is a target, resulting in "_p", the key [1] is a key ('k') of type int ('i'),
+and it's a constant ('c'). Add 1 for the '_'.
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
+static int
+get_signature_length(NOTNULL(expression * const e)) {
+    switch (e->type) {
+        case EXPR_TARGET:
+            return 2 + ((e->expr.t->key != NULL) /* if there's a key on this target ... */
+                       ? get_signature_length(e->expr.t->key->expr) + 1 /* ... get its length. */
+                       : 0);
+        case EXPR_CONSTANT:
+            return 3;
+        case EXPR_IDENT:
+            return 3; /* 1 for '_', 1 for 'i', 1 for 'c' */
+        case EXPR_KEY: /* for '_', 'k' */
+            return 2 + get_signature_length(e->expr.k->expr);
+    }
+    return 0;
+}
+
+
+/* the order of these letters match with the pir_type enumeration.
+ * These are used for generating the full opname (set I0, 10 -> set_i_ic).
+ */
+static char const type_codes[5] = {'i', 'n', 's', 'p', '?'};
+
+
+/*
+
+=item C<static char *
+write_signature(expression * const iter, char *instr_writer)>
+
+Write the signature for the operand C<iter>, using the character
+pointer C<instr_writer>. When the operand is an indexed target node
+(in other words, it has a key node), this function is invoked recursively
+passing the key as an argument.
+
+This function returns the updated character pointer (due to pass-by-value
+semantics of the C calling conventions).
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static char *
+write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
+    switch (iter->type) {
+        case EXPR_TARGET:
+            *instr_writer++ = type_codes[iter->expr.t->type];
+
+            if (iter->expr.t->key) {
+                *instr_writer++ = '_';
+                *instr_writer++ = 'k';
+                if ((iter->expr.t->key->expr->type == EXPR_TARGET)
+                    && (iter->expr.t->key->expr->expr.t->type == PMC_TYPE)) {
+                    /* the key is a target, and its type is a PMC. In that case, do not
+                     * print the signature; 'kp' is not valid.
+                     */
+                }
+                else {
+                    /*
+                    instr_writer = write_signature(iter->expr.t->key->expr, instr_writer);
+                    */
+                    switch (iter->expr.t->key->expr->type) {
+                        case EXPR_CONSTANT:
+                            *instr_writer++ = 'c';
+                            break;
+                        default:
+                            fprintf(stderr, "write_signature: non-constant key\n");
+                            instr_writer = write_signature(iter->expr.t->key->expr, instr_writer);
+                            break;
+                    }
+                }
+            }
+            break;
+        case EXPR_CONSTANT:
+            *instr_writer++ = type_codes[iter->expr.c->type];
+            *instr_writer++ = 'c';
+            break;
+        case EXPR_IDENT: /* used for labels; these will be converted to (i)nteger (c)onstants*/
+            *instr_writer++ = 'i';
+            *instr_writer++ = 'c';
+            break;
+        case EXPR_KEY:
+            *instr_writer++ = 'k';
+
+            instr_writer    = write_signature(iter->expr.k->expr, instr_writer);
+            /*
+
+            switch (iter->expr.k->expr->type) {
+                case EXPR_CONSTANT:
+                   *instr_writer++ = 'c';
+                   break;
+                default:
+                    fprintf(stderr, "write_signature: non-constant key\n");
+                    instr_writer = write_signature(iter->expr.k->expr, instr_writer);
+                    break;
+            }
+            */
+
+            break;
+    }
+    return instr_writer;
+}
+
+
+/*
+
+=item C<static char *
+get_signatured_opname(instruction * const instr)>
+
+Returns the full opname of the instruction C<name>; the signature
+of the opname is based on the operands, some examples are shown
+below:
+
+ set I0, 10        --> set_i_ic
+ print "hi"        --> print_sc
+ set P0[1], 3.14   --> set_p_kic_nc
+
+For each operand, an underscore is added; then for the types
+int, num, string or pmc, an 'i', 'n', 's' or 'p' is added
+respectively. If the operand is a constant, a 'c' suffic is added.
+
+If the operand is a key of something, a 'k' prefix is added.
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static char *
+get_signatured_opname(NOTNULL(lexer_state * const lexer), NOTNULL(instruction * const instr)) {
+    size_t      fullname_length;
+    char       *fullname;
+    char       *instr_writer;
+    expression *iter         = instr->operands;
+    unsigned    num_operands = 0;
+
+    /* get length of short opname (and add 1 for the NULL character) */
+    fullname_length = strlen(instr->opname) + 1;
+
+    /* for each operand, calculate the length of the signature (for that op.)
+     * and add it to the full length.
+     */
+    if (iter) {
+        iter = iter->next;
+        do {
+            int keylength    = get_signature_length(iter);
+            /* printf("keylength of operand was: %d\n", keylength);
+            */
+            fullname_length += keylength;
+            iter             = iter->next;
+            ++num_operands;
+        }
+        while (iter != instr->operands->next);
+    }
+
+    /* now we know how long the fullname will be, allocate enough memory. */
+    fullname = (char *)pir_mem_allocate_zeroed(lexer, fullname_length * sizeof (char));
+
+    /* copy the short name into fullname buffer, and set instr_writer to
+     * the character after that.
+     */
+    strcpy(fullname, instr->opname);
+    instr_writer = fullname + strlen(instr->opname);
+
+    /* now iterate again over all operands, and codify them into the fullname.
+     * As we counted the number of operands, this loop can be written a bit simpler.
+     */
+    iter = instr->operands;
+    while (num_operands-- > 0) {
+        iter            = iter->next;
+        *instr_writer++ = '_'; /* separate each operand code by a '_' */
+        instr_writer    = write_signature(iter, instr_writer);
+    }
+
+    return fullname;
+}
+
+/*
+
+XXX temp. solution.
+
+*/
+PARROT_WARN_UNUSED_RESULT
+static double
+get_constant_value(constant * const c) {
+    PARROT_ASSERT(c->type == INT_TYPE || c->type == NUM_TYPE);
+
+    switch (c->type) {
+        case INT_TYPE:
+            return c->val.ival;
+        case NUM_TYPE:
+            return c->val.nval;
+        default:
+            return 0;
+    }
+}
+
+
+/*
+
+XXX is this really needed? why not just disallow lt 10, 20, L ?
+
+*/
+static void
+flow_op_const_fold(yyscan_t yyscanner, int flow_op) {
+    lexer_state * const lexer = yyget_extra(yyscanner);
+    expression *arg1, *arg2, *arg3;
+    int result;
+    instruction * instr = CURRENT_INSTRUCTION(lexer);
+    double arg1val, arg2val;
+
+    PARROT_ASSERT(instr);
+
+    get_operands(lexer, BIT(0) | BIT(1) | BIT(2), &arg1, &arg2, &arg3);
+    /*
+    arg1 = get_operand(lexer, 1);
+    arg2 = get_operand(lexer, 2);
+    arg3 = get_operand(lexer, 3);
+    */
+
+    PARROT_ASSERT(arg1);
+    PARROT_ASSERT(arg2);
+
+    arg1val = get_constant_value(arg1->expr.c);
+    arg2val = get_constant_value(arg2->expr.c);
+
+    result = evaluate_n_n(arg1val, flow_op, arg2val);
+
+    PARROT_ASSERT(result == TRUE || result == FALSE);
+
+    if (result == FALSE) {
+        update_op(lexer, instr, PARROT_OP_noop); /* XXX maybe delete/clear such instructions. */
+    }
+    else { /* true */
+        update_op(lexer, instr, PARROT_OP_branch_ic);
+        instr->operands = NULL;
+        push_operand(lexer, arg3);
+        arg3->next = arg3;
+    }
+
+
+
+
+}
+
+/*
+
+=item C<static void
+math_op_const_fold(yyscan_t yyscanner, int folding_op, int new_op)>
+
+Do constant folding for the math operator C<folding_op>; this can be
+OP_ADD, OP_SUB, or OP_MUL. This function takes the 2nd and 3rd operands
+and computes the result based on C<folding_op>. The 2nd and 3rd operands
+are removed from the instruction, and the computed result is added as a new
+2nd operand.
+
+XXX really needed? Why not just disallow add $I0, 10, 20 ??
+
+=cut
+
+*/
+static void
+math_op_const_fold(yyscan_t yyscanner, int folding_op, int new_op) {
+    expression  * const arg1,
+                * const arg2,
+                * const arg3;
+    lexer_state * const lexer = yyget_extra(yyscanner);
+    instruction * const instr = CURRENT_INSTRUCTION(lexer);
+    constant    *       result;
+    double              arg1val,
+                        arg2val;
+    pir_type type1, type2;
+
+    update_op(lexer, instr, new_op);
+
+    /* now do constant-folding on the 2nd and 3rd arguments. */
+
+    get_operands(lexer, BIT(0) | BIT(1) | BIT(2), &arg1, &arg2, &arg3);
+
+
+    /* based on the constant types, retrieve the values from the right union fields;
+     * note that fold_i_i must be called only when both types are INT_TYPE; adding
+     * int + float will result in float anyway.
+     * This code is not very nice, but it's straightforward, and unfortunately necessary.
+     */
+    type1 = arg2->expr.c->type;
+    type2 = arg3->expr.c->type;
+
+    if (type1 == NUM_TYPE || type2 == NUM_TYPE) {
+        double val1;
+        double val2;
+
+        if (type1 == NUM_TYPE)
+            val1 = arg2->expr.c->val.nval;
+        else
+            val1 = arg2->expr.c->val.ival;
+
+        if (type2 == NUM_TYPE)
+            val2 = arg3->expr.c->val.nval;
+        else
+            val2 = arg3->expr.c->val.ival;
+
+        result = fold_n_n(yyscanner, val1, folding_op, val2);
+    }
+    else { /* both are not NUM_TYPE */
+        result = fold_i_i(yyscanner, arg2->expr.c->val.ival, folding_op, arg3->expr.c->val.ival);
+    }
+
+
+
+    /* remove all operands on the current instruction */
+    CURRENT_INSTRUCTION(lexer)->operands = NULL;
+    /* operands are circular linked lists; arg1 is the only operand to be kept, so update
+     * its next pointer; otherwise, the old operands are still there through this link.
+     */
+    arg1->next = arg1;
+
+    /* add the first operand, and the result for the "set" op. */
+    push_operand(lexer, arg1);
+    push_operand(lexer, expr_from_const(lexer, result));
+
+}
 
 /*
 
 =item C<static int
 get_opinfo(yyscan_t yyscanner)>
 
-
+Compute the signatured opname from the instruction name and its arguments.
+Based on this signature, the opcode is retrieved. If the opcode cannot
+be found (i.e., it's -1), then a check is done for some special math ops;
+C<add_i_ic_ic> and the like do not exist, but instead should be replaced
+by C<set_i_ic> (and the like). If it's not one of these special cases,
+then that means the op is not valid, and an error message will be reported.
 
 =cut
 
 */
+PARROT_IGNORABLE_RESULT
 static int
 get_opinfo(yyscan_t yyscanner) {
     lexer_state * const lexer = yyget_extra(yyscanner);
-
     instruction * const instr = CURRENT_INSTRUCTION(lexer);
 
-    char * fullopname   = get_signatured_opname(lexer, instr);
-    int opcode;
-
-    /*
-    if (STREQ(fullopname, "add_i_ic_ic"))
-        fullopname = "set_i_ic";
-    */
+    char * const fullopname = get_signatured_opname(lexer, instr);
+    int          opcode;
 
     /* find the numeric opcode for the signatured op. */
     opcode = lexer->interp->op_lib->op_code(fullopname, 1);
 
-    /* if the op does not exist, emit an error message */
+    /* if the op does not exist, it might be one of the math. ops that need
+     * constant folding.
+     */
     if (opcode < 0) {
-        yyerror(yyscanner, lexer, "'%s' is not a parrot op", fullopname);
-        return FALSE;
+
+        /* do these tests only if opcode was not found; this way, the checks are not done
+         * for all instructions, but only if the instruction was not found.
+         */
+        if (STREQ(fullopname, "add_i_ic_ic")) {
+            math_op_const_fold(yyscanner, OP_ADD, PARROT_OP_set_i_ic);
+            return TRUE;
+        }
+        else if (STREQ(fullopname, "add_n_ic_ic")) {
+            math_op_const_fold(yyscanner, OP_ADD, PARROT_OP_set_n_ic);
+            return TRUE;
+        }
+        else if (STREQ(fullopname, "add_n_nc_nc")) {
+            math_op_const_fold(yyscanner, OP_ADD, PARROT_OP_set_n_nc);
+            return TRUE;
+        }
+        else if (STREQ(fullopname, "sub_i_ic_ic")) {
+            math_op_const_fold(yyscanner, OP_SUB, PARROT_OP_set_i_ic);
+            return TRUE;
+        }
+        else if (STREQ(fullopname, "sub_n_nc_nc")) {
+            math_op_const_fold(yyscanner, OP_SUB, PARROT_OP_set_n_nc);
+            return TRUE;
+        }
+        else if (STREQ(fullopname, "sub_n_ic_ic")) {
+            math_op_const_fold(yyscanner, OP_SUB, PARROT_OP_set_n_ic);
+            return TRUE;
+        }
+        else if (STREQ(fullopname, "mul_i_ic_ic")) {
+            math_op_const_fold(yyscanner, OP_MUL, PARROT_OP_set_i_ic);
+            return TRUE;
+        }
+        else if (STREQ(fullopname, "lt_ic_ic_ic")) {
+            flow_op_const_fold(yyscanner, OP_LT);
+            return TRUE;
+        }
+        else {
+            yyerror(yyscanner, lexer, "'%s' is not a parrot op", fullopname);
+            return FALSE;
+        }
     }
-
-    /* store the opinfo, signatured opnmae and opcde in the current instruction */
-    /*
-    instr->opinfo = &lexer->interp->op_info_table[opcode];
-    instr->opname = fullopname;
-    instr->opcode = opcode;
-    */
-    update_op(lexer, instr, opcode);
-
-    return TRUE;
+    else {
+        update_op(lexer, instr, opcode);
+        return TRUE;
+    }
 
 }
 
@@ -2852,21 +3285,22 @@ If there are errors, FALSE is returned; if successful, TRUE is returned.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
 static int
 check_op_args_for_symbols(yyscan_t yyscanner) {
     lexer_state * const lexer = yyget_extra(yyscanner);
-    struct   op_info_t * opinfo;
-    short    i;
-    short    opcount;
-    unsigned num_operands;
-    char    *fullopname;
-    int      opcode;
-    int      result;
-    int      label_bitmask = 0; /* an int is at least 32 bits;
-                                 * an op cannot have more than 8 operands, as defined in
-                                 * include/parrot/op.h:18, so an int is good enough for
-                                 * a bit mask to cover all operands.
-                                 */
+    struct op_info_t  * opinfo;
+    short               i;
+    short               opcount;
+    unsigned            num_operands;
+    char               *fullopname;
+    int                 opcode;
+    int                 result;
+    int                 label_bitmask = 0; /* an int is at least 32 bits;
+                                            * an op cannot have more than 8 operands, as defined in
+                                            * include/parrot/op.h:18, so an int is good enough for
+                                            * a bit mask to cover all operands.
+                                            */
 
     /* iterate over all operands to set the type and PASM register on all target nodes, if any */
     num_operands = get_operand_count(lexer);
@@ -2908,30 +3342,39 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
     /* if failure, return false */
     if (result == FALSE)
         return FALSE;
+    else {
+        int i = 0;
+        expression *iter = CURRENT_INSTRUCTION(lexer)->operands;
+        opinfo           = CURRENT_INSTRUCTION(lexer)->opinfo;
 
-    opinfo = CURRENT_INSTRUCTION(lexer)->opinfo;
 
-    PARROT_ASSERT(opinfo);
+        PARROT_ASSERT(opinfo);
 
-    opcount = opinfo->op_count - 1; /* according to op.h, opcount also counts the op itself. */
+        opcount = opinfo->op_count - 1; /* according to op.h, opcount also counts the op itself. */
 
-    PARROT_ASSERT(opcount >= 0);
+        PARROT_ASSERT(opcount >= 0);
 
-    for (i = 0; i < opcount; i++) {
-        expression *operand = get_operand(lexer, i + 1); /* get_operand starts counting at 1 */
+        if (iter == NULL)
+            return TRUE;
 
-        PARROT_ASSERT(operand);
+        iter = iter->next; /* go to first */
 
-        if (opinfo->labels[i] == 0) { /* operand i is NOT a LABEL */
-             /* test the bitmask; if we expected this operand was a label, but now we found out
-              * through opinfo that it's not supposed to be a label at this position, so emit
-              * an error.
-              */
-             if (TEST_BIT(label_bitmask, BIT(i))) {
-                 PARROT_ASSERT(operand->type == EXPR_IDENT);
-                 yyerror(yyscanner, lexer, "symbol '%s' is not declared", operand->expr.id);
-                 return FALSE;
-             }
+
+        /* iterate over all operands */
+        while (iter != CURRENT_INSTRUCTION(lexer)->operands->next) {
+            if (opinfo->labels[i] == 0) {
+                /* test the bitmask; if we expected this operand was a label, but now we found out
+                 * through opinfo that it's not supposed to be a label at this position, so emit
+                 * an error.
+                 */
+                if (TEST_BIT(label_bitmask, BIT(i))) {
+                    yyerror(yyscanner, lexer, "symbol '%s' is not declared", iter->expr.id);
+                    return FALSE;
+                }
+            }
+
+            iter = iter->next;
+            ++i;
         }
     }
     return TRUE;

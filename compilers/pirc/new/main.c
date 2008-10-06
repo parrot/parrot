@@ -10,7 +10,7 @@
 #include <stdarg.h>
 #include "pirparser.h"
 #include "pircompiler.h"
-
+#include "piremit.h"
 
 /* use pthreads library to test thread safety.
    does not work currently on windows.
@@ -63,6 +63,8 @@ print_help(char const * const program_name)
     fprintf(stderr, "  -d        show debug messages of parser\n");
     fprintf(stderr, "  -h        show this help message\n");
     fprintf(stderr, "  -W        show warning messages\n");
+    fprintf(stderr, "  -S        do not perform strength reduction\n");
+    fprintf(stderr, "  -v        verbose mode\n");
     fprintf(stderr, "  -o <file> write output to the specified file. "
                     "Currently only works in combination with '-E' option\n");
 }
@@ -107,7 +109,7 @@ typedef struct parser_args {
     FILE *infile;
     char *filename;
     int   thr_id;
-    int   warnings;
+    int   flags;
 
 } parser_args;
 
@@ -130,7 +132,7 @@ parse_file(void *a) {
     FILE        *infile    = args->infile;
     char        *filename  = args->filename;
     int          thr_id    = args->thr_id;
-    int          warnings  = args->warnings;
+    int          flags     = args->flags;
 
     /* create a yyscan_t object */
     yylex_init(&yyscanner);
@@ -139,7 +141,7 @@ parse_file(void *a) {
     /* set the input file */
     yyset_in(infile, yyscanner);
     /* set the extra parameter in the yyscan_t structure */
-    lexer = new_lexer(filename, warnings);
+    lexer = new_lexer(filename, flags);
     yyset_extra(lexer, yyscanner);
     /* go parse */
     yyparse(yyscanner, lexer);
@@ -155,7 +157,7 @@ parse_file(void *a) {
         print_subs(lexer);
         fclose(lexer->outfile);
 
-        if (warnings)
+        if (TEST_FLAG(lexer->flags, LEXER_FLAG_WARNINGS))
             check_unused_symbols(lexer);
 
     }
@@ -191,7 +193,7 @@ int
 main(int argc, char *argv[]) {
     char const * const program_name = argv[0];
     int                flexdebug    = 0;
-    int                warningson   = 0;
+    int                flags        = 0;
     char              *filename     = NULL;
     char              *outputfile   = NULL;
 
@@ -230,7 +232,13 @@ main(int argc, char *argv[]) {
                 }
                 break;
             case 'W':
-                warningson = 1;
+                SET_FLAG(flags, LEXER_FLAG_WARNINGS);
+                break;
+            case 'S':
+                SET_FLAG(flags, LEXER_FLAG_NOSTRENGTHREDUCTION);
+                break;
+            case 'v':
+                SET_FLAG(flags, LEXER_FLAG_VERBOSE);
                 break;
             default:
                 fprintf(stderr, "Unknown option: '%c'\n", argv[0][1]);
@@ -273,7 +281,7 @@ main(int argc, char *argv[]) {
         args.infile    = infile;
         args.filename  = filename;
         args.thr_id    = i;
-        args.warnings  = warningson;
+        args.flags     = flags;
 
         pthread_create(&threads[i], NULL, parse_file, &args);
 
@@ -307,7 +315,7 @@ main(int argc, char *argv[]) {
     args.infile    = infile;
     args.filename  = filename;
     args.thr_id    = 0;
-    args.warnings  = warningson;
+    args.flags     = flags;
 
     parse_file(&args);
 }
@@ -329,8 +337,11 @@ parser finds a syntax error.
 =cut
 
 */
+PARROT_IGNORABLE_RESULT
 int
-yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message, ...) {
+yyerror(yyscan_t yyscanner, NOTNULL(lexer_state * const lexer),
+        NOTNULL(char const * const message), ...)
+{
     char const * const current_token = yyget_text(yyscanner);
     va_list arg_ptr;
 

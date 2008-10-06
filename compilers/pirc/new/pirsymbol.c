@@ -59,7 +59,7 @@ This is the vanilla register allocator.
 
 */
 int
-next_register(struct lexer_state * const lexer, pir_type type) {
+next_register(NOTNULL(struct lexer_state * const lexer), pir_type type) {
     CURRENT_SUB(lexer)->regs_used[type]++; /* count number of registers used */
     return lexer->curregister[type]++;
 }
@@ -76,8 +76,10 @@ This code is taken from IMCC.
 =cut
 
 */
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 unsigned
-get_hashcode(char * const str, unsigned num_buckets) {
+get_hashcode(NOTNULL(char * const str), unsigned num_buckets) {
     unsigned long  key = 0;
     char const    *s;
 
@@ -98,7 +100,7 @@ Store the bucket C<buck> in the hashtable C<table> at index C<hash>.
 
 */
 void
-store_bucket(hashtable * const table, bucket * const buck, unsigned long hash) {
+store_bucket(NOTNULL(hashtable * const table), NOTNULL(bucket * const buck), unsigned long hash) {
     buck->next = table->contents[hash];
     table->contents[hash] = buck;
 }
@@ -113,8 +115,10 @@ Return the bucket at hash index C<hash> from the hashtable C<table>.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 bucket *
-get_bucket(hashtable * const table, unsigned long hash) {
+get_bucket(NOTNULL(hashtable * const table), unsigned long hash) {
     return table->contents[hash];
 }
 
@@ -128,8 +132,10 @@ Create a new symbol node, returns it after initialization.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 symbol *
-new_symbol(lexer_state * const lexer, char * const name, pir_type type) {
+new_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char * const name), pir_type type) {
     symbol *sym = pir_mem_allocate_zeroed_typed(lexer, symbol);
     sym->name   = name;
     sym->type   = type;
@@ -154,7 +160,9 @@ will have been given a PASM register.
 
 */
 void
-declare_local(struct lexer_state * const lexer, pir_type type, symbol * const list) {
+declare_local(NOTNULL(struct lexer_state * const lexer), pir_type type,
+              NOTNULL(symbol * const list))
+{
     symbol    *iter  = list;
     hashtable *table = &CURRENT_SUB(lexer)->symbols;
 
@@ -183,7 +191,7 @@ never used, a warning message is printed to C<stderr>.
 
 */
 void
-check_unused_symbols(struct lexer_state * const lexer) {
+check_unused_symbols(NOTNULL(struct lexer_state * const lexer)) {
     subroutine *subiter = lexer->subs->next; /* start at first sub. */
 
     puts("");
@@ -221,8 +229,10 @@ allocate a PASM register for it.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 symbol *
-find_symbol(struct lexer_state * const lexer, char * const name) {
+find_symbol(NOTNULL(struct lexer_state * const lexer), NOTNULL(char * const name)) {
     hashtable    *table    = &CURRENT_SUB(lexer)->symbols;
     unsigned long hashcode = get_hashcode(name, table->size);
     bucket       *buck     = get_bucket(table, hashcode);
@@ -251,8 +261,10 @@ identified by C<regno> and of type C<type>.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static pir_reg *
-new_pir_reg(lexer_state * const lexer, pir_type type, int regno) {
+new_pir_reg(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     pir_reg *r = pir_mem_allocate_zeroed_typed(lexer, pir_reg);
     r->type    = type;
     r->regno   = regno;
@@ -272,8 +284,10 @@ a pointer to it is returned, if not, NULL is returned.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static pir_reg *
-find_register(struct lexer_state * const lexer, pir_type type, int regno) {
+find_register(NOTNULL(struct lexer_state * const lexer), pir_type type, int regno) {
     /* should do a binary search. fix later.
      */
     pir_reg *iter = CURRENT_SUB(lexer)->registers[type];
@@ -310,7 +324,7 @@ The function returns the allocated PASM register.
 
 */
 static int
-use_register(struct lexer_state * const lexer, pir_type type, int regno) {
+use_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     pir_reg *reg;
 
     /* create a new node representing this PIR register */
@@ -365,7 +379,7 @@ and a new (pasm) register is allocated to it, which is returned.
 
 */
 int
-color_reg(struct lexer_state * const lexer, pir_type type, int regno) {
+color_reg(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     pir_reg *reg = find_register(lexer, type, regno);
 
     /* was the register already used, then it was already colored by
@@ -389,8 +403,10 @@ Constructor to create a new global_label object.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static global_label *
-new_global_label(lexer_state * const lexer, char * const name) {
+new_global_label(NOTNULL(lexer_state * const lexer), NOTNULL(char * const name)) {
     global_label *glob = pir_mem_allocate_zeroed_typed(lexer, global_label);
     glob->name         = name;
     glob->const_nr     = 0;
@@ -402,13 +418,13 @@ new_global_label(lexer_state * const lexer, char * const name) {
 =item C<void
 store_global_label(struct lexer_state * const lexer, char * const name)>
 
-Store the global identifier C<name>.
+Store the global identifier C<name> in C<lexer>'s global label table.
 
 =cut
 
 */
 void
-store_global_label(struct lexer_state * const lexer, char * const name) {
+store_global_label(NOTNULL(lexer_state * const lexer), NOTNULL(char * const name)) {
     hashtable    *table = &lexer->globals;
     unsigned long hash  = get_hashcode(name, table->size);
     bucket *b           = new_bucket(lexer);
@@ -428,8 +444,10 @@ then NULL is returned.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 global_label *
-find_global_label(struct lexer_state * const lexer, char * const name) {
+find_global_label(NOTNULL(lexer_state * const lexer), NOTNULL(char * const name)) {
     hashtable    *table    = &lexer->globals;
     unsigned long hashcode = get_hashcode(name, table->size);
     bucket *b              = get_bucket(table, hashcode);
@@ -454,7 +472,7 @@ Store the globally defined constant C<c> in the constant table.
 
 */
 void
-store_global_constant(struct lexer_state * const lexer, constant * const c) {
+store_global_constant(NOTNULL(lexer_state * const lexer), NOTNULL(constant * const c)) {
     hashtable    *table = &lexer->constants;
     unsigned long hash  = get_hashcode(c->name, table->size);
     bucket *b           = new_bucket(lexer);
@@ -473,8 +491,10 @@ that name, then NULL is returned.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 constant *
-find_global_constant(struct lexer_state * const lexer, char * const name) {
+find_global_constant(NOTNULL(lexer_state * const lexer), NOTNULL(char * const name)) {
     hashtable    *table    = &lexer->constants;
     unsigned long hashcode = get_hashcode(name, table->size);
     bucket *b              = get_bucket(table, hashcode);
@@ -501,8 +521,10 @@ location in the source to which any branching instruction can jump to.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static local_label *
-new_local_label(lexer_state * const lexer, char * const name, unsigned offset) {
+new_local_label(NOTNULL(lexer_state * const lexer), NOTNULL(char * const name), unsigned offset) {
     local_label *l = pir_mem_allocate_zeroed_typed(lexer, local_label);
     l->name        = name;
     l->offset      = offset;
@@ -518,7 +540,9 @@ store_local_label(struct lexer_state * const lexer, char * const labelname, unsi
 
 */
 void
-store_local_label(struct lexer_state * const lexer, char * const labelname, unsigned offset) {
+store_local_label(NOTNULL(lexer_state * const lexer), NOTNULL(char * const labelname),
+                  unsigned offset)
+{
     local_label  *l     = new_local_label(lexer, labelname, offset);
     hashtable    *table = &CURRENT_SUB(lexer)->labels;
     unsigned long hash  = get_hashcode(labelname, table->size);
@@ -538,8 +562,9 @@ a label, an error is emitted, otherwise, the offset of that label is returned.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
 unsigned
-find_local_label(struct lexer_state * const lexer, char * const labelname) {
+find_local_label(NOTNULL(lexer_state * const lexer), NOTNULL(char * const labelname)) {
     hashtable    *table    = &CURRENT_SUB(lexer)->labels;
     unsigned long hashcode = get_hashcode(labelname, table->size);
     bucket *b              = get_bucket(table, hashcode);

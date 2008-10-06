@@ -31,6 +31,9 @@ the list of blocks.
 =cut
 
 */
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static allocated_mem_ptrs *
 new_mem_ptrs_block(void) {
     return mem_allocate_zeroed_typed(allocated_mem_ptrs);
@@ -48,7 +51,7 @@ is invoked, C<ptr> will be freed through C<mem_sys_free()>.
 
 */
 static void
-register_ptr(lexer_state *lexer, void *ptr) {
+register_ptr(NOTNULL(lexer_state *lexer), ARGIN(void *ptr)) {
     allocated_mem_ptrs *ptrs = lexer->mem_allocations;
 
     PARROT_ASSERT(ptrs);
@@ -77,8 +80,11 @@ iterating over these pointers and freeing them.
 =cut
 
 */
+PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 void *
-pir_mem_allocate_zeroed(lexer_state * const lexer, size_t numbytes) {
+pir_mem_allocate_zeroed(NOTNULL(lexer_state * const lexer), size_t numbytes) {
     void *ptr = mem_sys_allocate_zeroed(numbytes);
 
     totalmem += numbytes;
@@ -90,7 +96,7 @@ pir_mem_allocate_zeroed(lexer_state * const lexer, size_t numbytes) {
 /*
 
 =item C<void
-init_hashtable(hashtable * table, unsigned size)>
+init_hashtable(lexer_state * const lexer, hashtable * const table, unsigned size)>
 
 Initialize the hashtable C<table> with space for C<size> buckets.
 
@@ -98,7 +104,9 @@ Initialize the hashtable C<table> with space for C<size> buckets.
 
 */
 void
-init_hashtable(lexer_state * const lexer, hashtable * table, unsigned size) {
+init_hashtable(NOTNULL(lexer_state * const lexer), NOTNULL(hashtable * const table),
+               unsigned size)
+{
     table->contents  = (bucket **)pir_mem_allocate_zeroed(lexer, size * sizeof (bucket *));
     table->size      = size;
     table->obj_count = 0;
@@ -115,8 +123,11 @@ a Parrot interpreter structure.
 =cut
 
 */
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 lexer_state *
-new_lexer(char * const filename, int flags) {
+new_lexer(NULLOK(char * const filename), int flags) {
     lexer_state *lexer     = mem_allocate_zeroed_typed(lexer_state);
     lexer->filename        = filename;
     lexer->interp          = Parrot_new(NULL);
@@ -152,7 +163,7 @@ Write an error message to C<stderr> and increment number of errors.
 
 */
 void
-pirerror(lexer_state * const lexer, char const * const message, ...) {
+pirerror(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const message), ...) {
     va_list arg_ptr;
 
     va_start(arg_ptr, message);
@@ -175,8 +186,10 @@ Constructor for a bucket object.
 =cut
 
 */
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 bucket *
-new_bucket(lexer_state * const lexer) {
+new_bucket(NOTNULL(lexer_state * const lexer)) {
     return pir_mem_allocate_zeroed_typed(lexer, bucket);
 }
 
@@ -194,7 +207,7 @@ program will be used many times.
 
 */
 static void
-store_string(lexer_state * const lexer, char * const str) {
+store_string(NOTNULL(lexer_state * const lexer), NOTNULL(char * const str)) {
     hashtable    *table = &lexer->strings;
     unsigned long hash  = get_hashcode(str, table->size);
     bucket *b           = new_bucket(lexer);
@@ -215,8 +228,10 @@ that buffer will be returned.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static char *
-find_string(lexer_state * const lexer, char * const str) {
+find_string(NOTNULL(lexer_state * const lexer), NOTNULL(char * const str)) {
     hashtable    *table = &lexer->strings;
     unsigned long hash  = get_hashcode(str, table->size);
     bucket *b           = get_bucket(table, hash);
@@ -245,8 +260,10 @@ XXX maybe make this a runtime (commandline) option? Might be slightly slower.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 char *
-dupstrn(lexer_state * const lexer, char * const source, size_t slen) {
+dupstrn(NOTNULL(lexer_state * const lexer), NOTNULL(char * const source), size_t slen) {
     char *result = find_string(lexer, source);
     /* make sure the string is terminated in time */
     source[slen] = '\0';
@@ -275,8 +292,10 @@ does: duplicate a string.
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 char *
-dupstr(lexer_state * const lexer, char * const source) {
+dupstr(NOTNULL(lexer_state * const lexer), NOTNULL(char * const source)) {
     return dupstrn(lexer, source, strlen(source));
 }
 
@@ -293,10 +312,11 @@ Call the destructor on the Parrot Interpreter, and free C<lexer> itself.
 
 */
 void
-release_resources(lexer_state *lexer) {
+release_resources(NOTNULL(lexer_state *lexer)) {
     allocated_mem_ptrs *iter;
 
-    fprintf(stderr, "Total nr of bytes allocated: %d\n", totalmem);
+    if (TEST_FLAG(lexer->flags, LEXER_FLAG_VERBOSE))
+        fprintf(stderr, "Total nr of bytes allocated: %d\n", totalmem);
 
     Parrot_destroy(lexer->interp);
 
@@ -306,6 +326,7 @@ release_resources(lexer_state *lexer) {
         allocated_mem_ptrs *temp = iter;
         unsigned i;
 
+        /* free all pointers in the ppointer block */
         for (i = 0; i < iter->allocs_in_this_block; i++)
             mem_sys_free(iter->ptrs[i]);
 

@@ -49,7 +49,7 @@ typedef struct global_label {
 
 } global_label;
 
-
+/* structure to represent a local label */
 typedef struct local_label {
     char               *name;
     unsigned            offset;

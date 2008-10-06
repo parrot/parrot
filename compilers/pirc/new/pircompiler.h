@@ -28,7 +28,9 @@ typedef struct cache {
 
 
 typedef enum lexer_flags {
-    LEXER_FLAG_WARNINGS = 1 << 0
+    LEXER_FLAG_WARNINGS            = 1 << 0,
+    LEXER_FLAG_NOSTRENGTHREDUCTION = 1 << 1,
+    LEXER_FLAG_VERBOSE
 
 } lexer_flags;
 
@@ -48,6 +50,18 @@ typedef struct allocated_mem_ptrs {
     struct allocated_mem_ptrs *next;
 
 } allocated_mem_ptrs;
+
+
+/* struct to represent a global label reference; the contained instruction
+ * will be changed, if the label can be found during global label fixup.
+ */
+typedef struct global_fixup {
+    instruction *instr;    /* the instruction that will be patched, if possible */
+    char        *label;    /* the label to which this instruction refers */
+
+    struct global_fixup *next;
+
+} global_fixup;
 
 
 /* store the "globals" of the lexer in a structure which is passed around. */
@@ -76,6 +90,9 @@ typedef struct lexer_state {
     hashtable      globals;
     hashtable      strings;        /* hashtable containing pointers to all parsed strings */
 
+    global_fixup  *global_refs;    /* list of instructions that need to be fixed up, as they
+                                    * reference global labels.
+                                    */
     allocated_mem_ptrs *mem_allocations; /* list of pointers to allocated memory */
 
 } lexer_state;
@@ -95,7 +112,7 @@ char *dupstrn(lexer_state * const lexer, char * const str, size_t numchars);
 
 bucket *new_bucket(lexer_state * const lexer);
 
-void init_hashtable(lexer_state * const lexer, hashtable * table, unsigned size);
+void init_hashtable(lexer_state * const lexer, hashtable * const table, unsigned size);
 
 #define pir_mem_allocate_zeroed_typed(lxr, type) (type *)pir_mem_allocate_zeroed(lxr, sizeof (type))
 
