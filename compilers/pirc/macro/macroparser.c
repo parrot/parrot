@@ -137,7 +137,7 @@
 
 /*
  * $Id$
- * Copyright (C) 2007, The Perl Foundation.
+ * Copyright (C) 2007-2008, The Perl Foundation.
  */
 
 
@@ -146,9 +146,17 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
-#include "macroparser.h"
+
 #include "macro.h"
+
+#include "macroparser.h"
+
 #include "lexer.h"
+
+#include "parrot/string_funcs.h"
+
+#include "parrot/parrot.h"
+
 
 /* prevent inclusion of <unistd.h> on windows */
 #define YY_NO_UNISTD_H
@@ -163,7 +171,7 @@
 extern YY_DECL;
 
 /* declare yyerror */
-extern int yyerror(yyscan_t yyscanner, lexer_state *lexer, char *message);
+extern int yyerror(yyscan_t yyscanner, lexer_state *lexer, char const * const message, ...);
 
 #define YYDEBUG         1
 
@@ -215,15 +223,14 @@ char *concat(char *str1, char *str2, int insert_space);
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 63 "macro.y"
+#line 71 "macro.y"
 {
-    char  *sval;
-    struct list *lval;
+    char             *sval;
+    struct list      *lval;
     struct macro_def *mval;
-
 }
 /* Line 187 of yacc.c.  */
-#line 227 "macroparser.c"
+#line 234 "macroparser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -236,7 +243,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 240 "macroparser.c"
+#line 247 "macroparser.c"
 
 #ifdef short
 # undef short
@@ -540,13 +547,13 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   130,   130,   131,   134,   135,   138,   139,   143,   150,
-     151,   152,   153,   154,   157,   163,   164,   172,   173,   176,
-     177,   178,   181,   184,   187,   193,   197,   203,   210,   211,
-     214,   215,   218,   219,   220,   223,   227,   235,   236,   237,
-     238,   241,   242,   245,   246,   249,   250,   253,   254,   257,
-     258,   261,   262,   265,   266,   269,   272,   273,   279,   280,
-     281,   282
+       0,   151,   151,   152,   155,   156,   159,   160,   164,   171,
+     172,   173,   174,   175,   178,   184,   185,   193,   194,   197,
+     198,   199,   202,   205,   208,   214,   218,   224,   231,   232,
+     235,   236,   239,   240,   241,   244,   248,   256,   257,   258,
+     259,   262,   263,   266,   267,   270,   271,   274,   275,   278,
+     279,   282,   283,   286,   287,   290,   293,   294,   300,   301,
+     302,   303
 };
 #endif
 
@@ -1520,215 +1527,215 @@ yyreduce:
   switch (yyn)
     {
         case 8:
-#line 144 "macro.y"
+#line 165 "macro.y"
     { emit("\n");  /* after each statement, emit a newline */ ;}
     break;
 
   case 14:
-#line 158 "macro.y"
+#line 179 "macro.y"
     { emit("setline");
-                  emit((yyvsp[(2) - (3)].sval));
-                ;}
+                   emit((yyvsp[(2) - (3)].sval));
+                 ;}
     break;
 
   case 16:
-#line 165 "macro.y"
+#line 186 "macro.y"
     { emit("setfile");
-                emit((yyvsp[(2) - (2)].sval));
-                emit("\n");
-              ;}
+                   emit((yyvsp[(2) - (2)].sval));
+                   emit("\n");
+                 ;}
     break;
 
   case 19:
-#line 176 "macro.y"
+#line 197 "macro.y"
     { emit((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 20:
-#line 177 "macro.y"
+#line 198 "macro.y"
     { expand((yyvsp[(1) - (2)].mval), (yyvsp[(2) - (2)].lval), lexer); ;}
     break;
 
   case 21:
-#line 178 "macro.y"
+#line 199 "macro.y"
     { char *label = munge_id((yyvsp[(1) - (1)].sval), 1, lexer);
-                                       emit(label);
-                                     ;}
+                                                   emit(label);
+                                                 ;}
     break;
 
   case 22:
-#line 181 "macro.y"
+#line 202 "macro.y"
     { char *label = munge_id((yyvsp[(1) - (1)].sval), 1, lexer);
-                                       emit(label);
-                                     ;}
+                                                   emit(label);
+                                                 ;}
     break;
 
   case 23:
-#line 184 "macro.y"
+#line 205 "macro.y"
     { char *local = munge_id((yyvsp[(1) - (1)].sval), 0, lexer);
-                                       emit(local);
-                                     ;}
+                                                   emit(local);
+                                                 ;}
     break;
 
   case 24:
-#line 187 "macro.y"
+#line 208 "macro.y"
     { char *label = munge_id((yyvsp[(1) - (1)].sval), 0, lexer);
-                                       emit(label);
-                                     ;}
+                                                   emit(label);
+                                                 ;}
     break;
 
   case 25:
-#line 194 "macro.y"
+#line 215 "macro.y"
     { include_file((yyvsp[(2) - (2)].sval), lexer); ;}
     break;
 
   case 26:
-#line 198 "macro.y"
+#line 219 "macro.y"
     { define_constant(lexer->globaldefinitions, (yyvsp[(2) - (3)].sval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 27:
-#line 207 "macro.y"
+#line 228 "macro.y"
     { define_macro(lexer->globaldefinitions, (yyvsp[(2) - (6)].sval), (yyvsp[(3) - (6)].lval), (yyvsp[(5) - (6)].sval)); ;}
     break;
 
   case 28:
-#line 210 "macro.y"
+#line 231 "macro.y"
     { (yyval.sval) = ""; ;}
     break;
 
   case 29:
-#line 211 "macro.y"
+#line 232 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval);   ;}
     break;
 
   case 30:
-#line 214 "macro.y"
+#line 235 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
   case 31:
-#line 215 "macro.y"
+#line 236 "macro.y"
     { (yyval.sval) = concat((yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].sval), 1); ;}
     break;
 
   case 32:
-#line 218 "macro.y"
+#line 239 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
   case 33:
-#line 219 "macro.y"
+#line 240 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
   case 34:
-#line 220 "macro.y"
+#line 241 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
   case 35:
-#line 224 "macro.y"
+#line 245 "macro.y"
     { (yyval.sval) = (yyvsp[(2) - (2)].sval); ;}
     break;
 
   case 36:
-#line 228 "macro.y"
+#line 249 "macro.y"
     { /* create a string like ".local <type> <id>" */
-                     (yyval.sval) = dupstr(".local");
-                     (yyval.sval) = concat((yyval.sval), (yyvsp[(2) - (3)].sval), 1);
-                     (yyval.sval) = concat((yyval.sval), (yyvsp[(3) - (3)].sval), 1);
-                   ;}
+                          (yyval.sval) = dupstr(".local");
+                          (yyval.sval) = concat((yyval.sval), (yyvsp[(2) - (3)].sval), 1);
+                          (yyval.sval) = concat((yyval.sval), (yyvsp[(3) - (3)].sval), 1);
+                        ;}
     break;
 
   case 41:
-#line 241 "macro.y"
+#line 262 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 42:
-#line 242 "macro.y"
+#line 263 "macro.y"
     { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
     break;
 
   case 43:
-#line 245 "macro.y"
+#line 266 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 44:
-#line 246 "macro.y"
+#line 267 "macro.y"
     { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
     break;
 
   case 45:
-#line 249 "macro.y"
+#line 270 "macro.y"
     { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 46:
-#line 250 "macro.y"
+#line 271 "macro.y"
     { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 47:
-#line 253 "macro.y"
+#line 274 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 48:
-#line 254 "macro.y"
+#line 275 "macro.y"
     { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
     break;
 
   case 49:
-#line 257 "macro.y"
+#line 278 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
   case 50:
-#line 258 "macro.y"
+#line 279 "macro.y"
     { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
     break;
 
   case 51:
-#line 261 "macro.y"
+#line 282 "macro.y"
     { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 52:
-#line 262 "macro.y"
+#line 283 "macro.y"
     { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 53:
-#line 265 "macro.y"
+#line 286 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
   case 54:
-#line 266 "macro.y"
+#line 287 "macro.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
   case 55:
-#line 269 "macro.y"
+#line 290 "macro.y"
     { (yyval.sval) = (yyvsp[(2) - (3)].sval); ;}
     break;
 
   case 56:
-#line 272 "macro.y"
+#line 293 "macro.y"
     { (yyval.sval) = ""; ;}
     break;
 
   case 57:
-#line 273 "macro.y"
+#line 294 "macro.y"
     { (yyval.sval) = concat((yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].sval), 0); ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1732 "macroparser.c"
+#line 1739 "macroparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1942,7 +1949,7 @@ yyreturn:
 }
 
 
-#line 287 "macro.y"
+#line 308 "macro.y"
 
 
 
@@ -1962,9 +1969,9 @@ Returns the newly created node.
 */
 static list *
 new_list(char *first_item) {
-    list *L = (list *)malloc(sizeof (list));
-    assert(L != NULL);
-    memset(L, 0, sizeof (list));
+    list *L = (list *)mem_sys_allocate_zeroed(sizeof (list));
+
+
     L->item = first_item;
     return L;
 }
@@ -2053,9 +2060,9 @@ expand(macro_def *macro, list *args, lexer_state *lexer) {
     /* construct a map data structure that maps the argument values to the parameter names */
     /* enter the parameters as temporary symbols (.macro_const) */
     constant_table *macro_params = new_constant_table(lexer->globaldefinitions, lexer);
-    list *params = macro->parameters;
+    list           *params       = macro->parameters;
 
-    int current_scope_nr;
+    int   current_scope_nr;
     char *current_macro_id;
 
     while (params && args) {
@@ -2067,21 +2074,15 @@ expand(macro_def *macro, list *args, lexer_state *lexer) {
     /* check for both conditions; either can be non-null, indicating an error.
      * If both are null, then all went ok.
      */
-    if (params != NULL) { /* args must be null, so too few arguments */
+    if (params != NULL)  /* args must be null, so too few arguments */
         fprintf(stderr, "Too few arguments for macro expansion %s.\n", macro->name);
-    }
-    if (args != NULL) { /* params must be null, so too many arguments */
+
+    if (args != NULL)  /* params must be null, so too many arguments */
         fprintf(stderr, "Too many arguments for macro expansion %s.\n", macro->name);
-    }
-/*
-    fprintf(stderr, "expanding '%s'\n", macro->name);
-    fprintf(stderr, "[%s]\n", macro->body);
-*/
+
+
     /* parse the macro body */
 
-/*
-    fprintf(stderr, "expansion '%s' starting\n", macro->name);
-*/
     current_macro_id = lexer->macro_id;
     lexer->macro_id  = macro->name;
     /* save current scope id */
@@ -2093,37 +2094,25 @@ expand(macro_def *macro, list *args, lexer_state *lexer) {
     /* restore current scope id */
     lexer->unique_id = current_scope_nr;
     lexer->macro_id  = current_macro_id;
-/*
-    fprintf(stderr, "expansion '%s' done\n", macro->name);
-*/
 
     /* now remove the temporary constant definitions */
     pop_constant_table(lexer);
     delete_constant_table(macro_params);
-/*
-    update_unique_id(lexer);
-*/
+
 }
 
-/*
 
-=item C<define_constant>
 
-Define the specified name as an alias for the specified value.
 
-=cut
-
-*/
 static void
-define_constant(constant_table *table, char *name, char *value) {
-    macro_def *def = (macro_def *)malloc(sizeof (macro_def));
-    assert(def != NULL);
-    memset(def, 0, sizeof (macro_def));
+define_constant( constant_table *table, char *name, char *value) {
 
-    def->name = name;
-    def->body = value;
+    macro_def *def = (macro_def *)mem_sys_allocate_zeroed(sizeof (macro_def));
 
-    def->next = table->definitions;
+    def->name          = name;
+    def->body          = value;
+
+    def->next          = table->definitions;
     table->definitions = def;
 
 
@@ -2140,17 +2129,15 @@ Define a macro by the given name, parameters and body.
 */
 static void
 define_macro(constant_table *table, char *name, list *parameters, char *body) {
-    macro_def *macro = (macro_def *)malloc(sizeof (macro_def));
-    assert(macro != NULL);
-    memset(macro, 0, sizeof (macro_def));
+    struct macro_def *macro   = (struct macro_def *)mem_sys_allocate(sizeof (struct macro_def));
 
     /* initialize the fields */
-    macro->name = name;
-    macro->body = body;
-    macro->parameters = parameters;
+    macro->name        = name;
+    macro->body        = body;
+    macro->parameters  = parameters;
 
     /* link the macro in the list */
-    macro->next = table->definitions;
+    macro->next        = table->definitions;
     table->definitions = macro;
 }
 
@@ -2195,7 +2182,7 @@ inserted between the two strings.
 
 */
 char *
-concat(char *str1, char *str2, int need_space) {
+concat(char * str1, char * str2, int need_space) {
     assert (str2 != NULL);
     if (str1 == NULL) {
         return str2;
@@ -2206,15 +2193,16 @@ concat(char *str1, char *str2, int need_space) {
          * buffer, and only increase it if it's full. For now this is the easiest solution.
          */
         int   strlen1   = strlen(str1);
-        char *newbuffer = (char *)calloc(strlen1 + strlen(str2) + 1 + (need_space ? 1 : 0), sizeof (char));
+        char *newbuffer = (char *)mem_sys_allocate((strlen1 + strlen(str2) + 1
+                                                   + (need_space ? 1 : 0))
+                                                   * sizeof (char));
 
-        assert(newbuffer != NULL);
+
         sprintf(newbuffer, "%s%s%s", str1, need_space ? " " : "", str2);
 
-        /*
-        free(str1);
-        free(str2);
-        */
+        mem_sys_free(str1);
+        mem_sys_free(str2);
+
         return newbuffer;
     }
 }
@@ -2302,11 +2290,9 @@ emit_int(int val) {
 */
 static constant_table *
 new_constant_table(constant_table *current, lexer_state *lexer) {
-    constant_table *table = (constant_table *)malloc(sizeof (constant_table));
-    assert(table != NULL);
-    table->definitions = NULL;
-    table->prev = current;
-
+    constant_table *table    = (constant_table *)mem_sys_allocate(sizeof (constant_table));
+    table->definitions       = NULL;
+    table->prev              = current;
     lexer->globaldefinitions = table;
     return table;
 }
@@ -2321,7 +2307,7 @@ new_constant_table(constant_table *current, lexer_state *lexer) {
 */
 static constant_table *
 pop_constant_table(lexer_state *lexer) {
-    constant_table *popped = lexer->globaldefinitions;
+    constant_table *popped   = lexer->globaldefinitions;
     lexer->globaldefinitions = popped->prev;
     return popped;
 }
@@ -2340,9 +2326,9 @@ delete_constant_table(constant_table *table) {
     while (iter != NULL) {
         macro_def *temp = iter;
         iter = iter->next;
-        free(temp);
+        mem_sys_free(temp);
     }
-    free(table);
+    mem_sys_free(table);
 }
 
 
@@ -2376,7 +2362,7 @@ munge_id(char *id, int is_label_declaration, lexer_state *lexer) {
     /* calculate length of the generated label: length of macro name,
      * plus length of label name.
      */
-    int length = format_length + strlen(lexer->macro_id) + lexer->num_digits;
+    int   length    = format_length + strlen(lexer->macro_id) + lexer->num_digits;
     char *munged_id = NULL;
 
     length += strlen(id);
@@ -2384,7 +2370,7 @@ munge_id(char *id, int is_label_declaration, lexer_state *lexer) {
     if (is_label_declaration)
         length++; /* reserve 1 more byte for the ":" */
 
-    munged_id = (char *)calloc(length + 1, sizeof (char));
+    munged_id = (char *)mem_sys_allocate((length + 1) * sizeof (char));
     assert(munged_id != NULL);
     /* generate the identifier; if it's a declaration, then add the colon. */
     sprintf(munged_id, format, lexer->macro_id, id, lexer->unique_id,
@@ -2504,7 +2490,7 @@ Function for syntax error handling.
 
 */
 int
-yyerror(yyscan_t yyscanner, lexer_state *lexer, char *message) {
+yyerror(yyscan_t yyscanner, lexer_state *lexer, char const * const message, ...) {
     fprintf(stderr, "Error in '%s' (line %d): %s\n", lexer->currentfile, lexer->line, message);
     lexer->errors++;
     return 0;

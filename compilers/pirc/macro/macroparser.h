@@ -98,15 +98,14 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 63 "macro.y"
+#line 71 "macro.y"
 {
-    char  *sval;
-    struct list *lval;
+    char             *sval;
+    struct list      *lval;
     struct macro_def *mval;
-
 }
 /* Line 1489 of yacc.c.  */
-#line 110 "macroparser.h"
+#line 109 "macroparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

@@ -2,7 +2,7 @@
 
 /*
  * $Id$
- * Copyright (C) 2007, The Perl Foundation.
+ * Copyright (C) 2007-2008, The Perl Foundation.
  */
 
 /*
@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include "macro.h"
 #include "lexer.h"
+
+#include "parrot/parrot.h"
 
 #define  YY_NO_UNISTD_H
 #include "macroparser.h"
@@ -68,21 +70,6 @@ dupstrn(char const * const source, size_t num_chars) {
     return newstring;
 }
 
-/*
-
-Update location information. Handling of heredocs is buggy w.r.t. line no.
-Fix this routine.
-
-*/
-static void
-update_location(char *scanned_string, lexer_state *lexer) {
-    char *iter = scanned_string;
-    while (*iter != '\0') {
-        if (*iter == '\n')
-            lexer->line++;
-        iter++;
-    }
-}
 
 
 /*
@@ -92,10 +79,7 @@ int ctr[YY_NUM_RULES];
 int num_rules = YY_NUM_RULES;
 
 
-/* after a rule is matched, execute this block of code to keep track of the line no. */
-#define YY_USER_ACTION   { ++ctr[yy_act];             \
-                           update_location(yytext, yyget_extra(yyscanner)); \
-                         }
+#define YY_USER_ACTION   { ++ctr[yy_act]; }
 
 
 
@@ -115,6 +99,7 @@ static int is_pir_directive(char *name);
 %option noyy_top_state
 %option outfile="macrolexer.c"
 %option header-file="macrolexer.h"
+%option yylineno
 
 
 %x MACRODEF
@@ -446,7 +431,8 @@ REG            "$"?[SNIP]{DIGITS}
                         return TK_VAR_EXPANSION;
                      }
                      else {
-                        fprintf(stderr, "Error: cannot find expansion for parameter '%s'\n", yytext + 1);
+                        fprintf(stderr, "Error: cannot find expansion for parameter '%s'\n",
+                                yytext + 1);
                         lexer->errors++;
                      }
 
@@ -621,6 +607,10 @@ REG            "$"?[SNIP]{DIGITS}
 
 Returns a non-zero value if the specified name is a PIR directive.
 
+XXX It might be worthwhile to enter the PIR directives as rules; this saves a lot
+of checking; these rules should just return TK_ANY.
+
+
 */
 static int
 is_pir_directive(char *name) {
@@ -655,6 +645,7 @@ is_pir_directive(char *name) {
         ".param",
         ".return",
         ".sub",
+        ".tailcall",
         ".yield",
         NULL /* needed to easily write loops on this array */
     };
@@ -663,9 +654,9 @@ is_pir_directive(char *name) {
     char * const *iter = directives;
 
     while (*iter != NULL) {
-        if (strcmp(*iter, name) == 0) {
+        if (STREQ(*iter, name))
             return 1;
-        }
+
         iter++;
     }
     return 0;
