@@ -201,7 +201,7 @@ sub _set_limits {
     my $self = shift;
     my ($conf, $verbose, $platform) = @_;
 
-    my $limits = "config/gen/platform/generic/platorm_limits.h";
+    my $limits = "config/gen/platform/generic/platform_limits.h";
     if ( -e "config/gen/platform/$platform/platform_limits.h" ) {
         $limits = "config/gen/platform/$platform/platform_limits.h";
     }
