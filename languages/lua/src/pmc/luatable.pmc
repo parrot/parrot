@@ -605,27 +605,26 @@ The C<==> operation. Compares reference (not in depth).
 =cut
 
 */
-    INTVAL is_equal(PMC *value) {
-MMD_LuaTable: {
-            PMC *meth = find_meth(INTERP, SELF, "__eq");
-            if (meth) {
-                PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
-                                                       SELF, value);
+    MULTI INTVAL is_equal(LuaTable value) {
+        PMC *meth = find_meth(INTERP, SELF, "__eq");
+        if (meth) {
+            PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                   SELF, value);
 
-                if (PMC_IS_NULL(retval))
-                    return (INTVAL)0;
-
-                return VTABLE_get_bool(INTERP, retval);
-            }
-
-            if (SELF == value)
-                return (INTVAL)1;
-            else
+            if (PMC_IS_NULL(retval))
                 return (INTVAL)0;
+
+            return VTABLE_get_bool(INTERP, retval);
         }
-MMD_DEFAULT: {
+
+        if (SELF == value)
+            return (INTVAL)1;
+        else
             return (INTVAL)0;
-        }
+    }
+
+    MULTI INTVAL is_equal(DEFAULT value) {
+        return (INTVAL)0;
     }
 
 /*
@@ -635,62 +634,61 @@ MMD_DEFAULT: {
 =cut
 
 */
-    INTVAL cmp(PMC *value) {
-MMD_LuaTable: {
+    MULTI INTVAL cmp(LuaTable value) {
 #if 0
-            PMC *meth = find_meth(INTERP, SELF, "__cmp");
-            if (meth) {
-                PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
-                                                       SELF, value);
+        PMC *meth = find_meth(INTERP, SELF, "__cmp");
+        if (meth) {
+            PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                   SELF, value);
 
-                if (retval)
-                    return (INTVAL)VTABLE_get_number(INTERP, retval);
-            }
+            if (retval)
+                return (INTVAL)VTABLE_get_number(INTERP, retval);
+        }
 #else
-            PMC *_lt = find_meth(INTERP, SELF, "__lt");
+        PMC *_lt = find_meth(INTERP, SELF, "__lt");
 
-            if (_lt) {
-                PMC *retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP",
-                                                       SELF, value);
-                INTVAL r = retval ? VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
+        if (_lt) {
+            PMC *retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP",
+                                                   SELF, value);
+            INTVAL r = retval ? VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
 
-                if (r)
-                    return (INTVAL)-1;
+            if (r)
+                return (INTVAL)-1;
+            else {
+                PMC *_le = find_meth(INTERP, SELF, "__le");
+                if (_le) {
+                    retval = Parrot_runops_fromc_args(INTERP, _le, "PPP",
+                                                      SELF, value);
+                    r = retval ?
+                        VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
+
+                    if (r)
+                        return (INTVAL)0;
+                    else
+                        return (INTVAL)1;
+                }
                 else {
-                    PMC *_le = find_meth(INTERP, SELF, "__le");
-                    if (_le) {
-                        retval = Parrot_runops_fromc_args(INTERP, _le, "PPP",
-                                                          SELF, value);
-                        r = retval ?
-                            VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
+                    retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP",
+                                                      value, SELF);
+                    r      = retval
+                        ? VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
 
-                        if (r)
-                            return (INTVAL)0;
-                        else
-                            return (INTVAL)1;
-                    }
-                    else {
-                        retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP",
-                                                          value, SELF);
-                        r      = retval
-                            ? VTABLE_get_bool(INTERP, retval) : (INTVAL)0;
-
-                        if (r)
-                            return (INTVAL)1;
-                        else
-                            return (INTVAL)0;
-                    }
+                    if (r)
+                        return (INTVAL)1;
+                    else
+                        return (INTVAL)0;
                 }
             }
+        }
 #endif
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
-                    "attempt to compare two table values");
-        }
-MMD_DEFAULT: {
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
-                "attempt to compare table with %Ss",
-                    VTABLE_name(INTERP, value));
-        }
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+                "attempt to compare two table values");
+    }
+
+    MULTI INTVAL cmp(DEFAULT value) {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+            "attempt to compare table with %Ss",
+                VTABLE_name(INTERP, value));
     }
 
 /*

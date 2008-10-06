@@ -338,7 +338,7 @@ Throws an exception.
 =cut
 
 */
-    PMC* add(PMC *value, PMC *dest) {
+    MULTI PMC* add(DEFAULT value, PMC *dest) {
         PMC *meth = find_meth(INTERP, SELF, "__add");
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
@@ -352,7 +352,7 @@ Throws an exception.
         return dest;
     }
 
-    void i_add(PMC *value) {
+    MULTI void i_add(DEFAULT value) {
         PMC *meth = find_meth(INTERP, SELF, "__add");
 
         if (!meth)
@@ -364,7 +364,7 @@ Throws an exception.
             SELF = pmc_new(INTERP, dynpmc_LuaNil);
     }
 
-    PMC* subtract(PMC *value, PMC *dest) {
+    MULTI PMC* subtract(DEFAULT value, PMC *dest) {
         PMC *meth = find_meth(INTERP, SELF, "__sub");
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
@@ -378,7 +378,7 @@ Throws an exception.
         return dest;
     }
 
-    void i_subtract(PMC *value) {
+    MULTI void i_subtract(DEFAULT value) {
         PMC *meth = find_meth(INTERP, SELF, "__sub");
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
@@ -390,7 +390,7 @@ Throws an exception.
             SELF = pmc_new(INTERP, dynpmc_LuaNil);
     }
 
-    PMC* multiply(PMC *value, PMC *dest) {
+    MULTI PMC* multiply(DEFAULT value, PMC *dest) {
         PMC *meth = find_meth(INTERP, SELF, "__mul");
 
         if (!meth)
@@ -405,7 +405,7 @@ Throws an exception.
         return dest;
     }
 
-    void i_multiply(PMC *value) {
+    MULTI void i_multiply(DEFAULT value) {
         PMC *meth = find_meth(INTERP, SELF, "__mul");
 
         if (!meth)
@@ -418,7 +418,7 @@ Throws an exception.
             SELF = pmc_new(INTERP, dynpmc_LuaNil);
     }
 
-    PMC* divide(PMC *value, PMC *dest) {
+    MULTI PMC* divide(DEFAULT value, PMC *dest) {
         PMC *meth = find_meth(INTERP, SELF, "__div");
 
         if (!meth)
@@ -433,7 +433,7 @@ Throws an exception.
         return dest;
     }
 
-    void i_divide(PMC *value) {
+    MULTI void i_divide(DEFAULT value) {
         PMC *meth = find_meth(INTERP, SELF, "__div");
 
         if (!meth)
@@ -446,7 +446,7 @@ Throws an exception.
             SELF = pmc_new(INTERP, dynpmc_LuaNil);
     }
 
-    PMC* modulus(PMC *value, PMC *dest) {
+    MULTI PMC* modulus(DEFAULT value, PMC *dest) {
         PMC *meth = find_meth(INTERP, SELF, "__mod");
 
         if (!meth)
@@ -461,7 +461,7 @@ Throws an exception.
         return dest;
     }
 
-    void i_modulus(PMC *value) {
+    MULTI void i_modulus(DEFAULT value) {
         PMC *meth = find_meth(INTERP, SELF, "__mod");
 
         if (!meth)
@@ -474,7 +474,7 @@ Throws an exception.
             SELF = pmc_new(INTERP, dynpmc_LuaNil);
     }
 
-    PMC* pow(PMC *value, PMC *dest) {
+    MULTI PMC* pow(DEFAULT value, PMC *dest) {
         PMC *meth = find_meth(INTERP, SELF, "__pow");
 
         if (!meth)
@@ -489,7 +489,7 @@ Throws an exception.
         return dest;
     }
 
-    void i_pow(PMC *value) {
+    MULTI void i_pow(DEFAULT value) {
         PMC *meth = find_meth(INTERP, SELF, "__pow");
 
         if (!meth)
@@ -502,7 +502,7 @@ Throws an exception.
             SELF = pmc_new(INTERP, dynpmc_LuaNil);
     }
 
-    PMC* concatenate(PMC *value, PMC *dest) {
+    MULTI PMC* concatenate(DEFAULT value, PMC *dest) {
         PMC *meth = find_meth(INTERP, SELF, "__concat");
 
         if (!meth)
@@ -517,7 +517,7 @@ Throws an exception.
         return dest;
     }
 
-    void i_concatenate(PMC *value) {
+    MULTI void i_concatenate(DEFAULT value) {
         PMC *meth = find_meth(INTERP, SELF, "__concat");
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
@@ -536,7 +536,7 @@ Throws an exception.
 =cut
 
 */
-    INTVAL is_equal(PMC *value) {
+    MULTI INTVAL is_equal(DEFAULT value) {
         return (INTVAL)0;
     }
 
@@ -547,7 +547,7 @@ Throws an exception.
 =cut
 
 */
-    INTVAL cmp(PMC *value) {
+    MULTI INTVAL cmp(DEFAULT value) {
         STRING *self_name = SELF.name();
         STRING *val_name  = VTABLE_name(INTERP, value);
 

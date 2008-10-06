@@ -139,13 +139,12 @@ Return always C<false>.
 =cut
 
 */
-    INTVAL is_equal(PMC *value) {
-MMD_LuaNil: {
-            return (INTVAL)1;
-        }
-MMD_DEFAULT: {
-            return (INTVAL)0;
-        }
+    MULTI INTVAL is_equal(LuaNil value) {
+        return (INTVAL)1;
+    }
+
+    MULTI INTVAL is_equal(DEFAULT value) {
+        return (INTVAL)0;
     }
 
 /*

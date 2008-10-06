@@ -212,13 +212,12 @@ Used to unarchive the boolean.
 =cut
 
 */
-    INTVAL is_equal(PMC *value) {
-MMD_LuaBoolean: {
-            return (INTVAL)(PMC_int_val(SELF) == PMC_int_val(value));
-        }
-MMD_DEFAULT: {
-            return (INTVAL)0;
-        }
+    MULTI INTVAL is_equal(LuaBoolean value) {
+        return (INTVAL)(PMC_int_val(SELF) == PMC_int_val(value));
+    }
+
+    MULTI INTVAL is_equal(DEFAULT value) {
+        return (INTVAL)0;
     }
 
 /*

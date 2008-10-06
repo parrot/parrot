@@ -169,16 +169,15 @@ Return the string "thread".
 =cut
 
 */
-    INTVAL is_equal(PMC *value) {
-MMD_LuaThread: {
-            if (SELF == value)
-                return (INTVAL)1;
-            else
-                return (INTVAL)0;
-        }
-MMD_DEFAULT: {
+    MULTI INTVAL is_equal(LuaThread value) {
+        if (SELF == value)
+            return (INTVAL)1;
+        else
             return (INTVAL)0;
-        }
+    }
+
+    MULTI INTVAL is_equal(DEFAULT value) {
+            return (INTVAL)0;
     }
 
 /*

@@ -124,19 +124,24 @@ Return the string "function".
 
 /*
 
-=item C<INTVAL is_equal(PMC* value)>
+=back
+
+=head2 non-Vtable Methods
+
+=over 4
+
+=item C<INTVAL is_equal(PMC *value)>
 
 =cut
 
 */
-    INTVAL is_equal(PMC* value) {
-MMD_LuaClosure: {
-            return (PMC_sub(SELF))->start_offs == (PMC_sub(value))->start_offs
-                && (PMC_sub(SELF))->seg        == (PMC_sub(value))->seg;
-        }
-MMD_DEFAULT: {
-            return (INTVAL)0;
-        }
+    MULTI INTVAL is_equal(LuaClosure value) {
+        return (PMC_sub(SELF))->start_offs == (PMC_sub(value))->start_offs
+            && (PMC_sub(SELF))->seg        == (PMC_sub(value))->seg;
+    }
+
+    MULTI INTVAL is_equal(DEFAULT value) {
+        return (INTVAL)0;
     }
 
 /*
