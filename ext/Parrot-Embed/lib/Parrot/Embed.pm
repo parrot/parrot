@@ -37,11 +37,7 @@ It provides the core implementation used by the L<Parrot::Interpreter> module.
 Do consider using L<Parrot::Interpreter> first however.  See also
 L<Parrot::PMC>.
 
-The only useful interface provided by this module is Parrot_revision().
-
-=head2 Parrot_revision()
-
-Returns the integer revision number of the embedded libparrot.
+This module provides no user-inspectable code.
 
 =head1 AUTHOR
 

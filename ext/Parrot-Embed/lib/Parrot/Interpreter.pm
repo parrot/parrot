@@ -47,11 +47,10 @@ Version 20081006
         print "Invoking the Sub gave ", $result_pmc->get_string( $interp ), "!\n";
 
 All Parrot access goes through an I<interpreter>, mediated through a
-C<Parrot::Interpreter> object.  There is always one or more interpreters active
-in a system.
-
-An interpreter allows you to load code, to compile code, and to find and store
-global symbols in Parrot.
+C<Parrot::Interpreter> object.  There is always at least one active interpreter
+in a system.  An interpreter allows you to load code, to compile code, and to
+find and store global symbols in Parrot.  These are usually subroutines but
+they may be other types of PMCs.
 
 =head3 Memory and Resource Implications
 
