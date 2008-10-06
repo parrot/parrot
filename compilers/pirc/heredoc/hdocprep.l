@@ -353,7 +353,7 @@ LINECOMMENT    [#].*{EOL}
 <SCANSTRING>"<<"{Q_STRING} { /* 2nd and later heredoc argument */
                              global_state *state = yyget_extra(yyscanner);
                              /* yyleng - (4 (for << and 2 quotes), + 1 for NULL character = 3) */
-                             state->delimiter = (char *)mem_sys_allocate(yyleng - 4 + 1
+                             state->delimiter = (char *)mem_sys_allocate((yyleng - 4 + 1)
                                                                          * sizeof (char));
 
                              PARROT_ASSERT(state->delimiter);
@@ -368,7 +368,7 @@ LINECOMMENT    [#].*{EOL}
 <INITIAL>"<<"{Q_STRING} { /* only copy the string after "<<'" and skip the last quote too */
                          global_state *state = yyget_extra(yyscanner);
                          /* allocate storage for the delimiter, skip the << and quote characters. */
-                         state->delimiter    = (char *)mem_sys_allocate(yyleng - 4 + 1
+                         state->delimiter    = (char *)mem_sys_allocate((yyleng - 4 + 1)
                                                                         * sizeof (char));
                          PARROT_ASSERT(state->delimiter);
 
@@ -413,7 +413,7 @@ LINECOMMENT    [#].*{EOL}
                          int           len   = strlen(state->heredoc);
 
                          /* length of heredoc + 1 for NULL character + 2 for escaped '\n' */
-                         char         *temp  = (char *)mem_sys_allocate(len + 3 * sizeof (char));
+                         char         *temp  = (char *)mem_sys_allocate((len + 3) * sizeof (char));
 
                          strcpy(temp, state->heredoc);
 
