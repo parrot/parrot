@@ -1,19 +1,15 @@
 #!perl
 
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 9;
 use File::Spec;
 
-use_ok('Parrot::Embed', 'Parrot_revision') or exit;
-
-my $revision = Parrot_revision();
-cmp_ok $revision, '>', 23000;
-diag "Parrot_revision $revision\n";
+use_ok('Parrot::Embed' ) or exit;
 
 my $module = 'Parrot::Interpreter';
 can_ok( $module, 'new' );

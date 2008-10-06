@@ -22,7 +22,7 @@ C<LD_LIBRARY_PATH> on Unix-like systems and C<PATH> on Windows.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2006 - 2007 The Perl Foundation/chromatic
+Copyright (C) 2006 - 2008 The Perl Foundation/chromatic
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Parrot itself.

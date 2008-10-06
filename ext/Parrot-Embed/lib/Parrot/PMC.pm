@@ -4,7 +4,7 @@ package Parrot::PMC;
 
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '20081006';
 
 use Parrot::Embed;
 
@@ -18,7 +18,7 @@ Parrot::PMC - access a Parrot PMC from Perl 5
 
 =head1 VERSION
 
-Version 0.02
+Version 20081006
 
 =head1 SYNOPSIS
 
@@ -86,7 +86,7 @@ Someday there may be a CPAN version of this code.  Who knows?
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (C) 2006-2007 The Perl Foundation / chromatic.
+Copyright (C) 2006-2008 The Perl Foundation / chromatic.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Parrot itself.
