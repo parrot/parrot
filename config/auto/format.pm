@@ -85,8 +85,17 @@ sub _set_intvalmaxmin {
     else {
         die qq{Configure.pl:  Can't find limits for type '$iv'\n};
     }
+
     $conf->data->set( intvalmin   => $ivmin );
     $conf->data->set( intvalmax   => $ivmax );
+
+    $conf->cc_gen('config/auto/format/maxmin.in');
+    eval { $conf->cc_build(); };
+    if ( $@ ) {
+        $ivmin = '0';
+        $ivmax = '0';
+    }
+
 }
 
 sub _set_floatvalfmt_nvsize {
