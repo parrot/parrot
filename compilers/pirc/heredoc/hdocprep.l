@@ -121,7 +121,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 char *
 dupstr(char * const source) {
-    char *newstring = (char *)mem_sys_allocate(strlen(source) + 1 * sizeof (char));
+    char *newstring = (char *)mem_sys_allocate((strlen(source) + 1) * sizeof (char));
     strcpy(newstring, source);
     return newstring;
 }
@@ -490,9 +490,6 @@ LINECOMMENT    [#].*{EOL}
                             char * const thisline = (char *)mem_sys_allocate((yyleng + 1)
                                                                              * sizeof (char));
                             strcpy(thisline, yytext);
-                          /* thisline[yyleng] = '\0';
-                          */
-
 
                             state->heredoc = strcat(state->heredoc, thisline);
                          }
@@ -528,7 +525,7 @@ LINECOMMENT    [#].*{EOL}
 <INCLUDE>{WS}          { /* skip whitespace */ }
 
 <INCLUDE>{Q_STRING}    { /* include this file */
-                         char * const filename = yytext;
+                         char * const filename = dupstr(yytext);
 
                          filename[strlen(filename) - 1] = '\0';
                          scanfile(filename + 1);
