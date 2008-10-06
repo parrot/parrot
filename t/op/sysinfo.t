@@ -9,7 +9,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More import => [ '$TODO' ];
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 use Parrot::Config;
 
 use Config;
@@ -43,6 +43,8 @@ Tests for basic system information.
 =item 7 The CPU architecture
 
 =item 8 The CPU model
+
+=item 9, 10 The min and max INTVAL values
 
 =back
 
@@ -153,3 +155,18 @@ pasm_output_is( <<'CODE', $PConfig{archname}, "sysinfo CPU Model" );
 CODE
 }
 
+# 9, 10
+
+SKIP: {
+        skip 'Testing only in some known platforms' => unless $PConfig{osname} eq 'linux';
+
+pir_output_like( <<'CODE', '/^-[1-9][0-9]*\n[1-9][0-9]*\n$/', 'INTVAL min and max values');
+.include 'sysinfo.pasm'
+.sub main :main
+    $I0 = sysinfo .SYSINFO_PARROT_INTMIN
+    say $I0
+    $I0 = sysinfo .SYSINFO_PARROT_INTMAX
+    say $I0
+.end
+CODE
+}
