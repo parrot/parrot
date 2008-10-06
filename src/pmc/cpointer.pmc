@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2008, The Perl Foundation.
-$Id: pointer.pmc 26309 2008-03-11 09:50:21Z allison $
+$Id$
 
 =head1 NAME
 
@@ -93,8 +93,8 @@ pointer.
         if (data->pointer) {
             if (string_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
                 PMC **pmc_pointer = (PMC **) data->pointer;
-                PARROT_ASSERT(*pmc_pointer); 
-                pobject_lives(interp, (PObj *) *pmc_pointer); 
+                PARROT_ASSERT(*pmc_pointer);
+                pobject_lives(interp, (PObj *) *pmc_pointer);
             }
             else if (string_equal(interp, data->sig, CONST_STRING(interp, "S")) == 0) {
                 STRING **str_pointer = (STRING **) data->pointer;
