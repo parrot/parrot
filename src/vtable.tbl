@@ -141,57 +141,57 @@ PMC* add(PMC* value, PMC* dest)
 PMC* add_int(INTVAL value, PMC* dest)
 PMC* add_float(FLOATVAL value, PMC* dest)
 
-void i_add(PMC* value)
-void i_add_int(INTVAL value)
-void i_add_float(FLOATVAL value)
+void i_add(PMC* value) :write
+void i_add_int(INTVAL value) :write
+void i_add_float(FLOATVAL value) :write
 
 PMC* subtract(PMC* value, PMC* dest)
 PMC* subtract_int(INTVAL value, PMC* dest)
 PMC* subtract_float(FLOATVAL value, PMC* dest)
 
-void i_subtract(PMC* value)
-void i_subtract_int(INTVAL value)
-void i_subtract_float(FLOATVAL value)
+void i_subtract(PMC* value) :write
+void i_subtract_int(INTVAL value) :write
+void i_subtract_float(FLOATVAL value) :write
 
 PMC* multiply(PMC* value, PMC* dest)
 PMC* multiply_int(INTVAL value, PMC* dest)
 PMC* multiply_float(FLOATVAL value, PMC* dest)
 
-void i_multiply(PMC* value)
-void i_multiply_int(INTVAL value)
-void i_multiply_float(FLOATVAL value)
+void i_multiply(PMC* value) :write
+void i_multiply_int(INTVAL value) :write
+void i_multiply_float(FLOATVAL value) :write
 
 PMC* divide(PMC* value, PMC* dest)
 PMC* divide_int(INTVAL value, PMC* dest)
 PMC* divide_float(FLOATVAL value, PMC* dest)
 
-void i_divide(PMC* value)
-void i_divide_int(INTVAL value)
-void i_divide_float(FLOATVAL value)
+void i_divide(PMC* value) :write
+void i_divide_int(INTVAL value) :write
+void i_divide_float(FLOATVAL value) :write
 
 PMC* floor_divide(PMC* value, PMC* dest)
 PMC* floor_divide_int(INTVAL value, PMC* dest)
 PMC* floor_divide_float(FLOATVAL value, PMC* dest)
 
-void i_floor_divide(PMC* value)
-void i_floor_divide_int(INTVAL value)
-void i_floor_divide_float(FLOATVAL value)
+void i_floor_divide(PMC* value) :write
+void i_floor_divide_int(INTVAL value) :write
+void i_floor_divide_float(FLOATVAL value) :write
 
 PMC* modulus(PMC* value, PMC* dest)
 PMC* modulus_int(INTVAL value, PMC* dest)
 PMC* modulus_float(FLOATVAL value, PMC* dest)
 
-void i_modulus(PMC* value)
-void i_modulus_int(INTVAL value)
-void i_modulus_float(FLOATVAL value)
+void i_modulus(PMC* value) :write
+void i_modulus_int(INTVAL value) :write
+void i_modulus_float(FLOATVAL value) :write
 
 PMC* pow(PMC* value, PMC* dest)
 PMC* pow_int(INTVAL value, PMC* dest)
 PMC* pow_float(FLOATVAL value, PMC* dest)
 
-void i_pow(PMC* value)
-void i_pow_int(INTVAL value)
-void i_pow_float(FLOATVAL value)
+void i_pow(PMC* value) :write
+void i_pow_int(INTVAL value) :write
+void i_pow_float(FLOATVAL value) :write
 
 void increment() :write
 void decrement() :write
@@ -206,38 +206,38 @@ void i_neg() :write
 PMC* bitwise_or(PMC* value, PMC* dest)
 PMC* bitwise_or_int(INTVAL value, PMC* dest)
 
-void i_bitwise_or(PMC* value)
-void i_bitwise_or_int(INTVAL value)
+void i_bitwise_or(PMC* value) :write
+void i_bitwise_or_int(INTVAL value) :write
 
 PMC* bitwise_and(PMC* value, PMC* dest)
 PMC* bitwise_and_int(INTVAL value, PMC* dest)
 
-void i_bitwise_and(PMC* value)
-void i_bitwise_and_int(INTVAL value)
+void i_bitwise_and(PMC* value) :write
+void i_bitwise_and_int(INTVAL value) :write
 
 PMC* bitwise_xor(PMC* value, PMC* dest)
 PMC* bitwise_xor_int(INTVAL value, PMC* dest)
 
-void i_bitwise_xor(PMC* value)
-void i_bitwise_xor_int(INTVAL value)
+void i_bitwise_xor(PMC* value) :write
+void i_bitwise_xor_int(INTVAL value) :write
 
 PMC* bitwise_ors(PMC* value, PMC* dest)
 PMC* bitwise_ors_str(STRING* value, PMC* dest)
 
-void i_bitwise_ors(PMC* value)
-void i_bitwise_ors_str(STRING* value)
+void i_bitwise_ors(PMC* value) :write
+void i_bitwise_ors_str(STRING* value) :write
 
 PMC* bitwise_ands(PMC* value, PMC* dest)
 PMC* bitwise_ands_str(STRING* value, PMC* dest)
 
-void i_bitwise_ands(PMC* value)
-void i_bitwise_ands_str(STRING* value)
+void i_bitwise_ands(PMC* value) :write
+void i_bitwise_ands_str(STRING* value) :write
 
 PMC* bitwise_xors(PMC* value, PMC* dest)
 PMC* bitwise_xors_str(STRING* value, PMC* dest)
 
-void i_bitwise_xors(PMC* value)
-void i_bitwise_xors_str(STRING* value)
+void i_bitwise_xors(PMC* value) :write
+void i_bitwise_xors_str(STRING* value) :write
 
 PMC* bitwise_not(PMC* dest)
 void i_bitwise_not() :write
@@ -248,20 +248,20 @@ void i_bitwise_nots() :write
 PMC* bitwise_shl(PMC* value, PMC* dest)
 PMC* bitwise_shl_int(INTVAL value, PMC* dest)
 
-void i_bitwise_shl(PMC* value)
-void i_bitwise_shl_int(INTVAL value)
+void i_bitwise_shl(PMC* value) :write
+void i_bitwise_shl_int(INTVAL value) :write
 
 PMC* bitwise_shr(PMC* value, PMC* dest)
 PMC* bitwise_shr_int(INTVAL value, PMC* dest)
 
-void i_bitwise_shr(PMC* value)
-void i_bitwise_shr_int(INTVAL value)
+void i_bitwise_shr(PMC* value) :write
+void i_bitwise_shr_int(INTVAL value) :write
 
 PMC* bitwise_lsr(PMC* value, PMC* dest)
 PMC* bitwise_lsr_int(INTVAL value, PMC* dest)
 
-void i_bitwise_lsr(PMC* value)
-void i_bitwise_lsr_int(INTVAL value)
+void i_bitwise_lsr(PMC* value) :write
+void i_bitwise_lsr_int(INTVAL value) :write
 
 [CMP]
 INTVAL is_equal(PMC* value)
@@ -288,14 +288,14 @@ void i_logical_not() :write
 PMC* concatenate(PMC* value, PMC* dest)
 PMC* concatenate_str(STRING* value, PMC* dest)
 
-void i_concatenate(PMC* value)
-void i_concatenate_str(STRING* value)
+void i_concatenate(PMC* value) :write
+void i_concatenate_str(STRING* value) :write
 
 PMC* repeat(PMC* value, PMC* dest)
 PMC* repeat_int(INTVAL value, PMC* dest)
 
-void i_repeat(PMC* value)
-void i_repeat_int(INTVAL value)
+void i_repeat(PMC* value) :write
+void i_repeat_int(INTVAL value) :write
 
 void substr(INTVAL offset, INTVAL length, PMC* dest)
 STRING* substr_str(INTVAL offset, INTVAL length)
