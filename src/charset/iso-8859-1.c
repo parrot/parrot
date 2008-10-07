@@ -131,7 +131,8 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
 
 =item C<static void set_graphemes>
 
-RT#48260: Not yet documented!!!
+Sets C<replace_count> graphemes in STRING C<source_string> starting at offset C<offset>.
+Gets the replacement graphemes from STRING C<insert_string>.
 
 =cut
 
@@ -149,7 +150,7 @@ set_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
 
 =item C<static STRING * to_latin1>
 
-RT#48260: Not yet documented!!!
+Converts STRING C<src> to Latin1 in STRING C<dest>.
 
 =cut
 
@@ -190,7 +191,7 @@ to_latin1(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
 
 =item C<static STRING * to_unicode>
 
-RT#48260: Not yet documented!!!
+Converts STRING C<src> to unicode STRING C<dest>.
 
 =cut
 
@@ -232,7 +233,7 @@ to_unicode(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
 
 =item C<static STRING * to_charset>
 
-RT#48260: Not yet documented!!!
+Converts the STRING C<src> to an ISO-8859-1 STRING C<dest>.
 
 =cut
 
@@ -257,7 +258,8 @@ to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
 
 =item C<static STRING* compose>
 
-RT#48260: Not yet documented!!!
+ISO-8859-1 does not support composing, so we just copy the STRING C<src> and return the
+copy.
 
 =cut
 
@@ -276,7 +278,7 @@ compose(PARROT_INTERP, ARGIN(STRING *src))
 
 =item C<static STRING* decompose>
 
-RT#48260: Not yet documented!!!
+SO-8859-1 does not support decomposing, so we throw an exception.
 
 =cut
 
@@ -294,7 +296,8 @@ decompose(PARROT_INTERP, SHIM(STRING *src))
 
 =item C<static void upcase>
 
-RT#48260: Not yet documented!!!
+Convert all graphemes in the STRING C<source_string> to upper case, for those
+graphemes that support cases.
 
 =cut
 
@@ -325,7 +328,8 @@ upcase(PARROT_INTERP, ARGIN(STRING *source_string))
 
 =item C<static void downcase>
 
-RT#48260: Not yet documented!!!
+Converts all graphemes in STRING C<source_string> to lower-case, for those graphemes
+that support cases.
 
 =cut
 
@@ -355,7 +359,8 @@ downcase(PARROT_INTERP, ARGIN(STRING *source_string))
 
 =item C<static void titlecase>
 
-RT#48260: Not yet documented!!!
+Converts the graphemes in STRING C<source_string> to title case, for those graphemes
+that support cases.
 
 =cut
 
@@ -394,7 +399,8 @@ titlecase(PARROT_INTERP, ARGIN(STRING *source_string))
 
 =item C<static void upcase_first>
 
-RT#48260: Not yet documented!!!
+Converts the first grapheme in STRING C<source_string> to upper case, if it
+supports cases.
 
 =cut
 
@@ -422,7 +428,8 @@ upcase_first(PARROT_INTERP, ARGIN(STRING *source_string))
 
 =item C<static void downcase_first>
 
-RT#48260: Not yet documented!!!
+Converts the first character of the STRING C<source_string> to lower case, if the
+grapheme supports lower case.
 
 =cut
 
@@ -450,7 +457,8 @@ downcase_first(PARROT_INTERP, ARGIN(STRING *source_string))
 
 =item C<static void titlecase_first>
 
-RT#48260: Not yet documented!!!
+Converts the first grapheme in STRING C<source_string> to title case, if the grapheme
+supports case.
 
 =cut
 
@@ -467,7 +475,7 @@ titlecase_first(PARROT_INTERP, ARGIN(STRING *source_string))
 
 =item C<static UINTVAL validate>
 
-RT#48260: Not yet documented!!!
+Returns 1 if the STRING C<src> is a valid ISO-8859-1 STRING. Returns 0 otherwise.
 
 =cut
 
@@ -574,7 +582,7 @@ find_not_cclass(PARROT_INTERP, INTVAL flags,
 
 =item C<static STRING * string_from_codepoint>
 
-RT#48260: Not yet documented!!!
+Creates a new STRING from the single codepoint C<codepoint>.
 
 =cut
 
@@ -594,7 +602,7 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 
 =item C<const CHARSET * Parrot_charset_iso_8859_1_init>
 
-RT#48260: Not yet documented!!!
+Initializes the ISO-8859-1 charset by installing all the necessary function pointers.
 
 =cut
 
@@ -641,7 +649,7 @@ Parrot_charset_iso_8859_1_init(PARROT_INTERP)
 
 =item C<STRING * charset_cvt_iso_8859_1_to_ascii>
 
-RT#48260: Not yet documented!!!
+Converts STRING C<src> in ISO-8859-1 to ASCII STRING C<dest>.
 
 =cut
 
