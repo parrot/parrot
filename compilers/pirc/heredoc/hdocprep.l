@@ -24,21 +24,40 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
+#include <assert.h>
+
+#ifdef LINKPARROT
+
 #include "parrot/string_funcs.h"
 #include "parrot/parrot.h"
+
+#else
+
+#define STREQ(x,y)              (0 == strcmp(x,y))
+#define mem_sys_allocate(x)     yyalloc(x, yyscanner)
+#define PARROT_MALLOC
+#define PARROT_WARN_UNUSED_RESULT
+#define PARROT_CANNOT_RETURN_NULL
+#define PARROT_ASSERT(x)        assert(x)
+#define mem_sys_free(x)         yyfree(x, yyscanner)
+
+#endif
 
 /* keep Microsoft Visual Studio compiler happy */
 #define YY_NO_UNISTD_H
 
 /* declare the prototype of yylex */
-#define YY_DECL int yylex( yyscan_t yyscanner)
+#define YY_DECL int yylex(yyscan_t yyscanner)
+
+
 
 
 extern char *yyget_text(yyscan_t yyscanner);
 extern void  yyset_in(FILE *fp, yyscan_t yyscanner);
 extern int   yylex_destroy(yyscan_t yyscanner);
 extern int   yylex(yyscan_t yyscanner);
-
+extern int   yyget_lineno(yyscan_t yyscanner);
 
 /* all globals are collected in this structure which
  * is set in yyscan_t's "extra" field, available through
@@ -120,20 +139,12 @@ PARROT_MALLOC
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 char *
-dupstr(char * const source) {
+dupstr(char * const source, yyscan_t yyscanner) {
     char *newstring = (char *)mem_sys_allocate((strlen(source) + 1) * sizeof (char));
     strcpy(newstring, source);
     return newstring;
 }
 
-
-void
-printrules(void) {
-    extern int ctr[];
-    int i;
-    for (i = 0; i < YY_NUM_RULES; i++)
-        fprintf(output, "#rule %d was used %d times\n", i, ctr[i]);
-}
 
 
 /*
@@ -150,11 +161,11 @@ PARROT_MALLOC
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static global_state *
-init_global_state(char * const filename) {
+init_global_state(char * const filename, yyscan_t yyscanner) {
     global_state *state = (global_state *)mem_sys_allocate(sizeof (global_state));
     state->filename    = filename;
     state->heredoc     = NULL;
-    state->linebuffer  = dupstr("");
+    state->linebuffer  = dupstr("", yyscanner);
     state->delimiter   = NULL;
     state->file_buffer = NULL;
     state->errors      = 0;
@@ -171,7 +182,7 @@ free all memory of the global state structure.
 
 */
 static void
-destroy_global_state(global_state *state) {
+destroy_global_state(global_state *state, yyscan_t yyscanner) {
     if (state->linebuffer)
         mem_sys_free(state->linebuffer);
     if (state->heredoc)
@@ -209,17 +220,22 @@ scanfile(char * const filename) {
     /* set the scanner to a string buffer and go parse */
     yyset_in(fp, yyscanner);
 
-    state = init_global_state(filename);
+    state = init_global_state(filename, yyscanner);
 
     yyset_extra(state, yyscanner);
 
     /* the lexer never returns anything, only call it once. Don't give a YYSTYPE object. */
     yylex(yyscanner);
 
+    /*
+    destroy_global_state(state, yyscanner);
+    */
+
     /* clean up after playing */
     yylex_destroy(yyscanner);
 
-    destroy_global_state(state);
+
+
 
 }
 /*
@@ -255,18 +271,6 @@ main(int argc, char *argv[]) {
 */
 
 
-/*
-
-using this we can check how often each rule is executed.
-XXX this should be removed at some point (globals!)
-
-*/
-
-int ctr[YY_NUM_RULES];
-
-int num_rules = YY_NUM_RULES;
-
-#define YY_USER_ACTION    do { ++ctr[yy_act]; } while (0);
 
 
 %}
@@ -282,7 +286,7 @@ int num_rules = YY_NUM_RULES;
 %option warn
 %option noyy_top_state
 %option outfile="hdocprep.c"
-%option prefix="hd_pre"
+%option header-file="hdocprep.h"
 %option yylineno
 
 %pointer
@@ -360,9 +364,7 @@ LINECOMMENT    [#].*{EOL}
 
                              strncpy(state->delimiter, yytext + 3, yyleng - 4);
                              state->delimiter[yyleng - 4] = '\0';
-
-                             state->heredoc = dupstr("");
-
+                             state->heredoc = dupstr("", yyscanner);
 
                              BEGIN(SAVELINE2);
                            }
@@ -377,16 +379,10 @@ LINECOMMENT    [#].*{EOL}
                          strncpy(state->delimiter, yytext + 3, yyleng - 4);
                          state->delimiter[yyleng - 4] = '\0';
 
-                         /*
-                         state->delimiter = dupstr(state->delimiter);
-                         */
+                         state->heredoc = dupstr("", yyscanner);
 
 
-                         state->heredoc = dupstr("");
 
-/*
-                         fprintf(stderr, "intial Q string: [%s]\n", state->delimiter);
-*/
                          BEGIN(SAVELINE);
                         }
 
@@ -397,15 +393,7 @@ LINECOMMENT    [#].*{EOL}
 
                          PARROT_ASSERT(state->linebuffer != NULL);
 
-                         state->linebuffer = (char *)mem_sys_allocate((strlen(yytext) + 1) * sizeof (char));
-
-                         strcpy(state->linebuffer, yytext);
-                         state->linebuffer = dupstr(state->linebuffer);
-
-                         /*
-                         fprintf(stderr, "saveline eol: [%s]\n", state->linebuffer);
-                         dupstr(yytext);
-                         */
+                         state->linebuffer = dupstr(yytext, yyscanner);
 
                          BEGIN(HEREDOC);
                        }
@@ -417,11 +405,7 @@ LINECOMMENT    [#].*{EOL}
                           */
                          global_state *state = yyget_extra(yyscanner);
 
-                         /*state->linebuffer = dupstr(yytext);
-                         */
-                         state->linebuffer = (char *)mem_sys_allocate((yyleng + 1) * sizeof (char));
-                         strcpy(state->linebuffer, yytext);
-                         state->linebuffer = dupstr(state->linebuffer);
+                         state->linebuffer = dupstr(yytext, yyscanner);
 
                          yy_switch_to_buffer(state->file_buffer, yyscanner);
 
@@ -434,18 +418,18 @@ LINECOMMENT    [#].*{EOL}
                          global_state *state = yyget_extra(yyscanner);
 
                          int           len   = strlen(state->heredoc);
-                         char *temp;
-
-                         /*fprintf(stderr, "heredoc eol: len so far is: %d\n", len);
-                         */
 
                          /* length of heredoc + 1 for NULL character + 2 for escaped '\n' */
-                         temp  = (char *)mem_sys_allocate((len + 4) * sizeof (char));
+                         char         *temp  = (char *)mem_sys_allocate((len + 3) * sizeof (char));
+
+                         PARROT_ASSERT(state->heredoc != NULL);
 
 
-                         sprintf(temp, "%s\\n%c", state->heredoc, '\0');
-                         state->heredoc = temp;
+                         /* translate "\n" to a "\" and "n" character */
+                         sprintf(temp, "%s\\n", state->heredoc);
 
+
+                         state->heredoc      = temp;
 
                        }
 
@@ -469,10 +453,10 @@ LINECOMMENT    [#].*{EOL}
 
                             PARROT_ASSERT(state->heredoc != NULL);
 
-                           /* mem_sys_free(state->heredoc);
-                            */
+                     /*       mem_sys_free(state->heredoc);
+                     */
 
-                            state->heredoc = dupstr("");
+                            state->heredoc = dupstr("", yyscanner);
 
                             /* save the current buffer, because we go scan the
                              * rest of the string that was saved in <SAVELINE(2)>.
@@ -484,12 +468,12 @@ LINECOMMENT    [#].*{EOL}
                             PARROT_ASSERT(state->linebuffer != NULL);
 
                             yy_scan_string(state->linebuffer, yyscanner);
+
+
                          }
                          else {
                             /* save this heredoc string line */
-                            char * const thisline = (char *)mem_sys_allocate((yyleng + 1)
-                                                                             * sizeof (char));
-                            strcpy(thisline, yytext);
+                            char * const thisline = dupstr(yytext, yyscanner);
 
                             state->heredoc = strcat(state->heredoc, thisline);
                          }
@@ -525,10 +509,13 @@ LINECOMMENT    [#].*{EOL}
 <INCLUDE>{WS}          { /* skip whitespace */ }
 
 <INCLUDE>{Q_STRING}    { /* include this file */
-                         char * const filename = dupstr(yytext);
+                         char * filename = dupstr(yytext, yyscanner);
 
                          filename[strlen(filename) - 1] = '\0';
                          scanfile(filename + 1);
+
+                         /*mem_sys_free(filename);
+                         */
 
                        }
 
