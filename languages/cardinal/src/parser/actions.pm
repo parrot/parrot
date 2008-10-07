@@ -558,6 +558,7 @@ method block_signature($/) {
 
     if $<block_param> {
         my $block := $( $<block_param>[0] );
+        $block.named('!BLOCK');
         $past.symbol($block.name(), :scope('lexical'));
         $params.push($block);
     }
@@ -635,7 +636,9 @@ method call_args($/) {
         $past := PAST::Op.new( :pasttype('call'), :node($/) );
     }
     if $<do_block> {
-        $past.push( $( $<do_block>[0] ) );
+        my $do := $( $<do_block>[0] );
+        $do.named(PAST::Val.new(:value('!BLOCK')));
+        $past.push($do);
     }
     make $past;
 }

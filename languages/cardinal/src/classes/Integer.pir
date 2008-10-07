@@ -68,7 +68,7 @@ Runs C<block> for each integer from the current value of the Integer down to n.
 
 .sub 'downto' :method
     .param int n
-    .param pmc block
+    .param pmc block :named('!BLOCK')
     $I1 = self
   downto_loop:
     $I0 = $I1 < n
@@ -88,7 +88,7 @@ Runs C<block> for each integer from the current value of the Integer up to n.
 
 .sub 'upto' :method
     .param int n
-    .param pmc block
+    .param pmc block :named('!BLOCK')
     $I1 = self
   upto_loop:
     $I0 = $I1 > n

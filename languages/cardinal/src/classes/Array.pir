@@ -508,7 +508,7 @@ if passed, otherwise returns nil.
 
 .sub delete :method
     .param pmc item
-    .param pmc block :optional
+    .param pmc block :optional :named('!BLOCK')
     .param int block_flag :opt_flag
     .local pmc nil
     .local pmc elem
@@ -787,7 +787,7 @@ Run C<block> once for each item in C<self>, with the item passed as an arg.
 =cut
 
 .sub 'each' :method
-    .param pmc block
+    .param pmc block :named('!BLOCK')
     $P0 = new 'Iterator', self
   each_loop:
     unless $P0 goto each_loop_end
@@ -798,7 +798,7 @@ Run C<block> once for each item in C<self>, with the item passed as an arg.
 .end
 
 .sub 'each_with_index' :method
-    .param pmc block
+    .param pmc block :named('!BLOCK')
     .local int len
     len = elements self
     $I0 = 0
@@ -819,7 +819,7 @@ Creates a new Array containing the results and returns it.
 =cut
 
 .sub 'collect' :method
-    .param pmc block
+    .param pmc block :named('!BLOCK')
     .local pmc result
     result = new 'CardinalArray'
     $P0 = new 'Iterator', self

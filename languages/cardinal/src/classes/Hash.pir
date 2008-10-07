@@ -301,13 +301,8 @@ property instead.
 
 .namespace ['Hash']
 
-.sub 'new' :method :multi(_)
-    $P0 = new 'CardinalHash'
-    .return($P0)
-.end
-
-.sub 'new' :method :multi(_,_)
-    .param pmc a
+.sub 'new' :method
+    .param pmc a :optional :named('!BLOCK')
     $P0 = new 'CardinalHash'
     setattribute $P0, 'default', a
     .return($P0)

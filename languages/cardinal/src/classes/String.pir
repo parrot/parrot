@@ -126,7 +126,7 @@ Returns the characters in C<self> in reverse order. Destructive update.
     .return(self)
 .end
 
-.sub split :method :multi('CardinalString')
+.sub 'split' :method :multi('CardinalString',_)
     .param string delim
     .local string objst
     .local pmc pieces
@@ -154,6 +154,14 @@ Returns the characters in C<self> in reverse order. Destructive update.
     goto loop
   done:
     .return(retv)
+.end
+
+.sub 'each' :method :multi('CardinalString',_)
+    .param pmc delim
+    .param pmc block :named('!BLOCK')
+    .local pmc list
+    list = self.'split'(delim)
+    list.'each'(block)
 .end
 
 .sub lc :method
@@ -456,7 +464,7 @@ Warning: Partial implementation. Look for TODO
 .end
 
 .sub 'each_byte' :method
-    .param pmc block
+    .param pmc block :named('!BLOCK')
     .local pmc iterator, item
     iterator = new 'Iterator', self
   each_loop:
@@ -627,7 +635,6 @@ B<Note:> partial implementation only
 
     .return a.'split'(b)
 .end
-
 
 =item join
 
