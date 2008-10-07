@@ -209,6 +209,7 @@ token basic_primary {
     | <warray> {*}                          #= warray
     | <array> {*}                           #= array
     | <pcomp_stmt> {*}                      #= pcomp_stmt
+    | <yield> {*}                           #= yield
     | <control_command> {*}                 #= control_command
 }
 
@@ -286,6 +287,10 @@ token control_command {
     | 'next'  {*}                   #= next
     | 'break' {*}                   #= break
     | 'redo'  {*}                   #= redo
+}
+
+token yield {
+    'yield' <call_args> {*}
 }
 
 rule module {

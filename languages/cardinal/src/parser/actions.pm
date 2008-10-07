@@ -51,6 +51,9 @@ method comp_stmt($/,$key) {
         }
         else {
             $?BLOCK := PAST::Block.new( PAST::Stmts.new(), :node($/));
+            my $block := PAST::Var.new(:scope('parameter'), :named('!BLOCK'), :name('!BLOCK'), :viviself('Undef'));
+            $?BLOCK.symbol($block.name(), :scope('lexical'));
+            $?BLOCK[0].push($block);
         }
         @?BLOCK.unshift($?BLOCK);
     }
@@ -425,6 +428,24 @@ method control_command($/,$key) {
         );
 }
 
+method yield($/) {
+    our $?BLOCK;
+    our @?BLOCK;
+    my $blockname;
+    if $?BLOCK.symbol('!BLOCK') {
+        if defined($?BLOCK.symbol('!BLOCK')<name>) {
+            $blockname := $?BLOCK.symbol('!BLOCK')<name>;
+        }
+        else {
+            $blockname := '!BLOCK';
+        }
+    }
+    my $call := $( $<call_args> );
+    $call.unshift( PAST::Var.new(:scope('lexical'), :name(~$blockname)));
+    $call.node($/);
+    make $call;
+}
+
 method module($/) {
     my $past := $( $<comp_stmt> );
     my $name := $( $<module_identifier> );
@@ -559,6 +580,12 @@ method block_signature($/) {
     if $<block_param> {
         my $block := $( $<block_param>[0] );
         $block.named('!BLOCK');
+        $past.symbol($block.name(), :scope('lexical'));
+        $past.symbol('!BLOCK', :name(~$block.name()));
+        $params.push($block);
+    }
+    else {
+        my $block := PAST::Var.new(:scope('parameter'), :named('!BLOCK'), :name('!BLOCK'), :viviself('Undef'));
         $past.symbol($block.name(), :scope('lexical'));
         $params.push($block);
     }
