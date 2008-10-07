@@ -150,7 +150,7 @@ pir_error_output_unlike( $library . <<'CODE', <<'OUTPUT', "Complex i_add" );
     foo[0] = 1.0
     foo[1] = 1.0
     make_readonly(foo)
-    add foo, foo, 4
+    add foo, 4
     print "NOT OKAY\n"
 .end
 CODE
