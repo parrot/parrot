@@ -392,7 +392,7 @@ Creates an identical copy of the complex number.
     }
 
     VTABLE PMC *clone() {
-        PMC *dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC *dest = pmc_new_noinit(INTERP, VTABLE_type(INTERP, SELF));
         PMC_data(dest) = mem_allocate_typed(Parrot_Complex_attributes);
         RE(dest) = RE(SELF);
         IM(dest) = IM(SELF);
@@ -678,10 +678,7 @@ Adds C<value> to the complex number, placing the result in C<dest>.
 */
 
     MULTI PMC *add(Complex value, PMC *dest) {
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         RE(dest) = RE(SELF) + RE(value);
         IM(dest) = IM(SELF) + IM(value);
@@ -690,10 +687,7 @@ Adds C<value> to the complex number, placing the result in C<dest>.
     }
 
     MULTI PMC *add(DEFAULT value, PMC *dest) {
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         RE(dest) = RE(SELF) + VTABLE_get_number(INTERP, value);
         IM(dest) = IM(SELF);
@@ -702,10 +696,7 @@ Adds C<value> to the complex number, placing the result in C<dest>.
     }
 
     VTABLE PMC *add_int(INTVAL value, PMC *dest) {
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         RE(dest) = RE(SELF) + value;
         IM(dest) = IM(SELF);
@@ -714,12 +705,8 @@ Adds C<value> to the complex number, placing the result in C<dest>.
     }
 
     VTABLE PMC *add_float(FLOATVAL value, PMC *dest) {
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
-        VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
         RE(dest) = RE(SELF) + value;
         IM(dest) = IM(SELF);
 
@@ -758,10 +745,7 @@ Subtracts C<value> from the complex number, placing the result in C<dest>.
 */
 
     MULTI PMC *subtract(Complex value, PMC *dest) {
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         RE(dest) = RE(SELF) - RE(value);
         IM(dest) = IM(SELF) - IM(value);
@@ -770,10 +754,7 @@ Subtracts C<value> from the complex number, placing the result in C<dest>.
     }
 
     MULTI PMC *subtract(DEFAULT value, PMC *dest) {
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         RE(dest) = RE(SELF) - VTABLE_get_number(INTERP, value);
         IM(dest) = IM(SELF);
@@ -782,10 +763,7 @@ Subtracts C<value> from the complex number, placing the result in C<dest>.
     }
 
     VTABLE PMC *subtract_int(INTVAL value, PMC *dest) {
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         RE(dest) = RE(SELF) - value;
         IM(dest) = IM(SELF);
@@ -794,10 +772,7 @@ Subtracts C<value> from the complex number, placing the result in C<dest>.
     }
 
     VTABLE PMC *subtract_float(FLOATVAL value, PMC *dest) {
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         RE(dest) = RE(SELF) - value;
         IM(dest) = IM(SELF);
@@ -854,10 +829,7 @@ Multiplies the complex number SELF inplace with C<value>.
     MULTI PMC *multiply(Complex value, PMC *dest) {
         FLOATVAL re = RE(SELF) * RE(value) - IM(SELF) * IM(value);
         FLOATVAL im = IM(SELF) * RE(value) + RE(SELF) * IM(value);
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         RE(dest) = re;
         IM(dest) = im;
@@ -868,10 +840,7 @@ Multiplies the complex number SELF inplace with C<value>.
     MULTI PMC *multiply(DEFAULT value, PMC *dest) {
         FLOATVAL re = RE(SELF) * VTABLE_get_number(INTERP, value);
         FLOATVAL im = IM(SELF) * VTABLE_get_number(INTERP, value);
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         RE(dest) = re;
         IM(dest) = im;
@@ -880,10 +849,7 @@ Multiplies the complex number SELF inplace with C<value>.
     }
 
     VTABLE PMC *multiply_int(INTVAL value, PMC *dest) {
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         RE(dest) = RE(SELF) * value;
         IM(dest) = IM(SELF) * value;
@@ -892,10 +858,7 @@ Multiplies the complex number SELF inplace with C<value>.
     }
 
     VTABLE PMC *multiply_float(FLOATVAL value, PMC *dest) {
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         RE(dest) = RE(SELF) * value;
         IM(dest) = IM(SELF) * value;
@@ -959,10 +922,7 @@ http://docs.sun.com/source/806-3568/ncg_goldberg.html
         FLOATVAL mod, re, im;
 
         complex_check_divide_zero(INTERP, value);
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         /* a little speed optimisation: cache an intermediate number;
             I'm not sure the compiler does this */
@@ -984,10 +944,7 @@ http://docs.sun.com/source/806-3568/ncg_goldberg.html
     MULTI PMC *divide(DEFAULT value, PMC *dest) {
         FLOATVAL d = VTABLE_get_number(INTERP, value);
         float_check_divide_zero(INTERP, d);
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         RE(dest) = RE(SELF) / d;
         IM(dest) = IM(SELF) / d;
@@ -997,10 +954,7 @@ http://docs.sun.com/source/806-3568/ncg_goldberg.html
 
     VTABLE PMC *divide_int(INTVAL value, PMC *dest) {
         int_check_divide_zero(INTERP, value);
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         RE(dest) = RE(SELF) / value;
         IM(dest) = IM(SELF) / value;
@@ -1010,10 +964,7 @@ http://docs.sun.com/source/806-3568/ncg_goldberg.html
 
     VTABLE PMC *divide_float(FLOATVAL value, PMC *dest) {
         float_check_divide_zero(INTERP, value);
-        if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         RE(dest) = RE(SELF) / value;
         IM(dest) = IM(SELF) / value;
@@ -1073,7 +1024,7 @@ Set C<dest> to the negated value of C<SELF>.
 */
 
     VTABLE PMC *neg(PMC *dest) {
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         RE(dest) = -RE(SELF);
         IM(dest) = -IM(SELF);
@@ -1169,7 +1120,7 @@ ln(+-i) = +- (pi i)/2
 */
 
     METHOD ln() {
-        PMC     *d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC     *d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re = RE(SELF);
         FLOATVAL im = IM(SELF);
 
@@ -1199,7 +1150,7 @@ exp(a + bi) = exp(a) * (cos(b) + i * sin(b))
 */
 
     METHOD exp() {
-        PMC     *d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC     *d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re = RE(SELF);
         FLOATVAL im = IM(SELF);
         FLOATVAL f  = exp(re);
@@ -1249,7 +1200,7 @@ Returns C<FUNC>(SELF).
 */
 
     METHOD sin() {
-        PMC     *d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC     *d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re = RE(SELF);
         FLOATVAL im = IM(SELF);
 
@@ -1276,7 +1227,7 @@ Returns C<FUNC>(SELF).
     }
 
     METHOD cos() {
-        PMC     *d  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC     *d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re = RE(SELF);
         FLOATVAL im = IM(SELF);
 
@@ -1299,8 +1250,8 @@ Returns C<FUNC>(SELF).
     }
 
     METHOD tan() {
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC *e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         (PMC *d) = PCCINVOKE(INTERP, SELF, "sin");
         (PMC *e) = PCCINVOKE(INTERP, SELF, "cos");
@@ -1311,8 +1262,8 @@ Returns C<FUNC>(SELF).
     }
 
     METHOD cot() {
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC *e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         (PMC *d) = PCCINVOKE(INTERP, SELF, "cos");
         (PMC *e) = PCCINVOKE(INTERP, SELF, "sin");
 
@@ -1322,8 +1273,8 @@ Returns C<FUNC>(SELF).
     }
 
     METHOD sec() {
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC *e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         RE(d)  = 1.0;
         IM(d)  = 0.0;
         (PMC *e) = PCCINVOKE(INTERP, SELF, "cos");
@@ -1334,8 +1285,8 @@ Returns C<FUNC>(SELF).
     }
 
     METHOD csc() {
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC *e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         RE(d)  = 1.0;
         IM(d)  = 0.0;
         (PMC *e) = PCCINVOKE(INTERP, SELF, "sin");
@@ -1379,8 +1330,8 @@ Returns the inverse function of SELF.
 */
 
     METHOD asin() {
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC *e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         e      = Parrot_Complex_multi_multiply_Complex_PMC(INTERP, SELF, SELF, e);
         RE(e)  = 1.0 - RE(e);
@@ -1398,8 +1349,8 @@ Returns the inverse function of SELF.
     }
 
     METHOD acos() {
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC *e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         e      = Parrot_Complex_multi_multiply_Complex_PMC(INTERP, SELF, SELF, e);
         RE(e)  = 1.0 - RE(e);
@@ -1417,8 +1368,8 @@ Returns the inverse function of SELF.
     }
 
     METHOD atan() {
-        PMC     *d  = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC     *e  = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC     *d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC     *e  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re = RE(SELF);
         FLOATVAL im = IM(SELF);
 
@@ -1437,7 +1388,7 @@ Returns the inverse function of SELF.
     }
 
     METHOD acot() {
-        PMC     *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC     *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC     *e;
         FLOATVAL a = RE(SELF);
         FLOATVAL b = IM(SELF);
@@ -1450,7 +1401,7 @@ Returns the inverse function of SELF.
     }
 
     METHOD acsc() {
-        PMC     *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC     *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC     *e;
         FLOATVAL a = RE(SELF);
         FLOATVAL b = IM(SELF);
@@ -1463,7 +1414,7 @@ Returns the inverse function of SELF.
     }
 
     METHOD asec() {
-        PMC     *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC     *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC     *e;
         FLOATVAL a = RE(SELF);
         FLOATVAL b = IM(SELF);
@@ -1496,7 +1447,7 @@ tanh(z) = sinh(z) / cosh(z)
 */
 
     METHOD sinh() {
-        PMC     *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC     *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL a = RE(SELF);
         FLOATVAL b = IM(SELF);
 
@@ -1507,7 +1458,7 @@ tanh(z) = sinh(z) / cosh(z)
     }
 
     METHOD cosh() {
-        PMC     *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC     *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL a = RE(SELF);
         FLOATVAL b = IM(SELF);
 
@@ -1521,8 +1472,8 @@ tanh(z) = sinh(z) / cosh(z)
     }
 
     METHOD tanh() {
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC *e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         (PMC *d) = PCCINVOKE(INTERP, SELF, "sinh");
         (PMC *e) = PCCINVOKE(INTERP, SELF, "cosh");
@@ -1534,7 +1485,7 @@ tanh(z) = sinh(z) / cosh(z)
 
     METHOD coth() {
         FLOATVAL a, b;
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         (PMC *d) = PCCINVOKE(INTERP, SELF, "tanh");
         a      = RE(d);
@@ -1548,7 +1499,7 @@ tanh(z) = sinh(z) / cosh(z)
 
     METHOD csch() {
         FLOATVAL a, b;
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         (PMC *d) = PCCINVOKE(INTERP, SELF, "sinh");
         a      = RE(d);
@@ -1562,7 +1513,7 @@ tanh(z) = sinh(z) / cosh(z)
 
     METHOD sech() {
         FLOATVAL a, b;
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         (PMC *d) = PCCINVOKE(INTERP, SELF, "cosh");
         a      = RE(d);
@@ -1603,8 +1554,8 @@ atanh = i atan(-ix)
 */
 
     METHOD asinh() {
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC *e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         RE(d)  = IM(SELF);
         IM(d)  = -RE(SELF);
@@ -1617,8 +1568,8 @@ atanh = i atan(-ix)
     }
 
     METHOD acosh() {
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC *e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         (PMC *d) = PCCINVOKE(INTERP, SELF, "acos");
         RE(e)  = -IM(d);
@@ -1628,8 +1579,8 @@ atanh = i atan(-ix)
     }
 
     METHOD atanh() {
-        PMC *d = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC *e = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC *e = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         RE(d)  = IM(SELF);
         IM(d)  = -RE(SELF);
@@ -1642,7 +1593,7 @@ atanh = i atan(-ix)
     }
 
     METHOD acoth() {
-        PMC     *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC     *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC     *e;
         FLOATVAL a = RE(SELF);
         FLOATVAL b = IM(SELF);
@@ -1655,7 +1606,7 @@ atanh = i atan(-ix)
     }
 
     METHOD acsch() {
-        PMC     *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC     *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC     *e;
         FLOATVAL a = RE(SELF);
         FLOATVAL b = IM(SELF);
@@ -1668,7 +1619,7 @@ atanh = i atan(-ix)
     }
 
     METHOD asech() {
-        PMC     *d = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC     *d = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC     *e;
         FLOATVAL a = RE(SELF);
         FLOATVAL b = IM(SELF);
@@ -1700,13 +1651,10 @@ x ^ y = exp(y * ln x))
 */
 
     MULTI PMC *pow(Complex value, PMC *dest) {
-        PMC *l = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *l = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC *log;
 
-        if (!PMC_IS_NULL(dest))
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
 
         Parrot_PCCINVOKE(interp, SELF, CONST_STRING(interp, "ln"),
@@ -1722,13 +1670,10 @@ x ^ y = exp(y * ln x))
     }
 
     MULTI PMC *pow(DEFAULT value, PMC *dest) {
-        PMC *l = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *l = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC *log;
 
-        if (!PMC_IS_NULL(dest))
-            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         Parrot_PCCINVOKE(interp, SELF, CONST_STRING(interp, "ln"),
                      "->P", &log);
@@ -1740,7 +1685,7 @@ x ^ y = exp(y * ln x))
     }
 
     METHOD sqrt() {
-        PMC *result = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *result = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL absval = SELF.get_number();
         FLOATVAL sx = RE(SELF);
         FLOATVAL sy = IM(SELF);
