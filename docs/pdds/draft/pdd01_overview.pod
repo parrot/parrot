@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-docs/pdds/pdd01_overview.pod - A high-level overview of the Parrot system
+docs/pdds/pdd01_overview.pod - A high-level overview of Parrot
 
 =head1 ABSTRACT
 
-A high-level overview of the Parrot system.
+A high-level overview of the Parrot virtual machine.
 
 =head1 VERSION
 
@@ -15,23 +15,15 @@ $Revision$
 
 =head1 DESCRIPTION
 
-The following diagram gives a rough outline of the architecture of
-Parrot and the relationship between its major components, ranging from
-the components closest to the high-level languages targeting Parrot,
-down to those closest to the operating system.
-
- +---------------------------------------------------+
- |            Parser Grammar Engine (PGE)            |
- +---------------------------------------------------+
- |             Tree Grammar Engine (TGE)             |
- +-------------------------+-------------------------+
- |          PASM           |           PIR           |
- |   (assembly language)   | (intermediate language) |
- +-------------------------+-------------------------+
- |             Parrot Interpreter (IMCC)             |
- +---------------------------------------------------+
- |                    Extensions                     |
- +---------------------------------------------------+
+Parrot is a virtual machine for dynamic languages like Python, PHP, Ruby, and
+Perl. A dynamic language is one that allows things like extension of the code
+base, subroutine and class definition, and altering the type system at
+runtime.  Static languages like Java or C# restrict these features to compile
+time. If this sounds like an edgy idea, keep in mind that Lisp, one of the
+prime examples of a dynamic language, has been around since 1958. The basic
+paradigm shift to dynamic languages leads the way to other more advanced
+dynamic features like higher-order functions, closures, continuations, and
+coroutines.
 
 =head1 IMPLEMENTATION
 
