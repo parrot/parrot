@@ -15,6 +15,8 @@ New in October 2008 release
     - implemented Str.comb
     - ord() and chr() builtins
     - improved parsing of literal numbers
+    - support for hyphens and dashes in identifiers
+    - next() on for-loops
 
 New in 0.7.1
 - Implementation
