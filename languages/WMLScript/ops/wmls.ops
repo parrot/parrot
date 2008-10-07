@@ -68,11 +68,13 @@ implements C<GT> WMLScript opcode.
 =cut
 
 inline op isgt(out PMC, invar PMC, invar PMC) {
+    INTVAL result;
     INTVAL dynpmc_WmlsBoolean = pmc_type(interp,
         const_string(interp, "WmlsBoolean"));
     INTVAL dynpmc_WmlsInvalid = pmc_type(interp,
         const_string(interp, "WmlsInvalid"));
-    INTVAL result = mmd_dispatch_i_pp(interp, $2, $3, MMD_CMP);
+    Parrot_mmd_multi_dispatch_from_c_args(interp,
+            "cmp", "PP->I", $2, $3, &result);
 
     if (4 == result) {
         $1 = pmc_new(interp, dynpmc_WmlsInvalid);
@@ -92,11 +94,13 @@ implements C<GE> WMLScript opcode.
 =cut
 
 inline op isge(out PMC, invar PMC, invar PMC) {
+    INTVAL result;
     INTVAL dynpmc_WmlsBoolean = pmc_type(interp,
         const_string(interp, "WmlsBoolean"));
     INTVAL dynpmc_WmlsInvalid = pmc_type(interp,
         const_string(interp, "WmlsInvalid"));
-    INTVAL result = mmd_dispatch_i_pp(interp, $2, $3, MMD_CMP);
+    Parrot_mmd_multi_dispatch_from_c_args(interp,
+            "cmp", "PP->I", $2, $3, &result);
 
     if (4 == result) {
         $1 = pmc_new(interp, dynpmc_WmlsInvalid);
@@ -116,11 +120,13 @@ implements C<LE> WMLScript opcode.
 =cut
 
 inline op isle(out PMC, invar PMC, invar PMC) {
+    INTVAL result;
     INTVAL dynpmc_WmlsBoolean = pmc_type(interp,
         const_string(interp, "WmlsBoolean"));
     INTVAL dynpmc_WmlsInvalid = pmc_type(interp,
         const_string(interp, "WmlsInvalid"));
-    INTVAL result = mmd_dispatch_i_pp(interp, $2, $3, MMD_CMP);
+    Parrot_mmd_multi_dispatch_from_c_args(interp,
+            "cmp", "PP->I", $2, $3, &result);
 
     if (4 == result) {
         $1 = pmc_new(interp, dynpmc_WmlsInvalid);
@@ -140,11 +146,13 @@ implements C<LT> WMLScript opcode.
 =cut
 
 inline op islt(out PMC, invar PMC, invar PMC) {
+    INTVAL result;
     INTVAL dynpmc_WmlsBoolean = pmc_type(interp,
         const_string(interp, "WmlsBoolean"));
     INTVAL dynpmc_WmlsInvalid = pmc_type(interp,
         const_string(interp, "WmlsInvalid"));
-    INTVAL result = mmd_dispatch_i_pp(interp, $2, $3, MMD_CMP);
+    Parrot_mmd_multi_dispatch_from_c_args(interp,
+            "cmp", "PP->I", $2, $3, &result);
 
     if (4 == result) {
         $1 = pmc_new(interp, dynpmc_WmlsInvalid);
@@ -163,11 +171,13 @@ implements C<EQ> WMLScript opcode.
 =cut
 
 inline op iseq(out PMC, invar PMC, invar PMC) {
+    INTVAL result;
     INTVAL dynpmc_WmlsBoolean = pmc_type(interp,
         const_string(interp, "WmlsBoolean"));
     INTVAL dynpmc_WmlsInvalid = pmc_type(interp,
         const_string(interp, "WmlsInvalid"));
-    INTVAL result = mmd_dispatch_i_pp(interp, $2, $3, MMD_EQ);
+    Parrot_mmd_multi_dispatch_from_c_args(interp,
+            "is_equal", "PP->I", $2, $3, &result);
 
     if (4 == result) {
         $1 = pmc_new(interp, dynpmc_WmlsInvalid);
@@ -187,11 +197,13 @@ implements C<NE> WMLScript opcode.
 =cut
 
 inline op isne(out PMC, invar PMC, invar PMC) {
+    INTVAL result;
     INTVAL dynpmc_WmlsBoolean = pmc_type(interp,
         const_string(interp, "WmlsBoolean"));
     INTVAL dynpmc_WmlsInvalid = pmc_type(interp,
         const_string(interp, "WmlsInvalid"));
-    INTVAL result = mmd_dispatch_i_pp(interp, $2, $3, MMD_EQ);
+    Parrot_mmd_multi_dispatch_from_c_args(interp,
+            "is_equal", "PP->I", $2, $3, &result);
 
     if (4 == result) {
         $1 = pmc_new(interp, dynpmc_WmlsInvalid);
