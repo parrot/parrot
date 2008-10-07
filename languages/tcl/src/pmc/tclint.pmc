@@ -31,14 +31,9 @@ pmclass TclInt
     }
 
 
-    /*
-     * MMD Override:
-     *   TclInt shouldn't automatically promote division to float.
-     */
-    PMC* divide(PMC* value, PMC* dest) {
-      MMD_TclInt: {
-        INTVAL n = PMC_int_val(SELF);
-        INTVAL d = PMC_int_val(value);
+    /* TclInt shouldn't automatically promote division to float. */
+    MULTI PMC *divide(Integer value, PMC* dest) {
+        INTVAL d = VTABLE_get_integer(INTERP, value);
 
         if (d == 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
@@ -47,23 +42,9 @@ pmclass TclInt
         if (!dest)
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
-        VTABLE_set_integer_native(INTERP, dest, n / d);
+        VTABLE_set_integer_native(INTERP, dest, SELF.get_integer() / d);
         return dest;
-      }
-      MMD_DEFAULT: {
-        FLOATVAL d = VTABLE_get_number(INTERP, value);
-
-        if (d == 0.0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
-                "float division by zero");
-
-        if (!dest)
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
-        VTABLE_set_number_native(INTERP, dest, SELF.get_number() / d);
-        return dest;
-      }
     }
-
 }
 
 /*
