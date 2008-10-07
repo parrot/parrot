@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 53;
+use Parrot::Test tests => 54;
 
 =head1 NAME
 
@@ -1867,6 +1867,34 @@ pir_output_is( << 'CODE', << 'OUTPUT', "csch of complex numbers" );
 CODE
 done
 OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "add using subclass of Complex (RT #59630)" );
+.sub main
+    $P0 = subclass 'Complex', 'MyComplex'
+
+    .local pmc a, b, c
+    ##   a = 1 + 0i
+    a = new 'MyComplex'
+    a['real'] = 1
+    a['imag'] = 2
+    say a
+
+    ##   b = 1 + 0i
+    b = new 'MyComplex'
+    b['real'] = 3
+    b['imag'] = 4
+    say b
+
+    ##   c = a - b
+    c = add a, b
+    say c
+.end
+CODE
+1+2i
+3+4i
+4+6i
+OUTPUT
+
 
 # Local Variables:
 #   mode: cperl
