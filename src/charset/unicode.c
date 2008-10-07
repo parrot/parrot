@@ -168,7 +168,8 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
 
 =item C<static void set_graphemes>
 
-RT#48260: Not yet documented!!!
+Sets C<replace_count> graphemes in STRING C<source_string> starting at offset C<offset>.
+Gets the graphemes to be replaced from STRING C<insert_string>.
 
 =cut
 
@@ -186,7 +187,8 @@ set_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
 
 =item C<static STRING * get_graphemes>
 
-RT#48260: Not yet documented!!!
+Gets the graphemes from STRING C<source_string> starting at C<offset>. Gets C<count>
+graphemes total.
 
 =cut
 
@@ -204,7 +206,8 @@ get_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
 
 =item C<static STRING * get_graphemes_inplace>
 
-RT#48260: Not yet documented!!!
+Gets C<count> graphemes in place from STRING C<source_string> starting at offset
+C<offset>. Puts them into STRING C<dest_string>.
 
 =cut
 
@@ -223,7 +226,7 @@ get_graphemes_inplace(PARROT_INTERP, ARGIN(STRING *source_string),
 
 =item C<static STRING* to_charset>
 
-RT#48260: Not yet documented!!!
+Converts input STRING C<src> to unicode STRING C<dest>.
 
 =cut
 
@@ -246,7 +249,10 @@ to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
 
 =item C<static STRING* compose>
 
-RT#48260: Not yet documented!!!
+If Parrot is built with ICU, composes the STRING C<src>. Attempts to denormalize the STRING
+into the ICU default, NFC.
+
+If Parrot does not have ICU included, throws an exception.
 
 =cut
 
@@ -303,7 +309,7 @@ compose(PARROT_INTERP, ARGIN(STRING *src))
 
 =item C<static STRING* decompose>
 
-RT#48260: Not yet documented!!!
+Decompose function for unicode charset. This function is not yet implemented.
 
 =cut
 
@@ -313,6 +319,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING*
 decompose(PARROT_INTERP, SHIM(STRING *src))
 {
+    /* TODO: RT#59696 Implement this. */
     UNIMPL;
 }
 
@@ -320,7 +327,10 @@ decompose(PARROT_INTERP, SHIM(STRING *src))
 
 =item C<static void upcase>
 
-RT#48260: Not yet documented!!!
+Converts the STRING C<src> to all upper-case graphemes, for those characters which support
+upper-case versions. 
+
+Throws an exception if ICU is not installed.
 
 =cut
 
@@ -403,7 +413,9 @@ upcase(PARROT_INTERP, ARGIN(STRING *src))
 
 =item C<static void downcase>
 
-RT#48260: Not yet documented!!!
+Converts all graphemes to lower-case, for those graphemes which have cases.
+
+Throws an exception if ICU is not installed.
 
 =cut
 
@@ -464,7 +476,9 @@ u_strToLower(UChar *dest, int32_t destCapacity,
 
 =item C<static void titlecase>
 
-RT#48260: Not yet documented!!!
+Converts the string to title case, for those characters which support cases.
+
+Throws an exception if ICU is not installed.
 
 =cut
 
@@ -523,7 +537,8 @@ u_strToTitle(UChar *dest, int32_t destCapacity,
 
 =item C<static void upcase_first>
 
-RT#48260: Not yet documented!!!
+Converts the first grapheme in the STRING C<source_string> to uppercase, if the grapheme
+supports it. Not implemented.
 
 =cut
 
@@ -532,6 +547,7 @@ RT#48260: Not yet documented!!!
 static void
 upcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 {
+    /* TODO: RT#59696 Implement this. */
     UNIMPL;
 }
 
@@ -539,7 +555,8 @@ upcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 
 =item C<static void downcase_first>
 
-RT#48260: Not yet documented!!!
+Converts the first grapheme in the STRING C<source_string> to lower-case, if the
+grapheme supports it. Not implemented
 
 =cut
 
@@ -548,6 +565,7 @@ RT#48260: Not yet documented!!!
 static void
 downcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 {
+    /* TODO: RT#59696 Implement this. */
     UNIMPL;
 }
 
@@ -555,7 +573,8 @@ downcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 
 =item C<static void titlecase_first>
 
-RT#48260: Not yet documented!!!
+Converts the first grapheme in STRING C<source_string> to title case, if the string
+supports it. Not implemented.
 
 =cut
 
@@ -564,6 +583,7 @@ RT#48260: Not yet documented!!!
 static void
 titlecase_first(PARROT_INTERP, SHIM(STRING *source_string))
 {
+    /* TODO: RT#59696 Implement this. */
     UNIMPL;
 }
 
@@ -571,7 +591,8 @@ titlecase_first(PARROT_INTERP, SHIM(STRING *source_string))
 
 =item C<static INTVAL compare>
 
-RT#48260: Not yet documented!!!
+Compares two STRINGs C<lhs> and C<rhs>. Returns -1 if C<lhs> < C<rhs>. Returns
+0 if C<lhs> = C<rhs>. Returns 1 if C<lhs> > C<rhs>.
 
 =cut
 
@@ -609,7 +630,8 @@ compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
 
 =item C<static INTVAL cs_rindex>
 
-RT#48260: Not yet documented!!!
+Finds the last index of substring C<search_string> in STRING C<source_string>, starting
+from C<offset>. Not implemented.
 
 =cut
 
@@ -619,6 +641,7 @@ static INTVAL
 cs_rindex(PARROT_INTERP, SHIM(STRING *source_string),
         SHIM(STRING *search_string), UINTVAL offset)
 {
+    /* TODO: RT#59696 Implement this. */
     UNIMPL;
 }
 
@@ -626,7 +649,7 @@ cs_rindex(PARROT_INTERP, SHIM(STRING *source_string),
 
 =item C<static UINTVAL validate>
 
-RT#48260: Not yet documented!!!
+Returns 1 if the STRING C<src> is a valid unicode string, returns 0 otherwise.
 
 =cut
 
@@ -845,7 +868,7 @@ find_not_cclass(PARROT_INTERP, INTVAL flags,
 
 =item C<static STRING * string_from_codepoint>
 
-RT#48260: Not yet documented!!!
+Returns a one-codepoint string for the given codepoint.
 
 =cut
 
@@ -870,7 +893,7 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 
 =item C<static size_t compute_hash>
 
-RT#48260: Not yet documented!!!
+Computes the hash of the given SRING C<src> with starting seed value C<seed>.
 
 =cut
 
@@ -896,7 +919,7 @@ compute_hash(PARROT_INTERP, ARGIN(const STRING *src), size_t seed)
 
 =item C<const CHARSET * Parrot_charset_unicode_init>
 
-RT#48260: Not yet documented!!!
+Initializes the unicode charset by installing all the necessary function pointers.
 
 =cut
 
