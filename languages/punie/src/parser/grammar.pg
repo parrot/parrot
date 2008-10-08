@@ -226,27 +226,27 @@ token ws {
 }
 
 proto infix:<+> is assoc('left') is precedence('=')
-    is pirop('n_add')
+    is pirop('add')
     {...}
 
 proto infix:<-> is assoc('left') is equiv(infix:<+>)
-    is pirop('n_sub')
+    is pirop('sub')
     {...}
 
 proto infix:<.> is assoc('left')  is equiv(infix:<+>)
-    is pirop('n_concat')
+    is pirop('concat')
     {...}
 
 proto infix:<*> is assoc('left') is tighter(infix:<+>)
-    is pirop('n_mul')
+    is pirop('mul')
     {...}
 
 proto infix:</> is assoc('left') is equiv(infix:<*>)
-    is pirop('n_div')
+    is pirop('div')
     {...}
 
 proto infix:<%> is assoc('left') is equiv(infix:<*>)
-    is pirop('n_mod')
+    is pirop('mod')
     {...}
 
 proto infix:<x> is assoc('left') is equiv(infix:<*>)
