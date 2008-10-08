@@ -84,6 +84,19 @@ Return the integer 1.
 
 /*
 
+=item C<STRING *get_string()>
+
+Returns a Parrot string representation of the number.
+
+=cut
+
+*/
+    VTABLE STRING *get_string() {
+        return Parrot_sprintf_c(INTERP, "%vg", SELF.get_number());
+    }
+
+/*
+
 =item C<void set_integer_native(INTVAL value)>
 
 =cut
