@@ -29,6 +29,29 @@ src/builtins/globals.pir - initialize miscellaneous global variables
     ##  set up %*INC
     $P0 = new 'CardinalHash'
     set_hll_global '%INC', $P0
+        
+    ## global record separator
+    #$P1 = new 'CardinalString'
+    #$P1 = "\n"
+    $P1 = get_hll_global ['NilClass'], '!CARDINALMETA'
+    set_hll_global '$/', $P1
+
+    $P2 = new 'CardinalString'
+    $P2 = "parrot"
+    set_hll_global 'RUBY_PLATFORM', $P2
+
+    $P3 = new 'CardinalString'
+    $P3 = "1.9"
+    set_hll_global 'RUBY_VERSION', $P3
+.end
+
+=item
+ Uses Parrot builtin Random type, doesnt seem to be working
+=cut
+.sub 'rand'
+    $P0 = new 'Random'
+    $I0 = $P0
+    .return ($I0)
 .end
 
 # Local Variables:

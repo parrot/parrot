@@ -35,6 +35,14 @@ def is(got,expected,desc='')
     proclaim(got == expected, desc)
 end
 
+def isgt(got,expected,desc='')
+    proclaim(got > expected, desc)
+end
+
+def isge(got,expected,desc='')
+    proclaim(got >= expected, desc)
+end
+
 def isnt(got,expected,desc='')
     proclaim(got != expected, desc)
 end

@@ -26,7 +26,6 @@ Stolen from Rakudo
 
 .end
 
-
 =item get_string()    (vtable method)
 
 Return the elements of the list concatenated.
@@ -38,6 +37,23 @@ Return the elements of the list concatenated.
     $S0 = concat '[', $S0
     $S0 = concat $S0, ']'
     .return ($S0)
+.end
+
+.sub 'initialize' :method :multi(_)
+        noop
+.end
+
+.include "hllmacros.pir"
+.sub 'initialize' :method :multi(_,CardinalInteger)
+    .param pmc size
+    .local pmc i
+    i = new 'CardinalInteger'
+    i = 0
+    $P0 = get_hll_global 'nil'
+    .DoWhile( {
+                self[i] = $P0
+                inc i
+              }, i < size)
 .end
 
 =item to_s()    (method)
@@ -74,6 +90,35 @@ Removes all elements from the array.
     self = 0
 .end
 
+=item fill(value)
+
+Fill C<self> with C<value>
+Doesnt work, but it should be close...
+
+=cut
+
+.sub 'fill' :method
+    .param pmc value
+    .param int offset :optional
+    .param int end_index :optional
+                
+    unless end_index goto set_index
+    unless offset goto set_offset
+    goto do_fill
+    
+    set_index:
+        end_index = self.'length'()
+        unless offset goto set_offset
+        goto do_fill
+    set_offset:
+        offset = 0
+        goto do_fill
+    do_fill:
+        $P0 = new 'CardinalString'
+        $P0 = value
+        splice self, value, offset, end_index
+        .return (self)
+.end
 
 =item ACCEPTS(topic)
 
@@ -126,6 +171,16 @@ Return the number of elements in the list.
 .sub 'elems' :method
     $I0 = elements self
     .return ($I0)
+.end
+
+=item
+ 
+Return the class name
+
+=cut
+
+.sub 'class' :method
+    .return self.'WHAT'()
 .end
 
 =item sort()
@@ -227,6 +282,15 @@ Return a sorted copy of the list
     self.append($P0)
 .end
 
+.sub 'max' :method
+  $P0 = 'infix:max'(self)
+  .return($P0)
+.end
+
+.sub 'min' :method
+  $P0 = 'infix:min'(self)
+  .return($P0)
+.end
 
 =item include?(ELEMENT)
 
@@ -250,6 +314,21 @@ Return true if self contains ELEMENT
         .return($P0)
 .end
 
+=item
+Return true is C<self> is of size 0
+=cut
+.sub 'empty?' :method
+    .local int len
+    len = self.'length'()
+    if len == 0 goto empty
+    goto not_empty
+    empty:
+       $P0 = get_hll_global ['Bool'], 'True'
+       .return ($P0)
+    not_empty:
+        $P0 = get_hll_global ['Bool'], 'False'
+        .return ($P0)
+.end
 
 =item unshift(ELEMENTS)
 
@@ -657,8 +736,8 @@ Checks to see if the specified index or indices have been assigned to.  Returns 
 
 .sub grep :method
     .param pmc test
+    .param pmc block :named('!BLOCK')
     .local pmc retv
-    .local pmc block
     .local pmc block_res
     .local pmc block_arg
     .local int narg
@@ -671,15 +750,14 @@ Checks to see if the specified index or indices have been assigned to.  Returns 
   loop:
     if i == narg goto done
     block_arg = self[i]
-
-    newclosure block, test
+    $P0 = 'infix:=~'(block_arg, test)
+    unless $P0 goto next
     block_res = block(block_arg)
-
     if block_res goto grepped
     goto next
 
   grepped:
-    retv.'push'(block_arg)
+    retv.'push'(block_res)
     goto next
 
   next:
@@ -1176,7 +1254,7 @@ The min operator.
 =cut
 
 .sub 'infix:min'
-    .param pmc args :slurpy
+    .param pmc args
 
     # If we have no arguments, undefined.
     .local int elems
@@ -1191,11 +1269,14 @@ have_args:
     .local int i
     cur_min = args[0]
     i = 1
+    .local pmc compare
+    compare = get_hll_global 'infix:<=>'
 find_min_loop:
     if i >= elems goto find_min_loop_end
     $P0 = args[i]
-    $I0 = 'infix:cmp'($P0, cur_min)
-    if $I0 != -1 goto not_min
+    #$I0 = cur_min.'infix:cmp'($P0)
+    $I0 = cur_min.compare($P0)
+    if $I0 != 1 goto not_min
     set cur_min, $P0
 not_min:
     inc i
@@ -1213,7 +1294,7 @@ The max operator.
 =cut
 
 .sub 'infix:max'
-    .param pmc args :slurpy
+    .param pmc args
 
     # If we have no arguments, undefined.
     .local int elems
@@ -1228,11 +1309,14 @@ have_args:
     .local int i
     cur_max = args[0]
     i = 1
+    .local pmc compare
+    compare = get_hll_global 'infix:<=>'
 find_max_loop:
     if i >= elems goto find_max_loop_end
     $P0 = args[i]
-    $I0 = 'infix:cmp'($P0, cur_max)
-    if $I0 != 1 goto not_max
+    #$I0 = 'infix:<=>'($P0, cur_max)
+    $I0 = cur_max.compare($P0)
+    if $I0 != -1 goto not_max
     set cur_max, $P0
 not_max:
     inc i

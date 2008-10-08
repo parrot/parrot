@@ -33,6 +33,28 @@ builtin functions for Ruby.
     'print'($S0, "\n")
 .end
 
+.sub 'readline'
+    #.param pmc sep              :optional #record sep
+    $P0 = getstdin
+    $S0 = $P0.readline('')
+    .return($S0)
+.end
+
+.sub 'printf'
+    .param pmc fmt
+    .param pmc args             :slurpy
+    $P0 = get_hll_global ['Kernel'], '!CARDINALMETA'
+    $P0.'printf'(fmt, args :flat)
+.end
+
+.sub 'sprintf'
+    .param pmc fmt
+    .param pmc args             :slurpy
+    $P0 = get_hll_global ['Kernel'], '!CARDINALMETA'
+    $P1 = $P0.'sprintf'(fmt, args :flat)
+    .return ($P1)
+.end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

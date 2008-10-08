@@ -351,6 +351,8 @@ method constant_variable($/) {
     if $name eq 'Array' { $name := "CardinalArray"; }
     elsif $name eq 'Hash' { $name := "CardinalHash"; }
     elsif $name eq 'String' { $name := "CardinalString"; }
+    elsif $name eq 'Range' { $name := "CardinalRange"; }
+    elsif $name eq 'Integer' { $name := "CardinalInteger"; }
     my $past := PAST::Var.new( :name($name), :scope('package'), :node($/), :viviself('Undef'), :namespace( @a ) );
     make $past;
 }

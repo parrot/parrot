@@ -309,6 +309,9 @@ Returns a copy of C<self> with all lower case letters converted to upper case
     .return (retv)
 .end
 
+=item
+  TODO: Read from the global record separator
+=cut
 .sub 'chomp' :method
     .param string splitby :optional
     .param int custom_split :opt_flag
@@ -335,6 +338,9 @@ Returns a copy of C<self> with all lower case letters converted to upper case
     .return(retv)
 .end
 
+=item
+  TODO: Read from the global record separator
+=cut
 .sub 'chomp!' :method
     .param string splitby :optional
     .param int custom_split :opt_flag

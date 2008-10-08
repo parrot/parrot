@@ -61,6 +61,14 @@ src/builtins/control.pir - Cardinal Control functions
     throw e
 .end
 
+=item sleep(num)
+Sleep for number of seconds.
+=cut
+.sub 'sleep'
+    .param num a               
+    sleep a
+.end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

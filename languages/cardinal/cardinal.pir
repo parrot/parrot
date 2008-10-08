@@ -37,7 +37,8 @@ object.
 
 .namespace [ 'cardinal::Compiler' ]
 
-.loadlib 'cardinal_group'
+#no caridinal_group found on my machine
+#.loadlib 'cardinal_group'
 
 .sub 'onload' :anon :load :init
     load_bytecode 'PCT.pbc'

@@ -121,7 +121,6 @@ such as C<eval>, C<require>, and C<use>.
     $P0 = 'require'(file, 'file'=>1)
 .end
 
-
 =back
 
 =cut

@@ -46,6 +46,10 @@ Returns a Perl representation of the CardinalInteger.
     .return($S0)
 .end
 
+.sub 'integer?' :method
+  $P0 = get_hll_global['Bool'], 'True'
+  .return($P0)
+.end
 
 =item to_s()
 
@@ -59,6 +63,71 @@ Returns a CardinalString representation of the CardinalInteger.
     .return($P0)
 .end
 
+=item
+to_i()
+to_int()
+floor()
+ceil()
+round()
+truncate()
+
+All return C<self>
+
+=cut
+
+.sub 'to_i' :method
+    .return(self)
+.end
+
+.sub 'to_int' :method
+    .return(self)
+.end
+
+.sub 'floor' :method
+    .return(self)
+.end
+
+.sub 'ceil' :method
+    .return(self)
+.end
+
+.sub 'round' :method
+    .return(self)
+.end
+
+.sub 'truncate' :method
+    .return(self)
+.end
+
+.sub 'numerator' :method
+    .return(self)
+.end
+
+=item
+
+Returns 1
+
+=cut
+
+.sub 'denominator' :method
+   $P0 = new 'CardinalInteger'
+   $P0 = 1
+   .return($P0)
+.end
+
+
+=item gcd(num)
+
+Return the greatest common divisor of C<self> and num
+
+=cut
+
+.sub 'gcd' :method
+   .param num other
+   $N0 = self
+   gcd $I0, $N0, other
+   .return($I0)
+.end
 
 =item downto(n, block)
 
@@ -97,6 +166,49 @@ Runs C<block> for each integer from the current value of the Integer up to n.
     inc $I1
     goto upto_loop
   upto_done:
+.end
+
+=item
+
+Runs C<block> for integer from 0 to value of C<self>
+
+=cut
+
+.include "hllmacros.pir"
+.sub 'times' :method
+   .param pmc block
+   $I0 = 0
+   $I1 = self
+   .While($I0 < $I1, {
+        block($I0)
+        inc $I0
+   })
+.end
+
+=item succ()
+
+Return C<self> plus 1
+
+=cut
+
+.sub 'succ' :method
+  $P0 = new 'CardinalInteger'
+  $P0 = 1
+  $P1 = 'infix:+'($P0, self)
+  .return ($P1)
+.end
+
+=item next()
+
+Return C<self> plus 1
+
+=cut
+
+.sub 'next' :method
+  $P0 = new 'CardinalInteger'
+  $P0 = 1
+  $P1 = 'infix:+'($P0, self)
+  .return ($P1)
 .end
 
 
