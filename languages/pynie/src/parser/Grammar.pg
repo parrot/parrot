@@ -641,15 +641,15 @@ proto infix:<**>   is looser('term:')        { ... }
 proto prefix:<~>   is looser(infix:<**>)     { ... }
 proto prefix:<+>   is looser(prefix:<~>)     { ... }
 proto prefix:<->   is equiv(prefix:<+>)  is pirop('n_neg')     { ... }
-proto infix:<*>    is looser(prefix:<+>) is pirop('n_mul')     { ... }
-proto infix:</>    is equiv(infix:<*>)   is pirop('n_div')     { ... }
-proto infix:<//>   is equiv(infix:<*>)   is pirop('n_fdiv')    { ... }
-proto infix:<%>    is equiv(infix:<*>)   is pirop('n_mod')     { ... }
-proto infix:<+>    is looser(infix:<*>)  is pirop('n_add')     { ... }
-proto infix:<->    is equiv(infix:<+>)   is pirop('n_sub')     { ... }
+proto infix:<*>    is looser(prefix:<+>) is pirop('mul')     { ... }
+proto infix:</>    is equiv(infix:<*>)   is pirop('div')     { ... }
+proto infix:<//>   is equiv(infix:<*>)   is pirop('fdiv')    { ... }
+proto infix:<%>    is equiv(infix:<*>)   is pirop('mod')     { ... }
+proto infix:<+>    is looser(infix:<*>)  is pirop('add')     { ... }
+proto infix:<->    is equiv(infix:<+>)   is pirop('sub')     { ... }
 
-proto infix:«<<»   is looser(infix:<+>)  is pirop('n_shl')     { ... }
-proto infix:«>>»   is equiv(infix:«<<»)  is pirop('n_shr')     { ... }
+proto infix:«<<»   is looser(infix:<+>)  is pirop('shl')     { ... }
+proto infix:«>>»   is equiv(infix:«<<»)  is pirop('shr')     { ... }
 proto infix:<&>    is looser(infix:«<<»)     { ... }
 proto infix:<^>    is looser(infix:<&>)      { ... }
 proto infix:<|>    is looser(infix:<^>)      { ... }
