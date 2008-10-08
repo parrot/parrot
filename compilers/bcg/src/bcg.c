@@ -85,7 +85,8 @@ BCG_destroy(BCG_info *bcg_info)
 =item C<void
 BCG_start_code_gen(BCG_info * bcg_info)>
 
-RT#48260: Not yet documented!!!
+Sets the state of BCG to the CODEGEN state. If BCG is not able to switch to this
+state reasonably, an exception is thrown.
 
 =cut
 
@@ -108,7 +109,8 @@ BCG_start_code_gen(BCG_info * bcg_info)
 =item C<void
 BCG_end_code_gen(BCG_info * bcg_info)>
 
-RT#48260: Not yet documented!!!
+Moves BCG back out of the CODEGEN state. If BCG is not in the CODEGEN state, an
+exception is thrown.
 
 =cut
 
@@ -130,7 +132,9 @@ BCG_end_code_gen(BCG_info * bcg_info)
 =item C<void
 BCG_start_sub(BCG_info * bcg_info, char *sub_name, char *pragma)>
 
-RT#48260: Not yet documented!!!
+Starts the code generation for a new subroutine object, and adds the subroutine to the
+BCG symbol table. If BCG is not in the CODEGEN state, an exception is thrown. Moves BCG
+into the SUB state.
 
 =cut
 
@@ -158,7 +162,9 @@ BCG_start_sub(BCG_info * bcg_info, char *sub_name, char *pragma)
 =item C<void
 BCG_end_sub(BCG_info * bcg_info)>
 
-RT#48260: Not yet documented!!!
+Moves BCG out of the SUB state and runs the vanilla register allocator on the
+current subroutine unit. If BCG is not in the SUB state, an exceptio is
+thrown.
 
 =cut
 
@@ -184,7 +190,8 @@ BCG_end_sub(BCG_info * bcg_info)
 =item C<void
 BCG_start_call(BCG_info * bcg_info, char *sub_name)>
 
-RT#48260: Not yet documented!!!
+Moves BCG into the CALL state. If BCG is not in the SUB state initially, an exception
+is thrown.
 
 =cut
 
@@ -206,7 +213,8 @@ BCG_start_call(BCG_info * bcg_info, char *sub_name)
 =item C<void
 BCG_end_call(BCG_info * bcg_info)>
 
-RT#48260: Not yet documented!!!
+Moves BCG out of the CALL state. If BCG is not initially in the call state, an
+exception is thrown.
 
 =cut
 
@@ -228,7 +236,8 @@ BCG_end_call(BCG_info * bcg_info)
 =item C<void
 BCG_start_op(BCG_info * bcg_info, char *op_name)>
 
-RT#48260: Not yet documented!!!
+Moves BCG into the OP state. Adds the current op C<op_name> into the current unit.
+If BCG is not in the SUB state initially, an exception is thrown.
 
 =cut
 
@@ -256,7 +265,8 @@ BCG_start_op(BCG_info * bcg_info, char *op_name)
 =item C<void
 BCG_end_op(BCG_info * bcg_info)>
 
-RT#48260: Not yet documented!!!
+Moves BCG out of the OP state. If BCG is not in the OP state initially, an exception
+is thrown. Resolves the full name of the current op.
 
 =cut
 
@@ -282,7 +292,9 @@ BCG_end_op(BCG_info * bcg_info)
 =item C<void
 BCG_var(BCG_info * bcg_info, char *var_name, char var_type)>
 
-RT#48260: Not yet documented!!!
+Adds the variable given by C<var_name> with type C<var_type> to the current op. Makes sure
+the variable is located in the current unit's symbol table. If BCG is not in the OP state
+to begin with, an exception is thrown.
 
 =cut
 
@@ -317,7 +329,8 @@ BCG_var(BCG_info * bcg_info, char *var_name, char var_type)
 =item C<void
 BCG_val(BCG_info * bcg_info, char *val, char val_type)>
 
-RT#48260: Not yet documented!!!
+Adds a constant value C<val> of type C<val_type> to the current op. If BCG is not in
+the OP state, an exception is thrown.
 
 =cut
 
@@ -344,7 +357,8 @@ BCG_val(BCG_info * bcg_info, char *val, char val_type)
 =item C<void
 BCG_label(BCG_info * bcg_info, char *label)>
 
-RT#48260: Not yet documented!!!
+Adds a label C<label> to the current unit. If BCG is not in the SUB state, an
+exception is thrown.
 
 =cut
 
@@ -389,7 +403,8 @@ BCG_print_pasm(BCG_info * bcg_info)
 =item C<bcg_info_private *
 bcg_info_private_create(BCG_info * bcg_info)>
 
-RT#48260: Not yet documented!!!
+Allocates space for C<bcg_info>'s private data structure. This structure is allocated
+from the system and needs to be freed.
 
 =cut
 
@@ -411,7 +426,8 @@ bcg_info_private_create(BCG_info * bcg_info)
 =item C<void
 bcg_info_private_destroy(BCG_info * bcg_info, bcg_info_private * bcg_info_priv)>
 
-RT#48260: Not yet documented!!!
+Destroys C<bcg_info>'s private data structure C<bcg_info_priv>. Destroy's all units
+in the private structure.
 
 =cut
 
@@ -439,7 +455,7 @@ bcg_info_private_destroy(BCG_info * bcg_info, bcg_info_private * bcg_info_priv)
 =item C<void
 bcg_info_add_unit(BCG_info * bcg_info, bcg_unit * unit)>
 
-RT#48260: Not yet documented!!!
+Adds C<unit> to the double-linked list in C<bcg_info>.
 
 =cut
 
@@ -467,7 +483,7 @@ bcg_info_add_unit(BCG_info * bcg_info, bcg_unit * unit)
 =item C<static void
 set_state(BCG_info * bcg_info, bcg_state state)>
 
-RT#48260: Not yet documented!!!
+Set's BCG's internal state field to include C<state>.
 
 =cut
 
@@ -484,7 +500,7 @@ set_state(BCG_info * bcg_info, bcg_state state)
 =item C<static void
 unset_state(BCG_info * bcg_info, bcg_state state)>
 
-RT#48260: Not yet documented!!!
+Sets BCG's internal state field to exclude C<state>.
 
 =cut
 
@@ -501,7 +517,7 @@ unset_state(BCG_info * bcg_info, bcg_state state)
 =item C<static int
 in_state(BCG_info * bcg_info, bcg_state state)>
 
-RT#48260: Not yet documented!!!
+Determines if BCG is currently in C<state>. Returns 1 if true, 0 otherwise.
 
 =cut
 
