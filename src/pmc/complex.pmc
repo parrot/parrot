@@ -456,13 +456,16 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
     }
 
     VTABLE FLOATVAL get_number_keyed_str(STRING *key) {
-        FLOATVAL value = 0.0;
+        FLOATVAL value;
         if (string_equal(INTERP, key, CONST_STRING(INTERP, "real")) == 0) {
             GET_ATTR_re(INTERP, SELF, value);
         }
         else if (string_equal(INTERP, key, CONST_STRING(INTERP, "imag")) == 0) {
             GET_ATTR_im(INTERP, SELF, value);
         }
+        else
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION, "Complex: key is neither 'real' or 'imag'");
         return value;
     }
 
@@ -647,6 +650,9 @@ to C<value>.
         else if (string_equal(INTERP, key, CONST_STRING(INTERP, "imag")) == 0) {
             SET_ATTR_im(INTERP, SELF, value);
         }
+        else
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION, "Complex: key is neither 'real' or 'imag'");
     }
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
