@@ -23,24 +23,24 @@ proto infix:<^>     is looser(prefix:<->)  { ... }
 
 ## multiplicative
 proto infix:<*>     is looser(infix:<^>)
-    is pirop('n_mul')
+    is pirop('mul')
     { ... }
 
 proto infix:</>     is equiv(infix:<*>)
-    is pirop('n_div')
+    is pirop('div')
     { ... }
 
 proto infix:<%>     is equiv(infix:<*>)
-    is pirop('n_mod')
+    is pirop('mod')
     { ... }
 
 ## additive
 proto infix:<+>     is looser(infix:<*>)
-    is pirop('n_add')
+    is pirop('add')
     { ... }
 
 proto infix:<->     is equiv(infix:<+>)
-    is pirop('n_sub')
+    is pirop('sub')
     { ... }
 
 ## assignment
@@ -59,7 +59,7 @@ proto infix:«>»     is equiv(infix:<==>) { ... }
 proto infix:«>=»    is equiv(infix:<==>) { ... }
 
 ## boolean
-proto prefix:<!>    is looser(infix:<==>) is pirop('n_not') { ... }
+proto prefix:<!>    is looser(infix:<==>) is pirop('not') { ... }
 proto infix:<&&>    is looser(prefix:<!>) is assoc('left') { ... }
 proto infix:<||>    is looser(infix:<&&>) is assoc('left') { ... }
 
