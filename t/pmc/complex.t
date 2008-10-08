@@ -1868,7 +1868,7 @@ CODE
 done
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "add using subclass of Complex (RT #59630)" );
+pir_output_is( << 'CODE', << 'OUTPUT', "add using subclass of Complex (RT #59630)", todo=>'TODO');
 .sub main
     $P0 = subclass 'Complex', 'MyComplex'
 
