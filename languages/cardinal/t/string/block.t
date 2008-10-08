@@ -11,7 +11,7 @@ s.each_byte() do |c|
    ruby[i] = c
    i = i + 1
 end
-is ruby, 'ruby', '.each_char for String'
+is ruby, 'ruby', '.each_byte for String'
 parrot = 'parrot'
 i = 0
 parrot.each('r') do |split|

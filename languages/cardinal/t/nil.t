@@ -1,5 +1,5 @@
 require 'test'
-plan 4
+plan 5
 
 ele = nil
 is ele, nil, 'nil == nil'
@@ -10,5 +10,10 @@ isnt nil, ele2, 'nil == against a number'
 ele3 = 'squaak!'
 isnt ele3, nil, 'nil == against a string'
 
-puts nil.to_s
-is nil.to_s, '', 'to_s for nil'
+is nil.to_s, '', 'to_s on nil'
+
+if ele.nil?
+   pass '.nil? on nil'
+else
+   fail '.nil? on nil'
+end

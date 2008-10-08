@@ -1,5 +1,5 @@
 require 'test'
-plan 2
+plan 1
 
 class NumberHolder
     def initialize(n)
@@ -9,7 +9,6 @@ class NumberHolder
     def inc
         @num = @num + 1
     end
-    alias increment inc
 
     def num
       	@num
@@ -17,5 +16,7 @@ class NumberHolder
 end
 
 obj = NumberHolder.new(0)
-is obj.inc, 1, '.alias method'
-is obj.increment, 2, '.alias method'
+obj.inc
+obj.freeze
+#p obj
+isnt obj.inc, 2, '.freeze method'
