@@ -197,37 +197,6 @@ complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value) {
     string_cstring_free(str);
 }
 
-/*
-
-=item C<static FLOATVAL*
-complex_locate_keyed_num(PARROT_INTERP, PMC *self, STRING *key)>
-
-Interpret the string C<key>; valid keys are C<real> and C<imag>,
-representing the real and imaginary parts of the complex number.
-
-=cut
-
-*/
-
-static FLOATVAL*
-complex_locate_keyed_num(PARROT_INTERP, PMC *self, STRING *key) {
-    /* do imag first since real can be read much faster anyway */
-    STRING *imag = CONST_STRING(interp, "imag");
-
-    if (0 == string_equal(interp, key, imag)) {
-        return &PARROT_COMPLEX(self)->im;
-    }
-    else {
-        STRING *real = CONST_STRING(interp, "real");
-        if (0 == string_equal(interp, key, real))
-            return &PARROT_COMPLEX(self)->re;
-        else
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_INVALID_OPERATION,
-                "Complex: key is neither 'real' or 'imag'");
-    }
-}
-
 static void
 int_check_divide_zero(PARROT_INTERP, INTVAL value) {
     if (value == 0)
@@ -376,7 +345,8 @@ Creates an identical copy of the complex number.
     VTABLE void init() {
         /* XXX should check if mem_sys_allocate failed */
         PMC_data(SELF) = mem_allocate_typed(Parrot_Complex_attributes);
-        RE(SELF) = IM(SELF) = 0.0;
+        SET_ATTR_re(INTERP, SELF, 0.0);
+        SET_ATTR_im(INTERP, SELF, 0.0);
 
         PObj_active_destroy_SET(SELF);
     }
@@ -392,12 +362,13 @@ Creates an identical copy of the complex number.
     }
 
     VTABLE PMC *clone() {
-        PMC *dest = pmc_new_noinit(INTERP, VTABLE_type(INTERP, SELF));
-        PMC_data(dest) = mem_allocate_typed(Parrot_Complex_attributes);
-        RE(dest) = RE(SELF);
-        IM(dest) = IM(SELF);
+        FLOATVAL re, im;
+        PMC *dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        GET_ATTR_re(INTERP, SELF, re);
+        GET_ATTR_im(INTERP, SELF, im);
+        SET_ATTR_re(INTERP, dest, re);
+        SET_ATTR_im(INTERP, dest, im);
 
-        PObj_active_destroy_SET(dest);
         return dest;
     }
 
@@ -429,15 +400,24 @@ Returns true if the complex number is non-zero.
     }
 
     VTABLE FLOATVAL get_number() {
-        return sqrt(RE(SELF) * RE(SELF) + IM(SELF) * IM(SELF));
+        FLOATVAL re, im;
+        GET_ATTR_re(INTERP, SELF, re);
+        GET_ATTR_im(INTERP, SELF, im);
+        return sqrt(re * re + im * im);
     }
 
     VTABLE STRING *get_string() {
-        return Parrot_sprintf_c(INTERP, "%vg%+vgi", RE(SELF), IM(SELF));
+        FLOATVAL re, im;
+        GET_ATTR_re(INTERP, SELF, re);
+        GET_ATTR_im(INTERP, SELF, im);
+        return Parrot_sprintf_c(INTERP, "%vg%+vgi", re, im);
     }
 
     VTABLE INTVAL get_bool() {
-        return !(FLOAT_IS_ZERO(RE(SELF)) && FLOAT_IS_ZERO(IM(SELF)));
+        FLOATVAL re, im;
+        GET_ATTR_re(INTERP, SELF, re);
+        GET_ATTR_im(INTERP, SELF, im);
+        return !(FLOAT_IS_ZERO(re) && FLOAT_IS_ZERO(im));
     }
 
 /*
@@ -476,11 +456,14 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
     }
 
     VTABLE FLOATVAL get_number_keyed_str(STRING *key) {
-        const FLOATVAL * const num = complex_locate_keyed_num(INTERP, SELF, key);
-        if (num)
-            return *num;
-
-        return 0.0;
+        FLOATVAL value = 0.0;
+        if (string_equal(INTERP, key, CONST_STRING(INTERP, "real")) == 0) {
+            GET_ATTR_re(INTERP, SELF, value);
+        }
+        else if (string_equal(INTERP, key, CONST_STRING(INTERP, "imag")) == 0) {
+            GET_ATTR_im(INTERP, SELF, value);
+        }
+        return value;
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
@@ -536,24 +519,28 @@ Set real or imag depending on key
 */
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
+        FLOATVAL f;
         switch (key) {
             case 0:
-                return RE(SELF);
+                GET_ATTR_re(INTERP, SELF, f);
+                break;
             case 1:
-                return IM(SELF);
+                GET_ATTR_im(INTERP, SELF, f);
+                break;
             default:
                 Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION, "Complex: key must be 0 or 1");
         }
+        return f;
     }
 
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL v) {
         switch (key) {
             case 0:
-                RE(SELF) = v;
+                SET_ATTR_re(INTERP, SELF, v);
                 break;
             case 1:
-                IM(SELF) = v;
+                SET_ATTR_im(INTERP, SELF, v);
                 break;
             default:
                 Parrot_ex_throw_from_c_args(interp, NULL,
@@ -585,17 +572,23 @@ part to C<0.0>
 */
 
     VTABLE void set_string_native(STRING *value) {
-        complex_parse_string(INTERP, &RE(SELF), &IM(SELF), value);
+        FLOATVAL re, im;
+        complex_parse_string(INTERP, &re, &im, value);
+        SET_ATTR_re(INTERP, SELF, re);
+        SET_ATTR_im(INTERP, SELF, im);
     }
 
     VTABLE void set_pmc(PMC *value) {
-        if (value->vtable->base_type == enum_class_Complex) {
-            RE(SELF) = RE(value);
-            IM(SELF) = IM(value);
+        if (VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Complex")))
+        {
+            FLOATVAL re, im;
+            GET_ATTR_re(INTERP, value, re);
+            GET_ATTR_im(INTERP, value, im);
+            SET_ATTR_re(INTERP, SELF, re);
+            SET_ATTR_im(INTERP, SELF, im);
         }
-        else {
-            SELF.set_string_native(VTABLE_get_string(INTERP, value));
-        }
+        else
+            VTABLE_set_string_native(INTERP, SELF, VTABLE_get_string(INTERP, value));
     }
 
     VTABLE void set_integer_native(INTVAL value) {
@@ -603,8 +596,8 @@ part to C<0.0>
     }
 
     VTABLE void set_number_native(FLOATVAL value) {
-        RE(SELF) = value;
-        IM(SELF) = 0.0;
+        SET_ATTR_re(INTERP, SELF, value);
+        SET_ATTR_im(INTERP, SELF, 0.0);
     }
 
 /*
@@ -648,9 +641,12 @@ to C<value>.
     }
 
     VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) {
-        FLOATVAL * const num = complex_locate_keyed_num(INTERP, SELF, key);
-        if (num)
-            *num = value;
+        if (string_equal(INTERP, key, CONST_STRING(INTERP, "real")) == 0) {
+            SET_ATTR_re(INTERP, SELF, value);
+        }
+        else if (string_equal(INTERP, key, CONST_STRING(INTERP, "imag")) == 0) {
+            SET_ATTR_im(INTERP, SELF, value);
+        }
     }
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
@@ -678,56 +674,74 @@ Adds C<value> to the complex number, placing the result in C<dest>.
 */
 
     MULTI PMC *add(Complex value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        FLOATVAL re1, im1, re2, im2;
+        dest = pmc_new(INTERP, enum_class_Complex);
 
-        RE(dest) = RE(SELF) + RE(value);
-        IM(dest) = IM(SELF) + IM(value);
+        GET_ATTR_re(INTERP, SELF, re1);
+        GET_ATTR_im(INTERP, SELF, im1);
+        GET_ATTR_re(INTERP, value, re2);
+        GET_ATTR_im(INTERP, value, im2);
+        SET_ATTR_re(INTERP, dest, re1 + re2);
+        SET_ATTR_im(INTERP, dest, im1 + im2);
 
         return dest;
     }
 
     MULTI PMC *add(DEFAULT value, PMC *dest) {
+        FLOATVAL re, im;
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
-        RE(dest) = RE(SELF) + VTABLE_get_number(INTERP, value);
-        IM(dest) = IM(SELF);
+        GET_ATTR_re(INTERP, SELF, re);
+        GET_ATTR_im(INTERP, SELF, im);
+        SET_ATTR_re(INTERP, dest, re + VTABLE_get_number(INTERP, value));
+        SET_ATTR_im(INTERP, dest, im);
 
         return dest;
     }
 
     VTABLE PMC *add_int(INTVAL value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        RE(dest) = RE(SELF) + value;
-        IM(dest) = IM(SELF);
-
-        return dest;
+        return SELF.add_float((FLOATVAL)value, dest);
     }
 
     VTABLE PMC *add_float(FLOATVAL value, PMC *dest) {
+        FLOATVAL re, im;
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
-        RE(dest) = RE(SELF) + value;
-        IM(dest) = IM(SELF);
+        GET_ATTR_re(INTERP, SELF, re);
+        GET_ATTR_im(INTERP, SELF, im);
+        SET_ATTR_re(INTERP, dest, re + value);
+        SET_ATTR_im(INTERP, dest, im);
 
         return dest;
     }
 
     MULTI void i_add(Complex value) {
-        RE(SELF) += RE(value);
-        IM(SELF) += IM(value);
+        FLOATVAL re1, im1, re2, im2;
+
+        GET_ATTR_re(INTERP, SELF, re1);
+        GET_ATTR_im(INTERP, SELF, im1);
+        GET_ATTR_re(INTERP, value, re2);
+        GET_ATTR_im(INTERP, value, im2);
+        SET_ATTR_re(INTERP, SELF, re1 + re2);
+        SET_ATTR_im(INTERP, SELF, im1 + im2);
     }
 
     MULTI void i_add(DEFAULT value) {
-        RE(SELF) += VTABLE_get_number(INTERP, value);
+        FLOATVAL re;
+
+        GET_ATTR_re(INTERP, SELF, re);
+        SET_ATTR_re(INTERP, SELF, re + VTABLE_get_number(INTERP, value));
     }
 
     VTABLE void i_add_int(INTVAL value) {
-        RE(SELF) += (FLOATVAL)value;
+        SELF.i_add_float((FLOATVAL)value);
     }
 
     VTABLE void i_add_float(FLOATVAL value) {
-        RE(SELF) += value;
+        FLOATVAL re;
+
+        GET_ATTR_re(INTERP, SELF, re);
+        SET_ATTR_re(INTERP, SELF, re + value);
     }
 
 /*
@@ -745,56 +759,75 @@ Subtracts C<value> from the complex number, placing the result in C<dest>.
 */
 
     MULTI PMC *subtract(Complex value, PMC *dest) {
+        FLOATVAL re1, im1, re2, im2;
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
-        RE(dest) = RE(SELF) - RE(value);
-        IM(dest) = IM(SELF) - IM(value);
+        GET_ATTR_re(INTERP, SELF, re1);
+        GET_ATTR_im(INTERP, SELF, im1);
+        GET_ATTR_re(INTERP, value, re2);
+        GET_ATTR_im(INTERP, value, im2);
+        SET_ATTR_re(INTERP, dest, re1 - re2);
+        SET_ATTR_im(INTERP, dest, im1 - im2);
 
         return dest;
     }
 
     MULTI PMC *subtract(DEFAULT value, PMC *dest) {
+        FLOATVAL re, im;
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
-        RE(dest) = RE(SELF) - VTABLE_get_number(INTERP, value);
-        IM(dest) = IM(SELF);
+        GET_ATTR_re(INTERP, SELF, re);
+        GET_ATTR_im(INTERP, SELF, im);
+        SET_ATTR_re(INTERP, dest, re - VTABLE_get_number(INTERP, value));
+        SET_ATTR_im(INTERP, dest, im);
 
         return dest;
     }
 
     VTABLE PMC *subtract_int(INTVAL value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        RE(dest) = RE(SELF) - value;
-        IM(dest) = IM(SELF);
-
-        return dest;
+        return SELF.subtract_float((FLOATVAL)value, dest);
     }
 
     VTABLE PMC *subtract_float(FLOATVAL value, PMC *dest) {
+        FLOATVAL re, im;
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
-        RE(dest) = RE(SELF) - value;
-        IM(dest) = IM(SELF);
+        GET_ATTR_re(INTERP, SELF, re);
+        GET_ATTR_im(INTERP, SELF, im);
+        SET_ATTR_re(INTERP, dest, re - value);
+        SET_ATTR_im(INTERP, dest, im);
 
         return dest;
     }
 
     MULTI void i_subtract(Complex value) {
-        RE(SELF) -= RE(value);
-        IM(SELF) -= IM(value);
+        FLOATVAL re1, im1, re2, im2;
+
+        GET_ATTR_re(INTERP, SELF, re1);
+        GET_ATTR_im(INTERP, SELF, im1);
+        GET_ATTR_re(INTERP, value, re2);
+        GET_ATTR_im(INTERP, value, im2);
+        SET_ATTR_re(INTERP, SELF, re1 - re2);
+        SET_ATTR_im(INTERP, SELF, im1 - im2);
+
     }
 
     MULTI void i_subtract(DEFAULT value) {
-        RE(SELF) -= VTABLE_get_number(INTERP, value);
+        FLOATVAL re;
+
+        GET_ATTR_re(INTERP, SELF, re);
+        SET_ATTR_re(INTERP, SELF, re - VTABLE_get_number(INTERP, value));
     }
 
     VTABLE void i_subtract_int(INTVAL value) {
-        RE(SELF) -= (FLOATVAL)value;
+        SELF.i_subtract_float((FLOATVAL) value);
     }
 
     VTABLE void i_subtract_float(FLOATVAL value) {
-        RE(SELF) -= value;
+        FLOATVAL re;
+
+        GET_ATTR_re(INTERP, SELF, re);
+        SET_ATTR_re(INTERP, SELF, re - value);
     }
 /*
 
@@ -820,19 +853,21 @@ Multiplies the complex number SELF inplace with C<value>.
 
 /*
 
-  TODO for better precision:
-
   (a+ib)(c+id)=(ac-bd)+i((a+b)(c+d)-ac-bd).
   (a+bi)(c+di)=(ac-bd)+i(ad+bc)
 
 */
     MULTI PMC *multiply(Complex value, PMC *dest) {
-        FLOATVAL re = RE(SELF) * RE(value) - IM(SELF) * IM(value);
-        FLOATVAL im = IM(SELF) * RE(value) + RE(SELF) * IM(value);
+        FLOATVAL a, b, c, d;
+
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
-        RE(dest) = re;
-        IM(dest) = im;
+        GET_ATTR_re(INTERP, SELF, a);
+        GET_ATTR_im(INTERP, SELF, b);
+        GET_ATTR_re(INTERP, value, c);
+        GET_ATTR_im(INTERP, value, d);
+        SET_ATTR_re(INTERP, dest, a * c - b * d);
+        SET_ATTR_im(INTERP, dest, a * d + b * c);
 
         return dest;
     }
@@ -849,28 +884,30 @@ Multiplies the complex number SELF inplace with C<value>.
     }
 
     VTABLE PMC *multiply_int(INTVAL value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        RE(dest) = RE(SELF) * value;
-        IM(dest) = IM(SELF) * value;
-
-        return dest;
+        return SELF.multiply_float((FLOATVAL) value, dest);
     }
 
     VTABLE PMC *multiply_float(FLOATVAL value, PMC *dest) {
+        FLOATVAL re, im;
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
-        RE(dest) = RE(SELF) * value;
-        IM(dest) = IM(SELF) * value;
+        GET_ATTR_re(INTERP, SELF, re);
+        GET_ATTR_im(INTERP, SELF, im);
+        SET_ATTR_re(INTERP, dest, re * value);
+        SET_ATTR_im(INTERP, dest, im * value);
 
         return dest;
     }
 
     MULTI void i_multiply(Complex value) {
-        FLOATVAL re = RE(SELF) * RE(value) - IM(SELF) * IM(value);
-        FLOATVAL im = IM(SELF) * RE(value) + RE(SELF) * IM(value);
-        RE(SELF)    = re;
-        IM(SELF)    = im;
+        FLOATVAL a, b, c, d;
+
+        GET_ATTR_re(INTERP, SELF, a);
+        GET_ATTR_im(INTERP, SELF, b);
+        GET_ATTR_re(INTERP, value, c);
+        GET_ATTR_im(INTERP, value, d);
+        SET_ATTR_re(INTERP, SELF, a * c - b * d);
+        SET_ATTR_im(INTERP, SELF, a * d + b * c);
     }
 
     MULTI void i_multiply(DEFAULT value) {
@@ -884,8 +921,12 @@ Multiplies the complex number SELF inplace with C<value>.
     }
 
     VTABLE void i_multiply_float(FLOATVAL value) {
-        RE(SELF) *= value;
-        IM(SELF) *= value;
+        FLOATVAL re, im;
+
+        GET_ATTR_re(INTERP, SELF, re);
+        GET_ATTR_im(INTERP, SELF, im);
+        SET_ATTR_re(INTERP, SELF, re * value);
+        SET_ATTR_im(INTERP, SELF, im * value);
     }
 
 /*
