@@ -213,7 +213,7 @@ This method generated code for ending a subroutine call.
 
 =item C<void startOp(STRING *op)>
 
-This method generates code for an opertion.
+This method generates code for a normal op.
 
 =cut
 
@@ -236,9 +236,9 @@ This method generates code for an opertion.
 
 /*
 
-=item C<void startOp(STRING *op)>
+=item C<void endOp()>
 
-This method marks the end of an operation.
+This method marks the end of an op.
 
 =cut
 
@@ -350,6 +350,16 @@ This method generates bytecode for label.
     }
 
 
+/*
+
+=item C<void printPASM()>
+
+This method decompiles the bytecode to PASM.
+See emit_pasm(BCG_info * bcg_info).
+
+=cut
+
+*/
     METHOD printPASM()
     {
         BCG_info *bcg_info = (BCG_info *)PMC_struct_val(SELF);
