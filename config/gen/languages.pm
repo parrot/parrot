@@ -8,8 +8,7 @@ config/gen/languages.pm - Build files for language implementations
 =head1 DESCRIPTION
 
 Config step for languages.  Builds C<languages/Makefile> and loops over
-list of languages.  Special support for C<languages/tcl> and
-C<languages/dotnet>.
+list of languages.  Special support for C<languages/dotnet>.
 
 A space separated list of languages can be passed in with the option
 'languages'.  An empty list of languages is OK. This means that only
@@ -50,7 +49,6 @@ sub _init {
         parrot_compiler perl6 pheme PIR pipp punie pynie
         regex
         scheme squaak
-        tcl
         unlambda urm
         WMLScript
         Zcode
@@ -77,15 +75,6 @@ sub runstep {
         elsif ( $language eq 'c99' ) {
             $conf->genfile("$langdir/config/makefiles/root.in"     => "$langdir/Makefile");
             $conf->genfile("$langdir/config/makefiles/cpp.in"      => "$langdir/src/cpp/Makefile");
-        }
-        elsif ( $language eq 'tcl' ) {
-            # tcl has more than one Makefile
-            # currently this is handled as a special case
-            $conf->genfile("$langdir/config/makefiles/examples.in" => "$langdir/examples/Makefile"
-            );
-            $conf->genfile("$langdir/config/makefiles/root.in"     => "$langdir/Makefile",
-                expand_gmake_syntax                                => 1,
-            );
         }
         elsif ( $language eq 'perl6' ) {
             $conf->genfile("$langdir/config/makefiles/root.in"     => "$langdir/Makefile");

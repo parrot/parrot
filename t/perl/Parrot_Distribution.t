@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 33;
+use Test::More tests => 32;
 use File::Spec;
 
 =head1 NAME
@@ -54,7 +54,7 @@ my @old_directory_list = (
     'compilers/bcg/src/pmc',   'languages/APL/src/pmc',
     'languages/WMLScript/pmc',
     'languages/dotnet/pmc',    'languages/lua/src/pmc',
-    'languages/perl6/src/pmc', 'languages/tcl/src/pmc',
+    'languages/perl6/src/pmc',
     map { File::Spec->catdir( 'src', $_ ) } qw(dynpmc pmc)
 );
 

@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 29;
+use Test::More tests => 28;
 
 =head1 NAME
 
@@ -220,19 +220,6 @@ close $FH;
 $out = `$parrot languages/squaak/squaak.pbc $filename`;
 ok($out eq "Hello, World!\n", "check squaak");
 unlink($filename);
-
-TODO: {
-    local $TODO = 'missing file ?';
-
-$filename = 'test.tcl';
-open $FH, '>', $filename
-        or die "Can't open $filename ($!).\n";
-print $FH "puts {hello world!}\n";
-close $FH;
-$out = `$parrot languages/tcl/tcl.pbc $filename`;
-ok($out eq "hello world!\n", "check tcl");
-unlink($filename);
-}
 
 # Local Variables:
 #   mode: cperl

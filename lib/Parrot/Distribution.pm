@@ -625,7 +625,6 @@ sub perl_script_file_directories {
             python
             regex
             scheme scheme/Scheme
-            tcl/tools
             urm
             > ),
         map( "tools/$_" => qw<build dev docs util> ),;
@@ -684,7 +683,6 @@ sub perl_module_file_directories {
             pipp/lib/Parrot/Test pipp/lib/Parrot/Test/Pipp
             regex/lib
             scheme scheme/Scheme
-            tcl/lib/Parrot/Test
             urm/lib/URM
             > ),
         map( "languages/jako/lib/Jako/Construct/$_" => qw<

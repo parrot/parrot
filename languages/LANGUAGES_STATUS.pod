@@ -1053,23 +1053,9 @@ C<languages/squaak>
 
 A from scratch implementation of a Tcl 8.5 compiler in parrot.
 
-=item Status
-
-Passes nearly 25% of tcl's (lightly converted) test suite, using a
-Test::More like harness. (Doesn't run quite enough of tcl yet to simply
-use tcltest.tcl)
-
-=item Last verified with parrot version
-
-0.7.1
-
 =item Location
 
-C<languages/tcl>.
-
-=item Issues
-
-L<http://code.google.com/p/partcl/issues/list>
+L<http://code.google.com/p/partcl/>
 
 =back
 

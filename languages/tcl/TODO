@@ -1,5 +1,0 @@
-All bugs and todo items should be documented in partcl's issue tracker at:
- http://code.google.com/p/partcl/issues/list
-
-... But not everything is: any TODO'd items in t/*.t need fixing, as do any
-spec tests that are TODO'd or SKIP'd in lib/skipped_tests.tcl

@@ -98,7 +98,6 @@ my %type_for_suffix = (
     'spec'         => 'RPM build specification',
     't'            => 'Test file',
     'tbl'          => 'Vtable file',
-    'tcl'          => 'TCL code',
     'txt'          => 'Text file',
     'urm'          => 'URM code',
     'vim'          => 'Vim file',
