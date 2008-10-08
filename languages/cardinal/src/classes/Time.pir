@@ -1,4 +1,4 @@
-## $Id: Time.pir 29852 2008-07-29 17:49:39Z dmknopp $
+## $Id$
 
 =head1 TITLE
 

@@ -1,4 +1,4 @@
-## $Id: GC.pir 1 2008-09-27 00:00:00Z dmknopp $
+## $Id$
 
 =head1 TITLE
 

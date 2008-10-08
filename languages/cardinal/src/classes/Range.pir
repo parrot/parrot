@@ -1,4 +1,4 @@
-## $Id: CardinalRange.pir 30797 2008-09-05 18:58:32Z dmknopp $
+## $Id$
 
 =head1 NAME
 

@@ -1,4 +1,4 @@
-## $Id: Math.pir 1 2008-09-27 17:49:39Z dmknopp $
+## $Id$
 
 =head1 TITLE
 
