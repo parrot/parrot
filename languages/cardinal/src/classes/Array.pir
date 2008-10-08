@@ -101,11 +101,11 @@ Doesnt work, but it should be close...
     .param pmc value
     .param int offset :optional
     .param int end_index :optional
-                
+
     unless end_index goto set_index
     unless offset goto set_offset
     goto do_fill
-    
+
     set_index:
         end_index = self.'length'()
         unless offset goto set_offset
@@ -174,7 +174,7 @@ Return the number of elements in the list.
 .end
 
 =item
- 
+
 Return the class name
 
 =cut

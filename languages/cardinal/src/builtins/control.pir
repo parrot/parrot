@@ -65,7 +65,7 @@ src/builtins/control.pir - Cardinal Control functions
 Sleep for number of seconds.
 =cut
 .sub 'sleep'
-    .param num a               
+    .param num a
     sleep a
 .end
 

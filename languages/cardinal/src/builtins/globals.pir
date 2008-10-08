@@ -29,7 +29,7 @@ src/builtins/globals.pir - initialize miscellaneous global variables
     ##  set up %*INC
     $P0 = new 'CardinalHash'
     set_hll_global '%INC', $P0
-        
+
     ## global record separator
     #$P1 = new 'CardinalString'
     #$P1 = "\n"

@@ -54,7 +54,7 @@ Returns true if he object is defined, false otherwise
 .end
 
 .sub 'initialize' :method
-    time $I0 
+    time $I0
     $P0 = new 'CardinalInteger'
     $P0 = $I0
     setattribute self, '$!time_in_millis', $P0

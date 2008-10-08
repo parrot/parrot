@@ -72,13 +72,13 @@ Returns true if the object is defined, false otherwise
 .end
 
 .sub 'puts' :method
-    .param pmc args     :slurpy   
+    .param pmc args     :slurpy
     $P0 = get_hll_global 'puts'
     .return $P0(args :flat)
 .end
 
 .sub 'readline' :method
-    .param pmc args     :slurpy   
+    .param pmc args     :slurpy
     $P0 = get_hll_global 'readline'
     .return $P0(args)
 .end
@@ -114,7 +114,7 @@ Call the OS with C<cmd>, return the ouput.
    $S0 = pop pipe      # pop buf layer
    goto lp
    lp:
-       buffer = read pipe, 256 
+       buffer = read pipe, 256
        output.'concat'(buffer)
        if pipe goto lp
        goto done

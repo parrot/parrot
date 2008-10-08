@@ -38,7 +38,7 @@ Perform initializations and create the GC class
 #   .return ($S0)
 #.end
 
-.sub 'init' :vtable('init') 
+.sub 'init' :vtable('init')
     $P1 = new 'CardinalInteger'
     $P1 = 0
     setattribute self, '$!disabled', $P1

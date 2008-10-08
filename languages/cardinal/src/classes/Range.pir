@@ -114,7 +114,7 @@ Gets the beginning or end of the range.
 .end
 
 =item
- 
+
 =cut
 
 .sub 'to' :method
