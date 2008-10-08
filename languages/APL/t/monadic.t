@@ -54,11 +54,11 @@ __DATA__
 
 === circle
 --- APL: ○1
---- out: 3.14159
+--- out: 3.14159265358979
 
 === circle
 --- APL: ○3
---- out: 9.42478
+--- out: 9.42477796076938
 
 === ceiling positive
 --- APL: ⌈3.14
@@ -78,7 +78,7 @@ __DATA__
 
 === exponential
 --- APL: *1
---- out: 2.71828
+--- out: 2.71828182845905
 
 === natural logarithm
 --- APL: ⍟2.71828182845905
