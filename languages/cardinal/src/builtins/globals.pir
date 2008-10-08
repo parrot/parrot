@@ -45,6 +45,8 @@ src/builtins/globals.pir - initialize miscellaneous global variables
     set_hll_global 'RUBY_VERSION', $P3
 .end
 
+=over
+
 =item
  Uses Parrot builtin Random type, doesnt seem to be working
 =cut
@@ -53,6 +55,10 @@ src/builtins/globals.pir - initialize miscellaneous global variables
     $I0 = $P0
     .return ($I0)
 .end
+
+=back
+
+=cut
 
 # Local Variables:
 #   mode: pir
