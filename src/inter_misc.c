@@ -353,36 +353,48 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
 {
     switch (what) {
         case EXECUTABLE_FULLNAME:
-            return VTABLE_get_string(interp,
-                VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
-                    IGLOBALS_EXECUTABLE));
+        {
+            PMC *exe_name = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
+                    IGLOBALS_EXECUTABLE);
+            if (PMC_IS_NULL(exe_name))
+                return CONST_STRING(interp, "");
+            return VTABLE_get_string(interp,exe_name);
+        }
         case EXECUTABLE_BASENAME:
-            {
-            char   *fullname_c;
-            STRING *fullname;
+        {
             STRING *basename;
-            int     pos;
+            PMC    *exe_name = VTABLE_get_pmc_keyed_int(interp,
+                                interp->iglobals, IGLOBALS_EXECUTABLE);
 
-            /* Need to strip back to what follows the final / or \. */
-            fullname = VTABLE_get_string(interp,
-                VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
-                    IGLOBALS_EXECUTABLE));
-            fullname_c = string_to_cstring(interp, fullname);
-            pos = strlen(fullname_c) - 1;
-            while (pos > 0 && fullname_c[pos] != '/' && fullname_c[pos] != '\\')
-                pos--;
-            if (pos > 0)
-                pos++;
-            basename = string_from_cstring(interp, fullname_c + pos, 0);
-            mem_sys_free(fullname_c);
-            return basename;
+            if (PMC_IS_NULL(exe_name))
+                return CONST_STRING(interp, "");
+
+            else {
+                /* Need to strip back to what follows the final / or \. */
+                STRING *fullname   = VTABLE_get_string(interp, exe_name);
+                char   *fullname_c = string_to_cstring(interp, fullname);
+                int     pos        = strlen(fullname_c) - 1;
+
+                while (pos              >  0
+                &&     fullname_c[pos] != '/'
+                &&     fullname_c[pos] != '\\')
+                    pos--;
+
+                if (pos > 0)
+                    pos++;
+
+                basename = string_from_cstring(interp, fullname_c + pos, 0);
+                mem_sys_free(fullname_c);
+
+                return basename;
             }
+        }
         case RUNTIME_PREFIX:
             return Parrot_get_runtime_path(interp);
         default:
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in interpinfo");
-    } /* switch */
+    }
 }
 
 /*
