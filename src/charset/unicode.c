@@ -328,7 +328,7 @@ decompose(PARROT_INTERP, SHIM(STRING *src))
 =item C<static void upcase>
 
 Converts the STRING C<src> to all upper-case graphemes, for those characters which support
-upper-case versions. 
+upper-case versions.
 
 Throws an exception if ICU is not installed.
 
