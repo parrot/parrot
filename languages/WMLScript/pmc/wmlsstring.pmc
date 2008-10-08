@@ -258,64 +258,68 @@ Return the integer 2.
 =cut
 
 */
-    PMC* add(PMC* value, PMC* dest) {
-MMD_WmlsString: {
-            STRING* result = string_concat(INTERP,
-                SELF.get_string(), VTABLE_get_string(INTERP, value), 0);
-            dest = pmc_new(INTERP, dynpmc_WmlsString);
-            VTABLE_set_string_native(INTERP, dest, result);
-            return dest;
-        }
-MMD_WmlsInteger: {
-            STRING* result = string_concat(INTERP,
-                SELF.get_string(), VTABLE_get_string(INTERP, value), 0);
-            dest = pmc_new(INTERP, dynpmc_WmlsString);
-            VTABLE_set_string_native(INTERP, dest, result);
-            return dest;
-        }
-MMD_WmlsBoolean: {
-            STRING* result = string_concat(INTERP,
-                SELF.get_string(), VTABLE_get_string(INTERP, value), 0);
-            dest = pmc_new(INTERP, dynpmc_WmlsString);
-            VTABLE_set_string_native(INTERP, dest, result);
-            return dest;
-        }
-MMD_WmlsFloat: {
-            STRING* result = string_concat(INTERP,
-                SELF.get_string(), VTABLE_get_string(INTERP, value), 0);
-            dest = pmc_new(INTERP, dynpmc_WmlsString);
-            VTABLE_set_string_native(INTERP, dest, result);
-            return dest;
-        }
-MMD_DEFAULT: {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
-        }
+    MULTI PMC* add(WmlsString value, PMC* dest) {
+        STRING* result = string_concat(INTERP,
+            SELF.get_string(), VTABLE_get_string(INTERP, value), 0);
+        dest = pmc_new(INTERP, dynpmc_WmlsString);
+        VTABLE_set_string_native(INTERP, dest, result);
+        return dest;
     }
 
-    void i_add(PMC* value) {
-MMD_WmlsString: {
-            STRING* result = string_append(INTERP,
-                SELF.get_string(), VTABLE_get_string(INTERP, value));
-            SELF.set_string_native(result);
-        }
-MMD_WmlsInteger: {
-            STRING* result = string_append(INTERP,
-                SELF.get_string(), VTABLE_get_string(INTERP, value));
-            SELF.set_string_native(result);
-        }
-MMD_WmlsBoolean: {
-            STRING* result = string_append(INTERP,
-                SELF.get_string(), VTABLE_get_string(INTERP, value));
-            SELF.set_string_native(result);
-        }
-MMD_WmlsFloat: {
-            STRING* result = string_append(INTERP,
-                SELF.get_string(), VTABLE_get_string(INTERP, value));
-            SELF.set_string_native(result);
-        }
-MMD_DEFAULT: {
-            SELF.morph(dynpmc_WmlsInvalid);
-        }
+    MULTI PMC* add(WmlsInteger value, PMC* dest) {
+        STRING* result = string_concat(INTERP,
+            SELF.get_string(), VTABLE_get_string(INTERP, value), 0);
+        dest = pmc_new(INTERP, dynpmc_WmlsString);
+        VTABLE_set_string_native(INTERP, dest, result);
+        return dest;
+    }
+
+    MULTI PMC* add(WmlsBoolean value, PMC* dest) {
+        STRING* result = string_concat(INTERP,
+            SELF.get_string(), VTABLE_get_string(INTERP, value), 0);
+        dest = pmc_new(INTERP, dynpmc_WmlsString);
+        VTABLE_set_string_native(INTERP, dest, result);
+        return dest;
+    }
+
+    MULTI PMC* add(WmlsFloat value, PMC* dest) {
+        STRING* result = string_concat(INTERP,
+            SELF.get_string(), VTABLE_get_string(INTERP, value), 0);
+        dest = pmc_new(INTERP, dynpmc_WmlsString);
+        VTABLE_set_string_native(INTERP, dest, result);
+        return dest;
+    }
+
+    MULTI PMC* add(DEFAULT value, PMC* dest) {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI void i_add(WmlsString value) {
+        STRING* result = string_append(INTERP,
+            SELF.get_string(), VTABLE_get_string(INTERP, value));
+        SELF.set_string_native(result);
+    }
+
+    MULTI void i_add(WmlsInteger value) {
+        STRING* result = string_append(INTERP,
+            SELF.get_string(), VTABLE_get_string(INTERP, value));
+        SELF.set_string_native(result);
+    }
+
+    MULTI void i_add(WmlsBoolean value) {
+        STRING* result = string_append(INTERP,
+            SELF.get_string(), VTABLE_get_string(INTERP, value));
+        SELF.set_string_native(result);
+    }
+
+    MULTI void i_add(WmlsFloat value) {
+        STRING* result = string_append(INTERP,
+            SELF.get_string(), VTABLE_get_string(INTERP, value));
+        SELF.set_string_native(result);
+    }
+
+    MULTI void i_add(DEFAULT value) {
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
@@ -327,155 +331,159 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* subtract(PMC* value, PMC* dest) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseNumber"),
-                "->P", &trans1);
+    MULTI PMC* subtract(WmlsString value, PMC* dest) {
+        PMC *trans1, *trans2;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseNumber"),
+            "->P", &trans1);
 
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseNumber"),
-                "->P", &trans2);
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseNumber"),
+            "->P", &trans2);
 
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans1)
-                              - VTABLE_get_integer(INTERP, trans2);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            if (trans1->vtable->base_type != dynpmc_WmlsInvalid
-              && trans2->vtable->base_type != dynpmc_WmlsInvalid) {
-                FLOATVAL result = VTABLE_get_number(INTERP, trans1)
-                                - VTABLE_get_number(INTERP, trans2);
-                dest = pmc_new(INTERP, dynpmc_WmlsFloat);
-                VTABLE_set_number_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans1)
+                          - VTABLE_get_integer(INTERP, trans2);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              - VTABLE_get_integer(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        if (trans1->vtable->base_type != dynpmc_WmlsInvalid
+          && trans2->vtable->base_type != dynpmc_WmlsInvalid) {
+            FLOATVAL result = VTABLE_get_number(INTERP, trans1)
+                            - VTABLE_get_number(INTERP, trans2);
+            dest = pmc_new(INTERP, dynpmc_WmlsFloat);
+            VTABLE_set_number_native(INTERP, dest, result);
+            return dest;
         }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              - VTABLE_get_integer(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
-        }
-MMD_WmlsFloat: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseFloat"),
-                "->P", &trans);
+    MULTI PMC* subtract(WmlsInteger value, PMC* dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            if (trans->vtable->base_type == dynpmc_WmlsFloat) {
-                FLOATVAL result = VTABLE_get_number(INTERP, trans)
-                                - VTABLE_get_number(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsFloat);
-                VTABLE_set_number_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          - VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
         }
-MMD_DEFAULT: {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* subtract(WmlsBoolean value, PMC* dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          - VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* subtract(WmlsFloat value, PMC* dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseFloat"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsFloat) {
+            FLOATVAL result = VTABLE_get_number(INTERP, trans)
+                            - VTABLE_get_number(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsFloat);
+            VTABLE_set_number_native(INTERP, dest, result);
+            return dest;
+        }
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* subtract(DEFAULT value, PMC* dest) {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI void i_subtract(WmlsString value) {
+        PMC *trans1, *trans2;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseNumber"),
+            "->P", &trans1);
+
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseNumber"),
+            "->P", &trans2);
+
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans1)
+                          - VTABLE_get_integer(INTERP, trans2);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
+        }
+        else if (trans1->vtable->base_type != dynpmc_WmlsInvalid
+               && trans2->vtable->base_type != dynpmc_WmlsInvalid) {
+            FLOATVAL result = VTABLE_get_number(INTERP, trans1)
+                            - VTABLE_get_number(INTERP, trans2);
+            SELF.morph(dynpmc_WmlsFloat);
+            SELF.set_number_native(result);
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
         }
     }
 
-    void i_subtract(PMC* value) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseNumber"),
-                "->P", &trans1);
+    MULTI void i_subtract(WmlsInteger value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseNumber"),
-                "->P", &trans2);
-
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans1)
-                              - VTABLE_get_integer(INTERP, trans2);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else if (trans1->vtable->base_type != dynpmc_WmlsInvalid
-                   && trans2->vtable->base_type != dynpmc_WmlsInvalid) {
-                FLOATVAL result = VTABLE_get_number(INTERP, trans1)
-                                - VTABLE_get_number(INTERP, trans2);
-                SELF.morph(dynpmc_WmlsFloat);
-                SELF.set_number_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          - VTABLE_get_integer(INTERP, value);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              - VTABLE_get_integer(INTERP, value);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              - VTABLE_get_integer(INTERP, value);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_WmlsFloat: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseFloat"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsFloat) {
-                FLOATVAL result = VTABLE_get_number(INTERP, trans)
-                                - VTABLE_get_number(INTERP, value);
-                SELF.morph(dynpmc_WmlsFloat);
-                SELF.set_number_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_DEFAULT: {
+        else {
             SELF.morph(dynpmc_WmlsInvalid);
         }
+    }
+
+    MULTI void i_subtract(WmlsBoolean value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          - VTABLE_get_integer(INTERP, value);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+    MULTI void i_subtract(WmlsFloat value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseFloat"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsFloat) {
+            FLOATVAL result = VTABLE_get_number(INTERP, trans)
+                            - VTABLE_get_number(INTERP, value);
+            SELF.morph(dynpmc_WmlsFloat);
+            SELF.set_number_native(result);
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+    MULTI void i_subtract(DEFAULT value) {
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
@@ -487,155 +495,159 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* multiply(PMC *value, PMC *dest) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseNumber"),
-                "->P", &trans1);
+    MULTI PMC* multiply(WmlsString value, PMC *dest) {
+        PMC *trans1, *trans2;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseNumber"),
+            "->P", &trans1);
 
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseNumber"),
-                "->P", &trans2);
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseNumber"),
+            "->P", &trans2);
 
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans1)
-                              * VTABLE_get_integer(INTERP, trans2);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            if (trans1->vtable->base_type != dynpmc_WmlsInvalid
-              && trans2->vtable->base_type != dynpmc_WmlsInvalid) {
-                FLOATVAL result = VTABLE_get_number(INTERP, trans1)
-                                * VTABLE_get_number(INTERP, trans2);
-                dest = pmc_new(INTERP, dynpmc_WmlsFloat);
-                VTABLE_set_number_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans1)
+                          * VTABLE_get_integer(INTERP, trans2);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              * VTABLE_get_integer(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        if (trans1->vtable->base_type != dynpmc_WmlsInvalid
+          && trans2->vtable->base_type != dynpmc_WmlsInvalid) {
+            FLOATVAL result = VTABLE_get_number(INTERP, trans1)
+                            * VTABLE_get_number(INTERP, trans2);
+            dest = pmc_new(INTERP, dynpmc_WmlsFloat);
+            VTABLE_set_number_native(INTERP, dest, result);
+            return dest;
         }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              * VTABLE_get_integer(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
-        }
-MMD_WmlsFloat: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseFloat"),
-                "->P", &trans);
+    MULTI PMC* multiply(WmlsInteger value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            if (trans->vtable->base_type == dynpmc_WmlsFloat) {
-                FLOATVAL result = VTABLE_get_number(INTERP, trans)
-                                * VTABLE_get_number(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsFloat);
-                VTABLE_set_number_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          * VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
         }
-MMD_DEFAULT: {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* multiply(WmlsBoolean value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          * VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* multiply(WmlsFloat value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseFloat"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsFloat) {
+            FLOATVAL result = VTABLE_get_number(INTERP, trans)
+                            * VTABLE_get_number(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsFloat);
+            VTABLE_set_number_native(INTERP, dest, result);
+            return dest;
+        }
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* multiply(DEFAULT value, PMC *dest) {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI void i_multiply(WmlsString value) {
+        PMC *trans1, *trans2;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseNumber"),
+            "->P", &trans1);
+
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseNumber"),
+            "->P", &trans2);
+
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans1)
+                          * VTABLE_get_integer(INTERP, trans2);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
+        }
+        else if (trans1->vtable->base_type != dynpmc_WmlsInvalid
+               && trans2->vtable->base_type != dynpmc_WmlsInvalid) {
+            FLOATVAL result = VTABLE_get_number(INTERP, trans1)
+                            * VTABLE_get_number(INTERP, trans2);
+            SELF.morph(dynpmc_WmlsFloat);
+            SELF.set_number_native(result);
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
         }
     }
 
-    void i_multiply(PMC* value) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseNumber"),
-                "->P", &trans1);
+    MULTI void i_multiply(WmlsInteger value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseNumber"),
-                "->P", &trans2);
-
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans1)
-                              * VTABLE_get_integer(INTERP, trans2);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else if (trans1->vtable->base_type != dynpmc_WmlsInvalid
-                   && trans2->vtable->base_type != dynpmc_WmlsInvalid) {
-                FLOATVAL result = VTABLE_get_number(INTERP, trans1)
-                                * VTABLE_get_number(INTERP, trans2);
-                SELF.morph(dynpmc_WmlsFloat);
-                SELF.set_number_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          * VTABLE_get_integer(INTERP, value);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              * VTABLE_get_integer(INTERP, value);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              * VTABLE_get_integer(INTERP, value);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_WmlsFloat: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseFloat"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsFloat) {
-                FLOATVAL result = VTABLE_get_number(INTERP, trans)
-                                * VTABLE_get_number(INTERP, value);
-                SELF.morph(dynpmc_WmlsFloat);
-                SELF.set_number_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_DEFAULT: {
+        else {
             SELF.morph(dynpmc_WmlsInvalid);
         }
+    }
+
+    MULTI void i_multiply(WmlsBoolean value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          * VTABLE_get_integer(INTERP, value);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+    MULTI void i_multiply(WmlsFloat value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseFloat"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsFloat) {
+            FLOATVAL result = VTABLE_get_number(INTERP, trans)
+                            * VTABLE_get_number(INTERP, value);
+            SELF.morph(dynpmc_WmlsFloat);
+            SELF.set_number_native(result);
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+    MULTI void i_multiply(DEFAULT value) {
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
@@ -647,168 +659,172 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* divide(PMC *value, PMC *dest) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseFloat"),
-                "->P", &trans1);
+    MULTI PMC* divide(WmlsString value, PMC *dest) {
+        PMC *trans1, *trans2;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseFloat"),
+            "->P", &trans1);
 
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseFloat"),
-                "->P", &trans2);
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseFloat"),
+            "->P", &trans2);
 
-            if (trans1->vtable->base_type != dynpmc_WmlsInvalid
-            &&  trans2->vtable->base_type != dynpmc_WmlsInvalid) {
-                FLOATVAL d = VTABLE_get_number(INTERP, trans2);
-                if (d != 0.0) {
-                    FLOATVAL result = VTABLE_get_number(INTERP, trans1) / d;
-                    dest = pmc_new(INTERP, dynpmc_WmlsFloat);
-                    VTABLE_set_number_native(INTERP, dest, result);
-                    return dest;
-                }
+        if (trans1->vtable->base_type != dynpmc_WmlsInvalid
+        &&  trans2->vtable->base_type != dynpmc_WmlsInvalid) {
+            FLOATVAL d = VTABLE_get_number(INTERP, trans2);
+            if (d != 0.0) {
+                FLOATVAL result = VTABLE_get_number(INTERP, trans1) / d;
+                dest = pmc_new(INTERP, dynpmc_WmlsFloat);
+                VTABLE_set_number_native(INTERP, dest, result);
+                return dest;
             }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                FLOATVAL d = VTABLE_get_number(INTERP, value);
-                if (d != 0.0) {
-                    FLOATVAL result = VTABLE_get_number(INTERP, trans) / d;
-                    dest = pmc_new(INTERP, dynpmc_WmlsFloat);
-                    VTABLE_set_number_native(INTERP, dest, result);
-                    return dest;
-                }
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+    MULTI PMC* divide(WmlsInteger value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                FLOATVAL d = VTABLE_get_number(INTERP, value);
-                if (d != 0.0) {
-                    FLOATVAL result = VTABLE_get_number(INTERP, trans) / d;
-                    dest = pmc_new(INTERP, dynpmc_WmlsFloat);
-                    VTABLE_set_number_native(INTERP, dest, result);
-                    return dest;
-                }
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0.0) {
+                FLOATVAL result = VTABLE_get_number(INTERP, trans) / d;
+                dest = pmc_new(INTERP, dynpmc_WmlsFloat);
+                VTABLE_set_number_native(INTERP, dest, result);
+                return dest;
             }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
         }
-MMD_WmlsFloat: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseFloat"),
-                "->P", &trans);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
 
-            if (trans->vtable->base_type == dynpmc_WmlsFloat) {
-                FLOATVAL d = VTABLE_get_number(INTERP, value);
-                if (d != 0.0) {
-                    FLOATVAL result = VTABLE_get_number(INTERP, trans) / d;
-                    dest = pmc_new(INTERP, dynpmc_WmlsFloat);
-                    VTABLE_set_number_native(INTERP, dest, result);
-                    return dest;
-                }
+    MULTI PMC* divide(WmlsBoolean value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0.0) {
+                FLOATVAL result = VTABLE_get_number(INTERP, trans) / d;
+                dest = pmc_new(INTERP, dynpmc_WmlsFloat);
+                VTABLE_set_number_native(INTERP, dest, result);
+                return dest;
             }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
         }
-MMD_DEFAULT: {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* divide(WmlsFloat value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseFloat"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsFloat) {
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0.0) {
+                FLOATVAL result = VTABLE_get_number(INTERP, trans) / d;
+                dest = pmc_new(INTERP, dynpmc_WmlsFloat);
+                VTABLE_set_number_native(INTERP, dest, result);
+                return dest;
+            }
+        }
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* divide(DEFAULT value, PMC *dest) {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI void i_divide(WmlsString value) {
+        PMC *trans1, *trans2;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseFloat"),
+            "->P", &trans1);
+
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseFloat"),
+            "->P", &trans2);
+
+        if (trans1->vtable->base_type != dynpmc_WmlsInvalid
+        &&  trans2->vtable->base_type != dynpmc_WmlsInvalid) {
+            FLOATVAL d = VTABLE_get_number(INTERP, trans2);
+            if (d != 0.0) {
+                FLOATVAL result = VTABLE_get_number(INTERP, trans1) / d;
+                SELF.morph(dynpmc_WmlsFloat);
+                SELF.set_number_native(result);
+            }
+            else {
+                SELF.morph(dynpmc_WmlsInvalid);
+            }
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
         }
     }
 
-    void i_divide(PMC *value) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseFloat"),
-                "->P", &trans1);
+    MULTI void i_divide(WmlsInteger value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseFloat"),
-                "->P", &trans2);
-
-            if (trans1->vtable->base_type != dynpmc_WmlsInvalid
-            &&  trans2->vtable->base_type != dynpmc_WmlsInvalid) {
-                FLOATVAL d = VTABLE_get_number(INTERP, trans2);
-                if (d != 0.0) {
-                    FLOATVAL result = VTABLE_get_number(INTERP, trans1) / d;
-                    SELF.morph(dynpmc_WmlsFloat);
-                    SELF.set_number_native(result);
-                }
-                else {
-                    SELF.morph(dynpmc_WmlsInvalid);
-                }
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0.0) {
+                FLOATVAL result = VTABLE_get_number(INTERP, trans) / d;
+                SELF.morph(dynpmc_WmlsFloat);
+                SELF.set_number_native(result);
             }
             else {
                 SELF.morph(dynpmc_WmlsInvalid);
             }
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                FLOATVAL d = VTABLE_get_number(INTERP, value);
-                if (d != 0.0) {
-                    FLOATVAL result = VTABLE_get_number(INTERP, trans) / d;
-                    SELF.morph(dynpmc_WmlsFloat);
-                    SELF.set_number_native(result);
-                }
-                else {
-                    SELF.morph(dynpmc_WmlsInvalid);
-                }
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                FLOATVAL d = VTABLE_get_number(INTERP, value);
-                if (d != 0.0) {
-                    FLOATVAL result = VTABLE_get_number(INTERP, trans) / d;
-                    SELF.morph(dynpmc_WmlsFloat);
-                    SELF.set_number_native(result);
-                }
-                else {
-                    SELF.morph(dynpmc_WmlsInvalid);
-                }
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_WmlsFloat: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseFloat"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsFloat) {
-                FLOATVAL d = VTABLE_get_number(INTERP, value);
-                if (d != 0.0) {
-                    FLOATVAL result = VTABLE_get_number(INTERP, trans) / d;
-                    SELF.morph(dynpmc_WmlsFloat);
-                    SELF.set_number_native(result);
-                }
-                else {
-                    SELF.morph(dynpmc_WmlsInvalid);
-                }
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_DEFAULT: {
+        else {
             SELF.morph(dynpmc_WmlsInvalid);
         }
+    }
+
+    MULTI void i_divide(WmlsBoolean value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0.0) {
+                FLOATVAL result = VTABLE_get_number(INTERP, trans) / d;
+                SELF.morph(dynpmc_WmlsFloat);
+                SELF.set_number_native(result);
+            }
+            else {
+                SELF.morph(dynpmc_WmlsInvalid);
+            }
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+    MULTI void i_divide(WmlsFloat value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseFloat"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsFloat) {
+            FLOATVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0.0) {
+                FLOATVAL result = VTABLE_get_number(INTERP, trans) / d;
+                SELF.morph(dynpmc_WmlsFloat);
+                SELF.set_number_native(result);
+            }
+            else {
+                SELF.morph(dynpmc_WmlsInvalid);
+            }
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+    MULTI void i_divide(DEFAULT value) {
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
@@ -820,132 +836,134 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* floor_divide(PMC *value, PMC *dest) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
+    MULTI PMC* floor_divide(WmlsString value, PMC *dest) {
+        PMC *trans1, *trans2;
 
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans1);
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
-                "->P", &trans2);
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans1);
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
+            "->P", &trans2);
 
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL d = VTABLE_get_integer(INTERP, trans2);
-                if (d != 0) {
-                    INTVAL result = VTABLE_get_integer(INTERP, trans1) / d;
-                    dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                    VTABLE_set_integer_native(INTERP, dest, result);
-                    return dest;
-                }
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL d = VTABLE_get_integer(INTERP, trans2);
+            if (d != 0) {
+                INTVAL result = VTABLE_get_integer(INTERP, trans1) / d;
+                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                VTABLE_set_integer_native(INTERP, dest, result);
+                return dest;
             }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL d = VTABLE_get_number(INTERP, value);
-                if (d != 0) {
-                    INTVAL result = VTABLE_get_integer(INTERP, trans) / d;
-                    dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                    VTABLE_set_integer_native(INTERP, dest, result);
-                    return dest;
-                }
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+    MULTI PMC* floor_divide(WmlsInteger value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL d = VTABLE_get_number(INTERP, value);
-                if (d != 0) {
-                    INTVAL result = VTABLE_get_integer(INTERP, trans) / d;
-                    dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                    VTABLE_set_integer_native(INTERP, dest, result);
-                    return dest;
-                }
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0) {
+                INTVAL result = VTABLE_get_integer(INTERP, trans) / d;
+                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                VTABLE_set_integer_native(INTERP, dest, result);
+                return dest;
             }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
         }
-MMD_DEFAULT: {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* floor_divide(WmlsBoolean value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0) {
+                INTVAL result = VTABLE_get_integer(INTERP, trans) / d;
+                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                VTABLE_set_integer_native(INTERP, dest, result);
+                return dest;
+            }
+        }
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* floor_divide(DEFAULT value, PMC *dest) {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI void i_floor_divide(WmlsString value) {
+        PMC *trans1, *trans2;
+
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans1);
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
+            "->P", &trans2);
+
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL d = VTABLE_get_integer(INTERP, trans2);
+            if (d != 0) {
+                INTVAL result = VTABLE_get_integer(INTERP, trans1) / d;
+                SELF.morph(dynpmc_WmlsInteger);
+                SELF.set_integer_native(result);
+            }
+            else {
+                SELF.morph(dynpmc_WmlsInvalid);
+            }
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
         }
     }
 
-    void i_floor_divide(PMC *value) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
+    MULTI void i_floor_divide(WmlsInteger value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans1);
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
-                "->P", &trans2);
-
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL d = VTABLE_get_integer(INTERP, trans2);
-                if (d != 0) {
-                    INTVAL result = VTABLE_get_integer(INTERP, trans1) / d;
-                    SELF.morph(dynpmc_WmlsInteger);
-                    SELF.set_integer_native(result);
-                }
-                else {
-                    SELF.morph(dynpmc_WmlsInvalid);
-                }
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0) {
+                INTVAL result = VTABLE_get_integer(INTERP, trans) / d;
+                SELF.morph(dynpmc_WmlsInteger);
+                SELF.set_number_native(result);
             }
             else {
                 SELF.morph(dynpmc_WmlsInvalid);
             }
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL d = VTABLE_get_number(INTERP, value);
-                if (d != 0) {
-                    INTVAL result = VTABLE_get_integer(INTERP, trans) / d;
-                    SELF.morph(dynpmc_WmlsInteger);
-                    SELF.set_number_native(result);
-                }
-                else {
-                    SELF.morph(dynpmc_WmlsInvalid);
-                }
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL d = VTABLE_get_number(INTERP, value);
-                if (d != 0) {
-                    INTVAL result = VTABLE_get_integer(INTERP, trans) / d;
-                    SELF.morph(dynpmc_WmlsInteger);
-                    SELF.set_number_native(result);
-                }
-                else {
-                    SELF.morph(dynpmc_WmlsInvalid);
-                }
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_DEFAULT: {
+        else {
             SELF.morph(dynpmc_WmlsInvalid);
         }
+    }
+
+    MULTI void i_floor_divide(WmlsBoolean value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0) {
+                INTVAL result = VTABLE_get_integer(INTERP, trans) / d;
+                SELF.morph(dynpmc_WmlsInteger);
+                SELF.set_number_native(result);
+            }
+            else {
+                SELF.morph(dynpmc_WmlsInvalid);
+            }
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+    MULTI void i_floor_divide(DEFAULT value) {
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
@@ -957,132 +975,134 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* cmodulus(PMC *value, PMC *dest) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
+    MULTI PMC* cmodulus(WmlsString value, PMC *dest) {
+        PMC *trans1, *trans2;
 
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans1);
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
-                "->P", &trans2);
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans1);
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
+            "->P", &trans2);
 
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL d = VTABLE_get_integer(INTERP, trans2);
-                if (d != 0) {
-                    INTVAL result = VTABLE_get_integer(INTERP, trans1) % d;
-                    dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                    VTABLE_set_integer_native(INTERP, dest, result);
-                    return dest;
-                }
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL d = VTABLE_get_integer(INTERP, trans2);
+            if (d != 0) {
+                INTVAL result = VTABLE_get_integer(INTERP, trans1) % d;
+                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                VTABLE_set_integer_native(INTERP, dest, result);
+                return dest;
             }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL d = VTABLE_get_number(INTERP, value);
-                if (d != 0) {
-                    INTVAL result = VTABLE_get_integer(INTERP, trans) % d;
-                    dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                    VTABLE_set_integer_native(INTERP, dest, result);
-                    return dest;
-                }
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+    MULTI PMC* cmodulus(WmlsInteger value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL d = VTABLE_get_number(INTERP, value);
-                if (d != 0) {
-                    INTVAL result = VTABLE_get_integer(INTERP, trans) % d;
-                    dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                    VTABLE_set_integer_native(INTERP, dest, result);
-                    return dest;
-                }
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0) {
+                INTVAL result = VTABLE_get_integer(INTERP, trans) % d;
+                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                VTABLE_set_integer_native(INTERP, dest, result);
+                return dest;
             }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
         }
-MMD_DEFAULT: {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* cmodulus(WmlsBoolean value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0) {
+                INTVAL result = VTABLE_get_integer(INTERP, trans) % d;
+                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+                VTABLE_set_integer_native(INTERP, dest, result);
+                return dest;
+            }
+        }
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* cmodulus(DEFAULT value, PMC *dest) {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI void i_cmodulus(WmlsString value) {
+        PMC *trans1, *trans2;
+
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans1);
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
+            "->P", &trans2);
+
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL d = VTABLE_get_integer(INTERP, trans2);
+            if (d != 0) {
+                INTVAL result = VTABLE_get_integer(INTERP, trans1) % d;
+                SELF.morph(dynpmc_WmlsInteger);
+                SELF.set_integer_native(result);
+            }
+            else {
+                SELF.morph(dynpmc_WmlsInvalid);
+            }
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
         }
     }
 
-    void i_cmodulus(PMC *value) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
+    MULTI void i_cmodulus(WmlsInteger value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans1);
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
-                "->P", &trans2);
-
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL d = VTABLE_get_integer(INTERP, trans2);
-                if (d != 0) {
-                    INTVAL result = VTABLE_get_integer(INTERP, trans1) % d;
-                    SELF.morph(dynpmc_WmlsInteger);
-                    SELF.set_integer_native(result);
-                }
-                else {
-                    SELF.morph(dynpmc_WmlsInvalid);
-                }
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0) {
+                INTVAL result = VTABLE_get_integer(INTERP, trans) % d;
+                SELF.morph(dynpmc_WmlsInteger);
+                SELF.set_number_native(result);
             }
             else {
                 SELF.morph(dynpmc_WmlsInvalid);
             }
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL d = VTABLE_get_number(INTERP, value);
-                if (d != 0) {
-                    INTVAL result = VTABLE_get_integer(INTERP, trans) % d;
-                    SELF.morph(dynpmc_WmlsInteger);
-                    SELF.set_number_native(result);
-                }
-                else {
-                    SELF.morph(dynpmc_WmlsInvalid);
-                }
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL d = VTABLE_get_number(INTERP, value);
-                if (d != 0) {
-                    INTVAL result = VTABLE_get_integer(INTERP, trans) % d;
-                    SELF.morph(dynpmc_WmlsInteger);
-                    SELF.set_number_native(result);
-                }
-                else {
-                    SELF.morph(dynpmc_WmlsInvalid);
-                }
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_DEFAULT: {
+        else {
             SELF.morph(dynpmc_WmlsInvalid);
         }
+    }
+
+    MULTI void i_cmodulus(WmlsBoolean value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL d = VTABLE_get_number(INTERP, value);
+            if (d != 0) {
+                INTVAL result = VTABLE_get_integer(INTERP, trans) % d;
+                SELF.morph(dynpmc_WmlsInteger);
+                SELF.set_number_native(result);
+            }
+            else {
+                SELF.morph(dynpmc_WmlsInvalid);
+            }
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+    MULTI void i_cmodulus(DEFAULT value) {
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
@@ -1094,111 +1114,113 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* bitwise_or(PMC *value, PMC *dest) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
+    MULTI PMC* bitwise_or(WmlsString value, PMC *dest) {
+        PMC *trans1, *trans2;
 
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans1);
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
-                "->P", &trans2);
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans1);
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
+            "->P", &trans2);
 
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans1)
-                              | VTABLE_get_integer(INTERP, trans2);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans1)
+                          | VTABLE_get_integer(INTERP, trans2);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              | VTABLE_get_integer(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+    MULTI PMC* bitwise_or(WmlsInteger value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              | VTABLE_get_integer(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          | VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
         }
-MMD_DEFAULT: {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* bitwise_or(WmlsBoolean value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          | VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* bitwise_or(DEFAULT value, PMC *dest) {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI void i_bitwise_or(WmlsString value) {
+        PMC *trans1, *trans2;
+
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans1);
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
+            "->P", &trans2);
+
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans1)
+                          | VTABLE_get_integer(INTERP, trans2);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
         }
     }
 
-    void i_bitwise_or(PMC *value) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
+    MULTI void i_bitwise_or(WmlsInteger value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans1);
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
-                "->P", &trans2);
-
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans1)
-                              | VTABLE_get_integer(INTERP, trans2);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          | VTABLE_get_integer(INTERP, value);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              | VTABLE_get_integer(INTERP, value);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              | VTABLE_get_integer(INTERP, value);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_DEFAULT: {
+        else {
             SELF.morph(dynpmc_WmlsInvalid);
         }
+    }
+
+    MULTI void i_bitwise_or(WmlsBoolean value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          | VTABLE_get_integer(INTERP, value);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+    MULTI void i_bitwise_or(DEFAULT value) {
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
@@ -1210,111 +1232,113 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* bitwise_and(PMC *value, PMC *dest) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
+    MULTI PMC* bitwise_and(WmlsString value, PMC *dest) {
+        PMC *trans1, *trans2;
 
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans1);
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
-                "->P", &trans2);
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans1);
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
+            "->P", &trans2);
 
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans1)
-                              & VTABLE_get_integer(INTERP, trans2);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans1)
+                          & VTABLE_get_integer(INTERP, trans2);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              & VTABLE_get_integer(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+    MULTI PMC* bitwise_and(WmlsInteger value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              & VTABLE_get_integer(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          & VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
         }
-MMD_DEFAULT: {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* bitwise_and(WmlsBoolean value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          & VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* bitwise_and(DEFAULT value, PMC *dest) {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI void i_bitwise_and(WmlsString value) {
+        PMC *trans1, *trans2;
+
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans1);
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
+            "->P", &trans2);
+
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans1)
+                          & VTABLE_get_integer(INTERP, trans2);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
         }
     }
 
-    void i_bitwise_and(PMC *value) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
+    MULTI void i_bitwise_and(WmlsInteger value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans1);
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
-                "->P", &trans2);
-
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans1)
-                              & VTABLE_get_integer(INTERP, trans2);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          & VTABLE_get_integer(INTERP, value);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              & VTABLE_get_integer(INTERP, value);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              & VTABLE_get_integer(INTERP, value);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_DEFAULT: {
+        else {
             SELF.morph(dynpmc_WmlsInvalid);
         }
+    }
+
+    MULTI void i_bitwise_and(WmlsBoolean value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          & VTABLE_get_integer(INTERP, value);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+    MULTI void i_bitwise_and(DEFAULT value) {
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
@@ -1326,111 +1350,113 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* bitwise_xor(PMC *value, PMC *dest) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
+    MULTI PMC* bitwise_xor(WmlsString value, PMC *dest) {
+        PMC *trans1, *trans2;
 
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans1);
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
-                "->P", &trans2);
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans1);
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
+            "->P", &trans2);
 
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans1)
-                              ^ VTABLE_get_integer(INTERP, trans2);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans1)
+                          ^ VTABLE_get_integer(INTERP, trans2);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              ^ VTABLE_get_integer(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+    MULTI PMC* bitwise_xor(WmlsInteger value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              ^ VTABLE_get_integer(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          ^ VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
         }
-MMD_DEFAULT: {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* bitwise_xor(WmlsBoolean value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          ^ VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* bitwise_xor(DEFAULT value, PMC *dest) {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI void i_bitwise_xor(WmlsString value) {
+        PMC *trans1, *trans2;
+
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans1);
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
+            "->P", &trans2);
+
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans1)
+                          ^ VTABLE_get_integer(INTERP, trans2);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
         }
     }
 
-    void i_bitwise_xor(PMC *value) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
+    MULTI void i_bitwise_xor(WmlsInteger value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans1);
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
-                "->P", &trans2);
-
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans1)
-                              ^ VTABLE_get_integer(INTERP, trans2);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          ^ VTABLE_get_integer(INTERP, value);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              ^ VTABLE_get_integer(INTERP, value);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              ^ VTABLE_get_integer(INTERP, value);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_DEFAULT: {
+        else {
             SELF.morph(dynpmc_WmlsInvalid);
         }
+    }
+
+    MULTI void i_bitwise_xor(WmlsBoolean value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          ^ VTABLE_get_integer(INTERP, value);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+    MULTI void i_bitwise_xor(DEFAULT value) {
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
@@ -1442,111 +1468,113 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* bitwise_shr(PMC *value, PMC *dest) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
+    MULTI PMC* bitwise_shr(WmlsString value, PMC *dest) {
+        PMC *trans1, *trans2;
 
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans1);
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
-                "->P", &trans2);
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans1);
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
+            "->P", &trans2);
 
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans1)
-                              >> VTABLE_get_integer(INTERP, trans2);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans1)
+                          >> VTABLE_get_integer(INTERP, trans2);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              >> VTABLE_get_integer(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+    MULTI PMC* bitwise_shr(WmlsInteger value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              >> VTABLE_get_integer(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          >> VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
         }
-MMD_DEFAULT: {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* bitwise_shr(WmlsBoolean value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          >> VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* bitwise_shr(DEFAULT value, PMC *dest) {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI void i_bitwise_shr(WmlsString value) {
+        PMC *trans1, *trans2;
+
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans1);
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
+            "->P", &trans2);
+
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans1)
+                          >> VTABLE_get_integer(INTERP, trans2);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
         }
     }
 
-    void i_bitwise_shr(PMC *value) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
+    MULTI void i_bitwise_shr(WmlsInteger value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans1);
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
-                "->P", &trans2);
-
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans1)
-                              >> VTABLE_get_integer(INTERP, trans2);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          >> VTABLE_get_integer(INTERP, value);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              >> VTABLE_get_integer(INTERP, value);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              >> VTABLE_get_integer(INTERP, value);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_DEFAULT: {
+        else {
             SELF.morph(dynpmc_WmlsInvalid);
         }
+    }
+
+    MULTI void i_bitwise_shr(WmlsBoolean value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          >> VTABLE_get_integer(INTERP, value);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+    MULTI void i_bitwise_shr(DEFAULT value) {
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
@@ -1558,111 +1586,113 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* bitwise_lsr(PMC *value, PMC *dest) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
+    MULTI PMC* bitwise_lsr(WmlsString value, PMC *dest) {
+        PMC *trans1, *trans2;
 
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans1);
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
-                "->P", &trans2);
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans1);
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
+            "->P", &trans2);
 
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans1)
-                              >> VTABLE_get_integer(INTERP, trans2);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans1)
+                          >> VTABLE_get_integer(INTERP, trans2);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              >> VTABLE_get_integer(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+    MULTI PMC* bitwise_lsr(WmlsInteger value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              >> VTABLE_get_integer(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          >> VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
         }
-MMD_DEFAULT: {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* bitwise_lsr(WmlsBoolean value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          >> VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* bitwise_lsr(DEFAULT value, PMC *dest) {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI void i_bitwise_lsr(WmlsString value) {
+        PMC *trans1, *trans2;
+
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans1);
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
+            "->P", &trans2);
+
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans1)
+                          >> VTABLE_get_integer(INTERP, trans2);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
         }
     }
 
-    void i_bitwise_lsr(PMC *value) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
+    MULTI void i_bitwise_lsr(WmlsInteger value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans1);
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
-                "->P", &trans2);
-
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans1)
-                              >> VTABLE_get_integer(INTERP, trans2);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          >> VTABLE_get_integer(INTERP, value);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              >> VTABLE_get_integer(INTERP, value);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              >> VTABLE_get_integer(INTERP, value);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_DEFAULT: {
+        else {
             SELF.morph(dynpmc_WmlsInvalid);
         }
+    }
+
+    MULTI void i_bitwise_lsr(WmlsBoolean value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          >> VTABLE_get_integer(INTERP, value);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+    MULTI void i_bitwise_lsr(DEFAULT value) {
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
@@ -1674,111 +1704,113 @@ MMD_DEFAULT: {
 =cut
 
 */
-    PMC* bitwise_shl(PMC *value, PMC *dest) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
+    MULTI PMC* bitwise_shl(WmlsString value, PMC *dest) {
+        PMC *trans1, *trans2;
 
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans1);
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
-                "->P", &trans2);
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans1);
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
+            "->P", &trans2);
 
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans1)
-                              << VTABLE_get_integer(INTERP, trans2);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans1)
+                          << VTABLE_get_integer(INTERP, trans2);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              << VTABLE_get_integer(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
+    MULTI PMC* bitwise_shl(WmlsInteger value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              << VTABLE_get_integer(INTERP, value);
-                dest = pmc_new(INTERP, dynpmc_WmlsInteger);
-                VTABLE_set_integer_native(INTERP, dest, result);
-                return dest;
-            }
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          << VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
         }
-MMD_DEFAULT: {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* bitwise_shl(WmlsBoolean value, PMC *dest) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          << VTABLE_get_integer(INTERP, value);
+            dest = pmc_new(INTERP, dynpmc_WmlsInteger);
+            VTABLE_set_integer_native(INTERP, dest, result);
+            return dest;
+        }
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI PMC* bitwise_shl(DEFAULT value, PMC *dest) {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    }
+
+    MULTI void i_bitwise_shl(WmlsString value) {
+        PMC *trans1, *trans2;
+
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans1);
+        Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
+            "->P", &trans2);
+
+        if (trans1->vtable->base_type == dynpmc_WmlsInteger
+        &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans1)
+                          << VTABLE_get_integer(INTERP, trans2);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
         }
     }
 
-    void i_bitwise_shl(PMC *value) {
-MMD_WmlsString: {
-            PMC *trans1, *trans2;
+    MULTI void i_bitwise_shl(WmlsInteger value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
 
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans1);
-            Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
-                "->P", &trans2);
-
-            if (trans1->vtable->base_type == dynpmc_WmlsInteger
-            &&  trans2->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans1)
-                              << VTABLE_get_integer(INTERP, trans2);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          << VTABLE_get_integer(INTERP, value);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
         }
-MMD_WmlsInteger: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              << VTABLE_get_integer(INTERP, value);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_WmlsBoolean: {
-            PMC *trans;
-            Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
-                "->P", &trans);
-
-            if (trans->vtable->base_type == dynpmc_WmlsInteger) {
-                INTVAL result = VTABLE_get_integer(INTERP, trans)
-                              << VTABLE_get_integer(INTERP, value);
-                SELF.morph(dynpmc_WmlsInteger);
-                SELF.set_integer_native(result);
-            }
-            else {
-                SELF.morph(dynpmc_WmlsInvalid);
-            }
-        }
-MMD_DEFAULT: {
+        else {
             SELF.morph(dynpmc_WmlsInvalid);
         }
+    }
+
+    MULTI void i_bitwise_shl(WmlsBoolean value) {
+        PMC *trans;
+        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "parseInt"),
+            "->P", &trans);
+
+        if (trans->vtable->base_type == dynpmc_WmlsInteger) {
+            INTVAL result = VTABLE_get_integer(INTERP, trans)
+                          << VTABLE_get_integer(INTERP, value);
+            SELF.morph(dynpmc_WmlsInteger);
+            SELF.set_integer_native(result);
+        }
+        else {
+            SELF.morph(dynpmc_WmlsInvalid);
+        }
+    }
+
+    MULTI void i_bitwise_shl(DEFAULT value) {
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
@@ -1788,26 +1820,28 @@ MMD_DEFAULT: {
 =cut
 
 */
-    INTVAL is_equal(PMC* value) {
-MMD_WmlsString: {
-            return !string_equal(INTERP,
-                SELF.get_string(), VTABLE_get_string(INTERP, value));
-        }
-MMD_WmlsInteger: {
-            return !string_equal(INTERP,
-                SELF.get_string(), VTABLE_get_string(INTERP, value));
-        }
-MMD_WmlsBoolean: {
-            return !string_equal(INTERP,
-                SELF.get_string(), VTABLE_get_string(INTERP, value));
-        }
-MMD_WmlsFloat: {
-            return !string_equal(INTERP,
-                SELF.get_string(), VTABLE_get_string(INTERP, value));
-        }
-MMD_DEFAULT: {
-            return 4;
-        }
+    MULTI INTVAL is_equal(WmlsString value) {
+        return !string_equal(INTERP,
+            SELF.get_string(), VTABLE_get_string(INTERP, value));
+    }
+
+    MULTI INTVAL is_equal(WmlsInteger value) {
+        return !string_equal(INTERP,
+            SELF.get_string(), VTABLE_get_string(INTERP, value));
+    }
+
+    MULTI INTVAL is_equal(WmlsBoolean value) {
+        return !string_equal(INTERP,
+            SELF.get_string(), VTABLE_get_string(INTERP, value));
+    }
+
+    MULTI INTVAL is_equal(WmlsFloat value) {
+        return !string_equal(INTERP,
+            SELF.get_string(), VTABLE_get_string(INTERP, value));
+    }
+
+    MULTI INTVAL is_equal(DEFAULT value) {
+        return 4;
     }
 
 /*
@@ -1817,26 +1851,28 @@ MMD_DEFAULT: {
 =cut
 
 */
-    INTVAL cmp(PMC* value) {
-MMD_WmlsString: {
-            return string_compare(INTERP,
-                SELF.get_string(), VTABLE_get_string(INTERP, value));
-        }
-MMD_WmlsInteger: {
-            return string_compare(INTERP,
-                SELF.get_string(), VTABLE_get_string(INTERP, value));
-        }
-MMD_WmlsBoolean: {
-            return string_compare(INTERP,
-                SELF.get_string(), VTABLE_get_string(INTERP, value));
-        }
-MMD_WmlsFloat: {
-            return string_compare(INTERP,
-                SELF.get_string(), VTABLE_get_string(INTERP, value));
-        }
-MMD_DEFAULT: {
-            return 4;
-        }
+    MULTI INTVAL cmp(WmlsString value) {
+        return string_compare(INTERP,
+            SELF.get_string(), VTABLE_get_string(INTERP, value));
+    }
+
+    MULTI INTVAL cmp(WmlsInteger value) {
+        return string_compare(INTERP,
+            SELF.get_string(), VTABLE_get_string(INTERP, value));
+    }
+
+    MULTI INTVAL cmp(WmlsBoolean value) {
+        return string_compare(INTERP,
+            SELF.get_string(), VTABLE_get_string(INTERP, value));
+    }
+
+    MULTI INTVAL cmp(WmlsFloat value) {
+        return string_compare(INTERP,
+            SELF.get_string(), VTABLE_get_string(INTERP, value));
+    }
+
+    MULTI INTVAL cmp(DEFAULT value) {
+        return 4;
     }
 
 /*
