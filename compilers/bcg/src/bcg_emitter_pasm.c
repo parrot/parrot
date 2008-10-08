@@ -11,7 +11,7 @@ bcg_emitter_pasm.c
 
 =head1 DESCRIPTION
 
-RT#48264
+Contains the function C<emit_pasm>, which dumps the current bytecode as PASM code.
 
 =head2 Methods
 
@@ -30,7 +30,7 @@ RT#48264
 =item C<void
 emit_pasm(BCG_info * bcg_info)>
 
-RT#48260: Not yet documented!!!
+Dumps the PASM equivalent of the current bytecode stored in BCG.
 
 =cut
 
