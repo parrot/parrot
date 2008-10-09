@@ -358,7 +358,7 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
                     IGLOBALS_EXECUTABLE);
             if (PMC_IS_NULL(exe_name))
                 return CONST_STRING(interp, "");
-            return VTABLE_get_string(interp,exe_name);
+            return VTABLE_get_string(interp, exe_name);
         }
         case EXECUTABLE_BASENAME:
         {
