@@ -2589,7 +2589,7 @@ Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
 
     /* create the signature string, and the various PMCs that are needed to
        store all the parameters and parameter counts. */
-    const char *signature   = string_to_cstring(interp, VTABLE_get_string(interp, sig_obj));
+    char *signature         = string_to_cstring(interp, VTABLE_get_string(interp, sig_obj));
     PMC * const args_sig    = pmc_new(interp, enum_class_FixedIntegerArray);
     PMC * const results_sig = pmc_new(interp, enum_class_FixedIntegerArray);
     PMC * const ret_cont    = new_ret_continuation_pmc(interp, NULL);
