@@ -65,12 +65,12 @@ Initializes the pointer object.
     VTABLE void init() {
         Parrot_CPointer_attributes *pdata_struct =
             mem_allocate_typed(Parrot_CPointer_attributes);
-        PMC_data(SELF) = pdata_struct;
 
+        PMC_data(SELF)        = pdata_struct;
         pdata_struct->pointer = NULL;
-        pdata_struct->sig = NULL;
+        pdata_struct->sig     = NULL;
 
-        PObj_custom_mark_SET(SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
 /*
@@ -101,6 +101,23 @@ pointer.
                 PARROT_ASSERT(*str_pointer);
                 pobject_lives(interp, (PObj *) *str_pointer);
             }
+        }
+    }
+
+/*
+
+=item C<void destroy()>
+
+Destroys the PMC and frees all allocated memory.
+
+*/
+
+    VTABLE void destroy() {
+        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+
+        if (data) {
+            mem_sys_free(data);
+            PMC_data(SELF) = NULL;
         }
     }
 
