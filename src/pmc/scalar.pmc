@@ -523,9 +523,9 @@ Divides C<SELF> by C<value> inplace.
                 "float division by zero");
 
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        d    = floor(SELF.get_number() / d);
 
-        VTABLE_set_integer_native(INTERP, dest,
-                (INTVAL) floor(SELF.get_number() / d));
+        VTABLE_set_integer_native(INTERP, dest, (INTVAL)d);
         return dest;
     }
 
