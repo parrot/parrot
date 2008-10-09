@@ -435,7 +435,7 @@ C<key>.
         PMC    *next_key, *box;
         STRING *s_key;
 
-        if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_hash_iterator_FLAGS)
+        if (PObj_get_FLAGS(key) & KEY_pipp_iterator_FLAG)
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                     "can't use an int as an Iterator key");
 
@@ -512,7 +512,7 @@ C<key>.
         PippHashTable *ht;
 
         /* deal with Iterator stuff */
-        if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_hash_iterator_FLAGS) {
+        if (PObj_get_FLAGS(key) & KEY_pipp_iterator_FLAG) {
 
             ht                  = (PippHashTable *)PMC_struct_val(SELF);
             s_key               = ht->internalPointer->key;
@@ -520,12 +520,6 @@ C<key>.
             next_key            = pmc_new(INTERP, enum_class_String);
             VTABLE_set_string_native(INTERP, next_key, s_key);
 
-            /* Tell the Iterator that it's done iterating. */
-            if (ht->internalPointer == NULL) {
-                PMC *iter = ht->iter;
-                PMC *key  = (PMC *)PMC_struct_val(iter);
-                PMC_int_val(key) = -1;
-            }
             return next_key;
         }
 
@@ -600,18 +594,12 @@ C<key>.
         PippHashTable *ht;
 
         /* deal with Iterator stuff */
-        if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_hash_iterator_FLAGS) {
+        if (PObj_get_FLAGS(key) & KEY_pipp_iterator_FLAG) {
 
             ht                  = (PippHashTable *)PMC_struct_val(SELF);
             s_key               = ht->internalPointer->key;
             ht->internalPointer = ht->internalPointer->tableNext;
 
-            /* Tell the Iterator that it's done iterating. */
-            if (ht->internalPointer == NULL) {
-                PMC *iter = ht->iter;
-                PMC *key  = (PMC *)PMC_struct_val(iter);
-                PMC_int_val(key) = -1;
-            }
             return s_key;
         }
 
@@ -622,7 +610,6 @@ C<key>.
         /* if there isn't one (i.e. key is null) */
         if (next_key == NULL) {
             /* dispatch to get_string_keyed_str */
-            dprintf("there is no next key\n");
             return SELF.get_string_keyed_str(s_key);
         }
 
@@ -687,9 +674,10 @@ C<key>.
         PMC    *box, *next_key;
         STRING *s_key;
 
-        if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_hash_iterator_FLAGS)
+        if (PObj_get_FLAGS(key) & KEY_pipp_iterator_FLAG)
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                     "You can't use a float as an Iterator key.");
+
         /* peel off the next key */
         next_key = key_next(INTERP, key);
         s_key    = VTABLE_get_string(INTERP, key);
@@ -1335,12 +1323,13 @@ failures.
         PippHashTable *ht    = (PippHashTable *)PMC_struct_val(SELF);
         PippBucket    *bkt   = ht->tableHead;
         PMC           *iter  = pmc_new_init(INTERP, enum_class_Iterator, SELF);
-        PMC           *key   = pmc_new(INTERP, enum_class_Key);
-        PMC_struct_val(iter) = key;
-        PMC_int_val(key)     = ht->elementCount ? 0 : -1;
+        PMC           *key   = (PMC *)PMC_struct_val(iter);
         ht->iter             = iter;
+        PMC_int_val(key)     = ht->elementCount ? 0 : -1;
 
-        PObj_get_FLAGS(key) |= KEY_hash_iterator_FLAGS;
+        /* set the key's flags so get_type_keyed knows when it's being called
+         * from an Iterator. */
+        PObj_get_FLAGS(key) |= KEY_pipp_iterator_FLAG;
 
         /* Get the Iterator and ht->internalPointer in sync. */
         while (bkt != ht->internalPointer) {
@@ -1431,8 +1420,8 @@ PHPArray, just make a clone.
         }
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL,
-                    EXCEPTION_PARROT_USAGE_ERROR, "can't assign a non-aggregate"
-                    " PMC to a PhpArray");
+                    EXCEPTION_PARROT_USAGE_ERROR,
+                    "can't assign a non-aggregate PMC to a PhpArray");
     }
 /*
 
@@ -1646,8 +1635,8 @@ non-comparable PHPArrays.
         }
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL,
-                    EXCEPTION_PARROT_USAGE_ERROR, "can't assign a non-aggregate"
-                    " PMC to a PhpArray");
+                    EXCEPTION_PARROT_USAGE_ERROR,
+                    "can't assign a non-aggregate PMC to a PhpArray");
     }
 
 /*
@@ -1689,6 +1678,216 @@ In PHP, arrays are always greater than strings.  This function always returns
 
 =over 4
 
+=item C<METHOD void next()>
+
+Advance the internal pointer to the next element.  This method emulates the
+behavior of PHP's C<next()> function.
+
+=cut
+
+*/
+    METHOD next() {
+
+        PippHashTable *ht  = (PippHashTable *)PMC_struct_val(SELF);
+
+        if (ht->internalPointer != NULL) {
+            if (ht->iter) {
+                PMC *key = (PMC *)PMC_struct_val(ht->iter);
+                VTABLE_nextkey_keyed(INTERP, key, SELF, ITERATE_GET_NEXT);
+            }
+            ht->internalPointer = ht->internalPointer->tableNext;
+        }
+        RETURN(void);
+    }
+
+/*
+
+=item C<METHOD void prev()>
+
+Move the internal pointer to the previous element.  This method emulates the
+behavior of PHP's C<prev()> function.
+
+=cut
+
+*/
+    METHOD prev() {
+
+        PippHashTable *ht  = (PippHashTable *)PMC_struct_val(SELF);
+
+        if (ht->internalPointer != NULL) {
+            if (ht->iter) {
+                PMC           *key = (PMC *)PMC_struct_val(ht->iter);
+                /*VTABLE_nextkey_keyed(INTERP, key, SELF, ITERATE_FROM_END);*/
+                dprintf("key int val is %d\n", PMC_int_val(key));
+                VTABLE_nextkey_keyed(INTERP, key, SELF, ITERATE_GET_PREV);
+            }
+            ht->internalPointer = ht->internalPointer->tablePrev;
+        }
+        RETURN(void);
+    }
+
+/*
+
+=item C<METHOD void reset()>
+
+Move the internal pointer to the first element of this PhpArray, according to
+insertion order.  This method emulates the behavior of PHP's C<reset()>
+function.
+
+=cut
+
+*/
+    METHOD reset() {
+
+        PippHashTable *ht  = (PippHashTable *)PMC_struct_val(SELF);
+
+        ht->internalPointer = ht->tableHead;
+        if (ht->iter) {
+            PMC *key = (PMC *)PMC_struct_val(ht->iter);
+            VTABLE_nextkey_keyed(INTERP, key, SELF, ITERATE_FROM_START);
+        }
+        RETURN(void);
+    }
+
+/*
+
+=item C<METHOD void end()>
+
+Move the internal pointer to the last element of this PhpArray, according to
+insertion order.  This method emulates the behavior of PHP's C<end()> function.
+
+=cut
+
+*/
+    METHOD end() {
+
+        PippHashTable *ht  = (PippHashTable *)PMC_struct_val(SELF);
+
+        ht->internalPointer = ht->tableTail;
+        if (ht->iter) {
+            PMC *key = (PMC *)PMC_struct_val(ht->iter);
+            VTABLE_nextkey_keyed(INTERP, key, SELF, ITERATE_FROM_END);
+        }
+        RETURN(void);
+    }
+
+/*
+
+=item C<METHOD STRING* key()>
+
+Return the key of the element pointed to by the internal pointer.  If the
+internal pointer does not point at a valid element, the empty string is
+returned.  This method has no side-effects and does not modify the internal
+pointer.
+
+=cut
+
+*/
+    METHOD key() {
+
+        STRING        *s_key;
+        PippHashTable *ht  = (PippHashTable *)PMC_struct_val(SELF);
+
+        if (ht->internalPointer)
+            s_key = string_copy(INTERP, ht->internalPointer->key);
+        else
+            s_key = CONST_STRING(INTERP, "");
+
+        RETURN(STRING *s_key);
+    }
+
+/*
+
+=item C<METHOD PMC* current()>
+
+Return a clone of value of the element pointed to by the internal pointer.  If
+the internal pointer does not point at a valid element, PMCNULL is returned.
+This method has no side-effects and does not modify the internal pointer.
+
+=cut
+
+*/
+    METHOD current() {
+
+        PMC           *p_val;
+        PippHashTable *ht  = (PippHashTable *)PMC_struct_val(SELF);
+
+        if (ht->internalPointer)
+            p_val = VTABLE_clone(INTERP, ht->internalPointer->value);
+        else
+            p_val = PMCNULL;
+
+        RETURN(PMC *p_val);
+    }
+
+/*
+
+=item C<METHOD PMC* each()>
+
+Return a PhpArray containing the key/value pair pointed to by the internal
+pointer, then advance the internal pointer to the next pair.  The returned
+PhpArray has the following key/value pairs, in this order:
+
+=over 4
+
+=item * 1       => value
+
+=item * "value" => value
+
+=item * 0       => key
+
+=item * "key"   => key
+
+=back
+
+where C<key> and C<value> are the key and value from this PhpArray.  If the
+internal pointer does not point to a valid element, a PhpBoolean C<false> will
+be returned.
+
+=cut
+
+*/
+    METHOD each() {
+
+        PippHashTable *ht  = (PippHashTable *)PMC_struct_val(SELF);
+        PMC           *keys, *p_val, *p_key;
+        STRING        *s_key;
+
+        if (ht->internalPointer != NULL) {
+
+            PippHashTable *keys_ht;
+
+            p_val = ht->internalPointer->value;
+            s_key = ht->internalPointer->key;
+            p_key = pmc_new(INTERP, enum_class_String);
+            VTABLE_set_string_native(INTERP, p_key, s_key);
+
+            keys = pmc_new(INTERP, PMC_type(SELF));
+            keys_ht = (PippHashTable *)PMC_struct_val(keys);
+            pipp_hash_put(INTERP, keys_ht, CONST_STRING(INTERP, "1"), VTABLE_clone(INTERP, p_val));
+            pipp_hash_put(INTERP, keys_ht, CONST_STRING(INTERP, "value"), p_val);
+            pipp_hash_put(INTERP, keys_ht, CONST_STRING(INTERP, "0"), VTABLE_clone(INTERP, p_key));
+            pipp_hash_put(INTERP, keys_ht, CONST_STRING(INTERP, "key"), p_key);
+
+            ht->internalPointer = ht->internalPointer->tableNext;
+            if (ht->iter) {
+                PMC *key = (PMC *)PMC_struct_val(ht->iter);
+                VTABLE_nextkey_keyed(INTERP, key, SELF, ITERATE_GET_NEXT);
+            }
+
+        }
+        else {
+            keys = pmc_new(INTERP, dynpmc_PhpBoolean);
+            VTABLE_set_integer_native(INTERP, keys, 0);
+        }
+
+        RETURN(PMC *keys);
+    }
+
+/*
+
+
+
 =item C<PMC* to_number()>
 
 =cut
@@ -1700,7 +1899,7 @@ In PHP, arrays are always greater than strings.  This function always returns
 
 /*
 
-=item C<void sanity_check()>
+=item C<METHOD void sanity_check()>
 
 Check if everything about the PippHashTable looks sane.  If anything looks
 broken, the code will throw an exception.
@@ -1749,8 +1948,13 @@ broken, the code will throw an exception.
 
 =head1 AUTHORS
 
-Christoph Otto
-Francois Perrad
+=over 4
+
+=item Christoph Otto
+
+=item Francois Perrad
+
+=back
 
 =cut
 

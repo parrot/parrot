@@ -19,7 +19,7 @@ $Id$
     if (dbg && strlen(dbg)) { \
         STRING *pstr = Parrot_sprintf_c(interp, __VA_ARGS__);  \
         char *str = string_to_cstring(interp, pstr);           \
-        printf("%s", str);        \
+        fprintf(stderr, "%s", str);        \
         string_cstring_free(str);   \
     } \
 }
@@ -102,6 +102,10 @@ $Id$
     (i) = ((i) >> 16) | (i);\
     (i)++;\
 
+/* Using KEY_hash_iterator_FLAGS causes Parrot_Key_nextkey_keyed try using
+ * Special Magic in Parrot_Key_nextkey_keyed() intended for Hash PMCs. */
+
+#define KEY_pipp_iterator_FLAG PObj_private7_FLAG
 
 typedef struct pipp_bucket {
     struct pipp_bucket * bucketPrev;

@@ -21,7 +21,7 @@ Tests the PhpArray PMC.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(73)
+    plan(79)
 
     basic_get_set()
     stack_and_queue_ops()
@@ -31,7 +31,7 @@ Tests the PhpArray PMC.
     exists_delete_tests()
     generic_iterator_tests_string_key()
     generic_iterator_tests_pmc_key()
-    #php_iterator_tests()
+    php_iterator_tests()
     #php_array_func_tests()
     cmp_shallow_native()
     cmp_order_test()
@@ -548,6 +548,7 @@ iter_skip_loop:
     unless it goto iter_skip_done
     p.'next'()
     val_str = shift it
+    val_str = p[val_str]
     concat s, val_str
     goto iter_skip_loop
 iter_skip_done:

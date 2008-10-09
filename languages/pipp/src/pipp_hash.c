@@ -240,7 +240,6 @@ void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
             curr_key = curr_bkt->key;
             cmp_bkt = curr_bkt->tableNext;
             while (cmp_bkt != NULL) {
-                dprintf("'%Ss' vs '%Ss'... ", curr_key, cmp_bkt->key);
                 if (!string_compare(interp, curr_key, cmp_bkt->key))
                     Parrot_ex_throw_from_c_args(interp, NULL, -1,
                             "PHPArray corruption: PHPArray contains duplicate keys.");
@@ -248,7 +247,6 @@ void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
             }
             curr_bkt = curr_bkt->tableNext;
         }
-        dprintf("\n");
     }
 
     /* check that internalPointer is sane */
@@ -264,7 +262,7 @@ void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
             Parrot_ex_throw_from_c_args(interp, NULL, -1,
                     "PHPArray corruption: ht->internalPointer doesn't point to "
                     "an element of this PHPArray.");
-        dprintf("internalPointer points at position #%d\n", ip_pos);
+        dprintf("internalPointer points at position #%d (0 being the beginngin)\n", ip_pos);
     }
     else
         dprintf("internalPointer is NULL, which is just fine\n");
@@ -405,6 +403,7 @@ Otherwise return NULL.
 PMC* pipp_hash_get(PARROT_INTERP, PippHashTable *ht, STRING *key) {
     PippBucket *bucket;
 
+    dprintf("pipp_hash_get called with key '%Ss'\n", key);
     bucket = pipp_hash_get_bucket(interp, ht, key);
     if (bucket)
         return bucket->value;
