@@ -102,7 +102,7 @@ static void convert_arg_from_str(PARROT_INTERP, ARGMOD(call_state *st))
         FUNC_MODIFIES(*st);
 
 static parrot_context_t * count_signature_elements(PARROT_INTERP,
-    ARGIN(const char* signature),
+    ARGIN(const char *signature),
     ARGMOD(PMC * args_sig),
     ARGMOD(PMC * results_sig),
     int flag)
@@ -1935,8 +1935,8 @@ Adds the necessary registers to a new context and returns the context.
 */
 
 static parrot_context_t *
-count_signature_elements(PARROT_INTERP, ARGIN(const char* signature),
-    ARGMOD(PMC * args_sig), ARGMOD(PMC * results_sig), int flag)
+count_signature_elements(PARROT_INTERP, ARGIN(const char *signature),
+    ARGMOD(PMC *args_sig), ARGMOD(PMC *results_sig), int flag)
 {
     const char  *x;
     unsigned int seen_arrow  = 0;
@@ -2648,20 +2648,21 @@ Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
 
     /* PIR Subs need runops to run their opcodes. */
     if (sub_obj->vtable->base_type == enum_class_Sub) {
-        opcode_t offset;
-        offset = dest - interp->code->base.data;
+        opcode_t offset = dest - interp->code->base.data;
         runops(interp, offset);
     }
 
     /* Set the return values from the subroutine's context into the
        caller's context */
-
     set_context_sig_returns(interp, ctx, indexes, ret_x, result_list);
+
     PObj_live_CLEAR(args_sig);
     PObj_live_CLEAR(results_sig);
+
     interp->current_args   = save_current_args;
     interp->args_signature = save_args_signature;
     interp->current_object = save_current_object;
+    string_cstring_free(signature);
 }
 
 
