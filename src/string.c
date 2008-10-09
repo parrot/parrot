@@ -3078,7 +3078,8 @@ If C<minus> is true, then C<-> is prepended to the string representation.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING*
-uint_to_str(PARROT_INTERP, ARGOUT(char *tc), UHUGEINTVAL num, char base, int minus)
+uint_to_str(PARROT_INTERP, ARGOUT(char *tc), UHUGEINTVAL num,
+    unsigned int base, int minus)
 {
     /* the buffer must be at least as long as this */
     char               *p    = tc + sizeof (UHUGEINTVAL)*8 + 1;
@@ -3120,7 +3121,7 @@ If C<< num < 0 >>, then C<-> is prepended to the string representation.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-int_to_str(PARROT_INTERP, ARGOUT(char *tc), HUGEINTVAL num, char base)
+int_to_str(PARROT_INTERP, ARGOUT(char *tc), HUGEINTVAL num, unsigned int base)
 {
     const int is_neg = (num < 0);
 

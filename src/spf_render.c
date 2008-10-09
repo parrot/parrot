@@ -707,7 +707,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                             const void * const ptr =
                                 obj->getptr(interp, info.type, obj);
                             STRING * const ts = uint_to_str(interp, tc,
-                                       (HUGEINTVAL) (size_t) ptr, 16, 0);
+                                       (UHUGEINTVAL) (size_t) ptr, 16, 0);
 
                             targ = str_append_w_flags(interp, targ, &info,
                                     ts, prefix);

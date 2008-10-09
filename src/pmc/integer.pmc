@@ -1178,7 +1178,8 @@ METHOD get_as_base(INTVAL base) {
             "get_as_base: base out of bounds");
 
         result = int_to_str(interp, buf,
-                (HUGEINTVAL)VTABLE_get_integer(INTERP, SELF), base);
+                (HUGEINTVAL)VTABLE_get_integer(INTERP, SELF),
+                (unsigned int)base);
         RETURN(STRING *result);
     }
 

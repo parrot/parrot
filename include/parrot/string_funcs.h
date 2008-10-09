@@ -510,8 +510,8 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * int_to_str(PARROT_INTERP,
     ARGOUT(char *tc),
-    HUGEINTVAL num,
-    char base)
+    HUGEINTVAL   num,
+    unsigned int base)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*tc);
@@ -520,9 +520,9 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING* uint_to_str(PARROT_INTERP,
     ARGOUT(char *tc),
-    UHUGEINTVAL num,
-    char base,
-    int minus)
+    UHUGEINTVAL  num,
+    unsigned int base,
+    int          minus)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*tc);
