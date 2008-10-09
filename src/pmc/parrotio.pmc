@@ -96,14 +96,14 @@ Opens the file with the given mode, using the given IO layer.
         if (l) {
             ParrotIO * const io = (ParrotIO *)PMC_data(pio);
 
-            /* RT#46079 move this into the layer */
+            /* RT #46079 move this into the layer */
             if ((is_mmap && (io->b.flags & PIO_BF_MMAP)) || !is_mmap) {
                 l = interp->piodata->default_stack;
 
                 if (STREQ(l->name, "buf"))
                     l = l->down;
 
-                /* RT#46081 layer is stored twice - which is used when */
+                /* RT #46081 layer is stored twice - which is used when */
                 io->stack           = l;
                 PMC_struct_val(pio) = l;
 
@@ -301,11 +301,12 @@ This does B<not> close the file.
             /* called as class method - open, slurp, close file */
             char * const path = string_to_cstring(interp, name);
             PMC  * const pio  = PIO_open(INTERP, NULL, path, "<");
-            const INTVAL size = Parrot_stat_info_intval(INTERP, name, STAT_FILESIZE);
+            const size_t size =
+                (size_t)(Parrot_stat_info_intval(INTERP, name, STAT_FILESIZE));
 
             string_cstring_free(path);
 
-            /* RT#46085 handle stdin */
+            /* RT #46085 handle stdin */
             result = PIO_reads(INTERP, pio, size);
             PIO_close(INTERP, pio);
             RETURN(STRING *result);
@@ -342,17 +343,17 @@ Flushes pending writes.
 
 =item C<METHOD setbuf(INTVAL)>
 
-RT#46087 TBD
+RT #46087 TBD
 
 =item C<METHOD setlinebuf()>
 
-RT#46089 TBD
+RT #46089 TBD
 
 =item C<METHOD INTVAL get_fd()>
 
 Get the file descriptor out of the ParrotIO object.
 
-RT#48312 Still to do: integral file descriptors might not exist outside of the UNIX platform.
+RT #48312 Still to do: integral file descriptors might not exist outside of the UNIX platform.
                       or for other streams.
 
 =cut
