@@ -50,6 +50,8 @@ bigint_clear(PARROT_INTERP, PMC *self) {
 
 static void
 bigint_set(PARROT_INTERP, PMC *dest, PMC *src) {
+    mpz_clear(BN(dest));
+    mpz_init(BN(dest));
     mpz_set(BN(dest), BN(src));
 }
 
