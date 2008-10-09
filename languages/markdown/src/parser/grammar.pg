@@ -169,16 +169,18 @@ token _ListItem {
 }
 
 token Inlines {
-    [
-    | <!Endline> <Inline>
-    | <.Endline> <Inline>
-    ]+
+    <_Inline>+
     <.Endline>?
+}
+
+token _Inline {
+    | <!Endline> <Inline> {*}   #= Inline
+    | <Endline> <?Inline> {*}   #= Endline
 }
 
 token Inline {
     | <Str> {*}                 #= Str
-    | <Endline> {*}             #= Endline
+#    | <Endline> {*}             #= Endline
     | <Space> {*}               #= Space
     | <Strong> {*}              #= Strong
     | <Emph> {*}                #= Emph
@@ -207,13 +209,22 @@ token Entity {
     | <CharEntity> {*}
 }
 
-token Endline { TerminalLine | NormalEndline }
-
-token NormalEndline {
-    <Sp> <Newline> <!BlankLine> <!AtxStart>
+token Endline {
+    <TerminalEndline> | <NormalEndline>
+    {*}
 }
 
-token TerminalEndline { <Sp> <Newline> <Eof> }
+token NormalEndline {
+    <.Sp> <.Newline> <!BlankLine> <!BlockQuote> <!AtxStart> <!_Setext>
+}
+
+token _Setext {
+    <Line> [ '===' '='* | '---' '-'* ] <Newline>
+}
+
+token TerminalEndline {
+    <.Sp> <.Newline> <.Eof>
+}
 
 token Symbol {
     <SpecialChar> {*}

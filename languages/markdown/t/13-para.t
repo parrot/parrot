@@ -17,7 +17,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 use Test::More;
 
 language_output_is( 'markdown', <<'CODE', <<'OUT', 'Para 1' );
@@ -30,6 +30,17 @@ CODE
 <p>This is a paragraph. It has two sentences.</p>
 
 <p>This is another paragraph. It also has two sentences.</p>
+
+OUT
+
+language_output_is( 'markdown', <<'CODE', <<'OUT', 'Para multi-line' );
+
+This is a paragraph.
+It has two sentences.
+
+CODE
+<p>This is a paragraph.
+It has two sentences.</p>
 
 OUT
 

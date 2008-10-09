@@ -33,7 +33,7 @@ method Block($/, $key) {
 
 method Para($/) {
     my $mast := Markdown::Para.new();
-    for $<Inlines><Inline> {
+    for $<Inlines><_Inline> {
         $mast.push( $( $_ ) );
     }
     make $mast;
@@ -53,6 +53,10 @@ method AtxHeading($/) {
 
 method AtxInline($/) {
     make $( $<Inline> );
+}
+
+method _Inline($/, $key) {
+    make $( $/{$key} );
 }
 
 method Inline($/, $key) {
@@ -221,6 +225,10 @@ method Entity($/) {
 }
 
 method Symbol($/) {
+    make Markdown::Word.new( :text( $/.text() ) );
+}
+
+method Endline($/) {
     make Markdown::Word.new( :text( $/.text() ) );
 }
 
