@@ -733,7 +733,8 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "invalid conversion to int - bad char %c", *start);
 
-        VTABLE_set_integer_native(INTERP, result, i);
+        /* TODO: autopromote to BigInt instead of casting away the high bit */
+        VTABLE_set_integer_native(INTERP, result, (INTVAL)i);
         RETURN(PMC *result);
     }
 /*
@@ -978,13 +979,14 @@ Find last occurence of C<substring>, but not after the C<start> position.
 
     METHOD reverse_index(STRING *substring, INTVAL start) {
         STRING * const src = VTABLE_get_string(INTERP, SELF);
-        UINTVAL len;
-        INTVAL res = -1;
+        INTVAL         res = -1;
+        UINTVAL        len;
 
         if (start < 0)
             RETURN(INTVAL res);
 
         len = string_length(interp, src);
+
         if (!len)
             RETURN(INTVAL res);
 
@@ -994,7 +996,7 @@ Find last occurence of C<substring>, but not after the C<start> position.
         if (!string_length(interp, substring))
             RETURN(INTVAL res);
 
-        res = CHARSET_RINDEX(INTERP, src, substring, start);
+        res = CHARSET_RINDEX(INTERP, src, substring, (UINTVAL)start);
         RETURN(INTVAL res);
     }
 }
