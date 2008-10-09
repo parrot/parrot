@@ -23,6 +23,12 @@ NCI function setup, compiler registration, C<interpinfo>, and C<sysinfo> opcodes
 #include "inter_misc.str"
 #include "../compilers/imcc/imc.h"
 
+#include "parrot/has_header.h"
+
+#ifdef PARROT_HAS_HEADER_SYSUTSNAME
+#  include <sys/utsname.h>
+#endif
+
 /* HEADERIZER HFILE: include/parrot/interpreter.h */
 
 /*
@@ -466,12 +472,31 @@ sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
         case PARROT_OS:
             return const_string(interp, BUILD_OS_NAME);
         case PARROT_OS_VERSION:
+#ifdef PARROT_HAS_HEADER_SYSUTSNAME
+            {
+                struct utsname info;
+                if (uname(&info) == 0) {
+                    return string_make(interp, info.version, strlen(info.version), "ascii", 0);
+                }
+            }
+#endif
+            break;
         case PARROT_OS_VERSION_NUMBER:
+#ifdef PARROT_HAS_HEADER_SYSUTSNAME
+            {
+                struct utsname info;
+                if (uname(&info) == 0) {
+                    return string_make(interp, info.release, strlen(info.version), "ascii", 0);
+                }
+            }
+#endif
+            break;
         case CPU_ARCH:
         case CPU_TYPE:
         default:
-            return CONST_STRING(interp, "");
+            break;
     }
+    return CONST_STRING(interp, "");
 }
 
 /*
