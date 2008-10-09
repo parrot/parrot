@@ -85,6 +85,9 @@ Change the thread ID we refer to to C<new_tid>.
 */
 
     VTABLE void set_integer_native(INTVAL new_tid) {
+        if (new_tid < 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INTERP_ERROR,
+                "Attempt to set invalid thread id %d", (int)new_tid);
         PMC_int_val(SELF) = new_tid;
     }
 /*
@@ -97,7 +100,8 @@ Join the thread, returning whatever its main method returns.
 
 */
     METHOD join() {
-        PMC *ret          = pt_thread_join(INTERP, PMC_int_val(SELF));
+        PMC *ret = pt_thread_join(INTERP,
+            (UINTVAL)VTABLE_get_integer(INTERP, SELF));
 
         /* invalidate self */
         PMC_int_val(SELF) = -1;
@@ -109,15 +113,15 @@ Join the thread, returning whatever its main method returns.
 
 =item C<METHOD detach()>
 
-Detach the thread so it cannot be joined and will free its
-resources immediatelly when it exits.
+Detach the thread so it cannot be joined and will free its resources
+immediately when it exits.
 
 =cut
 
 */
 
     METHOD detach() {
-        pt_thread_detach(PMC_int_val(SELF));
+        pt_thread_detach((UINTVAL)VTABLE_get_integer(INTERP, SELF));
     }
 
 /*
@@ -131,7 +135,7 @@ Terminate a running thread.
 */
 
     METHOD kill() {
-        pt_thread_kill(PMC_int_val(SELF));
+        pt_thread_kill((UINTVAL)VTABLE_get_integer(INTERP, SELF));
     }
 
 }
