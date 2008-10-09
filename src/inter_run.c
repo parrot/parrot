@@ -134,7 +134,7 @@ Parrot_runops_fromc(PARROT_INTERP, ARGIN(PMC *sub))
     parrot_context_t *ctx;
 
     /* we need one return continuation with a NULL offset */
-    PMC * const ret_c = new_ret_continuation_pmc(interp, NULL);
+    PMC * const ret_c    = new_ret_continuation_pmc(interp, NULL);
     interp->current_cont = ret_c;
 #if defined GC_VERBOSE && GC_VERBOSE
     PObj_report_SET(ret_c);     /* s. also dod.c */

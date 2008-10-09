@@ -8,10 +8,10 @@ src/gc/register.c - Register handling routines
 
 =head1 DESCRIPTION
 
-Parrot has 4 register sets, one for each of its basic types. The
-number of registers in each set varies depending on the use counts of
-the subroutine and is determined by the PASM/PIR compiler in the
-register allocation pass (F<imcc/reg_alloc.c>).
+Parrot has 4 register sets, one for each of its basic types. The number of
+registers in each set varies depending on the use counts of the subroutine and
+is determined by the PASM/PIR compiler in the register allocation pass
+(F<imcc/reg_alloc.c>).
 
 =cut
 
@@ -63,16 +63,16 @@ The macro CONTEXT() hides these details
 /*
 =head2 Context and register frame allocation
 
-There are two allocation strategies: chunked memory and malloced
-with a free list.
+There are two allocation strategies: chunked memory and malloced with a free
+list.
 
  CHUNKED_CTX_MEM = 1
 
-C<ctx_mem.data> is a pointer to an allocated chunk of memory.
-The pointer C<ctx_mem.free> holds the next usable
-location. With (full) continuations the C<ctx_mem.free> pointer can't be
-moved below the C<ctx_mem.threshold>, which is the highest context pointer
-of all active continuations.
+C<ctx_mem.data> is a pointer to an allocated chunk of memory.  The pointer
+C<ctx_mem.free> holds the next usable location. With (full) continuations the
+C<ctx_mem.free> pointer can't be moved below the C<ctx_mem.threshold>, which is
+the highest context pointer of all active continuations.
+
 [the code for this is incomplete; it had suffered some bit-rot and was
 getting in the way of maintaining the other case.  -- rgr, 4-Feb-06.]
 
@@ -80,8 +80,8 @@ RT #46177 GC has to lower this threshold when collecting continuations.
 
  CHUNKED_CTX_MEM = 0
 
-Context/register memory is malloced. C<ctx_mem.free> is used as a free
-list of reusable items.
+Context/register memory is malloced. C<ctx_mem.free> is used as a free list of
+reusable items.
 
 =cut
 
@@ -89,19 +89,18 @@ list of reusable items.
 
 #define CTX_ALLOC_SIZE 0x20000
 
-#define ALIGNED_CTX_SIZE (((sizeof (struct Parrot_Context) + NUMVAL_SIZE - 1) \
+#define ALIGNED_CTX_SIZE (((sizeof (Parrot_Context) + NUMVAL_SIZE - 1) \
         / NUMVAL_SIZE) * NUMVAL_SIZE)
 
 /*
 
 =pod
 
-Round register allocation size up to the nearest multiple of 8. A
-granularity of 8 is arbitrary, it could have been some bigger power of 2. A
-"slot" is an index into the free_list array. Each slot in free_list has a
-linked list of pointers to already allocated contexts available for (re)use.
-The slot where an available context is stored corresponds to the size of the
-context.
+Round register allocation size up to the nearest multiple of 8. A granularity
+of 8 is arbitrary, it could have been some bigger power of 2. A "slot" is an
+index into the free_list array. Each slot in free_list has a linked list of
+pointers to already allocated contexts available for (re)use.  The slot where
+an available context is stored corresponds to the size of the context.
 
 =cut
 
@@ -131,7 +130,7 @@ context.
 
 =item C<void destroy_context>
 
-Free allocated context memory
+Frees allocated context memory.
 
 =cut
 
@@ -140,11 +139,9 @@ Free allocated context memory
 void
 destroy_context(PARROT_INTERP)
 {
-    int slot;
-    Parrot_Context *context;
+    Parrot_Context *context = CONTEXT(interp);
+    int             slot;
 
-    /* clear active contexts all the way back to the initial context */
-    context = CONTEXT(interp);
     while (context) {
         Parrot_Context * const prev = context->caller_ctx;
         if (context->n_regs_used) {
@@ -167,11 +164,12 @@ destroy_context(PARROT_INTERP)
     mem_sys_free(interp->ctx_mem.free_list);
 }
 
+
 /*
 
 =item C<void create_initial_context>
 
-Create initial interpreter context.
+Creates the interpreter's initial context.
 
 =cut
 
@@ -195,11 +193,13 @@ create_initial_context(PARROT_INTERP)
     UNUSED(ignored);
 }
 
+
 /*
 
 =item C<void parrot_gc_context>
 
-Cleanup dead context memory. Called by the garbage collector.
+Cleans up dead context memory; called by the garbage collector.  This only
+applies in the chunked context memory scheme.
 
 =cut
 
@@ -214,19 +214,22 @@ parrot_gc_context(PARROT_INTERP)
 
     if (!interp->ctx_mem.threshold)
         return;
-    LVALUE_CAST(char *, ctx.bp) = interp->ctx_mem.threshold -
-        sizeof (parrot_regs_t);
+    LVALUE_CAST(char *, ctx.bp) = interp->ctx_mem.threshold
+                                - sizeof (parrot_regs_t);
     /* RT #46187 */
 #else
     UNUSED(interp);
 #endif
 }
 
+
 /*
 
 =item C<static void clear_regs>
 
-RT #48260: Not yet documented!!!
+Clears all registers in a context.  PMC and STRING registers contain PMCNULL
+and NULL, respectively.  Integer and float registers contain negative flag
+values, for debugging purposes.
 
 =cut
 
@@ -241,19 +244,20 @@ clear_regs(PARROT_INTERP, ARGMOD(parrot_context_t *ctx))
      *
      * if the architecture has 0x := NULL and 0.0 we could memset too
      */
-    ctx->bp.regs_i = interp->ctx.bp.regs_i;
+    ctx->bp.regs_i    = interp->ctx.bp.regs_i;
     ctx->bp_ps.regs_s = interp->ctx.bp_ps.regs_s;
+
     for (i = 0; i < ctx->n_regs_used[REGNO_PMC]; i++) {
         CTX_REG_PMC(ctx, i) = PMCNULL;
     }
+
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; i++) {
         CTX_REG_STR(ctx, i) = NULL;
     }
 
     if (Interp_debug_TEST(interp, PARROT_REG_DEBUG_FLAG)) {
         /* depending on -D40 we set int, num to garbage different garbage
-         * RT #46179 remove this code for parrot 1.0
-         */
+         * RT #46179 remove this code for parrot 1.0 */
         for (i = 0; i < ctx->n_regs_used[REGNO_INT]; i++) {
             CTX_REG_INT(ctx, i) = -999;
         }
@@ -271,11 +275,12 @@ clear_regs(PARROT_INTERP, ARGMOD(parrot_context_t *ctx))
     }
 }
 
+
 /*
 
 =item C<static void init_context>
 
-RT #48260: Not yet documented!!!
+Initializes a freshly allocated or recycled context.
 
 =cut
 
@@ -293,7 +298,7 @@ init_context(PARROT_INTERP, ARGMOD(parrot_context_t *ctx),
     ctx->current_cont      = NULL;
     ctx->current_object    = NULL; /* RT #46181 who clears it?  */
     ctx->current_HLL       = 0;
-    ctx->handlers = PMCNULL;
+    ctx->handlers          = PMCNULL;
 
     if (old) {
         /* some items should better be COW copied */
@@ -307,15 +312,17 @@ init_context(PARROT_INTERP, ARGMOD(parrot_context_t *ctx),
         /* end COW */
         ctx->recursion_depth   = old->recursion_depth;
     }
+
     /* other stuff is set inside Sub.invoke */
     clear_regs(interp, ctx);
 }
 
+
 /*
 
-=item C<struct Parrot_Context * Parrot_dup_context>
+=item C<Parrot_Context * Parrot_dup_context>
 
-Duplicate the passed context
+Duplicates the passed context, making the result the current context.
 
 =cut
 
@@ -323,24 +330,23 @@ Duplicate the passed context
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-struct Parrot_Context *
-Parrot_dup_context(PARROT_INTERP, ARGIN(const struct Parrot_Context *old))
+Parrot_Context *
+Parrot_dup_context(PARROT_INTERP, ARGIN(const Parrot_Context *old))
 {
-    size_t          diff;
     Parrot_Context *ctx;
-    DECL_CONST_CAST;
 
     const size_t reg_alloc = old->regs_mem_size;
-    const int slot = CALCULATE_SLOT_NUM(reg_alloc);
-    void * ptr = interp->ctx_mem.free_list[slot];
+    const int    slot      = CALCULATE_SLOT_NUM(reg_alloc);
+    void        *ptr       = interp->ctx_mem.free_list[slot];
+    size_t       diff;
 
     if (ptr)
         interp->ctx_mem.free_list[slot] = *(void **) ptr;
     else
         ptr = (void *)mem_sys_allocate(reg_alloc + ALIGNED_CTX_SIZE);
 
-    ctx = (Parrot_Context *)ptr;
-    CONTEXT(interp) = ctx;
+    ctx                         = (Parrot_Context *)ptr;
+    CONTEXT(interp)             = ctx;
 
     ctx->regs_mem_size          = reg_alloc;
     ctx->n_regs_used            = mem_allocate_n_zeroed_typed(4, INTVAL);
@@ -348,20 +354,22 @@ Parrot_dup_context(PARROT_INTERP, ARGIN(const struct Parrot_Context *old))
     ctx->n_regs_used[REGNO_NUM] = old->n_regs_used[REGNO_NUM];
     ctx->n_regs_used[REGNO_STR] = old->n_regs_used[REGNO_STR];
     ctx->n_regs_used[REGNO_PMC] = old->n_regs_used[REGNO_PMC];
-    diff                        = (const long *)ctx - (const long *) old;
+    diff                        = (const long *)ctx - (const long *)old;
 
     interp->ctx.bp.regs_i    += diff;
     interp->ctx.bp_ps.regs_s += diff;
     init_context(interp, ctx, old);
+
     return ctx;
 }
 
+
 /*
 
-=item C<struct Parrot_Context * Parrot_push_context>
+=item C<Parrot_Context * Parrot_push_context>
 
-Remember old context in C<caller_ctx>, suitable to use with
-C<Parrot_pop_context>.
+Creates and sets the current context to a new context, remembering the old
+context in C<caller_ctx>.  Suitable to use with C<Parrot_pop_context>.
 
 =cut
 
@@ -370,7 +378,7 @@ C<Parrot_pop_context>.
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-struct Parrot_Context *
+Parrot_Context *
 Parrot_push_context(PARROT_INTERP, ARGMOD(INTVAL *n_regs_used))
 {
     Parrot_Context * const old = CONTEXT(interp);
@@ -385,12 +393,13 @@ Parrot_push_context(PARROT_INTERP, ARGMOD(INTVAL *n_regs_used))
     return ctx;
 }
 
+
 /*
 
 =item C<void Parrot_pop_context>
 
-Free the context created with C<Parrot_push_context> and restore the previous
-context.
+Frees the context created with C<Parrot_push_context> and restores the previous
+context (the caller context).
 
 =cut
 
@@ -406,7 +415,7 @@ Parrot_pop_context(PARROT_INTERP)
     Parrot_free_context(interp, ctx, 1);
 
     /* restore old, set cached interpreter base pointers */
-    CONTEXT(interp) = old;
+    CONTEXT(interp)      = old;
     interp->ctx.bp       = old->bp;
     interp->ctx.bp_ps    = old->bp_ps;
 }
@@ -414,10 +423,10 @@ Parrot_pop_context(PARROT_INTERP)
 
 /*
 
-=item C<struct Parrot_Context * Parrot_alloc_context>
+=item C<Parrot_Context * Parrot_alloc_context>
 
-Allocate a new context and set the context pointer. Please note that the
-register usage C<n_regs_used> is copied.  The function returns the new context.
+Allocates and returns a new context as the current context.  Note that the
+register usage C<n_regs_used> is copied.
 
 =cut
 
@@ -425,7 +434,7 @@ register usage C<n_regs_used> is copied.  The function returns the new context.
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-struct Parrot_Context *
+Parrot_Context *
 Parrot_alloc_context(PARROT_INTERP, ARGMOD(INTVAL *number_regs_used))
 {
     Parrot_Context *old, *ctx;
@@ -447,10 +456,10 @@ Parrot_alloc_context(PARROT_INTERP, ARGMOD(INTVAL *number_regs_used))
 
     /* this gets attached to the context, which should free it */
     INTVAL * const n_regs_used = mem_allocate_n_zeroed_typed(4, INTVAL);
-    n_regs_used[REGNO_INT] = number_regs_used[REGNO_INT];
-    n_regs_used[REGNO_NUM] = number_regs_used[REGNO_NUM];
-    n_regs_used[REGNO_STR] = number_regs_used[REGNO_STR];
-    n_regs_used[REGNO_PMC] = number_regs_used[REGNO_PMC];
+    n_regs_used[REGNO_INT]     = number_regs_used[REGNO_INT];
+    n_regs_used[REGNO_NUM]     = number_regs_used[REGNO_NUM];
+    n_regs_used[REGNO_STR]     = number_regs_used[REGNO_STR];
+    n_regs_used[REGNO_PMC]     = number_regs_used[REGNO_PMC];
 
     /*
      * If slot is beyond the end of the allocated list, extend the list to
@@ -498,7 +507,7 @@ Parrot_alloc_context(PARROT_INTERP, ARGMOD(INTVAL *number_regs_used))
     }
 #endif
 
-    CONTEXT(interp) = ctx = (Parrot_Context *)ptr;
+    CONTEXT(interp)      = ctx = (Parrot_Context *)ptr;
 
     ctx->regs_mem_size   = reg_alloc;
     ctx->n_regs_used     = n_regs_used;
@@ -516,12 +525,13 @@ Parrot_alloc_context(PARROT_INTERP, ARGMOD(INTVAL *number_regs_used))
     return ctx;
 }
 
+
 /*
 
 =item C<void Parrot_free_context>
 
-Free the context. If C<re_use> is true, this function is called by a
-return continuation invoke, else from the destructor of a continuation.
+Frees the context. If C<re_use> is true, this function is called by a return
+continuation invoke, else from the destructor of a continuation.
 
 =cut
 
@@ -529,7 +539,7 @@ return continuation invoke, else from the destructor of a continuation.
 
 PARROT_API
 void
-Parrot_free_context(PARROT_INTERP, ARGMOD(struct Parrot_Context *ctxp), int re_use)
+Parrot_free_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctxp), int re_use)
 {
     /*
      * The context structure has a reference count, initially 0.  This field is
@@ -583,11 +593,12 @@ Parrot_free_context(PARROT_INTERP, ARGMOD(struct Parrot_Context *ctxp), int re_u
     }
 }
 
+
 /*
 
 =item C<void Parrot_set_context_threshold>
 
-Mark the context as possible threshold.
+Marks the context as possible threshold.
 
 =cut
 
@@ -595,7 +606,7 @@ Mark the context as possible threshold.
 
 PARROT_API
 void
-Parrot_set_context_threshold(SHIM_INTERP, SHIM(struct Parrot_Context *ctxp))
+Parrot_set_context_threshold(SHIM_INTERP, SHIM(Parrot_Context *ctxp))
 {
     /* nothing to do */
 }
@@ -612,7 +623,7 @@ Parrot_set_context_threshold(SHIM_INTERP, SHIM(struct Parrot_Context *ctxp))
 
 =item C<void Parrot_clear_i>
 
-RT #48260: Not yet documented!!!
+Sets all integer registers in the current context to 0.
 
 =cut
 
@@ -627,11 +638,12 @@ Parrot_clear_i(PARROT_INTERP)
         REG_INT(interp, i) = 0;
 }
 
+
 /*
 
 =item C<void Parrot_clear_s>
 
-RT #48260: Not yet documented!!!
+Sets all STRING registers in the current context to NULL.
 
 =cut
 
@@ -646,11 +658,12 @@ Parrot_clear_s(PARROT_INTERP)
         REG_STR(interp, i) = NULL;
 }
 
+
 /*
 
 =item C<void Parrot_clear_p>
 
-RT #48260: Not yet documented!!!
+Sets all PMC registers in the current context to NULL.
 
 =cut
 
@@ -665,11 +678,12 @@ Parrot_clear_p(PARROT_INTERP)
         REG_PMC(interp, i) = PMCNULL;
 }
 
+
 /*
 
 =item C<void Parrot_clear_n>
 
-RT #48260: Not yet documented!!!
+Sets all number registers in the current context to 0.0.
 
 =cut
 
