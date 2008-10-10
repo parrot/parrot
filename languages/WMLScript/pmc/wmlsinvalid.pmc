@@ -391,7 +391,7 @@ Return the string "invalid".
 =cut
 
 */
-    INTVAL is_equal(PMC* value) {
+    MULTI INTVAL is_equal(DEFAULT value) {
             return 4;
     }
 
@@ -402,7 +402,7 @@ Return the string "invalid".
 =cut
 
 */
-    INTVAL cmp(PMC* value) {
+    MULTI INTVAL cmp(DEFAULT value) {
             return 4;
     }
 
