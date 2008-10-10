@@ -94,7 +94,7 @@ void Parrot_dod_free_sysmem(SHIM_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*b);
 
-void Parrot_dod_ms_run(PARROT_INTERP, int flags)
+void Parrot_dod_ms_run(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
 void Parrot_dod_ms_run_init(PARROT_INTERP)

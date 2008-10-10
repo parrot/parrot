@@ -389,7 +389,7 @@ static void parrot_gc_ims_mark(PARROT_INTERP)
 static void parrot_gc_ims_reinit(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void parrot_gc_ims_run(PARROT_INTERP, int flags)
+static void parrot_gc_ims_run(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
 static void parrot_gc_ims_run_increment(PARROT_INTERP)
@@ -656,7 +656,7 @@ static void
 parrot_gc_ims_reinit(PARROT_INTERP)
 {
     Gc_ims_private *g_ims;
-    Arenas * const arena_base = interp->arena_base;
+    Arenas * const  arena_base = interp->arena_base;
 
     arena_base->lazy_dod = 0;
     Parrot_dod_ms_run_init(interp);
@@ -770,7 +770,7 @@ parrot_gc_ims_sweep(PARROT_INTERP)
      */
 
     /* TODO mark volatile roots */
-    Parrot_dod_trace_root(interp, g_ims->lazy ? 0 : GC_trace_stack_FLAG);
+    Parrot_dod_trace_root(interp, g_ims->lazy ? 0 : (int)GC_trace_stack_FLAG);
 
     /* mark (again) rest of children */
     Parrot_dod_trace_children(interp, (size_t) -1);
@@ -974,7 +974,7 @@ Interface to C<Parrot_do_dod_run>. C<flags> is one of:
 */
 
 static void
-parrot_gc_ims_run(PARROT_INTERP, int flags)
+parrot_gc_ims_run(PARROT_INTERP, UINTVAL flags)
 {
     int                    lazy;
     Arenas * const         arena_base = interp->arena_base;

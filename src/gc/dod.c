@@ -1091,7 +1091,7 @@ Runs the stop-the-world mark & sweep (MS) collector.
 */
 
 void
-Parrot_dod_ms_run(PARROT_INTERP, int flags)
+Parrot_dod_ms_run(PARROT_INTERP, UINTVAL flags)
 {
     Arenas * const arena_base = interp->arena_base;
 
@@ -1137,7 +1137,7 @@ Parrot_dod_ms_run(PARROT_INTERP, int flags)
     Parrot_go_collect(interp);
 
     /* Now go trace the PMCs */
-    if (trace_active_PMCs(interp, flags & GC_trace_stack_FLAG)) {
+    if (trace_active_PMCs(interp, (int)(flags & GC_trace_stack_FLAG))) {
         int ignored;
 
         arena_base->dod_trace_ptr = NULL;
