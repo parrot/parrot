@@ -717,14 +717,14 @@ Return the string "true" or "false".
 
 /*
 
-=item C<PMC* cmodulus(PMC *value, PMC *dest)>
+=item C<PMC* modulus(PMC *value, PMC *dest)>
 
-=item C<void i_cmodulus(PMC *value)>
+=item C<void i_modulus(PMC *value)>
 
 =cut
 
 */
-    MULTI PMC* cmodulus(WmlsInteger value, PMC* dest) {
+    MULTI PMC* modulus(WmlsInteger value, PMC* dest) {
         INTVAL d = VTABLE_get_integer(INTERP, value);
         if (d != 0) {
             INTVAL result = SELF.get_integer() % d;
@@ -735,7 +735,7 @@ Return the string "true" or "false".
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    MULTI PMC* cmodulus(WmlsBoolean value, PMC* dest) {
+    MULTI PMC* modulus(WmlsBoolean value, PMC* dest) {
         INTVAL d = VTABLE_get_integer(INTERP, value);
         if (d != 0) {
             INTVAL result = SELF.get_integer() % d;
@@ -746,7 +746,7 @@ Return the string "true" or "false".
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    MULTI PMC* cmodulus(WmlsString value, PMC* dest) {
+    MULTI PMC* modulus(WmlsString value, PMC* dest) {
         PMC *trans;
         Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
                 "->P", &trans);
@@ -763,11 +763,11 @@ Return the string "true" or "false".
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    MULTI PMC* cmodulus(DEFAULT value, PMC* dest) {
+    MULTI PMC* modulus(DEFAULT value, PMC* dest) {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    MULTI void i_cmodulus(WmlsInteger value) {
+    MULTI void i_modulus(WmlsInteger value) {
         INTVAL d = VTABLE_get_integer(INTERP, value);
         if (d != 0) {
             INTVAL result = SELF.get_integer() % d;
@@ -779,7 +779,7 @@ Return the string "true" or "false".
         }
     }
 
-    MULTI void i_cmodulus(WmlsBoolean value) {
+    MULTI void i_modulus(WmlsBoolean value) {
         INTVAL d = VTABLE_get_integer(INTERP, value);
         if (d != 0) {
             INTVAL result = SELF.get_integer() % d;
@@ -791,7 +791,7 @@ Return the string "true" or "false".
         }
     }
 
-    MULTI void i_cmodulus(WmlsString value) {
+    MULTI void i_modulus(WmlsString value) {
         PMC *trans;
         Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
                 "->P", &trans);
@@ -812,7 +812,7 @@ Return the string "true" or "false".
         }
     }
 
-    MULTI void i_cmodulus(DEFAULT value) {
+    MULTI void i_modulus(DEFAULT value) {
         SELF.morph(dynpmc_WmlsInvalid);
     }
 

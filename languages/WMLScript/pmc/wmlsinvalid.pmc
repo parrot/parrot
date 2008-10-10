@@ -267,18 +267,18 @@ Return the string "invalid".
 
 /*
 
-=item C<PMC* cmodulus(PMC *value, PMC *dest)>
+=item C<PMC* modulus(PMC *value, PMC *dest)>
 
-=item C<void i_cmodulus(PMC *value)>
+=item C<void i_modulus(PMC *value)>
 
 =cut
 
 */
-    PMC* cmodulus(PMC* value, PMC* dest) {
+    PMC* modulus(PMC* value, PMC* dest) {
             return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_cmodulus(PMC* value) {
+    void i_modulus(PMC* value) {
             return;
     }
 

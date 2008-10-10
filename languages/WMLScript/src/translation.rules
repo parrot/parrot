@@ -688,7 +688,7 @@ code = 25
 class = op
 pop = 2
 push = 1
-instruction = ${DEST0} = cmod ${STACK1}, ${STACK0}
+instruction = ${DEST0} = mod ${STACK1}, ${STACK0}
 
 ## Bitwise Instructions
 
