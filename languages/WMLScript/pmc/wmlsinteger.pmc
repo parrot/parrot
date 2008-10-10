@@ -89,7 +89,7 @@ Return the integer 0.
 =cut
 
 */
-    PMC* get_class() {
+    VTABLE PMC* get_class() {
         PMC* retval = pmc_new(interp, dynpmc_WmlsInteger);
         PMC_int_val(retval) = 0;
         return retval;
@@ -104,13 +104,13 @@ Return the integer 0.
 =cut
 
 */
-    PMC* neg(PMC* dest) {
+    VTABLE PMC* neg(PMC* dest) {
         dest = pmc_new(INTERP, dynpmc_WmlsInteger);
         PMC_int_val(dest) = - SELF.get_integer();
         return dest;
     }
 
-    void i_neg() {
+    VTABLE void i_neg() {
         INTVAL result = - SELF.get_integer();
         SELF.set_integer_native(result);
     }
@@ -124,13 +124,13 @@ Return the integer 0.
 =cut
 
 */
-    PMC* bitwise_not(PMC* dest) {
+    VTABLE PMC* bitwise_not(PMC* dest) {
         dest = pmc_new(INTERP, dynpmc_WmlsInteger);
         PMC_int_val(dest) = ~ SELF.get_integer();
         return dest;
     }
 
-    void i_bitwise_not() {
+    VTABLE void i_bitwise_not() {
         INTVAL result = ~ SELF.get_integer();
         SELF.set_integer_native(result);
     }
@@ -144,13 +144,13 @@ Return the integer 0.
 =cut
 
 */
-    PMC* logical_not(PMC* dest) {
+    VTABLE PMC* logical_not(PMC* dest) {
         dest = pmc_new(INTERP, dynpmc_WmlsBoolean);
         VTABLE_set_bool(INTERP, dest, ! SELF.get_bool());
         return dest;
     }
 
-    void i_logical_not() {
+    VTABLE void i_logical_not() {
         INTVAL result = ! SELF.get_bool();
         SELF.morph(dynpmc_WmlsBoolean);
         SELF.set_integer_native(result);

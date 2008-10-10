@@ -76,7 +76,7 @@ Return the integer 1.
 =cut
 
 */
-    PMC* get_class() {
+    VTABLE PMC* get_class() {
         PMC* retval = pmc_new(interp, dynpmc_WmlsInteger);
         PMC_int_val(retval) = 1;
         return retval;
@@ -102,7 +102,7 @@ Returns a Parrot string representation of the number.
 =cut
 
 */
-    void set_integer_native(INTVAL value) {
+    VTABLE void set_integer_native(INTVAL value) {
         PMC_num_val(SELF) = (FLOATVAL)value;
     }
 
@@ -115,13 +115,13 @@ Returns a Parrot string representation of the number.
 =cut
 
 */
-    PMC* neg(PMC* dest) {
+    VTABLE PMC* neg(PMC* dest) {
         dest = pmc_new(INTERP, dynpmc_WmlsFloat);
         PMC_num_val(dest) = - SELF.get_number();
         return dest;
     }
 
-    void i_neg() {
+    VTABLE void i_neg() {
         FLOATVAL result = - SELF.get_number();
         SELF.set_number_native(result);
     }
@@ -135,11 +135,11 @@ Returns a Parrot string representation of the number.
 =cut
 
 */
-    PMC* bitwise_not(PMC* dest) {
+    VTABLE PMC* bitwise_not(PMC* dest) {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_not() {
+    VTABLE void i_bitwise_not() {
         SELF.morph(dynpmc_WmlsInvalid);
     }
 
@@ -152,13 +152,13 @@ Returns a Parrot string representation of the number.
 =cut
 
 */
-    PMC* logical_not(PMC* dest) {
+    VTABLE PMC* logical_not(PMC* dest) {
         dest = pmc_new(INTERP, dynpmc_WmlsBoolean);
         VTABLE_set_bool(INTERP, dest, ! SELF.get_bool());
         return dest;
     }
 
-    void i_logical_not() {
+    VTABLE void i_logical_not() {
         INTVAL result = ! SELF.get_bool();
         SELF.morph(dynpmc_WmlsBoolean);
         SELF.set_integer_native(result);
@@ -554,11 +554,11 @@ Returns a Parrot string representation of the number.
 
 */
     PMC* floor_divide(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_floor_divide(PMC* value) {
-            SELF.morph(dynpmc_WmlsInvalid);
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
@@ -571,11 +571,11 @@ Returns a Parrot string representation of the number.
 
 */
     PMC* modulus(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_modulus(PMC* value) {
-            SELF.morph(dynpmc_WmlsInvalid);
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
@@ -588,11 +588,11 @@ Returns a Parrot string representation of the number.
 
 */
     PMC* bitwise_or(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_bitwise_or(PMC* value) {
-            SELF.morph(dynpmc_WmlsInvalid);
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
@@ -605,11 +605,11 @@ Returns a Parrot string representation of the number.
 
 */
     PMC* bitwise_and(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_bitwise_and(PMC* value) {
-            SELF.morph(dynpmc_WmlsInvalid);
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
@@ -622,11 +622,11 @@ Returns a Parrot string representation of the number.
 
 */
     PMC* bitwise_xor(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_bitwise_xor(PMC* value) {
-            SELF.morph(dynpmc_WmlsInvalid);
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
@@ -639,11 +639,11 @@ Returns a Parrot string representation of the number.
 
 */
     PMC* bitwise_shr(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_bitwise_shr(PMC* value) {
-            SELF.morph(dynpmc_WmlsInvalid);
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
@@ -656,11 +656,11 @@ Returns a Parrot string representation of the number.
 
 */
     PMC* bitwise_lsr(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_bitwise_lsr(PMC* value) {
-            SELF.morph(dynpmc_WmlsInvalid);
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*
@@ -673,11 +673,11 @@ Returns a Parrot string representation of the number.
 
 */
     PMC* bitwise_shl(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_bitwise_shl(PMC* value) {
-            SELF.morph(dynpmc_WmlsInvalid);
+        SELF.morph(dynpmc_WmlsInvalid);
     }
 
 /*

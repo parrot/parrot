@@ -52,7 +52,7 @@ pmclass WmlsInvalid
 =cut
 
 */
-    PMC* clone() {
+    VTABLE PMC* clone() {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
@@ -65,7 +65,7 @@ Return the integer 4.
 =cut
 
 */
-    PMC* get_class() {
+    VTABLE PMC* get_class() {
         PMC* retval = pmc_new(interp, dynpmc_WmlsInteger);
         PMC_int_val(retval) = 4;
         return retval;
@@ -80,7 +80,7 @@ Return the string "invalid".
 =cut
 
 */
-    STRING* get_string() {
+    VTABLE STRING* get_string() {
         return const_string(INTERP, "invalid");
     }
 
@@ -91,7 +91,7 @@ Return the string "invalid".
 =cut
 
 */
-    void increment() {
+    VTABLE void increment() {
         return;
     }
 
@@ -102,7 +102,7 @@ Return the string "invalid".
 =cut
 
 */
-    void decrement() {
+    VTABLE void decrement() {
         return;
     }
 
@@ -115,11 +115,11 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* absolute(PMC* dest) {
+    VTABLE PMC* absolute(PMC* dest) {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_absolute() {
+    VTABLE void i_absolute() {
         return;
     }
 
@@ -132,11 +132,11 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* neg(PMC* dest) {
+    VTABLE PMC* neg(PMC* dest) {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_neg() {
+    VTABLE void i_neg() {
         return;
     }
 
@@ -149,11 +149,11 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* bitwise_not(PMC* dest) {
+    VTABLE PMC* bitwise_not(PMC* dest) {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_not() {
+    VTABLE void i_bitwise_not() {
         return;
     }
 
@@ -166,11 +166,11 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* logical_not(PMC* dest) {
+    VTABLE PMC* logical_not(PMC* dest) {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_logical_not() {
+    VTABLE void i_logical_not() {
         return;
     }
 
