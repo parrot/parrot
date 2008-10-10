@@ -21,8 +21,9 @@ Tests the PhpArray PMC.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(79)
+    plan(81)
 
+    weird_imcc_bug_workaround()
     basic_get_set()
     stack_and_queue_ops()
     index_increment()
@@ -32,7 +33,7 @@ Tests the PhpArray PMC.
     generic_iterator_tests_string_key()
     generic_iterator_tests_pmc_key()
     php_iterator_tests()
-    #php_array_func_tests()
+    php_array_func_tests()
     cmp_shallow_native()
     cmp_order_test()
     cmp_deep_native()
@@ -43,7 +44,25 @@ Tests the PhpArray PMC.
     add_pmc_shallow_native()
     #get_repr_deep()
     vanilla_freeze_thaw()
-    #goofy_freeze_thaw()
+    goofy_freeze_thaw()
+.end
+
+#An apparent bug in imcc allows the keys in keyed assignments to make methods
+#unreachable.  Calling these methods before any keyed assignments happen
+#ensures that imcc can find these methods later.
+#If removing references to this sub doesn't cause any test failures, they can
+#safely be removed.
+.sub weird_imcc_bug_workaround
+    .local pmc p
+    p = new 'PhpArray'
+    p.'next'()
+    p.'prev'()
+    p.'current'()
+    p.'end'()
+    p.'key'()
+    p.'current'()
+    p.'each'()
+    p.'sanity_check'()
 .end
 
 .sub basic_get_set
