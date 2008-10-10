@@ -587,11 +587,11 @@ Returns a Parrot string representation of the number.
 =cut
 
 */
-    PMC* bitwise_or(PMC* value, PMC* dest) {
+    VTABLE PMC* bitwise_or(PMC* value, PMC* dest) {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_or(PMC* value) {
+    VTABLE void i_bitwise_or(PMC* value) {
         SELF.morph(dynpmc_WmlsInvalid);
     }
 
@@ -604,11 +604,11 @@ Returns a Parrot string representation of the number.
 =cut
 
 */
-    PMC* bitwise_and(PMC* value, PMC* dest) {
+    VTABLE PMC* bitwise_and(PMC* value, PMC* dest) {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_and(PMC* value) {
+    VTABLE void i_bitwise_and(PMC* value) {
         SELF.morph(dynpmc_WmlsInvalid);
     }
 
@@ -621,11 +621,11 @@ Returns a Parrot string representation of the number.
 =cut
 
 */
-    PMC* bitwise_xor(PMC* value, PMC* dest) {
+    VTABLE PMC* bitwise_xor(PMC* value, PMC* dest) {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_xor(PMC* value) {
+    VTABLE void i_bitwise_xor(PMC* value) {
         SELF.morph(dynpmc_WmlsInvalid);
     }
 
@@ -638,11 +638,11 @@ Returns a Parrot string representation of the number.
 =cut
 
 */
-    PMC* bitwise_shr(PMC* value, PMC* dest) {
+    VTABLE PMC* bitwise_shr(PMC* value, PMC* dest) {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_shr(PMC* value) {
+    VTABLE void i_bitwise_shr(PMC* value) {
         SELF.morph(dynpmc_WmlsInvalid);
     }
 
@@ -655,11 +655,11 @@ Returns a Parrot string representation of the number.
 =cut
 
 */
-    PMC* bitwise_lsr(PMC* value, PMC* dest) {
+    VTABLE PMC* bitwise_lsr(PMC* value, PMC* dest) {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_lsr(PMC* value) {
+    VTABLE void i_bitwise_lsr(PMC* value) {
         SELF.morph(dynpmc_WmlsInvalid);
     }
 
@@ -672,11 +672,11 @@ Returns a Parrot string representation of the number.
 =cut
 
 */
-    PMC* bitwise_shl(PMC* value, PMC* dest) {
+    VTABLE PMC* bitwise_shl(PMC* value, PMC* dest) {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_shl(PMC* value) {
+    VTABLE void i_bitwise_shl(PMC* value) {
         SELF.morph(dynpmc_WmlsInvalid);
     }
 

@@ -190,11 +190,11 @@ Return the string "invalid".
 
 */
     PMC* add(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_add(PMC* value) {
-            return;
+        return;
     }
 
 /*
@@ -207,11 +207,11 @@ Return the string "invalid".
 
 */
     PMC* subtract(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_subtract(PMC* value) {
-            return;
+        return;
     }
 
 /*
@@ -224,11 +224,11 @@ Return the string "invalid".
 
 */
     PMC* multiply(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_multiply(PMC* value) {
-            return;
+        return;
     }
 
 /*
@@ -241,11 +241,11 @@ Return the string "invalid".
 
 */
     PMC* divide(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_divide(PMC* value) {
-            return;
+        return;
     }
 
 /*
@@ -258,11 +258,11 @@ Return the string "invalid".
 
 */
     PMC* floor_divide(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_floor_divide(PMC* value) {
-            return;
+        return;
     }
 
 /*
@@ -275,11 +275,11 @@ Return the string "invalid".
 
 */
     PMC* modulus(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     void i_modulus(PMC* value) {
-            return;
+        return;
     }
 
 /*
@@ -291,12 +291,12 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* bitwise_or(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    VTABLE PMC* bitwise_or(PMC* value, PMC* dest) {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_or(PMC* value) {
-            return;
+    VTABLE void i_bitwise_or(PMC* value) {
+        return;
     }
 
 /*
@@ -308,12 +308,12 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* bitwise_and(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    VTABLE PMC* bitwise_and(PMC* value, PMC* dest) {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_and(PMC* value) {
-            return;
+    VTABLE void i_bitwise_and(PMC* value) {
+        return;
     }
 
 /*
@@ -325,12 +325,12 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* bitwise_xor(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    VTABLE PMC* bitwise_xor(PMC* value, PMC* dest) {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_xor(PMC* value) {
-            return;
+    VTABLE void i_bitwise_xor(PMC* value) {
+        return;
     }
 
 /*
@@ -342,12 +342,12 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* bitwise_shr(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    VTABLE PMC* bitwise_shr(PMC* value, PMC* dest) {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_shr(PMC* value) {
-            return;
+    VTABLE void i_bitwise_shr(PMC* value) {
+        return;
     }
 
 /*
@@ -359,12 +359,12 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* bitwise_lsr(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    VTABLE PMC* bitwise_lsr(PMC* value, PMC* dest) {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_lsr(PMC* value) {
-            return;
+    VTABLE void i_bitwise_lsr(PMC* value) {
+        return;
     }
 
 /*
@@ -376,12 +376,12 @@ Return the string "invalid".
 =cut
 
 */
-    PMC* bitwise_shl(PMC* value, PMC* dest) {
-            return pmc_new(INTERP, dynpmc_WmlsInvalid);
+    VTABLE PMC* bitwise_shl(PMC* value, PMC* dest) {
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
-    void i_bitwise_shl(PMC* value) {
-            return;
+    VTABLE void i_bitwise_shl(PMC* value) {
+        return;
     }
 
 /*
@@ -392,7 +392,7 @@ Return the string "invalid".
 
 */
     MULTI INTVAL is_equal(DEFAULT value) {
-            return 4;
+        return 4;
     }
 
 /*
@@ -403,7 +403,7 @@ Return the string "invalid".
 
 */
     MULTI INTVAL cmp(DEFAULT value) {
-            return 4;
+        return 4;
     }
 
 }
