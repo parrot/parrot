@@ -8,7 +8,7 @@ if $P1 goto has_lib
 loadlib $P1, 'cygpq'
 if $P1 goto has_lib
 $P2 = new 'Exception'
-$P2[0] = 'error loading libpg - loadlib failed'
+$P2 = 'error loading libpq - loadlib failed'
 throw $P2
 has_lib:
 dlfunc $P2, $P1, 'PQconnectStart', 'pt'
