@@ -80,7 +80,6 @@ Return the absolute value of the number
     .RETURN_NULL()
   L1:
     $P1 = shift args
-    $P1 = $P1.'to_number'()
     $I0 = isa $P1, 'PhpFloat'
     unless $I0 goto L2
     $N1 = $P1
@@ -93,7 +92,13 @@ Return the absolute value of the number
     $I0 = abs $I1
     .RETURN_LONG($I0)
   L3:
+    $I0 = isa $P1, 'array'
+    unless $I0 goto L4
     .RETURN_FALSE()
+  L4:
+    $N1 = $P1
+    $N0 = abs $N1
+    .RETURN_DOUBLE($N0)
 .end
 
 =item C<float acos(float number)>
@@ -641,7 +646,6 @@ Formats a number with grouped thousands
     dec_point = '.'
     unless argc == 1 goto L1
     $P1 = shift args
-    $P1 = $P1.'to_number'()
     $N1 = $P1
     .return _number_format($N1, 0, dec_point, thousand_sep)
   L1:
