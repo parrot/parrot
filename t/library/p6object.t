@@ -12,6 +12,8 @@ t/library/p6object.t -- P6object tests
 
 =head1 DESCRIPTION
 
+Testing Perl 6 objects.
+
 =cut
 
 .sub 'main' :main
@@ -151,7 +153,7 @@ t/library/p6object.t -- P6object tests
     isa_nok($P0, 'P6protoobject', '["Foo::JKL"]')
     p6obj_tests(jklproto, 'Foo::JKL', 'shortname'=>'JKL', 'isa'=>'P6object', 'can'=>'foo')
 
-=pod
+=for never
 
     isa_ok(mnoproto, 'Float', 'MNO proto')
     isa_ok(mnoproto, 'ABC', 'MNO proto')
@@ -251,6 +253,10 @@ t/library/p6object.t -- P6object tests
     .return ()
 .end
 
+
+=head1 SUBROUTINES
+
+=over 4
 
 =item p6obj_tests(proto, class [, options])
 
@@ -543,3 +549,7 @@ diagnostic message).
 .sub 'foo' :method
     .return ('WXY::foo')
 .end
+
+=back
+
+=cut
