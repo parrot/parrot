@@ -1048,7 +1048,7 @@ Return the integer 0.
                        VTABLE_get_integer(INTERP, value));
     }
 
-    MULTI INTVAL cmp(Wmlsboolean value) {
+    MULTI INTVAL cmp(WmlsBoolean value) {
         return int_cmp(SELF.get_integer(),
                        VTABLE_get_integer(INTERP, value));
     }
