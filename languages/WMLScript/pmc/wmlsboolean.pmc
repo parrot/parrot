@@ -234,7 +234,7 @@ Return the string "true" or "false".
 =cut
 
 */
-    MUTLI PMC* add(WmlsInteger value, PMC* dest) {
+    MULTI PMC* add(WmlsInteger value, PMC* dest) {
         INTVAL result = SELF.get_integer()
                       + VTABLE_get_integer(INTERP, value);
         dest = pmc_new(INTERP, dynpmc_WmlsInteger);
@@ -242,7 +242,7 @@ Return the string "true" or "false".
         return dest;
     }
 
-    MUTLI PMC* add(WmlsBoolean value, PMC* dest) {
+    MULTI PMC* add(WmlsBoolean value, PMC* dest) {
         INTVAL result = SELF.get_integer()
                       + VTABLE_get_integer(INTERP, value);
         dest = pmc_new(INTERP, dynpmc_WmlsInteger);
@@ -250,7 +250,7 @@ Return the string "true" or "false".
         return dest;
     }
 
-    MUTLI PMC* add(WmlsFloat value, PMC* dest) {
+    MULTI PMC* add(WmlsFloat value, PMC* dest) {
         FLOATVAL result = SELF.get_number()
                         + VTABLE_get_number(INTERP, value);
         dest = pmc_new(INTERP, dynpmc_WmlsFloat);
@@ -258,7 +258,7 @@ Return the string "true" or "false".
         return dest;
     }
 
-    MUTLI PMC* add(WmlsString value, PMC* dest) {
+    MULTI PMC* add(WmlsString value, PMC* dest) {
         STRING* result = string_concat(INTERP,
               SELF.get_string(),
               VTABLE_get_string(INTERP, value), 0);
@@ -267,7 +267,7 @@ Return the string "true" or "false".
         return dest;
     }
 
-    MUTLI PMC* add(DEFAULT value, PMC* dest) {
+    MULTI PMC* add(DEFAULT value, PMC* dest) {
         return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
