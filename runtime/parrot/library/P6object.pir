@@ -230,7 +230,7 @@ Return a true value if the invocant 'can' C<x>.
 .end
 
 
-=item register(parrotclass [, 'name'=>name] [, 'protoobject'=>proto] [, 'parent'=>parentclass])
+=item register(parrotclass [, 'name'=>name] [, 'protoobject'=>proto] [, 'parent'=>parentclass] [, 'hll'=>hll])
 
 Sets objects of type C<parrotclass> to use C<protoobject>,
 and verifies that C<parrotclass> has P6object methods defined
@@ -254,6 +254,18 @@ or 'Object').
     if $I0 goto have_parrotclass
     parrotclass = self.'get_parrotclass'(parrotclass)
   have_parrotclass:
+
+    ## get the hll, either from options or the caller's namespace
+    .local pmc hll
+    hll = options['hll']
+    $I0 = defined $P0
+    if $I0, have_hll
+    $P0 = getinterp
+    $P0 = $P0['namespace';1]
+    $P0 = $P0.get_name()
+    hll = shift $P0
+    options['hll'] = hll
+  have_hll:
 
     ##  add any needed parent classes
     .local pmc parentclass
@@ -357,8 +369,9 @@ or 'Object').
     setattribute how, 'shortname', shortname
 
     ##  store the protoobject in appropriate namespace
+    unshift ns, hll
     $S0 = pop ns
-    set_hll_global ns, $S0, protoobject
+    set_root_global ns, $S0, protoobject
     goto have_how
 
     ##  anonymous classes have empty strings for shortname and longname
@@ -377,7 +390,7 @@ or 'Object').
 .end
 
 
-=item new_class(name [, 'parent'=>parentclass] [, 'attr'=>attr])
+=item new_class(name [, 'parent'=>parentclass] [, 'attr'=>attr] [, 'hll'=>hll])
 
 Create a new class called C<name> as a subclass of C<parentclass>.
 If C<parentclass> isn't supplied, defaults to using C<P6object>
@@ -391,8 +404,63 @@ of names separated by spaces.
     .param pmc name
     .param pmc options         :slurpy :named
 
-    .local pmc parrotclass
+    .local pmc parrotclass, hll
+
+    hll = options['hll']
+    $I0 = defined $P0
+    if $I0, have_hll
+    $P0 = getinterp
+    $P0 = $P0['namespace';1]
+    $P0 = $P0.get_name()
+    hll = shift $P0
+    options['hll'] = hll
+  have_hll:
+
+    $I0 = isa name, 'String'
+    if $I0, parrotclass_string
     parrotclass = newclass name
+    goto have_parrotclass
+  parrotclass_string:
+    $S0 = name
+    .local pmc class_ns, lookup
+    class_ns = split '::', $S0
+    unshift class_ns, hll
+    lookup = get_root_namespace class_ns
+    $I0 = defined lookup
+    unless $I0, parrotclass_no_namespace
+    parrotclass = newclass lookup
+    goto have_parrotclass
+  parrotclass_no_namespace:
+    # make the namespace for classes without a namespace
+    .local pmc base_ns, extra_ns
+    base_ns = class_ns
+    extra_ns = new 'ResizablePMCArray'
+    $P0 = pop base_ns
+    unshift extra_ns, $P0
+  base_ns_loop:
+    $P0 = get_root_namespace base_ns
+    $I0 = defined $P0
+    if $I0, base_ns_loop_end
+    $P0 = pop base_ns
+    unshift extra_ns, $P0
+    goto base_ns_loop
+  base_ns_loop_end:
+    .local pmc iter, ns_item, ns
+    .local string ns_item
+    iter = new 'Iterator', extra_ns
+  create_ns_loop:
+    unless iter, create_ns_loop_end
+    ns_item = shift iter
+    $S0 = ns_item
+    $P0 = new 'NameSpace'
+    ns = get_root_namespace base_ns
+    ns.add_namespace($S0, $P0)
+    push base_ns, ns_item
+    goto create_ns_loop
+  create_ns_loop_end:
+    ns = get_root_namespace base_ns
+    parrotclass = newclass ns
+  have_parrotclass:
 
     .local pmc attrlist, iter
     attrlist = options['attr']
@@ -439,6 +507,12 @@ Multimethod helper to return the parrotclass for C<x>.
     parrotclass = getattribute $P0, 'parrotclass'
     .return (parrotclass)
   x_string:
+    parrotclass = get_class x
+    unless null parrotclass goto done
+    $S0 = x
+    $P0 = split '::', $S0
+    x = get_hll_namespace $P0
+  x_ns:
     parrotclass = get_class x
   done:
     .return (parrotclass)

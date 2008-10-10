@@ -45,7 +45,7 @@ object.
 
 =cut
 
-.namespace [ 'Markdown::Compiler' ]
+.namespace [ 'Markdown';'Compiler' ]
 
 .sub 'onload' :anon :load :init
     load_bytecode 'PCT.pbc'
@@ -73,7 +73,7 @@ Transform MAST C<source> into a String containing HTML.
     .param pmc source
     .param pmc adverbs         :slurpy :named
 
-    new $P0, 'Markdown::HTML::Compiler'
+    $P0 = new ['Markdown';'HTML';'Compiler']
     .return $P0.'to_html'(source, adverbs :flat :named)
 .end
 

@@ -29,7 +29,7 @@ for compiling programs in Parrot.
     $P0[4] = "    .param pmc %0 :named(%1)"
     $P0[5] = "    .param pmc %0 :optional :named(%1)\n    .param int has_%0 :opt_flag"
     $P0[6] = "    .param pmc %0 :slurpy :named"
-    set_hll_global ['POST::Sub'], '%!paramfmt', $P0
+    set_hll_global ['POST';'Sub'], '%!paramfmt', $P0
     .return ()
 .end
 
@@ -49,7 +49,7 @@ Get/set
 
 =cut
 
-.namespace [ 'POST::Node' ]
+.namespace [ 'POST';'Node' ]
 
 =item result([value])
 
@@ -66,7 +66,7 @@ as the result of the current node.
     if has_value == 1 goto set_value
     value = self['result']
     if null value goto result_null
-    $I0 = isa value, 'POST::Node'
+    $I0 = isa value, ['POST';'Node']
     if $I0 goto result_node
     .return (value)
   result_node:
@@ -138,7 +138,7 @@ Get/set the opcode type for this node.
 
 =cut
 
-.namespace [ 'POST::Op' ]
+.namespace [ 'POST';'Op' ]
 
 .sub 'pirop' :method
     .param pmc value           :optional
@@ -153,7 +153,7 @@ Get/set the opcode type for this node.
 .end
 
 
-.namespace [ 'POST::Label' ]
+.namespace [ 'POST';'Label' ]
 
 .sub 'result' :method
     .param pmc value           :optional
@@ -171,7 +171,7 @@ Get/set the opcode type for this node.
 .end
 
 
-.namespace [ 'POST::Sub' ]
+.namespace [ 'POST';'Sub' ]
 
 .sub 'blocktype' :method
     .param pmc value           :optional
@@ -256,7 +256,7 @@ Get/set the opcode type for this node.
   have_code:
 
     .local pmc paramfmt
-    paramfmt = get_hll_global ['POST::Sub'], '%!paramfmt'
+    paramfmt = get_hll_global ['POST';'Sub'], '%!paramfmt'
     $S0 = paramfmt[paramseq]
     named = code.'escape'(named)
     code.'emit'($S0, pname, named)

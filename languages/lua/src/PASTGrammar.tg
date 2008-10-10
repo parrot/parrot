@@ -17,14 +17,14 @@ grammar Lua::PAST::Grammar is TGE::Grammar;
 transform past (ROOT) :language('PIR') {
     new $P0, 'Integer'
     set $P0, 0
-    set_hll_global ['Lua::PAST'], '$looplevel', $P0
+    set_hll_global ['Lua';'PAST'], '$looplevel', $P0
     new $P0, 'Boolean'
     set $P0, 1
-    set_hll_global ['Lua::PAST'], '?vararg', $P0
+    set_hll_global ['Lua';'PAST'], '?vararg', $P0
     .local pmc symbtab
-    new symbtab, 'Lua::Symbtab'
+    symbtab = new ['Lua';'Symbtab']
     symbtab.'push_scope'()
-    set_hll_global ['Lua::PAST'], '$symbtab', symbtab
+    set_hll_global ['Lua';'PAST'], '$symbtab', symbtab
     .local pmc past
     $P0 = node['block']
     past = tree.'get'('past', $P0, 'Lua::Grammar::block')
@@ -65,7 +65,7 @@ transform past (Lua::Grammar::block) :language('PIR') {
     past.'push'(cpast)
   L3:
     .local pmc symbtab
-    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
+    symbtab = get_hll_global ['Lua';'PAST'], '$symbtab'
     symbtab.'pop_scope'()
     .return (past)
 }
@@ -81,7 +81,7 @@ transform past (Lua::Grammar::statement) :language('PIR') {
 
 transform past (Lua::Grammar::do_block) :language('PIR') {
     .local pmc symbtab
-    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
+    symbtab = get_hll_global ['Lua';'PAST'], '$symbtab'
     symbtab.'push_scope'()
     $P0 = node['block']
     .return tree.'get'('past', $P0, 'Lua::Grammar::block')
@@ -93,7 +93,7 @@ transform past (Lua::Grammar::if_stat) :language('PIR') {
     $P0 = node['expression']
     expr = tree.'get'('past', $P0, 'Lua::Grammar::expression')
     .local pmc symbtab
-    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
+    symbtab = get_hll_global ['Lua';'PAST'], '$symbtab'
     symbtab.'push_scope'()
     .local pmc past, cpast, blk
     $P0 = node['block']
@@ -130,7 +130,7 @@ transform past (Lua::Grammar::elseif_block) :language('PIR') {
     $P0 = node['expression']
     expr = tree.'get'('past', $P0, 'Lua::Grammar::expression')
     .local pmc symbtab
-    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
+    symbtab = get_hll_global ['Lua';'PAST'], '$symbtab'
     symbtab.'push_scope'()
     .local pmc blk
     $P0 = node['block']
@@ -142,13 +142,13 @@ transform past (Lua::Grammar::elseif_block) :language('PIR') {
 
 transform past (Lua::Grammar::while_stat) :language('PIR') {
     .local pmc looplevel
-    looplevel = get_hll_global ['Lua::PAST'], '$looplevel'
+    looplevel = get_hll_global ['Lua';'PAST'], '$looplevel'
     inc looplevel
     .local pmc expr
     $P0 = node['expression']
     expr = tree.'get'('past', $P0, 'Lua::Grammar::expression')
     .local pmc symbtab
-    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
+    symbtab = get_hll_global ['Lua';'PAST'], '$symbtab'
     symbtab.'push_scope'()
     .local pmc blk
     $P0 = node['block']
@@ -161,10 +161,10 @@ transform past (Lua::Grammar::while_stat) :language('PIR') {
 
 transform past (Lua::Grammar::repeat_stat) :language('PIR') {
     .local pmc looplevel
-    looplevel = get_hll_global ['Lua::PAST'], '$looplevel'
+    looplevel = get_hll_global ['Lua';'PAST'], '$looplevel'
     inc looplevel
     .local pmc symbtab
-    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
+    symbtab = get_hll_global ['Lua';'PAST'], '$symbtab'
     symbtab.'push_scope'()
     .local pmc blk
     $P0 = node['block']
@@ -180,7 +180,7 @@ transform past (Lua::Grammar::repeat_stat) :language('PIR') {
 
 transform past (Lua::Grammar::for_stat) :language('PIR') {
     .local pmc looplevel
-    looplevel = get_hll_global ['Lua::PAST'], '$looplevel'
+    looplevel = get_hll_global ['Lua';'PAST'], '$looplevel'
     inc looplevel
     .local pmc past
     $S0 = node.'find_key'()
@@ -199,7 +199,7 @@ transform past (Lua::Grammar::for_stat) :language('PIR') {
 
 transform past (Lua::Grammar::fornum) :language('PIR') {
     .local pmc symbtab
-    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
+    symbtab = get_hll_global ['Lua';'PAST'], '$symbtab'
     symbtab.'push_scope'()
     $P0 = node['Name']
     $S0 = $P0.'result_object'()
@@ -232,7 +232,7 @@ transform past (Lua::Grammar::fornum) :language('PIR') {
 
 transform past (Lua::Grammar::forlist) :language('PIR') {
     .local pmc symbtab
-    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
+    symbtab = get_hll_global ['Lua';'PAST'], '$symbtab'
     symbtab.'push_scope'()
     .local pmc namelist
     new namelist, 'ResizablePMCArray'
@@ -268,7 +268,7 @@ transform past (Lua::Grammar::local_stat) :language('PIR') {
 
 transform past (Lua::Grammar::local_declaration) :language('PIR') {
     .local pmc symbtab
-    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
+    symbtab = get_hll_global ['Lua';'PAST'], '$symbtab'
     .local pmc explist
     $P0 = node['expression_list']
     if null $P0 goto L1
@@ -300,7 +300,7 @@ transform past (Lua::Grammar::local_declaration) :language('PIR') {
 
 transform past (Lua::Grammar::local_function) :language('PIR') {
     .local pmc symbtab
-    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
+    symbtab = get_hll_global ['Lua';'PAST'], '$symbtab'
     .local pmc var
     $P0 = node['Name']
     $S0 = $P0.'result_object'()
@@ -332,7 +332,7 @@ transform past (Lua::Grammar::return_statement) :language('PIR') {
 
 transform past (Lua::Grammar::break_statement) :language('PIR') {
     .local pmc looplevel
-    looplevel = get_hll_global ['Lua::PAST'], '$looplevel'
+    looplevel = get_hll_global ['Lua';'PAST'], '$looplevel'
     if looplevel <= 0 goto L1
     $P0 = get_hll_global ['PAST'], 'Op'
     .return $P0.'new'('node'=>node, 'pasttype'=>'break')
@@ -417,7 +417,7 @@ transform explist (Lua::Grammar::function_args) :language('PIR') {
 
 transform past (Lua::Grammar::function_stat) :language('PIR') {
     .local pmc symbtab
-    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
+    symbtab = get_hll_global ['Lua';'PAST'], '$symbtab'
     .local pmc past, var
     $P0 = node['functionname']
     var = tree.'get'('past', $P0, 'Lua::Grammar::functionname')
@@ -427,7 +427,7 @@ transform past (Lua::Grammar::function_stat) :language('PIR') {
     $P1 = get_hll_global ['PAST'], 'Var'
     $S1 = symbtab.'insert'('self')
     past = $P1.'new'('node'=>$P0, 'name'=>$S1, 'scope'=>'parameter')
-    set_hll_global ['Lua::PAST'], '$?self', past
+    set_hll_global ['Lua';'PAST'], '$?self', past
   L1:
     $S0 = tree.'get'('Name', $P0, 'Lua::Grammar::functionname')
     $P0 = node['function_body']
@@ -460,7 +460,7 @@ transform Name (Lua::Grammar::functionname) :language('PIR') {
 
 transform past (Lua::Grammar::functionname) :language('PIR') {
     .local pmc symbtab
-    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
+    symbtab = get_hll_global ['Lua';'PAST'], '$symbtab'
     .local pmc iter
     $P0 = node['Name']
     new iter, 'Iterator', $P0
@@ -492,16 +492,16 @@ transform past (Lua::Grammar::functionname) :language('PIR') {
 
 transform past (Lua::Grammar::function_body) :language('PIR') {
     .local pmc symbtab
-    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
+    symbtab = get_hll_global ['Lua';'PAST'], '$symbtab'
     symbtab.'push_scope'()
     .local pmc parlist
     new parlist, 'ResizablePMCArray'
     .local pmc var
-    var = get_hll_global ['Lua::PAST'], '$?self'
+    var = get_hll_global ['Lua';'PAST'], '$?self'
     if null var goto L1
     push parlist, var
     null var
-    set_hll_global ['Lua::PAST'], '$?self', var
+    set_hll_global ['Lua';'PAST'], '$?self', var
   L1:
     $P0 = node['parameter_list']
     if null $P0 goto L2
@@ -535,20 +535,20 @@ transform past (Lua::Grammar::function_body) :language('PIR') {
     push parlist, var
   L5:
     .local pmc has_vararg
-    has_vararg = get_hll_global ['Lua::PAST'], '?vararg'
+    has_vararg = get_hll_global ['Lua';'PAST'], '?vararg'
     new $P0, 'Boolean'
     set $P0, $I0
-    set_hll_global ['Lua::PAST'], '?vararg', $P0
+    set_hll_global ['Lua';'PAST'], '?vararg', $P0
     .local pmc looplevel
-    looplevel = get_hll_global ['Lua::PAST'], '$looplevel'
+    looplevel = get_hll_global ['Lua';'PAST'], '$looplevel'
     new $P0, 'Integer'
     set $P0, 0
-    set_hll_global ['Lua::PAST'], '$looplevel', $P0
+    set_hll_global ['Lua';'PAST'], '$looplevel', $P0
     .local pmc past
     $P0 = node['block']
     past = tree.'get'('past', $P0, 'Lua::Grammar::block')
-    set_hll_global ['Lua::PAST'], '$looplevel', looplevel
-    set_hll_global ['Lua::PAST'], '?vararg', has_vararg
+    set_hll_global ['Lua';'PAST'], '$looplevel', looplevel
+    set_hll_global ['Lua';'PAST'], '?vararg', has_vararg
     $P0 = get_hll_global ['PAST'], 'Block'
     .return $P0.'new'(parlist :flat, past, 'node'=>node)
 }
@@ -647,7 +647,7 @@ transform past (Lua::Grammar::expr) :language('PIR') {
   L1:
     .local pmc optable, optok
     .local string pirop
-    optable = get_hll_global [ 'Lua::Grammar' ], '$optable'
+    optable = get_hll_global [ 'Lua';'Grammar' ], '$optable'
     optok = optable[type]
     pirop = optok['pirop']
     .local pmc past
@@ -749,7 +749,7 @@ transform past (Lua::Grammar::parenthesed_expression) :language('PIR') {
 
 transform past (Lua::Grammar::Name) :language('PIR') {
     .local pmc symbtab
-    symbtab = get_hll_global ['Lua::PAST'], '$symbtab'
+    symbtab = get_hll_global ['Lua';'PAST'], '$symbtab'
     $P0 = get_hll_global ['PAST'], 'Var'
     $S0 = node.'result_object'()
     ($I0, $S1) = symbtab.'lookup'($S0)
@@ -762,7 +762,7 @@ transform past (Lua::Grammar::Name) :language('PIR') {
 
 transform past (Lua::Grammar::vararg) :language('PIR') {
     .local pmc has_vararg
-    has_vararg = get_hll_global ['Lua::PAST'], '?vararg'
+    has_vararg = get_hll_global ['Lua';'PAST'], '?vararg'
     unless has_vararg goto L1
     $P0 = get_hll_global ['PAST'], 'Op'
     .return $P0.'new'('node'=>node, 'pasttype'=>'vararg')

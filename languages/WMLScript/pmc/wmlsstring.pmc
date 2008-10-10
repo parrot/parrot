@@ -432,6 +432,7 @@ Return the integer 2.
         else {
             SELF.morph(dynpmc_WmlsInvalid);
         }
+        return pmc_new(INTERP, dynpmc_WmlsInvalid);
     }
 
     MULTI void i_subtract(WmlsInteger value) {

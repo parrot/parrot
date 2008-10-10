@@ -10,13 +10,14 @@ also.)
 
 =cut
 
-.namespace [ "PGE::Text" ]
+.namespace [ 'PGE';'Text' ]
 
 .include "cclass.pasm"
 
 .sub "__onload" :load
-    .local pmc base
-    $P0 = subclass 'PGE::Grammar', 'PGE::Text'
+    .local pmc p6meta
+    p6meta = get_hll_global 'P6metaclass'
+    p6meta.'new_class'('PGE::Text', 'parent'=>'PGE::Grammar')
 .end
 
 =head2 Available rules

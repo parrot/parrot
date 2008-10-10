@@ -35,7 +35,7 @@ Used by F<languages/lua/lua.pir>.
     new $P0, 'P6metaclass'
     $P0.'new_class'('Lua::Compiler', 'parent'=>'PCT::HLLCompiler', 'attr'=>'$ostgrammar')
 
-    new $P0, 'Lua::Compiler'
+    $P0 = new ['Lua';'Compiler']
     $P0.'language'('Lua')
     $P0.'parsegrammar'('Lua::Grammar')
     $P0.'astgrammar'('Lua::PAST::Grammar')
@@ -45,7 +45,7 @@ Used by F<languages/lua/lua.pir>.
 .end
 
 
-.namespace [ 'Lua::Compiler' ]
+.namespace [ 'Lua';'Compiler' ]
 
 =head2 Overloaded methods
 
@@ -91,7 +91,7 @@ resulting ost.
 .end
 
 
-.namespace [ 'Lua::PAST::Grammar' ]
+.namespace [ 'Lua';'PAST';'Grammar' ]
 
 =head2 Functions
 
@@ -112,7 +112,7 @@ used in F<languages/lua/src/PASTGrammar.tg>
 .end
 
 
-.namespace [ 'Lua::POST::Grammar' ]
+.namespace [ 'Lua';'POST';'Grammar' ]
 
 =item C<internal_error>
 
@@ -129,16 +129,16 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .end
 
 
-.namespace [ 'POST::Node' ]
+.namespace [ 'POST';'Node' ]
 
 .sub 'has_call_in_last_op' :method
-    $I0 = isa self, 'POST::Ops'
+    $I0 = isa self, ['POST';'Ops']
     unless $I0 goto L1
     $P0 = self.'list'()
     $I0 = elements $P0
     unless $I0 goto L1
     $P1 = $P0[-1]
-    $I0 = isa $P1, 'POST::Op'
+    $I0 = isa $P1, ['POST';'Op']
     unless $I0 goto L1
     $S0 = $P1.'pirop'()
     unless $S0 == 'call' goto L1
@@ -148,7 +148,7 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .end
 
 
-.namespace [ 'Lua::POST::Sub' ]
+.namespace [ 'Lua';'POST';'Sub' ]
 
 .sub '__onload' :anon :load :init
     new $P0, 'P6metaclass'
@@ -180,7 +180,7 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .end
 
 
-.namespace [ 'Lua::POST::Chunk' ]
+.namespace [ 'Lua';'POST';'Chunk' ]
 
 .sub '__onload' :anon :load :init
     new $P0, 'P6metaclass'
@@ -194,9 +194,9 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .end
 
 
-.namespace [ 'POST::Compiler' ]
+.namespace [ 'POST';'Compiler' ]
 
-.sub 'pir' :method :multi(_, ['Lua::POST::Chunk'])
+.sub 'pir' :method :multi(_, ['Lua';'POST';'Chunk'])
     .param pmc node
     .local pmc subcode
     subcode = get_global '@!subcode'
@@ -217,10 +217,11 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .end
 
 
-.namespace [ 'Lua::Symbtab' ]
+.namespace [ 'Lua';'Symbtab' ]
 
 .sub '__onload' :anon :load :init
-    $P0 = subclass 'ResizablePMCArray', 'Lua::Symbtab'
+    $P0 = get_hll_global 'P6metaclass'
+    $P0 = $P0.'new_class'('Lua::Symbtab', 'parent'=>'ResizablePMCArray')
     new $P0, 'Integer'
     set $P0, 0
     set_global '$nb', $P0

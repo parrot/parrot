@@ -24,7 +24,7 @@ object.
 
 =cut
 
-.namespace [ 'Squaak::Compiler' ]
+.namespace [ 'Squaak';'Compiler' ]
 
 .loadlib 'squaak_group'
 

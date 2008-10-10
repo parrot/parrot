@@ -24,7 +24,7 @@ object.
 
 =cut
 
-.namespace [ 'C99::CPP::Compiler' ]
+.namespace [ 'C99';'CPP';'Compiler' ]
 
 .loadlib 'c99_group'
 
@@ -58,7 +58,7 @@ to the C compiler.
 .include 'src/gen_actions.pir'
 
 
-.namespace [ 'C99::CPP::Grammar' ]
+.namespace [ 'C99';'CPP';'Grammar' ]
 
 .sub 'debug'
     .param pmc match

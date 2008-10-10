@@ -1270,7 +1270,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'load_bytecode with .pir (RT #39807)' );
     _dumper($P2)
 .end
 CODE
-"VAR1" => PMC 'PGE::Match' => "aabbb" @ 3
+"VAR1" => PMC 'PGE;Match' => "aabbb" @ 3
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'load_bytecode with .pbc (RT #39807)' );
@@ -1286,7 +1286,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'load_bytecode with .pbc (RT #39807)' );
     _dumper($P2)
 .end
 CODE
-"VAR1" => PMC 'PGE::Match' => "aabbb" @ 3
+"VAR1" => PMC 'PGE;Match' => "aabbb" @ 3
 OUTPUT
 
 pir_error_output_like( <<'CODE', qr/Null PMC access in invoke()/, 'invoking null pmc' );

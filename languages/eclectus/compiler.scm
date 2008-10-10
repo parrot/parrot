@@ -79,32 +79,32 @@
 
 ;; arithmetic forms
 (define-primitive (fxadd1 arg)
-  (past::op '(@ (pirop "n_add"))
+  (past::op '(@ (pirop "add"))
             (emit-expr arg)
             (emit-expr 1)))
 
 (define-primitive (fx+ arg1 arg2)
-  (past::op '(@ (pirop "n_add"))
+  (past::op '(@ (pirop "add"))
             (emit-expr arg1)
             (emit-expr arg2)))
 
 (define-primitive (fxsub1 arg)
-  (past::op '(@ (pirop "n_sub"))
+  (past::op '(@ (pirop "sub"))
             (emit-expr arg)
             (emit-expr 1)))
 
 (define-primitive (fx- arg1 arg2)
-  (past::op '(@ (pirop "n_sub"))
+  (past::op '(@ (pirop "sub"))
             (emit-expr arg1)
             (emit-expr arg2)))
 
 (define-primitive (fxlogand arg1 arg2)
-  (past::op '(@ (pirop "n_band"))
+  (past::op '(@ (pirop "band"))
             (emit-expr arg1)
             (emit-expr arg2)))
 
 (define-primitive (fxlogor arg1 arg2)
-  (past::op '(@ (pirop "n_bor"))
+  (past::op '(@ (pirop "bor"))
             (emit-expr arg1)
             (emit-expr arg2)))
 

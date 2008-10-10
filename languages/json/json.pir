@@ -24,7 +24,7 @@ object.
 
 =cut
 
-.namespace [ 'json::Compiler' ]
+.namespace [ 'json';'Compiler' ]
 
 .loadlib 'json_group'
 

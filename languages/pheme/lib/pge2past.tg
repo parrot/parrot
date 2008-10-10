@@ -2,7 +2,7 @@ grammar Pheme::AST::Grammar is TGE::Grammar;
 
 transform past (ROOT) :language('PIR') {
     .local pmc result
-    result = new 'PAST::Block'
+    result = new ['PAST';'Block']
     result.'namespace'( 'Pheme' )
 
     .local pmc lists
@@ -36,7 +36,7 @@ transform past (pheme_list) :language('PIR') {
     elem = node[key_name]
 
     .local pmc op
-    op = new 'PAST::Op'
+    op = new ['PAST';'Op']
     op.'name'( '__list_to_cons' )
     op.'pasttype'( 'call' )
 
@@ -61,7 +61,7 @@ transform past (pheme_list) :language('PIR') {
     .local string special_name
     special_name = special
 
-    special = new 'PAST::Op'
+    special = new ['PAST';'Op']
     special.'name'( special_name )
     op.'push'( special )
 
@@ -82,7 +82,7 @@ transform past (pheme_list) :language('PIR') {
 
   iter_end:
     .local pmc result
-    result = new 'PAST::Op'
+    result = new ['PAST';'Op']
     result.'name'( '__evaluate' )
     result.'pasttype'( 'call' )
     result.'push'( op )
@@ -151,7 +151,7 @@ transform application (PAST::Op) :language('PIR') {
 
   rewrite_to_call:
     .local pmc result
-    result = new 'PAST::Op'
+    result = new ['PAST';'Op']
     result.'pasttype'( 'call' )
     result.'name'( func_name )
 
@@ -177,7 +177,7 @@ transform make_cons (list) :language('PIR') {
     iter = new 'Iterator', node
 
     .local pmc cons
-    cons = new 'PAST::Op'
+    cons = new ['PAST';'Op']
     cons.'name'( '__list_to_cons' )
     cons.'pasttype'( 'call' )
 
@@ -192,7 +192,7 @@ transform make_cons (list) :language('PIR') {
 
   iter_end:
     .local pmc eval
-    eval = new 'PAST::Op'
+    eval = new ['PAST';'Op']
     eval.'name'( '__evaluate' )
     eval.'pasttype'( 'call' )
     eval.'push'( cons )
@@ -213,7 +213,7 @@ transform special_form (define) :language('PIR') {
     name_str = name.'name'()
 
     .local pmc result
-    result = new 'PAST::Block'
+    result = new ['PAST';'Block']
 
     result.'name'( name_str )
     result.'push'( lambda )
@@ -255,7 +255,7 @@ transform quote (PAST::Op) :language( 'PIR' ) {
 
 transform force_to_val (PAST::Op) :language('PIR') {
     .local pmc result
-    result = new 'PAST::Val'
+    result = new ['PAST';'Val']
 
     .local string name
     name = node.'name'()
@@ -286,7 +286,7 @@ transform force_to_val (PAST::Var) :language('PIR') {
 
 transform cond (PAST::Op) :language( 'PIR' ) {
     .local pmc result
-    result = new 'PAST::Op'
+    result = new ['PAST';'Op']
     result.'pasttype'( 'if' )
 
     .local pmc iter
@@ -321,7 +321,7 @@ transform cond (PAST::Op) :language( 'PIR' ) {
 
   nest_if:
     .local pmc new_if
-    new_if = new 'PAST::Op'
+    new_if = new ['PAST';'Op']
     new_if.'pasttype'( 'if' )
     parent_if.'push'( new_if )
     parent_if = new_if
@@ -333,7 +333,7 @@ transform cond (PAST::Op) :language( 'PIR' ) {
 
 transform lambda (PAST::Op) :language('PIR') {
     .local pmc result
-    result = new 'PAST::Block'
+    result = new ['PAST';'Block']
     result.'blocktype'( 'declaration' )
 
     .local pmc child_iter
@@ -357,7 +357,7 @@ transform lambda (PAST::Op) :language('PIR') {
   args_iter_loop:
     unless args_iter goto args_iter_end
     child    = shift args_iter
-    arg      = new 'PAST::Var'
+    arg      = new ['PAST';'Var']
     arg_name = child.'name'()
     arg.'name'( arg_name )
     arg.'scope'( 'parameter' )
@@ -432,7 +432,7 @@ transform rewrite_var_name (PAST::Val) :language('PIR') {
 
   rewrite_to_var:
     .local pmc var
-    var = new 'PAST::Var'
+    var = new ['PAST';'Var']
     var.'scope'( 'lexical' )
     var.'name'( arg_name )
     .return( var )
@@ -467,7 +467,7 @@ transform define (PAST::Op) :language('PIR') {
 transform past (empty_list) :language('PIR') {
     .local pmc result
 
-    result = new 'PAST::Op'
+    result = new ['PAST';'Op']
     result.'name'( '__make_empty_cons' )
 
     .return( result )
@@ -475,7 +475,7 @@ transform past (empty_list) :language('PIR') {
 
 transform past (atom) :language('PIR') {
     .local pmc result
-    result   = new 'PAST::Val'
+    result   = new ['PAST';'Val']
 
     .local string value
     value    = node
@@ -502,7 +502,7 @@ transform past (atom) :language('PIR') {
 
 transform past (quoted_string) :language('PIR') {
     .local pmc result
-    result = new 'PAST::Val'
+    result = new ['PAST';'Val']
 
     .local string value
     value  = node

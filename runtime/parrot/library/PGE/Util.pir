@@ -11,13 +11,14 @@ parsing tasks using PGE.
 
 =cut
 
-.namespace [ 'PGE::Util' ]
+.namespace [ 'PGE';'Util' ]
 
 .include 'cclass.pasm'
 
 .sub "__onload" :load
-    .local pmc base
-    $P0 = subclass 'PGE::Grammar', 'PGE::Util'
+    .local pmc p6meta
+    p6meta = new 'P6metaclass'
+    p6meta.'new_class'('PGE::Util', 'parent'=>'PGE::Grammar')
     .return ()
 .end
 
@@ -59,7 +60,7 @@ of the match.
     .local int lines
     .local pmc line_number
     #  FIXME: use 'line_number' method instead?
-    line_number = get_hll_global ['PGE::Util'], 'line_number'
+    line_number = get_hll_global ['PGE';'Util'], 'line_number'
     (lines) = mob.line_number(pos)
     inc lines
     message .= ' at line '
@@ -120,7 +121,7 @@ Emits the list of messages to stderr.
     .local int lines
     .local pmc line_number
     #  FIXME: use 'line_number' method instead?
-    line_number = get_hll_global ['PGE::Util'], 'line_number'
+    line_number = get_hll_global ['PGE';'Util'], 'line_number'
     (lines) = mob.line_number(pos)
     inc lines
     message .= ' at line '

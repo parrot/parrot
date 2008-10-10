@@ -47,7 +47,7 @@ js is a compiler for ECMAScript-262 (3rd edition) running on Parrot.
 
 
 
-.namespace ['JS::Compiler']
+.namespace ['JS';'Compiler']
 
 .loadlib 'js_group'
 
@@ -56,7 +56,7 @@ js is a compiler for ECMAScript-262 (3rd edition) running on Parrot.
     load_bytecode 'Protoobject.pbc'
 
     $P0 = get_hll_global 'Protomaker'
-    $P1 = get_class ['PCT::HLLCompiler']
+    $P1 = get_class ['PCT';'HLLCompiler']
     $P0.'new_subclass'($P1, 'JS::Compiler')
 
     ## Create a list called '@?BLOCK' and store it, so it can

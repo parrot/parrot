@@ -24,15 +24,18 @@ object.
 
 =cut
 
-.namespace [ 'Pheme::Compiler' ]
+.namespace [ 'Pheme';'Compiler' ]
 
 .sub '__onload' :load :init
     load_bytecode 'PCT.pbc'
     load_bytecode 'PGE/Text.pbc'
 
-    $P0 = subclass 'PGE::Match', 'Match'
-    $P0 = subclass 'Match',      'Grammar'
-    $P0 = subclass 'Grammar',    'Pheme::PGE::Grammar'
+    .local pmc p6meta
+    p6meta = get_hll_global 'P6metaclass'
+
+    $P0 = p6meta.'new_class'('Match','parent'=>'PGE::Match')
+    $P0 = p6meta.'new_class'('Grammar','parent'=>'Match')
+    $P0 = p6meta.'new_class'('Pheme::PGE::Grammar','parent'=>'Grammar')
 
     $P0 = get_hll_global ['PCT'], 'HLLCompiler'
     $P1 = $P0.'new'()

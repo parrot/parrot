@@ -33,7 +33,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, 'Foo::Bar::baz'" );
   load_bytecode 'PGE/Util.pir'
 
   .local pmc split, p6rule, regex
-  split  = get_global ['PGE::Util'], 'split'
+  split  = get_global ['PGE';'Util'], 'split'
   p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('\:+')
 
@@ -56,7 +56,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, 'Foo::'" );
   load_bytecode 'PGE/Util.pir'
 
   .local pmc split, p6rule, regex
-  split  = get_global ['PGE::Util'], 'split'
+  split  = get_global ['PGE';'Util'], 'split'
   p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('\:+')
 
@@ -77,7 +77,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, '::Foo'" );
   load_bytecode 'PGE/Util.pir'
 
   .local pmc split, p6rule, regex
-  split  = get_global ['PGE::Util'], 'split'
+  split  = get_global ['PGE';'Util'], 'split'
   p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('\:+')
 
@@ -99,7 +99,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, 'Foo'" );
   load_bytecode 'PGE/Util.pir'
 
   .local pmc split, p6rule, regex
-  split  = get_global ['PGE::Util'], 'split'
+  split  = get_global ['PGE';'Util'], 'split'
   p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('\:+')
 
@@ -120,7 +120,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:/, 'Foo::Bar'" );
   load_bytecode 'PGE/Util.pir'
 
   .local pmc split, p6rule, regex
-  split  = get_global ['PGE::Util'], 'split'
+  split  = get_global ['PGE';'Util'], 'split'
   p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('\:')
 
@@ -143,7 +143,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:/, 'Foo::Bar::Baz', 2" );
   load_bytecode 'PGE/Util.pir'
 
   .local pmc split, p6rule, regex
-  split  = get_global ['PGE::Util'], 'split'
+  split  = get_global ['PGE';'Util'], 'split'
   p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('\:+')
 
@@ -165,7 +165,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /(a)(b)/, 'abracadabra'" );
   load_bytecode 'PGE/Util.pir'
 
   .local pmc split, p6rule, regex
-  split  = get_global ['PGE::Util'], 'split'
+  split  = get_global ['PGE';'Util'], 'split'
   p6rule = compreg 'PGE::Perl6Regex'
   regex  = p6rule('(a)(b)')
 

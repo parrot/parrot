@@ -98,10 +98,10 @@ applies to a child of the current node (generally inherited attributes).
     load_bytecode 'compilers/tge/TGE/Compiler.pbc'
 
     # import <die> and <line_number> rules from PGE::Util
-    $P0 = get_class ['TGE::Parser']
-    $P1 = get_hll_global ['PGE::Util'], 'die'
+    $P0 = get_class ['TGE';'Parser']
+    $P1 = get_hll_global ['PGE';'Util'], 'die'
     $P0.'add_method'('die', $P1)
-    $P1 = get_hll_global ['PGE::Util'], 'line_number'
+    $P1 = get_hll_global ['PGE';'Util'], 'line_number'
     $P0.'add_method'('line_number', $P1)
 
   end:

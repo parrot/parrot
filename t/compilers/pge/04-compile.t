@@ -62,7 +62,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'compile into a new grammar' );
     .local pmc p6compiler
     p6compiler = compreg 'PGE::Perl6Regex'
     $P1 = p6compiler('.+', 'name'=>'xyz', 'grammar'=>'PGE::Test')
-    $P2 = get_hll_global ['PGE::Test'], 'xyz'
+    $P2 = get_hll_global ['PGE';'Test'], 'xyz'
     $P3 = $P2('ok 1')
     say $P3
 .end
@@ -78,7 +78,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'compile into a new grammar, 2x' );
     p6compiler = compreg 'PGE::Perl6Regex'
     $P1 = p6compiler('.+', 'name'=>'abc', 'grammar'=>'PGE::Test')
     $P1 = p6compiler('.+', 'name'=>'xyz', 'grammar'=>'PGE::Test')
-    $P2 = get_hll_global ['PGE::Test'], 'abc'
+    $P2 = get_hll_global ['PGE';'Test'], 'abc'
     $P3 = $P2('ok 1')
     say $P3
 .end

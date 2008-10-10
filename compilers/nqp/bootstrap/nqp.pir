@@ -21,7 +21,7 @@ object.
 
 =cut
 
-.namespace [ 'NQP::Compiler' ]
+.namespace [ 'NQP';'Compiler' ]
 
 .loadlib 'nqp_group'
 
@@ -81,7 +81,7 @@ to the nqp compiler.
 .end
 
 
-#.namespace [ 'NQP::Grammar::Actions' ]
+#.namespace [ 'NQP';'Grammar';'Actions' ]
 #
 #.sub 'package_declarator_helper'
 #    .param pmc match
@@ -123,7 +123,7 @@ to the nqp compiler.
 
     ##  initialize optable with inline PIR
     .local pmc optable
-    optable = get_hll_global [ 'NQP::Grammar' ], '$optable'
+    optable = get_hll_global [ 'NQP';'Grammar' ], '$optable'
     optable['prefix:~'; 'inline'] = <<"        END"
         ##  inline prefix:~
         $S0 = %0

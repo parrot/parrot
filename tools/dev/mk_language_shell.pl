@@ -287,7 +287,7 @@ object.
 
 =cut
 
-.namespace [ '@lang@::Compiler' ]
+.namespace [ '@lang@';'Compiler' ]
 
 .loadlib '@lclang@_group'
 

@@ -4,7 +4,7 @@ PGE::Exp - base class for expressions
 
 =cut
 
-.namespace [ "PGE::Exp" ]
+.namespace [ 'PGE';'Exp' ]
 
 .include "interpinfo.pasm"
 .include "cclass.pasm"
@@ -22,7 +22,7 @@ PGE::Exp - base class for expressions
     .local pmc term
 
     .local pmc p6meta, expproto
-    p6meta = new 'P6metaclass'
+    p6meta = get_hll_global 'P6metaclass'
     expproto = p6meta.'new_class'('PGE::Exp', 'parent'=>'PGE::Match')
     p6meta.'new_class'('PGE::Exp::Literal',      'parent'=>expproto)
     p6meta.'new_class'('PGE::Exp::Scalar',       'parent'=>expproto)
@@ -76,7 +76,9 @@ C<target> adverbs.
     .local string grammar
     grammar = adverbs['grammar']
     if grammar == '' goto ns_root
-    code.'emit'(".namespace [ '%0' ]", grammar)
+    $P0 = split '::', grammar
+    $P0 = code.'key'($P0 :flat)
+    code.'emit'(".namespace %0", $P0)
     goto ns_done
   ns_root:
     code.'emit'('.namespace')
@@ -91,8 +93,9 @@ C<target> adverbs.
     $P0 = compreg 'PIR'
     $P1 = $P0(code)
   make_grammar:
+    if grammar == '' goto end
     push_eh end
-    $P0 = new 'P6metaclass'
+    $P0 = get_hll_global 'P6metaclass'
     $P0.'new_class'(grammar, 'parent'=>'PGE::Grammar')
     pop_eh
   end:
@@ -131,7 +134,7 @@ tree as a PIR code object that can be compiled.
     .local pmc exp
     .local string explabel
     exp = self
-    set_hll_global ['PGE::Exp'], '$!group', exp
+    set_hll_global ['PGE';'Exp'], '$!group', exp
     exp = exp.reduce(self)
 
     ##   we don't need a coroutine if :ratchet is set
@@ -327,7 +330,7 @@ tree as a PIR code object that can be compiled.
 .end
 
 
-.namespace [ 'PGE::Exp::Literal' ]
+.namespace [ 'PGE';'Exp';'Literal' ]
 
 .sub 'reduce' :method
     .param pmc next
@@ -369,7 +372,7 @@ tree as a PIR code object that can be compiled.
 .end
 
 
-.namespace [ 'PGE::Exp::Concat' ]
+.namespace [ 'PGE';'Exp';'Concat' ]
 
 .sub 'reduce' :method
     .param pmc next
@@ -396,10 +399,10 @@ tree as a PIR code object that can be compiled.
     inc i
     if i >= n goto concat_lit_end
     exp1 = children[i]
-    $I1 = isa exp1, 'PGE::Exp::Literal'
+    $I1 = isa exp1, ['PGE';'Exp';'Literal']
     if $I1 == 0 goto concat_lit_shift
     exp0 = children[j]
-    $I0 = isa exp0, 'PGE::Exp::Literal'
+    $I0 = isa exp0, ['PGE';'Exp';'Literal']
     if $I0 == 0 goto concat_lit_shift
     $I0 = exp0['ignorecase']
     $I1 = exp1['ignorecase']
@@ -450,7 +453,7 @@ tree as a PIR code object that can be compiled.
 .end
 
 
-.namespace [ 'PGE::Exp::Quant' ]
+.namespace [ 'PGE';'Exp';'Quant' ]
 
 .sub 'reduce' :method
     .param pmc next
@@ -620,7 +623,7 @@ tree as a PIR code object that can be compiled.
 .end
 
 
-.namespace [ 'PGE::Exp::Group' ]
+.namespace [ 'PGE';'Exp';'Group' ]
 
 .sub 'reduce' :method
     .param pmc next
@@ -631,9 +634,9 @@ tree as a PIR code object that can be compiled.
     ##   This group is non-backtracking, so concatenate a "cut group"
     ##   node (PGE::Exp::Cut) to its child.
     exp = self[0]
-    $P0 = new 'PGE::Exp::Concat'
+    $P0 = new ['PGE';'Exp';'Concat']
     $P0[0] = exp
-    $P1 = new 'PGE::Exp::Cut'
+    $P1 = new ['PGE';'Exp';'Cut']
     $P0[1] = $P1
     self[0] = $P0
 
@@ -641,11 +644,11 @@ tree as a PIR code object that can be compiled.
     .local pmc group
     ##   Temporarily store this group as the current group.  Any
     ##   cut nodes we encounter will set a cutmark into this group.
-    group = get_hll_global ['PGE::Exp'], '$!group'
-    set_hll_global ['PGE::Exp'], '$!group', self
+    group = get_hll_global ['PGE';'Exp'], '$!group'
+    set_hll_global ['PGE';'Exp'], '$!group', self
     exp = self[0]
     exp = exp.reduce(next)
-    set_hll_global ['PGE::Exp'], '$!group', group
+    set_hll_global ['PGE';'Exp'], '$!group', group
     $I0 = self['cutmark']
     if $I0 > 0 goto keep_group
     $I0 = self['iscapture']
@@ -683,7 +686,7 @@ tree as a PIR code object that can be compiled.
 .end
 
 
-.namespace [ 'PGE::Exp::CGroup' ]
+.namespace [ 'PGE';'Exp';'CGroup' ]
 
 .sub 'pir' :method
     .param pmc code
@@ -751,7 +754,7 @@ tree as a PIR code object that can be compiled.
 .end
 
 
-.namespace [ 'PGE::Exp::Subrule' ]
+.namespace [ 'PGE';'Exp';'Subrule' ]
 
 .sub 'reduce' :method
     .param pmc next
@@ -796,11 +799,13 @@ tree as a PIR code object that can be compiled.
     rname = substr subname, $I0
     $I0 -= 2
     grammar = substr subname, 0, $I0
-    code.emit(<<"        CODE", grammar, rname, args :flat :named)
+    $P0 = split '::', grammar
+    $P0 = code.'key'($P0)
+    code.emit(<<"        CODE", grammar, rname, $P0, args :flat :named)
         %L: # grammar subrule %0::%1
           captob = captscope.'new'(captscope, 'grammar'=>'%0')
           captob.'to'(pos)
-          $P0 = get_hll_global ['%0'], '%1'
+          $P0 = get_hll_global %2, '%1'
         CODE
     goto subrule_match
 
@@ -893,7 +898,7 @@ tree as a PIR code object that can be compiled.
 .end
 
 
-.namespace [ 'PGE::Exp::Alt' ]
+.namespace [ 'PGE';'Exp';'Alt' ]
 
 .sub 'reduce' :method
     .param pmc next
@@ -932,7 +937,7 @@ tree as a PIR code object that can be compiled.
 .end
 
 
-.namespace [ 'PGE::Exp::Anchor' ]
+.namespace [ 'PGE';'Exp';'Anchor' ]
 
 .sub 'reduce' :method
     .param pmc next
@@ -1046,7 +1051,7 @@ tree as a PIR code object that can be compiled.
 .end
 
 
-.namespace [ 'PGE::Exp::CCShortcut' ]
+.namespace [ 'PGE';'Exp';'CCShortcut' ]
 
 .sub 'reduce' :method
     .param pmc next
@@ -1186,7 +1191,7 @@ tree as a PIR code object that can be compiled.
 
 .end
 
-.namespace [ 'PGE::Exp::Cut' ]
+.namespace [ 'PGE';'Exp';'Cut' ]
 
 .sub 'reduce' :method
     .param pmc next
@@ -1198,7 +1203,7 @@ tree as a PIR code object that can be compiled.
     ##   This node is cutting a group.  We need to
     ##   get the current group's cutmark, or set
     ##   one if it doesn't already have one.
-    group = get_hll_global ['PGE::Exp'], '$!group'
+    group = get_hll_global ['PGE';'Exp'], '$!group'
     cutmark = group['cutmark']
     if cutmark > 0 goto has_cutmark
     $P1 = new 'CodeString'
@@ -1238,7 +1243,7 @@ tree as a PIR code object that can be compiled.
 .end
 
 
-.namespace [ 'PGE::Exp::Scalar' ]
+.namespace [ 'PGE';'Exp';'Scalar' ]
 
 .sub 'reduce' :method
     .param pmc next
@@ -1272,7 +1277,7 @@ tree as a PIR code object that can be compiled.
 .end
 
 
-.namespace [ 'PGE::Exp::EnumCharList' ]
+.namespace [ 'PGE';'Exp';'EnumCharList' ]
 
 .sub 'reduce' :method
     .param pmc next
@@ -1314,7 +1319,7 @@ tree as a PIR code object that can be compiled.
 .end
 
 
-.namespace [ 'PGE::Exp::Newline' ]
+.namespace [ 'PGE';'Exp';'Newline' ]
 
 .sub 'reduce' :method
     .param pmc next
@@ -1339,7 +1344,7 @@ tree as a PIR code object that can be compiled.
 .end
 
 
-.namespace [ 'PGE::Exp::Conj' ]
+.namespace [ 'PGE';'Exp';'Conj' ]
 
 .sub 'reduce' :method
     .param pmc next
@@ -1397,7 +1402,7 @@ tree as a PIR code object that can be compiled.
     .return ()
 .end
 
-.namespace [ "PGE::Exp::Closure" ]
+.namespace [ 'PGE';'Exp';'Closure' ]
 
 .sub 'reduce' :method
     .param pmc next
@@ -1422,7 +1427,7 @@ tree as a PIR code object that can be compiled.
     code.emit(<<"        CODE", label, next, lang, value)
         %0: # closure
           $S1 = %3
-          $P0 = get_hll_global ['PGE::Match'], '%!cache'
+          $P0 = get_hll_global ['PGE';'Match'], '%!cache'
           $P1 = $P0[$S1]
           unless null $P1 goto %0_1
           $P1 = compreg %2
@@ -1443,7 +1448,7 @@ tree as a PIR code object that can be compiled.
     .return ()
 .end
 
-.namespace [ "PGE::Exp::Action" ]
+.namespace [ 'PGE';'Exp';'Action' ]
 
 .sub 'reduce' :method
     .param pmc next

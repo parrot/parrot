@@ -52,7 +52,7 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 =cut
 
 
-.namespace [ 'PAST::Compiler' ]
+.namespace [ 'PAST';'Compiler' ]
 
 .sub '__onload' :anon :load :init
     load_bytecode 'PCT.pbc'
@@ -101,11 +101,11 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
     load_bytecode 'Getopt/Obj.pbc'
 
     # import PGE::Util::die into Pipp::Grammar
-    $P0 = get_hll_global ['PGE::Util'], 'die'
-    set_hll_global ['Pipp::Grammar'], 'die', $P0
+    $P0 = get_hll_global ['PGE';'Util'], 'die'
+    set_hll_global ['Pipp';'Grammar'], 'die', $P0
 
     # register and set up the the HLLCompiler
-    $P1 = new [ 'PCT::HLLCompiler' ]
+    $P1 = new [ 'PCT';'HLLCompiler' ]
     $P1.'language'('Pipp')
     $P1.'parsegrammar'('Pipp::Grammar')
     $P1.'parseactions'('Pipp::Grammar::Actions')
@@ -294,7 +294,7 @@ ERROR:
 
     # compile and evaluate the PAST returned from scheme_entry()
     .local pmc past_compiler
-    past_compiler = new [ 'PCT::HLLCompiler' ]
+    past_compiler = new [ 'PCT';'HLLCompiler' ]
     $P0 = split ' ', 'post pir evalpmc'
     past_compiler.'stages'( $P0 )
     past_compiler.'eval'(stmts)

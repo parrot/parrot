@@ -21,7 +21,7 @@ object.
 
 =cut
 
-.namespace [ 'HQ9plus::Compiler' ]
+.namespace [ 'HQ9plus';'Compiler' ]
 
 .sub 'onload' :anon :load :init
     load_bytecode 'PCT.pbc'

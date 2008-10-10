@@ -1,11 +1,11 @@
-.namespace [ 'C99::CPP::ASTGrammar' ]
+.namespace [ 'C99';'CPP';'ASTGrammar' ]
 
 .include 'languages/c99/src/preamble'
 .include 'languages/c99/src/CPP_ASTGrammar.pir'
 .include "iterator.pasm"
 
 .sub '__onload' :load
-    $P0 = get_class 'C99::CPP::ASTGrammar'
+    $P0 = get_class ['C99';'CPP';'ASTGrammar']
     if null $P0 goto error
     addattribute $P0, 'scope_stack'
     .return ()
@@ -76,7 +76,7 @@ error:
     .param pmc value
     .local pmc scope
     scope = self.'top_scope_stack'()
-    $I0 = isa scope, 'Cardinal::PAST::Block'
+    $I0 = isa scope, ['Cardinal';'PAST';'Block']
     unless $I0 goto end
     scope.'vardecl'(key, value)
     .return ()

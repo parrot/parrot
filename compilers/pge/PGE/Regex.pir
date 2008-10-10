@@ -9,7 +9,7 @@ a number of built-in rules.
 
 =cut
 
-.namespace [ 'PGE::Match' ]
+.namespace [ 'PGE'; 'Match' ]
 
 .include 'cclass.pasm'
 .include 'interpinfo.pasm'

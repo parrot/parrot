@@ -48,7 +48,7 @@
 
     # compile and evaluate the PAST returned from scheme_entry()
     .local pmc past_compiler
-    past_compiler = new [ 'PCT::HLLCompiler' ]
+    past_compiler = new [ 'PCT';'HLLCompiler' ]
     $P0 = split ' ', 'post pir'
     past_compiler.'stages'( $P0 )
     $P1 = past_compiler.'eval'(stmts)

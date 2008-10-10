@@ -8,7 +8,7 @@ This file implements match objects returned by the Parrot Grammar Engine.
 
 =cut
 
-.namespace [ 'PGE::Match' ]
+.namespace [ 'PGE';'Match' ]
 
 .sub '__onload' :load
     load_bytecode 'P6object.pbc'
@@ -57,23 +57,24 @@ is set or implied.
 
     ##   set values based on src param
     .local int issrcmatch, pos, iscont
-    .local string grammar
-    .local pmc target
-    issrcmatch = isa src, 'PGE::Match'
+    .local pmc grammar
+    .local pmc target, grammar_class
+    issrcmatch = isa src, ['PGE';'Match']
     if issrcmatch goto target_from_src
     .local pmc target
     target = new 'String'
     target = src
     pos = 0
     iscont = 1
-    grammar = typeof self
+    $P0 = self.'HOW'()
+    grammar_class = getattribute $P0, 'parrotclass'
     goto adverb_pos
   target_from_src:
     target = getattribute src, '$.target'
     $P0 = getattribute src, '$.pos'
     pos = $P0
     iscont = 0
-    grammar = typeof src
+    grammar_class = typeof src
     if pos >= 0 goto adverb_pos
     pos = 0
 
@@ -108,12 +109,20 @@ is set or implied.
     $I0 = exists adverbs['grammar']
     unless $I0 goto with_grammar
     grammar = adverbs['grammar']
+    $S0 = typeof grammar
+    eq $S0, 'NameSpace', grammar_namespace
+    $S0 = grammar
+    $P0 = split '::', $S0
+    grammar_class = get_class $P0
+    goto with_grammar
+  grammar_namespace:
+    grammar_class = grammar
   with_grammar:
   with_adverbs:
 
     ##   create the new match object
     .local pmc mob, mfrom, mpos
-    mob = new grammar
+    mob = new grammar_class
     setattribute mob, '$.target', target
     mfrom = new 'Integer'
     mfrom = pos

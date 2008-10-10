@@ -12,7 +12,7 @@ for Markdown.
 
 =cut
 
-.namespace [ 'Markdown::Node' ]
+.namespace [ 'Markdown';'Node' ]
 
 .sub 'onload' :anon :load :init
     .local pmc p6meta, base
@@ -44,7 +44,7 @@ for Markdown.
 .end
 
 
-.namespace [ 'Markdown::Title' ]
+.namespace [ 'Markdown';'Title' ]
 
 .sub 'level' :method
     .param pmc value           :optional

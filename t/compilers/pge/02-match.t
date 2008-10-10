@@ -49,7 +49,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'push on a Match object' );
 .sub main :main
     .local pmc match, str, arr
     load_bytecode 'PGE.pbc'
-    match = new 'PGE::Match'
+    match = new ['PGE';'Match']
     str = new 'String'
     str = 'foo'
     push match, str

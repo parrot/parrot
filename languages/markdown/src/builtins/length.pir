@@ -7,7 +7,7 @@ length.pir -- simple implementation of a length function
 
 =cut
 
-.namespace [ 'Markdown::Grammar' ]
+.namespace [ 'Markdown';'Grammar' ]
 
 .sub 'length' :method
     $S0 = self

@@ -19,7 +19,7 @@ running compilers from a command line.
     $P0.'new_class'('PCT::HLLCompiler', 'attr'=>$S0)
 .end
 
-.namespace [ 'PCT::HLLCompiler' ]
+.namespace [ 'PCT';'HLLCompiler' ]
 
 .include 'cclass.pasm'
 
@@ -319,7 +319,7 @@ to any options and return the resulting parse tree.
 .sub 'parse' :method
     .param pmc source
     .param pmc adverbs         :slurpy :named
-    .local pmc parsegrammar_name, top
+    .local pmc parsegrammar, top
 
     .local string tcode
     tcode = adverbs['transcode']
@@ -336,11 +336,25 @@ to any options and return the resulting parse tree.
     target = adverbs['target']
     target = downcase target
 
-    parsegrammar_name = self.'parsegrammar'()
-    unless parsegrammar_name goto err_no_parsegrammar
-    top = get_hll_global parsegrammar_name, 'TOP'
+    parsegrammar = self.'parsegrammar'()
+    $I0 = can parsegrammar, 'TOP'
+    unless $I0 goto parsegrammar_string
+    top = find_method parsegrammar, 'TOP'
+    goto have_top
+  parsegrammar_string:
+    $P0 = self.'parse_name'(parsegrammar)
+    $S0 = pop $P0
+    $P1 = get_hll_global $P0, $S0
+    $I0 = can $P1, 'TOP'
+    unless $I0 goto parsegrammar_ns
+    top = find_method $P1, 'TOP'
+    goto have_top
+  parsegrammar_ns:
+    $P0 = self.'parse_name'(parsegrammar)
+    top = get_hll_global $P0, 'TOP'
     unless null top goto have_top
-    self.'panic'('Cannot find TOP regex in ', parsegrammar_name)
+  err_notop:
+    self.'panic'('Cannot find TOP regex in ', parsegrammar)
   have_top:
     .local pmc parseactions, action
     null action
@@ -367,7 +381,7 @@ to any options and return the resulting parse tree.
     action = new parseactions
   have_action:
     .local pmc match
-    match = top(source, 'grammar' => parsegrammar_name, 'action' => action)
+    match = top(source, 'grammar' => parsegrammar, 'action' => action)
     unless match goto err_failedparse
     .return (match)
 
@@ -406,7 +420,7 @@ resulting ast.
     .local pmc ast
     ast = source.'item'()
     pop_eh
-    $I0 = isa ast, 'PAST::Node'
+    $I0 = isa ast, ['PAST';'Node']
     unless $I0 goto err_past
     .return (ast)
 

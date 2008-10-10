@@ -9,7 +9,7 @@ for compiling programs in Parrot.
 
 =cut
 
-.namespace [ 'PAST::Node' ]
+.namespace [ 'PAST';'Node' ]
 
 .sub 'onload' :anon :load :init
     ##   create the PAST::Node base class
@@ -118,7 +118,7 @@ Get/set the constant value for this node.
 
 =cut
 
-.namespace [ 'PAST::Val' ]
+.namespace [ 'PAST';'Val' ]
 
 .sub 'value' :method
     .param pmc value           :optional
@@ -146,7 +146,7 @@ members and (optionally named) Parrot registers respectively.
 
 =cut
 
-.namespace [ 'PAST::Var' ]
+.namespace [ 'PAST';'Var' ]
 
 .sub 'scope' :method
     .param pmc value           :optional
@@ -320,7 +320,7 @@ assumes "call".
 
 =cut
 
-.namespace [ 'PAST::Op' ]
+.namespace [ 'PAST';'Op' ]
 
 .sub 'pasttype' :method
     .param pmc value           :optional
@@ -448,7 +448,7 @@ blocks in Perl6 C<if>, C<while>, and other similar statements).
 
 =cut
 
-.namespace [ 'PAST::Block' ]
+.namespace [ 'PAST';'Block' ]
 
 .sub 'blocktype' :method
     .param pmc value           :optional
@@ -639,7 +639,7 @@ Get/set any pirflags for this block.
 .end
 
 
-.namespace [ 'PAST::VarList' ]
+.namespace [ 'PAST';'VarList' ]
 
 .sub 'bindvalue' :method
     .param pmc value           :optional

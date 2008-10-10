@@ -27,8 +27,8 @@ pir_output_is( <<'CODE', <<'OUT', "PGE::Hs match" );
     load_bytecode "PGE.pbc"
     load_bytecode "PGE/Hs.pir"
 
-    match = get_global ['PGE::Hs'], "match"
-    add_rule = get_global ['PGE::Hs'], "add_rule"
+    match = get_global ['PGE';'Hs'], "match"
+    add_rule = get_global ['PGE';'Hs'], "add_rule"
     add_rule("foo", "s")
     result = match("test", "t(.<foo>)t")
     eq result, "PGE_Match 0 4 [PGE_Match 1 3 [] [(\"foo\", PGE_Match 2 3 [] [])]] []\n", OK

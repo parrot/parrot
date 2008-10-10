@@ -15,10 +15,11 @@ Markdown::HTML::Compiler implements a compiler for MAST nodes.
 
 =cut
 
-.namespace [ 'Markdown::HTML::Compiler' ]
+.namespace [ 'Markdown';'HTML';'Compiler' ]
 
 .sub '__onload' :anon :load :init
-    $P0 = newclass 'Markdown::HTML::Compiler'
+    $P0 = get_hll_global 'P6metaclass'
+    $P0 = $P0.'new_class'('Markdown::HTML::Compiler')
 .end
 
 .sub 'to_html' :method
@@ -76,7 +77,7 @@ Return generated HTML for all of its children.
 
 =cut
 
-.sub 'html' :method :multi(_,['Markdown::Document'])
+.sub 'html' :method :multi(_,['Markdown';'Document'])
     .param pmc node
     .return self.'html_children'(node)
 .end
@@ -86,7 +87,7 @@ Return generated HTML for all of its children.
 
 =cut
 
-.sub 'html' :method :multi(_,['Markdown::HorizontalRule'])
+.sub 'html' :method :multi(_,['Markdown';'HorizontalRule'])
     .param pmc node
     .local pmc code
     new code, 'CodeString'
@@ -99,7 +100,7 @@ Return generated HTML for all of its children.
 
 =cut
 
-.sub 'html' :method :multi(_,['Markdown::Title'])
+.sub 'html' :method :multi(_,['Markdown';'Title'])
     .param pmc node
     $S1 = self.'html_children'(node)
     $S2 = node.'level'()
@@ -121,7 +122,7 @@ Return generated HTML for all of its children.
 
 =cut
 
-.sub 'html' :method :multi(_,['Markdown::Para'])
+.sub 'html' :method :multi(_,['Markdown';'Para'])
     .param pmc node
     $S1 = self.'html_children'(node)
     .local pmc code
@@ -137,7 +138,7 @@ Return generated HTML for all of its children.
 
 =cut
 
-.sub 'html' :method :multi(_,['Markdown::BlockQuote'])
+.sub 'html' :method :multi(_,['Markdown';'BlockQuote'])
     .param pmc node
     .local pmc code
     new code, 'CodeString'
@@ -163,7 +164,7 @@ Return generated HTML for all of its children.
 
 =cut
 
-.sub 'html' :method :multi(_,['Markdown::ItemizedList'])
+.sub 'html' :method :multi(_,['Markdown';'ItemizedList'])
     .param pmc node
     $S1 = self.'html_children'(node)
     .local pmc code
@@ -179,7 +180,7 @@ Return generated HTML for all of its children.
 
 =cut
 
-.sub 'html' :method :multi(_,['Markdown::OrderedList'])
+.sub 'html' :method :multi(_,['Markdown';'OrderedList'])
     .param pmc node
     $S1 = self.'html_children'(node)
     .local pmc code
@@ -195,7 +196,7 @@ Return generated HTML for all of its children.
 
 =cut
 
-.sub 'html' :method :multi(_,['Markdown::ListItem'])
+.sub 'html' :method :multi(_,['Markdown';'ListItem'])
     .param pmc node
     $S1 = self.'html_children'(node)
     .local pmc code
@@ -211,7 +212,7 @@ Return generated HTML for all of its children.
 
 =cut
 
-.sub 'html' :method :multi(_,['Markdown::Emphasis'])
+.sub 'html' :method :multi(_,['Markdown';'Emphasis'])
     .param pmc node
     $S1 = self.'html_children'(node)
     .local pmc code
@@ -227,7 +228,7 @@ Return generated HTML for all of its children.
 
 =cut
 
-.sub 'html' :method :multi(_,['Markdown::Strong'])
+.sub 'html' :method :multi(_,['Markdown';'Strong'])
     .param pmc node
     $S1 = self.'html_children'(node)
     .local pmc code
@@ -243,7 +244,7 @@ Return generated HTML for all of its children.
 
 =cut
 
-.sub 'html' :method :multi(_,['Markdown::Code'])
+.sub 'html' :method :multi(_,['Markdown';'Code'])
     .param pmc node
     $S1 = node.'text'()
     $S1 = xml_escape($S1)
@@ -260,7 +261,7 @@ Return generated HTML for all of its children.
 
 =cut
 
-.sub 'html' :method :multi(_,['Markdown::Entity'])
+.sub 'html' :method :multi(_,['Markdown';'Entity'])
     .param pmc node
     $S1 = node.'text'()
     .local pmc code
@@ -273,7 +274,7 @@ Return generated HTML for all of its children.
 
 =cut
 
-.sub 'html' :method :multi(_,['Markdown::Line'])
+.sub 'html' :method :multi(_,['Markdown';'Line'])
     .param pmc node
     $S1 = node.'text'()
     $S1 = xml_escape($S1)
@@ -287,7 +288,7 @@ Return generated HTML for all of its children.
 
 =cut
 
-.sub 'html' :method :multi(_,['Markdown::Word'])
+.sub 'html' :method :multi(_,['Markdown';'Word'])
     .param pmc node
     $S1 = node.'text'()
     $S1 = xml_escape($S1)
@@ -301,7 +302,7 @@ Return generated HTML for all of its children.
 
 =cut
 
-.sub 'html' :method :multi(_,['Markdown::Space'])
+.sub 'html' :method :multi(_,['Markdown';'Space'])
     .param pmc node
     .local pmc code
     new code, 'CodeString'

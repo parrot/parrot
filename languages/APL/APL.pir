@@ -35,7 +35,7 @@ object.
     $P1.'parseactions'('APL::Grammar::Actions')
 
     ##  tell PCT to always generate pmcs for Float constants
-    $P0 = get_hll_global ['PAST::Compiler'], '%valflags'
+    $P0 = get_hll_global ['PAST';'Compiler'], '%valflags'
     $P0['Float'] = ''
 .end
 

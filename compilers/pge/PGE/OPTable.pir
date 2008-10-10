@@ -10,7 +10,7 @@ PGE::OPTable - PGE operator precedence table and parser
 
 =cut
 
-.namespace [ "PGE::OPTable" ]
+.namespace [ 'PGE';'OPTable' ]
 
 .const int PGE_OPTABLE_EXPECT_TERM   = 0x01
 .const int PGE_OPTABLE_EXPECT_OPER   = 0x02
@@ -91,7 +91,7 @@ Adds (or replaces) a syntactic category's defaults.
     key = substr name, $I0
 
     .local pmc sctable, token
-    sctable = get_hll_global ["PGE::OPTable"], "%!sctable"
+    sctable = get_hll_global ['PGE';'OPTable'], '%!sctable'
     $I0 = exists sctable[syncat]
     if $I0 == 0 goto token_hash
     token = sctable[syncat]
@@ -590,7 +590,7 @@ Adds (or replaces) a syntactic category's defaults.
   end_1b:
     $P0 = $P0[-1]
     if null $P0 goto end_2
-    $I0 = isa $P0, 'PGE::Match'
+    $I0 = isa $P0, ['PGE';'Match']
     if $I0 goto end_1a
   end_2:
     unless rulename goto end_all

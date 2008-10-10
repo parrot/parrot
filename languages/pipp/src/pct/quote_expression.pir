@@ -55,7 +55,7 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
 
 =cut
 
-.namespace ['Pipp::Grammar']
+.namespace ['Pipp';'Grammar']
 
 ## called from code in grammar.pg
 .sub 'quote_expression' :method

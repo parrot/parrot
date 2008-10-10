@@ -10,7 +10,7 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 10;
 
 foreach my $name (qw(Node Val Var Op Block Stmts)) {
-    my $module = "PAST::$name";
+    my $module = "'PAST';'$name'";
     my $code   = <<'CODE'
 .sub _main :main
     load_bytecode 'PCT.pbc'
@@ -20,8 +20,8 @@ foreach my $name (qw(Node Val Var Op Block Stmts)) {
 CODE
         ;
 
-    $code .= "    node = new '$module'\n";
-    $code .= "    node2 = new '$module'\n";
+    $code .= "    node = new [$module]\n";
+    $code .= "    node2 = new [$module]\n";
     $code .= <<'CODE'
     node.'init'('name' => 'foo')
     node2.'init'('name' => 'bar')
@@ -35,6 +35,7 @@ CODE
 CODE
         ;
 
+        $module =~ s/'//g;
     pir_output_is( $code, <<"OUT", "set attributes for $module via method" );
 foo
 "ast" => PMC '$module'  {
@@ -52,7 +53,7 @@ pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Val node in visual format' );
     load_bytecode 'PCT.pbc'
     load_bytecode 'library/dumper.pbc'
     .local pmc node
-    node = new 'PAST::Val'
+    node = new ['PAST';'Val']
     node.'value'(1)
     node.'returns'('Integer')
     $P1 = node.'value'()
@@ -65,7 +66,7 @@ pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Val node in visual format' );
 CODE
 1
 Integer
-"ast" => PMC 'PAST::Val'  {
+"ast" => PMC 'PAST;Val'  {
     <value> => 1
     <returns> => "Integer"
 }
@@ -79,7 +80,7 @@ pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Var node in visual format' );
     load_bytecode 'PCT.pbc'
     load_bytecode 'library/dumper.pbc'
     .local pmc node
-    node = new 'PAST::Var'
+    node = new ['PAST';'Var']
     node.'scope'('foo')
     node.'viviself'('baz')
     node.'lvalue'('buz')
@@ -87,7 +88,7 @@ pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Var node in visual format' );
     .return ()
 .end
 CODE
-"ast" => PMC 'PAST::Var'  {
+"ast" => PMC 'PAST;Var'  {
     <scope> => "foo"
     <viviself> => "baz"
     <lvalue> => "buz"
@@ -99,7 +100,7 @@ pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Op node in visual format' );
     load_bytecode 'PCT.pbc'
     load_bytecode 'library/dumper.pbc'
     .local pmc node
-    node = new 'PAST::Op'
+    node = new ['PAST';'Op']
     node.'pasttype'('pirop')
     node.'pirop'('add')
     node.'lvalue'('foo')
@@ -108,7 +109,7 @@ pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Op node in visual format' );
     .return ()
 .end
 CODE
-"ast" => PMC 'PAST::Op'  {
+"ast" => PMC 'PAST;Op'  {
     <pasttype> => "pirop"
     <pirop> => "add"
     <lvalue> => "foo"
@@ -121,13 +122,13 @@ pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Block node in visual format' );
     load_bytecode 'PCT.pbc'
     load_bytecode 'library/dumper.pbc'
     .local pmc node
-    node = new 'PAST::Block'
+    node = new ['PAST';'Block']
     node.'blocktype'('declaration')
     "_dumper"(node, "ast")
     .return ()
 .end
 CODE
-"ast" => PMC 'PAST::Block'  {
+"ast" => PMC 'PAST;Block'  {
     <blocktype> => "declaration"
 }
 OUT

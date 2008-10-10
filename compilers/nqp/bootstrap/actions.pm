@@ -747,7 +747,7 @@ method package_declarator($/, $key) {
     #if ($<sym> eq 'class') { ...code to make class... }
 
     make $past;
- #    PIR q< $P0 = get_hll_global ['NQP::Grammar::Actions'], 'package_declarator_helper' >;
+ #    PIR q< $P0 = get_hll_global ['NQP';'Grammar';'Actions'], 'package_declarator_helper' >;
  #    PIR q< $P1 = find_lex '$/'                          >;
  #    PIR q< $P2 = find_lex '$key'                        >;
  #    PIR q< $P0($P1, $P2)                                >;

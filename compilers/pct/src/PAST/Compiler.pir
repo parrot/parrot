@@ -40,7 +40,7 @@ any value type.
 .include "except_types.pasm"
 .include "interpinfo.pasm"
 
-.namespace [ 'PAST::Compiler' ]
+.namespace [ 'PAST';'Compiler' ]
 
 .sub 'onload' :anon :load :init
     load_bytecode 'PCT/HLLCompiler.pbc'
@@ -481,7 +481,7 @@ nodes of type C<PAST::Stmts>.
 
 =cut
 
-.sub 'as_post' :method :multi(_, PAST::Node)
+.sub 'as_post' :method :multi(_, ['PAST';'Node'])
     .param pmc node
     .param pmc options         :slurpy :named
 
@@ -510,7 +510,7 @@ Return the POST representation of a C<PAST::Block>.
 
 =cut
 
-.sub 'as_post' :method :multi(_, ['PAST::Block'])
+.sub 'as_post' :method :multi(_, ['PAST';'Block'])
     .param pmc node
     .param pmc options         :slurpy :named
 
@@ -618,7 +618,7 @@ Return the POST representation of a C<PAST::Block>.
     bpost.'push'(ctrllabel)
     bpost.'push_pirop'('.local pmc exception')
     bpost.'push_pirop'('.get_results (exception)')
-    $I0 = isa ctrlpast, 'PAST::Node'
+    $I0 = isa ctrlpast, ['PAST';'Node']
     if $I0 goto control_past
     if ctrlpast == 'return_pir' goto control_return
     self.panic("Unrecognized control handler '", ctrlpast, "'")
@@ -724,7 +724,7 @@ the node's "pasttype" attribute.
 
 =cut
 
-.sub 'as_post' :method :multi(_, ['PAST::Op'])
+.sub 'as_post' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
 
@@ -766,7 +766,7 @@ a 'pasttype' of 'pirop'.
 
 =cut
 
-.sub 'pirop' :method :multi(_, ['PAST::Op'])
+.sub 'pirop' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
 
@@ -813,7 +813,7 @@ for calling a sub.
 
 =cut
 
-.sub 'call' :method :multi(_, ['PAST::Op'])
+.sub 'call' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
     .local string pasttype
@@ -838,7 +838,7 @@ for calling a sub.
     goto children_done
   call_by_name:
     (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>signature)
-    $I0 = isa name, 'PAST::Node'
+    $I0 = isa name, ['PAST';'Node']
     if $I0 goto call_by_name_past
     $S0 = self.'escape'(name)
     unshift posargs, $S0
@@ -868,7 +868,7 @@ to invoke a method on a PMC.
 
 =cut
 
-.sub 'callmethod' :method :multi(_, ['PAST::Op'])
+.sub 'callmethod' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
     .return self.'call'(node, options :flat :named)
@@ -884,7 +884,7 @@ a 'pasttype' of if/unless.
 
 =cut
 
-.sub 'if' :method :multi(_,['PAST::Op'])
+.sub 'if' :method :multi(_,['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
 
@@ -978,7 +978,7 @@ a 'pasttype' of if/unless.
     ret
 .end
 
-.sub 'unless' :method :multi(_, ['PAST::Op'])
+.sub 'unless' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
     .return self.'if'(node, options :flat :named)
@@ -993,7 +993,7 @@ Return the POST representation of a C<while> or C<until> loop.
 
 =cut
 
-.sub 'while' :method :multi(_, ['PAST::Op'])
+.sub 'while' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
 
@@ -1044,7 +1044,7 @@ Return the POST representation of a C<while> or C<until> loop.
     .return (ops)
 .end
 
-.sub 'until' :method :multi(_, ['PAST::Op'])
+.sub 'until' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
     .return self.'while'(node, options :flat :named)
@@ -1058,7 +1058,7 @@ Return the POST representation of a C<repeat_while> or C<repeat_until> loop.
 
 =cut
 
-.sub 'repeat_while' :method :multi(_, ['PAST::Op'])
+.sub 'repeat_while' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
 
@@ -1104,7 +1104,7 @@ Return the POST representation of a C<repeat_while> or C<repeat_until> loop.
     .return (ops)
 .end
 
-.sub 'repeat_until' :method :multi(_, ['PAST::Op'])
+.sub 'repeat_until' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
     .return self.'repeat_while'(node, options :flat :named)
@@ -1118,7 +1118,7 @@ by C<node>.
 
 =cut
 
-.sub 'for' :method :multi(_, ['PAST::Op'])
+.sub 'for' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
 
@@ -1213,7 +1213,7 @@ to C<ResizablePMCArray> if not set.
 
 =cut
 
-.sub 'list' :method :multi(_, ['PAST::Op'])
+.sub 'list' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
 
@@ -1249,7 +1249,7 @@ a return value.
 
 =cut
 
-.sub 'return' :method :multi(_, ['PAST::Op'])
+.sub 'return' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
 
@@ -1286,7 +1286,7 @@ handler.
 
 =cut
 
-.sub 'try' :method :multi(_, ['PAST::Op'])
+.sub 'try' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options       :slurpy :named
 
@@ -1341,7 +1341,7 @@ $x < $y and $y < $z, but $y only gets evaluated once.
 
 =cut
 
-.sub 'chain' :method :multi(_, ['PAST::Op'])
+.sub 'chain' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
     .local pmc clist, cpast
@@ -1350,7 +1350,7 @@ $x < $y and $y < $z, but $y only gets evaluated once.
     clist = new 'ResizablePMCArray'
     cpast = node
   chain_loop:
-    $I0 = isa cpast, 'PAST::Op'
+    $I0 = isa cpast, ['PAST';'Op']
     if $I0 == 0 goto chain_end
     .local string pasttype
     pasttype = cpast.'pasttype'()
@@ -1403,7 +1403,7 @@ being refactored out using thunks of some sort.)
 
 =cut
 
-.sub 'def_or' :method :multi(_, ['PAST::Op'])
+.sub 'def_or' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
 
@@ -1445,7 +1445,7 @@ a second child is found that evaluates as true.
 
 =cut
 
-.sub 'xor' :method :multi(_,['PAST::Op'])
+.sub 'xor' :method :multi(_,['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
 
@@ -1504,7 +1504,7 @@ node with a 'pasttype' of bind.
 
 =cut
 
-.sub 'bind' :method :multi(_, ['PAST::Op'])
+.sub 'bind' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
 
@@ -1533,7 +1533,7 @@ opcode -- see RT#47828).
 
 =cut
 
-.sub 'copy' :method :multi(_, ['PAST::Op'])
+.sub 'copy' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
     .local pmc rpast, rpost, lpast, lpost
@@ -1556,7 +1556,7 @@ node with a 'pasttype' of inline.
 
 =cut
 
-.sub 'inline' :method :multi(_, ['PAST::Op'])
+.sub 'inline' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
 
@@ -1611,7 +1611,7 @@ attribute.
 
 =cut
 
-.sub 'as_post' :method :multi(_, ['PAST::Var'])
+.sub 'as_post' :method :multi(_, ['PAST';'Var'])
     .param pmc node
     .param pmc options         :slurpy :named
 
@@ -1681,7 +1681,7 @@ attribute.
 .end
 
 
-.sub 'parameter' :method :multi(_, ['PAST::Var'])
+.sub 'parameter' :method :multi(_, ['PAST';'Var'])
     .param pmc node
     .param pmc bindpost
 
@@ -1727,7 +1727,7 @@ attribute.
 .end
 
 
-.sub 'package' :method :multi(_, ['PAST::Var'])
+.sub 'package' :method :multi(_, ['PAST';'Var'])
     .param pmc node
     .param pmc bindpost
 
@@ -1772,7 +1772,7 @@ attribute.
 .end
 
 
-.sub 'lexical' :method :multi(_, ['PAST::Var'])
+.sub 'lexical' :method :multi(_, ['PAST';'Var'])
     .param pmc node
     .param pmc bindpost
 
@@ -1814,7 +1814,7 @@ attribute.
 .end
 
 
-.sub 'keyed' :method :multi(_, ['PAST::Var'])
+.sub 'keyed' :method :multi(_, ['PAST';'Var'])
     .param pmc node
     .param pmc bindpost
     .param string keyrtype     :optional
@@ -1875,14 +1875,14 @@ attribute.
 .end
 
 
-.sub 'keyed_int' :method :multi(_, ['PAST::Var'])
+.sub 'keyed_int' :method :multi(_, ['PAST';'Var'])
     .param pmc node
     .param pmc bindpost
     .return self.'keyed'(node, bindpost, 'i')
 .end
 
 
-.sub 'attribute' :method :multi(_, ['PAST::Var'])
+.sub 'attribute' :method :multi(_, ['PAST';'Var'])
     .param pmc node
     .param pmc bindpost
 
@@ -1928,7 +1928,7 @@ attribute.
 .end
 
 
-.sub 'register' :method :multi(_, ['PAST::Var'])
+.sub 'register' :method :multi(_, ['PAST';'Var'])
     .param pmc node
     .param pmc bindpost
 
@@ -1978,7 +1978,7 @@ to have a PMC generated containing the constant value.
 
 =cut
 
-.sub 'as_post' :method :multi(_, ['PAST::Val'])
+.sub 'as_post' :method :multi(_, ['PAST';'Val'])
     .param pmc node
     .param pmc options         :slurpy :named
 

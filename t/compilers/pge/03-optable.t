@@ -92,7 +92,8 @@ sub optable_output_is {
     load_bytecode 'PGE/Dumper.pir'
 
     .local pmc optable
-    optable = new 'PGE::OPTable'
+    $P0 = get_hll_global ['PGE'], 'OPTable'
+    optable = $P0.'new'()
 
     optable.newtok('infix:+', 'precedence'=>'=')
     optable.newtok('infix:-', 'equiv'=>'infix:+')
@@ -110,7 +111,7 @@ sub optable_output_is {
     optable.newtok('postfix:--', 'equiv'=>'prefix:++')
 
     .local pmc ident
-    ident = get_global ['PGE::Match'], 'ident'
+    ident = get_global ['PGE';'Match'], 'ident'
     optable.newtok('term:', 'tighter'=>'prefix:++', 'parsed'=>ident)
     optable.newtok('circumfix:( )', 'equiv'=>'term:')
     optable.newtok('circumfix:[ ]', 'equiv'=>'term:')

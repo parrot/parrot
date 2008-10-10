@@ -13,7 +13,7 @@ pir_output_is( <<'CODE', <<'OUT', 'some of the auxiliary methods' );
 
 .sub _main :main
     load_bytecode 'PCT/HLLCompiler.pbc'
-    $P0 = new 'PCT::HLLCompiler'
+    $P0 = new ['PCT';'HLLCompiler']
 
     # parse_name method
     $P1 = $P0.'parse_name'('None::Module')
@@ -45,6 +45,7 @@ pir_output_is( <<'CODE', <<'OUT', 'one complete start-to-end compiler' );
 
 .sub 'TOP'
     .param string source
+    .param pmc options         :slurpy :named
     .return (source)
 .end
 
@@ -59,12 +60,12 @@ pir_output_is( <<'CODE', <<'OUT', 'one complete start-to-end compiler' );
 .sub 'get' :method
     .param string stage
 
-    $P0 = new 'PAST::Op'
+    $P0 = new ['PAST';'Op']
     $P0.'pasttype'('inline')
     $P0.'inline'("print %0\nprint \"\\n\"")
 
     $P2 = getattribute self, "text"
-    $P1 = new 'PAST::Val'
+    $P1 = new ['PAST';'Val']
     $P1.'value'($P2)
 
     $P0.'push'($P1)
@@ -94,12 +95,12 @@ pir_output_is( <<'CODE', <<'OUT', 'one complete start-to-end compiler' );
     .return ($P0)
 .end
 
-.namespace [ 'None::Compiler' ]
+.namespace [ 'None';'Compiler' ]
 
 .sub _main :main
     load_bytecode 'PCT.pbc'
 
-    $P0 = new 'PCT::HLLCompiler'
+    $P0 = new ['PCT';'HLLCompiler']
     $P0.'language'('None')
     $P0.'parsegrammar'('NoneParser')
     $P0.'astgrammar'('NoneGrammar')
@@ -124,7 +125,7 @@ pir_output_is( <<'CODE', <<'OUT', 'default stages' );
     load_bytecode 'PCT/HLLCompiler.pbc'
 
     .local pmc hllcompiler
-    hllcompiler = new 'PCT::HLLCompiler'
+    hllcompiler = new ['PCT';'HLLCompiler']
 
     $P0 = getattribute hllcompiler, "@stages"
     $S0 = join " ", $P0
@@ -141,7 +142,7 @@ pir_output_is( <<'CODE', <<'OUT', 'inserting and removing stages' );
     load_bytecode 'PCT/HLLCompiler.pbc'
 
     .local pmc hllcompiler
-    hllcompiler = new 'PCT::HLLCompiler'
+    hllcompiler = new ['PCT';'HLLCompiler']
 
     hllcompiler.removestage('parse')
     hllcompiler.addstage('foo')

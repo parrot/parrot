@@ -276,7 +276,7 @@ pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'isa PGE::Match (success)' );
         print $S0
         print "\n"
 
-        isa_match = isa match, 'PGE::Match'
+        isa_match = isa match, ['PGE';'Match']
         if isa_match goto OK1
         print "not "
 OK1:print "ok 1\n"
@@ -287,7 +287,7 @@ OK1:print "ok 1\n"
         print $S0
         print "\n"
 
-        isa_match = isa $P0, 'PGE::Match'
+        isa_match = isa $P0, ['PGE';'Match']
         if isa_match goto OK2
         print "not "
 OK2:print "ok 2\n"
@@ -309,7 +309,7 @@ pir_output_is( $PRE . <<'CODE'. $POST, <<OUT, 'isa PGE::Match (failure)' );
         print $S0
         print "\n"
 
-        isa_match = isa match, 'PGE::Match'
+        isa_match = isa match, ['PGE';'Match']
         if isa_match goto OK1
         print "not "
 OK1:print "ok 1\n"

@@ -4,11 +4,9 @@
 	load_bytecode 'PGE.pbc'
 	load_bytecode 'PGE/Text.pbc'
 
-	.local pmc compiler
-	compiler = newclass 'PhemeCompiler'
-	addattribute compiler, 'ast'
-	addattribute compiler, 'ost'
-	addattribute compiler, 'pir'
+	.local pmc compiler, p6meta
+    p6meta = get_hll_global 'P6metaclass'
+    compiler = p6meta.'new_class'('PhemeCompiler','attr'=>'ast ost pir')
 
 	.return()
 .end
@@ -82,7 +80,7 @@
     .local pmc start_rule
     .local pmc match
 
-    start_rule = find_global 'Pheme::Grammar', 'prog'
+    start_rule = find_global ['Pheme';'Grammar'], 'prog'
     match      = get_root_global ['parrot';'PGE'], 'Match'
     source     = match.'new'(source, 'grammar'=>'Pheme::Grammar')
 
@@ -105,7 +103,7 @@
 	tge_past = getattribute self, 'ast'
 
 	.local pmc compiler
-	compiler = new 'TGE::Compiler'
+	compiler = new ['TGE';'Compiler']
 
 	.local pmc ast_builder
 	ast_builder = tge_past.apply( parse_tree )

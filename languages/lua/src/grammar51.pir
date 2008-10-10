@@ -11,7 +11,7 @@ Used by F<languages/lua/lua.pir> and F<languages/lua/test_lex.pir>.
 
 =cut
 
-.namespace [ 'Lua::Grammar' ]
+.namespace [ 'Lua';'Grammar' ]
 
 =head2 Functions
 
@@ -41,11 +41,11 @@ L<http://www.lua.org/manual/5.1/manual.html#2.1>.
     .param string message
     .local int lineno
 #    .local pmc infile
-#    infile = get_hll_global ['TGE::Compiler'], '$!infile'
+#    infile = get_hll_global ['TGE';'Compiler'], '$!infile'
 #    $S0 = infile
 #    $S0 .= ':'
     $S0 = '_._:'
-    $P0 = get_hll_global ['PGE::Util'], 'line_number'
+    $P0 = get_hll_global ['PGE';'Util'], 'line_number'
     lineno = mob.$P0()
     inc lineno
     $S1 = lineno

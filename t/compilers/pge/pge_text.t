@@ -32,7 +32,7 @@ pir_output_is( <<'CODE', <<'OUT', "bracketed" );
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Text.pir'
 
-    bracketed = get_global ['PGE::Text'], "bracketed"
+    bracketed = get_global ['PGE';'Text'], "bracketed"
 
     $S0 = "{ nested { and } okay, () and <>,  escaped \\}'s } okay"
     $P0 = bracketed($S0)

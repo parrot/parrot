@@ -20,41 +20,37 @@ needed for C99.  The currently defined ast nodes:
 .include 'languages/c99/src/preamble'
 
 .HLL 'C99', 'c99_group'
-.namespace [ 'C99::CPP::PAST' ]
+.namespace [ 'C99';'CPP';'PAST' ]
 
 .sub '__onload' :load
-    .local pmc base
-    base = newclass 'C99::CPP::PAST::Node'
-    addattribute base, 'children'
-    addattribute base, 'source'
-    addattribute base, 'pos'
-    addattribute base, 'name'
-    addattribute base, 'line'
+    .local pmc base, p6meta
+    p6meta = get_hll_global 'P6metaclass'
+    base = p6meta.'new_class'('C99::CPP::PAST::Node','attr'=>'children source pos name line')
 
-    $P0 = subclass base, 'C99::CPP::PAST::IF_SECTION'
-    $P0 = subclass base, 'C99::CPP::PAST::IFNDEF'
-    $P0 = subclass base, 'C99::CPP::PAST::IFDEF'
-    $P0 = subclass base, 'C99::CPP::PAST::IF'
-    $P0 = subclass base, 'C99::CPP::PAST::ELIF'
-    $P0 = subclass base, 'C99::CPP::PAST::ELSE'
-    $P0 = subclass base, 'C99::CPP::PAST::DEFINE'
-    $P0 = subclass base, 'C99::CPP::PAST::DEFINE_FUNCTION'
-    $P0 = subclass base, 'C99::CPP::PAST::INCLUDE'
-    $P0 = subclass base, 'C99::CPP::PAST::ERROR'
-    $P0 = subclass base, 'C99::CPP::PAST::LINE'
-    $P0 = subclass base, 'C99::CPP::PAST::PRAGMA'
-    $P0 = subclass base, 'C99::CPP::PAST::SOURCE_LINE'
-    $P0 = subclass base, 'C99::CPP::PAST::WSNWS'
+    $P0 = p6meta.'new_class'('C99::CPP::PAST::IF_SECTION','parent'=>'C99::CPP::PAST::Node')
+    $P0 = p6meta.'new_class'('C99::CPP::PAST::IFNDEF','parent'=>'C99::CPP::PAST::Node')
+    $P0 = p6meta.'new_class'('C99::CPP::PAST::IFDEF','parent'=>'C99::CPP::PAST::Node')
+    $P0 = p6meta.'new_class'('C99::CPP::PAST::IF','parent'=>'C99::CPP::PAST::Node')
+    $P0 = p6meta.'new_class'('C99::CPP::PAST::ELIF','parent'=>'C99::CPP::PAST::Node')
+    $P0 = p6meta.'new_class'('C99::CPP::PAST::ELSE','parent'=>'C99::CPP::PAST::Node')
+    $P0 = p6meta.'new_class'('C99::CPP::PAST::DEFINE','parent'=>'C99::CPP::PAST::Node')
+    $P0 = p6meta.'new_class'('C99::CPP::PAST::DEFINE_FUNCTION','parent'=>'C99::CPP::PAST::Node')
+    $P0 = p6meta.'new_class'('C99::CPP::PAST::INCLUDE','parent'=>'C99::CPP::PAST::Node')
+    $P0 = p6meta.'new_class'('C99::CPP::PAST::ERROR','parent'=>'C99::CPP::PAST::Node')
+    $P0 = p6meta.'new_class'('C99::CPP::PAST::LINE','parent'=>'C99::CPP::PAST::Node')
+    $P0 = p6meta.'new_class'('C99::CPP::PAST::PRAGMA','parent'=>'C99::CPP::PAST::Node')
+    $P0 = p6meta.'new_class'('C99::CPP::PAST::SOURCE_LINE','parent'=>'C99::CPP::PAST::Node')
+    $P0 = p6meta.'new_class'('C99::CPP::PAST::WSNWS','parent'=>'C99::CPP::PAST::Node')
 
 
     $P0 = new 'Integer'
     $P0 = 10
-    set_hll_global ['C99::CPP::PAST'], 'serial_number', $P0
+    set_hll_global ['C99';'CPP';'PAST'], 'serial_number', $P0
     .return ()
 .end
 
 
-.namespace [ 'C99::CPP::PAST::Node' ]
+.namespace [ 'C99';'CPP';'PAST';'Node' ]
 
 .sub 'attr' :method
     .param string attrname
@@ -149,7 +145,7 @@ needed for C99.  The currently defined ast nodes:
 
 .sub 'node' :method
     .param pmc node
-    $I0 = isa node, 'C99::CPP::PAST::Node'
+    $I0 = isa node, ['C99';'CPP';'PAST';'Node']
     if $I0 goto clone_past
   clone_pge:
     $S0 = node
@@ -191,7 +187,7 @@ counting at 10 (so that the values 0..9 can be considered "safe").
     if has_fmt goto unique_1
     fmt = ''
   unique_1:
-    $P0 = get_hll_global ['C99::CPP::PAST'], 'serial_number'
+    $P0 = get_hll_global ['C99';'CPP';'PAST'], 'serial_number'
     $S0 = $P0
     $S0 = concat fmt, $S0
     inc $P0
@@ -266,35 +262,35 @@ counting at 10 (so that the values 0..9 can be considered "safe").
 .end
 
 
-.namespace [ 'C99::CPP::PAST::Node' ]
+.namespace [ 'C99';'CPP';'PAST';'Node' ]
 .gen_dumplist('children')
-.namespace [ 'C99::CPP::PAST::IF_SECTION' ]
+.namespace [ 'C99';'CPP';'PAST';'IF_SECTION' ]
 .gen_dumplist('children')
-.namespace [ 'C99::CPP::PAST::IFNDEF' ]
+.namespace [ 'C99';'CPP';'PAST';'IFNDEF' ]
 .gen_dumplist('line children')
-.namespace [ 'C99::CPP::PAST::IFDEF' ]
+.namespace [ 'C99';'CPP';'PAST';'IFDEF' ]
 .gen_dumplist('line children')
-.namespace [ 'C99::CPP::PAST::IF' ]
+.namespace [ 'C99';'CPP';'PAST';'IF' ]
 .gen_dumplist('line children')
-.namespace [ 'C99::CPP::PAST::ELIF' ]
+.namespace [ 'C99';'CPP';'PAST';'ELIF' ]
 .gen_dumplist('line children')
-.namespace [ 'C99::CPP::PAST::ELSE' ]
+.namespace [ 'C99';'CPP';'PAST';'ELSE' ]
 .gen_dumplist('children')
-.namespace [ 'C99::CPP::PAST::DEFINE' ]
+.namespace [ 'C99';'CPP';'PAST';'DEFINE' ]
 .gen_dumplist('name line')
-.namespace [ 'C99::CPP::PAST::DEFINE_FUNCTION' ]
+.namespace [ 'C99';'CPP';'PAST';'DEFINE_FUNCTION' ]
 .gen_dumplist('name line')
-.namespace [ 'C99::CPP::PAST::INCLUDE' ]
+.namespace [ 'C99';'CPP';'PAST';'INCLUDE' ]
 .gen_dumplist('line')
-.namespace [ 'C99::CPP::PAST::ERROR' ]
+.namespace [ 'C99';'CPP';'PAST';'ERROR' ]
 .gen_dumplist('line')
-.namespace [ 'C99::CPP::PAST::LINE' ]
+.namespace [ 'C99';'CPP';'PAST';'LINE' ]
 .gen_dumplist('line')
-.namespace [ 'C99::CPP::PAST::PRAGMA' ]
+.namespace [ 'C99';'CPP';'PAST';'PRAGMA' ]
 .gen_dumplist('line')
-.namespace [ 'C99::CPP::PAST::SOURCE_LINE' ]
+.namespace [ 'C99';'CPP';'PAST';'SOURCE_LINE' ]
 .gen_dumplist('line')
-.namespace [ 'C99::CPP::PAST::WSNWS' ]
+.namespace [ 'C99';'CPP';'PAST';'WSNWS' ]
 .gen_dumplist('line')
 
 # Local Variables:

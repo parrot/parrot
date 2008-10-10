@@ -2,15 +2,16 @@
 # $Id$
 
 .sub '__onload' :init :load
-    $P0 = newclass 'NQP::Grammar::Actions'
+    $P0 = get_hll_global 'P6metaclass'
+    $P0 = $P0.'new_class'('NQP::Grammar::Actions')
 
     ##  create the stack for nested lexical blocks
     $P0 = new 'ResizablePMCArray'
-    set_hll_global ['NQP::Grammar::Actions'], '@?BLOCK', $P0
+    set_hll_global ['NQP';'Grammar';'Actions'], '@?BLOCK', $P0
 
     ##  initialize optable with inline PIR
     .local pmc optable
-    optable = get_hll_global [ 'NQP::Grammar' ], '$optable'
+    optable = get_hll_global [ 'NQP';'Grammar' ], '$optable'
 
     optable['postfix:++'; 'inline'] = <<"        END"
         ##  inline postfix:++
@@ -27,7 +28,7 @@
     .return ()
 .end
 
-.namespace [ 'NQP::Grammar::Actions' ]
+.namespace [ 'NQP';'Grammar';'Actions' ]
 
 
 ##    method TOP($/, $key) {

@@ -1,6 +1,6 @@
 # $Id$
 
-.namespace ['lolcode::Grammar']
+.namespace ['lolcode';'Grammar']
 
 .sub 'yarn_literal' :method
     .param pmc adverbs         :slurpy :named

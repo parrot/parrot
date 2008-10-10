@@ -9,7 +9,7 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Parrot::Test tests => 6;
 
 foreach my $name (qw(Op Ops Sub Label)) {
-    my $module = "POST::$name";
+    my $module = "'POST';'$name'";
     my $code   = <<'CODE'
 .sub _main
     load_bytecode 'PCT.pbc'
@@ -19,8 +19,8 @@ foreach my $name (qw(Op Ops Sub Label)) {
 CODE
         ;
 
-    $code .= "    node = new '$module'\n";
-    $code .= "    node2 = new '$module'\n";
+    $code .= "    node = new [$module]\n";
+    $code .= "    node2 = new [$module]\n";
     $code .= <<'CODE'
     node.'init'('name' => 'foo')
     node2.'init'('name' => 'bar')
@@ -34,6 +34,7 @@ CODE
 CODE
         ;
 
+        $module =~ s/'//g;
     pir_output_is( $code, <<"OUT", "set attributes for $module via method" );
 foo
 "ost" => PMC '$module'  {
@@ -51,7 +52,7 @@ pir_output_is( <<'CODE', <<'OUT', 'dump POST::Op node in visual format' );
     load_bytecode 'PCT.pbc'
     load_bytecode 'library/dumper.pbc'
     .local pmc node
-    node = new 'POST::Op'
+    node = new ['POST';'Op']
     node.'pirop'('add')
     node.'result'('$P1')
     node.'inline'('%r=1')
@@ -59,7 +60,7 @@ pir_output_is( <<'CODE', <<'OUT', 'dump POST::Op node in visual format' );
     .return ()
 .end
 CODE
-"ost" => PMC 'POST::Op'  {
+"ost" => PMC 'POST;Op'  {
     <pirop> => "add"
     <result> => "$P1"
     <inline> => "%r=1"
@@ -71,13 +72,13 @@ pir_output_is( <<'CODE', <<'OUT', 'dump POST::Label node in visual format' );
     load_bytecode 'PCT.pbc'
     load_bytecode 'library/dumper.pbc'
     .local pmc node
-    node = new 'POST::Label'
+    node = new ['POST';'Label']
     node.'name'('labeler')
     "_dumper"(node, "ost")
     .return ()
 .end
 CODE
-"ost" => PMC 'POST::Label'  {
+"ost" => PMC 'POST;Label'  {
     <name> => "labeler"
 }
 OUT

@@ -40,7 +40,7 @@ GRAMMAR
     # Match against the source
     .local pmc match
     .local pmc start_rule
-    start_rule = get_global ['TGE::Parser'], "start"
+    start_rule = get_global ['TGE';'Parser'], "start"
     print "loaded start rule\n"
     match = start_rule(source)
     print "matched start rule\n"
@@ -79,7 +79,7 @@ pir_error_output_like( <<'CODE', qr/Syntax error at line 4, near "transform "/, 
 GRAMMAR
     .local pmc match
     .local pmc start_rule
-    start_rule = get_global ['TGE::Parser'], "start"
+    start_rule = get_global ['TGE';'Parser'], "start"
     match = start_rule(source, 'grammar'=>'TGE::Parser') # should throw.
 .end
 

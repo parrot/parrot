@@ -1,19 +1,19 @@
 # Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
-.namespace [ 'NQP::Compiler' ]
+.namespace [ 'NQP';'Compiler' ]
 
 .sub '__onload' :load :init
     load_bytecode 'PGE.pbc'
     load_bytecode 'PCT.pbc'
 
-    $P0 = new [ 'PCT::HLLCompiler' ]
+    $P0 = new [ 'PCT';'HLLCompiler' ]
     $P0.'language'('NQP')
     $P0.'parsegrammar'('NQP::Grammar')
     $P0.'parseactions'('NQP::Grammar::Actions')
 
     $P0 = new 'Integer'
-    set_hll_global ['NQP::Grammar'], '$!endstmt', $P0
+    set_hll_global ['NQP';'Grammar'], '$!endstmt', $P0
 .end
 
 .sub 'main' :main

@@ -9,33 +9,33 @@
 
 =for example
 
-"stmts" => PMC 'PAST::Stmts'  {
+"stmts" => PMC ['PAST';'Stmts']  {
     <source> => "4 + 1\n"
     <pos> => 0
-    [0] => PMC 'PAST::Op'  {
+    [0] => PMC ['PAST';'Op']  {
         <name> => "say"
         <pasttype> => "call"
-        [0] => PMC 'PAST::Op'  {
+        [0] => PMC ['PAST';'Op']  {
             <pasttype> => "bind"
-            [0] => PMC 'PAST::Var'  {
+            [0] => PMC ['PAST';'Var']  {
                 <name> => "last"
                 <scope> => "package"
                 <lvalue> => 1
             }
-            [1] => PMC 'PAST::Op'  {
+            [1] => PMC ['PAST';'Op']  {
                 <name> => "infix:+"
                 <pasttype> => undef
                 <pirop> => "add"
                 <lvalue> => undef
                 <source> => "+"
                 <pos> => 2
-                [0] => PMC 'PAST::Val'  {
+                [0] => PMC ['PAST';'Val']  {
                     <value> => "4"
                     <returns> => "Integer"
                     <source> => "4"
                     <pos> => 0
                 }
-                [1] => PMC 'PAST::Val'  {
+                [1] => PMC ['PAST';'Val']  {
                     <value> => "1"
                     <returns> => "Integer"
                     <source> => "1"
@@ -63,36 +63,36 @@
 .sub main :main
 
     .local pmc val_4
-    val_4 = new 'PAST::Val'
+    val_4 = new ['PAST';'Val']
     val_4.init( 'value' => '4', 'returns' => 'Integer' )
 
     .local pmc val_1
-    val_1 = new 'PAST::Val'
+    val_1 = new ['PAST';'Val']
     val_1.init( 'value' => '1', 'returns' => 'Integer' )
 
     .local pmc op_add
-    op_add = new 'PAST::Op'
+    op_add = new ['PAST';'Op']
     op_add.init( val_4, val_1, 'name' => 'infix:+', 'pirop' => 'add' )
 
     .local pmc var_last
-    var_last = new 'PAST::Var'
+    var_last = new ['PAST';'Var']
     var_last.init( 'name' => 'last', 'scope' => 'package', 'lvalue' => 1 )
 
     .local pmc op_bind
-    op_bind = new 'PAST::Op'
+    op_bind = new ['PAST';'Op']
     op_bind.init( var_last, op_add, 'pasttype' => 'bind' )
 
     .local pmc op_say
-    op_say = new 'PAST::Op'
+    op_say = new ['PAST';'Op']
     op_say.init( op_bind, 'name' => 'say', 'pasttype' => 'call' )
 
     .local pmc stmts
-    stmts = new 'PAST::Stmts'
+    stmts = new ['PAST';'Stmts']
     stmts.'init'( op_say, 'name'=>'stmts' )
 
     # compile to PIR and display
     .local pmc astcompiler
-    astcompiler = new [ 'PCT::HLLCompiler' ]
+    astcompiler = new [ 'PCT';'HLLCompiler' ]
     astcompiler.'removestage'('parse')
     astcompiler.'removestage'('past')
 

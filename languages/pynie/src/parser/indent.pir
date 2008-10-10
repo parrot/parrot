@@ -11,7 +11,7 @@ src/parser/indent.pir - Helper parsing function for Python indents
 
 .include 'cclass.pasm'
 
-.namespace [ 'Pynie::Grammar' ]
+.namespace [ 'Pynie';'Grammar' ]
 
 .sub 'onload' :load :init
     .local pmc optable, ws

@@ -42,17 +42,17 @@ F<docs/pdds/pdd26_ast.pod>
 
     # content of the block
     .local pmc val_x
-    val_x = new 'PAST::Val'
+    val_x = new ['PAST';'Val']
     val_x.init( 'value' => '-536870912', 'returns' => 'Integer' )
 
     # wrap the content in a block
     .local pmc var_block
-    var_block = new 'PAST::Block'
+    var_block = new ['PAST';'Block']
     var_block.init( val_x, 'blocktype' => 'immediate' )
 
     # set up compiler
     .local pmc astcompiler
-    astcompiler = new [ 'PCT::HLLCompiler' ]
+    astcompiler = new [ 'PCT';'HLLCompiler' ]
     astcompiler.'removestage'('parse')
     astcompiler.'removestage'('past')
 

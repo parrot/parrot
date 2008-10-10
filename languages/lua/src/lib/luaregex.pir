@@ -187,13 +187,15 @@ Francois Perrad
 .sub '__onload' :anon :load :init
     load_bytecode 'PGE.pbc'
 
-    $P0 = subclass 'PGE::Exp::CCShortcut', 'PGE::Exp::LuaCCShortcut'
-    $P0 = subclass 'PGE::Exp::CGroup', 'PGE::Exp::LuaCGroup'
-    $P0 = subclass 'PGE::Exp', 'PGE::Exp::LuaBalanced'
-    $P0 = subclass 'Hash', 'PGE::Cache'
+    .local pmc p6meta
+    p6meta = get_hll_global 'P6metaclass'
+    $P0 = p6meta.'new_class'('PGE::Exp::LuaCCShortcut', 'parent'=>'PGE::Exp::CCShortcut')
+    $P0 = p6meta.'new_class'('PGE::Exp::LuaCGroup', 'parent'=>'PGE::Exp::CGroup')
+    $P0 = p6meta.'new_class'('PGE::Exp::LuaBalanced', 'parent'=>'PGE::Exp')
+    $P0 = p6meta.'new_class'('PGE::Cache', 'parent'=>'Hash')
 .end
 
-.namespace [ 'PGE::LuaRegex' ]
+.namespace [ 'PGE';'LuaRegex' ]
 
 .sub 'compile_luaregex'
     .param pmc source
@@ -210,7 +212,7 @@ Francois Perrad
 
     unless target == '' goto no_cache
     .local pmc cache
-    cache = get_hll_global ['PGE::LuaRegex'], 'cache_compile'
+    cache = get_hll_global ['PGE';'LuaRegex'], 'cache_compile'
     $P0 = cache[source]
     if null $P0 goto no_cache
     .return ($P0)
@@ -245,7 +247,7 @@ Francois Perrad
 .sub 'luaregex'
     .param pmc mob
     .local pmc optable
-    optable = get_hll_global ['PGE::LuaRegex'], '$optable'
+    optable = get_hll_global ['PGE';'LuaRegex'], '$optable'
     $P0 = optable.'parse'(mob)
     .return ($P0)
 .end
@@ -256,13 +258,13 @@ Francois Perrad
 
 .sub '__onload' :anon :load :init
     .local pmc optable
-    new optable, 'PGE::OPTable'
-    set_hll_global ['PGE::LuaRegex'], '$optable', optable
+    optable = new ['PGE';'OPTable']
+    set_hll_global ['PGE';'LuaRegex'], '$optable', optable
 
-    $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_literal'
+    $P0 = get_hll_global ['PGE';'LuaRegex'], 'parse_literal'
     optable.newtok('term:', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
 
-    $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_anchor'
+    $P0 = get_hll_global ['PGE';'LuaRegex'], 'parse_anchor'
     optable.newtok('term:^', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
     optable.newtok('term:$', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
@@ -285,7 +287,7 @@ Francois Perrad
     optable.newtok('term:%x', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
     optable.newtok('term:%X', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
 
-    $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_backref'
+    $P0 = get_hll_global ['PGE';'LuaRegex'], 'parse_backref'
     optable.newtok('term:%1', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
     optable.newtok('term:%2', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
     optable.newtok('term:%3', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
@@ -298,17 +300,17 @@ Francois Perrad
 
     optable.newtok('circumfix:( )', 'equiv'=>'term:', 'nows'=>1, 'nullterm'=>1, 'match'=>'PGE::Exp::LuaCGroup')
 
-    $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_enumclass'
+    $P0 = get_hll_global ['PGE';'LuaRegex'], 'parse_enumclass'
     optable.newtok('term:[', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
-    $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_enumclass2'
+    $P0 = get_hll_global ['PGE';'LuaRegex'], 'parse_enumclass2'
     optable.newtok('term:.', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
     optable.newtok('term:%z', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
     optable.newtok('term:%Z', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_balanced'
+    $P0 = get_hll_global ['PGE';'LuaRegex'], 'parse_balanced'
     optable.newtok('term:%b', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    $P0 = get_hll_global ['PGE::LuaRegex'], 'parse_quantifier'
+    $P0 = get_hll_global ['PGE';'LuaRegex'], 'parse_quantifier'
     optable.newtok('postfix:*', 'looser'=>'term:', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
     optable.newtok('postfix:+', 'equiv'=>'postfix:*', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
     optable.newtok('postfix:?', 'equiv'=>'postfix:*', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
@@ -317,10 +319,10 @@ Francois Perrad
     optable.newtok('infix:', 'looser'=>'postfix:*', 'right'=>1, 'nows'=>1, 'match'=>'PGE::Exp::Concat')
 
     .local pmc cache, mt
-    new cache, 'PGE::Cache'
-    set_hll_global ['PGE::LuaRegex'], 'cache_compile', cache
+    cache = new ['PGE';'Cache']
+    set_hll_global ['PGE';'LuaRegex'], 'cache_compile', cache
 
-    $P0 = get_hll_global ['PGE::LuaRegex'], 'compile_luaregex'
+    $P0 = get_hll_global ['PGE';'LuaRegex'], 'compile_luaregex'
     compreg 'PGE::LuaRegex', $P0
 .end
 
@@ -579,7 +581,7 @@ Francois Perrad
 .end
 
 
-.namespace [ 'PGE::Exp' ]
+.namespace [ 'PGE';'Exp' ]
 
 .sub 'luaanalyze' :method
     .param pmc pad
@@ -598,7 +600,7 @@ Francois Perrad
 .end
 
 
-.namespace [ 'PGE::Exp::LuaCGroup' ]
+.namespace [ 'PGE';'Exp';'LuaCGroup' ]
 
 .sub 'luaanalyze' :method
     .param pmc pad
@@ -626,7 +628,7 @@ Francois Perrad
     .param string next
 
     $P0 = self[0]
-    $I0 = isa $P0, 'PGE::Exp::Literal'
+    $I0 = isa $P0, ['PGE';'Exp';'Literal']
     unless $I0 goto super
     $S0 = $P0
     unless $S0 == '' goto super
@@ -653,12 +655,12 @@ Francois Perrad
     .return ()
 
   super:
-    $P0 = get_hll_global ['PGE::Exp::CGroup'], 'pir'
+    $P0 = get_hll_global ['PGE';'Exp';'CGroup'], 'pir'
     .return $P0(self, code, label, next)
 .end
 
 
-.namespace [ 'PGE::Exp::LuaCCShortcut' ]
+.namespace [ 'PGE';'Exp';'LuaCCShortcut' ]
 
 .sub 'reduce' :method
     .param pmc next
@@ -718,7 +720,7 @@ Francois Perrad
 .end
 
 
-.namespace [ 'PGE::Exp::LuaBalanced' ]
+.namespace [ 'PGE';'Exp';'LuaBalanced' ]
 
 .sub 'reduce' :method
     .param pmc next

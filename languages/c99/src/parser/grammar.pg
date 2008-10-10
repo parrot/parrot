@@ -166,7 +166,8 @@ rule declarator_prefix {
 
 rule declarator_suffix {
     | '(' <parameter_type_list> ')' {*}    #= parameter_type_list
-    | '(' <identifier_list>? ')' {*}       #= identifier_list ## old-style C parameter declarations
+    ## old-style C parameter declarations
+    | '(' <identifier_list>? ')' {*}       #= identifier_list
     | '[' <assignment_expression>? ']'
     | '[' '*' ']'
 }

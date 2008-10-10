@@ -140,8 +140,9 @@ EOF_SIMPLE_GRAMMAR
     .local string test_name
                   test_name    = 'Simple::Test' . test_num_str
 
+    $P0 = split '::', test_name
     .local pmc parser
-               parser = find_global test_name, 'main'
+               parser = find_global $P0, 'main'
 
   next_target:
     .local string target
