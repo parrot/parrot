@@ -94,11 +94,11 @@ information see F<src/pmc.c>.
 =cut
 
 */
-    void* get_pointer() {
+    VTABLE void* get_pointer() {
         return Lua_PMC;
     }
 
-    void set_pointer(void *ptr) {
+    VTABLE void set_pointer(void *ptr) {
         Lua_PMC = (PMC *)ptr;
     }
 

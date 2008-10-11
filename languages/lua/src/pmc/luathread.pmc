@@ -54,7 +54,7 @@ Raises an exception. Use C<init_pmc()>.
 =cut
 
 */
-    void init() {
+    VTABLE void init() {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "LuaThread init without sub");
     }
@@ -66,7 +66,7 @@ Raises an exception. Use C<init_pmc()>.
 =cut
 
 */
-    void init_pmc(PMC *sub) {
+    VTABLE void init_pmc(PMC *sub) {
         PMC *classobj = Parrot_oo_get_class_str(INTERP,
                           const_string(INTERP, "Parrot::Coroutine"));
         PMC *init_args;
@@ -92,7 +92,7 @@ Marks the Parrot::Coroutine as live.
 =cut
 
 */
-    void mark() {
+    VTABLE void mark() {
         if (PMC_pmc_val(SELF))
             pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
         if (PMC_metadata(SELF))
@@ -108,7 +108,7 @@ Return the string "thread".
 =cut
 
 */
-    STRING* name() {
+    VTABLE STRING* name() {
         return const_string(INTERP, "thread");
     }
 
@@ -119,7 +119,7 @@ Return the string "thread".
 =cut
 
 */
-    PMC* clone() {
+    VTABLE PMC* clone() {
         return SELF;
     }
 
@@ -130,7 +130,7 @@ Return the string "thread".
 =cut
 
 */
-    PMC* get_attr_str(STRING *key) {
+    VTABLE PMC* get_attr_str(STRING *key) {
         return PMC_pmc_val(SELF);
     }
 
@@ -141,7 +141,7 @@ Return the string "thread".
 =cut
 
 */
-    STRING* get_string() {
+    VTABLE STRING* get_string() {
         return Parrot_sprintf_c(INTERP, "thread: %08X", SELF);
     }
 
@@ -152,7 +152,7 @@ Return the string "thread".
 =cut
 
 */
-    void set_pmc(PMC *value) {
+    VTABLE void set_pmc(PMC *value) {
         PMC_pmc_val(SELF) = PMC_pmc_val(value);
     }
 

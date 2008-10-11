@@ -102,7 +102,7 @@ Changes the PMC to a PMC of a new type
 =cut
 
 */
-    void morph(INTVAL type) {
+    VTABLE void morph(INTVAL type) {
         if (PMC_type(SELF) == type)
             return;
         pmc_reuse(INTERP, SELF, type, 0);
@@ -117,7 +117,7 @@ Returns C<true>.
 =cut
 
 */
-    INTVAL get_bool() {
+    VTABLE INTVAL get_bool() {
         return (INTVAL)1;
     }
 
@@ -130,7 +130,7 @@ Returns the address of the PMC.
 =cut
 
 */
-    void* get_pointer() {
+    VTABLE void* get_pointer() {
         return SELF;
     }
 
@@ -141,7 +141,7 @@ Returns the address of the PMC.
 =cut
 
 */
-    void assign_pmc(PMC *value) {
+    VTABLE void assign_pmc(PMC *value) {
         VTABLE_morph(INTERP, SELF, PMC_type(value));
         if (PMC_type(value) != dynpmc_LuaNil)
             SELF.set_pmc(value);
@@ -156,7 +156,7 @@ Throws an exception.
 =cut
 
 */
-    PMC* get_pmc_keyed(PMC *key) {
+    VTABLE PMC* get_pmc_keyed(PMC *key) {
         PMC *meth = find_meth(INTERP, SELF, "__index");
 
         if (meth) {
@@ -186,7 +186,7 @@ Throws an exception.
 =cut
 
 */
-    void set_pmc_keyed(PMC *key, PMC *value) {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         PMC *meth = find_meth(INTERP, SELF, "__newindex");
 
         if (!meth)
@@ -213,7 +213,7 @@ Throws an exception.
 =cut
 
 */
-    PMC* neg(PMC *dest) {
+    VTABLE PMC* neg(PMC *dest) {
         PMC *meth = find_meth(INTERP, SELF, "__unm");
 
         if (!meth)
@@ -228,7 +228,7 @@ Throws an exception.
         return dest;
     }
 
-    void i_neg() {
+    VTABLE void i_neg() {
         PMC *meth = find_meth(INTERP, SELF, "__unm");
 
         if (!meth)
@@ -250,7 +250,7 @@ Common implementation
 =cut
 
 */
-    PMC* logical_not(PMC *dest) {
+    VTABLE PMC* logical_not(PMC *dest) {
         dest = pmc_new(INTERP, dynpmc_LuaBoolean);
         VTABLE_set_bool(INTERP, dest, ! SELF.get_bool());
         return dest;
@@ -265,7 +265,7 @@ Always returns true.
 =cut
 
 */
-    INTVAL defined() {
+    VTABLE INTVAL defined() {
         return (INTVAL)1;
     }
 
@@ -278,7 +278,7 @@ Throws an exception.
 =cut
 
 */
-    opcode_t* invoke(void *next) {
+    VTABLE opcode_t* invoke(void *next) {
         PMC *meth = find_meth(INTERP, SELF, "__call");
         PMC *retval;
 

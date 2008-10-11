@@ -43,7 +43,7 @@ pmclass LuaClosure
 =cut
 
 */
-    void init_pmc(PMC *sub) {
+    VTABLE void init_pmc(PMC *sub) {
         if (VTABLE_isa(INTERP, sub, const_string(INTERP, "Closure"))) {
             PMC_struct_val(SELF) = mem_allocate_zeroed_typed(Parrot_sub);
             PMC_pmc_val(SELF)    = NULL;
@@ -66,7 +66,7 @@ Marks the closure as live.
 =cut
 
 */
-    void mark() {
+    VTABLE void mark() {
         SUPER();
         if (PMC_metadata(SELF))
             pobject_lives(INTERP, (PObj *)PMC_metadata(SELF));
@@ -81,7 +81,7 @@ Return the string "function".
 =cut
 
 */
-    STRING* name() {
+    VTABLE STRING* name() {
         return const_string(INTERP, "function");
     }
 
@@ -92,7 +92,7 @@ Return the string "function".
 =cut
 
 */
-    PMC* clone() {
+    VTABLE PMC* clone() {
         PMC *ret = SUPER();
         PMC_metadata(ret) = PMC_metadata(SELF);
         PObj_custom_mark_destroy_SETALL(ret);
@@ -106,7 +106,7 @@ Return the string "function".
 =cut
 
 */
-    STRING* get_string() {
+    VTABLE STRING* get_string() {
         return Parrot_sprintf_c(INTERP, "function: %08X", SELF);
     }
 
@@ -117,7 +117,7 @@ Return the string "function".
 =cut
 
 */
-    void set_pmc(PMC *value) {
+    VTABLE void set_pmc(PMC *value) {
         PMC_struct_val(SELF) = PMC_struct_val(value);
         PMC_metadata(SELF)   = PMC_metadata(value);
     }

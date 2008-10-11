@@ -49,7 +49,7 @@ Allow :
 =cut
 
 */
-    PMC* new_from_string(STRING *rep, INTVAL flags) {
+    VTABLE PMC* new_from_string(STRING *rep, INTVAL flags) {
         PMC *res;
         INTVAL type = PMC_type(SELF);
         if (flags & PObj_constant_FLAG)
@@ -68,7 +68,7 @@ Return the string "nil".
 =cut
 
 */
-    STRING* name() {
+    VTABLE STRING* name() {
         return const_string(INTERP, "nil");
     }
 
@@ -81,7 +81,7 @@ Creates and returns a clone of the scalar.
 =cut
 
 */
-    PMC* clone() {
+    VTABLE PMC* clone() {
         PMC *dest = pmc_new(INTERP, PMC_type(SELF));
         STRUCT_COPY(&PMC_union(dest), &PMC_union(SELF));
         return dest;
@@ -96,7 +96,7 @@ Return the string "nil".
 =cut
 
 */
-    STRING* get_string() {
+    VTABLE STRING* get_string() {
         return const_string(INTERP, "nil");
     }
 
@@ -109,7 +109,7 @@ Return always C<false>.
 =cut
 
 */
-    INTVAL get_bool() {
+    VTABLE INTVAL get_bool() {
         return (INTVAL)0;
     }
 
@@ -122,7 +122,7 @@ Return always C<false>.
 =cut
 
 */
-    INTVAL defined() {
+    VTABLE INTVAL defined() {
         return (INTVAL)0;
     }
 

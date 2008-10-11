@@ -70,7 +70,7 @@ Initializes the userdata.
 =cut
 
 */
-    void init() {
+    VTABLE void init() {
         Parrot_LuaUserdata_attributes *u = mem_allocate_zeroed_typed(Parrot_LuaUserdata_attributes);
         PMC_data(SELF) = u;
         u_env(SELF) = getcurrenv(INTERP);
@@ -87,7 +87,7 @@ Marks the userdata as live.
 =cut
 
 */
-    void mark() {
+    VTABLE void mark() {
         if (u_val(SELF))
             pobject_lives(INTERP, (PObj *)u_val(SELF));
         if (u_env(SELF))
@@ -105,7 +105,7 @@ Call finalizer and free the userdata.
 =cut
 
 */
-    void destroy() {
+    VTABLE void destroy() {
         Parrot_LuaUserdata_attributes *u = PARROT_LUAUSERDATA(SELF);
         PMC *meth = find_meth(INTERP, SELF, "__gc");
 
@@ -125,7 +125,7 @@ Call finalizer and free the userdata.
 =cut
 
 */
-    STRING* get_string() {
+    VTABLE STRING* get_string() {
         return Parrot_sprintf_c(INTERP, "userdata: %08X", SELF);
     }
 
@@ -138,7 +138,7 @@ Return the string "userdata".
 =cut
 
 */
-    STRING* name() {
+    VTABLE STRING* name() {
         return const_string(INTERP, "userdata");
     }
 
@@ -149,7 +149,7 @@ Return the string "userdata".
 =cut
 
 */
-    PMC* clone() {
+    VTABLE PMC* clone() {
         return SELF;
     }
 
@@ -160,7 +160,7 @@ Return the string "userdata".
 =cut
 
 */
-    void set_pmc(PMC *value) {
+    VTABLE void set_pmc(PMC *value) {
         /* TODO: should be get_attr_str() and getfenv() */
         u_val(SELF)        = u_val(value);
         u_env(SELF)        = u_env(value);
@@ -174,7 +174,7 @@ Return the string "userdata".
 =cut
 
 */
-    PMC* get_attr_str(STRING *key) {
+    VTABLE PMC* get_attr_str(STRING *key) {
         return u_val(SELF);
     }
 
@@ -185,7 +185,7 @@ Return the string "userdata".
 =cut
 
 */
-    void set_attr_str(STRING *key, PMC *value) {
+    VTABLE void set_attr_str(STRING *key, PMC *value) {
         u_val(SELF) = value;
     }
 

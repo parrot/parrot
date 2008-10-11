@@ -41,7 +41,7 @@ Initializes the string.
 =cut
 
 */
-    void init() {
+    VTABLE void init() {
         PMC_str_val(SELF) = string_make_empty(INTERP, enum_stringrep_one, 0);
         PObj_custom_mark_SET(SELF);
     }
@@ -57,7 +57,7 @@ Allow :
 =cut
 
 */
-    PMC* new_from_string(STRING *rep, INTVAL flags) {
+    VTABLE PMC* new_from_string(STRING *rep, INTVAL flags) {
         PMC *res;
         INTVAL type = PMC_type(SELF);
         if (flags & PObj_constant_FLAG)
@@ -79,7 +79,7 @@ Marks the string as live.
 =cut
 
 */
-    void mark() {
+    VTABLE void mark() {
         if (PMC_str_val(SELF))
             pobject_lives(INTERP, (PObj *)PMC_str_val(SELF));
     }
@@ -93,7 +93,7 @@ Creates a copy of the string.
 =cut
 
 */
-    PMC* clone() {
+    VTABLE PMC* clone() {
         return VTABLE_new_from_string(INTERP, SELF, PMC_str_val(SELF), 0);
     }
 
@@ -106,7 +106,7 @@ Returns the string itself.
 =cut
 
 */
-    STRING* get_string() {
+    VTABLE STRING* get_string() {
         return PMC_str_val(SELF);
     }
 
@@ -119,7 +119,7 @@ Return the string "string".
 =cut
 
 */
-    STRING* name() {
+    VTABLE STRING* name() {
         return const_string(INTERP, "string");
     }
 
@@ -130,7 +130,7 @@ Return the string "string".
 =cut
 
 */
-    void set_integer_native(INTVAL value) {
+    VTABLE void set_integer_native(INTVAL value) {
         SELF.morph(dynpmc_LuaNumber);
         SELF.set_integer_native(value);
     }
@@ -142,7 +142,7 @@ Return the string "string".
 =cut
 
 */
-    void set_number_native(FLOATVAL value) {
+    VTABLE void set_number_native(FLOATVAL value) {
         SELF.morph(dynpmc_LuaNumber);
         SELF.set_number_native(value);
     }
@@ -156,7 +156,7 @@ Sets the value of the string to that of the specified C<string>.
 =cut
 
 */
-    void set_string_native(STRING *value) {
+    VTABLE void set_string_native(STRING *value) {
         /* Only allow constant PMCs to embed constant strings */
         if (PObj_constant_TEST(SELF) && !PObj_constant_TEST(value)) {
             const char *copy = string_to_cstring(INTERP, value);
@@ -176,7 +176,7 @@ the specified C<PMC>.
 =cut
 
 */
-    void set_pmc(PMC *value) {
+    VTABLE void set_pmc(PMC *value) {
         PMC_str_val(SELF) = VTABLE_get_string(INTERP, value);
     }
 
@@ -187,7 +187,7 @@ the specified C<PMC>.
 =cut
 
 */
-    PMC* neg(PMC *dest) {
+    VTABLE PMC* neg(PMC *dest) {
         PMC *n;
         Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
             "->P", &n);
@@ -206,7 +206,7 @@ the specified C<PMC>.
 =cut
 
 */
-    void i_neg() {
+    VTABLE void i_neg() {
         PMC *n;
         Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
             "->P", &n);
@@ -227,7 +227,7 @@ Return length of the string.
 =cut
 
 */
-    INTVAL elements() {
+    VTABLE INTVAL elements() {
         return string_length(INTERP, PMC_str_val(SELF));
     }
 
@@ -240,7 +240,7 @@ Used to archive the string.
 =cut
 
 */
-    void freeze(visit_info *info) {
+    VTABLE void freeze(visit_info *info) {
         IMAGE_IO *io = info->image_io;
         SUPER(info);
         VTABLE_push_string(INTERP, io, PMC_str_val(SELF));
@@ -255,7 +255,7 @@ Used to unarchive the string.
 =cut
 
 */
-    void thaw(visit_info *info) {
+    VTABLE void thaw(visit_info *info) {
         IMAGE_IO *io = info->image_io;
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL)

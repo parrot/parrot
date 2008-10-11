@@ -377,7 +377,7 @@ Initializes the instance.
 =cut
 
 */
-    void init() {
+    VTABLE void init() {
         PMC_struct_val(SELF) = NULL;
         PMC_metadata(SELF)   = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -393,7 +393,7 @@ Marks the hash as live.
 =cut
 
 */
-    void mark() {
+    VTABLE void mark() {
         STRING *mode = NULL;
         PMC    *meta = PMC_metadata(SELF);
 
@@ -428,7 +428,7 @@ Free hash structure.
 =cut
 
 */
-    void destroy() {
+    VTABLE void destroy() {
         if (PMC_struct_val(SELF)) {
             lua_destroy_table(INTERP, PMC_hash(SELF));
             PMC_struct_val(SELF) = NULL;
@@ -444,7 +444,7 @@ Return the string "table".
 =cut
 
 */
-    STRING* name() {
+    VTABLE STRING* name() {
         return const_string(INTERP, "table");
     }
 
@@ -464,7 +464,7 @@ therefore only clone the reference to themselves, not make a deep copy.
 =cut
 
 */
-    PMC* clone() {
+    VTABLE PMC* clone() {
         return SELF;
     }
 
@@ -475,7 +475,7 @@ therefore only clone the reference to themselves, not make a deep copy.
 =cut
 
 */
-    STRING* get_string() {
+    VTABLE STRING* get_string() {
         return Parrot_sprintf_c(INTERP, "table: %08X", SELF);
     }
 
@@ -486,7 +486,7 @@ therefore only clone the reference to themselves, not make a deep copy.
 =cut
 
 */
-    void set_pmc(PMC *other) {
+    VTABLE void set_pmc(PMC *other) {
         PMC_struct_val(SELF) = PMC_struct_val(other);
         PMC_metadata(SELF)   = PMC_metadata(other);
     }
@@ -500,7 +500,7 @@ C<table> accessor.
 =cut
 
 */
-    PMC* get_pmc_keyed(PMC *key) {
+    VTABLE PMC* get_pmc_keyed(PMC *key) {
         PMC  *value  = NULL;
         PMC **pvalue = lua_get(INTERP, PMC_hash(SELF), key);
 
@@ -534,7 +534,7 @@ C<table> mutator.
 =cut
 
 */
-    void set_pmc_keyed(PMC *key, PMC *value) {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         if (! lua_get(INTERP, PMC_hash(SELF), key)) {
             PMC *meth = find_meth(INTERP, SELF, "__newindex");
             if (meth) {
@@ -586,7 +586,7 @@ Returns the number of elements in the table.
 =cut
 
 */
-    INTVAL elements() {
+    VTABLE INTVAL elements() {
         return numuse(PMC_hash(SELF));
     }
 
