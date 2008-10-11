@@ -700,7 +700,7 @@ Calculates pow inplace
 
 */
 
-    VTABLE PMC *pow(PMC *value, PMC *dest) {
+    MULTI PMC *pow(PMC *value, PMC *dest) {
         const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
