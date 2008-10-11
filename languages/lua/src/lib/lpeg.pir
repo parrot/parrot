@@ -142,7 +142,7 @@ LIST
 .sub 'newpatt' :anon
     .param int n
     .local pmc res
-    $P0 = new ['lpeg';'Pattern']
+    new $P0, 'lpeg::Pattern'
     $I0 = n + 1
     set $P0, $I0
     .local pmc mt
@@ -994,11 +994,10 @@ NOT YET IMPLEMENTED.
 .end
 
 
-.namespace [ 'lpeg';'Pattern' ]
+.namespace [ 'lpeg::Pattern' ]
 
 .sub '__onload' :anon :load :init
-    $P0 = get_hll_global 'P6metaclass'
-    $P0 = $P0.'new_class'('lpeg::Pattern','parent'=>'FixedPMCArray')
+    $P0 = subclass 'FixedPMCArray', 'lpeg::Pattern'
 .end
 
 .sub 'get_string' :vtable :method
@@ -1026,7 +1025,7 @@ NOT YET IMPLEMENTED.
     .param int op
     .param int offset
     .param int aux
-    $P0 = new ['lpeg';'Instruction']
+    new $P0, 'lpeg::Instruction'
     new $P1, 'Integer'
     set $P1, op
     setattribute $P0, 'code', $P1
@@ -1058,11 +1057,15 @@ NOT YET IMPLEMENTED.
 .end
 
 
-.namespace [ 'lpeg';'Instruction' ]
+.namespace [ 'lpeg::Instruction' ]
 
 .sub '__onload' :anon :load :init
-    $P0 = get_hll_global 'P6metaclass'
-    $P0 = $P0.'new_class'('lpeg::Instruction','attr'=>'code aux offset f buff')
+    $P0 = newclass 'lpeg::Instruction'
+    addattribute $P0, 'code'
+    addattribute $P0, 'aux'
+    addattribute $P0, 'offset'
+    addattribute $P0, 'f'
+    addattribute $P0, 'buff'
 .end
 
 .const string names = <<'LIST'

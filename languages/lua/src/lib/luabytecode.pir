@@ -10,25 +10,47 @@ lib/luabytecode.pir - Lua bytecode translation Library
 =cut
 
 
-.namespace ['Lua';'Bytecode']
+.namespace ['Lua::Bytecode']
 
 .sub '__onload' :anon :load :init
-    .local pmc p6meta
-    p6meta = new 'P6metaclass'
-    $P0 = p6meta.'new_class'('Lua::Bytecode','attr'=>'version format endian sizeof_int sizeof_size_t sizeof_opcode sizeof_number integral top')
-    $P0 = p6meta.'new_class'('Lua::Function', 'attr'=>'source linedefined lastlinedefined nups numparams is_vararg maxstacksize code k p lineinfo locvars upvalues')
-    $P0 = p6meta.'new_class'('Lua::InstructionList','parent'=>'FixedIntegerArray')
-    $P0 = p6meta.'new_class'('Lua::ConstantList','parent'=>'FixedPMCArray')
-    $P0 = p6meta.'new_class'('Lua::Nil','parent'=>'Undef')
-    $P0 = p6meta.'new_class'('Lua::Boolean','parent'=>'Boolean')
-    $P0 = p6meta.'new_class'('Lua::Number','parent'=>'Float')
-    $P0 = p6meta.'new_class'('Lua::String','parent'=>'String')
-    $P0 = p6meta.'new_class'('Lua::PrototypeList','parent'=>'FixedPMCArray')
-    $P0 = p6meta.'new_class'('Lua::LineList','parent'=>'FixedIntegerArray')
-    $P0 = p6meta.'new_class'('Lua::LocalList','parent'=>'FixedPMCArray')
-    $P0 = p6meta.'new_class'('Lua::Local','parent'=>'String','attr'=>'startpc endpc')
-    $P0 = p6meta.'new_class'('Lua::UpvalueList','parent'=>'FixedPMCArray')
-    $P0 = p6meta.'new_class'('Lua::Upvalue','parent'=>'String')
+    $P0 = newclass 'Lua::Bytecode'
+    addattribute $P0, 'version'
+    addattribute $P0, 'format'
+    addattribute $P0, 'endian'
+    addattribute $P0, 'sizeof_int'
+    addattribute $P0, 'sizeof_size_t'
+    addattribute $P0, 'sizeof_opcode'
+    addattribute $P0, 'sizeof_number'
+    addattribute $P0, 'integral'
+    addattribute $P0, 'top'
+    $P0 = newclass 'Lua::Function'
+    addattribute $P0, 'source'
+    addattribute $P0, 'linedefined'
+    addattribute $P0, 'lastlinedefined'
+    addattribute $P0, 'nups'
+    addattribute $P0, 'numparams'
+    addattribute $P0, 'is_vararg'
+    addattribute $P0, 'maxstacksize'
+    addattribute $P0, 'code'
+    addattribute $P0, 'k'
+    addattribute $P0, 'p'
+    addattribute $P0, 'lineinfo'
+    addattribute $P0, 'locvars'
+    addattribute $P0, 'upvalues'
+    $P0 = subclass 'FixedIntegerArray', 'Lua::InstructionList'
+    $P0 = subclass 'FixedPMCArray', 'Lua::ConstantList'
+    $P0 = subclass 'Undef', 'Lua::Nil'
+    $P0 = subclass 'Boolean', 'Lua::Boolean'
+    $P0 = subclass 'Float', 'Lua::Number'
+    $P0 = subclass 'String', 'Lua::String'
+    $P0 = subclass 'FixedPMCArray', 'Lua::PrototypeList'
+    $P0 = subclass 'FixedIntegerArray', 'Lua::LineList'
+    $P0 = subclass 'FixedPMCArray', 'Lua::LocalList'
+    $P0 = subclass 'String', 'Lua::Local'
+    addattribute $P0, 'startpc'
+    addattribute $P0, 'endpc'
+    $P0 = subclass 'FixedPMCArray', 'Lua::UpvalueList'
+    $P0 = subclass 'String', 'Lua::Upvalue'
 .end
 
 .sub 'brief' :method
@@ -74,7 +96,7 @@ PIRCODE
 .end
 
 
-.namespace ['Lua';'Function']
+.namespace ['Lua::Function']
 
 .sub 'brief' :method
     .param int i
@@ -207,7 +229,7 @@ PIRCODE
 .end
 
 
-.namespace ['Lua';'ConstantList']
+.namespace ['Lua::ConstantList']
 
 .sub 'brief' :method
     .local int i, n
@@ -240,7 +262,7 @@ PIRCODE
 .end
 
 
-.namespace ['Lua';'Nil']
+.namespace ['Lua::Nil']
 
 .sub 'brief' :method
     .param int i
@@ -262,7 +284,7 @@ PIRCODE
 .end
 
 
-.namespace ['Lua';'Boolean']
+.namespace ['Lua::Boolean']
 
 .sub 'brief' :method
     .param int i
@@ -291,7 +313,7 @@ PIRCODE
 .end
 
 
-.namespace ['Lua';'Number']
+.namespace ['Lua::Number']
 
 .sub 'brief' :method
     .param int i
@@ -320,7 +342,7 @@ PIRCODE
 .end
 
 
-.namespace ['Lua';'String']
+.namespace ['Lua::String']
 
 .sub 'brief' :method
     .param int i
@@ -352,7 +374,7 @@ PIRCODE
 .end
 
 
-.namespace ['Lua';'PrototypeList']
+.namespace ['Lua::PrototypeList']
 
 .sub 'brief' :method
     .param int level
@@ -391,7 +413,7 @@ PIRCODE
 .end
 
 
-.namespace ['Lua';'LocalList']
+.namespace ['Lua::LocalList']
 
 .sub 'brief' :method
     .local int i, n
@@ -429,7 +451,7 @@ PIRCODE
 .end
 
 
-.namespace ['Lua';'Local']
+.namespace ['Lua::Local']
 
 .sub 'brief' :method
     .param int i
@@ -456,7 +478,7 @@ PIRCODE
 .end
 
 
-.namespace ['Lua';'UpvalueList']
+.namespace ['Lua::UpvalueList']
 
 .sub 'brief' :method
     .local int i, n
@@ -472,7 +494,7 @@ PIRCODE
 .end
 
 
-.namespace ['Lua';'Upvalue']
+.namespace ['Lua::Upvalue']
 
 .sub 'brief' :method
     .param int i
