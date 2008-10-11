@@ -45,9 +45,9 @@ typedef struct _MMD_table {
 } MMD_table;
 
 typedef struct _multi_func_list {
-        STRING *multi_name;
-        STRING *short_sig;
-        STRING *full_sig;
+        char *multi_name;
+        char *short_sig;
+        char *full_sig;
         funcptr_t func_ptr;
 } multi_func_list;
 
@@ -94,9 +94,9 @@ void Parrot_mmd_add_function(PARROT_INTERP,
 
 PARROT_API
 void Parrot_mmd_add_multi_from_c_args(PARROT_INTERP,
-    ARGIN(STRING *sub_name),
-    ARGIN(STRING *short_sig),
-    ARGIN(STRING *long_sig),
+    ARGIN(char *sub_name),
+    ARGIN(char *short_sig),
+    ARGIN(char *long_sig),
     ARGIN(funcptr_t multi_func_ptr))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

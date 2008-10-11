@@ -1924,25 +1924,28 @@ stored in the specified namespace.
 
 PARROT_API
 void
-Parrot_mmd_add_multi_from_c_args(PARROT_INTERP, ARGIN(STRING *sub_name),
-        ARGIN(STRING *short_sig), ARGIN(STRING *long_sig),
+Parrot_mmd_add_multi_from_c_args(PARROT_INTERP, ARGIN(char *sub_name),
+        ARGIN(char *short_sig), ARGIN(char *long_sig),
         ARGIN(funcptr_t multi_func_ptr))
 {
         PMC *multi_sig;
-        PMC *type_list = string_split(interp, CONST_STRING(interp, ","), long_sig);
+        STRING *sub_name_str   = string_from_cstring(interp, sub_name, 0);
+        STRING *long_sig_str    = string_from_cstring(interp, long_sig, 0);
+        STRING *short_sig_str  = string_from_cstring(interp, short_sig, 0);
+        PMC *type_list = string_split(interp, CONST_STRING(interp, ","), long_sig_str);
         STRING *namespace_name = VTABLE_get_string_keyed_int(interp, type_list, 0);
 
         /* Create an NCI sub for the C function */
         PMC *sub_obj = constant_pmc_new(interp, enum_class_NCI);
         VTABLE_set_pointer_keyed_str(interp, sub_obj,
-                short_sig, F2DPTR(multi_func_ptr));
+                short_sig_str, F2DPTR(multi_func_ptr));
 
         /* Attach a type tuple array to the NCI sub for multi dispatch */
-        multi_sig = mmd_build_type_tuple_from_long_sig(interp, long_sig);
+        multi_sig = mmd_build_type_tuple_from_long_sig(interp, long_sig_str);
         PMC_pmc_val(sub_obj) = multi_sig;
 
-        mmd_add_multi_to_namespace(interp, namespace_name, sub_name, sub_obj);
-        mmd_add_multi_global(interp, sub_name, sub_obj);
+        mmd_add_multi_to_namespace(interp, namespace_name, sub_name_str, sub_obj);
+        mmd_add_multi_global(interp, sub_name_str, sub_obj);
 }
 
 /*

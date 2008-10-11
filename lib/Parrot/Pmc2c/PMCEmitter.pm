@@ -562,9 +562,9 @@ sub init_func {
 
     my $multi_funcs = $self->find_multi_functions();
     my $multi_list = join( ",\n        ",
-        map { '{ CONST_STRING(interp, "'. $_->[0] .  '"), ' . "\n          " .
-                'CONST_STRING(interp, "'. $_->[1] .  '"), ' . "\n          " .
-                'CONST_STRING(interp, "'. $_->[2] .  '"), ' . "\n          " .
+        map { '{ "'. $_->[0] .  '", ' . "\n          " .
+                '"'. $_->[1] .  '", ' . "\n          " .
+                '"'. $_->[2] .  '", ' . "\n          " .
                 '(funcptr_t) ' . $_->[3] . ' }' } @$multi_funcs );
 
     my @isa = grep { $_ ne 'default' } @{ $self->parents };
