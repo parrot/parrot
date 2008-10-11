@@ -1871,24 +1871,36 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', "add using subclass of Complex (RT #59630)", todo=>'TODO');
 .sub main
     $P0 = subclass 'Complex', 'MyComplex'
+    addattribute $P0, "re"
+    addattribute $P0, "im"
 
     .local pmc a, b, c
-    ##   a = 1 + 0i
+    ##   a = 1 + 2i
     a = new 'MyComplex'
     a['real'] = 1
     a['imag'] = 2
     say a
 
-    ##   b = 1 + 0i
+    ##   b = 3 + 4i
     b = new 'MyComplex'
     b['real'] = 3
     b['imag'] = 4
     say b
 
-    ##   c = a - b
+    ##   c = a + b
     c = add a, b
     say c
 .end
+
+.namespace ['MyComplex']
+
+.sub 'init' :vtable
+    $P1 = new 'Float'
+    setattribute self, "re", $P1
+    $P2 = new 'Float'
+    setattribute self, "im", $P2
+.end
+
 CODE
 1+2i
 3+4i
