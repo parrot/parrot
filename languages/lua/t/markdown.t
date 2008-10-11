@@ -48,6 +48,7 @@ local html = markdown.markdown [=[
 # Title
 
 Some text.
+
 ]=]
 
 print(html)
