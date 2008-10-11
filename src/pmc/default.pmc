@@ -2488,6 +2488,29 @@ Default fallback. Performs a multiple dispatch call for 'cmp_string'.
 
 /*
 
+=item C<PMC *cmp_pmc(PMC *value)>
+
+Default fallback. Performs a multiple dispatch call for 'cmp_pmc'.
+
+=cut
+
+*/
+
+    VTABLE PMC *cmp_pmc(PMC *value) {
+        PMC *retval;
+
+        /* Don't multidispatch if you've got two pointers to the same PMC. They
+         * are equal. */
+        if (SELF == value)
+            return 0;
+
+        Parrot_mmd_multi_dispatch_from_c_args(interp,
+                "cmp_pmc", "PP->P", SELF, value, &retval);
+
+        return retval;
+    }
+/*
+
 =item C<PMC *logical_or(PMC *value, PMC *dest)>
 
 Default fallback. Performs a multiple dispatch call for 'logical_or'.

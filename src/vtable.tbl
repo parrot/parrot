@@ -273,6 +273,7 @@ INTVAL is_same(PMC* value)
 INTVAL cmp(PMC* value)
 INTVAL cmp_num(PMC* value)
 INTVAL cmp_string(PMC* value)
+PMC* cmp_pmc(PMC* value)
 
 PMC* logical_or(PMC* value, PMC* dest)
 

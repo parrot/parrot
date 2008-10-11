@@ -220,6 +220,7 @@ s/^(\s*)(INTVAL\s+is_same\(const\s+PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(INTVAL\s+cmp\(PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(INTVAL\s+cmp_num\(PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(INTVAL\s+cmp_string\(PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;
+s/^(\s*)(INTVAL\s+cmp_pmc\(PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(PMC\s+\*logical_or\(PMC\s+\*\w*,\s+PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(PMC\s+\*logical_xor\(PMC\s+\*\w*,\s+PMC\s+\*\w*\)\s+{)/$2VTABLE $2/;
 s/^(\s*)(PMC\s+\*logical_and\(PMC\s+\*\w*,\s+PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;
