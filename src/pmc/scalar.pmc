@@ -57,7 +57,12 @@ bitwise_left_shift_internal(PARROT_INTERP, PMC *self,
 
     /* Store the result. */
     if (! overflow_p) {
-        dest = pmc_new(interp, VTABLE_type(interp, self));
+        /* If SELF is the destination, we won't want to create a
+           new PMC, because then we won't have the result in SELF.
+           Only create a new PMC if we aren't saving the result
+           to SELF, or if they are both NULL */
+        if (dest != self || dest == NULL)
+            dest = pmc_new(interp, VTABLE_type(interp, self));
 
         VTABLE_set_integer_native(interp, dest, result);
     }
