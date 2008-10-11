@@ -753,8 +753,8 @@ Return the integer 0.
             Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
                     "->P", &value);
         }
-        if ( value->vtable->base_type == dynpmc_WmlsInteger
-          || value->vtable->base_type == dynpmc_WmlsBoolean ) {
+        if (value->vtable->base_type == dynpmc_WmlsInteger
+          || value->vtable->base_type == dynpmc_WmlsBoolean) {
             INTVAL result = SELF.get_integer()
                           | VTABLE_get_integer(INTERP, value);
             dest = pmc_new(INTERP, dynpmc_WmlsInteger);
@@ -771,8 +771,8 @@ Return the integer 0.
             Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
                     "->P", &value);
         }
-        if ( value->vtable->base_type == dynpmc_WmlsInteger
-          || value->vtable->base_type == dynpmc_WmlsBoolean ) {
+        if (value->vtable->base_type == dynpmc_WmlsInteger
+          || value->vtable->base_type == dynpmc_WmlsBoolean) {
             INTVAL result = SELF.get_integer()
                           | VTABLE_get_integer(INTERP, value);
             SELF.morph(dynpmc_WmlsInteger);
@@ -797,8 +797,8 @@ Return the integer 0.
             Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
                     "->P", &value);
         }
-        if ( value->vtable->base_type == dynpmc_WmlsInteger
-          || value->vtable->base_type == dynpmc_WmlsBoolean ) {
+        if (value->vtable->base_type == dynpmc_WmlsInteger
+          || value->vtable->base_type == dynpmc_WmlsBoolean) {
             INTVAL result = SELF.get_integer()
                           & VTABLE_get_integer(INTERP, value);
             dest = pmc_new(INTERP, dynpmc_WmlsInteger);
@@ -815,8 +815,8 @@ Return the integer 0.
             Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
                     "->P", &value);
         }
-        if ( value->vtable->base_type == dynpmc_WmlsInteger
-          || value->vtable->base_type == dynpmc_WmlsBoolean ) {
+        if (value->vtable->base_type == dynpmc_WmlsInteger
+          || value->vtable->base_type == dynpmc_WmlsBoolean) {
             INTVAL result = SELF.get_integer()
                           & VTABLE_get_integer(INTERP, value);
             SELF.morph(dynpmc_WmlsInteger);
@@ -841,8 +841,8 @@ Return the integer 0.
             Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
                     "->P", &value);
         }
-        if ( value->vtable->base_type == dynpmc_WmlsInteger
-          || value->vtable->base_type == dynpmc_WmlsBoolean ) {
+        if (value->vtable->base_type == dynpmc_WmlsInteger
+          || value->vtable->base_type == dynpmc_WmlsBoolean) {
             INTVAL result = SELF.get_integer()
                           ^ VTABLE_get_integer(INTERP, value);
             dest = pmc_new(INTERP, dynpmc_WmlsInteger);
@@ -859,8 +859,8 @@ Return the integer 0.
             Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
                     "->P", &value);
         }
-        if ( value->vtable->base_type == dynpmc_WmlsInteger
-          || value->vtable->base_type == dynpmc_WmlsBoolean ) {
+        if (value->vtable->base_type == dynpmc_WmlsInteger
+          || value->vtable->base_type == dynpmc_WmlsBoolean) {
             INTVAL result = SELF.get_integer()
                           ^ VTABLE_get_integer(INTERP, value);
             SELF.morph(dynpmc_WmlsInteger);
@@ -885,8 +885,8 @@ Return the integer 0.
             Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
                     "->P", &value);
         }
-        if ( value->vtable->base_type == dynpmc_WmlsInteger
-          || value->vtable->base_type == dynpmc_WmlsBoolean ) {
+        if (value->vtable->base_type == dynpmc_WmlsInteger
+          || value->vtable->base_type == dynpmc_WmlsBoolean) {
             INTVAL result = SELF.get_integer()
                           >> VTABLE_get_integer(INTERP, value);
             dest = pmc_new(INTERP, dynpmc_WmlsInteger);
@@ -903,8 +903,8 @@ Return the integer 0.
             Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
                     "->P", &value);
         }
-        if ( value->vtable->base_type == dynpmc_WmlsInteger
-          || value->vtable->base_type == dynpmc_WmlsBoolean ) {
+        if (value->vtable->base_type == dynpmc_WmlsInteger
+          || value->vtable->base_type == dynpmc_WmlsBoolean) {
             INTVAL result = SELF.get_integer()
                           >> VTABLE_get_integer(INTERP, value);
             SELF.morph(dynpmc_WmlsInteger);
@@ -929,8 +929,8 @@ Return the integer 0.
             Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
                     "->P", &value);
         }
-        if ( value->vtable->base_type == dynpmc_WmlsInteger
-          || value->vtable->base_type == dynpmc_WmlsBoolean ) {
+        if (value->vtable->base_type == dynpmc_WmlsInteger
+          || value->vtable->base_type == dynpmc_WmlsBoolean) {
             INTVAL result = SELF.get_integer()
                           >> VTABLE_get_integer(INTERP, value);
             dest = pmc_new(INTERP, dynpmc_WmlsInteger);
@@ -947,8 +947,8 @@ Return the integer 0.
             Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
                     "->P", &value);
         }
-        if ( value->vtable->base_type == dynpmc_WmlsInteger
-          || value->vtable->base_type == dynpmc_WmlsBoolean ) {
+        if (value->vtable->base_type == dynpmc_WmlsInteger
+          || value->vtable->base_type == dynpmc_WmlsBoolean) {
             INTVAL result = SELF.get_integer()
                           >> VTABLE_get_integer(INTERP, value);
             SELF.morph(dynpmc_WmlsInteger);
@@ -973,8 +973,8 @@ Return the integer 0.
             Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
                     "->P", &value);
         }
-        if ( value->vtable->base_type == dynpmc_WmlsInteger
-          || value->vtable->base_type == dynpmc_WmlsBoolean ) {
+        if (value->vtable->base_type == dynpmc_WmlsInteger
+          || value->vtable->base_type == dynpmc_WmlsBoolean) {
             INTVAL result = SELF.get_integer()
                           << VTABLE_get_integer(INTERP, value);
             dest = pmc_new(INTERP, dynpmc_WmlsInteger);
@@ -991,8 +991,8 @@ Return the integer 0.
             Parrot_PCCINVOKE(interp, value, const_string(interp, "parseInt"),
                     "->P", &value);
         }
-        if ( value->vtable->base_type == dynpmc_WmlsInteger
-          || value->vtable->base_type == dynpmc_WmlsBoolean ) {
+        if (value->vtable->base_type == dynpmc_WmlsInteger
+          || value->vtable->base_type == dynpmc_WmlsBoolean) {
             INTVAL result = SELF.get_integer()
                           << VTABLE_get_integer(INTERP, value);
             SELF.morph(dynpmc_WmlsInteger);
