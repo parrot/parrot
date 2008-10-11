@@ -164,7 +164,7 @@ ok($out =~ /^Usage/, "check m4");
 $filename = 'test.text';
 open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
-print $FH "Hello, World!\n";
+print $FH "Hello, World!\n\n";
 close $FH;
 $out = `$parrot languages/markdown/markdown.pbc $filename`;
 ok($out eq "<p>Hello, World!</p>\n\n", "check markdown");
