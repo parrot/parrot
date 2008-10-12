@@ -536,6 +536,7 @@ docs/pmc/struct.pod                                         [main]doc
 docs/pmc/subs.pod                                           [main]doc
 docs/pmc2c.pod                                              [main]doc
 docs/porting_intro.pod                                      [main]doc
+docs/project/branching_guide.pod                            [main]doc
 docs/project/cage_cleaners_guide.pod                        [main]doc
 docs/project/committer_guide.pod                            [main]doc
 docs/project/debian_packaging_guide.pod                     [main]doc
