@@ -41,22 +41,30 @@ int yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const me
 
 
 
-static void  process_file(char * const filename, lexer_state * const lexer);
-static void  process_string(char * const buffer, lexer_state * const lexer);
-static void  include_file(char * const filename, lexer_state * const lexer);
-static void  expand(macro_def * const macro, list *args, lexer_state * const lexer);
-static void  define_constant(constant_table * const table, char * const name, char * const value);
+static void process_file(char * const filename, lexer_state * const lexer);
+static void process_string(char * const buffer, lexer_state * const lexer);
+static void include_file(char * const filename, lexer_state * const lexer, int currentline);
+static void expand(yyscan_t yyscanner, macro_def * const macro, list *args,
+                   lexer_state * const lexer);
 
-static void  define_macro(constant_table * const table, char * const name, list * const parameters,
-                          char * const body);
+static void define_constant(constant_table * const table, char * const name, char * const value);
 
-static void  emit(lexer_state * const lexer, char * const str);
+static void define_macro(constant_table * const table, char * const name, list * const parameters,
+                         char * const body, int line_defined);
+
+static void emit(lexer_state * const lexer, char * const str);
+static void emitf(lexer_state * const lexer, char * const str, ...);
+
 static list *new_list(char * const first_item);
 static list *add_item(list * const L, char * const item);
 
 static char *munge_id(char * const label_id, int is_label_declaration, lexer_state * const lexer);
-static constant_table *new_constant_table(constant_table * const current, lexer_state * const lexer);
+
+static constant_table *new_constant_table(constant_table * const current,
+                                          lexer_state * const lexer);
+
 static constant_table *pop_constant_table(lexer_state * const lexer);
+
 static void delete_constant_table(constant_table *table);
 static void update_unique_id(lexer_state * const lexer);
 
@@ -184,7 +192,7 @@ anything              : any
 any                   : TK_ANY
                             { emit(lexer, $1); }
                       | TK_DOT_IDENT arguments
-                            { expand($1, $2, lexer); }
+                            { expand(yyscanner, $1, $2, lexer); }
                       | TK_LABEL_EXPANSION              /* LABEL: */
                             {
                               char *label = munge_id($1, 1, lexer);
@@ -208,7 +216,7 @@ any                   : TK_ANY
 
 
 include_statement     : ".include" TK_STRINGC
-                            { include_file($2, lexer); }
+                            { include_file($2, lexer, macroget_lineno(yyscanner)); }
                       ;
 
 macro_const_definition: ".macro_const" TK_IDENT expression
@@ -217,10 +225,18 @@ macro_const_definition: ".macro_const" TK_IDENT expression
 
 
 
-macro_definition      : ".macro" TK_IDENT parameters "\n"
+macro_definition      : macro_keyword TK_IDENT parameters "\n"
                         opt_macro_body
                         ".endm"
-                            { define_macro(lexer->globaldefinitions, $2, $3, $5); }
+                            {
+                              define_macro(lexer->globaldefinitions, $2, $3, $5,
+                                           lexer->line_defined);
+                            }
+                      ;
+
+/* separate rule for .macro directive, so we can capture the current line number */
+macro_keyword         : ".macro"
+                            { lexer->line_defined = macroget_lineno(yyscanner); }
                       ;
 
 opt_macro_body        : /* empty */
@@ -378,13 +394,20 @@ Process the specified file.
 
 */
 static void
-include_file(char * const filename, lexer_state * const lexer) {
+include_file(char * const filename, lexer_state * const lexer, int currentline) {
     PARROT_ASSERT(filename != NULL);
     fprintf(stderr, "including: %s\n", filename);
     /* remove closing quote */
     filename[strlen(filename) - 1] = '\0';
+
+    emitf(lexer, "\n.line 1\n");
+    emitf(lexer, ".file '%s'\n", filename + 1);
+
     /* give address of string, skipping opening quote */
     process_file(filename + 1, lexer);
+
+    emitf(lexer, "\n.line %d\n", currentline);
+    emitf(lexer, ".file '%s'\n", lexer->currentfile);
 }
 
 /*
@@ -417,7 +440,7 @@ Expand the specified macro (or constant).
 
 */
 static void
-expand(macro_def * const macro, list * args, lexer_state * const lexer) {
+expand(yyscan_t yyscanner, macro_def * const macro, list * args, lexer_state * const lexer) {
     /* construct a map data structure that maps the argument values to the parameter names */
     /* enter the parameters as temporary symbols (.macro_const) */
     constant_table *macro_params = new_constant_table(lexer->globaldefinitions, lexer);
@@ -450,7 +473,14 @@ expand(macro_def * const macro, list * args, lexer_state * const lexer) {
     current_scope_nr = lexer->unique_id;
     update_unique_id(lexer);
     lexer->unique_id = lexer->id_gen;
+
+    if (macro->line_defined)
+        emitf(lexer, "\n.line %d\n", macro->line_defined);
+
     process_string(macro->body, lexer);
+
+    if (macro->line_defined)
+        emitf(lexer, "\n.line %d\n", macroget_lineno(yyscanner));
 
     /* restore current scope id */
     lexer->unique_id = current_scope_nr;
@@ -491,18 +521,19 @@ Define a macro by the given name, parameters and body.
 */
 static void
 define_macro(constant_table * const table, char * const name, list * const parameters,
-             char * const body)
+             char * const body, int line_defined)
 {
     struct macro_def *macro   = (struct macro_def *)mem_sys_allocate(sizeof (struct macro_def));
 
     /* initialize the fields */
-    macro->name        = name;
-    macro->body        = body;
-    macro->parameters  = parameters;
+    macro->name         = name;
+    macro->body         = body;
+    macro->parameters   = parameters;
+    macro->line_defined = line_defined;
 
     /* link the macro in the list */
-    macro->next        = table->definitions;
-    table->definitions = macro;
+    macro->next         = table->definitions;
+    table->definitions  = macro;
 }
 
 
@@ -644,6 +675,14 @@ All tokens are separated with a space,  C<)>, C<]>, C<,>.
 static void
 emit(lexer_state * const lexer, char * const str) {
     fprintf(lexer->outfile, "%s ", str);
+}
+
+static void
+emitf(lexer_state * const lexer, char * const str, ...) {
+    va_list arg_ptr;
+    va_start(arg_ptr, str);
+    vfprintf(lexer->outfile, str, arg_ptr);
+    va_end(arg_ptr);
 }
 
 static void

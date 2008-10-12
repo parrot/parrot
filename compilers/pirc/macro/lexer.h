@@ -17,6 +17,7 @@ typedef struct lexer_state {
     int             unique_id;                /* unique number for generated locals and labels */
     int             num_digits;               /* keep track of number of digits in unique_id */
     FILE           *outfile;
+    int             line_defined;
 
 } lexer_state;
 
