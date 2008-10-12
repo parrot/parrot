@@ -63,6 +63,21 @@ new/piremit$(O): new/piremit.c new/piremit.h
     $(CC) $(CFLAGS) -c new/piremit.c
 
 
+heredoc: heredoc/hdocprep$(O)
+    $(LINK) hdocprep$(O)
+
+heredoc/hdocprep$(O): heredoc/hdocprep.c
+    $(CC) $(CFLAGS) -c heredoc/hdocprep.c
+
+macro: macro/macroparser$(O) macro/macrolexer$(O)
+    $(LINK) macroparser$(O) macrolexer$(O) $(LIBPARROT)
+
+macro/macroparser$(O): macro/macroparser.c
+    $(CC) $(CFLAGS) -c macro/macroparser.c
+
+macro/macrolexer$(O): macro/macrolexer.c
+    $(CC) $(CFLAGS) -c macro/macrolexer.c
+
 # This is a listing of all targets, that are meant to be called by users
 help:
     @echo ""
