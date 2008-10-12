@@ -20,13 +20,19 @@ Its main features are:
 
 =item * checks for proper use of op arguments in PIR syntax (disallowing, e.g.: $S0 = print)
 
+=item * allow multiple heredocs in subroutine invocations (like: foo(<<'A', <<'B', <<'C') )
+
 =back
 
 =head2 Compiling and Running
 
 =head3 Windows using Microsoft Visual Studio
 
+To compile:
+
  cl /c /I..\..\..\include *.c
+
+To link:
 
  link /nodefaultlib main.obj pircompunit.obj pirlexer.obj pirparser.obj \
    pirsymbol.obj pircompiler.obj kernel32.lib msvcrt.lib ..\..\..\libparrot.lib
@@ -52,7 +58,7 @@ so that X=0, Y=7 and Z=0.)
 When running PIRC, it needs the shared library C<libparrot>; in order to let
 PIRC find it, set the path as follows:
 
- export LD_LIBRARY_PATH=<path to parrot>/parrot/blib/lib
+ export LD_LIBRARY_PATH=../../../blib/lib
 
 Running is as easy as:
 
@@ -97,6 +103,9 @@ is transformed into:
    $S0 = "This is a heredoc string\n  divided\n    over\n      five\n        lines.\n"
  .end
 
+In order to allow C<.include>d file to have heredoc strings, the heredoc preprocessor
+also handles the C<.include> directive, even though logically this is a macro function.
+
 
 =head2 Macro preprocessing
 
@@ -109,6 +118,10 @@ The macro layer basically implements text replacements. The following directives
 =item C<.macro>
 
 =item C<.macro_const>
+
+=item C<.macro_local>
+
+=item C<.macro_label>
 
 =back
 
@@ -328,7 +341,7 @@ The directory compilers/pirc has a number of subdirectories:
 =item src - contains the hand-written, recursive-descent implementation of PIRC.
 Note that this is no longer maintained at the moment.
 
-=item t - for tests.
+=item t - for tests. No tests yet at this point.
 
 =back
 
@@ -379,19 +392,9 @@ feedback even more :-)
 
 =over 4
 
-=item * All, except the first heredoc argument, contains 1 newline character too many.
-Heredoc parsing is a bit complex, and there might be many other issues.
-
-=item * Memory management needs to be improved.
+=item * Memory management of the macro processor needs to be fixed. (heredoc and PIR parser are ok).
 
 =item * Braced macro argument handling needs a lot of testing.
-
-=item * The current design does not allow any heredocs in C<.include>d files, because
-the C<.include> directive is implemented in the second phase. This issue should
-be solved at some point. A possible solution is to combine the heredoc and macro
-preprocessors, however this might result in unmaintainable code. Another solution would
-be to implement the heredoc preprocessor in plain C, as opposed to the Flex implementation.
-
 
 =back
 
@@ -425,6 +428,8 @@ that'd be helpful:
 =over 4
 
 =item * how are named args/params handled/represented in bytecode?
+
+=item * pirc/{macro, heredoc, new} need Makefiles.
 
 =back
 
