@@ -9,7 +9,7 @@ To prepare a release:
 
 =item 0.
 
-Announce the new release to parrot-porters@perl.org and to the IRC channel #parrot
+Announce the new release to parrot-dev@lists.parrot.org and to the IRC channel #parrot
 at least a couple days in advance. Ask whether there are any showstopping bugs.
 It's also good to ask for updates to F<NEWS>, F<CREDITS>, F<PLATFORMS>,
 F<RESPONSIBLE_PARTIES> and F<LANGUAGES_STATUS>.
@@ -255,7 +255,7 @@ following channels (and any others you can think of):
 
 =item a
 
-Send a text email to parrot-porters, perl6-language, perl6-announce,
+Send a text email to parrot-dev, perl6-language, perl6-announce,
 perl5-porters, etc.  You should also include LWN.net in this mailing; email to
 C<lwn> at that domain.
 
