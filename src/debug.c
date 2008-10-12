@@ -469,7 +469,7 @@ the -t option.\n"
 "Add a watchpoint"
     };
 
-static const DebuggerCmd * get_command(long cmdhash) /* HEADERIZER SKIP */
+static const DebuggerCmd * get_command(unsigned long cmdhash) /* HEADERIZER SKIP */
 {
     switch ((enum DebugCmd)cmdhash) {
         case debug_cmd_break:
@@ -698,7 +698,8 @@ parse_string(PARROT_INTERP, ARGIN(const char *str), ARGOUT(STRING **strP))
     }
 
     /* create the output STRING */
-    *strP = string_make(interp, string_start, str - string_start, NULL, 0);
+    *strP = string_make(interp, string_start, (UINTVAL)(str - string_start),
+        NULL, 0);
 
     /* skip the closing quote */
     if (*str)
@@ -1193,7 +1194,8 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
 
     TRACEDEB_MSG("PDB_run_command");
 
-    cmd= get_command(c);
+    cmd = get_command(c);
+
     if (cmd) {
         (* cmd->func)(pdb, cmdline);
         return 0;
@@ -1513,8 +1515,9 @@ INV_COND:   PIO_eprintf(interp->pdb->debugger, "Invalid condition\n");
 #if TRACE_DEBUGGER
             fprintf(stderr, "PDB_break: '%s'\n", str);
 #endif
-            condition->value = string_make(interp,
-                str, i - 1, NULL, 0);
+            condition->value = string_make(interp, str, (UINTVAL)(i - 1),
+                NULL, 0);
+
             condition->type |= PDB_cond_const;
         }
         else if (condition->type & PDB_cond_pmc) {
@@ -1724,11 +1727,13 @@ PDB_continue(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     /* Skip any breakpoint? */
     if (command)
         ln = get_ulong(& command, 0);
+
     if (ln != 0) {
         if (!pdb->breakpoint) {
             PIO_eprintf(pdb->debugger, "No breakpoints to skip\n");
             return;
         }
+
         PDB_skip_breakpoint(interp, ln);
     }
 
@@ -1930,7 +1935,7 @@ Skip C<i> times all breakpoints.
 */
 
 void
-PDB_skip_breakpoint(PARROT_INTERP, long i)
+PDB_skip_breakpoint(PARROT_INTERP, unsigned long i)
 {
 #if TRACE_DEBUGGER
         fprintf(stderr, "PDB_skip_breakpoint: %li\n", i);
@@ -2175,7 +2180,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PARROT_MALLOC
 char *
-PDB_escape(ARGIN(const char *string), INTVAL length)
+PDB_escape(ARGIN(const char *string), UINTVAL length)
 {
     const char *end;
     char       *_new, *fill;
@@ -2295,7 +2300,7 @@ Disassembles C<op>.
 */
 
 size_t
-PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), int space,
+PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
         ARGIN(const op_info_t *info), ARGIN(const opcode_t *op),
         ARGMOD_NULLOK(PDB_file_t *file), ARGIN_NULLOK(const opcode_t *code_start),
         int full_name)
@@ -3153,6 +3158,7 @@ PDB_help(PARROT_INTERP, ARGIN(const char *command))
     parse_command(cmdline, &c);
 
     cmd = get_command(c);
+
     if (cmd) {
         PIO_eprintf(interp->pdb->debugger, "%s\n", cmd->help);
     }
