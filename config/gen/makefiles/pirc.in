@@ -39,44 +39,44 @@ all: pirc heredoc macro
 
 
 pirc: new/main$(O) new/pirparser$(O) new/pirlexer$(O) new/pircompunit$(O) new/pircompiler$(O) new/pirsymbol$(O) new/piremit$(O)
-    $(LINK) main$(O) pirparser$(O) pirlexer$(O) pircompunit$(O) pircompiler$(O) pirsymbol$(O) piremit$(O) $(LIBPARROT)
+	$(LINK) main$(O) pirparser$(O) pirlexer$(O) pircompunit$(O) pircompiler$(O) pirsymbol$(O) piremit$(O) $(LIBPARROT)
 
 new/main$(O): new/main.c
-    $(CC) $(CFLAGS) -c new/main.c
+	$(CC) $(CFLAGS) -c new/main.c
 
 new/pirparser$(O): new/pirparser.c new/pirparser.h
-    $(CC) $(CFLAGS) -c new/pirparser.c
+	$(CC) $(CFLAGS) -c new/pirparser.c
 
 new/pirlexer$(O): new/pirlexer.c src/pirlexer.h
-    $(CC) $(CFLAGS) -c new/pirlexer.c
+	$(CC) $(CFLAGS) -c new/pirlexer.c
 
 new/pircompunit$(O): new/pircompunit.c new/pircompunit.h
-    $(CC) $(CFLAGS) -c new/pircompunit.c
+	$(CC) $(CFLAGS) -c new/pircompunit.c
 
 new/pircompiler$(O): new/pircompiler.c new/pircompiler.h
-    $(CC) $(CFLAGS) -c new/pircompiler.c
+	$(CC) $(CFLAGS) -c new/pircompiler.c
 
 new/pirsymbol$(O): new/pirsymbol.c new/pirsymbol.h
-    $(CC) $(CFLAGS) -c new/pirsymbol.c
+	$(CC) $(CFLAGS) -c new/pirsymbol.c
 
 new/piremit$(O): new/piremit.c new/piremit.h
-    $(CC) $(CFLAGS) -c new/piremit.c
+	$(CC) $(CFLAGS) -c new/piremit.c
 
 
 heredoc: heredoc/hdocprep$(O)
-    $(LINK) hdocprep$(O)
+	$(LINK) hdocprep$(O)
 
 heredoc/hdocprep$(O): heredoc/hdocprep.c
-    $(CC) $(CFLAGS) -c heredoc/hdocprep.c
+	$(CC) $(CFLAGS) -c heredoc/hdocprep.c
 
 macro: macro/macroparser$(O) macro/macrolexer$(O)
-    $(LINK) macroparser$(O) macrolexer$(O) $(LIBPARROT)
+	$(LINK) macroparser$(O) macrolexer$(O) $(LIBPARROT)
 
 macro/macroparser$(O): macro/macroparser.c
-    $(CC) $(CFLAGS) -c macro/macroparser.c
+	$(CC) $(CFLAGS) -c macro/macroparser.c
 
 macro/macrolexer$(O): macro/macrolexer.c
-    $(CC) $(CFLAGS) -c macro/macrolexer.c
+	$(CC) $(CFLAGS) -c macro/macrolexer.c
 
 # This is a listing of all targets, that are meant to be called by users
 help:
