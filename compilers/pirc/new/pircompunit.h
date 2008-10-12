@@ -432,6 +432,11 @@ void reset_register_allocator(struct lexer_state * const lexer);
 /* to check whether given name is a parrot opcode */
 int is_parrot_op(struct lexer_state * const lexer, char * const name);
 
+void close_sub(struct lexer_state * const lexer);
+void fixup_global_labels(struct lexer_state * const lexer);
+void set_instr_flag(struct lexer_state * const lexer, instr_flag flag);
+void convert_inv_to_instr(struct lexer_state * const lexer, invocation * const inv);
+
 void panic(struct lexer_state * lexer, char * const message);
 
 #endif /* PARROT_PIR_PIRCOMPUNIT_H_GUARD */

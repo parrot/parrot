@@ -94,7 +94,9 @@ Function to emit a final last cry that something's wrong and exit.
 =cut
 
 */
+/*
 PARROT_DOES_NOT_RETURN
+*/
 void
 panic(lexer_state * lexer, char * const message) {
     fprintf(stderr, "Fatal: %s\n", message);
@@ -740,6 +742,7 @@ load_library(lexer_state * const lexer, char * const library) {
     /* see imcc.y:600 */
     STRING *libname       = string_from_cstring(lexer->interp, library, strlen(library));
     PMC    *ignored_value = Parrot_load_lib(lexer->interp, libname, NULL);
+    UNUSED(ignored_value);
     Parrot_register_HLL_lib(lexer->interp, libname);
 }
 

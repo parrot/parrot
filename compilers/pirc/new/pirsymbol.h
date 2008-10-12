@@ -95,6 +95,7 @@ unsigned get_hashcode(char * const str, unsigned num_buckets);
 
 bucket *get_bucket(hashtable * const table, unsigned long hash);
 
+void store_bucket(hashtable * const table, bucket * const buck, unsigned long hash);
 
 #endif /* PARROT_PIR_PIRSYMBOL_H_GUARD */
 

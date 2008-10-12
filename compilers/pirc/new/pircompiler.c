@@ -332,7 +332,7 @@ release_resources(NOTNULL(lexer_state *lexer)) {
 
         iter = iter->next;
         /* free the current pointer block itself */
-        mem_sys_free(iter);
+        mem_sys_free(temp);
     }
 
     /* finally, free the lexer itself */
