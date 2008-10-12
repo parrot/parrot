@@ -15,6 +15,7 @@
 
 /* the 4 parrot types; use explicit values, they are used to index an array,
  * so this way we can be sure that works properly.
+ * (don't assume enum's start counting at 0).
  */
 typedef enum pir_types {
     INT_TYPE     = 0,
@@ -341,7 +342,7 @@ void set_sub_lexid(struct lexer_state * const lexer, char * const lexid);
 void set_sub_instanceof(struct lexer_state * const lexer, char * const classname);
 
 /* install a new subroutine node */
-void new_subr(struct lexer_state *lexer, char * const subname);
+void new_subr(struct lexer_state * const lexer, char * const subname);
 
 /* functions for setting argument flags or argument alias */
 argument *set_arg_flag(argument * const arg, arg_flag flag);
@@ -430,8 +431,6 @@ void reset_register_allocator(struct lexer_state * const lexer);
 
 /* to check whether given name is a parrot opcode */
 int is_parrot_op(struct lexer_state * const lexer, char * const name);
-
-void free_subs(struct lexer_state * const lexer);
 
 void panic(struct lexer_state * lexer, char * const message);
 

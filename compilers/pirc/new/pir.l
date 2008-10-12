@@ -227,6 +227,7 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 ".set_arg"        { return TK_SET_ARG; }
 ".const"          { return TK_CONST; }
 ".end"            { return TK_END; }
+".file"           { return TK_FILE; }
 
 ".get_results"    { return TK_GET_RESULTS; }
 ".globalconst"    { return TK_GLOBALCONST; }
@@ -234,6 +235,7 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 ".HLL_map"        { return TK_HLL_MAP; }
 ".invocant"       { return TK_INVOCANT; }
 ".lex"            { return TK_LEX; }
+".line"           { return TK_LINE; }
 ".loadlib"        { return TK_LOADLIB; }
 ".local"          { return TK_LOCAL; }
 

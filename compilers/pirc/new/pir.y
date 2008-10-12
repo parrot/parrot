@@ -252,6 +252,8 @@ static int get_opinfo(yyscan_t yyscanner);
        TK_END               ".end"
        TK_PARAM             ".param"
        TK_LEX               ".lex"
+       TK_LINE              ".line"
+       TK_FILE              ".file"
        TK_LOCAL             ".local"
        TK_NAMESPACE         ".namespace"
        TK_INVOCANT          ".invocant"
@@ -500,10 +502,17 @@ pir_chunk         : sub_def
                   | hll_specifier
                   | hll_mapping
                   | loadlib
+                  | location_directive
                   ;
 
 loadlib           : ".loadlib" TK_STRINGC
                             { load_library(lexer, $2); }
+                  ;
+
+location_directive: ".line" TK_INTC
+                            { yyset_lineno ($2, yyscanner); }
+                  | ".file" TK_STRINGC
+                            { lexer->filename = $2; }
                   ;
 
 /* HLL stuff      */
@@ -656,12 +665,16 @@ statement         : parrot_stat
                   | getresults_stat
                   | null_stat
                   | empty_stat
+                  | location_stat
                   | error_stat
                   ;
 
 /* make sure a new instruction node is created; call set_instr() for that. */
 empty_stat        : "\n"
                         { set_instr(lexer, NULL); }
+                  ;
+
+location_stat     : location_directive "\n"
                   ;
 
 /* "error" is a built-in rule; used for trying to recover. */
@@ -1850,7 +1863,8 @@ fold_i_i(yyscan_t yyscanner, int a, pir_math_operator op, int b) {
             result = (a ^ b);
             break;
         case OP_POW:
-            result = pow(a, b);
+            /* is this cast safe? -- w.r.t. limits of int range. */
+            result = (int)pow(a, b);
             break;
         case OP_CONCAT:
             yyerror(yyscanner, yyget_extra(yyscanner),
@@ -2649,11 +2663,15 @@ convert_3_to_2_args(int opcode, NOTNULL(int *second_op_index)) {
 
         case PARROT_OP_sub_i_i_i:
             return PARROT_OP_sub_i_i;
+
         case PARROT_OP_sub_i_i_ic:
+        case PARROT_OP_sub_i_ic:
             return PARROT_OP_sub_i_ic;
+
         case PARROT_OP_sub_n_n_n:
             return PARROT_OP_sub_n_n;
         case PARROT_OP_sub_n_n_nc:
+        case PARROT_OP_sub_n_nc:
             return PARROT_OP_sub_n_nc;
 
         case PARROT_OP_sub_i_ic_i:
@@ -2705,7 +2723,7 @@ do_strength_reduction(yyscan_t yyscanner) {
 
     /* don't do strength reduction if a "don't do" flag was set */
     if (TEST_FLAG(lexer->flags, LEXER_FLAG_NOSTRENGTHREDUCTION))
-      return;
+        return;
 
     instr = CURRENT_INSTRUCTION(lexer);
 
@@ -2737,7 +2755,7 @@ do_strength_reduction(yyscan_t yyscanner) {
                     arg1->next = arg2->next;
             }
             else if (check_value(arg2->expr.c, 0)) {
-                instr->opcode = PARROT_OP_noop; /* clear this one */
+                update_op(lexer, instr, PARROT_OP_noop); /* clear this one */
             }
             break;
         case PARROT_OP_add_n_nc:
@@ -2777,6 +2795,10 @@ do_strength_reduction(yyscan_t yyscanner) {
         case PARROT_OP_sub_i_ic:
             if (check_value(arg2->expr.c, 1)) { /* sub $I0, 1 --> dec $I0 */
                 update_op(lexer, instr, PARROT_OP_dec_i);
+                if (second_op_index == 2)
+                    arg1->next = arg1;
+                else
+                    arg1->next = arg2->next;
             }
             else if (check_value(arg2->expr.c, 0)) { /* sub $I0, 0 --> noop */
                 update_op(lexer, instr, PARROT_OP_noop);
@@ -3222,6 +3244,7 @@ get_opinfo(yyscan_t yyscanner) {
      */
     if (opcode < 0) {
 
+        /* XXX REMOVE THESE; THESE OPS SHOULD BE REAL OPS; DON"T FAKE THEM */
         /* do these tests only if opcode was not found; this way, the checks are not done
          * for all instructions, but only if the instruction was not found.
          */
