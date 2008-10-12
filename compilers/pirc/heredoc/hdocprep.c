@@ -453,22 +453,21 @@ struct yy_trans_info
     flex_int32_t yy_verify;
     flex_int32_t yy_nxt;
     };
-static yyconst flex_int16_t yy_accept[125] =
+static yyconst flex_int16_t yy_accept[118] =
     {   0,
-        0,    0,    0,    0,   12,   12,    0,    0,    0,    0,
-        0,    0,    0,    0,    0,    0,   21,   14,   13,   14,
-       14,   14,   14,   14,   20,    4,   20,   20,   20,   12,
-       11,   12,   12,   20,   19,   20,   20,   20,    9,   20,
-       20,   20,   10,   20,   20,    6,    5,    6,    6,    6,
-       16,   18,   16,   20,   20,   13,    0,   13,    0,    1,
-        0,    0,    0,    0,    2,    0,    0,    4,    0,    4,
-        0,    1,    0,    0,   12,   11,   12,   12,   19,    0,
-        9,    0,    9,    0,    1,    0,    0,   10,    0,   10,
-        0,    1,    0,    5,    0,   18,    0,   17,    0,    0,
+        0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+        0,    0,    0,    0,   21,   19,    5,   19,   19,   19,
+       19,   19,   20,    4,   20,   20,   20,   18,   15,   17,
+       15,   18,   18,   18,   20,    7,   20,   20,   20,    8,
+       20,   20,   20,    9,   20,   20,   13,   12,   13,   13,
+       13,    5,    0,    1,    0,    0,    0,    0,    2,    0,
+        0,    4,    0,    0,    1,    0,    0,   17,    0,   16,
+        0,    0,    0,    7,    0,    0,    1,    0,    0,    8,
+        0,    0,    1,    0,    0,   10,    0,    9,    0,    1,
+        0,   12,    0,    0,    0,    0,    0,    0,    0,    0,
 
-        0,    0,    0,    0,    0,    0,    0,    0,    8,    0,
-        0,    0,    0,    7,    0,    0,    0,    0,    3,    0,
-        0,    0,   15,    0
+        0,    6,    0,    0,    0,    0,   11,    0,    0,    0,
+        0,    3,    0,    0,    0,   14,    0
     } ;
 
 static yyconst flex_int32_t yy_ec[256] =
@@ -509,116 +508,116 @@ static yyconst flex_int32_t yy_meta[20] =
         1,    1,    1,    1,    1,    1,    1,    1,    1
     } ;
 
-static yyconst flex_int16_t yy_base[149] =
+static yyconst flex_int16_t yy_base[142] =
     {   0,
-        0,    7,   15,   19,   27,   31,   35,   39,   43,   47,
-       51,   55,   59,   66,   74,    0,  220,  221,   23,  216,
-       63,  203,  208,   70,   79,  221,   81,   83,   85,    0,
-      221,  213,   87,  221,  221,  212,   89,   91,  221,   95,
-       97,   99,  221,  101,  103,  221,  221,  211,  105,  204,
-      221,  221,  174,    9,  169,  107,  172,  109,  111,  221,
-      113,  157,    0,  115,  221,  117,  119,  221,  121,  221,
-      123,  221,  125,  127,    0,  221,  129,  131,  221,  133,
-      221,  135,  221,  137,  221,  139,  141,  221,  144,  221,
-      146,  221,  148,  221,  148,  221,  149,  221,    0,  166,
+        0,    7,   15,   19,   28,   34,   39,   43,   47,   51,
+       55,   59,   63,   70,  220,  221,  221,  216,   23,  203,
+      208,   67,   74,  221,   77,   79,   81,  221,  221,  221,
+      176,    9,   83,  171,   85,  221,   87,   91,   93,  221,
+       95,   97,   99,  221,  101,  103,  221,  221,  173,  105,
+      154,  221,  107,  221,  109,  143,    0,  111,  221,  113,
+      115,  221,  117,  119,  221,  121,  123,  221,  123,  221,
+        0,  134,  126,  221,  128,  132,  221,  134,  136,  221,
+      140,  142,  221,  144,  146,  221,  148,  221,  150,  221,
+      152,  221,  152,  121,  153,   85,  162,  156,   68,   52,
 
-       84,  151,   64,  160,  154,   57,   44,  156,  221,    0,
-       49,  154,  161,  221,    0,   45,   29,  165,  221,  167,
-       31,   26,  221,  221,  178,  180,  182,  184,  186,  188,
-      190,  192,  194,  196,  198,   35,  200,  202,  204,  206,
-      208,   31,   27,   23,   11,    1,    0,  210
+      157,  221,    0,   57,  166,  166,  221,    0,   53,   37,
+      169,  221,  171,   39,   34,  221,  221,  180,  182,  184,
+      186,  188,  190,  192,  194,  196,  198,  200,   43,   27,
+      202,  204,  206,  208,  210,  212,   23,   11,    1,    0,
+      214
     } ;
 
-static yyconst flex_int16_t yy_def[149] =
+static yyconst flex_int16_t yy_def[142] =
     {   0,
-      125,  125,  126,  126,  127,  127,  128,  128,  129,  129,
-      130,  130,  131,  131,  128,   15,  124,  124,  124,  124,
-      132,  124,  124,  133,  134,  124,  134,  135,  134,  136,
-      124,  136,  137,  124,  124,  124,  132,  138,  124,  138,
-      139,  140,  124,  140,  141,  124,  124,  124,  132,  124,
-      124,  124,  124,  142,  143,  124,  124,  124,  132,  124,
-      132,  124,  124,  133,  124,  133,  134,  124,  134,  124,
-      135,  124,  135,  134,  136,  124,  137,  137,  124,  138,
-      124,  138,  124,  139,  124,  139,  140,  124,  140,  124,
-      141,  124,  141,  124,  124,  124,  142,  124,  142,  143,
+      118,  118,  119,  119,  120,  120,  121,  121,  122,  122,
+      123,  123,  124,  124,  117,  117,  117,  117,  125,  117,
+      117,  126,  127,  117,  127,  128,  127,  117,  117,  117,
+      117,  129,  125,  130,  131,  117,  131,  132,  133,  117,
+      133,  134,  135,  117,  135,  136,  117,  117,  117,  125,
+      117,  117,  125,  117,  125,  117,  117,  126,  117,  126,
+      127,  117,  127,  128,  117,  128,  127,  117,  129,  117,
+      129,  130,  131,  117,  131,  132,  117,  132,  133,  117,
+      133,  134,  117,  134,  135,  117,  135,  117,  136,  117,
+      136,  117,  117,  117,  137,  138,  127,  139,  140,  117,
 
-      124,  144,  145,  134,  146,  147,  124,  144,  124,  144,
-      145,  148,  146,  124,  146,  147,  124,  148,  124,  148,
-      124,  124,  124,    0,  124,  124,  124,  124,  124,  124,
-      124,  124,  124,  124,  124,  124,  124,  124,  124,  124,
-      124,  124,  124,  124,  124,  124,  124,  124
+      137,  117,  137,  138,  141,  139,  117,  139,  140,  117,
+      141,  117,  141,  117,  117,  117,    0,  117,  117,  117,
+      117,  117,  117,  117,  117,  117,  117,  117,  117,  117,
+      117,  117,  117,  117,  117,  117,  117,  117,  117,  117,
+      117
     } ;
 
 static yyconst flex_int16_t yy_nxt[241] =
     {   0,
-      116,  113,   19,   20,  102,   21,  103,   22,   23,   19,
-       20,  111,   21,   98,   22,   23,   24,   26,   27,   99,
-       28,   26,   27,  108,   28,   56,   57,  100,   29,   31,
-       32,   97,   33,   31,   32,   75,   33,   35,   36,  123,
-       37,   35,   36,  122,   37,   39,   40,  121,   41,   39,
-       40,  114,   41,   43,   44,  109,   45,   43,   44,  117,
-       45,   47,   48,  114,   49,   60,   61,   50,   47,   48,
-      109,   49,   65,   66,   50,   51,   52,   53,   54,   37,
-       55,   68,   69,   70,   69,   72,   73,   68,   69,   60,
-       78,   60,   61,   81,   82,  107,   74,   83,   82,   85,
+      109,  106,   17,   18,   95,   19,   96,   20,   21,   17,
+       18,  104,   19,   70,   20,   21,   22,   24,   25,   71,
+       26,   24,   25,  101,   26,   54,   55,   72,   27,   29,
+       30,   31,   32,   33,   34,   29,   30,   31,   32,   33,
+       34,   36,   37,   69,   38,   36,   37,  116,   38,   40,
+       41,  115,   42,   40,   41,  114,   42,   44,   45,  107,
+       46,   44,   45,  102,   46,   48,   49,  110,   50,   59,
+       60,   51,   48,   49,  107,   50,   62,   63,   51,   62,
+       63,   65,   66,   62,   63,   54,   55,   74,   75,   74,
+       75,  102,   67,   77,   78,   80,   81,   80,   81,   83,
 
-       86,   88,   89,   90,   89,   92,   93,   60,   61,   56,
-       57,   56,   57,   60,   61,   60,   61,   65,   66,   65,
-       66,   68,   69,   68,   69,   72,   73,   72,   73,   68,
-       69,   60,   78,   60,   78,   81,   82,   81,   82,   85,
-       86,   85,   86,   88,   89,  104,   88,   89,   92,   93,
-       92,   93,  105,   98,  106,  109,  119,  120,  114,   99,
-      109,  110,   68,   69,  115,  114,  110,  119,  120,  119,
-      120,  115,   98,  101,   56,   98,   96,  112,   18,   18,
-       25,   25,   30,   30,   34,   34,   38,   38,   42,   42,
-       46,   46,   59,   59,   64,   64,   67,   67,   71,   71,
+       84,   86,   87,   88,   87,   90,   91,   54,   55,   54,
+       55,   54,   55,   59,   60,   59,   60,   62,   63,   62,
+       63,   65,   66,   65,   66,   62,   63,   70,   74,   75,
+       74,   75,  100,   71,   77,   78,   77,   78,   80,   81,
+       70,   97,   80,   81,   83,   84,   83,   84,   86,   87,
+       86,   87,   90,   91,   90,   91,   98,  102,   99,   94,
+      107,  102,   93,  103,   62,   63,  108,  103,  112,  113,
+      107,  112,  113,  112,  113,   92,  108,   70,   68,  105,
+       16,   16,   23,   23,   28,   28,   35,   35,   39,   39,
+       43,   43,   47,   47,   53,   53,   58,   58,   61,   61,
 
-       77,   77,   80,   80,   84,   84,   87,   87,   91,   91,
-      118,  118,   95,   94,   79,   76,   63,   62,   58,  124,
-       17,  124,  124,  124,  124,  124,  124,  124,  124,  124,
-      124,  124,  124,  124,  124,  124,  124,  124,  124,  124
+       64,   64,   73,   73,   76,   76,   79,   79,   82,   82,
+       85,   85,   89,   89,  111,  111,   57,   56,   52,  117,
+       15,  117,  117,  117,  117,  117,  117,  117,  117,  117,
+      117,  117,  117,  117,  117,  117,  117,  117,  117,  117
     } ;
 
 static yyconst flex_int16_t yy_chk[241] =
     {   0,
-      147,  146,    1,    1,   63,    1,   63,    1,    1,    2,
-        2,  145,    2,   54,    2,    2,    2,    3,    3,   54,
-        3,    4,    4,  144,    4,   19,   19,  143,    4,    5,
-        5,  142,    5,    6,    6,  136,    6,    7,    7,  122,
-        7,    8,    8,  121,    8,    9,    9,  117,    9,   10,
-       10,  116,   10,   11,   11,  111,   11,   12,   12,  107,
-       12,   13,   13,  106,   13,   21,   21,   13,   14,   14,
-      103,   14,   24,   24,   14,   15,   15,   15,   15,   15,
-       15,   25,   25,   27,   27,   28,   28,   29,   29,   33,
-       33,   37,   37,   38,   38,  101,   29,   40,   40,   41,
+      140,  139,    1,    1,   57,    1,   57,    1,    1,    2,
+        2,  138,    2,   32,    2,    2,    2,    3,    3,   32,
+        3,    4,    4,  137,    4,   19,   19,  130,    4,    5,
+        5,    5,    5,    5,    5,    6,    6,    6,    6,    6,
+        6,    7,    7,  129,    7,    8,    8,  115,    8,    9,
+        9,  114,    9,   10,   10,  110,   10,   11,   11,  109,
+       11,   12,   12,  104,   12,   13,   13,  100,   13,   22,
+       22,   13,   14,   14,   99,   14,   23,   23,   14,   25,
+       25,   26,   26,   27,   27,   33,   33,   35,   35,   37,
+       37,   96,   27,   38,   38,   39,   39,   41,   41,   42,
 
-       41,   42,   42,   44,   44,   45,   45,   49,   49,   56,
-       56,   58,   58,   59,   59,   61,   61,   64,   64,   66,
-       66,   67,   67,   69,   69,   71,   71,   73,   73,   74,
-       74,   77,   77,   78,   78,   80,   80,   82,   82,   84,
-       84,   86,   86,   87,   87,   74,   89,   89,   91,   91,
-       93,   93,   95,   97,   95,  102,  112,  112,  105,   97,
-      108,  102,  104,  104,  105,  113,  108,  118,  118,  120,
-      120,  113,  100,   62,   57,   55,   53,  104,  125,  125,
-      126,  126,  127,  127,  128,  128,  129,  129,  130,  130,
-      131,  131,  132,  132,  133,  133,  134,  134,  135,  135,
+       42,   43,   43,   45,   45,   46,   46,   50,   50,   53,
+       53,   55,   55,   58,   58,   60,   60,   61,   61,   63,
+       63,   64,   64,   66,   66,   67,   67,   69,   73,   73,
+       75,   75,   94,   69,   76,   76,   78,   78,   79,   79,
+       72,   67,   81,   81,   82,   82,   84,   84,   85,   85,
+       87,   87,   89,   89,   91,   91,   93,   95,   93,   56,
+       98,  101,   51,   95,   97,   97,   98,  101,  105,  105,
+      106,  111,  111,  113,  113,   49,  106,   34,   31,   97,
+      118,  118,  119,  119,  120,  120,  121,  121,  122,  122,
+      123,  123,  124,  124,  125,  125,  126,  126,  127,  127,
 
-      137,  137,  138,  138,  139,  139,  140,  140,  141,  141,
-      148,  148,   50,   48,   36,   32,   23,   22,   20,   17,
-      124,  124,  124,  124,  124,  124,  124,  124,  124,  124,
-      124,  124,  124,  124,  124,  124,  124,  124,  124,  124
+      128,  128,  131,  131,  132,  132,  133,  133,  134,  134,
+      135,  135,  136,  136,  141,  141,   21,   20,   18,   15,
+      117,  117,  117,  117,  117,  117,  117,  117,  117,  117,
+      117,  117,  117,  117,  117,  117,  117,  117,  117,  117
     } ;
 
 /* Table of booleans, true if rule could match eol. */
 static yyconst flex_int32_t yy_rule_can_match_eol[21] =
     {   0,
-1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1,
+1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0,
     0,     };
 
 static yyconst flex_int16_t yy_rule_linenum[20] =
     {   0,
-      317,  319,  322,  326,  333,  335,  357,  372,  389,  401,
-      415,  436,  495,  501,  505,  509,  511,  522,  525
+      301,  303,  306,  310,  317,  320,  337,  349,  371,  390,
+      442,  461,  463,  493,  497,  499,  524,  528,  530
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -641,22 +640,20 @@ static yyconst flex_int16_t yy_rule_linenum[20] =
  * normal strings. Newline characters are escaped.
  * POD comments and line comments are filtered out.
  *
+ *
  */
 
-/* TODO:
-   - there's a weirdness in the SAVELINE state; we need to duplicate
-     the yytext string twice, otherwise things go wrong badly.
-
-   - it might be interesting to improve memory handling to make things
-     a bit more efficient.
-
- */
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <assert.h>
+
+/* to easily switch between parrot's functions and without; for testing */
+/*
+#define LINKPARROT
+*/
+
 
 #ifdef LINKPARROT
 
@@ -665,13 +662,18 @@ static yyconst flex_int16_t yy_rule_linenum[20] =
 
 #else
 
-#define STREQ(x,y)              (0 == strcmp(x,y))
-#define mem_sys_allocate(x)     yyalloc(x,yyscanner)
+#include <assert.h>
+
+#define NULLOK(x)                   x
+#define NOTNULL(x)                  x
+#define STREQ(x,y)                  (0 == strcmp(x,y))
+#define mem_sys_allocate(x)         calloc(1, x)
+#define mem_sys_allocate_zeroed(x)  calloc(1, x)
 #define PARROT_MALLOC
 #define PARROT_WARN_UNUSED_RESULT
 #define PARROT_CANNOT_RETURN_NULL
-#define PARROT_ASSERT(x)        assert(x)
-#define mem_sys_free(x)         yyfree(x,yyscanner)
+#define PARROT_ASSERT(x)            assert(x)
+#define mem_sys_free(x)             free(x)
 
 #endif
 
@@ -680,8 +682,6 @@ static yyconst flex_int16_t yy_rule_linenum[20] =
 
 /* declare the prototype of yylex */
 #define YY_DECL int yylex(yyscan_t yyscanner)
-
-
 
 
 extern char *yyget_text(yyscan_t yyscanner);
@@ -705,6 +705,8 @@ typedef struct global_state {
     YY_BUFFER_STATE file_buffer;   /* needed to store the ref. to the file
                                       when scanning a string buffer */
 
+    FILE           *outfile;        /* output file; or STDOUT if no file is specified */
+
 } global_state;
 
 /* accessor methods for setting and getting the lexer_state */
@@ -713,12 +715,6 @@ typedef struct global_state {
 extern YY_EXTRA_TYPE  yyget_extra(yyscan_t scanner);
 extern void           yyset_extra(YY_EXTRA_TYPE lexer ,yyscan_t scanner);
 
-#define output stdout
-
-/* macro to chop off the last character, typically a newline character,
- * but can also be something else
- */
-#define chop_yytext()   (yytext[--yyleng] = '\0')
 
 
 /*
@@ -736,7 +732,7 @@ Emit an error message.
 
 */
 static void
-lex_error(yyscan_t yyscanner, char const * const message, ...) {
+lex_error(yyscan_t yyscanner, NOTNULL(char const * const message), ...) {
     global_state * const state  = yyget_extra(yyscanner);
     int                  lineno = yyget_lineno(yyscanner);
     va_list              arg_ptr;
@@ -753,34 +749,12 @@ lex_error(yyscan_t yyscanner, char const * const message, ...) {
 }
 
 
-/*
-
-=item C<char *
-dupstr(char * const source)>
-
-The C89 standard does not define a dupstr() in the C library,
-so define our own dupstr. Function names beginning with "str"
-are reserved (I think), so make it dupstr, as that is what it
-does: duplicate a string.
-
-=cut
-
-*/
-PARROT_MALLOC
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-char *
-dupstr(char * const source, yyscan_t yyscanner) {
-    char *newstring = (char *)mem_sys_allocate((strlen(source) + 1) * sizeof (char));
-    strcpy(newstring, source);
-    return newstring;
-}
-
 
 
 /*
 
-=item C<init_global_state>
+=item C<static global_state *
+init_global_state(char * const filename, FILE *outfile)>
 
 create and initialize a global_state structure, containing all 'global'
 variables that are needed during the scanning.
@@ -792,20 +766,23 @@ PARROT_MALLOC
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static global_state *
-init_global_state(char * const filename, yyscan_t yyscanner) {
+init_global_state(NOTNULL(char * const filename), NOTNULL(FILE *outfile)) {
     global_state *state = (global_state *)mem_sys_allocate(sizeof (global_state));
-    state->filename    = filename;
-    state->heredoc     = NULL;
-    state->linebuffer  = dupstr("", yyscanner);
-    state->delimiter   = NULL;
-    state->file_buffer = NULL;
-    state->errors      = 0;
+    state->filename     = filename;
+    state->heredoc      = NULL;
+    state->linebuffer   = NULL;
+    state->delimiter    = NULL;
+    state->file_buffer  = NULL;
+    state->errors       = 0;
+    state->outfile      = outfile;
+
     return state;
 }
 
 /*
 
-=item C<destroy_global_state>
+=item C<static void
+destroy_global_state(global_state * state)>
 
 free all memory of the global state structure.
 
@@ -813,7 +790,7 @@ free all memory of the global state structure.
 
 */
 static void
-destroy_global_state(global_state *state, yyscan_t yyscanner) {
+destroy_global_state(NOTNULL(global_state *state)) {
     if (state->linebuffer)
         mem_sys_free(state->linebuffer);
     if (state->heredoc)
@@ -827,13 +804,13 @@ destroy_global_state(global_state *state, yyscan_t yyscanner) {
 /*
 
 =item C<static void
-scanfile(char * const filename)>
+scanfile(char * const filename, FILE *outputfile)>
 
 =cut
 
 */
 static void
-scanfile(char * const filename) {
+scanfile(NOTNULL(char * const filename), NOTNULL(FILE *outfile)) {
     yyscan_t      yyscanner;
     global_state *state = NULL;
     FILE         *fp;
@@ -851,24 +828,19 @@ scanfile(char * const filename) {
     /* set the scanner to a string buffer and go parse */
     yyset_in(fp,yyscanner);
 
-    state = init_global_state(filename, yyscanner);
+    state = init_global_state(filename, outfile);
 
     yyset_extra(state,yyscanner);
 
     /* the lexer never returns anything, only call it once. Don't give a YYSTYPE object. */
     yylex(yyscanner);
 
-    /*
-    destroy_global_state(state, yyscanner);
-    */
+    destroy_global_state(state);
 
     /* clean up after playing */
     yylex_destroy(yyscanner);
-
-
-
-
 }
+
 /*
 
 =item C<int
@@ -881,13 +853,30 @@ Entry point of the heredoc pre-processor.
 */
 int
 main(int argc, char *argv[]) {
+    FILE *outfile;
+    char *outputfile = "heredoc.out";
+
     /* check for proper usage */
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <file>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
-    scanfile(argv[1]);
+    outfile = fopen(outputfile, "w");
+
+    if (outfile == NULL) {
+        fprintf(stderr, "Failed to open file '%s' for output. Aborting.\n", outputfile);
+        exit(EXIT_FAILURE);
+    }
+
+    fprintf(outfile, "# output generated by %s\n", argv[0]);
+
+    scanfile(argv[1], outfile);
+
+    fclose(outfile);
+
+
+    fprintf(stderr, "heredoc pre-processed successfully.\n");
 
     return 0;
 }
@@ -910,17 +899,15 @@ main(int argc, char *argv[]) {
 
 
 
-
-#line 915 "hdocprep.c"
+#line 903 "hdocprep.c"
 
 #define INITIAL 0
 #define POD 1
-#define HEREDOC 2
-#define HEREDOC2 3
-#define SAVELINE 4
-#define SAVELINE2 5
-#define SCANSTRING 6
-#define INCLUDE 7
+#define INCLUDE 2
+#define SAVE_REST_OF_LINE 3
+#define SAVE_REST_AGAIN 4
+#define HEREDOC_STRING 5
+#define SCAN_STRING 6
 
 #ifndef YY_NO_UNISTD_H
 /* Special case for "unistd.h", since it is non-ANSI. We include it way
@@ -1203,10 +1190,10 @@ YY_DECL
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
 /* %% [7.0] user's declarations go here */
-#line 315 "hdocprep.l"
+#line 299 "hdocprep.l"
 
 
-#line 1210 "hdocprep.c"
+#line 1197 "hdocprep.c"
 
     if ( !yyg->yy_init )
         {
@@ -1270,13 +1257,13 @@ yy_match:
             while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
                 {
                 yy_current_state = (int) yy_def[yy_current_state];
-                if ( yy_current_state >= 125 )
+                if ( yy_current_state >= 118 )
                     yy_c = yy_meta[(unsigned int) yy_c];
                 }
             yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
             ++yy_cp;
             }
-        while ( yy_current_state != 124 );
+        while ( yy_current_state != 117 );
         yy_cp = yyg->yy_last_accepting_cpos;
         yy_current_state = yyg->yy_last_accepting_state;
 
@@ -1332,293 +1319,316 @@ do_action:  /* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 317 "hdocprep.l"
+#line 301 "hdocprep.l"
 { /* ignore line comments */ }
     YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 319 "hdocprep.l"
+#line 303 "hdocprep.l"
 { yy_push_state(POD, yyscanner); }
     YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 322 "hdocprep.l"
+#line 306 "hdocprep.l"
 { /* end of POD comment */
-                         yy_pop_state(yyscanner);
-                       }
+                          yy_pop_state(yyscanner);
+                        }
     YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 326 "hdocprep.l"
+#line 310 "hdocprep.l"
 { /* ignore pod comments */ }
     YY_BREAK
 case YY_STATE_EOF(POD):
-#line 328 "hdocprep.l"
+#line 312 "hdocprep.l"
 { /* we're scanning a POD comment, but encountered end-of-file. */
-                         lex_error(yyscanner, "POD comment not closed!");
-                         yyterminate();
-                       }
+                          lex_error(yyscanner, "POD comment not closed!");
+                          yyterminate();
+                        }
     YY_BREAK
 case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
-#line 333 "hdocprep.l"
-{ /* don't do anything */ }
+#line 317 "hdocprep.l"
+{ fprintf(yyget_extra(yyscanner)->outfile, "\n"); }
     YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 335 "hdocprep.l"
-{ /* echo everything when scanning the string. */
-                         fprintf(output, "%s", yytext);
-                       }
-    YY_BREAK
-case YY_STATE_EOF(SCANSTRING):
-#line 339 "hdocprep.l"
-{ /* end of saved string */
-                         global_state *state = yyget_extra(yyscanner);
-                         PARROT_ASSERT(state->file_buffer);
-                         yy_switch_to_buffer(state->file_buffer,yyscanner);
+#line 320 "hdocprep.l"
+{
+                          global_state * const state = yyget_extra(yyscanner);
 
-                         /* clear the temp. variable; file_buffer is only used to temporarily
-                          * store a reference to the current buffer when we switch from file
-                          * to string scanning; after finishing scanning the string (which
-                          * is now, as we just scanned <<EOF>>), we switch back to the file
-                          * buffer.
-                          */
-                         state->file_buffer = NULL;
+                          state->delimiter = (char *)mem_sys_allocate_zeroed((yyleng - 4 + 1)
+                                                                             * sizeof (char));
 
-                         BEGIN(INITIAL);
+                          strncpy(state->delimiter, yytext + 3, yyleng - 4);
 
-                       }
+                          state->heredoc = (char *)mem_sys_allocate_zeroed(3 * sizeof (char));
+
+                          strcpy(state->heredoc, "\\n");
+
+                          BEGIN(SAVE_REST_OF_LINE);
+
+                        }
     YY_BREAK
 case 7:
+/* rule 7 can match eol */
 YY_RULE_SETUP
-#line 357 "hdocprep.l"
-{ /* 2nd and later heredoc argument */
-                             global_state *state = yyget_extra(yyscanner);
-                             /* yyleng - (4 (for << and 2 quotes), + 1 for NULL character = 3) */
-                             state->delimiter = (char *)mem_sys_allocate((yyleng - 4 + 1)
-                                                                         * sizeof (char));
+#line 337 "hdocprep.l"
+{ /* match the rest of the line */
+                              global_state * const state = yyget_extra(yyscanner);
 
-                             PARROT_ASSERT(state->delimiter);
+                              state->linebuffer = (char *)mem_sys_allocate_zeroed((yyleng + 2)
+                                                                                  * sizeof (char));
 
-                             strncpy(state->delimiter, yytext + 3, yyleng - 4);
-                             state->delimiter[yyleng - 4] = '\0';
-                             state->heredoc = dupstr("", yyscanner);
+                              sprintf(state->linebuffer, "%s\n", yytext);
 
-                             BEGIN(SAVELINE2);
-                           }
+                              BEGIN(HEREDOC_STRING);
+
+                            }
     YY_BREAK
 case 8:
+/* rule 8 can match eol */
 YY_RULE_SETUP
-#line 372 "hdocprep.l"
-{ /* only copy the string after "<<'" and skip the last quote too */
-                         global_state *state = yyget_extra(yyscanner);
-                         /* allocate storage for the delimiter, skip the << and quote characters. */
-                         state->delimiter    = (char *)mem_sys_allocate((yyleng - 4 + 1)
-                                                                        * sizeof (char));
-                         PARROT_ASSERT(state->delimiter);
+#line 349 "hdocprep.l"
+{ /* match the rest of the line */
+                              global_state * const state = yyget_extra(yyscanner);
 
-                         strncpy(state->delimiter, yytext + 3, yyleng - 4);
-                         state->delimiter[yyleng - 4] = '\0';
+                              /* at this point we're saving the rest of the line again,
+                               * so we were scanning the line buffer; free this now to
+                               * prevent memory leaks.
+                               */
+                              PARROT_ASSERT(state->linebuffer != NULL);
+                              mem_sys_free(state->linebuffer);
 
-                         state->heredoc = dupstr("", yyscanner);
+                              state->linebuffer = (char *)mem_sys_allocate_zeroed((yyleng + 2)
+                                                                                  * sizeof (char));
 
+                              sprintf(state->linebuffer, "%s\n", yytext);
 
+                              yy_switch_to_buffer(state->file_buffer,yyscanner);
 
-                         BEGIN(SAVELINE);
-                        }
+                              BEGIN(HEREDOC_STRING);
+
+                            }
     YY_BREAK
 case 9:
 /* rule 9 can match eol */
 YY_RULE_SETUP
-#line 389 "hdocprep.l"
-{ /* this state is used when reading the first heredoc delimiter
-                          * argument. Save the rest of the line and go scan the heredoc.
-                          */
-                         global_state *state = yyget_extra(yyscanner);
+#line 371 "hdocprep.l"
+{
+                              global_state * const state = yyget_extra(yyscanner);
 
-                         PARROT_ASSERT(state->linebuffer != NULL);
+                              int len = strlen(state->heredoc);
 
-                         state->linebuffer = dupstr(yytext, yyscanner);
+                              /* allocate enough space for the current heredoc and an
+                               * escaped newline character, + the NULL character.
+                               */
+                              char *temp = (char *)mem_sys_allocate_zeroed((len + 1 + 2)
+                                                                           * sizeof (char));
 
-                         BEGIN(HEREDOC);
-                       }
+                              sprintf(temp, "%s\\n", state->heredoc);
+
+                              mem_sys_free(state->heredoc);
+
+                              state->heredoc = temp;
+
+                            }
     YY_BREAK
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 401 "hdocprep.l"
-{ /* this state is used when reading the 2nd and later heredoc
-                            delimiter arguments. Save the rest of the line and go scan
-                            the heredoc string. First, though, switch back to the file,
-                            because <SAVELINE2> state is activated when reading a string.
-                          */
-                         global_state *state = yyget_extra(yyscanner);
+#line 390 "hdocprep.l"
+{
+                             global_state * const state = yyget_extra(yyscanner);
 
-                         state->linebuffer = dupstr(yytext, yyscanner);
+                             /* remove the newline character */
+                             /* can this be done through #ifdef, to prevent checks? */
+                             if (yytext[yyleng - 2] == '\r')
+                                 yytext[yyleng - 2] = '\0';
+                             else /* yytext[yyleng - 1] is '\n'. */
+                                 yytext[yyleng - 1] = '\0';
 
-                         yy_switch_to_buffer(state->file_buffer,yyscanner);
+                             if (strcmp(state->delimiter, yytext) == 0) { /* delimiter found? */
 
-                         BEGIN(HEREDOC);
-                       }
+                                 /* done with the delimiter */
+                                 mem_sys_free(state->delimiter);
+                                 state->delimiter = NULL;
+
+                                 /* we're going to scan from the linebuffer, save the current
+                                  * buffer for later (to restore it).
+                                  */
+                                 state->file_buffer = YY_CURRENT_BUFFER;
+
+                                 /* print the flattened heredoc string */
+                                 fprintf(yyget_extra(yyscanner)->outfile, "\"%s\"", state->heredoc);
+
+                                 mem_sys_free(state->heredoc);
+                                 state->heredoc = NULL;
+
+                                 /* now continue with scanning the string that we saved */
+                                 BEGIN(SCAN_STRING);
+
+                                 yy_scan_string(state->linebuffer,yyscanner);
+                             }
+                             else { /* nope, this is part of the heredoc; save this line */
+
+                                 int len = strlen(state->heredoc);
+
+                                 char *temp = (char *)mem_sys_allocate((len + yyleng + 1 + 2)
+                                                                       * sizeof (char));
+
+                                 sprintf(temp, "%s%s\\n", state->heredoc, yytext);
+
+                                 mem_sys_free(state->heredoc);
+
+                                 state->heredoc = temp;
+                             }
+                           }
+    YY_BREAK
+case YY_STATE_EOF(HEREDOC_STRING):
+#line 437 "hdocprep.l"
+{ /* end of file while reading heredoc */
+                              lex_error(yyscanner, "runaway heredoc string");
+                              yyterminate();
+                            }
     YY_BREAK
 case 11:
-/* rule 11 can match eol */
 YY_RULE_SETUP
-#line 415 "hdocprep.l"
-{ /* Scan a newline character, append this to the heredoc, but
-                            escape it.
-                          */
-                         global_state *state = yyget_extra(yyscanner);
+#line 442 "hdocprep.l"
+{ /* a 'nested' heredoc string */
+                              global_state *state = yyget_extra(yyscanner);
 
-                         int           len   = strlen(state->heredoc);
+                              PARROT_ASSERT(state->delimiter == NULL);
 
-                         /* length of heredoc + 1 for NULL character + 2 for escaped '\n' */
-                         char         *temp  = (char *)mem_sys_allocate((len + 3) * sizeof (char));
+                              /* <<"FOO", only save the characters 'F','O','O'. */
+                              state->delimiter = (char *)mem_sys_allocate_zeroed((yyleng - 4 + 1)
+                                                                                 * sizeof (char));
+                              /* strncpy adds the NULL char., according to the spec. */
+                              strncpy(state->delimiter, yytext + 3, yyleng - 4);
 
-                         PARROT_ASSERT(state->heredoc != NULL);
+                              state->heredoc = (char *)mem_sys_allocate_zeroed(3 * sizeof (char));
 
+                              /* an empty heredoc has at least a newline */
+                              strcpy(state->heredoc, "\\n");
 
-                         /* translate "\n" to a "\" and "n" character */
-                         sprintf(temp, "%s\\n", state->heredoc);
-
-
-                         state->heredoc      = temp;
-
-                       }
+                              BEGIN(SAVE_REST_AGAIN);
+                            }
     YY_BREAK
 case 12:
+/* rule 12 can match eol */
 YY_RULE_SETUP
-#line 436 "hdocprep.l"
-{ /* scan heredoc string contents */
-
-                         global_state *state = yyget_extra(yyscanner);
-
-                         /* on windows remove the '\r' character */
-                         if (yytext[yyleng - 1] == '\r') {
-                            chop_yytext();
-                         }
-
-                         if (STREQ(yytext, state->delimiter)) {
-
-                            fprintf(output, "\"%s\"", state->heredoc);
-
-                               /* free the delimiter memory */
-                            mem_sys_free(state->delimiter);
-
-                            state->delimiter = NULL;
-
-                            PARROT_ASSERT(state->heredoc != NULL);
-
-                     /*       mem_sys_free(state->heredoc);
-                     */
-
-                            state->heredoc = dupstr("", yyscanner);
-
-                            /* save the current buffer, because we go scan the
-                             * rest of the string that was saved in <SAVELINE(2)>.
-                             */
-                            state->file_buffer = YY_CURRENT_BUFFER;
-
-                            BEGIN(SCANSTRING);
-
-                            PARROT_ASSERT(state->linebuffer != NULL);
-
-                            yy_scan_string(state->linebuffer,yyscanner);
-
-
-                         }
-                         else {
-                            /* save this heredoc string line */
-                            char * const thisline = dupstr(yytext, yyscanner);
-
-                            state->heredoc = strcat(state->heredoc, thisline);
-                         }
-                       }
-    YY_BREAK
-case YY_STATE_EOF(HEREDOC):
-#line 482 "hdocprep.l"
-{ /* End of file while reading a heredoc string. This is bad. */
-
-                         lex_error(yyscanner, "end of file while reading heredoc string '%s'",
-                                   yyget_extra(yyscanner)->delimiter);
-
-                         yyterminate();
-                       }
-    YY_BREAK
-case YY_STATE_EOF(INITIAL):
-case YY_STATE_EOF(HEREDOC2):
-case YY_STATE_EOF(SAVELINE):
-case YY_STATE_EOF(SAVELINE2):
-case YY_STATE_EOF(INCLUDE):
-#line 491 "hdocprep.l"
-{ /* end of file */
-                         yyterminate();
-                       }
+#line 461 "hdocprep.l"
+{ /* do nothing */ }
     YY_BREAK
 case 13:
-/* rule 13 can match eol */
 YY_RULE_SETUP
-#line 495 "hdocprep.l"
-{ /* we only want to print a single newline instead of all newlines. */
-                         fprintf(output, "\n");
-                       }
+#line 463 "hdocprep.l"
+{ fprintf(yyget_extra(yyscanner)->outfile, "%s", yytext); }
+    YY_BREAK
+case YY_STATE_EOF(SCAN_STRING):
+#line 465 "hdocprep.l"
+{
+                              global_state * const state = yyget_extra(yyscanner);
+
+                              /* switch back to file; */
+                              yy_switch_to_buffer(state->file_buffer,yyscanner);
+
+                              /* done with scanning the rest of the line; free its memory */
+                              mem_sys_free(state->linebuffer);
+                              /* and make sure there's no stray pointers */
+                              state->linebuffer  = NULL;
+
+                              state->file_buffer = NULL;
+
+                              /* make sure the PIR parser will report the right line numbers,
+                               * in case of errors; as the heredoc string, which was X lines,
+                               * is now flattened into 1 line, the line number must be adjusted.
+                               */
+                              fprintf(state->outfile, "\n.line %d\n", yyget_lineno(yyscanner));
+
+                              BEGIN(INITIAL);
+                            }
+    YY_BREAK
+case YY_STATE_EOF(INITIAL):
+#line 489 "hdocprep.l"
+{ /* end of file */
+                              yyterminate();
+                            }
     YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 501 "hdocprep.l"
-{ /* just echo everything else */
-                         fprintf(output, "%s", yytext);
-                       }
+#line 493 "hdocprep.l"
+{ /* .include directives must be handled here */
+                              yy_push_state(INCLUDE, yyscanner);
+                            }
     YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 505 "hdocprep.l"
-{ /* .include directives must be handled here */
-                         yy_push_state(INCLUDE, yyscanner);
-                       }
+#line 497 "hdocprep.l"
+{ /* skip whitespace */ }
     YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 509 "hdocprep.l"
-{ /* skip whitespace */ }
+#line 499 "hdocprep.l"
+{ /* include this file */
+                              global_state * const state = yyget_extra(yyscanner);
+
+                              char * filename = (char *)mem_sys_allocate_zeroed((yyleng - 2 + 1)
+                                                                                * sizeof (char));
+
+                              strncpy(filename, yytext + 1, yyleng - 2);
+
+                              /* make sure that any error messages that occur in the .included
+                               * file will report the right line number and file name.
+                               */
+                              fprintf(state->outfile, ".line 1\n");
+                              fprintf(state->outfile, ".file %s\n", yytext); /* is quoted */
+
+                              scanfile(filename, state->outfile);
+
+                              /* restore the location information; we didn't count the "\n"
+                               * yet that will come after the .include dir.; hence the + 1 now.
+                               */
+                              fprintf(state->outfile, ".line %d\n", yyget_lineno(yyscanner) + 1);
+                              fprintf(state->outfile, ".file '%s'\n", state->filename);
+
+                              mem_sys_free(filename);
+                            }
     YY_BREAK
 case 17:
+/* rule 17 can match eol */
 YY_RULE_SETUP
-#line 511 "hdocprep.l"
-{ /* include this file */
-                         char * filename = dupstr(yytext, yyscanner);
-
-                         filename[strlen(filename) - 1] = '\0';
-                         scanfile(filename + 1);
-
-                         /*mem_sys_free(filename);
-                         */
-
-                       }
+#line 524 "hdocprep.l"
+{ /* after .include "foo.pir", go back to the state we were in */
+                              yy_pop_state(yyscanner);
+                            }
     YY_BREAK
 case 18:
-/* rule 18 can match eol */
 YY_RULE_SETUP
-#line 522 "hdocprep.l"
-{ yy_pop_state(yyscanner); }
+#line 528 "hdocprep.l"
+{ fprintf(stderr, "wrong scanner state\n"); }
     YY_BREAK
 case 19:
-/* rule 19 can match eol */
 YY_RULE_SETUP
-#line 525 "hdocprep.l"
-{ /* do nothing. */ }
+#line 530 "hdocprep.l"
+{
+                              fprintf(yyget_extra(yyscanner)->outfile, "%s", yytext);
+                            }
     YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 527 "hdocprep.l"
+#line 534 "hdocprep.l"
 ECHO;
     YY_BREAK
-#line 1622 "hdocprep.c"
+#line 1628 "hdocprep.c"
+case YY_STATE_EOF(INCLUDE):
+case YY_STATE_EOF(SAVE_REST_OF_LINE):
+case YY_STATE_EOF(SAVE_REST_AGAIN):
+    yyterminate();
 
     case YY_END_OF_BUFFER:
         {
@@ -1925,7 +1935,7 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
         while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
             {
             yy_current_state = (int) yy_def[yy_current_state];
-            if ( yy_current_state >= 125 )
+            if ( yy_current_state >= 118 )
                 yy_c = yy_meta[(unsigned int) yy_c];
             }
         yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
@@ -1959,11 +1969,11 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
     while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
         {
         yy_current_state = (int) yy_def[yy_current_state];
-        if ( yy_current_state >= 125 )
+        if ( yy_current_state >= 118 )
             yy_c = yy_meta[(unsigned int) yy_c];
         }
     yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-    yy_is_jam = (yy_current_state == 124);
+    yy_is_jam = (yy_current_state == 117);
 
     return yy_is_jam ? 0 : yy_current_state;
 }
@@ -2867,7 +2877,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 /* %ok-for-header */
 
-#line 527 "hdocprep.l"
+#line 534 "hdocprep.l"
 
 
 
