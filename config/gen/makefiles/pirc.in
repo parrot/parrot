@@ -104,34 +104,34 @@ help:
 
 
 docs: src/pirlexer.c src/pirparser.c doc/design.pod
-    pod2html --css=http://www.parrotcode.org/css/perl.css src/pirlexer.c > doc/pirlexer.html
-    pod2html --css=http://www.parrotcode.org/css/perl.css src/pirparser.c > doc/pirparser.html
-    pod2html --css=http://www.parrotcode.org/css/perl.css src/pirvtable.c > doc/pirvtable.html
-    pod2html --css=http://www.parrotcode.org/css/perl.css src/pirout.c > doc/pirout.html
-    pod2html --css=http://www.parrotcode.org/css/perl.css src/jsonout.c > doc/jsonout.html
-    pod2html --css=http://www.parrotcode.org/css/perl.css src/pastout.c > doc/pastout.html
-    pod2html --css=http://www.parrotcode.org/css/perl.css src/pirutil.c > doc/pirutil.html
-    pod2html --css=http://www.parrotcode.org/css/perl.css doc/design.pod > doc/design.html
-    pod2html --css=http://www.parrotcode.org/css/perl.css README.pod > doc/README.html
+	pod2html --css=http://www.parrotcode.org/css/perl.css src/pirlexer.c > doc/pirlexer.html
+	pod2html --css=http://www.parrotcode.org/css/perl.css src/pirparser.c > doc/pirparser.html
+	pod2html --css=http://www.parrotcode.org/css/perl.css src/pirvtable.c > doc/pirvtable.html
+	pod2html --css=http://www.parrotcode.org/css/perl.css src/pirout.c > doc/pirout.html
+	pod2html --css=http://www.parrotcode.org/css/perl.css src/jsonout.c > doc/jsonout.html
+	pod2html --css=http://www.parrotcode.org/css/perl.css src/pastout.c > doc/pastout.html
+	pod2html --css=http://www.parrotcode.org/css/perl.css src/pirutil.c > doc/pirutil.html
+	pod2html --css=http://www.parrotcode.org/css/perl.css doc/design.pod > doc/design.html
+	pod2html --css=http://www.parrotcode.org/css/perl.css README.pod > doc/README.html
 
 test: all
-    cd t && prove && cd ..
-    podchecker $(SOURCES) \
-  doc/design.pod \
-  README.pod
+	cd t && prove && cd ..
+	podchecker $(SOURCES) \
+	doc/design.pod \
+	README.pod
 
 # regenerate the Makefile
 Makefile: $(BUILD_DIR)/config/gen/makefiles/pirc.in
-    cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::makefiles --target=compilers/pirc/Makefile
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::makefiles --target=compilers/pirc/Makefile
 
 
 clean:
-    $(RM_F) *$(O)
+	$(RM_F) *$(O)
 
 realclean: clean
-    $(RM_F) \
-  Makefile \
-  pirc$(EXE) \
-  doc/*.html
+	$(RM_F) \
+Makefile \
+pirc$(EXE) \
+doc/*.html
 
 distclean: realclean
