@@ -10,16 +10,14 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdarg.h>
 #include <math.h>
 
 #include "macro.h"
-
 #include "macroparser.h"
-
 #include "lexer.h"
 
 #include "parrot/string_funcs.h"
-
 #include "parrot/parrot.h"
 
 
@@ -36,34 +34,38 @@
 extern YY_DECL;
 
 /* declare yyerror */
-extern int yyerror(yyscan_t yyscanner, lexer_state *lexer, char const * const message, ...);
+int yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message, ...);
 
 #define YYDEBUG         1
 
 
 
 
-static void  process_file(char *filename, lexer_state *lexer);
-static void  process_string(char *buffer, lexer_state *lexer);
-static void  include_file(char *filename, lexer_state *lexer);
-static void  expand(macro_def *macro, list *args, lexer_state *lexer);
-static void  define_constant(constant_table *table, char *name, char *value);
-static void  define_macro(constant_table *table, char *name, list *parameters, char *body);
-static void  emit(char *str);
-static list *new_list(char *first_item);
-static list *add_item(list *L, char *item);
+static void  process_file(char * const filename, lexer_state * const lexer);
+static void  process_string(char * const buffer, lexer_state * const lexer);
+static void  include_file(char * const filename, lexer_state * const lexer);
+static void  expand(macro_def * const macro, list *args, lexer_state * const lexer);
+static void  define_constant(constant_table * const table, char * const name, char * const value);
 
-static char *munge_id(char *label_id, int is_label_declaration, lexer_state *lexer);
-static constant_table *new_constant_table(constant_table *current, lexer_state *lexer);
-static constant_table *pop_constant_table(lexer_state *lexer);
+static void  define_macro(constant_table * const table, char * const name, list * const parameters,
+                          char * const body);
+
+static void  emit(lexer_state * const lexer, char * const str);
+static list *new_list(char * const first_item);
+static list *add_item(list * const L, char * const item);
+
+static char *munge_id(char * const label_id, int is_label_declaration, lexer_state * const lexer);
+static constant_table *new_constant_table(constant_table * const current, lexer_state * const lexer);
+static constant_table *pop_constant_table(lexer_state * const lexer);
 static void delete_constant_table(constant_table *table);
-static void update_unique_id(lexer_state *lexer);
+static void update_unique_id(lexer_state * const lexer);
 
-macro_def *find_macro(constant_table *table, char *name);
+macro_def *find_macro(constant_table * const table, char * const name);
 
-extern char *dupstr(char *str);
+extern char *dupstr(char * const str);
 
 char *concat(char *str1, char *str2, int insert_space);
+char *concatn(int insert_space, unsigned numargs, ...);
 
 
 %}
@@ -82,7 +84,6 @@ char *concat(char *str1, char *str2, int insert_space);
        TK_MACRO_CONST               ".macro_const"
        TK_MACRO_LOCAL               ".macro_local"
        TK_MACRO_LABEL               ".macro_label"
-       TK_LINE                      ".line"
 
 %token <sval> TK_INT                "int"
        <sval> TK_NUM                "num"
@@ -148,97 +149,93 @@ char *concat(char *str1, char *str2, int insert_space);
 %%
 
 
-program        :
-               | opt_nl statements opt_nl
-               ;
+program               :
+                      | opt_nl statements opt_nl
+                      ;
 
-opt_nl         : /* empty */
-               | "\n"
-               ;
+opt_nl                : /* empty */
+                      | "\n"
+                      ;
 
-statements     : statement
-               | statements newline
-                 statement
-               ;
+statements            : statement
+                      | statements newline
+                        statement
+                      ;
 
-newline        : "\n"
-                 { emit("\n");  /* after each statement, emit a newline */ }
-               ;
+newline               : "\n"
+                            { emit(lexer, "\n");  /* after each statement, emit a newline */ }
+                      ;
 
 /* handle macro definitions, expansions, include statements
  * and constant definitions. Anything else is skipped.
  */
-statement      : macro_definition
-               | include_statement
-               | macro_const_definition
-               | line_directive
-               | anything
-               ;
+statement             : macro_definition
+                      | include_statement
+                      | macro_const_definition
+                      | anything
+                      ;
 
-line_directive : ".line" TK_INTC opt_filename
-                 { emit("setline");
-                   emit($2);
-                 }
-               ;
-
-opt_filename   : /* empty */
-               | ',' TK_STRINGC
-                 { emit("setfile");
-                   emit($2);
-                   emit("\n");
-                 }
-               ;
 
 /* skip any thing else */
-anything       : any
-               | anything any
-               ;
+anything              : any
+                      | anything any
+                      ;
 
-any            : TK_ANY                          { emit($1); }
-               | TK_DOT_IDENT arguments          { expand($1, $2, lexer); }
-               | TK_LABEL_EXPANSION              { char *label = munge_id($1, 1, lexer);
-                                                   emit(label);
-                                                 } /* LABEL: */
-               | TK_UNIQUE_LABEL                 { char *label = munge_id($1, 1, lexer);
-                                                   emit(label);
-                                                 }
-               | TK_UNIQUE_LOCAL                 { char *local = munge_id($1, 0, lexer);
-                                                   emit(local);
-                                                 }
-               | TK_VAR_EXPANSION                { char *label = munge_id($1, 0, lexer);
-                                                   emit(label);
-                                                 } /* .$VAR */
-               ;
+any                   : TK_ANY
+                            { emit(lexer, $1); }
+                      | TK_DOT_IDENT arguments
+                            { expand($1, $2, lexer); }
+                      | TK_LABEL_EXPANSION              /* LABEL: */
+                            {
+                              char *label = munge_id($1, 1, lexer);
+                              emit(lexer, label);
+                            }
+                      | TK_UNIQUE_LABEL
+                            {
+                              char *label = munge_id($1, 1, lexer);
+                              emit(lexer, label);
+                            }
+                      | TK_UNIQUE_LOCAL
+                            {
+                              char *local = munge_id($1, 0, lexer);
+                              emit(lexer, local);
+                            }
+                      | TK_VAR_EXPANSION        /* .$VAR */
+                            { char *label = munge_id($1, 0, lexer);
+                              emit(lexer, label);
+                            }
+                      ;
 
 
 include_statement     : ".include" TK_STRINGC
-                        { include_file($2, lexer); }
+                            { include_file($2, lexer); }
                       ;
 
 macro_const_definition: ".macro_const" TK_IDENT expression
-                        { define_constant(lexer->globaldefinitions, $2, $3); }
+                            { define_constant(lexer->globaldefinitions, $2, $3); }
                       ;
 
 
 
-macro_definition      : ".macro" TK_IDENT
-                        parameters "\n"
+macro_definition      : ".macro" TK_IDENT parameters "\n"
                         opt_macro_body
                         ".endm"
-                        { define_macro(lexer->globaldefinitions, $2, $3, $5); }
+                            { define_macro(lexer->globaldefinitions, $2, $3, $5); }
                       ;
 
-opt_macro_body        : /* empty, make sure the macro body is a valid string. */ { $$ = ""; }
-                      | macro_body  { $$ = $1;   }
+opt_macro_body        : /* empty */
+                            { $$ = ""; } /*  make sure the macro body is a valid string. */
+                      | macro_body
                       ;
 
-macro_body            : body_token               { $$ = $1; }
-                      | macro_body body_token    { $$ = concat($1, $2, 1); }
+macro_body            : body_token
+                      | macro_body body_token
+                            { $$ = concat($1, $2, 1); }
                       ;
 
-body_token            : TK_ANY                   { $$ = $1; }
-                      | label_declaration        { $$ = $1; }
-                      | local_declaration        { $$ = $1; }
+body_token            : TK_ANY
+                      | label_declaration
+                      | local_declaration
                       ;
 
 label_declaration     : ".macro_label" TK_LABEL_ID
@@ -246,62 +243,73 @@ label_declaration     : ".macro_label" TK_LABEL_ID
                       ;
 
 local_declaration     : ".macro_local" type TK_LOCAL_ID
-                        { /* create a string like ".local <type> <id>" */
-                          $$ = dupstr(".local");
-                          $$ = concat($$, $2, 1);
-                          $$ = concat($$, $3, 1);
-                        }
+                            { /* create a string like ".local <type> <id>" */
+                              $$ = concatn(1, 3, ".local", $2, $3);
+                            }
                       ;
 
-type          : "int"
-              | "pmc"
-              | "num"
-              | "string"
-              ;
+type                  : "int"
+                      | "pmc"
+                      | "num"
+                      | "string"
+                      ;
 
-parameters    : /* empty */              { $$ = NULL; }
-              | '(' opt_param_list ')'   { $$ = $2;   }
-              ;
+parameters            : /* empty */
+                            { $$ = NULL; }
+                      | '(' opt_param_list ')'
+                            { $$ = $2;   }
+                      ;
 
-opt_param_list: /* empty */          { $$ = NULL; }
-              | param_list           { $$ = $1;   }
-              ;
+opt_param_list        : /* empty */
+                            { $$ = NULL; }
+                      | param_list
+                      ;
 
-param_list    : TK_IDENT                 { $$ = new_list($1); }
-              | param_list ',' TK_IDENT  { $$ = add_item($1, $3); }
-              ;
+param_list            : TK_IDENT
+                            { $$ = new_list($1); }
+                      | param_list ',' TK_IDENT
+                            { $$ = add_item($1, $3); }
+                      ;
 
-arguments     : /* empty */               { $$ = NULL; }
-              | '(' opt_arg_list ')'      { $$ = $2;   }
-              ;
+arguments             : /* empty */
+                            { $$ = NULL; }
+                      | '(' opt_arg_list ')'
+                            { $$ = $2;   }
+                      ;
 
-opt_arg_list  : /* empty */   { $$ = NULL; }
-              | arg_list      { $$ = $1;   }
-              ;
+opt_arg_list          : /* empty */
+                            { $$ = NULL; }
+                      | arg_list
+                      ;
 
-arg_list      : arg               { $$ = new_list($1); }
-              | arg_list ',' arg  { $$ = add_item($1, $3); }
-              ;
+arg_list              : arg
+                            { $$ = new_list($1); }
+                      | arg_list ',' arg
+                            { $$ = add_item($1, $3); }
+                      ;
 
-arg           : expression { $$ = $1; }
-              | braced_arg { $$ = $1; }
-              ;
+arg                   : expression
+                      | braced_arg
+                      ;
 
-braced_arg    : '{' long_arg '}' { $$ = $2; }
-              ;
+braced_arg            : '{' long_arg '}'
+                            { $$ = $2; }
+                      ;
 
-long_arg      : /* empty */      { $$ = ""; }
-              | long_arg TK_ANY  { $$ = concat($1, $2, 0); }
-              ;
+long_arg              : /* empty */
+                            { $$ = ""; }
+                      | long_arg TK_ANY
+                            { $$ = concat($1, $2, 0); }
+                      ;
 
 
 /* all types of expressions can probably be handled as a more generic token, such as "TK_EXPR"
  * we don't care if it's a string or a number; it's just text replacing. */
-expression    : TK_IDENT
-              | TK_NUMC
-              | TK_INTC
-              | TK_STRINGC
-              ;
+expression            : TK_IDENT
+                      | TK_NUMC
+                      | TK_INTC
+                      | TK_STRINGC
+                      ;
 
 
 
@@ -323,10 +331,8 @@ Returns the newly created node.
 
 */
 static list *
-new_list(char *first_item) {
+new_list(char * const first_item) {
     list *L = (list *)mem_sys_allocate_zeroed(sizeof (list));
-
-
     L->item = first_item;
     return L;
 }
@@ -345,9 +351,9 @@ same as was specified).
 
 */
 static list *
-add_item(list *L, char *item) {
+add_item(list * const L, char * const item) {
     list *iter = L;
-    assert(iter != NULL);
+    PARROT_ASSERT(iter != NULL);
 
     /* the item is added at the end of the list. This
      * can be done more efficiently, but for now this works.
@@ -372,8 +378,8 @@ Process the specified file.
 
 */
 static void
-include_file(char *filename, lexer_state *lexer) {
-    assert(filename != NULL);
+include_file(char * const filename, lexer_state * const lexer) {
+    PARROT_ASSERT(filename != NULL);
     fprintf(stderr, "including: %s\n", filename);
     /* remove closing quote */
     filename[strlen(filename) - 1] = '\0';
@@ -389,7 +395,7 @@ include_file(char *filename, lexer_state *lexer) {
 
 */
 static void
-update_unique_id(lexer_state *lexer) {
+update_unique_id(lexer_state * const lexer) {
     /* each expansion has a unique id that is used for label/local munging */
     lexer->id_gen++;
     /* Count number of digits:
@@ -411,7 +417,7 @@ Expand the specified macro (or constant).
 
 */
 static void
-expand(macro_def *macro, list *args, lexer_state *lexer) {
+expand(macro_def * const macro, list * args, lexer_state * const lexer) {
     /* construct a map data structure that maps the argument values to the parameter names */
     /* enter the parameters as temporary symbols (.macro_const) */
     constant_table *macro_params = new_constant_table(lexer->globaldefinitions, lexer);
@@ -460,7 +466,7 @@ expand(macro_def *macro, list *args, lexer_state *lexer) {
 
 
 static void
-define_constant( constant_table *table, char *name, char *value) {
+define_constant(constant_table * const table, char * const name, char * const value) {
 
     macro_def *def = (macro_def *)mem_sys_allocate_zeroed(sizeof (macro_def));
 
@@ -475,7 +481,8 @@ define_constant( constant_table *table, char *name, char *value) {
 
 /*
 
-=item C<define_macro>
+=item C<void
+define_macro(constant_table * const table, char * const name, list * const parameters)>
 
 Define a macro by the given name, parameters and body.
 
@@ -483,7 +490,9 @@ Define a macro by the given name, parameters and body.
 
 */
 static void
-define_macro(constant_table *table, char *name, list *parameters, char *body) {
+define_macro(constant_table * const table, char * const name, list * const parameters,
+             char * const body)
+{
     struct macro_def *macro   = (struct macro_def *)mem_sys_allocate(sizeof (struct macro_def));
 
     /* initialize the fields */
@@ -499,7 +508,8 @@ define_macro(constant_table *table, char *name, list *parameters, char *body) {
 
 /*
 
-=item C<find_macro>
+=item C<macro_def *
+find_macro(constant_table * const table, char * const name)>
 
 Find the specified macro. If the specified macro does not exist,
 NULL is returned.
@@ -508,9 +518,9 @@ NULL is returned.
 
 */
 macro_def *
-find_macro(constant_table *table, char *name) {
+find_macro(constant_table * const table, char * const name) {
     macro_def *iter = table->definitions;
-    assert(name != NULL);
+    PARROT_ASSERT(name != NULL);
 
     /* iterate over the list and compare each node's name */
     while (iter != NULL) {
@@ -536,9 +546,9 @@ inserted between the two strings.
 =cut
 
 */
-char *
+static char *
 concat(char * str1, char * str2, int need_space) {
-    assert (str2 != NULL);
+    PARROT_ASSERT (str2 != NULL);
     if (str1 == NULL) {
         return str2;
     }
@@ -562,6 +572,56 @@ concat(char * str1, char * str2, int need_space) {
     }
 }
 
+/*
+
+=item C<static char *
+concatn(int need_space, unsigned numargs, ...)>
+
+Concatenate C<numargs> strings together into one new string. If C<need_space> is
+non-zero, the strings are separated by a space.
+
+=cut
+
+*/
+static char *
+concatn(int need_space, unsigned numargs, ...) {
+    va_list  arg_ptr;
+    unsigned iter;
+    char   **args;
+    size_t   totalsize = 1; /* always 1 for NULL character */
+    char    *result;
+    size_t   result_index = 0;
+
+    args = (char **)mem_sys_allocate(numargs * sizeof (char *));
+
+    va_start(arg_ptr, numargs);
+
+    for (iter = 0; iter < numargs; iter++) {
+        /* store the argument in an array */
+        args[iter] = va_arg(arg_ptr, char *);
+        /* update total length so far */
+        totalsize += strlen(args[iter]);
+    }
+
+    va_end(arg_ptr);
+
+    if (need_space) /* then also allocate for separating spaces */
+        totalsize += numargs - 1; /* 10 arguments would be separated by 9 spaces */
+
+    result = (char *)mem_sys_allocate_zeroed(totalsize * sizeof (char));
+
+    for (iter = 0; iter < numargs; iter++) {
+        /* sprintf returns the number of characters printed; use that as an offset for next time */
+        result_index += sprintf(result + result_index, "%s%s", args[iter], need_space ? " " : "");
+        /* free old memory */
+        mem_sys_free(args[iter]);
+    }
+
+    mem_sys_free(args);
+
+    return result;
+}
+
 /* short-cut to check for a label; last character must be ":" */
 #define is_label(X)     (X[strlen(X) - 1] == ':')
 
@@ -571,7 +631,8 @@ concat(char * str1, char * str2, int need_space) {
 
 /*
 
-=item C<emit>
+=item C<static void
+emit(lexer_state * const lexer, char * const str)>
 
 Emit the specified string. This function will be the "gateway" to the
 output file. All tokens except C<.sub>, C<.end> and C<.namespace> are indented.
@@ -581,7 +642,12 @@ All tokens are separated with a space,  C<)>, C<]>, C<,>.
 
 */
 static void
-emit(char *str) {
+emit(lexer_state * const lexer, char * const str) {
+    fprintf(lexer->outfile, "%s ", str);
+}
+
+static void
+pretty_print(char * const str) {
     FILE *output = stdout;
     /* globals! */
     static int just_nl    = 1;
@@ -630,12 +696,6 @@ emit(char *str) {
 
 }
 
-void
-emit_int(int val) {
-    FILE *output = stdout;
-    fprintf(output, "%d ", val);
-}
-
 /*
 
 =item C<new_constant_table>
@@ -644,7 +704,7 @@ emit_int(int val) {
 
 */
 static constant_table *
-new_constant_table(constant_table *current, lexer_state *lexer) {
+new_constant_table(constant_table * const current, lexer_state * const lexer) {
     constant_table *table    = (constant_table *)mem_sys_allocate(sizeof (constant_table));
     table->definitions       = NULL;
     table->prev              = current;
@@ -661,7 +721,7 @@ new_constant_table(constant_table *current, lexer_state *lexer) {
 
 */
 static constant_table *
-pop_constant_table(lexer_state *lexer) {
+pop_constant_table(lexer_state * const lexer) {
     constant_table *popped   = lexer->globaldefinitions;
     lexer->globaldefinitions = popped->prev;
     return popped;
@@ -678,9 +738,10 @@ static void
 delete_constant_table(constant_table *table) {
     /* destroy all definitions */
     macro_def *iter = table->definitions;
+
     while (iter != NULL) {
         macro_def *temp = iter;
-        iter = iter->next;
+        iter            = iter->next;
         mem_sys_free(temp);
     }
     mem_sys_free(table);
@@ -709,16 +770,16 @@ argument must be 0 for that.
 
 */
 static char *
-munge_id(char *id, int is_label_declaration, lexer_state *lexer) {
+munge_id(char * const id, int is_label_declaration, lexer_state * const lexer) {
     /* the format of the generated label: */
-    char const * const format = "_unique_%s_%s_%d%s";
-    int const format_length   = strlen(format);
+    char const * const format        = "_unique_%s_%s_%d%s";
+    int  const         format_length = strlen(format);
 
     /* calculate length of the generated label: length of macro name,
      * plus length of label name.
      */
     int   length    = format_length + strlen(lexer->macro_id) + lexer->num_digits;
-    char *munged_id = NULL;
+    char *munged_id;
 
     length += strlen(id);
 
@@ -726,10 +787,11 @@ munge_id(char *id, int is_label_declaration, lexer_state *lexer) {
         length++; /* reserve 1 more byte for the ":" */
 
     munged_id = (char *)mem_sys_allocate((length + 1) * sizeof (char));
-    assert(munged_id != NULL);
+
     /* generate the identifier; if it's a declaration, then add the colon. */
     sprintf(munged_id, format, lexer->macro_id, id, lexer->unique_id,
             is_label_declaration ? ":" : "");
+
     return munged_id;
 }
 
@@ -737,7 +799,8 @@ munge_id(char *id, int is_label_declaration, lexer_state *lexer) {
 
 /*
 
-=item C<process_string>
+=item C<static void
+process_string(char * const buffer, lexer_state * const lexer)>
 
 Process the string stored in C<buffer>. First a new yyscan_t
 object is created, initialized, after which the specified
@@ -746,15 +809,15 @@ buffer is parsed. Afterwards the yyscan_t object is destroyed.
 =cut
 
 */
-void
-process_string(char *buffer, lexer_state *lexer) {
+static void
+process_string(char * const buffer, lexer_state * const lexer) {
     /* initialize a yyscan_t object */
     yyscan_t yyscanner;
     macrolex_init(&yyscanner);
 
     macroset_debug(lexer->flexdebug, yyscanner);
     macroset_extra(lexer, yyscanner);
-    assert(buffer != NULL);
+    PARROT_ASSERT(buffer != NULL);
     /* set the scanner to a string buffer and go parse */
     macro_scan_string(buffer, yyscanner);
     yyparse(yyscanner, lexer);
@@ -764,63 +827,55 @@ process_string(char *buffer, lexer_state *lexer) {
 
 /*
 
-=item C<process_file>
+=item C<static void
+process_file(char * const filename, lexer_state * const lexer)>
 
 Process the specified file.
 
 =cut
 
 */
-void
-process_file(char *filename, lexer_state *lexer) {
-    FILE *fp = NULL;
-    yyscan_t yyscanner;
+static void
+process_file(char * const filename, lexer_state * const lexer) {
+    char     *temp_file;
+    FILE     *fp;
+    yyscan_t  yyscanner;
 
-    if (filename == NULL) { /* no file name means reading from stdin. */
+    if (filename == NULL)  /* no file name means reading from stdin. */
         fp = stdin;
-    }
-    else { /* open the specified file */
+    else  /* open the specified file */
         fp = fopen(filename, "r");
-    }
 
     if (fp == NULL) {
         fprintf(stderr, "Failed to open file %s\n", filename);
+        return;
     }
-    else {
-        /* save current state of lexer, these are overwritten, so that
-         * error messages indicate an error in the string (macro body).
-         */
-        int temp_line   = lexer->line;
-        char *temp_file = lexer->currentfile;
 
-        /* construct a yylex_t object */
-        macrolex_init(&yyscanner);
-        macroset_in(fp, yyscanner);
-        macroset_debug(lexer->flexdebug, yyscanner);
-        macroset_extra(lexer, yyscanner);
+    /* save current state of lexer, these are overwritten, so that
+     * error messages indicate an error in the string (macro body).
+     */
+    temp_file = lexer->currentfile;
 
-        /* emit directives that set the file/line */
-/* they must be within compilation unit; this doesn't happen right now...
-        emit("setfile");
-        emit(filename);
-        emit("setline");
-        emit_int(1);
-*/
+    /* construct a yylex_t object */
+    macrolex_init(&yyscanner);
+    macroset_in(fp, yyscanner);
+    macroset_debug(lexer->flexdebug, yyscanner);
+    macroset_extra(lexer, yyscanner);
 
-        /* go parse the file */
-        yyparse(yyscanner, lexer);
-        /* and clean up */
-        macrolex_destroy(yyscanner);
+    /* go parse the file */
+    yyparse(yyscanner, lexer);
+    /* and clean up */
+    macrolex_destroy(yyscanner);
 
-        /* restore state of lexer */
-        lexer->line        = temp_line;
-        lexer->currentfile = temp_file;
-    }
+    /* restore state of lexer */
+    lexer->currentfile = temp_file;
+
 }
 
 /*
 
-=item C<print_help>
+=item C<static void
+print_help(char const * const programname)>
 
 =cut
 
@@ -837,7 +892,8 @@ print_help(char const * const programname) {
 
 /*
 
-=item C<yyerror>
+=item C<int
+yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message, ...)>
 
 Function for syntax error handling.
 
@@ -845,16 +901,26 @@ Function for syntax error handling.
 
 */
 int
-yyerror(yyscan_t yyscanner, lexer_state *lexer, char const * const message, ...) {
-    fprintf(stderr, "Error in '%s' (line %d): %s\n", lexer->currentfile, lexer->line, message);
-    lexer->errors++;
+yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message, ...) {
+    va_list arg_ptr;
+
+    fprintf(stderr, "Error in '%s' (line %d): ", lexer->currentfile, macroget_lineno(yyscanner));
+
+    va_start(arg_ptr, message);
+    vfprintf(stderr, message, arg_ptr);
+    va_end(arg_ptr);
+
+    puts("");
+
+    ++lexer->errors;
     return 0;
 }
 
 
 /*
 
-=item C<main>
+=item C<int
+main(int argc, char *argv[])>
 
 Pre-processor main function.
 
@@ -870,16 +936,15 @@ main(int argc, char *argv[]) {
     argc--;
     argv++;
 
-    lexer = (lexer_state *)malloc(sizeof (lexer_state));
-    memset(lexer, 0, sizeof (lexer_state));
-    assert(lexer != NULL);
-    lexer->unique_id = 0;
-    lexer->line      = 1;
-    lexer->errors    = 0;
-    lexer->flexdebug = 0;
-    lexer->macro_id  = NULL;
+    lexer = (lexer_state *)mem_sys_allocate_zeroed(sizeof (lexer_state));
+
+    lexer->unique_id         = 0;
+    lexer->errors            = 0;
+    lexer->flexdebug         = 0;
+    lexer->macro_id          = NULL;
     lexer->globaldefinitions = new_constant_table(NULL, lexer);
 
+    lexer->outfile           = stdout;
 
     /* very basic argument handling; I'm too lazy to check out
      * the standard funtion for that, right now. This is a TODO.
@@ -923,7 +988,7 @@ main(int argc, char *argv[]) {
 
     /* clean up and go home */
     delete_constant_table(lexer->globaldefinitions);
-    free(lexer);
+    mem_sys_free(lexer);
 
     return 0;
 }

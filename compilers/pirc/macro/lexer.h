@@ -8,16 +8,15 @@
 
 
 typedef struct lexer_state {
-    constant_table *globaldefinitions;
-    char *currentfile;
-    int   errors;
-    int   flexdebug;
-    char *macro_id;
-    int   line;
-    int   id_gen;     /* generator for unique ids */
-    int   unique_id;  /* unique number for generated locals and labels */
-    int   num_digits; /* keep track of number of digits in unique_id */
-
+    constant_table *globaldefinitions;        /* symbol table */
+    char           *currentfile;              /* file being processed */
+    int             errors;                   /* error counter */
+    int             flexdebug;                /* debug flag */
+    char           *macro_id;
+    int             id_gen;                   /* generator for unique ids */
+    int             unique_id;                /* unique number for generated locals and labels */
+    int             num_digits;               /* keep track of number of digits in unique_id */
+    FILE           *outfile;
 
 } lexer_state;
 

@@ -6,7 +6,7 @@
 #define PARROT_PIR_MACRO_H_GUARD
 
 typedef struct list {
-    char *item;
+    char        *item;
 
     struct list *next;
 
@@ -14,10 +14,10 @@ typedef struct list {
 
 
 typedef struct macro_def {
-    char *name;
-    char *body;
-    int   line_defined;
-	list *parameters;
+    char             *name;
+    char             *body;
+    int               line_defined;
+    list             *parameters;
 
     struct macro_def *next;
 
@@ -34,13 +34,13 @@ typedef struct macro_def {
  * table pointed to by the "prev" field.
  */
 typedef struct constant_table {
-	macro_def *definitions;
-	/* constant tables are linked through this pointer,
-	 * and organized as a stack. If a constant is not found
-	 * in this table, then the previous table is tried, and so on,
-	 * while there is a previous table.
-	 */
-	struct constant_table *prev;
+    macro_def *definitions;
+    /* constant tables are linked through this pointer,
+     * and organized as a stack. If a constant is not found
+     * in this table, then the previous table is tried, and so on,
+     * while there is a previous table.
+     */
+    struct constant_table *prev;
 
 } constant_table;
 

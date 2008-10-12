@@ -81,24 +81,23 @@
      TK_MACRO_CONST = 262,
      TK_MACRO_LOCAL = 263,
      TK_MACRO_LABEL = 264,
-     TK_LINE = 265,
-     TK_INT = 266,
-     TK_NUM = 267,
-     TK_STRING = 268,
-     TK_PMC = 269,
-     TK_IDENT = 270,
-     TK_ANY = 271,
-     TK_BODY = 272,
-     TK_DOT_IDENT = 273,
-     TK_LABEL_ID = 274,
-     TK_LOCAL_ID = 275,
-     TK_VAR_EXPANSION = 276,
-     TK_LABEL_EXPANSION = 277,
-     TK_UNIQUE_LABEL = 278,
-     TK_UNIQUE_LOCAL = 279,
-     TK_STRINGC = 280,
-     TK_NUMC = 281,
-     TK_INTC = 282
+     TK_INT = 265,
+     TK_NUM = 266,
+     TK_STRING = 267,
+     TK_PMC = 268,
+     TK_IDENT = 269,
+     TK_ANY = 270,
+     TK_BODY = 271,
+     TK_DOT_IDENT = 272,
+     TK_LABEL_ID = 273,
+     TK_LOCAL_ID = 274,
+     TK_VAR_EXPANSION = 275,
+     TK_LABEL_EXPANSION = 276,
+     TK_UNIQUE_LABEL = 277,
+     TK_UNIQUE_LOCAL = 278,
+     TK_STRINGC = 279,
+     TK_NUMC = 280,
+     TK_INTC = 281
    };
 #endif
 /* Tokens.  */
@@ -109,24 +108,23 @@
 #define TK_MACRO_CONST 262
 #define TK_MACRO_LOCAL 263
 #define TK_MACRO_LABEL 264
-#define TK_LINE 265
-#define TK_INT 266
-#define TK_NUM 267
-#define TK_STRING 268
-#define TK_PMC 269
-#define TK_IDENT 270
-#define TK_ANY 271
-#define TK_BODY 272
-#define TK_DOT_IDENT 273
-#define TK_LABEL_ID 274
-#define TK_LOCAL_ID 275
-#define TK_VAR_EXPANSION 276
-#define TK_LABEL_EXPANSION 277
-#define TK_UNIQUE_LABEL 278
-#define TK_UNIQUE_LOCAL 279
-#define TK_STRINGC 280
-#define TK_NUMC 281
-#define TK_INTC 282
+#define TK_INT 265
+#define TK_NUM 266
+#define TK_STRING 267
+#define TK_PMC 268
+#define TK_IDENT 269
+#define TK_ANY 270
+#define TK_BODY 271
+#define TK_DOT_IDENT 272
+#define TK_LABEL_ID 273
+#define TK_LOCAL_ID 274
+#define TK_VAR_EXPANSION 275
+#define TK_LABEL_EXPANSION 276
+#define TK_UNIQUE_LABEL 277
+#define TK_UNIQUE_LOCAL 278
+#define TK_STRINGC 279
+#define TK_NUMC 280
+#define TK_INTC 281
 
 
 
@@ -145,16 +143,14 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdarg.h>
 #include <math.h>
 
 #include "macro.h"
-
 #include "macroparser.h"
-
 #include "lexer.h"
 
 #include "parrot/string_funcs.h"
-
 #include "parrot/parrot.h"
 
 
@@ -171,34 +167,38 @@
 extern YY_DECL;
 
 /* declare yyerror */
-extern int yyerror(yyscan_t yyscanner, lexer_state *lexer, char const * const message, ...);
+int yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message, ...);
 
 #define YYDEBUG         1
 
 
 
 
-static void  process_file(char *filename, lexer_state *lexer);
-static void  process_string(char *buffer, lexer_state *lexer);
-static void  include_file(char *filename, lexer_state *lexer);
-static void  expand(macro_def *macro, list *args, lexer_state *lexer);
-static void  define_constant(constant_table *table, char *name, char *value);
-static void  define_macro(constant_table *table, char *name, list *parameters, char *body);
-static void  emit(char *str);
-static list *new_list(char *first_item);
-static list *add_item(list *L, char *item);
+static void  process_file(char * const filename, lexer_state * const lexer);
+static void  process_string(char * const buffer, lexer_state * const lexer);
+static void  include_file(char * const filename, lexer_state * const lexer);
+static void  expand(macro_def * const macro, list *args, lexer_state * const lexer);
+static void  define_constant(constant_table * const table, char * const name, char * const value);
 
-static char *munge_id(char *label_id, int is_label_declaration, lexer_state *lexer);
-static constant_table *new_constant_table(constant_table *current, lexer_state *lexer);
-static constant_table *pop_constant_table(lexer_state *lexer);
+static void  define_macro(constant_table * const table, char * const name, list * const parameters,
+                          char * const body);
+
+static void  emit(lexer_state * const lexer, char * const str);
+static list *new_list(char * const first_item);
+static list *add_item(list * const L, char * const item);
+
+static char *munge_id(char * const label_id, int is_label_declaration, lexer_state * const lexer);
+static constant_table *new_constant_table(constant_table * const current, lexer_state * const lexer);
+static constant_table *pop_constant_table(lexer_state * const lexer);
 static void delete_constant_table(constant_table *table);
-static void update_unique_id(lexer_state *lexer);
+static void update_unique_id(lexer_state * const lexer);
 
-macro_def *find_macro(constant_table *table, char *name);
+macro_def *find_macro(constant_table * const table, char * const name);
 
-extern char *dupstr(char *str);
+extern char *dupstr(char * const str);
 
 char *concat(char *str1, char *str2, int insert_space);
+char *concatn(int insert_space, unsigned numargs, ...);
 
 
 
@@ -223,7 +223,7 @@ char *concat(char *str1, char *str2, int insert_space);
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 71 "macro.y"
+#line 73 "macro.y"
 {
     char             *sval;
     struct list      *lval;
@@ -458,20 +458,20 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  4
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   63
+#define YYLAST   59
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  33
+#define YYNTOKENS  32
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  29
+#define YYNNTS  27
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  61
+#define YYNRULES  57
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  80
+#define YYNSTATES  74
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   282
+#define YYMAXUTOK   281
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -483,7 +483,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      29,    30,     2,     2,    28,     2,     2,     2,     2,     2,
+      27,    28,     2,     2,    29,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -491,7 +491,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    31,     2,    32,     2,     2,     2,     2,
+       2,     2,     2,    30,     2,    31,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -507,7 +507,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27
+      25,    26
 };
 
 #if YYDEBUG
@@ -516,44 +516,41 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyprhs[] =
 {
        0,     0,     3,     4,     8,     9,    11,    13,    17,    19,
-      21,    23,    25,    27,    29,    33,    34,    37,    39,    42,
-      44,    47,    49,    51,    53,    55,    58,    62,    69,    70,
-      72,    74,    77,    79,    81,    83,    86,    90,    92,    94,
-      96,    98,    99,   103,   104,   106,   108,   112,   113,   117,
-     118,   120,   122,   126,   128,   130,   134,   135,   138,   140,
-     142,   144
+      21,    23,    25,    27,    29,    32,    34,    37,    39,    41,
+      43,    45,    48,    52,    59,    60,    62,    64,    67,    69,
+      71,    73,    76,    80,    82,    84,    86,    88,    89,    93,
+      94,    96,    98,   102,   103,   107,   108,   110,   112,   116,
+     118,   120,   124,   125,   128,   130,   132,   134
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      34,     0,    -1,    -1,    35,    36,    35,    -1,    -1,     4,
-      -1,    38,    -1,    36,    37,    38,    -1,     4,    -1,    45,
-      -1,    43,    -1,    44,    -1,    39,    -1,    41,    -1,    10,
-      27,    40,    -1,    -1,    28,    25,    -1,    42,    -1,    41,
-      42,    -1,    16,    -1,    18,    55,    -1,    22,    -1,    23,
-      -1,    24,    -1,    21,    -1,     6,    25,    -1,     7,    15,
-      61,    -1,     3,    15,    52,     4,    46,     5,    -1,    -1,
-      47,    -1,    48,    -1,    47,    48,    -1,    16,    -1,    49,
-      -1,    50,    -1,     9,    19,    -1,     8,    51,    20,    -1,
-      11,    -1,    14,    -1,    12,    -1,    13,    -1,    -1,    29,
-      53,    30,    -1,    -1,    54,    -1,    15,    -1,    54,    28,
-      15,    -1,    -1,    29,    56,    30,    -1,    -1,    57,    -1,
-      58,    -1,    57,    28,    58,    -1,    61,    -1,    59,    -1,
-      31,    60,    32,    -1,    -1,    60,    16,    -1,    15,    -1,
-      26,    -1,    27,    -1,    25,    -1
+      33,     0,    -1,    -1,    34,    35,    34,    -1,    -1,     4,
+      -1,    37,    -1,    35,    36,    37,    -1,     4,    -1,    42,
+      -1,    40,    -1,    41,    -1,    38,    -1,    39,    -1,    38,
+      39,    -1,    15,    -1,    17,    52,    -1,    21,    -1,    22,
+      -1,    23,    -1,    20,    -1,     6,    24,    -1,     7,    14,
+      58,    -1,     3,    14,    49,     4,    43,     5,    -1,    -1,
+      44,    -1,    45,    -1,    44,    45,    -1,    15,    -1,    46,
+      -1,    47,    -1,     9,    18,    -1,     8,    48,    19,    -1,
+      10,    -1,    13,    -1,    11,    -1,    12,    -1,    -1,    27,
+      50,    28,    -1,    -1,    51,    -1,    14,    -1,    51,    29,
+      14,    -1,    -1,    27,    53,    28,    -1,    -1,    54,    -1,
+      55,    -1,    54,    29,    55,    -1,    58,    -1,    56,    -1,
+      30,    57,    31,    -1,    -1,    57,    15,    -1,    14,    -1,
+      25,    -1,    26,    -1,    24,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   151,   151,   152,   155,   156,   159,   160,   164,   171,
-     172,   173,   174,   175,   178,   184,   185,   193,   194,   197,
-     198,   199,   202,   205,   208,   214,   218,   224,   231,   232,
-     235,   236,   239,   240,   241,   244,   248,   256,   257,   258,
-     259,   262,   263,   266,   267,   270,   271,   274,   275,   278,
-     279,   282,   283,   286,   287,   290,   293,   294,   300,   301,
-     302,   303
+       0,   152,   152,   153,   156,   157,   160,   161,   165,   172,
+     173,   174,   175,   180,   181,   184,   186,   188,   193,   198,
+     203,   210,   214,   220,   227,   228,   231,   232,   236,   237,
+     238,   241,   245,   251,   252,   253,   254,   258,   259,   264,
+     265,   268,   270,   275,   276,   281,   282,   285,   287,   291,
+     292,   295,   300,   301,   308,   309,   310,   311
 };
 #endif
 
@@ -564,18 +561,18 @@ static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "\".macro\"", "\"\\n\"", "\".endm\"",
   "\".include\"", "\".macro_const\"", "\".macro_local\"",
-  "\".macro_label\"", "\".line\"", "\"int\"", "\"num\"", "\"string\"",
-  "\"pmc\"", "\"identifier\"", "\"any token\"", "\"macro body\"",
-  "\".identifier\"", "\"label\"", "\"$identifier\"", "\"var expansion\"",
+  "\".macro_label\"", "\"int\"", "\"num\"", "\"string\"", "\"pmc\"",
+  "\"identifier\"", "\"any token\"", "\"macro body\"", "\".identifier\"",
+  "\"label\"", "\"$identifier\"", "\"var expansion\"",
   "\"label target expansion\"", "\"unique label\"", "\"unique local\"",
   "\"string constant\"", "\"number constant\"", "\"integer constant\"",
-  "','", "'('", "')'", "'{'", "'}'", "$accept", "program", "opt_nl",
-  "statements", "newline", "statement", "line_directive", "opt_filename",
-  "anything", "any", "include_statement", "macro_const_definition",
-  "macro_definition", "opt_macro_body", "macro_body", "body_token",
-  "label_declaration", "local_declaration", "type", "parameters",
-  "opt_param_list", "param_list", "arguments", "opt_arg_list", "arg_list",
-  "arg", "braced_arg", "long_arg", "expression", 0
+  "'('", "')'", "','", "'{'", "'}'", "$accept", "program", "opt_nl",
+  "statements", "newline", "statement", "anything", "any",
+  "include_statement", "macro_const_definition", "macro_definition",
+  "opt_macro_body", "macro_body", "body_token", "label_declaration",
+  "local_declaration", "type", "parameters", "opt_param_list",
+  "param_list", "arguments", "opt_arg_list", "arg_list", "arg",
+  "braced_arg", "long_arg", "expression", 0
 };
 #endif
 
@@ -586,33 +583,31 @@ static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277,   278,   279,   280,   281,   282,    44,    40,
-      41,   123,   125
+     275,   276,   277,   278,   279,   280,   281,    40,    41,    44,
+     123,   125
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    33,    34,    34,    35,    35,    36,    36,    37,    38,
-      38,    38,    38,    38,    39,    40,    40,    41,    41,    42,
-      42,    42,    42,    42,    42,    43,    44,    45,    46,    46,
-      47,    47,    48,    48,    48,    49,    50,    51,    51,    51,
-      51,    52,    52,    53,    53,    54,    54,    55,    55,    56,
-      56,    57,    57,    58,    58,    59,    60,    60,    61,    61,
-      61,    61
+       0,    32,    33,    33,    34,    34,    35,    35,    36,    37,
+      37,    37,    37,    38,    38,    39,    39,    39,    39,    39,
+      39,    40,    41,    42,    43,    43,    44,    44,    45,    45,
+      45,    46,    47,    48,    48,    48,    48,    49,    49,    50,
+      50,    51,    51,    52,    52,    53,    53,    54,    54,    55,
+      55,    56,    57,    57,    58,    58,    58,    58
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     0,     3,     0,     1,     1,     3,     1,     1,
-       1,     1,     1,     1,     3,     0,     2,     1,     2,     1,
-       2,     1,     1,     1,     1,     2,     3,     6,     0,     1,
-       1,     2,     1,     1,     1,     2,     3,     1,     1,     1,
-       1,     0,     3,     0,     1,     1,     3,     0,     3,     0,
-       1,     1,     3,     1,     1,     3,     0,     2,     1,     1,
-       1,     1
+       1,     1,     1,     1,     2,     1,     2,     1,     1,     1,
+       1,     2,     3,     6,     0,     1,     1,     2,     1,     1,
+       1,     2,     3,     1,     1,     1,     1,     0,     3,     0,
+       1,     1,     3,     0,     3,     0,     1,     1,     3,     1,
+       1,     3,     0,     2,     1,     1,     1,     1
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -620,45 +615,45 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       4,     5,     0,     0,     1,     0,     0,     0,     0,    19,
-      47,    24,    21,    22,    23,     4,     6,    12,    13,    17,
-      10,    11,     9,    41,    25,     0,    15,    49,    20,     8,
-       3,     0,    18,    43,     0,    58,    61,    59,    60,    26,
-       0,    14,    56,     0,    50,    51,    54,    53,     7,    45,
-       0,    44,    28,    16,     0,    48,     0,    42,     0,     0,
-       0,    32,     0,    29,    30,    33,    34,    57,    55,    52,
-      46,    37,    39,    40,    38,     0,    35,    27,    31,    36
+       4,     5,     0,     0,     1,     0,     0,     0,    15,    43,
+      20,    17,    18,    19,     4,     6,    12,    13,    10,    11,
+       9,    37,    21,     0,    45,    16,     8,     3,     0,    14,
+      39,     0,    54,    57,    55,    56,    22,    52,     0,    46,
+      47,    50,    49,     7,    41,     0,    40,    24,     0,    44,
+       0,    38,     0,     0,     0,    28,     0,    25,    26,    29,
+      30,    53,    51,    48,    42,    33,    35,    36,    34,     0,
+      31,    23,    27,    32
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     2,     3,    15,    31,    16,    17,    41,    18,    19,
-      20,    21,    22,    62,    63,    64,    65,    66,    75,    34,
-      50,    51,    28,    43,    44,    45,    46,    54,    47
+      -1,     2,     3,    14,    28,    15,    16,    17,    18,    19,
+      20,    56,    57,    58,    59,    60,    69,    31,    45,    46,
+      25,    38,    39,    40,    41,    48,    42
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -18
+#define YYPACT_NINF -14
 static const yytype_int8 yypact[] =
 {
-       2,   -18,     5,    -3,   -18,    -5,   -14,     8,     1,   -18,
-     -17,   -18,   -18,   -18,   -18,    23,   -18,   -18,    19,   -18,
-     -18,   -18,   -18,     9,   -18,     7,     3,    -1,   -18,    29,
-     -18,    -3,   -18,    21,    35,   -18,   -18,   -18,   -18,   -18,
-      24,   -18,   -18,    18,    22,   -18,   -18,   -18,   -18,   -18,
-      25,    26,     0,   -18,   -15,   -18,    -1,   -18,    36,    33,
-      34,   -18,    47,     0,   -18,   -18,   -18,   -18,   -18,   -18,
-     -18,   -18,   -18,   -18,   -18,    37,   -18,   -18,   -18,   -18
+       6,   -14,     7,    -3,   -14,    -5,   -13,     1,   -14,     4,
+     -14,   -14,   -14,   -14,    18,   -14,    15,   -14,   -14,   -14,
+     -14,    16,   -14,     2,    -1,   -14,    33,   -14,    -3,   -14,
+      20,    40,   -14,   -14,   -14,   -14,   -14,   -14,    17,    19,
+     -14,   -14,   -14,   -14,   -14,    21,    22,    -7,   -10,   -14,
+      -1,   -14,    32,    29,    34,   -14,    42,    -7,   -14,   -14,
+     -14,   -14,   -14,   -14,   -14,   -14,   -14,   -14,   -14,    31,
+     -14,   -14,   -14,   -14
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -18,   -18,    41,   -18,   -18,    27,   -18,   -18,   -18,    42,
-     -18,   -18,   -18,   -18,   -18,    -4,   -18,   -18,   -18,   -18,
-     -18,   -18,   -18,   -18,   -18,     6,   -18,   -18,    38
+     -14,   -14,    39,   -14,   -14,    26,   -14,    41,   -14,   -14,
+     -14,   -14,   -14,    -2,   -14,   -14,   -14,   -14,   -14,   -14,
+     -14,   -14,   -14,     8,   -14,   -14,    36
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -668,38 +663,36 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -6
 static const yytype_int8 yytable[] =
 {
-       5,    67,    -2,     6,     7,     4,     1,     8,    59,    60,
-      23,    24,    27,     9,    35,    10,    61,    68,    11,    12,
-      13,    14,    35,    25,    36,    37,    38,    29,    26,    -5,
-      42,    40,    36,    37,    38,     9,    49,    10,    33,    52,
-      11,    12,    13,    14,    71,    72,    73,    74,    55,    53,
-      56,    70,    77,    76,    58,    57,    30,    79,    48,    78,
-      32,     0,    69,    39
+       5,    53,    54,     6,     7,    61,    -2,     4,    55,    21,
+       1,    22,     8,    32,     9,    23,    32,    10,    11,    12,
+      13,    62,    26,    33,    34,    35,    33,    34,    35,    37,
+       8,    24,     9,    -5,    44,    10,    11,    12,    13,    65,
+      66,    67,    68,    30,    47,    49,    64,    71,    50,    51,
+      73,    52,    70,    27,    43,    72,     0,    29,    63,    36
 };
 
 static const yytype_int8 yycheck[] =
 {
-       3,    16,     0,     6,     7,     0,     4,    10,     8,     9,
-      15,    25,    29,    16,    15,    18,    16,    32,    21,    22,
-      23,    24,    15,    15,    25,    26,    27,     4,    27,     0,
-      31,    28,    25,    26,    27,    16,    15,    18,    29,     4,
-      21,    22,    23,    24,    11,    12,    13,    14,    30,    25,
-      28,    15,     5,    19,    28,    30,    15,    20,    31,    63,
-      18,    -1,    56,    25
+       3,     8,     9,     6,     7,    15,     0,     0,    15,    14,
+       4,    24,    15,    14,    17,    14,    14,    20,    21,    22,
+      23,    31,     4,    24,    25,    26,    24,    25,    26,    30,
+      15,    27,    17,     0,    14,    20,    21,    22,    23,    10,
+      11,    12,    13,    27,     4,    28,    14,     5,    29,    28,
+      19,    29,    18,    14,    28,    57,    -1,    16,    50,    23
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     4,    34,    35,     0,     3,     6,     7,    10,    16,
-      18,    21,    22,    23,    24,    36,    38,    39,    41,    42,
-      43,    44,    45,    15,    25,    15,    27,    29,    55,     4,
-      35,    37,    42,    29,    52,    15,    25,    26,    27,    61,
-      28,    40,    31,    56,    57,    58,    59,    61,    38,    15,
-      53,    54,     4,    25,    60,    30,    28,    30,    28,     8,
-       9,    16,    46,    47,    48,    49,    50,    16,    32,    58,
-      15,    11,    12,    13,    14,    51,    19,     5,    48,    20
+       0,     4,    33,    34,     0,     3,     6,     7,    15,    17,
+      20,    21,    22,    23,    35,    37,    38,    39,    40,    41,
+      42,    14,    24,    14,    27,    52,     4,    34,    36,    39,
+      27,    49,    14,    24,    25,    26,    58,    30,    53,    54,
+      55,    56,    58,    37,    14,    50,    51,     4,    57,    28,
+      29,    28,    29,     8,     9,    15,    43,    44,    45,    46,
+      47,    15,    31,    55,    14,    10,    11,    12,    13,    48,
+      18,     5,    45,    19
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1527,215 +1520,156 @@ yyreduce:
   switch (yyn)
     {
         case 8:
-#line 165 "macro.y"
-    { emit("\n");  /* after each statement, emit a newline */ ;}
+#line 166 "macro.y"
+    { emit(lexer, "\n");  /* after each statement, emit a newline */ ;}
     break;
 
-  case 14:
-#line 179 "macro.y"
-    { emit("setline");
-                   emit((yyvsp[(2) - (3)].sval));
-                 ;}
+  case 15:
+#line 185 "macro.y"
+    { emit(lexer, (yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 16:
-#line 186 "macro.y"
-    { emit("setfile");
-                   emit((yyvsp[(2) - (2)].sval));
-                   emit("\n");
-                 ;}
-    break;
-
-  case 19:
-#line 197 "macro.y"
-    { emit((yyvsp[(1) - (1)].sval)); ;}
-    break;
-
-  case 20:
-#line 198 "macro.y"
+#line 187 "macro.y"
     { expand((yyvsp[(1) - (2)].mval), (yyvsp[(2) - (2)].lval), lexer); ;}
     break;
 
-  case 21:
+  case 17:
+#line 189 "macro.y"
+    {
+                              char *label = munge_id((yyvsp[(1) - (1)].sval), 1, lexer);
+                              emit(lexer, label);
+                            ;}
+    break;
+
+  case 18:
+#line 194 "macro.y"
+    {
+                              char *label = munge_id((yyvsp[(1) - (1)].sval), 1, lexer);
+                              emit(lexer, label);
+                            ;}
+    break;
+
+  case 19:
 #line 199 "macro.y"
-    { char *label = munge_id((yyvsp[(1) - (1)].sval), 1, lexer);
-                                                   emit(label);
-                                                 ;}
+    {
+                              char *local = munge_id((yyvsp[(1) - (1)].sval), 0, lexer);
+                              emit(lexer, local);
+                            ;}
     break;
 
-  case 22:
-#line 202 "macro.y"
-    { char *label = munge_id((yyvsp[(1) - (1)].sval), 1, lexer);
-                                                   emit(label);
-                                                 ;}
-    break;
-
-  case 23:
-#line 205 "macro.y"
-    { char *local = munge_id((yyvsp[(1) - (1)].sval), 0, lexer);
-                                                   emit(local);
-                                                 ;}
-    break;
-
-  case 24:
-#line 208 "macro.y"
+  case 20:
+#line 204 "macro.y"
     { char *label = munge_id((yyvsp[(1) - (1)].sval), 0, lexer);
-                                                   emit(label);
-                                                 ;}
+                              emit(lexer, label);
+                            ;}
     break;
 
-  case 25:
-#line 215 "macro.y"
+  case 21:
+#line 211 "macro.y"
     { include_file((yyvsp[(2) - (2)].sval), lexer); ;}
     break;
 
-  case 26:
-#line 219 "macro.y"
+  case 22:
+#line 215 "macro.y"
     { define_constant(lexer->globaldefinitions, (yyvsp[(2) - (3)].sval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
-  case 27:
-#line 228 "macro.y"
+  case 23:
+#line 223 "macro.y"
     { define_macro(lexer->globaldefinitions, (yyvsp[(2) - (6)].sval), (yyvsp[(3) - (6)].lval), (yyvsp[(5) - (6)].sval)); ;}
     break;
 
-  case 28:
-#line 231 "macro.y"
+  case 24:
+#line 227 "macro.y"
     { (yyval.sval) = ""; ;}
     break;
 
-  case 29:
-#line 232 "macro.y"
-    { (yyval.sval) = (yyvsp[(1) - (1)].sval);   ;}
-    break;
-
-  case 30:
-#line 235 "macro.y"
-    { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
-    break;
-
-  case 31:
-#line 236 "macro.y"
+  case 27:
+#line 233 "macro.y"
     { (yyval.sval) = concat((yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].sval), 1); ;}
     break;
 
-  case 32:
-#line 239 "macro.y"
-    { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
-    break;
-
-  case 33:
-#line 240 "macro.y"
-    { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
-    break;
-
-  case 34:
-#line 241 "macro.y"
-    { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
-    break;
-
-  case 35:
-#line 245 "macro.y"
+  case 31:
+#line 242 "macro.y"
     { (yyval.sval) = (yyvsp[(2) - (2)].sval); ;}
     break;
 
-  case 36:
-#line 249 "macro.y"
+  case 32:
+#line 246 "macro.y"
     { /* create a string like ".local <type> <id>" */
-                          (yyval.sval) = dupstr(".local");
-                          (yyval.sval) = concat((yyval.sval), (yyvsp[(2) - (3)].sval), 1);
-                          (yyval.sval) = concat((yyval.sval), (yyvsp[(3) - (3)].sval), 1);
-                        ;}
+                              (yyval.sval) = concatn(1, 3, ".local", (yyvsp[(2) - (3)].sval), (yyvsp[(3) - (3)].sval));
+                            ;}
     break;
 
-  case 41:
-#line 262 "macro.y"
+  case 37:
+#line 258 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
-  case 42:
-#line 263 "macro.y"
+  case 38:
+#line 260 "macro.y"
     { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
     break;
 
-  case 43:
-#line 266 "macro.y"
+  case 39:
+#line 264 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
-  case 44:
-#line 267 "macro.y"
-    { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
-    break;
-
-  case 45:
-#line 270 "macro.y"
+  case 41:
+#line 269 "macro.y"
     { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
     break;
 
-  case 46:
+  case 42:
 #line 271 "macro.y"
     { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
-  case 47:
-#line 274 "macro.y"
+  case 43:
+#line 275 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
-  case 48:
-#line 275 "macro.y"
+  case 44:
+#line 277 "macro.y"
     { (yyval.lval) = (yyvsp[(2) - (3)].lval);   ;}
     break;
 
-  case 49:
-#line 278 "macro.y"
+  case 45:
+#line 281 "macro.y"
     { (yyval.lval) = NULL; ;}
     break;
 
-  case 50:
-#line 279 "macro.y"
-    { (yyval.lval) = (yyvsp[(1) - (1)].lval);   ;}
-    break;
-
-  case 51:
-#line 282 "macro.y"
+  case 47:
+#line 286 "macro.y"
     { (yyval.lval) = new_list((yyvsp[(1) - (1)].sval)); ;}
     break;
 
-  case 52:
-#line 283 "macro.y"
+  case 48:
+#line 288 "macro.y"
     { (yyval.lval) = add_item((yyvsp[(1) - (3)].lval), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
-  case 53:
-#line 286 "macro.y"
-    { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
-    break;
-
-  case 54:
-#line 287 "macro.y"
-    { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
-    break;
-
-  case 55:
-#line 290 "macro.y"
+  case 51:
+#line 296 "macro.y"
     { (yyval.sval) = (yyvsp[(2) - (3)].sval); ;}
     break;
 
-  case 56:
-#line 293 "macro.y"
+  case 52:
+#line 300 "macro.y"
     { (yyval.sval) = ""; ;}
     break;
 
-  case 57:
-#line 294 "macro.y"
+  case 53:
+#line 302 "macro.y"
     { (yyval.sval) = concat((yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].sval), 0); ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1739 "macroparser.c"
+#line 1673 "macroparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1949,7 +1883,7 @@ yyreturn:
 }
 
 
-#line 308 "macro.y"
+#line 316 "macro.y"
 
 
 
@@ -1968,10 +1902,8 @@ Returns the newly created node.
 
 */
 static list *
-new_list(char *first_item) {
+new_list(char * const first_item) {
     list *L = (list *)mem_sys_allocate_zeroed(sizeof (list));
-
-
     L->item = first_item;
     return L;
 }
@@ -1990,9 +1922,9 @@ same as was specified).
 
 */
 static list *
-add_item(list *L, char *item) {
+add_item(list * const L, char * const item) {
     list *iter = L;
-    assert(iter != NULL);
+    PARROT_ASSERT(iter != NULL);
 
     /* the item is added at the end of the list. This
      * can be done more efficiently, but for now this works.
@@ -2017,8 +1949,8 @@ Process the specified file.
 
 */
 static void
-include_file(char *filename, lexer_state *lexer) {
-    assert(filename != NULL);
+include_file(char * const filename, lexer_state * const lexer) {
+    PARROT_ASSERT(filename != NULL);
     fprintf(stderr, "including: %s\n", filename);
     /* remove closing quote */
     filename[strlen(filename) - 1] = '\0';
@@ -2034,7 +1966,7 @@ include_file(char *filename, lexer_state *lexer) {
 
 */
 static void
-update_unique_id(lexer_state *lexer) {
+update_unique_id(lexer_state * const lexer) {
     /* each expansion has a unique id that is used for label/local munging */
     lexer->id_gen++;
     /* Count number of digits:
@@ -2056,7 +1988,7 @@ Expand the specified macro (or constant).
 
 */
 static void
-expand(macro_def *macro, list *args, lexer_state *lexer) {
+expand(macro_def * const macro, list * args, lexer_state * const lexer) {
     /* construct a map data structure that maps the argument values to the parameter names */
     /* enter the parameters as temporary symbols (.macro_const) */
     constant_table *macro_params = new_constant_table(lexer->globaldefinitions, lexer);
@@ -2105,7 +2037,7 @@ expand(macro_def *macro, list *args, lexer_state *lexer) {
 
 
 static void
-define_constant( constant_table *table, char *name, char *value) {
+define_constant(constant_table * const table, char * const name, char * const value) {
 
     macro_def *def = (macro_def *)mem_sys_allocate_zeroed(sizeof (macro_def));
 
@@ -2120,7 +2052,8 @@ define_constant( constant_table *table, char *name, char *value) {
 
 /*
 
-=item C<define_macro>
+=item C<void
+define_macro(constant_table * const table, char * const name, list * const parameters)>
 
 Define a macro by the given name, parameters and body.
 
@@ -2128,7 +2061,9 @@ Define a macro by the given name, parameters and body.
 
 */
 static void
-define_macro(constant_table *table, char *name, list *parameters, char *body) {
+define_macro(constant_table * const table, char * const name, list * const parameters,
+             char * const body)
+{
     struct macro_def *macro   = (struct macro_def *)mem_sys_allocate(sizeof (struct macro_def));
 
     /* initialize the fields */
@@ -2144,7 +2079,8 @@ define_macro(constant_table *table, char *name, list *parameters, char *body) {
 
 /*
 
-=item C<find_macro>
+=item C<macro_def *
+find_macro(constant_table * const table, char * const name)>
 
 Find the specified macro. If the specified macro does not exist,
 NULL is returned.
@@ -2153,9 +2089,9 @@ NULL is returned.
 
 */
 macro_def *
-find_macro(constant_table *table, char *name) {
+find_macro(constant_table * const table, char * const name) {
     macro_def *iter = table->definitions;
-    assert(name != NULL);
+    PARROT_ASSERT(name != NULL);
 
     /* iterate over the list and compare each node's name */
     while (iter != NULL) {
@@ -2181,9 +2117,9 @@ inserted between the two strings.
 =cut
 
 */
-char *
+static char *
 concat(char * str1, char * str2, int need_space) {
-    assert (str2 != NULL);
+    PARROT_ASSERT (str2 != NULL);
     if (str1 == NULL) {
         return str2;
     }
@@ -2207,6 +2143,56 @@ concat(char * str1, char * str2, int need_space) {
     }
 }
 
+/*
+
+=item C<static char *
+concatn(int need_space, unsigned numargs, ...)>
+
+Concatenate C<numargs> strings together into one new string. If C<need_space> is
+non-zero, the strings are separated by a space.
+
+=cut
+
+*/
+static char *
+concatn(int need_space, unsigned numargs, ...) {
+    va_list  arg_ptr;
+    unsigned iter;
+    char   **args;
+    size_t   totalsize = 1; /* always 1 for NULL character */
+    char    *result;
+    size_t   result_index = 0;
+
+    args = (char **)mem_sys_allocate(numargs * sizeof (char *));
+
+    va_start(arg_ptr, numargs);
+
+    for (iter = 0; iter < numargs; iter++) {
+        /* store the argument in an array */
+        args[iter] = va_arg(arg_ptr, char *);
+        /* update total length so far */
+        totalsize += strlen(args[iter]);
+    }
+
+    va_end(arg_ptr);
+
+    if (need_space) /* then also allocate for separating spaces */
+        totalsize += numargs - 1; /* 10 arguments would be separated by 9 spaces */
+
+    result = (char *)mem_sys_allocate_zeroed(totalsize * sizeof (char));
+
+    for (iter = 0; iter < numargs; iter++) {
+        /* sprintf returns the number of characters printed; use that as an offset for next time */
+        result_index += sprintf(result + result_index, "%s%s", args[iter], need_space ? " " : "");
+        /* free old memory */
+        mem_sys_free(args[iter]);
+    }
+
+    mem_sys_free(args);
+
+    return result;
+}
+
 /* short-cut to check for a label; last character must be ":" */
 #define is_label(X)     (X[strlen(X) - 1] == ':')
 
@@ -2216,7 +2202,8 @@ concat(char * str1, char * str2, int need_space) {
 
 /*
 
-=item C<emit>
+=item C<static void
+emit(lexer_state * const lexer, char * const str)>
 
 Emit the specified string. This function will be the "gateway" to the
 output file. All tokens except C<.sub>, C<.end> and C<.namespace> are indented.
@@ -2226,7 +2213,12 @@ All tokens are separated with a space,  C<)>, C<]>, C<,>.
 
 */
 static void
-emit(char *str) {
+emit(lexer_state * const lexer, char * const str) {
+    fprintf(lexer->outfile, "%s ", str);
+}
+
+static void
+pretty_print(char * const str) {
     FILE *output = stdout;
     /* globals! */
     static int just_nl    = 1;
@@ -2275,12 +2267,6 @@ emit(char *str) {
 
 }
 
-void
-emit_int(int val) {
-    FILE *output = stdout;
-    fprintf(output, "%d ", val);
-}
-
 /*
 
 =item C<new_constant_table>
@@ -2289,7 +2275,7 @@ emit_int(int val) {
 
 */
 static constant_table *
-new_constant_table(constant_table *current, lexer_state *lexer) {
+new_constant_table(constant_table * const current, lexer_state * const lexer) {
     constant_table *table    = (constant_table *)mem_sys_allocate(sizeof (constant_table));
     table->definitions       = NULL;
     table->prev              = current;
@@ -2306,7 +2292,7 @@ new_constant_table(constant_table *current, lexer_state *lexer) {
 
 */
 static constant_table *
-pop_constant_table(lexer_state *lexer) {
+pop_constant_table(lexer_state * const lexer) {
     constant_table *popped   = lexer->globaldefinitions;
     lexer->globaldefinitions = popped->prev;
     return popped;
@@ -2323,9 +2309,10 @@ static void
 delete_constant_table(constant_table *table) {
     /* destroy all definitions */
     macro_def *iter = table->definitions;
+
     while (iter != NULL) {
         macro_def *temp = iter;
-        iter = iter->next;
+        iter            = iter->next;
         mem_sys_free(temp);
     }
     mem_sys_free(table);
@@ -2354,16 +2341,16 @@ argument must be 0 for that.
 
 */
 static char *
-munge_id(char *id, int is_label_declaration, lexer_state *lexer) {
+munge_id(char * const id, int is_label_declaration, lexer_state * const lexer) {
     /* the format of the generated label: */
-    char const * const format = "_unique_%s_%s_%d%s";
-    int const format_length   = strlen(format);
+    char const * const format        = "_unique_%s_%s_%d%s";
+    int  const         format_length = strlen(format);
 
     /* calculate length of the generated label: length of macro name,
      * plus length of label name.
      */
     int   length    = format_length + strlen(lexer->macro_id) + lexer->num_digits;
-    char *munged_id = NULL;
+    char *munged_id;
 
     length += strlen(id);
 
@@ -2371,10 +2358,11 @@ munge_id(char *id, int is_label_declaration, lexer_state *lexer) {
         length++; /* reserve 1 more byte for the ":" */
 
     munged_id = (char *)mem_sys_allocate((length + 1) * sizeof (char));
-    assert(munged_id != NULL);
+
     /* generate the identifier; if it's a declaration, then add the colon. */
     sprintf(munged_id, format, lexer->macro_id, id, lexer->unique_id,
             is_label_declaration ? ":" : "");
+
     return munged_id;
 }
 
@@ -2382,7 +2370,8 @@ munge_id(char *id, int is_label_declaration, lexer_state *lexer) {
 
 /*
 
-=item C<process_string>
+=item C<static void
+process_string(char * const buffer, lexer_state * const lexer)>
 
 Process the string stored in C<buffer>. First a new yyscan_t
 object is created, initialized, after which the specified
@@ -2391,15 +2380,15 @@ buffer is parsed. Afterwards the yyscan_t object is destroyed.
 =cut
 
 */
-void
-process_string(char *buffer, lexer_state *lexer) {
+static void
+process_string(char * const buffer, lexer_state * const lexer) {
     /* initialize a yyscan_t object */
     yyscan_t yyscanner;
     macrolex_init(&yyscanner);
 
     macroset_debug(lexer->flexdebug, yyscanner);
     macroset_extra(lexer, yyscanner);
-    assert(buffer != NULL);
+    PARROT_ASSERT(buffer != NULL);
     /* set the scanner to a string buffer and go parse */
     macro_scan_string(buffer, yyscanner);
     yyparse(yyscanner, lexer);
@@ -2409,63 +2398,55 @@ process_string(char *buffer, lexer_state *lexer) {
 
 /*
 
-=item C<process_file>
+=item C<static void
+process_file(char * const filename, lexer_state * const lexer)>
 
 Process the specified file.
 
 =cut
 
 */
-void
-process_file(char *filename, lexer_state *lexer) {
-    FILE *fp = NULL;
-    yyscan_t yyscanner;
+static void
+process_file(char * const filename, lexer_state * const lexer) {
+    char     *temp_file;
+    FILE     *fp;
+    yyscan_t  yyscanner;
 
-    if (filename == NULL) { /* no file name means reading from stdin. */
+    if (filename == NULL)  /* no file name means reading from stdin. */
         fp = stdin;
-    }
-    else { /* open the specified file */
+    else  /* open the specified file */
         fp = fopen(filename, "r");
-    }
 
     if (fp == NULL) {
         fprintf(stderr, "Failed to open file %s\n", filename);
+        return;
     }
-    else {
-        /* save current state of lexer, these are overwritten, so that
-         * error messages indicate an error in the string (macro body).
-         */
-        int temp_line   = lexer->line;
-        char *temp_file = lexer->currentfile;
 
-        /* construct a yylex_t object */
-        macrolex_init(&yyscanner);
-        macroset_in(fp, yyscanner);
-        macroset_debug(lexer->flexdebug, yyscanner);
-        macroset_extra(lexer, yyscanner);
+    /* save current state of lexer, these are overwritten, so that
+     * error messages indicate an error in the string (macro body).
+     */
+    temp_file = lexer->currentfile;
 
-        /* emit directives that set the file/line */
-/* they must be within compilation unit; this doesn't happen right now...
-        emit("setfile");
-        emit(filename);
-        emit("setline");
-        emit_int(1);
-*/
+    /* construct a yylex_t object */
+    macrolex_init(&yyscanner);
+    macroset_in(fp, yyscanner);
+    macroset_debug(lexer->flexdebug, yyscanner);
+    macroset_extra(lexer, yyscanner);
 
-        /* go parse the file */
-        yyparse(yyscanner, lexer);
-        /* and clean up */
-        macrolex_destroy(yyscanner);
+    /* go parse the file */
+    yyparse(yyscanner, lexer);
+    /* and clean up */
+    macrolex_destroy(yyscanner);
 
-        /* restore state of lexer */
-        lexer->line        = temp_line;
-        lexer->currentfile = temp_file;
-    }
+    /* restore state of lexer */
+    lexer->currentfile = temp_file;
+
 }
 
 /*
 
-=item C<print_help>
+=item C<static void
+print_help(char const * const programname)>
 
 =cut
 
@@ -2482,7 +2463,8 @@ print_help(char const * const programname) {
 
 /*
 
-=item C<yyerror>
+=item C<int
+yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message, ...)>
 
 Function for syntax error handling.
 
@@ -2490,16 +2472,26 @@ Function for syntax error handling.
 
 */
 int
-yyerror(yyscan_t yyscanner, lexer_state *lexer, char const * const message, ...) {
-    fprintf(stderr, "Error in '%s' (line %d): %s\n", lexer->currentfile, lexer->line, message);
-    lexer->errors++;
+yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message, ...) {
+    va_list arg_ptr;
+
+    fprintf(stderr, "Error in '%s' (line %d): ", lexer->currentfile, macroget_lineno(yyscanner));
+
+    va_start(arg_ptr, message);
+    vfprintf(stderr, message, arg_ptr);
+    va_end(arg_ptr);
+
+    puts("");
+
+    ++lexer->errors;
     return 0;
 }
 
 
 /*
 
-=item C<main>
+=item C<int
+main(int argc, char *argv[])>
 
 Pre-processor main function.
 
@@ -2515,16 +2507,15 @@ main(int argc, char *argv[]) {
     argc--;
     argv++;
 
-    lexer = (lexer_state *)malloc(sizeof (lexer_state));
-    memset(lexer, 0, sizeof (lexer_state));
-    assert(lexer != NULL);
-    lexer->unique_id = 0;
-    lexer->line      = 1;
-    lexer->errors    = 0;
-    lexer->flexdebug = 0;
-    lexer->macro_id  = NULL;
+    lexer = (lexer_state *)mem_sys_allocate_zeroed(sizeof (lexer_state));
+
+    lexer->unique_id         = 0;
+    lexer->errors            = 0;
+    lexer->flexdebug         = 0;
+    lexer->macro_id          = NULL;
     lexer->globaldefinitions = new_constant_table(NULL, lexer);
 
+    lexer->outfile           = stdout;
 
     /* very basic argument handling; I'm too lazy to check out
      * the standard funtion for that, right now. This is a TODO.
@@ -2568,7 +2559,7 @@ main(int argc, char *argv[]) {
 
     /* clean up and go home */
     delete_constant_table(lexer->globaldefinitions);
-    free(lexer);
+    mem_sys_free(lexer);
 
     return 0;
 }

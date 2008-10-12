@@ -39,6 +39,23 @@ extern char *concat(char *str1, char *str2);
 
 
 
+
+/*
+
+See dupstr, except that this version takes the number of characters to be
+copied. Easy for copying a string except the quotes.
+
+*/
+char *
+dupstrn(char const * const source, size_t num_chars) {
+    char *newstring = (char *)mem_sys_allocate_zeroed((num_chars + 1) * sizeof (char));
+    assert(newstring);
+    /* only copy num_chars characters */
+    strncpy(newstring, source, num_chars);
+    return newstring;
+}
+
+
 /*
 
 The C89 standard does not define a strdup() in the C library,
@@ -49,28 +66,8 @@ does: duplicate a string.
 */
 char *
 dupstr(char const * const source) {
-    char *newstring = (char *)calloc(strlen(source) + 1, sizeof (char));
-    assert(newstring);
-    strcpy(newstring, source);
-    return newstring;
+    return dupstrn(source, strlen(source));
 }
-
-/*
-
-See dupstr, except that this version takes the number of characters to be
-copied. Easy for copying a string except the quotes.
-
-*/
-char *
-dupstrn(char const * const source, size_t num_chars) {
-    char *newstring = (char *)calloc(num_chars + 1, sizeof (char));
-    assert(newstring);
-    /* only copy num_chars characters */
-    strncpy(newstring, source, num_chars);
-    return newstring;
-}
-
-
 
 /*
 Use these on a big file with macros, and check out whether there are unused rules.
@@ -108,7 +105,6 @@ static int is_pir_directive(char *name);
 %x MACROPAR
 %x MACROBODY
 %x EXPAND
-%x LINE
 %x MACROLOCAL
 %x BRACEDARGS
 %s EXPARGS
@@ -169,18 +165,8 @@ REG            "$"?[SNIP]{DIGITS}
                       return TK_NL;
                     }
 
-<LINE>{NEWLINE}     { yy_pop_state(yyscanner);
-                      yylval->sval = "\n";
-                      return TK_NL;
-                    }
-
 <BRACEDARGS>{NEWLINE} { yylval->sval = "\n"; return TK_ANY; }
 
-
-".line"             { /* */
-                      yy_push_state(LINE, yyscanner);
-                      return TK_LINE;
-                    }
 
 ".include"          { /* */
                       yy_push_state(INCLUDE, yyscanner);
@@ -206,15 +192,15 @@ REG            "$"?[SNIP]{DIGITS}
                             return TK_LABEL_ID;
                           }
 
-<MACROBODY>{IDENT}":"     { /* unique label declaration, add special marker. */
-                            yylval->sval = (char *)calloc(yyleng + 1 + 1, sizeof (char));
-                            /* stick a special marker "@" so we can recognize this as a label that
-                             * must be munged.
-                             */
-                            strncpy(yylval->sval, yytext, yyleng - 1);
-                            strcpy(yylval->sval + yyleng - 1, "@:");
-                            return TK_LABEL_ID;
-                          }
+<MACROBODY>{IDENT}":"   { /* unique label declaration, add special marker. */
+                          yylval->sval = (char *)mem_sys_allocate((yyleng + 1 + 1) * sizeof (char));
+                          /* stick a special marker "@" so we can recognize this as a label that
+                           * must be munged.
+                           */
+                          strncpy(yylval->sval, yytext, yyleng - 1);
+                          strcpy(yylval->sval + yyleng - 1, "@:");
+                          return TK_LABEL_ID;
+                        }
 
 <MACROBODY>".$"{IDENT}    { /* referring to a declared label or local id. */
                             yylval->sval = dupstr(yytext );
@@ -247,14 +233,14 @@ REG            "$"?[SNIP]{DIGITS}
                             return TK_LOCAL_ID;
                           }
 
-<MACROLOCAL>{IDENT}       { /* unique local id declaration -- non-parameter */
-                            yylval->sval = (char *)calloc(yyleng + 1 + 1, sizeof (char));
-                            strcpy(yylval->sval, yytext);
-                            /* add special marker that this token needs munging later */
-                            yylval->sval[yyleng] = '@';
-                            yy_pop_state(yyscanner);
-                            return TK_LOCAL_ID;
-                          }
+<MACROLOCAL>{IDENT}    { /* unique local id declaration -- non-parameter */
+                         yylval->sval = (char *)mem_sys_allocate((yyleng + 1 + 1) * sizeof (char));
+                         strcpy(yylval->sval, yytext);
+                         /* add special marker that this token needs munging later */
+                         yylval->sval[yyleng] = '@';
+                         yy_pop_state(yyscanner);
+                         return TK_LOCAL_ID;
+                       }
 
 <MACROBODY>".endm" { /* when reading ".endm" while scanning macro body, go back to previous state */
 
@@ -447,22 +433,6 @@ REG            "$"?[SNIP]{DIGITS}
                        return TK_ANY;
                       }
 
-<LINE>","       { return ','; }
-
-
-
-<LINE>{DIGITS}           { /*  */
-                           yylval->sval = dupstr(yytext);
-                           return TK_INTC;
-                         }
-
-
-
-<LINE>{Q_STRING}      { /* */
-                        yylval->sval = dupstr(yytext);
-                        return TK_STRINGC;
-                      }
-
 <*>","                { /* in all other cases (than the above), treat a comma just as any token. */
                         yylval->sval = dupstr(yytext);
                         return TK_ANY;
@@ -631,12 +601,14 @@ is_pir_directive(char *name) {
         ".end_call",
         ".end_return",
         ".end_yield",
+        ".file",
         ".get_results",
         ".globalconst",
         ".HLL",
         ".HLL_map",
         ".invocant",
         ".lex",
+        ".line",
         ".loadlib",
         ".local",
         ".meth_call",
