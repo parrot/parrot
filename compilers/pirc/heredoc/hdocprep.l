@@ -19,6 +19,12 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+/* don't bother to include the header file (which is generated);
+ * we don't need it, really. Just some prototypes declarations needed.
+ */
+int yylex_init(yyscan_t * yyscanner);
+
+
 /* to easily switch between parrot's functions and without; for testing */
 /*
 #define LINKPARROT
