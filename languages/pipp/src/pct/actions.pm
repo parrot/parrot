@@ -363,9 +363,8 @@ method class_definition($/) {
                     :lexical( 0 ),
                     PAST::Stmts.new(
                         PAST::Op.new(
-                            :inline(   "$P0 = get_hll_global 'P6metaclass'\n $P1 = split '::', '"
-                                     ~ $<CLASS_NAME>
-                                     ~ "'\n push_eh subclass_done\n $P2 = $P0.'new_class'($P1)\n pop_eh\n subclass_done:\n" ),
+                            :inline(   "$P0 = get_hll_global 'P6metaclass'\n"
+                                     ~ "$P2 = $P0.'new_class'('" ~ $<CLASS_NAME> ~ "')\n" ),
                             :pasttype( 'inline' )
                         )
                     )
