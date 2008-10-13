@@ -312,14 +312,6 @@ method function_definition($/) {
     make $past;
 }
 
-method member_definition($/) {
-    make PAST::Op.new(
-             $( $<var> ),
-             $( $<literal> ),
-             :pasttype('bind'),
-         );
-}
-
 method method_definition($/) {
 
     # note that $<param_list> creates a new PAST::Block.
@@ -372,6 +364,9 @@ method class_definition($/) {
         := PAST::Block.new(
                     :blocktype('immediate'),
            );
+    for $<member_definition> {
+        $methods_block.symbol( ~$_<VAR_NAME><ident>, :scope('attribute') );
+    }
     for $<method_definition> {
         $methods_block.push( $($_) );
     }
