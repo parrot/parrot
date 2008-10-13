@@ -25,8 +25,17 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 23;
+use Parrot::Test;
 use Test::More;
+use Parrot::Test::Lua;
+
+my $test_prog = Parrot::Test::Lua::get_test_prog();
+if ( $test_prog eq 'lua' || $test_prog eq 'luac.pl' ) {
+    plan skip_all => "parrot only";
+}
+else {
+    plan tests => 23;
+}
 
 language_output_is( 'Lua_lex', <<'CODE', <<'OUT', 'hello' );
 print("hello")
