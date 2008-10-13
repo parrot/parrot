@@ -29,7 +29,7 @@ language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'definition of a cla
 class Dings {
     
     function bums() {
-        echo "The function bums() in class dings has been called.\n";
+        echo "The function bums() in class Dings has been called.\n";
     }
 }
 
@@ -46,7 +46,7 @@ language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'dummy class' );
 class Dings {
     
     function bums() {
-        echo "The function bums() in class dings has been called.\n";
+        echo "The function bums() in class Dings has been called.\n";
     }
 }
  
@@ -55,7 +55,7 @@ $dings->bums();
  
 ?>
 END_CODE
-The function bums() in class dings has been called.
+The function bums() in class Dings has been called.
 END_EXPECTED
 
 
