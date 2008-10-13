@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -7,6 +7,8 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
+use File::Temp 'tempfile';
+
 use Parrot::Test tests => 44;
 
 =head1 NAME
@@ -210,11 +212,9 @@ ok 2
 -42
 OUTPUT
 
-my $temp = "temp.pir";
-END { unlink $temp; }
+my ($TEMP, $temp_pir) = tempfile( SUFFIX => '.pir' );
 
-open my $S, '>', "$temp" or die "Can't write $temp";
-print $S <<'EOF';
+print $TEMP <<'EOF';
 .sub Integer_divide_Integer
     .param pmc left
     .param pmc right
@@ -223,26 +223,23 @@ print $S <<'EOF';
     .return(lhs)
 .end
 EOF
-close $S;
+close $TEMP;
 
-pir_output_is( <<'CODE', <<'OUTPUT', "PASM MMD divide - loaded sub" );
-
+pir_output_is( <<"CODE", <<'OUTPUT', "PASM MMD divide - loaded sub" );
 .sub _main
     .local pmc divide
-    load_bytecode "temp.pir"
+    load_bytecode "$temp_pir"
     divide = global "Integer_divide_Integer"
     add_multi "divide", "Integer,Integer", divide
 
-    $P0 = new 'Integer'
-    $P1 = new 'Integer'
-    $P2 = new 'Integer'
-    $P1 = 10
-    $P2 = 3
-    $P0 = $P1 / $P2
-    print $P0
-    print "\n"
+    \$P0 = new 'Integer'
+    \$P1 = new 'Integer'
+    \$P2 = new 'Integer'
+    \$P1 = 10
+    \$P2 = 3
+    \$P0 = \$P1 / \$P2
+    say \$P0
 .end
-
 CODE
 42
 OUTPUT
@@ -930,11 +927,9 @@ CODE
 2
 OUTPUT
 
-## my $temp = "temp.pir";
-## END { unlink $temp; };
+($TEMP, $temp_pir) = tempfile( SUFFIX => '.pir' );
 
-open my $P, '>', "$temp" or die "can't write $temp";
-print $P <<'EOF';
+print $TEMP <<'EOF';
 .namespace ["AInt"]
 .sub add :multi(AInt, Integer, PMC)
     .param pmc l
@@ -948,20 +943,19 @@ print $P <<'EOF';
     .return(d)
 .end
 EOF
-close $P;
+close $TEMP;
 
-pir_output_is( <<'CODE', <<'OUTPUT', "override builtin add" );
+pir_output_is( <<"CODE", <<'OUTPUT', "override builtin add" );
 .sub main
-    load_bytecode "temp.pir"
-    $P0 = subclass "Integer", "AInt"
-    $P0 = new "AInt"
-    $P1 = new 'Integer'
-    set $P0, 6
-    set $P1, 2
+    load_bytecode "$temp_pir"
+    \$P0 = subclass "Integer", "AInt"
+    \$P0 = new "AInt"
+    \$P1 = new 'Integer'
+    set \$P0, 6
+    set \$P1, 2
 
-    $P2 = add $P0, $P1
-    print $P2
-    print "\n"
+    \$P2 = add \$P0, \$P1
+    say \$P2
 .end
 CODE
 62
@@ -1234,7 +1228,7 @@ CODE
 Called multi for class
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "unicode sub names and multi (RT#39254)" );
+pir_output_is( <<'CODE', <<'OUTPUT', "unicode sub names and multi (RT #39254)" );
 .sub unicode:"\u7777" :multi(string)
   .param pmc arg
   print 'String:'

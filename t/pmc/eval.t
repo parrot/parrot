@@ -1,11 +1,14 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
+use File::Temp 'tempfile';
+
 use Parrot::Test tests => 17;
 
 =head1 NAME
@@ -509,8 +512,8 @@ CODE
 ok
 OUTPUT
 
-open my $TEMP, '>', "temp.pir" or die "can't open 'temp.pir': $!";
-END { unlink "temp.pir" }
+my ($TEMP, $filename) = tempfile( SUFFIX => '.pir' );
+
 print $TEMP <<PIR;
   .sub foo
      print a typo
@@ -518,10 +521,10 @@ print $TEMP <<PIR;
 PIR
 close $TEMP;
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "compile err in load_bytecode" );
+pir_error_output_like( <<"CODE", <<'OUTPUT', "compile err in load_bytecode" );
 .sub main :main
-     load_bytecode "temp.pir"
-     print "never\n"
+     load_bytecode "$filename"
+     print "never\\n"
      end
 .end
 CODE
@@ -531,7 +534,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "catch compile err in load_bytecode" );
 .sub main :main
      push_eh handler
-     load_bytecode "temp.pir"
+     load_bytecode "$filename"
      print "never\n"
      end
 handler:
