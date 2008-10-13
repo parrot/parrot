@@ -222,7 +222,7 @@ pmc: $(HASH_OBJS) $(PHP_GROUP)
 #Recompiling is close enough for now.
 $(HASH_OBJS): $(HASH_SOURCES) $(HASH_H)
 	$(TOUCH) $(PMCDIR)/phparray.pmc
-	$(CC) $(CFLAGS) -I$(INCLUDE_DIR) $(HASH_SOURCES) -c -o $(HASH_OBJS)
+	$(CC) $(CFLAGS) -I$(INCLUDE_DIR) $(HASH_SOURCES) -c -g -o $(HASH_OBJS)
 
 export DYNPMC_INCLUDE=$(PIPPDIR)
 export DYNPMC_LINK=$(HASH_OBJS)
