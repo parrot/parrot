@@ -357,10 +357,9 @@ method param_list($/) {
 method class_definition($/) {
     my $past := PAST::Block.new(
                     :node($/),
-                    :blocktype('declaration'),
                     :namespace( $<CLASS_NAME><ident> ),
+                    :blocktype('declaration'),
                     :pirflags( ':init :load' ),
-                    :lexical( 0 ),
                     PAST::Stmts.new(
                         PAST::Op.new(
                             :inline(   "$P0 = get_hll_global 'P6metaclass'\n"
@@ -369,9 +368,14 @@ method class_definition($/) {
                         )
                     )
                 );
+    my $methods_block
+        := PAST::Block.new(
+                    :blocktype('immediate'),
+           );
     for $<method_definition> {
-        $past.push( $($_) );
+        $methods_block.push( $($_) );
     }
+    $past.push( $methods_block );
 
     make $past;
 }

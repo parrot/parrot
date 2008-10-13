@@ -74,7 +74,7 @@ token FUNCTION_NAME         { <ident>                                           
 token METHOD_NAME           { <ident>                                                    }
 token CONSTANT_NAME         { <ident>                                                    }
 token CLASS_NAME            { <ident>                                                    }
-token VAR_NAME              {  '$' <ident>                                           {*} }
+token VAR_NAME              { '$' <ident>                                            {*} }
 
 # terms
 rule  method_call           { <var> '->' <METHOD_NAME> '(' <arguments> ')'           {*} }
