@@ -73,7 +73,7 @@ rule  var_assign            { <var>        '=' <expression> <.statement_delimite
 token FUNCTION_NAME         { <ident>                                                    }
 token METHOD_NAME           { <ident>                                                    }
 token CONSTANT_NAME         { <ident>                                                    }
-token CLASS_NAME            { <ident> [ '::' <ident> ]*                                  }
+token CLASS_NAME            { <ident>                                                    }
 token VAR_NAME              {  '$' <ident>                                           {*} }
 
 # terms
