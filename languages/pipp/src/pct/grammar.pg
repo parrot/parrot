@@ -130,32 +130,32 @@ token curly_interpolation   { '{' <var> '}'                                     
 # operator precedence table
 rule  expression  is optable                                        { ... }
 
-proto 'postfix:++' is precedence('1')                               { ... }
-proto 'postfix:--' is equiv(postfix:<++>)                           { ... }
-proto 'prefix:++'  is equiv(postfix:<++>)                           { ... }
-proto 'prefix:--'  is equiv(postfix:<++>)                           { ... }
+proto postfix:'++' is precedence('1')                               { ... }
+proto postfix:'--' is equiv(postfix:<++>)                           { ... }
+proto prefix:'++'  is equiv(postfix:<++>)                           { ... }
+proto prefix:'--'  is equiv(postfix:<++>)                           { ... }
 
-proto 'infix:|'    is looser('postfix:++')                          { ... }
-proto 'infix:&'    is equiv('infix:|')                              { ... }
-proto 'infix:^'    is equiv('infix:|')                              { ... }
+proto infix:'|'    is looser('postfix:++')                          { ... }
+proto infix:'&'    is equiv('infix:|')                              { ... }
+proto infix:'^'    is equiv('infix:|')                              { ... }
 
-proto 'infix:<'    is tighter('infix:|')                            { ... }
-proto 'infix:<='   is equiv('infix:<')                              { ... }
-proto 'infix:>'    is equiv('infix:<')                              { ... }
-proto 'infix:>='   is equiv('infix:<')                              { ... }
-proto 'infix:=='   is equiv('infix:<')                              { ... }
-proto 'infix:!='   is equiv('infix:<')                              { ... }
+proto infix:'<'    is tighter('infix:|')                            { ... }
+proto infix:'<='   is equiv('infix:<')                              { ... }
+proto infix:'>'    is equiv('infix:<')                              { ... }
+proto infix:'>='   is equiv('infix:<')                              { ... }
+proto infix:'=='   is equiv('infix:<')                              { ... }
+proto infix:'!='   is equiv('infix:<')                              { ... }
 
-proto 'infix:+'    is tighter('infix:<')                            { ... }
-proto 'infix:-'    is equiv('infix:+')                              { ... }
-proto 'infix:.'    is equiv('infix:+')    is pirop('concat')        { ... }
+proto infix:'+'    is tighter('infix:<')                            { ... }
+proto infix:'-'    is equiv('infix:+')                              { ... }
+proto infix:'.'    is equiv('infix:+')    is pirop('concat')        { ... }
 
-proto 'infix:*'    is tighter('infix:+')                            { ... }
-proto 'infix:%'    is equiv('infix:*')                              { ... }
-proto 'infix:/'    is equiv('infix:*')                              { ... }
+proto infix:'*'    is tighter('infix:+')                            { ... }
+proto infix:'%'    is equiv('infix:*')                              { ... }
+proto infix:'/'    is equiv('infix:*')                              { ... }
 
-proto 'prefix:-'   is tighter('infix:*')                            { ... }
-proto 'prefix:+'   is equiv('prefix:-')                             { ... }
-proto 'prefix:!'   is equiv('prefix:-')                             { ... }
+proto prefix:'-'   is tighter('infix:*')                            { ... }
+proto prefix:'+'   is equiv('prefix:-')                             { ... }
+proto prefix:'!'   is equiv('prefix:-')                             { ... }
 
-proto 'term:'      is tighter('prefix:-') is parsed(&term)          { ... }
+proto term:''      is tighter('prefix:-') is parsed(&term)          { ... }
