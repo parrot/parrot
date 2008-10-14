@@ -52,8 +52,9 @@ void yyset_column(int col, yyscan_t yyscanner);
 
 /* to easily switch between parrot's functions and without; for testing */
 
+/*
 #define LINKPARROT
-
+*/
 
 
 #ifdef LINKPARROT
