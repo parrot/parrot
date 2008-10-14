@@ -25,6 +25,10 @@
 #include "parser.h"
 #include "optimizer.h"
 
+/* prevent declarations of malloc() and free() in the generated parser. */
+#define YYMALLOC
+#define YYFREE
+
 #ifndef YYENABLE_NLS
 #  define YYENABLE_NLS 0
 #endif
