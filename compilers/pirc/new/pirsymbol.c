@@ -5,6 +5,7 @@
 #include "pircompiler.h"
 #include "pirsymbol.h"
 #include "pircompunit.h"
+#include "piryy.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -79,7 +80,7 @@ This code is taken from IMCC.
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 unsigned
-get_hashcode(NOTNULL(char * const str), unsigned num_buckets) {
+get_hashcode(NOTNULL(char const * const str), unsigned num_buckets) {
     unsigned long  key = 0;
     char const    *s;
 
@@ -135,7 +136,7 @@ Create a new symbol node, returns it after initialization.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 symbol *
-new_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char * const name), pir_type type) {
+new_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name), pir_type type) {
     symbol *sym = pir_mem_allocate_zeroed_typed(lexer, symbol);
     sym->name   = name;
     sym->type   = type;
@@ -232,7 +233,7 @@ allocate a PASM register for it.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 symbol *
-find_symbol(NOTNULL(struct lexer_state * const lexer), NOTNULL(char * const name)) {
+find_symbol(NOTNULL(struct lexer_state * const lexer), NOTNULL(char const * const name)) {
     hashtable    *table    = &CURRENT_SUB(lexer)->symbols;
     unsigned long hashcode = get_hashcode(name, table->size);
     bucket       *buck     = get_bucket(table, hashcode);
@@ -406,7 +407,7 @@ Constructor to create a new global_label object.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static global_label *
-new_global_label(NOTNULL(lexer_state * const lexer), NOTNULL(char * const name)) {
+new_global_label(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)) {
     global_label *glob = pir_mem_allocate_zeroed_typed(lexer, global_label);
     glob->name         = name;
     glob->const_nr     = 0;
@@ -424,7 +425,7 @@ Store the global identifier C<name> in C<lexer>'s global label table.
 
 */
 void
-store_global_label(NOTNULL(lexer_state * const lexer), NOTNULL(char * const name)) {
+store_global_label(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)) {
     hashtable    *table = &lexer->globals;
     unsigned long hash  = get_hashcode(name, table->size);
     bucket *b           = new_bucket(lexer);
@@ -447,7 +448,7 @@ then NULL is returned.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 global_label *
-find_global_label(NOTNULL(lexer_state * const lexer), NOTNULL(char * const name)) {
+find_global_label(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)) {
     hashtable    *table    = &lexer->globals;
     unsigned long hashcode = get_hashcode(name, table->size);
     bucket *b              = get_bucket(table, hashcode);
@@ -524,7 +525,9 @@ location in the source to which any branching instruction can jump to.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static local_label *
-new_local_label(NOTNULL(lexer_state * const lexer), NOTNULL(char * const name), unsigned offset) {
+new_local_label(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name),
+                unsigned offset)
+{
     local_label *l = pir_mem_allocate_zeroed_typed(lexer, local_label);
     l->name        = name;
     l->offset      = offset;
@@ -540,7 +543,7 @@ store_local_label(struct lexer_state * const lexer, char * const labelname, unsi
 
 */
 void
-store_local_label(NOTNULL(lexer_state * const lexer), NOTNULL(char * const labelname),
+store_local_label(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const labelname),
                   unsigned offset)
 {
     local_label  *l     = new_local_label(lexer, labelname, offset);
@@ -564,7 +567,7 @@ a label, an error is emitted, otherwise, the offset of that label is returned.
 */
 PARROT_WARN_UNUSED_RESULT
 unsigned
-find_local_label(NOTNULL(lexer_state * const lexer), NOTNULL(char * const labelname)) {
+find_local_label(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const labelname)) {
     hashtable    *table    = &CURRENT_SUB(lexer)->labels;
     unsigned long hashcode = get_hashcode(labelname, table->size);
     bucket *b              = get_bucket(table, hashcode);
@@ -576,7 +579,7 @@ find_local_label(NOTNULL(lexer_state * const lexer), NOTNULL(char * const labeln
     }
 
     /* no label found, emit an error message. */
-    pirerror(lexer, "in sub '%s': cannot find offset for label '%s'",
+    yypirerror(lexer->yyscanner, lexer, "in sub '%s': cannot find offset for label '%s'",
              CURRENT_SUB(lexer)->sub_name, labelname);
 
     return 0;

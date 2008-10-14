@@ -9,7 +9,6 @@
 #include "pirsymbol.h"
 #include "pircompunit.h"
 
-
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
@@ -39,7 +38,7 @@ typedef enum lexer_flags {
  * before creating a new node in the list of allocated_mem_ptrs structures,
  * but for small programs with few memory allocations, this means an overhead.
  * Likewise, if the number is too small, this means a lot of allocation of these
- * blocks, as they're full quickly.
+ * blocks, as they're full quickly. XXX maybe make this configurable?
  *
  */
 #define NUM_MEM_ALLOCS_PER_BLOCK    512
@@ -57,18 +56,30 @@ typedef struct allocated_mem_ptrs {
  */
 typedef struct global_fixup {
     instruction *instr;    /* the instruction that will be patched, if possible */
-    char        *label;    /* the label to which this instruction refers */
+    char const  *label;    /* the label to which this instruction refers */
 
     struct global_fixup *next;
 
 } global_fixup;
 
 
-/* store the "globals" of the lexer in a structure which is passed around. */
+/* Taken from pirlexer.h, needed for declaration of yyscanner in lexer_state. */
+#ifndef YY_TYPEDEF_YY_SCANNER_T
+#  define YY_TYPEDEF_YY_SCANNER_T
+
+typedef void * yyscan_t;
+
+#endif
+
+
+/* store the "globals" of the lexer in a structure which is passed around.
+ * as there's only 1 lexer_state, Size Doesn't Matter (really), so the large
+ * number of fields is not a problem.
+ */
 typedef struct lexer_state {
     int            flags;          /* general flags, e.g. warnings level */
-    int            parse_errors;
-    char          *filename;       /* name of input file */
+    unsigned       parse_errors;
+    char const    *filename;       /* name of input file */
     FILE          *outfile;        /* name of output file */
 
     subroutine    *subs;           /* list of subs; always points to the current sub. */
@@ -95,6 +106,12 @@ typedef struct lexer_state {
                                     */
     allocated_mem_ptrs *mem_allocations; /* list of pointers to allocated memory */
 
+    yyscan_t       yyscanner;      /* sometimes when we only have a lexer, we want yyscanner
+                                    * as well. Useful for if we need yyscanner, but only have
+                                    * lexer.
+                                    */
+
+
 } lexer_state;
 
 
@@ -102,18 +119,17 @@ typedef struct lexer_state {
 /* constructor for a lexer_state object */
 lexer_state *new_lexer(char * const filename, int flags);
 
-void pirerror(lexer_state * const lexer, char const * const message, ...);
-
 void release_resources(lexer_state *lexer);
 
-char *dupstr(lexer_state * const lexer, char * const str);
+char const *dupstr(lexer_state * const lexer, char * const str);
 
-char *dupstrn(lexer_state * const lexer, char * const str, size_t numchars);
+char const *dupstrn(lexer_state * const lexer, char * const str, size_t numchars);
 
 bucket *new_bucket(lexer_state * const lexer);
 
 void init_hashtable(lexer_state * const lexer, hashtable * const table, unsigned size);
 
+/* same trick as in parrot's memory system, for "automagic" casting */
 #define pir_mem_allocate_zeroed_typed(lxr, type) (type *)pir_mem_allocate_zeroed(lxr, sizeof (type))
 
 void *pir_mem_allocate_zeroed(lexer_state * const lexer, size_t numbytes);

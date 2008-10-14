@@ -61,6 +61,10 @@ TODO:
 #include <math.h>
 #include "parrot/oplib/ops.h"
 
+/* prevent declarations of malloc() and free() in pirparser.h */
+#define YYMALLOC
+#define YYFREE
+
 #include "pirparser.h"
 #include "pircompiler.h"
 #include "pircompunit.h"
@@ -76,7 +80,11 @@ TODO:
 #define YY_NO_UNISTD_H
 
 /* define YY_DECL, so that in "pirlexer.h" it won't be defined */
-#define YY_DECL int yylex(YYSTYPE *yylval, yyscan_t yyscanner)
+#define YY_DECL int yypirlex(YYSTYPE *yylval, yyscan_t yyscanner)
+
+#ifndef __STDC_VERSION__
+#  define __STDC_VERSION__ 0
+#endif
 
 /* include "pirlexer.h" before "piryy.h" */
 #include "pirlexer.h"
@@ -86,6 +94,10 @@ TODO:
 extern YY_DECL;
 
 /**** End of Sequence. ****/
+
+
+int  yypirget_column(yyscan_t yyscanner);
+void yypirset_column(int col, yyscan_t yyscanner);
 
 
 /* Enumeration of mathematical operator types; these are used to index the opnames array. */
@@ -130,7 +142,7 @@ typedef enum pir_rel_operators {
 } pir_rel_operator;
 
 /* names of the binary operators */
-static char * const opnames[] = {
+static char const * const opnames[] = {
     "add",
     "inc", /* use this when "add"ing 1 */
     "sub",
@@ -170,26 +182,26 @@ static constant *fold_i_i(yyscan_t yyscanner, int a, pir_math_operator op, int b
 static constant *fold_n_i(yyscan_t yyscanner, double a, pir_math_operator op, int b);
 static constant *fold_i_n(yyscan_t yyscanner, int a, pir_math_operator op, double b);
 static constant *fold_n_n(yyscan_t yyscanner, double a, pir_math_operator op, double b);
-static constant *fold_s_s(yyscan_t yyscanner, char *a, pir_math_operator op, char *b);
+static constant *fold_s_s(yyscan_t yyscanner, char const *a, pir_math_operator op, char const *b);
 
 static int evaluate_i_i(int a, pir_rel_operator op, int b);
 static int evaluate_n_n(double a, pir_rel_operator op, double b);
 static int evaluate_i_n(int a, pir_rel_operator op, double b);
 static int evaluate_n_i(double a, pir_rel_operator op, int b);
-static int evaluate_s_s(char * const a, pir_rel_operator op, char * const b);
+static int evaluate_s_s(char const * const a, pir_rel_operator op, char const * const b);
 
 static int evaluate_s(char * const s);
 static int evaluate_c(lexer_state * const lexer, constant * const c);
 
-static char *concat_strings(lexer_state * const lexer, char *a, char *b);
+static char *concat_strings(lexer_state * const lexer, char const * a, char const * b);
 
 static void create_if_instr(yyscan_t yyscanner, lexer_state * const lexer, int invert,
-                            int hasnull, char * const name, char * const label);
+                            int hasnull, char const * const name, char const * const label);
 
 static void do_strength_reduction(yyscan_t yyscanner);
 static int check_value(constant * const c, int val);
 
-static void check_first_arg_direction(yyscan_t yyscanner, char * const opname);
+static void check_first_arg_direction(yyscan_t yyscanner, char const * const opname);
 
 static int check_op_args_for_symbols(yyscan_t yyscanner);
 static int get_opinfo(yyscan_t yyscanner);
@@ -202,12 +214,10 @@ static int get_opinfo(yyscan_t yyscanner);
 /* enable slightly more helpful error messages */
 #define YYERROR_VERBOSE 1
 
-/* keep MSVC happy */
 #ifndef YYENABLE_NLS
 #  define YYENABLE_NLS 0
 #endif
 
-/* keep MSVC happy */
 #ifndef YYLTYPE_IS_TRIVIAL
 #  define YYLTYPE_IS_TRIVIAL 0
 #endif
@@ -230,7 +240,7 @@ static int get_opinfo(yyscan_t yyscanner);
 %union {
     double              dval;
     int                 ival;
-    char               *sval;
+    char   const       *sval;
     struct constant    *cval;
     struct instruction *instr;
     struct expression  *expr;
@@ -439,6 +449,8 @@ static int get_opinfo(yyscan_t yyscanner);
 %type <cval> const_tail
              constant
 
+%name-prefix="yypir"
+
 
 /* needed for reentrancy */
 %pure-parser
@@ -510,7 +522,7 @@ loadlib           : ".loadlib" TK_STRINGC
                   ;
 
 location_directive: ".line" TK_INTC
-                            { yyset_lineno ($2, yyscanner); }
+                            { yypirset_lineno ($2, yyscanner); }
                   | ".file" TK_STRINGC
                             { lexer->filename = $2; }
                   ;
@@ -740,7 +752,7 @@ keylist_assignment: keylist '=' expression
                          /* the "instruction" that was set now appears to be
                           * an identifier; get the name, and check its type.
                           */
-                         char * const instr = CURRENT_INSTRUCTION(lexer)->opname;
+                         char const * const instr = CURRENT_INSTRUCTION(lexer)->opname;
                          symbol *sym        = find_symbol(lexer, instr);
                          target *obj;
 
@@ -748,11 +760,11 @@ keylist_assignment: keylist '=' expression
                           * it must have been declared.
                           */
                          if (sym == NULL) {
-                            yyerror(yyscanner, lexer, "indexed object '%s' not declared", instr);
+                            yypirerror(yyscanner, lexer, "indexed object '%s' not declared", instr);
                             sym = new_symbol(lexer, instr, PMC_TYPE);
                          }
                          else if (sym->type != PMC_TYPE) /* found symbol, now check it's a PMC */
-                            yyerror(yyscanner, lexer,
+                            yypirerror(yyscanner, lexer,
                                     "indexed object '%s' must be of type 'pmc'", instr);
 
                          /* convert the symbol into a target */
@@ -800,13 +812,13 @@ keyaccess         : pmc_object keylist
                            else { /* it's not a register, so it must be a declared symbol */
                                symbol *sym = find_symbol(lexer, target_name($1));
                                if (sym == NULL) {
-                                   yyerror(yyscanner, lexer,
+                                   yypirerror(yyscanner, lexer,
                                            "indexed object '%s' not declared", target_name($1));
                                    /* make sure sym is a valid pointer */
                                    sym = new_symbol(lexer, target_name($1), PMC_TYPE);
                                }
                                else if (sym->type != PMC_TYPE)
-                                   yyerror(yyscanner, lexer,
+                                   yypirerror(yyscanner, lexer,
                                            "indexed object '%s' is not of type 'pmc'",
                                            target_name($1));
 
@@ -896,7 +908,7 @@ assignment        : target '=' TK_INTC
                           symbol *sym = find_symbol(lexer, $3);
                           if (sym == NULL) {
                               if (!is_parrot_op(lexer, $3))
-                                  yyerror(yyscanner, lexer, "'%s' is neither a declared symbol "
+                                  yypirerror(yyscanner, lexer, "'%s' is neither a declared symbol "
                                                             "nor a parrot opcode", $3);
                               else { /* handle it as an op */
                                   unshift_operand(lexer, expr_from_target(lexer, $1));
@@ -929,7 +941,7 @@ assignment        : target '=' TK_INTC
                               if (is_parrot_op(lexer, $3))
                                   set_instrf(lexer, $3, "%T%E", $1, expr_from_key(lexer, $4));
                               else
-                                  yyerror(yyscanner, lexer, "indexed object '%s' not declared", $3);
+                                  yypirerror(yyscanner, lexer, "indexed object '%s' not declared", $3);
 
                               /* create a symbol node anyway, so we can continue with instr. gen. */
                               sym = new_symbol(lexer, $3, PMC_TYPE);
@@ -937,7 +949,7 @@ assignment        : target '=' TK_INTC
                           else {
                               /* at this point, sym is not NULL, even if there was an error */
                               if (sym->type != PMC_TYPE)
-                                  yyerror(yyscanner, lexer,
+                                  yypirerror(yyscanner, lexer,
                                           "indexed object '%s' must be of type 'pmc'", $3);
 
                               t = target_from_symbol(lexer, sym);
@@ -953,11 +965,11 @@ assignment        : target '=' TK_INTC
                           target *t;
 
                           if (sym == NULL) {
-                              yyerror(yyscanner, lexer, "indexed object '%s' not declared", $3);
+                              yypirerror(yyscanner, lexer, "indexed object '%s' not declared", $3);
                               sym = new_symbol(lexer, $3, PMC_TYPE);
                           }
                           else if (sym->type != PMC_TYPE)
-                              yyerror(yyscanner, lexer,
+                              yypirerror(yyscanner, lexer,
                                       "indexed object '%s' must be of type 'pmc'", $3);
 
                           t = target_from_symbol(lexer, sym);
@@ -1027,12 +1039,12 @@ assignment        : target '=' TK_INTC
                           target *t;
 
                           if (sym == NULL) {
-                              yyerror(yyscanner, lexer, "indexed object '%s' not declared", $1);
+                              yypirerror(yyscanner, lexer, "indexed object '%s' not declared", $1);
                               /* create a dummy symbol so we can continue without seg. faults */
                               sym = new_symbol(lexer, $1, PMC_TYPE);
                           }
                           else if (sym->type != PMC_TYPE)
-                              yyerror(yyscanner, lexer,
+                              yypirerror(yyscanner, lexer,
                                       "indexed object '%s' must be of type 'pmc'", $1);
                           /* at this point sym is a valid (possibly dummy) object for sure */
                           t = target_from_symbol(lexer, sym);
@@ -1276,7 +1288,7 @@ local_var_name    : identifier
                         { /* try to find symbol for this id; if found, it was already declared */
                           symbol *sym = find_symbol(lexer, $1);
                           if (sym)
-                              yyerror(yyscanner, lexer, "symbol '%s' is already declared", $1);
+                              yypirerror(yyscanner, lexer, "symbol '%s' is already declared", $1);
                           $$ = $1;
                         }
                   ;
@@ -1291,10 +1303,10 @@ lex_decl          : ".lex" TK_STRINGC ',' pmc_object "\n"
                               symbol *sym = find_symbol(lexer, target_name($4));
 
                               if (sym == NULL) /* check declaration */
-                                  yyerror(yyscanner, lexer, "lexical '%s' is not declared",
+                                  yypirerror(yyscanner, lexer, "lexical '%s' is not declared",
                                           target_name($4));
                               else if (sym->type != PMC_TYPE) /* a .lex must be a PMC */
-                                  yyerror(yyscanner, lexer, "lexical '%s' must be of type 'pmc'",
+                                  yypirerror(yyscanner, lexer, "lexical '%s' must be of type 'pmc'",
                                           target_name($4));
                           }
                           set_lex_flag($4, $2);
@@ -1406,11 +1418,11 @@ methodcall           : pmc_object '.' method arguments
                              else { /* is not a register but a symbol */
                                  symbol *sym = find_symbol(lexer, target_name($1));
                                  if (sym == NULL)
-                                     yyerror(yyscanner, lexer, "object '%s' not declared",
+                                     yypirerror(yyscanner, lexer, "object '%s' not declared",
                                              target_name($1));
 
                                  else if (sym->type != PMC_TYPE)
-                                     yyerror(yyscanner, lexer,
+                                     yypirerror(yyscanner, lexer,
                                              "cannot invoke method: '%s' is not of type 'pmc'",
                                              target_name($1));
 
@@ -1441,13 +1453,13 @@ method               : identifier
                              symbol *sym = find_symbol(lexer, $1);
 
                              if (sym == NULL) {
-                                yyerror(yyscanner, lexer,
+                                yypirerror(yyscanner, lexer,
                                         "method identifier '%s' not declared", $1);
                                 /* make sure sym is not NULL */
                                 sym = new_symbol(lexer, $1, PMC_TYPE);
                              }
                              else if (sym->type != PMC_TYPE && sym->type != STRING_TYPE)
-                                 yyerror(yyscanner, lexer,
+                                 yypirerror(yyscanner, lexer,
                                          "method '%s' must be of type 'pmc' or 'string'", $1);
 
                              $$ = expr_from_target(lexer, target_from_symbol(lexer, sym));
@@ -1732,7 +1744,7 @@ symbol      : reg
             | identifier { /* a symbol must have been declared; check that at this point. */
                            symbol *sym = find_symbol(lexer, $1);
                            if (sym == NULL) {
-                               yyerror(yyscanner, lexer, "symbol '%s' not declared", $1);
+                               yypirerror(yyscanner, lexer, "symbol '%s' not declared", $1);
 
                                    /* make sure sym is not NULL */
                                sym = new_symbol(lexer, $1, UNKNOWN_TYPE);
@@ -1832,7 +1844,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static constant *
 fold_i_i(yyscan_t yyscanner, int a, pir_math_operator op, int b) {
-    int result;
+    int result = 0;
 
     switch (op) {
         case OP_ADD:
@@ -1843,7 +1855,7 @@ fold_i_i(yyscan_t yyscanner, int a, pir_math_operator op, int b) {
             break;
         case OP_DIV:
             if (b == 0)
-                yyerror(yyscanner, yyget_extra(yyscanner), "cannot divide by 0!");
+                yypirerror(yyscanner, yypirget_extra(yyscanner), "cannot divide by 0!");
             else
                 result = a / b;
             break;
@@ -1867,7 +1879,7 @@ fold_i_i(yyscan_t yyscanner, int a, pir_math_operator op, int b) {
             result = (int)pow(a, b);
             break;
         case OP_CONCAT:
-            yyerror(yyscanner, yyget_extra(yyscanner),
+            yypirerror(yyscanner, yypirget_extra(yyscanner),
                     "cannot concatenate operands of type 'int' and 'int'");
             break;
         case OP_LSR:
@@ -1912,13 +1924,11 @@ fold_i_i(yyscan_t yyscanner, int a, pir_math_operator op, int b) {
             result = (a != b);
             break;
 
-        /* OP_INC and OP_DEC are here only to keep the C compiler happy */
-        case OP_INC:
-        case OP_DEC:
-            panic(yyget_extra(yyscanner), "detected 'inc' or 'dec' in fold_i_i()");
+        default:
+            panic(yypirget_extra(yyscanner), "detected 'inc' or 'dec' in fold_i_i()");
             break;
     }
-    return new_const(yyget_extra(yyscanner), INT_TYPE, result);
+    return new_const(yypirget_extra(yyscanner), INT_TYPE, result);
 }
 
 /*
@@ -1935,7 +1945,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static constant *
 fold_n_i(yyscan_t yyscanner, double a, pir_math_operator op, int b) {
-    double result;
+    double result = 0;
     switch (op) {
         case OP_ADD:
             result = a + b;
@@ -1945,7 +1955,7 @@ fold_n_i(yyscan_t yyscanner, double a, pir_math_operator op, int b) {
             break;
         case OP_DIV:
             if (b == 0)
-                yyerror(yyscanner, yyget_extra(yyscanner), "cannot divide by 0!");
+                yypirerror(yyscanner, yypirget_extra(yyscanner), "cannot divide by 0!");
             else
                 result = a / b;
             break;
@@ -1961,7 +1971,7 @@ fold_n_i(yyscan_t yyscanner, double a, pir_math_operator op, int b) {
         case OP_LSR:
         case OP_XOR:
         case OP_CONCAT:
-            yyerror(yyscanner, yyget_extra(yyscanner),
+            yypirerror(yyscanner, yypirget_extra(yyscanner),
                     "cannot apply binary operator '%s' to types 'num' and 'int'", opnames[op]);
             break;
         case OP_POW:
@@ -1996,12 +2006,11 @@ fold_n_i(yyscan_t yyscanner, double a, pir_math_operator op, int b) {
             break;
 
         /* OP_INC and OP_DEC are here only to keep the C compiler happy */
-        case OP_INC:
-        case OP_DEC:
-            panic(yyget_extra(yyscanner), "detected 'inc' or 'dec' in fold_n_i()");
+        default:
+            panic(yypirget_extra(yyscanner), "detected 'inc' or 'dec' in fold_n_i()");
             break;
     }
-    return new_const(yyget_extra(yyscanner), NUM_TYPE, result);
+    return new_const(yypirget_extra(yyscanner), NUM_TYPE, result);
 }
 
 /*
@@ -2018,7 +2027,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static constant *
 fold_i_n(yyscan_t yyscanner, int a, pir_math_operator op, double b) {
-    double result;
+    double result = 0;
 
     switch (op) {
         case OP_ADD:
@@ -2029,7 +2038,7 @@ fold_i_n(yyscan_t yyscanner, int a, pir_math_operator op, double b) {
             break;
         case OP_DIV:
             if (b == 0)
-                yyerror(yyscanner, yyget_extra(yyscanner), "cannot divide by 0!");
+                yypirerror(yyscanner, yypirget_extra(yyscanner), "cannot divide by 0!");
             else
                 result = a / b;
             break;
@@ -2045,7 +2054,7 @@ fold_i_n(yyscan_t yyscanner, int a, pir_math_operator op, double b) {
         case OP_SHL:
         case OP_XOR:
         case OP_CONCAT:
-            yyerror(yyscanner, yyget_extra(yyscanner),
+            yypirerror(yyscanner, yypirget_extra(yyscanner),
                     "cannot apply binary operator '%s' to types 'int' and 'num'", opnames[op]);
             break;
         case OP_POW:
@@ -2080,12 +2089,11 @@ fold_i_n(yyscan_t yyscanner, int a, pir_math_operator op, double b) {
             break;
 
         /* OP_INC and OP_DEC are here only to keep the C compiler happy */
-        case OP_INC:
-        case OP_DEC:
-            panic(yyget_extra(yyscanner), "detected 'inc' or 'dec' in fold_i_n()");
+        default:
+            panic(yypirget_extra(yyscanner), "detected 'inc' or 'dec' in fold_i_n()");
             break;
     }
-    return new_const(yyget_extra(yyscanner), NUM_TYPE, result);
+    return new_const(yypirget_extra(yyscanner), NUM_TYPE, result);
 }
 
 /*
@@ -2102,7 +2110,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static constant *
 fold_n_n(yyscan_t yyscanner, double a, pir_math_operator op, double b) {
-    double result;
+    double result = 0;
     switch (op) {
         case OP_ADD:
             result = a + b;
@@ -2112,7 +2120,7 @@ fold_n_n(yyscan_t yyscanner, double a, pir_math_operator op, double b) {
             break;
         case OP_DIV:
             if (b == 0) /* throw exception ? */
-                yyerror(yyscanner, yyget_extra(yyscanner), "cannot divide by 0");
+                yypirerror(yyscanner, yypirget_extra(yyscanner), "cannot divide by 0");
             else
                 result = a / b;
             break;
@@ -2131,7 +2139,7 @@ fold_n_n(yyscan_t yyscanner, double a, pir_math_operator op, double b) {
         case OP_SHR:
         case OP_SHL:
         case OP_XOR:
-            yyerror(yyscanner, yyget_extra(yyscanner),
+            yypirerror(yyscanner, yypirget_extra(yyscanner),
                     "cannot apply binary operator '%s' to arguments of type number", opnames[op]);
             break;
         case OP_OR:
@@ -2142,7 +2150,7 @@ fold_n_n(yyscan_t yyscanner, double a, pir_math_operator op, double b) {
             break;
         case OP_FDIV:
             if (b == 0)
-                yyerror(yyscanner, yyget_extra(yyscanner), "cannot divide by 0");
+                yypirerror(yyscanner, yypirget_extra(yyscanner), "cannot divide by 0");
             else
                 result = floor(a / b);
             break;
@@ -2166,11 +2174,10 @@ fold_n_n(yyscan_t yyscanner, double a, pir_math_operator op, double b) {
             break;
 
         /* OP_INC and OP_DEC are here only to keep the C compiler happy */
-        case OP_INC:
-        case OP_DEC:
+        default:
             break;
     }
-    return new_const(yyget_extra(yyscanner), NUM_TYPE, result);
+    return new_const(yypirget_extra(yyscanner), NUM_TYPE, result);
 }
 
 /*
@@ -2188,10 +2195,10 @@ other operators will result in an error.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static constant *
-fold_s_s(yyscan_t yyscanner, NOTNULL(char *a), pir_math_operator op, NOTNULL(char *b)) {
+fold_s_s(yyscan_t yyscanner, NOTNULL(char const *a), pir_math_operator op, NOTNULL(char const *b)) {
     switch (op) {
         case OP_CONCAT: {
-            lexer_state *lexer = yyget_extra(yyscanner);
+            lexer_state *lexer = yypirget_extra(yyscanner);
             return new_const(lexer, STRING_TYPE, concat_strings(lexer, a, b));
         }
         case OP_ADD:
@@ -2210,9 +2217,9 @@ fold_s_s(yyscan_t yyscanner, NOTNULL(char *a), pir_math_operator op, NOTNULL(cha
         case OP_OR:
         case OP_AND:
         case OP_FDIV:
-            yyerror(yyscanner, yyget_extra(yyscanner),
+            yypirerror(yyscanner, yypirget_extra(yyscanner),
                     "cannot apply binary operator '%s' to arguments of type number", opnames[op]);
-            return new_const(yyget_extra(yyscanner), STRING_TYPE, a);
+            return new_const(yypirget_extra(yyscanner), STRING_TYPE, a);
 
         case OP_ISEQ:
         case OP_ISLE:
@@ -2220,13 +2227,12 @@ fold_s_s(yyscan_t yyscanner, NOTNULL(char *a), pir_math_operator op, NOTNULL(cha
         case OP_ISGE:
         case OP_ISGT:
         case OP_ISNE:
-            return new_const(yyget_extra(yyscanner), INT_TYPE, (1 == evaluate_s_s(a, op, b)));
+            return new_const(yypirget_extra(yyscanner), INT_TYPE, (1 == evaluate_s_s(a, op, b)));
 
 
         /* OP_INC and OP_DEC are here only to keep the C compiler happy */
-        case OP_INC:
-        case OP_DEC:
-            panic(yyget_extra(yyscanner), "detected 'inc' or 'dec' in fold_s_s()");
+        default:
+            panic(yypirget_extra(yyscanner), "detected 'inc' or 'dec' in fold_s_s()");
             break;
     }
     return NULL;
@@ -2332,7 +2338,7 @@ Parrot source code; this function uses the result of C<strcmp()>.
 */
 PARROT_WARN_UNUSED_RESULT
 static int
-evaluate_s_s(NOTNULL(char * const a), pir_rel_operator op, NOTNULL(char * const b)) {
+evaluate_s_s(NOTNULL(char const * const a), pir_rel_operator op, NOTNULL(char const * const b)) {
     int result = strcmp(a, b); /* do /not/ use STREQ; we're interested in the result. */
 
     switch (op) {
@@ -2407,18 +2413,16 @@ evaluate_c(NOTNULL(lexer_state * const lexer), NOTNULL(constant * const c)) {
             return (c->val.nval != 0);
         case STRING_TYPE:
             return evaluate_s(c->val.sval);
-        case PMC_TYPE:
-        case UNKNOWN_TYPE:
+        default:
             panic(lexer, "impossible constant type in evaluate_c()");
-            break;
+            return 0;
     }
-    return 0; /* keep compiler happy; will never happen. */
 }
 
 /*
 
 =item C<static char *
-concat_strings(lexer_state * const lexer, char *a, char *b)>
+concat_strings(lexer_state * const lexer, char const *a, char const *b)>
 
 Concatenates two strings into a new buffer. The new string is returned.
 
@@ -2428,7 +2432,9 @@ Concatenates two strings into a new buffer. The new string is returned.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static char *
-concat_strings(NOTNULL(lexer_state * const lexer), NOTNULL(char * a), NOTNULL(char * b)) {
+concat_strings(NOTNULL(lexer_state * const lexer), NOTNULL(char const * a),
+               NOTNULL(char const * b))
+{
     int strlen_a = strlen(a);
     char *newstr = (char *)pir_mem_allocate_zeroed(lexer, (strlen_a + strlen(b) + 1)
                                                           * sizeof (char));
@@ -2458,13 +2464,13 @@ C<name> is the name of the variable that is checked during this instruction
 */
 static void
 create_if_instr(yyscan_t yyscanner, NOTNULL(lexer_state * const lexer), int invert, int hasnull,
-                NOTNULL(char * const name),
-                NOTNULL(char * const label))
+                NOTNULL(char const * const name),
+                NOTNULL(char const * const label))
 {
     /* try to find the symbol; if it was declared it will be found; otherwise emit an error. */
     symbol *sym = find_symbol(lexer, name);
     if (sym == NULL) {
-        yyerror(yyscanner, lexer, "symbol '%s' not declared'", name);
+        yypirerror(yyscanner, lexer, "symbol '%s' not declared'", name);
         /* create a dummy symbol so we can continue without segfaulting. */
         sym = new_symbol(lexer, name, UNKNOWN_TYPE);
     }
@@ -2537,7 +2543,7 @@ be removed, so that the direction of the first operand will change from OUT to I
 */
 static void
 reduce_strength(yyscan_t yyscanner, int newop, int op2_index) {
-    lexer_state * const lexer = yyget_extra(yyscanner);
+    lexer_state * const lexer = yypirget_extra(yyscanner);
     instruction *       instr = CURRENT_INSTRUCTION(lexer);
     /* based on the signatures, we know for sure that the first and second operands are targets. */
 
@@ -2680,6 +2686,8 @@ convert_3_to_2_args(int opcode, NOTNULL(int *second_op_index)) {
         case PARROT_OP_sub_n_nc_n:
             *second_op_index = 2;
             return PARROT_OP_sub_n_nc;
+        default:
+            break;
     }
     return -1;
 }
@@ -2713,7 +2721,7 @@ becomes:
 */
 static void
 do_strength_reduction(yyscan_t yyscanner) {
-    lexer_state *lexer = yyget_extra(yyscanner);
+    lexer_state *lexer = yypirget_extra(yyscanner);
     instruction *instr;
     expression  *arg1;
     expression  *arg2;
@@ -2773,7 +2781,7 @@ do_strength_reduction(yyscan_t yyscanner) {
             if (check_value(arg2->expr.c, 1))  /* div $I0, 1 --> noop */
                 update_op(lexer, instr, PARROT_OP_noop);
             else if (check_value(arg2->expr.c, 0))  /* div $I0, 0 --> error */
-                yyerror(yyscanner, lexer, "cannot divide by 0");
+                yypirerror(yyscanner, lexer, "cannot divide by 0");
             break;
         case PARROT_OP_mul_i_ic:
             if (check_value(arg2->expr.c, 1))  /* mul $I0, 1 --> noop */
@@ -2842,9 +2850,9 @@ not be allowed.
 
 */
 static void
-check_first_arg_direction(yyscan_t yyscanner, NOTNULL(char * const opname)) {
+check_first_arg_direction(yyscan_t yyscanner, NOTNULL(char const * const opname)) {
     int dir_first_arg;
-    lexer_state * const lexer = yyget_extra(yyscanner);
+    lexer_state * const lexer = yypirget_extra(yyscanner);
 
     PARROT_ASSERT(CURRENT_INSTRUCTION(lexer));
 
@@ -2858,7 +2866,7 @@ check_first_arg_direction(yyscan_t yyscanner, NOTNULL(char * const opname)) {
 
     /* direction cannot be IN or INOUT */
     if (dir_first_arg == PARROT_ARGDIR_IN)
-        yyerror(yyscanner, lexer, "cannot write first arg of op '%s' as a target "
+        yypirerror(yyscanner, lexer, "cannot write first arg of op '%s' as a target "
                                   "(direction of argument is IN).", opname);
 
 }
@@ -2902,6 +2910,9 @@ get_signature_length(NOTNULL(expression * const e)) {
             return 3; /* 1 for '_', 1 for 'i', 1 for 'c' */
         case EXPR_KEY: /* for '_', 'k' */
             return 2 + get_signature_length(e->expr.k->expr);
+        default:
+            fprintf(stderr, "wrong expression typein get_signature_length()\n");
+            break;
     }
     return 0;
 }
@@ -2987,6 +2998,9 @@ write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
             }
             */
 
+            break;
+        default:
+            fprintf(stderr, "wrong expression type in write_signature()\n");
             break;
     }
     return instr_writer;
@@ -3094,7 +3108,7 @@ XXX is this really needed? why not just disallow lt 10, 20, L ?
 */
 static void
 flow_op_const_fold(yyscan_t yyscanner, int flow_op) {
-    lexer_state * const lexer = yyget_extra(yyscanner);
+    lexer_state * const lexer = yypirget_extra(yyscanner);
     expression *arg1, *arg2, *arg3;
     int result;
     instruction * instr = CURRENT_INSTRUCTION(lexer);
@@ -3152,10 +3166,10 @@ XXX really needed? Why not just disallow add $I0, 10, 20 ??
 */
 static void
 math_op_const_fold(yyscan_t yyscanner, int folding_op, int new_op) {
-    expression  * const arg1,
-                * const arg2,
-                * const arg3;
-    lexer_state * const lexer = yyget_extra(yyscanner);
+    expression  * arg1,
+                * arg2,
+                * arg3;
+    lexer_state * const lexer = yypirget_extra(yyscanner);
     instruction * const instr = CURRENT_INSTRUCTION(lexer);
     constant    *       result;
     double              arg1val,
@@ -3230,7 +3244,7 @@ then that means the op is not valid, and an error message will be reported.
 PARROT_IGNORABLE_RESULT
 static int
 get_opinfo(yyscan_t yyscanner) {
-    lexer_state * const lexer = yyget_extra(yyscanner);
+    lexer_state * const lexer = yypirget_extra(yyscanner);
     instruction * const instr = CURRENT_INSTRUCTION(lexer);
 
     char * const fullopname = get_signatured_opname(lexer, instr);
@@ -3281,7 +3295,7 @@ get_opinfo(yyscan_t yyscanner) {
             return TRUE;
         }
         else {
-            yyerror(yyscanner, lexer, "'%s' is not a parrot op", fullopname);
+            yypirerror(yyscanner, lexer, "'%s' is not a parrot op", fullopname);
             return FALSE;
         }
     }
@@ -3311,9 +3325,9 @@ If there are errors, FALSE is returned; if successful, TRUE is returned.
 PARROT_WARN_UNUSED_RESULT
 static int
 check_op_args_for_symbols(yyscan_t yyscanner) {
-    lexer_state * const lexer = yyget_extra(yyscanner);
+    lexer_state * const lexer = yypirget_extra(yyscanner);
     struct op_info_t  * opinfo;
-    short               i;
+    unsigned short      i;
     short               opcount;
     unsigned            num_operands;
     char               *fullopname;
@@ -3391,7 +3405,7 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
                  * an error.
                  */
                 if (TEST_BIT(label_bitmask, BIT(i))) {
-                    yyerror(yyscanner, lexer, "symbol '%s' is not declared", iter->expr.id);
+                    yypirerror(yyscanner, lexer, "symbol '%s' is not declared", iter->expr.id);
                     return FALSE;
                 }
             }

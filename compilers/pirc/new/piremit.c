@@ -14,6 +14,11 @@
 
 =head1 FUNCTIONS
 
+This file contains emit functions.
+
+XXX Take the print_* function as a template to create the
+PBC-generating functions.
+
 =over 4
 
 =cut
@@ -37,6 +42,11 @@ static char const pir_register_types[5] = {'I', 'N', 'S', 'P', '?'};
 /* prototype declaration */
 void print_expr(lexer_state * const lexer, expression * const expr);
 void print_key(lexer_state * const lexer, key *k);
+void print_target(lexer_state *lexer, target * const t);
+void print_constant(lexer_state * const lexer, constant * const c);
+void print_expressions(lexer_state * const lexer, expression * const expr);
+void print_instruction(lexer_state * const lexer, instruction *ins);
+void print_statement(lexer_state * const lexer, subroutine * const sub);
 
 /*
 
@@ -116,6 +126,7 @@ print_constant(lexer_state * const lexer, constant * const c) {
             fprintf(out, "\"%s\"", c->val.pval);
             break;
         case UNKNOWN_TYPE:
+        default:
             panic(lexer, "Unknown type detected in print_constant()");
             break;
     }
@@ -146,6 +157,8 @@ print_expr(lexer_state * const lexer, expression * const expr) {
         case EXPR_KEY:
             print_key(lexer, expr->expr.k);
             break;
+        default:
+            break;
     }
 }
 
@@ -173,6 +186,7 @@ print_expressions(lexer_state * const lexer, expression * const expr) {
         while (iter != expr->next);
     }
 }
+
 
 void
 print_instruction(lexer_state * const lexer, instruction *ins) {

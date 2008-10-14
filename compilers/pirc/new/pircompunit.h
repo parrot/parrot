@@ -142,7 +142,7 @@ typedef union value {
 
 /* literal constants, possibly named */
 typedef struct constant {
-    char            *name;     /* name of the constant, if declared as a constant */
+    char const      *name;     /* name of the constant, if declared as a constant */
     pir_type         type;     /* type of the constant */
     value            val;      /* value of the constant */
     struct constant *next;
@@ -162,7 +162,7 @@ typedef struct expression {
     union __expression_union {
         struct target  *t;
         constant       *c;
-        char           *id;
+        char const     *id;
         struct key     *k;
 
     } expr;
@@ -196,14 +196,14 @@ typedef struct target {
     pir_type       type;           /* type of this target. */
 
     union { /* target is either a .local/.param or a PIR register; no need to store both */
-        char      *name;           /* if this is a declared local */
-        int        regno;          /* if this is a register */
+        char const *name;           /* if this is a declared local */
+        int         regno;          /* if this is a register */
     } u;
 
     int            color;          /* for register allocation; -1 means no reg. allocated. */
     target_flag    flags;          /* flags like :slurpy etc. */
-    char          *alias;          /* if this is a named parameter, this is the alias */
-    char          *lex_name;       /* if this is a lexical, this field contains the name */
+    char const    *alias;          /* if this is a named parameter, this is the alias */
+    char const    *lex_name;       /* if this is a lexical, this field contains the name */
     struct key    *key;            /* the key of this target, i.e. $P0[$P1], $P1 is key. */
 
     struct target *next;
@@ -220,7 +220,7 @@ typedef struct target {
 typedef struct argument {
     expression      *value; /* the value of this argument */
     int              flags; /* :flat or :named, if specified */
-    char            *alias; /* value of the :named flag */
+    char const      *alias; /* value of the :named flag */
 
     struct argument *next;  /* points to the next argument */
 
@@ -250,8 +250,8 @@ typedef struct invocation {
 /* the instruction node represents a single parrot instruction */
 typedef struct instruction {
     unsigned            offset;       /* sequence number of this instruction */
-    char               *label;        /* label of this instruction */
-    char               *opname;       /* name of the instruction, such as "print" and "set" */
+    char         const *label;        /* label of this instruction */
+    char         const *opname;       /* name of the instruction, such as "print" and "set" */
     expression         *operands;     /* operands like "$I0" and "42" in "set $I0, 42" */
     int                 flags;        /* XXX used for checking if this op jumps */
     struct op_info_t   *opinfo;       /* pointer to the op_info containing this op's meta data */
@@ -269,7 +269,7 @@ typedef struct instruction {
 /* a hashtable bucket for storing something */
 typedef struct bucket {
     union __bucket_union {
-        char                *str;
+        char const          *str;
         struct symbol       *sym;
         struct local_label  *loc;
         struct global_label *glob;
@@ -302,11 +302,11 @@ struct label;
 /* a sub */
 typedef struct subroutine {
     key                *name_space;    /* this sub's namespace */
-    char               *sub_name;      /* this sub's name */
-    char               *outer_sub;     /* this sub's outer subroutine, if any */
-    char               *lex_id;        /* this sub's lex_id, if any */
-    char               *vtable_method; /* name of vtable method that this sub's overriding if any */
-    char               *instanceof;    /* XXX document this XXX */
+    char const         *sub_name;      /* this sub's name */
+    char const         *outer_sub;     /* this sub's outer subroutine, if any */
+    char const         *lex_id;        /* this sub's lex_id, if any */
+    char const         *vtable_method; /* name of vtable method that this sub's overriding if any */
+    char const         *instanceof;    /* XXX document this XXX */
     int                 flags;         /* this sub's flags */
 
     /* XXX the whole multi stuff must be implemented */
@@ -336,34 +336,36 @@ struct lexer_state;
 void set_namespace(struct lexer_state * const lexer, key * const ns);
 
 /* various set functions to set the value of a subroutine flag */
-void set_sub_outer(struct lexer_state * const lexer, char * const outersub);
-void set_sub_vtable(struct lexer_state * const lexer, char * vtablename);
-void set_sub_lexid(struct lexer_state * const lexer, char * const lexid);
-void set_sub_instanceof(struct lexer_state * const lexer, char * const classname);
+void set_sub_outer(struct lexer_state * const lexer, char const * const outersub);
+void set_sub_vtable(struct lexer_state * const lexer, char const * vtablename);
+void set_sub_lexid(struct lexer_state * const lexer, char const * const lexid);
+void set_sub_instanceof(struct lexer_state * const lexer, char const * const classname);
 
 /* install a new subroutine node */
-void new_subr(struct lexer_state * const lexer, char * const subname);
+void new_subr(struct lexer_state * const lexer, char const * const subname);
 
 /* functions for setting argument flags or argument alias */
 argument *set_arg_flag(argument * const arg, arg_flag flag);
-argument *set_arg_alias(struct lexer_state * const lexer, char * const alias);
+argument *set_arg_alias(struct lexer_state * const lexer, char const * const alias);
 
 /* constructors for constant nodes */
-constant *new_named_const(struct lexer_state * const lexer, pir_type type, char * const name, ...);
+constant *new_named_const(struct lexer_state * const lexer, pir_type type,
+                          char const * const name, ...);
+
 constant *new_const(struct lexer_state * const lexer, pir_type type, ...);
 
 /* conversion functions, each wrapping its argument in an expression node */
 expression *expr_from_const(struct lexer_state * const lexer, constant * const c);
 expression *expr_from_target(struct lexer_state * const lexer, target * const t);
-expression *expr_from_ident(struct lexer_state * const lexer, char * const name);
+expression *expr_from_ident(struct lexer_state * const lexer, char const * const name);
 expression *expr_from_key(struct lexer_state * const lexer, key * const k);
 
 /* functions for argument node creation and storing */
 argument *new_argument(struct lexer_state * const lexer, expression * const expr);
 argument *add_arg(argument *arg1, argument * const arg2);
 
-target *add_param(struct lexer_state * const lexer, pir_type type, char * const name);
-target *set_param_alias(struct lexer_state * const lexer, char * const alias);
+target *add_param(struct lexer_state * const lexer, pir_type type, char const * const name);
+target *set_param_alias(struct lexer_state * const lexer, char const * const alias);
 target *set_param_flag(struct lexer_state * const lexer, target * const t, target_flag flag);
 
 target *set_curtarget(struct lexer_state * const lexer, target * const t);
@@ -372,7 +374,7 @@ argument *set_curarg(struct lexer_state * const lexer, argument * const arg);
 /* target constructors */
 target *add_target(struct lexer_state * const lexer, target *t1, target * const t);
 target *new_reg(struct lexer_state * const lexer, pir_type type, int regno);
-target *new_target(struct lexer_state * const lexer, pir_type type, char * const name);
+target *new_target(struct lexer_state * const lexer, pir_type type, char const * const name);
 
 /* set a key on a target node */
 void set_target_key(target * const t, key * const k);
@@ -384,44 +386,47 @@ void set_invocation_args(invocation * const inv, argument * const args);
 void set_invocation_results(invocation * const inv, target * const results);
 
 /* conversion functions that wrap their arguments into a target node */
-target *target_from_string(struct lexer_state * const lexer, char * const str);
-target *target_from_ident(struct lexer_state * const lexer, pir_type type, char * const id);
+target *target_from_string(struct lexer_state * const lexer, char const * const str);
+target *target_from_ident(struct lexer_state * const lexer, pir_type type, char const * const id);
 target *target_from_symbol(struct lexer_state * const lexer, struct symbol * const sym);
 
 /* management functions for key nodes */
 key *new_key(struct lexer_state * const lexer, expression * const expr);
 key *add_key(struct lexer_state * const lexer, key *keylist, expression * const newkey);
 
-void load_library(struct lexer_state * const lexer, char * const library);
-void set_hll(struct lexer_state * const lexer, char * const hll);
-void set_hll_map(struct lexer_state * const lexer, char * const stdtype, char * const hlltype);
+void load_library(struct lexer_state * const lexer, char const * const library);
+void set_hll(struct lexer_state * const lexer, char const * const hll);
+void set_hll_map(struct lexer_state * const lexer, char const * const stdtype,
+                 char const * const hlltype);
+
 void set_sub_flag(struct lexer_state * const lexer, sub_flag flag);
 
 /* constructor and functions for setting instruction fields */
-void set_label(struct lexer_state * const lexer, char * const label);
-void set_instr(struct lexer_state * const lexer, char * const opname);
-void set_instrf(struct lexer_state * const lxr, char * const op, char const * const fmt, ...);
+void set_label(struct lexer_state * const lexer, char const * const label);
+void set_instr(struct lexer_state * const lexer, char const * const opname);
+void set_instrf(struct lexer_state * const lxr, char const * const op, char const * const fmt, ...);
 void unshift_operand(struct lexer_state * const lexer, expression * const operand);
 void push_operand(struct lexer_state * const lexer, expression * const operand);
+void add_operands(struct lexer_state * const lexer, char const * const format, ...);
 
 void get_operands(struct lexer_state * const lexer, int bitmask, ...);
 expression *get_operand(struct lexer_state * const lexer, short n);
 unsigned get_operand_count(struct lexer_state * const lexer);
 
-void update_instr(struct lexer_state * const lexer, char * const newop);
+void update_instr(struct lexer_state * const lexer, char const * const newop);
 void update_op(struct lexer_state * const lexer, instruction * const instr, int newop);
 
 void remove_operand(struct lexer_state * const lexer, unsigned index);
 void remove_all_operands(struct lexer_state * const lexer);
 
 
-void set_lex_flag(target * const t, char * const lexname);
-char *get_inverse(char * const instr);
+void set_lex_flag(target * const t, char const * const lexname);
+char const *get_inverse(char const * const instr);
 void invert_instr(struct lexer_state * const lexer);
 
 /* local declaration functions */
 struct symbol *add_local(struct symbol * const list, struct symbol * const local);
-struct symbol *new_local(struct lexer_state * const lexer, char * const name, int unique);
+struct symbol *new_local(struct lexer_state * const lexer, char const * const name, int unique);
 
 /* compare two target nodes */
 int targets_equal(target const * const t1, target const * const t2);
@@ -430,14 +435,16 @@ int targets_equal(target const * const t1, target const * const t2);
 void reset_register_allocator(struct lexer_state * const lexer);
 
 /* to check whether given name is a parrot opcode */
-int is_parrot_op(struct lexer_state * const lexer, char * const name);
+int is_parrot_op(struct lexer_state * const lexer, char const * const name);
 
 void close_sub(struct lexer_state * const lexer);
 void fixup_global_labels(struct lexer_state * const lexer);
 void set_instr_flag(struct lexer_state * const lexer, instr_flag flag);
 void convert_inv_to_instr(struct lexer_state * const lexer, invocation * const inv);
 
-void panic(struct lexer_state * lexer, char * const message);
+void generate_get_params(struct lexer_state * const lexer);
+
+void panic(struct lexer_state * lexer, char const * const message);
 
 #endif /* PARROT_PIR_PIRCOMPUNIT_H_GUARD */
 

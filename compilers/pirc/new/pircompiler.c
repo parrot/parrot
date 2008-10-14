@@ -10,6 +10,7 @@
 
 #include "pircompiler.h"
 #include "parrot/parrot.h"
+#include "piryy.h"
 
 /* XXX count memory, so we can check out mem. savings of string reuse */
 static int totalmem = 0;
@@ -149,31 +150,6 @@ new_lexer(NULLOK(char * const filename), int flags) {
     return lexer;
 }
 
-/*
-
-=item C<void
-pirerror(lexer_state * const lexer, char const * const message, ...)>
-
-General error function, if C<yyerror()> is not desirable (not a parse
-error) or not possible (if no access to the parser's C<yyscanner> object).
-
-Write an error message to C<stderr> and increment number of errors.
-
-=cut
-
-*/
-void
-pirerror(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const message), ...) {
-    va_list arg_ptr;
-
-    va_start(arg_ptr, message);
-    fprintf(stderr, "Error: ");
-    vfprintf(stderr, message, arg_ptr);
-    fprintf(stderr, "\n");
-    va_end(arg_ptr);
-
-    ++lexer->parse_errors;
-}
 
 
 /*
@@ -207,7 +183,7 @@ program will be used many times.
 
 */
 static void
-store_string(NOTNULL(lexer_state * const lexer), NOTNULL(char * const str)) {
+store_string(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const str)) {
     hashtable    *table = &lexer->strings;
     unsigned long hash  = get_hashcode(str, table->size);
     bucket *b           = new_bucket(lexer);
@@ -217,7 +193,7 @@ store_string(NOTNULL(lexer_state * const lexer), NOTNULL(char * const str)) {
 
 /*
 
-=item C<static char *
+=item C<static char const *
 find_string(lexer_state * const lexer, char * const str)>
 
 Find the string C<str> in the lexer's string hashtable. If the string was found,
@@ -230,8 +206,8 @@ that buffer will be returned.
 */
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static char *
-find_string(NOTNULL(lexer_state * const lexer), NOTNULL(char * const str)) {
+static char const *
+find_string(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const str)) {
     hashtable    *table = &lexer->strings;
     unsigned long hash  = get_hashcode(str, table->size);
     bucket *b           = get_bucket(table, hash);
@@ -262,18 +238,20 @@ XXX maybe make this a runtime (commandline) option? Might be slightly slower.
 */
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-char *
+char const *
 dupstrn(NOTNULL(lexer_state * const lexer), NOTNULL(char * const source), size_t slen) {
-    char *result = find_string(lexer, source);
+    char const * result = find_string(lexer, source);
     /* make sure the string is terminated in time */
     source[slen] = '\0';
 
     if (result == NULL) { /* not found */
-        result = (char *)pir_mem_allocate_zeroed(lexer, slen + 1 * sizeof (char));
+        char * newbuffer = (char *)pir_mem_allocate_zeroed(lexer, slen + 1 * sizeof (char));
         /* only copy num_chars characters */
-        strncpy(result, source, slen);
+        strncpy(newbuffer, source, slen);
         /* cache the string */
-        store_string(lexer, result);
+        store_string(lexer, newbuffer);
+
+        result = newbuffer;
     }
 
     return result;
@@ -294,7 +272,7 @@ does: duplicate a string.
 */
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-char *
+char const *
 dupstr(NOTNULL(lexer_state * const lexer), NOTNULL(char * const source)) {
     return dupstrn(lexer, source, strlen(source));
 }

@@ -244,11 +244,11 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 230 "pir.y"
+#line 240 "pir.y"
 {
     double              dval;
     int                 ival;
-    char               *sval;
+    char   const       *sval;
     struct constant    *cval;
     struct instruction *instr;
     struct expression  *expr;

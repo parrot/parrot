@@ -65,19 +65,19 @@ Poletto and Sarkar).
 #include "pircompunit.h"
 #include "pircompiler.h"
 #include "pirsymbol.h"
+#include "piryy.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
 
-
 #include "parrot/oplib/ops.h"
-
 #include "parrot/string_funcs.h"
 #include "parrot/dynext.h"
 
 
-static unsigned const prime_numbers[] = {113 /* think of more primes */ };
+static unsigned const prime_numbers[] = {113 /* XXX think of more primes */ };
 
 /*
 
@@ -98,7 +98,7 @@ Function to emit a final last cry that something's wrong and exit.
 PARROT_DOES_NOT_RETURN
 */
 void
-panic(lexer_state * lexer, char * const message) {
+panic(lexer_state * lexer, char const * const message) {
     fprintf(stderr, "Fatal: %s\n", message);
     release_resources(lexer);
     exit(EXIT_FAILURE);
@@ -157,7 +157,7 @@ Thus, set the :outer() argument to the current subroutine.
 
 */
 void
-set_sub_outer(lexer_state * const lexer, char * const outersub) {
+set_sub_outer(lexer_state * const lexer, char const * const outersub) {
     CURRENT_SUB(lexer)->outer_sub = outersub;
     SET_FLAG(lexer->subs->flags, SUB_FLAG_OUTER);
 }
@@ -177,7 +177,7 @@ in fact not a vtable method, an error message is emitted.
 
 */
 void
-set_sub_vtable(lexer_state * const lexer, char *vtablename) {
+set_sub_vtable(lexer_state * const lexer, char const *vtablename) {
     int vtable_index;
 
     if (vtablename == NULL)  /* the sub's name I<is> the vtablename */
@@ -190,7 +190,8 @@ set_sub_vtable(lexer_state * const lexer, char *vtablename) {
 
     /* now check whether the method name actually a vtable method */
     if (vtable_index == -1)
-        pirerror(lexer, "'%s' is not a vtable method but was used with :vtable flag", vtablename);
+        yypirerror(lexer->yyscanner, lexer,
+                   "'%s' is not a vtable method but was used with :vtable flag", vtablename);
 
 
     CURRENT_SUB(lexer)->vtable_method = vtablename;
@@ -208,7 +209,7 @@ Set the lexical identifier on the current sub.
 
 */
 void
-set_sub_lexid(lexer_state * const lexer, char * const lexid) {
+set_sub_lexid(lexer_state * const lexer, char const * const lexid) {
     CURRENT_SUB(lexer)->lex_id = lexid;
     SET_FLAG(lexer->subs->flags, SUB_FLAG_LEXID);
 }
@@ -222,7 +223,7 @@ set_sub_instanceof(lexer_state * const lexer, char * const classname)>
 
 */
 void
-set_sub_instanceof(lexer_state * const lexer, char * const classname) {
+set_sub_instanceof(lexer_state * const lexer, char const * const classname) {
     CURRENT_SUB(lexer)->instanceof = classname;
 }
 
@@ -259,7 +260,7 @@ their thing.
 
 */
 void
-new_subr(lexer_state * const lexer, char * const subname) {
+new_subr(lexer_state * const lexer, char const * const subname) {
     subroutine *newsub = pir_mem_allocate_zeroed_typed(lexer, subroutine);
     int index;
 
@@ -318,7 +319,7 @@ Create a new instruction node and set C<opname> as the instruction.
 
 */
 static instruction *
-new_instruction(lexer_state * const lexer, char * const opname) {
+new_instruction(lexer_state * const lexer, char const * const opname) {
     instruction *ins = pir_mem_allocate_zeroed_typed(lexer, instruction);
     ins->opname      = opname;
     ins->opcode      = -1; /* make sure this field is properly initialized;
@@ -339,7 +340,7 @@ into the current subroutine's statements list.
 
 */
 static void
-new_statement(lexer_state * const lexer, char * const opname) {
+new_statement(lexer_state * const lexer, char const * const opname) {
     instruction *instr = new_instruction(lexer, opname);
 
     /* within a subroutine, each instruction has a sequence number to be able to
@@ -456,7 +457,7 @@ Create a new target node. The node's next pointer is initialized to itself.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
-new_target(lexer_state * const lexer, pir_type type, char * const name) {
+new_target(lexer_state * const lexer, pir_type type, char const * const name) {
     target *t       = pir_mem_allocate_zeroed_typed(lexer, target);
     t->type         = type;
     t->key          = NULL;
@@ -550,7 +551,7 @@ current subroutine, and a new register is allocated for it.
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
-add_param(lexer_state * const lexer, pir_type type, char * const name) {
+add_param(lexer_state * const lexer, pir_type type, char const * const name) {
     target *targ = new_target(lexer, type, name);
     symbol *sym  = new_symbol(lexer, name, type);
 
@@ -598,7 +599,7 @@ Set the argument of the :named flag for the current target
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
-set_param_alias(lexer_state * const lexer, char * const alias) {
+set_param_alias(lexer_state * const lexer, char const * const alias) {
     PARROT_ASSERT(lexer->curtarget != NULL);
     lexer->curtarget->alias = alias;
     SET_FLAG(lexer->curtarget->flags, TARGET_FLAG_NAMED);
@@ -626,10 +627,12 @@ set_param_flag(lexer_state * const lexer, target * const param, target_flag flag
     SET_FLAG(param->flags, flag);
 
     if (TEST_FLAG(flag, TARGET_FLAG_SLURPY) && param->type != PMC_TYPE)
-        pirerror(lexer, "cannot set :slurpy flag on non-pmc %s", target_name(param));
+        yypirerror(lexer->yyscanner, lexer,
+                   "cannot set :slurpy flag on non-pmc %s", target_name(param));
 
     if (TEST_FLAG(flag, TARGET_FLAG_OPT_FLAG) && param->type != INT_TYPE)
-        pirerror(lexer, "cannot set :opt_flag flag on non-int %s", target_name(param));
+        yypirerror(lexer->yyscanner, lexer,
+                   "cannot set :opt_flag flag on non-int %s", target_name(param));
 
     return param;
 }
@@ -720,7 +723,7 @@ The argument on which the alias is set is returned.
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 argument *
-set_arg_alias(lexer_state * const lexer, char * const alias) {
+set_arg_alias(lexer_state * const lexer, char const * const alias) {
     PARROT_ASSERT(lexer->curarg != NULL);
     lexer->curarg->alias = alias;
     SET_FLAG(lexer->curarg->flags, ARG_FLAG_NAMED);
@@ -738,7 +741,7 @@ Load the library indicated by C<library>.
 
 */
 void
-load_library(lexer_state * const lexer, char * const library) {
+load_library(lexer_state * const lexer, char const * const library) {
     /* see imcc.y:600 */
     STRING *libname       = string_from_cstring(lexer->interp, library, strlen(library));
     PMC    *ignored_value = Parrot_load_lib(lexer->interp, libname, NULL);
@@ -758,7 +761,7 @@ Set the label C<label> on the current instruction.
 
 */
 void
-set_label(lexer_state * const lexer, char * const labelname) {
+set_label(lexer_state * const lexer, char const * const labelname) {
     instruction *instr = CURRENT_INSTRUCTION(lexer);
 
     PARROT_ASSERT(instr);
@@ -792,7 +795,7 @@ set_label(lexer_state * const lexer, char * const labelname) {
 /*
 
 =item C<void
-set_instr(lexer_state * const lexer, char * const opname)>
+set_instr(lexer_state * const lexer, char const * const opname)>
 
 Sets C<opname> to the current instruction, without operands. This is a
 wrapper function for C<set_instrf> to prevent calls with an empty format
@@ -802,7 +805,7 @@ string.
 
 */
 void
-set_instr(lexer_state * const lexer, char * const opname) {
+set_instr(lexer_state * const lexer, char const * const opname) {
     set_instrf(lexer, opname, "");
 }
 
@@ -817,7 +820,7 @@ Update the current instruction; the new opname is given by C<newop>.
 
 */
 void
-update_instr(lexer_state * const lexer, char * const newop) {
+update_instr(lexer_state * const lexer, char const * const newop) {
     PARROT_ASSERT(CURRENT_INSTRUCTION(lexer));
     CURRENT_INSTRUCTION(lexer)->opname = newop;
 }
@@ -898,7 +901,7 @@ refer to the (non-)terminals used in a Yacc/Bison specification.
 
 */
 void
-set_instrf(lexer_state * const lexer, char * const opname, char const * const format, ...) {
+set_instrf(lexer_state * const lexer, char const * const opname, char const * const format, ...) {
     va_list  arg_ptr;       /* for the var. args */
     unsigned i;             /* loop iterator */
     size_t   format_length; /* length of the format string. */
@@ -991,8 +994,8 @@ C<if> becomes C<unless>, C<greater-than> becomes C<less-or-equals>.
 
 */
 PARROT_CONST_FUNCTION
-char *
-get_inverse(char * const instr) {
+char const *
+get_inverse(char const * const instr) {
          if (STREQ(instr, "if")) return "unless";
     else if (STREQ(instr, "gt")) return "le";
     else if (STREQ(instr, "ge")) return "lt";
@@ -1018,8 +1021,8 @@ already in place.
 */
 void
 invert_instr(lexer_state * const lexer) {
-    instruction * const ins   = CURRENT_INSTRUCTION(lexer);
-    char               *instr;
+    instruction * const  ins   = CURRENT_INSTRUCTION(lexer);
+    char          const *instr;
     PARROT_ASSERT(ins);
 
     instr = ins->opname;
@@ -1170,7 +1173,7 @@ appropriate type from C<arg_ptr>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static constant *
-create_const(lexer_state * const lexer, pir_type type, char * const name, va_list arg_ptr) {
+create_const(lexer_state * const lexer, pir_type type, char const * const name, va_list arg_ptr) {
     constant *c = pir_mem_allocate_zeroed_typed(lexer, constant);
     c->name     = name;
     c->type     = type;
@@ -1188,6 +1191,7 @@ create_const(lexer_state * const lexer, pir_type type, char * const name, va_lis
             c->val.sval = va_arg(arg_ptr, char *);
             break;
         case UNKNOWN_TYPE:
+        default:
             panic(lexer, "unknown data type in create_const()");
             break;
     }
@@ -1210,7 +1214,7 @@ Wrapper function for C<create_const>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 constant *
-new_named_const(lexer_state * const lexer, pir_type type, char * const name, ...) {
+new_named_const(lexer_state * const lexer, pir_type type, char const * const name, ...) {
     constant *c;
     va_list arg_ptr;
     va_start(arg_ptr, name);
@@ -1371,7 +1375,7 @@ Convert a ident to an expression node and returns it.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 expression *
-expr_from_ident(lexer_state * const lexer, char * const id) {
+expr_from_ident(lexer_state * const lexer, char const * const id) {
     expression *e = new_expr(lexer, EXPR_IDENT);
     e->expr.id    = id;
     return e;
@@ -1487,7 +1491,7 @@ Create a target node from the string C<str>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
-target_from_string(lexer_state * const lexer, char * const str) {
+target_from_string(lexer_state * const lexer, char const * const str) {
     return new_target(lexer, STRING_TYPE, str);
 }
 
@@ -1504,7 +1508,7 @@ Wrap the identifier C<id> of type C<type> in a target node.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
-target_from_ident(lexer_state * const lexer, pir_type type, char * const id) {
+target_from_ident(lexer_state * const lexer, pir_type type, char const * const id) {
     return new_target(lexer, type, id);
 }
 
@@ -1520,7 +1524,7 @@ Set the lexical name C<name> on target C<t>.
 
 */
 void
-set_lex_flag(target * const t, char * const name) {
+set_lex_flag(target * const t, char const * const name) {
     t->lex_name = name;
 }
 
@@ -1537,7 +1541,7 @@ Code taken from imcc.y; needs testing.
 
 */
 void
-set_hll(lexer_state * const lexer, char * const hll) {
+set_hll(lexer_state * const lexer, char const * const hll) {
     STRING * const hll_name             = string_from_cstring(lexer->interp, hll, strlen(hll));
     CONTEXT(lexer->interp)->current_HLL = Parrot_register_HLL(lexer->interp, hll_name);
 }
@@ -1562,7 +1566,7 @@ Code taken from imcc.y; needs testing.
 
 */
 void
-set_hll_map(lexer_state * const lexer, char * const stdtype, char * const maptype) {
+set_hll_map(lexer_state * const lexer, char const * const stdtype, char const * const maptype) {
     Parrot_Context *ctx           = CONTEXT(lexer->interp);
     STRING * const  built_in_name = string_from_cstring(lexer->interp, stdtype, strlen(stdtype));
     STRING * const  language_name = string_from_cstring(lexer->interp, maptype, strlen(maptype));
@@ -1572,10 +1576,10 @@ set_hll_map(lexer_state * const lexer, char * const stdtype, char * const maptyp
     /* check if both the built-in and language types exist. */
 
     if (built_in_type <= 0)
-        pirerror(lexer, "type '%s' is not a built-in type", stdtype);
+        yypirerror(lexer->yyscanner, lexer, "type '%s' is not a built-in type", stdtype);
 
     if (language_type <= 0)
-        pirerror(lexer, "user type '%s' cannot be found", maptype);
+        yypirerror(lexer->yyscanner, lexer, "user type '%s' cannot be found", maptype);
 
     Parrot_register_HLL_type(lexer->interp, ctx->current_HLL, built_in_type, language_type);
 }
@@ -1759,7 +1763,7 @@ The newly created symbol node is returned.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 symbol *
-new_local(lexer_state * const lexer, char * const name, int has_unique_reg){
+new_local(lexer_state * const lexer, char const * const name, int has_unique_reg){
     symbol *s = new_symbol(lexer, name, UNKNOWN_TYPE);
 
     if (has_unique_reg)
@@ -1783,7 +1787,7 @@ the arity and types of operands.
 
 */
 int
-is_parrot_op(lexer_state * const lexer, char * const name) {
+is_parrot_op(lexer_state * const lexer, char const * const name) {
     int opcode = lexer->interp->op_lib->op_code(name, 0); /* check short name, e.g. "set" */
 
     /* if not found, try long name, e.g. "set_i_ic" */
@@ -1916,7 +1920,7 @@ C<get_params> etc.
 
 */
 static void
-new_sub_instr(lexer_state * const lexer, int opcode, char * const opname, ...) {
+new_sub_instr(lexer_state * const lexer, int opcode, char const * const opname, ...) {
     new_statement(lexer, opname);
     CURRENT_INSTRUCTION(lexer)->opinfo = &lexer->interp->op_info_table[opcode];
     CURRENT_INSTRUCTION(lexer)->opcode = opcode;
@@ -1936,9 +1940,7 @@ The C<opinfo>, C<opname> and C<opcode> fields of C<instr> are updated.
 void
 update_op(NOTNULL(lexer_state * const lexer), NOTNULL(instruction * const instr), int newop) {
     instr->opinfo = &lexer->interp->op_info_table[newop];
-
-    /* XXX opinfo->full_name is a [const char *] ... Can this casting cause any problems? */
-    instr->opname = (char *)instr->opinfo->full_name;
+    instr->opname = instr->opinfo->full_name;
     instr->opcode = newop;
 }
 
@@ -1957,7 +1959,7 @@ during compile time.
 
 */
 static void
-save_global_reference(lexer_state * const lexer, instruction * const instr, char * const label) {
+save_global_reference(lexer_state * const lexer, instruction * const instr, char const * const label) {
     global_fixup *ref = pir_mem_allocate_zeroed_typed(lexer, global_fixup);
 
     ref->instr = instr;

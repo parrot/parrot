@@ -10,9 +10,21 @@
 #ifndef PARROT_PIR_PIRYY_H_GUARD
 #define PARROT_PIR_PIRYY_H_GUARD
 
+/* Just to make sure that yscan_t can be used as a type in this file.
+ * These directives are taken from pirlexer.h.
+ */
+#ifndef YY_TYPEDEF_YY_SCANNER_T
+#  define YY_TYPEDEF_YY_SCANNER_T
 
-int yyparse(yyscan_t yyscanner, lexer_state * const lexer);
-int yyerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message, ...);
+typedef void * yyscan_t;
+
+#endif
+
+
+int yypirparse(yyscan_t yyscanner, struct lexer_state * const lexer);
+int yypirerror(yyscan_t yyscanner, struct lexer_state * const lexer,
+                                   char const * const message, ...);
+
 
 #endif /* PARROT_PIR_PIRYY_H_GUARD */
 
