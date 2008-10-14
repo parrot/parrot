@@ -631,13 +631,14 @@ Append the other array to this array.
 
         /* pre-size it */
         VTABLE_set_integer_native(INTERP, SELF, n + m);
-        if (other->vtable->base_type == SELF->vtable->base_type ||
-                other->vtable->base_type == enum_class_FixedPMCArray) {
+
+        if (other->vtable->base_type == SELF->vtable->base_type
+        ||  other->vtable->base_type == enum_class_FixedPMCArray) {
             PMC **other_data = PMC_data_typed(other, PMC **);
             PMC **this_data  = PMC_data_typed(SELF, PMC **);
 
-            for (i = 0; i < m; ++i)
-                this_data[n + i] = other_data[i];
+            /* libc is faster at copying data than a manual loop here */
+            memmove(this_data + n, other_data, m  * sizeof (PMC *));
         }
         else {
             PMC **this_data = PMC_data_typed(SELF, PMC **);
