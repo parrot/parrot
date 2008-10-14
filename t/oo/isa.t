@@ -20,20 +20,21 @@ composition.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(22)
+    plan(27)
 
     isa_by_string_name()
     isa_by_class_object()
     subclass_isa_by_string_name()
     subclass_isa_by_class_object()
     string_isa_and_pmc_isa_have_same_result()
-.end    
+    string_register_and_string_pmc_isa_have_same_result()
+.end
 
 
 .sub isa_by_string_name
     $P1 = newclass "Foo"
     $S1 = typeof $P1
-    
+
     is( 'Class', $S1, 'typeof newclass retval')
 
     $I3 = isa $P1, "Class"
@@ -62,7 +63,7 @@ composition.
     $I3 = isa foo_class, class_class
     ok ($I3, 'isa newclass retval a Class')
 
-    $P2 = new foo_class 
+    $P2 = new foo_class
     $S1 = typeof $P2
     is ( 'Foo2', $S1, 'typeof new our class?')
 
@@ -83,7 +84,7 @@ composition.
     $I3 = isa bar_class, "Class"
     ok ($I3, 'does subclass generate class objects')
 
-    $P2 = new bar_class 
+    $P2 = new bar_class
     $S1 = typeof $P2
     is ('Bar3', $S1, 'does new give us an obj of our type')
 
@@ -107,7 +108,7 @@ composition.
     $I3 = isa bar_class, class_class
     ok ($I3, 'is the class of a subclass Class')
 
-    $P2 = new bar_class 
+    $P2 = new bar_class
     $S1 = typeof $P2
     is ('Bar4', $S1, 'typeof new class our class')
 
@@ -136,6 +137,43 @@ composition.
     cl = 'Object'
     $I1 = isa obj, cl
     ok ($I1, 'isa String instance an Object')
+.end
+
+.sub string_register_and_string_pmc_isa_have_same_result
+    .local pmc xyzns, xyzclass, xyzobj
+
+    xyzns    = get_root_namespace ['foo';'XYZ']
+    xyzclass = newclass xyzns
+    xyzobj   = new xyzclass
+
+    # prove that it's the correct type
+    $S0 = xyzobj.'abc'()
+    is( $S0, 'XYZ::abc', 'sanity check for correct method and type' )
+
+    # test two forms of isa
+    $P0 = new 'String'
+    $P0 = 'XYZ'
+    $I0 = isa xyzobj, 'XYZ'
+    ok( $I0, 'isa given string register should return true when it isa' )
+
+    $I0 = isa xyzobj, 'ZYX'
+    $I0 = not $I0
+    ok( $I0, '... and false when it is not' )
+
+    $I0 = isa xyzobj, $P0
+    ok( $I0, 'isa given string PMC should return true when it isa' )
+
+    $P0 = 'ZYX'
+    $I0 = isa xyzobj, $P0
+    $I0 = not $I0
+    ok( $I0, '... and false when it is not' )
+.end
+
+.HLL 'foo', ''
+.namespace ['XYZ']
+
+.sub 'abc' :method
+    .return( 'XYZ::abc' )
 .end
 
 # Local Variables:
