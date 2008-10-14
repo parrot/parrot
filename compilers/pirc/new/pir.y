@@ -1855,7 +1855,8 @@ fold_i_i(yyscan_t yyscanner, int a, pir_math_operator op, int b) {
             break;
         case OP_DIV:
             if (b == 0)
-                yypirerror(yyscanner, yypirget_extra(yyscanner), "cannot divide by 0!");
+                yypirerror(yyscanner, (lexer_state * const)yypirget_extra(yyscanner),
+                           "cannot divide by 0!");
             else
                 result = a / b;
             break;
@@ -1879,7 +1880,7 @@ fold_i_i(yyscan_t yyscanner, int a, pir_math_operator op, int b) {
             result = (int)pow(a, b);
             break;
         case OP_CONCAT:
-            yypirerror(yyscanner, yypirget_extra(yyscanner),
+            yypirerror(yyscanner, (lexer_state * const)yypirget_extra(yyscanner),
                     "cannot concatenate operands of type 'int' and 'int'");
             break;
         case OP_LSR:
@@ -1925,7 +1926,8 @@ fold_i_i(yyscan_t yyscanner, int a, pir_math_operator op, int b) {
             break;
 
         default:
-            panic(yypirget_extra(yyscanner), "detected 'inc' or 'dec' in fold_i_i()");
+            panic((lexer_state *)yypirget_extra(yyscanner),
+                  "detected 'inc' or 'dec' in fold_i_i()");
             break;
     }
     return new_const(yypirget_extra(yyscanner), INT_TYPE, result);
@@ -1955,7 +1957,8 @@ fold_n_i(yyscan_t yyscanner, double a, pir_math_operator op, int b) {
             break;
         case OP_DIV:
             if (b == 0)
-                yypirerror(yyscanner, yypirget_extra(yyscanner), "cannot divide by 0!");
+                yypirerror(yyscanner, (lexer_state * const)yypirget_extra(yyscanner),
+                           "cannot divide by 0!");
             else
                 result = a / b;
             break;
@@ -1971,7 +1974,7 @@ fold_n_i(yyscan_t yyscanner, double a, pir_math_operator op, int b) {
         case OP_LSR:
         case OP_XOR:
         case OP_CONCAT:
-            yypirerror(yyscanner, yypirget_extra(yyscanner),
+            yypirerror(yyscanner, (lexer_state * const)yypirget_extra(yyscanner),
                     "cannot apply binary operator '%s' to types 'num' and 'int'", opnames[op]);
             break;
         case OP_POW:
@@ -2007,10 +2010,11 @@ fold_n_i(yyscan_t yyscanner, double a, pir_math_operator op, int b) {
 
         /* OP_INC and OP_DEC are here only to keep the C compiler happy */
         default:
-            panic(yypirget_extra(yyscanner), "detected 'inc' or 'dec' in fold_n_i()");
+            panic((lexer_state *)yypirget_extra(yyscanner),
+                  "detected 'inc' or 'dec' in fold_n_i()");
             break;
     }
-    return new_const(yypirget_extra(yyscanner), NUM_TYPE, result);
+    return new_const((lexer_state * const)yypirget_extra(yyscanner), NUM_TYPE, result);
 }
 
 /*
@@ -2038,7 +2042,8 @@ fold_i_n(yyscan_t yyscanner, int a, pir_math_operator op, double b) {
             break;
         case OP_DIV:
             if (b == 0)
-                yypirerror(yyscanner, yypirget_extra(yyscanner), "cannot divide by 0!");
+                yypirerror(yyscanner, (lexer_state * const)yypirget_extra(yyscanner),
+                           "cannot divide by 0!");
             else
                 result = a / b;
             break;
@@ -2054,7 +2059,7 @@ fold_i_n(yyscan_t yyscanner, int a, pir_math_operator op, double b) {
         case OP_SHL:
         case OP_XOR:
         case OP_CONCAT:
-            yypirerror(yyscanner, yypirget_extra(yyscanner),
+            yypirerror(yyscanner, (lexer_state * const)yypirget_extra(yyscanner),
                     "cannot apply binary operator '%s' to types 'int' and 'num'", opnames[op]);
             break;
         case OP_POW:
@@ -2088,12 +2093,12 @@ fold_i_n(yyscan_t yyscanner, int a, pir_math_operator op, double b) {
             result = (a != b);
             break;
 
-        /* OP_INC and OP_DEC are here only to keep the C compiler happy */
         default:
-            panic(yypirget_extra(yyscanner), "detected 'inc' or 'dec' in fold_i_n()");
+            panic((lexer_state *)yypirget_extra(yyscanner),
+                  "detected 'inc' or 'dec' in fold_i_n()");
             break;
     }
-    return new_const(yypirget_extra(yyscanner), NUM_TYPE, result);
+    return new_const((lexer_state * const)yypirget_extra(yyscanner), NUM_TYPE, result);
 }
 
 /*
@@ -2120,7 +2125,8 @@ fold_n_n(yyscan_t yyscanner, double a, pir_math_operator op, double b) {
             break;
         case OP_DIV:
             if (b == 0) /* throw exception ? */
-                yypirerror(yyscanner, yypirget_extra(yyscanner), "cannot divide by 0");
+                yypirerror(yyscanner, (lexer_state * const)yypirget_extra(yyscanner),
+                           "cannot divide by 0");
             else
                 result = a / b;
             break;
@@ -2139,7 +2145,7 @@ fold_n_n(yyscan_t yyscanner, double a, pir_math_operator op, double b) {
         case OP_SHR:
         case OP_SHL:
         case OP_XOR:
-            yypirerror(yyscanner, yypirget_extra(yyscanner),
+            yypirerror(yyscanner, (lexer_state * const)yypirget_extra(yyscanner),
                     "cannot apply binary operator '%s' to arguments of type number", opnames[op]);
             break;
         case OP_OR:
@@ -2150,7 +2156,8 @@ fold_n_n(yyscan_t yyscanner, double a, pir_math_operator op, double b) {
             break;
         case OP_FDIV:
             if (b == 0)
-                yypirerror(yyscanner, yypirget_extra(yyscanner), "cannot divide by 0");
+                yypirerror(yyscanner, (lexer_state * const)yypirget_extra(yyscanner),
+                           "cannot divide by 0");
             else
                 result = floor(a / b);
             break;
@@ -2177,7 +2184,7 @@ fold_n_n(yyscan_t yyscanner, double a, pir_math_operator op, double b) {
         default:
             break;
     }
-    return new_const(yypirget_extra(yyscanner), NUM_TYPE, result);
+    return new_const((lexer_state * const)yypirget_extra(yyscanner), NUM_TYPE, result);
 }
 
 /*
@@ -2196,11 +2203,11 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static constant *
 fold_s_s(yyscan_t yyscanner, NOTNULL(char const *a), pir_math_operator op, NOTNULL(char const *b)) {
+    lexer_state *lexer = (lexer_state *)yypirget_extra(yyscanner);
     switch (op) {
-        case OP_CONCAT: {
-            lexer_state *lexer = yypirget_extra(yyscanner);
+        case OP_CONCAT:
             return new_const(lexer, STRING_TYPE, concat_strings(lexer, a, b));
-        }
+
         case OP_ADD:
         case OP_SUB:
         case OP_DIV:
@@ -2217,9 +2224,9 @@ fold_s_s(yyscan_t yyscanner, NOTNULL(char const *a), pir_math_operator op, NOTNU
         case OP_OR:
         case OP_AND:
         case OP_FDIV:
-            yypirerror(yyscanner, yypirget_extra(yyscanner),
+            yypirerror(yyscanner, lexer,
                     "cannot apply binary operator '%s' to arguments of type number", opnames[op]);
-            return new_const(yypirget_extra(yyscanner), STRING_TYPE, a);
+            return new_const(lexer, STRING_TYPE, a);
 
         case OP_ISEQ:
         case OP_ISLE:
@@ -2227,12 +2234,12 @@ fold_s_s(yyscan_t yyscanner, NOTNULL(char const *a), pir_math_operator op, NOTNU
         case OP_ISGE:
         case OP_ISGT:
         case OP_ISNE:
-            return new_const(yypirget_extra(yyscanner), INT_TYPE, (1 == evaluate_s_s(a, op, b)));
+            return new_const(lexer, INT_TYPE, (1 == evaluate_s_s(a, op, b)));
 
 
         /* OP_INC and OP_DEC are here only to keep the C compiler happy */
         default:
-            panic(yypirget_extra(yyscanner), "detected 'inc' or 'dec' in fold_s_s()");
+            panic(lexer, "detected 'inc' or 'dec' in fold_s_s()");
             break;
     }
     return NULL;
@@ -2543,8 +2550,8 @@ be removed, so that the direction of the first operand will change from OUT to I
 */
 static void
 reduce_strength(yyscan_t yyscanner, int newop, int op2_index) {
-    lexer_state * const lexer = yypirget_extra(yyscanner);
-    instruction *       instr = CURRENT_INSTRUCTION(lexer);
+    lexer_state *lexer = (lexer_state *)yypirget_extra(yyscanner);
+    instruction *instr = CURRENT_INSTRUCTION(lexer);
     /* based on the signatures, we know for sure that the first and second operands are targets. */
 
     /* get the operands */
@@ -2721,7 +2728,7 @@ becomes:
 */
 static void
 do_strength_reduction(yyscan_t yyscanner) {
-    lexer_state *lexer = yypirget_extra(yyscanner);
+    lexer_state *lexer = (lexer_state *)yypirget_extra(yyscanner);
     instruction *instr;
     expression  *arg1;
     expression  *arg2;
@@ -2852,7 +2859,8 @@ not be allowed.
 static void
 check_first_arg_direction(yyscan_t yyscanner, NOTNULL(char const * const opname)) {
     int dir_first_arg;
-    lexer_state * const lexer = yypirget_extra(yyscanner);
+    lexer_state * lexer = (lexer_state *)yypirget_extra(yyscanner);
+
 
     PARROT_ASSERT(CURRENT_INSTRUCTION(lexer));
 
@@ -3108,7 +3116,7 @@ XXX is this really needed? why not just disallow lt 10, 20, L ?
 */
 static void
 flow_op_const_fold(yyscan_t yyscanner, int flow_op) {
-    lexer_state * const lexer = yypirget_extra(yyscanner);
+    lexer_state * const lexer = (lexer_state * const)yypirget_extra(yyscanner);
     expression *arg1, *arg2, *arg3;
     int result;
     instruction * instr = CURRENT_INSTRUCTION(lexer);
@@ -3169,7 +3177,7 @@ math_op_const_fold(yyscan_t yyscanner, int folding_op, int new_op) {
     expression  * arg1,
                 * arg2,
                 * arg3;
-    lexer_state * const lexer = yypirget_extra(yyscanner);
+    lexer_state * const lexer = (lexer_state * const)yypirget_extra(yyscanner);
     instruction * const instr = CURRENT_INSTRUCTION(lexer);
     constant    *       result;
     double              arg1val,
@@ -3244,7 +3252,7 @@ then that means the op is not valid, and an error message will be reported.
 PARROT_IGNORABLE_RESULT
 static int
 get_opinfo(yyscan_t yyscanner) {
-    lexer_state * const lexer = yypirget_extra(yyscanner);
+    lexer_state * const lexer = (lexer_state * const)yypirget_extra(yyscanner);
     instruction * const instr = CURRENT_INSTRUCTION(lexer);
 
     char * const fullopname = get_signatured_opname(lexer, instr);
@@ -3325,7 +3333,7 @@ If there are errors, FALSE is returned; if successful, TRUE is returned.
 PARROT_WARN_UNUSED_RESULT
 static int
 check_op_args_for_symbols(yyscan_t yyscanner) {
-    lexer_state * const lexer = yypirget_extra(yyscanner);
+    lexer_state * const lexer = (lexer_state * const)yypirget_extra(yyscanner);
     struct op_info_t  * opinfo;
     unsigned short      i;
     short               opcount;
