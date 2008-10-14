@@ -23,7 +23,7 @@ or the resulting PIR code (target='PIR').
 
 =cut
 
-.namespace [ 'Tcl::Glob' ]
+.namespace [ 'Tcl';'Glob' ]
 
 .sub 'compile_glob'
     .param pmc source
@@ -52,9 +52,9 @@ or the resulting PIR code (target='PIR').
 
   analyze:
     .local pmc exp, pad
-    exp = new 'PGE::Exp::Concat'
+    exp = new ['PGE';'Exp';'Concat']
     $I0 = 1
-    $P0 = new 'PGE::Exp::Anchor'
+    $P0 = new ['PGE';'Exp';'Anchor']
     $P0.'result_object'('^')
     exp[0] = $P0
     if null match goto analyze_1
@@ -62,7 +62,7 @@ or the resulting PIR code (target='PIR').
     exp[$I0] = $P0
     inc $I0
   analyze_1:
-    $P0 = new 'PGE::Exp::Anchor'
+    $P0 = new ['PGE';'Exp';'Anchor']
     $P0.'result_object'('$')
     exp[$I0] = $P0
 
@@ -85,7 +85,7 @@ or the resulting PIR code (target='PIR').
     load_bytecode 'PGE.pbc'
     load_bytecode 'PCT/HLLCompiler.pbc'
 
-    optable = new 'PGE::OPTable'
+    optable = new ['PGE';'OPTable']
     store_global '$optable', optable
 
     $P0 = find_global 'glob_literal'
@@ -102,11 +102,11 @@ or the resulting PIR code (target='PIR').
 
     optable.newtok('infix:', 'looser'=>'term:', 'assoc'=>'list', 'nows'=>1, 'match'=>'PGE::Exp::Concat')
 
-    $P2 = newclass [ 'Tcl::Glob::Compiler' ]
+    $P2 = newclass [ 'Tcl';'Glob';'Compiler' ]
     addattribute $P2, '$!compsub'
 
     $P0 = get_global 'compile_glob'
-    $P1 = new [ 'Tcl::Glob::Compiler' ]
+    $P1 = new [ 'Tcl';'Glob';'Compiler' ]
     $P1.'register'('Tcl::Glob', $P0)
 
     .return ()
@@ -127,7 +127,7 @@ parse C<PGE::Match> object.
     .param pmc adverbs         :slurpy :named
 
     .local pmc optable, match
-    optable = find_global 'Tcl::Glob', '$optable'
+    optable = find_global ['Tcl';'Glob'], '$optable'
     match = optable.'parse'(mob)
     .return (match)
 .end
@@ -329,7 +329,7 @@ Parse an enumerated character list, such as [abcd],
     .return (mob)
 .end
 
-.namespace [ 'Tcl::Glob::Compiler' ]
+.namespace [ 'Tcl';'Glob';'Compiler' ]
 
 =item register(string name, pmc compsub)
 
