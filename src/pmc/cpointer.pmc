@@ -110,6 +110,8 @@ pointer.
 
 Destroys the PMC and frees all allocated memory.
 
+=cut
+
 */
 
     VTABLE void destroy() {
