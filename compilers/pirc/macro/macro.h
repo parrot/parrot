@@ -6,7 +6,7 @@
 #define PARROT_PIR_MACRO_H_GUARD
 
 typedef struct list {
-    char        *item;
+    char const  *item;
 
     struct list *next;
 
@@ -14,8 +14,8 @@ typedef struct list {
 
 
 typedef struct macro_def {
-    char             *name;
-    char             *body;
+    char const       *name;
+    char const       *body;
     int               line_defined;
     list             *parameters;
 
