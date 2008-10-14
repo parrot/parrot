@@ -14,13 +14,13 @@ EXE           = @exe@
 BUILD_DIR     = @build_dir@
 RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 
-LIBPARROT     = @build_dir@/libparrot@a@
+LIBPARROT     = @libparrot@
 
 CC_INC        = -I../../include
 C_LIBS        = @libs@
 CC_SHARED     = @cc_shared@
 CFLAGS        = $(CC_INC) @ccflags@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ $(CC_SHARED)
-LINK_DYNAMIC  =  @link_dynamic@
+LINK_DYNAMIC  = @link_dynamic@
 LINK          = @link@
 LINKFLAGS     = @linkflags@ @link_debug@ @ld_debug@
 LD            = @ld@
@@ -39,7 +39,10 @@ all: pirc heredoc macro
 
 
 pirc: new/main$(O) new/pirparser$(O) new/pirlexer$(O) new/pircompunit$(O) new/pircompiler$(O) new/pirsymbol$(O) new/piremit$(O)
-	$(LINK) main$(O) pirparser$(O) pirlexer$(O) pircompunit$(O) pircompiler$(O) pirsymbol$(O) piremit$(O) $(LIBPARROT)
+	$(LINK) @ld_out@$@ \
+	main$(O) pirparser$(O) pirlexer$(O) pircompunit$(O) pircompiler$(O) \
+	pirsymbol$(O) piremit$(O) \
+	@rpath_blib@ @libparrot_ldflags@ $(LINKFLAGS) $(LINK_DYNAMIC)
 
 new/main$(O): new/main.c
 	$(CC) $(CFLAGS) -c new/main.c
