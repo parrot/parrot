@@ -16,20 +16,20 @@ grammar Lua::POST::Grammar is TGE::Grammar;
 
 transform post (PAST::Block) :language('PIR') {
     null $P0
-    set_hll_global ['Lua::POST'], '$?environ', $P0
+    set_hll_global ['Lua';'POST'], '$?environ', $P0
     .local pmc endlabels
-    endlabels = get_hll_global ['Lua::POST'], '@endlabels'
+    endlabels = get_hll_global ['Lua';'POST'], '@endlabels'
     new $P0, 'ResizableStringArray'
-    set_hll_global ['Lua::POST'], '@endlabels', $P0
+    set_hll_global ['Lua';'POST'], '@endlabels', $P0
     .local pmc outerpost
-    outerpost = get_hll_global ['Lua::POST'], '$?SUB'
+    outerpost = get_hll_global ['Lua';'POST'], '$?SUB'
     .local string name
     $S0 = node.'name'()
     unless $S0 == '' goto L1
     $S0 = 'anon'
   L1:
     .local pmc post
-    $P0 = get_hll_global ['Lua'; 'POST'], 'Sub'
+    $P0 = get_hll_global ['Lua';'POST'], 'Sub'
     post = $P0.'new'('node'=>node, 'outer'=>outerpost, 'pirflags'=>':anon :lex', 'blocktype'=>'declaration')
     $S1 = $S0 . '_'
     name = post.'unique'($S1)
@@ -42,7 +42,7 @@ transform post (PAST::Block) :language('PIR') {
     post.'ops_const'($P0)
     $P0 = post.'push_new'('POST::Ops')
     post.'ops_subr'($P0)
-    set_hll_global ['Lua::POST'], '$?SUB', post
+    set_hll_global ['Lua';'POST'], '$?SUB', post
     .local pmc iter, cpost
     iter = node.'iterator'()
   L2:
@@ -52,8 +52,8 @@ transform post (PAST::Block) :language('PIR') {
     post.'push'(cpost)
     goto L2
   L3:
-    set_hll_global ['Lua::POST'], '$?SUB', outerpost
-    set_hll_global ['Lua::POST'], '@endlabels', endlabels
+    set_hll_global ['Lua';'POST'], '$?SUB', outerpost
+    set_hll_global ['Lua';'POST'], '@endlabels', endlabels
     .local string esc_name
     esc_name = post.'escape'(name)
     if null outerpost goto L4
@@ -127,7 +127,7 @@ transform post (PAST::Stmts) :language('PIR') {
     goto L1
   L2:
     null $P0
-    set_hll_global ['Lua::POST'], '$?environ', $P0
+    set_hll_global ['Lua';'POST'], '$?environ', $P0
     .return (ops)
 }
 
@@ -259,7 +259,7 @@ transform call (PAST::Op) :language('PIR') {
   L2:
     ops.'push_pirop'('call', arglist :flat, 'node'=>node, 'result'=>'')
     null $P0
-    set_hll_global ['Lua::POST'], '$?environ', $P0
+    set_hll_global ['Lua';'POST'], '$?environ', $P0
     .return (ops)
 }
 
@@ -313,7 +313,7 @@ transform and (PAST::Op) :language('PIR') {
     ops.'push_new'('POST::Label', 'result'=>endlabel)
     ops.'result'($S0)
     null $P0
-    set_hll_global ['Lua::POST'], '$?environ', $P0
+    set_hll_global ['Lua';'POST'], '$?environ', $P0
     .return (ops)
 }
 
@@ -371,7 +371,7 @@ transform if (PAST::Op) :language('PIR') {
 
 transform while (PAST::Op) :language('PIR') {
     .local pmc endlabels
-    endlabels = get_hll_global ['Lua::POST'], '@endlabels'
+    endlabels = get_hll_global ['Lua';'POST'], '@endlabels'
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
@@ -398,7 +398,7 @@ transform while (PAST::Op) :language('PIR') {
 
 transform repeat (PAST::Op) :language('PIR') {
     .local pmc endlabels
-    endlabels = get_hll_global ['Lua::POST'], '@endlabels'
+    endlabels = get_hll_global ['Lua';'POST'], '@endlabels'
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
@@ -425,7 +425,7 @@ transform repeat (PAST::Op) :language('PIR') {
 
 transform fornum (PAST::Op) :language('PIR') {
     .local pmc endlabels
-    endlabels = get_hll_global ['Lua::POST'], '@endlabels'
+    endlabels = get_hll_global ['Lua';'POST'], '@endlabels'
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
@@ -486,7 +486,7 @@ transform fornum (PAST::Op) :language('PIR') {
 
 transform forlist (PAST::Op) :language('PIR') {
     .local pmc endlabels
-    endlabels = get_hll_global ['Lua::POST'], '@endlabels'
+    endlabels = get_hll_global ['Lua';'POST'], '@endlabels'
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
@@ -641,7 +641,7 @@ transform return (PAST::Op) :language('PIR') {
 
 transform break (PAST::Op) :language('PIR') {
     .local pmc endlabels
-    endlabels = get_hll_global ['Lua::POST'], '@endlabels'
+    endlabels = get_hll_global ['Lua';'POST'], '@endlabels'
     $S0 = endlabels[0]
     $P0 = get_hll_global ['POST'], 'Op'
     .return $P0.'new'($S0, 'node'=>node, 'pirop'=>'goto')
@@ -785,7 +785,7 @@ transform post (PAST::Val) :language('PIR') {
 
 transform key (PAST::Val) :language('PIR') {
     .local pmc subpost
-    subpost = get_hll_global ['Lua::POST'], '$?SUB'
+    subpost = get_hll_global ['Lua';'POST'], '$?SUB'
     .local pmc storage_const
     storage_const = subpost.'storage_const'()
     .local string name
@@ -883,7 +883,7 @@ transform post (PAST::Var) :language('PIR') {
 
 transform parameter (PAST::Var) :language('PIR') {
     .local pmc subpost
-    subpost = get_hll_global ['Lua::POST'], '$?SUB'
+    subpost = get_hll_global ['Lua';'POST'], '$?SUB'
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
@@ -914,7 +914,7 @@ transform parameter (PAST::Var) :language('PIR') {
 
 transform lexical (PAST::Var) :language('PIR') {
     .local pmc subpost
-    subpost = get_hll_global ['Lua::POST'], '$?SUB'
+    subpost = get_hll_global ['Lua';'POST'], '$?SUB'
     .local pmc storage_lex
     storage_lex = subpost.'storage_lex'()
     .local pmc ops
@@ -970,8 +970,8 @@ transform package (PAST::Var) :language('PIR') {
     goto L2
   L1:
     .local pmc subpost
-    subpost = get_hll_global ['Lua::POST'], '$?SUB'
-    basepost = get_hll_global ['Lua::POST'], '$?environ'
+    subpost = get_hll_global ['Lua';'POST'], '$?SUB'
+    basepost = get_hll_global ['Lua';'POST'], '$?environ'
     unless null basepost goto L3
     .local pmc ops_subr
     ops_subr = subpost.'ops_subr'()
@@ -986,7 +986,7 @@ PIRCODE
   L4:
     result = ops.'unique'('$P')
     basepost = ops.'push_pirop'('callmethod', 'getfenv', 'subr', 'result'=>result)
-    set_hll_global ['Lua::POST'], '$?environ', basepost
+    set_hll_global ['Lua';'POST'], '$?environ', basepost
   L3:
     .local pmc storage_const
     storage_const = subpost.'storage_const'()

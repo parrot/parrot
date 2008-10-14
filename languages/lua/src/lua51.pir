@@ -91,7 +91,7 @@ resulting ost.
 .end
 
 
-.namespace [ 'Lua';'PAST';'Grammar' ]
+.namespace [ 'Lua::PAST::Grammar' ]
 
 =head2 Functions
 
@@ -112,7 +112,7 @@ used in F<languages/lua/src/PASTGrammar.tg>
 .end
 
 
-.namespace [ 'Lua';'POST';'Grammar' ]
+.namespace [ 'Lua::POST::Grammar' ]
 
 =item C<internal_error>
 
