@@ -112,7 +112,8 @@ Create and returns a clone of a PAST node.
 .sub 'clone' :vtable :method
     .local pmc res
     $S0 = typeof self
-    res = new $S0
+    $P0 = split ';', $S0
+    res = new $P0
     .local pmc iter
     iter = self.'iterator'()
   iter_child_loop:
@@ -187,7 +188,8 @@ array of children.  Returns the newly created node.
     .param string class
     .param pmc children        :slurpy
     .param pmc adverbs         :slurpy :named
-    $P0 = new class
+    $P0 = split '::', class
+    $P0 = new $P0
     $P0.'init'(children :flat, adverbs :flat :named)
     push self, $P0
     .return ($P0)
