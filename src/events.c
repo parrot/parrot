@@ -1294,8 +1294,8 @@ Parrot_sleep_on_event(PARROT_INTERP, FLOATVAL t, ARGIN_NULLOK(opcode_t *next))
      * place the opcode_t* next arg in the event data, so that
      * we can identify this event in wakeup
      */
-    Parrot_new_timer_event(interp, (PMC *) next, t,
-            0, 0, NULL, EVENT_TYPE_SLEEP);
+    Parrot_new_timer_event(interp, (PMC *) next, t, 0.0, 0,
+        NULL, EVENT_TYPE_SLEEP);
     next = wait_for_wakeup(interp, next);
 #else
     /*

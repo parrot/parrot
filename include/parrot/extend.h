@@ -163,9 +163,9 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Parrot_String Parrot_new_string(PARROT_INTERP,
     ARGIN_NULLOK(const char *buffer),
-    int length,
+    Parrot_UInt length,
     ARGIN_NULLOK(const char * const encoding_name),
-    Parrot_Int flags)
+    Parrot_UInt flags)
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -289,7 +289,7 @@ PARROT_API
 void Parrot_PMC_set_cstringn(PARROT_INTERP,
     Parrot_PMC pmc,
     ARGIN_NULLOK(const char *value),
-    Parrot_Int length)
+    Parrot_UInt length)
         __attribute__nonnull__(1);
 
 PARROT_API
@@ -297,7 +297,7 @@ void Parrot_PMC_set_cstringn_intkey(PARROT_INTERP,
     Parrot_PMC pmc,
     Parrot_Int key,
     ARGIN_NULLOK(const char *value),
-    Parrot_Int length)
+    Parrot_UInt length)
         __attribute__nonnull__(1);
 
 PARROT_API

@@ -470,8 +470,8 @@ again:
             return NULL;
         }
 
-        program_code =
-            (char *)mmap(0, program_size, PROT_READ, MAP_SHARED, fd, (off_t)0);
+        program_code = (char *)mmap(0, (size_t)program_size,
+                        PROT_READ, MAP_SHARED, fd, (off_t)0);
 
         if (program_code == (void *)MAP_FAILED) {
             Parrot_warn(interp, PARROT_WARNINGS_IO_FLAG,
@@ -503,7 +503,8 @@ again:
 
     pf = PackFile_new(interp, is_mapped);
 
-    if (!PackFile_unpack(interp, pf, (opcode_t *)program_code, program_size)) {
+    if (!PackFile_unpack(interp, pf, (opcode_t *)program_code,
+            (size_t)program_size)) {
         PIO_eprintf(interp, "Parrot VM: Can't unpack packfile %s.\n",
                 fullname);
         return NULL;

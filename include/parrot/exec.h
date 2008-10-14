@@ -78,7 +78,7 @@ typedef struct Parrot_exec_rellocation_t {
 
 typedef struct Parrot_exec_section_t {
     char                                               *code;
-    int                                                 size;
+    size_t                                              size;
 } Parrot_exec_section_t;
 
 typedef struct Parrot_exec_objfile_t {

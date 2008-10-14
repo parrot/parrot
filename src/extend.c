@@ -695,7 +695,7 @@ Assign the passed-in length-noted string to the passed-in PMC.
 PARROT_API
 void
 Parrot_PMC_set_cstringn(PARROT_INTERP,
-        Parrot_PMC pmc, ARGIN_NULLOK(const char *value), Parrot_Int length)
+        Parrot_PMC pmc, ARGIN_NULLOK(const char *value), Parrot_UInt length)
 {
     PARROT_CALLIN_START(interp);
     VTABLE_set_string_native(interp, pmc,
@@ -774,7 +774,8 @@ Assign the passed-in length-noted string to the passed-in PMC.
 PARROT_API
 void
 Parrot_PMC_set_cstringn_intkey(PARROT_INTERP,
-        Parrot_PMC pmc, Parrot_Int key, ARGIN_NULLOK(const char *value), Parrot_Int length)
+        Parrot_PMC pmc, Parrot_Int key, ARGIN_NULLOK(const char *value),
+        Parrot_UInt length)
 {
     PARROT_CALLIN_START(interp);
     VTABLE_set_string_keyed_int(interp, pmc, key,
@@ -1206,8 +1207,9 @@ PARROT_API
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Parrot_String
-Parrot_new_string(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), int length,
-        ARGIN_NULLOK(const char * const encoding_name), Parrot_Int flags)
+Parrot_new_string(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
+    Parrot_UInt length, ARGIN_NULLOK(const char * const encoding_name),
+    Parrot_UInt flags)
 {
     Parrot_String retval;
     PARROT_CALLIN_START(interp);
