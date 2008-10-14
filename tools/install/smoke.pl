@@ -92,7 +92,8 @@ if ($prefix) {
 if (@ARGV and $ARGV[0] =~ /^DESTDIR/) {
     if ($ARGV[0] =~ /^DESTDIR=(\S+)/) {
         $DESTDIR = $1;
-    } else {
+    }
+    else {
         $DESTDIR = $ARGV[1];
     }
 }
