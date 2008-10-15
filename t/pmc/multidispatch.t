@@ -9,7 +9,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use File::Temp 'tempfile';
 
-use Parrot::Test tests => 44;
+use Parrot::Test tests => 45;
 
 =head1 NAME
 
@@ -1404,6 +1404,22 @@ foo(_)  : arg0
 foo(_,_): arg0 arg1
 bar(_)  : arg0
 bar(_,_): arg0 arg1
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "multi-dispatch on PMCNULL" );
+
+.sub main :main
+    null $P0
+    foo($P0)
+.end
+.sub foo :multi(String)
+    say "string"
+.end
+.sub foo :multi(_)
+    say "any"
+.end
+CODE
+any
 OUTPUT
 
 # Local Variables:
