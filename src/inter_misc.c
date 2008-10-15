@@ -492,6 +492,7 @@ sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
 #endif
             break;
         case CPU_ARCH:
+            return string_make(interp, PARROT_CPU_ARCH, sizeof (PARROT_CPU_ARCH) - 1, "ascii", 0);
         case CPU_TYPE:
         default:
             break;
