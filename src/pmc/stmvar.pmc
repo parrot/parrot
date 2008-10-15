@@ -8,7 +8,8 @@ src/pmc/stmvar.pmc -- A transactional variable
 
 =head1 DESCRIPTION
 
-XXX
+A transactional variable for Parrot's Software Transactional Memory (STM)
+implementation. 
 
 =head2 Methods
 
@@ -35,7 +36,15 @@ pmclass STMVar is_shared need_ext no_ro {
 
 =item C<void init()>
 
-...
+Initialize the STMVar PMC. Allocates the necessary STM data structures for the
+PMC and sets the PObj_custom_mark flag.
+
+=item C<void init_pmc(value)>
+
+Initializes a new STMVar PMC based on PMC C<value>. If C<value> is another STMVar
+or an STMRef PMC, we simply copy the PMC internals of that PMC into this one.
+If not, we create a new STM structure based on C<value> and assign that to this
+PMC.
 
 =cut
 
@@ -87,6 +96,36 @@ Mark data associated with this transactional variable.
 
         Parrot_STM_mark_pmc_handle(INTERP, PMC_STM_handle(SELF));
     }
+
+/*
+
+=item C<get_read>
+
+Reads the current STM value of the PMC
+
+=item C<get_update>
+
+Begin an STM process on this PMC, and return a PMC pointer to the updated data.
+
+=item C<set>
+
+Writes the value C<new_value> to the PMC, or begins an STM transaction to do that.
+
+=item C<freeze>
+
+Freeze the PMC into a serial format.
+
+=item C<thaw>
+
+Thaws the PMC from a serial bytecode format
+
+=item C<share_ro>
+
+TODO: Document this!
+
+=cut
+
+*/
 
     METHOD get_read() {
         PMC *read = Parrot_STM_read(INTERP, PMC_STM_handle(SELF));
