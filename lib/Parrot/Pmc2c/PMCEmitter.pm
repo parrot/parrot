@@ -472,8 +472,6 @@ sub find_mmd_methods {
                 $mmd_method_name = "Parrot_" . $self->name . "_" . $mmd->name;
                 push @mmds, [ $func, $left, $right, $mmd_method_name ];
             }
-
-            #$self->{mmds} = @mmds;    # RT#43739
         }
     }
     return ( \@mmds, \@init_mmds, [ keys %init_mmds ] );
