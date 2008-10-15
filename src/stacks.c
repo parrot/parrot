@@ -246,6 +246,7 @@ rotate_entries(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p), INTVAL num_entrie
     if (num_entries < 0) {
         INTVAL i;
         Stack_Entry_t temp;
+        Stack_Entry_t *temp_ptr;
         INTVAL depth;
 
         num_entries = -num_entries;
@@ -255,33 +256,58 @@ rotate_entries(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p), INTVAL num_entrie
             Parrot_ex_throw_from_c_args(interp, NULL, ERROR_STACK_SHALLOW,
                 "Stack too shallow!");
 
-        /* XXX Dereferencing stack_entry here is a cavalcade of danger */
-        temp = *stack_entry(interp, stack, depth);
+        temp_ptr = stack_entry(interp, stack, depth);
+        if (temp_ptr == NULL)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+                "Attempt to dereference NULL Stack_Entry_t");
+
+        temp = *temp_ptr;
         for (i = depth; i > 0; i--) {
-            *stack_entry(interp, stack, i) =
-                *stack_entry(interp, stack, i - 1);
+            Stack_Entry_t *tempa, *tempb;
+            tempa = stack_entry(interp, stack, i);
+            tempb = stack_entry(interp, stack, i - 1);
+            if (tempa == NULL || tempb == NULL)
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+                    "Attempt to dereference NULL Stack_Entry_t");
+
+            *tempa = *tempb;
         }
 
-        *stack_entry(interp, stack, 0) = temp;
+        temp_ptr = stack_entry(interp, stack, 0);
+        if(temp_ptr == NULL)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+                "Attempt to dereference NULL Stack_Entry_t");
+        *temp_ptr = temp;
     }
     else {
         INTVAL i;
-        Stack_Entry_t temp;
+        Stack_Entry_t temp, *temp_ptr;
         INTVAL depth = num_entries - 1;
 
         if (stack_height(interp, stack) < (size_t)num_entries)
             Parrot_ex_throw_from_c_args(interp, NULL, ERROR_STACK_SHALLOW,
                 "Stack too shallow!");
 
-        /* XXX Dereferencing stack_entry here is a cavalcade of danger */
-        temp = *stack_entry(interp, stack, 0);
+        temp_ptr = stack_entry(interp, stack, 0);
+        if(temp_ptr == NULL)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+                "Attempt to dereference NULL Stack_Entry_t");
+        temp = *temp_ptr;
 
         for (i = 0; i < depth; i++) {
-            *stack_entry(interp, stack, i) =
-                *stack_entry(interp, stack, i + 1);
+            Stack_Entry_t *tempa, *tempb;
+            tempa = stack_entry(interp, stack, i);
+            tempb = stack_entry(interp, stack, i + 1);
+            if (tempa == NULL || tempb == NULL)
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+                    "Attempt to dereference NULL Stack_Entry_t");
+            *tempa = *tempb;
         }
-
-        *stack_entry(interp, stack, depth) = temp;
+        temp_ptr = stack_entry(interp, stack, depth);
+        if (temp_ptr == NULL)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+                "Attempt to dereference NULL Stack_Entry_t");
+        *temp_ptr = temp;
     }
 }
 
