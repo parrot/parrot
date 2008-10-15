@@ -29,44 +29,49 @@ Makes sure that specific source files have matching test files.
 
 ## make sure PMC files match test files
 PMC: {
-    my $pmc_dir    = 'src/pmc';
-    my $pmc_suffix = '.pmc';
 
-    my $test_dir    = 't/pmc';
-    my $test_suffix = '.t';
+    # Set variables for pmc
+    my $pmc_dir         = 'src/pmc';
+    my $pmc_suffix      = '.pmc';
+    my $test_pmc_dir    = 't/pmc';
+    my $test_pmc_suffix = '.t';
+    my $test_pmc_miss   = find_files($pmc_dir,$pmc_suffix,$test_pmc_dir,$test_pmc_suffix);
 
-    my ( @pmc_files, @test_files );
+    # Set variables for dynpmc
+    my $dynpmc_dir         = 'src/dynpmc';
+    my $dynpmc_suffix      = '.pmc';
+    my $test_dynpmc_dir    = 't/dynpmc';
+    my $test_dynpmc_suffix = '.t';
+    my $test_dynpmc_miss   = find_files($dynpmc_dir,$dynpmc_suffix,$test_dynpmc_dir,$test_dynpmc_suffix);
 
-    # find pmc files
-    find {
-        no_chdir => 1,
-        wanted => sub { files_of_type( \@pmc_files, $pmc_suffix ) },
-    } => catdir( $PConfig{build_dir}, $pmc_dir );
-
-    # find test files
-    find {
-        no_chdir => 1,
-        wanted => sub { files_of_type( \@test_files, $test_suffix ) },
-    } => catdir( $PConfig{build_dir}, $test_dir );
-
-    my ( $pmc_miss, $test_miss ) = list_diff( \@pmc_files, \@test_files );
+    # Set variables for dynoplibs
+    my $dynoplibs_dir         = 'src/dynoplibs';
+    my $dynoplibs_suffix      = '.ops';
+    my $test_dynoplibs_dir    = 't/dynoplibs';
+    my $test_dynoplibs_suffix = '.t';
+    my $test_dynoplibs_miss   = find_files($dynoplibs_dir,$dynoplibs_suffix,$test_dynoplibs_dir,$test_dynoplibs_suffix);
 
     local $" = "\n\t";
 
-TODO: {
-        local $TODO = "not yet implemented";
-        ok( !@$pmc_miss, "there are test files for all PMC files in $pmc_dir" )
-            or diag "files in $test_dir but not in PMC dir:\n\t@$pmc_miss";
-    }
-    ok( !@$test_miss, "there are PMC files for all test files in $test_dir" )
-        or diag "files in $pmc_dir but not in test dir:\n\t@$test_miss";
+    # Tests in src/pmc
+    ok( !@$test_pmc_miss, "there are PMC files for all test files in $test_pmc_dir" )
+        or diag "files in $pmc_dir but not in test dir:\n\t@$test_pmc_miss";
 
+TODO: {
+    local $TODO = "rotest PMC not yet tested";
+
+    # Tests in src/dynpmc
+    ok( !@$test_dynpmc_miss, "there are PMC files for all test files in $test_dynpmc_dir" )
+        or diag "files in $dynpmc_dir but not in test dir:\n\t@$test_dynpmc_miss";
+} # TODO
+
+    # Tests in src/dynoplibs
+    ok( !@$test_dynoplibs_miss, "there are OPS files for all test files in $test_dynoplibs_dir" )
+        or diag "files in $dynoplibs_dir but not in test dir:\n\t@$test_dynoplibs_miss";
 }    # PMC
 
-# RT#44457: DYNPMC, DYNOPS, etc.
-
 # remember to change the number of tests :-)
-BEGIN { plan tests => 2; }
+BEGIN { plan tests => 3; }
 
 sub files_of_type {
     my ( $listref, $ext ) = @_;
@@ -85,8 +90,31 @@ sub list_diff {
     grep { $elem{$_}++ } @$a;
     grep { $elem{$_}-- } @$b;
 
-    return ( [ sort grep { $elem{$_} < 0 } keys %elem ], [ sort grep { $elem{$_} > 0 } keys %elem ],
-    );
+    return [ sort grep { $elem{$_} > 0 } keys %elem ];
+}
+
+sub find_files {
+
+    my ($type_dir,$type_suffix,$test_dir,$test_suffix) = @_;
+
+    my ( @type_files, @test_files );
+
+    # find suffix type files
+    find {
+        no_chdir => 1,
+        wanted => sub { files_of_type( \@type_files, $type_suffix ) },
+    } => catdir( $PConfig{build_dir}, $type_dir );
+
+    # find test files
+    find {
+        no_chdir => 1,
+        wanted => sub { files_of_type( \@test_files, $test_suffix ) },
+    } => catdir( $PConfig{build_dir}, $test_dir );
+
+    my $test = list_diff( \@type_files, \@test_files );
+
+    return $test;
+
 }
 
 # Local Variables:
