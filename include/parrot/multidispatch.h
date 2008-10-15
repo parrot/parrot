@@ -45,24 +45,15 @@ typedef struct _MMD_table {
 } MMD_table;
 
 typedef struct _multi_func_list {
-        char *multi_name;
-        char *short_sig;
-        char *full_sig;
+        const char *multi_name;
+        const char *short_sig;
+        const char *full_sig;
         funcptr_t func_ptr;
 } multi_func_list;
 
 
 /* HEADERIZER BEGIN: src/multidispatch.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC* Parrot_build_sig_object_from_varargs(PARROT_INTERP,
-    ARGIN(const char *sig),
-    va_list args)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
 
 PARROT_API
 PARROT_WARN_UNUSED_RESULT
@@ -75,6 +66,15 @@ funcptr_t get_mmd_dispatch_type(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*is_pmc);
+
+PARROT_API
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC* Parrot_build_sig_object_from_varargs(PARROT_INTERP,
+    ARGIN(const char *sig),
+    va_list args)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_API
 void Parrot_mmd_add_by_class(PARROT_INTERP,
@@ -94,9 +94,9 @@ void Parrot_mmd_add_function(PARROT_INTERP,
 
 PARROT_API
 void Parrot_mmd_add_multi_from_c_args(PARROT_INTERP,
-    ARGIN(char *sub_name),
-    ARGIN(char *short_sig),
-    ARGIN(char *long_sig),
+    ARGIN(const char *sub_name),
+    ARGIN(const char *short_sig),
+    ARGIN(const char *long_sig),
     ARGIN(funcptr_t multi_func_ptr))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

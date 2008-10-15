@@ -1924,8 +1924,10 @@ stored in the specified namespace.
 
 PARROT_API
 void
-Parrot_mmd_add_multi_from_c_args(PARROT_INTERP, ARGIN(char *sub_name),
-        ARGIN(char *short_sig), ARGIN(char *long_sig),
+Parrot_mmd_add_multi_from_c_args(PARROT_INTERP,
+        ARGIN(const char *sub_name),
+        ARGIN(const char *short_sig),
+        ARGIN(const char *long_sig),
         ARGIN(funcptr_t multi_func_ptr))
 {
         PMC *multi_sig;
