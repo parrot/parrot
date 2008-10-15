@@ -49,7 +49,7 @@ Returns the Parrot string value of the element at index C<key>.
         }
 
         if (key >= PMC_int_val(SELF))
-            SELF.set_integer_native(key+1);
+            return string_from_literal(INTERP, "");
 
         data = (STRING**)PMC_data(SELF);
 
