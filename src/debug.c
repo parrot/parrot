@@ -2306,7 +2306,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
         int full_name)
 {
     int         j;
-    int         size = 0;
+    size_t     size = 0;
 
     /* Write the opcode name */
     const char * p = full_name ? info->full_name : info->name;

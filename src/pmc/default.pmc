@@ -230,7 +230,7 @@ Returns true (1) if B<method> is found in B<what>, false (0) otherwise.
 static INTVAL
 does_isa(PARROT_INTERP, const STRING *method, const STRING *what)
 {
-    UINTVAL pos    = 0;
+    INTVAL  pos    = 0;
     INTVAL  length = string_length(interp, what);
 
     do {
@@ -240,7 +240,7 @@ does_isa(PARROT_INTERP, const STRING *method, const STRING *what)
         if (idx < 0)
             return 0;
 
-        pos = (INTVAL)idx;
+        pos = idx;
 
         if (pos >= length)
             return 0;

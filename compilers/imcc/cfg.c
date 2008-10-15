@@ -1032,6 +1032,7 @@ compute_dominators(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     change = 1;
 
     while (change) {
+        unsigned int i;
         change = 0;
 
         /* TODO: This 'for' should be a breadth-first search for speed */
