@@ -17,6 +17,12 @@ New in October 2008 release
     - improved parsing of literal numbers
     - support for hyphens and dashes in identifiers
     - next() on for-loops
+- Compilers
+  + PIRC
+    - fixed Heredoc preprocessor
+    - cleaned up Macro preprocessor
+    - many code clean-ups, warning fixes and consting
+    - updated Makefile for easier compilation
 
 New in 0.7.1
 - Implementation
