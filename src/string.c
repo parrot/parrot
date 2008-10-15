@@ -2237,6 +2237,7 @@ string_hash(PARROT_INTERP, ARGMOD_NULLOK(STRING *s), size_t seed)
 {
     register size_t h;
 
+    /* TODO: #59810 (using seed != 3793 breaks things) */
     if (!s)
         return seed;
 
