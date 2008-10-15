@@ -845,9 +845,10 @@ ok 4
 OUTPUT
 
 SKIP: {
-    skip( 'No integer overflow without GMP installed', 1 ) unless $PConfig{gmp};
+    skip( 'No integer overflow for 32-bit INTVALs without GMP installed', 1 )
+        if $PConfig{intvalsize} == 4 && !$PConfig{gmp};
 
-    pir_output_is( <<'CODE', <<OUTPUT, "regression test for integer overflow with 'pow'" );
+    pir_output_is( <<'CODE', <<OUTPUT, "integer overflow with 'pow'" );
 .sub main
     .local pmc i1, i2, r
     i1 = new 'Integer'
