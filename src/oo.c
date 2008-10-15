@@ -580,10 +580,28 @@ fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
     else
         type = VTABLE_get_integer(interp, type_pmc);
 
-    if (type > enum_type_undef)
+    if (type > enum_type_undef) {
+        STRING *classname;
+
+        if (VTABLE_isa(interp, name, CONST_STRING(interp, "ResizableStringArray"))) {
+            PMC * const base_ns = VTABLE_get_pmc_keyed_int(interp,
+                                    interp->HLL_namespace,
+                                    CONTEXT(interp)->current_HLL);
+            PMC             *ns = Parrot_get_namespace_keyed(interp,
+                                    base_ns, name);
+
+            if (!PMC_IS_NULL(classname))
+                classname = VTABLE_get_string(interp, ns);
+            else
+                classname = CONST_STRING(interp, "");
+        }
+        else
+            classname = VTABLE_get_string(interp, name);
+
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Class %Ss already registered!\n",
-            string_escape_string(interp, VTABLE_get_string(interp, name)));
+            string_escape_string(interp, classname));
+    }
 
     if (type < enum_type_undef)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
