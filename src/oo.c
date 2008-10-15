@@ -590,7 +590,7 @@ fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
             PMC             *ns = Parrot_get_namespace_keyed(interp,
                                     base_ns, name);
 
-            if (!STRING_IS_NULL(classname))
+            if (!PMC_IS_NULL(ns))
                 classname = VTABLE_get_string(interp, ns);
             else
                 classname = CONST_STRING(interp, "");
