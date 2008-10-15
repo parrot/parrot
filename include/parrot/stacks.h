@@ -94,14 +94,6 @@ void * pop_dest(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_API
-void rotate_entries(PARROT_INTERP,
-    ARGMOD(Stack_Chunk_t **stack_p),
-    INTVAL num_entries)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*stack_p);
-
-PARROT_API
 void stack_destroy(SHIM(Stack_Chunk_t *top));
 
 PARROT_API
