@@ -9,7 +9,7 @@ src/pmc/stmvar.pmc -- A transactional variable
 =head1 DESCRIPTION
 
 A transactional variable for Parrot's Software Transactional Memory (STM)
-implementation. 
+implementation.
 
 =head2 Methods
 
