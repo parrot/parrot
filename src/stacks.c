@@ -274,7 +274,7 @@ rotate_entries(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p), INTVAL num_entrie
         }
 
         temp_ptr = stack_entry(interp, stack, 0);
-        if(temp_ptr == NULL)
+        if (temp_ptr == NULL)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
                 "Attempt to dereference NULL Stack_Entry_t");
         *temp_ptr = temp;
@@ -289,7 +289,7 @@ rotate_entries(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p), INTVAL num_entrie
                 "Stack too shallow!");
 
         temp_ptr = stack_entry(interp, stack, 0);
-        if(temp_ptr == NULL)
+        if (temp_ptr == NULL)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
                 "Attempt to dereference NULL Stack_Entry_t");
         temp = *temp_ptr;
