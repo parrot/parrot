@@ -335,7 +335,6 @@ PARROT_API
 void
 parrot_mark_hash(PARROT_INTERP, ARGIN(Hash *hash))
 {
-    UINTVAL found  = 0;
     int mark_key   = 0;
     int mark_value = 0;
 

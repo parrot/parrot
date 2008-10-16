@@ -743,10 +743,9 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
         /* Loop from newest handler to oldest handler. */
         while (!PMC_IS_NULL(iter) && VTABLE_get_bool(interp, iter)) {
             PMC *handler = VTABLE_shift_pmc(interp, iter);
-            INTVAL valid_handler = 0;
 
             if (!PMC_IS_NULL(handler)) {
-                INTVAL valid_handler;
+                INTVAL valid_handler = 0;
                 Parrot_PCCINVOKE(interp, handler, CONST_STRING(interp, "can_handle"),
                         "P->I", task, &valid_handler);
 

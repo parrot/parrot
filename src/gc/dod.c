@@ -257,7 +257,6 @@ Parrot_dod_trace_root(PARROT_INTERP, int trace_stack)
     parrot_context_t *ctx;
 
     /* note: adding locals here did cause increased DOD runs */
-    unsigned int i = 0;
 
     if (trace_stack == 2) {
         trace_system_areas(interp);
