@@ -56,22 +56,21 @@ Start compilation by passing any command line C<args> to the Pheme compiler.
 
     $P0 = compreg 'Pheme'
 
-    push_eh exit_handler
+    .include 'except_severity.pasm'
+    .local pmc eh
+    eh = new 'ExceptionHandler'
+    eh.'handle_types'(.EXCEPT_EXIT)
+    set_addr eh, exit_handler
+    push_eh eh
       $P1 = $P0.'command_line'(args)
     pop_eh
     goto done
 
   exit_handler:
     .get_results($P0)
-    .include 'except_severity.pasm'
-    $I0 = $P0
-    if $I0 != .EXCEPT_EXIT goto rethrow_error
 
   done:
     end
-
-  rethrow_error:
-    rethrow $P0
 .end
 
 .include 'languages/pheme/lib/PhemeObjects.pir'
