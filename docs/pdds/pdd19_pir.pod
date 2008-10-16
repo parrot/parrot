@@ -229,7 +229,22 @@ separating them with commas:
 
 The optional C<:unique_reg> modifier will force the register allocator to
 associate the identifier with a unique register for the duration of the
-subroutine.
+subroutine. If the register allocator is thought of as an optimization
+tool for allowing fewer registers to be used in a register frame by reusing
+unused registers, then the C<:unique_reg> directive forces this
+optimization to be turned off. This can be important in a number of
+situations:
+
+=over 4
+
+=item* When a subroutine has a small fixed number of registers
+
+=item* When a named variable or named register is used throughout the entire
+subroutine
+
+=item* When a reference needs to be made to a register
+
+=back
 
 =item .lex <string constant>, <reg>
 
