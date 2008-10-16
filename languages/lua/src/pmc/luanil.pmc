@@ -149,23 +149,6 @@ Return always C<false>.
 
 /*
 
-=item C<INTVAL cmp(PMC *value)>
-
-Performs a multiple dispatch call for 'cmp'.
-Without shortcut like in Default PMC.
-
-=cut
-
-*/
-    VTABLE INTVAL cmp(PMC *value) {
-        INTVAL retval;
-        Parrot_mmd_multi_dispatch_from_c_args(interp,
-                "cmp", "PP->I", SELF, value, &retval);
-        return retval;
-    }
-
-/*
-
 =back
 
 =head2 Specific Methods
