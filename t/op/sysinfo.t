@@ -133,15 +133,11 @@ CODE
 
 # 7
 
-TODO: {
-	local $TODO = "Not Currently Implemented";
-	
 pasm_output_is( <<'CODE', $PConfig{cpuarch}, "sysinfo CPU Arch Family" );
 		sysinfo_s_ic S1, 7
 		print S1
 		end
 CODE
-}
 
 # 8
 
