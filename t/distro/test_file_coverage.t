@@ -57,13 +57,9 @@ PMC: {
     ok( !@$test_pmc_miss, "there are PMC files for all test files in $test_pmc_dir" )
         or diag "files in $pmc_dir but not in test dir:\n\t@$test_pmc_miss";
 
-TODO: {
-    local $TODO = "rotest PMC not yet tested";
-
     # Tests in src/dynpmc
     ok( !@$test_dynpmc_miss, "there are PMC files for all test files in $test_dynpmc_dir" )
         or diag "files in $dynpmc_dir but not in test dir:\n\t@$test_dynpmc_miss";
-} # TODO
 
     # Tests in src/dynoplibs
     ok( !@$test_dynoplibs_miss, "there are OPS files for all test files in $test_dynoplibs_dir" )
