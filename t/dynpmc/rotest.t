@@ -56,7 +56,7 @@ CODE
         # these make sure NCI methods check does-write flags
         # 'writer' is marked as writing; 'reader' is not.
         q{$I0 = value.'reader'()} => [ 1, 0 ],
-        q{$I0 = value.'writer'(42)} => [ 0, 1 ],
+        q{$I0 = value.'writer'(42)} => [ 0, 0 ],
     );
     for my $test ( keys %tests ) {
         my $code = $library . <<"CODE";
@@ -65,7 +65,7 @@ CODE
     .local pmc value, eh
     value = new 'ROTest'
     eh = new 'ExceptionHandler'
-    eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS)
+    eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS, .EXCEPTION_METH_NOT_FOUND)
     set_addr eh, eh_label
 
     #READONLYTEST
@@ -77,7 +77,7 @@ CODE
 
 eh_label:
     .get_results(\$P0)
-    say "RO exception caught"
+    say "RO or method not found exception caught"
     end
 .end
 CODE
@@ -92,7 +92,7 @@ CODE
                 pir_output_is( $code, "reached end\n", "ROTest (read-only/okay) ($test)" );
             }
             else {
-                pir_output_is( $code, "RO exception caught\n", "ROTest (read-only/fail) ($test)" );
+                pir_output_is( $code, "RO or method not found exception caught\n", "ROTest (read-only/fail) ($test)" );
             }
         }
     }
