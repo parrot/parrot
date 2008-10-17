@@ -341,12 +341,39 @@ For example, to get the immediate caller's LexPad, use:
     $P0 = getinterp
     $P1 = $P0["lexpad"; 1]
 
+To access a sub's C<:outer> subroutine, use the C<get_outer()> method:
+
+    .include "interpinfo.pasm"
+    interpinfo $P1, .INTERPINFO_CURRENT_SUB
+    $P2 = $P1."get_outer"()
+
+Here, C<$P1> contains information on the current subroutine. C<$P2> will
+contain C<$P1>'s outer subroutine.
+
+To get C<$P2>'s outer subroutine (if any), the same method can be used on C<$P2>
+itself:
+
+    $P3 = $P2."get_outer"()
+
+
+Using the C<interpinfo> instruction is one way to do it. Another way is this:
+
+    $P0 = getinterp
+    $P1 = $P0["outer"; "sub"]
+    $P2 = $P0["outer"; "sub"; 2] # get the outer sub of the current's outer subroutine
+
+It is also possible to get the C<:outer> sub's LexPad, as above:
+
+    $P0 = getinterp
+    $P1 = $P0["outer"; "lexpad"]
+
+See [1] for an example.
+
 It's likely that this interface will continue to be available even once call
 frames become visible as PMCs.
 
-=head1 IMPLEMENTATION
-
 TODO: Full interpreter introspection interface.
+
 
 =head1 ATTACHMENTS
 
@@ -358,7 +385,13 @@ None.
 
 =head1 REFERENCES
 
-None.
+=over 4
+
+=item [1]
+
+t/op/lexicals.t
+
+=back
 
 =cut
 
