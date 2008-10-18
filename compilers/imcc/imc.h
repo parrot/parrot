@@ -424,10 +424,11 @@ struct parser_state_t {
     struct parser_state_t *next;
     Interp *interp;
     const char *file;
+    int file_needs_free; /* If *file is malloced, we need to free it */
     FILE *handle;
     int line;
-    int pasm_file;      /* pasm_file mode of this frame */
-    int pragmas;        /* n_operators ... */
+    int pasm_file;       /* pasm_file mode of this frame */
+    int pragmas;         /* n_operators ... */
 };
 
 typedef enum _AsmState {
