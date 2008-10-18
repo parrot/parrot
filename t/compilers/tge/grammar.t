@@ -32,7 +32,7 @@ pir_output_is( <<'CODE', <<'OUT', 'test compiling anonymous and named grammars' 
 
     # Compile a grammar from the source
     .local pmc grammar
-    $P1 = new 'TGE::Compiler'
+    $P1 = new ['TGE';'Compiler']
     grammar = $P1.'compile'(<<'GRAMMAR')
     transform min (Leaf) :language('PIR') {
         $P1 = getattribute node, "value"
@@ -158,7 +158,7 @@ GRAMMAR
 
     # Compile a grammar from the source
     .local pmc grammar
-    $P1 = new 'TGE::Compiler'
+    $P1 = new ['TGE';'Compiler']
     grammar = $P1.'compile'(source)
 
     # Build up the tree for testing

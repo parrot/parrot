@@ -60,7 +60,7 @@ documentation at L<http://www.json.org/>.
    unless match goto failed
 
    .local pmc pirgrammar, pirbuilder, pir
-   pirgrammar = new 'JSON::PIR'
+   pirgrammar = new ['JSON'; 'PIR']
    pirbuilder = pirgrammar.apply(match)
    pir = pirbuilder.get('result')
 

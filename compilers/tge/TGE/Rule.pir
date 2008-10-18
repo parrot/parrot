@@ -10,14 +10,14 @@ A basic class to hold defined attribute grammar rules.
 
 =cut
 
-.namespace [ "TGE::Rule" ]
+.namespace [ 'TGE'; 'Rule' ]
 
 # Possibly better named "type", "name", "parent", "action/exec",
 # "copy/value"
 
 .sub "__onload" :load
     .local pmc base
-    newclass base, "TGE::Rule"
+    newclass base, ['TGE';'Rule']
     addattribute base, "type"   # node type that this rule applies to
     addattribute base, "name"   # name of attribute being defined
     addattribute base, "parent" # where the attribute is applied

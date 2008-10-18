@@ -16,12 +16,12 @@ eventually handle indexing for faster tree searches.
 
 =cut
 
-.namespace [ "TGE::Tree" ]
+.namespace [ 'TGE'; 'Tree' ]
 
 .sub "__onload" :load
     # define the class
     .local pmc base
-    newclass base, "TGE::Tree"
+    newclass base, ['TGE';'Tree']
     addattribute base, "cell"    # a hash for storing values of tree nodes
     addattribute base, "visit"   # arrays of rules that apply to each node type
     addattribute base, "data"    # the original unmodified tree

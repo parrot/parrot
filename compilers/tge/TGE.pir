@@ -19,7 +19,7 @@ TGE - A tree grammar engine.
 
         # Compile a grammar from the source grammar file
         .local pmc compiler
-        compiler = new 'TGE::Compiler'
+        compiler = new ['TGE';'Compiler']
 
         .local pmc grammar
         grammar = compiler.'compile'(source)

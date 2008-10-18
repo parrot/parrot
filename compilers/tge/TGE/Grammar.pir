@@ -11,12 +11,12 @@ TGE::Grammar - The base class for all tree grammars.
 
 =cut
 
-.namespace [ 'TGE::Grammar' ]
+.namespace [ 'TGE'; 'Grammar' ]
 
 .sub '__onload' :load
     # define the class
     .local pmc base
-    newclass base, 'TGE::Grammar'
+    newclass base, ['TGE';'Grammar']
     addattribute base, 'rules'   # the rules in the grammar (an array)
     addattribute base, 'symbols' # used for tracking symbols parsed
                                  # (often a hash, but grammar chooses
@@ -53,7 +53,7 @@ Add a rule to the current attribute grammar.
 
     # create a new attribute grammar rule
     .local pmc rule
-    rule = new 'TGE::Rule'
+    rule = new ['TGE';'Rule']
     setattribute rule, 'type', type
     setattribute rule, 'name', name
     setattribute rule, 'parent', parent
@@ -77,7 +77,7 @@ I<top node> of the data structure.
     .param pmc tree
     .local pmc newtree
     .local pmc visit
-    newtree = new 'TGE::Tree'
+    newtree = new ['TGE';'Tree']
     setattribute newtree, 'data', tree
     setattribute newtree, 'grammar', self
     visit = getattribute newtree, 'visit'

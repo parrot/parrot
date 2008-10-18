@@ -8,13 +8,13 @@ TGE::Compiler - A compiler for the grammar syntax of TGE.
 
 =cut
 
-.namespace [ 'TGE::Compiler' ]
+.namespace [ 'TGE'; 'Compiler' ]
 
 .sub __onload :load
     load_bytecode 'TGE.pbc'
 
-    $P0 = get_class 'TGE::Grammar'
-    $P1 = subclass $P0, 'TGE::Compiler'
+    $P0 = get_class [ 'TGE'; 'Grammar' ]
+    $P1 = subclass $P0, [ 'TGE'; 'Compiler' ]
 .end
 
 =head2 parse_grammar
@@ -397,10 +397,17 @@ loop_end:
     .local string code
     .local string type
     .local string inherit
-    type = grammar["type"]
+    type    = grammar["type"]
     inherit = grammar["inherit"]
-    code = "\n.namespace"
+    .local pmc inherit_parts
+    inherit_parts = split '::', inherit
+    inherit       = join "'; '", inherit_parts
+    code    = "\n.namespace"
+
     if type == '' goto no_type
+    .local pmc type_parts
+    type_parts = split '::', type
+    type       = join "'; '", type_parts
     code .= " [ '"
     code .= type
     code .= "' ]"
@@ -409,11 +416,11 @@ loop_end:
     code .= ".sub '__onload' :load :init\n"
     code .= "    load_bytecode 'TGE.pbc'\n"
     code .= "    push_eh class_loaded\n"
-    code .= "    $P1 = subclass '"
+    code .= "    $P1 = subclass [ '"
     code .= inherit
-    code .= "', '"
+    code .= "' ], [ '"
     code .= type
-    code .= "'\n"
+    code .= "' ]\n"
     code .= "    pop_eh\n"
     code .= "  class_loaded:\n"
     code .= "\n.end\n\n"
