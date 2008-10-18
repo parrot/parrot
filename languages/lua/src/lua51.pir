@@ -81,7 +81,9 @@ resulting ost.
     .local pmc ostgrammar, ostbuilder
     ostgrammar_name = self.'ostgrammar'()
     unless ostgrammar_name goto default_ostgrammar
-    ostgrammar = new ostgrammar_name
+    .local pmc ostgrammar_namekeys
+    ostgrammar_namekeys = split '::', ostgrammar_name
+    ostgrammar = new ostgrammar_namekeys
     ostbuilder = ostgrammar.'apply'(source)
     .return ostbuilder.'get'('post')
 
@@ -91,7 +93,7 @@ resulting ost.
 .end
 
 
-.namespace [ 'Lua::PAST::Grammar' ]
+.namespace [ 'Lua'; 'PAST'; 'Grammar' ]
 
 =head2 Functions
 
@@ -112,7 +114,7 @@ used in F<languages/lua/src/PASTGrammar.tg>
 .end
 
 
-.namespace [ 'Lua::POST::Grammar' ]
+.namespace [ 'Lua'; 'POST'; 'Grammar' ]
 
 =item C<internal_error>
 
