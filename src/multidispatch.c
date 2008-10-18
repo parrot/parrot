@@ -513,6 +513,7 @@ Parrot_build_sig_object_from_varargs(PARROT_INTERP, ARGIN(const char *sig), va_l
                             i, enum_type_INTVAL);
                     break;
                 case 'N':
+                    VTABLE_push_float(interp, call_object, va_arg(args, FLOATVAL));
                     VTABLE_set_integer_keyed_int(interp, type_tuple,
                             i, enum_type_FLOATVAL);
                     break;
