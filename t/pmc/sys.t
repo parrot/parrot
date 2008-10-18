@@ -25,7 +25,7 @@ Tests system dependend stuff
 
 =cut
 
-my (undef, $temp_pir) = tempfile( SUFFIX => '.pir' );
+my (undef, $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 pir_output_is( <<"CODE", <<OUT, "spawnw, _config" );
 

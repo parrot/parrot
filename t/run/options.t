@@ -100,7 +100,7 @@ unlink $second_pir_file;
 sub create_pir_file {
     my $word = shift;
 
-    my ( $fh, $filename ) = tempfile( UNLINK => 0, SUFFIX => '.pir' );
+    my ( $fh, $filename ) = tempfile( UNLINK => 0, SUFFIX => '.pir', UNLINK => 1 );
     print $fh <<"END_PIR";
 
 .macro println(word)

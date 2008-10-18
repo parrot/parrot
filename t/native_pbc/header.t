@@ -26,12 +26,12 @@ Tests the layout of the PBC header.
 =cut
 
 # idea stolen from t/pmc/sub.t
-my $tmppasm = File::Temp->new( UNLINK => 1, SUFFIX => '.pasm' );
+my $tmppasm = File::Temp->new( UNLINK => 1, SUFFIX => '.pasm', CLEANUP => 1 );
 print $tmppasm <<END;
 set I0, 0
 END
 $tmppasm->flush;
-my $out_f = File::Temp->new( UNLINK => 1, SUFFIX => '.pbc' );
+my $out_f = File::Temp->new( UNLINK => 1, SUFFIX => '.pbc', CLEANUP => 1 );
 my $path_to_parrot = Parrot::Test::path_to_parrot();
 my $parrot = File::Spec->join( File::Spec->curdir(), 'parrot' . $PConfig{exe} );
 my $args = $ENV{TEST_PROG_ARGS} || '';

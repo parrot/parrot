@@ -34,7 +34,7 @@ my $PERL5  = $PConfig{perl};
 
 my $ended_ok = 0;
 
-my ($FOO, $temp_pasm) = tempfile( SUFFIX => '.pasm', DIR => cwd() );
+my ($FOO, $temp_pasm) = tempfile( SUFFIX => '.pasm', DIR => cwd(), UNLINK => 1 );
 
 print $FOO <<'ENDF';
   .macro_const BAR 42
@@ -55,7 +55,7 @@ before
 after
 OUT
 
-($FOO, $temp_pasm) = tempfile( SUFFIX => '.pasm' );
+($FOO, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $FOO <<'ENDF';
   .macro_const BAR 42
@@ -76,7 +76,7 @@ before
 after
 OUT
 
-($FOO, my $temp_pir) = tempfile( SUFFIX => '.pir' );
+($FOO, my $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $FOO <<'ENDF';
   .const int BAR = 42
@@ -97,7 +97,7 @@ before
 after
 OUT
 
-($FOO, my $temp_inc) = tempfile( SUFFIX => '.inc' );
+($FOO, my $temp_inc) = tempfile( SUFFIX => '.inc', UNLINK => 1 );
 
 print $FOO <<'ENDF';
   .const int BAR = 42
@@ -118,7 +118,7 @@ before
 after
 OUT
 
-($FOO, $temp_inc) = tempfile( SUFFIX => '.inc' );
+($FOO, $temp_inc) = tempfile( SUFFIX => '.inc', UNLINK => 1 );
 
 print $FOO <<'EOF';
 .sub _foo       # sub foo(int a, int b)
@@ -166,7 +166,7 @@ OUT
 # test load_bytecode branches and subs
 
 # write sub2
-($FOO, $temp_pir) = tempfile( SUFFIX => '.pir' );
+($FOO, $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $FOO <<'ENDF';
 .sub _sub2
@@ -177,7 +177,7 @@ ENDF
 close $FOO;
 
 # compile it
-(undef, my $temp_pbc) = tempfile( SUFFIX => '.pbc' );
+(undef, my $temp_pbc) = tempfile( SUFFIX => '.pbc', UNLINK => 1 );
 system_or_die( $PARROT, '-o', $temp_pbc, $temp_pir );
 
 pir_output_is( <<"CODE", <<'OUT', 'call sub in external pbc' );
@@ -199,8 +199,8 @@ sub2
 OUT
 
 # write sub2
-($FOO,  $temp_pir) = tempfile( SUFFIX => '.pir' );
-(undef, $temp_pbc) = tempfile( SUFFIX => '.pbc' );
+($FOO,  $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
+(undef, $temp_pbc) = tempfile( SUFFIX => '.pbc', UNLINK => 1 );
 
 print $FOO <<'ENDF';
 .sub _sub2
@@ -237,8 +237,8 @@ back
 OUT
 
 # write sub2
-($FOO,  $temp_pir) = tempfile( SUFFIX => '.pir' );
-(undef, $temp_pbc) = tempfile( SUFFIX => '.pbc' );
+($FOO,  $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
+(undef, $temp_pbc) = tempfile( SUFFIX => '.pbc', UNLINK => 1 );
 
 print $FOO <<'ENDF';
 .sub _not_sub2
@@ -333,7 +333,7 @@ back
 OUT
 
 # write subs
-($FOO, $temp_pir) = tempfile( SUFFIX => '.pir' );
+($FOO, $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $FOO <<'ENDF';
 .sub _sub1
@@ -373,7 +373,7 @@ OUT
     # include a non-existent file and catch the error message
     my $err_msg;
     {
-        ($FOO, $temp_pir) = tempfile( SUFFIX => '.pir' );
+        ($FOO, $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
         print $FOO <<'END_PIR';
 # Including a non-existent file should produce an error
@@ -388,7 +388,7 @@ END_PIR
 
         my $OLDERR;
         open $OLDERR, '>&', 'STDERR' or die "Can't save STDERR: $!\n";
-        (undef, my $temp_out) = tempfile( SUFFIX => '.out' );
+        (undef, my $temp_out) = tempfile( SUFFIX => '.out', UNLINK => 1 );
         open STDERR, '>', $temp_out or die "Can't write $temp_out: $!\n";
         system( $PARROT, $temp_pir );    # We expect an error here.
         open $FOO, '<', $temp_out or die "Can't read $temp_out: $!\n";

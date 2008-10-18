@@ -212,7 +212,7 @@ ok 2
 -42
 OUTPUT
 
-my ($TEMP, $temp_pir) = tempfile( SUFFIX => '.pir' );
+my ($TEMP, $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
 .sub Integer_divide_Integer
@@ -927,7 +927,7 @@ CODE
 2
 OUTPUT
 
-($TEMP, $temp_pir) = tempfile( SUFFIX => '.pir' );
+($TEMP, $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
 .namespace ["AInt"]

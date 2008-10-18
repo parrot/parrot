@@ -512,7 +512,7 @@ CODE
 ok
 OUTPUT
 
-my ($TEMP, $filename) = tempfile( SUFFIX => '.pir' );
+my ($TEMP, $filename) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<PIR;
   .sub foo

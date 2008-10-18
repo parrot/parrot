@@ -180,7 +180,7 @@ in sub
 back
 OUTPUT
 
-my ($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm' );
+my ($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 print $TEMP <<'EOF';
   .pcc_sub _sub1:
   say "in sub1"
@@ -209,7 +209,7 @@ found sub
 in sub1
 OUTPUT
 
-($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm' );
+($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
   .pcc_sub _sub1:
@@ -240,7 +240,7 @@ in sub1
 back
 OUTPUT
 
-($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm' );
+($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
   .pcc_sub _sub1:
@@ -291,7 +291,7 @@ in sub1
 back
 OUTPUT
 
-my (undef, $temp_pbc)  = tempfile( SUFFIX => '.pbc'  );
+my (undef, $temp_pbc)  = tempfile( SUFFIX => '.pbc', UNLINK => 1 );
 
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pasm);
 
@@ -412,7 +412,7 @@ CODE
 ok
 OUT
 
-($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm' );
+($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
   .pcc_sub :load _sub1:
@@ -433,7 +433,7 @@ in sub1
 back
 OUTPUT
 
-($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm' );
+($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
   .pcc_sub _error:
@@ -470,7 +470,7 @@ in sub1
 back
 OUTPUT
 
-($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm' );
+($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
   .pcc_sub :load _sub1:
@@ -518,7 +518,7 @@ in sub2
 back
 OUTPUT
 
-($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm' );
+($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
   .pcc_sub _sub1:
@@ -566,7 +566,7 @@ in sub1
 back
 OUTPUT
 
-($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm' );
+($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
   .pcc_sub :load _sub1:
@@ -727,7 +727,7 @@ in sub1
 back
 OUTPUT
 
-($TEMP, my $temp_pir) = tempfile( SUFFIX => '.pir' );
+($TEMP, my $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
 .sub _foo
@@ -975,7 +975,7 @@ ok
 nofoo/
 OUTPUT
 
-($TEMP, my $l1_pir) = tempfile( SUFFIX => '.pir' );
+($TEMP, my $l1_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
 (my $l1_pbc         = $l1_pir) =~ s/\.pir/.pbc/;
 
 print $TEMP <<'EOF';
@@ -989,7 +989,7 @@ print $TEMP <<'EOF';
 EOF
 close $TEMP;
 
-($TEMP, my $l2_pir) = tempfile( SUFFIX => '.pir' );
+($TEMP, my $l2_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
 (my $l2_pbc         = $l2_pir) =~ s/\.pir/.pbc/;
 
 print $TEMP <<'EOF';
@@ -1025,6 +1025,8 @@ l22
 main 2
 main 3
 OUTPUT
+
+unlink( $l1_pbc, $l2_pbc );
 
 pir_output_is( <<'CODE', <<'OUTPUT', "immediate code as const" );
 .sub make_pi :immediate :anon

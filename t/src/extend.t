@@ -392,7 +392,7 @@ Wibble
 6
 OUTPUT
 
-my ($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm' );
+my ($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
   .pcc_sub _sub1:
@@ -410,7 +410,7 @@ EOF
 close $TEMP;
 
 # compile to pbc
-my (undef, $temp_pbc) = tempfile( SUFFIX => '.pbc' );
+my (undef, $temp_pbc) = tempfile( SUFFIX => '.pbc', UNLINK => 1 );
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pasm);
 
 c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub' );
@@ -471,7 +471,7 @@ hello in sub2
 back
 OUTPUT
 
-($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm' );
+($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
   .pcc_sub _sub1:
@@ -543,7 +543,7 @@ caught
 back
 OUTPUT
 
-($TEMP, my $temp_pir) = tempfile( SUFFIX => '.pir' );
+($TEMP, my $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
 .sub main :main
