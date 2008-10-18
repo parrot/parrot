@@ -467,36 +467,6 @@ Parrot_MMD_method_name(SHIM_INTERP, INTVAL idx)
 
 /*
 
-=item C<INTVAL Parrot_MMD_method_idx>
-
-Return the MMD function number for method name or -1 on failure.
-
-RT #45973 allow dynamic expansion at runtime.
-
-{{**DEPRECATE**}}
-
-=cut
-
-*/
-
-PARROT_API
-PARROT_PURE_FUNCTION
-INTVAL
-Parrot_MMD_method_idx(SHIM_INTERP, ARGIN(const char *name))
-{
-    INTVAL i;
-
-    for (i = 0; i < MMD_USER_FIRST; ++i) {
-        if (STREQ(Parrot_mmd_func_names[i], name))
-            return i;
-    }
-
-    return -1;
-}
-
-
-/*
-
 =item C<PMC * Parrot_class_lookup>
 
 Looks for the class named C<class_name> and returns it if it exists.

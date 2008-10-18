@@ -121,11 +121,6 @@ void Parrot_invalidate_method_cache(PARROT_INTERP,
 
 PARROT_API
 PARROT_PURE_FUNCTION
-INTVAL Parrot_MMD_method_idx(SHIM_INTERP, ARGIN(const char *name))
-        __attribute__nonnull__(2);
-
-PARROT_API
-PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
 const char* Parrot_MMD_method_name(SHIM_INTERP, INTVAL idx);
 
