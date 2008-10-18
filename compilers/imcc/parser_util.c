@@ -275,10 +275,7 @@ int
 is_op(PARROT_INTERP, ARGIN(const char *name))
 {
     return interp->op_lib->op_code(name, 0) >= 0
-        || interp->op_lib->op_code(name, 1) >= 0
-        || ((name[0] == 'n' && name[1] == '_')
-                && (interp->op_lib->op_code(name + 2, 0) >= 0
-                   || interp->op_lib->op_code(name + 2, 1) >= 0));
+        || interp->op_lib->op_code(name, 1) >= 0;
 }
 
 /*
