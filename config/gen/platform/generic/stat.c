@@ -88,6 +88,9 @@ stat_common(PARROT_INTERP, struct stat *statbuf, INTVAL thing, int status)
         case STAT_ISDIR:
             result = S_ISDIR(statbuf->st_mode);
             break;
+        case STAT_ISREG:
+            result = S_ISREG(statbuf->st_mode);
+            break;
         case STAT_ISDEV:
             result = S_ISCHR(statbuf->st_mode) || S_ISBLK(statbuf->st_mode);
             break;

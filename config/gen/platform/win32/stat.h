@@ -30,6 +30,10 @@
 #  define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
 #endif
 
+#ifndef S_ISREG
+#  define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
+#endif
+
 #endif /* PARROT_PLATFORM_WIN32_STAT_H_GUARD */
 
 /*

@@ -17,24 +17,25 @@
 
 /* &gen_from_def(stat.pasm) */
 
-#define STAT_EXISTS     0
-#define STAT_FILESIZE   1
-#define STAT_ISDIR      2
-#define STAT_ISDEV      3
-#define STAT_CREATETIME 4
-#define STAT_ACCESSTIME 5
-#define STAT_MODIFYTIME 6
-#define STAT_CHANGETIME 7
-#define STAT_BACKUPTIME 8
-#define STAT_UID        9
-#define STAT_GID        10
-#define STAT_PLATFORM_DEV -1
-#define STAT_PLATFORM_INODE -2
-#define STAT_PLATFORM_MODE -3
-#define STAT_PLATFORM_NLINKS -4
-#define STAT_PLATFORM_DEVTYPE -5
-#define STAT_PLATFORM_BLOCKSIZE -6
-#define STAT_PLATFORM_BLOCKS -7
+#define STAT_EXISTS               0
+#define STAT_FILESIZE             1
+#define STAT_ISDIR                2
+#define STAT_ISREG                3
+#define STAT_ISDEV                4
+#define STAT_CREATETIME           5
+#define STAT_ACCESSTIME           6
+#define STAT_MODIFYTIME           7
+#define STAT_CHANGETIME           8
+#define STAT_BACKUPTIME           9
+#define STAT_UID                 10
+#define STAT_GID                 11
+#define STAT_PLATFORM_DEV       - 1
+#define STAT_PLATFORM_INODE     - 2
+#define STAT_PLATFORM_MODE      - 3
+#define STAT_PLATFORM_NLINKS    - 4
+#define STAT_PLATFORM_DEVTYPE   - 5
+#define STAT_PLATFORM_BLOCKSIZE - 6
+#define STAT_PLATFORM_BLOCKS    - 7
 
 /* &end_gen */
 
