@@ -132,7 +132,7 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, intermediate position
     $I33 = defined function
     unless $I33 goto bad_func
 doit:
-    .return function(argv :flat)
+    .tailcall function(argv :flat)
 bad_func:
     printerr "_funcall:  Bad function.\n"
     exit 0
@@ -210,7 +210,7 @@ bad_func:
     printerr "_funcall:  Bad function.\n"
     exit 0
 doit:
-    .return function(argv :flat)
+    .tailcall function(argv :flat)
 .end
 
 ## Return quotient and remainder as two integers.
@@ -308,7 +308,7 @@ pir_output_is( <<'CODE', <<'OUT', "new tail call syntax" );
 .end
 
 .sub foo
-    .return bar()
+    .tailcall bar()
     print "never\n"
 .end
 
@@ -340,7 +340,7 @@ pir_output_is( <<'CODE', <<'OUT', "new tail method call syntax" );
     n = getattribute self, [ "Foo" ], "n"
     dec n
     unless n goto done
-    .return self."go"()
+    .tailcall self."go"()
 done:
 .end
 
