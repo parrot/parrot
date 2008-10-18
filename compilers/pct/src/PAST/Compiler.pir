@@ -432,6 +432,10 @@ nodes make it into the tree.
 .sub 'as_post' :method :multi(_, _)
     .param pmc node
     .param pmc options         :slurpy :named
+    unless null node goto not_null_node
+    self.panic("PAST::Compiler can't compile a null node")
+    not_null_node:
+
     $S0 = typeof node
     self.panic("PAST::Compiler can't compile node of type ", $S0)
 .end
