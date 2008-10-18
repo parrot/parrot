@@ -575,10 +575,6 @@ Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
     sig_object = Parrot_build_sig_object_from_varargs(interp, sig, args);
     va_end(args);
 
-    /* remove leading "__" from old-style MMD name */
-    if (name[0] == '_' && name[1] == '_')
-        name += 2;
-
     sub = Parrot_mmd_find_multi_from_sig_obj(interp, const_string(interp, name), sig_object);
 
     if (PMC_IS_NULL(sub))
