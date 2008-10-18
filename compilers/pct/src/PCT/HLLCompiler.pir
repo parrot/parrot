@@ -410,8 +410,12 @@ resulting ast.
     .local string astgrammar_name
     astgrammar_name = self.'astgrammar'()
     unless astgrammar_name goto compile_match
+
+    .local pmc astgrammar_namelist
     .local pmc astgrammar, astbuilder
-    astgrammar = new astgrammar_name
+    astgrammar_namelist = self.'parse_name'(astgrammar_name)
+    unless astgrammar_namelist goto err_past
+    astgrammar = new astgrammar_namelist
     astbuilder = astgrammar.'apply'(source)
     .return astbuilder.'get'('past')
 
