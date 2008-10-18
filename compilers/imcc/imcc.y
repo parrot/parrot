@@ -637,7 +637,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %token <t> SHR_ASSIGN SHL_ASSIGN SHR_U_ASSIGN
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV PMCV LOG_XOR
 %token <t> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
-%token <t> GLOBAL GLOBALOP ADDR RESULT RETURN YIELDT GET_RESULTS
+%token <t> GLOBAL GLOBALOP ADDR RESULT RETURN TAILCALL YIELDT GET_RESULTS
 %token <t> POW SHIFT_RIGHT_U LOG_AND LOG_OR
 %token <t> COMMA ESUB DOTDOT
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
@@ -1453,6 +1453,14 @@ labeled_inst:
            is_def=0;
            mem_sys_free($4);
          }
+   | TAILCALL sub_call
+         {
+           $$ = NULL;
+           IMCC_INFO(interp)->cur_call->pcc_sub->flags |= isTAIL_CALL;
+           IMCC_INFO(interp)->cur_call = NULL;
+         }
+   /* This style is deprecated as per RT#58974. Use ".tailcall" for
+      tailcalls instead of ".return". */
    | RETURN  sub_call
          {
            $$ = NULL;
