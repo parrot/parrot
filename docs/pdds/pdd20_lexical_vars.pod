@@ -375,6 +375,9 @@ frames become visible as PMCs.
 
 TODO: Full interpreter introspection interface.
 
+=head1 IMPLEMENTATION
+
+TK.
 
 =head1 ATTACHMENTS
 
