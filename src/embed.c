@@ -391,13 +391,20 @@ Parrot_readbc(PARROT_INTERP, ARGIN_NULLOK(const char *fullname))
     else {
         STRING * const fs = string_make(interp, fullname, strlen(fullname),
             NULL, 0);
+
+        /* can't read a file that doesn't exist */
         if (!Parrot_stat_info_intval(interp, fs, STAT_EXISTS)) {
             PIO_eprintf(interp, "Parrot VM: Can't stat %s, code %i.\n",
                     fullname, errno);
             return NULL;
         }
 
-        /* RT #46153 check for regular file */
+        /* we may need to relax this if we want to read bytecode from pipes */
+        if (!Parrot_stat_info_intval(interp, fs, STAT_ISREG)) {
+            PIO_eprintf(interp, "Parrot VM: '%s', is not a regular file %i.\n",
+                    fullname, errno);
+            return NULL;
+        }
 
         program_size = Parrot_stat_info_intval(interp, fs, STAT_FILESIZE);
 
