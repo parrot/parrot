@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 8;
 
 =head1 NAME
 
@@ -106,35 +106,6 @@ CODE
 84
 84
 42
-OUTPUT
-
-pir_output_is( <<"CODE", <<'OUTPUT', "Perl6Scalar" );
-$library
-.loadlib "perl6_group"
-.sub main :main
-    .local pmc foo, eh
-
-    foo = new 'Perl6Scalar'
-    foo = 42
-
-    eh = new 'ExceptionHandler'
-    eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS)
-    set_addr eh, eh_label
-
-    make_readonly(foo)
-    push_eh eh
-    foo = 43
-    pop_eh
-    print "no exception caught"
-
-eh_label:
-    .get_results(\$P0)
-    say "RO exception caught"
-    end
-
-.end
-CODE
-RO exception caught
 OUTPUT
 
 pir_output_is( $library . <<'CODE', <<'OUTPUT', "Integer stays Integer" );
