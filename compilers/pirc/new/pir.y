@@ -57,47 +57,36 @@ TODO:
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include <math.h>
 #include "parrot/oplib/ops.h"
-
-/* prevent declarations of malloc() and free() in pirparser.h */
-#define YYMALLOC
-#define YYFREE
-
-#include "pirparser.h"
 #include "pircompiler.h"
 #include "pircompunit.h"
 #include "pirsymbol.h"
-
-/* Note: the following sequence of #defines and #includes must be kept in this order.
- * Do not make changes to this; the sequence is important in order to be compilable.
- */
-
-/**** Begin of Sequence. ****/
-
-/* prevent inclusion of <unistd.h> on windows */
-#define YY_NO_UNISTD_H
-
-/* define YY_DECL, so that in "pirlexer.h" it won't be defined */
-#define YY_DECL int yypirlex(YYSTYPE *yylval, yyscan_t yyscanner)
-
-#ifndef __STDC_VERSION__
-#  define __STDC_VERSION__ 0
-#endif
-
-/* include "pirlexer.h" before "piryy.h" */
-#include "pirlexer.h"
 #include "piryy.h"
 
-/* declare yylex(); do this I<after> including "pirlexer.h" */
-extern YY_DECL;
+/* #defines to prevent declarations of malloc() and free() in pirparser.h */
+#define YYMALLOC
+#define YYFREE
+#include "pirparser.h"
 
-/**** End of Sequence. ****/
+/* #define to prevent declaration of yypirlex() in pirlexer.h */
+#define YY_DECL
+#include "pirlexer.h"
+
+int yypirlex(YYSTYPE *yylval, yyscan_t yyscanner);
+
+#ifdef _WIN32
+/* prevent warnings about unreachable code. */
+#  pragma warning (disable:4702)
+/* prevent warnings about possible loss of data. */
+#  pragma warning (disable:4244)
+/* prevent warnings about uninitialized yylval object. */
+#  pragma warning (disable:4701)
+
+#else
 
 
-int  yypirget_column(yyscan_t yyscanner);
-void yypirset_column(int col, yyscan_t yyscanner);
+#endif
 
 
 /* Enumeration of mathematical operator types; these are used to index the opnames array. */
@@ -2966,6 +2955,12 @@ write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
                      */
                 }
                 else {
+                    if ((iter->expr.t->key->expr->type == EXPR_TARGET)
+                       & (iter->expr.t->key->expr->expr.t->type == INT_TYPE)) /* $I register */
+                    {
+                       *instr_writer++ = 'i';
+                    }
+                    else
                     /*
                     instr_writer = write_signature(iter->expr.t->key->expr, instr_writer);
                     */

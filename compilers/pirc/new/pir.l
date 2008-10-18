@@ -17,6 +17,19 @@
 #  define __STDC_VERSION__ 0
 #endif
 
+#ifndef YY_NO_UNISTD_H
+#  define YY_NO_UNISTD_H
+#endif
+
+/* prevent warnings on undefined #defines: */
+#ifndef YY_MAIN
+#  define YY_MAIN 0
+#endif
+
+#ifndef YY_ALWAYS_INTERACTIVE
+#  define YY_ALWAYS_INTERACTIVE 0
+#endif
+
 }
 
 %{
@@ -69,34 +82,27 @@ easier to maintain, and preferable.
 #include "piryy.h"
 
 
-
-
-
 /* define the type of the extra field in the yyscan_t object that is passed around;
  * this is the lexer_state structure, defined in "pircompiler.h"
  */
 #define YY_EXTRA_TYPE  struct lexer_state *
 
 /* accessor methods for setting and getting the lexer_state */
-extern YY_EXTRA_TYPE yyget_extra(                     yyscan_t scanner);
-extern void          yyset_extra(YY_EXTRA_TYPE lexer, yyscan_t scanner);
-
 extern int  yypirget_column(yyscan_t yyscanner);
 extern void yypirset_column(int col, yyscan_t yyscanner);
 
-/* prevent warnings on undefined #defines: */
+#ifdef _WIN32
+/* warning C4018: "signed/unsigned mismatch" */
+#  pragma warning (disable:4018)
+/* warning C4244: "conversion from 'int' to 'yytype_int16' */
+#  pragma warning (disable:4244)
 
-#ifndef YY_NO_UNISTD_H
-#  define YY_NO_UNISTD_H
+#else
+/* is this possible on other platforms? */
+
 #endif
 
-#ifndef YY_MAIN
-#  define YY_MAIN 0
-#endif
 
-#ifndef YY_ALWAYS_INTERACTIVE
-#  define YY_ALWAYS_INTERACTIVE 0
-#endif
 
 
 

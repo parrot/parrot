@@ -29,7 +29,8 @@ typedef struct cache {
 typedef enum lexer_flags {
     LEXER_FLAG_WARNINGS            = 1 << 0,
     LEXER_FLAG_NOSTRENGTHREDUCTION = 1 << 1,
-    LEXER_FLAG_VERBOSE             = 1 << 2
+    LEXER_FLAG_VERBOSE             = 1 << 2,
+    LEXER_FLAG_EMIT_PASM           = 1 << 3
 
 } lexer_flags;
 

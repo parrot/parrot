@@ -197,12 +197,20 @@ print_instruction(lexer_state * const lexer, instruction *ins) {
 
     if (ins->opname) {
 
-        fprintf(out, "%u   %s ", ins->offset, ins->opname);
+        if (TEST_FLAG(lexer->flags, LEXER_FLAG_EMIT_PASM)) {
 
-        print_expressions(lexer, ins->operands);
+            fprintf(out, "    %s ", ins->opinfo->name);
+            print_expressions(lexer, ins->operands);
+        }
+        else {
+            fprintf(out, "%u   %s ", ins->offset, ins->opname);
 
-        fprintf(out, "\t# op %d", ins->opcode);
+            print_expressions(lexer, ins->operands);
 
+            fprintf(out, "\t# op %d", ins->opcode);
+
+
+        }
         fprintf(out, "\n");
     }
 }

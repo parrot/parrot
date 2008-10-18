@@ -11,6 +11,9 @@
 #include "pirparser.h"
 #include "pircompiler.h"
 #include "piremit.h"
+#include "piryy.h"
+#include "pirlexer.h"
+
 
 /* XXX use pthreads library to test thread safety.
    does not work currently on windows.
@@ -25,23 +28,6 @@
 #  include <pthread.h>
 #  define NUM_THREADS 1
 #endif
-
-/* before including the lexer's header file, make sure to define this: */
-#ifndef YY_NO_UNISTD_H
-#  define YY_NO_UNISTD_H
-#endif
-
-#ifndef __STDC_VERSION__
-#  define __STDC_VERSION__ 0
-#endif
-
-#include "pirlexer.h"
-/* include this after "pirlexer.h", as C<yyscan_t> structure must be defined first
- * which is done in "pirlexer.h"
- */
-#include "piryy.h"
-
-
 
 void * parse_file(void *a);
 
@@ -238,6 +224,9 @@ main(int argc, char *argv[]) {
                     fprintf(stderr, "Missing argument for option '-o'\n");
                     exit(EXIT_FAILURE);
                 }
+                break;
+            case 'p':
+                SET_FLAG(flags, LEXER_FLAG_EMIT_PASM);
                 break;
             case 'W':
                 SET_FLAG(flags, LEXER_FLAG_WARNINGS);
