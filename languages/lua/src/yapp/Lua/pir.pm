@@ -263,7 +263,7 @@ package pirVisitor;
         my $self = shift;
         my ($op) = @_;
         my $FH   = $self->{fh};
-        print {$FH} "    .return $op->{arg1}->{symbol}(";
+        print {$FH} "    .tailcall $op->{arg1}->{symbol}(";
         my $first = 1;
         foreach ( @{ $op->{arg2} } ) {
             print {$FH} ", " unless ($first);
