@@ -8,10 +8,10 @@ src/pmc/fixedbooleanarray.pmc - fixed size array for booleans only
 
 =head1 DESCRIPTION
 
-The C<FixedBooleanArray PMC> implements an array of fixed size, which
-stores booleans.  It uses the C<Boolean PMC> for all conversions.  The
-C<FixedBooleanArray PMC> is extended by the C<ResizableBooleanArray
-PMC>.
+The C<FixedBooleanArray> PMC implements an array of fixed size, which
+stores booleans.  It uses the C<Boolean> PMC for all conversions.  The
+C<FixedBooleanArray> PMC is extended by the C<ResizableBooleanArray>
+PMC.
 
 =head2 Functions
 
@@ -22,11 +22,6 @@ PMC>.
 */
 
 #include "parrot/parrot.h"
-
-
-/*
- * RT#46677 merge this with functions from BigInt PMC
- */
 
 #define BITS_PER_CHAR 8
 
