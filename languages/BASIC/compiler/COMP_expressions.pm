@@ -526,7 +526,7 @@ sub pushargs {
     }
 
     #foreach(@args) {
-    #push @$code, qq{\t.arg $_->[0]\t\t# $_->[0]};
+    #push @$code, qq{\t.set_arg $_->[0]\t\t# $_->[0]};
     #}
     pop @$work;    # REmove startarg tag...
     return ( scalar @args, @args );

@@ -2,7 +2,7 @@
 
   .local pmc a, b, c, x, y, z
   .begin_call
-  .arg a :flat :named('a')
+  .set_arg a :flat :named('a')
   .call x
   .result y :slurpy :optional
   .end_call
@@ -24,7 +24,7 @@
   .local pmc a, b, c, x, y, z
 
   .begin_call
-  .arg 1 :named('x')
+  .set_arg 1 :named('x')
   .call x
   .end_call
 .end
@@ -33,7 +33,7 @@
   .local pmc a, b, c, x, y, z, g
 
   .begin_call
-  .arg 1 :flat
+  .set_arg 1 :flat
   .call g
   .end_call
 .end

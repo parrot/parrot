@@ -441,7 +441,7 @@ token heredoc_id {
 #}
 
 rule arguments {
-    [ '.arg' <simple_expr> <set_flags>* <.nl> ]*
+    [ '.set_arg' <simple_expr> <set_flags>* <.nl> ]*
     {*}
 }
 
@@ -794,7 +794,7 @@ TODO: put this in <%pir_directive> PIR directives
 =cut
 
 token pir_directive {
-    [ '.arg'
+    [ '.set_arg'
     | '.const'
     | '.endm'
     | '.end'

@@ -17,8 +17,8 @@ pir_output_is( <<'CODE', <<'OUT', "low-level syntax" );
     .const .Sub sub = "_sub"
     .const int y = 20
     .begin_call
-    .arg 10
-    .arg y
+    .set_arg 10
+    .set_arg y
     .call sub
     .local string z
     .result z
@@ -256,7 +256,7 @@ done in coroutine
 done in main
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', ".arg :flat" );
+pir_output_is( <<'CODE', <<'OUT', ".set_arg :flat" );
 .sub _main
     .local pmc x, y, z, ar, ar2, s
     x = new 'String'
@@ -274,11 +274,11 @@ pir_output_is( <<'CODE', <<'OUT', ".arg :flat" );
     push ar2, "ok 5\n"
     .const .Sub s = "_sub"
     .begin_call
-    .arg x
-    .arg ar :flat
-    .arg y
-    .arg ar2 :flat
-    .arg z
+    .set_arg x
+    .set_arg ar :flat
+    .set_arg y
+    .set_arg ar2 :flat
+    .set_arg z
     .call s
     .end_call
     end

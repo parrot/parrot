@@ -137,12 +137,12 @@ NOMATCH:
     repeat match, " ", 500
 loop:
     .begin_call
-    .arg s
-    .arg ovector
-    .arg ok
-    .arg i
-    .arg match
-    .arg 500
+    .set_arg s
+    .set_arg ovector
+    .set_arg ok
+    .set_arg i
+    .set_arg match
+    .set_arg 500
     .nci_call COPY_SUBSTRING
     .end_call
     if i goto subp

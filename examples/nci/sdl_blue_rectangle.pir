@@ -33,15 +33,15 @@
     new_SDL_Rect   = global "new_SDL_Rect"
 
     .begin_call
-        .arg 65535
+        .set_arg 65535
         .nci_call SDL_Init
     .end_call
 
     .begin_call
-        .arg 640
-        .arg 480
-        .arg  0
-        .arg   0
+        .set_arg 640
+        .set_arg 480
+        .set_arg  0
+        .set_arg   0
         .nci_call SetVideoMode
         .result screen
     .end_call
@@ -67,9 +67,9 @@
     set blue_rect['y'], 190
 
     .begin_call
-        .arg screen
-        .arg blue_rect
-        .arg blue
+        .set_arg screen
+        .set_arg blue_rect
+        .set_arg blue
         .nci_call SDL_FillRect
         .local int ok
         .result ok
@@ -77,11 +77,11 @@
 
     # update full screen (all 0 arguments)
     .begin_call
-        .arg screen
-        .arg 0
-        .arg 0
-        .arg 0
-        .arg 0
+        .set_arg screen
+        .set_arg 0
+        .set_arg 0
+        .set_arg 0
+        .set_arg 0
         .nci_call SDL_UpdateRect
     .end_call
 

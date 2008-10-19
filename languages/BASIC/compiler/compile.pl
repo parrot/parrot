@@ -174,8 +174,8 @@ END_PIR
                 eq \$I0, 0, DEBUGGER_DONE        # This breakpoint doesn't exist
         DEBUGGER_STOP:
                 \$P1=new .Hash
-@debdecl                .arg \$P1
-                .arg debline
+@debdecl                .set_arg \$P1
+                .set_arg debline
                 _DEBUGGER_STOP_FOR_REAL()
         DEBUGGER_DONE: noop
         .end    # End debug segment

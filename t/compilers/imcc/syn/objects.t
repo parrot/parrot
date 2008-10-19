@@ -255,8 +255,8 @@ pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax, args" );
     newclass class, "Foo"
     obj = new "Foo"
     .begin_call
-    .arg "hello"
-    .arg "\n"
+    .set_arg "hello"
+    .set_arg "\n"
     .invocant obj
     .meth_call "_meth"
     .result $S0

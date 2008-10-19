@@ -389,7 +389,7 @@ OUTPUT
 pir_error_output_like( <<'CODE', <<'OUTPUT', 'unknown macro' );
 .sub test :main
 .macro M(A)
-    .arg .A
+    .set_arg .A
 .endm
     .M(a)
     end

@@ -180,8 +180,8 @@ TOKEN_FUNC:
   func = symbol['func']
   # indirect call of subs, seems to need elaborate PIR syntax
   .begin_call
-    .arg state
-    .arg arguments
+    .set_arg state
+    .set_arg arguments
   .call func
     ret_func_1:
     .result text

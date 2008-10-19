@@ -14,9 +14,9 @@ language_output_like( 'PIR_PGE', <<'CODE', qr/Parse successful!/, 'long sub invo
 .sub main :main
     .local int x, y, z
     .begin_call
-    .arg 1
-    .arg 2
-    .arg 3
+    .set_arg 1
+    .set_arg 2
+    .set_arg 3
     .call foo
     .local int a, b, c
     .result a
