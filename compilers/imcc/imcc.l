@@ -325,6 +325,7 @@ SP              [ ]
 <pod>{EOL}      { IMCC_INFO(interp)->line++; }
 
 <INITIAL,emit>".lex"     return LEXICAL;
+".arg"                   return ARG;
 ".set_arg"               return ARG;
 ".sub"                   return SUB;
 ".end"                   return ESUB;

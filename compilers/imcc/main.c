@@ -584,7 +584,7 @@ do_pre_process(PARROT_INTERP)
             case EMIT:          printf(".emit\n"); break;
             case EOM:           printf(".eom\n"); break;
             case LOCAL:         printf(".local "); break;
-            case ARG:           printf(".arg "); break;
+            case ARG:           printf(".set_arg "); break;
             case SUB:           printf(".sub "); break;
             case ESUB:          printf(".end"); break;
             case RESULT:        printf(".result "); break;
