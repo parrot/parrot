@@ -60,8 +60,8 @@ $step = test_step_constructor_and_description($conf);
     );
     ok( $ret, "runstep() returned true value" );
     ok( defined $step->result(), "Result was defined");
-    is($conf->data->get('ctags'), 'ctags',
-        "Correct value for 'ctags' attribute was set");
+    ok($possible_ctags{$conf->data->get('ctags')},
+        "Acceptable value for 'ctags' attribute was set");
 }
 
 $conf->replenish($serialized);
