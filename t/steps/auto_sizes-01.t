@@ -279,9 +279,9 @@ auto::sizes::_handle_hugeintvalsize(
         intvalsize      => $intvalsize,
     },
 );
-ok( ! defined $conf->data->get( 'hugeintval' ), 
+ok( ! defined $conf->data->get( 'hugeintval' ),
     "Got expected value for hugeintval");
-ok( ! defined $conf->data->get( 'hugeintvalsize' ), 
+ok( ! defined $conf->data->get( 'hugeintvalsize' ),
     "Got expected value for hugeintvalsize");
 $conf->data->set( hugeintval => undef );
 $conf->data->set( hugeintvalsize => undef );

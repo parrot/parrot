@@ -242,7 +242,7 @@ CODE
 ok
 OUTPUT
 
-# RT#46803 is this test good enough?
+# RT #46803 is this test good enough?
 pir_output_is( <<'CODE', <<'OUTPUT', "GC isn't too eager" );
 .sub main :main
     .local string reason

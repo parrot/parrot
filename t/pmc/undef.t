@@ -103,7 +103,7 @@ Tests mainly morphing undef to other types.
     $S1 = typeof pmc1
     is( $S1, 'Undef', 'PMC String morph to undef' )
 .end
- 
+
 .sub undef_pmc_set_to_integer_native
     .local pmc pmc1
     pmc1 = new 'Undef'
@@ -114,7 +114,7 @@ Tests mainly morphing undef to other types.
     pmc1_is_a = isa pmc1, "Integer"
     ok( pmc1_is_a, 'PMC Undef set to int isa Integer' )
 .end
- 
+
 .sub undef_pmc_isa_after_assignment
     .local pmc pmc1
     pmc1 = new 'Undef'
@@ -145,9 +145,9 @@ Tests mainly morphing undef to other types.
     is( bool1, 1, 'PMC Undef does scalar' )
 
     does bool1, pmc1, "no_interface"
-    is( bool1, 0, 'PMC Undef does not do no_interface' ) 
+    is( bool1, 0, 'PMC Undef does not do no_interface' )
 .end
- 
+
 .sub verify_clone_works
     $P1 = new 'Undef'
     $P2 = clone $P1
@@ -159,10 +159,10 @@ Tests mainly morphing undef to other types.
     $P1 = new 'Undef'
     $P2 = new 'Undef'
     if $P1 == $P2 goto ok
-        ok( 0, 'Undef == Undef (RT#33603)' )
+        ok( 0, 'Undef == Undef (RT #33603)' )
         .return()
   ok:
-    ok( 1, 'Undef == Undef (RT#33603)' )
+    ok( 1, 'Undef == Undef (RT #33603)' )
 .end
 
 # Local Variables:

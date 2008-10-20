@@ -537,7 +537,7 @@ CODE
 /No such attribute 'no_such' in class 'Foo'/
 OUTPUT
 
-# RT#46845
+# RT #46845
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "getting NULL attribute" );
     newclass P1, "Foo"

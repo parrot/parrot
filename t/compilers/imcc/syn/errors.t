@@ -67,7 +67,7 @@ END_PIR
 /^error:imcc:syntax error, unexpected IDENTIFIER, expecting/
 END_EXPECTED
 
-pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'Array is on type, RT#42769' );
+pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'Array is on type, RT #42769' );
 .sub main :main
   .local Array my_string
   my_string = new String

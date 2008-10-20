@@ -170,7 +170,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Getting negatively indexed elements" );
     push_eh caught
     set I0, P0[-1]
     pop_eh
-    say "no exception"    
+    say "no exception"
     end
 caught:
     say "caught an exception"
@@ -203,7 +203,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
     push_eh caught
     set I0, P0[1]
     pop_eh
-    say "no exception"    
+    say "no exception"
     end
 caught:
     say "caught an exception"
@@ -300,7 +300,7 @@ pir_output_like(
 
 .sub main :main
      .local pmc compares, cmp_fun
-     # RT#46855 doesnt work wit prederef of JIT
+     # RT #46855 doesnt work wit prederef of JIT
      bounds 1
      compares = new 'Integer'
      compares = 0
@@ -526,7 +526,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "equality" );
     print "1:"
     if fpa1 == fpa2 goto L1
     print "not "
-L1: say "equal"    
+L1: say "equal"
 
     fpa1 = 3
     print "2:"

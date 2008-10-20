@@ -57,7 +57,7 @@ BEGIN {
 
 plan tests => 1;
 
-# RT#44437 this should really be using src_dir insetad of build_dir but it
+# RT #44437 this should really be using src_dir insetad of build_dir but it
 # doesn't exist (yet)
 my $build_dir    = $PConfig{build_dir};
 my $manifest     = maniread("$build_dir/MANIFEST");

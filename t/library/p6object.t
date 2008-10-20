@@ -404,7 +404,7 @@ split C<value> on spaces and return that.
 =cut
 
 .sub 'qw'
-    .param pmc value 
+    .param pmc value
     $I0 = does value, 'array'
     if $I0 goto done
     $S0 = value
@@ -450,8 +450,8 @@ Test for x and y being the same PMC.
 =item isa_ok(object, class, objectname)
 
 Test if C<object> is/isn't an instance of C<class> as reported
-by the C<isa> opcode.  C<objectname> is used to generate the 
-diagnostic message in output (i.e., it's not the actual 
+by the C<isa> opcode.  C<objectname> is used to generate the
+diagnostic message in output (i.e., it's not the actual
 diagnostic message).
 
 =cut

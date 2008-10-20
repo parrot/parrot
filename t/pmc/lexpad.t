@@ -31,7 +31,7 @@ Tests the LexPad PMC.
     ok(0, "shouldn't be able to create a LexPad without an initializer")
     goto end
 eh:
-    ok(1, "can't create a LexPad without an initializer")    
+    ok(1, "can't create a LexPad without an initializer")
 end:
 .end
 

@@ -31,7 +31,7 @@ Tests the LexInfo PMC.
     ok(0, "shouldn't be able to create a LexInfo without an initializer")
     goto end
 eh:
-    ok(1, "can't create a LexInfo without an initializer")    
+    ok(1, "can't create a LexInfo without an initializer")
 end:
 .end
 

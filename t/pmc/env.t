@@ -176,7 +176,7 @@ end:
     delete env['PARROT_TMP_ADD_3']
 .end
 
-## RT#50186 - shouldn't segfault
+## RT #50186 - shouldn't segfault
 .sub oob_query
     new $P0, 'Env'
     set $S0, $P0[999]

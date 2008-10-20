@@ -37,7 +37,7 @@ my $cwd = cwd();
     );
 
     my $conf = Parrot::Configure->new;
-    
+
     my $serialized = $conf->pcfreeze();
 
     test_step_thru_runstep( $conf, q{init::install}, $args );

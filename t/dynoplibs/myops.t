@@ -139,7 +139,7 @@ loop:
     inc I0
     # check_events
     get_global P1, "flag"
-    ge P1, 7, done 
+    ge P1, 7, done
     le I0, 40, loop
 
 done:
@@ -266,7 +266,7 @@ pasm_output_is( <<'CODE', <<OUTPUT, "conv_i2_i" );
     conv_i2 I0
     print I0
     print "\n"
-    inc I0              # 2 ^ 15 
+    inc I0              # 2 ^ 15
     conv_i2 I0
     print I0
     print "\n"

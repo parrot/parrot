@@ -72,7 +72,7 @@ pir_output_is( <<'CODE', <<'OUT', 'inspect_p_p_s' );
     $P1 = inspect $P0, 'flags'
     $I0 = $P1
     $I1 = 1 << 29 # flag 29 is PObj_is_class_FLAG
-    
+
     $I2 = $I0 & $I1
     if $I2 goto flags_ok
       print "not "

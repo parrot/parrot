@@ -131,7 +131,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Setting negatively indexed elements" );
     end
 caught:
     say "caught an exception"
-    end    
+    end
 CODE
 caught an exception
 OUTPUT

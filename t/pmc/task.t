@@ -155,7 +155,7 @@ pir_output_is( <<'CODE', <<'OUT', "freeze and thaw a task" );
     setattribute $P0, 'birthtime', $P2
 
     $S0  = freeze $P0
-    $P10 = thaw $S0 
+    $P10 = thaw $S0
 
     $P3 = getattribute $P10, 'status'
     print $P3

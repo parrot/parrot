@@ -46,7 +46,7 @@ CODE
 OUT
 
 # 5 ##########################
-pir_output_is( <<'CODE', <<'OUT', "RT#42769 register name 'object' is valid" );
+pir_output_is( <<'CODE', <<'OUT', "RT #42769 register name 'object' is valid" );
 .sub main :main
     .local int object
     object = 1

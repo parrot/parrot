@@ -148,7 +148,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Setting negatively indeded elements" );
     end
 caught:
     say "caught something"
-    end    
+    end
 CODE
 caught something
 OUTPUT
@@ -164,7 +164,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Getting negatively indeded elements" );
     end
 caught:
     say "caught an exception"
-    end    
+    end
 CODE
 caught an exception
 OUTPUT

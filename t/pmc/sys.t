@@ -67,7 +67,7 @@ pir_output_is( <<'CODE', <<'OUT', "conf_hash is read-only")
     goto end
 is_ro:
     say 'hash is read-only'
-end:    
+end:
 .end
 
 .include 'library/config.pir'

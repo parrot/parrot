@@ -59,7 +59,7 @@ OUTPUT
 SKIP: {
     skip( 'known segfault; needs GC/STM hackery', 1 );
 
-    pir_output_is( <<'CODE', <<'OUTPUT', "Add, remove, several threads", todo => 'RT#41892' );
+    pir_output_is( <<'CODE', <<'OUTPUT', "Add, remove, several threads", todo => 'RT #41892' );
 .sub add_thread
     .param pmc queue
     .param int start

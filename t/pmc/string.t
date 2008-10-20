@@ -1167,7 +1167,7 @@ loop:
     .const .Sub tr_00 = 'tr_00_init'
     el = elements tr_00
     say el
-   
+
     $P0 = new 'String'
     $P0.'trans'(s, tr_00)
 
@@ -1314,13 +1314,13 @@ OUTPUT
   print 'main empty '
   print $I0
   say ''
-  
+
   $P0 = "Hello world"
   $I0 = $P0.'reverse_index'('', 0)
   print 'search empty '
   print $I0
   say ''
-  
+
   $I0 = $P0.'reverse_index'('o', -1)
   print 'negative start '
   print $I0

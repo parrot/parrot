@@ -322,7 +322,7 @@ sub verify_attributes {
     my $results   = shift;    # the results hash ref: file -> value
     my $files     = shift;    # an arrayref of files we care about. (undef->all)
     my $allow_empty = shift;  # should we allow blank values? (default: no)
-   
+
     $allow_empty = 0 unless defined $allow_empty;
 
     my @files;

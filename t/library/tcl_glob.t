@@ -68,7 +68,7 @@ load_failed:
 
 .sub 'is_glob'
     .param string original
-    .param string glob   
+    .param string glob
     .param string test_description
 
     .local int boolean
@@ -78,7 +78,7 @@ load_failed:
 
 .sub 'isnt_glob'
     .param string original
-    .param string glob   
+    .param string glob
     .param string test_description
 
     .local int boolean
@@ -88,11 +88,11 @@ load_failed:
 
 .sub 'do_glob'
     .param string original
-    .param string glob   
+    .param string glob
 
     .local pmc globber
     globber = compreg 'Tcl::Glob'
-    
+
     .local pmc rule
     rule = globber.'compile'(glob)
 

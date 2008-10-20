@@ -37,7 +37,7 @@ ok 1 - caught div_i_ic_ic exception
 ok 2 - caught div_n_nc_nc exception
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'comments before .param(RT#46499)');
+pir_output_is( <<'CODE', <<'OUT', 'comments before .param(RT #46499)');
 .sub main :main
   comments(1,2)
 .end
@@ -51,7 +51,7 @@ CODE
 hello
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'comments between .param(RT#46499)', todo => 'broken');
+pir_output_is( <<'CODE', <<'OUT', 'comments between .param(RT #46499)', todo => 'broken');
 .sub main :main
   comments(1,2)
 .end
@@ -65,7 +65,7 @@ CODE
 hello
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'whitespace before .param(RT#46499)');
+pir_output_is( <<'CODE', <<'OUT', 'whitespace before .param(RT #46499)');
 .sub main :main
   comments(1,2)
 .end
@@ -79,7 +79,7 @@ CODE
 hello
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'whitespace between .param(RT#46499)', todo => 'broken');
+pir_output_is( <<'CODE', <<'OUT', 'whitespace between .param(RT #46499)', todo => 'broken');
 .sub main :main
   comments(1,2)
 .end
@@ -93,7 +93,7 @@ CODE
 hello
 OUT
 
-pir_error_output_like( <<'CODE', <<'OUT', 'off by one error message (RT#40204)', todo=>'broken');
+pir_error_output_like( <<'CODE', <<'OUT', 'off by one error message (RT #40204)', todo=>'broken');
 .sub foo :main
   $P0 = new 'Hash'
   $P1 = $P0['x']

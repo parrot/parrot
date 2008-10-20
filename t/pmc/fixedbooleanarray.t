@@ -304,7 +304,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw" );
     fba = thaw s
     say fba
 
-.end    
+.end
 
 CODE
 01001000100010010
@@ -330,7 +330,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "clone" );
     fba2 = clone fba1
     say fba2
 
-.end    
+.end
 
 CODE
 01001000100010010

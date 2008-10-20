@@ -125,7 +125,7 @@ ok(! defined ($conf->data->get( 'msvcversion' )),
     $minor = undef;
     $verbose = 1;
     capture(
-        sub { $status = 
+        sub { $status =
             $step->_handle_not_msvc($conf, $major, $minor, $verbose); },
         \$stdout,
     );

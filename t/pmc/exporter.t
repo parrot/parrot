@@ -49,7 +49,7 @@ pir_output_is( <<'CODE', <<'OUT', 'source' );
     say 'ok 1 - source() returns PMCNULL upon Exporter init'
 
     # get a NameSpace PMC for testing
-    # RT#46859 replace with make_namespace, when implemented
+    # RT #46859 replace with make_namespace, when implemented
     .local pmc ns
     ns = get_namespace ['Eponymous']
 
@@ -80,7 +80,7 @@ pir_output_is( <<'CODE', <<'OUT', 'source' );
 .end
 
 
-# RT#46859 replace with make_namespace, when implemented
+# RT #46859 replace with make_namespace, when implemented
 .namespace ['Eponymous']
 .sub 'Eponymous' :anon
 .end
@@ -107,7 +107,7 @@ pir_output_is( <<'CODE', <<'OUT', 'destination' );
     say 'ok 2 - ...which is current namespace at first'
 
     # get a NameSpace PMC for testing
-    # RT#46859 replace with make_namespace, when implemented
+    # RT #46859 replace with make_namespace, when implemented
     .local pmc ns
     ns = get_namespace ['Eponymous']
 
@@ -138,7 +138,7 @@ pir_output_is( <<'CODE', <<'OUT', 'destination' );
 .end
 
 
-# RT#46859 replace with make_namespace, when implemented
+# RT #46859 replace with make_namespace, when implemented
 .namespace ['Eponymous']
 .sub 'Eponymous' :anon
 .end
@@ -405,7 +405,7 @@ CODE
 ok 1
 OUT
 
-# RT#46861 test exporting mmd subs
+# RT #46861 test exporting mmd subs
 
 # Local Variables:
 #   mode: cperl

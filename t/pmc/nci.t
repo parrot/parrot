@@ -2623,7 +2623,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "arity" );
     library_name = 'libnci_test'
     .local pmc libnci_test
     libnci_test = loadlib  library_name
-    
+
     .local pmc nci_c
     nci_c = dlfunc libnci_test, "nci_c", "c"
     $I0 = nci_c.arity()

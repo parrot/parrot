@@ -448,7 +448,7 @@ ok1:
     set P6, "ok 5\n"
     setattribute P5, '.aa', P6
     print "ok 4\n"
-    getattribute P7, P5, '.aa' 
+    getattribute P7, P5, '.aa'
     print P7
     end
 CODE

@@ -116,7 +116,7 @@ well.
 .end
 
 .sub null_key
-    # See RT#59542
+    # See RT #59542
     new $P0, 'Hash'
     $P0['yum'] = 5
     null $S0
@@ -129,7 +129,7 @@ catched:
 check:
     is( $I0, 1, 'using null string as key throws' )
 .end
- 
+
 .sub hash_keys_with_nulls_in_them
     new $P0, 'Hash'
     set $S0, "parp\0me"
@@ -144,7 +144,7 @@ check:
     is( $I0, 1, 'hash key with null 1' )
     is( $I1, 2, 'hash key will null 2' )
 .end
- 
+
 .sub nearly_the_same_hash_keys
     new $P0, 'Hash'
     set $S0, "a\0"
@@ -159,7 +159,7 @@ check:
     is( $I0, 1, 'hash key with null' )
     is( $I1, 2, 'almost identical hash key with null' )
 .end
- 
+
 .sub the_same_hash_keys
     new $P0, 'Hash'
     set $S0, "Happy"
@@ -174,10 +174,10 @@ check:
 
     is( $I1, 2, 'set and lookup by $S1 (identical to $S0)' )
 .end
- 
+
 # NB Next test depends on "key2" hashing to zero, which it does with
 # the current algorithm; if the algorithm changes, change the test!
-# XXX - really? 
+# XXX - really?
 
 .sub key_that_hashes_to_zero
         new $P0, 'Hash'
@@ -187,7 +187,7 @@ check:
 
         is( $I0, 1, 'key that hashes to zero XXX' )
 .end
- 
+
 .sub size_of_the_hash
     new $P0, 'Hash'
 
@@ -203,7 +203,7 @@ check:
     set $I0, $P0
     is( $I0, 2, 'hash size of 2' )
 .end
- 
+
 .sub stress_test_loop_set_check
     new	$P0, 'Hash'
 
@@ -250,7 +250,7 @@ DONE:
         set $I0, $P0["mikey832"]
         is( $I0, 0, 'lookup: mikey832 (never set)' )
 .end
- 
+
 ## stuff them in, and check periodically that we can pull selected ones out.
 ##   *_multiple_keys are used by stress_test_lots_of_keys
 
@@ -345,7 +345,7 @@ ret:
     is( $I51, 0, 'key51000 does not exist after delete' )
     is( $I52, 0, 'key52000 does not exist after delete' )
 .end
- 
+
 # Check all values after setting all of them
 .sub stress_test_loop_set_loop_check
     new	$P0, 'Hash'
@@ -375,7 +375,7 @@ L2:
 DONE:
         ok( 1, 'stress test: loop set with loop check' )
 .end
- 
+
 .sub testing_two_hash_indices_with_integers_at_a_time
       new $P0, 'Hash'
 
@@ -396,7 +396,7 @@ DONE:
       set $I0,$P0[$S1]
       is( $I0,-15, 'lookup int in bar via var' )
 .end
- 
+
 .sub testing_two_hash_indices_with_numbers_at_a_time
       new $P0, 'Hash'
 
@@ -418,7 +418,7 @@ DONE:
       is( $N0,-15.100000, 'lookup num in bar via var' )
 
 .end
- 
+
 .sub testing_two_hash_indices_with_strings_at_a_time
       new $P0, 'Hash'
 
@@ -440,7 +440,7 @@ DONE:
       is( $S0,"qux", 'lookup str in bar via var' )
 
 .end
- 
+
 # So far, we have only used INTVALs, FLOATVALs and STRINGs as values
 # and/or keys. Now we try PMCs.
 
@@ -473,7 +473,7 @@ DONE:
       is( $S1, "Undef", 'lookup Undef PMC' )
 
 .end
- 
+
 .sub setting_scalar_pmcs_and_getting_scalar_values
       new $P0, 'Hash'
       new $P1, 'Integer'
@@ -499,7 +499,7 @@ DONE:
       is( $S2, $S1, 'lookup PMC and get scalar Str' )
 
 .end
- 
+
 .sub getting_values_from_undefined_keys
       new $P2, 'Hash'
 
@@ -518,7 +518,7 @@ DONE:
     P0_is_null:
       ok( $I1, 'undefined key returns null PMC' )
 .end
- 
+
 .sub setting_and_getting_non_scalar_pmcs
         new $P0,'Hash'
         new $P1,'ResizablePMCArray'
@@ -529,7 +529,7 @@ DONE:
         set $S0,$P2[4]
         is( $S0, 'string', 'set and get non-scalar PMCs' )
 .end
- 
+
 .sub testing_clone
     new $P0, 'Hash'
     set $S0, "a"
@@ -574,7 +574,7 @@ DONE:
 # ok6:
 #     print "ok 6\n"
 .end
- 
+
 .sub compound_keys
     new $P0, 'Hash'
     new $P1, 'Hash'
@@ -583,34 +583,34 @@ DONE:
     set $P0["a"], $P1
     set $S0, $P0["a";"b"]
     is( $S0, "ab", 'Str from compound key' )
-    
+
     set $P2[20], 77
     set $P1["n"], $P2
     set $I0, $P0["a";"n";20]
     is( $I0, 77, 'Int from compound key^2' )
-    
+
     set $S0, "a"
     set $S1, "n"
     set $I0, 20
     set $I0, $P0[$S0;$S1;$I0]
     is( $I0, 77, 'Int from indirect compound key^2' )
-    
+
     set $P0["c"], $P2
     set $P2[33], $P1
     set $S0, $P0["c";33;"b"]
     is( $S0, "ab", 'Str from indirect/direct compound key^2' )
-    
+
     set $S0, "c"
     set $I1, 33
     set $S2, "b"
     set $S0, $P0[$S0;$I1;$S2]
     is( $S0, "ab", 'Str from indirect compound key^2' )
-    
+
     set $P1["b"], 47.11
     set $N0, $P0["c";$I1;$S2]
     is( $N0, 47.11, 'Num from indirect compound key^2' )
 .end
- 
+
 .sub getting_pmcs_from_compound_keys
     new $P0, 'Hash'
     new $P1, 'Hash'
@@ -623,7 +623,7 @@ DONE:
     is( $S0, "12", "lookup PMC from compound key" )
 .end
 # 12
- 
+
 .sub getting_pmcs_from_string_int_compound_keys
     new $P0, 'Hash'
     new $P1, 'Hash'
@@ -637,13 +637,13 @@ DONE:
     set $I0, $P0["a";9]
     is( $I0, 4, 'lookup Inc PMC from compound hash' )
 .end
- 
+
 # A hash is only false if it has size 0
 
 .sub if_hash
     new $P0, 'Hash'
- 
-    ## Could just use Test::More tests directly, but then we are really 
+
+    ## Could just use Test::More tests directly, but then we are really
     ## checking casting to Int then testing value (I think)
     ## ie. ok( $P0, '...' )
 
@@ -676,7 +676,7 @@ DONE:
     ok( $P0, 'Hash with one value (Undef PMC) is true' )
 
 .end
- 
+
 .sub unless_hash
     new $P0, 'Hash'
 
@@ -709,7 +709,7 @@ DONE:
     ok( $I0, 'Hash with one value (Undef PMC) is true' )
 
 .end
- 
+
 .sub defined_hash
     new $P0, 'Hash'
 
@@ -736,37 +736,37 @@ DONE:
     $I0 = not $I0
     ok( $I0, 'Undef PMC in hash slot is undefined' )
 .end
- 
+
 .sub exists_hash_key
     new $P0, 'Hash'
 
     set $P0["a"], 1
     exists $I0, $P0["a"]
     ok( $I0, 'assigned hash key exists' )
-    
+
     exists $I0, $P0["b"]
     $I0 = not $I0
     ok( $I0, 'unassigned hash key does not exist' )
-    
+
     new $P1, 'Undef'
     set $P0["c"], $P1
     exists $I0, $P0["c"]
     ok( $I0, 'hash key assigned Undef PMC exists' )
 .end
- 
+
 .sub delete_hash_key
     new $P0, 'Hash'
 
     set $P0["a"], 1
     exists $I0, $P0["a"]
     ok( $I0, 'assigned hash key exists' )
-   
+
     delete $P0["a"]
     exists $I0, $P0["a"]
     $I0 = not $I0
     ok( $I0, 'delete hash key does not exist' )
 .end
- 
+
 .sub cloning_keys
     new $P10, 'Hash'
     new $P1, 'Key'
@@ -783,7 +783,7 @@ DONE:
     set $S0, $P10[$S2]
     is( $S0, "Sheep", 'cloned key again look up same value' )
 .end
- 
+
 .sub cloning_pmc_vals
     new $P10, 'Hash'
 
@@ -801,7 +801,7 @@ DONE:
     set $P0, $P2["str"]
     is( $P0, 'value', 'cloned hash contains pre-clone set str' )
 .end
- 
+
 .sub entry_types_type_keyed
     ## XXX is there any concern that including this will impact other tests?
     .include "pmctypes.pasm"
@@ -830,7 +830,7 @@ DONE:
     is( $I0, .String, 'entry type is String' )
 
 .end
- 
+
 .sub delete_and_free_list
     set $I2, 10
     set $I1, 1
@@ -883,7 +883,7 @@ lp:
     val1 = hash1['X']
     is( val1, "U", 'hash in PIR' )
 .end
- 
+
 .sub setting_with_compound_keys
     .local pmc outer_hash
     outer_hash = new 'Hash'
@@ -975,7 +975,7 @@ lp:
     is( elem_num, -135.135000, 'float in inner Hash' )
 
 .end
- 
+
 .sub mutating_the_lookup_string
     new $P0, 'Hash'
     set $P0["a"], "one"
@@ -994,7 +994,7 @@ lp:
     set $S1, $P0[$S0]
     is( $S1, "three", 'lookup via concated^2 str in reg' )
 .end
- 
+
 .sub check_whether_interface_is_done
     .local pmc pmc1
     pmc1 = new 'Hash'
@@ -1006,7 +1006,7 @@ lp:
 
     does bool1, pmc1, "hash"
     ok( bool1, 'Hash PMC does hash' )
-    
+
     does bool1, pmc1, "no_interface"
     bool1 = not bool1
     ok( bool1, 'Hash PMC does not do no_interface' )
@@ -1087,7 +1087,7 @@ postit_end:
 
   is( result, 'ae', 'the c key was no longer iterated over' )
 .end
- 
+
 .sub unicode_keys_register_rt_39249
   $P1 = new 'Hash'
 

@@ -164,7 +164,7 @@ while (<>) {
 
 }
 
-# RT#46863 The following used to be bignum_test.pl.
+# RT #46863 The following used to be bignum_test.pl.
 # Maybe it should be factored out to Parrot::Test::BigNum.
 
 # This allows a single bignum test to be run directly through the C
@@ -284,7 +284,7 @@ ENDOFUSAGE
         s/''/\'/g;
     }
 
-    # RT#46865 Capture STDOUT
+    # RT #46865 Capture STDOUT
     runtest( $_[0], $_[1], $ops{ $ARGV[2] }, $_[3], $round{ $_[4] }, $_[5] );
 }
 

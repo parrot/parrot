@@ -325,7 +325,7 @@ my @include_orig = qw( src/pmc src/dynpmc );
         qr/^This program may only be called after 'make' has run/,
         "Got expected error message for running program at wrong time"
     );
-    
+
     ok( chdir $cwd, "changed back to original directory" );
 }
 

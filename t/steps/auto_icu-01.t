@@ -291,7 +291,7 @@ my $die = auto::icu::_die_message();
 like($die, qr/Something is wrong with your ICU installation/s,
     "Got expected die message");
 
-{   
+{
     my $phony = q{/path/to/icu-config};
     my ($stdout, $stderr);
     capture(
@@ -304,7 +304,7 @@ like($die, qr/Something is wrong with your ICU installation/s,
     );
 }
 
-{   
+{
     my $phony = q{-lalpha};
     my ($stdout, $stderr);
     capture(
@@ -317,7 +317,7 @@ like($die, qr/Something is wrong with your ICU installation/s,
     );
 }
 
-{   
+{
     my $phony = q{alpha/include};
     my ($stdout, $stderr);
     capture(
@@ -330,7 +330,7 @@ like($die, qr/Something is wrong with your ICU installation/s,
     );
 }
 
-{   
+{
     my ($stdout, $stderr);
     capture(
         sub { auto::icu::_verbose_report(0, 'alpha', 'beta', 'gamma'); },
@@ -586,12 +586,12 @@ $conf->replenish($serialized);
                 mode => q{configure},
             }
         );
-        
+
         rerun_defaults_for_testing($conf, $args );
         $conf->add_steps($pkg);
         $conf->options->set( %{$args} );
         $step = test_step_constructor_and_description($conf);
-        
+
         {
             my ($stdout, $stderr, $ret);
             capture(

@@ -39,9 +39,8 @@ OUTPUT
 
 my $loadlib = <<'EOC';
 #
-# the .loadlib directive gets run, before the .HLL_map below
-# is parsed, therefore the .DynLexPad constant is already
-# available
+# the .loadlib directive gets run before the .HLL_map below is parsed,
+# therefore the .DynLexPad constant is already available
 #
 .loadlib "dynlexpad"
 
@@ -175,25 +174,27 @@ LexPad
 OUTPUT
 
 pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - lexpad interop" );
-
 .sub 'test' :main
     foo()
 .end
+
 .sub foo
     .lex 'a', $P0               # static lexical
     $P0 = new 'String'
-    $P0 = "ok 1\n"
+    $P0 = "ok 1"
     $P1 = find_lex 'a'
-    print $P1
+    say $P1
+
     $P2 = new 'String'
-    $P2 = "ok 2\n"
+    $P2 = "ok 2"
     store_lex 'a', $P2
-    print $P0                   # sic!
+    say $P0                   # sic!
+
     $P3 = new 'String'
-    $P3 = "ok 3\n"
+    $P3 = "ok 3"
     store_lex 'b', $P3          # and a dynamic one
     $P4 = find_lex 'b'
-    print $P4
+    say $P4
 .end
 CODE
 ok 1
@@ -201,10 +202,10 @@ ok 2
 ok 3
 OUTPUT
 
-TODO:{
+TODO: {
     local $TODO = "iterator not implemented for DynLexPads";
-pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - iterator" );
 
+pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - iterator" );
 .sub 'test' :main
     .local pmc dlp, str1, str2, str3, it, key, interp
 
@@ -222,9 +223,11 @@ pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "dynlexpad - iterator" );
     str3 = 'sad pants'
 
     interp = getinterp
-    dlp = interp['lexpad']
+    dlp    = interp['lexpad']
 
+    say "Getting iterator"
     it = new 'Iterator', dlp
+    say "Have iterator"
 iter_loop:
     unless it goto iter_done
     key = shift it
@@ -243,6 +246,7 @@ b:content pants
 c:sad pants
 OUTPUT
 }
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

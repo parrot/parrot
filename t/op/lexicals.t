@@ -1282,7 +1282,7 @@ hello world
 hello world
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "RT#56398:  Patrick's request" );
+pir_output_is( <<'CODE', <<'OUTPUT', "RT #56398:  Patrick's request" );
 .sub 'main' :main
 	foo('try 1')
 	foo('try 2')
@@ -1315,7 +1315,7 @@ outer foo try 3
 inner foo try 3
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "RT#56398: Bob's recursion bug");
+pir_output_is( <<'CODE', <<'OUTPUT', "RT #56398: Bob's recursion bug");
 .sub main :main
 	rpwi(0)
 .end
@@ -1352,7 +1352,7 @@ rpwi:  recursive case
 [got 99]
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "RT#56398: Jonathan's recursive case" );
+pir_output_is( <<'CODE', <<'OUTPUT', "RT #56398: Jonathan's recursive case" );
 .sub 'main' :main
     $P0 = new 'ResizablePMCArray'
     push $P0, 'a'
@@ -1380,7 +1380,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "RT#56398: Jonathan's recursive case" );
     $P0 = find_global 'anon_1'
     $P1 = newclosure $P0
     .lex '$recur', $P1
-    
+
     $P2 = find_lex '$thing'
     $I0 = isa $P2, 'ResizablePMCArray'
     unless $I0 goto not_ResizablePMCArray

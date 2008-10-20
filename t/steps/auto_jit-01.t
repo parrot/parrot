@@ -348,7 +348,7 @@ $cwd = cwd();
         "Got expected value for TEMP_exec_o");
     is( $conf->data->get( 'TEMP_exec_dep' ), '',
         "Got expected value for TEMP_exec_dep");
-    is( $step->result(), 'no', 
+    is( $step->result(), 'no',
         "Got expected result for no JIT");
 
     chdir $cwd or croak "Unable to change back to starting directory";

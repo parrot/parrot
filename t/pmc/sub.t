@@ -863,7 +863,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "caller introspection via interp" );
     # this test will fail when run with -Oc
     # as the call chain is cut down with tail calls
     foo()
-    
+
     $P0 = get_hll_global ["Bar"], "foo"
     $P0()
     print "ok\n"

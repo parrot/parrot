@@ -131,7 +131,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Setting negatively indexed elements" );
     print "no ex\n"
     end
 eh:
-    say "got an ex"    
+    say "got an ex"
     end
 CODE
 got an ex
@@ -148,7 +148,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Getting negatively indexed elements" );
     end
 eh:
     say "got an ex"
-    end    
+    end
 CODE
 got an ex
 OUTPUT

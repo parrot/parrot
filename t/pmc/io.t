@@ -113,7 +113,7 @@ CODE
 a line
 OUTPUT
 
-# RT#46843
+# RT #46843
 pir_output_is( <<'CODE', <<'OUTPUT', "get_fd()/fdopen" );
 .sub main :main
     getstdout P0
@@ -131,7 +131,7 @@ CODE
 ok
 OUTPUT
 
-# RT#46843
+# RT #46843
 pir_output_is( <<'CODE', <<'OUTPUT', 'fdopen - no close' );
 .sub main :main
     getstdout P0
@@ -460,7 +460,7 @@ OUTPUT
 
 unlink("temp.file");
 
-# RT#46843
+# RT #46843
 pir_output_is( <<'CODE', <<'OUT', 'standard file descriptors' );
 .sub main :main
        getstdin P0

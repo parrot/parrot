@@ -593,7 +593,7 @@ OUTPUT
 
 SKIP: {
     skip("TODO test causes infinite loop in new exception implementation", 1);
-pir_output_is(<<'CODE', <<'OUTPUT', "taking a continuation promotes RetCs", todo => 'see RT#56458');
+pir_output_is(<<'CODE', <<'OUTPUT', "taking a continuation promotes RetCs", todo => 'see RT #56458');
 ## This test creates a continuation in a inner sub and re-invokes it later.  The
 ## re-invocation signals an error, which is caught by an intermediate sub.
 ## Returning from the "test" sub the second time failed in r28794; invoking
@@ -633,7 +633,7 @@ handle_errs:
 	## Take a continuation.
 	.local pmc cont
 	cont = new 'Continuation'
-	set_addr cont, over_there 
+	set_addr cont, over_there
 	print "    returning from foo\n"
 	.return (cont)
 over_there:

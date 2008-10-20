@@ -38,7 +38,7 @@
     }, {
       ok (1, '.IfElse, false else')
     })
-  
+
     $I2 = 0
     .While( $I2<10, {
       inc $I2
@@ -47,7 +47,7 @@
       ok (1, '.While doing something')
     }, {
       ok (0, '.While doing something')
-    }) 
+    })
 
     .While( 1==0, {
       ok (0, 'while body should never happen')
@@ -66,12 +66,12 @@
       ok (1, '.DoWhile doing something')
     }, {
       ok (0, '.DoWhile doing something')
-    }) 
+    })
 
     $I2 = 0
     .Loop({
         .IfElse($I2==10,{
-            goto loop_done  
+            goto loop_done
         }, {
             inc $I2
         })
