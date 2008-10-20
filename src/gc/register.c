@@ -216,7 +216,6 @@ parrot_gc_context(PARROT_INTERP)
         return;
     LVALUE_CAST(char *, ctx.bp) = interp->ctx_mem.threshold
                                 - sizeof (parrot_regs_t);
-    /* RT #46187 */
 #else
     UNUSED(interp);
 #endif
