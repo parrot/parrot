@@ -80,16 +80,13 @@ op callmethodcc(invar PMC, in STR) :object_base :flow {
 }
 
 op callmethodcc(invar PMC, invar PMC) :object_base :flow {
-  PMC      * const object     = $1;
-  PMC      * const method_pmc = $2;
-  opcode_t * const next       = expr NEXT();
-  /* RT#42371 should we check if object.can(method) */
+  opcode_t        *dest;
+  opcode_t * const next  = expr NEXT();
 
-  opcode_t *dest;
+  interp->current_object = $1;
+  interp->current_cont   = NEED_CONTINUATION;
+  dest                   = VTABLE_invoke(interp, $2, next);
 
-  interp->current_object = object;
-  interp->current_cont = NEED_CONTINUATION;
-  dest = VTABLE_invoke(interp, method_pmc, next);
   goto ADDRESS(dest);
 }
 
