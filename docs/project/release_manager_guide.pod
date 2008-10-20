@@ -269,7 +269,7 @@ your mail client lets you.
 
 Modify the topic on #parrot, e.g.:
 
- /topic #parrot Parrot 0.4.8 Released | http://parrotcode.org/
+ /topic #parrot Parrot 0.4.8 Released | http://parrot.org/
 
 =item d
 
