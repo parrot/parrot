@@ -380,7 +380,6 @@ Sets the property for C<*key> to C<*value>.
         else {
             PMC * const prop = make_prop_hash(INTERP, SELF);
 
-            /* RT #46663 is this too late for --gc-debug? */
             VTABLE_set_pmc_keyed_str(INTERP, prop, key, value);
         }
     }
