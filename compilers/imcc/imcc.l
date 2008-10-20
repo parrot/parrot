@@ -833,7 +833,8 @@ destroy_frame(struct macro_frame_t *frame, void *yyscanner)
     /* RT #42383 if frame->s.file was allocated free it */
     /* Update: This should do it! */
     if (frame->s.file_needs_free) {
-        mem_sys_free(frame->s.file);
+        DECL_CONST_CAST;
+        mem_sys_free(PARROT_const_cast(char *,frame->s.file));
         frame->s.file_needs_free = 0;
     }
     mem_sys_free(frame);
