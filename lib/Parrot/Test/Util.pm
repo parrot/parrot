@@ -37,11 +37,29 @@ our @ISA = qw( Exporter );
 our @EXPORT_OK = qw( create_tempfile );
 
 
+=head1 Functions
+
+=over 4
+
+=item C<create_tempfile>
+
+Creates a tempfile using File::Temp::tempfile, passing parameters through.
+Returns a Perl-friendly path using forward-slashes, rather than a platform-
+specific path that may contain unescaped backslashes which may be interpreted
+as (likely invalid) unicode escape codes.
+
+=cut
+
 sub create_tempfile {
         my ($filehandle, $filename) = &tempfile;
         $filename =~ s/\\/\//g;
         return ( $filehandle, $filename );
 }
+
+
+=back
+
+=cut
 
 
 1;
