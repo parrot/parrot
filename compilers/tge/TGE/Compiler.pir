@@ -404,7 +404,6 @@ loop_end:
     inherit       = join "'; '", inherit_parts
     code    = "\n.namespace"
 
-    if type == '' goto no_type
     .local pmc type_parts
     type_parts = split '::', type
     type       = join "'; '", type_parts

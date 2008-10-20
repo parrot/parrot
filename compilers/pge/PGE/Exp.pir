@@ -81,7 +81,7 @@ C<target> adverbs.
     code.'emit'(".namespace %0", $P0)
     goto ns_done
   ns_root:
-    code.'emit'('.namespace')
+    code.'emit'('.namespace []')
   ns_done:
 
     $P0 = self.'root_pir'(adverbs :flat :named)
