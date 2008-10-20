@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use File::Temp 'tempfile';
+use Parrot::Test::Util 'create_tempfile';
 
 use Parrot::Test;
 use Parrot::Config;
@@ -392,7 +392,7 @@ Wibble
 6
 OUTPUT
 
-my ($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
+my ($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
   .pcc_sub _sub1:
@@ -410,7 +410,7 @@ EOF
 close $TEMP;
 
 # compile to pbc
-my (undef, $temp_pbc) = tempfile( SUFFIX => '.pbc', UNLINK => 1 );
+my (undef, $temp_pbc) = create_tempfile( SUFFIX => '.pbc', UNLINK => 1 );
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pasm);
 
 c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub' );
@@ -471,7 +471,7 @@ hello in sub2
 back
 OUTPUT
 
-($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
+($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
   .pcc_sub _sub1:
@@ -543,7 +543,7 @@ caught
 back
 OUTPUT
 
-($TEMP, my $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
+($TEMP, my $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
 .sub main :main

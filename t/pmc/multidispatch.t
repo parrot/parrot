@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use File::Temp 'tempfile';
+use Parrot::Test::Util 'create_tempfile';
 
 use Parrot::Test tests => 45;
 
@@ -212,7 +212,7 @@ ok 2
 -42
 OUTPUT
 
-my ($TEMP, $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
+my ($TEMP, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
 .sub Integer_divide_Integer
@@ -927,7 +927,7 @@ CODE
 2
 OUTPUT
 
-($TEMP, $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
+($TEMP, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
 .namespace ["AInt"]

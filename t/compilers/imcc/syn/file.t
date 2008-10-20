@@ -4,14 +4,14 @@
 
 use strict;
 use warnings;
-use lib qw( . lib ../lib ../../lib );
+use lib qw( lib );
 
 use Cwd 'cwd';
 
 use File::Spec;
 use Test::More;
 
-use File::Temp 'tempfile';
+use Parrot::Test::Util 'create_tempfile';
 
 use Parrot::Config;
 use Parrot::Test tests => 14;
@@ -505,12 +505,6 @@ sub system_or_die {
         die "Couldn't run: @args\n";
     }
     print "# Return $rc\n";
-}
-
-sub create_tempfile {
-        my ($filehandle, $filename) = &tempfile;
-        $filename =~ s/\\/\//g;
-        return ( $filehandle, $filename );
 }
 
 # Local Variables:

@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use File::Temp 'tempfile';
+use Parrot::Test::Util 'create_tempfile';
 
 use Parrot::Test tests => 17;
 
@@ -512,7 +512,7 @@ CODE
 ok
 OUTPUT
 
-my ($TEMP, $filename) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
+my ($TEMP, $filename) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<PIR;
   .sub foo

@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use File::Temp 'tempfile';
+use Parrot::Test::Util 'create_tempfile';
 
 use Parrot::Test tests => 2;
 
@@ -25,7 +25,7 @@ Tests system dependend stuff
 
 =cut
 
-my (undef, $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
+my (undef, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 pir_output_is( <<"CODE", <<OUT, "spawnw, _config" );
 

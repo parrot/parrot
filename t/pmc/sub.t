@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use File::Temp 'tempfile';
+use Parrot::Test::Util 'create_tempfile';
 
 use Parrot::Test tests => 65;
 use Parrot::Config;
@@ -180,7 +180,7 @@ in sub
 back
 OUTPUT
 
-my ($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
+my ($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 print $TEMP <<'EOF';
   .pcc_sub _sub1:
   say "in sub1"
@@ -209,7 +209,7 @@ found sub
 in sub1
 OUTPUT
 
-($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
+($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
   .pcc_sub _sub1:
@@ -240,7 +240,7 @@ in sub1
 back
 OUTPUT
 
-($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
+($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
   .pcc_sub _sub1:
@@ -291,7 +291,7 @@ in sub1
 back
 OUTPUT
 
-my (undef, $temp_pbc)  = tempfile( SUFFIX => '.pbc', UNLINK => 1 );
+my (undef, $temp_pbc)  = create_tempfile( SUFFIX => '.pbc', UNLINK => 1 );
 
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pasm);
 
@@ -412,7 +412,7 @@ CODE
 ok
 OUT
 
-($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
+($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
   .pcc_sub :load _sub1:
@@ -433,7 +433,7 @@ in sub1
 back
 OUTPUT
 
-($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
+($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
   .pcc_sub _error:
@@ -470,7 +470,7 @@ in sub1
 back
 OUTPUT
 
-($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
+($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
   .pcc_sub :load _sub1:
@@ -518,7 +518,7 @@ in sub2
 back
 OUTPUT
 
-($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
+($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
   .pcc_sub _sub1:
@@ -566,7 +566,7 @@ in sub1
 back
 OUTPUT
 
-($TEMP, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
+($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
   .pcc_sub :load _sub1:
@@ -679,7 +679,7 @@ CODE
 /too few arguments passed \(1\) - 2 params expected/
 OUTPUT
 
-($TEMP, $temp_pasm) = tempfile();
+($TEMP, $temp_pasm) = create_tempfile();
 print $TEMP <<'EOF';
 .sub _sub1 :load
   say "in sub1"
@@ -700,7 +700,7 @@ in sub1
 back
 OUTPUT
 
-($TEMP, $temp_pasm) = tempfile();
+($TEMP, $temp_pasm) = create_tempfile();
 print $TEMP <<'EOF';
 .sub _foo
   print "error\n"
@@ -727,7 +727,7 @@ in sub1
 back
 OUTPUT
 
-($TEMP, my $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
+($TEMP, my $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
 .sub _foo
@@ -975,7 +975,7 @@ ok
 nofoo/
 OUTPUT
 
-($TEMP, my $l1_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
+($TEMP, my $l1_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 (my $l1_pbc         = $l1_pir) =~ s/\.pir/.pbc/;
 
 print $TEMP <<'EOF';
@@ -989,7 +989,7 @@ print $TEMP <<'EOF';
 EOF
 close $TEMP;
 
-($TEMP, my $l2_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
+($TEMP, my $l2_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 (my $l2_pbc         = $l2_pir) =~ s/\.pir/.pbc/;
 
 print $TEMP <<'EOF';
