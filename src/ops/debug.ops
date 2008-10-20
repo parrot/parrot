@@ -88,16 +88,16 @@ Print all the Parrot registers at once.
 =cut
 
 op debug_print() :base_debug {
+    if (!interp->pdb)
+        Parrot_ex_throw_from_c_args(interp, expr NEXT(),
+            EXCEPTION_INVALID_OPERATION,
+            "Initialize debugger with debug_init before using debug_print");
+
     if (!(interp->pdb->state & PDB_BREAK)) {
-#if 1
-        PIO_eprintf(interp, "debug_print is disabled\n");
-#else
-        /* RT #42379 register layout */
-        PDB_print_int(interp, &interp->int_reg, -1);
-        PDB_print_num(interp, &interp->num_reg, -1);
-        PDB_print_string(interp, &interp->string_reg, -1);
-        PDB_print_pmc(interp, &interp->pmc_reg, -1, NULL);
-#endif
+        PDB_print(interp, "I");
+        PDB_print(interp, "N");
+        PDB_print(interp, "S");
+        PDB_print(interp, "P");
     }
 }
 
