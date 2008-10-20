@@ -385,12 +385,12 @@ __src/parser/grammar-oper.pg__
 proto 'term:'     is precedence('=')     is parsed(&term)      { ... }
 
 ## multiplicative operators
-proto infix:<*>   is looser(term:)       is pirop('n_mul')     { ... }
-proto infix:</>   is equiv(infix:<*>)    is pirop('n_div')     { ... }
+proto infix:<*>   is looser(term:)       is pirop('mul')     { ... }
+proto infix:</>   is equiv(infix:<*>)    is pirop('div')     { ... }
 
 ## additive operators
-proto infix:<+>   is looser(infix:<*>)   is pirop('n_add')     { ... }
-proto infix:<->   is equiv(infix:<+>)    is pirop('n_sub')     { ... }
+proto infix:<+>   is looser(infix:<*>)   is pirop('add')     { ... }
+proto infix:<->   is equiv(infix:<+>)    is pirop('sub')     { ... }
 
 __src/parser/actions.pm__
 # @Id@
