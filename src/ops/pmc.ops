@@ -122,7 +122,7 @@ inline op new(out PMC, in PMC) :object_classes {
         const INTVAL type = pmc_type_p(interp, classname_key);
         if (type <= 0)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NO_CLASS,
-                "Class '%Ss' not found", readable_name(interp, classname_key));
+            "Class '%Ss' not found", VTABLE_get_repr(interp, classname_key));
         $1 = pmc_new(interp, type);
     }
 }
@@ -137,7 +137,7 @@ op new(out PMC, in PMC, in PMC) {
         const INTVAL type = pmc_type_p(interp, classname_key);
         if (type <= 0)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NO_CLASS,
-                "Class '%Ss' not found", readable_name(interp, classname_key));
+            "Class '%Ss' not found", VTABLE_get_repr(interp, classname_key));
         $1 = pmc_new_init(interp, type, $3);
     }
 }

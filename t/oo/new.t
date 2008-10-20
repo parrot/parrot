@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 24;
 
 =head1 NAME
 
@@ -635,6 +635,14 @@ pir_error_output_like( <<'CODE', <<'OUT', 'Cannot instantiate class from slice k
 .end
 CODE
 /Slice not allowed in namespace/
+OUT
+
+pir_error_output_like(<<'CODE', <<'OUT', 'Instantiate class from invalid key');
+.sub 'main' :main
+    $P0 = new [ 'Foo'; 'Bar'; 'Baz' ]
+.end
+CODE
+/Class '\[ 'Foo' ; 'Bar' ; 'Baz' \]' not found/
 OUT
 
 # Local Variables:

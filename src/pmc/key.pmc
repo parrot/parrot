@@ -443,7 +443,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
         }
     }
 
-    void thawfinish(visit_info *info) {
+    VTABLE void thawfinish(visit_info *info) {
         PMC *key = SELF;
 
         while (1) {
@@ -456,6 +456,10 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
 
             key = next;
         }
+    }
+
+    VTABLE STRING* get_repr() {
+        return key_set_to_string(INTERP, SELF);
     }
 }
 

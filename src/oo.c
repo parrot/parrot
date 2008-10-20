@@ -407,8 +407,7 @@ Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
 
 Given a String or Key PMC return the STRING* representation
 
-RT #45967 this function, key_set_to_string, and the key PMC get_repr should be
-consolidated
+{{{ DEPRECATED -- RT #45967 }}}
 
 =cut
 
@@ -420,21 +419,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING*
 readable_name(PARROT_INTERP, ARGIN(PMC *name))
 {
-    PMC    *array;
-
-    if (name->vtable->base_type == enum_class_String)
-        return VTABLE_get_string(interp, name);
-
-    array   = pmc_new(interp, enum_class_ResizableStringArray);
-
-    PARROT_ASSERT(name->vtable->base_type == enum_class_Key);
-
-    while (name) {
-        VTABLE_push_string(interp, array, VTABLE_get_string(interp, name));
-        name = key_next(interp, name);
-    }
-
-    return string_join(interp, CONST_STRING(interp, ";"), array);
+    return VTABLE_get_repr(interp, name);
 }
 
 

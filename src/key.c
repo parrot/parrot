@@ -556,8 +556,8 @@ PARROT_WARN_UNUSED_RESULT
 STRING *
 key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
 {
-    STRING * const semicolon = string_from_cstring(interp, " ; ", 3);
-    STRING * const quote     = string_from_cstring(interp, "'", 1);
+    STRING * const semicolon = CONST_STRING(interp, " ; ");
+    STRING * const quote     = CONST_STRING(interp, "'");
     STRING        *value     = string_from_cstring(interp, "[ ", 2);
 
     for (; key; key = (PMC *)PMC_data(key)) {

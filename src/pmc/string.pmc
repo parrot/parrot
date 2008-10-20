@@ -967,6 +967,10 @@ Checks if the ascii STRING C<str> is just an integer.
         return ret;
     }
 
+    VTABLE STRING* get_repr() {
+        return key_set_to_string(INTERP, SELF);
+    }
+
 /*
 
 =item C<INTEGER reverse_index(STRING *substring, INTVAL start)>
