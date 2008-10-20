@@ -34,7 +34,7 @@ my $PERL5  = $PConfig{perl};
 
 my $ended_ok = 0;
 
-my ($FOO, $temp_pasm) = tempfile( SUFFIX => '.pasm', DIR => cwd(), UNLINK => 1 );
+my ($FOO, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', DIR => cwd(), UNLINK => 1 );
 
 print $FOO <<'ENDF';
   .macro_const BAR 42
@@ -47,7 +47,6 @@ pir_output_is( <<"CODE", <<'OUT', 'include pasm' );
     .include "$temp_pasm"
     print .BAR
     say "\\nafter"
-    end
 .end
 CODE
 before
@@ -55,7 +54,7 @@ before
 after
 OUT
 
-($FOO, $temp_pasm) = tempfile( SUFFIX => '.pasm', UNLINK => 1 );
+($FOO, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $FOO <<'ENDF';
   .macro_const BAR 42
@@ -68,7 +67,6 @@ pir_output_is( <<"CODE", <<'OUT', 'include pasm (absolute path)' );
     .include '$temp_pasm'
     say .BAR
     say "after"
-    end
 .end
 CODE
 before
@@ -76,7 +74,7 @@ before
 after
 OUT
 
-($FOO, my $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
+($FOO, my $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $FOO <<'ENDF';
   .const int BAR = 42
@@ -89,7 +87,6 @@ pir_output_is( <<"CODE", <<'OUT', 'include pir' );
     .include "$temp_pir"
     print BAR
     say "\\nafter"
-    end
 .end
 CODE
 before
@@ -97,7 +94,7 @@ before
 after
 OUT
 
-($FOO, my $temp_inc) = tempfile( SUFFIX => '.inc', UNLINK => 1 );
+($FOO, my $temp_inc) = create_tempfile( SUFFIX => '.inc', UNLINK => 1 );
 
 print $FOO <<'ENDF';
   .const int BAR = 42
@@ -110,7 +107,6 @@ pir_output_is( <<"CODE", <<'OUT', 'include temp.inc' );
     .include "$temp_inc"
     print BAR
     say "\\nafter"
-    end
 .end
 CODE
 before
@@ -118,7 +114,7 @@ before
 after
 OUT
 
-($FOO, $temp_inc) = tempfile( SUFFIX => '.inc', UNLINK => 1 );
+($FOO, $temp_inc) = create_tempfile( SUFFIX => '.inc', UNLINK => 1 );
 
 print $FOO <<'EOF';
 .sub _foo       # sub foo(int a, int b)
@@ -153,7 +149,6 @@ pir_output_is( <<"CODE", <<'OUT', 'subroutine in external file' );
    say r
    print "s = "
    say s
-   end
 .end
 .include "$temp_inc"
 CODE
@@ -166,18 +161,17 @@ OUT
 # test load_bytecode branches and subs
 
 # write sub2
-($FOO, $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
+($FOO, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $FOO <<'ENDF';
 .sub _sub2
     say "sub2"
-    end
 .end
 ENDF
 close $FOO;
 
 # compile it
-(undef, my $temp_pbc) = tempfile( SUFFIX => '.pbc', UNLINK => 1 );
+(undef, my $temp_pbc) = create_tempfile( SUFFIX => '.pbc', UNLINK => 1 );
 system_or_die( $PARROT, '-o', $temp_pbc, $temp_pir );
 
 pir_output_is( <<"CODE", <<'OUT', 'call sub in external pbc' );
@@ -190,7 +184,6 @@ pir_output_is( <<"CODE", <<'OUT', 'call sub in external pbc' );
     .call \$P0
     ret:
     .end_call
-    end
 .end
 CODE
 sub1
@@ -199,15 +192,14 @@ sub2
 OUT
 
 # write sub2
-($FOO,  $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
-(undef, $temp_pbc) = tempfile( SUFFIX => '.pbc', UNLINK => 1 );
+($FOO,  $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
+(undef, $temp_pbc) = create_tempfile( SUFFIX => '.pbc', UNLINK => 1 );
 
 print $FOO <<'ENDF';
 .sub _sub2
     print "sub2\n"
    .begin_return
    .end_return
-    end
 .end
 ENDF
 close $FOO;
@@ -227,7 +219,6 @@ pir_output_is( <<"CODE", <<'OUT', 'call sub in external pbc, return' );
     ret:
     .end_call
     say "back"
-    end
 .end
 CODE
 sub1
@@ -237,18 +228,16 @@ back
 OUT
 
 # write sub2
-($FOO,  $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
-(undef, $temp_pbc) = tempfile( SUFFIX => '.pbc', UNLINK => 1 );
+($FOO,  $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
+(undef, $temp_pbc) = create_tempfile( SUFFIX => '.pbc', UNLINK => 1 );
 
 print $FOO <<'ENDF';
 .sub _not_sub2
     say "not sub2"
-    end
 .end
 
 .sub _sub2
     say "sub2"
-    end
 .end
 ENDF
 close $FOO;
@@ -266,7 +255,6 @@ pir_output_is( <<"CODE", <<'OUT', 'call sub in external pbc with 2 subs' );
     .call \$P0
     ret:
     .end_call
-    end
 .end
 CODE
 sub1
@@ -281,7 +269,6 @@ print $FOO <<'ENDF';
     print "sub2\n"
    .begin_return
    .end_return
-    end
 .end
 ENDF
 close $FOO;
@@ -299,7 +286,6 @@ pir_output_is( <<"CODE", <<'OUT', 'call sub in external pir, return' );
     ret:
     .end_call
     say "back"
-    end
 .end
 CODE
 sub1
@@ -317,14 +303,12 @@ pir_output_is( <<'CODE', <<'OUT', 'call internal sub like external' );
     ret:
     .end_call
     print "back\n"
-    end
 .end
 
 .sub _sub2
     print "sub2\n"
    .begin_return
    .end_return
-    end
 .end
 CODE
 sub1
@@ -333,7 +317,7 @@ back
 OUT
 
 # write subs
-($FOO, $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
+($FOO, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $FOO <<'ENDF';
 .sub _sub1
@@ -344,14 +328,12 @@ print $FOO <<'ENDF';
     ret:
     .end_call
     say "back"
-    end
 .end
 
 .sub _sub2
     say "sub2"
     .begin_return
     .end_return
-    end
 .end
 ENDF
 
@@ -373,7 +355,7 @@ OUT
     # include a non-existent file and catch the error message
     my $err_msg;
     {
-        ($FOO, $temp_pir) = tempfile( SUFFIX => '.pir', UNLINK => 1 );
+        ($FOO, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
         print $FOO <<'END_PIR';
 # Including a non-existent file should produce an error
@@ -381,14 +363,13 @@ OUT
 # An error should have been raised
 .sub test :main
   # dummy, because a main function is expected
-  end
 .end
 END_PIR
         close $FOO;
 
         my $OLDERR;
         open $OLDERR, '>&', 'STDERR' or die "Can't save STDERR: $!\n";
-        (undef, my $temp_out) = tempfile( SUFFIX => '.out', UNLINK => 1 );
+        (undef, my $temp_out) = create_tempfile( SUFFIX => '.out', UNLINK => 1 );
         open STDERR, '>', $temp_out or die "Can't write $temp_out: $!\n";
         system( $PARROT, $temp_pir );    # We expect an error here.
         open $FOO, '<', $temp_out or die "Can't read $temp_out: $!\n";
@@ -410,7 +391,6 @@ END_PIR
   .local string enoent_err_msg
   err enoent_err_msg, $ENOENT
   print enoent_err_msg
-  end
 .end
 END_PIR
         close $FOO;
@@ -448,7 +428,6 @@ SKIP:
     ret_again:
     .end_call
     print "back again\n"
-    end
 .end
 CODE
 sub1
@@ -515,6 +494,8 @@ OUT
 
 $ended_ok = 1;
 
+exit;
+
 sub system_or_die {
     my @args = @_;
 
@@ -524,6 +505,12 @@ sub system_or_die {
         die "Couldn't run: @args\n";
     }
     print "# Return $rc\n";
+}
+
+sub create_tempfile {
+        my ($filehandle, $filename) = &tempfile;
+        $filename =~ s/\\/\//g;
+        return ( $filehandle, $filename );
 }
 
 # Local Variables:
