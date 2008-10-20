@@ -38,10 +38,13 @@ transform post (PAST::Block) :language('PIR') {
     post.'storage_lex'($P0)
     new $P0, 'Hash'
     post.'storage_const'($P0)
-    $P0 = post.'push_new'('POST::Ops')
-    post.'ops_const'($P0)
-    $P0 = post.'push_new'('POST::Ops')
-    post.'ops_subr'($P0)
+    $P0 = get_hll_global ['POST'], 'Ops'
+    $P1 = $P0.'new'()
+    post.'push'($P1)
+    post.'ops_const'($P1)
+    $P1 = $P0.'new'()
+    post.'push'($P1)
+    post.'ops_subr'($P1)
     set_hll_global ['Lua';'POST'], '$?SUB', post
     .local pmc iter, cpost
     iter = node.'iterator'()
@@ -304,13 +307,16 @@ transform and (PAST::Op) :language('PIR') {
   L2:
     ops.'push_pirop'('clone', $S0, expr1)
     ops.'push_pirop'('goto', endlabel)
-    ops.'push_new'('POST::Label', 'result'=>label)
+    $P1 = get_hll_global ['POST'], 'Label'
+    $P0 = $P1.'new'('result'=>label)
+    ops.'push'($P0)
     .local pmc expr2
     $P0 = node[1]
     expr2 = tree.'get'('post', $P0)
     ops.'push'(expr2)
     ops.'push_pirop'('clone', $S0, expr2)
-    ops.'push_new'('POST::Label', 'result'=>endlabel)
+    $P0 = $P1.'new'('result'=>endlabel)
+    ops.'push'($P0)
     ops.'result'($S0)
     null $P0
     set_hll_global ['Lua';'POST'], '$?environ', $P0
@@ -356,7 +362,9 @@ transform if (PAST::Op) :language('PIR') {
     ops.'push'(else)
   L1:
     ops.'push_pirop'('goto', endlabel)
-    ops.'push_new'('POST::Label', 'result'=>thenlabel)
+    $P1 = get_hll_global ['POST'], 'Label'
+    $P0 = $P1.'new'('result'=>thenlabel)
+    ops.'push'($P0)
     .local pmc then
     $P0 = node[1]
     $I0 = defined $P0
@@ -364,7 +372,8 @@ transform if (PAST::Op) :language('PIR') {
     then = tree.'get'('post', $P0)
     ops.'push'(then)
   L2:
-    ops.'push_new'('POST::Label', 'result'=>endlabel)
+    $P0 = $P1.'new'('result'=>endlabel)
+    ops.'push'($P0)
     .return (ops)
 }
 
@@ -379,7 +388,9 @@ transform while (PAST::Op) :language('PIR') {
     looplabel = ops.'unique'('while_')
     endlabel = looplabel . '_end'
     unshift endlabels, endlabel
-    ops.'push_new'('POST::Label', 'result'=>looplabel)
+    $P1 = get_hll_global ['POST'], 'Label'
+    $P0 = $P1.'new'('result'=>looplabel)
+    ops.'push'($P0)
     .local pmc expr
     $P0 = node[0]
     expr = tree.'get'('cond', $P0)
@@ -390,7 +401,8 @@ transform while (PAST::Op) :language('PIR') {
     blk = tree.'get'('post', $P0)
     ops.'push'(blk)
     ops.'push_pirop'('goto', looplabel)
-    ops.'push_new'('POST::Label', 'result'=>endlabel)
+    $P0 = $P1.'new'('result'=>endlabel)
+    ops.'push'($P0)
     $P0 = shift endlabels
     .return (ops)
 }
@@ -406,7 +418,9 @@ transform repeat (PAST::Op) :language('PIR') {
     looplabel = ops.'unique'('repeat_')
     endlabel = looplabel . '_end'
     unshift endlabels, endlabel
-    ops.'push_new'('POST::Label', 'result'=>looplabel)
+    $P1 = get_hll_global ['POST'], 'Label'
+    $P0 = $P1.'new'('result'=>looplabel)
+    ops.'push'($P0)
     .local pmc blk
     $P0 = node[0]
     blk = tree.'get'('post', $P0)
@@ -417,7 +431,8 @@ transform repeat (PAST::Op) :language('PIR') {
     ops.'push'(expr)
     ops.'push_pirop'('if', expr, endlabel)
     ops.'push_pirop'('goto', looplabel)
-    ops.'push_new'('POST::Label', 'result'=>endlabel)
+    $P0 = $P1.'new'('result'=>endlabel)
+    ops.'push'($P0)
     $P0 = shift endlabels
     .return (ops)
 }
@@ -464,13 +479,17 @@ transform fornum (PAST::Op) :language('PIR') {
     blklabel = looplabel . '_blk'
     endlabel = looplabel . '_end'
     unshift endlabels, endlabel
-    ops.'push_new'('POST::Label', 'result'=>looplabel)
+    $P1 = get_hll_global ['POST'], 'Label'
+    $P0 = $P1.'new'('result'=>looplabel)
+    ops.'push'($P0)
     ops.'push_pirop'('unless', incr, orlabel)
     ops.'push_pirop'('gt', var, limit, endlabel)
     ops.'push_pirop'('goto', blklabel)
-    ops.'push_new'('POST::Label', 'result'=>orlabel)
+    $P0 = $P1.'new'('result'=>orlabel)
+    ops.'push'($P0)
     ops.'push_pirop'('lt', var, limit, endlabel)
-    ops.'push_new'('POST::Label', 'result'=>blklabel)
+    $P0 = $P1.'new'('result'=>blklabel)
+    ops.'push'($P0)
     ops.'push_pirop'('clone', loc_v, var)
     .local pmc blk
     $P0 = node[2]
@@ -478,7 +497,8 @@ transform fornum (PAST::Op) :language('PIR') {
     ops.'push'(blk)
     ops.'push_pirop'('add', var, step)
     ops.'push_pirop'('goto', looplabel)
-    ops.'push_new'('POST::Label', 'result'=>endlabel)
+    $P0 = $P1.'new'('result'=>endlabel)
+    ops.'push'($P0)
     $P0 = shift endlabels
     .return (ops)
 }
@@ -574,7 +594,9 @@ transform forlist (PAST::Op) :language('PIR') {
     looplabel = ops.'unique'('forlist_')
     endlabel = looplabel . '_end'
     unshift endlabels, endlabel
-    ops.'push_new'('POST::Label', 'result'=>looplabel)
+    $P1 = get_hll_global ['POST'], 'Label'
+    $P0 = $P1.'new'('result'=>looplabel)
+    ops.'push'($P0)
     new iter, 'Iterator', tmp
     $S0 = '('
   L9:
@@ -599,7 +621,8 @@ transform forlist (PAST::Op) :language('PIR') {
     blk = tree.'get'('post', $P0)
     ops.'push'(blk)
     ops.'push_pirop'('goto', looplabel)
-    ops.'push_new'('POST::Label', 'result'=>endlabel)
+    $P0 = $P1.'new'('result'=>endlabel)
+    ops.'push'($P0)
     $P0 = shift endlabels
     .return (ops)
 }
@@ -905,7 +928,9 @@ transform parameter (PAST::Var) :language('PIR') {
     vivilabel = ops.'unique'('vivify_')
     ops.'push_pirop'('unless_null', pname, vivilabel)
     ops.'push_pirop'('new', pname, '"LuaNil"')
-    ops.'push_new'('POST::Label', 'result'=>vivilabel)
+    $P0 = get_hll_global ['POST'], 'Label'
+    $P0 = $P0.'new'('result'=>vivilabel)
+    ops.'push'($P0)
     ops.'result'(pname)
     storage_lex[name] = pname
     .return (ops)
