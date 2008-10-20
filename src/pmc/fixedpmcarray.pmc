@@ -175,7 +175,7 @@ Returns the number of elements in the array as a Parrot string. (??? -leo)
 =item C<STRING *get_repr()>
 
 Returns a string representation of the array contents.
-RT#46673 implement freeze/thaw and use that instead.
+RT #46673 implement freeze/thaw and use that instead.
 
 =cut
 
@@ -278,12 +278,12 @@ Returns the Parrot string value of the element at index C<key>.
 */
 
     VTABLE STRING *get_string_keyed_int(INTVAL key) {
-        PMC * const tempPMC = SELF.get_pmc_keyed_int(key);
+        PMC * const retval = SELF.get_pmc_keyed_int(key);
 
-        if (PMC_IS_NULL(tempPMC))
-            return CONST_STRING(interp, "");
+        if (PMC_IS_NULL(retval))
+            return string_from_literal(interp, "");
 
-        return VTABLE_get_string(INTERP, tempPMC);
+        return VTABLE_get_string(INTERP, retval);
     }
 
 /*
@@ -492,7 +492,7 @@ C<value>.
         else {
             PMC *box = SELF.get_pmc_keyed_int(k);
 
-            /* RT#46675: autovivify an Array and insert it in SELF */
+            /* RT #46675: autovivify an Array and insert it in SELF */
             if (!box)
                 box = pmc_new(INTERP, SELF.type());
 
@@ -581,7 +581,7 @@ Sets the PMC at index C<key> to C<value>.
         else {
             PMC *box = SELF.get_pmc_keyed_int(k);
 
-            /* RT#46675: autovivify an Array and insert it in SELF */
+            /* RT #46675: autovivify an Array and insert it in SELF */
             if (!box)
                 box = pmc_new(INTERP, SELF.type());
 

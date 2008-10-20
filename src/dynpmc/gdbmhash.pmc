@@ -133,7 +133,7 @@ A uninitialized GDBMHash returns 0.
 
 =cut
 
-RT#46395: This can be optimized by keeping track of number of elements
+RT #46395: This can be optimized by keeping track of number of elements
 
 */
 
@@ -218,20 +218,22 @@ Returns the string value for the element at C<*key>.
 
 */
 
-    STRING* get_string_keyed(PMC* key) {
-        STRING* keystr, *val;
+    STRING* get_string_keyed(PMC *key) {
+        STRING *keystr, *val;
         GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
         datum key_gdbm, val_gdbm;
 
         if (!key)
-            return CONST_STRING(INTERP, "");
+            return string_from_literal(INTERP, "");
+
         if (!dbf)
-            return CONST_STRING(INTERP, "");
-        keystr = make_hash_key(interp, key);
+            return string_from_literal(INTERP, "");
+
+        keystr         = make_hash_key(interp, key);
 
         key_gdbm.dsize = keystr->strlen;
         key_gdbm.dptr  = keystr->strstart;
-        val_gdbm = gdbm_fetch(dbf, key_gdbm);
+        val_gdbm       = gdbm_fetch(dbf, key_gdbm);
 
         val = string_from_cstring(interp, val_gdbm.dptr, val_gdbm.dsize);
         free(val_gdbm.dptr);

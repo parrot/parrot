@@ -353,7 +353,7 @@ PackFile_destroy(PARROT_INTERP, ARGMOD_NULLOK(PackFile *pf))
     if (pf->is_mmap_ped) {
         DECL_CONST_CAST;
         /* Cast the result to void to avoid a warning with
-         * some not-so-standard mmap headers, see RT#56110
+         * some not-so-standard mmap headers, see RT #56110
          */
         munmap((void *)PARROT_const_cast(opcode_t *, pf->src), pf->size);
     }
@@ -625,7 +625,7 @@ mark_1_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
 
 =item C<static INTVAL find_const_iter>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -649,7 +649,7 @@ find_const_iter(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
 
 =item C<void mark_const_subs>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -883,7 +883,7 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     && (self->need_endianize || self->need_wordsize)) {
         DECL_CONST_CAST;
         /* Cast the result to void to avoid a warning with
-         * some not-so-standard mmap headers, see RT#56110
+         * some not-so-standard mmap headers, see RT #56110
          */
         munmap((void *)PARROT_const_cast(opcode_t *, self->src), self->size);
         self->is_mmap_ped = 0;
@@ -1430,7 +1430,7 @@ PackFile_Segment_new_seg(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
 
 =item C<static PackFile_Segment * create_seg>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1500,7 +1500,7 @@ PF_create_default_segs(PARROT_INTERP, ARGIN(const char *file_name), int add)
 
 =item C<void PackFile_Segment_destroy>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1525,7 +1525,7 @@ PackFile_Segment_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 
 =item C<size_t PackFile_Segment_packed_size>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -1555,7 +1555,7 @@ PackFile_Segment_packed_size(PARROT_INTERP, ARGIN(PackFile_Segment *self))
 
 =item C<opcode_t * PackFile_Segment_pack>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -2635,20 +2635,20 @@ Parrot_debug_pc_to_filename(PARROT_INTERP, ARGIN(const PackFile_Debug *debug), o
         {
             switch (debug->mappings[i]->mapping_type) {
                 case PF_DEBUGMAPPINGTYPE_NONE:
-                    return CONST_STRING(interp, "(unknown file)");
+                    return string_from_literal(interp, "(unknown file)");
                 case PF_DEBUGMAPPINGTYPE_FILENAME:
                     return PF_CONST(debug->code,
                         debug->mappings[i]->u.filename)->u.string;
                 case PF_DEBUGMAPPINGTYPE_SOURCESEG:
-                    return CONST_STRING(interp, "(unknown file)");
+                    return string_from_literal(interp, "(unknown file)");
                 default:
                     continue;
             }
         }
     }
 
-    /* Otherwise, no mappings = no filename. */
-    return CONST_STRING(interp, "(unknown file)");
+    /* Otherwise, no mappings == no filename. */
+    return string_from_literal(interp, "(unknown file)");
 }
 
 /*
@@ -2733,7 +2733,7 @@ Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
 
 =item C<static PackFile_Constant * clone_constant>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -2835,7 +2835,7 @@ find_constants(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct))
 
 =item C<void Parrot_destroy_constants>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -2948,7 +2948,7 @@ fixup_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 
 I<What does this do?>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -2985,7 +2985,7 @@ fixup_packed_size(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 
 I<What does this do?>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -3111,7 +3111,7 @@ fixup_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg), ARGIN(const opcode_t *
 
 I<What does this do?>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -3175,7 +3175,7 @@ find_fixup(ARGMOD(PackFile_FixupTable *ft), INTVAL type, ARGIN(const char *name)
 
 I<What does this do?>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -3207,7 +3207,7 @@ find_fixup_iter(PARROT_INTERP, ARGIN(PackFile_Segment *seg), ARGIN(void *user_da
 
 I<What does this do?>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 

@@ -147,7 +147,7 @@ Returns the Parrot string value of the key.
         if (PObj_get_FLAGS(SELF) & KEY_type_FLAGS)
             return key_string(INTERP, SELF);
 
-        return CONST_STRING(INTERP, "");
+        return string_from_literal(INTERP, "");
     }
 
 /*
@@ -284,8 +284,8 @@ PMC_int_val(-1) means end of iteration.
 */
 
     VTABLE PMC *nextkey_keyed(PMC *agg, INTVAL what) {
-        const INTVAL n   = VTABLE_elements(INTERP, agg);
         PMC         *ret = SELF;
+        const INTVAL n   = VTABLE_elements(INTERP, agg);
 
         switch (what) {
             case ITERATE_FROM_START_KEYS:
@@ -312,8 +312,8 @@ PMC_int_val(-1) means end of iteration.
                  * with an Integer KEY
                  */
 
-                if (VTABLE_isa(INTERP, agg, CONST_STRING(interp, "Hash")) &&
-                     agg->vtable->base_type != enum_class_OrderedHash)
+                 if (VTABLE_isa(INTERP, agg, CONST_STRING(interp, "Hash"))
+                 &&  agg->vtable->base_type != enum_class_OrderedHash)
                     PObj_get_FLAGS(ret) |= KEY_hash_iterator_FLAGS;
         init:
                 PMC_int_val(ret) = 0;
@@ -344,7 +344,7 @@ PMC_int_val(-1) means end of iteration.
             case ITERATE_FROM_END:
                 PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
                 PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
-                PMC_int_val(ret) = n - 1;
+                PMC_int_val(ret)     = n - 1;
                 break;
             default:
                 Parrot_ex_throw_from_c_args(interp, NULL,
@@ -393,8 +393,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
         const INTVAL flags  = (PObj_get_FLAGS(SELF) & KEY_type_FLAGS);
 
         /* write the contents of a register - else thaw can't restore
-         * the register state
-         */
+         * the register state */
         VTABLE_push_integer(INTERP, io, flags & ~KEY_register_FLAG);
 
         /* and contents of this key component */

@@ -521,7 +521,7 @@ non-existent layers, returns an empty string.
                 if (last)
                     return string_from_cstring(INTERP, last->name, 0);
 
-                return CONST_STRING(INTERP, "");
+                return string_from_literal(INTERP, "");
             }
 
             for (++n; n && layer; layer = layer->down, ++n)
@@ -531,7 +531,7 @@ non-existent layers, returns an empty string.
                 return string_from_cstring(INTERP, layer->name, 0);
         }
 
-        return CONST_STRING(INTERP, "");
+        return string_from_literal(INTERP, "");
     }
 /*
 

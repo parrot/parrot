@@ -363,7 +363,7 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
             PMC *exe_name = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
                     IGLOBALS_EXECUTABLE);
             if (PMC_IS_NULL(exe_name))
-                return CONST_STRING(interp, "");
+                return string_from_literal(interp, "");
             return VTABLE_get_string(interp, exe_name);
         }
         case EXECUTABLE_BASENAME:
@@ -373,7 +373,7 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
                                 interp->iglobals, IGLOBALS_EXECUTABLE);
 
             if (PMC_IS_NULL(exe_name))
-                return CONST_STRING(interp, "");
+                return string_from_literal(interp, "");
 
             else {
                 /* Need to strip back to what follows the final / or \. */
@@ -457,7 +457,7 @@ C<info_wanted> is one of:
     CPU_ARCH
     CPU_TYPE
 
-If unknown info is requested then and empty string is returned.
+If unknown info is requested then an empty string is returned.
 
 =cut
 
@@ -497,7 +497,7 @@ sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
         default:
             break;
     }
-    return CONST_STRING(interp, "");
+    return string_from_literal(interp, "");
 }
 
 /*

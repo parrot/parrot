@@ -192,12 +192,13 @@ Retrieves the C<type> attribute of this event handler.
 */
 
     VTABLE STRING *get_string() {
-        Parrot_EventHandler_attributes *e = PMC_data_typed(SELF, Parrot_EventHandler_attributes *);
+        Parrot_EventHandler_attributes *e =
+            PMC_data_typed(SELF, Parrot_EventHandler_attributes *);
 
         if (e)
             return string_copy(INTERP, e->type);
 
-        return CONST_STRING(INTERP, "");
+        return string_from_literal(INTERP, "");
     }
 
 /*
