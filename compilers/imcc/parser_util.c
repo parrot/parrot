@@ -92,17 +92,13 @@ static Instruction * var_arg_ins(PARROT_INTERP,
 /* HEADERIZER END: static */
 
 /*
- * FIXME:
- *
  * used in -D20 to print files with the output of every PIR compilation
  * this can't be attached to the interpreter or packfile because it has to be
  * absolutely global to prevent the files from being overwritten.
  *
- * This is not thread safe as is. A mutex needs to be added.
- *
- * See RT#40010 for more discussion.
  */
-static INTVAL eval_nr = 0;
+static Parrot_mutex eval_nr_lock;
+static INTVAL       eval_nr  = 0;
 
 /*
 
@@ -602,6 +598,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     void                  *yyscanner;
     Parrot_Context        *ignored;
     INTVAL regs_used[4] = {3, 3, 3, 3};
+    INTVAL eval_number;
 
     do_yylex_init(interp, &yyscanner);
 
@@ -619,7 +616,14 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     ignored = Parrot_push_context(interp, regs_used);
     UNUSED(ignored);
 
-    snprintf(name, sizeof (name), "EVAL_" INTVAL_FMT, ++eval_nr);
+    if (eval_nr == 0)
+        MUTEX_INIT(eval_nr_lock);
+
+    LOCK(eval_nr_lock);
+    eval_number = ++eval_nr;
+    UNLOCK(eval_nr_lock);
+
+    snprintf(name, sizeof (name), "EVAL_" INTVAL_FMT, eval_number);
     new_cs = PF_create_default_segs(interp, name, 0);
     old_cs = Parrot_switch_to_cs(interp, new_cs, 0);
 
@@ -1492,6 +1496,9 @@ imcc_destroy(PARROT_INTERP)
 
     mem_sys_free(IMCC_INFO(interp));
     IMCC_INFO(interp) = NULL;
+
+    if (eval_nr != 0)
+        MUTEX_DESTROY(eval_nr_lock);
 }
 
 /*
