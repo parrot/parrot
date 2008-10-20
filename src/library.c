@@ -559,7 +559,6 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, ARGMOD(STRING *file),
     STRING *full_name;
     PMC    *paths;
     INTVAL  i, n;
-    char   *prefix_c;
 
     /* if this is an absolute path return it as is */
     if (is_abs_path(file))
@@ -572,10 +571,8 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, ARGMOD(STRING *file),
     else
         paths = get_search_paths(interp, PARROT_LIB_PATH_INCLUDE);
 
-    prefix_c = Parrot_get_runtime_prefix(interp);
-    prefix   = string_from_cstring(interp, prefix_c, 0);
-    n        = VTABLE_elements(interp, paths);
-    mem_sys_free(prefix_c);
+    prefix = Parrot_get_runtime_path(interp);
+    n = VTABLE_elements(interp, paths);
 
     for (i = 0; i < n; ++i) {
         STRING * const path = VTABLE_get_string_keyed_int(interp, paths, i);
@@ -631,6 +628,9 @@ Parrot_locate_runtime_file(PARROT_INTERP, ARGIN(const char *file_name),
 
 Return a malloced C-string for the runtime prefix.  The calling function
 must free it.
+
+This function is deprecated, use Parrot_get_runtime_path instead.
+See RT#58988
 
 =cut
 
