@@ -75,6 +75,10 @@ The following are PIR keywords, and cannot be used as identifiers:
  num       pmc      string      unless
 
 
+{{ NOTE: compilers/pirc does not have any reserved words; all keywords and ops
+   can be used as identifiers.
+}}
+
 {{ NOTE: The use of C<::> in identifiers is deprecated. [See RT #48735] }}
 
 =head3 Labels
@@ -589,16 +593,38 @@ See L<docs/pdds/pdd16_native_call> for details.
 
 =item .return <var> [:<flag>]*
 
+{{ Deprecated; use .set_return instead. See RT#58236. }}
+
+=item .set_return <var> [:<flag>]*
+
 Between C<.begin_return> and C<.end_return>, specify one or
 more of the return value(s) of the current subroutine.  Available
 flags: C<:flat>, C<:named>.
 
+=item .yield <var> [:<flag>]*
+
+{{ Deprecated; use .set_yield instead. See RT#58236. }}
+
+=item .set_yield <var> [:<flag>]*
+
+Between C<.begin_yield> and C<.end_yield>, specify one or
+more of the yield value(s) of the current subroutine.  Available
+flags: C<:flat>, C<:named>.
+
 =item .arg <var> [:<flag>]*
+
+{{ Deprecated. Use .set_arg instead. See RT#58236. }}
+
+=item .set_arg <var> [:<flag>]*
 
 Between C<.begin_call> and C<.call>, specify an argument to be
 passed.  Available flags: C<:flat>, C<:named>.
 
 =item .result <var> [:<flag>]*
+
+{{ Deprecated. Use .get_result instead. See RT#58236. }}
+
+=item .get_result <var> [:<flag>]*
 
 Between C<.call> and C<.end_call>, specify where one or more return
 value(s) should be stored.  Available flags:
@@ -825,11 +851,28 @@ sequence break more conspicuous, this is necessary to distinguish this
 syntax from other uses of the C<.return> directive that will be probably
 deprecated.
 
+{{ Since .return is deprecated in .begin_/end_return, do we still need and/or
+   want the parentheses?
+}}
+
 =item .return <var>(args)
+
+{{ Deprecated. Use .tailcall instead. See RT#58236. }}
 
 =item .return <var>.'somemethod'(args)
 
+{{ Deprecated. Use .tailcall instead. See RT#58236. }}
+
 =item .return <var>.<var>(args)
+
+{{ Deprecated. Use .tailcall instead. See RT#58236. }}
+
+=item .tailcall <var>(args)
+
+=item .tailcall <var>.'somemethod'(args)
+
+=item .tailcall <var>.<var>(args)
+
 
 Tail call: call a function or method and return from the sub with the
 function or method call return values.
@@ -881,7 +924,7 @@ The include file is searched for in the current directory and in
 runtime/parrot/include, in that order. The first file of that name to be found
 is included.
 
-{{ NOTE: the C<include> directive's search order is subject to change. }}
+{{ NOTE: the C<.include> directive's search order is subject to change. }}
 
 =item * C<.macro> <identifier> [<parameters>]
 
@@ -1143,7 +1186,7 @@ C<.macro_local> instead of C<.local> to take advantage of the name munging.
    .param int c
   ...
   .begin_return
-   .return xy
+   .set_return xy
   .end_return
   ...
   .end
@@ -1158,13 +1201,13 @@ C<.macro_local> instead of C<.local> to take advantage of the name munging.
   .local num y
   .local str z
   .begin_call
-  .arg x
-  .arg y
-  .arg z
+  .set_arg x
+  .set_arg y
+  .set_arg z
   .call $P0, $P1    # r = _sub_label(x, y, z)
   ret_addr:
   .local int r  # optional - new result var
-  .result r
+  .get_result r
   .end_call
 
 =head2 NCI Call
@@ -1173,12 +1216,12 @@ C<.macro_local> instead of C<.local> to take advantage of the name munging.
   dlfunc $P1, $P0, "funcname", "signature"
   ...
   .begin_call
-  .arg x
-  .arg y
-  .arg z
+  .set_arg x
+  .set_arg y
+  .set_arg z
   .nci_call $P1 # r = funcname(x, y, z)
   .local int r  # optional - new result var
-  .result r
+  .get_result r
   .end_call
 
 =head2 Subroutine Call Syntactic Sugar
@@ -1208,7 +1251,7 @@ Instead of the label a subroutine object can be used too:
    self."_other_meth"()
   ...
   .begin_return
-   .return xy
+   .set_return xy
   .end_return
   ...
   .end
@@ -1226,13 +1269,13 @@ C<meth_call> which must immediately be preceded by the C<.invocant>:
    newclass class, "Foo"
    new obj, class
   .begin_call
-  .arg x
-  .arg y
-  .arg z
+  .set_arg x
+  .set_arg y
+  .set_arg z
   .invocant obj
   .meth_call "_method" [, $P1 ] # r = obj."_method"(x, y, z)
   .local int r  # optional - new result var
-  .result r
+  .get_result r
   .end_call
 
 The return continuation is optional. The method can be a string
@@ -1244,9 +1287,9 @@ constant or a string variable.
 
   .return ()            # return no value
 
-  .return func_call()   # tail call function
+  .tailcall func_call()   # tail call function
 
-  .return o."meth"()    # tail method call
+  .tailcall o."meth"()    # tail method call
 
 Similarly, one can yield using the .yield directive
 
@@ -1259,13 +1302,13 @@ Similarly, one can yield using the .yield directive
 
 Arguments are B<save>d in reverse order onto the user stack:
 
-   .arg y   # save args in reversed order
-   .arg x
+   .set_arg y   # save args in reversed order
+   .set_arg x
    call _foo    #(r, s) = _foo(x,y)
    .local int r
    .local int s
-   .result r    # restore results in order
-   .result s    #
+   .get_result r    # restore results in order
+   .get_result s    #
 
 and return values are B<restore>d in argument order from there.
 
