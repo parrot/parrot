@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 160;
+use Parrot::Test tests => 161;
 use Parrot::Config;
 
 =head1 NAME
@@ -2889,6 +2889,32 @@ CODE
 0
 -89
 0
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'constant string and modify-in-situ op (RT #60030)' );
+.sub doit
+    .param string s
+    $I0 = index s, '::'
+    say s
+    substr s, $I0, 2, "/"
+    say s
+    collect
+    say s
+.end
+
+.sub main :main
+    doit('Foo::Bar')
+
+    # repeat to prove that the constant 'Foo::Bar' remains unchanged
+    doit('Foo::Bar')
+.end
+CODE
+Foo::Bar
+Foo/Bar
+Foo/Bar
+Foo::Bar
+Foo/Bar
+Foo/Bar
 OUT
 
 # Local Variables:
