@@ -1,11 +1,16 @@
 # $Id$
 
-New in October 2008 release
+New in 0.8.0
 - Implementation
   + float precision expanded to 15 significant digits from 6
   + large integers autopromoted in PIR so as not to lose precision
   + improved precision of complex square root
 - Languages
+  + Cardinal (Ruby)
+    - implemented yield builtin
+    - Range, Time, Math, GC, Kernel classes
+    - many more tests
+    - added a new committer
   + Markdown : new lightweight markup language
     - start implementation with PCT/NQP
   + partcl (Tcl 8.5.4)
