@@ -103,7 +103,6 @@ sub get_default_tests {
        push @default_tests, @core_tests;
        unless ($core_tests_only) {
            unshift @default_tests, @configure_tests;
-           push @default_tests, @standard_tests;
        }
     }
     wantarray

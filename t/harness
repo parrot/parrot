@@ -32,7 +32,7 @@ local @ARGV = @ARGV;
 
 $ENV{RUNNING_MAKE_TEST} = $longopts->{running_make_test};
 
-# Suck the short options into the TEST_PROG_ARGS 
+# Suck the short options into the TEST_PROG_ARGS
 # environmental variable.
 my %opts;
 getopts('wgjPCSefbvdr?hO:D:', \%opts);
@@ -99,7 +99,7 @@ if ($longopts->{html}) {
         );
         $harness->runtests(@tests);
         send_archive_to_smolder(%env_data) if $longopts->{send_to_smolder};
-        
+
     } else {
         eval { require TAP::Harness };
         if ($@) {
@@ -172,8 +172,8 @@ Run optimized to the specified level.
 
 =item C<-D[number]>
 
-Pass the specified debug bits to the parrot interpreter.  Note that 
-C<-D40> (fill I, N registers with garbage) is always enabled.  
+Pass the specified debug bits to the parrot interpreter.  Note that
+C<-D40> (fill I, N registers with garbage) is always enabled.
 See 'parrot --help-debug' for available flags.
 
 =back
