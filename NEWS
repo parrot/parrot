@@ -35,6 +35,12 @@ New in 0.8.0
     - an old style line numbered Basic interpreter able to use parrot objects
     - example connecting to mysql via nci
     - example using classes to write and run an embedded Basic program
+- Documentation
+  + Book
+    - Added chapters for PCT, PMCs, and Opcodes/Runcores
+    - Expanded and improved formatting in various chapters
+    - Renumbered chapters
+
 
 New in 0.7.1
 - Implementation
