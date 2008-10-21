@@ -2098,9 +2098,10 @@ static void
 set_context_sig_returns(PARROT_INTERP, ARGMOD(parrot_context_t *ctx),
     ARGMOD(opcode_t **indexes), ARGIN(const char *ret_x), ARGMOD(PMC *result_list))
 {
-    unsigned int index = 0;
-    unsigned int seen_arrow = 1;
-    const char *x;
+    const char   *x;
+    STRING       *empty_string = CONST_STRING(interp, "");
+    unsigned int  index        = 0;
+    unsigned int  seen_arrow   = 1;
 
     /* result_accessors perform the arg accessor function,
      * assigning the corresponding registers to the result variables */
@@ -2137,6 +2138,11 @@ set_context_sig_returns(PARROT_INTERP, ARGMOD(parrot_context_t *ctx),
                         EXCEPTION_INVALID_OPERATION,
                         "Parrot_pcc_invoke_sub_from_sig_object: invalid reg type %c!", *x);
             }
+
+            /* invalidate the CPointer's pointers so that GC doesn't try to
+             * mark stack values -- RT #59880*/
+            VTABLE_set_string_keyed_str(interp, result_item,
+                empty_string, empty_string);
         }
     }
 
@@ -2594,7 +2600,7 @@ Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     PMC * const results_sig = pmc_new(interp, enum_class_FixedIntegerArray);
     PMC * const ret_cont    = new_ret_continuation_pmc(interp, NULL);
     PMC * const result_list = VTABLE_get_attr_str(interp, sig_obj,
-            CONST_STRING(interp, "results"));
+            CONST_STRING(interp, "returns"));
 
     parrot_context_t *ctx;
     opcode_t         *dest;
@@ -2629,9 +2635,10 @@ Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     save_args_signature    = interp->args_signature;
     save_current_object    = interp->current_object;
 
-    /* Set the function input parameters in the context structure, and return the
-       offset in the signature where the return params start. */
-    ret_x = set_context_sig_params(interp, signature, n_regs_used, sigs, indexes, ctx, sig_obj);
+    /* Set the function input parameters in the context structure, and return
+     * the offset in the signature where the return params start. */
+    ret_x = set_context_sig_params(interp, signature, n_regs_used,
+                                   sigs, indexes, ctx, sig_obj);
 
     /* Set up the context object for the function invokation */
     interp->current_object       = PMCNULL;
