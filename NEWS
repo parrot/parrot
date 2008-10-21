@@ -30,6 +30,11 @@ New in 0.8.0
     - updated Makefile for easier compilation
   + IMCC
     - Added .tailcall syntax to replace .return in tailcall context
+- Examples
+  + Added pirric, an old style line numbered Basic interpreter able to
+    use parrot objects, an example of using the mysql nci example from
+    it, and an example of using the interpreter classes to write and
+    run a Basic program from a Basic program.
 
 New in 0.7.1
 - Implementation
