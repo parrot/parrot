@@ -3216,7 +3216,7 @@ PDB_backtrace(PARROT_INTERP)
 
     /* information about the current sub */
     PMC              *sub = interpinfo_p(interp, CURRENT_SUB);
-    parrot_context_t *ctx = CONTEXT(interp);
+    Parrot_Context   *ctx = CONTEXT(interp);
 
     if (!PMC_IS_NULL(sub)) {
         str = Parrot_Context_infostr(interp, ctx);

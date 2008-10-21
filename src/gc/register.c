@@ -25,14 +25,14 @@ is determined by the PASM/PIR compiler in the register allocation pass
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void clear_regs(PARROT_INTERP, ARGMOD(parrot_context_t *ctx))
+static void clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*ctx);
 
 static void init_context(PARROT_INTERP,
-    ARGMOD(parrot_context_t *ctx),
-    ARGIN_NULLOK(const parrot_context_t *old))
+    ARGMOD(Parrot_Context *ctx),
+    ARGIN_NULLOK(const Parrot_Context *old))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*ctx);
@@ -210,7 +210,7 @@ void
 parrot_gc_context(PARROT_INTERP)
 {
 #if CHUNKED_CTX_MEM
-    parrot_context_t ctx;
+    Parrot_Context ctx;
 
     if (!interp->ctx_mem.threshold)
         return;
@@ -235,7 +235,7 @@ values, for debugging purposes.
 */
 
 static void
-clear_regs(PARROT_INTERP, ARGMOD(parrot_context_t *ctx))
+clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
 {
     int i;
 
@@ -286,8 +286,8 @@ Initializes a freshly allocated or recycled context.
 */
 
 static void
-init_context(PARROT_INTERP, ARGMOD(parrot_context_t *ctx),
-        ARGIN_NULLOK(const parrot_context_t *old))
+init_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctx),
+        ARGIN_NULLOK(const Parrot_Context *old))
 {
     ctx->ref_count         = 0;    /* RT #46191 1 - Exceptions !!! */
     ctx->current_results   = NULL;

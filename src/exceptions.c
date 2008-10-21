@@ -42,7 +42,7 @@ PARROT_CAN_RETURN_NULL
 static opcode_t * pass_exception_args(PARROT_INTERP,
     ARGIN(const char *sig),
     ARGIN(opcode_t *dest),
-    ARGIN(parrot_context_t * old_ctx),
+    ARGIN(Parrot_Context * old_ctx),
     ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -215,7 +215,7 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
 PARROT_CAN_RETURN_NULL
 static opcode_t *
 pass_exception_args(PARROT_INTERP, ARGIN(const char *sig),
-        ARGIN(opcode_t *dest), ARGIN(parrot_context_t * old_ctx), ...)
+        ARGIN(opcode_t *dest), ARGIN(Parrot_Context * old_ctx), ...)
 {
     va_list   ap;
     opcode_t *next;

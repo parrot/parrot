@@ -296,15 +296,15 @@ with gdb and a version of parrot compiled with C<gcc> and the C<-g> flag.
 	    \b\004ï¿½ï¿½ï¿½ï¿½tï¿½ï¿½\bï¿½\004\b\001") at src/inter_run.c:216
             offset = 0
             dest = (opcode_t *) 0x8239730
-            ctx = (parrot_context_t *) 0x822a3b0
+            ctx = (Parrot_Context *) 0x822a3b0
             new_sig = ""
             sig_p = 0xb7eefca7 "P"
-            old_ctx = (parrot_context_t * const) 0x804e298
+            old_ctx = (Parrot_Context * const) 0x804e298
     #8  0xb7c688fb in Parrot_runops_fromc_args (interp=0x804e008, sub=0x8204d58, 
         sig=0xb7eefca6 "vP") at src/inter_run.c:293
             args = 0xbfec614c "@M \bï¿½bï¿½ï¿½Pï¿½\222K\230ï¿½\004\b@\236\"\b@M
 		\bXM \b\004ï¿½ï¿½ï¿½ï¿½tï¿½ï¿½\bï¿½\004\b\001"
-            ctx = (parrot_context_t *) 0xb7fa1548
+            ctx = (Parrot_Context *) 0xb7fa1548
     #9  0xb7c50c51 in Parrot_runcode (interp=0x804e008, argc=1, argv=0xbfec62e8)
         at src/embed.c:783
             userargv = (PMC *) 0x8204d40

@@ -560,7 +560,7 @@ op get_results(inconst PMC) :flow {
 
 op get_params(inconst PMC) :flow {
     opcode_t * const _this = CUR_OPCODE;
-    parrot_context_t *caller_ctx, *ctx;
+    Parrot_Context *caller_ctx, *ctx;
     PMC * ccont;
     PMC * const signature = $1;
     INTVAL argc;
@@ -594,7 +594,7 @@ op get_params(inconst PMC) :flow {
 
 op set_returns(inconst PMC) :flow {
     opcode_t * const _this = CUR_OPCODE;
-    parrot_context_t *ctx;
+    Parrot_Context *ctx;
     PMC *ccont;
     PMC *signature = $1;
     INTVAL argc;
@@ -606,7 +606,7 @@ op set_returns(inconst PMC) :flow {
 
     if (PMC_cont(ccont)->address) {
         /* Call is from runops_fromc */
-        parrot_context_t * const caller_ctx = PMC_cont(ccont)->to_ctx;
+        Parrot_Context * const caller_ctx = PMC_cont(ccont)->to_ctx;
         if (! caller_ctx) {
             /* there is no point calling Parrot_ex_throw_from_c_args here, because
                PDB_backtrace can't deal with a missing to_ctx either. */

@@ -375,7 +375,7 @@ Introspection interface. C<key> can be:
         STRING *s     = CONST_STRING(interp, "globals");
         int     level = 0;
 
-        parrot_context_t *ctx;
+        Parrot_Context *ctx;
 
         if (string_equal(interp, item, s) == 0)
             return interp->root_namespace;

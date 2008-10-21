@@ -35,7 +35,7 @@ Marks the context C<*ctx>.
 */
 
 void
-mark_context(PARROT_INTERP, ARGMOD(parrot_context_t* ctx))
+mark_context(PARROT_INTERP, ARGMOD(Parrot_Context* ctx))
 {
     PObj *obj;
     int   i;
@@ -334,7 +334,7 @@ Used by Parrot_Context_infostr.
 
 PARROT_API
 int
-Parrot_Context_get_info(PARROT_INTERP, ARGIN(const parrot_context_t *ctx),
+Parrot_Context_get_info(PARROT_INTERP, ARGIN(const Parrot_Context *ctx),
                     ARGOUT(Parrot_Context_info *info))
 {
     Parrot_sub *sub;
@@ -426,7 +426,7 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING*
-Parrot_Context_infostr(PARROT_INTERP, ARGIN(const parrot_context_t *ctx))
+Parrot_Context_infostr(PARROT_INTERP, ARGIN(const Parrot_Context *ctx))
 {
     Parrot_Context_info info;
     STRING             *res = NULL;
@@ -461,11 +461,11 @@ Locate the LexPad containing the given name. Return NULL on failure.
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC*
-Parrot_find_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(const parrot_context_t *ctx))
+Parrot_find_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(const Parrot_Context *ctx))
 {
     while (1) {
         PMC                    * const lex_pad = ctx->lex_pad;
-        const parrot_context_t * const outer   = ctx->outer_ctx;
+        const Parrot_Context   * const outer   = ctx->outer_ctx;
 
         if (!outer)
             return lex_pad;
@@ -566,8 +566,8 @@ void
 Parrot_continuation_check(PARROT_INTERP, ARGIN(PMC *pmc),
     ARGIN(Parrot_cont *cc))
 {
-    parrot_context_t *to_ctx       = cc->to_ctx;
-    parrot_context_t *from_ctx     = CONTEXT(interp);
+    Parrot_Context *to_ctx       = cc->to_ctx;
+    Parrot_Context *from_ctx     = CONTEXT(interp);
 
 #if CTX_LEAK_DEBUG
     if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG))
@@ -593,7 +593,7 @@ void
 Parrot_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc),
         ARGIN(Parrot_cont *cc))
 {
-    parrot_context_t *to_ctx = cc->to_ctx;
+    Parrot_Context *to_ctx = cc->to_ctx;
 
     /* debug print before context is switched */
     if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG)) {

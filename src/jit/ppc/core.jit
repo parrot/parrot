@@ -1297,7 +1297,7 @@ Parrot_get_results_pc {
     jit_emit_mov_ri_i(NATIVECODE, ISR1, jit_info->cur_op);
     jit_emit_lwz(NATIVECODE, ISR2, offsetof(Interp, ctx.state), r16);
     jit_emit_stw(NATIVECODE, ISR1,
-        offsetof(parrot_context_t, current_results), ISR2);
+        offsetof(Parrot_Context, current_results), ISR2);
     }
     else {
     PackFile_Constant **constants  = CONTEXT(interp)->constants;

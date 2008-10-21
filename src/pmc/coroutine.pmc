@@ -130,8 +130,8 @@ Swaps the "context".
             print_sub_name(INTERP, SELF);
 
         if (!co->ctx) {
-            parrot_context_t *caller_ctx;
-            parrot_context_t *ctx;
+            Parrot_Context *caller_ctx;
+            Parrot_Context *ctx;
             PMC *ccont;
 
             /* RT#46699 factor out common code with Sub.invoke and inherit it */
@@ -180,7 +180,7 @@ Swaps the "context".
         else if (!(PObj_get_FLAGS(SELF) & SUB_FLAG_CORO_FF)) {
             PMC *ccont;
             Stack_Chunk_t    *state;
-            parrot_context_t *ctx;
+            Parrot_Context   *ctx;
 
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
             wanted_seg            = co->seg;
@@ -205,7 +205,7 @@ Swaps the "context".
         else {
             PMC *ccont;
             Stack_Chunk_t    *state;
-            parrot_context_t *ctx;
+            Parrot_Context   *ctx;
 
             PObj_get_FLAGS(SELF) &= ~SUB_FLAG_CORO_FF;
             /* switch back to last remembered code seg and context */

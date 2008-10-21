@@ -25,7 +25,7 @@ the Lua C<Userdata> type.
 #define u_env(pmc) (PARROT_LUAUSERDATA(pmc))->env
 
 static PMC* curr_func(PARROT_INTERP) {
-    parrot_context_t *sub_ctx = CONTEXT(interp)->caller_ctx;
+    Parrot_Context *sub_ctx = CONTEXT(interp)->caller_ctx;
     while (1) {
         PMC *cont;
         if (sub_ctx->current_sub && PMC_metadata(sub_ctx->current_sub))

@@ -134,7 +134,7 @@ inline op pic_get_params__(inconst PMC) :pic :flow {
     PMC *sig, *ccont;
     opcode_t *src_pc;
     void **src_pred;
-    parrot_context_t *caller_ctx, *ctx;
+    Parrot_Context *caller_ctx, *ctx;
     int n;
 
     /* avoid load dependencies - intermix derefs
@@ -185,7 +185,7 @@ inline op pic_set_returns__(inconst PMC) :pic :flow {
     PMC *sig, *ccont;
     opcode_t *dest_pc;
     void **dest_pred;
-    parrot_context_t *caller_ctx, *ctx;
+    Parrot_Context *caller_ctx, *ctx;
     Parrot_cont *cc;
     int n;
 
@@ -241,7 +241,7 @@ inline op pic_callr__(inconst PMC) :pic :flow {
     Parrot_MIC *mic;
     Parrot_PIC_lru *lru;
     void *args[6];      /* RT#42355 ARG_MAX */
-    parrot_context_t *ctx;
+    Parrot_Context *ctx;
     opcode_t *pc;
     void **pred_pc;
     INTVAL i, n_args, *sig_bits;

@@ -51,7 +51,7 @@ typedef struct call_state_item {
         } op;
     } u;
 
-    parrot_context_t *ctx;   /* the source or destination context */
+    Parrot_Context *ctx;     /* the source or destination context */
     INTVAL used;             /* src: whether this argument has been consumed
                               * (or: whether the previous arg has?) */
     INTVAL i;                /* number of args/params already processed */
@@ -111,7 +111,7 @@ int Parrot_fetch_arg_nci(PARROT_INTERP, ARGMOD(call_state *st))
 
 PARROT_API
 int Parrot_init_arg_indexes_and_sig_pmc(SHIM_INTERP,
-    ARGIN(parrot_context_t *ctx),
+    ARGIN(Parrot_Context *ctx),
     ARGIN_NULLOK(opcode_t *indexes),
     ARGIN_NULLOK(PMC* sig_pmc),
     ARGMOD(call_state_item *sti))
@@ -130,7 +130,7 @@ void Parrot_init_arg_nci(PARROT_INTERP,
 
 PARROT_API
 int Parrot_init_arg_op(PARROT_INTERP,
-    ARGIN(parrot_context_t *ctx),
+    ARGIN(Parrot_Context *ctx),
     ARGIN_NULLOK(opcode_t *pc),
     ARGIN(call_state_item *sti))
         __attribute__nonnull__(1)
@@ -139,7 +139,7 @@ int Parrot_init_arg_op(PARROT_INTERP,
 
 PARROT_API
 int Parrot_init_arg_sig(SHIM_INTERP,
-    ARGIN(parrot_context_t *ctx),
+    ARGIN(Parrot_Context *ctx),
     ARGIN(const char *sig),
     ARGIN_NULLOK(void *ap),
     ARGMOD(call_state_item *sti))
@@ -159,8 +159,8 @@ void Parrot_init_ret_nci(PARROT_INTERP,
 
 PARROT_API
 void parrot_pass_args(PARROT_INTERP,
-    ARGMOD(parrot_context_t *src_ctx),
-    ARGMOD(parrot_context_t *dest_ctx),
+    ARGMOD(Parrot_Context *src_ctx),
+    ARGMOD(Parrot_Context *dest_ctx),
     ARGMOD(opcode_t *src_indexes),
     ARGMOD(opcode_t *dest_indexes),
     arg_pass_t param_or_result)
@@ -220,7 +220,7 @@ PARROT_WARN_UNUSED_RESULT
 opcode_t * parrot_pass_args_fromc(PARROT_INTERP,
     ARGIN(const char *sig),
     ARGMOD(opcode_t *dest),
-    ARGIN(parrot_context_t *old_ctxp),
+    ARGIN(Parrot_Context *old_ctxp),
     va_list ap)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -230,33 +230,29 @@ opcode_t * parrot_pass_args_fromc(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-void * set_retval(PARROT_INTERP, int sig_ret, ARGIN(parrot_context_t *ctx))
+void * set_retval(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 FLOATVAL set_retval_f(PARROT_INTERP,
     int sig_ret,
-    ARGIN(parrot_context_t *ctx))
+    ARGIN(Parrot_Context *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-INTVAL set_retval_i(PARROT_INTERP,
-    int sig_ret,
-    ARGIN(parrot_context_t *ctx))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC* set_retval_p(PARROT_INTERP, int sig_ret, ARGIN(parrot_context_t *ctx))
+INTVAL set_retval_i(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-STRING* set_retval_s(PARROT_INTERP,
-    int sig_ret,
-    ARGIN(parrot_context_t *ctx))
+PMC* set_retval_p(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+STRING* set_retval_s(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 

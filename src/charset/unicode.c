@@ -915,7 +915,7 @@ find_not_cclass(PARROT_INTERP, INTVAL flags,
 
 /*
 
-=item C<static STRING* string_from_codepoint>
+=item C<static STRING * string_from_codepoint>
 
 Returns a one-codepoint string for the given codepoint.
 

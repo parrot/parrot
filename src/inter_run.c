@@ -29,7 +29,7 @@ Various functions that call the run loop.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static parrot_context_t * runops_args(PARROT_INTERP,
+static Parrot_Context * runops_args(PARROT_INTERP,
     ARGIN(PMC *sub),
     ARGIN_NULLOK(PMC *obj),
     SHIM(STRING *meth),
@@ -114,7 +114,7 @@ runops(PARROT_INTERP, size_t offs)
 
 /*
 
-=item C<parrot_context_t * Parrot_runops_fromc>
+=item C<Parrot_Context * Parrot_runops_fromc>
 
 Runs the Parrot ops, called from C code. The function arguments are
 already setup according to Parrot calling conventions, the C<sub> argument
@@ -127,11 +127,11 @@ is an invocable C<Sub> PMC.
 PARROT_API
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
-parrot_context_t *
+Parrot_Context *
 Parrot_runops_fromc(PARROT_INTERP, ARGIN(PMC *sub))
 {
     opcode_t offset, *dest;
-    parrot_context_t *ctx;
+    Parrot_Context *ctx;
 
     /* we need one return continuation with a NULL offset */
     PMC * const ret_c    = new_ret_continuation_pmc(interp, NULL);
@@ -157,7 +157,7 @@ Parrot_runops_fromc(PARROT_INTERP, ARGIN(PMC *sub))
 
 /*
 
-=item C<static parrot_context_t * runops_args>
+=item C<static Parrot_Context * runops_args>
 
 Calls the PMC subroutine C<sub> with optional name C<meth>. If PMC object
 C<obj> is provided, the call is treated as a method call on that object.
@@ -180,16 +180,16 @@ TODO: Update this list of possible signature elements.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static parrot_context_t *
+static Parrot_Context *
 runops_args(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj),
         SHIM(STRING *meth), ARGIN(const char *sig), va_list ap)
 {
     opcode_t offset, *dest;
-    parrot_context_t *ctx;
+    Parrot_Context *ctx;
 
     char new_sig[10];
     const char *sig_p;
-    parrot_context_t * const old_ctx = CONTEXT(interp);
+    Parrot_Context * const old_ctx = CONTEXT(interp);
 
     interp->current_cont  = new_ret_continuation_pmc(interp, NULL);
     interp->current_object = obj;
@@ -258,7 +258,7 @@ PARROT_CAN_RETURN_NULL
 void *
 Parrot_run_meth_fromc(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj), SHIM(STRING *meth))
 {
-    parrot_context_t *ctx;
+    Parrot_Context *ctx;
     opcode_t offset, *dest;
 
     interp->current_cont   = new_ret_continuation_pmc(interp, NULL);
@@ -294,7 +294,7 @@ PMC *
 Parrot_runops_fromc_args(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(const char *sig), ...)
 {
     va_list args;
-    parrot_context_t *ctx;
+    Parrot_Context *ctx;
 
     va_start(args, sig);
     ctx = runops_args(interp, sub, PMCNULL, NULL, sig, args);
@@ -322,7 +322,7 @@ Parrot_runops_fromc_args_event(PARROT_INTERP, ARGIN(PMC *sub),
         ARGIN(const char *sig), ...)
 {
     va_list args;
-    parrot_context_t *ctx;
+    Parrot_Context *ctx;
     void *retval;
     /*
      * running code from event handlers isn't fully reentrant due to
@@ -365,7 +365,7 @@ Parrot_runops_fromc_args_reti(PARROT_INTERP, ARGIN(PMC *sub),
         ARGIN(const char *sig), ...)
 {
     va_list args;
-    parrot_context_t *ctx;
+    Parrot_Context *ctx;
 
     va_start(args, sig);
     ctx = runops_args(interp, sub, PMCNULL, NULL, sig, args);
@@ -392,7 +392,7 @@ Parrot_runops_fromc_args_retf(PARROT_INTERP, ARGIN(PMC *sub),
         ARGIN(const char *sig), ...)
 {
     va_list args;
-    parrot_context_t *ctx;
+    Parrot_Context *ctx;
 
     va_start(args, sig);
     ctx = runops_args(interp, sub, PMCNULL, NULL, sig, args);
@@ -420,7 +420,7 @@ Parrot_run_meth_fromc_args(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj
         ARGIN(STRING *meth), ARGIN(const char *sig), ...)
 {
     va_list args;
-    parrot_context_t *ctx;
+    Parrot_Context *ctx;
 
     va_start(args, sig);
     ctx = runops_args(interp, sub, obj, meth, sig, args);
@@ -447,7 +447,7 @@ Parrot_run_meth_fromc_args_reti(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC
         ARGIN(STRING *meth), ARGIN(const char *sig), ...)
 {
     va_list args;
-    parrot_context_t *ctx;
+    Parrot_Context *ctx;
 
     va_start(args, sig);
     ctx = runops_args(interp, sub, obj, meth, sig, args);
@@ -474,7 +474,7 @@ Parrot_run_meth_fromc_args_retf(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC
         ARGIN(STRING *meth), ARGIN(const char *sig), ...)
 {
     va_list args;
-    parrot_context_t *ctx;
+    Parrot_Context *ctx;
 
     va_start(args, sig);
     ctx = runops_args(interp, sub, obj, meth, sig, args);
@@ -501,7 +501,7 @@ void *
 Parrot_runops_fromc_arglist(PARROT_INTERP, ARGIN(PMC *sub),
         ARGIN(const char *sig), va_list args)
 {
-    parrot_context_t * const ctx = runops_args(interp, sub, PMCNULL, NULL, sig, args);
+    Parrot_Context * const ctx = runops_args(interp, sub, PMCNULL, NULL, sig, args);
 
     return set_retval(interp, *sig, ctx);
 }
@@ -524,7 +524,7 @@ INTVAL
 Parrot_runops_fromc_arglist_reti(PARROT_INTERP, ARGIN(PMC *sub),
         ARGIN(const char *sig), va_list args)
 {
-    parrot_context_t * const ctx = runops_args(interp, sub, PMCNULL, NULL, sig, args);
+    Parrot_Context * const ctx = runops_args(interp, sub, PMCNULL, NULL, sig, args);
 
     return set_retval_i(interp, *sig, ctx);
 }
@@ -547,7 +547,7 @@ FLOATVAL
 Parrot_runops_fromc_arglist_retf(PARROT_INTERP, ARGIN(PMC *sub),
         ARGIN(const char *sig), va_list args)
 {
-    parrot_context_t * const ctx = runops_args(interp, sub, PMCNULL, NULL, sig, args);
+    Parrot_Context * const ctx = runops_args(interp, sub, PMCNULL, NULL, sig, args);
 
     return set_retval_f(interp, *sig, ctx);
 }
@@ -571,7 +571,7 @@ void*
 Parrot_run_meth_fromc_arglist(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj),
         ARGIN(STRING *meth), ARGIN(const char *sig), va_list args)
 {
-    parrot_context_t *ctx;
+    Parrot_Context *ctx;
 
     ctx = runops_args(interp, sub, obj, meth, sig, args);
     return set_retval(interp, *sig, ctx);
@@ -597,7 +597,7 @@ INTVAL
 Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj),
         ARGIN(STRING *meth), ARGIN(const char *sig), va_list args)
 {
-    parrot_context_t * const ctx = runops_args(interp, sub, obj, meth, sig, args);
+    Parrot_Context * const ctx = runops_args(interp, sub, obj, meth, sig, args);
 
     return set_retval_i(interp, *sig, ctx);
 }
@@ -621,7 +621,7 @@ FLOATVAL
 Parrot_run_meth_fromc_arglist_retf(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj),
         ARGIN(STRING *meth), ARGIN(const char *sig), va_list args)
 {
-    parrot_context_t * const ctx = runops_args(interp, sub, obj, meth, sig, args);
+    Parrot_Context * const ctx = runops_args(interp, sub, obj, meth, sig, args);
     return set_retval_f(interp, *sig, ctx);
 }
 

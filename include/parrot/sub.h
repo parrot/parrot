@@ -157,7 +157,7 @@ typedef struct Parrot_sub {
     PMC      *lex_info;          /* LexInfo PMC */
     PMC      *outer_sub;         /* :outer for closures */
     PMC      *eval_pmc;          /* eval container / NULL */
-    parrot_context_t *ctx;       /* the context this sub is in */
+    Parrot_Context *ctx;         /* the context this sub is in */
     UINTVAL  comp_flags;         /* compile time and additional flags */
     Parrot_sub_arginfo *arg_info;/* Argument counts and flags. */
 
@@ -241,7 +241,7 @@ PMC * new_ret_continuation_pmc(PARROT_INTERP,
 
 PARROT_API
 int Parrot_Context_get_info(PARROT_INTERP,
-    ARGIN(const parrot_context_t *ctx),
+    ARGIN(const Parrot_Context *ctx),
     ARGOUT(Parrot_Context_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -252,7 +252,7 @@ PARROT_API
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING* Parrot_Context_infostr(PARROT_INTERP,
-    ARGIN(const parrot_context_t *ctx))
+    ARGIN(const Parrot_Context *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -274,7 +274,7 @@ void invalidate_retc_context(PARROT_INTERP, ARGMOD(PMC *cont))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*cont);
 
-void mark_context(PARROT_INTERP, ARGMOD(parrot_context_t* ctx))
+void mark_context(PARROT_INTERP, ARGMOD(Parrot_Context* ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(* ctx);
@@ -323,7 +323,7 @@ PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC* Parrot_find_pad(PARROT_INTERP,
     ARGIN(STRING *lex_name),
-    ARGIN(const parrot_context_t *ctx))
+    ARGIN(const Parrot_Context *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

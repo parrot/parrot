@@ -205,7 +205,7 @@ typedef union {
  */
 #define CTX_LEAK_DEBUG 1
 
-typedef struct Parrot_Context {
+struct Parrot_Context {
     /* common header with Interp_Context */
     struct Parrot_Context *caller_ctx;  /* caller context */
     Regs_ni                bp;          /* pointers to FLOATVAL & INTVAL */
@@ -243,9 +243,7 @@ typedef struct Parrot_Context {
      * to simplify conversio between code ptrs in e.g. invoke
      */
     size_t pred_offset;
-} parrot_context_t;
-
-typedef parrot_context_t Parrot_Context;
+};
 
 struct _Thread_data;    /* in thread.h */
 struct _Caches;         /* caches .h */
@@ -633,7 +631,7 @@ INTVAL Parrot_run_meth_fromc_args_reti(PARROT_INTERP,
 PARROT_API
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
-parrot_context_t * Parrot_runops_fromc(PARROT_INTERP, ARGIN(PMC *sub))
+Parrot_Context * Parrot_runops_fromc(PARROT_INTERP, ARGIN(PMC *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

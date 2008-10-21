@@ -225,8 +225,8 @@ destination to continue execution.
 
     VTABLE opcode_t *invoke(void *next) {
         Parrot_cont      *cc           = PMC_cont(SELF);
-        parrot_context_t *from_ctx     = CONTEXT(interp);
-        parrot_context_t *to_ctx       = cc->to_ctx;
+        Parrot_Context   *from_ctx     = CONTEXT(interp);
+        Parrot_Context   *to_ctx       = cc->to_ctx;
         opcode_t         *pc           = cc->address;
 
         Parrot_continuation_check(interp, SELF, cc);

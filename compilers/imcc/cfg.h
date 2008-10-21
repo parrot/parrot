@@ -108,7 +108,7 @@ Life_range * make_life_range(ARGMOD(SymReg *r), int idx)
 PARROT_WARN_UNUSED_RESULT
 int natural_preheader(
     ARGIN(const IMC_Unit *unit),
-    ARGIN(const Loop_info* loop_info))
+    ARGIN(const Loop_info *loop_info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

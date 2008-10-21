@@ -39,7 +39,7 @@ Parrot's LexPad throws an exception for unknown names.
 =cut
 
 op store_lex(in STR, invar PMC) {
-    parrot_context_t * const ctx      = CONTEXT(interp);
+    Parrot_Context   * const ctx      = CONTEXT(interp);
     STRING           * const lex_name = $1;
     PMC              * const lex_pad  = Parrot_find_pad(interp, lex_name, ctx);
 
@@ -62,7 +62,7 @@ standard LexPad throws and exception for non-existing names.
 =cut
 
 op find_lex(out PMC, in STR) {
-    parrot_context_t * const ctx      = CONTEXT(interp);
+    Parrot_Context   * const ctx      = CONTEXT(interp);
     STRING           * const lex_name = $2;
     PMC              * const lex_pad  = Parrot_find_pad(interp, lex_name, ctx);
 

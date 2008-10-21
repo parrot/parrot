@@ -254,7 +254,7 @@ typedef struct dotnet_managed_ptr {
     Dotnet_Ptr_Type type;
     union {
         PMC* pmc;              /* For arrays, fields and PMCs. */
-        parrot_context_t *ctx; /* For registers. */
+        Parrot_Context *ctx;   /* For registers. */
     };
     union {
         int index;             /* For arrays. */

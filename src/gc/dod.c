@@ -254,7 +254,7 @@ int
 Parrot_dod_trace_root(PARROT_INTERP, int trace_stack)
 {
     Arenas           * const arena_base = interp->arena_base;
-    parrot_context_t *ctx;
+    Parrot_Context   *ctx;
 
     /* note: adding locals here did cause increased DOD runs */
 

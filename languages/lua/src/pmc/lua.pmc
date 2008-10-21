@@ -33,7 +33,7 @@ INTVAL dynpmc_LuaUserdata;
 static PMC * Lua_PMC;
 
 static STRING*
-context_infostr(PARROT_INTERP, parrot_context_t *ctx)
+context_infostr(PARROT_INTERP, Parrot_Context *ctx)
 {
     Parrot_Context_info info;
     STRING *res = NULL;
@@ -110,7 +110,7 @@ information see F<src/pmc.c>.
 
 */
     METHOD STRING* caller() {
-        parrot_context_t *sub_ctx = CONTEXT(interp)->caller_ctx;
+        Parrot_Context   *sub_ctx = CONTEXT(interp)->caller_ctx;
         STRING           *retval;
 
         /* backtrace: follow the continuation chain */
@@ -356,7 +356,7 @@ information see F<src/pmc.c>.
         STRING *str;
 
         /* information about the current sub */
-        parrot_context_t *sub_ctx = CONTEXT(interp)->caller_ctx;
+        Parrot_Context *sub_ctx = CONTEXT(interp)->caller_ctx;
 
         if (level == 0) {
             str = context_infostr(INTERP, sub_ctx);
@@ -396,7 +396,7 @@ information see F<src/pmc.c>.
 
 */
     METHOD STRING* where() {
-        parrot_context_t *sub_ctx = CONTEXT(interp)->caller_ctx;
+        Parrot_Context   *sub_ctx = CONTEXT(interp)->caller_ctx;
         STRING           *retval;
 
         /* backtrace: follow the continuation chain */

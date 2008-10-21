@@ -1494,7 +1494,7 @@ Parrot_get_results_pc {
         emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EAX, emit_None, 1,
                 offsetof(Interp, ctx.state));
         emitm_movl_i_m(NATIVECODE, jit_info->cur_op, emit_EAX, emit_None, 1,
-                offsetof(parrot_context_t, current_results));
+                offsetof(Parrot_Context, current_results));
     }
     else {
         PackFile_Constant ** constants;
