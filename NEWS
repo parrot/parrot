@@ -5,6 +5,7 @@ New in 0.8.0
   + float precision expanded to 15 significant digits from 6
   + large integers autopromoted in PIR so as not to lose precision
   + improved precision of complex square root
+  + exception handlers can register types of exceptions they catch
 - Languages
   + Cardinal (Ruby)
     - implemented gather, take, and yield builtins
@@ -22,7 +23,18 @@ New in 0.8.0
     - improved parsing of literal numbers
     - support for hyphens and dashes in identifiers
     - next() on for-loops
+    - fixed floating point constant precision
+    - improved namespace handling, closer to STD.pm model
+    - support for exporting symbols
 - Compilers
+  + P6object
+    - now generates classes in nested namespaces instead of :: names
+    - supports class creation in caller's HLL namespace
+  + PCT / PGE
+    - now using true nested namespaces instead of :: names
+    - cleaned up HLLCompiler interactive prompts and readline mode
+    - updated to use typed exception handler registration
+    - added initial support for loop control exceptions
   + PIRC
     - fixed Heredoc preprocessor
     - cleaned up Macro preprocessor
