@@ -215,7 +215,7 @@ OUTPUT
 }    #skip x86_64
 
 SKIP: {
-    skip ('Intermittent failures on Darwin', 1) if $^O =~ /darwin/;
+    skip( "Intermittent failures on several platforms (See RT #59790)", 1 );
 
 pir_output_is( <<'CODE', <<'OUTPUT', "wait + invalidate outer transcation" );
 .const int N = 50
