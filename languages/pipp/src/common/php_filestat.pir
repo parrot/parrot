@@ -123,7 +123,9 @@ Returns true if filename exists
 
 .sub 'file_exists'
     .param pmc args :slurpy
-    .STAT($I0, args, .STAT_EXISTS)
+    .local int stat_const
+    stat_const = .STAT_EXISTS
+    .STAT($I0, args, stat_const)
     .RETURN_BOOL($I0)
 .end
 
@@ -135,7 +137,9 @@ Get last access time of file
 
 .sub 'fileatime'
     .param pmc args :slurpy
-    .STAT($I0, args, .STAT_ACCESSTIME)
+    .local int stat_const
+    stat_const = .STAT_ACCESSTIME
+    .STAT($I0, args, stat_const)
     .RETURN_LONG($I0)
 .end
 
@@ -147,7 +151,9 @@ Get inode modification time of file
 
 .sub 'filectime'
     .param pmc args :slurpy
-    .STAT($I0, args, .STAT_CREATETIME)
+    .local int stat_const
+    stat_const = .STAT_CREATETIME
+    .STAT($I0, args, stat_const)
     .RETURN_LONG($I0)
 .end
 
@@ -159,7 +165,9 @@ Get file group
 
 .sub 'filegroup'
     .param pmc args :slurpy
-    .STAT($I0, args, .STAT_GID)
+    .local int stat_const
+    stat_const = .STAT_GID
+    .STAT($I0, args, stat_const)
     .RETURN_LONG($I0)
 .end
 
@@ -170,9 +178,7 @@ Get file inode
 =cut
 
 .sub 'fileinode'
-    .param pmc args :slurpy
-    .STAT($I0, args, .STAT_PLATFORM_INODE)
-    .RETURN_LONG($I0)
+    not_implemented()
 .end
 
 =item C<int filemtime(string filename)>
@@ -183,7 +189,9 @@ Get last modification time of file
 
 .sub 'filemtime'
     .param pmc args :slurpy
-    .STAT($I0, args, .STAT_MODIFYTIME)
+    .local int stat_const
+    stat_const = .STAT_MODIFYTIME
+    .STAT($I0, args, stat_const)
     .RETURN_LONG($I0)
 .end
 
@@ -195,7 +203,9 @@ Get file owner
 
 .sub 'fileowner'
     .param pmc args :slurpy
-    .STAT($I0, args, .STAT_UID)
+    .local int stat_const
+    stat_const = .STAT_UID
+    .STAT($I0, args, stat_const)
     .RETURN_LONG($I0)
 .end
 
@@ -206,9 +216,7 @@ Get file permissions
 =cut
 
 .sub 'fileperms'
-    .param pmc args :slurpy
-    .STAT($I0, args, .STAT_PLATFORM_MODE)
-    .RETURN_LONG($I0)
+    not_implemented()
 .end
 
 =item C<int filesize(string filename)>
@@ -219,7 +227,9 @@ Get file size
 
 .sub 'filesize'
     .param pmc args :slurpy
-    .STAT($I0, args, .STAT_FILESIZE)
+    .local int stat_const
+    stat_const = .STAT_FILESIZE
+    .STAT($I0, args, stat_const)
     .RETURN_LONG($I0)
 .end
 
@@ -243,7 +253,9 @@ Returns true if file is directory
 
 .sub 'is_dir'
     .param pmc args :slurpy
-    .STAT($I0, args, .STAT_ISDIR)
+    .local int stat_const
+    stat_const = .STAT_ISDIR
+    .STAT($I0, args, stat_const)
     .RETURN_BOOL($I0)
 .end
 
