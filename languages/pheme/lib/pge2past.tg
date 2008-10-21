@@ -103,7 +103,7 @@ transform past (list_item) :language('PIR') {
     .return tree.'get'( 'past', elem, key_name )
 }
 
-transform special_form (PAST::Op) :language('PIR') {
+transform special_form (PAST;Op) :language('PIR') {
     .local pmc make_cons
     make_cons = node[0]
 
@@ -120,7 +120,7 @@ transform special_form (PAST::Op) :language('PIR') {
 }
 
 # this *may* be an application; this is an optimization
-transform application (PAST::Op) :language('PIR') {
+transform application (PAST;Op) :language('PIR') {
     .local pmc make_cons
     make_cons = node[0]
 
@@ -166,7 +166,7 @@ transform application (PAST::Op) :language('PIR') {
     .return( result )
 }
 
-transform cons (PAST::Op) :language('PIR') {
+transform cons (PAST;Op) :language('PIR') {
     .local pmc make_cons
     make_cons = node[0]
     .return( make_cons )
@@ -221,7 +221,7 @@ transform special_form (define) :language('PIR') {
     .return( result )
 }
 
-transform quote (PAST::Op) :language( 'PIR' ) {
+transform quote (PAST;Op) :language( 'PIR' ) {
     .local pmc children
     children = node.'get_array'()
 
@@ -253,7 +253,7 @@ transform quote (PAST::Op) :language( 'PIR' ) {
     .return( node )
 }
 
-transform force_to_val (PAST::Op) :language('PIR') {
+transform force_to_val (PAST;Op) :language('PIR') {
     .local pmc result
     result = new ['PAST';'Val']
 
@@ -276,15 +276,15 @@ transform force_to_val (PAST::Op) :language('PIR') {
     .return( node )
 }
 
-transform force_to_val (PAST::Val) :language('PIR') {
+transform force_to_val (PAST;Val) :language('PIR') {
     .return( node )
 }
 
-transform force_to_val (PAST::Var) :language('PIR') {
+transform force_to_val (PAST;Var) :language('PIR') {
     .return( node )
 }
 
-transform cond (PAST::Op) :language( 'PIR' ) {
+transform cond (PAST;Op) :language( 'PIR' ) {
     .local pmc result
     result = new ['PAST';'Op']
     result.'pasttype'( 'if' )
@@ -331,7 +331,7 @@ transform cond (PAST::Op) :language( 'PIR' ) {
     .return( result )
 }
 
-transform lambda (PAST::Op) :language('PIR') {
+transform lambda (PAST;Op) :language('PIR') {
     .local pmc result
     result = new ['PAST';'Block']
     result.'blocktype'( 'declaration' )
@@ -385,13 +385,13 @@ transform lambda (PAST::Op) :language('PIR') {
     result.'push'( child )
     goto child_iter_loop
 
-    # XXX - must rewrite all PAST::Val in children to PAST::Var as appropriate
+    # XXX - must rewrite all PAST;Val in children to PAST;Var as appropriate
   child_iter_end:
     rewrite_args = pop arg_names_stack
     .return( result )
 }
 
-transform rewrite_var_name (PAST::Op) :language('PIR') {
+transform rewrite_var_name (PAST;Op) :language('PIR') {
     .local pmc children
     children = node.'get_array'()
 
@@ -414,7 +414,7 @@ transform rewrite_var_name (PAST::Op) :language('PIR') {
     .return( node )
 }
 
-transform rewrite_var_name (PAST::Val) :language('PIR') {
+transform rewrite_var_name (PAST;Val) :language('PIR') {
     .local pmc arg_names_stack
     arg_names_stack = find_global 'arg_names_stack'
 
@@ -438,11 +438,11 @@ transform rewrite_var_name (PAST::Val) :language('PIR') {
     .return( var )
 }
 
-transform rewrite_var_name (PAST::Var) :language('PIR') {
+transform rewrite_var_name (PAST;Var) :language('PIR') {
     .return( node )
 }
 
-transform define (PAST::Op) :language('PIR') {
+transform define (PAST;Op) :language('PIR') {
     .local pmc iter
     iter = node.'iterator'()
 
