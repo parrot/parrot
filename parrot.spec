@@ -1,11 +1,11 @@
 Name:           parrot
-Version:        0.7.1
+Version:        0.8.0
 Release:        1%{?dist}
 Summary:        Parrot Virtual Machine
 License:        Artistic 2.0
 Group:          Development/Libraries
-URL:            http://www.parrotcode.org/
-Source0:        http://www.cpan.org/authors/id/P/PM/PMIC/parrot-%{version}.tar.gz
+URL:            http://www.parrot.org/
+Source0:        http://www.cpan.org/authors/id/P/PA/PARTICLE/parrot-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  readline-devel
 BuildRequires:  ncurses-devel
@@ -132,6 +132,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Tue Oct 21 2008 particle <particle@parrot.org> 0.8.0
+- updated to 0.8.0
+
 * Tue Sep 16 2008 pmichaud <pmichaud@pobox.com> 0.7.1
 - updated to 0.7.1
 
