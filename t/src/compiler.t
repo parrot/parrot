@@ -8,7 +8,9 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan tests => 6;
+$^O eq 'MSWin32'
+    ? plan( skip_all => 'linking problem' )
+    : plan( tests => 6 );
 
 =head1 NAME
 
