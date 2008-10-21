@@ -7,7 +7,7 @@ New in 0.8.0
   + improved precision of complex square root
 - Languages
   + Cardinal (Ruby)
-    - implemented yield builtin
+    - implemented gather, take, and yield builtins
     - Range, Time, Math, GC, Kernel classes
     - many more tests
     - added a new committer
@@ -31,10 +31,10 @@ New in 0.8.0
   + IMCC
     - Added .tailcall syntax to replace .return in tailcall context
 - Examples
-  + Added pirric, an old style line numbered Basic interpreter able to
-    use parrot objects, an example of using the mysql nci example from
-    it, and an example of using the interpreter classes to write and
-    run a Basic program from a Basic program.
+  + pirric (BASIC)
+    - an old style line numbered Basic interpreter able to use parrot objects
+    - example connecting to mysql via nci
+    - example using classes to write and run an embedded Basic program
 
 New in 0.7.1
 - Implementation
