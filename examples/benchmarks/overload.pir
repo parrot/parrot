@@ -3,9 +3,6 @@
 .sub bench :main
 .include "pmctypes.pasm"
 .include "mmd.pasm"
-   .local pmc my_mul
-   my_mul = global "my_mul"
-   add_multi .MMD_MULTIPLY, .Integer, .Integer, my_mul
    .local int i
    .local pmc r
    .local pmc a
@@ -26,7 +23,7 @@ loop:
 .end
 
 
-.sub my_mul
+.sub my_mul :multi(Integer, Integer, Integer)
    .param pmc left
    .param pmc right
    .param pmc dest
