@@ -23,6 +23,8 @@ New in October 2008 release
     - cleaned up Macro preprocessor
     - many code clean-ups, warning fixes and consting
     - updated Makefile for easier compilation
+  + IMCC
+    - Added .tailcall syntax to replace .return in tailcall context
 
 New in 0.7.1
 - Implementation
