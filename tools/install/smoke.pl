@@ -5,9 +5,9 @@
 use strict;
 use warnings;
 use 5.008;
+
 use Getopt::Long;
-use lib qw( lib );
-use vars qw( %PConfig );
+use File::Spec::Functions;
 
 use Test::More tests => 28;
 
@@ -17,22 +17,21 @@ tools/install/smoke.pl - checks parrot in install directory
 
 =head1 SYNOPSIS
 
-  parrot in bin
+parrot in bin
 
     % cd /usr/local/parrot-$version
-    % perl tools/install/smoke.pl -Ilib
+    % perl tools/install/smoke.pl
 
-  parrot in .
+parrot in .
 
     % perl tools/install/smoke.pl --bindir=.
 
-  test installation in DESTDIR:
+test installation in DESTDIR:
 
     % cd /usr/src/parrot
     % mkdir .inst
     % make install DESTDIR=.inst
     % perl tools/install/smoke.pl DESTDIR=.inst
-
 
 =head1 DESCRIPTION
 
@@ -43,68 +42,29 @@ try to detect missing parts.
 
 =over
 
-=item -I libdir
-
-Add libdir to the libpath to find Parrot::Config
-
 =item --bindir=/usr/bin
 
-Override Parrot::Config bindir
+Override default value : 'bin'
 
 =item --libdir=/usr/lib
 
-Override Parrot::Config libdir
-
-=item --prefix=/usr
-
-Override Parrot::Config prefix and adjust
-libdir and bindir accordingly.
-
-=item DESTDIR=instpath
-
-Use the temp. installation in instpath.
+Override default value : 'lib'
 
 =back
 
 =cut
 
-my (@libdirs, $prefix, $bindir, $libdir, $DESTDIR);
-my $opts = GetOptions( 'I=s'       => \@libdirs,
-                       'prefix=s'  => \$prefix,
-                       'bindir=s'  => \$bindir,
-                       'libdir=s'  => \$libdir,
-                       'DESTDIR=s' => \$DESTDIR,
-                     );
-if (@libdirs) {
-    push @INC, @libdirs;
-}
-require Parrot::Config;
-Parrot::Config->import;
-require Parrot::Test;
+my ($bindir, $libdir, $DESTDIR);
+my $opts = GetOptions(
+    'bindir=s'  => \$bindir,
+    'libdir=s'  => \$libdir,
+    'DESTDIR=s' => \$DESTDIR,
+);
 
-$bindir = $PConfig{bindir} unless $bindir;
-$libdir = $PConfig{libdir} unless $libdir;
-if ($prefix) {
-    $bindir = $prefix . "/bin";
-    $libdir = $prefix . "/lib";
-}
-# Check for DESTDIR arg and adjust the path
-if (@ARGV and $ARGV[0] =~ /^DESTDIR/) {
-    if ($ARGV[0] =~ /^DESTDIR=(\S+)/) {
-        $DESTDIR = $1;
-    }
-    else {
-        $DESTDIR = $ARGV[1];
-    }
-}
-if ($DESTDIR) {
-    my $envsep = $^O eq 'MSWin32' ? ';' : ':';
-    $ENV{PATH} = $DESTDIR.$bindir.$envsep.$ENV{PATH};
-    $bindir = $DESTDIR . $bindir;
-    $libdir = $DESTDIR . $libdir;
-}
+$bindir = 'bin' unless $bindir;
+$libdir = 'lib' unless $libdir;
 
-use File::Spec::Functions;
+chdir $DESTDIR if ($DESTDIR);
 
 my $filename;
 my $exe;
@@ -115,7 +75,6 @@ my $parrot = catfile($bindir, 'parrot');
 #
 # parrot executable
 #
--x $parrot or die "$parrot does not exist\n";
 
 $exe = catfile($bindir, 'pbc_merge');
 $out = `$exe`;
