@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 
 =head1 NAME
 
@@ -84,6 +84,15 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'say and print with a number register' );
 CODE
 3.14159
 3.14159
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'say with PMCNULL argument (RT #59532)' );
+.sub 'main'
+    null $P0
+    say $P0
+.end
+CODE
+/Null PMC in say/
 OUTPUT
 
 # Local Variables:

@@ -223,11 +223,18 @@ op say(in STR) :base_io {
 }
 
 op say(invar PMC) :base_io {
-  PMC * const p = $1;
-  STRING * const s = (VTABLE_get_string(interp, p));
-  if (s)
-    PIO_putps(interp, _PIO_STDOUT(interp), s);
-  PIO_puts(interp, _PIO_STDOUT(interp), "\n");
+  PMC    * const p = $1;
+
+  if (PMC_IS_NULL(p)) {
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+        "Null PMC in say");
+  }
+  else {
+    STRING * const s = VTABLE_get_string(interp, p);
+    if (s)
+        PIO_putps(interp, _PIO_STDOUT(interp), s);
+    PIO_puts(interp, _PIO_STDOUT(interp), "\n");
+  }
 }
 
 
