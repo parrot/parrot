@@ -227,17 +227,6 @@ methods are now called 'list', 'hash', and 'item' respectively.
 
 =back
 
-=head2 P6object class creation
-
-=over 4
-
-=item P6object .new_class('Foo::Bar') will create ['Foo';'Bar'] [post 0.7.1]
-
-See RT #58932.  Strings passed as class names to P6object will be
-automatically separated on double-colons.
-
-=back
-
 =head2 Functions
 
 =over 4
