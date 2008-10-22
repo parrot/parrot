@@ -1,0 +1,100 @@
+/*
+Copyright (C) 2001-2008, The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/packfilesegment.pmc - PackfileSegment PMC
+
+=head1 DESCRIPTION
+
+This class implements a PackfileSegment class, an abstract class defining a
+couple of methods which all Packfile segments will implement.  The stub methods
+found here explode when called.
+
+See packfile.pmc for the toplevel Packfile interface; see PDD13 for the design
+spec.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass PackfileSegment {
+
+
+/*
+
+=item C<void init()>
+
+Initialize the structure.  (Create a blank PackFile_Segment object.)
+
+=cut
+
+*/
+    VTABLE void init() {
+        PMC_data(SELF) = PackFile_Segment_new(interp, NULL, "", 0);
+    }
+
+
+/*
+
+=item C<STRING *pack()>
+
+Serialize the segment.
+
+=cut
+
+*/
+    METHOD pack() {
+        PackFile_Segment *pfseg = PMC_data_typed(SELF, PackFile_Segment *);
+        opcode_t length = PackFile_Segment_packed_size(interp, pfseg) * sizeof (opcode_t);
+        opcode_t *newptr, *ptr = (opcode_t*)mem_sys_allocate(length);
+        STRING *str;
+        newptr = PackFile_Segment_pack(interp, pfseg, ptr);
+        /* FIXME: PARROT_BINARY_CHARSET seems like a better choice, but the
+         * comparison function for the binary charset plugin always returns
+         * "equal", which means tests fail.
+         */
+        str = string_make_direct(interp, (const char*)ptr,
+                (newptr - ptr) * sizeof (opcode_t),
+                PARROT_FIXED_8_ENCODING, PARROT_DEFAULT_CHARSET, 0);
+        mem_sys_free(ptr);
+        RETURN(STRING *str);
+    }
+
+
+/*
+
+=item C<void unpack(STRING *data)>
+
+Unpack a serialized segment string.
+
+=cut
+
+*/
+    METHOD unpack(STRING *data) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                                    "unpack() not implemented.");
+    }
+
+}
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

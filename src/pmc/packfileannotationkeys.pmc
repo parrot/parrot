@@ -1,0 +1,101 @@
+/*
+Copyright (C) 2001-2008, The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/packfileannotationkeys.pmc - PackfileAnnotationKeys PMC
+
+=head1 DESCRIPTION
+
+This class implements a PackfileAnnotationKeys object, an array storing the
+table of keys and types contained within a PackfileAnnotations container.
+
+See packfile.pmc for the toplevel Packfile interface, see packfilesegment.pmc
+for the list of common methods every packfile segment pmc must implement; see
+PDD13 for the design spec.
+
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass PackfileAnnotationKeys {
+
+/*
+
+=item C<STRING *get_string_keyed_int(INTVAL index)>
+
+Fetch the given entry's name key.
+
+=cut
+
+*/
+    VTABLE STRING *get_string_keyed_int(INTVAL index)  {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<void set_string_keyed_int(INTVAL index, STRING *value)>
+
+Store the given entry's name key.
+
+=cut
+
+*/
+    VTABLE void set_string_keyed_int(INTVAL index, STRING *value)  {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<INTVAL get_integer_keyed_int(INTVAL index)>
+
+Fetch the given entry's annotation type.
+
+=cut
+
+*/
+    VTABLE INTVAL get_integer_keyed_int(INTVAL index)  {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<void set_integer_keyed_int(INTVAL index, INTVAL value)>
+
+Store the given entry's annotation type.
+
+=cut
+
+*/
+    VTABLE void set_integer_keyed_int(INTVAL index, INTVAL value)  {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+}
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

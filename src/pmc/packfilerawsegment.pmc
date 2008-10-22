@@ -1,0 +1,88 @@
+/*
+Copyright (C) 2001-2008, The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/packfilerawsegment.pmc - PackfileRawSegment PMC
+
+=head1 DESCRIPTION
+
+This class implements a PackfileRawSegment object, a low level view of a
+segment that just splits it into an array of integers.
+
+See packfile.pmc for the toplevel Packfile interface, see packfilesegment.pmc
+for the list of common methods every packfile segment pmc must implement; see
+PDD13 for the design spec.
+
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass PackfileRawSegment extends PackfileSegment {
+
+
+/*
+
+=item C<INTVAL elements()>
+
+Get the number of elements in the array.
+
+=cut
+
+*/
+    VTABLE INTVAL elements() {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<INTVAL get_integer_keyed_int(INTVAL key)>
+
+Fetch an integer's worth of data from the segment.
+
+=cut
+
+*/
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key)  {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<void set_integer_keyed_int(INTVAL key, INTVAL value)>
+
+Set an integer's worth of data in the segment.
+
+=cut
+
+*/
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value)  {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+}
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

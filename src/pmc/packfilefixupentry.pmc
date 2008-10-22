@@ -1,0 +1,122 @@
+/*
+Copyright (C) 2001-2008, The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/packfilefixupentry.pmc - PackfileFixupEntry PMC
+
+=head1 DESCRIPTION
+
+This class implements a PackfileFixupEntry object.  It is an element in the
+PackfileFixupTable segment of the .pbc file.  See PDD13 for a design spec.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass PackfileFixupEntry {
+
+/*
+
+=item C<STRING *get_string()>
+
+Fetch the label field of the fixup entry.
+
+=cut
+
+*/
+    VTABLE STRING *get_string() {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+/*
+
+=item C<void set_string_native(STRING *value)>
+
+Set the label field of the fixup entry.
+
+=cut
+
+*/
+    VTABLE void set_string_native(STRING *value) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Fetch the offset field of the fixup entry.
+
+=cut
+
+*/
+    VTABLE INTVAL get_integer() {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<void set_integer_native(INTVAL offset)>
+
+Set the offset field of the fixup entry.
+
+=cut
+
+*/
+    VTABLE void set_integer_native(INTVAL offset) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<INTVAL get_type()>
+
+Fetch the type field of the fixup entry.
+
+=cut
+
+*/
+    INTVAL get_type() {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<void set_type(INTVAL type)>
+
+Set the type field of the fixup entry.
+
+=cut
+
+*/
+    void set_type(INTVAL offset) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+}
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

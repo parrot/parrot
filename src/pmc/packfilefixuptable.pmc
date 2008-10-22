@@ -1,0 +1,88 @@
+/*
+Copyright (C) 2001-2008, The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/packfilefixuptable.pmc - PackfileFixupTable PMC
+
+=head1 DESCRIPTION
+
+This class implements a PackfileFixupTable object, a segment of the .pbc
+data file storing an array of PackfileFixupEntry PMCs.
+
+See packfile.pmc for the toplevel Packfile interface, see packfilesegment.pmc
+for the list of common methods every packfile segment pmc must implement; see
+PDD13 for the design spec.
+
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass PackfileFixupTable extends PackfileSegment {
+
+
+/*
+
+=item C<INTVAL elements()>
+
+Get the number of elements in the array.
+
+=cut
+
+*/
+    VTABLE INTVAL elements() {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<PMC *get_pmc_keyed_int(INTVAL index)>
+
+Fetch the given PackfileFixupEntry PMC.
+
+=cut
+
+*/
+    VTABLE PMC *get_pmc_keyed_int(INTVAL index)  {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<void set_pmc_keyed_int(INTVAL index, PMC *value)>
+
+Store a PackfileFixupEntry PMC to the given slot.
+
+=cut
+
+*/
+    VTABLE void set_pmc_keyed_int(INTVAL index, PMC *value)  {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+}
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

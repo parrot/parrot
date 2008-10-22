@@ -1,0 +1,315 @@
+/*
+Copyright (C) 2001-2008, The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/packfile.pmc - Packfile PMC
+
+=head1 DESCRIPTION
+
+This class implements a Packfile object, as specified in PDD13.  This object is
+the top level parser and serializer for *.pbc files.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "pmc_packfiledirectory.h"
+
+pmclass Packfile {
+
+/*
+
+=item C<void init()>
+
+Initialize the structure.  (Create a blank PackFile object.)
+
+=cut
+
+*/
+    VTABLE void init() {
+        PObj_active_destroy_SET(SELF);
+        PMC_data(SELF) = PackFile_new(interp, 0);
+    }
+
+
+/*
+
+=item C<void destroy()>
+
+Destroys the PackFile object.
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+        PackFile_destroy(interp, PMC_data_typed(SELF, PackFile *));
+    }
+
+/*
+
+=item C<STRING *get_string()>
+
+Return raw serialized PBC file data.
+
+=cut
+
+*/
+    VTABLE STRING *get_string() {
+        PackFile *pf = PMC_data_typed(SELF, PackFile *);
+        opcode_t length = PackFile_pack_size(interp, pf) * sizeof (opcode_t);
+        opcode_t *ptr = (opcode_t*)mem_sys_allocate(length);
+        STRING *str;
+        PackFile_pack(interp, pf, ptr);
+        /* FIXME: PARROT_BINARY_CHARSET seems like a better choice, but the
+         * comparison function for the binary charset plugin always returns
+         * "equal", which means tests fail.
+         */
+        str = string_make_direct(interp, (const char*)ptr, length,
+                PARROT_FIXED_8_ENCODING, PARROT_DEFAULT_CHARSET, 0);
+        mem_sys_free(ptr);
+        return str;
+    }
+
+/*
+
+=item C<void set_string_native(STRING *str)>
+
+Parse raw serialized PBC file data into the Packfile data structure.
+
+=cut
+
+Implementation note: taken from the bottom end of Parrot_readbc().
+*/
+    VTABLE void set_string_native(STRING *str) {
+        PackFile *pf = PMC_data_typed(SELF, PackFile *);
+        const opcode_t *ptr = (const opcode_t*)Parrot_string_cstring(interp, str);
+        int length = string_length(interp, str);
+        if (!PackFile_unpack(interp, pf, ptr, length))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+                                        "Can't unpack packfile.");
+
+        /* Set :main routine */
+        do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
+    }
+
+
+/*
+
+=item C<INTVAL get_integer_keyed_str(STRING *key)>
+
+Fetch an integer keyed value from the packfile object.  Valid keys are:
+
+=over 4
+
+=item wordsize
+
+=item byteorder
+
+=item fptype
+
+=item version_major
+
+=item version_minor
+
+=item version_patch
+
+=item bytecode_major
+
+=item bytecode_minor
+
+=item uuid_type
+
+=item uuid_length
+
+=back
+
+=cut
+
+*/
+    VTABLE INTVAL get_integer_keyed_str(STRING *key) {
+        PackFile *pf = PMC_data_typed(SELF, PackFile *);
+        if (!string_compare(interp, key, CONST_STRING(interp, "wordsize")))
+            return pf->header->wordsize;
+        if (!string_compare(interp, key, CONST_STRING(interp, "byteorder")))
+            return pf->header->byteorder;
+        if (!string_compare(interp, key, CONST_STRING(interp, "fptype")))
+            return pf->header->floattype;
+        if (!string_compare(interp, key, CONST_STRING(interp, "version_major")))
+            return pf->header->major;
+        if (!string_compare(interp, key, CONST_STRING(interp, "version_minor")))
+            return pf->header->minor;
+        if (!string_compare(interp, key, CONST_STRING(interp, "version_patch")))
+            return pf->header->patch;
+        if (!string_compare(interp, key, CONST_STRING(interp, "bytecode_major")))
+            return pf->header->bc_major;
+        if (!string_compare(interp, key, CONST_STRING(interp, "bytecode_minor")))
+            return pf->header->bc_minor;
+        if (!string_compare(interp, key, CONST_STRING(interp, "uuid_type")))
+            return pf->header->uuid_type;
+        if (!string_compare(interp, key, CONST_STRING(interp, "uuid_length")))
+            return pf->header->uuid_size;
+
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_KEY_NOT_FOUND,
+                       "PackFile: No such integer key \"%s\"",
+                       Parrot_string_cstring(interp, key));
+    }
+
+/*
+
+=item C<STRING *get_string_keyed_str(STRING *key)>
+
+Fetch a string keyed value from the packfile object.  Valid keys are:
+
+=over 4
+
+=item uuid
+
+=back
+
+=cut
+
+*/
+    VTABLE STRING *get_string_keyed_str(STRING *key) {
+        PackFile *pf = PMC_data_typed(SELF, PackFile *);
+        if (!string_compare(interp, key, CONST_STRING(interp, "uuid")))
+            return string_from_cstring(interp, (char*)pf->header->uuid_data, pf->header->uuid_size);
+
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_KEY_NOT_FOUND,
+                       "PackFile: No such string key \"%s\"",
+                       Parrot_string_cstring(interp, key));
+    }
+
+
+/*
+
+=item C<INTVAL get_integer_keyed(PMC *key)>
+
+Fetch a keyed integer value from the packfile object.  Dispatches to
+get_integer_keyed_str.
+
+=cut
+
+*/
+    VTABLE INTVAL get_integer_keyed(PMC *key) {
+        STRING * const s = VTABLE_get_string(INTERP, key);
+        return SELF.get_integer_keyed_str(s);
+    }
+
+
+/*
+
+=item C<STRING *get_string_keyed(PMC *key)>
+
+Fetch a keyed string value from the packfile object.  Dispatches to
+get_string_keyed_str.
+
+=cut
+
+*/
+    VTABLE STRING *get_string_keyed(PMC *key) {
+        STRING * const s = VTABLE_get_string(INTERP, key);
+        return SELF.get_string_keyed_str(s);
+    }
+
+/*
+
+=item C<void set_integer_keyed_str(STRING *key, INTVAL value)>
+
+Set an integer keyed value to the specified value.  Valid keys are:
+
+=over 4
+
+=item version_major
+
+=item version_minor
+
+=item version_patch
+
+=item uuid_type
+
+=back
+
+=cut
+
+*/
+    VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
+        PackFile *pf = PMC_data_typed(SELF, PackFile *);
+        if (!string_compare(interp, key, CONST_STRING(interp, "version_major"))) {
+            pf->header->major = value;
+            return;
+        }
+        if (!string_compare(interp, key, CONST_STRING(interp, "version_minor"))) {
+            pf->header->minor = value;
+            return;
+        }
+        if (!string_compare(interp, key, CONST_STRING(interp, "version_patch"))) {
+            pf->header->patch = value;
+            return;
+        }
+        if (!string_compare(interp, key, CONST_STRING(interp, "uuid_type"))) {
+            pf->header->uuid_type = value;
+            return;
+        }
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_KEY_NOT_FOUND,
+                       "PackFile: No such integer key \"%s\"",
+                       Parrot_string_cstring(interp, key));
+    }
+
+
+/*
+
+=item C<void set_integer_keyed(PMC *key, INTVALval)>
+
+Set a keyed integer value in the packfile object.  Dispatches to
+set_integer_keyed_str.
+
+=cut
+
+*/
+    VTABLE void set_integer_keyed(PMC *key, INTVAL val) {
+        STRING * const s = VTABLE_get_string(INTERP, key);
+        SELF.set_integer_keyed_str(s, val);
+    }
+
+
+/*
+
+=item C<PMC *get_directory()>
+
+Fetch the PackfileDirectory PMC that represents the directory segment at the
+start of the packfile.
+
+=cut
+
+*/
+    METHOD get_directory() {
+        PackFile *pf = PMC_data_typed(SELF, PackFile *);
+        PMC *dir = pmc_new(interp, enum_class_PackfileDirectory);
+        PMC_data(dir) = &pf->directory;
+        RETURN(PMC *dir);
+    }
+
+
+}
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

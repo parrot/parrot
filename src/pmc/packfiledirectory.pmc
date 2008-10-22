@@ -1,0 +1,168 @@
+/*
+Copyright (C) 2001-2008, The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/packfiledirectory.pmc - PackfileDirectory PMC
+
+=head1 DESCRIPTION
+
+This class implements a PackfileDirectory object, a segment of the .pbc data
+file used for listing the rest of the file's contents.  Essentially this
+segment is a container for all other segments within a Packfile.
+
+See packfile.pmc for the toplevel Packfile interface, see packfilesegment.pmc
+for the list of common methods every packfile segment pmc must implement; see
+PDD13 for the design spec.
+
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass PackfileDirectory extends PackfileSegment {
+
+
+/*
+
+=item C<INTVAL elements()>
+
+Get the number of elements in the array.
+
+=cut
+
+*/
+    VTABLE INTVAL elements() {
+        PackFile_Directory *pfd = PMC_data_typed(SELF, PackFile_Directory *);
+        return pfd->num_segments;
+    }
+
+
+/*
+
+=item C<PMC *get_pmc_keyed_int(INTVAL index)>
+
+Fetch a segment PMC from the array.
+
+=cut
+
+*/
+    VTABLE PMC *get_pmc_keyed_int(INTVAL index)  {
+        PackFile_Directory *pfd = PMC_data_typed(SELF, PackFile_Directory *);
+        PackFile_Segment *pfseg;
+        PMC *rv;
+        int pmc_type;
+        if (index < 0 || index >= (INTVAL)pfd->num_segments)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                                        "PackfileDirectory: index out of bounds!");
+        pfseg = pfd->segments[index];
+        switch (pfseg->type) {
+            case PF_DIR_SEG:
+                pmc_type = enum_class_PackfileDirectory;
+                break;
+            case PF_FIXUP_SEG:
+                pmc_type = enum_class_PackfileFixupTable;
+                break;
+            case PF_CONST_SEG:
+                pmc_type = enum_class_PackfileConstantTable;
+                break;
+            case PF_BYTEC_SEG:
+            case PF_UNKNOWN_SEG:
+            case PF_DEBUG_SEG:
+            default:
+                pmc_type = enum_class_PackfileRawSegment;
+        }
+        rv = pmc_new(interp, pmc_type);
+        PMC_data(rv) = pfseg;
+        return rv;
+    }
+
+
+/*
+
+=item C<STRING *get_string_keyed_int(INTVAL index)>
+
+Fetch a string containing the name of the specified segment PMC.
+
+=cut
+
+*/
+    VTABLE STRING *get_string_keyed_int(INTVAL index)  {
+        PackFile_Directory *pfd = PMC_data_typed(SELF, PackFile_Directory *);
+        PackFile_Segment *pfseg;
+        PMC *rv;
+        if (index < 0 || index >= (INTVAL)pfd->num_segments)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                                        "PackfileDirectory: index out of bounds!");
+        pfseg = pfd->segments[index];
+        return const_string(interp, pfseg->name);
+    }
+
+
+/*
+
+=item C<PMC *get_pmc_keyed_str(STRING *name)>
+
+Search the array for a segment with the given name, and return it if it exists.
+
+=cut
+
+*/
+    VTABLE PMC *get_pmc_keyed_str(STRING *name)  {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<PMC *get_pmc_keyed(PMC *key)>
+
+Fetch a keyed string value from the packfiledirectory object.  Dispatches to
+get_pmc_keyed_str.
+
+=cut
+
+*/
+    VTABLE PMC *get_pmc_keyed(PMC *key) {
+        STRING * const s = VTABLE_get_string(INTERP, key);
+        return SELF.get_pmc_keyed_str(s);
+    }
+
+
+/*
+
+=item C<void set_pmc_keyed_str(STRING *name, PMC *segment)>
+
+Add a segment with the given name to the directory.  If a segment with this
+name already existed, it will be replaced with the new segment.
+
+=cut
+
+*/
+    VTABLE void set_pmc_keyed_str(STRING *name, PMC *segment)  {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+}
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

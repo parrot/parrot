@@ -1,0 +1,119 @@
+/*
+Copyright (C) 2001-2008, The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/packfileannotations.pmc - PackfileAnnotations PMC
+
+=head1 DESCRIPTION
+
+This class implements a PackfileAnnotations object, a segment of the .pbc data
+file used for listing annotations.  It is a container for PackfileAnnotation
+objects.
+
+See packfile.pmc for the toplevel Packfile interface, see packfilesegment.pmc
+for the list of common methods every packfile segment pmc must implement; see
+PDD13 for the design spec.
+
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass PackfileAnnotations extends PackfileSegment {
+
+
+/*
+
+=item C<PMC *get_key_list()>
+
+Get the PackfileAnnotationKeys PMC, listing the keys and types of annotations
+contained within this object.
+
+=cut
+
+*/
+    PMC *get_key_list() {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<INTVAL elements()>
+
+Get the number of elements in the array.
+
+=cut
+
+*/
+    VTABLE INTVAL elements() {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<PMC *get_pmc_keyed_int(INTVAL index)>
+
+Fetch an annotation PMC from the array.
+
+=cut
+
+*/
+    VTABLE PMC *get_pmc_keyed_int(INTVAL index)  {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<void set_pmc_keyed_int(INTVAL index, PMC *annotation)>
+
+Add an annotation to the array at the given offset.  An exception will be
+thrown unless all of the following criteria are met:
+
+=over 4
+
+=item - The type of the PMC passed is PackfileAnnotation
+
+=item - The entry at the previous index is defined
+
+=item - The offset of the previous entry is less than this entry
+
+=item - The offset of the next entry, if it exists, is greater than this entry
+
+=item - The key ID references a valid annotation key
+
+=back
+
+=cut
+
+*/
+    VTABLE void set_pmc_keyed_int(INTVAL index, PMC *annotation)  {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+}
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

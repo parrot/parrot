@@ -1,0 +1,124 @@
+/*
+Copyright (C) 2001-2008, The Perl Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/packfileannotation.pmc - PackfileAnnotation PMC
+
+=head1 DESCRIPTION
+
+This class implements a PackfileAnnotation object.  It is an element in the
+PackfileAnnotations segment of the .pbc file.  See PDD13 for a design spec.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+pmclass PackfileAnnotation {
+
+
+/*
+
+=item C<INTVAL get_offset()>
+
+Fetch the offset into the bytecode of the instruction that is being annotated.
+
+=cut
+
+*/
+    INTVAL get_offset() {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<void set_offset(INTVAL offset)>
+
+Set the offset into the bytecode of the instruction that is being annotated.
+
+=cut
+
+*/
+    void set_offset(INTVAL offset) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<INTVAL get_key_id()>
+
+Fetch the ID of the key of the annotation.
+
+=cut
+
+*/
+    INTVAL get_key_id() {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<void set_key_id(INTVAL offset)>
+
+Set the ID of the key of the annotation.
+
+=cut
+
+*/
+    void set_key_id(INTVAL offset) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Fetch the value of the annotation.
+
+=cut
+
+*/
+    VTABLE INTVAL get_integer() {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+
+/*
+
+=item C<void set_integer(INTVAL offset)>
+
+Set the value of the annotation.
+
+=cut
+
+*/
+    VTABLE void set_integer(INTVAL offset) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    }
+
+}
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
