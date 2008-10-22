@@ -22,7 +22,7 @@ Tests the ExceptionHandler PMC.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(5)
+    plan(7)
 
     .local pmc eh
     new eh, 'ExceptionHandler'
@@ -90,7 +90,7 @@ Tests the ExceptionHandler PMC.
     pop_eh
     pop_eh
 
-    exit 0
+    goto subclass_handler
 
   typed_handler_one:
     .local pmc e, c
@@ -106,7 +106,69 @@ Tests the ExceptionHandler PMC.
     c = e['resume']
     eh = 0
     c()
+
+  subclass_handler:
+    .local pmc myhandler
+    myhandler = subclass_exception_handler()
+    $I0 = subclass_handler_pop(myhandler)
+    ok($I0, 'Exception Handler subclass popped')
+    $I0 = subclass_handler_catches(myhandler)
+    todo($I0, 'Exception Handler subclass catch exception')
 .end
+
+.sub subclass_exception_handler
+    .local pmc myhandler
+    myhandler = subclass 'ExceptionHandler', [ 'MyHandler' ]
+    .return(myhandler)
+.end
+
+.sub subclass_handler_pop
+    .param pmc myhandler
+    .local pmc eh
+    new eh, 'ExceptionHandler'
+    set_addr eh, subclassed_popped
+    push_eh eh
+
+    .local pmc myeh
+    new myeh, myhandler
+    set_addr myeh, subclassed_handler
+    push_eh myeh
+
+    pop_eh
+
+    $P0 = new 'Exception'
+    throw $P0
+
+  subclassed_popped:
+    .return(1)
+
+  subclassed_handler:
+    .return(0)
+.end
+
+.sub subclass_handler_catches
+    .param pmc myhandler
+    .local pmc eh
+    new eh, 'ExceptionHandler'
+    set_addr eh, subclassed_failed
+    push_eh eh
+
+    .local pmc myeh
+    new myeh, myhandler
+    set_addr myeh, subclassed_handler
+    push_eh myeh
+
+    $P0 = new 'Exception'
+    throw $P0
+
+  subclassed_failed:
+    .return(0)
+
+  subclassed_handler:
+    .return(1)
+.end
+
+.namespace [ 'MyHandler' ]
 
 # Local Variables:
 #   mode: pir

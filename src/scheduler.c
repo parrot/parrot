@@ -498,7 +498,7 @@ Parrot_cx_delete_handler_local(PARROT_INTERP, ARGIN(STRING *handler_type))
         PMC *handler = VTABLE_get_pmc_keyed_int(interp, handlers, index);
         if (!PMC_IS_NULL(handler)) {
             if (string_equal(interp, handler_type, CONST_STRING(interp, "exception")) == 0
-                        && handler->vtable->base_type == enum_class_ExceptionHandler) {
+                        && VTABLE_isa(interp, handler, CONST_STRING(interp, "ExceptionHandler"))) {
                 VTABLE_set_pmc_keyed_int(interp, handlers, index, PMCNULL);
                 return;
             }
