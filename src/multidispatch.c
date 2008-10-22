@@ -856,7 +856,6 @@ void
 Parrot_mmd_register_sub(PARROT_INTERP, INTVAL func_nr,
              INTVAL left_type, INTVAL right_type, ARGIN(const PMC *sub))
 {
-    /* returned from mmdvt_find */
     if (sub->vtable->base_type == enum_class_NCI) {
         Parrot_mmd_register(interp, func_nr, left_type, right_type,
                 D2FPTR(PMC_struct_val(sub)));

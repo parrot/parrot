@@ -1562,28 +1562,6 @@ Jump to a label if R<VAL1> is stringwise less than R<VAL2>.
 
 I<Arguments: P, P, IC>
 
-=head3 mmdvtfind
-
-X<mmdvtfind opcode (PASM)>
-
-  mmdvtfind R<DEST>, R<FUNC>, R<LEFT>, R<RIGHT>
-
-Get the subroutine PMC for the multi-method vtable function R<FUNC>
-for the two given PMC types.
-
-I<Arguments: P, I, I, I>
-
-=head3 mmdvtregister
-
-X<mmdvtregister opcode (PASM)>
-
-  mmdvtregister R<FUNC>, R<LEFT>, R<RIGHT>, R<SUB>
-
-Register the subroutine R<SUB> as the multi-method vtable function R<FUNC>
-for the two given PMC types.
-
-I<Arguments: I, I, I, P>
-
 =head3 mod
 
 X<mod opcode (PASM)>

@@ -183,11 +183,6 @@ Will have to be:
     print $S0
     substr $P0, 1, 2, "x"
 
-=item * mmdvtregister and mmdvtablefind opcodes [post 0.7.0]
-
-These opcodes are part of the old MMD system, now deprecated and to be removed
-when the branch is merged in after the release.
-
 =item * C<addr> shortcut for C<set_addr> op [post 0.7.1]
 
 The C<addr> shortcut that is mapped to the C<set_addr> will no longer be
