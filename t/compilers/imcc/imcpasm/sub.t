@@ -11,7 +11,7 @@ use Parrot::Test tests => 2;
 pir_2_pasm_like( <<'CODE', <<'OUT', "non-constant dest bsr, invoke" );
 .sub _main
     $P26 = new 'Sub'
-    $I15 = addr _sub1
+    $I15 = set_addr _sub1
     $P26 = $I15
     invokecc $P26
     ret
@@ -34,7 +34,7 @@ OUT
 pir_2_pasm_like( <<'CODE', <<'OUT', "nonlocal bsr" );
 .sub _main
     $P26 = new 'Sub'
-    $I15 = addr _f
+    $I15 = set_addr _f
     $P26 = $I15
     invokecc $P26
     ret

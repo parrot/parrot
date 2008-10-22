@@ -389,7 +389,6 @@ SP              [ ]
 "int"                         return INTV;
 "num"                         return FLOATV;
 "new"                         return NEW;
-"addr"                        return ADDR;
 "global"                      return GLOBALOP;
 "pmc"                         return PMCV;
 "string"                      return STRINGV;

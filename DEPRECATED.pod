@@ -183,13 +183,6 @@ Will have to be:
     print $S0
     substr $P0, 1, 2, "x"
 
-=item * C<addr> shortcut for C<set_addr> op [post 0.7.1]
-
-The C<addr> shortcut that is mapped to the C<set_addr> will no longer be
-supported. Instead, use the C<set_addr> directly.
-
-See RT#58238.
-
 =item * C<.return> in tailcall context [post 0.7.2]
 
 The C<.return> directive in a tailcall context will be replaced by the more

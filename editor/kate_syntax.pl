@@ -23,7 +23,7 @@ if ( $parrot eq '-h' ) {
 $parrot =~ s/\/$//;
 
 my @imcc_oplike = qw( .sym .arg prototyped non_prototyped .class
-    .endclass .param inc dec new defined addr global clone );
+    .endclass .param inc dec new defined global clone );
 
 my @imcc_spdirec = qw(.call .result .return .local .const .globalconst
     end goto if unless call branch jump jsr ret invoke invokecc throw

@@ -608,7 +608,6 @@ do_pre_process(PARROT_INTERP)
             case STRINGV:       printf("string ");break;
             case PMCV:          printf("pmc ");break;
             case NEW:           printf("new ");break;
-            case ADDR:          printf("addr ");break;
             case GLOBAL:        printf("global ");break;
             case SHIFT_LEFT:    printf(" << ");break;
             case SHIFT_RIGHT:   printf(" >> ");break;
