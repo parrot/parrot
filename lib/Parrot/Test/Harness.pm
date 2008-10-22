@@ -173,8 +173,9 @@ sub import {
               $options{exec}     ? ( exec => $options{exec} )
             : $options{compiler} ? ( exec => [ '../../parrot', './' . $options{compiler} ] )
             :                      ();
-        $harness_options{verbosity} = $options{verbosity} ? $options{verbosity} : 0;
-        $harness_options{jobs} = $ENV{TEST_JOBS} || $options{jobs} || 1;
+        $harness_options{verbosity} =                    $options{verbosity} || 0;
+        $harness_options{jobs}      = $ENV{TEST_JOBS} || $options{jobs}      || 1;
+
         TAP::Harness->new( \%harness_options )->runtests( @files );
 
         return;
