@@ -99,7 +99,7 @@ ok( !@strange_chars, 'Portable characters in filenames' )
         . @strange_chars . " files:\n@strange_chars" );
 
 ok( !@too_long, 'Filenames length' )
-    or diag( "Filename with with more than 32 chars found in "
+    or diag( "Filename with more than 32 chars found in "
         . @too_long . " files:\n@too_long" );
 
 # Local Variables:

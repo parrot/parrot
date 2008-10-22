@@ -18,7 +18,7 @@ Parrot::Configure - Conducts the execution of Configuration Steps
 
 =head1 DESCRIPTION
 
-This module provides provides a means for registering, executing, and
+This module provides a means for registering, executing, and
 coordinating one or more configuration steps.  Please see
 F<docs/configuration.pod> for further details about the configuration
 framework.

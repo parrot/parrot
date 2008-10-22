@@ -18,7 +18,7 @@ t/library/md5.t - test MD5 library
 
 =head1 DESCRIPTION
 
-Tests the MD5 library. You can create the test results using using
+Tests the MD5 library. You can create the test results using
 the command-line md5sum like this:
 
  $ echo -n Hello World! | md5sum
