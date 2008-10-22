@@ -393,6 +393,7 @@ or 'Object').
 =item new_class(name [, 'parent'=>parentclass] [, 'attr'=>attr] [, 'hll'=>hll])
 
 Create a new class called C<name> as a subclass of C<parentclass>.
+When C<name> is a string, then double-colons will be treated as separators.
 If C<parentclass> isn't supplied, defaults to using C<P6object>
 as the parent.  The C<attr> parameter is a list of attribute names
 to be added to the class, specified as either an array or a string
