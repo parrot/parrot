@@ -197,8 +197,19 @@ OUT
 
 
 # PackfileDirectory.get_string_keyed_int
+{
+    my $EXPECTED = <<EXPECTED;
+BYTECODE_runtime/parrot/library/uuid.pir
+FIXUP_runtime/parrot/library/uuid.pir
+CONSTANT_runtime/parrot/library/uuid.pir
+PIC_idx_runtime/parrot/library/uuid.pir
+BYTECODE_runtime/parrot/library/uuid.pir_DB
+EXPECTED
 
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'PackfileDirectory.get_string_keyed_int' );
+    $EXPECTED =~ s/\//\\/g
+        if $^O eq 'MSWin32';
+
+    pir_output_is( <<'CODE' . $get_uuid_pbc, $EXPECTED, 'PackfileDirectory.get_string_keyed_int' );
 .sub 'test' :main
     .local pmc pf, pfdir
     pf    = _pbc()
@@ -215,12 +226,7 @@ pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'PackfileDirectory.get_string_
     .return()
 .end
 CODE
-BYTECODE_runtime/parrot/library/uuid.pir
-FIXUP_runtime/parrot/library/uuid.pir
-CONSTANT_runtime/parrot/library/uuid.pir
-PIC_idx_runtime/parrot/library/uuid.pir
-BYTECODE_runtime/parrot/library/uuid.pir_DB
-OUT
+}
 
 
 # PackfileDirectory.get_pmc_keyed_str
