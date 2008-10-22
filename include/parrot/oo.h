@@ -148,13 +148,6 @@ PMC * Parrot_remove_parent(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING* readable_name(PARROT_INTERP, ARGIN(PMC *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 void destroy_object_cache(PARROT_INTERP)
         __attribute__nonnull__(1);
 

@@ -250,10 +250,6 @@ Parrot_mmd_register_sub, Parrot_mmd_destroy, Parrot_MMD_search_default_infix,
 mmd_arg_tuple_inline, Parrot_mmd_search_default, mmd_cvt_to_types,
 Parrot_mmd_rebuild_table.
 
-=item readable_name [post 0.7.1]
-
-See RT #45967.
-
 =back
 
 =cut

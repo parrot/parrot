@@ -403,28 +403,6 @@ Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
 
 /*
 
-=item C<STRING* readable_name>
-
-Given a String or Key PMC return the STRING* representation
-
-{{{ DEPRECATED -- RT #45967 }}}
-
-=cut
-
-*/
-
-PARROT_API
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING*
-readable_name(PARROT_INTERP, ARGIN(PMC *name))
-{
-    return VTABLE_get_repr(interp, name);
-}
-
-
-/*
-
 =item C<const char* Parrot_MMD_method_name>
 
 Return the method name for the given MMD enum.
