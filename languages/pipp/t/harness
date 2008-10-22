@@ -39,9 +39,9 @@ use strict;
 use warnings;
 use lib '..';
 
-use Cwd                   ();
-use File::Spec;
-use Test::Harness         ();
+use Cwd           ();
+use File::Spec    ();
+use TAP::Harness  3.0;
 
 my $language = 'pipp';
 
@@ -99,7 +99,8 @@ if ( grep { m/^--files$/ } @ARGV ) {
        $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::PCT';
     }
 
-    Test::Harness::runtests( @files ) if scalar( @files );
+    my $harness = TAP::Harness->new( );
+    $harness->runtests(@files);
 }
 
 =head1 HISTORY
