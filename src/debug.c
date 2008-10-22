@@ -979,8 +979,11 @@ Parrot_debugger_start(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
 
     debugger_cmdline(interp);
 
-    if (interp->pdb->state & PDB_EXIT)
+    if (interp->pdb->state & PDB_EXIT) {
+        TRACEDEB_MSG("Parrot_debugger_start Parrot_exit");
         Parrot_exit(interp, 0);
+    }
+    TRACEDEB_MSG("Parrot_debugger_start ends");
 }
 
 /*
@@ -1958,6 +1961,8 @@ char
 PDB_program_end(PARROT_INTERP)
 {
     PDB_t * const pdb = interp->pdb;
+
+    TRACEDEB_MSG("PDB_program_end");
 
     /* Remove the RUNNING state */
     pdb->state &= ~PDB_RUNNING;

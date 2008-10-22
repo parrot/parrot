@@ -660,6 +660,7 @@ prepare_for_run(PARROT_INTERP)
         case PARROT_SWITCH_JIT_CORE:
         case PARROT_CGP_CORE:
         case PARROT_CGP_JIT_CORE:
+        case PARROT_DEBUGGER_CORE:
             init_prederef(interp, interp->run_core);
             break;
         default:
@@ -1263,6 +1264,7 @@ notify_func_table(PARROT_INTERP, ARGIN(op_func_t* table), int on)
         case PARROT_SLOW_CORE:      /* normal func core */
         case PARROT_FAST_CORE:      /* normal func core */
         case PARROT_CGOTO_CORE:     /* cgoto address list  */
+        case PARROT_DEBUGGER_CORE:
             PARROT_ASSERT(table);
             interp->op_func_table = table;
             break;
