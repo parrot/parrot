@@ -123,7 +123,7 @@ NOT IMPLEMENTED.
 
 =item C<object mssql_fetch_object(resource result_id [, int result_type])>
 
-Returns a psuedo-object of the current row in the result set specified by result_id
+Returns a pseudo-object of the current row in the result set specified by result_id
 
 NOT IMPLEMENTED.
 

@@ -94,7 +94,7 @@ STMLog PMC type.
 
 The runtime library C<transaction> runs a supplied subroutine (with
 optional supplied arugments) in a separate transaction commiting the
-result. For example, (Perlish) psuedocode for inserting at the beginning
+result. For example, (Perlish) pseudocode for inserting at the beginning
 of a linked list might look like this:
 
  STM::transaction(sub {
