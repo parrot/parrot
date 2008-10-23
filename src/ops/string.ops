@@ -269,9 +269,6 @@ inline op substr(out STR, inout STR, in INT, in INT, in STR) :base_core {
 }
 
 inline op substr(inout STR, in INT, in INT, in STR) :base_core {
-    if (PObj_constant_TEST($1))
-        $1 = Parrot_make_COW_reference(interp, $1);
-
     (void)string_replace(interp, $1, $2, $3, $4, NULL);
 }
 

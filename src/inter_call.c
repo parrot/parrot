@@ -601,9 +601,16 @@ fetch_arg_op(PARROT_INTERP, ARGMOD(call_state *st))
             UVal_int(st->val) = constant ? idx : CTX_REG_INT(st->src.ctx, idx);
             break;
         case PARROT_ARG_STRING:
-            UVal_str(st->val) = constant ? st->src.ctx->constants[idx]->u.string
-                                         : CTX_REG_STR(st->src.ctx, idx);
+        {
+            /* ensure that callees don't modify constant caller strings */
+            if (constant)
+                UVal_str(st->val) = Parrot_make_COW_reference(interp,
+                                        st->src.ctx->constants[idx]->u.string);
+            else
+                UVal_str(st->val) = CTX_REG_STR(st->src.ctx, idx);
+
             break;
+        }
         case PARROT_ARG_FLOATVAL:
             UVal_num(st->val) = constant ? st->src.ctx->constants[idx]->u.number
                                          : CTX_REG_NUM(st->src.ctx, idx);
