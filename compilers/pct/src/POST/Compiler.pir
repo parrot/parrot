@@ -151,7 +151,7 @@ Return pir for an operation node.
 
   pirop_tailcall:
     name = shift arglist
-    fmt = '    .return %n(%,)'
+    fmt = '    .tailcall %n(%,)'
     goto pirop_emit
 
   pirop_inline:
