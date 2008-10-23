@@ -267,6 +267,7 @@ typedef void (*funcptr_t)(void);
 #define LOCALEDIR  "."
 
 typedef struct _hash Hash;
+typedef struct PackFile_ByteCode PackFile_ByteCode;
 
 #include "parrot/settings.h"
 #include "parrot/enums.h"

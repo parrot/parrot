@@ -356,7 +356,7 @@ struct parrot_interp_t {
     INTVAL resume_flag;
     size_t resume_offset;
 
-    struct PackFile_ByteCode *code;           /* The code we are executing */
+    PackFile_ByteCode *code;                  /* The code we are executing */
     struct PackFile          *initial_pf;     /* first created PF  */
 
     struct _imc_info_t *imc_info;             /* imcc data */

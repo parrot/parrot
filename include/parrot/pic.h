@@ -82,7 +82,7 @@ PARROT_CANNOT_RETURN_NULL
 Parrot_PIC* parrot_PIC_alloc_pic(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void parrot_PIC_alloc_store(ARGOUT(struct PackFile_ByteCode *cs), size_t n)
+void parrot_PIC_alloc_store(ARGOUT(PackFile_ByteCode *cs), size_t n)
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*cs);
 

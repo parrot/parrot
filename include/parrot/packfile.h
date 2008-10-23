@@ -156,7 +156,7 @@ typedef struct PackFile_FixupEntry {
     opcode_t                  type;     /* who knows what fixups we need? */
     char                     *name;     /* name of the label */
     opcode_t                  offset;   /* location of the item */
-    struct PackFile_ByteCode *seg;
+    PackFile_ByteCode        *seg;
 } PackFile_FixupEntry;
 
 typedef enum {
@@ -169,7 +169,7 @@ typedef struct PackFile_FixupTable {
     PackFile_Segment             base;
     opcode_t                     fixup_count;
     PackFile_FixupEntry        **fixups;
-    struct PackFile_ByteCode    *code;   /* where this segment belongs to */
+    PackFile_ByteCode           *code;   /* where this segment belongs to */
 } PackFile_FixupTable;
 
 #define PFC_NONE    '\0'
@@ -192,10 +192,10 @@ typedef struct PackFile_ConstTable {
     PackFile_Segment           base;
     opcode_t                   const_count;
     PackFile_Constant        **constants;
-    struct PackFile_ByteCode  *code;  /* where this segment belongs to */
+    PackFile_ByteCode         *code;  /* where this segment belongs to */
 } PackFile_ConstTable;
 
-typedef struct PackFile_ByteCode {
+struct PackFile_ByteCode {
     PackFile_Segment       base;
     Prederef               prederef;    /* The predereferenced code and info */
     struct Parrot_jit_info_t     *jit_info;    /* JITs data */
@@ -204,7 +204,7 @@ typedef struct PackFile_ByteCode {
     struct PackFile_Debug *debugs;
     PackFile_ConstTable   *const_table;
     PackFile_FixupTable   *fixups;
-} PackFile_ByteCode;
+};
 
 enum PF_DEBUGMAPPINGTYPE {
     PF_DEBUGMAPPINGTYPE_NONE = 0,

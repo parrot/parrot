@@ -211,7 +211,7 @@ of usable memory, PICs from the rear.
 */
 
 void
-parrot_PIC_alloc_store(ARGOUT(struct PackFile_ByteCode *cs), size_t n)
+parrot_PIC_alloc_store(ARGOUT(PackFile_ByteCode *cs), size_t n)
 {
     Parrot_PIC_store *store;
     size_t size;
