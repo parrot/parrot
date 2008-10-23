@@ -203,6 +203,12 @@ method this($/) {
          );
 }
 
+method member($/) {
+    make PAST::Op.new(
+             :inline( "%r = self" )
+         );
+}
+
 method else_clause($/) {
     make $( $<block> );
 }

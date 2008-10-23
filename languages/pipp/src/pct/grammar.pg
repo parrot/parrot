@@ -71,6 +71,7 @@ rule  var_assign            { <var>        '=' <expression> <.statement_delimite
 
 # identifiers
 token FUNCTION_NAME         { <ident>                                                    }
+token MEMBER_NAME           { <ident>                                                    }
 token METHOD_NAME           { <ident>                                                    }
 token CONSTANT_NAME         { <ident>                                                    }
 token CLASS_NAME            { <ident>                                                    }
@@ -92,6 +93,7 @@ token quote                 { [ <.before '"' > <quote_expression: :qq>
                             }
 rule  constant              { <CONSTANT_NAME>                                        {*} }
 rule  this                  { '$this'                                                {*} } 
+rule  member                { <this> '->' <MEMBER_NAME>                              {*} } 
 rule  array_elem            { <VAR_NAME> '[' <expression> ']'                        {*} }
 token var                   { <this> {*}                   #= this
                             | <array_elem> {*}             #= array_elem
@@ -110,6 +112,7 @@ rule  term                  { <method_call> {*}            #= method_call
                             | '(' <expression> {*} ')'     #= expression
                             | <literal> {*}                #= literal
                             | <constant> {*}               #= constant
+                            | <member> {*}                 #= member
                             | <var> {*}                    #= var
                             }
 
