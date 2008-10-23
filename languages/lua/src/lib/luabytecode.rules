@@ -528,7 +528,7 @@ PIR
         format => 'ABC',
         synopsis => 'return R(A)(R(A+1), ... , R(A+B-1))',
         pir => <<'PIR',
-    ${INS} = concat "  .return ${REG}"
+    ${INS} = concat "  .tailcall ${REG}"
     $S1 = ${A}
     ${INS} = concat $S1
     ${INS} = concat "("
@@ -1062,7 +1062,7 @@ PIR
     ${CLOSURE} = $P0[${B}]
     $P0 = getattribute ${CLOSURE}, 'nups'
     ${NUPS} = $P0
-    ${UPVAL} = 0 
+    ${UPVAL} = 0
 PIR
     },
 };
