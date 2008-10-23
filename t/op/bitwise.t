@@ -508,7 +508,8 @@ SKIP: {
 
     my @todo;
     @todo = ( todo => 'broken with JIT (RT #43245)' )
-        if $ENV{TEST_PROG_ARGS} =~ /-j/;
+        if ( defined $ENV{TEST_PROG_ARGS} and 
+            $ENV{TEST_PROG_ARGS} =~ /-j/ );
 
     pir_output_is( <<'CODE', <<'OUT', "I-reg shl and PMC shl are consistent", @todo );
 ## The PMC shl op will promote Integer to Bigint when needed.  We can't stuff a
