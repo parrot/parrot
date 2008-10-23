@@ -2662,7 +2662,7 @@ Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
         /* can't re-enter the runloop from here with CGP: RT #60048 */
         INTVAL old_core  = interp->run_core;
         opcode_t offset  = dest - interp->code->base.data;
-        if (interp->run_core = PARROT_CGP_CORE)
+        if (interp->run_core == PARROT_CGP_CORE)
             interp->run_core = PARROT_SLOW_CORE;
         runops(interp, offset);
         interp->run_core = old_core;
