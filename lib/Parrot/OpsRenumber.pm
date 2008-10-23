@@ -77,7 +77,6 @@ sub renum_op_map_file {
 
     my $file = scalar(@_) ? shift : $self->{num_file};
     if ($major_version == 0) {
-
         # Pre-Parrot 1.0 case
 
         # We open up the currently existing ops.num and file and read it
@@ -91,7 +90,7 @@ sub renum_op_map_file {
         # pushed into %fixed as well.  Nothing happens to the (opcode) lines
         # below the DYNAMIC line.
 
-        my ( $name, $number, @lines, %fixed, $fix );
+        my ( $name, $number, @lines, %seen, %fixed, $fix );
         $fix = 1;
         open my $OP, '<', $file
             or die "Can't open $file, error $!";
@@ -104,7 +103,8 @@ sub renum_op_map_file {
             s/^\s*//;
             next unless $_;
             ( $name, $number ) = split( /\s+/, $_ );
-            $fixed{$name} = $number if ($fix);
+            $seen{$name}  = $number;
+            $fixed{$name} = $number if $fix;
         }
         close $OP;
 
@@ -148,7 +148,7 @@ sub renum_op_map_file {
             # For all other opcodes, we'll print the opcode, increment the
             # index, then print the index on that same line.
 
-            else {
+            elsif ( $seen{ $_->full_name } ) {
                 printf $OP "%-31s%4d\n", $_->full_name, ++$n;
             }
         }

@@ -23,11 +23,11 @@
 
 # or TODO much better: all .pbc files should make-depend on PBC_COMPAT
 
-# Also, if you're removing an opcode, be sure to run
-# make -f tools/dev/ops_renum.mak
+# Also, if you're removing an opcode, be sure to run "make opsrenumber"
 
 # please insert tab separated entries at the top of the list
 
+3.20	2008.10.23	pmichaud	make opsrenumber fix
 3.19	2008.08.04	coke	remove getclass opcodes
 3.18	2008.07.16	bernhard	remove opcode getfd
 3.18	2008.07.16	bernhard	remove opcode getfd
