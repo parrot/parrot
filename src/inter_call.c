@@ -101,6 +101,7 @@ static void convert_arg_from_str(PARROT_INTERP, ARGMOD(call_state *st))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*st);
 
+PARROT_CANNOT_RETURN_NULL
 static Parrot_Context * count_signature_elements(PARROT_INTERP,
     ARGIN(const char *signature),
     ARGMOD(PMC *args_sig),
@@ -145,6 +146,7 @@ static void null_val(int sig, ARGMOD(call_state *st))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*st);
 
+PARROT_CAN_RETURN_NULL
 static const char * set_context_sig_params(PARROT_INTERP,
     ARGIN(const char *signature),
     ARGMOD(INTVAL *n_regs_used),
@@ -1941,6 +1943,7 @@ Adds the necessary registers to a new context and returns the context.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static Parrot_Context *
 count_signature_elements(PARROT_INTERP, ARGIN(const char *signature),
     ARGMOD(PMC *args_sig), ARGMOD(PMC *results_sig), int flag)
@@ -2234,6 +2237,7 @@ are the calls to C<commit_last_arg_sig_object> and C<commit_last_arg>.
 
 */
 
+PARROT_CAN_RETURN_NULL
 static const char *
 set_context_sig_params(PARROT_INTERP, ARGIN(const char *signature),
     ARGMOD(INTVAL *n_regs_used), ARGMOD(PMC **sigs),
