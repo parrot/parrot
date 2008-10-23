@@ -105,7 +105,14 @@ if ( grep { m/^--files$/ } @ARGV ) {
                                        my ( $harness, $test_file ) = @_;
                                        
                                        # the directory t/pmc contains only PIR test files
-                                       return [ "../parrot$PConfig{exe}", $test_file ] if $test_file =~ m!t/pmc/.*[.]t$!;
+                                       return [ "../parrot$PConfig{exe}",
+                                                $test_file
+                                              ] if $test_file =~ m!t/pmc/.*[.]t$!;
+
+                                       return [ "../parrot$PConfig{exe}",
+                                                'pipp/pipp.pbc',
+                                                $test_file
+                                              ] if $test_file =~ m!t/in_php/.*[.]t$!;
 
                                        return undef;
                                   }
