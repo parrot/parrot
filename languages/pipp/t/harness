@@ -53,20 +53,32 @@ if ( grep { m/^--files$/ } @ARGV ) {
     print join( "\n", @files );
     print "\n" if scalar(@files);
 } else { 
-    my @files;
     # TODO: use Getopt::Long or such
-    my $with_php = ( grep { m/^--with-php$/ } @ARGV ) ? 1 : 0;
-    @ARGV = grep { ! m/^--with-php$/ } @ARGV;
+    my @cmd = ( "../parrot$PConfig{exe}", 'pipp/pipp.pbc' );
+    $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::Phc';
 
-    my $with_phc = ( grep { m/^--with-phc$/ } @ARGV ) ? 1 : 0;
-    @ARGV = grep { ! m/^--with-phc$/ } @ARGV;
+    if ( grep { m/^--with-php$/ } @ARGV ) { 
+         @ARGV = grep { ! m/^--with-php$/ } @ARGV;
+         $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::PHP';
+         @cmd = qw{ php-cgi -q -C -n } ;
+    }
+    elsif ( grep { m/^--with-phc$/ } @ARGV ) {
+        @ARGV = grep { ! m/^--with-phc$/ } @ARGV;
+        $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::Phc';
+        push @cmd, '--variant=phc';
+    }
+    elsif ( grep { m/^--with-antlr3$/ } @ARGV ) {
+        @ARGV = grep { ! m/^--with-antlr3$/ } @ARGV;
+        $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::Antlr3';
+        push @cmd, '--variant=antlr3';
+    }
+    elsif ( grep { m/^--with-pct$/ } @ARGV ) {
+        @ARGV = grep { ! m/^--with-pct$/ } @ARGV;
+        $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::PCT';
+        push @cmd, '--variant=pct';
+    }
 
-    my $with_antlr3 = ( grep { m/^--with-antlr3$/ } @ARGV ) ? 1 : 0;
-    @ARGV = grep { ! m/^--with-antlr3$/ } @ARGV;
-
-    my $with_pct = ( grep { m/^--with-pct$/ } @ARGV ) ? 1 : 0;
-    @ARGV = grep { ! m/^--with-pct$/ } @ARGV;
-
+    my @files;
     if ( scalar(@ARGV) ) {
         # Someone specified tests for me to run.
         @files = grep { -f $_ } @ARGV
@@ -83,36 +95,14 @@ if ( grep { m/^--files$/ } @ARGV ) {
         }
     }
 
-    # XXX There should be a better to indicate which implementation should be used
-    if ( $with_php ) {
-       $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::PHP';
-    }
-    elsif ( $with_phc ) {
-       $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::Phc';
-    }
-    elsif ( $with_antlr3 ) {
-       $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::Antlr3';
-    }
-    elsif ( $with_pct ) {
-       $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::PCT';
-    }
-    else {
-       $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::PCT';
-    }
-
     my $harness = TAP::Harness->new( {
                       exec => sub {
                                        my ( $harness, $test_file ) = @_;
                                        
                                        # the directory t/pmc contains only PIR test files
-                                       return [ "../parrot$PConfig{exe}",
-                                                $test_file
-                                              ] if $test_file =~ m!t/pmc/.*[.]t$!;
+                                       return [ "../parrot$PConfig{exe}", $test_file ] if $test_file =~ m!t/pmc/.*[.]t$!;
 
-                                       return [ "../parrot$PConfig{exe}",
-                                                'pipp/pipp.pbc',
-                                                $test_file
-                                              ] if $test_file =~ m!t/in_php/.*[.]t$!;
+                                       return [ @cmd, $test_file ] if $test_file =~ m!t/in_php/.*[.]t$!;
 
                                        return undef;
                                   }
