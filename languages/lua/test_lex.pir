@@ -34,14 +34,15 @@ and imports many definitions from the full Lua compiler
 =cut
 
 .sub '__onload' :anon :load :init
-    load_bytecode 'languages/lua/lua.pbc'
+    load_bytecode 'PCT.pbc'
 
-    $P0 = new ['PCT';'HLLCompiler']
+    $P0 = get_hll_global ['PCT'], 'HLLCompiler'
+    $P0 = $P0.'new'()
     $P0.'language'('LuaTestLex')
     $P0.'parsegrammar'('Lua::TestLex')
     $P0.'astgrammar'('Lua::DumpLex')
 
-    $S0 = "Lexico of Lua 5.1 on Parrot  Copyright (C) 2005-2008, The Perl Foundation.\n"
+    $S0 = "Lexico of Lua 5.1 on Parrot\nCopyright (C) 2005-2008, The Perl Foundation.\n"
     $P0.'commandline_banner'($S0)
     $P0.'commandline_prompt'('> ')
 
@@ -79,6 +80,8 @@ and imports many definitions from the full Lua compiler
 
 .include 'languages/lua/src/dumplex_gen.pir'
 .include 'languages/lua/src/lua51_testlex_gen.pir'
+.include 'languages/lua/src/grammar51.pir'
+.include 'languages/lua/src/lua51_gen.pir'
 
 .namespace []
 
