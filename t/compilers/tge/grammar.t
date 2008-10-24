@@ -44,7 +44,7 @@ GRAMMAR
 
     # Add the grammar keyword and recompile
     grammar = $P1.'compile'(<<'GRAMMAR')
-    grammar TreeMin is TGE::Grammar;
+    grammar TreeMin is TGE;Grammar;
     transform min (Leaf) :language('PIR') {
         $P1 = getattribute node, "value"
        .return ($P1)
@@ -57,7 +57,7 @@ GRAMMAR
     .local string source
     source = "=head NAME\n\n TreeMin2\n\n=cut\n\n"
     source .= <<'GRAMMAR'
-    grammar TreeMin2 is TGE::Grammar;
+    grammar TreeMin2 is TGE;Grammar;
     transform min (Leaf) :language('PIR') {
         $P1 = getattribute node, "value"
        .return ($P1)
@@ -83,7 +83,7 @@ pir_output_is( <<'CODE', <<'OUT', 'complete example: Branch/Leaf tree grammar' )
     # Load the grammar in a string
     .local string source
     source = <<'GRAMMAR'
-    grammar TreeMin is TGE::Grammar;
+    grammar TreeMin is TGE;Grammar;
 
     transform min (Leaf) :language('PIR') {
         $P1 = getattribute node, "value"
@@ -285,7 +285,7 @@ TODO: {
     # Load the grammar in a string
     .local string source
     source = <<'GRAMMAR'
-    grammar TreeMin is TGE::Grammar;
+    grammar TreeMin is TGE;Grammar;
 
     transform tiddlywinks (ROOT) :language('PIR') {
         say 'in tiddlywinks'
@@ -306,7 +306,7 @@ GRAMMAR
 
     # Compile a grammar from the source
     .local pmc grammar
-    $P1 = new 'TGE::Compiler'
+    $P1 = new 'TGE;Compiler'
     grammar = $P1.'compile'(source)
 
     # Apply the grammar to the test tree
