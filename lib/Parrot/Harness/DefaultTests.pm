@@ -92,7 +92,14 @@ push @developing_tests,
 sub get_default_tests {
     my ($core_tests_only, $runcore_tests_only) = @_;
 
-    # add metadata.t and coding standards tests only if we're DEVELOPING
+    # Add metadata.t and coding standards tests only if we're DEVELOPING
+
+    # Note:  As of 2008-10-21, we're no longer including @standard_tests in
+    # @default_tests -- which means they're not included in 'make test'.
+    # But, for the time being, at least, we are still making
+    # it an exportable variable.  So we'll test for it in
+    # t/pharness/01-default_tests.t.
+
     if ( -e "DEVELOPING" ) {
         push @standard_tests, @developing_tests;
     }

@@ -11,9 +11,7 @@ use Test::More;
 eval {
     use Parrot::Config qw( %PConfig );
 };
-plan( skip_all => "no time to understand and modify these before release 0.8.0" );
-plan( skip_all => 't/harness only runs once configuration has completed' )
-    if $@;
+plan( skip_all => 't/harness only runs once configuration has completed' ) if $@;
 plan( tests => 30 );
 use Carp;
 use Cwd;
@@ -56,16 +54,16 @@ my $cwd = cwd();
     ok(@default_tests =
         get_default_tests($core_tests_only, $runcore_tests_only),
         "get_default_tests() returned successfully");
-    is(scalar(@default_tests), 4, "Got expected 4 tests");
+    is(scalar(@default_tests), 3, "Got expected 3 tests");
     is($default_tests[0], q{gamma.t}, "Start with configure_tests as expected");
-    is($default_tests[3], q{delta.t}, "End with standard_tests as expected");
+    is($default_tests[2], q{beta.t}, "End with core_tests as expected");
 
     @default_tests = ();
     ($core_tests_only, $runcore_tests_only) = (0,0);
     ok($default_tests_ref =
         get_default_tests($core_tests_only, $runcore_tests_only),
         "get_default_tests() returned successfully");
-    is(scalar(@{ $default_tests_ref }), 4, "Got expected 4 tests");
+    is(scalar(@{ $default_tests_ref }), 3, "Got expected 3 tests");
 
     ok(chdir $cwd, "Able to change back to starting directory after testing");
 }
@@ -85,6 +83,7 @@ my $cwd = cwd();
         "get_default_tests() returned successfully");
     is(scalar(@default_tests), 1, "Got expected 1 test");
     is($default_tests[0], q{alpha.t}, "runcore_tests only as expected");
+    # reset for subsequent tests
     @Parrot::Harness::DefaultTests::standard_tests = qw( delta.t );
 
     @default_tests = ();
@@ -94,6 +93,7 @@ my $cwd = cwd();
         "get_default_tests() returned successfully");
     is(scalar(@default_tests), 2, "Got expected 2 tests");
     is($default_tests[1], q{beta.t}, "core_tests only as expected");
+    # reset for subsequent tests
     @Parrot::Harness::DefaultTests::standard_tests = qw( delta.t );
 
     @default_tests = ();
@@ -101,11 +101,12 @@ my $cwd = cwd();
     ok(@default_tests =
         get_default_tests($core_tests_only, $runcore_tests_only),
         "get_default_tests() returned successfully");
-    is(scalar(@default_tests), 5, "Got expected 5 tests");
+    is(scalar(@default_tests), 3, "Got expected 3 tests");
     is($default_tests[0], q{gamma.t}, "Start with configure_tests as expected");
-    is($default_tests[3], q{delta.t}, "End with standard_tests as expected");
-    is($default_tests[4], q{epsilon.t},
-        "standard_tests include developing_tests");
+    is($default_tests[2], q{beta.t}, "End with core_tests as expected");
+    is(scalar(@Parrot::Harness::DefaultTests::standard_tests),
+        2, "Got expected 2 coding standards tests");
+    # reset for subsequent tests
     @Parrot::Harness::DefaultTests::standard_tests = qw( delta.t );
 
     @default_tests = ();
@@ -113,7 +114,8 @@ my $cwd = cwd();
     ok($default_tests_ref =
         get_default_tests($core_tests_only, $runcore_tests_only),
         "get_default_tests() returned successfully");
-    is(scalar(@{ $default_tests_ref }), 5, "Got expected 5 tests");
+    is(scalar(@{ $default_tests_ref }), 3, "Got expected 3 tests");
+    # reset for subsequent tests
     @Parrot::Harness::DefaultTests::standard_tests = qw( delta.t );
 
     ok(chdir $cwd, "Able to change back to starting directory after testing");
