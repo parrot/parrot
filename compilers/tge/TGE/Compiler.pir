@@ -399,38 +399,46 @@ loop_end:
     .local string inherit
     type    = grammar["type"]
     inherit = grammar["inherit"]
-    .local pmc inherit_parts
-    inherit_parts = split '::', inherit
-    inherit       = join "'; '", inherit_parts
-    code    = "\n.namespace"
+    .local string inherit_key, type_key
+    inherit_key = self.'classname_key'(inherit)
+    type_key    = self.'classname_key'(type)
 
-    .local pmc type_parts
-    type_parts = split '::', type
-    type       = join "'; '", type_parts
-    code .= " [ '"
-    code .= type
-    code .= "' ]"
+    code  = "\n.namespace"
+    code .= type_key
   no_type:
     code .= "\n\n"
     code .= ".sub '__onload' :load :init\n"
     code .= "    load_bytecode 'TGE.pbc'\n"
     code .= "    push_eh class_loaded\n"
-    code .= "    $P1 = subclass [ '"
-    code .= inherit
-    code .= "' ], [ '"
-    code .= type
-    code .= "' ]\n"
+    code .= "    $P1 = subclass "
+    code .= inherit_key
+    code .= ", "
+    code .= type_key
+    code .= "\n"
     code .= "    pop_eh\n"
     code .= "  class_loaded:\n"
     code .= "\n.end\n\n"
     .return (code)
 .end
 
-=head1 AUTHOR
+.sub 'classname_key' :method
+    .param string name
+    .local string key
+    .local pmc parts
+    parts = split '::', name
 
-Allison Randal <allison@perl.org>
+    # If splitting on '::' doesn't break down name, try splitting on ';'.
+    $I0 = elements parts
+    if $I0 > 1 goto build_key
+    parts = split ';', name
 
-=cut
+  build_key:
+    key = " [ '"
+    $S0  = join "'; '", parts
+    key .= $S0
+    key .= "' ]"
+    .return (key)
+.end
 
 # Local Variables:
 #   mode: pir
