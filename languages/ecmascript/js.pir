@@ -13,8 +13,6 @@ js is a compiler for ECMAScript-262 (3rd edition) running on Parrot.
 =cut
 
 
-#.include 'src/gen_builtins.pir'
-
 ## Create a 'List' class; stolen from Rakudo.
 ## At some point, this should be refactored/reused.
 ##
@@ -53,24 +51,18 @@ js is a compiler for ECMAScript-262 (3rd edition) running on Parrot.
 
 .sub 'onload' :load :init :anon
     load_bytecode 'PCT.pbc'
-    load_bytecode 'Protoobject.pbc'
 
-    $P0 = get_hll_global 'Protomaker'
-    $P1 = get_class ['PCT';'HLLCompiler']
-    $P0.'new_subclass'($P1, 'JS::Compiler')
+    $P0 = get_hll_global ['PCT'], 'HLLCompiler'
+    $P1 = $P0.'new'()
+    $P1.'language'('JS')
+    $P1.'parsegrammar'('JS::Grammar')
+    $P1.'parseactions'('JS::Grammar::Actions')
 
     ## Create a list called '@?BLOCK' and store it, so it can
     ## be used in the parse actions.
     ##
     $P0 = new 'List'
     set_hll_global ['JS';'Grammar';'Actions'], '@?BLOCK', $P0
-.end
-
-
-.sub 'init' :vtable :method
-    self.'language'('JS')
-    self.'parsegrammar'('JS::Grammar')
-    self.'parseactions'('JS::Grammar::Actions')
 .end
 
 
