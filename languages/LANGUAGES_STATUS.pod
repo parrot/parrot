@@ -932,7 +932,7 @@ C<languages/punie>
 
 =item Description
 
-A Python compiler for Parrot implemented with PCT
+A Python compiler for Parrot implemented with PCT.
 
 =item Status
 
@@ -959,8 +959,9 @@ python
 
 =item Status
 
-Mostly working except for classes/exec/import. For licensing reasons, not in
-parrot's svn tree.
+This project is stalled. 
+It used to be mostly working except for classes/exec/import.
+For licensing reasons, not in parrot's svn tree.
 
 =item Last verified with parrot version
 
