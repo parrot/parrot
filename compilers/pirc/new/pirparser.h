@@ -136,7 +136,18 @@
      TK_FLAG_FLAT = 352,
      TK_FLAG_OPTIONAL = 353,
      TK_FLAG_OPT_FLAG = 354,
-     TK_FLAG_INVOCANT = 355
+     TK_FLAG_INVOCANT = 355,
+     TK_MACRO = 356,
+     TK_ENDM = 357,
+     TK_MACRO_LOCAL = 358,
+     TK_MACRO_LABEL = 359,
+     TK_MACRO_CONST = 360,
+     TK_MACRO_LABEL_ID = 361,
+     TK_MACRO_LOCAL_ID = 362,
+     TK_MACRO_IDENT = 363,
+     TK_MACRO_ARG_IDENT = 364,
+     TK_MACRO_ARG_OTHER = 365,
+     TK_MACRO_CONST_VAL = 366
    };
 #endif
 /* Tokens.  */
@@ -238,13 +249,24 @@
 #define TK_FLAG_OPTIONAL 353
 #define TK_FLAG_OPT_FLAG 354
 #define TK_FLAG_INVOCANT 355
+#define TK_MACRO 356
+#define TK_ENDM 357
+#define TK_MACRO_LOCAL 358
+#define TK_MACRO_LABEL 359
+#define TK_MACRO_CONST 360
+#define TK_MACRO_LABEL_ID 361
+#define TK_MACRO_LOCAL_ID 362
+#define TK_MACRO_IDENT 363
+#define TK_MACRO_ARG_IDENT 364
+#define TK_MACRO_ARG_OTHER 365
+#define TK_MACRO_CONST_VAL 366
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 229 "pir.y"
+#line 233 "pir.y"
 {
     double              dval;
     int                 ival;
@@ -257,9 +279,11 @@ typedef union YYSTYPE
     struct invocation  *invo;
     struct key         *key;
     struct symbol      *symb;
+    struct macro_def   *mval;
+    struct macro_param *pval;
 }
 /* Line 1489 of yacc.c.  */
-#line 263 "pirparser.h"
+#line 287 "pirparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

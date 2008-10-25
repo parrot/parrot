@@ -63,6 +63,7 @@ TODO:
 #include "pircompunit.h"
 #include "pirsymbol.h"
 #include "piryy.h"
+#include "pirmacro.h"
 
 /* #defines to prevent declarations of malloc() and free() in pirparser.h */
 #define YYMALLOC
@@ -88,6 +89,7 @@ int yypirlex(YYSTYPE *yylval, yyscan_t yyscanner);
 
 #endif
 
+void expand_macro(yyscan_t yyscanner, macro_def * const macro, macro_param * args);
 
 /* Enumeration of mathematical operator types; these are used to index the opnames array. */
 typedef enum pir_math_operators {
@@ -195,6 +197,8 @@ static void check_first_arg_direction(yyscan_t yyscanner, char const * const opn
 static int check_op_args_for_symbols(yyscan_t yyscanner);
 static int get_opinfo(yyscan_t yyscanner);
 
+/* names of the Parrot types */
+static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
 
 
 /* enable debugging of generated parser */
@@ -238,6 +242,8 @@ static int get_opinfo(yyscan_t yyscanner);
     struct invocation  *invo;
     struct key         *key;
     struct symbol      *symb;
+    struct macro_def   *mval;
+    struct macro_param *pval;
 }
 
 
@@ -348,6 +354,28 @@ static int get_opinfo(yyscan_t yyscanner);
        TK_FLAG_OPTIONAL     ":optional"
        TK_FLAG_OPT_FLAG     ":opt_flag"
        TK_FLAG_INVOCANT     ":invocant"
+
+/* tokens and types for macro layer */
+
+%token TK_MACRO             ".macro"
+       TK_ENDM              ".endm"
+       TK_MACRO_LOCAL       ".macro_local"
+       TK_MACRO_LABEL       ".macro_label"
+       TK_MACRO_CONST       ".macro_const"
+
+
+%token <sval> TK_MACRO_LABEL_ID    "macro-label"
+       <sval> TK_MACRO_LOCAL_ID    "macro-local"
+       <mval> TK_MACRO_IDENT       "macro-identifier"
+       <sval> TK_MACRO_ARG_IDENT   "macro-id-argument"
+       <sval> TK_MACRO_ARG_OTHER   "macro-argument"
+       <sval> TK_MACRO_CONST_VAL   "macro-constant"
+
+%type <pval> opt_macro_args
+             macro_args
+             macro_arg_list
+
+%type <sval> macro_arg
 
 %type <sval> unop
              identifier
@@ -504,46 +532,109 @@ pir_chunk         : sub_def
                   | hll_mapping
                   | loadlib
                   | location_directive
+                  | macro_definition
                   ;
 
+
+/* implementation of macro layer */
+
+macro_definition  : macro_const
+                  | macro
+                  ;
+
+macro_const       : ".macro_const" TK_IDENT TK_MACRO_CONST_VAL
+                        { new_macro_const(lexer->macros, $2, $3, yypirget_lineno(yyscanner)); }
+                  ;
+
+macro             : macro_header '(' macro_parameters ')' "\n"
+                    macro_body
+                    ".endm"
+                        {  fprintf(stderr, "macro body: [%s]\n", CURRENT_MACRO(lexer)->body); }
+                  ;
+
+macro_header      : ".macro" identifier
+                        { new_macro(lexer->macros, $2, yypirget_lineno(yyscanner), TRUE); }
+                  ;
+
+macro_parameters  : /* empty */
+                  | macro_params
+                  ;
+
+macro_params      : macro_param
+                  | macro_params ',' macro_param
+                  ;
+
+macro_param       : identifier
+                        { add_macro_param(CURRENT_MACRO(lexer), $1); }
+                  ;
+
+macro_body        : /* empty */
+                  | macro_statements
+                  ;
+
+macro_statements  : macro_statement
+                  | macro_statements macro_statement
+                  ;
+
+macro_statement   : macro_instr "\n"
+                  ;
+
+macro_instr       : macro_label_decl
+                  | macro_local_decl
+                  ;
+
+macro_label_decl  : ".macro_label" TK_MACRO_LABEL_ID
+                        { store_macro_string(CURRENT_MACRO(lexer), "%s\n", $2); }
+                  ;
+
+macro_local_decl  : ".macro_local" type TK_MACRO_LOCAL_ID
+                        {
+                          store_macro_string(CURRENT_MACRO(lexer), ".local %s %s\n",
+                                             pir_type_names[$2], $3);
+                        }
+                  ;
+
+/* end of macro layer */
+
+
 loadlib           : ".loadlib" TK_STRINGC
-                            { load_library(lexer, $2); }
+                        { load_library(lexer, $2); }
                   ;
 
 location_directive: ".line" TK_INTC
-                            { yypirset_lineno ($2, yyscanner); }
+                        { yypirset_lineno ($2, yyscanner); }
                   | ".file" TK_STRINGC
-                            { lexer->filename = $2; }
+                        { lexer->filename = $2; }
                   ;
 
 /* HLL stuff      */
 
 hll_specifier     : ".HLL" TK_STRINGC
-                            { set_hll(lexer, $2); }
+                        { set_hll(lexer, $2); }
                   ;
 
 hll_mapping       : ".HLL_map" TK_STRINGC '=' TK_STRINGC
-                            { set_hll_map(lexer, $2, $4); }
+                        { set_hll_map(lexer, $2, $4); }
                   ;
 
 namespace_decl    : ".namespace" '[' opt_namespace ']'
-                            { set_namespace(lexer, $3); }
+                        { set_namespace(lexer, $3); }
                   ;
 
 opt_namespace     : /* empty */
-                            { $$ = NULL; }
+                        { $$ = NULL; }
                   | namespace
-                            { $$ = $1; }
+                        { $$ = $1; }
                   ;
 
 namespace         : namespace_slice
-                            { $$ = new_key(lexer, $1); }
+                        { $$ = new_key(lexer, $1); }
                   | namespace ';' namespace_slice
-                            { $$ = add_key(lexer, $1, $3); }
+                        { $$ = add_key(lexer, $1, $3); }
                   ;
 
 namespace_slice   : TK_STRINGC
-                            { $$ = expr_from_const(lexer, new_const(lexer, STRING_TYPE, $1)); }
+                        { $$ = expr_from_const(lexer, new_const(lexer, STRING_TYPE, $1)); }
                   ;
 
 sub_def           : sub_head sub_flags "\n"
@@ -667,8 +758,51 @@ statement         : parrot_stat
                   | null_stat
                   | empty_stat
                   | location_stat
+                  | macro_expansion
                   | error_stat
                   ;
+
+
+/* grammar rules for macro expansion; .macro_const expansions are done in the lexer. */
+
+macro_expansion   : TK_MACRO_IDENT opt_macro_args "\n"
+                        { expand_macro(yyscanner, $1, $2); }
+                  ;
+
+opt_macro_args    : /* empty */
+                        { $$ = NULL; }
+                  | '(' macro_args ')'
+                        { $$ = $2; }
+                  ;
+
+macro_args        : /* empty */
+                        { $$ = NULL; }
+                  | macro_arg_list
+                  ;
+
+macro_arg_list    : macro_arg
+                        { $$ = new_macro_param($1); }
+                  | macro_arg_list ',' macro_arg
+                        {
+                          macro_param *param = new_macro_param($3);
+                          param->next = $1;
+                          $$ = param;
+                        }
+                  ;
+
+macro_arg         : TK_MACRO_ARG_IDENT  /* identifiers are handled separately to check them */
+                        {
+                          symbol *sym = find_symbol(lexer, $1);
+                          if (sym == NULL) {
+                              yypirerror(yyscanner, lexer, "macro argument '%s' is not a "
+                                                           "declared identifier", $1);
+                          }
+                        }
+                  | TK_MACRO_ARG_OTHER  /* all other macro argument options */
+                  ;
+
+/* end of macro expansion */
+
 
 /* make sure a new instruction node is created; call set_instr() for that. */
 empty_stat        : "\n"

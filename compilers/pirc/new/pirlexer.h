@@ -38,7 +38,8 @@
 
 
 
-#line 42 "pirlexer.h"
+
+#line 43 "pirlexer.h"
 
 #define  YY_INT_ALIGNED short int
 
@@ -320,6 +321,15 @@ void yypirfree (void * ,yyscan_t yyscanner );
 
 #ifdef YY_HEADER_EXPORT_START_CONDITIONS
 #define INITIAL 0
+#define MACROHEAD 1
+#define MACROBODY 2
+#define MACROLOCAL 3
+#define MACROLABEL 4
+#define MACROEXPAND 5
+#define MACROCONST 6
+#define SCANSTR 7
+#define SCANMACRO 8
+#define STRINGEXPAND 9
 
 #endif
 
@@ -477,9 +487,9 @@ extern int yypirlex (YYSTYPE * yylval_param ,yyscan_t yyscanner);
 #undef YY_DECL
 #endif
 
-#line 352 "pir.l"
+#line 714 "pir.l"
 
 
-#line 484 "pirlexer.h"
+#line 494 "pirlexer.h"
 #undef yypirIN_HEADER
 #endif /* yypirHEADER_H */

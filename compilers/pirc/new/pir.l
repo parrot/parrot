@@ -30,6 +30,7 @@
 #  define YY_ALWAYS_INTERACTIVE 0
 #endif
 
+
 }
 
 %{
@@ -48,26 +49,8 @@ pir.l - implementation of the lexical analyzer of the PIR assembly language.
 =head1 DESCRIPTION
 
 This file implements the lexical analyzer of the PIR assembly language.
-
-The current approach is to create a three-pass compiler, but if any optimizations
-in this schedule can be made, then this is preferred. This needs more experimentation.
-
-The first pass is the heredoc pre-processor, which converts all heredoc strings into
-normal strings (they are "flattened). Furthermore, this phase strips all comments, both
-POD and line comments.
-
-The second pass is the macro pre-processor, which handles the C<.macro>, C<.macro_const>
-and C<.include> directives. The resulting output is the file that can be fed into the
-actual PIR parser.
-
-The third pass is then the PIR parsing phase. It takes the output of the macro pre-processor,
-which contains no heredoc strings and macros. For that reason, the PIR lexer is very
-simple and straightforward.
-
-Each of the phases can be easily implemented. When they must be combined, the complexity
-grows quickly. Therefore, this approach, which is probably not the most efficient, is
-easier to maintain, and preferable.
-
+The macro layer is implemented here as well. Heredocs are processed by
+a different preprocessor.
 
 =cut
 
@@ -76,18 +59,20 @@ easier to maintain, and preferable.
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <assert.h>
 #include "pirparser.h"
 #include "pircompiler.h"
 #include "piryy.h"
-
+#include "pirmacro.h"
 
 /* define the type of the extra field in the yyscan_t object that is passed around;
  * this is the lexer_state structure, defined in "pircompiler.h"
  */
 #define YY_EXTRA_TYPE  struct lexer_state *
 
-/* accessor methods for setting and getting the lexer_state */
+/* accessor methods for setting and getting the column; flex doesn't generate
+ * prototypes for these for some reason. It's probably a missing feature, so
+ * let's do that here and now.
+ */
 extern int  yypirget_column(yyscan_t yyscanner);
 extern void yypirset_column(int col, yyscan_t yyscanner);
 
@@ -103,13 +88,17 @@ extern void yypirset_column(int col, yyscan_t yyscanner);
 #endif
 
 
+void expand_macro(yyscan_t yyscanner, macro_def * const macro, macro_param * args);
 
-
+/* static prototypes */
+static int is_pir_directive(char * const text);
+static macro_table *pop_macro_table(lexer_state * const lexer);
+static char * munge_id(char const * const id, lexer_state * const lexer);
 
 
 %}
 
-ALPHA          [a-zA-Z@_]
+ALPHA          [a-zA-Z_]
 DIGIT          [0-9]
 DIGITS         {DIGIT}+
 ALNUM          {ALPHA}|{DIGIT}
@@ -131,6 +120,7 @@ DQ_STRING       \"(\\.|[^"\\\n])*\"
 SQ_STRING       \'[^'\n]*\'
 Q_STRING       {SQ_STRING}|{DQ_STRING}
 
+REGISTER       "$"[SNIP]{DIGITS}
 
 /* make sure yytext is a pointer */
 %pointer
@@ -165,6 +155,19 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 /* create a scanner in debug mode; XXX remove this in production build. */
 %option debug
 
+%option stack
+
+%x MACROHEAD
+%x MACROBODY
+%x MACROLOCAL
+%x MACROLABEL
+%x MACROEXPAND
+%x MACROCONST
+/* note that SCANSTR is an inclusive state, purely to override default action for <<EOF>> */
+%s SCANSTR
+%s SCANMACRO
+
+%x STRINGEXPAND
 
 %%
 
@@ -212,24 +215,6 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
                     return TK_CONC;
                   }
 
-{WS}"."           { /* $P0 .$P1 means error; either space on both side or none at all. */
-                    yypirerror(yyscanner, yyget_extra(yyscanner),
-                          "ambiguous '.'; must be enclosed in space on both sides or none at all.");
-                    return TK_CONC;
-                  }
-
-"."{WS}           { /* $P0. $P1 means error; see {WS}"." */
-                    yypirerror(yyscanner, yyget_extra(yyscanner),
-                          "ambiguous '.'; must be enclosed in space on both sides or none at all.");
-                    return TK_CONC;
-                  }
-
-"."               { /* at this point all dot-whitespace combinations have been covered;
-                     * so we can be sure that the dot does not have any surrounding
-                     * whitespace: that's the method-call dot, as in $P0.$P1().
-                     */
-                     return '.';
-                  }
 
 "="               { return '='; }
 ";"               { return ';'; }
@@ -339,22 +324,661 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 {BIN}             { yylval->ival = atoi(yytext); return TK_INTC; }
 {OCT}             { yylval->ival = atoi(yytext); return TK_INTC; }
 
+"."               { /* at this point all dot-whitespace combinations have been covered;
+                     * so we can be sure that the dot does not have any surrounding
+                     * whitespace: that's the method-call dot, as in $P0.$P1().
+                     */
+                     return '.';
+                  }
 
-.           { /* any character not covered in the rules above is an error. */
-              yypirerror(yyscanner, yyget_extra(yyscanner),
-                         "unexpected character: '%c'", yytext[0]);
-            }
 
-<<EOF>>     { /* end of file, stop scanning. */
-              yyterminate();
-            }
+
+%{
+
+/* SCANSTR<<EOF>> and SCANMACRO<<EOF>> must be defined before <INTIAL><<EOF>>,
+ * because they are %s states, which means they are inclusive, not exclusive states.
+ * An inclusive scanner state will recognize all other tokens defined in <INITIAL>
+ * state, but they are used here to override the action when scanning <INITIAL><<EOF>>.
+ */
+
+/* SCANSTR and SCANMACRO are states that are active when expanding a macro_const
+ * or a macro, respectively. When expanding a macro_const, no new macro_table
+ * is created, which acts as a local symbol table for parameters. Hence, there
+ * are two different <<EOF>> actions for them.
+ */
+
+%}
+
+<SCANSTR><<EOF>>   { /* switch back from .macro_const buffer to file. */
+                     lexer_state * const lexer = yyget_extra(yyscanner);
+                     yy_pop_state(yyscanner);
+                     yy_switch_to_buffer(lexer->buffer, yyscanner);
+                   }
+
+<SCANMACRO><<EOF>> { /* override the default <<EOF>> action; go back to normal state and
+                      * switch back to the saved file.
+                      */
+                     lexer_state * const lexer = yyget_extra(yyscanner);
+                     macro_table * const table = pop_macro_table(lexer);
+
+                     yy_pop_state(yyscanner); /* pop off the SCANMACRO scanner state */
+
+                     /* switch back to whatever buffer we were scanning before we started
+                      * to read the macro's buffer.
+                      */
+                     yy_switch_to_buffer(table->prev_buff, yyscanner);
+
+                     /* restore line number */
+                     yyset_lineno(table->lineno, yyscanner);
+
+                     /* restore current scope id */
+                     lexer->unique_id = table->scopeno;
+
+                     /* fprintf(stderr, "scanmacro:<<eof>>\n"); */
+                     /*  delete_constant_table(macro_params);
+                     */
+                   }
+
+<SCANMACRO>{IDENT}"@"    {
+                            char *id = dupstrn(yyget_extra(yyscanner), yytext, yyleng - 1);
+                            yylval->sval = munge_id(id, yyget_extra(yyscanner));
+                            fprintf(stderr, "munged id: %s\n", yylval->sval);
+                            return TK_IDENT;
+
+                  }
+
+<INITIAL><<EOF>>  { /* end of file, stop scanning. */
+                    yyterminate();
+                  }
+
+.                 { /* any character not covered in the rules above is an error. */
+                    yypirerror(yyscanner, yyget_extra(yyscanner),
+                               "unexpected character: '%c'", yytext[0]);
+                  }
+
+
+%{
+
+/*****************************************************************************
+*
+*  the following rules implement the macro layer.
+*
+*****************************************************************************/
+%}
+
+
+%{
+
+/********************** .macro_const ****************************************/
+
+%}
+
+".macro_const"               {
+                               yy_push_state(MACROCONST, yyscanner);
+                               return TK_MACRO_CONST;
+                             }
+
+<MACROCONST>{IDENT}          {
+                               yylval->sval = dupstr(yyget_extra(yyscanner), yytext);
+                               return TK_IDENT;
+                             }
+
+<MACROCONST>{REGISTER}|{FLOATNUM}|{OCT}|({SIGN}?{DIGITS})|{HEX}|{BIN}|{Q_STRING} {
+                               /* only these tokens can be macro constant values */
+                               yylval->sval = dupstr(yyget_extra(yyscanner), yytext);
+                               yy_pop_state(yyscanner);
+                               return TK_MACRO_CONST_VAL;
+                             }
+
+<MACROCONST>{WS}             { /* ignore whitespace */ }
+<MACROCONST>.                {
+                               yypirerror(yyscanner, yyget_extra(yyscanner),
+                                          "unknown character: '%c'", yytext[0]);
+                             }
+<MACROCONST><<EOF>>          {
+                               yypirerror(yyscanner, yyget_extra(yyscanner),
+                                          "read end of file during .macro_const definition");
+                             }
+
+%{
+
+/**************** macro header (.macro <ident> <parameters> ) ***************/
+
+%}
+
+".macro"                     { /* start a macro definition */
+                               yy_push_state(MACROHEAD, yyscanner);
+                               return TK_MACRO;
+                             }
+
+<MACROHEAD>{IDENT}           {
+                               yylval->sval = dupstr(yyget_extra(yyscanner), yytext);
+                               return TK_IDENT;
+                             }
+
+<MACROHEAD>"("               { return '('; }
+<MACROHEAD>")"               { return ')'; }
+<MACROHEAD>","               { return ','; }
+
+<MACROHEAD>{EOL}[\t\r\n ]*   { /* a set of continuous newlines yields a single newline token. */
+                               yy_pop_state(yyscanner); /* remove MACROHEAD state */
+                               yy_push_state(MACROBODY, yyscanner); /* enter MACROBODY state */
+                               return TK_NL;
+                             }
+%{
+
+/******************************* macro expansion ***************************/
+
+/*
+ * Only identifiers, constants and registers are recognized.
+ */
+
+%}
+
+
+"."{IDENT}                   {
+                               lexer_state *lexer = yyget_extra(yyscanner);
+                               macro_def *macro   = find_macro(lexer->macros, yytext + 1);
+
+
+                               if (macro == NULL) {
+                                   yyless(1); /* return all but first character */
+                                   return '.';
+                               }
+                               else {
+                                   /* fprintf(stderr, "found .ident: %s\n", yytext + 1); */
+
+                                   /* store current buffer at this point, because we'll be
+                                    * scanning a string buffer later on. Saving must be done
+                                    * in the lexer specification, otherwise YY_CURRENT_BUFFER
+                                    * cannot be used (it's a macro).
+                                    */
+                                   lexer->buffer = YY_CURRENT_BUFFER;
+
+                                   /* if it's a .macro, (not .macro_const), then go into
+                                    * MACROEXPAND state, to correctly parse the arguments.
+                                    * For .macro_const, we don't want this, because a .macro_const
+                                    * is expanded here, hidden from the parser.
+                                    */
+                                   if (macro->takes_args) {
+                                       yylval->mval = macro;
+                                       yy_push_state(MACROEXPAND, yyscanner);
+                                       return TK_MACRO_IDENT;
+                                   }
+                                   else { /* expand the .macro_const here; no need for
+                                           * adding this to the grammar.
+                                           */
+                                       yy_push_state(SCANSTR, yyscanner);
+                                       yy_scan_string(macro->body, yyscanner);
+                                   }
+                               }
+                             }
+
+<MACROEXPAND>"."{IDENT}      { /* expand a .macro_const or parameter in argument list */
+                               lexer_state *lexer = yyget_extra(yyscanner);
+                               macro_def *macro   = find_macro(lexer->macros, yytext + 1);
+                               if (macro == NULL) {
+                                   yypirerror(yyscanner, lexer, "'%s' is not a macro", yytext + 1);
+                               }
+                               else {
+                                   if (macro->takes_args) {
+                                       yypirerror(yyscanner, lexer, "cannot expand a .macro"
+                                                  "in another .macro's argument list");
+                                   }
+                                   else {
+                                       lexer->buffer = YY_CURRENT_BUFFER;
+                                       yy_push_state(STRINGEXPAND, yyscanner);
+                                       yy_scan_string(macro->body, yyscanner);
+                                   }
+                               }
+                             }
+
+<MACROEXPAND>{IDENT}         {
+                               yylval->sval = dupstr(yyget_extra(yyscanner), yytext);
+                               return TK_MACRO_ARG_IDENT;
+                             }
+
+<MACROEXPAND>{REGISTER}      {
+                               yylval->sval = dupstr(yyget_extra(yyscanner), yytext);
+                               return TK_MACRO_ARG_OTHER;
+                             }
+
+<MACROEXPAND>{WS}            { /* ignore whitespace */ }
+<MACROEXPAND>","             { return ','; }
+<MACROEXPAND>"("             { return '('; }
+<MACROEXPAND>")"             {
+                               yy_pop_state(yyscanner); /* leave MACROEXPAND state */
+                               return ')';
+                             }
+
+<STRINGEXPAND,MACROEXPAND>{FLOATNUM}|{OCT}|({SIGN}?{DIGITS})|{HEX}|{BIN}|{Q_STRING} {
+                               yylval->sval = dupstr(yyget_extra(yyscanner), yytext);
+                               return TK_MACRO_ARG_OTHER;
+                             }
+
+<STRINGEXPAND><<EOF>>        {
+                               lexer_state * const lexer = yyget_extra(yyscanner);
+                               yy_pop_state(yyscanner);
+                               yy_switch_to_buffer(lexer->buffer, yyscanner);
+                             }
+
+<MACROEXPAND>.               { yypirerror(yyscanner, yyget_extra(yyscanner),
+                                          "unknown character in macro expansion: %c", yytext[0]);
+                             }
+
+
+%{
+
+/******************************** .macro_local *****************************/
+
+%}
+
+<MACROBODY>".macro_local"    {
+                               yy_push_state(MACROLOCAL, yyscanner);
+                               return TK_MACRO_LOCAL;
+                             }
+
+<MACROLOCAL>"int"            { return TK_INT; }
+<MACROLOCAL>"pmc"            { return TK_PMC; }
+<MACROLOCAL>"num"            { return TK_NUM; }
+<MACROLOCAL>"string"         { return TK_STRING; }
+
+<MACROLOCAL>{IDENT}          {
+
+                               char * temp = (char *)mem_sys_allocate((yyleng + 2) * sizeof (char));
+                               /* stick a special marker "@" so we can recognize this as a id
+                                * that must be munged.
+                                */
+                               strncpy(temp, yytext, yyleng);
+                               strcpy(temp + yyleng, "@");
+                               yylval->sval = temp;
+                               return TK_MACRO_LOCAL_ID;
+                             }
+
+<SCANMACRO>".$"{IDENT}       { /* .$foo */
+                               lexer_state * const lexer = yyget_extra(yyscanner);
+
+
+                             }
+
+<MACROLOCAL>{EOL}[\t\r\n ]*  {
+                               yy_pop_state(yyscanner);
+                               return TK_NL;
+                             }
+
+
+%{
+
+/****************************** .macro_label ********************************/
+
+%}
+
+<MACROBODY>".macro_label"    {
+                               yy_push_state(MACROLABEL, yyscanner);
+                               return TK_MACRO_LABEL;
+                             }
+
+<MACROLABEL>{IDENT}":"       {
+                               char * temp = (char *)mem_sys_allocate((yyleng + 2) * sizeof (char));
+                               /* stick a special marker "@" so we can recognize this as a label
+                                * that must be munged.
+                                */
+                               strncpy(temp, yytext, yyleng - 1);
+                               strcpy(temp + yyleng - 1, "@:");
+                               yylval->sval = temp;
+                               return TK_MACRO_LABEL_ID;
+                             }
+
+<MACROLABEL>"$"{IDENT}":"    {
+                               char * temp = (char *)mem_sys_allocate((yyleng + 2) * sizeof (char));
+                               /* stick a special marker "@" so we can recognize this as a label
+                                * that must be munged.
+                                */
+                               strncpy(temp, yytext, yyleng - 1);
+                               strcpy(temp + yyleng - 1, "@:");
+                               yylval->sval = temp;
+                               return TK_MACRO_LABEL_ID;
+                             }
+
+<MACROLABEL>{EOL}[\t\r\n ]*  { yy_pop_state(yyscanner); /* leave MACROLABEL state */
+                               return TK_NL;
+                             }
+
+
+<SCANMACRO>{IDENT}"@:"       { /* scan a label when expanding a buffer; declared as .macro_label */
+                               char *label  = dupstrn(yyget_extra(yyscanner), yytext, yyleng - 2);
+                               yylval->sval = munge_id(label, yyget_extra(yyscanner));
+                               return TK_LABEL;
+                             }
+
+<SCANMACRO>"$"{IDENT}"@:"    { /* scan a label when expanding macro; was a macro parameter */
+                               lexer_state *lexer = yyget_extra(yyscanner);
+                               char *paramname = dupstrn(lexer, yytext + 1, yyleng - 3);
+                               macro_def *labelparam = find_macro(lexer->macros, paramname);
+                               if (labelparam == NULL) {
+                                   yypirerror(yyscanner, lexer, "Cannot expand %s; '%s' was not "
+                                              "declared as a macro parameter", yytext, paramname);
+                               }
+                               else {
+                                   unsigned len = strlen(labelparam->body);
+                                   char *unquoted = (char *)mem_sys_allocate_zeroed(
+                                                                         (len - 1) * sizeof (char));
+                                   strncpy(unquoted, labelparam->body + 1, len - 2);
+                                   yylval->sval = munge_id(unquoted, lexer);
+                                   mem_sys_free(unquoted);
+                               }
+                               return TK_LABEL;
+                             }
+
+
+%{
+
+/*************************** macro body scanning (storing) ****************************/
+
+%}
+
+<MACROBODY>{EOL}[\t\r\n ]*   { store_macro_char(CURRENT_MACRO(yyget_extra(yyscanner)), '\n'); }
+
+<MACROBODY>".endm"           {
+                               yy_pop_state(yyscanner); /* leave MACROBODY state */
+                               return TK_ENDM;
+                             }
+
+<MACROBODY>.                 { /* store everything else */
+                               store_macro_char(CURRENT_MACRO(yyget_extra(yyscanner)), yytext[0]);
+                             }
+
+<MACROBODY><<EOF>>           {
+                               yypirerror(yyscanner, yyget_extra(yyscanner),
+                                          "read end of file while reading macro body");
+                             }
+
+
+%{ /*
+{WS}"."           {
+                    yypirerror(yyscanner, yyget_extra(yyscanner),
+                          "ambiguous '.'; must be enclosed in space on both sides or none at all.");
+                    return TK_CONC;
+                  }
+
+
+"."{WS}           {
+                    yypirerror(yyscanner, yyget_extra(yyscanner),
+                          "ambiguous '.'; must be enclosed in space on both sides or none at all.");
+                    return TK_CONC;
+                  }
+
+       */
+%}
 
 %%
 
+/*
+
+=head1 FUNCTIONS
+
+Helper functions for macro expansion. These function are only used by the lexer,
+so keep them local to this file.
+
+=over 4
+
+=cut
+
+*/
+
+
+/*
+
+=item C<static macro_table *
+peek_macro_table(lexer_state * const lexer)>
+
+=cut
+
+*/
+static macro_table *
+peek_macro_table(lexer_state * const lexer) {
+    return lexer->macros;
+}
+
+/*
+
+=item C<munge_id>
+
+Generate an identifier based on a macro label or locaal declaration, or a macro label
+or local expansion.
+
+A label declaration looks like: ".label $LABEL:", from which a normal
+PIR label is created, formatted as: "_unique_MACRO_LABEL_?:".
+
+A label expansion looks like ".$LABEL", from which a label identifier is
+generated, formatted as: "_unique_MACRO_LABEL_?"
 
 
 
+=cut
 
+*/
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static char *
+munge_id(char const * const id, lexer_state * const lexer) {
+    /* the format of the generated label: */
+    char const * const format        = "_unique_%s_%s_%d"; /* 16 characters */
+    int  const         format_length = strlen(format);
+
+
+    macro_table *table = peek_macro_table(lexer);
+
+    /* calculate length of the generated label: length of macro name,
+     * plus length of label name.
+     */
+    int   length    = format_length + strlen(table->thismacro->name) + lexer->num_digits;
+    char *munged_id;
+
+    length += strlen(id);
+
+    munged_id = (char *)mem_sys_allocate((length + 1) * sizeof (char));
+
+    /* generate the identifier; if it's a declaration, then add the colon. */
+    sprintf(munged_id, format, table->thismacro->name, id, lexer->unique_id);
+
+    return munged_id;
+}
+
+
+
+/*
+
+=item C<static macro_table *
+pop_macro_table(lexer_state * const lexer)>
+
+Pop off the current macro symbol table from the
+macro symbol table stack and return it.
+
+=cut
+
+*/
+PARROT_IGNORABLE_RESULT
+PARROT_CANNOT_RETURN_NULL
+static macro_table *
+pop_macro_table(lexer_state * const lexer) {
+    macro_table *popped = lexer->macros;
+    lexer->macros       = popped->prev;
+    return popped;
+}
+
+
+/*
+
+=item C<static void
+push_macro_table(lexer_state * const lexer, macro_table * const table)>
+
+=cut
+
+*/
+static void
+push_macro_table(lexer_state * const lexer, macro_table * const table) {
+    table->prev   = lexer->macros;
+    lexer->macros = table;
+}
+
+/*
+
+=item C<static void
+update_unique_id(lexer_state * const lexer)>
+
+=cut
+
+*/
+static void
+update_unique_id(lexer_state * const lexer) {
+    /* each expansion has a unique id that is used for label/local munging */
+    ++lexer->id_gen;
+    /* Count number of digits:
+     * log10 returns a double, get the part before the dot (so, "3.14" -> "3")
+     * using the floor() function.
+     * log10(1000) -> 3, so add 1 more digit.
+     */
+    lexer->num_digits = (int)floor(log10(lexer->id_gen)) + 1;
+}
+
+
+/*
+
+=item C<static void
+expand(yyscan_t yyscanner, macro_def * const macro, list * args, lexer_state * const lexer)>
+
+Expand the specified macro (or constant).
+
+=cut
+
+*/
+void
+expand_macro(yyscan_t yyscanner, macro_def * const macro, macro_param * args) {
+    /* construct a map data structure that maps the argument values to the parameter names */
+    /* enter the parameters as temporary symbols (.macro_const) */
+    lexer_state *lexer        = yypirget_extra(yyscanner);
+    macro_table *macro_params = new_macro_table(lexer->macros);
+    macro_param *params       = macro->parameters;
+
+    /* push the new macro_table, acting as a local symbol scope */
+    push_macro_table(lexer, macro_params);
+
+    /* save the current line, unique_id and current buffer in the macro_table,
+     * so they can be restored when the macro_table is popped from the stack.
+     */
+    macro_params->lineno     = yyget_lineno(yyscanner);
+    /* save current scope id */
+    macro_params->scopeno    = lexer->unique_id;
+    macro_params->prev_buff  = lexer->buffer; /* cannot use YY_CURRENT_BUFFER here, but it was
+                                                 stored in lexer->buffer anyway, so store that. */
+    macro_params->thismacro  = macro; /* let the macro_table point to the macro-definition that
+                                         is being expanded; this allows access to macro name etc. */
+
+    while (params && args) {
+        new_macro_const(macro_params, params->name, args->name, yyget_lineno(yyscanner));
+      /*  fprintf(stderr, "defining parameter '%s' as '%s'\n", params->name, args->name); */
+        params = params->next;
+        args   = args->next;
+    }
+
+    /* check for both conditions; either can be non-null, indicating an error.
+     * If both are null, then all went ok.
+     */
+    if (params != NULL)  /* args must be null, so too few arguments */
+        yypirerror(yyscanner, lexer, "Too few arguments for macro expansion '%s'", macro->name);
+
+    if (args != NULL)  /* params must be null, so too many arguments */
+        yypirerror(yyscanner, lexer, "Too many arguments for macro expansion '%s'", macro->name);
+
+
+    update_unique_id(lexer);
+    lexer->unique_id = lexer->id_gen;
+
+    /* switch to SCANMACRO state, and tell the lexer to get
+     * next tokens from the string buffer by calling yy_scan_string().
+     */
+    yy_push_state(SCANMACRO, yyscanner);
+    yy_scan_string(macro->body, yyscanner);
+    /* update the line number in the yyscanner so that any error message occuring
+     * refers to the bad line in the macro definition. Note that this must done
+     * **after** the call to yy_scan_string(), which sets the line number to 1.
+     */
+    yyset_lineno(macro->linedefined, yyscanner);
+}
+
+/*
+
+=item C<static int
+is_pir_directive(char * const text)>
+
+Returns TRUE if C<text> is a PIR directive; FALSE otherwise.
+
+=cut
+
+*/
+
+/*
+PARROT_PURE
+PARROT_WARN_UNUSED_RESULT
+*/
+static int
+is_pir_directive(char * const text) {
+    char const * const directives[] = {
+        ".set_arg"      ,
+        ".const"        ,
+        ".end"          ,
+        ".file"         ,
+        ".get_results"  ,
+        ".globalconst"  ,
+        ".HLL"          ,
+        ".HLL_map"      ,
+        ".invocant"     ,
+        ".lex"          ,
+        ".line"         ,
+        ".loadlib"      ,
+        ".local"        ,
+        ".meth_call"    ,
+        ".namespace"    ,
+        ".nci_call"     ,
+        ".param"        ,
+        ".begin_call"   ,
+        ".begin_return" ,
+        ".begin_yield"  ,
+        ".call"         ,
+        ".end_call"     ,
+        ".end_return"   ,
+        ".end_yield"    ,
+        ".get_result"   ,
+        ".return"       ,
+        ".sub"          ,
+        ".yield"        ,
+        ".set_return"   ,
+        ".set_yield"    ,
+        ".tailcall"     ,
+        NULL
+    };
+
+    char const * const * iter;
+    iter = directives;
+
+    while (*iter) {
+        if (STREQ(*iter, text))
+            return 1;
+        iter++;
+    }
+    return 0;
+}
+
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

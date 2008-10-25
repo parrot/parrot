@@ -11,6 +11,7 @@
 #include "pircompiler.h"
 #include "parrot/parrot.h"
 #include "piryy.h"
+#include "pirmacro.h"
 
 /* XXX count memory, so we can check out mem. savings of string reuse */
 static int totalmem = 0;
@@ -145,7 +146,8 @@ new_lexer(NULLOK(char * const filename), int flags) {
     /* create a hashtable for storing .const declarations */
     init_hashtable(lexer, &lexer->constants, HASHTABLE_SIZE_INIT);
 
-
+    /* create a new symbol table for macros XXX why not a hashtable? XXX */
+    lexer->macros = new_macro_table(NULL);
 
     return lexer;
 }

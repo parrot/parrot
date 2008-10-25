@@ -8,6 +8,7 @@
 
 #include "pirsymbol.h"
 #include "pircompunit.h"
+#include "pirmacro.h"
 
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
@@ -112,9 +113,19 @@ typedef struct lexer_state {
                                     * lexer.
                                     */
 
+    /* macro stuff */
+    macro_table              *macros;        /* macro definitions */
+    int                       num_digits;    /* keep track of number of digits needed for id_gen */
+    int                       id_gen;        /* for generating unique identifiers */
+    int                       unique_id;     /* current unique id */
+    struct yy_buffer_state   *buffer;  /* for saving buffer state when scanning a .macro_const */
+
+
 
 } lexer_state;
 
+/* accessor for current macro; always first on the list. */
+#define CURRENT_MACRO(X)    X->macros->definitions
 
 
 /* constructor for a lexer_state object */
