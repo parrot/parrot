@@ -1,6 +1,6 @@
 =pod
 
-=head1 Parrot Intermediate Representation
+=head0 Parrot Intermediate Representation
 
 Z<CHP-3>
 
@@ -22,21 +22,22 @@ each that are necessary.
 X<.pasm files> A file with a F<.pasm> extension is treated as pure PASM
 code by Parrot, as is any file run with the C<-a> command-line option.
 This mode is mainly used for running pure PASM tests, and is not likely
-to be useful for most developers. Parrot treats any extension other than
-F<.pasm> as a PIR file in mixed mode. X<.pir files> As a convention, files
-containing pure PIR code generally have a F<.pir> extension.
+to be useful for most developers. Parrot will treat a file with any 
+extension other than F<.pasm> as a PIR file in mixed mode. 
+X<.pir files> As a convention, files containing pure PIR code generally 
+have a F<.pir> extension.
 
 X<PIR (Parrot intermediate representation);documentation>
-PIR is well documented, both in traditional documentation but also in
+PIR is well documented, both in traditional documentation and in
 instructional code examples. The documentation for the PIR compiler IMCC
 in F<imcc/docs/> or the project documentation in F<docs/> are good
 sources for information. The test suite in F<imcc/t> shows examples of
 proper working code as it should be. These are all good starting points
 for digging deeper into the PIR syntax and functionality.
 
-=head2 Statements
+=head1 Statements
 
-Z<CHP-10-SECT-1>
+Z<CHP-3-SECT-1>
 
 X<statements (PIR)>
 X<PIR (Parrot intermediate representation);statements>
@@ -64,9 +65,9 @@ operators:
 
 We will get into all of these in more detail as we go.
 
-=head2 Variables and Constants
+=head1 Variables and Constants
 
-Z<CHP-10-SECT-2>
+Z<CHP-3-SECT-2>
 
 X<constants (PIR)>
 X<PIR (Parrot intermediate representation);constants>
@@ -75,9 +76,9 @@ Literal constants in PIR are the same as constants in PASM. Integers
 and floating-point numbers are numeric literals and strings are
 enclosed in quotes. PIR strings use the same escape sequences as PASM.
 
-=head3 Parrot Registers
+=head2 Parrot Registers
 
-Z<CHP-10-SECT-2.1>
+Z<CHP-3-SECT-2.1>
 
 PIR code has a variety of ways to store values while you work with
 them. The most basic way is to use Parrot registers directly. PASM
@@ -99,13 +100,13 @@ the pool of allocated registers too large.> Of course, as with any
 memory management situation, fewer allocations translates directly
 to improved performance.
 
-=head3 Temporary Registers
+=head2 Temporary Register Variables
 
-Z<CHP-10-SECT-2.2>
+Z<CHP-3-SECT-2.2>
 
-X<$ (dollar sign);for temporary registers (PIR)>
-X<temporary registers (PIR)>
-X<PIR (Parrot intermediate representation);temporary registers>
+X<$ (dollar sign);for temporary register variables (PIR)>
+X<temporary register variables (PIR)>
+X<PIR (Parrot intermediate representation);temporary register variables>
 PIR provides an easier way to work with Parrot registers. The
 temporary register variables are named like the PASM registers--with a
 single character for the type of register and a number--but they start
@@ -146,7 +147,7 @@ to C<S16>. These numbers are hypothetical, of course. Which registers
 Parrot actually uses in these situations is based on a large number
 of factors.
 
-Parrot allocates temporary registersN<As well as named variables,
+Parrot allocates temporary register variablesN<As well as named variables,
 which we'll talk about next.> to Parrot registers in ascending order
 based on their I<score>. The score is used to determine whether a
 register is being actively used, and whether it can be reused for
@@ -196,11 +197,11 @@ or just
 to see resulting PASM on I<stdout>.
 
 You'll find more details on these options and many others in
-A<CHP-11-SECT-4>"Parrot Command-Line Options" in Chapter 11.
+A<CHP-13-SECT-4>"Parrot Command-Line Options" in Chapter 13.
 
-=head3 Named Variables
+=head2 Named Variables
 
-Z<CHP-10-SECT-2>
+Z<CHP-3-SECT-2.3>
 
 X<named variables (PIR)>
 X<PIR (Parrot intermediate representation);named variables>
@@ -230,9 +231,9 @@ but it's a safe bet they will before the production release. Parrot
 opcode names are normally not allowed as variable names, though there
 are some exceptions.
 
-=head3 PMC variables
+=head2 PMC variables
 
-Z<CHP-10-SECT-2.3.1>
+Z<CHP-3-SECT-2.4>
 
 PMC registers and variables act much like any integer, floating-point
 number, or string register or variable, but you have to instantiate a
@@ -260,9 +261,9 @@ C<new>:
   hello = "Hello, Polly.\n"
   print hello
 
-=head3 Named Constants
+=head2 Named Constants
 
-Z<CHP-10-SECT-2.4>
+Z<CHP-3-SECT-2.5>
 
 X<PIR (Parrot intermediate representation);named constants>
 X<named constants (PIR)>
@@ -283,9 +284,9 @@ but have to be declared beforehand:
   .const string mouse = "Mouse"     # string constant
   .const num pi = 3.14159           # floating point constant
 
-=head3 Register Spilling
+=head2 Register Spilling
 
-Z<CHP-10-SECT-2.5>
+Z<CHP-3-SECT-2.6>
 
 X<registers;spilling in PIR>
 X<PIR (Parrot intermediate representation);register spilling>
@@ -341,9 +342,9 @@ if two variables have the same score Parrot may assign registers based
 on the hashed value of the variable name. Parrot randomizes the seed
 to the hash function to guarantee you never get a consistent order.
 
-=head2 Symbol Operators
+=head1 Symbol Operators
 
-Z<CHP-10-SECT-3>
+Z<CHP-3-SECT-3>
 
 X<symbol operators in IMCC>
 You probably noticed the C<=> assignment operator in some of the
@@ -354,7 +355,7 @@ earlier examples:
 
 Standing alone, it's the same as the PASM C<set> opcode. In fact, if
 you run F<parrot> in bytecode debugging mode (as in
-A<CHP-11-SECT-4.2>"Assembler Options" in Chapter 11), you'll see it
+A<CHP-13-SECT-4.2>"Assembler Options" in Chapter 11), you'll see it
 really is just a C<set> opcode underneath.
 
 PIR has many other symbol operators: arithmetic, concatenation,
@@ -384,22 +385,20 @@ syntax in PIR with the assignment operator:
   $P0 = newclass "Foo"
   ...
 
-A complete list of PIR operators is available in A<CHP-11>Chapter 11.
-We'll discuss the comparison operators in A<CHP-10-SECT-3>"Symbol
-Operators" later in this chapter.
+A complete list of PIR operators is available in A<CHP-13>Chapter 13.
 
-=head2 Labels
+=head1 Labels
 
-Z<CHP-10-SECT-4>
+Z<CHP-3-SECT-4>
 
 X<PIR (Parrot intermediate representation);labels>
 X<labels (PIR)>
 Like PASM, any line can start with a label definition like C<LABEL:>,
 but label definitions can also stand on their own line.
 
-PIR code has both local and global labels. Global labels start with an
-underscore. The name of a global label has to be unique, since it can
-be called at any point in the program. Local labels start with a
+PIR code can contain both local and global labels. Global labels start 
+with an underscore. The name of a global label has to be unique, since 
+it can be called at any point in the program. Local labels start with a
 letter. A local label is accessible only in the compilation unit where
 it's defined.N<We'll discuss compilation units in the next section.>
 The name has to be unique there, but it can be reused in a different
@@ -413,7 +412,7 @@ subroutine calls.
 
 =head2 Compilation Units
 
-Z<CHP-10-SECT-4.1>
+Z<CHP-3-SECT-4.1>
 
 X<PIR (Parrot intermediate representation);compilation units>
 X<compilation units (PIR)>
@@ -432,7 +431,7 @@ with the C<.end> directive:
 This example defines a compilation unit named C<_main> that prints a
 string. The name is actually a global label for this piece of code. If
 you generate a PASM file from the PIR code (see the end of the
-A<CHP-10-SECT-2.2>"Temporary Registers" section earlier in this
+A<CHP-3-SECT-2.2>"Temporary Register Variables" section earlier in this
 chapter), you'll see that the name translates to an ordinary label:
 
   _main:
@@ -457,12 +456,12 @@ compilation unit C<_main>, but the name isn't critical.
 
 This code prints out "Hello, Polly." but not "Polly want a cracker?":
 
-The A<CHP-10-SECT-6>"Subroutines" section later in this chapter goes
-into much more detail about compilation units and their uses.
+A<CHP-04>Chapter 4 goes into much more detail about compilation units 
+and their uses.
 
-=head2 Flow Control
+=head1 Flow Control
 
-Z<CHP-10-SECT-5>
+Z<CHP-3-SECT-5>
 
 X<PIR (Parrot intermediate representation);flow control>
 X<flow control;in PIR>
@@ -526,7 +525,7 @@ if C<$I0> is less than C<$I1>. The C<if $I0 E<lt> $I1 goto L1>
 statement translates directly to the PASM C<lt> branch operation.
 
 The rest of the comparison operators are summarized in
-A<CHP-11-SECT-3>"PIR Instructions" in Chapter 11.
+A<CHP-13-SECT-3>"PIR Instructions" in Chapter 11.
 
 X<loops;PIR>
 X<PIR (Parrot intermediate representation);loop constructs>
