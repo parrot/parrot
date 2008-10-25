@@ -50,7 +50,7 @@ rule  statement_delimiter   { ';'
                             | <before '?'>
                             | $
                             }
-rule  echo_statement        { 'echo' <arguments> <.statement_delimiter>              {*} }
+rule  echo_statement        { 'echo' <ws>  <arguments> <.statement_delimiter>        {*} }
 rule  expression_statement  { <expression> <.statement_delimiter>                    {*} }
 rule  arguments             { [ <expression> [',' <expression>]* ]?                  {*} }
 rule  if_statement          { 'if' '(' <expression> ')' <block> <else_clause>?       {*} }
