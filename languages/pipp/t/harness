@@ -102,9 +102,11 @@ if ( grep { m/^--files$/ } @ARGV ) {
                                        # the directory t/pmc contains only PIR test files
                                        return [ "../parrot$PConfig{exe}", $test_file ] if $test_file =~ m!t/pmc/.*[.]t$!;
 
+                                       # the directory t/in_php contains only test scripts written in PHP
                                        return [ @cmd, $test_file ] if $test_file =~ m!t/in_php/.*[.]t$!;
 
-                                       return undef;
+                                       # all other directories contain test scripts written in Perl
+                                       return [ $PConfig{perl}, $test_file ];
                                   }
                   } ); 
     $harness->runtests(@files);
