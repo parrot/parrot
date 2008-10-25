@@ -18,12 +18,12 @@ use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
 # core Perl modules
-use Test::More     tests => 1;
+use Test::More     tests => 2;
 
 # Parrot modules
 use Parrot::Test;
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'function with not args' );
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'function with no args' );
 <?php
 
 function dummy_no_args()  {
@@ -35,5 +35,19 @@ dummy_no_args();
 ?>
 END_CODE
 The function dummy_no_args() has been called.
+END_EXPECTED
+
+language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'function with one arg', todo => 'not implemented yet' );
+<?php
+
+function echo_count( $count )  {
+  echo "count: $count\n";
+}
+
+echo_count( 123456 );
+
+?>
+END_CODE
+123456
 END_EXPECTED
 
