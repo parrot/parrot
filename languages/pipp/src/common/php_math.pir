@@ -92,8 +92,8 @@ Return the absolute value of the number
     $I0 = abs $I1
     .RETURN_LONG($I0)
   L3:
-    $I0 = isa $P1, 'array'
-    unless $I0 goto L4
+    $S0 = typeof $P1
+    unless $S0 == 'array' goto L4
     .RETURN_FALSE()
   L4:
     $N1 = $P1
