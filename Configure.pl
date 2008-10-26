@@ -647,7 +647,7 @@ or
 
 =head1 SEE ALSO
 
-F<config/init/data.pl>, F<lib/Parrot/Configure.pm>,
+F<lib/Parrot/Configure.pm>,
 F<lib/Parrot/Configure/Step.pm>, F<docs/configuration.pod>
 
 =cut

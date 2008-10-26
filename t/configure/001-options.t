@@ -12,7 +12,7 @@ BEGIN {
     our $topdir = realpath($Bin) . "/../..";
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More qw(no_plan); # tests => 34;
+use Test::More tests => 51;
 use Carp;
 use Parrot::Configure::Options qw| process_options |;
 use Parrot::Configure::Options::Conf::CLI ();
@@ -293,7 +293,7 @@ The files in this directory test functionality used by F<Configure.pl>.
 
 The tests in this file test subroutines exported by
 Parrot::Configure::Options as it is used in F<Configure.pl>, I<i.e.>, with
-C<mode => configure>..
+C<mode =E<gt> q{configure}>.
 
 =head1 AUTHOR
 
