@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -15,7 +15,6 @@ package gen::platform;
 
 use strict;
 use warnings;
-
 
 use base qw(Parrot::Configure::Step);
 
@@ -206,6 +205,8 @@ sub _set_limits {
         $limits = "config/gen/platform/$platform/platform_limits.h";
     }
     copy_if_diff( $limits, "include/parrot/platform_limits.h" );
+
+    return;
 }
 
 sub _set_implementations {
@@ -330,6 +331,8 @@ END_HERE
         print {$PLATFORM_C} $in_c, "\n\n";
         close $IN_C;
     }
+
+    return;
 }
 
 sub _handle_asm {
@@ -341,6 +344,8 @@ sub _handle_asm {
             copy_if_diff( $asm_file, "src/platform_asm.s" );
         }
     }
+
+    return;
 }
 
 1;
