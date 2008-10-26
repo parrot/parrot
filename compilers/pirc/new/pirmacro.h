@@ -86,7 +86,7 @@ void store_macro_string(macro_def * const macro, char * const str, ...);
 
 macro_param * new_macro_param(char * const value);
 
-#endif /* PARROT_PIR_MACRO_H_GUARD */
+#endif /* PARROT_PIR_PIRMACRO_H_GUARD */
 
 /*
  * Local variables:
