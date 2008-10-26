@@ -41,7 +41,7 @@ use lib '..';
 
 use Cwd           ();
 use File::Spec    ();
-use TAP::Harness  3.0;
+use TAP::Harness  3.12;     # minimum version that allows closures for the 'exec' option
 use Parrot::Config;
 
 my $language = 'pipp';
