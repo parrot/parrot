@@ -155,6 +155,7 @@ GEN_CONFIGS = \
     $(INC_DIR)/config.h \
     $(INC_DIR)/platform.h \
     $(INC_DIR)/platform_interface.h \
+    $(INC_DIR)/platform_limits.h \
     $(INC_DIR)/has_header.h \
     $(INC_DIR)/feature.h \
     $(INC_DIR)/core_pmcs.h \
