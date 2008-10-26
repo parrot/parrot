@@ -9,7 +9,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 45;
+use Parrot::Test tests => 47;
 
 =head1 NAME
 
@@ -1420,6 +1420,84 @@ pir_output_is( <<'CODE', <<'OUTPUT', "multi-dispatch on PMCNULL" );
 .end
 CODE
 any
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "multi-dispatch with :optional" );
+
+.sub 'main' :main
+    foo('Hello')
+    foo('Goodbye', 2)
+    foo(1)
+    foo(100, 200)
+.end
+
+.sub foo :multi(string)
+    .param string s
+    .param int    i      :optional
+    .param int    have_i :opt_flag
+
+    say s
+    unless have_i goto done
+    say i
+  done:
+.end
+
+.sub foo :multi(int)
+    .param int x
+    .param int i      :optional
+    .param int have_i :opt_flag
+
+    say x
+    unless have_i goto done
+    say i
+  done:
+.end
+CODE
+Hello
+Goodbye
+2
+1
+100
+200
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', .autoboxed MMD with :optional', todo => 'RT #60124' );
+
+.sub 'main' :main
+    foo('Hello')
+    foo('Goodbye', 2)
+    foo(1)
+    foo(100, 200)
+.end
+
+.sub foo :multi(String)
+    .param pmc s
+    .param pmc i      :optional
+    .param int have_i :opt_flag
+
+    say s
+    unless have_i goto done
+    say i
+  done:
+.end
+
+.sub foo :multi(Integer)
+    .param pmc x
+    .param pmc i      :optional
+    .param int have_i :opt_flag
+
+    say x
+    unless have_i goto done
+    say i
+  done:
+.end
+CODE
+Hello
+Goodbye
+2
+1
+100
+200
 OUTPUT
 
 # Local Variables:
