@@ -28,14 +28,19 @@ Its main features are:
 
 =head3 Windows using Microsoft Visual Studio
 
+The Makefile doesn't work perfectly; compilation is fine, but linking doesn't work,
+so that needs to be done manually.
+
 To compile:
 
- cl /c /I..\..\..\include *.c
+ cd compilers\pirc
+ nmake pirc
 
 To link:
 
- link /nodefaultlib main.obj pircompunit.obj pirlexer.obj pirparser.obj \
-   pirsymbol.obj pircompiler.obj kernel32.lib msvcrt.lib ..\..\..\libparrot.lib
+ link /out:pirc.exe /nodefaultlib main.obj pircompunit.obj pirlexer.obj pirparser.obj \
+   pirsymbol.obj pircompiler.obj pirmacro.obj hdocprep.obj \
+   kernel32.lib msvcrt.lib ..\..\libparrot.lib
 
 When running PIRC, it needs the shared library C<libparrot>; an easy way to do
 this is copy C<libparrot.dll> in the Parrot root directory to C<compilers/pirc/new>.
@@ -44,16 +49,13 @@ Running PIRC is as easy as:
 
  pirc test.pir
 
+See 'pirc -h' for help.
+
 =head3 Linux using GCC
 
- cc -c -I../../../include *.c
+The Makefile should work fine on Linux:
 
- cc main.o pircompiler.o pircompunit.o pirlexer.o pirparser.o \
-     pirsymbol.o ../../../blib/lib/libparrot.so.X.Y.Z -o pirc
-
-where C<X>, C<Y> and C<Z> together represent the version of Parrot
-(for instance, at the time of writing this, the version is 0.7.0,
-so that X=0, Y=7 and Z=0.)
+ cd compilers/pirc && make
 
 When running PIRC, it needs the shared library C<libparrot>; in order to let
 PIRC find it, set the path as follows:
@@ -67,15 +69,13 @@ Running is as easy as:
 =head2 Overview
 
 The new Bison/Flex based implementation of the PIR compiler is designed
-as a three-stage compiler:
+as a two-stage compiler:
 
 =over 4
 
 =item 1. Heredoc preprocessor
 
-=item 2. Macro preprocessor
-
-=item 3. PIR compiler
+=item 2. PIR compiler
 
 =back
 
@@ -105,15 +105,16 @@ is transformed into:
 
 In order to allow C<.include>d file to have heredoc strings, the heredoc preprocessor
 also handles the C<.include> directive, even though logically this is a macro function.
+See the discussion below for how the C<.include> directive works.
 
+=head2 PIR compilers
 
-=head2 Macro preprocessing
+The PIR compiler parses the output of the heredoc preprocessor. PIRC's lexer also
+handles macros.
 
 The macro layer basically implements text replacements. The following directives are handled:
 
 =over 4
-
-=item C<.include>
 
 =item C<.macro>
 
@@ -204,14 +205,7 @@ This will result in the output:
  .end
 
 
-=head2 PIR Compiler
-
-The output of the macro preprocessor is fed to the actual PIR compiler. The
-PIR compiler builds a data structure during the parsing phase (often referred
-to as an Abstract Syntax Tree - AST). The rest of this section describes the
-features of the PIR compiler.
-
-=head3 Instruction selection
+=head3 PIR compiler
 
 As Parrot instructions are polymorphic, the PIR compiler is responsible for
 selecting the right variant of the instruction. The selection is based on the
@@ -334,8 +328,6 @@ The directory compilers/pirc has a number of subdirectories:
 
 =item heredoc - contains the implementation of the heredoc preprocessor
 
-=item macro - contains the implementation of the macro layer
-
 =item new - contains the Bison/Flex implementation of PIRC
 
 =item src - contains the hand-written, recursive-descent implementation of PIRC.
@@ -343,31 +335,12 @@ Note that this is no longer maintained at the moment.
 
 =item t - for tests. No tests yet at this point.
 
+=item macro - contains the old implementation of the macro preprocessor. This is now
+integrated with pirc/new.
+
 =back
 
 =head1 NOTES
-
-=head2 Usage
-
-Currently the different compilers/pre-processors are located in different directories.
-The different pre-processors are invoked from the main driver in pirc.c. The latter
-assumes all three processors are compiled, as the following executables:
-
- heredoc pre-processor: hdocprep
- macro pre-processor:   macroparser
-
-Running a file through the whole PIR compiler is then done as follows:
-
- $ ./pirc test.pir
-
-When you want to run the heredoc pre-processor only, do this:
-
- $ ./pirc -H test.pir
-
-When you want to pre-process the file only (heredoc + macro parsing), do this:
-
- $ ./pirc -E test.pir
-
 
 
 =head2 Cygwin processable lexer spec.
@@ -429,7 +402,7 @@ that'd be helpful:
 
 =item * how are named args/params handled/represented in bytecode?
 
-=item * pirc/{macro, heredoc, new} need Makefiles.
+=item * the Makefile (generated from config/gen/makefiles/pirc.in) must be fixed for Windows.
 
 =back
 
@@ -453,7 +426,7 @@ See also:
 
 =item * C<languages/PIR> for a PGE based implementation.
 
-=item * C<compilers/pirc>, a hand-written, recursive-descent PIR parser.
+=item * C<compilers/pirc/src>, a hand-written, recursive-descent PIR parser.
 
 =item * C<compilers/imcc>, the current I<standard> PIR implementation.
 
