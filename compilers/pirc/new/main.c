@@ -13,6 +13,7 @@
 #include "piremit.h"
 #include "piryy.h"
 #include "pirlexer.h"
+#include "pirheredoc.h"
 
 
 /* XXX use pthreads library to test thread safety.
@@ -29,7 +30,7 @@
 #  define NUM_THREADS 1
 #endif
 
-void * parse_file(void *a);
+void * process_file(void *a);
 
 /*
 
@@ -50,15 +51,19 @@ static void
 print_help(char const * const program_name)
 {
     fprintf(stderr, "Usage: %s [options] <file>\n", program_name);
-    fprintf(stderr, "Options:\n\n");
-    /*fprintf(stderr, "  -E        pre-process\n"); */
-    fprintf(stderr, "  -d        show debug messages of parser\n");
-    fprintf(stderr, "  -h        show this help message\n");
-    fprintf(stderr, "  -W        show warning messages\n");
-    fprintf(stderr, "  -S        do not perform strength reduction\n");
-    fprintf(stderr, "  -v        verbose mode\n");
-    fprintf(stderr, "  -o <file> write output to the specified file. "
-                    "Currently only works in combination with '-E' option\n");
+    fprintf(stderr, "Options:\n\n"
+    "  -E        run heredoc and macro preprocessors only\n"
+    "  -d        show debug messages of parser\n"
+    "  -h        show this help message\n"
+    "  -H        heredoc preprocessing only\n"
+    "  -n        no output, only print 'ok' if successful\n"
+    "  -o <file> write output to the specified file. "
+    "Currently only works in combination with '-E' option\n"
+    "  -p        pasm output\n"
+    "  -S        do not perform strength reduction\n"
+    "  -v        verbose mode\n"
+    "  -W        show warning messages\n"
+    );
 }
 
 
@@ -110,21 +115,14 @@ typedef struct parser_args {
 
 This will be the proper declaration after testing for thread-safety:
 
-void parse_file(int flexdebug, FILE *infile, char * const filename)
+void parse_file(int flexdebug, FILE *infile, char * const filename, int flags)
 
 */
-void *
-parse_file(void *a) {
+
+void
+parse_file(int flexdebug, FILE *infile, char * const filename, int flags, int thr_id) {
     yyscan_t     yyscanner;
     lexer_state *lexer     = NULL;
-
-    /* unpack the arguments from the structure parser_args */
-    parser_args *args      = (parser_args *)a;
-    int          flexdebug = args->flexdebug;
-    FILE        *infile    = args->infile;
-    char        *filename  = args->filename;
-    int          thr_id    = args->thr_id;
-    int          flags     = args->flags;
 
     /* create a yyscan_t object */
     yypirlex_init(&yyscanner);
@@ -147,8 +145,15 @@ parse_file(void *a) {
         if (lexer->outfile == NULL)
             fprintf(stderr, "Failed to open file %s\n", outfile);
 
-        fprintf(stderr, "Parse successful!\n");
-        print_subs(lexer);
+
+
+        if (TEST_FLAG(lexer->flags, LEXER_FLAG_NOOUTPUT)) /* handy for testing the compiler */
+            fprintf(stdout, "ok\n");
+        else {
+            fprintf(stderr, "Parse successful!\n");
+            print_subs(lexer);
+        }
+
         fclose(lexer->outfile);
 
         if (TEST_FLAG(lexer->flags, LEXER_FLAG_WARNINGS))
@@ -166,10 +171,31 @@ parse_file(void *a) {
     /* clean up after playing */
     release_resources(lexer);
     yypirlex_destroy(yyscanner);
+}
+
+/*
+
+temporary function for the thread-testing code.
+Unpack the arguments and invoke parse_file().
+
+*/
+void *
+process_file(void *a) {
+
+
+    /* unpack the arguments from the structure parser_args */
+    parser_args *args      = (parser_args *)a;
+    int          flexdebug = args->flexdebug;
+    FILE        *infile    = args->infile;
+    char        *filename  = args->filename;
+    int          thr_id    = args->thr_id;
+    int          flags     = args->flags;
+
+    parse_file(flexdebug, infile, filename, flags, thr_id);
 
     return NULL;
-
 }
+
 
 
 
@@ -206,6 +232,9 @@ main(int argc, char *argv[]) {
                 yydebug = 1;
                 break;
 #endif
+            case 'E':
+                SET_FLAG(flags, LEXER_FLAG_PREPROCESS);
+                break;
             case 'f':
                 flexdebug = 1;
                 break;
@@ -213,6 +242,12 @@ main(int argc, char *argv[]) {
                 print_help(program_name);
                 exit(EXIT_SUCCESS); /* asking for help doesn't make you a failure */
                 /* break; */
+            case 'H':
+                SET_FLAG(flags, LEXER_FLAG_HEREDOCONLY);
+                break;
+            case 'n':
+                SET_FLAG(flags, LEXER_FLAG_NOOUTPUT);
+                break;
             case 'o':
                 if (argc > 1) { /* there must be at least 2 more args,
                                          the output file, and an input */
@@ -269,6 +304,7 @@ main(int argc, char *argv[]) {
             infile   = open_file(argv[0], "r");
             filename = argv[0];
         }
+
         if (infile == NULL) {
             fprintf(stderr, "Failed to open file '%s'\n", argv[0]);
             exit(EXIT_FAILURE);
@@ -280,7 +316,7 @@ main(int argc, char *argv[]) {
         args.thr_id    = i;
         args.flags     = flags;
 
-        pthread_create(&threads[i], NULL, parse_file, &args);
+        pthread_create(&threads[i], NULL, process_file, &args);
 
     }
 
@@ -290,31 +326,34 @@ main(int argc, char *argv[]) {
 }
 #else
 {
-    parser_args args;
-    FILE *infile = NULL;
+    /* non-thread testing code; this is the normal case */
+    FILE *file = NULL;
 
-    if (argc < 1) { /* no file specified, read from stdin */
-        infile   = stdin;
-        filename = NULL;
+    if (argc < 1) {
+        fprintf(stderr, "pirc: no input specified\n");
+        exit(EXIT_FAILURE);
     }
-    else {
-        /* done handling arguments, open the file */
-        infile   = open_file(argv[0], "r");
-        filename = argv[0];
+
+    /* if user requested only to process heredocs, send output to stdout and return. */
+    if (TEST_FLAG(flags, LEXER_FLAG_HEREDOCONLY)) {
+        process_heredocs(argv[0], stdout);
+        return 0;
     }
-    if (infile == NULL) {
+
+    file = fopen("heredoc.out", "w");
+    process_heredocs(argv[0], file);
+    fclose(file);
+    /* done handling arguments, open the file */
+    file     = open_file("heredoc.out", "r");
+    filename = argv[0];
+
+    if (file == NULL) {
         fprintf(stderr, "Failed to open file '%s'\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
-    /* pack all args for parse_file() */
-    args.flexdebug = flexdebug;
-    args.infile    = infile;
-    args.filename  = filename;
-    args.thr_id    = 0;
-    args.flags     = flags;
+    parse_file(flexdebug, file, filename, flags, 0);
 
-    parse_file(&args);
 }
 #endif
 
@@ -326,7 +365,7 @@ main(int argc, char *argv[]) {
 /*
 
 =item C<int
-yyerror(yyscan_t yyscanner, lexer_state * const  lexer, char const * const message, ...)>
+yypirerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message, ...)>
 
 Default parse error handling routine, that is invoked when the bison-generated
 parser finds a syntax error.

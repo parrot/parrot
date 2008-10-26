@@ -28,10 +28,13 @@ typedef struct cache {
 
 
 typedef enum lexer_flags {
-    LEXER_FLAG_WARNINGS            = 1 << 0,
-    LEXER_FLAG_NOSTRENGTHREDUCTION = 1 << 1,
-    LEXER_FLAG_VERBOSE             = 1 << 2,
-    LEXER_FLAG_EMIT_PASM           = 1 << 3
+    LEXER_FLAG_WARNINGS            = 1 << 0, /* print warnings */
+    LEXER_FLAG_NOSTRENGTHREDUCTION = 1 << 1, /* skip strength reduction */
+    LEXER_FLAG_VERBOSE             = 1 << 2, /* be verbose */
+    LEXER_FLAG_EMIT_PASM           = 1 << 3, /* emit runnable pasm code */
+    LEXER_FLAG_PREPROCESS          = 1 << 4, /* preprocess code only */
+    LEXER_FLAG_HEREDOCONLY         = 1 << 5, /* preprocess heredocs only */
+    LEXER_FLAG_NOOUTPUT            = 1 << 6  /* don't print anything on success, except 'ok' */
 
 } lexer_flags;
 
@@ -40,7 +43,7 @@ typedef enum lexer_flags {
  * before creating a new node in the list of allocated_mem_ptrs structures,
  * but for small programs with few memory allocations, this means an overhead.
  * Likewise, if the number is too small, this means a lot of allocation of these
- * blocks, as they're full quickly. XXX maybe make this configurable?
+ * blocks, as they're full quickly. XXX maybe make this runtime configurable?
  *
  */
 #define NUM_MEM_ALLOCS_PER_BLOCK    512

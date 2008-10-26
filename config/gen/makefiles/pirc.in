@@ -32,16 +32,19 @@ new/pirlexer.c \
 new/pircompunit.c \
 new/pircompiler.c \
 new/pirsymbol.c \
-new/piremit.c
+new/piremit.c \
+new/hdocprep.c \
+new/pirmacro.c
 
 # the default target
 all: pirc heredoc macro
 
 
-pirc: new/main$(O) new/pirparser$(O) new/pirlexer$(O) new/pircompunit$(O) new/pircompiler$(O) new/pirsymbol$(O) new/piremit$(O)
+pirc: new/main$(O) new/pirparser$(O) new/pirlexer$(O) new/pircompunit$(O) \
+	new/pircompiler$(O) new/pirsymbol$(O) new/piremit$(O) new/hdocprep$(O) new/pirmacro$(O)
 	$(LINK) @ld_out@$@ \
 	main$(O) pirparser$(O) pirlexer$(O) pircompunit$(O) pircompiler$(O) \
-	pirsymbol$(O) piremit$(O) \
+	pirsymbol$(O) piremit$(O) hdocprep$(O) pirmacro$(O) \
 	@rpath_blib@ @libparrot_ldflags@ $(LINKFLAGS) $(LINK_DYNAMIC)
 
 new/main$(O): new/main.c
@@ -65,9 +68,14 @@ new/pirsymbol$(O): new/pirsymbol.c new/pirsymbol.h
 new/piremit$(O): new/piremit.c new/piremit.h
 	$(CC) $(CFLAGS) -c new/piremit.c
 
+new/hdocprep$(O): new/hdocprep.c new/hdocprep.l
+	$(CC) $(CFLAGS) -c new/hdocprep.c
+
+new/pirmacro$(O): new/pirmacro.c new/pirmacro.h
+	$(CC) $(CFLAGS) -c new/pirmacro.c
 
 heredoc: heredoc/hdocprep$(O)
-	$(LINK) hdocprep$(O)
+	$(LINK) hdocprep$(O) $(LIBPARROT)
 
 heredoc/hdocprep$(O): heredoc/hdocprep.c
 	$(CC) $(CFLAGS) -c heredoc/hdocprep.c
@@ -82,22 +90,12 @@ macro/macrolexer$(O): macro/macrolexer.c
 	$(CC) $(CFLAGS) -c macro/macrolexer.c
 
 
-docs: src/pirlexer.c src/pirparser.c doc/design.pod
-	pod2html --css=http://www.parrotcode.org/css/perl.css src/pirlexer.c > doc/pirlexer.html
-	pod2html --css=http://www.parrotcode.org/css/perl.css src/pirparser.c > doc/pirparser.html
-	pod2html --css=http://www.parrotcode.org/css/perl.css src/pirvtable.c > doc/pirvtable.html
-	pod2html --css=http://www.parrotcode.org/css/perl.css src/pirout.c > doc/pirout.html
-	pod2html --css=http://www.parrotcode.org/css/perl.css src/jsonout.c > doc/jsonout.html
-	pod2html --css=http://www.parrotcode.org/css/perl.css src/pastout.c > doc/pastout.html
-	pod2html --css=http://www.parrotcode.org/css/perl.css src/pirutil.c > doc/pirutil.html
-	pod2html --css=http://www.parrotcode.org/css/perl.css doc/design.pod > doc/design.html
-	pod2html --css=http://www.parrotcode.org/css/perl.css README.pod > doc/README.html
 
 test: all
 	cd t && prove && cd ..
 	podchecker $(SOURCES) \
 	doc/design.pod \
-	README.pod
+    README.pod
 
 # regenerate the Makefile
 Makefile: $(BUILD_DIR)/config/gen/makefiles/pirc.in
