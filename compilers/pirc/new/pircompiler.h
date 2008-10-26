@@ -114,12 +114,18 @@ typedef struct lexer_state {
                                     */
 
     /* macro stuff */
-    macro_table              *macros;        /* macro definitions */
+    macro_table              *macros;        /* macro definitions; they are organized in
+                                              * C<macro_table>s, which are just symbol tables,
+                                              * representing scopes. Tables can be stacked,
+                                              * so it's easy to add a nested scope and pop it off
+                                              * after you're done with it.
+                                              */
+
     int                       num_digits;    /* keep track of number of digits needed for id_gen */
     int                       id_gen;        /* for generating unique identifiers */
     int                       unique_id;     /* current unique id */
-    struct yy_buffer_state   *buffer;  /* for saving buffer state when scanning a .macro_const */
 
+    struct yy_buffer_state   *buffer;  /* for saving buffer state when scanning a .macro_const */
 
 
 } lexer_state;
@@ -144,7 +150,15 @@ void init_hashtable(lexer_state * const lexer, hashtable * const table, unsigned
 /* same trick as in parrot's memory system, for "automagic" casting */
 #define pir_mem_allocate_zeroed_typed(lxr, type) (type *)pir_mem_allocate_zeroed(lxr, sizeof (type))
 
+/* use pir_mem_allocate functions if you don't want to worry about freeing it; all memory
+ * allocated will be freed after the compilation. If you only need some memory temporarily
+ * and freeing can be done soon after (manually), then use parrot's mem_sys_allocate().
+ */
 void *pir_mem_allocate_zeroed(lexer_state * const lexer, size_t numbytes);
+
+void *pir_mem_allocate(lexer_state * const lexer, size_t numbytes);
+
+void pirwarning(lexer_state * const lexer, int lineno, char const * const message, ...);
 
 #endif /* PARROT_PIR_PIRCOMPILER_H_GUARD */
 

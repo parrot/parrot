@@ -87,14 +87,17 @@ extern void yypirset_column(int col, yyscan_t yyscanner);
 
 #endif
 
-
+void include_file(yyscan_t yyscanner, char const * const filename);
 void expand_macro(yyscan_t yyscanner, macro_def * const macro, macro_param * args);
 
 /* static prototypes */
 static int is_pir_directive(char * const text);
 static macro_table *pop_macro_table(lexer_state * const lexer);
+static macro_table *peek_macro_table(lexer_state * const lexer);
 static char * munge_id(char const * const id, lexer_state * const lexer);
 
+static void save_filestate(yyscan_t yyscanner);
+static int restore_filestate(yyscan_t yyscanner);
 
 %}
 
@@ -275,6 +278,14 @@ REGISTER       "$"[SNIP]{DIGITS}
 ".set_yield"      { return TK_SET_YIELD; }
 ".tailcall"       { return TK_TAILCALL; }
 
+
+".endm"|".macro_local"|".macro_label"  { /* make sure these are not used outside macro defs */
+                    yypirerror(yyscanner, yyget_extra(yyscanner),
+                                            "cannot use '%s' outside of macro definitions", yytext);
+                               }
+
+
+
 ":anon"           { return TK_FLAG_ANON; }
 ":init"           { return TK_FLAG_INIT; }
 ":load"           { return TK_FLAG_LOAD; }
@@ -324,13 +335,11 @@ REGISTER       "$"[SNIP]{DIGITS}
 {BIN}             { yylval->ival = atoi(yytext); return TK_INTC; }
 {OCT}             { yylval->ival = atoi(yytext); return TK_INTC; }
 
-"."               { /* at this point all dot-whitespace combinations have been covered;
-                     * so we can be sure that the dot does not have any surrounding
-                     * whitespace: that's the method-call dot, as in $P0.$P1().
+"."               { /* XXX some work to be done to disallow $P0 . foo()
+                     * spaces should not be allowed.
                      */
                      return '.';
                   }
-
 
 
 %{
@@ -374,18 +383,18 @@ REGISTER       "$"[SNIP]{DIGITS}
                      /* restore current scope id */
                      lexer->unique_id = table->scopeno;
 
-                     /* fprintf(stderr, "scanmacro:<<eof>>\n"); */
-                     /*  delete_constant_table(macro_params);
+                     /*  XXX delete_macro_table(macro_params);
                      */
                    }
 
-<SCANMACRO>{IDENT}"@"    {
-                            char *id = dupstrn(yyget_extra(yyscanner), yytext, yyleng - 1);
-                            yylval->sval = munge_id(id, yyget_extra(yyscanner));
-                            fprintf(stderr, "munged id: %s\n", yylval->sval);
+<SCANMACRO>{IDENT}"@"  { /* when scanning a macro body, the @ marker indicates the {IDENT} must
+                          * be munged.
+                          */
+                            lexer_state * const lexer = yyget_extra(yyscanner);
+                            char const  * const id    = dupstrn(lexer, yytext, yyleng - 1);
+                            yylval->sval              = munge_id(id, lexer);
                             return TK_IDENT;
-
-                  }
+                       }
 
 <INITIAL><<EOF>>  { /* end of file, stop scanning. */
                     yyterminate();
@@ -476,14 +485,30 @@ REGISTER       "$"[SNIP]{DIGITS}
 %}
 
 
-"."{IDENT}                   {
-                               lexer_state *lexer = yyget_extra(yyscanner);
-                               macro_def *macro   = find_macro(lexer->macros, yytext + 1);
+"."{IDENT}                   { /* .foo; it can be a macro, macro_local, or just $P0.foo(),
+                                * but we need to check that.
+                                */
+                               lexer_state * const lexer = yyget_extra(yyscanner);
+                               macro_def   * const macro = find_macro(lexer->macros, yytext + 1);
 
+                               if (macro == NULL) { /* it's not a macro */
 
-                               if (macro == NULL) {
+                                   /* it may be a .macro_local */
+                                   macro_table *table = peek_macro_table(lexer);
+
+                                   if (table->thismacro != NULL) { /* not expanding a macro */
+
+                                       if (is_macro_local(table->thismacro, yytext + 1)) {
+                                           yylval->sval = munge_id(yytext + 1, lexer);
+                                           return TK_IDENT;
+                                       }
+                                       /* else fall through */
+                                   }
+
+                                   /* table->thismacro == NULL || is_macro_local() == FALSE */
                                    yyless(1); /* return all but first character */
                                    return '.';
+
                                }
                                else {
                                    /* fprintf(stderr, "found .ident: %s\n", yytext + 1); */
@@ -515,22 +540,23 @@ REGISTER       "$"[SNIP]{DIGITS}
                              }
 
 <MACROEXPAND>"."{IDENT}      { /* expand a .macro_const or parameter in argument list */
-                               lexer_state *lexer = yyget_extra(yyscanner);
-                               macro_def *macro   = find_macro(lexer->macros, yytext + 1);
-                               if (macro == NULL) {
-                                   yypirerror(yyscanner, lexer, "'%s' is not a macro", yytext + 1);
-                               }
-                               else {
+                               lexer_state * const lexer = yyget_extra(yyscanner);
+                               macro_def   * const macro   = find_macro(lexer->macros, yytext + 1);
+
+                               if (macro) {
+                                   /* .foo( .bar() ) is not allowed; that's too fancy for PIR. */
                                    if (macro->takes_args) {
                                        yypirerror(yyscanner, lexer, "cannot expand a .macro"
                                                   "in another .macro's argument list");
                                    }
-                                   else {
+                                   else { /* we do allow expansion of .macro_consts as macro args */
                                        lexer->buffer = YY_CURRENT_BUFFER;
                                        yy_push_state(STRINGEXPAND, yyscanner);
                                        yy_scan_string(macro->body, yyscanner);
                                    }
                                }
+                               else
+                                   yypirerror(yyscanner, lexer, "'%s' is not a macro", yytext + 1);
                              }
 
 <MACROEXPAND>{IDENT}         {
@@ -573,102 +599,184 @@ REGISTER       "$"[SNIP]{DIGITS}
 
 %}
 
-<MACROBODY>".macro_local"    {
-                               yy_push_state(MACROLOCAL, yyscanner);
-                               return TK_MACRO_LOCAL;
+<MACROBODY>".local"         { /* give a warning if the right flag is set */
+                              /*
+                              lexer_state * const lexer = yyget_extra(yyscanner);
+                              if (TEST_FLAG(lexer->flags, LEXER_FLAG_WARNINGS))
+                                  pirwarning(lexer, yyget_lineno(yyscanner),
+                                             "use of .local in macros prevents multiple "
+                                             "usage of macro in one sub. Use .macro_local instead");
+                              return TK_LOCAL;
+                              XXX we should disallow .local altogether in macros.
+                              Doesn't make sense to use it.
+                              */
+                            }
+
+
+<MACROBODY>".macro_local"   {
+                              yy_push_state(MACROLOCAL, yyscanner);
+                              return TK_MACRO_LOCAL;
+                            }
+
+<MACROLOCAL>"int"           { return TK_INT; }
+<MACROLOCAL>"pmc"           { return TK_PMC; }
+<MACROLOCAL>"num"           { return TK_NUM; }
+<MACROLOCAL>"string"        { return TK_STRING; }
+
+<MACROLOCAL>{IDENT}         { /* normal .macro_local */
+                              lexer_state * const lexer = yyget_extra(yyscanner);
+                              /* reserve space for {IDENT}, the @ marker and the NULL char. */
+                              char * temp = (char *)mem_sys_allocate((yyleng + 2) * sizeof (char));
+                              /* stick a special marker "@" so we can recognize this as a id
+                               * that must be munged.
+                               */
+                              sprintf(temp, "%s@", yytext);
+                              yylval->sval = temp;
+
+                              /* declare it as a macro local symbol */
+                              declare_macro_local(CURRENT_MACRO(lexer), dupstr(lexer, yytext));
+                              return TK_MACRO_LOCAL_ID;
+                            }
+
+<MACROLOCAL>"$"{IDENT}      { /* declare a .macro_local based on a parameter */
+                              lexer_state * const lexer = yyget_extra(yyscanner);
+
+                              char * temp = (char *)mem_sys_allocate((yyleng + 2) * sizeof (char));
+                              /* stick a "@" after, so it can be recognized later */
+                              sprintf(temp, "%s@", yytext);
+                              yylval->sval = temp;
+
+                              /* declare the {IDENT} part as a local */
+                              declare_macro_local(CURRENT_MACRO(lexer), dupstr(lexer, yytext + 1));
+                              return TK_MACRO_LOCAL_ID;
+
+                            }
+
+<SCANMACRO>".$"{IDENT}      { /* .$foo */
+                              lexer_state * const lexer = yyget_extra(yyscanner);
+                              macro_table * const table = peek_macro_table(lexer);
+                              macro_def   * const param = find_macro(table, yytext + 2);
+
+                              if (param == NULL)
+                                  yypirerror(yyscanner, lexer, "Cannot expand '%s', as it is "
+                                             "not a macro parameter", yytext);
+                              else {
+                                  unsigned len = strlen(param->body);
+                                  /* length includes quotes, so substract 2, + 1 for NULL char. */
+                                  char *unquoted = (char *)mem_sys_allocate_zeroed(
+                                                                        (len - 1) * sizeof (char));
+                                  /* remove the quotes */
+                                  strncpy(unquoted, param->body + 1, len - 2);
+                                  yylval->sval = munge_id(unquoted, lexer);
+
+                                  mem_sys_free(unquoted);
+                                  return TK_IDENT;
+
+                              }
+
+                            }
+
+<SCANMACRO>"$"{IDENT}"@"   { /* expanding a .macro_local using a macro parameter value */
+                             lexer_state * const lexer     = yyget_extra(yyscanner);
+                             char  const * const paramname = dupstrn(lexer, yytext + 1, yyleng - 2);
+                             macro_def   * const param     = find_macro(lexer->macros, paramname);
+
+                             if (param == NULL) {
+                                yypirerror(yyscanner, lexer, "Cannot expand %s; '%s' was not "
+                                           "declared as a macro parameter", yytext, paramname);
                              }
+                             else {
+                                unsigned  len      = strlen(param->body);
+                                char     *unquoted = (char *)mem_sys_allocate_zeroed(
+                                                                      (len - 1) * sizeof (char));
 
-<MACROLOCAL>"int"            { return TK_INT; }
-<MACROLOCAL>"pmc"            { return TK_PMC; }
-<MACROLOCAL>"num"            { return TK_NUM; }
-<MACROLOCAL>"string"         { return TK_STRING; }
+                                /* unquote the string */
+                                strncpy(unquoted, param->body + 1, len - 2);
 
-<MACROLOCAL>{IDENT}          {
-
-                               char * temp = (char *)mem_sys_allocate((yyleng + 2) * sizeof (char));
-                               /* stick a special marker "@" so we can recognize this as a id
-                                * that must be munged.
-                                */
-                               strncpy(temp, yytext, yyleng);
-                               strcpy(temp + yyleng, "@");
-                               yylval->sval = temp;
-                               return TK_MACRO_LOCAL_ID;
+                                yylval->sval       = munge_id(unquoted, lexer);
+                                mem_sys_free(unquoted);
                              }
+                             /* fprintf(stderr, "scanmacro:$id@: [%s]\n", yylval->sval); */
 
-<SCANMACRO>".$"{IDENT}       { /* .$foo */
-                               lexer_state * const lexer = yyget_extra(yyscanner);
+                             return TK_IDENT;
+                           }
 
+<MACROLOCAL>{WS}            { /* ignore whitespace */ }
 
-                             }
+<MACROLOCAL>{EOL}[\t\r\n ]* {
+                              yy_pop_state(yyscanner);
+                              return TK_NL;
+                            }
 
-<MACROLOCAL>{EOL}[\t\r\n ]*  {
-                               yy_pop_state(yyscanner);
-                               return TK_NL;
-                             }
-
-
+<MACROLOCAL>.               { /* this state is only used for declaring .macro_locals */
+                              yypirerror(yyscanner, yyget_extra(yyscanner),
+                                 "unknown character '%c' when declaring .macro_local", yytext[0]);
+                            }
 %{
 
 /****************************** .macro_label ********************************/
 
 %}
 
-<MACROBODY>".macro_label"    {
-                               yy_push_state(MACROLABEL, yyscanner);
-                               return TK_MACRO_LABEL;
-                             }
+<MACROBODY>".macro_label"   {
+                              yy_push_state(MACROLABEL, yyscanner);
+                              return TK_MACRO_LABEL;
+                            }
 
-<MACROLABEL>{IDENT}":"       {
-                               char * temp = (char *)mem_sys_allocate((yyleng + 2) * sizeof (char));
-                               /* stick a special marker "@" so we can recognize this as a label
-                                * that must be munged.
-                                */
-                               strncpy(temp, yytext, yyleng - 1);
-                               strcpy(temp + yyleng - 1, "@:");
-                               yylval->sval = temp;
-                               return TK_MACRO_LABEL_ID;
-                             }
+<MACROLABEL>"$"?{IDENT}":"  { /* if the "$" is there, it's a macro label using a macro
+                               * parameter's value; otherwise it's a normal macro label
+                               */
+                              lexer_state * const lexer = yyget_extra(yyscanner);
+                              char * temp = (char *)pir_mem_allocate(lexer,
+                                                                     (yyleng + 2) * sizeof (char));
+                              /* stick a special marker "@" so we can recognize this as a label
+                               * that must be munged.
+                               */
+                              strncpy(temp, yytext, yyleng - 1);
+                              strcpy(temp + yyleng - 1, "@:");
 
-<MACROLABEL>"$"{IDENT}":"    {
-                               char * temp = (char *)mem_sys_allocate((yyleng + 2) * sizeof (char));
-                               /* stick a special marker "@" so we can recognize this as a label
-                                * that must be munged.
-                                */
-                               strncpy(temp, yytext, yyleng - 1);
-                               strcpy(temp + yyleng - 1, "@:");
-                               yylval->sval = temp;
-                               return TK_MACRO_LABEL_ID;
-                             }
-
-<MACROLABEL>{EOL}[\t\r\n ]*  { yy_pop_state(yyscanner); /* leave MACROLABEL state */
-                               return TK_NL;
-                             }
+                              yylval->sval = temp;
+                              declare_macro_local(CURRENT_MACRO(lexer), dupstr(lexer, yytext));
+                              return TK_MACRO_LABEL_ID;
+                            }
 
 
-<SCANMACRO>{IDENT}"@:"       { /* scan a label when expanding a buffer; declared as .macro_label */
-                               char *label  = dupstrn(yyget_extra(yyscanner), yytext, yyleng - 2);
-                               yylval->sval = munge_id(label, yyget_extra(yyscanner));
-                               return TK_LABEL;
-                             }
+<MACROLABEL>{EOL}[\t\r\n ]* {
+                              yy_pop_state(yyscanner); /* leave MACROLABEL state */
+                              return TK_NL;
+                            }
 
-<SCANMACRO>"$"{IDENT}"@:"    { /* scan a label when expanding macro; was a macro parameter */
-                               lexer_state *lexer = yyget_extra(yyscanner);
-                               char *paramname = dupstrn(lexer, yytext + 1, yyleng - 3);
-                               macro_def *labelparam = find_macro(lexer->macros, paramname);
-                               if (labelparam == NULL) {
-                                   yypirerror(yyscanner, lexer, "Cannot expand %s; '%s' was not "
-                                              "declared as a macro parameter", yytext, paramname);
-                               }
-                               else {
-                                   unsigned len = strlen(labelparam->body);
-                                   char *unquoted = (char *)mem_sys_allocate_zeroed(
-                                                                         (len - 1) * sizeof (char));
-                                   strncpy(unquoted, labelparam->body + 1, len - 2);
-                                   yylval->sval = munge_id(unquoted, lexer);
-                                   mem_sys_free(unquoted);
-                               }
-                               return TK_LABEL;
+
+<SCANMACRO>{IDENT}"@:"      { /* scan a label when expanding a buffer; declared as .macro_label */
+                              lexer_state * const lexer = yyget_extra(yyscanner);
+                              char const  * const label = dupstrn(lexer, yytext, yyleng - 2);
+                              yylval->sval = munge_id(label, lexer);
+                              return TK_LABEL;
+                            }
+
+<SCANMACRO>"$"{IDENT}"@:"  { /* scan a label when expanding macro; was a macro parameter */
+                             lexer_state * const lexer     = yyget_extra(yyscanner);
+                             char const  * const paramname = dupstrn(lexer, yytext + 1, yyleng - 3);
+                             macro_def   * const param     = find_macro(lexer->macros, paramname);
+
+                             if (param == NULL) {
+                                 yypirerror(yyscanner, lexer, "Cannot expand %s; '%s' was not "
+                                            "declared as a macro parameter", yytext, paramname);
                              }
+                             else {
+                                 unsigned len   = strlen(param->body);
+                                 char *unquoted = (char *)mem_sys_allocate_zeroed(
+                                                                       (len - 1) * sizeof (char));
+                                 /* unquote the string; which reminds me: XXX we need to make
+                                  * sure that macro arguments used as label or local ids are
+                                  * in fact quoted strings.
+                                  */
+                                 strncpy(unquoted, param->body + 1, len - 2);
+                                 yylval->sval = munge_id(unquoted, lexer);
+                                 mem_sys_free(unquoted);
+                             }
+                             return TK_LABEL;
+                           }
 
 
 %{
@@ -732,9 +840,13 @@ so keep them local to this file.
 =item C<static macro_table *
 peek_macro_table(lexer_state * const lexer)>
 
+Return the top of the macro_table stack; this is the currently
+active macro_table object.
+
 =cut
 
 */
+PARROT_WARN_UNUSED_RESULT
 static macro_table *
 peek_macro_table(lexer_state * const lexer) {
     return lexer->macros;
@@ -742,18 +854,18 @@ peek_macro_table(lexer_state * const lexer) {
 
 /*
 
-=item C<munge_id>
+=item C<static char *
+munge_id(char const * const id, lexer_state * const lexer)>
 
-Generate an identifier based on a macro label or locaal declaration, or a macro label
-or local expansion.
-
-A label declaration looks like: ".label $LABEL:", from which a normal
-PIR label is created, formatted as: "_unique_MACRO_LABEL_?:".
+Generate an identifier based on a macro label or local expansion.
 
 A label expansion looks like ".$LABEL", from which a label identifier is
-generated, formatted as: "_unique_MACRO_LABEL_?"
+generated, formatted as: "$macro_<MACRO>_<LABEL>_<SCOPE>".
 
-
+In this format, C<MACRO> refers to the macro name of the macro in which
+the .macro_local or .macro_label was defined; C<LABEL> refers to the runtime
+value of the label or local variable (this can be a macro's argument's value).
+C<SCOPE> refers to the unique scope ID of this macro expansion.
 
 =cut
 
@@ -763,8 +875,16 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static char *
 munge_id(char const * const id, lexer_state * const lexer) {
-    /* the format of the generated label: */
-    char const * const format        = "_unique_%s_%s_%d"; /* 16 characters */
+    /* the format of the generated label; note that it has a $ character,
+     * which is not allowed in normal PIR identifiers. This way, you cannot
+     * use the generated names outside of macros. We dont't want people
+     * write outside of macros:
+     *
+     *   macro_foo_bar_1 = 42
+     *
+     * Hence the $ character.
+     */
+    char const * const format        = "$macro_%s_%s_%d"; /* 15 characters */
     int  const         format_length = strlen(format);
 
 
@@ -778,9 +898,8 @@ munge_id(char const * const id, lexer_state * const lexer) {
 
     length += strlen(id);
 
-    munged_id = (char *)mem_sys_allocate((length + 1) * sizeof (char));
+    munged_id = (char *)pir_mem_allocate_zeroed(lexer, (length + 1) * sizeof (char));
 
-    /* generate the identifier; if it's a declaration, then add the colon. */
     sprintf(munged_id, format, table->thismacro->name, id, lexer->unique_id);
 
     return munged_id;
@@ -814,6 +933,10 @@ pop_macro_table(lexer_state * const lexer) {
 =item C<static void
 push_macro_table(lexer_state * const lexer, macro_table * const table)>
 
+Push macro_table C<table> onto the macro scope stack. Any attempt to find
+a macro definition will start in C<table>. If not found, the stack will be walked
+down (recursing into older entries).
+
 =cut
 
 */
@@ -827,6 +950,10 @@ push_macro_table(lexer_state * const lexer, macro_table * const table) {
 
 =item C<static void
 update_unique_id(lexer_state * const lexer)>
+
+Update the unique ID generator; the number of characters that the new number
+is taking in a string is recalculated, as the unique IDs are used in string
+context.
 
 =cut
 
@@ -849,7 +976,15 @@ update_unique_id(lexer_state * const lexer) {
 =item C<static void
 expand(yyscan_t yyscanner, macro_def * const macro, list * args, lexer_state * const lexer)>
 
-Expand the specified macro (or constant).
+Expand the specified macro (or constant). The current yy_buffer_state is saved, as well
+as the current scope ID (for macro expansions; each expansion has its own unique scope ID);
+as well as the current line number. The macro_table, which defines the macro parameters/arguments,
+gets a reference to the macro definition that is being expanded; that's the C<thismacro> field
+of the C<macro_table> structure.
+
+An argument count check is done to make sure there's exactly enough arguments for the defined
+parameters. Then, the macro definition's body (a string buffer) is scanned (instead of the
+file that we were scanning).
 
 =cut
 
@@ -919,10 +1054,10 @@ Returns TRUE if C<text> is a PIR directive; FALSE otherwise.
 
 */
 
-/*
-PARROT_PURE
+/*  XXX I don't think we need this any longer.
+
+PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
-*/
 static int
 is_pir_directive(char * const text) {
     char const * const directives[] = {
@@ -959,8 +1094,14 @@ is_pir_directive(char * const text) {
         ".tailcall"     ,
         NULL
     };
+*/
 
+    /* Reading from right to left:
+     * iter is a pointer to constant pointers to constant characters.
+     */
+/*
     char const * const * iter;
+
     iter = directives;
 
     while (*iter) {
@@ -970,6 +1111,8 @@ is_pir_directive(char * const text) {
     }
     return 0;
 }
+
+*/
 
 
 /*

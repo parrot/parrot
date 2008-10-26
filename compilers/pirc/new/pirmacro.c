@@ -14,7 +14,10 @@
 
 /*
 
-=head1 FUNCTION
+=head1 FUNCTIONS
+
+This file contains functions that manage the macro datastructures.
+Actual expansion of the macros is completely handled in the lexer (pir.l).
 
 =over 4
 
@@ -30,15 +33,16 @@
 =item C<macro_def *
 new_macro(macro_table * const table, char * const name, int lineno)>
 
+Create a new macro definition node and store it in the macro_table C<table>
+
 =cut
 
 */
+PARROT_MALLOC
 PARROT_IGNORABLE_RESULT
 macro_def *
-new_macro(macro_table * const table, char * const name, int lineno, int takes_args) {
+new_macro(macro_table * const table, char const * const name, int lineno, int takes_args) {
     macro_def *macro   = (macro_def *)mem_sys_allocate(sizeof (macro_def));
-
-  /*  fprintf(stderr, "new_macro: %s (line %d)\n", name, lineno); */
 
     macro->name        = name;
     macro->linedefined = lineno;
@@ -50,19 +54,22 @@ new_macro(macro_table * const table, char * const name, int lineno, int takes_ar
     macro->next        = table->definitions;
     table->definitions = macro;
 
-   /* fprintf(stderr, "new_macro done\n"); */
-
     return macro;
 }
 
 /*
+
+=item C<macro_param *
+new_macro_param(char const * const value)
+
+=cut
 
 */
 PARROT_MALLOC
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 macro_param *
-new_macro_param(char * const value) {
+new_macro_param(char const * const value) {
     macro_param *param = (macro_param *)mem_sys_allocate(sizeof (macro_param));
     param->name        = value;
     param->next        = NULL;
@@ -71,9 +78,14 @@ new_macro_param(char * const value) {
 
 /*
 
+=item C<void
+add_macro_param(macro_def * const macro, char * const name)>
+
+=cut
+
 */
 void
-add_macro_param(macro_def * const macro, char * const name) {
+add_macro_param(macro_def * const macro, char const * const name) {
     macro_param *param = new_macro_param(name);
     param->next        = macro->parameters;
     macro->parameters  = param;
@@ -85,6 +97,9 @@ add_macro_param(macro_def * const macro, char * const name) {
 =item C<void
 new_macro_const(macro_table * const table, char const * const name, char const * const value)>
 
+Define a new C<.macro_const>, by name of C<name> as an alias for C<value> The new macro
+const is entered in the macro_table C<table>
+
 =cut
 
 */
@@ -93,14 +108,25 @@ new_macro_const(macro_table * const table, char const * const name, char const *
                       int lineno)
 {
     macro_def *def     = new_macro(table, name, lineno, FALSE);
-    def->body          = value;
+    /* XXX is this cast from const * const to const * dangerous? */
+    def->body          = (char *)value;
 }
 
 
+/*
+
+=item C<void
+check_size(macro_def * const macro, unsigned length)>
+
+Check C<macro>'s buffer size.
+
+=cut
+
+*/
 void
-check_size(macro_def * const macro) {
+check_size(macro_def * const macro, unsigned length) {
    unsigned used = macro->cursor - macro->body;
-    if (used >= macro->buffersize) {
+    if (used + length >= macro->buffersize) {
 
         /* XXX do the resize */
 
@@ -111,13 +137,18 @@ check_size(macro_def * const macro) {
 
 /*
 
+=item C<void
+store_macro_char(macro_def * const macro, char c)>
+
 Store the character C<c> in C<macro>'s body buffer.
+
+=cut
 
 */
 void
 store_macro_char(macro_def * const macro, char c) {
     /* if buffer is full, resize it. */
-    check_size(macro);
+    check_size(macro, 1);
     *(macro->cursor)++ = c;
 }
 
@@ -126,14 +157,23 @@ store_macro_char(macro_def * const macro, char c) {
 
 /*
 
-Store the string C<str> in C<macro>'s body buffer.
+=item C<void
+store_macro_string(macro_def * const macro, char * const str, ...)>
+
+Store the string C<str> in C<macro>'s body buffer. The total number
+of characters to be written should not exceed MAX_NUM_CHARS. It's not known
+beforehand how much space we need in the buffer due to the var. arg. list.
+
+=cut
 
 */
 void
 store_macro_string(macro_def * const macro, char * const str, ...) {
     va_list arg_ptr;
 
-    check_size(macro);
+#define MAX_NUM_CHARS   256
+
+    check_size(macro, MAX_NUM_CHARS);
 
     va_start(arg_ptr, str);
     /* vsprintf returns number of characters written; adjust cursor with that. */
@@ -156,7 +196,7 @@ NULL is returned.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 macro_def *
-find_macro(macro_table * const table, char * const name) {
+find_macro(macro_table * const table, char const * const name) {
     macro_def *iter = table->definitions;
 
     PARROT_ASSERT(name != NULL);
@@ -195,20 +235,63 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 macro_table *
 new_macro_table(macro_table * const current) {
-    macro_table *table       = (macro_table *)mem_sys_allocate(sizeof (macro_table));
+    macro_table *table       = (macro_table *)mem_sys_allocate_zeroed(sizeof (macro_table));
     table->definitions       = NULL;
     table->prev = NULL;
 
     table->prev              = current;
+    table->thismacro         = NULL;
 
     return table;
 }
 
 
+/*
+
+=item C<void
+declare_macro_local(macro_def * const macro, char * const name)>
+
+Declare C<name> as a .macro_local for the macro definition C<macro>.
+
+=cut
+
+*/
+void
+declare_macro_local(macro_def * const macro, char const * const name) {
+    macro_param * param = new_macro_param(name);
+    param->next         = macro->macrolocals;
+    macro->macrolocals  = param;
+/*
+    fprintf(stderr, "declare_macro_local(): %s\n", name);
+    */
+}
 
 
+/*
 
+=item C<int
+is_macro_local(macro_def * const macro, char * const name)>
 
+Check whether C<name> was declared as a C<.macro_local> in the macro
+definition C<macro>.
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
+int
+is_macro_local(macro_def * const macro, char const * const name) {
+    macro_param *iter = macro->macrolocals;
+
+/*    fprintf(stderr, "is_macro_local: %s\n", name);*/
+
+    while (iter) {
+        if (STREQ(iter->name, name))
+            return TRUE;
+        iter = iter->next;
+    }
+    return FALSE;
+}
 
 
 

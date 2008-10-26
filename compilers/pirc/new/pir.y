@@ -357,12 +357,11 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
 
 /* tokens and types for macro layer */
 
-%token TK_MACRO             ".macro"
-       TK_ENDM              ".endm"
-       TK_MACRO_LOCAL       ".macro_local"
-       TK_MACRO_LABEL       ".macro_label"
-       TK_MACRO_CONST       ".macro_const"
-
+%token TK_MACRO                    ".macro"
+       TK_ENDM                     ".endm"
+       TK_MACRO_LOCAL              ".macro_local"
+       TK_MACRO_LABEL              ".macro_label"
+       TK_MACRO_CONST              ".macro_const"
 
 %token <sval> TK_MACRO_LABEL_ID    "macro-label"
        <sval> TK_MACRO_LOCAL_ID    "macro-local"
@@ -376,6 +375,8 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
              macro_arg_list
 
 %type <sval> macro_arg
+
+/* normal rules and types */
 
 %type <sval> unop
              identifier
@@ -466,6 +467,7 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
 %type <cval> const_tail
              constant
 
+/* all exported functions start with "yypir", instead of default "yy". */
 %name-prefix="yypir"
 
 
@@ -536,7 +538,8 @@ pir_chunk         : sub_def
                   ;
 
 
-/* implementation of macro layer */
+/* implementation of macro layer: macro definition */
+
 
 macro_definition  : macro_const
                   | macro
@@ -549,7 +552,7 @@ macro_const       : ".macro_const" TK_IDENT TK_MACRO_CONST_VAL
 macro             : macro_header '(' macro_parameters ')' "\n"
                     macro_body
                     ".endm"
-                        {  fprintf(stderr, "macro body: [%s]\n", CURRENT_MACRO(lexer)->body); }
+                        { /* fprintf(stderr, "macro body: [%s]\n", CURRENT_MACRO(lexer)->body);*/ }
                   ;
 
 macro_header      : ".macro" identifier
@@ -594,7 +597,8 @@ macro_local_decl  : ".macro_local" type TK_MACRO_LOCAL_ID
                         }
                   ;
 
-/* end of macro layer */
+/* end of macro layer: definition */
+
 
 
 loadlib           : ".loadlib" TK_STRINGC

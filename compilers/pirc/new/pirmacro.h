@@ -8,20 +8,21 @@
 
 
 typedef struct macro_param {
-    char               *name;
+    char const         *name;
     struct macro_param *next;
 
 } macro_param;
 
 
 typedef struct macro_def {
-    char             *name;
+    char const       *name;
     char             *body;
     char             *cursor;  /* to write into the body buffer */
     int               takes_args;  /* flag to indicate whether this is a .macro or .macro_const */
 
     int               linedefined;
     macro_param      *parameters;
+    macro_param      *macrolocals;
 
     unsigned          buffersize;
 
@@ -68,15 +69,27 @@ typedef struct macro_table {
 } macro_table;
 
 
-macro_def *new_macro(macro_table * const table, char * const name, int lineno, int takes_args);
 
-void add_macro_param(macro_def * const macro, char * const name);
+typedef struct file_state {
+
+    struct yy_buffer_state *buffer;
+    char const *            filename;
+    int                     lineno;
+
+    struct file_state      *prev;
+
+} file_state;
+
+
+macro_def *new_macro(macro_table * const table, char const * const name, int lineno, int takes_args);
+
+void add_macro_param(macro_def * const macro, char const * const name);
 
 void new_macro_const(macro_table * const table, char const * const name,
                         char const * const value, int lineno);
 
 
-macro_def *find_macro(macro_table * const table, char * const name);
+macro_def *find_macro(macro_table * const table, char const * const name);
 
 macro_table * new_macro_table(macro_table * const current);
 
@@ -84,9 +97,14 @@ void store_macro_char(macro_def * const macro, char c) ;
 
 void store_macro_string(macro_def * const macro, char * const str, ...);
 
-macro_param * new_macro_param(char * const value);
+macro_param * new_macro_param(char const * const value);
+
+void declare_macro_local(macro_def * const macro, char const * const name);
+
+int is_macro_local(macro_def * const macro, char const * const name);
 
 #endif /* PARROT_PIR_PIRMACRO_H_GUARD */
+
 
 /*
  * Local variables:
