@@ -150,6 +150,12 @@ static void Parrot_mmd_ensure_writable(PARROT_INTERP,
     ARGIN_NULLOK(const PMC *pmc))
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static PMC* Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static int Parrot_mmd_maybe_candidate(PARROT_INTERP,
     ARGIN(PMC *pmc),
     ARGIN(PMC *cl))
@@ -1466,6 +1472,27 @@ mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
     return ar;
 }
 
+static PMC *
+Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub))
+{
+    /* has to be a builtin multi method */
+    if (sub->vtable->base_type == enum_class_NCI)
+        return PMC_pmc_val(sub);
+
+    if (VTABLE_isa(interp, sub, CONST_STRING(interp, "Sub"))) {
+        PMC *multi_sig = PMC_sub(sub)->multi_signature;
+
+        if (multi_sig->vtable->base_type == enum_class_FixedPMCArray) {
+            multi_sig = PMC_sub(sub)->multi_signature =
+                mmd_cvt_to_types(interp, multi_sig);
+        }
+
+        return multi_sig;
+    }
+
+    return PMCNULL;
+}
+
 
 #define MMD_BIG_DISTANCE 0x7fff
 
@@ -1486,25 +1513,14 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
     PMC *multi_sig, *mro;
     INTVAL i, n, args, dist, j, m;
 
-    /* has to be a builtin multi method */
-    if (pmc->vtable->base_type == enum_class_NCI) {
-        multi_sig = PMC_pmc_val(pmc);
-    }
-    else if (VTABLE_isa(interp, pmc, CONST_STRING(interp, "Sub"))
-         ||  VTABLE_isa(interp, pmc, CONST_STRING(interp, "Closure"))) {
-        multi_sig = PMC_sub(pmc)->multi_signature;
+    if (PMC_IS_NULL(PMC_sub(pmc)->multi_signature))
+        return 0;
 
-        /* some method */
-        if (!multi_sig)
-            return 0;
+    multi_sig = Parrot_mmd_get_cached_multi_sig(interp, pmc);
 
-        if (multi_sig->vtable->base_type == enum_class_FixedPMCArray) {
-            multi_sig = PMC_sub(pmc)->multi_signature =
-                mmd_cvt_to_types(interp, multi_sig);
-        }
-    }
-    else
+    if (PMC_IS_NULL(multi_sig))
         return MMD_BIG_DISTANCE;
+
     n    = VTABLE_elements(interp, multi_sig);
     args = VTABLE_elements(interp, arg_tuple);
 
