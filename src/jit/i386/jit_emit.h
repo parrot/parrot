@@ -3860,17 +3860,30 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
     int i = 0;
     char *pc;
     int arg_count = 0;
-    int strings   = 0;
+    int string_buffer_count = 0;
     const int ST_SIZE_OF = 124;
     const int JIT_ALLOC_SIZE = 1024;
 
     char *sig = (char *)signature->strstart + 1; /* skip over the result */
-    size_t stack_space_needed = calc_signature_needs(sig, &strings);
+    size_t stack_space_needed = calc_signature_needs(sig, &string_buffer_count);
 
-    int st_offset = 16 + stack_space_needed;
-    int args_offset = 16;
-    int strings_offset = st_offset + ST_SIZE_OF;
-    int total_stack_needed = strings_offset + 4 * strings;
+
+    int base_offset = 0;
+    int strings_offset = base_offset - (sizeof(char*) * string_buffer_count);
+    int st_offset = strings_offset - ST_SIZE_OF;
+    int args_offset = st_offset - stack_space_needed;
+    int temp_calls_offset = args_offset - 16;
+
+    int total_stack_needed = -temp_calls_offset;
+
+    /* 
+     * ESP
+     * 0-15, 16 bytes for utility calls
+     * stack_space_needed for actual NCI call
+     * st
+     * STRINGS -> char * holding space
+     * EBP
+     */
 
     /* this ought to be enough - the caller of this function
      * should free the function pointer returned here
@@ -3885,71 +3898,72 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
     emitm_subl_i_r(pc, total_stack_needed, emit_ESP);
 
     /* Parrot_init_arg_nci(interp, &st, "S"); */
+    /* args signature "S" */
     emitm_movl_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, 16);
-    emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 8);
+    emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
 
     /*&st*/
-    emitm_lea_m_r(interp, pc, emit_EAX, emit_ESP, 0, 1, st_offset);
-    emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 4);
+    emitm_lea_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, st_offset);
+    emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
 
     /*interpreter*/
     emitm_movl_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, 8);
-    emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 0);
+    emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 0);
 
     if (sig && *sig)
       emitm_call_cfunc(pc, Parrot_init_arg_nci);
 
     while (*sig) {
-        emitm_movl_i_m(pc, arg_count, emit_ESP, 0, 1, 8);
+        emitm_movl_i_m(pc, arg_count, emit_EBP, 0, 1, temp_calls_offset + 8);
 
         switch (*sig) {
             case '0':    /* null ptr or such - doesn't consume a reg */
                 jit_emit_bxor_rr_i(interp, pc, emit_EAX, emit_EAX);
-                emitm_movl_m_r(interp, pc, emit_EAX, emit_ESP, 0, 1, args_offset);
+                emitm_movl_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'f':
                 emitm_call_cfunc(pc, get_nci_N);
-                emitm_fstps(interp, pc, emit_ESP, 0, 1, args_offset);
+                emitm_fstps(interp, pc, emit_EBP, 0, 1, args_offset);
                 break;
             case 'N':
             case 'd':
                 emitm_call_cfunc(pc, get_nci_N);
-                emitm_fstpl(interp, pc, emit_ESP, 0, 1, args_offset);
+                emitm_fstpl(interp, pc, emit_EBP, 0, 1, args_offset);
                 args_offset += 4;
                 break;
             case 'I':   /* INTVAL */
             case 'l':   /* long */
             case 'i':   /* int */
                 emitm_call_cfunc(pc, get_nci_I);
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, args_offset);
+                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 't':   /* string, pass a cstring */
                 emitm_call_cfunc(pc, get_nci_S);
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 4);
+                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
                 emitm_call_cfunc(pc, string_to_cstring);
 
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, args_offset);
+                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 /* save off temporary allocation address */
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, strings_offset);
+                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, strings_offset);
                 strings_offset += 4;
 
                 /* reset ESP(4) */
-                emitm_lea_m_r(interp, pc, emit_EAX, emit_ESP, 0, 1, st_offset);
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 4);
+                emitm_lea_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, st_offset);
+                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
                 break;
             case 's':   /* short: movswl intreg_o(base), %eax */
                 emitm_call_cfunc(pc, get_nci_I);
                 emitm_movswl_r_r(pc, emit_EAX, emit_EAX)
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, args_offset);
+                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'c':   /* char: movsbl intreg_o(base), %eax */
                 emitm_call_cfunc(pc, get_nci_I);
                 emitm_movsbl_r_r(pc, emit_EAX, emit_EAX);
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, args_offset);
+                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'J':   /* interpreter */
                 emitm_movl_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, 8);
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, args_offset);
+                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 arg_count--;
                 break;
             case 'p':   /* push pmc->data */
@@ -3970,7 +3984,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
                 emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, offsetof(struct PMC, pmc_ext));
                 emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, offsetof(struct PMC_EXT, data));
 #  endif
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, args_offset);
+                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'O':   /* push PMC * object in P2 */
             case 'P':   /* push PMC * */
@@ -3982,7 +3996,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
                 emitm_jxs(pc, emitm_jne, 2); /* skip the xor */
                 jit_emit_bxor_rr_i(interp, pc, emit_EAX, emit_EAX);
 #  endif
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, args_offset);
+                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'v':
                 break;
@@ -3990,21 +4004,21 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
                 emitm_call_cfunc(pc, get_nci_P);
                 emitm_lea_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, offsetof(struct PMC, data));
                 /* emitm_lea_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, 0); */
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, args_offset);
+                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'b':   /* buffer (void*) pass PObj_bufstart(SReg) */
                 emitm_call_cfunc(pc, get_nci_S);
                 emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, (size_t) &PObj_bufstart((STRING *) 0));
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, args_offset);
+                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'B':   /* buffer (void**) pass &PObj_bufstart(SReg) */
                 emitm_call_cfunc(pc, get_nci_S);
                 emitm_lea_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, (size_t) &PObj_bufstart((STRING *) 0));
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, args_offset);
+                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'S':
                 emitm_call_cfunc(pc, get_nci_S);
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, args_offset);
+                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
 
 
@@ -4019,7 +4033,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
                 /* we need the offset of PMC_int_val */
                 emitm_call_cfunc(pc, get_nci_P);
                 emitm_lea_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, (size_t) &PMC_int_val((PMC *) 0));
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, args_offset);
+                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             default:
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
@@ -4043,18 +4057,18 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
     emitm_subl_i_r(pc, 16, emit_ESP);
 
     /* SAVE OFF EAX */
-    emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 8);
+    emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
 
     /*&st*/
-    emitm_lea_m_r(interp, pc, emit_EAX, emit_ESP, 0, 1, st_offset);
-    emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 4);
+    emitm_lea_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, st_offset);
+    emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
 
     /*interpreter*/
     emitm_movl_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, 8);
-    emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 0);
+    emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 0);
 
     /* RESTORE BACK EAX */
-    emitm_movl_m_r(interp, pc, emit_EAX, emit_ESP, 0, 1, 8);
+    emitm_movl_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
 
     /* now place return value in registers */
     /* first in signature is the return value */
@@ -4072,49 +4086,49 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
             break;
         case 'f':
         case 'd':
-            jit_emit_fstore_mb_n(interp, pc, emit_ESP, 8);
+            jit_emit_fstore_mb_n(interp, pc, emit_EBP, temp_calls_offset + 8);
             emitm_call_cfunc(pc, set_nci_N);
             /* pop num from st(0) and mov to reg */
             break;
         case 's':
             /* movswl %ax, %eax */
             emitm_movswl_r_r(pc, emit_EAX, emit_EAX);
-            emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 8);
+            emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
             emitm_call_cfunc(pc, set_nci_I);
             break;
         case 'c':
             /* movsbl %al, %eax */
             emitm_movsbl_r_r(pc, emit_EAX, emit_EAX);
-            emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 8);
+            emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
             emitm_call_cfunc(pc, set_nci_I);
             break;
         case 'I':   /* INTVAL */
         case 'l':
         case 'i':
-            emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 8);
+            emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
             emitm_call_cfunc(pc, set_nci_I);
             break;
         case 'v': /* void - do nothing */
             break;
         case 'P':
-            emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 8);
+            emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
             emitm_call_cfunc(pc, set_nci_P);
             break;
         case 'p':   /* make a new unmanaged struct */
             /* save return value on stack */
 
             /* save pointer p */
-            emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 12);
+            emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 12);
 
             /* make new pmc */
-            emitm_movl_i_m(pc, enum_class_UnManagedStruct, emit_ESP, 0, 1, 4);
+            emitm_movl_i_m(pc, enum_class_UnManagedStruct, emit_EBP, 0, 1, temp_calls_offset + 4);
             emitm_call_cfunc(pc, pmc_new);
 
             /* restore pointer p to EDX */
-            emitm_movl_m_r(interp, pc, emit_EDX, emit_ESP, 0, 1, 12);
+            emitm_movl_m_r(interp, pc, emit_EDX, emit_EBP, 0, 1, temp_calls_offset + 12);
 
             /* copy UnManagedStruct to stack for set_nci_P call */
-            emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 8);
+            emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
 
             /* eax = PMC, get return value into edx */
             /* stuff return value into pmc->data */
@@ -4129,30 +4143,30 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
             emitm_movl_r_m(interp, pc, emit_EDX, emit_EAX, 0, 1, offsetof(struct PMC_EXT, data));
 #  endif
 
-            /* reset ESP(4) */
-            emitm_lea_m_r(interp, pc, emit_EAX, emit_ESP, 0, 1, st_offset);
-            emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 4);
+            /* reset EBP(4) */
+            emitm_lea_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, st_offset);
+            emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
 
             emitm_call_cfunc(pc, set_nci_P);
             break;
         case 'S':
-            emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 8);
+            emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
             emitm_call_cfunc(pc, set_nci_S);
             break;
         case 't':   /* string */
             /* EAX is char* */
-            emitm_movl_i_m(pc, 0, emit_ESP, 0, 1, 8); /* len */
+            emitm_movl_i_m(pc, 0, emit_EBP, 0, 1, temp_calls_offset + 8); /* len */
 
-            /* overrights addres of st in ESP(4) */
-            emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 4);
+            /* overrights address of st in EBP(4) */
+            emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
 
             emitm_call_cfunc(pc, string_from_cstring);
 
-            emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 8);
+            emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
 
-            /* reset ESP(4) */
-            emitm_lea_m_r(interp, pc, emit_EAX, emit_ESP, 0, 1, st_offset);
-            emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 4);
+            /* reset EBP(4) */
+            emitm_lea_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, st_offset);
+            emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
 
             emitm_call_cfunc(pc, set_nci_S);
             break;
@@ -4169,9 +4183,9 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
 
     /* free temporary strings */
     strings_offset = st_offset + ST_SIZE_OF;
-    for (i=0; i<strings; i++) {
-        emitm_movl_m_r(interp, pc, emit_EAX, emit_ESP, 0, 1, strings_offset);
-        emitm_movl_r_m(interp, pc, emit_EAX, emit_ESP, 0, 1, 0);
+    for (i=0; i<string_buffer_count; i++) {
+        emitm_movl_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, strings_offset);
+        emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 0);
         emitm_call_cfunc(pc, string_cstring_free);
     }
 

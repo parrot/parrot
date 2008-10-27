@@ -515,9 +515,11 @@ sub make_arg {
         return "PObj_bufstart(t_$temp_num)";
     };
     /B/ && do {
-        push @{$temps_ref},          "STRING *t_$temp_num;";
-        push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_S($reg_num);";
-        return "&PObj_bufstart(t_$temp_num)";
+        push @{$temps_ref}, "char *s_$temp_num;\n    char *t_$temp_num;\n    void** v_$temp_num = (void **) &t_$temp_num;";
+        push @{$extra_preamble_ref},
+            "{STRING * s= GET_NCI_S($reg_num); t_$temp_num = s ? string_to_cstring(interp, s) : (char *) NULL; s_$temp_num = t_$temp_num;}";
+        push @{$extra_postamble_ref}, "do { if (s_$temp_num) string_cstring_free(s_$temp_num); } while (0);";
+        return "v_$temp_num";
     };
     /J/ && do {
         return "interp";
