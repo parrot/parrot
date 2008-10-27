@@ -3876,7 +3876,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
 
     int total_stack_needed = -temp_calls_offset;
 
-    /* 
+    /*
      * ESP
      * 0-15, 16 bytes for utility calls
      * stack_space_needed for actual NCI call
