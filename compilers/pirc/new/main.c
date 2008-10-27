@@ -72,6 +72,7 @@ print_help(char const * const program_name)
     "  -S        do not perform strength reduction\n"
     "  -v        verbose mode\n"
     "  -W        show warning messages\n"
+    "  -y        debug bison-generated parser\n"
     );
 }
 
@@ -274,14 +275,15 @@ main(int argc, char *argv[]) {
             case 'p':
                 SET_FLAG(flags, LEXER_FLAG_EMIT_PASM);
                 break;
-            case 'W':
-                SET_FLAG(flags, LEXER_FLAG_WARNINGS);
-                break;
             case 'S':
                 SET_FLAG(flags, LEXER_FLAG_NOSTRENGTHREDUCTION);
                 break;
             case 'v':
                 SET_FLAG(flags, LEXER_FLAG_VERBOSE);
+                break;
+            case 'W':
+                SET_FLAG(flags, LEXER_FLAG_WARNINGS);
+                break;
             case 'y':
                 yypirdebug = 1;
                 break;

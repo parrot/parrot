@@ -449,6 +449,7 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
              condition
              augmented_op
              unique_reg_flag
+             int_or_num
 
 %type <invo> long_invocation
              long_invocation_stat
@@ -1380,10 +1381,22 @@ condition         : target rel_op expression
                         { $$ = evaluate_n_n($1, $2, $3); }
                   | TK_STRINGC rel_op TK_STRINGC
                         { $$ = evaluate_s_s($1, $2, $3); }
-                  | TK_STRINGC rel_op TK_INTC
-                        { yypirerror(yyscanner, lexer, "cannot compare string to integer"); }
+
+                  /* if not catching these cases, error message is obscure */
+                  | TK_STRINGC rel_op int_or_num
+                        {
+                          yypirerror(yyscanner, lexer, "cannot compare string to %s",
+                                     $3 == INT_TYPE ? "integer" : "number");
+                        }
                   | TK_INTC rel_op TK_STRINGC
                         { yypirerror(yyscanner, lexer, "cannot compare integer to string"); }
+                  | TK_NUMC rel_op TK_STRINGC
+                        { yypirerror(yyscanner, lexer, "cannot compare number to string"); }
+                  ;
+
+/* helper rule to for error catching; this rule is needed to prevent shift/reduce conflicts. */
+int_or_num        : TK_INTC    { $$ = INT_TYPE; }
+                  | TK_NUMC    { $$ = NUM_TYPE; }
                   ;
 
 if_unless         : "if"       { $$ = DONT_INVERT_OPNAME; /* no need to invert */ }
