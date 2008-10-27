@@ -37,6 +37,8 @@ PBC-generating functions.
  */
 static char const pir_register_types[5] = {'I', 'N', 'S', 'P', '?'};
 
+static void emit_pir_statement(lexer_state * const lexer, subroutine * const sub);
+static void emit_pir_instruction(lexer_state * const lexer, instruction * const instr);
 
 
 /* prototype declaration */
@@ -293,6 +295,64 @@ print_subs(struct lexer_state * const lexer) {
     }
 }
 
+
+
+
+static void
+emit_pir_instruction(lexer_state * const lexer, instruction * const instr) {
+
+    if (instr->label)
+        fprintf(out, "  %s:\n", instr->label);
+    if (instr->opinfo)
+        fprintf(out, "    %s\n", instr->opinfo->name);
+}
+
+static void
+emit_pir_statement(lexer_state * const lexer, subroutine * const sub) {
+    if (sub->statements != NULL) {
+        instruction *statiter = sub->statements->next;
+
+        do {
+            emit_pir_instruction(lexer, statiter);
+            statiter = statiter->next;
+        }
+        while (statiter != sub->statements->next);
+    }
+}
+
+
+
+void
+emit_pir_subs(lexer_state * const lexer) {
+    if (lexer->subs != NULL) {
+        /* set iterator to first item */
+        subroutine *subiter = lexer->subs->next;
+
+        do {
+
+            fprintf(out, "\n.namespace ");
+            print_key(lexer, subiter->name_space);
+            fprintf(out, "\n");
+
+
+
+            fprintf(out, "\n.sub %s", subiter->sub_name);
+
+            if (TEST_FLAG(subiter->flags, SUB_FLAG_MAIN))
+                fprintf(out, ":main ");
+            if (TEST_FLAG(subiter->flags, SUB_FLAG_METHOD))
+                fprintf(out, ":method ");
+                /* XXX and so on; check which ones are available in PASM mode. */
+
+            fprintf(out, "\n");
+            emit_pir_statement(lexer, subiter);
+            fprintf(out, ".end\n");
+
+            subiter = subiter->next;
+        }
+        while (subiter != lexer->subs->next);
+    }
+}
 
 /*
 

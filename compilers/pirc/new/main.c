@@ -76,7 +76,9 @@ print_help(char const * const program_name)
     "  -S        do not perform strength reduction\n"
     "  -v        verbose mode\n"
     "  -W        show warning messages\n"
+#ifdef YYDEBUG
     "  -y        debug bison-generated parser\n"
+#endif
     );
 }
 
@@ -163,6 +165,8 @@ parse_file(int flexdebug, FILE *infile, char * const filename, int flags, int th
 
         if (TEST_FLAG(lexer->flags, LEXER_FLAG_NOOUTPUT)) /* handy for testing the compiler */
             fprintf(stdout, "ok\n");
+        else if (TEST_FLAG(lexer->flags, LEXER_FLAG_PREPROCESS))
+            emit_pir_subs(lexer);
         else {
             fprintf(stderr, "Parse successful!\n");
             print_subs(lexer);
