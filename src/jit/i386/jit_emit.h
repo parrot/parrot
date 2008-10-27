@@ -3869,7 +3869,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
 
 
     int base_offset = 0;
-    int strings_offset = base_offset - (sizeof(char*) * string_buffer_count);
+    int strings_offset = base_offset - (sizeof (char*) * string_buffer_count);
     int st_offset = strings_offset - ST_SIZE_OF;
     int args_offset = st_offset - stack_space_needed;
     int temp_calls_offset = args_offset - 16;
