@@ -1431,7 +1431,15 @@ mmd_build_type_tuple_from_long_sig(PARROT_INTERP, ARGIN(STRING *long_sig))
 
 =item C<static PMC* mmd_cvt_to_types>
 
-RT #48260: Not yet documented!!!
+Given a ResizablePMCArray PMC containing some form of type identifier (either
+the string name of a class or a PMC representing the type), resolves all type
+references to type IDs, if possible.  If that's not possible, returns PMCNULL.
+In that case you can't dispatch to the multi variant with this type signature,
+as Parrot doesn't yet know about the respective types requested -- you have to
+register them first.
+
+Otherwise, returns a ResizableIntegerArray PMC full of type IDs representing
+the signature of a multi variant to which you may be able to dispatch.
 
 {{**DEPRECATE**}}
 
@@ -1444,11 +1452,9 @@ PARROT_WARN_UNUSED_RESULT
 static PMC*
 mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
 {
-    PMC * const ar = pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC        *ar = PMCNULL;
     const INTVAL n = VTABLE_elements(interp, multi_sig);
     INTVAL       i;
-
-    VTABLE_set_integer_native(interp, ar, n);
 
     for (i = 0; i < n; ++i) {
         PMC * const sig_elem = VTABLE_get_pmc_keyed_int(interp, multi_sig, i);
@@ -1456,14 +1462,32 @@ mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
 
         if (sig_elem->vtable->base_type == enum_class_String) {
             STRING * const sig = VTABLE_get_string(interp, sig_elem);
+
+            /* yes, this is horrible and ugly */
             if (memcmp(sig->strstart, "__VOID", 6) == 0) {
+                if (PMC_IS_NULL(ar)) {
+                    ar = pmc_new(interp, enum_class_FixedIntegerArray);
+                    VTABLE_set_integer_native(interp, ar, n);
+                }
                 PMC_int_val(ar)--;  /* RT #45951 */
                 break;
             }
+
+            if (!sig)
+                return PMCNULL;
+
             type = pmc_type(interp, sig);
+
+            if (type == enum_type_undef)
+                return PMCNULL;
         }
-        else {
+        else
             type = pmc_type_p(interp, sig_elem);
+
+        /* create destination PMC only as necessary */
+        if (PMC_IS_NULL(ar)) {
+            ar = pmc_new(interp, enum_class_FixedIntegerArray);
+            VTABLE_set_integer_native(interp, ar, n);
         }
 
         VTABLE_set_integer_keyed_int(interp, ar, i, type);
@@ -1483,8 +1507,12 @@ Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub))
         PMC *multi_sig = PMC_sub(sub)->multi_signature;
 
         if (multi_sig->vtable->base_type == enum_class_FixedPMCArray) {
-            multi_sig = PMC_sub(sub)->multi_signature =
-                mmd_cvt_to_types(interp, multi_sig);
+            PMC *converted_sig = mmd_cvt_to_types(interp, multi_sig);
+
+            if (PMC_IS_NULL(converted_sig))
+                return PMCNULL;
+
+            multi_sig = PMC_sub(sub)->multi_signature = converted_sig;
         }
 
         return multi_sig;
