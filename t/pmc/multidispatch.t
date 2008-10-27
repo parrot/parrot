@@ -464,21 +464,22 @@ ok 1
 42
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'MMD on PMC types', todo => 'RT #41374' );
+pir_output_is( <<'CODE', <<'OUT', 'MMD on PMC types' );
 .sub 'test' :main
     $P0 = new 'String'
     $P0 = "ok 1\n"
-    $P1 = new 'Integer'
-    $P1 = "ok 2\n"
     p($P0)
-    p($P1)
+
     .local pmc pstring
-    PString = subclass 'String', 'PString'
+    pstring = subclass 'String', 'PString'
+    $P1 = new 'PString'
+    $P1 = "ok 2\n"
+    p($P1)
 
     $P0 = subclass 'PString', "Xstring"
     $P0 = new "Xstring"
     $P0 = "ok 3\n"
-    $P1 = subclass 'PString', "Ystring"
+    $P1 = subclass 'String', "Ystring"
     $P1 = new "Ystring"
     $P1 = "ok 4\n"
     p($P0)
@@ -503,16 +504,18 @@ PSt ok 3
 String ok 4
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types quoted", todo => 'RT #41374' );
+pir_output_is( <<'CODE', <<'OUT', 'MMD on PMC types quoted' );
 .sub main :main
     $P0 = new 'String'
     $P0 = "ok 1\n"
-    $P1 = new 'Integer'
-    $P1 = "ok 2\n"
     p($P0)
-    p($P1)
+
     .local pmc pstring
-    PString = subclass 'String', 'PString'
+    pstring = subclass 'String', 'PString'
+    $P1 = new 'PString'
+    $P1 = "ok 2\n"
+    p($P1)
+
     $P0 = subclass "PString", "Xstring"
     $P0 = new "Xstring"
     $P0 = "ok 3\n"
@@ -583,17 +586,18 @@ String ok 4
 No applicable methods/
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types 3", todo => 'RT #41374' );
+pir_output_is( <<'CODE', <<'OUT', 'MMD on PMC types 3' );
 .sub main :main
-    .local  pmc  lib_perl_group
-    lib_perl_group    = loadlib 'perl_group'
-
     $P0 = new 'String'
     $P0 = "ok 1\n"
-    $P1 = new 'PerlInt'
-    $P1 = "ok 2\n"
     p($P0)
+
+    .local pmc pstring
+    pstring = subclass 'String', 'PString'
+    $P1 = new 'PString'
+    $P1 = "ok 2\n"
     p($P1)
+
     $P0 = subclass "PString", "Xstring"
     $P0 = new "Xstring"
     $P0 = "ok 3\n"
@@ -602,7 +606,10 @@ pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types 3", todo => 'RT #41374' );
     $P1 = "ok 4\n"
     p($P0)
     p($P1)
-    $P0 = new 'PerlInt'
+
+    .local pmc pint
+    pint = subclass 'Integer', 'PInt'
+    $P0 = new 'PInt'
     $P0 = 42
     p($P0)
 .end
@@ -634,17 +641,18 @@ String ok 4
 Intege 42
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types, global namespace", todo => 'RT #41374' );
+pir_output_is( <<'CODE', <<'OUT', 'MMD on PMC types, global namespace' );
 .sub main :main
-    .local  pmc  lib_perl_group
-    lib_perl_group    = loadlib 'perl_group'
-
     $P0 = new 'String'
     $P0 = "ok 1\n"
-    $P1 = new 'PerlInt'
-    $P1 = "ok 2\n"
     p($P0)
+
+    .local pmc pstring
+    pstring = subclass 'String', 'PString'
+    $P1 = new 'PString'
+    $P1 = "ok 2\n"
     p($P1)
+
     $P0 = subclass "PString", "Xstring"
     $P0 = new "Xstring"
     $P0 = "ok 3\n"
@@ -673,20 +681,20 @@ PSt ok 3
 String ok 4
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types, package namespace", todo => 'RT #41374' );
-
+pir_output_is( <<'CODE', <<'OUT', 'MMD on PMC types, package namespace' );
 .namespace ["Some"]
 
 .sub main :main
-    .local  pmc  lib_perl_group
-    lib_perl_group    = loadlib 'perl_group'
-
     $P0 = new 'String'
     $P0 = "ok 1\n"
-    $P1 = new 'PerlInt'
-    $P1 = "ok 2\n"
     p($P0)
+
+    .local pmc pstring
+    pstring = subclass 'String', 'PString'
+    $P1 = new 'PString'
+    $P1 = "ok 2\n"
     p($P1)
+
     $P0 = subclass "PString", "Xstring"
     $P0 = new "Xstring"
     $P0 = "ok 3\n"
@@ -718,9 +726,6 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types - Any", todo => 'RT #41374' );
 
 .sub main :main
-    .local  pmc  lib_perl_group
-    lib_perl_group    = loadlib 'perl_group'
-
     $P0 = new 'String'
     $P0 = "ok 1\n"
     $P1 = new 'PerlInt'
@@ -806,12 +811,11 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "add as method - inherited", todo => 'RT #41374' );
 .sub main :main
-    .local  pmc  lib_perl_group
-    lib_perl_group    = loadlib 'perl_group'
-
     .local pmc d, l, r
-    l = new 'PerlInt'
-    r = new 'PerlInt'
+    .local pmc pint
+    pint = subclass 'Integer', 'PInt'
+    l = new 'PInt'
+    r = new 'PInt'
     l = 3
     r = 39
     d = l."add"(r, d)
