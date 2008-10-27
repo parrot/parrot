@@ -231,7 +231,7 @@ print_statement(lexer_state * const lexer, subroutine * const sub) {
 
 }
 
-/*
+
 static char const * const subflag_names[] = {
     "method",
     "init",
@@ -246,7 +246,7 @@ static char const * const subflag_names[] = {
     "multi",
     "lexid"
 };
-*/
+
 
 
 
@@ -277,6 +277,8 @@ print_subs(struct lexer_state * const lexer) {
             fprintf(out, "\n");
 
             if (subiter->flags) {
+
+
                 fprintf(out, "\n.pcc_sub ");
 
                 if (TEST_FLAG(subiter->flags, SUB_FLAG_MAIN))
@@ -330,19 +332,17 @@ emit_pir_subs(lexer_state * const lexer) {
 
         do {
 
+            int i;
             fprintf(out, "\n.namespace ");
             print_key(lexer, subiter->name_space);
-            fprintf(out, "\n");
-
-
 
             fprintf(out, "\n.sub %s", subiter->sub_name);
 
-            if (TEST_FLAG(subiter->flags, SUB_FLAG_MAIN))
-                fprintf(out, ":main ");
-            if (TEST_FLAG(subiter->flags, SUB_FLAG_METHOD))
-                fprintf(out, ":method ");
-                /* XXX and so on; check which ones are available in PASM mode. */
+            for (i = 0; i < BIT(i); i++) {
+                if (TEST_FLAG(subiter->flags, BIT(i))) {
+                    fprintf(out, " :%s", subflag_names[i]);
+                }
+            }
 
             fprintf(out, "\n");
             emit_pir_statement(lexer, subiter);
