@@ -15,6 +15,13 @@
 #include "pirlexer.h"
 #include "pirheredoc.h"
 
+/* global variable to set parser in debug mode.
+ * It is not clear to me whether the global can be replaced
+ * by a parser-specific flag.
+ */
+extern int yypirdebug = 0;
+
+
 
 /* XXX use pthreads library to test thread safety.
    does not work currently on windows.
@@ -219,9 +226,11 @@ main(int argc, char *argv[]) {
     char              *filename     = NULL;
     char              *outputfile   = NULL;
 
+
     /* skip program name */
     argc--;
     argv++;
+
 
 
     /* XXX very basic argument handling; I'm too lazy to check out
@@ -273,6 +282,8 @@ main(int argc, char *argv[]) {
                 break;
             case 'v':
                 SET_FLAG(flags, LEXER_FLAG_VERBOSE);
+            case 'y':
+                yypirdebug = 1;
                 break;
             default:
                 fprintf(stderr, "Unknown option: '%c'\n", argv[0][1]);
