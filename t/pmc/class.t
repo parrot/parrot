@@ -107,8 +107,7 @@ Tests the Class PMC.
     new class, 'Class'
     result = class.'new'()
 
-    #isa_ok(result, 'Object')
-    todo(0, 'Object - is isa_ok broken?')
+    isa_ok(result, 'Object')
 
     $I0 = 1
     push_eh t_non_attribute_key
