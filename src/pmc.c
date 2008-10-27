@@ -84,14 +84,17 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 pmc_new(PARROT_INTERP, INTVAL base_type)
 {
-    PMC *const classobj = interp->vtables[base_type]->pmc_class;
+    PARROT_ASSERT(interp->vtables[base_type]);
+    {
+        PMC *const classobj = interp->vtables[base_type]->pmc_class;
 
-    if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
-        return VTABLE_instantiate(interp, classobj, PMCNULL);
-    else {
-        PMC * const pmc = get_new_pmc_header(interp, base_type, 0);
-        VTABLE_init(interp, pmc);
-        return pmc;
+        if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
+            return VTABLE_instantiate(interp, classobj, PMCNULL);
+        else {
+            PMC * const pmc = get_new_pmc_header(interp, base_type, 0);
+            VTABLE_init(interp, pmc);
+            return pmc;
+        }
     }
 }
 
