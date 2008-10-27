@@ -79,7 +79,8 @@ void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_in
         }
         PARROT_ASSERT(j <= sig_length);
 
-        params = string_make(interp, param_sig, j, "ascii", 0);
+        params = string_make(interp, param_sig, strlen(param_sig), NULL, PObj_constant_FLAG);
+
         nci_info->pcc_params_signature = params;
 
         mem_sys_free(param_sig);
@@ -162,10 +163,13 @@ Sets the specified function pointer and signature (C<*key>).
     VTABLE void set_pointer_keyed_str(STRING *key, void *func) {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         int jitted = 0;
+        char *key_c;
 
         /* Store the original function and signature. */
         PMC_struct_val(SELF) = func;
-        nci_info->signature  = key;
+        key_c = string_to_cstring(INTERP, key);
+        nci_info->signature  = string_make(interp, key_c, strlen(key_c), NULL, PObj_constant_FLAG);
+        string_cstring_free(key_c);
         pcc_params(INTERP, key, nci_info);
 
         /* Arity is length of that string minus one (the return type). */
