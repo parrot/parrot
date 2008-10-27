@@ -641,8 +641,8 @@ static yyconst flex_int32_t yy_rule_can_match_eol[21] =
 
 static yyconst flex_int16_t yy_rule_linenum[20] =
     {   0,
-      272,  274,  277,  281,  288,  291,  308,  320,  342,  361,
-      413,  432,  434,  464,  468,  470,  495,  499,  501
+      273,  275,  278,  282,  289,  292,  309,  321,  343,  362,
+      414,  433,  435,  465,  469,  471,  496,  500,  502
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -676,6 +676,7 @@ static yyconst flex_int16_t yy_rule_linenum[20] =
 #include <stdarg.h>
 #include "parrot/parrot.h"
 #include "parrot/string_funcs.h"
+#include "pirheredoc.h"
 
 
 /* don't bother to include the header file (which is generated);
@@ -871,7 +872,7 @@ process_heredocs(NOTNULL(char * const filename), NOTNULL(FILE *outfile)) {
 
 
 
-#line 875 "hdocprep.c"
+#line 876 "hdocprep.c"
 
 #define INITIAL 0
 #define POD 1
@@ -1162,10 +1163,10 @@ YY_DECL
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
 /* %% [7.0] user's declarations go here */
-#line 270 "hdocprep.l"
+#line 271 "hdocprep.l"
 
 
-#line 1169 "hdocprep.c"
+#line 1170 "hdocprep.c"
 
     if ( !yyg->yy_init )
         {
@@ -1291,19 +1292,19 @@ do_action:  /* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 272 "hdocprep.l"
+#line 273 "hdocprep.l"
 { /* ignore line comments */ }
     YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 274 "hdocprep.l"
+#line 275 "hdocprep.l"
 { yy_push_state(POD, yyscanner); }
     YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 277 "hdocprep.l"
+#line 278 "hdocprep.l"
 { /* end of POD comment */
                           yy_pop_state(yyscanner);
                         }
@@ -1311,11 +1312,11 @@ YY_RULE_SETUP
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 281 "hdocprep.l"
+#line 282 "hdocprep.l"
 { /* ignore pod comments */ }
     YY_BREAK
 case YY_STATE_EOF(POD):
-#line 283 "hdocprep.l"
+#line 284 "hdocprep.l"
 { /* we're scanning a POD comment, but encountered end-of-file. */
                           lex_error(yyscanner, "POD comment not closed!");
                           yyterminate();
@@ -1324,12 +1325,12 @@ case YY_STATE_EOF(POD):
 case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
-#line 288 "hdocprep.l"
+#line 289 "hdocprep.l"
 { fprintf(yyget_extra(yyscanner)->outfile, "\n"); }
     YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 291 "hdocprep.l"
+#line 292 "hdocprep.l"
 {
                           global_state * const state = yyget_extra(yyscanner);
 
@@ -1349,7 +1350,7 @@ YY_RULE_SETUP
 case 7:
 /* rule 7 can match eol */
 YY_RULE_SETUP
-#line 308 "hdocprep.l"
+#line 309 "hdocprep.l"
 { /* match the rest of the line */
                               global_state * const state = yyget_extra(yyscanner);
 
@@ -1365,7 +1366,7 @@ YY_RULE_SETUP
 case 8:
 /* rule 8 can match eol */
 YY_RULE_SETUP
-#line 320 "hdocprep.l"
+#line 321 "hdocprep.l"
 { /* match the rest of the line */
                               global_state * const state = yyget_extra(yyscanner);
 
@@ -1390,7 +1391,7 @@ YY_RULE_SETUP
 case 9:
 /* rule 9 can match eol */
 YY_RULE_SETUP
-#line 342 "hdocprep.l"
+#line 343 "hdocprep.l"
 {
                               global_state * const state = yyget_extra(yyscanner);
 
@@ -1413,7 +1414,7 @@ YY_RULE_SETUP
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 361 "hdocprep.l"
+#line 362 "hdocprep.l"
 {
                              global_state * const state = yyget_extra(yyscanner);
 
@@ -1462,7 +1463,7 @@ YY_RULE_SETUP
                            }
     YY_BREAK
 case YY_STATE_EOF(HEREDOC_STRING):
-#line 408 "hdocprep.l"
+#line 409 "hdocprep.l"
 { /* end of file while reading heredoc */
                               lex_error(yyscanner, "runaway heredoc string");
                               yyterminate();
@@ -1470,7 +1471,7 @@ case YY_STATE_EOF(HEREDOC_STRING):
     YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 413 "hdocprep.l"
+#line 414 "hdocprep.l"
 { /* a 'nested' heredoc string */
                               global_state *state = yyget_extra(yyscanner);
 
@@ -1493,16 +1494,16 @@ YY_RULE_SETUP
 case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
-#line 432 "hdocprep.l"
+#line 433 "hdocprep.l"
 { /* do nothing */ }
     YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 434 "hdocprep.l"
+#line 435 "hdocprep.l"
 { fprintf(yyget_extra(yyscanner)->outfile, "%s", yytext); }
     YY_BREAK
 case YY_STATE_EOF(SCAN_STRING):
-#line 436 "hdocprep.l"
+#line 437 "hdocprep.l"
 {
                               global_state * const state = yyget_extra(yyscanner);
 
@@ -1526,26 +1527,26 @@ case YY_STATE_EOF(SCAN_STRING):
                             }
     YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 460 "hdocprep.l"
+#line 461 "hdocprep.l"
 { /* end of file */
                               yyterminate();
                             }
     YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 464 "hdocprep.l"
+#line 465 "hdocprep.l"
 { /* .include directives must be handled here */
                               yy_push_state(INCLUDE, yyscanner);
                             }
     YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 468 "hdocprep.l"
+#line 469 "hdocprep.l"
 { /* skip whitespace */ }
     YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 470 "hdocprep.l"
+#line 471 "hdocprep.l"
 { /* include this file */
                               global_state * const state = yyget_extra(yyscanner);
 
@@ -1574,19 +1575,19 @@ YY_RULE_SETUP
 case 17:
 /* rule 17 can match eol */
 YY_RULE_SETUP
-#line 495 "hdocprep.l"
+#line 496 "hdocprep.l"
 { /* after .include "foo.pir", go back to the state we were in */
                               yy_pop_state(yyscanner);
                             }
     YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 499 "hdocprep.l"
+#line 500 "hdocprep.l"
 { lex_error(yyscanner, "wrong scanner state\n"); }
     YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 501 "hdocprep.l"
+#line 502 "hdocprep.l"
 {
 
                               fprintf(yyget_extra(yyscanner)->outfile, "%s", yytext);
@@ -1594,10 +1595,10 @@ YY_RULE_SETUP
     YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 506 "hdocprep.l"
+#line 507 "hdocprep.l"
 ECHO;
     YY_BREAK
-#line 1601 "hdocprep.c"
+#line 1602 "hdocprep.c"
 case YY_STATE_EOF(INCLUDE):
 case YY_STATE_EOF(SAVE_REST_OF_LINE):
 case YY_STATE_EOF(SAVE_REST_AGAIN):
@@ -2850,7 +2851,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 /* %ok-for-header */
 
-#line 506 "hdocprep.l"
+#line 507 "hdocprep.l"
 
 
 

@@ -2075,7 +2075,7 @@ fold_i_i(yyscan_t yyscanner, int a, pir_math_operator op, int b) {
                   "detected 'inc' or 'dec' in fold_i_i()");
             break;
     }
-    return new_const(yypirget_extra(yyscanner), INT_TYPE, result);
+    return new_const((lexer_state * const)yypirget_extra(yyscanner), INT_TYPE, result);
 }
 
 /*

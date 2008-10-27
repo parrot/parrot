@@ -95,7 +95,7 @@ macro_table * new_macro_table(macro_table * const current);
 
 void store_macro_char(macro_def * const macro, char c) ;
 
-void store_macro_string(macro_def * const macro, char * const str, ...);
+void store_macro_string(macro_def * const macro, char const * const str, ...);
 
 macro_param * new_macro_param(char const * const value);
 

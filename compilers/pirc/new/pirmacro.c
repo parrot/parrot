@@ -27,7 +27,7 @@ Actual expansion of the macros is completely handled in the lexer (pir.l).
 
 */
 
-
+static void check_size(macro_def * const macro, unsigned length);
 
 
 
@@ -134,7 +134,7 @@ if not, then the buffer is doubled in size.
 =cut
 
 */
-void
+static void
 check_size(macro_def * const macro, unsigned length) {
    unsigned used = macro->cursor - macro->body;
     if (used + length >= macro->buffersize) {
@@ -179,7 +179,7 @@ beforehand how much space we need in the buffer due to the var. arg. list.
 
 */
 void
-store_macro_string(macro_def * const macro, char * const str, ...) {
+store_macro_string(macro_def * const macro, char const * const str, ...) {
     va_list arg_ptr;
 
 #define MAX_NUM_CHARS_IN_STRING   256

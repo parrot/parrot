@@ -46,6 +46,7 @@
 #include <stdarg.h>
 #include "parrot/parrot.h"
 #include "parrot/string_funcs.h"
+#include "pirheredoc.h"
 
 
 /* don't bother to include the header file (which is generated);
