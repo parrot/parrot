@@ -19,7 +19,11 @@
  * It is not clear to me whether the global can be replaced
  * by a parser-specific flag.
  */
+#ifdef YYDEBUG
+
 extern int yypirdebug = 0;
+
+#endif
 
 
 
@@ -238,12 +242,6 @@ main(int argc, char *argv[]) {
      * the standard funtion for that, right now. This is a TODO. */
     while (argc > 0 && argv[0][0] == '-') {
         switch (argv[0][1]) {
-            /* Only allow for debug flag if the generated parser supports it */
-#ifdef YYDEBUG
-            case 'd':
-                yydebug = 1;
-                break;
-#endif
             case 'E':
                 SET_FLAG(flags, LEXER_FLAG_PREPROCESS);
                 break;
@@ -284,9 +282,12 @@ main(int argc, char *argv[]) {
             case 'W':
                 SET_FLAG(flags, LEXER_FLAG_WARNINGS);
                 break;
+/* Only allow for debug flag if the generated parser supports it */
+#ifdef YYDEBUG
             case 'y':
                 yypirdebug = 1;
                 break;
+#endif
             default:
                 fprintf(stderr, "Unknown option: '%c'\n", argv[0][1]);
                 exit(EXIT_FAILURE);
