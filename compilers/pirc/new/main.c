@@ -20,10 +20,12 @@
    does not work currently on windows.
    The check for _MSC_VER is not correct but works for me.
 */
+
+/*
 #ifndef _MSC_VER
 #  define TEST_THREAD_SAFETY
 #endif
-
+*/
 
 #ifdef TEST_THREAD_SAFETY
 #  include <pthread.h>
