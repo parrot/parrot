@@ -13,7 +13,9 @@
 #include "piryy.h"
 #include "pirmacro.h"
 
-/* XXX count memory, so we can check out mem. savings of string reuse */
+/* XXX count memory, so we can check out mem. savings of string reuse
+ * Only temporarily used, so no need to "fix" this.
+ */
 static int totalmem = 0;
 
 
@@ -102,7 +104,9 @@ pir_mem_allocate_zeroed(NOTNULL(lexer_state * const lexer), size_t numbytes) {
 =item C<void *
 pir_mem_allocate(NOTNULL(lexer_state * const lexer), size_t numbytes)>
 
-See C<pir_mem_allocate_zeroed()>. Memory is C<not> zeroed.
+See C<pir_mem_allocate_zeroed()>. Memory is C<not> guaranteed to be zeroed.
+(It might, it might not, depending on what your system finds appropriate.
+Don't count on it anyway.)
 
 =cut
 
@@ -260,6 +264,7 @@ See dupstr, except that this version takes the number of characters to be
 copied. Easy for copying a string except the quotes, for instance.
 
 XXX maybe make this a runtime (commandline) option? Might be slightly slower.
+XXX Otherwise maybe a build option using #defines.
 
 =cut
 

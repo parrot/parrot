@@ -9,7 +9,9 @@
 #include "pirmacro.h"
 #include "parrot/parrot.h"
 
-/* macros can store up to 4K characters, after which the buffer must be resized. */
+/* macros can store up to 4K characters, after which the buffer must be resized.
+ * XXX make this configurable through a commandline option?
+ */
 #define INIT_MACRO_SIZE     4096
 
 /*
@@ -20,6 +22,8 @@ This file contains functions that manage the macro datastructures.
 Actual expansion of the macros is completely handled in the lexer (pir.l).
 
 =over 4
+
+=cut
 
 */
 
@@ -62,6 +66,10 @@ new_macro(macro_table * const table, char const * const name, int lineno, int ta
 =item C<macro_param *
 new_macro_param(char const * const value)
 
+Constructor for a C<macro_param> struct object. Initializes
+the C<name> attribute of the C<macro_param> object to C<value>.
+A pointer to the newly allocated C<macro_param> object is returned.
+
 =cut
 
 */
@@ -80,6 +88,8 @@ new_macro_param(char const * const value) {
 
 =item C<void
 add_macro_param(macro_def * const macro, char * const name)>
+
+Add a macro parameter by name of C<name> to the macro definition C<macro>.
 
 =cut
 
@@ -118,7 +128,8 @@ new_macro_const(macro_table * const table, char const * const name, char const *
 =item C<void
 check_size(macro_def * const macro, unsigned length)>
 
-Check C<macro>'s buffer size.
+Check C<macro>'s buffer size whether C<length> bytes can be added;
+if not, then the buffer is doubled in size.
 
 =cut
 
@@ -171,9 +182,9 @@ void
 store_macro_string(macro_def * const macro, char * const str, ...) {
     va_list arg_ptr;
 
-#define MAX_NUM_CHARS   256
+#define MAX_NUM_CHARS_IN_STRING   256
 
-    check_size(macro, MAX_NUM_CHARS);
+    check_size(macro, MAX_NUM_CHARS_IN_STRING);
 
     va_start(arg_ptr, str);
     /* vsprintf returns number of characters written; adjust cursor with that. */
@@ -251,7 +262,7 @@ new_macro_table(macro_table * const current) {
 =item C<void
 declare_macro_local(macro_def * const macro, char * const name)>
 
-Declare C<name> as a .macro_local for the macro definition C<macro>.
+Declare C<name> as a C<.macro_local> for the macro definition C<macro>.
 
 =cut
 
@@ -261,9 +272,6 @@ declare_macro_local(macro_def * const macro, char const * const name) {
     macro_param * param = new_macro_param(name);
     param->next         = macro->macrolocals;
     macro->macrolocals  = param;
-/*
-    fprintf(stderr, "declare_macro_local(): %s\n", name);
-    */
 }
 
 
@@ -282,8 +290,6 @@ PARROT_WARN_UNUSED_RESULT
 int
 is_macro_local(macro_def * const macro, char const * const name) {
     macro_param *iter = macro->macrolocals;
-
-/*    fprintf(stderr, "is_macro_local: %s\n", name);*/
 
     while (iter) {
         if (STREQ(iter->name, name))

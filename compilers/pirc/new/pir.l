@@ -160,6 +160,7 @@ REGISTER       "$"[SNIP]{DIGITS}
 
 %option stack
 
+/* XXX document, and possibly rename, these states, when are they used? */
 %x MACROHEAD
 %x MACROBODY
 %x MACROLOCAL
@@ -281,8 +282,8 @@ REGISTER       "$"[SNIP]{DIGITS}
 
 ".endm"|".macro_local"|".macro_label"  { /* make sure these are not used outside macro defs */
                     yypirerror(yyscanner, yyget_extra(yyscanner),
-                                            "cannot use '%s' outside of macro definitions", yytext);
-                               }
+                               "cannot use '%s' outside of macro definitions", yytext);
+                  }
 
 
 
@@ -741,7 +742,7 @@ REGISTER       "$"[SNIP]{DIGITS}
                             }
 
 
-<MACROLABEL>{EOL}[\t\r\n ]* {
+<MACROLABEL>{EOL}[\t\r\n ]* { /* the newline character after a ".macro_label $foo:" declaration */
                               yy_pop_state(yyscanner); /* leave MACROLABEL state */
                               return TK_NL;
                             }
@@ -796,7 +797,7 @@ REGISTER       "$"[SNIP]{DIGITS}
                                store_macro_char(CURRENT_MACRO(yyget_extra(yyscanner)), yytext[0]);
                              }
 
-<MACROBODY><<EOF>>           {
+<MACROBODY><<EOF>>           { /* catch run-away macro bodys */
                                yypirerror(yyscanner, yyget_extra(yyscanner),
                                           "read end of file while reading macro body");
                              }
@@ -859,7 +860,7 @@ munge_id(char const * const id, lexer_state * const lexer)>
 
 Generate an identifier based on a macro label or local expansion.
 
-A label expansion looks like ".$LABEL", from which a label identifier is
+A label expansion looks like ".$<LABEL>", from which a label identifier is
 generated, formatted as: "$macro_<MACRO>_<LABEL>_<SCOPE>".
 
 In this format, C<MACRO> refers to the macro name of the macro in which
@@ -884,6 +885,7 @@ munge_id(char const * const id, lexer_state * const lexer) {
      *
      * Hence the $ character.
      */
+    char       *       munged_id;
     char const * const format        = "$macro_%s_%s_%d"; /* 15 characters */
     int  const         format_length = strlen(format);
 
@@ -893,9 +895,15 @@ munge_id(char const * const id, lexer_state * const lexer) {
     /* calculate length of the generated label: length of macro name,
      * plus length of label name.
      */
-    int   length    = format_length + strlen(table->thismacro->name) + lexer->num_digits;
-    char *munged_id;
+    int length = format_length;
 
+    /* add length of the macro name */
+    length += strlen(table->thismacro->name);
+
+    /* add length of unique id to total length */
+    length += lexer->num_digits;
+
+    /* add length of the actual label id */
     length += strlen(id);
 
     munged_id = (char *)pir_mem_allocate_zeroed(lexer, (length + 1) * sizeof (char));
