@@ -138,8 +138,8 @@ compilers/pirc/macro/macrolexer.c
 compilers/pirc/macro/macrolexer.h
 compilers/pirc/macro/macroparser.c
 compilers/pirc/macro/macroparser.h
-compilers/pirc/heredoc/hdocprep.l
-compilers/pirc/heredoc/hdocprep.c
+compilers/pirc/new/hdocprep.l
+compilers/pirc/new/hdocprep.c
 languages/plumhead/src/yacc/plumhead_lexer.c
 languages/plumhead/src/yacc/plumhead_parser.c
 languages/plumhead/src/yacc/plumhead_parser.h
