@@ -1571,6 +1571,22 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
         if (type_sig == type_call)
             continue;
 
+        /* promote primitives to their PMC equivalents, as PCC will autobox
+         * the distance penalty makes primitive variants look cheaper */
+        switch (type_call) {
+            case enum_type_INTVAL:
+                if (type_sig == enum_class_Integer) { dist++; continue; }
+                break;
+            case enum_type_FLOATVAL:
+                if (type_sig == enum_class_Float)   { dist++; continue; }
+                break;
+            case enum_type_STRING:
+                if (type_sig == enum_class_String)  { dist++; continue; }
+                break;
+            default:
+                break;
+        }
+
         /*
          * different native types are very different, except a PMC
          * which matches any PMC
@@ -1970,20 +1986,21 @@ Parrot_mmd_add_multi_from_c_args(PARROT_INTERP,
         ARGIN(const char *long_sig),
         ARGIN(funcptr_t multi_func_ptr))
 {
-        PMC *multi_sig;
+        STRING *comma          = CONST_STRING(interp, ",");
         STRING *sub_name_str   = string_from_cstring(interp, sub_name, 0);
-        STRING *long_sig_str    = string_from_cstring(interp, long_sig, 0);
+        STRING *long_sig_str   = string_from_cstring(interp, long_sig, 0);
         STRING *short_sig_str  = string_from_cstring(interp, short_sig, 0);
-        PMC *type_list = string_split(interp, CONST_STRING(interp, ","), long_sig_str);
+        PMC    *type_list      = string_split(interp, comma, long_sig_str);
         STRING *namespace_name = VTABLE_get_string_keyed_int(interp, type_list, 0);
-
         /* Create an NCI sub for the C function */
-        PMC *sub_obj = constant_pmc_new(interp, enum_class_NCI);
-        VTABLE_set_pointer_keyed_str(interp, sub_obj,
-                short_sig_str, F2DPTR(multi_func_ptr));
+        PMC    *sub_obj        = constant_pmc_new(interp, enum_class_NCI);
+        PMC    *multi_sig      = mmd_build_type_tuple_from_long_sig(interp,
+                                    long_sig_str);
+
+        VTABLE_set_pointer_keyed_str(interp, sub_obj, short_sig_str,
+                                        F2DPTR(multi_func_ptr));
 
         /* Attach a type tuple array to the NCI sub for multi dispatch */
-        multi_sig = mmd_build_type_tuple_from_long_sig(interp, long_sig_str);
         PMC_pmc_val(sub_obj) = multi_sig;
 
         mmd_add_multi_to_namespace(interp, namespace_name, sub_name_str, sub_obj);

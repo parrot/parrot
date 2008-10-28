@@ -1459,7 +1459,7 @@ Goodbye
 200
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', '.autoboxed MMD with :optional', todo => 'RT #60124' );
+pir_output_is( <<'CODE', <<'OUTPUT', '.autoboxed MMD with :optional' );
 
 .sub 'main' :main
     foo('Hello')
