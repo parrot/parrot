@@ -6,7 +6,9 @@
 #define PARROT_PIR_PIRMACRO_H_GUARD
 
 
-
+/* struct to represent macro parameter declaration, or,
+ * a macro argument, or, a .macro_local.
+ */
 typedef struct macro_param {
     char const         *name;
     struct macro_param *next;
@@ -14,6 +16,15 @@ typedef struct macro_param {
 } macro_param;
 
 
+/* struct to represent a macro definition; it has a name (.macro <name>),
+ * a body, which is a string buffer containing the macro definition.
+ * C<cursor> is used to write into this buffer; C<linedefined> stores the
+ * linenumber at which the macro definition started.
+ * C<parameters> is a list of macro parameters; C<macrolocals> is a list
+ * of declared C<.macro_local>s.
+ * C<buffersize> contains the size of the buffer; if the buffer is full
+ * its size is doubled.
+ */
 typedef struct macro_def {
     char const       *name;
     char             *body;
@@ -26,7 +37,7 @@ typedef struct macro_def {
 
     unsigned          buffersize;
 
-    struct macro_def *next;
+    struct macro_def *next; /* macro definitions are stored in a list */
 
 } macro_def;
 
@@ -70,23 +81,15 @@ typedef struct macro_table {
 
 
 
-typedef struct file_state {
-
-    struct yy_buffer_state *buffer;
-    char const *            filename;
-    int                     lineno;
-
-    struct file_state      *prev;
-
-} file_state;
 
 
-macro_def *new_macro(macro_table * const table, char const * const name, int lineno, int takes_args);
+macro_def *new_macro(macro_table * const table, char const * const name, int lineno,
+                     int takes_args);
 
 void add_macro_param(macro_def * const macro, char const * const name);
 
 void new_macro_const(macro_table * const table, char const * const name,
-                        char const * const value, int lineno);
+                     char const * const value, int lineno);
 
 
 macro_def *find_macro(macro_table * const table, char const * const name);
