@@ -113,17 +113,16 @@ not_a_string:
         print num_elements
         say ') {'
 
-        .local pmc    iter, val
-        .local string indent, key
+        .local pmc    it, val, key
+        .local string indent, key_str
         .local int    key_starts_with_digit
         indent = '  '
-        new iter, .Iterator, a
-        set iter, 0
+        it = iter a
 iter_loop:
-    unless iter, iter_end
-        shift key, iter
-        # TODO: ugly workaround as Hash keys are stringified
-        key_starts_with_digit = is_cclass .CCLASS_NUMERIC, key, 0
+    unless it, iter_end
+        shift key, it
+        key_str = key
+        key_starts_with_digit = is_cclass .CCLASS_NUMERIC, key_str, 0
         print indent
         print '['
         if key_starts_with_digit goto key_is_an_integer_1
