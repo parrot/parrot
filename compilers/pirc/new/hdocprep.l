@@ -46,6 +46,7 @@
 #include <stdarg.h>
 #include "parrot/parrot.h"
 #include "parrot/string_funcs.h"
+#include "parrot/embed.h"
 #include "pirheredoc.h"
 
 
@@ -473,16 +474,40 @@ LINECOMMENT    [#].*{EOL}
 
                               char * filename = (char *)mem_sys_allocate_zeroed((yyleng - 2 + 1)
                                                                                 * sizeof (char));
+                              char * fullpath;
+
+                              /* for now, create an interpreter when we need one;
+                               * XXX create the interpreter before invoking heredoc preprocessor,
+                               * so it can be passed as a parameter, and used here.
+                               */
+                              Interp *interp = Parrot_new(NULL);
+
+                              if (interp == NULL) /* ...  and then this check can be removed. XXX */
+                                  fprintf(stderr, "No interpreter!\n");
 
                               strncpy(filename, yytext + 1, yyleng - 2);
 
+                              /* fprintf(stderr, "locating runtime file: [%s]\n", filename); */
+                              fullpath = Parrot_locate_runtime_file(interp, filename,
+                                                                    PARROT_RUNTIME_FT_INCLUDE);
+
+                              if (fullpath == NULL) {
+                                  fprintf(stderr, "Please make sure you're running pirc from "
+                                          "parrot root directory, not from compilers/pirc. "
+                                          "This will be fixed later. Sorry!\n");
+
+                                  /* for now, just fall back to filename */
+                                  fullpath = filename;
+                              }
+
+                              /* fprintf(stderr, "fullpath: [%s]\n", fullpath); */
                               /* make sure that any error messages that occur in the .included
                                * file will report the right line number and file name.
                                */
                               fprintf(state->outfile, ".line 1\n");
                               fprintf(state->outfile, ".file %s\n", yytext); /* is quoted */
 
-                              process_heredocs(filename, state->outfile);
+                              process_heredocs(fullpath, state->outfile);
 
                               /* restore the location information; we didn't count the "\n"
                                * yet that will come after the .include dir.; hence the + 1 now.
@@ -491,6 +516,8 @@ LINECOMMENT    [#].*{EOL}
                               fprintf(state->outfile, ".file '%s'\n", state->filename);
 
                               mem_sys_free(filename);
+                              mem_sys_free(fullpath);
+                              Parrot_destroy(interp);
                             }
 
 <INCLUDE>{EOL}              { /* after .include "foo.pir", go back to the state we were in */
