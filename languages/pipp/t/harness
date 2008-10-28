@@ -39,41 +39,51 @@ use strict;
 use warnings;
 use lib '..';
 
-use Cwd           ();
-use File::Spec    ();
-use TAP::Harness  3.12;     # minimum version that allows closures for the 'exec' option
+use Cwd                     ();
+use File::Spec              ();
+use TAP::Harness            3.12;     # support closures for the 'exec' option
+use TAP::Harness::Archive   0.12; 
 use Parrot::Config;
+use Getopt::Long;
+use Parrot::Harness::Smoke;
+
+my ( $files_flag, $send_to_smolder_flag, $archive_flag );
+my ( $php_flag, $pct_flag, $antlr3_flag, $phc_flag );
+GetOptions(
+    'file'            => \$files_flag,
+    'send-to-smolder' => \$send_to_smolder_flag,
+    'archive'         => \$archive_flag,
+    'with-antlr3'     => \$antlr3_flag,
+    'with-pct'        => \$pct_flag,
+    'with-phc'        => \$phc_flag,
+    'with-php'        => \$php_flag,
+);
 
 my $language = 'pipp';
 
-if ( grep { m/^--files$/ } @ARGV ) {
+if ( $files_flag ) {
     # Only the Makefile in 'parrot/languages' uses --files
     my $dir = File::Spec->catfile( $language, 't' );
     my @files = glob( File::Spec->catfile( $dir, '*/*.t' ) );
     print join( "\n", @files );
     print "\n" if scalar(@files);
 } else { 
-    # TODO: use Getopt::Long or such
     my @cmd = ( "../parrot$PConfig{exe}", 'pipp/pipp.pbc' );
     $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::Phc';
 
-    if ( grep { m/^--with-php$/ } @ARGV ) { 
-         @ARGV = grep { ! m/^--with-php$/ } @ARGV;
+    if ( $php_flag ) { 
          $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::PHP';
          @cmd = qw{ php-cgi -q -C -n } ;
     }
-    elsif ( grep { m/^--with-phc$/ } @ARGV ) {
-        @ARGV = grep { ! m/^--with-phc$/ } @ARGV;
+    elsif ( $phc_flag ) {
         $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::Phc';
         push @cmd, '--variant=phc';
     }
-    elsif ( grep { m/^--with-antlr3$/ } @ARGV ) {
-        @ARGV = grep { ! m/^--with-antlr3$/ } @ARGV;
+    elsif ( $antlr3_flag ) {
         $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::Antlr3';
         push @cmd, '--variant=antlr3';
     }
-    elsif ( grep { m/^--with-pct$/ } @ARGV ) {
-        @ARGV = grep { ! m/^--with-pct$/ } @ARGV;
+    elsif ( $pct_flag ) {
         $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::PCT';
         push @cmd, '--variant=pct';
     }
@@ -95,21 +105,47 @@ if ( grep { m/^--files$/ } @ARGV ) {
         }
     }
 
-    my $harness = TAP::Harness->new( {
-                      exec => sub {
-                                       my ( $harness, $test_file ) = @_;
-                                       
-                                       # the directory t/pmc contains only PIR test files
-                                       return [ "../parrot$PConfig{exe}", $test_file ] if $test_file =~ m!t/pmc/.*[.]t$!;
+    my $exec_sub
+        = sub {
+              my ( $harness, $test_file ) = @_;
 
-                                       # the directory t/in_php contains only test scripts written in PHP
-                                       return [ @cmd, $test_file ] if $test_file =~ m!t/in_php/.*[.]t$!;
+              # the directory t/pmc contains only PIR test files
+              return [ "../parrot$PConfig{exe}", $test_file ] if $test_file =~ m!t/pmc/.*[.]t$!;
 
-                                       # all other directories contain test scripts written in Perl
-                                       return [ $PConfig{perl}, $test_file ];
-                                  }
-                  } ); 
-    $harness->runtests(@files);
+              # the directory t/in_php contains only test scripts written in PHP
+              return [ @cmd, $test_file ] if $test_file =~ m!t/in_php/.*[.]t$!;
+
+              # all other directories contain test scripts written in Perl
+              return [ $PConfig{perl}, $test_file ];
+          };  
+    if ( $archive_flag ) { 
+        my %env_data = Parrot::Harness::Smoke::collect_test_environment_data();
+       
+        my $report_file = ['pipp_test_run.tar.gz'];
+        my $harness = TAP::Harness::Archive->new(
+            {
+                exec             => $exec_sub,
+                verbosity        => $ENV{HARNESS_VERBOSE},
+                archive          => $report_file->[0],
+                merge            => 1,
+                extra_properties => \%env_data,
+            }
+        );
+        $harness->runtests(@files);
+
+        if ( $send_to_smolder_flag ) {
+            $env_data{report_file} = $report_file;
+            $env_data{project_id}  = 10;
+            Parrot::Harness::Smoke::send_archive_to_smolder(%env_data);
+        }
+    } else {
+       my $harness = TAP::Harness->new(
+           {
+               exec => $exec_sub,
+           }
+       );
+        $harness->runtests(@files);
+    }
 }
 
 =head1 HISTORY

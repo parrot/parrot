@@ -3,12 +3,12 @@
 
 =head1 NAME
 
-Parrot::Harness::Smoke - Subroutines used by F<t/harness> to generate smoke reports
+Parrot::Harness::Smoke - Subroutines used by harness-skripts to generate smoke reports
 
 =head1 DESCRIPTION
 
-This package exports on request subroutines used by F<t/harness> to generate
-smoke reports.
+This package exports on request subroutines used by the root F<t/harness> 
+and by language implementation F<t/harness> to generate smoke reports.
 
 Following subroutines are supported:
 
@@ -38,13 +38,16 @@ our @EXPORT_OK = qw(
     send_archive_to_smolder
 );
 
+# language implementations have a different project id
 my %SMOLDER_CONFIG = (
-    server     => 'http://smolder.plusthree.com',
-    username   => 'parrot-autobot',
-    password   => 'squ@wk',
-    project_id => 8,
+    server       => 'http://smolder.plusthree.com',
+    username     => 'parrot-autobot',
+    password     => 'squ@wk',
+    project_id   => 8,
+    report_file  => ['parrot_test_run.tar.gz'],
 );
 
+# language implementations must pass their respective project id
 sub send_archive_to_smolder {
     my %test_env_data = @_;
     eval { require LWP::UserAgent };
@@ -54,9 +57,12 @@ sub send_archive_to_smolder {
             . ('-' x 55) . "\n\n$@\n";
     }
 
-    my $url = $SMOLDER_CONFIG{server}
-      . '/app/developer_projects/process_add_report/'
-      . $SMOLDER_CONFIG{project_id};
+    my $project_id   = delete $test_env_data{project_id}  || $SMOLDER_CONFIG{project_id}; 
+    my $report_file  = delete $test_env_data{report_file} || $SMOLDER_CONFIG{report_file}; 
+    my $url
+        =   $SMOLDER_CONFIG{server}
+          . '/app/developer_projects/process_add_report/'
+          . $project_id;
     my $ua = LWP::UserAgent->new();
 
     # create our tags based off the test environment information
@@ -70,18 +76,19 @@ sub send_archive_to_smolder {
             username     => $SMOLDER_CONFIG{username},
             password     => $SMOLDER_CONFIG{password},
             tags         => $tags,
-            report_file  => ['parrot_test_run.tar.gz'],
+            report_file  => $report_file,
         ]
     );
 
     if ($response->code == 302) {
         my ($report_id) = $response->content =~ /Reported #(\d+) added/i;
         my $report_url = "$SMOLDER_CONFIG{server}/app/public_projects/report_details/$report_id";
-        my $project_url = $SMOLDER_CONFIG{server}
-          . '/app/public_projects/smoke_reports/'
-          . $SMOLDER_CONFIG{project_id};
+        my $project_url
+            =   $SMOLDER_CONFIG{server}
+              . '/app/public_projects/smoke_reports/'
+              . $project_id;
         print "Test report successfully sent to Smolder at\n$report_url"
-            . "\nYou can see other recent reports at\n$project_url.\n\n";
+            . "\nYou can see other recent reports at\n$project_url .\n\n";
     }
     else {
         die "Could not upload report to Smolder at $SMOLDER_CONFIG{server}"
