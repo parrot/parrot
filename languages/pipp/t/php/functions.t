@@ -38,6 +38,16 @@ END_CODE
 The function dummy_no_args() has been called.
 END_EXPECTED
 
+=for perl6
+
+sub echo_count( $count )  {
+  print "count: $count\n";
+}
+
+echo_count( 123456 );
+
+=cut
+
 language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'function with one arg', todo => 'not implemented yet' );
 <?php
 
