@@ -298,15 +298,18 @@ print_subs(struct lexer_state * const lexer) {
 }
 
 
-
-
 static void
 emit_pir_instruction(lexer_state * const lexer, instruction * const instr) {
 
     if (instr->label)
         fprintf(out, "  %s:\n", instr->label);
-    if (instr->opinfo)
-        fprintf(out, "    %s\n", instr->opinfo->name);
+    if (instr->opinfo) {
+        fprintf(out, "    %-10s\t", instr->opinfo->name);
+
+        print_expressions(lexer, instr->operands);
+
+        fprintf(out, "\n");
+    }
 }
 
 static void
