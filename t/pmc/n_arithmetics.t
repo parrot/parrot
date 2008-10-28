@@ -175,9 +175,9 @@ various combinations of Parrot integer and number types.
     P2 = new 'Integer'
     set P2, 666
     div P2, P0, P1
-    is( P2, -32.5203, 'divide Integer by Integer' )
+    is( P2, -32.5203, 'divide Integer by Integer', 0.0001 )
     P3 = div P0, P1
-    is( P3, -32.5203, 'divide Integer by Integer in assignment' )
+    is( P3, -32.5203, 'divide Integer by Integer in assignment', 0.0001 )
     ## check dividing by constants.
     P2 = div P0, 11
     is( P2, 363.6363636363636364, 'divide Integer by constant' )
@@ -301,10 +301,10 @@ various combinations of Parrot integer and number types.
     P0 = new 'Float'
     set P0, -123.123
     div P1, P0, P10
-    is( P1, -0.03078075, 'divide Float by Int' )
+    is( P1, -0.03078075, 'divide Float by Int', 0.0001 )
     P30 = P1
     P1 = div P0, P10
-    is( P1, -0.03078075, 'divide Float by Int in assignment' )
+    is( P1, -0.03078075, 'divide Float by Int in assignment', 0.0001 )
     ## check that we are not reusing P1.
     ne_addr P30, P1, not_broken
     ok( 0, 'not reusing P1' )
@@ -357,11 +357,11 @@ various combinations of Parrot integer and number types.
     P2 = add P1, 6.78
     is( P2, -116.343, 'add neg Float to constant Float' )
     P2 = add P0, 6.78
-    is( P2,  4007.03, 'add pos Float to constant Float' )
+    is( P2,  4007.026, 'add pos Float to constant Float', 0.001 )
     P2 = mul P1, 6.78
     is( P2, -834.77394, 'multiply Float by constant Float' )
     P2 = div P0, 6.78
-    is( P2,  590.007, 'divide Float by constant Float' )
+    is( P2,  590.007, 'divide Float by constant Float', 0.001 )
 .end
 
 .sub subtract_float_from_float
@@ -375,7 +375,7 @@ various combinations of Parrot integer and number types.
     is( P2, 4123.369, 'subtract Float from Float' )
     P30 = P2
     P2 = sub P1, P0
-    is( P2, 4123.369, 'subtract Float from Float in assignment' )
+    is( P2, -4123.369, 'subtract Float from Float in assignment' )
     ## check that we are not reusing P2.
     ne_addr P30, P2, not_broken
     ok( 0, 'not reusing P2' )
@@ -394,10 +394,10 @@ various combinations of Parrot integer and number types.
     P2 = new 'Float'
     set P2, 6.66
     mul P2, P0, P1
-    is( P2, -49252.2288258, 'multiply Float from Float' )
+    is( P2, -49252.2288258, 'multiply Float from Float', 0.000001 )
     P30 = P2
     P2 = mul P0, P1
-    is( P2, -49252.2288258, 'muliply Float from Float in assignment' )
+    is( P2, -49252.2288258, 'muliply Float from Float in assignment', 0.000001 )
     ## check that we are not reusing P2.
     ne_addr P30, P2, not_broken
     ok( 0, 'not reusing P2' )
@@ -416,10 +416,10 @@ various combinations of Parrot integer and number types.
     P2 = new 'Float'
     set P2, 6.66
     div P2, P1, P0
-    is( P2, -0.0307788571002883, 'divide neg Float by pos Float' )
+    is( P2, -0.0307788571002883, 'divide neg Float by pos Float', 0.0000001 )
     P30 = P2
     P2 = div P0, P1
-    is( P2, -32.4898, 'divide pos Float by neg Float in assignment' )
+    is( P2, -32.4898, 'divide pos Float by neg Float in assignment', 0.0001 )
     ## check that we are not reusing P2.
     ne_addr P30, P2, not_broken
     ok( 0, 'not reusing P2' )

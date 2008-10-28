@@ -224,6 +224,7 @@ description of the test.
 
 .sub test_pass
     .param string description :optional
+    .param int    have_desc   :opt_flag
 
     set_output( 'ok', description )
 .end

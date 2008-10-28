@@ -336,11 +336,12 @@ recording it with the optional test description in C<description>.
 =cut
 
 .sub 'ok' :method
-    .param int    passed
-    .param string description     :optional
-    .param int    has_description :opt_flag
+    .param pmc passed
+    .param pmc description     :optional
+    .param int has_description :opt_flag
 
     if has_description goto OK
+    description = new 'String'
     description = ''
 
   OK:

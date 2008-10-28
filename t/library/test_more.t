@@ -23,6 +23,7 @@
     test_namespace.export_to(curr_namespace, exports)
 
     plan( 74 )
+
     test_skip()
     test_todo()
     test_ok()
@@ -127,14 +128,14 @@
     test_test( 'passing test is() for pmcs')
 
     right = new 'Integer'
-    right = 0
-    test_fail()
+    right = 1
+    test_fail( 'zero versus 1' )
     test_diag( 'Have: zero' )
-    test_diag( 'Want: 0' )
-    is( left, right )
+    test_diag( 'Want: 1' )
+    is( left, right, 'zero versus 1' )
     test_test( 'failing test is() for pmcs')
 
-    left = '0'
+    left = '1'
     test_pass( 'comparing two pmcs' )
     is( left, right, 'comparing two pmcs' )
     test_test( 'passing test is() for pmcs with description')
@@ -148,7 +149,7 @@
     expected    .= hash_string
 
     test_fail( 'comparing two pmcs' )
-    test_diag( 'Have: 0' )
+    test_diag( 'Have: 1' )
     test_diag( expected )
     is( left, right, 'comparing two pmcs' )
     test_test( 'failing test is() for pmcs with description')
@@ -163,7 +164,7 @@
     test_diag( 'Have: -100' )
     test_diag( 'Want: not -100' )
     isnt( -100, -100 )
-    test_test( 'failing test is() for ints')
+    test_test( 'failing test isnt() for ints')
 
     test_pass( 'comparing two unidentical integers' )
     isnt( 512, 215, 'comparing two unidentical integers' )
