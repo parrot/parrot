@@ -539,6 +539,9 @@ new_local_label(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const n
 =item C<void
 store_local_label(lexer_state * const lexer, char const * const labelname, unsigned offset)>
 
+Store the (sub-)local label C<labelname>, having I<address> C<offset> in the current
+subroutine structure.
+
 =cut
 
 */

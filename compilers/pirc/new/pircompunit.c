@@ -935,6 +935,11 @@ set_instrf(lexer_state * const lexer, char const * const opname, char const * co
 =item C<void
 add_operands(lexer_state * const lexer, char const * const format, ...)>
 
+Add operands to the current instruction. This is a variable argument function;
+C<format> contains placeholders, see the macro C<get_instr_var_arg> above
+for which placeholders. The number of placeholders should match the number
+of operands passed to this function.
+
 =cut
 
 */
