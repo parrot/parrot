@@ -102,8 +102,10 @@ inline op pic_inline_sub__(inconst INT, invar PMC, invar PMC) :pic {
         }
         else {
             if (PARROT_ERRORS_test(interp, PARROT_ERRORS_OVERFLOW_FLAG)) {
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ERR_OVERFLOW,
+                opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
+                        EXCEPTION_ERR_OVERFLOW,
                         "Integer overflow");
+                goto ADDRESS(handler);
             }
             /* #RT42354 preserve type system */
             VTABLE_morph(interp, left, enum_class_BigInt);
@@ -282,7 +284,12 @@ inline op pic_callr__(inconst PMC) :pic :flow {
                         ((opcode_t*)cur_opcode)[2 + i]);
                 break;
             default:
-                Parrot_ex_throw_from_c_args(interp, NULL, 1, "unhandled sig_bits");
+                {
+                    opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
+                        EXCEPTION_INVALID_OPERATION,
+                        "unhandled sig_bits");
+                    goto ADDRESS(handler);
+                }
         }
     }
     /* set_args(); set_p_pc; get_results(1), x; invokecc_p */

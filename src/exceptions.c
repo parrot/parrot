@@ -227,6 +227,19 @@ pass_exception_args(PARROT_INTERP, ARGIN(const char *sig),
     return next;
 }
 
+PARROT_CANNOT_RETURN_NULL
+static PMC *
+build_exception_from_args(PARROT_INTERP, int ex_type,
+        ARGIN(const char *format), va_list arglist)
+{
+    /* Make and set exception message. */
+    STRING *msg = strchr(format, '%') ?
+        Parrot_vsprintf_c(interp, format, arglist) :
+        string_make(interp, format, strlen(format), NULL, 0);
+
+    return Parrot_ex_build_exception(interp, EXCEPT_error, ex_type, msg);
+}
+
 /*
 
 =item C<void Parrot_ex_throw_from_c>
@@ -298,6 +311,36 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 
 /*
 
+=item C<opcode_t * Parrot_ex_throw_from_op_args>
+
+Throws an exception from an opcode, with an error message constructed
+from a format string and arguments.
+
+See also C<Parrot_ex_throw_from_c>, C<Parrot_ex_throw_from_op>, and
+C<exit_fatal()>.
+
+=cut
+
+*/
+
+PARROT_API
+PARROT_CAN_RETURN_NULL
+opcode_t *
+Parrot_ex_throw_from_op_args(PARROT_INTERP, ARGIN_NULLOK(void *dest),
+        int ex_type, ARGIN(const char *format), ...)
+{
+    PMC *exception;
+
+    va_list arglist;
+    va_start(arglist, format);
+    exception = build_exception_from_args(interp, ex_type, format, arglist);
+    va_end(arglist);
+
+    return Parrot_ex_throw_from_op(interp, exception, dest);
+}
+
+/*
+
 =item C<void Parrot_ex_throw_from_c_args>
 
 Throws an exception, with an error message constructed from a format string and
@@ -318,22 +361,12 @@ void
 Parrot_ex_throw_from_c_args(PARROT_INTERP, ARGIN_NULLOK(void *ret_addr),
         int exitcode, ARGIN(const char *format), ...)
 {
-    STRING *msg = NULL;
     PMC *exception;
 
-    /* Make and set exception message. */
-    if (strchr(format, '%')) {
-        va_list arglist;
-        va_start(arglist, format);
-        msg = Parrot_vsprintf_c(interp, format, arglist);
-        va_end(arglist);
-    }
-    else
-        msg = string_make(interp, format, strlen(format),
-                NULL, PObj_external_FLAG);
-
-    exception = Parrot_ex_build_exception(interp,
-            EXCEPT_error, exitcode, msg);
+    va_list arglist;
+    va_start(arglist, format);
+    exception = build_exception_from_args(interp, exitcode, format, arglist);
+    va_end(arglist);
 
     Parrot_ex_throw_from_c(interp, exception);
 }

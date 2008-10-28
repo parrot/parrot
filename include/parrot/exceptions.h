@@ -198,6 +198,16 @@ opcode_t * Parrot_ex_throw_from_op(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_API
+PARROT_CAN_RETURN_NULL
+opcode_t * Parrot_ex_throw_from_op_args(PARROT_INTERP,
+    ARGIN_NULLOK(void *dest),
+    int ex_type,
+    ARGIN(const char *format),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4);
+
 PARROT_DOES_NOT_RETURN
 void do_panic(
     NULLOK_INTERP,

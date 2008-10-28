@@ -185,21 +185,24 @@ Intersegment branch to location in fixup table named $1.
 =cut
 
 inline op branch_cs(in STR) :base_loop :check_event :flow {
-    char * const         label = string_to_cstring(interp, $1);
-    PackFile_FixupEntry * const fe =
-        PackFile_find_fixup_entry(interp, enum_fixup_label, label);
+    PackFile_FixupEntry * fe;
+    {
+        char * const label = string_to_cstring(interp, $1);
+        fe = PackFile_find_fixup_entry(interp, enum_fixup_label, label);
+        string_cstring_free(label);
+    }
 
     if (!fe) {
-        string_cstring_free(label);
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+        opcode_t * handler= Parrot_ex_throw_from_op_args(interp, NULL,
+            EXCEPTION_INVALID_OPERATION,
             "branch_cs: fixup for '%Ss' not found", $1);
+        goto ADDRESS(handler);
     }
     else {
         interp->resume_offset = fe->offset;
         Parrot_switch_to_cs(interp, fe->seg, 1);
+        mem_sys_free(fe);
     }
-    mem_sys_free(fe);
-    string_cstring_free(label);
     interp->resume_flag = 2;
     goto ADDRESS(0);
 }
@@ -242,9 +245,12 @@ inline op local_branch(invar PMC, in LABEL) :base_core :check_event :flow {
     INTVAL return_addr;
     opcode_t *dest = expr NEXT();
 
-    if (PMC_IS_NULL($1) || $1->vtable->base_type != enum_class_ResizableIntegerArray)
-        Parrot_ex_throw_from_c_args(interp, dest, EXCEPTION_INVALID_OPERATION,
+    if (PMC_IS_NULL($1) || $1->vtable->base_type != enum_class_ResizableIntegerArray) {
+        opcode_t * handler = Parrot_ex_throw_from_op_args(interp, dest,
+            EXCEPTION_INVALID_OPERATION,
             "Must pass a valid integer array to 'local_branch'");
+        goto ADDRESS(handler);
+    }
 
     return_addr = PTR2INTVAL(dest);
     VTABLE_push_integer(interp, $1, return_addr);
@@ -263,18 +269,24 @@ inline op local_return(invar PMC) :flow {
     opcode_t *next;
     opcode_t *dest = expr NEXT();
 
-    if (PMC_IS_NULL($1) || $1->vtable->base_type != enum_class_ResizableIntegerArray)
-        Parrot_ex_throw_from_c_args(interp, dest, EXCEPTION_INVALID_OPERATION,
+    if (PMC_IS_NULL($1) || $1->vtable->base_type != enum_class_ResizableIntegerArray) {
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, dest,
+            EXCEPTION_INVALID_OPERATION,
             "Must pass a valid integer array to 'local_return'");
+        goto ADDRESS(handler);
+    }
 
     return_addr = VTABLE_pop_integer(interp, $1);
     next = INTVAL2PTR(opcode_t *, return_addr);
 
     /* The return address must be within the current code segment. */
     if (! ( next >= interp->code->base.data
-            && next < (interp->code->base.data + interp->code->base.size)) )
-        Parrot_ex_throw_from_c_args(interp, dest, EXCEPTION_INVALID_OPERATION,
+            && next < (interp->code->base.data + interp->code->base.size)) ) {
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, dest,
+            EXCEPTION_INVALID_OPERATION,
             "Address for 'local_return' must be within the current code segment");
+        goto ADDRESS(handler);
+    }
 
     goto ADDRESS(next);
 }
@@ -608,7 +620,7 @@ op set_returns(inconst PMC) :flow {
         /* Call is from runops_fromc */
         Parrot_Context * const caller_ctx = PMC_cont(ccont)->to_ctx;
         if (! caller_ctx) {
-            /* there is no point calling Parrot_ex_throw_from_c_args here, because
+            /* there is no point calling Parrot_ex_throw_..., because
                PDB_backtrace can't deal with a missing to_ctx either. */
             exit_fatal(1, "No caller_ctx for continuation %p.", ccont);
         }

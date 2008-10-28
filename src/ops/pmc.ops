@@ -59,27 +59,31 @@ to do with the intializer.  See PDD02 for more.
 =cut
 
 op new(out PMC, in INT) {
-  if ($2 <= 0 || $2 >= interp->n_vtable_max) {
-    Parrot_ex_throw_from_c_args(interp, 0, EXCEPTION_NO_CLASS,
-                   "Illegal PMC enum (%d) in new", (int)$2);
-  }
+    if ($2 <= 0 || $2 >= interp->n_vtable_max) {
+        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            EXCEPTION_NO_CLASS,
+            "Illegal PMC enum (%d) in new", (int)$2);
+        goto ADDRESS(dest);
+    }
 
-  /* If we're creating a continuation, the continuation PMC needs to be in the
-   * destination register before its init method copies the registers. */
-  if ($2 == enum_class_Continuation) {
-      $1 = pmc_new_noinit(interp, $2);
-      VTABLE_init(interp, $1);
-  }
-  else
-    $1 = pmc_new(interp, $2);
+    /* If we're creating a continuation, the continuation PMC needs to be in the
+     * destination register before its init method copies the registers. */
+    if ($2 == enum_class_Continuation) {
+        $1 = pmc_new_noinit(interp, $2);
+        VTABLE_init(interp, $1);
+    }
+    else
+        $1 = pmc_new(interp, $2);
 }
 
 op new(out PMC, in INT, in PMC) {
-  if ($2 <= 0 || $2 >= interp->n_vtable_max) {
-    Parrot_ex_throw_from_c_args(interp, 0, EXCEPTION_NO_CLASS,
-                   "Illegal PMC enum (%d) in new", (int)$2);
-  }
-  $1 = pmc_new_init(interp, $2, $3);
+    if ($2 <= 0 || $2 >= interp->n_vtable_max) {
+        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+            EXCEPTION_NO_CLASS,
+            "Illegal PMC enum (%d) in new", (int)$2);
+        goto ADDRESS(dest);
+    }
+    $1 = pmc_new_init(interp, $2, $3);
 }
 
 op new(out PMC, in STR) {
@@ -90,9 +94,12 @@ op new(out PMC, in STR) {
         $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
     else {
         const INTVAL type = pmc_type(interp, classname);
-        if (type <= 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NO_CLASS,
+        if (type <= 0) {
+            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+                EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", classname);
+            goto ADDRESS(dest);
+        }
         $1 = pmc_new(interp, type);
     }
 }
@@ -105,9 +112,12 @@ op new(out PMC, in STR, in PMC) {
         $1 = VTABLE_instantiate(interp, classobj, $3);
     else {
         const INTVAL type = pmc_type(interp, classname);
-        if (type <= 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NO_CLASS,
+        if (type <= 0) {
+            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+                EXCEPTION_NO_CLASS,
                 "Class '%Ss' not found", classname);
+            goto ADDRESS(dest);
+        }
         $1 = pmc_new_init(interp, type, $3);
     }
 }
@@ -120,9 +130,12 @@ inline op new(out PMC, in PMC) :object_classes {
         $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
     else {
         const INTVAL type = pmc_type_p(interp, classname_key);
-        if (type <= 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NO_CLASS,
-            "Class '%Ss' not found", VTABLE_get_repr(interp, classname_key));
+        if (type <= 0) {
+            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+                EXCEPTION_NO_CLASS,
+                "Class '%Ss' not found", VTABLE_get_repr(interp, classname_key));
+            goto ADDRESS(dest);
+        }
         $1 = pmc_new(interp, type);
     }
 }
@@ -135,9 +148,12 @@ op new(out PMC, in PMC, in PMC) {
         $1 = VTABLE_instantiate(interp, classobj, $3);
     else {
         const INTVAL type = pmc_type_p(interp, classname_key);
-        if (type <= 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NO_CLASS,
-            "Class '%Ss' not found", VTABLE_get_repr(interp, classname_key));
+        if (type <= 0) {
+            opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+                EXCEPTION_NO_CLASS,
+                "Class '%Ss' not found", VTABLE_get_repr(interp, classname_key));
+            goto ADDRESS(dest);
+        }
         $1 = pmc_new_init(interp, type, $3);
     }
 }
@@ -286,9 +302,11 @@ op find_method(out PMC, invar PMC, in STR) :flow {
     opcode_t * const resume = expr NEXT();
     $1 = VTABLE_find_method(interp, $2, $3);
     if (PMC_IS_NULL($1) || !VTABLE_defined(interp, $1)) {
-        Parrot_ex_throw_from_c_args(interp, resume, EXCEPTION_METH_NOT_FOUND,
+        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, resume,
+            EXCEPTION_METH_NOT_FOUND,
             "Method '%Ss' not found for invocant of class '%Ss'", $3,
             VTABLE_get_string(interp, VTABLE_get_class(interp, $2)));
+        goto ADDRESS(dest);
     }
     restart ADDRESS(resume);
 }

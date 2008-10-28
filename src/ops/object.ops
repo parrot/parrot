@@ -63,19 +63,23 @@ op callmethodcc(invar PMC, in STR) :object_base :flow {
 
   if (PMC_IS_NULL(method_pmc)) {
     PMC * const _class = VTABLE_get_class(interp, object);
-
-    if (PMC_IS_NULL(_class))
-        Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_METH_NOT_FOUND,
-            "Method '%Ss' not found for non-object", meth);
-    else
-        Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_METH_NOT_FOUND,
-            "Method '%Ss' not found for invocant of class '%Ss'", meth,
-            VTABLE_get_string(interp, _class));
+    if (PMC_IS_NULL(_class)) {
+      dest = Parrot_ex_throw_from_op_args(interp, next,
+          EXCEPTION_METH_NOT_FOUND,
+          "Method '%Ss' not found for non-object", meth);
+    }
+    else {
+      dest = Parrot_ex_throw_from_op_args(interp, next,
+          EXCEPTION_METH_NOT_FOUND,
+          "Method '%Ss' not found for invocant of class '%Ss'", meth,
+          VTABLE_get_string(interp, _class));
+    }
   }
-
-  interp->current_object = object;
-  interp->current_cont   = NEED_CONTINUATION;
-  dest                   = VTABLE_invoke(interp, method_pmc, next);
+  else {
+    interp->current_object = object;
+    interp->current_cont   = NEED_CONTINUATION;
+    dest                   = VTABLE_invoke(interp, method_pmc, next);
+  }
   goto ADDRESS(dest);
 }
 
@@ -103,13 +107,15 @@ op callmethod(invar PMC, in STR, invar PMC) :object_base :flow {
 
 
   if (PMC_IS_NULL(method_pmc)) {
-    Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_METH_NOT_FOUND,
+    dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METH_NOT_FOUND,
         "Method '%Ss' not found for invocant of class '%Ss'", meth,
         VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
   }
-  interp->current_object = object;
-  interp->current_cont = $3;
-  dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
+  else {
+    interp->current_object = object;
+    interp->current_cont = $3;
+    dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
+  }
   goto ADDRESS(dest);
 }
 
@@ -135,14 +141,16 @@ op tailcallmethod(invar PMC, in STR) :object_base :flow {
   opcode_t *dest;
 
   if (PMC_IS_NULL(method_pmc)) {
-    Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_METH_NOT_FOUND,
+    dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METH_NOT_FOUND,
         "Method '%Ss' not found for invocant of class '%Ss'", meth,
         VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
   }
-  interp->current_cont = CONTEXT(interp)->current_cont;
-  PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL;
-  interp->current_object = object;
-  dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
+  else {
+    interp->current_cont = CONTEXT(interp)->current_cont;
+    PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL;
+    interp->current_object = object;
+    dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
+  }
   goto ADDRESS(dest);
 }
 
@@ -263,8 +271,10 @@ inline op subclass(out PMC, in PMC) :object_classes :flow {
     opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
-      Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_NO_CLASS,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
+            EXCEPTION_NO_CLASS,
             "Class '%Ss' doesn't exist", VTABLE_get_string(interp, $2));
+        goto ADDRESS(handler);
     }
     $1 = pmc_new(interp, enum_class_Class);
     VTABLE_add_parent(interp, $1, parent_class);
@@ -276,8 +286,10 @@ inline op subclass(out PMC, in PMC, in STR) :object_classes :flow {
     opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
-      Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_NO_CLASS,
+        opcode_t * handler = Parrot_ex_throw_from_op_args(interp, next,
+            EXCEPTION_NO_CLASS,
             "Class '%Ss' doesn't exist", VTABLE_get_string(interp, $2));
+        goto ADDRESS(handler);
     }
     $1 = Parrot_oo_newclass_from_str(interp, $3);
     VTABLE_add_parent(interp, $1, parent_class);
@@ -289,8 +301,10 @@ inline op subclass(out PMC, in PMC, in PMC) :object_classes :flow {
     opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
-      Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_NO_CLASS,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
+            EXCEPTION_NO_CLASS,
             "Class '%Ss' doesn't exist", VTABLE_get_string(interp, $2));
+        goto ADDRESS(handler);
     }
     $1 = pmc_new_init(interp, enum_class_Class, $3);
     VTABLE_add_parent(interp, $1, parent_class);
@@ -315,8 +329,10 @@ op subclass(out PMC, in STR) :object_classes :flow {
     opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
-      Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_NO_CLASS,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
+            EXCEPTION_NO_CLASS,
             "Class '%Ss' doesn't exist", $2);
+        goto ADDRESS(handler);
     }
 
     $1 = pmc_new(interp, enum_class_Class);
@@ -329,8 +345,10 @@ op subclass(out PMC, in STR, in STR) :object_classes :flow {
     opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
-      Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_NO_CLASS,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
+            EXCEPTION_NO_CLASS,
             "Class '%Ss' doesn't exist", $2);
+        goto ADDRESS(handler);
     }
 
     $1  = Parrot_oo_newclass_from_str(interp, $3);
@@ -343,8 +361,10 @@ op subclass(out PMC, in STR, in PMC) :object_classes :flow {
     opcode_t * const next         = expr NEXT();
 
     if (PMC_IS_NULL(parent_class)) {
-      Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_NO_CLASS,
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, next,
+            EXCEPTION_NO_CLASS,
             "Class '%Ss' doesn't exist", $2);
+        goto ADDRESS(handler);
     }
 
     $1 = pmc_new_init(interp, enum_class_Class, $3);
@@ -427,9 +447,12 @@ inline op addattribute(invar PMC, in STR) :object_classes {
 
     if (VTABLE_isa(interp, $1, class_name) || VTABLE_isa(interp, $1, role_name))
         VTABLE_add_attribute(interp, $1, $2, PMCNULL);
-    else
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+    else {
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
+            EXCEPTION_INVALID_OPERATION,
             "Cannot add attribute to non-class");
+        goto ADDRESS(handler);
+    }
 }
 
 =item B<removeattribute>(invar PMC, in STR) B<(unimplemented)>

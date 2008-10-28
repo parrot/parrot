@@ -88,10 +88,12 @@ Print all the Parrot registers at once.
 =cut
 
 op debug_print() :base_debug {
-    if (!interp->pdb)
-        Parrot_ex_throw_from_c_args(interp, expr NEXT(),
+    if (!interp->pdb) {
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_INVALID_OPERATION,
             "Initialize debugger with debug_init before using debug_print");
+        goto ADDRESS(handler);
+    }
 
     if (!(interp->pdb->state & PDB_BREAK)) {
         PDB_print(interp, "I");
