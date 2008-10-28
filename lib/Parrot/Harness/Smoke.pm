@@ -7,7 +7,7 @@ Parrot::Harness::Smoke - Subroutines used by harness-skripts to generate smoke r
 
 =head1 DESCRIPTION
 
-This package exports on request subroutines used by the root F<t/harness> 
+This package exports on request subroutines used by the root F<t/harness>
 and by language implementation F<t/harness> to generate smoke reports.
 
 Following subroutines are supported:
@@ -57,8 +57,8 @@ sub send_archive_to_smolder {
             . ('-' x 55) . "\n\n$@\n";
     }
 
-    my $project_id   = delete $test_env_data{project_id}  || $SMOLDER_CONFIG{project_id}; 
-    my $report_file  = delete $test_env_data{report_file} || $SMOLDER_CONFIG{report_file}; 
+    my $project_id   = delete $test_env_data{project_id}  || $SMOLDER_CONFIG{project_id};
+    my $report_file  = delete $test_env_data{report_file} || $SMOLDER_CONFIG{report_file};
     my $url
         =   $SMOLDER_CONFIG{server}
           . '/app/developer_projects/process_add_report/'
