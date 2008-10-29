@@ -415,8 +415,8 @@ loop_end:
     code .= ", "
     code .= type_key
     code .= "\n"
-    code .= "    pop_eh\n"
     code .= "  class_loaded:\n"
+    code .= "    pop_eh\n"
     code .= "\n.end\n\n"
     .return (code)
 .end
