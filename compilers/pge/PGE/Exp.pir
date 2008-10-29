@@ -97,7 +97,6 @@ C<target> adverbs.
     push_eh end
     $P0 = get_hll_global 'P6metaclass'
     $P0.'new_class'(grammar, 'parent'=>'PGE::Grammar')
-    pop_eh
   end:
     .return ($P1)
 
