@@ -19,11 +19,12 @@ Tests the C<Key> PMC.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(6)
+    plan(7)
 
     traverse_key_chain()
     extract_int_from_string_keys()
     extract_string_from_int_keys()
+    do_not_collect_string_keys_early_rt_60128()
 .end
 
 .sub traverse_key_chain
@@ -83,6 +84,79 @@ e2:
     is( P1, 'ok1', 'retrieve key is int, set key was str const' )
     set P1, P0[2]
     is( P1, 'ok2', 'retrieve key is const int, set key was str const' )
+.end
+
+.sub do_not_collect_string_keys_early_rt_60128
+    .local pmc proc, a
+    proc = get_root_global [ 'tcl' ], '&proc'
+    proc()
+    a = get_root_global [ 'tcl' ], '&a'
+    a()
+    collect
+    a()
+    ok(1, 'register and non-register string keys should be COW (RT #60128)' )
+.end
+
+# support for do_not_collect_string_keys_early_rt_60128
+.HLL 'tcl', ''
+.namespace []
+
+.sub '&info'
+iterate:
+  .local pmc call_chain, lexpad
+  call_chain = get_root_global ['_tcl'], 'call_chain'
+  lexpad     = call_chain[-1]
+  .local pmc    iterator
+  .local string elem
+  iterator = iter lexpad
+loop:
+  unless iterator goto end
+  elem = shift iterator
+  $S0 = substr elem, 0, 1, ''
+  goto loop
+end:
+  .return('')
+.end
+
+.sub '&proc'
+
+ $S0 = <<'code'
+.namespace []
+.sub 'xxx' :anon
+  .local pmc call_chain, lexpad
+  call_chain = get_root_global ['_tcl'], 'call_chain'
+  lexpad = new 'Hash'
+  push call_chain, lexpad
+  .local pmc arg_list
+  arg_list = new 'ResizablePMCArray'
+  lexpad['args'] = arg_list
+    $P14 = find_name "&info"
+    $P14()
+  $P0 = pop call_chain
+  .return('')
+.end
+code
+
+  .local pmc pir_compiler
+  pir_compiler = compreg 'PIR'
+  $P0 = pir_compiler($S0)
+  $P0 = $P0[0]
+  $P1 = new 'TclProc'
+  assign $P1, $P0
+  .local pmc ns_target
+  ns_target = get_hll_namespace
+  ns_target['&a'] = $P1
+.end
+
+.HLL '_Tcl', ''
+.namespace []
+
+.sub prepare_lib :init
+  load_bytecode 'PGE.pbc'
+  $P0 = get_class 'Sub'
+  $P1 = subclass $P0, 'TclProc'
+  $P1 = new 'ResizablePMCArray'
+  store_global 'call_chain', $P1
 .end
 
 # Local Variables:

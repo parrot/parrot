@@ -403,23 +403,34 @@ STRING *
 key_string(PARROT_INTERP, ARGIN(PMC *key))
 {
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
-    case KEY_string_FLAG:
-        return PMC_str_val(key);
-    case KEY_string_FLAG | KEY_register_FLAG:
-        return REG_STR(interp, PMC_int_val(key));
-                                                   /*   PMC_pmc_val(key)); */
-    case KEY_pmc_FLAG | KEY_register_FLAG:
+        /* remember to COW strings instead of returning them directly */
+        case KEY_string_FLAG:
         {
-        PMC * const reg = REG_PMC(interp, PMC_int_val(key));
-        return VTABLE_get_string(interp, reg);
+            STRING *s = PMC_str_val(key);
+            if (s)
+                s = Parrot_make_COW_reference(interp, s);
+            return s;
         }
-    case KEY_integer_FLAG:
-        return string_from_int(interp, PMC_int_val(key));
-    case KEY_integer_FLAG | KEY_register_FLAG:
-        return string_from_int(interp, REG_INT(interp, PMC_int_val(key)));
-    default:
-    case KEY_pmc_FLAG:
-        return VTABLE_get_string(interp, key);
+        case KEY_string_FLAG | KEY_register_FLAG:
+        {
+            STRING *s = REG_STR(interp, PMC_int_val(key));
+            if (s)
+                s = Parrot_make_COW_reference(interp, s);
+            return s;
+        }
+                                               /*   PMC_pmc_val(key)); */
+        case KEY_pmc_FLAG | KEY_register_FLAG:
+        {
+            PMC * const reg = REG_PMC(interp, PMC_int_val(key));
+            return VTABLE_get_string(interp, reg);
+        }
+        case KEY_integer_FLAG:
+            return string_from_int(interp, PMC_int_val(key));
+        case KEY_integer_FLAG | KEY_register_FLAG:
+            return string_from_int(interp, REG_INT(interp, PMC_int_val(key)));
+        default:
+        case KEY_pmc_FLAG:
+            return VTABLE_get_string(interp, key);
     }
 }
 
