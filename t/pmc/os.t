@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -30,7 +30,6 @@ Tests the C<OS> PMC.
 =cut
 
 END {
-
     # Clean up environment on exit
     rmdir "xpto"  if -d "xpto";
     unlink "xpto" if -f "xpto";
@@ -184,14 +183,14 @@ CODE
 SKIP: {
     skip 'not implemented on windows yet', 1 if ( $MSWin32 && $MSVC );
 
-    opendir my $IN, '.';
+    opendir my $IN, 'docs';
     my @entries = readdir $IN;
     closedir $IN;
     my $entries = join( ' ', @entries ) . "\n";
     pir_output_is( <<'CODE', $entries, 'Test OS.readdir' );
 .sub main :main
     $P1 = new 'OS'
-    $P2 = $P1.readdir('.')
+    $P2 = $P1.readdir('docs')
 
     $S0 = join ' ', $P2
     print $S0
