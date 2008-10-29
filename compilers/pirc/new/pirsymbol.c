@@ -239,11 +239,26 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
     bucket       *buck     = get_bucket(table, hashcode);
 
     while (buck) {
-        if (STREQ(bucket_symbol(buck)->name, name)) {
-            if (bucket_symbol(buck)->color == -1) /* no PASM register assigned yet */
-                bucket_symbol(buck)->color = next_register(lexer, bucket_symbol(buck)->type);
+        symbol *sym = bucket_symbol(buck);
 
-            return bucket_symbol(buck);
+        if (STREQ(sym->name, name)) {
+            if (sym->color == -1) { /* no PASM register assigned yet */
+                sym->color = next_register(lexer, sym->type);
+
+                /* create a new live_interval for this symbol, and enter it into the list */
+                PARROT_ASSERT(sym->interval == NULL);
+                sym->interval = new_live_interval(lexer->instr_counter);
+                add_live_interval(lexer->lra, sym->interval);
+            }
+            else {
+                /* update end point of interval */
+                sym->interval->endpoint = lexer->instr_counter;
+            }
+
+            fprintf(stderr, "live range of variable %s: (%d, %d)\n", sym->name,
+                    sym->interval->startpoint, sym->interval->endpoint);
+
+            return sym;
         }
 
         buck = buck->next;

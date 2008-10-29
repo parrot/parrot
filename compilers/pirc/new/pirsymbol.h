@@ -19,12 +19,16 @@
 #include "pircompiler.h"
 #include "pircompunit.h"
 
+#include "pirregalloc.h"
+
 /* structure to represent a declared local variable or parameter */
 typedef struct symbol {
     char    const *name;  /* name of this symbol */
     pir_type       type;  /* type of this symbol */
     int            color; /* allocated PASM register for this symbol, -1 if not allocated. */
     target_flag    flags;
+
+    live_interval *interval; /* live information */
 
     struct symbol *next;
 
@@ -36,6 +40,8 @@ typedef struct pir_reg {
     int             regno; /* symbolic (PIR) register number */
     pir_type        type;  /* type of ths register */
     int             color; /* register assigned by register allocator, -1 if not allocated. */
+
+    live_interval  *interval; /* live interval */
 
     struct pir_reg *next;
 

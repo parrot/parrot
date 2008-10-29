@@ -2257,10 +2257,6 @@ close_sub(lexer_state * const lexer) {
 }
 
 
-
-
-
-
 /*
 
 =back

@@ -9,7 +9,7 @@
 #include "pirsymbol.h"
 #include "pircompunit.h"
 #include "pirmacro.h"
-
+#include "pirregalloc.h"
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
@@ -77,6 +77,8 @@ typedef void * yyscan_t;
 #endif
 
 
+
+
 /* store the "globals" of the lexer in a structure which is passed around.
  * as there's only 1 lexer_state, Size Doesn't Matter (really), so the large
  * number of fields is not a problem.
@@ -130,6 +132,8 @@ typedef struct lexer_state {
 
     struct yy_buffer_state   *buffer;  /* for saving buffer state when scanning a .macro_const */
 
+    /* register allocation */
+    lin_reg_allocator        *lra;
 
 } lexer_state;
 

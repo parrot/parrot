@@ -12,6 +12,7 @@
 #include "parrot/parrot.h"
 #include "piryy.h"
 #include "pirmacro.h"
+#include "pirregalloc.h"
 
 /* XXX count memory, so we can check out mem. savings of string reuse
  * Only temporarily used, so no need to "fix" this.
@@ -178,6 +179,8 @@ new_lexer(NULLOK(char * const filename), int flags) {
 
     /* create a new symbol table for macros XXX why not a hashtable? XXX */
     lexer->macros = new_macro_table(NULL);
+
+    lexer->lra    = new_lin_reg_allocator();
 
     return lexer;
 }

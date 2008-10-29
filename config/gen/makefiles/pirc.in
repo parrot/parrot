@@ -34,17 +34,19 @@ new/pircompiler.c \
 new/pirsymbol.c \
 new/piremit.c \
 new/hdocprep.c \
-new/pirmacro.c
+new/pirmacro.c \
+new/pirregalloc.c
 
 # the default target
 all: pirc heredoc macro
 
 
 pirc: new/main$(O) new/pirparser$(O) new/pirlexer$(O) new/pircompunit$(O) \
-	new/pircompiler$(O) new/pirsymbol$(O) new/piremit$(O) new/hdocprep$(O) new/pirmacro$(O)
+	new/pircompiler$(O) new/pirsymbol$(O) new/piremit$(O) new/hdocprep$(O) \
+	new/pirmacro$(O) new/pirregalloc$(O)
 	$(LINK) @ld_out@$@ \
 	main$(O) pirparser$(O) pirlexer$(O) pircompunit$(O) pircompiler$(O) \
-	pirsymbol$(O) piremit$(O) hdocprep$(O) pirmacro$(O) \
+	pirsymbol$(O) piremit$(O) hdocprep$(O) pirmacro$(O) pirregalloc$(O) \
 	@rpath_blib@ @libparrot_ldflags@ $(LINKFLAGS) $(LINK_DYNAMIC)
 
 new/main$(O): new/main.c
@@ -73,6 +75,9 @@ new/hdocprep$(O): new/hdocprep.c new/hdocprep.l
 
 new/pirmacro$(O): new/pirmacro.c new/pirmacro.h
 	$(CC) $(CFLAGS) -c new/pirmacro.c
+
+new/pirregalloc$(O): new/pirregalloc.c new/pirregalloc.h
+	$(CC) $(CFLAGS) -c new/pirregalloc.c
 
 heredoc: heredoc/hdocprep$(O)
 	$(LINK) hdocprep$(O) $(LIBPARROT)
