@@ -348,6 +348,10 @@ use_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     /* get a new PASM register for this PIR register. */
     reg->color = next_register(lexer, type);
 
+    /* create a new live interval for this symbolic register */
+    reg->interval = new_live_interval(lexer->instr_counter);
+    add_live_interval(lexer->lra, reg->interval);
+
     /* link this register into the list of "colored" registers; each of
      * them has been assigned a unique PASM register.
      */
@@ -400,9 +404,14 @@ color_reg(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
 
     /* was the register already used, then it was already colored by
      * the register allocator; in that case that PASM register is returned.
+     * Furthermore, as the register is referenced again, its live interval
+     * endpoint must be updated.
      */
-    if (reg)
+    if (reg) {
+        /* update end point of interval */
+        reg->interval->endpoint = lexer->instr_counter;
         return reg->color;
+    }
 
     /* we're still here, so the register was not used yet; do that now. */
     return use_register(lexer, type, regno);
