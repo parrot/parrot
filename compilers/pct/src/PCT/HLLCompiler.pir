@@ -56,6 +56,7 @@ running compilers from a command line.
     $P0  = _config()    # currently works in the build tree, but not in the install tree
     $S0  = $P0['revision']
   _handler:
+    pop_eh
     $P2 = new 'String'
     $P2  = 'This compiler is built with the Parrot Compiler Toolkit, parrot revision '
     $P2 .= $S0
@@ -324,11 +325,12 @@ to any options and return the resulting parse tree.
     .local string tcode
     tcode = adverbs['transcode']
     unless tcode goto transcode_done
-    push_eh transcode_done
+    push_eh transcode_skip
     $I0 = find_charset tcode
     $S0 = source
     $S0 = trans_charset $S0, $I0
     assign source, $S0
+  transcode_skip:
     pop_eh
   transcode_done:
 
@@ -429,6 +431,7 @@ resulting ast.
     .return (ast)
 
   err_past:
+    pop_eh
     $S0 = typeof source
     .return self.'panic'('Unable to obtain PAST from ', $S0)
 .end
@@ -561,6 +564,7 @@ specifies the encoding to use for the input (e.g., "utf8").
     goto interactive_loop
   interactive_trap:
     get_results '0', $P0
+    pop_eh
     $S0 = $P0
     if $S0 == '' goto have_newline
     $S1 = substr $S0, -1, 1

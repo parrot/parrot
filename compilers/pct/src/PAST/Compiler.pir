@@ -590,14 +590,12 @@ Return the POST representation of a C<PAST::Block>.
     if compiler goto children_compiler
 
     ##  control exception handler
-    .local pmc ctrlpast, ctrllabel, rethrowlabel
+    .local pmc ctrlpast, ctrllabel
     ctrlpast = node.'control'()
     unless ctrlpast goto children_past
     $P0 = get_hll_global ['POST'], 'Label'
     $S0 = self.'unique'('control_')
     ctrllabel = $P0.'new'('result'=>$S0)
-    $S0 = concat $S0, '_rethrow'
-    rethrowlabel = $P0.'new'('result'=>$S0)
     $S0 = self.'uniquereg'('P')
     bpost.'push_pirop'('new', $S0, "'ExceptionHandler'")
     bpost.'push_pirop'('set_addr', $S0, ctrllabel)
@@ -631,7 +629,6 @@ Return the POST representation of a C<PAST::Block>.
     $S0 = self.'uniquereg'('P')
     bpost.'push_pirop'('getattribute', $S0, 'exception', '"payload"')
     bpost.'push_pirop'('return', $S0)
-    bpost.'push'(rethrowlabel)
     bpost.'push_pirop'('rethrow', 'exception')
     goto sub_done
   control_past:
@@ -1327,6 +1324,7 @@ handler.
     if null catchpast goto catch_done
     catchpost = self.'as_post'(catchpast, 'rtype'=>'v')
     ops.'push'(catchpost)
+    ops.'push_pirop'('pop_eh')         # FIXME: should be before catchpost
   catch_done:
     ops.'push'(endlabel)
     ops.'result'(trypost)
@@ -1648,9 +1646,9 @@ attribute.
   have_scope:
     push_eh scope_error
     $P0 = find_method self, scope
-    pop_eh
     .return self.$P0(node, bindpost)
   scope_error:
+    pop_eh
     unless scope goto scope_error_1
     scope = concat " '", scope
     scope = concat scope, "'"
