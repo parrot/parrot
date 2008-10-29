@@ -34,7 +34,8 @@ typedef enum lexer_flags {
     LEXER_FLAG_EMIT_PASM           = 1 << 3, /* emit runnable pasm code */
     LEXER_FLAG_PREPROCESS          = 1 << 4, /* preprocess code only */
     LEXER_FLAG_HEREDOCONLY         = 1 << 5, /* preprocess heredocs only */
-    LEXER_FLAG_NOOUTPUT            = 1 << 6  /* don't print anything on success, except 'ok' */
+    LEXER_FLAG_NOOUTPUT            = 1 << 6, /* don't print anything on success, except 'ok' */
+    LEXER_FLAG_REGALLOC            = 1 << 7
 
 } lexer_flags;
 

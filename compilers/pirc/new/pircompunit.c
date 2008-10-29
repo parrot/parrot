@@ -424,9 +424,9 @@ targets_equal(target const * const left, target const * const right) {
 
     if (TEST_FLAG(left->flags, TARGET_FLAG_IS_REG)) {      /* if left is a reg */
         if (TEST_FLAG(right->flags, TARGET_FLAG_IS_REG)) { /* then right must be a reg */
-            if ((left->type == right->type)                /* types must match */
+            if ((left->syminfo->type == right->syminfo->type)                /* types must match */
             &&  (target_regno(left) == target_regno(right) /* PIR regno must match */
-            &&  (left->color == right->color)))            /* PASM regno must match */
+            &&  (left->syminfo->color == right->syminfo->color)))    /* PASM regno must match */
                 return TRUE;
         }
         else /* left is a reg, right is not */
@@ -459,9 +459,8 @@ PARROT_CANNOT_RETURN_NULL
 target *
 new_target(lexer_state * const lexer, pir_type type, char const * const name) {
     target *t       = pir_mem_allocate_zeroed_typed(lexer, target);
-    t->type         = type;
+
     t->key          = NULL;
-    t->color        = -1;         /* -1 means no PASM register assigned yet */
     t->next         = t; /* circly linked list */
 
     /* only set the name if there was one. Note that target-name and target-regno
@@ -504,9 +503,10 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
 target_from_symbol(lexer_state * const lexer, symbol * const sym) {
-    target *t = new_target(lexer, sym->type, sym->name);
-    t->color  = sym->color; /* copy the allocaled register */
-    t->flags  = sym->flags; /* copy the flags */
+    target *t  = new_target(lexer, sym->syminfo.type, sym->name);
+    t->syminfo = &sym->syminfo;
+    t->flags   = sym->flags; /* copy the flags */
+
     return t;
 }
 
@@ -579,7 +579,9 @@ add_param(lexer_state * const lexer, pir_type type, char const * const name) {
      * allocated register is stored in both the symbol and the target node.
      *
      */
-    sym->color = targ->color = next_register(lexer, type);
+    /*sym->color = targ->color = next_register(lexer, type);*/
+    sym->syminfo.color = next_register(lexer, type);
+    targ->syminfo      = &sym->syminfo;
 
     return targ;
 
@@ -626,11 +628,11 @@ target *
 set_param_flag(lexer_state * const lexer, target * const param, target_flag flag) {
     SET_FLAG(param->flags, flag);
 
-    if (TEST_FLAG(flag, TARGET_FLAG_SLURPY) && param->type != PMC_TYPE)
+    if (TEST_FLAG(flag, TARGET_FLAG_SLURPY) && param->syminfo->type != PMC_TYPE)
         yypirerror(lexer->yyscanner, lexer,
                    "cannot set :slurpy flag on non-pmc %s", target_name(param));
 
-    if (TEST_FLAG(flag, TARGET_FLAG_OPT_FLAG) && param->type != INT_TYPE)
+    if (TEST_FLAG(flag, TARGET_FLAG_OPT_FLAG) && param->syminfo->type != INT_TYPE)
         yypirerror(lexer->yyscanner, lexer,
                    "cannot set :opt_flag flag on non-int %s", target_name(param));
 
@@ -1322,7 +1324,13 @@ target *
 new_reg(lexer_state * const lexer, pir_type type, int regno) {
     target *t       = new_target(lexer, type, NULL); /* no identifier */
     target_regno(t) = regno;
-    t->color        = color_reg(lexer, type, regno);
+    /* t->color        = color_reg(lexer, type, regno);*/
+    {
+        int color = color_reg(lexer, type, regno);
+        pir_reg *reg = find_register(lexer, type, regno);
+        t->syminfo = &reg->syminfo;
+    }
+
     /* set a flag on this target node saying it's a register */
     SET_FLAG(t->flags, TARGET_FLAG_IS_REG);
     return t;
@@ -1998,7 +2006,7 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
 
             /* if the target is a register, invoke that. */
             if (TEST_FLAG(inv->sub->flags, TARGET_FLAG_IS_REG)) {
-                target *sub = new_reg(lexer, PMC_TYPE, inv->sub->color);
+                target *sub = new_reg(lexer, PMC_TYPE, inv->sub->syminfo->color);
                 if (inv->retcc) { /* return continuation present? */
                     new_sub_instr(lexer, PARROT_OP_invoke_p_p, "invoke_p_p");
                     add_operands(lexer, "%T%T", inv->sub, inv->retcc);

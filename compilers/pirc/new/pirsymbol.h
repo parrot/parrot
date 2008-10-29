@@ -21,14 +21,21 @@
 
 #include "pirregalloc.h"
 
+
+/* core of any symbolic object in PIR: it has a PASM register, a type, and a live interval */
+typedef struct symreg {
+    int            color;
+    pir_type       type;
+    live_interval *interval;
+
+} symreg;
+
+
 /* structure to represent a declared local variable or parameter */
 typedef struct symbol {
     char    const *name;  /* name of this symbol */
-    pir_type       type;  /* type of this symbol */
-    int            color; /* allocated PASM register for this symbol, -1 if not allocated. */
+    symreg         syminfo;
     target_flag    flags;
-
-    live_interval *interval; /* live information */
 
     struct symbol *next;
 
@@ -38,14 +45,13 @@ typedef struct symbol {
 /* structure to represent a PIR register. */
 typedef struct pir_reg {
     int             regno; /* symbolic (PIR) register number */
-    pir_type        type;  /* type of ths register */
-    int             color; /* register assigned by register allocator, -1 if not allocated. */
-
-    live_interval  *interval; /* live interval */
+    symreg          syminfo;
 
     struct pir_reg *next;
 
 } pir_reg;
+
+
 
 
 /* structure to represent a global label */
@@ -72,6 +78,10 @@ void declare_local(struct lexer_state * const lexer, pir_type type, symbol * con
 
 /* to find a symbol in the symbol table */
 symbol *find_symbol(struct lexer_state * const lexer, char const * const name);
+
+
+pir_reg *find_register(struct lexer_state * const lexer, pir_type type, int regno);
+
 
 /* to find declared symbols that are never referenced */
 void check_unused_symbols(struct lexer_state * const lexer);

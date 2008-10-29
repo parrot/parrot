@@ -137,11 +137,12 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 symbol *
 new_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name), pir_type type) {
-    symbol *sym = pir_mem_allocate_zeroed_typed(lexer, symbol);
-    sym->name   = name;
-    sym->type   = type;
-    sym->next   = NULL;
-    sym->color  = -1; /* -1 means no PASM reg has been allocated yet for this symbol */
+    symbol *sym         = pir_mem_allocate_zeroed_typed(lexer, symbol);
+    sym->name           = name;
+    sym->syminfo.type   = type;
+    sym->syminfo.color  = -1; /* -1 means no PASM reg has been allocated yet for this symbol */
+
+    sym->next           = NULL;
     return sym;
 }
 
@@ -174,8 +175,8 @@ declare_local(NOTNULL(lexer_state * const lexer), pir_type type,
         bucket_symbol(b)   = iter;
         store_bucket(table, b, hash);
 
-        iter->type  = type;
-        iter        = iter->next;
+        iter->syminfo.type  = type;
+        iter                = iter->next;
     }
 
 }
@@ -204,7 +205,7 @@ check_unused_symbols(NOTNULL(lexer_state * const lexer)) {
         for (i = 0; i < symbols->size; i++) {
             bucket *b = get_bucket(symbols, i);
             while (b) {
-                if (bucket_symbol(b)->color == -1)
+                if (bucket_symbol(b)->syminfo.color == -1)
                     fprintf(stderr, "Warning: in sub '%s': symbol '%s' declared but not used\n",
                                     subiter->sub_name, bucket_symbol(b)->name);
 
@@ -242,21 +243,23 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
         symbol *sym = bucket_symbol(buck);
 
         if (STREQ(sym->name, name)) {
-            if (sym->color == -1) { /* no PASM register assigned yet */
-                sym->color = next_register(lexer, sym->type);
+            if (sym->syminfo.color == -1) { /* no PASM register assigned yet */
+                sym->syminfo.color = next_register(lexer, sym->syminfo.type);
 
                 /* create a new live_interval for this symbol, and enter it into the list */
-                PARROT_ASSERT(sym->interval == NULL);
-                sym->interval = new_live_interval(lexer->instr_counter);
-                add_live_interval(lexer->lra, sym->interval);
+                PARROT_ASSERT(sym->syminfo.interval == NULL);
+                sym->syminfo.interval = new_live_interval(lexer->instr_counter);
+                add_live_interval(lexer->lra, sym->syminfo.interval);
+
+                sym->syminfo.interval->syminfo = &sym->syminfo;
             }
             else {
                 /* update end point of interval */
-                sym->interval->endpoint = lexer->instr_counter;
+                sym->syminfo.interval->endpoint = lexer->instr_counter;
             }
 
             fprintf(stderr, "live range of variable %s: (%d, %d)\n", sym->name,
-                    sym->interval->startpoint, sym->interval->endpoint);
+                    sym->syminfo.interval->startpoint, sym->syminfo.interval->endpoint);
 
             return sym;
         }
@@ -282,10 +285,13 @@ PARROT_CANNOT_RETURN_NULL
 static pir_reg *
 new_pir_reg(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     pir_reg *r = pir_mem_allocate_zeroed_typed(lexer, pir_reg);
-    r->type    = type;
+
+    r->syminfo.type    = type;
+    r->syminfo.color   = -1; /* -1 means no PASM register is allocated for this PIR register. */
+
     r->regno   = regno;
     r->next    = NULL;
-    r->color   = -1; /* -1 means no PASM register has been allocated for this PIR register. */
+
     return r;
 }
 
@@ -302,14 +308,17 @@ a pointer to it is returned, if not, NULL is returned.
 */
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static pir_reg *
+pir_reg *
 find_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     /* should do a binary search. fix later.
      */
     pir_reg *iter = CURRENT_SUB(lexer)->registers[type];
     while (iter != NULL) {
-        if (iter->regno == regno)
+        if (iter->regno == regno) {
+            /* update the end point of this register's live interval */
+            iter->syminfo.interval->endpoint = lexer->instr_counter;
             return iter;
+        }
 
         /*
         if (iter->regno > regno)
@@ -346,11 +355,14 @@ use_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     /* create a new node representing this PIR register */
     reg = new_pir_reg(lexer, type, regno);
     /* get a new PASM register for this PIR register. */
-    reg->color = next_register(lexer, type);
+    reg->syminfo.color = next_register(lexer, type);
 
     /* create a new live interval for this symbolic register */
-    reg->interval = new_live_interval(lexer->instr_counter);
-    add_live_interval(lexer->lra, reg->interval);
+    reg->syminfo.interval = new_live_interval(lexer->instr_counter);
+    add_live_interval(lexer->lra, reg->syminfo.interval);
+    /* let the interval have a pointer to this symbolic register */
+    reg->syminfo.interval->syminfo = &reg->syminfo;
+
 
     /* link this register into the list of "colored" registers; each of
      * them has been assigned a unique PASM register.
@@ -379,7 +391,7 @@ use_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     **/
 
     /* return newly allocated register */
-    return reg->color;
+    return reg->syminfo.color;
 }
 
 
@@ -409,8 +421,8 @@ color_reg(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
      */
     if (reg) {
         /* update end point of interval */
-        reg->interval->endpoint = lexer->instr_counter;
-        return reg->color;
+        reg->syminfo.interval->endpoint = lexer->instr_counter;
+        return reg->syminfo.color;
     }
 
     /* we're still here, so the register was not used yet; do that now. */

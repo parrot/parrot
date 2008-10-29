@@ -6,13 +6,7 @@
 #ifndef PARROT_PIR_PIRREGALLOC_H_GUARD
 #define PARROT_PIR_PIRREGALLOC_H_GUARD
 
-
-typedef enum live_flags {
-    LIVE_FLAG_NOSTART = 1 << 0,
-    LIVE_FLAG_NOFREE  = 1 << 1 /* set if the register should not be freed */
-
-} live_flag;
-
+struct symreg;
 
 typedef struct live_interval {
     unsigned symreg;            /* the interval is for this variable */
@@ -20,15 +14,23 @@ typedef struct live_interval {
     unsigned startpoint;        /* start point of the live range of the variable */
     unsigned endpoint;          /* end point of the live range of the variable */
 
-    int      flags;
 
-    struct   live_interval *next;
-    struct   live_interval *prev;
+    /* pointer to the symbol or pir_reg, in order to update (re-color) the PASM register */
+    struct   symreg  *syminfo;
+
+    /* XXX check out whether we can set up a union. These pointers are sick of working too hard */
+    /* for interval list */
+    struct   live_interval *nexti;
+    struct   live_interval *previ;
+
+    /* for active list */
+    struct   live_interval *nexta;
+    struct   live_interval *preva;
 
 } live_interval;
 
 typedef struct free_reg {
-    unsigned regno;
+    unsigned          regno;
     struct free_reg * next;
 
 
@@ -49,6 +51,10 @@ lin_reg_allocator *new_lin_reg_allocator(void);
 live_interval * new_live_interval(unsigned firstuse_location);
 
 void add_live_interval(lin_reg_allocator *lra, live_interval *i);
+
+struct lexer_state;
+
+void linear_scan_register_allocation(struct lexer_state * const lexer);
 
 #endif /* PARROT_PIR_PIRREGALLOC_H_GUARD */
 

@@ -193,18 +193,23 @@ typedef struct key {
  * return values, it's a local variable (or register).
  */
 typedef struct target {
-    pir_type       type;           /* type of this target. */
 
-    union { /* target is either a .local/.param or a PIR register; no need to store both */
+    /* XXX remove this union, change some bits in the parser, and let all target fields
+     * that are stored in symbols or pir_regs, point to these fields.
+     */
+    union target_id { /* target is either a .local/.param or a PIR register; don't store both */
         char const *name;           /* if this is a declared local */
         int         regno;          /* if this is a register */
     } u;
 
-    int            color;          /* for register allocation; -1 means no reg. allocated. */
+   /* int            color; */         /* for register allocation; -1 means no reg. allocated. */
     target_flag    flags;          /* flags like :slurpy etc. */
     char const    *alias;          /* if this is a named parameter, this is the alias */
     char const    *lex_name;       /* if this is a lexical, this field contains the name */
     struct key    *key;            /* the key of this target, i.e. $P0[$P1], $P1 is key. */
+
+
+    struct symreg *syminfo;
 
     struct target *next;
 

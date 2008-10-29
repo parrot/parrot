@@ -14,6 +14,7 @@
 #include "piryy.h"
 #include "pirlexer.h"
 #include "pirheredoc.h"
+#include "pirregalloc.h"
 
 /* global variable to set parser in debug mode.
  * It is not clear to me whether the global can be replaced
@@ -73,6 +74,7 @@ print_help(char const * const program_name)
     "  -o <file> write output to the specified file. "
     "Currently only works in combination with '-E' option\n"
     "  -p        pasm output\n"
+    "  -r        activate the register allocator for improved register usage\n"
     "  -S        do not perform strength reduction\n"
     "  -v        verbose mode\n"
     "  -W        show warning messages\n"
@@ -158,10 +160,13 @@ parse_file(int flexdebug, FILE *infile, char * const filename, int flags, int th
         char outfile[20];
         sprintf(outfile, "output_thr_%d", thr_id);
         lexer->outfile = open_file(outfile, "w");
-        if (lexer->outfile == NULL)
+        if (lexer->outfile == NULL) {
             fprintf(stderr, "Failed to open file %s\n", outfile);
+            lexer->outfile = stdout;
+        }
 
-
+        if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC))
+            linear_scan_register_allocation(lexer);
 
         if (TEST_FLAG(lexer->flags, LEXER_FLAG_NOOUTPUT)) /* handy for testing the compiler */
             fprintf(stdout, "ok\n");
@@ -276,6 +281,9 @@ main(int argc, char *argv[]) {
                 break;
             case 'p':
                 SET_FLAG(flags, LEXER_FLAG_EMIT_PASM);
+                break;
+            case 'r':
+                SET_FLAG(flags, LEXER_FLAG_REGALLOC);
                 break;
             case 'S':
                 SET_FLAG(flags, LEXER_FLAG_NOSTRENGTHREDUCTION);

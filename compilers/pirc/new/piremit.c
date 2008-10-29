@@ -96,7 +96,8 @@ printed as well. Examples:
 */
 void
 print_target(lexer_state *lexer, target * const t) {
-    fprintf(out, "%c%d", pir_register_types[t->type], t->color);
+
+    fprintf(out, "%c%d", pir_register_types[t->syminfo->type], t->syminfo->color);
 
     /* if the target has a key, print that too */
     if (t->key)

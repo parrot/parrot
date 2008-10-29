@@ -892,7 +892,8 @@ keylist_assignment: keylist '=' expression
                             yypirerror(yyscanner, lexer, "indexed object '%s' not declared", instr);
                             sym = new_symbol(lexer, instr, PMC_TYPE);
                          }
-                         else if (sym->type != PMC_TYPE) /* found symbol, now check it's a PMC */
+                         else if (sym->syminfo.type != PMC_TYPE)
+                            /* found symbol, now check it's a PMC */
                             yypirerror(yyscanner, lexer,
                                     "indexed object '%s' must be of type 'pmc'", instr);
 
@@ -946,7 +947,7 @@ keyaccess         : pmc_object keylist
                                    /* make sure sym is a valid pointer */
                                    sym = new_symbol(lexer, target_name($1), PMC_TYPE);
                                }
-                               else if (sym->type != PMC_TYPE)
+                               else if (sym->syminfo.type != PMC_TYPE)
                                    yypirerror(yyscanner, lexer,
                                            "indexed object '%s' is not of type 'pmc'",
                                            target_name($1));
@@ -1077,7 +1078,7 @@ assignment        : target '=' TK_INTC
                           }
                           else {
                               /* at this point, sym is not NULL, even if there was an error */
-                              if (sym->type != PMC_TYPE)
+                              if (sym->syminfo.type != PMC_TYPE)
                                   yypirerror(yyscanner, lexer,
                                           "indexed object '%s' must be of type 'pmc'", $3);
 
@@ -1097,7 +1098,7 @@ assignment        : target '=' TK_INTC
                               yypirerror(yyscanner, lexer, "indexed object '%s' not declared", $3);
                               sym = new_symbol(lexer, $3, PMC_TYPE);
                           }
-                          else if (sym->type != PMC_TYPE)
+                          else if (sym->syminfo.type != PMC_TYPE)
                               yypirerror(yyscanner, lexer,
                                       "indexed object '%s' must be of type 'pmc'", $3);
 
@@ -1172,7 +1173,7 @@ assignment        : target '=' TK_INTC
                               /* create a dummy symbol so we can continue without seg. faults */
                               sym = new_symbol(lexer, $1, PMC_TYPE);
                           }
-                          else if (sym->type != PMC_TYPE)
+                          else if (sym->syminfo.type != PMC_TYPE)
                               yypirerror(yyscanner, lexer,
                                       "indexed object '%s' must be of type 'pmc'", $1);
                           /* at this point sym is a valid (possibly dummy) object for sure */
@@ -1450,7 +1451,7 @@ lex_decl          : ".lex" TK_STRINGC ',' pmc_object "\n"
                               if (sym == NULL) /* check declaration */
                                   yypirerror(yyscanner, lexer, "lexical '%s' is not declared",
                                           target_name($4));
-                              else if (sym->type != PMC_TYPE) /* a .lex must be a PMC */
+                              else if (sym->syminfo.type != PMC_TYPE) /* a .lex must be a PMC */
                                   yypirerror(yyscanner, lexer, "lexical '%s' must be of type 'pmc'",
                                           target_name($4));
                           }
@@ -1566,7 +1567,7 @@ methodcall           : pmc_object '.' method arguments
                                      yypirerror(yyscanner, lexer, "object '%s' not declared",
                                              target_name($1));
 
-                                 else if (sym->type != PMC_TYPE)
+                                 else if (sym->syminfo.type != PMC_TYPE)
                                      yypirerror(yyscanner, lexer,
                                              "cannot invoke method: '%s' is not of type 'pmc'",
                                              target_name($1));
@@ -1603,7 +1604,8 @@ method               : identifier
                                 /* make sure sym is not NULL */
                                 sym = new_symbol(lexer, $1, PMC_TYPE);
                              }
-                             else if (sym->type != PMC_TYPE && sym->type != STRING_TYPE)
+                             else if (sym->syminfo.type != PMC_TYPE
+                                  &&  sym->syminfo.type != STRING_TYPE)
                                  yypirerror(yyscanner, lexer,
                                          "method '%s' must be of type 'pmc' or 'string'", $1);
 
@@ -3099,20 +3101,20 @@ static char *
 write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
     switch (iter->type) {
         case EXPR_TARGET:
-            *instr_writer++ = type_codes[iter->expr.t->type];
+            *instr_writer++ = type_codes[iter->expr.t->syminfo->type];
 
             if (iter->expr.t->key) {
                 *instr_writer++ = '_';
                 *instr_writer++ = 'k';
                 if ((iter->expr.t->key->expr->type == EXPR_TARGET)
-                    && (iter->expr.t->key->expr->expr.t->type == PMC_TYPE)) {
+                    && (iter->expr.t->key->expr->expr.t->syminfo->type == PMC_TYPE)) {
                     /* the key is a target, and its type is a PMC. In that case, do not
                      * print the signature; 'kp' is not valid.
                      */
                 }
                 else {
                     if ((iter->expr.t->key->expr->type == EXPR_TARGET)
-                       & (iter->expr.t->key->expr->expr.t->type == INT_TYPE)) /* $I register */
+                       & (iter->expr.t->key->expr->expr.t->syminfo->type == INT_TYPE)) /* $I register */
                     {
                        *instr_writer++ = 'i';
                     }
@@ -3319,8 +3321,7 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
                 symbol *sym = find_symbol(lexer, target_name(operand->expr.t));
 
                 if (sym) { /* copy the type and PASM register from the symbol */
-                    operand->expr.t->type  = sym->type;
-                    operand->expr.t->color = sym->color;
+                    operand->expr.t->syminfo = &sym->syminfo;
                 }
                 else { /* it's not a declared symbol; for now assume it's a label */
                     if (operand->type == EXPR_TARGET) {
