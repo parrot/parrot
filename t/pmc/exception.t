@@ -664,6 +664,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler" );
     exit 0
   try:
     .get_results($P0)
+    pop_eh
     $S1 = $P0['stacktrace']
     $S1 .= "\n"
     say $S1
