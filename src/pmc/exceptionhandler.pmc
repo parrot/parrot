@@ -78,7 +78,7 @@ Mark any active exception handler data as live.
 
     /*
      * can't reuse Continuation's destroy yet -
-     * RT#46703 fix ref_count handling for exception_handlers first
+     * RT #46703 fix ref_count handling for exception_handlers first
      *
      * An ExceptionHandler is kind of a limited Continuation
      * (can only call 'up the stack').  Therefore we probably don't
@@ -86,11 +86,18 @@ Mark any active exception handler data as live.
      */
 
     VTABLE void destroy() {
-        Parrot_cont * const cc = PMC_cont(SELF);
+        Parrot_cont                        * const cc          = PMC_cont(SELF);
+        Parrot_ExceptionHandler_attributes * const core_struct =
+            PARROT_EXCEPTIONHANDLER(SELF);
 
         if (cc) {
             mem_sys_free(cc);
             PMC_struct_val(SELF) = NULL;
+        }
+
+        if (core_struct) {
+            mem_sys_free(core_struct);
+            PMC_data(SELF) = NULL;
         }
     }
 
