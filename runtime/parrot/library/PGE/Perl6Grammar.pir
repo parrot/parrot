@@ -187,8 +187,8 @@ the output to the correct output file.
           .local pmc p6meta
           p6meta = get_hll_global 'P6metaclass'
           p6meta.'new_class'('%0', 'parent'=>'%1')
-          pop_eh
         %2:
+          pop_eh
         CODE
   ns_optable:
     $P0 = ns['optable']

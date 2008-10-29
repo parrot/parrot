@@ -219,9 +219,10 @@ Return a true value if the invocant 'can' C<x>.
   method_loop:
     unless methoditer goto mro_loop
     $S0 = shift methoditer
-    push_eh method_loop
+    push_eh method_next
     $P0 = methods[$S0]
     parrotclassns.'add_sub'($S0, $P0)
+  method_next:
     pop_eh
     goto method_loop
   mro_end:

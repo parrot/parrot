@@ -107,7 +107,8 @@ attribute if the iterator is exhausted.
     goto return
 
   eh_exhausted:
-    get_results '0,0', $P0, $S0
+    .get_results ($P0)
+    pop_eh
   exhausted:
     $P99 = getattribute self, 'exhausted'
     inc $P99

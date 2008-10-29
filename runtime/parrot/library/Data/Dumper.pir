@@ -45,6 +45,7 @@ no_def_name:
     .return ( 1 )
 
 ERROR2:
+    pop_eh
     print "can not find class Data::Dumper::Default!\n"
     end
     .return ( 0 )
