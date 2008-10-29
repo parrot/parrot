@@ -92,9 +92,13 @@ new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
     PMC * const entry = constant_pmc_new(interp, enum_class_FixedPMCArray);
 
     if (entry_name && !STRING_IS_EMPTY(entry_name)) {
-        STRING *const_name = const_string(interp,
-            string_to_cstring(interp, entry_name));
+        char   *cstring    = string_to_cstring(interp, entry_name);
+        UINTVAL len        = string_length(interp, entry_name);
+        STRING *const_name = string_make_direct(interp, cstring,
+            len, PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+            PObj_constant_FLAG);
 
+        string_cstring_free(cstring);
         VTABLE_set_pmc_keyed_str(interp, hll_info, const_name, entry);
     }
     else
