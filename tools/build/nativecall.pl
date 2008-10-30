@@ -305,7 +305,7 @@ sub print_head {
 #if defined(HAS_JIT) && defined(I386)
 #  include "parrot/exec.h"
 #  include "jit.h"
-/*#  define CAN_BUILD_CALL_FRAMES*/
+#  define CAN_BUILD_CALL_FRAMES
 #endif
 
 /*
