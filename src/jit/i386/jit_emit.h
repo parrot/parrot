@@ -3940,7 +3940,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
             case 't':   /* string, pass a cstring */
                 emitm_call_cfunc(pc, get_nci_S);
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
-                emitm_call_cfunc(pc, string_to_cstring);
+                emitm_call_cfunc(pc, string_to_cstring_nullable);
 
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 /* save off temporary allocation address */
