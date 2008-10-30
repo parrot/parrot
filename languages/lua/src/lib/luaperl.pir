@@ -44,6 +44,7 @@ It's a temporary work. Waiting for the real PIR compiler/interpreter.
     new $P0, 'OS'
     push_eh _handler
     $P0.'rm'(filename)
+    pop_eh
   _handler:
     .return ()
 .end
@@ -75,6 +76,7 @@ It's a temporary work. Waiting for the real PIR compiler/interpreter.
     pio = new 'ParrotIO'
     push_eh _handler
     content = pio.'slurp'(filename)
+    pop_eh
     if content goto L1
     $S0 = err
     print "Can't slurp '"

@@ -162,6 +162,7 @@ LIST
     new $P0, MYPMC
     push_eh _handler
     $P0 = .op $P1, $P2
+    pop_eh
     .local pmc mt
     mt = lua_getmetatable(MYTYPE)
     .local pmc res
@@ -394,6 +395,7 @@ LIST
     new $P0, MYPMC
     push_eh _handler
     $P0 = $P1.'sqrt'()
+    pop_eh
     mt = lua_getmetatable(MYTYPE)
     res = lua_newuserdata($P0, mt)
     .return (res)

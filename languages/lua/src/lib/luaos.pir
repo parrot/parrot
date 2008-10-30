@@ -294,6 +294,7 @@ describing the error.
     new $P0, 'OS'
     push_eh _handler
     $P0.'rm'($S1)
+    pop_eh
     new res, 'LuaBoolean'
     set res, 1
     .return (res)
@@ -331,6 +332,7 @@ fails, it returns B<nil>, plus a string describing the error.
     new $P0, 'OS'
     push_eh _handler
     $P0.'rename'($S1, $S2)
+    pop_eh
     new res, 'LuaBoolean'
     set res, 1
     .return (res)

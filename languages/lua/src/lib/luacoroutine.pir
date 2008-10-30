@@ -132,6 +132,7 @@ C<resume> returns B<false> plus the error message.
   L1:
     push_eh _handler
     (res :slurpy) = $P0.'resume'(argv :flat)
+    pop_eh
     .return (1, res :flat)
   _handler:
     .local pmc e

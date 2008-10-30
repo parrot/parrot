@@ -583,6 +583,7 @@ messages and in debug information.
     .local pmc env
     env = get_hll_global '_G'
     $P0.'setfenv'(env)
+    pop_eh
     .return ($P0)
   _handler:
     .get_results ($P0)
@@ -606,6 +607,7 @@ messages and in debug information.
     .local pmc env
     env = get_hll_global '_G'
     $P0.'setfenv'(env)
+    pop_eh
     .return ($P0)
   _handler:
     .get_results ($P0)
@@ -946,6 +948,7 @@ This function never returns.
     .param pmc vararg :slurpy
     push_eh _handler
     ($P0 :slurpy) = f(vararg :flat)
+    pop_eh
     .return (0, $P0)
   _handler:
     .local pmc ex

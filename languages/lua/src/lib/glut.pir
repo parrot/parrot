@@ -134,6 +134,7 @@ not LuaGL
   L2:
     push_eh _handler
     $P0()
+    pop_eh
     .return ()
   _handler:
     .local pmc e
@@ -175,6 +176,7 @@ not LuaGL
   L2:
     push_eh _handler
     $P0()
+    pop_eh
     .return ()
   _handler:
     .local pmc e
@@ -272,6 +274,7 @@ not LuaGL
     set $P3, y
     push_eh _handler
     $P0($P1, $P2, $P3)
+    pop_eh
     .return ()
   _handler:
     .local pmc e
@@ -339,6 +342,7 @@ not LuaGL
     set $P2, height
     push_eh _handler
     $P0($P1, $P2)
+    pop_eh
     .return ()
   _handler:
     .local pmc e

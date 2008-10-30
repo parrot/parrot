@@ -44,6 +44,7 @@ Francois Perrad.
     .local string gen_pir
     gen_pir = script.'translate'()
     save_pir(gen_pir, filename)
+    pop_eh
     end
   _handler:
     .local pmc e
@@ -66,6 +67,7 @@ Francois Perrad.
     pio = new 'ParrotIO'
     push_eh _handler
     content = pio.'slurp'(filename)
+    pop_eh
     if content goto L1
     $S0 = err
     print "Can't slurp '"

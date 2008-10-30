@@ -47,6 +47,7 @@ Francois Perrad.
     $P0 = split '\', $S0
     basename = pop $P0
     script.'brief'(basename)
+    pop_eh
     end
   _handler:
     .local pmc e
@@ -69,6 +70,7 @@ Francois Perrad.
     pio = new 'ParrotIO'
     push_eh _handler
     content = pio.'slurp'(filename)
+    pop_eh
     if content goto L1
     $S0 = err
     print "Can't slurp '"

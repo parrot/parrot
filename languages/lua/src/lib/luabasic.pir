@@ -288,6 +288,7 @@ default for C<f> is 1.
     inc level
     push_eh _handler
     f = $P0['sub'; level]
+    pop_eh
   L2:
     .return (f)
   _handler:
@@ -525,6 +526,7 @@ In case of any error, C<pcall> returns B<false> plus the error message.
     lua_checkany(1, f)
     push_eh _handler
     (res :slurpy) = f(argv :flat)
+    pop_eh
     set status, 1
     .return (status, res :flat)
   _handler:
@@ -913,6 +915,7 @@ error, C<xpcall> returns false plus the result from C<err>.
     lua_checkany(2, err_)
     push_eh _handler
     (res :slurpy) = f()
+    pop_eh
     set status, 1
     .return (status, res :flat)
   _handler:

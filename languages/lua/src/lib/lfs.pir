@@ -417,6 +417,7 @@ Returns C<true> in case of success or C<nil> plus an error string.
     new $P0, 'OS'
     push_eh _handler
     $P0.'chdir'($S1)
+    pop_eh
     new res, 'LuaBoolean'
     set res, 1
     .return (res)
@@ -451,6 +452,7 @@ string.
     new $P0, 'OS'
     push_eh _handler
     $S0 = $P0.'cwd'()
+    pop_eh
     new res, 'LuaString'
     set res, $S0
     .return (res)
@@ -485,6 +487,7 @@ when there is no more entries. Raises an error if C<path> is not a directory.
     new $P0, 'OS'
     push_eh _handler
     $P1 = $P0.'readdir'($S1)
+    pop_eh
     .lex 'upvar_dir', $P1
     .const .Sub dir_aux = 'dir_aux'
     res = newclosure dir_aux
@@ -558,6 +561,7 @@ C<nil> plus an error string.
     push_eh _handler
     $I1 = 0o775
     $P0.'mkdir'($S1, $I1)
+    pop_eh
     new res, 'LuaBoolean'
     set res, 1
     .return (res)
@@ -592,6 +596,7 @@ C<nil> plus an error string.
     new $P0, 'OS'
     push_eh _handler
     $P0.'rm'($S1)
+    pop_eh
     new res, 'LuaBoolean'
     set res, 1
     .return (res)
