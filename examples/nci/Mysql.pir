@@ -151,7 +151,7 @@ done:
     .param string database
 
     .local pmc mysql_real_connect
-    mysql_real_connect = get_mysql_function('mysql_real_connect', 'ppttttiti')
+    mysql_real_connect = get_mysql_function('mysql_real_connect', 'ppttttitl')
     .local pmc mysql
     mysql = getattribute self, 'mysql'
     .local pmc result

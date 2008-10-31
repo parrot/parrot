@@ -4187,6 +4187,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
         emitm_movl_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, strings_offset);
         emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 0);
         emitm_call_cfunc(pc, string_cstring_free);
+        strings_offset += 4;
     }
 
     jit_emit_stack_frame_leave(pc);
