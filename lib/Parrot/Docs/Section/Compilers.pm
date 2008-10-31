@@ -48,6 +48,7 @@ sub new {
         $self->new_group( 'BCG',  'Byte Code Generation',       'compilers/bcg' ),
         $self->new_group( 'JSON', 'JavaScript Object Notation', 'compilers/json' ),
         $self->new_group( 'PIRC', 'a PIR Compiler',             'compilers/pirc' ),
+        $self->new_group( 'NCIGEN', 'Native Call Interface Generator', 'compilers/ncigen' ),
     );
 }
 

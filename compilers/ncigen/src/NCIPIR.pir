@@ -12,7 +12,7 @@ NCIPIR::Compiler defines a compiler that converts a c99AST tree into PIR
 
 =cut
 
-.namespace [ 'NCIPIR::Compiler' ]
+.namespace [ 'NCIPIR';'Compiler' ]
 
 .sub '__onload' :load :init
     .local pmc p6meta, cproto
@@ -33,7 +33,7 @@ NCIPIR::Compiler defines a compiler that converts a c99AST tree into PIR
     .param pmc adverbs         :slurpy :named
 
     .local pmc newself
-    newself = new 'NCIPIR::Compiler'
+    newself = new ['NCIPIR';'Compiler']
 
     ##  start with empty code
     .local pmc code
@@ -41,7 +41,7 @@ NCIPIR::Compiler defines a compiler that converts a c99AST tree into PIR
     newself.'code'(code)
 
     ##  if the root node isn't a Sub, wrap it
-    $I0 = isa ast, 'c99AST::Decls'
+    $I0 = isa ast, ['c99AST';'Decls']
     if $I0 goto have_sub
     $P0 = get_hll_global ['c99AST'], 'Decls'
     ast = $P0.'new'(ast, 'name'=>'anon')
@@ -172,7 +172,7 @@ Return pir for an operation node.
 
 =cut
 
-.sub 'pir' :method :multi(_,['c99AST::FuncDecl'])
+.sub 'pir' :method :multi(_,['c99AST';'FuncDecl'])
     .param pmc node
 
     ##  get list of arguments to operation
@@ -261,7 +261,7 @@ Generate a label.
 
 =cut
 
-.sub 'pir' :method :multi(_, ['c99AST::TypeDef'])
+.sub 'pir' :method :multi(_, ['c99AST';'TypeDef'])
     .param pmc node
     .return ('')
     .return pir_dump(node)
@@ -273,7 +273,7 @@ Generate a label.
 
 =cut
 
-.sub 'pir' :method :multi(_, ['c99AST::VarDecl'])
+.sub 'pir' :method :multi(_, ['c99AST';'VarDecl'])
     .param pmc node
     .return ('')
     .return pir_dump(node)
