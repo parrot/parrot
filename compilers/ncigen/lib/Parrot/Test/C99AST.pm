@@ -79,7 +79,7 @@ sub like {
 }
 
 sub istypedef {
-  return like( qr/c99AST::TypeDef/, @_);
+  return like( qr/c99AST;TypeDef/, @_);
 }
 sub ispointer {
   return like( qr/<pointer> => 1/, @_);

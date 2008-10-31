@@ -9,7 +9,7 @@ for compiling c99 programs.
 
 =cut
 
-.namespace [ 'c99AST::Node' ]
+.namespace [ 'c99AST';'Node' ]
 
 .sub 'onload' :anon :load :init
     ##   create the c99AST::Node base class
@@ -120,7 +120,7 @@ Get/set the constant value for this node.
 
 =cut
 
-.namespace [ 'c99AST::TypeDef' ]
+.namespace [ 'c99AST';'TypeDef' ]
 
 .sub 'value' :method
     .param pmc value           :optional
@@ -147,7 +147,7 @@ parameter, and array/hash variables respectively.
 
 =cut
 
-.namespace [ 'c99AST::VarDecl' ]
+.namespace [ 'c99AST';'VarDecl' ]
 
 .sub 'type' :method
     .param pmc value           :optional

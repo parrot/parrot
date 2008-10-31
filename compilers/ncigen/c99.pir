@@ -24,7 +24,7 @@ object.
 
 =cut
 
-.namespace [ 'C99::Compiler' ]
+.namespace [ 'C99';'Compiler' ]
 
 .loadlib 'c99_group'
 
@@ -76,7 +76,7 @@ USAGE
     $P2 = $P0.'command_line'(args)
 .end
 
-.namespace [ 'PCT::HLLCompiler' ]
+.namespace [ 'PCT';'HLLCompiler' ]
 
 .sub 'nci_ast' :method
     .param pmc source
@@ -87,7 +87,7 @@ USAGE
     .local pmc ast
     ast = source.'item'()
     pop_eh
-    $I0 = isa ast, 'c99AST::Decls'
+    $I0 = isa ast, ['c99AST';'Decls']
     unless $I0 goto err_past
     .return (ast)
 
@@ -114,7 +114,7 @@ USAGE
 .include 'src/gen_actions.pir'
 
 
-.namespace [ 'C99::Grammar' ]
+.namespace [ 'C99';'Grammar' ]
 
 .sub 'debug'
     .param pmc match

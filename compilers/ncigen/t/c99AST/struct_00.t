@@ -15,4 +15,4 @@ typedef struct SPITupleTable
 } SPITupleTable;
 CODE
 
-contains("<complex> => PMC 'c99AST::Struct'");
+contains("<complex> => PMC 'c99AST;Struct'");
