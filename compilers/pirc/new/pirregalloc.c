@@ -197,7 +197,7 @@ add_interval_to_active(lsr_allocator *lsr, live_interval * const i, pir_type typ
 
     i->nexta = iter;
     lsr->active[type] = i;
-    return;
+    return;    /* is sorting needed? */
 
     while (iter && iter->endpoint < i->endpoint) {
         iter = iter->nexta;

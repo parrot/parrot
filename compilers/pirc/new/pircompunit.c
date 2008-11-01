@@ -422,25 +422,24 @@ PARROT_WARN_UNUSED_RESULT
 int
 targets_equal(target const * const left, target const * const right) {
 
-    return 0;
-    //if (TEST_FLAG(left->flags, TARGET_FLAG_IS_REG)) {      /* if left is a reg */
-    //    if (TEST_FLAG(right->flags, TARGET_FLAG_IS_REG)) { /* then right must be a reg */
-    //        if ((left->syminfo->type == right->syminfo->type)        /* types must match */
-    //        &&  (left->s.reg->regno == right->s.reg->regno           /* PIR regno must match */
-    //        &&  (left->syminfo->color == right->syminfo->color)))    /* PASM regno must match */
-    //            return TRUE;
-    //    }
-    //    else /* left is a reg, right is not */
-    //        return FALSE;
-    //
-    //}
-    //else { /* left is not a reg */
-    //
-    //    if (!TEST_FLAG(right->flags, TARGET_FLAG_IS_REG)  /* right must not be a reg */
-    //    && (left->s.sym->name && right->s.sym->name       /* both must have a name */
-    //    && STREQ(left->s.sym->name, right->s.sym->name))) /* and they must be equal */
-    //        return TRUE;
-    //}
+    if (TEST_FLAG(left->flags, TARGET_FLAG_IS_REG)) {      /* if left is a reg */
+        if (TEST_FLAG(right->flags, TARGET_FLAG_IS_REG)) { /* then right must be a reg */
+            if ((left->s.reg->type == right->s.reg->type)        /* types must match */
+            &&  (left->s.reg->regno == right->s.reg->regno           /* PIR regno must match */
+            &&  (left->s.reg->color == right->s.reg->color)))    /* PASM regno must match */
+                return TRUE;
+        }
+        else /* left is a reg, right is not */
+            return FALSE;
+
+    }
+    else { /* left is not a reg */
+
+        if (!TEST_FLAG(right->flags, TARGET_FLAG_IS_REG)  /* right must not be a reg */
+        && (left->s.sym->name && right->s.sym->name       /* both must have a name */
+        && STREQ(left->s.sym->name, right->s.sym->name))) /* and they must be equal */
+            return TRUE;
+    }
 
     return FALSE;
 }
