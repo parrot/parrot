@@ -35,6 +35,7 @@ The name of a test function is usually 'nci_<signature>'. E.g. the function
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <parrot/config.h>
 
 #ifdef __cplusplus
@@ -1099,6 +1100,26 @@ nci_vp(Opaque *inOpaque)
         printf("got %d\n", inOpaque->x);
     else
         printf("got null");
+}
+
+/*
+
+=item C<PARROT_API char *
+nci_ttt(void *p)>
+
+Prints "s2, s1, s1d"
+
+=cut
+
+*/
+
+PARROT_API char *
+nci_ttt(char *s1, char *s2)
+{
+    char* s = (char*) malloc(strlen(s2) + (2 * strlen(s1)) + 5);
+    sprintf( s, "%s, %s, %s", s2, s2, s1);
+    printf("%s\n", s);
+    return s;
 }
 
 
