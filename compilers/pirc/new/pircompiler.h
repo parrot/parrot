@@ -134,7 +134,7 @@ typedef struct lexer_state {
     struct yy_buffer_state   *buffer;  /* for saving buffer state when scanning a .macro_const */
 
     /* register allocation */
-    lin_reg_allocator        *lra;
+    lsr_allocator            *lsr;
 
 } lexer_state;
 

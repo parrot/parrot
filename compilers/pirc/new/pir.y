@@ -892,7 +892,7 @@ keylist_assignment: keylist '=' expression
                             yypirerror(yyscanner, lexer, "indexed object '%s' not declared", instr);
                             sym = new_symbol(lexer, instr, PMC_TYPE);
                          }
-                         else if (sym->syminfo.type != PMC_TYPE)
+                         else if (sym->type != PMC_TYPE)
                             /* found symbol, now check it's a PMC */
                             yypirerror(yyscanner, lexer,
                                     "indexed object '%s' must be of type 'pmc'", instr);
@@ -926,7 +926,7 @@ op_arg_expr       : constant
                   | identifier
                          { /* this is either a LABEL or a symbol; in the latter case, the type
                             * will be filled in later. */
-                           $$ = expr_from_target(lexer, new_target(lexer, UNKNOWN_TYPE, $1));
+                           $$ = expr_from_ident(lexer, $1);
                          }
                   | reg
                          { $$ = expr_from_target(lexer, $1); }
@@ -940,23 +940,16 @@ keyaccess         : pmc_object keylist
                            if (TEST_FLAG($1->flags, TARGET_FLAG_IS_REG))
                                $$ = $1;
                            else { /* it's not a register, so it must be a declared symbol */
-                               symbol *sym = find_symbol(lexer, target_name($1));
-                               if (sym == NULL) {
-                                   yypirerror(yyscanner, lexer,
-                                           "indexed object '%s' not declared", target_name($1));
-                                   /* make sure sym is a valid pointer */
-                                   sym = new_symbol(lexer, target_name($1), PMC_TYPE);
-                               }
-                               else if (sym->syminfo.type != PMC_TYPE)
+                               if ($1->s.sym->type != PMC_TYPE)
                                    yypirerror(yyscanner, lexer,
                                            "indexed object '%s' is not of type 'pmc'",
-                                           target_name($1));
+                                           $1->s.sym->name);
 
                                /* create a target node based on the symbol node;
                                 * sym already has a PASM register, so through
                                 * this the target will get that too.
                                 */
-                               $$ = target_from_symbol(lexer, sym);
+                               $$ = $1;
                            }
 
                            /* in both cases (register or symbol), set the key on this target */
@@ -1078,7 +1071,7 @@ assignment        : target '=' TK_INTC
                           }
                           else {
                               /* at this point, sym is not NULL, even if there was an error */
-                              if (sym->syminfo.type != PMC_TYPE)
+                              if (sym->type != PMC_TYPE)
                                   yypirerror(yyscanner, lexer,
                                           "indexed object '%s' must be of type 'pmc'", $3);
 
@@ -1098,7 +1091,7 @@ assignment        : target '=' TK_INTC
                               yypirerror(yyscanner, lexer, "indexed object '%s' not declared", $3);
                               sym = new_symbol(lexer, $3, PMC_TYPE);
                           }
-                          else if (sym->syminfo.type != PMC_TYPE)
+                          else if (sym->type != PMC_TYPE)
                               yypirerror(yyscanner, lexer,
                                       "indexed object '%s' must be of type 'pmc'", $3);
 
@@ -1173,7 +1166,7 @@ assignment        : target '=' TK_INTC
                               /* create a dummy symbol so we can continue without seg. faults */
                               sym = new_symbol(lexer, $1, PMC_TYPE);
                           }
-                          else if (sym->syminfo.type != PMC_TYPE)
+                          else if (sym->type != PMC_TYPE)
                               yypirerror(yyscanner, lexer,
                                       "indexed object '%s' must be of type 'pmc'", $1);
                           /* at this point sym is a valid (possibly dummy) object for sure */
@@ -1446,14 +1439,10 @@ has_unique_reg    : /* empty */     { $$ = 0; }
 lex_decl          : ".lex" TK_STRINGC ',' pmc_object "\n"
                         { /* if $4 is not a register, it must be a declared symbol */
                           if (!TEST_FLAG($4->flags, TARGET_FLAG_IS_REG)) {
-                              symbol *sym = find_symbol(lexer, target_name($4));
 
-                              if (sym == NULL) /* check declaration */
-                                  yypirerror(yyscanner, lexer, "lexical '%s' is not declared",
-                                          target_name($4));
-                              else if (sym->syminfo.type != PMC_TYPE) /* a .lex must be a PMC */
+                              if ($4->s.sym->type != PMC_TYPE) /* a .lex must be a PMC */
                                   yypirerror(yyscanner, lexer, "lexical '%s' must be of type 'pmc'",
-                                          target_name($4));
+                                          $4->s.sym->name);
                           }
                           set_lex_flag($4, $2);
                         }
@@ -1562,18 +1551,18 @@ methodcall           : pmc_object '.' method arguments
                                 invocant = $1;
                              }
                              else { /* is not a register but a symbol */
-                                 symbol *sym = find_symbol(lexer, target_name($1));
-                                 if (sym == NULL)
-                                     yypirerror(yyscanner, lexer, "object '%s' not declared",
-                                             target_name($1));
 
-                                 else if (sym->syminfo.type != PMC_TYPE)
+                                 symbol *sym = find_symbol(lexer, $1->s.sym->name);
+                                 if (sym == NULL)
+                                     yypirerror(yyscanner, lexer,
+                                             "symbol '%s' was not declared", $1->s.sym->name);
+                                 else if ($1->s.sym->type != PMC_TYPE)
                                      yypirerror(yyscanner, lexer,
                                              "cannot invoke method: '%s' is not of type 'pmc'",
-                                             target_name($1));
+                                             $1->s.sym->name);
 
                                  /* get a target based on the symbol, it contains a register */
-                                 invocant = target_from_symbol(lexer, sym);
+                                 invocant = $1;
                              }
 
                              $$ = invoke(lexer, CALL_METHOD, invocant, $3);
@@ -1591,7 +1580,12 @@ subcall              : sub arguments
 sub                  : pmc_object
                            { $$ = $1; }
                      | TK_STRINGC
-                           { $$ = target_from_string(lexer, $1); }
+                           {
+                               symbol *sym = find_symbol(lexer, $1);
+                               if (sym == NULL)
+                                   sym = new_symbol(lexer, $1, PMC_TYPE);
+
+                               $$ = target_from_symbol(lexer, sym); }
                      ;
 
 method               : identifier
@@ -1604,8 +1598,8 @@ method               : identifier
                                 /* make sure sym is not NULL */
                                 sym = new_symbol(lexer, $1, PMC_TYPE);
                              }
-                             else if (sym->syminfo.type != PMC_TYPE
-                                  &&  sym->syminfo.type != STRING_TYPE)
+                             else if (sym->type != PMC_TYPE
+                                  &&  sym->type != STRING_TYPE)
                                  yypirerror(yyscanner, lexer,
                                          "method '%s' must be of type 'pmc' or 'string'", $1);
 
@@ -1620,7 +1614,14 @@ method               : identifier
                      ;
 
 pmc_object           : identifier
-                           { $$ = target_from_ident(lexer, PMC_TYPE, $1); }
+                           {
+                             symbol *sym = find_symbol(lexer, $1);
+                             if (sym == NULL)
+                                 sym = new_symbol(lexer, $1, PMC_TYPE);
+
+                             $$ = target_from_symbol(lexer, sym);
+
+                           }
                      | TK_PREG
                            { $$ = new_reg(lexer, PMC_TYPE, $1); }
 
@@ -3101,20 +3102,43 @@ static char *
 write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
     switch (iter->type) {
         case EXPR_TARGET:
-            *instr_writer++ = type_codes[iter->expr.t->syminfo->type];
+            if (TEST_FLAG(iter->expr.t->flags, TARGET_FLAG_IS_REG))
+                *instr_writer++ = type_codes[iter->expr.t->s.reg->type];
+            else
+                *instr_writer++ = type_codes[iter->expr.t->s.sym->type];
 
             if (iter->expr.t->key) {
                 *instr_writer++ = '_';
                 *instr_writer++ = 'k';
+                /* XXX fix this mess. */
                 if ((iter->expr.t->key->expr->type == EXPR_TARGET)
-                    && (iter->expr.t->key->expr->expr.t->syminfo->type == PMC_TYPE)) {
+                    &&
+                    (  (iter->expr.t->key->expr->expr.t->flags & TARGET_FLAG_IS_REG)
+                     ?
+                       (iter->expr.t->key->expr->expr.t->s.reg->type == PMC_TYPE)
+                     :
+                       (iter->expr.t->key->expr->expr.t->s.sym->type == PMC_TYPE)
+                    )
+                   ) {
                     /* the key is a target, and its type is a PMC. In that case, do not
                      * print the signature; 'kp' is not valid.
                      */
                 }
                 else {
-                    if ((iter->expr.t->key->expr->type == EXPR_TARGET)
-                       & (iter->expr.t->key->expr->expr.t->syminfo->type == INT_TYPE)) /* $I register */
+                    if (
+                       (iter->expr.t->key->expr->type == EXPR_TARGET)
+                       &&
+
+
+                       (
+                       (iter->expr.t->key->expr->expr.t->flags & TARGET_FLAG_IS_REG)
+                       ?
+                       (iter->expr.t->key->expr->expr.t->s.reg->type == INT_TYPE)
+                       :
+                       (iter->expr.t->key->expr->expr.t->s.sym->type == INT_TYPE)
+                       )
+                       )
+
                     {
                        *instr_writer++ = 'i';
                     }
@@ -3310,36 +3334,29 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
                                             * include/parrot/op.h:18, so an int is good enough for
                                             * a bit mask to cover all operands.
                                             */
+    fprintf(stderr, "check args\n");
 
     /* iterate over all operands to set the type and PASM register on all target nodes, if any */
     num_operands = get_operand_count(lexer);
     for (i = 0; i < num_operands; i++) {
         expression *operand = get_operand(lexer, i + 1); /* get_operand counts from 1 */
-        if (operand->type == EXPR_TARGET) { /* if it is a target... */
 
-            if (!TEST_FLAG(operand->expr.t->flags, TARGET_FLAG_IS_REG)) { /* not a register */
-                symbol *sym = find_symbol(lexer, target_name(operand->expr.t));
-
-                if (sym) { /* copy the type and PASM register from the symbol */
-                    operand->expr.t->syminfo = &sym->syminfo;
-                }
-                else { /* it's not a declared symbol; for now assume it's a label */
-                    if (operand->type == EXPR_TARGET) {
-                        /* if it's not a register (otherwise, no need to check) */
-                        if (!TEST_FLAG(operand->expr.t->flags, TARGET_FLAG_IS_REG)) {
-                            /* convert the target to an identifier */
-                            operand->expr.id = target_name(operand->expr.t);
-                            operand->type    = EXPR_IDENT;
-
-                            /* set a bit in the bitmask indicating it is assumed to be a label;
-                             * this prevents us doing a symbol lookup in the second loop; a
-                             * bitmask is faster.
-                             */
-                            SET_BIT(label_bitmask, BIT(i));
-                        }
-                    }
-                }
+        if (operand->type == EXPR_IDENT) { /* op_arg ::= identifier */
+            /* the operand is an identifier, check now whether it was a symbol. If so,
+             * then a new target node is created which receives a pointer to the symbol.
+             * Then, convert the operand to an EXPR_TARGET.
+             */
+            symbol *sym = find_symbol(lexer, operand->expr.id);
+            if (sym) {
+                operand->expr.t        = new_target(lexer, sym->type);
+                operand->expr.t->s.sym = sym;  /* target's pointer set to symbol */
+                operand->type          = EXPR_TARGET; /* convert operand node into EXPR_TARGET */
             }
+            else { /* it must be a label */
+                SET_BIT(label_bitmask, BIT(i));
+                fprintf(stderr, "%s must be a label\n", operand->expr.id);
+            }
+
         }
     }
 
@@ -3380,6 +3397,8 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
                     return FALSE;
                 }
             }
+            else
+                fprintf(stderr, "operand %d is expected to be a label\n", i);
 
             iter = iter->next;
             ++i;

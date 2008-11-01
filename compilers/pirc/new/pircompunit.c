@@ -422,24 +422,25 @@ PARROT_WARN_UNUSED_RESULT
 int
 targets_equal(target const * const left, target const * const right) {
 
-    if (TEST_FLAG(left->flags, TARGET_FLAG_IS_REG)) {      /* if left is a reg */
-        if (TEST_FLAG(right->flags, TARGET_FLAG_IS_REG)) { /* then right must be a reg */
-            if ((left->syminfo->type == right->syminfo->type)                /* types must match */
-            &&  (target_regno(left) == target_regno(right) /* PIR regno must match */
-            &&  (left->syminfo->color == right->syminfo->color)))    /* PASM regno must match */
-                return TRUE;
-        }
-        else /* left is a reg, right is not */
-            return FALSE;
-
-    }
-    else { /* left is not a reg */
-
-        if (!TEST_FLAG(right->flags, TARGET_FLAG_IS_REG)  /* right must not be a reg */
-        && (target_name(left) && target_name(right)       /* both must have a name */
-        && STREQ(target_name(left), target_name(right)))) /* and they must be equal */
-            return TRUE;
-    }
+    return 0;
+    //if (TEST_FLAG(left->flags, TARGET_FLAG_IS_REG)) {      /* if left is a reg */
+    //    if (TEST_FLAG(right->flags, TARGET_FLAG_IS_REG)) { /* then right must be a reg */
+    //        if ((left->syminfo->type == right->syminfo->type)        /* types must match */
+    //        &&  (left->s.reg->regno == right->s.reg->regno           /* PIR regno must match */
+    //        &&  (left->syminfo->color == right->syminfo->color)))    /* PASM regno must match */
+    //            return TRUE;
+    //    }
+    //    else /* left is a reg, right is not */
+    //        return FALSE;
+    //
+    //}
+    //else { /* left is not a reg */
+    //
+    //    if (!TEST_FLAG(right->flags, TARGET_FLAG_IS_REG)  /* right must not be a reg */
+    //    && (left->s.sym->name && right->s.sym->name       /* both must have a name */
+    //    && STREQ(left->s.sym->name, right->s.sym->name))) /* and they must be equal */
+    //        return TRUE;
+    //}
 
     return FALSE;
 }
@@ -447,7 +448,7 @@ targets_equal(target const * const left, target const * const right) {
 /*
 
 =item C<target *
-new_target(pir_type type, char * const name)>
+new_target(pir_type type)>
 
 Create a new target node. The node's next pointer is initialized to itself.
 
@@ -457,20 +458,11 @@ Create a new target node. The node's next pointer is initialized to itself.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
-new_target(lexer_state * const lexer, pir_type type, char const * const name) {
+new_target(lexer_state * const lexer, pir_type type) {
     target *t       = pir_mem_allocate_zeroed_typed(lexer, target);
 
     t->key          = NULL;
     t->next         = t; /* circly linked list */
-
-    /* only set the name if there was one. Note that target-name and target-regno
-     * are stored in a union (saving a few bytes on each target object), so that
-     * it's very important not to assign to both.
-     */
-    if (name)
-        target_name(t)  = name;
-    else
-        target_regno(t) = -1;
 
     return t;
 }
@@ -494,7 +486,8 @@ set_target_key(target * const t, key * const k) {
 =item C<target *
 target_from_symbol(lexer_state * const lexer, symbol * const sym)>
 
-Convert a symbol node into a target node.
+Convert symbol C<sym> into a target node. The resulting target has
+a pointer to C<sym>.
 
 =cut
 
@@ -503,8 +496,8 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
 target_from_symbol(lexer_state * const lexer, symbol * const sym) {
-    target *t  = new_target(lexer, sym->syminfo.type, sym->name);
-    t->syminfo = &sym->syminfo;
+    target *t  = new_target(lexer, sym->type);
+    t->s.sym   = sym; /* set a pointer from target to symbol */
     t->flags   = sym->flags; /* copy the flags */
 
     return t;
@@ -552,7 +545,7 @@ PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
 add_param(lexer_state * const lexer, pir_type type, char const * const name) {
-    target *targ = new_target(lexer, type, name);
+    target *targ = new_target(lexer, type);
     symbol *sym  = new_symbol(lexer, name, type);
 
     PARROT_ASSERT(CURRENT_SUB(lexer));
@@ -580,8 +573,8 @@ add_param(lexer_state * const lexer, pir_type type, char const * const name) {
      *
      */
     /*sym->color = targ->color = next_register(lexer, type);*/
-    sym->syminfo.color = next_register(lexer, type);
-    targ->syminfo      = &sym->syminfo;
+    sym->color  = next_register(lexer, type);
+    targ->s.sym = sym;
 
     return targ;
 
@@ -628,13 +621,17 @@ target *
 set_param_flag(lexer_state * const lexer, target * const param, target_flag flag) {
     SET_FLAG(param->flags, flag);
 
-    if (TEST_FLAG(flag, TARGET_FLAG_SLURPY) && param->syminfo->type != PMC_TYPE)
+    /* note that param is always an identifier; registers are not allowed as parameters.
+     * Therefore it's safe to reference param->s.sym, without checking for not
+     * being a register.
+     */
+    if (TEST_FLAG(flag, TARGET_FLAG_SLURPY) && param->s.sym->type != PMC_TYPE)
         yypirerror(lexer->yyscanner, lexer,
-                   "cannot set :slurpy flag on non-pmc %s", target_name(param));
+                   "cannot set :slurpy flag on non-pmc %s", param->s.sym->name);
 
-    if (TEST_FLAG(flag, TARGET_FLAG_OPT_FLAG) && param->syminfo->type != INT_TYPE)
+    if (TEST_FLAG(flag, TARGET_FLAG_OPT_FLAG) && param->s.sym->type != INT_TYPE)
         yypirerror(lexer->yyscanner, lexer,
-                   "cannot set :opt_flag flag on non-int %s", target_name(param));
+                   "cannot set :opt_flag flag on non-int %s", param->s.sym->name);
 
     return param;
 }
@@ -1322,13 +1319,12 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
 new_reg(lexer_state * const lexer, pir_type type, int regno) {
-    target *t       = new_target(lexer, type, NULL); /* no identifier */
-    target_regno(t) = regno;
-    /* t->color        = color_reg(lexer, type, regno);*/
+    target *t       = new_target(lexer, type);
+
     {
         int color = color_reg(lexer, type, regno);
         pir_reg *reg = find_register(lexer, type, regno);
-        t->syminfo = &reg->syminfo;
+        t->s.reg = reg;
     }
 
     /* set a flag on this target node saying it's a register */
@@ -1490,40 +1486,6 @@ invoke(lexer_state * const lexer, invoke_type type, ...) {
 }
 
 
-
-/*
-
-=item C<target *
-target_from_string(char * const str)>
-
-Create a target node from the string C<str>.
-
-=cut
-
-*/
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-target *
-target_from_string(lexer_state * const lexer, char const * const str) {
-    return new_target(lexer, STRING_TYPE, str);
-}
-
-/*
-
-=item C<target *
-target_from_ident(pir_type type, char * const id)>
-
-Wrap the identifier C<id> of type C<type> in a target node.
-
-=cut
-
-*/
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-target *
-target_from_ident(lexer_state * const lexer, pir_type type, char const * const id) {
-    return new_target(lexer, type, id);
-}
 
 
 /*
@@ -2006,7 +1968,7 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
 
             /* if the target is a register, invoke that. */
             if (TEST_FLAG(inv->sub->flags, TARGET_FLAG_IS_REG)) {
-                target *sub = new_reg(lexer, PMC_TYPE, inv->sub->syminfo->color);
+                target *sub = new_reg(lexer, PMC_TYPE, inv->sub->s.reg->color);
                 if (inv->retcc) { /* return continuation present? */
                     new_sub_instr(lexer, PARROT_OP_invoke_p_p, "invoke_p_p");
                     add_operands(lexer, "%T%T", inv->sub, inv->retcc);
@@ -2018,7 +1980,7 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
             }
             else { /* find the global label in the current file, or find it during runtime */
                 target *sub        = generate_unique_pir_reg(lexer, PMC_TYPE);
-                global_label *glob = find_global_label(lexer, target_name(inv->sub));
+                global_label *glob = find_global_label(lexer, inv->sub->s.sym->name);
 
                 if (glob) {
                     /* XXX fix pmc const stuff */
@@ -2029,7 +1991,7 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
                     new_sub_instr(lexer, PARROT_OP_find_sub_not_null_p_sc,
                                   "find_sub_not_null_p_sc");
 
-                    add_operands(lexer, "%T%s", sub, target_name(inv->sub));
+                    add_operands(lexer, "%T%s", sub, inv->sub->s.sym->name);
 
                     /* save the current instruction in a list; entries in this list will be
                      * fixed up, if possible, after the parsing phase.
@@ -2046,7 +2008,7 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
                      *   find_sub_not_null_p_sc
                      *
                      */
-                    save_global_reference(lexer, CURRENT_INSTRUCTION(lexer), target_name(inv->sub));
+                    save_global_reference(lexer, CURRENT_INSTRUCTION(lexer), inv->sub->s.sym->name);
                 }
 
                 new_sub_instr(lexer, PARROT_OP_invokecc_p, "invokecc_p");

@@ -184,9 +184,7 @@ typedef struct key {
 } key;
 
 
-/* accessor macros for target name and (PIR) register number */
-#define target_name(t)  t->u.name
-#define target_regno(t) t->u.regno
+
 
 /* The target node represents a .local, .param or register that can receive a value,
  * hence the name "target". When receiving arguments, it's a parameter, when receiving
@@ -194,22 +192,15 @@ typedef struct key {
  */
 typedef struct target {
 
-    /* XXX remove this union, change some bits in the parser, and let all target fields
-     * that are stored in symbols or pir_regs, point to these fields.
-     */
-    union target_id { /* target is either a .local/.param or a PIR register; don't store both */
-        char const *name;           /* if this is a declared local */
-        int         regno;          /* if this is a register */
-    } u;
+    union sym_union {
+        struct symbol  *sym;
+        struct pir_reg *reg;
+    } s;
 
-   /* int            color; */         /* for register allocation; -1 means no reg. allocated. */
     target_flag    flags;          /* flags like :slurpy etc. */
     char const    *alias;          /* if this is a named parameter, this is the alias */
     char const    *lex_name;       /* if this is a lexical, this field contains the name */
     struct key    *key;            /* the key of this target, i.e. $P0[$P1], $P1 is key. */
-
-
-    struct symreg *syminfo;
 
     struct target *next;
 
@@ -379,7 +370,7 @@ argument *set_curarg(struct lexer_state * const lexer, argument * const arg);
 /* target constructors */
 target *add_target(struct lexer_state * const lexer, target *t1, target * const t);
 target *new_reg(struct lexer_state * const lexer, pir_type type, int regno);
-target *new_target(struct lexer_state * const lexer, pir_type type, char const * const name);
+target *new_target(struct lexer_state * const lexer, pir_type type);
 
 /* set a key on a target node */
 void set_target_key(target * const t, key * const k);
@@ -391,8 +382,6 @@ void set_invocation_args(invocation * const inv, argument * const args);
 void set_invocation_results(invocation * const inv, target * const results);
 
 /* conversion functions that wrap their arguments into a target node */
-target *target_from_string(struct lexer_state * const lexer, char const * const str);
-target *target_from_ident(struct lexer_state * const lexer, pir_type type, char const * const id);
 target *target_from_symbol(struct lexer_state * const lexer, struct symbol * const sym);
 
 /* management functions for key nodes */

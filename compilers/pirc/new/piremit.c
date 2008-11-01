@@ -97,7 +97,14 @@ printed as well. Examples:
 void
 print_target(lexer_state *lexer, target * const t) {
 
-    fprintf(out, "%c%d", pir_register_types[t->syminfo->type], t->syminfo->color);
+    if (TEST_FLAG(t->flags, TARGET_FLAG_IS_REG)) {
+        if (t->s.reg == NULL)
+            fprintf(stderr, "reg target has no pir_reg ptr!\n");
+
+        fprintf(out, "%c%d", pir_register_types[t->s.reg->type], t->s.reg->color);
+    }
+    else
+        fprintf(out, "%c%d", pir_register_types[t->s.sym->type], t->s.sym->color);
 
     /* if the target has a key, print that too */
     if (t->key)

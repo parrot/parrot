@@ -22,19 +22,14 @@
 #include "pirregalloc.h"
 
 
-/* core of any symbolic object in PIR: it has a PASM register, a type, and a live interval */
-typedef struct symreg {
+
+/* structure to represent a declared local variable or parameter */
+typedef struct symbol {
     int            color;
     pir_type       type;
     live_interval *interval;
 
-} symreg;
-
-
-/* structure to represent a declared local variable or parameter */
-typedef struct symbol {
-    char    const *name;  /* name of this symbol */
-    symreg         syminfo;
+    char const    *name;  /* name of this symbol */
     target_flag    flags;
 
     struct symbol *next;
@@ -44,8 +39,11 @@ typedef struct symbol {
 
 /* structure to represent a PIR register. */
 typedef struct pir_reg {
-    int             regno; /* symbolic (PIR) register number */
-    symreg          syminfo;
+    int            color;
+    pir_type       type;
+    live_interval *interval;
+
+    int            regno; /* symbolic (PIR) register number */
 
     struct pir_reg *next;
 
