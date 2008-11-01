@@ -191,6 +191,16 @@ l    pttl  #  unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,cons
 v    t     #  void mysql_debug(const char *debug)
 # --- end mysqlclient library ---
 
+# My mysql does not fit with the previous section
+p    pttttitl
+#  MYSQL * mysql_real_connect(MYSQL *mysql, const char *host,
+#                               const char *user,
+#                               const char *passwd,
+#                               const char *db,
+#                               unsigned int port,
+#                               const char *unix_socket,
+#                               unsigned long clientflag)
+
 # Used by library/pcre.pir
 p    tiB3P
 p    tip3P
