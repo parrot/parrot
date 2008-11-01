@@ -307,8 +307,6 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
             STRING *j = CONST_STRING(interp, ";");
             STRING *res;
 
-            Parrot_block_GC_mark(interp);
-
             /* 
              * When running with -t4, the invoke done in
              * Parrot_ns_get_name stomps on settings in interp; we
@@ -323,6 +321,8 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
             PMC      *params_signature  = interp->params_signature;
             PMC      *returns_signature = interp->returns_signature;
 
+            Parrot_block_GC_mark(interp);
+
             ns_array = Parrot_ns_get_name(interp, s->namespace_stash);
 
             /* Restore stuff that might have got overwritten */
@@ -333,7 +333,6 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
             interp->args_signature = args_signature;
             interp->params_signature = params_signature;
             interp->returns_signature = returns_signature;
-
 
             if (s->name)
                 VTABLE_push_string(interp, ns_array, s->name);
