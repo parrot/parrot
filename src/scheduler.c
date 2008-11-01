@@ -494,7 +494,7 @@ Parrot_cx_delete_handler_local(PARROT_INTERP, ARGIN(STRING *handler_type))
         /* Loop from newest handler to oldest handler. */
         INTVAL index;
         const INTVAL elements = VTABLE_elements(interp, handlers);
-        typedef enum Htype { Hunknown,  Hexception, Hevent };
+        typedef enum { Hunknown,  Hexception, Hevent } Htype;
         const Htype htype =
             (string_equal(interp, handler_type, CONST_STRING(interp, "exception")) == 0) ?
             Hexception :
