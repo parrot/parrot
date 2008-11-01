@@ -483,7 +483,6 @@ void
 Parrot_cx_delete_handler_local(PARROT_INTERP, ARGIN(STRING *handler_type))
 {
     PMC *handlers  = CONTEXT(interp)->handlers;
-    INTVAL elements, index;
 
     if (PMC_IS_NULL(handlers))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -491,27 +490,46 @@ Parrot_cx_delete_handler_local(PARROT_INTERP, ARGIN(STRING *handler_type))
 
     if (STRING_IS_NULL(handler_type) || STRING_IS_EMPTY(handler_type))
         VTABLE_shift_pmc(interp, handlers);
+    else {
+        /* Loop from newest handler to oldest handler. */
+        INTVAL index;
+        const INTVAL elements = VTABLE_elements(interp, handlers);
+        typedef enum Htype { Hunknown,  Hexception, Hevent };
+        const Htype htype =
+            (string_equal(interp, handler_type, CONST_STRING(interp, "exception")) == 0) ?
+            Hexception :
+            (string_equal(interp, handler_type, CONST_STRING(interp, "event")) == 0) ?
+                Hevent :
+                Hunknown;
+        STRING * const handler_name = (htype == Hexception) ?
+            CONST_STRING(interp, "ExceptionHandler") :
+            (STRING *) NULL;
 
-    /* Loop from newest handler to oldest handler. */
-    elements = VTABLE_elements(interp, handlers);
-    for (index = 0; index < elements; ++index) {
-        PMC *handler = VTABLE_get_pmc_keyed_int(interp, handlers, index);
-        if (!PMC_IS_NULL(handler)) {
-            if (string_equal(interp, handler_type, CONST_STRING(interp, "exception")) == 0
-                        && VTABLE_isa(interp, handler, CONST_STRING(interp, "ExceptionHandler"))) {
-                VTABLE_set_pmc_keyed_int(interp, handlers, index, PMCNULL);
-                return;
+        for (index = 0; index < elements; ++index) {
+            PMC *handler = VTABLE_get_pmc_keyed_int(interp, handlers, index);
+            if (!PMC_IS_NULL(handler)) {
+                switch (htype) {
+                    case Hexception:
+                        if (VTABLE_isa(interp, handler, handler_name)) {
+                            VTABLE_set_pmc_keyed_int(interp, handlers, index, PMCNULL);
+                            return;
+                        }
+                        break;
+                    case Hevent:
+                        if (handler->vtable->base_type == enum_class_EventHandler) {
+                            VTABLE_set_pmc_keyed_int(interp, handlers, index, PMCNULL);
+                            return;
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
-            else if (string_equal(interp, handler_type, CONST_STRING(interp, "event")) == 0
-                        && handler->vtable->base_type == enum_class_EventHandler) {
-                VTABLE_set_pmc_keyed_int(interp, handlers, index, PMCNULL);
-                return;
-           }
         }
-    }
 
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-        "No handler to delete.");
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_INVALID_OPERATION, "No handler to delete.");
+    }
 }
 
 
