@@ -31,7 +31,7 @@ language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'require & version' );
 require "lpeg"
 print(lpeg.version())
 CODE
-0.8
+0.9
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'lpeg.P"str"' );

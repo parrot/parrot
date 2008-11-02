@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-lib/lpeg.pir - Parsing Expression Grammar for Lua, version 0.8
+lib/lpeg.pir - Parsing Expression Grammar for Lua, version 0.9
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,7 @@ See on L<http://www.inf.puc-rio.br/~roberto/lpeg.html#intro>
     set_hll_global 'luaopen_lpeg', entry
 .end
 
-.const string VERSION = '0.8'
+.const string VERSION = '0.9'
 .const string PATTERN_T = 'pattern'
 
 .sub 'luaopen_lpeg'
@@ -48,9 +48,11 @@ See on L<http://www.inf.puc-rio.br/~roberto/lpeg.html#intro>
     $P2 = split "\n", <<'LIST'
 match
 print
+locale
 C
-Ca
+Cf
 Cc
+Cg
 Cp
 Cb
 Carg
@@ -96,32 +98,26 @@ LIST
 .const int IAny = 0
 .const int IChar = 1
 .const int ISet = 2
-.const int IZSet = 3
-.const int ITestAny = 4
-.const int ITestChar = 5
-.const int ITestSet = 6
-.const int ITestZSet = 7
-.const int ISpan = 8
-.const int ISpanZ = 9
-.const int IRet = 10
-.const int IEnd = 11
-.const int IChoice = 12
-.const int IJmp = 13
-.const int ICall = 14
-.const int IOpenCall = 15
-.const int ICommit = 16
-.const int IPartialCommit = 17
-.const int IBackCommit = 18
-.const int IFailTwice = 19
-.const int IFail = 20
-.const int IGiveup = 21
-.const int IFunc = 22
-.const int IFullCapture = 23
-.const int IEmptyCapture = 24
-.const int IEmptyCaptureIdx = 25
-.const int IOpenCapture = 26
-.const int ICloseCapture = 27
-.const int ICloseRunTime = 28
+.const int ISpan = 3
+.const int IRet = 4
+.const int IEnd = 5
+.const int IChoice = 6
+.const int IJmp = 7
+.const int ICall = 8
+.const int IOpenCall = 9
+.const int ICommit = 10
+.const int IPartialCommit = 11
+.const int IBackCommit = 12
+.const int IFailTwice = 13
+.const int IFail = 14
+.const int IGiveup = 15
+.const int IFunc = 16
+.const int IFullCapture = 17
+.const int IEmptyCapture = 18
+.const int IEmptyCaptureIdx = 19
+.const int IOpenCapture = 20
+.const int ICloseCapture = 21
+.const int ICloseRunTime = 22
 
 # kinds of captures
 .const int Cclose = 0
@@ -135,8 +131,9 @@ LIST
 .const int Cquery = 8
 .const int Cstring = 9
 .const int Csubst = 10
-.const int Caccum = 11
+.const int Cfold = 11
 .const int Cruntime = 12
+.const int Cgroup = 13
 
 
 .sub 'newpatt' :anon
@@ -221,7 +218,7 @@ LIST
     $I0 = - n
     unless $I0 <= 255 goto L5
     (res, $P0) = newpatt(2)
-    $P0.'setinstaux'(0, ITestAny, 2, $I0)
+    $P0.'setinstaux'(0, IAny, 2, $I0)
     $P0.'setinst'(1, IFail, 0)
     goto L2
   L5:
@@ -229,7 +226,7 @@ LIST
     $I0 -= 255
     (res, $P0, offset) = any($I0, 3, 2)
     $I1 = offset + 1
-    $P0.'setinstaux'(0, ITestAny, $I1, 255)
+    $P0.'setinstaux'(0, IAny, $I1, 255)
     $P0.'setinstaux'(1, IFailTwice, offset, 255)
     $P0.'setinst'(offset, IFailTwice, 0)
     goto L2
@@ -412,11 +409,13 @@ rules:
 * If the argument is a string, it is translated to a pattern that matches
 literally the string.
 
-* If the argument is a number, it is translated as follows. A non-negative
-number I<n> gives a pattern that matches exactly I<n> characters; a negative
-number I<-n> gives a pattern that succeeds only if the input string does not
-have I<n> characters. It is (as expected) equivalent to the unary minus
-operation (see below) applied over the absolute value of I<n>.
+* If the argument is a non-negative number I<n>, the result is a pattern
+that matches exactly I<n> characters.
+
+* If the argument is a negative number I<-n>, the result is a pattern
+that succeeds only if the input string does not have I<n> characters:
+It is equivalent to the unary minus operation applied over the pattern
+corresponding to the (non-negative) value I<n>.
 
 * If the argument is a boolean, the result is a pattern that always succeeds
 or always fails (according to the boolean value), without consuming any input.
@@ -426,9 +425,6 @@ L</Grammars>).
 
 * If the argument is a function, returns a pattern equivalent to a match-time
 capture over the empty string.
-
-If the function is called with parameters I<s> and I<i>, its result is valid
-if it is in the range I<[i, len(s) + 1]>.
 
 NOT YET IMPLEMENTED (see getpatt).
 
@@ -483,6 +479,7 @@ NOT YET IMPLEMENTED.
     $S1 = lua_checkstring(1, str)
     $I1 = length $S1
     unless $I1 == 1 goto L1
+    # a unit set is equivalent to a literal
     $P1 = getpatt(1, str)
     .return ($P1)
   L1:
@@ -517,11 +514,42 @@ NOT YET IMPLEMENTED.
 .end
 
 
+=item C<locale ([table])>
+
+Returns a table with patterns for matching some character classes according
+to the current locale. The table has fields named C<alnum>, C<alpha>,
+C<cntrl>, C<digit>, C<graph>, C<lower>, C<print>, C<punct>, C<space>,
+C<upper>, and C<xdigit>, each one containing a correspondent pattern.
+Each pattern matches any single character that belongs to its class.
+
+If called with an argument C<table>, then it creates those fields inside the
+given table and returns that table.
+
+NOT YET IMPLEMENTED.
+
+=cut
+
+.sub 'locale'
+    .param pmc t :optional
+    .param pmc extra :slurpy
+    if null t goto L1
+    $I0 = isa t, 'LuaNil'
+    unless $I0 goto L2
+  L1:
+    new t, 'LuaTable'
+    goto L3
+  L2:
+    lua_checktype(1, t, 'table')
+  L3:
+    not_implemented()
+    .return (t)
+.end
+
 =item C<#patt>
 
-Returns a pattern equivalent to I<&patt> in the original PEG notation.
-This is a pattern that matches only if the input string does match C<patt>,
+Returns a pattern that matches only if the input string matches C<patt>,
 but without consuming any input, independently of success or failure.
+(This pattern is equivalent to I<&patt> in the original PEG notation.)
 
 When it succeeds, C<#patt> produces all captures produced by C<patt>.
 
@@ -539,24 +567,24 @@ NOT YET IMPLEMENTED.
 
 =item C<-patt>
 
-Returns a pattern equivalent to I<!patt> in the original PEG notation.
-This pattern matches only if the input string does not match C<patt>.
-It does not consume any input, independently of success or failure.
+Returns a pattern that matches only if the input string does not match
+C<patt>. It does not consume any input, independently of success or failure.
+(This pattern is equivalent to I<!patt> in the original PEG notation.)
 
-As an example, the pattern C<-1> matches only the end of string.
+As an example, the pattern C<-lpeg.P(1)> matches only the end of string.
 
-This pattern never produces any captures, because either C<patt> fails
-or C<-patt> fails. (A failing pattern produces no captures.)
+This pattern never produces any captures, because either C<patt> fails or
+C<-patt> fails. (A failing pattern never produces captures.)
 
-NOT YET IMPLEMENTED (see __sub).
+NOT YET IMPLEMENTED.
 
 =cut
 
 .sub '__unm' :method
     .param pmc patt
-    new $P0, 'LuaString'
-    set $P0, ''
-    .return __sub($P0, patt)
+    ($P1, $P0) = getpatt(1, patt)
+    $I1 = $P0
+    not_implemented()
 .end
 
 
@@ -565,7 +593,7 @@ NOT YET IMPLEMENTED (see __sub).
 Returns a pattern equivalent to an I<ordered choice> of C<patt1> and C<patt2>.
 (This is denoted by I<patt1 / patt2> in the original PEG notation, not to be
 confused with the C</> operation in LPeg.) It matches either C<patt1> or
-C<patt2> (with no backtracking once one of them succeeds). The identity
+C<patt2>, with no backtracking once one of them succeeds. The identity
 element for this operation is the pattern C<lpeg.P(false)>, which always fails.
 
 If both C<patt1> and C<patt2> are character sets, this operation is equivalent
@@ -646,6 +674,10 @@ I<patt+>, and C<patt^-1> is equivalent to I<patt?> in the original PEG notation.
 
 In all cases, the resulting pattern is greedy with no backtracking. That is,
 it matches only the longest possible sequence of matches for C<patt>.
+
+In all cases, the resulting pattern is greedy with no backtracking (also
+called a I<possessive> repetition). That is, it matches only the longest
+possible sequence of matches for C<patt>.
 
 NOT YET IMPLEMENTED.
 
@@ -732,14 +764,6 @@ what values are produced.
     not_implemented()
 .end
 
-.sub 'emptycap_aux' :anon
-    .param pmc n
-    .param int kind
-    .param string msg
-    $I1 = lua_checknumber(1, n)
-    not_implemented()
-.end
-
 
 =item C<lpeg.C (patt)>
 
@@ -758,83 +782,42 @@ NOT YET IMPLEMENTED (see capture_aux).
 .end
 
 
-=item C<lpeg.Ca (patt)>
-
-Creates an I<accumulator capture>. This capture assumes that C<patt> should
-produce at least one captured value of any kind, which becomes the initial
-value of an I<accumulator>. Pattern C<patt> then may produce zero or more
-I<function captures>. Each of these functions in these captures is called
-having the accumulator as its first argument (followed by any other arguments
-provided by its own pattern), and the value returned by the function becomes
-the new value of the accumulator. The final value of this accumulator is the
-sole result of the whole capture.
-
-As an example, the following pattern matches a list of numbers separated by
-commas and returns their addition:
-
- -- matches a numeral and captures its value
- local number = lpeg.R"09"^1 / tonumber
- --
- -- auxiliary function to add two numbers
- local function add (acc, newvalue) return acc + newvalue end
- --
- list = lpeg.Ca(number * ("," * number / add)^0)
- --
- -- example of use
- print(list:match("10,30,43"))   --> 83
-
-NOT YET IMPLEMENTED (see capture_aux).
-
-=cut
-
-.sub 'Ca'
-    .param pmc patt :optional
-    .param pmc extra :slurpy
-    .return capture_aux(patt, Caccum, 0)
-.end
-
-
 =item C<lpeg.Carg (n)>
 
 Creates an I<argument capture>. This pattern matches the empty string and
 produces the value given as the nth extra argument given in the call to
 C<lpeg.match>.
 
-NOT YET IMPLEMENTED (see emptycap_aux).
+NOT YET IMPLEMENTED.
 
 =cut
 
 .sub 'Carg'
     .param pmc n :optional
     .param pmc extra :slurpy
-    .return emptycap_aux(n, C_arg, "invalid argument index")
+    $I1 = lua_checknumber(1, n)
+    not_implemented()
 .end
 
 
-=item C<lpeg.Cb (n)>
+=item C<lpeg.Cb (name)>
 
 Creates a I<back capture>. This pattern matches the empty string and produces
-the values produced by the nth previous capture.
+the values produced by the I<most recent> group capture named C<name>.
 
-Captures are numbered dynamically. So, the first previous capture is the last
-capture to match before the current one. The numbering includes only complete
-captures; so, if the back capture is inside another capture, this enclosing
-capture is ignored (because it is not complete when the back capture is seen).
-Numbering does not count nested captures. Numbering counts captures, not the
-values produced by them; it does not matter whether a capture produces zero
-or many values, it counts as one.
+I<Most recent> means the last I<complete outermost> group capture with the
+given name. A I<Complete> capture means that the entire pattern corresponding
+to the capture has matched. An I<Outermost> capture means that the capture
+is not inside another complete capture.
 
-B<This is an experimental feature. It probably will be changed or even removed
-in future releases.>
-
-NOT YET IMPLEMENTED (see emptycap_aux).
+NOT YET IMPLEMENTED.
 
 =cut
 
 .sub 'Cb'
-    .param pmc n :optional
+    .param pmc name :optional
     .param pmc extra :slurpy
-    .return emptycap_aux(n, Cbackref, "invalid back reference")
+    not_implemented()
 .end
 
 
@@ -850,6 +833,84 @@ NOT YET IMPLEMENTED.
 .sub 'Cc'
     .param pmc vararg :optional
     not_implemented()
+.end
+
+
+=item C<lpeg.Cf (patt, func)>
+
+Creates an I<fold capture>. If C<patt> produces a list of captures
+I<C1 C2 ... Cn>, this capture will produce the value
+I<func(...func(func(C1, C2), C3)..., Cn)>, that is, it will I<fold>
+(or I<accumulate>, or I<reduce>) the captures from C<patt> using function
+<func>.
+
+This capture assumes that C<patt> should produce at least one capture with
+at least one value (of any type), which becomes the initial value of an
+I<accumulator>. (If you need a specific initial value, you may prefix a
+constant capture to C<patt>.) For each subsequent capture LPeg calls C<func>
+with this accumulator as the first argument and all values produced by the
+capture as extra arguments; the value returned by this call becomes the new
+value for the accumulator. The final value of the accumulator becomes the
+captured value.
+
+As an example, the following pattern matches a list of numbers separated by
+commas and returns their addition:
+
+ -- matches a numeral and captures its value
+ number = lpeg.R"09"^1 / tonumber
+ --
+ -- matches a list of numbers, captures their values
+ list = number * ("," * number)^0
+ --
+ -- auxiliary function to add two numbers
+ function add (acc, newvalue) return acc + newvalue end
+ --
+ -- folds the list of numbers adding them
+ sum = lpeg.Cf(list, add)
+ --
+ -- example of use
+ print(sum:match("10,30,43"))   --> 83
+
+NOT YET IMPLEMENTED (see capture_aux).
+
+=cut
+
+.sub 'Cf'
+    .param pmc patt :optional
+    .param pmc func :optional
+    .param pmc extra :slurpy
+    lua_checktype(2, func, 'function')
+    .return capture_aux(patt, Cfold, 0)
+.end
+
+
+=item C<lpeg.Cg (patt [, name])>
+
+Creates a I<group capture>. It groups all values returned by C<patt> into a
+single capture. The group may be anonymous (if no name is given) or named with
+the given name.
+
+An anonymous group serves to join values from several captures into a single
+capture. A named group has a different behavior. In most situations, a named
+group returns no values at all. Its values are only relevant for a following
+back capture or when used inside a table capture.
+
+NOT YET IMPLEMENTED (see capture_aux).
+
+=cut
+
+.sub 'Cg'
+    .param pmc patt :optional
+    .param pmc name :optional
+    .param pmc extra :optional
+    if null name goto L1
+    $I0 = isa name, 'LuaNil'
+    unless $I0 goto L2
+  L1:
+    .return capture_aux(patt, Cgroup, 0)
+  L2:
+    lua_checkstring(2, name)
+    .return capture_aux(patt, Cgroup, 2)
 .end
 
 
@@ -872,10 +933,10 @@ NOT YET IMPLEMENTED.
 =item C<lpeg.Cs (patt)>
 
 Creates a I<substitution capture>, which captures the substring of the subject
-that matches C<patt>, with I<substitutions>. For any capture inside C<patt>,
-the substring that matched the capture is replaced by the capture value (which
-should be a string). The capture values from C<patt> are not returned
-independently (only as substrings in the resulting string).
+that matches C<patt>, with I<substitutions>. For any capture inside C<patt>
+with a value, the substring that matched the capture is replaced by the capture
+value (which should be a string). The final captured value is the string
+resulting from all replacements.
 
 NOT YET IMPLEMENTED (see capture_aux).
 
@@ -890,11 +951,11 @@ NOT YET IMPLEMENTED (see capture_aux).
 
 =item C<lpeg.Ct (patt)>
 
-Creates a I<table capture>. This capture creates a table and puts all captures
-made by C<patt> inside this table in successive integer keys, starting at 1.
-
-The captured value is only this table. The captures made by C<patt> are not
-returned independently (only as table elements).
+Creates a I<table capture>. This capture creates a table and puts all values
+from all anonymous captures made by C<patt> inside this table in successive
+integer keys, starting at 1. Moreover, for each named capture group created by
+C<patt>, the first value of the group is put into the table with the group
+name as its key. The captured value is only the table.
 
 NOT YET IMPLEMENTED (see capture_aux).
 
@@ -913,26 +974,23 @@ Creates a I<string capture>. It creates a capture string based on C<string>.
 The captured value is a copy of C<string>, except that the character C<%>
 works as an escape character: any sequence in C<string> of the form I<%n>,
 with I<n> between 1 and 9, stands for the match of the I<n>-th capture in
-C<patt>. (Currently these nested captures can be only simple captures.)
-The sequence C<%0> stands for the whole match.
-The sequence C<%%> stands for a single C<%>.
+C<patt>. The sequence C<%0> stands for the whole match. The sequence C<%%>
+stands for a single C<%>.
 
 =item C<patt / table>
 
-Creates a I<query capture>. It indexes the given table using as key the value
-of the first capture of C<patt>, or the whole match if C<patt> made no capture.
+Creates a I<query capture>. It indexes the given table using as key the first
+value captured by C<patt>, or the whole match if C<patt> produced no value.
 The value at that index is the final value of the capture. If the table does
-not have that key, there is no captured value. Everything works as if there
-was no capture.
+not have that key, there is no captured value.
 
 =item C<patt / function>
 
 Creates a I<function capture>. It calls the given function passing all
 captures made by C<patt> as arguments, or the whole match if C<patt> made
 no capture. The values returned by the C<function> are the final values
-of the capture. (This capture may create multiple values.) In particular,
-if function returns no value, there is no captured value; everything works
-as if there was no capture.
+of the capture. In particular, if C<function> returns no value, there is
+no captured value.
 
 NOT YET IMPLEMENTED (see capture_aux).
 
