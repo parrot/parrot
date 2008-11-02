@@ -715,6 +715,7 @@ examples/nci/xlibtest.p6                                    [main]doc
 examples/nci/xlibtest.pir                                   [main]doc
 examples/nci/xlibtest.rb                                    [main]doc
 examples/opengl/shapes.pir                                  [main]doc
+examples/opengl/static-triangle.pir                         [main]doc
 examples/opengl/triangle.pir                                [main]doc
 examples/pasm/cat.pasm                                      [main]doc
 examples/pasm/fact.pasm                                     [main]doc
