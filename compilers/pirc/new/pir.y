@@ -558,7 +558,10 @@ macro             : macro_header '(' macro_parameters ')' "\n"
                   ;
 
 macro_header      : ".macro" identifier
-                        { new_macro(lexer->macros, $2, yypirget_lineno(yyscanner), TRUE); }
+                        {
+                          new_macro(lexer->macros, $2, yypirget_lineno(yyscanner), TRUE,
+                                    lexer->macro_size);
+                        }
                   ;
 
 macro_parameters  : /* empty */
@@ -882,8 +885,8 @@ keylist_assignment: keylist '=' expression
                           * an identifier; get the name, and check its type.
                           */
                          char const * const instr = CURRENT_INSTRUCTION(lexer)->opname;
-                         symbol *sym        = find_symbol(lexer, instr);
-                         target *obj;
+                         symbol     *       sym   = find_symbol(lexer, instr);
+                         target     *       obj;
 
                          /* find the symbol for the object being indexed;
                           * it must have been declared.
@@ -1001,6 +1004,7 @@ parrot_op_assign  : target '=' parrot_op op_arg_expr ',' parrot_op_args
                           unshift_operand(lexer, expr_from_target(lexer, $1));
                           if (check_op_args_for_symbols(yyscanner))
                               check_first_arg_direction(yyscanner, $3);
+                              /* no strength reduction here */
                         }
                   ;
 
@@ -1260,7 +1264,7 @@ conditional_instr : if_unless "null" TK_IDENT "goto" identifier
                           istrue = $1 ? !istrue : istrue;
                           if (istrue) {
                               set_instrf(lexer, "branch", "%I", $4);
-                              set_instr_flag(lexer, INSTR_FLAG_BRANCH);
+                              set_op_labelflag(lexer, BIT(1));
                           }
                           else
                               set_instr(lexer, "noop");
@@ -1302,7 +1306,7 @@ conditional_instr : if_unless "null" TK_IDENT "goto" identifier
 
                              push_operand(lexer, expr_from_ident(lexer, $4));
 
-                             set_instr_flag(lexer, INSTR_FLAG_ISXX);
+                             set_op_labelflag(lexer, BIT(2));
                           }
                           else { /* evaluation during compile time */
                              /* if the result was false but the instr. was "unless", or,
@@ -1312,7 +1316,7 @@ conditional_instr : if_unless "null" TK_IDENT "goto" identifier
                              if (($2 == FALSE && $1 == NEED_INVERT_OPNAME)/* unless false -> jump */
                              ||  ($2 == TRUE  && $1 == DONT_INVERT_OPNAME)) {  /* if true -> jump */
                                 set_instrf(lexer, "branch", "%I", $4);
-                                set_instr_flag(lexer, INSTR_FLAG_BRANCH);
+                                set_op_labelflag(lexer, BIT(1));
                              }
                              else                       /* if false, unless true --> do nothing */
                                 set_instr(lexer, "noop");
@@ -1404,7 +1408,7 @@ then              : "goto" /* PIR mode */
 goto_stat         : "goto" identifier "\n"
                         {
                           set_instrf(lexer, "branch", "%I", $2);
-                          set_instr_flag(lexer, INSTR_FLAG_BRANCH);
+                          set_op_labelflag(lexer, BIT(1));
                           get_opinfo(yyscanner);
                         }
                   ;
@@ -1442,7 +1446,7 @@ lex_decl          : ".lex" TK_STRINGC ',' pmc_object "\n"
 
                               if ($4->s.sym->type != PMC_TYPE) /* a .lex must be a PMC */
                                   yypirerror(yyscanner, lexer, "lexical '%s' must be of type 'pmc'",
-                                          $4->s.sym->name);
+                                             $4->s.sym->name);
                           }
                           set_lex_flag($4, $2);
                         }
@@ -2637,7 +2641,7 @@ create_if_instr(yyscan_t yyscanner, NOTNULL(lexer_state * const lexer), int inve
         set_instrf(lexer, invert ? "unless" : "if", "%T%I", target_from_symbol(lexer, sym), label);
 
     /* set a flag on this instruction */
-    set_instr_flag(lexer, INSTR_FLAG_IFUNLESS);
+    set_op_labelflag(lexer, BIT(2));
 }
 
 /*
@@ -3348,7 +3352,7 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
              */
             symbol *sym = find_symbol(lexer, operand->expr.id);
             if (sym) {
-                operand->expr.t        = new_target(lexer, sym->type);
+                operand->expr.t        = new_target(lexer);
                 operand->expr.t->s.sym = sym;  /* target's pointer set to symbol */
                 operand->type          = EXPR_TARGET; /* convert operand node into EXPR_TARGET */
             }
@@ -3397,8 +3401,10 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
                     return FALSE;
                 }
             }
-            else
-                fprintf(stderr, "operand %d is expected to be a label\n", i);
+            else { /* operand i is a label. */
+                /* fprintf(stderr, "operand %d is expected to be a label\n", i); */
+
+            }
 
             iter = iter->next;
             ++i;

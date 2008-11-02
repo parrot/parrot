@@ -244,17 +244,28 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
 
         if (STREQ(sym->name, name)) {
             if (sym->color == -1) { /* no PASM register assigned yet */
+
+                /* get a new reg from vanilla reg. allocator */
                 sym->color = next_register(lexer, sym->type);
 
                 /* create a new live_interval for this symbol, and enter it into the list */
                 PARROT_ASSERT(sym->interval == NULL);
-                sym->interval = new_live_interval(lexer->lsr, lexer->instr_counter, sym->type);
+
+                /* use the current line number for interval start/end points; the instruction
+                 * counter may not be updated yet, so that counter is less suitable.
+                 */
+                sym->interval = new_live_interval(lexer->lsr, yypirget_lineno(lexer->yyscanner),
+                                                  sym->type);
 
                 sym->interval->color = &sym->color;
+
+                if (TEST_FLAG(sym->flags, TARGET_FLAG_UNIQUE_REG)) {
+                    SET_FLAG(sym->interval->flags, INTERVAL_FLAG_UNIQUE_REG);
+                }
             }
             else {
                 /* update end point of interval */
-                sym->interval->endpoint = lexer->instr_counter;
+                sym->interval->endpoint = yypirget_lineno(lexer->yyscanner);
             }
 
             if (TEST_FLAG(lexer->flags, LEXER_FLAG_VERBOSE))

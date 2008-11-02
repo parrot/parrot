@@ -35,7 +35,7 @@ typedef enum lexer_flags {
     LEXER_FLAG_PREPROCESS          = 1 << 4, /* preprocess code only */
     LEXER_FLAG_HEREDOCONLY         = 1 << 5, /* preprocess heredocs only */
     LEXER_FLAG_NOOUTPUT            = 1 << 6, /* don't print anything on success, except 'ok' */
-    LEXER_FLAG_REGALLOC            = 1 << 7
+    LEXER_FLAG_REGALLOC            = 1 << 7  /* use register allocation optimizer */
 
 } lexer_flags;
 
@@ -77,7 +77,9 @@ typedef void * yyscan_t;
 
 #endif
 
-
+/* macros can store up to 4K characters, after which the buffer must be resized.
+ */
+#define INIT_MACRO_SIZE     4096
 
 
 /* store the "globals" of the lexer in a structure which is passed around.
@@ -130,6 +132,7 @@ typedef struct lexer_state {
     int                       num_digits;    /* keep track of number of digits needed for id_gen */
     int                       id_gen;        /* for generating unique identifiers */
     int                       unique_id;     /* current unique id */
+    unsigned                  macro_size;    /* initial macro body buffr size */
 
     struct yy_buffer_state   *buffer;  /* for saving buffer state when scanning a .macro_const */
 

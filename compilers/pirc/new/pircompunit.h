@@ -65,13 +65,6 @@ typedef enum arg_flags {
 
 } arg_flag;
 
-/* instruction flags */
-typedef enum instr_flags {
-    INSTR_FLAG_BRANCH   = 1 << 0,  /* unconditional branch instruction */
-    INSTR_FLAG_IFUNLESS = 1 << 1,  /* conditional branch instruction */
-    INSTR_FLAG_ISXX     = 1 << 2   /* isXX variant of conditional branch instruction */
-
-} instr_flag;
 
 /* sub flags */
 typedef enum sub_flags {
@@ -249,7 +242,7 @@ typedef struct instruction {
     char         const *label;        /* label of this instruction */
     char         const *opname;       /* name of the instruction, such as "print" and "set" */
     expression         *operands;     /* operands like "$I0" and "42" in "set $I0, 42" */
-    int                 flags;        /* XXX used for checking if this op jumps */
+    int                 oplabelbits;
     struct op_info_t   *opinfo;       /* pointer to the op_info containing this op's meta data */
     int                 opcode;       /* the opcode of one of this op */
 
@@ -370,7 +363,7 @@ argument *set_curarg(struct lexer_state * const lexer, argument * const arg);
 /* target constructors */
 target *add_target(struct lexer_state * const lexer, target *t1, target * const t);
 target *new_reg(struct lexer_state * const lexer, pir_type type, int regno);
-target *new_target(struct lexer_state * const lexer, pir_type type);
+target *new_target(struct lexer_state * const lexer);
 
 /* set a key on a target node */
 void set_target_key(target * const t, key * const k);
@@ -433,7 +426,7 @@ int is_parrot_op(struct lexer_state * const lexer, char const * const name);
 
 void close_sub(struct lexer_state * const lexer);
 void fixup_global_labels(struct lexer_state * const lexer);
-void set_instr_flag(struct lexer_state * const lexer, instr_flag flag);
+void set_op_labelflag(struct lexer_state * const lexer, int flag);
 void convert_inv_to_instr(struct lexer_state * const lexer, invocation * const inv);
 
 void generate_get_params(struct lexer_state * const lexer);

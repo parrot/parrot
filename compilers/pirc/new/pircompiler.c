@@ -178,9 +178,11 @@ new_lexer(NULLOK(char * const filename), int flags) {
     init_hashtable(lexer, &lexer->constants, HASHTABLE_SIZE_INIT);
 
     /* create a new symbol table for macros XXX why not a hashtable? XXX */
-    lexer->macros = new_macro_table(NULL);
+    lexer->macros     = new_macro_table(NULL);
+    lexer->macro_size = INIT_MACRO_SIZE;
 
-    lexer->lsr    = new_linear_scan_register_allocator();
+    /* create a new linear scan register allocator */
+    lexer->lsr        = new_linear_scan_register_allocator();
 
     return lexer;
 }

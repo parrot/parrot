@@ -4,15 +4,13 @@
  */
 
 #include <stdarg.h>
+#include <string.h>
 #include "pirmacro.h"
 #include "pircompiler.h"
 #include "pirmacro.h"
 #include "parrot/parrot.h"
 
-/* macros can store up to 4K characters, after which the buffer must be resized.
- * XXX make this configurable through a commandline option?
- */
-#define INIT_MACRO_SIZE     4096
+
 
 /*
 
@@ -45,14 +43,19 @@ Create a new macro definition node and store it in the macro_table C<table>
 PARROT_MALLOC
 PARROT_IGNORABLE_RESULT
 macro_def *
-new_macro(macro_table * const table, char const * const name, int lineno, int takes_args) {
+new_macro(macro_table * const table, char const * const name, int lineno, int takes_args,
+          unsigned initsize)
+{
     macro_def *macro   = (macro_def *)mem_sys_allocate(sizeof (macro_def));
 
     macro->name        = name;
     macro->linedefined = lineno;
     macro->takes_args  = takes_args;
-    macro->body        = (char *)mem_sys_allocate_zeroed(sizeof (char) * INIT_MACRO_SIZE);
-    macro->buffersize  = INIT_MACRO_SIZE;
+
+    if (initsize) /* only call allocate function if initsize != zero */
+        macro->body    = (char *)mem_sys_allocate_zeroed(sizeof (char) * initsize);
+
+    macro->buffersize  = initsize;
     macro->cursor      = macro->body;
     /* link the macro in the list */
     macro->next        = table->definitions;
@@ -117,7 +120,10 @@ void
 new_macro_const(macro_table * const table, char const * const name, char const * const value,
                       int lineno)
 {
-    macro_def *def     = new_macro(table, name, lineno, FALSE);
+    /* macro constants are just macros, but they have no body; the value is already
+     * parsed and allocated in memory.
+     */
+    macro_def *def     = new_macro(table, name, lineno, FALSE, 0);
     /* XXX is this cast from const * const to const * dangerous? */
     def->body          = (char *)value;
 }
@@ -136,12 +142,18 @@ if not, then the buffer is doubled in size.
 */
 static void
 check_size(macro_def * const macro, unsigned length) {
-   unsigned used = macro->cursor - macro->body;
+    unsigned used = macro->cursor - macro->body;
     if (used + length >= macro->buffersize) {
-
-        /* XXX do the resize */
-
-        macro->buffersize <<= 1; /* double the size (moving all bits left by 1 means doubling) */
+        unsigned  newsize = macro->buffersize << 1;
+        char     *newbuffer;
+         /* double the size (moving all bits left by 1 means doubling) */
+        newbuffer = (char *)mem_sys_allocate(sizeof (char) * macro->buffersize);
+        memcpy(newbuffer, macro->body, macro->buffersize);
+        mem_sys_free(macro->body);
+        macro->buffersize = newsize;
+        macro->body       = newbuffer;
+        /* update cursor as well */
+        macro->cursor     = macro->body + used;
     }
 }
 

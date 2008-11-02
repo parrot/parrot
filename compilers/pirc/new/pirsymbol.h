@@ -4,13 +4,13 @@
  */
 
 
-/* This file defines the data structures for symbol management. A symbol
- * is a declared .local or .param, or a PIR register. Although these
- * two data structures are very similar, and they could potentially be
- * merged, this should not be done. Declared symbols are handled a bit
- * different from PIR registers, as the latter do not need to be
- * declared. Merging them would only result in more complex code.
- *
+/* This file defines the data structures for symbol management.
+ * A symbol object represents a declared .local/.param, while
+ * a pir_reg object represents a PIR symbolic register ($I0, $S1, etc.).
+ * For each symbol/pir-reg in a sub, there is only one corresponding
+ * symbol/pir_reg object.
+ * References to these symbols are stored as target nodes (during the
+ * parse), which will point to these symbol or pir_reg objects.
  */
 
 #ifndef PARROT_PIR_PIRSYMBOL_H_GUARD
@@ -18,7 +18,6 @@
 
 #include "pircompiler.h"
 #include "pircompunit.h"
-
 #include "pirregalloc.h"
 
 
@@ -39,11 +38,11 @@ typedef struct symbol {
 
 /* structure to represent a PIR register. */
 typedef struct pir_reg {
-    int            color;
-    pir_type       type;
-    live_interval *interval;
+    int             color;
+    pir_type        type;
+    live_interval  *interval;
 
-    int            regno; /* symbolic (PIR) register number */
+    int             regno; /* symbolic (PIR) register number */
 
     struct pir_reg *next;
 
@@ -103,6 +102,7 @@ constant *find_global_constant(struct lexer_state * const lexer, char * const na
 int next_register(struct lexer_state * const lexer, pir_type type);
 
 void store_local_label(struct lexer_state * const lexer, char const * const label, unsigned offset);
+
 unsigned find_local_label(struct lexer_state * const lexer, char const * const label);
 
 unsigned get_hashcode(char const * const str, unsigned num_buckets);

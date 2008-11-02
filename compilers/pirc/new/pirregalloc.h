@@ -7,6 +7,11 @@
 #define PARROT_PIR_PIRREGALLOC_H_GUARD
 
 
+typedef enum interval_flags {
+    INTERVAL_FLAG_UNIQUE_REG   = 1 << 0
+
+} interval_flag;
+
 /* A live interval represents the live span of a variable. Register optimization
  * is done on the registers assigned by the vanilla register allocator, which
  * just allocates a new register when needed. The symreg field contains this
@@ -28,7 +33,8 @@ typedef struct live_interval {
 
 
     /* pointer to the symbol or pir_reg, in order to update (re-color) the PASM register */
-    int     *color;
+    int           *color;
+    interval_flag  flags;
 
 /*    union next_union { */
         struct   live_interval *nexti;

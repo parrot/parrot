@@ -54,6 +54,16 @@ new_linear_scan_register_allocator(void) {
     return lsr;
 }
 
+void
+print_list(char *msg, live_interval *i) {
+    fprintf(stderr, "%s: ", msg);
+    while (i) {
+        fprintf(stderr, "[%d] ", i->endpoint);
+        i = i->nexta;
+    }
+    fprintf(stderr, "\n");
+}
+
 /*
 
 =item C<void
@@ -103,7 +113,12 @@ lengtha(live_interval *list) {
 =item C<live_interval *
 new_live_interval(lsr_allocator * const lsr, unsigned firstuse_location, pir_type type)>
 
-Constructor for a live_interval struct object.
+Constructor for a live_interval struct object. After creating the new interval object,
+its startpoint and endpoint are initialized to the value in C<firstuse_location>. Note
+that an interval has a type; the register allocator keeps a list of interval for each
+type, because obviously you can't mix different types of registers.
+
+The newly created interval is added to the list of intervals.
 
 =cut
 
@@ -113,10 +128,12 @@ PARROT_WARN_UNUSED_RESULT
 live_interval *
 new_live_interval(lsr_allocator * const lsr, unsigned firstuse_location, pir_type type) {
     live_interval *i = (live_interval *)mem_sys_allocate_zeroed(sizeof (live_interval));
+    static int count = 0;
 
     /* this is the first usage of the register, and up to now also the last */
     i->startpoint = i->endpoint = firstuse_location;
 
+    /*fprintf(stderr, "Live interval %d (location: %u)\n", ++count, firstuse_location);*/
     add_live_interval(lsr, i, type);
     return i;
 }
@@ -139,30 +156,59 @@ add_live_interval(lsr_allocator * const lsr, live_interval * const i, pir_type t
     /* if there's no interval for the specified type, insert i as the first one and return */
     if (iter == NULL) {
         lsr->intervals[type] = i;
+        print_list("intervals (1): ", lsr->intervals[type]);
         return;
     }
 
     /* search for the right point to insert */
 
-    /* I think this is a bit wonky. It happens to be the case that intervals are only added
-     * in the right order, due to fact that parser parses variables in order (declarations).
-     * XXX evaluate whether this needs fixing.
-     */
     while (iter->nexti && iter->startpoint < i->startpoint) {
         iter = iter->nexti;
     }
 
-    /* at this point iter->startpoint >= i->startpoint */
+    /* at this point iter->startpoint >= i->startpoint, or iter->nexti is NULL */
 
-    iter->nexti = i;
-    i->previ    = iter;
+    if (iter->nexti) {
+        PARROT_ASSERT(iter->startpoint >= i->startpoint);
+        /* iter->startpoint >= i->startpoint */
+        /* insert i before iter */
+        i->nexti = iter;
+        if (iter->previ) {
+            i->previ = iter->previ;
+            i->previ->nexti = i;
+        }
+        else {
+            lsr->intervals[type] = i;
+        }
+        iter->previ = i;
 
+        /* print_list("intervals (2): ", lsr->intervals[type]); */
+    }
+    else {
+        /* iter->nexti is NULL */
+        if (iter->startpoint < i->startpoint) { /* add i after iter */
+            iter->nexti = i;
+            i->previ = iter;
+        }
+        else { /* iter->startpoint >= i->startpoint */
+            /* insert i before iter */
+            i->nexti = iter;
+            if (iter->previ) {
+                i->previ = iter->previ;
+                i->previ->nexti = i;
+            }
+            else {
+                lsr->intervals[type] = i;
+            }
+            iter->previ = i;
+        }
 
-    /*
-    fprintf(stderr, "live intervals: #%d\n", lengthi(lsr->intervals[type]));
-    */
+        /* print_list("intervals (3): ", lsr->intervals[type]);*/
+    }
+
+    /* fprintf(stderr, "live intervals: #%d\n", lengthi(lsr->intervals[type])); */
+
 }
-
 
 
 
@@ -181,42 +227,56 @@ static void
 add_interval_to_active(lsr_allocator *lsr, live_interval * const i, pir_type type) {
     live_interval *iter = lsr->active[type];
 
-/*
-    if (iter)
-        fprintf(stderr, "length of active: %d\n", lengtha(lsr->active[type]));
-*/
-
     /* if there's no active intervals, set i as first */
     if (iter == NULL) {
         lsr->active[type] = i;
-/*
-        fprintf(stderr, "added, #active: %d\n", lengtha(lsr->active[type]));
-*/
+        /* print_list("(1)", lsr->active[type]); */
         return;
     }
 
-    i->nexta = iter;
-    lsr->active[type] = i;
-    return;    /* is sorting needed? */
-
-    while (iter && iter->endpoint < i->endpoint) {
+    while (iter->nexta && iter->endpoint < i->endpoint) {
         iter = iter->nexta;
     }
 
-    /* at this point, iter->endpoint >= i->endpoint. insert here */
+    /* at this point iter->endpoint >= i->endpoint, or, iter->next is NULL, or both */
 
-    if (iter) {
+    if (iter->nexta) {
+
+        PARROT_ASSERT(iter->endoint >= i->endpoint);
+
         i->nexta = iter;
-        i->preva = iter->preva;
-    }
-    else {
-        i->preva    = iter;
-        iter->nexta = i;
-    }
+        if (iter->preva) {
+            i->preva = iter->preva;
+            i->preva->nexta = i;
+        }
+        else {
+            lsr->active[type] = i;
+        }
+        iter->preva = i;
 
-    /*
-    fprintf(stderr, "add_interval_to_active() length is now: %d\n", lengtha(lsr->active[type]));
-    */
+        /* print_list("(2)", lsr->active[type]); */
+    }
+    else { /* iter->next is NULL */
+
+        if (iter->endpoint > i->endpoint) { /* iter > i, so insert before iter */
+            i->nexta = iter;
+            if (iter->preva) {
+                i->preva = iter->preva;
+                i->preva->nexta = i;
+            }
+            else { /* if a node has no prev pointer, then it's the first */
+                lsr->active[type] = i;
+            }
+            iter->preva = i;
+
+        }
+        else { /* i->endpoint >= iter->endpoint */
+            /* add i after iter; i->next is NULL, so it's the last item */
+            i->preva    = iter;
+            iter->nexta = i;
+        }
+        /* print_list("(3)", lsr->active[type]); */
+    }
 }
 
 /*
@@ -268,6 +328,8 @@ static void
 add_free_reg(lsr_allocator * const lsr, unsigned regno, pir_type type) {
     free_reg *reg;
 
+    /* fprintf(stderr, "add_free_reg(): %u\n", regno); */
+
     /* if we still had some free_reg object lying around, re-use that one;
      * if not, then allocate a new one.
      */
@@ -318,22 +380,27 @@ remove_from_active(live_interval *i) {
 expire_old_intervals(lsr_allocator * const lsr, live_interval * i, pir_type type)>
 
 Go over all active intervals; if the endpoint of one of them is >= than
-C<i>'s start point, the action is aborted. Otherwise C<j> is 'removed' from
+C<i>'s start point, the action is aborted. This is why the C<active> list must be
+sorted on increasing endpoint. Otherwise C<j> is 'removed' from
 active, as it has expired. (the variable is no longer needed).
 
 =cut
 
 */
 static void
-expire_old_intervals(lsr_allocator * const lsr, live_interval * i, pir_type type) {
+expire_old_intervals(lsr_allocator * const lsr, live_interval * const i, pir_type type) {
     live_interval *j;
 
     for (j = lsr->active[type]; j != NULL; j = j->nexta) {
-        if (j->endpoint >= i->startpoint)
+        if (j->endpoint >= i->startpoint) {
             return;
+        }
 
-        remove_from_active(j);
-        add_free_reg(lsr, j->realreg, type);
+        /* don't remove from active if a :unique_reg flag was set */
+        if (!TEST_FLAG(j->flags, INTERVAL_FLAG_UNIQUE_REG)) {
+            remove_from_active(j);
+            add_free_reg(lsr, j->realreg, type);
+        }
     }
 
 }
@@ -355,8 +422,12 @@ linear_scan_register_allocation(lsr_allocator * const lsr) {
     live_interval * i;
     pir_type type = 0; /* types run from 0 to 4; see pircompunit.h */
 
+
     for (type = 0; type < 4; ++type) { /* handle each of the 4 parrot types separately. */
 
+        /* fprintf(stderr, "Lin.scan.reg.alloc.: %u variables to be mapped\n",
+           lengthi(lsr->intervals[type]));
+        */
         for (i = lsr->intervals[type]; i != NULL; i = i->nexti) {
 
             expire_old_intervals(lsr, i, type);
@@ -364,6 +435,7 @@ linear_scan_register_allocation(lsr_allocator * const lsr) {
             /* get a free register */
             i->realreg = get_free_reg(lsr, type);
 
+            /* fprintf(stderr, "Vanilla register %u is mapped to %u\n", *i->color, i->realreg); */
             /* update the symbol/pir_reg with this newly allocated reg */
             *i->color = i->realreg;
 

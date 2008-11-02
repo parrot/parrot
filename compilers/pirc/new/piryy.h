@@ -25,6 +25,7 @@ int yypirparse(yyscan_t yyscanner, struct lexer_state * const lexer);
 int yypirerror(yyscan_t yyscanner, struct lexer_state * const lexer,
                                    char const * const message, ...);
 
+int yypirget_lineno(yyscan_t yyscanner);
 
 #endif /* PARROT_PIR_PIRYY_H_GUARD */
 

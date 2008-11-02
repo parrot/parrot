@@ -84,7 +84,7 @@ typedef struct macro_table {
 
 
 macro_def *new_macro(macro_table * const table, char const * const name, int lineno,
-                     int takes_args);
+                     int takes_args, unsigned initsize);
 
 void add_macro_param(macro_def * const macro, char const * const name);
 

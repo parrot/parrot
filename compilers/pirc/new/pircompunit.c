@@ -447,7 +447,7 @@ targets_equal(target const * const left, target const * const right) {
 /*
 
 =item C<target *
-new_target(pir_type type)>
+new_target(lexer_state * const lexer)>
 
 Create a new target node. The node's next pointer is initialized to itself.
 
@@ -457,7 +457,7 @@ Create a new target node. The node's next pointer is initialized to itself.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
-new_target(lexer_state * const lexer, pir_type type) {
+new_target(lexer_state * const lexer) {
     target *t       = pir_mem_allocate_zeroed_typed(lexer, target);
 
     t->key          = NULL;
@@ -495,7 +495,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
 target_from_symbol(lexer_state * const lexer, symbol * const sym) {
-    target *t  = new_target(lexer, sym->type);
+    target *t  = new_target(lexer);
     t->s.sym   = sym; /* set a pointer from target to symbol */
     t->flags   = sym->flags; /* copy the flags */
 
@@ -544,7 +544,7 @@ PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
 add_param(lexer_state * const lexer, pir_type type, char const * const name) {
-    target *targ = new_target(lexer, type);
+    target *targ = new_target(lexer);
     symbol *sym  = new_symbol(lexer, name, type);
 
     PARROT_ASSERT(CURRENT_SUB(lexer));
@@ -980,9 +980,9 @@ encode different flags.
 
 */
 void
-set_instr_flag(lexer_state * const lexer, instr_flag flag) {
+set_op_labelflag(lexer_state * const lexer, int flag) {
     PARROT_ASSERT(CURRENT_INSTRUCTION(lexer));
-    SET_FLAG(CURRENT_INSTRUCTION(lexer)->flags, flag);
+    SET_FLAG(CURRENT_INSTRUCTION(lexer)->oplabelbits, flag);
 }
 
 /*
@@ -1318,13 +1318,12 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
 new_reg(lexer_state * const lexer, pir_type type, int regno) {
-    target *t       = new_target(lexer, type);
+    target *t       = new_target(lexer);
+    pir_reg *reg;
 
-    {
-        int color = color_reg(lexer, type, regno);
-        pir_reg *reg = find_register(lexer, type, regno);
-        t->s.reg = reg;
-    }
+    color_reg(lexer, type, regno);
+    reg = find_register(lexer, type, regno);
+    t->s.reg = reg;
 
     /* set a flag on this target node saying it's a register */
     SET_FLAG(t->flags, TARGET_FLAG_IS_REG);
@@ -2107,37 +2106,22 @@ fixup_local_labels(lexer_state * const lexer) {
         /* depending on what kind of branching instruction, get the right operand
          * that contains the label.
          */
-        switch (iter->flags) {
-            case INSTR_FLAG_BRANCH: /* goto A */
-                /* first operand is a label */
-                label = iter->operands; /* there's only one, but its next is itself,
-                                                                     so don't bother */
-                break;
-            case INSTR_FLAG_IFUNLESS: /* if A, B */
-                /* second operand is a label */
-                label = iter->operands->next->next;
-                break;
-            case INSTR_FLAG_ISXX: /* isle A, B, C */
-                /* third operand is a label */
-                label = iter->operands->next->next->next;
-                break;
-            default:
-                break;
+        if (iter->oplabelbits) {}
 
-        }
 
+
+
+        /*
         if (iter->flags) {
             unsigned offset     = find_local_label(lexer, label->expr.id);
             unsigned curr_instr = iter->offset;
 
-            /* a label is stored as an identifier in an expression node.
-             * make sure this is the case (otherwise it's a bug).
-             */
-            PARROT_ASSERT(label->type == EXPR_IDENT);
-            /* change the operand into a constant; adjust the expression type. */
+
+
             label->expr.c = new_const(lexer, INT_TYPE, offset - curr_instr);
             label->type   = EXPR_CONSTANT;
         }
+        */
 
     }
     while (iter != lexer->subs->statements); /* iterate over all instructions */

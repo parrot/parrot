@@ -70,6 +70,7 @@ print_help(char const * const program_name)
     "  -d        show debug messages of parser\n"
     "  -h        show this help message\n"
     "  -H        heredoc preprocessing only\n"
+    "  -m <size> specify initial macro buffer size; default is 4096 bytes\n"
     "  -n        no output, only print 'ok' if successful\n"
     "  -o <file> write output to the specified file. "
     "Currently only works in combination with '-E' option\n"
@@ -138,7 +139,9 @@ void parse_file(int flexdebug, FILE *infile, char * const filename, int flags)
 */
 
 void
-parse_file(int flexdebug, FILE *infile, char * const filename, int flags, int thr_id) {
+parse_file(int flexdebug, FILE *infile, char * const filename, int flags, int thr_id,
+           unsigned macro_size)
+{
     yyscan_t     yyscanner;
     lexer_state *lexer     = NULL;
 
@@ -150,6 +153,8 @@ parse_file(int flexdebug, FILE *infile, char * const filename, int flags, int th
     yypirset_in(infile, yyscanner);
     /* set the extra parameter in the yyscan_t structure */
     lexer = new_lexer(filename, flags);
+    lexer->macro_size = macro_size;
+
     yypirset_extra(lexer, yyscanner);
     /* and store the yyscanner in the lexer, so they're close buddies */
     lexer->yyscanner = yyscanner;
@@ -215,7 +220,7 @@ process_file(void *a) {
     int          thr_id    = args->thr_id;
     int          flags     = args->flags;
 
-    parse_file(flexdebug, infile, filename, flags, thr_id);
+    parse_file(flexdebug, infile, filename, flags, thr_id, INIT_MACRO_SIZE);
 
     return NULL;
 }
@@ -240,6 +245,7 @@ main(int argc, char *argv[]) {
     int                flags        = 0;
     char              *filename     = NULL;
     char              *outputfile   = NULL;
+    unsigned           macrosize    = INIT_MACRO_SIZE;
 
 
     /* skip program name */
@@ -264,6 +270,17 @@ main(int argc, char *argv[]) {
                 /* break; */
             case 'H':
                 SET_FLAG(flags, LEXER_FLAG_HEREDOCONLY);
+                break;
+            case 'm':
+                if (argc > 1) {
+                    argc--;
+                    argv++;
+                    macrosize = atoi(argv[0]);
+                }
+                else {
+                    fprintf(stderr, "Missing argument for option '-m'\n");
+                    exit(EXIT_FAILURE);
+                }
                 break;
             case 'n':
                 SET_FLAG(flags, LEXER_FLAG_NOOUTPUT);
@@ -381,7 +398,7 @@ main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    parse_file(flexdebug, file, filename, flags, 0);
+    parse_file(flexdebug, file, filename, flags, 0, macrosize);
 
 }
 #endif
