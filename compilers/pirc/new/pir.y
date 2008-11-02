@@ -376,6 +376,12 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
 
 %type <sval> macro_arg
 
+/* for PASM */
+
+%token TK_PASM_MARKER_START        "<pasm-marker>"
+%token TK_PIR_MARKER_START         "<pir-marker>"
+%token <sval> TK_PARROT_OP         "parrot-op"
+
 /* normal rules and types */
 
 %type <sval> unop
@@ -515,7 +521,15 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
 
 /* Top-level rules */
 
-TOP               : opt_nl
+
+/* the */
+TOP               : "<pir-marker>"  pir_contents
+                  | "<pasm-marker>" pasm_contents
+                  ;
+
+/* PIR grammar */
+
+pir_contents      : opt_nl
                     pir_chunks
                     opt_nl
                         { fixup_global_labels(lexer); }
@@ -1973,6 +1987,85 @@ augmented_op: "*="         { $$ = OP_MUL; }
             | "<<="        { $$ = OP_SHL; }
             | ">>>="       { $$ = OP_LSR; }
             ;
+
+
+/* PASM grammar */
+
+pasm_contents             : opt_nl
+                            pasm_lines
+                            { fprintf(stderr, "PASM input is not handled yet.\n"); }
+                          ;
+
+pasm_lines                : pasm_line
+                          | pasm_lines pasm_line
+                          ;
+
+pasm_line                 : pasm_statement "\n"
+                          | namespace_directive
+                          ;
+
+namespace_directive       : ".namespace" pasm_key "\n"
+                          ;
+
+pasm_key                  : '[' pasm_keys ']'
+                          ;
+
+pasm_keys                 : TK_STRINGC
+                          | pasm_keys ';' TK_STRINGC
+                          ;
+
+pasm_statement            : label opt_pasm_instruction
+                          | pasm_instruction
+                          ;
+
+opt_pasm_instruction      : /* empty */
+                          | pasm_instruction
+                          ;
+
+label                     : sub_directive TK_LABEL
+                          | TK_LABEL
+                          ;
+
+sub_directive             : ".pcc_sub" pasm_sub_flags
+                          ;
+
+pasm_sub_flags            : /* empty */
+                          | pasm_sub_flags pasm_sub_flag
+                          ;
+
+pasm_sub_flag             : ":init"
+                          | ":main"
+                          | ":load"
+                          | ":anon"
+                          | ":postcomp"
+                          | ":immediate"
+                          ;
+
+pasm_instruction          : TK_PARROT_OP opt_pasm_arguments
+                          | ".lex" TK_STRINGC ',' TK_PREG
+
+                          ;
+
+opt_pasm_arguments        : /* empty */
+                          | pasm_arguments
+                          ;
+
+pasm_arguments            : pasm_argument
+                          | pasm_arguments ',' pasm_argument
+                          ;
+
+pasm_argument             : TK_STRINGC
+                          | TK_INTC
+                          | TK_NUMC
+                          | pasm_reg
+                          | pasm_key
+                          ;
+
+pasm_reg                  : TK_PREG
+                          | TK_NREG
+                          | TK_SREG
+                          | TK_IREG
+                          ;
 
 %%
 

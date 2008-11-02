@@ -138,6 +138,8 @@ void parse_file(int flexdebug, FILE *infile, char * const filename, int flags)
 
 */
 
+void init_scanner_state(yyscan_t yyscanner);
+
 void
 parse_file(int flexdebug, FILE *infile, char * const filename, int flags, int thr_id,
            unsigned macro_size)
@@ -154,6 +156,13 @@ parse_file(int flexdebug, FILE *infile, char * const filename, int flags, int th
     /* set the extra parameter in the yyscan_t structure */
     lexer = new_lexer(filename, flags);
     lexer->macro_size = macro_size;
+
+    /* initialize the scanner state */
+    init_scanner_state(yyscanner);
+
+    if (strstr(filename, ".pasm")) { /* PASM mode */
+        SET_FLAG(lexer->flags, LEXER_FLAG_PASMFILE);
+    }
 
     yypirset_extra(lexer, yyscanner);
     /* and store the yyscanner in the lexer, so they're close buddies */

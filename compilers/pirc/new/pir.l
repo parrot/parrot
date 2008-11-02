@@ -173,8 +173,27 @@ REGISTER       "$"[SNIP]{DIGITS}
 
 %x STRINGEXPAND
 
+%x SPECIALSTART
+%x PASM
+
 %%
 
+
+<SPECIALSTART>.|\n    {
+                        fprintf(stderr, "special start state\n");
+                        yyless(0);
+                        yy_pop_state(yyscanner);
+
+                        if (TEST_FLAG(yypirget_extra(yyscanner)->flags, LEXER_FLAG_PASMFILE)) {
+                            BEGIN(PASM);
+                            return TK_PASM_MARKER_START;
+                        }
+                        else {
+                            BEGIN(INITIAL);
+                            return TK_PIR_MARKER_START;
+                        }
+
+                      }
 
 {WS}              { /* ignore whitespace */ }
 
@@ -820,7 +839,45 @@ REGISTER       "$"[SNIP]{DIGITS}
        */
 %}
 
+%{
+
+/* PASM tokens.
+ *
+ * do not mix with other tokens, using <state1, state2> notation.
+ * This becomes unmanageable
+ */
+%}
+
+<PASM>"P"{DIGIT}+       { yylval->ival = atoi(yytext + 1); return TK_PREG; }
+<PASM>"N"{DIGIT}+       { yylval->ival = atoi(yytext + 1); return TK_NREG; }
+<PASM>"I"{DIGIT}+       { yylval->ival = atoi(yytext + 1); return TK_IREG; }
+<PASM>"S"{DIGIT}+       { yylval->ival = atoi(yytext + 1); return TK_SREG; }
+
+<PASM>{IDENT}           {
+                          yylval->sval = dupstr(yypirget_extra(yyscanner), yytext);
+                          return TK_PARROT_OP;
+                        }
+
+<PASM>{FLOATNUM}        { yylval->dval = atof(yytext); return TK_NUMC; }
+<PASM>{SIGN}?{DIGITS}   { yylval->ival = atoi(yytext); return TK_INTC; }
+<PASM>{HEX}             { yylval->ival = atoi(yytext); return TK_INTC; }
+<PASM>{BIN}             { yylval->ival = atoi(yytext); return TK_INTC; }
+<PASM>{OCT}             { yylval->ival = atoi(yytext); return TK_INTC; }
+
+<PASM>{Q_STRING}        { /* copy the string, remove the quotes. */
+                          yylval->sval = dupstrn(yyget_extra(yyscanner), yytext + 1, yyleng - 2);
+                          return TK_STRINGC;
+                        }
+
+<PASM>{WS}              { /* ignore whitespace */ }
+
+<PASM>{EOL}[\t\r\n ]*   { return TK_NL; }
+
+<PASM><<EOF>>           { yyterminate(); }
+
 %%
+
+
 
 /*
 
@@ -834,6 +891,23 @@ so keep them local to this file.
 =cut
 
 */
+
+
+/*
+
+=item C<void
+init_scanner_state(yyscan_t yyscanner)>
+
+Initializes C<yyscanner> to the SPECIALSTART state, which can then decided
+whether to scan PASM or PIR tokens.
+
+=cut
+
+*/
+void
+init_scanner_state(yyscan_t yyscanner) {
+    yy_push_state(SPECIALSTART, yyscanner);
+}
 
 
 /*

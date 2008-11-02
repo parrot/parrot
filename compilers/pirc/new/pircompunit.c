@@ -1598,17 +1598,6 @@ void
 push_operand(lexer_state * const lexer, NOTNULL(expression * const operand)) {
     PARROT_ASSERT(lexer->subs->statements);
 
-    /*
-    if (CURRENT_INSTRUCTION(lexer)->operands == NULL) {
-        CURRENT_INSTRUCTION(lexer)->operands = operand;
-    }
-    else {
-        operand->next = CURRENT_INSTRUCTION(lexer)->operands->next;
-        CURRENT_INSTRUCTION(lexer)->operands->next = operand;
-        CURRENT_INSTRUCTION(lexer)->operands       = operand;
-    }
-    */
-
     if (CURRENT_INSTRUCTION(lexer)->operands) {
         operand->next = CURRENT_INSTRUCTION(lexer)->operands->next;
         CURRENT_INSTRUCTION(lexer)->operands->next = operand;

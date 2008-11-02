@@ -78,6 +78,7 @@ XXX free all other stuff of lsr.
 void
 destroy_linear_scan_regiser_allocator(lsr_allocator *lsr) {
 
+
     mem_sys_free(lsr);
 }
 
@@ -242,7 +243,7 @@ add_interval_to_active(lsr_allocator *lsr, live_interval * const i, pir_type typ
 
     if (iter->nexta) {
 
-        PARROT_ASSERT(iter->endoint >= i->endpoint);
+        PARROT_ASSERT(iter->endpoint >= i->endpoint);
 
         i->nexta = iter;
         if (iter->preva) {

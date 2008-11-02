@@ -147,7 +147,10 @@
      TK_MACRO_IDENT = 363,
      TK_MACRO_ARG_IDENT = 364,
      TK_MACRO_ARG_OTHER = 365,
-     TK_MACRO_CONST_VAL = 366
+     TK_MACRO_CONST_VAL = 366,
+     TK_PASM_MARKER_START = 367,
+     TK_PIR_MARKER_START = 368,
+     TK_PARROT_OP = 369
    };
 #endif
 /* Tokens.  */
@@ -260,6 +263,9 @@
 #define TK_MACRO_ARG_IDENT 364
 #define TK_MACRO_ARG_OTHER 365
 #define TK_MACRO_CONST_VAL 366
+#define TK_PASM_MARKER_START 367
+#define TK_PIR_MARKER_START 368
+#define TK_PARROT_OP 369
 
 
 
@@ -283,7 +289,7 @@ typedef union YYSTYPE
     struct macro_param *pval;
 }
 /* Line 1489 of yacc.c.  */
-#line 287 "pirparser.h"
+#line 293 "pirparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

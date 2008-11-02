@@ -35,7 +35,8 @@ typedef enum lexer_flags {
     LEXER_FLAG_PREPROCESS          = 1 << 4, /* preprocess code only */
     LEXER_FLAG_HEREDOCONLY         = 1 << 5, /* preprocess heredocs only */
     LEXER_FLAG_NOOUTPUT            = 1 << 6, /* don't print anything on success, except 'ok' */
-    LEXER_FLAG_REGALLOC            = 1 << 7  /* use register allocation optimizer */
+    LEXER_FLAG_REGALLOC            = 1 << 7, /* use register allocation optimizer */
+    LEXER_FLAG_PASMFILE            = 1 << 8
 
 } lexer_flags;
 
