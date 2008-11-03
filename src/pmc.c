@@ -341,8 +341,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 constant_pmc_new(PARROT_INTERP, INTVAL base_type)
 {
-    PMC * const pmc = get_new_pmc_header(interp, base_type,
-            PObj_constant_FLAG);
+    PMC * const pmc = get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
     VTABLE_init(interp, pmc);
     return pmc;
 }
@@ -391,6 +390,66 @@ constant_pmc_new_init(PARROT_INTERP, INTVAL base_type, ARGIN_NULLOK(PMC *init))
     PMC * const pmc = get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
     VTABLE_init_pmc(interp, pmc, init);
     return pmc;
+}
+
+/*
+
+=item C<PMC * temporary_pmc_new(PARROT_INTERP, INTVAL base_type)>
+
+Creates a new temporary PMC of type C<base_type>, the call C<init>.  B<You> are
+responsible for freeing this PMC when it goes out of scope, with
+C<free_temporary_pmc()>.  B<Do not> store this PMC in any other PMCs, or allow
+it to be stored.  B<Do not> store any regular PMC in this PMC, or allow the
+storage of any regular PMC in this PMC.
+
+If you don't know what this means means, or you can't tell if either case will
+happen as the result of any call you make on or with this PMC, B<DO NOT> use
+this function, lest you cause weird crashes and memory errors.  Use
+C<pmc_new()> instead.
+
+(Why do these functions even exist?  Used judiciously, they can reduce GC
+pressure in hotspots tremendously.  If you haven't audited the code carefully
+-- including profiling and benchmarking -- then use C<pmc_new()> instead, and
+never B<ever> add C<PARROT_API> to either function.)
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PMC *
+temporary_pmc_new(PARROT_INTERP, INTVAL base_type)
+{
+    PMC * const pmc = get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
+    VTABLE_init(interp, pmc);
+    return pmc;
+}
+
+/*
+
+=item C<PMC * temporary_pmc_free>
+
+Frees a new temporary PMC created by C<temporary_pmc_new()>.  Do not call this
+with any other type of PMC.  Do not forget to call this (or you'll leak PMCs).
+Read and I<understand> the warnings for C<temporary_pmc_new()> before you're
+tempted to use this.
+
+=cut
+
+*/
+
+PMC *
+temporary_pmc_free(PARROT_INTERP, PMC *pmc)
+{
+    Arenas            *arena_base = interp->arena_base;
+    Small_Object_Pool *pool       = arena_base->constant_pmc_pool;
+
+    if (PObj_is_PMC_EXT_TEST(pmc))
+        Parrot_free_pmc_ext(interp, pmc);
+
+    PObj_flags_SETTO((PObj *)pmc, PObj_on_free_list_FLAG);
+    pool->add_free_object(interp, pool, (PObj *)pmc);
+    pool->num_free_objects++;
 }
 
 /*

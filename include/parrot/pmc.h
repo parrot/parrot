@@ -97,6 +97,13 @@ void dod_unregister_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
+PMC * temporary_pmc_new(PARROT_INTERP, INTVAL base_type)
+        __attribute__nonnull__(1);
+
+PMC * temporary_pmc_free(PARROT_INTERP, PMC *pmc)
+        __attribute__nonnull__(1);
+
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pmc.c */
 
