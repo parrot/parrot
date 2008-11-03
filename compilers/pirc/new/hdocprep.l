@@ -515,7 +515,7 @@ LINECOMMENT    [#].*{EOL}
                               fprintf(state->outfile, ".line %d\n", yyget_lineno(yyscanner) + 1);
                               fprintf(state->outfile, ".file '%s'\n", state->filename);
 
-                              if (filename != filepath)
+                              if (filename != fullpath)
                                   mem_sys_free(filename); /* only free one of them if they're
                                                                  same pointer */
                               mem_sys_free(fullpath);
