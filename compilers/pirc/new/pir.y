@@ -380,6 +380,7 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
 
 %token TK_PASM_MARKER_START        "<pasm-marker>"
 %token TK_PIR_MARKER_START         "<pir-marker>"
+%token TK_PCC_SUB                  ".pcc_sub"
 %token <sval> TK_PARROT_OP         "parrot-op"
 
 /* normal rules and types */
@@ -2016,6 +2017,8 @@ pasm_keys                 : TK_STRINGC
 
 pasm_statement            : label opt_pasm_instruction
                           | pasm_instruction
+                          | ".line" TK_INTC
+                          | ".file" TK_STRINGC
                           ;
 
 opt_pasm_instruction      : /* empty */
@@ -2043,7 +2046,6 @@ pasm_sub_flag             : ":init"
 
 pasm_instruction          : TK_PARROT_OP opt_pasm_arguments
                           | ".lex" TK_STRINGC ',' TK_PREG
-
                           ;
 
 opt_pasm_arguments        : /* empty */

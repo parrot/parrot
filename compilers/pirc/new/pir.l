@@ -848,6 +848,40 @@ REGISTER       "$"[SNIP]{DIGITS}
  */
 %}
 
+<PASM>","               { return ','; }
+<PASM>"["               { return '['; }
+<PASM>"]"               { return ']'; }
+
+<PASM>":main"           { return TK_FLAG_MAIN; }
+<PASM>":load"           { return TK_FLAG_LOAD; }
+<PASM>":init"           { return TK_FLAG_INIT; }
+<PASM>":anon"           { return TK_FLAG_ANON; }
+<PASM>":postcomp"       { return TK_FLAG_POSTCOMP; }
+<PASM>":immediate"      { return TK_FLAG_IMMEDIATE; }
+
+<PASM>".pcc_sub"        { return TK_PCC_SUB; }
+<PASM>".lex"            { return TK_LEX; }
+<PASM>".namespace"      { return TK_NAMESPACE; }
+<PASM>".macro"          { yypirerror(yyscanner, yypirget_extra(yyscanner),
+                                     "macros are not supported in PASM mode");
+                        }
+<PASM>".macro_const"    { yypirerror(yyscanner, yypirget_extra(yyscanner),
+                                     "macro constants are not supported in PASM mode");
+                        }
+
+<PASM>".line"           { return TK_LINE; }
+<PASM>".file"           { return TK_FILE; }
+
+<PASM>"."{IDENT}        { yypirerror(yyscanner, yypirget_extra(yyscanner),
+                                     "macro expansion or directive '%s' not supported in PASM mode",
+                                     yytext);
+                        }
+
+<PASM>{IDENT}":"        {
+                          yylval->sval = dupstrn(yypirget_extra(yyscanner), yytext, yyleng - 1);
+                          return TK_LABEL;
+                        }
+
 <PASM>"P"{DIGIT}+       { yylval->ival = atoi(yytext + 1); return TK_PREG; }
 <PASM>"N"{DIGIT}+       { yylval->ival = atoi(yytext + 1); return TK_NREG; }
 <PASM>"I"{DIGIT}+       { yylval->ival = atoi(yytext + 1); return TK_IREG; }
