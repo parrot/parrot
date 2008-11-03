@@ -887,9 +887,9 @@ REGISTER       "$"[SNIP]{DIGITS}
 <PASM>"I"{DIGIT}+       { yylval->ival = atoi(yytext + 1); return TK_IREG; }
 <PASM>"S"{DIGIT}+       { yylval->ival = atoi(yytext + 1); return TK_SREG; }
 
-<PASM>{IDENT}           {
+<PASM>{IDENT}           { /* can be a parrot op or a label; the check is done in the parser. */
                           yylval->sval = dupstr(yypirget_extra(yyscanner), yytext);
-                          return TK_PARROT_OP;
+                          return TK_IDENT;
                         }
 
 <PASM>{FLOATNUM}        { yylval->dval = atof(yytext); return TK_NUMC; }

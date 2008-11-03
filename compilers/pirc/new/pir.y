@@ -1992,9 +1992,18 @@ augmented_op: "*="         { $$ = OP_MUL; }
 
 /* PASM grammar */
 
-pasm_contents             : opt_nl
+pasm_contents             : pasm_init
                             pasm_lines
                             { fprintf(stderr, "PASM input is not handled yet.\n"); }
+                          ;
+
+/* helper rule to install the first subroutine; any parsed instruction must go into
+ * a subroutine, but PASM allows you start writing ops immediately, without declaring
+ * a subroutine first. Give the subroutine a funny name containing characters normally
+ * not allowed, so we don't have any name collisions.
+ */
+pasm_init                 : opt_nl
+                                { new_subr(lexer, "@start"); }
                           ;
 
 pasm_lines                : pasm_line
@@ -2035,45 +2044,11 @@ pasm_sub_flag             : ":init"
                           | ":immediate"
                           ;
 
-pasm_instruction          : parrot_instruction
+pasm_instruction          : parrot_op op_args
                           | lex_decl
                           ;
 
-parrot_instruction        : pasm_op opt_pasm_arguments
-                          ;
 
-pasm_op                   : TK_PARROT_OP
-                                {
-                                  if (!is_parrot_op(lexer, $1)) {
-                                    yypirerror(yyscanner, lexer, "'%s' is not a parrot op", $1);
-                                  }
-                                  else {
-
-                                  }
-                                }
-                          ;
-
-
-opt_pasm_arguments        : /* empty */
-                          | pasm_arguments
-                          ;
-
-pasm_arguments            : pasm_argument
-                          | pasm_arguments ',' pasm_argument
-                          ;
-
-pasm_argument             : TK_STRINGC
-                          | TK_INTC
-                          | TK_NUMC
-                          | pasm_reg
-                          | keylist
-                          ;
-
-pasm_reg                  : TK_PREG
-                          | TK_NREG
-                          | TK_SREG
-                          | TK_IREG
-                          ;
 
 %%
 
