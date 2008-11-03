@@ -1166,9 +1166,9 @@ Returns whether the class is or inherits from C<*class>.
 
     VTABLE INTVAL isa_pmc(PMC *lookup) {
         Parrot_Class_attributes * const _class    = PARROT_CLASS(SELF);
-        INTVAL        i, num_classes;
-        STRING       *classname;
+        STRING       *classname, *self_name;
         PMC          *classobj;
+        INTVAL        i, num_classes;
 
         if (PMC_IS_NULL(lookup))
             return 0;
@@ -1187,8 +1187,13 @@ Returns whether the class is or inherits from C<*class>.
 
         classname = VTABLE_get_string(interp, classobj);
 
+        /* avoid the expensive string copy, if possible */
+        self_name = SELF->vtable->base_type != enum_class_PMCProxy
+                  ? make_class_name(interp, SELF)
+                  : VTABLE_get_string(interp, SELF);
+
         /* Check if the passed name is the same as the stored short name. */
-        if (string_equal(interp, classname, _class->name) == 0)
+        if (string_equal(interp, classname, self_name) == 0)
             return 1;
 
         /* Check if the passed name is the same as the fully qualified name. */

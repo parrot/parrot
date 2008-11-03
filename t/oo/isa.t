@@ -20,7 +20,7 @@ composition.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(27)
+    plan(29)
 
     isa_by_string_name()
     isa_by_class_object()
@@ -99,9 +99,11 @@ composition.
 .end
 
 .sub subclass_isa_by_class_object
-    .local pmc foo_class, bar_class
-    foo_class = newclass "Foo4"
-    bar_class = subclass "Foo4", "Bar4"
+    .local pmc foo_class, bar_class, sub_sub_class, my_sub_class
+    foo_class     = newclass "Foo4"
+    bar_class     = subclass "Foo4", "Bar4"
+    sub_sub_class = subclass 'Sub', 'SubSub'
+    my_sub_class  = subclass 'SubSub', 'MySub'
 
     .local pmc class_class
     class_class = get_class "Class"
@@ -122,6 +124,16 @@ composition.
     object_class = get_class "Object"
     $I3 = isa $P2, object_class
     ok ($I3, 'new class isa Object')
+
+    .local pmc sub_class
+    sub_class = get_class 'Sub'
+    $P2       = new sub_sub_class
+    $I3       = isa $P2, sub_class
+    ok( $I3, 'new class isa Sub' )
+
+    $P2       = new my_sub_class
+    $I3       = isa $P2, sub_class
+    ok( $I3, 'new subclass isa Sub' )
 .end
 
 
