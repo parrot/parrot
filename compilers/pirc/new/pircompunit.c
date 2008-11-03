@@ -306,6 +306,20 @@ new_subr(lexer_state * const lexer, char const * const subname) {
 
 }
 
+/*
+
+=item C<void
+set_sub_name(struct lexer_state * const lexer, char const * const subname)>
+
+Set the current subroutine's name to C<subname>.
+
+=cut
+
+*/
+void
+set_sub_name(struct lexer_state * const lexer, char const * const subname) {
+    CURRENT_SUB(lexer)->sub_name = subname;
+}
 
 
 /*

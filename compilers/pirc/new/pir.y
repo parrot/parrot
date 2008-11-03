@@ -1992,9 +1992,7 @@ augmented_op: "*="         { $$ = OP_MUL; }
 
 /* PASM grammar */
 
-pasm_contents             : pasm_init
-                            pasm_lines
-                            { fprintf(stderr, "PASM input is not handled yet.\n"); }
+pasm_contents             : pasm_init pasm_lines
                           ;
 
 /* helper rule to install the first subroutine; any parsed instruction must go into
@@ -2010,28 +2008,31 @@ pasm_lines                : pasm_line
                           | pasm_lines pasm_line
                           ;
 
-pasm_line                 : pasm_statement "\n"
+pasm_line                 : pasm_statement
                           | namespace_decl "\n"
                           | lex_decl                  /* lex_decl rule has already a "\n" token */
                           | location_directive "\n"
                           ;
 
-pasm_statement            : label opt_pasm_instruction
+pasm_statement            : TK_LABEL opt_pasm_instruction
+                                { set_label(lexer, $1); }
+                          | pasm_sub_directive opt_pasm_instruction
                           | pasm_instruction
                           ;
 
-opt_pasm_instruction      : /* empty */
+opt_pasm_instruction      : empty_stat
                           | pasm_instruction
                           ;
 
-label                     : sub_directive
-                          | TK_LABEL
+pasm_sub_directive        : pasm_sub_head pasm_sub_flags TK_LABEL
+                                { set_sub_name(lexer, $3); } /* now update the sub's name */
                           ;
 
-sub_directive             : ".pcc_sub" pasm_sub_flags TK_LABEL
-                                { new_subr(lexer, $3); }
+pasm_sub_head             : ".pcc_sub"
+                                { new_subr(lexer, NULL); } /* don't know the sub's name yet */
                           ;
 
+/* XXX check out which flags are PASM as well, and refactor PIR grammar bits. */
 pasm_sub_flags            : /* empty */
                           | pasm_sub_flags pasm_sub_flag
                           ;
@@ -2044,8 +2045,12 @@ pasm_sub_flag             : ":init"
                           | ":immediate"
                           ;
 
-pasm_instruction          : parrot_op op_args
-                          | lex_decl
+pasm_instruction          : parrot_op op_args "\n"
+                                {
+                                  if (!is_parrot_op(lexer, $1)) {
+                                      yypirerror(yyscanner, lexer, "'%s' is not a parrot op", $1);
+                                  }
+                                }
                           ;
 
 

@@ -333,6 +333,8 @@ void set_sub_instanceof(struct lexer_state * const lexer, char const * const cla
 /* install a new subroutine node */
 void new_subr(struct lexer_state * const lexer, char const * const subname);
 
+void set_sub_name(struct lexer_state * const lexer, char const * const subname);
+
 /* functions for setting argument flags or argument alias */
 argument *set_arg_flag(argument * const arg, arg_flag flag);
 argument *set_arg_alias(struct lexer_state * const lexer, char const * const alias);
