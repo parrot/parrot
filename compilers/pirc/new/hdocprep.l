@@ -488,14 +488,14 @@ LINECOMMENT    [#].*{EOL}
                               strncpy(filename, yytext + 1, yyleng - 2);
 
                               /* fprintf(stderr, "locating runtime file: [%s]\n", filename); */
-                              fullpath = Parrot_locate_runtime_file(interp, filename,
-                                                                    PARROT_RUNTIME_FT_INCLUDE);
+                              fullpath = NULL; /*Parrot_locate_runtime_file(interp, filename,
+                                                                    PARROT_RUNTIME_FT_INCLUDE); */
 
-                              if (fullpath == NULL) {
+                              if (fullpath == NULL) { /*
                                   fprintf(stderr, "Please make sure you're running pirc from "
                                           "parrot root directory, not from compilers/pirc. "
                                           "This will be fixed later. Sorry!\n");
-
+*/
                                   /* for now, just fall back to filename */
                                   fullpath = filename;
                               }
@@ -515,7 +515,9 @@ LINECOMMENT    [#].*{EOL}
                               fprintf(state->outfile, ".line %d\n", yyget_lineno(yyscanner) + 1);
                               fprintf(state->outfile, ".file '%s'\n", state->filename);
 
-                              mem_sys_free(filename);
+                              if (filename != filepath)
+                                  mem_sys_free(filename); /* only free one of them if they're
+                                                                 same pointer */
                               mem_sys_free(fullpath);
                               Parrot_destroy(interp);
                             }

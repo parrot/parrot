@@ -373,7 +373,7 @@ C<vfprintf()>.
 void
 pirwarning(lexer_state * const lexer, int lineno, char const * const message, ...) {
     va_list arg_ptr;
-    fprintf(stderr, "warning (line %d): ");
+    fprintf(stderr, "warning (line %d): ", lineno);
     va_start(arg_ptr, message);
     vfprintf(stderr, message, arg_ptr);
     va_end(arg_ptr);
