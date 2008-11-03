@@ -2002,34 +2002,25 @@ pasm_lines                : pasm_line
                           ;
 
 pasm_line                 : pasm_statement "\n"
-                          | namespace_directive
-                          ;
-
-namespace_directive       : ".namespace" pasm_key "\n"
-                          ;
-
-pasm_key                  : '[' pasm_keys ']'
-                          ;
-
-pasm_keys                 : TK_STRINGC
-                          | pasm_keys ';' TK_STRINGC
+                          | namespace_decl "\n"
+                          | lex_decl                  /* lex_decl rule has already a "\n" token */
+                          | location_directive "\n"
                           ;
 
 pasm_statement            : label opt_pasm_instruction
                           | pasm_instruction
-                          | ".line" TK_INTC
-                          | ".file" TK_STRINGC
                           ;
 
 opt_pasm_instruction      : /* empty */
                           | pasm_instruction
                           ;
 
-label                     : sub_directive TK_LABEL
+label                     : sub_directive
                           | TK_LABEL
                           ;
 
-sub_directive             : ".pcc_sub" pasm_sub_flags
+sub_directive             : ".pcc_sub" pasm_sub_flags TK_LABEL
+                                { new_subr(lexer, $3); }
                           ;
 
 pasm_sub_flags            : /* empty */
@@ -2044,9 +2035,24 @@ pasm_sub_flag             : ":init"
                           | ":immediate"
                           ;
 
-pasm_instruction          : TK_PARROT_OP opt_pasm_arguments
-                          | ".lex" TK_STRINGC ',' TK_PREG
+pasm_instruction          : parrot_instruction
+                          | lex_decl
                           ;
+
+parrot_instruction        : pasm_op opt_pasm_arguments
+                          ;
+
+pasm_op                   : TK_PARROT_OP
+                                {
+                                  if (!is_parrot_op(lexer, $1)) {
+                                    yypirerror(yyscanner, lexer, "'%s' is not a parrot op", $1);
+                                  }
+                                  else {
+
+                                  }
+                                }
+                          ;
+
 
 opt_pasm_arguments        : /* empty */
                           | pasm_arguments
@@ -2060,7 +2066,7 @@ pasm_argument             : TK_STRINGC
                           | TK_INTC
                           | TK_NUMC
                           | pasm_reg
-                          | pasm_key
+                          | keylist
                           ;
 
 pasm_reg                  : TK_PREG
