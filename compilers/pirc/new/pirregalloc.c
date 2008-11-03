@@ -162,7 +162,7 @@ add_live_interval(lsr_allocator * const lsr, live_interval * const i, pir_type t
     /* if there's no interval for the specified type, insert i as the first one and return */
     if (iter == NULL) {
         lsr->intervals[type] = i;
-        print_list("intervals (1): ", lsr->intervals[type]);
+        /* print_list("intervals (1): ", lsr->intervals[type]); */
         return;
     }
 

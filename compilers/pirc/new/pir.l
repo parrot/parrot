@@ -180,7 +180,6 @@ REGISTER       "$"[SNIP]{DIGITS}
 
 
 <SPECIALSTART>.|\n    {
-                        fprintf(stderr, "special start state\n");
                         yyless(0);
                         yy_pop_state(yyscanner);
 
@@ -882,6 +881,9 @@ REGISTER       "$"[SNIP]{DIGITS}
                           return TK_LABEL;
                         }
 
+<PASM>"$"[SNIP]{DIGIT}+ { yypirerror(yyscanner, yypirget_extra(yyscanner),
+                                     "symbolic registers are not allowed in PASM mode");
+                        }
 <PASM>"P"{DIGIT}+       { yylval->ival = atoi(yytext + 1); return TK_PREG; }
 <PASM>"N"{DIGIT}+       { yylval->ival = atoi(yytext + 1); return TK_NREG; }
 <PASM>"I"{DIGIT}+       { yylval->ival = atoi(yytext + 1); return TK_IREG; }
@@ -907,6 +909,9 @@ REGISTER       "$"[SNIP]{DIGITS}
 
 <PASM>{EOL}[\t\r\n ]*   { return TK_NL; }
 
+<PASM>.                 { yypirerror(yyscanner, yypirget_extra(yyscanner),
+                                     "unrecognized character: %c", yytext[0]);
+                        }
 <PASM><<EOF>>           { yyterminate(); }
 
 %%

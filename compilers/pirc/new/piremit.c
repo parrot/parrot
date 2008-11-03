@@ -202,8 +202,12 @@ void
 print_instruction(lexer_state * const lexer, instruction *ins) {
     PARROT_ASSERT(ins != NULL);
 
-    if (ins->label)
-        fprintf(out, "%u %s:\n", ins->offset, ins->label);
+    if (ins->label) {
+        if (TEST_FLAG(lexer->flags, LEXER_FLAG_EMIT_PASM))
+            fprintf(out, "%s:\n", ins->label);
+        else
+            fprintf(out, "%u %s:\n", ins->offset, ins->label);
+    }
 
     if (ins->opname) {
 
