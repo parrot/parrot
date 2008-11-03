@@ -1227,35 +1227,21 @@ Returns whether the class is or inherits from C<*classname>.
 
     VTABLE INTVAL isa(STRING *classname) {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
-        STRING              *self_name;
-
-        INTVAL i, num_parents;
+        PMC                            *want_class;
 
         /* hard-code this one exception right away */
         if (string_equal(interp, classname, CONST_STRING(interp, "Class")) == 0)
             return 1;
 
-        /* avoid the expensive string copy, if possible */
-        self_name = SELF->vtable->base_type != enum_class_PMCProxy
-            ? make_class_name(interp, SELF)
-            : VTABLE_get_string(interp, SELF);
+        want_class = Parrot_oo_get_class_str(interp, classname);
 
-        /* check the fully-qualified name */
-        if (string_equal(interp, classname, self_name) == 0)
+        if (PMC_IS_NULL(want_class))
+            return 0;
+
+        if (SELF == want_class)
             return 1;
 
-        /* loop through parents */
-        num_parents = VTABLE_elements(interp, _class->parents);
-
-        for (i = 0; i < num_parents; i++) {
-            PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp,
-                    _class->parents, i);
-
-            if (VTABLE_isa(interp, cur_class, classname))
-                return 1;
-        }
-
-        return 0;
+        return VTABLE_isa_pmc(interp, SELF, want_class);
     }
 
 /*
