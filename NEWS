@@ -8,6 +8,8 @@ New in the November 2008 release
     - Integrated macro processing in PIRC's lexer
     - Integrated heredoc lexer in PIRC executable
     - Added preprocess and heredoc-preprocess commandline options
+    - Integrated the PASM grammar into PIRC
+    - Added a register allocator to optimize the built-in vanilla allocator
     - code cleanups and documentation
 
 New in 0.8.0
