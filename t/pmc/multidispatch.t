@@ -9,7 +9,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 47;
+use Parrot::Test tests => 48;
 
 =head1 NAME
 
@@ -1466,6 +1466,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', '.autoboxed MMD with :optional' );
     foo('Goodbye', 2)
     foo(1)
     foo(100, 200)
+    foo(77.7)
+    foo(77.7, 88.8)
 .end
 
 .sub foo :multi(String)
@@ -1489,6 +1491,17 @@ pir_output_is( <<'CODE', <<'OUTPUT', '.autoboxed MMD with :optional' );
     say i
   done:
 .end
+
+.sub foo :multi(Float)
+    .param pmc x
+    .param pmc i      :optional
+    .param int have_i :opt_flag
+
+    say x
+    unless have_i goto done
+    say i
+  done:
+.end
 CODE
 Hello
 Goodbye
@@ -1496,6 +1509,70 @@ Goodbye
 1
 100
 200
+77.7
+77.7
+88.8
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'more .autoboxed MMD with :optional' );
+
+.sub 'main' :main
+    foo('Hello', 'Hi')
+    foo('Goodbye', 'Ta ta', 2)
+    foo(1, 2)
+    foo(100, 200, 400)
+    foo(77.7, 88.8)
+    foo(77.7, 88.8, 99.9)
+.end
+
+.sub foo :multi(String, String)
+    .param pmc x
+    .param pmc y
+    .param pmc i      :optional
+    .param int have_i :opt_flag
+
+    print x
+    print y
+    unless have_i goto done
+    print i
+  done:
+    say ''
+.end
+
+.sub foo :multi(Integer, Integer)
+    .param pmc x
+    .param pmc y
+    .param pmc i      :optional
+    .param int have_i :opt_flag
+
+    print x
+    print y
+    unless have_i goto done
+    print i
+  done:
+    say ''
+.end
+
+.sub foo :multi(Float, Float)
+    .param pmc x
+    .param pmc y
+    .param pmc i      :optional
+    .param int have_i :opt_flag
+
+    print x
+    print y
+    unless have_i goto done
+    print i
+  done:
+    say ''
+.end
+CODE
+HelloHi
+GoodbyeTa ta2
+12
+100200400
+77.788.8
+77.788.899.9
 OUTPUT
 
 # Local Variables:
