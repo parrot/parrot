@@ -121,11 +121,11 @@ sub load_op_map_files {
         if ( $prev + 1 != $number ) {
             die "hole in ops.num before #$number";
         }
-        if ( exists $self->{optable}->{$name} ) {
+        if ( exists $self->{optable}{$name} ) {
             die "duplicate opcode $name and $number";
         }
         $prev = $number;
-        $self->{optable}->{$name} = $number;
+        $self->{optable}{$name} = $number;
         if ( $number > $self->{max_op_num} ) {
             $self->{max_op_num} = $number;
         }
@@ -141,10 +141,10 @@ sub load_op_map_files {
         s/^\s*//;
         next unless $_;
         ($name) = split( /\s+/, $_ );
-        if ( exists $self->{optable}->{$name} ) {
-            die "skipped opcode is also in $num_file";
+        if ( exists $self->{optable}{$name} ) {
+            die "skipped opcode is also in $num_file:$.";
         }
-        $self->{skiptable}->{$name} = 1;
+        $self->{skiptable}{$name} = 1;
     }
     undef $op;
     return 1;
@@ -177,16 +177,15 @@ Will emit warnings under these circumstances:
 
 sub sort_ops {
     my $self = shift;
-    for my $el ( @{ $self->{ops}->{OPS} } ) {
-        if ( exists $self->{optable}->{ $el->full_name } ) {
-            $el->{CODE} = $self->{optable}->{ $el->full_name };
+    for my $el ( @{ $self->{ops}{OPS} } ) {
+        if ( exists $self->{optable}{ $el->full_name } ) {
+            $el->{CODE} = $self->{optable}{ $el->full_name };
         }
-        elsif ( exists $self->{skiptable}->{ $el->full_name } ) {
+        elsif ( exists $self->{skiptable}{ $el->full_name } ) {
             $el->{CODE} = -1;
         }
         elsif ( $el->{experimental} ) {
-            my $n = $self->{optable}->{ $el->full_name } =
-                ++$self->{max_op_num};
+            my $n = $self->{optable}{ $el->full_name } = ++$self->{max_op_num};
             warn sprintf(
                 "%-25s %-10s experimental, not in ops.num\n",
                 $el->full_name, $n
@@ -201,8 +200,8 @@ sub sort_ops {
             $el->{CODE} = -1;
         }
     }
-    @{ $self->{ops}->{OPS} } =
-        sort { $a->{CODE} <=> $b->{CODE} } ( @{ $self->{ops}->{OPS} } );
+    @{ $self->{ops}{OPS} } =
+        sort { $a->{CODE} <=> $b->{CODE} } ( @{ $self->{ops}{OPS} } );
 }
 
 =head2 C<prepare_real_ops()>
@@ -233,15 +232,15 @@ sub prepare_real_ops {
     my $self = shift;
 
     my $real_ops = Parrot::OpsFile->new( [], $self->{nolines} );
-    $real_ops->{PREAMBLE} = $self->{ops}->{PREAMBLE};
+    $real_ops->{PREAMBLE} = $self->{ops}{PREAMBLE};
     $real_ops->version( $self->{ops}->version );
 
     # verify opcode numbers
     my $seq = 0;
-    for my $el ( @{ $self->{ops}->{OPS} } ) {
-        next if ( $el->{CODE} < 0 );    # skip
+    for my $el ( @{ $self->{ops}{OPS} } ) {
+        next if $el->{CODE} < 0;    # skip
         my $opname = $el->full_name;
-        my $n      = $self->{optable}->{$opname};    # former global
+        my $n      = $self->{optable}{$opname};    # former global
         if ( $n != $el->{CODE} ) {
             die "op $opname: number mismatch: ops.num $n vs. core.ops $el->{CODE}";
         }

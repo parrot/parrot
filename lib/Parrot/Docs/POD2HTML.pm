@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -183,7 +183,7 @@ sub process_code_start_token {
 
     if ( $text =~ /^Parrot::/o ) {
 
-        # RT#43715 - C<Perl::Module> should really be L<Perl::Module>
+        # RT #43715 - C<Perl::Module> should really be L<Perl::Module>
         # but this will do until the docs are changed.
 
         my $href = $self->href_for_perl_module($text);
@@ -690,9 +690,9 @@ s/([^\n\t !\#\$\%\(\)\*\+,\.\~\/\:\;=\?\@\[\\\]\^_\`\{\|\}abcdefghijklmnopqrstuv
 
 =head1 HISTORY
 
-In order to avoid modifying C<Pod:Simple::HTLM> large sections of its code
-have been copied here, and then refactored and adjusted to enable various
-bits of Parrot-specific behaviour.
+In order to avoid modifying C<Pod:Simple::HTML>, large sections of its code
+have been copied here, and then refactored and adjusted to enable various bits
+of Parrot-specific behaviour.
 
 =cut
 
