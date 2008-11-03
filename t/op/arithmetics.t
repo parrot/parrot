@@ -170,7 +170,7 @@ OUTPUT
 #
 
 SKIP: {
-    skip 'failling on win32' => 1 if $^O =~ m/win32/i;
+    skip 'failing on win32' => 1 if $^O =~ m/win32/i;
 
 pasm_output_is( <<'CODE', <<OUTPUT, "turn a native number into its negative" );
         set N0, 0

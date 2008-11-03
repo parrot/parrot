@@ -101,7 +101,7 @@ OUT
 
 SKIP: {
     skip( "No thread config yet", 3 ) unless ( $platforms{$^O} );
-    skip 'failling on win32' => 3 if $^O =~ m/win32/i;
+    skip 'failing on win32' => 3 if $^O =~ m/win32/i;
 
     pasm_output_like( <<'CODE', <<'OUT', "Timer setup - initializer/start" );
 .include "timer.pasm"

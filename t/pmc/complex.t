@@ -1051,7 +1051,7 @@ win32fail:
     .return()
 
 win32fail: 
-    skip( 17, 'failling on win32' )
+    skip( 17, 'failing on win32' )
 .end
  
 .sub cosh_of_complex_numbers

@@ -159,7 +159,7 @@ OUTPUT
 }
 
 SKIP: {
-    skip 'failling on win32' => 1 if $^O =~ m/win32/i;
+    skip 'failing on win32' => 1 if $^O =~ m/win32/i;
 
 pir_output_is( <<'CODE', <<'OUTPUT', "thread type 2" );
 .sub main :main
@@ -207,7 +207,7 @@ OUTPUT
 }
 
 SKIP: {
-    skip 'failling on win32' => 1 if $^O =~ m/win32/i;
+    skip 'failing on win32' => 1 if $^O =~ m/win32/i;
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'thread - kill' );
 .sub main :main
