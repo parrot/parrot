@@ -480,11 +480,11 @@ LINECOMMENT    [#].*{EOL}
                                * XXX create the interpreter before invoking heredoc preprocessor,
                                * so it can be passed as a parameter, and used here.
                                */
-                              Interp *interp = Parrot_new(NULL);
+                          /*    Interp *interp = Parrot_new(NULL);
 
-                              if (interp == NULL) /* ...  and then this check can be removed. XXX */
+                              if (interp == NULL)
                                   fprintf(stderr, "No interpreter!\n");
-
+*/
                               strncpy(filename, yytext + 1, yyleng - 2);
 
                               /* fprintf(stderr, "locating runtime file: [%s]\n", filename); */
@@ -519,7 +519,7 @@ LINECOMMENT    [#].*{EOL}
                                   mem_sys_free(filename); /* only free one of them if they're
                                                                  same pointer */
                               mem_sys_free(fullpath);
-                              Parrot_destroy(interp);
+                          /*    Parrot_destroy(interp); */
                             }
 
 <INCLUDE>{EOL}              { /* after .include "foo.pir", go back to the state we were in */
