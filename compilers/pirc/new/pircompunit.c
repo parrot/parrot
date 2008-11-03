@@ -25,26 +25,6 @@ of the parsed PIR code. Through the symbol management, which is done
 in F<pirsymbol.c>, a vanilla register allocator is implemented.
 
 
-=head1 OPTIMIZATION
-
-Although at this point not as important as bytecode generation,
-PIRC might need an optimizing register allocator. For this to work,
-the following is needed:
-
-=over 4
-
-=item * create a datastructure that stores basic blocks; a basic block
-is a block of instructions that will always be executed consecutively;
-no jumps to or from within this block will be done, except of course
-to the first instruction in the block, and from the last instruction
-in the block. Registers within such a block can safely be reorganized.
-
-=item * once we know what the basic blocks are, a linear scan register
-allocation implementation can be implemented. This is more efficient than
-a graph coloring algorithm. (See C<Linear Scan Register Allocation> by
-Poletto and Sarkar).
-
-=back
 
 =head1 TODO
 

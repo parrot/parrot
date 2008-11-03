@@ -54,6 +54,11 @@ new_linear_scan_register_allocator(void) {
     return lsr;
 }
 
+/*
+
+XXX debug function only
+
+*/
 void
 print_list(char *msg, live_interval *i) {
     fprintf(stderr, "%s: ", msg);
@@ -69,21 +74,30 @@ print_list(char *msg, live_interval *i) {
 =item C<void
 destroy_linear_scan_regiser_allocator(lsr_allocator *lsr)>
 
-Destructor for linear scan register allocator.
-XXX free all other stuff of lsr.
+Destructor for linear scan register allocator. All live_interval
+objects are destroyed as well.
 
 =cut
 
 */
 void
 destroy_linear_scan_regiser_allocator(lsr_allocator *lsr) {
+    pir_type type;
 
+    for (type = 0; type < 4; ++type) {
+        live_interval *iter = lsr->intervals[type];
+        while (iter) {
+            iter = iter->nexti;
+            mem_sys_free(iter->previ);
+        }
+    }
 
     mem_sys_free(lsr);
 }
 
 /*
 
+XXX debug function only.
 Return length of list C<list>
 
 */
@@ -98,16 +112,7 @@ lengthi(live_interval *list) {
     return len;
 }
 
-static unsigned
-lengtha(live_interval *list) {
-    unsigned len = 0;
 
-    while (list) {
-        ++len;
-        list = list->nexta;
-    }
-    return len;
-}
 
 /*
 
@@ -361,16 +366,16 @@ Remove interval C<i> from the list of active intervals.
 */
 static void
 remove_from_active(live_interval *i) {
-    /*
-    fprintf(stderr, "remove active()\n");
-    */
-
+    /* if it has a previous node, that previous node's next is set
+     * to i's next.
+     */
     if (i->preva)
         i->preva->nexta = i->nexta;
+    /* if it has a next node, that next node's previous is set to
+     * i's previous.
+     */
     if (i->nexta)
         i->nexta->preva = i->preva;
-
-    /* XXX I think at this point we can mem_sys_free() it */
 }
 
 

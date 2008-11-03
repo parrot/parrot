@@ -1076,7 +1076,7 @@ static const yytype_uint16 yyrline[] =
     1972,  1978,  1979,  1980,  1981,  1982,  1983,  1984,  1985,  1986,
     1987,  1988,  1989,  1995,  2003,  2007,  2008,  2011,  2012,  2013,
     2014,  2017,  2019,  2020,  2023,  2024,  2027,  2031,  2036,  2037,
-    2040,  2041,  2042,  2043,  2044,  2045,  2048
+    2040,  2042,  2044,  2046,  2048,  2050,  2054
 };
 #endif
 
@@ -4473,18 +4473,51 @@ yyreduce:
     { new_subr(lexer, NULL); ;}
     break;
 
-  case 406:
+  case 400:
+#line 2041 "pir.y"
+    { set_sub_flag(lexer, SUB_FLAG_INIT); ;}
+    break;
+
+  case 401:
+#line 2043 "pir.y"
+    { set_sub_flag(lexer, SUB_FLAG_MAIN); ;}
+    break;
+
+  case 402:
+#line 2045 "pir.y"
+    { set_sub_flag(lexer, SUB_FLAG_LOAD); ;}
+    break;
+
+  case 403:
+#line 2047 "pir.y"
+    { set_sub_flag(lexer, SUB_FLAG_ANON); ;}
+    break;
+
+  case 404:
 #line 2049 "pir.y"
+    { set_sub_flag(lexer, SUB_FLAG_POSTCOMP); ;}
+    break;
+
+  case 405:
+#line 2051 "pir.y"
+    { set_sub_flag(lexer, SUB_FLAG_IMMEDIATE); ;}
+    break;
+
+  case 406:
+#line 2055 "pir.y"
     {
                                   if (!is_parrot_op(lexer, (yyvsp[(1) - (3)].sval))) {
                                       yypirerror(yyscanner, lexer, "'%s' is not a parrot op", (yyvsp[(1) - (3)].sval));
+                                  }
+                                  else {
+                                    get_opinfo(yyscanner);
                                   }
                                 ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 4488 "pirparser.c"
+#line 4521 "pirparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -4698,7 +4731,7 @@ yyreturn:
 }
 
 
-#line 2058 "pir.y"
+#line 2067 "pir.y"
 
 
 

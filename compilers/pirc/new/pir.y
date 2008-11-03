@@ -2038,17 +2038,26 @@ pasm_sub_flags            : /* empty */
                           ;
 
 pasm_sub_flag             : ":init"
+                                { set_sub_flag(lexer, SUB_FLAG_INIT); }
                           | ":main"
+                                { set_sub_flag(lexer, SUB_FLAG_MAIN); }
                           | ":load"
+                                { set_sub_flag(lexer, SUB_FLAG_LOAD); }
                           | ":anon"
+                                { set_sub_flag(lexer, SUB_FLAG_ANON); }
                           | ":postcomp"
+                                { set_sub_flag(lexer, SUB_FLAG_POSTCOMP); }
                           | ":immediate"
+                                { set_sub_flag(lexer, SUB_FLAG_IMMEDIATE); }
                           ;
 
 pasm_instruction          : parrot_op op_args "\n"
                                 {
                                   if (!is_parrot_op(lexer, $1)) {
                                       yypirerror(yyscanner, lexer, "'%s' is not a parrot op", $1);
+                                  }
+                                  else {
+                                    get_opinfo(yyscanner);
                                   }
                                 }
                           ;
