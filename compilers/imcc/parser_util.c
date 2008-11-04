@@ -665,19 +665,12 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     if (!IMCC_INFO(interp)->error_code) {
         Parrot_sub *sub_data;
 
-        sub = pmc_new(interp, enum_class_Eval);
-
-        PackFile_fixup_subs(interp, PBC_MAIN, sub);
-
-        /* restore old byte_code, */
-        if (old_cs)
-            (void)Parrot_switch_to_cs(interp, old_cs, 0);
-
         /*
          * create sub PMC
          *
          * TODO if a sub was denoted :main return that instead
          */
+        sub                  = pmc_new(interp, enum_class_Eval);
         sub_data             = PMC_sub(sub);
         sub_data->seg        = new_cs;
         sub_data->start_offs = 0;
@@ -705,6 +698,13 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     Parrot_unblock_GC_mark(interp);
 
     yylex_destroy(yyscanner);
+
+    /* Now run any :load/:init subs. */
+    PackFile_fixup_subs(interp, PBC_MAIN, sub);
+
+    /* restore old byte_code, */
+    if (old_cs)
+        (void)Parrot_switch_to_cs(interp, old_cs, 0);
 
     return sub;
 }
