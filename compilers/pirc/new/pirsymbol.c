@@ -251,11 +251,7 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
                 /* create a new live_interval for this symbol, and enter it into the list */
                 PARROT_ASSERT(sym->interval == NULL);
 
-                /* use the current line number for interval start/end points; the instruction
-                 * counter may not be updated yet, so that counter is less suitable.
-                 */
-                sym->interval = new_live_interval(lexer->lsr, yypirget_lineno(lexer->yyscanner),
-                                                  sym->type);
+                sym->interval = new_live_interval(lexer->lsr, lexer->stmt_counter, sym->type);
 
                 sym->interval->color = &sym->color;
 
@@ -369,7 +365,7 @@ use_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     reg->color = next_register(lexer, type);
 
     /* create a new live interval for this symbolic register */
-    reg->interval = new_live_interval(lexer->lsr, lexer->instr_counter, type);
+    reg->interval = new_live_interval(lexer->lsr, lexer->stmt_counter, type);
     /* let the interval have a pointer to this symbolic register */
     reg->interval->color = &reg->color;
 

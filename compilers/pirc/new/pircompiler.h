@@ -36,7 +36,7 @@ typedef enum lexer_flags {
     LEXER_FLAG_HEREDOCONLY         = 1 << 5, /* preprocess heredocs only */
     LEXER_FLAG_NOOUTPUT            = 1 << 6, /* don't print anything on success, except 'ok' */
     LEXER_FLAG_REGALLOC            = 1 << 7, /* use register allocation optimizer */
-    LEXER_FLAG_PASMFILE            = 1 << 8
+    LEXER_FLAG_PASMFILE            = 1 << 8  /* the input is PASM, not PIR code */
 
 } lexer_flags;
 
@@ -104,6 +104,7 @@ typedef struct lexer_state {
     int            pir_reg_generator; /* for unique PIR register allocator, for temp. PIR regs. */
 
     unsigned       instr_counter;  /* to assign an index to each instruction */
+    unsigned       stmt_counter;   /* to count "logical" statements, even if multi-line. */
 
     Interp        *interp;         /* parrot interpreter */
 

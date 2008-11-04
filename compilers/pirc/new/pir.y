@@ -762,10 +762,11 @@ unique_reg_flag   : ":unique_reg"
 
 instructions      : /* empty */
                   | instructions instruction
+                        { ++lexer->stmt_counter; }
                   ;
 
 instruction       : TK_LABEL statement
-                         { set_label(lexer, $1); }
+                        { set_label(lexer, $1); }
                   | statement
                   ;
 
@@ -1570,7 +1571,12 @@ opt_long_results     : /* empty */
 long_results         : long_result
                            { $$ = $1; }
                      | long_results long_result
-                           { $$ = add_target(lexer, $1, $2); }
+                           {
+                               if ($2)
+                                   $$ = add_target(lexer, $1, $2);
+                               else
+                                   $$ = $1
+                           }
                      ;
 
 long_result          : ".get_result" result_target "\n"
