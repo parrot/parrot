@@ -179,7 +179,10 @@ REGISTER       "$"[SNIP]{DIGITS}
 %%
 
 
-<SPECIALSTART>.|\n    {
+<SPECIALSTART>.|\n    { /* only when the scanning starts, is this state used. Only a single
+                         * character is read, pushed back, and then, depending on the
+                         * lexer flags, either PASM or PIR mode (INITIAL state) is activated.
+                         */
                         yyless(0);
                         yy_pop_state(yyscanner);
 
@@ -1164,76 +1167,6 @@ expand_macro(yyscan_t yyscanner, macro_def * const macro, macro_param * args) {
     yyset_lineno(macro->linedefined, yyscanner);
 }
 
-/*
-
-=item C<static int
-is_pir_directive(char * const text)>
-
-Returns TRUE if C<text> is a PIR directive; FALSE otherwise.
-
-=cut
-
-*/
-
-/*  XXX I don't think we need this any longer.
-
-PARROT_PURE_FUNCTION
-PARROT_WARN_UNUSED_RESULT
-static int
-is_pir_directive(char * const text) {
-    char const * const directives[] = {
-        ".set_arg"      ,
-        ".const"        ,
-        ".end"          ,
-        ".file"         ,
-        ".get_results"  ,
-        ".globalconst"  ,
-        ".HLL"          ,
-        ".HLL_map"      ,
-        ".invocant"     ,
-        ".lex"          ,
-        ".line"         ,
-        ".loadlib"      ,
-        ".local"        ,
-        ".meth_call"    ,
-        ".namespace"    ,
-        ".nci_call"     ,
-        ".param"        ,
-        ".begin_call"   ,
-        ".begin_return" ,
-        ".begin_yield"  ,
-        ".call"         ,
-        ".end_call"     ,
-        ".end_return"   ,
-        ".end_yield"    ,
-        ".get_result"   ,
-        ".return"       ,
-        ".sub"          ,
-        ".yield"        ,
-        ".set_return"   ,
-        ".set_yield"    ,
-        ".tailcall"     ,
-        NULL
-    };
-*/
-
-    /* Reading from right to left:
-     * iter is a pointer to constant pointers to constant characters.
-     */
-/*
-    char const * const * iter;
-
-    iter = directives;
-
-    while (*iter) {
-        if (STREQ(*iter, text))
-            return 1;
-        iter++;
-    }
-    return 0;
-}
-
-*/
 
 
 /*

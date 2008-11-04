@@ -36,7 +36,9 @@
  * normal strings. Newline characters are escaped.
  * POD comments and line comments are filtered out.
  *
- *
+ * This pre-processor also handles the C<.include> directive.
+ * This is necessary, as all files being compiled as a side-effect
+ * must have their heredocs flattened.
  */
 
 
@@ -50,7 +52,7 @@
 #include "pirheredoc.h"
 
 
-/* don't bother to include the header file (which is generated);
+/* don't bother to generate and include the header file;
  * we don't need it, really. Just some prototypes declarations needed.
  */
 int   yylex_init(yyscan_t * yyscanner);
@@ -110,7 +112,7 @@ extern void           yyset_extra(YY_EXTRA_TYPE lexer , yyscan_t scanner);
 =item C<static void
 lex_error(yyscan_t yyscanner, char const * const message, ...)>
 
-Emit an error message.
+Emit an error message, increment error counter.
 
 =cut
 
@@ -140,7 +142,7 @@ lex_error(yyscan_t yyscanner, NOTNULL(char const * const message), ...) {
 =item C<static global_state *
 init_global_state(char * const filename, FILE *outfile)>
 
-create and initialize a global_state structure, containing all 'global'
+Create and initialize a global_state structure, containing all 'global'
 variables that are needed during the scanning.
 
 =cut
@@ -168,7 +170,7 @@ init_global_state(NOTNULL(char * const filename), NOTNULL(FILE *outfile)) {
 =item C<static void
 destroy_global_state(global_state * state)>
 
-free all memory of the global state structure.
+Free all memory of the global state structure.
 
 =cut
 
@@ -190,6 +192,12 @@ destroy_global_state(NOTNULL(global_state *state)) {
 =item C<void
 process_heredocs(char * const filename, FILE *outputfile)>
 
+Scan the file C<filename> for heredoc strings, and write the I<normalized> heredoc
+strings to the file C<outputfile>. The scan session uses a fresh C<yyscan_t>
+object, so any nested (recursive, in a way) calls of this function are handled
+fine, as each invocation has its own state. After the file C<filename> is processed,
+all resources are released.
+
 =cut
 
 */
@@ -203,7 +211,7 @@ process_heredocs(NOTNULL(char * const filename), NOTNULL(FILE *outfile)) {
     fp = fopen(filename, "r");
 
     if (fp == NULL) {
-        fprintf(stderr, "error opening file '%s'\n", filename);
+        fprintf(stderr, "heredoc preprocesor: error opening file '%s'\n", filename);
         exit(EXIT_FAILURE);
     }
 
@@ -528,10 +536,7 @@ LINECOMMENT    [#].*{EOL}
 
 <INCLUDE>.                  { lex_error(yyscanner, "wrong scanner state\n"); }
 
-<INITIAL>.                  {
-
-                              fprintf(yyget_extra(yyscanner)->outfile, "%s", yytext);
-                            }
+<INITIAL>.                  { fprintf(yyget_extra(yyscanner)->outfile, "%s", yytext); }
 
 %%
 
