@@ -305,6 +305,21 @@ unique number.
 .end
 
 
+=item isa([type])
+
+Ask the current object's metaclass if C<self> is a C<type>, through its C<isa>
+method. If so, return 1, else return 0.
+
+=cut
+
+.sub 'isa' :method
+    .param pmc type
+    $P0 = self.'HOW'()
+    $I0 = $P0.'isa'(self, type)
+    .return ($I0)
+.end
+
+
 =back
 
 =head1 AUTHOR
