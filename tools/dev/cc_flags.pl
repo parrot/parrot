@@ -31,9 +31,15 @@ use strict;
 use warnings;
 
 my $return_only;
+my $verbose;
 
 if ($ARGV[0] eq '--return-only') {
     $return_only = 1;
+    shift;
+}
+
+if ($ARGV[0] eq '-v') {
+    $verbose = 1;
     shift;
 }
 
@@ -137,6 +143,10 @@ if ($cfile) {
 if ($return_only) {
     print join ' ', @ARGV;
     exit;
+}
+
+if ($verbose) {
+    print join ' ', @ARGV;
 }
 
 exit system(@ARGV) / 256;

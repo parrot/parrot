@@ -37,67 +37,43 @@ new/hdocprep.c \
 new/pirmacro.c \
 new/pirregalloc.c
 
+OBJS          = \
+new/main$(O) \
+new/pirparser$(O) \
+new/pirlexer$(O) \
+new/pircompunit$(O) \
+new/pircompiler$(O) \
+new/pirsymbol$(O) \
+new/piremit$(O) \
+new/hdocprep$(O) \
+new/pirmacro$(O) \
+new/pirregalloc$(O)
+
+.c$(O) :
+  @$(PERL) ../../tools/dev/cc_flags.pl -v ../../CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
+
+
 # the default target
-all: pirc heredoc macro
+all: pirc$(EXE)
 
 
-pirc: new/main$(O) new/pirparser$(O) new/pirlexer$(O) new/pircompunit$(O) \
-	new/pircompiler$(O) new/pirsymbol$(O) new/piremit$(O) new/hdocprep$(O) \
-	new/pirmacro$(O) new/pirregalloc$(O)
+pirc$(EXE): $(OBJS)
 	$(LINK) @ld_out@$@ \
-	main$(O) pirparser$(O) pirlexer$(O) pircompunit$(O) pircompiler$(O) \
-	pirsymbol$(O) piremit$(O) hdocprep$(O) pirmacro$(O) pirregalloc$(O) \
-	@rpath_blib@ @libparrot_ldflags@ $(LINKFLAGS) $(LINK_DYNAMIC)
-
-new/main$(O): new/main.c
-	$(CC) $(CFLAGS) -c new/main.c
+  $(OBJS) \
+	@rpath_blib@ ../../@libparrot_ldflags@ $(C_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 
 new/pirparser$(O): new/pirparser.c new/pirparser.h
-	$(CC) $(CFLAGS) -c new/pirparser.c
-
 new/pirlexer$(O): new/pirlexer.c src/pirlexer.h
-	$(CC) $(CFLAGS) -c new/pirlexer.c
-
 new/pircompunit$(O): new/pircompunit.c new/pircompunit.h
-	$(CC) $(CFLAGS) -c new/pircompunit.c
-
 new/pircompiler$(O): new/pircompiler.c new/pircompiler.h
-	$(CC) $(CFLAGS) -c new/pircompiler.c
-
 new/pirsymbol$(O): new/pirsymbol.c new/pirsymbol.h
-	$(CC) $(CFLAGS) -c new/pirsymbol.c
-
 new/piremit$(O): new/piremit.c new/piremit.h
-	$(CC) $(CFLAGS) -c new/piremit.c
-
 new/hdocprep$(O): new/hdocprep.c new/hdocprep.l
-	$(CC) $(CFLAGS) -c new/hdocprep.c
-
 new/pirmacro$(O): new/pirmacro.c new/pirmacro.h
-	$(CC) $(CFLAGS) -c new/pirmacro.c
-
 new/pirregalloc$(O): new/pirregalloc.c new/pirregalloc.h
-	$(CC) $(CFLAGS) -c new/pirregalloc.c
-
-heredoc: heredoc/hdocprep$(O)
-	$(LINK) hdocprep$(O) $(LIBPARROT)
-
-heredoc/hdocprep$(O): heredoc/hdocprep.c
-	$(CC) $(CFLAGS) -c heredoc/hdocprep.c
-
-macro: macro/macroparser$(O) macro/macrolexer$(O)
-	$(LINK) macroparser$(O) macrolexer$(O) $(LIBPARROT)
-
-macro/macroparser$(O): macro/macroparser.c
-	$(CC) $(CFLAGS) -c macro/macroparser.c
-
-macro/macrolexer$(O): macro/macrolexer.c
-	$(CC) $(CFLAGS) -c macro/macrolexer.c
-
-
 
 test: all
-	cd t && prove && cd ..
+	prove 
 	podchecker $(SOURCES) \
 	doc/design.pod \
     README.pod
@@ -109,6 +85,8 @@ Makefile: $(BUILD_DIR)/config/gen/makefiles/pirc.in
 
 clean:
 	$(RM_F) *$(O)
+	$(RM_F) $(OBJS)
+	$(RM_F) pirc
 
 realclean: clean
 	$(RM_F) \

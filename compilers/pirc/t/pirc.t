@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use lib qw( . ../../../lib);
+use lib qw( . ../../lib);
 use Test::More;
 use Parrot::Config;
 
@@ -21,7 +21,7 @@ my @files;
 BEGIN {
 
     # test all files in current directory
-    my $dir = ".";
+    my $dir = "t";
 
     # get all files
     @files = <$dir/*>;
@@ -41,8 +41,8 @@ my $count = 1;
 foreach my $file (@files) {
 
     # skip this file
-    next if $file eq "./pirc.t";
-    my $cmd = "../pirc $file";
+    next if $file eq "t/pirc.t";
+    my $cmd = "pirc $file";
     run_command($cmd);
     ok( $count, "" );
     $count++;
