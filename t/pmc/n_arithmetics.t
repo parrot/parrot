@@ -442,8 +442,6 @@ various combinations of Parrot integer and number types.
     ok( 0, 'variables have different addresses' )
 .end
 
-### Tests of ".pragma n_operators 1" moved to n_operators.t
-
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
