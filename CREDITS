@@ -163,7 +163,7 @@ D: Rakudo builtins
 E: cdavaz@gmail.com
 
 N: Chris Dolan
-D: TAP language author, and Parrot Bug fixes
+D: TAP language author, Parrot Bug fixes and Rakudo patches
 E: cdolan@cpan.org
 
 N: Chris Fields (cjfields)
