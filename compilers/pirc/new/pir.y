@@ -2024,31 +2024,12 @@ opt_pasm_instruction      : empty_stat
                           | pasm_instruction
                           ;
 
-pasm_sub_directive        : pasm_sub_head pasm_sub_flags TK_LABEL
+pasm_sub_directive        : pasm_sub_head sub_flags TK_LABEL
                                 { set_sub_name(lexer, $3); } /* now update the sub's name */
                           ;
 
 pasm_sub_head             : ".pcc_sub"
                                 { new_subr(lexer, NULL); } /* don't know the sub's name yet */
-                          ;
-
-/* XXX check out which flags are PASM as well, and refactor PIR grammar bits. */
-pasm_sub_flags            : /* empty */
-                          | pasm_sub_flags pasm_sub_flag
-                          ;
-
-pasm_sub_flag             : ":init"
-                                { set_sub_flag(lexer, SUB_FLAG_INIT); }
-                          | ":main"
-                                { set_sub_flag(lexer, SUB_FLAG_MAIN); }
-                          | ":load"
-                                { set_sub_flag(lexer, SUB_FLAG_LOAD); }
-                          | ":anon"
-                                { set_sub_flag(lexer, SUB_FLAG_ANON); }
-                          | ":postcomp"
-                                { set_sub_flag(lexer, SUB_FLAG_POSTCOMP); }
-                          | ":immediate"
-                                { set_sub_flag(lexer, SUB_FLAG_IMMEDIATE); }
                           ;
 
 pasm_instruction          : parrot_op op_args "\n"
@@ -2057,7 +2038,7 @@ pasm_instruction          : parrot_op op_args "\n"
                                       yypirerror(yyscanner, lexer, "'%s' is not a parrot op", $1);
                                   }
                                   else {
-                                    get_opinfo(yyscanner);
+                                      get_opinfo(yyscanner);
                                   }
                                 }
                           ;
