@@ -148,7 +148,7 @@ typedef struct constant {
 #define CONST_STRVAL(c) c->val.sval
 
 /* The expression node is used as a wrapper to represent target nodes (like .param, .local
- * and registers), constant nodes (either named or anonymous), XXX identifiers?? XXX,
+ * and registers), constant nodes (either named or anonymous), label identifiers,
  * or key nodes, such as ["x";42].
  */
 typedef struct expression {

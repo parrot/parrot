@@ -1371,7 +1371,7 @@ conditional_instr : if_unless "null" TK_IDENT "goto" identifier
                              if (($2 == FALSE && $1 == NEED_INVERT_OPNAME)/* unless false -> jump */
                              ||  ($2 == TRUE  && $1 == DONT_INVERT_OPNAME)) {  /* if true -> jump */
                                 set_instrf(lexer, "branch", "%I", $4);
-                                set_op_labelflag(lexer, BIT(1));
+                                set_op_labelflag(lexer, BIT(0));
                              }
                              else                       /* if false, unless true --> do nothing */
                                 set_instr(lexer, "noop");
@@ -1463,7 +1463,7 @@ then              : "goto" /* PIR mode */
 goto_stat         : "goto" identifier "\n"
                         {
                           set_instrf(lexer, "branch", "%I", $2);
-                          set_op_labelflag(lexer, BIT(1));
+                          set_op_labelflag(lexer, BIT(0)); /* bit 0 means: "1 << 0" */
                           get_opinfo(yyscanner);
                         }
                   ;
@@ -3517,7 +3517,13 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
                 }
             }
             else { /* operand i is a label. */
-                /* fprintf(stderr, "operand %d is expected to be a label\n", i); */
+                /* set the i'th flag, indicating that the i'th operand is actually a
+                 * label. Then later, when we're going to fixup the labels, we know
+                 * which one to fix.
+                 */
+                fprintf(stderr, "setting %dth label flag on instruction %s\n", BIT(i),
+                        CURRENT_INSTRUCTION(lexer)->opname);
+                SET_FLAG(CURRENT_INSTRUCTION(lexer)->oplabelbits, BIT(i));
 
             }
 

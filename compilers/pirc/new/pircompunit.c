@@ -199,6 +199,9 @@ set_sub_lexid(lexer_state * const lexer, char const * const lexid) {
 =item C<void
 set_sub_instanceof(lexer_state * const lexer, char * const classname)>
 
+Set the value of the C<:instanceof> flag on a sub. Note that this flag
+is experimental, and not actually used at this point.
+
 =cut
 
 */
@@ -2062,14 +2065,6 @@ the label's offset is subtracted from the current instruction's offset,
 and the operand of the branch instruction is changed into this numeric
 representation of the label.
 
-XXX TODO: figure out how we can set a INSTR_FLAG_BRANCH or whatever on /all/
-branching ops; can we figure out through the interp's op_lib thing?
-Surely, the ops are defined with a :flow flag or whatever. Use this!
-
-(Currently, this flag is set manually in the parser. That must be fixed,
- but we don't want a list of string comparisons for 'branch', 'if', 'jump',
- etc.; that's lame.)
-
 =cut
 
 */
@@ -2089,20 +2084,66 @@ fixup_local_labels(lexer_state * const lexer) {
         /* depending on what kind of branching instruction, get the right operand
          * that contains the label.
          */
-        if (iter->oplabelbits) {}
+        if (iter->oplabelbits) { /* this is a quick global check if any label bits have been set
+                                  * if no label at all, skip this whole block.
+                                  */
 
+            /* now check for each operand */
+            expression *operand = iter->operands;
 
+            /* iter->operands is a circular linked list, point to the *last* operand. */
 
+            /* Note that since oplabelbits has at least 1 bit set (otherwise it wouldn't
+             * have been evaluated as "true" in the if statement above), we can be
+             * sure there's at least one operand. Don't do silly tests here anymore.
+             */
+            int flag = 0;
 
-        /*
-        if (iter->flags) {
-            unsigned offset     = find_local_label(lexer, label->expr.id);
-            unsigned curr_instr = iter->offset;
+            /* fprintf(stderr, "instruction '%s' has at least 1 label...\n", iter->opname); */
 
+            do {
 
+                operand = operand->next;
 
-            label->expr.c = new_const(lexer, INT_TYPE, offset - curr_instr);
-            label->type   = EXPR_CONSTANT;
+                if (TEST_FLAG(iter->oplabelbits, BIT(flag))) {
+                    /* the current operand is a label; fix it up. No, not a date. */
+                    char const * labelid = operand->expr.id;
+                    unsigned     offset  = find_local_label(lexer, labelid);
+
+                    /* fprintf(stderr, "operand %d is a label\n", BIT(flag)); */
+
+                    if (offset) { /* label was found */
+                        unsigned curr_instr = iter->offset;
+
+                        /* convert the label identifier into a integer offset. */
+
+                        /* XXX it would be nice if we can keep the label ID around.
+                         * Fix that later.
+                         */
+                        operand->expr.c = new_const(lexer, INT_TYPE, offset - curr_instr);
+                        operand->type   = EXPR_CONSTANT;
+                    }
+                    else {
+                        yypirerror(lexer->yyscanner, lexer,
+                                   "cannot fix up reference to label '%s'", labelid);
+                    }
+                } /*
+                else {
+                    fprintf(stderr, "NOT a label (operand %d): ", BIT(flag));
+                    print_expr(lexer, operand);
+                }
+                */
+
+                /* move the flag 1 bit over to the left */
+                flag <<= 1;
+
+            }
+            while (operand != iter->operands);
+
+        } /*
+        else {
+            if (iter->opname)
+                fprintf(stderr, "instruction '%s did not have labels\n", iter->opname);
         }
         */
 

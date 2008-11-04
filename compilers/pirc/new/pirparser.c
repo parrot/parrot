@@ -3463,7 +3463,7 @@ yyreduce:
                              if (((yyvsp[(2) - (4)].ival) == FALSE && (yyvsp[(1) - (4)].ival) == NEED_INVERT_OPNAME)/* unless false -> jump */
                              ||  ((yyvsp[(2) - (4)].ival) == TRUE  && (yyvsp[(1) - (4)].ival) == DONT_INVERT_OPNAME)) {  /* if true -> jump */
                                 set_instrf(lexer, "branch", "%I", (yyvsp[(4) - (4)].sval));
-                                set_op_labelflag(lexer, BIT(1));
+                                set_op_labelflag(lexer, BIT(0));
                              }
                              else                       /* if false, unless true --> do nothing */
                                 set_instr(lexer, "noop");
@@ -3591,7 +3591,7 @@ yyreduce:
 #line 1464 "pir.y"
     {
                           set_instrf(lexer, "branch", "%I", (yyvsp[(2) - (3)].sval));
-                          set_op_labelflag(lexer, BIT(1));
+                          set_op_labelflag(lexer, BIT(0)); /* bit 0 means: "1 << 0" */
                           get_opinfo(yyscanner);
                         ;}
     break;
@@ -6164,7 +6164,13 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
                 }
             }
             else { /* operand i is a label. */
-                /* fprintf(stderr, "operand %d is expected to be a label\n", i); */
+                /* set the i'th flag, indicating that the i'th operand is actually a
+                 * label. Then later, when we're going to fixup the labels, we know
+                 * which one to fix.
+                 */
+                fprintf(stderr, "setting %dth label flag on instruction %s\n", BIT(i),
+                        CURRENT_INSTRUCTION(lexer)->opname);
+                SET_FLAG(CURRENT_INSTRUCTION(lexer)->oplabelbits, BIT(i));
 
             }
 
