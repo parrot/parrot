@@ -1499,10 +1499,6 @@ mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
 static PMC *
 Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub))
 {
-    /* has to be a builtin multi method */
-    if (sub->vtable->base_type == enum_class_NCI)
-        return PMC_pmc_val(sub);
-
     if (VTABLE_isa(interp, sub, CONST_STRING(interp, "Sub"))) {
         PMC *multi_sig = PMC_sub(sub)->multi_signature;
 
@@ -1541,10 +1537,16 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
     PMC *multi_sig, *mro;
     INTVAL i, n, args, dist, j, m;
 
-    if (PMC_IS_NULL(PMC_sub(pmc)->multi_signature))
-        return 0;
+    /* has to be a builtin multi method */
+    if (pmc->vtable->base_type == enum_class_NCI)
+        multi_sig = PMC_pmc_val(pmc);
+    else {
+        /* not a multi; no distance */
+        if (!PMC_sub(pmc)->multi_signature)
+            return 0;
 
-    multi_sig = Parrot_mmd_get_cached_multi_sig(interp, pmc);
+        multi_sig = Parrot_mmd_get_cached_multi_sig(interp, pmc);
+    }
 
     if (PMC_IS_NULL(multi_sig))
         return MMD_BIG_DISTANCE;
