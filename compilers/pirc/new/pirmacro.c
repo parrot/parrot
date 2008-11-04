@@ -67,7 +67,7 @@ new_macro(macro_table * const table, char const * const name, int lineno, int ta
 /*
 
 =item C<macro_param *
-new_macro_param(char const * const value)
+new_macro_param(char const * const value)>
 
 Constructor for a C<macro_param> struct object. Initializes
 the C<name> attribute of the C<macro_param> object to C<value>.
