@@ -1117,7 +1117,7 @@ PARROT_API char *
 nci_ttt(char *s1, char *s2)
 {
     char* s = (char*) malloc(strlen(s2) + (2 * strlen(s1)) + 5);
-    sprintf( s, "%s, %s, %s", s2, s2, s1);
+    sprintf(s, "%s, %s, %s", s2, s2, s1);
     printf("%s\n", s);
     return s;
 }

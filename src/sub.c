@@ -307,7 +307,7 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
             STRING *j = CONST_STRING(interp, ";");
             STRING *res;
 
-            /* 
+            /*
              * When running with -t4, the invoke done in
              * Parrot_ns_get_name stomps on settings in interp; we
              * have to save these and restore them to avoid affecting
