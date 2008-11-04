@@ -11,8 +11,6 @@
 #def gen_x():
 #    return imap(lambda k: (k, 4*k + 2, 0, 2*k + 1), count(1))
 
-.pragma n_operators 1
-
 .sub count
     .param pmc start
 loop:
