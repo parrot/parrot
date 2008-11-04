@@ -50,7 +50,7 @@ new/pirmacro$(O) \
 new/pirregalloc$(O)
 
 .c$(O) :
-  @$(PERL) ../../tools/dev/cc_flags.pl -v ../../CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
+	@$(PERL) ../../tools/dev/cc_flags.pl -v ../../CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
 
 
 # the default target
