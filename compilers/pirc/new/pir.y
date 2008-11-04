@@ -3473,7 +3473,8 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
             }
             else { /* it must be a label */
                 SET_BIT(label_bitmask, BIT(i));
-                fprintf(stderr, "%s must be a label\n", operand->expr.id);
+                /* fprintf(stderr, "%s must be a label\n", operand->expr.id);
+                 */
             }
 
         }
@@ -3501,11 +3502,14 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
         if (iter == NULL)
             return TRUE;
 
-        iter = iter->next; /* go to first */
-
-
         /* iterate over all operands */
-        while (iter != CURRENT_INSTRUCTION(lexer)->operands->next) {
+        do {
+            iter = iter->next;
+
+            /* fprintf(stderr, "operand %d is %s supposed to be a label\n", i,
+               opinfo->labels[i]? "":"not");
+             */
+
             if (opinfo->labels[i] == 0) {
                 /* test the bitmask; if we expected this operand was a label, but now we found out
                  * through opinfo that it's not supposed to be a label at this position, so emit
@@ -3521,15 +3525,19 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
                  * label. Then later, when we're going to fixup the labels, we know
                  * which one to fix.
                  */
+
+                /*
                 fprintf(stderr, "setting %dth label flag on instruction %s\n", BIT(i),
                         CURRENT_INSTRUCTION(lexer)->opname);
+                 */
+
                 SET_FLAG(CURRENT_INSTRUCTION(lexer)->oplabelbits, BIT(i));
 
             }
 
-            iter = iter->next;
             ++i;
         }
+        while (iter != CURRENT_INSTRUCTION(lexer)->operands);
     }
     return TRUE;
 }

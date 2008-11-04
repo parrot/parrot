@@ -167,6 +167,9 @@ print_expr(lexer_state * const lexer, expression * const expr) {
         case EXPR_KEY:
             print_key(lexer, expr->expr.k);
             break;
+        case EXPR_LABEL:
+            fprintf(out, "%d", expr->expr.l->offset);
+            break;
         default:
             break;
     }

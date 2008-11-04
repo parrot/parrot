@@ -2056,6 +2056,25 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
 
 /*
 
+=item C<static label *
+new_label(lexer_state * const lexer, char const * const labelid, int offset)>
+
+Constructor for a label operand.
+
+=cut
+
+*/
+PARROT_MALLOC
+static label *
+new_label(lexer_state * const lexer, char const * const labelid, int offset) {
+    label *l  = pir_mem_allocate_zeroed_typed(lexer, label);
+    l->name   = labelid;
+    l->offset = offset;
+    return l;
+}
+
+/*
+
 =item C<static void
 fixup_local_labels(subroutine * const sub)>
 
@@ -2099,8 +2118,6 @@ fixup_local_labels(lexer_state * const lexer) {
              */
             int flag = 0;
 
-            /* fprintf(stderr, "instruction '%s' has at least 1 label...\n", iter->opname); */
-
             do {
 
                 operand = operand->next;
@@ -2115,37 +2132,23 @@ fixup_local_labels(lexer_state * const lexer) {
                     if (offset) { /* label was found */
                         unsigned curr_instr = iter->offset;
 
-                        /* convert the label identifier into a integer offset. */
-
-                        /* XXX it would be nice if we can keep the label ID around.
-                         * Fix that later.
-                         */
-                        operand->expr.c = new_const(lexer, INT_TYPE, offset - curr_instr);
-                        operand->type   = EXPR_CONSTANT;
+                        /* convert the label identifier into a real label object */
+                        operand->expr.l = new_label(lexer, labelid, offset - curr_instr);
+                        operand->type   = EXPR_LABEL;
                     }
                     else {
                         yypirerror(lexer->yyscanner, lexer,
                                    "cannot fix up reference to label '%s'", labelid);
                     }
-                } /*
-                else {
-                    fprintf(stderr, "NOT a label (operand %d): ", BIT(flag));
-                    print_expr(lexer, operand);
                 }
-                */
 
-                /* move the flag 1 bit over to the left */
-                flag <<= 1;
+                ++flag;
 
             }
             while (operand != iter->operands);
 
-        } /*
-        else {
-            if (iter->opname)
-                fprintf(stderr, "instruction '%s did not have labels\n", iter->opname);
         }
-        */
+
 
     }
     while (iter != lexer->subs->statements); /* iterate over all instructions */

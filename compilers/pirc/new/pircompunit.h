@@ -33,7 +33,8 @@ typedef enum expr_types {
     EXPR_TARGET,
     EXPR_CONSTANT,
     EXPR_IDENT,
-    EXPR_KEY
+    EXPR_KEY,
+    EXPR_LABEL
 
 } expr_type;
 
@@ -142,6 +143,14 @@ typedef struct constant {
 
 } constant;
 
+/* for representing a label operand */
+typedef struct label {
+    int         offset;
+    char const *name;
+
+} label;
+
+
 #define CONST_INTVAL(c) c->val.ival
 #define CONST_NUMVAL(c) c->val.nval
 #define CONST_PMCVAL(c) c->val.pval
@@ -157,6 +166,7 @@ typedef struct expression {
         constant       *c;
         char const     *id;
         struct key     *k;
+        struct label   *l;
 
     } expr;
 
