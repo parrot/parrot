@@ -121,6 +121,7 @@ sub makefiles {
         : keys %{ $self->{makefiles} };
 
     foreach my $target (@targets) {
+        $target =~ s/\\/\//g if $^O eq 'MSWin32';
         my $args   = $self->{makefiles}->{$target};
         my $source = delete $args->{SOURCE};
 
