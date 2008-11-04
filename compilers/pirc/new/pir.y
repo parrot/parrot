@@ -1024,7 +1024,6 @@ parrot_op_assign  : target '=' parrot_op op_arg_expr ',' parrot_op_args
                   ;
 
 assignment_stat   : assignment "\n"
-                        { get_opinfo(yyscanner); }
                   ;
 
 assignment        : target '=' TK_INTC
@@ -1033,6 +1032,8 @@ assignment        : target '=' TK_INTC
                               set_instrf(lexer, "null", "%T", $1);
                           else
                               set_instrf(lexer, "set", "%T%i", $1, $3);
+
+                          get_opinfo(yyscanner);
                         }
                   | target '=' TK_NUMC
                         {
@@ -1040,20 +1041,29 @@ assignment        : target '=' TK_INTC
                               set_instrf(lexer, "null", "%T", $1);
                           else
                               set_instrf(lexer, "set", "%T%n", $1, $3);
+
+                          get_opinfo(yyscanner);
                         }
                   | target '=' TK_STRINGC
-                        { set_instrf(lexer, "set", "%T%s", $1, $3); }
+                        {
+                          set_instrf(lexer, "set", "%T%s", $1, $3);
+                          get_opinfo(yyscanner);
+                        }
                   | target '=' binary_expr
-                        { unshift_operand(lexer, expr_from_target(lexer, $1)); }
+                        {
+                          unshift_operand(lexer, expr_from_target(lexer, $1));
+                          get_opinfo(yyscanner);
+                        }
                   | target '=' parrot_op
                         {
                           symbol *sym = find_symbol(lexer, $3);
                           if (sym == NULL) {
                               if (!is_parrot_op(lexer, $3))
                                   yypirerror(yyscanner, lexer, "'%s' is neither a declared symbol "
-                                                            "nor a parrot opcode", $3);
+                                                               "nor a parrot opcode", $3);
                               else { /* handle it as an op */
                                   unshift_operand(lexer, expr_from_target(lexer, $1));
+                                  get_opinfo(yyscanner);
                                   check_first_arg_direction(yyscanner, $3);
                               }
                           }
@@ -1062,6 +1072,7 @@ assignment        : target '=' TK_INTC
                               unshift_operand(lexer, expr_from_target(lexer,
                                                      target_from_symbol(lexer, sym)));
                               unshift_operand(lexer, expr_from_target(lexer, $1));
+                              get_opinfo(yyscanner);
                           }
                         }
                   | target '=' parrot_op keylist
@@ -1080,8 +1091,10 @@ assignment        : target '=' TK_INTC
                           symbol *sym = find_symbol(lexer, $3);
                           target *t;
                           if (sym == NULL) {
-                              if (is_parrot_op(lexer, $3))
+                              if (is_parrot_op(lexer, $3)) {
                                   set_instrf(lexer, $3, "%T%E", $1, expr_from_key(lexer, $4));
+                                  get_opinfo(yyscanner);
+                              }
                               else
                                   yypirerror(yyscanner, lexer, "indexed object '%s' not declared", $3);
 
@@ -1099,6 +1112,7 @@ assignment        : target '=' TK_INTC
                               update_instr(lexer, "set");
                               unshift_operand(lexer, expr_from_target(lexer, t));
                               unshift_operand(lexer, expr_from_target(lexer, $1));
+                              get_opinfo(yyscanner);
                           }
                         }
                   | target '=' keyword keylist
@@ -1117,15 +1131,20 @@ assignment        : target '=' TK_INTC
                           t = target_from_symbol(lexer, sym);
                           set_target_key(t, $4);
                           set_instrf(lexer, "set", "%T%T", $1, t);
+                          get_opinfo(yyscanner);
                         }
                   | target '=' TK_PREG keylist
                         {
                           target *preg = new_reg(lexer, PMC_TYPE, $3);
                           set_target_key(preg, $4);
                           set_instrf(lexer, "set", "%T%T", $1, preg);
+                          get_opinfo(yyscanner);
                         }
                   | target augmented_op expression
-                        { set_instrf(lexer, opnames[$2], "%T%E", $1, $3); }
+                        {
+                          set_instrf(lexer, opnames[$2], "%T%E", $1, $3);
+                          get_opinfo(yyscanner);
+                        }
                   | target "+=" TK_INTC
                         {
                           if ($3 == 1)
@@ -1134,6 +1153,8 @@ assignment        : target '=' TK_INTC
                               set_instr(lexer, "noop");
                           else
                               set_instrf(lexer, "add", "%T%i", $1, $3);
+
+                          get_opinfo(yyscanner);
                         }
                   | target "+=" TK_NUMC
                         {
@@ -1143,6 +1164,8 @@ assignment        : target '=' TK_INTC
                               set_instr(lexer, "noop");
                           else
                               set_instrf(lexer, "add", "%T%n", $1, $3);
+
+                          get_opinfo(yyscanner);
                         }
                   | target "-=" TK_INTC
                         {
@@ -1152,6 +1175,8 @@ assignment        : target '=' TK_INTC
                               set_instr(lexer, "noop");
                           else
                               set_instrf(lexer, "sub", "%T%i", $1, $3);
+
+                          get_opinfo(yyscanner);
                         }
                   | target "-=" TK_NUMC
                         {
@@ -1161,19 +1186,32 @@ assignment        : target '=' TK_INTC
                               set_instr(lexer, "noop");
                           else
                               set_instrf(lexer, "sub", "%T%n", $1, $3);
+
+                          get_opinfo(yyscanner);
                         }
                   | target "+=" target
-                        { set_instrf(lexer, "add", "%T%T", $1, $3); }
+                        {
+                          set_instrf(lexer, "add", "%T%T", $1, $3);
+                          get_opinfo(yyscanner);
+                        }
                   | target "-=" target
-                        { set_instrf(lexer, "sub", "%T%T", $1, $3); }
+                        {
+                          set_instrf(lexer, "sub", "%T%T", $1, $3);
+                          get_opinfo(yyscanner);
+                        }
                   | target '=' unop expression
-                        { set_instrf(lexer, $3, "%T%E", $1, $4); }
+                        {
+                          set_instrf(lexer, $3, "%T%E", $1, $4);
+                          get_opinfo(yyscanner);
+                        }
                   | target '=' target binop target
                         {
                           if (targets_equal($1, $3)) /* $P0 = $P0 + $P1 ==> $P0 += $P1 */
                               set_instrf(lexer, opnames[$4], "%T%T", $1, $5);
                           else
                               set_instrf(lexer, opnames[$4], "%T%T%T", $1, $3, $5);
+
+                          get_opinfo(yyscanner);
                         }
                   | keyword keylist '=' expression
                         {
@@ -1192,12 +1230,14 @@ assignment        : target '=' TK_INTC
                           t = target_from_symbol(lexer, sym);
                           set_target_key(t, $2);
                           set_instrf(lexer, "set", "%T%E", t, $4);
+                          get_opinfo(yyscanner);
                       }
                   | TK_PREG keylist '=' expression
                         {
                           target *preg = new_reg(lexer, PMC_TYPE, $1);
                           set_target_key(preg, $2);
                           set_instrf(lexer, "set", "%T%E", preg, $4);
+                          get_opinfo(yyscanner);
                         }
                   ;
 
@@ -3085,15 +3125,20 @@ check_first_arg_direction(yyscan_t yyscanner, NOTNULL(char const * const opname)
     lexer_state * lexer = (lexer_state *)yypirget_extra(yyscanner);
 
 
-    PARROT_ASSERT(CURRENT_INSTRUCTION(lexer));
-
-    PARROT_ASSERT(CURRENT_INSTRUCTION(lexer)->opinfo);
-
     /* op_count also counts the instruction itself, so must be at least 2 */
-    PARROT_ASSERT(CURRENT_INSTRUCTION(lexer)->opinfo->op_count >= 2);
+    assert(CURRENT_INSTRUCTION(lexer)->opinfo->op_count >= 2);
 
     /* get the direction of the first argument */
-    dir_first_arg = CURRENT_INSTRUCTION(lexer)->opinfo->dirs[0];
+    if (!CURRENT_INSTRUCTION(lexer)->opinfo->dirs)
+        fprintf(stderr, "no opinfo->dirs!\n");
+    else {
+        op_info_t *opinfo =     CURRENT_INSTRUCTION(lexer)->opinfo;
+        if (opinfo)
+
+            dir_first_arg = CURRENT_INSTRUCTION(lexer)->opinfo->dirs[0];
+        else
+            fprintf(stderr, " no opinfo!\n");
+    }
 
     /* direction cannot be IN or INOUT */
     if (dir_first_arg == PARROT_ARGDIR_IN)
@@ -3409,7 +3454,6 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
                                             * include/parrot/op.h:18, so an int is good enough for
                                             * a bit mask to cover all operands.
                                             */
-    fprintf(stderr, "check args\n");
 
     /* iterate over all operands to set the type and PASM register on all target nodes, if any */
     num_operands = get_operand_count(lexer);
