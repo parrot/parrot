@@ -138,9 +138,9 @@ find_exception_handler(PARROT_INTERP, ARGIN(PMC *exception))
          * RT #45917 this check should better be in Parrot_exit
          */
 
-        /* we should probably detach the thread here */
+        /* no exception handler, but this is not the main thread */
         if (interp->thread_data && interp->thread_data->tid)
-            return NULL;
+            pt_thread_detach(interp->thread_data->tid);
 
         /*
          * only main should run the destroy functions - exit handler chain
