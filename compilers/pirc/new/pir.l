@@ -610,6 +610,12 @@ REGISTER       "$"[SNIP]{DIGITS}
                                yy_switch_to_buffer(lexer->buffer, yyscanner);
                              }
 
+<MACROEXPAND>"{"[^}]*"}"     { /* a braced argument; match ANYTHING up to the closing brace. */
+                               yylval->sval = dupstrn(yyget_extra(yyscanner),
+                                                      yytext + 1, yyleng - 2);
+                               return TK_MACRO_ARG_OTHER;
+                             }
+
 <MACROEXPAND>.               { yypirerror(yyscanner, yyget_extra(yyscanner),
                                           "unknown character in macro expansion: %c", yytext[0]);
                              }
