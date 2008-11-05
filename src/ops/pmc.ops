@@ -58,7 +58,7 @@ to do with the intializer.  See PDD02 for more.
 
 =cut
 
-op new(out PMC, in INT) {
+op new(out PMC, in INT) :deprecated {
     if ($2 <= 0 || $2 >= interp->n_vtable_max) {
         opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_NO_CLASS,
@@ -76,7 +76,7 @@ op new(out PMC, in INT) {
         $1 = pmc_new(interp, $2);
 }
 
-op new(out PMC, in INT, in PMC) {
+op new(out PMC, in INT, in PMC) :deprecated {
     if ($2 <= 0 || $2 >= interp->n_vtable_max) {
         opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_NO_CLASS,
