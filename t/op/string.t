@@ -1968,7 +1968,7 @@ String #2
 OUTPUT
 
 SKIP: {
-    skip( "Peding reimplementation of find_encoding", 1 );
+    skip( "Pending reimplementation of find_encoding", 1 );
     pasm_output_is( <<'CODE', <<'OUTPUT', 'find_encoding' );
       find_encoding I0, "singlebyte"
       print I0
