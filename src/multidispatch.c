@@ -73,14 +73,6 @@ static void mmd_add_multi_to_namespace(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PMC* mmd_arg_tuple_inline(PARROT_INTERP,
-    ARGIN(STRING *signature),
-    va_list args)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
 static PMC* mmd_build_type_tuple_from_long_sig(PARROT_INTERP,
     ARGIN(STRING *long_sig))
         __attribute__nonnull__(1)
@@ -139,11 +131,6 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC* Parrot_mmd_arg_tuple_func(PARROT_INTERP)
         __attribute__nonnull__(1);
-
-PARROT_CANNOT_RETURN_NULL
-static PMC * Parrot_mmd_deref(PARROT_INTERP, ARGIN(PMC *value))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
 
 static void Parrot_mmd_ensure_writable(PARROT_INTERP,
     INTVAL function,
@@ -382,30 +369,6 @@ Parrot_mmd_find_multi_from_sig_obj(PARROT_INTERP, ARGIN(STRING *name), ARGIN(PMC
 
     return VTABLE_get_pmc_keyed_int(interp, candidate_list, 0);
 
-}
-
-/*
-
-=item C<static PMC * Parrot_mmd_deref>
-
-If C<value> is a reference-like PMC, dereference it so we can make an MMD
-call on the 'real' value.
-
-{{**DEPRECATE**}}
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-static PMC *
-Parrot_mmd_deref(PARROT_INTERP, ARGIN(PMC *value))
-{
-    if (!PObj_is_object_TEST(value)
-    &&  VTABLE_type(interp, value) != value->vtable->base_type)
-        return VTABLE_get_pmc(interp, value);
-    else
-        return value;
 }
 
 
@@ -734,57 +697,6 @@ mmd_expand_y(PARROT_INTERP, INTVAL func_nr, INTVAL new_y)
 
 /*
 
-=item C<void mmd_add_by_class>
-
-Add a function to the MMD table by class name, rather than class number.
-Handles the case where the named class isn't loaded yet.
-
-Adds a new MMD function C<funcptr> to the C<func_num> function table
-that will be invoked when the left parameter is of class C<left_class>
-and the right parameter is of class C<right_class>. Both classes are
-C<STRING *>s that hold the PMC class names for the left and right sides.
-If either class isn't yet loaded, Parrot will cache the information such
-that the function will be installed if at some point in the future both
-classes are available.
-
-Currently this is done by just assigning class numbers to the classes,
-which the classes will pick up and use if they're later loaded, but we
-may later put the functions into a deferred table that we scan when PMC
-classes are loaded. Either way, the function will be guaranteed to be
-installed when it's needed.
-
-The function table must exist, but if it is too small, it will
-automatically be expanded.
-
-{{**DEPRECATE**}}
-
-=cut
-
-*/
-
-PARROT_API
-void
-Parrot_mmd_add_by_class(PARROT_INTERP,
-             INTVAL functype,
-             ARGIN(STRING *left_class), ARGIN(STRING *right_class),
-             NULLOK(funcptr_t funcptr))
-{
-    INTVAL left_type  = pmc_type(interp, left_class);
-    INTVAL right_type = pmc_type(interp, right_class);
-
-    if (left_type == enum_type_undef)
-        left_type = pmc_register(interp, left_class);
-
-    if (right_type == enum_type_undef)
-        right_type = pmc_register(interp, right_class);
-
-    Parrot_mmd_register(interp, functype, left_type, right_type, funcptr);
-
-}
-
-
-/*
-
 =item C<void Parrot_mmd_register>
 
 Register a function C<funcptr> for MMD function table C<func_num> for classes
@@ -1047,66 +959,6 @@ Parrot_mmd_sort_manhattan(PARROT_INTERP, ARGIN(PMC *candidates))
         return PMCNULL;
 
     return candidates;
-}
-
-
-/*
-
-=item C<static PMC* mmd_arg_tuple_inline>
-
-Return a list of argument types. PMC arguments are specified as function
-arguments.
-
-{{**DEPRECATE** Not actually called anywhere.}}
-
-=cut
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC*
-mmd_arg_tuple_inline(PARROT_INTERP, ARGIN(STRING *signature), va_list args)
-{
-    INTVAL       i;
-    PMC * const  arg_tuple = pmc_new(interp, enum_class_FixedIntegerArray);
-    const INTVAL sig_len   = string_length(interp, signature);
-
-    if (!sig_len)
-        return arg_tuple;
-
-    VTABLE_set_integer_native(interp, arg_tuple, sig_len);
-
-    for (i = 0; i < sig_len; ++i) {
-        INTVAL type = string_index(interp, signature, i);
-        switch (type) {
-            case 'I':
-                VTABLE_set_integer_keyed_int(interp, arg_tuple,
-                        i, enum_type_INTVAL);
-                break;
-            case 'N':
-                VTABLE_set_integer_keyed_int(interp, arg_tuple,
-                        i, enum_type_FLOATVAL);
-                break;
-            case 'S':
-                VTABLE_set_integer_keyed_int(interp, arg_tuple,
-                        i, enum_type_STRING);
-                break;
-            case 'O':
-            case 'P':
-            {
-                PMC *arg = va_arg(args, PMC *);
-                type     = VTABLE_type(interp, arg);
-                VTABLE_set_integer_keyed_int(interp, arg_tuple, i, type);
-                break;
-            }
-            default:
-                Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "Unknown signature type %d in mmd_arg_tuple", type);
-                break;
-        }
-
-    }
-    return arg_tuple;
 }
 
 
@@ -2041,46 +1893,6 @@ Parrot_mmd_add_multi_list_from_c_args(PARROT_INTERP,
                 mmd_info[i].full_sig,
                 mmd_info[i].func_ptr);
     }
-}
-
-
-/*
-
-=item C<void Parrot_mmd_rebuild_table>
-
-Rebuild the static MMD_table for the given class type and MMD function
-number. If C<type> is negative all classes are rebuilt. If C<func_nr> is
-negative all MMD functions are rebuilt.
-
-{{**DEPRECATE**}}
-
-=cut
-
-*/
-
-PARROT_API
-void
-Parrot_mmd_rebuild_table(PARROT_INTERP, INTVAL type, INTVAL func_nr)
-{
-    MMD_table *table;
-    UINTVAL    i;
-
-    UNUSED(type);
-
-    if (!interp->binop_mmd_funcs)
-        return;
-
-    table = interp->binop_mmd_funcs + func_nr;
-
-    if (!table)
-        return;
-
-    /* RT #45963 specific parts of table
-     * the type and it's mro and
-     * all classes that inherit from type
-     */
-    for (i = 0; i < table->x * table->y; ++i)
-        table->mmd_funcs[i] = NULL;
 }
 
 

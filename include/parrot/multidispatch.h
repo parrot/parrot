@@ -77,16 +77,6 @@ PMC* Parrot_build_sig_object_from_varargs(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_API
-void Parrot_mmd_add_by_class(PARROT_INTERP,
-    INTVAL functype,
-    ARGIN(STRING *left_class),
-    ARGIN(STRING *right_class),
-    NULLOK(funcptr_t funcptr))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
-
-PARROT_API
 void Parrot_mmd_add_function(PARROT_INTERP,
     INTVAL func_nr,
     NULLOK(funcptr_t function))
@@ -154,10 +144,6 @@ void Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
-
-PARROT_API
-void Parrot_mmd_rebuild_table(PARROT_INTERP, INTVAL type, INTVAL func_nr)
-        __attribute__nonnull__(1);
 
 PARROT_API
 void Parrot_mmd_register(PARROT_INTERP,
