@@ -1,6 +1,6 @@
 # $Id$
 
-This file is best viewed with "perldoc README.win32".
+This file is best viewed with "perldoc README_win32".
 
 =head1 NAME
 
