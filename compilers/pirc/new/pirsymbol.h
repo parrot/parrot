@@ -98,8 +98,7 @@ void store_global_constant(struct lexer_state * const lexer, constant * const c)
 /* find a global .const symbol */
 constant *find_global_constant(struct lexer_state * const lexer, char * const name);
 
-/* get a new PASM register of the specified type */
-int next_register(struct lexer_state * const lexer, pir_type type);
+void assign_vanilla_register(struct lexer_state * const lexer, symbol * const sym);
 
 void store_local_label(struct lexer_state * const lexer, char const * const label, unsigned offset);
 

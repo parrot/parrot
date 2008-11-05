@@ -563,14 +563,12 @@ add_param(lexer_state * const lexer, pir_type type, char const * const name) {
     declare_local(lexer, type, sym);
     /* parameters must always get a PASM register, even if they're not
      * "used"; in the generated PASM instructions, they're always used
-     * (to store the incoming values). Therefore, allocate a new register
-     * at this point, not in symbol.c::find_symbol(). Make sure that the
-     * allocated register is stored in both the symbol and the target node.
-     *
+     * (to store the incoming values).
      */
-    /*sym->color = targ->color = next_register(lexer, type);*/
-    sym->color  = next_register(lexer, type);
+    assign_vanilla_register(lexer, sym);
+
     targ->s.sym = sym;
+
 
     return targ;
 

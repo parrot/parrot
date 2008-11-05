@@ -50,7 +50,7 @@ Globally defined constants are stored in yet another separate list.
 
 /*
 
-=item C<int
+=item C<static int
 next_register(struct lexer_state * const lexer, pir_type type)>
 
 Returns a new register of the specified type.
@@ -59,10 +59,37 @@ This is the vanilla register allocator.
 =cut
 
 */
-int
+static int
 next_register(NOTNULL(lexer_state * const lexer), pir_type type) {
     CURRENT_SUB(lexer)->regs_used[type]++; /* count number of registers used */
     return lexer->curregister[type]++;
+}
+
+
+/*
+
+=item C<void
+assign_vanilla_register(lexer_state * const lexer, symbol * const sym)>
+
+Assign a new register to symbol C<sym>, and create a new live interval for C<sym>.
+
+=cut
+
+*/
+void
+assign_vanilla_register(NOTNULL(lexer_state * const lexer), symbol * const sym) {
+    sym->color    = next_register(lexer, sym->type);
+
+    sym->interval = new_live_interval(lexer->lsr, lexer->stmt_counter, sym->type);
+
+    /* set the reference of the interval to the symbol's color */
+    sym->interval->color = &sym->color;
+
+    /* mark the interval, so that its register is not reused, if the :unique_reg
+     * flag was set.
+     */
+    if (TEST_FLAG(sym->flags, TARGET_FLAG_UNIQUE_REG))
+        SET_FLAG(sym->interval->flags, INTERVAL_FLAG_UNIQUE_REG);
 }
 
 
@@ -137,12 +164,12 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 symbol *
 new_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name), pir_type type) {
-    symbol *sym         = pir_mem_allocate_zeroed_typed(lexer, symbol);
-    sym->name           = name;
+    symbol *sym = pir_mem_allocate_zeroed_typed(lexer, symbol);
+    sym->name   = name;
     sym->type   = type;
     sym->color  = -1; /* -1 means no PASM reg has been allocated yet for this symbol */
 
-    sym->next           = NULL;
+    sym->next   = NULL;
     return sym;
 }
 
@@ -170,13 +197,34 @@ declare_local(NOTNULL(lexer_state * const lexer), pir_type type,
 
     /* store all symbols in the list and set the type on each symbol. */
     while (iter != NULL) {
-        unsigned long hash = get_hashcode(iter->name, table->size);
-        bucket *b          = new_bucket(lexer);
-        bucket_symbol(b)   = iter;
-        store_bucket(table, b, hash);
 
-        iter->type  = type;
-        iter                = iter->next;
+        unsigned long hash = get_hashcode(iter->name, table->size);
+
+        /* look up this symbol; if it exists already, that's an error.
+         * don't use find_symbol, as that will update the live_interval of the symbol.
+         * also, we already have the hash value now, and find_symbol() would only
+         * recalculate that.
+         */
+        bucket *b = get_bucket(table, hash);
+        while (b) {
+            symbol *s = bucket_symbol(b);
+            if (STREQ(s->name, iter->name)) {
+                yypirerror(lexer->yyscanner, lexer, "symbol '%s' already declared", iter->name);
+                break; /* out of the loop */
+            }
+            b = b->next;
+        }
+
+
+        if (b == NULL) { /* loop was broken because b == NULL, so it wasnt found; */
+            b = new_bucket(lexer);
+            bucket_symbol(b) = iter;
+            store_bucket(table, b, hash);
+            iter->type  = type;
+        }
+
+
+        iter = iter->next;
     }
 
 }
@@ -243,26 +291,12 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
         symbol *sym = bucket_symbol(buck);
 
         if (STREQ(sym->name, name)) {
-            if (sym->color == -1) { /* no PASM register assigned yet */
-
+            if (sym->color == -1)  /* no PASM register assigned yet */
                 /* get a new reg from vanilla reg. allocator */
-                sym->color = next_register(lexer, sym->type);
+                assign_vanilla_register(lexer, sym);
+            else  /* update end point of interval */
+                sym->interval->endpoint = lexer->stmt_counter;
 
-                /* create a new live_interval for this symbol, and enter it into the list */
-                PARROT_ASSERT(sym->interval == NULL);
-
-                sym->interval = new_live_interval(lexer->lsr, lexer->stmt_counter, sym->type);
-
-                sym->interval->color = &sym->color;
-
-                if (TEST_FLAG(sym->flags, TARGET_FLAG_UNIQUE_REG)) {
-                    SET_FLAG(sym->interval->flags, INTERVAL_FLAG_UNIQUE_REG);
-                }
-            }
-            else {
-                /* update end point of interval */
-                sym->interval->endpoint = yypirget_lineno(lexer->yyscanner);
-            }
 
             if (TEST_FLAG(lexer->flags, LEXER_FLAG_VERBOSE))
                 fprintf(stderr, "live range of variable %s: (%d, %d)\n", sym->name,
@@ -323,7 +357,7 @@ find_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     while (iter != NULL) {
         if (iter->regno == regno) {
             /* update the end point of this register's live interval */
-            iter->interval->endpoint = lexer->instr_counter;
+            iter->interval->endpoint = lexer->stmt_counter;
             return iter;
         }
 

@@ -390,7 +390,6 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
              sub_id
              opt_paren_string
              paren_string
-             local_var_name
              keyword
              parrot_op
 
@@ -1479,17 +1478,8 @@ local_id_list     : local_id
                         { $$ = add_local($1, $3); }
                   ;
 
-local_id          : local_var_name has_unique_reg
+local_id          : identifier has_unique_reg
                         { $$ = new_local(lexer, $1, $2); }
-                  ;
-
-local_var_name    : identifier
-                        { /* try to find symbol for this id; if found, it was already declared */
-                          symbol *sym = find_symbol(lexer, $1);
-                          if (sym)
-                              yypirerror(yyscanner, lexer, "symbol '%s' is already declared", $1);
-                          $$ = $1;
-                        }
                   ;
 
 has_unique_reg    : /* empty */     { $$ = 0; }
@@ -3472,6 +3462,7 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
              * Then, convert the operand to an EXPR_TARGET.
              */
             symbol *sym = find_symbol(lexer, operand->expr.id);
+
             if (sym) {
                 operand->expr.t        = new_target(lexer);
                 operand->expr.t->s.sym = sym;  /* target's pointer set to symbol */
@@ -3479,10 +3470,7 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
             }
             else { /* it must be a label */
                 SET_BIT(label_bitmask, BIT(i));
-                /* fprintf(stderr, "%s must be a label\n", operand->expr.id);
-                 */
             }
-
         }
     }
 
