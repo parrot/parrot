@@ -427,7 +427,7 @@ temporary_pmc_new(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-=item C<PMC * temporary_pmc_free>
+=item C<void temporary_pmc_free>
 
 Frees a new temporary PMC created by C<temporary_pmc_new()>.  Do not call this
 with any other type of PMC.  Do not forget to call this (or you'll leak PMCs).
@@ -438,7 +438,7 @@ tempted to use this.
 
 */
 
-PMC *
+void
 temporary_pmc_free(PARROT_INTERP, PMC *pmc)
 {
     Arenas            *arena_base = interp->arena_base;
