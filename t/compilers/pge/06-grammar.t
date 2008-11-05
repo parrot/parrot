@@ -142,7 +142,7 @@ EOF_SIMPLE_GRAMMAR
 
     $P0 = split '::', test_name
     .local pmc parser
-               parser = find_global $P0, 'main'
+               parser = get_hll_global $P0, 'main'
 
   next_target:
     .local string target

@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -98,21 +98,21 @@ pasm_output_is( <<'CODE', '12', "Fetch and store" );
         set P0, 12
         set P1, 7
         store_global "Integer", P0
-        find_global P1, "Integer"
+        get_hll_global P1, "Integer"
         print P1
         end
 CODE
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Find null global" );
        null S0
-       find_global P1, S0
+       get_hll_global P1, S0
        end
 CODE
 /Tried to get null global/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUT, "not found null" );
-        find_global P1, "no_such_global"
+        get_hll_global P1, "no_such_global"
         print "ok 1\n"
         defined I0, P1
         unless I0, ok2
@@ -127,7 +127,7 @@ OUT
 pir_output_is( <<'CODE', <<OUT, "find/store global with key" );
 .sub main :main
         set_it()
-        $P1 = find_global [ "Monkey" ; "Toaster" ], "Explosion"
+        $P1 = get_hll_global [ "Monkey" ; "Toaster" ], "Explosion"
         print $P1
 .end
 .sub set_it

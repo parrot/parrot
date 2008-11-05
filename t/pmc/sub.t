@@ -1457,8 +1457,8 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'set_outer' );
 .sub main :main
-    $P0 = find_global "example_outer"
-    $P1 = find_global "example_inner"
+    $P0 = get_hll_global "example_outer"
+    $P1 = get_hll_global "example_inner"
     $P1.set_outer($P0)
     $P0()
     $P1()

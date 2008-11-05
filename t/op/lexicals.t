@@ -1377,7 +1377,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "RT #56398: Jonathan's recursive case" );
     .lex '$thing', thing
     .lex '$prefix', prefix
 
-    $P0 = find_global 'anon_1'
+    $P0 = get_hll_global 'anon_1'
     $P1 = newclosure $P0
     .lex '$recur', $P1
 
@@ -1388,7 +1388,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "RT #56398: Jonathan's recursive case" );
     $P3 = find_lex '$prefix'
     print $P3
     print "[\n"
-    $P4 = find_global 'anon_2'
+    $P4 = get_hll_global 'anon_2'
     $P5 = newclosure $P4
     $P6 = find_lex '$thing'
     'map'($P5, $P6)

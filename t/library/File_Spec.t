@@ -1,12 +1,12 @@
-#!perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+#! perl
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test;
+use Parrot::Test tests => 21;
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ t/library/File-Spec.t - test File::Spec module
 
 =head1 SYNOPSIS
 
-        % prove t/library/File-Spec.t
+    % prove t/library/File-Spec.t
 
 =head1 DESCRIPTION
 
@@ -97,7 +97,7 @@ OUT
 pir_output_is( $PRE . <<'CODE'. $POST, <<"OUT", "_get_osname" );
         .local string osname
         .local pmc get_osname
-        get_osname = find_global 'File::Spec', '_get_osname'
+        get_osname = get_hll_global [ 'File::Spec' ], '_get_osname'
         osname= get_osname()
         print osname
         goto END
@@ -108,7 +108,7 @@ OUT
 pir_output_is( $PRE . <<'CODE'. $POST, <<'OUT', "_get_module" );
         .local string module
         .local pmc get_module
-        get_module = find_global 'File::Spec', '_get_module'
+        get_module = get_hll_global [ 'File::Spec' ], '_get_module'
         module= get_module( 'MSWin32' )
         print module
         print "\n"
@@ -119,16 +119,6 @@ CODE
 Win32
 Unix
 OUT
-
-# remember to change the number of tests! :-)
-BEGIN {
-    if ( $^O eq 'MSWin32' ) {
-        plan tests => 21;
-    }
-    else {
-        plan skip_all => 'win32 implementation only' unless $^O =~ m/MSWin32/;
-    }
-}
 
 # Local Variables:
 #   mode: cperl
