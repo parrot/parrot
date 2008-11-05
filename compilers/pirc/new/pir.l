@@ -160,6 +160,11 @@ REGISTER       "$"[SNIP]{DIGITS}
 
 %option stack
 
+/* override memory allocation function with Parrot's memory functions */
+%option noyyalloc
+%option noyyrealloc
+%option noyyfree
+
 /* XXX document, and possibly rename, these states, when are they used? */
 %x MACROHEAD
 %x MACROBODY
@@ -182,16 +187,20 @@ REGISTER       "$"[SNIP]{DIGITS}
 <SPECIALSTART>.|\n    { /* only when the scanning starts, is this state used. Only a single
                          * character is read, pushed back, and then, depending on the
                          * lexer flags, either PASM or PIR mode (INITIAL state) is activated.
+                         * The alternative (documented in Bison's info) would be to have a
+                         * check on some variable, which is written right after the %% marker
+                         * above. However, that code would be executed on every call to the
+                         * lexer, which is a bit of a waste.
                          */
-                        yyless(0);
-                        yy_pop_state(yyscanner);
+                        yyless(0); /* put everything back. It's only 1 character anyway */
+                        yy_pop_state(yyscanner); /* SPECIALSTART was pushed on state stack*/
 
                         if (TEST_FLAG(yypirget_extra(yyscanner)->flags, LEXER_FLAG_PASMFILE)) {
                             BEGIN(PASM);
                             return TK_PASM_MARKER_START;
                         }
                         else {
-                            BEGIN(INITIAL);
+                            BEGIN(INITIAL); /* this is the normal case; PASM is glued on later */
                             return TK_PIR_MARKER_START;
                         }
 
@@ -1172,6 +1181,27 @@ expand_macro(yyscan_t yyscanner, macro_def * const macro, macro_param * args) {
      */
     yyset_lineno(macro->linedefined, yyscanner);
 }
+
+
+/* override Flex generated memory functions: all memory allocated
+ * by Flex goes through Parrot's memory allocators.
+ */
+PARROT_MALLOC
+void *
+yyalloc(size_t bytes, yyscan_t yyscanner) {
+    return mem_sys_allocate(bytes);
+}
+
+void *
+yyrealloc(void * ptr, size_t bytes, yyscan_t yyscanner) {
+    return mem_sys_realloc(ptr, bytes);
+}
+
+void
+yyfree(void *ptr, yyscan_t yyscanner) {
+    mem_sys_free(ptr);
+}
+
 
 
 

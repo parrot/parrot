@@ -479,6 +479,9 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
 
 %debug
 
+/* generate a header file with all token definitions for the lexer */
+%defines
+
 /* needed for reentrancy */
 %pure-parser
 
@@ -1391,7 +1394,19 @@ condition         : target rel_op expression
                            * "le" are 1 position after "gt" and "ge" respectively in the
                            * opnames array; hence the [$2 + 1] index.
                            */
-                          if ($2 == OP_GE || $2 == OP_GT)
+
+                          /* NOTE: a reference is made here to $<ival>0. This is the <ival> of
+                           * $0, which refers to the (non)terminal /before/ the use of
+                           * the "condition" rule, in this case "if_unless". If the value
+                           * of that non-terminal is in face "NEED_INVERT_OPNAME", then
+                           * we shouldn't do it here, as the inversion of "le" or "lt" is
+                           * again "ge" or "gt", and these instructions don't exist.
+                           *
+                           * Note that this usage is Perfectly Safe, as long as we are sure
+                           * that $0 has in fact a <ival>. As "condition" is only used in
+                           * exactly one place in the whole grammer, we can be sure of this.
+                           */
+                          if (($<ival>0 != NEED_INVERT_OPNAME) && ($2 == OP_GE || $2 == OP_GT))
                               set_instrf(lexer, opnames[$2 + 1], "%E%T", $3, $1);
                           else
                               set_instrf(lexer, opnames[$2], "%T%E", $1, $3);
@@ -1400,7 +1415,7 @@ condition         : target rel_op expression
                         }
                   | TK_INTC rel_op target
                         {
-                          if ($2 == OP_GE || $2 == OP_GT)
+                          if (($<ival>0 != NEED_INVERT_OPNAME) && ($2 == OP_GE || $2 == OP_GT))
                               set_instrf(lexer, opnames[$2 + 1], "%T%i", $3, $1);
                           else
                               set_instrf(lexer, opnames[$2], "%i%T", $1, $3);
@@ -1408,7 +1423,7 @@ condition         : target rel_op expression
                         }
                   | TK_NUMC rel_op target
                         {
-                          if ($2 == OP_GE || $2 == OP_GT)
+                          if (($<ival>0 != NEED_INVERT_OPNAME) && ($2 == OP_GE || $2 == OP_GT))
                               set_instrf(lexer, opnames[$2 + 1], "%T%n", $3, $1);
                           else
                               set_instrf(lexer, opnames[$2], "%n%T", $1, $3);
@@ -1417,7 +1432,7 @@ condition         : target rel_op expression
                         }
                   | TK_STRINGC rel_op target
                         {
-                          if ($2 == OP_GE || $2 == OP_GT)
+                          if (($<ival>0 != NEED_INVERT_OPNAME) && ($2 == OP_GE || $2 == OP_GT))
                               set_instrf(lexer, opnames[$2], "%T%s", $3, $1);
                           else
                               set_instrf(lexer, opnames[$2], "%s%T", $1, $3);
