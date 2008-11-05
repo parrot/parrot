@@ -376,7 +376,6 @@ SP              [ ]
 <emit,INITIAL>".HLL_map"      return HLL_MAP;
 ".endnamespace"               return ENDNAMESPACE;
 ".local"                      return LOCAL;
-".global"                     return GLOBAL;
 <emit,INITIAL>".const"        return CONST;
 ".globalconst"                return GLOBAL_CONST;
 ".param"                      return PARAM;
