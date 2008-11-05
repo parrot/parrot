@@ -3015,14 +3015,6 @@ X<.pcc_sub directive>
 Create a symbol entry for subroutine at the _LABEL. This directive is
 for PASM code only.
 
-=head3 .pragma
-
-X<.pragma directive>
-
-  .pragma prototyped
-
-Set default calling conventions.
-
 =head3 .result
 
 X<.result directive>

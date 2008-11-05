@@ -354,17 +354,6 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     ||  (STREQ(name, "set_returns")))
         return var_arg_ins(interp, unit, name, r, n, emit);
 
-    if ((IMCC_INFO(interp)->state->pragmas & PR_N_OPERATORS)
-         && ((STREQ(name, "abs"))
-         ||  (STREQ(name, "neg"))
-         ||  (STREQ(name, "not"))
-         ||  (STREQ(name, "bnot"))
-         ||  (STREQ(name, "bnots")))) {
-        strcpy(buf, "n_");
-        strcat(buf, name);
-        name = buf;
-    }
-
 #if 0
     ins = multi_keyed(interp, unit, name, r, n, keyvec, emit);
     if (ins)

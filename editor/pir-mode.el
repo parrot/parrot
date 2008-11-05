@@ -232,7 +232,7 @@ newline or semicolon after an end keyword."
     ".include" ".invocant" ".lex" ".line" ".loadlib" ".macro" ".meth_call"
     ".namespace" ".nci_call" ".pcc_begin" ".pcc_begin_return"
     ".pcc_begin_yield" ".pcc_call" ".pcc_end" ".pcc_end_return"
-    ".pcc_end_yield" ".pcc_sub" ".pragma" ".result" ".return" ".sub"
+    ".pcc_end_yield" ".pcc_sub" ".result" ".return" ".sub"
     ".yield"))
 
 (defvar pir-variable-declarations

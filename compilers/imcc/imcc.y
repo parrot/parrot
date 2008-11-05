@@ -625,7 +625,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %nonassoc '\n'
 %nonassoc <t> PARAM
 
-%token <t> PRAGMA N_OPERATORS HLL HLL_MAP
+%token <t> HLL HLL_MAP
 %token <t> GOTO ARG IF UNLESS PNULL
 %token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL ADV_OPT_FLAG ADV_NAMED ADV_ARROW
 %token <t> NEW ADV_INVOCANT
@@ -650,7 +650,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %token <s> IREG NREG SREG PREG IDENTIFIER REG MACRO ENDM
 %token <s> STRINGC INTC FLOATC USTRINGC
 %token <s> PARROT_OP
-%type <t> type pragma_1 hll_def return_or_yield comma_or_goto opt_unique_reg
+%type <t> type hll_def return_or_yield comma_or_goto opt_unique_reg
 %type <i> program
 %type <i> class_namespace
 %type <i> constdef sub emit pcc_ret pcc_yield
@@ -733,23 +733,12 @@ compilation_unit:
    ;
 
 pragma:
-     PRAGMA pragma_1 '\n'      { $$ = 0; }
-   | hll_def         '\n'      { $$ = 0; }
+     hll_def         '\n'      { $$ = 0; }
    | LOADLIB STRINGC '\n'
          {
            $$ = 0;
            do_loadlib(interp, $2);
            mem_sys_free($2);
-         }
-   ;
-
-pragma_1:
-     N_OPERATORS INTC
-         {
-           if ($2)
-               IMCC_INFO(interp)->state->pragmas |= PR_N_OPERATORS;
-           else
-               IMCC_INFO(interp)->state->pragmas &= ~PR_N_OPERATORS;
          }
    ;
 

@@ -398,11 +398,6 @@ SymReg* get_pasm_reg(PARROT_INTERP, ARGIN(const char *name))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/pcc.c */
 
-/* pragmas avialable: */
-typedef enum {
-  PR_N_OPERATORS = 0x01
-} _imc_pragmas;
-
 #define PARROT_MAX_RECOVER_ERRORS 40
 /* this is the number of times parrot will try to retry while compiling. */
 
@@ -428,7 +423,6 @@ struct parser_state_t {
     FILE *handle;
     int line;
     int pasm_file;       /* pasm_file mode of this frame */
-    int pragmas;         /* n_operators ... */
 };
 
 typedef enum _AsmState {

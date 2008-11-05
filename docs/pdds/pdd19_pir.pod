@@ -396,19 +396,6 @@ such that have nested scopes, can use this directive.
 
 Closes the scope block that was opened with .namespace <identifier>.
 
-=item .pragma n_operators [deprecated: RT #57438]
-
-Convert arithmethic infix operators to n_infix operations. The unary opcodes
-C<abs>, C<not>, C<bnot>, C<bnots>, and C<neg> are also changed to use a C<n_>
-prefix.
-
- .pragma n_operators 1
- .sub foo
-   ...
-   $P0 = $P1 + $P2           # n_add $P0, $P1, $P2
-   $P2 = abs $P0             # n_abs $P2, $P0
-
-
 =back
 
 =head3 Subroutine flags

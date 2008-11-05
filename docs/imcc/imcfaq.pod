@@ -105,11 +105,9 @@ necessary to debug the PASM code as bugs in IMCC are found.
 Hand writing and debugging of code aside, most PIR code will be mostly
 compiler generated. In this respect, the most important technical reason to
 use PIR is the amount of abstraction it provides. PIR now completely hides
-the Parrot calling conventions and allows different call conventions to be
-selected via .pragma without changes to the high-level code emitter. This
-allows Parrot to change somewhat without impacting existing compilers. The
-workload is balanced between the IMCC team and the compiler authors. The term
-"modular" springs to mind.
+the Parrot calling conventions. This allows Parrot to change somewhat without
+impacting existing compilers. The workload is balanced between the IMCC
+team and the compiler authors. The term "modular" springs to mind.
 
 Since development on the old assembler has stopped, IMCC will be the best way
 to compile bytecode classes complete with metadata and externally linkable

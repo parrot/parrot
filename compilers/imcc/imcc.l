@@ -380,8 +380,6 @@ SP              [ ]
 <emit,INITIAL>".const"        return CONST;
 ".globalconst"                return GLOBAL_CONST;
 ".param"                      return PARAM;
-<*>".pragma"                  return PRAGMA;
-<*>"n_operators"              return N_OPERATORS;
 "goto"                        return GOTO;
 "if"                          return IF;
 "unless"                      return UNLESS;
@@ -789,7 +787,6 @@ new_frame(PARROT_INTERP) {
         else
             tmp->s.file = IMCC_INFO(interp)->frames->s.file;
         tmp->s.file_needs_free = IMCC_INFO(interp)->frames->s.file_needs_free;
-        tmp->s.pragmas   = IMCC_INFO(interp)->frames->s.pragmas;
     }
 
     tmp->s.interp = interp;
