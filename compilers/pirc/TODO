@@ -1,0 +1,17 @@
+TASKS LIST FOR PIRC COMPLETION
+
+This is an overview of tasks in order to complete PIRC.
+By "complete", or "completion", it is meant to be able
+to use PIRC as a PIR compiler, without needing the current
+PIR compiler, IMCC.
+
+Fairly randomly sorted, the tasks are:
+
+1.  Emit the actual bytecodes into a PackFile/codesegment.
+
+2.  Create a PMC constant for strings, numbers, keys and
+    subroutines.
+
+3.  Complete PASM output, so it can actually be parsed and run.
+
+More tasks will be added as I think of them. --kjs
