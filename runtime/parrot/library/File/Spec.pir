@@ -157,11 +157,11 @@ found_module:
     module= '_get_module'( osname )
 
     .local pmc platform
-    platform= new String
+    platform= new 'String'
     platform= module
 
     .local pmc class
-    class= new String
+    class= new 'String'
     class= name
 
     concat class, class, '::'
