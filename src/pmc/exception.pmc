@@ -53,18 +53,18 @@ These arguments can be retrieved with the C<get_results> opcode.
 
 pmclass Exception {
 
-    ATTR INTVAL    id;           /* The task ID in the scheduler. */
-    ATTR FLOATVAL  birthtime;    /* The creation time stamp of the exception. */
-    ATTR STRING   *message;      /* The exception message. */
-    ATTR PMC      *payload;      /* The payload for the exception. */
-    ATTR PMC      *resume;       /* A continuation for resuming after handling the exception. */
-    ATTR INTVAL    severity;     /* The severity of the exception. */
-    ATTR INTVAL    type;         /* The type of the exception. */
-    ATTR INTVAL    exit_code;    /* The exit code of the exception. */
-    ATTR PMC      *stacktrace;   /* The stacktrace of an exception. */
-    ATTR INTVAL    handled;      /* Whether the exception has been handled. */
-    ATTR PMC      *handler_iter; /* An iterator of handlers (for rethrow). */
-    ATTR Parrot_Context *handler_ctx; /* A stored context for handler iterator. */
+    ATTR INTVAL          id;           /* The task ID in the scheduler. */
+    ATTR FLOATVAL        birthtime;    /* The creation time stamp of the exception. */
+    ATTR STRING         *message;      /* The exception message. */
+    ATTR PMC            *payload;      /* The payload for the exception. */
+    ATTR PMC            *resume;       /* Continuation for resuming after handling the exception. */
+    ATTR INTVAL          severity;     /* The severity of the exception. */
+    ATTR INTVAL          type;         /* The type of the exception. */
+    ATTR INTVAL          exit_code;    /* The exit code of the exception. */
+    ATTR PMC            *backtrace;    /* The backtrace of an exception. */
+    ATTR INTVAL          handled;      /* Whether the exception has been handled. */
+    ATTR PMC            *handler_iter; /* An iterator of handlers (for rethrow). */
+    ATTR Parrot_Context *handler_ctx;  /* A stored context for handler iterator. */
 
 /*
 
@@ -89,13 +89,13 @@ Initializes the exception with default values.
         PObj_active_destroy_SET(SELF);
 
         /* Set up the core struct and default values for the exception object. */
-        PMC_data(SELF)          = core_struct;
-        core_struct->severity   = 0;
-        core_struct->handled    = 0;
-        core_struct->message    = CONST_STRING(interp, "");
-        core_struct->payload    = PMCNULL;
-        core_struct->resume     = PMCNULL;
-        core_struct->stacktrace = PMCNULL;
+        PMC_data(SELF)            = core_struct;
+        core_struct->severity     = 0;
+        core_struct->handled      = 0;
+        core_struct->message      = CONST_STRING(interp, "");
+        core_struct->payload      = PMCNULL;
+        core_struct->resume       = PMCNULL;
+        core_struct->backtrace    = PMCNULL;
         core_struct->handler_iter = PMCNULL;
     }
 
@@ -119,17 +119,17 @@ Initializes the exception with supplied values.
         PObj_active_destroy_SET(SELF);
 
         /* Set up the core struct and default values for the exception object. */
-        PMC_data(SELF)          = core_struct;
-        core_struct->severity   = ishash ?
+        PMC_data(SELF)            = core_struct;
+        core_struct->severity     = ishash ?
             VTABLE_get_integer_keyed_str(interp, values, CONST_STRING(interp, 'severity')) :
             0;
-        core_struct->handled    = 0;
-        core_struct->message    = ishash ?
+        core_struct->handled      = 0;
+        core_struct->message      = ishash ?
             VTABLE_get_string_keyed_str(interp, values, CONST_STRING(interp, 'message')) :
             VTABLE_get_string(interp, values);
-        core_struct->payload    = PMCNULL;
-        core_struct->resume     = PMCNULL;
-        core_struct->stacktrace = PMCNULL;
+        core_struct->payload      = PMCNULL;
+        core_struct->resume       = PMCNULL;
+        core_struct->backtrace    = PMCNULL;
         core_struct->handler_iter = PMCNULL;
     }
 
@@ -151,8 +151,8 @@ Mark any active exception data as live.
             pobject_lives(interp, (PObj *)core_struct->payload);
         if (core_struct->resume)
             pobject_lives(interp, (PObj *)core_struct->resume);
-        if (core_struct->stacktrace)
-            pobject_lives(interp, (PObj *)core_struct->stacktrace);
+        if (core_struct->backtrace)
+            pobject_lives(interp, (PObj *)core_struct->backtrace);
         if (core_struct->handler_iter)
             pobject_lives(interp, (PObj *)core_struct->handler_iter);
     }
@@ -576,8 +576,8 @@ Retrieve an attribute value for the exception object.
         else if (string_equal(INTERP, name, CONST_STRING(INTERP, "resume")) == 0) {
                 GET_ATTR_resume(interp, SELF, value);
         }
-        else if (string_equal(INTERP, name, CONST_STRING(INTERP, "stacktrace")) == 0) {
-                GET_ATTR_stacktrace(interp, SELF, value);
+        else if (string_equal(INTERP, name, CONST_STRING(INTERP, "backtrace")) == 0) {
+                GET_ATTR_backtrace(interp, SELF, value);
         }
         else if (string_equal(INTERP, name, CONST_STRING(INTERP, "handler_iter")) == 0) {
                 GET_ATTR_handler_iter(interp, SELF, value);
@@ -628,8 +628,8 @@ Set an attribute value for the exception object.
         else if (string_equal(INTERP, name, CONST_STRING(INTERP, "resume")) == 0) {
             SET_ATTR_resume(interp, SELF, value);
         }
-        else if (string_equal(INTERP, name, CONST_STRING(INTERP, "stacktrace")) == 0) {
-            SET_ATTR_stacktrace(interp, SELF, value);
+        else if (string_equal(INTERP, name, CONST_STRING(INTERP, "backtrace")) == 0) {
+            SET_ATTR_backtrace(interp, SELF, value);
         }
         else if (string_equal(INTERP, name, CONST_STRING(INTERP, "handler_iter")) == 0) {
             SET_ATTR_handler_iter(interp, SELF, value);
@@ -665,8 +665,8 @@ Set this PMC as shared.
         if (!PMC_IS_NULL(shared_struct->payload))
             shared_struct->payload = pt_shared_fixup(INTERP, shared_struct->payload);
 
-        if (!PMC_IS_NULL(shared_struct->stacktrace))
-            shared_struct->stacktrace = pt_shared_fixup(INTERP, shared_struct->stacktrace);
+        if (!PMC_IS_NULL(shared_struct->backtrace))
+            shared_struct->backtrace = pt_shared_fixup(INTERP, shared_struct->backtrace);
 
         if (!PMC_IS_NULL(shared_struct->handler_iter))
             shared_struct->handler_iter = pt_shared_fixup(INTERP, shared_struct->handler_iter);
