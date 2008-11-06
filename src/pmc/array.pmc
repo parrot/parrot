@@ -325,20 +325,6 @@ Returns the integer value of the element at index C<key>.
 
 /*
 
-=item C<INTVAL type_keyed_int(INTVAL key)>
-
-=cut
-
-*/
-
-    VTABLE INTVAL type_keyed_int(INTVAL key) {
-        PMC * const value = SELF.get_pmc_keyed_int(key);
-
-        return VTABLE_type(INTERP, value);
-    }
-
-/*
-
 =item C<INTVAL get_integer_keyed(PMC *key)>
 
 Returns the integer value of the element at index C<key>.

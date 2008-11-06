@@ -421,21 +421,6 @@ Returns the number of elements in the array.
 
 /*
 
-=item C<INTVAL type_keyed_int(INTVAL key)>
-
-Returns the type of the element at index C<key>.
-
-=cut
-
-*/
-
-    VTABLE INTVAL type_keyed_int(INTVAL key) {
-        HashEntry *e = get_entry(INTERP, SELF, key);
-        return e->type;
-    }
-
-/*
-
 =item C<INTVAL get_integer_keyed_int(INTVAL key)>
 
 Returns the integer value of the element at index C<key>.

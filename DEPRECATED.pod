@@ -29,10 +29,6 @@ warnings.
 
 See RT #48577.
 
-=item * C<type_keyed_int> [post 0.5.2]
-
-See RT #48579.
-
 =item * C<type> [post 0.5.2]
 
 See RT #48567.

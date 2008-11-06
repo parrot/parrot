@@ -50,7 +50,6 @@ our @dont_delegate = qw(
     set_string_keyed_int
     setprop
     subclass
-    type_keyed_int
 );
 
 our $dont_delegate = { map { $_, 1 } (@dont_delegate) };

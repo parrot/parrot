@@ -439,22 +439,6 @@ Returns the PMC's type.
 
 /*
 
-=item C<INTVAL type_keyed_int(INTVAL key)>
-
-Converts C<key> to a PMC key and returns the result of calling
-C<type_keyed()> with it.
-
-=cut
-
-*/
-
-    VTABLE INTVAL type_keyed_int(INTVAL key) {
-        PMC *const r_key = INT2KEY(INTERP, key);
-        return SELF.type_keyed(r_key);
-    }
-
-/*
-
 =item C<STRING *name()>
 
 Returns the name of the PMC.

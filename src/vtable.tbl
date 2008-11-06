@@ -24,7 +24,6 @@ PMC* getprops()
 
 INTVAL type()
 INTVAL type_keyed(PMC* key)
-INTVAL type_keyed_int(INTVAL key)
 
 STRING* name()
 
