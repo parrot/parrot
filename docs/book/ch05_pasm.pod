@@ -2976,9 +2976,8 @@ current namespace:
 
   .namespace [ "Foo" ]
 
-If no namespace is set, or if the namespace is explicitly set to an
-empty string, then the subroutine is stored in the outermost
-namespace.
+If the namespace is explicitly set to an empty string or key, then the
+subroutine is stored in the outermost namespace.
 
 The C<callmethodcc>X<callmethodcc opcode (PASM)> opcode makes a method
 call. It follows the Parrot calling conventions, so it expects to

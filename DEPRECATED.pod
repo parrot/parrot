@@ -123,12 +123,6 @@ See RT #48735.
 
 See RT #46715.
 
-=item * C<.namespace> (without brackets) [post 0.6.2]
-
-All should C<.namespace> directives without brackets should take
-empty brackets to indicate the root namespace.
-See RT #48549.
-
 =item * C<.HLL_map> <string> ',' <string> [post 0.6.4]
 
 This will be replaced by C<.HLL_map> <string> '=' <string>

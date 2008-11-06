@@ -392,7 +392,7 @@ X<.namespace>
 Namespaces provide a mechanism where names can be reused. This may not
 sound like much, but in large complicated systems, or systems with
 many included libraries, it can become a big hassle very quickly. Each
-namespace get's it's own area for function names and global variables.
+namespace get's its own area for function names and global variables.
 This way, you can have multiple functions named C<create> or C<new>
 or C<convert>, for instance, without having to use I<Multi-Method
 Dispatch> (MMD), which we will describe later.

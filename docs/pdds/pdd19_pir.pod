@@ -316,9 +316,6 @@ You can specify the root namespace by using empty brackets, such as:
 
 The brackets are not optional, although the key inside them is.
 
-{{ NOTE: currently the brackets *are* optional, so this is an
-implementation change. See RT #48549}}
-
 =item .loadlib 'lib_name'
 
 Load the given library at compile time, that is, as soon that line is
