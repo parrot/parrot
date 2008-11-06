@@ -53,6 +53,20 @@ method code_short_tag($/) {
     make $past;
 }
 
+method code_echo_tag($/) {
+    my $past := PAST::Stmts.new( :node($/) );
+
+    my $echo := $( $<arguments> );
+    $echo.name( 'echo' );
+    $past.push( $echo );
+
+    for $<statement> {
+        $past.push( $($_) );
+    }
+
+    make $past;
+}
+
 method code_script_tag($/) {
     my $past := PAST::Stmts.new( :node($/) );
     for $<statement> {

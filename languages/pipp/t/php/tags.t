@@ -23,7 +23,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 7;
+use Test::More     tests => 8;
 use Parrot::Test;
 
 
@@ -45,7 +45,7 @@ CODE
 hello world
 OUTPUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'short echoing tags', todo => 'not implemented' );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'short echoing tags' );
 <?= "hello world\n";
 CODE
 hello world
@@ -63,7 +63,13 @@ CODE
 hello world
 OUTPUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'messy script tags', todo => "grammar needs work" );
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'broken script tag' );
+<scriptlanguage="php"> echo "hello world\n"; </script>
+CODE
+<scriptlanguage="php"> echo "hello world\n"; </script>
+OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'messy script tags' );
 <script          
        language      = 
     'php'
