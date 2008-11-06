@@ -15,6 +15,8 @@ value of the comment is passed as the second argument to the method.
 
 =end comments
 
+=cut
+
 class Pipp::Grammar::Actions;
 
 method TOP($/) {
