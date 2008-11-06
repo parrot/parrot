@@ -263,7 +263,6 @@ beginstore_1:
     # Store the value...
     .local string type
     type = spec."type"()
-    $S0 = typeof $I0
     if_null val, undef
     if type == 'String' goto str
     if type == 'Array' goto array
