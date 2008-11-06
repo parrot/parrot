@@ -44,7 +44,7 @@ method SEA($/) {
          );
 }
 
-method code_tp1($/) {
+method code_short_tag($/) {
     my $past := PAST::Stmts.new( :node($/) );
     for $<statement> {
         $past.push( $($_) );
@@ -53,7 +53,7 @@ method code_tp1($/) {
     make $past;
 }
 
-method code_tp2($/) {
+method code_script_tag($/) {
     my $past := PAST::Stmts.new( :node($/) );
     for $<statement> {
         $past.push( $($_) );
@@ -75,7 +75,7 @@ method statement($/,$key) {
     make $( $/{$key} );
 }
 
-method inline_sea_tp1($/) {
+method inline_sea_short_tag($/) {
    make PAST::Op.new(
             PAST::Val.new(
                 :value(~$<SEA_empty_allowed>),

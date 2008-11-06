@@ -28,4 +28,5 @@ nok();
 is();
 isnt();
 
+# vim: expandtab shiftwidth=4 ft=php:
 ?>

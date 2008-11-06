@@ -130,7 +130,8 @@ GOT_NO_F_OPTION:
         source_fn = rest
         goto GOT_PHP_SOURCE_FN
 GOT_NO_FILE_ON_COMMAND_LINE:
-    printerr 'Got no PHP file.'
+        #XXX: should do REPL or read from stdin
+        printerr "No input file specified.\n"
     exit -1
 
 GOT_PHP_SOURCE_FN:

@@ -15,23 +15,25 @@ token ws                    { [ \h
                               | <multilinecomment>
                               ]*
                             }
+token ws_char               { [ \h | \v ] }
 token singlelinecomment     { '#'  \N*
                             | '//' \N*
                             }
 token multilinecomment      { '/*' .*? '*/' }
 
-# embedding code into a sea of HTML
-token sea_or_code           { <code_tp1> {*}               #= code_tp1
-                            | <code_tp2> {*}               #= code_tp2
-                            | <SEA> {*}                    #= SEA
+# embedding code into a sea of text
+token sea_or_code           { <code_short_tag> {*}     #= code_short_tag
+                            | <code_script_tag> {*}    #= code_script_tag
+                            | <SEA> {*}                #= SEA
                             }
-regex SEA                   { '<'? .+? ( <before '<'> | $ )                          {*} } 
-rule  code_tp1              { <.CODE_START_TP1> <statement>* <.CODE_END_TP1>?        {*} }
-rule  code_tp2              { <.CODE_START_TP2> <statement>* <.CODE_END_TP2>?        {*} }
-token CODE_START_TP1        { '<?php'                                                    }
-token CODE_START_TP2        { '<script language="php">'                                  }
-token CODE_END_TP1          { '?>' \n?                                                   }
-token CODE_END_TP2          { '</script>' \n?                                            }
+regex SEA                   { '<'? .+? ( <before '<'> | $ )                                 {*} } 
+rule  code_short_tag        { <.CODE_START_SHORT_TAG>  <statement>* <.CODE_END_SHORT_TAG>?  {*} }
+rule  code_script_tag       { <.CODE_START_SCRIPT_TAG> <statement>* <.CODE_END_SCRIPT_TAG>? {*} }
+token CODE_START_SHORT_TAG  { '<?' 'php'?                                                       }
+token CODE_START_SCRIPT_TAG { '<script' <ws_char> 'language' '=' <quoted_lang_name> '>' }
+token quoted_lang_name      { [ '"php"' | '\'php\'' ]                                   }
+token CODE_END_SHORT_TAG    { '?>' \n?                                                  }
+token CODE_END_SCRIPT_TAG   { '</script' '>'                                            }
 
 # block and statements
 rule  block                 { '{' <statement>* '}'                                   {*} }
@@ -40,8 +42,8 @@ rule  statement             { <echo_statement> {*}         #= echo_statement
                             | <if_statement> {*}           #= if_statement
                             | <while_statement> {*}        #= while_statement
                             | <for_statement> {*}          #= for_statement
-                            | <inline_sea_tp1> {*}         #= inline_sea_tp1
-                            | <inline_sea_tp2> {*}         #= inline_sea_tp2
+                            | <inline_sea_short_tag> {*}   #= inline_sea_short_tag
+                            | <inline_sea_script_tag> {*}  #= inline_sea_script_tag
                             | <var_assign> {*}             #= var_assign
                             | <function_definition> {*}    #= function_definition
                             | <class_definition> {*}       #= class_definition
@@ -64,8 +66,8 @@ rule  for_statement         { 'for'
                                   <expression>
                                ')' <block>                                           {*}
                             }
-token inline_sea_tp1        { <.CODE_END_TP1> <SEA_empty_allowed> <.CODE_START_TP1>  {*} }
-token inline_sea_tp2        { <.CODE_END_TP2> <SEA_empty_allowed> <.CODE_START_TP2>  {*} }
+token inline_sea_short_tag  { <.CODE_END_SHORT_TAG>  <SEA_empty_allowed> <.CODE_START_SHORT_TAG>  {*} }
+token inline_sea_script_tag { <.CODE_END_SCRIPT_TAG> <SEA_empty_allowed> <.CODE_START_SCRIPT_TAG> {*} }
 regex SEA_empty_allowed     { <-[<]>*? <before '<'>                                      }
 rule  var_assign            { <var>        '=' <expression> <.statement_delimiter>   {*} }
 
