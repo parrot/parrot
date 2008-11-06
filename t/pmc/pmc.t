@@ -41,15 +41,9 @@ pasm_output_is( <<'CODE', <<'OUTPUT', 'typeof' );
     print  "not "
 OK_1:
     print  "ok 1\n"
-    typeof I0,P0
-    eq     I0, .Integer, OK_2
-    print  "not "
-OK_2:
-    print  "ok 2\n"
     end
 CODE
 ok 1
-ok 2
 OUTPUT
 
 my $checkTypes;
@@ -75,9 +69,6 @@ EOPASM
     set S1, "$type"
     typeof S0, P0
     ne S0, S1, L_BadName
-    set I1, $id
-    typeof I0, P0
-    ne I0, I1, L_BadId
 CHECK
 }
 
@@ -85,7 +76,7 @@ pasm_output_like( <<"CODE", <<OUTPUT, "PMC type check" );
     new P10, 'Hash'
     new P11, 'Hash'
 $checkTypes
-    print "All names and ids ok.\\n"
+    print "All names ok.\\n"
     end
 L_BadName:
     print S1
@@ -93,16 +84,8 @@ L_BadName:
     print S0
     print "\\"\\n"
     end
-L_BadId:
-    print S1
-    print " PMCs should be type "
-    print I1
-    print " but have incorrect type "
-    print I0
-    print "\\n"
-    end
 CODE
-/All names and ids ok/
+/All names ok/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', 'find_method' );

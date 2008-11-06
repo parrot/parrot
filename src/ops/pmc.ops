@@ -128,17 +128,9 @@ op new(out PMC, in PMC, in PMC) {
 
 =item B<typeof>(out STR, invar PMC)
 
-=item B<typeof>(out INT, invar PMC)
-
 =item B<typeof>(out PMC, invar PMC)
 
 Return the type of PMC in $2.
-
-=item B<typeof>(out INT, invar PMC, in KEY)
-
-=item B<typeof>(out INT, invar PMC, in INTKEY)
-
-Return the type of the entry in aggregate PMC in $2 at key $3.
 
 =cut
 
@@ -148,32 +140,6 @@ inline op typeof(out STR, invar PMC) {
 
 inline op typeof(out PMC, invar PMC) {
   $1 = VTABLE_get_class(interp, $2);
-}
-
-inline op typeof(out INT, invar PMC) {
-  $1 = VTABLE_type(interp, $2);
-}
-
-inline op typeof(out INT, invar PMC, in KEY) {
-  $1 = VTABLE_type_keyed(interp, $2, $3);
-}
-
-inline op typeof(out INT, invar PMC, in INTKEY) {
-  $1 = VTABLE_type_keyed_int(interp, $2, $3);
-}
-########################################
-
-=item B<typeof>(out STR, in INT)
-
-Return the (native) Parrot type of datatype $2.
-
-=cut
-
-inline op typeof(out STR, in INT) {
-    if ($2 > 0 && $2 < interp->n_vtable_max)
-                $1 = interp->vtables[$2]->whoami;
-    else
-                $1 = Parrot_get_datatype_name(interp, $2);
 }
 
 ########################################

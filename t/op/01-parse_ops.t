@@ -49,7 +49,6 @@ my %parse_errors = map { $_ => 1 } qw(
     ne
     set
     slice
-    typeof
     yield
 );
 
