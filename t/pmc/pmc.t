@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 16;
 use Parrot::PMC qw(%pmc_types);
 
 =head1 NAME
@@ -24,8 +24,6 @@ Contains a lot of PMC related tests.
 
 =cut
 
-my $max_pmc = scalar( keys(%pmc_types) ) + 1;
-
 pasm_output_is( <<'CODE', <<'OUTPUT', "newpmc" );
         print "starting\n"
         new P0, 'Integer'
@@ -34,20 +32,6 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "newpmc" );
 CODE
 starting
 ending
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "illegal min newpmc" );
-    new P0, 0
-    end
-CODE
-/Illegal PMC enum \(0\) in new/
-OUTPUT
-
-pasm_error_output_like( <<"CODE", <<'OUTPUT', "illegal max newpmc" );
-    new P0, $max_pmc
-    end
-CODE
-/Illegal PMC enum \(\d+\) in new/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'typeof' );
@@ -86,7 +70,7 @@ while ( my ( $type, $id ) = each %pmc_types ) {
     setprop P0, "_ro", P10
 EOPASM
     $checkTypes .= <<"CHECK";
-    new P0, .$type
+    new P0, '$type'
     $set_ro
     set S1, "$type"
     typeof S0, P0
@@ -127,14 +111,6 @@ pasm_error_output_like( <<'CODE', <<'OUTPUT', 'find_method' );
     end
 CODE
 /Method 'no_such_meth' not found for invocant of class 'Integer'/
-OUTPUT
-
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "new with a native type" );
-    new P1, .INTVAL
-    print "never\n"
-    end
-CODE
-/(unknown macro|unexpected DOT)/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "eq_addr same" );
