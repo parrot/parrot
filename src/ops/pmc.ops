@@ -178,43 +178,6 @@ inline op typeof(out STR, in INT) {
 
 ########################################
 
-=item B<find_type>(out INT, in STR)
-
-=item B<find_type>(out INT, in PMC)
-
-Find the PMC type or Parrot datatype by name.
-
-=cut
-
-op find_type(out INT, in STR) {
-    $1 = pmc_type(interp, $2);
-}
-
-op find_type(out INT, in PMC) {
-
-    INTVAL n;
-
-    if ($2->vtable->base_type == enum_class_String)
-        $1 = pmc_type(interp, VTABLE_get_string(interp, $2));
-    else if ($2->vtable->base_type == enum_class_Key)
-        $1 = pmc_type_p(interp, $2);
-    else if ((n = VTABLE_elements(interp, $2)) <= 0)
-        $1 = 0;
-    else {
-        PMC *_class = interp->class_hash;
-        INTVAL i;
-        for (i = 0; i < n; ++i) {
-            STRING *part = VTABLE_get_string_keyed_int(interp, $2, i);
-            _class = VTABLE_get_pmc_keyed_str(interp, _class, part);
-            if (PMC_IS_NULL(_class))
-                break;
-        }
-        $1 = PMC_IS_NULL(_class) ? 0 : PMC_int_val(_class);
-    }
-}
-
-########################################
-
 =item B<valid_type>(out INT, in INT)
 
 Check if the PMC type or Parrot datatype $2 is valid.

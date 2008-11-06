@@ -21,12 +21,8 @@ Tests the object/class subsystem.
     .include "iglobals.pasm"
     .include "interpinfo.pasm"
 
-    plan(201)
+    plan(194)
 
-    find_type__base_class()
-    find_type__subclass()
-    find_type_nested__with_key()
-    find_type_nested__with_array_EXPERIMENTAL()
     get_classname_from_class()
     test_get_class()
     test_isa()
@@ -102,55 +98,6 @@ Tests the object/class subsystem.
     # END_OF_TESTS
 .end
 
-.sub find_type__base_class
-    newclass $P1, "Foo1"
-
-    find_type $I0, "Foo1"
-    isgt $I0, $I0, 0
-    ok( $I0, 'find_type returns valid integer type for Foo' )
-
-    find_type $I0, "Bar1"
-    isgt $I0, $I0, 0
-    is( $I0, 0, 'find_type returns falls for undelared Bar1' )
-.end
-
-.sub find_type__subclass
-    newclass $P1, "Foo2"
-    subclass $P2, $P1, "Bar2"
-
-    find_type $I0, "Foo2"
-    isgt $I0, $I0, 0
-    ok( $I0, 'find_type returns valid integer type for Foo' )
-
-    find_type $I0, "Bar2"
-    isgt $I0, $I0, 0
-    ok( $I0, 'find_type returns valid integer type for subclass of Foo' )
-
-    find_type $I0, "Qux2"
-    isgt $I0, $I0, 0
-    is( $I0, 0, 'find_type returns false for undelared Qux' )
-.end
-
-.sub find_type_nested__with_key
-    newclass $P1, ["Foo3"; "Bar3"]
-
-    find_type $I0, ["Foo3"; "Bar3"]
-    isgt $I1, $I0, 0
-    ok( $I1, 'find_type for nested with key' )
-.end
-
-.sub find_type_nested__with_array_EXPERIMENTAL
-    newclass $P1, ["Foo4"; "Bar4"]
-
-    new $P2, 'ResizablePMCArray'
-    push $P2, "Foo4"
-    push $P2, "Bar4"
-
-    find_type $I0, $P2
-    isgt $I0, $I0, 0
-    ok( $I0, 'find_type for nexted with array' )
-.end
- 
 .sub get_classname_from_class
     newclass $P1, "Foo5"
     set $S0, $P1
