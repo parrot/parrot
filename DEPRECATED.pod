@@ -25,10 +25,6 @@ warnings.
 
 =over 4
 
-=item * C<type_keyed> [post 0.5.2]
-
-See RT #48577.
-
 =item * C<type> [post 0.5.2]
 
 See RT #48567.

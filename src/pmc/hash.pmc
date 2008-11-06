@@ -146,35 +146,6 @@ Marks the hash as live.
 
 /*
 
-=item C<INTVAL type_keyed(PMC *key)>
-
-Returns the type of the element for C<*key>.
-
-=cut
-
-*/
-
-    VTABLE INTVAL type_keyed(PMC *key) {
-        PMC               *valpmc;
-        PMC               *nextkey;
-        STRING     * const keystr = make_hash_key(INTERP, key);
-        HashBucket * const b      = parrot_hash_get_bucket(INTERP,
-            (Hash *)PMC_struct_val(SELF), keystr);
-
-        if (!b)
-            return 0;
-
-        nextkey = key_next(INTERP, key);
-        valpmc  = (PMC *)b->value;
-
-        if (!nextkey)
-            return VTABLE_type(INTERP, valpmc);
-
-        return VTABLE_type_keyed(INTERP, valpmc, nextkey);
-    }
-
-/*
-
 =item C<PMC *clone()>
 
 Creates and returns a clone of the hash.

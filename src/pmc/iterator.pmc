@@ -648,20 +648,6 @@ Returns the result of calling C<defined_keyed(key)> on the aggregate.
         return VTABLE_defined_keyed_int(INTERP, agg, PMC_int_val(key) + idx);
     }
 
-/*
-
-=item C<INTVAL type_keyed(PMC *key)>
-
-Returns the result of calling C<type_keyed(key)> on the aggregate.
-
-=cut
-
-*/
-
-    VTABLE INTVAL type_keyed(PMC *key) {
-        return VTABLE_type_keyed(INTERP, PMC_pmc_val(SELF), key);
-    }
-
     VTABLE PMC *get_iter() {
         return SELF;
     }

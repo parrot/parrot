@@ -41,7 +41,6 @@ s/^(\s*)(void\s+setprop\(STRING\s+\*\w*,\s+PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(void\s+delprop\(STRING\s+\*\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(PMC\s+\*getprops\(\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(INTVAL\s+type\(\)\s+{)/$1VTABLE $2/;
-s/^(\s*)(INTVAL\s+type_keyed\(PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(UINTVAL\s+subtype\(INTVAL\s+\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(STRING\s+\*name\(\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(PMC\s+\*clone\(\)\s+{)/$1VTABLE $2/;
