@@ -145,7 +145,7 @@ See RT #48549.
 
 This will be replaced by C<.HLL_map> <string> '=' <string>
 
-See RT #57430.
+See RT #57430 / RT #57432.
 
 =item * C<.HLL> <string> ',' <string> [post 0.6.4]
 
