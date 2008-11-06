@@ -51,30 +51,7 @@ can't be expressed using just integers, floating point
 numbers and strings can be expressed with a PMC.
 
 Parrot comes with many types of PMC that encapsulate common,
-useful behavior. Here's a program that lists all of the PMC
-types that are builtin to Parrot:
-
-=head3 Example 1: list all PMC types
-
-    .sub _ :main
-        $I0 = 1                         # The first PMC
-      loop:
-        $I1 = valid_type $I0
-        unless $I1 goto end_loop        # stop on invalid PMC number
-        $S0 = typeof $I0                # get PMC type name
-        print $I0                       # output PMC number
-        print "\t"
-        print $S0                       # output PMC type name
-        print "\n"
-        inc $I0
-        goto loop
-      end_loop:
-    .end
-
-In this program, the C<typeof> opcode is used to determine
-the type of each PMC available to Parrot. When given an
-integer argument, C<typeof> will return the name of the PMC
-type corresponding to that integer as a string.
+useful behavior.
 
 Many of the PMC type names give clues as to how they are
 used. Here's a table that gives a short description of

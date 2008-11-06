@@ -204,7 +204,6 @@ newline or semicolon after an end keyword."
     "tailcall" "tailcallmethod" "tan" "tanh" "tell" "thaw" "throw" "time"
     "titlecase" "trace" "trans_charset" "trans_encoding" "typeof"
     "unless" "unless_null" "unpin" "unregister" "unshift" "upcase"
-    "valid_type"
     "warningsoff" "warningson"
     "xor"
     "yield"))

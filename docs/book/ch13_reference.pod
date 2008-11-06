@@ -2766,14 +2766,6 @@ but before it's invoked.
 
 See also: C<invokecc>.
 
-=head3 valid_type
-
-X<valid_type opcode (PASM)>
-
-  valid_type R<DEST>, R<TYPE>
-
-Check whether a PMC type or native Parrot datatype is a valid one.
-
 I<Arguments: IR, I>
 
 =head3 vers
