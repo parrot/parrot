@@ -311,7 +311,7 @@ OR IF YOU NEED THIS (OR INSTANTIATE), TELL CHIP
 
 =cut
 
-op new(out PMC, in INT, in STR) {
+op new(out PMC, in INT, in STR) :deprecated {
     PMC *_class;
     if ($2 <= 0 || $2 >= interp->n_vtable_max) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
