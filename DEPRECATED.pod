@@ -33,10 +33,6 @@ See RT #48577.
 
 See RT #48579.
 
-=item * C<type_keyed_str> [post 0.5.2]
-
-See RT #48581.
-
 =item * C<type> [post 0.5.2]
 
 See RT #48567.

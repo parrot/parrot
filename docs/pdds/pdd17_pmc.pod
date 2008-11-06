@@ -928,9 +928,8 @@ Set the pointer value of the element indexed by a PMC, integer, or string key.
 
   INTVAL type_keyed(INTERP, PMC* self, PMC* key) [RT #48577]
   INTVAL type_keyed_int(INTERP, PMC* self, INTVAL key) [RT #48579]
-  INTVAL type_keyed_str(INTERP, PMC* self, STRING* key) [RT #48581]
 
-Return the type number of the PMC indexed by a PMC, integer, or string key.
+Return the type number of the PMC indexed by a PMC or integer key.
 The I<key> parameter is guaranteed not to be null for this method.
 
 =item pop_integer
