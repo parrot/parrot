@@ -27,6 +27,7 @@ PIR or an Eval PMC (bytecode).
     set_global '@!subcode', $P0
 
     $P0 = new 'String'
+    $P0 = '[]'
     set_global '$?NAMESPACE', $P0
     .return ()
 .end
@@ -260,9 +261,6 @@ the sub.
     goto subpir_done
 
   subpir_post:
-    if nskey != '' goto have_nskey
-    nskey = '[]'
-  have_nskey:
     code.'emit'("\n.namespace %0", nskey)
     $S0 = code.'escape'(name)
     code.'emit'(".sub %0 %1", $S0, pirflags)
