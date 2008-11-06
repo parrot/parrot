@@ -401,10 +401,6 @@ END_BODY
     pathquote  = ''
     unless osname == 'MSWin32' goto not_windows
     pathquote  = '"'
-    $I0 = index cc, 'gcc'
-    if $I0 > -1 goto not_windows
-    libparrot  = concat slash, libparrot
-    libparrot  = concat build_dir, libparrot
   not_windows:
 
     .local string link
