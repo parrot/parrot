@@ -203,7 +203,7 @@ implementation of a simple yet non-trivial language.
 
 =item * L<docs/pdds/pdd26_past.pod>
 
-=item * L<docs/pdds/draft/pdd19_pir.pod>
+=item * L<docs/pdds/pdd19_pir.pod>
 
 =item * F<http://dev.perl.org/perl6/doc/design/syn/S05.html>
 

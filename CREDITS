@@ -129,6 +129,9 @@ N: Bob Wilkinson
 D: Numerous document typos.
 E: bob@fourtheye.org
 
+N: Brad Bowman
+D: pod fixes
+
 N: Brad Gilbert
 D: Add test for sysinfo op.
 E: b2gills@gmail.com

@@ -33,7 +33,7 @@ Yes.
 
 Although Parrot is currently still under development, Parrot has been usable for
 a long time. The primary way to use Parrot is to write Parrot Intermediate
-Representation (PIR), described in L<PDD19|docs/pdds/draft/pdd19_pir.pod>.
+Representation (PIR), described in L<PDD19|docs/pdds/pdd19_pir.pod>.
 PIR is a high-level assembly language. See the L<examples> directory.
 
 =head2 When can I expect to use Parrot with a I<real> programming language?

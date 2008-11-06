@@ -93,7 +93,7 @@ STMLog PMC type.
 =head2 Starting and ending transactions
 
 The runtime library C<transaction> runs a supplied subroutine (with
-optional supplied arugments) in a separate transaction commiting the
+optional supplied arguments) in a separate transaction commiting the
 result. For example, (Perlish) pseudocode for inserting at the beginning
 of a linked list might look like this:
 

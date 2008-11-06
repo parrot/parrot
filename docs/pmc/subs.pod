@@ -132,7 +132,7 @@ subs, B<:init> subs are also run when compiling from memory.  B<:load> subs
 are run only in any source or bytecode files loaded subsequently.
 
 These markers are called "pragmas", and are defined fully in
-L<docs/pdds/draft/pdd19_pir.pod>.  The following table summarizes the behavior
+L<docs/pdds/pdd19_pir.pod>.  The following table summarizes the behavior
 of the five pragmas that cause Parrot to run a sub implicitly:
 
                 ------ Executed when --------
@@ -309,7 +309,7 @@ F<t/pmc/sub.t>
 =head1 SEE ALSO
 
 F<docs/pdds/pdd03_calling_conventions.pod>
-F<docs/pdds/draft/pdd19_pir.pod>
+F<docs/pdds/pdd19_pir.pod>
 
 =head1 AUTHOR
 

@@ -88,7 +88,7 @@ executing this subroutine. By the way, I could use C<.sub foo :main> and
 Parrot will use the C<foo> subroutine as the main body of the program.
 The actual name of the subroutine does not matter as long as it has the
 C<:main> pragma.  The full set of pragmas are defined in
-L<docs/pdds/draft/pdd19_pir.pod>.
+L<docs/pdds/pdd19_pir.pod>.
 
 Before going into more details about subroutines and calling
 conventions, let's compare some PIR syntax to the equivalent PASM.
@@ -297,7 +297,7 @@ Alberto Simões
 
 =over 4
 
-* Jonathan Scott Duff
+=item * Jonathan Scott Duff
 
 =back
 
