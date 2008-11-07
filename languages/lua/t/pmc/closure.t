@@ -114,7 +114,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
     bool1 = istrue pmc1
     print bool1
     print "\n"
-    .const .Sub F1 = 'f1'
+    .const 'Sub' F1 = 'f1'
     pmc1 = F1
     bool1 = istrue pmc1
     print bool1
@@ -154,8 +154,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
 .HLL 'Lua', 'lua_group'
 .sub _main
-#    .const .LuaClosure F1 = 'f1'
-    .const .Sub pmc1 = 'f1'
+#    .const 'LuaClosure' F1 = 'f1'
+    .const 'Sub' pmc1 = 'f1'
     .local int bool1
     bool1 = isa pmc1, 'LuaClosure'
     print bool1
@@ -183,7 +183,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL (autoboxing)' );
     print "\n"
 .end
 .sub test :outer(_main)
-    .const .Sub T = 'test'
+    .const 'Sub' T = 'test'
     .return (T)
 .end
 CODE
@@ -232,7 +232,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check init_pmc' );
 .HLL 'Lua', 'lua_group'
 .sub _main
-    .const .Sub pmc1 = 'f1'
+    .const 'Sub' pmc1 = 'f1'
     .local pmc pmc2
     pmc2 = new 'LuaClosure', pmc1
     .local int bool1
@@ -258,7 +258,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'load from pbc' );
     lua_openlibs()
     .local pmc tmp_0
     tmp_0 = get_hll_global '_G'
-    .const .LuaString cst_1 = 'print'
+    .const 'LuaString' cst_1 = 'print'
     .local pmc tmp_1
     tmp_1 = tmp_0[cst_1]
     tmp_1(tmp_1)
@@ -275,7 +275,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'from pir' );
     luaopen_basic()
     .local pmc tmp_0
     tmp_0 = get_hll_global '_G'
-    .const .LuaString cst_1 = 'print'
+    .const 'LuaString' cst_1 = 'print'
     .local pmc tmp_1
     tmp_1 = tmp_0[cst_1]
     tmp_1(tmp_1)
@@ -296,7 +296,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'from compilation' );
         .sub _loader
             .local pmc table
             table = new 'LuaTable'
-            .const .Sub F1 = 'f1'
+            .const 'Sub' F1 = 'f1'
             newclosure $P0, F1
             $P0.'setfenv'(table)
             .return ($P0)
@@ -329,7 +329,7 @@ print {$X} q{
   .sub _loader
       .local pmc table
       table = new 'LuaTable'
-      .const .Sub F1 = 'f1'
+      .const 'Sub' F1 = 'f1'
       newclosure $P0, F1
       $P0.'setfenv'(table)
       .return ($P0)

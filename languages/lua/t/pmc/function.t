@@ -114,7 +114,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check get_bool' );
     bool1 = istrue pmc1
     print bool1
     print "\n"
-    .const .Sub F1 = 'f1'
+    .const 'Sub' F1 = 'f1'
     pmc1 = F1
     bool1 = istrue pmc1
     print bool1
@@ -154,8 +154,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
 .HLL 'Lua', 'lua_group'
 .sub _main
-#    .const .LuaFunction F1 = 'f1'
-    .const .Sub pmc1 = 'f1'
+#    .const 'LuaFunction' F1 = 'f1'
+    .const 'Sub' pmc1 = 'f1'
     .local int bool1
     bool1 = isa pmc1, 'LuaFunction'
     print bool1
@@ -183,7 +183,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL (autoboxing)' );
     print "\n"
 .end
 .sub test
-    .const .Sub T = 'test'
+    .const 'Sub' T = 'test'
     .return (T)
 .end
 CODE
@@ -241,7 +241,7 @@ pir_output_like( << 'CODE', << 'OUTPUT', 'load from pbc' );
 .sub _main :anon
     .local pmc tmp_0
     tmp_0 = get_hll_global '_G'
-    .const .LuaString cst_1 = 'print'
+    .const 'LuaString' cst_1 = 'print'
     .local pmc tmp_1
     tmp_1 = tmp_0[cst_1]
     tmp_1(tmp_1)

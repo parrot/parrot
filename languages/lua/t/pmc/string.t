@@ -180,7 +180,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL & .const' );
 .HLL 'Lua', 'lua_group'
 .sub _main
-    .const .LuaString cst1 = "simple string"
+    .const 'LuaString' cst1 = "simple string"
     print cst1
     print "\n"
     .local int bool1
@@ -196,7 +196,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', '.const & empty string' );
 .HLL 'Lua', 'lua_group'
 .sub _main
-    .const .LuaString cst1 = ''
+    .const 'LuaString' cst1 = ''
     print cst1
     print "\n"
     .local int bool1

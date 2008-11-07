@@ -192,7 +192,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL & .const' );
 .HLL 'Lua', 'lua_group'
 .sub _main
-    .const .LuaNumber cst1 = '3.14'
+    .const 'LuaNumber' cst1 = '3.14'
     print cst1
     print "\n"
     .local int bool1
@@ -208,7 +208,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tostring' );
 .HLL 'Lua', 'lua_group'
 .sub _main
-    .const .LuaNumber cst1 = '3.14'
+    .const 'LuaNumber' cst1 = '3.14'
     print cst1
     print "\n"
     $P0 = cst1.'tostring'()
@@ -227,7 +227,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
 .HLL 'Lua', 'lua_group'
 .sub _main
-    .const .LuaNumber cst1 = '3.14'
+    .const 'LuaNumber' cst1 = '3.14'
     print cst1
     print "\n"
     $P0 = cst1.'tonumber'()
