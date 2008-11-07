@@ -1,12 +1,12 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 11;
 
 =head1 NAME
 
@@ -268,92 +268,6 @@ CODE
 1
 0
 OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "new_p_i_s" );
-    new P0, .FixedIntegerArray, "(1, 17,42,0,77,0b111,    0Xff)"
-    set I0, P0
-    print I0
-    print "\n"
-    set I1, 0
-loop:
-    set I2, P0[I1]
-    print I2
-    print "\n"
-    inc I1
-    lt I1, I0, loop
-    print "ok\n"
-    end
-CODE
-7
-1
-17
-42
-0
-77
-7
-255
-ok
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "get_repr, with array created with type id" );
-.sub main
-    new $P0, .FixedIntegerArray, "(1, 17,42,0,77,0b111,    0Xff)"
-    set $I0, $P0
-    print $I0
-    print "\n"
-    get_repr $S0, $P0
-    print $S0
-    print "\n"
-.end
-CODE
-7
-[ 1, 17, 42, 0, 77, 7, 255 ]
-OUTPUT
-
-TODO: {
-    local $TODO = 'These tests require an obscure opcode that does not exist';
-
-    pasm_output_is( <<'CODE', <<'OUTPUT', "new_p_s_s" );
-    new P0, 'FixedIntegerArray', "(1, 17,42,0,77,0b111,    0Xff)"
-    set I0, P0
-    print I0
-    print "\n"
-    set I1, 0
-loop:
-    set I2, P0[I1]
-    print I2
-    print "\n"
-    inc I1
-    lt I1, I0, loop
-    print "ok\n"
-    end
-CODE
-7
-1
-17
-42
-0
-77
-7
-255
-ok
-OUTPUT
-
-    pir_output_is( <<'CODE', <<'OUTPUT', "get_repr" );
-.sub main
-    new $P0, 'FixedIntegerArray', "(1, 17,42,0,77,0b111,    0Xff)"
-    set $I0, $P0
-    print $I0
-    print "\n"
-    get_repr $S0, $P0
-    print $S0
-    print "\n"
-.end
-CODE
-7
-[ 1, 17, 42, 0, 77, 7, 255 ]
-OUTPUT
-}
 
 1;
 

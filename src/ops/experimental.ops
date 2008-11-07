@@ -301,28 +301,6 @@ inline op pow(out NUM, in NUM, in INT) :base_core {
     $1 = res;
 }
 
-=item B<new>(out PMC, in INT, in STR)
-
-Create a new PMC of the type $2 according to the PMCs string representation
-in $3.
-
-BUT SINCE INSTANTIATE WILL PROBABLY DIE, DON'T USE THIS;
-OR IF YOU NEED THIS (OR INSTANTIATE), TELL CHIP
-
-=cut
-
-op new(out PMC, in INT, in STR) :deprecated {
-    PMC *_class;
-    if ($2 <= 0 || $2 >= interp->n_vtable_max) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
-                   EXCEPTION_NO_CLASS,
-                   "Illegal PMC enum (%d) in new", (int)$2);
-        goto ADDRESS(handler);
-    }
-    _class = interp->vtables[$2]->pmc_class;
-    $1 = VTABLE_new_from_string(interp, _class, $3, 0);
-}
-
 ########################################
 
 =item B<add_io_event>(invar PMC, invar PMC, invar PMC, inconst INT)
