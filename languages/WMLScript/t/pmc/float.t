@@ -150,7 +150,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL & .const' );
 .HLL "WMLScript", "wmls_group"
 .sub _main
-    .const .WmlsFloat cst1 = "3.14"
+    .const "WmlsFloat" cst1 = "3.14"
     print cst1
     print "\n"
     .local int bool1
@@ -167,7 +167,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check istrue' );
 .loadlib "wmls_ops"
 .HLL "WMLScript", "wmls_group"
 .sub _main
-    .const .WmlsFloat cst1 = "3.14"
+    .const "WmlsFloat" cst1 = "3.14"
     print cst1
     print "\n"
     $P0 = istrue cst1
@@ -187,7 +187,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check typeof' );
 .loadlib "wmls_ops"
 .HLL "WMLScript", "wmls_group"
 .sub _main
-    .const .WmlsFloat cst1 = "3.14"
+    .const "WmlsFloat" cst1 = "3.14"
     print cst1
     print "\n"
     $P0 = typeof cst1
@@ -207,7 +207,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check defined' );
 .loadlib "wmls_ops"
 .HLL "WMLScript", "wmls_group"
 .sub _main
-    .const .WmlsFloat cst1 = "3.14"
+    .const "WmlsFloat" cst1 = "3.14"
     print cst1
     print "\n"
     $P0 = defined cst1

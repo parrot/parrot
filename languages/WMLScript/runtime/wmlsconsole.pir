@@ -20,9 +20,9 @@ See "WMLScript Reference UP.SDK R4.B3 - October 1999".
 .sub 'getConsole'
     new $P0, 'Hash'
 
-    .const .Sub _console_print = '_console_print'
+    .const 'Sub' _console_print = '_console_print'
     $P0[0]  = _console_print
-    .const .Sub _console_println = '_console_println'
+    .const 'Sub' _console_println = '_console_println'
     $P0[1]  = _console_println
 
     .return ($P0)

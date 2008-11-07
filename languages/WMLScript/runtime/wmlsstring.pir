@@ -49,37 +49,37 @@ See "WMLScript Standard Libraries Specification", section 9 "String".
 .sub 'getString'
     new $P0, 'Hash'
 
-    .const .Sub _string_length = '_string_length'
+    .const 'Sub' _string_length = '_string_length'
     $P0[0]  = _string_length
-    .const .Sub _string_isEmpty = '_string_isEmpty'
+    .const 'Sub' _string_isEmpty = '_string_isEmpty'
     $P0[1]  = _string_isEmpty
-    .const .Sub _string_charAt = '_string_charAt'
+    .const 'Sub' _string_charAt = '_string_charAt'
     $P0[2]  = _string_charAt
-    .const .Sub _string_subString = '_string_subString'
+    .const 'Sub' _string_subString = '_string_subString'
     $P0[3]  = _string_subString
-    .const .Sub _string_find = '_string_find'
+    .const 'Sub' _string_find = '_string_find'
     $P0[4]  = _string_find
-    .const .Sub _string_replace = '_string_replace'
+    .const 'Sub' _string_replace = '_string_replace'
     $P0[5]  = _string_replace
-    .const .Sub _string_elements = '_string_elements'
+    .const 'Sub' _string_elements = '_string_elements'
     $P0[6]  = _string_elements
-    .const .Sub _string_elementAt = '_string_elementAt'
+    .const 'Sub' _string_elementAt = '_string_elementAt'
     $P0[7]  = _string_elementAt
-    .const .Sub _string_removeAt = '_string_removeAt'
+    .const 'Sub' _string_removeAt = '_string_removeAt'
     $P0[8]  = _string_removeAt
-    .const .Sub _string_replaceAt = '_string_replaceAt'
+    .const 'Sub' _string_replaceAt = '_string_replaceAt'
     $P0[9]  = _string_replaceAt
-    .const .Sub _string_insertAt = '_string_insertAt'
+    .const 'Sub' _string_insertAt = '_string_insertAt'
     $P0[10] = _string_insertAt
-    .const .Sub _string_squeeze = '_string_squeeze'
+    .const 'Sub' _string_squeeze = '_string_squeeze'
     $P0[11] = _string_squeeze
-    .const .Sub _string_trim = '_string_trim'
+    .const 'Sub' _string_trim = '_string_trim'
     $P0[12] = _string_trim
-    .const .Sub _string_compare = '_string_compare'
+    .const 'Sub' _string_compare = '_string_compare'
     $P0[13] = _string_compare
-    .const .Sub _string_toString = '_string_toString'
+    .const 'Sub' _string_toString = '_string_toString'
     $P0[14] = _string_toString
-    .const .Sub _string_format = '_string_format'
+    .const 'Sub' _string_format = '_string_format'
     $P0[15] = _string_format
 
     .return ($P0)

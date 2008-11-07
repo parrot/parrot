@@ -69,7 +69,7 @@ helper for CALL_LIB* opcodes.
     $P2 = $P1[findex]
     .return ($P2)
   _handler:
-    .const .Sub not_implemented = 'not_implemented'
+    .const 'Sub' not_implemented = 'not_implemented'
     .return (not_implemented)
 .end
 

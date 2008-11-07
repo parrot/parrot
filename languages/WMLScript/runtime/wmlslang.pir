@@ -23,35 +23,35 @@ See "WMLScript Standard Libraries Specification", section 7 "Lang".
 .sub 'getLang'
     new $P0, 'Hash'
 
-    .const .Sub _lang_abs = '_lang_abs'
+    .const 'Sub' _lang_abs = '_lang_abs'
     $P0[0]  = _lang_abs
-    .const .Sub _lang_min = '_lang_min'
+    .const 'Sub' _lang_min = '_lang_min'
     $P0[1]  = _lang_min
-    .const .Sub _lang_max = '_lang_max'
+    .const 'Sub' _lang_max = '_lang_max'
     $P0[2]  = _lang_max
-    .const .Sub _lang_parseInt = '_lang_parseInt'
+    .const 'Sub' _lang_parseInt = '_lang_parseInt'
     $P0[3]  = _lang_parseInt
-    .const .Sub _lang_parseFloat = '_lang_parseFloat'
+    .const 'Sub' _lang_parseFloat = '_lang_parseFloat'
     $P0[4]  = _lang_parseFloat
-    .const .Sub _lang_isInt = '_lang_isInt'
+    .const 'Sub' _lang_isInt = '_lang_isInt'
     $P0[5]  = _lang_isInt
-    .const .Sub _lang_isFloat = '_lang_isFloat'
+    .const 'Sub' _lang_isFloat = '_lang_isFloat'
     $P0[6]  = _lang_isFloat
-    .const .Sub _lang_maxInt = '_lang_maxInt'
+    .const 'Sub' _lang_maxInt = '_lang_maxInt'
     $P0[7]  = _lang_maxInt
-    .const .Sub _lang_minInt = '_lang_minInt'
+    .const 'Sub' _lang_minInt = '_lang_minInt'
     $P0[8]  = _lang_minInt
-    .const .Sub _lang_float = '_lang_float'
+    .const 'Sub' _lang_float = '_lang_float'
     $P0[9]  = _lang_float
-    .const .Sub _lang_exit = '_lang_exit'
+    .const 'Sub' _lang_exit = '_lang_exit'
     $P0[10] = _lang_exit
-    .const .Sub _lang_abort = '_lang_abort'
+    .const 'Sub' _lang_abort = '_lang_abort'
     $P0[11] = _lang_abort
-    .const .Sub _lang_random = '_lang_random'
+    .const 'Sub' _lang_random = '_lang_random'
     $P0[12] = _lang_random
-    .const .Sub _lang_seed = '_lang_seed'
+    .const 'Sub' _lang_seed = '_lang_seed'
     $P0[13] = _lang_seed
-    .const .Sub _lang_characterSet = '_lang_characterSet'
+    .const 'Sub' _lang_characterSet = '_lang_characterSet'
     $P0[14] = _lang_characterSet
 
     .return ($P0)

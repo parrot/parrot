@@ -152,7 +152,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check istrue' );
 .loadlib "wmls_ops"
 .HLL "WMLScript", "wmls_group"
 .sub _main
-    .const .WmlsBoolean cst1 = "1"
+    .const "WmlsBoolean" cst1 = "1"
     print cst1
     print "\n"
     $P0 = istrue cst1
@@ -172,7 +172,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check typeof' );
 .loadlib "wmls_ops"
 .HLL "WMLScript", "wmls_group"
 .sub _main
-    .const .WmlsBoolean cst1 = "1"
+    .const "WmlsBoolean" cst1 = "1"
     print cst1
     print "\n"
     $P0 = typeof cst1
@@ -192,7 +192,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check defined' );
 .loadlib "wmls_ops"
 .HLL "WMLScript", "wmls_group"
 .sub _main
-    .const .WmlsBoolean cst1 = "1"
+    .const "WmlsBoolean" cst1 = "1"
     print cst1
     print "\n"
     $P0 = defined cst1

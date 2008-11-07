@@ -23,21 +23,21 @@ See "WMLScript Standard Libraries Specification", section 8 "Float".
 .sub 'getFloat'
     new $P0, 'Hash'
 
-    .const .Sub _float_int = '_float_int'
+    .const 'Sub' _float_int = '_float_int'
     $P0[0]  = _float_int
-    .const .Sub _float_floor = '_float_floor'
+    .const 'Sub' _float_floor = '_float_floor'
     $P0[1]  = _float_floor
-    .const .Sub _float_ceil = '_float_ceil'
+    .const 'Sub' _float_ceil = '_float_ceil'
     $P0[2]  = _float_ceil
-    .const .Sub _float_pow = '_float_pow'
+    .const 'Sub' _float_pow = '_float_pow'
     $P0[3]  = _float_pow
-    .const .Sub _float_round = '_float_round'
+    .const 'Sub' _float_round = '_float_round'
     $P0[4]  = _float_round
-    .const .Sub _float_sqrt = '_float_sqrt'
+    .const 'Sub' _float_sqrt = '_float_sqrt'
     $P0[5]  = _float_sqrt
-    .const .Sub _float_maxFloat = '_float_maxFloat'
+    .const 'Sub' _float_maxFloat = '_float_maxFloat'
     $P0[6]  = _float_maxFloat
-    .const .Sub _float_minFloat = '_float_minFloat'
+    .const 'Sub' _float_minFloat = '_float_minFloat'
     $P0[7]  = _float_minFloat
 
     .return ($P0)

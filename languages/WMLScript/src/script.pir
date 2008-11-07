@@ -412,7 +412,7 @@ PIRCODE
     couple = self[idx]
     function_index = couple[0]
     function_name = couple[1]
-    pir .= "  .const .Sub "
+    pir .= "  .const 'Sub' "
     pir .= function_name
     pir .= " = 'function"
     $S0 = function_index
