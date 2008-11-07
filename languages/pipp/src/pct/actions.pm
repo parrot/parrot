@@ -205,11 +205,12 @@ method var($/,$key) {
 }
 
 method VAR_NAME($/) {
+    our $?PIPP_SCOPE;
     make PAST::Var.new(
-             :scope('package'),
+             :scope( $?PIPP_SCOPE ?? $?PIPP_SCOPE !! 'package' ),
              :name(~$/),
              :viviself('Undef'),
-             :lvalue(1)
+             :lvalue(1),
          );
 }
 
@@ -324,12 +325,17 @@ method NUMBER($/) {
 
 method function_definition($/) {
 
+    # PHP has two scopes: local to functions and global
+    our $?PIPP_SCOPE := 'lexical';
+
     # note that $<param_list> creates a new PAST::Block.
     my $past := $( $<param_list> );
 
     $past.name( ~$<FUNCTION_NAME> );
     $past.control('return_pir');
     $past.push( $( $<block> ) );
+
+    $?PIPP_SCOPE := '';
 
     make $past;
 }
