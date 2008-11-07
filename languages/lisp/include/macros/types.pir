@@ -121,7 +121,7 @@ Create a new function object with label L, placing the result in F.
     # VALID_IN_PARROT_0_2_0 setattribute .F, "LispFunction\0body", .L
 
     .local pmc _func
-    .const .Sub _func = .L
+    .const 'Sub' _func = .L
     setattribute .F, "body", _func
 
 .endm

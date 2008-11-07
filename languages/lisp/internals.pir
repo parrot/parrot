@@ -362,7 +362,7 @@ ARG_LOOP_END:
     .local pmc body
     .THIRD(body, form)
 
-    .const .Sub sub_that_calls_eval = 'sub_that_calls_eval'
+    .const 'Sub' sub_that_calls_eval = 'sub_that_calls_eval'
     .local pmc closure
     closure = newclosure sub_that_calls_eval       # Capture the scope the closure
 

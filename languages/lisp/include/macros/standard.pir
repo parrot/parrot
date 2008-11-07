@@ -54,7 +54,7 @@ Sets R to true (the TRUE symbol).
 
   _specialformp = new "LispSpecialForm"
   # VALID_IN_PARROT_0_2_0 _specialformp._set_body(.L)
-  .const .Sub _special_func = .L
+  .const 'Sub' _special_func = .L
   _specialformp._set_body(_special_func)
 
   _namep = new "LispString"
