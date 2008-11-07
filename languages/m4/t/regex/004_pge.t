@@ -18,17 +18,17 @@ pir_output_is( << 'END_PIR', << 'END_OUT', "check whether PGE is there" );
     .local pmc p6rule
     p6rule = compreg "PGE::Perl6Regex"
 
-    .local string pattern       
+    .local string pattern
     pattern = "^(<[_a..zA..Z]><[_a..zA..Z0..9]>*)"  # capture the complete id
 
-    .local pmc word_rulesub                     
+    .local pmc word_rulesub
     word_rulesub = p6rule(pattern)                  # compile the pattern to a rulesub
 
     .local string target
     target = "Hello World"                          # target string
     .local pmc match
     .local pmc captures
-    captures = new .Undef
+    captures = new 'Undef'
 
     .local pmc word_rulesub
     match = word_rulesub(target)                    # execute rule on target string
@@ -47,13 +47,13 @@ match_success:
     .local pmc captures_0
     captures_0 = captures[0]                    # TODO will the blow up when the match failed?
     print "The first capture is: "
-    print captures_0 
+    print captures_0
     print "\n"
 
     goto end_main
 
 match_fail:
-    print "match failed\n"   
+    print "match failed\n"
 
 end_main:
 .end

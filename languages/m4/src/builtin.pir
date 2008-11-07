@@ -35,320 +35,320 @@ Initialise all builtin and predefined macros.
   # Generate a table of Sub
   builtin_tab = state['builtin_tab']
 
-  .const .Sub func_m4_not_implemented = "m4_not_implemented"
+  .const 'Sub' func_m4_not_implemented = "m4_not_implemented"
 
   #     name                    GNUext  macros  blind   function */
   #   { "__file__",                TRUE,        FALSE,        FALSE,        m4___file__ },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = '__file__'
-  .const .Sub func_m4___file__ = "m4___file__"
+  .const 'Sub' func_m4___file__ = "m4___file__"
   builtin['func'] = func_m4___file__
   builtin['blind_no_args'] = 0
   builtin_tab['__file__'] = builtin
 
   #   { "__line__",                TRUE,        FALSE,        FALSE,        m4___line__ },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = '__line__'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 0
   builtin_tab['__line__'] = builtin
 
   #   { "builtin",                TRUE,        FALSE,        TRUE,        m4_builtin },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'builtin'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 1
   builtin_tab['builtin'] = builtin
 
   #   { "changecom",                FALSE,        FALSE,        FALSE,        m4_changecom },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'changecom'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 0
   builtin_tab['changecom'] = builtin
 
   #   { "changequote",	        FALSE,        FALSE,        FALSE,        m4_changequote },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'changequote'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 0
   builtin_tab['changequote'] = builtin
 
   #   { "changeword",        TRUE,        FALSE,        FALSE,        m4_changeword },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'changeword'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 0
   builtin_tab['changeword'] = builtin
 
   #   { "debugmode",        TRUE,        FALSE,        FALSE,        m4_debugmode },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'debugmode'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 0
   builtin_tab['debugmode'] = builtin
 
   #   { "debugfile",        TRUE,        FALSE,        FALSE,        m4_debugfile },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'debugfile'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 0
   builtin_tab['debugfile'] = builtin
 
   #   { "decr",                FALSE,        FALSE,        TRUE,        m4_decr },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'decr'
-  .const .Sub func_m4_decr = "m4_decr"
+  .const 'Sub' func_m4_decr = "m4_decr"
   builtin['func'] = func_m4_decr
   builtin['blind_no_args'] = 1
   builtin_tab['decr'] = builtin
 
   #   { "define",                FALSE,        TRUE,        TRUE,        m4_define },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'define'
-  .const .Sub func_m4_define = "m4_define"
+  .const 'Sub' func_m4_define = "m4_define"
   builtin['func'] = func_m4_define
   builtin['blind_no_args'] = 1
   builtin_tab['define'] = builtin
 
   #   { "defn",                FALSE,        FALSE,        TRUE,        m4_defn },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'defn'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 1
   builtin_tab['defn'] = builtin
 
   #   { "divert",                FALSE,        FALSE,        FALSE,        m4_divert },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'divert'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 0
   builtin_tab['divert'] = builtin
 
   #   { "divnum",                FALSE,        FALSE,        FALSE,        m4_divnum },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'divnum'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 0
   builtin_tab['divnum'] = builtin
 
   #   { "dnl",                  FALSE,        FALSE,        FALSE,        m4_dnl },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'dnl'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 0
   builtin_tab['dnl'] = builtin
 
   #   { "dumpdef",                FALSE,        FALSE,        FALSE,        m4_dumpdef },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'dumpdef'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 0
   builtin_tab['dumpdef'] = builtin
 
   #   { "errprint",                FALSE,        FALSE,        FALSE,        m4_errprint },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'errprint'
-  .const .Sub func_m4_errprint = "m4_errprint"
+  .const 'Sub' func_m4_errprint = "m4_errprint"
   builtin['func'] = func_m4_errprint
   builtin['blind_no_args'] = 0
   builtin_tab['errprint'] = builtin
 
   #   { "esyscmd",                TRUE,        FALSE,        TRUE,        m4_esyscmd },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'esyscmd'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 1
   builtin_tab['esyscmd'] = builtin
 
   #   { "eval",		FALSE,	FALSE,	TRUE,	m4_eval },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'eval'
-  .const .Sub func_m4_eval = "m4_eval"
+  .const 'Sub' func_m4_eval = "m4_eval"
   builtin['func'] = func_m4_eval
   builtin['blind_no_args'] = 1
   builtin_tab['eval'] = builtin
 
   #   { "format",		TRUE,	FALSE,	FALSE,	m4_format },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'format'
-  .const .Sub func_m4_format = "m4_format"
+  .const 'Sub' func_m4_format = "m4_format"
   builtin['func'] = func_m4_format
   builtin['blind_no_args'] = 0
   builtin_tab['format'] = builtin
 
   #   { "ifdef",		FALSE,	FALSE,	TRUE,	m4_ifdef },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'ifdef'
-  .const .Sub func_m4_ifdef = "m4_ifdef"
+  .const 'Sub' func_m4_ifdef = "m4_ifdef"
   builtin['func'] = func_m4_ifdef
   builtin['blind_no_args'] = 1
   builtin_tab['ifdef'] = builtin
 
   #   { "ifelse",		FALSE,	FALSE,	TRUE,	m4_ifelse },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'ifelse'
-  .const .Sub func_m4_ifelse = "m4_ifelse"
+  .const 'Sub' func_m4_ifelse = "m4_ifelse"
   builtin['func'] = func_m4_ifelse
   builtin['blind_no_args'] = 1
   builtin_tab['ifelse'] = builtin
 
   #   { "include",		FALSE,	FALSE,	TRUE,	m4_include },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'include'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 1
   builtin_tab['include'] = builtin
 
   #   { "incr",	        	FALSE,	FALSE,	TRUE,	m4_incr },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'incr'
-  .const .Sub func_m4_incr = "m4_incr"
+  .const 'Sub' func_m4_incr = "m4_incr"
   builtin['func'] = func_m4_incr
   builtin['blind_no_args'] = 1
   builtin_tab['incr'] = builtin
 
   #   { "index",		FALSE,	FALSE,	TRUE,	m4_index },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'index'
-  .const .Sub func_m4_index = "m4_index"
+  .const 'Sub' func_m4_index = "m4_index"
   builtin['func'] = func_m4_index
   builtin['blind_no_args'] = 1
   builtin_tab['index'] = builtin
 
   #   { "indir",		TRUE,	FALSE,	FALSE,	m4_indir },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'indir'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 0
   builtin_tab['indir'] = builtin
 
   #   { "len",	        	FALSE,	FALSE,	TRUE,	m4_len },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'len'
-  .const .Sub func_m4_len = "m4_len"
+  .const 'Sub' func_m4_len = "m4_len"
   builtin['func'] = func_m4_len
   builtin['blind_no_args'] = 1
   builtin_tab['len'] = builtin
 
   #   { "m4exit",		FALSE,	FALSE,	FALSE,	m4_m4exit },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'm4exit'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 0
   builtin_tab['m4exit'] = builtin
 
   #   { "m4wrap",		FALSE,	FALSE,	FALSE,	m4_m4wrap },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'm4wrap'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 0
   builtin_tab['m4wrap'] = builtin
 
   #   { "maketemp",		FALSE,	FALSE,	TRUE,	m4_maketemp },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'maketemp'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 1
   builtin_tab['maketemp'] = builtin
 
   #   { "patsubst",		TRUE,	FALSE,	TRUE,	m4_patsubst },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'patsubst'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 1
   builtin_tab['patsubst'] = builtin
 
   #   { "popdef",		FALSE,	FALSE,	TRUE,	m4_popdef },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'popdef'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 1
   builtin_tab['popdef'] = builtin
 
   #   { "pushdef",		FALSE,	TRUE,	TRUE,	m4_pushdef },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'pushdef'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 1
   builtin_tab['pushdef'] = builtin
 
   #   { "regexp",		TRUE,	FALSE,	TRUE,	m4_regexp },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'regexp'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 1
   builtin_tab['regexp'] = builtin
 
   #   { "shift",		FALSE,	FALSE,	FALSE,	m4_shift },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'shift'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 0
   builtin_tab['shift'] = builtin
 
   #   { "sinclude",		FALSE,	FALSE,	TRUE,	m4_sinclude },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'sinclude'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 1
   builtin_tab['sinclude'] = builtin
 
   #   { "substr",		FALSE,	FALSE,	TRUE,	m4_substr },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'substr'
-  .const .Sub func_m4_substr = "m4_substr"
+  .const 'Sub' func_m4_substr = "m4_substr"
   builtin['func'] = func_m4_substr
   builtin['blind_no_args'] = 1
   builtin_tab['substr'] = builtin
 
   #   { "syscmd",		FALSE,	FALSE,	TRUE,	m4_syscmd },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'syscmd'
-  .const .Sub func_m4_syscmd = "m4_syscmd"
+  .const 'Sub' func_m4_syscmd = "m4_syscmd"
   builtin['func'] = func_m4_syscmd
   builtin['blind_no_args'] = 1
   builtin_tab['syscmd'] = builtin
 
   #   { "sysval",		FALSE,	FALSE,	FALSE,	m4_sysval },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'sysval'
-  .const .Sub func_m4_sysval = "m4_sysval"
+  .const 'Sub' func_m4_sysval = "m4_sysval"
   builtin['func'] = func_m4_sysval
   builtin['blind_no_args'] = 0
   builtin_tab['sysval'] = builtin
 
   #   { "traceoff",		FALSE,	FALSE,	FALSE,	m4_traceoff },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'traceoff'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 0
   builtin_tab['traceoff'] = builtin
 
   #   { "traceon",		FALSE,	FALSE,	FALSE,	m4_traceon },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'traceon'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 0
   builtin_tab['traceon'] = builtin
 
   #   { "translit",		FALSE,	FALSE,	TRUE,	m4_translit },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'translit'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 1
   builtin_tab['translit'] = builtin
 
   #   { "undefine",		FALSE,	FALSE,	TRUE,	m4_undefine },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'undefine'
-  .const .Sub func_m4_undefine = "m4_undefine"
+  .const 'Sub' func_m4_undefine = "m4_undefine"
   builtin['func'] = func_m4_undefine
   builtin['blind_no_args'] = 1
   builtin_tab['undefine'] = builtin
 
   #   { "undivert",		FALSE,	FALSE,	FALSE,	m4_undivert },
-  builtin = new .Hash
+  builtin = new 'Hash'
   builtin['name'] = 'undivert'
   builtin['func'] = func_m4_not_implemented
   builtin['blind_no_args'] = 0
@@ -372,7 +372,7 @@ Initialise all builtin and predefined macros.
 
   builtin_tab = state['builtin_tab']
   prefix_all_builtins = state['prefix_all_builtins']
-  iterator = new .Iterator, builtin_tab
+  iterator = new 'Iterator', builtin_tab
   set iterator, .ITERATE_FROM_START
 ITER_LOOP:
   unless iterator, END_ITER
@@ -403,7 +403,7 @@ Install a builtin macro with name 'name', bound to the function 'bp'.
 
   # Now store the passed symbol
   .local pmc symbol
-  symbol = new .Hash
+  symbol = new 'Hash'
   symbol['name'] = name
   symbol['type'] = 'TOKEN_FUNC'
 
@@ -440,7 +440,7 @@ This function is also called from main().
 
   # Now store the passed symbol
   .local pmc symbol
-  symbol = new .Hash
+  symbol = new 'Hash'
   symbol['name'] = name
   symbol['text'] = text
   symbol['type'] = 'TOKEN_TEXT'
@@ -546,7 +546,7 @@ The individual arguments are seperated by a blank.
   .local pmc    iterator, arg
   .local int    is_first_arg
   is_first_arg = 1
-  iterator = new .Iterator, arguments
+  iterator = new 'Iterator', arguments
   set iterator, .ITERATE_FROM_START
 ITER_LOOP:
   unless iterator, END_ITER
