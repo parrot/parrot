@@ -9,8 +9,7 @@ grammar Pipp::Grammar is PCT::Grammar;
 token TOP                   { ^ <sea_or_code>+                                       {*} }
 
 # whitespace and comments
-token ws                    { [ \h
-                              | \v
+token ws                    { [ <.ws_char>
                               | <singlelinecomment>
                               | <multilinecomment>
                               ]*
