@@ -82,7 +82,7 @@ NATIVE_b:
     dtypes[0] = in_b
     goto END
 ENUM_TYPE:
-    $P0 = new .Hash
+    $P0 = new "Hash"
     $P0["type"] = ELEMENT_TYPE_I
     $P0["byref"] = 0
     annotate_reg_type($P0)

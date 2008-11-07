@@ -62,9 +62,9 @@ sub pre_translation() {
 .local int stack_depth
 .local pmc prop_type_state, prop_stack_depth, lazy_moves
 stack_depth = -1
-prop_type_state = new Hash
-prop_stack_depth = new Hash
-lazy_moves = new ResizablePMCArray
+prop_type_state = new 'Hash'
+prop_stack_depth = new 'Hash'
+lazy_moves = new 'ResizablePMCArray'
 PIR
 }
 
@@ -506,7 +506,7 @@ sub post_call {
 }
 
 sub pop_all {
-    return "stack_depth = -1\nlazy_moves = new ResizablePMCArray\n";
+    return "stack_depth = -1\nlazy_moves = new 'ResizablePMCArray'\n";
 }
 
 # Local Variables:

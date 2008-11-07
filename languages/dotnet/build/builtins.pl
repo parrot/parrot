@@ -50,7 +50,7 @@ $output .= <<'PIR_OUT';
     # Generic unimplemented internal method body (throws exception).
 EXCEPTION_UNIMPLEMENTED:
     body = <<"PIR"
-$P0 = new .Exception
+$P0 = new "Exception"
 $P0 = "System.NotImplementedException"
 $P1 = new "System.NotImplementedException"
 $P0["obj"] = $P1
@@ -181,7 +181,7 @@ sub generate_lookup {
     # Add failure.
     $pir .= <<'PIR'
 FAIL:
-    $P0 = new .Exception
+    $P0 = new "Exception"
     $P0 = "No body supplied for built-in method"
     throw $P0
 PIR

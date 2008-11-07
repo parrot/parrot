@@ -452,7 +452,7 @@ NO_IN_TRACE:
     pc = 0
 
         # Initialize stack types array.
-        stypes = new ResizablePMCArray
+        stypes = new "ResizablePMCArray"
 
     # Instantiate a bytecode escaper.
     escaper = find_global "Data::Escape", "String"
@@ -490,7 +490,7 @@ TRANSPIR
     if null ehs goto NO_EH_HEADER
     i = elements ehs
     gen_pir = concat ".local pmc cur_exception\n"
-    gen_pir = concat ".local pmc saved_ehs\nsaved_ehs = new .FixedPMCArray\nsaved_ehs = "
+    gen_pir = concat ".local pmc saved_ehs\nsaved_ehs = new 'FixedPMCArray'\nsaved_ehs = "
     tmp = i
     gen_pir = concat tmp
     gen_pir = concat "\n"
@@ -498,7 +498,7 @@ NO_EH_HEADER:
     gen_pir = concat "pushmark 0\n"
 
     # Translation loop.
-    ss_propogate = new .Hash
+    ss_propogate = new 'Hash'
 TRANS_LOOP:
     pc = bc.get_pos()
         next_pc = pc
@@ -568,8 +568,8 @@ NOT_TRY_START:
     gen_pir = concat ":\n"
 
     # Need to fix up stack type state. Create new empty array.
-    stypes = new ResizablePMCArray
-    type_trans = new Hash
+    stypes = new "ResizablePMCArray"
+    type_trans = new "Hash"
     type_trans["type"] = ELEMENT_TYPE_CLASS
     type_trans["byref"] = 0
     annotate_reg_type(type_trans)
@@ -911,7 +911,7 @@ PIR
         # jumptable
         elsif (/^jumptable$/) {
             $out = <<"PIR";
-    \${P_ARG_$arg_num} = new FixedPMCArray
+    \${P_ARG_$arg_num} = new "FixedPMCArray"
     i = bc.read_uint32()
     next_pc += 4
     \${P_ARG_$arg_num} = i
@@ -957,7 +957,7 @@ PIR
     if ( $rule->{'class'} eq 'op' ) {
 
         # Init destination types array.
-        $pir .= "    dtypes = new ResizablePMCArray\n";
+        $pir .= "    dtypes = new 'ResizablePMCArray'\n";
 
         # Insert typeinfo code (sets up dtypes).
         $pir .= "### typeinfo\n";
@@ -1095,7 +1095,7 @@ PIR
             $pir .= <<PIR
 \$I1000000 = loadtype["type"]
 if \$I1000000 != ELEMENT_TYPE_VALUETYPE goto $label
-dtypes = new ResizablePMCArray
+dtypes = new "ResizablePMCArray"
 dtypes[0] = loadtype
 $pre_op
 gen_pir = concat dest0
@@ -1236,8 +1236,8 @@ PIRCODE
     elsif ( $rule->{'class'} eq 'calling' ) {
 
         # Init destination types array and params array and set meta-variable.
-        $pir .= "    dtypes = new ResizablePMCArray\n";
-        $pir .= "    c_params = new ResizableStringArray\n";
+        $pir .= "    dtypes = new 'ResizablePMCArray'\n";
+        $pir .= "    c_params = new 'ResizableStringArray'\n";
         $mv->{'PARAMS'} = 'c_params';
         push @localmv, 'PARAMS';
 

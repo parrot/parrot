@@ -32,7 +32,7 @@ GETDEFREF:
     .local pmc ex, ret, elems
 
     # We return a hash with details of the return type or parameter in it.
-    ret = new .Hash
+    ret = new 'Hash'
 
     # Read type token.
     t1 = signature.read_compressed()
@@ -99,7 +99,7 @@ NOFP:
     .local pmc ex, ret, elems
 
     # We return a hash with details of the return type or parameter in it.
-    ret = new .Hash
+    ret = new 'Hash'
 
     # First need to read a custom modifier.
     #(cmod_req, cmod_type_def_or_ref) = get_signature_CustomMod(signature)
@@ -160,7 +160,7 @@ NOFP:
     .local pmc ex, ret, elems
 
     # We return a hash with details of the return type or parameter in it.
-    ret = new .Hash
+    ret = new 'Hash'
 
     # Read type token.
     t1 = signature.read_compressed()

@@ -32,7 +32,7 @@ EXTERNAL:
     class_id = memberref.get_class_id()
     dec class_id
     if class_type == 1 goto TYPEREF
-    ex = new .Exception
+    ex = new 'Exception'
     ex["message"] = "Unsupported member reference type for field"
     throw ex
 

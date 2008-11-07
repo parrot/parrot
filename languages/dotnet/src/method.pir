@@ -126,14 +126,14 @@ METHOD_END:
     annotate_reg_type(rettype)
 
     # Create parameter types array.
-    ptypes = new .ResizablePMCArray
+    ptypes = new 'ResizablePMCArray'
 
     # If it's an instance method and explicit not set, add "this" to the list.
     this_offset = 0
     pir_multi = ""
     if static_check == 0 goto NOSELF
     if explicit_check != 0 goto NOSELF
-    ptype = new Hash
+    ptype = new 'Hash'
     ptype["type"] = 0x1C
     ptype["byref"] = 0
     annotate_reg_type(ptype)
@@ -257,7 +257,7 @@ NOT_VARARG:
     .local pmc ltypes, ltype
 
     pir_output = ""
-    ltypes = new .ResizablePMCArray
+    ltypes = new 'ResizablePMCArray'
 
     # Get signature.
     bc = meth.get_bytecode()
@@ -355,7 +355,7 @@ EXTERNAL:
     dec class_id
     if class_type == 1 goto TYPEREF
     if class_type == 3 goto METHODDEF
-    ex = new .Exception
+    ex = new 'Exception'
     ex["message"] = "Unsupported member reference type for method"
     throw ex
 
