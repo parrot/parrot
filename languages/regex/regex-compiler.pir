@@ -1,6 +1,6 @@
 .sub __init_compiler :load
   loadlib $P0, "match_group"
-  .const .Sub $P1 =  "_compile_regex"
+  .const 'Sub' $P1 =  "_compile_regex"
   compreg "regex", $P1
 .end
 
