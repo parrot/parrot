@@ -14,7 +14,7 @@ version 0.1
     new stream, "Stream::Sub"
 
     # set the source sub
-    .const .Sub temp = "_test"
+    .const 'Sub' temp = "_test"
     stream."source"( temp )
 
     ...

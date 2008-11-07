@@ -1381,7 +1381,7 @@ OUTPUT
   new P10, 'Integer'
   set_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
-  .const .Sub P6 = "_call_back"
+  .const 'Sub' P6 = "_call_back"
   # prepare user data
   new P7, 'Integer'
   set P7, 42
@@ -1451,7 +1451,7 @@ OUTPUT
 
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
-    .const .Sub cb = "_call_back"
+    .const 'Sub' cb = "_call_back"
     .local pmc cb_wrapped
     cb_wrapped = new_callback cb, user_data, "vtU"	# Z in pdd16
     print "created a callback sub\n"
@@ -1513,7 +1513,7 @@ OUTPUT
   new P10, 'Integer'
   set_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
-  .const .Sub P6 = "_call_back"
+  .const 'Sub' P6 = "_call_back"
   # prepare user data
   new P7, 'Integer'
   set P7, 42
@@ -1587,7 +1587,7 @@ OUTPUT
 
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
-    .const .Sub cb = "_call_back"
+    .const 'Sub' cb = "_call_back"
     .local pmc cb_wrapped
     cb_wrapped = new_callback cb, user_data, "vpU"	# Z in pdd16
     print "created a callback sub\n"
@@ -1660,7 +1660,7 @@ OUTPUT
   new P10, 'Integer'
   set_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
-  .const .Sub P6 = "_call_back"
+  .const 'Sub' P6 = "_call_back"
   # prepare user data
   new P7, 'Integer'
   set P7, 42
@@ -1718,7 +1718,7 @@ OUTPUT
   new P10, 'Integer'
   set_global "cb_done", P10
   # first attempt - create cb manually (this step will be hidden later)
-  .const .Sub P6 = "_call_back"
+  .const 'Sub' P6 = "_call_back"
   # prepare user data
   new P7, 'Integer'
   set P7, 42
@@ -1789,7 +1789,7 @@ OUTPUT
 
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
-    .const .Sub cb = "_call_back"
+    .const 'Sub' cb = "_call_back"
     .local pmc cb_wrapped
     cb_wrapped = new_callback cb, user_data, "vUi"	# Z in pdd16
     print "created a callback sub\n"
@@ -1866,7 +1866,7 @@ OUTPUT
 
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
-    .const .Sub cb = "_call_back"
+    .const 'Sub' cb = "_call_back"
     .local pmc cb_wrapped
     cb_wrapped = new_callback cb, user_data, "vUp"	# Z in pdd16
     print "created a callback sub\n"
@@ -1965,7 +1965,7 @@ OUTPUT
 
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
-    .const .Sub cb = "_call_back"
+    .const 'Sub' cb = "_call_back"
     .local pmc cb_wrapped
     cb_wrapped = new_callback cb, user_data, "vUp"	# Z in pdd16
     print "created a callback sub\n"

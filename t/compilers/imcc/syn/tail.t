@@ -20,8 +20,8 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, final position" );
     $P1 = 20
     $P2 = new 'Integer'
     $P2 = 3
-    .const .Sub f = "_floor"
-    .const .Sub c = "_funcall"
+    .const 'Sub' f = "_floor"
+    .const 'Sub' c = "_funcall"
     set_args "0,0,0", f, $P1, $P2
     get_results "0,0", $P3, $P4
     invokecc c
@@ -32,7 +32,7 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, final position" );
     print " and "
     print $P4
     print ".\n"
-    .const .Sub s = "_fib_step"
+    .const 'Sub' s = "_fib_step"
     set_args "0,0,0", s, $P1, $P2
     get_results "0,0,0", $P3, $P4, $P5
     invokecc c
@@ -102,8 +102,8 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, intermediate position
     $P1 = 20
     $P2 = new 'Integer'
     $P2 = 3
-    .const .Sub f = "_floor"
-    .const .Sub s = "_fib_step"
+    .const 'Sub' f = "_floor"
+    .const 'Sub' s = "_fib_step"
     ($P3, $P4) = _funcall(f, $P1, $P2)
     print "_floor returned "
     print 2
@@ -177,8 +177,8 @@ pir_output_is( <<'CODE', <<'OUT', "tail call optimization, implicit final return
     $P1 = 20
     $P2 = new 'Integer'
     $P2 = 3
-    .const .Sub f = "_floor"
-    .const .Sub s = "_fib_step"
+    .const 'Sub' f = "_floor"
+    .const 'Sub' s = "_fib_step"
     ($P3, $P4) = _funcall(f, $P1, $P2)
     print "_floor returned "
     print 2
@@ -256,7 +256,7 @@ pir_output_is( <<'CODE', <<'OUT', ":flatten in .return" );
     $P1 = 20
     $P2 = new 'Integer'
     $P2 = 3
-    .const .Sub s = "_fib_step"
+    .const 'Sub' s = "_fib_step"
     ($P3, $P4, $P5) = _funcall(s, $P1, $P2)
     print "_fib_step returned "
     print 3

@@ -256,7 +256,7 @@ Match whitespace between tokens.
     .local pmc mob, mfrom, mpos
     .local int rep, pos, lastpos
     .local string nextchars
-    .const .Sub corou = "ws_corou"
+    .const 'Sub' corou = "ws_corou"
     nextchars = ""
   ws_1:
     $P0 = get_hll_global ['PGE'], 'Match'

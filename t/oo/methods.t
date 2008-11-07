@@ -103,7 +103,7 @@ pir_output_is( <<'CODE', <<'OUT', "overridden find_method() should not eat passe
 
     say meth_name
 
-    .const .Sub meth = 'meth'
+    .const 'Sub' meth = 'meth'
     .return (meth)
 .end
 CODE

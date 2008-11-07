@@ -245,7 +245,7 @@ Tests the Class PMC.
     attribs = class.'attributes'()
     attribs['foo'] = 'bar'
 
-    .const .Sub meth_to_add = 'foo'
+    .const 'Sub' meth_to_add = 'foo'
 
     class.'add_method'( 'foo', meth_to_add )
     attribs = class.'methods'()

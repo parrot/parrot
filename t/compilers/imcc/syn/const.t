@@ -115,7 +115,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "PMC const 1 - Sub" );
 .sub 'main' :main
-    .const .Sub $P0 = "foo"
+    .const 'Sub' $P0 = "foo"
     print "ok 1\n"
     $P0()
     print "ok 3\n"
@@ -131,7 +131,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "PMC const 2 - Sub ident" );
 .sub 'main' :main
-    .const .Sub func = "foo"
+    .const 'Sub' func = "foo"
     print "ok 1\n"
     func()
     print "ok 3\n"

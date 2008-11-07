@@ -58,7 +58,7 @@ Parrot::Coroutine - A pure PIR implementation of coroutines
 
         .local int coro_class, idx
         .local pmc coro
-        .const .Sub coro_sub = "enumerate_tree"
+        .const 'Sub' coro_sub = "enumerate_tree"
         coro = new 'Parrot::Coroutine', coro_sub
         ($P0 :optional, $I0 :opt_flag) = coro.'resume'(coro, tree)
         idx = 0
@@ -105,7 +105,7 @@ END:
 This method is normally called via the C<new> op:
 
     .local pmc coro
-    .const .Sub coro_sub = "enumerate_tree"
+    .const 'Sub' coro_sub = "enumerate_tree"
     coro_class = get_class 'Parrot::Coroutine'
     coro = coro_class.'new'('initial_sub' => coro_sub)
 

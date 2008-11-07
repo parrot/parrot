@@ -197,7 +197,7 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUT', ".const - Sub constant" );
 .pcc_sub :main main:
     print "ok 1\n"
-    .const .Sub P0 = "foo"
+    .const 'Sub' P0 = "foo"
     invokecc P0
     print "ok 3\n"
     end
@@ -212,7 +212,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "pmc constant 1" );
 .sub main :main
-    .const .Integer i = "42"
+    .const 'Integer' i = "42"
     print i
     print "\n"
 .end
@@ -222,7 +222,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "pmc constant 2" );
 .sub main :main
-    .const .Integer i = "42"
+    .const 'Integer' i = "42"
     print i
     print "\n"
 .end
@@ -231,7 +231,7 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "pmc constant PASM" );
-    .const .Integer P0 = "42"
+    .const 'Integer' P0 = "42"
     print P0
     print "\n"
     end

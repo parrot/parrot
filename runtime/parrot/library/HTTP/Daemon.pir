@@ -325,7 +325,7 @@ runnloop.
 .sub '_select_active' :method
     .local pmc active, conn, sock
     .local int i, n
-    .const .Sub req_handler = "req_handler"
+    .const 'Sub' req_handler = "req_handler"
     active = getattribute self, 'active'
     n = elements active
     i = 0

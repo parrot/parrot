@@ -506,7 +506,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'set a sub as an attribute, in a macro' );
 .macro create_inst(inst_name,M)
     print "entering macro create_inst\n"
     .inst_name = new 'MyClass'
-    .const .Sub c3 = .M
+    .const 'Sub' c3 = .M
     setattribute .inst_name, 'MyFuncInMyClass', c3
     print "leaving macro create_inst\n"
 .endm

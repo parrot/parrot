@@ -14,7 +14,7 @@ use Parrot::Test tests => 21;
 
 pir_output_is( <<'CODE', <<'OUT', "low-level syntax" );
 .sub test :main
-    .const .Sub sub = "_sub"
+    .const 'Sub' sub = "_sub"
     .const int y = 20
     .begin_call
     .set_arg 10
@@ -272,7 +272,7 @@ pir_output_is( <<'CODE', <<'OUT', ".set_arg :flat" );
     push ar2, "ok 3\n"
     push ar2, "ok 4\n"
     push ar2, "ok 5\n"
-    .const .Sub s = "_sub"
+    .const 'Sub' s = "_sub"
     .begin_call
     .set_arg x
     .set_arg ar :flat

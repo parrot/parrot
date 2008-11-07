@@ -67,7 +67,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Sub" );
     stream = new "Stream::Sub"
 
     # set the stream's source sub   #'
-    .const .Sub temp = "_hello"
+    .const 'Sub' temp = "_hello"
     assign stream, temp
 
     # dump the stream
@@ -113,7 +113,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::read_bytes" );
 
     $P0 = new "Stream::Sub"
     # set the stream's source sub      #'
-    .const .Sub temp = "_hello"
+    .const 'Sub' temp = "_hello"
     assign $P0, temp
 
     stream = new "Stream::Replay"
@@ -191,13 +191,13 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Combiner" );
 
     # create the counter stream
     counter = new "Stream::Sub"
-    .const .Sub ct = "_counter"
+    .const 'Sub' ct = "_counter"
     assign counter, ct
 
     # create the text stream
     text = new "Stream::Sub"
     # set its source
-    .const .Sub src = "_text"
+    .const 'Sub' src = "_text"
     assign text, src
 
     # create a combiner stream
@@ -207,7 +207,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Combiner" );
     assign combined, text
 
     # specify our own combiner sub
-    .const .Sub cb = "_combiner"
+    .const 'Sub' cb = "_combiner"
     combined."combiner"( cb )
 
     # dump the combined stream
@@ -278,7 +278,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Coroutine" );
     stream = new "Stream::Coroutine"
 
     # set the stream's source coroutine #'
-    .const .Sub temp = "_coro"
+    .const 'Sub' temp = "_coro"
     assign stream, temp
     #stream."source"( temp )
 
@@ -358,7 +358,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::ParrotIO" );
 
     # endless counter
     counter = new "Stream::Sub"
-    .const .Sub temp = "_counter"
+    .const 'Sub' temp = "_counter"
     assign counter, temp
 
     # combine the counter and the file's lines   #'
@@ -710,7 +710,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Filter" );
     # create the counter stream
     stream = new "Stream::Sub"
     # assign its source
-    .const .Sub temp = "_counter"
+    .const 'Sub' temp = "_counter"
     assign stream, temp
 
     # create the filter stream
@@ -718,7 +718,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Filter" );
     # assign its source
     assign filter, stream
     # set the filter sub
-    .const .Sub ft = "_filter"
+    .const 'Sub' ft = "_filter"
     filter."filter"( ft )
 
     # dump the stream
@@ -793,7 +793,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::include" );
 
     stream = new "Stream::Sub"
 
-    .const .Sub temp = "_counter"
+    .const 'Sub' temp = "_counter"
     assign stream, temp
 
     # dump the stream
@@ -823,7 +823,7 @@ LOOP:
 
     temp = new "Stream::Sub"
 
-    .const .Sub func = "_included"
+    .const 'Sub' func = "_included"
     assign temp, func
 
     # include it
@@ -841,7 +841,7 @@ SKIP:
 
     # create another stream
     temp = new "Stream::Sub"
-    .const .Sub func = "_counter2"
+    .const 'Sub' func = "_counter2"
     assign temp, func
 
     # include it
@@ -901,7 +901,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Lines" );
     # create a text stream
     stream = new "Stream::Sub"
     # set the source
-    .const .Sub temp = "_text"
+    .const 'Sub' temp = "_text"
     assign stream, temp
 
     # create a lines stream
@@ -1363,7 +1363,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Sub" );
 
     stream = new "Stream::Sub"
 
-    .const .Sub temp = "_counter"
+    .const 'Sub' temp = "_counter"
     assign stream, temp
 
     # dump the stream
@@ -1424,7 +1424,7 @@ SKIP:
     stream = new "Stream::Writer"
 
     # set the stream's source sub
-    .const .Sub temp = "_reader"
+    .const 'Sub' temp = "_reader"
     assign stream, temp
 
     print "main start\n"

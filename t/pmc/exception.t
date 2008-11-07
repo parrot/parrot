@@ -485,7 +485,7 @@ OUTPUT
 pir_error_output_like( <<'CODE', <<'OUTPUT', "pushaction - throw in main" );
 .sub main :main
     print "main\n"
-    .const .Sub at_exit = "exit_handler"
+    .const 'Sub' at_exit = "exit_handler"
     pushaction at_exit
     $P0 = new 'Exception'
     throw $P0
@@ -509,7 +509,7 @@ pir_output_like(
 .sub main :main
     push_eh h
     print "main\n"
-    .const .Sub at_exit = "exit_handler"
+    .const 'Sub' at_exit = "exit_handler"
     pushaction at_exit
     $P1 = new 'Exception'
     throw $P1

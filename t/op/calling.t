@@ -606,14 +606,14 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "tailcall 1" );
 .sub main :main
-    .const .Sub f = "foo"
+    .const 'Sub' f = "foo"
     print "main\n"
     get_results "0", $S0
     invokecc f
     print $S0
 .end
 .sub foo
-    .const .Sub b = "bar"
+    .const 'Sub' b = "bar"
     print "foo\n"
     tailcall b
 .end
@@ -631,14 +631,14 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "tailcall 2 - pass arg" );
 .sub main :main
-    .const .Sub f = "foo"
+    .const 'Sub' f = "foo"
     print "main\n"
     get_results "0", $S0
     invokecc f
     print $S0
 .end
 .sub foo
-    .const .Sub b = "bar"
+    .const 'Sub' b = "bar"
     print "foo\n"
     set_args "0", "from_foo\n"
     tailcall b
@@ -660,14 +660,14 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "tailcall 3 - pass arg" );
 .sub main :main
-    .const .Sub f = "foo"
+    .const 'Sub' f = "foo"
     print "main\n"
     get_results "0", $S0
     invokecc f
     print $S0
 .end
 .sub foo
-    .const .Sub b = "bar"
+    .const 'Sub' b = "bar"
     print "foo\n"
     set_args "0", "from_foo\n"
     tailcall b
@@ -775,13 +775,13 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "tailcall 4 - pir calls" );
 .sub main :main
-    .const .Sub f = "foo"
+    .const 'Sub' f = "foo"
     print "main\n"
     $S0 = f()
     print $S0
 .end
 .sub foo
-    .const .Sub b = "bar"
+    .const 'Sub' b = "bar"
     print "foo\n"
     .return b("from_foo\n")
 .end
@@ -1330,7 +1330,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall - overlapping Ix" );
     print "\n"
 .end
 .sub foo
-    .const .Sub b = "bar"
+    .const 'Sub' b = "bar"
     I0 = 10
     I1 = 20
     set_args "0,0", I1, I0
@@ -1350,7 +1350,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall - optional not set" );
     print "ok\n"
 .end
 .sub foo
-    .const .Sub b = "bar"
+    .const 'Sub' b = "bar"
     .return b(10, 20)
 .end
 .sub bar
@@ -1381,7 +1381,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall - optional set" );
     print "ok\n"
 .end
 .sub foo
-    .const .Sub b = "bar"
+    .const 'Sub' b = "bar"
     .return b(10, 20, 30)
 .end
 .sub bar
@@ -1634,7 +1634,7 @@ L2:
         print ".\n"
         .return ()
 L3:
-        .const .Sub $P49 = "___internal_main_test_"
+        .const 'Sub' $P49 = "___internal_main_test_"
         newclosure $P48, $P49
         .return _try_it($I42, $P48)
 .end

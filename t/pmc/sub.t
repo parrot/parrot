@@ -28,7 +28,7 @@ C<Continuation> PMCs.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "PASM subs - invokecc" );
-    .const .Sub P0 = "func"
+    .const 'Sub' P0 = "func"
 
     set I5, 3
     set_args "0", I5
@@ -350,14 +350,14 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "equality of closures" );
 .pcc_sub main:
-      .const .Sub P3 = "f1"
+      .const 'Sub' P3 = "f1"
       newclosure P0, P3
       clone P1, P0
       eq P0, P1, OK1
       print "not "
 OK1:  print "ok 1\n"
 
-      .const .Sub P4 = "f2"
+      .const 'Sub' P4 = "f2"
       newclosure P2, P4
       eq P0, P2, BAD2
       branch OK2
@@ -378,13 +378,13 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "equality of subs" );
-      .const .Sub P0 = "f1"
+      .const 'Sub' P0 = "f1"
       clone P1, P0
       eq P0, P1, OK1
       print "not "
 OK1:  print "ok 1\n"
 
-      .const .Sub P2 = "f2"
+      .const 'Sub' P2 = "f2"
       clone P1, P0
       eq P0, P2, BAD2
       branch OK2
@@ -1038,7 +1038,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "immediate code as const" );
 .end
 
 .sub main :main
-    .const .Sub pi = "make_pi"
+    .const 'Sub' pi = "make_pi"
     print pi
     print "\n"
 .end
@@ -1059,7 +1059,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "immediate code as const - obj" );
 .end
 
 .sub main :main
-    .const .Sub o = "make_obj"
+    .const 'Sub' o = "make_obj"
     $P0 = getattribute o, 'x'
     print $P0
 .end
@@ -1247,7 +1247,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub constant' );
 .sub main :main
-    .const .Sub s = unicode:"\u7777"
+    .const 'Sub' s = unicode:"\u7777"
     s()
 .end
 

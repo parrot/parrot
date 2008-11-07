@@ -409,7 +409,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_outer via interp' );
 .sub "main"
-    .const .Sub foo = "foo"
+    .const 'Sub' foo = "foo"
     .local pmc foo_cl
     .lex "a", $P0
     foo_cl = newclosure foo
@@ -417,7 +417,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_outer via interp' );
     print $P0
 .end
 .sub foo  :outer('main')
-    .const .Sub bar = "bar"
+    .const 'Sub' bar = "bar"
     .local pmc bar_cl
     bar_cl = newclosure bar
     bar_cl()
@@ -467,7 +467,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'closure 3' );
     .local pmc n
     .lex '$n', n
     n = arg
-    .const .Sub anon = "anon"
+    .const 'Sub' anon = "anon"
     $P0 = newclosure anon
     .return ($P0)
 .end
@@ -551,8 +551,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'closure 4' );
      .lex 'x', x
      .lex 'y', y
      .lex 'choose', choose
-     .const .Sub choose_sub = "_choose"
-     .const .Sub fail_sub = "_fail"
+     .const 'Sub' choose_sub = "_choose"
+     .const 'Sub' fail_sub = "_fail"
      fail = newclosure fail_sub
      arr1 = new 'ResizablePMCArray'
      arr1[0] = 1
@@ -603,7 +603,7 @@ the_end:
      .include "interpinfo.pasm"
      $P1 = interpinfo .INTERPINFO_CURRENT_CONT
      store_lex  "cc", $P1
-     .const .Sub tr_sub = "_try"
+     .const 'Sub' tr_sub = "_try"
      newclosure our_try, tr_sub
      store_lex "try", our_try
      $P2 = our_try(choices)
@@ -621,7 +621,7 @@ the_end:
      store_lex "fail", $P1
      $P1()
 have_choices:
-     .const .Sub f = "new_fail"
+     .const 'Sub' f = "new_fail"
      newclosure $P2, f
      store_lex "fail", $P2
      $P3 = find_lex "choices"
@@ -676,7 +676,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'closure 5' );
     $P0 = new 'Integer'
     $P0 = 0
 
-    .const .Sub bar_sub = "bar"
+    .const 'Sub' bar_sub = "bar"
     $P1 = newclosure bar_sub
     .return ($P1)
 .end
@@ -731,7 +731,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'closure 6' );
     print "foo: "
     print $P0
     print "\n"
-    .const .Sub closure = 'bar'
+    .const 'Sub' closure = 'bar'
     $P2 = newclosure closure
     .return($P2)
 .end
@@ -1200,7 +1200,7 @@ sub test_closures
     $P1 = 1
 
     find_lex $P2, '@closures'
-    .const .Sub $P3 = 'anonymous'
+    .const 'Sub' $P3 = 'anonymous'
     newclosure $P4, $P3
     push $P2, $P4
 
@@ -1284,27 +1284,27 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "RT #56398:  Patrick's request" );
 .sub 'main' :main
-	foo('try 1')
-	foo('try 2')
-	foo('try 3')
+    foo('try 1')
+    foo('try 2')
+    foo('try 3')
 .end
 
 .sub 'foo' :lexid('foo')
-	.param pmc x
-	.lex '$x', x
-	print "outer foo "
-	say x
-	'inner'()
+    .param pmc x
+    .lex '$x', x
+    print "outer foo "
+    say x
+    'inner'()
 .end
 
 .sub 'inner' :outer('foo')
-	.local pmc x
-	x = find_lex '$x'
-	print "inner foo "
-	say x
-	$P0 = new 'String'
-	$P0 = 'BOGUS!'
-	store_lex '$x', $P0
+    .local pmc x
+    x = find_lex '$x'
+    print "inner foo "
+    say x
+    $P0 = new 'String'
+    $P0 = 'BOGUS!'
+    store_lex '$x', $P0
 .end
 CODE
 outer foo try 1
@@ -1317,33 +1317,33 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "RT #56398: Bob's recursion bug");
 .sub main :main
-	rpwi(0)
+    rpwi(0)
 .end
 
 .sub rpwi
-	.param int recursive_p
-	unless recursive_p goto do_lex
-	print "rpwi:  recursive case\n"
-	.return ()
+    .param int recursive_p
+    unless recursive_p goto do_lex
+    print "rpwi:  recursive case\n"
+    .return ()
 do_lex:
-	.lex "(SAVED *SHARP-EQUAL-ALIST*)", $P40
-	$P40 = new 'Integer'
-	$P40 = 99
-	.const .Sub $P80 = "(:INTERNAL rpwi 0)"
-	newclosure $P81, $P80
-	## $P81 = clone $P80
-	## pushaction $P81
-	print "rpwi:  lex case\n"
-	rpwi(1)
-	$P81()
+    .lex "(SAVED *SHARP-EQUAL-ALIST*)", $P40
+    $P40 = new 'Integer'
+    $P40 = 99
+    .const 'Sub' $P80 = "(:INTERNAL rpwi 0)"
+    newclosure $P81, $P80
+    ## $P81 = clone $P80
+    ## pushaction $P81
+    print "rpwi:  lex case\n"
+    rpwi(1)
+    $P81()
 .end
 
 .sub "(:INTERNAL rpwi 0)" :anon :outer('rpwi')
-	print "[restoring *SHARP-EQUAL-ALIST*]\n"
-	find_lex $P40, "(SAVED *SHARP-EQUAL-ALIST*)"
-	print "[got "
-	print $P40
-	print "]\n"
+    print "[restoring *SHARP-EQUAL-ALIST*]\n"
+    find_lex $P40, "(SAVED *SHARP-EQUAL-ALIST*)"
+    print "[got "
+    print $P40
+    print "]\n"
 .end
 CODE
 rpwi:  lex case

@@ -522,19 +522,6 @@ SP              [ ]
 
 <emit,INITIAL>{DOT}{LETTER}{LETTERDIGIT}* {
         char   * const macro_name = yytext + 1;
-        STRING * name_string      = string_from_cstring(interp, macro_name, 0);
-        const int type            = pmc_type(interp, name_string);
-
-        if (type > 0) {
-            const size_t len = 16;
-            char * const buf = (char *)mem_sys_allocate(len);
-            snprintf(buf, len, "%d", type);
-
-            /* XXX: free valp->s if already used? Sounds like a good idea, */
-            /* but big segfaults if you do. */
-            valp->s = buf;
-            return INTC;
-        }
 
         if (!expand_macro(interp, macro_name, yyscanner)) {
             yyless(1);

@@ -53,7 +53,7 @@ Parses a YAML string and returns a data structure.
 
     # A Sub that can be given to the library
     # this callback function will eventually by called by the library
-    .const .Sub yaml_handler = "_yaml_handler"
+    .const 'Sub' yaml_handler = "_yaml_handler"
     .local pmc yaml_handler_wrapped
     yaml_handler_wrapped = new_callback yaml_handler, user_data, "vUp"	# Z in pdd16
 

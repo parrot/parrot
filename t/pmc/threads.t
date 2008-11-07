@@ -901,10 +901,10 @@ okay:
 .end
 
 .sub full_check
-    .const .Sub c_setup = 'setup'
-    .const .Sub c_sanity = 'check_sanity'
-    .const .Sub c_mutate = 'mutate'
-    .const .Sub c_value = 'check_value'
+    .const 'Sub' c_setup = 'setup'
+    .const 'Sub' c_sanity = 'check_sanity'
+    .const 'Sub' c_mutate = 'mutate'
+    .const 'Sub' c_value = 'check_value'
 
     .local pmc g_setup
     g_setup = get_hll_global [ 'Foo' ], 'setup'
@@ -945,7 +945,7 @@ okay:
     $P0 = 1
     store_global 'test_num', $P0
 
-    .const .Sub _check = 'full_check'
+    .const 'Sub' _check = 'full_check'
     _check()
 
     $P0 = new 'ParrotThread'

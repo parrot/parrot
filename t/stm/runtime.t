@@ -33,8 +33,8 @@ my $choice_test = <<'CODE';
 
     .local pmc _choice_one
     .local pmc _choice_two
-    .const .Sub choice_one = 'choice_one'
-    .const .Sub choice_two = 'choice_two'
+    .const 'Sub' choice_one = 'choice_one'
+    .const 'Sub' choice_two = 'choice_two'
     _choice_one = newclosure choice_one
     _choice_two = newclosure choice_two
     .local pmc _choice
@@ -223,7 +223,7 @@ OUTPUT
     .param pmc setting
     .lex 'value', value
     .lex 'set_to', setting
-    .const .Sub _clobber = '_clobber'
+    .const 'Sub' _clobber = '_clobber'
     $P0 = newclosure _clobber
     .return ($P0)
 .end
@@ -242,7 +242,7 @@ OUTPUT
 .sub make_normal
     .param pmc value
     .lex 'value', value
-    .const .Sub _normal = '_normal'
+    .const 'Sub' _normal = '_normal'
     $P0 = newclosure _normal
     .return ($P0)
 .end
@@ -303,8 +303,8 @@ do_retry:
     value = -1
     value = new 'STMVar', value
 
-    .const .Sub wakeup = 'wakeup_func'
-    .const .Sub choice = 'choice_thread'
+    .const 'Sub' wakeup = 'wakeup_func'
+    .const 'Sub' choice = 'choice_thread'
     $P0 = new 'ParrotThread'
     $P1 = new 'ParrotThread'
     $P0.'run_clone'(choice, value)
@@ -314,7 +314,7 @@ do_retry:
     $P1.'join'()
 
     tx = get_hll_global ['STM'], 'transaction'
-    .const .Sub _get = '_get'
+    .const 'Sub' _get = '_get'
     $P0 = tx(_get, value)
     if $P0 != 0 goto failed
     print "ok\n"

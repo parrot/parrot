@@ -850,7 +850,7 @@ OK4:    ok( $I0, 'ne_str "0(Integer), "ABC" -> true' )
     .local int el
 
     s = "atugcsATUGCS"
-    .const .Sub tr_00 = 'tr_00_init'
+    .const 'Sub' tr_00 = 'tr_00_init'
     el = elements tr_00
     is( el, 256, 'elements' )
 
@@ -910,8 +910,8 @@ loop:
 .end
 
 .sub new_from_string
-    .const .String ok = "ok"
-    is( ok, "ok", '.const .String' )
+    .const 'String' ok = "ok"
+    is( ok, "ok", ".const 'String'" )
 .end
 
 .sub get_string_returns_cow_string

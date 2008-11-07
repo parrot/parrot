@@ -56,7 +56,7 @@ END:
 
 .sub init :vtable :method
 
-    .const .Sub temp = "_default_combiner"
+    .const 'Sub' temp = "_default_combiner"
     self."combiner"( temp )
 
     temp = new 'ResizablePMCArray'

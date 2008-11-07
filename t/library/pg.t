@@ -79,7 +79,7 @@ table, which should be created by your sysadmin.
     test.'ok'($I1, 'res.resultStatus() == PGRES_COMMAND_OK ')
     res.'clear'()
     # install a notice receiver to silent the CREATE
-    .const .Sub cb = 'notice'
+    .const 'Sub' cb = 'notice'
     $P0 = con.'setNoticeReceiver'(cb, test)
     # create a temp table
     res = con.'exec'(<<'EOT')

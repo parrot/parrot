@@ -25,7 +25,7 @@ Tests the C<Coroutine> PMC.
 pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine 1" );
 .include "interpinfo.pasm"
 .pcc_sub _main:
-    .const .Sub P0 = "_coro"
+    .const 'Sub' P0 = "_coro"
     new P10, 'Integer'
     set P10, 2
     set_global "i", P10
@@ -54,7 +54,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example" );
 .sub __main__
     .local pmc return
     .local pmc counter
-    .const .Sub itr = "_iterator"
+    .const 'Sub' itr = "_iterator"
 
     .local pmc zero
     zero = new 'Integer'
@@ -109,7 +109,7 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in main" );
 .include "interpinfo.pasm"
 _main:
-    .const .Sub P0 = "_coro"
+    .const 'Sub' P0 = "_coro"
     push_eh _catchm
     new P16, 'Integer'
     set P16, 2
@@ -148,7 +148,7 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro" );
 .include "interpinfo.pasm"
 _main:
-    .const .Sub P0 = "_coro"
+    .const 'Sub' P0 = "_coro"
     push_eh _catchm
     new P16, 'Integer'
     set P16, 2
@@ -187,7 +187,7 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro no handler" );
 .include "interpinfo.pasm"
 _main:
-    .const .Sub P0 = "_coro"
+    .const 'Sub' P0 = "_coro"
     push_eh _catchm
     new P16, 'Integer'
     set P16, 2
@@ -223,7 +223,7 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro rethrow" );
 .include "interpinfo.pasm"
 _main:
-    .const .Sub P0 = "_coro"
+    .const 'Sub' P0 = "_coro"
     push_eh _catchm
     new P16, 'Integer'
     set P16, 2
@@ -353,7 +353,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "re-entering coro from another sub" );
 
 .sub main :main
     .local int z
-    .const .Sub corou = "_coroufn"
+    .const 'Sub' corou = "_coroufn"
     corou("from main")
     z = 0
   loop:

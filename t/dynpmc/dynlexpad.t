@@ -82,12 +82,12 @@ pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "check :outer" );
     $P2 = find_lex 'a'
     print $P2
     print "\n"
-    .const .Sub bar_sub = "bar"
+    .const 'Sub' bar_sub = "bar"
     $P0 = newclosure bar_sub
     $P0()
 .end
 .sub bar :outer(foo)
-    .const .Sub baz_sub = "baz"
+    .const 'Sub' baz_sub = "baz"
     $P0 = newclosure baz_sub
     $P0()
 .end
@@ -112,7 +112,7 @@ pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "tcl-ish upvar" );
     $P2 = find_lex 'a'
     print $P2
     print "\n"
-    .const .Sub bar_sub = "bar"
+    .const 'Sub' bar_sub = "bar"
     $P0 = newclosure bar_sub
     $P0()
     # check the upvar
@@ -121,7 +121,7 @@ pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "tcl-ish upvar" );
     print "\n"
 .end
 .sub bar :outer(foo)
-    .const .Sub baz_sub = "baz"
+    .const 'Sub' baz_sub = "baz"
     $P0 = newclosure baz_sub
     $P0()
 .end

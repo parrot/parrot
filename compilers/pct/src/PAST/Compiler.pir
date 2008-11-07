@@ -683,7 +683,7 @@ Return the POST representation of a C<PAST::Block>.
     $P0 = get_hll_global ['POST'], 'Ops'
     bpost = $P0.'new'(bpost, 'node'=>node, 'result'=>result)
     if ns goto block_decl_ns
-    concat $S0, '.const .Sub ', result
+    concat $S0, ".const 'Sub' ", result
     concat $S0, ' = '
     concat $S0, name
     bpost.'push_pirop'($S0)

@@ -985,7 +985,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "addmethod op" );
 .sub main :main
     .local pmc c
     c = newclass ['whatever']
-    .const .Sub foo = "whatever_foo"
+    .const 'Sub' foo = "whatever_foo"
     addmethod c, "foo", foo
     $P0 = new ['whatever']
     $P0.'foo'()

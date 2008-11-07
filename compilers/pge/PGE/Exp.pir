@@ -155,7 +155,7 @@ tree as a PIR code object that can be compiled.
       .sub %0 :method
           .param pmc adverbs   :slurpy :named
           .local pmc mob
-          .const .Sub corou = %1
+          .const 'Sub' corou = %1
           $P0 = corou
           $P0 = clone $P0
           mob = $P0(self, adverbs)

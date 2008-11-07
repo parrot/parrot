@@ -14,7 +14,7 @@ version 0.1
     new stream, "Stream::Writer"
 
     # set the source sub
-    .const .Sub temp = "_reader"
+    .const 'Sub' temp = "_reader"
     stream."source"( temp )
 
     stream."write"( "hello, world" )
@@ -86,7 +86,7 @@ END:
     .param pmc source
     .local pmc status
 
-    .const .Sub stub = "_reader_stub"
+    .const 'Sub' stub = "_reader_stub"
     setprop stub, "CALL", source
     self."setSource"( stub )
 

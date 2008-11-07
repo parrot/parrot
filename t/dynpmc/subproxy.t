@@ -40,11 +40,11 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "test type of HLL_mapped .Sub" );
 .sub main :main
-    .const .Sub b = 'bar'
+    .const 'Sub' b = 'bar'
     $S0 = typeof b
     print $S0
     print "\n"
-    .const .Sub f = 'foo'
+    .const 'Sub' f = 'foo'
     $S0 = typeof f
     print $S0
     print "\n"

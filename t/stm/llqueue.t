@@ -98,8 +98,8 @@ loop:
 .sub main :main
     .local pmc threads
 
-    .const .Sub add_thread = 'add_thread'
-    .const .Sub remove_thread = 'remove_thread'
+    .const 'Sub' add_thread = 'add_thread'
+    .const 'Sub' remove_thread = 'remove_thread'
 
     .local pmc queue
 
@@ -268,7 +268,7 @@ got_head:
 
 .sub add_head :method
     .param pmc value
-    .const .Sub _add_head = '_add_head'
+    .const 'Sub' _add_head = '_add_head'
     $P1 = get_hll_global ['STM'], 'transaction'
     $P1(_add_head, self, value)
 .end
@@ -302,7 +302,7 @@ no_tail:
 .end
 
 .sub remove_tail :method
-    .const .Sub _remove_tail = '_remove_tail'
+    .const 'Sub' _remove_tail = '_remove_tail'
     $P1 = get_hll_global ['STM'], 'transaction'
     $P2 = $P1(_remove_tail, self)
     .return ($P2)
