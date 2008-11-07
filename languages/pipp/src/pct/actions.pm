@@ -353,6 +353,7 @@ method param_list($/) {
                     :blocktype('declaration'),
                     :node($/)
                 );
+    my $arity := 0;
     for $<VAR_NAME> {
         my $param := $( $_ );
         $param.scope('parameter');
@@ -363,7 +364,9 @@ method param_list($/) {
              :scope('lexical'),
              $param.name()
         );
+        $arity++;
     }
+    $past.arity( $arity );
 
     make $past;
 }
