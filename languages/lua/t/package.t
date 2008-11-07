@@ -209,7 +209,7 @@ print {$X} <<'PIR';
 
 .sub '__onload' :anon :load
 #    print "__onload mod_foo\n"
-    .const .Sub entry = 'luaopen_mod_foo'
+    .const 'Sub' entry = 'luaopen_mod_foo'
     set_root_global 'luaopen_mod_foo', entry
 .end
 
@@ -222,7 +222,7 @@ print {$X} <<'PIR';
     new _mod_foo, 'LuaTable'
     set $P1, 'mod_foo'
     _lua__GLOBAL[$P1] = _mod_foo
-    .const .Sub _mod_foo_bar = '_mod_foo_bar'
+    .const 'Sub' _mod_foo_bar = '_mod_foo_bar'
     set $P1, 'bar'
     _mod_foo[$P1] = _mod_foo_bar
     .return (_mod_foo)

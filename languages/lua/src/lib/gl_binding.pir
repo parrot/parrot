@@ -21,7 +21,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 .sub '__onload' :anon :load
 #    print '__onload gl_binding\n'
-    .const .Sub entry = 'luaopen_gl_binding'
+    .const 'Sub' entry = 'luaopen_gl_binding'
     set_hll_global 'luaopen_gl_binding', entry
 .end
 

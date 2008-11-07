@@ -22,7 +22,7 @@ This implementation is based on F<runtime/parrot/library/uuid.pir>.
 
 .sub '__onload' :anon :load
 #    print "__onload uuid\n"
-    .const .Sub entry = 'luaopen_uuid'
+    .const 'Sub' entry = 'luaopen_uuid'
     set_hll_global 'luaopen_uuid', entry
 .end
 
@@ -49,7 +49,7 @@ LIST
     lua_register($P1, _uuid, $P2)
 
     # ???
-    .const .Sub _uuid_time = 'time'
+    .const 'Sub' _uuid_time = 'time'
     _uuid_time.'setfenv'(_lua__GLOBAL)
     set $P1, 'time'
     _uuid[$P1] = _uuid_time

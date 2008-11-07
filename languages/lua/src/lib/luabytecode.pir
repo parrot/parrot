@@ -79,7 +79,7 @@ lib/luabytecode.pir - Lua bytecode translation Library
     env = get_hll_global '_G'
     .local pmc vararg
     vararg = argstolua(env, args)
-    .const .Sub main = '&function_0'
+    .const 'Sub' main = '&function_0'
     main.'setfenv'(env)
     ($I0, $P0) = docall(main, vararg :flat)
     unless $I0 goto L1

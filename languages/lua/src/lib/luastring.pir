@@ -607,7 +607,7 @@ table:
     .lex 'upvar_rulesub', rulesub
     $P0 = clone s
     .lex 'upvar_s', $P0
-    .const .Sub gmatch_aux = 'gmatch_aux'
+    .const 'Sub' gmatch_aux = 'gmatch_aux'
     res = newclosure gmatch_aux
     .return (res)
 .end

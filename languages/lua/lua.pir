@@ -274,7 +274,7 @@ show version information.
     (narg, $P0) = getargs(args, n)  # collect arguments
     .local pmc env
     env = get_hll_global '_G'
-    .const .LuaString k_arg = 'arg'
+    .const 'LuaString' k_arg = 'arg'
     env.'rawset'(k_arg, $P0)
     .local string fname
     fname = args[n]
@@ -361,7 +361,7 @@ show version information.
     .param string name
     .local pmc env
     env = get_hll_global '_G'
-    .const .LuaString k_require = 'require'
+    .const 'LuaString' k_require = 'require'
     $P0 = env.'rawget'(k_require)
     new $P1, 'LuaString'
     set $P1, name
@@ -373,7 +373,7 @@ show version information.
 .sub 'dotty' :anon
     .local pmc env
     env = get_hll_global '_G'
-    .const .LuaString k_print = 'print'
+    .const 'LuaString' k_print = 'print'
     .local int has_readline
     .local pmc stdin
     stdin = getstdin

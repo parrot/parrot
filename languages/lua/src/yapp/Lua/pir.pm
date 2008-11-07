@@ -41,7 +41,7 @@ package pirVisitor;
     env = get_hll_global '_G'
     .local pmc vararg
     vararg = argstolua(env, args)
-    .const .Sub main = '_main'
+    .const 'Sub' main = '_main'
     main.'setfenv'(env)
     ($I0, $P0) = docall(main, vararg :flat)
     unless $I0 goto L1
@@ -408,7 +408,7 @@ package pirVisitor;
         my $self  = shift;
         my ($dir) = @_;
         my $FH    = $self->{fh};
-        print {$FH} "    .const .$dir->{type} $dir->{result}->{symbol} = '$dir->{arg1}'\n";
+        print {$FH} "    .const '$dir->{type}' $dir->{result}->{symbol} = '$dir->{arg1}'\n";
         return;
     }
 

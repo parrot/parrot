@@ -41,7 +41,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 
     # create (private) environment (with fields IO_INPUT, IO_OUTPUT, __close)
     .local pmc _io_env
-    .const .Sub _io_fclose = 'fclose'
+    .const 'Sub' _io_fclose = 'fclose'
     _io_env = newfenv(_io_fclose)
 
     .local pmc _lua__GLOBAL
@@ -69,7 +69,7 @@ readline
 LIST
     lua_register($P1, _io, $P2, _io_env)
 
-    .const .Sub _readline = 'readline'
+    .const 'Sub' _readline = 'readline'
     _readline.'setfenv'(_io_env)
 
     $P0 = get_hll_namespace ['io'; 'file']
@@ -90,7 +90,7 @@ LIST
     .param pmc fct
     .local pmc env
     new env, 'LuaTable'
-    .const .LuaString key = '__close'
+    .const 'LuaString' key = '__close'
     env[key] = fct
     .return (env)
 .end
@@ -105,7 +105,7 @@ LIST
     .param pmc io
     .param pmc io_env
     .local pmc env
-    .const .Sub _io_noclose = 'noclose'
+    .const 'Sub' _io_noclose = 'noclose'
     env = newfenv(_io_noclose) # close function for default files
     new $P1, 'LuaString'
     new $P3, 'LuaNumber'
@@ -308,7 +308,7 @@ LIST
     mt = file.'get_metatable'()
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = get_hll_global '_REGISTRY'
-    .const .LuaString key = 'ParrotIO'
+    .const 'LuaString' key = 'ParrotIO'
     mt_file = _lua__REGISTRY[key]
     unless mt == mt_file goto L1
     res = getattribute file, 'data'
@@ -331,7 +331,7 @@ LIST
     .param pmc file
     .local pmc env
     env = file.'getfenv'()
-    .const .LuaString key = '__close'
+    .const 'LuaString' key = '__close'
     $P0 = env[key]
     .return $P0(file)
 .end
@@ -342,7 +342,7 @@ LIST
     .local pmc res
     .lex 'upvar_file', file
     .lex 'upvar_toclose', toclose
-    .const .Sub readline = 'readline'
+    .const 'Sub' readline = 'readline'
     res = newclosure readline
     .return (res)
 .end
@@ -393,7 +393,7 @@ Equivalent to C<file:flush> over the default output file.
 .sub 'flush'
     .param pmc extra :slurpy
     .local pmc file
-    .const .LuaString key = 'flush'
+    .const 'LuaString' key = 'flush'
     file = getiofile(IO_OUTPUT)
     $P0 = file[key]
     .return $P0(file)
@@ -463,7 +463,7 @@ input file. In this case it does not close the file when the loop ends.
     .local pmc file
     .local pmc f
     unless null filename goto L1
-    .const .LuaString key = 'lines'
+    .const 'LuaString' key = 'lines'
     file = getiofile(IO_INPUT)
     $P0 = file[key]
     .return $P0(file)
@@ -623,7 +623,7 @@ Equivalent to C<io.input():read>.
 .sub 'read'
     .param pmc argv :slurpy
     .local pmc file
-    .const .LuaString key = 'read'
+    .const 'LuaString' key = 'read'
     file = getiofile(IO_INPUT)
     $P0 = file[key]
     .return $P0(file, argv :flat)
@@ -680,7 +680,7 @@ handle, and B<nil> if C<obj> is not a file handle.
     mt = obj.'get_metatable'()
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = get_hll_global '_REGISTRY'
-    .const .LuaString key = 'ParrotIO'
+    .const 'LuaString' key = 'ParrotIO'
     mt_file = _lua__REGISTRY[key]
     if mt == mt_file goto L1
     new res, 'LuaNil'
@@ -707,7 +707,7 @@ Equivalent to C<io.output():write>.
 .sub 'write'
     .param pmc argv :slurpy
     .local pmc file
-    .const .LuaString key = 'write'
+    .const 'LuaString' key = 'write'
     file = getiofile(IO_OUTPUT)
     $P0 = file[key]
     .return $P0(file, argv :flat)

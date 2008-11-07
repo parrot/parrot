@@ -1042,7 +1042,7 @@ PIR
         format => 'ABx',
         synopsis => 'R(A) := closure(KPROTO[Bx], R(A), ... , R(A+n))',
         pir => <<'PIR',
-    ${INS} = concat "  .const .Sub ${PROTO}"
+    ${INS} = concat "  .const 'Sub' ${PROTO}"
     $S2 = ${B}
     ${INS} = concat $S2
     ${INS} = concat " = '"

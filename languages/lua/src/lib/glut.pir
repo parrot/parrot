@@ -23,7 +23,7 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 .sub '__onload' :anon :load
 #    print "__onload glut\n"
-    .const .Sub entry = 'luaopen_glut'
+    .const 'Sub' entry = 'luaopen_glut'
     set_hll_global 'luaopen_glut', entry
 .end
 
@@ -117,7 +117,7 @@ not LuaGL
     lua_error("incorrect argument to function 'glut.DisplayFunc'")
   L1:
     set_hll_global 'displayFunc.name', funcname
-    .const .Sub display = 'display'
+    .const 'Sub' display = 'display'
     glutDisplayFunc(display)
 .end
 
@@ -159,7 +159,7 @@ not LuaGL
     lua_error("incorrect argument to function 'glut.IdleFunc'")
   L1:
     set_hll_global 'idleFunc.name', funcname
-    .const .Sub idle = 'idle'
+    .const 'Sub' idle = 'idle'
     glutIdleFunc(idle)
 .end
 
@@ -197,7 +197,7 @@ not LuaGL
     .param pmc extra :slurpy
     .local pmc argv
     new argv, 'ResizableStringArray'
-    .const .Sub glutInit = 'glutInit'
+    .const 'Sub' glutInit = 'glutInit'
     $P0 = get_hll_global ['NCI'], 'call_toolkit_init'
     $P0(glutInit, argv)
 .end
@@ -248,7 +248,7 @@ not LuaGL
     lua_error("incorrect argument to function 'glut.KeyboardFunc'")
   L1:
     set_hll_global 'keyboardFunc.name', funcname
-    .const .Sub keyboard = 'keyboard'
+    .const 'Sub' keyboard = 'keyboard'
     glutKeyboardFunc(keyboard)
 .end
 
@@ -319,7 +319,7 @@ not LuaGL
     lua_error("incorrect argument to function 'glut.ReshapeFunc'")
   L1:
     set_hll_global 'reshapeFunc.name', funcname
-    .const .Sub reshape = 'reshape'
+    .const 'Sub' reshape = 'reshape'
     glutReshapeFunc(reshape)
 .end
 

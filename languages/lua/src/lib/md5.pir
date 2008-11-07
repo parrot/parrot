@@ -23,7 +23,7 @@ see F<src/dynpmc/mdx.pmc>.
 
 .sub '__onload' :anon :load
 #    print "__onload md5\n"
-    .const .Sub entry = 'luaopen_md5'
+    .const 'Sub' entry = 'luaopen_md5'
     set_hll_global 'luaopen_md5', entry
 .end
 

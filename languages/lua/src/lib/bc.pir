@@ -25,7 +25,7 @@ Use PMC BigFloat when available.
 
 .sub '__onload' :anon :load
 #    print "__onload bc\n"
-    .const .Sub entry = 'luaopen_bc'
+    .const 'Sub' entry = 'luaopen_bc'
     set_hll_global 'luaopen_bc', entry
 .end
 

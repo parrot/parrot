@@ -22,7 +22,7 @@ This implementation is based on F<runtime/parrot/library/MIME/Base64.pir>.
 
 .sub '__onload' :anon :load
 #    print "__onload base64\n"
-    .const .Sub entry = 'luaopen_base64'
+    .const 'Sub' entry = 'luaopen_base64'
     set_hll_global 'luaopen_base64', entry
 .end
 

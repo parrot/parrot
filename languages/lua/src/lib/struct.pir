@@ -110,7 +110,7 @@ All functions are registered inside a table C<struct>.
 
 .sub '__onload' :anon :load
 #    print "__onload struct\n"
-    .const .Sub entry = 'luaopen_struct'
+    .const 'Sub' entry = 'luaopen_struct'
     set_hll_global 'luaopen_struct', entry
 .end
 

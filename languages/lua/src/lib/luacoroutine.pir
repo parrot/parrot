@@ -220,7 +220,7 @@ case of error, propagates the error.
     .local pmc co
     .lex 'upvar_co', co
     co = create(f)
-    .const .Sub auxwrap = 'auxwrap'
+    .const 'Sub' auxwrap = 'auxwrap'
     res = newclosure auxwrap
     .return (res)
 .end

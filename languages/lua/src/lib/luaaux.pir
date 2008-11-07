@@ -793,7 +793,7 @@ If this argument is absent or is B<nil>, returns C<def>. Otherwise, raises an er
     .param pmc names
     .param pmc env :optional
     if null libname goto L1
-    .const .LuaString _loaded = '_LOADED'
+    .const 'LuaString' _loaded = '_LOADED'
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = get_hll_global '_REGISTRY'
     $P0 = _lua__REGISTRY[_loaded]
@@ -903,7 +903,7 @@ This function never returns.
     inc i
     goto L4
   L5:
-    .const .LuaString k_arg = 'arg'
+    .const 'LuaString' k_arg = 'arg'
     env.'rawset'(k_arg, $P0)
   L3:
     .return (res)

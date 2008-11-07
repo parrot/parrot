@@ -22,7 +22,7 @@ This implementation is based on F<languages/markdown/markdown.pir>.
 
 .sub '__onload' :anon :load
 #    print "__onload markdown\n"
-    .const .Sub entry = 'luaopen_markdown'
+    .const 'Sub' entry = 'luaopen_markdown'
     set_hll_global 'luaopen_markdown', entry
 .end
 

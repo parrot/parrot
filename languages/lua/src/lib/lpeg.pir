@@ -24,7 +24,7 @@ See on L<http://www.inf.puc-rio.br/~roberto/lpeg.html#intro>
 
 .sub '__onload' :anon :load
 #    print "__onload lpeg\n"
-    .const .Sub entry = 'luaopen_lpeg'
+    .const 'Sub' entry = 'luaopen_lpeg'
     set_hll_global 'luaopen_lpeg', entry
 .end
 
