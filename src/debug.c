@@ -806,7 +806,7 @@ parse_command(ARGIN(const char *command), ARGOUT(unsigned long *cmdP))
 Debugger command line.
 
 Gets and executes commands, looping until the debugger state
-is chnaged, either to exit or to start executing code.
+is changed, either to exit or to start executing code.
 
 =cut
 
@@ -3387,7 +3387,7 @@ static PDB_breakpoint_t *gdb_bps;
  * RT #46143 We can't remove the breakpoint yet, executing the next ins
  * most likely fails, as the length of the debug-brk stmt doesn't
  * match the old opcode
- * Setting a breakpoint will also fail, if the bytecode os r/o
+ * Setting a breakpoint will also fail, if the bytecode is r/o
  *
  */
 /*

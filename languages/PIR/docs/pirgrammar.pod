@@ -18,7 +18,7 @@ but are not implemented.
 
 Please note that languages/PIR is B<not> the official definition of the
 PIR language. The reference implementation of PIR is IMCC, located
-in C<parrot/compilers/IMCC>. However, languages/PIR tries to be as close
+in C<parrot/compilers/imcc>. However, languages/PIR tries to be as close
 to IMCC as possible. IMCC's grammar could use some cleaning up;
 languages/PIR might be a basis to start with a clean reimplementation of
 PIR in C (using Lex/Yacc).
