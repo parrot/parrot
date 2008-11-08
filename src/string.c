@@ -2394,8 +2394,8 @@ string_escape_string_delimited(PARROT_INTERP,
                     break;
             }
             if (c >= 0x20) {
-                dp[i++] = (unsigned char)c;
-                PARROT_ASSERT(i < charlen);
+                dp[i++]         = (unsigned char)c;
+                result->bufused = result->strlen = i;
                 continue;
             }
         }
