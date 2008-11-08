@@ -17,8 +17,8 @@
     .param int flags
 
     .local pmc self
-    $I0  = typeof class
-    self = new $I0
+    $S0  = typeof class
+    self = new $S0
 
     .local pmc pos
     pos = new 'Integer'
@@ -79,7 +79,7 @@ false:
     $I1 = find_not_cclass .CCLASS_NUMERIC, str, 0, $I0
     if $I1 == $I0 goto numeric
 
-    token = new .String
+    token = new 'String'
     token = str
     goto return
 

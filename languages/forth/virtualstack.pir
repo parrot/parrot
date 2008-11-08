@@ -11,7 +11,7 @@
 
 .sub init :vtable :method
     .local pmc cstack
-    cstack = new .ResizableStringArray
+    cstack = new 'ResizableStringArray'
     setattribute self, '@cstack', cstack
 .end
 

@@ -17,7 +17,7 @@
     load_bytecode 'languages/forth/forth.pir'
 
     .local pmc iter
-    iter = new .Iterator, args
+    iter = new 'Iterator', args
 next_file:
     unless iter goto done
     $S0 = shift iter
