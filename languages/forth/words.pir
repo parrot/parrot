@@ -409,7 +409,7 @@ END_PIR
     code.emit(<<"END_PIR", b, a, $S0, $S1, $S2)
     %2 = %0
     %3 = %1
-    %4 = new .Float
+    %4 = new 'Float'
     %4 = %3 + %2
 END_PIR
     push stack, $S2
@@ -433,7 +433,7 @@ END_PIR
     code.emit(<<"END_PIR", b, a, $S0, $S1, $S2)
     %2 = %0
     %3 = %1
-    %4 = new .Float
+    %4 = new 'Float'
     %4 = %3 - %2
 END_PIR
     push stack, $S2
