@@ -6,7 +6,7 @@ say.pir -- simple implementation of a say function
 
 =cut
 
-.namespace
+.namespace []
 
 .sub 'say'
     .param pmc args            :slurpy
