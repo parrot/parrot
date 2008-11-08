@@ -251,7 +251,7 @@ NO_EXCEPTION_UNIMPLEMENTED_OPTION:
 
   # First we set up a table of all symbols, that is macros
   .local pmc symtab
-  symtab = 'Hash'
+  symtab = new 'Hash'
   # symtab = new 'OrderedHash'
   state['symtab'] = symtab
 
