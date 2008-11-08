@@ -20,7 +20,7 @@
   # Make a copy of argv, because this can easier be handled in get_options
   # TODO: eliminate need for copy
   .local pmc argv_pmc_arr
-  argv_pmc_arr = new .ResizablePMCArray
+  argv_pmc_arr = new "ResizablePMCArray"
   .local int k, argc
   k = 0
   argc = argv
