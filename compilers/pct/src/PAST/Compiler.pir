@@ -1644,11 +1644,12 @@ attribute.
     scope = $P0['scope']
     unless scope goto scope_error
   have_scope:
-    push_eh scope_error
+    push_eh scope_error_ex
     $P0 = find_method self, scope
     .return self.$P0(node, bindpost)
-  scope_error:
+  scope_error_ex:
     pop_eh
+  scope_error:
     unless scope goto scope_error_1
     scope = concat " '", scope
     scope = concat scope, "'"
