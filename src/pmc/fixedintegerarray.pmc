@@ -400,7 +400,7 @@ Resizes the array to C<size> elements.
                 "FixedIntegerArray: Can't resize!");
 
         PMC_int_val(SELF) = size;
-        PMC_data(SELF)    = mem_sys_allocate_zeroed(size * sizeof (INTVAL));
+        mem_realloc_n_typed(PMC_data(SELF), size, INTVAL);
         PObj_active_destroy_SET(SELF);
     }
 
@@ -481,9 +481,10 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
         INTVAL tempInt;
-        PMC   * const tempPMC = pmc_new(INTERP, enum_class_Integer);
+        PMC   * const tempPMC = temporary_pmc_new(INTERP, enum_class_Integer);
         VTABLE_set_string_native(INTERP, tempPMC, value);
         tempInt        = VTABLE_get_integer(INTERP, tempPMC);
+        temporary_pmc_free(interp, tempPMC);
         SELF.set_integer_keyed_int(key, tempInt);
     }
 
