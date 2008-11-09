@@ -1044,11 +1044,19 @@ Return the POST representation of a C<while> or C<until> loop.
     exprrtype = '*'
   have_exprrtype:
 
-    ops.'push'(looplabel)
     exprpost = self.'as_post'(exprpast, 'rtype'=>exprrtype)
+
+    .local pmc arglist
+    arglist = new 'ResizablePMCArray'
+    $I0 = bodypast.'arity'()
+    unless $I0 goto have_arglist
+    push arglist, exprpost
+  have_arglist:
+
+    ops.'push'(looplabel)
     ops.'push'(exprpost)
     ops.'push_pirop'(iftype, exprpost, endlabel)
-    bodypost = self.'as_post'(bodypast, 'rtype'=>'v')
+    bodypost = self.'as_post'(bodypast, 'rtype'=>'v', 'arglist'=>arglist)
     ops.'push'(bodypost)
     ops.'push_pirop'('goto', looplabel)
     ops.'push'(endlabel)
