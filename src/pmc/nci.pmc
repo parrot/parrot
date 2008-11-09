@@ -84,11 +84,11 @@ void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_in
         if (j) {
             nci_info->pcc_params_signature = string_make(interp, param_sig, j,
                 NULL, PObj_constant_FLAG);
-            mem_sys_free(param_sig);
         }
         else
             nci_info->pcc_params_signature = CONST_STRING(interp, "");
 
+        mem_sys_free(param_sig);
         string_cstring_free(sig_c);
     }
 
@@ -254,7 +254,7 @@ Creates and returns a clone of the NCI.
         nci_info_ret->signature             = nci_info_self->signature;
         nci_info_ret->pcc_params_signature  = nci_info_self->pcc_params_signature;
         nci_info_ret->arity                 = nci_info_self->arity;
-        nci_info_ret->jitted                = nci_info_self->arity;
+        nci_info_ret->jitted                = nci_info_self->jitted;
         PObj_get_FLAGS(ret)    |= (PObj_get_FLAGS(SELF) & 0x7);
 
         return ret;
@@ -308,7 +308,8 @@ shifted down.
             nci_jit_sub_t jit_func = (nci_jit_sub_t) D2FPTR(nci_info->func);
 
             /* Parrot_eprintf(interp, "JITTED %S\n", nci_info->signature); */
-            jit_func(INTERP, SELF, (char *) nci_info->pcc_params_signature->strstart);
+            jit_func(INTERP, SELF,
+                (char *) nci_info->pcc_params_signature->strstart);
         }
         else {
             if (PObj_flag_TEST(private2, SELF)) {
@@ -383,7 +384,8 @@ Return the arity of the NCI (the number of arugments).
         if (nci_info && nci_info->func)
             arity = nci_info->arity;
         else
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                EXCEPTION_INVALID_OPERATION,
                 "You cannot get the arity of an undefined NCI.");
 
         RETURN(INTVAL arity);
