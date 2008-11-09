@@ -412,17 +412,15 @@ typedef enum _enum_opt {
 
 struct nodeType_t;
 
-/*
- * see also imcc/imcc.l struct macro_frame_t
- */
+/* see also imcc/imcc.l struct macro_frame_t */
 struct parser_state_t {
     struct parser_state_t *next;
-    Interp *interp;
-    const char *file;
-    int file_needs_free; /* If *file is malloced, we need to free it */
-    FILE *handle;
-    int line;
-    int pasm_file;       /* pasm_file mode of this frame */
+    Interp                *interp;
+    const char            *file;
+    FILE                  *handle;
+    int                    file_needs_free; /* is *file malloced? */
+    int                    line;
+    int                    pasm_file;       /* pasm_file mode of this frame */
 };
 
 typedef enum _AsmState {
@@ -439,6 +437,36 @@ typedef enum _imcc_reg_allocator_t {
 
 PARROT_API void IMCC_push_parser_state(PARROT_INTERP);
 PARROT_API void IMCC_pop_parser_state(PARROT_INTERP, void *yyscanner);
+
+/* globals store the state between individual e_pbc_emit calls */
+typedef struct subs_t {
+    IMC_Unit      *unit;
+    struct subs_t *prev;
+    struct subs_t *next;
+    SymHash        fixup;              /* currently set_p_pc sub names only */
+    int            ins_line;           /* line number for debug */
+    int            n_basic_blocks;     /* block count */
+    int            pmc_const;          /* index in const table */
+    size_t         size;               /* code size in ops */
+} subs_t;
+
+/* subs are kept per code segment */
+typedef struct code_segment_t {
+    PackFile_ByteCode     *seg;           /* bytecode segment */
+    PackFile_Segment      *jit_info;      /* bblocks, register usage */
+    subs_t                *subs;          /* current sub data */
+    subs_t                *first;         /* first sub of code segment */
+    struct code_segment_t *prev;          /* previous code segment */
+    struct code_segment_t *next;          /* next code segment */
+    SymHash                key_consts;    /* this seg's cached key constants */
+    int                    pic_idx;       /* next index of PIC */
+} code_segment_t;
+
+typedef struct _imcc_globals_t {
+    code_segment_t *cs;           /* current code segment */
+    code_segment_t *first;        /* first code segment   */
+    int             inter_seg_n;
+} imcc_globals;
 
 typedef struct _imc_info_t {
     void                  *yyscanner;
@@ -463,6 +491,7 @@ typedef struct _imc_info_t {
     char                 *cur_macro_name;
 
     struct macro_frame_t *frames;
+    imcc_globals         *globals;
 
     char                 *macro_buffer;
     Hash                 *macros;

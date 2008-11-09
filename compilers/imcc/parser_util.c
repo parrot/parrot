@@ -933,6 +933,9 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
 
     if (imc_info) {
         IMCC_INFO(interp) = imc_info->prev;
+        if (imc_info->globals)
+            mem_sys_free(imc_info->globals);
+
         mem_sys_free(imc_info);
     }
 

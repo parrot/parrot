@@ -45,40 +45,6 @@ TODO memory clean up
 
 */
 
-/*
- * globals store the state between individual e_pbc_emit calls
- */
-
-typedef struct subs_t {
-    size_t         size;               /* code size in ops */
-    int            ins_line;           /* line number for debug */
-    int            n_basic_blocks;     /* block count */
-    SymHash        fixup;              /* currently set_p_pc sub names only */
-    IMC_Unit      *unit;
-    int            pmc_const;          /* index in const table */
-    struct subs_t *prev;
-    struct subs_t *next;
-} subs_t;
-
-/* subs are kept per code segment */
-typedef struct code_segment_t {
-    PackFile_ByteCode     *seg;           /* bytecode segment */
-    PackFile_Segment      *jit_info;      /* bblocks, register usage */
-    subs_t                *subs;          /* current sub data */
-    subs_t                *first;         /* first sub of code segment */
-    struct code_segment_t *prev;          /* previous code segment */
-    struct code_segment_t *next;          /* next code segment */
-    SymHash                key_consts;    /* this seg's cached key constants */
-    int                    pic_idx;       /* next index of PIC */
-} code_segment_t;
-
-static struct globals {
-    code_segment_t *cs;               /* current code segment */
-    code_segment_t *first;            /* first code segment */
-    int             inter_seg_n;
-} globals;
-
-
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -143,12 +109,14 @@ static PMC* create_lexinfo(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static subs_t * find_global_label(
+    PARROT_INTERP,
     ARGIN(const char *name),
     ARGIN(const subs_t *sym),
     ARGOUT(int *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
         FUNC_MODIFIES(*pc);
 
 PARROT_WARN_UNUSED_RESULT
@@ -179,8 +147,9 @@ static void imcc_globals_destroy(SHIM_INTERP,
     SHIM(int ex),
     SHIM(void *param));
 
-static void make_new_sub(ARGIN(IMC_Unit *unit))
-        __attribute__nonnull__(1);
+static void make_new_sub(PARROT_INTERP, ARGIN(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void make_pmc_const(PARROT_INTERP, ARGMOD(SymReg *r))
         __attribute__nonnull__(1)
@@ -194,7 +163,8 @@ static PMC* mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static int old_blocks(void);
+static int old_blocks(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
@@ -208,10 +178,13 @@ static void store_fixup(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void store_key_const(ARGIN(const char *str), int idx)
+static void store_key_const(PARROT_INTERP, ARGIN(const char *str), int idx)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void store_sub_size(PARROT_INTERP, size_t size, size_t ins_line)
         __attribute__nonnull__(1);
 
-static void store_sub_size(size_t size, size_t ins_line);
 static void verify_signature(PARROT_INTERP,
     ARGIN(const Instruction *ins),
     ARGIN(opcode_t *pc))
@@ -225,7 +198,8 @@ static void verify_signature(PARROT_INTERP,
 #ifdef HAS_JIT
 
 PARROT_WARN_UNUSED_RESULT
-static int old_blocks(void);
+static int old_blocks(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 #endif /* HAS_JIT */
 
@@ -240,9 +214,9 @@ RT #48260: Not yet documented!!!
 */
 
 static void
-imcc_globals_destroy(SHIM_INTERP, SHIM(int ex), SHIM(void *param))
+imcc_globals_destroy(PARROT_INTERP, SHIM(int ex), SHIM(void *param))
 {
-    code_segment_t *cs = globals.cs;
+    code_segment_t *cs = IMCC_INFO(interp)->globals->cs;
 
     while (cs) {
         subs_t         *s       = cs->subs;
@@ -260,7 +234,7 @@ imcc_globals_destroy(SHIM_INTERP, SHIM(int ex), SHIM(void *param))
         cs      = prev_cs;
     }
 
-    globals.cs = NULL;
+    IMCC_INFO(interp)->globals->cs = NULL;
 }
 
 
@@ -360,25 +334,27 @@ e_pbc_open(PARROT_INTERP, SHIM(void *param))
 {
     code_segment_t *cs = mem_allocate_zeroed_typed(code_segment_t);
 
-    /* register cleanup code */
-    if (!globals.cs)
-        Parrot_on_exit(interp, imcc_globals_destroy, NULL);
+    if (!IMCC_INFO(interp)->globals)
+        IMCC_INFO(interp)->globals = mem_allocate_zeroed_typed(imcc_globals);
 
-    cs->prev = globals.cs;
+    if (IMCC_INFO(interp)->globals->cs)
+        clear_sym_hash(&IMCC_INFO(interp)->globals->cs->key_consts);
+    else {
+        /* register cleanup code */
+        Parrot_on_exit(interp, imcc_globals_destroy, NULL);
+    }
 
     /* free previous cached key constants if any */
-    if (globals.cs)
-        clear_sym_hash(&globals.cs->key_consts);
-
     create_symhash(&cs->key_consts);
 
     cs->next     = NULL;
+    cs->prev     = IMCC_INFO(interp)->globals->cs;
     cs->subs     = NULL;
     cs->first    = NULL;
     cs->jit_info = NULL;
 
-    if (!globals.first)
-        globals.first = cs;
+    if (!IMCC_INFO(interp)->globals->first)
+        IMCC_INFO(interp)->globals->first = cs;
     else
         cs->prev->next = cs;
 
@@ -387,8 +363,7 @@ e_pbc_open(PARROT_INTERP, SHIM(void *param))
         PMC *self;
 
         cs->seg = interp->code =
-            PF_create_default_segs(interp,
-                    IMCC_INFO(interp)->state->file, 1);
+            PF_create_default_segs(interp, IMCC_INFO(interp)->state->file, 1);
 
         /*
          * create a PMC constant holding the interpreter state
@@ -401,7 +376,7 @@ e_pbc_open(PARROT_INTERP, SHIM(void *param))
         (void) add_const_table_pmc(interp, self);
     }
 
-    globals.cs = cs;
+    IMCC_INFO(interp)->globals->cs = cs;
 
     return 0;
 }
@@ -420,12 +395,12 @@ get size/line of bytecode in ops till now
 
 PARROT_WARN_UNUSED_RESULT
 static int
-old_blocks(void)
+old_blocks(PARROT_INTERP)
 {
     size_t  size = 0;
     const   subs_t *s;
 
-    for (s = globals.cs->subs; s; s = s->prev) {
+    for (s = IMCC_INFO(interp)->globals->cs->subs; s; s = s->prev) {
         size += s->n_basic_blocks;
     }
 
@@ -447,30 +422,35 @@ PARROT_CANNOT_RETURN_NULL
 opcode_t *
 make_jit_info(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 {
-    const size_t old  = old_blocks();
+    const size_t old  = old_blocks(interp);
     const size_t size = unit->n_basic_blocks + old;
 
-    if (!globals.cs->jit_info) {
-        const  size_t len  = strlen(globals.cs->seg->base.name) + 5;
+    if (!IMCC_INFO(interp)->globals->cs->jit_info) {
+        const  size_t len  =
+            strlen(IMCC_INFO(interp)->globals->cs->seg->base.name) + 5;
         char * const  name = mem_allocate_n_typed(len, char);
 
-        snprintf(name, len, "%s_JIT", globals.cs->seg->base.name);
-        globals.cs->jit_info = PackFile_Segment_new_seg(interp,
+        snprintf(name, len, "%s_JIT",
+            IMCC_INFO(interp)->globals->cs->seg->base.name);
+
+        IMCC_INFO(interp)->globals->cs->jit_info =
+                PackFile_Segment_new_seg(interp,
                     interp->code->base.dir, PF_UNKNOWN_SEG, name, 1);
 
         mem_sys_free(name);
     }
 
     /* store current size */
-    globals.cs->subs->n_basic_blocks = unit->n_basic_blocks;
+    IMCC_INFO(interp)->globals->cs->subs->n_basic_blocks = unit->n_basic_blocks;
 
     /* offset of block start and end, 4 * registers_used */
-    globals.cs->jit_info->data =
-        mem_realloc_n_typed(globals.cs->jit_info->data, size * 4, opcode_t);
+    IMCC_INFO(interp)->globals->cs->jit_info->data =
+        mem_realloc_n_typed(IMCC_INFO(interp)->globals->cs->jit_info->data,
+            size * 4, opcode_t);
 
-    globals.cs->jit_info->size = size * 4;
+    IMCC_INFO(interp)->globals->cs->jit_info->size = size * 4;
 
-    return globals.cs->jit_info->data + old * 4;
+    return IMCC_INFO(interp)->globals->cs->jit_info->data + old * 4;
 }
 
 #endif /* HAS_JIT */
@@ -479,28 +459,28 @@ make_jit_info(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 
 =item C<static void make_new_sub>
 
-allocate a new globals.cs->subs structure
+allocate a new globals->cs->subs structure
 
 =cut
 
 */
 
 static void
-make_new_sub(ARGIN(IMC_Unit *unit))
+make_new_sub(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 {
     subs_t * const s = mem_allocate_zeroed_typed(subs_t);
 
-    s->prev          = globals.cs->subs;
+    s->prev          = IMCC_INFO(interp)->globals->cs->subs;
     s->unit          = unit;
     s->pmc_const     = -1;
 
-    if (globals.cs->subs)
-        globals.cs->subs->next = s;
+    if (IMCC_INFO(interp)->globals->cs->subs)
+        IMCC_INFO(interp)->globals->cs->subs->next = s;
 
-    if (!globals.cs->first)
-        globals.cs->first = s;
+    if (!IMCC_INFO(interp)->globals->cs->first)
+        IMCC_INFO(interp)->globals->cs->first = s;
 
-    globals.cs->subs = s;
+    IMCC_INFO(interp)->globals->cs->subs = s;
 
     create_symhash(&s->fixup);
 }
@@ -523,9 +503,9 @@ get_old_size(PARROT_INTERP, ARGOUT(int *ins_line))
 
     *ins_line   = 0;
 
-    if (globals.cs && interp->code->base.data) {
+    if (IMCC_INFO(interp)->globals->cs && interp->code->base.data) {
         subs_t *s;
-        for (s = globals.cs->subs; s; s = s->prev) {
+        for (s = IMCC_INFO(interp)->globals->cs->subs; s; s = s->prev) {
             size      += s->size;
             *ins_line += s->ins_line;
         }
@@ -545,10 +525,10 @@ RT #48260: Not yet documented!!!
 */
 
 static void
-store_sub_size(size_t size, size_t ins_line)
+store_sub_size(PARROT_INTERP, size_t size, size_t ins_line)
 {
-    globals.cs->subs->size     = size;
-    globals.cs->subs->ins_line = ins_line;
+    IMCC_INFO(interp)->globals->cs->subs->size     = size;
+    IMCC_INFO(interp)->globals->cs->subs->ins_line = ins_line;
 }
 
 /*
@@ -564,7 +544,7 @@ RT #48260: Not yet documented!!!
 static void
 store_fixup(PARROT_INTERP, ARGIN(const SymReg *r), int pc, int offset)
 {
-    SymReg * const fixup = _mk_address(interp, &globals.cs->subs->fixup,
+    SymReg * const fixup = _mk_address(interp, &IMCC_INFO(interp)->globals->cs->subs->fixup,
             r->name, U_add_all);
 
     if (r->set == 'p')
@@ -589,9 +569,10 @@ RT #48260: Not yet documented!!!
 */
 
 static void
-store_key_const(ARGIN(const char *str), int idx)
+store_key_const(PARROT_INTERP, ARGIN(const char *str), int idx)
 {
-    SymReg * const c = _mk_const(&globals.cs->key_consts, str, 0);
+    SymReg * const c =
+        _mk_const(&IMCC_INFO(interp)->globals->cs->key_consts, str, 0);
     c->color = idx;
 }
 
@@ -667,13 +648,14 @@ get a global label, return the pc (absolute)
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static subs_t *
-find_global_label(ARGIN(const char *name), ARGIN(const subs_t *sym), ARGOUT(int *pc))
+find_global_label(PARROT_INTERP, ARGIN(const char *name),
+    ARGIN(const subs_t *sym), ARGOUT(int *pc))
 {
     subs_t *s;
 
     *pc = 0;
 
-    for (s = globals.cs->first; s; s = s->next) {
+    for (s = IMCC_INFO(interp)->globals->cs->first; s; s = s->next) {
         SymReg * const r = s->unit->instructions->symregs[0];
 
         /* if names and namespaces are matching - ok */
@@ -705,7 +687,7 @@ fixup_globals(PARROT_INTERP)
     subs_t *s;
     int     jumppc = 0;
 
-    for (s = globals.cs->first; s; s = s->next) {
+    for (s = IMCC_INFO(interp)->globals->cs->first; s; s = s->next) {
         const SymHash * const hsh = &s->fixup;
         unsigned int          i;
 
@@ -717,7 +699,7 @@ fixup_globals(PARROT_INTERP)
                 int addr = jumppc + fixup->color;
 
                 /* check in matching namespace */
-                subs_t *s1 = find_global_label(fixup->name, s, &pc);
+                subs_t *s1 = find_global_label(interp, fixup->name, s, &pc);
 
                 /*
                  * if failed change opcode:
@@ -1051,7 +1033,7 @@ find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
     if (!len)
         return NULL;
 
-    for (s = globals.cs->first; s; s = s->next) {
+    for (s = IMCC_INFO(interp)->globals->cs->first; s; s = s->next) {
         if (STREQ(s->unit->lexid->name, unit->outer->name)) {
             PObj_get_FLAGS(s->unit->sub_pmc) |= SUB_FLAG_IS_OUTER;
             return s->unit->sub_pmc;
@@ -1094,16 +1076,17 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), int offs, int end)
     Parrot_sub          *sub;
 
     const int            k            = add_const_table(interp);
-    IMC_Unit            * const unit  = globals.cs->subs->unit;
     PackFile_ConstTable *ct           = interp->code->const_table;
     PackFile_Constant   *pfc          = ct->constants[k];
+    IMC_Unit            * const unit  =
+        IMCC_INFO(interp)->globals->cs->subs->unit;
 
     INTVAL               type         =
         (r->pcc_sub->calls_a_sub & ITPCCYIELD) ?
             enum_class_Coroutine :
                 unit->outer ? enum_class_Closure : enum_class_Sub;
 
-    globals.cs->subs->pmc_const       = k;
+    IMCC_INFO(interp)->globals->cs->subs->pmc_const = k;
 
     if (unit->_namespace) {
         /* strip namespace off from front */
@@ -1267,7 +1250,8 @@ add_const_key(PARROT_INTERP, ARGIN(const opcode_t *key), int size, ARGIN(const c
     const opcode_t    *rc;
     PackFile_Constant *pfc;
 
-    const SymReg * const r = _get_sym(&globals.cs->key_consts, s_key);
+    const SymReg * const r =
+        _get_sym(&IMCC_INFO(interp)->globals->cs->key_consts, s_key);
 
     if (r)
         return r->color;
@@ -1284,7 +1268,7 @@ add_const_key(PARROT_INTERP, ARGIN(const opcode_t *key), int size, ARGIN(const c
 
     k = add_const_table_key(interp, pfc->u.key);
 
-    store_key_const(s_key, k);
+    store_key_const(interp, s_key, k);
 
     IMCC_debug(interp, DEBUG_PBC_CONST, "\t=> %s #%d size %d\n",
                s_key, k, size);
@@ -1660,13 +1644,13 @@ RT #48260: Not yet documented!!!
 */
 
 int
-e_pbc_new_sub(SHIM_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
+e_pbc_new_sub(PARROT_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
 {
     if (!unit->instructions)
         return 0;
 
     /* we start a new compilation unit */
-    make_new_sub(unit);
+    make_new_sub(interp, unit);
 
     return 0;
 }
@@ -1704,9 +1688,13 @@ e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
     pragma = ins->symregs[0]->pcc_sub->pragma;
 
     if (pragma & P_IMMEDIATE) {
+        imcc_globals *g            = IMCC_INFO(interp)->globals;
+        IMCC_INFO(interp)->globals = NULL;
+
         IMCC_debug(interp, DEBUG_PBC, "immediate sub '%s'",
                 ins->symregs[0]->name);
         PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
+        IMCC_INFO(interp)->globals = g;
     }
 
     return 0;
@@ -1828,7 +1816,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
                 code_size, oldsize);
 
         constant_folding(interp, unit);
-        store_sub_size(code_size, ins_size);
+        store_sub_size(interp, code_size, ins_size);
 
         /*
          * allocate code and pic_index
@@ -1851,7 +1839,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
 
         /* add debug if necessary */
         if (IMCC_INFO(interp)->optimizer_level == 0
-          || IMCC_INFO(interp)->optimizer_level == OPT_PASM) {
+        || IMCC_INFO(interp)->optimizer_level  == OPT_PASM) {
             const char * const sourcefile = unit->file;
 
             /* FIXME length and multiple subs */
@@ -1928,7 +1916,8 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
              *
              * drawback: if we reach 0xffff, we'd have to resize again
              */
-            interp->code->pic_index->data[offs / 2] = ++globals.cs->pic_idx;
+            interp->code->pic_index->data[offs / 2] =
+                ++IMCC_INFO(interp)->globals->cs->pic_idx;
         }
 
         /* Start generating the bytecode */
