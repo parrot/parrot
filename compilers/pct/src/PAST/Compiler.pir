@@ -693,16 +693,21 @@ Return the POST representation of a C<PAST::Block>.
     goto block_done
 
   block_immediate:
+    .local pmc arglist
+    arglist = options['arglist']
+    unless null arglist goto have_arglist
+    arglist = new 'ResizablePMCArray'
+  have_arglist:
     result = self.'uniquereg'(rtype)
     $P0 = get_hll_global ['POST'], 'Ops'
     bpost = $P0.'new'(bpost, 'node'=>node, 'result'=>result)
     if ns goto block_immediate_ns
-    bpost.'push_pirop'('call', name, 'result'=>result)
+    bpost.'push_pirop'('call', name, arglist :flat, 'result'=>result)
     goto block_done
   block_immediate_ns:
     $S0 = '$P10'
     bpost.'push_pirop'('get_hll_global', $S0, ns, name, 'result'=>$S0)
-    bpost.'push_pirop'('call', $S0, 'result'=>result)
+    bpost.'push_pirop'('call', $S0, arglist :flat, 'result'=>result)
 
   block_done:
     ##  remove current block from @?BLOCK
@@ -967,7 +972,13 @@ a 'pasttype' of if/unless.
     null childpost
     $I0 = defined childpast
     unless $I0 goto no_childpast
-    childpost = self.'as_post'(childpast, 'rtype'=>childrtype)
+    .local pmc arglist
+    arglist = new 'ResizablePMCArray'
+    $I0 = childpast.'arity'()
+    unless $I0 > 0 goto have_arglist
+    push arglist, exprpost
+  have_arglist:   
+    childpost = self.'as_post'(childpast, 'rtype'=>childrtype, 'arglist'=>arglist)
     goto childpost_coerce
   no_childpast:
     if rtype == 'v' goto ret_childpost
