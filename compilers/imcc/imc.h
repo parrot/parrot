@@ -441,63 +441,61 @@ PARROT_API void IMCC_push_parser_state(PARROT_INTERP);
 PARROT_API void IMCC_pop_parser_state(PARROT_INTERP, void *yyscanner);
 
 typedef struct _imc_info_t {
-    struct _imc_info_t *prev;
-    IMC_Unit * imc_units;
-    IMC_Unit * last_unit;
-    IMC_Unit * cur_unit;
-    int n_comp_units;
-    int imcc_warn;
-    int verbose;
-    int debug;
-    int IMCC_DEBUG;
-    int gc_off;
-    int write_pbc;
-    int allocator;
-    SymReg* sr_return;
-    AsmState asm_state;
-    int optimizer_level;
-    int dont_optimize;
-    int has_compile;
-    int allocated;
-    SymHash ghash;
-    SymReg  *  cur_namespace;
-    struct nodeType_t *top_node;
+    void                  *yyscanner;
+    struct _imc_info_t    *prev;
+    IMC_Unit              *imc_units;
+    IMC_Unit              *last_unit;
+    IMC_Unit              *cur_unit;
+    SymReg                *sr_return;
+    SymReg                *cur_namespace;
+    struct nodeType_t     *top_node;
     struct parser_state_t *state;
-    jmp_buf jump_buf;               /* The jump for error  handling */
-    int error_code;                 /* The Error code. */
-    STRING * error_message;         /* The Error message */
+    STRING                *error_message;   /* The Error message */
 
     /* some values that were global... */
-    int line;                   /* current line number */
-    int cur_pmc_type;
-    SymReg *cur_call;
-    SymReg *cur_obj;
-    const char *adv_named_id;
+    SymReg               *cur_call;
+    SymReg               *cur_obj;
+    const char           *adv_named_id;
 
     /* Lex globals */
-    int in_pod;
-    char *heredoc_end;
-    char *heredoc_content;
-    char *cur_macro_name;
+    char                 *heredoc_end;
+    char                 *heredoc_content;
+    char                 *cur_macro_name;
 
-    int expect_pasm;
     struct macro_frame_t *frames;
 
-    char *macro_buffer;
-    Hash *macros;
+    char                 *macro_buffer;
+    Hash                 *macros;
 
-    /*
-     * these are used for constructing one INS
-     */
+    /* these are used for constructing one INS */
 #define IMCC_MAX_STATIC_REGS 100
-    SymReg *regs[IMCC_MAX_STATIC_REGS];
-    int nkeys;
-    SymReg *keys[IMCC_MAX_FIX_REGS]; /* TODO key overflow check */
-    int keyvec;
-    int cnr;
-    int nargs;
-    int in_slice;
-    void *yyscanner;
+    SymReg               *regs[IMCC_MAX_STATIC_REGS];
+    SymReg               *keys[IMCC_MAX_FIX_REGS]; /* TODO key overflow check */
+    AsmState              asm_state;
+    SymHash               ghash;
+    jmp_buf               jump_buf;        /* The jump for error  handling */
+    int                   IMCC_DEBUG;
+    int                   allocated;
+    int                   allocator;
+    int                   cnr;
+    int                   cur_pmc_type;
+    int                   debug;
+    int                   dont_optimize;
+    int                   error_code;      /* The Error code. */
+    int                   expect_pasm;
+    int                   gc_off;
+    int                   has_compile;
+    int                   imcc_warn;
+    int                   in_pod;
+    int                   in_slice;
+    int                   keyvec;
+    int                   line;                   /* current line number */
+    int                   optimizer_level;
+    int                   nargs;
+    int                   n_comp_units;
+    int                   nkeys;
+    int                   verbose;
+    int                   write_pbc;
 } imc_info_t;
 
 #define IMCC_INFO(i) (((Parrot_Interp)(i))->imc_info)
