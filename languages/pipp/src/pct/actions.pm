@@ -19,19 +19,12 @@ value of the comment is passed as the second argument to the method.
 
 class Pipp::Grammar::Actions;
 
-sub test_scope() {
-    our $?PIPP_SCOPE;
-    my $s := $?PIPP_SCOPE;
-    return $s;
-}
-
 method TOP($/) {
     my $past  := PAST::Stmts.new( :node($/) );
     for $<sea_or_code> {
         $past.push( $($_) );
     }
 
-    our $?PIPP_SCOPE := '____top';
     make $past;
 }
 
@@ -52,13 +45,10 @@ method SEA($/) {
 }
 
 method code_short_tag($/) {
-    #our $?PIPP_SCOPE := '___________code_short_tag';
-    my $past := PAST::Stmts.new( :node($/), :name( 'code_short_tag' ~ test_scope() ) );
+    my $past := PAST::Stmts.new( :node($/) );
     for $<statement> {
         $past.push( $($_) );
     }
-
-     $past.name( 'code_short_tag_2_____' ~ test_scope() );
 
     make $past;
 }
@@ -87,7 +77,6 @@ method code_script_tag($/) {
 }
 
 method block($/) {
-    our $?PIPP_SCOPE := '___block';
     my $past := PAST::Stmts.new( :node($/) );
     for $<statement> {
         $past.push( $($_) );
@@ -97,15 +86,7 @@ method block($/) {
 }
 
 method statement($/,$key) {
-    our $?PIPP_SCOPE := '_____statement';
-    my $past;
-    if $key eq 'echo_statement' {
-       $past := $( $<echo_statement> );
-    }
-    else {
-       $past := $( $/{$key} );
-    }
-    make $past;
+    make $( $/{$key} );
 }
 
 method inline_sea_short_tag($/) {
@@ -120,9 +101,8 @@ method inline_sea_short_tag($/) {
 }
 
 method echo_statement($/) {
-    #our $?PIPP_SCOPE := '________echo_statement';
     my $past := $( $<arguments> );
-    $past.name( 'echo' ~ '__scope:' ~ test_scope() );
+    $past.name( 'echo' );
 
     make $past;
 }
@@ -173,7 +153,6 @@ method constant($/) {
 }
 
 method arguments($/) {
-    # our $?PIPP_SCOPE := '________arguments';
     my $past := PAST::Op.new(
                     :pasttype('call'),
                     :node($/)
@@ -222,7 +201,6 @@ method array_elem($/) {
 }
 
 method var($/,$key) {
-    # our $?PIPP_SCOPE := '________var';
     make $( $/{$key} );
 }
 
@@ -230,7 +208,7 @@ method VAR_NAME($/) {
     our $?PIPP_SCOPE;
     make PAST::Var.new(
              :scope( $?PIPP_SCOPE ?? $?PIPP_SCOPE !! 'package' ),
-             :name(~$/ ~ 'xxxxx' ~ test_scope()),
+             :name(~$/),
              :viviself('Undef'),
              :lvalue(1),
          );
@@ -279,7 +257,6 @@ method for_statement($/) {
 
 # Handle the operator precedence table.
 method expression($/, $key) {
-    # our $?PIPP_SCOPE := '________expression';
     if ($key eq 'end') {
         make $($<expr>);
     }
