@@ -977,7 +977,7 @@ a 'pasttype' of if/unless.
     $I0 = childpast.'arity'()
     unless $I0 > 0 goto have_arglist
     push arglist, exprpost
-  have_arglist:   
+  have_arglist:
     childpost = self.'as_post'(childpast, 'rtype'=>childrtype, 'arglist'=>arglist)
     goto childpost_coerce
   no_childpast:
