@@ -24,14 +24,14 @@ Arena holds and manages a set number of items of a single size and shape.
 
 =over 4
 
-=item* GC
+=item * GC
 
 Garbage collector. A garbage collector is a system that finds memory objects
 that are not being used by the system, and frees them automatically. Garbage
 collection is broken into two distinct phases: the I<mark phase> that searches
 for unreferenced objects, and the I<sweep phase> that frees all dead objects.
 
-=item* DOD
+=item * DOD
 
 Dead object detection, a deprecated term that refers to the I<mark phase>
 of the garbage collector.

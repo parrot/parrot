@@ -541,7 +541,7 @@ Define return results for the subroutine return statement.
 
 For all of these opcodes the passed invar PMC constant is the string
 representation of a FixedIntegerArray with one flag word per argument.
-The flags are documented currently in F<include/parrot/enum.h> only.
+The flags are documented currently in F<include/parrot/enums.h> only.
 
 After this argument a variable amount of arguments must follow according
 to the elements of the signature array.
@@ -784,6 +784,7 @@ Only valid inside an exception handler. Rethrow the exception $1.
 Get a count of currently active exception handlers on the stack.
 
 =item B<die>(in STR)
+
 =item B<die>(in PMC)
 
 Die with message $1
