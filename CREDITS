@@ -361,6 +361,10 @@ E: Jerry.Gay@gmail.com
 D: test suite, compiler tools, perl6, TAP language, entropy reduction, ECMAScript
 S: Seattle, WA
 
+N: Jimmy
+E: zhuomingliang@yahoo.com.cn
+D: Various patches for Pipp.
+
 N: John J. Trammell
 E: trammell@el-swifto.com
 D: coding standard tests
