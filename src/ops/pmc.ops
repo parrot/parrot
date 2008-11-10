@@ -519,8 +519,7 @@ $2 and $3.
 
 =cut
 
-inline op add_multi(in INT, in INT, in INT, invar PMC) {
-  /* {{**DEPRECATE**}} */
+inline op add_multi(in INT, in INT, in INT, invar PMC) :deprecated {
   Parrot_ex_throw_from_c_args(interp, expr NEXT(), EXCEPTION_INVALID_OPERATION,
       "Must add multi by function and type name, not number");
 }
@@ -535,8 +534,7 @@ Find the sub that would be called for vtable entry $2 for types $3 and $4.
 
 =cut
 
-inline op find_multi(out PMC, in INT, in INT, in INT) {
-  /* {{**DEPRECATE**}} */
+inline op find_multi(out PMC, in INT, in INT, in INT) :deprecated {
   Parrot_ex_throw_from_c_args(interp, expr NEXT(), EXCEPTION_INVALID_OPERATION,
       "Must find multi by function and type name, not number");
 }

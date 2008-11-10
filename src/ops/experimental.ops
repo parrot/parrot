@@ -185,7 +185,7 @@ Have $1 turn itself into a PMC of type $2.
 
 =cut
 
-inline op morph(invar PMC, in INT) {
+inline op morph(invar PMC, in INT) :deprecated {
   VTABLE_morph(interp, $1, $2);
 }
 

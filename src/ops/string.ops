@@ -334,8 +334,7 @@ inline op sprintf(out PMC, invar PMC, invar PMC) :base_core {
 
 =item B<new>(out STR, in INT)
 
-Allocate a new empty string, of length $2 (optional), encoding $3
-(optional) and type $4. (optional)
+Allocate a new empty string of length $2 (optional).
 
 =cut
 
