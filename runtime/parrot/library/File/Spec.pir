@@ -100,14 +100,11 @@ called as object methods.
 .end
 
 
+.include 'sysinfo.pasm'
+
 .sub '_get_osname'
-    .local pmc config
-    .local pmc osname
-
-    config= '_config'()
-    osname= config['osname']
-
-    .return( osname )
+    $S0 = sysinfo .SYSINFO_PARROT_OS
+    .return ( $S0 )
 .end
 
 
