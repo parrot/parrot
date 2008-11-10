@@ -123,7 +123,52 @@ NOT IMPLEMENTED.
 =cut
 
 .sub 'basename'
-    not_implemented()
+    .param pmc args :slurpy
+    .local string path
+    .local string suffix
+    .local string separator
+
+    ($I0, path, suffix) = parse_parameters('s|s', args :flat)
+    if $I0 goto L1
+    .RETURN_NULL()
+  L1:
+    sysinfo $S0, 4
+    if $S0 == 'MSWin32' goto L2
+    if $S0 == 'netware' goto L2
+    separator = '/'
+    goto L3
+  L2:
+    separator = '/\'
+  L3:
+    $I1 = 0
+    $P0 = split '', path
+  L4:
+    unless $P0 goto L5
+    $S1 = pop $P0
+    $I0 = index separator, $S1
+    inc $I1
+    if $I0 == -1 goto L4
+    dec $I1
+  L5:
+    .local int len_path
+    .local int len_suffix
+    .local int pos1
+    .local int pos2
+
+    len_path = length path
+    len_suffix = length suffix
+
+    pos1 = len_path - $I1
+    pos2 = len_path - len_suffix
+    $S3  = substr path, pos2
+    unless $S3 == suffix goto L6
+
+    $I2  = pos2 - pos1
+    $S4 = substr path, pos1, $I2
+    .RETURN_STRING($S4)
+  L6:
+    $S2 = substr path, pos1
+    .RETURN_STRING($S2)
 .end
 
 =item C<string bin2hex(string data)>
