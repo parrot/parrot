@@ -1177,7 +1177,6 @@ by C<node>.
     ops.'push'(looplabel)
     ops.'push_pirop'('unless', iter, endlabel)
 
-
     .local pmc subpast
     subpast = node[1]
 
@@ -1209,9 +1208,9 @@ by C<node>.
   arity_end:
 
     .local pmc subpost
-    subpost = self.'as_post'(subpast, 'rtype'=>'P')
+    subpast.'blocktype'('immediate')                       # FIXME
+    subpost = self.'as_post'(subpast, 'rtype'=>'P', 'arglist'=>arglist)
     ops.'push'(subpost)
-    ops.'push_pirop'('call', subpost, arglist :flat)
     ops.'push_pirop'('goto', looplabel)
     ops.'push'(nextlabel)
     ops.'push_pirop'('.local pmc exception')
