@@ -274,13 +274,14 @@
     $P0  = $P0.'item'()
     $P1  = match['block']
     block = $P1.'item'()
-    block.'blocktype'('sub')
+    block.'blocktype'('immediate')
     .local pmc params, topic_var
     params = block[0]
     $P3 = get_hll_global ['PAST'], 'Var'
     topic_var = $P3.'new'('name'=>'$_', 'scope'=>'parameter')
     params.'push'(topic_var)
     block.'symbol'('$_', 'scope'=>'lexical')
+    block.'arity'(1)
     $P2  = get_hll_global ['PAST'], 'Op'
     $S1  = match['sym']
     past = $P2.'new'($P0, block, 'pasttype'=>$S1, 'node'=>match)
