@@ -159,7 +159,7 @@ Tests the Complex PMC.
     assign $P0, $P1
     is( $P0, "-13+2i", '"-13 +2i" parsed as -13+2i' )
 .end
- 
+
 .sub exception_malformed_string__real_part
     new $P0, 'Complex'
     push_eh handler
@@ -168,7 +168,7 @@ Tests the Complex PMC.
 handler:
     .exception_is( "Complex: malformed string" )
 .end
- 
+
 .sub exception_malformed_string__imaginary_part
     new $P0, 'Complex'
     push_eh handler
@@ -177,7 +177,7 @@ handler:
 handler:
     .exception_is( "Complex: malformed string" )
 .end
- 
+
 .sub exception_malformed_string__missing_plus_or_minus
     new $P0, 'Complex'
     push_eh handler
@@ -186,7 +186,7 @@ handler:
 handler:
     .exception_is( "Complex: malformed string" )
 .end
- 
+
 .sub test_complex_add
     new $P0, 'Complex'
     new $P1, 'Complex'
@@ -272,7 +272,7 @@ handler:
     sub $P1, $P3, $P0
     is( $P1, "1024+3i", '2048 minus 1024-3i is 1024+3i' )
 .end
- 
+
 .sub test_complex_multiply
     new $P0, 'Complex'
     new $P1, 'Complex'
@@ -316,7 +316,7 @@ handler:
     mul $P1, $P3, $P0
     is( $P1, "10+10i", '10 x 1+i is 10+10i' )
  .end
- 
+
 .sub test_complex_divide
     new $P0, 'Complex'
     new $P1, 'Complex'
@@ -351,7 +351,7 @@ handler:
     div $P1, $P0, 0.5
     is( $P1, "4-6i", '2-3i / 0.5 = 4-6i' )
 .end
- 
+
 .sub complex_divide_by_zero_Complex
     skip( 1, 'div by zero not caught' )
     .return()
@@ -384,7 +384,7 @@ handler:
 handler:
     .exception_is( 'Divide by zero' )
 .end
- 
+
 .sub complex_divide_by_zero_Integer
     skip( 1, 'div by zero not caught' )
     .return()
@@ -417,7 +417,7 @@ handler:
         set $P0, "0"
         nok( $P0, 'Complex(0) -> bool = true' )
 .end
- 
+
 .sub test_get_keyed
         new $P0, 'Complex'
         new $P1, 'String'
@@ -441,7 +441,7 @@ handler:
         is( $I0, "-3", 'get real portion -> Int' )
         is( $I1, "1", 'get imag portion -> Int' )
 .end
- 
+
 .sub exception_get_keyed__invalid_string_key
     new $P0, 'Complex'
     set $P0, "5 + 3.5i"
@@ -450,7 +450,7 @@ handler:
 handler:
     .exception_is( "Complex: key is neither 'real' or 'imag'" )
 .end
- 
+
 .sub exception_get_keyed__invalid_numeric_key
     new $P0, 'Complex'
     set $P0, "5 + 3.5i"
@@ -459,7 +459,7 @@ handler:
 handler:
     .exception_is( "Complex: key must be 0 or 1" )
 .end
- 
+
 .sub set_int_or_num
     new $P0, 'Complex'
 
@@ -471,7 +471,7 @@ handler:
     set $P0, .4
     is( $P0, "0.4+0i", '.4 -> Complex = 0.4+0i' )
 .end
- 
+
 .sub set_keyed
     new $P0, 'Complex'
     new $P1, 'String'
@@ -492,7 +492,7 @@ handler:
     set $P0["imag"], $P2
     is( $P0, "0.5+6i", '... now using String PMCs' )
 .end
- 
+
 .sub exception_set_keyed__invalid_key
     new $P0, 'Complex'
     push_eh handler
@@ -500,7 +500,7 @@ handler:
 handler:
     .exception_is( "Complex: key must be 0 or 1" )
 .end
- 
+
 .sub test_is_equal
     new $P0, 'Complex'
     new $P1, 'Complex'
@@ -509,11 +509,11 @@ handler:
     set $P1["real"], 2
     set $P1["imag"], 3
 
-    is( $P0, $P1, 'create new Complex from real/imag and test eq' ) 
+    is( $P0, $P1, 'create new Complex from real/imag and test eq' )
     set $P1, 0
-    isnt( $P0, $P1, '... now make sure it ne to 0' )  
+    isnt( $P0, $P1, '... now make sure it ne to 0' )
 .end
- 
+
 .sub test_complex_abs
     new $P0, 'Complex'
     set $P0, "4 + 3i"
@@ -521,7 +521,7 @@ handler:
     abs $P1, $P0
     is( $P1, "5", 'abs 4+3j -> 5' )
 .end
- 
+
 .sub check_whether_interface_is_done
     .local pmc pmc1
     pmc1 = new 'Complex'
@@ -533,7 +533,7 @@ handler:
     does bool1, pmc1, "no_interface"
     nok( bool1, 'Comples !does no_interface' )
 .end
- 
+
 .sub instantiate__pasm__i
     skip( 1, 'instantiate n/y' )
     .return()
@@ -558,7 +558,7 @@ handler:
     # $P1 = $P0."instantiate"(2.0, 3.0)
     is( $P1, "2+3i", 'instantiate pir n' )
 .end
- 
+
 .sub instantiate__pir__p
     skip( 1, 'instantiate n/y' )
     .return()
@@ -580,7 +580,7 @@ handler:
     # $P1 = $P0."instantiate"("2 + 3i")
     is( $P1, "2+3i", 'instantiate pir s' )
 .end
- 
+
 .sub test_complex_neg
      new $P0, 'Complex'
      set $P0, "1.3 + 1.7i"
@@ -591,12 +591,12 @@ handler:
      .fp_eq_ok($N0, -1.3, 'test complex negative')
      .fp_eq_ok($N1, -1.7, '... and the imag port')
 .end
- 
+
 .sub test_clone
      new $P0, 'Complex'
      set $P0, "1 - 3i"
      clone $P1, $P0
-     is( $P0, $P1, 'clone Complex PMC') 
+     is( $P0, $P1, 'clone Complex PMC')
 
      set $P0, "0 + 0i"
      set $N0, $P1[0]
@@ -604,7 +604,7 @@ handler:
      .fp_eq_ok($N0, 1.0, 'no change to cloned after setting orig')
      .fp_eq_ok($N1, -3.0, '... nor to imag portion')
 .end
- 
+
 .sub test_sub
     .local pmc d, f, c
     d = new 'Undef'
@@ -617,14 +617,14 @@ handler:
 
     typeof $S0, d
     is( $S0, "Complex", 'd is typeof Complex' )
-    
+
     d = f - c
     is( d, "-2.8-2i", '2.2 - 5+2j = -2.8-2i' )
 
     typeof $S0, d
     is( $S0, "Complex", 'typeof still Complex' )
 .end
- 
+
 .sub test_i_sub
     .local pmc f, c
     f = new 'Float'
@@ -653,7 +653,7 @@ handler:
     .sprintf_is( "%.3f%+.3fi", "0+3.141592653589793i", "0.000+3.142i" )
     .sprintf_is( "%.3f%+.3fi", "0+i", "0.000+1.000i" )
 .end
- 
+
 .macro pow_test_is(base, power, message)
     c = .base
     c2 = .power
@@ -680,7 +680,7 @@ handler:
     c2 = new 'Float'
     .pow_test_is( "2i", 0.5, "1.000000+1.000000i" )
 .end
- 
+
 .sub e_raised_pi_time_i__plus_1_equal_0
     .local pmc c, c2, c3
     c  = new 'Complex'
@@ -695,10 +695,10 @@ handler:
     c2 += 1.0
     .sprintf_is( "%.3f%+.3fi", c2, "0.000+0.000i" )
 .end
- 
+
 # # The inverse hyperbolic functions are broken wrt -0.0
 # # Need to find some formal spec for when to return -0.0.
- 
+
 .macro complex_op_is( val, res, op )
     new $P1, 'Complex'
     new $P2, 'Complex'
@@ -720,10 +720,11 @@ handler:
 
 .sub ln_of_complex_numbers
     .local pmc config_hash, interp
+    .local string osname
     interp = getinterp
     config_hash = interp[.IGLOBALS_CONFIG_HASH]
-    $S0 = config_hash["os_name"]
-    eq $S0, "MSWin32", win32fail 
+    osname = config_hash["os_name"]
+    eq osname, "MSWin32", win32fail
 
     .complex_op_is("-2+0i", "0.693147+3.141593i", 'ln' )
     .complex_op_is("-1+0i", "0.000000+3.141593i", 'ln' )
@@ -737,7 +738,11 @@ handler:
     .complex_op_is("0+0.5i", "-0.693147+1.570796i", 'ln' )
     .complex_op_is("0+1i", "0.000000+1.570796i", 'ln' )
     .complex_op_is("0+2i", "0.693147+1.570796i", 'ln' )
+  t_inf:
+    skip(1, 'inf is not platform-independent' )
+    goto end_inf
     .complex_op_is("0+0i", "-inf+0.000000i", 'ln' )
+  end_inf:
     .complex_op_is("2+3i", "1.282475+0.982794i", 'ln' )
     .complex_op_is("2-3i", "1.282475-0.982794i", 'ln' )
     .complex_op_is("-2+3i", "1.282475+2.158799i", 'ln' )
@@ -747,7 +752,7 @@ handler:
 win32fail:
     skip( 17, 'inf is not platform-independent' )
 .end
- 
+
 .sub exp_of_complex_numbers
     .complex_op_is( "-2+0i", "0.135335+0.000000i", 'exp' )
     .complex_op_is( "-1+0i", "0.367879+0.000000i", 'exp' )
@@ -792,7 +797,7 @@ win32fail:
     .complex_op_is( "-2+3i", "0.895977+1.674149i", 'sqrt' )
     .complex_op_is( "-2-3i", "0.895977-1.674149i", 'sqrt' )
 .end
- 
+
 .sub sin_of_complex_numbers
     .complex_op_is("-2+0i", "-0.909297+0.000000i", 'sin' )
     .complex_op_is("-1+0i", "-0.841471+0.000000i", 'sin' )
@@ -812,7 +817,7 @@ win32fail:
     .complex_op_is("-2+3i", "-9.154499-4.168907i", 'sin' )
     .complex_op_is("-2-3i", "-9.154499+4.168907i", 'sin' )
 .end
- 
+
 .sub cos_of_complex_numbers
     .complex_op_is("-2+0i", "-0.416147+0.000000i", 'cos' )
     .complex_op_is("-1+0i", "0.540302+0.000000i", 'cos' )
@@ -832,7 +837,7 @@ win32fail:
     .complex_op_is("-2+3i", "-4.189626+9.109228i", 'cos' )
     .complex_op_is("-2-3i", "-4.189626-9.109228i", 'cos' )
 .end
- 
+
 .sub tan_of_complex_numbers
     .complex_op_is("-2+0i", "2.185040+0.000000i", 'tan' )
     .complex_op_is("-1+0i", "-1.557408+0.000000i", 'tan' )
@@ -852,7 +857,7 @@ win32fail:
     .complex_op_is("-2+3i", "0.003764+1.003239i", 'tan' )
     .complex_op_is("-2-3i", "0.003764-1.003239i", 'tan' )
 .end
- 
+
 .sub cot_of_complex_numbers
     .complex_op_is("-2+0i", "0.457658+0.000000i", 'cot' )
     .complex_op_is("-1+0i", "-0.642093+0.000000i", 'cot' )
@@ -871,7 +876,7 @@ win32fail:
     .complex_op_is("-2+3i", "0.003740-0.996758i", 'cot' )
     .complex_op_is("-2-3i", "0.003740+0.996758i", 'cot' )
 .end
- 
+
 .sub sec_of_complex_numbers
     .complex_op_is("-2+0i", "-2.402998+0.000000i", 'sec' )
     .complex_op_is("-1+0i", "1.850816+0.000000i", 'sec' )
@@ -891,7 +896,7 @@ win32fail:
     .complex_op_is("-2+3i", "-0.041675-0.090611i", 'sec' )
     .complex_op_is("-2-3i", "-0.041675+0.090611i", 'sec' )
 .end
- 
+
 .sub csc_of_complex_numbers
     .complex_op_is("-2+0i", "-1.099750+0.000000i", 'csc' )
     .complex_op_is("-1+0i", "-1.188395+0.000000i", 'csc' )
@@ -910,7 +915,7 @@ win32fail:
     .complex_op_is("-2+3i", "-0.090473+0.041201i", 'csc' )
     .complex_op_is("-2-3i", "-0.090473-0.041201i", 'csc' )
 .end
- 
+
 .sub asin_of_complex_numbers
     .complex_op_is("-2+0i", "-1.570796+1.316958i", 'asin' )
     .complex_op_is("-1+0i", "-1.570796+0.000000i", 'asin' )
@@ -930,7 +935,7 @@ win32fail:
     .complex_op_is("-2+3i", "-0.570653+1.983387i", 'asin' )
     .complex_op_is("-2-3i", "-0.570653-1.983387i", 'asin' )
 .end
- 
+
 .sub acos_of_complex_numbers
     .complex_op_is("-2+0i", "3.141593-1.316958i", 'acos' )
     .complex_op_is("-1+0i", "3.141593+0.000000i", 'acos' )
@@ -950,7 +955,7 @@ win32fail:
     .complex_op_is("-2+3i", "2.141449-1.983387i", 'acos' )
     .complex_op_is("-2-3i", "2.141449+1.983387i", 'acos' )
 .end
- 
+
 .sub atan_of_complex_numbers
     .complex_op_is("-2+0i", "-1.107149+0.000000i", 'atan' )
     .complex_op_is("-1+0i", "-0.785398+0.000000i", 'atan' )
@@ -985,7 +990,7 @@ win32fail:
     .complex_op_is("-2+3i", "-0.160875-0.229073i", 'acot' )
     .complex_op_is("-2-3i", "-0.160875+0.229073i", 'acot' )
 .end
- 
+
 .sub asec_of_complex_numbers
     .complex_op_is("-2+0i", "2.094395+0.000000i", 'asec' )
     .complex_op_is("-1+0i", "3.141593+0.000000i", 'asec' )
@@ -1004,7 +1009,7 @@ win32fail:
     .complex_op_is("-2+3i", "1.721182+0.231335i", 'asec' )
     .complex_op_is("-2-3i", "1.721182-0.231335i", 'asec' )
 .end
- 
+
 .sub acsc_of_complex_numbers
     .complex_op_is("-2+0i", "-0.523599+0.000000i", 'acsc' )
     .complex_op_is("-1+0i", "-1.570796+0.000000i", 'acsc' )
@@ -1023,13 +1028,13 @@ win32fail:
     .complex_op_is("-2+3i", "-0.150386-0.231335i", 'acsc' )
     .complex_op_is("-2-3i", "-0.150386+0.231335i", 'acsc' )
 .end
- 
+
 .sub sinh_of_complex_numbers
     .local pmc config_hash, interp
     interp = getinterp
     config_hash = interp[.IGLOBALS_CONFIG_HASH]
     $S0 = config_hash["os_name"]
-    eq $S0, "MSWin32", win32fail 
+    eq $S0, "MSWin32", win32fail
 
     .complex_op_is("-2+0i", "-3.626860+0.000000i", 'sinh' )
     .complex_op_is("-1+0i", "-1.175201+0.000000i", 'sinh' )
@@ -1050,10 +1055,10 @@ win32fail:
     .complex_op_is("-2-3i", "3.590565-0.530921i", 'sinh' )
     .return()
 
-win32fail: 
+win32fail:
     skip( 17, 'failing on win32' )
 .end
- 
+
 .sub cosh_of_complex_numbers
     .complex_op_is("-2+0i", "3.762196+0.000000i", 'cosh' )
     .complex_op_is("-1+0i", "1.543081+0.000000i", 'cosh' )
@@ -1073,7 +1078,7 @@ win32fail:
     .complex_op_is("-2+3i", "-3.724546-0.511823i", 'cosh' )
     .complex_op_is("-2-3i", "-3.724546+0.511823i", 'cosh' )
 .end
- 
+
 .sub tanh_of_complex_numbers
     .complex_op_is("-2+0i", "-0.964028+0.000000i", 'tanh' )
     .complex_op_is("-1+0i", "-0.761594+0.000000i", 'tanh' )
@@ -1093,7 +1098,7 @@ win32fail:
     .complex_op_is("-2+3i", "-0.965386-0.009884i", 'tanh' )
     .complex_op_is("-2-3i", "-0.965386+0.009884i", 'tanh' )
 .end
- 
+
 .sub coth_of_complex_numbers
     .complex_op_is("-2+0i", "-1.037315+0.000000i", 'coth' )
     .complex_op_is("-1+0i", "-1.313035+0.000000i", 'coth' )
@@ -1112,7 +1117,7 @@ win32fail:
     .complex_op_is("-2+3i", "-1.035747+0.010605i", 'coth' )
     .complex_op_is("-2-3i", "-1.035747-0.010605i", 'coth' )
 .end
- 
+
 .sub sech_of_complex_numbers
     .complex_op_is("-2+0i", "0.265802+0.000000i", 'sech' )
     .complex_op_is("-1+0i", "0.648054+0.000000i", 'sech' )
@@ -1132,7 +1137,7 @@ win32fail:
     .complex_op_is("-2+3i", "-0.263513+0.036212i", 'sech' )
     .complex_op_is("-2-3i", "-0.263513-0.036212i", 'sech' )
 .end
- 
+
 .sub csch_of_complex_numbers
     .complex_op_is("-2+0i", "-0.275721+0.000000i", 'csch' )
     .complex_op_is("-1+0i", "-0.850918+0.000000i", 'csch' )
@@ -1151,7 +1156,7 @@ win32fail:
     .complex_op_is("-2+3i", "0.272549-0.040301i", 'csch' )
     .complex_op_is("-2-3i", "0.272549+0.040301i", 'csch' )
 .end
- 
+
 .sub add_using_subclass_of_complex_bug_59630
     skip( 3, 'add using subclass of Complex - RT #59630' )
     .return()
