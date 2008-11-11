@@ -46,7 +46,7 @@ Parrot::Test::Util::Runloop->testloop(
     name     => 'no trailing whitespace',
     files    => [@files],
     skips    => $skip_files,
-    per_line => sub { $_[0] !~ m{.?[ \t]+$}m },
+    per_line => sub { $_[0] !~ m{[ \t]$}m },
     diag_prefix => 'Trailing space or tab char found'
 );
 
