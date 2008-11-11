@@ -77,6 +77,7 @@ any value type.
     piropsig['pow']        = 'NN+'
     piropsig['print']      = 'v*'
     piropsig['set']        = 'PP'
+    piropsig['isnull']     = 'IP'
     set_global '%piropsig', piropsig
 
     ##  %valflags specifies when PAST::Val nodes are allowed to
