@@ -51,32 +51,50 @@ Tests for basic system information.
 
 =cut
 
+my @setup = (
+    { pconfig_key => 'intvalsize',
+      pasm_key    => 1,
+      desc        => 'integer size',
+      reg_type    => 'I',
+    },
+    { pconfig_key => 'doublesize',
+      pasm_key    => 2,
+      desc        => 'float size',
+      reg_type    => 'I',
+    },
+    { pconfig_key => 'ptrsize',
+      pasm_key    => 3,
+      desc        => 'pointer size',
+      reg_type    => 'I',
+    },
+    { pconfig_key => 'osname',
+      pasm_key    => 4,
+      desc        => 'osname',
+      reg_type    => 'S',
+    },
+    { pconfig_key => 'cpuarch',
+      pasm_key    => 7,
+      desc        => 'CPU Arch Family',
+      reg_type    => 'S',
+    },
+);
 
-
-pasm_output_is( <<'CODE', $PConfig{intvalsize}, "sysinfo integer size" );
-   sysinfo_i_ic I1, 1
+foreach ( @setup ) {
+    if ( $_->{reg_type} eq 'I' ) {
+        pasm_output_is( <<"CODE", $PConfig{$_->{pconfig_key}}, "sysinfo $_->{desc}" );
+   sysinfo_i_ic I1, $_->{pasm_key}
    print I1
 end
 CODE
-
-# XXX is 'doublesize' the right thing to use?
-pasm_output_is( <<'CODE', $PConfig{doublesize}, "sysinfo float size" );
-   sysinfo_i_ic I1, 2
-   print I1
-end
-CODE
-
-pasm_output_is( <<'CODE', $PConfig{ptrsize}, "sysinfo pointer size" );
-   sysinfo_i_ic I1, 3
-   print I1
-end
-CODE
-
-pasm_output_is( <<'CODE', $PConfig{osname}, "sysinfo osname" );
-   sysinfo_s_ic S1, 4
+    }
+    else {
+        pasm_output_is( <<"CODE", $PConfig{$_->{pconfig_key}}, "sysinfo $_->{desc}" );
+   sysinfo_s_ic S1, $_->{pasm_key}
    print S1
 end
 CODE
+    }
+}
 
 # 5 & 6
 if ( $PConfig{osname} eq 'MSWin32' ) {
@@ -132,16 +150,6 @@ end
 CODE
     }
 }
-
-# 7
-
-pasm_output_is( <<'CODE', $PConfig{cpuarch}, "sysinfo CPU Arch Family" );
-    sysinfo_s_ic S1, 7
-    print S1
-end
-CODE
-
-# 8
 
 SKIP:
 {
