@@ -138,7 +138,7 @@ pir_output_is( <<'CODE', <<'OUT', "tail recursive sub" );
 recur:
    product = product * count
    dec count
-   .return _fact(product, count)
+   .tailcall _fact(product, count)
 .end
 
 CODE

@@ -152,7 +152,7 @@ Executes C<.'next'()>, and returns C<.'value'()>.
 
 .sub 'nextval' :method
     self.'next'()
-    .return self.'value'()
+    .tailcall self.'value'()
 .end
 
 =back

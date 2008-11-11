@@ -191,7 +191,7 @@ Execute the SQL command and return a Pg;Result object.
     con = getattribute self, 'con'
     exec = get_root_global ['parrot';'Pg'], 'PQexec'
     res = exec(con, cmd)
-    .return mk_res(res)
+    .tailcall mk_res(res)
 .end
 
 .include "datatypes.pasm"
@@ -237,7 +237,7 @@ done:
     (n, vals) = mk_struct(values)
     # we don't handle binary
     res = exec(con, cmd, n, nil, vals, nil, nil, 0)
-    .return mk_res(res)
+    .tailcall mk_res(res)
 .end
 
 =item res = con.'prepare'(name, query, nparams)
@@ -255,7 +255,7 @@ Prepare a query for execution with B<execPrepared>
     f = get_root_global ['parrot';'Pg'], 'PQprepare'
     nil = new 'ManagedStruct'
     res = f(con, name, query, nparams, nil)
-    .return mk_res(res)
+    .tailcall mk_res(res)
 .end
 
 =item res = con.'execPrepared'(name, val, ...)
@@ -274,7 +274,7 @@ Execute a prepared query.
     nil = new 'ManagedStruct'
     (n, vals) = mk_struct(values)
     res = f(con, name, n, vals, nil, nil, 0)
-    .return mk_res(res)
+    .tailcall mk_res(res)
 .end
 
 =item $P0 = con.'setNoticeReceiver'(cb, arg)

@@ -70,7 +70,7 @@ pir_output_is( <<'CODE', <<'OUT', "tail recursive callcc" );
    if n <= 1 goto fin
    f = f * n
    dec n
-   .return _fact(f, n)
+   .tailcall _fact(f, n)
 fin:
    .return(f)
 .end
