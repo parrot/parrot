@@ -39,7 +39,7 @@ tree transformations using the Parrot compiler toolkit.
 .sub 'main' :main
     .param pmc args
     $P0 = compreg 'Punie'
-    .return $P0.'command_line'(args)
+    .tailcall $P0.'command_line'(args)
 .end
 
 .include 'src/builtins/builtins.pir'
