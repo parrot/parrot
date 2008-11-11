@@ -96,15 +96,13 @@ static int is_all_hex_digits(ARGIN(const char *s))
 static void Parrot_version(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void usage(ARGMOD(FILE* fp))
+static void usage(ARGMOD(FILE *fp))
         __attribute__nonnull__(1)
-        FUNC_MODIFIES(* fp);
+        FUNC_MODIFIES(*fp);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-
-static int load_pbc, run_pbc, write_pbc, pre_process_only, pasm_file;
 
 /*
 
@@ -117,7 +115,7 @@ Outputs usage error message.
 */
 
 static void
-usage(ARGMOD(FILE* fp))
+usage(ARGMOD(FILE *fp))
 {
     fprintf(fp,
             "parrot -[abcCEfgGhjprStvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
@@ -341,7 +339,9 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
         usage(stderr);
         exit(EXIT_SUCCESS);
     }
-    run_pbc = 1;
+
+    SET_STATE_RUN_PBC(interp);
+    UNSET_STATE_RUN_FROM_FILE(interp);
 
     while ((status = longopt_get(interp, *argc, (const char **)*argv, options,
             &opt)) > 0) {
@@ -435,7 +435,7 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                 fgetc(stdin);
                 break;
             case 'a':
-                pasm_file = 1;
+                SET_STATE_PASM_FILE(interp);
                 break;
             case 'h':
                 help();
@@ -453,10 +453,12 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                 Parrot_version(interp);
                 break;
             case 'r':
-                ++run_pbc;
+                if (STATE_RUN_PBC(interp))
+                    SET_STATE_RUN_FROM_FILE(interp);
+                SET_STATE_RUN_PBC(interp);
                 break;
             case 'c':
-                load_pbc = 1;
+                SET_STATE_LOAD_PBC(interp);
                 break;
             case 'v':
                 IMCC_INFO(interp)->verbose++;
@@ -465,16 +467,18 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                 yydebug = 1;
                 break;
             case 'E':
-                pre_process_only = 1;
+                SET_STATE_PRE_PROCESS(interp);
                 break;
             case 'o':
-                run_pbc = 0;
+                UNSET_STATE_RUN_PBC(interp);
+                UNSET_STATE_RUN_FROM_FILE(interp);
                 interp->output_file = opt.opt_arg;
                 break;
 
             case OPT_PBC_OUTPUT:
-                run_pbc = 0;
-                write_pbc = 1;
+                UNSET_STATE_RUN_PBC(interp);
+                UNSET_STATE_RUN_FROM_FILE(interp);
+                SET_STATE_WRITE_PBC(interp);
                 if (!interp->output_file)
                     interp->output_file = "-";
                 break;
@@ -854,18 +858,18 @@ determine_input_file_type(PARROT_INTERP, ARGIN(const char * const sourcefile))
         const char * const ext = strrchr(sourcefile, '.');
 
         if (ext && (STREQ(ext, ".pbc"))) { /* a PBC file */
-            load_pbc  = 1;
-            write_pbc = 0;
+            SET_STATE_LOAD_PBC(interp);
+            UNSET_STATE_WRITE_PBC(interp);
         }
-        else if (!load_pbc) {
+        else if (!STATE_LOAD_PBC(interp)) {
             if (!(imc_yyin_set(fopen(sourcefile, "r"), yyscanner)))    {
                 IMCC_fatal_standalone(interp, EXCEPTION_EXTERNAL_ERROR,
                                       "Error reading source file %s.\n",
                                       sourcefile);
             }
-            if (ext && STREQ(ext, ".pasm")) {
-                pasm_file = 1;
-            }
+
+            if (ext && STREQ(ext, ".pasm"))
+                SET_STATE_PASM_FILE(interp);
         }
     }
 }
@@ -887,14 +891,14 @@ determine_output_file_type(PARROT_INTERP,
     const char * const ext = strrchr(output_file, '.');
 
     if (ext) {
-        if (STREQ(ext, ".pbc")) {
-            write_pbc = 1;
-        }
+        if (STREQ(ext, ".pbc"))
+            SET_STATE_WRITE_PBC(interp);
         else if (STREQ(ext, PARROT_OBJ_EXT)) {
 #if EXEC_CAPABLE
-            load_pbc  = 1;
-            write_pbc = 0;
-            run_pbc   = 1;
+            SET_STATE_LOAD_PBC(interp);
+            SET_STATE_RUN_PBC(interp);
+            UNSET_STATE_WRITE_PBC(interp);
+            UNSET_STATE_RUN_FROM_FILE(interp);
             *obj_file = 1;
             Parrot_set_run_core(interp, PARROT_EXEC_CORE);
 #else
@@ -920,10 +924,10 @@ compile_to_bytecode(PARROT_INTERP,
                     ARGIN(const char * const sourcefile),
                     ARGIN(const char * const output_file))
 {
-    yyscan_t  yyscanner = IMCC_INFO(interp)->yyscanner;
-    const int per_pbc   = (write_pbc | run_pbc) != 0;
-    const int opt_level = IMCC_INFO(interp)->optimizer_level;
     PackFile *pf;
+    yyscan_t  yyscanner = IMCC_INFO(interp)->yyscanner;
+    const int per_pbc   = (STATE_WRITE_PBC(interp) | STATE_RUN_PBC(interp)) !=0;
+    const int opt_level = IMCC_INFO(interp)->optimizer_level;
 
     /* Shouldn't be more than five, but five extra is cheap */
     char opt_desc[10];
@@ -943,7 +947,8 @@ compile_to_bytecode(PARROT_INTERP,
 
     IMCC_info(interp, 1, "Starting parse...\n");
 
-    IMCC_INFO(interp)->state->pasm_file = pasm_file;
+    IMCC_INFO(interp)->state->pasm_file = STATE_PASM_FILE(interp) ? 1 : 0;
+
     IMCC_TRY(IMCC_INFO(interp)->jump_buf,
              IMCC_INFO(interp)->error_code) {
         if (yyparse(yyscanner, interp))
@@ -1013,7 +1018,7 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
     else
         determine_input_file_type(interp, sourcefile);
 
-    if (pre_process_only) {
+    if (STATE_PRE_PROCESS(interp)) {
         do_pre_process(interp);
         Parrot_destroy(interp);
         yylex_destroy(yyscanner);
@@ -1031,7 +1036,7 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
             IMCC_fatal_standalone(interp, 1, "main: outputfile is sourcefile\n");
     }
 
-    IMCC_INFO(interp)->write_pbc = write_pbc;
+    IMCC_INFO(interp)->write_pbc = STATE_WRITE_PBC(interp) ? 1 : 0;
 
     if (IMCC_INFO(interp)->verbose) {
         IMCC_info(interp, 1, "debug = 0x%x\n", IMCC_INFO(interp)->debug);
@@ -1041,7 +1046,7 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
 
     /* If the input file is Parrot bytecode, then we simply read it
        into a packfile, which Parrot then loads */
-    if (load_pbc) {
+    if (STATE_LOAD_PBC(interp)) {
         PackFile * const pf = Parrot_readbc(interp, sourcefile);
 
         if (!pf)
@@ -1052,7 +1057,7 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
         compile_to_bytecode(interp, sourcefile, output_file);
 
     /* Produce a PBC output file, if one was requested */
-    if (write_pbc) {
+    if (STATE_WRITE_PBC(interp)) {
         if (!output_file) {
             IMCC_fatal_standalone(interp, 1,
                     "main: NULL output_file when trying to write .pbc\n");
@@ -1060,7 +1065,7 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
         imcc_write_pbc(interp, output_file);
 
         /* If necessary, load the file written above */
-        if (run_pbc == 2 && !STREQ(output_file, "-")) {
+        if (STATE_RUN_FROM_FILE(interp) && !STREQ(output_file, "-")) {
             PackFile *pf;
 
             IMCC_info(interp, 1, "Loading %s\n", output_file);
@@ -1068,12 +1073,12 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
             if (!pf)
                 IMCC_fatal_standalone(interp, 1, "Packfile loading failed\n");
             Parrot_loadbc(interp, pf);
-            load_pbc = 1;
+            STATE_LOAD_PBC(interp);
         }
     }
 
     /* Run the bytecode */
-    if (run_pbc)
+    if (STATE_RUN_PBC(interp))
         imcc_run_pbc(interp, obj_file, output_file, argc, argv);
 
     yylex_destroy(yyscanner);

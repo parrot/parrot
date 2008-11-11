@@ -14,11 +14,11 @@
 #ifdef PARROT_HAS_HEADER_SYSEXITS
 #  include <sysexits.h>
 #else
-#  define EX_DATAERR 1
-#  define EX_SOFTWARE 1
-#  define EX_NOINPUT 1
-#  define EX_IOERR 1
-#  define EX_USAGE 1
+#  define EX_DATAERR     1
+#  define EX_SOFTWARE    1
+#  define EX_NOINPUT     1
+#  define EX_IOERR       1
+#  define EX_USAGE       1
 #  define EX_UNAVAILABLE 1
 #endif  /* PARROT_HAS_HEADER_SYSEXITS */
 
@@ -527,6 +527,7 @@ typedef struct _imc_info_t {
     int                   nargs;
     int                   n_comp_units;
     int                   nkeys;
+    int                   compiler_state;         /* see PBC_* flags */
     int                   verbose;
     int                   write_pbc;
     opcode_t              npc;
@@ -534,12 +535,43 @@ typedef struct _imc_info_t {
 
 #define IMCC_INFO(i) (((Parrot_Interp)(i))->imc_info)
 
-#define IMC_TRACE 0
+#define IMC_TRACE      0
 #define IMC_TRACE_HIGH 0
 
+/* main.c */
+#define PBC_LOAD        (1 << 0)
+#define PBC_RUN         (1 << 1)
+#define PBC_WRITE       (1 << 2)
+#define PBC_PRE_PROCESS (1 << 3)
+#define PBC_PASM_FILE   (1 << 4)
+#define PBC_RUN_FILE    (1 << 5)
+
+#define COMPILER_STATE(i) IMCC_INFO(i)->compiler_state
+
+#define STATE_LOAD_PBC(i)      (COMPILER_STATE(i) & PBC_LOAD)
+#define STATE_RUN_PBC(i)       (COMPILER_STATE(i) & PBC_RUN)
+#define STATE_WRITE_PBC(i)     (COMPILER_STATE(i) & PBC_WRITE)
+#define STATE_PRE_PROCESS(i)   (COMPILER_STATE(i) & PBC_PRE_PROCESS)
+#define STATE_PASM_FILE(i)     (COMPILER_STATE(i) & PBC_PASM_FILE)
+#define STATE_RUN_FROM_FILE(i) (COMPILER_STATE(i) & PBC_RUN_FILE)
+
+#define SET_STATE_LOAD_PBC(i)      (COMPILER_STATE(i) |= PBC_LOAD)
+#define SET_STATE_RUN_PBC(i)       (COMPILER_STATE(i) |= PBC_RUN)
+#define SET_STATE_WRITE_PBC(i)     (COMPILER_STATE(i) |= PBC_WRITE)
+#define SET_STATE_PRE_PROCESS(i)   (COMPILER_STATE(i) |= PBC_PRE_PROCESS)
+#define SET_STATE_PASM_FILE(i)     (COMPILER_STATE(i) |= PBC_PASM_FILE)
+#define SET_STATE_RUN_FROM_FILE(i) (COMPILER_STATE(i) |= PBC_RUN_FILE)
+
+#define UNSET_STATE_LOAD_PBC(i)      (COMPILER_STATE(i) &= ~PBC_LOAD)
+#define UNSET_STATE_RUN_PBC(i)       (COMPILER_STATE(i) &= ~PBC_RUN)
+#define UNSET_STATE_WRITE_PBC(i)     (COMPILER_STATE(i) &= ~PBC_WRITE)
+#define UNSET_STATE_PRE_PROCESS(i)   (COMPILER_STATE(i) &= ~PBC_PRE_PROCESS)
+#define UNSET_STATE_PASM_FILE(i)     (COMPILER_STATE(i) &= ~PBC_PASM_FILE)
+#define UNSET_STATE_RUN_FROM_FILE(i) (COMPILER_STATE(i) &= ~PBC_RUN_FILE)
+
 /* imclexer.c */
-PARROT_API FILE* imc_yyin_set(FILE* new_yyin, void *yyscanner);
-PARROT_API FILE* imc_yyin_get(void *yyscanner);
+PARROT_API FILE * imc_yyin_set(FILE *new_yyin, void *yyscanner);
+PARROT_API FILE * imc_yyin_get(void *yyscanner);
 
 
 #endif /* PARROT_IMCC_IMC_H_GUARD */
