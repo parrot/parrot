@@ -25,10 +25,6 @@ warnings.
 
 =over 4
 
-=item * C<type> [post 0.5.2]
-
-See RT #48567.
-
 =item * C<new_from_string> [post 0.5.0]
 
 See RT #47011.
@@ -68,13 +64,6 @@ See RT #58410.
 =head1 Class Features
 
 =over 4
-
-=item * Integer Type IDs [post 0.5.0]
-
-See RT #48024. Instead of C<$P0 = new Integer> or C<$P0 = new .Integer>,
-use the following syntax, which works for both PMCs and objects.
-
-  $P0 = new 'Integer'
 
 =item * PMC union struct [post 0.5.0]
 
