@@ -54,110 +54,113 @@ Tests for basic system information.
 
 
 pasm_output_is( <<'CODE', $PConfig{intvalsize}, "sysinfo integer size" );
-		sysinfo_i_ic I1, 1
-		print I1
-		end
+   sysinfo_i_ic I1, 1
+   print I1
+end
 CODE
 
 # XXX is 'doublesize' the right thing to use?
 pasm_output_is( <<'CODE', $PConfig{doublesize}, "sysinfo float size" );
-		sysinfo_i_ic I1, 2
-		print I1
-		end
+   sysinfo_i_ic I1, 2
+   print I1
+end
 CODE
 
 pasm_output_is( <<'CODE', $PConfig{ptrsize}, "sysinfo pointer size" );
-		sysinfo_i_ic I1, 3
-		print I1
-		end
+   sysinfo_i_ic I1, 3
+   print I1
+end
 CODE
 
 pasm_output_is( <<'CODE', $PConfig{osname}, "sysinfo osname" );
-		sysinfo_s_ic S1, 4
-        print S1
-        end
+   sysinfo_s_ic S1, 4
+   print S1
+end
 CODE
 
 # 5 & 6
-if( $PConfig{osname} eq 'MSWin32' ){
-	# Windows 5 & 6
-	SKIP: {
-		eval{ require Win32; } or
-		    skip "requires package Win32 for these tests", 2;
-		
-		# specifically don't use $Config{osvers}
-		# because it probably was the system perl was compiled on
-		# and we can do much better than that
-		
-		my $osname = Win32::GetOSName();
-		$osname = 'WinXP' if $osname =~ m/^WinXP/;
-		TODO: {
-			local $TODO = "Not Currently Implemented";
-pasm_output_is( <<'CODE', $osname, "sysinfo OS version string" );
-		sysinfo_s_ic S1, 5
-		print S1
-		end
-CODE
-		
-		my($osvername,$major,$minor,$id) = Win32::GetOSVersion();
+if ( $PConfig{osname} eq 'MSWin32' ) {
+    # Windows 5 & 6
+    SKIP:
+    {
+        eval { require Win32; } or
+            skip "requires package Win32 for these tests", 2;
 
-pasm_output_is( <<'CODE', "$major.$minor", "sysinfo OS version number string" );
-		sysinfo_s_ic S1, 6
-		print S1
-		end
-CODE
-		}
-	}
+        # specifically don't use $Config{osvers}
+        # because it probably was the system perl was compiled on
+        # and we can do much better than that
 
-}else{
-	# Other 5 & 6
-
-# XXX I know this is wrong on Win32 but is it correct on any others?
-# XXX also should it be %Config or %PConfig
-TODO: {
-	local $TODO = "Not Currently Implemented";
-	
-pasm_output_is( <<'CODE', $Config{osvers}, "sysinfo OS version string" );
-		sysinfo_s_ic S1, 5
-		print S1
-		end
+        my $osname = Win32::GetOSName();
+        $osname = 'WinXP' if $osname =~ m/^WinXP/;
+        TODO: {
+            local $TODO = "Not Currently Implemented";
+            pasm_output_is( <<'CODE', $osname, "sysinfo OS version string" );
+    sysinfo_s_ic S1, 5
+    print S1
+end
 CODE
 
-pasm_output_is( <<'CODE', $Config{osvers}, "sysinfo OS version number string" );
-		sysinfo_s_ic S1, 6
-		print S1
-		end
-CODE
-	}
+            my ( $osvername, $major, $minor, $id ) = Win32::GetOSVersion();
 
+            pasm_output_is( <<'CODE', "$major.$minor", "sysinfo OS version number string" );
+    sysinfo_s_ic S1, 6
+    print S1
+end
+CODE
+        }
+    }
+}
+else {
+    # Other 5 & 6
+
+    # XXX I know this is wrong on Win32 but is it correct on any others?
+    # XXX also should it be %Config or %PConfig
+    TODO:
+    {
+        local $TODO = "Not Currently Implemented";
+
+        pasm_output_is( <<'CODE', $Config{osvers}, "sysinfo OS version string" );
+    sysinfo_s_ic S1, 5
+    print S1
+end
+CODE
+
+        pasm_output_is( <<'CODE', $Config{osvers}, "sysinfo OS version number string" );
+    sysinfo_s_ic S1, 6
+    print S1
+end
+CODE
+    }
 }
 
 # 7
 
 pasm_output_is( <<'CODE', $PConfig{cpuarch}, "sysinfo CPU Arch Family" );
-		sysinfo_s_ic S1, 7
-		print S1
-		end
+    sysinfo_s_ic S1, 7
+    print S1
+end
 CODE
 
 # 8
 
-SKIP: {
-	skip "Requires a lot of work to find out the correct answer", 1;
-	
-pasm_output_is( <<'CODE', $PConfig{archname}, "sysinfo CPU Model" );
-		sysinfo_s_ic S1, 8
-		print S1
-		end
+SKIP:
+{
+    skip "Requires a lot of work to find out the correct answer", 1;
+
+    pasm_output_is( <<'CODE', $PConfig{archname}, "sysinfo CPU Model" );
+   sysinfo_s_ic S1, 8
+   print S1
+end
 CODE
 }
 
 # 9, 10
 
-SKIP: {
-        skip 'Testing only in some known platforms' => unless $PConfig{osname} eq 'linux';
+SKIP:
+{
+    skip 'Testing only in some known platforms' => unless $PConfig{osname} eq 'linux';
 
-pir_output_like( <<'CODE', '/^-[1-9][0-9]*\n[1-9][0-9]*\n$/', 'INTVAL min and max values');
+    pir_output_like( <<'CODE', '/^-[1-9][0-9]*\n[1-9][0-9]*\n$/', 'INTVAL min and max values');
 .include 'sysinfo.pasm'
 .sub main :main
     $I0 = sysinfo .SYSINFO_PARROT_INTMIN
