@@ -44,11 +44,11 @@ ASCII key.
     init_particle_effect()
 
     # Set up GLUT callbacks
-    .const .Sub draw       = 'draw'
-    .const .Sub idle       = 'idle'
-    .const .Sub reshape    = 'reshape'
-    .const .Sub keyboard   = 'keyboard'
-    .const .Sub visibility = 'visibility'
+    .const 'Sub' draw       = 'draw'
+    .const 'Sub' idle       = 'idle'
+    .const 'Sub' reshape    = 'reshape'
+    .const 'Sub' keyboard   = 'keyboard'
+    .const 'Sub' visibility = 'visibility'
     glutDisplayFunc   (draw)
     glutIdleFunc      (idle)
     glutReshapeFunc   (reshape)
@@ -80,7 +80,7 @@ ASCII key.
     .local pmc call_toolkit_init
     call_toolkit_init = get_global ['NCI'], 'call_toolkit_init'
 
-    .const .Sub glutInit = 'glutInit'
+    .const 'Sub' glutInit = 'glutInit'
     $P0 = call_toolkit_init(glutInit, argv)
     copy argv, $P0
 
@@ -751,7 +751,7 @@ ASCII key.
     # say state
 
     if state == .GLUT_NOT_VISIBLE goto hidden
-    .const .Sub idle = 'idle'
+    .const 'Sub' idle = 'idle'
     glutIdleFunc(idle)
     .return ()
 

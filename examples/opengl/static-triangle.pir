@@ -38,7 +38,7 @@ keyboard handling has been removed.
     .local pmc call_toolkit_init
     call_toolkit_init = get_global ['NCI'], 'call_toolkit_init'
 
-    .const .Sub glutInit = 'glutInit'
+    .const 'Sub' glutInit = 'glutInit'
     argv = call_toolkit_init(glutInit, argv)
 
     # Set display mode, create GLUT window, save window handle
@@ -52,7 +52,7 @@ keyboard handling has been removed.
     set_global 'glut_window', window
 
     # Set up GLUT callbacks
-    .const .Sub draw     = 'draw'
+    .const 'Sub' draw     = 'draw'
     glutDisplayFunc (draw)
 
     # Enter the GLUT main loop
@@ -66,14 +66,14 @@ keyboard handling has been removed.
 
     glBegin(.GL_TRIANGLES)
 
-    glColor3f(1, 0, 0)
-    glVertex3f(-.5, -.5, 0)
+    glColor3d(1,0,0)
+    glVertex3f(-1, -1, 0)
 
-    glColor3f(0, 1, 0)
-    glVertex3f( .5, -.5, 0)
+    glColor3d(0, 1, 0)
+    glVertex3f(1, -1, 0)
 
-    glColor3f(0, 0, 1)
-    glVertex3f(0  ,  .5, 0)
+    glColor3d(0, 0, 1)
+    glVertex3f(0, 1, 0)
 
     glEnd()
 
