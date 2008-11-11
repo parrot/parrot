@@ -186,7 +186,8 @@ CODE
 
 SKIP:
 {
-    skip 'Testing only in some known platforms' => unless $PConfig{osname} eq 'linux';
+    skip 'Testing only in some known platforms', 1
+        unless $PConfig{osname} eq 'linux';
 
     pir_output_like( <<'CODE', '/^-[1-9][0-9]*\n[1-9][0-9]*\n$/', 'INTVAL min and max values');
 .include 'sysinfo.pasm'
