@@ -8,11 +8,12 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
-use Test::More import => [ '$TODO' ];
+use Test::More;
+use Config;
+
 use Parrot::Test tests => 9;
 use Parrot::Config;
 
-use Config;
 
 =head1 NAME
 
