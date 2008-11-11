@@ -96,7 +96,7 @@ Return the special ID used to request the PHP logo in phpinfo screens
     wrong_param_count()
     .RETURN_NULL()
   L1:
-    .return logo_guid()
+    .tailcall logo_guid()
 .end
 
 =item C<string php_real_logo_guid(void)>
@@ -154,7 +154,7 @@ STILL INCOMPLETE (see get_uname).
     if $I0 goto L1
     .RETURN_NULL()
   L1:
-    .return get_uname(mode)
+    .tailcall get_uname(mode)
 .end
 
 =item C<void phpcredits([int flag])>

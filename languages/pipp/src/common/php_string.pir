@@ -85,9 +85,9 @@ php_string.pir - PHP string Standard Library
     unless argc > 1 goto L3
     $P2 = shift args
     $S2 = $P2
-    .return _trim($S1, $S2, .mode)
+    .tailcall _trim($S1, $S2, .mode)
   L3:
-    .return _trim($S1, " \n\r\t\v\0", .mode)
+    .tailcall _trim($S1, " \n\r\t\v\0", .mode)
 .endm
 
 =item C<string addcslashes(string str, string charlist)>
@@ -303,7 +303,7 @@ An alias for implode
 
 .sub 'join'
     .param pmc args :slurpy
-    .return implode(args :flat)
+    .tailcall implode(args :flat)
 .end
 
 =item C<array localeconv(void)>
@@ -599,7 +599,7 @@ An alias for strstr
 
 .sub 'strchr'
     .param pmc args :slurpy
-    .return strstr(args :flat)
+    .tailcall strstr(args :flat)
 .end
 
 =item C<int strcoll(string str1, string str2)>

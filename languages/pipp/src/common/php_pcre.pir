@@ -278,7 +278,7 @@ NOT IMPLEMENTED.
     unless null pce goto L2
     .RETURN_FALSE()
   L2:
-    .return preg_grep_impl(pce, input, flags)
+    .tailcall preg_grep_impl(pce, input, flags)
 .end
 
 .sub 'preg_grep_impl' :anon
@@ -336,7 +336,7 @@ STILL INCOMPLETE (see pcre_match_impl).
     unless $I0 >= 4 goto L3
     use_flags = 1
   L3:
-    .return pcre_match_impl(pce, subject, subpats, 0, use_flags, flags, start_offset)
+    .tailcall pcre_match_impl(pce, subject, subpats, 0, use_flags, flags, start_offset)
 .end
 
 .sub 'pcre_match_impl' :anon
@@ -389,7 +389,7 @@ STILL INCOMPLETE (see pcre_match_impl).
     unless $I0 >= 4 goto L3
     use_flags = 1
   L3:
-    .return pcre_match_impl(pce, subject, subpats, 1, use_flags, flags, start_offset)
+    .tailcall pcre_match_impl(pce, subject, subpats, 1, use_flags, flags, start_offset)
 .end
 
 =item C<string preg_quote(string str [, string delim_char])>
@@ -486,7 +486,7 @@ NOT IMPLEMENTED.
     unless null pce goto L2
     .RETURN_FALSE()
   L2:
-    .return pcre_split_impl(pce, subject, limit, flags)
+    .tailcall pcre_split_impl(pce, subject, limit, flags)
 .end
 
 .sub 'pcre_split_impl' :anon
