@@ -677,7 +677,7 @@ done:
 
 .sub unicode:"monadic:\u2374" :multi (APLVector) # shape
     .param pmc op1
-    .return op1.'get_shape'()
+    .tailcall op1.'get_shape'()
 .end
 
 .sub unicode:"dyadic:\u2374" :multi (APLVector,APLVector) # reshape
