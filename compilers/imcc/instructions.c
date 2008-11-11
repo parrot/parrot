@@ -35,14 +35,6 @@ These functions operate over this array and its contents.
 
 */
 
-/* Global variables , forward def */
-
-#if 0
-static Instruction * last_ins;
-
-int n_comp_units;
-#endif
-
 /* HEADERIZER HFILE: compilers/imcc/instructions.h */
 
 /* HEADERIZER BEGIN: static */
