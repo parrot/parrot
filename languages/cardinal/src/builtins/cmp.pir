@@ -28,7 +28,7 @@ Swiped from Rakudo.
     .param pmc a
     .param pmc b
     $I0 = iseq a, b
-    .return 'prefix:?'($I0)
+    .tailcall 'prefix:?'($I0)
 .end
 
 .sub 'infix:==' :multi(Bool,Bool)
@@ -43,21 +43,21 @@ Swiped from Rakudo.
     .param pmc a
     .param pmc b
     $I0 = iseq a, b
-    .return 'prefix:?'($I0)
+    .tailcall 'prefix:?'($I0)
 .end
 
 .sub 'infix:==' :multi(NilClass,_)
     .param pmc a
     .param pmc b
     $I0 = iseq a, b
-    .return 'prefix:?'($I0)
+    .tailcall 'prefix:?'($I0)
 .end
 
 .sub 'infix:==' :multi(_,NilClass)
     .param pmc a
     .param pmc b
     $I0 = iseq a, b
-    .return 'prefix:?'($I0)
+    .tailcall 'prefix:?'($I0)
 .end
 
 .sub 'infix:==' :multi(CardinalArray,CardinalArray)
@@ -76,9 +76,9 @@ Swiped from Rakudo.
     inc i
     if $I0 goto loop
   fail:
-    .return 'prefix:?'(0)
+    .tailcall 'prefix:?'(0)
   success:
-    .return 'prefix:?'(1)
+    .tailcall 'prefix:?'(1)
 .end
 
 
@@ -87,7 +87,7 @@ Swiped from Rakudo.
     .param pmc b
     $I0 = 'infix:=='(a, b)
     $I0 = not $I0
-    .return 'prefix:?'($I0)
+    .tailcall 'prefix:?'($I0)
 .end
 
 
@@ -95,7 +95,7 @@ Swiped from Rakudo.
     .param pmc a
     .param pmc b
     $I0 = islt a, b
-    .return 'prefix:?'($I0)
+    .tailcall 'prefix:?'($I0)
 .end
 
 
@@ -103,7 +103,7 @@ Swiped from Rakudo.
     .param pmc a
     .param pmc b
     $I0 = isle a, b
-    .return 'prefix:?'($I0)
+    .tailcall 'prefix:?'($I0)
 .end
 
 
@@ -111,7 +111,7 @@ Swiped from Rakudo.
     .param pmc a
     .param pmc b
     $I0 = isgt a, b
-    .return 'prefix:?'($I0)
+    .tailcall 'prefix:?'($I0)
 .end
 
 
@@ -119,7 +119,7 @@ Swiped from Rakudo.
     .param pmc a
     .param pmc b
     $I0 = isge a, b
-    .return 'prefix:?'($I0)
+    .tailcall 'prefix:?'($I0)
 .end
 
 
@@ -133,7 +133,7 @@ Swiped from Rakudo.
 .sub 'infix:=~'
     .param pmc topic
     .param pmc x
-    .return x(topic)
+    .tailcall x(topic)
 .end
 
 .sub 'infix:!~'

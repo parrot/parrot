@@ -204,49 +204,49 @@ just return a clone of the CardinalRange.
  Return first element in CardinalRange. Will later be refactored as part of the Enumerable module.
 =cut
 .sub 'min' :method
-    .return self.'from'()
+    .tailcall self.'from'()
 .end
 
 =item
  Return first element in CardinalRange.
 =cut
 .sub 'begin' :method
-    .return self.'from'()
+    .tailcall self.'from'()
 .end
 
 =item
  Return first element in CardinalRange.
 =cut
 .sub 'first' :method
-    .return self.'from'()
+    .tailcall self.'from'()
 .end
 
 .sub 'minmax' :method
     $P0 = self.'from'()
     $P1 = self.'to'()
     $P2 = get_hll_global 'list'
-    .return $P2($P0, $P1)
+    .tailcall $P2($P0, $P1)
 .end
 
 =item
  Return last element in CardinalRange. Will later be refactored as part of the Enumerable module.
 =cut
 .sub 'max' :method
-    .return self.'to'()
+    .tailcall self.'to'()
 .end
 
 =item
  Return last element in CardinalRange.
 =cut
 .sub 'last' :method
-    .return self.'to'()
+    .tailcall self.'to'()
 .end
 
 =item
  Return last element in CardinalRange.
 =cut
 .sub 'end' :method
-    .return self.'to'()
+    .tailcall self.'to'()
 .end
 
 =item

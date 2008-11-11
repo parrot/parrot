@@ -185,7 +185,7 @@ Defines the .true method on all objects via C<prefix:?>.
 =cut
 
 .sub 'true' :method
- .return 'prefix:?'(self)
+ .tailcall 'prefix:?'(self)
 .end
 
 =item get_bool(vtable)
@@ -209,12 +209,12 @@ Print the object
 
 .sub 'print' :method
     $P0 = get_hll_global 'print'
-    .return $P0(self)
+    .tailcall $P0(self)
 .end
 
 .sub 'puts' :method
     $P0 = get_hll_global 'puts'
-    .return $P0(self)
+    .tailcall $P0(self)
 .end
 
 =item to_s()
@@ -241,7 +241,7 @@ This is the same a to_s by default unless overriden
 
 .sub 'puts' :method
     $P0 = get_hll_global 'puts'
-    .return $P0(self)
+    .tailcall $P0(self)
 .end
 
 =item !cloneattr(attrlist)
@@ -302,7 +302,7 @@ Get a list of all methods in the object.
 .end
 
 .sub 'class' :method
-    .return self.'WHAT'()
+    .tailcall self.'WHAT'()
 .end
 
 .sub 'defined' :method

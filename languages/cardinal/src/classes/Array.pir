@@ -180,7 +180,7 @@ Return the class name
 =cut
 
 .sub 'class' :method
-    .return self.'WHAT'()
+    .tailcall self.'WHAT'()
 .end
 
 =item sort()
@@ -214,7 +214,7 @@ Return a sorted copy of the list
     goto fpa_loop
   fpa_end:
     fpa.'sort'(by)
-    .return 'list'(fpa :flat)
+    .tailcall 'list'(fpa :flat)
 .end
 
 .sub 'sort!' :method
@@ -660,7 +660,7 @@ Checks to see if the specified index or indices have been assigned to.  Returns 
     goto loop
 
   done:
-    .return 'prefix:?'(test)
+    .tailcall 'prefix:?'(test)
 .end
 
 =item kv()
@@ -1097,7 +1097,7 @@ Operator form for building a list from its arguments.
 
 .sub 'infix:,'
     .param pmc args            :slurpy
-    .return 'list'(args :flat)
+    .tailcall 'list'(args :flat)
 .end
 
 
@@ -1382,53 +1382,53 @@ Returns the elements of LIST in the opposite order.
 .sub keys :multi('CardinalArray')
   .param pmc list
 
-  .return list.'keys'()
+  .tailcall list.'keys'()
 .end
 
 .sub values :multi('CardinalArray')
   .param pmc list
 
-  .return list.'values'()
+  .tailcall list.'values'()
 .end
 
 .sub delete :multi('CardinalArray')
   .param pmc list
   .param pmc indices :slurpy
 
-  .return list.'delete'(indices :flat)
+  .tailcall list.'delete'(indices :flat)
 .end
 
 .sub exists :multi('CardinalArray')
   .param pmc list
   .param pmc indices :slurpy
 
-  .return list.'exists'(indices :flat)
+  .tailcall list.'exists'(indices :flat)
 .end
 
 .sub kv :multi('CardinalArray')
     .param pmc list
 
-    .return list.'kv'()
+    .tailcall list.'kv'()
 .end
 
 .sub pairs :multi('CardinalArray')
     .param pmc list
 
-    .return list.'pairs'()
+    .tailcall list.'pairs'()
 .end
 
 .sub grep :multi(_,'CardinalArray')
     .param pmc test
     .param pmc list :slurpy
 
-    .return list.'grep'(test)
+    .tailcall list.'grep'(test)
 .end
 
 .sub first :multi(_,'CardinalArray')
     .param pmc test
     .param pmc list :slurpy
 
-    .return list.'first'(test)
+    .tailcall list.'first'(test)
 .end
 
 .sub 'infix:<<' :multi('CardinalArray',_)

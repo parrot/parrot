@@ -171,7 +171,7 @@ Returns true if he object is defined, false otherwise
 .end
 
 .sub 'day' :method
-   .return self.'mday'()
+   .tailcall self.'mday'()
 .end
 
 .sub 'mday' :method

@@ -31,7 +31,7 @@ CardinalInteger - Cardinal integers
 
 .sub 'ACCEPTS' :method
     .param num topic
-    .return 'infix:=='(topic, self)
+    .tailcall 'infix:=='(topic, self)
 .end
 
 

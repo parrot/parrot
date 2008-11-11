@@ -68,19 +68,19 @@ Returns true if the object is defined, false otherwise
 .sub 'print' :method
     .param pmc args     :slurpy
     $P0 = get_hll_global 'print'
-    .return $P0(self)
+    .tailcall $P0(self)
 .end
 
 .sub 'puts' :method
     .param pmc args     :slurpy
     $P0 = get_hll_global 'puts'
-    .return $P0(args :flat)
+    .tailcall $P0(args :flat)
 .end
 
 .sub 'readline' :method
     .param pmc args     :slurpy
     $P0 = get_hll_global 'readline'
-    .return $P0(args)
+    .tailcall $P0(args)
 .end
 
 .sub 'printf' :method
@@ -89,7 +89,7 @@ Returns true if the object is defined, false otherwise
     $P0 = get_hll_global 'print'
     $P99 = get_hll_global ['Kernel'], '!CARDINALMETA'
     $P1 = $P99.'sprintf'(fmt, args :flat)
-    .return $P0($P1)
+    .tailcall $P0($P1)
 .end
 
 .sub 'sprintf' :method

@@ -236,7 +236,7 @@ otherwise.
 .sub kv :multi('Hash')
     .param pmc hash
 
-    .return hash.'kv'()
+    .tailcall hash.'kv'()
 .end
 
 
