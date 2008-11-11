@@ -510,6 +510,7 @@ typedef struct _imc_info_t {
     int                   cur_pmc_type;
     int                   debug;
     int                   dont_optimize;
+    int                   emitter;
     int                   error_code;      /* The Error code. */
     int                   expect_pasm;
     int                   gc_off;

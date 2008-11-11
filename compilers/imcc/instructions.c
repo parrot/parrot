@@ -80,8 +80,6 @@ static const Emitter emitters[] = {
      e_pbc_close},
 };
 
-static int emitter;     /* XXX */
-
 /*
 
 =item C<Instruction * _mk_instruction>
@@ -847,11 +845,11 @@ PARROT_API
 int
 emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(void *param))
 {
-    emitter                          = type;
+    IMCC_INFO(interp)->emitter       = type;
     IMCC_INFO(interp)->has_compile   = 0;
     IMCC_INFO(interp)->dont_optimize = 0;
 
-    return (emitters[emitter]).open(interp, param);
+    return (emitters[IMCC_INFO(interp)->emitter]).open(interp, param);
 }
 
 /*
@@ -869,7 +867,8 @@ PARROT_API
 int
 emit_flush(PARROT_INTERP, ARGIN_NULLOK(void *param), ARGIN(IMC_Unit *unit))
 {
-    Instruction * ins;
+    Instruction *ins;
+    int          emitter = IMCC_INFO(interp)->emitter;
 
     if (emitters[emitter].new_sub)
         (emitters[emitter]).new_sub(interp, param, unit);
@@ -899,7 +898,7 @@ PARROT_API
 int
 emit_close(PARROT_INTERP, ARGIN_NULLOK(void *param))
 {
-    return (emitters[emitter]).close(interp, param);
+    return (emitters[IMCC_INFO(interp)->emitter]).close(interp, param);
 }
 
 /*
