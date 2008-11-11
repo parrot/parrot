@@ -668,8 +668,7 @@ Return the POST representation of a C<PAST::Block>.
 
     ##  determine name and namespace
     name = self.'escape'(name)
-    $I0 = defined ns
-    unless $I0 goto have_ns_key
+    unless ns goto have_ns_key
     $P0 = get_global '%!codestring'
     ns = $P0.'key'(ns)
   have_ns_key:
