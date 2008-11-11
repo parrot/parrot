@@ -176,7 +176,7 @@ doit:
     ## changed magically behind our backs by a subsequent yield/resume, so
     ## we can't just return directly.
     cc = getattribute self, 'yield_cont'
-    .return cc(result :flat)
+    .tailcall cc(result :flat)
 
 dead:
     ## Complain about attempted zombie creation.
@@ -207,7 +207,7 @@ passed to C<resume> are returned as the values from C<yield>.
 
     ## Return to the coro caller.
     cc = getattribute self, 'yield_cont'
-    .return cc(args :flat)
+    .tailcall cc(args :flat)
 .end
 
 =head1 BUGS

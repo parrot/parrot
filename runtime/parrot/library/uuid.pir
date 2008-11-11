@@ -160,7 +160,7 @@ CURRENTLY, UNUSABLE. NEED A SOURCE OF ENTROPY.
 =cut
 
 .sub 'generate'
-    .return 'generate_random'()
+    .tailcall 'generate_random'()
 .end
 
 

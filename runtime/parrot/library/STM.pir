@@ -126,7 +126,7 @@ do_return:
     the_cont = interpinfo .INTERPINFO_CURRENT_CONT
     ends = global 'ends'
     push ends, the_cont
-    .return closure(args :flat)
+    .tailcall closure(args :flat)
 .end
 
 .sub _end_tx

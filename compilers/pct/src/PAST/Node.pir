@@ -57,7 +57,7 @@ Accessor method -- sets/returns the return type for the invocant.
 .sub 'returns' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('returns', value, has_value)
+    .tailcall self.'attr'('returns', value, has_value)
 .end
 
 
@@ -71,7 +71,7 @@ for the node.
 .sub 'arity' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('arity', value, has_value)
+    .tailcall self.'attr'('arity', value, has_value)
 .end
 
 
@@ -85,7 +85,7 @@ associated with the argument.
 .sub 'named' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('named', value, has_value)
+    .tailcall self.'attr'('named', value, has_value)
 .end
 
 
@@ -98,7 +98,7 @@ Accessor method -- sets/returns the "flatten" flag on arguments.
 .sub 'flat' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('flat', value, has_value)
+    .tailcall self.'attr'('flat', value, has_value)
 .end
 
 
@@ -123,7 +123,7 @@ Get/set the constant value for this node.
 .sub 'value' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('value', value, has_value)
+    .tailcall self.'attr'('value', value, has_value)
 .end
 
 =back
@@ -151,7 +151,7 @@ members and (optionally named) Parrot registers respectively.
 .sub 'scope' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('scope', value, has_value)
+    .tailcall self.'attr'('scope', value, has_value)
 .end
 
 
@@ -167,7 +167,7 @@ Otherwise, the node refers to a lexical variable from an outer scope.
 .sub 'isdecl' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('isdecl', value, has_value)
+    .tailcall self.'attr'('isdecl', value, has_value)
 .end
 
 
@@ -181,7 +181,7 @@ variable is being used in an lvalue context.
 .sub 'lvalue' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('lvalue', value, has_value)
+    .tailcall self.'attr'('lvalue', value, has_value)
 .end
 
 
@@ -196,7 +196,7 @@ of 'package'.
 .sub 'namespace' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('namespace', value, has_value)
+    .tailcall self.'attr'('namespace', value, has_value)
 .end
 
 
@@ -212,7 +212,7 @@ passed in).
 .sub 'slurpy' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('slurpy', value, has_value)
+    .tailcall self.'attr'('slurpy', value, has_value)
 .end
 
 
@@ -227,7 +227,7 @@ implementation) a PAST tree to create the value.
 .sub 'viviself' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('viviself', value, has_value)
+    .tailcall self.'attr'('viviself', value, has_value)
 .end
 
 
@@ -242,7 +242,7 @@ attribute.
 .sub 'vivibase' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('vivibase', value, has_value)
+    .tailcall self.'attr'('vivibase', value, has_value)
 .end
 
 
@@ -325,7 +325,7 @@ assumes "call".
 .sub 'pasttype' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('pasttype', value, has_value)
+    .tailcall self.'attr'('pasttype', value, has_value)
 .end
 
 
@@ -344,7 +344,7 @@ PIR opcodes that PAST "knows" about is in F<POST.pir>.
 .sub 'pirop' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('pirop', value, has_value)
+    .tailcall self.'attr'('pirop', value, has_value)
 .end
 
 
@@ -358,7 +358,7 @@ child as an lvalue (e.g., for assignment).
 .sub 'lvalue' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('lvalue', value, has_value)
+    .tailcall self.'attr'('lvalue', value, has_value)
 .end
 
 =item inline([STRING code])
@@ -388,7 +388,7 @@ given by "%r", "%t", or "%u" in the C<code> string:
 .sub 'inline' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('inline', value, has_value)
+    .tailcall self.'attr'('inline', value, has_value)
 .end
 
 
@@ -453,7 +453,7 @@ blocks in Perl6 C<if>, C<while>, and other similar statements).
 .sub 'blocktype' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('blocktype', value, has_value)
+    .tailcall self.'attr'('blocktype', value, has_value)
 .end
 
 
@@ -468,7 +468,7 @@ value "return_pir" generates code to handle C<CONTROL_RETURN> exceptions.
 .sub 'control' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('control', value, has_value)
+    .tailcall self.'attr'('control', value, has_value)
 .end
 
 
@@ -497,7 +497,7 @@ storing in a symbol table, etc.).
     value = $P0.'new'()
     has_value = 1
   getset_value:
-    .return self.'attr'('loadinit', value, has_value)
+    .tailcall self.'attr'('loadinit', value, has_value)
 .end
 
 
@@ -511,7 +511,7 @@ can be either a string or an array of strings.
 .sub 'namespace' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('namespace', value, has_value)
+    .tailcall self.'attr'('namespace', value, has_value)
 .end
 
 
@@ -563,7 +563,7 @@ to rely on this behavior in the future.
 
 .sub 'symbol_defaults' :method
     .param pmc attr            :slurpy :named
-    .return self.'symbol'('', attr :flat :named)
+    .tailcall self.'symbol'('', attr :flat :named)
 .end
 
 
@@ -577,7 +577,7 @@ favor of the C<symbol> method above.
 .sub 'symtable' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('symtable', value, has_value)
+    .tailcall self.'attr'('symtable', value, has_value)
 .end
 
 
@@ -593,7 +593,7 @@ scope for any nested blocks within it.
 .sub 'lexical' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('lexical', value, has_value, 1)
+    .tailcall self.'attr'('lexical', value, has_value, 1)
 .end
 
 
@@ -608,7 +608,7 @@ PAST compiler.
 .sub 'compiler' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('compiler', value, has_value)
+    .tailcall self.'attr'('compiler', value, has_value)
 .end
 
 =item compiler_args()
@@ -623,7 +623,7 @@ not set.
     .param pmc value           :named :slurpy
     .local int have_value
     have_value = elements value
-    .return self.'attr'('compiler_args', value, have_value)
+    .tailcall self.'attr'('compiler_args', value, have_value)
 .end
 
 =item pirflags([pirflags])
@@ -635,7 +635,7 @@ Get/set any pirflags for this block.
 .sub 'pirflags' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('pirflags', value, has_value)
+    .tailcall self.'attr'('pirflags', value, has_value)
 .end
 
 
@@ -644,7 +644,7 @@ Get/set any pirflags for this block.
 .sub 'bindvalue' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('bindvalue', value, has_value)
+    .tailcall self.'attr'('bindvalue', value, has_value)
 .end
 
 

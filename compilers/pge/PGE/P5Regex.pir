@@ -36,7 +36,7 @@
     pad = new 'Hash'
     pad['subpats'] = 0
     exp = exp.'p5analyze'(pad)
-    .return exp.'compile'(adverbs :flat :named)
+    .tailcall exp.'compile'(adverbs :flat :named)
 .end
 
 

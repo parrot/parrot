@@ -79,7 +79,7 @@ Force a backtrack.  (Taken from A05.)
 
 .sub "fail" :method
     $P0 = get_hll_global ['PGE'], 'Match'
-    .return $P0.'new'(self)
+    .tailcall $P0.'new'(self)
 .end
 
 
@@ -90,7 +90,7 @@ Match a single uppercase character.
 =cut
 
 .sub 'upper' :method
-    .return '!cclass'(self, .CCLASS_UPPERCASE)
+    .tailcall '!cclass'(self, .CCLASS_UPPERCASE)
 .end
 
 
@@ -101,7 +101,7 @@ Match a single lowercase character.
 =cut
 
 .sub "lower" :method
-    .return '!cclass'(self, .CCLASS_LOWERCASE)
+    .tailcall '!cclass'(self, .CCLASS_LOWERCASE)
 .end
 
 
@@ -112,7 +112,7 @@ Match a single alphabetic character.
 =cut
 
 .sub "alpha" :method
-    .return '!cclass'(self, .CCLASS_ALPHABETIC)
+    .tailcall '!cclass'(self, .CCLASS_ALPHABETIC)
 .end
 
 =item C<digit()>
@@ -122,7 +122,7 @@ Match a single digit.
 =cut
 
 .sub "digit" :method
-    .return '!cclass'(self, .CCLASS_NUMERIC)
+    .tailcall '!cclass'(self, .CCLASS_NUMERIC)
 .end
 
 =item C<xdigit()>
@@ -132,7 +132,7 @@ Match a single alphanumeric character.
 =cut
 
 .sub "xdigit" :method
-    .return '!cclass'(self, .CCLASS_HEXADECIMAL)
+    .tailcall '!cclass'(self, .CCLASS_HEXADECIMAL)
 .end
 
 =item C<space()>
@@ -142,7 +142,7 @@ Match a single whitespace character.
 =cut
 
 .sub "space" :method
-    .return '!cclass'(self, .CCLASS_WHITESPACE)
+    .tailcall '!cclass'(self, .CCLASS_WHITESPACE)
 .end
 
 =item C<print()>
@@ -152,7 +152,7 @@ Match a single printable character.
 =cut
 
 .sub "print" :method
-    .return '!cclass'(self, .CCLASS_PRINTING)
+    .tailcall '!cclass'(self, .CCLASS_PRINTING)
 .end
 
 =item C<graph()>
@@ -162,7 +162,7 @@ Match a single "graphical" character.
 =cut
 
 .sub "graph" :method
-    .return '!cclass'(self, .CCLASS_GRAPHICAL)
+    .tailcall '!cclass'(self, .CCLASS_GRAPHICAL)
 .end
 
 =item C<blank()>
@@ -172,7 +172,7 @@ Match a single "blank" character.
 =cut
 
 .sub "blank" :method
-    .return '!cclass'(self, .CCLASS_BLANK)
+    .tailcall '!cclass'(self, .CCLASS_BLANK)
 .end
 
 =item C<cntrl()>
@@ -182,7 +182,7 @@ Match a single "control" character.
 =cut
 
 .sub "cntrl" :method
-    .return '!cclass'(self, .CCLASS_CONTROL)
+    .tailcall '!cclass'(self, .CCLASS_CONTROL)
 .end
 
 =item C<punct()>
@@ -192,7 +192,7 @@ Match a single punctuation character.
 =cut
 
 .sub "punct" :method
-    .return '!cclass'(self, .CCLASS_PUNCTUATION)
+    .tailcall '!cclass'(self, .CCLASS_PUNCTUATION)
 .end
 
 =item C<alnum()>
@@ -202,7 +202,7 @@ Match a single alphanumeric character.
 =cut
 
 .sub "alnum" :method
-    .return '!cclass'(self, .CCLASS_ALPHANUMERIC)
+    .tailcall '!cclass'(self, .CCLASS_ALPHANUMERIC)
 .end
 
 =item C<sp()>
@@ -212,7 +212,7 @@ Match a single space character.  (Taken from E05.)
 =cut
 
 .sub "sp" :method
-    .return '!literal'(self, ' ')
+    .tailcall '!literal'(self, ' ')
 .end
 
 =item C<lt()>
@@ -222,7 +222,7 @@ Match a single left angle bracket.  (Taken from E05.)
 =cut
 
 .sub "lt" :method
-    .return '!literal'(self, '<')
+    .tailcall '!literal'(self, '<')
 .end
 
 =item C<gt()>
@@ -232,7 +232,7 @@ Match a single right angle bracket. (Taken from E05.)
 =cut
 
 .sub "gt" :method
-    .return '!literal'(self, '>')
+    .tailcall '!literal'(self, '>')
 .end
 
 =item C<dot()>
@@ -242,7 +242,7 @@ Match a single dot ('.').  (Taken from E05.)
 =cut
 
 .sub "dot" :method
-    .return '!literal'(self, '.')
+    .tailcall '!literal'(self, '.')
 .end
 
 =item C<ws()>

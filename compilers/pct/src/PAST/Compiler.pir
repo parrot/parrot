@@ -125,7 +125,7 @@ Compile the abstract syntax tree given by C<past> into POST.
   have_blockpast:
     null $P0
     set_global '$?SUB', $P0                                # see RT#49758
-    .return self.'as_post'(past, 'rtype'=>'v')
+    .tailcall self.'as_post'(past, 'rtype'=>'v')
 .end
 
 =item escape(str)
@@ -181,7 +181,7 @@ is one of the signature flags described above.
     reg = substr 'SSSNNNII', $I0, 1
   reg_psin:
     reg = concat '$', reg
-    .return self.'unique'(reg)
+    .tailcall self.'unique'(reg)
   reg_void:
     .return ('')
   err_nortype:
@@ -452,7 +452,7 @@ Return an empty POST node that can be used to hold a (PMC) result.
     .local string result
     $P0 = get_hll_global ['POST'], 'Ops'
     result = self.'uniquereg'('P')
-    .return $P0.'new'('result'=>result)
+    .tailcall $P0.'new'('result'=>result)
 .end
 
 =item as_post(String class)
@@ -471,7 +471,7 @@ is typically invoked by the various vivification methods below
     $P0 = get_hll_global ['POST'], 'Op'
     result = self.'uniquereg'('P')
     $S0 = self.'escape'(node)
-    .return $P0.'new'(result, $S0, 'pirop'=>'new', 'result'=>result)
+    .tailcall $P0.'new'(result, $S0, 'pirop'=>'new', 'result'=>result)
 .end
 
 =item as_post(PAST::Node node)
@@ -746,22 +746,22 @@ the node's "pasttype" attribute.
     pasttype = node.'pasttype'()
     unless pasttype goto post_pirop
     $P0 = find_method self, pasttype
-    .return self.$P0(node, options :flat :named)
+    .tailcall self.$P0(node, options :flat :named)
 
   post_pirop:
     .local pmc pirop
     pirop = node.'pirop'()
     unless pirop goto post_inline
-    .return self.'pirop'(node, options :flat :named)
+    .tailcall self.'pirop'(node, options :flat :named)
 
   post_inline:
     .local pmc inline
     inline = node.'inline'()
     unless inline goto post_call
-    .return self.'inline'(node, options :flat :named)
+    .tailcall self.'inline'(node, options :flat :named)
 
   post_call:
-    .return self.'call'(node, options :flat :named)
+    .tailcall self.'call'(node, options :flat :named)
 .end
 
 
@@ -877,7 +877,7 @@ to invoke a method on a PMC.
 .sub 'callmethod' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
-    .return self.'call'(node, options :flat :named)
+    .tailcall self.'call'(node, options :flat :named)
 .end
 
 
@@ -993,7 +993,7 @@ a 'pasttype' of if/unless.
 .sub 'unless' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
-    .return self.'if'(node, options :flat :named)
+    .tailcall self.'if'(node, options :flat :named)
 .end
 
 
@@ -1067,7 +1067,7 @@ Return the POST representation of a C<while> or C<until> loop.
 .sub 'until' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
-    .return self.'while'(node, options :flat :named)
+    .tailcall self.'while'(node, options :flat :named)
 .end
 
 =item repeat_while(PAST::Op node)
@@ -1127,7 +1127,7 @@ Return the POST representation of a C<repeat_while> or C<repeat_until> loop.
 .sub 'repeat_until' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
-    .return self.'repeat_while'(node, options :flat :named)
+    .tailcall self.'repeat_while'(node, options :flat :named)
 .end
 
 
@@ -1664,7 +1664,7 @@ attribute.
   have_scope:
     push_eh scope_error_ex
     $P0 = find_method self, scope
-    .return self.$P0(node, bindpost)
+    .tailcall self.$P0(node, bindpost)
   scope_error_ex:
     pop_eh
   scope_error:
@@ -1672,7 +1672,7 @@ attribute.
     scope = concat " '", scope
     scope = concat scope, "'"
   scope_error_1:
-    .return self.'panic'("Scope", scope, " not found for PAST::Var '", name, "'")
+    .tailcall self.'panic'("Scope", scope, " not found for PAST::Var '", name, "'")
 .end
 
 
@@ -1768,18 +1768,18 @@ attribute.
     if bindpost goto package_bind
     fetchop = $P0.'new'(ops, name, 'pirop'=>'get_global')
     storeop = $P0.'new'(name, ops, 'pirop'=>'set_global')
-    .return self.'vivify'(node, ops, fetchop, storeop)
+    .tailcall self.'vivify'(node, ops, fetchop, storeop)
   package_bind:
-    .return $P0.'new'(name, bindpost, 'pirop'=>'set_global', 'result'=>bindpost)
+    .tailcall $P0.'new'(name, bindpost, 'pirop'=>'set_global', 'result'=>bindpost)
 
   package_hll:
     if ns goto package_ns
     if bindpost goto package_hll_bind
     fetchop = $P0.'new'(ops, name, 'pirop'=>'get_hll_global')
     storeop = $P0.'new'(name, ops, 'pirop'=>'set_hll_global')
-    .return self.'vivify'(node, ops, fetchop, storeop)
+    .tailcall self.'vivify'(node, ops, fetchop, storeop)
   package_hll_bind:
-    .return $P0.'new'(name, bindpost, 'pirop'=>'set_hll_global', 'result'=>bindpost)
+    .tailcall $P0.'new'(name, bindpost, 'pirop'=>'set_hll_global', 'result'=>bindpost)
 
   package_ns:
     $P1 = new 'CodeString'
@@ -1787,9 +1787,9 @@ attribute.
     if bindpost goto package_ns_bind
     fetchop = $P0.'new'(ops, ns, name, 'pirop'=>'get_hll_global')
     storeop = $P0.'new'(ns, name, ops, 'pirop'=>'set_hll_global')
-    .return self.'vivify'(node, ops, fetchop, storeop)
+    .tailcall self.'vivify'(node, ops, fetchop, storeop)
   package_ns_bind:
-    .return $P0.'new'(ns, name, bindpost, 'pirop'=>'set_hll_global', 'result'=>bindpost)
+    .tailcall $P0.'new'(ns, name, bindpost, 'pirop'=>'set_hll_global', 'result'=>bindpost)
 .end
 
 
@@ -1814,7 +1814,7 @@ attribute.
     $P0 = get_hll_global ['POST'], 'Op'
     fetchop = $P0.'new'(ops, name, 'pirop'=>'find_lex')
     storeop = $P0.'new'(name, ops, 'pirop'=>'store_lex')
-    .return self.'vivify'(node, ops, fetchop, storeop)
+    .tailcall self.'vivify'(node, ops, fetchop, storeop)
 
   lexical_decl:
     ops = $P0.'new'('node'=>node)
@@ -1829,9 +1829,9 @@ attribute.
   lexical_bind:
     $P0 = get_hll_global ['POST'], 'Op'
     if isdecl goto lexical_bind_decl
-    .return $P0.'new'(name, bindpost, 'pirop'=>'store_lex', 'result'=>bindpost)
+    .tailcall $P0.'new'(name, bindpost, 'pirop'=>'store_lex', 'result'=>bindpost)
   lexical_bind_decl:
-    .return $P0.'new'(name, bindpost, 'pirop'=>'.lex', 'result'=>bindpost)
+    .tailcall $P0.'new'(name, bindpost, 'pirop'=>'.lex', 'result'=>bindpost)
 .end
 
 
@@ -1888,7 +1888,7 @@ attribute.
     if bindpost goto keyed_bind
     fetchop = $P0.'new'(ops, name, 'pirop'=>'set')
     storeop = $P0.'new'(name, ops, 'pirop'=>'set')
-    .return self.'vivify'(node, ops, fetchop, storeop)
+    .tailcall self.'vivify'(node, ops, fetchop, storeop)
   keyed_bind:
     ops.'result'(bindpost)
     ops.'push_pirop'('set', name, ops)
@@ -1899,7 +1899,7 @@ attribute.
 .sub 'keyed_int' :method :multi(_, ['PAST';'Var'])
     .param pmc node
     .param pmc bindpost
-    .return self.'keyed'(node, bindpost, 'i')
+    .tailcall self.'keyed'(node, bindpost, 'i')
 .end
 
 
@@ -1935,17 +1935,17 @@ attribute.
     $P0 = get_hll_global ['POST'], 'Op'
     fetchop = $P0.'new'(ops, call_on, name, 'pirop'=>'getattribute')
     storeop = $P0.'new'(call_on, name, ops, 'pirop'=>'setattribute')
-    .return self.'vivify'(node, ops, fetchop, storeop)
+    .tailcall self.'vivify'(node, ops, fetchop, storeop)
 
   attribute_decl:
-    .return $P0.'new'('node'=>node)
+    .tailcall $P0.'new'('node'=>node)
 
   attribute_bind:
     $P0 = get_hll_global ['POST'], 'Op'
     if isdecl goto attribute_bind_decl
-    .return $P0.'new'(call_on, name, bindpost, 'pirop'=>'setattribute', 'result'=>bindpost)
+    .tailcall $P0.'new'(call_on, name, bindpost, 'pirop'=>'setattribute', 'result'=>bindpost)
   attribute_bind_decl:
-    .return $P0.'new'(call_on, name, bindpost, 'pirop'=>'setattribute', 'result'=>bindpost)
+    .tailcall $P0.'new'(call_on, name, bindpost, 'pirop'=>'setattribute', 'result'=>bindpost)
 .end
 
 

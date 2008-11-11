@@ -71,7 +71,7 @@ Both classes support the following methods.
 .sub 'header' :method
     .local pmc plan
     plan = getattribute self, 'plan'
-    .return plan.'header'()
+    .tailcall plan.'header'()
 .end
 
 .sub 'footer' :method
@@ -79,7 +79,7 @@ Both classes support the following methods.
 
     .local pmc plan
     plan = getattribute self, 'plan'
-    .return plan.'footer'( ran )
+    .tailcall plan.'footer'( ran )
 .end
 
 .namespace [ 'Test'; 'Builder'; 'ActivePlan' ]

@@ -38,7 +38,7 @@ If the data is not valid, an exception will be thrown.
     .local pmc JSON, config
     JSON = compreg "JSON"
 
-    .return JSON(text)
+    .tailcall JSON(text)
 .end
 
 =head2 WriteConfig(config, filename, ?:compact)

@@ -94,7 +94,7 @@ the generated pir of C<node>'s children.
 
 .sub 'pir' :method :multi(_,_)
     .param pmc node
-    .return self.'pir_children'(node)
+    .tailcall self.'pir_children'(node)
 .end
 
 
@@ -306,9 +306,9 @@ the sub.
     compiler = compreg $S0
     $I0 = isa compiler, 'Sub'
     if $I0 goto compiler_sub
-    .return compiler.'compile'(source, options :flat :named)
+    .tailcall compiler.'compile'(source, options :flat :named)
   compiler_sub:
-    .return compiler(source, options :flat :named)
+    .tailcall compiler(source, options :flat :named)
 .end
 
 =back

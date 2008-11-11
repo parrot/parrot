@@ -109,7 +109,7 @@ Return the C<P6protoobject> for the invocant.
 .sub 'WHAT' :method
     .local pmc how, what
     how = self.'HOW'()
-    .return how.'WHAT'()
+    .tailcall how.'WHAT'()
 .end
 
 
@@ -481,7 +481,7 @@ of names separated by spaces.
     goto iter_loop
   iter_end:
   attr_done:
-    .return self.'register'(parrotclass, options :named :flat)
+    .tailcall self.'register'(parrotclass, options :named :flat)
 .end
 
 

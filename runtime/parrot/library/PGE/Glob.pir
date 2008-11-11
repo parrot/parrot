@@ -66,7 +66,7 @@ or the resulting PIR code (target='PIR').
     $P0.'result_object'('$')
     exp[$I0] = $P0
 
-    .return exp.'compile'(adverbs :flat :named)
+    .tailcall exp.'compile'(adverbs :flat :named)
 .end
 
 
@@ -77,7 +77,7 @@ or the resulting PIR code (target='PIR').
     load_bytecode 'PGE/Dumper.pbc'
 
     $P0 = compreg 'PGE::Glob'
-    .return $P0.'command_line'(args)
+    .tailcall $P0.'command_line'(args)
 .end
 
 
@@ -371,7 +371,7 @@ Compile C<source> (possibly modified by any provided options).
     #   $!compsub is deprecated
     compsub = getattribute self, '$!compsub'
 
-    .return compsub(source, adverbs :flat :named)
+    .tailcall compsub(source, adverbs :flat :named)
 .end
 
 =back

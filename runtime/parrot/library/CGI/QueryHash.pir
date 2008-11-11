@@ -203,7 +203,7 @@ END:
 .sub hex_to_int
     .param pmc hex
 
-    .return hex.'to_int'(16)
+    .tailcall hex.'to_int'(16)
 .end
 
 =back

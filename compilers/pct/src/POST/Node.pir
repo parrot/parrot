@@ -70,7 +70,7 @@ as the result of the current node.
     if $I0 goto result_node
     .return (value)
   result_node:
-    .return value.'result'()
+    .tailcall value.'result'()
   result_null:
     .return ('')
   set_value:
@@ -143,13 +143,13 @@ Get/set the opcode type for this node.
 .sub 'pirop' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('pirop', value, has_value)
+    .tailcall self.'attr'('pirop', value, has_value)
 .end
 
 .sub 'inline' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('inline', value, has_value)
+    .tailcall self.'attr'('inline', value, has_value)
 .end
 
 
@@ -176,49 +176,49 @@ Get/set the opcode type for this node.
 .sub 'blocktype' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('blocktype', value, has_value)
+    .tailcall self.'attr'('blocktype', value, has_value)
 .end
 
 
 .sub 'namespace' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('namespace', value, has_value)
+    .tailcall self.'attr'('namespace', value, has_value)
 .end
 
 
 .sub 'outer' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('outer', value, has_value)
+    .tailcall self.'attr'('outer', value, has_value)
 .end
 
 
 .sub 'lexid' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('lexid', value, has_value)
+    .tailcall self.'attr'('lexid', value, has_value)
 .end
 
 
 .sub 'pirflags' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('pirflags', value, has_value)
+    .tailcall self.'attr'('pirflags', value, has_value)
 .end
 
 
 .sub 'compiler' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('compiler', value, has_value)
+    .tailcall self.'attr'('compiler', value, has_value)
 .end
 
 
 .sub 'compiler_args' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('compiler_args', value, has_value)
+    .tailcall self.'attr'('compiler_args', value, has_value)
 .end
 
 

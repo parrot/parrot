@@ -242,13 +242,13 @@ object.
 =cut
 
 .sub 'item' :method
-    .return self.'result_object'()
+    .tailcall self.'result_object'()
 .end
 
 
 # deprecated RT#54000
 .sub 'get_scalar' :method
-    .return self.'item'()
+    .tailcall self.'item'()
 .end
 
 
@@ -270,7 +270,7 @@ Returns or sets the "result object" for the match object.
     if null obj goto ret_null
     .return (obj)
   ret_null:
-    .return self.'text'()
+    .tailcall self.'text'()
 .end
 
 

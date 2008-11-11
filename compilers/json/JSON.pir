@@ -67,7 +67,7 @@ documentation at L<http://www.json.org/>.
    .local pmc pirc, result
    pirc = compreg "PIR"
    result = pirc(pir)
-   .return result()
+   .tailcall result()
 
   failed:
    P0 = new 'Exception'

@@ -19,7 +19,7 @@
 .sub 'main' :main
     .param pmc args
     $P0 = compreg 'NQP'
-    .return $P0.'command_line'(args, 'encoding'=>'utf8', 'transcode'=>'ascii')
+    .tailcall $P0.'command_line'(args, 'encoding'=>'utf8', 'transcode'=>'ascii')
 .end
 
 .include 'src/Grammar_gen.pir'

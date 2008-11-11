@@ -89,19 +89,19 @@ done_init:
     # Default to a null. We could in the future make this more
     # clever, or conditional.
 json_null:
-    .return _json_null(thing,pretty,indent)
+    .tailcall _json_null(thing,pretty,indent)
 json_string:
-    .return _json_string(thing,pretty,indent)
+    .tailcall _json_string(thing,pretty,indent)
 json_array:
-    .return _json_array(thing,pretty,indent)
+    .tailcall _json_array(thing,pretty,indent)
 json_hash:
-    .return _json_hash(thing,pretty,indent)
+    .tailcall _json_hash(thing,pretty,indent)
 json_boolean:
-    .return _json_boolean(thing,pretty,indent)
+    .tailcall _json_boolean(thing,pretty,indent)
 json_integer:
-    .return _json_number(thing,pretty,indent)
+    .tailcall _json_number(thing,pretty,indent)
 json_float:
-    .return _json_number(thing,pretty,indent)
+    .tailcall _json_number(thing,pretty,indent)
 
 .end
 

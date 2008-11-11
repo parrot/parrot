@@ -41,12 +41,12 @@ properly.
 
 # deprecated RT#54000
 .sub 'get_array' :method
-    .return self.'list'()
+    .tailcall self.'list'()
 .end
 
 # deprecated RT#54000
 .sub 'get_hash' :method
-    .return self.'hash'()
+    .tailcall self.'hash'()
 .end
 
 

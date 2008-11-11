@@ -221,7 +221,7 @@ the output to the correct output file.
 
   compile_pir:
     $P0 = compreg 'PIR'
-    .return $P0(out)
+    .tailcall $P0(out)
 .end
 
 
@@ -304,7 +304,7 @@ the output to the correct output file.
         .param pmc mob
         .param pmc adverbs :named :slurpy
         $P0 = get_hll_global %0, "$optable"
-        .return $P0.'parse'(mob, 'rulename'=>"%1", adverbs :named :flat)
+        .tailcall $P0.'parse'(mob, 'rulename'=>"%1", adverbs :named :flat)
       .end
       END
   with_rulepir:
@@ -322,14 +322,14 @@ the output to the correct output file.
     .param pmc stmt
     .param pmc namespace
     .param pmc nstable
-    .return 'regex_stmt'(stmt, namespace, nstable)
+    .tailcall 'regex_stmt'(stmt, namespace, nstable)
 .end
 
 .sub 'rule_stmt'
     .param pmc stmt
     .param pmc namespace
     .param pmc nstable
-    .return 'regex_stmt'(stmt, namespace, nstable)
+    .tailcall 'regex_stmt'(stmt, namespace, nstable)
 .end
 
 

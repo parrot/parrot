@@ -249,7 +249,7 @@ Accessor method -- sets/returns the C<name> attribute of the invocant.
 .sub 'name' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('name', value, has_value)
+    .tailcall self.'attr'('name', value, has_value)
 .end
 
 

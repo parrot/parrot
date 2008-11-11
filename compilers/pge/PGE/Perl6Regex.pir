@@ -111,7 +111,7 @@ or the resulting PIR code (target='PIR').
     pad['lexscope'] = $P0
     exp = exp.'perl6exp'(pad)
     if null exp goto err_null
-    .return exp.'compile'(adverbs :flat :named)
+    .tailcall exp.'compile'(adverbs :flat :named)
 
   err_null:
     $I0 = match.'from'()
@@ -332,7 +332,7 @@ Return a failed match if the stoptoken is found.
     .return (mob)
 
   term_ws:
-    .return 'parse_term_ws'(mob)
+    .tailcall 'parse_term_ws'(mob)
 
   end_noterm:
     (mob) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
@@ -1395,14 +1395,14 @@ Parse a modifier.
     ##   reduce and return it.
     $I0 = defined self[1]
     if $I0 goto with_rhs
-    .return exp0.'perl6exp'(pad)
+    .tailcall exp0.'perl6exp'(pad)
   with_rhs:
 
     ##   if lhs is whitespace, then this is a prefix-alt and
     ##   we ignore it (by simply returning its rhs)
     $I0 = isa exp0, ['PGE';'Exp';'WS']
     if $I0 == 0 goto with_lhs
-    .return exp1.'perl6exp'(pad)
+    .tailcall exp1.'perl6exp'(pad)
   with_lhs:
 
     .local pmc lexscope, savescope, iter

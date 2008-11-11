@@ -23,7 +23,7 @@
     .return (opts)
 
   help:
-    .return 'help'(prog)
+    .tailcall 'help'(prog)
 .end
 
 

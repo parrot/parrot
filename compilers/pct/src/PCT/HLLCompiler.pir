@@ -150,37 +150,37 @@ the compiler is ready for code to be compiled and executed.
 .sub 'stages' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('@stages', value, has_value)
+    .tailcall self.'attr'('@stages', value, has_value)
 .end
 
 .sub 'parsegrammar' :method
     .param string value        :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('$parsegrammar', value, has_value)
+    .tailcall self.'attr'('$parsegrammar', value, has_value)
 .end
 
 .sub 'parseactions' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('$parseactions', value, has_value)
+    .tailcall self.'attr'('$parseactions', value, has_value)
 .end
 
 .sub 'astgrammar' :method
     .param string value        :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('$astgrammar', value, has_value)
+    .tailcall self.'attr'('$astgrammar', value, has_value)
 .end
 
 .sub 'commandline_banner' :method
     .param string value        :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('$commandline_banner', value, has_value)
+    .tailcall self.'attr'('$commandline_banner', value, has_value)
 .end
 
 .sub 'commandline_prompt' :method
     .param string value        :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('$commandline_prompt', value, has_value)
+    .tailcall self.'attr'('$commandline_prompt', value, has_value)
 .end
 
 =item removestage(string stagename)
@@ -419,7 +419,7 @@ resulting ast.
     unless astgrammar_namelist goto err_past
     astgrammar = new astgrammar_namelist
     astbuilder = astgrammar.'apply'(source)
-    .return astbuilder.'get'('past')
+    .tailcall astbuilder.'get'('past')
 
   compile_match:
     push_eh err_past
@@ -433,7 +433,7 @@ resulting ast.
   err_past:
     pop_eh
     $S0 = typeof source
-    .return self.'panic'('Unable to obtain PAST from ', $S0)
+    .tailcall self.'panic'('Unable to obtain PAST from ', $S0)
 .end
 
 
@@ -447,7 +447,7 @@ Transform PAST C<source> into POST.
     .param pmc source
     .param pmc adverbs         :slurpy :named
     $P0 = compreg 'PAST'
-    .return $P0.'to_post'(source, adverbs :flat :named)
+    .tailcall $P0.'to_post'(source, adverbs :flat :named)
 .end
 
 
@@ -456,7 +456,7 @@ Transform PAST C<source> into POST.
     .param pmc adverbs         :slurpy :named
 
     $P0 = compreg 'POST'
-    .return $P0.'to_pir'(source, adverbs :flat :named)
+    .tailcall $P0.'to_pir'(source, adverbs :flat :named)
 .end
 
 
@@ -636,7 +636,7 @@ options are passed to the evaluator.
     .return ($P0)
 
   err_infile:
-    .return self.'panic'('Error: file cannot be read: ', iname)
+    .tailcall self.'panic'('Error: file cannot be read: ', iname)
 .end
 
 
@@ -665,7 +665,7 @@ Performs option processing of command-line args
     push getopts, $S0
     goto getopts_loop
   getopts_end:
-    .return getopts.'get_options'(args)
+    .tailcall getopts.'get_options'(args)
 .end
 
 
@@ -750,7 +750,7 @@ Generic method for compilers invoked from a shell command line.
     .return ()
 
   err_output:
-    .return self.'panic'('Error: file cannot be written: ', output)
+    .tailcall self.'panic'('Error: file cannot be written: ', output)
   usage:
     self.'usage'(arg0)
     goto end
