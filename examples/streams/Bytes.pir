@@ -19,7 +19,7 @@ This example shows the usage of C<Stream::read_bytes>.
 
     $P0 = new "Stream::Sub"
     # set the stream's source sub
-    .const .Sub temp = "_hello"
+    .const 'Sub' temp = "_hello"
     assign $P0, $P1
 
     stream = new "Stream::Replay"

@@ -27,7 +27,7 @@ Creates a counter stream that generates numbers from 0 to 9.
     # create the counter stream
     stream = new "Stream::Sub"
     # assign its source
-    .const .Sub temp = "_counter"
+    .const 'Sub' temp = "_counter"
     assign stream, temp
 
     # create the filter stream
@@ -35,7 +35,7 @@ Creates a counter stream that generates numbers from 0 to 9.
     # assign its source
     assign filter, stream
     # set the filter sub
-    .const .Sub temp = "_filter"
+    .const 'Sub' temp = "_filter"
     filter."filter"( temp )
 
     # dump the stream

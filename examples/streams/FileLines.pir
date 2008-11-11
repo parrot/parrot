@@ -48,7 +48,7 @@ NO_NAME:
 
     # endless counter
     counter = new "Stream::Sub"
-    .const .Sub temp = "_counter"
+    .const 'Sub' temp = "_counter"
     assign counter, temp
 
     # combine the counter and the file's lines

@@ -251,7 +251,7 @@ get:
     .local int h2
     h2 = h / 2
     thr = new 'ParrotThread'
-    .const .Sub raw_calc_f = 'raw_calc'
+    .const 'Sub' raw_calc_f = 'raw_calc'
     .include 'cloneflags.pasm'
     .local int flags
     flags  = .PARROT_CLONE_CODE
@@ -453,7 +453,7 @@ loop_b:
     if g <= 255 goto loop_g
     r += 36
     if r <= 255 goto loop_r
-    .const .Sub by_bright = "bright"
+    .const 'Sub' by_bright = "bright"
     palette.'sort'(by_bright)
     .return (palette)
 .end

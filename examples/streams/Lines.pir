@@ -22,7 +22,7 @@ Creates a stream and pipes it through a Stream::Lines stream.
     # create a text stream
     stream = new "Stream::Sub"
     # set the source
-    .const .Sub temp = "_text"
+    .const 'Sub' temp = "_text"
     assign stream, temp
 
     # create a lines stream

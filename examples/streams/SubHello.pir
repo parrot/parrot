@@ -20,7 +20,7 @@ Creates a C<Stream::Sub> and dumps it.
     stream = new "Stream::Sub"
 
     # set the stream's source sub
-    .const .Sub temp = "_hello"
+    .const 'Sub' temp = "_hello"
     assign stream, temp
 
     # dump the stream

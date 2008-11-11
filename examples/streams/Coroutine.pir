@@ -32,7 +32,7 @@ Creates a coroutine stream and dumps it.
 
     # set the stream's source coroutine
     # A .Sub is a coroutine when there is a yield?
-    .const .Sub temp = "_coro"
+    .const 'Sub' temp = "_coro"
     assign stream, temp
     #stream."source"( temp )
 

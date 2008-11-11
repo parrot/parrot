@@ -10,7 +10,7 @@ This example demonstrates creating a closure.
     $P0 = 22
 
     .local pmc base_sub, myclosure
-    .const .Sub base_sub = "closure_sub"
+    .const 'Sub' base_sub = "closure_sub"
 
     newclosure myclosure, base_sub
     $P1 = myclosure(5)

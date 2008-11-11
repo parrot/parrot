@@ -69,7 +69,7 @@ done:
         $P0 = new 'String'
         $P0.'reverse'(line)
 
-	.const .Sub tr_00 = 'tr_00_init'
+	.const 'Sub' tr_00 = 'tr_00_init'
 	$P0.'trans'(line, tr_00)
 
 	i = 0

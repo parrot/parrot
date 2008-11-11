@@ -35,13 +35,13 @@ Creates the 3 Stream objects and dumps the combined stream.
 
     # create the counter stream
     counter = new "Stream::Sub"
-    .const .Sub temp = "_counter"
+    .const 'Sub' temp = "_counter"
     assign counter, temp
 
     # create the text stream
     text = new "Stream::Sub"
     # set its source
-    .const .Sub temp = "_text"
+    .const 'Sub' temp = "_text"
     assign text, temp
 
     # create a combiner stream
@@ -51,7 +51,7 @@ Creates the 3 Stream objects and dumps the combined stream.
     assign combined, text
 
     # specify our own combiner sub
-    .const .Sub temp = "_combiner"
+    .const 'Sub' temp = "_combiner"
     combined."combiner"( temp )
 
     # dump the combined stream

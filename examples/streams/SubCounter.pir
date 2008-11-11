@@ -21,7 +21,7 @@ Creates a C<Stream::Sub> and dumps it.
     stream = new "Stream::Sub"
 
     # set the stream's source sub
-    .const .Sub temp = "_counter"
+    .const 'Sub' temp = "_counter"
     assign stream, temp
 
     # dump the stream

@@ -26,7 +26,7 @@ F<docs/pdds/pdd03_calling_conventions.pod>
 =cut
 
     # Fetch a subroutine objec
-    .const .Sub P0 = "_sub"
+    .const 'Sub' P0 = "_sub"
 
     # Call the sub in argument, create return continuation
     invokecc P0

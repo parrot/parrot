@@ -20,7 +20,7 @@ Creates a counter stream and dumps it.
     stream = new "Stream::Sub"
 
     # set the stream's source sub
-    .const .Sub temp = "_counter"
+    .const 'Sub' temp = "_counter"
     assign stream, temp
 
     # dump the stream
@@ -56,7 +56,7 @@ LOOP:
 
     temp = new "Stream::Sub"
 
-    .const .Sub func = "_included"
+    .const 'Sub' func = "_included"
     assign temp, func
 
     # include it
@@ -84,7 +84,7 @@ writes "world".
 
     # create another stream
     temp = new "Stream::Sub"
-    .const .Sub func = "_counter2"
+    .const 'Sub' func = "_counter2"
     assign temp, func
 
     # include it

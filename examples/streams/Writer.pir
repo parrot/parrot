@@ -20,7 +20,7 @@ Creates a C<Stream::Writer> and writes to it.
     stream = new "Stream::Writer"
 
     # set the stream's source sub
-    .const .Sub temp = "_reader"
+    .const 'Sub' temp = "_reader"
     assign stream, temp
 
     print "main start\n"
