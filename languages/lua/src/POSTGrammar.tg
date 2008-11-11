@@ -647,6 +647,12 @@ transform return (PAST::Op) :language('PIR') {
     unless $I0 goto L3
     if arglist goto L4
     $P0.'pirop'('tailcall')
+    # remove useless new LuaNil
+    $P0 = ops.'pop'()
+    ops.'push'($P0)
+    $P1 = $P0.'pop'()
+    $P2 = $P0.'pop'()
+    $P0.'push'($P1)
     .return (ops)
   L4:
     $S1 = '(' . $S0
