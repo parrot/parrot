@@ -44,7 +44,7 @@ for whatever the distribution's parent directory is called on your machine.
                 |
                 +--> LICENSE
                 |
-                +--> src 
+                +--> src
                 |
                 +--> tools
                 |
@@ -149,7 +149,7 @@ For recursive C<diff> patches, copy the patch file to F<workingdir>, and run:
     patch -p0 < some.patch
 
 In order to be on the safe side run 'make test' before actually committing
-the changes. 
+the changes.
 
 =head2 Configuration of files to ignore
 
@@ -166,7 +166,7 @@ The list of these ignore files can be set up with:
 
     svn propedit svn:ignore <PATH>
 
-In order to keep the two different checks synchronized, 
+In order to keep the two different checks synchronized,
 the MANIFEST and MANIFEST.SKIP file should be regenerated with:
 
     perl tools/dev/mk_manifest_and_skip.pl
