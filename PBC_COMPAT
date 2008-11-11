@@ -26,7 +26,8 @@
 # Also, if you're removing an opcode, be sure to run "make opsrenumber"
 
 # please insert tab separated entries at the top of the list
-
+ 
+3.22	2008.11.11	coke	remove morph_p_i, add_multi_i_i_i_p, find_multi_p_i_i_i
 3.21	2008.11.06	coke	remove new_p_i, new_p_i_p, find_type_i_p, find_type_i_s, valid_type_i_i, typeof_i_p, typeof_i_p_k, typeof_i_p_ik, typeof_s_i
 3.20	2008.10.23	pmichaud	make opsrenumber fix
 3.19	2008.08.04	coke	remove getclass opcodes

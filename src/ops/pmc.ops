@@ -512,32 +512,21 @@ addition or subtraction, or one of the other binary MMD operations.
 
 ########################################
 
-=item B<add_multi>(in INT, in INT, in INT, invar PMC)
+=item B<add_multi>(in STR, in STR, invar PMC)
 
-Register method $4 as the MMD method for vtable entry $1 for classes
-$2 and $3.
+Register method $3 as the MMD method for the sub named $1 with signature $2.
 
 =cut
-
-inline op add_multi(in INT, in INT, in INT, invar PMC) :deprecated {
-  Parrot_ex_throw_from_c_args(interp, expr NEXT(), EXCEPTION_INVALID_OPERATION,
-      "Must add multi by function and type name, not number");
-}
 
 inline op add_multi(in STR, in STR, invar PMC) {
   Parrot_mmd_add_multi_from_long_sig(interp, $1, $2, $3);
 }
 
-=item B<find_multi>(out PMC, in STR, in STR, in STR)
+=item B<find_multi>(out PMC, in STR, in STR)
 
-Find the sub that would be called for vtable entry $2 for types $3 and $4.
+Set $1 to the sub that would be called for sub named $2 with signature $3.
 
 =cut
-
-inline op find_multi(out PMC, in INT, in INT, in INT) :deprecated {
-  Parrot_ex_throw_from_c_args(interp, expr NEXT(), EXCEPTION_INVALID_OPERATION,
-      "Must find multi by function and type name, not number");
-}
 
 inline op find_multi(out PMC, in STR, in STR) {
   $1 = Parrot_mmd_find_multi_from_long_sig(interp, $2, $3);
