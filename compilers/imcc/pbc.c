@@ -1899,7 +1899,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
                     last_label = addr->color - IMCC_INFO(interp)->npc;
             IMCC_debug(interp, DEBUG_PBC_FIXUP,
                     "branch label at pc %d addr %d %s %d\n",
-                    IMCC_INFO(interp)->npc, addr->color, addr->name,last_label);
+                    IMCC_INFO(interp)->npc, addr->color, addr->name, last_label);
         }
 
         /* add debug line info */
