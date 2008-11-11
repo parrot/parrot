@@ -118,8 +118,6 @@ NOT IMPLEMENTED.
 
 Returns the filename component of the path
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'basename'
