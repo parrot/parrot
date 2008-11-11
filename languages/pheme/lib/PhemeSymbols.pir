@@ -25,7 +25,7 @@
 .sub __resolve_at_runtime :multi( [ 'Pheme'; 'Cons' ] )
 	.param pmc args :slurpy
 
-	.return __list_to_cons( args :flat )
+	.tailcall __list_to_cons( args :flat )
 .end
 
 .sub __resolve_at_runtime :multi( string )
@@ -38,10 +38,10 @@
 	unless function goto return_list
 	pop_eh
 
-	.return function( args :flat )
+	.tailcall function( args :flat )
 
   return_list:
-	.return __list_to_cons( symbol_name, args :flat )
+	.tailcall __list_to_cons( symbol_name, args :flat )
 .end
 
 .sub __list_to_cons
@@ -93,7 +93,7 @@
 
 	if first_type == 'String' goto call_func
 
-	.return __list_to_cons( cons_list :flat )
+	.tailcall __list_to_cons( cons_list :flat )
 
   call_func:
 	first  = shift cons_list
@@ -101,7 +101,7 @@
 	.local string func_name
 	func_name = first
 
-	.return __resolve_at_runtime( func_name, cons_list :flat )
+	.tailcall __resolve_at_runtime( func_name, cons_list :flat )
 .end
 
 .sub '__evaluate' :multi( pmc )
@@ -129,7 +129,7 @@
 	.param pmc cons
 
 	.local pmc tail
-	.return cons.'tail'()
+	.tailcall cons.'tail'()
 .end
 
 .sub include_file
@@ -174,7 +174,7 @@
 	result = __evaluate( cond )
 	unless result goto iter_loop
 
-	.return __evaluate( action )
+	.tailcall __evaluate( action )
 
   iter_end:
 	.return()
@@ -235,7 +235,7 @@
 	l_tail = l_cons.'tail'()
 	r_tail = r_cons.'tail'()
 
-	.return 'eqlist?'( l_head, r_head )
+	.tailcall 'eqlist?'( l_head, r_head )
 .end
 
 .sub 'eq?' :multi( pmc, pmc )
@@ -253,7 +253,7 @@
 	.param pmc l_cons
 	.param pmc r_cons
 
-	.return 'eqlist?'( l_cons, r_cons )
+	.tailcall 'eqlist?'( l_cons, r_cons )
 .end
 
 # XXX - return #t

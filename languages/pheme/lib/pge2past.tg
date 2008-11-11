@@ -87,7 +87,7 @@ transform past (pheme_list) :language('PIR') {
     result.'pasttype'( 'call' )
     result.'push'( op )
 
-    .return tree.'get'( key_name, result )
+    .tailcall tree.'get'( key_name, result )
 }
 
 transform past (list_item) :language('PIR') {
@@ -100,7 +100,7 @@ transform past (list_item) :language('PIR') {
     .local pmc    elem
     elem     = node[key_name]
 
-    .return tree.'get'( 'past', elem, key_name )
+    .tailcall tree.'get'( 'past', elem, key_name )
 }
 
 transform special_form (PAST;Op) :language('PIR') {
@@ -116,7 +116,7 @@ transform special_form (PAST;Op) :language('PIR') {
     .local string form_name
     form_name = form_op.'name'()
 
-    .return tree.'get'( form_name, make_cons )
+    .tailcall tree.'get'( form_name, make_cons )
 }
 
 # this *may* be an application; this is an optimization
