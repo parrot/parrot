@@ -126,7 +126,7 @@ Sets the name of the subroutine.
 
 Sets the pointer to the actual subroutine.
 
-*** Don't use that - use .Sub constants instead ***
+*** Don't use that - use C<.const 'Sub'> in PIR instead ***
 
 =cut
 
@@ -134,7 +134,7 @@ Sets the pointer to the actual subroutine.
 
     VTABLE void set_pointer(void *value) {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-            "Don't set the address of a sub\nuse .Sub constants instead");
+            "Don't set the address of a sub\nuse .const 'Sub' instead");
     }
 
 /*
@@ -288,8 +288,7 @@ Invokes the subroutine.
          */
         if (!PMC_IS_NULL(sub->lex_info)) {
             context->lex_pad = pmc_new_init(INTERP,
-                    Parrot_get_ctx_HLL_type(interp,
-                        enum_class_LexPad),
+                    Parrot_get_ctx_HLL_type(interp, enum_class_LexPad),
                     sub->lex_info);
             VTABLE_set_pointer(INTERP, context->lex_pad, context);
         }
