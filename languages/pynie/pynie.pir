@@ -44,7 +44,7 @@ to the Pynie compiler.
     .param pmc args
     load_bytecode 'PGE/Dumper.pbc'
     $P0 = compreg 'Pynie'
-    .return $P0.'command_line'(args)
+    .tailcall $P0.'command_line'(args)
 .end
 
 
