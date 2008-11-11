@@ -495,6 +495,8 @@ typedef struct _imc_info_t {
 
     char                 *macro_buffer;
     Hash                 *macros;
+    PackFile_Debug       *debug_seg;
+    opcode_t             *pc;
 
     /* these are used for constructing one INS */
 #define IMCC_MAX_STATIC_REGS 100
@@ -518,6 +520,7 @@ typedef struct _imc_info_t {
     int                   imcc_warn;
     int                   in_pod;
     int                   in_slice;
+    int                   ins_line;
     int                   keyvec;
     int                   line;                   /* current line number */
     int                   optimizer_level;
@@ -526,6 +529,7 @@ typedef struct _imc_info_t {
     int                   nkeys;
     int                   verbose;
     int                   write_pbc;
+    opcode_t              npc;
 } imc_info_t;
 
 #define IMCC_INFO(i) (((Parrot_Interp)(i))->imc_info)

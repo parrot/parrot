@@ -1794,10 +1794,8 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
     op_info_t *op_info;
 
     /* XXX move these statics into IMCC_INFO */
-    static PackFile_Debug *debug_seg;
-    static int             ins_line;
-    static opcode_t       *pc;
-    static opcode_t        npc;
+    opcode_t       *pc;
+    opcode_t        npc;
     /* XXX end */
 
 #if IMC_TRACE_HIGH
@@ -1808,7 +1806,8 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
     if (ins == unit->instructions) {
         int ins_size;
 
-        const int    oldsize   = get_old_size(interp, &ins_line);
+        const int    oldsize   = get_old_size(interp,
+                                    &IMCC_INFO(interp)->ins_line);
         const int    code_size = get_codesize(interp, unit, &ins_size);
         const size_t bytes     = (oldsize + code_size) * sizeof (opcode_t);
 
@@ -1834,8 +1833,8 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
         interp->code->base.size       = oldsize + code_size;
         interp->code->pic_index->size = (oldsize + code_size) / 2;
 
-        pc  = (opcode_t *)interp->code->base.data + oldsize;
-        npc = 0;
+        IMCC_INFO(interp)->pc  = (opcode_t *)interp->code->base.data + oldsize;
+        IMCC_INFO(interp)->npc = 0;
 
         /* add debug if necessary */
         if (IMCC_INFO(interp)->optimizer_level == 0
@@ -1843,14 +1842,16 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
             const char * const sourcefile = unit->file;
 
             /* FIXME length and multiple subs */
-            debug_seg  = Parrot_new_debug_seg(interp,
-                    interp->code, (size_t) ins_line + ins_size + 1);
+            IMCC_INFO(interp)->debug_seg  = Parrot_new_debug_seg(interp,
+                interp->code,
+                (size_t)IMCC_INFO(interp)->ins_line + ins_size + 1);
 
-            Parrot_debug_add_mapping(interp, debug_seg, ins_line,
-                     PF_DEBUGMAPPINGTYPE_FILENAME, sourcefile, 0);
+            Parrot_debug_add_mapping(interp, IMCC_INFO(interp)->debug_seg,
+                IMCC_INFO(interp)->ins_line,
+                PF_DEBUGMAPPINGTYPE_FILENAME, sourcefile, 0);
         }
         else
-            debug_seg = NULL;
+            IMCC_INFO(interp)->debug_seg = NULL;
 
         /* if item is a PCC_SUB entry then store it constants */
         if (ins->symregs[0] && ins->symregs[0]->pcc_sub) {
@@ -1874,9 +1875,11 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
     }
 
     /* if this is not the first sub then store the sub */
-    if (npc && unit->pasm_file && ins->symregs[0] && ins->symregs[0]->pcc_sub) {
+    if (IMCC_INFO(interp)->npc && unit->pasm_file
+    &&  ins->symregs[0]        && ins->symregs[0]->pcc_sub) {
         /* we can only set the offset for PASM code */
-        add_const_pmc_sub(interp, ins->symregs[0], npc, npc);
+        add_const_pmc_sub(interp, ins->symregs[0], IMCC_INFO(interp)->npc,
+            IMCC_INFO(interp)->npc);
     }
 
     if (ins->opname && *ins->opname) {
@@ -1893,21 +1896,22 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
             if (addr->color == -1)
                 IMCC_fatal(interp, 1, "e_pbc_emit: "
                         "no label offset defined for '%s'\n", addr->name);
-            last_label = addr->color - npc;
+                    last_label = addr->color - IMCC_INFO(interp)->npc;
             IMCC_debug(interp, DEBUG_PBC_FIXUP,
                     "branch label at pc %d addr %d %s %d\n",
-                    npc, addr->color, addr->name, last_label);
+                    IMCC_INFO(interp)->npc, addr->color, addr->name,last_label);
         }
 
         /* add debug line info */
-        if (debug_seg)
-            debug_seg->base.data[ins_line++] = (opcode_t) ins->line;
+        if (IMCC_INFO(interp)->debug_seg)
+            IMCC_INFO(interp)->debug_seg->base.data[IMCC_INFO(interp)->ins_line++] =
+                (opcode_t)ins->line;
 
         op = (opcode_t)ins->opnum;
 
         /* add PIC idx */
         if (parrot_PIC_op_is_cached(op)) {
-            const size_t offs = pc - interp->code->base.data;
+            const size_t offs = IMCC_INFO(interp)->pc - interp->code->base.data;
             /*
              * for pic_idx fitting into a short, we could
              * further reduce the size by storing shorts
@@ -1921,12 +1925,13 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
         }
 
         /* Start generating the bytecode */
-        *pc++   = op;
+        *(IMCC_INFO(interp)->pc)++   = op;
 
         /* Get the info for that opcode */
         op_info = &interp->op_info_table[op];
 
-        IMCC_debug(interp, DEBUG_PBC, "%d %s", npc, op_info->full_name);
+        IMCC_debug(interp, DEBUG_PBC, "%d %s", IMCC_INFO(interp)->npc,
+            op_info->full_name);
 
         for (i = 0; i < op_info->op_count-1; i++) {
             switch (op_info->types[i]) {
@@ -1937,7 +1942,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
                             /* we don't have a branch with offset 1 !? */
                             IMCC_fatal(interp, 1, "e_pbc_emit: "
                                     "no label offset found\n");
-                        *pc++      = last_label;
+                        *(IMCC_INFO(interp)->pc)++      = last_label;
                         last_label = 1;
                         break;
                         /* else fall through */
@@ -1957,19 +1962,20 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
                     if (r->type & VT_CONSTP)
                         r = r->reg;
 
-                    *pc++ = (opcode_t) r->color;
+                    *(IMCC_INFO(interp)->pc)++ = (opcode_t) r->color;
                     IMCC_debug(interp, DEBUG_PBC, " %d", r->color);
                     break;
                 case PARROT_ARG_KC:
                     r = ins->symregs[i];
                     if (r->set == 'K') {
                         PARROT_ASSERT(r->color >= 0);
-                        *pc++ = r->color;
+                        *(IMCC_INFO(interp)->pc)++ = r->color;
                     }
                     else {
-                        *pc++ = build_key(interp, r);
+                        *(IMCC_INFO(interp)->pc)++ = build_key(interp, r);
                     }
-                    IMCC_debug(interp, DEBUG_PBC, " %d", pc[-1]);
+                    IMCC_debug(interp, DEBUG_PBC, " %d",
+                        IMCC_INFO(interp)->pc[-1]);
                     break;
                 default:
                     IMCC_fatal(interp, 1, "e_pbc_emit:"
@@ -1984,20 +1990,20 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
 
             /* TODO get rid of verify_signature - PIR call sigs are already
              * fixed, but PASM still needs it */
-            verify_signature(interp, ins, pc);
+         verify_signature(interp, ins, IMCC_INFO(interp)->pc);
 
             /* emit var_args part */
             for (; i < ins->opsize - 1; ++i) {
                 r = ins->symregs[i];
                 if (r->type & VT_CONSTP)
                     r = r->reg;
-                *pc++ = (opcode_t) r->color;
+                *(IMCC_INFO(interp)->pc)++ = (opcode_t) r->color;
                 IMCC_debug(interp, DEBUG_PBC, " %d", r->color);
             }
         }
 
         IMCC_debug(interp, DEBUG_PBC, "\t%I\n", ins);
-        npc += ins->opsize;
+        IMCC_INFO(interp)->npc += ins->opsize;
     }
 
     return ok;
