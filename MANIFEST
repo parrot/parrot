@@ -715,6 +715,7 @@ examples/nci/xlibtest.nqp                                   [main]doc
 examples/nci/xlibtest.p6                                    [main]doc
 examples/nci/xlibtest.pir                                   [main]doc
 examples/nci/xlibtest.rb                                    [main]doc
+examples/opengl/shapes.p6                                   [main]doc
 examples/opengl/shapes.pir                                  [main]doc
 examples/opengl/static-triangle.p6                          [main]doc
 examples/opengl/static-triangle.pir                         [main]doc
