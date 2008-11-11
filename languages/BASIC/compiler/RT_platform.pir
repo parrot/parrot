@@ -1,7 +1,9 @@
 .include "RT_platform_win32.pir"
 .include "RT_platform_ANSIscreen.pir"
+.include "sysinfo.pasm"
+
 .sub _platform_setup		# void platform_setup(void)
-	sysinfo S0, 4
+	sysinfo S0, .SYSINFO_PARROT_OS
 	ne S0, "MSWin32", NOTWIN
 	_win32_setup()
 	branch END
@@ -9,7 +11,7 @@ NOTWIN: _ansi_setup()
 END:	noop
 .end
 .sub _platform_shutdown
-	sysinfo S0, 4
+	sysinfo S0, .SYSINFO_PARROT_OS
 	ne S0, "MSWin32", NOTWIN
 	_win32_shutdown()
 	branch END
@@ -20,7 +22,7 @@ END:	noop
 	find_global $P0, "PRINTCOL"
 	set $P0["value"], 0
 	store_global "PRINTCOL", $P0
-	sysinfo S0, 4
+	sysinfo S0, .SYSINFO_PARROT_OS
 	ne S0, "MSWin32", NOTWIN
 	_win32_screen_clear()
 	branch END
@@ -30,13 +32,13 @@ END:	noop
 
 #SCREEN_SETXCUR:
 #	set I1, P6[.VALUE]
-#	sysinfo S0, 4
+#	sysinfo S0, .SYSINFO_PARROT_OS
 #	eq S0, "MSWin32", WIN32_SCREEN_SETXCUR
 #	branch ANSI_SCREEN_SETXCUR
 #
 #SCREEN_SETYCUR:
 #	set I1, P6[.VALUE]
-#	sysinfo S0, 4
+#	sysinfo S0, .SYSINFO_PARROT_OS
 #	eq S0, "MSWin32", WIN32_SCREEN_SETYCUR
 #	branch ANSI_SCREEN_SETYCUR
 #

@@ -120,6 +120,8 @@ Returns the filename component of the path
 
 =cut
 
+.include 'sysinfo.pasm'
+
 .sub 'basename'
     .param pmc args :slurpy
     .local string path
@@ -130,7 +132,7 @@ Returns the filename component of the path
     if $I0 goto L1
     .RETURN_NULL()
   L1:
-    sysinfo $S0, 4
+    $S0 = sysinfo .SYSINFO_PARROT_OS
     if $S0 == 'MSWin32' goto L2
     if $S0 == 'netware' goto L2
     separator = '/'
