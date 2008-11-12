@@ -85,7 +85,6 @@ sub keyboard($key, $x, $y) {
     # For ESCAPE, 'Q', and 'q', exit program
     if ($key == 27 | 81 | 113) {
         glutDestroyWindow($window);
-        exit();
     }
     # For all other keys, just toggle rotation
     else {

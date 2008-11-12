@@ -71,16 +71,15 @@ our $aspect      = 1.0;
 our $frames      = 0;
 our $paused      = 0;
 
-our $now         = time();
-our $time_prev   = $now;
-our $time_curr   = $now;
+our $time_prev   = time();
+our $time_curr   = $time_prev;
 our $time_sim    = 0.0;
 our $time_sim_dt = 0.0;
 
 glutIdleFunc(     &idle     );
 glutDisplayFunc(  &draw     );
 # glutReshapeFunc(  &reshape  );
-# glutKeyboardFunc( &keyboard );
+glutKeyboardFunc( &keyboard );
 
 glutMainLoop();
 
@@ -103,11 +102,13 @@ sub init_glut($display_mode, $window_title, @args is rw) {
 
 sub idle {
     $time_prev = $time_curr;
-    $time_curr = $now = time();
+    $time_curr = time();
 
-    my $dt = $paused ?? 0 !! $now - $time_prev;
+    my $dt = $paused ?? 0 !! $time_curr - $time_prev;
 
     $time_sim_dt = $dt;
+    # XXXX: Broken because of Parrot RT #60036
+    # $time_sim   += $dt;
     $time_sim    = $dt + $time_sim;
 
     glutPostRedisplay() unless $paused;
@@ -127,9 +128,7 @@ sub keyboard($key, $x, $y) {
     if ($key == 27 | 81 | 113) {
         glutDestroyWindow($glut_window);
 
-        say "FPS: { $time_sim / ($frames || 1) }";
-
-        exit();
+        say "FPS: { $frames / ($time_sim || .001) }";
     }
     # For all other keys, just toggle pause
     else {
