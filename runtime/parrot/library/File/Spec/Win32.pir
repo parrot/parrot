@@ -97,7 +97,7 @@ return_cached:
     rulesub= p6rule( ':ignorecase ^ ( <?alpha> \: )? <[\\/]>' )
     match= rulesub( file )
 
-    .return match.'__get_bool'()
+    .tailcall match.'__get_bool'()
 .end
 
 

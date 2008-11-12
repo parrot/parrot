@@ -470,7 +470,7 @@ yes:
     srv = conn.'server'()
     $I0 = srv.'exists_conn'(conn)
     if $I0 goto do_read
-    .return srv.'accept_conn'()
+    .tailcall srv.'accept_conn'()
 
 do_read:
     req = conn.'get_request'()
@@ -821,7 +821,7 @@ END:
 
 .sub hex_to_int
     .param pmc hex
-    .return hex.'to_int'(16)
+    .tailcall hex.'to_int'(16)
 .end
 
 # if file is *.pir or *.pbc run it as CGI
