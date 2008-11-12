@@ -1525,14 +1525,6 @@ labeled_inst:
            IMCC_INFO(interp)->cur_call->pcc_sub->flags |= isTAIL_CALL;
            IMCC_INFO(interp)->cur_call = NULL;
          }
-   /* This style is deprecated as per RT#58974. Use ".tailcall" for
-      tailcalls instead of ".return". */
-   | RETURN  sub_call
-         {
-           $$ = NULL;
-           IMCC_INFO(interp)->cur_call->pcc_sub->flags |= isTAIL_CALL;
-           IMCC_INFO(interp)->cur_call = NULL;
-         }
    | GOTO label_op { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "branch", 1, $2); }
    | PARROT_OP vars
          {

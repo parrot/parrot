@@ -146,13 +146,6 @@ Will have to be:
     print $S0
     substr $P0, 1, 2, "x"
 
-=item * C<.return> in tailcall context [post 0.7.2]
-
-The C<.return> directive in a tailcall context will be replaced by the more
-explicit C<.tailcall> directive.
-
-See RT #58974.
-
 =item * C<.return> in C<.begin_return> / C<.end_return> [post 0.7.2]
 
 The C<.return> directive in a C<.begin_return> sequence will be replaced by
