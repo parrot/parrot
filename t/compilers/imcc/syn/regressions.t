@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 
 pir_error_output_like( <<'CODE', <<'OUT', 'invalid get_results syntax');
 .sub main :main
@@ -103,6 +103,17 @@ no:
 .end
 CODE
 /(?s:Null PMC access in get_bool.*current instr.*:4\))/
+OUT
+
+pir_error_output_like( <<'CODE', <<'OUT', 'bare method names not allowed (RT #45859)', todo=>'still allowed');
+.sub foo :main
+  $P0 = new 'String'
+  $P0 = 'HI'
+  $P0.lower()
+  say $P0
+.end
+CODE
+/error:imcc:syntax error, unexpected/
 OUT
 
 # Local Variables:
