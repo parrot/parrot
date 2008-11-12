@@ -393,7 +393,7 @@ loop:
 
     $P0 = get_hll_global ['STM'], 'transaction'
     $P1 = global '_fetchHead'
-    .return $P0($P1, self, removep, blockp)
+    .tailcall $P0($P1, self, removep, blockp)
 .end
 
 .sub _fetchHead :method

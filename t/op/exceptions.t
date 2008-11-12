@@ -432,7 +432,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "exit_handler via exit exception" );
     push_eh handler
     exit 0
 handler:
-    .return exit_handler()
+    .tailcall exit_handler()
 .end
 
 .sub exit_handler :outer(main)
