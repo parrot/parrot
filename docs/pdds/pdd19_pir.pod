@@ -839,18 +839,6 @@ deprecated.
    want the parentheses?
 }}
 
-=item .return <var>(args)
-
-{{ Deprecated. Use .tailcall instead. See RT#58236. }}
-
-=item .return <var>.'somemethod'(args)
-
-{{ Deprecated. Use .tailcall instead. See RT#58236. }}
-
-=item .return <var>.<var>(args)
-
-{{ Deprecated. Use .tailcall instead. See RT#58236. }}
-
 =item .tailcall <var>(args)
 
 =item .tailcall <var>.'somemethod'(args)
