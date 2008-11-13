@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 20;
 
 =head1 NAME
 
@@ -94,17 +94,6 @@ CODE
 OUT
 
 ## testing private subs
-pir_output_is( $PRE . <<'CODE'. $POST, <<"OUT", "_get_osname" );
-        .local string osname
-        .local pmc get_osname
-        get_osname = get_hll_global [ 'File::Spec' ], '_get_osname'
-        osname= get_osname()
-        print osname
-        goto END
-CODE
-$^O
-OUT
-
 pir_output_is( $PRE . <<'CODE'. $POST, <<'OUT', "_get_module" );
         .local string module
         .local pmc get_module

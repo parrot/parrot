@@ -60,11 +60,11 @@ tag C<all> is allowed for todo tests that should fail on any system.
 .const int TESTS = 308
 
 .sub main :main
-    load_bytecode 'config.pir'
     load_bytecode 'Test/Builder.pir'
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Dumper.pbc'
     .include "iglobals.pasm"
+    .include "sysinfo.pasm"
 
     # Variable declarations, initializations
     .local pmc test       # the test harness object.
@@ -455,6 +455,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
       throw $P1
 .end
 
+
 .sub 'find_skip_in_description'
     .param string description
 
@@ -477,11 +478,8 @@ tag C<all> is allowed for todo tests that should fail on any system.
     .local pmc iter
     iter = new 'Iterator', skip_os
 
-    .local pmc config
-    config = _config()
-
     .local string osname
-    osname = config['osname']
+    osname = sysinfo .SYSINFO_PARROT_OS
 
   iter_loop:
     unless iter goto iter_end

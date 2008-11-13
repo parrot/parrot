@@ -30,7 +30,7 @@ Zakharevich, Paul Schinder, and others.
 Since these functions are different for most operating systems, each set of
 OS specific routines is available in a separate module, including:
 
-    *File::Spec::Unix
+    File::Spec::Unix
     *File::Spec::Mac
     *File::Spec::OS2
     File::Spec::Win32
@@ -52,6 +52,7 @@ called as object methods.
 
 .namespace [ 'File::Spec' ]
 
+.include 'sysinfo.pasm'
 
 .sub VERSION :method
     .local string version
@@ -64,7 +65,7 @@ called as object methods.
     '_init'()
 
     .local string osname
-    osname= '_get_osname'()
+    osname= sysinfo .SYSINFO_PARROT_OS
 
     .local string platform
     platform= '_get_module'( osname )
@@ -97,14 +98,6 @@ called as object methods.
     ## set modules['cygwin'], 'Cygwin'
 
     store_global '_modules', modules
-.end
-
-
-.include 'sysinfo.pasm'
-
-.sub '_get_osname'
-    $S0 = sysinfo .SYSINFO_PARROT_OS
-    .return ( $S0 )
 .end
 
 
@@ -148,7 +141,7 @@ found_module:
     typeof name, self
 
     .local string osname
-    osname= '_get_osname'()
+    osname= sysinfo .SYSINFO_PARROT_OS
 
     .local string module
     module= '_get_module'( osname )
@@ -165,9 +158,6 @@ found_module:
     concat class, class, platform
     .return(class)
 .end
-
-
-.include 'library/config.pir'
 
 # Local Variables:
 #   mode: pir

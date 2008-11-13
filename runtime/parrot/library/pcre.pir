@@ -42,16 +42,16 @@ and is additionally stored as global 'PCRE', 'lib'.
 
 =cut
 
+.include "sysinfo.pasm"
+
 .sub init
     .local pmc libpcre
     .local pmc pcre_function
-    .local pmc config
     .local string osname
     .local int loaded
 
-    config = _config()
-    osname = config['osname']
-
+    osname = sysinfo .SYSINFO_PARROT_OS
+     
     if 'MSWin32' == osname goto LIB_WIN32
     if 'cygwin'  == osname goto LIB_CYGWIN
 
@@ -202,8 +202,6 @@ Returns the match.
 
     .return( ver )
 .end
-
-.include "library/config.pir"
 
 =back
 
