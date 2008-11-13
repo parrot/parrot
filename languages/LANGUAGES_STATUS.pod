@@ -517,10 +517,11 @@ See also L<http://homepages.cwi.nl/~tromp/cl/lazy-k.html>
 =item Status
 
 Working, but not complete. Part of languages smoke testing.
+A new maintainer is sought.
 
 =item Last verified with parrot version
 
-0.7.1
+0.8.0
 
 =item Location
 

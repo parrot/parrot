@@ -96,14 +96,14 @@ put:
     null NUL
     k1f = new_expr(expK1, f, NUL)
 
-    .return  new_expr(expS2, k1f, g)
+    .tailcall  new_expr(expS2, k1f, g)
 .end
 
 .sub append
     .param pmc old
     .param pmc n
 
-    .return run_in_sequence(n, old)
+    .tailcall run_in_sequence(n, old)
 .end
 
 # convert expression (which sould be a churn numeral to a native int
@@ -130,7 +130,7 @@ err:
     .param pmc list
     .local pmc k
     k = global "K"
-    .return new_apply(list, k)
+    .tailcall new_apply(list, k)
 .end
 
 # get tail of list
@@ -138,7 +138,7 @@ err:
     .param pmc list
     .local pmc ki
     ki = global "KI"
-    .return new_apply(list, ki)
+    .tailcall new_apply(list, ki)
 .end
 
 # create globals for commonly used expressions and
@@ -201,7 +201,7 @@ err:
     .param pmc lhs
     .param pmc rhs
 
-    .return new_expr(expA, lhs, rhs)
+    .tailcall new_expr(expA, lhs, rhs)
 .end
 
 # parse from an IO handle
@@ -221,7 +221,7 @@ loop:
     unless ch == '`' goto not_bq
 	op = parse(io)
 	arg = parse(io)
-	.return new_apply(op, arg)
+	.tailcall new_apply(op, arg)
 not_bq:
     unless ch == 'i' goto not_i
 	.return (I)
