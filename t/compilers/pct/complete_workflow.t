@@ -4,14 +4,11 @@
 
 use strict;
 use warnings;
-use 5;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 
-use Cwd qw(cwd);
-use Data::Dumper;
 use Test::More;
-use Parrot::Test tests => 7;
 
+use Parrot::Test tests => 10;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Config;
 
@@ -54,12 +51,18 @@ END_PG
 
 ok( $pg_fn, 'got name of grammar file' );
 ok( -e $pg_fn, 'grammar file exists' );
-#diag( Dumper( \%PConfig ) );
 
 # compile the grammar
 ( my $gen_grammar_fn = $pg_fn ) =~s/pg$/pir/;
-system( $PARROT, $PERL6GRAMMAR, "--output=$gen_grammar_fn", $pg_fn );
+my $rv = Parrot::Test::run_command(
+   qq{$PARROT $PERL6GRAMMAR $pg_fn},
+   STDOUT => $gen_grammar_fn,
+);
+is( $rv, 0, 'generated PIR successfully' ); 
 ok( -e $gen_grammar_fn, 'generated parser exists' );
+my $gen_grammar = slurp_file($gen_grammar_fn);
+unlink $gen_grammar_fn;;
+
 
 # set up a file with the actions
 my ($PM, $pm_fn) = create_tempfile( SUFFIX => '.pm', DIR => $TEST_DIR, UNLINK => 1 );
@@ -89,10 +92,17 @@ ok( $pm_fn, 'got name of action file' );
 ok( -e $pm_fn, 'action file exists' );
 #diag( Dumper( \%PConfig ) );
 
-# compile the grammar
+# compile the actions
 ( my $gen_actions_fn = $pm_fn ) =~s/nqp$/pir/;
-system( $PARROT, $NQP, "--output=$gen_actions_fn", "--target=pir", $pm_fn );
 ok( -e $gen_actions_fn, 'generated parser exists' );
+$rv = Parrot::Test::run_command(
+   qq{$PARROT $NQP --target=pir $pm_fn},
+   STDOUT => $gen_actions_fn,
+);
+is( $rv, 0, 'generated PIR successfully' ); 
+ok( -e $gen_actions_fn, 'generated actions exist' );
+my $gen_actions = slurp_file($gen_actions_fn);
+unlink $gen_actions_fn;;
 
 
 my $driver_pir = <<'CODE';
@@ -123,8 +133,22 @@ my $driver_pir = <<'CODE';
 
 CODE
 
-$driver_pir .= "\n.include '$gen_grammar_fn'";
-$driver_pir .= "\n.include '$gen_actions_fn'";
+# Add the generated code to the driver,
+# so that everything is in one place
+$driver_pir .= <<"CODE";
+#------------------------------#
+# The generated parser         #
+#------------------------------#
+
+$gen_grammar
+
+#------------------------------#
+# The generated actions        #
+#------------------------------#
+
+$gen_actions
+
+CODE
 
 pir_output_is( $driver_pir, <<'OUT', 'workflow, parse only' ); 
 "parse" => PMC 'TestGrammar;Grammar' => "thingy" @ 0
