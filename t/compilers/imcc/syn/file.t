@@ -12,7 +12,6 @@ use File::Spec;
 use Test::More;
 
 use Parrot::Test::Util 'create_tempfile';
-
 use Parrot::Config;
 use Parrot::Test tests => 14;
 
