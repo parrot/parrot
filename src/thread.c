@@ -1180,7 +1180,7 @@ pt_suspend_self_for_gc(PARROT_INTERP)
 
     if (interp->thread_data->state & THREAD_STATE_SUSPEND_GC_REQUESTED) {
         DEBUG_ONLY(fprintf(stderr, "remove queued request\n"));
-        while (!PMC_IS_NULL(Parrot_cx_delete_suspend_for_gc(interp)));
+        while (!PMC_IS_NULL(Parrot_cx_delete_suspend_for_gc(interp))) {/*Empty body*/};
         DEBUG_ONLY(fprintf(stderr, "removed all queued requests\n"));
         interp->thread_data->state &= ~THREAD_STATE_SUSPEND_GC_REQUESTED;
     }
@@ -1575,7 +1575,7 @@ pt_DOD_start_mark(PARROT_INTERP)
     }
     else if (interp->thread_data->state &
                THREAD_STATE_SUSPEND_GC_REQUESTED) {
-        while (!PMC_IS_NULL(Parrot_cx_delete_suspend_for_gc(interp)));
+        while (!PMC_IS_NULL(Parrot_cx_delete_suspend_for_gc(interp))) {/*Empty body*/};
 
         interp->thread_data->state &= ~THREAD_STATE_SUSPEND_GC_REQUESTED;
         interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC;

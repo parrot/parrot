@@ -1793,11 +1793,6 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
     int        ok = 0;
     op_info_t *op_info;
 
-    /* XXX move these statics into IMCC_INFO */
-    opcode_t       *pc;
-    opcode_t        npc;
-    /* XXX end */
-
 #if IMC_TRACE_HIGH
     PIO_eprintf(NULL, "e_pbc_emit\n");
 #endif

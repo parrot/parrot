@@ -346,7 +346,7 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     int dirs = 0;
     Instruction *ins;
     op_info_t   *op_info;
-    char fullname[64], format[128], buf[10];
+    char fullname[64], format[128];
 
     if ((STREQ(name, "set_args"))
     ||  (STREQ(name, "get_results"))
@@ -1353,7 +1353,7 @@ imcc_vfprintf(PARROT_INTERP, ARGMOD(FILE *fd), ARGIN(const char *format), va_lis
         int         ch = 0;
         size_t      n;
 
-        for (n = 0; (ch = *fmt) && ch != '%'; fmt++, n++);
+        for (n = 0; (ch = *fmt) && ch != '%'; fmt++, n++) {/*Empty body*/};
 
         /* print prev string */
         if (n) {
