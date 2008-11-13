@@ -833,16 +833,17 @@ inline op pop_eh() {
 }
 
 inline op throw(invar PMC) :flow {
-    opcode_t * dest;
-    opcode_t * const ret  = expr NEXT();
-    PMC * resume = new_ret_continuation_pmc(interp, ret);
+    opcode_t *dest;
+    opcode_t *const ret    = expr NEXT();
+    PMC            *resume = new_ret_continuation_pmc(interp, ret);
     VTABLE_set_attr_str(interp, $1, const_string(interp, "resume"), resume);
-    dest = Parrot_ex_throw_from_op(interp, $1, resume);
+    dest = Parrot_ex_throw_from_op(interp, $1, ret);
     goto ADDRESS(dest);
 }
 
 inline op throw(invar PMC, invar PMC) :flow {
-    opcode_t * const dest = Parrot_ex_throw_from_op(interp, $1, $2);
+    opcode_t * const dest = Parrot_ex_throw_from_op(interp, $1,
+                                VTABLE_get_pointer(interp, $2));
     goto ADDRESS(dest);
 }
 
@@ -857,28 +858,30 @@ inline op count_eh(out INT) {
 }
 
 inline op die(in STR) :flow {
-    opcode_t * dest;
-    PMC *exception = Parrot_ex_build_exception(interp, EXCEPT_error,
-            CONTROL_ERROR, $1);
-    opcode_t * const ret  = expr NEXT();
-    PMC * resume = new_ret_continuation_pmc(interp, ret);
+    opcode_t        *dest;
+    opcode_t * const ret       = expr NEXT();
+    PMC             *resume    = new_ret_continuation_pmc(interp, ret);
+    PMC             *exception = Parrot_ex_build_exception(interp, EXCEPT_error,
+                                    CONTROL_ERROR, $1);
+
     VTABLE_set_attr_str(interp, exception,
                         const_string(interp, "resume"), resume);
-    dest = Parrot_ex_throw_from_op(interp, exception, resume);
+    dest = Parrot_ex_throw_from_op(interp, exception, ret);
     goto ADDRESS(dest);
 }
 
 inline op die(in PMC) :flow {
-    opcode_t *dest;
-    opcode_t * const ret = expr NEXT();
-    STRING          *msg = PMC_IS_NULL($1)
-                         ? NULL : VTABLE_get_string(interp, $1);
-    PMC            *exception =
+    opcode_t        *dest;
+    opcode_t * const ret       = expr NEXT();
+    PMC             *resume    = new_ret_continuation_pmc(interp, ret);
+    STRING          *msg       = PMC_IS_NULL($1)
+                               ? NULL : VTABLE_get_string(interp, $1);
+    PMC             *exception =
         Parrot_ex_build_exception(interp, EXCEPT_error, CONTROL_ERROR, msg);
-    PMC * resume = new_ret_continuation_pmc(interp, ret);
+
     VTABLE_set_attr_str(interp, exception,
                         const_string(interp, "resume"), resume);
-    dest = Parrot_ex_throw_from_op(interp, exception, resume);
+    dest = Parrot_ex_throw_from_op(interp, exception, ret);
     goto ADDRESS(dest);
 }
 
@@ -886,23 +889,25 @@ inline op die(in INT, in INT) :flow {
     if ($1 == EXCEPT_doomed)
         _exit($2);
     else {
-        PMC *exception        = Parrot_ex_build_exception(interp, $1, $2, NULL);
-        opcode_t * const ret  = expr NEXT();
-        PMC * resume = new_ret_continuation_pmc(interp, ret);
-        opcode_t * const dest = Parrot_ex_throw_from_op(interp, exception, resume);
+        opcode_t * const ret       = expr NEXT();
+        PMC             *resume    = new_ret_continuation_pmc(interp, ret);
+        PMC             *exception = Parrot_ex_build_exception(interp, $1,
+                                                               $2, NULL);
+        opcode_t * const dest      = Parrot_ex_throw_from_op(interp,
+                                                             exception, ret);
         goto ADDRESS(dest);
     }
 }
 
 inline op exit(in INT) :flow {
-    opcode_t * dest;
-    PMC      *exception   =
-        Parrot_ex_build_exception(interp, EXCEPT_exit, $1, NULL);
-    opcode_t * const ret  = expr NEXT();
-    PMC * resume = new_ret_continuation_pmc(interp, ret);
+    opcode_t        *dest;
+    opcode_t * const ret       = expr NEXT();
+    PMC             *resume    = new_ret_continuation_pmc(interp, ret);
+    PMC             *exception = Parrot_ex_build_exception(interp, EXCEPT_exit,
+                                                      $1, NULL);
     VTABLE_set_attr_str(interp, exception,
                         const_string(interp, "resume"), resume);
-    dest = Parrot_ex_throw_from_op(interp, exception, resume);
+    dest = Parrot_ex_throw_from_op(interp, exception, ret);
     goto ADDRESS(dest);
 }
 
