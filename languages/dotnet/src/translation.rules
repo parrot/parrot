@@ -1563,7 +1563,7 @@ typeinfo = <<PIR
 
 # Get signature.
 ${PTEMP1} = new "DotNetSignature"
-${STEMP0} = ${ASSEMBLY}.get_blob(${ITEMP0})
+${STEMP0} = ${ASSEMBLY}.'get_blob'(${ITEMP0})
 ${PTEMP1} = ${STEMP0}
 
 # Parse signature, annotate it with register types and store it.
@@ -1602,7 +1602,7 @@ typeinfo = <<PIR
 
 # Get signature.
 ${PTEMP1} = new "DotNetSignature"
-${STEMP0} = ${ASSEMBLY}.get_blob(${ITEMP0})
+${STEMP0} = ${ASSEMBLY}.'get_blob'(${ITEMP0})
 ${PTEMP1} = ${STEMP0}
 
 # Parse signature, annotate it with register types and store it.
@@ -1758,18 +1758,18 @@ if ${ITEMP0} goto castclass_INTERNAL_TYPE
 # External type. Get typeref token.
 ${ITEMP0} = band ${ARG0}, 0x00FFFFFF
 dec ${ITEMP0} # Array starts at 0, meta-data table starts at 1.
-${PTEMP2} = ${ASSEMBLY}.get_typerefs()
+${PTEMP2} = ${ASSEMBLY}.'get_typerefs'()
 ${PTEMP3} = ${PTEMP2}[${ITEMP0}]
-${STEMP1} = ${PTEMP3}.get_namespace()
+${STEMP1} = ${PTEMP3}.'get_namespace'()
 goto castclass_DONE_TYPE
 
 # Internal type. Get class token.
 castclass_INTERNAL_TYPE:
 ${ITEMP0} = band ${ARG0}, 0x01FFFFFF
 ${ITEMP0} -= 2
-${PTEMP2} = ${ASSEMBLY}.get_classes()
+${PTEMP2} = ${ASSEMBLY}.'get_classes'()
 ${PTEMP3} = ${PTEMP2}[${ITEMP0}]
-${STEMP1} = ${PTEMP3}.get_fullname()
+${STEMP1} = ${PTEMP3}.'get_fullname'()
 castclass_DONE_TYPE:
 
 # Generate two new labels.
@@ -1832,18 +1832,18 @@ if ${ITEMP0} goto isinst_INTERNAL_TYPE
 # External type. Get typeref token.
 ${ITEMP0} = band ${ARG0}, 0x00FFFFFF
 dec ${ITEMP0} # Array starts at 0, meta-data table starts at 1.
-${PTEMP2} = ${ASSEMBLY}.get_typerefs()
+${PTEMP2} = ${ASSEMBLY}.'get_typerefs'()
 ${PTEMP3} = ${PTEMP2}[${ITEMP0}]
-${STEMP1} = ${PTEMP3}.get_namespace()
+${STEMP1} = ${PTEMP3}.'get_namespace'()
 goto isinst_DONE_TYPE
 
 # Internal type. Get class token.
 isinst_INTERNAL_TYPE:
 ${ITEMP0} = band ${ARG0}, 0x01FFFFFF
 ${ITEMP0} -= 2
-${PTEMP2} = ${ASSEMBLY}.get_classes()
+${PTEMP2} = ${ASSEMBLY}.'get_classes'()
 ${PTEMP3} = ${PTEMP2}[${ITEMP0}]
-${STEMP1} = ${PTEMP3}.get_fullname()
+${STEMP1} = ${PTEMP3}.'get_fullname'()
 isinst_DONE_TYPE:
 
 # Generate two new labels.
@@ -1907,7 +1907,7 @@ class = op
 pop = 1
 arguments = ttype
 instruction = <<INS
-$P1000000 = ${STACK0}.load_pmc()
+$P1000000 = ${STACK0}.'load_pmc'()
 $P1000000.__init()
 INS
 typeinfo = # None
@@ -1918,9 +1918,9 @@ class = op
 pop = 2
 arguments = ttype
 instruction = <<INS
-$P1000000 = ${STACK0}.load_pmc()
+$P1000000 = ${STACK0}.'load_pmc'()
 $P1000000 = clone $P1000000
-${STACK1}.store_pmc($P1000000)
+${STACK1}.'store_pmc'($P1000000)
 INS
 typeinfo = # None
 
@@ -1931,7 +1931,7 @@ pop = 1
 push = 1
 arguments = ttype
 instruction = <<INS
-$P1000000 = ${STACK0}.load_pmc()
+$P1000000 = ${STACK0}.'load_pmc'()
 ${DEST0} = clone $P1000000
 INS
 typeinfo = <<PIR
@@ -2161,18 +2161,18 @@ if ${ITEMP0} goto unbox_INTERNAL_TYPE
 # External type. Get typeref token.
 ${ITEMP0} = band ${ARG0}, 0x00FFFFFF
 dec ${ITEMP0} # Array starts at 0, meta-data table starts at 1.
-${PTEMP2} = ${ASSEMBLY}.get_typerefs()
+${PTEMP2} = ${ASSEMBLY}.'get_typerefs'()
 ${PTEMP3} = ${PTEMP2}[${ITEMP0}]
-${STEMP1} = ${PTEMP3}.get_namespace()
+${STEMP1} = ${PTEMP3}.'get_namespace'()
 goto unbox_DONE_TYPE
 
 # Internal type. Get class token.
 unbox_INTERNAL_TYPE:
 ${ITEMP0} = band ${ARG0}, 0x01FFFFFF
 ${ITEMP0} -= 2
-${PTEMP2} = ${ASSEMBLY}.get_classes()
+${PTEMP2} = ${ASSEMBLY}.'get_classes'()
 ${PTEMP3} = ${PTEMP2}[${ITEMP0}]
-${STEMP1} = ${PTEMP3}.get_fullname()
+${STEMP1} = ${PTEMP3}.'get_fullname'()
 unbox_DONE_TYPE:
 
 # Build new type info hash.
@@ -2300,7 +2300,7 @@ if ${ITEMP0} goto newarr_INTERNAL_TYPE
 # External type. Get typeref token.
 ${ITEMP0} = band ${ARG0}, 0x00FFFFFF
 dec ${ITEMP0} # Array starts at 0, meta-data table starts at 1.
-${PTEMP2} = ${ASSEMBLY}.get_typerefs()
+${PTEMP2} = ${ASSEMBLY}.'get_typerefs'()
 ${PTEMP3} = ${PTEMP2}[${ITEMP0}]
 goto newarr_DONE_TYPE
 
@@ -2308,12 +2308,12 @@ goto newarr_DONE_TYPE
 newarr_INTERNAL_TYPE:
 ${ITEMP0} = band ${ARG0}, 0x01FFFFFF
 dec ${ITEMP0} # Array starts at 0, meta-data table starts at 1.
-${PTEMP2} = ${ASSEMBLY}.get_classes()
+${PTEMP2} = ${ASSEMBLY}.'get_classes'()
 ${PTEMP3} = ${PTEMP2}[${ITEMP0}]
 newarr_DONE_TYPE:
 
 # See if we have a built-in type.
-${STEMP0} = ${PTEMP3}.get_namespace()
+${STEMP0} = ${PTEMP3}.'get_namespace'()
 if ${STEMP0} != "System" goto newarr_OBJECT
 
 # Get name of the built-in type and see if it's an integer or float.
@@ -2628,7 +2628,7 @@ push = 1
 arguments = tstring
 pir = <<PIR
 ${ITEMP0} = band ${ARG0}, 0x0FFFFFFF
-${STEMP0} = ${ASSEMBLY}.get_user_string(${ITEMP0})
+${STEMP0} = ${ASSEMBLY}.'get_user_string'(${ITEMP0})
 ${STEMP2} = '"'
 ${STEMP1} = escaper(${STEMP0}, ${STEMP2})
 ${ITEMP0} = find_encoding "utf8"
@@ -2861,7 +2861,7 @@ code = 46
 class = op
 pop = 1
 push = 1
-instruction = ${DEST0} = ${STACK0}.load_int()
+instruction = ${DEST0} = ${STACK0}.'load_int'()
 typeinfo = <<PIR
 ${PTEMP0} = new "Hash"
 ${PTEMP0}["type"] = ELEMENT_TYPE_I1
@@ -2875,7 +2875,7 @@ code = 47
 class = op
 pop = 1
 push = 1
-instruction = ${DEST0} = ${STACK0}.load_int()
+instruction = ${DEST0} = ${STACK0}.'load_int'()
 typeinfo = <<PIR
 ${PTEMP0} = new "Hash"
 ${PTEMP0}["type"] = ELEMENT_TYPE_U1
@@ -2889,7 +2889,7 @@ code = 48
 class = op
 pop = 1
 push = 1
-instruction = ${DEST0} = ${STACK0}.load_int()
+instruction = ${DEST0} = ${STACK0}.'load_int'()
 typeinfo = <<PIR
 ${PTEMP0} = new "Hash"
 ${PTEMP0}["type"] = ELEMENT_TYPE_I2
@@ -2903,7 +2903,7 @@ code = 49
 class = op
 pop = 1
 push = 1
-instruction = ${DEST0} = ${STACK0}.load_int()
+instruction = ${DEST0} = ${STACK0}.'load_int'()
 typeinfo = <<PIR
 ${PTEMP0} = new "Hash"
 ${PTEMP0}["type"] = ELEMENT_TYPE_U2
@@ -2917,7 +2917,7 @@ code = 4A
 class = op
 pop = 1
 push = 1
-instruction = ${DEST0} = ${STACK0}.load_int()
+instruction = ${DEST0} = ${STACK0}.'load_int'()
 typeinfo = <<PIR
 ${PTEMP0} = new "Hash"
 ${PTEMP0}["type"] = ELEMENT_TYPE_I4
@@ -2931,7 +2931,7 @@ code = 4C
 class = op
 pop = 1
 push = 1
-instruction = ${DEST0} = ${STACK0}.load_pmc()
+instruction = ${DEST0} = ${STACK0}.'load_pmc'()
 typeinfo = <<PIR
 ${PTEMP0} = new "Hash"
 ${PTEMP0}["type"] = ELEMENT_TYPE_I8
@@ -2945,7 +2945,7 @@ code = 4B
 class = op
 pop = 1
 push = 1
-instruction = ${DEST0} = ${STACK0}.load_int()
+instruction = ${DEST0} = ${STACK0}.'load_int'()
 typeinfo = <<PIR
 ${PTEMP0} = new "Hash"
 ${PTEMP0}["type"] = ELEMENT_TYPE_U4
@@ -2959,7 +2959,7 @@ code = 4D
 class = op
 pop = 1
 push = 1
-instruction = ${DEST0} = ${STACK0}.load_int()
+instruction = ${DEST0} = ${STACK0}.'load_int'()
 typeinfo = <<PIR
 ${PTEMP0} = new "Hash"
 ${PTEMP0}["type"] = ELEMENT_TYPE_I
@@ -2973,7 +2973,7 @@ code = 4E
 class = op
 pop = 1
 push = 1
-instruction = ${DEST0} = ${STACK0}.load_float()
+instruction = ${DEST0} = ${STACK0}.'load_float'()
 typeinfo = <<PIR
 ${PTEMP0} = new "Hash"
 ${PTEMP0}["type"] = ELEMENT_TYPE_R4
@@ -2987,7 +2987,7 @@ code = 4F
 class = op
 pop = 1
 push = 1
-instruction = ${DEST0} = ${STACK0}.load_float()
+instruction = ${DEST0} = ${STACK0}.'load_float'()
 typeinfo = <<PIR
 ${PTEMP0} = new "Hash"
 ${PTEMP0}["type"] = ELEMENT_TYPE_R8
@@ -3001,7 +3001,7 @@ code = 50
 class = op
 pop = 1
 push = 1
-instruction = ${DEST0} = ${STACK0}.load_pmc()
+instruction = ${DEST0} = ${STACK0}.'load_pmc'()
 typeinfo = <<PIR
 ${PTEMP0} = new "Hash"
 ${PTEMP0}["type"] = ELEMENT_TYPE_OBJECT
@@ -3014,56 +3014,56 @@ PIR
 code = 51
 class = op
 pop = 2
-instruction = ${STACK1}.store_pmc(${STACK0})
+instruction = ${STACK1}.'store_pmc'(${STACK0})
 typeinfo = # None
 
 [stind.i1]
 code = 52
 class = op
 pop = 2
-instruction = ${STACK1}.store_int(${STACK0})
+instruction = ${STACK1}.'store_int'(${STACK0})
 typeinfo = # None
 
 [stind.i2]
 code = 53
 class = op
 pop = 2
-instruction = ${STACK1}.store_int(${STACK0})
+instruction = ${STACK1}.'store_int'(${STACK0})
 typeinfo = # None
 
 [stind.i4]
 code = 54
 class = op
 pop = 2
-instruction = ${STACK1}.store_int(${STACK0})
+instruction = ${STACK1}.'store_int'(${STACK0})
 typeinfo = # None
 
 [stind.i8]
 code = 55
 class = op
 pop = 2
-instruction = ${STACK1}.store_pmc(${STACK0})
+instruction = ${STACK1}.'store_pmc'(${STACK0})
 typeinfo = # None
 
 [stind.i]
 code = DF
 class = op
 pop = 2
-instruction = ${STACK1}.store_int(${STACK0})
+instruction = ${STACK1}.'store_int'(${STACK0})
 typeinfo = # None
 
 [stind.r4]
 code = 56
 class = op
 pop = 2
-instruction = ${STACK1}.store_float(${STACK0})
+instruction = ${STACK1}.'store_float'(${STACK0})
 typeinfo = # None
 
 [stind.r8]
 code = 57
 class = op
 pop = 2
-instruction = ${STACK1}.store_float(${STACK0})
+instruction = ${STACK1}.'store_float'(${STACK0})
 typeinfo = # None
 
 

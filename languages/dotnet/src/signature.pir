@@ -18,7 +18,7 @@ OPTIONAL:
 GETDEFREF:
 
     # Read type def or ref.
-    type_def_or_ref = signature.read_compressed()
+    type_def_or_ref = signature.'read_compressed'()
 
     # Return stuff.
     .return (opt_req, type_def_or_ref)
@@ -35,7 +35,7 @@ GETDEFREF:
     ret = new 'Hash'
 
     # Read type token.
-    t1 = signature.read_compressed()
+    t1 = signature.'read_compressed'()
 
     # First see if we have a custom modifier.
     if t1 == 0x1F goto CMOD
@@ -43,12 +43,12 @@ GETDEFREF:
     goto NO_CMOD
 CMOD:
     (cmod_req, cmod_type_def_or_ref) = get_signature_CustomMod(signature, t1)
-    t1 = signature.read_compressed()
+    t1 = signature.'read_compressed'()
 NO_CMOD:
 
     # If it's byref, we've got another one to read.
     if t1 != 0x10 goto NORMALTYPE
-    t2 = signature.read_compressed()
+    t2 = signature.'read_compressed'()
     ret["type"] = t2
     ret["byref"] = 1
     goto TYPEREAD
@@ -61,7 +61,7 @@ TYPEREAD:
     type = ret["type"]
     if type < 0x0F goto NOTOKEN
     if type > 0x12 goto NOTOKEN
-    token = signature.read_compressed()
+    token = signature.'read_compressed'()
     ret["token"] = token
 NOTOKEN:
 
@@ -106,7 +106,7 @@ NOFP:
     # XXX We need to do stuff with these. Maybe.
 
     # First token is always 6.
-    t1 = signature.read_compressed()
+    t1 = signature.'read_compressed'()
     if t1 == 6 goto NORMAL
     ex = new 'Exception'
     ex = "Expected a field signature, got something else."
@@ -114,7 +114,7 @@ NOFP:
 NORMAL:
 
     # Read type token.
-    t1 = signature.read_compressed()
+    t1 = signature.'read_compressed'()
     ret["type"] = t1
     ret["byref"] = 0
 
@@ -122,7 +122,7 @@ NORMAL:
     type = ret["type"]
     if type < 0x0F goto NOTOKEN
     if type > 0x12 goto NOTOKEN
-    token = signature.read_compressed()
+    token = signature.'read_compressed'()
     ret["token"] = token
 NOTOKEN:
 
@@ -163,18 +163,18 @@ NOFP:
     ret = new 'Hash'
 
     # Read type token.
-    t1 = signature.read_compressed()
+    t1 = signature.'read_compressed'()
 
     # There's a chance this won't be a type token, but rather a constraint.
     # It can only be the pinned constraint.
     if t1 != 0x45 goto NOTPINNED
     ret["pinned"] = 1
-    t1 = signature.read_compressed()
+    t1 = signature.'read_compressed'()
 NOTPINNED:
 
     # If it's byref, we've got another one to read.
     if t1 != 0x10 goto NORMALTYPE
-    t2 = signature.read_compressed()
+    t2 = signature.'read_compressed'()
     ret["type"] = t2
     ret["byref"] = 1
     goto TYPEREAD
@@ -187,7 +187,7 @@ TYPEREAD:
     type = ret["type"]
     if type < 0x0F goto NOTOKEN
     if type > 0x12 goto NOTOKEN
-    token = signature.read_compressed()
+    token = signature.'read_compressed'()
     ret["token"] = token
 NOTOKEN:
 

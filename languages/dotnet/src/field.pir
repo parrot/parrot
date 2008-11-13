@@ -16,20 +16,20 @@
 
     # If we're here, it's an internal field. Get field name and signature.
     field_id = band token, 0x1FFFFFF
-    field = assembly.get_field(field_id)
-    sig = field.get_signature()
-    class = field.get_class()
-    ns = class.get_fullname()
+    field = assembly.'get_field'(field_id)
+    sig = field.'get_signature'()
+    class = field.'get_class'()
+    ns = class.'get_fullname'()
     goto DONE
 
     # If we get here, it's an external field. Get member semantics PMC.
 EXTERNAL:
     field_id = band token, 0x1FFFFFF
     dec field_id
-    memberrefs = assembly.get_memberrefs()
+    memberrefs = assembly.'get_memberrefs'()
     memberref = memberrefs[field_id]
-    class_type = memberref.get_class_type()
-    class_id = memberref.get_class_id()
+    class_type = memberref.'get_class_type'()
+    class_id = memberref.'get_class_id'()
     dec class_id
     if class_type == 1 goto TYPEREF
     ex = new 'Exception'
@@ -38,9 +38,9 @@ EXTERNAL:
 
     # If we have a typeref, get it.
 TYPEREF:
-    typerefs = assembly.get_typerefs()
+    typerefs = assembly.'get_typerefs'()
     class = typerefs[class_id]
-    tmp = class.get_namespace()
+    tmp = class.'get_namespace'()
     ns = clone tmp
     if ns == "" goto NO_DOT
     ns = concat "."
@@ -48,7 +48,7 @@ NO_DOT:
     tmp = class
     ns = concat tmp
     field = memberref
-    sig = memberref.get_signature()
+    sig = memberref.'get_signature'()
 
     # Return stuff.
 DONE:

@@ -14,14 +14,14 @@
     .local int flags, impl_flags, static_check, abstract_check, runtime_check
 
     # Check if method is static, abstract and/or runtime provided.
-    flags = meth.get_flags()
-    impl_flags = meth.get_impl_flags()
+    flags = meth.'get_flags'()
+    impl_flags = meth.'get_impl_flags'()
     static_check = band flags, 0x10
     abstract_check = band flags, 0x0400
     runtime_check = band impl_flags, 0x1002 # Internal or runtime
 
     # Get details of parameter info and multi-method dispatch markup.
-    ns = class.get_fullname()
+    ns = class.'get_fullname'()
     (rettype, ptypes, pir_params, pir_multi) = trans_method_params(assembly, meth, ns)
 
     # Emit top of method.
@@ -104,13 +104,13 @@ METHOD_END:
     .local pmc rettype, ptypes, ptype
 
     # Get signature.
-    sig_pos = meth.get_signature()
-    sig_data = assembly.get_blob(sig_pos)
+    sig_pos = meth.'get_signature'()
+    sig_data = assembly.'get_blob'(sig_pos)
     signature = new "DotNetSignature"
     signature = sig_data
 
     # Get flags.
-    flags = signature.read_uint8()
+    flags = signature.'read_uint8'()
 
     # Check if it's a static method, has this specified explicitly or is
     # var arg.
@@ -119,7 +119,7 @@ METHOD_END:
     vararg_check = band flags, 0x7
 
     # Get number of parameters.
-    param_count = signature.read_compressed()
+    param_count = signature.'read_compressed'()
 
     # Return type.
     rettype = get_signature_RetType_or_Param(signature)
@@ -194,15 +194,15 @@ MMD_CLASS:
     ex = "Unknown class type to build MMD signature for."
     throw ex
 MMD_CLASS_DEF:
-    classes = assembly.get_classes()
+    classes = assembly.'get_classes'()
     dec class_id
     class = classes[class_id]
-    tmp = class.get_fullname()
+    tmp = class.'get_fullname'()
     tmp = namespace_to_key(tmp)
     pir_multi = concat tmp
     goto MMD_DONE
 MMD_CLASS_REF:
-    classes = assembly.get_typerefs()
+    classes = assembly.'get_typerefs'()
     class = classes[class_id]
     tmp = class
     tmp = namespace_to_key(tmp)
@@ -260,15 +260,15 @@ NOT_VARARG:
     ltypes = new 'ResizablePMCArray'
 
     # Get signature.
-    bc = meth.get_bytecode()
-    sig_pos = bc.get_locals_sig()
+    bc = meth.'get_bytecode'()
+    sig_pos = bc.'get_locals_sig'()
     if sig_pos == 0 goto EXIT
-    sig_data = assembly.get_blob(sig_pos)
+    sig_data = assembly.'get_blob'(sig_pos)
     signature = new "DotNetSignature"
     signature = sig_data
 
     # Ensure it's a local sig. XXX Right thing to do when it's not?
-    sig_type = signature.read_uint8()
+    sig_type = signature.'read_uint8'()
     if sig_type == 0x7 goto SIG_OK
     ex = new 'Exception'
     ex = "Locals signature is not a locals signature."
@@ -276,7 +276,7 @@ NOT_VARARG:
 SIG_OK:
 
     # Read locals count.
-    count = signature.read_compressed()
+    count = signature.'read_compressed'()
 
     # Loop over local variabless.
     i = 0
@@ -338,9 +338,9 @@ EXIT:
     # If we're here, it's an internal method. Get method PMC, namespace, parse
     # its sig etc.
     meth_id = band token, 0x1FFFFFF
-    meth = assembly.get_method(meth_id)
-    class = meth.get_class()
-    ns = class.get_fullname()
+    meth = assembly.'get_method'(meth_id)
+    class = meth.'get_class'()
+    ns = class.'get_fullname'()
     (rettype, ptypes, tmp) = trans_method_params(assembly, meth, ns)
     goto DONE
 
@@ -348,10 +348,10 @@ EXIT:
 EXTERNAL:
     meth_id = band token, 0x1FFFFFF
     dec meth_id
-    memberrefs = assembly.get_memberrefs()
+    memberrefs = assembly.'get_memberrefs'()
     memberref = memberrefs[meth_id]
-    class_type = memberref.get_class_type()
-    class_id = memberref.get_class_id()
+    class_type = memberref.'get_class_type'()
+    class_id = memberref.'get_class_id'()
     dec class_id
     if class_type == 1 goto TYPEREF
     if class_type == 3 goto METHODDEF
@@ -361,9 +361,9 @@ EXTERNAL:
 
     # If we have a typeref, get it.
 TYPEREF:
-    typerefs = assembly.get_typerefs()
+    typerefs = assembly.'get_typerefs'()
     class = typerefs[class_id]
-    tmp = class.get_namespace()
+    tmp = class.'get_namespace'()
     ns = clone tmp
     if ns == "" goto NO_DOT
     ns = concat "."
@@ -376,9 +376,9 @@ NO_DOT:
 
     # If we have a methoddef, grab it.
 METHODDEF:
-    meth = assembly.get_method(class_id)
-    class = meth.get_class()
-    ns = class.get_fullname()
+    meth = assembly.'get_method'(class_id)
+    class = meth.'get_class'()
+    ns = class.'get_fullname'()
     (rettype, ptypes, tmp) = trans_method_params(assembly, meth, ns)
     goto DONE
 
@@ -484,16 +484,16 @@ PLOOP_END:
     # A type in this file.
 DEF:
     dec class_id # Because row 2 = element 0 here, thanks to the global class
-    classes = assembly.get_classes()
+    classes = assembly.'get_classes'()
     pclass = classes[class_id]
-    pclass_ns = pclass.get_fullname()
+    pclass_ns = pclass.'get_fullname'()
     goto DONE
 
     # A type in another file.
 REF:
-    classes = assembly.get_typerefs()
+    classes = assembly.'get_typerefs'()
     pclass = classes[class_id]
-    pclass_ns = pclass.get_namespace()
+    pclass_ns = pclass.'get_namespace'()
     pclass_ns = clone pclass_ns
     if pclass_ns == "" goto NO_NS
     pclass_ns = concat "."

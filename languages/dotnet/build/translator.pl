@@ -447,8 +447,8 @@ printerr "\\n"
 NO_IN_TRACE:
 
     # Get bytecode and initialize pc.
-    bc = meth.get_bytecode()
-    bc_length = bc.get_length()
+    bc = meth.'get_bytecode'()
+    bc_length = bc.'get_length'()
     pc = 0
 
         # Initialize stack types array.
@@ -486,7 +486,7 @@ TRANSPIR
     # routine will jump back to TRANS_LOOP after translating the instruction.
     $pir .= <<'PIRCODE';
     # If we have exception handlers, need some intial stuff emitted.
-    ehs = bc.get_eh()
+    ehs = bc.'get_eh'()
     if null ehs goto NO_EH_HEADER
     i = elements ehs
     gen_pir = concat ".local pmc cur_exception\n"
@@ -500,7 +500,7 @@ NO_EH_HEADER:
     # Translation loop.
     ss_propogate = new 'Hash'
 TRANS_LOOP:
-    pc = bc.get_pos()
+    pc = bc.'get_pos'()
         next_pc = pc
     if pc >= bc_length goto COMPLETE
 
@@ -530,11 +530,11 @@ EH_LOOP:
     eh = ehs[i]
 
     # If this is the start of a try block, emit a push_eh instruction.
-    try_offset = eh.get_try_offset()
-    try_length = eh.get_try_length()
+    try_offset = eh.'get_try_offset'()
+    try_length = eh.'get_try_length'()
     if try_offset != pc goto NOT_TRY_START
     gen_pir = concat "push_eh LAB"
-    handler_offset = eh.get_handler_offset()
+    handler_offset = eh.'get_handler_offset'()
     tmp = handler_offset
     gen_pir = concat tmp
     gen_pir = concat "\npushmark "
@@ -545,8 +545,8 @@ EH_LOOP:
 NOT_TRY_START:
 
     # If this is the start of a typed exception handler...
-    handler_offset = eh.get_handler_offset()
-    eh_flags = eh.get_flags()
+    handler_offset = eh.'get_handler_offset'()
+    eh_flags = eh.'get_flags'()
     if eh_flags != 0 goto NOT_TYPED_EH_START
     if handler_offset != pc goto NOT_TYPED_EH_START
 
@@ -554,8 +554,8 @@ NOT_TRY_START:
     # is accepted.
     gen_pir = concat ".get_results (cur_exception)\n"
     gen_pir = concat "$P1000001 = cur_exception[\"obj\"]\n"
-    class_type = eh.get_class_type()
-    class_id = eh.get_class_id()
+    class_type = eh.'get_class_type'()
+    class_id = eh.'get_class_id'()
     gen_pir = concat "$I1000000 = isa $P1000001, "
     ($P0, $S0) = class_info_from_ehtype(assembly, class_type, class_id)
     $S0 = namespace_to_key($S0)
@@ -680,7 +680,7 @@ sub generate_dispatch_table {
     # rather than O(n).
     my $pir = <<PIRCODE;
         # Translation code dispatch table.
-        cur_ic = bc.read_uint8()
+        cur_ic = bc.'read_uint8'()
         next_pc += 1
 PIRCODE
     $pir .= binary_dispatch_table( '', @rules_grouped );
@@ -756,7 +756,7 @@ sub binary_dispatch_table {
                 hex($x) <=> hex($1)
             } @rules;
             $pir .= "B2_BRANCH_$_:\n";
-            $pir .= "    cur_ic = bc.read_uint8()\n    next_pc += 1\n";
+            $pir .= "    cur_ic = bc.'read_uint8'()\n    next_pc += 1\n";
             $pir .= binary_dispatch_table( $_, @rules );
         }
     }
@@ -838,73 +838,73 @@ PIR
 
         # uint8
         if (/^uint8$/) {
-            $out      = "    \${I_ARG_$arg_num} = bc.read_uint8()\n    next_pc += 1\n";
+            $out      = "    \${I_ARG_$arg_num} = bc.'read_uint8'()\n    next_pc += 1\n";
             $arg_name = "I_ARG_$arg_num";
         }
 
         # int8
         elsif (/^int8$/) {
-            $out      = "    \${I_ARG_$arg_num} = bc.read_int8()\n    next_pc += 1\n";
+            $out      = "    \${I_ARG_$arg_num} = bc.'read_int8'()\n    next_pc += 1\n";
             $arg_name = "I_ARG_$arg_num";
         }
 
         # uint16
         elsif (/^uint16$/) {
-            $out      = "    \${I_ARG_$arg_num} = bc.read_uint16()\n    next_pc += 2\n";
+            $out      = "    \${I_ARG_$arg_num} = bc.'read_uint16'()\n    next_pc += 2\n";
             $arg_name = "I_ARG_$arg_num";
         }
 
         # int16
         elsif (/^int16$/) {
-            $out      = "    \${I_ARG_$arg_num} = bc.read_int16()\n    next_pc += 2\n";
+            $out      = "    \${I_ARG_$arg_num} = bc.'read_int16'()\n    next_pc += 2\n";
             $arg_name = "I_ARG_$arg_num";
         }
 
         # uint32
         elsif (/^uint32$/) {
-            $out      = "    \${I_ARG_$arg_num} = bc.read_uint32()\n    next_pc += 4\n";
+            $out      = "    \${I_ARG_$arg_num} = bc.'read_uint32'()\n    next_pc += 4\n";
             $arg_name = "I_ARG_$arg_num";
         }
 
         # int32
         elsif (/^int32$/) {
-            $out      = "    \${I_ARG_$arg_num} = bc.read_int32()\n    next_pc += 4\n";
+            $out      = "    \${I_ARG_$arg_num} = bc.'read_int32'()\n    next_pc += 4\n";
             $arg_name = "I_ARG_$arg_num";
         }
 
         # float32
         elsif (/^float32$/) {
-            $out      = "    \${N_ARG_$arg_num} = bc.read_float32()\n    next_pc += 4\n";
+            $out      = "    \${N_ARG_$arg_num} = bc.'read_float32'()\n    next_pc += 4\n";
             $arg_name = "N_ARG_$arg_num";
         }
 
         # float64
         elsif (/^float64$/) {
-            $out      = "    \${N_ARG_$arg_num} = bc.read_float64()\n    next_pc += 8\n";
+            $out      = "    \${N_ARG_$arg_num} = bc.'read_float64'()\n    next_pc += 8\n";
             $arg_name = "N_ARG_$arg_num";
         }
 
         # tfield
         elsif (/^tfield$/) {
-            $out      = "    \${I_ARG_$arg_num} = bc.read_tfield()\n    next_pc += 4\n";
+            $out      = "    \${I_ARG_$arg_num} = bc.'read_tfield'()\n    next_pc += 4\n";
             $arg_name = "I_ARG_$arg_num";
         }
 
         # tmethod
         elsif (/^tmethod$/) {
-            $out      = "    \${I_ARG_$arg_num} = bc.read_tmethod()\n    next_pc += 4\n";
+            $out      = "    \${I_ARG_$arg_num} = bc.'read_tmethod'()\n    next_pc += 4\n";
             $arg_name = "I_ARG_$arg_num";
         }
 
         # ttype
         elsif (/^ttype$/) {
-            $out      = "    \${I_ARG_$arg_num} = bc.read_ttype()\n    next_pc += 4\n";
+            $out      = "    \${I_ARG_$arg_num} = bc.'read_ttype'()\n    next_pc += 4\n";
             $arg_name = "I_ARG_$arg_num";
         }
 
         # tstring
         elsif (/^tstring$/) {
-            $out      = "    \${I_ARG_$arg_num} = bc.read_tstring()\n    next_pc += 4\n";
+            $out      = "    \${I_ARG_$arg_num} = bc.'read_tstring'()\n    next_pc += 4\n";
             $arg_name = "I_ARG_$arg_num";
         }
 
@@ -912,13 +912,13 @@ PIR
         elsif (/^jumptable$/) {
             $out = <<"PIR";
     \${P_ARG_$arg_num} = new "FixedPMCArray"
-    i = bc.read_uint32()
+    i = bc.'read_uint32'()
     next_pc += 4
     \${P_ARG_$arg_num} = i
     j = 0
 JT_LOOP_$name:
     if j == i goto JT_LOOP_END_$name
-    \$I0 = bc.read_int32()
+    \$I0 = bc.'read_int32'()
     next_pc += 4
     \${P_ARG_$arg_num}[j] = \$I0
     inc j

@@ -3,7 +3,7 @@
 
 [System.Object::InternalGetHashCode]
     .param pmc obj
-    $I0 = obj.__hash(42)
+    $I0 = obj.'__hash'(42)
     .return($I0)
 
 

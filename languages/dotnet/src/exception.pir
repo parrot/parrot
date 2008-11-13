@@ -24,12 +24,12 @@ EH_LOOP:
     eh = ehs[i]
 
     # Get info about handler.
-    flags = eh.get_flags()
-    try_start = eh.get_try_offset()
-    try_length = eh.get_try_length()
+    flags = eh.'get_flags'()
+    try_start = eh.'get_try_offset'()
+    try_length = eh.'get_try_length'()
     try_end = try_start + try_length
-    handler_start = eh.get_handler_offset()
-    handler_length = eh.get_handler_length()
+    handler_start = eh.'get_handler_offset'()
+    handler_length = eh.'get_handler_length'()
     handler_end = handler_start + handler_length
 
     # See if we've got to the block we're leaving for. If so, we know the
@@ -102,11 +102,11 @@ EH_LOOP_END:
 EH_LOOP:
     if i >= num_handlers goto EH_LOOP_END
     eh = ehs[i]
-    flags = eh.get_flags()
+    flags = eh.'get_flags'()
     if flags != 2 goto EH_LOOP_NEXT
-    handler_start = eh.get_handler_offset()
+    handler_start = eh.'get_handler_offset'()
     if pc < handler_start goto EH_LOOP_NEXT
-    handler_length = eh.get_handler_length()
+    handler_length = eh.'get_handler_length'()
     handler_end = handler_start + handler_length
     if pc > handler_end goto EH_LOOP_NEXT
     found = i
@@ -158,16 +158,16 @@ NOT_SHAFTED:
     # A type in this file.
 DEF:
     dec class_id # Because row 2 = element 0 here, thanks to the global class
-    classes = assembly.get_classes()
+    classes = assembly.'get_classes'()
     pclass = classes[class_id]
-    pclass_ns = pclass.get_fullname()
+    pclass_ns = pclass.'get_fullname'()
     goto DONE
 
     # A type in another file.
 REF:
-    classes = assembly.get_typerefs()
+    classes = assembly.'get_typerefs'()
     pclass = classes[class_id]
-    pclass_ns = pclass.get_namespace()
+    pclass_ns = pclass.'get_namespace'()
     pclass_ns = clone pclass_ns
     if pclass_ns == "" goto NO_NS
     pclass_ns = concat "."
