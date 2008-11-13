@@ -331,8 +331,8 @@ sub run_command {
         }
     }
 
-    if ( $out and $err and "$out" eq "$err" ) {
-        $err = "&STDOUT";
+    if ( $out and $err and $out eq $err ) {
+        $err = '&STDOUT';
     }
 
     local *OLDOUT if $out;    ## no critic Variables::ProhibitConditionalDeclarations
