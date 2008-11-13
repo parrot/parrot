@@ -60,7 +60,7 @@ Accessor for the 'ostgrammar' attribute.
 .sub 'ostgrammar' :method
     .param string value        :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('$ostgrammar', value, has_value)
+    .tailcall self.'attr'('$ostgrammar', value, has_value)
 .end
 
 
@@ -85,11 +85,11 @@ resulting ost.
     ostgrammar_namekeys = split '::', ostgrammar_name
     ostgrammar = new ostgrammar_namekeys
     ostbuilder = ostgrammar.'apply'(source)
-    .return ostbuilder.'get'('post')
+    .tailcall ostbuilder.'get'('post')
 
   default_ostgrammar:
     $P0 = compreg 'PAST'
-    .return $P0.'compile'(source, adverbs :flat :named)
+    .tailcall $P0.'compile'(source, adverbs :flat :named)
 .end
 
 
@@ -160,25 +160,25 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .sub 'ops_const' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('ops_const', value, has_value)
+    .tailcall self.'attr'('ops_const', value, has_value)
 .end
 
 .sub 'ops_subr' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('ops_subr', value, has_value)
+    .tailcall self.'attr'('ops_subr', value, has_value)
 .end
 
 .sub 'storage_const' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('storage_const', value, has_value)
+    .tailcall self.'attr'('storage_const', value, has_value)
 .end
 
 .sub 'storage_lex' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('storage_lex', value, has_value)
+    .tailcall self.'attr'('storage_lex', value, has_value)
 .end
 
 
@@ -192,7 +192,7 @@ used in F<languages/lua/src/POSTGrammar.tg>
 .sub 'prologue' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('prologue', value, has_value)
+    .tailcall self.'attr'('prologue', value, has_value)
 .end
 
 

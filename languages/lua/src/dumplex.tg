@@ -40,7 +40,7 @@ transform past (ROOT) :language('PIR') {
     goto L2
   L1:
     $P0 = get_hll_global ['PAST'], 'Block'
-    .return $P0.'new'(past, 'node'=>node, 'name'=>'anon')
+    .tailcall $P0.'new'(past, 'node'=>node, 'name'=>'anon')
 }
 
 
@@ -55,7 +55,7 @@ transform past (Lua::TestLex::token) :language('PIR') {
     $S1 = concat 'Lua::TestLex::', $S0
     past = tree.'get'('past', $P0, $S1)
     $P0 = get_hll_global ['PAST'], 'Op'
-    .return $P0.'new'(past, 'node'=>node, 'name'=>'println', 'pasttype'=>'call')
+    .tailcall $P0.'new'(past, 'node'=>node, 'name'=>'println', 'pasttype'=>'call')
 }
 
 
@@ -67,7 +67,7 @@ transform past (Lua::TestLex::keyword) :language('PIR') {
     $S0 = node.'result_object'()
     $S1 = concat "keyword:\t", $S0
     $P0 = get_hll_global ['PAST'], 'Val'
-    .return $P0.'new'('node'=>node, 'value'=>$S1)
+    .tailcall $P0.'new'('node'=>node, 'value'=>$S1)
 }
 
 
@@ -79,7 +79,7 @@ transform past (Lua::TestLex::punctuator) :language('PIR') {
     $S0 = node.'result_object'()
     $S1 = concat "punct:\t", $S0
     $P0 = get_hll_global ['PAST'], 'Val'
-    .return $P0.'new'('node'=>node, 'value'=>$S1)
+    .tailcall $P0.'new'('node'=>node, 'value'=>$S1)
 }
 
 
@@ -91,7 +91,7 @@ transform past (Lua::TestLex::Name) :language('PIR') {
     $S0 = node.'result_object'()
     $S1 = concat "Name:\t", $S0
     $P0 = get_hll_global ['PAST'], 'Val'
-    .return $P0.'new'('node'=>node, 'value'=>$S1)
+    .tailcall $P0.'new'('node'=>node, 'value'=>$S1)
 }
 
 
@@ -117,7 +117,7 @@ transform past (Lua::TestLex::String) :language('PIR') {
     internal_error('unknown string')
   L9:
     $P0 = get_hll_global ['PAST'], 'Val'
-    .return $P0.'new'('node'=>node, 'value'=>$S1)
+    .tailcall $P0.'new'('node'=>node, 'value'=>$S1)
 }
 
 
@@ -129,7 +129,7 @@ transform past (Lua::TestLex::Number) :language('PIR') {
     $S0 = node.'result_object'()
     $S1 = concat "Number:\t", $S0
     $P0 = get_hll_global ['PAST'], 'Val'
-    .return $P0.'new'('node'=>node, 'value'=>$S1)
+    .tailcall $P0.'new'('node'=>node, 'value'=>$S1)
 }
 
 =back

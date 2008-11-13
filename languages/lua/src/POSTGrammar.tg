@@ -109,7 +109,7 @@ PIRCODE
     post.'outer'(start)
     start.'push'(post)
     $P0 = get_hll_global ['Lua'; 'POST'], 'Chunk'
-    .return $P0.'new'(start, 'node'=>node, 'prologue'=><<'PIRCODE')
+    .tailcall $P0.'new'(start, 'node'=>node, 'prologue'=><<'PIRCODE')
 .include "interpinfo.pasm"
 .HLL "Lua", "lua_group"
 PIRCODE
@@ -136,13 +136,13 @@ transform post (PAST::Stmts) :language('PIR') {
 
 
 transform void (PAST::Stmts) :language('PIR') {
-    .return tree.'get'('post', node)
+    .tailcall tree.'get'('post', node)
 }
 
 
 transform void (PAST::Op) :language('PIR') {
     $S0 = node.'pasttype'()
-    .return tree.'get'($S0, node)
+    .tailcall tree.'get'($S0, node)
 }
 
 
@@ -150,9 +150,9 @@ transform cond (PAST::Op) :language('PIR') {
     $S0 = node.'pirop'()
     $I0 = index $S0, 'is'
     unless $I0 >= 0 goto L1
-    .return tree.'get'('cmp', node)
+    .tailcall tree.'get'('cmp', node)
   L1:
-    .return tree.'get'('post', node)
+    .tailcall tree.'get'('post', node)
 }
 
 
@@ -170,7 +170,7 @@ transform post (PAST::Op) :language('PIR') {
     post.'result'(result)
     .return (post)
   L1:
-    .return tree.'get'($S0, node)
+    .tailcall tree.'get'($S0, node)
 }
 
 
@@ -325,7 +325,7 @@ transform and (PAST::Op) :language('PIR') {
 
 
 transform or (PAST::Op) :language('PIR') {
-    .return tree.'get'('and', node)
+    .tailcall tree.'get'('and', node)
 }
 
 
@@ -671,7 +671,7 @@ transform break (PAST::Op) :language('PIR') {
     endlabels = get_hll_global ['Lua';'POST'], '@endlabels'
     $S0 = endlabels[0]
     $P0 = get_hll_global ['POST'], 'Op'
-    .return $P0.'new'($S0, 'node'=>node, 'pirop'=>'goto')
+    .tailcall $P0.'new'($S0, 'node'=>node, 'pirop'=>'goto')
 }
 
 
@@ -779,7 +779,7 @@ transform parenthese (PAST::Op) :language('PIR') {
 
 
 transform cond (PAST::Val) :language('PIR') {
-    .return tree.'get'('post', node)
+    .tailcall tree.'get'('post', node)
 }
 
 
@@ -806,7 +806,7 @@ transform post (PAST::Val) :language('PIR') {
     ops.'result'(result)
     .return (ops)
   L1:
-    .return tree.'get'(type, node)
+    .tailcall tree.'get'(type, node)
 }
 
 
@@ -898,13 +898,13 @@ transform constructor (PAST::Val) :language('PIR') {
 
 
 transform cond (PAST::Var) :language('PIR') {
-    .return tree.'get'('post', node)
+    .tailcall tree.'get'('post', node)
 }
 
 
 transform post (PAST::Var) :language('PIR') {
     $S0 = node.'scope'()
-    .return tree.'get'($S0, node)
+    .tailcall tree.'get'($S0, node)
 }
 
 
@@ -1056,7 +1056,7 @@ PIRCODE
 
 
 transform keyed (PAST::Var) :language('PIR') {
-    .return tree.'get'('package', node)
+    .tailcall tree.'get'('package', node)
 }
 
 

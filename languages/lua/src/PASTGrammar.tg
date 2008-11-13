@@ -34,7 +34,7 @@ transform past (ROOT) :language('PIR') {
     $P0 = get_hll_global ['PAST'], 'Var'
     arg = $P0.'new'('node'=>node, 'name'=>'vararg', 'scope'=>'parameter', 'slurpy'=>1)
     $P0 = get_hll_global ['PAST'], 'Block'
-    .return $P0.'new'(arg, past, 'node'=>node, 'name'=>'&main')
+    .tailcall $P0.'new'(arg, past, 'node'=>node, 'name'=>'&main')
   L1:
     $S1 = $I0
     $S0 = "symbol table (" . $S1
@@ -75,7 +75,7 @@ transform past (Lua::Grammar::statement) :language('PIR') {
     $S0 = node.'find_key'()
     $P0 = node[$S0]
     $S0 = concat 'Lua::Grammar::', $S0
-    .return tree.'get'('past', $P0, $S0)
+    .tailcall tree.'get'('past', $P0, $S0)
 }
 
 
@@ -84,7 +84,7 @@ transform past (Lua::Grammar::do_block) :language('PIR') {
     symbtab = get_hll_global ['Lua';'PAST'], '$symbtab'
     symbtab.'push_scope'()
     $P0 = node['block']
-    .return tree.'get'('past', $P0, 'Lua::Grammar::block')
+    .tailcall tree.'get'('past', $P0, 'Lua::Grammar::block')
 }
 
 
@@ -136,7 +136,7 @@ transform past (Lua::Grammar::elseif_block) :language('PIR') {
     $P0 = node['block']
     blk = tree.'get'('past', $P0, 'Lua::Grammar::block')
     $P0 = get_hll_global ['PAST'], 'Op'
-    .return $P0.'new'(expr, blk, 'node'=>node, 'pasttype'=>'if')
+    .tailcall $P0.'new'(expr, blk, 'node'=>node, 'pasttype'=>'if')
 }
 
 
@@ -155,7 +155,7 @@ transform past (Lua::Grammar::while_stat) :language('PIR') {
     blk = tree.'get'('past', $P0, 'Lua::Grammar::block')
     dec looplevel
     $P0 = get_hll_global ['PAST'], 'Op'
-    .return $P0.'new'(expr, blk, 'node'=>node, 'pasttype'=>'while')
+    .tailcall $P0.'new'(expr, blk, 'node'=>node, 'pasttype'=>'while')
 }
 
 
@@ -174,7 +174,7 @@ transform past (Lua::Grammar::repeat_stat) :language('PIR') {
     expr = tree.'get'('past', $P0, 'Lua::Grammar::expression')
     dec looplevel
     $P0 = get_hll_global ['PAST'], 'Op'
-    .return $P0.'new'(blk, expr, 'node'=>node, 'pasttype'=>'repeat')
+    .tailcall $P0.'new'(blk, expr, 'node'=>node, 'pasttype'=>'repeat')
 }
 
 
@@ -226,7 +226,7 @@ transform past (Lua::Grammar::fornum) :language('PIR') {
     push explist, expr
   L3:
     $P0 = get_hll_global ['PAST'], 'Op'
-    .return $P0.'new'(name, explist, 'node'=>node, 'pasttype'=>'fornum')
+    .tailcall $P0.'new'(name, explist, 'node'=>node, 'pasttype'=>'fornum')
 }
 
 
@@ -254,7 +254,7 @@ transform past (Lua::Grammar::forlist) :language('PIR') {
     .local pmc explist
     explist = tree.'get'('explist', $P0, 'Lua::Grammar::expression_list')
     $P0 = get_hll_global ['PAST'], 'Op'
-    .return $P0.'new'(namelist, explist, 'node'=>node, 'pasttype'=>'forlist')
+    .tailcall $P0.'new'(namelist, explist, 'node'=>node, 'pasttype'=>'forlist')
 }
 
 
@@ -262,7 +262,7 @@ transform past (Lua::Grammar::local_stat) :language('PIR') {
     $S0 = node.'find_key'()
     $P0 = node[$S0]
     $S0 = concat 'Lua::Grammar::', $S0
-    .return tree.'get'('past', $P0, $S0)
+    .tailcall tree.'get'('past', $P0, $S0)
 }
 
 
@@ -294,7 +294,7 @@ transform past (Lua::Grammar::local_declaration) :language('PIR') {
     goto L3
   L4:
     $P0 = get_hll_global ['PAST'], 'Op'
-    .return $P0.'new'(namelist, explist, 'node'=>node, 'pasttype'=>'assignlist')
+    .tailcall $P0.'new'(namelist, explist, 'node'=>node, 'pasttype'=>'assignlist')
 }
 
 
@@ -324,9 +324,9 @@ transform past (Lua::Grammar::return_statement) :language('PIR') {
     .local pmc explist
     $P0 = shift $P0
     explist = tree.'get'('explist', $P0, 'Lua::Grammar::expression_list')
-    .return $P1.'new'(explist :flat, 'node'=>node, 'pasttype'=>'return')
+    .tailcall $P1.'new'(explist :flat, 'node'=>node, 'pasttype'=>'return')
   L1:
-    .return $P1.'new'('node'=>node, 'pasttype'=>'return')
+    .tailcall $P1.'new'('node'=>node, 'pasttype'=>'return')
 }
 
 
@@ -335,7 +335,7 @@ transform past (Lua::Grammar::break_statement) :language('PIR') {
     looplevel = get_hll_global ['Lua';'PAST'], '$looplevel'
     if looplevel <= 0 goto L1
     $P0 = get_hll_global ['PAST'], 'Op'
-    .return $P0.'new'('node'=>node, 'pasttype'=>'break')
+    .tailcall $P0.'new'('node'=>node, 'pasttype'=>'break')
   L1:
     node.'syntaxerror'("no loop to break")
 }
@@ -345,7 +345,7 @@ transform past (Lua::Grammar::expression_stat) :language('PIR') {
     $P0 = node['assignment']
     unless null $P0 goto L1
     $P0 = node['primary_expression']
-    .return tree.'get'('past', $P0, 'Lua::Grammar::primary_expression')
+    .tailcall tree.'get'('past', $P0, 'Lua::Grammar::primary_expression')
   L1:
     .local pmc varlist, explist
     $P0 = shift $P0
@@ -357,7 +357,7 @@ transform past (Lua::Grammar::expression_stat) :language('PIR') {
     expr.'lvalue'(1)
     unshift varlist, expr
     $P0 = get_hll_global ['PAST'], 'Op'
-    .return $P0.'new'(varlist, explist, 'node'=>node, 'pasttype'=>'assignlist')
+    .tailcall $P0.'new'(varlist, explist, 'node'=>node, 'pasttype'=>'assignlist')
 }
 
 
@@ -382,10 +382,10 @@ transform varlist (Lua::Grammar::assignment) :language('PIR') {
 transform explist (Lua::Grammar::assignment) :language('PIR') {
     $P0 = node['expression_list']
     if null $P0 goto L1
-    .return tree.'get'('explist', $P0, 'Lua::Grammar::expression_list')
+    .tailcall tree.'get'('explist', $P0, 'Lua::Grammar::expression_list')
   L1:
     $P0 = node['assignment']
-    .return tree.'get'('explist', $P0, 'Lua::Grammar::assignment')
+    .tailcall tree.'get'('explist', $P0, 'Lua::Grammar::assignment')
 }
 
 
@@ -411,7 +411,7 @@ transform explist (Lua::Grammar::function_args) :language('PIR') {
     .return (explist)
   L3:
     $P0 = shift $P0
-    .return tree.'get'('explist', $P0, 'Lua::Grammar::expression_list')
+    .tailcall tree.'get'('explist', $P0, 'Lua::Grammar::expression_list')
 }
 
 
@@ -434,7 +434,7 @@ transform past (Lua::Grammar::function_stat) :language('PIR') {
     past = tree.'get'('past', $P0, 'Lua::Grammar::function_body')
     past.'name'($S0)
     $P0 = get_hll_global ['PAST'], 'Op'
-    .return $P0.'new'(var, past, 'node'=>node, 'pasttype'=>'assign')
+    .tailcall $P0.'new'(var, past, 'node'=>node, 'pasttype'=>'assign')
 }
 
 
@@ -550,7 +550,7 @@ transform past (Lua::Grammar::function_body) :language('PIR') {
     set_hll_global ['Lua';'PAST'], '$looplevel', looplevel
     set_hll_global ['Lua';'PAST'], '?vararg', has_vararg
     $P0 = get_hll_global ['PAST'], 'Block'
-    .return $P0.'new'(parlist :flat, past, 'node'=>node)
+    .tailcall $P0.'new'(parlist :flat, past, 'node'=>node)
 }
 
 
@@ -603,13 +603,13 @@ transform record (Lua::Grammar::record_field) :language('PIR') {
 transform key (Lua::Grammar::Name) :language('PIR') {
     $S0 = node.'result_object'()
     $P0 = get_hll_global ['PAST'], 'Val'
-    .return $P0.'new'('node'=>node, 'name'=>'key', 'value'=>$S0)
+    .tailcall $P0.'new'('node'=>node, 'name'=>'key', 'value'=>$S0)
 }
 
 
 transform key (Lua::Grammar::index) :language('PIR') {
     $P0 = node['expression']
-    .return tree.'get'('past', $P0, 'Lua::Grammar::expression')
+    .tailcall tree.'get'('past', $P0, 'Lua::Grammar::expression')
 }
 
 
@@ -632,7 +632,7 @@ transform explist (Lua::Grammar::expression_list) :language('PIR') {
 
 transform past (Lua::Grammar::expression) :language('PIR') {
     $P0 = node['expr']
-    .return tree.'get'('past', $P0, 'Lua::Grammar::expr')
+    .tailcall tree.'get'('past', $P0, 'Lua::Grammar::expr')
 }
 
 
@@ -643,7 +643,7 @@ transform past (Lua::Grammar::expr) :language('PIR') {
     $S0 = node.'find_key'()
     $P0 = node[$S0]
     $S0 = concat 'Lua::Grammar::', $S0
-    .return tree.'get'('past', $P0, $S0)
+    .tailcall tree.'get'('past', $P0, $S0)
   L1:
     .local pmc optable, optok
     .local string pirop
@@ -677,7 +677,7 @@ transform past (Lua::Grammar::simple_expression) :language('PIR') {
     $S0 = node.'find_key'()
     $P0 = node[$S0]
     $S0 = concat 'Lua::Grammar::', $S0
-    .return tree.'get'('past', $P0, $S0)
+    .tailcall tree.'get'('past', $P0, $S0)
 }
 
 
@@ -734,7 +734,7 @@ transform past (Lua::Grammar::prefix_expression) :language('PIR') {
     $S0 = node.'find_key'()
     $P0 = node[$S0]
     $S0 = concat 'Lua::Grammar::', $S0
-    .return tree.'get'('past', $P0, $S0)
+    .tailcall tree.'get'('past', $P0, $S0)
 }
 
 
@@ -743,7 +743,7 @@ transform past (Lua::Grammar::parenthesed_expression) :language('PIR') {
     $P0 = node['expression']
     past = tree.'get'('past', $P0, 'Lua::Grammar::expression')
     $P0 = get_hll_global ['PAST'], 'Op'
-    .return $P0.'new'(past, 'node'=>node, 'pasttype'=>'parenthese')
+    .tailcall $P0.'new'(past, 'node'=>node, 'pasttype'=>'parenthese')
 }
 
 
@@ -754,9 +754,9 @@ transform past (Lua::Grammar::Name) :language('PIR') {
     $S0 = node.'result_object'()
     ($I0, $S1) = symbtab.'lookup'($S0)
     unless $I0 goto L1
-    .return $P0.'new'('node'=>node, 'name'=>$S1, 'scope'=>'lexical')
+    .tailcall $P0.'new'('node'=>node, 'name'=>$S1, 'scope'=>'lexical')
   L1:
-    .return $P0.'new'('node'=>node, 'name'=>$S0, 'scope'=>'package')
+    .tailcall $P0.'new'('node'=>node, 'name'=>$S0, 'scope'=>'package')
 }
 
 
@@ -765,7 +765,7 @@ transform past (Lua::Grammar::vararg) :language('PIR') {
     has_vararg = get_hll_global ['Lua';'PAST'], '?vararg'
     unless has_vararg goto L1
     $P0 = get_hll_global ['PAST'], 'Op'
-    .return $P0.'new'('node'=>node, 'pasttype'=>'vararg')
+    .tailcall $P0.'new'('node'=>node, 'pasttype'=>'vararg')
   L1:
     node.'syntaxerror'("cannot use '...' outside a vararg function")
 }
@@ -773,26 +773,26 @@ transform past (Lua::Grammar::vararg) :language('PIR') {
 
 transform past (Lua::Grammar::nil) :language('PIR') {
     $P0 = get_hll_global ['PAST'], 'Val'
-    .return $P0.'new'('node'=>node, 'name'=>'LuaNil')
+    .tailcall $P0.'new'('node'=>node, 'name'=>'LuaNil')
 }
 
 
 transform past (Lua::Grammar::true) :language('PIR') {
     $P0 = get_hll_global ['PAST'], 'Val'
-    .return $P0.'new'('node'=>node, 'name'=>'LuaBoolean', 'value'=>1)
+    .tailcall $P0.'new'('node'=>node, 'name'=>'LuaBoolean', 'value'=>1)
 }
 
 
 transform past (Lua::Grammar::false) :language('PIR') {
     $P0 = get_hll_global ['PAST'], 'Val'
-    .return $P0.'new'('node'=>node, 'name'=>'LuaBoolean', 'value'=>0)
+    .tailcall $P0.'new'('node'=>node, 'name'=>'LuaBoolean', 'value'=>0)
 }
 
 
 transform past (Lua::Grammar::number) :language('PIR') {
     $S0 = node.'result_object'()
     $P0 = get_hll_global ['PAST'], 'Val'
-    .return $P0.'new'('node'=>node, 'name'=>'LuaNumber', 'value'=>$S0)
+    .tailcall $P0.'new'('node'=>node, 'name'=>'LuaNumber', 'value'=>$S0)
 }
 
 
@@ -801,7 +801,7 @@ transform past (Lua::Grammar::string) :language('PIR') {
     $P0 = node[$S0]
     $S0 = $P0.'result_object'()
     $P0 = get_hll_global ['PAST'], 'Val'
-    .return $P0.'new'('node'=>node, 'name'=>'LuaString', 'value'=>$S0)
+    .tailcall $P0.'new'('node'=>node, 'name'=>'LuaString', 'value'=>$S0)
 }
 
 =head1 AUTHORS
