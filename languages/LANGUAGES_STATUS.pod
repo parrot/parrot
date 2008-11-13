@@ -1075,10 +1075,11 @@ See also L<http://www.madore.org/~david/programs/unlambda/>
 =item Status
 
 Working. Part of languages smoke testing.
+A new maintainer is sought.
 
 =item Last verified with parrot version
 
-0.7.1
+0.8.0
 
 =item Location
 

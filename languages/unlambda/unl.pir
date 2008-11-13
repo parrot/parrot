@@ -40,7 +40,7 @@ run:
     $P0 = getinterp
     $P0."recursion_limit"(50000)
     prog = parse(in)
-    cchar = new .String
+    cchar = new 'String'
     global "cchar" = cchar
     # _dumper( prog, "prog" )
     ev(prog)
@@ -54,15 +54,15 @@ run:
 
     .local string ch
     .local pmc op, arg, pair
-    .const .Sub i  = "i"
-    .const .Sub k  = "k"
-    .const .Sub s  = "s"
-    .const .Sub c  = "c"
-    .const .Sub d  = "d"
-    .const .Sub v  = "v"
-    .const .Sub e  = "e"
-    .const .Sub rd  = "rd"
-    .const .Sub pc  = "pc"
+    .const 'Sub' i  = "i"
+    .const 'Sub' k  = "k"
+    .const 'Sub' s  = "s"
+    .const 'Sub' c  = "c"
+    .const 'Sub' d  = "d"
+    .const 'Sub' v  = "v"
+    .const 'Sub' e  = "e"
+    .const 'Sub' rd  = "rd"
+    .const 'Sub' pc  = "pc"
 loop:
     ch = read io, 1
     unless ch == '`' goto not_bq
@@ -76,9 +76,9 @@ loop:
 not_bq:
     unless ch == '.' goto not_dot
 	$S0 = read io, 1
-	arg = new .String
+	arg = new 'String'
 	arg = $S0
-	.return clos_pr(arg)
+	.tailcall clos_pr(arg)
 not_dot:
     unless ch == '@' goto not_rd
 	.return (rd)
@@ -88,14 +88,14 @@ not_rd:
 not_pc:
     unless ch == '?' goto not_rc
 	$S0 = read io, 1
-	arg = new .String
+	arg = new 'String'
 	arg = $S0
-	.return clos_rc(arg)
+	.tailcall clos_rc(arg)
 not_rc:
     unless ch == 'r' goto not_r
-	arg = new .String
+	arg = new 'String'
 	arg = "\n"
-	.return clos_pr(arg)
+	.tailcall clos_pr(arg)
 not_r:
     unless ch == 'i' goto not_i
 	.return (i)
@@ -137,8 +137,8 @@ not_comment:
 # debugging helper
 .sub unparse
     .param pmc exp
-    $I0 = typeof exp
-    unless $I0 == .FixedPMCArray goto no_ar
+    $I0 = isa exp, 'FixedPMCArray'
+    unless $I0 goto no_ar
 	$I1 = elements exp
 	if $I1 != 2 goto no_ar
 	.local pmc car, cdr
@@ -166,12 +166,12 @@ no_ar:
 .sub ev
     .param pmc exp
     ## unparse_all(exp)
-    $I0 = typeof exp
-    unless $I0 == .FixedPMCArray goto no_ar
+    $I0 = isa exp, 'FixedPMCArray'
+    unless $I0 goto no_ar
 	$I1 = elements exp
 	if $I1 != 2 goto no_pair
 	.local pmc car, cdr, op, arg
-	.const .Sub d  = "d"
+	.const 'Sub' d  = "d"
 	car = exp[0]
 	cdr = exp[1]
 	# this is tricky - we have to apply car
@@ -179,11 +179,11 @@ no_ar:
 	# else this doesn't play together with call/cc
 	op = ev(car)
 	if car != d goto not_d
-	.return clos_d1(cdr)
+	.tailcall clos_d1(cdr)
 
     not_d:
 	arg = ev(cdr)
-	.return op(arg)
+	.tailcall op(arg)
 no_ar:
     .return (exp)
 no_pair:
@@ -199,7 +199,7 @@ no_pair:
     .param pmc arg
     .local pmc cl
     .lex 'x', arg
-    .const .Sub pr = "pr"
+    .const 'Sub' pr = "pr"
     cl = newclosure pr
     .return (cl)
 .end
@@ -223,15 +223,15 @@ no_pair:
 # k constant generator
 .sub k
     .param pmc arg
-    .const .Sub k1  = "k1"
-    .return clos_k1(arg)
+    .const 'Sub' k1  = "k1"
+    .tailcall clos_k1(arg)
 .end
 
 .sub clos_k1
     .param pmc arg
     .local pmc cl
     .lex 'x', arg
-    .const .Sub k1 = "k1"
+    .const 'Sub' k1 = "k1"
     cl = newclosure k1
     .return (cl)
 .end
@@ -247,14 +247,14 @@ no_pair:
 # s substitution
 .sub s
     .param pmc arg
-    .return clos_s1("x", arg)
+    .tailcall clos_s1("x", arg)
 .end
 
 .sub clos_s1
     .param pmc arg
     .local pmc cl
     .lex 'x', arg
-    .const .Sub s1 = "s1"
+    .const 'Sub' s1 = "s1"
     cl = newclosure s1
     .return (cl)
 .end
@@ -264,7 +264,7 @@ no_pair:
     .param pmc arg
     .local pmc x
     x = find_lex 'x'
-    .return clos_s2(x, arg)
+    .tailcall clos_s2(x, arg)
 .end
 
 #
@@ -276,7 +276,7 @@ no_pair:
     .local pmc cl
     .lex 'x', arg
     .lex 'y', arg2
-    .const .Sub s2 = "s2"
+    .const 'Sub' s2 = "s2"
     cl = newclosure s2
     .return (cl)
 .end
@@ -289,7 +289,7 @@ no_pair:
     y = find_lex 'y'
     f1 = x(z)
     f2 = y(z)
-    .return f1(f2)
+    .tailcall f1(f2)
 .end
 
 .include "interpinfo.pasm"
@@ -307,16 +307,16 @@ no_pair:
     .param pmc x
     .local pmc cc, c1
     cc = interpinfo .INTERPINFO_CURRENT_CONT
-    .const .Sub c1 = "c1"
+    .const 'Sub' c1 = "c1"
     cc = clos_c1(cc)
-    .return x(cc)
+    .tailcall x(cc)
 .end
 
 .sub clos_c1
     .param pmc arg
     .local pmc cl
     .lex 'cc', arg
-    .const .Sub c1 = "c1"
+    .const 'Sub' c1 = "c1"
     cl = newclosure c1
     .return (cl)
 .end
@@ -341,7 +341,7 @@ no_pair:
     .param pmc arg
     .local pmc cl
     .lex 'F', arg
-    .const .Sub d1 = "d1"
+    .const 'Sub' d1 = "d1"
     cl = newclosure d1
     .return (cl)
 .end
@@ -352,7 +352,7 @@ no_pair:
     .local pmc x, f
     f = find_lex 'F'
     x = ev(f)
-    .return x(y)
+    .tailcall x(y)
 .end
 
 # e exit
@@ -374,18 +374,18 @@ no_pair:
     cchar = global "cchar"
     cchar = ch
     if ch == '' goto void
-       .const .Sub i = "i"
-       .return x(i)
+       .const 'Sub' i = "i"
+       .tailcall x(i)
 void:
-       .const .Sub v = "v"
-       .return x(v)
+       .const 'Sub' v = "v"
+       .tailcall x(v)
 .end
 
 .sub clos_rc
     .param pmc arg
     .local pmc cl
     .lex 'ch', arg
-    .const .Sub rc = "rc"
+    .const 'Sub' rc = "rc"
     cl = newclosure rc
     .return (cl)
 .end
@@ -398,14 +398,14 @@ void:
     cchar = global "cchar"
     ch = cchar
     if ch == '' goto void
-       .const .Sub i = "i"
+       .const 'Sub' i = "i"
        $P0 = find_lex "ch"
        $S0 = $P0
        if $S0 != ch goto void
-       .return x(i)
+       .tailcall x(i)
 void:
-       .const .Sub v = "v"
-       .return x(v)
+       .const 'Sub' v = "v"
+       .tailcall x(v)
 .end
 
 # | reprint character read
@@ -418,10 +418,10 @@ void:
     if ch == '' goto void
 	s = clone cchar
         p = clos_pr(s)
-        .return x(p)
+        .tailcall x(p)
 void:
-        .const .Sub v = "v"
-        .return x(v)
+        .const 'Sub' v = "v"
+        .tailcall x(v)
 .end
 
 .include "library/dumper.pir"
