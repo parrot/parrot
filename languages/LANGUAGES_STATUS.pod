@@ -332,7 +332,7 @@ Planned.
 
 =item Last verified with parrot version
 
-0.7.1
+0.8.0
 
 =item Location
 
@@ -733,7 +733,7 @@ Part of languages smoke testing.
 
 =item Last verified with parrot version
 
-0.6.4
+0.8.0
 
 =item Location
 
