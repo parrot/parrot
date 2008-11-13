@@ -176,7 +176,7 @@ methods are now called 'list', 'hash', and 'item' respectively.
 
 =back
 
-=head2 Functions
+=head1 Functions
 
 =over 4
 
