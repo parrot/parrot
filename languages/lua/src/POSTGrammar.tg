@@ -81,8 +81,8 @@ PIRCODE
     result = ops.'unique'('$P')
     ops.'push_pirop'('newclosure', result, $S0)
     $S0 = ops.'unique'('$P')
-    ops.'push_pirop'('callmethod', 'getfenv', 'subr', 'result'=>$S0)
-    ops.'push_pirop'('callmethod', 'setfenv', result, $S0, 'result'=>'')
+    ops.'push_pirop'('callmethod', '"getfenv"', 'subr', 'result'=>$S0)
+    ops.'push_pirop'('callmethod', '"setfenv"', result, $S0, 'result'=>'')
     ops.'result'(result)
     .return (ops)
   L4:
@@ -1014,7 +1014,7 @@ PIRCODE
     subpost.'ops_subr'($P0)
   L4:
     result = ops.'unique'('$P')
-    basepost = ops.'push_pirop'('callmethod', 'getfenv', 'subr', 'result'=>result)
+    basepost = ops.'push_pirop'('callmethod', '"getfenv"', 'subr', 'result'=>result)
     set_hll_global ['Lua';'POST'], '$?environ', basepost
   L3:
     .local pmc storage_const

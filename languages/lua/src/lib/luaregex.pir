@@ -262,61 +262,61 @@ Francois Perrad
     set_hll_global ['PGE';'LuaRegex'], '$optable', optable
 
     $P0 = get_hll_global ['PGE';'LuaRegex'], 'parse_literal'
-    optable.newtok('term:', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('term:', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
 
     $P0 = get_hll_global ['PGE';'LuaRegex'], 'parse_anchor'
-    optable.newtok('term:^', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
-    optable.newtok('term:$', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('term:^', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('term:$', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    optable.newtok('term:%a', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
-    optable.newtok('term:%A', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
-    optable.newtok('term:%c', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
-    optable.newtok('term:%C', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
-    optable.newtok('term:%d', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
-    optable.newtok('term:%D', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
-    optable.newtok('term:%l', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
-    optable.newtok('term:%L', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
-    optable.newtok('term:%p', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
-    optable.newtok('term:%P', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
-    optable.newtok('term:%s', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
-    optable.newtok('term:%S', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
-    optable.newtok('term:%u', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
-    optable.newtok('term:%U', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
-    optable.newtok('term:%w', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
-    optable.newtok('term:%W', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
-    optable.newtok('term:%x', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
-    optable.newtok('term:%X', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
+    optable.'newtok'('term:%a', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
+    optable.'newtok'('term:%A', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
+    optable.'newtok'('term:%c', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
+    optable.'newtok'('term:%C', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
+    optable.'newtok'('term:%d', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
+    optable.'newtok'('term:%D', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
+    optable.'newtok'('term:%l', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
+    optable.'newtok'('term:%L', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
+    optable.'newtok'('term:%p', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
+    optable.'newtok'('term:%P', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
+    optable.'newtok'('term:%s', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
+    optable.'newtok'('term:%S', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
+    optable.'newtok'('term:%u', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
+    optable.'newtok'('term:%U', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
+    optable.'newtok'('term:%w', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
+    optable.'newtok'('term:%W', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
+    optable.'newtok'('term:%x', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
+    optable.'newtok'('term:%X', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::LuaCCShortcut')
 
     $P0 = get_hll_global ['PGE';'LuaRegex'], 'parse_backref'
-    optable.newtok('term:%1', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
-    optable.newtok('term:%2', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
-    optable.newtok('term:%3', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
-    optable.newtok('term:%4', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
-    optable.newtok('term:%5', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
-    optable.newtok('term:%6', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
-    optable.newtok('term:%7', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
-    optable.newtok('term:%8', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
-    optable.newtok('term:%9', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('term:%1', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('term:%2', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('term:%3', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('term:%4', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('term:%5', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('term:%6', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('term:%7', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('term:%8', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('term:%9', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    optable.newtok('circumfix:( )', 'equiv'=>'term:', 'nows'=>1, 'nullterm'=>1, 'match'=>'PGE::Exp::LuaCGroup')
+    optable.'newtok'('circumfix:( )', 'equiv'=>'term:', 'nows'=>1, 'nullterm'=>1, 'match'=>'PGE::Exp::LuaCGroup')
 
     $P0 = get_hll_global ['PGE';'LuaRegex'], 'parse_enumclass'
-    optable.newtok('term:[', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('term:[', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
     $P0 = get_hll_global ['PGE';'LuaRegex'], 'parse_enumclass2'
-    optable.newtok('term:.', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
-    optable.newtok('term:%z', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
-    optable.newtok('term:%Z', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('term:.', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('term:%z', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('term:%Z', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
     $P0 = get_hll_global ['PGE';'LuaRegex'], 'parse_balanced'
-    optable.newtok('term:%b', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('term:%b', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
     $P0 = get_hll_global ['PGE';'LuaRegex'], 'parse_quantifier'
-    optable.newtok('postfix:*', 'looser'=>'term:', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
-    optable.newtok('postfix:+', 'equiv'=>'postfix:*', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
-    optable.newtok('postfix:?', 'equiv'=>'postfix:*', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
-    optable.newtok('postfix:-', 'equiv'=>'postfix:*', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('postfix:*', 'looser'=>'term:', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('postfix:+', 'equiv'=>'postfix:*', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('postfix:?', 'equiv'=>'postfix:*', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('postfix:-', 'equiv'=>'postfix:*', 'left'=>1, 'nows'=>1, 'parsed'=>$P0)
 
-    optable.newtok('infix:', 'looser'=>'postfix:*', 'right'=>1, 'nows'=>1, 'match'=>'PGE::Exp::Concat')
+    optable.'newtok'('infix:', 'looser'=>'postfix:*', 'right'=>1, 'nows'=>1, 'match'=>'PGE::Exp::Concat')
 
     .local pmc cache, mt
     cache = new ['PGE';'Cache']
