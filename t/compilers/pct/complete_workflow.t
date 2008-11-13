@@ -7,6 +7,7 @@ use warnings;
 use 5;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 
+use Cwd qw(cwd);
 use Data::Dumper;
 use Test::More tests => 1;
 
