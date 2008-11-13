@@ -217,10 +217,10 @@ LIST
   L6:
     unless $S0 == 'i' goto L7
     sysinfo $I0, .SYSINFO_PARROT_INTSIZE
-    .return getnum(fmt, $I0)
+    .tailcall getnum(fmt, $I0)
   L7:
     unless $S0 == 'c' goto L8
-    .return getnum(fmt, 1)
+    .tailcall getnum(fmt, 1)
   L8:
     unless $S0 == 's' goto L9
     .return (0, fmt)
@@ -238,7 +238,7 @@ LIST
   L1:
     fmt = substr fmt, 1
     $I0 = getmaxalign()
-    .return getnum(fmt, $I0)
+    .tailcall getnum(fmt, $I0)
 .end
 
 .sub 'gettoalign' :anon

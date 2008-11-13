@@ -778,7 +778,7 @@ NOT YET IMPLEMENTED (see capture_aux).
 .sub 'C'
     .param pmc patt :optional
     .param pmc extra :slurpy
-    .return capture_aux(patt, Csimple, 0)
+    .tailcall capture_aux(patt, Csimple, 0)
 .end
 
 
@@ -880,7 +880,7 @@ NOT YET IMPLEMENTED (see capture_aux).
     .param pmc func :optional
     .param pmc extra :slurpy
     lua_checktype(2, func, 'function')
-    .return capture_aux(patt, Cfold, 0)
+    .tailcall capture_aux(patt, Cfold, 0)
 .end
 
 
@@ -907,10 +907,10 @@ NOT YET IMPLEMENTED (see capture_aux).
     $I0 = isa name, 'LuaNil'
     unless $I0 goto L2
   L1:
-    .return capture_aux(patt, Cgroup, 0)
+    .tailcall capture_aux(patt, Cgroup, 0)
   L2:
     lua_checkstring(2, name)
-    .return capture_aux(patt, Cgroup, 2)
+    .tailcall capture_aux(patt, Cgroup, 2)
 .end
 
 
@@ -945,7 +945,7 @@ NOT YET IMPLEMENTED (see capture_aux).
 .sub 'Cs'
     .param pmc patt :optional
     .param pmc extra :slurpy
-    .return capture_aux(patt, Csubst, 0)
+    .tailcall capture_aux(patt, Csubst, 0)
 .end
 
 
@@ -964,7 +964,7 @@ NOT YET IMPLEMENTED (see capture_aux).
 .sub 'Ct'
     .param pmc patt :optional
     .param pmc extra :slurpy
-    .return capture_aux(patt, Ctable, 0)
+    .tailcall capture_aux(patt, Ctable, 0)
 .end
 
 
@@ -1005,15 +1005,15 @@ NOT YET IMPLEMENTED (see capture_aux).
     if $I0 goto L1
     goto L2
   L1:
-    .return capture_aux(patt, Cfunction, 2)
+    .tailcall capture_aux(patt, Cfunction, 2)
   L2:
     $I0 = isa arg, 'LuaTable'
     unless $I0 goto L3
-    .return capture_aux(patt, Cquery, 2)
+    .tailcall capture_aux(patt, Cquery, 2)
   L3:
     $I0 = isa arg, 'LuaString'
     unless $I0 goto L4
-    .return capture_aux(patt, Cstring, 2)
+    .tailcall capture_aux(patt, Cstring, 2)
   L4:
     lua_argerror(2, "invalid replacement value")
 .end
