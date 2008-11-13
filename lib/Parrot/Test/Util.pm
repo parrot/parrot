@@ -17,11 +17,9 @@ Parrot::Test::Util - utilities for Parrot tests
 This module provides basic utilities for Parrot test scripts. So far, there's
 only one utility, C<create_tempfile>, which must be requested for import.
 
-
 =head1 AUTHOR
 
 Written by Jerry Gay.
-
 
 =cut
 
@@ -52,10 +50,11 @@ as (likely invalid) unicode escape codes.
 
 sub create_tempfile {
         my ($filehandle, $filename) = &tempfile;
-        $filename =~ s/\\/\//g;
-        return ( $filehandle, $filename );
-}
 
+        $filename =~ s/\\/\//g;
+
+        return ($filehandle, $filename);
+}
 
 =back
 
