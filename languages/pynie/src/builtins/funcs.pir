@@ -1089,7 +1089,7 @@ loop:
      unless $I0 < stopn goto done
      tmp = new 'Integer'
      tmp = $I0
-     lst.push(tmp)
+     lst.'push'(tmp)
 
      inc $I0
      goto loop

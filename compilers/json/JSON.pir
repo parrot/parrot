@@ -55,14 +55,14 @@ documentation at L<http://www.json.org/>.
 
    $P0 = get_root_global ['parrot'; 'PGE'], 'Match'
    match = $P0.'new'(json_string)
-   match.to(0)
+   match.'to'(0)
    match = parse(match)
    unless match goto failed
 
    .local pmc pirgrammar, pirbuilder, pir
    pirgrammar = new ['JSON'; 'PIR']
-   pirbuilder = pirgrammar.apply(match)
-   pir = pirbuilder.get('result')
+   pirbuilder = pirgrammar.'apply'(match)
+   pir = pirbuilder.'get'('result')
 
    .local pmc pirc, result
    pirc = compreg "PIR"

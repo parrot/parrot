@@ -105,7 +105,7 @@ array_exists:
     goto loop
 end_loop:
 
-    newtree._scan_node(tree, 'ROOT')
+    newtree.'_scan_node'(tree, 'ROOT')
     .return (newtree)
 .end
 
@@ -158,7 +158,7 @@ LOOP:
     dec $I1
     $P1 = $P0[$I1]
     print "\t\t     [\n"
-    $P1.dump()
+    $P1.'dump'()
     print "\t\t     ],\n"
     if $I1 > 0 goto LOOP
 

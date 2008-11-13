@@ -87,13 +87,6 @@ See RT #57638.
 See RT #48016
 and RT #48018.
 
-=item * bare method names [post 0.6.4]
-
-C<foo.bar()>, where C<bar> is not a local identifier (thus indicating
-a method name) is no longer supported.
-
-See RT #45859.
-
 =item * C<#line> [post 0.6.4]
 
 Will be replaced by C<.line> to be more consistent with other PIR syntax.

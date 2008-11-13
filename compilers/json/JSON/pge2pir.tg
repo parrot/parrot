@@ -7,11 +7,11 @@ transform result (ROOT) {
     $S0 = tree.'get'('pir', node, 'value')
 
     pir = new 'CodeString'
-    pir.emit('.sub anon :anon')
-    pir.emit($S0)
+    pir.'emit'('.sub anon :anon')
+    pir.'emit'($S0)
     result = node['ret']
-    pir.emit('    .return (%0)',result)
-    pir.emit('.end')
+    pir.'emit'('    .return (%0)',result)
+    pir.'emit'('.end')
 
    .return(pir)
 } 
@@ -53,27 +53,27 @@ transform pir (value) {
 
   got_true:
     pir = new 'CodeString'
-    result = pir.unique('$P')
+    result = pir.'unique'('$P')
     $S0 = node
-    pir.emit("    %0 = new 'Boolean'", result)
-    pir.emit('    %0 = 1', result, $S0)
+    pir.'emit'("    %0 = new 'Boolean'", result)
+    pir.'emit'('    %0 = 1', result, $S0)
     node['ret'] = result
     .return(pir)
 
   got_false:
     pir = new 'CodeString'
-    result = pir.unique('$P')
+    result = pir.'unique'('$P')
     $S0 = node
-    pir.emit("    %0 = new 'Boolean'", result)
-    pir.emit('    %0 = 0', result, $S0)
+    pir.'emit'("    %0 = new 'Boolean'", result)
+    pir.'emit'('    %0 = 0', result, $S0)
     node['ret'] = result
     .return(pir)
 
   got_null:
     pir = new 'CodeString'
-    result = pir.unique('$P')
+    result = pir.'unique'('$P')
     $S0 = node
-    pir.emit('    null %0', result)
+    pir.'emit'('    null %0', result)
     node['ret'] = result
     .return(pir)
 }
@@ -82,8 +82,8 @@ transform pir (object) {
     .local pmc pir
     pir = new 'CodeString'
     .local string result, child_result, key_result
-    result = pir.unique('$P')
-    pir.emit("    %0 = new 'Hash'", result)
+    result = pir.'unique'('$P')
+    pir.'emit'("    %0 = new 'Hash'", result)
     
     .local pmc items
 
@@ -115,7 +115,7 @@ loop:
     pir .= $S0 
     key_result = key['ret']
 
-    pir.emit('    %0[%1] = %2', result, key_result, child_result)
+    pir.'emit'('    %0[%1] = %2', result, key_result, child_result)
 
 
     goto loop
@@ -129,8 +129,8 @@ transform pir (array) {
     .local pmc pir
     pir = new 'CodeString'
     .local string result, child_result
-    result = pir.unique('$P')
-    pir.emit("    %0 = new 'ResizablePMCArray'", result)
+    result = pir.'unique'('$P')
+    pir.'emit'("    %0 = new 'ResizablePMCArray'", result)
     
     .local pmc items
 
@@ -150,7 +150,7 @@ loop:
     pir .= $S0 
 
     child_result = child['ret']
-    pir.emit('    push %0, %1', result, child_result)
+    pir.'emit'('    push %0, %1', result, child_result)
     goto loop
 end:
     node['ret'] = result
@@ -179,7 +179,7 @@ transform pir (string) {
     $P1 = new 'String'
     $S1 = substr $S0, 2, 4
     $P1 = $S1
-    $I0 = $P1.to_int(16)
+    $I0 = $P1.'to_int'(16)
     $S0 = chr $I0 
     goto char
   escape:
@@ -190,10 +190,10 @@ transform pir (string) {
     goto loop
   loop_end:
 
-    result = pir.unique('$P')
-    $S1 = pir.escape(tmp)
-    pir.emit("    %0 = new 'String'", result)
-    pir.emit('    %0 = %1', result, $S1)
+    result = pir.'unique'('$P')
+    $S1 = pir.'escape'(tmp)
+    pir.'emit'("    %0 = new 'String'", result)
+    pir.'emit'('    %0 = %1', result, $S1)
     node['ret'] = result
    .return(pir)
 }
@@ -201,10 +201,10 @@ transform pir (string) {
 transform pir (number) {
     .local pmc pir, result
     pir = new 'CodeString'
-    result = pir.unique('$P')
+    result = pir.'unique'('$P')
     $S0 = node
-    pir.emit("    %0 = new 'Integer'", result)
-    pir.emit('    %0 = %1', result, $S0)
+    pir.'emit'("    %0 = new 'Integer'", result)
+    pir.'emit'('    %0 = %1', result, $S0)
     node['ret'] = result
    .return(pir)
 }

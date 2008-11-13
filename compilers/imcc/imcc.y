@@ -1721,11 +1721,23 @@ the_sub:
            if ($1->set != 'P')
                IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "Sub isn't a PMC");
          }
-   | target DOT sub_label_op   { IMCC_INFO(interp)->cur_obj = $1; $$ = $3; }
+   | target DOT sub_label_op
+        {
+            /* disallow bareword method names; SREG name constants are fine */
+            char *name = $3->name;
+            if (!($3->type & VTREG) && (*name != '\'' || *name != '\"')) {
+                IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+                    "Bareword method name '%s' not allowed in PIR", $3->name);
+            }
+
+            IMCC_INFO(interp)->cur_obj = $1;
+            $$                         = $3;
+        }
    | target DOT STRINGC
          {
-           IMCC_INFO(interp)->cur_obj = $1; $$ = mk_const(interp, $3, 'S');
-           mem_sys_free($3);
+            IMCC_INFO(interp)->cur_obj = $1;
+            $$                         = mk_const(interp, $3, 'S');
+            mem_sys_free($3);
          }
    | target DOT target         { IMCC_INFO(interp)->cur_obj = $1; $$ = $3; }
    ;

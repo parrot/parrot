@@ -392,7 +392,7 @@ Unlike in Perl 5, the newline before the delimiter is not part of the string.
     mob.'to'(pos)
     .return (mob)
   fail_backchar_digit:
-    self.panic('encountered invalid octal digit')
+    self.'panic'('encountered invalid octal digit')
   fail:
     mob.'to'(-1)
     .return (mob)
