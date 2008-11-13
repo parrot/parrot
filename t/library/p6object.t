@@ -26,7 +26,7 @@ Testing Perl 6 objects.
     test_namespace.'export_to'(curr_namespace, exports)
 
     ##  set our plan
-    plan(232)
+    plan(233)
 
     ##  make sure we can load the P6object library
     push_eh load_fail
@@ -151,7 +151,15 @@ Testing Perl 6 objects.
     is_same($P0, jklproto, 'return from .new_class =:= Foo::JKL')
     $P0 = get_hll_global 'Foo::JKL'
     isa_nok($P0, 'P6protoobject', '["Foo::JKL"]')
-    p6obj_tests(jklproto, 'Foo::JKL', 'shortname'=>'JKL', 'isa'=>'P6object', 'can'=>'foo')
+    jklobj = p6obj_tests(jklproto, 'Foo::JKL', 'shortname'=>'JKL', 'isa'=>'P6object', 'can'=>'foo')
+
+    ##  add a method to a class
+    $P0 = get_hll_global ['ABC'], 'foo'
+    p6meta.'add_method'('bar', $P0, 'to'=>jklproto)
+    jklobj = new ['Foo';'JKL']
+    $S0 = jklobj.'bar'()
+    is($S0, 'ABC::foo', 'JKL.bar via add_method')
+    
 
 =for never
 

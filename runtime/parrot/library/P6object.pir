@@ -231,6 +231,27 @@ Return a true value if the invocant 'can' C<x>.
 .end
 
 
+=item add_method(name, method, [, 'to'=>parrotclass])
+
+Add C<method> with C<name> to C<parrotclass>.
+
+=cut
+
+.sub 'add_method' :method
+    .param string name
+    .param pmc method
+    .param pmc options         :slurpy :named
+
+    $P0 = options['to']
+    unless null $P0 goto have_to
+    $P0 = self
+  have_to:
+    .local pmc parrotclass
+    parrotclass = self.'get_parrotclass'($P0)
+    parrotclass.'add_method'(name, method)
+.end
+
+
 =item register(parrotclass [, 'name'=>name] [, 'protoobject'=>proto] [, 'parent'=>parentclass] [, 'hll'=>hll])
 
 Sets objects of type C<parrotclass> to use C<protoobject>,
