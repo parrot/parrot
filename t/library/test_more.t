@@ -16,11 +16,11 @@
     curr_namespace = get_namespace
     test_namespace = get_namespace [ 'Test'; 'More' ]
     exports = split " ", "ok is diag like skip todo is_deeply isa_ok isnt"
-    test_namespace.export_to(curr_namespace, exports)
+    test_namespace.'export_to'(curr_namespace, exports)
 
     test_namespace = get_namespace [ 'Test'; 'Builder'; 'Tester' ]
     exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
-    test_namespace.export_to(curr_namespace, exports)
+    test_namespace.'export_to'(curr_namespace, exports)
 
     plan( 74 )
 

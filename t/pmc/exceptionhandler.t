@@ -29,14 +29,14 @@ Tests the ExceptionHandler PMC.
     ok(1, 'Instantiated ExceptionHandler')
 
     set_addr eh, nonfatal_handler_one
-    eh.min_severity(.EXCEPT_NORMAL)
-    eh.max_severity(.EXCEPT_WARNING)
+    eh.'min_severity'(.EXCEPT_NORMAL)
+    eh.'max_severity'(.EXCEPT_WARNING)
     push_eh eh
 
     new eh, 'ExceptionHandler'
     set_addr eh, error_handler_one
-    eh.min_severity(.EXCEPT_ERROR)
-    eh.max_severity(.EXCEPT_FATAL)
+    eh.'min_severity'(.EXCEPT_ERROR)
+    eh.'max_severity'(.EXCEPT_FATAL)
     push_eh eh
 
     $P0 = new 'Exception'
@@ -71,12 +71,12 @@ Tests the ExceptionHandler PMC.
 
     new eh, 'ExceptionHandler'
     set_addr eh, typed_handler_one
-    eh.handle_types(.CONTROL_OK, .CONTROL_BREAK)
+    eh.'handle_types'(.CONTROL_OK, .CONTROL_BREAK)
     push_eh eh
 
     new eh, 'ExceptionHandler'
     set_addr eh, typed_handler_two
-    eh.handle_types(.EXCEPTION_SYNTAX_ERROR, .EXCEPTION_UNEXPECTED_NULL)
+    eh.'handle_types'(.EXCEPTION_SYNTAX_ERROR, .EXCEPTION_UNEXPECTED_NULL)
     push_eh eh
 
     $P0 = new 'Exception'

@@ -928,13 +928,13 @@ loop:
     .local pmc s
     s = new 'String'
     s = "123"
-    $I0 = s.to_int(10)
+    $I0 = s.'to_int'(10)
     is( $I0, "123", 'String.to_int(10)' )
     s = "2a"
-    $I0 = s.to_int(16)
+    $I0 = s.'to_int'(16)
     is( $I0, "42", '... 16' )
     s = "1001"
-    $I0 = s.to_int(2)
+    $I0 = s.'to_int'(2)
     is( $I0, "9", '... 2' )
 .end
 
@@ -1002,7 +1002,7 @@ handler:
     s = new 'String'
     s = "123"
     push_eh handler
-        $I0 = s.to_int(3)
+        $I0 = s.'to_int'(3)
 handler:
     .exception_is( 'invalid conversion to int - bad char 3' )
 .end
@@ -1012,7 +1012,7 @@ handler:
     s = new 'String'
     s = "123"
     push_eh handler
-        $I0 = s.to_int(37)
+        $I0 = s.'to_int'(37)
 handler:
     .exception_is( 'invalid conversion to int - bad base 37' )
 .end

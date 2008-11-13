@@ -60,10 +60,10 @@ Tests the CodeString class directly.
 .sub basic_emit
     .local pmc code
     code = new 'CodeString'
-    code.emit('label:')
-    code.emit('    say "Hello, World"')
-    code.emit('    $I0 = 1')
-    code.emit('    $N0 = 0.1')
+    code.'emit'('label:')
+    code.'emit'('    say "Hello, World"')
+    code.'emit'('    $I0 = 1')
+    code.'emit'('    $N0 = 0.1')
     is(code, <<'CODE', "code string looks fine")
 label:
     say "Hello, World"
@@ -75,9 +75,9 @@ CODE
 .sub emit_with_pos_args
     .local pmc code
     code = new 'CodeString'
-    code.emit('label_%0:', 1234)
-    code.emit('    say "%0, %1"', 'Hello', 'World')
-    code.emit('    %0 = %2', '$I0', 24, 48)
+    code.'emit'('label_%0:', 1234)
+    code.'emit'('    say "%0, %1"', 'Hello', 'World')
+    code.'emit'('    %0 = %2', '$I0', 24, 48)
     is(code, <<'CODE', "code string with positional args looks fine")
 label_1234:
     say "Hello, World"
@@ -88,9 +88,9 @@ CODE
 .sub emit_with_percent_args
     .local pmc code
     code = new 'CodeString'
-    code.emit('label_%0:', 1234)
-    code.emit('    say "%,"', 'Hello')
-    code.emit('    say "%,"', 'Hello', 'World', 'of', 'Parrot')
+    code.'emit'('label_%0:', 1234)
+    code.'emit'('    say "%,"', 'Hello')
+    code.'emit'('    say "%,"', 'Hello', 'World', 'of', 'Parrot')
     is(code, <<'CODE', "code string with % args looks fine")
 label_1234:
     say "Hello"
@@ -101,9 +101,9 @@ CODE
 .sub emit_with_named_args
     .local pmc code
     code = new 'CodeString'
-    code.emit('label_%a:', 'a'=>1234)
-    code.emit('    say "%b, %c"', 'b'=>'Hello', 'c'=>'World')
-    code.emit('    say "%d"', 'b'=>'Hello', 'c'=>'World')
+    code.'emit'('label_%a:', 'a'=>1234)
+    code.'emit'('    say "%b, %c"', 'b'=>'Hello', 'c'=>'World')
+    code.'emit'('    say "%d"', 'b'=>'Hello', 'c'=>'World')
     is(code, <<'CODE', "emit with named args looks fine")
 label_1234:
     say "Hello, World"
@@ -114,9 +114,9 @@ CODE
 .sub emit_with_pos_and_named_args
     .local pmc code
     code = new 'CodeString'
-    code.emit('label_%a:', 'a'=>1234)
-    code.emit('    %0 "%b, %c"', 'say', 'print', 'b'=>'H', 'c'=>'W')
-    code.emit('    say "%,, %c"', 'alpha', 'beta', 'b'=>'H', 'c'=>'W')
+    code.'emit'('label_%a:', 'a'=>1234)
+    code.'emit'('    %0 "%b, %c"', 'say', 'print', 'b'=>'H', 'c'=>'W')
+    code.'emit'('    say "%,, %c"', 'alpha', 'beta', 'b'=>'H', 'c'=>'W')
     is(code, <<'CODE', "emit with pos + named args")
 label_1234:
     say "H, W"
@@ -155,7 +155,7 @@ CODE
     .local pmc code
     null $P0
     code = new 'CodeString'
-    code.emit('new', 'n'=>$P0)
+    code.'emit'('new', 'n'=>$P0)
     is(code, "new\n", "regression on first char repl bug looks fine")
 .end
 

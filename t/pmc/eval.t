@@ -322,7 +322,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "eval.get_string - same file" );
   close io
   load_bytecode "temp.pbc"
   os = new 'OS'
-  os.rm("temp.pbc")
+  os.'rm'("temp.pbc")
   f2 = compi("foo_2", "hello from foo_2")
   io = open "temp.pbc", ">"
   print io, f2

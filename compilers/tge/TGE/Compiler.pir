@@ -42,8 +42,8 @@ structure.
 
     # Transform the parse tree and return the result
     .local pmc tree_match
-    tree_match = self.apply(match)
-    $P5 = tree_match.get('result')
+    tree_match = self.'apply'(match)
+    $P5 = tree_match.'get'('result')
 #        say 'Data structure dump:'
 #        '_dumper'($P5, "syntax tree")
     .return($P5)
@@ -55,17 +55,17 @@ structure.
 .end
 
 .sub init :vtable :method
-    self.add_rule("ROOT",       "result", ".", "ROOT_result")
-    self.add_rule("statements", "result", ".", "statements_result")
-    self.add_rule("statement",  "result", ".", "statement_result")
-    self.add_rule("transrule",  "result", ".", "transrule_result")
-    self.add_rule("grammardec", "result", ".", "grammardec_result")
-    self.add_rule("type",       "value",  ".", "type_value")
-    self.add_rule("inherit",    "value",  ".", "inherit_value")
-    self.add_rule("name",       "value",  ".", "name_value")
-    self.add_rule("parent",     "value",  ".", "parent_value")
-    self.add_rule("action",     "value",  ".", "action_value")
-    self.add_rule("language",   "value",  ".", "language_value")
+    self.'add_rule'("ROOT",       "result", ".", "ROOT_result")
+    self.'add_rule'("statements", "result", ".", "statements_result")
+    self.'add_rule'("statement",  "result", ".", "statement_result")
+    self.'add_rule'("transrule",  "result", ".", "transrule_result")
+    self.'add_rule'("grammardec", "result", ".", "grammardec_result")
+    self.'add_rule'("type",       "value",  ".", "type_value")
+    self.'add_rule'("inherit",    "value",  ".", "inherit_value")
+    self.'add_rule'("name",       "value",  ".", "name_value")
+    self.'add_rule'("parent",     "value",  ".", "parent_value")
+    self.'add_rule'("action",     "value",  ".", "action_value")
+    self.'add_rule'("language",   "value",  ".", "language_value")
 .end
 
 .sub ROOT_result :method
@@ -74,7 +74,7 @@ structure.
     $I0 = exists node["TGE::Parser::statements"]
     unless $I0 goto err_no_tree
     $P0 = node["TGE::Parser::statements"]
-    $P2 = tree.get('result', $P0, 'statements')
+    $P2 = tree.'get'('result', $P0, 'statements')
     .return ($P2)
 
 err_no_tree:
@@ -96,7 +96,7 @@ err_no_tree:
 loop_start:
     unless iter goto loop_end
     $P1 = shift iter
-    $P2 = tree.get('result', $P1, 'statement')
+    $P2 = tree.'get'('result', $P1, 'statement')
     push statements, $P2
     goto loop_start
 loop_end:
@@ -120,7 +120,7 @@ err_no_tree:
       shift $S1, iter           # get the key of the iterator
       $P2 = iter[$S1]
 
-      result = tree.get('result', $P2, $S1)
+      result = tree.'get'('result', $P2, $S1)
 
       goto iter_loop
   iter_end:
@@ -143,7 +143,7 @@ err_no_tree:
       shift $S1, iter           # get the key of the iterator
       $P2 = iter[$S1]
 
-      $P3 = tree.get('value', $P2, $S1)
+      $P3 = tree.'get'('value', $P2, $S1)
 
       rule[$S1] = $P3
       goto iter_loop
@@ -177,7 +177,7 @@ err_no_rule:
       shift $S1, iter           # get the key of the iterator
       $P2 = iter[$S1]
 
-      $P3 = tree.get('value', $P2, $S1)
+      $P3 = tree.'get'('value', $P2, $S1)
 
       decl[$S1] = $P3
       goto iter_loop
@@ -193,7 +193,7 @@ err_no_rule:
     $P1 = node[0]
     $P2 = $P1['type']
     .local pmc value
-    value = tree.get('value', $P2, 'type')
+    value = tree.'get'('value', $P2, 'type')
     .return (value)
 .end
 
@@ -357,7 +357,7 @@ loop_end:
     type = rule["type"]
     name = rule["name"]
     parent = rule["parent"]
-    output = "    self.add_rule('"
+    output = "    self.'add_rule'('"
     output .= type
     output .= "', '"
     output .= name

@@ -325,19 +325,19 @@ Tests the Class PMC.
     .local int test_val
 
     class = new 'Class'
-    class.name('foo')
-    class.add_attribute('a')
+    class.'name'('foo')
+    class.'add_attribute'('a')
 
-    result = class.inspect()
+    result = class.'inspect'()
     ok(1, 'inspect() with no args called returns successfully')
 
     test_val = elements result
     is(test_val, 6, 'inspect() returns correctly sized value')
 
-    result = class.inspect('name')
+    result = class.'inspect'('name')
     is(result, 'foo', 'inspect() "name" param returns expected value')
 
-    result = class.inspect('attributes')
+    result = class.'inspect'('attributes')
     test_val = elements result
     is(test_val, 1, 'inspect() "attributes" param returns correctly sized value')
 .end
@@ -352,7 +352,7 @@ Tests the Class PMC.
     attrs = new 'Hash'
     attrs['name'] = 'Monkey'
     class = new 'Class', attrs
-    class.add_attribute('banana')
+    class.'add_attribute'('banana')
     class_instance = class.'new'()
     ok(1, 'clone() created class Monkey and instantiated it')
 
@@ -370,7 +370,7 @@ Tests the Class PMC.
     test_val = elements test_pmc
     is(test_val, 1, 'clone() attribute survived cloning')
 
-    class_instance.add_attribute('jungle')
+    class_instance.'add_attribute'('jungle')
     ok(1, 'clone() can modify cloned class')
 .end
 
@@ -383,7 +383,7 @@ Tests the Class PMC.
     class = new 'Hash'
     class['name'] = 'Monkey2'
     class_instance = new 'Class', class
-    class_instance.add_attribute('banana')
+    class_instance.'add_attribute'('banana')
     monkey = class_instance.'new'()
     ok(1, 'clone_pmc() created class Monkey and instantiated it')
 
@@ -403,7 +403,7 @@ Tests the Class PMC.
     num_elems = elements test_ns
     is(num_elems, 1, 'clone_pmc() attribute survived cloning')
 
-    mandrill.add_attribute('jungle')
+    mandrill.'add_attribute'('jungle')
     ok(1, 'clone_pmc() can modify cloned class')
 .end
 
@@ -441,7 +441,7 @@ Tests the Class PMC.
     ok(1, 'new() set second attribute')
 
     # Call method.
-    result = class_instance.add()
+    result = class_instance.'add'()
     is(result, 42, 'new() added method returns expected value')
 .end
 

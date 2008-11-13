@@ -37,8 +37,8 @@ pir_output_is( <<'CODE', <<'OUT', 'single parent' );
     B.'add_method'("foo", $P0)
 
     $P0 = B.'new'()
-    $P0.foo()
-    $P0.bar()
+    $P0.'foo'()
+    $P0.'bar'()
 .end
 
 .sub testA :method
@@ -74,9 +74,9 @@ pir_output_is( <<'CODE', <<'OUT', 'grandparent' );
     C.'add_method'("foo", $P0)
 
     $P0 = C.'new'()
-    $P0.foo()
-    $P0.bar()
-    $P0.baz()
+    $P0.'foo'()
+    $P0.'bar'()
+    $P0.'baz'()
 .end
 
 .sub testA :method
@@ -116,9 +116,9 @@ pir_output_is( <<'CODE', <<'OUT', 'multiple inheritance' );
     C.'add_method'("foo", $P0)
 
     $P0 = C.'new'()
-    $P0.foo()
-    $P0.bar()
-    $P0.baz()
+    $P0.'foo'()
+    $P0.'bar'()
+    $P0.'baz'()
 .end
 
 .sub testA :method
@@ -167,10 +167,10 @@ pir_output_is( <<'CODE', <<'OUT', 'diamond inheritance' );
     D.'add_method'("foo", $P0)
 
     $P0 = D.'new'()
-    $P0.foo()
-    $P0.bar()
-    $P0.baz()
-    $P0.wag()
+    $P0.'foo'()
+    $P0.'bar'()
+    $P0.'baz'()
+    $P0.'wag'()
 .end
 
 .sub testA :method

@@ -435,95 +435,95 @@ pir_output_is( <<'CODE', <<'OUT', "bug #32996" );
         $S0 = "Foo"
         newclass $P0, $S0
         $P1 = new $S0
-        $P1.method1()
-        $P1.method2()
+        $P1.'method1'()
+        $P1.'method2'()
 
         $P2 = new $S0
-        $P2.method1()
-        $P2.method2()
+        $P2.'method1'()
+        $P2.'method2'()
 
         $P3 = new $S0
-        $P3.method1()
-        $P3.method2()
+        $P3.'method1'()
+        $P3.'method2'()
 
         $P4 = new $S0
-        $P4.method1()
-        $P4.method2()
+        $P4.'method1'()
+        $P4.'method2'()
 
         $P5 = new $S0
-        $P5.method1()
-        $P5.method2()
+        $P5.'method1'()
+        $P5.'method2'()
 
         $P6 = new $S0
-        $P6.method1()
-        $P6.method2()
+        $P6.'method1'()
+        $P6.'method2'()
 
         $P7 = new $S0
-        $P7.method1()
-        $P7.method2()
+        $P7.'method1'()
+        $P7.'method2'()
 
         $P8 = new $S0
-        $P8.method1()
-        $P8.method2()
+        $P8.'method1'()
+        $P8.'method2'()
 
         $P9 = new $S0
-        $P9.method1()
-        $P9.method2()
+        $P9.'method1'()
+        $P9.'method2'()
 
         $P10 = new $S0
-        $P10.method1()
-        $P10.method2()
+        $P10.'method1'()
+        $P10.'method2'()
 
         $P11 = new $S0
-        $P11.method1()
-        $P11.method2()
+        $P11.'method1'()
+        $P11.'method2'()
 
         $P12 = new $S0
-        $P12.method1()
-        $P12.method2()
+        $P12.'method1'()
+        $P12.'method2'()
 
         $P13 = new $S0
-        $P13.method1()
-        $P13.method2()
+        $P13.'method1'()
+        $P13.'method2'()
 
         $P14 = new $S0
-        $P14.method1()
-        $P14.method2()
+        $P14.'method1'()
+        $P14.'method2'()
 
         $P15 = new $S0
-        $P15.method1()
-        $P15.method2()
+        $P15.'method1'()
+        $P15.'method2'()
 
-        $P1.method1()
-        $P1.method2()
-        $P2.method1()
-        $P2.method2()
-        $P3.method1()
-        $P3.method2()
-        $P4.method1()
-        $P4.method2()
-        $P5.method1()
-        $P5.method2()
-        $P6.method1()
-        $P6.method2()
-        $P7.method1()
-        $P7.method2()
-        $P8.method1()
-        $P8.method2()
-        $P9.method1()
-        $P9.method2()
-        $P10.method1()
-        $P10.method2()
-        $P11.method1()
-        $P11.method2()
-        $P12.method1()
-        $P12.method2()
-        $P13.method1()
-        $P13.method2()
-        $P14.method1()
-        $P14.method2()
-        $P15.method1()
-        $P15.method2()
+        $P1.'method1'()
+        $P1.'method2'()
+        $P2.'method1'()
+        $P2.'method2'()
+        $P3.'method1'()
+        $P3.'method2'()
+        $P4.'method1'()
+        $P4.'method2'()
+        $P5.'method1'()
+        $P5.'method2'()
+        $P6.'method1'()
+        $P6.'method2'()
+        $P7.'method1'()
+        $P7.'method2'()
+        $P8.'method1'()
+        $P8.'method2'()
+        $P9.'method1'()
+        $P9.'method2'()
+        $P10.'method1'()
+        $P10.'method2'()
+        $P11.'method1'()
+        $P11.'method2'()
+        $P12.'method1'()
+        $P12.'method2'()
+        $P13.'method1'()
+        $P13.'method2'()
+        $P14.'method1'()
+        $P14.'method2'()
+        $P15.'method1'()
+        $P15.'method2'()
 
         end
 .end

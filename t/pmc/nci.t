@@ -2626,17 +2626,17 @@ pir_output_is( << 'CODE', << 'OUTPUT', "arity" );
 
     .local pmc nci_c
     nci_c = dlfunc libnci_test, "nci_c", "c"
-    $I0 = nci_c.arity()
+    $I0 = nci_c.'arity'()
     say $I0
 
     .local pmc multiply
     multiply = dlfunc libnci_test, "nci_pii", "pii"
-    $I0 = multiply.arity()
+    $I0 = multiply.'arity'()
     say $I0
 
     .local pmc nci_iiii
     nci_iiii = dlfunc libnci_test, "nci_iiii", "iiii"
-    $I0 = nci_iiii.arity()
+    $I0 = nci_iiii.'arity'()
     say $I0
 .end
 CODE

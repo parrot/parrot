@@ -303,10 +303,10 @@ pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by resolve' );
 
     $P3 = new 'ResizableStringArray'
     push $P3, "badger"
-    $P1.resolve_method($P3)
+    $P1.'resolve_method'($P3)
     print "ok 1 - set resolve list\n"
 
-    $P4 = $P1.resolve_method()
+    $P4 = $P1.'resolve_method'()
     $S0 = $P4[0]
     if $S0 == "badger" goto ok_2
     print "not "
@@ -371,10 +371,10 @@ pir_output_is( <<'CODE', <<'OUT', 'role that does a role' );
     print "ok 2 - added one rule that does another role to the class\n"
 
     $P0 = PHB.'new'()
-    $P0.give_payrise()
+    $P0.'give_payrise'()
     print "ok 3 - called method from direct role\n"
 
-    $P0.fire()
+    $P0.'fire'()
     print "ok 4 - called method from indirect role\n"
 .end
 

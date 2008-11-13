@@ -29,7 +29,7 @@ pir_output_is( <<'CODE', <<'OUT', 'addrole_p_p' );
     addrole $P1, $P0
     print "ok 1 - addrole op executed\n"
 
-    $P2 = $P1.roles()
+    $P2 = $P1.'roles'()
     $I0 = elements $P2
     if $I0 == 1 goto ok_2
     print "not "
@@ -62,8 +62,8 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'inspect_p_p_s' );
 .sub 'test' :main
     $P0 = new 'Class'
-    $P0.name('foo')
-    $P0.add_attribute('a')
+    $P0.'name'('foo')
+    $P0.'add_attribute'('a')
 
     $P1 = inspect $P0, 'name'
     say $P1

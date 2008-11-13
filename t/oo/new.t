@@ -89,7 +89,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'manually create named class object' );
 .sub main :main
     $P1 = new "Class"
-    $P1.name("Foo")
+    $P1.'name'("Foo")
     $S1 = typeof $P1
     say $S1
 

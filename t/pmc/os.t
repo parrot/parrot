@@ -190,7 +190,7 @@ SKIP: {
     pir_output_is( <<'CODE', $entries, 'Test OS.readdir' );
 .sub main :main
     $P1 = new 'OS'
-    $P2 = $P1.readdir('docs')
+    $P2 = $P1.'readdir'('docs')
 
     $S0 = join ' ', $P2
     print $S0
@@ -206,11 +206,11 @@ SKIP: {
     pir_output_is( <<'CODE', <<"OUT", 'Test OS.rename' );
 .sub main :main
     $P1 = new 'OS'
-    $P1.rename('____some_test_file', '___some_other_file')
+    $P1.'rename'('____some_test_file', '___some_other_file')
     $I0 = stat '___some_other_file', 0
     print $I0
     print "\n"
-    $P1.rm('___some_other_file')
+    $P1.'rm'('___some_other_file')
 .end
 CODE
 1

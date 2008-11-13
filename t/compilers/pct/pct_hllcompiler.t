@@ -144,12 +144,12 @@ pir_output_is( <<'CODE', <<'OUT', 'inserting and removing stages' );
     .local pmc hllcompiler
     hllcompiler = new ['PCT';'HLLCompiler']
 
-    hllcompiler.removestage('parse')
-    hllcompiler.addstage('foo')
-    hllcompiler.addstage('bar', 'before' => 'evalpmc')
-    hllcompiler.addstage('optimize', 'after' => 'past')
-    hllcompiler.addstage('optimize', 'after' => 'post')
-    hllcompiler.addstage('peel', 'after' => 'optimize')
+    hllcompiler.'removestage'('parse')
+    hllcompiler.'addstage'('foo')
+    hllcompiler.'addstage'('bar', 'before' => 'evalpmc')
+    hllcompiler.'addstage'('optimize', 'after' => 'past')
+    hllcompiler.'addstage'('optimize', 'after' => 'post')
+    hllcompiler.'addstage'('peel', 'after' => 'optimize')
     $P0 = getattribute hllcompiler, "@stages"
     $S0 = join " ", $P0
     say $S0

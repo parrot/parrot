@@ -691,7 +691,7 @@ handler:
     $N0 *= 4
     c[0] = 0.0
     c[1] = $N0
-    c2 = c.exp()
+    c2 = c.'exp'()
     c2 += 1.0
     .sprintf_is( "%.3f%+.3fi", c2, "0.000+0.000i" )
 .end

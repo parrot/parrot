@@ -183,7 +183,7 @@ Tests the PMCProxy PMC.
     $P2 = $P0.'new'()
     ok(1, 'instantiated the class')
 
-    $P3 = $P2.inspect('methods')
+    $P3 = $P2.'inspect'('methods')
     is($P3, 42, "the magic overriding sub was called")
     ok(1, 'Called non-overridden method, which called overridden vtable method')
 .end

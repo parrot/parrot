@@ -654,7 +654,7 @@ loop:
     $P99 = new 'Sub'
     push $P5, $P99
 
-    $P4.append( $P4 )
+    $P4.'append'( $P4 )
     ok( 1, 'parsing' )
 
     $I1 = $P4
@@ -662,14 +662,14 @@ loop:
 
     $P10 = $P1
     $I1 = $P10
-    $P10.append( $P4 )
+    $P10.'append'( $P4 )
     $I2 = $P10
     is( $I1, $I2, 'append empty ResizablePMCArray' )
 
     $S1 = $P10[2]
     is( $S1, 'c', 'indexing elements' )
 
-    $P10.append( $P2 )
+    $P10.'append'( $P2 )
     is( $P10, 5, 'append FixedPMCArray' )
 
     $S1 = $P10[2]
@@ -678,7 +678,7 @@ loop:
     $S1 = $P10[4]
     is( $S1, 'e', 'indexing elements' )
 
-    $P3.append( $P10 )
+    $P3.'append'( $P10 )
     is( $P3, 8, 'append ResizablePMCArray' )
 
     $S1 = $P3[2]
@@ -687,7 +687,7 @@ loop:
     $S1 = $P3[4]
     is( $S1, 'b', 'indexing elements' )
 
-    $P3.append( $P5 )
+    $P3.'append'( $P5 )
     is( $P3, 9, 'append subclass' )
 
     $S1 = $P3[2]
@@ -884,7 +884,7 @@ end:
     is($S0, "4 5 3 2 5 1", "RPA has expected values")
 
     $P0 = get_global 'cmp_func'
-    array.sort($P0)
+    array.'sort'($P0)
     ok(1, "sort returns without crashing")
 .end
 

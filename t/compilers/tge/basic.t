@@ -25,7 +25,7 @@ pir_output_is( <<'CODE', <<'OUT', 'build up a basic rule in a grammar' );
 
     .local pmc AG
     AG = new ['TGE';'Grammar']
-    AG.add_rule('Leaf', 'min', '.', '.return(1)')
+    AG.'add_rule'('Leaf', 'min', '.', '.return(1)')
 
     $P1 = getattribute AG, 'rules'
     .local pmc rule_obj

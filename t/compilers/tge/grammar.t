@@ -98,9 +98,9 @@ pir_output_is( <<'CODE', <<'OUT', 'complete example: Branch/Leaf tree grammar' )
         .local pmc right_val
 
         left = getattribute node, "left"
-        left_val = tree.get('min', left)
+        left_val = tree.'get'('min', left)
         right = getattribute node, "right"
-        right_val = tree.get('min', right)
+        right_val = tree.'get'('min', right)
 
         min = left_val
         if min <= right_val goto got_min
@@ -113,19 +113,19 @@ pir_output_is( <<'CODE', <<'OUT', 'complete example: Branch/Leaf tree grammar' )
     transform gmin (ROOT) :language('PIR') {
         .local pmc gmin
         gmin = new 'Integer'
-        gmin = tree.get('min', node)
+        gmin = tree.'get'('min', node)
         .return (gmin)
     }
 
     transform gmin (Branch) :applyto('left') :language('PIR') {
         .local pmc gmin
-        gmin = tree.get('gmin', node)
+        gmin = tree.'get'('gmin', node)
         .return (gmin)
     }
 
     transform gmin (Branch) :applyto('right') :language('PIR') {
         .local pmc gmin
-        gmin = tree.get('gmin', node)
+        gmin = tree.'get'('gmin', node)
         .return (gmin)
     }
 
@@ -135,7 +135,7 @@ pir_output_is( <<'CODE', <<'OUT', 'complete example: Branch/Leaf tree grammar' )
         .local pmc newnode
 
         newnode = new 'Leaf'
-        $P1 = tree.get('gmin', node)
+        $P1 = tree.'get'('gmin', node)
         setattribute newnode, 'value', $P1
         .return(newnode)
     }
@@ -147,8 +147,8 @@ pir_output_is( <<'CODE', <<'OUT', 'complete example: Branch/Leaf tree grammar' )
         newnode = new 'Branch'
         left_child = getattribute node, 'left'
         right_child = getattribute node, 'right'
-        $P1 = tree.get('result', left_child)
-        $P2 = tree.get('result', right_child)
+        $P1 = tree.'get'('result', left_child)
+        $P2 = tree.'get'('result', right_child)
 
         setattribute newnode, 'left', $P1
         setattribute newnode, 'right', $P2
@@ -167,10 +167,10 @@ GRAMMAR
 
     # Apply the grammar to the test tree
     .local pmc AGI
-    AGI = grammar.apply(tree)
+    AGI = grammar.'apply'(tree)
 
     # Retrieve the value of a top level attribute
-    $P4 = AGI.get('gmin')
+    $P4 = AGI.'get'('gmin')
     print "the global minimum attribute value is: "
     print $P4
     print " of type: "
@@ -179,7 +179,7 @@ GRAMMAR
     print "\n"
 
     # Rerieve the transformed tree
-    $P5 = AGI.get('result')
+    $P5 = AGI.'get'('result')
 
     $P6 = getattribute tree, 'left'
     $P7 = getattribute $P6, 'left'
@@ -311,10 +311,10 @@ GRAMMAR
 
     # Apply the grammar to the test tree
     .local pmc AGI
-    AGI = grammar.apply(testing)
+    AGI = grammar.'apply'(testing)
 
     # Retrieve the value of a top level attribute
-    $P4 = AGI.get('tiddlywinks')
+    $P4 = AGI.'get'('tiddlywinks')
     end
 .end
 

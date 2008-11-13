@@ -107,7 +107,7 @@ pir_output_is( <<'CODE', <<'OUT', 'manually create named class object' );
     push parent_list, parent
     class_init_args['parents'] = parent_list
     $P1 = new "Class", class_init_args
-    $P1.name("Foo")
+    $P1.'name'("Foo")
     $S1 = typeof $P1
     say $S1
 

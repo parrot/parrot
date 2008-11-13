@@ -972,14 +972,14 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Nested namespace introspection" );
     print "\n"
 
     .local pmc bar_ns
-    bar_ns = foo_ns.find_namespace( 'Bar' )
+    bar_ns = foo_ns.'find_namespace'( 'Bar' )
     $S0    = bar_ns
     print "Found nested namespace: "
     print $S0
     print "\n"
 
     .local pmc baz_ns
-    baz_ns    = bar_ns.find_namespace( 'Baz' )
+    baz_ns    = bar_ns.'find_namespace'( 'Baz' )
     no_symbol = 'Baz'
 
     .local int is_defined
@@ -995,7 +995,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Nested namespace introspection" );
 
   find_symbols:
     .local pmc a_sub
-    a_sub = bar_ns.find_sub( 'a_sub' )
+    a_sub = bar_ns.'find_sub'( 'a_sub' )
     $S0   = a_sub
     a_sub()
     print "Found sub: "
@@ -1003,20 +1003,20 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Nested namespace introspection" );
     print "\n"
 
     .local pmc some_sub
-    some_sub  = bar_ns.find_sub( 'some_sub' )
+    some_sub  = bar_ns.'find_sub'( 'some_sub' )
     no_symbol = 'some_sub'
 
     is_defined = defined some_sub
     if is_defined goto oops
 
     .local pmc a_var
-    a_var    = bar_ns.find_var( 'a_var' )
+    a_var    = bar_ns.'find_var'( 'a_var' )
     print "Found var: "
     print a_var
     print "\n"
 
     .local pmc some_var
-    some_var    = bar_ns.find_var( 'some_var' )
+    some_var    = bar_ns.'find_var'( 'some_var' )
     no_symbol = 'some_var'
 
     is_defined = defined some_var

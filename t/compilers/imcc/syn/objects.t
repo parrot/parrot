@@ -35,7 +35,7 @@ pir_output_is( <<'CODE', <<'OUT', "meth call syntax" );
     .local pmc obj
     newclass class, "Foo"
     obj = new "Foo"
-    obj._meth()
+    obj.'_meth'()
     print "done\n"
     end
 .end
@@ -57,7 +57,7 @@ pir_output_is( <<'CODE', <<'OUT', "meth call syntax m.o(arg)" );
     obj = new "Foo"
     $P0 = new 'String'
     $P0 = "ok\n"
-    obj._meth($P0)
+    obj.'_meth'($P0)
     print "done\n"
     end
 .end
@@ -82,7 +82,7 @@ pir_output_is( <<'CODE', <<'OUT', "meth call ret = o.m(arg)" );
     obj = new "Foo"
     $P0 = new 'String'
     $P0 = "ok\n"
-    $S0 = obj._meth($P0)
+    $S0 = obj.'_meth'($P0)
     print $S0
     end
 .end
@@ -111,7 +111,6 @@ pir_output_is( <<'CODE', <<'OUT', "meth call syntax, string" );
     newclass class, "Foo"
     obj = new "Foo"
     obj."_meth"()
-    obj._meth()
     set S10, "_meth"
     obj.S10()
     set $S10, "_meth"
@@ -124,7 +123,6 @@ pir_output_is( <<'CODE', <<'OUT', "meth call syntax, string" );
     print "in meth\n"
 .end
 CODE
-in meth
 in meth
 in meth
 in meth
@@ -177,7 +175,7 @@ pir_output_is( <<'CODE', <<'OUT', "meth call syntax - method, self" );
     .local pmc obj
     newclass class, "Foo"
     obj = new "Foo"
-    obj._meth()
+    obj.'_meth'()
     print "done\n"
     end
 .end
@@ -315,7 +313,7 @@ pir_output_is( <<'CODE', <<'OUT', "meth call syntax - reserved word" );
     .local pmc obj
     newclass class, "Foo"
     obj = new "Foo"
-    obj.open()
+    obj.'open'()
     print "done\n"
     end
 .end

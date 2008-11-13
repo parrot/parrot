@@ -95,38 +95,38 @@ sub optable_output_is {
     $P0 = get_hll_global ['PGE'], 'OPTable'
     optable = $P0.'new'()
 
-    optable.newtok('infix:+', 'precedence'=>'=')
-    optable.newtok('infix:-', 'equiv'=>'infix:+')
-    optable.newtok('infix:*', 'tighter'=>'infix:+')
-    optable.newtok('infix:/', 'equiv'=>'infix:*')
-    optable.newtok('infix:**', 'tighter'=>'infix:*')
-    optable.newtok('infix:==', 'looser'=>'infix:+')
-    optable.newtok('infix:=', 'looser'=>'infix:==', 'assoc'=>'right')
-    optable.newtok('infix:,', 'tighter'=>'infix:=', 'assoc'=>'list')
-    optable.newtok('infix:;', 'looser'=>'infix:=', 'assoc'=>'list')
+    optable.'newtok'('infix:+', 'precedence'=>'=')
+    optable.'newtok'('infix:-', 'equiv'=>'infix:+')
+    optable.'newtok'('infix:*', 'tighter'=>'infix:+')
+    optable.'newtok'('infix:/', 'equiv'=>'infix:*')
+    optable.'newtok'('infix:**', 'tighter'=>'infix:*')
+    optable.'newtok'('infix:==', 'looser'=>'infix:+')
+    optable.'newtok'('infix:=', 'looser'=>'infix:==', 'assoc'=>'right')
+    optable.'newtok'('infix:,', 'tighter'=>'infix:=', 'assoc'=>'list')
+    optable.'newtok'('infix:;', 'looser'=>'infix:=', 'assoc'=>'list')
 
-    optable.newtok('prefix:++', 'tighter'=>'infix:**')
-    optable.newtok('prefix:--', 'equiv'=>'prefix:++')
-    optable.newtok('postfix:++', 'equiv'=>'prefix:++')
-    optable.newtok('postfix:--', 'equiv'=>'prefix:++')
+    optable.'newtok'('prefix:++', 'tighter'=>'infix:**')
+    optable.'newtok'('prefix:--', 'equiv'=>'prefix:++')
+    optable.'newtok'('postfix:++', 'equiv'=>'prefix:++')
+    optable.'newtok'('postfix:--', 'equiv'=>'prefix:++')
 
     .local pmc ident
     ident = get_global ['PGE';'Match'], 'ident'
-    optable.newtok('term:', 'tighter'=>'prefix:++', 'parsed'=>ident)
-    optable.newtok('circumfix:( )', 'equiv'=>'term:')
-    optable.newtok('circumfix:[ ]', 'equiv'=>'term:')
-    optable.newtok('postcircumfix:( )', 'looser'=>'term:', 'nows'=>1, 'nullterm'=>1)
-    optable.newtok('postcircumfix:[ ]', 'equiv'=>'postcircumfix:( )', 'nows'=>1)
+    optable.'newtok'('term:', 'tighter'=>'prefix:++', 'parsed'=>ident)
+    optable.'newtok'('circumfix:( )', 'equiv'=>'term:')
+    optable.'newtok'('circumfix:[ ]', 'equiv'=>'term:')
+    optable.'newtok'('postcircumfix:( )', 'looser'=>'term:', 'nows'=>1, 'nullterm'=>1)
+    optable.'newtok'('postcircumfix:[ ]', 'equiv'=>'postcircumfix:( )', 'nows'=>1)
 
     .local string test
     test = "<<test>>"
 
     .local pmc match
-    match = optable.parse(test, 'stop'=>' ;')
+    match = optable.'parse'(test, 'stop'=>' ;')
     unless match goto fail
     $P0 = match['expr']
     tree($P0)
-    $I0 = match.to()
+    $I0 = match.'to'()
     $I1 = length test
     if $I0 == $I1 goto succeed
     print " (pos="

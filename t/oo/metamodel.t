@@ -23,7 +23,7 @@ Tests the metamodel for the OO implementation.
     curr_namespace = get_namespace
     test_namespace = get_namespace [ 'Test'; 'More' ]
     exports = split " ", "plan ok is isa_ok skip todo"
-    test_namespace.export_to(curr_namespace, exports)
+    test_namespace.'export_to'(curr_namespace, exports)
 
     plan( 12 )
 
@@ -33,9 +33,9 @@ Tests the metamodel for the OO implementation.
 
     class = new "Class", init_args1
     isa_ok(class, "Class", "created class isa Class")
-    $P1 = class.name()
+    $P1 = class.'name'()
     is($P1, "Dog", "created a new class via Class")
-    $P1 = class.name()
+    $P1 = class.'name'()
     is($P1, "Dog", "Class accessor doesn't destroy value")
 
     class.'add_attribute'('bark')
@@ -125,7 +125,7 @@ get_attr:
   .param pmc bark :optional
   .param int got_bark :opt_flag
   .local pmc rv
-  rv = self._accessor( "bark", bark, got_bark )
+  rv = self.'_accessor'( "bark", bark, got_bark )
   .return(rv)
 .end
 
@@ -133,7 +133,7 @@ get_attr:
   .param pmc tail :optional
   .param int got_tail :opt_flag
   .local pmc rv
-  rv = self._accessor( "tail", tail, got_tail )
+  rv = self.'_accessor'( "tail", tail, got_tail )
   .return(rv)
 .end
 

@@ -77,7 +77,7 @@ loop:
     dec index
     if index < 0 goto end_loop
     currule = actions[index]
-    self._install_action(node, currule)
+    self.'_install_action'(node, currule)
     goto loop
 end_loop:
     .return()
@@ -130,10 +130,10 @@ name_hash_exists:
     if $I0 goto eval_cell
 scan_name:
     if got_type goto scan_with_type
-    self._scan_node(node)
+    self.'_scan_node'(node)
     goto done_scan
 scan_with_type:
-    self._scan_node(node,type)
+    self.'_scan_node'(node,type)
 done_scan:
     # Second check to see if _scan_node defined the cell
     cell = $P2[id]
@@ -152,7 +152,7 @@ done_scan:
     print ") that you asked for.\n"
     .return ()
 eval_cell:
-    $P3 = self._eval_cell(cell,node)
+    $P3 = self.'_eval_cell'(cell,node)
     .return($P3)
 .end
 
@@ -210,7 +210,7 @@ name_hash_exists:
     parent = getattribute rule, 'parent'
     if parent == '.' goto use_parent_id
     .local pmc child_node
-    child_node = self._lookup_child(node, parent)
+    child_node = self.'_lookup_child'(node, parent)
     id = self.'_lookup_id'(child_node)
     goto use_child_id
 use_parent_id:

@@ -799,7 +799,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcallmeth" );
     n = new 'Integer'
     n = 2000
     setattribute o, [ "Foo" ], "n", n
-    o.go()
+    o.'go'()
     n = getattribute o, [ "Foo" ], "n"
     print n
     print "\n"
