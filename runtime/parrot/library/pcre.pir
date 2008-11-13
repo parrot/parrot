@@ -51,7 +51,7 @@ and is additionally stored as global 'PCRE', 'lib'.
     .local int loaded
 
     osname = sysinfo .SYSINFO_PARROT_OS
-     
+
     if 'MSWin32' == osname goto LIB_WIN32
     if 'cygwin'  == osname goto LIB_CYGWIN
 
