@@ -104,7 +104,7 @@ TODO: open these files and complain when they don't or pass filehandles
   .local int    is_defined
 
   pio = new 'ParrotIO'
-  input_string = pio.slurp( filename )
+  input_string = pio.'slurp'( filename )
 
   # state['stack';'input'] has been created in input_init
   # TODO: seperate input blocks for every file
