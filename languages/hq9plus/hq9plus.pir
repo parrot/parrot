@@ -4,7 +4,7 @@ hq9plus.pir - A HQ9plus compiler.
 
 =head2 Description
 
-This is the base file for the HQ9plus compiler.
+This is the driver for the HQ9plus compiler.
 
 This file includes the parsing and grammar rules from
 the src/ directory, loads the relevant PGE libraries,
@@ -26,11 +26,13 @@ object.
 .sub 'onload' :anon :load :init
     load_bytecode 'PCT.pbc'
 
-    $P0 = get_hll_global ['PCT'], 'HLLCompiler'
-    $P1 = $P0.'new'()
+    $P1 = new ['PCT';'HLLCompiler']
+
     $P1.'language'('HQ9plus')
     $P1.'parsegrammar'('HQ9plus::Grammar')
     $P1.'parseactions'('HQ9plus::Grammar::Actions')
+
+    .return()
 .end
 
 =item main(args :slurpy)  :main
@@ -61,4 +63,3 @@ to the HQ9plus compiler.
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4 ft=pir:
-
