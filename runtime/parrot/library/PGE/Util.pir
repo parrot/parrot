@@ -205,11 +205,11 @@ split_loop:
     unless match goto split_end
 
     ##  save substring up to current match
-    $I0 = match.from()
+    $I0 = match.'from'()
     $I0 -= pos
     $S0 = substr str, pos, $I0
     push result, $S0
-    pos = match.to()
+    pos = match.'to'()
 
     .local pmc captures
     captures = match.'list'()

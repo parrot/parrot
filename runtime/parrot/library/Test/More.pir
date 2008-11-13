@@ -85,7 +85,7 @@ already declared a plan or if you pass an invalid argument.
 
     .local pmc test
     find_global test, [ 'Test'; 'More' ], '_test'
-    test.plan( tests )
+    test.'plan'( tests )
 .end
 
 =item C<ok( passed, description )>
@@ -102,7 +102,7 @@ recording it with the optional test description in C<description>.
     .local pmc test
     find_global test, [ 'Test'; 'More' ], '_test'
 
-    test.ok( passed, description )
+    test.'ok'( passed, description )
 .end
 
 =item C<nok( passed, description )>
@@ -122,7 +122,7 @@ C<passed>, recording it with the optional test description in C<description>.
     .local int reverse_passed
     reverse_passed = not passed
 
-    test.ok( reverse_passed, description )
+    test.'ok'( reverse_passed, description )
 .end
 
 =item C<is( left, right, description )>
@@ -161,7 +161,7 @@ add more.
     r    = right
     pass = iseq l, r
 
-    test.ok( pass, description )
+    test.'ok'( pass, description )
     if pass goto done
 
     .local string diagnostic
@@ -172,7 +172,7 @@ add more.
     r_string    = right
 
     diagnostic = _make_diagnostic( l_string, r_string )
-    test.diag( diagnostic )
+    test.'diag'( diagnostic )
   done:
 .end
 
@@ -203,7 +203,7 @@ add more.
     pass     = isle diff, prec_num
 
   report:
-    test.ok( pass, description )
+    test.'ok'( pass, description )
     if pass goto done
 
     .local string diagnostic
@@ -214,7 +214,7 @@ add more.
     r_string    = right
 
     diagnostic = _make_diagnostic( l_string, r_string )
-    test.diag( diagnostic )
+    test.'diag'( diagnostic )
   done:
 .end
 
@@ -233,7 +233,7 @@ add more.
     r    = right
     pass = iseq l, r
 
-    test.ok( pass, description )
+    test.'ok'( pass, description )
     if pass goto done
 
     .local string diagnostic
@@ -244,7 +244,7 @@ add more.
     r_string    = right
 
     diagnostic = _make_diagnostic( l_string, r_string )
-    test.diag( diagnostic )
+    test.'diag'( diagnostic )
   done:
 .end
 
@@ -288,7 +288,7 @@ add more.
     goto result
 
   result:
-    test.ok( pass, description )
+    test.'ok'( pass, description )
     if pass goto done
 
     .local string diagnostic
@@ -299,7 +299,7 @@ add more.
     r_string    = right
 
     diagnostic = _make_diagnostic( l_string, r_string )
-    test.diag( diagnostic )
+    test.'diag'( diagnostic )
   done:
 .end
 
@@ -328,7 +328,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     pass = 1
 
   report:
-    test.ok( pass, description )
+    test.'ok'( pass, description )
     if pass goto done
 
     .local string diagnostic
@@ -340,7 +340,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     r_string = 'not ' . r_string
 
     diagnostic = _make_diagnostic( l_string, r_string )
-    test.diag( diagnostic )
+    test.'diag'( diagnostic )
   done:
 .end
 
@@ -363,7 +363,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     pass = 1
 
   report:
-    test.ok( pass, description )
+    test.'ok'( pass, description )
     if pass goto done
 
     .local string diagnostic
@@ -375,7 +375,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     r_string = 'not ' . r_string
 
     diagnostic = _make_diagnostic( l_string, r_string )
-    test.diag( diagnostic )
+    test.'diag'( diagnostic )
   done:
 .end
 
@@ -398,7 +398,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     pass = 1
 
   report:
-    test.ok( pass, description )
+    test.'ok'( pass, description )
     if pass goto done
 
     .local string diagnostic
@@ -410,7 +410,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     r_string = 'not ' . r_string
 
     diagnostic = _make_diagnostic( l_string, r_string )
-    test.diag( diagnostic )
+    test.'diag'( diagnostic )
   done:
 .end
 
@@ -428,7 +428,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     pass = isne left, right
 
   report:
-    test.ok( pass, description )
+    test.'ok'( pass, description )
     if pass goto done
 
     .local string diagnostic
@@ -440,7 +440,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     r_string = 'not ' . r_string
 
     diagnostic = _make_diagnostic( l_string, r_string )
-    test.diag( diagnostic )
+    test.'diag'( diagnostic )
   done:
 .end
 
@@ -455,7 +455,7 @@ Prints C<diagnostic> to the screen, without affecting test comparisons.
 
     .local pmc test
     find_global test, [ 'Test'; 'More' ], '_test'
-    test.diag( diagnostic )
+    test.'diag'( diagnostic )
 .end
 
 
@@ -868,10 +868,10 @@ optional test description in C<description>.
     pass = 1
 
   report:
-    test.ok( pass, description )
+    test.'ok'( pass, description )
     if pass goto done
 
-    test.diag( diagnostic )
+    test.'diag'( diagnostic )
   done:
 .end
 
@@ -927,7 +927,7 @@ and the C<reason> you have marked it as TODO.
     .local pmc test
     find_global test, [ 'Test'; 'More' ], '_test'
 
-    test.todo( args :flat )
+    test.'todo'( args :flat )
 .end
 
 =item C<isa_ok( object, class_name, object_name )>

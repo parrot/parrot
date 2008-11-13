@@ -33,7 +33,7 @@ This method enables Data::Dumper to work on Match objects.
     $S0 = self
     dumper."genericString"("", $S0)
     print " @ "
-    $I0 = self.from()
+    $I0 = self.'from'()
     print $I0
     hascapts = 0
     hash = self.'hash'()

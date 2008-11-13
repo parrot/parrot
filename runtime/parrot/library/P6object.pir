@@ -263,7 +263,7 @@ or 'Object').
     if $I0, have_hll
     $P0 = getinterp
     $P0 = $P0['namespace';1]
-    $P0 = $P0.get_name()
+    $P0 = $P0.'get_name'()
     hll = shift $P0
     options['hll'] = hll
   have_hll:
@@ -413,7 +413,7 @@ of names separated by spaces.
     if $I0, have_hll
     $P0 = getinterp
     $P0 = $P0['namespace';1]
-    $P0 = $P0.get_name()
+    $P0 = $P0.'get_name'()
     hll = shift $P0
     options['hll'] = hll
   have_hll:
@@ -456,7 +456,7 @@ of names separated by spaces.
     $S0 = ns_item
     $P0 = new 'NameSpace'
     ns = get_root_namespace base_ns
-    ns.add_namespace($S0, $P0)
+    ns.'add_namespace'($S0, $P0)
     push base_ns, ns_item
     goto create_ns_loop
   create_ns_loop_end:

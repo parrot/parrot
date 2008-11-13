@@ -186,7 +186,7 @@ is one of the signature flags described above.
   reg_void:
     .return ('')
   err_nortype:
-    self.panic('rtype not set')
+    self.'panic'('rtype not set')
 .end
 
 =item coerce(post, rtype)
@@ -310,7 +310,7 @@ forced into that register (with conversions as needed).
     .return (post)
 
   err_nortype:
-    self.panic('rtype not set')
+    self.'panic'('rtype not set')
 .end
 
 
@@ -434,11 +434,11 @@ nodes make it into the tree.
     .param pmc node
     .param pmc options         :slurpy :named
     unless null node goto not_null_node
-    self.panic("PAST::Compiler can't compile a null node")
+    self.'panic'("PAST::Compiler can't compile a null node")
     not_null_node:
 
     $S0 = typeof node
-    self.panic("PAST::Compiler can't compile node of type ", $S0)
+    self.'panic'("PAST::Compiler can't compile node of type ", $S0)
 .end
 
 =item as_post(Undef)
@@ -624,7 +624,7 @@ Return the POST representation of a C<PAST::Block>.
     $I0 = isa ctrlpast, ['PAST';'Node']
     if $I0 goto control_past
     if ctrlpast == 'return_pir' goto control_return
-    self.panic("Unrecognized control handler '", ctrlpast, "'")
+    self.'panic'("Unrecognized control handler '", ctrlpast, "'")
   control_return:
     ##  handle 'return' exceptions
     $S0 = self.'uniquereg'('P')
@@ -1538,7 +1538,7 @@ node with a 'pasttype' of bind.
     rpost = self.'coerce'(rpost, 'P')
     ops.'push'(rpost)
 
-    lpast.lvalue(1)
+    lpast.'lvalue'(1)
     lpost = self.'as_post'(lpast, 'bindpost'=>rpost)
     ops.'push'(lpost)
     ops.'result'(lpost)
@@ -1872,7 +1872,7 @@ attribute.
     #  if the keyed node is an lvalue, its base is an lvalue also
     $I0 = node.'lvalue'()
     unless $I0 goto have_lvalue
-    basepast.lvalue($I0)
+    basepast.'lvalue'($I0)
   have_lvalue:
 
     basepost = self.'as_post'(basepast, 'rtype'=>'P')

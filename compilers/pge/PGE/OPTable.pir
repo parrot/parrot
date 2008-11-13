@@ -316,7 +316,7 @@ Adds (or replaces) a syntactic category's defaults.
     mpos = pos
     $P0 = ws(mob)
     unless $P0 goto token_next_1
-    pos = $P0.to()
+    pos = $P0.'to'()
     goto token_next_1
   token_next_ws:
     pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
@@ -453,7 +453,7 @@ Adds (or replaces) a syntactic category's defaults.
     ##   shift operator onto the operator stack
     push tokenstack, token
     push operstack, oper
-    pos = oper.to()
+    pos = oper.'to'()
     ##   for circumfix ops, increase the circumfix nesting level
     $I0 = isgt tokencat, PGE_OPTABLE_POSTCIRCUMFIX
     circumnest += $I0
@@ -463,7 +463,7 @@ Adds (or replaces) a syntactic category's defaults.
 
   term_shift:
     push termstack, oper
-    pos = oper.to()
+    pos = oper.'to'()
     expect = token['expect']
     expect = shr expect, 8
     goto token_next
@@ -553,7 +553,7 @@ Adds (or replaces) a syntactic category's defaults.
     mpos = $I0
     oper = $P0(mob, 'action'=>action)
     delete mob['KEY']
-    $P0 = oper.from()
+    $P0 = oper.'from'()
     $P0 = pos
   token_match_success:
     $P0 = token["name"]
@@ -583,7 +583,7 @@ Adds (or replaces) a syntactic category's defaults.
     ##   somewhere we encountered an error that caused us to backtrack
     ##   find the "real" ending position here
   end_1a:
-    $I0 = $P0.to()
+    $I0 = $P0.'to'()
     if $I0 <= wspos goto end_1b
     wspos = $I0
     mpos = $I0
