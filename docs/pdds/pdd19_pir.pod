@@ -822,10 +822,6 @@ Function or method call. These notations are shorthand for a longer PCC
 function call. I<var> can denote a global subroutine, a local I<identifier> or
 a I<reg>.
 
-{{ DEPRECATION NOTE: bare word method names (e.g. C<foo.bar()> where
-C<bar> is not a local variable name) are deprecated. Use a quoted string
-instead. See #45859. }}
-
 =item .return ([<var> [:<flag> ...], ...])
 
 Return from the current subroutine with zero or more values.
