@@ -186,7 +186,7 @@ transform make_cons (list) :language('PIR') {
   iter_loop:
     unless iter, iter_end
     child = shift iter
-    child = tree.get( 'past', child, 'list_item' )
+    child = tree.'get'( 'past', child, 'list_item' )
     cons.'push'( child )
     goto iter_loop
 
