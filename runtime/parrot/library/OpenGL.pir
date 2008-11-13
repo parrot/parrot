@@ -215,7 +215,7 @@ alternating function names and Parrot NCI signatures.
     .param pmc nci_list
 
     .local pmc namespace_key
-    namespace_key = namespace.get_name()
+    namespace_key = namespace.'get_name'()
 
     .local pmc list_iter
     list_iter = iter nci_list
@@ -300,8 +300,8 @@ caller's namespace is assumed.
   symbol_loop_end:
 
     # Export all symbols and renames to the requested namespace
-    gl_namespace.export_to(to_namespace, export_list)
-    gl_namespace.export_to(to_namespace, export_renames)
+    gl_namespace.'export_to'(to_namespace, export_list)
+    gl_namespace.'export_to'(to_namespace, export_renames)
 .end
 
 
