@@ -223,7 +223,7 @@ transform special_form (define) :language('PIR') {
 
 transform quote (PAST;Op) :language( 'PIR' ) {
     .local pmc children
-    children = node.'get_array'()
+    children = node.'list'()
 
     # first kid is quote op; remove
     .local pmc quote_op
@@ -270,7 +270,7 @@ transform force_to_val (PAST;Op) :language('PIR') {
     result.'returns'( 'Undef' )
 
     .local pmc children
-    children = node.'get_array'()
+    children = node.'list'()
     unshift children, result
 
     .return( node )
@@ -393,7 +393,7 @@ transform lambda (PAST;Op) :language('PIR') {
 
 transform rewrite_var_name (PAST;Op) :language('PIR') {
     .local pmc children
-    children = node.'get_array'()
+    children = node.'list'()
 
     .local int elements
     elements = children
