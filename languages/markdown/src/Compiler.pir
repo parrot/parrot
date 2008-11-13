@@ -26,7 +26,7 @@ Markdown::HTML::Compiler implements a compiler for MAST nodes.
     .param pmc past
     .param pmc adverbs         :slurpy :named
 
-    .return self.'html'(past)
+    .tailcall self.'html'(past)
 .end
 
 .sub 'xml_escape' :anon
@@ -69,7 +69,7 @@ Return generated HTML for all of its children.
 
 .sub 'html' :method :multi(_,_)
     .param pmc node
-    .return self.'html_children'(node)
+    .tailcall self.'html_children'(node)
 .end
 
 
@@ -79,7 +79,7 @@ Return generated HTML for all of its children.
 
 .sub 'html' :method :multi(_,['Markdown';'Document'])
     .param pmc node
-    .return self.'html_children'(node)
+    .tailcall self.'html_children'(node)
 .end
 
 

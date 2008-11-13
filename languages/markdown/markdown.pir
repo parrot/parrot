@@ -74,7 +74,7 @@ Transform MAST C<source> into a String containing HTML.
     .param pmc adverbs         :slurpy :named
 
     $P0 = new ['Markdown';'HTML';'Compiler']
-    .return $P0.'to_html'(source, adverbs :flat :named)
+    .tailcall $P0.'to_html'(source, adverbs :flat :named)
 .end
 
 

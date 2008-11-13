@@ -40,7 +40,7 @@ for Markdown.
 .sub 'text' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('text', value, has_value)
+    .tailcall self.'attr'('text', value, has_value)
 .end
 
 
@@ -49,7 +49,7 @@ for Markdown.
 .sub 'level' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('level', value, has_value)
+    .tailcall self.'attr'('level', value, has_value)
 .end
 
 
