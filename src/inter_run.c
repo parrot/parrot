@@ -43,7 +43,7 @@ static Parrot_Context * runops_args(PARROT_INTERP,
 /* HEADERIZER END: static */
 
 #define STACKED_EXCEPTIONS 1
-/* #define RUNLOOP_TRACE 1 */
+#define RUNLOOP_TRACE      0
 
 static int
 runloop_id_counter = 0;          /* for synthesizing runloop ids. */
@@ -61,21 +61,23 @@ Run parrot ops. Set exception handler and/or resume after exception.
 void
 runops(PARROT_INTERP, size_t offs)
 {
-    volatile size_t offset = offs;
-    const int old_runloop_id    = interp->current_runloop_id;
-    const int our_runloop_level = ++interp->current_runloop_level;
-    const int our_runloop_id    = ++runloop_id_counter;
+    volatile size_t offset            = offs;
+    const    int    old_runloop_id    = interp->current_runloop_id;
+    const    int    our_runloop_level = ++interp->current_runloop_level;
+    const    int    our_runloop_id    = ++runloop_id_counter;
 
     /* It is OK if the runloop ID overflows; we only ever test it for equality,
        so the chance of collision is slight. */
     interp->current_runloop_id = our_runloop_id;
-#ifdef RUNLOOP_TRACE
+
+#if RUNLOOP_TRACE
     fprintf(stderr, "[entering loop %d, level %d]\n",
             interp->current_runloop_id, our_runloop_level);
 #endif
+
     /*
      * STACKED_EXCEPTIONS are necessary to catch exceptions in reentered
-     * run loops, e.g. if a delegate methods throws an exception
+     * run loops, e.g. if a delegate method throws an exception
      */
 #if ! STACKED_EXCEPTIONS
     if (!interp->current_runloop)
@@ -84,13 +86,13 @@ runops(PARROT_INTERP, size_t offs)
         new_runloop_jump_point(interp);
         if (setjmp(interp->current_runloop->resume)) {
             /* an exception was handled */
-            if (STACKED_EXCEPTIONS) {
+            if (STACKED_EXCEPTIONS)
                 free_runloop_jump_point(interp);
-            }
-            interp->current_runloop_level = our_runloop_level - 1;
-            interp->current_runloop_id = old_runloop_id;
 
-#ifdef RUNLOOP_TRACE
+            interp->current_runloop_level = our_runloop_level - 1;
+            interp->current_runloop_id    = old_runloop_id;
+
+#if RUNLOOP_TRACE
             fprintf(stderr, "[handled exception; back to loop %d, level %d]\n",
                     interp->current_runloop_id, interp->current_runloop_level);
 #endif
@@ -101,15 +103,16 @@ runops(PARROT_INTERP, size_t offs)
     runops_int(interp, offset);
 
     /* Remove the current runloop marker (put it on the free list). */
-    if (STACKED_EXCEPTIONS) {
+    if (STACKED_EXCEPTIONS || interp->current_runloop)
         free_runloop_jump_point(interp);
-    }
-#ifdef RUNLOOP_TRACE
+
+#if RUNLOOP_TRACE
     fprintf(stderr, "[exiting loop %d, level %d]\n",
             our_runloop_id, our_runloop_level);
 #endif
+
     interp->current_runloop_level = our_runloop_level - 1;
-    interp->current_runloop_id = old_runloop_id;
+    interp->current_runloop_id    = old_runloop_id;
 }
 
 /*
@@ -217,11 +220,12 @@ runops_args(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj),
         sig_p = new_sig;
     }
 
-    if (*sig_p && (dest[0] == PARROT_OP_get_params_pc
-                || (sub->vtable->base_type == enum_class_ExceptionHandler
-                    && PMC_cont(sub)->current_results))) {
+    if (*sig_p && (dest[0]     == PARROT_OP_get_params_pc
+    || (sub->vtable->base_type == enum_class_ExceptionHandler
+    &&  PMC_cont(sub)->current_results))) {
         dest = parrot_pass_args_fromc(interp, sig_p, dest, old_ctx, ap);
     }
+
     /*
      * main is now started with runops_args_fromc too
      * PASM subs usually don't have get_params
@@ -263,7 +267,7 @@ Parrot_run_meth_fromc(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj), SH
 
     interp->current_cont   = new_ret_continuation_pmc(interp, NULL);
     interp->current_object = obj;
-    dest = VTABLE_invoke(interp, sub, (void *)1);
+    dest                   = VTABLE_invoke(interp, sub, (void *)1);
 
     if (!dest)
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -649,13 +653,13 @@ new_runloop_jump_point(PARROT_INTERP)
     Parrot_runloop *jump_point;
 
     if (interp->runloop_jmp_free_list) {
-        jump_point = interp->runloop_jmp_free_list;
+        jump_point                    = interp->runloop_jmp_free_list;
         interp->runloop_jmp_free_list = jump_point->prev;
     }
     else
         jump_point = mem_allocate_typed(Parrot_runloop);
 
-    jump_point->prev = interp->current_runloop;
+    jump_point->prev        = interp->current_runloop;
     interp->current_runloop = jump_point;
 }
 
@@ -674,9 +678,9 @@ void
 free_runloop_jump_point(PARROT_INTERP)
 {
     Parrot_runloop * const jump_point = interp->current_runloop;
-    interp->current_runloop = jump_point->prev;
-    jump_point->prev = interp->runloop_jmp_free_list;
-    interp->runloop_jmp_free_list = jump_point;
+    interp->current_runloop           = jump_point->prev;
+    jump_point->prev                  = interp->runloop_jmp_free_list;
+    interp->runloop_jmp_free_list     = jump_point;
 }
 
 /*

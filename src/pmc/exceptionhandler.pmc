@@ -193,27 +193,28 @@ Report whether the exception handler can handle a particular type of exception.
             VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
 
         if (exception->vtable->base_type == enum_class_Exception
-                || VTABLE_isa(INTERP, exception, CONST_STRING(INTERP, "Exception"))) {
+        ||  VTABLE_isa(INTERP, exception, CONST_STRING(INTERP, "Exception"))) {
 
             if (severity < core_struct->min_severity) {
                 RETURN(INTVAL 0);
             }
             else if (core_struct->max_severity > 0
-                    && severity > core_struct->max_severity) {
+                 &&  severity                  > core_struct->max_severity) {
                 RETURN(INTVAL 0);
             }
             else if (core_struct->handled_types != PMCNULL) {
                 INTVAL elems = VTABLE_elements(interp, core_struct->handled_types);
-                INTVAL type = VTABLE_get_integer_keyed_str(interp,
-                        exception,
+                INTVAL type  = VTABLE_get_integer_keyed_str(interp, exception,
                         CONST_STRING(interp, "type"));
                 INTVAL i;
+
                 for (i = 0; i < elems; i++) {
                     INTVAL handled_type = VTABLE_get_integer_keyed_int(interp,
                             core_struct->handled_types, i);
                     if (handled_type == type)
                         RETURN(INTVAL 1);
                 }
+
                 RETURN(INTVAL 0);
             }
 
@@ -242,6 +243,7 @@ Set or get the minimum severity of the exception handler.
     METHOD min_severity(INTVAL severity :optional, INTVAL have_severity :opt_flag) {
         Parrot_ExceptionHandler_attributes * const core_struct =
                     PARROT_EXCEPTIONHANDLER(SELF);
+
         if (have_severity)
             core_struct->min_severity = severity;
         else
@@ -263,6 +265,7 @@ Set or get the maximum severity of the exception handler.
     METHOD max_severity(INTVAL severity :optional, INTVAL have_severity :opt_flag) {
         Parrot_ExceptionHandler_attributes * const core_struct =
                     PARROT_EXCEPTIONHANDLER(SELF);
+
         if (have_severity)
             core_struct->max_severity = severity;
         else

@@ -326,12 +326,12 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
             ns_array = Parrot_ns_get_name(interp, s->namespace_stash);
 
             /* Restore stuff that might have got overwritten */
-            interp->current_cont = saved_ccont;
-            interp->current_args = current_args;
-            interp->current_params = current_params;
-            interp->current_returns = current_returns;
-            interp->args_signature = args_signature;
-            interp->params_signature = params_signature;
+            interp->current_cont      = saved_ccont;
+            interp->current_args      = current_args;
+            interp->current_params    = current_params;
+            interp->current_returns   = current_returns;
+            interp->args_signature    = args_signature;
+            interp->params_signature  = params_signature;
             interp->returns_signature = returns_signature;
 
             if (s->name)
