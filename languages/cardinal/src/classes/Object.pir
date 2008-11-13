@@ -59,7 +59,7 @@ resolve_loop:
     push resolve_list, $P0
     goto resolve_loop
 resolve_loop_end:
-    class.resolve_method(resolve_list)
+    class.'resolve_method'(resolve_list)
 
     .return(class)
 .end
@@ -140,10 +140,10 @@ Create a new object having the same class as the invocant.
     # Instantiate.
     .local pmc cardinalmeta
     cardinalmeta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
-    $P0 = cardinalmeta.get_parrotclass(self)
+    $P0 = cardinalmeta.'get_parrotclass'(self)
     $P1 = $P0.'new'()
     $P2 = $P1.'HOW'()
-    $I0 = $P2.can(self,'initialize')
+    $I0 = $P2.'can'(self,'initialize')
     unless $I0, no_initialize
     $P2 = $P1.'initialize'(args :flat, named_args :named :flat)
   no_initialize:
@@ -255,7 +255,7 @@ Create a clone of self, also cloning the attributes given by attrlist.
     .local pmc result
     .local pmc cardinalmeta
     cardinalmeta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
-    $P0 = cardinalmeta.get_parrotclass(self)
+    $P0 = cardinalmeta.'get_parrotclass'(self)
     result = new $P0
 
     .local pmc attr_it
@@ -287,7 +287,7 @@ Get a list of all methods in the object.
 .include 'library/dumper.pir'
 .sub 'methods' :method
     $P0 = class self
-    $P1 = $P0.methods()
+    $P1 = $P0.'methods'()
     .local pmc meth_iter
     meth_iter = new 'Iterator', $P1
     .local pmc method_list
@@ -295,7 +295,7 @@ Get a list of all methods in the object.
   methods_loop:
     unless meth_iter goto methods_loop_end
     $P0 = shift meth_iter
-    method_list.push($P0)
+    method_list.'push'($P0)
     goto methods_loop
   methods_loop_end:
     .return(method_list)

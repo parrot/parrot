@@ -121,7 +121,7 @@ src/builtins/op.pir - Cardinal ops
     item = shift it
     $I0 = b.'include?'(item)
     unless $I0, loop
-    intersection.push(item)
+    intersection.'push'(item)
     goto loop
   loop_end:
     .return (intersection)

@@ -146,7 +146,7 @@ list_cmp_loop:
     .local pmc elem_1, elem_2
     elem_1 = self[i]
     elem_2 = topic[i]
-    ($I0) = elem_1.ACCEPTS(elem_2)
+    ($I0) = elem_1.'ACCEPTS'(elem_2)
     unless $I0 goto no_match
     inc i
     goto list_cmp_loop
@@ -223,9 +223,9 @@ Return a sorted copy of the list
     if has_by goto have_by
     by = get_hll_global 'infix:cmp'
   have_by:
-    $P0 = self.sort()
+    $P0 = self.'sort'()
     self = 0
-    self.append($P0)
+    self.'append'($P0)
 .end
 
 =item uniq(...)
@@ -277,9 +277,9 @@ Return a sorted copy of the list
 .end
 
 .sub 'uniq!' :method
-    $P0 = self.uniq()
+    $P0 = self.'uniq'()
     self = 0
-    self.append($P0)
+    self.'append'($P0)
 .end
 
 .sub 'max' :method
@@ -905,7 +905,7 @@ Creates a new Array containing the results and returns it.
     unless $P0 goto each_loop_end
     $P1 = shift $P0
     $P2 = block($P1)
-    result.push($P2)
+    result.'push'($P2)
     goto each_loop
   each_loop_end:
     .return (result)
@@ -1033,7 +1033,7 @@ The zip operator.
     args_iter = new 'Iterator', args
     item = new 'CardinalArray'
     $P0 = shift iterator
-    item.push($P0)
+    item.'push'($P0)
   inner_loop:
     unless args_iter, inner_loop_done
     arg = shift args_iter
@@ -1041,11 +1041,11 @@ The zip operator.
     unless null $P0 goto arg_not_null
     $P0 = get_hll_global 'nil'
   arg_not_null:
-    item.push($P0)
+    item.'push'($P0)
     goto inner_loop
   inner_loop_done:
     inc i
-    zipped.push(item)
+    zipped.'push'(item)
     goto setup_loop
   setup_loop_done:
 

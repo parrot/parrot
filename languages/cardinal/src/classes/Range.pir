@@ -404,7 +404,7 @@ Run C<block> once for each item in C<self>, with the item passed as an arg.
     .param pmc block    :named ("!BLOCK")
     $P0 = self.'first'()
     $P1 = $P0.'HOW'()
-    $I0 = $P1.can(self,'succ')
+    $I0 = $P1.'can'(self,'succ')
     if $I0 != 0 goto continuous_range
     $P0 = self.'iterator'()
     goto each_loop

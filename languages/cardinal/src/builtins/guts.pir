@@ -90,7 +90,7 @@ Checks the type of a parameter.
     .lex "$/", $P0
   no_match_to_copy:
 
-    $I0 = type.ACCEPTS(value)
+    $I0 = type.'ACCEPTS'(value)
     if $I0 goto ok
     'die'('Parameter type check failed')
 ok:
@@ -120,7 +120,7 @@ Internal helper method to create a class.
     push resolve_list, $P0
     goto resolve_loop
   resolve_loop_end:
-    class.resolve_method(resolve_list)
+    class.'resolve_method'(resolve_list)
 
     .return(class)
 .end

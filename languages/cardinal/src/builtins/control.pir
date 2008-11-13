@@ -36,7 +36,7 @@ src/builtins/control.pir - Cardinal Control functions
     .local pmc eh
     list = 'list'()
     eh = new 'ExceptionHandler'
-    eh.handle_types(.CONTROL_TAKE)
+    eh.'handle_types'(.CONTROL_TAKE)
     set_addr eh, handler
     push_eh eh
     block()
@@ -49,7 +49,7 @@ src/builtins/control.pir - Cardinal Control functions
     message = exception['message']
     continuation = exception['resume']
     $P0 = exception['payload']
-    list.push($P0)
+    list.'push'($P0)
     continuation()
 .end
 
