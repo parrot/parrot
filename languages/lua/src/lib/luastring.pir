@@ -225,7 +225,7 @@ are also returned, after the two indices.
 
 .sub 'find'
     .param pmc argv :slurpy
-    .return str_find_aux(1, argv :flat)
+    .tailcall str_find_aux(1, argv :flat)
 .end
 
 .sub 'str_find_aux' :anon
@@ -722,11 +722,11 @@ is replaced.
     $I0 = isa repl, 'LuaNumber'
     unless $I0 goto L1
     $P0 = repl.'tostring'()
-    .return add_s(b, s, match, $P0)
+    .tailcall add_s(b, s, match, $P0)
   L1:
     $I0 = isa repl, 'LuaString'
     unless $I0 goto L2
-    .return add_s(b, s, match, repl)
+    .tailcall add_s(b, s, match, repl)
   L2:
     $I0 = isa repl, 'LuaClosure'
     if $I0 goto L3
@@ -881,7 +881,7 @@ start the search; its default value is 1 and may be negative.
 
 .sub 'match'
     .param pmc argv :slurpy
-    .return str_find_aux(0, argv :flat)
+    .tailcall str_find_aux(0, argv :flat)
 .end
 
 

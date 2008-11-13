@@ -101,7 +101,7 @@ does not close the file when the loop ends.)
 .sub 'lines' :method
     .param pmc extra :slurpy
     tofile(self)
-    .return aux_lines(self, 0)
+    .tailcall aux_lines(self, 0)
 .end
 
 
@@ -149,7 +149,7 @@ empty string, or B<nil> on end of file.
     tofile(self)
     f = getattribute self, 'data'
     if formats goto L1
-    .return read_line(f)
+    .tailcall read_line(f)
   L1:
     .local int narg
     .local int i

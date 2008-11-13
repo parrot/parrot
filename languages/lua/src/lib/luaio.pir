@@ -333,7 +333,7 @@ LIST
     env = file.'getfenv'()
     .const 'LuaString' key = '__close'
     $P0 = env[key]
-    .return $P0(file)
+    .tailcall $P0(file)
 .end
 
 .sub 'aux_lines' :lex
@@ -396,7 +396,7 @@ Equivalent to C<file:flush> over the default output file.
     .const 'LuaString' key = 'flush'
     file = getiofile(IO_OUTPUT)
     $P0 = file[key]
-    .return $P0(file)
+    .tailcall $P0(file)
 .end
 
 
@@ -466,7 +466,7 @@ input file. In this case it does not close the file when the loop ends.
     .const 'LuaString' key = 'lines'
     file = getiofile(IO_INPUT)
     $P0 = file[key]
-    .return $P0(file)
+    .tailcall $P0(file)
   L1:
     $S1 = lua_checkstring(1, filename)
     f = open $S1, '<'
@@ -474,7 +474,7 @@ input file. In this case it does not close the file when the loop ends.
     lua_argerror(1, $S1)
   L2:
     file = newfile(f)
-    .return aux_lines(file, 1)
+    .tailcall aux_lines(file, 1)
 .end
 
 
@@ -626,7 +626,7 @@ Equivalent to C<io.input():read>.
     .const 'LuaString' key = 'read'
     file = getiofile(IO_INPUT)
     $P0 = file[key]
-    .return $P0(file, argv :flat)
+    .tailcall $P0(file, argv :flat)
 .end
 
 
@@ -710,7 +710,7 @@ Equivalent to C<io.output():write>.
     .const 'LuaString' key = 'write'
     file = getiofile(IO_OUTPUT)
     $P0 = file[key]
-    .return $P0(file, argv :flat)
+    .tailcall $P0(file, argv :flat)
 .end
 
 

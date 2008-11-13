@@ -203,7 +203,7 @@ protected mode).
     $S1 = lua_optstring(1, filename, '')
     ($P0, $S0) = lua_loadfile($S1)
     if null $P0 goto L1
-    .return $P0()
+    .tailcall $P0()
   L1:
     lua_error($S0)
 .end
@@ -262,7 +262,7 @@ default for C<f> is 1.
     res = get_hll_global '_G'
     .return (res)
   L3:
-    .return lua_getfenv(f)
+    .tailcall lua_getfenv(f)
 .end
 
 .sub 'getfunc' :anon
@@ -388,7 +388,7 @@ NOT YET IMPLEMENTED.
     lua_checktype(1, func, 'function')
     $S2 = lua_optstring(2, chunkname, '=(load)')
     not_implemented()
-    .return load_aux($P0, $S0)
+    .tailcall load_aux($P0, $S0)
 .end
 
 .sub 'load_aux' :anon
@@ -417,7 +417,7 @@ standard input, if no file name is given.
     .param pmc extra :slurpy
     $S1 = lua_optstring(1, filename, '')
     ($P0, $S0) = lua_loadfile($S1)
-    .return load_aux($P0, $S0)
+    .tailcall load_aux($P0, $S0)
 .end
 
 
@@ -438,7 +438,7 @@ To load and run a given string, use the idiom
     $S1 = lua_checkstring(1, s)
     $S2 = lua_optstring(2, chunkname, $S1)
     ($P0, $S0) = lua_loadbuffer($S1, $S2)
-    .return load_aux($P0, $S0)
+    .tailcall load_aux($P0, $S0)
 .end
 
 

@@ -141,7 +141,7 @@ Compile C<source>.
     setprop self, 'num', $P0
     $S1 = $S0 . '.lua'
     save_lua(source, $S1)
-    .return compile_file($S1)
+    .tailcall compile_file($S1)
 .end
 
 =back

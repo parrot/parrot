@@ -118,7 +118,7 @@ Returns the environment of object C<o>.
 .sub 'getfenv'
     .param pmc o :optional
     .param pmc extra :slurpy
-    .return lua_getfenv(o)
+    .tailcall lua_getfenv(o)
 .end
 
 

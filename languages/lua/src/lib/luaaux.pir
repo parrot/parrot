@@ -567,9 +567,9 @@ messages and in debug information.
   L1:
     $S0 = substr data, 0, 4
     unless $S0 == "\033Lua" goto L2
-    .return undump(data, chunkname)
+    .tailcall undump(data, chunkname)
   L2:
-    .return parser(data, chunkname)
+    .tailcall parser(data, chunkname)
 .end
 
 .sub 'parser' :anon
@@ -628,7 +628,7 @@ C<name> is the chunk name, used for debug information and error messages.
 .sub 'lua_loadbuffer'
     .param string buff
     .param string chunkname
-    .return lua_load(buff, chunkname)
+    .tailcall lua_load(buff, chunkname)
 .end
 
 
@@ -659,7 +659,7 @@ This function only loads the chunk; it does not run it.
     if filename == '' goto L4
     close f
   L4:
-    .return lua_load($S0, chunkname)
+    .tailcall lua_load($S0, chunkname)
   L3:
     $S0 = 'cannot open '
     $S0 .= filename

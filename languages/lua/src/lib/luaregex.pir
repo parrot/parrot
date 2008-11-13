@@ -656,7 +656,7 @@ Francois Perrad
 
   super:
     $P0 = get_hll_global ['PGE';'Exp';'CGroup'], 'pir'
-    .return $P0(self, code, label, next)
+    .tailcall $P0(self, code, label, next)
 .end
 
 
