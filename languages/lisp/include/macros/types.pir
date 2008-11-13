@@ -43,7 +43,7 @@ Create a new stream object from ParrotIO object S, placing the result in R.
 
 .macro STREAM(R,S)
   .R = new "LispStream"
-  .R._set_io(.S)
+  .R.'_set_io'(.S)
 .endm
 
 =head2 .READTABLE(R)

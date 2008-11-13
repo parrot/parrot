@@ -44,7 +44,7 @@ FUNCTION_FORM:
   .ASSERT_TYPE_AND_BRANCH(symbol, "symbol", FUNCTION_NOT_FOUND)
 
   # Retrieve the function from the symbol.
-  function = symbol._get_function()
+  function = symbol.'_get_function'()
 
   # If the function wasn't set for the symbol, throw an error.
   defined found, function
@@ -77,7 +77,7 @@ FUNCTION_LOOP:
   goto FUNCTION_LOOP
 
 FUNCTION_CALL:
-  .return _FUNCTION_CALL(function,funcargs)
+  .tailcall _FUNCTION_CALL(function,funcargs)
   # VALID_IN_PARROT_0_2_0 goto DONE
 
 FUNCTION_NOT_FOUND:
@@ -105,7 +105,7 @@ MACRO_FORM:
    macrosym = _LOOKUP_SYMBOL("*MACROEXPAND-HOOK*")
    if_null macrosym, MACRO_NOT_INITIALIZED
 
-   macroexp = macrosym._get_value()             # Get the expander function
+   macroexp = macrosym.'_get_value'()             # Get the expander function
   .ASSERT_TYPE_AND_BRANCH(macroexp, "function", MACRO_NOT_INITIALIZED)
 
    # VALID_IN_PARROT_0_2_0  peek_pad macroenv                           # Get current lexical scope
@@ -121,7 +121,7 @@ MACRO_FORM:
 
 SYMBOL:
   symbol = form
-  symname = symbol._get_name_as_string()
+  symname = symbol.'_get_name_as_string'()
 
   .local int is_special
   is_special = _IS_SPECIAL(symbol)                 # Check if we're a dynamic
@@ -131,8 +131,8 @@ SYMBOL:
 DYNAMIC_SYMBOL:
   .local pmc package
   .local string pkgname
-  package = symbol._get_package()
-  pkgname = package._get_name_as_string()
+  package = symbol.'_get_package'()
+  pkgname = package.'_get_name_as_string'()
 
   symbol = _LOOKUP_GLOBAL(pkgname, symname)
   goto CHECK_VALUE
@@ -144,7 +144,7 @@ LEXICAL_SYMBOL:
   goto CHECK_VALUE
 
 CHECK_VALUE:
-  retv = symbol._get_value()                    # Check for symbol's value
+  retv = symbol.'_get_value'()                    # Check for symbol's value
 
   defined found, retv
   unless found goto SYMBOL_NOT_FOUND

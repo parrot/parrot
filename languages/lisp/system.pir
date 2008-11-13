@@ -166,7 +166,7 @@ DONE:
     .ASSERT_TYPE(pkg, "package")
 
     .local pmc pkgname
-    pkgname = pkg._get_name()
+    pkgname = pkg.'_get_name'()
 
     goto DONE
 
@@ -287,7 +287,7 @@ DONE:
   .ASSERT_TYPE(intopkg, "package")
   .ASSERT_TYPE(frompkg, "package")
 
-   exports = frompkg._get_exports()
+   exports = frompkg.'_get_exports'()
 
    iter i, exports
 
@@ -297,8 +297,8 @@ LOOP:
    shift symname, i
    symnames = symname
 
-   symbol = frompkg._lookup_symbol(symnames)
-   intopkg._import_symbol(symbol)
+   symbol = frompkg.'_lookup_symbol'(symnames)
+   intopkg.'_import_symbol'(symbol)
 
    goto LOOP
 
@@ -336,7 +336,7 @@ LOOP:
   .ASSERT_TYPE(symbol, "string")
 
    symname = symbol
-   package._export_symbol(symname)
+   package.'_export_symbol'(symname)
 
   .CDR(symbols, symbols)
    goto LOOP
@@ -571,7 +571,7 @@ DONE:
   .CAR(stream, args)
   .ASSERT_TYPE(stream, "stream")
 
-   io = stream._get_io()
+   io = stream.'_get_io'()
 
    peek char, io
    if char == "" goto ERROR_EOF
@@ -603,7 +603,7 @@ DONE:
   .CAR(stream, args)
   .ASSERT_TYPE(stream, "stream")
 
-   io = stream._get_io()
+   io = stream.'_get_io'()
    close io
 
   .TRUE(retv)
@@ -670,14 +670,14 @@ DONE:
 
    macro = new "LispMacro"
 
-   val = form._get_args()
-   macro._set_args(val)
+   val = form.'_get_args'()
+   macro.'_set_args'(val)
 
-   val = form._get_scope()
-   macro._set_scope(val)
+   val = form.'_get_scope'()
+   macro.'_set_scope'(val)
 
-   val = form._get_body()
-   macro._set_body(val)
+   val = form.'_get_body'()
+   macro.'_set_body'(val)
 
    goto DONE
 

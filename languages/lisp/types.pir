@@ -159,7 +159,7 @@ Set up the types.
     .local pmc tmps
 
     .local pmc name
-    name = self._get_name()
+    name = self.'_get_name'()
 
     .local int test
     defined test, name
@@ -246,7 +246,7 @@ DONE:
     .local pmc stack
     .local pmc hash
 
-    symname = symbol._get_name_as_string()
+    symname = symbol.'_get_name_as_string'()
 
     hash = getattribute self,  "internal"
 
@@ -279,7 +279,7 @@ DONE:
     stack = hash[name]
 
     symbol = _SYMBOL(name)
-    symbol._set_package(self)
+    symbol.'_set_package'(self)
 
     push stack, symbol
 
@@ -352,7 +352,7 @@ DONE:
     goto DONE
 
 SYMBOL_NOT_FOUND:
-    symbol = self._intern_symbol(name)
+    symbol = self.'_intern_symbol'(name)
 
     stack = internal[name]
     external[name] = stack

@@ -24,7 +24,7 @@ internals.pir - lexical and global variables, function call
   find_global package, "PACKAGES", pkgname      # Look for the package
   pop_eh
 
-  retv = package._lookup_symbol(symname)        # Lookup the symbol
+  retv = package.'_lookup_symbol'(symname)        # Lookup the symbol
 
   goto DONE
 
@@ -81,10 +81,10 @@ GLOBAL_SYMBOL:
   symbol = _LOOKUP_GLOBAL("COMMON-LISP", "*PACKAGE*")
   if_null symbol, PACKAGE_NOT_FOUND
 
-  package = symbol._get_value()
+  package = symbol.'_get_value'()
   if_null package, PACKAGE_NOT_FOUND
 
-  pkgname = package._get_name_as_string()
+  pkgname = package.'_get_name_as_string'()
 
   retv = _LOOKUP_GLOBAL(pkgname, symname)
   goto DONE
@@ -108,7 +108,7 @@ DONE:
 
   .local string symname
 
-  symname = symbol._get_name_as_string()
+  symname = symbol.'_get_name_as_string'()
 
   store_global pkgname, symname, symbol
 .end
@@ -123,7 +123,7 @@ DONE:
 
   .local string symname
 
-  symname = symbol._get_name_as_string()
+  symname = symbol.'_get_name_as_string'()
 
   # VALID_IN_PARROT_0_2_0 store_lex -1, symname, symbol
   store_lex symname, symbol
@@ -143,15 +143,15 @@ DONE:
   .local int test
 
    symbol = _LOOKUP_GLOBAL("COMMON-LISP", "*PACKAGE*")
-   package = symbol._get_value()
+   package = symbol.'_get_value'()
 
    symbol = _SYMBOL(symname)                    # Create a new symbol
-   symbol._set_package(package)                 # Set the home package
+   symbol.'_set_package'(package)                 # Set the home package
 
    defined test, value                          # Set a value if provided
    if test == 0 goto DONE
 
-   symbol._set_value(value)
+   symbol.'_set_value'(value)
    goto DONE
 
 DONE:
@@ -176,7 +176,7 @@ DONE:
 
   name = new "LispString"
   name = symname
-  symbol._set_name(name)
+  symbol.'_set_name'(name)
 
   .return(symbol)
 .end
@@ -204,21 +204,21 @@ DONE:
   find_global package, "PACKAGES", pkgname
   pop_eh
 
-  symbol = package._intern_symbol(symname)
-  symbol._set_package(package)                  # Set the home package
+  symbol = package.'_intern_symbol'(symname)
+  symbol.'_set_package'(package)                  # Set the home package
 
   defined test, value                           # Set a value if provided
   if test == 0 goto FUNCTION
 
-  symbol._set_value(value)
+  symbol.'_set_value'(value)
   goto FUNCTION
 
 FUNCTION:                                       # Set a function if provided
   defined test, function
   if test == 0 goto DONE
 
-  function._set_name(symname)
-  symbol._set_function(function)
+  function.'_set_name'(symname)
+  symbol.'_set_function'(function)
   goto DONE
 
 PACKAGE_NOT_CREATED:
@@ -240,9 +240,9 @@ Call a function.
     .param pmc args
 
     .local pmc proto
-    proto = function._get_args()
+    proto = function.'_get_args'()
     .local pmc body
-    body  = function._get_body()
+    body  = function.'_get_body'()
 
     .local string type
     type = typeof function                     # Get the function type
@@ -260,19 +260,19 @@ Call a function.
     # print type
     # print " is the type\n"
     if type != 'Sub' goto NOT_A_COMPILED_FUNCTION
-        .return body( args )
+        .tailcall body( args )
     NOT_A_COMPILED_FUNCTION:
 
     if type != 'LispCons' goto NOT_A_LISP_CONS
         .local pmc scope
-        scope = function._get_scope()
+        scope = function.'_get_scope'()
 
                                         # 1st arg - the code to evaluate
                                         # 2nd arg - the arg prototype
                                         # 3rd arg - the args to evaluate
                                         # The closure
         # set_args "0,0,0", body, proto, args
-        .return scope( body, proto, args )
+        .tailcall scope( body, proto, args )
         # VALID_IN_PARROT_0_2_0 pushtopp                            # Save the upper registers
         # VALID_IN_PARROT_0_2_0 invokecc                            # Call the closure
         # VALID_IN_PARROT_0_2_0 poptopp                             # Restore the upper registers
@@ -368,9 +368,9 @@ ARG_LOOP_END:
 
     .local pmc lisp_function
     lisp_function = new "LispFunction"
-    lisp_function._set_args(args)
-    lisp_function._set_body(body)
-    lisp_function._set_scope(closure)
+    lisp_function.'_set_args'(args)
+    lisp_function.'_set_body'(body)
+    lisp_function.'_set_scope'(closure)
 
     .return(lisp_function)
 .end
@@ -410,7 +410,7 @@ CLOSURE_ARGS:
     .CAR(clval, clargsptr)                        # The lexical value
     .CAR(clarg, clprotptr)                        # The lexical arg prototype
 
-    clsymname = clarg._get_name_as_string()
+    clsymname = clarg.'_get_name_as_string'()
     clsym = _LEXICAL_SYMBOL(clsymname, clval)    # Create a new lexical symbol
 
     .CDR(clargsptr, clargsptr)
@@ -428,7 +428,7 @@ CLOSURE_BODY:
 
     .LIST_1(clearg, clbody)
     # VALID_IN_PARROT_0_2_0  pop_pad
-    .return _eval(clearg)
+    .tailcall _eval(clearg)
 
 CLOSURE_TOO_FEW_ARGS:
     # VALID_IN_PARROT_0_2_0  pop_pad

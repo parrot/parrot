@@ -37,16 +37,16 @@ The function that implements the Lisp reader CLtL 2.2.
                                         # the input stream to read from.
 
     .CAR(istream, args)
-    stream = istream._get_io()
+    stream = istream.'_get_io'()
 
     symbol = _LOOKUP_GLOBAL("SYSTEM", "*READER-MACROS*")
-    readmacros = symbol._get_value()
+    readmacros = symbol.'_get_value'()
 
     symbol = _LOOKUP_GLOBAL("COMMON-LISP", "*READTABLE*")
-    readobj = symbol._get_value()
+    readobj = symbol.'_get_value'()
 
-    readtable = readobj._get_table()
-    readcase  = readobj._get_case()
+    readtable = readobj.'_get_table'()
+    readcase  = readobj.'_get_case'()
 
     .local string char
     .local int ordv
@@ -223,20 +223,20 @@ DONE:
 
 GET_STDIN:
    symbol = _LOOKUP_GLOBAL("COMMON-LISP", "*STANDARD-INPUT*")
-   istream = symbol._get_value()
+   istream = symbol.'_get_value'()
    goto DONE_ARGS
 
 DONE_ARGS:
   .ASSERT_TYPE_AND_BRANCH(istream, "stream", ERROR_NONSTREAM)
-   stream = istream._get_io()
+   stream = istream.'_get_io'()
 
    symbol = _LOOKUP_GLOBAL("SYSTEM", "*READER-MACROS*")
-   readmacros = symbol._get_value()
+   readmacros = symbol.'_get_value'()
 
    symbol = _LOOKUP_GLOBAL("COMMON-LISP", "*READTABLE*")
-   readobj = symbol._get_value()
+   readobj = symbol.'_get_value'()
 
-   readtable = readobj._get_table()
+   readtable = readobj.'_get_table'()
 
   .NIL(retv)                              # Initialize the return to NIL
    lptr = retv
@@ -402,7 +402,7 @@ As described in CLtL section 2.4.4
     .local pmc stream
     .CAR(stream, args)                    # Get the input stream off the args
     .local pmc istream
-     istream = stream._get_io()
+     istream = stream.'_get_io'()
 
     .local string char
 LOOP:
@@ -426,14 +426,14 @@ As described in CLtL section 2.4.5.
     .local pmc stream
     .CAR(stream, args)                    # Get the input stream off the args
     .local pmc istream
-    istream = stream._get_io()
+    istream = stream.'_get_io'()
 
     .local pmc symbol
     symbol = _LOOKUP_GLOBAL("COMMON-LISP", "*READTABLE*")
     .local pmc readtable
-    readtable = symbol._get_value()
+    readtable = symbol.'_get_value'()
     .local pmc table
-    table = readtable._get_table()
+    table = readtable.'_get_table'()
 
     .local string strtok
     strtok = ""
@@ -511,14 +511,14 @@ As described in CLtL section 2.4.7
   .local pmc func
 
   .CAR(stream,args)
-  istream = stream._get_io()
+  istream = stream.'_get_io'()
 
   read char, istream, 1
 
   symbol = _LOOKUP_GLOBAL("SYSTEM", "*DISPATCHING-MACROS*")
   .ASSERT_TYPE_AND_BRANCH(symbol, "symbol", MACRO_NOT_INITIALIZED)
 
-  macros = symbol._get_value()
+  macros = symbol.'_get_value'()
   .ASSERT_TYPE_AND_BRANCH(macros, "hash", MACRO_NOT_INITIALIZED)
 
   macro = macros[char]

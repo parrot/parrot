@@ -56,10 +56,10 @@ SYMBOL:
   symbol = _LOOKUP_GLOBAL("COMMON-LISP", "*PACKAGE*")
   if_null symbol, PACKAGE_NOT_FOUND
 
-  package = symbol._get_value()                 # Get the current package
+  package = symbol.'_get_value'()                 # Get the current package
   if_null package, PACKAGE_NOT_FOUND
 
-  pkgname = package._get_name_as_string()
+  pkgname = package.'_get_name_as_string'()
   symname = token
 
   retv = _LOOKUP_GLOBAL(pkgname, symname)

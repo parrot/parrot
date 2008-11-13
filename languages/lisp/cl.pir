@@ -17,17 +17,17 @@ cl.pir - Set up the package 'COMMON-LISP'
     store_global "PACKAGES", "CL", package
 
     .local pmc t
-    t = package._intern_symbol("T")                      # Create the T symbol, T meaning true
-    t._set_value(t)
-    t._set_package(package)
-    t._set_special(t)
+    t = package.'_intern_symbol'("T")                      # Create the T symbol, T meaning true
+    t.'_set_value'(t)
+    t.'_set_package'(package)
+    t.'_set_special'(t)
     store_global "SYMBOLS", "T", t                       # Quick alias to T
 
     .local pmc nil
-    nil = package._intern_symbol("NIL")                  # Create the NIL symbol
-    nil._set_value(nil)
-    nil._set_package(package)
-    nil._set_special(t)
+    nil = package.'_intern_symbol'("NIL")                  # Create the NIL symbol
+    nil.'_set_value'(nil)
+    nil.'_set_package'(package)
+    nil.'_set_special'(t)
     store_global "SYMBOLS", "NIL",  nil                  # Quick alias to NIL
 
     .INTEGER(value,1)
@@ -161,16 +161,16 @@ cl.pir - Set up the package 'COMMON-LISP'
     goto INVALID_FUNCTION_NAME
 
 CAR_IS_FUNCTION:
-    .return _FUNCTION_CALL(car, args_of_func)
+    .tailcall _FUNCTION_CALL(car, args_of_func)
 
 CAR_IS_SYMBOL:
     .local pmc func
-    func = car._get_function()                   # Get the function from symbol
+    func = car.'_get_function'()                   # Get the function from symbol
     if_null func, INVALID_FUNCTION_NAME          # Throw an error if undefined
     type = typeof func
     # print type
     # print ' for CAR_IS_SYMBOL'
-    .return _FUNCTION_CALL(func,args_of_func)
+    .tailcall _FUNCTION_CALL(func,args_of_func)
 
 INVALID_FUNCTION_NAME:
     .ERROR_1("undefined-function", "%s is not a function name", car)
@@ -229,7 +229,7 @@ DONE:
   .CAR(symbol, args)
   .ASSERT_TYPE(symbol, "symbol")
 
-   val = symbol._get_value()
+   val = symbol.'_get_value'()
    if_null val, UNBOUND
 
   .TRUE(retv)
@@ -402,12 +402,12 @@ DONE:
 
 SYMBOL:
     .local string symname
-    symname = form._get_name_as_string()         # Retrieve the symbols name
+    symname = form.'_get_name_as_string'()         # Retrieve the symbols name
 
     .local pmc package
-    package = form._get_package()                # Retrieve the symbols package name
+    package = form.'_get_package'()                # Retrieve the symbols package name
     .local string pkgname
-    pkgname = package._get_name_as_string()
+    pkgname = package.'_get_name_as_string'()
 
     .local pmc symbol
     symbol = _LOOKUP_GLOBAL(pkgname, symname)    # Lookup the symbol
@@ -416,7 +416,7 @@ SYMBOL:
     found = defined symbol                       # Ensure the symbol was found in
     unless found goto FUNCTION_NOT_FOUND         # the global namespace
 
-    retv = symbol._get_function()                # Ensure the symbol had a function
+    retv = symbol.'_get_function'()                # Ensure the symbol had a function
     defined found, symbol                        # defined
     unless found goto FUNCTION_NOT_FOUND
 
@@ -456,7 +456,7 @@ DONE:
   .ASSERT_LENGTH_BETWEEN(args, 0, 1, ERROR_NARGS)
 
    symbol = _LOOKUP_GLOBAL("COMMON-LISP", "*GENSYM-COUNTER*")
-   gcnt = symbol._get_value()
+   gcnt = symbol.'_get_value'()
 
    suffix = gcnt
    prefix = "G"
@@ -690,7 +690,7 @@ BIND_LOOP:
     inc i
     value  = keyvals[i]                          # Pop value of key/val list
 
-    name = symbol._get_name_as_string()
+    name = symbol.'_get_name_as_string'()
 
     test = _IS_SPECIAL(symbol)
     if test == 0 goto BIND_LEXICAL
@@ -703,10 +703,10 @@ BIND_LEXICAL:
     goto BIND_LOOP
 
 BIND_DYNAMIC:
-    package = symbol._get_package()              # Get dynamic symbols package
+    package = symbol.'_get_package'()              # Get dynamic symbols package
 
-    symbol = package._shadow_symbol(name)        # Shadow the symbol
-    symbol._set_value(value)                     # Set the new value
+    symbol = package.'_shadow_symbol'(name)        # Shadow the symbol
+    symbol.'_set_value'(value)                     # Set the new value
 
     push dynvars, symbol                         # Keep around for tracking
 
@@ -748,10 +748,10 @@ CLEANUP_LOOP:
     if i >= nvar goto CLEANUP_DONE
 
     symbol  = dynvars[i]                         # Symbol to be unshadowed
-    name    = symbol._get_name_as_string()
-    package = symbol._get_package()
+    name    = symbol.'_get_name_as_string'()
+    package = symbol.'_get_package'()
 
-    package._unshadow_symbol(name)               # Unshadow the symbol
+    package.'_unshadow_symbol'(name)               # Unshadow the symbol
 
     inc i
     goto CLEANUP_LOOP
@@ -930,7 +930,7 @@ LOOP:
 
   .ASSERT_TYPE(symbol, "symbol")                # Ensure variable is a symbol
 
-   name = symbol._get_name_as_string()          # Get the symbols name
+   name = symbol.'_get_name_as_string'()          # Get the symbols name
    lexical = _LOOKUP_LEXICAL(name)              # Look for it in lexical env
    if_null lexical, SET_SYMBOL_VALUE
 
@@ -940,7 +940,7 @@ SET_SYMBOL_VALUE:
   .LIST_1(earg, value)                          # Evaluate the value form
    retv = _eval(earg)
 
-   symbol._set_value(retv)
+   symbol.'_set_value'(retv)
 
   .CDR(lptr, lptr)
   .CDR(lptr, lptr)
