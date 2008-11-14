@@ -1,12 +1,6 @@
-#!perl
-# Copyright (C) 2007, The Perl Foundation.
+#! parrot
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 1;
 
 =head1 NAME
 
@@ -22,33 +16,42 @@ Tests OO features related to names and namespaces.
 
 =cut
 
-pir_output_is(
-    <<'CODE', <<'OUT', 'Create HLL class same-named as Parrot class', todo => 'RT #43419' );
-    .HLL "perl6", ""
+.HLL "perl6", ""
 
-    .namespace []
+.namespace []
 
-    .sub main :main
-        # works
-        $P0 = new 'Class'
-        $P0.'name'('AnObject')
-        $S0 = $P0
-        say $S0
+.sub main :main
+    .include 'include/test_more.pir'
 
-        # fails
-        $P0 = new 'Class'
-        $P0.'name'('Object')
-        $S0 = $P0
-        say $S0
-    .end
-CODE
-perl6;AnObject
-perl6;Object
-OUT
+    plan(2)
+
+    hll_object_different_than_parrot_name()
+    hll_object_same_as_parrot_name()
+.end
+
+.sub hll_object_different_than_parrot_name
+    # works
+    $P0 = new 'Class'
+    $P0.'name'('AnObject')
+    $S0 = $P0
+    is ($S0, 'AnObject','HLL obj w/ name different than parrot obj created')
+.end
+
+.sub hll_object_same_as_parrot_name
+    # fails
+    $P0 = new 'Class'
+    push_eh OK_1
+    $P0.'name'('Object')
+    pop_eh
+    $S0 = $P0
+    ok (0, 'HLL obj created w/ same name as parrot obj')
+    .return()
+OK_1:    
+    ok (1, 'HLL obj w/ same name as parrot obj not created')
+.end
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir 
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
