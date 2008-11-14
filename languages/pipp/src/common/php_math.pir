@@ -109,7 +109,7 @@ Return the arc cosine of the number in radians
 
 .sub 'acos'
     .param pmc args :slurpy
-    .TRIG1(args, acos)
+    .TRIG1(args, 'acos')
 .end
 
 =item C<float acosh(float number)>
@@ -120,7 +120,7 @@ Returns the inverse hyperbolic cosine of the number, i.e. the value whose hyperb
 
 .sub 'acosh'
     .param pmc args :slurpy
-    .TRIG1(args, acosh)
+    .TRIG1(args, 'acosh')
 .end
 
 =item C<float asin(float number)>
@@ -131,7 +131,7 @@ Returns the arc sine of the number in radians
 
 .sub 'asin'
     .param pmc args :slurpy
-    .TRIG1(args, asin)
+    .TRIG1(args, 'asin')
 .end
 
 =item C<float asinh(float number)>
@@ -142,7 +142,7 @@ Returns the inverse hyperbolic sine of the number, i.e. the value whose hyperbol
 
 .sub 'asinh'
     .param pmc args :slurpy
-    .TRIG1(args, asinh)
+    .TRIG1(args, 'asinh')
 .end
 
 =item C<float atan(float number)>
@@ -153,7 +153,7 @@ Returns the arc tangent of the number in radians
 
 .sub 'atan'
     .param pmc args :slurpy
-    .TRIG1(args, atan)
+    .TRIG1(args, 'atan')
 .end
 
 =item C<float atan2(float y, float x)>
@@ -186,7 +186,7 @@ Returns the inverse hyperbolic tangent of the number, i.e. the value whose hyper
 
 .sub 'atanh'
     .param pmc args :slurpy
-    .TRIG1(args, atanh)
+    .TRIG1(args, 'atanh')
 .end
 
 =item C<string base_convert(string number, int frombase, int tobase)>
@@ -295,7 +295,7 @@ Returns the cosine of the number in radians
 
 .sub 'cos'
     .param pmc args :slurpy
-    .TRIG1(args, cos)
+    .TRIG1(args, 'cos')
 .end
 
 =item C<float cosh(float number)>
@@ -306,7 +306,7 @@ Returns the hyperbolic cosine of the number, defined as (exp(number) + exp(-numb
 
 .sub 'cosh'
     .param pmc args :slurpy
-    .TRIG1(args, cosh)
+    .TRIG1(args, 'cosh')
 .end
 
 =item C<string decbin(int decimal_number)>
@@ -874,7 +874,7 @@ Returns the sine of the number in radians
 
 .sub 'sin'
     .param pmc args :slurpy
-    .TRIG1(args, sin)
+    .TRIG1(args, 'sin')
 .end
 
 =item C<float sinh(float number)>
@@ -885,7 +885,7 @@ Returns the hyperbolic sine of the number, defined as (exp(number) - exp(-number
 
 .sub 'sinh'
     .param pmc args :slurpy
-    .TRIG1(args, sinh)
+    .TRIG1(args, 'sinh')
 .end
 
 =item C<float sqrt(float number)>
@@ -916,7 +916,7 @@ Returns the tangent of the number in radians
 
 .sub 'tan'
     .param pmc args :slurpy
-    .TRIG1(args, tan)
+    .TRIG1(args, 'tan')
 .end
 
 =item C<float tanh(float number)>
@@ -927,7 +927,7 @@ Returns the hyperbolic tangent of the number, defined as sinh(number)/cosh(numbe
 
 .sub 'tanh'
     .param pmc args :slurpy
-    .TRIG1(args, tanh)
+    .TRIG1(args, 'tanh')
 .end
 
 =back
