@@ -65,7 +65,7 @@
     print "CharacterSet "
     print character_set
     print "\n"
-    constants.dump()
+    constants.'dump'()
 
     print "## Pragma Pool\n"
     print "##\n"
@@ -76,7 +76,7 @@
     print "NumberOfPragmas "
     print number_of_pragmas
     print "\n"
-    pragmas.dump()
+    pragmas.'dump'()
 
     print "## Function Pool\n"
     print "##\n"
@@ -89,8 +89,8 @@
     print "\n"
     .local pmc function_name_table
     function_name_table = self['FunctionNameTable']
-    function_name_table.dump()
-    functions.dump()
+    function_name_table.'dump'()
+    functions.'dump'()
 .end
 
 .sub 'translate' :method
@@ -109,13 +109,13 @@ PIRCODE
 
     .local pmc function_name_table
     function_name_table = self['FunctionNameTable']
-    $S0 = function_name_table.translate(self)
+    $S0 = function_name_table.'translate'(self)
     pir .= $S0
     pir .= "\n.end\n"
 
     .local pmc functions
     functions = self['Functions']
-    $S0 = functions.translate(self)
+    $S0 = functions.'translate'(self)
     pir .= $S0
 
     pir .= <<'PIRCODE'
@@ -154,7 +154,7 @@ PIRCODE
     print "cst"
     print idx
     print " "
-    constant.dump()
+    constant.'dump'()
     print "\n"
     inc idx
     goto L1
@@ -165,7 +165,7 @@ PIRCODE
     .param int idx
     .local pmc constant
     constant = self[idx]
-    $S0 = constant.translate(idx)
+    $S0 = constant.'translate'(idx)
     .return ($S0)
 .end
 
@@ -307,7 +307,7 @@ PIRCODE
     print "pragma"
     print idx
     print " "
-    pragma.dump()
+    pragma.'dump'()
     print "\n"
     inc idx
     goto L1
@@ -444,7 +444,7 @@ PIRCODE
     print "## function "
     print idx
     print "\n"
-    function.dump()
+    function.'dump'()
     inc idx
     goto L1
   L2:
@@ -462,7 +462,7 @@ PIRCODE
   L1:
     unless idx < nb goto L2
     function = self[idx]
-    $S0 = function.translate(script, idx)
+    $S0 = function.'translate'(script, idx)
     pir .= $S0
     inc idx
     goto L1

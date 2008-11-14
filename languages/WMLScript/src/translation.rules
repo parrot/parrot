@@ -161,7 +161,7 @@ PIR
 code = 60
 class = calling
 inline = 07
-nb_arg = script.get_nb_arg(${INLINE})
+nb_arg = script.'get_nb_arg'(${INLINE})
 pir = <<PIR
     ${INS} = concat "  "
     ${INS} = concat ${DEST0}
@@ -177,7 +177,7 @@ PIR
 code = 09
 class = calling
 arguments = uint8
-nb_arg = script.get_nb_arg(${ARG1})
+nb_arg = script.'get_nb_arg'(${ARG1})
 pir = <<PIR
     ${INS} = concat "  "
     ${INS} = concat ${DEST0}
@@ -264,7 +264,7 @@ pir = <<PIR
     ${INS} = concat "\n"
     $I0 = exists ${CONST}[$S1]
     if $I0 goto L6_${CURIC}
-    $S0 = constants.translate(${ARG1})
+    $S0 = constants.'translate'(${ARG1})
     ${CONST}[$S1] = $S0
   L6_${CURIC}:
     $S0 = ${ARG2}   # findex
@@ -275,7 +275,7 @@ pir = <<PIR
     ${INS} = concat "\n"
     $I0 = exists ${CONST}[$S1]
     if $I0 goto L7_${CURIC}
-    $S0 = constants.translate(${ARG2})
+    $S0 = constants.'translate'(${ARG2})
     ${CONST}[$S1] = $S0
   L7_${CURIC}:
     ${INS} = concat "  ${PTEMP0} = find_lib_url(${STEMP1}, ${STEMP2})\n"
@@ -300,7 +300,7 @@ pir = <<PIR
     ${INS} = concat "\n"
     $I0 = exists ${CONST}[$S1]
     if $I0 goto L6_${CURIC}
-    $S0 = constants.translate(${ARG1})
+    $S0 = constants.'translate'(${ARG1})
     ${CONST}[$S1] = $S0
   L6_${CURIC}:
     $S0 = ${ARG2}   # findex
@@ -311,7 +311,7 @@ pir = <<PIR
     ${INS} = concat "\n"
     $I0 = exists ${CONST}[$S1]
     if $I0 goto L7_${CURIC}
-    $S0 = constants.translate(${ARG2})
+    $S0 = constants.'translate'(${ARG2})
     ${CONST}[$S1] = $S0
   L7_${CURIC}:
     ${INS} = concat "  ${PTEMP0} = find_lib_url(${STEMP1}, ${STEMP2})\n"
@@ -425,7 +425,7 @@ pir = <<PIR
     ${INS} = concat "\n"
     $I0 = exists ${CONST}[$S1]
     if $I0 goto L1_${CURIC}
-    $S0 = constants.translate(${INLINE})
+    $S0 = constants.'translate'(${INLINE})
     ${CONST}[$S1] = $S0
   L1_${CURIC}:
 PIR
@@ -446,7 +446,7 @@ pir = <<PIR
     ${INS} = concat "\n"
     $I0 = exists ${CONST}[$S1]
     if $I0 goto L1_${CURIC}
-    $S0 = constants.translate(${ARG1})
+    $S0 = constants.'translate'(${ARG1})
     ${CONST}[$S1] = $S0
   L1_${CURIC}:
 PIR
@@ -467,7 +467,7 @@ pir = <<PIR
     ${INS} = concat "\n"
     $I0 = exists ${CONST}[$S1]
     if $I0 goto L1_${CURIC}
-    $S0 = constants.translate(${ARG1})
+    $S0 = constants.'translate'(${ARG1})
     ${CONST}[$S1] = $S0
   L1_${CURIC}:
 PIR

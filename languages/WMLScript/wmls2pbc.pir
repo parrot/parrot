@@ -39,10 +39,10 @@ wmlsd, wmls2pir, wmlsi
     .local pmc script
     new loader, 'WmlsBytecode'
     push_eh _handler
-    script = loader.load(content)
+    script = loader.'load'(content)
     script['filename'] = filename
     .local string gen_pir
-    gen_pir = script.translate()
+    gen_pir = script.'translate'()
     .local pmc pir_comp
     .local pmc pbc_out
     pir_comp = compreg 'PIR'

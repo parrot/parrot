@@ -39,7 +39,7 @@ wmls2pir, wmls2pbc, wmlsi
     .local pmc script
     new loader, 'WmlsBytecode'
     push_eh _handler
-    script = loader.load(content)
+    script = loader.'load'(content)
     script['filename'] = filename
     script.dump()
     end
