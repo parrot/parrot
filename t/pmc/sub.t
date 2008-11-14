@@ -9,7 +9,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 65;
+use Parrot::Test tests => 64;
 use Parrot::Config;
 
 =head1 NAME
@@ -158,25 +158,6 @@ CODE
 ok 1
 in sub
 in next sub
-back
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "pcc sub perl::syn::tax" );
-    get_global P0, "_the::sub::some::where"
-    defined I0, P0
-    if I0, ok
-    print "not "
-ok:
-    print "ok 1\n"
-    invokecc P0
-    say "back"
-    end
-.pcc_sub _the::sub::some::where:
-    print "in sub\n"
-    returncc
-CODE
-ok 1
-in sub
 back
 OUTPUT
 

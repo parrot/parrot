@@ -79,8 +79,6 @@ The following are PIR keywords, and cannot be used as identifiers:
    can be used as identifiers.
 }}
 
-{{ NOTE: The use of C<::> in identifiers is deprecated. [See RT #48735] }}
-
 =head3 Labels
 
 A label declaration consists of a label name followed by a colon. A label name

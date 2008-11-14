@@ -1586,18 +1586,18 @@ end:
     addattribute $P1, "i"
     addattribute $P1, "j"
     # define attrib access functions in Foo54 namespace
-    get_global $P5, "Foo54::set"
-    addmethod $P1, "Foo54::set", $P5
-    get_global $P5, "Foo54::get"
-    addmethod $P1, "Foo54::get", $P5
+    get_global $P5, "Foo54__set"
+    addmethod $P1, "Foo54__set", $P5
+    get_global $P5, "Foo54__get"
+    addmethod $P1, "Foo54__get", $P5
 
     subclass $P2, $P1, "Bar54"
     addattribute $P2, "k"
     addattribute $P2, "l"
-    get_global $P5, "Bar54::set"
-    addmethod $P2, "Bar54::set", $P5
-    get_global $P5, "Bar54::get"
-    addmethod $P2, "Bar54::get", $P5
+    get_global $P5, "Bar54__set"
+    addmethod $P2, "Bar54__set", $P5
+    get_global $P5, "Bar54__get"
+    addmethod $P2, "Bar54__get", $P5
 
     # instantiate a Bar54 object
     new $P13, "Bar54"
@@ -1607,52 +1607,52 @@ end:
     set $P5, "i"       # attribute slots have reference semantics
     set_args "0,0", $P5, "i"
     get_results ""
-    callmethodcc $P13, "Foo54::set"
+    callmethodcc $P13, "Foo54__set"
 
     new $P5, 'String'
     set $P5, "j"
     set_args "0,0", $P5, "j"
     get_results ""
-    callmethodcc  $P13,"Foo54::set"
+    callmethodcc  $P13,"Foo54__set"
 
     new $P5, 'String'
     set $P5, "k"
     set_args "0,0", $P5, "k"
     get_results ""
-    callmethodcc  $P13,"Bar54::set"
+    callmethodcc  $P13,"Bar54__set"
 
     new $P5, 'String'
     set $P5, "l"
     set_args "0,0", $P5, "l"
     get_results ""
-    callmethodcc  $P13,"Bar54::set"
+    callmethodcc  $P13,"Bar54__set"
 
     # now retrieve attributes
     set_args "0",  "i"
     get_results "0", $P5
-    callmethodcc  $P13,"Foo54::get"
-    is( $P5, "i", 'got attrib i from Bar54->Foo54::get' )
+    callmethodcc  $P13,"Foo54__get"
+    is( $P5, "i", 'got attrib i from Bar54->Foo54__get' )
 
     set_args "0",  "j"
     get_results "0", $P5
-    callmethodcc  $P13,"Foo54::get"
-    is( $P5, "j", 'got attrib j from Bar54->Foo54::get' )
+    callmethodcc  $P13,"Foo54__get"
+    is( $P5, "j", 'got attrib j from Bar54->Foo54__get' )
 
     set_args "0",  "k"
     get_results "0", $P5
-    callmethodcc  $P13,"Bar54::get"
-    is( $P5, "k", 'got attrib k from Bar54->Bar54::get' )
+    callmethodcc  $P13,"Bar54__get"
+    is( $P5, "k", 'got attrib k from Bar54->Bar54__get' )
 
     set_args "0",  "l"
     get_results "0", $P5
-    callmethodcc  $P13,"Bar54::get"
-    is( $P5, "l", 'got attrib l from Bar54->Bar54::get' )
+    callmethodcc  $P13,"Bar54__get"
+    is( $P5, "l", 'got attrib l from Bar54->Bar54__get' )
 .end
 
 # set(obj: Pvalue, Iattr_idx)
-.sub Foo54::set
+.sub Foo54__set
     get_params "0,0", $P5, $S4
-    ok( 1, "in Foo54::set" )
+    ok( 1, "in Foo54__set" )
     interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
     setattribute $P2, $S4, $P5
     set_returns ""
@@ -1660,27 +1660,27 @@ end:
 .end
 
 # Pattr = get(obj: Iattr_idx)
-.sub Foo54::get
+.sub Foo54__get
     get_params "0", $S4
-    ok( 1, "in Foo54::get" )
+    ok( 1, "in Foo54__get" )
     interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
     getattribute $P5, $P2, $S4
     set_returns "0", $P5
     returncc
 .end
 
-.sub Bar54::set
+.sub Bar54__set
     get_params "0,0", $P5, $S4
     interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
-    ok( 1, "in Bar54::set" )
+    ok( 1, "in Bar54__set" )
     setattribute $P2, $S4, $P5
     set_returns ""
     returncc
 .end
 
-.sub Bar54::get
+.sub Bar54__get
     get_params "0", $S4
-    ok( 1, "in Bar54::get" )
+    ok( 1, "in Bar54__get" )
     interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
     getattribute $P5, $P2, $S4
     set_returns "0", $P5

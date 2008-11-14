@@ -93,10 +93,6 @@ See [RT#45857], [RT#43269], and [RT#47141].
 
 See RT #48737.
 
-=item * Use of C<::> in identifiers [post 0.5.1]
-
-See RT #48735.
-
 =item * C<.namespace [ "a" .. "b" ]> [post 0.5.0]
 
 See RT #46715.
