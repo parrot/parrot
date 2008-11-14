@@ -46,7 +46,7 @@ print $PG <<'END_PG';
 
 grammar TestGrammar::Grammar is PCT::Grammar;
 
-token TOP   { 'thingy' }
+token TOP   { 'thingy' {*} }
 END_PG
 
 ok( $pg_fn, 'got name of grammar file' );
@@ -77,7 +77,7 @@ method TOP($/) {
                      PAST::Op.new(
                          PAST::Val.new(
                              :value( ~$/ ),
-                             :returns('thingy')
+                             :returns('String')
                          ),
                          :pirop('say'),
                          :pasttype('pirop')
@@ -117,7 +117,8 @@ my $driver_pir = <<'CODE';
     .local pmc args
     args = new 'ResizableStringArray'
     push args, "command"
-    push args, "--target=parse"
+    # push args, "--target=parse"
+    #push args, "--target=past"
     push args, "t/compilers/pct/sample.txt"
     #push args, "thingy"
 
@@ -151,7 +152,7 @@ $gen_actions
 CODE
 
 pir_output_is( $driver_pir, <<'OUT', 'workflow, parse only' ); 
-"parse" => PMC 'TestGrammar;Grammar' => "thingy" @ 0
+thingy
 OUT
 
 
