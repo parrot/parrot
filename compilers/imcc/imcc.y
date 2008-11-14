@@ -833,7 +833,7 @@ hll_def:
             IMCC_INFO(interp)->cur_namespace = NULL;
             $$ = 0;
          }
-   | HLL_MAP STRINGC comma_will_be_equals STRINGC
+   | HLL_MAP STRINGC '=' STRINGC
          {
             Parrot_Context *ctx           = CONTEXT(interp);
             STRING * const  built_in_name =
@@ -848,13 +848,6 @@ hll_def:
                 built_in_type, language_type);
             $$ = 0;
          }
-   ;
-
-/* this rule is temporary for deprecation of the .HLL_map variant using
-   a comma; the comma will be replaced by a '=' character. */
-comma_will_be_equals:
-     COMMA
-   | '='
    ;
 
 constdef:

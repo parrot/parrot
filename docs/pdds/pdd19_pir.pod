@@ -334,8 +334,6 @@ HLL. Use C<.loadlib> instead.
 
 =item .HLL_map <core_type> = <user_type> [unimplemented: RT #57430]
 
-=item .HLL_map <core_type>, <user_type> [deprecated: RT # 57432]
-
 Whenever Parrot has to create PMCs inside C code on behalf of the running
 user program, it consults the current type mapping for the executing HLL
 and creates a PMC of type I<user_type> instead of I<core_type>, if such

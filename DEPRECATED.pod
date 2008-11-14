@@ -97,12 +97,6 @@ See RT #48737.
 
 See RT #46715.
 
-=item * C<.HLL_map> <string> ',' <string> [post 0.6.4]
-
-This will be replaced by C<.HLL_map> <string> '=' <string>
-
-See RT #57430 / RT #57432.
-
 =item * C<.HLL> <string> ',' <string> [post 0.6.4]
 
 This will be replaced by C<.HLL> <string>; the second string (and
