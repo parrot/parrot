@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -130,6 +130,10 @@ not ok
 OUTPUT
 test_test($desc);
 
+
+# The exact error output for pasm_output_isnt() depends on the version of Test::Builder.
+# So, in order to avoid version dependent failures, be content with checking the
+# standard output.
 $desc = 'pasm_output_isnt: failure';
 test_out("not ok 1 - $desc");
 test_fail(+10);
@@ -141,14 +145,14 @@ $err = <<"ERR";
 # '
 ERR
 chomp $err;
-test_err $err;
+test_err( $err );
 pasm_output_isnt( <<'CODE', <<'OUTPUT', $desc );
     print "ok\n"
     end
 CODE
 ok
 OUTPUT
-test_test($desc);
+test_test(title => $desc, skip_err => 1);
 
 $desc = 'pasm_output_like: success';
 test_out("ok 1 - $desc");
@@ -222,6 +226,9 @@ not ok
 OUTPUT
 test_test($desc);
 
+# The exact error output for pir_output_isnt() depends on the version of Test::Builder.
+# So, in order to avoid version dependent failures, be content with checking the
+# standard output.
 $desc = 'pir_output_isnt: failure';
 test_out("not ok 1 - $desc");
 test_fail(+10);
@@ -241,7 +248,7 @@ pir_output_isnt( <<'CODE', <<'OUTPUT', $desc );
 CODE
 ok
 OUTPUT
-test_test($desc);
+test_test(title => $desc, skip_err => 1);
 
 $desc = 'pir_output_like: success';
 test_out("ok 1 - $desc");
