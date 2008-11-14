@@ -467,6 +467,7 @@ docs/configuration.pod                                      [devel]doc
 docs/debug.pod                                              [devel]doc
 docs/debugger.pod                                           [main]doc
 docs/dev/byteorder.pod                                      [main]doc
+docs/dev/c_functions.pod                                    [main]doc
 docs/dev/debugging_with_msvc.pod                            [main]doc
 docs/dev/events.pod                                         [devel]doc
 docs/dev/fhs.pod                                            [devel]doc
@@ -480,7 +481,6 @@ docs/dev/pcc_state.pod                                      [main]doc
 docs/dev/pccmethods.pod                                     [main]doc
 docs/dev/pmc_freeze.pod                                     [devel]doc
 docs/dev/pmc_obj_design_meeting_notes.pod                   [main]doc
-docs/dev/seatbelts.pod                                      [main]doc
 docs/embed.pod                                              [main]doc
 docs/extend.pod                                             [main]doc
 docs/faq.pod                                                [main]doc
