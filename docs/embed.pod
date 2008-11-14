@@ -7,7 +7,7 @@ embed.pod - Parrot embedding system
 
 =head1 SYNOPSIS
 
-    #include <parrot.h>
+    #include <parrot/parrot.h>
     #include <parrot/embed.h>
     #include <parrot/extend.h>
 
@@ -23,7 +23,7 @@ embed.pod - Parrot embedding system
 
         pf = Parrot_readbc(interp, "foo.pbc");
         Parrot_loadbc(interp, pf);
-        Parrot_runcode(pf, argc, argv);
+        Parrot_runcode(interp, argc, argv);
 
         Parrot_destroy(interp);
 
