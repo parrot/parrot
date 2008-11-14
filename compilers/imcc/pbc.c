@@ -268,8 +268,8 @@ add_const_table(PARROT_INTERP)
             (PackFile_Constant **)mem_sys_allocate(newcount * sizeof (PackFile_Constant *));
     }
 
-    interp->code->const_table->constants[newcount - 1] = new_constant;
-    interp->code->const_table->const_count             = newcount;
+    interp->code->const_table->constants[oldcount] = new_constant;
+    interp->code->const_table->const_count         = newcount;
 
     return oldcount;
 }
@@ -1688,13 +1688,24 @@ e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
     pragma = ins->symregs[0]->pcc_sub->pragma;
 
     if (pragma & P_IMMEDIATE) {
-        imcc_globals *g            = IMCC_INFO(interp)->globals;
-        IMCC_INFO(interp)->globals = NULL;
+        const imcc_globals  *g           = IMCC_INFO(interp)->globals;
+        const SymReg       **data        = IMCC_INFO(interp)->ghash.data;
+        const unsigned int   size        = IMCC_INFO(interp)->ghash.size;
+        const unsigned int   entries     = IMCC_INFO(interp)->ghash.entries;
+
+        IMCC_INFO(interp)->globals       = NULL;
+        IMCC_INFO(interp)->ghash.data    = NULL;
+        IMCC_INFO(interp)->ghash.size    = 0;
+        IMCC_INFO(interp)->ghash.entries = 0;
 
         IMCC_debug(interp, DEBUG_PBC, "immediate sub '%s'",
                 ins->symregs[0]->name);
         PackFile_fixup_subs(interp, PBC_IMMEDIATE, NULL);
-        IMCC_INFO(interp)->globals = g;
+
+        IMCC_INFO(interp)->globals       = g;
+        IMCC_INFO(interp)->ghash.data    = data;
+        IMCC_INFO(interp)->ghash.size    = size;
+        IMCC_INFO(interp)->ghash.entries = entries;
     }
 
     return 0;
@@ -1789,9 +1800,9 @@ int
 e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
         ARGIN(const Instruction *ins))
 {
-    int        op, i;
-    int        ok = 0;
     op_info_t *op_info;
+    int        ok = 0;
+    int        op, i;
 
 #if IMC_TRACE_HIGH
     PIO_eprintf(NULL, "e_pbc_emit\n");
@@ -1985,7 +1996,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
 
             /* TODO get rid of verify_signature - PIR call sigs are already
              * fixed, but PASM still needs it */
-         verify_signature(interp, ins, IMCC_INFO(interp)->pc);
+            verify_signature(interp, ins, IMCC_INFO(interp)->pc);
 
             /* emit var_args part */
             for (; i < ins->opsize - 1; ++i) {
