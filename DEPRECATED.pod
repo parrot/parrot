@@ -159,19 +159,6 @@ See RT #58978.
 
 =back
 
-=head1 Parrot Compiler tools
-
-=head2 Capture-based objects
-
-=over 4
-
-=item get_array, get_hash, get_scalar deprecations [post 0.6.2]
-
-See RT#54000.  The 'get_array', 'get_hash', and 'get_scalar'
-methods are now called 'list', 'hash', and 'item' respectively.
-
-=back
-
 =head1 Functions
 
 =over 4

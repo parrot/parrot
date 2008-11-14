@@ -463,7 +463,7 @@ Set this capture to hold the value of another.
 
 */
 
-    METHOD get_array() {
+    METHOD list() {
         PMC *capt_array;
         PMC *capt = SELF;
         /* XXX:  This workaround is for when we get here as
@@ -481,7 +481,7 @@ Set this capture to hold the value of another.
         RETURN(PMC *capt_array);
     }
 
-    METHOD get_hash() {
+    METHOD hash() {
         PMC *capt_hash;
         PMC *capt = SELF;
         /* XXX:  This workaround is for when we get here as

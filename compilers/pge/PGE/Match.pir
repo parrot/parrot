@@ -246,12 +246,6 @@ object.
 .end
 
 
-# deprecated RT#54000
-.sub 'get_scalar' :method
-    .tailcall self.'item'()
-.end
-
-
 =item C<result_object([pmc obj])>
 
 Returns or sets the "result object" for the match object.

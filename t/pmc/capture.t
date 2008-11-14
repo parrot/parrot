@@ -243,9 +243,9 @@ CODE
 0 0
 OUTPUT
 
-pir_output_is( $PRE . <<'CODE'. $POST, <<'OUTPUT', "get_hash, get_array" );
-    $P0 = capt.'get_array'()
-    $P1 = capt.'get_hash'()
+pir_output_is( $PRE . <<'CODE'. $POST, <<'OUTPUT', "hash, list" );
+    $P0 = capt.'list'()
+    $P1 = capt.'hash'()
 
     $S0 = typeof $P0
     $S1 = typeof $P1
@@ -297,7 +297,7 @@ CODE
 2
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'get_array method delegation' );
+pir_output_is( <<'CODE', <<'OUTPUT', 'list method delegation' );
 .sub main :main
     $P0 = subclass 'Capture', 'Match'
     addattribute $P0, '$.abc'
@@ -310,7 +310,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_array method delegation' );
     $P2 = new 'String'
     setattribute $P1, '$.xyz', $P2
 
-    $P2 = $P1.'get_array'()
+    $P2 = $P1.'list'()
     $P2 = 0
     $I0 = elements $P2
     print $I0

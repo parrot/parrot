@@ -42,7 +42,7 @@ match_success:
     match."dump"()                                  # display captures ($0, $1, etc.)
 
     .local pmc captures
-    ( captures ) = match."get_array"()
+    ( captures ) = match.'list'()
 
     .local pmc captures_0
     captures_0 = captures[0]                    # TODO will the blow up when the match failed?

@@ -197,7 +197,7 @@ Uses regular expressions for finding tokens.
   # TODO: is there a method for extraction the matched string?
   .local int token_from, token_to
   .local pmc captures
-  ( captures ) = match."get_array"()
+  ( captures ) = match.'list'()
   token_from = match.'from'()
   token_to = match.'to'()
   token_data = captures[0]
