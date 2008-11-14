@@ -1,4 +1,4 @@
-=pod
+=pod 
 
 =head0 Parrot Intermediate Representation
 
@@ -6,34 +6,32 @@ Z<CHP-3>
 
 X<Parrot Intermediate Representation;;(see PIR)>
 X<PIR (Parrot intermediate representation)>
-The Parrot intermediate representation (PIR) is an overlay on top of
-Parrot assembly language (PASM) that provides some simplifications and
-high-level constructs. It has many high-level features that ease the
-pain of working with PASM code, but it still isn't considered to be
-a high-level language by itself. PASM is discussed in more detail in
-A<CHP-5>Chapter 5.
+The Parrot intermediate representation (PIR) is an overlay on top of the
+Parrot assembly language (PASM). PIR provides some simplifications and
+high-level constructs to simplify programming tasks above what an
+assembly language like PASM typically would have. It has many
+high-level features that will be familiar to programmers, but
+it still isn't considered to be a high-level language by itself. In fact,
+the Parrot developers specifically want to keep in that way for a
+number of reasons. PASM, the Parrot assembly language on which PIR is
+based, is discussed in more detail in A<CHP-5>Chapter 5.
 
-Internally Parrot works a little differently with PASM and PIR source
-code, so each has different restrictions. Parrot's default is to run in a
-mixed mode that allows PASM code to combine with the higher-level syntax
-unique to PIR. This gives the programmer flexibility to use aspects of
-each that are necessary.
-
-X<.pasm files> A file with a F<.pasm> extension is treated as pure PASM
-code by Parrot, as is any file run with the C<-a> command-line option.
-This mode is mainly used for running pure PASM tests, and is not likely
-to be useful for most developers. Parrot will treat a file with any 
-extension other than F<.pasm> as a PIR file in mixed mode. 
 X<.pir files> As a convention, files containing pure PIR code generally 
-have a F<.pir> extension.
+have a F<.pir> extension. Parrot will treat a file with any other
+extension, besides F<.pasm> as a PIR file in mixed mode. This means that
+the file can contain PIR and PASM code interchangably, with a few caveats
+that will be discussed later.
 
 X<PIR (Parrot intermediate representation);documentation>
 PIR is well documented, both in traditional documentation and in
 instructional code examples. The documentation for the PIR compiler IMCC
 in F<imcc/docs/> or the project documentation in F<docs/> are good
-sources for information. The test suite in F<imcc/t> shows examples of
-proper working code as it should be. These are all good starting points
-for digging deeper into the PIR syntax and functionality.
+sources for information about the current syntax, semantics, and
+implementation. The other PIR compiler, PIRC, has it's own documentation
+that is slowly maturing. This is a useful source of information too. The
+test suite in F<imcc/t> shows examples of proper working code. In fact,
+the test suite is the definitive PIR resource, because it shows how PIR
+I<actually works>, even when the documentation may be out of date. 
 
 =head1 Statements
 
@@ -41,15 +39,21 @@ Z<CHP-3-SECT-1>
 
 X<statements (PIR)>
 X<PIR (Parrot intermediate representation);statements>
-The syntax of statements in PIR is much more flexible than PASM. All
-PASM opcodes are valid PIR code, so the basic syntax is the same. The
-statement delimiter is a newline C<\n>, so each statement has to be on
-its own line. Statements may also start with a label, for use with jumps
-and branches. Comments are marked by a hash sign (C<#>), and continue
-until the end of the line. PIR allows POD blocks for multi-line
-documentation, and heredocs for multiline string constants.
+The syntax of statements in PIR is much more flexible then is commonly
+found in assembly languages, but is more rigid and "close to the machine"
+then some higher-level languages like C are. PIR has a very close
+relationship with the Parrot assembly language, PASM. All PASM instructions
+are valid PIR instructions. PIR does add some extra syntactic options to
+help improve readability and programmability, however. The statement
+delimiter for both PIR and PASM is a newline C<\n>. Each statement has to
+be on its own line N<This isn't entirely true when you consider things like
+macros and heredocs, but we'll tackle those issues when we come to them.>,
+but empty whitespace lines between statements are okay. Statements may also
+start with a label, for use with jumps and branches. Comments are marked by
+a hash sign (C<#>), and continue until the end of the line. POD blocks may
+be used for multi-line documentation.
 
-Unlike PASM, PIR has some higher-level constructs, including
+To help with readability, PIR has some high-level constructs, including
 symbol operators:
 
   $I1 = 5                       # set $I1, 5
@@ -63,7 +67,13 @@ operators:
 
   if $I1 <= 5 goto LABEL        # le $I1, 5, LABEL
 
-We will get into all of these in more detail as we go.
+We will get into all of these in more detail as we go. Notice that PIR
+does not, and will not, have high-level looping structures like C<while>
+or C<for> loops and C<if>/C<then>/C<else> branch structures. Because of
+these omissions PIR can become a little bit messy and unweildy for large
+programs. Luckily, there are a large group of high-level languages (HLL)
+that can be used to program Parrot instead. PIR is used primarily to
+write the compilers and libraries for these languages.
 
 =head1 Variables and Constants
 

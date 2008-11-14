@@ -18,6 +18,11 @@ implement dynamic high-level languages, it has support for many advanced
 features such as lexical and global variables, objects, garbage collection,
 continuations, coroutines, and much more.
 
+X<.pasm files> A file with a F<.pasm> extension is treated as pure PASM
+code by Parrot, as is any file run with the C<-a> command-line option.
+This mode is mainly used for running pure PASM tests from the test suite,
+and is not likely to be useful for most developers.  
+
 Some people may ask why we have PASM at all, especially with PIR which
 has much nicer syntax. The answer is that PASM, like all assembly languages
 has a one-to-one correspondence with the underlying Parrot Bytecode (PBC).
