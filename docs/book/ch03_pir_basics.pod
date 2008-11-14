@@ -79,135 +79,81 @@ write the compilers and libraries for these languages.
 
 Z<CHP-3-SECT-2>
 
-X<constants (PIR)>
-X<PIR (Parrot intermediate representation);constants>
-X<strings;in PIR>
-Literal constants in PIR are the same as constants in PASM. Integers
-and floating-point numbers are numeric literals and strings are
-enclosed in quotes. PIR strings use the same escape sequences as PASM.
-
 =head2 Parrot Registers
 
 Z<CHP-3-SECT-2.1>
 
 PIR code has a variety of ways to store values while you work with
-them. The most basic way is to use Parrot registers directly. PASM
-register names always start with a single character that shows whether
-it is an integer (I), numeric (N), string (S), or PMC (P) register,
-and end with the number of the register:
+them. Actually, the only place to store values is in a Parrot register,
+but there are multiple ways to work with these registers. Parrot's
+register names always start with a dollar sign, followed by a single
+character that shows whether it is an integer (I), numeric (N), string
+(S), or PMC (P) register, and then the number of the register:
 
   $S0 = "Hello, Polly.\n"
   print $S0
 
 You can have as many registers of each type as you need, Parrot will
-allocate new registers if you need more.N<Parrot registers are allocated
-in a linear array, and register numbers are indices into this array.
-Having more registers means Parrot must allocate more storage space for
-them, which can decrease memory efficency and register allocation/fetch
-performance. In general, it's better to keep the number of registers
-small, and to use registers with contiguous numbers to prevent growing
-the pool of allocated registers too large.> Of course, as with any
-memory management situation, fewer allocations translates directly
-to improved performance.
+automatically allocate new ones for you. The process is transparent, and
+programmers should never have to worry about it.
 
-=head2 Temporary Register Variables
+Parrot registers are allocated in a linear array, and register numbers
+are indices into this array. Having more registers means Parrot must
+allocate more storage space for them, which can decrease memory efficency
+and register allocation/fetch performance. In general, it's better to
+keep the number of registers small. However, the number of the register
+does not necessarily correspond to the actual storage location where the
+register data is held. A memory allocator unit translates register names
+in the form "$S0" into an actual fixed memory location. This allocator
+can also help to optimize register usage so that existing registers are
+reused instead of allocating new ones in memory. The sort version is that
+the programmer should never have to worry about register allocation, and
+should feel free to use as many as she wants. As with any system, it's
+a good idea to be mindful of the things that might impact performance
+anyway.
 
-Z<CHP-3-SECT-2.2>
 
-X<$ (dollar sign);for temporary register variables (PIR)>
-X<temporary register variables (PIR)>
-X<PIR (Parrot intermediate representation);temporary register variables>
-PIR provides an easier way to work with Parrot registers. The
-temporary register variables are named like the PASM registers--with a
-single character for the type of register and a number--but they start
-with a C<$> character:
 
-  set $S42, "Hello, Polly.\n"
-  print $S42
+=head2 Constants
 
-X<registers;PASM registers vs. PIR temporary register variables>
-The most obvious difference between Parrot registers ("P7") and temporary
-register variables ("$P7") is that you have an unlimited number of
-temporaries. Parrot handles register allocation automatically, and
-performs register reuse optimizations for you when it finds such
-situations.
+X<constants (PIR)>
+X<PIR (Parrot intermediate representation);constants>
+X<strings;in PIR>
+Parrot has four primary data types: integers, floating-point numbers,
+strings, and PMCs. Integers and floating-point numbers can be specified
+in the code with numeric constants.
 
-The previous example used the C<$S42> temporary. When the code is
-compiled, that temporary is allocated to a Parrot register. As long as
-the temporary is needed, it is stored in the same register. When it's
-no longer needed, the Parrot register is re-allocated to some other
-value. This example uses two temporary string registers:
+  $I0 = 42       # Integers are regular numeric constants
+  $I1 = -1       # They can be negative or positive
+  $I2 = 0xA5     # They can also be hexadecimal
+  $I3 = 046      # ...or octal
 
-  $S42 = "Hello, "  # allocated to S16
-  print $S42
-  $S43 = "Polly.\n" # allocated to S16 again
-  print $S43
+  $N0 = 3.14     # Numbers can have a decimal point
+  $N1 = 4        # ...or they don't
+  $N2 = -1.2e+4  # Numbers can also use scientific notation.
+  
+String literals are enclosed in single or double-quotes:
 
-Since they don't overlap, Parrot can allocate both to a single register.
-If you change the order a little so both temporaries are needed at the
-same time, Parrot will allocate them to different registers instead:
+  $S0 = "This is a valid literal string"
+  $S1 = 'This is also a valid literal string'
 
-  $S42 = "Hello, "  # allocated to S17
-  $S43 = "Polly.\n" # allocated to S16
-  print $S42
-  print $S43
+Strings in double-quotes accept all sorts of escape sequences using
+backslashes. Strings in single-quotes only allow escapes for nested
+quotes:
 
-In this case, C<$S42> is allocated to C<S17> and C<$S43> is allocated
-to C<S16>. These numbers are hypothetical, of course. Which registers
-Parrot actually uses in these situations is based on a large number
-of factors.
+  $S0 = "This string is \n on two lines"
+  $S0 = 'This is a \n one-line string with a slash in it'
 
-Parrot allocates temporary register variablesN<As well as named variables,
-which we'll talk about next.> to Parrot registers in ascending order
-based on their I<score>. The score is used to determine whether a
-register is being actively used, and whether it can be reused for
-another purpose. Variables used in a loop have a higher score than
-variables outside a loop. Variables that span a long range have a
-lower score than ones that are used only briefly. Variables which have
-a low score (and thus are used less) are shuffled and reused for new
-temporaries.
+Or, if you need more flexibility, you can use a heredoc:
 
-If you want to peek behind the curtain and see how Parrot is
-allocating registers, you can run it with the C<-d> switch to turn on
-IMCC debugging output.
-
-  $ parrot -d1000 hello.pir
-
-If F<hello.pir> contains this code from the second example above
-(wrapped in a subroutine definition so it will compile):
-
-  .sub _main
-    $S42 = "Hello, "  # allocated to S17
-    $S43 = "Polly.\n" # allocated to S16
-    print $S42
-    print $S43
-    end
-  .end
-
-it produces this output:
-
-  code_size(ops) 11  oldsize 0
-  0 set_s_sc 17 1 set S17, "Hello, "
-  3 set_s_sc 16 0 set S16, "Polly.\n"
-  6 print_s 17    print S17
-  8 print_s 16    print S16
-  10 end  end
-  Hello, Polly.
-
-That's probably a lot more information than you wanted if you're just
-starting out. You can also generate a PASM file with the C<-o> switch
-and have a look at how the PIR code translates:
-
-  $ parrot -o hello.pasm hello.pir
-
-or just
-
-  $ parrot -o- hello.pir
-
-to see resulting PASM on I<stdout>.
-
-You'll find more details on these options and many others in
-A<CHP-13-SECT-4>"Parrot Command-Line Options" in Chapter 13.
+  $S2 = << "End_Token"
+  
+  This is a multi-line string literal. Notice that
+  it doesn't use quotation marks. The string continues
+  until the ending token (the thing in quotes next to
+  the << above) is found.
+  
+  End_Token
 
 =head2 Named Variables
 
@@ -215,9 +161,13 @@ Z<CHP-3-SECT-2.3>
 
 X<named variables (PIR)>
 X<PIR (Parrot intermediate representation);named variables>
-Named variables can be used anywhere a register or temporary register
-is used. They're declared with the C<.local> statement which requires
-a variable type and a name:
+Calling a value "$S0" isn't very descriptive, and usually it's a lot
+nicer to be able to refer to values using a helpful name. For this
+reason Parrot allows registers to be given temporary variable names to
+use instead. These named variables can be used anywhere a register
+would be used normally  N<...because they actually are registers, but
+with fancier names>. They're declared with the C<.local> statement
+which requires a variable type and a name:
 
   .local string hello
   set hello, "Hello, Polly.\n"
@@ -232,14 +182,16 @@ The valid types are C<int>, C<num>, C<string>, and C<pmc> or any
 Parrot class name (like C<PerlInt> or C<PerlString>). It should come
 as no surprise that these are the same divisions as Parrot's four
 register types. Named variables are valid from the point of their
-definition to the end of the compilation unit.
+definition to the end of the current function.
 
 The name of a variable must be a valid PIR identifier. It can contain
 letters, digits, and underscores, but the first character has to be a
-letter or underscore. Identifiers don't have any limit on length yet,
-but it's a safe bet they will before the production release. Parrot
-opcode names are normally not allowed as variable names, though there
-are some exceptions.
+letter or underscore. There is no limit to the length of an identifier,
+especially since the automatic code generators in use with the various
+high-level languages on parrot tend to generate very long identifier
+names in some situations. Of course, making huge identifier names could
+cause all sorts of memory allocation problems or inefficiencies in
+parsing. Push the limits at your own risk.
 
 =head2 PMC variables
 
@@ -248,21 +200,15 @@ Z<CHP-3-SECT-2.4>
 PMC registers and variables act much like any integer, floating-point
 number, or string register or variable, but you have to instantiate a
 new PMC object before you use it. The C<new> instruction creates a new
-PMC. Unlike PASM, PIR doesn't use a dot in front of the class name.
+PMC of a specified type:
 
-  P0 = new PerlString        # same as new P0, .PerlString
-  P0 = "Hello, Polly.\n"
-  print P0
+  $P0 = new 'PerlString'     # This is how the Perl people do it
+  $P0 = "Hello, Polly.\n"
+  print $P0
 
 This example creates a C<PerlString> object, stores it in the PMC
-register C<P0>, assigns the value "Hello, Polly.\n" to it, and prints
-it. The syntax is exactly the same for temporary register variables:
-
-  $P4711 = new PerlString
-  $P4711 = "Hello, Polly.\n"
-  print $P4711
-
-With named variables the type passed to the C<.local> directive is
+register C<$P0>, assigns the value "Hello, Polly.\n" to it, and prints
+it.  With named variables the type passed to the C<.local> directive is
 either the generic C<pmc> or a type compatible with the type passed to
 C<new>:
 
@@ -270,6 +216,17 @@ C<new>:
   hello = new PerlString
   hello = "Hello, Polly.\n"
   print hello
+
+PIR is a dynamic language, and that dynamicism is readily displayed in
+the way PMC values are handled. Primitive registers like strings,
+numbers, and integers perform a special action called I<autoboxing>
+when they are assigned to a PMC. Autoboxing is when a primative scalar
+type is automatically converted to a PMC object type. There are PMC
+classes for String, Number, and Integer which can be quickly converted
+to and from primitive int, number, and string types. Notice that the
+primative types are in lower-case, while the PMC classes are
+capitalized. We will discuss PMCs and all the details of their
+interactions in Z<CHP-11> Chapter 11.
 
 =head2 Named Constants
 
@@ -293,64 +250,6 @@ but have to be declared beforehand:
   .const int the_answer = 42        # integer constant
   .const string mouse = "Mouse"     # string constant
   .const num pi = 3.14159           # floating point constant
-
-=head2 Register Spilling
-
-Z<CHP-3-SECT-2.6>
-
-X<registers;spilling in PIR>
-X<PIR (Parrot intermediate representation);register spilling>
-As we mentioned earlier, Parrot allocates all temporary register
-variables and named variables to Parrot registers. When Parrot runs
-out of registers to allocate, it has to store some of the variables
-elsewhere. This is known as I<spilling>. Parrot spills the variables
-with the lowest score and stores them in a C<PerlArray> object while
-they aren't used, then restores them to a register the next time
-they're needed. Consider an example that creates 33 integer variables,
-all containing values that are used later:
-
-  set $I1, 1
-  set $I2, 2
-  ...
-  set $I33, 33
-  ...
-  print $I1
-  print $I2
-  ...
-  print $I33
-
-Parrot allocates the 32 available integer registers to variables with
-a higher score and spills the variables with a lower score. In this
-example it picks C<$I1> and C<$I2>. Behind the scenes, Parrot
-generates code to store the values:
-
-  new P31, "PerlArray"
-  ...
-  set I0, 1           # I0 allocated to $I1
-  set P31[0], I0      # spill $I1
-  set I0, 2           # I0 reallocated to $I2
-  set P31[1], I0      # spill $I2
-
-It creates a C<PerlArray> object and stores it in register
-C<P31>.N<C<P31> is reserved for register spilling in PIR code, so
-generally it shouldn't be accessed directly.> The C<set> instruction
-is the last time C<$I1> is used for a while, so immediately after
-that, Parrot stores its value in the spill array and frees up C<I0> to
-be reallocated.
-
-Just before C<$I1> and C<$I2> are accessed to be printed, Parrot
-generates code to fetch the values from the spill array:
-
-  ...
-  set I0, P31[0]       # fetch $I1
-  print I0
-
-You cannot rely on any particular register assignment for temporary
-variables or named variables. The register allocator does follow a set
-of precedence rules for allocation, but these rules may change. Also,
-if two variables have the same score Parrot may assign registers based
-on the hashed value of the variable name. Parrot randomizes the seed
-to the hash function to guarantee you never get a consistent order.
 
 =head1 Symbol Operators
 
