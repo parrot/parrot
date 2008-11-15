@@ -44,7 +44,7 @@ ok( translate( "t.dll", "t.pbc" ), 'translate' );
 
 ## Tests.
 is( run_pir(<<'PIR'), <<'OUTPUT', 'set_x' );
-.HLL 'dotnet', ''
+.HLL 'dotnet'
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"
@@ -60,7 +60,7 @@ PIR
 OUTPUT
 
 is( run_pir(<<'PIR'), <<'OUTPUT', 'set_y' );
-.HLL 'dotnet', ''
+.HLL 'dotnet'
 .sub main
 	.local pmc obj
 	load_bytecode "t.pbc"

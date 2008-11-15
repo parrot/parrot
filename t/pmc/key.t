@@ -98,7 +98,7 @@ e2:
 .end
 
 # support for do_not_collect_string_keys_early_rt_60128
-.HLL 'tcl', ''
+.HLL 'tcl'
 .namespace []
 
 .sub '&info'
@@ -148,7 +148,7 @@ code
   ns_target['&a'] = $P1
 .end
 
-.HLL '_Tcl', ''
+.HLL '_Tcl'
 .namespace []
 
 .sub prepare_lib :init

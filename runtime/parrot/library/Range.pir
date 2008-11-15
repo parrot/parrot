@@ -5,7 +5,7 @@ L<http://perlcabal.org/syn/S03.html#Range_semantics>
 
 =cut
 
-.HLL 'parrot', ''
+.HLL 'parrot'
 .namespace [ 'Range' ]
 
 =head1 macros

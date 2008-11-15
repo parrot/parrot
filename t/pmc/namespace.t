@@ -562,7 +562,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "HLL and vars" );
 # initial storage of _tcl global variable...
 
-.HLL '_Tcl', ''
+.HLL '_Tcl'
 
 .sub huh
   $P0 = new 'Integer'
@@ -571,7 +571,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "HLL and vars" );
 .end
 
 # start running HLL language
-.HLL 'Tcl', ''
+.HLL 'Tcl'
 
 .sub foo :main
   huh()
@@ -585,10 +585,10 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "HLL and namespace directives" );
-.HLL '_Tcl', ''
+.HLL '_Tcl'
 .namespace ['Foo'; 'Bar']
 
-.HLL 'Tcl', ''
+.HLL 'Tcl'
 
 .sub main :main
   $P0 = get_namespace
@@ -611,7 +611,7 @@ OUTPUT
 
     open $S, '>', $temp_a or die "Can't write $temp_a";
     print $S <<'EOF';
-.HLL 'eek', ''
+.HLL 'eek'
 
 .sub foo :load :anon
   $P1 = new 'String'
@@ -627,7 +627,7 @@ EOF
     close $S;
 
     pir_output_is( <<'CODE', <<'OUTPUT', ":anon subs still get default namespace" );
-.HLL 'cromulent', ''
+.HLL 'cromulent'
 
 .sub what
    load_bytecode 'temp_a.pir'
@@ -649,7 +649,7 @@ SKIP:
         if ( exists $ENV{TEST_PROG_ARGS} and $ENV{TEST_PROG_ARGS} =~ m/-r/ );
 
     pir_output_is( <<'CODE', <<'OUTPUT', "get_global in current" );
-.HLL 'bork', ''
+.HLL 'bork'
 .namespace []
 
 .sub a :immediate
@@ -671,7 +671,7 @@ OUTPUT
 
 open $S, '>', "$temp_b.pir" or die "Can't write $temp_b.pir";
 print $S <<'EOF';
-.HLL 'B', ''
+.HLL 'B'
 .sub b_foo
     print "b_foo\n"
 .end
@@ -751,7 +751,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', "export_to -- success with array" );
-.HLL 'A', ''
+.HLL 'A'
 .sub main :main
     a_foo()
     load_bytecode "$temp_b.pir"
@@ -774,7 +774,7 @@ b_foo
 OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', "export_to -- success with hash (empty value)" );
-.HLL 'A', ''
+.HLL 'A'
 .sub main :main
     a_foo()
     load_bytecode "$temp_b.pir"
@@ -797,7 +797,7 @@ b_foo
 OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', "export_to -- success with hash (null value)" );
-.HLL 'A', ''
+.HLL 'A'
 .sub main :main
     a_foo()
     load_bytecode "$temp_b.pir"
@@ -821,7 +821,7 @@ b_foo
 OUTPUT
 
 pir_error_output_like( <<"CODE", <<'OUTPUT', "export_to -- success with hash (and value)" );
-.HLL 'A', ''
+.HLL 'A'
 .sub main :main
     a_foo()
     load_bytecode "$temp_b.pir"
@@ -1082,7 +1082,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_root_namespace "Foo"' );
         print "Found root namespace 'foo'.\n"
     NO_NAMESPACE_FOUND:
 .end
-.HLL 'Foo', ''
+.HLL 'Foo'
 .sub dummy
 .end
 CODE

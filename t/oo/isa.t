@@ -181,7 +181,7 @@ composition.
     ok( $I0, '... and false when it is not' )
 .end
 
-.HLL 'foo', ''
+.HLL 'foo'
 .namespace ['XYZ']
 
 .sub 'abc' :method

@@ -368,7 +368,7 @@ sub generate_initial_pir {
     my $pir = <<TRANSPIR;
 # THIS IS A GENERATED FILE! DO NOT EDIT!
 
-.HLL '_dotnet', ''
+.HLL '_dotnet'
 
 .sub trans_instructions
     .param pmc assembly

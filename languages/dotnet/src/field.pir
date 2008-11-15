@@ -1,6 +1,6 @@
 # This file contains code relating to field translation.
 
-.HLL '_dotnet', ''
+.HLL '_dotnet'
 
 # This gets field info from a field token.
 .sub field_info_from_token

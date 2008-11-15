@@ -1,6 +1,6 @@
 # This file contains code relating to method translation.
 
-.HLL '_dotnet', ''
+.HLL '_dotnet'
 
 # This is the starting point for translating a method.
 .sub trans_method

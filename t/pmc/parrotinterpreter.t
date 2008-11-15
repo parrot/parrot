@@ -95,7 +95,7 @@ Accessing globals from other interpreters.
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'setting HLL map dynamically' );
-.HLL 'Perl6', ''
+.HLL 'Perl6'
 
 .sub 'main' :main
     $P0 = get_class 'Integer'

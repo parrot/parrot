@@ -97,7 +97,7 @@ See RT #48737.
 
 See RT #46715.
 
-=item * C<.HLL> <string> ',' <string> [post 0.6.4]
+=item * C<.HLL> <string> ',' <string> [post 0.8.1]
 
 This will be replaced by C<.HLL> <string>; the second string (and
 comma to separate them) will no longer be accepted. Use C<.loadlib>

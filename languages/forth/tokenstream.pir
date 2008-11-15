@@ -1,5 +1,5 @@
 
-.HLL 'Forth', ''
+.HLL 'Forth'
 .namespace ['TokenStream']
 
 .sub init :anon :load

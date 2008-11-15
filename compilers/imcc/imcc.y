@@ -815,6 +815,8 @@ pragma:
    ;
 
 hll_def:
+
+     /* This HLL variant is deprecated */
      HLL STRINGC COMMA STRINGC
          {
             STRING * const hll_name = string_unescape_cstring(interp, $2 + 1, '"', NULL);
@@ -829,6 +831,15 @@ hll_def:
                 UNUSED(ignored);
                 Parrot_register_HLL_lib(interp, hll_lib);
             }
+
+            IMCC_INFO(interp)->cur_namespace = NULL;
+            $$ = 0;
+         }
+   | HLL STRINGC
+         {
+            STRING * const hll_name = string_unescape_cstring(interp, $2 + 1, '"', NULL);
+            CONTEXT(interp)->current_HLL =
+                Parrot_register_HLL(interp, hll_name);
 
             IMCC_INFO(interp)->cur_namespace = NULL;
             $$ = 0;

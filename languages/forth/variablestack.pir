@@ -1,5 +1,5 @@
 
-.HLL 'Forth', ''
+.HLL 'Forth'
 .namespace ['VariableStack']
 
 .sub init :anon :load

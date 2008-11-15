@@ -758,7 +758,7 @@ Bar? 1
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE | CLONE_GLOBALS| CLONE_HLL" );
-.HLL 'Test', ''
+.HLL 'Test'
 .sub setup
     $P0 = new 'Integer'
     $P0 = 42
@@ -782,7 +782,7 @@ okay2:
     print "ok 2\n"
 .end
 
-.HLL '', ''
+.HLL ''
 
 .include 'cloneflags.pasm'
 

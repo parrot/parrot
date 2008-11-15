@@ -322,7 +322,7 @@ parsed.  See also the C<loadlib> opcode, which does the same at run time.
 A library loaded this way is also available at runtime, as if it has been
 loaded again in C<:load>, so there is no need to call C<loadlib> at runtime.
 
-=item .HLL <hll_name> [unimplemented: RT #57426]
+=item .HLL <hll_name>
 
 Define the HLL for the current file. Takes one string constant, the name
 of the HLL.

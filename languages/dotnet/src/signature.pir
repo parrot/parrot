@@ -1,6 +1,6 @@
 # This file contains code relating to signatures.
 
-.HLL '_dotnet', ''
+.HLL '_dotnet'
 
 # Read a CustomMod.
 .sub get_signature_CustomMod

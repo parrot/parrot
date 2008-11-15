@@ -11,7 +11,7 @@ use Parrot::Test tests => 2;
 
 pir_output_is( <<'CODE', <<'OUT', ".param :slurpy (using PMC)" );
 
-.HLL 'misc', ''
+.HLL 'misc'
 .HLL_map 'ResizablePMCArray' = 'ResizableStringArray'
 
 .sub main :main
@@ -38,7 +38,7 @@ pir_output_is( <<'CODE', <<'OUT', ".param :slurpy (using object)" );
  $P0 = subclass 'ResizablePMCArray', 'Stack'
 .end
 
-.HLL 'misc', ''
+.HLL 'misc'
 .HLL_map 'ResizablePMCArray' = 'Stack'
 
 .sub main :main

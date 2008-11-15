@@ -1,7 +1,7 @@
 # This file contains some of the code that drives the .NET EXE/DLL to PIR
 # translation process.
 
-.HLL '_dotnet', ''
+.HLL '_dotnet'
 
 # This sub is the way translation from .NET to PIR is started.
 .sub dotnet_to_pir
@@ -28,7 +28,7 @@
     pir_output = ""
 
     # Output HLL directive.
-    pir_output = concat ".HLL 'dotnet', ''\n"
+    pir_output = concat ".HLL 'dotnet'\n"
 
     # Put in ops loader code.
     pir_output = concat <<"PIR"

@@ -514,7 +514,7 @@ diagnostic message).
     .return ('Foo::JKL::foo')
 .end
 
-.HLL 'myhll', ''
+.HLL 'myhll'
 
 .sub 'hll_tests'
     .local pmc exports, curr_namespace, root_namespace
