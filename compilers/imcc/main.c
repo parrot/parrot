@@ -341,7 +341,6 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
     }
 
     SET_STATE_RUN_PBC(interp);
-    UNSET_STATE_RUN_FROM_FILE(interp);
 
     while ((status = longopt_get(interp, *argc, (const char **)*argv, options,
             &opt)) > 0) {
@@ -471,13 +470,11 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                 break;
             case 'o':
                 UNSET_STATE_RUN_PBC(interp);
-                UNSET_STATE_RUN_FROM_FILE(interp);
                 interp->output_file = opt.opt_arg;
                 break;
 
             case OPT_PBC_OUTPUT:
                 UNSET_STATE_RUN_PBC(interp);
-                UNSET_STATE_RUN_FROM_FILE(interp);
                 SET_STATE_WRITE_PBC(interp);
                 if (!interp->output_file)
                     interp->output_file = "-";
@@ -898,7 +895,6 @@ determine_output_file_type(PARROT_INTERP,
             SET_STATE_LOAD_PBC(interp);
             SET_STATE_RUN_PBC(interp);
             UNSET_STATE_WRITE_PBC(interp);
-            UNSET_STATE_RUN_FROM_FILE(interp);
             *obj_file = 1;
             Parrot_set_run_core(interp, PARROT_EXEC_CORE);
 #else
@@ -1073,7 +1069,7 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
             if (!pf)
                 IMCC_fatal_standalone(interp, 1, "Packfile loading failed\n");
             Parrot_loadbc(interp, pf);
-            STATE_LOAD_PBC(interp);
+            SET_STATE_LOAD_PBC(interp);
         }
     }
 
