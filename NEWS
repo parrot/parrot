@@ -11,6 +11,8 @@ New in the November 2008 release
     - Integrated the PASM grammar into PIRC
     - Added a register allocator to optimize the built-in vanilla allocator
     - code cleanups and documentation
+- Deprecations
+    + PARROT_API has changed to PARROT_EXPORT
 
 New in 0.8.0
 - Implementation
