@@ -105,6 +105,7 @@ all: \
  $(LIBPATH)/base64.pbc \
  $(LIBPATH)/bc.pbc \
  $(LIBPATH)/bitlib.pbc \
+ $(LIBPATH)/complex.pbc \
  $(LIBPATH)/gl.pbc \
  $(LIBPATH)/gl_binding.pbc \
  $(LIBPATH)/glut.pbc \
@@ -208,6 +209,9 @@ $(LIBPATH)/bc.pbc: $(LIBPATH)/bc.pir
 
 $(LIBPATH)/bitlib.pbc: $(LIBPATH)/bitlib.pir
 	-$(PARROT) --output=$(LIBPATH)/bitlib.pbc $(LIBPATH)/bitlib.pir
+
+$(LIBPATH)/complex.pbc: $(LIBPATH)/complex.pir
+	-$(PARROT) --output=$(LIBPATH)/complex.pbc $(LIBPATH)/complex.pir
 
 $(LIBPATH)/gl.pir: $(LIBPATH)/gl.lua lua.pbc
 	-$(PARROT) luap.pir --target=pir $(LIBPATH)/gl.lua > $(LIBPATH)/gl.pir

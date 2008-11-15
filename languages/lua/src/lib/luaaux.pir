@@ -763,6 +763,25 @@ If this argument is absent or is B<nil>, returns C<def>. Otherwise, raises an er
 .end
 
 
+=item C<lua_optnumber (narg, arg, def)>
+
+If the function argument C<narg> is a number, returns this number.
+If this argument is absent or is B<nil>, returns C<def>. Otherwise, raises an error.
+
+=cut
+
+.sub 'lua_optnumber'
+    .param int narg
+    .param pmc arg
+    .param num default
+    if null arg goto L1
+    unless arg goto L1
+    .tailcall lua_checknumber(narg, arg)
+  L1:
+    .return (default)
+.end
+
+
 =item C<lua_optstring (narg, arg, def)>
 
 If the function argument C<narg> is a string, returns this string.
