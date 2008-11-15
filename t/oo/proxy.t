@@ -1,12 +1,6 @@
-#!perl
+#! parrot
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 5;
 
 =head1 NAME
 
@@ -22,88 +16,73 @@ Tests OO features related to creating and using class proxies.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'typeof a low-level object' );
 .sub main :main
+    .include 'include/test_more.pir'
+
+    plan(9)
+
+    typeof_a_low_level_object()
+    typeof_a_high_level_object()
+    typeof_a_class_object()
+    proxy_as_parent_of_class()
+    proxy_as_parent_of_class_with_new()
+
+.end
+
+.sub typeof_a_low_level_object
     $P0 = new 'String'
     $S1 = typeof $P0
-    say $S1
     $P1 = typeof $P0
-
     $I3 = isa $P1, "PMCProxy"
-    print $I3
-    print "\n"
-.end
-CODE
-String
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'typeof a high-level object' );
-.sub main :main
+    is ($S1, 'String', 'object is typeof string')
+    ok ($I3, 'object isa PMCProxy')
+.end
+
+.sub typeof_a_high_level_object
     $P0 = newclass "Foo"
     $P0 = new "Foo"
-    $S1 = typeof $P0
-    say $S1
-    $P1 = typeof $P0
 
+    $S1 = typeof $P0
+    is ($S1, 'Foo', 'object is typeof Foo')
+
+    $P1 = typeof $P0
     $I3 = isa $P1, "PMCProxy"
-    print $I3
-    print "\n"
+    nok ($I3, 'object not isa PMCProxy')
+
     $I3 = isa $P1, "Foo"
-    print $I3
-    print "\n"
+    ok ($I3, 'object isa Foo')
 .end
-CODE
-Foo
-0
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'typeof a Class object' );
-.sub main :main
-    $P0 = newclass "Foo"
+.sub typeof_a_class_object
+    $P0 = newclass "Bar"
     $S1 = typeof $P0
-    say $S1
+    is ($S1, 'Class', 'object is typeof Class')
     $P1 = typeof $P0
 
     $I3 = isa $P1, "PMCProxy"
-    print $I3
-    print "\n"
+    ok ($I3, "object isa PMCProxy")
 .end
-CODE
-Class
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'proxy as parent of class' );
-.sub main :main
+.sub proxy_as_parent_of_class
     $P0 = get_class 'Hash'
     $P1 = subclass $P0, [ 'MyClass' ]
     $P2 = new [ 'MyClass' ]
     $P2['xyz'] = 'abc'
     $S1 = $P2['xyz']
-    print $S1
-    print "\n"
+    is ($S1, 'abc', "retrieve value from subclassed hash")
 .end
-CODE
-abc
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'proxy as parent of class w/new' );
-.sub main :main
+.sub proxy_as_parent_of_class_with_new
     $P0 = get_class 'Hash'
     $P1 = subclass $P0, ['Foo';'Bar']
     $P2 = new ['Foo';'Bar']
     $S0 = typeof $P2
-    say $S0
+    is ($S0, 'Foo;Bar', 'object is typeof Foo;Bar')
 .end
-CODE
-Foo;Bar
-OUT
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
