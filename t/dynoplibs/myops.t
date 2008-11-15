@@ -80,7 +80,7 @@ END_PASM
        ( todo => 'RT #49718, add scheduler features to JIT' ) : ();
 
 TODO: {
-local $TODO = 'fails on win32' if $^O =~ m/win32/i;
+local $TODO = 'fails on win32' if $^O =~ m/win32/i && ! $is_mingw;
 pir_output_is( << 'CODE', << 'OUTPUT', "one alarm", @todo );
 .loadlib "myops_ops"
 
