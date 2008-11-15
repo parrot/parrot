@@ -1,12 +1,6 @@
-#!perl
+#! parrot
 # Copyright (C) 2007 - 2008, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 3;
 
 =head1 NAME
 
@@ -22,98 +16,118 @@ Tests features related to the creation, addition, and execution of OO methods.
 
 =cut
 
-my $external_lib = "method_library.pir";
-my $filehandle;
-open $filehandle, '>', "$external_lib" or die "Can't write $external_lib";
-print $filehandle <<'EOF';
-    .namespace ['Foo']
+.sub main :main
+    .include 'test_more.pir'
 
+    create_library()
+
+    plan(5)
+
+    loading_methods_from_file()
+    loading_methods_from_eval()
+    overridden_find_method()
+
+    delete_library()
+
+.end
+
+.sub create_library
+    .local pmc file
+    .local string filename
+
+    filename = "method_library.pir"
+    file = open filename, ">"
+
+    $S0 = <<'END'
+    .namespace['Foo']
     .sub 'bar_method' :method
-        say 'in bar_method'
+        .return (1)
     .end
-EOF
-close $filehandle;
+END
 
-pir_output_is( <<'CODE', <<'OUT', 'loading a set of methods from a file' );
-.sub 'main' :main
+    print file, $S0
+    close file
+
+.end
+
+.sub delete_library
+    .local pmc os
+    os = new 'OS'
+    $S0 = "method_library.pir"
+    os.'rm'($S0)
+.end
+
+.sub loading_methods_from_file
     $P0 = newclass 'Foo'
     $P1 = new 'Foo'
-    $P1.'foo_method'()
+    $I0 = $P1.'foo_method'()
+    ok ($I0, 'calling foo_method')
 
     load_bytecode 'method_library.pir'
     $P1 = new 'Foo'
-    $P1.'bar_method'()
+    $I0 = $P1.'bar_method'()
+    ok ($I0, 'calling bar_method')
+    $P0 = null
 .end
 
 .namespace ['Foo']
 .sub 'foo_method' :method
-    say 'in foo_method'
+    .return (1)
 .end
-CODE
-in foo_method
-in bar_method
-OUT
+.namespace []
 
-unlink $external_lib;
+.sub loading_methods_from_eval
+    $P0 = newclass 'Bar'
+    $P1 = new 'Bar'
 
-pir_output_is( <<'CODE', <<'OUT', "loading a set of methods from eval'd code" );
-.sub 'main' :main
-    $P0 = newclass 'Foo'
-    $P1 = new 'Foo'
-    $P1.'foo_method'()
+    $I0 = $P1.'foo_method'()
+    ok ($I0, 'calling foo_method')
 
     $S2 = <<'END'
-        .namespace ['Foo']
+        .namespace ['Bar']
         .sub 'bar_method' :method
-            say 'in bar_method'
+            .return (1)
         .end
 END
     $P2 = compreg 'PIR'
     $P2($S2)
 
-    $P1 = new 'Foo'
-    $P1.'bar_method'()
+    $P1 = new 'Bar'
+    $I0 = $P1.'bar_method'()
+    ok ($I0, 'calling bar_method')
 .end
 
-.namespace ['Foo']
+.namespace ['Bar']
 .sub 'foo_method' :method
-    say 'in foo_method'
+    .return (1)
 .end
-CODE
-in foo_method
-in bar_method
-OUT
+.namespace []
 
-pir_output_is( <<'CODE', <<'OUT', "overridden find_method() should not eat passed-in args (RT #48134)" );
-.sub 'main' :main
+.sub overridden_find_method
     $P0 = newclass 'Obj'
     $P2 = new 'Obj'
-    $P2.'some_method'(42)
+    $I0 = $P2.'some_method'(42)
+    is ($I0, 42, 'calling overriden method')
 .end
 
 .namespace ['Obj']
 
 .sub 'meth' :method
     .param pmc a
-    say a
+    .return (a)
 .end
 
 .sub 'find_method' :vtable :method
     .param string meth_name
 
-    say meth_name
-
     .const 'Sub' meth = 'meth'
     .return (meth)
 .end
-CODE
-some_method
-42
-OUT
+
+.namespace []
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
