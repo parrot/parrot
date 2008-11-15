@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2007, The Perl Foundation.
+# Copyright (C) 2004-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -214,8 +214,8 @@ Run the given $command in a cross-platform manner.
 
 %options include...
 
-    STDOUT    filehandle to redirect STDOUT to
-    STDERR    filehandle to redirect STDERR to
+    STDOUT    name of file to redirect STDOUT to
+    STDERR    name of file to redirect STDERR to
     CD        directory to run the command in
 
 For example:
