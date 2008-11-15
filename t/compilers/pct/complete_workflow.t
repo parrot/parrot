@@ -81,7 +81,7 @@ OUT
 }
 
 {
-    test_pct( 'our', <<'GRAMMAR', <<'ACTIONS', <<'OUT', todo => 'broken, our vars get lost' );
+    test_pct( 'our', <<'GRAMMAR', <<'ACTIONS', <<'OUT', todo => 'RT# 60554, our vars get lost' );
 token TOP    { <thingy> {*} }
 token thingy { 'thingy' {*} }
 GRAMMAR
