@@ -28,18 +28,6 @@ use Test::More     tests => 10;
 use Parrot::Test;
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'constants' );
-<?php
-  echo SEEK_SET, "\n";
-  echo SEEK_CUR, "\n";
-  echo SEEK_END, "\n";
-?>
-CODE
-0
-1
-2
-OUTPUT
-
 unlink 'pipp/file.txt' if -f 'pipp/file.txt';
 open my $X, '>', 'pipp/file.txt';
 binmode $X, ':raw';
@@ -47,6 +35,20 @@ print {$X} "line 1\n";
 print {$X} "line 2\n";
 print {$X} "line 3\n";
 close $X;
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'basename' );
+<?php
+  echo basename('def.html'), "\n";
+  echo basename('abc/def.html'), "\n";
+  echo basename('abc/def.html', '.html'), "\n";
+  echo basename('abc/def.html.html', '.html'), "\n";
+?>
+CODE
+def.html
+def.html
+def
+def.html
+OUTPUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'file_get_contents(file)' );
 <?php

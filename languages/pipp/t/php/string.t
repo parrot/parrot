@@ -24,7 +24,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 15;
+use Test::More     tests => 14;
 use Parrot::Test;
 
 
@@ -42,20 +42,6 @@ language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'chr' );
 ?>
 CODE
 A
-OUTPUT
-
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'basename' );
-<?php
-  echo basename('def.html'), "\n";
-  echo basename('abc/def.html'), "\n";
-  echo basename('abc/def.html', '.html'), "\n";
-  echo basename('abc/def.html.html', '.html'), "\n";
-?>
-CODE
-def.html
-def.html
-def
-def.html
 OUTPUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'ltrim' );

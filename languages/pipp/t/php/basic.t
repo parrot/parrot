@@ -24,8 +24,20 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 3;
+use Test::More     tests => 4;
 use Parrot::Test;
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'constants' );
+<?php
+  echo SEEK_SET, "\n";
+  echo SEEK_CUR, "\n";
+  echo SEEK_END, "\n";
+?>
+CODE
+0
+1
+2
+OUTPUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'getenv()' );
 <?php
