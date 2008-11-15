@@ -8,7 +8,7 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 
 use Test::More;
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 18;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Config;
 
@@ -30,10 +30,10 @@ After that the generated compiler is tested against a sample input.
 
 =cut
 
-# sanity test
-test_pct( 'sanity', <<'END_GRAMMAR', <<'END_ACTIONS' );
+{
+    test_pct( 'sanity', <<'GRAMMAR', <<'ACTIONS', <<'OUT' );
 token TOP   { 'thingy' {*} }
-END_GRAMMAR
+GRAMMAR
 
 method TOP($/) {
     my $past  := PAST::Stmts.new(
@@ -49,12 +49,41 @@ method TOP($/) {
 
     make $past;
 }
-END_ACTIONS
+ACTIONS
+thingy
+OUT
+}
+
+{
+    test_pct( 'key', <<'GRAMMAR', <<'ACTIONS', <<'OUT' );
+token TOP   { 'thingy' {*}  #= key_for_thingy
+            | 'stuff'  {*}  #= key_for_stuff  
+            }
+GRAMMAR
+
+method TOP($/,$key) {
+    my $past  := PAST::Stmts.new(
+                     PAST::Op.new(
+                         PAST::Val.new(
+                             :value( ~$/ ~ " with key: '" ~ $key ~ "'" ),
+                             :returns('String')
+                         ),
+                         :pirop('say'),
+                         :pasttype('pirop')
+                     )
+                 );
+
+    make $past;
+}
+ACTIONS
+thingy with key: 'key_for_thingy'
+OUT
+}
 
 # 10 test cases in this sub
 sub test_pct
 {
-    my ( $name, $grammar, $actions ) = @_;
+    my ( $name, $grammar, $actions, $output ) = @_;
 
     # Do not assume that . is in $PATH
     # places to look for things
@@ -66,7 +95,7 @@ sub test_pct
     my $NQP           = "$BUILD_DIR/compilers/nqp/nqp.pbc";
 
     # this will be passed to pir_output_is()
-    my $driver_pir = <<'EOT';
+    my $pir_code = <<'EOT';
 .namespace [ 'TestGrammar'; 'Compiler' ]
 
 .sub 'onload' :anon :load :init
@@ -120,7 +149,7 @@ EOT
     ok( -e $gen_parser_fn, "$name: generated parser exist" );
     my $gen_parser = slurp_file($gen_parser_fn);
     unlink $gen_parser_fn;
-    $driver_pir .= <<"EOT";
+    $pir_code .= <<"EOT";
 #------------------------------#
 # The generated parser         #
 #------------------------------#
@@ -159,7 +188,7 @@ EOT
 
     # Add the generated code to the driver,
     # so that everything is in one place
-    $driver_pir .= <<"EOT";
+    $pir_code .= <<"EOT";
 
 #------------------------------#
 # The generated actions        #
@@ -169,9 +198,9 @@ $gen_actions
 
 EOT
 
-    pir_output_is( $driver_pir, <<'OUT', "$name: output of compiler" );
-thingy
-OUT
+    pir_output_is( $pir_code, $output , "$name: output of compiler" );
+
+    return;
 }
 
 
