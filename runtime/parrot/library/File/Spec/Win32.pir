@@ -225,8 +225,8 @@ do_match_1:
     match= rulesub( path )
     unless match, no_match_1
     $P0= match[0]
-    $I0= $P0.from()
-    $I1= $P0.to()
+    $I0= $P0.'from'()
+    $I1= $P0.'to'()
     $S0= $P0
     $S0= upcase $S0
     substr path, $I0, $I1, $S0
@@ -239,8 +239,8 @@ do_match_2:
     match= rulesub( path )
     unless match, no_match_2
     $P0= match[0]
-    $I0= $P0.from()
-    $I1= $P0.to()
+    $I0= $P0.'from'()
+    $I1= $P0.'to'()
     $S0= "\\"
     substr path, $I0, $I1, $S0
     goto do_match_2
@@ -254,8 +254,8 @@ do_match_3:
     match= rulesub( path )
     unless match, no_match_3
     $P0= match[0]
-    $I0= $P0.from()
-    $I1= $P0.to()
+    $I0= $P0.'from'()
+    $I1= $P0.'to'()
     $S0= $P0
     $S0 .= "\\"
     substr path, $I0, $I1, $S0
@@ -270,8 +270,8 @@ do_match_4:
     match= rulesub( path )
     unless match, no_match_4
     $P0= match[0]
-    $I0= $P0.from()
-    $I1= $P0.to()
+    $I0= $P0.'from'()
+    $I1= $P0.'to'()
     $S0= "\\"
     substr path, $I0, $I1, $S0
     goto do_match_4
@@ -290,8 +290,8 @@ do_match_5:
     match= rulesub( path )
     unless match, no_match_5
     $P0= match[0]
-    $I0= $P0.from()
-    $I1= $P0.to()
+    $I0= $P0.'from'()
+    $I1= $P0.'to'()
     $S0= ""
     substr path, $I0, $I1, $S0
 no_match_5:
@@ -309,8 +309,8 @@ match_6:
     match= rulesub( path )
     unless match, no_match_3
     $P0= match[0]
-    $I0= $P0.from()
-    $I1= $P0.to()
+    $I0= $P0.'from'()
+    $I1= $P0.'to'()
     $S0= ""
     substr path, $I0, $I1, $S0
 no_match_6:
@@ -323,8 +323,8 @@ do_match_7:
     match= rulesub( path )
     unless match, no_match_7
     $P0= match[0]
-    $I0= $P0.from()
-    $I1= $P0.to()
+    $I0= $P0.'from'()
+    $I1= $P0.'to'()
     $S0= "\\\.\.\\\.\.\\"
     substr path, $I0, $I1, $S0
     goto do_match_7
@@ -338,8 +338,8 @@ match_8:
 do_match_8:
     unless match, no_match_8
     $P0= match[0]
-    $I0= $P0.from()
-    $I1= $P0.to()
+    $I0= $P0.'from'()
+    $I1= $P0.'to'()
     $S0= "\.\.\\\.\.\\"
     substr path, $I0, $I1, $S0
     goto do_match_8
@@ -380,8 +380,8 @@ do_match_12:
     match= rulesub( path )
     unless match, no_match_12
     $P0= match[0]
-    $I0= $P0.from()
-    $I1= $P0.to()
+    $I0= $P0.'from'()
+    $I1= $P0.'to'()
     $S0= "\\"
     substr path, $I0, $I1, $S0
 no_match_12:
@@ -394,8 +394,8 @@ do_match_13:
     match= rulesub( path )
     unless match, no_match_13
     $P0= match[0]
-    $I0= $P0.from()
-    $I1= $P0.to()
+    $I0= $P0.'from'()
+    $I1= $P0.'to'()
     $S0= ""
     substr path, $I0, $I1, $S0
     goto match_13
@@ -408,7 +408,7 @@ no_match_13:
 #    my @dirs = $self->splitdir($dirs);
     .local pmc a_dirs
     a_dirs= new 'ResizableStringArray'
-    ( a_dirs )= self.splitdir( s_dirs )
+    ( a_dirs )= self.'splitdir'( s_dirs )
 
 ## TODO unfinished
 #    my (@base_dirs, @path_dirs);
