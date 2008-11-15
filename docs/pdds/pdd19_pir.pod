@@ -239,12 +239,12 @@ situations:
 
 =over 4
 
-=item* When a subroutine has a small fixed number of registers
+=item * When a subroutine has a small fixed number of registers
 
-=item* When a named variable or named register is used throughout the entire
+=item * When a named variable or named register is used throughout the entire
 subroutine
 
-=item* When a reference needs to be made to a register
+=item * When a reference needs to be made to a register
 
 =back
 
