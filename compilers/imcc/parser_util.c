@@ -1486,6 +1486,9 @@ imcc_destroy(PARROT_INTERP)
     if (macros)
         parrot_chash_destroy(interp, macros);
 
+    if (IMCC_INFO(interp)->globals)
+        mem_sys_free(IMCC_INFO(interp)->globals);
+
     mem_sys_free(IMCC_INFO(interp));
     IMCC_INFO(interp) = NULL;
 
