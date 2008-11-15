@@ -174,8 +174,8 @@ NOT_LOADED:
     data_str = new 'UnManagedStruct', data_str_decl
 
     push  external_data_decl, .DATATYPE_STRUCT_PTR
-    P9 = external_data_decl[-1]
-    setprop P9, "_struct", data_str
+    $P9 = external_data_decl[-1]
+    setprop $P9, "_struct", data_str
     push external_data_decl, 0
     push external_data_decl, 0
 

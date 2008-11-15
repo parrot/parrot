@@ -187,8 +187,8 @@ END:
     .local string path
 
 .include "interpinfo.pasm"
-    interpinfo P0, .INTERPINFO_CURRENT_SUB
-    getprop $P0, "path", P0
+    interpinfo $P1, .INTERPINFO_CURRENT_SUB
+    getprop $P0, "path", $P1
     path = $P0
 
     $S0 = clone path
