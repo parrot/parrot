@@ -493,20 +493,13 @@ inline op copy(inout PMC, invar PMC) :base_mem {
   PMC   * const clone = VTABLE_clone(interp, $2);
   INTVAL type         = VTABLE_type(interp, $2);
 
+  /* Preserve the metadata on the destination. */
+  PMC  * const meta   = PObj_flag_TEST(is_PMC_EXT, $1) ?
+        PMC_metadata($1) : PMCNULL;
+
   /* avoid leaks and unreachable memory by destroying the destination PMC */
   if (PObj_active_destroy_TEST($1))
       VTABLE_destroy(interp, $1);
-
-  /* If type comes back as zero, must be an object with an anoymous class.
-   * We can't morph to that, though, so we'll just do it via Undef. */
-  if (type == 0)
-    type = enum_class_Undef;
-
-  VTABLE_morph(interp, $1, type);
-
-  /* yeah, more clearing necessary */
-  if (PObj_active_destroy_TEST($1))
-    VTABLE_destroy(interp, $1);
 
   /* the source PMC knows how to clone itself, but we must reuse the
    destination header */
@@ -516,6 +509,10 @@ inline op copy(inout PMC, invar PMC) :base_mem {
   PObj_active_destroy_CLEAR(clone);
   if (PObj_is_PMC_EXT_TEST(clone))
     clone->pmc_ext = NULL;
+
+  /* Restore metadata. */
+  if (PObj_flag_TEST(is_PMC_EXT, $1) && !PMC_IS_NULL(meta))
+    $1->pmc_ext->_metadata = meta;
 }
 
 =back
