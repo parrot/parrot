@@ -799,10 +799,10 @@ parameter. [this restriction unimplemented: RT #36283]
 This is short for:
 
   .begin_call
-  .arg <arg1> <flag2>
+  .set_arg <arg1> <flag2>
   ...
   .call <var2>
-  .result <var1> <flag1>
+  .get_result <var1> <flag1>
   ...
   .end_call
 
