@@ -8,7 +8,7 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 
 use Test::More;
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 3 * 9;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Config;
 
@@ -80,10 +80,41 @@ thingy with key: 'key_for_thingy'
 OUT
 }
 
+{
+    test_pct( 'our', <<'GRAMMAR', <<'ACTIONS', <<'OUT', todo => 'broken, our vars get lost' );
+token TOP    { <thingy> {*} }
+token thingy { 'thingy' {*} }
+GRAMMAR
+
+method TOP($/) {
+    our $?MY_OUR_VAR := 'was passed down';
+    make $( $<thingy> );
+}
+
+method thingy($/) {
+    our $?MY_OUR_VAR;
+    my $past  := PAST::Stmts.new(
+                     PAST::Op.new(
+                         PAST::Val.new(
+                             :value( 'our var ' ~ $?MY_OUR_VAR ),
+                             :returns('String')
+                         ),
+                         :pirop('say'),
+                         :pasttype('pirop')
+                     )
+                 );
+
+    make $past;
+}
+ACTIONS
+our var was passed down
+OUT
+}
+
 # 10 test cases in this sub
 sub test_pct
 {
-    my ( $name, $grammar, $actions, $output ) = @_;
+    my ( $name, $grammar, $actions, $output, @other ) = @_;
 
     # Do not assume that . is in $PATH
     # places to look for things
@@ -198,7 +229,7 @@ $gen_actions
 
 EOT
 
-    pir_output_is( $pir_code, $output , "$name: output of compiler" );
+    pir_output_is( $pir_code, $output , "$name: output of compiler", @other );
 
     return;
 }
