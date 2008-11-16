@@ -188,7 +188,9 @@ parse_file(int flexdebug, FILE *infile, char * const filename, int flags, int th
         else if (TEST_FLAG(lexer->flags, LEXER_FLAG_PREPROCESS))
             emit_pir_subs(lexer);
         else {
+            /*
             fprintf(stderr, "Parse successful!\n");
+            */
             print_subs(lexer);
         }
 
