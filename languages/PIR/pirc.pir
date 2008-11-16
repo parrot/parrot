@@ -204,9 +204,9 @@ depending on the context.
         if null $P0 goto do_normal
         if $P0 > 0 goto do_macro
     do_normal:
-        .return normal_label(mob, adverbs :flat :named)
+        .tailcall normal_label(mob, adverbs :flat :named)
     do_macro:
-        .return macro_label_decl(mob, adverbs :flat :named)
+        .tailcall macro_label_decl(mob, adverbs :flat :named)
 .end
 
 .sub init_macro_rules
