@@ -579,6 +579,42 @@ specifies the encoding to use for the input (e.g., "utf8").
 .end
 
 
+=item EXPORTALL(source, destination)
+
+Export all namespace entries from the default export namespace for source
+(source::EXPORT::ALL) to the destination namespace.
+
+=cut
+
+.sub 'EXPORTALL' :method
+    .param pmc source
+    .param pmc dest
+    .local pmc ns_iter, item, export_list
+
+    source = source['EXPORT']
+    unless source, no_namespace_error
+    source = source['ALL']
+    unless source, no_namespace_error
+
+    ns_iter = iter source
+    export_list = new 'ResizablePMCArray'
+  export_loop:
+    unless ns_iter, export_loop_end
+    item = shift ns_iter
+    push export_list, item
+    goto export_loop
+  export_loop_end:
+
+    source.'export_to'(dest,export_list)
+    .return ()
+
+  no_namespace_error:
+    $P0 = new 'Exception'
+    $P0 = 'Missing EXPORT::ALL NameSpace'
+    throw $P0
+    .return ()
+.end
+
 =item evalfiles(files [, args] [, "encoding" => encoding] [, "option" => value, ...])
 
 Compile and evaluate a file or files.  The C<files> argument may

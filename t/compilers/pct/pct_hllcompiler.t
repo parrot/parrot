@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use lib qw(t . lib ../lib ../../lib ../../../lib);
 use Test::More;
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 pir_output_is( <<'CODE', <<'OUT', 'some of the auxiliary methods' );
 
@@ -158,6 +158,44 @@ pir_output_is( <<'CODE', <<'OUT', 'inserting and removing stages' );
 
 CODE
 past optimize peel post optimize peel pir bar evalpmc foo
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'EXPORTALL method' );
+.namespace []
+
+.sub main :main
+    load_bytecode 'PCT.pbc'
+    .local pmc h, source, dest
+    h = new ['PCT';'HLLCompiler']
+
+    $P0 = new 'NameSpace'
+    set_hll_global ['Omg'], 'Lol', $P0
+
+    source = get_hll_namespace ['Foo';'Bar']
+    dest = get_hll_namespace ['Omg';'Lol']
+
+    h.'EXPORTALL'(source,dest)
+
+    $P0 = get_hll_global ['Omg';'Lol'], 'hi'
+    $P0()
+    $P0 = get_hll_global ['Omg';'Lol'], 'lol'
+    $P0()
+.end
+
+.namespace ['Foo';'Bar';'EXPORT';'ALL']
+
+.sub 'lol'
+    say 'omgwtf!'
+.end
+
+.sub 'hi'
+    say 'hello world!'
+.end
+
+
+CODE
+hello world!
+omgwtf!
 OUT
 
 # Local Variables:
