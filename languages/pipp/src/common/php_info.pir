@@ -15,11 +15,18 @@ php_info.pir - PHP info Standard Library
 
 .include 'languages/pipp/src/common/php_MACRO.pir'
 
-.const string PHP_LOGO_GUID = 'PHPE9568F34-D428-11d2-A769-00AA001ACF42'
+.const string PHP_LOGO_GUID     = 'PHPE9568F34-D428-11d2-A769-00AA001ACF42'
 .const string PHP_EGG_LOGO_GUID = 'PHPE9568F36-D428-11d2-A769-00AA001ACF42'
-.const string ZEND_LOGO_GUID = 'PHPE9568F35-D428-11d2-A769-00AA001ACF42'
+.const string ZEND_LOGO_GUID    = 'PHPE9568F35-D428-11d2-A769-00AA001ACF42'
 
 .include 'tm.pasm'
+
+.sub '__init' :anon :load :init
+    .local pmc cst
+    .GET_CONSTANTS(cst)
+    $S0 = sysinfo .SYSINFO_PARROT_OS
+    .REGISTER_STRING_CONSTANT(cst, 'PHP_OS', $S0)
+.end
 
 .sub 'logo_guid' :anon
     $I0 = time

@@ -3,15 +3,15 @@
 
 =head1 NAME
 
-t/php/var.t - Test for constants
+t/php/constant.t - Test for constants
 
 =head1 SYNOPSIS
 
-    % perl -I../lib pipp/t/php/constants.t
+    % perl -I../lib pipp/t/php/constant.t
 
 =head1 DESCRIPTION
 
-Tests support for constants.
+Tests support for user set and predefined constants.
 
 See L<http://www.php.net/manual/en/language.constants.php>.
 
@@ -23,8 +23,8 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 12;
-use Parrot::Test;
+use Parrot::Test   tests => 13;
+use Parrot::Config qw( %PConfig );
 
 language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), string' );
 <?php
@@ -137,6 +137,14 @@ language_output_like( 'Pipp', <<'END_CODE', <<'END_OUT', 'constant() undefined' 
 END_CODE
 /Couldn't find constant UNDEF_CST/
 END_OUT
+
+# predefined constants
+
+language_output_is( 'Pipp', <<'END_CODE', $PConfig{osname}, 'PHP_OS' );
+<?php
+echo constant("PHP_OS");
+END_CODE
+
 
 # Local Variables:
 #   mode: cperl

@@ -73,6 +73,7 @@ STILL INCOMPLETE.
 
 .sub 'define'
     .param pmc args :slurpy
+
     .local int argc
     argc = args
     .local int case_sensitive
