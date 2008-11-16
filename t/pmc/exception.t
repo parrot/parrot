@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 29;
+use Parrot::Test tests => 30;
 
 =head1 NAME
 
@@ -675,6 +675,42 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler" );
 .end
 CODE
 /No such string attribute/
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "catch ex from C-level MULTI function", todo => "broken" );
+.sub main :main
+
+.local pmc p, q
+
+    p = new 'Integer'
+    set p, "0"
+
+    push_eh handler
+    #throw an exception from a C-level MULTI function
+    q = p / p
+    goto end
+    pop_eh
+    goto end
+
+handler:
+    .local pmc exception
+    .local string message
+    .get_results (exception)
+
+    message = exception['message']
+    say_something(message)
+end:
+.end
+
+.sub say_something
+    .param string message
+    #Calling this sub is enough to trigger the bug.  If execution reached this
+    #point, the bug is fixed.
+    say "no segfault"
+end:
+.end
+CODE
+no segfault
 OUTPUT
 
 # Local Variables:
