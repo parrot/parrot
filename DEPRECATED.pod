@@ -147,6 +147,12 @@ the more descriptive C<.get_result>.
 
 See RT #58978.
 
+=item * C<:lexid> will become C<:subid> [post 0.8.1]
+
+C<:lexid> will be renamed to C<:subid>.
+
+See RT #60592.
+
 =back
 
 =head1 Functions
