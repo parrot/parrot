@@ -1,0 +1,27 @@
+#! perl
+# Copyright (C) 2008, The Perl Foundation.
+# $Id$
+
+use strict;
+use warnings;
+
+use lib '../../lib';
+
+use Test::Harness;
+
+eval { require TAP::Harness };
+if ($@) {
+    Test::Harness::runtests( @ARGV );
+    exit;
+}
+else {
+    my $harness = TAP::Harness->new({
+        verbosity  => $ENV{HARNESS_VERBOSE},
+        merge      => 0,
+        jobs       => $ENV{TEST_JOBS} || 1,
+        directives => 1,
+    });
+
+    my $results = $harness->runtests(@ARGV);
+    exit ( $results->all_passed() ? 0 : 1 );
+}

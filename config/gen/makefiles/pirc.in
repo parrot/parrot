@@ -73,7 +73,7 @@ new/pirmacro$(O): new/pirmacro.c new/pirmacro.h
 new/pirregalloc$(O): new/pirregalloc.c new/pirregalloc.h
 
 test: all
-	prove 
+	perl t/harness t/*.t
 	podchecker $(SOURCES) \
 	doc/design.pod \
     README.pod
