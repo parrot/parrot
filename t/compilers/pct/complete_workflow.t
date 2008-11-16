@@ -8,7 +8,7 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 
 use Test::More;
 
-use Parrot::Test tests => 3 * 9;
+use Parrot::Test tests => 4 * 9;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Config;
 
@@ -81,7 +81,7 @@ OUT
 }
 
 {
-    test_pct( 'our', <<'GRAMMAR', <<'ACTIONS', <<'OUT', todo => 'RT# 60554, our vars get lost' );
+    test_pct( 'our down', <<'GRAMMAR', <<'ACTIONS', <<'OUT', todo => 'RT# 60554, our vars get lost' );
 token TOP    { <thingy> {*} }
 token thingy { 'thingy' {*} }
 GRAMMAR
@@ -110,6 +110,39 @@ ACTIONS
 our var was passed down
 OUT
 }
+
+{
+    test_pct( 'our up', <<'GRAMMAR', <<'ACTIONS', <<'OUT' );
+token TOP    { <thingy> {*} }
+token thingy { 'thingy' {*} }
+GRAMMAR
+
+method TOP($/) {
+    our $?MY_OUR_VAR;
+    my $past := $( $<thingy> ); # $?MY_OUR_VAR will be set
+    $past[0][0].value( 'our var ' ~ $?MY_OUR_VAR );
+
+    make $past;
+}
+
+method thingy($/) {
+    our $?MY_OUR_VAR := 'was passed up';
+    make PAST::Stmts.new(
+             PAST::Op.new(
+                 PAST::Val.new(
+                     :value( 'will be overwritten' ),
+                     :returns('String')
+                 ),
+                 :pirop('say'),
+                 :pasttype('pirop')
+             )
+         );
+}
+ACTIONS
+our var was passed up
+OUT
+}
+
 
 # 10 test cases in this sub
 sub test_pct
