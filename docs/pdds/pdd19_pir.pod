@@ -528,6 +528,13 @@ PMC type other than 'Sub'.  However, as currently implemented it doesn't
 work well with C<:outer> or existing PMC types such as C<Closure>,
 C<Coroutine>, etc.
 
+=item :nsentry( <string_constant> )
+
+Specify the name by which the subroutine is stored in the namespace. The default
+name by which a subroutine is stored in the namespace (if this flag is missing),
+is the subroutine's name as given after the C<.sub> directive. This flag allows
+to override this.
+
 =back
 
 
