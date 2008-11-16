@@ -516,6 +516,10 @@ I<subname>.
 
 =item :lexid( <string_constant> )
 
+Deprecated; see RT#60592. C<:lexid> will be renamed to C<:subid>.
+
+=item :subid( <string_constant> )
+
 Specifies a unique string identifier for the subroutine. This is useful for
 referring to a particular subroutine with C<:outer>, even though several
 subroutines in the file may have the same name (because they are multi, or in
