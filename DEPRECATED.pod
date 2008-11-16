@@ -165,6 +165,13 @@ Parrot_mmd_add_function, mmd_expand_x, mmd_expand_y, Parrot_mmd_register,
 Parrot_mmd_register_sub, Parrot_mmd_destroy, Parrot_MMD_search_default_infix,
 Parrot_mmd_search_default, mmd_cvt_to_types.
 
+=item src/pic.c and src/pic_jit.c [post 0.8.1]
+
+These two files were a thin prototype implementation of Polymorphic Inline
+Caching that only ever applied to 4 opcodes, one of which has now been removed.
+The files (and all functions in them) are deprecated, and will be removed. See
+RT #60048.
+
 =back
 
 =cut
