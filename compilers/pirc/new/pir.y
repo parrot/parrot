@@ -698,8 +698,6 @@ sub_flag          : ":anon"
                          { set_sub_flag(lexer, SUB_FLAG_LOAD); }
                   | ":main"
                          { set_sub_flag(lexer, SUB_FLAG_MAIN); }
-                  | ":method"
-                         { set_sub_flag(lexer, SUB_FLAG_METHOD); }
                   | ":lex"
                          { set_sub_flag(lexer, SUB_FLAG_LEX); }
                   | ":postcomp"
@@ -710,6 +708,8 @@ sub_flag          : ":anon"
                          { set_sub_flag(lexer, SUB_FLAG_MULTI); }
                   | ":outer" '(' sub_id ')'
                          { set_sub_outer(lexer, $3); }
+                  | ":method" opt_paren_string
+                         { set_sub_methodname(lexer, $2); }
                   | ":vtable" opt_paren_string
                          { set_sub_vtable(lexer, $2); }
                   | ":lexid" paren_string

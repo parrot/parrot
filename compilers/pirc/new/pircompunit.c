@@ -197,6 +197,27 @@ set_sub_lexid(lexer_state * const lexer, char const * const lexid) {
 /*
 
 =item C<void
+set_sub_methodname(lexer_state * const lexer, char * const methodname)>
+
+Set the :method flag on a sub; if C<methodname> is not NULL, then it contains
+the name by which the sub is stored as a method.
+
+=cut
+
+*/
+void
+set_sub_methodname(lexer_state * const lexer, char const * const methodname) {
+    if (methodname)
+        CURRENT_SUB(lexer)->methodname = methodname;
+    else
+        CURRENT_SUB(lexer)->methodname = CURRENT_SUB(lexer)->sub_name;
+
+    SET_FLAG(lexer->subs->flags, SUB_FLAG_METHOD);
+}
+
+/*
+
+=item C<void
 set_sub_instanceof(lexer_state * const lexer, char * const classname)>
 
 Set the value of the C<:instanceof> flag on a sub. Note that this flag
