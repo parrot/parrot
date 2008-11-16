@@ -89,7 +89,7 @@ int yypirlex(YYSTYPE *yylval, yyscan_t yyscanner);
 
 #endif
 
-void expand_macro(yyscan_t yyscanner, macro_def * const macro, macro_param * args);
+char *expand_macro(yyscan_t yyscanner, macro_def * const macro, macro_param * args);
 
 /* Enumeration of mathematical operator types; these are used to index the opnames array. */
 typedef enum pir_math_operators {
@@ -247,8 +247,6 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
 }
 
 
-%token TK_NL                "\n"
-
 %token TK_HLL               ".HLL"
        TK_HLL_MAP           ".HLL_map"
        TK_LOADLIB           ".loadlib"
@@ -281,6 +279,8 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
        TK_GET_RESULT        ".get_result"
        TK_NCI_CALL          ".nci_call"
        TK_TAILCALL          ".tailcall"
+
+%token <sval> TK_NL         "\n"
 
 %token <sval> TK_LABEL      "label"
        <sval> TK_IDENT      "identifier"
@@ -392,6 +392,10 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
              paren_string
              keyword
              parrot_op
+             macro_expansion
+             braced_contents
+             braced_arg
+             braced_item
 
 %type <targ> sub
              pmc_object
@@ -785,15 +789,18 @@ statement         : parrot_stat
                   | null_stat
                   | empty_stat
                   | location_stat
-                  | macro_expansion
+                  | expansion_stat
                   | error_stat
                   ;
 
 
 /* grammar rules for macro expansion; .macro_const expansions are done in the lexer. */
 
+expansion_stat    : macro_expansion
+                  ;
+
 macro_expansion   : TK_MACRO_IDENT opt_macro_args "\n"
-                        { expand_macro(yyscanner, $1, $2); }
+                        { $$ = expand_macro(yyscanner, $1, $2); }
                   ;
 
 opt_macro_args    : /* empty */
@@ -826,6 +833,31 @@ macro_arg         : TK_MACRO_ARG_IDENT  /* identifiers are handled separately to
                           }
                         }
                   | TK_MACRO_ARG_OTHER  /* all other macro argument options */
+                  | TK_MACRO_IDENT opt_macro_args
+                        { $$ = expand_macro(yyscanner, $1, $2); }
+                  | braced_arg
+                  ;
+
+braced_arg        : '{' braced_contents '}'
+                        { $$ = $2; }
+                  ;
+
+
+braced_contents   : /* empty */ { $$ = ""; }
+                  | braced_contents braced_item
+                        { /* XXX cleanup memory stuff */
+                          char *newbuff = (char *)mem_sys_allocate((strlen($1) + strlen($2) + 2)
+                                                                   * sizeof (char));
+                          sprintf(newbuff, "%s %s", $1, $2);
+                          $$ = newbuff;
+                        }
+                  ;
+
+braced_item       : "\n"
+                  | TK_MACRO_ARG_OTHER
+                  | TK_MACRO_ARG_IDENT
+                  | TK_MACRO_IDENT opt_macro_args
+                        { $$ = expand_macro(yyscanner, $1, $2); }
                   ;
 
 /* end of macro expansion */
@@ -1754,8 +1786,7 @@ short_return_stat    : ".return" arguments "\n"
                               $$ = invoke(lexer, CALL_RETURN);
                               set_invocation_args($$, $2);
                             }
-                     /* XXX replace this .return with .tailcall; for testing, keep it .return. */
-                     | ".return" simple_invocation "\n"
+                     | ".tailcall" simple_invocation "\n"
                             { /* was the invocation a method call? then it becomes a method tail
                                * call, otherwise it's just a normal (sub) tail call.
                                */
@@ -1904,8 +1935,10 @@ const_tail            : "int" identifier '=' TK_INTC
                             { $$ = new_named_const(lexer, NUM_TYPE, $2, $4); }
                       | "string" identifier '=' TK_STRINGC
                             { $$ = new_named_const(lexer, STRING_TYPE, $2, $4); }
+                      /*
                       | "pmc" identifier '=' TK_STRINGC
                             { $$ = new_named_const(lexer, PMC_TYPE, $2, $4); }
+                      */
                       /*
                       | "Sub" identifier '=' TK_STRINGC
                       | "Coroutine" identifier '=' TK_STRINGC

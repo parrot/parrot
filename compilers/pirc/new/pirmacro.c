@@ -272,6 +272,21 @@ new_macro_table(macro_table * const current) {
 /*
 
 =item C<void
+delete_macro_table(macro_table * table)>
+
+Free resources allocated for the macro_table C<table>.
+
+=cut
+
+*/
+void
+delete_macro_table(macro_table * table) {
+    mem_sys_free(table);
+}
+
+/*
+
+=item C<void
 declare_macro_local(macro_def * const macro, char * const name)>
 
 Declare C<name> as a C<.macro_local> for the macro definition C<macro>.

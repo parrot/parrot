@@ -319,7 +319,7 @@ emit_pir_instruction(lexer_state * const lexer, instruction * const instr) {
     if (instr->label)
         fprintf(out, "  %s:\n", instr->label);
     if (instr->opinfo) {
-        fprintf(out, "    %-10s\t", instr->opinfo->name);
+        fprintf(out, "    %-10s\t", instr->opinfo->name);   /* set_p_pc became 'chopn'... XXX!!! */
 
         print_expressions(lexer, instr->operands);
 
@@ -370,6 +370,76 @@ emit_pir_subs(lexer_state * const lexer) {
         }
         while (subiter != lexer->subs->next);
     }
+}
+
+static void
+emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
+    int i;
+
+    /* emit the opcode */
+
+
+    /* emit the arguments */
+
+    /* note that opinfo->op_count counts all operands plus the op itself;
+     * so substract 1 for the op itself.
+     */
+    for (i = 0; i < instr->opinfo->op_count - 1; ++i) {
+        /*
+        switch () {
+
+        }
+        */
+
+    }
+
+}
+
+static void
+emit_pbc_instructions(lexer_state * const lexer, subroutine * const sub) {
+    instruction *iter;
+    if (sub->statements == NULL)
+        return;
+
+    iter = sub->statements;
+
+    do {
+        emit_pbc_instr(lexer, iter);
+        iter = iter->next;
+    }
+    while (iter != sub->statements->next);
+}
+
+/*
+
+=item C<void
+emit_pbc(lexer_state * const lexer)>
+
+Generate Parrot Byte Code from the abstract syntax tree. This is the top-level
+function; it initializes the data structures (code segment), and then starts
+emitting byte code (by means of helper functions).
+
+=cut
+
+*/
+void
+emit_pbc(lexer_state * const lexer) {
+    subroutine *subiter;
+
+    if (lexer->subs == NULL)
+        return;
+
+    subiter = lexer->subs->next;
+
+    /* initialize data structures in which PBC is going to be emitted. */
+
+
+    /* iterate over all instructions and emit them */
+    do {
+        emit_pbc_instructions(lexer, subiter);
+        subiter = subiter->next;
+    }
+    while (subiter != lexer->subs->next);
 }
 
 /*

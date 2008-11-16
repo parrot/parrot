@@ -88,7 +88,7 @@ extern void yypirset_column(int col, yyscan_t yyscanner);
 #endif
 
 void include_file(yyscan_t yyscanner, char const * const filename);
-void expand_macro(yyscan_t yyscanner, macro_def * const macro, macro_param * args);
+char *expand_macro(yyscan_t yyscanner, macro_def * const macro, macro_param * args);
 
 /* static prototypes */
 static int is_pir_directive(char * const text);
@@ -181,6 +181,7 @@ REGISTER       "$"[SNIP]{DIGITS}
 %x SPECIALSTART
 %x PASM
 
+
 %%
 
 
@@ -211,6 +212,7 @@ REGISTER       "$"[SNIP]{DIGITS}
 [#].*{EOL}{WS}*   { /* ignore line comments */ }
 
 {EOL}[\t\r\n ]*   { /* a set of continuous newlines yields a single newline token. */
+                    yylval->sval = "\n";
                     return TK_NL;
                   }
 
@@ -414,8 +416,8 @@ REGISTER       "$"[SNIP]{DIGITS}
                      /* restore current scope id */
                      lexer->unique_id = table->scopeno;
 
-                     /*  XXX delete_macro_table(macro_params);
-                     */
+                     delete_macro_table(table);
+
                    }
 
 <SCANMACRO>{IDENT}"@"  { /* when scanning a macro body, the @ marker indicates the {IDENT} must
@@ -562,8 +564,8 @@ REGISTER       "$"[SNIP]{DIGITS}
                                        return TK_MACRO_IDENT;
                                    }
                                    else { /* expand the .macro_const here; no need for
-                                           * adding this to the grammar.
-                                           */
+                                           * adding this to the grammar. */
+                                       /* goto SCANSTR state, and scan macro->body */
                                        yy_push_state(SCANSTR, yyscanner);
                                        yy_scan_string(macro->body, yyscanner);
                                    }
@@ -572,13 +574,21 @@ REGISTER       "$"[SNIP]{DIGITS}
 
 <MACROEXPAND>"."{IDENT}      { /* expand a .macro_const or parameter in argument list */
                                lexer_state * const lexer = yyget_extra(yyscanner);
-                               macro_def   * const macro   = find_macro(lexer->macros, yytext + 1);
+                               macro_def   * const macro = find_macro(lexer->macros, yytext + 1);
 
                                if (macro) {
                                    /* .foo( .bar() ) is not allowed; that's too fancy for PIR. */
                                    if (macro->takes_args) {
+                                      /*
                                        yypirerror(yyscanner, lexer, "cannot expand a .macro"
                                                   "in another .macro's argument list");
+
+                                       */
+
+                                       yylval->mval = macro;
+                                       /* yy_push_state(MACROEXPAND, yyscanner);
+                                       */
+                                      return TK_MACRO_IDENT;
                                    }
                                    else { /* we do allow expansion of .macro_consts as macro args */
                                        lexer->buffer = YY_CURRENT_BUFFER;
@@ -619,11 +629,8 @@ REGISTER       "$"[SNIP]{DIGITS}
                                yy_switch_to_buffer(lexer->buffer, yyscanner);
                              }
 
-<MACROEXPAND>"{"[^}]*"}"     { /* a braced argument; match ANYTHING up to the closing brace. */
-                               yylval->sval = dupstrn(yyget_extra(yyscanner),
-                                                      yytext + 1, yyleng - 2);
-                               return TK_MACRO_ARG_OTHER;
-                             }
+<MACROEXPAND>"{"             { return '{'; }
+<MACROEXPAND>"}"             { return '}'; }
 
 <MACROEXPAND>.               { yypirerror(yyscanner, yyget_extra(yyscanner),
                                           "unknown character in macro expansion: %c", yytext[0]);
@@ -740,7 +747,7 @@ REGISTER       "$"[SNIP]{DIGITS}
 
 <MACROLOCAL>{WS}            { /* ignore whitespace */ }
 
-<MACROLOCAL>{EOL}[\t\r\n ]* {
+<MACROLOCAL>{EOL}[\t\r\n ]* { /* newline after .macro_local <type> <ident> line */
                               yy_pop_state(yyscanner);
                               return TK_NL;
                             }
@@ -894,7 +901,7 @@ REGISTER       "$"[SNIP]{DIGITS}
                                      yytext);
                         }
 
-<PASM>{IDENT}":"        {
+<PASM>{IDENT}":"        { /* a label in PASM */
                           yylval->sval = dupstrn(yypirget_extra(yyscanner), yytext, yyleng - 1);
                           return TK_LABEL;
                         }
@@ -955,7 +962,7 @@ so keep them local to this file.
 =item C<void
 init_scanner_state(yyscan_t yyscanner)>
 
-Initializes C<yyscanner> to the SPECIALSTART state, which can then decided
+Initializes C<yyscanner> to the SPECIALSTART state, which can then decide
 whether to scan PASM or PIR tokens.
 
 =cut
@@ -1125,10 +1132,12 @@ An argument count check is done to make sure there's exactly enough arguments fo
 parameters. Then, the macro definition's body (a string buffer) is scanned (instead of the
 file that we were scanning).
 
+The function returns the body of the macro being expanded.
+
 =cut
 
 */
-void
+char *
 expand_macro(yyscan_t yyscanner, macro_def * const macro, macro_param * args) {
     /* construct a map data structure that maps the argument values to the parameter names */
     /* enter the parameters as temporary symbols (.macro_const) */
@@ -1180,23 +1189,58 @@ expand_macro(yyscan_t yyscanner, macro_def * const macro, macro_param * args) {
      * **after** the call to yy_scan_string(), which sets the line number to 1.
      */
     yyset_lineno(macro->linedefined, yyscanner);
+
+    return macro->body;
 }
 
 
 /* override Flex generated memory functions: all memory allocated
  * by Flex goes through Parrot's memory allocators.
  */
+
+/*
+
+=item C<void *
+yyalloc(size_t bytes, yyscan_t yyscanner)>
+
+Allocate C<bytes> of memory; the C<yyscanner> argument is not used.
+
+=cut
+
+*/
 PARROT_MALLOC
 void *
 yyalloc(size_t bytes, yyscan_t yyscanner) {
     return mem_sys_allocate(bytes);
 }
 
+/*
+
+=item C<void *
+yyrealloc(void * ptr, size_t bytes, yyscan_t yyscanner)>
+
+Reallocate memory pointed to by C<ptr>. The new memory region is C<bytes> in size;
+the C<yyscanner> argument is not used.
+
+=cut
+
+*/
 void *
 yyrealloc(void * ptr, size_t bytes, yyscan_t yyscanner) {
     return mem_sys_realloc(ptr, bytes);
 }
 
+/*
+
+=item C<void
+yyfree(void *ptr, yyscan_t yyscanner)>
+
+Free memory pointed to by C<ptr>. The C<yyscanner> argument is not used,
+but part of the signature as it is a Flex-generated function.
+
+=cut
+
+*/
 void
 yyfree(void *ptr, yyscan_t yyscanner) {
     mem_sys_free(ptr);
