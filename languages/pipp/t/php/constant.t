@@ -23,7 +23,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test   tests => 13;
+use Parrot::Test   tests => 20;
 use Parrot::Config qw( %PConfig );
 
 language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), string' );
@@ -143,6 +143,41 @@ END_OUT
 language_output_is( 'Pipp', <<'END_CODE', $PConfig{osname}, 'PHP_OS' );
 <?php
 echo constant("PHP_OS");
+END_CODE
+
+language_output_is( 'Pipp', <<'END_CODE', '5.3.0 on Parrot', 'PHP_VERSION' );
+<?php
+echo constant("PHP_VERSION");
+END_CODE
+
+language_output_is( 'Pipp', <<'END_CODE', '5', 'PHP_MAJOR_VERSION' );
+<?php
+echo constant("PHP_MAJOR_VERSION");
+END_CODE
+
+language_output_is( 'Pipp', <<'END_CODE', '3', 'PHP_MINOR_VERSION' );
+<?php
+echo constant("PHP_MINOR_VERSION");
+END_CODE
+
+language_output_is( 'Pipp', <<'END_CODE', '0', 'PHP_RELEASE_VERSION' );
+<?php
+echo constant("PHP_RELEASE_VERSION");
+END_CODE
+
+language_output_is( 'Pipp', <<'END_CODE', ' on Parrot', 'PHP_EXTRA_VERSION' );
+<?php
+echo constant("PHP_EXTRA_VERSION");
+END_CODE
+
+language_output_is( 'Pipp', <<'END_CODE', '50300', 'PHP_VERSION_ID' );
+<?php
+echo constant("PHP_VERSION_ID");
+END_CODE
+
+language_output_is( 'Pipp', <<'END_CODE', '0', 'PHP_ZTS' );
+<?php
+echo constant("PHP_ZTS");
 END_CODE
 
 
