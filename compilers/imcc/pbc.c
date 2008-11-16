@@ -129,9 +129,9 @@ static void fixup_globals(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-static int get_codesize(PARROT_INTERP,
+static size_t get_codesize(PARROT_INTERP,
     ARGIN(const IMC_Unit *unit),
-    ARGOUT(int *src_lines))
+    ARGOUT(size_t *src_lines))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -592,11 +592,11 @@ Stores globals for later fixup, returning the code size in number of ops.
 */
 
 PARROT_WARN_UNUSED_RESULT
-static int
-get_codesize(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(int *src_lines))
+static size_t
+get_codesize(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(size_t *src_lines))
 {
     Instruction *ins = unit->instructions;
-    int          code_size;
+    size_t       code_size;
 
     /* run through instructions:
      * - sanity check
