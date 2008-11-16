@@ -306,6 +306,7 @@ typedef struct subroutine {
     char const         *lex_id;        /* this sub's lex_id, if any */
     char const         *vtable_method; /* name of vtable method that this sub's overriding if any */
     char const         *instanceof;    /* XXX document this XXX */
+    char const         *nsentry;       /* name by which the sub is stored in the namespace */
     int                 flags;         /* this sub's flags */
 
     /* XXX the whole multi stuff must be implemented */
@@ -339,6 +340,7 @@ void set_sub_outer(struct lexer_state * const lexer, char const * const outersub
 void set_sub_vtable(struct lexer_state * const lexer, char const * vtablename);
 void set_sub_lexid(struct lexer_state * const lexer, char const * const lexid);
 void set_sub_instanceof(struct lexer_state * const lexer, char const * const classname);
+void set_sub_nsentry(struct lexer_state * const lexer, char const * const nsentry);
 
 /* install a new subroutine node */
 void new_subr(struct lexer_state * const lexer, char const * const subname);

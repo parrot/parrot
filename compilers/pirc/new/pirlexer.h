@@ -489,7 +489,7 @@ extern int yypirlex (YYSTYPE * yylval_param ,yyscan_t yyscanner);
 #undef YY_DECL
 #endif
 
-#line 942 "pir.l"
+#line 943 "pir.l"
 
 
 #line 496 "pirlexer.h"

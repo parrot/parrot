@@ -213,6 +213,22 @@ set_sub_instanceof(lexer_state * const lexer, char const * const classname) {
 /*
 
 =item C<void
+set_sub_nsentry(lexer_state * const lexer, char const * const nsentry)>
+
+Set the value of the C<:nsentry> flag on a sub. The value of C<nsentry> is the name
+by which the sub is stored in the namespace.
+
+=cut
+
+*/
+void
+set_sub_nsentry(lexer_state * const lexer, char const * const nsentry) {
+    CURRENT_SUB(lexer)->nsentry = nsentry;
+}
+
+/*
+
+=item C<void
 set_sub_flag(lexer_state * const lexer, sub_flag flag)>
 
 Set a subroutine flag on the current sub.

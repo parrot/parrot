@@ -345,7 +345,8 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
        TK_FLAG_POSTCOMP     ":postcomp"
        TK_FLAG_IMMEDIATE    ":immediate"
        TK_FLAG_LEXID        ":lexid"
-       TK_INSTANCEOF        ":instanceof"
+       TK_FLAG_INSTANCEOF   ":instanceof"
+       TK_FLAG_NSENTRY      ":nsentry"
 
 %token TK_FLAG_UNIQUE_REG   ":unique_reg"
        TK_FLAG_NAMED        ":named"
@@ -715,6 +716,8 @@ sub_flag          : ":anon"
                          { set_sub_lexid(lexer, $2); }
                   | ":instanceof" paren_string
                          { set_sub_instanceof(lexer, $2); }
+                  | ":nsentry" paren_string
+                         { set_sub_nsentry(lexer, $2); }
                   ;
 
 multi_type        : identifier

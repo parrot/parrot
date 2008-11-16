@@ -331,7 +331,8 @@ REGISTER       "$"[SNIP]{DIGITS}
 ":vtable"         { return TK_FLAG_VTABLE; }
 ":multi"          { return TK_FLAG_MULTI; }
 ":lexid"          { return TK_FLAG_LEXID; }
-":instanceof"     { return TK_INSTANCEOF; }
+":instanceof"     { return TK_FLAG_INSTANCEOF; }
+":nsentry"        { return TK_FLAG_NSENTRY; }
 
 ":unique_reg"     { return TK_FLAG_UNIQUE_REG; }
 ":optional"       { return TK_FLAG_OPTIONAL; }
