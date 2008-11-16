@@ -239,20 +239,20 @@ test:     all test-pct
 test-all: all test-php test-phc test-antlr3 test-pct test-pmc
 
 test-php:
-	- cd .. && $(PERL) pipp/t/harness --with-php
+	- $(PERL) t/harness --with-php
 
 test-phc:
-	- cd .. && $(PERL) pipp/t/harness --with-phc
+	- $(PERL) t/harness --with-phc
 
 test-antlr3:
-	- cd .. && $(PERL) pipp/t/harness --with-antlr3
+	- $(PERL) t/harness --with-antlr3
 
 test-pct:
-	- cd .. && $(PERL) pipp/t/harness --with-pct
+	- $(PERL) t/harness --with-pct
 
 # run the test suite, create a TAP archive and send it off to smolder
 smolder_test : build
-	- cd .. && $(PERL) pipp/t/harness --with-pct --archive --send-to-smolder
+	- $(PERL) t/harness --with-pct --archive --send-to-smolder
 
 
 # make sure debugging output is disabled while running the tests

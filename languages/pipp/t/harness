@@ -47,6 +47,7 @@ use TAP::Harness::Archive   0.12;
 use Parrot::Config;
 use Getopt::Long;
 use Parrot::Harness::Smoke;
+use Parrot::Test;
 
 my ( $files_flag, $master_flag, $send_to_smolder_flag, $archive_flag );
 my ( $php_flag, $pct_flag, $antlr3_flag, $phc_flag );
@@ -71,8 +72,9 @@ if ( $files_flag ) {
     print join( "\n", @files );
     print "\n" if scalar(@files);
 } else { 
-    my @cmd = ( "../parrot$PConfig{exe}", 'pipp/pipp.pbc' );
-    $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::Phc';
+    my $path_to_parrot = Parrot::Test::path_to_parrot();
+    my @cmd = ( "$path_to_parrot/parrot$PConfig{exe}", "$path_to_parrot/languages/pipp/pipp.pbc" );
+    $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::PCT';
 
     if ( $php_flag ) { 
          $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::PHP';
@@ -113,7 +115,7 @@ if ( $files_flag ) {
               my ( $harness, $test_file ) = @_;
 
               # the directory t/pmc contains only PIR test files
-              return [ "../parrot$PConfig{exe}", $test_file ] if $test_file =~ m!t/pmc/.*[.]t$!;
+              return [ "$path_to_parrot/parrot$PConfig{exe}", $test_file ] if $test_file =~ m!t/pmc/.*[.]t$!;
 
               # the directory t/in_php contains only test scripts written in PHP
               return [ @cmd, $test_file ] if $test_file =~ m!t/in_php/.*[.]t$!;

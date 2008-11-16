@@ -7,7 +7,7 @@ t/php/sha1.t - Standard Library sha1
 
 =head1 SYNOPSIS
 
-    % perl -I../lib pipp/t/php/sha1.t
+    % perl php/sha1.t
 
 =head1 DESCRIPTION
 
@@ -55,8 +55,8 @@ string
 20
 OUTPUT
 
-unlink 'pipp/file.txt' if -f 'pipp/file.txt';
-open my $X, '>', 'pipp/file.txt';
+unlink 'file.txt' if -f 'file.txt';
+open my $X, '>', 'file.txt';
 print {$X} 'message digest';
 close $X;
 
@@ -68,7 +68,7 @@ CODE
 c12252ceda8be8994d5fa0290a47231c1d16aae3
 OUTPUT
 
-unlink 'pipp/file.txt' if -f 'pipp/file.txt';
+unlink 'file.txt' if -f 'file.txt';
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'sha1_file(nofile)' );
 <?php

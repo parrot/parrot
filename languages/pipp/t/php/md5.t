@@ -7,7 +7,7 @@ t/php/md5.t - Standard Library md5
 
 =head1 SYNOPSIS
 
-    % perl -I../lib pipp/t/php/md5.t
+    % perl t/php/md5.t
 
 =head1 DESCRIPTION
 
@@ -55,8 +55,8 @@ string
 16
 OUTPUT
 
-unlink 'pipp/file.txt' if -f 'pipp/file.txt';
-open my $X, '>', 'pipp/file.txt';
+unlink 'file.txt' if -f 'file.txt';
+open my $X, '>', 'file.txt';
 print {$X} 'message digest';
 close $X;
 
@@ -68,7 +68,7 @@ CODE
 f96b697d7cb7938d525a2f31aaf161d0
 OUTPUT
 
-unlink 'pipp/file.txt' if -f 'pipp/file.txt';
+unlink 'file.txt' if -f 'file.txt';
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'md5_file(nofile)' );
 <?php

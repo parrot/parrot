@@ -7,7 +7,7 @@ t/php/filestat.t - Standard Library filestat
 
 =head1 SYNOPSIS
 
-    % perl -I../lib pipp/t/php/filestat.t
+    % perl t/php/filestat.t
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,7 @@ use Test::More     tests => 3;
 use Parrot::Test;
 
 
-unlink 'pipp/file.txt' if (-f 'pipp/file.txt');
+unlink 'file.txt' if (-f 'file.txt');
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'file_exists()' );
 <?php
@@ -38,7 +38,7 @@ CODE
 
 OUTPUT
 
-open my $X, '>', 'pipp/file.txt';
+open my $X, '>', 'file.txt';
 binmode $X, ':raw';
 print {$X} "line 1\n";
 print {$X} "line 2\n";
@@ -61,7 +61,7 @@ CODE
 21
 OUTPUT
 
-unlink 'pipp/file.txt' if (-f 'pipp/file.txt');
+unlink 'file.txt' if (-f 'file.txt');
 
 
 # Local Variables:

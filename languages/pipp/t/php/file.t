@@ -28,8 +28,8 @@ use Test::More     tests => 10;
 use Parrot::Test;
 
 
-unlink 'pipp/file.txt' if -f 'pipp/file.txt';
-open my $X, '>', 'pipp/file.txt';
+unlink 'file.txt' if -f 'file.txt';
+open my $X, '>', 'file.txt';
 binmode $X, ':raw';
 print {$X} "line 1\n";
 print {$X} "line 2\n";
@@ -137,7 +137,7 @@ CODE
 
 OUTPUT
 
-unlink 'pipp/file.txt' if -f 'pipp/file.txt';
+unlink 'file.txt' if -f 'file.txt';
 
 
 # Local Variables:
