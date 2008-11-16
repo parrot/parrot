@@ -1,3 +1,7 @@
+#!perl
+# Copyright (C) 2008, The Perl Foundation.
+# $Id$
+
 use lib "../../lib";
 use Parrot::Test tests => 2;
 
@@ -22,3 +26,12 @@ main:
     set_returns
     returncc
 OUTPUT
+
+
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
