@@ -3,6 +3,7 @@
 New in the November 2008 release
 - Implementation
   + remove the pseudo PIR opcode 'addr'
+  + add the 'box' opcode
 - Compilers
   + PIRC
     - Integrated macro processing in PIRC's lexer
@@ -13,6 +14,7 @@ New in the November 2008 release
     - code cleanups and documentation
 - Deprecations
     + PARROT_API has changed to PARROT_EXPORT
+    + :lexid becomes :subid
 
 New in 0.8.0
 - Implementation
