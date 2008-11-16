@@ -394,6 +394,10 @@ or 'Object').
     unshift ns, hll
     $S0 = pop ns
     set_root_global ns, $S0, protoobject
+    ##  store the protoobject in the default export namespace
+    push ns, 'EXPORT'
+    push ns, 'ALL'
+    set_root_global ns, $S0, protoobject
     goto have_how
 
     ##  anonymous classes have empty strings for shortname and longname
