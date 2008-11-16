@@ -233,7 +233,7 @@ Convert Win32 style line endins with Unix style line endings.
 
 =item C<path_to_parrot()>
 
-Construct a relative path from the current dir to the parrot root dir.
+Construct an absolute path to the parrot root dir.
 
 =item C<per_test( $ext, $test_no )>
 
@@ -448,9 +448,8 @@ sub path_to_parrot {
 
     my $path = $INC{'Parrot/Config.pm'};
     $path =~ s{ /lib/Parrot/Config.pm \z}{}xms;
-    return $path eq q{}
-        ? File::Spec->curdir()
-        : $path;
+
+    return Cwd::realpath( $path );
 }
 
 sub generate_languages_functions {
