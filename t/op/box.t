@@ -16,7 +16,7 @@ Tests all box operators.
 
 =cut
 
-.const int TESTS = 12
+.const int TESTS = 24
 
 # must set these up before the .HLL_map statements later
 .sub '__setup' :immediate
@@ -54,6 +54,12 @@ Tests all box operators.
     is( $I0, 100, 'value preserved when boxing int' )
 
     isa_ok( $P0, 'Integer', 'int boxed to appropriate base type' )
+
+    $I0 = 200
+    $P0 = box $I0
+    $I0 = $P0
+    is( $I0, 200, 'value preserved when boxing int from reg' )
+    isa_ok( $P0, 'Integer', 'int boxed to appropriate base type from reg' )
 .end
 
 .sub 'box_num'
@@ -62,6 +68,13 @@ Tests all box operators.
     is( $N0, 77.7, 'value preserved when boxing num' )
 
     isa_ok( $P0, 'Float', 'num boxed to appropriate base type' )
+
+    $N0 = 88.8
+    $P0 = box $N0
+    $N0 = $P0
+    is( $N0, 88.8, 'value preserved when boxing num from reg' )
+
+    isa_ok( $P0, 'Float', 'num boxed to appropriate base type from reg' )
 .end
 
 .sub 'box_string'
@@ -70,6 +83,13 @@ Tests all box operators.
     is( $S0, 'Hi, there', 'value preserved when boxing string' )
 
     isa_ok( $P0, 'String', 'string boxed to appropriate base type' )
+
+    $S0 = 'Hello, there'
+    $P0 = box $S0
+    $S0 = $P0
+    is( $S0, 'Hello, there', 'value preserved when boxing string from reg' )
+
+    isa_ok( $P0, 'String', 'string boxed to appropriate base type from reg' )
 .end
 
 .HLL 'for_test'
@@ -85,6 +105,13 @@ Tests all box operators.
     is( $I0, -100, 'value preserved when boxing int in HLL' )
 
     isa_ok( $P0, 'MyInt', 'int boxed to appropriate base type for HLL' )
+
+    $I0 = -999
+    $P0 = box $I0
+    $I0 = $P0
+    is( $I0, -999, 'value preserved when boxing int in HLL from reg' )
+
+    isa_ok( $P0, 'MyInt', 'int boxed to appropriate type for HLL from reg')
 .end
 
 .sub 'box_num'
@@ -93,6 +120,13 @@ Tests all box operators.
     is( $N0, -77.7, 'value preserved when boxing num in HLL' )
 
     isa_ok( $P0, 'MyFloat', 'num boxed to appropriate base type for HLL' )
+
+    $N0 = -222222.222222
+    $P0 = box $N0
+    $N0 = $P0
+    is( $N0, -222222.222222, 'value preserved when boxing num in HLL from reg' )
+
+    isa_ok( $P0, 'MyFloat', 'num boxed to appropriate type for HLL from reg' )
 .end
 
 .sub 'box_string'
@@ -101,6 +135,13 @@ Tests all box operators.
     is( $S0, 'Bye, bye!', 'value preserved when boxing string in HLL' )
 
     isa_ok( $P0, 'MyString', 'string boxed to appropriate base type for HLL' )
+
+    $S0 = 'Hello, goodbye!'
+    $P0 = box $S0
+    $S0 = $P0
+    is( $S0, 'Hello, goodbye!', 'value preserved when boxing string in HLL from reg' )
+
+    isa_ok($P0, 'MyString', 'string boxed to appropriate type for HLL from reg')
 .end
 
 # Local Variables:
