@@ -37,7 +37,8 @@ Otherwise I run the tests that were passed on the command line.
 # pragmata
 use strict;
 use warnings;
-use lib '..';
+use FindBin ();
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin/../lib";
 
 use Cwd                     ();
 use File::Spec              ();
