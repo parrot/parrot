@@ -43,7 +43,6 @@ method TOP($/) {
                              :returns('String')
                          ),
                          :pirop('say'),
-                         :pasttype('pirop')
                      )
                  );
 
@@ -69,7 +68,6 @@ method TOP($/,$key) {
                              :returns('String')
                          ),
                          :pirop('say'),
-                         :pasttype('pirop')
                      )
                  );
 
@@ -100,7 +98,6 @@ method thingy($/) {
                              :returns('String')
                          ),
                          :pirop('say'),
-                         :pasttype('pirop')
                      )
                  );
 
@@ -134,7 +131,6 @@ method thingy($/) {
                      :returns('String')
                  ),
                  :pirop('say'),
-                 :pasttype('pirop')
              )
          );
 }
