@@ -706,16 +706,16 @@ $put_pointer
     jit_key_name = string_append(interp, jit_key_name, signature);
     b = VTABLE_get_pmc_keyed_str(interp, HashPointer, jit_key_name);
 
-    if (b && b->vtable->base_type == enum_class_UnManagedStruct) {
+    if (b && b->vtable->base_type == enum_class_ManagedStruct) {
         *jitted = 1;
-        return F2DPTR(PMC_data(b));
+        return F2DPTR(VTABLE_get_pointer(interp, b));
     }
     else {
         void * const result = Parrot_jit_build_call_func(interp, pmc_nci, signature);
         if (result) {
             *jitted = 1;
-            temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
-            PMC_data(temp_pmc) = (void*)result;
+            temp_pmc = pmc_new(interp, enum_class_ManagedStruct);
+            VTABLE_set_pointer(interp, temp_pmc, (void *)result);
             VTABLE_set_pmc_keyed_str(interp, HashPointer, jit_key_name, temp_pmc);
             return result;
         }
