@@ -23,7 +23,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test   tests => 20;
+use Parrot::Test   tests => 21;
 use Parrot::Config qw( %PConfig );
 
 language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), string' );
@@ -178,6 +178,11 @@ END_CODE
 language_output_is( 'Pipp', <<'END_CODE', '0', 'PHP_ZTS' );
 <?php
 echo constant("PHP_ZTS");
+END_CODE
+
+language_output_is( 'Pipp', <<'END_CODE', '5', 'PHP_MAJOR_VERSION' );
+<?php
+echo PHP_MAJOR_VERSION;
 END_CODE
 
 
