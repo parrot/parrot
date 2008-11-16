@@ -267,7 +267,7 @@ inline op elements(out INT, invar PMC) {
 
 =head2 Fast access ops
 
-The fast access ops are shortcuts to common operations implemented invar PMCs.
+The fast access ops are shortcuts to common operations implemented in var PMCs.
 
 =over 4
 
@@ -578,6 +578,33 @@ direct reference so messing with it can do harm to the method lookup.
 
 op get_mro(out PMC, invar PMC) :deprecated {
   $1 = $2->vtable->mro;
+}
+
+########################################
+
+=item B<box>(out PMC, in INT)
+
+=item B<box>(out PMC, in NUM)
+
+=item B<box>(out PMC, in STR)
+
+Create a HLL-mapped PMC containing the provided primitive.
+
+=cut
+
+op box(out PMC, in INT) {
+    $1 = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
+    VTABLE_set_integer_native(interp, $1, $2);
+}
+
+op box(out PMC, in NUM) {
+    $1 = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
+    VTABLE_set_number_native(interp, $1, $2);
+}
+
+op box(out PMC, in STR) {
+    $1 = pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_String));
+    VTABLE_set_string_native(interp, $1, $2);
 }
 
 =back
