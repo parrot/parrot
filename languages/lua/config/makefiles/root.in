@@ -100,23 +100,23 @@ all: \
  $(PMCDIR)/lua_group$(LOAD_EXT) \
  $(LIB_PBCS) \
  $(LIBPATH)/luaperl.pbc \
- $(LIBPATH)/_helpers.pbc \
- $(LIBPATH)/alarm.pbc \
- $(LIBPATH)/base64.pbc \
- $(LIBPATH)/bc.pbc \
- $(LIBPATH)/bitlib.pbc \
- $(LIBPATH)/complex.pbc \
+ _helpers.pbc \
+ alarm.pbc \
+ base64.pbc \
+ bc.pbc \
+ bitlib.pbc \
+ complex.pbc \
  $(LIBPATH)/gl.pbc \
- $(LIBPATH)/gl_binding.pbc \
- $(LIBPATH)/glut.pbc \
- $(LIBPATH)/lfs.pbc \
- $(LIBPATH)/lpeg.pbc \
- $(LIBPATH)/markdown.pbc \
- $(LIBPATH)/md5.pbc \
- $(LIBPATH)/random.pbc \
- $(LIBPATH)/sha1.pbc \
- $(LIBPATH)/struct.pbc \
- $(LIBPATH)/uuid.pbc \
+ gl_binding.pbc \
+ glut.pbc \
+ lfs.pbc \
+ lpeg.pbc \
+ markdown.pbc \
+ md5.pbc \
+ random.pbc \
+ sha1.pbc \
+ struct.pbc \
+ uuid.pbc \
  $(GEN_PIR) \
  $(GEN_PBC) \
  src/yapp/Lua/parser.pm
@@ -195,23 +195,23 @@ $(LIBPATH)/luadebug.pbc: $(LIBPATH)/luadebug.pir
 $(LIBPATH)/luabytecode.pbc: $(LIBPATH)/luabytecode.pir $(LIBPATH)/luabytecode_gen.pir
 	-$(PARROT) --output=$(LIBPATH)/luabytecode.pbc $(LIBPATH)/luabytecode.pir
 
-$(LIBPATH)/_helpers.pbc: $(LIBPATH)/_helpers.pir
-	$(PARROT) --output=$(LIBPATH)/_helpers.pbc $(LIBPATH)/_helpers.pir
+_helpers.pbc: $(LIBPATH)/_helpers.pir
+	$(PARROT) --output=_helpers.pbc $(LIBPATH)/_helpers.pir
 
-$(LIBPATH)/alarm.pbc: $(LIBPATH)/alarm.pir
-	-$(PARROT) --output=$(LIBPATH)/alarm.pbc $(LIBPATH)/alarm.pir
+alarm.pbc: $(LIBPATH)/alarm.pir
+	-$(PARROT) --output=alarm.pbc $(LIBPATH)/alarm.pir
 
-$(LIBPATH)/base64.pbc: $(LIBPATH)/base64.pir
-	-$(PARROT) --output=$(LIBPATH)/base64.pbc $(LIBPATH)/base64.pir
+base64.pbc: $(LIBPATH)/base64.pir
+	-$(PARROT) --output=base64.pbc $(LIBPATH)/base64.pir
 
-$(LIBPATH)/bc.pbc: $(LIBPATH)/bc.pir
-	-$(PARROT) --output=$(LIBPATH)/bc.pbc $(LIBPATH)/bc.pir
+bc.pbc: $(LIBPATH)/bc.pir
+	-$(PARROT) --output=bc.pbc $(LIBPATH)/bc.pir
 
-$(LIBPATH)/bitlib.pbc: $(LIBPATH)/bitlib.pir
-	-$(PARROT) --output=$(LIBPATH)/bitlib.pbc $(LIBPATH)/bitlib.pir
+bitlib.pbc: $(LIBPATH)/bitlib.pir
+	-$(PARROT) --output=bitlib.pbc $(LIBPATH)/bitlib.pir
 
-$(LIBPATH)/complex.pbc: $(LIBPATH)/complex.pir
-	-$(PARROT) --output=$(LIBPATH)/complex.pbc $(LIBPATH)/complex.pir
+complex.pbc: $(LIBPATH)/complex.pir
+	-$(PARROT) --output=complex.pbc $(LIBPATH)/complex.pir
 
 $(LIBPATH)/gl.pir: $(LIBPATH)/gl.lua lua.pbc
 	-$(PARROT) luap.pir --target=pir $(LIBPATH)/gl.lua > $(LIBPATH)/gl.pir
@@ -219,36 +219,36 @@ $(LIBPATH)/gl.pir: $(LIBPATH)/gl.lua lua.pbc
 $(LIBPATH)/gl.pbc: $(LIBPATH)/gl.pir
 	-$(PARROT) --output=$(LIBPATH)/gl.pbc $(LIBPATH)/gl.pir
 
-$(LIBPATH)/gl_binding.pbc: $(LIBPATH)/gl_binding.pir
-	-$(PARROT) --output=$(LIBPATH)/gl_binding.pbc $(LIBPATH)/gl_binding.pir
+gl_binding.pbc: $(LIBPATH)/gl_binding.pir
+	-$(PARROT) --output=gl_binding.pbc $(LIBPATH)/gl_binding.pir
 
-$(LIBPATH)/glut.pbc: $(LIBPATH)/glut.pir
-	-$(PARROT) --output=$(LIBPATH)/glut.pbc $(LIBPATH)/glut.pir
+glut.pbc: $(LIBPATH)/glut.pir
+	-$(PARROT) --output=glut.pbc $(LIBPATH)/glut.pir
 
-$(LIBPATH)/lfs.pbc: $(LIBPATH)/lfs.pir
-	-$(PARROT) --output=$(LIBPATH)/lfs.pbc $(LIBPATH)/lfs.pir
+lfs.pbc: $(LIBPATH)/lfs.pir
+	-$(PARROT) --output=lfs.pbc $(LIBPATH)/lfs.pir
 
-$(LIBPATH)/lpeg.pbc: $(LIBPATH)/lpeg.pir
-	-$(PARROT) --output=$(LIBPATH)/lpeg.pbc $(LIBPATH)/lpeg.pir
+lpeg.pbc: $(LIBPATH)/lpeg.pir
+	-$(PARROT) --output=lpeg.pbc $(LIBPATH)/lpeg.pir
 
-$(LIBPATH)/markdown.pbc: $(LIBPATH)/markdown.pir
-	-$(PARROT) --output=$(LIBPATH)/markdown.pbc $(LIBPATH)/markdown.pir
+markdown.pbc: $(LIBPATH)/markdown.pir
+	-$(PARROT) --output=markdown.pbc $(LIBPATH)/markdown.pir
 
-$(LIBPATH)/md5.pbc: $(LIBPATH)/md5.pir
-	-$(PARROT) --output=$(LIBPATH)/md5.pbc $(LIBPATH)/md5.pir
+md5.pbc: $(LIBPATH)/md5.pir
+	-$(PARROT) --output=md5.pbc $(LIBPATH)/md5.pir
 
-$(LIBPATH)/random.pbc: $(LIBPATH)/random.pir
-	-$(PARROT) --output=$(LIBPATH)/random.pbc $(LIBPATH)/random.pir
+random.pbc: $(LIBPATH)/random.pir
+	-$(PARROT) --output=random.pbc $(LIBPATH)/random.pir
 
-$(LIBPATH)/sha1.pbc: $(LIBPATH)/md5.pir
+sha1.pbc: $(LIBPATH)/md5.pir
 	$(PERL) -pe "s|md5|sha1|g; s|MD5|SHA1|g" $(LIBPATH)/md5.pir > $(LIBPATH)/sha1.pir
-	-$(PARROT) --output=$(LIBPATH)/sha1.pbc $(LIBPATH)/sha1.pir
+	-$(PARROT) --output=sha1.pbc $(LIBPATH)/sha1.pir
 
-$(LIBPATH)/struct.pbc: $(LIBPATH)/struct.pir
-	-$(PARROT) --output=$(LIBPATH)/struct.pbc $(LIBPATH)/struct.pir
+struct.pbc: $(LIBPATH)/struct.pir
+	-$(PARROT) --output=struct.pbc $(LIBPATH)/struct.pir
 
-$(LIBPATH)/uuid.pbc: $(LIBPATH)/uuid.pir
-	-$(PARROT) --output=$(LIBPATH)/uuid.pbc $(LIBPATH)/uuid.pir
+uuid.pbc: $(LIBPATH)/uuid.pir
+	-$(PARROT) --output=uuid.pbc $(LIBPATH)/uuid.pir
 
 $(LIBPATH)/luabytecode_gen.pir: $(LIBPATH)/luabytecode.rules src/build/translator.pl
 	$(PERL) src/build/translator.pl $(LIBPATH)/luabytecode.rules --output $(LIBPATH)/luabytecode_gen.pir
