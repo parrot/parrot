@@ -344,7 +344,7 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
        TK_FLAG_MULTI        ":multi"
        TK_FLAG_POSTCOMP     ":postcomp"
        TK_FLAG_IMMEDIATE    ":immediate"
-       TK_FLAG_LEXID        ":lexid"
+       TK_FLAG_SUBID        ":subid"
        TK_FLAG_INSTANCEOF   ":instanceof"
        TK_FLAG_NSENTRY      ":nsentry"
 
@@ -712,8 +712,8 @@ sub_flag          : ":anon"
                          { set_sub_methodname(lexer, $2); }
                   | ":vtable" opt_paren_string
                          { set_sub_vtable(lexer, $2); }
-                  | ":lexid" paren_string
-                         { set_sub_lexid(lexer, $2); }
+                  | ":subid" paren_string
+                         { set_sub_subid(lexer, $2); }
                   | ":instanceof" paren_string
                          { set_sub_instanceof(lexer, $2); }
                   | ":nsentry" paren_string

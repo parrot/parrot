@@ -163,7 +163,7 @@
      TK_FLAG_MULTI = 344,
      TK_FLAG_POSTCOMP = 345,
      TK_FLAG_IMMEDIATE = 346,
-     TK_FLAG_LEXID = 347,
+     TK_FLAG_SUBID = 347,
      TK_FLAG_INSTANCEOF = 348,
      TK_FLAG_NSENTRY = 349,
      TK_FLAG_UNIQUE_REG = 350,
@@ -280,7 +280,7 @@
 #define TK_FLAG_MULTI 344
 #define TK_FLAG_POSTCOMP 345
 #define TK_FLAG_IMMEDIATE 346
-#define TK_FLAG_LEXID 347
+#define TK_FLAG_SUBID 347
 #define TK_FLAG_INSTANCEOF 348
 #define TK_FLAG_NSENTRY 349
 #define TK_FLAG_UNIQUE_REG 350
@@ -1107,7 +1107,7 @@ static const char *const yytname[] =
   "\"%=\"", "\"**=\"", "\"/=\"", "\"|=\"", "\"&=\"", "\"//=\"", "\"~=\"",
   "\".=\"", "\":init\"", "\":load\"", "\":main\"", "\":anon\"",
   "\":method\"", "\":outer\"", "\":vtable\"", "\":lex\"", "\":multi\"",
-  "\":postcomp\"", "\":immediate\"", "\":lexid\"", "\":instanceof\"",
+  "\":postcomp\"", "\":immediate\"", "\":subid\"", "\":instanceof\"",
   "\":nsentry\"", "\":unique_reg\"", "\":named\"", "\":slurpy\"",
   "\":flat\"", "\":optional\"", "\":opt_flag\"", "\":invocant\"",
   "\".macro\"", "\".endm\"", "\".macro_local\"", "\".macro_label\"",
@@ -2720,7 +2720,7 @@ yyreduce:
 
   case 65:
 #line 716 "pir.y"
-    { set_sub_lexid(lexer, (yyvsp[(2) - (2)].sval)); ;}
+    { set_sub_subid(lexer, (yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 66:

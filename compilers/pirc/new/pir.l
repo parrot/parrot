@@ -330,7 +330,7 @@ REGISTER       "$"[SNIP]{DIGITS}
 ":outer"          { return TK_FLAG_OUTER; }
 ":vtable"         { return TK_FLAG_VTABLE; }
 ":multi"          { return TK_FLAG_MULTI; }
-":lexid"          { return TK_FLAG_LEXID; }
+":subid"          { return TK_FLAG_SUBID; }
 ":instanceof"     { return TK_FLAG_INSTANCEOF; }
 ":nsentry"        { return TK_FLAG_NSENTRY; }
 

@@ -181,7 +181,7 @@ set_sub_vtable(lexer_state * const lexer, char const *vtablename) {
 /*
 
 =item C<void
-set_sub_lexid(lexer_state * const lexer, char * const lexid)>
+set_sub_subid(lexer_state * const lexer, char * const subid)>
 
 Set the lexical identifier on the current sub.
 
@@ -189,9 +189,9 @@ Set the lexical identifier on the current sub.
 
 */
 void
-set_sub_lexid(lexer_state * const lexer, char const * const lexid) {
-    CURRENT_SUB(lexer)->lex_id = lexid;
-    SET_FLAG(lexer->subs->flags, SUB_FLAG_LEXID);
+set_sub_subid(lexer_state * const lexer, char const * const subid) {
+    CURRENT_SUB(lexer)->subid = subid;
+    SET_FLAG(lexer->subs->flags, SUB_FLAG_SUBID);
 }
 
 /*
@@ -288,7 +288,7 @@ new_subr(lexer_state * const lexer, char const * const subname) {
     newsub->sub_name   = subname;
 
     /* set default lexid */
-    newsub->lex_id     = subname;
+    newsub->subid      = subname;
 
     /* take namespace of this sub of the lexer, which keeps track of that */
     newsub->name_space = lexer->current_ns;

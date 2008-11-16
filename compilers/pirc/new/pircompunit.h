@@ -81,7 +81,7 @@ typedef enum sub_flags {
     SUB_FLAG_VTABLE     = 1 << 8,  /* this sub overrides a vtable method */
     SUB_FLAG_LEX        = 1 << 9,  /* this sub needs a LexPad */
     SUB_FLAG_MULTI      = 1 << 10, /* this sub is a multi method/sub */
-    SUB_FLAG_LEXID      = 1 << 11, /* this sub has a namespace-unaware identifier
+    SUB_FLAG_SUBID      = 1 << 11, /* this sub has a namespace-unaware identifier
                                       XXX this flag needed? XXX */
     SUB_FLAG_INSTANCEOF = 1 << 12  /* this sub has an :instanceof flag. XXX document this XXX */
 
@@ -303,7 +303,7 @@ typedef struct subroutine {
     key                *name_space;    /* this sub's namespace */
     char const         *sub_name;      /* this sub's name */
     char const         *outer_sub;     /* this sub's outer subroutine, if any */
-    char const         *lex_id;        /* this sub's lex_id, if any */
+    char const         *subid;         /* this sub's subid, if any */
     char const         *vtable_method; /* name of vtable method that this sub's overriding if any */
     char const         *instanceof;    /* XXX document this XXX */
     char const         *nsentry;       /* name by which the sub is stored in the namespace */
@@ -339,7 +339,7 @@ void set_namespace(struct lexer_state * const lexer, key * const ns);
 /* various set functions to set the value of a subroutine flag */
 void set_sub_outer(struct lexer_state * const lexer, char const * const outersub);
 void set_sub_vtable(struct lexer_state * const lexer, char const * vtablename);
-void set_sub_lexid(struct lexer_state * const lexer, char const * const lexid);
+void set_sub_subid(struct lexer_state * const lexer, char const * const subid);
 void set_sub_instanceof(struct lexer_state * const lexer, char const * const classname);
 void set_sub_nsentry(struct lexer_state * const lexer, char const * const nsentry);
 void set_sub_methodname(struct lexer_state * const lexer, char const * const methodname);
