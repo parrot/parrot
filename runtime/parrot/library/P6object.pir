@@ -458,34 +458,11 @@ of names separated by spaces.
     parrotclass = newclass lookup
     goto have_parrotclass
   parrotclass_no_namespace:
-    # make the namespace for classes without a namespace
-    .local pmc base_ns, extra_ns
-    base_ns = class_ns
-    extra_ns = new 'ResizablePMCArray'
-    $P0 = pop base_ns
-    unshift extra_ns, $P0
-  base_ns_loop:
-    $P0 = get_root_namespace base_ns
-    $I0 = defined $P0
-    if $I0, base_ns_loop_end
-    $P0 = pop base_ns
-    unshift extra_ns, $P0
-    goto base_ns_loop
-  base_ns_loop_end:
-    .local pmc iter, ns_item, ns
-    .local string ns_item
-    iter = new 'Iterator', extra_ns
-  create_ns_loop:
-    unless iter, create_ns_loop_end
-    ns_item = shift iter
-    $S0 = ns_item
-    $P0 = new 'NameSpace'
-    ns = get_root_namespace base_ns
-    ns.'add_namespace'($S0, $P0)
-    push base_ns, ns_item
-    goto create_ns_loop
-  create_ns_loop_end:
-    ns = get_root_namespace base_ns
+    # The namespace doesn't exist, so we need to create it
+    .local pmc ns
+    ns = new 'NameSpace'
+    set_root_global class_ns, '', ns
+    ns = get_root_namespace class_ns
     parrotclass = newclass ns
   have_parrotclass:
 
