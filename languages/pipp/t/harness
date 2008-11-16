@@ -7,19 +7,19 @@ languages/pipp/t/harness - A harness for Pipp
 
 =head1 SYNOPSIS
 
-  cd languages && perl -I../lib pipp/t/harness --files
+  cd languages && perl pipp/t/harness --files
 
-  cd languages && perl -I../lib pipp/t/harness 
+  cd languages && perl pipp/t/harness 
 
-  cd languages && perl -I../lib pipp/t/harness --with-php
+  cd languages && perl pipp/t/harness --with-php
 
-  cd languages && perl -I../lib pipp/t/harness --with-phc
+  cd languages && perl pipp/t/harness --with-phc
 
-  cd languages && perl -I../lib pipp/t/harness --with-antlr3
+  cd languages && perl pipp/t/harness --with-antlr3
 
-  cd languages && perl -I../lib pipp/t/harness --with-pct
+  cd languages && perl pipp/t/harness --with-pct
 
-  cd languages && perl -I../lib pipp/t/harness \
+  cd languages && perl pipp/t/harness \
                    pipp/t/hello.t 
 
 =head1 DESCRIPTION
@@ -48,10 +48,11 @@ use Parrot::Config;
 use Getopt::Long;
 use Parrot::Harness::Smoke;
 
-my ( $files_flag, $send_to_smolder_flag, $archive_flag );
+my ( $files_flag, $master_flag, $send_to_smolder_flag, $archive_flag );
 my ( $php_flag, $pct_flag, $antlr3_flag, $phc_flag );
 GetOptions(
-    'file'            => \$files_flag,
+    'files'           => \$files_flag,
+    'master'          => \$master_flag,          # unused, but passed by languages/t/harness
     'send-to-smolder' => \$send_to_smolder_flag,
     'archive'         => \$archive_flag,
     'with-antlr3'     => \$antlr3_flag,
@@ -63,9 +64,10 @@ GetOptions(
 my $language = 'pipp';
 
 if ( $files_flag ) {
-    # Only the Makefile in 'parrot/languages' uses --files
+    # Only the Makefile in 'parrot/languages' uses --files for unified testing
     my $dir = File::Spec->catfile( $language, 't' );
-    my @files = glob( File::Spec->catfile( $dir, '*/*.t' ) );
+    # unified testing can't handle test scripts written in PHP
+    my @files = grep { ! m/in_php/ && ! m/pmc/ } glob( File::Spec->catfile( $dir, '*/*.t' ) );
     print join( "\n", @files );
     print "\n" if scalar(@files);
 } else { 
