@@ -28,11 +28,12 @@ These are the vtable functions for the namespace PMC.
 
 #include "parrot/parrot.h"
 
-static void add_to_class(Interp *interp, 
+static void add_to_class(
+        Interp *interp,
         Parrot_NameSpace_attributes * const nsinfo,
         PMC * const classobj,
         STRING *key,
-        PMC *value)  {
+        PMC *value ) {
     /* Insert it in class, if there is a class */
     if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
         VTABLE_add_method(interp, classobj, key, value);
