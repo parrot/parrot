@@ -11,23 +11,19 @@
 .end
 
 
-.sub '__new_from_string'
-    .param pmc class
-    .param pmc str
-    .param int flags
+.sub 'set_string_native' :vtable :method
+    .param string str
 
-    .local pmc self
-    $S0  = typeof class
-    self = new $S0
+    .local pmc code
+    code = new 'String'
+    code = str
 
     .local pmc pos
     pos = new 'Integer'
     pos = 0
 
-    setattribute self, '$code', str
-    setattribute self, '$pos',  pos
-
-    .return(self)
+    setattribute self, '$code', code
+    setattribute self, '$pos', pos
 .end
 
 

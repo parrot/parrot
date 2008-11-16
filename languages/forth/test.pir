@@ -113,8 +113,8 @@ missing_output:
 
 exception:
     .local pmc except
-    get_results '0', except
-    output = except[0]
+    .get_results (except)
+    output = except
 
 compare:
     if output == expected goto ok

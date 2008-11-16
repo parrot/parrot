@@ -60,10 +60,10 @@ loop:
     $S0 = readline stdin
     unless stdin goto end
 
-#    push_eh exception
+    push_eh exception
       $P0 = forth($S0)
       $P0()
-#    pop_eh
+    pop_eh
 
     print " ok\n"
     goto loop
@@ -71,8 +71,8 @@ end:
     .return()
 
 exception:
-    get_results '0', $P0
-    $S0 = $P0[0]
+    .get_results ($P0)
+    $S0 = $P0
     print $S0
     print "\n"
     goto loop
@@ -80,11 +80,12 @@ exception:
 
 
 .sub ' compile'
-    .param pmc input
+    .param string input
 
     .local pmc code, stream, stack
     code   = new 'CodeString'
-    stream = new 'TokenStream', input
+    stream = new 'TokenStream'
+    set stream, input
     stack  = new 'VirtualStack'
 
     code.'emit'(<<"END_PIR")
