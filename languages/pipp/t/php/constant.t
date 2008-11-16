@@ -26,164 +26,164 @@ use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 use Parrot::Test   tests => 21;
 use Parrot::Config qw( %PConfig );
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), string' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'define() and constant(), string' );
 <?php
 
 define( "THIS_IS", "it" );
 echo constant("THIS_IS"), "\n";
-END_CODE
+CODE
 it
-END_OUT
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), integer' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'define() and constant(), integer' );
 <?php
 
 define( "TEN_TIMES_TEN", 100 );
 echo constant("TEN_TIMES_TEN"), "\n";
-END_CODE
+CODE
 100
-END_OUT
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), FALSE' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'define() and constant(), FALSE' );
 <?php
 
 define( "FAUX", FALSE );
 echo constant("FAUX"), "\n";
-END_CODE
+CODE
 
-END_OUT
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), NULL' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'define() and constant(), NULL' );
 <?php
 
 define( "NUL", NULL );
 echo constant("NUL"), "\n";
-END_CODE
+CODE
 
-END_OUT
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), Float' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'define() and constant(), Float' );
 <?php
 
 define( "PI", 3.14159 );
 echo constant("PI"), "\n";
-END_CODE
+CODE
 3.14159
-END_OUT
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and constant(), TRUE' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'define() and constant(), TRUE' );
 <?php
 
 define( "VRAI", TRUE );
 echo constant("VRAI"), "\n";
-END_CODE
+CODE
 1
-END_OUT
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and echo, String' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'define() and echo, String' );
 <?php
 
 define( "THIS_IS", "it" );
 echo THIS_IS;
 echo "\n";
-END_CODE
+CODE
 it
-END_OUT
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and echo, Float' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'define() and echo, Float' );
 <?php
 
 define( "PI", 3.14159 );
 echo PI, "\n";
-END_CODE
+CODE
 3.14159
-END_OUT
+OUT
 
-language_output_like( 'Pipp', <<'END_CODE', <<'END_OUT', 'define(), Array' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'define(), Array' );
 <?php
   $hello['world'] = 'hi';
   define( "HELLO", $hello );
-END_CODE
+CODE
 /Constants may only evaluate to scalar values/
-END_OUT
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() write once' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'define() write once' );
 <?php
 
   echo define( 'MY_VAR', 'Ok' ), "\n";
   echo define( 'MY_VAR', 'redefine' ), "\n";
   echo MY_VAR, "\n";
-END_CODE
+CODE
 1
 
 Ok
-END_OUT
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'define() and defined()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'define() and defined()' );
 <?php
 
 define( "PI", 3.14159 );
 echo defined("PI"), "\n";
 echo defined("UNDEF_PI"), "\n";
-END_CODE
+CODE
 1
 
-END_OUT
+OUT
 
-language_output_like( 'Pipp', <<'END_CODE', <<'END_OUT', 'constant() undefined' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'constant() undefined' );
 <?php
 
   echo constant("UNDEF_CST");
-END_CODE
+CODE
 /Couldn't find constant UNDEF_CST/
-END_OUT
+OUT
 
 # predefined constants
 
-language_output_is( 'Pipp', <<'END_CODE', $PConfig{osname}, 'PHP_OS' );
+language_output_is( 'Pipp', <<'CODE', $PConfig{osname}, 'PHP_OS' );
 <?php
 echo constant("PHP_OS");
-END_CODE
+CODE
 
-language_output_is( 'Pipp', <<'END_CODE', '5.3.0 on Parrot', 'PHP_VERSION' );
+language_output_is( 'Pipp', <<'CODE', '5.3.0 on Parrot', 'PHP_VERSION' );
 <?php
 echo constant("PHP_VERSION");
-END_CODE
+CODE
 
-language_output_is( 'Pipp', <<'END_CODE', '5', 'PHP_MAJOR_VERSION' );
+language_output_is( 'Pipp', <<'CODE', '5', 'PHP_MAJOR_VERSION' );
 <?php
 echo constant("PHP_MAJOR_VERSION");
-END_CODE
+CODE
 
-language_output_is( 'Pipp', <<'END_CODE', '3', 'PHP_MINOR_VERSION' );
+language_output_is( 'Pipp', <<'CODE', '3', 'PHP_MINOR_VERSION' );
 <?php
 echo constant("PHP_MINOR_VERSION");
-END_CODE
+CODE
 
-language_output_is( 'Pipp', <<'END_CODE', '0', 'PHP_RELEASE_VERSION' );
+language_output_is( 'Pipp', <<'CODE', '0', 'PHP_RELEASE_VERSION' );
 <?php
 echo constant("PHP_RELEASE_VERSION");
-END_CODE
+CODE
 
-language_output_is( 'Pipp', <<'END_CODE', ' on Parrot', 'PHP_EXTRA_VERSION' );
+language_output_is( 'Pipp', <<'CODE', ' on Parrot', 'PHP_EXTRA_VERSION' );
 <?php
 echo constant("PHP_EXTRA_VERSION");
-END_CODE
+CODE
 
-language_output_is( 'Pipp', <<'END_CODE', '50300', 'PHP_VERSION_ID' );
+language_output_is( 'Pipp', <<'CODE', '50300', 'PHP_VERSION_ID' );
 <?php
 echo constant("PHP_VERSION_ID");
-END_CODE
+CODE
 
-language_output_is( 'Pipp', <<'END_CODE', '0', 'PHP_ZTS' );
+language_output_is( 'Pipp', <<'CODE', '0', 'PHP_ZTS' );
 <?php
 echo constant("PHP_ZTS");
-END_CODE
+CODE
 
-language_output_is( 'Pipp', <<'END_CODE', '5', 'PHP_MAJOR_VERSION' );
+language_output_is( 'Pipp', <<'CODE', '5', 'PHP_MAJOR_VERSION' );
 <?php
 echo PHP_MAJOR_VERSION;
-END_CODE
+CODE
 
 
 # Local Variables:
