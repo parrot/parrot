@@ -28,6 +28,27 @@ These are the vtable functions for the namespace PMC.
 
 #include "parrot/parrot.h"
 
+static void add_to_class(Interp *interp, 
+        Parrot_NameSpace_attributes * const nsinfo,
+        PMC * const classobj,
+        STRING *key,
+        PMC *value)  {
+    /* Insert it in class, if there is a class */
+    if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
+        VTABLE_add_method(interp, classobj, key, value);
+
+    /* Otherwise, store it in the namespace for the class to
+     * retrieve later */
+    else {
+        /* If we don't have a place to hang methods, make one. */
+        if (PMC_IS_NULL(nsinfo->methods))
+            nsinfo->methods = pmc_new(interp, enum_class_Hash);
+
+        /* Insert it. */
+        VTABLE_set_pmc_keyed_str(interp, nsinfo->methods, key, value);
+    }
+}
+
 /*
  * Typically a named slot contains either another namespace or a
  * var/sub (not both).
@@ -163,8 +184,7 @@ really a public API.
 */
 
     VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
-        const int   val_is_NS =
-            value->vtable->base_type == enum_class_NameSpace;
+        const int   val_is_NS = value->vtable->base_type == enum_class_NameSpace;
         PMC        *new_tuple = NULL;
         PMC * const old       = (PMC *)parrot_hash_get(INTERP, NS_HASH(SELF), key);
 
@@ -199,26 +219,12 @@ really a public API.
                         nsinfo->vtable = vtable = pmc_new(interp, enum_class_Hash);
 
                     /* Insert it. */
-                    VTABLE_set_pmc_keyed_int(INTERP, vtable,
-                        sub->vtable_index, value);
+                    VTABLE_set_pmc_keyed_int(INTERP, vtable, sub->vtable_index, value);
                 }
             }
 
             if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
-                /* Insert it in class, if there is a class */
-                if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
-                    VTABLE_add_method(interp, classobj, key, value);
-
-                /* Otherwise, store it in the namespace for the class to
-                 * retrieve later */
-                else {
-                    /* If we don't have a place to hang methods, make one. */
-                    if (PMC_IS_NULL(nsinfo->methods))
-                        nsinfo->methods = pmc_new(interp, enum_class_Hash);
-
-                    /* Insert it. */
-                    VTABLE_set_pmc_keyed_str(INTERP, nsinfo->methods, key, value);
-                }
+              add_to_class(INTERP, nsinfo, classobj, key, value);
             }
 
             /* If it's anonymous, we're done. */
@@ -232,19 +238,7 @@ really a public API.
             PMC              * const classobj = VTABLE_get_class(interp, SELF);
 
             /* Insert it in class, if there is a class */
-            if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
-                VTABLE_add_method(interp, classobj, key, value);
-
-            /* Otherwise, store it in the namespace for the class to
-             * retrieve later */
-            else {
-                /* If we don't have a place to hang methods, make one. */
-                if (PMC_IS_NULL(nsinfo->methods))
-                    nsinfo->methods = pmc_new(interp, enum_class_Hash);
-
-                /* Insert it. */
-                VTABLE_set_pmc_keyed_str(INTERP, nsinfo->methods, key, value);
-            }
+              add_to_class(INTERP, nsinfo, classobj, key, value);
         }
 
         /* If it's a multi-sub... */
@@ -258,20 +252,7 @@ really a public API.
                 Parrot_sub * const sub = PMC_sub(VTABLE_get_pmc_keyed_int(interp, value, 0));
 
                 if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
-                    /* Insert it in class, if there is a class */
-                    if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
-                        VTABLE_add_method(interp, classobj, key, value);
-
-                    /* Otherwise, store it in the namespace for the class to
-                     * retrieve later */
-                    else {
-                        /* If we don't have a place to hang methods, make one. */
-                        if (PMC_IS_NULL(nsinfo->methods))
-                            nsinfo->methods = pmc_new(interp, enum_class_Hash);
-
-                        /* Insert it. */
-                        VTABLE_set_pmc_keyed_str(INTERP, nsinfo->methods, key, value);
-                    }
+                    add_to_class(INTERP, nsinfo, classobj, key, value);
 
                     SUPER(key, value);
                 }
