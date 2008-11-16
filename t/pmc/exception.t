@@ -677,6 +677,7 @@ CODE
 /No such string attribute/
 OUTPUT
 
+#RT #60556
 pir_output_is( <<'CODE', <<'OUTPUT', "catch ex from C-level MULTI function", todo => "broken" );
 .sub main :main
 
