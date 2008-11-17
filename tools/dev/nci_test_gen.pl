@@ -12,7 +12,7 @@ sub perl_test_prefix {
 my $temp = <<'EOT';
 #! perl
 # Copyright (C) 2001-2008, The Perl Foundation.
-# $Id: nci.t 32277 2008-11-01 21:24:24Z tewk $
+# $Id$
 
 use strict;
 use warnings;
@@ -119,7 +119,7 @@ my $sig_ret_type_id = {
 };
 my $sig_arg_type_id = { %$sig_ret_type_id };
 $sig_arg_type_id->{'c'} = "c";
-    
+
 my $c_ret_type_id = {
   'i' => "int ",
   't' => "char *",
@@ -173,7 +173,7 @@ sub gen_rand_string {
 sub gen_rand_hexaddr {
   my $i_to_hex = {
     0 => 0, 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7, 8 => 8, 9=>9,
-    10 => 'a', 11 => 'b', 12 => 'c', 13 => 'd', 14 => 'e', 15 => 'f', 
+    10 => 'a', 11 => 'b', 12 => 'c', 13 => 'd', 14 => 'e', 15 => 'f',
   };
   my $hex = "0x";
   for (1 .. 8) {
@@ -230,7 +230,7 @@ sub gen_pir_sig {
   my ($sig) = @_;
   my @pirsigs;
   my @pirsigssay;
-  
+
   for my $cursigc (split('', substr($sig, 1, length $sig))) {
     my ($w, $uw) = gen_rand_wrapped_value($cursigc);
     push @pirsigs, $w;
@@ -247,7 +247,7 @@ sub gen_c_sig {
   my @csig;
   my @printfformat;
   my @printfsig;
- 
+
   my $i = 1;
   for my $cursigc (split('', substr($sig, 1, length $sig))) {
     push @csig, $c_ret_type_id->{$cursigc} ."_$i";
@@ -291,7 +291,7 @@ EOT
   my $output = "\n$pirsigsay"  unless $pirsigsay eq "";
   unless ($pirretval eq "") {
     $output .= "\n" unless $output eq "";
-    $output .= "$pirretval" 
+    $output .= "$pirretval"
   }
 
   return (gen_perl_test($sig, $pircode, $output), $ccode);
