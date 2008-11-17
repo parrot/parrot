@@ -73,10 +73,10 @@ new/pirmacro$(O): new/pirmacro.c new/pirmacro.h
 new/pirregalloc$(O): new/pirregalloc.c new/pirregalloc.h
 
 test: all
-	perl t/harness t/*.t
 	podchecker $(SOURCES) \
 	doc/design.pod \
-    README.pod
+	README.pod
+	perl t/harness
 
 # regenerate the Makefile
 Makefile: $(BUILD_DIR)/config/gen/makefiles/pirc.in

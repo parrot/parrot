@@ -9,9 +9,11 @@ use lib '../../lib';
 
 use Test::Harness;
 
+my @tests = @ARGV ? @ARGV : <t/*.t>;
+
 eval { require TAP::Harness };
 if ($@) {
-    Test::Harness::runtests( @ARGV );
+    Test::Harness::runtests( @tests );
     exit;
 }
 else {
@@ -22,6 +24,6 @@ else {
         directives => 1,
     });
 
-    my $results = $harness->runtests(@ARGV);
+    my $results = $harness->runtests(@tests);
     exit ( $results->all_passed() ? 0 : 1 );
 }
