@@ -106,7 +106,6 @@ Call the OS with C<cmd>, return the ouput.
 .sub '`' :method
    .param string cmd
    .local pmc pipe
-   print "cmd="
    pipe = open cmd, "-|"
    .local string buffer
    .local pmc output
@@ -143,6 +142,17 @@ Call the OS, return C<true> if successful, otherwise  C<false>
 .sub 'exit!' :method
     .param int return
     exit return
+.end
+
+.sub callcc :method
+        .param pmc block :named('!BLOCK')
+        .local pmc cont
+        cont = new 'CardinalContinuation'
+        set_addr cont, done
+        block(cont)
+        goto done
+
+        done:
 .end
 
 =back

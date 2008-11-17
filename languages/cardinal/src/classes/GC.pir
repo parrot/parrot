@@ -54,11 +54,11 @@ Perform initializations and create the GC class
         $P1 = 1
         setattribute self, '$!disabled', $P1
         collectoff
-        $P0 = 'CardinalString'
+        $P0 = new 'CardinalString'
         $P0 = 'false'
         .return ($P0)
    already_disabled:
-        $P0 = 'CardinalString'
+        $P0 = new 'CardinalString'
         $P0 = 'true'
         .return ($P0)
 .end
@@ -68,7 +68,7 @@ Perform initializations and create the GC class
    if $P0 == 1 goto enable
    goto already_enabled
    already_enabled:
-        $P0 = 'CardinalString'
+        $P0 = new 'CardinalString'
         $P0 = 'false'
         .return ($P0)
    enable:
@@ -76,7 +76,7 @@ Perform initializations and create the GC class
         $P1 = 0
         setattribute self, '$!disabled', $P1
         collecton
-        $P0 = 'CardinalString'
+        $P0 = new 'CardinalString'
         $P0 = 'true'
         .return ($P0)
 .end
@@ -85,6 +85,39 @@ Perform initializations and create the GC class
     collect
     $P0 = get_hll_global 'nil'
     .return ($P0)
+.end
+
+.sub 'each_object' :method
+    .param pmc block :named('!BLOCK')
+    .local pmc addr_space, itr
+    .local pmc test
+    .return(1)
+    test = new 'CardinalString'
+    test = "yo"
+    # Nope AddrResgistry is not what I expected, we cant use it.
+    # We need to create Hash to store all the objects, Use WeakRefs to store the pmcs?
+    addr_space = new 'AddrRegistry'
+    $I0 = get_addr test
+    addr_space[$I0] = test
+    #$P0 = addr_space.'methods'()
+    #say $P0
+    itr = new 'Iterator', addr_space
+    print "created iterator: "
+    say itr
+    $S0 = typeof itr
+    print "itr type="
+    say $S0
+    itr_loop:
+        unless itr goto itr_end
+        $P0 = shift itr
+        $I0 = defined $P0
+        unless $I0 goto itr_loop
+        print "found: "
+        say $P0
+        goto itr_loop
+    itr_end:
+        say "done looping thru addr_space"
+        .return ()
 .end
 
 # Local Variables:

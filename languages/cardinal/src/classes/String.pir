@@ -24,7 +24,7 @@ Stolen from Rakudo
     .local pmc cardinalmeta, strproto
     cardinalmeta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
     strproto = cardinalmeta.'new_class'('CardinalString', 'parent'=>'String CardinalObject')
-    cardinalmeta.'register'('CardinalString', 'parent'=>'CardinalObject', 'protoobject'=>strproto)
+    cardinalmeta.'register'('String', 'parent'=>'CardinalObject', 'protoobject'=>strproto)
 .end
 
 .sub 'new' :method :multi(_)
@@ -99,7 +99,6 @@ Returns a new CardinalString with the characters of C<self> in reverse order.
 .sub 'reverse' :method
     .local pmc res
     .local int i
-    .local string str
 
     res = new 'CardinalString'
 

@@ -18,10 +18,13 @@ Perform initializations and create the Math class
 
 .namespace ['Math']
 
+
+.const num PI = 3.14159265358979
+
 .sub 'onload' :anon :init :load
     .local pmc cardinalmeta
     $P0 = get_hll_global ['CardinalObject'], '!CARDINALMETA'
-    cardinalmeta = $P0.'new_class'('Math', 'parent'=>'', 'attr'=>'$!PI')
+    cardinalmeta = $P0.'new_class'('Math', 'parent'=>'', 'attr'=>'')
     #cardinalmeta = $P0.'HOW'()
     #set_hll_global ['Math'], '!CARDINALMETA', cardinalmeta
 
@@ -132,6 +135,11 @@ Perform initializations and create the Math class
     .return ($N0)
 .end
 
+.sub 'sqrt' :method
+    .param num arg
+    sqrt $N0, arg
+    .return ($N0)
+.end
 
 # Local Variables:
 #   mode: pir

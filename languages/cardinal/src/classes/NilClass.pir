@@ -23,6 +23,12 @@ Return the elements of the list concatenated.
     .return($P0)
 .end
 
+.sub 'to_i' :method
+    $P0 = new 'CardinalInteger'
+    $P0 = 0
+    .return ($P0)
+.end
+
 .sub 'to_a' :method
     $P0 = new 'CardinalArray'
     .return ($P0)
@@ -32,6 +38,11 @@ Return the elements of the list concatenated.
     $P0 = new 'CardinalString'
     $P0 = ''
     .return($P0)
+.end
+
+.sub 'nil?' :method
+    $P0 = get_hll_global ['Bool'], 'True'
+    .return ($P0)
 .end
 
 .namespace []

@@ -53,12 +53,23 @@ Returns true if he object is defined, false otherwise
    .return ($I0)
 .end
 
-.sub 'initialize' :method
+.sub 'initialize' :method :multi(_,_)
+    .param pmc t
+    $P0 = new 'CardinalInteger'
+    $P0 = t
+    setattribute self, '$!time_in_millis', $P0
+    $P1 = get_hll_global['Bool'], 'False'
+    # TODO fix this, check gmt then set to appropriate value
+    setattribute self, '$!gmt', $P1
+.end
+
+.sub 'initialize' :method :multi(_)
     time $I0
     $P0 = new 'CardinalInteger'
     $P0 = $I0
     setattribute self, '$!time_in_millis', $P0
     $P1 = get_hll_global['Bool'], 'False'
+    # TODO fix this, check gmt then set to appropriate value
     setattribute self, '$!gmt', $P1
 .end
 

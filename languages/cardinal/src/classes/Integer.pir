@@ -24,7 +24,6 @@ CardinalInteger - Cardinal integers
     cardinalmeta.'register'('Float', 'parent'=>'CardinalObject', 'protoobject'=>intproto)
 .end
 
-
 =item ACCEPTS()
 
 =cut
@@ -33,7 +32,6 @@ CardinalInteger - Cardinal integers
     .param num topic
     .tailcall 'infix:=='(topic, self)
 .end
-
 
 =item perl()
 
@@ -59,7 +57,8 @@ Returns a CardinalString representation of the CardinalInteger.
 
 .sub 'to_s' :method
     $P0 = new 'CardinalString'
-    $P0 = self
+    $S0 = self
+    $P0 = $S0
     .return($P0)
 .end
 
