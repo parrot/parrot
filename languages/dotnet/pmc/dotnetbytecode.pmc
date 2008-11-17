@@ -145,7 +145,7 @@ pmclass DotNetBytecode dynpmc group dotnet {
     METHOD INTVAL read_int8()
     {
         dotnet_bytecode *bc = (dotnet_bytecode *)PMC_struct_val(SELF);
-        INTVAL           result;
+        INTVAL           result = 0;
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
@@ -168,7 +168,7 @@ pmclass DotNetBytecode dynpmc group dotnet {
     METHOD INTVAL read_uint8()
     {
         dotnet_bytecode *bc = (dotnet_bytecode *)PMC_struct_val(SELF);
-        INTVAL           result;
+        INTVAL           result = 0;
 
         /* Handle cases where we've an invalid PMC. */
         if (!bc)
@@ -181,7 +181,7 @@ pmclass DotNetBytecode dynpmc group dotnet {
                "Read past end of bytecode");
 
         /* Otherwise read the value. */
-        result = (INTVAL)bc->body[bc->cur_pos];
+        result = (INTVAL)((unsigned char)bc->body[bc->cur_pos]);
         bc->cur_pos++;
         RETURN(INTVAL result);
     }
@@ -190,7 +190,7 @@ pmclass DotNetBytecode dynpmc group dotnet {
     /* Read a signed 16-bit integer. */
     METHOD INTVAL read_int16()
     {
-        INTVAL           result;
+        INTVAL           result  = 0;
         dotnet_bytecode *bc      = (dotnet_bytecode *)PMC_struct_val(SELF);
         char            *val_ptr = (char *)&result;
 
@@ -223,7 +223,7 @@ pmclass DotNetBytecode dynpmc group dotnet {
     /* Read an unsigned 16-bit integer. */
     METHOD INTVAL read_uint16()
     {
-        INTVAL           result;
+        INTVAL           result  = 0;
         dotnet_bytecode *bc      = (dotnet_bytecode *)PMC_struct_val(SELF);
         char            *val_ptr = (char *)&result;
 
@@ -256,7 +256,7 @@ pmclass DotNetBytecode dynpmc group dotnet {
     /* Read a signed 32-bit integer. */
     METHOD INTVAL read_int32()
     {
-        INTVAL           result;
+        INTVAL           result  = 0;
         dotnet_bytecode *bc      = (dotnet_bytecode *)PMC_struct_val(SELF);
         char            *val_ptr = (char *)&result;
 
@@ -293,7 +293,7 @@ pmclass DotNetBytecode dynpmc group dotnet {
     /* Read an unsigned 32-bit integer. */
     METHOD INTVAL read_uint32()
     {
-        INTVAL           result;
+        INTVAL           result  = 0;
         dotnet_bytecode *bc      = (dotnet_bytecode *)PMC_struct_val(SELF);
         char            *val_ptr = (char *)&result;
 
@@ -330,7 +330,7 @@ pmclass DotNetBytecode dynpmc group dotnet {
     /* Read a 32-bit (single precision) floating pointer number. */
     METHOD FLOATVAL read_float32()
     {
-        FLOATVAL         result;
+        FLOATVAL         result  = 0;
         dotnet_bytecode *bc      = (dotnet_bytecode *)PMC_struct_val(SELF);
         char            *val_ptr = (char *)&result;
 
@@ -368,7 +368,7 @@ pmclass DotNetBytecode dynpmc group dotnet {
     METHOD FLOATVAL read_float64()
     {
         int              i;
-        FLOATVAL         result;
+        FLOATVAL         result  = 0;
         dotnet_bytecode *bc      = (dotnet_bytecode *)PMC_struct_val(SELF);
         char            *val_ptr = (char *)&result;
 
@@ -407,7 +407,7 @@ pmclass DotNetBytecode dynpmc group dotnet {
     /* Read a field token (32 bits, unsigned). */
     METHOD INTVAL read_tfield()
     {
-        INTVAL           result;
+        INTVAL           result  = 0;
         dotnet_bytecode *bc      = (dotnet_bytecode *)PMC_struct_val(SELF);
         char            *val_ptr = (char *)&result;
 
@@ -444,7 +444,7 @@ pmclass DotNetBytecode dynpmc group dotnet {
     /* Read a method token (32 bits, unsigned). */
     METHOD INTVAL read_tmethod()
     {
-        INTVAL           result;
+        INTVAL           result  = 0;
         dotnet_bytecode *bc      = (dotnet_bytecode *)PMC_struct_val(SELF);
         char            *val_ptr = (char *)&result;
 
@@ -481,7 +481,7 @@ pmclass DotNetBytecode dynpmc group dotnet {
     /* Read a type token (32 bits, unsigned). */
     METHOD INTVAL read_ttype()
     {
-        INTVAL           result;
+        INTVAL           result  = 0;
         dotnet_bytecode *bc      = (dotnet_bytecode *)PMC_struct_val(SELF);
         char            *val_ptr = (char *)&result;
 
@@ -519,7 +519,7 @@ pmclass DotNetBytecode dynpmc group dotnet {
     /* Read a string token (32 bits, unsigned). */
     METHOD INTVAL read_tstring()
     {
-        INTVAL           result;
+        INTVAL           result  = 0;
         dotnet_bytecode *bc      = (dotnet_bytecode *)PMC_struct_val(SELF);
         char            *val_ptr = (char *)&result;
 
