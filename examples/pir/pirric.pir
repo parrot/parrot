@@ -191,20 +191,20 @@ read_args:
     if arg == '-t' goto opt_tron
 
     #say arg
-    program.load(arg)
+    program.'load'(arg)
 
     $I0 = 1
     goto start
 
 opt_tron:
-    runner.trace(1)
+    runner.'trace'(1)
     inc $I1
     goto read_args
 
 no_prog:
     $I0 = 0
 start:
-    $I1 = runner.runloop($I0)
+    $I1 = runner.'runloop'($I0)
     exit $I1
 .end
 
@@ -345,7 +345,7 @@ done:
     $P4 = new 'Integer'
     setattribute self, 'exitcode', $P4
 
-    self.clear_vars()
+    self.'clear_vars'()
 .end
 
 #-----------------------------------------------------------------------
@@ -401,7 +401,7 @@ done:
 .sub clear_all :method
     .local pmc stack
 
-    self.clear_vars()
+    self.'clear_vars'()
     stack = getattribute self, 'stack'
     stack = 0
 .end
@@ -434,8 +434,8 @@ done:
 
     .local pmc arg
 
-    arg = self.evaluate(tokenizer)
-    $P0 = tokenizer.get()
+    arg = self.'evaluate'(tokenizer)
+    $P0 = tokenizer.'get'()
     $I0 = defined $P0
     unless $I0 goto fail
     ne $P0, ')', fail
@@ -458,8 +458,8 @@ fail:
 
     .local pmc arg
 
-    arg = self.evaluate(tokenizer)
-    $P0 = tokenizer.get()
+    arg = self.'evaluate'(tokenizer)
+    $P0 = tokenizer.'get'()
     $I0 = defined $P0
     unless $I0 goto fail
     ne $P0, ')', fail
@@ -474,13 +474,13 @@ fail:
 
     .local pmc arg1, arg2
 
-    arg1 = self.evaluate(tokenizer)
-    $P0 = tokenizer.get()
+    arg1 = self.'evaluate'(tokenizer)
+    $P0 = tokenizer.'get'()
     $I0 = defined $P0
     unless $I0 goto fail
     ne $P0, ',', fail
-    arg2 = self.evaluate(tokenizer)
-    $P0 = tokenizer.get()
+    arg2 = self.'evaluate'(tokenizer)
+    $P0 = tokenizer.'get'()
     $I0 = defined $P0
     unless $I0 goto fail
     ne $P0, ')', fail
@@ -499,21 +499,21 @@ fail:
     .local pmc delim
 
     args = new 'ResizablePMCArray'
-    token = tokenizer.get()
+    token = tokenizer.'get'()
     $I0 = defined token
     unless $I0 goto fail
     eq token, ')', empty
     null arg
-    arg = self.evaluate(tokenizer, token)
+    arg = self.'evaluate'(tokenizer, token)
 nextarg:
     push args, arg
     null arg
-    delim = tokenizer.get()
+    delim = tokenizer.'get'()
     $I0 = defined delim
     unless $I0 goto fail
     eq delim, ')', endargs
     ne delim, ',', fail
-    arg = self.evaluate(tokenizer)
+    arg = self.'evaluate'(tokenizer)
     goto nextarg
 endargs:
     .return(args)
@@ -528,9 +528,9 @@ fail:
 .sub predef_new :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
-    $P1 = self.get_1_arg(tokenizer)
+    $P1 = self.'get_1_arg'(tokenizer)
     $S1 = $P1
     #print 'NEW: '
     #say $S1
@@ -545,9 +545,9 @@ fail:
 .sub predef_isa :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
-    ($P1, $P2) = self.get_2_args(tokenizer)
+    ($P1, $P2) = self.'get_2_args'(tokenizer)
     $I0 = isa $P1, $P2
     $P0 = new 'Integer'
     $P0 = $I0
@@ -560,9 +560,9 @@ fail:
 .sub predef_chr :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
-    $P2 = self.get_1_arg(tokenizer)
+    $P2 = self.'get_1_arg'(tokenizer)
 
     $I0 = $P2
     $S0 = chr $I0
@@ -579,9 +579,9 @@ fail:
 .sub predef_asc :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
-    $P2 = self.get_1_arg(tokenizer)
+    $P2 = self.'get_1_arg'(tokenizer)
 
     $S0 = $P2
     $I0 = ord $S0
@@ -596,10 +596,10 @@ fail:
 .sub predef_len :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
     null $P5
-    $P5 = self.get_1_arg(tokenizer)
+    $P5 = self.'get_1_arg'(tokenizer)
 
     $S5 = $P5
     $I0 = length $S5
@@ -614,11 +614,11 @@ fail:
 .sub predef_left :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
     null $P5
     null $P6
-    ($P5, $P6) = self.get_2_args(tokenizer)
+    ($P5, $P6) = self.'get_2_args'(tokenizer)
 
     $S0 = $P5
     $I0 = $P6
@@ -634,11 +634,11 @@ fail:
 .sub predef_right :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
     null $P5
     null $P6
-    ($P5, $P6) = self.get_2_args(tokenizer)
+    ($P5, $P6) = self.'get_2_args'(tokenizer)
 
     $S0 = $P5
     $I0 = $P6
@@ -656,9 +656,9 @@ fail:
 .sub predef_mid :method
     .param pmc tokenizer
 
-    $P0 = tokenizer.get()
+    $P0 = tokenizer.'get'()
     ne $P0, '(', fail
-    $P1 = self.get_args(tokenizer)
+    $P1 = self.'get_args'(tokenizer)
     $I0 = $P1
     lt $I0, 2, fail
     gt $I0, 3, fail
@@ -683,11 +683,11 @@ fail:
 .sub predef_complex :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
     null $P5
     null $P6
-    ($P5, $P6) = self.get_2_args(tokenizer)
+    ($P5, $P6) = self.'get_2_args'(tokenizer)
     $P7 = new 'Complex'
     $N5 = $P5
     $N6 = $P6
@@ -702,10 +702,10 @@ fail:
 .sub predef_exp :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
-    $P2 = self.get_numeric_arg(tokenizer)
-    $P3 = $P2.exp()
+    $P2 = self.'get_numeric_arg'(tokenizer)
+    $P3 = $P2.'exp'()
     .return($P3)
 fail:
     SyntaxError()
@@ -715,10 +715,10 @@ fail:
 .sub predef_ln :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
-    $P2 = self.get_numeric_arg(tokenizer)
-    $P3 = $P2.ln()
+    $P2 = self.'get_numeric_arg'(tokenizer)
+    $P3 = $P2.'ln'()
     .return($P3)
 fail:
     SyntaxError()
@@ -728,10 +728,10 @@ fail:
 .sub predef_sin :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
-    $P2 = self.get_numeric_arg(tokenizer)
-    $P3 = $P2.sin()
+    $P2 = self.'get_numeric_arg'(tokenizer)
+    $P3 = $P2.'sin'()
     .return($P3)
 fail:
     SyntaxError()
@@ -741,10 +741,10 @@ fail:
 .sub predef_sinh :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
-    $P2 = self.get_numeric_arg(tokenizer)
-    $P3 = $P2.sinh()
+    $P2 = self.'get_numeric_arg'(tokenizer)
+    $P3 = $P2.'sinh'()
     .return($P3)
 fail:
     SyntaxError()
@@ -754,10 +754,10 @@ fail:
 .sub predef_cos :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
-    $P2 = self.get_numeric_arg(tokenizer)
-    $P3 = $P2.cos()
+    $P2 = self.'get_numeric_arg'(tokenizer)
+    $P3 = $P2.'cos'()
     .return($P3)
 fail:
     SyntaxError()
@@ -767,10 +767,10 @@ fail:
 .sub predef_cosh :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
-    $P2 = self.get_numeric_arg(tokenizer)
-    $P3 = $P2.cosh()
+    $P2 = self.'get_numeric_arg'(tokenizer)
+    $P3 = $P2.'cosh'()
     .return($P3)
 fail:
     SyntaxError()
@@ -780,10 +780,10 @@ fail:
 .sub predef_tan :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
-    $P2 = self.get_numeric_arg(tokenizer)
-    $P3 = $P2.tan()
+    $P2 = self.'get_numeric_arg'(tokenizer)
+    $P3 = $P2.'tan'()
     .return($P3)
 fail:
     SyntaxError()
@@ -793,10 +793,10 @@ fail:
 .sub predef_tanh :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
-    $P2 = self.get_numeric_arg(tokenizer)
-    $P3 = $P2.tanh()
+    $P2 = self.'get_numeric_arg'(tokenizer)
+    $P3 = $P2.'tanh'()
     .return($P3)
 fail:
     SyntaxError()
@@ -806,10 +806,10 @@ fail:
 .sub predef_asin :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
-    $P2 = self.get_numeric_arg(tokenizer)
-    $P3 = $P2.asin()
+    $P2 = self.'get_numeric_arg'(tokenizer)
+    $P3 = $P2.'asin'()
     .return($P3)
 fail:
     SyntaxError()
@@ -819,10 +819,10 @@ fail:
 .sub predef_acos :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
-    $P2 = self.get_numeric_arg(tokenizer)
-    $P3 = $P2.acos()
+    $P2 = self.'get_numeric_arg'(tokenizer)
+    $P3 = $P2.'acos'()
     .return($P3)
 fail:
     SyntaxError()
@@ -832,10 +832,10 @@ fail:
 .sub predef_atan :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
-    $P2 = self.get_numeric_arg(tokenizer)
-    $P3 = $P2.atan()
+    $P2 = self.'get_numeric_arg'(tokenizer)
+    $P3 = $P2.'atan'()
     .return($P3)
 fail:
     SyntaxError()
@@ -845,10 +845,10 @@ fail:
 .sub predef_sqr :method
     .param pmc tokenizer
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '(', fail
-    $P2 = self.get_numeric_arg(tokenizer)
-    $P3 = $P2.sqrt()
+    $P2 = self.'get_numeric_arg'(tokenizer)
+    $P3 = $P2.'sqrt'()
     .return($P3)
 fail:
     SyntaxError()
@@ -864,7 +864,7 @@ fail:
 
     $I0 = defined token
     if $I0 goto check
-    token = tokenizer.get()
+    token = tokenizer.'get'()
 check:
     $I0 = defined token
     unless $I0 goto fail
@@ -899,7 +899,7 @@ no_predef:
 
     #say $S0
     .local pmc var
-    var = self.get_var($S0)
+    var = self.'get_var'($S0)
 
     unless_null var, getvar
 
@@ -907,7 +907,7 @@ no_predef:
     $I0 = defined $P0
     if $I0 goto spaced
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     $S1 = $P1
     ne $S1, '(', var_not_defined
 
@@ -915,19 +915,19 @@ no_predef:
     #say $S0
     var = get_hll_global $S0
     if_null var, fail
-    args = self.get_args(tokenizer)
+    args = self.'get_args'(tokenizer)
     $P9 = var(args)
     .return($P9)
 spaced:
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     ne $P1, '.', fail
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     $S1 = $P1
     $P2 = $P0 [$S1]
 
-    $P4 = tokenizer.get()
+    $P4 = tokenizer.'get'()
     eq $P4, '(', getargs
-    tokenizer.back()
+    tokenizer.'back'()
 
     .return($P2)
 
@@ -941,7 +941,7 @@ isfloat:
     .return(token)
 
 getargs:
-    args = self.get_args(tokenizer)
+    args = self.'get_args'(tokenizer)
     $I0 = defined args
     unless $I0 goto emptyargs
 endargs:
@@ -952,16 +952,16 @@ emptyargs:
     .return($P3)
 
 getvar:
-    $P2 = tokenizer.get()
+    $P2 = tokenizer.'get'()
     eq $P2, '.', dotted
-    tokenizer.back()
+    tokenizer.'back'()
     .return(var)
 
 dotted:
-    $P3 = tokenizer.get()
-    $P4 = tokenizer.get()
+    $P3 = tokenizer.'get'()
+    $P4 = tokenizer.'get'()
     eq $P4, '(', methodcall
-    tokenizer.back()
+    tokenizer.'back'()
 
     $S1 = $P3
     $P5 = getattribute token, $S1
@@ -972,7 +972,7 @@ methodcall:
     #say $S2
 
     .local pmc methargs
-    methargs = self.get_args(tokenizer)
+    methargs = self.'get_args'(tokenizer)
     $I0 = defined methargs
     unless $I0 goto memptyargs
     $P5 = var.$S2(methargs :flat)
@@ -983,8 +983,8 @@ memptyargs:
     .return($P2)
 
 parenexp:
-    $P1 = self.evaluate(tokenizer)
-    token = tokenizer.get()
+    $P1 = self.'evaluate'(tokenizer)
+    token = tokenizer.'get'()
     ne token, ')', fail
     .return($P1)
 
@@ -1000,15 +1000,15 @@ fail:
     .param pmc tokenizer
     .param pmc token :optional
 
-    $P0 = self.eval_base(tokenizer, token)
+    $P0 = self.'eval_base'(tokenizer, token)
 again:
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     eq $P1, '[', keyit
-    tokenizer.back()
+    tokenizer.'back'()
     .return($P0)
 keyit:
-    $P2 = self.evaluate(tokenizer)
-    $P1 = tokenizer.get()
+    $P2 = self.'evaluate'(tokenizer)
+    $P1 = tokenizer.'get'()
     eq $P1, ']', last
     ne $P1, ',', fail
     $P3 = $P0 [$P2]
@@ -1032,14 +1032,14 @@ fail:
     .param pmc tokenizer
     .param pmc token :optional
 
-    $P0 = self.eval_base_1(tokenizer, token)
+    $P0 = self.'eval_base_1'(tokenizer, token)
 more:
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     eq $P1, '^', dopow
-    tokenizer.back()
+    tokenizer.'back'()
     .return($P0)
 dopow:
-    $P2 = self.eval_unary(tokenizer)
+    $P2 = self.'eval_unary'(tokenizer)
     null $P3
     $P3 = pow $P0, $P2
     set $P0, $P3
@@ -1051,14 +1051,14 @@ dopow:
 .sub eval_mod :method
     .param pmc tokenizer
     .param pmc token :optional
-    $P0 = self.eval_pow(tokenizer, token)
+    $P0 = self.'eval_pow'(tokenizer, token)
 more:
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     eq $P1, 'MOD', domod
-    tokenizer.back()
+    tokenizer.'back'()
     .return($P0)
 domod:
-    $P2 = self.eval_pow(tokenizer)
+    $P2 = self.'eval_pow'(tokenizer)
     $P3 = clone $P0
     mod $P3, $P2
     set $P0, $P3
@@ -1072,20 +1072,24 @@ domod:
 
     $I0 = defined token
     if $I0 goto check
-    token = tokenizer.get()
-check:
+    token = tokenizer.'get'()
     $I0 = defined token
     unless $I0 goto fail
+check:
+# Quick fix to MMD problem
+    $I0 = isa token, 'Literal'
+    if $I0 goto notoken
 
     eq token, '-', unaryminus
     eq token, '+', unaryplus
-    $P0 = self.eval_mod(tokenizer, token)
+notoken:
+    $P0 = self.'eval_mod'(tokenizer, token)
     .return($P0)
 unaryplus:
-    $P0 = self.eval_unary(tokenizer)
+    $P0 = self.'eval_unary'(tokenizer)
     .return($P0)
 unaryminus:
-    $P0 = self.eval_unary(tokenizer)
+    $P0 = self.'eval_unary'(tokenizer)
     $P1 = clone $P0
     $P1 = 0
     $P1 = $P1 - $P0
@@ -1099,21 +1103,21 @@ fail:
     .param pmc tokenizer
     .param pmc token :optional
 
-    $P0 = self.eval_unary(tokenizer, token)
+    $P0 = self.'eval_unary'(tokenizer, token)
 more:
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     eq $P1, '*', domul
     eq $P1, '/', dodiv
-    tokenizer.back()
+    tokenizer.'back'()
     .return($P0)
 domul:
-    $P2 = self.eval_unary(tokenizer)
+    $P2 = self.'eval_unary'(tokenizer)
     $P3 = clone $P0
     mul $P3, $P2
     set $P0, $P3
     goto more
 dodiv:
-    $P2 = self.eval_unary(tokenizer)
+    $P2 = self.'eval_unary'(tokenizer)
     $P3 = clone $P0
     div $P3, $P2
     set $P0, $P3
@@ -1125,16 +1129,16 @@ dodiv:
     .param pmc tokenizer
     .param pmc token :optional
 
-    $P0 = self.eval_mul(tokenizer, token)
+    $P0 = self.'eval_mul'(tokenizer, token)
 more:
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     eq $P1, '+', doadd
     eq $P1, '-', dosub
-    tokenizer.back()
+    tokenizer.'back'()
     .return($P0)
 
 doadd:
-    $P2 = self.eval_mul(tokenizer)
+    $P2 = self.'eval_mul'(tokenizer)
     clone $P3, $P0
 
     $I3 = isa $P3, 'String'
@@ -1154,7 +1158,7 @@ str_add:
     goto more
 
 dosub:
-    $P2 = self.eval_mul(tokenizer)
+    $P2 = self.'eval_mul'(tokenizer)
     clone $P3, $P0
     sub $P3, $P2
     set $P0, $P3
@@ -1166,16 +1170,16 @@ dosub:
     .param pmc tokenizer
     .param pmc token :optional
 
-    $P0 = self.eval_add(tokenizer, token)
+    $P0 = self.'eval_add'(tokenizer, token)
 more:
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     eq $P1, '=', doequal
     eq $P1, '<', doless
     eq $P1, '>', dogreat
-    tokenizer.back()
+    tokenizer.'back'()
     .return($P0)
 doequal:
-    $P2 = self.eval_add(tokenizer)
+    $P2 = self.'eval_add'(tokenizer)
     clone $P3, $P0
     $I0 = iseq $P3, $P2
     null $P0
@@ -1183,7 +1187,7 @@ doequal:
     set $P0, $I0
     goto more
 doless:
-    $P2 = self.eval_add(tokenizer)
+    $P2 = self.'eval_add'(tokenizer)
     clone $P3, $P0
     $I0 = islt $P3, $P2
     null $P0
@@ -1191,7 +1195,7 @@ doless:
     set $P0, $I0
     goto more
 dogreat:
-    $P2 = self.eval_add(tokenizer)
+    $P2 = self.'eval_add'(tokenizer)
     clone $P3, $P0
     $I0 = isgt $P3, $P2
     null $P0
@@ -1205,7 +1209,7 @@ dogreat:
     .param pmc tokenizer
     .param pmc token :optional
 
-    $P0 = self.eval_comp(tokenizer, token)
+    $P0 = self.'eval_comp'(tokenizer, token)
 #    $I0 = isa $P0, 'Integer'
 #    unless $I0 goto done
 #    say '<Integer'
@@ -1220,7 +1224,7 @@ dogreat:
     .local pmc program
     program = getattribute self, 'program'
     .local pmc iter
-    iter = program.begin()
+    iter = program.'begin'()
 
     .local int fline
 nextline:
@@ -1259,7 +1263,7 @@ noline:
     pcurline = new 'Integer'
     setattribute self, 'curline', pcurline
 
-    iter = program.begin()
+    iter = program.'begin'()
 
     push_eh handle_excep
 
@@ -1270,7 +1274,7 @@ noline:
 
 next:
     if curline goto runit
-    self.interactive()
+    self.'interactive'()
     goto next
 
 runit:
@@ -1286,7 +1290,7 @@ executeline:
 
     .local pmc tokenizer
     tokenizer = newTokenizer($S1)
-    self.execute(tokenizer)
+    self.'execute'(tokenizer)
     unless iter goto endprog
     shift curline, iter
     goto next
@@ -1334,7 +1338,7 @@ handle_stop:
 
 handle_cont:
     unless stopline goto cannot_cont
-    iter = self.findline(stopline)
+    iter = self.'findline'(stopline)
     shift curline, iter
     stopline = 0
     push_eh handle_excep
@@ -1353,7 +1357,7 @@ handle_jump:
     target = $P2
 
 do_jump:
-    iter = self.findline(target)
+    iter = self.'findline'(target)
     if_null iter, noline
     curline = target
 
@@ -1370,7 +1374,7 @@ handle_gosub:
 handle_next:
     $P2 = getattribute $P1, 'jumpline'
     $I1 = $P2
-    iter = self.findline($I1)
+    iter = self.'findline'($I1)
     curline = shift iter
 
 handled_jump:
@@ -1384,7 +1388,7 @@ handle_return:
     unless $I0 goto no_gosub
     $P0 = pop stack
     curline = $P0
-    iter = self.findline(curline)
+    iter = self.'findline'(curline)
     curline = shift iter
     #say curline
     push_eh handle_excep
@@ -1418,7 +1422,7 @@ goto_error:
     $I1 = PIRRIC_ERROR_NORMAL
     $P3 = $I1
     $I0 = $P4
-    iter = self.findline($I0)
+    iter = self.'findline'($I0)
     if_null iter, noline
     curline = $I0
     push_eh handle_excep
@@ -1459,25 +1463,25 @@ reinit:
     .local pmc token
 
     tokenizer = newTokenizer(line)
-    token = tokenizer.get()
+    token = tokenizer.'get'()
     $I0 = isa token, 'Integer'
     unless $I0 goto execute
 
 # Have line number: if has content store it, else delete
     $I0 = token
-    line = tokenizer.getall()
+    line = tokenizer.'getall'()
     $I1 = length line
     unless $I1 goto deleteit
 
-    program.storeline($I0, line)
+    program.'storeline'($I0, line)
     goto reinit
 
 deleteit:
-    program.deleteline($I0)
+    program.'deleteline'($I0)
     goto reinit
 
 execute:
-    self.execute(tokenizer, token)
+    self.'execute'(tokenizer, token)
 .end
 
 #-----------------------------------------------------------------------
@@ -1487,7 +1491,7 @@ execute:
     .param int has :opt_flag
 
     if has goto check
-    token = tokenizer.get()
+    token = tokenizer.'get'()
 check:
     unless token goto next
 
@@ -1507,22 +1511,22 @@ findkey:
     if $I0 goto exec
 
     .local pmc op
-    op = tokenizer.get()
+    op = tokenizer.'get'()
     eq op, '=', assign
     eq op, '[', keyed
     goto fail
 assign:
     .local pmc value
-    value = self.evaluate(tokenizer)
-    self.set_var(key, value)
+    value = self.'evaluate'(tokenizer)
+    self.'set_var'(key, value)
 
     goto next
 keyed:
     .local pmc obj, index, auxobj
-    obj = self.get_var(key)
+    obj = self.'get_var'(key)
 keyed_next:
-    index = self.evaluate(tokenizer)
-    op = tokenizer.get()
+    index = self.'evaluate'(tokenizer)
+    op = tokenizer.'get'()
     eq op, ']', last
     ne op, ',', fail
     auxobj = obj[index]
@@ -1532,9 +1536,9 @@ keyed_next:
     null auxobj
     goto keyed_next
 last:
-    op = tokenizer.get()
+    op = tokenizer.'get'()
     ne op, '=', fail
-    value = self.evaluate(tokenizer)
+    value = self.'evaluate'(tokenizer)
     obj[index] = value
     goto next
 fail:
@@ -1581,7 +1585,7 @@ setattrs:
 .sub func_CLEAR :method
     .param pmc tokenizer
 
-    self.clear_all()
+    self.'clear_all'()
 .end
 
 .sub func_CONT :method
@@ -1612,7 +1616,7 @@ setattrs:
     .param pmc tokenizer
 
     .local pmc arg
-    arg = self.evaluate(tokenizer)
+    arg = self.'evaluate'(tokenizer)
     .local string msg
     msg = arg
     UserError(msg)
@@ -1622,30 +1626,30 @@ setattrs:
     .param pmc tokenizer
 
     .local pmc pvar
-    pvar = tokenizer.get()
+    pvar = tokenizer.'get'()
     .local string var
     var = pvar
     upcase var
-    $P0 = tokenizer.get()
+    $P0 = tokenizer.'get'()
     ne $P0, '=', fail
     .local pmc value
-    value = self.evaluate(tokenizer)
-    $P0 = tokenizer.get()
+    value = self.'evaluate'(tokenizer)
+    $P0 = tokenizer.'get'()
     $S0 = $P0
     upcase $S0
     ne $S0, 'TO', fail
 
     .local pmc limit
-    limit = self.evaluate(tokenizer)
+    limit = self.'evaluate'(tokenizer)
 
     .local pmc increment
-    $P0 = tokenizer.get()
+    $P0 = tokenizer.'get'()
     $I0 = defined $P0
     unless $I0 goto default_step
     $S0 = $P0
     upcase $S0
     ne $S0, 'STEP', fail
-    increment = self.evaluate(tokenizer)
+    increment = self.'evaluate'(tokenizer)
     goto prepare
 default_step:
     increment = new 'Integer'
@@ -1654,7 +1658,7 @@ prepare:
     .local pmc for
     for = new 'For'
     .local pmc line
-    line = self.getcurline()
+    line = self.'getcurline'()
     setattribute for, 'jumpline', line
     setattribute for, 'increment', increment
     setattribute for, 'limit', limit
@@ -1680,7 +1684,7 @@ fail:
     .param pmc tokenizer
 
     .local pmc arg
-    arg = tokenizer.get()
+    arg = tokenizer.'get'()
     $I0 = defined arg
     unless $I0 goto fail
     $I0 = arg
@@ -1697,7 +1701,7 @@ fail:
     .param pmc tokenizer
 
     .local pmc arg
-    arg = tokenizer.get()
+    arg = tokenizer.'get'()
     $I0 = defined arg
     unless $I0 goto fail
     $I0 = arg
@@ -1719,8 +1723,8 @@ fail:
     .local pmc arg
     .local pmc token
 
-    arg = self.evaluate(tokenizer)
-    token = tokenizer.get()
+    arg = self.'evaluate'(tokenizer)
+    token = tokenizer.'get'()
     $I0 = defined token
     unless $I0 goto fail
     $S0 = token
@@ -1731,7 +1735,7 @@ fail:
     unless $I0 goto is_false
     $I0 = arg
     unless $I0 goto is_false
-    self.execute(tokenizer)
+    self.'execute'(tokenizer)
     goto finish
 
 is_false:
@@ -1739,7 +1743,7 @@ is_false:
     level = 1
 # Search for ELSE, taking nested IF into account
 nextitem:
-    $P0 = tokenizer.get ()
+    $P0 = tokenizer.'get' ()
     $I0 = defined $P0
     unless $I0 goto finish
     $I0 = isa $P0, 'String'
@@ -1755,7 +1759,7 @@ is_if:
 is_else:
     dec level
     if level > 0 goto nextitem
-    self.execute(tokenizer)
+    self.'execute'(tokenizer)
 
 finish:
     .return()
@@ -1768,7 +1772,7 @@ fail:
 
     .local pmc program
     program = getattribute self, 'program'
-    program.list(0, 0)
+    program.'list'(0, 0)
 
 .end
 
@@ -1776,13 +1780,13 @@ fail:
     .param pmc tokenizer
 
     .local pmc arg
-    arg = self.evaluate(tokenizer)
-    $P1 = tokenizer.get()
+    arg = self.'evaluate'(tokenizer)
+    $P1 = tokenizer.'get'()
     $I1 = defined $P1
     unless $I1 goto notype
     ne $P1, ',', notype
 
-    $P1 = tokenizer.get()
+    $P1 = tokenizer.'get'()
     $I1 = defined $P1
     unless $I1 goto fail
     $S1 = $P1
@@ -1796,7 +1800,7 @@ notype:
     newprogram = new ['Program']
     .local string filename
     filename = arg
-    newprogram.load(filename)
+    newprogram.'load'(filename)
     setattribute self, 'program', newprogram
 
     .local pmc end
@@ -1818,13 +1822,13 @@ fail:
     for = stack[$I0]
     .local pmc controlvar, varvalue, increment, limit
     controlvar = getattribute for, 'controlvar'
-    varvalue = self.get_var(controlvar)
+    varvalue = self.'get_var'(controlvar)
     increment = getattribute for, 'increment'
     limit = getattribute for, 'limit'
 
     $P0 = clone varvalue
     add $P0, increment
-    self.set_var(controlvar, $P0)
+    self.'set_var'(controlvar, $P0)
 
     lt increment, 0, negstep
     gt $P0, limit, endloop
@@ -1848,27 +1852,27 @@ endloop:
     .param pmc tokenizer
 
     .local pmc token
-    token = tokenizer.get()
+    token = tokenizer.'get'()
     $S0 = token
     upcase $S0
     if $S0 == 'ERROR' goto on_error
     goto fail
 on_error:
-    token = tokenizer.get()
+    token = tokenizer.'get'()
     $S0 = token
     upcase $S0
     if $S0 == 'GOTO' goto on_error_goto
     if $S0 == 'EXIT' goto on_error_exit
     goto fail
 on_error_exit:
-    $P0 = self.evaluate(tokenizer)
+    $P0 = self.'evaluate'(tokenizer)
     $I0 = $P0
-    self.set_error_exit($I0)
+    self.'set_error_exit'($I0)
     goto finish
 on_error_goto:
-    $P0 = self.evaluate(tokenizer)
+    $P0 = self.'evaluate'(tokenizer)
     $I0 = $P0
-    self.set_error_goto($I0)
+    self.'set_error_goto'($I0)
     goto finish
 fail:
     SyntaxError()
@@ -1880,7 +1884,7 @@ finish:
 
     .local pmc arg
 
-    arg = tokenizer.get()
+    arg = tokenizer.'get'()
     $I0 = defined arg
     unless $I0 goto endline
 
@@ -1888,10 +1892,10 @@ item:
     $S0 = arg
     upcase $S0
     eq $S0, 'ELSE', endline
-    arg = self.evaluate(tokenizer, arg)
+    arg = self.'evaluate'(tokenizer, arg)
 print_it:
     print arg
-    arg = tokenizer.get()
+    arg = tokenizer.'get'()
     $I0 = defined arg
     unless $I0 goto endline
     eq arg, ';', nextitem
@@ -1910,7 +1914,7 @@ endline:
     say ''
     .return()
 nextitem:
-    arg = tokenizer.get()
+    arg = tokenizer.'get'()
     $I0 = defined arg
     unless $I0 goto finish
     $S0 = arg
@@ -1940,10 +1944,10 @@ fail:
 .sub func_RUN :method
     .param pmc tokenizer
 
-    self.clear_all()
+    self.'clear_all'()
     .local pmc program, iter
     program = getattribute self, 'program'
-    iter = program.begin()
+    iter = program.'begin'()
     .local int numline
     numline = 0
     unless iter goto doit
@@ -1958,8 +1962,8 @@ doit:
     .param pmc tokenizer
 
     .local pmc arg
-    arg = self.evaluate(tokenizer)
-    $P1 = tokenizer.get()
+    arg = self.'evaluate'(tokenizer)
+    $P1 = tokenizer.'get'()
     $I1 = defined $P1
     if $I1 goto fail
 
@@ -1967,7 +1971,7 @@ doit:
     filename = arg
     .local pmc program
     program = getattribute self, 'program'
-    program.save(filename)
+    program.'save'(filename)
 
     .return()
 
@@ -1986,13 +1990,13 @@ fail:
 .sub func_TROFF :method
     .param pmc tokenizer
 
-    self.trace(0)
+    self.'trace'(0)
 .end
 
 .sub func_TRON :method
     .param pmc tokenizer
 
-    self.trace(1)
+    self.'trace'(1)
 .end
 
 ########################################################################
@@ -2347,16 +2351,16 @@ nextline:
 enterline:
     inc linecount
     tokenizeline = newTokenizer(line)
-    token = tokenizeline.get()
+    token = tokenizeline.'get'()
     linenum = token
     unless linenum goto fail
-    line = tokenizeline.getall()
-    self.storeline(linenum, line)
+    line = tokenizeline.'getall'()
+    self.'storeline'(linenum, line)
     goto nextline
 
 eof:
     close file
-    $I0 = self.elements()
+    $I0 = self.'elements'()
     unless $I0 == linecount goto fatal
     .return()
 
@@ -2375,7 +2379,7 @@ fatal:
 
     open file, filename, '>'
 
-    self.list(0, 0, file)
+    self.'list'(0, 0, file)
 
     close file
 .end
