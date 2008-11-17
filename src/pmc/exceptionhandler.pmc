@@ -218,13 +218,7 @@ Report whether the exception handler can handle a particular type of exception.
                 RETURN(INTVAL 0);
             }
 
-            /* The exception handler has already been used before. */
-            else if (VTABLE_get_integer(INTERP, SELF)) {
-                RETURN(INTVAL 0);
-            }
-            else {
-                RETURN(INTVAL 1);
-            }
+            RETURN(INTVAL 1);
         }
 
         RETURN(INTVAL 0);

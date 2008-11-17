@@ -836,6 +836,9 @@ inline op throw(invar PMC) :flow {
     opcode_t *dest;
     opcode_t *const ret    = expr NEXT();
     PMC            *resume = new_ret_continuation_pmc(interp, ret);
+    // We might return here after handling the exception, so mark the
+    // current context appropriately.
+    CONTEXT(interp)->ref_count++;
     VTABLE_set_attr_str(interp, $1, const_string(interp, "resume"), resume);
     dest = Parrot_ex_throw_from_op(interp, $1, ret);
     goto ADDRESS(dest);

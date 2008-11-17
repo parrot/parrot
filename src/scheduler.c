@@ -773,9 +773,6 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
                         VTABLE_set_attr_str(interp, task,
                                 CONST_STRING(interp, "handler_iter"), iter);
                         VTABLE_set_pointer(interp, task, context);
-
-                        /* Mark that this handler has been used before. */
-                        VTABLE_set_integer_native(interp, handler, 1);
                     }
                     return handler;
                 }
