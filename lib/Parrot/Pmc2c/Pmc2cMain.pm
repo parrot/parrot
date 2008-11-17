@@ -1,9 +1,10 @@
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2008, The Perl Foundation.
 # $Id$
 package Parrot::Pmc2c::Pmc2cMain;
 use strict;
 use warnings;
-use Storable 2.13;
+
+use Storable 2.18;
 use Parrot::PMC ();
 use Parrot::Pmc2c::VTable ();
 use Parrot::Pmc2c::Dumper;

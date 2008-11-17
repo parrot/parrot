@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -9,10 +9,11 @@ Parrot::Configure - Conducts the execution of Configuration Steps
 
     use Parrot::Configure;
 
-    my $conf = Parrot::Configure->new;
-    my $data = $conf->data;
+    my $conf    = Parrot::Configure->new;
+    my $data    = $conf->data;
     my $options = $conf->options;
-    my @steps = $conf->steps;
+    my @steps   = $conf->steps;
+
     $conf->add_steps(@steps);
     $conf->runsteps;
 
@@ -39,7 +40,7 @@ use warnings;
 
 use lib qw(config);
 use Carp qw(carp);
-use Storable qw(nstore retrieve nfreeze thaw);
+use Storable qw(2.18 nstore retrieve nfreeze thaw);
 use Parrot::Configure::Data;
 use base qw(Parrot::Configure::Compiler);
 

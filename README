@@ -14,20 +14,21 @@ For more details, see the full text of the license in the file LICENSE.
 PREREQUISITES
 -------------
 
-You need a C compiler, a linker and a make program of course. If you will be
+You need a C compiler, a linker, and a make program of course. If you will be
 linking with the ICU library you have to download and install it before
 configuring Parrot.
 
 Get it from http://www-306.ibm.com/software/globalization/icu/downloads.jsp
 
-You also need Perl 5.8.0 or newer to run various configure and build scripts.
+You also need Perl 5.8.0 or newer, Storable 2.18 or newer, and Bundle::Parrot
+to run various configure and build scripts.
 
 For most of the platforms that we are supporting initially, Parrot should build
-out of the box.  The list of targeted platforms can be found in PLATFORMS.
+out of the box.  PLATFORM lists our target platforms.
 
-The current configure system is primitive, as it's only
-a temporary solution. It will be happy with most any answers
-you decide to feed it. Garbage In, Garbage Out.
+The current configure system is primitive, as it's only a temporary solution.
+It will be happy with most any answers you decide to feed it. Garbage In,
+Garbage Out.
 
 INSTRUCTIONS
 ------------
@@ -63,9 +64,9 @@ Next, run make:
 For UNIX like systems that come with its own make, 'gmake' should be
 used.  (On most Linux systems, this is the default make.)
 
-On windows systems, 'nmake' is used
+On Windows systems, use 'nmake'.
 
-On other systems, just try 'make'
+On other systems, just try 'make'.
 
 Now, the interpreter should build.  If you are building the ICU library
 (this is the default on most systems), you need to use GNU make instead
