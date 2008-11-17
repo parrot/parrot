@@ -641,7 +641,7 @@ In the exception handler
 After throwing
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "Resumable exceptions from a different context" );
+pir_output_is( <<'CODE', <<'OUTPUT', "Resumable exceptions from a different context", todo => "Pending Tene's 'stop disabling exception handlers' patch." );
 .sub main :main
     push_eh catcher
     'foo'()
