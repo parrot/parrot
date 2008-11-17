@@ -34,38 +34,38 @@ Press Escape key to exit.
     .local pmc display
     display = openDisplay('')
 
-    display.hello()
+    display.'hello'()
 
     print 'DefaultScreen: '
-    $I0 = display.DefaultScreen()
+    $I0 = display.'DefaultScreen'()
     say $I0
 
     print 'BlackPixel: '
     .local int black
-    black = display.BlackPixel()
+    black = display.'BlackPixel'()
     say black
 
     print 'WhitePixel: '
     .local int white
-    white = display.WhitePixel(0)
+    white = display.'WhitePixel'(0)
     say white
 
 # Create and map the window
 
     .local pmc rw
-    rw = display.RootWindow()
+    rw = display.'RootWindow'()
 
     .local pmc w
-    w = display.CreateSimpleWindow(rw, 0, 0, 600, 400, 0, 0, white)
+    w = display.'CreateSimpleWindow'(rw, 0, 0, 600, 400, 0, 0, white)
     $I0 = KeyPressMask
     bor $I0, ButtonPressMask
     bor $I0, ButtonReleaseMask
     bor $I0, PointerMotionMask
     bor $I0, StructureNotifyMask
     bor $I0, ExposureMask
-    w.SelectInput($I0)
-    w.StoreName('Hello, parrot')
-    w.Map()
+    w.'SelectInput'($I0)
+    w.'StoreName'('Hello, parrot')
+    w.'Map'()
 
 # Get keycode of the Escape key to check in key press event
 
@@ -79,7 +79,7 @@ Press Escape key to exit.
 #    print $I0
 #    print '-'
     .local int codeEscape
-    codeEscape = display.KeysymToKeycode($I0)
+    codeEscape = display.'KeysymToKeycode'($I0)
 #    say codeEscape
 
     .local pmc listline
@@ -103,9 +103,9 @@ Press Escape key to exit.
     lastpx = 0
     lastpy = 0
 loop:
-    $I0 = display.NextEvent(event)
+    $I0 = display.'NextEvent'(event)
 
-    $I1 = event.type()
+    $I1 = event.'type'()
 
     eq $I1, KeyPress, keypress
     eq $I1, KeyRelease, loop
@@ -121,7 +121,7 @@ loop:
     goto loop
 
 keypress:
-    $I0 = event.keycode()
+    $I0 = event.'keycode'()
 #    say 'Keypress'
 #    say $I0
 
@@ -132,14 +132,14 @@ keypress:
 #    eq $S0, 'Escape', finish
 
     ne $I0, codeEscape, loop
-    w.Unmap()
-    w.Destroy()
+    w.'Unmap'()
+    w.'Destroy'()
     goto loop
 
 press:
-    lastpx = event.x()
-    lastpy = event.y()
-    w.DrawPoint(lastpx, lastpy)
+    lastpx = event.'x'()
+    lastpy = event.'y'()
+    w.'DrawPoint'(lastpx, lastpy)
     line = new 'ResizableIntegerArray'
     push listline, line
     push line, lastpx
@@ -160,10 +160,10 @@ paint:
 #    $I0 = event.time()
 #    print $I0
 #    print ' '
-    px = event.x()
+    px = event.'x'()
 #    print px
 #    print ' '
-    py = event.y()
+    py = event.'y'()
 #    print py
 #    say ''
 
@@ -172,7 +172,7 @@ paint:
 checky:
     eq lastpy, py, loop
 draw:
-    w.DrawLine(lastpx, lastpy, px, py)
+    w.'DrawLine'(lastpx, lastpy, px, py)
     lastpx = px
     lastpy = py
     push line, px
@@ -204,14 +204,14 @@ nextline:
     inc $I3
     lastpy = $P0[$I3]
     inc $I3
-    w.DrawPoint(lastpx, lastpy)
+    w.'DrawPoint'(lastpx, lastpy)
 nextpoint:
     eq $I3, $I2, nextline
     px = $P0[$I3]
     inc $I3
     py = $P0[$I3]
     inc $I3
-    w.DrawLine(lastpx, lastpy, px, py)
+    w.'DrawLine'(lastpx, lastpy, px, py)
     lastpx = px
     lastpy = py
     goto nextpoint
@@ -219,8 +219,8 @@ nextpoint:
     goto loop
 
 message:
-    w.Unmap()
-    w.Destroy()
+    w.'Unmap'()
+    w.'Destroy'()
     goto loop
 
 # End. Close window and display, and exit.
@@ -228,7 +228,7 @@ message:
 finish:
     say 'Exiting'
 
-    display.Close()
+    display.'Close'()
 .end
 
 #-----------------------------------------------------------------------

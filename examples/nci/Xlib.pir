@@ -116,9 +116,9 @@ done:
     explist[0] = 'get_xlib_handle'
     explist[1] = 'get_xlib_function'
     explist[2] = 'get_Window_class'
-    ns.export_to(nsDisplay, explist)
+    ns.'export_to'(nsDisplay, explist)
     nsWindow = get_namespace ['Window']
-    ns.export_to(nsWindow, explist)
+    ns.'export_to'(nsWindow, explist)
 
 done:
     .return(Display)
@@ -161,7 +161,7 @@ done:
     explist[0] = 'get_xlib_handle'
     explist[1] = 'get_xlib_function'
     explist[2] = 'get_Pixmap_class'
-    nsmain.export_to(ns, explist)
+    nsmain.'export_to'(ns, explist)
 
 done:
     .return(Drawable)
@@ -189,7 +189,7 @@ done:
     explist = new 'ResizablePMCArray'
     explist[0] = 'get_xlib_handle'
     explist[1] = 'get_xlib_function'
-    ns.export_to(nsWindow, explist)
+    ns.'export_to'(nsWindow, explist)
 
 done:
     .return(Window)
@@ -215,7 +215,7 @@ done:
     explist = new 'ResizablePMCArray'
     explist[0] = 'get_xlib_handle'
     explist[1] = 'get_xlib_function'
-    ns.export_to(nsPixmap, explist)
+    ns.'export_to'(nsPixmap, explist)
 done:
     .return(Pixmap)
 .end
@@ -339,7 +339,7 @@ getit:
     .param int has_screen :opt_flag
 
     if has_screen goto doit
-    screen = self.DefaultScreen()
+    screen = self.'DefaultScreen'()
 doit:
     .local pmc func
     func = get_xlib_function('XDefaultDepth', 'ipi')
@@ -351,7 +351,7 @@ doit:
 #-----------------------------------------------------------------------
 .sub DefaultGC :method
     .local int screen
-    screen = self.DefaultScreen()
+    screen = self.'DefaultScreen'()
     .local pmc xdisp
     xdisp = getattribute self, attr_XDisplay
     .local pmc func
@@ -366,7 +366,7 @@ doit:
     .param int has :opt_flag
 
     if has goto doit
-    screen = self.DefaultScreen()
+    screen = self.'DefaultScreen'()
 doit:
     .local pmc func
     func = get_xlib_function('XBlackPixel','ipi')
@@ -380,7 +380,7 @@ doit:
     .param int screen :optional
     .param int has :opt_flag
     if has goto doit
-    screen = self.DefaultScreen()
+    screen = self.'DefaultScreen'()
 doit:
     .local pmc func
     func = get_xlib_function('XWhitePixel', 'ipi')
@@ -454,7 +454,7 @@ gotit:
     func = get_xlib_function('XRootWindow', 'ppi')
     $P0 = getattribute self, attr_XDisplay
     .local pmc window
-    $I0 = self.DefaultScreen()
+    $I0 = self.'DefaultScreen'()
     $P1 = func($P0, $I0)
 
     .local pmc arg
@@ -762,9 +762,9 @@ done:
     .local pmc disp
     disp = getattribute self, attr_display
     .local pmc xdisp
-    xdisp = self.getdisplay()
+    xdisp = self.'getdisplay'()
     .local pmc gc
-    gc = disp.DefaultGC()
+    gc = disp.'DefaultGC'()
     .local pmc xwin
     xwin = getattribute self, attr_XWindow
 
@@ -784,9 +784,9 @@ done:
     .local pmc disp
     disp = getattribute self, attr_display
     .local pmc xdisp
-    xdisp = self.getdisplay()
+    xdisp = self.'getdisplay'()
     .local pmc gc
-    gc = disp.DefaultGC()
+    gc = disp.'DefaultGC'()
     .local pmc xwin
     xwin = getattribute self, attr_XWindow
 
@@ -808,8 +808,8 @@ done:
 
     .local pmc disp, xdisp, src_xdraw, dest_xdraw, gc
     disp = getattribute self, attr_display
-    gc = disp.DefaultGC()
-    xdisp = self.getdisplay()
+    gc = disp.'DefaultGC'()
+    xdisp = self.'getdisplay'()
     src_xdraw = getattribute source, attr_XWindow
     dest_xdraw = getattribute self, attr_XWindow
 
@@ -829,12 +829,12 @@ done:
     .local pmc disp
     disp = getattribute self, attr_display
     .local pmc xdisp
-    xdisp = self.getdisplay()
+    xdisp = self.'getdisplay'()
     .local pmc xwin
     xwin = getattribute self, attr_XWindow
 
     if has_depth goto doit
-    depth = disp.DefaultDepth()
+    depth = disp.'DefaultDepth'()
 
 doit:
     .local pmc func
@@ -869,7 +869,7 @@ doit:
 #-----------------------------------------------------------------------
 .sub Destroy :method
     .local pmc xdisp
-    xdisp = self.getdisplay()
+    xdisp = self.'getdisplay'()
     .local pmc xwin
     xwin = getattribute self, attr_XWindow
     .local pmc func
@@ -883,7 +883,7 @@ doit:
     .param int mask
 
     .local pmc xdisp
-    xdisp = self.getdisplay()
+    xdisp = self.'getdisplay'()
     .local pmc xwin
     xwin = getattribute self, attr_XWindow
 
@@ -892,7 +892,7 @@ doit:
     protocols = get_xlib_function('XSetWMProtocols', 'ipppi')
     .local pmc disp
     disp = getattribute self, attr_display
-    $I0 = disp.InternAtom('WM_DELETE_WINDOW')
+    $I0 = disp.'InternAtom'('WM_DELETE_WINDOW')
     $P0 = new 'ResizableIntegerArray'
     $P0[0] = -91
     $P0[1] = 1
@@ -910,7 +910,7 @@ doit:
 #-----------------------------------------------------------------------
 .sub Map :method
     .local pmc xdisp
-    xdisp = self.getdisplay()
+    xdisp = self.'getdisplay'()
     .local pmc xwin
     xwin = getattribute self, attr_XWindow
     .local pmc func
@@ -922,7 +922,7 @@ doit:
 #-----------------------------------------------------------------------
 .sub Unmap :method
     .local pmc xdisp
-    xdisp = self.getdisplay()
+    xdisp = self.'getdisplay'()
     .local pmc xwin
     xwin = getattribute self, attr_XWindow
     .local pmc func
@@ -936,7 +936,7 @@ doit:
     .param string name
 
     .local pmc xdisp
-    xdisp = self.getdisplay()
+    xdisp = self.'getdisplay'()
     .local pmc xwin
     xwin = getattribute self, attr_XWindow
 
@@ -966,7 +966,7 @@ doit:
     $I0 = defined drawable
     unless $I0 goto done
     .local pmc xdisp
-    xdisp = self.getdisplay()
+    xdisp = self.'getdisplay'()
     .local pmc func
     func = get_xlib_function('XFreePixmap', 'ipp')
     $I0 = func(xdisp, drawable)
