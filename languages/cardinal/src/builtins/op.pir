@@ -86,6 +86,13 @@ src/builtins/op.pir - Cardinal ops
     .return ($P0)
 .end
 
+.sub 'infix:-=' :multi(_,_)
+    .param pmc a
+    .param pmc b
+    a -= b
+    .return (a)
+.end
+
 .sub 'infix:+=' :multi(_,_)
     .param pmc a
     .param pmc b

@@ -348,11 +348,12 @@ method funcall($/) {
 method constant_variable($/) {
     my @a;
     my $name := ~$/;
-    if $name eq 'Array' { $name := "CardinalArray"; }
-    elsif $name eq 'Hash' { $name := "CardinalHash"; }
+    if $name eq 'Integer' { $name := "CardinalInteger"; }
     elsif $name eq 'String' { $name := "CardinalString"; }
+    elsif $name eq 'Array' { $name := "CardinalArray"; }
+    elsif $name eq 'Hash' { $name := "CardinalHash"; }
     elsif $name eq 'Range' { $name := "CardinalRange"; }
-    elsif $name eq 'Integer' { $name := "CardinalInteger"; }
+    elsif $name eq 'File' { $name := "CardinalFile"; }
     my $past := PAST::Var.new( :name($name), :scope('package'), :node($/), :viviself('Undef'), :namespace( @a ) );
     make $past;
 }

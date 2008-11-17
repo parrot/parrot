@@ -69,6 +69,15 @@ Sleep for number of seconds.
     sleep a
 .end
 
+=item callcc(cc)
+
+=cut
+.sub 'callcc'
+    .param pmc block :named('!BLOCK')
+    $P0 = get_hll_global ['Kernel'], '!CARDINALMETA'
+    $P0.'callcc'(block :named('!BLOCK'))
+.end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

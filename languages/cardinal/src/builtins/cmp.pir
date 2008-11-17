@@ -39,7 +39,14 @@ Swiped from Rakudo.
     .return ($P0)
 .end
 
-.sub 'infix:==' :multi(CardinalString,CardinalString)
+.sub 'infix:==' :multi(Integer,Integer)
+    .param pmc a
+    .param pmc b
+    $I0 = iseq a, b
+    .tailcall 'prefix:?'($I0)
+.end
+
+.sub 'infix:==' :multi(String,String)
     .param pmc a
     .param pmc b
     $I0 = iseq a, b
@@ -49,14 +56,24 @@ Swiped from Rakudo.
 .sub 'infix:==' :multi(NilClass,_)
     .param pmc a
     .param pmc b
-    $I0 = iseq a, b
+    # mmd tells us they are different types, so return false
+    $I0 = 0
     .tailcall 'prefix:?'($I0)
 .end
 
 .sub 'infix:==' :multi(_,NilClass)
     .param pmc a
     .param pmc b
-    $I0 = iseq a, b
+    # mmd tells us they are different types, so return false
+    $I0 = 0
+    .tailcall 'prefix:?'($I0)
+.end
+
+.sub 'infix:==' :multi(NilClass,NilClass)
+    .param pmc a
+    .param pmc b
+    # mmd tells us they are same types and both of type NilClass, so return true
+    $I0 = 1
     .tailcall 'prefix:?'($I0)
 .end
 
@@ -95,6 +112,19 @@ Swiped from Rakudo.
     .param pmc a
     .param pmc b
     $I0 = islt a, b
+    .tailcall 'prefix:?'($I0)
+.end
+
+.sub 'infix:<' :multi(Integer,Integer)
+    .param pmc a
+    .param pmc b
+    # creating a specific multi method
+    # where marshall into the correct register type
+    # gave a much needed boost in performance. Will investigate this later.
+    $I0 = a
+    $I1 = b
+    #$I0 = islt a, b
+    $I0 = islt $I0, $I1
     .tailcall 'prefix:?'($I0)
 .end
 

@@ -472,7 +472,7 @@ proto 'infix:+=' is equiv('infix:=')
                  { ... }
 
 proto 'infix:-=' is equiv('infix:=')
-                 is pirop('sub')        { ... }
+                 { ... }
 
 proto 'infix:/=' is equiv('infix:=')
                  is pirop('div')        { ... }

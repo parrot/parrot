@@ -30,11 +30,24 @@ src/builtins/globals.pir - initialize miscellaneous global variables
     $P0 = new 'CardinalHash'
     set_hll_global '%INC', $P0
 
-    ## global record separator
     #$P1 = new 'CardinalString'
     #$P1 = "\n"
+    ## global input record separator
     $P1 = get_hll_global ['NilClass'], '!CARDINALMETA'
     set_hll_global '$/', $P1
+    ## global output record separator
+    $P4 = get_hll_global ['NilClass'], '!CARDINALMETA'
+    set_hll_global '$\', $P4
+
+    #getstdin $P5
+    #set_hll_global '$stdin', $P5
+    #set_hll_global '$>', $P5
+
+    getstdout $P6
+    set_hll_global '$stdout', $P6
+
+    #getstderr $P7
+    #set_hll_global 'stderr', $P7
 
     $P2 = new 'CardinalString'
     $P2 = "parrot"
