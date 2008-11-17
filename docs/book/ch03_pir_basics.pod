@@ -226,7 +226,7 @@ classes for String, Number, and Integer which can be quickly converted
 to and from primitive int, number, and string types. Notice that the
 primative types are in lower-case, while the PMC classes are
 capitalized. We will discuss PMCs and all the details of their
-interactions in Z<CHP-11> Chapter 11.
+interactions in A<CHP-11> Chapter 11.
 
 =head2 Named Constants
 
@@ -255,21 +255,12 @@ but have to be declared beforehand:
 
 Z<CHP-3-SECT-3>
 
-X<symbol operators in IMCC>
-You probably noticed the C<=> assignment operator in some of the
-earlier examples:
-
-  $S2000 = "Hello, Polly.\n"
-  print $S2000
-
-Standing alone, it's the same as the PASM C<set> opcode. In fact, if
-you run F<parrot> in bytecode debugging mode (as in
-A<CHP-13-SECT-4.2>"Assembler Options" in Chapter 11), you'll see it
-really is just a C<set> opcode underneath.
-
+X<symbol operators in PIR>
 PIR has many other symbol operators: arithmetic, concatenation,
-comparison, bitwise, and logical. Many of these combine with
-assignment to produce the equivalent of a PASM opcode:
+comparison, bitwise, and logical. All PIR operators are translated
+into one or more PASM opcodes internally, but the details of this
+translation stay safely hidden from the programmer. Consider this
+example snippet:
 
   .local int sum
   sum = $I42 + 5
@@ -277,24 +268,17 @@ assignment to produce the equivalent of a PASM opcode:
   print "\n"
 
 The statement C<sum = $I42 + 5> translates to something like
-C<add I16, I17, 5>.
+C<add I16, I17, 5> in PASM. The exact translation isn't too important
+N<Unless you're hacking on IMCC or PIRC!>, so we don't have to worry
+about it for now. We will talk more about PASM and it's instruction
+set in X<CHP-5> Chapter 5.
 
-PIR also provides C<+=>, C<-=>, C<<< >>= >>>, ... that map to the
-two-argument forms like C<add I16, I17>.
+PIR also provides automatic assignment operators such as C<+=>, C<-=>,
+and C<<< >>= >>>. These operators help programmers to peform common
+manipulations on a data value in place, and save a few keystrokes while
+doing them.
 
-Many PASM opcodes that return a single value also have an alternate
-syntax in PIR with the assignment operator:
-
-  $I0 = length str               # length $I0, str
-  $I0 = isa PerlInt, "scalar"    # isa $I0, PerlInt, "scalar"
-  $I0 = exists hash["key"]       # exists $I0, hash["key"]
-  $N0 = sin $N1
-  $N0 = atan $N1, $N2
-  $S0 = repeat "x", 20
-  $P0 = newclass "Foo"
-  ...
-
-A complete list of PIR operators is available in A<CHP-13>Chapter 13.
+A complete list of PIR operators is available in A<CHP-13> Chapter 13.
 
 =head1 Labels
 
@@ -302,22 +286,26 @@ Z<CHP-3-SECT-4>
 
 X<PIR (Parrot intermediate representation);labels>
 X<labels (PIR)>
-Like PASM, any line can start with a label definition like C<LABEL:>,
-but label definitions can also stand on their own line.
+Any line in PIR can start with a label definition like C<LABEL:>,
+but label definitions can also stand on their own line. Labels are like
+flags or markers that the program can jump to or return to at different
+times. Labels and jump operations (which we will discuss a little bit
+later) are one of the primary methods to change control flow in PIR, so
+it is well worth understanding.
 
 PIR code can contain both local and global labels. Global labels start 
-with an underscore. The name of a global label has to be unique, since 
+with an underscore. The name of a global label has to be unique since 
 it can be called at any point in the program. Local labels start with a
-letter. A local label is accessible only in the compilation unit where
-it's defined.N<We'll discuss compilation units in the next section.>
-The name has to be unique there, but it can be reused in a different
-compilation unit.
+letter. A local label is accessible only in the function where it is
+defined. The name has to be unique within that function, but the same
+name can be reused in other functions without causing a collision.
 
   branch L1   # local label
   bsr    _L2  # global label
 
-Labels are most often used in branching instructions and in
-subroutine calls.
+Labels are most often used in branching instructions, which are used
+to implement high level control structures by our high-level language
+compilers.
 
 =head2 Compilation Units
 
@@ -332,38 +320,43 @@ source file must be defined in a compilation unit. The simplest syntax
 for a PIR compilation unit starts with the C<.sub> directive and ends
 with the C<.end> directive:
 
-  .sub _main
+  .sub main
       print "Hello, Polly.\n"
-      end
   .end
 
-This example defines a compilation unit named C<_main> that prints a
-string. The name is actually a global label for this piece of code. If
-you generate a PASM file from the PIR code (see the end of the
-A<CHP-3-SECT-2.2>"Temporary Register Variables" section earlier in this
-chapter), you'll see that the name translates to an ordinary label:
+This example defines a compilation unit named C<main> that prints a
+string.The first compilation unit in a file is normally executed
+first but you can flag any compilation unit as the first one to
+execute with the C<:main> marker. The convention is to name the first
+compilation unit C<main>, but the name isn't critical.
 
-  _main:
-          print "Hello, Polly.\n"
-          end
-
-
-The first compilation unit in a file is normally executed first, but
-as in PASM you can flag any compilation unit as the first one to
-execute with the C<@MAIN> marker. The convention is to name the first
-compilation unit C<_main>, but the name isn't critical.
-
-  .sub _first
+  .sub first
       print "Polly want a cracker?\n"
       end
   .end
 
-  .sub _main @MAIN
+  .sub main :main
       print "Hello, Polly.\n"
+  .end
+
+This code prints out "Hello, Polly." but not "Polly want a cracker?".
+This is because the function C<main> has the C<:main> flag, so it is
+executed first. The function C<first>, which doesn't have this flag
+is never executed. However, if we change around this example a little:
+
+  .sub first :main
+      print "Polly want a cracker?\n"
       end
   .end
 
-This code prints out "Hello, Polly." but not "Polly want a cracker?":
+  .sub main
+      print "Hello, Polly.\n"
+  .end
+
+The output now is "Polly want a cracker?". Execution in PIR starts
+at the main function and continues until the end of that function only.
+If you want to do more stuff if your program, you will need to call
+other functions explicitly.
 
 A<CHP-04>Chapter 4 goes into much more detail about compilation units 
 and their uses.
@@ -374,15 +367,19 @@ Z<CHP-3-SECT-5>
 
 X<PIR (Parrot intermediate representation);flow control>
 X<flow control;in PIR>
-As in PASM, flow control in PIR is done entirely with conditional and
-unconditional branches. This may seem simplistic, but remember that
-PIR is a thin overlay on the assembly language of a virtual processor.
-For the average assembly language, jumps are the fundamental unit of
-flow control.
+Flow control in PIR is done entirely with conditional and
+unconditional branches. This may seem simplistic and primitive, but
+remember that PIR is a thin overlay on the assembly language of a
+virtual processor. High level control structures are invariably linked
+to the language in which they are used, so any attempt by Parrot to
+provide these structures would work for some languages but not by
+others. The only way to make sure all languages and their control
+structures can be equally accomdated is to simply give them the most
+simple and fundamental building blocks to work with. Language
+agnosticism is an important design goal in Parrot. 
 
 X<goto instruction (PIR)>
-Any PASM branch instruction is valid, but PIR has some high-level
-constructs of its own. The most basic is the unconditional branch:
+The most basic branching instruction is the unconditional branch:
 C<goto>.
 
   .sub _main
@@ -411,9 +408,8 @@ X<unless (conditional);instruction (PIR)>
 In this example, the C<goto> branches to the label C<L1> only if the
 value stored in C<$I0> is true. The C<unless> statement is quite
 similar, but branches when the tested value is false. An undefined
-value, 0, or an empty string are all false values. The C<if ... goto>
-statement translates directly to the PASM C<if>, and C<unless>
-translates to the PASM C<unless>.
+value, 0, or an empty string are all false values. Any other values
+are considered to be true values.
 
 The comparison operators (C<E<lt>>, C<E<lt>=>, C<==>, C<!=>, C<E<gt>>,
 C<E<gt>=>) can combine with C<if ...  goto>. These branch when the
