@@ -7,20 +7,17 @@ languages/pipp/t/harness - A harness for Pipp
 
 =head1 SYNOPSIS
 
-  cd languages && perl pipp/t/harness --files
+  cd languages && perl pipp/t/harness --files --master
 
-  cd languages && perl pipp/t/harness 
+  cd languages/pipp && perl t/harness 
 
-  cd languages && perl pipp/t/harness --with-php
+  cd languages/pipp && perl t/harness --with-phc
 
-  cd languages && perl pipp/t/harness --with-phc
+  cd languages/pipp && perl t/harness --with-antlr3
 
-  cd languages && perl pipp/t/harness --with-antlr3
+  cd languages/pipp && perl t/harness --with-pct
 
-  cd languages && perl pipp/t/harness --with-pct
-
-  cd languages && perl pipp/t/harness \
-                   pipp/t/hello.t 
+  cd languages/pipp && perl t/harness t/hello.t 
 
 =head1 DESCRIPTION
 
@@ -31,6 +28,9 @@ This list is one per line, and is relative to the languages dir.
 If I'm called with no args, I run the complete suite.
 
 Otherwise I run the tests that were passed on the command line.
+The options C<--with-pct>, C<--with-phc> and C<--with-antlr3> select
+the variant of Pipp. Default is the PCT variant, using the
+Parrot Compiler Toolkit.
 
 =cut
 
@@ -44,7 +44,7 @@ use Cwd                     ();
 use File::Spec              ();
 use TAP::Harness            3.12;     # support closures for the 'exec' option
 use TAP::Harness::Archive   0.12; 
-use Parrot::Config;
+use Parrot::Config          qw( %PConfig );
 use Getopt::Long;
 use Parrot::Harness::Smoke;
 use Parrot::Test;
@@ -62,11 +62,11 @@ GetOptions(
     'with-php'        => \$php_flag,
 );
 
-my $language = 'pipp';
+my $hll = 'pipp';
 
 if ( $files_flag ) {
     # Only the Makefile in 'parrot/languages' uses --files for unified testing
-    my $dir = File::Spec->catfile( $language, 't' );
+    my $dir = File::Spec->catfile( $hll, 't' );
     # unified testing can't handle test scripts written in PHP
     my @files = grep { ! m/in_php/ && ! m/pmc/ } glob( File::Spec->catfile( $dir, '*/*.t' ) );
     print join( "\n", @files );
@@ -100,9 +100,9 @@ if ( $files_flag ) {
     } else {
         ( undef, undef, my $current_dir ) = File::Spec->splitpath( Cwd::getcwd() );
         if ( $current_dir eq 'languages' ) {
-            @files = glob( File::Spec->catfile( $language, 't', '*/*.t' ) );
+            @files = glob( File::Spec->catfile( $hll, 't', '*/*.t' ) );
         }
-        elsif ( $current_dir eq $language ) {
+        elsif ( $current_dir eq $hll ) {
             @files = glob( File::Spec->catfile( 't', '*/*.t' ) );
         }
         else {
