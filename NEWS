@@ -6,6 +6,7 @@ New in the November 2008 release
   + remove the pseudo PIR opcode 'addr'
   + add the 'box' opcode
 - Languages
+  + New tool for "fire and forget" rebase/rebuild/test of Parrot and Rakudo
 - Compilers
   + PIRC
     - Integrated macro processing in PIRC's lexer
@@ -15,8 +16,13 @@ New in the November 2008 release
     - Added a register allocator to optimize the built-in vanilla allocator
     - code cleanups and documentation
 - Deprecations
-    + PARROT_API has changed to PARROT_EXPORT
-    + :lexid becomes :subid
+  + PARROT_API has changed to PARROT_EXPORT
+  + :lexid becomes :subid
+- Miscellaneous
+  + OpenGL
+    - Minor fixes to Parrot's base OpenGL bindings
+    - Convert OpenGL PIR examples to Perl 6 (two complete, one WIP)
+    - New simplified OpenGL PIR example for NCI JIT testing
 
 New in 0.8.0
 - Implementation
