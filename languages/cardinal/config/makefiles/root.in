@@ -62,8 +62,14 @@ BUILTINS_PIR = \
   src/classes/Time.pir \
   src/classes/Math.pir \
   src/classes/GC.pir \
+  src/classes/IO.pir \
+  src/classes/Proc.pir \
+  src/classes/File.pir \
+  src/classes/FileStat.pir \
+  src/classes/Dir.pir \
   src/builtins/globals.pir \
   src/builtins/eval.pir \
+  src/classes/Continuation.pir \
 
 # PMCS = cardinal
 # PMC_SOURCES = $(PMC_DIR)/cardinal.pmc
