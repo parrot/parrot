@@ -183,6 +183,7 @@ my %C_TYPE = (
     GLhandleARB             => 'unsigned int',
     GLXVideoDeviceNV        => 'unsigned int',
 
+    GLulong                 => 'unsigned long',
     XID                     => 'unsigned long',
     Window                  => 'unsigned long',
     Drawable                => 'unsigned long',
