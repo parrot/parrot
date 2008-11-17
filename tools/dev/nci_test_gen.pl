@@ -1,7 +1,7 @@
 #! perl
 =pod
 This is used to generate nci tests for nci signatures.
-usefull in debugging nci
+useful in debugging nci
 =cut
 
 use strict;
