@@ -32,16 +32,16 @@ Connection data and query are hard coded, edit the file to change.
     $S0 = get_client_info()
     say $S0
 # Just a test of the error method
-    $S0 = m.error()
+    $S0 = m.'error'()
     $I0 = bytelength $S0
     unless $I0 goto good
     say $S0
     exit 1
 good:
 
-    m.connect('localhost', 'parrot', 'baDworD', 'parrot')
+    m.'connect'('localhost', 'parrot', 'baDworD', 'parrot')
 
-    m.query('select * from hello;')
+    m.'query'('select * from hello;')
 
     .local pmc r
     r = m.'use_result'()
@@ -49,7 +49,7 @@ good:
     .local int n
     n = r.'field_count'()
 nextrow:
-    row = r.fetch_row()
+    row = r.'fetch_row'()
     $I0 = defined row
     unless $I0 goto finish
     #n = row
@@ -68,17 +68,17 @@ endrow:
     goto nextrow
 finish:
 
-    r.free()
+    r.'free'()
 
 # Testing prepared statement
 
     .local pmc stmt
-    stmt = m.prepare('select * from hello where foo = ?')
-    $I0 = stmt.param_count()
+    stmt = m.'prepare'('select * from hello where foo = ?')
+    $I0 = stmt.'param_count'()
     print 'Param count: '
     say $I0
 
-    $I0 = stmt.close()
+    $I0 = stmt.'close'()
     print 'Close result: '
     say $I0
 .end
