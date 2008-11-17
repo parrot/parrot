@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#! perl
 =pod
 This is used to generate nci tests for nci signatures.
 usefull in debugging nci
@@ -231,7 +231,7 @@ sub gen_pir_sig {
   my @pirsigs;
   my @pirsigssay;
 
-  for my $cursigc (split('', substr($sig, 1, length $sig))) {
+  for my $cursigc (split(//, substr($sig, 1, length $sig))) {
     my ($w, $uw) = gen_rand_wrapped_value($cursigc);
     push @pirsigs, $w;
     push @pirsigssay, $uw;
@@ -249,7 +249,7 @@ sub gen_c_sig {
   my @printfsig;
 
   my $i = 1;
-  for my $cursigc (split('', substr($sig, 1, length $sig))) {
+  for my $cursigc (split(//, substr($sig, 1, length $sig))) {
     push @csig, $c_ret_type_id->{$cursigc} ."_$i";
     push @printfformat, $printf_sig_type->{$cursigc};
     push @printfsig, "_$i";
@@ -288,7 +288,7 @@ PARROT_API ${crettype}nci_$sig($csig) {$printfline
 EOT
 
   my $output = "";
-  my $output = "\n$pirsigsay"  unless $pirsigsay eq "";
+  $output = "\n$pirsigsay"  unless $pirsigsay eq "";
   unless ($pirretval eq "") {
     $output .= "\n" unless $output eq "";
     $output .= "$pirretval"
@@ -345,8 +345,8 @@ vpddii
 vJP
 };
 
-open(my $cout, ">nci_test.c");
-open(my $perlout, ">nci_me.t");
+open(my $cout, q{>}, "nci_test.c");
+open(my $perlout, q{>}, "nci_me.t");
 print $perlout perl_test_prefix();
 print $cout c_prefix();
 
@@ -368,3 +368,10 @@ system('perl nci_me.t');
 }
 
 main();
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
