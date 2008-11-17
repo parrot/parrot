@@ -466,10 +466,8 @@ Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
 void
 Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
 {
-    FILE *fp;
-    int i;
-
-    fp = fopen(file, "w");
+    FILE  *fp = fopen(file, "w");
+    size_t i;
 
     fprintf(fp, "\xFE\xED\xFA\xCE"); /* Header for Darwin */
     save_int(fp, 0x12);
@@ -544,6 +542,7 @@ Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
     save_int(fp, obj->symbol_count);
     for (i = 0; i < 13; i++)
         save_int(fp, 0);
+
     /* Text */
     for (i = 0; i < obj->text.size; i++)
         fprintf(fp, "%c", obj->text.code[i]);

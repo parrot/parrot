@@ -263,19 +263,16 @@ int
 Parrot_dlclose(void *handle)
 {
     if (handle && !(((struct mach_header *)handle)->magic == MH_MAGIC
-                     || ((struct mach_header *)handle)->magic == MH_CIGAM))
-    {
+               ||   ((struct mach_header *)handle)->magic == MH_CIGAM)) {
         unsigned long options = NSUNLINKMODULE_OPTION_NONE;
 #ifdef __ppc__
         options = NSUNLINKMODULE_OPTION_RESET_LAZY_REFERENCES;
 #endif
 
-        return (int)NSUnLinkModule(handle, options);
+        return NSUnLinkModule(handle, options) ? 1 : 0;
     }
     else
-    {
         return 0;
-    }
 }
 
 /*

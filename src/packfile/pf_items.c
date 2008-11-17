@@ -580,7 +580,7 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
     PIO_eprintf(NULL, "PF_fetch_number: Byteordering..\n");
 #endif
     /* Here is where the size transforms get messy */
-    if (NUMVAL_SIZE == 8 && pf->header->floattype == 1) {
+    if (NUMVAL_SIZE == 8 && ! pf->header->floattype) {
         (pf->fetch_nv)((unsigned char *)&f, (const unsigned char *) *stream);
         *((const unsigned char **) (stream)) += 12;
     }
@@ -870,10 +870,11 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
             pf->fetch_op = fetch_op_le_4;
         else
             pf->fetch_op = fetch_op_le_8;
-        if (pf->header->floattype == 0)
-            pf->fetch_nv = fetch_buf_le_8;
-        else if (pf->header->floattype == 1)
+
+        if (pf->header->floattype)
             pf->fetch_nv = cvt_num12_num8_le;
+        else
+            pf->fetch_nv = fetch_buf_le_8;
     }
     else {
         if (pf->header->wordsize == 4)
@@ -890,19 +891,20 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
             pf->fetch_op = fetch_op_be_4;
         else
             pf->fetch_op = fetch_op_be_8;
-        if (pf->header->floattype == 0)
-            pf->fetch_nv = fetch_buf_be_8;
-        else if (pf->header->floattype == 1)
+
+        if (pf->header->floattype)
             pf->fetch_nv = cvt_num12_num8_be;
+        else
+            pf->fetch_nv = fetch_buf_be_8;
     }
     else {
         if (pf->header->wordsize == 4)
             pf->fetch_op = fetch_op_le_4;
         else
             pf->fetch_op = fetch_op_le_8;
-        if (NUMVAL_SIZE == 8 && pf->header->floattype == 1)
+        if (NUMVAL_SIZE == 8 && pf->header->floattype)
             pf->fetch_nv = cvt_num12_num8;
-        else if (NUMVAL_SIZE != 8 && pf->header->floattype == 0)
+        else if (NUMVAL_SIZE != 8 && ! pf->header->floattype)
             pf->fetch_nv = fetch_buf_le_8;
     }
 #endif

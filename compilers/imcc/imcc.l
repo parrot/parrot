@@ -800,7 +800,6 @@ destroy_frame(struct macro_frame_t *frame, void *yyscanner)
     int             ret    = 0;
     int             i;
 
-
     for (i = 0; i < frame->expansion.num_param; i++) {
         mem_sys_free(frame->expansion.name[i]);
         frame->expansion.name[i] = NULL;
