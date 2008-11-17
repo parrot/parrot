@@ -30,12 +30,7 @@ object.
     $P0 = subclass 'ResizablePMCArray', 'List'
 .end
 
-.namespace [ 'List' ]
-
-
-
-
-.namespace [ 'cardinal::Compiler' ]
+.namespace [ 'cardinal';'Compiler' ]
 
 #no caridinal_group found on my machine
 #.loadlib 'cardinal_group'
