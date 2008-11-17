@@ -1191,8 +1191,17 @@ Increments the integer.
 */
 
 VTABLE void increment() {
-    /* RT #46633 overflow */
-    PMC_int_val(SELF)++;
+    const INTVAL a = VTABLE_get_integer(INTERP, SELF);
+    const INTVAL c = a + 1;
+
+    /* did not overflow */
+    if ((c^a) >= 0 || (c^1) >= 0)
+        VTABLE_set_integer_native(interp, SELF, c);
+    else {
+        VTABLE_morph(interp, SELF, enum_class_BigInt);
+        VTABLE_set_integer_native(interp, SELF, a);
+        VTABLE_increment(interp, SELF);
+    }
 }
 
 
@@ -1207,8 +1216,16 @@ Decrements the integer.
 */
 
 VTABLE void decrement() {
-    /* RT #46633 overflow */
-    PMC_int_val(SELF)--;
+    const INTVAL a = SELF.get_integer();
+    const INTVAL c = a - 1;
+
+    if ((c^a) >= 0 || (c^~1) >= 0)
+        VTABLE_set_integer_native(interp, SELF, c);
+    else {
+        VTABLE_morph(interp, SELF, enum_class_BigInt);
+        VTABLE_set_integer_native(interp, SELF, a);
+        VTABLE_decrement(interp, SELF);
+    }
 }
 
 
