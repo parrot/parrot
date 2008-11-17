@@ -5,6 +5,11 @@
 
 ROADMAP - A plan for parrot 1.0 and beyond.
 
+=head1 OTHER DOCUMENTS
+
+See L<https://trac.parrot.org/parrot/wiki/ParrotRoadmap>, created at
+the Parrot Developer Summit in November 2008.
+
 =head1 PURPOSE
 
 A high level overview of the work that is remaining to release parrot 1.0,
