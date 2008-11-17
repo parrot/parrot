@@ -269,6 +269,30 @@ test-pcc-testsuite: all t/pcc-testsuite
 t/pcc-testsuite:
 	svn co http:////code.roadsend.com//svn//pcc//trunk//pcc-testsuite t/pcc-testsuite
 
+# this does not work yet
+# Make sue that php 5.3 is in $PATH,
+# e.g export PATH=~/devel/PHP/php5/sapi/cli:$PATH
+test-php-qa-testsuite: pipp \
+ t/php_qa_testsuite/php5/run-tests.php \
+ t/php_qa_testsuite/php5/tests 
+ #t/php_qa_testsuite/php5/Zend/tests
+	cd t/php_qa_testsuite/php5 && cvs update tests run-tests.php
+	cd t/php_qa_testsuite/php5 && \
+ TEST_PHP_EXECUTABLE=pipp \
+ TEST_PHP_CGI_EXECUTABLE=pipp \
+ php run-tests.php -v --keep-all | tee run_tests.log
+
+t/php_qa_testsuite/php5/run-tests.php:
+	cd t/php_qa_testsuite && cvs -d :pserver:cvsread@cvs.php.net:/repository checkout -r PHP_5_3 php5/run-tests.php  
+
+t/php_qa_testsuite/php5/tests:
+	cd t/php_qa_testsuite && cvs -d :pserver:cvsread@cvs.php.net:/repository checkout -r PHP_5_3 php5/tests
+
+#t/php_qa_testsuite/php5/Zend/tests:
+	#cd php_qa_testsuite && cvs -d :pserver:cvsread@cvs.php.net:/repository/ZendEngine2 checkout -r PHP_5_3 php5/Zend/tests
+
+
+# cleaning up
 clean: clean-common clean-pct clean-antlr3 clean-test clean-hash
 
 clean-common: clean-pmc
