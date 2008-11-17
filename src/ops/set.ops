@@ -494,8 +494,7 @@ inline op copy(inout PMC, invar PMC) :base_mem {
   INTVAL type         = VTABLE_type(interp, $2);
 
   /* Preserve the metadata on the destination. */
-  PMC  * const meta   = PObj_flag_TEST(is_PMC_EXT, $1) ?
-        PMC_metadata($1) : PMCNULL;
+  PMC   * const meta  = VTABLE_getprops(interp, $1);
 
   /* avoid leaks and unreachable memory by destroying the destination PMC */
   if (PObj_active_destroy_TEST($1))
@@ -511,8 +510,14 @@ inline op copy(inout PMC, invar PMC) :base_mem {
     clone->pmc_ext = NULL;
 
   /* Restore metadata. */
-  if (PObj_flag_TEST(is_PMC_EXT, $1) && !PMC_IS_NULL(meta))
-    $1->pmc_ext->_metadata = meta;
+  if (!PMC_IS_NULL(meta)) {
+      PMC * const iter = VTABLE_get_iter(interp, meta);
+      while (VTABLE_get_bool(interp, iter)) {
+          STRING * const key = VTABLE_shift_string(interp, iter);
+          PMC * const value  = VTABLE_get_pmc_keyed_str(interp, meta, key);
+          VTABLE_setprop(interp, $1, key, value);
+      }
+  }
 }
 
 =back
