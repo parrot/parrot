@@ -3857,23 +3857,23 @@ void *
 Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
 {
     Parrot_jit_info_t jit_info;
-    int i = 0;
-    char *pc;
-    int arg_count = 0;
-    int string_buffer_count = 0;
-    const int ST_SIZE_OF = 124;
-    const int JIT_ALLOC_SIZE = 1024;
+    char     *pc;
+    int       i                    = 0;
+    int       arg_count            = 0;
+    int       string_buffer_count  = 0;
+    const int ST_SIZE_OF           = 124;
+    const int JIT_ALLOC_SIZE       = 1024;
 
-    char *sig = (char *)signature->strstart + 1; /* skip over the result */
-    size_t stack_space_needed = calc_signature_needs(sig, &string_buffer_count);
+    /* skip over the result */
+    char      *sig                = (char *)signature->strstart + 1;
+    size_t     stack_space_needed = calc_signature_needs(sig,
+                                        &string_buffer_count);
 
-
-    int base_offset = 0;
-    int strings_offset = base_offset - (sizeof (char*) * string_buffer_count);
-    int st_offset = strings_offset - ST_SIZE_OF;
-    int args_offset = st_offset - stack_space_needed;
-    int temp_calls_offset = args_offset - 16;
-
+    int base_offset        = 0;
+    int strings_offset     = base_offset - (sizeof (char *) * string_buffer_count);
+    int st_offset          = strings_offset - ST_SIZE_OF;
+    int args_offset        = st_offset - stack_space_needed;
+    int temp_calls_offset  = args_offset - 16;
     int total_stack_needed = -temp_calls_offset;
 
     /*
@@ -3891,7 +3891,9 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
     pc = jit_info.native_ptr = jit_info.arena.start = (char *)mem_alloc_executable(JIT_ALLOC_SIZE);
 
 
-    /* this generated jit function will be called as (INTERP (EBP 8), func_ptr (ESP 12), args signature (ESP 16)) */
+    /* this generated jit function will be called as (INTERP (EBP 8), func_ptr
+    * (ESP 12), args signature (ESP 16)) */
+
     /* make stack frame, preserve %ebx */
     jit_emit_stack_frame_enter(pc);
 
@@ -3903,7 +3905,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
     emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
 
     /*&st*/
-    emitm_lea_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, st_offset);
+    emitm_lea_m_r(interp,  pc, emit_EAX, emit_EBP, 0, 1, st_offset);
     emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
 
     /*interpreter*/
