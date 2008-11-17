@@ -217,6 +217,10 @@ Report whether the exception handler can handle a particular type of exception.
 
                 RETURN(INTVAL 0);
             }
+            else if (core_struct->max_severity > 0 ||
+                    core_struct->min_severity > 0) {
+                RETURN(INTVAL 1);
+            }
 
             /* The exception handler has already been used before. */
             else if (VTABLE_get_integer(INTERP, SELF)) {
