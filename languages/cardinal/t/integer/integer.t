@@ -2,7 +2,7 @@ require 'test'
 plan 51
 
 # add a test against the expected class type when we get .class worked out better
-# out class hierachry needs some work
+# our class hierachry needs some work
 def test_by_int(pos, neg, desc)
         isnt pos, '300', desc
  	isnt neg, '-300', desc
