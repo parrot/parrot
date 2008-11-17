@@ -310,7 +310,11 @@ pir_error_output_like( <<'CODE', <<"OUTPUT", $desc, todo => 'foo' );
 CODE
 /bar/
 OUTPUT
-test_test($desc);
+if($Test::Builder::VERSION == 0.84) {
+    test_test(title => $desc, skip_err => 1);
+} else {
+    test_test($desc);
+}
 
 # Local Variables:
 #   mode: cperl
