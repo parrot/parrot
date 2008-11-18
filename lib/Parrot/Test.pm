@@ -331,7 +331,8 @@ sub run_command {
         }
     }
 
-    if ( $out and $err and $out eq $err ) {
+    ##  File::Temp overloads 'eq' here, so we need the quotes. RT #58840
+    if ( $out and $err and "$out" eq "$err" ) {
         $err = '&STDOUT';
     }
 
