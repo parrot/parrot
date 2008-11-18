@@ -160,6 +160,8 @@ Any exception handlers that currently rely on this feature will need to
 either be more specific about what they catch or rethrow exceptions they
 don't recognize.
 
+See RT #60640.
+
 =back
 
 =head1 Functions
