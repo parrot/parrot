@@ -145,8 +145,5 @@ compilers/pirc/macro/macroparser.c
 compilers/pirc/macro/macroparser.h
 compilers/pirc/new/hdocprep.l
 compilers/pirc/new/hdocprep.c
-languages/pipp/src/yacc/plumhead_lexer.c
-languages/pipp/src/yacc/plumhead_parser.c
-languages/pipp/src/yacc/plumhead_parser.h
 # these ones include long POD
 docs/embed.pod
