@@ -159,7 +159,7 @@ See RT #60592.
 
 =over 4
 
-=item PARROT_API changes to PARROT_EXPORT
+=item PARROT_API changes to PARROT_EXPORT [post 0.8.1]
 
 The PARROT_API name suggests something that is not the case yet.  This will
 become PARROT_EXPORT after November 2008 release.  (We will reintroduce
