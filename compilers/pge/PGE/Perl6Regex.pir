@@ -1441,6 +1441,9 @@ Parse a modifier.
     .local pmc exp0, exp1
 
     exp0 = self[0]
+    $I0 = isa exp0, ['PGE';'Exp';'Scalar']
+    unless $I0 goto err_no_lvalue
+
     cname = exp0['cname']
     exp1 = self[1]
 
@@ -1481,6 +1484,11 @@ Parse a modifier.
   end:
     exp1 = exp1.'perl6exp'(pad)
     .return (exp1)
+
+  err_no_lvalue:
+    $P0 = get_hll_global ['PGE';'Perl6Regex'], 'parse_error'
+    $I0 = self.'from'()
+    $P0(self, $I0, 'lhs of alias must be an lvalue')
 .end
 
 
