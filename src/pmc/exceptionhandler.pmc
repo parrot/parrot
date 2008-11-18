@@ -204,8 +204,7 @@ Report whether the exception handler can handle a particular type of exception.
             }
             else if (core_struct->handled_types != PMCNULL) {
                 INTVAL elems = VTABLE_elements(interp, core_struct->handled_types);
-                INTVAL type  = VTABLE_get_integer_keyed_str(interp, exception,
-                        CONST_STRING(interp, "type"));
+                INTVAL type  = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "type"));
                 INTVAL i;
 
                 for (i = 0; i < elems; i++) {

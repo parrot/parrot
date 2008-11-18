@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -96,6 +96,8 @@ sub info_for_first_long_line {
         $line =~ s/\t/' ' x (1 + length($`) % 8)/eg;  # expand \t
         next if $line =~ m/https?:\/\//;              # skip long web addresses
         next if $line =~ m/\$Id:/;
+        next if $line =~ m/CONST_STRING\(/;           # see RT#60616, no line splits with CONST_STRING
+
         return sprintf '%s:%d: %d cols', $file, $., length($line)
             if length($line) > $num_col_limit;
     }
