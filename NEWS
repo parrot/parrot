@@ -24,6 +24,9 @@ New in the November 2008 release
     - implemented increment on protoobjects
     - added initial support for MAIN subs
     - added .PARROT method
+  + Pipp
+    - Added some predefined constants.
+    - Added implemention of the function basename().
 - Compilers
   + PCT
     - added '.isa' method to PCT::Node
