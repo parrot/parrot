@@ -19,7 +19,8 @@ well.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
+    .include 'except_types.pasm'
 
     plan(143)
 
@@ -119,13 +120,22 @@ well.
     new $P0, 'Hash'
     $P0['yum'] = 5
     null $S0
-    push_eh catched
     $I0 = 0
+
+    $P2 = new 'ExceptionHandler'
+    $P2.'handle_types'(.EXCEPTION_UNEXPECTED_NULL)
+    set_addr $P2, null_ex_eh
+    push_eh $P2
+
     $P1 = $P0[$S0]
+
     goto check
-catched:
+
+null_ex_eh:
     $I0 = 1
+
 check:
+    pop_eh
     is( $I0, 1, 'using null string as key throws' )
 .end
 
