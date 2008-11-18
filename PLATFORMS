@@ -37,6 +37,7 @@ linux-x86_64-gcc3.4.3         8   Y    -    -     Y   Y   Y    Y     ?  20060618
 linux-x86_64-gcc4.1.0         8   Y    -    -     Y   Y   Y    Y     ?  20070116
 linux-x86_64-gcc4.1.0         4   Y    -    -     Y   Y   Y    Y/2   ?  20060807
 linux-x86_64-gcc4.1.2         8   Y    -    -     Y   Y   Y    Y     ?  20080220
+linux-x86_64-gcc4.3.2         8   Y    -    -     Y   Y   Y    Y     ?  20081118
 openbsd-zaurus-gcc3.3.5           Y    -    -     Y   Y   Y    ?     ?  20070309
 sol8-sparc-cc                B    -    -    -     -   -   -    Y/85  ?  20080818
 sol8-sparc-gcc_4.1.0         B    -    -    -     -   -   -    Y/87  ?  20080818
