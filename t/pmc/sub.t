@@ -660,7 +660,7 @@ CODE
 /too few arguments passed \(1\) - 2 params expected/
 OUTPUT
 
-($TEMP, $temp_pasm) = create_tempfile();
+($TEMP, $temp_pasm) = create_tempfile(UNLINK => 1);
 print $TEMP <<'EOF';
 .sub _sub1 :load
   say "in sub1"
@@ -681,7 +681,7 @@ in sub1
 back
 OUTPUT
 
-($TEMP, $temp_pasm) = create_tempfile();
+($TEMP, $temp_pasm) = create_tempfile(UNLINK => 1);
 print $TEMP <<'EOF';
 .sub _foo
   print "error\n"

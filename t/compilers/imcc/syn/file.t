@@ -490,7 +490,7 @@ with_slash() called!
 without_slash() called!
 OUT
 }
-
+unlink(@temp_files);
 $ended_ok = 1;
 
 exit;
