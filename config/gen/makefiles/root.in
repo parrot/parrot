@@ -692,7 +692,7 @@ help :
 	@echo ""
 	@echo "Smoke Testing:"
 	@echo "  smoke:             Run the test suite and send smoke.html to "
-	@echo "                     http:////smoke.parrotcode.org/"
+	@echo "                     http:////smoke.parrotcode.org//"
 	@echo "  smokej:            Same as smoke, but with JIT runcore"
 	@echo "  smokeexec:         Same as smoke, but generate first executables"
 	@echo "                     with the exec runcore"
@@ -1834,7 +1834,7 @@ SUNLINT_HUSH_OPTS = \
 
 SUNLINT_OPTS_FOR_THE_FUTURE = -b -m -Xc
 
-# Lint options at: http://docs.sun.com/app/docs/doc/819-5265/6n7c29cli?a=view
+# Lint options at: http:////docs.sun.com//app//docs//doc//819-5265//6n7c29cli?a=view
 SUNLINTOPTS = \
     -b \
     -p \
@@ -1871,15 +1871,15 @@ bsdlint : $(PARROT)
 	rm -f *.ln
 	$(LINT) $(CC_INC) "-Isrc/pmc" $(BSD_LINT_FLAGS) $(BSD_LINT_EXCLUSIONS) $(LINTABLE_CFILES)
 
-# For checking with splint see also http://www.perlfoundation.org/parrot/index.cgi?splint
-# Splint: http://splint.org
+# For checking with splint see also http:////www.perlfoundation.org//parrot//index.cgi?splint
+# Splint: http:////splint.org
 SPLINT = splint
 
 # Temp directory for splint.  Add +keep to splintflags if you want work files
 # kept in there after completion.
 SPLINT_TMP = $(TMP)/splint
 
-# Splint flags: http://splint.org/manual/html/appB.html
+# Splint flags: http:////splint.org//manual//html//appB.html
 # The dashes in the names don't make any difference to Splint, but I've
 # made them match how they are in the manual.  Otherwise, you might be
 # looking for "declundef", except that it's "decl-undef" in the docs.
