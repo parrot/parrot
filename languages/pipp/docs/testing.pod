@@ -13,7 +13,7 @@ These tests are used by 'make test'.
 
 Run individual tests like:
   
-  perl t/harness t/in_php/01_sea_only.t
+  perl t/harness --verbose t/in_php/01_sea_only.t
 
 =head1 How to run the PHP test suite
 

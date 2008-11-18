@@ -7,19 +7,19 @@ Pipp - Introduction
 =head1 What is Pipp?
 
 Pipp aims to be a complete implementation of PHP on Parrot.
+In short, Pipp in Parrot's PHP.
 
 =head1 Goals
 
 Implement PHP.
 
-Provide a side by side comparison of different parsing and tree transformation
-techniques. 
-
+A secondary gaol in to provide a side by side comparison
+of different parsing and tree transformation techniques. 
 Currently there are three variants of Pipp:
 
 =over
 
-=item pct       - Parrot compiler toolkit
+=item pct       - Parrot compiler toolkit, this is the default
 
 =item phc       - take XML output from phc and munge it with XSLT
 

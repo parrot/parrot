@@ -2,7 +2,14 @@
 
 N: Bernhard Schmalhofer
 E: Bernhard.Schmalhofer@gmx.de
+D: Started this madness
 
 N: Christoph Otto
-D: PhpArray PMC implementation
 E: christoph.mksig@org
+D: PhpArray PMC implementation
+D: Parser improvements
+
+N: François Perrad
+E: francois.perrad@gadz.org
+W: http://fperrad.googlepages.com/home
+D: Implementation of functions

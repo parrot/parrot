@@ -1,0 +1,18 @@
+# $Id$
+
+=head1 TITLE
+
+extensions - How Pipp supports PHP extensions
+
+=head1 Technical notes
+
+Currently there is no support at all for extensions.
+=head1 AUTHOR
+
+Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
+
+=head1 SEE ALSO
+
+  L<http://www.php.net/manual/en/internals2.php>
+
+=cut
