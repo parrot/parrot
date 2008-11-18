@@ -434,7 +434,7 @@ of names separated by spaces.
     .local pmc parrotclass, hll
 
     hll = options['hll']
-    $I0 = defined hll 
+    $I0 = defined hll
     if $I0, have_hll
     $P0 = getinterp
     $P0 = $P0['namespace';1]
