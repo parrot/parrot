@@ -2008,7 +2008,8 @@ to have a PMC generated containing the constant value.
     ops = $P0.'new'('node'=>node)
 
     .local pmc value, returns
-    value = node.'value'()
+    value = node['value']
+    if null value goto err_novalue
     returns = node.'returns'()
     if returns goto have_returns
     $S0 = typeof value
@@ -2039,6 +2040,9 @@ to have a PMC generated containing the constant value.
     ops.'push_pirop'('assign', result, value)
     ops.'result'(result)
     .return (ops)
+
+  err_novalue:
+    self.'panic'('PAST::Val node missing :value attribute')
 .end
 
 
