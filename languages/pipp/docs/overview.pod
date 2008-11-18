@@ -12,10 +12,11 @@ In short, Pipp in Parrot's PHP.
 =head1 Goals
 
 Implement PHP.
+Support well behaving PHP extensions.
 
-A secondary gaol in to provide a side by side comparison
+A secondary goal is to provide a side by side comparison
 of different parsing and tree transformation techniques. 
-Currently there are three variants of Pipp:
+Therefore there are currently three variants of Pipp:
 
 =over
 
@@ -29,7 +30,7 @@ Currently there are three variants of Pipp:
 
 =head1 Status
 
-21 out of 1322 tests in the PHP 5.3.0 test suite pass for the PCT variant.
+No current status available.
 
 =head1 Dependencies
 
