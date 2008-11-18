@@ -79,18 +79,20 @@ OUT
 }
 
 {
-    test_pct( 'our down', <<'GRAMMAR', <<'ACTIONS', <<'OUT', todo => 'RT# 60554, our vars get lost' );
+    test_pct( 'our down', <<'GRAMMAR', <<'ACTIONS', <<'OUT' )
 token TOP    { <thingy> {*} }
 token thingy { 'thingy' {*} }
 GRAMMAR
 
 method TOP($/) {
-    our $?MY_OUR_VAR := 'was passed down';
+    # thingy() is executed before TOP.
+    # So setting $?MY_OUR_VAR here won't affect the generated PAST
+    our $?MY_OUR_VAR := 'was set in method TOP';
     make $( $<thingy> );
 }
 
 method thingy($/) {
-    our $?MY_OUR_VAR;
+    our $?MY_OUR_VAR := 'was set in method thingy';
     my $past  := PAST::Stmts.new(
                      PAST::Op.new(
                          PAST::Val.new(
@@ -104,7 +106,7 @@ method thingy($/) {
     make $past;
 }
 ACTIONS
-our var was passed down
+our var was set in method thingy
 OUT
 }
 
