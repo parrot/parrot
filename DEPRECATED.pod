@@ -87,7 +87,7 @@ and RT #48018.
 
 Will be replaced by C<.line> to be more consistent with other PIR syntax.
 
-See [RT#45857], [RT#43269], and [RT#47141].
+See RT #45857, RT #43269, and RT #47141.
 
 =item * C<<.namespace <identifier> >> syntax [post 0.5.1]
 
@@ -165,11 +165,15 @@ The PARROT_API name suggests something that is not the case yet.  This will
 become PARROT_EXPORT after November 2008 release.  (We will reintroduce
 PARROT_API on specific functions where appropriate post 1.0.0.)
 
+See RT #60624.
+
 =item Old-style MMD functions [post 0.7.1]
 
 Parrot_mmd_add_function, mmd_expand_x, mmd_expand_y, Parrot_mmd_register,
 Parrot_mmd_register_sub, Parrot_mmd_destroy, Parrot_MMD_search_default_infix,
 Parrot_mmd_search_default, mmd_cvt_to_types.
+
+See RT #60626.
 
 =item src/pic.c and src/pic_jit.c [post 0.8.1]
 
