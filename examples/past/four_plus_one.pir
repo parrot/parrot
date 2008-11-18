@@ -64,27 +64,27 @@
 
     .local pmc val_4
     val_4 = new ['PAST';'Val']
-    val_4.init( 'value' => '4', 'returns' => 'Integer' )
+    val_4.'init'( 'value' => '4', 'returns' => 'Integer' )
 
     .local pmc val_1
     val_1 = new ['PAST';'Val']
-    val_1.init( 'value' => '1', 'returns' => 'Integer' )
+    val_1.'init'( 'value' => '1', 'returns' => 'Integer' )
 
     .local pmc op_add
     op_add = new ['PAST';'Op']
-    op_add.init( val_4, val_1, 'name' => 'infix:+', 'pirop' => 'add' )
+    op_add.'init'( val_4, val_1, 'name' => 'infix:+', 'pirop' => 'add' )
 
     .local pmc var_last
     var_last = new ['PAST';'Var']
-    var_last.init( 'name' => 'last', 'scope' => 'package', 'lvalue' => 1 )
+    var_last.'init'( 'name' => 'last', 'scope' => 'package', 'lvalue' => 1 )
 
     .local pmc op_bind
     op_bind = new ['PAST';'Op']
-    op_bind.init( var_last, op_add, 'pasttype' => 'bind' )
+    op_bind.'init'( var_last, op_add, 'pasttype' => 'bind' )
 
     .local pmc op_say
     op_say = new ['PAST';'Op']
-    op_say.init( op_bind, 'name' => 'say', 'pasttype' => 'call' )
+    op_say.'init'( op_bind, 'name' => 'say', 'pasttype' => 'call' )
 
     .local pmc stmts
     stmts = new ['PAST';'Stmts']

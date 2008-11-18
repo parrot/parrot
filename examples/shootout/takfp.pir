@@ -43,7 +43,7 @@ endif:
 	$N1 = Tak(tmp, z, x)
 	tmp = z - 1
 	$N2 = Tak(tmp, x, y)
-	.return Tak($N0, $N1, $N2)
+	.tailcall Tak($N0, $N1, $N2)
 .end
 
 

@@ -15,7 +15,7 @@ to use particle's Exporter).
     curr_namespace = get_namespace
     test_namespace = get_namespace [ 'Test'; 'More' ]
     exports = split " ", "plan ok is isa_ok skip todo"
-    test_namespace.export_to(curr_namespace, exports)
+    test_namespace.'export_to'(curr_namespace, exports)
 
     plan( 4 )
 

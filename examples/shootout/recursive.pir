@@ -66,12 +66,12 @@ a1:
 	if y goto a2
 	$I0 = x - 1
 	$I1 = 1
-	.return ack($I0, $I1)
+	.tailcall ack($I0, $I1)
 a2:
 	$I2 = y - 1
 	$I3 = ack(x, $I2)
 	$I4 = x - 1
-	.return ack($I4, $I3)
+	.tailcall ack($I4, $I3)
 .end
 
 .sub FibInt
@@ -116,7 +116,7 @@ endif:
 	$N1 = TakNum(tmp, z, x)
 	tmp = z - 1.0
 	$N2 = TakNum(tmp, x, y)
-	.return TakNum($N0, $N1, $N2)
+	.tailcall TakNum($N0, $N1, $N2)
 .end
 
 .sub TakInt
@@ -133,7 +133,7 @@ endif:
 	tmp = TakInt(tmp, z, x)
 	dec z
 	z = TakInt(tmp, x, y)
-	.return TakInt($I0, tmp, z)
+	.tailcall TakInt($I0, tmp, z)
 .end
 
 

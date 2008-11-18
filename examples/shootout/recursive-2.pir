@@ -69,13 +69,13 @@ END
     dec y
     y = ack(x, y)
     dec x
-    .return ack(x, y)
+    .tailcall ack(x, y)
 a1:
     inc y
     .return (y)
 a2:
     dec x
-    .return ack(x, 1)
+    .tailcall ack(x, 1)
 .end
 
 .sub FibInt
@@ -120,7 +120,7 @@ endif:
     $N1 = TakNum(tmp, z, x)
     dec z
     z = TakNum(z, x, y)
-    .return TakNum($N0, $N1, z)
+    .tailcall TakNum($N0, $N1, z)
 .end
 
 .sub TakInt
@@ -137,7 +137,7 @@ endif:
     tmp = TakInt(tmp, z, x)
     dec z
     z   = TakInt(z, x, y)
-    .return TakInt($I0, tmp, z)
+    .tailcall TakInt($I0, tmp, z)
 .end
 
 

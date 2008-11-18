@@ -13,13 +13,13 @@ methods, calling methods, and setting attributes.
     addattribute myclass, 'baz'
 
     myobj = new 'Foo'
-    myobj.set_bar("Hello")
-    myobj.set_baz(5)
+    myobj.'set_bar'("Hello")
+    myobj.'set_baz'(5)
 
-    $S0 = myobj.get_bar()
+    $S0 = myobj.'get_bar'()
     say $S0
 
-    $I0 = myobj.get_baz()
+    $I0 = myobj.'get_baz'()
     print $I0
     print "\n"
 

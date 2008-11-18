@@ -48,12 +48,12 @@ a1:
     if y goto a2
 	$I0 = x - 1
 	$I1 = 1
-	.return ack($I0, $I1)
+	.tailcall ack($I0, $I1)
 a2:
     $I2 = y - 1
     $I3 = ack(x, $I2)
     $I4 = x - 1
-    .return ack($I4, $I3)
+    .tailcall ack($I4, $I3)
 .end
 
 # Local Variables:
