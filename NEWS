@@ -4,16 +4,38 @@ New in the November 2008 release
 - Implementation
   + CPAN module Storable 2.18 added as a configuration and build dependency
   + remove the pseudo PIR opcode 'addr'
-  + add the 'box' opcode
+  + added the 'box' opcode
+  + fixed 'pop_eh' handling in PIR libraries and examples
+  + removed usage of .return for tailcalls (use .tailcall instead)
+  + removed 'get_hash' and 'get_array' from Capture PMC and Capture_PIR
 - Languages
-  + New tool for "fire and forget" rebase/rebuild/test of Parrot and Rakudo
+  + Rakudo
+    - refactored Junctions implementation
+    - new tool for "fire and forget" rebase/rebuild/test of Parrot and Rakudo
+    - updated container/reference semantics
+    - added more builtin methods and functions
+    - improved support for multilevel namespaces
+    - added support for .Str, .succ, .pred in user-defined classes
+    - implemented pointy blocks on if/loops
+    - increased STD.pm convergence
+    - added %*VM hash
+    - improved MMD candidate sorting
+    - improved integration of Num and Int
+    - implemented increment on protoobjects
+    - added initial support for MAIN subs
+    - added .PARROT method
 - Compilers
+  + PCT
+    - added '.isa' method to PCT::Node
+    - clean up 'immediate block' handling
+    - allow arguments to immediate blocks in loops/conditionals
+    - metaclass objects can now 'add_method'
   + PIRC
-    - Integrated macro processing in PIRC's lexer
-    - Integrated heredoc lexer in PIRC executable
-    - Added preprocess and heredoc-preprocess commandline options
-    - Integrated the PASM grammar into PIRC
-    - Added a register allocator to optimize the built-in vanilla allocator
+    - integrated macro processing in PIRC's lexer
+    - integrated heredoc lexer in PIRC executable
+    - added preprocess and heredoc-preprocess commandline options
+    - integrated the PASM grammar into PIRC
+    - added a register allocator to optimize the built-in vanilla allocator
     - code cleanups and documentation
 - Deprecations
   + PARROT_API will become PARROT_EXPORT
