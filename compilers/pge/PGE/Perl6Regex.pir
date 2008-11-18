@@ -593,7 +593,7 @@ combinations.
     .return (mob)
 
   err_closure:
-    parse_error(mob, pos, "Error in closure quantifier")
+    'parse_error'(mob, pos, "Error in closure quantifier")
 .end
 
 
@@ -607,7 +607,7 @@ Throw an exception for quantifiers in term position.
     .param pmc mob
     .local int pos
     pos = mob.'to'()
-    parse_error(mob, pos, "Quantifier follows nothing in regex")
+    'parse_error'(mob, pos, "Quantifier follows nothing in regex")
 .end
 
 
@@ -1054,6 +1054,7 @@ Parse a modifier.
   name:
     pos = find_not_cclass .CCLASS_WORD, target, pos, lastpos
     $I1 = pos - $I0
+    if $I1 == 0 goto err_null_cut
     $S0 = substr target, $I0, $I1
     mob['key'] = $S0
     mob.'result_object'(value)
@@ -1068,6 +1069,9 @@ Parse a modifier.
   end:
     ### XXX pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
     mob.'to'(pos)
+    .return (mob)
+  err_null_cut:
+    'parse_error'(mob, pos, 'Cut quantifier follows nothing')
     .return (mob)
 .end
 
