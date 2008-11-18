@@ -5,21 +5,23 @@ platforms.
 See also http://smoke.parrotcode.org/smoke/ for recent test results.
 See also t/TESTS.STATUS.pod about the status of the test suite.
 
+This list is divided into 2 sections: "Supported" (as defined by
+docs/parrot.pod) and "Extra".
+
+
+Supported platforms:
 Platform                     B8    Runloops      Feature Comp Test Inst YYYYMMDD
                                 CGoto JIT EXEC   Thr Sig
 --------------------------------------------------------------------------------
-aix5.3-power-gcc4.2          B8   -    -    -             Y    ?     ?  20080510
+cygwin1.5.24-x86-gcc3.4.4     4   Y    Y    -     -   -   Y    Y/6*1 ?  20071016
+cygwin1.5.25-x86-gcc3.4.4     4   Y    Y    -     -   -   Y    Y/6*1 ?  20080513
 darwin7.9.0-ppc-3.3          B    Y    Y    -     Y   Y   Y    Y/5   Y  20060808
 darwin8.6.0-ppc-gcc4.0.1     B    ?    ?    ?     ?   ?   ?    Y/4   ?  20060807
 darwin8.8.0-ppc-gcc4.0.1     B    Y/2  ?    ?     ?   ?   Y    Y     ?  20070116
 darwin8.6.0-x86-gcc4.0.1          ?    -    ?     ?   ?   Y    Y     ?  20060607
 darwin8.8.1-x86-gcc4.0.1          Y/2  ?    ?     ?   ?   Y    Y     ?  20070116
 darwin8.11.1-x86-gcc4.0.1         Y    ?    ?     ?   ?   Y    Y/7   ?  20080220
-freebsd-amd64-gcc3.4.6            Y    Y*3  ?     ?   ?   Y    Y     ?  20071008
 freebsd-x86-gcc-3.4.6             Y    ?    ?     ?   ?   Y    Y     ?  20080519
-linux-ppc-gcc3.4.5                Y    Y    Y     ?   ?   Y    Y     ?  20080519
-linux-ps3-gcc4.1.1           B    Y    Y    Y     Y   Y   Y    Y/3   -  20070308
-linux-s390x-gcc4.1.2         B4   ?    -    -     Y   Y   Y    Y/2   ?  20080908
 linux-x86-gcc3.3.3.20040412       Y/2  ?    ?     ?   ?   Y    Y     ?  20070116
 linux-x86-gcc3.3.5.2005013        Y    Y    Y     Y   Y   Y    Y     ?  20060618
 linux-x86-gcc3.4.5                Y    Y    Y     ?   ?   Y    Y     ?  20071016
@@ -33,12 +35,6 @@ linux-x86-gcc4.2.4                Y    Y    ?     Y   Y   Y    Y     ?  20081023
 linux-x86-gcc4.3.2                Y    Y    ?     Y   Y   Y    Y     ?  20081030
 linux-x86-icc9.1                  Y    Y    Y     ?   ?   Y    Y     ?  20071014
 linux-x86-llvm-gcc-4.2            Y    Y    ?     ?   ?   Y    Y     ?  20080801
-linux-x86_64-gcc3.4.3         8   Y    -    -     Y   Y   Y    Y     ?  20060618
-linux-x86_64-gcc4.1.0         8   Y    -    -     Y   Y   Y    Y     ?  20070116
-linux-x86_64-gcc4.1.0         4   Y    -    -     Y   Y   Y    Y/2   ?  20060807
-linux-x86_64-gcc4.1.2         8   Y    -    -     Y   Y   Y    Y     ?  20080220
-linux-x86_64-gcc4.3.2         8   Y    -    -     Y   Y   Y    Y     ?  20081118
-openbsd-zaurus-gcc3.3.5           Y    -    -     Y   Y   Y    ?     ?  20070309
 sol8-sparc-cc                B    -    -    -     -   -   -    Y/85  ?  20080818
 sol8-sparc-gcc_4.1.0         B    -    -    -     -   -   -    Y/87  ?  20080818
 sol10-sparc-cc_5.8           B    Y    -    -     Y   Y   Y    Y/9   ?  20060807
@@ -46,20 +42,39 @@ sol10-sparc-cc_5.9           B4*4 Y    -    -     Y   Y   Y    Y     ?  20080510
 sol10-sparc-cc_5.9           B8   Y    -    -     Y   Y   Y    Y/2   ?  20080518
 sol10-sparc-gcc_4.0.2        B4*4 Y    -    -     Y   Y   Y    Y/1   ?  20080510
 sol10-sparc-gcc_4.0.2        B8   Y    -    -     Y   Y   Y    Y/2   ?  20080518
-sol10-x86-cc_5.9              4   -    -    -     -   -   Y    Y     ?  20071010
-sol11-x86-cc_5.8                  -    -    -     -   -   -    Y/121 ?  20070821
-opensolaris-x86-gcc_4.0.3     4   Y    Y    ?     ?   ?   Y    Y/2   ?  20080325
 tru64-alpha-compaq_c6.5       8   ?    ?    ?     Y   ?   Y    Y/2   ?  20060203
-cygwin1.5.24-x86-gcc3.4.4     4   Y    Y    -     -   -   Y    Y/6*1 ?  20071016
-cygwin1.5.25-x86-gcc3.4.4     4   Y    Y    -     -   -   Y    Y/6*1 ?  20080513
 win32-x86-mingw_gcc3.4.5          Y    Y    -     -   -   Y    Y     Y  20080917
 win32-x86-mingw_gcc4.2.1          Y    Y    -     -   -   Y    Y/11  ?  20080520
 win32-x86-msvc_6.0                -    Y    -     Y   -   Y    Y/5   ?  20080520
 win32-x86-msvc_7.1                -    Y    -     Y   -   Y    Y/11  ?  20080520
 win32-x86-msvc_8.0                -    Y    -     Y   -   Y    Y/1   ?  20080520
-win32-x86_64-msvc_8.0             -    N    -     -   -   N    N     ?  20080520
 win32-x86-msvc_9.0                -    Y    -     Y   -   Y    Y/1   ?  20080520
 
+
+Extra Platforms:
+
+Platform                     B8    Runloops      Feature Comp Test Inst YYYYMMDD
+                                CGoto JIT EXEC   Thr Sig
+--------------------------------------------------------------------------------
+aix5.3-power-gcc4.2          B8   -    -    -             Y    ?     ?  20080510
+freebsd-amd64-gcc3.4.6            Y    Y*3  ?     ?   ?   Y    Y     ?  20071008
+freebsd-x86-gcc-3.4.6             Y    ?    ?     ?   ?   Y    Y     ?  20080519
+linux-ppc-gcc3.4.5                Y    Y    Y     ?   ?   Y    Y     ?  20080519
+linux-ps3-gcc4.1.1           B    Y    Y    Y     Y   Y   Y    Y/3   -  20070308
+linux-s390x-gcc4.1.2         B4   ?    -    -     Y   Y   Y    Y/2   ?  20080908
+linux-x86_64-gcc3.4.3         8   Y    -    -     Y   Y   Y    Y     ?  20060618
+linux-x86_64-gcc4.1.0         8   Y    -    -     Y   Y   Y    Y     ?  20070116
+linux-x86_64-gcc4.1.0         4   Y    -    -     Y   Y   Y    Y/2   ?  20060807
+linux-x86_64-gcc4.1.2         8   Y    -    -     Y   Y   Y    Y     ?  20080220
+linux-x86_64-gcc4.3.2         8   Y    -    -     Y   Y   Y    Y     ?  20081118
+openbsd-zaurus-gcc3.3.5           Y    -    -     Y   Y   Y    ?     ?  20070309
+sol10-x86-cc_5.9              4   -    -    -     -   -   Y    Y     ?  20071010
+sol11-x86-cc_5.8                  -    -    -     -   -   -    Y/121 ?  20070821
+opensolaris-x86-gcc_4.0.3     4   Y    Y    ?     ?   ?   Y    Y/2   ?  20080325
+win32-x86_64-msvc_8.0             -    N    -     -   -   N    N     ?  20080520
+
+
+Legend:
 ?   ... unknown or untested
 -   ... no
 Y   ... yes
