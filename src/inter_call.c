@@ -2610,7 +2610,8 @@ Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     PMC * const args_sig    = pmc_new(interp, enum_class_FixedIntegerArray);
     PMC * const results_sig = pmc_new(interp, enum_class_FixedIntegerArray);
     PMC * const ret_cont    = new_ret_continuation_pmc(interp, NULL);
-    PMC * const result_list = VTABLE_get_attr_str(interp, sig_obj, CONST_STRING(interp, "returns"));
+    PMC * const result_list = VTABLE_get_attr_str(interp, sig_obj,
+            CONST_STRING(interp, "returns"));
 
     Parrot_Context *ctx;
     opcode_t         *dest;

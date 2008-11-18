@@ -71,8 +71,10 @@ Parrot_ex_build_exception(PARROT_INTERP, INTVAL severity,
 {
     PMC *exception = pmc_new(interp, enum_class_Exception);
 
-    VTABLE_set_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"), severity);
-    VTABLE_set_integer_keyed_str(interp, exception, CONST_STRING(interp, "type"), error);
+    VTABLE_set_integer_keyed_str(interp, exception,
+            CONST_STRING(interp, "severity"), severity);
+    VTABLE_set_integer_keyed_str(interp, exception,
+            CONST_STRING(interp, "type"), error);
     if (msg)
         VTABLE_set_string_native(interp, exception, msg);
 
@@ -101,10 +103,8 @@ find_exception_handler(PARROT_INTERP, ARGIN(PMC *exception))
     else {
         STRING * const message = VTABLE_get_string(interp, exception);
         INTVAL exit_status = 1;
-        const INTVAL severity = VTABLE_get_integer_keyed_str(
-                                    interp,
-                                    exception,
-                                    CONST_STRING(interp, "severity"));
+        const INTVAL severity = VTABLE_get_integer_keyed_str(interp,
+                exception, CONST_STRING(interp, "severity"));
 
         /* flush interpreter output to get things printed in order */
         PIO_flush(interp, PIO_STDOUT(interp));
@@ -122,10 +122,8 @@ find_exception_handler(PARROT_INTERP, ARGIN(PMC *exception))
         }
         else if (severity == EXCEPT_exit) {
             /* TODO: get exit status based on type */
-            exit_status = VTABLE_get_integer_keyed_str
-                              interp,
-                              exception,
-                              CONST_STRING(interp, "exit_code"));
+            exit_status = VTABLE_get_integer_keyed_str(interp,
+                    exception, CONST_STRING(interp, "exit_code"));
         }
         else {
                 PIO_eprintf(interp, "No exception handler and no message\n");
@@ -286,10 +284,8 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     }
 
     if (Interp_debug_TEST(interp, PARROT_BACKTRACE_DEBUG_FLAG)) {
-        int exitcode = VTABLE_get_integer_keyed_str(
-                           interp,
-                           exception,
-                           CONST_STRING(interp, "exit_code"));
+        int exitcode = VTABLE_get_integer_keyed_str(interp, exception,
+                CONST_STRING(interp, "exit_code"));
         STRING *msg = VTABLE_get_string(interp, exception);
         PIO_eprintf(interp,
             "Parrot_ex_throw_from_c (severity:%d error:%d): %Ss\n",
@@ -434,7 +430,8 @@ PARROT_API
 void
 Parrot_ex_mark_unhandled(PARROT_INTERP, ARGIN(PMC *exception))
 {
-    VTABLE_set_integer_keyed_str(interp, exception, CONST_STRING(interp, "handled"), -1);
+    VTABLE_set_integer_keyed_str(interp, exception,
+            CONST_STRING(interp, "handled"), -1);
 }
 
 /*
