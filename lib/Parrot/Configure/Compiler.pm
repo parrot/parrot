@@ -465,11 +465,15 @@ sub genfile {
             if ( $line =~ m{/$} ) {
                 die "$source:$.: line ends in a slash\n";
             }
+
             $line =~ s{(/+)}{
                 my $len = length $1;
                 my $slash = $conf->data->get('slash');
                 '/' x ($len/2) . ($len%2 ? $slash : '');
             }eg;
+
+            # #60584: fix wildcard handling in vim-install target on windows
+            $line =~ s{(\:\s+.*?)\\\*}{$1/\*}g;
 
             # replace \* with \\*, so make will not eat the \
             $line =~ s{(\\\*)}{\\$1}g;
