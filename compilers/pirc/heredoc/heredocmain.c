@@ -9,10 +9,16 @@
 
 /*
 
+=head1 Functions
+
+=over 4
+
 =item C<int
 main(int argc, char *argv[])>
 
 Entry point of the heredoc pre-processor.
+
+=back
 
 =cut
 
