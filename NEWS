@@ -16,8 +16,8 @@ New in the November 2008 release
     - Added a register allocator to optimize the built-in vanilla allocator
     - code cleanups and documentation
 - Deprecations
-  + PARROT_API has changed to PARROT_EXPORT
-  + :lexid becomes :subid
+  + PARROT_API will become PARROT_EXPORT
+  + :lexid will become :subid
 - Miscellaneous
   + OpenGL
     - Minor fixes to Parrot's base OpenGL bindings
