@@ -47,6 +47,7 @@ sub _init {
         -Wcast-qual
         -Wchar-subscripts
         -Wcomment
+        -Wconversion
         -Wdisabled-optimization
         -Wendif-labels
         -Wextra

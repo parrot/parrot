@@ -180,12 +180,13 @@ static int pass_pmc(SHIM_INTERP,
         __attribute__nonnull__(6)
         FUNC_MODIFIES(*dest_base);
 
-static int pass_str(SHIM_INTERP,
+static int pass_str(PARROT_INTERP,
     ARGIN(const PMC *sig),
     ARGIN(const char *src_base),
     ARGIN(const void **src),
     ARGOUT(char *dest_base),
     ARGIN(void * const *dest))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
@@ -441,16 +442,21 @@ RT #48260: Not yet documented!!!
 */
 
 static int
-pass_str(SHIM_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
+pass_str(PARROT_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
         ARGIN(const void **src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
     int i;
     int n = SIG_ELEMS(sig);
 
     for (i = 2; n; ++i, --n) {
-        STRING * const arg = *(STRING* const *)(src_base + ((const opcode_t*)src)[i]);
-        *(STRING* *)(dest_base + ((const opcode_t*)dest)[i])= arg;
+        STRING *arg = *(STRING* const *)(src_base + ((const opcode_t*)src)[i]);
+
+        if (PObj_constant_TEST(arg))
+            arg = Parrot_make_COW_reference(interp, arg);
+
+        *(STRING* *)(dest_base + ((const opcode_t*)dest)[i]) = arg;
     }
+
     return i;
 }
 
@@ -525,14 +531,20 @@ pass_mixed(PARROT_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
                 break;
             case PARROT_ARG_STRING:
                 {
-                STRING * const argS = *(STRING * const *)(src_base + ((const opcode_t*)src)[i]);
-                *(STRING* *)(dest_base + ((const opcode_t*)dest)[i])= argS;
+                STRING *argS = *(STRING * const *)(src_base + ((const opcode_t *)src)[i]);
+
+                if (PObj_constant_TEST(argS))
+                    argS = Parrot_make_COW_reference(interp, argS);
+
+                *(STRING **)(dest_base + ((const opcode_t*)dest)[i]) = argS;
                 }
                 break;
             case PARROT_ARG_STRING|PARROT_ARG_CONSTANT:
                 {
-                STRING * const argS = (STRING*)(src)[i];
-                *(STRING* *)(dest_base + ((const opcode_t*)dest)[i])= argS;
+                STRING *argS = (STRING *)(src)[i];
+                if (PObj_constant_TEST(argS))
+                    argS = Parrot_make_COW_reference(interp, argS);
+                *(STRING **)(dest_base + ((const opcode_t *)dest)[i]) = argS;
                 }
                 break;
             case PARROT_ARG_PMC:
