@@ -153,6 +153,13 @@ C<:lexid> will be renamed to C<:subid>.
 
 See RT #60592.
 
+=item * Exception Handlers won't automatically be disabled [post 0.8.1]
+
+Exception handlers won't be automatically disabled after 0.8.1.
+Any exception handlers that currently rely on this feature will need to
+either be more specific about what they catch or rethrow exceptions they
+don't recognize.
+
 =back
 
 =head1 Functions
