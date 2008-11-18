@@ -106,7 +106,8 @@ relevant C code.
 sub goto_offset {
     my ( $self, $offset ) = @_;
 
-    return "goto **(void **)(cur_opcode += $offset)";
+    return "CONTEXT(interp)->current_pc = CUR_OPCODE + $offset;\n"
+    .      "goto **(void **)(cur_opcode += $offset)";
 }
 
 =item C<goto_pop()>
