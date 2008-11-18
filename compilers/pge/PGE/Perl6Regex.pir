@@ -1498,7 +1498,7 @@ Parse a modifier.
   err_no_lvalue:
     $P0 = get_hll_global ['PGE';'Perl6Regex'], 'parse_error'
     $I0 = self.'from'()
-    $P0(self, $I0, 'lhs of alias must be an lvalue')
+    $P0(self, $I0, 'LHS of alias must be lvalue')
 .end
 
 

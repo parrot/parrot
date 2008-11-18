@@ -26,5 +26,16 @@
 [a|?]		abcdef		/Quantifier follows nothing/	bare ? after |
 [a| ?]		abcdef		/Quantifier follows nothing/	bare ? after |+sp
 
+: abc		abcdef		/Quantifier follows nothing/	bare : at start
+  : abc		abcdef		/Quantifier follows nothing/	bare : after ws
+[:|a]		abcdef		/Quantifier follows nothing/	bare : after [
+[ :|a]		abcdef		/Quantifier follows nothing/	bare : after [+sp
+[a|:]		abcdef		/Quantifier follows nothing/	bare : after |
+[a| :]		abcdef		/Quantifier follows nothing/	bare : after |+sp
+
 		abcdef		/Null pattern illegal/		null pattern
   		abcdef		/Null pattern illegal/		ws null pattern
+
+  =abc		abcdef		/LHS of alias must be lvalue/	bare : after ws
+[ =a]		abcdef		/LHS of alias must be lvalue/	bare : after [+sp
+[a| =a]		abcdef		/LHS of alias must be lvalue/	bare : after |+sp
