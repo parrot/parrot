@@ -5,24 +5,24 @@
 
 .sub '__onload' :anon :load
 #    print "__onload (script.pir)\n"
-    $P0 = subclass 'Hash', 'Wmls::Script'
-    $P0 = subclass 'Array', 'Wmls::Constants'
-    $P0 = subclass 'Integer', 'Wmls::ConstantInteger'
-    $P0 = subclass 'Float', 'Wmls::ConstantFloat'
-    $P0 = subclass 'String', 'Wmls::ConstantUTF8String'
-    $P0 = subclass 'String', 'Wmls::ConstantEmptyString'
-    $P0 = subclass 'String', 'Wmls::ConstantString'
-    $P0 = subclass 'Array', 'Wmls::Pragmas'
-    $P0 = subclass 'Hash', 'Wmls::AccessDomain'
-    $P0 = subclass 'Hash', 'Wmls::AccessPath'
-    $P0 = subclass 'Hash', 'Wmls::UserAgentProperty'
-    $P0 = subclass 'Hash', 'Wmls::UserAgentProperty&Scheme'
-    $P0 = subclass 'Array', 'Wmls::Functions'
-    $P0 = subclass 'Array', 'Wmls::FunctionNameTable'
-    $P0 = subclass 'Hash', 'Wmls::Function'
+    $P0 = subclass 'Hash', 'Wmls_Script'
+    $P0 = subclass 'Array', 'Wmls_Constants'
+    $P0 = subclass 'Integer', 'Wmls_ConstantInteger'
+    $P0 = subclass 'Float', 'Wmls_ConstantFloat'
+    $P0 = subclass 'String', 'Wmls_ConstantUTF8String'
+    $P0 = subclass 'String', 'Wmls_ConstantEmptyString'
+    $P0 = subclass 'String', 'Wmls_ConstantString'
+    $P0 = subclass 'Array', 'Wmls_Pragmas'
+    $P0 = subclass 'Hash', 'Wmls_AccessDomain'
+    $P0 = subclass 'Hash', 'Wmls_AccessPath'
+    $P0 = subclass 'Hash', 'Wmls_UserAgentProperty'
+    $P0 = subclass 'Hash', 'Wmls_UserAgentProperty&Scheme'
+    $P0 = subclass 'Array', 'Wmls_Functions'
+    $P0 = subclass 'Array', 'Wmls_FunctionNameTable'
+    $P0 = subclass 'Hash', 'Wmls_Function'
 .end
 
-.namespace ['Wmls::Script']
+.namespace ['Wmls_Script']
 
 .sub 'dump' :method
     .local string filename
@@ -140,7 +140,7 @@ PIRCODE
     .return (number_of_arguments)
 .end
 
-.namespace ['Wmls::Constants']
+.namespace ['Wmls_Constants']
 
 .sub 'dump' :method
     .local int nb
@@ -169,7 +169,7 @@ PIRCODE
     .return ($S0)
 .end
 
-.namespace ['Wmls::ConstantInteger']
+.namespace ['Wmls_ConstantInteger']
 
 .sub 'dump' :method
     print "int "
@@ -193,7 +193,7 @@ PIRCODE
     .return (pir)
 .end
 
-.namespace ['Wmls::ConstantFloat']
+.namespace ['Wmls_ConstantFloat']
 
 .sub 'dump' :method
     print "float "
@@ -217,7 +217,7 @@ PIRCODE
     .return (pir)
 .end
 
-.namespace ['Wmls::ConstantUTF8String']
+.namespace ['Wmls_ConstantUTF8String']
 
 .sub 'dump' :method
     .local int len
@@ -246,7 +246,7 @@ PIRCODE
     .return (pir)
 .end
 
-.namespace ['Wmls::ConstantEmptyString']
+.namespace ['Wmls_ConstantEmptyString']
 
 .sub 'dump' :method
     print "empty string"
@@ -264,7 +264,7 @@ PIRCODE
     .return (pir)
 .end
 
-.namespace ['Wmls::ConstantString']
+.namespace ['Wmls_ConstantString']
 
 .sub 'dump' :method
     .local int len
@@ -293,7 +293,7 @@ PIRCODE
     .return (pir)
 .end
 
-.namespace ['Wmls::Pragmas']
+.namespace ['Wmls_Pragmas']
 
 .sub 'dump' :method
     .local int nb
@@ -314,7 +314,7 @@ PIRCODE
   L2:
 .end
 
-.namespace ['Wmls::AccessDomain']
+.namespace ['Wmls_AccessDomain']
 
 .sub 'dump' :method
     .local int access_domain_index
@@ -323,7 +323,7 @@ PIRCODE
     print access_domain_index
 .end
 
-.namespace ['Wmls::AccessPath']
+.namespace ['Wmls_AccessPath']
 
 .sub 'dump' :method
     .local int access_path_index
@@ -332,7 +332,7 @@ PIRCODE
     print access_path_index
 .end
 
-.namespace ['Wmls::UserAgentProperty']
+.namespace ['Wmls_UserAgentProperty']
 
 .sub 'dump' :method
     .local int property_name_index
@@ -345,7 +345,7 @@ PIRCODE
     print content_index
 .end
 
-.namespace ['Wmls::UserAgentProperty&Scheme']
+.namespace ['Wmls_UserAgentProperty&Scheme']
 
 .sub 'dump' :method
     .local int property_name_index
@@ -362,7 +362,7 @@ PIRCODE
     print scheme_index
 .end
 
-.namespace ['Wmls::FunctionNameTable']
+.namespace ['Wmls_FunctionNameTable']
 
 .sub 'dump' :method
     print "## Function Name Table\n"
@@ -430,7 +430,7 @@ PIRCODE
     .return (pir)
 .end
 
-.namespace ['Wmls::Functions']
+.namespace ['Wmls_Functions']
 
 .sub 'dump' :method
     .local int nb
@@ -470,7 +470,7 @@ PIRCODE
     .return (pir)
 .end
 
-.namespace ['Wmls::Function']
+.namespace ['Wmls_Function']
 
 .sub 'dump' :method
     .local int number_of_arguments

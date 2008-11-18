@@ -288,7 +288,7 @@ sub generate_initial_pir {
     return $pir = <<'PIRCODE';
 # THIS IS A GENERATED FILE! DO NOT EDIT!
 
-.namespace ['Wmls::Function']
+.namespace ['Wmls_Function']
 
 PIRCODE
 }

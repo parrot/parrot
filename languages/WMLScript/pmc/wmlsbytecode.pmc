@@ -179,7 +179,7 @@ static int _load_constant_pool(Interp *interp)
 
     NumberOfConstants = _get_mb16();
     Constants = pmc_new(interp, pmc_type(interp,
-          const_string(interp, "Wmls::Constants")));
+          const_string(interp, "Wmls_Constants")));
     VTABLE_set_integer_native(interp, Constants, NumberOfConstants);
     VTABLE_set_pmc_keyed_str(interp, script,
         const_string(interp, "Constants"), Constants);
@@ -196,7 +196,7 @@ static int _load_constant_pool(Interp *interp)
         {
             INTVAL ConstantInteger8 = _get_int8();
             Constant = pmc_new(interp, pmc_type(interp,
-              const_string(interp, "Wmls::ConstantInteger")));
+              const_string(interp, "Wmls_ConstantInteger")));
             VTABLE_set_integer_native(interp, Constant, ConstantInteger8);
             break;
         }
@@ -204,7 +204,7 @@ static int _load_constant_pool(Interp *interp)
         {
             INTVAL ConstantInteger16 = _get_int16();
             Constant = pmc_new(interp, pmc_type(interp,
-              const_string(interp, "Wmls::ConstantInteger")));
+              const_string(interp, "Wmls_ConstantInteger")));
             VTABLE_set_integer_native(interp, Constant, ConstantInteger16);
             break;
         }
@@ -212,7 +212,7 @@ static int _load_constant_pool(Interp *interp)
         {
             INTVAL ConstantInteger32 = _get_int32();
             Constant = pmc_new(interp, pmc_type(interp,
-              const_string(interp, "Wmls::ConstantInteger")));
+              const_string(interp, "Wmls_ConstantInteger")));
             VTABLE_set_integer_native(interp, Constant, ConstantInteger32);
             break;
         }
@@ -220,7 +220,7 @@ static int _load_constant_pool(Interp *interp)
         {
             FLOATVAL ConstantFloat32 = _get_float32();
             Constant = pmc_new(interp, pmc_type(interp,
-              const_string(interp, "Wmls::ConstantFloat")));
+              const_string(interp, "Wmls_ConstantFloat")));
             VTABLE_set_number_native(interp, Constant, ConstantFloat32);
             break;
         }
@@ -233,14 +233,14 @@ static int _load_constant_pool(Interp *interp)
                 (void)_get_uint8();
             }
             Constant = pmc_new(interp, pmc_type(interp,
-              const_string(interp, "Wmls::ConstantUTF8String")));
+              const_string(interp, "Wmls_ConstantUTF8String")));
             VTABLE_set_string_native(interp, Constant, String);
             break;
         }
         case 5:
         {
             Constant = pmc_new(interp, pmc_type(interp,
-              const_string(interp, "Wmls::ConstantEmptyString")));
+              const_string(interp, "Wmls_ConstantEmptyString")));
             break;
         }
         case 6:
@@ -252,7 +252,7 @@ static int _load_constant_pool(Interp *interp)
                 (void)_get_uint8();
             }
             Constant = pmc_new(interp, pmc_type(interp,
-              const_string(interp, "Wmls::ConstantString")));
+              const_string(interp, "Wmls_ConstantString")));
             VTABLE_set_string_native(interp, Constant, String);
             break;
         }
@@ -274,7 +274,7 @@ static int _load_pragma_pool(Interp *interp)
 
     NumberOfPragmas = _get_mb16();
     Pragmas = pmc_new(interp, pmc_type(interp,
-          const_string(interp, "Wmls::Pragmas")));
+          const_string(interp, "Wmls_Pragmas")));
     VTABLE_set_integer_native(interp, Pragmas, NumberOfPragmas);
     VTABLE_set_pmc_keyed_str(interp, script,
         const_string(interp, "Pragmas"), Pragmas);
@@ -287,7 +287,7 @@ static int _load_pragma_pool(Interp *interp)
         {
             UINTVAL AccessDomainIndex = _get_mb16();
             Pragma = pmc_new(interp, pmc_type(interp,
-              const_string(interp, "Wmls::AccessDomain")));
+              const_string(interp, "Wmls_AccessDomain")));
             VTABLE_set_integer_keyed_str(interp, Pragma,
               const_string(interp, "AccessDomainIndex"), AccessDomainIndex);
             break;
@@ -296,7 +296,7 @@ static int _load_pragma_pool(Interp *interp)
         {
             UINTVAL AccessPathIndex = _get_mb16();
             Pragma = pmc_new(interp, pmc_type(interp,
-              const_string(interp, "Wmls::AccessPath")));
+              const_string(interp, "Wmls_AccessPath")));
             VTABLE_set_integer_keyed_str(interp, Pragma,
               const_string(interp, "AccessPathIndex"), AccessPathIndex);
             break;
@@ -306,7 +306,7 @@ static int _load_pragma_pool(Interp *interp)
             UINTVAL PropertyNameIndex = _get_mb16();
             UINTVAL ContentIndex = _get_mb16();
             Pragma = pmc_new(interp, pmc_type(interp,
-              const_string(interp, "Wmls::UserAgentProperty")));
+              const_string(interp, "Wmls_UserAgentProperty")));
             VTABLE_set_integer_keyed_str(interp, Pragma,
               const_string(interp, "PropertyNameIndex"), PropertyNameIndex);
             VTABLE_set_integer_keyed_str(interp, Pragma,
@@ -319,7 +319,7 @@ static int _load_pragma_pool(Interp *interp)
             UINTVAL ContentIndex = _get_mb16();
             UINTVAL SchemeIndex = _get_mb16();
             Pragma = pmc_new(interp, pmc_type(interp,
-              const_string(interp, "Wmls::UserAgentProperty&Scheme")));
+              const_string(interp, "Wmls_UserAgentProperty&Scheme")));
             VTABLE_set_integer_keyed_str(interp, Pragma,
               const_string(interp, "PropertyNameIndex"), PropertyNameIndex);
             VTABLE_set_integer_keyed_str(interp, Pragma,
@@ -348,14 +348,14 @@ static int _load_function_pool(Interp *interp)
 
     NumberOfFunctions = _get_uint8();
     Functions = pmc_new(interp, pmc_type(interp,
-          const_string(interp, "Wmls::Functions")));
+          const_string(interp, "Wmls_Functions")));
     VTABLE_set_integer_native(interp, Functions, NumberOfFunctions);
     VTABLE_set_pmc_keyed_str(interp, script,
         const_string(interp, "Functions"), Functions);
 
     NumberOfFunctionNames = _get_uint8();
     FunctionNameTable = pmc_new(interp, pmc_type(interp,
-          const_string(interp, "Wmls::FunctionNameTable")));
+          const_string(interp, "Wmls_FunctionNameTable")));
     VTABLE_set_integer_native(interp, FunctionNameTable,
         NumberOfFunctionNames);
     VTABLE_set_pmc_keyed_str(interp, script,
@@ -388,7 +388,7 @@ static int _load_function_pool(Interp *interp)
             (void)_get_uint8();
         }
         Function = pmc_new(interp, pmc_type(interp,
-          const_string(interp, "Wmls::Function")));
+          const_string(interp, "Wmls_Function")));
         VTABLE_set_integer_keyed_str(interp, Function,
           const_string(interp, "NumberOfArguments"), NumberOfArguments);
         VTABLE_set_integer_keyed_str(interp, Function,
@@ -444,7 +444,7 @@ Loads WMLScript bytecode.
 */
     METHOD PMC* load(STRING* bytecode) {
         script = pmc_new(INTERP, pmc_type(INTERP,
-          const_string(INTERP, "Wmls::Script")));
+          const_string(INTERP, "Wmls_Script")));
         _init(INTERP, bytecode);
         if (_load_header(INTERP))
             goto err;
