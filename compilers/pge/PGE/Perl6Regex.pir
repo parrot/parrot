@@ -1071,7 +1071,7 @@ Parse a modifier.
     mob.'to'(pos)
     .return (mob)
   err_null_cut:
-    'parse_error'(mob, pos, 'Cut quantifier follows nothing')
+    'parse_quant_error'(mob)
     .return (mob)
 .end
 
@@ -1216,10 +1216,16 @@ Parse a modifier.
     isarray = pad['isarray']
     pad['isarray'] = 1
     exp0 = self[0]
+    $I0 = isa exp0, ['PGE';'Exp';'WS']
+    if $I0 goto err_parse_quant
     exp0['isquant'] = 1
     exp0 = exp0.'perl6exp'(pad)
     self[0] = exp0
     pad['isarray'] = isarray
+    .return (self)
+  err_parse_quant:
+    $P0 = get_hll_global ['PGE';'Perl6Regex'], 'parse_quant_error'
+    $P0(self)
     .return (self)
 .end
 
