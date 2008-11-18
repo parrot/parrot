@@ -610,12 +610,12 @@ ly1:
     setattribute self, "orig", ar
     all = new 'Hash'
     setattribute self, "all", all
-    self.create_1("rows")
-    self.create_1("cols")
-    self.create_1("sqrs")
-    self.create_1("i_rows")
-    self.create_1("i_cols")
-    self.create_1("i_sqrs")
+    self.'create_1'("rows")
+    self.'create_1'("cols")
+    self.'create_1'("sqrs")
+    self.'create_1'("i_rows")
+    self.'create_1'("i_cols")
+    self.'create_1'("i_sqrs")
 
     rows = getattribute self, "rows"
     cols = getattribute self, "cols"
@@ -1466,7 +1466,7 @@ ex:
     unless changed goto not_A
     .return (changed)
 not_A:
-    .return self."find_C_y_wing_1"(x, y, B, A)
+    .tailcall self."find_C_y_wing_1"(x, y, B, A)
 .end
 
 # check, if we find another pair with 1 digit in common with el
@@ -1483,7 +1483,7 @@ not_A:
     # now find another pair in
     # - another *this* row, col, or square
     # - AC or BC giving another unique element C
-    .return self."find_C_y_wing"(x, y, A, B)
+    .tailcall self."find_C_y_wing"(x, y, A, B)
 .end
 
 # the quare y has a uniq digit at x - set it
@@ -1670,7 +1670,7 @@ nxt_n:
     if b != 2 goto m02
     $I0 = bits1(m2)
     if $I0 != 3 goto m02
-    .return self.inv_dbl(i_rcss, n, m0, sx, 2, what)
+    .tailcall self.'inv_dbl'(i_rcss, n, m0, sx, 2, what)
 m02:
     if m0 != m2 goto m12
     # m0 == m2
@@ -1678,7 +1678,7 @@ m02:
     if b != 2 goto m12
     $I0 = bits1(m1)
     if $I0 != 3 goto m12
-    .return self.inv_dbl(i_rcss, n, m0, sx, 1, what)
+    .tailcall self.'inv_dbl'(i_rcss, n, m0, sx, 1, what)
 m12:
     if m1 != m2 goto ret
     # m1 == m2
@@ -1686,7 +1686,7 @@ m12:
     if b != 2 goto ret
     $I0 = bits1(m0)
     if $I0 != 3 goto ret
-    .return self.inv_dbl(i_rcss, n, m1, sx, 0, what)
+    .tailcall self.'inv_dbl'(i_rcss, n, m1, sx, 0, what)
 ret:
     .return (0)
 .end
@@ -1966,7 +1966,7 @@ start:
     n = 1                       # try all numbers at best pos
 loop:
     all = thaw state        # restore state
-    self.set_attrs(all)         # set attributes to this state
+    self.'set_attrs'(all)         # set attributes to this state
     sqrs = getattribute self, "sqrs"
     sqr = sqrs[y]
     e = sqr[x]
