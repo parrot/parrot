@@ -472,9 +472,6 @@ sub genfile {
                 '/' x ($len/2) . ($len%2 ? $slash : '');
             }eg;
 
-            # #60584: fix wildcard handling in vim-install target on windows
-            $line =~ s{(\:\s+.*?)\\\*}{$1/\*}g;
-
             # replace \* with \\*, so make will not eat the \
             $line =~ s{(\\\*)}{\\$1}g;
         }
