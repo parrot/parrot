@@ -6,13 +6,24 @@ use lib "../../lib";
 use Parrot::Test tests => 1;
 
 pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "macro");
-.sub todo
-    print "hi"
+.sub main
+    .local pmc x, y, z
+    .local string a, b, c
+    .local int i, j
+    .local num pi
+    x = 1
+    a = "hi"
+    i = 42
+    pi = 3.14
 .end
 CODE
-todo:
+.namespace []
+main:
     get_params
-    print "hi"
+    set P0, 1
+    set S0, "hi"
+    set I0, 42
+    set N0, 3.140000
     set_returns
     returncc
 OUTPUT

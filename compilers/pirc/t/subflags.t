@@ -6,14 +6,15 @@
 use lib "../../lib";
 use Parrot::Test tests => 1;
 
-pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "subflags");
-.sub todo
+pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "test for :main");
+.sub main :main
 .end
 CODE
-todo:
+.namespace []
+
+.pcc_sub :main main:
     get_params
-    set_returns
-    returncc
+    end
 OUTPUT
 
 
