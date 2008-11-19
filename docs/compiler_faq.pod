@@ -127,7 +127,7 @@ created as a Coroutine PMC:
   .end
 
 The sub C<bar> will return to the caller of C<foo>. (Warning! This fails
-in some cases. XXX Find the RT ticket and reference it here.) 
+in some cases. XXX Find the RT ticket and reference it here.)
 
 =head2 How do I generate a sub call with a variable-length parameter
 list in PIR?
@@ -179,8 +179,8 @@ Use the C<:optional> and C<:opt_flag> pragmas:
 
 =head2 How do I create nested subroutines?
 
-Please refer to 
-L<docs/pdds/pdd20_lexical_vars.pod/Nested Subroutines Have Outies; the ":outer" attribute> 
+Please refer to
+L<docs/pdds/pdd20_lexical_vars.pod/Nested Subroutines Have Outies; the ":outer" attribute>
 for details.
 
 =head1 Variables
@@ -201,27 +201,27 @@ or the C<get_root_global> or C<get_hll_global> op:
 You can retrieve the namespace hash and use the C<delete> opcode.
 
     .sub main :main
-	$P0 = new 'Integer'
-	$P0 = 42
-	set_hll_global 'foo', $P0
-	set_hll_global ['Bar'], 'baz', $P0
-	show_baz()
-	.local pmc ns, Bar_ns
-	ns = get_hll_namespace
-	delete ns['foo']              # delete from top level
-	Bar_ns = ns['Bar']            # get Bar namespace
-	delete Bar_ns['baz']
-	show_baz()
+    $P0 = new 'Integer'
+    $P0 = 42
+    set_hll_global 'foo', $P0
+    set_hll_global ['Bar'], 'baz', $P0
+    show_baz()
+    .local pmc ns, Bar_ns
+    ns = get_hll_namespace
+    delete ns['foo']              # delete from top level
+    Bar_ns = ns['Bar']            # get Bar namespace
+    delete Bar_ns['baz']
+    show_baz()
     .end
     .sub show_baz
-	$P0 = get_hll_global ['Bar'], 'baz'
-	print "'baz' is "
-	if null $P0 goto is_null
-	print $P0
-	print ".\n"
-	.return ()
-    is_null: 
-	print "null.\n"
+    $P0 = get_hll_global ['Bar'], 'baz'
+    print "'baz' is "
+    if null $P0 goto is_null
+    print $P0
+    print ".\n"
+    .return ()
+    is_null:
+    print "null.\n"
     .end
 
 
@@ -446,7 +446,7 @@ You can also explicitly create an exception object and throw it:
 =head2 How do I catch an exception in PIR?
 
 Use C<push_eh> to push an exception handler onto the stack. End the set of
-instructions that might throw the exception you're intrested in with 
+instructions that might throw the exception you're intrested in with
 C<pop_eh>.
 
     push_eh handler
@@ -454,12 +454,13 @@ C<pop_eh>.
     pop_eh
     ... # ok
 
-An exception handler is called with two arguments: the exception and its
-extracted message for your convenience.
+An exception handler is called with one argument, which is the exception object.
+The message of the exception can be easily extracted, as follows:
 
   handler: # exception
-    .get_results ($P0, $S0)
+    .get_results ($P0)
     print 'Exception caught:'
+    $S0 = $P0['message']
     say $S0
     ...
 
@@ -470,7 +471,7 @@ Rethrow the exception if it has a severity of C<EXCEPT_EXIT>.
   .include 'except_severity.pasm'
   ...
   handler:
-    .get_results ($P0, $S0)
+    .get_results ($P0)
     $I0 = $P0['severity']
     if $I0 == .EXCEPT_EXIT goto handle_exit
     say 'Exception caught!'
@@ -491,8 +492,9 @@ Exception example:
   handler:
     .local pmc exception
     .local string message
-    .get_results (exception, message)
+    .get_results (exception)
     print 'Exception: '
+    message = exception['message']
     print message
     print "\n"
     exit 1
