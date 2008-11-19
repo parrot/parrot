@@ -176,7 +176,7 @@ build:           build-pct
 
 build-all:       build-pct build-phc build-antlr3
 
-build-common:    pmc src/common/pipplib.pbc pipp.pbc $(PHP_EXT)
+build-common:    pmc src/common/pipplib.pbc pipp.pbc $(PHP_EXT) Test.pir
 
 build-pct:       build-common
 
@@ -217,6 +217,10 @@ pipp.pbc: \
     src/pct/quote_expression.pir
 	$(PARROT) -o pipp.pbc src/common/pipp.pir
 
+Test.pir: Test.php pipp.pbc
+	$(PARROT) pipp.pbc --target=pir --output=Test.pir Test.php
+
+
 pmc: $(HASH_OBJS) $(PHP_GROUP)
 
 #Any change to the hash code means phparray needs to be relinked too.
@@ -228,7 +232,7 @@ $(HASH_OBJS): $(HASH_SOURCES) $(HASH_H)
 export DYNPMC_INCLUDE=$(PIPPDIR)
 export DYNPMC_LINK=$(HASH_OBJS)
 
-$(PHP_GROUP): $(PARROT) $(PMC_SOURCES)
+$(PHP_GROUP): $(PMC_SOURCES)
 	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) compile $(PMCS)
 	@cd $(PMCDIR) && $(PMCBUILD) linklibs $(PMCS)

@@ -153,6 +153,10 @@ GOT_PHP_SOURCE_FN:
     .local string target
     target = opt['target']
 
+    # output file
+    .local string output
+    output = opt['output']
+
     # look at commandline and decide what to do
     .local string cmd, err_msg, variant
     .local int ret
@@ -196,7 +200,7 @@ VARIANT_PCT:
     .local pmc pipp_compiler
     pipp_compiler = compreg 'Pipp'
 
-    .tailcall pipp_compiler.'evalfiles'( source_fn, 'target' => target )
+    .tailcall pipp_compiler.'evalfiles'( source_fn, 'target' => target, 'output' => output )
 
 VARIANT_PHC:
     .local string phc_src_dir
@@ -318,7 +322,8 @@ ERROR:
     push getopts, 'variant=s'          # switch between variants
     push getopts, 'target=s'           # compilation target, used during development
     push getopts, 'run-nqp'            # run PAST set up in NQP
-
+    push getopts, 'output|o=s'
+ 
     # standard PHP options
     push getopts, 'version'
     push getopts, 'help'
