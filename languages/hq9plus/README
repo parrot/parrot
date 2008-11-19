@@ -1,7 +1,6 @@
 $Id$
 
-HQ9plus is a non turing-complete language.
-Type 'make test' and take a look at the test scripts in 't'.
+HQ9plus is a non turing-complete joke language.
+Please test with 'make test'. Test scripts are located in the directory 't'.
 
-See http://en.wikipedia.org/wiki/HQ9+ and
-http://www.esolangs.org/wiki/HQ9_Plus for details.
+See http://www.esolangs.org/wiki/HQ9_Plus for details.
