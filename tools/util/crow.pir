@@ -29,7 +29,7 @@ module, L<runtime/parrot/library/Crow.pir>.
     curr_namespace = get_namespace
     test_namespace = get_namespace ['Crow']
     exports = split ' ', 'get_news get_args process'
-    test_namespace.export_to(curr_namespace, exports)
+    test_namespace.'export_to'(curr_namespace, exports)
 
     .local pmc opts
     opts = get_args(args)
@@ -79,7 +79,7 @@ module, L<runtime/parrot/library/Crow.pir>.
     curr_namespace = get_namespace
     test_namespace = get_namespace [ 'Config';'JSON' ]
     exports = split ' ', 'ReadConfig'
-    test_namespace.export_to(curr_namespace, exports)
+    test_namespace.'export_to'(curr_namespace, exports)
 
     .local pmc result
     result = ReadConfig(filename)

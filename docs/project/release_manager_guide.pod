@@ -26,6 +26,9 @@ F<CREDITS>, F<PLATFORMS>, F<RESPONSIBLE_PARTIES> and F<LANGUAGES_STATUS>.
 You might also select a name for your release. For example, you could
 select a name from L<http://en.wikipedia.org/wiki/List_of_parrots>.
 
+Set up your account on L<http://www.parrot.org/> and ask one of Allison, Jerry,
+Jeff, Will, or chromatic to bestow you story-creating powers.
+
 =item 1.
 
 Make sure you're up to date:
@@ -373,8 +376,8 @@ the 3rd Tuesday of each month. Version numbers for each release will be
 determined each month, and will depend on the features actually present in
 that release.
 
- - November 18th, 2008  - chromatic
  - December 16th, 2008  - Andrew Whitworth
+ - January 20th, 2009   - chromatic
 
 =cut
 

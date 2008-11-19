@@ -1,6 +1,6 @@
 # $Id$
 
-New in the November 2008 release
+New in 0.8.1
 - Implementation
   + added CPAN module Storable 2.12 as a configuration and build dependency
   + removed the pseudo PIR opcode 'addr'
