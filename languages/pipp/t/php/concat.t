@@ -14,37 +14,32 @@ Concatenate various thingies.
 # pragmata
 use strict;
 use warnings;
-
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-# core Perl modules
-use Test::More     tests => 3;
+use Parrot::Test tests => 3;
 
-# Parrot modules
-use Parrot::Test;
-
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'concatenate 2 strings' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'concatenate 2 strings' );
 <?php
 echo '1' . "a\n"
 ?>
-END_CODE
+CODE
 1a
-END_EXPECTED
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'concatenate four strings' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'concatenate four strings' );
 <?php
 echo 'Hell' . 'o, ' . 'World!' . "\n"
 ?>
-END_CODE
+CODE
 Hello, World!
-END_EXPECTED
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'concatenate an int and a string' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'concatenate an int and a string' );
 <?php
 echo 1 . "a\n"
 ?>
-END_CODE
+CODE
 1a
-END_EXPECTED
+OUT
 

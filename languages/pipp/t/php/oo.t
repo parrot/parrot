@@ -24,7 +24,7 @@ use Test::More     tests => 5;
 # Parrot modules
 use Parrot::Test;
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'definition of a class' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'definition of a class' );
 <?php
 
 class Dings {
@@ -37,11 +37,11 @@ class Dings {
 echo "After class definition.\n"
  
 ?>
-END_CODE
+CODE
 After class definition.
-END_EXPECTED
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'calling an instance method' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'calling an instance method' );
 <?php
 
 class Dings {
@@ -55,11 +55,11 @@ $dings = new Dings;
 $dings->bums();
  
 ?>
-END_CODE
+CODE
 The function bums() in class Dings has been called.
-END_EXPECTED
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'class with a public member' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'class with a public member' );
 <?php
 
 class Dings {
@@ -74,12 +74,12 @@ $dings = new Dings;
 $dings->bums();
  
 ?>
-END_CODE
+CODE
 The function bums() in class Dings has been called.
-END_EXPECTED
+OUT
 
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'calling a method within a method' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'calling a method within a method' );
 <?php
 
 class Foo {
@@ -98,10 +98,10 @@ $foo = new Foo;
 $foo->baz();
  
 ?>
-END_CODE
+CODE
 The method baz() of class Foo has been called.
 The method bar() of class Foo has been called.
-END_EXPECTED
+OUT
 
 =for perl6
 
@@ -126,7 +126,7 @@ $foo.echo_member();
 
 =cut
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'accessing an attribute', todo => 'not implemented yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'accessing an attribute', todo => 'not implemented yet' );
 <?php
 
 class Foo {
@@ -142,7 +142,7 @@ $foo = new Foo;
 $foo->echo_menber();
  
 ?>
-END_CODE
+CODE
 a member of Foo
-END_EXPECTED
+OUT
 

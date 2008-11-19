@@ -11,33 +11,27 @@ String testing.
 
 =cut
 
-# pragmata
 use strict;
 use warnings;
-
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-# core Perl modules
-use Test::More     tests => 21;
-
-# Parrot modules
-use Parrot::Test;
+use Parrot::Test tests => 21;
 
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', '== for equal strings' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', '== for equal strings' );
 <?php
 if ( 'asdf' == 'asdf' )
 {
   echo "== for equal strings\n";
 }
 ?>
-END_CODE
+CODE
 == for equal strings
-END_EXPECTED
+OUT
 
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', '== for unequal strings' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', '== for unequal strings' );
 <?php
 if ( 'asdf' == 'jklö' )
 {
@@ -48,12 +42,12 @@ else
   echo "== for unequal strings\n";
 }
 ?>
-END_CODE
+CODE
 == for unequal strings
-END_EXPECTED
+OUT
 
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', '!= for equal strings' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', '!= for equal strings' );
 <?php
 if ( 'asdf' != 'asdf' )
 {
@@ -64,85 +58,85 @@ else
   echo "!= for equal strings\n";
 }
 ?>
-END_CODE
+CODE
 != for equal strings
-END_EXPECTED
+OUT
 
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', '!= for unequal strings' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', '!= for unequal strings' );
 <?php
 if ( 'asdf' != 'jklö' )
 {
   echo "!= for unequal strings\n";
 }
 ?>
-END_CODE
+CODE
 != for unequal strings
-END_EXPECTED
+OUT
 
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'var_dump()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'var_dump()' );
 <?php
 var_dump( 'asdf' );
 ?>
-END_CODE
+CODE
 string(4) "asdf"
-END_EXPECTED
+OUT
 
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'string interpolation, simple syntax' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'string interpolation, simple syntax' );
 <?php
 $var1 = "VAR1";
 $var2 = "VAR2";
 echo "$var1 $var2\n";
 ?>
-END_CODE
+CODE
 VAR1 VAR2
-END_EXPECTED
+OUT
 
 SKIP: {
     skip 'runaway process', 1;
 
-    language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'dollar followed by a space' );
+    language_output_is( 'Pipp', <<'CODE', <<'OUT', 'dollar followed by a space' );
 <?php
  
 echo ";$ ;", "\n";
 
 ?>
-END_CODE
+CODE
 ;$ ;
-END_EXPECTED
+OUT
 }
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'curly string interpolation, one var' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'curly string interpolation, one var' );
 <?php
 $var1 = "VAR1";
 echo "{$var1}\n";
 ?>
-END_CODE
+CODE
 VAR1
-END_EXPECTED
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'curly string interpolation, two vars', todo => 'broken' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'curly string interpolation, two vars', todo => 'broken' );
 <?php
 $var1 = "VAR1";
 $var2 = "VAR2";
 echo "{$var1} {$var2}\n";
 ?>
-END_CODE
+CODE
 VAR1 VAR2
-END_EXPECTED
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'print a pair of curlies' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'print a pair of curlies' );
 <?php
 echo "curlies: {}\n";
 ?>
-END_CODE
+CODE
 curlies: {}
-END_EXPECTED
+OUT
 
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'single quoted string' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'single quoted string' );
 <?php
 
 $dummy = 'INTERPOLATED';
@@ -170,7 +164,7 @@ echo 'backslash and a dollar: \$dummy', "\n";
 echo 'backslash and twiddles: \{$dummy}', "\n";
 
 ?>
-END_CODE
+CODE
 no variable expansion: $dummy
 no variable expansion in twiddles: {$dummy}
 backslash at end: \
@@ -192,9 +186,9 @@ backslash and single quote: \'
 two backslashes and a single quote: \\'
 backslash and a dollar: \$dummy
 backslash and twiddles: \{$dummy}
-END_EXPECTED
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'double quoted string' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'double quoted string' );
 <?php
 
 $dummy = 'INTERPOLATED';
@@ -217,7 +211,7 @@ echo "backslash and a dollar: \\\$dummy", "\n";
 echo "backslash and twiddles: \{$dummy}", "\n";
 
 ?>
-END_CODE
+CODE
 variable expansion: INTERPOLATED
 backslash at end: \
 backslash not at end: \dummy
@@ -235,97 +229,97 @@ backslash and single quote: \'
 two backslashes and a single quote: \\'
 backslash and a dollar: \$dummy
 backslash and twiddles: \{INTERPOLATED}
-END_EXPECTED
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'curly quotes in double quoted string' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'curly quotes in double quoted string' );
 <?php
 
 echo ";{;", "\n";
 echo ";\{;", "\n";
 
 ?>
-END_CODE
+CODE
 ;{;
 ;\{;
-END_EXPECTED
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<"END_EXPECTED", 'vertical tab, new in PHP 5.3' );
+language_output_is( 'Pipp', <<'CODE', <<"OUT", 'vertical tab, new in PHP 5.3' );
 <?php
 
 echo "a vertical tab: \v", "\n";
 
 ?>
-END_CODE
+CODE
 a vertical tab: \013
-END_EXPECTED
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<"END_EXPECTED", 'form feed, new in PHP 5.3' );
+language_output_is( 'Pipp', <<'CODE', <<"OUT", 'form feed, new in PHP 5.3' );
 <?php
 
 echo "a form feed: \f", "\n";
 
 ?>
-END_CODE
+CODE
 a form feed: \f
-END_EXPECTED
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<"END_EXPECTED", 'carriage return' );
+language_output_is( 'Pipp', <<'CODE', <<"OUT", 'carriage return' );
 <?php
 
 echo "a carriage return: \r<--", "\n";
 
 ?>
-END_CODE
+CODE
 a carriage return: \r<--
-END_EXPECTED
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<"END_EXPECTED", 'hex escapes' );
+language_output_is( 'Pipp', <<'CODE', <<"OUT", 'hex escapes' );
 <?php
 
 echo "ABC \x41\x42\x43", "\n";
 
 ?>
-END_CODE
+CODE
 ABC ABC
-END_EXPECTED
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<"END_EXPECTED", 'octal escapes' );
+language_output_is( 'Pipp', <<'CODE', <<"OUT", 'octal escapes' );
 <?php
 
 echo "ABC \101\102\103", "\n";
 
 ?>
-END_CODE
+CODE
 ABC ABC
-END_EXPECTED
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<"END_EXPECTED", 'octals ge \400 escapes', todo => 'not implemented yet' );
+language_output_is( 'Pipp', <<'CODE', <<"OUT", 'octals ge \400 escapes', todo => 'not implemented yet' );
 <?php
 
 echo "ABC \501\502\503", "\n";
 
 ?>
-END_CODE
+CODE
 ABC ABC
-END_EXPECTED
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<"END_EXPECTED", 'hex escapes followed by a digit' );
+language_output_is( 'Pipp', <<'CODE', <<"OUT", 'hex escapes followed by a digit' );
 <?php
 
 echo "A1B2C3 \x411\x422\x433", "\n";
 
 ?>
-END_CODE
+CODE
 A1B2C3 A1B2C3
-END_EXPECTED
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<"END_EXPECTED", 'octal escapes followed by a digit' );
+language_output_is( 'Pipp', <<'CODE', <<"OUT", 'octal escapes followed by a digit' );
 <?php
 
 echo "A1B2C3 \1011\1022\1033", "\n";
 
 ?>
-END_CODE
+CODE
 A1B2C3 A1B2C3
-END_EXPECTED
+OUT
 

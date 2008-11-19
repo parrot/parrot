@@ -10,17 +10,11 @@ Hello World test.
 
 =cut
 
-# pragmata
 use strict;
 use warnings;
-
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-# core Perl modules
-use Test::More;
-
-# Parrot modules
 use Parrot::Test;
 
 # A little helper to do data driven testing
@@ -31,12 +25,12 @@ sub run_tests {
         die 'invalid test' unless ref( $_ ) eq 'ARRAY';
         die 'invalid test' unless scalar(@{$_}) >= 2 || scalar(@{$_}) <= 5;
         my ( $php_code, $expected, $desc, %options ) = @{$_};
-        $php_code = <<"END_CODE";
+        $php_code = <<"CODE";
 <?php
 echo $php_code;
 echo "\\n";
 ?>
-END_CODE
+CODE
 
         # expected input can be set up as array reference
         if ( ref $expected ) {

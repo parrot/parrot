@@ -11,20 +11,14 @@ Defining and calling closures.
 
 =cut
 
-# pragmata
 use strict;
 use warnings;
-
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-# core Perl modules
-use Test::More     tests => 1;
+use Parrot::Test tests => 1;
 
-# Parrot modules
-use Parrot::Test;
-
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'function with no args', todo => 'not implemented yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'function with no args', todo => 'not implemented yet' );
 <?php
 
 $dummy_no_args = function ()  {
@@ -34,6 +28,6 @@ $dummy_no_args = function ()  {
 $dummy_no_args();
 
 ?>
-END_CODE
+CODE
 The function dummy_no_args() has been called.
-END_EXPECTED
+OUT

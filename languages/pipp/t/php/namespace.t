@@ -11,20 +11,14 @@ Working with namespaces.
 
 =cut
 
-# pragmata
 use strict;
 use warnings;
-
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-# core Perl modules
-use Test::More     tests => 1;
+use Parrot::Test tests => 1;
 
-# Parrot modules
-use Parrot::Test;
-
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'namespace with dummy class', todo => 'no implemented yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with dummy class', todo => 'no implemented yet' );
 <?php
 
 namespace A::B;
@@ -40,7 +34,6 @@ $dings = new A::Dings;
 $dings->bums();
  
 ?>
-END_CODE
+CODE
 The function bums() in class A::Dings has been called.
-END_EXPECTED
-
+OUT

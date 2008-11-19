@@ -30,36 +30,36 @@ print $hello;
 
 =cut
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'string assignment' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'string assignment' );
 <?php
 $hello = "Hallo\n";
 echo $hello;
 ?>
-END_CODE
+CODE
 Hallo
-END_OUT
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'integer assignment' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'integer assignment' );
 <?php
 $hello = -1000;
 echo $hello;
 echo "\n";
 ?>
-END_CODE
+CODE
 -1000
-END_OUT
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'expression assignment' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'expression assignment' );
 <?php
 $hello = -1000 + 2000;
 echo $hello;
 echo "\n";
 ?>
-END_CODE
+CODE
 1000
-END_OUT
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'expression assignment' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'expression assignment' );
 <?php
 $h = -1000;
 $e = 2000;
@@ -67,11 +67,11 @@ $l = $h + $e;
 echo $l;
 echo "\n";
 ?>
-END_CODE
+CODE
 1000
-END_OUT
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'expression assignment' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'expression assignment' );
 <?php
 $h       = 1;
 $e1      = 2;
@@ -90,7 +90,7 @@ echo $_12345; echo "\n";
 echo $_0; echo "\n";
 
 ?>
-END_CODE
+CODE
 1
 2
 3
@@ -98,9 +98,9 @@ END_CODE
 5
 6
 7
-END_OUT
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'case sensitivity' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'case sensitivity' );
 <?php
 $abc = 1;
 $abC = 2;
@@ -120,7 +120,7 @@ echo $AbC; echo "\n";
 echo $ABc; echo "\n";
 echo $ABC; echo "\n";
 ?>
-END_CODE
+CODE
 1
 2
 3
@@ -129,4 +129,4 @@ END_CODE
 6
 7
 8
-END_OUT
+OUT

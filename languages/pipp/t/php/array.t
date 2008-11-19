@@ -27,53 +27,53 @@ use Parrot::Test;
 use Test::More     tests => 6;
 
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'less than' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'less than' );
 <?php
 $hello['world'] = 'hi';
 echo $hello['world'];
 echo "\n";
 ?>
-END_CODE
+CODE
 hi
-END_OUT
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'less than' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'less than' );
 <?php
 $hello['world'] = 'hi';
 echo $hello['world'];
 echo "\n";
 ?>
-END_CODE
+CODE
 hi
-END_OUT
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'less than' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'less than' );
 <?php
 $hello['world'] = 'hi';
 echo $hello['world'];
 echo "\n";
-END_CODE
+CODE
 hi
-END_OUT
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'array with integer index' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'array with integer index' );
 <?php
 $thrice[3] = 9;
 echo $thrice[3];
 echo "\n";
-END_CODE
+CODE
 9
-END_OUT
+OUT
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_OUT', 'string interpolation' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'string interpolation' );
 <?php
 $thrice[3] = 9;
 echo "3 times 3 equals $thrice[3]\n";
-END_CODE
+CODE
 3 times 3 equals 9
-END_OUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'count' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'count' );
 <?php
   $hello['world'] = 'hi';
   $hello['World'] = 'Hi';
@@ -81,7 +81,7 @@ language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'count' );
 ?>
 CODE
 2
-OUTPUT
+OUT
 
 # Local Variables:
 #   mode: cperl
