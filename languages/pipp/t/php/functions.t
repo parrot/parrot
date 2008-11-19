@@ -19,12 +19,12 @@ use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
 # core Perl modules
-use Test::More     tests => 2;
+use Test::More     tests => 3;
 
 # Parrot modules
 use Parrot::Test;
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'function with no args' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'function with no args' );
 <?php
 
 function dummy_no_args()  {
@@ -34,9 +34,33 @@ function dummy_no_args()  {
 dummy_no_args();
 
 ?>
-END_CODE
+CODE
 The function dummy_no_args() has been called.
-END_EXPECTED
+OUT
+
+=for perl6
+
+sub say_count( $count )  {
+  print "count: $count\n";
+}
+
+say_count( 123456 );
+
+=cut
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'function with one arg' );
+<?php
+
+function say_count( $count )  {
+  echo "count: $count\n";
+}
+
+say_count( 123456 );
+
+?>
+CODE
+count: 123456
+OUT
 
 =for perl6
 
@@ -48,7 +72,7 @@ echo_count( 123456 );
 
 =cut
 
-language_output_is( 'Pipp', <<'END_CODE', <<'END_EXPECTED', 'function with one arg', todo => 'not implemented yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'function with one arg', todo => 'parser error' );
 <?php
 
 function echo_count( $count )  {
@@ -58,7 +82,7 @@ function echo_count( $count )  {
 echo_count( 123456 );
 
 ?>
-END_CODE
+CODE
 123456
-END_EXPECTED
+OUT
 

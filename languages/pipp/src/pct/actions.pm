@@ -205,9 +205,9 @@ method var($/,$key) {
 }
 
 method VAR_NAME($/) {
-    our $?PIPP_SCOPE;
+    our $?PIPP_CURRENT_SCOPE;
     make PAST::Var.new(
-             :scope( $?PIPP_SCOPE ?? $?PIPP_SCOPE !! 'package' ),
+             :scope( $?PIPP_CURRENT_SCOPE ?? $?PIPP_CURRENT_SCOPE !! 'package' ),
              :name(~$/),
              :viviself('Undef'),
              :lvalue(1),
@@ -326,7 +326,7 @@ method NUMBER($/) {
 method function_definition($/) {
 
     # PHP has two scopes: local to functions and global
-    our $?PIPP_SCOPE := 'lexical';
+    our $?PIPP_CURRENT_SCOPE := 'lexical';
 
     # note that $<param_list> creates a new PAST::Block.
     my $past := $( $<param_list> );
@@ -335,9 +335,19 @@ method function_definition($/) {
     $past.control('return_pir');
     $past.push( $( $<block> ) );
 
-    $?PIPP_SCOPE := '';
+    $?PIPP_CURRENT_SCOPE := '';
 
     make $past;
+}
+
+# nested functions are not supported yet
+method ENTER_FUNCTION_DEF($/) {
+    our $?PIPP_CURRENT_SCOPE;
+    $?PIPP_CURRENT_SCOPE := 'lexical';
+}
+method EXIT_FUNCTION_DEF($/) {
+    our $?PIPP_CURRENT_SCOPE;
+    $?PIPP_CURRENT_SCOPE := 'package';
 }
 
 method method_definition($/) {

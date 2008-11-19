@@ -134,7 +134,9 @@ rule  term                  { <method_call> {*}            #= method_call
                             }
 
 # declarations
-rule  function_definition   { 'function' <FUNCTION_NAME> <param_list> <block>        {*} }
+rule  function_definition   { 'function' <FUNCTION_NAME> <.ENTER_FUNCTION_DEF> <param_list> <block> <.EXIT_FUNCTION_DEF>        {*} }
+token ENTER_FUNCTION_DEF    { {*} }    # special subrule for marking variable scope
+token EXIT_FUNCTION_DEF     { {*} }    # ditto
 rule  method_definition     { 'function' <METHOD_NAME> <param_list> <block>          {*} }
 rule  param_list            { '(' [ <VAR_NAME> [',' <VAR_NAME>]* ]? ')'              {*} }
 rule  member_definition     { 'public' <VAR_NAME> '=' <literal> <.statement_delimiter>    {*} }
