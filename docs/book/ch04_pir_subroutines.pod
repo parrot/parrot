@@ -8,17 +8,25 @@ Z<CHP-4>
 
 X<PIR (Parrot intermediate representation);subroutines>
 X<subroutines;in PIR>
-A calculation like "the factorial of a number" may be used several
-times in a large program. Subroutines allow this kind of functionality
-to be abstracted into a unit. It's a benefit for code reuse and
-maintainability. Even though PASM is just an assembly language for a
-virtual processor, it has a number of features to support high-level
-subroutine calls. PIR offers a smoother interface to those features.
+Code reuse has become a cornerstone of modern software engineering.
+Common tasks are routinely packaged as libraries for later reuse
+by other developers. The most basic building block of code reuse is
+the "function" or "subroutine". A calculation like "the factorial of
+a number", for example, may be used several times in a large program.
+Subroutines allow this kind of functionality to be abstracted into a
+single stand-alone unit for reuse. PIR is a subroutine-based language
+in that all code in PIR must exist in a subroutine. Execution starts,
+as we have seen, in the C<:main> subroutine, and others can be called
+to perform the tasks of a program. From subroutines we can construct
+more elaborate chunks of code reusability: methods and objects. In
+this chapter we will talk about how subroutines work in PIR, and how
+they can be used by developers to create programs for Parrot.
 
-PIR provides several different sets of syntax for subroutine calls.
-This is a language designed to implement other languages, and every
-language does subroutine calls a little differently. What's needed is
-a set of building blocks and tools, not a single prepackaged solution.
+Parrot supports multiple high-level languages, and each language uses
+a different syntax for defining and calling subroutines. The goal of
+PIR is not to be a high-level language in itself, but to provide the
+basic tools that other languages can use to implement them. PIR's
+syntax for subroutines may seem very primitive for this reason.
 
 =head2 Parrot Calling Conventions
 
@@ -26,66 +34,46 @@ Z<CHP-4-SECT-1>
 
 X<PIR (Parrot intermediate representation);subroutines;Parrot calling conventions>
 X<subroutines;Parrot calling conventions;in PIR>
-As we mentioned in the previous chapter, Parrot defines a set of
-calling conventions for externally visible subroutines. In these
-calls, the caller is responsible for preserving its own registers, and
-arguments and return values are passed in a predefined set of Parrot
-registers. The calling conventions use the Continuation Passing Style
-X<Continuation Passing Style (CPS)>X<CPS (Continuation Passing Style)>
-to pass control to subroutines and back again.
+The way that Parrot calls a subroutine--by passing arguments, altering
+control flow, and returning results--is called the "Parrot Calling
+Conventions", or PCC. The details of PCC are generally hidden from the
+programmer, being partially implemented in C and being partially
+implemented in PASM. PIR has several constructs to gloss over these
+details, and the average programmer will not need to worry about them.
+PCC uses the Continuation Passing Style X<Continuation Passing Style
+(CPS)>X<CPS (Continuation Passing Style)> (CPS) to pass control to
+subroutines and back again. Again, the details of this can be largely
+ignored for developers who don't need it, but the power of this approach
+can be harnessed by those who do. We'll talk more about PCC and CPS in
+this and in later chapters as well.
 
-=head3 Subroutines
+=head3 Subroutine Calls
 
 X<PIR (Parrot intermediate representation);subroutine calls>
-The fact that the Parrot calling conventions are clearly defined also
-makes it possible to provide some higher-level syntax for it. Manually
-setting up all the registers for each subroutine call isn't just
-tedious, it's also prone to bugs introduced by typos. PIR's simplest
-subroutine call syntax looks much like a high-level language. This
-example calls the subroutine C<_fact> with two arguments and assigns
-the result to C<$I0>:
+PIR's simplest subroutine call syntax looks much like a subroutine
+call from a high-level language. This example calls the subroutine
+C<fact> with two arguments and assigns the result to C<$I0>:
 
-     ($I0, $I1) = _fact(count, product)
+     ($I0, $I1) = 'fact'(count, product)
 
 This simple statement hides a great deal of complexity. It generates a
-subroutine object and stores it in C<P0>. It assigns the arguments to
-the appropriate registers, assigning any extra arguments to the
-overflow array in C<P3>. It also sets up the other registers to mark
-whether this is a prototyped call and how many arguments it passes of
-each type. It calls the subroutine stored in C<P0>, saving and
-restoring the top half of all register frames around the call. And
-finally, it assigns the result of the call to the given temporary
-register variables (for a single result you can drop the parentheses).
-If the one line above were written out in basic PIR it would be
-something like:
-
-  newsub P0, .Sub, _fact
-  I5 = count
-  I6 = product
-  I0 = 1
-  I1 = 2
-  I2 = 0
-  I3 = 0
-  I4 = 0
-  savetop
-  invokecc
-  restoretop
-  $I0 = I5
-  $I1 = I6
-
-The PIR code actually generates an C<invokecc> opcode internally. It
-not only invokes the subroutine in C<P0>, but also generates a new
-return continuation in C<P1>. The called subroutine invokes this
-continuation to return control to the caller.
+subroutine PMC object, creates a continuation PMC object to return
+control flow after the subroutine, passes the arguments, looks up the
+subroutine by name (and by signature if it's been overloaded), it calls
+the subroutine, and finally it assigns the results of the call to the
+given register variables. This is quite a lot of work for a single
+statement, and that's ignoring the computational logic that the
+subroutine itself implements.
 
 =head3 Expanded Subroutine Syntax
 
 The single line subroutine call is incredibly convenient, but it isn't
 always flexible enough. So PIR also has a more verbose call syntax
 that is still more convenient than manual calls. This example pulls
-the subroutine C<_fact> out of the global symbol table and calls it:
+the subroutine C<fact> out of the global symbol table into a PMC
+register and calls it:
 
-  find_global $P1, "_fact"
+  find_global $P1, "fact"
 
   .begin_call
     .arg count
@@ -97,35 +85,26 @@ the subroutine C<_fact> out of the global symbol table and calls it:
 X<.arg directive>
 X<.result directive>
 The whole chunk of code from C<.begin_call> to C<.end_call> acts as a
-single unit. The C<.begin_call> directive can be marked as
-C<prototyped> or C<unprototyped>, which corresponds to the flag C<I0>
-in the calling conventions. The C<.arg> directive sets up arguments to
-the call. The C<.call> directive saves top register frames, calls
-the subroutine, and restores the top registers. The C<.result>
-directive retrieves return values from the call.
+single unit. The C<.arg> directive sets up and passes arguments to
+the call. The C<.call> directive calls the subroutine, returns control
+flow after the subroutine has completed. The C<.result> directive
+retrieves returned values from the call.
 
 =head3 Subroutine Declarations
 
 X<.param directive>
 In addition to syntax for subroutine calls, PIR provides syntax for
-subroutine definitions. The C<.param> directive pulls parameters out
-of the registers and creates local named variables for them:
+subroutine definitions. Subrtroutines are defined with the C<.sub>
+directive, and end with the C<.end> directive. We've already seen
+this syntax in our earlier examples. The C<.param> defines input
+parameters and creates local named variables for them:
 
   .param int c
 
-X<.begin_return directive>
-X<.end_return directive>
-The C<.begin_return> and C<.end_return> directives act as a
-unit much like the C<.begin_call> and C<.end_call> directives:
-
-  .begin_return
-    .return p
-  .end_return
-
 X<.return directive>
-The C<.return> directive sets up return values in the appropriate
-registers. After all the registers are set up the unit invokes the
-return continuation in C<P1> to return control to the caller.
+The C<.return> directive allows the subroutine to return control flow
+to the calling subroutine, and optionally returns result output values.
+
 
 Here's a complete code example that reimplements the factorial code
 from the previous section as an independent subroutine. The subroutine
@@ -134,20 +113,20 @@ the C<_main> function.  Parrot resolves global symbols like the
 C<_fact> label between different units.
 
   # factorial.pir
-  .sub _main
+  .sub main
      .local int count
      .local int product
      count = 5
      product = 1
 
-     $I0 = _fact(count, product)
+     $I0 = fact(count, product)
 
      print $I0
      print "\n"
      end
   .end
 
-  .sub _fact
+  .sub fact
      .param int c
      .param int p
 
@@ -157,41 +136,32 @@ C<_fact> label between different units.
      dec c
      branch loop
   fin:
-     .begin_return
      .return p
-     .end_return
   .end
 
-
 This example defines two local named variables, C<count> and
-C<product>, and assigns them the values 1 and 5. It calls the C<_fact>
+C<product>, and assigns them the values 1 and 5. It calls the C<fact>
 subroutine passing the two variables as arguments. In the call, the
 two arguments are assigned to consecutive integer registers, because
-they're stored in typed integer variables. The C<_fact> subroutine
-uses C<.param> and the return directives for retrieving parameters and
-returning results. The final printed result is 120.
-
-You may want to generate a PASM source file for the above example to
-look at the details of how the PIR code translates to PASM:
-
-  $ parrot -o- factorial.pir
+they're stored in typed integer variables. The C<fact> subroutine
+uses C<.param> and the C<.return> directives for retrieving parameters
+and returning results. The final printed result is 120.
 
 =head2 Continuation Passing Style
 
 Continuations are snapshots, a frozen image of the current execution
-state of the VM. Once we have a continuation, we can invoke it to
+state of the VM. Once we have a continuation we can invoke it to
 return to the point where the continuation was first created. It's
 like a magical timewarp that allows the developer to arbitrarily move
-control flow back to any previous point in the program, if they want
-C<there's actually no magic involved, just a lot of interesting ideas
-and involved code>. 
+control flow back to any previous point in the program N<there's actually
+no magic involved, just a lot of interesting ideas and involved code>. 
 
 Continuations are not a new concept, they've been boggling the minds
 of Lisp and Scheme programmers for many years. However, despite all
-their power and flexibility, they haven't been well-utilized in most
+their power and flexibility they haven't been well-utilized in most
 modern programming languages or in their underlying libraries and
 virtual machines. Parrot aims to change that: In Parrot, almost every
-control flow manipulation, including all subroutine, method, and
+control flow manipulation including all subroutine, method, and
 coroutine calls, are performed using continuations. This mechanism
 is mostly hidden from developers who build applications on top of
 Parrot. The power and flexibility is available if people want to use
@@ -202,7 +172,37 @@ X<Continuation Passing Style;CPS> Continuation Passing Style (CPS).
 CPS allows parrot to offer all sorts of neat features, such as tail-call
 optimizations and lexical subroutines.
 
+=head3 Tailcalls
+
+In many cases, a subroutine will set up and call another subroutine,
+and then return the result of the second call directly. This is called
+a X<tailcall> tailcall, and is important in PIR. Here's a contrived
+example in pseudocode:
+
+ call add_two(5)
+ 
+ subroutine add_two(value)
+	 value = add_one(value)
+	 return add_one(value)
+
+In this example, the subroutine C<add_two> makes two calls to
+c<add_one>. The second call to C<add_one> is used as the return
+value. C<add_one> is called and it's result is immediately returned
+to the caller of C<add_two>, it is never stored anywhere. We can
+optimize this situation is we realize that the second call to
+C<add_one> is returning to the same place that C<add_two> is. The
+two subroutine calls can share a return continution, instead of
+having to create a new continuation for each call.
+
+X<.tailcall directive>
+In PIR code, we use the C<.tailcall> directive to make a tailcall
+like this, instead of the C<.return> directive. C<.tailcall>
+performs this optimization by reusing the return continution of
+the parent function to make the tailcall.
+
 =head3 Creating and Using Continuations
+
+{{TODO: Write this section!}}
 
 =head2 Lexical Subroutines
 
@@ -219,8 +219,8 @@ own lexical variables that cannot be seen or modified by the outer subroutine.
 Let us diverge for a minute and start looking forward at the idea of X<High
 Level Languages;HLL> High Level Languages (HLLs) such as Perl, Python, and
 Ruby. All of these languages allow nested scopes, or blocks within blocks
-that can have their own lexical variables. Let's look back at the C programming
-language, where this kind of construct is not uncommon:
+that can have their own lexical variables. Let's look back at the C
+programming language, where this kind of construct is not uncommon:
 
   {
       int x = 0;
@@ -264,7 +264,7 @@ As we have seen above, we can declare a new subroutine to be a nested inner
 subroutine of an existing outer subroutine using the C<:outer> flag. The
 outer flag is used to specify the name of the outer subroutine. Where there
 may be multiple subroutines with the same name N<such is the case with
-multisubs, which we will discuss soon>, we can use the C<:lexid> flag on the
+multisubs, which we will discuss soon>, we can use the C<:subid> flag on the
 outer subroutine to give it a different--and unique--name that the lexical
 subroutines can reference in their C<:outer> declarations. Within lexical
 subroutines, the C<.lex> command defines a local variable that follows these
