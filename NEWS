@@ -27,6 +27,10 @@ New in the November 2008 release
   + Pipp
     - Added some predefined constants.
     - Added implemention of the function basename().
+  + Cardinal (Ruby)
+    - Added initial support for the classes Proc, Continuation, Queue, Dir, and File, FileStat
+    - various minor bug fixes
+    - fixed broken regexs
 - Compilers
   + PCT
     - added '.isa' method to PCT::Node
