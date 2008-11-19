@@ -1482,22 +1482,22 @@ check : test
 # 'testC', 'testg' and 'testj' are tested only
 # when the needed runcores are available
 fulltest :
-	-@make@ testb
-#CONDITIONED_LINE(cg_flag):	-@make@ testC
-	-@make@ testf
-#CONDITIONED_LINE(cg_flag):	-@make@ testg
-#CONDITIONED_LINE(cg_flag):	-@make@ testj
-	-@make@ testr
-	-@make@ testS
-	-@make@ src_tests
-	-@make@ run_tests
-	-@make@ perl_tests
-	-@make@ codetest
-	-@make@ benchmark_tests
-	-@make@ doc_tests
-	-@make@ distro_tests
-	-@make@ manifest_tests
-	-@make@ examples_tests
+	-@make@ testb \
+#CONDITIONED_LINE(cg_flag):	testC \
+	testf \
+#CONDITIONED_LINE(cg_flag):	testg \
+#CONDITIONED_LINE(cg_flag):	testj \
+	testr \
+	testS \
+	src_tests \
+	run_tests \
+	perl_tests \
+	codetest \
+	benchmark_tests \
+	doc_tests \
+	manifest_tests \
+	examples_tests \
+	distro_tests
 
 # bounds checking, slow core
 testb : test_prep
