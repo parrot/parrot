@@ -73,7 +73,7 @@ the subroutine.
 
 If the sub is in the same compilation unit use a Sub constant:
 
-  .const .Sub foo = 'foo'
+  .const 'Sub' foo = 'foo'
   ...
   foo()
 
