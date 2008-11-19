@@ -179,9 +179,8 @@ D: Pipp
 E: christoph@mksig.org
 
 N: chromatic
-D: SDL library and examples; PIR Test::*; test suite cleanup
-D: Parrot::Embed; Pheme
-D: lead philosopher -- "Why doesn't this work?"
+D: SDL library and examples; PIR Test::*; test suite cleanup; Parrot::Embed
+D: freaky bugs; cool features; Pheme
 E: chromatic@wgz.org
 W: http://wgz.org/chromatic/
 

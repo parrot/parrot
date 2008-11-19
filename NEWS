@@ -2,16 +2,22 @@
 
 New in the November 2008 release
 - Implementation
-  + CPAN module Storable 2.12 added as a configuration and build dependency
-  + remove the pseudo PIR opcode 'addr'
+  + added CPAN module Storable 2.12 as a configuration and build dependency
+  + removed the pseudo PIR opcode 'addr'
   + added the 'box' opcode
   + fixed 'pop_eh' handling in PIR libraries and examples
   + removed usage of .return for tailcalls (use .tailcall instead)
   + removed 'get_hash' and 'get_array' from Capture PMC and Capture_PIR
+  + improved debugger and HLL coordination
+  + allowed MMD primitive autoboxing
+  + fixed all known memory leaks in PIR "Hello, world!"
+  + NCI signatures now JITted on x86-32 platforms (Windows and Linux)
+  + made the .const directive take a quoted type name instead of a constant
+  + made IMCC more re-entrant
 - Languages
   + Rakudo
     - refactored Junctions implementation
-    - new tool for "fire and forget" rebase/rebuild/test of Parrot and Rakudo
+    - added "fire and forget" tool to rebase/rebuild/test Parrot and Rakudo
     - updated container/reference semantics
     - added more builtin methods and functions
     - improved support for multilevel namespaces
@@ -25,17 +31,17 @@ New in the November 2008 release
     - added initial support for MAIN subs
     - added .PARROT method
   + Pipp
-    - Added some predefined constants.
-    - Added implemention of the function basename().
+    - added some predefined constants.
+    - added implemention of the function basename().
   + Cardinal (Ruby)
     - Added initial support for the classes Proc, Continuation, Queue, Dir, File, and FileStat
-    - various minor bug fixes
+    - fixed various minor bugs
     - fixed broken Regexes
 - Compilers
   + PCT
     - added '.isa' method to PCT::Node
-    - clean up 'immediate block' handling
-    - allow arguments to immediate blocks in loops/conditionals
+    - cleaned up 'immediate block' handling
+    - allowed arguments to immediate blocks in loops/conditionals
     - metaclass objects can now 'add_method'
   + PIRC
     - integrated macro processing in PIRC's lexer
@@ -44,14 +50,22 @@ New in the November 2008 release
     - integrated the PASM grammar into PIRC
     - added a register allocator to optimize the built-in vanilla allocator
     - code cleanups and documentation
+    - added 'make test' target
+   + TGE
+    - updated to work with new namespace/classname syntax
 - Deprecations
   + PARROT_API will become PARROT_EXPORT
   + :lexid will become :subid
 - Miscellaneous
+  + Documentation
+    - updates and additions to the Parrot book (see docs/book/)
   + OpenGL
-    - Minor fixes to Parrot's base OpenGL bindings
-    - Convert OpenGL PIR examples to Perl 6 (two complete, one WIP)
-    - New simplified OpenGL PIR example for NCI JIT testing
+    - minor fixes to Parrot's base OpenGL bindings
+    - converted OpenGL PIR examples to Perl 6 (two complete, one WIP)
+    - added simplified OpenGL PIR example for NCI JIT testing
+  + Tests
+    - further improvements to parallel tests
+    - tests no longer leave filesystem breadcrumbs
 
 New in 0.8.0
 - Implementation

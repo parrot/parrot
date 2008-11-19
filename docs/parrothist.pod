@@ -126,4 +126,8 @@ the strings?).
 
  Patrick   0.7.1          2008-Sep-16     "Manu Aloha"
 
+ particle  0.8.0          2008-Oct-21     "Pareto Principle"
+
+ chromatic 0.8.1          2008-Nov-18     "Tio Richie"
+
 =cut

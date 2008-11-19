@@ -1,9 +1,9 @@
 {
-    "release.version"  : "0.8.0",
-    "release.name"     : "Pareto Principle",
+    "release.version"  : "0.8.1",
+    "release.name"     : "Tio Richie",
     "release.day"      : "Tuesday",
-    "release.date"     : "21 Oct 2008",
-    "release.nextdate" : "18 Nov 2008",
+    "release.date"     : "18 Nov 2008",
+    "release.nextdate" : "16 Dec 2008",
 
     "web.root"         : "http://parrotcode.org/",
     "web.source"       : "source.html",
@@ -11,13 +11,13 @@
     "web.repository"   : "https://svn.perl.org/parrot/trunk/",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "15 Nov 2008",
+    "bugday.date"      : "13 Dec 2008",
 
     "rt.root"          : "https://rt.perl.org/rt3/",
-    "rt.tracking"      : "Ticket/Display.html?id=60046",
+    "rt.tracking"      : "Ticket/Display.html?id=60656",
 
     "wiki.root"        : "http://www.perlfoundation.org/parrot/index.cgi?",
-    "wiki.bugday"      : "bug_day_2008_11_15",
+    "wiki.bugday"      : "bug_day_2008_12_13",
 
     "cpan.search"      : "http://search.cpan.org/dist/parrot",
     "subversion.root"  : "http://subversion.tigris.org/",

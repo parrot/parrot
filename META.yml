@@ -4,7 +4,7 @@
 # See http://module-build.sourceforge.net/META-spec-current.html for details.
 ---
 name: parrot
-version: 0.8.0
+version: 0.8.1
 author: parrot-dev@parrot.org
 abstract: a virtual machine designed for dynamic languages
 license: artistic2
@@ -32,6 +32,9 @@ no_index:
         - Parrot::OpTrans::CSwitch
         - Parrot::OpTrans::Compiled
         - Parrot::OpsFile
+requires:
+  Storable: 2.12
+  perl: 5.8.4
 resources:
     homepage:   'http://parrot.org/'
     license:    'http://opensource.org/licenses/artistic-license-2.0.php'
