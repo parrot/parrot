@@ -42,7 +42,7 @@ typedef enum {
 /* HEADERIZER BEGIN: src/key.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 PMC * key_append(SHIM_INTERP, ARGMOD(PMC *key1), ARGIN(PMC *key2))
@@ -50,93 +50,93 @@ PMC * key_append(SHIM_INTERP, ARGMOD(PMC *key1), ARGIN(PMC *key2))
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*key1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL key_integer(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 void key_mark(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * key_new(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * key_new_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *value))
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * key_new_integer(PARROT_INTERP, INTVAL value)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * key_new_number(PARROT_INTERP, FLOATVAL value)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * key_new_pmc(PARROT_INTERP, ARGIN(PMC *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * key_new_string(PARROT_INTERP, ARGIN(STRING *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * key_next(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 FLOATVAL key_number(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * key_pmc(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 void key_set_integer(SHIM_INTERP, ARGMOD(PMC *key), INTVAL value)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*key);
 
-PARROT_API
+PARROT_EXPORT
 void key_set_number(SHIM_INTERP, ARGMOD(PMC *key), FLOATVAL value)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*key);
 
-PARROT_API
+PARROT_EXPORT
 void key_set_pmc(PARROT_INTERP, ARGMOD(PMC *key), ARGIN(PMC *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*key);
 
-PARROT_API
+PARROT_EXPORT
 void key_set_register(SHIM_INTERP,
     ARGMOD(PMC *key),
     INTVAL value,
@@ -144,19 +144,19 @@ void key_set_register(SHIM_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*key);
 
-PARROT_API
+PARROT_EXPORT
 void key_set_string(SHIM_INTERP, ARGMOD(PMC *key), ARGIN(STRING *value))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*key);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL key_type(SHIM_INTERP, ARGIN(const PMC *key))
         __attribute__nonnull__(2);

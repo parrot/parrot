@@ -1,5 +1,9 @@
 # $Id$
 
+New in December 2008 Release
+- Deprecations
+  + PARROT_API is now PARROT_EXPORT
+
 New in 0.8.1
 - Implementation
   + added CPAN module Storable 2.12 as a configuration and build dependency

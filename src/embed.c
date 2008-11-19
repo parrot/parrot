@@ -78,7 +78,7 @@ to get destroyed.
 #  include "jit.h"
 #endif
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Interp
 Parrot_new(ARGIN_NULLOK(Parrot_Interp parent))
@@ -108,7 +108,7 @@ Use this function when you call into Parrot before entering a run loop.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_init_stacktop(PARROT_INTERP, void *stack_top)
 {
@@ -134,7 +134,7 @@ C<PARROT_THR_TYPE_3>    enable variable sharing.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_set_flag(PARROT_INTERP, INTVAL flag)
 {
@@ -162,7 +162,7 @@ Set a debug flag: C<PARROT_DEBUG_FLAG>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_set_debug(PARROT_INTERP, UINTVAL flag)
 {
@@ -181,7 +181,7 @@ C<parrot> binary).
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_set_executable_name(PARROT_INTERP, Parrot_Pointer name)
 {
@@ -202,7 +202,7 @@ Set a trace flag: C<PARROT_TRACE_FLAG>
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_set_trace(PARROT_INTERP, UINTVAL flag)
 {
@@ -221,7 +221,7 @@ Clears a flag in the interpreter.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_clear_flag(PARROT_INTERP, INTVAL flag)
 {
@@ -239,7 +239,7 @@ Clears a flag in the interpreter.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_clear_debug(PARROT_INTERP, UINTVAL flag)
 {
@@ -257,7 +257,7 @@ Clears a flag in the interpreter.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_clear_trace(PARROT_INTERP, UINTVAL flag)
 {
@@ -275,7 +275,7 @@ Test the interpreter flags specified in C<flag>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 Parrot_Int
 Parrot_test_flag(PARROT_INTERP, INTVAL flag)
 {
@@ -293,7 +293,7 @@ Test the interpreter flags specified in C<flag>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 UINTVAL
 Parrot_test_debug(PARROT_INTERP, UINTVAL flag)
 {
@@ -311,7 +311,7 @@ Test the interpreter flags specified in C<flag>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 UINTVAL
 Parrot_test_trace(PARROT_INTERP, UINTVAL flag)
 {
@@ -329,7 +329,7 @@ Sets the specified run core.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_set_run_core(PARROT_INTERP, Parrot_Run_core_t core)
 {
@@ -347,7 +347,7 @@ Activates the given warnings.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_setwarnings(PARROT_INTERP, Parrot_warnclass wc)
 {
@@ -366,7 +366,7 @@ Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PackFile *
 Parrot_readbc(PARROT_INTERP, ARGIN_NULLOK(const char *fullname))
@@ -546,7 +546,7 @@ Loads the C<PackFile> returned by C<Parrot_readbc()>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_loadbc(PARROT_INTERP, NOTNULL(PackFile *pf))
 {
@@ -874,7 +874,7 @@ Sets up C<ARGV> and runs the ops.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_runcode(PARROT_INTERP, int argc, ARGIN(char **argv))
 {
@@ -970,7 +970,7 @@ Runs the interpreter's bytecode in debugging mode.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 opcode_t *
 Parrot_debug(PARROT_INTERP, NOTNULL(Parrot_Interp debugger), opcode_t * pc)
@@ -1013,7 +1013,7 @@ This is used by the Parrot disassembler.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_disassemble(PARROT_INTERP)
 {
@@ -1099,7 +1099,7 @@ the interpreter outside a runloop.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_run_native(PARROT_INTERP, native_func_t func)
 {

@@ -259,7 +259,7 @@ signature.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_init_arg_nci(PARROT_INTERP, ARGOUT(call_state *st),
     ARGIN(const char *sig))
@@ -288,7 +288,7 @@ signature.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_init_ret_nci(PARROT_INTERP, ARGOUT(call_state *st), ARGIN(const char *sig))
 {
@@ -330,7 +330,7 @@ These functions return 0 if no arguments are present, or 1 on success.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 int
 Parrot_init_arg_indexes_and_sig_pmc(SHIM_INTERP, ARGIN(Parrot_Context *ctx),
         ARGIN_NULLOK(opcode_t *indexes), ARGIN_NULLOK(PMC* sig_pmc),
@@ -377,7 +377,7 @@ of a C<get_*> or C<set_*> argument opcode.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 int
 Parrot_init_arg_op(PARROT_INTERP, ARGIN(Parrot_Context *ctx),
     ARGIN_NULLOK(opcode_t *pc), ARGIN(call_state_item *sti))
@@ -406,7 +406,7 @@ const_table), registers, function signature, and arguments.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 int
 Parrot_init_arg_sig(SHIM_INTERP, ARGIN(Parrot_Context *ctx),
     ARGIN(const char *sig), ARGIN_NULLOK(void *ap),
@@ -662,7 +662,7 @@ name and the value.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 int
 Parrot_fetch_arg(PARROT_INTERP, ARGMOD(call_state *st))
 {
@@ -741,7 +741,7 @@ PMC which is then set as the PMC value of the call_state object.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 int
 Parrot_fetch_arg_nci(PARROT_INTERP, ARGMOD(call_state *st))
 {
@@ -1148,7 +1148,7 @@ to store more values then there are in the signature. Returns 1 otherwise.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 int
 Parrot_store_arg(SHIM_INTERP, ARGIN(const call_state *st))
 {
@@ -1369,7 +1369,7 @@ slurpy parameters, and finally the named parameters.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_result)
 {
@@ -1576,7 +1576,7 @@ Converts a source argument to the expected destination type.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_convert_arg(PARROT_INTERP, ARGMOD(call_state *st))
 {
@@ -1619,7 +1619,7 @@ latter handles return values and yields.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 parrot_pass_args(PARROT_INTERP,
         ARGMOD(Parrot_Context *src_ctx), ARGMOD(Parrot_Context *dest_ctx),
@@ -2339,7 +2339,7 @@ string and call arguments are converted to a CallSignature PMC.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP, ARGIN(PMC *sub_obj),
         ARGIN(const char *sig), ...)
@@ -2409,7 +2409,7 @@ invokes a PMC method
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
         ARGIN(const char *signature), ...)
@@ -2590,7 +2590,7 @@ signature string and call arguments are passed in a CallSignature PMC.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
         ARGIN(PMC *sig_obj))

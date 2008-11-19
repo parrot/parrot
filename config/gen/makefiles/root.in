@@ -741,7 +741,7 @@ help :
 	@echo "  sunlint:           Code checking with Sun Studio's sunlint."
 	@echo "  splint:            Code checking with splint."
 	@echo "  headerizer:        Recreate header files for C-source files"
-	@echo "  apilist:           Show list of PARROT_API functions"
+	@echo "  apilist:           Show list of PARROT_EXPORT functions"
 	@echo "  malloclist:        Show list of PARROT_MALLOC functions"
 	@echo "  cover:             Run test suite coverage analysis."
 	@echo "  tags-vi:           Create tags for the vi editor."
@@ -2245,7 +2245,7 @@ tags.vi.dummy:
 
 # This target will eventually create all the headers automatically.  If you are
 # having problems with linkage in Win32 (or elsewhere), because something is
-# not PARROT_API but should be, then put PARROT_API in the C file and run "make
+# not PARROT_EXPORT but should be, then put PARROT_EXPORT in the C file and run "make
 # headerizer".  The .h file will get updated.
 
 HEADERIZER_O_FILES = \
@@ -2257,7 +2257,7 @@ headerizer : $(SRC_DIR)/core_pmcs.c
 	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl $(HEADERIZER_O_FILES) $(IMCC_DIR)/imcc.y
 
 apilist: $(SRC_DIR)/core_pmcs.c
-	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl --macro=PARROT_API $(HEADERIZER_O_FILES)
+	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl --macro=PARROT_EXPORT $(HEADERIZER_O_FILES)
 
 malloclist: $(SRC_DIR)/core_pmcs.c
 	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl --macro=PARROT_MALLOC $(HEADERIZER_O_FILES)

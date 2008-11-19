@@ -1678,7 +1678,7 @@ Blocks stop-the-world DOD runs.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_shared_DOD_block(PARROT_INTERP)
 {
@@ -1701,7 +1701,7 @@ Unblocks stop-the-world DOD runs.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_shared_DOD_unblock(PARROT_INTERP)
 {

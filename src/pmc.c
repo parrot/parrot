@@ -54,7 +54,7 @@ Tests if the given pmc is null.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PMC_is_null(SHIM_INTERP, NULLOK(const PMC *pmc))
 {
@@ -78,7 +78,7 @@ method to perform any other necessary initialization.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
@@ -112,7 +112,7 @@ turned into a PMC of a singleton type.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
@@ -299,7 +299,7 @@ allocation and initialization for continuations.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
@@ -323,7 +323,7 @@ Creates a new constant PMC of type C<base_type>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 constant_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
@@ -342,7 +342,7 @@ Creates a new constant PMC of type C<base_type>, then calls its C<init>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 constant_pmc_new(PARROT_INTERP, INTVAL base_type)
@@ -363,7 +363,7 @@ As C<pmc_new()>, but passes C<init> to the PMC's C<init_pmc()> vtable entry.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 pmc_new_init(PARROT_INTERP, INTVAL base_type, ARGOUT(PMC *init))
@@ -391,7 +391,7 @@ entry.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 constant_pmc_new_init(PARROT_INTERP, INTVAL base_type, ARGIN_NULLOK(PMC *init))
@@ -420,7 +420,7 @@ C<pmc_new()> instead.
 (Why do these functions even exist?  Used judiciously, they can reduce GC
 pressure in hotspots tremendously.  If you haven't audited the code carefully
 -- including profiling and benchmarking -- then use C<pmc_new()> instead, and
-never B<ever> add C<PARROT_API> to either function.)
+never B<ever> add C<PARROT_EXPORT> to either function.)
 
 =cut
 
@@ -478,7 +478,7 @@ representing that type.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 pmc_register(PARROT_INTERP, ARGIN(STRING *name))
 {
@@ -519,7 +519,7 @@ Returns the PMC type for C<name>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 pmc_type(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
@@ -553,7 +553,7 @@ Returns the PMC type for C<name>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 pmc_type_p(PARROT_INTERP, ARGIN(PMC *name))
 {
@@ -628,7 +628,7 @@ Create the MRO (method resolution order) array for this type.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_create_mro(PARROT_INTERP, INTVAL type)
 {
@@ -696,7 +696,7 @@ Registers the PMC with the interpreter's DOD registry.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 dod_register_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {

@@ -269,7 +269,7 @@ Returns pointer to offset.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 int *
 Parrot_exec_add_text_rellocation_reg(ARGIN(Parrot_exec_objfile_t *obj),
@@ -290,7 +290,7 @@ around C<Parrot_exec_add_text_rellocation>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_exec_add_text_rellocation_func(ARGIN(Parrot_exec_objfile_t *obj),
         ARGIN(char *nptr), ARGIN(const char *func_name))
@@ -308,7 +308,7 @@ Adds a text rellocation to the object file.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_exec_add_text_rellocation(ARGIN(Parrot_exec_objfile_t *obj), ARGIN(char *nptr),
     int type, ARGIN(const char *symbol), int disp)

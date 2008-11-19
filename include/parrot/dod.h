@@ -50,7 +50,7 @@
 /* HEADERIZER BEGIN: src/gc/dod.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 void pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -158,11 +158,11 @@ extern int CONSERVATIVE_POINTER_CHASING;
 /* HEADERIZER BEGIN: src/gc/gc_gms.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_gc_gms_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void parrot_gc_gms_pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

@@ -22,52 +22,52 @@
 /* HEADERIZER BEGIN: src/hll.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC* Parrot_get_ctx_HLL_namespace(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 INTVAL Parrot_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_get_HLL_id(PARROT_INTERP, ARGIN_NULLOK(STRING *hll_name))
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING * Parrot_get_HLL_name(PARROT_INTERP, INTVAL id)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC* Parrot_get_HLL_namespace(PARROT_INTERP, int hll_id)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 INTVAL Parrot_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_regenerate_HLL_namespaces(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 INTVAL Parrot_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 INTVAL Parrot_register_HLL_lib(PARROT_INTERP, ARGIN(STRING *hll_lib))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_register_HLL_type(PARROT_INTERP,
     INTVAL hll_id,
     INTVAL core_type,

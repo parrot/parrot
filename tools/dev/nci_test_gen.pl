@@ -285,7 +285,7 @@ EOT
   $pirretvalf = " " . $pirretval unless $pirretval eq "";
 
   my $ccode = <<EOT;
-PARROT_API ${crettype}nci_$sig($csig) {$printfline
+PARROT_EXPORT ${crettype}nci_$sig($csig) {$printfline
   return$pirretvalf;
 }
 EOT

@@ -127,7 +127,7 @@ is an invocable C<Sub> PMC.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Context *
@@ -256,7 +256,7 @@ If a PMC return value is registered it is returned.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 void *
@@ -291,7 +291,7 @@ invocable C<Sub> PMC.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
@@ -318,7 +318,7 @@ didn't return properly.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 void *
@@ -362,7 +362,7 @@ C<INTVAL>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 INTVAL
 Parrot_runops_fromc_args_reti(PARROT_INTERP, ARGIN(PMC *sub),
@@ -389,7 +389,7 @@ C<FLOATVAL>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 FLOATVAL
 Parrot_runops_fromc_args_retf(PARROT_INTERP, ARGIN(PMC *sub),
@@ -416,7 +416,7 @@ list.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 void*
@@ -444,7 +444,7 @@ list. Returns an C<INTVAL>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 INTVAL
 Parrot_run_meth_fromc_args_reti(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj),
@@ -471,7 +471,7 @@ list C<args>. Returns a C<FLOATVAL>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 FLOATVAL
 Parrot_run_meth_fromc_args_retf(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj),
@@ -498,7 +498,7 @@ argument list C<args>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 void *
@@ -522,7 +522,7 @@ argument list C<args>. Returns an C<INTVAL>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 INTVAL
 Parrot_runops_fromc_arglist_reti(PARROT_INTERP, ARGIN(PMC *sub),
@@ -545,7 +545,7 @@ argument list C<args>. Returns an C<FLOATVAL>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 FLOATVAL
 Parrot_runops_fromc_arglist_retf(PARROT_INTERP, ARGIN(PMC *sub),
@@ -568,7 +568,7 @@ C<args>. C<args> is a C variadic argument list created with C<va_start>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 void*
@@ -594,7 +594,7 @@ Returns an C<INTVAL>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 INTVAL
@@ -619,7 +619,7 @@ Returns a C<FLOATVAL>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 FLOATVAL
 Parrot_run_meth_fromc_arglist_retf(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj),
@@ -646,7 +646,7 @@ getting one from the free list.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 new_runloop_jump_point(PARROT_INTERP)
 {
@@ -673,7 +673,7 @@ Place runloop jump point back on the free list.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 free_runloop_jump_point(PARROT_INTERP)
 {

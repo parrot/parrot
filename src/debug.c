@@ -47,7 +47,7 @@ the Parrot debugger, and the C<debug> ops.
 #define DEBUG_CMD_BUFFER_LENGTH 255
 
 /* Not sure how we want to handle this sort of cross-project header */
-PARROT_API
+PARROT_EXPORT
 void
 IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...);
 
@@ -864,7 +864,7 @@ Initializes the Parrot debugger, if it's not already initialized.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_debugger_init(PARROT_INTERP)
 {
@@ -898,7 +898,7 @@ Destroy the current Parrot debugger instance.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_debugger_destroy(PARROT_INTERP)
 {
@@ -929,7 +929,7 @@ Loads a Parrot source file for the current program.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(STRING *filename))
 {
@@ -955,7 +955,7 @@ Start debugger.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_debugger_start(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
 {
@@ -1003,7 +1003,7 @@ debugger and then continue the normal execution of the program.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
 {
@@ -1146,7 +1146,7 @@ Interprets the contents of a file as user input commands
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 PDB_script_file(PARROT_INTERP, ARGIN(const char *command))
 {
@@ -2797,7 +2797,7 @@ Load a source code file.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
 {

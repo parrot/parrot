@@ -72,7 +72,7 @@ Any other value is a valid option identifier.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 int
 longopt_get(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
             ARGIN(const struct longopt_opt_decl options[]),

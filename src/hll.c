@@ -151,7 +151,7 @@ uses this.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 Parrot_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
 {
@@ -215,7 +215,7 @@ Otherwise, add the entry to the list and return 0.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 Parrot_register_HLL_lib(PARROT_INTERP, ARGIN(STRING *hll_lib))
 {
@@ -266,7 +266,7 @@ Return the ID of the given HLL name or -1 on error. C<parrot> has ID 0.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_get_HLL_id(PARROT_INTERP, ARGIN_NULLOK(STRING *hll_name))
@@ -302,7 +302,7 @@ returns NULL.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING *
@@ -340,7 +340,7 @@ Register a type mapping of C<< core_type => hll_type >> for the given HLL.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
         INTVAL core_type, INTVAL hll_type)
@@ -386,7 +386,7 @@ C<PARROT_HLL_NONE>, returns C<core_type> unchanged.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 Parrot_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
 {
@@ -432,7 +432,7 @@ the context.  If no type is registered, returns C<core_type>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 Parrot_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)
 {
@@ -451,7 +451,7 @@ Return root namespace of the current HLL.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC*
@@ -471,7 +471,7 @@ special value C<PARROT_HLL_NONE>, return the global root namespace.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC*
@@ -497,7 +497,7 @@ creating a new interpreter which shares an old interpreter's HLL_info.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_regenerate_HLL_namespaces(PARROT_INTERP)
 {

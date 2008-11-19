@@ -36,7 +36,7 @@ Register the specified function to be called on exit.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_on_exit(PARROT_INTERP, NOTNULL(exit_handler_f function), ARGIN_NULLOK(void *arg))
 {
@@ -61,7 +61,7 @@ Exit, calling any registered exit handlers.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 void
 Parrot_exit(PARROT_INTERP, int status)

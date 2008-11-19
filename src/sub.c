@@ -237,7 +237,7 @@ if possible; otherwise, creates a new one.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 PMC *
@@ -290,7 +290,7 @@ Return namespace, name, and location of subroutine.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING*
@@ -357,7 +357,7 @@ Used by Parrot_Context_infostr.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 int
 Parrot_Context_get_info(PARROT_INTERP, ARGIN(const Parrot_Context *ctx),
                     ARGOUT(Parrot_Context_info *info))
@@ -447,7 +447,7 @@ returns a pointer to the text.  Used in debug.c and warnings.c
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING*
@@ -529,7 +529,7 @@ Returns a pointer to the closure, (or throws exceptions if invalid).
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC*

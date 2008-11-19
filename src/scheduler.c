@@ -110,7 +110,7 @@ continue the runloop.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
@@ -207,7 +207,7 @@ Schedule an event to terminate the scheduler runloop.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_cx_runloop_end(PARROT_INTERP)
 {
@@ -226,7 +226,7 @@ interpreters/threads, must be called from within the interpreter's runloop.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task))
 {
@@ -248,7 +248,7 @@ from the list.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_cx_peek_task(PARROT_INTERP)
@@ -271,7 +271,7 @@ and running the passed C<sub>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_cx_schedule_timer(PARROT_INTERP,
         ARGIN_NULLOK(STRING *type), FLOATVAL duration, FLOATVAL interval,
@@ -305,7 +305,7 @@ Add a repeat task to scheduler's task list.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_cx_schedule_repeat(PARROT_INTERP, ARGIN(PMC *task))
 {
@@ -335,7 +335,7 @@ Create a new callback event, with an argument for the call.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_cx_schedule_callback(PARROT_INTERP,
         ARGIN(PMC *user_data), ARGIN(char *ext_data))
@@ -360,7 +360,7 @@ Tell the scheduler to suspend for GC at the next safe pause.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_cx_request_suspend_for_gc(PARROT_INTERP)
 {
@@ -380,7 +380,7 @@ Remove a task from the scheduler's task list.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_cx_delete_task(PARROT_INTERP, ARGIN(PMC *task))
 {
@@ -405,7 +405,7 @@ backward compatibility in the threads implementation.)
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)
@@ -457,7 +457,7 @@ Add a handler to the current context's list of handlers.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_cx_add_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
 {
@@ -479,7 +479,7 @@ handlers.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_cx_delete_handler_local(PARROT_INTERP, ARGIN(STRING *handler_type))
 {
@@ -544,7 +544,7 @@ Add a task handler to scheduler's list of handlers.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_cx_add_handler(PARROT_INTERP, ARGIN(PMC *handler))
 {
@@ -567,7 +567,7 @@ handlers.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_cx_delete_handler_typed(PARROT_INTERP, ARGIN(STRING *handler_type))
 {
@@ -590,7 +590,7 @@ the concurrency scheduler.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 Parrot_cx_count_handlers_typed(PARROT_INTERP, ARGIN(STRING *handler_type))
 {
@@ -625,7 +625,7 @@ Send a message to a scheduler in a different interpreter/thread.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), ARGIN_NULLOK(PMC *payload))
 {
@@ -665,7 +665,7 @@ one.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_cx_broadcast_message(PARROT_INTERP, ARGIN(STRING *messagetype), ARGIN_NULLOK(PMC *data))
 {
@@ -700,7 +700,7 @@ appropriate handler, returns PMCNULL.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_cx_find_handler_for_task(PARROT_INTERP, ARGIN(PMC *task))
@@ -735,7 +735,7 @@ context has no appropriate handler, returns PMCNULL.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
@@ -859,7 +859,7 @@ opcode.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 opcode_t *

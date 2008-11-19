@@ -173,14 +173,6 @@ See RT #60640.
 
 =over 4
 
-=item PARROT_API changes to PARROT_EXPORT [post 0.8.1]
-
-The PARROT_API name suggests something that is not the case yet.  This will
-become PARROT_EXPORT after November 2008 release.  (We will reintroduce
-PARROT_API on specific functions where appropriate post 1.0.0.)
-
-See RT #60624.
-
 =item Old-style MMD functions [post 0.7.1]
 
 Parrot_mmd_add_function, mmd_expand_x, mmd_expand_y, Parrot_mmd_register,

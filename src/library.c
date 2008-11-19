@@ -512,7 +512,7 @@ TODO:
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_add_library_path(PARROT_INTERP,
         ARGIN(const char *path),
@@ -548,7 +548,7 @@ F<include/parrot/library.h>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING*
@@ -601,7 +601,7 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, ARGMOD(STRING *file),
     return full_name;
 }
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PARROT_MALLOC
@@ -636,7 +636,7 @@ See RT#58988
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 char*
@@ -671,7 +671,7 @@ Return a string for the runtime prefix.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_get_runtime_path(PARROT_INTERP)

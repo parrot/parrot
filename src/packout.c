@@ -37,7 +37,7 @@ buffer.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 opcode_t
 PackFile_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
 {
@@ -80,7 +80,7 @@ Other pack routines are in F<src/packfile.c>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 PackFile_pack(PARROT_INTERP, ARGMOD(PackFile *self), ARGOUT(opcode_t *cursor))
 {
@@ -147,7 +147,7 @@ constant table into a contiguous region of memory.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 size_t
 PackFile_ConstTable_pack_size(PARROT_INTERP, ARGIN(PackFile_Segment *seg))
 {
@@ -176,7 +176,7 @@ C<PackFile_ConstTable_pack()>
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t *
@@ -205,7 +205,7 @@ constant is in constant table, so we have to search for it.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 int
 PackFile_find_in_const(PARROT_INTERP,
         ARGIN(const PackFile_ConstTable *ct), ARGIN(const PMC *key), int type)
@@ -241,7 +241,7 @@ The data is zero-padded to an opcode_t-boundary, so pad bytes may be added.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 opcode_t *

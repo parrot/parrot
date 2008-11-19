@@ -166,7 +166,7 @@ Lookup a class object from a namespace, string, or key PMC.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
@@ -229,7 +229,7 @@ Lookup a class object from a builtin string.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
@@ -368,7 +368,7 @@ Return index if C<name> is a valid vtable slot name.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
 {
@@ -413,7 +413,7 @@ Return the method name for the given MMD enum.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
 const char*
@@ -439,7 +439,7 @@ Otherwise it returns C<PMCNULL>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
@@ -596,7 +596,7 @@ RT #50646
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
@@ -762,7 +762,7 @@ all classes are invalidated.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_invalidate_method_cache(PARROT_INTERP, ARGIN_NULLOK(STRING *_class), ARGIN(STRING *meth))
 {
@@ -808,7 +808,7 @@ interpreter, and name of the method. Don't use a possible method cache.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
@@ -844,7 +844,7 @@ the name in the global stash.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
@@ -1113,7 +1113,7 @@ Computes the C3 linearization for the given class.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC*
@@ -1187,7 +1187,7 @@ the default implementation.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
                         ARGIN(PMC *exclude), int got_exclude,

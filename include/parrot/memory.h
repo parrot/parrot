@@ -44,25 +44,25 @@
 /* HEADERIZER BEGIN: src/gc/memory.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void * mem_sys_allocate(size_t size);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void * mem_sys_allocate_zeroed(size_t size);
 
-PARROT_API
+PARROT_EXPORT
 void mem_sys_free(ARGFREE(void *from));
 
-PARROT_API
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void * mem_sys_realloc(ARGFREE(void *from), size_t size);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void * mem_sys_realloc_zeroed(

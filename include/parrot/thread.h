@@ -164,11 +164,11 @@ typedef struct _Sync {
 /* HEADERIZER BEGIN: src/thread.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_shared_DOD_block(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_shared_DOD_unblock(PARROT_INTERP)
         __attribute__nonnull__(1);
 

@@ -31,7 +31,7 @@ Creates and returns a pointer to the new C<VTABLE>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 VTABLE *
@@ -50,7 +50,7 @@ Clones C<*base_vtable> and returns a pointer to the new C<VTABLE>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 VTABLE *
@@ -82,7 +82,7 @@ Destroys C<*vtable>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_destroy_vtable(PARROT_INTERP, ARGMOD(VTABLE *vtable))
 {

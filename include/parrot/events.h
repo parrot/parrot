@@ -83,19 +83,19 @@ struct QUEUE_ENTRY;
 /* HEADERIZER BEGIN: src/events.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_del_timer_event(PARROT_INTERP, ARGIN(const PMC *timer))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 opcode_t * Parrot_do_check_events(PARROT_INTERP,
     ARGIN_NULLOK(opcode_t *next))
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 opcode_t * Parrot_do_handle_events(PARROT_INTERP,
@@ -103,7 +103,7 @@ opcode_t * Parrot_do_handle_events(PARROT_INTERP,
     ARGIN_NULLOK(opcode_t *next))
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_event_add_io_event(PARROT_INTERP,
     ARGIN_NULLOK(PMC *pio),
     ARGIN_NULLOK(PMC *sub),
@@ -111,32 +111,32 @@ void Parrot_event_add_io_event(PARROT_INTERP,
     INTVAL which)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_init_events(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_init_signals(void);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_kill_event_loop(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_new_cb_event(PARROT_INTERP, ARGIN(PMC *cbi), ARGIN(char *ext))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_new_suspend_for_gc_event(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_new_terminate_event(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_new_timer_event(PARROT_INTERP,
     ARGIN_NULLOK(PMC *timer),
     FLOATVAL diff,
@@ -146,19 +146,19 @@ void Parrot_new_timer_event(PARROT_INTERP,
     parrot_event_type_enum typ)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_schedule_event(PARROT_INTERP, ARGMOD(parrot_event* ev))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(* ev);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_schedule_interp_qentry(PARROT_INTERP,
     ARGIN(struct QUEUE_ENTRY *entry))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 opcode_t * Parrot_sleep_on_event(PARROT_INTERP,

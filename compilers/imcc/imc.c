@@ -57,7 +57,7 @@ afterwards.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 imc_compile_all_units(PARROT_INTERP)
 {
@@ -106,7 +106,7 @@ on a single compilation unit at a time.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 imc_compile_unit(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 {
@@ -128,7 +128,7 @@ Cleans up the compiler state in preparation for another compiler invocation.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 imc_cleanup(PARROT_INTERP, ARGIN_NULLOK(void *yyscanner))
 {

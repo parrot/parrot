@@ -15,7 +15,7 @@
 /* HEADERIZER BEGIN: src/dynext.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_clone_lib_into(
@@ -28,7 +28,7 @@ PMC * Parrot_clone_lib_into(
         FUNC_MODIFIES(*d)
         FUNC_MODIFIES(*s);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_init_lib(PARROT_INTERP,
     ARGIN_NULLOK(PMC *(*load_func)(PARROT_INTERP)),
@@ -36,7 +36,7 @@ PMC * Parrot_init_lib(PARROT_INTERP,
     ARGIN_NULLOK(PMC *))))
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_load_lib(PARROT_INTERP,

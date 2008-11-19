@@ -105,7 +105,7 @@ Create the Parrot interpreter. Allocate memory and clear the registers.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Interp
 make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
@@ -282,7 +282,7 @@ This function is not currently used.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_destroy(PARROT_INTERP)
 {

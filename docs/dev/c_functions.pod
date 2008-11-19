@@ -184,7 +184,7 @@ For functions that could be inlined by the compiler for optimization. This
 is more of a hint then a command, and many compilers might ignore it
 entirely. Use this instead of the C<inline> keyword.
 
-=head2 PARROT_API
+=head2 PARROT_EXPORT
 
 For functions that are important API functions.
 
@@ -192,7 +192,7 @@ For functions that are important API functions.
 
 =head1 Examples
 
-    PARROT_API
+    PARROT_EXPORT
     PARROT_WARN_UNUSED_RESULT
     INTVAL
     string_str_index(PARROT_INTERP, NOTNULL(const STRING *s),
@@ -205,7 +205,7 @@ cannot be NULL. If the calling function ignores the return value,
 it's an error, because you'd never want to call C<string_str_index()>
 without wanting to know its value.
 
-    PARROT_API
+    PARROT_EXPORT
     PARROT_PURE_FUNCTION
     INTVAL
     parrot_hash_size(SHIM_INTERP, NOTNULL(const Hash *hash))
@@ -215,7 +215,7 @@ without wanting to know its value.
 
 This function is a pure function because it only looks at its parameters
 or global memory. The interpreter doesn't get used, but needs to be
-passed because all PARROT_API functions have interpreters passed, so is
+passed because all PARROT_EXPORT functions have interpreters passed, so is
 flagged as a SHIM_INTERP.
 
 We could put C<PARROT_WARN_UNUSED_RESULT> on this function, but since

@@ -108,7 +108,7 @@ Allocates the memory for a new C<ENCODING> from the system.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 ENCODING *
@@ -128,7 +128,7 @@ if it is successfully found, returns NULL otherwise.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const ENCODING *
@@ -158,7 +158,7 @@ encodings. See RT#58186.
    encodings and such for strings if we can't be sure we've got enough
    info set up to actually build strings... */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 const ENCODING *
@@ -179,7 +179,7 @@ Return the number of the encoding or -1 if not found.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_encoding_number(PARROT_INTERP, ARGIN(const STRING *encodingname))
@@ -205,7 +205,7 @@ Return the number of the encoding of the given string or -1 if not found.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_encoding_number_of_str(SHIM_INTERP, ARGIN(const STRING *src))
@@ -231,7 +231,7 @@ C<number_of_encoding> to the All_encodings array.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING*
@@ -252,7 +252,7 @@ Returns the encoding given by the INTVAL index C<number_of_encoding>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const ENCODING*
@@ -274,7 +274,7 @@ given by the C<number_of_encoding>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const char *
@@ -335,7 +335,7 @@ Only allows one of 4 possibilities: fixed_8, utf8, utf16, and ucs2.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 Parrot_register_encoding(PARROT_INTERP, ARGIN(const char *encodingname),
         ARGIN(ENCODING *encoding))
@@ -378,7 +378,7 @@ Sets the default encoding to C<encoding> with name C<encodingname>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 Parrot_make_default_encoding(SHIM_INTERP, SHIM(const char *encodingname),
         ARGIN(ENCODING *encoding))
@@ -397,7 +397,7 @@ Gets the default encoding.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 const ENCODING *
@@ -417,7 +417,7 @@ throws an exception.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 encoding_converter_t
 Parrot_find_encoding_converter(PARROT_INTERP, ARGIN(ENCODING *lhs), ARGIN(ENCODING *rhs))
 {

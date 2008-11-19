@@ -456,7 +456,7 @@ creation of memory pools.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_gc_gms_init(PARROT_INTERP)
 {
@@ -1344,7 +1344,7 @@ Set the object live - called by the pobject_lives macro
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 parrot_gc_gms_pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
 {

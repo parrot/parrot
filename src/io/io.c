@@ -55,7 +55,7 @@ Creates and returns a new C<ParrotIO> PMC.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
@@ -134,7 +134,7 @@ Currently C<iotype> is unused.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 ParrotIO *
@@ -164,7 +164,7 @@ Duplicates an IO stream.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
@@ -205,7 +205,7 @@ the pointers from the PMC.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 PIO_destroy(SHIM_INTERP, ARGMOD(PMC * pmc))
 {
@@ -259,7 +259,7 @@ Called when creating an interpreter.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 PIO_init(PARROT_INTERP)
 {
@@ -314,7 +314,7 @@ destruction.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 PIO_finish(PARROT_INTERP)
 {
@@ -364,7 +364,7 @@ IO system destructor, called on destruction of the last interpreter.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 PIO_internal_shutdown(PARROT_INTERP)
 {
@@ -384,7 +384,7 @@ layers (OS-specific first).
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PIO_init_stacks(PARROT_INTERP)
 {
@@ -471,7 +471,7 @@ This default implementation does nothing and returns C<0>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PIO_base_init(SHIM_INTERP, SHIM(ParrotIOLayer *l))
 {
@@ -501,7 +501,7 @@ XXX BD Should this be static?
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 PIO_parse_open_flags(ARGIN_NULLOK(const char *flagstr))
@@ -578,7 +578,7 @@ Iterates down the stack to the first layer implementing "Peek" API.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PIO_peek(PARROT_INTERP, ARGMOD(PMC *pmc), ARGOUT(STRING **buffer))
 {
@@ -608,7 +608,7 @@ limited, but we will see. --Melvin
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PIO_pioctl(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL cmd, INTVAL arg)
 {
@@ -659,7 +659,7 @@ buffering was enabled.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PIO_setbuf(PARROT_INTERP, ARGMOD(PMC *pmc), size_t bufsize)
 {
@@ -682,7 +682,7 @@ successfully set, or already enabled.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PIO_setlinebuf(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
@@ -704,7 +704,7 @@ Creates and returns a C<ParrotIO> PMC for C<*spath>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
@@ -744,7 +744,7 @@ OS IO handles (0, 1, 2).
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
@@ -784,7 +784,7 @@ Flushes, closes, and destroys the C<ParrotIO> PMC C<*pmc>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PIO_close(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
@@ -812,7 +812,7 @@ Flushes the C<ParrotIO> PMC C<*pmc>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 PIO_flush(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
@@ -838,7 +838,7 @@ Return a new C<STRING*> holding up to C<len> bytes.
 */
 
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
@@ -879,7 +879,7 @@ Reads up to C<len> bytes from C<*pmc> and copies them into C<*buffer>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 PIO_read(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(char *buffer), size_t len)
@@ -905,7 +905,7 @@ Writes C<len> bytes from C<*buffer> to C<*pmc>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 PIO_write(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const void *buffer), size_t len)
@@ -942,7 +942,7 @@ the file, C<1> for the current position, and C<2> for the end.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PIOOFF_T
 PIO_seek(PARROT_INTERP, ARGMOD(PMC *pmc), PIOOFF_T offset, INTVAL w)
@@ -965,7 +965,7 @@ Returns the current read/write position of C<*pmc>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PIOOFF_T
 PIO_tell(PARROT_INTERP, ARGMOD(PMC *pmc))
@@ -989,7 +989,7 @@ position is C<EOF>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 PIO_eof(SHIM_INTERP, ARGMOD(PMC *pmc))
@@ -1015,7 +1015,7 @@ Writes C<*s> tp C<*pmc>. C string version.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PIO_puts(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s))
 {
@@ -1032,7 +1032,7 @@ Writes C<*s> to C<*pmc>. Parrot string version.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PIO_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD_NULLOK(STRING *s))
 {
@@ -1068,7 +1068,7 @@ Writes a C string format with varargs to C<*pmc>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PIO_fprintf(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s), ...)
 {
@@ -1094,7 +1094,7 @@ Writes a C string format with varargs to C<stdout>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PIO_printf(PARROT_INTERP, ARGIN(const char *s), ...)
 {
@@ -1129,7 +1129,7 @@ Writes a C string format with varargs to C<stderr>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 INTVAL
 PIO_eprintf(NULLOK(PARROT_INTERP), ARGIN(const char *s), ...)
@@ -1166,7 +1166,7 @@ Returns C<*pmc>'s file descriptor, or C<0> if it is not defined.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PIOHANDLE
 PIO_getfd(SHIM_INTERP, ARGMOD(PMC *pmc))
@@ -1195,7 +1195,7 @@ Returns the C<ParrotIO> PMC for C<stdin>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
@@ -1214,7 +1214,7 @@ Returns the C<ParrotIO> PMC for C<stdout>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
@@ -1233,7 +1233,7 @@ Returns the C<ParrotIO> PMC for C<stderr>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
@@ -1258,7 +1258,7 @@ Called from C<trace_active_PMCs()> to mark the IO data live.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_IOData_mark(PARROT_INTERP, ARGIN(ParrotIOData *piodata))
 {
@@ -1293,7 +1293,7 @@ Returns C<offset>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PIOOFF_T
 PIO_make_offset(INTVAL offset)
 {
@@ -1351,7 +1351,7 @@ microseconds.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PIO_poll(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL which, INTVAL sec, INTVAL usec)
 {
@@ -1379,7 +1379,7 @@ the socket was successfully created.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
@@ -1406,7 +1406,7 @@ if it fails.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PIO_recv(PARROT_INTERP, ARGMOD(PMC *pmc), ARGOUT(STRING **buf))
 {
@@ -1429,7 +1429,7 @@ C<-1> if it cannot send the message.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 PIO_send(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *buf))
@@ -1452,7 +1452,7 @@ Connects C<*pmc> to C<*address>.  Returns C<-1> on failure.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PIO_connect(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *address))
 {
@@ -1475,7 +1475,7 @@ C<*address>.  Returns C<-1> on failure.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PIO_bind(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *address))
 {
@@ -1497,7 +1497,7 @@ Listens for new connections on socket C<*pmc>.  Returns C<-1> on failure.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 PIO_listen(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL backlog)
@@ -1521,7 +1521,7 @@ Returns C<NULL> on failure.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
@@ -1549,7 +1549,7 @@ Returns a boolean value indicating whether C<*pmc> is a console/tty.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 PIO_isatty(SHIM_INTERP, ARGMOD(PMC *pmc))

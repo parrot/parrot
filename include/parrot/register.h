@@ -63,23 +63,23 @@ typedef struct Parrot_Context Parrot_Context; /* parrot/interpreter.h */
 /* HEADERIZER BEGIN: src/gc/register.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_clear_i(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_clear_n(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_clear_p(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_clear_s(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_free_context(PARROT_INTERP,
     ARGMOD(Parrot_Context *ctxp),
     int re_use)
@@ -87,15 +87,15 @@ void Parrot_free_context(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*ctxp);
 
-PARROT_API
+PARROT_EXPORT
 void parrot_gc_context(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_pop_context(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Context * Parrot_push_context(PARROT_INTERP,
@@ -104,7 +104,7 @@ Parrot_Context * Parrot_push_context(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*n_regs_used);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_set_context_threshold(SHIM_INTERP, SHIM(Parrot_Context *ctxp));
 
 void create_initial_context(PARROT_INTERP)

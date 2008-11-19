@@ -510,11 +510,11 @@ typedef PMC *(*Parrot_compiler_func_t)(Parrot_Interp interp,
 /* HEADERIZER BEGIN: src/inter_create.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Interp make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_destroy(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -529,15 +529,15 @@ void Parrot_really_destroy(PARROT_INTERP,
 /* HEADERIZER BEGIN: src/inter_run.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 void free_runloop_jump_point(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void new_runloop_jump_point(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 void * Parrot_run_meth_fromc(PARROT_INTERP,
@@ -547,7 +547,7 @@ void * Parrot_run_meth_fromc(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 void* Parrot_run_meth_fromc_arglist(PARROT_INTERP,
@@ -561,7 +561,7 @@ void* Parrot_run_meth_fromc_arglist(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 FLOATVAL Parrot_run_meth_fromc_arglist_retf(PARROT_INTERP,
     ARGIN(PMC *sub),
@@ -574,7 +574,7 @@ FLOATVAL Parrot_run_meth_fromc_arglist_retf(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 INTVAL Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP,
@@ -588,7 +588,7 @@ INTVAL Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 void* Parrot_run_meth_fromc_args(PARROT_INTERP,
@@ -602,7 +602,7 @@ void* Parrot_run_meth_fromc_args(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 FLOATVAL Parrot_run_meth_fromc_args_retf(PARROT_INTERP,
     ARGIN(PMC *sub),
@@ -615,7 +615,7 @@ FLOATVAL Parrot_run_meth_fromc_args_retf(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 INTVAL Parrot_run_meth_fromc_args_reti(PARROT_INTERP,
     ARGIN(PMC *sub),
@@ -628,14 +628,14 @@ INTVAL Parrot_run_meth_fromc_args_reti(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Context * Parrot_runops_fromc(PARROT_INTERP, ARGIN(PMC *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 void * Parrot_runops_fromc_arglist(PARROT_INTERP,
@@ -646,7 +646,7 @@ void * Parrot_runops_fromc_arglist(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 FLOATVAL Parrot_runops_fromc_arglist_retf(PARROT_INTERP,
     ARGIN(PMC *sub),
@@ -656,7 +656,7 @@ FLOATVAL Parrot_runops_fromc_arglist_retf(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 INTVAL Parrot_runops_fromc_arglist_reti(PARROT_INTERP,
     ARGIN(PMC *sub),
@@ -666,7 +666,7 @@ INTVAL Parrot_runops_fromc_arglist_reti(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 PMC * Parrot_runops_fromc_args(PARROT_INTERP,
@@ -677,7 +677,7 @@ PMC * Parrot_runops_fromc_args(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 void * Parrot_runops_fromc_args_event(PARROT_INTERP,
@@ -688,7 +688,7 @@ void * Parrot_runops_fromc_args_event(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 FLOATVAL Parrot_runops_fromc_args_retf(PARROT_INTERP,
     ARGIN(PMC *sub),
@@ -698,7 +698,7 @@ FLOATVAL Parrot_runops_fromc_args_retf(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 INTVAL Parrot_runops_fromc_args_reti(PARROT_INTERP,
     ARGIN(PMC *sub),
@@ -723,19 +723,19 @@ void runops(PARROT_INTERP, size_t offs)
 /* HEADERIZER BEGIN: src/inter_cb.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_callback_C(ARGIN(char *external_data), ARGMOD(PMC *user_data))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*user_data);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_callback_D(ARGMOD(PMC *user_data), ARGIN(char *external_data))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*user_data);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC* Parrot_make_cb(PARROT_INTERP,
@@ -748,7 +748,7 @@ PMC* Parrot_make_cb(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(* sub);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_run_callback(PARROT_INTERP,
     ARGMOD(PMC* user_data),
     ARGIN(char* external_data))
@@ -763,23 +763,23 @@ void Parrot_run_callback(PARROT_INTERP,
 /* HEADERIZER BEGIN: src/inter_misc.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL interpinfo(PARROT_INTERP, INTVAL what)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC* interpinfo_p(PARROT_INTERP, INTVAL what)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING* interpinfo_s(PARROT_INTERP, INTVAL what)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void * Parrot_compile_file(PARROT_INTERP,
     ARGIN(const char *fullname),
@@ -789,7 +789,7 @@ void * Parrot_compile_file(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*error);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC * Parrot_compile_string(PARROT_INTERP,
@@ -802,7 +802,7 @@ PMC * Parrot_compile_string(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*error);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_compreg(PARROT_INTERP,
     ARGIN(STRING *type),
     NOTNULL(Parrot_compiler_func_t func))
@@ -810,14 +810,14 @@ void Parrot_compreg(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_mark_method_writes(PARROT_INTERP,
     int type,
     ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 void register_nci_method(PARROT_INTERP,
     const int type,
     ARGIN(void *func),
@@ -828,7 +828,7 @@ void register_nci_method(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-PARROT_API
+PARROT_EXPORT
 void register_raw_nci_method_in_ns(PARROT_INTERP,
     const int type,
     ARGIN(void *func),
@@ -855,7 +855,7 @@ void exec_init_prederef(PARROT_INTERP,
     void *prederef_arena);
 void prepare_for_run(PARROT_INTERP);
 void *init_jit(PARROT_INTERP, opcode_t *pc);
-PARROT_API void dynop_register(PARROT_INTERP, PMC* op_lib);
+PARROT_EXPORT void dynop_register(PARROT_INTERP, PMC* op_lib);
 void do_prederef(void **pc_prederef, PARROT_INTERP, int type);
 
 /* interpreter.pmc */
@@ -863,8 +863,8 @@ void clone_interpreter(Parrot_Interp dest, Parrot_Interp self, INTVAL flags);
 
 void Parrot_setup_event_func_ptrs(Parrot_Interp interp);
 
-PARROT_API void disable_event_checking(PARROT_INTERP);
-PARROT_API void enable_event_checking(PARROT_INTERP);
+PARROT_EXPORT void disable_event_checking(PARROT_INTERP);
+PARROT_EXPORT void enable_event_checking(PARROT_INTERP);
 #else
 
 struct Parrot_Interp_;

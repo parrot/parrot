@@ -777,7 +777,7 @@ F<src/malloc.c>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 UINTVAL
@@ -1201,7 +1201,7 @@ Returns a new list of type C<type>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 List *
@@ -1250,7 +1250,7 @@ Creates a new list containing PMC* values in C<PMC_data(container)>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 list_pmc_new(PARROT_INTERP, ARGMOD(PMC *container))
 {
@@ -1278,7 +1278,7 @@ these values is stored in user_data, where the keys are explicit.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 List *
@@ -1367,7 +1367,7 @@ Creates a new list of PMC* values in C<PMC_data(container)>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 list_pmc_new_init(PARROT_INTERP, ARGMOD(PMC *container), ARGIN(PMC *init))
 {
@@ -1392,7 +1392,7 @@ TODO - Barely tested. Optimize new array structure, fixed if big.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 List *
@@ -1468,7 +1468,7 @@ Marks the list and its contents as live for the memory management system.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 list_mark(PARROT_INTERP, ARGMOD(List *list))
 {
@@ -1507,7 +1507,7 @@ C<pinfo> is the visit info, (see include/parrot/pmc_freeze.h>).
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 list_visit(PARROT_INTERP, ARGIN(List *list), ARGMOD(void *pinfo))
 {
@@ -1562,7 +1562,7 @@ Sets the length of the list to C<len>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 list_set_length(PARROT_INTERP, ARGMOD(List *list), INTVAL len)
 {
@@ -1601,7 +1601,7 @@ Makes room for C<n_items> at C<idx>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 list_insert(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, INTVAL n_items)
 {
@@ -1674,7 +1674,7 @@ Deletes C<n_items> at C<idx>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 list_delete(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, INTVAL n_items)
 {
@@ -1756,7 +1756,7 @@ Pushes C<item> of type C<type> on to the end of the list.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 list_push(PARROT_INTERP, ARGMOD(List *list), ARGIN(void *item), int type)
 {
@@ -1775,7 +1775,7 @@ Pushes C<item> of type C<type> on to the start of the list.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 list_unshift(PARROT_INTERP, ARGMOD(List *list), ARGIN(void *item), int type)
 {
@@ -1801,7 +1801,7 @@ Removes and returns the last item of type C<type> from the end of the list.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 void *
 list_pop(PARROT_INTERP, ARGMOD(List *list), int type)
@@ -1839,7 +1839,7 @@ Removes and returns the first item of type C<type> from the start of the list.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 void *
 list_shift(PARROT_INTERP, ARGMOD(List *list), int type)
@@ -1878,7 +1878,7 @@ Assigns C<item> of type C<type> to index C<idx>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 list_assign(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, ARGIN(void *item), int type)
 {
@@ -1907,7 +1907,7 @@ Returns the item of type C<type> at index C<idx>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 void *
@@ -1937,7 +1937,7 @@ If C<count> is 0 then the items in C<value> will be inserted after C<offset>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 list_splice(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(List *value_list),
         INTVAL offset, INTVAL count)

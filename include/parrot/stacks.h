@@ -47,7 +47,7 @@ typedef void (*Stack_cleanup_method)(Interp*, Stack_Entry_t *);
 /* HEADERIZER BEGIN: src/stacks.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Stack_Chunk_t * cst_new_stack_chunk(PARROT_INTERP,
@@ -55,48 +55,48 @@ Stack_Chunk_t * cst_new_stack_chunk(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 void mark_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t *chunk))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*chunk);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Stack_Chunk_t * new_stack(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_dump_dynamic_environment(PARROT_INTERP,
     ARGIN(Stack_Chunk_t *dynamic_env))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_pop_mark(PARROT_INTERP, INTVAL mark)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_push_action(PARROT_INTERP, ARGIN(PMC *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_push_mark(PARROT_INTERP, INTVAL mark)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 void * pop_dest(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void stack_destroy(SHIM(Stack_Chunk_t *top));
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Stack_Entry_t * stack_entry(PARROT_INTERP,
@@ -105,12 +105,12 @@ Stack_Entry_t * stack_entry(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 size_t stack_height(SHIM_INTERP, ARGIN(const Stack_Chunk_t *chunk))
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 void * stack_peek(PARROT_INTERP,
@@ -119,7 +119,7 @@ void * stack_peek(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 void * stack_pop(PARROT_INTERP,
     ARGMOD(Stack_Chunk_t **stack_p),
@@ -129,7 +129,7 @@ void * stack_pop(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*stack_p);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Stack_Entry_t* stack_prepare_pop(PARROT_INTERP,
@@ -138,7 +138,7 @@ Stack_Entry_t* stack_prepare_pop(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*stack_p);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Stack_Entry_t* stack_prepare_push(PARROT_INTERP,
@@ -147,7 +147,7 @@ Stack_Entry_t* stack_prepare_push(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*stack_p);
 
-PARROT_API
+PARROT_EXPORT
 void stack_push(PARROT_INTERP,
     ARGMOD(Stack_Chunk_t **stack_p),
     ARGIN(void *thing),
@@ -158,7 +158,7 @@ void stack_push(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*stack_p);
 
-PARROT_API
+PARROT_EXPORT
 void stack_system_init(SHIM_INTERP);
 
 PARROT_WARN_UNUSED_RESULT

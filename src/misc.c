@@ -56,7 +56,7 @@ in turn calls C<Parrot_sprintf_format()> (see F<src/spf_render.c>).
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
@@ -78,7 +78,7 @@ C string version of C<Parrot_vsprintf_s()>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_vsprintf_c(PARROT_INTERP, ARGIN(const char *pat), va_list args)
@@ -102,7 +102,7 @@ Similar to C<Parrot_vsprintf()> but with an option to specify the length
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_vsnprintf(PARROT_INTERP, ARGOUT(char *targ),
                  size_t len, ARGIN(const char *pat), va_list args)
@@ -134,7 +134,7 @@ Calls C<Parrot_vsprintf_s()> with the C<va_list> obtained from C<...>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
@@ -162,7 +162,7 @@ C string version of C<Parrot_sprintf_s()>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
@@ -191,7 +191,7 @@ Similar to C<Parrot_sprintf()> but with an option to specify the length
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_snprintf(PARROT_INTERP, ARGOUT(char *targ), size_t len,
                 ARGIN(const char *pat), ...)
@@ -216,7 +216,7 @@ C<Array> PMC.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
@@ -239,7 +239,7 @@ A simulation of C<snprintf> for systems that do not support it.
 */
 
 
-PARROT_API
+PARROT_EXPORT
 int
 Parrot_secret_snprintf(ARGOUT(char *buffer), const size_t len, ARGIN(const char *format), ...)
 {

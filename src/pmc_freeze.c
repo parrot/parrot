@@ -35,11 +35,11 @@ C<STRING> with a vtable.
 #include "pmc_freeze.str"
 
 /* default.pmc thawing of properties */
-PARROT_API void
+PARROT_EXPORT void
 Parrot_default_thaw(Interp* , PMC* pmc, visit_info *info);
 
 /* XXX This should be in a header file. */
-PARROT_API void
+PARROT_EXPORT void
 Parrot_default_thawfinish(PARROT_INTERP, PMC* pmc, visit_info *info);
 
 
@@ -1734,7 +1734,7 @@ interrupted by a DOD run.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING*
@@ -1770,7 +1770,7 @@ Freeze using either method.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING*
@@ -1811,7 +1811,7 @@ Thaw a PMC, called from the C<thaw> opcode.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC*
@@ -1831,7 +1831,7 @@ constants.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC*
@@ -1852,7 +1852,7 @@ PMC.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC*

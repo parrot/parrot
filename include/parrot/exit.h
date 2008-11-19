@@ -27,12 +27,12 @@ typedef struct _handler_node_t {
 /* HEADERIZER BEGIN: src/exit.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 void Parrot_exit(PARROT_INTERP, int status)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_on_exit(PARROT_INTERP,
     NOTNULL(exit_handler_f function),
     ARGIN_NULLOK(void *arg))

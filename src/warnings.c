@@ -42,7 +42,7 @@ Prints the bytecode location of the warning or error to C<PIO_STDERR>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 print_pbc_location(PARROT_INTERP)
 {
@@ -96,7 +96,7 @@ C<message, ..> can be a C<Parrot_vsprintf_c()> format with arguments.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 Parrot_warn(PARROT_INTERP, INTVAL warnclass,
             ARGIN(const char *message), ...)

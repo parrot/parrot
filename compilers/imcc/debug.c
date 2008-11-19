@@ -38,7 +38,7 @@ IMCC_FATAL_EXCEPTION.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 void
 IMCC_fatal(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
@@ -61,7 +61,7 @@ Throws an IMCC_FATALY_EXCEPTION.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 void
 IMCC_fataly(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
@@ -85,7 +85,7 @@ recoverable exception but a forced exit.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 void
 IMCC_fatal_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
@@ -109,7 +109,7 @@ error.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 void
 IMCC_fataly_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
@@ -136,7 +136,7 @@ cause Parrot to exit.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...)
 {
@@ -160,7 +160,7 @@ then IMCC's verbose mode.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 IMCC_info(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
 {
@@ -184,7 +184,7 @@ Prints a debug message, if IMCC's debug mode is turned on.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 IMCC_debug(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
 {

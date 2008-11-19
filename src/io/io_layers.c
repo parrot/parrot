@@ -40,7 +40,7 @@ will be copied to the new instance.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 ParrotIOLayer *
@@ -79,7 +79,7 @@ C<*layer>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 PIO_base_delete_layer(ARGMOD_NULLOK(ParrotIOLayer *layer))
 {
@@ -97,7 +97,7 @@ Push a layer onto an IO object (C<*pmc>) or the default stack.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PIO_push_layer(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD_NULLOK(ParrotIOLayer *layer))
 {
@@ -173,7 +173,7 @@ RT#48260: Not yet documented!!!
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 ParrotIOLayer *
@@ -225,7 +225,7 @@ Pop a layer from an IO object (C<*pmc>) or the default stack.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 ParrotIOLayer *
@@ -312,7 +312,7 @@ we will do some funky copy-on-write stuff.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 ParrotIOLayer *

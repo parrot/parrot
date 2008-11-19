@@ -313,7 +313,7 @@ Print out the hash in human-readable form.  Except it's empty.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 parrot_dump_hash(SHIM_INTERP, ARGIN(const Hash *hash))
 {
@@ -331,7 +331,7 @@ Assumes that key and value are non null in all buckets.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 parrot_mark_hash(PARROT_INTERP, ARGIN(Hash *hash))
 {
@@ -570,7 +570,7 @@ structure identifying what to do and the location of the string.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 parrot_hash_visit(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(void *pinfo))
 {
@@ -728,7 +728,7 @@ Returns a new Parrot STRING hash in C<hptr>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 parrot_new_hash(SHIM_INTERP, ARGOUT(Hash **hptr))
 {
@@ -749,7 +749,7 @@ Create a new Parrot STRING hash in PMC_struct_val(container)
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 parrot_new_pmc_hash(SHIM_INTERP, ARGOUT(PMC *container))
 {
@@ -770,7 +770,7 @@ Returns a new C string hash in C<hptr>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 parrot_new_cstring_hash(SHIM_INTERP, ARGOUT(Hash **hptr))
 {
@@ -862,7 +862,7 @@ Used by Parrot_chash_destroy.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 parrot_hash_destroy(SHIM_INTERP, ARGMOD(Hash *hash))
 {
@@ -962,7 +962,7 @@ Create a new HASH with void * keys and values.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 parrot_new_pointer_hash(SHIM_INTERP, ARGOUT(Hash **hptr))
 {
@@ -980,7 +980,7 @@ C<PObj_constant_FLAG> or 0.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC*
@@ -1006,7 +1006,7 @@ Return the number of used entries in the hash.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 INTVAL
@@ -1028,7 +1028,7 @@ Called by iterator.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 void *
@@ -1082,7 +1082,7 @@ Returns the bucket for C<key>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 HashBucket *
@@ -1113,7 +1113,7 @@ Returns the value keyed by C<key> or C<NULL> if no bucket is found.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 void *
@@ -1133,7 +1133,7 @@ Returns whether the key exists in the hash.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 parrot_hash_exists(PARROT_INTERP, ARGIN(Hash *hash), ARGIN(void *key))
@@ -1153,7 +1153,7 @@ copied.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 HashBucket*
@@ -1210,7 +1210,7 @@ Deletes the key from the hash.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
 {
@@ -1249,7 +1249,7 @@ Clones C<hash> to C<dest>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 parrot_hash_clone(PARROT_INTERP, ARGIN(const Hash *hash), ARGOUT(Hash *dest))
 {

@@ -46,7 +46,7 @@ register stacks.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 stack_system_init(SHIM_INTERP)
 {
@@ -62,7 +62,7 @@ Get a new chunk either from the freelist or allocate one.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Stack_Chunk_t *
@@ -91,7 +91,7 @@ debugging/error reporting.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Stack_Chunk_t *
@@ -118,7 +118,7 @@ Mark entries in a stack structure during DOD.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 mark_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t *chunk))
 {
@@ -147,7 +147,7 @@ stack_destroy() doesn't need to do anything, since GC does it all.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 stack_destroy(SHIM(Stack_Chunk_t *top))
 {
@@ -164,7 +164,7 @@ Returns the height of the stack. The maximum "depth" is height - 1.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 size_t
 stack_height(SHIM_INTERP, ARGIN(const Stack_Chunk_t *chunk))
@@ -194,7 +194,7 @@ if C<|depth| > number> of entries in stack.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Stack_Entry_t *
@@ -232,7 +232,7 @@ Return a pointer, where new entries go for push.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Stack_Entry_t*
@@ -262,7 +262,7 @@ variable or something.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 stack_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
            ARGIN(void *thing), Stack_entry_type type, NULLOK(Stack_cleanup_method cleanup))
@@ -303,7 +303,7 @@ Return a pointer, where new entries are popped off.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Stack_Entry_t*
@@ -329,7 +329,7 @@ Pop off an entry and return a pointer to the contents.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 void *
 stack_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
@@ -389,7 +389,7 @@ Pop off a destination entry and return a pointer to the contents.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 void *
@@ -413,7 +413,7 @@ Peek at stack and return pointer to entry and the type of the entry.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 void *
@@ -462,7 +462,7 @@ C<PIO_eprintf>).  This is used only temporarily for debugging.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_dump_dynamic_environment(PARROT_INTERP, ARGIN(Stack_Chunk_t *dynamic_env))
 {
@@ -530,7 +530,7 @@ Pushes an action handler onto the dynamic environment.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_push_action(PARROT_INTERP, ARGIN(PMC *sub))
 {
@@ -552,7 +552,7 @@ Push a cleanup mark onto the dynamic environment.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_push_mark(PARROT_INTERP, INTVAL mark)
 {
@@ -570,7 +570,7 @@ Pop items off the dynamic environment up to the mark.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_pop_mark(PARROT_INTERP, INTVAL mark)
 {

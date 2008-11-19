@@ -42,7 +42,7 @@ class C<type>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 register_nci_method(PARROT_INTERP, const int type, ARGIN(void *func),
                     ARGIN(const char *name), ARGIN(const char *proto))
@@ -73,7 +73,7 @@ of PMC class C<type>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 register_raw_nci_method_in_ns(PARROT_INTERP, const int type, ARGIN(void *func),
         ARGIN(const char *name))
@@ -100,7 +100,7 @@ Mark the method C<name> on PMC type C<type> as one that modifies the PMC.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_mark_method_writes(PARROT_INTERP, int type, ARGIN(const char *name))
 {
@@ -122,7 +122,7 @@ Register a parser/compiler function.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_compreg(PARROT_INTERP, ARGIN(STRING *type),
                     NOTNULL(Parrot_compiler_func_t func))
@@ -156,7 +156,7 @@ Compile code string.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
@@ -183,7 +183,7 @@ Compile code file.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void *
 Parrot_compile_file(PARROT_INTERP, ARGIN(const char *fullname), ARGOUT(STRING **error))
@@ -221,7 +221,7 @@ interpreter.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 interpinfo(PARROT_INTERP, INTVAL what)
 {
@@ -309,7 +309,7 @@ interpreter.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC*
@@ -351,7 +351,7 @@ and RUNTIME_PREFIX.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING*

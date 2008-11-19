@@ -18,22 +18,22 @@
 /* HEADERIZER BEGIN: src/string_primitives.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CONST_FUNCTION
 INTVAL Parrot_char_digit_value(SHIM_INTERP, UINTVAL character);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 char * str_dup(ARGIN(const char *old))
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void string_set_data_directory(PARROT_INTERP, ARGIN(const char *dir))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 Parrot_UInt4 string_unescape_one(PARROT_INTERP,
     ARGMOD(UINTVAL *offset),
     ARGMOD(STRING *string))

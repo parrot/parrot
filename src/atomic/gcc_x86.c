@@ -45,7 +45,7 @@ C<expect> to C<update>. Otherwise sets C<update> to C<ptr>.
 */
 
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void *
 parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
@@ -79,7 +79,7 @@ C<l> = C<result>;
 */
 
 
-PARROT_API
+PARROT_EXPORT
 long
 parrot_i386_xadd(volatile long *l, long amount)
 {

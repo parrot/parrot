@@ -86,7 +86,7 @@ Allocates a new C<CHARSET> structure from the system.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_MALLOC
 CHARSET *
@@ -106,7 +106,7 @@ that holds the charsets back to the system.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_charsets_encodings_deinit(SHIM_INTERP)
 {
@@ -135,7 +135,7 @@ Returns the charset if it is found, NULL otherwise.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 const CHARSET *
@@ -162,7 +162,7 @@ Throws an exception (Can't load charsets dynamically yet. RT#58184).
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 CHARSET *
@@ -184,7 +184,7 @@ Return the number of the charset or -1 if not found.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_charset_number(PARROT_INTERP, ARGIN(const STRING *charsetname))
@@ -209,7 +209,7 @@ Return the number of the charset of the given string or -1 if not found.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_charset_number_of_str(SHIM_INTERP, ARGIN(const STRING *src))
@@ -235,7 +235,7 @@ C<number_of_charset>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING*
@@ -256,7 +256,7 @@ Returns the charset given by the INTVAL index C<number_of_charset>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 const CHARSET *
@@ -278,7 +278,7 @@ INTVAL index C<number_of_charset>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 const char *
@@ -382,7 +382,7 @@ failed, for any reason.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 Parrot_register_charset(PARROT_INTERP, ARGIN(const char *charsetname),
         ARGIN(CHARSET *charset))
@@ -425,7 +425,7 @@ charset converters.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_charsets_encodings_init(PARROT_INTERP)
 {
@@ -463,7 +463,7 @@ Sets the current default charset to C<charset> with name C<charsetname>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 Parrot_make_default_charset(SHIM_INTERP, SHIM(const char *charsetname),
         ARGIN(CHARSET *charset))
@@ -482,7 +482,7 @@ Returns the default charset.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const CHARSET *
@@ -501,7 +501,7 @@ Finds a converter from charset C<lhs> to charset C<rhs>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 charset_converter_t
@@ -536,7 +536,7 @@ Registers a converter C<func> from charset C<lhs> to C<rhs>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_register_charset_converter(SHIM_INTERP,
         ARGIN(const CHARSET *lhs), ARGIN(CHARSET *rhs),

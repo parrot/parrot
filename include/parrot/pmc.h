@@ -22,59 +22,59 @@
 /* HEADERIZER BEGIN: src/pmc.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC * constant_pmc_new(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC * constant_pmc_new_init(PARROT_INTERP,
     INTVAL base_type,
     ARGIN_NULLOK(PMC *init))
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC * constant_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void dod_register_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_create_mro(PARROT_INTERP, INTVAL type)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 INTVAL PMC_is_null(SHIM_INTERP, NULLOK(const PMC *pmc));
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * pmc_new(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC * pmc_new_init(PARROT_INTERP, INTVAL base_type, ARGOUT(PMC *init))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*init);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC * pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 INTVAL pmc_register(PARROT_INTERP, ARGIN(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC* pmc_reuse(PARROT_INTERP,
     ARGIN(PMC *pmc),
@@ -83,12 +83,12 @@ PMC* pmc_reuse(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL pmc_type(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 INTVAL pmc_type_p(PARROT_INTERP, ARGIN(PMC *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

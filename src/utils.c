@@ -387,7 +387,7 @@ C<how_random> is ignored.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 FLOATVAL
 Parrot_float_rand(INTVAL how_random)
 {
@@ -408,7 +408,7 @@ C<how_random> is ignored.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 Parrot_uint_rand(INTVAL how_random)
 {
@@ -429,7 +429,7 @@ C<how_random> is ignored.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 Parrot_int_rand(INTVAL how_random)
 {
@@ -450,7 +450,7 @@ C<how_random> is ignored.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random)
 {
@@ -468,7 +468,7 @@ Seeds the random number generator with C<seed>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_srand(INTVAL seed)
 {
@@ -537,7 +537,7 @@ Returns an offset value if it is found, or -1 if no match.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 Parrot_byte_index(SHIM_INTERP, ARGIN(const STRING *base),
         ARGIN(const STRING *search), UINTVAL start_offset)
@@ -583,7 +583,7 @@ Returns offset value or -1 (if no match).
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_byte_rindex(SHIM_INTERP, ARGIN(const STRING *base),
@@ -748,7 +748,7 @@ TODO: Add tests for the above conditions.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_register_move(PARROT_INTERP,
         int n_regs,

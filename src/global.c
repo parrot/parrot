@@ -148,7 +148,7 @@ the namespace, or NULL if not found.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
@@ -168,7 +168,7 @@ C<str_key>.  Return the namespace, or NULL if not found.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
@@ -190,7 +190,7 @@ array of strings.  Return the namespace.  Errors will result in exceptions.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
@@ -212,7 +212,7 @@ will result in exceptions.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
@@ -236,7 +236,7 @@ root namespace. Return the namespace.  Errors will result in exceptions.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
@@ -264,7 +264,7 @@ namespace. Return the namespace, or NULL if not found.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
@@ -289,7 +289,7 @@ Retrieve an array of names from a namespace object.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
@@ -333,7 +333,7 @@ KLUDGE ALERT: Currently prefers non-namespaces in case of collision.
  *       safe to just use the standard hash interface (if desired).
  */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
@@ -355,7 +355,7 @@ Set the global named C<globalname> in the namespace C<ns> to the value C<val>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_set_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
         ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(PMC *val))
@@ -378,7 +378,7 @@ entirely use the untyped interface.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
@@ -417,7 +417,7 @@ Finds and returns the data time named C<globalname> in the current namespace.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
@@ -442,7 +442,7 @@ entirely use the untyped interface.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
@@ -470,7 +470,7 @@ entirely use the untyped interface.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
@@ -494,7 +494,7 @@ Store the PMC C<val> into the namespace PMC C<ns> with name C<globalname>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_store_global_n(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
         ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(PMC *val))
@@ -520,7 +520,7 @@ Store the value C<val> with name C<globalname> in the current namespace.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_store_global_cur(PARROT_INTERP, ARGIN_NULLOK(STRING *globalname),
         ARGIN_NULLOK(PMC *val))
@@ -547,7 +547,7 @@ entirely use the untyped interface.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_store_global_k(PARROT_INTERP, ARGIN(PMC *pmc_key),
         ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(PMC *val))
@@ -585,7 +585,7 @@ the HLL root if C<str_key> is NULL, with the name C<globalname>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_store_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key),
         ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(PMC *val))
@@ -612,7 +612,7 @@ PMCNULL.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
@@ -647,7 +647,7 @@ anywhere, return PMCNULL.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
@@ -746,7 +746,7 @@ same name if it's defined as a multi.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub))
 {

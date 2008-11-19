@@ -35,7 +35,7 @@ Return datatype C<enum> for C<STRING*> type_name.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_get_datatype_enum(PARROT_INTERP, ARGIN(const STRING *type_name))
@@ -65,7 +65,7 @@ Return datatype name for C<type>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *

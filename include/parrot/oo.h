@@ -57,14 +57,14 @@ typedef enum {
 /* HEADERIZER BEGIN: src/oo.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_class_lookup(PARROT_INTERP, ARGIN(STRING *class_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_ComposeRole(PARROT_INTERP,
     ARGIN(PMC *role),
     ARGIN(PMC *exclude),
@@ -80,14 +80,14 @@ void Parrot_ComposeRole(PARROT_INTERP,
         __attribute__nonnull__(7)
         __attribute__nonnull__(8);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC* Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_find_method_direct(PARROT_INTERP,
@@ -97,7 +97,7 @@ PMC * Parrot_find_method_direct(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_find_method_with_cache(PARROT_INTERP,
@@ -107,38 +107,38 @@ PMC * Parrot_find_method_with_cache(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 INTVAL Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_invalidate_method_cache(PARROT_INTERP,
     ARGIN_NULLOK(STRING *_class),
     ARGIN(STRING *meth))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
 const char* Parrot_MMD_method_name(SHIM_INTERP, INTVAL idx);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_oo_get_class_str(PARROT_INTERP, ARGIN(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 PMC * Parrot_remove_parent(PARROT_INTERP,

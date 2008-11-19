@@ -52,7 +52,7 @@ Dumps the constant table C<self>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 PackFile_ConstTable_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *self))
 {
@@ -350,7 +350,7 @@ Dumps the fix-up table C<ft>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 PackFile_Fixup_dump(PARROT_INTERP, ARGIN(const PackFile_FixupTable *ft))
 {

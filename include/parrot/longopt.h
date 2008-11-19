@@ -47,7 +47,7 @@ struct longopt_opt_info {
 /* HEADERIZER BEGIN: src/longopt.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 int longopt_get(PARROT_INTERP,
     int argc,
     ARGIN(const char* argv[]),

@@ -833,7 +833,7 @@ the C<param> to the open function.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 int
 emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(void *param))
 {
@@ -855,7 +855,7 @@ IMC_Unit C<unit>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 int
 emit_flush(PARROT_INTERP, ARGIN_NULLOK(void *param), ARGIN(IMC_Unit *unit))
 {
@@ -886,7 +886,7 @@ Closes the given emitter.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 int
 emit_close(PARROT_INTERP, ARGIN_NULLOK(void *param))
 {

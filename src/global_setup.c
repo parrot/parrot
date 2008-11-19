@@ -56,7 +56,7 @@ will be used in subsequently created Interpreters.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_set_config_hash_internal(ARGIN(const unsigned char* parrot_config),
                                  unsigned int parrot_config_size)

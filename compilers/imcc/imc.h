@@ -77,15 +77,15 @@ typedef struct _IMC_Unit IMC_Unit;
 /* HEADERIZER BEGIN: compilers/imcc/imc.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 void imc_cleanup(PARROT_INTERP, ARGIN_NULLOK(void *yyscanner))
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void imc_compile_all_units(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void imc_compile_unit(PARROT_INTERP, ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -153,17 +153,17 @@ Instruction * INS_LABEL(PARROT_INTERP,
 /* HEADERIZER BEGIN: compilers/imcc/parser_util.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 int do_yylex_init(PARROT_INTERP, ARGOUT(yyscan_t* yyscanner))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(* yyscanner);
 
-PARROT_API
+PARROT_EXPORT
 void imcc_destroy(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_API
+PARROT_EXPORT
 void imcc_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -435,8 +435,8 @@ typedef enum _imcc_reg_allocator_t {
     IMCC_GRAPH_ALLOCATOR
 } imcc_reg_allocator;
 
-PARROT_API void IMCC_push_parser_state(PARROT_INTERP);
-PARROT_API void IMCC_pop_parser_state(PARROT_INTERP, void *yyscanner);
+PARROT_EXPORT void IMCC_push_parser_state(PARROT_INTERP);
+PARROT_EXPORT void IMCC_pop_parser_state(PARROT_INTERP, void *yyscanner);
 
 /* globals store the state between individual e_pbc_emit calls */
 typedef struct subs_t {
@@ -570,8 +570,8 @@ typedef struct _imc_info_t {
 #define UNSET_STATE_RUN_FROM_FILE(i) (COMPILER_STATE(i) &= ~PBC_RUN_FILE)
 
 /* imclexer.c */
-PARROT_API FILE * imc_yyin_set(FILE *new_yyin, void *yyscanner);
-PARROT_API FILE * imc_yyin_get(void *yyscanner);
+PARROT_EXPORT FILE * imc_yyin_set(FILE *new_yyin, void *yyscanner);
+PARROT_EXPORT FILE * imc_yyin_get(void *yyscanner);
 
 
 #endif /* PARROT_IMCC_IMC_H_GUARD */

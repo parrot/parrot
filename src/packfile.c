@@ -340,7 +340,7 @@ Delete a C<PackFile>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 PackFile_destroy(PARROT_INTERP, ARGMOD_NULLOK(PackFile *pf))
 {
@@ -685,7 +685,7 @@ alive by living subs.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
                pbc_action_enum_t action, ARGIN_NULLOK(PMC *eval_pmc))
@@ -754,7 +754,7 @@ Returns size of unpacked if everything is OK, else zero (0).
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 opcode_t
 PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
@@ -912,7 +912,7 @@ and this value is returned.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PackFile_map_segments(PARROT_INTERP, ARGIN(const PackFile_Directory *dir),
                        PackFile_map_segments_func_t callback,
@@ -941,7 +941,7 @@ owner of the segment; it gets destroyed when the packfile does.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PackFile_add_segment(SHIM_INTERP, ARGMOD(PackFile_Directory *dir),
         ARGIN(PackFile_Segment *seg))
@@ -967,7 +967,7 @@ returned, but its still owned by the C<PackFile>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PackFile_Segment *
@@ -1010,7 +1010,7 @@ The segment is returned and must be destroyed by the user.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PackFile_Segment *
@@ -1121,7 +1121,7 @@ A Segment Header has these entries:
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile *
@@ -1164,7 +1164,7 @@ doesn't load any bytecode but instead uses C<Parrot_compile_string>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PackFile *
@@ -1190,7 +1190,7 @@ Register the C<pack>/C<unpack>/... functions for a packfile type.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 INTVAL
 PackFile_funcs_register(SHIM_INTERP, ARGOUT(PackFile *pf), UINTVAL type,
                         const PackFile_funcs funcs)
@@ -1405,7 +1405,7 @@ Create a new segment.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Segment *
@@ -1466,7 +1466,7 @@ segments to the directory.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode *
@@ -1506,7 +1506,7 @@ RT #48260: Not yet documented!!!
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 PackFile_Segment_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 {
@@ -1531,7 +1531,7 @@ RT #48260: Not yet documented!!!
 
 */
 
-PARROT_API
+PARROT_EXPORT
 size_t
 PackFile_Segment_packed_size(PARROT_INTERP, ARGIN(PackFile_Segment *self))
 {
@@ -1561,7 +1561,7 @@ RT #48260: Not yet documented!!!
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t *
@@ -1596,7 +1596,7 @@ If a special is defined this gets called after.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const opcode_t *
@@ -1631,7 +1631,7 @@ Dumps the segment C<self>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 PackFile_Segment_dump(PARROT_INTERP, ARGIN(PackFile_Segment *self))
 {
@@ -2045,7 +2045,7 @@ Create a new default section.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Segment *
@@ -2491,7 +2491,7 @@ Create and append (or resize) a new debug seg for a code segment.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Debug *
@@ -2540,7 +2540,7 @@ number of the source segment in question).
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
                          opcode_t offset, int mapping_type,
@@ -2617,7 +2617,7 @@ that position.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
@@ -2661,7 +2661,7 @@ Switch to byte code segment number C<seg>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_switch_to_cs_by_nr(PARROT_INTERP, opcode_t seg)
 {
@@ -2696,7 +2696,7 @@ Switch to a byte code segment C<new_cs>, returning the old segment.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode *
@@ -2841,7 +2841,7 @@ RT #48260: Not yet documented!!!
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_destroy_constants(PARROT_INTERP)
 {
@@ -2897,7 +2897,7 @@ Clear a PackFile FixupTable.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 PackFile_FixupTable_clear(PARROT_INTERP, ARGMOD(PackFile_FixupTable *self))
 {
@@ -3117,7 +3117,7 @@ RT #48260: Not yet documented!!!
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 PackFile_FixupTable_new_entry(PARROT_INTERP,
         ARGIN(const char *label), INTVAL type, opcode_t offs)
@@ -3213,7 +3213,7 @@ RT #48260: Not yet documented!!!
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PackFile_FixupEntry *
@@ -3246,7 +3246,7 @@ Clear the C<PackFile_ConstTable> C<self>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 PackFile_ConstTable_clear(PARROT_INTERP, ARGMOD(PackFile_ConstTable *self))
 {
@@ -3286,7 +3286,7 @@ Returns cursor if everything is OK, else zero (0).
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const opcode_t *
@@ -3397,7 +3397,7 @@ This is only here so we can make a new one and then do an unpack.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 PackFile_Constant *
@@ -3423,7 +3423,7 @@ Don't delete C<PMC>s or C<STRING>s, they are destroyed via DOD/GC.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 PackFile_Constant_destroy(SHIM_INTERP, ARGMOD_NULLOK(PackFile_Constant *self))
 {
@@ -3441,7 +3441,7 @@ Constant into a contiguous region of memory.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 size_t
 PackFile_Constant_pack_size(PARROT_INTERP, ARGIN(const PackFile_Constant *self))
@@ -3506,7 +3506,7 @@ Returns cursor if everything is OK, else zero (0).
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const opcode_t *
@@ -3561,7 +3561,7 @@ Unpack a constant PMC.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 const opcode_t *
@@ -3622,7 +3622,7 @@ Returns cursor if everything is OK, else zero (0).
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const opcode_t *
@@ -3740,7 +3740,7 @@ directory.
  * intermediate hook during changes
  */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(STRING *file_str))
 {
@@ -3808,7 +3808,7 @@ If C<eval> is given, set this is the owner of the subroutines.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, ARGIN_NULLOK(PMC *eval))
 {

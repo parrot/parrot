@@ -205,7 +205,7 @@ applies in the chunked context memory scheme.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 parrot_gc_context(PARROT_INTERP)
 {
@@ -374,7 +374,7 @@ context in C<caller_ctx>.  Suitable to use with C<Parrot_pop_context>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Context *
@@ -404,7 +404,7 @@ context (the caller context).
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_pop_context(PARROT_INTERP)
 {
@@ -536,7 +536,7 @@ continuation invoke, else from the destructor of a continuation.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_free_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctxp), int re_use)
 {
@@ -603,7 +603,7 @@ Marks the context as possible threshold.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_set_context_threshold(SHIM_INTERP, SHIM(Parrot_Context *ctxp))
 {
@@ -628,7 +628,7 @@ Sets all integer registers in the current context to 0.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_clear_i(PARROT_INTERP)
 {
@@ -648,7 +648,7 @@ Sets all STRING registers in the current context to NULL.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_clear_s(PARROT_INTERP)
 {
@@ -668,7 +668,7 @@ Sets all PMC registers in the current context to NULL.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_clear_p(PARROT_INTERP)
 {
@@ -688,7 +688,7 @@ Sets all number registers in the current context to 0.0.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_clear_n(PARROT_INTERP)
 {

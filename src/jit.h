@@ -237,7 +237,7 @@ typedef struct Parrot_jit_fn_info_t {
 PARROT_DATA Parrot_jit_fn_info_t *op_jit;
 extern Parrot_jit_fn_info_t op_exec[];
 
-PARROT_API void Parrot_jit_newfixup(Parrot_jit_info_t *jit_info);
+PARROT_EXPORT void Parrot_jit_newfixup(Parrot_jit_info_t *jit_info);
 
 void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
                         PARROT_INTERP);

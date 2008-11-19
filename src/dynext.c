@@ -304,7 +304,7 @@ ParrotLibrary PMC object that represents the initialized library.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_init_lib(PARROT_INTERP,
@@ -464,7 +464,7 @@ C<d>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
@@ -539,7 +539,7 @@ TODO: fetch Parrot_lib load/init handler exceptions
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *

@@ -177,7 +177,7 @@ the particular garbage collector in use.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
 {

@@ -545,7 +545,7 @@ TODO: Needs to be documented!!!
 
 */
 
-PARROT_API
+PARROT_EXPORT
 int
 do_yylex_init(PARROT_INTERP, ARGOUT(yyscan_t* yyscanner))
 {
@@ -1456,7 +1456,7 @@ TODO: Needs to be documented!!!
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 imcc_init(PARROT_INTERP)
 {
@@ -1477,7 +1477,7 @@ TODO: Needs to be documented!!!
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 imcc_destroy(PARROT_INTERP)
 {

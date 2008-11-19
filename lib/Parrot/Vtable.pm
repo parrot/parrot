@@ -358,7 +358,7 @@ sub vtbl_embed {
 
         my $ret_type = find_type($return_type);
 
-        $protos .= sprintf "PARROT_API %s Parrot_PMC_%s( %s );\n", $ret_type, $name,
+        $protos .= sprintf "PARROT_EXPORT %s Parrot_PMC_%s( %s );\n", $ret_type, $name,
             $signature;
 
         # make sure the bare POD here doesn't appear in this module's perldoc
@@ -372,7 +372,7 @@ sub vtbl_embed {
 
     */
 
-    PARROT_API %s
+    PARROT_EXPORT %s
     Parrot_PMC_%s( %s )
     {
   END_HEADER

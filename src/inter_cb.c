@@ -59,7 +59,7 @@ Create a callback function according to pdd16.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC*
@@ -271,7 +271,7 @@ necessary items in its properties.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_run_callback(PARROT_INTERP,
         ARGMOD(PMC* user_data), ARGIN(char* external_data))
@@ -367,14 +367,14 @@ NCI callback functions. See pdd16.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_callback_C(ARGIN(char *external_data), ARGMOD(PMC *user_data))
 {
     verify_CD(external_data, user_data);
 }
 
-PARROT_API
+PARROT_EXPORT
 void
 Parrot_callback_D(ARGMOD(PMC *user_data), ARGIN(char *external_data))
 {

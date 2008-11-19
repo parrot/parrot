@@ -34,7 +34,7 @@ Returns a new C<Key> PMC.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
@@ -54,7 +54,7 @@ Returns a new integer C<Key> PMC with value C<value>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
@@ -79,7 +79,7 @@ Returns a new number C<Key> PMC with value C<value>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
@@ -104,7 +104,7 @@ Returns a new string C<Key> PMC with value C<value>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
@@ -130,7 +130,7 @@ C<STRING>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
@@ -150,7 +150,7 @@ Returns a new PMC C<Key> PMC with value C<value>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
@@ -173,7 +173,7 @@ Set the integer C<value> in C<key>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 key_set_integer(SHIM_INTERP, ARGMOD(PMC *key), INTVAL value)
 {
@@ -195,7 +195,7 @@ Set the register C<value> in C<key>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 key_set_register(SHIM_INTERP, ARGMOD(PMC *key), INTVAL value, INTVAL flag)
 {
@@ -217,7 +217,7 @@ Set the number C<value> in C<key>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 key_set_number(SHIM_INTERP, ARGMOD(PMC *key), FLOATVAL value)
 {
@@ -239,7 +239,7 @@ Set the string C<value> in C<key>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 key_set_string(SHIM_INTERP, ARGMOD(PMC *key), ARGIN(STRING *value))
 {
@@ -261,7 +261,7 @@ Set the PMC C<value> in C<key>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 key_set_pmc(PARROT_INTERP, ARGMOD(PMC *key), ARGIN(PMC *value))
 {
@@ -286,7 +286,7 @@ Returns the type of C<key>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 key_type(SHIM_INTERP, ARGIN(const PMC *key))
@@ -307,7 +307,7 @@ Returns an integer value corresponding to the key.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
 key_integer(PARROT_INTERP, ARGIN(PMC *key))
@@ -361,7 +361,7 @@ Throws an exception if the key is not a valid number.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 FLOATVAL
 key_number(PARROT_INTERP, ARGIN(PMC *key))
@@ -446,7 +446,7 @@ possible. Otherwise they throw exceptions.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
@@ -471,7 +471,7 @@ Returns the next key if C<key> is in a sequence of linked keys.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
@@ -498,7 +498,7 @@ Returns C<key1>.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 PMC *
@@ -526,7 +526,7 @@ Marks C<key> as live.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 key_mark(PARROT_INTERP, ARGIN(PMC *key))
 {
@@ -561,7 +561,7 @@ string value corresponding to the key.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *

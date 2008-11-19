@@ -91,25 +91,25 @@ typedef enum arg_pass_t {
 /* HEADERIZER BEGIN: src/inter_call.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_convert_arg(PARROT_INTERP, ARGMOD(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*st);
 
-PARROT_API
+PARROT_EXPORT
 int Parrot_fetch_arg(PARROT_INTERP, ARGMOD(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*st);
 
-PARROT_API
+PARROT_EXPORT
 int Parrot_fetch_arg_nci(PARROT_INTERP, ARGMOD(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*st);
 
-PARROT_API
+PARROT_EXPORT
 int Parrot_init_arg_indexes_and_sig_pmc(SHIM_INTERP,
     ARGIN(Parrot_Context *ctx),
     ARGIN_NULLOK(opcode_t *indexes),
@@ -119,7 +119,7 @@ int Parrot_init_arg_indexes_and_sig_pmc(SHIM_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*sti);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_init_arg_nci(PARROT_INTERP,
     ARGOUT(call_state *st),
     ARGIN(const char *sig))
@@ -128,7 +128,7 @@ void Parrot_init_arg_nci(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*st);
 
-PARROT_API
+PARROT_EXPORT
 int Parrot_init_arg_op(PARROT_INTERP,
     ARGIN(Parrot_Context *ctx),
     ARGIN_NULLOK(opcode_t *pc),
@@ -137,7 +137,7 @@ int Parrot_init_arg_op(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(4);
 
-PARROT_API
+PARROT_EXPORT
 int Parrot_init_arg_sig(SHIM_INTERP,
     ARGIN(Parrot_Context *ctx),
     ARGIN(const char *sig),
@@ -148,7 +148,7 @@ int Parrot_init_arg_sig(SHIM_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*sti);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_init_ret_nci(PARROT_INTERP,
     ARGOUT(call_state *st),
     ARGIN(const char *sig))
@@ -157,7 +157,7 @@ void Parrot_init_ret_nci(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*st);
 
-PARROT_API
+PARROT_EXPORT
 void parrot_pass_args(PARROT_INTERP,
     ARGMOD(Parrot_Context *src_ctx),
     ARGMOD(Parrot_Context *dest_ctx),
@@ -174,7 +174,7 @@ void parrot_pass_args(PARROT_INTERP,
         FUNC_MODIFIES(*src_indexes)
         FUNC_MODIFIES(*dest_indexes);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP,
     ARGIN(PMC *sub_obj),
     ARGIN(const char *sig),
@@ -183,7 +183,7 @@ void Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP,
     ARGIN(PMC *sub_obj),
     ARGIN(PMC *sig_obj))
@@ -191,7 +191,7 @@ void Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_PCCINVOKE(PARROT_INTERP,
     ARGIN(PMC* pmc),
     ARGMOD(STRING *method_name),
@@ -203,7 +203,7 @@ void Parrot_PCCINVOKE(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*method_name);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_process_args(PARROT_INTERP,
     ARGMOD(call_state *st),
     arg_pass_t param_or_result)
@@ -211,7 +211,7 @@ void Parrot_process_args(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*st);
 
-PARROT_API
+PARROT_EXPORT
 int Parrot_store_arg(SHIM_INTERP, ARGIN(const call_state *st))
         __attribute__nonnull__(2);
 

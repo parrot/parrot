@@ -39,12 +39,12 @@
 
 /* &end_gen */
 
-PARROT_API PMC *Parrot_stat_file(Parrot_Interp, STRING *);
-PARROT_API PMC *Parrot_stat_info_pmc(Parrot_Interp, STRING *, INTVAL);
-PARROT_API STRING *Parrot_stat_info_string(Parrot_Interp, STRING *, INTVAL);
-PARROT_API INTVAL Parrot_stat_info_intval(Parrot_Interp, STRING *, INTVAL);
-PARROT_API INTVAL Parrot_fstat_info_intval(Parrot_Interp, INTVAL, INTVAL);
-PARROT_API FLOATVAL Parrot_stat_info_floatval(Parrot_Interp, STRING *, INTVAL);
+PARROT_EXPORT PMC *Parrot_stat_file(Parrot_Interp, STRING *);
+PARROT_EXPORT PMC *Parrot_stat_info_pmc(Parrot_Interp, STRING *, INTVAL);
+PARROT_EXPORT STRING *Parrot_stat_info_string(Parrot_Interp, STRING *, INTVAL);
+PARROT_EXPORT INTVAL Parrot_stat_info_intval(Parrot_Interp, STRING *, INTVAL);
+PARROT_EXPORT INTVAL Parrot_fstat_info_intval(Parrot_Interp, INTVAL, INTVAL);
+PARROT_EXPORT FLOATVAL Parrot_stat_info_floatval(Parrot_Interp, STRING *, INTVAL);
 
 #endif /* PARROT_STAT_H_GUARD */
 

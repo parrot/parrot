@@ -46,7 +46,7 @@ disappears, its block is "orphaned" and will remain there.
 
 =item C<--macro=X>
 
-Print a list of all functions that have macro X.  For example, --macro=PARROT_API.
+Print a list of all functions that have macro X.  For example, --macro=PARROT_EXPORT.
 
 =back
 
@@ -70,7 +70,7 @@ my %warnings;
 my %opt;
 
 my %valid_macros = map { ( $_, 1 ) } qw(
-    PARROT_API
+    PARROT_EXPORT
     PARROT_INLINE
     PARROT_CAN_RETURN_NULL
     PARROT_CANNOT_RETURN_NULL
@@ -194,7 +194,7 @@ sub function_components_from_declaration {
 
     while ( @lines && ( $lines[0] =~ /^PARROT_/ ) ) {
         my $macro = shift @lines;
-        if ( $macro eq 'PARROT_API' ) {
+        if ( $macro eq 'PARROT_EXPORT' ) {
             $parrot_api = 1;
         }
         elsif ( $macro eq 'PARROT_INLINE' ) {
@@ -213,7 +213,7 @@ sub function_components_from_declaration {
     my $name = $1;
     $args = $2;
 
-    die "Can't have both PARROT_API and PARROT_INLINE on $name\n" if $parrot_inline && $parrot_api;
+    die "Can't have both PARROT_EXPORT and PARROT_INLINE on $name\n" if $parrot_inline && $parrot_api;
 
     my @args = split( /\s*,\s*/, $args );
     for (@args) {
@@ -227,7 +227,7 @@ sub function_components_from_declaration {
     my $is_static = 0;
     $is_static = $2 if $return_type =~ s/^((static)\s+)?//i;
 
-    die "$file $name: Impossible to have both static and PARROT_API" if $parrot_api && $is_static;
+    die "$file $name: Impossible to have both static and PARROT_EXPORT" if $parrot_api && $is_static;
 
     my %macros;
     for my $macro (@macros) {

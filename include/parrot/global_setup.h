@@ -20,7 +20,7 @@
 /* HEADERIZER BEGIN: src/global_setup.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_set_config_hash_internal(
     ARGIN(const unsigned char* parrot_config),
     unsigned int parrot_config_size)

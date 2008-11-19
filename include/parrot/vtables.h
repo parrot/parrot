@@ -17,7 +17,7 @@
 /* HEADERIZER BEGIN: src/vtables.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 VTABLE * Parrot_clone_vtable(PARROT_INTERP,
@@ -25,13 +25,13 @@ VTABLE * Parrot_clone_vtable(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 void Parrot_destroy_vtable(PARROT_INTERP, ARGMOD(VTABLE *vtable))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*vtable);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 VTABLE * Parrot_new_vtable(SHIM_INTERP);

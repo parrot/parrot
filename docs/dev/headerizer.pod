@@ -24,12 +24,12 @@ attributes for each of the functions that work with GCC.
 
 =head1 RUNNING THE HEADERIZER
 
-Yesterday there was a problem where I forgot to put PARROT_API on the
+Yesterday there was a problem where I forgot to put PARROT_EXPORT on the
 function in source, so linking on Windows broke.  If that happens again,
 here's what you do:
 
 * Run Configure.pl
-* Update the source with PARROT_API above the return type
+* Update the source with PARROT_EXPORT above the return type
 * Run "make headerizer"
 
-The .h file should now have PARROT_API for the function in question.
+The .h file should now have PARROT_EXPORT for the function in question.

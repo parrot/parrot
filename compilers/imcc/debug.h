@@ -27,12 +27,12 @@
 /* HEADERIZER BEGIN: compilers/imcc/debug.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 void IMCC_debug(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 void IMCC_fatal(PARROT_INTERP,
     NULLOK(int code),
@@ -41,7 +41,7 @@ void IMCC_fatal(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 void IMCC_fatal_standalone(PARROT_INTERP,
     int code,
@@ -50,7 +50,7 @@ void IMCC_fatal_standalone(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 void IMCC_fataly(PARROT_INTERP,
     NULLOK(int code),
@@ -59,7 +59,7 @@ void IMCC_fataly(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 void IMCC_fataly_standalone(PARROT_INTERP,
     int code,
@@ -68,12 +68,12 @@ void IMCC_fataly_standalone(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 void IMCC_info(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 void IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

@@ -37,7 +37,7 @@ return memory.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void *
@@ -93,7 +93,7 @@ otherwise.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void *
@@ -150,7 +150,7 @@ block.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void *
@@ -185,7 +185,7 @@ allocated and zeroed instead.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void *
@@ -293,7 +293,7 @@ Frees a chunk of memory back to the system.
 
 */
 
-PARROT_API
+PARROT_EXPORT
 void
 mem_sys_free(ARGFREE(void *from))
 {

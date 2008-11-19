@@ -76,41 +76,41 @@ typedef INTVAL (*encoding_converter_t)(PARROT_INTERP, ENCODING *lhs, ENCODING *r
 /* HEADERIZER BEGIN: src/encoding.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 const ENCODING * Parrot_default_encoding(SHIM_INTERP);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const char * Parrot_encoding_c_name(SHIM_INTERP, INTVAL number_of_encoding);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING* Parrot_encoding_name(SHIM_INTERP, INTVAL number_of_encoding);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_encoding_number(PARROT_INTERP,
     ARGIN(const STRING *encodingname))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_encoding_number_of_str(SHIM_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const ENCODING * Parrot_find_encoding(SHIM_INTERP,
     ARGIN(const char *encodingname))
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 encoding_converter_t Parrot_find_encoding_converter(PARROT_INTERP,
     ARGIN(ENCODING *lhs),
     ARGIN(ENCODING *rhs))
@@ -118,12 +118,12 @@ encoding_converter_t Parrot_find_encoding_converter(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const ENCODING* Parrot_get_encoding(SHIM_INTERP, INTVAL number_of_encoding);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 const ENCODING * Parrot_load_encoding(PARROT_INTERP,
@@ -131,18 +131,18 @@ const ENCODING * Parrot_load_encoding(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_API
+PARROT_EXPORT
 INTVAL Parrot_make_default_encoding(SHIM_INTERP,
     SHIM(const char *encodingname),
     ARGIN(ENCODING *encoding))
         __attribute__nonnull__(3);
 
-PARROT_API
+PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 ENCODING * Parrot_new_encoding(SHIM_INTERP);
 
-PARROT_API
+PARROT_EXPORT
 INTVAL Parrot_register_encoding(PARROT_INTERP,
     ARGIN(const char *encodingname),
     ARGIN(ENCODING *encoding))

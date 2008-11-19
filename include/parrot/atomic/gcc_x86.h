@@ -18,11 +18,11 @@
 /* HEADERIZER BEGIN: src/atomic/gcc_x86.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_API
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void * parrot_i386_cmpxchg(void *volatile *ptr, void *expect, void *update);
 
-PARROT_API
+PARROT_EXPORT
 long parrot_i386_xadd(volatile long *l, long amount);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

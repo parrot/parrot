@@ -38,9 +38,9 @@ typedef void* yyscan_t;
 
 SymReg * macro(PARROT_INTERP, char *name);
 
-PARROT_API int yyparse(yyscan_t, PARROT_INTERP);
-PARROT_API int yylex(YYSTYPE *, yyscan_t, PARROT_INTERP);
-PARROT_API int yylex_destroy(yyscan_t);
+PARROT_EXPORT int yyparse(yyscan_t, PARROT_INTERP);
+PARROT_EXPORT int yylex(YYSTYPE *, yyscan_t, PARROT_INTERP);
+PARROT_EXPORT int yylex_destroy(yyscan_t);
 
 int yylex_init(yyscan_t*);
 int yyget_column(yyscan_t);
