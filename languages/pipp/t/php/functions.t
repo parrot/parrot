@@ -19,7 +19,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
 # core Perl modules
-use Test::More     tests => 3;
+use Test::More     tests => 5;
 
 # Parrot modules
 use Parrot::Test;
@@ -84,5 +84,33 @@ echo_count( 123456 );
 ?>
 CODE
 count: 123456
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'function with two args' );
+<?php
+
+function echo_two_args( $arg_1, $arg_2 )  {
+  echo "$arg_1 $arg_2\n";
+}
+
+echo_two_args( 12, 'asdf' );
+
+?>
+CODE
+12 asdf
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'function with three args' );
+<?php
+
+function echo_two_args( $arg_1, $arg_2, $arg_3 )  {
+  echo "$arg_1 $arg_2 $arg_3\n";
+}
+
+echo_two_args( 12, 'asdf', -1 );
+
+?>
+CODE
+12 asdf -1
 OUT
 
