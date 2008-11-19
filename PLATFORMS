@@ -2,7 +2,8 @@
 
 Parrot was reported to compile and run tests successfully on the following
 platforms.
-See also http://smoke.parrotcode.org/smoke/ for recent test results.
+See also http://smolder.plusthree.com/app/public_projects/smoke_reports/8
+for recent test results.
 See also t/TESTS.STATUS.pod about the status of the test suite.
 
 This list is divided into 2 sections: "Supported" (as defined by
