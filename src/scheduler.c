@@ -72,7 +72,8 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
         /* Add the very first interpreter to the list of interps. */
         pt_add_to_interpreters(interp, NULL);
 
-        scheduler = pmc_new(interp, enum_class_Scheduler);
+        /* create as constant to avoid order-of-destruction errors, RT #60622 */
+        scheduler = constant_pmc_new(interp, enum_class_Scheduler);
         scheduler = VTABLE_share_ro(interp, scheduler);
 
         interp->scheduler = scheduler;

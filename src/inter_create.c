@@ -309,10 +309,7 @@ Note that C<exit_code> is ignored.
 void
 Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 {
-
-    /*
-     * wait for threads to complete if needed; terminate the event loop
-     */
+    /* wait for threads to complete if needed; terminate the event loop */
     if (!interp->parent_interpreter) {
         Parrot_cx_runloop_end(interp);
         pt_join_threads(interp);
@@ -327,7 +324,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
      * Need to turn off DOD blocking, else things stay alive and IO
      * handles aren't closed
      */
-    interp->arena_base->DOD_block_level =
+    interp->arena_base->DOD_block_level    =
         interp->arena_base->GC_block_level = 0;
 
     if (Interp_trace_TEST(interp, ~0)) {
@@ -344,9 +341,9 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     Parrot_do_dod_run(interp, GC_finish_FLAG);
 
 #if STM_PROFILE
-    if (interp->thread_data && interp->thread_data->stm_log &&
-            !interp->parent_interpreter &&
-                Interp_debug_TEST(interp, PARROT_THREAD_DEBUG_FLAG))
+    if (interp->thread_data && interp->thread_data->stm_log
+    && !interp->parent_interpreter
+    &&  Interp_debug_TEST(interp, PARROT_THREAD_DEBUG_FLAG))
         Parrot_STM_dump_profile(interp);
 #endif
 
