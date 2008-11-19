@@ -197,7 +197,9 @@ static void check_first_arg_direction(yyscan_t yyscanner, char const * const opn
 static int check_op_args_for_symbols(yyscan_t yyscanner);
 static int get_opinfo(yyscan_t yyscanner);
 
-/* names of the Parrot types */
+/* names of the Parrot types. Note that pir_type_namwes is global,
+ * but it's read-only, so that's fine.
+ */
 static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
 
 
@@ -284,7 +286,8 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
 
 %token <sval> TK_LABEL      "label"
        <sval> TK_IDENT      "identifier"
-       <sval> TK_INT        "int"
+
+%token <sval> TK_INT        "int"
        <sval> TK_NUM        "num"
        <sval> TK_PMC        "pmc"
        <sval> TK_STRING     "string"
@@ -293,7 +296,7 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
        <sval> TK_NULL       "null"
        <sval> TK_GOTO       "goto"
 
-       <sval> TK_STRINGC    "string constant"
+%token <sval> TK_STRINGC    "string constant"
        <ival> TK_INTC       "integer constant"
        <dval> TK_NUMC       "number constant"
        <ival> TK_PREG       "PMC register"
@@ -379,9 +382,9 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
 
 /* for PASM */
 
-%token TK_PASM_MARKER_START        "<pasm-marker>"
-%token TK_PIR_MARKER_START         "<pir-marker>"
-%token TK_PCC_SUB                  ".pcc_sub"
+%token        TK_PASM_MARKER_START "<pasm-input>"
+%token        TK_PIR_MARKER_START  "<pir-input>"
+%token        TK_PCC_SUB           ".pcc_sub"
 %token <sval> TK_PARROT_OP         "parrot-op"
 
 /* normal rules and types */
@@ -531,8 +534,8 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
 
 
 /* the */
-TOP               : "<pir-marker>"  pir_contents
-                  | "<pasm-marker>" pasm_contents
+TOP               : "<pir-input>"  pir_contents
+                  | "<pasm-input>" pasm_contents
                   ;
 
 /* PIR grammar */
@@ -771,7 +774,13 @@ unique_reg_flag   : ":unique_reg"
 
 instructions      : /* empty */
                   | instructions instruction
-                        { ++lexer->stmt_counter; }
+                        {
+                         ++lexer->stmt_counter;
+                         /* increment the logical statement counter; a statement can be
+                          * multiple lines, but each statement has its own ID for the
+                          * linear scan register allocator.
+                          */
+                        }
                   ;
 
 instruction       : TK_LABEL statement
@@ -1433,7 +1442,7 @@ condition         : target rel_op expression
                           /* NOTE: a reference is made here to $<ival>0. This is the <ival> of
                            * $0, which refers to the (non)terminal /before/ the use of
                            * the "condition" rule, in this case "if_unless". If the value
-                           * of that non-terminal is in face "NEED_INVERT_OPNAME", then
+                           * of that non-terminal is in fact "NEED_INVERT_OPNAME", then
                            * we shouldn't do it here, as the inversion of "le" or "lt" is
                            * again "ge" or "gt", and these instructions don't exist.
                            *
