@@ -323,7 +323,7 @@ ERROR:
     push getopts, 'target=s'           # compilation target, used during development
     push getopts, 'run-nqp'            # run PAST set up in NQP
     push getopts, 'output|o=s'
- 
+
     # standard PHP options
     push getopts, 'version'
     push getopts, 'help'
