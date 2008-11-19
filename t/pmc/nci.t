@@ -2686,7 +2686,7 @@ Waldo, Waldo, Hello
 Waldo, Waldo, Hello
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "nci_vfff - t_tt parameter" );
+pir_output_is( << 'CODE', << 'OUTPUT', "nci_vfff - v_fff parameter" );
 .sub test :main
     .local string library_name
     library_name = 'libnci_test'
