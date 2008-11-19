@@ -14,4 +14,18 @@ Fairly randomly sorted, the tasks are:
 
 3.  Complete PASM output, so it can actually be parsed and run.
 
+4.  Handle :multi flag properly.
+
+5.  Handle nested macro expansions.
+
+6.  Fix all memory leaks. this should be trivial, given PIR's built-in
+    allocated-memory-pointer-registering infrastructure. In some
+    places this is not used yet, and in others, it's not necessary
+    to use it (but in those mem_sys_free() must be called explicitly).
+
+7.  Figure out how :named argument passing works in bytecode.
+
+8.  Finish the parrot calling conventions ops in the back-end
+    (var.args must be fixed).
+
 More tasks will be added as I think of them. --kjs
