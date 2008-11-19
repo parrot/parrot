@@ -7,7 +7,14 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 47;
+use Parrot::Test;
+
+$ENV{TEST_PROG_ARGS} ||= '';
+
+plan( skip_all => 'lexicals not thawed properly from PBC, RT #60652' )
+    if $ENV{TEST_PROG_ARGS} =~ /-r/;
+
+plan( tests => 47 );
 
 =head1 NAME
 
