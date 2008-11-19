@@ -4,7 +4,7 @@ package Parrot::Pmc2c::Pmc2cMain;
 use strict;
 use warnings;
 
-use Storable 2.18;
+use Storable;
 use Parrot::PMC ();
 use Parrot::Pmc2c::VTable ();
 use Parrot::Pmc2c::Dumper;

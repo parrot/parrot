@@ -40,7 +40,7 @@ use warnings;
 
 use lib qw(config);
 use Carp qw(carp);
-use Storable qw(2.18 nstore retrieve nfreeze thaw);
+use Storable qw(2.12 nstore retrieve nfreeze thaw);
 use Parrot::Configure::Data;
 use base qw(Parrot::Configure::Compiler);
 

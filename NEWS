@@ -2,7 +2,7 @@
 
 New in the November 2008 release
 - Implementation
-  + CPAN module Storable 2.18 added as a configuration and build dependency
+  + CPAN module Storable 2.12 added as a configuration and build dependency
   + remove the pseudo PIR opcode 'addr'
   + added the 'box' opcode
   + fixed 'pop_eh' handling in PIR libraries and examples
