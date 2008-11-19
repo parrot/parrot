@@ -10,7 +10,6 @@ pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "test a basic :main sub");
 .end
 CODE
 .namespace []
-
 .pcc_sub :main main:
     get_params
     end
@@ -26,6 +25,8 @@ main:
     set_returns
     returncc
 OUTPUT
+
+
 
 
 

@@ -3,7 +3,7 @@
 # $Id$
 
 use lib "../../lib";
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 5;
 
 pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "macro");
 .sub main
@@ -28,53 +28,94 @@ main:
     returncc
 OUTPUT
 
-### test include statement
-##.include "subflags.pir"
-##
-### test .HLL statement
-##.HLL "PIRC", "pircgroup"
-##.pragma n_operators 1
-##
-##
-##.sub main
-### test local declarations
-##    .local pmc x, y, z
-##    .local string a, b, c
-##    .local int i, j
-##    .local num pi
-##
-### test simple expressions
-##    i = 42
-##    pi = 3.14
-##    a = "Hello World"
-##    b = 'hello world'
-##
-### test conditional statements
-##    if x < y goto X
-##    unless y > x goto Y
-##
-### test multiple labels
-##X:
-##Y:
-##Z:
-### test simple function call
-##    foo(1,2,3)
-##    .local pmc x, a, b, c
-##    x = foo(1, 2, 3)
-##    (a, b, c) = foo()
-##    $P0 = foo()
-##    P0 = foo()
-##    $S0 = foo()
-##    S0 = foo()
-##    $I0 = foo()
-##    I0 = foo()
-##    $N0 = foo()
-##    N0 = foo()
-##
-##    .local pmc I
-##    .local int P, S, N
-##    I = P.bar()
-##    N = S.'bar'()
+
+pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "if statement");
+.sub main
+    .local int x, y, z
+    if x < y goto X
+    unless y > x goto Y
+X:
+Y:
+Z:
+.end
+CODE
+.namespace []
+main:
+    get_params
+    lt I0, I1, 2
+    le I1, I0, 1
+X:
+Y:
+Z:
+    set_returns
+    returncc
+OUTPUT
+
+
+
+pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "if statement with keywords");
+.sub int
+    .local int if, int, goto
+    .local pmc pmc, null
+    if int > if goto L
+goto:
+L:
+.end
+CODE
+.namespace []
+int:
+    get_params
+    lt I1, I0, 1
+goto:
+L:
+    set_returns
+    returncc
+OUTPUT
+
+
+
+pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "sub call not in this compilation unit");
+.sub main
+    foo()
+.end
+CODE
+.namespace []
+main:
+    get_params
+    set_args ""
+    get_results ""
+    find_sub_not_null P0, "foo"
+    invokecc P0
+    set_returns
+    returncc
+OUTPUT
+
+
+
+pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "sub call in this compilation unit");
+.sub main
+    foo()
+.end
+.sub foo
+.end
+CODE
+.namespace []
+main:
+    get_params
+    set_args ""
+    get_results ""
+    set P0, 0
+    invokecc P0
+    set_returns
+    returncc
+.namespace []
+foo:
+    get_params
+    set_returns
+    returncc
+OUTPUT
+
+
 ##
 ### test return statements
 ##    .return (1)

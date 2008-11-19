@@ -295,7 +295,7 @@ print_subs(struct lexer_state * const lexer) {
             if (subiter->flags) {
 
 
-                fprintf(out, "\n.pcc_sub ");
+                fprintf(out, ".pcc_sub ");
 
                 if (TEST_FLAG(subiter->flags, SUB_FLAG_MAIN))
                     fprintf(out, ":main ");
