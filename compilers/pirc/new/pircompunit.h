@@ -359,6 +359,8 @@ constant *new_named_const(struct lexer_state * const lexer, pir_type type,
 
 constant *new_const(struct lexer_state * const lexer, pir_type type, ...);
 
+constant *new_pmc_const(char const * const type, char const * const name, constant * const value);
+
 /* conversion functions, each wrapping its argument in an expression node */
 expression *expr_from_const(struct lexer_state * const lexer, constant * const c);
 expression *expr_from_target(struct lexer_state * const lexer, target * const t);

@@ -1938,24 +1938,8 @@ const_tail            : "int" identifier '=' TK_INTC
                             { $$ = new_named_const(lexer, NUM_TYPE, $2, $4); }
                       | "string" identifier '=' TK_STRINGC
                             { $$ = new_named_const(lexer, STRING_TYPE, $2, $4); }
-                      /*
-                      | "pmc" identifier '=' TK_STRINGC
-                            { $$ = new_named_const(lexer, PMC_TYPE, $2, $4); }
-                      */
-                      /*
-                      | "Sub" identifier '=' TK_STRINGC
-                      | "Coroutine" identifier '=' TK_STRINGC
-                      */
-
-                      /* this might be useful, for:
-                         .const "Sub" foo = "foo" # make a Sub PMC of subr. "foo"
-                         .const "Float" PI = 3.14 # make a Float PMC for 3.14
-
-                        Is: .const pmc x = 'foo' any useful? Type of x is not clear.
-
                       | TK_STRINGC identifier '=' constant
                             { $$ = new_pmc_const($1, $2, $4); }
-                      */
                       ;
 
 
@@ -2077,7 +2061,13 @@ augmented_op: "*="         { $$ = OP_MUL; }
             ;
 
 
-/* PASM grammar */
+/* PASM grammar
+ *
+ * The PASM grammar uses a number of rules in PIR, but in PASM mode, a different set
+ * of tokens is recognized by the lexer. Therefore, a number of alternatives in the
+ * PIR grammar rules can never be matched, as the particular tokens will never be
+ * returned by the lexer. Neat, huh.
+ */
 
 pasm_contents             : pasm_init pasm_lines
                           ;
@@ -2097,7 +2087,7 @@ pasm_lines                : pasm_line
 
 pasm_line                 : pasm_statement
                           | namespace_decl "\n"
-                          | lex_decl                  /* lex_decl rule has already a "\n" token */
+                          | lex_decl                /* lex_decl rule has already a "\n" token */
                           | location_directive "\n"
                           ;
 
@@ -2116,17 +2106,17 @@ pasm_sub_directive        : pasm_sub_head sub_flags TK_LABEL
                           ;
 
 pasm_sub_head             : ".pcc_sub"
-                                { new_subr(lexer, NULL); } /* don't know the sub's name yet */
+                                { new_subr(lexer, NULL); } /* don't know the sub's name yet,
+                                                              hence NULL */
                           ;
 
 pasm_instruction          : parrot_op op_args "\n"
                                 {
-                                  if (!is_parrot_op(lexer, $1)) {
-                                      yypirerror(yyscanner, lexer, "'%s' is not a parrot op", $1);
-                                  }
-                                  else {
+                                  if (is_parrot_op(lexer, $1))
                                       get_opinfo(yyscanner);
-                                  }
+                                  else /* not a parrot op */
+                                      yypirerror(yyscanner, lexer, "'%s' is not a parrot op", $1);
+
                                 }
                           ;
 
@@ -2490,7 +2480,6 @@ fold_n_n(yyscan_t yyscanner, double a, pir_math_operator op, double b) {
             result = (a != b);
             break;
 
-        /* OP_INC and OP_DEC are here only to keep the C compiler happy */
         default:
             break;
     }

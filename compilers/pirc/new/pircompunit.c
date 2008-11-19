@@ -1261,6 +1261,27 @@ new_named_const(lexer_state * const lexer, pir_type type, char const * const nam
 /*
 
 =item C<constant *
+new_pmc_const(char const * const type, char const * const name, constant * const value)>
+
+Create a new PMC constant of type C<type>, name C<name> and having a value C<value>.
+The type must be a string indicating a valid type name (e.g. "Sub"). The name will be the name
+of the constant, and the value of the constant is passed as C<value>.
+
+XXX if type is "Sub", value must be looked up, as it is the name of a subroutine.
+
+=cut
+
+*/
+constant *
+new_pmc_const(char const * const type, char const * const name, constant * const value) {
+    value->name = name;
+    /* XXX implement this. Not sure yet how to. */
+    return value;
+}
+
+/*
+
+=item C<constant *
 new_const(lexer_state * const lexer, pir_type type, ...)>
 
 Creates a new constant node of the given type.
