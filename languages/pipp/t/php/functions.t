@@ -72,7 +72,7 @@ echo_count( 123456 );
 
 =cut
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'function with one arg', todo => 'parser error' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'function with one arg' );
 <?php
 
 function echo_count( $count )  {
@@ -83,6 +83,6 @@ echo_count( 123456 );
 
 ?>
 CODE
-123456
+count: 123456
 OUT
 

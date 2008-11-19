@@ -123,8 +123,8 @@ rule statement_delimiter {
     | $
 }
 
-rule echo_statement {
-    'echo' <arguments> <.statement_delimiter>
+token echo_statement {
+    'echo' <.ws_char> <arguments> <ws> <.statement_delimiter>
     {*}
 }
 
