@@ -1,9 +1,12 @@
 =head1 defined
 
-The C<defined> opcode tells you if the contents of a PMC is defined or not.  Using
-C<defined> on a temporary C<Integer>, C<Number>, or C<String> register may generate an error,
-depending on whether the temporary register has been used before and freed, or newly
-created.
+The C<defined> opcode tells you if the contents of a PMC is defined or not.
+Using C<defined> on a C<int>, C<num>, or C<string> register may generate
+an error if the register has been used before and freed or is newly created.
+
+C<defined> is a great way to test a PMC to ensure it's been set to a proper
+value before attempting to use it. Attempting to use a PMC that has not
+been defined may throw an exception or cause a bigger problem.
 
 =cut
 
@@ -19,9 +22,9 @@ created.
 
 =pod
 
-Most PMC's, but not all, should return true for C<defined>.  It all depends on
-how the PMC implements its vtable method for C<defined>.  For example, the C<Undef>
-PMC, returns false (0) for C<defined>.
+Most PMC's, but not all, should return true for C<defined>.  It all
+depends on how the PMC implements its vtable method for C<defined>.
+For example the C<Undef> PMC always returns false (0) for C<defined>.
 
 =cut
 

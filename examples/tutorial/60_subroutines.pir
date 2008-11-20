@@ -1,6 +1,15 @@
 =head1 Subroutines
 
-This example demonstrates a simple subroutine defined and called.
+PIR is a subroutine-based or "procedural" programming language.
+Subroutines are used to break large tasks into smaller chunks. These
+chunks can be used and reused throughout the program. Subroutines
+are defined with the C<.sub> directive and continue until the C<.end>
+directive.
+
+Subroutines can take any number of input parameters, and can return
+any number of output parameters. In practice, we recommend you don't
+go overboard with creating huge argument lists because it gets very
+messy and difficult to deal with very quickly.
 
 =cut
 

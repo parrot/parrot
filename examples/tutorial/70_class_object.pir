@@ -1,7 +1,29 @@
 =head1 Classes
 
-This example demstrates creating a class in PIR, adding attributes, defining
-methods, calling methods, and setting attributes.
+If we combine the ideas of namespaces, subroutines, and global variables,
+we are well along our way to the concept of a class. Classes are
+high-level constructs that keep data and code together into a single
+unit.
+
+A class definition in PIR consists of two parts: Creating a new class
+PMC object, and creating the methods for that class. The class PMC
+can be created with the C<newclass> and C<subclass> opcodes. Data fields,
+called "attributes" can be added to the class with the C<addattribute>
+opcode. Once a class PMC has been created, objects of that class
+can be instantiated like normal with the c<new> opcode.
+
+The functions of a class are called methods, and are created in a
+namespace with the same name as the class. In the example below, the
+class is called "Foo", and all the methods of that class are located
+in C<.namespace ["Foo"]>. Methods also need to have the C<:method>
+flag on them, to differentiate them from normal subroutines.
+
+Inside a method, the C<self> keyword acts like an additional parameter
+that contains the PMC object of the class that the method was called
+on.
+
+This example creates a class "Foo" with two attributes "bar" and "baz".
+It also has two setter and two accessor methods, one for each attribute.
 
 =cut
 

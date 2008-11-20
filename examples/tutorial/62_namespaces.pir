@@ -1,7 +1,15 @@
 =head1 Subroutines in a Namespace
 
-This example demonstrates defining a subroutine in another namespace, and
-retrieving it from the namespace. Also demonstrates the .namespace directive.
+Subroutines created in one namespace can be accessed from another
+using the C<get_global> opcode, just like global variables. In fact,
+since subroutines are really just PMCs, they are variables themselves
+and the two operations are actually the same.
+
+Namespaces can be defined in code using the C<.namespace> directive,
+followed by the name of the namespace as a hash key. The default root
+namespace can be specified with an empty set of brackets such as
+C<.namespace []>.
+
 
 =cut
 

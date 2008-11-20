@@ -1,6 +1,14 @@
 =head1 External C Function Call
 
-This example demonstrates using NCI to load a C library and call a C function.
+There is a vast wealth of libraries written for a variety of tasks, and
+Parrot can tap into most of them using an interface called NCI. NCI
+allows Parrot to make calls to low-level compiled functions from
+pre-compiled libraries.
+
+The C<loadlib> opcode loads in a compiled library as a Library PMC. The
+C<dlfunc> opcode takes a reference to that library PMC and the name of
+a function and returns an NCI subroutine PMC that can be invoked
+like a normal Parrot subroutine.
 
 =cut
 

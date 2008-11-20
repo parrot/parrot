@@ -1,6 +1,12 @@
 =head1 Continuations
 
-This example demonstrates creating a continuation, and using it as your own form of return.
+Continuations are tricky and amazing things. Parrot uses continuations for
+all sorts of things internally and you can use them too if you want. A
+continuation is like a snapshot of the current execution environment.
+If you invoke a continuation like a subroutine, it returns you to the
+point where you created the continuation. Also, you can set the address
+in the continuation to any label, so you can return to any arbitrary
+point in your code that you want by invoking it.
 
 =cut
 

@@ -1,8 +1,14 @@
 =head1 Coroutines
 
-This example demonstrates creating a coroutine, and using it as an auto
-increment (every time you call the coroutine it increments its internal
-variable by one).
+Coroutines are like special subroutines that use C<.yield> instead of
+C<.return>. In a normal subroutine, C<.return> passes results back to
+the caller, and then destroys the subroutine environment. C<.yield> on
+the other hand returns results to the parent but does not destroy the
+subroutine environment. The next time the coroutine is called, it
+continues execution from the point of the last C<.yield>, as if nothing
+has happened. If a coroutine calls C<.return> eventually, it is
+destroyed like a normal subroutine and the next call to it will start
+from the beginning of the coroutine.
 
 =cut
 
