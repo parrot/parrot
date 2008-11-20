@@ -310,8 +310,7 @@ inline op index(out INT, in STR, in STR, in INT) :base_core {
 
 Sets $1 to the result of calling C<Parrot_psprintf> with the
 given format ($2) and arguments ($3, which should be an ordered
-aggregate PMC).  In the (unimplemented) versions that don't include
-$3, arguments are popped off the user stack.
+aggregate PMC).
 
 The result is quite similar to using the system C<sprintf>, but is
 protected against buffer overflows and the like.  There are some
