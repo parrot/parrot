@@ -9,7 +9,7 @@ place.
 .sub main :main
 
     $I0 = 3
-    $I0 *= 2 
+    $I0 *= 2
     say $I0
 
     $N0 = 22.44
