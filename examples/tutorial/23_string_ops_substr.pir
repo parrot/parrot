@@ -1,10 +1,14 @@
 =head1 String Operations (continued)
 
-C<substr> selects the requested number of characters starting at
-the offset.  If the requested number of characters is left out,
-then all characters to the end of the string are removed.
-An optional fourth argument may be a string that will replace the
-selected characters.
+We can pick apart a string and pull substrings out of it using the
+C<substr> command. C<substr> takes a string, a starting position and
+optionally an ending position. It returns all the characters in
+the string between the starting and ending posiions. If the ending
+position is left out, C<substr> returns all the characters until the
+end of the string.
+
+An optional fourth argument can be a string that will be used to
+replace the characters between the start and end positions.
 
 =cut
 

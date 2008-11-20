@@ -1,7 +1,18 @@
 =head1 Hashes
 
-This example demonstrates using hashes, keyed access, and automatic conversion
-of low-level types to pmc types in keyed access.
+Hashes, also known in some places as "dictionaries" or "associative arrays"
+are like array structures except they are indexed by strings instead of
+integers. There are dedicated Hash PMCs, and a number of other PMCs that
+implement the hash interface as well.
+
+Hash PMCs are indexed using C<[ ]> square brackets with a string inside them.
+
+Arrays are typically considered to be homogeneous structures where all
+elements in the array are of the same type. This is why Parrot has types
+like "FixedIntegerArray" and "ResizableStringArray", which only contain
+integers or strings respectively. Hashes are usually treated as being
+heterogeneous, where each bucket in the hash can contain an element of a
+different type.
 
 =cut
 

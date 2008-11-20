@@ -1,7 +1,8 @@
 =head1 String Operations (continued)
 
-To find the length of a string in PIR, use the length opcode.  It works on any
-register containing a basic Parrot string, but not the String PMC.
+To find the length of a string in PIR, use the length opcode. It works on
+any register containing a basic Parrot string, but not the String PMC.
+C<length> returns an integer value with 0 being an empty string.
 
 =cut
 

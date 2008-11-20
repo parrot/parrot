@@ -1,6 +1,9 @@
 =head1
 
-This example demonstrates the split opcode.
+C<split> is an operation that breaks up a string at certain marker
+characters, and puts the resulting parts into an array. The first
+argument to C<split> is the pattern to search for, and the second
+argument is the string to search. The result is an array PMC.
 
 =cut
 

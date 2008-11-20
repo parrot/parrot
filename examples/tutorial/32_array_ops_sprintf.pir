@@ -1,7 +1,10 @@
 =head1
 
-This demonstrates sprintf (provide some description of the options).
-Particularly note the options for printing PMCs which C doesn't have.
+C<sprintf> is a function common to most programmers as part of the C
+standard library that allows the creation of a string from a given
+format and a list of operators. Parrot's C<sprintf> operator extends
+the format options of the regular sprintf function, and allows
+arguments to be taken from inside an array PMC.
 
 =cut
 
