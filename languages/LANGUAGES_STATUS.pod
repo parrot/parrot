@@ -332,7 +332,7 @@ Planned.
 
 =item Last verified with parrot version
 
-0.8.0
+0.8.1
 
 =item Location
 
@@ -397,11 +397,11 @@ A joke language. See L<http://www.cliff.biffle.org/esoterica/hq9plus.html>
 =item Status
 
 Works and is mostly complete.
-Based on PCT.
+Based on the Parrot Compiler Toolkit, PCT.
 
 =item Last verified with parrot version
 
-0.8.0
+0.8.1
 
 =item Location
 
@@ -521,7 +521,7 @@ A new maintainer is sought.
 
 =item Last verified with parrot version
 
-0.8.0
+0.8.1
 
 =item Location
 
@@ -724,16 +724,17 @@ C<compilers/nqp>
 
 =item Description
 
-Functioning compiler targeting PASM.
+Another joke language implemented with a compiler targeting PASM.
 
 =item Status
 
 Samples working, README explain how to build/use.
 Part of languages smoke testing.
+A new maintainer is sought.
 
 =item Last verified with parrot version
 
-0.8.0
+0.8.1
 
 =item Location
 
@@ -826,17 +827,15 @@ C<languages/pheme>
 
 Pipp is Parrot's PHP.
 
-One idea of Pipp is to have side by side comparison of different parsing
-and tree transformation strategies. Currently there are three variants:
-phc, PGE and ANTLR3.
+Implemented with PCT.
 
 =item Status
 
-Started.
+Very incomplete.
 
 =item Last verified with parrot version
 
-0.8.0
+0.8.1
 
 =item Location
 
@@ -1080,7 +1079,7 @@ A new maintainer is sought.
 
 =item Last verified with parrot version
 
-0.8.0
+0.8.1
 
 =item Location
 
