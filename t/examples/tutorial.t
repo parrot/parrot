@@ -195,10 +195,6 @@ Hello
 5
 END_EXPECTED
 
-    '80_closure.pir' => << 'END_EXPECTED',
-27
-END_EXPECTED
-
     '81_continuation.pir' => << 'END_EXPECTED',
 got argument: 4
 continuation called
