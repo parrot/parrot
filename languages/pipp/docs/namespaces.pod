@@ -45,5 +45,7 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
   L<http://wiki.php.net/rfc/namespaceref>
   L<http://inside.webfactory.de/en/blog/php-namespaces-explained.html>
   L<http://marc.info/?l=php-internals&m=121527668606247>
+  L<http://bugs.php.net/bug.php?id=46304>
+  L<http://loveandtheft.org/2008/10/26/set-sail-for-fail-php-namespaces/>
 
 =cut
