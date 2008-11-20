@@ -691,6 +691,7 @@ help :
 	@echo "  codingstd_tests:   Test pdd07_codingstd."
 	@echo "  testexec:          Testing the exec runcore."
 	@echo "  benchmark_tests:   Run all benchmarks."
+	@echo "  warnings_tests:    Run standard test suite with warnings enabled."
 	@echo "  manitest:          Check for new and missing files."
 	@echo "  doc_tests:         Check POD syntax of all files containing POD."
 	@echo "  buildtools_tests:  Test build tool pmc2c.pl."
@@ -1566,6 +1567,10 @@ codetest :
 # Test pdd07_codingstd
 codingstd_tests :
 	$(PERL) t/harness $(CODINGSTD_TEST_FILES)
+
+# Run standard test suite with warnings enabled.
+warnings_tests:
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -w $(RUNCORE_TEST_FILES)
 
 buildtools_tests :
 	$(PERL) t/harness $(BUILDTOOLS_TEST_FILES)

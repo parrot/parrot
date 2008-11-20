@@ -18,7 +18,8 @@ warnings selectively with:
 
 And then receive runtime warnings if they are using any deprecated opcodes.
 The C<-w> command line option for parrot can also be used to enable all
-warnings.
+warnings. You can use C<make warnings_tests> to run the standard test suite
+with this option.
 
 =head1 vtable entries
 
