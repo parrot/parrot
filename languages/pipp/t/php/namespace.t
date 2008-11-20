@@ -35,7 +35,7 @@ Encountered namespace: A\B
 Encountered namespace: \A\B\C
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with constant', todo => 'no implemented yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with constant', todo => 'not implemented yet' );
 <?php
 
 const FOO = "FOO in root.\n";
@@ -64,7 +64,29 @@ FOO in A::B
 FOO in root
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with variable', todo => 'no implemented yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'case insensitive namespace', todo => 'not implemented yet' );
+<?php
+
+namespace A\B;
+
+const FOO  = "FOO in a::b\n";
+
+namespace \;
+ 
+echo A\B\FOO;
+echo A\b\FOO;
+echo a\B\FOO;
+echo a\b\FOO;
+
+?>
+CODE
+FOO in a::b
+FOO in a::b
+FOO in a::b
+FOO in a::b
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with variable', todo => 'not implemented yet' );
 <?php
 
 $FOO = "FOO in root.\n";
@@ -93,7 +115,7 @@ FOO in A::B
 FOO in root
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with class', todo => 'no implemented yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with class', todo => 'not implemented yet' );
 <?php
 
 namespace A\B;
