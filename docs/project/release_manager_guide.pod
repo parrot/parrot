@@ -15,8 +15,8 @@ announce the tasks to the Parrot mailing list.  Make sure everyone knows what
 they've committed to accomplish in time for the release.  Ask the previous
 release manager to review PAUSE permissions so that PARROTRE owns all files.
 
-A couple of weeks in advance: Ask people to run C<make fulltest> and C<make
-codetest> and report (and hopefully fix!) any problems they find.
+A couple of weeks in advance: Ask people to run C<make fulltest> and report
+(and hopefully fix!) any problems they find.
 
 A couple of days in advance: announce the new release to
 parrot-dev@lists.parrot.org and to the IRC channel #parrot.  Ask whether there
@@ -130,7 +130,6 @@ Make sure everything works:
  $ perl Configure.pl --test ...
  $ make world docs html 2>&1 | tee make_world_docs_html.log
  $ make fulltest        2>&1 | tee make_fulltest.log
- $ make codetest        2>&1 | tee make_codetest.log
 
 Note that running "make fulltest" takes a while and that separate
 harnesses are being run.
