@@ -1520,7 +1520,7 @@ Parrot_mmd_sort_candidates(PARROT_INTERP, ARGIN(PMC *arg_tuple), ARGIN(PMC *cl))
     PMC   **data;
 
     const INTVAL n    = VTABLE_elements(interp, cl);
-    PMC * const  sort = pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC * const  sort = temporary_pmc_new(interp, enum_class_FixedIntegerArray);
 
     /*
      * create a helper structure:
@@ -1540,7 +1540,7 @@ Parrot_mmd_sort_candidates(PARROT_INTERP, ARGIN(PMC *arg_tuple), ARGIN(PMC *cl))
     }
 
     /* need an NCI function pointer */
-    nci                 = pmc_new(interp, enum_class_NCI);
+    nci                 = temporary_pmc_new(interp, enum_class_NCI);
     PMC_struct_val(nci) = F2DPTR(distance_cmp);
 
     /* sort it */
@@ -1567,6 +1567,8 @@ Parrot_mmd_sort_candidates(PARROT_INTERP, ARGIN(PMC *arg_tuple), ARGIN(PMC *cl))
     /* use helper structure */
     PMC_data(cl)   = helper;
     PMC_data(sort) = data;
+    temporary_pmc_free(interp, sort);
+    temporary_pmc_free(interp, nci);
 }
 
 
