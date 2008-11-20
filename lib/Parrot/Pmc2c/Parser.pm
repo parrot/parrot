@@ -105,7 +105,14 @@ sub find_attrs {
 
         # type
         \s+
-        (INTVAL|FLOATVAL|STRING\s+\*|PMC\s+\*|(?:struct\s+)?\w+\s+\*+|Parrot_\w*)
+        (   INTVAL
+          | FLOATVAL
+          | STRING\s+\*
+          | PMC\s+\*
+          | (?:struct\s+)?\w+\s+\*+
+          | (?:unsigned\s+)?char\s+\*+
+          | \w*
+        )
 
         # name
         \s*

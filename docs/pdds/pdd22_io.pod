@@ -49,11 +49,10 @@ combination of functionality for different platforms.
 
 =head2 Concurrency Model for Asynchronous I/O
 
-Currently, Parrot only implements synchronous I/O operations. For the
-1.0 release the asynchronous operations will be implemented separately
-from the synchronous ones. There may be an implementation that uses one
-variant to implement the other someday, but it's not an immediate
-priority.
+Currently, Parrot only implements synchronous I/O operations. Initially,
+the asynchronous operations will be implemented separately from the
+synchronous ones. There may be an implementation that uses one variant
+to implement the other someday, but it's not an immediate priority.
 
 Synchronous opcodes are differentiated from asynchronous opcodes by the
 presence of a callback argument in the asynchronous calls.  Asynchronous
@@ -90,7 +89,7 @@ share no variables with the calling code other than the status object.
 [See L<http://en.wikipedia.org/wiki/Asynchronous_I/O>, for a relatively
 comprehensive list of asynchronous I/O implementation options.]
 
-=head2 I/O PMC API
+=head2 FileHandle PMC API
 
 Methods
 
@@ -108,7 +107,7 @@ bare minimum.]
 
 =item C<new>
 
-  $P0 = new ParrotIO
+  $P0 = new 'FileHandle'
 
 Creates a new I/O stream object. [Note that this is usually performed
 via the C<open> opcode.]
@@ -124,9 +123,10 @@ object. With no arguments, it can be used to reopen a previously opened
 I/O stream. $S2 is a file path and $S3 is an optional mode for the
 stream (read, write, read/write, etc), using the same format as the
 C<open> opcode: 'r' for read, 'w' for write, 'a' for append, and 'p' for
-pipe. When the mode is set to write or append, a file is created without
-warning if none exists. When the mode is read (without write), a
-nonexistent file is an error.
+pipe. When the optional mode argument is not passed, the default is read mode.
+When the mode is set to write or append, a file is created without warning if
+none exists. When the mode is read (without write), a nonexistent file is an
+error.
 
 The asynchronous version takes a PMC callback as an additional final
 argument. When the open operation is complete, it invokes the callback
@@ -171,12 +171,11 @@ passing it a status object.
   $P0 = $P1.read($I2, $P3)
 
 Retrieves a specified number of bytes $I2, from a stream $P1 into a
-string $S0. By default it reads in bytes, but the ParrotIO object can be
-configured to read in code points instead, by applying a C<utf8> or
-similar role to the object [the syntax for applying a role to an object
-has yet to be defined in PDD 15]. If there are fewer bytes remaining in
-the stream than specified in the read request, it returns the remaining
-bytes (with no error).
+string $S0. By default it reads in bytes, but the FileHandle object can
+be configured to read in code points instead, by setting the character
+set and encoding on the filehandle object. If there are fewer bytes
+remaining in the stream than specified in the read request, it returns
+the remaining bytes (with no error).
 
 The asynchronous version takes an additional final PMC callback argument
 $P3, and only returns a status object $P0. When the read operation is
@@ -214,26 +213,13 @@ platform).
 
 =item C<buffer_type>
 
-  $I0 = $P1.buffer_type()
   $S0 = $P1.buffer_type()
-  $P0.buffer_type($I1)
   $P0.buffer_type($S1)
 
 Accessor (get and set) for the I/O stream's buffer type attribute. The
-attribute is returned as an integer value of one of the following
-constants, or a string value of 'unbuffered', 'line-buffered', or
-'full-buffered'.
-
-  0    PIO_NONBUF
-           Unbuffered I/O. Bytes are sent as soon as possible.
-  1    PIO_LINEBUF
-           Line buffered I/O. Bytes are sent when a record separator is
-           encountered.
-  2    PIO_FULLBUF
-           Fully buffered I/O. Bytes are sent when the buffer is full.
-           [Note, the constant was called "BLKBUF" because bytes are
-           sent as a block, but line buffering also sends them as a
-           block, so changed to "FULLBUF".]
+attribute is set or returned as a string value of 'unbuffered' (bytes sent as
+soon as possible), 'line-buffered' (bytes sent when record separator is
+encountered), or 'full-buffered' (bytes sent when the buffer is full).
 
 =item C<buffer_size>
 
@@ -243,19 +229,26 @@ constants, or a string value of 'unbuffered', 'line-buffered', or
 Accessor (get and set) for the I/O stream's buffer size attribute. The
 size is specified in bytes (positive integer value), though the buffer
 may hold a varying number of characters when dealing with an encoding of
-multi-byte codepoints.  The role that implements the handling of a
+multi-byte codepoints.  The code that implements the handling of a
 particular character set must provide the logic that marks the buffer as
 "full" when it can't hold the next codepoint even if there are empty
 bytes in the buffer.
 
-The buffer size can be set no matter what buffering mode is in use, but
-it's only relevant when in line buffering or full buffering mode (and
-line buffering mode will rarely reach the maximum buffer size).
+Setting the buffer size turns on full buffering mode for the I/O stream.
+The set buffer size is taken as a minimum, the I/O subsystem may round
+it up to a standard block size.
 
-It is recommended to only change the buffer size before starting IO
-operations, or after flushing the buffer. If the new size is larger than
-the existing data in the buffer, a size change is non-disruptive, but if
-the new size is smaller, it will truncate the buffer with a warning.
+The buffer is automatically flushed when the buffer size is changed. If
+the new size was larger than the existing data in the buffer, a size
+change would be non-disruptive, but if the new size was smaller,
+resizing it without flushing would truncate the buffer.
+
+=item C<mode>
+
+  $S0 = $P1.mode()
+
+Accessor (get only) for the I/O stream's read mode. This returns the mode
+string used to open the I/O stream.
 
 =item C<get_fd> [RT #48312]
 
@@ -263,14 +256,10 @@ the new size is smaller, it will truncate the buffer with a warning.
 
 For stream objects that are simple wrappers around a Unix filehandle,
 C<get_fd> retrieves the Unix integer file descriptor of the object.
-This method doesn't exist on stream objects that aren't Unix
-filehandles, so check C<does> for the appropriate role, or C<can> for
-the method before calling it.
+This method will simply return -1 on stream objects that aren't Unix
+filehandles.
 
 No asynchronous version.
-
-{{ NOTE: use a config probe (behind C<does> or C<can>) to determine support }}
-
 
 =back
 
@@ -324,8 +313,8 @@ object, otherwise do nothing.
 =head2 I/O Iterator PMC API
 
 [Implementation NOTE: this may either be the default Iterator object
-applied to a ParrotIO object, a separate Iterator object for I/O
-objects, or an Iterator role applied to I/O objects.]
+applied to a FileHandle or Socket object, a separate Iterator object for
+I/O objects, or an Iterator role applied to I/O objects.]
 
 =over 4
 
@@ -508,7 +497,7 @@ string of bytes.
   $S0 = peek $P1
 
 ['peek', 'seek', 'tell', and 'poll' are all candidates for moving from
-opcodes to ParrotIO object methods.]
+opcodes to FileHandle object methods.]
 
 C<peek> retrieves the next byte from a stream into a string, but doesn't
 remove it from the stream. By default it reads from standard input, but
@@ -588,7 +577,7 @@ object. It takes a stream object, an integer flag to select a command,
 and a single integer argument for the command. It returns an integer
 indicating the success or failure of the command.
 
-This opcode has been replaced with methods on the ParrotIO object, but
+This opcode has been replaced with methods on the FileHandle object, but
 is kept here for reference. See RT #48589
 
 The following constants are defined for the commands that C<pioctl> can
@@ -628,8 +617,8 @@ buffer-type commands:
 [Okay, I'm seriously considering moving most of these to methods on the
 ParrotIO object. More than that, moving them into a role that is
 composed into the ParrotIO object when needed. For the ones that have
-the form 'C<opcodename parrotIOobject, arguments>', I can't see that it's
-much less effort than 'C<parrotIOobject.methodname(arguments)>' for either
+the form 'C<opcodename io_object, arguments>', I can't see that it's
+much less effort than 'C<io_object.methodname(arguments)>' for either
 manually writing PIR or generating PIR. The slowest thing about I/O is
 I/O, so I can't see that we're getting much speed gain out of making
 them opcodes. The ones to keep as opcodes are 'C<unlink>', 'C<rmdir>', and
@@ -761,9 +750,9 @@ callback, passing it a status object.
 Most of these opcodes conform to the standard UNIX interface, but the
 layer API allows alternate implementations for each.
 
-[These I'm also considering moving to methods in a role for the ParrotIO
+[These I'm also considering moving to methods in a role for the Socket
 object. Keep 'socket' as an opcode, or maybe just make 'socket' an
-option on creating a new ParrotIO object.]
+option on creating a new Socket object.]
 
 =over 4
 

@@ -355,6 +355,12 @@ ENCODING_O_FILES  = @TEMP_encoding_o@
 
 IO_O_FILES = \
     $(IO_DIR)/io$(O) \
+    $(IO_DIR)/api$(O) \
+    $(IO_DIR)/buffer$(O) \
+    $(IO_DIR)/unix$(O) \
+    $(IO_DIR)/win32$(O) \
+    $(IO_DIR)/portable$(O) \
+    $(SRC_DIR)/io$(O) \
     $(IO_DIR)/io_buf$(O) \
     $(IO_DIR)/io_layers$(O) \
     $(IO_DIR)/io_unix$(O) \
@@ -585,6 +591,7 @@ STR_FILES = \
     $(SRC_DIR)/inter_create.str \
     $(SRC_DIR)/inter_misc.str \
     $(SRC_DIR)/io/io.str \
+    $(SRC_DIR)/io/api.str \
     $(SRC_DIR)/key.str \
     $(SRC_DIR)/library.str \
     $(SRC_DIR)/multidispatch.str \
