@@ -44,7 +44,7 @@ my $loadlib = <<'EOC';
 #
 .loadlib "dynlexpad"
 
-.HLL "Some", "dynlexpad"
+.HLL "Some"
 .HLL_map "LexPad" = "DynLexPad"
 
 EOC
@@ -159,7 +159,7 @@ pir_output_is( $loadlib . << 'CODE', << 'OUTPUT', "check that dynlexpad honors h
     print $S0
     print "\n"
 .end
-.HLL "parrot",""
+.HLL "parrot"
 .sub bar :lex
     .local pmc pad, interp
     interp = getinterp

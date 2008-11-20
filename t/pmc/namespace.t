@@ -518,7 +518,7 @@ END {
 
 open my $S, '>', "$temp_a.pir" or die "Can't write $temp_a.pir";
 print $S <<'EOF';
-.HLL "Foo", ""
+.HLL "Foo"
 .namespace ["Foo_A"]
 .sub loada :load
     $P0 = get_global ["Foo_A"], "A"

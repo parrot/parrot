@@ -40,7 +40,8 @@ lexically scoped variables.
     # Lexical behavior varies by HLL.  For example,
     # Tcl's lexicals are not declared at compile time.
 
-    .HLL "Tcl", "tcl_group"
+    .HLL "Tcl"
+    .loadlib 'tcl_group'
 
     .sub grault :lex        # without ":lex", Tcl subs have no lexicals
         P0 = find_lex "x"   # FAILS

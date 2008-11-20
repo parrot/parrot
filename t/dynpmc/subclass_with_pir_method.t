@@ -37,7 +37,8 @@ pir_output_is(
   $P1.'perl_printhi'()
 .end
 
-.HLL 'Perl', 'perl_group'
+.HLL 'Perl'
+.loadlib 'perl_group'
 .namespace ['PerlString']
 .sub 'perl_printhi' :method
     print "HI from PerlString\n"
@@ -51,7 +52,8 @@ OUTPUT
 
 pir_output_is(
     <<'CODE', <<'OUTPUT', "subclass with pir method - .HLL", todo => "PMCs don't obey HLL namespaces" );
-.HLL 'Perl', 'perl_group'
+.HLL 'Perl'
+.loadlib 'perl_group'
 .sub main :main
   new $P0, 'PerlString'
   $P0.'perl_printhi'()

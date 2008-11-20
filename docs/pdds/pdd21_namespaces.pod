@@ -477,7 +477,8 @@ This Perl:
 
 should map roughly to this PIR:
 
-  .HLL "Perl5", "perl5_group"
+  .HLL "Perl5"
+  .loadlib "perl5_group"
   .namespace [ "Foo" ]
   .sub main :main
     $P0 = new 'PerlInt'
@@ -500,7 +501,8 @@ The C<Foo::> namespace is created at run-time (without any optimizations).  In
 these cases, Parrot should create the namespace based on the HLL of the PIR
 subroutine that calls the store function.
 
-  .HLL "Perl5", "perl5_group"
+  .HLL "Perl5"
+  .loadlib "perl5_group"
   .sub main :main
     # $a = 'x';
     $P0 = new 'PerlString'

@@ -102,14 +102,6 @@ See RT #48737.
 
 See RT #46715.
 
-=item * C<.HLL> <string> ',' <string> [post 0.8.1]
-
-This will be replaced by C<.HLL> <string>; the second string (and
-comma to separate them) will no longer be accepted. Use C<.loadlib>
-for specifying the library name.
-
-See RT #57428.
-
 =item * vtable name .constants and __vtable overrides [post 0.5.2]
 
 See RT #48877.

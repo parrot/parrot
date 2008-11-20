@@ -54,7 +54,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "test type of HLL_mapped .Sub" );
     noop
 .end
 
-.HLL "Some", "subproxy"
+.HLL "Some"
+.loadlib "subproxy"
 .HLL_map "Sub" = "SubProxy"
 
 .sub foo

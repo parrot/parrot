@@ -327,11 +327,6 @@ loaded again in C<:load>, so there is no need to call C<loadlib> at runtime.
 Define the HLL for the current file. Takes one string constant, the name
 of the HLL.
 
-=item .HLL <hll_name>, <hll_lib> [deprecated: RT #57428]
-
-An old form of the .HLL directive that also loaded a shared lib for the
-HLL. Use C<.loadlib> instead.
-
 =item .HLL_map <core_type> = <user_type> [unimplemented: RT #57430]
 
 Whenever Parrot has to create PMCs inside C code on behalf of the running

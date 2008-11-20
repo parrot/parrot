@@ -16,7 +16,7 @@ Tests OO features related to names and namespaces.
 
 =cut
 
-.HLL "perl6", ""
+.HLL "perl6"
 
 .namespace []
 

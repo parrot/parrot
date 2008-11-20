@@ -174,7 +174,8 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', ".HLL 1" );
 # load our Foo test (pseudo) language
 # it defines one PMC type "Foo"
-.HLL "Fool", "foo"
+.HLL "Fool"
+.loadlib "foo"
 .sub main :main
     new $P1, "Foo"      # load by name
     $I1 = $P1
@@ -186,7 +187,8 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', ".HLL 2" );
-.HLL "Fool", "foo"
+.HLL "Fool"
+.loadlib "foo"
 .sub main :main
     new $P1, 'Foo'       # load by index
     $I1 = $P1
