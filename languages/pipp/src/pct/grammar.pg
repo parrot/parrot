@@ -43,29 +43,28 @@ regex SEA {
 }
 
 rule code_echo_tag {
-    <.CODE_START_ECHO_TAG>
-        <arguments> <.statement_delimiter>
+    <.CODE_START_ECHO_TAG> <arguments> <.statement_delimiter>
         <statement>*
     <.CODE_END_SHORT_TAG>?
     {*}
 }
 
 rule code_script_tag {
-    <.CODE_START_SCRIPT_TAG> <statement>* <.CODE_END_SCRIPT_TAG>?
+    <.CODE_START_SCRIPT_TAG>
+        <statement>*
+    <.CODE_END_SCRIPT_TAG>?
     {*}
 }
 
 rule code_short_tag {
-    <.CODE_START_SHORT_TAG>  <statement>* <.CODE_END_SHORT_TAG>?
+    <.CODE_START_SHORT_TAG>
+        <statement>*
+    <.CODE_END_SHORT_TAG>?
     {*}
 }
 
 regex CODE_START_SCRIPT_TAG {
-    '<script' <ws_char>+:
-    'language'         <ws_char>*:
-    '='                <ws_char>*:
-    <quoted_lang_name> <ws_char>*:
-    '>'
+    '<script' <ws_char>+: 'language' <ws_char>*: '=' <ws_char>*: <quoted_lang_name> <ws_char>*: '>'
 }
 
 regex CODE_END_SCRIPT_TAG { '</script' <ws_char>*: '>' }
@@ -80,14 +79,13 @@ token CODE_END_SHORT_TAG { '?>' \n?  }
 
 # block and statements
 rule block {
-    '{'
-        <statement>*
-    '}'
+    '{' <statement>* '}'
     {*}
 }
 
 rule statement {
-      <echo_statement>        {*}  #= echo_statement
+      <namespace_statement>   {*}  #= namespace_statement
+    | <echo_statement>        {*}  #= echo_statement
     | <expression_statement>  {*}  #= expression_statement
     | <if_statement>          {*}  #= if_statement
     | <while_statement>       {*}  #= while_statement
@@ -103,6 +101,11 @@ rule statement_delimiter {
       ';'
     | <before '?'>
     | $
+}
+
+rule namespace_statement {
+    'namespace' <NAMESPACE_NAME> ';'
+    {*}
 }
 
 token echo_statement {
@@ -179,6 +182,10 @@ token METHOD_NAME { <ident> }
 token CONSTANT_NAME { <ident> }
 
 token CLASS_NAME { <ident> }
+
+token NAMESPACE_SEPARATOR { '\\' }
+
+token NAMESPACE_NAME { <ident>? [ <.NAMESPACE_SEPARATOR> <ident> ]* }
 
 token VAR_NAME {
     '$' <ident>

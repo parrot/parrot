@@ -16,6 +16,7 @@ Only classes, functions and constants are namespaced.
 The current namespace can be queried with B<__NAMESPACE__>.
 Namespaces are case insensitive.
 No global code can precede the first B<namespace> directive.
+Free code is disallowed within namespaces.
 
 =head1 Implementation in Pipp
 
@@ -30,6 +31,7 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
   L<http://docs.php.net/manual/en/language.namespaces.php>
   L<http://wiki.php.net/rfc/namespaces>
   L<http://wiki.php.net/rfc/namespaceseparator>
+  L<http://wiki.php.net/rfc/backslashnamespaces>
   L<http://wiki.php.net/rfc/namespacecurlies>
   L<http://wiki.php.net/rfc/namespaceref>
   L<http://inside.webfactory.de/en/blog/php-namespaces-explained.html>

@@ -100,6 +100,20 @@ method inline_sea_short_tag($/) {
         );
 }
 
+method namespace_statement($/) {
+    our $?NS := ~$<NAMESPACE_NAME>; 
+    my $past := PAST::Op.new(
+                    :pasttype('call'),
+                    :name('echo'),
+                    :node($/),
+                    PAST::Val.new(
+                        :value('Encountered namespace: ' ~ $?NS ~ "\n"),
+                        :returns('PhpString'),
+                    ),
+                );
+    make $past;
+}
+
 method echo_statement($/) {
     my $past := $( $<arguments> );
     $past.name( 'echo' );
