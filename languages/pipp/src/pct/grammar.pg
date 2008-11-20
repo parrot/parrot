@@ -6,10 +6,7 @@
 grammar Pipp::Grammar is PCT::Grammar;
 
 # the starting rule
-token TOP {
-    ^ <sea_or_code>+
-    {*}
-}
+token TOP { ^ <sea_or_code>+ {*} }
 
 # whitespace and comments
 token ws {
@@ -24,18 +21,14 @@ token ws_all {
     ]
 }
 
-token ws_char {
-    [ \h | \v ]
-}
+token ws_char { [ \h | \v ] }
 
 token singlelinecomment {
       '#'  \N*
     | '//' \N*
 }
 
-token multilinecomment {
-    '/*' .*? '*/'
-}
+token multilinecomment { '/*' .*?  '*/' }
 
 # embedding code into a sea of text
 token sea_or_code {
@@ -76,25 +69,15 @@ regex CODE_START_SCRIPT_TAG {
     '>'
 }
 
-regex CODE_END_SCRIPT_TAG {
-    '</script' <ws_char>*: '>'
-}
+regex CODE_END_SCRIPT_TAG { '</script' <ws_char>*: '>' }
 
-token quoted_lang_name {
-    [ '"php"' | '\'php\'' ]
-}
+token quoted_lang_name { [ '"php"' | '\'php\'' ] }
 
-token CODE_START_ECHO_TAG {
-    '<?='
-}
+token CODE_START_ECHO_TAG { '<?=' }
 
-token CODE_START_SHORT_TAG {
-    '<?' 'php'?
-}
+token CODE_START_SHORT_TAG { '<?' 'php'?  }
 
-token CODE_END_SHORT_TAG {
-    '?>' \n?
-}
+token CODE_END_SHORT_TAG { '?>' \n?  }
 
 # block and statements
 rule block {
@@ -188,25 +171,15 @@ rule var_assign {
 
 
 # identifiers
-token FUNCTION_NAME {
-    <ident>
-}
+token FUNCTION_NAME { <ident> }
 
-token MEMBER_NAME {
-    <ident>
-}
+token MEMBER_NAME { <ident> }
 
-token METHOD_NAME {
-    <ident>
-}
+token METHOD_NAME { <ident> }
 
-token CONSTANT_NAME {
-    <ident>
-}
+token CONSTANT_NAME { <ident> }
 
-token CLASS_NAME {
-    <ident>
-}
+token CLASS_NAME { <ident> }
 
 token VAR_NAME {
     '$' <ident>
@@ -349,9 +322,7 @@ rule class_definition {
 
 
 token curly_interpolation {
-    '{'
-        <var>
-    '}'
+    '{' <var> '}'
     {*}
 }
 
