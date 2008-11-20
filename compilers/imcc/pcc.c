@@ -208,23 +208,41 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
         ARGIN(const char *op_name), int n,
         ARGIN_NULLOK(SymReg * const *args), ARGIN_NULLOK(const int *arg_flags))
 {
-    int i, flags;
-    char s[16];
-    SymReg ** const regs  = mem_allocate_n_zeroed_typed(n + 1, SymReg *);
-
     /* Notes:
      * The created string is in the format "\"(0x0010,0x0220,0x0010)\"".
      * flags always has exactly 4 hex digits.
      * The hex number at the end of the list has no "," but we can safely
-     * ignore this.  The terminal "0" in strlen should be a "\0", but has to be
-     * non-null to avoid confusing strlen().
+     * ignore this.
      */
-    unsigned int  bufpos  = 0;
-    unsigned int  bufsize = strlen("\"(") + (strlen("0xffff,") * n) + strlen(")\"0");
-    char         *buf     = mem_allocate_n_typed(bufsize, char);
+    static const char pref[] = {'"', '('};
+    static const char item[] = {'0', 'x', 'f', 'f', 'f', 'f', ','};
+    /* The list suffix includes the '\0' terminator */
+    static const char subf[] = {')', '"', '\0'};
+    static unsigned int lenpref = sizeof pref;
+    static unsigned int lenitem = sizeof item;
+    static unsigned int lensubf = sizeof subf;
+    int i, flags;
+    char s[16];
 
-    strcpy(buf, "\"(");
-    bufpos += strlen("\"(");
+    /* Avoid allocations on frequent number of params.
+     * Arbitrary value, some fine tunning may be good.
+     */
+    #define PCC_GET_ARGS_LIMIT 15
+    SymReg *regcache[PCC_GET_ARGS_LIMIT + 1];
+    char bufcache[lenpref + lenitem * PCC_GET_ARGS_LIMIT + lensubf];
+
+    SymReg ** const regs  = n < PCC_GET_ARGS_LIMIT ?
+        regcache :
+        mem_allocate_n_zeroed_typed(n + 1, SymReg *);
+
+    unsigned int  bufpos  = 0;
+    unsigned int  bufsize = lenpref + lenitem * n + lensubf;
+    char         *buf     = n < PCC_GET_ARGS_LIMIT ?
+        bufcache :
+        mem_allocate_n_typed(bufsize, char);
+
+    memcpy(buf, pref, lenpref);
+    bufpos += lenpref;
     for (i = 0; i < n; i++) {
         SymReg *arg = args[i];
 
@@ -261,24 +279,27 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
 
 
         snprintf(s, sizeof (s), "0x%.4x,", flags);
-        if (bufpos+strlen("0xffff,") >= bufsize)
+        if (bufpos+lenitem >= bufsize)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERNAL_PANIC,
                     "arg string is longer than allocated buffer");
-        strncpy(buf+bufpos, s, strlen("0xffff,"));
-        bufpos += strlen("0xffff,");
+        memcpy(buf+bufpos, s, lenitem);
+        bufpos += lenitem;
     }
 
     /* Backtrack over the ending comma if this is a non-empty list. */
-    if (bufpos != strlen("\"("))
+    if (bufpos != lenpref)
         bufpos--;
-    strcpy(buf+bufpos, ")\"");
+    memcpy(buf+bufpos, subf, lensubf);
 
     regs[0] = mk_const(interp, buf, 'S');
     ins     = insINS(interp, unit, ins, op_name, regs, n + 1);
 
-    mem_sys_free(regs);
-    mem_sys_free(buf);
+    if (n >= PCC_GET_ARGS_LIMIT) {
+        mem_sys_free(regs);
+        mem_sys_free(buf);
+    }
     return ins;
+    #undef PCC_GET_ARGS_LIMIT
 }
 
 /*
