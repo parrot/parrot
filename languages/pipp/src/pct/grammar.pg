@@ -173,15 +173,20 @@ rule var_assign {
 
 
 # identifiers
-token FUNCTION_NAME { <ident> }
+#
+token CLASS_NAME      { <ident> }
 
-token MEMBER_NAME { <ident> }
+token CONSTANT_NAME   { <ident> }
 
-token METHOD_NAME { <ident> }
+token FUNCTION_NAME   { <ident> }
 
-token CONSTANT_NAME { <ident> }
+token INTERFACE_NAME  { <ident> }
 
-token CLASS_NAME { <ident> }
+token MEMBER_NAME     { <ident> }
+
+token METHOD_NAME     { <ident> }
+
+# namespace support
 
 token NAMESPACE_SEPARATOR { '\\' }
 
@@ -303,13 +308,31 @@ token EXIT_FUNCTION_DEF {
     {*}
 }
 
-rule method_definition {
-    'function' <METHOD_NAME> <param_list> <block>
+rule param_list {
+    '(' [ <VAR_NAME> [',' <VAR_NAME>]* ]? ')'
     {*}
 }
 
-rule param_list {
-    '(' [ <VAR_NAME> [',' <VAR_NAME>]* ]? ')'
+# OO
+
+rule interface_definition {
+    'interface' <INTERFACE_NAME> [ 'implements' <INTERFACE_NAME> ]? '{'
+        <method_declaration>*
+    '}'
+    {*}
+}
+
+
+rule class_definition {
+    'class' <CLASS_NAME> [ 'implements' <INTERFACE_NAME> ]? '{'
+        <member_definition>*
+        <method_definition>*
+    '}'
+    {*}
+}
+
+rule method_declaration {
+    'function' <METHOD_NAME> <param_list> ';'
     {*}
 }
 
@@ -318,13 +341,11 @@ rule member_definition {
     {*}
 }
 
-rule class_definition {
-    'class' <CLASS_NAME> '{'
-        <member_definition>*
-        <method_definition>*
-    '}'
+rule method_definition {
+    'function' <METHOD_NAME> <param_list> <block>
     {*}
 }
+
 
 
 token curly_interpolation {
