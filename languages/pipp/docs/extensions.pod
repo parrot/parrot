@@ -4,9 +4,10 @@
 
 extensions - How Pipp supports PHP extensions
 
-=head1 Technical notes
+=head1 Implementation in Pipp
 
-Currently there is no support at all for extensions.
+Currently, Pipp has no support at all for extensions.
+
 =head1 AUTHOR
 
 Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>

@@ -1,0 +1,38 @@
+# $Id$
+
+=head1 TITLE
+
+namespaces - Notes on namespaces in PHP
+
+=head1 Description
+
+A namespace is introduced with the keyword B<namespace>.
+There can be multiple namespaces per file. They are not nested.
+Namespaces don't carry over to included files.
+B<define()> doesn't define in the current namespace.
+The backslash character serves as the namespace separator.
+Short names can be defined with B<use>.
+Only classes, functions and constants are namespaced.
+The current namespace can be queried with B<__NAMESPACE__>.
+Namespaces are case insensitive.
+No global code can precede the first B<namespace> directive.
+
+=head1 Implementation in Pipp
+
+Currently there is no support for namespaces in Pipp.
+
+=head1 AUTHOR
+
+Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
+
+=head1 SEE ALSO
+
+  L<http://docs.php.net/manual/en/language.namespaces.php>
+  L<http://wiki.php.net/rfc/namespaces>
+  L<http://wiki.php.net/rfc/namespaceseparator>
+  L<http://wiki.php.net/rfc/namespacecurlies>
+  L<http://wiki.php.net/rfc/namespaceref>
+  L<http://inside.webfactory.de/en/blog/php-namespaces-explained.html>
+  L<http://marc.info/?l=php-internals&m=121527668606247>
+
+=cut
