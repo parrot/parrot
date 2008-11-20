@@ -8,20 +8,19 @@ grammar Pipp::Grammar is PCT::Grammar;
 # the starting rule
 token TOP { ^ <sea_or_code>+ {*} }
 
-# whitespace and comments
+# whitespace rule used implicity by rules
 token ws {
       <!ww> <ws_all>+
     | <ws_all>*
 }
 
 token ws_all {
-    [ <.ws_char>
+      <.ws_char>
     | <singlelinecomment>
     | <multilinecomment>
-    ]
 }
 
-token ws_char { [ \h | \v ] }
+token ws_char { \h | \v }
 
 token singlelinecomment {
       '#'  \N*
@@ -71,7 +70,7 @@ regex CODE_START_SCRIPT_TAG {
 
 regex CODE_END_SCRIPT_TAG { '</script' <ws_char>*: '>' }
 
-token quoted_lang_name { [ '"php"' | '\'php\'' ] }
+token quoted_lang_name { '"php"' | '\'php\'' }
 
 token CODE_START_ECHO_TAG { '<?=' }
 
