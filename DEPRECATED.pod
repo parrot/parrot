@@ -4,8 +4,7 @@
 
 This is a list of currently deprecated features of Parrot.  Every deprecation
 has an associated RT ticket.  Each item indicates the last release it's
-guaranteed to appear in.  Items marked with a release of ??? are still
-deprecated, but a firm deadline for their removal has not yet been established.
+guaranteed to appear in.
 
 When deprecated items are removed, all usage of the feature in the
 repository should be updated or removed; including documentation.
@@ -106,7 +105,7 @@ See RT #46715.
 
 See RT #48877.
 
-=item * Assignment syntax with opcodes [post ???]
+=item * Assignment syntax with opcodes [post 0.8.2]
 
 See RT #36283.  When the first argument of an opcode is C<OUT>, then
 the assignment syntax will be allowed, as it is today.
