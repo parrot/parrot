@@ -40,17 +40,17 @@ Inspired by computer language shootout.
         arr_size = opt['arr-size']
 use_default_arr_size:
 
-    _bench( .Array, arr_size )
-    _bench( .FixedFloatArray, arr_size )
-    _bench( .FixedIntegerArray, arr_size )
-    _bench( .FixedPMCArray, arr_size )
-    _bench( .FixedStringArray, arr_size )
-    _bench( .IntList, arr_size )
-    _bench( .ResizableFloatArray, arr_size )
-    _bench( .ResizableIntegerArray, arr_size )
-    _bench( .ResizablePMCArray, arr_size )
-    _bench( .ResizableStringArray, arr_size )
-    _bench( .SArray, arr_size )
+    _bench( 'Array', arr_size )
+    _bench( 'FixedFloatArray', arr_size )
+    _bench( 'FixedIntegerArray', arr_size )
+    _bench( 'FixedPMCArray', arr_size )
+    _bench( 'FixedStringArray', arr_size )
+    _bench( 'IntList', arr_size )
+    _bench( 'ResizableFloatArray', arr_size )
+    _bench( 'ResizableIntegerArray', arr_size )
+    _bench( 'ResizablePMCArray', arr_size )
+    _bench( 'ResizableStringArray', arr_size )
+    _bench( 'SArray', arr_size )
 .end
 
 =head2 void bench( int arr_class, int arr_size )
@@ -58,7 +58,7 @@ use_default_arr_size:
 =cut
 
 .sub _bench
-    .param int arr_class
+    .param string arr_class
     .param int arr_size
 
     # Two arrays with fixed size
