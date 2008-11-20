@@ -194,10 +194,10 @@ Get/set the opcode type for this node.
 .end
 
 
-.sub 'lexid' :method
+.sub 'subid' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .tailcall self.'attr'('lexid', value, has_value)
+    .tailcall self.'attr'('subid', value, has_value)
 .end
 
 

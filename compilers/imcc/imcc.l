@@ -354,7 +354,7 @@ SP              [ ]
 <emit,INITIAL>":vtable"    return VTABLE_METHOD;
 ":unique_reg"              return UNIQUE_REG;
 ":instanceof"              return SUB_INSTANCE_OF;
-":lexid"                   return SUB_LEXID;
+":subid"                   return SUB_LEXID;
 
 ".result"                  return RESULT;
 ".get_results"             return GET_RESULTS;

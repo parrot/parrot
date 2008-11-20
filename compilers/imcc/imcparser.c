@@ -1537,7 +1537,7 @@ static const char *const yytname[] =
   "@2", "@3", "any_string", "pasmcode", "pasmline", "pasm_inst", "@4",
   "@5", "pasm_args", "emit", "@6", "opt_pasmcode", "class_namespace",
   "maybe_ns", "sub", "@7", "@8", "@9", "sub_params", "sub_param", "@10",
-  "sub_param_type_def", "multi", "outer", "vtable", "instanceof", "lexid",
+  "sub_param_type_def", "multi", "outer", "vtable", "instanceof", "subid",
   "multi_types", "multi_type", "sub_body", "pcc_sub_call", "@11",
   "opt_label", "opt_invocant", "sub_proto", "sub_proto_list", "proto",
   "pcc_call", "pcc_args", "pcc_arg", "pcc_results", "pcc_result", "@12",
@@ -3264,7 +3264,7 @@ yyreduce:
 #line 1074 "compilers/imcc/imcc.y"
     {
            (yyval.t) = 0;
-           IMCC_INFO(interp)->cur_unit->lexid = mk_const(interp, (yyvsp[(3) - (4)].s), 'S');
+           IMCC_INFO(interp)->cur_unit->subid = mk_const(interp, (yyvsp[(3) - (4)].s), 'S');
            mem_sys_free((yyvsp[(3) - (4)].s));
          }
     break;

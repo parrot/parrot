@@ -221,7 +221,7 @@ newline or semicolon after an end keyword."
 (defvar pir-dollar-register-regexp "\\$[INPS][0-9]+")
 
 (defvar pir-directives
-  '(":anon" ":flat" ":init" ":lex" ":lexid" ":load" ":main" ":method" ":multi"
+  '(":anon" ":flat" ":init" ":lex" ":subid" ":load" ":main" ":method" ":multi"
     ":named" ":opt_count" ":opt_flag" ":optional" ":outer" ":postcomp"
     ":slurpy" ":unique_reg" ":vtable" ":wrap"))
 

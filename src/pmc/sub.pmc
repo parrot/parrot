@@ -397,8 +397,8 @@ Marks the sub as live.
             pobject_lives(INTERP, (PObj *) sub->outer_sub);
         if (!PMC_IS_NULL(sub->eval_pmc))
             pobject_lives(INTERP, (PObj *) sub->eval_pmc);
-        if (sub->lexid)
-            pobject_lives(INTERP, (PObj *) sub->lexid);
+        if (sub->subid)
+            pobject_lives(INTERP, (PObj *) sub->subid);
         if (sub->ctx)
             mark_context(interp, sub->ctx);
     }
@@ -478,7 +478,7 @@ Archives the subroutine.
          * - n_regs_used[i]
          * - lex_info
          * - vtable_index
-         * - lexid
+         * - subid
          */
 
         VTABLE_push_integer(INTERP, io, (INTVAL) sub->start_offs);
@@ -500,9 +500,9 @@ Archives the subroutine.
         for (i = 0; i < 4; ++i)
             VTABLE_push_integer(INTERP, io, sub->n_regs_used[i]);
 
-        if (!sub->lexid)
-            sub->lexid = CONST_STRING(INTERP, "");
-        VTABLE_push_string(INTERP, io, sub->lexid);
+        if (!sub->subid)
+            sub->subid = CONST_STRING(INTERP, "");
+        VTABLE_push_string(INTERP, io, sub->subid);
     }
 
 /*
@@ -540,7 +540,7 @@ Unarchives the subroutine.
             for (i = 0; i < 4; ++i)
                 sub->n_regs_used[i] = VTABLE_shift_integer(INTERP, io);
 
-            sub->lexid        = VTABLE_shift_string(INTERP, io);
+            sub->subid        = VTABLE_shift_string(INTERP, io);
         }
     }
 

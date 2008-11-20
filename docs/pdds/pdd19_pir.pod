@@ -509,10 +509,6 @@ C<self>, as with the B<:method> flag.
 The marked C<.sub> is lexically nested within the sub known by
 I<subname>.
 
-=item :lexid( <string_constant> )
-
-Deprecated; see RT#60592. C<:lexid> will be renamed to C<:subid>.
-
 =item :subid( <string_constant> )
 
 Specifies a unique string identifier for the subroutine. This is useful for

@@ -1046,7 +1046,7 @@ find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
         return NULL;
 
     for (s = IMCC_INFO(interp)->globals->cs->first; s; s = s->next) {
-        if (STREQ(s->unit->lexid->name, unit->outer->name)) {
+        if (STREQ(s->unit->subid->name, unit->outer->name)) {
             PObj_get_FLAGS(s->unit->sub_pmc) |= SUB_FLAG_IS_OUTER;
             return s->unit->sub_pmc;
         }
@@ -1155,19 +1155,19 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     r->color  = add_const_str(interp, r);
     sub->name = ct->constants[r->color]->u.string;
 
-    /* If the unit has no lexid, set the lexid to match the name. */
-    if (!unit->lexid)
-        unit->lexid = r;
+    /* If the unit has no subid, set the subid to match the name. */
+    if (!unit->subid)
+        unit->subid = r;
     else {
         /* trim the quotes  */
-        unit->lexid->name = str_dup(unit->lexid->name + 1);
+        unit->subid->name = str_dup(unit->subid->name + 1);
 
         /* Otherwise, create string constant for it. */
-        unit->lexid->name[strlen(unit->lexid->name) - 1] = 0;
-        unit->lexid->color = add_const_str(interp, unit->lexid);
+        unit->subid->name[strlen(unit->subid->name) - 1] = 0;
+        unit->subid->color = add_const_str(interp, unit->subid);
     }
 
-    sub->lexid = ct->constants[unit->lexid->color]->u.string;
+    sub->subid = ct->constants[unit->subid->color]->u.string;
     ns_pmc     = NULL;
 
     if (ns_const >= 0 && ns_const < ct->const_count) {

@@ -67,7 +67,7 @@ struct _IMC_Unit {
     char             *vtable_name;      /* v-table method name, if any */
     char             *instance_of;      /* PMC or class this is an instance of
                                          * if any */
-    SymReg           *lexid;            /* Unique lexical scope id */
+    SymReg           *subid;            /* Unique subroutine id */
 
     struct            imcc_ostat ostat;
 };

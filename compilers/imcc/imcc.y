@@ -735,7 +735,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %type <t> argtype_list argtype paramtype_list paramtype
 %type <t> pcc_return_many
 %type <t> proto sub_proto sub_proto_list multi multi_types outer
-%type <t> vtable instanceof lexid
+%type <t> vtable instanceof subid
 %type <i> instruction assignment conditional_statement labeled_inst opt_label op_assign
 %type <i> if_statement unless_statement
 %type <i> func_assign get_results
@@ -1069,11 +1069,11 @@ instanceof:
          }
    ;
 
-lexid:
+subid:
      SUB_LEXID '(' STRINGC ')'
          {
            $$ = 0;
-           IMCC_INFO(interp)->cur_unit->lexid = mk_const(interp, $3, 'S');
+           IMCC_INFO(interp)->cur_unit->subid = mk_const(interp, $3, 'S');
            mem_sys_free($3);
          }
    ;
@@ -1196,7 +1196,7 @@ proto:
    | outer
    | vtable
    | instanceof
-   | lexid
+   | subid
    ;
 
 pcc_call:

@@ -1296,7 +1296,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "RT #56398:  Patrick's request" );
     foo('try 3')
 .end
 
-.sub 'foo' :lexid('foo')
+.sub 'foo' :subid('foo')
     .param pmc x
     .lex '$x', x
     print "outer foo "

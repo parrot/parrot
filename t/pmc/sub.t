@@ -1469,7 +1469,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', ':outer with identical sub names' );
 .end
 
 .namespace ['ABC']
-.sub 'outer' :lexid('abc_outer')
+.sub 'outer' :subid('abc_outer')
     .param pmc x
     .lex '$abc', x
     say 'ABC::outer'
@@ -1483,7 +1483,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', ':outer with identical sub names' );
 .end
 
 .namespace ['DEF']
-.sub 'outer' :lexid('def_outer')
+.sub 'outer' :subid('def_outer')
     .param pmc x
     .lex '$def', x
     say 'DEF::outer'
@@ -1504,7 +1504,7 @@ DEF::inner
 DEF lex
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', ':lexid and identical string constants' );
+pir_output_is( <<'CODE', <<'OUTPUT', ':subid and identical string constants' );
 .sub 'main'
     'foo'()
     'bar'()
@@ -1516,7 +1516,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', ':lexid and identical string constants' );
     say $P0
 .end
 
-.sub 'bar'  :lexid("abc")
+.sub 'bar'  :subid("abc")
     new $P0, "String"
     assign $P0, "abc"
     say $P0

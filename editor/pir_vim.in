@@ -45,7 +45,7 @@ syn match pirDirective  /\.\(pcc_begin\|pcc_call\|pcc_end\|invocant\|meth_call\|
 syn match pirDirective  /\.\(pcc_begin_return\|pcc_end_return\)/
 syn match pirDirective  /\.\(pcc_begin_yield\|pcc_end_yield\)/
 
-syn match pirDirective  /:\(main\|method\|load\|init\|anon\|multi\|immediate\|outer\|lex\|vtable|lexid\)/
+syn match pirDirective  /:\(main\|method\|load\|init\|anon\|multi\|immediate\|outer\|lex\|vtable|subid\)/
 syn match pirDirective  /:\(flat\|slurpy\|optional\|opt_flag\|named\)/
 
 " Macro invocation
