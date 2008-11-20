@@ -35,3 +35,9 @@
     function  = dlfunc libname, 'sqlite3_close', 'ip'
     set_root_global namespace_key, 'close', function
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
