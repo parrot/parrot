@@ -4,7 +4,7 @@
 
 namespaces - Notes on namespaces in PHP
 
-=head1 Description
+=head1 Namespaces in Pipp
 
 A namespace is introduced with the keyword B<namespace>.
 There can be multiple namespaces per file. They are not nested.
@@ -20,7 +20,16 @@ Free code is disallowed within namespaces.
 
 =head1 Implementation in Pipp
 
-Currently there is no support for namespaces in Pipp.
+Currently the namespace directive is only parsed.
+
+In order to ease implementation and testing, there will be
+some divergences in Pipp. 
+Code before the first namespace directive is allowed.
+Free code within namespace is allowed.
+There will be namespaced variables as well.
+'namespace \;' indicates the return to the root namespace.
+
+
 
 =head1 AUTHOR
 

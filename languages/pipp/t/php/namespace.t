@@ -20,7 +20,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 4;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'parsing of namespace directive' );
 <?php
@@ -35,10 +35,68 @@ Encountered namespace: A\B
 Encountered namespace: \A\B\C
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with dummy class', todo => 'no implemented yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with constant', todo => 'no implemented yet' );
 <?php
 
-namespace A::B;
+const FOO = "FOO in root.\n";
+
+namespace A\B;
+
+const FOO  = "FOO in A::B\n";
+
+echo FOO;
+echo A\B\FOO;
+echo \FOO;
+
+namespace \;
+ 
+echo FOO;
+echo A\B\FOO;
+echo \FOO;
+
+?>
+CODE
+FOO in A::B
+FOO in A::B
+FOO in root
+FOO in root
+FOO in A::B
+FOO in root
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with variable', todo => 'no implemented yet' );
+<?php
+
+$FOO = "FOO in root.\n";
+
+namespace A\B;
+
+$FOO  = "FOO in A::B\n";
+
+echo $FOO;
+echo $A\B\FOO;
+echo $\FOO;
+
+namespace \;
+ 
+echo $FOO;
+echo $A\B\FOO;
+echo $\FOO;
+
+?>
+CODE
+FOO in A::B
+FOO in A::B
+FOO in root
+FOO in root
+FOO in A::B
+FOO in root
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with class', todo => 'no implemented yet' );
+<?php
+
+namespace A\B;
 
 class Dings {
     
