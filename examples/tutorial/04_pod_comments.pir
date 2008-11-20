@@ -1,6 +1,6 @@
 =head1 Pod Documentation
 
-As you may have noticed, PIR files can contain Pod documentation.
+As you may have noticed, PIR files can contain POD documentation.
 
 =cut
 

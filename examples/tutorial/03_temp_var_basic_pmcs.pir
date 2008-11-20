@@ -1,13 +1,16 @@
 =head1 Basic PMC Types
 
 PMCs are objects, so to use a PMC, you first have to instantiate an object for
-the PMC using the 'new' opcode.
+the PMC using the 'new' opcode and the name of the class to instantiate it
+in.
 
 The simple data types have a corresponding PMC type. The Integer type is like
 $I0, the Float type is like $N0, and the String type is like $S0.
 
 Any data type more complex than a simple integer, float, or string (such as an
-array or hash) is also a PMC.
+array or hash) is also a PMC. Some PMC types are built into Parrot directly.
+Some can be loaded as a dynpmc. Some types are defined as classes in PIR
+code. We'l talk about some of these other types later.
 
 =cut
 

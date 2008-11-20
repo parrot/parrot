@@ -1,7 +1,10 @@
 =head1 Math Operations (continued)
 
-Some math operations have an opcode name, but no simple operator syntax in PIR,
-so you use the opcode name directly.
+Some math operations have an opcode name, but no simple operator syntax in
+PIR. In these cases you can use the opcode name directly.
+
+For a large list of the various mathematical operations supported by Parrot,
+see the documenation at F<src/ops/math.ops>.
 
 =cut
 

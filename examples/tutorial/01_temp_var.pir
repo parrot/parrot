@@ -1,11 +1,14 @@
 =head1 Simple Variables
 
-PIR has two kinds of variables. The most simple kind are the temporary variables
-(also called "symbolic registers"). The names of these variables consist of a
-dollar sign followed by a single letter and an integer.
-The letter in the name corresponds to the type of the variable,
-I for integer, N for number (float), S for string,
-and P for PMC (any kind of object).
+PIR has two kinds of variables. The most simple kind are Parrot
+registers. Registers are named with a dollar sign followed by a single
+letter type indicator and an integer. The letter in the name corresponds
+to the type of the variable, I for integer, N for number (float), S for
+string, and P for PMC (any kind of object). There are an unlimited
+number of each type of register per call frame, and you can use them
+in any order.
+
+The C<=> symbol can be used to assign a value to one of these registers.
 
 =cut
 

@@ -1,14 +1,15 @@
 =head1 Math Operations (continued)
 
-The second common form of math operation takes one argument and performs the
-operation on the result, modifying it in place.
+There is a second common form of math operations. This form takes
+one argument and performs the operation on the result, modifying it in
+place.
 
 =cut
 
 .sub main :main
 
     $I0 = 3
-    $I0 *= 2
+    $I0 *= 2 
     say $I0
 
     $N0 = 22.44
