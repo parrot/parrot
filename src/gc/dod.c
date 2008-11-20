@@ -298,14 +298,8 @@ Parrot_dod_trace_root(PARROT_INTERP, int trace_stack)
     pobject_lives(interp, (PObj *)interp->root_namespace);
 
     /* mark the concurrency scheduler */
-    if (interp->scheduler) {
-        /* the scheduler is a constant PMC, but it's an aggregate
-         * clearing the live flag here forces it to mark its children
-         * but it won't get collected during global destruction before tasks do
-         * See RT #60622 for the symptom of that problem */
-        PObj_live_CLEAR((PObj *)interp->scheduler);
+    if (interp->scheduler)
         pobject_lives(interp, (PObj *)interp->scheduler);
-    }
 
     /* s. packfile.c */
     mark_const_subs(interp);
@@ -1125,6 +1119,15 @@ Parrot_dod_ms_run(PARROT_INTERP, UINTVAL flags)
         clear_live_bits(interp->arena_base->pmc_pool);
         clear_live_bits(interp->arena_base->constant_pmc_pool);
 
+        /* keep the scheduler and its kids alive for Task-like PMCs to destroy
+         * themselves; run a sweep to collect them */
+        if (interp->scheduler) {
+            pobject_lives(interp, (PObj *)interp->scheduler);
+            VTABLE_mark(interp, interp->scheduler);
+            Parrot_dod_sweep(interp, interp->arena_base->pmc_pool);
+        }
+
+        /* now sweep everything that's left */
         Parrot_dod_sweep(interp, interp->arena_base->pmc_pool);
         Parrot_dod_sweep(interp, interp->arena_base->constant_pmc_pool);
 
