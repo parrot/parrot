@@ -96,8 +96,9 @@
 .sub 'translate' :method
     .local string pir
     pir = <<'PIRCODE'
+.HLL 'WMLScript'
+.loadlib 'wmls_group'
 .loadlib 'wmls_ops'
-.HLL 'WMLScript', 'wmls_group'
 
 .sub '__onload' :load :anon
 

@@ -16,8 +16,9 @@ See "WMLScript Standard Libraries Specification", section 7 "Lang".
 
 =cut
 
+.HLL 'WMLScript'
+.loadlib 'wmls_group'
 .loadlib 'wmls_ops'
-.HLL 'WMLScript', 'wmls_group'
 
 
 .sub 'getLang'

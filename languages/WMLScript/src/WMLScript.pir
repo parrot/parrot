@@ -1,8 +1,9 @@
 # Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
+.HLL 'WMLScript'
+.loadlib 'wmls_group'
 .loadlib 'wmls_ops'
-.HLL 'WMLScript', 'wmls_group'
 
 .include 'languages/WMLScript/src/wmlsstdlibs.pir'
 .include 'languages/WMLScript/src/stdlibs.pir'

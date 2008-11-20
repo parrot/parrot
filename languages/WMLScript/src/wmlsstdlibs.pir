@@ -23,8 +23,9 @@ See "WMLScript Standard Libraries Specification".
 
 =cut
 
+.HLL 'WMLScript'
+.loadlib 'wmls_group'
 .loadlib 'wmls_ops'
-.HLL 'WMLScript', 'wmls_group'
 
 .sub '__onload' :load :anon
 #    print "__onload (wmlsstdlibs.pir)\n"

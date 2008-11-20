@@ -13,8 +13,9 @@ See "WMLScript Reference UP.SDK R4.B3 - October 1999".
 
 =cut
 
+.HLL 'WMLScript'
+.loadlib 'wmls_group'
 .loadlib 'wmls_ops'
-.HLL 'WMLScript', 'wmls_group'
 
 
 .sub 'getConsole'
