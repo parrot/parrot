@@ -1,16 +1,10 @@
-#!perl
+#! parrot
 # Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 23;
-
 =head1 NAME
 
-t/oo/new.t - Test OO subclassing (instantiation)
+t/oo/subclass.t - Test OO subclassing (instantiation)
 
 =head1 SYNOPSIS
 
@@ -22,517 +16,457 @@ Tests OO features related to subclassing.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate subclass from class object' );
+.include 'except_types.pasm'
+
 .sub main :main
-    $P0 = newclass "Pre"
-    $P1 = subclass $P0, "Foo"
-    $S1 = typeof $P1
-    say $S1
+    .include 'test_more.pir'
 
-    $I3 = isa $P1, "Class"
-    print $I3
-    print "\n"
+    plan(70)
 
-    $P2 = new $P1
-
-    $S1 = typeof $P2
-    say $S1
-
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
-
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    instance_sub_class_from_class_object()
+    manually_create_anon_class_object()
+    manually_create_named_class_object()
+    instance_from_class_object_method()
+    instance_from_string_name()
+    instance_from_string_register()
+    instance_from_string_pmc_name()
+    instance_from_key_name()
+    instance_from_key_pmc_name()
+    instance_from_class_object_init()
+    instance_from_string_name_init()
+    instance_from_string_register_name_init()
+    instance_from_string_pmc_name_init()
+    instance_from_key_name_init()
+    subclasses_within_other_namespaces()
+    call_inherited_method()
+    call_inherited_init_vtable_overrides()
+    set_inherited_attribute_by_parent_key()
+    can_not_add_same_parent_twice()
+    can_not_be_own_parent()
+    can_not_be_own_ancestor()
+    no_loop_in_hierarchy()
+    subclass_does_what_parent_does()
 .end
-CODE
-Class
-1
-Foo
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'manually create anonymous class object' );
-.sub main :main
-    .local pmc parent, class_init_args, parent_list
-    parent = new "Class"
+.sub instance_sub_class_from_class_object
+    #instance_subclass_from_class_object
+    .local pmc parent_class, foo_class, foo_object
+
+    parent_class = newclass "PreFoo"
+    foo_class = subclass parent_class, "Foo"
+
+    $S1 = typeof foo_class 
+    is ($S1, 'Class', 'created Foo as subclass of Pre')
+
+    $I3 = isa foo_class, "Class"
+    ok ($I3, 'Foo isa Class')
+
+    foo_object = new foo_class 
+    $S1 = typeof foo_object
+    is ($S1, 'Foo', 'instance is typeof Foo')
+
+    $I3 = isa foo_object, "Foo"
+    ok ($I3, 'instance Foo isa Foo')
+
+    $I3 = isa foo_object, "Object"
+    ok ($I3, 'instance Foo isa Object')
+
+.end
+
+.sub manually_create_anon_class_object
+    # manually create anonymous class object' );
+    .local pmc parent_class, class_init_args, parent_list
+    .local pmc anon_class, anon_object
+
+    parent_class = new "Class"
     class_init_args = new 'Hash'
     parent_list = new 'ResizablePMCArray'
-    push parent_list, parent
+
+    push parent_list, parent_class
     class_init_args['parents'] = parent_list
-    $P1 = new "Class", class_init_args
-    $S1 = typeof $P1
-    say $S1
 
-    $I3 = isa $P1, "Class"
-    print $I3
-    print "\n"
+    anon_class = new "Class", class_init_args
+    $S1 = typeof anon_class
+    is ($S1, 'Class', 'create new instance of Class')
 
-    $P2 = new $P1
+    $I3 = isa anon_class, "Class"
+    ok ($I3, 'new instance isa Class')
 
-    $S1 = typeof $P2
-    print "'"
-    print $S1
-    print "'\n"
+    anon_object = new anon_class
 
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
+    $S1 = typeof anon_object
+    is ($S1, '', 'instance has typeof empty string')
 
-    $I3 = isa $P2, parent
-    print $I3
-    print "\n"
+    $I3 = isa anon_object, "Foo"
+    nok ($I3, 'instance not isa Foo')
 
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    $I3 = isa anon_object, parent_class
+    ok ($I3, 'instance isa parent')
+
+    $I3 = isa anon_object, "Object"
+    ok ($I3, 'instance isa Object')
+
 .end
-CODE
-Class
-1
-''
-0
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'manually create named class object' );
-.sub main :main
-    .local pmc parent, class_init_args, parent_list
-    parent = new "Class"
+.sub manually_create_named_class_object
+    # manually create named class object
+    .local pmc parent_class, class_init_args, parent_list
+    .local pmc bar_class, bar_object
+    parent_class = new "Class"
+
     class_init_args = new 'Hash'
     parent_list = new 'ResizablePMCArray'
-    push parent_list, parent
+    push parent_list, parent_class
     class_init_args['parents'] = parent_list
-    $P1 = new "Class", class_init_args
-    $P1.'name'("Foo")
-    $S1 = typeof $P1
-    say $S1
 
-    $I3 = isa $P1, "Class"
-    print $I3
-    print "\n"
+    bar_class = new "Class", class_init_args
+    bar_class.'name'("Bar")
 
-    $P2 = new $P1
+    $S1 = typeof bar_class
+    is ($S1, 'Class', 'create new instance of Class')
 
-    $S1 = typeof $P2
-    say $S1
+    $I3 = isa bar_class, "Class"
+    ok ($I3, 'instance isa Class')
 
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
+    bar_object = new bar_class
+    $S1 = typeof bar_object
+    is ($S1, 'Bar', 'instance is typeof Bar')
 
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    $I3 = isa bar_object, "Bar"
+    ok ($I3, 'instance isa Bar')
+
+    $I3 = isa bar_object, "Object"
+    ok ($I3, 'instance isa Object')
+
 .end
-CODE
-Class
-1
-Foo
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from class object method' );
-.sub main :main
-    $P0 = newclass "Pre"
-    $P1 = subclass "Pre", "Foo"
-    $P2 = $P1.'new'()
+.sub instance_from_class_object_method
+    # instantiate from class object method
+    .local pmc parent_class, baz_class, baz_object 
+    parent_class = newclass "PreBaz"
+    baz_class = subclass "PreBaz", "Baz"
+    baz_object = baz_class.'new'()
 
-    $S1 = typeof $P2
-    say $S1
+    $S1 = typeof baz_object
+    is ($S1, "Baz", "instance is typeof Baz")
 
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
+    $I3 = isa baz_object, "Baz"
+    ok ($I3, "instance isa Baz")
 
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    $I3 = isa baz_object, "Object"
+    ok ($I3, "instance isa Object")
+
 .end
-CODE
-Foo
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string name' );
-.sub main :main
-    $P0 = newclass "Pre"
-    $P1 = subclass "Pre", "Foo"
-    $P2 = new 'Foo'
+.sub instance_from_string_name
+    # instantiate from string name
+    .local pmc parent_class, qux_class, qux_object 
+    parent_class = newclass "PreQux"
+    qux_class = subclass "PreQux", "Qux"
+    qux_object = new 'Qux'
 
-    $S1 = typeof $P2
-    say $S1
+    $S1 = typeof qux_object
+    is ($S1, 'Qux', 'instance is typeof Qux')
 
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
+    $I3 = isa qux_object, "Qux"
+    ok ($I3, 'instance isa Qux')
 
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    $I3 = isa qux_object, "Object"
+    ok ($I3, 'instance isa Object')
+
 .end
-CODE
-Foo
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string register name' );
-.sub main :main
-    $P0 = newclass "Pre"
-    $P1 = subclass "Pre", "Foo"
-    $S1 = 'Foo'
-    $P2 = new $S1
+.sub instance_from_string_register
+    # instantiate from string register name
+    .local pmc parent_class, quux_class, quux_object
+    parent_class = newclass "PreQuux"
+    quux_class = subclass "PreQuux", "Quux"
+    $S1 = 'Quux'
+    quux_object = new $S1
 
-    $S1 = typeof $P2
-    say $S1
+    $S1 = typeof quux_object
+    is ($S1, 'Quux', 'instance is typeof Quux')
 
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
+    $I3 = isa quux_object, "Quux"
+    ok ($I3, 'instance isa Quux')
 
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    $I3 = isa quux_object, "Object"
+    ok ($I3, 'instance isa Object')
+
 .end
-CODE
-Foo
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string PMC name' );
-.sub main :main
-    $P0 = newclass "Pre"
-    $P1 = subclass "Pre", "Foo"
+.sub instance_from_string_pmc_name
+    # instantiate from string PMC name
+    .local pmc parent_class, bongo_class, bongo_object
+    parent_class = newclass "PreBongo"
+    bongo_class = subclass "PreBongo", "Bongo"
     $P3 = new 'String'
-    $P3 = 'Foo'
-    $P2 = new $P3
+    $P3 = 'Bongo'
+    bongo_object = new $P3
 
-    $S1 = typeof $P2
-    say $S1
+    $S1 = typeof bongo_object
+    is ($S1, 'Bongo', 'instance is typof Bongo')
 
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
+    $I3 = isa bongo_object, "Bongo"
+    ok ($I3, 'instance isa Bongo')
 
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    $I3 = isa bongo_object, "Object"
+    ok ($I3, 'instance isa Object')
+
 .end
-CODE
-Foo
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from key name' );
-.sub main :main
-    $P0 = newclass "Pre"
-    $P1 = subclass "Pre", ['Foo';'Bar']
-    $S1 = typeof $P1
-    say $S1
+.sub instance_from_key_name
+    # instantiate from key name'
+    .local pmc parent_class, foobar_class, foobar_object
+    parent_class = newclass "Zot"
+    foobar_class = subclass "Zot", ['Foo';'Bar']
+    $S1 = typeof foobar_class
+    is ($S1, 'Class', 'new class is typeof Class')
 
-    $I3 = isa $P1, "Class"
-    print $I3
-    print "\n"
+    $I3 = isa foobar_class, "Class"
+    ok ($I3, 'new class isa Class')
 
-    $P2 = new ['Foo';'Bar']
+    foobar_object = new ['Foo';'Bar']
 
-    $S1 = typeof $P2
-    say $S1
+    $S1 = typeof foobar_object
+    is ($S1, 'Foo;Bar', 'instance is typeof Foo;Bar')
 
-    $I3 = isa $P2, ['Foo';'Bar']
-    print $I3
-    print "\n"
+    $I3 = isa foobar_object, ['Foo';'Bar']
+    ok ($I3, 'instance isa Foo;Bar')
 
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    $I3 = isa foobar_object, "Object"
+    ok ($I3, 'instance isa Object')
+
 .end
-CODE
-Class
-1
-Foo;Bar
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from key PMC name', todo => 'create non-constant key' );
-.sub main :main
-    $P0 = newclass "Pre"
-    $P1 = subclass "Pre", ['Foo';'Bar']
-    $S1 = typeof $P1
-    say $S1
+.sub instance_from_key_pmc_name 
+    # instantiate from key PMC name
+    .local pmc parent_class, barbaz_class, barbaz_object
+    parent_class = newclass "Snork"
+    barbaz_class = subclass "Snork", ['Bar';'Baz']
+    $S1 = typeof barbaz_class
+    is ($S1, 'Class', 'new class is typeof Class')
 
-    $I3 = isa $P1, "Class"
-    print $I3
-    print "\n"
+    $I3 = isa barbaz_class, "Class"
+    ok ($I3, 'new class isa Class')
 
     # How do you set the value of a non-constant key PMC?
-    $P3 = new 'Key'
+    # $P3 = new 'Key'
+    # $P2 = new $P3
+    todo (0, 'set the value of a non-constant key PMC')
 
-    $P2 = new $P3
+    barbaz_object = new barbaz_class #remove this when todo is accomplished
 
-    $S1 = typeof $P2
-    say $S1
+    $S1 = typeof barbaz_object
+    is ($S1, 'Bar;Baz', 'instance is typeof Bar;Baz')
 
-    $I3 = isa $P2, 'Bar'
-    print $I3
-    print "\n"
+    $I3 = isa barbaz_object, 'Snork'
+    ok ($I3, 'instance isa Snork')
 
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    $I3 = isa barbaz_object, "Object"
+    ok ($I3, 'instance isa Object')
+
 .end
-CODE
-Class
-1
-Foo;Bar
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from class object with init' );
-.sub main :main
-    $P0 = newclass "Pre"
-    $P1 = subclass "Pre", "Foo"
-    addattribute $P1, 'data'
+.sub instance_from_class_object_init
+    # instantiate from class object with init
+    .local pmc parent_class, bork_class, bork_object
+    parent_class = newclass "Gork"
+    bork_class = subclass "Gork", "Bork"
+    addattribute bork_class, 'data'
     $P3 = new 'Hash'
     $P4 = new 'String'
-    $P4 = "data for Foo\n"
+    $P4 = "data for Gork\n"
     $P3['data'] = $P4
 
-    $P2 = new $P1, $P3
+    bork_object = new bork_class, $P3
 
-    $S1 = typeof $P2
-    say $S1
+    $S1 = typeof bork_object
+    is ($S1, 'Bork', 'instance is typeof Bork')
 
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
+    $I3 = isa bork_object, "Gork"
+    ok ($I3, 'instance isa Gork')
 
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    $I3 = isa bork_object, "Object"
+    ok ($I3, 'instance isa Object')
 
-    $P5 = getattribute $P2, 'data'
-    print $P5
+    $P5 = getattribute bork_object, 'data'
+    is ($P5, "data for Gork\n", 'read attribute data from instance of Bork')
+
 .end
-CODE
-Foo
-1
-1
-data for Foo
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string name with init' );
-.sub main :main
-    $P0 = newclass "Pre"
-    $P1 = subclass "Pre", "Foo"
-    addattribute $P1, 'data'
+.sub instance_from_string_name_init
+    # instantiate from string name with init
+    .local pmc parent_class, boogle_class, boogle_object
+    parent_class  = newclass "Froogle"
+    boogle_class = subclass "Froogle", "Boogle"
+    addattribute boogle_class, 'data'
     $P3 = new 'Hash'
     $P4 = new 'String'
-    $P4 = "data for Foo\n"
+    $P4 = "data for Boogle\n"
     $P3['data'] = $P4
 
-    $P2 = new 'Foo', $P3
+    boogle_object = new 'Boogle', $P3
 
-    $S1 = typeof $P2
-    say $S1
+    $S1 = typeof boogle_object
+    is ($S1, 'Boogle', 'instance is typeof Boogle')
 
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
+    $I3 = isa boogle_object, "Boogle"
+    ok ($I3, 'instance isa Boogle')
 
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    $I3 = isa boogle_object, "Object"
+    ok ($I3, 'instance isa Object')
 
-    $P5 = getattribute $P2, 'data'
-    print $P5
+    $P5 = getattribute boogle_object, 'data'
+    is ($P5, "data for Boogle\n", 'read attribute data from instance of Boogle')
+
 .end
-CODE
-Foo
-1
-1
-data for Foo
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string register name with init' );
-.sub main :main
-    $P0 = newclass "Pre"
-    $P1 = subclass "Pre", "Foo"
-    addattribute $P1, 'data'
+.sub instance_from_string_register_name_init
+    # instantiate from string register name with init
+    .local pmc parent_class, eek_class, eek_object
+    parent_class = newclass "Ook"
+    eek_class = subclass "Ook", "Eek"
+    addattribute eek_class, 'data'
     $P3 = new 'Hash'
     $P4 = new 'String'
-    $P4 = "data for Foo\n"
+    $P4 = "data for Eek\n"
     $P3['data'] = $P4
 
-    $S1 = 'Foo'
-    $P2 = new $S1, $P3
+    $S1 = 'Eek'
+    eek_object = new $S1, $P3
 
-    $S1 = typeof $P2
-    say $S1
+    $S1 = typeof eek_object
+    is ($S1, 'Eek', 'instance is typeof Eek')
 
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
+    $I3 = isa eek_object, "Eek"
+    ok ($I3, 'instance isa Eek')
 
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    $I3 = isa eek_object, "Object"
+    ok ($I3, 'instance isa Object')
 
-    $P5 = getattribute $P2, 'data'
-    print $P5
+    $P5 = getattribute eek_object, 'data'
+    is ($P5, "data for Eek\n", 'read attribute data from instance of Eek')
+
 .end
-CODE
-Foo
-1
-1
-data for Foo
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string PMC name with init' );
-.sub main :main
-    $P0 = newclass "Pre"
-    $P1 = subclass "Pre", "Foo"
-    addattribute $P1, 'data'
+#
+#pir_output_is( <<'CODE', <<'OUT', 'instantiate from string PMC name with init' );
+.sub instance_from_string_pmc_name_init
+    # instantiate from string PMC name with init
+    .local pmc parent_class, wobble_class, wobble_object
+    parent_class = newclass "Weeble"
+    wobble_class = subclass "Weeble", "Wobble"
+    addattribute wobble_class, 'data'
     $P3 = new 'Hash'
     $P4 = new 'String'
-    $P4 = "data for Foo\n"
+    $P4 = "data for Wobble\n"
     $P3['data'] = $P4
 
     $P6 = new 'String'
-    $P6 = 'Foo'
-    $P2 = new $P6, $P3
+    $P6 = 'Wobble'
+    wobble_object = new $P6, $P3
 
-    $S1 = typeof $P2
-    say $S1
+    $S1 = typeof wobble_object
+    is ($S1, 'Wobble', 'instance is typeof Wobble')
 
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
+    $I3 = isa wobble_object, "Wobble"
+    ok ($I3, 'instance isa Wobble')
 
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    $I3 = isa wobble_object, "Object"
+    ok ($I3, 'instance isa Object')
 
-    $P5 = getattribute $P2, 'data'
-    print $P5
+    $P5 = getattribute wobble_object, 'data'
+    is ($P5, "data for Wobble\n", 'read attribute data from instance of Wobble')
 .end
-CODE
-Foo
-1
-1
-data for Foo
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from key name with init', todo => 'init keyed' );
-.sub main :main
-    $P0 = newclass "Pre"
-    $P1 = subclass "Pre", ['Foo';'Bar']
-    addattribute $P1, 'data'
+.sub instance_from_key_name_init
+    # instantiate from key name with init
+    .local pmc parent_class, barfoo_class, barfoo_object
+    parent_class = newclass "Zork"
+    barfoo_class = subclass "Zork", ['Bar';'Foo']
+    addattribute barfoo_class, 'data'
 
     $P3 = new 'Hash'
     $P4 = new 'String'
-    $P4 = "data for Foo;Bar\n"
+    $P4 = "data for Bar;Foo\n"
     $P3['data'] = $P4
 
-    $P2 = new ['Foo';'Bar'], $P3
+    barfoo_object = new ['Bar';'Foo'], $P3
 
-    $S1 = typeof $P2
-    say $S1
+    $S1 = typeof barfoo_object
+    is ($S1, 'Bar;Foo', 'instance is typeof Bar;Foo')
 
-    $I3 = isa $P2, 'Bar'
-    print $I3
-    print "\n"
+    $I3 = isa barfoo_object, 'Zork'
+    ok ($I3, 'instance isa Zork')
 
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    $I3 = isa barfoo_object, "Object"
+    ok ($I3, 'instance isa Object')
 
-    $P5 = getattribute $P2, 'data'
-    print $P5
-.end
-CODE
-Foo;Bar
-1
-1
-data for Foo;Bar
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'declare subclasses within other namespaces' );
-.namespace [ 'other' ]
-.sub main :main
-    $P0 = newclass 'Pre'
-    $P99 = subclass 'Pre', 'Foo'
-    $P99 = subclass 'Pre', 'Bar'
-
-    $P1 = new 'Foo'
-    $P1.'blue'()
+    $P5 = getattribute barfoo_object, 'data'
+    is ($P5, "data for Bar;Foo\n", 'read attribute data from instance of Bar;Foo')
 .end
 
-.namespace [ 'Foo' ]
-.sub 'blue' :method
-    say 'foo blue'
-    $P1 = new 'Bar'
-    $P1.'blue'()
+.sub subclasses_within_other_namespaces
+    # declare subclasses within other namespaces
+    $P0 = newclass 'Tom'
+    $P99 = subclass 'Tom', 'Dick'
+    $P99 = subclass 'Tom', 'Harry'
+
+    $P1 = new 'Dick'
+    $S1 = $P1.'name'()
+    is ($S1, "Richard", 'calling method on Dick' )
+.end
+
+.namespace [ 'Dick' ]
+.sub 'name' :method
+    $P1 = new 'Harry'
+    $S1 = $P1.'name'()
+    is ($S1, "Harold", 'calling method on Harry from Namespace Dick')
+    .return ("Richard")
 .end
 
 
-.namespace [ 'Bar' ]
-.sub 'blue' :method
-    say 'bar blue'
+.namespace [ 'Harry' ]
+.sub 'name' :method
+    .return ("Harold")
 .end
-CODE
-foo blue
-bar blue
-OUT
+.namespace []
 
-pir_output_is( <<'CODE', <<'OUT', 'call inherited methods' );
-.namespace [ 'other' ]
-.sub main :main
-    $P0 = newclass 'Parent'
-    $P0 = subclass 'Parent', 'Foo'
+.sub call_inherited_method
+    # call inherited methods
+    $P0 = newclass 'Bilbo'
+    $P0 = subclass 'Bilbo', 'Frodo'
 
-    $P1 = new 'Foo'
-    $P1.'green'()
+    $P1 = new 'Frodo'
+    $I1 = $P1.'is_hobbit'()
+    ok ($I1, 'calling inherited method')
 .end
 
-.namespace [ 'Parent' ]
-.sub 'green' :method
-    say 'parent green'
+.namespace [ 'Bilbo' ]
+.sub 'is_hobbit' :method
+    .return (1)
 .end
-CODE
-parent green
-OUT
+.namespace []
 
-pir_output_is( <<'CODE', <<'OUT', 'call inherited init vtable overrides' );
-.sub main :main
-    $P99 = newclass 'Foo'
-    $P99 = subclass 'Foo', 'Bar'
-    addattribute $P99, 'storage'
-    $P1 = new 'Bar'
-    $P1.'say_strings'()
+.sub call_inherited_init_vtable_overrides
+    # call inherited init vtable overrides
+    $P0 = newclass 'Wombat'
+    $P1 = subclass 'Wombat', 'Frog'
+    addattribute $P0, 'storage'
+    $P1 = new 'Frog'
+    $I1 = $P1.'count_strings'()
+    is ($I1, 3, 'correct array length in vtable overriden init method')
 .end
 
-.namespace [ 'Bar' ]
+.namespace [ 'Frog' ]
 .sub 'init' :method :vtable
-    say 'Bar init'
     self.'add_string'('first string')
     self.'add_string'('second string')
     self.'add_string'('third string')
 .end
 
-.namespace [ 'Foo' ]
+.namespace [ 'Wombat' ]
 .sub 'init' :method :vtable
-    say 'Foo init'
     $P1 = new 'ResizablePMCArray'
     setattribute self, 'storage', $P1
 .end
@@ -543,86 +477,136 @@ pir_output_is( <<'CODE', <<'OUT', 'call inherited init vtable overrides' );
     push $P1, newstring
 .end
 
-.sub 'say_strings' :method
+.sub 'count_strings' :method
     $P1 = getattribute self, 'storage'
-    $S3 = join "\n", $P1
-    say $S3
+    $S3 = $P1
+    .return ($P1)
 .end
-CODE
-Foo init
-Bar init
-first string
-second string
-third string
-OUT
+.namespace []
 
-pir_output_is( <<'CODE', <<'OUT', 'set inherited attributes by parent key' );
-.sub main :main
-    $P0 = newclass 'Foo'
-    addattribute $P0, 'storage'
-    $P99 = subclass $P0, 'Bar'
-    $P1 = $P99.'new'()
-    $P2 = getattribute $P1, 'storage'
-    say $P2
+.sub set_inherited_attribute_by_parent_key
+    # set inherited attributes by parent key
+    .local pmc parent_class, child_class, child_object
+    parent_class = newclass 'Zolar'
+    addattribute parent_class, 'storage'
+    child_class = subclass parent_class, 'SonOfZolar'
+    child_object = child_class.'new'()
+    $P2 = getattribute child_object, 'storage'
+    is ($P2,'storage attribute value', 'retrieve attribute vale')
 .end
 
-.namespace [ 'Bar' ]
+.namespace [ 'SonOfZolar' ]
 .sub 'init' :method :vtable
-    say 'Bar init'
     .local pmc newstring
     newstring = new 'String'
     newstring = 'storage attribute value'
-    setattribute self, ['Foo'], 'storage', newstring
+    setattribute self, ['Zolar'], 'storage', newstring
+.end
+.namespace []
+
+.sub can_not_add_same_parent_twice
+    # the same parent can't be added twice
+    .local pmc eh, parent_class, child_class
+    parent_class = newclass 'Supervisor'
+    child_class = newclass 'Employee'
+
+try:
+    eh = new 'ExceptionHandler'
+    eh.'handle_types'(.EXCEPTION_INVALID_OPERATION)
+    set_addr eh, catch
+
+    push_eh eh
+    # attempt to add duplicate parent
+    addparent child_class, parent_class
+    addparent child_class, parent_class
+    $I0 = 1 # addparent success flag
+    goto finally
+
+catch:
+    $I0 = 0 # addparent failure flag
+
+finally:
+    pop_eh
+    nok ($I0, 'attempt to duplicate parent throws exception')
 .end
 
-CODE
-Bar init
-storage attribute value
-OUT
+.sub can_not_be_own_parent
+    # can't be own parent
+    .local pmc eh, parent_class
+    parent_class = newclass 'Frob'
 
-pir_error_output_like( <<'CODE', <<'OUT', "the same parent can't be added twice" );
-.sub main :main
-    $P0 = newclass 'Foo'
-    $P1 = newclass 'Bar'
-    addparent $P1, $P0
-    addparent $P1, $P0
+try:
+    eh = new 'ExceptionHandler'
+    eh.'handle_types'(.EXCEPTION_INVALID_OPERATION)
+    set_addr eh, catch
+
+    push_eh eh
+    # attempt to create inheritance loop
+    addparent parent_class, parent_class
+    $I0 = 1 # addparent success flag
+    goto finally
+
+catch:
+    $I0 = 0 # addparent failure flag
+
+finally:
+    pop_eh
+    nok ($I0, 'attempt to create inheritance loop throws exception')
 .end
-CODE
-/The class 'Bar' already has a parent class 'Foo'./
-OUT
 
-pir_error_output_like( <<'CODE', <<'OUT', "can't be own parent");
-.sub main :main
-    $P0 = newclass 'Foo'
-    addparent $P0, $P0
+.sub can_not_be_own_ancestor
+    # can't be own grandparent
+    .local pmc eh, parent_class, child_class
+    parent_class = newclass 'Parent'
+    child_class = subclass 'Parent', 'Child'
+
+try:
+    eh = new 'ExceptionHandler'
+    eh.'handle_types'(.EXCEPTION_INVALID_OPERATION)
+    set_addr eh, catch
+
+    push_eh eh
+    # attempt to create inheritance loop
+    addparent parent_class, child_class
+    $I0 = 1 # addparent success flag
+    goto finally
+
+catch:
+    $I0 = 0 # addparent failure flag
+
+finally:
+    pop_eh
+    nok ($I0, 'attempt to create inheritance loop throws exception')
 .end
-CODE
-/Can't be own parent/
-OUT
 
-pir_error_output_like( <<'CODE', <<'OUT', "can't be own grandparent");
-.sub main :main
-    $P0 = newclass 'Foo'
-    $P1 = subclass 'Foo', 'Bar'
-    addparent $P0, $P1
+.sub no_loop_in_hierarchy
+    # can't create loop in hierarchy
+    .local pmc eh, mutt_class, jeff_class
+    mutt_class = newclass 'Mutt'
+    jeff_class = newclass 'Jeff'
+
+try:
+    eh = new 'ExceptionHandler'
+    eh.'handle_types'(.EXCEPTION_INVALID_OPERATION)
+    set_addr eh, catch
+
+    push_eh eh
+    # attempt to create inheritance loop
+    addparent jeff_class, mutt_class
+    addparent mutt_class, jeff_class
+    $I0 = 1 # addparent success flag
+    goto finally
+
+catch:
+    $I0 = 0 # addparent failure flag
+
+finally:
+    pop_eh
+    nok ($I0, 'attempt to create inheritance loop throws exception')
 .end
-CODE
-/Loop in class hierarchy: 'Foo' is an ancestor of 'Bar'./
-OUT
 
-pir_error_output_like( <<'CODE', <<'OUT', "can't create loop in hierarchy");
-.sub main :main
-    $P0 = newclass 'Foo'
-    $P1 = newclass 'Bar'
-    addparent $P1, $P0
-    addparent $P0, $P1
-.end
-CODE
-/Loop in class hierarchy: 'Foo' is an ancestor of 'Bar'./
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'subclass should do what the parent does' );
-.sub 'main' :main
+.sub subclass_does_what_parent_does
+    # subclass should do what the parent does
     does_pmc()
     does_subclass()
 .end
@@ -630,34 +614,17 @@ pir_output_is( <<'CODE', <<'OUT', 'subclass should do what the parent does' );
 .sub 'does_pmc'
     $P0 = get_class 'ResizablePMCArray'
     $I0 = does $P0, 'array'
-
-    if $I0 goto okay
-    say 'not ok 1 - PMC that provides array should do array'
-    end
-
-  okay:
-    say 'ok 1 - PMC that provides array should do array'
+    ok ($I0, 'PMC that provides array does array')
 .end
 
 .sub 'does_subclass'
     $P0 = subclass 'ResizablePMCArray', 'List'
     $I0 = does $P0, 'array'
-
-    if $I0 goto okay
-    say 'not ok 2 - subclass of PMC that provides array should do array'
-    end
-
-  okay:
-    say 'ok 2 - subclass of PMC that provides array should do array'
+    ok ($I0, 'subclass of PMC that provides array does array')
 .end
-CODE
-ok 1 - PMC that provides array should do array
-ok 2 - subclass of PMC that provides array should do array
-OUT
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
