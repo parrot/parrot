@@ -1,9 +1,6 @@
 /*
- * $Id$
  * Copyright (C) 2003-2008, The Perl Foundation.
- *
- * pcc.c
- *
+ * $Id$
  */
 
 /*
@@ -229,7 +226,7 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
      */
     #define PCC_GET_ARGS_LIMIT 15
     SymReg *regcache[PCC_GET_ARGS_LIMIT + 1];
-    char bufcache[sizeof(pref) + sizeof(item) * PCC_GET_ARGS_LIMIT + sizeof(subf)];
+    char bufcache[sizeof (pref) + sizeof (item) * PCC_GET_ARGS_LIMIT + sizeof (subf)];
 
     SymReg ** const regs  = n < PCC_GET_ARGS_LIMIT ?
         regcache :
