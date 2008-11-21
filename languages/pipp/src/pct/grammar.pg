@@ -22,10 +22,7 @@ token ws_all {
 
 token ws_char { \h | \v }
 
-token singlelinecomment {
-      '#'  \N*
-    | '//' \N*
-}
+token singlelinecomment { [ '#' || '//' ] \N* }
 
 token multilinecomment { '/*' .*?  '*/' }
 
