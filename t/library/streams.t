@@ -857,9 +857,9 @@ SKIP:
 LOOP:
     self."write"( str )
 
-    ord I0, str
-    inc I0
-    chr str, I0
+    ord $I0, str
+    inc $I0
+    chr str, $I0
 
     if str != "G" goto LOOP
 .end
