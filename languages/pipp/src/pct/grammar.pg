@@ -175,17 +175,21 @@ rule var_assign {
 
 # identifiers
 #
-token CLASS_NAME      { <ident> }
+token CLASS_NAME               { <ident> }
 
-token CONSTANT_NAME   { <ident> }
+token CONSTANT_NAME            { <ident> }
 
-token FUNCTION_NAME   { <ident> }
+token CLASS_CONSTANT_ACCESSOR  { '::' }
 
-token INTERFACE_NAME  { <ident> }
+token STATIC_METHOD_ACCESSOR   { '::' }
 
-token MEMBER_NAME     { <ident> }
+token FUNCTION_NAME            { <ident> }
 
-token METHOD_NAME     { <ident> }
+token INTERFACE_NAME           { <ident> }
+
+token MEMBER_NAME              { <ident> }
+
+token METHOD_NAME              { <ident> }
 
 # namespace support
 
@@ -246,8 +250,13 @@ token quote {
     {*}
 }
 
-rule constant {
+token constant {
     <CONSTANT_NAME>
+    {*}
+}
+
+token class_constant {
+    <.CLASS_NAME> <.CLASS_CONSTANT_ACCESSOR> <.CONSTANT_NAME>
     {*}
 }
 
@@ -287,6 +296,7 @@ rule term {
     | <constructor_call>       {*}   #= constructor_call
     | '(' <expression> {*} ')'       #= expression
     | <literal>                {*}   #= literal
+    | <class_constant>         {*}   #= class_constant
     | <constant>               {*}   #= constant
     | <member>                 {*}   #= member
     | <var>                    {*}   #= var
@@ -323,26 +333,30 @@ rule interface_definition {
     {*}
 }
 
-
-rule class_definition {
-    'class' <CLASS_NAME> [ 'implements' <INTERFACE_NAME> ]? '{'
-        <member_definition>*
-        <method_definition>*
-    '}'
-    {*}
-}
-
 rule method_declaration {
     'function' <METHOD_NAME> <param_list> ';'
     {*}
 }
 
-rule member_definition {
-    'public' <VAR_NAME> '=' <literal> <.statement_delimiter>
+rule class_definition {
+    'class' <CLASS_NAME> [ 'implements' <INTERFACE_NAME> ]? '{'
+        <class_constant_definition>*
+        <class_member_definition>*
+        <class_method_definition>*
+    '}'
     {*}
 }
 
-rule method_definition {
+rule class_constant_definition {
+    'const' <CONSTANT_NAME> '=' <literal> <.statement_delimiter>
+    {*}
+}
+
+rule class_member_definition {
+    'public' <VAR_NAME> '=' <literal> <.statement_delimiter>
+}
+
+rule class_method_definition {
     'function' <METHOD_NAME> <param_list> <block>
     {*}
 }

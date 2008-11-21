@@ -11,18 +11,12 @@ Defining and using objects.
 
 =cut
 
-# pragmata
 use strict;
 use warnings;
-
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-# core Perl modules
-use Test::More     tests => 5;
-
-# Parrot modules
-use Parrot::Test;
+use Parrot::Test tests => 6;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'definition of a class' );
 <?php
@@ -39,6 +33,21 @@ echo "After class definition.\n"
 ?>
 CODE
 After class definition.
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'class constant', todo => 'not implemented yet' );
+<?php
+
+class Foo {
+    
+    const bar = "constant bar in class Foo\n"; 
+}
+
+echo Foo::bar;
+ 
+?>
+CODE
+constant bar in class Foo
 OUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'calling an instance method' );

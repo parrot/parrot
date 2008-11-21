@@ -20,10 +20,22 @@ value of the comment is passed as the second argument to the method.
 class Pipp::Grammar::Actions;
 
 method TOP($/) {
-    my $past  := PAST::Stmts.new( :node($/) );
+    my $past := PAST::Stmts.new( :node($/) );
+
     for $<sea_or_code> {
         $past.push( $($_) );
     }
+
+    # subrules may have added stuff to $?INIT
+    # execute it first
+    our $?INIT;
+    if defined( $?INIT ) {
+        $?INIT.blocktype('declaration');
+        $?INIT.pirflags(':init :load');
+        $past.unshift( $?INIT );
+        $?INIT := PAST::Block.new(); # For the next eval.
+    }
+    $past.unshift( PAST::Block.new( :name( 'INIT should have been added' ) ) );
 
     make $past;
 }
@@ -164,6 +176,39 @@ method constant($/) {
                  :value( ~$<CONSTANT_NAME> ),
              )
          );
+}
+
+# can be mergerd with constant
+method class_constant($/) {
+    make PAST::Op.new(
+             :name('constant'),
+             PAST::Val.new(
+                 :returns('PhpString'),
+                 :value( ~$/ ),
+             )
+         );
+}
+
+# class constants could probably also be set in a class init block
+method class_constant_definition($/) {
+    our $?INIT;
+    unless defined( $?INIT ) {
+        $?INIT := PAST::Block.new();
+    }
+    $?INIT.push( 
+        PAST::Op.new(
+            :pasttype('call'),
+            :name('define'),
+            :node( $/ ),
+            PAST::Val.new(
+                :value( 'Foo::' ~ ~$<CONSTANT_NAME> ),
+                :returns('PhpString'),
+            ),
+            $( $<literal> ),
+        )
+    );
+
+    make PAST::Block.new( :name( 'class_constant_definition' ) );
 }
 
 method arguments($/) {
@@ -364,7 +409,7 @@ method EXIT_FUNCTION_DEF($/) {
     $?PIPP_CURRENT_SCOPE := 'package';
 }
 
-method method_definition($/) {
+method class_method_definition($/) {
 
     # note that $<param_list> creates a new PAST::Block.
     my $past := $( $<param_list> );
@@ -415,14 +460,21 @@ method class_definition($/) {
                         )
                     )
                 );
+
+    # nothing to do for $<const_definition,
+    # setup of class constants is done in $?INIT
+    for $<class_constant_definition> {
+       $past.push($($_));
+    }
+
     my $methods_block
         := PAST::Block.new(
                     :blocktype('immediate'),
            );
-    for $<member_definition> {
+    for $<class_member_definition> {
         $methods_block.symbol( ~$_<VAR_NAME><ident>, :scope('attribute') );
     }
-    for $<method_definition> {
+    for $<class_method_definition> {
         $methods_block.push( $($_) );
     }
     $past.push( $methods_block );
