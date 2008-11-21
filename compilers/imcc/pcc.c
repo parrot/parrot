@@ -229,7 +229,7 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
      */
     #define PCC_GET_ARGS_LIMIT 15
     SymReg *regcache[PCC_GET_ARGS_LIMIT + 1];
-    char bufcache[lenpref + lenitem * PCC_GET_ARGS_LIMIT + lensubf];
+    char bufcache[sizeof(pref) + sizeof(item) * PCC_GET_ARGS_LIMIT + sizeof(subf)];
 
     SymReg ** const regs  = n < PCC_GET_ARGS_LIMIT ?
         regcache :
