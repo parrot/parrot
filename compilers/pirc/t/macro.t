@@ -3,7 +3,7 @@
 # $Id$
 
 use lib "../../lib";
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 
 
 pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "simple macro without parameters");
@@ -14,10 +14,32 @@ pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "simple macro without parameters");
     .Hi()
 .end
 CODE
- .namespace []
+.namespace []
 main:
     get_params
     print "hello"
+    set_returns
+    returncc
+OUTPUT
+
+pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "expansion w/ parameters and nested macro_const expansion");
+.macro_const ANSWER 42
+
+.macro foo(a,b)
+    say .a
+    say .b
+.endm
+
+.sub main
+    .foo(.ANSWER, "hi")
+.end
+
+CODE
+.namespace []
+main:
+    get_params
+    say 42
+    say "hi"
     set_returns
     returncc
 OUTPUT

@@ -533,7 +533,9 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
 /* Top-level rules */
 
 
-/* the */
+/* the very first token indicates what kind of file it is, and therefore
+ * acts as a selector for the right grammar.
+ */
 TOP               : "<pir-input>"  pir_contents
                   | "<pasm-input>" pasm_contents
                   ;
@@ -732,6 +734,10 @@ parameter_list    : parameters
                          { /* XXX */
                            /* generate_get_params(lexer); */
                            set_instr(lexer, "get_params");
+                           /* don't infer the signatured opname from arguments, it's always same:
+                            * get_params_pc (this is one of the special 4 instructions for
+                            * sub invocation).
+                            */
                            update_op(lexer, CURRENT_INSTRUCTION(lexer), PARROT_OP_get_params_pc);
                          }
                   ;
@@ -855,7 +861,8 @@ braced_arg        : '{' braced_contents '}'
                   ;
 
 
-braced_contents   : /* empty */ { $$ = ""; }
+braced_contents   : /* empty */
+                        { $$ = ""; }
                   | braced_contents braced_item
                         { /* XXX cleanup memory stuff */
                           char *newbuff = (char *)mem_sys_allocate((strlen($1) + strlen($2) + 2)
@@ -1342,23 +1349,23 @@ conditional_stat  : conditional_instr "\n"
  * do a correct parse and prevent shift/reduce conflicts.
  */
 conditional_instr : if_unless "null" TK_IDENT "goto" identifier
-                        { create_if_instr(yyscanner, lexer, $1, 1, $3, $4); }
+                        { create_if_instr(yyscanner, lexer, $1, 1, $3, $5); }
                   | if_unless "null" "int" "goto" identifier
-                        { create_if_instr(yyscanner, lexer, $1, 1, "int", $4); }
+                        { create_if_instr(yyscanner, lexer, $1, 1, "int", $5); }
                   | if_unless "null" "num" "goto" identifier
-                        { create_if_instr(yyscanner, lexer, $1, 1, "num", $4); }
+                        { create_if_instr(yyscanner, lexer, $1, 1, "num", $5); }
                   | if_unless "null" "pmc" "goto" identifier
-                        { create_if_instr(yyscanner, lexer, $1, 1, "pmc", $4); }
+                        { create_if_instr(yyscanner, lexer, $1, 1, "pmc", $5); }
                   | if_unless "null" "string" "goto" identifier
-                        { create_if_instr(yyscanner, lexer, $1, 1, "string", $4); }
+                        { create_if_instr(yyscanner, lexer, $1, 1, "string", $5); }
                   | if_unless "null" "if" "goto" identifier
-                        { create_if_instr(yyscanner, lexer, $1, 1, "if", $4); }
+                        { create_if_instr(yyscanner, lexer, $1, 1, "if", $5); }
                   | if_unless "null" "unless" "goto" identifier
-                        { create_if_instr(yyscanner, lexer, $1, 1, "unless", $4); }
+                        { create_if_instr(yyscanner, lexer, $1, 1, "unless", $5); }
                   | if_unless "null" "goto" "goto" identifier
-                        { create_if_instr(yyscanner, lexer, $1, 1, "goto", $4); }
+                        { create_if_instr(yyscanner, lexer, $1, 1, "goto", $5); }
                   | if_unless "null" "null" "goto" identifier
-                        { create_if_instr(yyscanner, lexer, $1, 1, "null", $4); }
+                        { create_if_instr(yyscanner, lexer, $1, 1, "null", $5); }
                   | if_unless constant then identifier
                         {
                           int istrue = evaluate_c(lexer, $2);
@@ -3186,9 +3193,9 @@ check_first_arg_direction(yyscan_t yyscanner, NOTNULL(char const * const opname)
     }
 
     /* direction cannot be IN or INOUT */
-    if (dir_first_arg == PARROT_ARGDIR_IN)
+    if (dir_first_arg != PARROT_ARGDIR_OUT)
         yypirerror(yyscanner, lexer, "cannot write first arg of op '%s' as a target "
-                                  "(direction of argument is IN).", opname);
+                                  "(direction of argument is IN/INOUT).", opname);
 
 }
 
