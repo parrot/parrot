@@ -17,7 +17,8 @@ This implementation is based on F<runtime/parrot/library/MIME/Base64.pir>.
 
 =cut
 
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .namespace [ 'base64' ]
 
 .sub '__onload' :anon :load

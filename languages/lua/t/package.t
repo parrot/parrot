@@ -205,7 +205,8 @@ unlink('../mod_foo.pbc') if ( -f '../mod_foo.pbc' );
 unlink('../mod_foo.pir') if ( -f '../mod_foo.pir' );
 open $X, '>', '../mod_foo.pir';
 print {$X} <<'PIR';
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 
 .sub '__onload' :anon :load
 #    print "__onload mod_foo\n"

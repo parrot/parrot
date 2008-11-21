@@ -15,7 +15,8 @@ See F<languages/lua/lib/luaio.pir>.
 
 =cut
 
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .namespace [ 'io'; 'file' ]
 
 .sub 'createmeta'

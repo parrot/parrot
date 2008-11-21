@@ -18,7 +18,8 @@ L<http://www.lua.org/manual/5.1/manual.html#5.1>.
 
 =cut
 
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .namespace [ 'basic' ]
 
 .sub 'luaopen_basic'

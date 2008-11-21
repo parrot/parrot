@@ -66,7 +66,8 @@ lib/luabytecode.pir - Lua bytecode translation Library
     .local string pir
     pir = <<'PIRCODE'
 .include 'interpinfo.pasm'
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 
 .namespace []
 

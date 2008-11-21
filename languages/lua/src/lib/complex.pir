@@ -17,7 +17,8 @@ This implementation is based on F<src/pmc/complex.pmc>.
 
 =cut
 
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .namespace [ 'complex' ]
 
 .sub '__onload' :anon :load

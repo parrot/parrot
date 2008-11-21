@@ -17,7 +17,8 @@ This implementation is based on F<languages/markdown/markdown.pir>.
 
 =cut
 
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .namespace [ 'markdown' ]
 
 .sub '__onload' :anon :load

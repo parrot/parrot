@@ -93,7 +93,8 @@ show version information.
 .include 'languages/lua/src/lib/luaregex.pir'
 
 
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 
 .sub 'main' :anon :main
     .param pmc args

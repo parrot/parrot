@@ -19,7 +19,8 @@ L<http://www.lua.org/manual/5.1/manual.html#5.2>.
 
 =cut
 
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .namespace [ 'coroutine' ]
 
 .sub 'luaopen_coroutine'

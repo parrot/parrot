@@ -33,7 +33,8 @@ L<http://www.lua.org/manual/5.1/manual.html#5.7>.
 
 =cut
 
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .namespace [ 'io' ]
 
 .sub 'luaopen_io'

@@ -47,7 +47,8 @@ L<http://www.lua.org/manual/5.1/manual.html#5.6>.
 
 =cut
 
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .namespace [ 'math' ]
 
 .sub 'luaopen_math'
@@ -99,7 +100,7 @@ LIST
 
     new $P0, 'LuaNumber'
     set $P0, 3.14159265358979323846
-    $P1 = 'pi'
+    set $P1, 'pi'
     _math[$P1] = $P0
 
     new $P0, 'LuaNumber'
@@ -107,7 +108,7 @@ LIST
     new $P2, 'LuaNumber'
     set $P2, 0.0
     div $P0, $P2
-    $P1 = 'huge'
+    set $P1, 'huge'
     _math[$P1] = $P0
 
 .end

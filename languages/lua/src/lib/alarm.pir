@@ -17,7 +17,8 @@ See original on L<http://www.tecgraf.puc-rio.br/~lhf/ftp/lua/#lalarm/>
 
 =cut
 
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .namespace [ 'alarm' ]
 
 .sub '__onload' :anon :load

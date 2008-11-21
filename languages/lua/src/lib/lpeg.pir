@@ -19,7 +19,8 @@ See on L<http://www.inf.puc-rio.br/~roberto/lpeg.html#intro>
 
 =cut
 
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .namespace [ 'lpeg' ]
 
 .sub '__onload' :anon :load

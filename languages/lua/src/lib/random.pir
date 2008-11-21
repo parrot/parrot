@@ -18,7 +18,8 @@ see F<runtime/parrot/library/Math/Random/mt19937ar.pir>.
 
 =cut
 
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .namespace [ 'random' ]
 
 .sub '__onload' :anon :load

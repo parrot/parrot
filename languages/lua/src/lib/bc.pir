@@ -20,7 +20,8 @@ Use PMC BigFloat when available.
 
 =cut
 
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .namespace [ 'bc' ]
 
 .sub '__onload' :anon :load

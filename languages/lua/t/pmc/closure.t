@@ -152,7 +152,8 @@ boolean
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .sub _main
 #    .const 'LuaClosure' F1 = 'f1'
     .const 'Sub' pmc1 = 'f1'
@@ -173,7 +174,8 @@ f1()
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL (autoboxing)' );
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .sub _main
     .local pmc pmc1
     pmc1 = test()
@@ -191,7 +193,8 @@ CODE
 OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .sub _main
     .local pmc pmc1
     pmc1 = new 'LuaClosure'
@@ -213,7 +216,8 @@ string\n
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .sub _main
     .local pmc pmc1
     pmc1 = new 'LuaClosure'
@@ -230,7 +234,8 @@ nil
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check init_pmc' );
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .sub _main
     .const 'Sub' pmc1 = 'f1'
     .local pmc pmc2
@@ -252,7 +257,8 @@ f1()
 OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'load from pbc' );
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .sub _main
     load_bytecode 'languages/lua/lua.pbc'
     lua_openlibs()
@@ -268,7 +274,8 @@ CODE
 OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'from pir' );
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .namespace [ 'basic' ]
 .sub _main
     collectoff
@@ -287,12 +294,14 @@ CODE
 OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'from compilation' );
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .sub _main
     .local pmc comp
     comp = compreg 'PIR'
     $S0 = <<'PIRCODE'
-        .HLL 'Lua', 'lua_group'
+        .HLL 'Lua'
+        .loadlib 'lua_group'
         .sub _loader
             .local pmc table
             table = new 'LuaTable'
@@ -325,7 +334,8 @@ OUTPUT
 
 open my $X, '>', '../foo.pir';
 print {$X} q{
-  .HLL 'Lua', 'lua_group'
+  .HLL 'Lua'
+  .loadlib 'lua_group'
   .sub _loader
       .local pmc table
       table = new 'LuaTable'
@@ -341,7 +351,8 @@ print {$X} q{
 close $X;
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'from PIR load_bytecode' );
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .sub _main
     load_bytecode 'foo.pir'
     $P0 = get_global '_loader'
@@ -364,7 +375,8 @@ OUTPUT
 system("../parrot -o ../foo.pbc ../foo.pir");
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'from PBC load_bytecode' );
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .sub _main
     load_bytecode 'foo.pbc'
     $P0 = get_global '_loader'
@@ -388,12 +400,14 @@ unlink '../foo.pir';
 unlink '../foo.pbc';
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'from compilation' );
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .sub _main
     .local pmc comp
     comp = compreg 'PIR'
     $S0 = <<'PIRCODE'
-        .HLL 'Lua', 'lua_group'
+        .HLL 'Lua'
+        .loadlib 'lua_group'
         .sub _loader
         .end
         .sub f1 :outer('_loader') :anon :lex

@@ -13,7 +13,8 @@ lib/luaaux.pir - Lua Auxiliary PIR Library
 
 =cut
 
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .namespace []
 
 

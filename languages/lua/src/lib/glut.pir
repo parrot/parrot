@@ -18,7 +18,8 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .namespace [ 'glut' ]
 
 .sub '__onload' :anon :load

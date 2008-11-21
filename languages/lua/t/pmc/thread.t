@@ -126,7 +126,8 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check logical_not' );
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 
 .sub '__start' :main
     loadlib $P0, 'lua_group'
@@ -158,7 +159,8 @@ boolean
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .sub '__start' :main
     load_bytecode 'Parrot/Coroutine.pbc'
     _main()
@@ -182,7 +184,8 @@ CODE
 OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .sub '__start' :main
     load_bytecode 'Parrot/Coroutine.pbc'
     _main()
@@ -214,7 +217,8 @@ string\n
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .sub '__start' :main
     load_bytecode 'Parrot/Coroutine.pbc'
     _main()
@@ -241,7 +245,8 @@ nil
 OUTPUT
 
 pir_error_output_like( << 'CODE', << 'OUTPUT', 'check __add' );
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .sub '__start' :main
     load_bytecode 'Parrot/Coroutine.pbc'
     _main()

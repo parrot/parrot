@@ -16,7 +16,8 @@ see F<runtime/parrot/library/OpenGL.pir>.
 
 =cut
 
-.HLL 'Lua', 'lua_group'
+.HLL 'Lua'
+.loadlib 'lua_group'
 .namespace [ 'gl_binding' ]
 
 .sub '__onload' :anon :load

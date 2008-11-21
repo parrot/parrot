@@ -23,7 +23,7 @@ Francois Perrad.
 
 =cut
 
-.HLL '', 'lua_group'
+.loadlib 'lua_group'
 
 .sub 'main' :main
     .param pmc argv
