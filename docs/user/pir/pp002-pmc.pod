@@ -5,25 +5,21 @@
 To run the example code in this article, you'll need to
 obtain a copy of Parrot and build it for your system. For
 information on obtaining Parrot, see
-L<http://www.parrotcode.org/>. Instructions for compiling
+L<http://www.parrot.org/>. Instructions for compiling
 Parrot are available in the Parrot distribution itself. All
-code examples in this article were tested with Parrot 0.4.5
+code examples in this article were tested with Parrot 0.8.1
 
 =head2 A quick review of Parrot
 
 As mentioned by Alberto Manuel Simões in TPR 2.3, Parrot is
 a register-based virtual machine with 4 register types:
-Integer, String, Number, PMC. Registers are
-referenced by a capital letter signifying the register type
-followed by the register number (C<$S15> is String register
-number 15). Parrot programs consist of lines of text where
-each line contains one opcode and its arguments.
+Integer, String, Number and PMC. PIR registers are
+referenced by a C<$> character, a capital letter signifying
+the register type followed by the register number (C<$S15> is
+String register number 15). Parrot programs consist of lines of
+text where each line contains one opcode and its arguments.
 
-Utilizing a slightly higher-level syntax called PIR (Parrot
-Intermediate Representation) you may obtain an arbitrary
-number of each register type by prefixing the register with
-a C<$> (For example, the virtual register C<$I51> is
-perfectly valid). Each subroutine will have as many registers
+Each subroutine will have as many registers
 available as necessary; a simple subroutine will only need
 a few whereas complex subroutines with many calculations will
 need a larger number of registers. This is a fundamental
@@ -75,7 +71,7 @@ several interesting and useful PMC types:
 Before I take a closer look at some of these PMC types,
 let's look at a common thing that people want to know how to
 do -- read command line arguments. The subroutine designated
-as the main program (by the C<:main> modifier) has an
+as the main program (by the C<:main> pragma) has an
 implicit parameter passed to it that is the command line
 arguments. Since previous examples never had such a
 parameter to the main program, Parrot simply ignored
@@ -107,7 +103,7 @@ contains the command line arguments. We then repeatedly use
 the C<shift> opcode to remove an element from the front of
 C<args> and place it into a string register which I then
 output. When the C<args> PMC is empty, it will evaluate as a
-boolean false and the conditional on line will cause the
+boolean false and the conditional on line 4 will cause the
 program to end.
 
 One problem with my program is that it's destructive to the
@@ -137,23 +133,27 @@ each indexed value.
 
 Line 4 shows something interesting about aggregates. Similar
 to perl, when you assign an aggregate to an integer thing
-(whether it be a register or local variable), Parrot puts
-the number of elements in the aggregate into the integer
-thing. (e.g., if you had a PMC that held 5 things in C<$P0>,
-the statement C<$I0 = $P0> assigns 5 to the register C<$I0>)
+(whether it be a register or local variable, but as was explained
+before, a local variable is in fact just a symbol indicating that
+is mapped to a register), Parrot puts the number of elements in
+the aggregate into the integer thing. (e.g., if you had a PMC that
+held 5 things in C<$P0>, the statement C<$I0 = $P0> assigns 5 to
+the register C<$I0>)
 
 Since I know how many things are in the aggregate, I can
 make a loop that increments a value until it reaches that
 number. Line 10 shows that to index an aggregate, you use
-square brackets just like you would in Perl and other
+square brackets just like you would in Perl and many other
 programming languages. Also note that I'm assigning to a
 string register and then printing that register. Why didn't
 I just do C<print args[$I0]> instead? Because this isn't a
 high level language. PIR provides a nicer syntax but it's
 still really low level. Each line of PIR still essentially
-corresponds to one opcode. So, while there's an opcode to
-index into an aggregate and an opcode to print a string,
-there is no opcode to do I<both> of those things.
+corresponds to one opcode (there are cases in which this is not
+the case, but those will be discussed later).
+So, while there's an opcode to index into an aggregate and
+an opcode to print a string, there is no opcode to do I<both>
+of those things.
 
 BTW, what type of aggregate is the C<args> PMC anyway?
 Another way to use the C<typeof> opcode is to pass it an
@@ -171,8 +171,7 @@ actual PMC:
 When you run this program it should output
 "ResizableStringArray". If you assign the result of the
 C<typeof> opcode to a string thing, you get the name of the
-PMC type. If you assign the result to an integer thing, you
-get the PMC type number.
+PMC type.
 
 =head2 "You are standing in a field of PMCs"
 

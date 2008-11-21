@@ -5,7 +5,7 @@ and manipulate objects (aka, object oriented programming).
 While it may seem strange for a low-level language like
 PIR to have the facility for object oriented programming,
 it makes perfect sense in this particular case. Remember,
-Parrot's number one goal is to be the underlying
+the original goal of Parrot was to be the underlying
 implementation for Perl6, which has object oriented
 features. Parrot's secondary goal is to provide a good
 platform for other dynamic languages such as Python, Ruby,
@@ -50,9 +50,8 @@ is some code to illustrate this example:
 As you might guess, the C<.namespace> directive tells Parrot
 what namespace to group subroutines under.  A namespace ends when
 another C<.namespace> directive changes the namespace or when
-the end of the file is reached. A C<.namespace> directive with
-with no names in the brackets changes back to the default
-namespace.
+the end of the file is reached. A C<.namespace> directive
+with no names in the brackets changes back to the root namespace.
 
 Perl programmers will recognize that Parrot
 C<.namespace> declarations are just like Perl C<package>
@@ -66,8 +65,7 @@ together in just a minute.
 Creating classes in Parrot is relatively easy. There are
 opcodes for it. The easiest to start with is C<newclass>;
 just say C<$P0 = newclass 'Foo'> where $P0 is a PMC
-register, and 'Foo' is the name
-of the class you want to create.
+register, and 'Foo' is the name of the class you want to create.
 
 When you wish to instantiate objects that belong to the class
 you've created, it's equally simple.  Just say C<myobj = new
@@ -85,18 +83,18 @@ created with C<newclass>.  Here's a simple example:
 You may notice that I didn't use the return value of
 C<newclass>.  That's only because this is a simple example.  :-)
 I'll talk about what to do with the return value of C<newclass>
-a little later.  Right now, let's talk about methods.
+a little later. Right now, let's talk about methods.
 
 =head2 Madness ... er, Methods
 
 So now that I've created a C<Dog> class, how do I add methods
 to it?  Remember before when I talked about namespaces?  Well,
-that's the answer.  To add methods to a class, you create a
+that's the answer. To add methods to a class, you create a
 namespace with the same name as the class and then put your
 subroutines in that namespace. PIR also provides a syntactic
-marker to let everyone know these subroutines are methods.  When
-declaring the subroutine add the C<:method> modifier after the
-subroutine name.  Here's a familiar example to anyone who has
+marker to let everyone know these subroutines are methods. When
+declaring the subroutine, add the C<:method> modifier after the
+subroutine name. Here's a familiar example to anyone who has
 read L<perlboot>.
 
 =head3 Example 3: Barnyard animals
@@ -145,10 +143,19 @@ namespaces with the same name as the class may be used to
 store methods for that class.
 
 One thing you may notice about method calls is that the
-method names are quoted. Why is that?  In the current design,
-quoting the method name is the only way to avoid ambiguity
-between actual method names and local variables that contain the
-method name.
+method names are quoted. Why is that? If you would have left out
+the quotes, then the identifier is assumed to be a declared
+C<.local> symbol. So, instead of writing:
+
+    elsie.'speak'()
+
+you could also have written:
+
+    .local string speak
+    speak = 'speak'
+    elsie.speak()
+
+Another example of this is shown below.
 
 =head3 Example 4: variable methods
 
@@ -175,12 +182,6 @@ method name.
         m = "bar"
         f.m()
     .end
-
-There has been some discussion of changing the syntax
-slightly so that when a variable is used for the method
-name, it is designated in some way so that the common case
-of calling a normal method name does not need to be quoted,
-but as of this writing, no such change has happened.
 
 =head2 But where do I store my stuff?
 
@@ -249,23 +250,23 @@ takes advantage of this to retrieve the attribute called
 
 Immediately after I create the class called "Dog", I use the
 PMC handle returned from C<newclass> to add an attribute called
-"name" to the class.  This just allocates a slot in the class for
+"name" to the class. This just allocates a slot in the class for
 the value, it does nothing more.
 
 Next, I create a new Dog and give it a name. Because
 attributes may only be PMCs, in order to give the Dog a
 name, I first have to create a new String PMC (this is one
 of the PMCs builtin to Parrot) and assign the name I wish
-to give the dog to this PMC.  Then I can pass this PMC as a
+to give the dog to this PMC. Then I can pass this PMC as a
 parameter to C<setattribute> to give my Dog a name.
 
-Seems kind of complicated, doesn't it?  Especially when you think
-about doing this for each animal.  Each animal namespace
+Seems kind of complicated, doesn't it? Especially when you think
+about doing this for each animal. Each animal namespace
 would have an identical version of the C<name> method.  For each
 call to C<newclass> I'd need to also call C<addattribute> so
 that all of the animals may have a name.  Each time I wish to
 assign a name to an animal, I'd first need to create a
-C<.String> and call C<setattribute> on it.  Et cetera.
+C<String> and call C<setattribute> on it. Et cetera.
 
 Surely there's a better way?!?  There is ...
 
@@ -276,7 +277,7 @@ programming without inheritance? Parrot has an opcode
 C<subclass> that lets you inherit data and methods from an
 existing class. We can use this ability to create a base
 class called "Animal" that contains the "name" attribute and
-2 methods that are common to all animals: C<setname> and
+two methods that are common to all animals: C<setname> and
 C<getname> Then, to create new animals, I just inherit from
 the Animal base class like so:
 
@@ -297,15 +298,15 @@ the Animal base class like so:
 Each subclass will contain an attribute called "name" that can be
 used to store the name of the animal.  The C<setname> method
 abstracts out the process of creating a C<String> PMC and
-calling C<setattribute> on it.  And finally the C<getname> method
+calling C<setattribute> on it. And finally the C<getname> method
 becomes a wrapper around C<getattribute>.
 
 =head2 Wrapup
 
 I hope this gives you an idea of how to do object oriented
-programming using Parrot.  The opcodes illustrated here are what
+programming using Parrot. The opcodes illustrated here are what
 any language implementor that targets Parrot would use to
-implement object oriented features in their language.  Of course
+implement object oriented features in their language. Of course
 there are more opcodes for richer object oriented behavior
 available in Parrot.  This article only covers the basics.  For
 more information see parrot/docs/pdds/pdd15_objects.pod.
