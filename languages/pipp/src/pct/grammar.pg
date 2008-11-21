@@ -8,11 +8,13 @@ grammar Pipp::Grammar is PCT::Grammar;
 # the starting rule
 token TOP { ^ <sea_or_code>+ {*} }
 
-# whitespace rule used implicity by rules
-token ws {
-      <!ww> <ws_all>+
-    | <ws_all>*
-}
+# Whitespace and comments
+
+token ws_char           { \h | \v }
+
+token singlelinecomment { [ '#' || '//' ] \N* }    # end of line comment like Unix shell and C++
+
+token multilinecomment  { '/*' .*?  '*/' }         # C-like multiline comment
 
 token ws_all {
       <.ws_char>
@@ -20,13 +22,13 @@ token ws_all {
     | <multilinecomment>
 }
 
-token ws_char { \h | \v }
+# whitespace rule used implicity by rules
+token ws {
+      <!ww> <ws_all>+
+    | <ws_all>*
+}
 
-token singlelinecomment { [ '#' || '//' ] \N* }
-
-token multilinecomment { '/*' .*?  '*/' }
-
-# embedding code into a sea of text
+# text or PHP-code
 token sea_or_code {
       <code_echo_tag>   {*}    #= code_echo_tag
     | <code_short_tag>  {*}    #= code_short_tag
@@ -34,6 +36,8 @@ token sea_or_code {
     | <SEA>             {*}    #= SEA
 }
 
+# text, in most cases broken HTML,
+# when an '<' is encountered check whether this is the start of PHP-code 
 regex SEA {
     '<'? .+? ( <before '<'> | $ )
     {*}
