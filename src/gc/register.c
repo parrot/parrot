@@ -27,7 +27,7 @@ is determined by the PASM/PIR compiler in the register allocation pass
  * so that later allocations don't suddenly restore a dangling
  * reference to a "working" condition.
  */
-#define CTX_LEAK_DEBUG_FULL 1
+#define CTX_LEAK_DEBUG_FULL 0
 
 
 
