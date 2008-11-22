@@ -101,17 +101,6 @@ method statement($/,$key) {
     make $( $/{$key} );
 }
 
-method inline_sea_echo_tag($/) {
-   make PAST::Op.new(
-            PAST::Val.new(
-                :value(~$<SEA_empty_allowed>),
-                :returns('PhpString')
-            ),
-            :name('echo'),
-            :node($/)
-        );
-}
-
 method inline_sea_short_tag($/) {
    make PAST::Op.new(
             PAST::Val.new(
