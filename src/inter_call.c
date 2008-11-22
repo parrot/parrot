@@ -2559,8 +2559,7 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
     interp->current_object       = pmc;
     interp->current_cont         = NEED_CONTINUATION;
     ctx->current_cont            = ret_cont;
-    PMC_cont(ret_cont)->from_ctx = ctx;
-    ctx->ref_count++;
+    PMC_cont(ret_cont)->from_ctx = Parrot_context_ref(interp, ctx);
     pccinvoke_meth               = VTABLE_find_method(interp, pmc, method_name);
 
     if (PMC_IS_NULL(pccinvoke_meth))
@@ -2654,8 +2653,7 @@ Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     interp->current_object       = PMCNULL;
     interp->current_cont         = NEED_CONTINUATION;
     ctx->current_cont            = ret_cont;
-    PMC_cont(ret_cont)->from_ctx = ctx;
-    ctx->ref_count++;
+    PMC_cont(ret_cont)->from_ctx = Parrot_context_ref(interp, ctx);
 
     /* Invoke the function */
     dest = VTABLE_invoke(interp, sub_obj, NULL);

@@ -156,10 +156,9 @@ new_continuation(PARROT_INTERP, ARGIN_NULLOK(const Parrot_cont *to))
     Parrot_Context * const to_ctx = to ? to->to_ctx : CONTEXT(interp);
 
     cc->to_ctx        = to_ctx;
-    cc->from_ctx      = CONTEXT(interp);
+    cc->from_ctx      = Parrot_context_ref(interp, CONTEXT(interp));
     cc->dynamic_state = NULL;
     cc->runloop_id    = 0;
-    CONTEXT(interp)->ref_count++;
     if (to) {
         cc->seg       = to->seg;
         cc->address   = to->address;
@@ -273,7 +272,7 @@ invalidate_retc_context(PARROT_INTERP, ARGMOD(PMC *cont))
         if (cont->vtable != interp->vtables[enum_class_RetContinuation])
             break;
         cont->vtable = interp->vtables[enum_class_Continuation];
-        ctx->ref_count++;
+        Parrot_context_ref(interp, ctx);
         cont = ctx->current_cont;
         ctx  = PMC_cont(cont)->from_ctx;
     }
@@ -564,10 +563,7 @@ parrot_new_closure(PARROT_INTERP, ARGIN(PMC *sub_pmc))
     cont->vtable    = interp->vtables[enum_class_Continuation];
 
     /* remember this (the :outer) ctx in the closure */
-    clos->outer_ctx = ctx;
-
-    /* the closure refs now this context too */
-    ctx->ref_count++;
+    clos->outer_ctx = Parrot_context_ref(interp, ctx);
 
 #if CTX_LEAK_DEBUG
     if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG))

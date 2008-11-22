@@ -272,7 +272,7 @@ Invokes the subroutine.
             ccont->vtable = interp->vtables[enum_class_Continuation];
 
         /* reference counting should work */
-        context->ref_count++;
+        Parrot_context_ref(interp, context);
 
         if (!PMC_IS_NULL(INTERP->current_object)) {
             context->current_object = INTERP->current_object;
