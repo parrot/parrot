@@ -391,96 +391,107 @@ X<Namespaces>
 X<.namespace>
 Namespaces provide a mechanism where names can be reused. This may not
 sound like much, but in large complicated systems, or systems with
-many included libraries, it can become a big hassle very quickly. Each
-namespace get's its own area for function names and global variables.
-This way, you can have multiple functions named C<create> or C<new>
-or C<convert>, for instance, without having to use I<Multi-Method
-Dispatch> (MMD), which we will describe later.
+many included libraries, it can be very handy. Each namespace get's its
+own area for function names and global variables. This way, you can have
+multiple functions named C<create> or C<new> or C<convert>, for
+instance, without having to use I<Multi-Method Dispatch> (MMD), which we
+will describe later. Namespaces are also important for defining classes,
+which we will also talk about a little later.
 
 Namespaces are specified with the C<.namespace []> directive. The brackets
-are themselves not optional, but the keys inside them are. Here are some
-examples:
+are not optional, but the keys inside them are. Here are some examples:
 
     .namespace [ ]               # The root namespace
     .namespace [ "Foo" ]         # The namespace "Foo"
     .namespace [ "Foo" ; "Bar" ] # Namespace Foo::Bar
     .namespace                   # WRONG! The [] are needed
 
-Using semicolons, namespaces can be nested to any arbitrary depth. Namespaces
-are special types of PMC, so we can access them and manipulate them just
-like other data objects. We can get the PMC for the root namespace using
-the C<get_root_namespace> opcode:
+Using semicolons, namespaces can be nested to any arbitrary depth.
+Namespaces are special types of PMC, so we can access them and manipulate
+them just like other data objects. We can get the PMC for the root
+namespace using the C<get_root_namespace> opcode:
 
     $P0 = get_root_namespace
 
 The current namespace, which might be different from the root namespace
 can be retrieved with the C<get_namespace> opcode:
 
-    $P0 = get_namespace             # get current namespace
-    $P0 = get_namespace [ "Foo" ]   # get PMC for namespace "Foo"
+    $P0 = get_namespace             # get current namespace PMC
+    $P0 = get_namespace ["Foo"]     # get PMC for namespace "Foo"
 
-Once we have a namespace PMC, we can call functions in it, or retrieve
-global variables from it using the following functions:
+Once we have a namespace PMC we can retrieve global variables and
+subroutine PMCs from it using the following functions:
 
     $P1 = get_global $S0            # Get global in current namespace
-    $P1 = get_global [ "Foo" ], $S0 # Get global in namespace "Foo"
+    $P1 = get_global ["Foo"], $S0   # Get global in namespace "Foo"
     $P1 = get_global $P0, $S0       # Get global in $P0 namespace PMC
 
-In the examples above, of course, C<$S0> contains the string name of the
-global variable or function from the namespace to find.
+Of course, once we have found a subroutine PMC from a namespace, we
+can invoke it like a normal subroutine:
+
+    $P1 = get_global ["Foo"], "MySubroutine"
+    $P1()                           # invoke it
 
 =head3 Method Syntax
 
 Z<CHP-4-SECT-2>
 
-Now that we've discussed namespaces, we can start to discuss
-object-oriented programming and method calls. The basic syntax is
-similar to the single line subroutine call above, but instead of a
-subroutine label name it takes a variable for the invocant PMC and a
+Now that we've discussed namespaces, we can start to discuss all the
+interesting things that namespaces enable, like object-oriented
+programming and method calls. Methods are just like subroutines, except
+they are invoked on a object PMC, and that PMC is passed as the c<self>
+parameter.
+
+The basic syntax for a method call is similar to the single line
+subroutine call above. It takes a variable for the invocant PMC and a
 string with the name of the method:
 
   object."methodname"(arguments)
 
+Notice that the name of the method must be contained in quotes. If the
+name of the method is not contained in quotes, it's treated as a named
+variable that does. Here's an example:
+
+  .local string methname = "Foo"
+  object.methname()               # Same as object."Foo"()
+
 The invocant can be a variable or register, and the method name can be
-a literal string, string variable, or method object register. This
-tiny bit of code sets up all the registers for a method call and makes
-the call, saving and restoring the top half of the register frames
-around the call. Internally, the call is a C<callmethodcc> opcode, so
-it also generates a return continuation.
+a literal string, string variable, or method object PMC.
 
 This example defines two methods in the C<Foo> class. It calls one
 from the main body of the subroutine and the other from within the
 first method:
 
-  .sub _main
+  .sub main
     .local pmc class
     .local pmc obj
     newclass class, "Foo"       # create a new Foo class
     new obj, "Foo"              # instantiate a Foo object
-    obj."_meth"()               # call obj."_meth" which is actually
+    obj."meth"()                # call obj."_meth" which is actually
     print "done\n"              # "_meth" in the "Foo" namespace
     end
   .end
 
   .namespace [ "Foo" ]          # start namespace "Foo"
 
-  .sub _meth :method            # define Foo::_meth global
+  .sub meth :method             # define Foo::_meth global
      print "in meth\n"
-     $S0 = "_other_meth"        # method names can be in a register too
+     $S0 = "other_meth"         # method names can be in a register too
      self.$S0()                 # self is the invocant
   .end
 
-  .sub _other_meth :method      # define another method
+  .sub other_meth :method       # define another method
      print "in other_meth\n"    # as above Parrot provides a return
   .end                          # statement
 
-Each method call looks up the method name in the symbol table of the
-object's class. Like C<.pccsub> in PASM, C<.sub> makes a symbol table
-entry for the subroutine in the current namespace.
+Each method call looks up the method name in the object's class namespace.
+The C<.sub> directive automatically makes a symbol table entry for the
+subroutine in the current namespace.
 
-When a C<.sub> is declared as a C<method>, it automatically creates a
+When a C<.sub> is declared as a C<:method>, it automatically creates a
 local variable named C<self> and assigns it the object passed in
-C<P2>.
+C<P2>. You don't need to write C<.param pmc self> to get it, it comes
+free with the method.
 
 You can pass multiple arguments to a method and retrieve multiple
 return values just like a single line subroutine call:
@@ -491,31 +502,35 @@ return values just like a single line subroutine call:
 
 PMCs all subscribe to a common interface of functions called X<VTABLE>
 VTABLEs. Every PMC implements the same set of these interfaces, which
-perform very specific low level tasks on the PMC. The term VTABLE was
+perform very specific low-level tasks on the PMC. The term VTABLE was
 originally a shortened form of the name "virtual function table",
 although that name isn't used any more by the developers, or in any of
-the documentation. The virtual functions in the VTABLE, called
-X<VTABLE interfaces> VTABLE interfaces, are similar to ordinary
-functions and methods in many respects. VTABLE interfaces are
-occasionally called "VTABLE functions", or "VTABLE methods" or even
-"VTABLE entries" in casual conversation. A quick comparison shows that
-VTABLE interfaces are not really subroutines or methods in the way
-that those terms have been used throughout the rest of Parrot. Like
-methods on an object, VTABLE interfaces are defined for a specific
-class of PMC, and can be invoked on any member of that class. Likewise,
-in a VTABLE interface declaration, the C<self> keyword is used to
-describe the object that it is invoked upon. That's where the
-similarities end, however. Unlike ordinary subroutines or methods,
-VTABLE methods cannot be invoked directly, they are not inherited
-through class hierarchies like how methods are.
+the documentation N<In fact, if you say "virtual function table" to
+one of the developers, they probably won't know what you are talking
+about>. The virtual functions in the VTABLE, called X<VTABLE
+interfaces> VTABLE interfaces, are similar to ordinary functions and
+methods in many respects. VTABLE interfaces are occasionally called
+"VTABLE functions", or "VTABLE methods" or even "VTABLE entries" in
+casual conversation. A quick comparison shows that VTABLE interfaces
+are not really subroutines or methods in the way that those terms have
+been used throughout the rest of Parrot. Like methods on an object,
+VTABLE interfaces are defined for a specific class of PMC, and can be
+invoked on any member of that class. Likewise, in a VTABLE interface
+declaration, the C<self> keyword is used to describe the object that
+it is invoked upon. That's where the similarities end, however. Unlike
+ordinary subroutines or methods, VTABLE methods cannot be invoked
+directly, they are also not inherited through class hierarchies like
+how methods are. With all this terminology discussion out of the way,
+we can start talking about what VTABLES are and how they are used in
+Parrot.
 
-VTABLE interfaces are used, for instance, to set and retrieve data from
-the PMCs, to invoke the PMC (if it's a subroutine) or to perform
-low-level arithmetic operations on the PMC. VTABLE interfaces are not
-called directly from PIR code, but are instead called internally by
-Parrot to implement specific opcodes and behaviors. For instance, the
-C<invoke> opcode calls the C<invoke> VTABLE interface of the subroutine
-PMC, while the C<inc> opcode on a PMC calls the C<increment> VTABLE
+VTABLE interfaces are the primary way that data in the PMC is accessed
+and modified. VTABLES also provide a way to invoke the PMC if it's a
+subroutine or subroutine-like PMC. VTABLE interfaces are not called
+directly from PIR code, but are instead called internally by Parrot to
+implement specific opcodes and behaviors. For instance, the C<invoke>
+opcode calls the C<invoke> VTABLE interface of the subroutine PMC,
+while the C<inc> opcode on a PMC calls the C<increment> VTABLE
 interface on that PMC. What VTABLE interface overrides do, in essence,
 is to allow the programmer to change the very way that Parrot accesses
 PMC data in the most fundamental way, and changes the very way that the
@@ -537,9 +552,11 @@ VTABLE interfaces are declared with the C<:vtable> flag:
   .end
 
 in which case the subroutine must have the same name as the VTABLE
-interface it is intended to implement. However, if you would like to name
-the function something different but still use it as a VTABLE interface,
-you could add an additional name parameter to the flag:
+interface it is intended to implement. VTABLE interfaces all have very
+specific names, and you can't override one with just any arbitrary name.
+However, if you would like to namethe function something different but
+still use it as a VTABLE interface, you could add an additional name
+parameter to the flag:
 
   .sub 'MySetInteger' :vtable('set_integer')
       #set the integer value of the PMC here
@@ -559,27 +576,33 @@ as VTABLE interfaces. This means we can have the following:
   .namespace [ "OtherClass" ]
   
   .local pmc myclass = new "MyClass"
-  say myclass                # Say converts to string internally
-  S0 = myclass               # Convert to a string, store in S0
-  S0 = myclass.'ToString'()  # The same
+  say myclass                 # say converts to string internally
+  $S0 = myclass               # Convert to a string, store in SS0
+  $S0 = myclass.'ToString'()  # The same
 
 Inside a VTABLE interface definition, the C<self> local variable contains
-the PMC on which the VTABLE interface is invoked.
+the PMC on which the VTABLE interface is invoked, just like in a method
+declaration.
 
 =head2 Coroutines
 
-Coroutines are similar to subroutines except that they have an internal
-notion of I<state>. Coroutines, in addition to performing a normal
-C<.return> to return control flow back to the caller and destroy the
-lexical environment of the subroutine, may also perform a
-C<.yield>. C<.yield> returns a value to the caller like C<.return> can,
-but it does not destroy the lexical state of the coroutine. The next time
-the coroutine is called, it continues execution from the point of the
-last C<.yield>, not at the beginning of the coroutine.
+X<PIR;Coroutines>
+X<Coroutines>
+We've mentioned coroutines several times before, and we're finally going
+to explain what they are. Coroutines are similar to subroutines except
+that they have an internal notion of I<state> N<And the cool new name!>.
+Coroutines, in addition to performing a normal C<.return> to return
+control flow back to the caller and destroy the lexical environment of
+the subroutine, may also perform a C<.yield> operation. C<.yield> returns
+a value to the caller like C<.return> can, but it does not destroy the
+lexical state of the coroutine. The next time the coroutine is called, it
+continues execution from the point of the last C<.yield>, not at the
+beginning of the coroutine.
 
-Coroutines, in essence, allow the programmer to manually simulate multiple
-threads of concurrent execution, something that is normally handled
-automatically and invisible at the hardware level.
+In a Coroutine, when we continue from a C<.yield>, the entire lexical
+environment is the same as it was when C<.yield> was called. This
+means that the parameter values don't change, even if we call the
+coroutine with different arguments later.
 
 =head3 Defining Coroutines
 
@@ -597,7 +620,7 @@ instead of a Subroutine one.
 
 =item* Creates a continuation
 
-Continuations, as we will see in more detail later, allow us to continue
+Continuations, as we have already seen, allow us to continue
 execution at the point of the continuation later. It's like a snapshot of
 the current execution environment. C<.yield> creates a continuation in
 the coroutine and stores the continuation object in the coroutine object
@@ -605,7 +628,7 @@ or later resuming from the point of the C<.yield>.
 
 =item* Returns a value
 
-C<.yield> can return a value N<or many values, or no values> to the caller
+C<.yield> can return a value N<or many values, or no values> to the caller.
 It is basically the same as a C<.return> in this regard.
 
 =back
