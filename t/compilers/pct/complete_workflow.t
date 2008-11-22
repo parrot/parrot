@@ -8,9 +8,9 @@ use lib qw(t . lib ../lib ../../lib ../../../lib);
 
 use Test::More;
 
-use Parrot::Test tests => 5 * 9;
+use Parrot::Test tests => 6 * 9;
 use Parrot::Test::Util 'create_tempfile';
-use Parrot::Config;
+use Parrot::Config qw(%PConfig);
 
 =head1 NAME
 
@@ -216,6 +216,84 @@ method thingy($/) {
 ACTIONS
 $?MY_OUR_VAR is in scope a
 $?MY_OUR_VAR is in scope b
+OUT
+}
+
+{
+    test_pct( 'our and key', <<'IN', <<'GRAMMAR', <<'ACTIONS', <<'OUT' );
+thingy
+IN
+token TOP {
+    <thingy_or_stuff>+
+    {*}
+}
+token thingy_or_stuff {
+      <THINGY> {*}  #= THINGY
+    | <STUFF>  {*}  #= STUFF  
+}
+token THINGY {
+    'thingy'
+    {*}
+} 
+token STUFF {
+    'stuff'
+    {*}
+} 
+GRAMMAR
+
+method TOP($/) {
+    my $past := PAST::Stmts.new();
+    for $<thingy_or_stuff> {
+        $past.push( $( $_ ) );
+    } 
+
+    our $?MY_OUR_VAR;
+    $past.unshift( $?MY_OUR_VAR );
+
+    make $past;
+}
+
+method thingy_or_stuff($/,$key) {
+    make $( $/{$key} );
+}
+
+method THINGY($/) {
+    our $?MY_OUR_VAR := PAST::Op.new(
+                           PAST::Val.new(
+                               :value( '$?MY_OUR_VAR was set in THINGY' ),
+                               :returns('String')
+                           ),
+                           :pirop('say'),
+                       );
+    make PAST::Op.new(
+             PAST::Val.new(
+                 :value( 'matched: ' ~ ~$/ ),
+                 :returns('String')
+             ),
+             :pirop('say'),
+         );
+}
+
+method STUFF($/) {
+    our $?MY_OUR_VAR := PAST::Op.new(
+                           PAST::Val.new(
+                               :value( '$?MY_OUR_VAR was set in THINGY' ),
+                               :returns('String')
+                           ),
+                           :pirop('say'),
+                       );
+    make PAST::Op.new(
+             PAST::Val.new(
+                 :value( 'matched: ' ~ ~$/ ),
+                 :returns('String')
+             ),
+             :pirop('say'),
+         );
+}
+
+ACTIONS
+$?MY_OUR_VAR was set in THINGY
+matched: thingy
 OUT
 }
 
