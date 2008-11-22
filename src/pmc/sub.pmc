@@ -250,7 +250,7 @@ Invokes the subroutine.
             context = Parrot_dup_context(INTERP, caller_ctx);
         else
 #endif
-        context               = Parrot_alloc_context(INTERP, sub->n_regs_used);
+        context               = Parrot_set_new_context(INTERP, sub->n_regs_used);
         context->current_sub  = SELF;
         context->caller_ctx   = caller_ctx;
         context->current_pc   = pc;

@@ -147,7 +147,7 @@ Swaps the "context".
 
             /* first time set current sub, cont, object */
             caller_ctx = CONTEXT(interp);
-            ctx        = Parrot_alloc_context(INTERP, co->n_regs_used);
+            ctx        = Parrot_set_new_context(INTERP, co->n_regs_used);
 
             co->ctx                   = ctx;
             co->dynamic_state         = interp->dynamic_env;
