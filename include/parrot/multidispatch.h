@@ -112,6 +112,14 @@ void Parrot_mmd_add_multi_list_from_c_args(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC* Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP,
+    ARGIN(PMC *sig_obj))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 void Parrot_mmd_destroy(PARROT_INTERP)
         __attribute__nonnull__(1);
 

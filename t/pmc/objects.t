@@ -530,7 +530,7 @@ l1:
 .end
 
 .namespace ["MyInt1"]
-.sub add :multi(MyInt1, MyInt1)
+.sub add :multi(MyInt1, MyInt1, MyInt1)
     .param pmc self
     .param pmc right
     .param pmc dest

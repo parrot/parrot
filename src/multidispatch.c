@@ -137,9 +137,7 @@ static void Parrot_mmd_ensure_writable(PARROT_INTERP,
     ARGIN_NULLOK(const PMC *pmc))
         __attribute__nonnull__(1);
 
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC* Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub))
+static PMC * Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -412,9 +410,9 @@ Parrot_build_sig_object_from_varargs(PARROT_INTERP, ARGIN(const char *sig), va_l
 {
     INTVAL i;
     INTVAL in_return_sig    = 0;
+    PMC   *type_tuple       = PMCNULL;
     PMC   *returns          = PMCNULL;
     PMC   *call_object      = pmc_new(interp, enum_class_CallSignature);
-    PMC * const type_tuple  = pmc_new(interp, enum_class_FixedIntegerArray);
     STRING *string_sig      = const_string(interp, sig);
     const INTVAL sig_len    = string_length(interp, string_sig);
 
@@ -423,9 +421,6 @@ Parrot_build_sig_object_from_varargs(PARROT_INTERP, ARGIN(const char *sig), va_l
 
     if (!sig_len)
         return call_object;
-
-    VTABLE_set_integer_native(interp, type_tuple, sig_len);
-    VTABLE_set_pmc(interp, call_object, type_tuple);
 
     VTABLE_set_string_native(interp, call_object, string_sig);
 
@@ -473,26 +468,16 @@ Parrot_build_sig_object_from_varargs(PARROT_INTERP, ARGIN(const char *sig), va_l
             switch (type) {
                 case 'I':
                     VTABLE_push_integer(interp, call_object, va_arg(args, INTVAL));
-                    VTABLE_set_integer_keyed_int(interp, type_tuple,
-                            i, enum_type_INTVAL);
                     break;
                 case 'N':
                     VTABLE_push_float(interp, call_object, va_arg(args, FLOATVAL));
-                    VTABLE_set_integer_keyed_int(interp, type_tuple,
-                            i, enum_type_FLOATVAL);
                     break;
                 case 'S':
                     VTABLE_push_string(interp, call_object, va_arg(args, STRING *));
-                    VTABLE_set_integer_keyed_int(interp, type_tuple,
-                            i, enum_type_STRING);
                     break;
                 case 'P':
                 {
                     PMC *pmc_arg = va_arg(args, PMC *);
-                    if (!PMC_IS_NULL(pmc_arg))
-                        VTABLE_set_integer_keyed_int(interp, type_tuple, i,
-                                VTABLE_type(interp, pmc_arg));
-
                     VTABLE_push_pmc(interp, call_object, pmc_arg);
                     break;
                 }
@@ -508,6 +493,8 @@ Parrot_build_sig_object_from_varargs(PARROT_INTERP, ARGIN(const char *sig), va_l
         }
     }
 
+    type_tuple = Parrot_mmd_build_type_tuple_from_sig_obj(interp, call_object);
+    VTABLE_set_pmc(interp, call_object, type_tuple);
     return call_object;
 }
 
@@ -1272,6 +1259,85 @@ mmd_build_type_tuple_from_long_sig(PARROT_INTERP, ARGIN(STRING *long_sig))
     PMC *type_list = string_split(interp, CONST_STRING(interp, ","), long_sig);
 
     return mmd_build_type_tuple_from_type_list(interp, type_list);
+}
+
+/*
+
+=item C<PMC* Parrot_mmd_build_type_tuple_from_sig_obj>
+
+Construct a FixedIntegerArray of type numbers from the arguments of a Call
+Signature object. Used for multiple dispatch.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC*
+Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP, ARGIN(PMC *sig_obj))
+{
+    PMC * const type_tuple = pmc_new(interp, enum_class_FixedIntegerArray);
+    INTVAL i;
+    INTVAL tuple_size = 0;
+    INTVAL args_ended = 0;
+    STRING *string_sig = VTABLE_get_string(interp, sig_obj);
+    const INTVAL sig_len = string_length(interp, string_sig);
+
+    /* First calculate the number of arguments participating in MMD */
+    for (i = 0; i < sig_len; ++i) {
+        INTVAL type = string_index(interp, string_sig, i);
+        if (type == '-')
+            break;
+
+        tuple_size++; 
+    }
+
+    VTABLE_set_integer_native(interp, type_tuple, tuple_size);
+
+    for (i = 0; i < sig_len; ++i) {
+        INTVAL type = string_index(interp, string_sig, i);
+        if (args_ended)
+            break;
+
+        /* Regular arguments just set the value */
+        switch (type) {
+            case 'I':
+                VTABLE_set_integer_keyed_int(interp, type_tuple,
+                        i, enum_type_INTVAL);
+                break;
+            case 'N':
+                VTABLE_set_integer_keyed_int(interp, type_tuple,
+                        i, enum_type_FLOATVAL);
+                break;
+            case 'S':
+                VTABLE_set_integer_keyed_int(interp, type_tuple,
+                        i, enum_type_STRING);
+                break;
+            case 'P':
+            {
+                PMC *pmc_arg = VTABLE_get_pmc_keyed_int(interp, sig_obj, i);
+                if (PMC_IS_NULL(pmc_arg))
+                    VTABLE_set_integer_keyed_int(interp, type_tuple,
+                            i, enum_type_PMC);
+                else
+                    VTABLE_set_integer_keyed_int(interp, type_tuple, i,
+                            VTABLE_type(interp, pmc_arg));
+
+                break;
+            }
+            case '-':
+                args_ended = 1;
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Multiple Dispatch: invalid argument type %c!", type);
+        }
+    }
+
+    return type_tuple;
 }
 
 /*

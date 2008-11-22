@@ -30,7 +30,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'Integer_divide_Integer  10 / 3 = 1003' );
 .sub 'test' :main
     .local pmc divide
     divide = global "Integer_divide_Integer"
-    add_multi "divide", "Integer,Integer", divide
+    add_multi "divide", "Integer,Integer,Integer", divide
 
     $P0 = new 'Integer'
     $P1 = new 'Integer'
@@ -225,7 +225,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "PASM MMD divide - loaded sub" );
     .local pmc divide
     load_bytecode "$temp_pir"
     divide = global "Integer_divide_Integer"
-    add_multi "divide", "Integer,Integer", divide
+    add_multi "divide", "Integer,Integer,Integer", divide
 
     \$P0 = new 'Integer'
     \$P1 = new 'Integer'
