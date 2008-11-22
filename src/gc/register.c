@@ -20,6 +20,17 @@ is determined by the PASM/PIR compiler in the register allocation pass
 #include "parrot/parrot.h"
 #include "parrot/register.h"
 
+
+/* set CTX_LEAK_DEBUG_FULL to 1 for enhanced context debugging.
+ * When set (1) freed contexts are "poisoned" so that any dangling
+ * references produce segfaults, and (2) contexts are not recycled
+ * so that later allocations don't suddenly restore a dangling
+ * reference to a "working" condition.
+ */
+#define CTX_LEAK_DEBUG_FULL 1
+
+
+
 /* HEADERIZER HFILE: include/parrot/register.h */
 
 /* HEADERIZER BEGIN: static */
@@ -568,7 +579,7 @@ Parrot_free_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctx), int deref)
             ctx->n_regs_used = NULL;
         }
 
-#if 0
+#if CTX_LEAK_DEBUG_FULL
         /* for debugging, poison the freed context in case anything
          * tries to use it later. */
         ctx->current_results   = (opcode_t *)0xbeefcafe;
@@ -595,8 +606,9 @@ Parrot_free_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctx), int deref)
         ptr             = ctx;
         slot            = CALCULATE_SLOT_NUM(ctx->regs_mem_size);
 
-        /* uncomment the following line to prevent recycling of contexts */
-        /* slot = 0; */
+#if CTX_DEBUG_LEAK_FULL
+        slot = 0;
+#endif
 
         PARROT_ASSERT(slot < interp->ctx_mem.n_free_slots);
         *(void **)ptr                   = interp->ctx_mem.free_list[slot];
