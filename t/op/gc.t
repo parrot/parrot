@@ -167,8 +167,8 @@ pir_output_is( <<'CODE', <<OUTPUT, "vanishing return continuation in method call
 .sub init :vtable :method
     print "init\n"
     sweep 1
-    new P6, 'String'
-    set P6, "hi"
+    new $P6, 'String'
+    set $P6, "hi"
     self."do_inc"()
     sweep 1
 .end

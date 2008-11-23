@@ -733,10 +733,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', "pir uses no ops" );
 .end
 
 .sub foo
-    get_params "0, 0", I16, I17
-    print I16
+    get_params "0, 0", $I16, $I17
+    print $I16
     print "\n"
-    print I17
+    print $I17
     print "\n"
     set_returns ""
     returncc
@@ -1331,14 +1331,14 @@ pir_output_is( <<'CODE', <<'OUTPUT', "tailcall - overlapping Ix" );
 .end
 .sub foo
     .const 'Sub' b = "bar"
-    I0 = 10
-    I1 = 20
-    set_args "0,0", I1, I0
+    $I0 = 10
+    $I1 = 20
+    set_args "0,0", $I1, $I0
     tailcall b
 .end
 .sub bar
-    get_params "0,0", I0, I1
-    .return (I0, I1)
+    get_params "0,0", $I0, $I1
+    .return ($I0, $I1)
 .end
 CODE
 2010
@@ -2422,33 +2422,33 @@ pir_output_is(
 .end
 
 .sub create_closure_and_run_it
-    P0 = new "Integer"
-    P0 = 3
-    .lex "val", P0
-    P2 = get_global "myclosure"
-    P1 = newclosure P2
+    $P0 = new "Integer"
+    $P0 = 3
+    .lex "val", $P0
+    $P2 = get_global "myclosure"
+    $P1 = newclosure $P2
     # There is a closure depending on our current context, so this shouldn't
     # free it.
-    .tailcall P1()
+    .tailcall $P1()
 .end
 
 .sub myclosure :outer(create_closure_and_run_it)
-    P1 = find_lex "val"
-    say P1
+    $P1 = find_lex "val"
+    say $P1
     donothing()
-    P1 = find_lex "val"
-    say P1
+    $P1 = find_lex "val"
+    say $P1
     .return ()
 .end
 
 .sub donothing
-    P0 = new "Integer"
-    P0 = 5
+    $P0 = new "Integer"
+    $P0 = 5
     # This creates a new binding that is not accessible by the
     # caller (myclosure)
-    .lex "val", P0
-    P2 = null
-    P1 = null
+    .lex "val", $P0
+    null $P2
+    null $P1
 .end
 CODE
 3
