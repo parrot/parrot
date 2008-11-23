@@ -14,8 +14,8 @@ SKIP: {
     skip("disabled graph coloring register allocator, RT #57028", 1);
 pir_2_pasm_like( <<'CODE', <<'OUT', "add_n_i_n" );
 .sub _ :anon
-   add N0, I0, N1
-   mul N0, I0, N1
+   add $N0, $I0, $N1
+   mul $N0, $I0, $N1
 .end
 CODE
 /set (N\d+), I0
@@ -28,8 +28,8 @@ OUT
 ##############################
 pir_2_pasm_is( <<'CODE', <<'OUT', "sub_n_ic_n" );
 .sub _ :anon
-   sub N0, 2, N1
-   div N0, 2, N1
+   sub $N0, 2, $N1
+   div $N0, 2, $N1
 .end
 CODE
 # IMCC does produce b0rken PASM files
@@ -46,8 +46,8 @@ SKIP: {
     skip("disabled graph coloring register allocator, RT #57028", 1);
 pir_2_pasm_like( <<'CODE', <<'OUT', "sub_n_i_n" );
 .sub _test
-   sub N0, I0, N1
-   div N0, I0, N1
+   sub $N0, $I0, $N1
+   div $N0, $I0, $N1
 .end
 CODE
 /_test:

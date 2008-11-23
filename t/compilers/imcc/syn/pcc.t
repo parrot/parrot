@@ -399,15 +399,15 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "\:main defined twice" );
 .sub foo :main
-        set S0, 'not ok'
-        print S0
+        set $S0, 'not ok'
+        print $S0
         print "\r\n"
         end
 .end
 
 .sub bar :main
-        set S0, 'ok'
-        print S0
+        set $S0, 'ok'
+        print $S0
         print "\r\n"
         end
 .end
