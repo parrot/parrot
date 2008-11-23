@@ -477,10 +477,11 @@ Return the name of the role (without the HLL namespace).
              */
             PMC * const names = Parrot_ns_get_name(interp, _namespace);
 
-            if (!PMC_IS_NULL(names))
+            if (!PMC_IS_NULL(names)) {
                 /* remove the HLL namespace name */
                 VTABLE_shift_string(INTERP, names);
                 return string_join(interp, CONST_STRING(interp, ";"), names);
+            }
         }
 
         /* Otherwise, copy the stored string name of the class. */
