@@ -84,14 +84,14 @@ OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "Set and get native float");
   .sub main :main
-    loadlib P0, 'rational'
-    new P0, 'Rational'
+    loadlib $P0, 'rational'
+    new $P0, 'Rational'
 
-    N0 = 11.1
-    P0 = N0
-    N1 = P0
+    $N0 = 11.1
+    $P0 = $N0
+    $N1 = $P0
 
-    say N1
+    say $N1
   .end
 CODE
 11.1

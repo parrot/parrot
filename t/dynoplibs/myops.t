@@ -85,8 +85,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "one alarm", @todo );
 .loadlib "myops_ops"
 
 .sub main :main
-    get_global P0, "_alarm"
-    alarm 0.1, P0
+    get_global $P0, "_alarm"
+    alarm 0.1, $P0
     print "1\n"
 
     # alarm should be triggered half-way
@@ -123,48 +123,48 @@ SKIP: {
 
 .loadlib "myops_ops"
 .sub main :main
-    P1 = new Integer
-    set P1, 0
-    set_global "flag", P1
-    get_global P0, "_alarm3"
-    alarm 0.3, P0
-    get_global P0, "_alarm2"
-    alarm 0.2, P0
-    get_global P0, "_alarm1"
-    alarm 0.1, P0
+    $P1 = new 'Integer'
+    set $P1, 0
+    set_global "flag", $P1
+    get_global $P0, "_alarm3"
+    alarm 0.3, $P0
+    get_global $P0, "_alarm2"
+    alarm 0.2, $P0
+    get_global $P0, "_alarm1"
+    alarm 0.1, $P0
 
-    set I0, 1
+    set $I0, 1
 loop:
     sleep 0.1
-    inc I0
+    inc $I0
     # check_events
-    get_global P1, "flag"
-    ge P1, 7, done
-    le I0, 40, loop
+    get_global $P1, "flag"
+    ge $P1, 7, done
+    le $I0, 40, loop
 
 done:
-    get_global P1, "flag"
-    I1 = P1
-    print I1
+    get_global $P1, "flag"
+    $I1 = $P1
+    print $I1
     print "\n"
 .end
 
 .sub _alarm1
-    get_global P0, "flag"
-    add P0, 1
-    set_global "flag", P0
+    get_global $P0, "flag"
+    add $P0, 1
+    set_global "flag", $P0
 .end
 
 .sub _alarm2
-    get_global P0, "flag"
-    add P0, 2
-    set_global "flag", P0
+    get_global $P0, "flag"
+    add $P0, 2
+    set_global "flag", $P0
 .end
 
 .sub _alarm3
-    get_global P0, "flag"
-    add P0, 4
-    set_global "flag", P0
+    get_global $P0, "flag"
+    add $P0, 4
+    set_global "flag", $P0
 .end
 
 CODE
@@ -175,14 +175,14 @@ OUTPUT
 
 .loadlib "myops_ops"
 .sub main :main
-    get_global P0, "_alarm"
-    alarm 0.5, 0.4, P0
-    set I0, 1
+    get_global $P0, "_alarm"
+    alarm 0.5, 0.4, $P0
+    set $I0, 1
 loop:
     sleep 1
-    inc I0
+    inc $I0
     # check_events
-    le I0, 4, loop
+    le $I0, 4, loop
 .end
 
 .sub _alarm
