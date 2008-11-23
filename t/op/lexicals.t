@@ -41,7 +41,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', '.lex parsing - PIR' );
 .sub main
-    .lex "$a", P0
+    .lex "$a", $P0
     print "ok\n"
 .end
 CODE
@@ -201,16 +201,16 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_lexpad - set var via pad' );
     .local pmc pad, interp
     interp = getinterp
     pad = interp["lexpad"]
-    .lex '$a', P0
+    .lex '$a', $P0
     unless null pad goto ok
     print "pad is NULL\n"
     end
 ok:
     print "ok\n"
-    P1 = new 'Integer'
-    P1 = 13013
-    pad['$a'] = P1
-    print P0
+    $P1 = new 'Integer'
+    $P1 = 13013
+    pad['$a'] = $P1
+    print $P0
     print "\n"
     end
 .end
@@ -221,8 +221,8 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_lexpad - set two vars via pad (2 lex -> 2 pmc)' );
 .sub main
-    .lex '$a', P0
-    .lex '$b', P2
+    .lex '$a', $P0
+    .lex '$b', $P2
     .local pmc pad, interp
     interp = getinterp
     pad = interp["lexpad"]
@@ -232,14 +232,14 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_lexpad - set two vars via pad (2 lex -
     end
 ok:
     print "ok\n"
-    P1 = new 'Integer'
-    P1 = 13013
-    pad['$a'] = P1
-    print P0
+    $P1 = new 'Integer'
+    $P1 = 13013
+    pad['$a'] = $P1
+    print $P0
     print "\n"
-    P1 = 42
-    pad['$b'] = P1
-    print P2
+    $P1 = 42
+    pad['$b'] = $P1
+    print $P2
     print "\n"
     end
 .end
@@ -251,11 +251,11 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'synopsis example' );
 .sub main
-    .lex '$a', P0
-    P1 = new 'Integer'
-    P1 = 13013
-    store_lex '$a', P1
-    print P0
+    .lex '$a', $P0
+    $P1 = new 'Integer'
+    $P1 = 13013
+    store_lex '$a', $P1
+    print $P0
     print "\n"
     end
 .end
@@ -328,7 +328,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_lexinfo from pad' );
 .sub main
-    .lex '$a', P0
+    .lex '$a', $P0
     .local pmc pad, interp, info
     interp = getinterp
     pad = interp["lexpad"]

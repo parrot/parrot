@@ -131,9 +131,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', ".get_results() - PIR" );
 .sub main :main
     print "main\n"
     push_eh _handler
-    new P1, 'Exception'
-    set P1, "just pining"
-    throw P1
+    new $P1, 'Exception'
+    set $P1, "just pining"
+    throw $P1
     print "not reached\n"
     end
 _handler:
@@ -142,12 +142,12 @@ _handler:
     .get_results (e)
     s = e
     print "caught it\n"
-    typeof S1, e
-    print S1
+    typeof $S1, e
+    print $S1
     print "\n"
     print s
     print "\n"
-    null P5
+    null $P5
 .end
 CODE
 main
