@@ -26,7 +26,7 @@ Tests the Foo PMC.
 pir_output_is( << 'CODE', << 'OUTPUT', "get_integer" );
 
 .sub main :main
-    loadlib P1, "foo"
+    loadlib $P1, "foo"
     $P1 = new "Foo"
 
     $I1 = $P1
@@ -42,7 +42,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with relative pathname, no ext" 
     ## load a relative pathname without the extension.  loadlib will convert the
     ## '/' characters to '\\' on windows.
     $S0 = "runtime/parrot/dynext/foo"
-    loadlib P1, $S0
+    loadlib $P1, $S0
 
     ## ensure that we can still make Foo instances.
     $P1 = new "Foo"
@@ -66,7 +66,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with absolute pathname, no ext" 
     ## this should always find the version in the build directory, since that's
     ## the only place "make test" will work.
     $S0 = concat "/runtime/parrot/dynext/foo"
-    loadlib P1, $S0
+    loadlib $P1, $S0
 
     ## ensure that we can still make Foo instances.
     $P1 = new "Foo"
@@ -88,7 +88,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with relative pathname & ext" );
 
     ## load a relative pathname with an extension.
     $S0 = concat "runtime/parrot/dynext/foo", $S0
-    loadlib P1, $S0
+    loadlib $P1, $S0
 
     ## ensure that we can still make Foo instances.
     $P1 = new "Foo"
@@ -114,7 +114,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "loadlib with absolute pathname & ext" );
     ## the only place "make test" will work.
     $S0 = concat $S0, "/runtime/parrot/dynext/foo"
     $S0 = concat $S0, $S1
-    loadlib P1, $S0
+    loadlib $P1, $S0
 
     ## ensure that we can still make Foo instances.
     $P1 = new "Foo"
