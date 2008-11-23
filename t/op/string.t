@@ -1463,38 +1463,38 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'index with different charsets' );
 .sub test :main
 
     print "default - default:\n"
-    set S0, "Parrot"
-    set S1, "rot"
-    index I1, S0, S1
-    print I1
+    set $S0, "Parrot"
+    set $S1, "rot"
+    index $I1, $S0, $S1
+    print $I1
     print "\n"
 
     print "ascii - ascii:\n"
-    set S0, ascii:"Parrot"
-    set S1, ascii:"rot"
-    index I1, S0, S1
-    print I1
+    set $S0, ascii:"Parrot"
+    set $S1, ascii:"rot"
+    index $I1, $S0, $S1
+    print $I1
     print "\n"
 
     print "default - ascii:\n"
-    set S0, "Parrot"
-    set S1, ascii:"rot"
-    index I1, S0, S1
-    print I1
+    set $S0, "Parrot"
+    set $S1, ascii:"rot"
+    index $I1, $S0, $S1
+    print $I1
     print "\n"
 
     print "ascii - default:\n"
-    set S0, ascii:"Parrot"
-    set S1, "rot"
-    index I1, S0, S1
-    print I1
+    set $S0, ascii:"Parrot"
+    set $S1, "rot"
+    index $I1, $S0, $S1
+    print $I1
     print "\n"
 
     print "binary - binary:\n"
-    set S0, binary:"Parrot"
-    set S1, binary:"rot"
-    index I1, S0, S1
-    print I1
+    set $S0, binary:"Parrot"
+    set $S1, binary:"rot"
+    index $I1, $S0, $S1
+    print $I1
     print "\n"
 
 .end
@@ -2656,18 +2656,18 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', 'join: get_string returns a null string' );
 
 .sub _main
-    newclass P0, "Foo"
+    newclass $P0, "Foo"
 
-    new P0, 'ResizablePMCArray'
+    new $P0, 'ResizablePMCArray'
 
-    P1 = new "Foo"
+    $P1 = new "Foo"
 
-    push P0, P1
+    push $P0, $P1
 
     print "a"
-    join S0, "", P0
+    join $S0, "", $P0
     print "b"
-    print S0
+    print $S0
     print "c\n"
     end
 .end
