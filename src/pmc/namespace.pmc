@@ -438,7 +438,8 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
             return SELF.get_pointer_keyed_str(VTABLE_get_string(INTERP, key));
 
         if (key->vtable->base_type == enum_class_Key) {
-            while (key) {
+            /* this loop (and function) could use a rewrite for clarity */
+            while (1) {
                 STRING * const part = VTABLE_get_string(INTERP, key);
                 key  = key_next(INTERP, key);
 
