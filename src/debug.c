@@ -2622,8 +2622,10 @@ PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
     pline = mem_allocate_zeroed_typed(PDB_line_t);
 
     /* If we already got a source, free it */
-    if (pdb->file)
-        PDB_free_file(interp);
+    if (pdb->file) {
+        PDB_free_file(interp, pdb->file);
+        pdb->file = NULL;
+    }
 
     pfile->line   = pline;
     pline->number = 1;
@@ -2676,7 +2678,8 @@ PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
         if (!pline) {
             PIO_eprintf(pdb->debugger,
                         "Label number %li out of bounds.\n", label->number);
-            /* RT #46127: free allocated memory */
+
+            PDB_free_file(interp, pfile);
             return;
         }
 
@@ -2745,10 +2748,8 @@ Frees any allocated source files.
 */
 
 void
-PDB_free_file(PARROT_INTERP)
+PDB_free_file(PARROT_INTERP, ARGIN_NULLOK(PDB_file_t *file))
 {
-    PDB_file_t *file = interp->pdb->file;
-
     while (file) {
         /* Free all of the allocated line structures */
         PDB_line_t  *line = file->line;
@@ -2782,9 +2783,6 @@ PDB_free_file(PARROT_INTERP)
         mem_sys_free(file);
         file  = nfile;
     }
-
-    /* Make sure we don't end up pointing at garbage memory */
-    interp->pdb->file = NULL;
 }
 
 /*
@@ -2815,8 +2813,10 @@ PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
 
     /* If there was a file already loaded or the bytecode was
        disassembled, free it */
-    if (pdb->file)
-        PDB_free_file(interp->pdb->debugee);
+    if (pdb->file) {
+        PDB_free_file(interp->pdb->debugee, interp->pdb->debugee->pdb->file);
+        interp->pdb->debugee->pdb->file = NULL;
+    }
 
     /* Get the name of the file */
     for (j = 0; command[j] == ' '; ++j)
