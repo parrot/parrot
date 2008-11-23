@@ -625,11 +625,12 @@ SP              [ ]
     }
 
 <emit,INITIAL>[ISNP]{DIGIT}{DIGIT}? {
-        if (valp) valp->s = str_dup(yytext);
-
         if (IMCC_INFO(interp)->state->pasm_file == 0)
             IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
             "'%s' is only a valid register name in PASM mode", yytext);
+
+        if (valp)
+            valp->s = str_dup(yytext);
 
         return REG;
     }
