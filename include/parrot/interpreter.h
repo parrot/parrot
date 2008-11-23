@@ -867,9 +867,9 @@ PARROT_EXPORT void disable_event_checking(PARROT_INTERP);
 PARROT_EXPORT void enable_event_checking(PARROT_INTERP);
 
 #if CTX_LEAK_DEBUG
-#  define Parrot_context_ref(a,b) Parrot_context_ref_trace(a,b,__FILE__,__LINE__)
+#  define Parrot_context_ref(a, b) Parrot_context_ref_trace((a), (b), __FILE__, __LINE__)
 #else /* !CTX_LEAK_DEBUG */
-#  define Parrot_context_ref(a,b) (((b)->ref_count++) , (b))
+#  define Parrot_context_ref(a, b) (((b)->ref_count++), (b))
 #endif /* CTX_LEAK_DEBUG */
 
 #else /* !PARROT_IN_CORE */
