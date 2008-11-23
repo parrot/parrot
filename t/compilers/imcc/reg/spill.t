@@ -660,8 +660,8 @@ my $code = repeat(
     INITS  => 'a<index> = <index>',
     ARGS   => 'a<index>',
     PARAMS => '.param pmc a<index>',
-    TESTS  => "set I0, a<index>\nne I0, <index>, fail",
-    TESTS2 => "set I0, a<index>\nne I0, <index>, fail"
+    TESTS  => "set \$I0, a<index>\nne \$I0, <index>, fail",
+    TESTS2 => "set \$I0, a<index>\nne \$I0, <index>, fail"
 );
 
 pir_output_is( $code, <<'OUT', "overflow pmcs 18 spill" );
@@ -674,8 +674,8 @@ $code = repeat(
     INITS  => 'a<index> = <index>',
     ARGS   => 'a<index>',
     PARAMS => '.param pmc a<index>',
-    TESTS  => "set I0, a<index>\nne I0, <index>, fail",
-    TESTS2 => "set I0, a<index>\nne I0, <index>, fail"
+    TESTS  => "set \$I0, a<index>\nne \$I0, <index>, fail",
+    TESTS2 => "set \$I0, a<index>\nne \$I0, <index>, fail"
 );
 
 pir_output_is( $code, <<'OUT', "overflow pmcs 22 spill" );
@@ -688,8 +688,8 @@ $code = repeat(
     INITS  => 'a<index> = <index>',
     ARGS   => 'a<index>',
     PARAMS => '.param pmc a<index>',
-    TESTS  => "set I0, a<index>\nne I0, <index>, fail",
-    TESTS2 => "set I0, a<index>\nne I0, <index>, fail"
+    TESTS  => "set \$I0, a<index>\nne \$I0, <index>, fail",
+    TESTS2 => "set \$I0, a<index>\nne \$I0, <index>, fail"
 );
 
 pir_output_is( $code, <<'OUT', "overflow pmcs 40 spill" );
@@ -702,8 +702,8 @@ $code = repeat(
     INITS  => 'a<index> = <index>',
     ARGS   => 'a<index>',
     PARAMS => '.param pmc a<index>',
-    TESTS  => "set I0, a<index>\nne I0, <index>, fail",
-    TESTS2 => "set I0, a<index>\nne I0, <index>, fail"
+    TESTS  => "set \$I0, a<index>\nne \$I0, <index>, fail",
+    TESTS2 => "set \$I0, a<index>\nne \$I0, <index>, fail"
 );
 
 pir_output_is( $code, <<'OUT', "overflow pmcs 60 spill" );
