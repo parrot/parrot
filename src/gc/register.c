@@ -376,7 +376,7 @@ Parrot_pop_context(PARROT_INTERP)
 
 #if CTX_LEAK_DEBUG
     if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
-        fprintf(stderr, "[force recycle of context %p (%d refs)]\n", 
+        fprintf(stderr, "[force recycle of context %p (%d refs)]\n",
             (void *)ctx, ctx->ref_count);
     }
 #endif
@@ -629,7 +629,7 @@ Helper function to trace references when CTX_LEAK_DEBUG is set.
 
 PARROT_EXPORT
 Parrot_Context *
-Parrot_context_ref_trace(PARROT_INTERP, 
+Parrot_context_ref_trace(PARROT_INTERP,
         ARGMOD(Parrot_Context *ctx),
         ARGIN(const char *file), int line)
 {

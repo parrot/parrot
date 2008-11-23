@@ -1291,7 +1291,7 @@ Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP, ARGIN(PMC *sig_obj))
         if (type == '-')
             break;
 
-        tuple_size++; 
+        tuple_size++;
     }
 
     VTABLE_set_integer_native(interp, type_tuple, tuple_size);

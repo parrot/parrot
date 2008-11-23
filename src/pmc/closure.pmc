@@ -129,7 +129,7 @@ Invokes the closure.
                 &&  outer->start_offs   == PMC_sub(current)->start_offs))) {
                     PMC *cont      = caller->current_cont;
                     cont->vtable   = interp->vtables[enum_class_Continuation];
-                    sub->outer_ctx = sub->ctx->outer_ctx 
+                    sub->outer_ctx = sub->ctx->outer_ctx
                                    = Parrot_context_ref(interp, caller);
                     return next;
                 }
@@ -149,7 +149,7 @@ Invokes the closure.
                 caller               = CONTEXT(interp);
                 cont                 = caller->current_cont;
                 cont->vtable         = interp->vtables[enum_class_Continuation];
-                sub->outer_ctx       = sub->ctx->outer_ctx 
+                sub->outer_ctx       = sub->ctx->outer_ctx
                                      = Parrot_context_ref(interp, caller);
 
                 (void)VTABLE_invoke(INTERP, cont, next);

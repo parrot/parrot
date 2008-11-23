@@ -121,7 +121,7 @@ CallSignature.
         PMC *type_tuple;
 
         GET_ATTR_type_tuple(INTERP, SELF, type_tuple);
-       
+
         if (PMC_IS_NULL(type_tuple)) {
             type_tuple = Parrot_mmd_build_type_tuple_from_sig_obj(INTERP, SELF);
             SET_ATTR_type_tuple(INTERP, SELF, type_tuple);
