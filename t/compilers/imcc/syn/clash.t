@@ -19,11 +19,11 @@ nok1:
     unless $I0 goto ok1
     print "nok 1\n"
 ok1:
-    null I0
-    if I0, nok2
+    null $I0
+    if $I0, nok2
     print "ok 2\n"
 nok2:
-    unless I0 goto ok2
+    unless $I0 goto ok2
     print "nok 2\n"
 ok2:
     end
@@ -43,11 +43,11 @@ nok1:
     unless $I0 == $I1 goto ok1
     print "nok 1\n"
 ok1:
-    null I0
-    if I0, nok2
+    null $I0
+    if $I0, nok2
     print "ok 2\n"
 nok2:
-    unless I0 goto ok2
+    unless $I0 goto ok2
     print "nok 2\n"
 ok2:
     unless $I0 > $I1 goto ok3
@@ -65,10 +65,10 @@ pir_output_is( <<'CODE', <<'OUT', "new" );
 .sub test :main
     $P1 = new 'String'
     $P1 = "ok 1\n"
-    new P1, 'String'
-    set P1, "ok 2\n"
+    new $P2, 'String'
+    set $P2, "ok 2\n"
     print $P1
-    print P1
+    print $P2
     end
 .end
 CODE
@@ -81,11 +81,11 @@ pir_output_is( <<'CODE', <<'OUT', "clone" );
     $P1 = new 'String'
     $P1 = "ok 1\n"
     $P0 = clone $P1
-    new P1, 'String'
-    set P1, "ok 2\n"
-    clone P0, P1
+    new $P1, 'String'
+    set $P1, "ok 2\n"
+    clone $P2, $P1
     print $P0
-    print P0
+    print $P2
     end
 .end
 CODE
@@ -97,11 +97,11 @@ pir_output_is( <<'CODE', <<'OUT', "defined" );
 .sub test :main
     $P1 = new 'Hash'
     $I0 = defined $P1
-    new P1, 'Hash'
-    defined I0, P1
+    new $P1, 'Hash'
+    defined $I0, $P1
     print $I0
     print "\n"
-    print I0
+    print $I0
     print "\n"
     end
 .end
@@ -115,15 +115,15 @@ pir_output_is( <<'CODE', <<'OUT', "defined keyed" );
     $P1 = new 'Hash'
     $P1["a"] = "ok 1\n"
     $I0 = defined $P1["a"]
-    new P1, 'Hash'
-    set P1["a"], "ok 2\n"
-    defined I0, P1["a"]
-    defined I1, P1["b"]
+    new $P1, 'Hash'
+    set $P1["a"], "ok 2\n"
+    defined $I0, $P1["a"]
+    defined $I1, $P1["b"]
     print $I0
     print "\n"
-    print I0
+    print $I0
     print "\n"
-    print I1
+    print $I1
     print "\n"
     end
 .end
@@ -151,14 +151,14 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "parrot op as label" );
 .sub test :main
-    null I0
+    null $I0
     goto set
 set:
-    if I0, err
-    if I0 goto err
-    inc I0
-    unless I0, err
-    unless I0 goto err
+    if $I0, err
+    if $I0 goto err
+    inc $I0
+    unless $I0, err
+    unless $I0 goto err
     print "ok\n"
     end
 err:
