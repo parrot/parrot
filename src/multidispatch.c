@@ -1376,6 +1376,9 @@ mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
         if (sig_elem->vtable->base_type == enum_class_String) {
             STRING * const sig = VTABLE_get_string(interp, sig_elem);
 
+            if (!sig)
+                return PMCNULL;
+
             /* yes, this is horrible and ugly */
             if (memcmp(sig->strstart, "__VOID", 6) == 0) {
                 if (PMC_IS_NULL(ar)) {
@@ -1385,9 +1388,6 @@ mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
                 PMC_int_val(ar)--;  /* RT #45951 */
                 break;
             }
-
-            if (!sig)
-                return PMCNULL;
 
             type = pmc_type(interp, sig);
 
