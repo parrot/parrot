@@ -112,6 +112,7 @@ all: \
  lfs.pbc \
  lpeg.pbc \
  markdown.pbc \
+ mathx.pbc \
  md5.pbc \
  random.pbc \
  sha1.pbc \
@@ -233,6 +234,9 @@ lpeg.pbc: $(LIBPATH)/lpeg.pir
 
 markdown.pbc: $(LIBPATH)/markdown.pir
 	-$(PARROT) --output=markdown.pbc $(LIBPATH)/markdown.pir
+
+mathx.pbc: $(LIBPATH)/mathx.pir
+	-$(PARROT) --output=mathx.pbc $(LIBPATH)/mathx.pir
 
 md5.pbc: $(LIBPATH)/md5.pir
 	-$(PARROT) --output=md5.pbc $(LIBPATH)/md5.pir

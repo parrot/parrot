@@ -229,6 +229,8 @@ These libraries are loaded dynamically with the Lua function C<require>.
 
 =item * markdown library F<languages/lua/src/lib/markdown.pir>
 
+=item * mathx library F<languages/lua/src/lib/mathx.pir>
+
 =item * md5 & sha1 library F<languages/lua/src/lib/md5.pir>
 
 =item * random library F<languages/lua/src/lib/random.pir>
