@@ -124,7 +124,7 @@ sub generate_initial_pir {
     return $pir = <<'PIRCODE';
 # THIS IS A GENERATED FILE! DO NOT EDIT!
 
-.namespace ['Lua::InstructionList']
+.namespace ['Lua'; 'InstructionList']
 
 PIRCODE
 }
