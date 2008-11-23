@@ -25,7 +25,7 @@ Tests the ParrotIO PMC.
 # L<PDD22/I\/O PMC API/=item new>
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    new P0, 'ParrotIO'
+    new $P0, 'ParrotIO'
     say "ok 1 - $P0 = new 'ParrotIO'"
 .end
 CODE

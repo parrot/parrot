@@ -27,7 +27,7 @@ Tests the FileHandle PMC.
 # L<PDD22/I\/O PMC API/=item new>
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    new P0, 'FileHandle'
+    new $P0, 'FileHandle'
     say "ok 1 - $P0 = new 'FileHandle'"
 .end
 CODE

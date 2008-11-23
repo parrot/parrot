@@ -21,7 +21,7 @@ Tests the Pointer PMC.
 
     plan(1)
 
-    new P0, 'Pointer'
+    new $P0, 'Pointer'
     ok(1, 'Instantiated .Pointer')
 .end
 

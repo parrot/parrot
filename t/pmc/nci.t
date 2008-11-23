@@ -170,8 +170,8 @@ OUTPUT
     push nci_dlvar_double_decl, 0
     assign nci_dlvar_double, nci_dlvar_double_decl
 
-    N2 = nci_dlvar_double[0]
-    print N2
+    $N2 = nci_dlvar_double[0]
+    print $N2
     print "\n"
 
     .local pmc nci_d
@@ -232,8 +232,8 @@ OUTPUT
     push nci_dlvar_float_decl, 0
     assign nci_dlvar_float, nci_dlvar_float_decl
 
-    N2 = nci_dlvar_float[0]
-    print N2
+    $N2 = nci_dlvar_float[0]
+    print $N2
     print "\n"
 
     .local pmc nci_f
@@ -319,8 +319,8 @@ OUTPUT
     push nci_p_out_decl, 0
     assign nci_p_out, nci_p_out_decl
 
-    I2 = nci_p_out[0]
-    print I2
+    $I2 = nci_p_out[0]
+    print $I2
     print "\n"
 NOT_LOADED:
 .end
@@ -412,27 +412,27 @@ SKIP:
     push nci_dlvar_int_decl, 0
     assign nci_dlvar_int, nci_dlvar_int_decl
 
-    I2 = nci_dlvar_int[0]
-    print I2
+    $I2 = nci_dlvar_int[0]
+    print $I2
     print "\n"
 
     .local pmc nci_v
     nci_v = dlfunc libnci_test, "nci_v", "v"
     nci_v()
-    I1 = nci_dlvar_int[0]
-    print I1
+    $I1 = nci_dlvar_int[0]
+    print $I1
     print "\n"
     nci_v()
-    I1 = nci_dlvar_int[0]
-    print I1
+    $I1 = nci_dlvar_int[0]
+    print $I1
     print "\n"
     nci_v()
-    I1 = nci_dlvar_int[0]
-    print I1
+    $I1 = nci_dlvar_int[0]
+    print $I1
     print "\n"
     nci_v()
-    I1 = nci_dlvar_int[0]
-    print I1
+    $I1 = nci_dlvar_int[0]
+    print $I1
     print "\n"
 NOT_LOADED:
 .end
@@ -637,19 +637,19 @@ OUTPUT
 .include "datatypes.pasm"
 
 .sub test :main
-  loadlib P1, "libnci_test"
+  loadlib $P1, "libnci_test"
   printerr "loaded\n"
   .local pmc nci_it
-  nci_it = dlfunc P1, "nci_it", "it"
+  nci_it = dlfunc $P1, "nci_it", "it"
   printerr "dlfunced\n"
-  ( I5 ) = nci_it( "ko" )
-  ne I5, 2, nok_1
+  ( $I5 ) = nci_it( "ko" )
+  ne $I5, 2, nok_1
   printerr "ok "
-  printerr I5
+  printerr $I5
   printerr "\n"
   end
 nok_1: printerr "nok 1\n"
-  printerr I5
+  printerr $I5
   printerr "\n"
   end
 nok_2: printerr "nok 2\n"
@@ -834,7 +834,7 @@ OUTPUT
   new P2, 'ResizablePMCArray'
 .include "datatypes.pasm"
   push P2, .DATATYPE_INT
-  push P2, 2	# 2 elem array
+  push P2, 2    # 2 elem array
   push P2, 0
   push P2, .DATATYPE_CHAR
   push P2, 0
@@ -866,7 +866,7 @@ OUTPUT
   new P2, 'ResizablePMCArray'
 .include "datatypes.pasm"
   push P2, .DATATYPE_FLOAT
-  push P2, 2	# 2 elem array
+  push P2, 2    # 2 elem array
   push P2, 0
   push P2, .DATATYPE_DOUBLE
   push P2, 0
@@ -1298,8 +1298,8 @@ OUTPUT
 
   # attach struct initializer
   assign nci_pi_out, nci_pi_out_decl
-  set I0, nci_pi_out[0]
-  print I0
+  set $I0, nci_pi_out[0]
+  print $I0
 NOT_LOADED:
   print "\n"
 .end
@@ -1320,13 +1320,13 @@ OUTPUT
   push P2, 0
   push P2, 0
   push P2, .DATATYPE_FLOAT
-  push P2, 0	# 1 elem array
+  push P2, 0    # 1 elem array
   push P2, 0
   push P2, .DATATYPE_INT
-  push P2, 0	# 1 elem array
+  push P2, 0    # 1 elem array
   push P2, 0
   push P2, .DATATYPE_CSTR
-  push P2, 0	# 1 elem array
+  push P2, 0    # 1 elem array
   push P2, 0
   new P5, 'ManagedStruct', P2
   set I6, 0
@@ -1453,7 +1453,7 @@ OUTPUT
     # this callback function will eventually by called by the library
     .const 'Sub' cb = "_call_back"
     .local pmc cb_wrapped
-    cb_wrapped = new_callback cb, user_data, "vtU"	# Z in pdd16
+    cb_wrapped = new_callback cb, user_data, "vtU"  # Z in pdd16
     print "created a callback sub\n"
 
     # now call the external sub, that takes a callback and user data
@@ -1494,8 +1494,8 @@ ERROR:
   print "external data: "
   print s
   print "\n"
-  get_global P12, "cb_done"
-  inc P12
+  get_global $P12, "cb_done"
+  inc $P12
   returncc
 .end
 
@@ -1517,7 +1517,7 @@ OUTPUT
   # prepare user data
   new P7, 'Integer'
   set P7, 42
-  new_callback P5, P6, P7, "viU"	# Z in pdd16
+  new_callback P5, P6, P7, "viU"    # Z in pdd16
   print "ok 1\n"
   # now call the external sub, that takes a call_back and user_data
   loadlib P1, "libnci_test"
@@ -1589,7 +1589,7 @@ OUTPUT
     # this callback function will eventually by called by the library
     .const 'Sub' cb = "_call_back"
     .local pmc cb_wrapped
-    cb_wrapped = new_callback cb, user_data, "vpU"	# Z in pdd16
+    cb_wrapped = new_callback cb, user_data, "vpU"  # Z in pdd16
     print "created a callback sub\n"
 
     # now call the external sub, that takes a callback and user data
@@ -1621,27 +1621,27 @@ ERROR:
 .end
 
 .sub _call_back
-  get_params "0,0", P5, P6
+  get_params "0,0", $P5, $P6
   print "in callback\n"
   print "user data: "
-  print P5
+  print $P5
   print "\n"
 
   # P6 is a UnManagedStruct PMC containing a pointer to an integer
-  new P2, 'ResizablePMCArray'
-  push P2, .DATATYPE_INT
-  push P2, 0
-  push P2, 0
-  assign P6, P2
+  new $P2, 'ResizablePMCArray'
+  push $P2, .DATATYPE_INT
+  push $P2, 0
+  push $P2, 0
+  assign $P6, $P2
 
   # print referenced integer in libnci_test.so
-  I17 = P6[0]
+  $I17 = $P6[0]
   print "external data: "
-  print I17
+  print $I17
   print "\n"
 
-  get_global P12, "cb_done"
-  inc P12
+  get_global $P12, "cb_done"
+  inc $P12
   returncc
 .end
 
@@ -1664,7 +1664,7 @@ OUTPUT
   # prepare user data
   new P7, 'Integer'
   set P7, 42
-  new_callback P5, P6, P7, "vUt"	# Z in pdd16
+  new_callback P5, P6, P7, "vUt"    # Z in pdd16
   print "ok 1\n"
   # now call the external sub, that takes a call_back and user_data
   loadlib P1, "libnci_test"
@@ -1722,7 +1722,7 @@ OUTPUT
   # prepare user data
   new P7, 'Integer'
   set P7, 42
-  new_callback P5, P6, P7, "vUi"	# Z in pdd16
+  new_callback P5, P6, P7, "vUi"    # Z in pdd16
   print "ok 1\n"
   # now call the external sub, that takes a call_back and user_data
   loadlib P1, "libnci_test"
@@ -1791,7 +1791,7 @@ OUTPUT
     # this callback function will eventually by called by the library
     .const 'Sub' cb = "_call_back"
     .local pmc cb_wrapped
-    cb_wrapped = new_callback cb, user_data, "vUi"	# Z in pdd16
+    cb_wrapped = new_callback cb, user_data, "vUi"  # Z in pdd16
     print "created a callback sub\n"
 
     # now call the external sub, that takes a callback and user data
@@ -1832,8 +1832,8 @@ ERROR:
   print "external data: "
   print i
   print "\n"
-  get_global P12, "cb_done"
-  inc P12
+  get_global $P12, "cb_done"
+  inc $P12
   returncc
 .end
 
@@ -1868,7 +1868,7 @@ OUTPUT
     # this callback function will eventually by called by the library
     .const 'Sub' cb = "_call_back"
     .local pmc cb_wrapped
-    cb_wrapped = new_callback cb, user_data, "vUp"	# Z in pdd16
+    cb_wrapped = new_callback cb, user_data, "vUp"  # Z in pdd16
     print "created a callback sub\n"
 
     # now call the external sub, that takes a callback and user data
@@ -1908,20 +1908,20 @@ ERROR:
   print "\n"
 
   # s is a UnManagedStruct PMC containing a pointer to an integer
-  new P2, 'ResizablePMCArray'
-  push P2, .DATATYPE_INT
-  push P2, 0
-  push P2, 0
-  assign s, P2
+  new $P2, 'ResizablePMCArray'
+  push $P2, .DATATYPE_INT
+  push $P2, 0
+  push $P2, 0
+  assign s, $P2
 
   # print referenced integer in libnci_test.so
-  I17 = s[0]
+  $I17 = s[0]
   print "external data: "
-  print I17
+  print $I17
   print "\n"
 
-  get_global P12, "cb_done"
-  inc P12
+  get_global $P12, "cb_done"
+  inc $P12
   returncc
 .end
 
@@ -1967,7 +1967,7 @@ OUTPUT
     # this callback function will eventually by called by the library
     .const 'Sub' cb = "_call_back"
     .local pmc cb_wrapped
-    cb_wrapped = new_callback cb, user_data, "vUp"	# Z in pdd16
+    cb_wrapped = new_callback cb, user_data, "vUp"  # Z in pdd16
     print "created a callback sub\n"
 
     # now call the external sub, that takes a callback and user data
@@ -1993,18 +1993,18 @@ OUTPUT
 .param pmc u
 .param pmc s
   # s is a UnManagedStruct PMC containing a pointer to an integer
-  new P2, 'ResizablePMCArray'
-  push P2, .DATATYPE_INT
-  push P2, 0
-  push P2, 0
-  assign s, P2
+  new $P2, 'ResizablePMCArray'
+  push $P2, .DATATYPE_INT
+  push $P2, 0
+  push $P2, 0
+  assign s, $P2
 
   print "external data: "
-  I17 = s[0]
-  print I17
+  $I17 = s[0]
+  print $I17
   print "\n"
-  I17 = I17 * 10
-  s[0] = I17
+  $I17 = $I17 * 10
+  s[0] = $I17
 
   returncc
 .end
@@ -2340,27 +2340,27 @@ SKIP:
     push nci_dlvar_int_decl, 0
     assign nci_dlvar_int, nci_dlvar_int_decl
 
-    I2 = nci_dlvar_int[0]
-    print I2
+    $I2 = nci_dlvar_int[0]
+    print $I2
     print "\n"
 
     .local pmc nci_vv
     nci_vv = dlfunc libnci_test, "nci_vv", "vv"
     nci_vv()
-    I1 = nci_dlvar_int[0]
-    print I1
+    $I1 = nci_dlvar_int[0]
+    print $I1
     print "\n"
     nci_vv()
-    I1 = nci_dlvar_int[0]
-    print I1
+    $I1 = nci_dlvar_int[0]
+    print $I1
     print "\n"
     nci_vv()
-    I1 = nci_dlvar_int[0]
-    print I1
+    $I1 = nci_dlvar_int[0]
+    print $I1
     print "\n"
     nci_vv()
-    I1 = nci_dlvar_int[0]
-    print I1
+    $I1 = nci_dlvar_int[0]
+    print $I1
     print "\n"
 NOT_LOADED:
 .end

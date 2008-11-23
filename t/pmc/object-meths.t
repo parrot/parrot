@@ -757,8 +757,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "callmethod - method name" );
 .namespace ["Foo"]
 .sub meth :method
     print "in meth\n"
-    getinterp P0
-    $P1 = P0["sub"]
+    getinterp $P0
+    $P1 = $P0["sub"]
     print $P1
     print "\n"
     .return ()

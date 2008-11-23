@@ -21,7 +21,7 @@ Tests the STMVar PMC.
 
     plan(1)
 
-    new P0, 'STMVar'
+    new $P0, 'STMVar'
     ok(1, 'Instantiated .STMVar')
 .end
 

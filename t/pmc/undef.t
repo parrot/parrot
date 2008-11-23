@@ -36,11 +36,11 @@ Tests mainly morphing undef to other types.
 .end
 
 .sub morph_to_string
-        new P0, 'String'
-        new P1, 'Undef'
-        set P0, "foo"
-        concat  P1, P0, P0
-        is( P1, 'foofoo', 'morphed to string' )
+        new $P0, 'String'
+        new $P1, 'Undef'
+        set $P0, "foo"
+        concat  $P1, $P0, $P0
+        is( $P1, 'foofoo', 'morphed to string' )
 .end
 
 .sub undef_pmc_is_false

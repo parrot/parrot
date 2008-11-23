@@ -33,13 +33,13 @@ pasm_output_is( <<"CODE", <<OUTPUT, "sin" );
         .include 'include/fp_equality.pasm'
         set     N1, 1.0
         sin     N2, N1
-        .fp_eq  (N2, 0.841471, EQ1)
+        .fp_eq_pasm  (N2, 0.841471, EQ1)
         print   "not "
 EQ1:    print   "ok 1\\n"
 
         set     I1, 1
         sin     N2, I1
-        .fp_eq  (N2, 0.841471, EQ2)
+        .fp_eq_pasm  (N2, 0.841471, EQ2)
         print   "not "
 EQ2:    print   "ok 2\\n"
 
@@ -53,13 +53,13 @@ pasm_output_is( <<"CODE", <<OUTPUT, "cos" );
         .include 'include/fp_equality.pasm'
         set     N1, 1.0
         cos     N2, N1
-        .fp_eq  (N2, 0.540302, EQ1)
+        .fp_eq_pasm  (N2, 0.540302, EQ1)
         print   "not "
 EQ1:    print   "ok 1\\n"
 
         set     I1, 1
         cos     N2, I1
-        .fp_eq  (N2, 0.540302, EQ2)
+        .fp_eq_pasm  (N2, 0.540302, EQ2)
         print   "not "
 EQ2:    print   "ok 2\\n"
         end
@@ -72,13 +72,13 @@ pasm_output_is( <<"CODE", <<OUTPUT, "tan" );
         .include 'include/fp_equality.pasm'
         set     N1, 1.0
         tan     N2, N1
-        .fp_eq  (N2, 1.557408, EQ1)
+        .fp_eq_pasm  (N2, 1.557408, EQ1)
         print   "not "
 EQ1:    print   "ok 1\\n"
 
         set     I1, 1
         tan     N2, I1
-        .fp_eq  (N2, 1.557408, EQ2)
+        .fp_eq_pasm  (N2, 1.557408, EQ2)
         print   "not "
 EQ2:    print   "ok 2\\n"
         end
@@ -91,13 +91,13 @@ pasm_output_is( <<"CODE", <<OUTPUT, "sec" );
         .include 'include/fp_equality.pasm'
         set N1, 1.0
         sec N2, N1
-        .fp_eq  (N2, 1.850816, EQ1)
+        .fp_eq_pasm  (N2, 1.850816, EQ1)
         print "not "
 EQ1:    print "ok 1\\n"
 
         set I1, 1
         sec N2, I1
-        .fp_eq  (N2, 1.850816, EQ2)
+        .fp_eq_pasm  (N2, 1.850816, EQ2)
         print "not "
 EQ2:    print "ok 2\\n"
         end
@@ -110,13 +110,13 @@ pasm_output_is( <<"CODE", <<OUTPUT, "atan" );
         .include 'include/fp_equality.pasm'
         set N1, 1.0
         atan N2, N1
-        .fp_eq  (N2, 0.785398, EQ1)
+        .fp_eq_pasm  (N2, 0.785398, EQ1)
         print "not "
 EQ1:    print "ok 1\\n"
 
         set I1, 1
         atan N2, I1
-        .fp_eq  (N2,0.785398 , EQ2)
+        .fp_eq_pasm  (N2,0.785398 , EQ2)
         print "not "
 EQ2:    print "ok 2\\n"
         end
@@ -129,13 +129,13 @@ pasm_output_is( <<"CODE", <<OUTPUT, "asin" );
         .include 'include/fp_equality.pasm'
         set N1, 1.0
         asin N2, N1
-        .fp_eq  (N2, 1.570796, EQ1)
+        .fp_eq_pasm  (N2, 1.570796, EQ1)
         print "not "
 EQ1:    print "ok 1\\n"
 
         set I1, 1
         asin N2, I1
-        .fp_eq  (N2, 1.570796 , EQ2)
+        .fp_eq_pasm  (N2, 1.570796 , EQ2)
         print "not "
 EQ2:    print "ok 2\\n"
 
@@ -149,13 +149,13 @@ pasm_output_is( <<"CODE", <<OUTPUT, "acos" );
         .include 'include/fp_equality.pasm'
         set N1, 1.0
         acos N2, N1
-        .fp_eq  (N2, 0.000000, EQ1)
+        .fp_eq_pasm  (N2, 0.000000, EQ1)
         print "not "
 EQ1:    print "ok 1\\n"
 
         set I1, 1
         acos N2, I1
-        .fp_eq  (N2, 0.000000, EQ2)
+        .fp_eq_pasm  (N2, 0.000000, EQ2)
         print "not "
 EQ2:    print "ok 2\\n"
 
@@ -169,13 +169,13 @@ pasm_output_is( <<"CODE", <<OUTPUT, "asec" );
         .include 'include/fp_equality.pasm'
         set N1, 1.0
         asec N2, N1
-        .fp_eq  (N2, 0.000000, EQ1)
+        .fp_eq_pasm  (N2, 0.000000, EQ1)
         print "not "
 EQ1:    print "ok 1\\n"
 
         set I1, 1
         asec N2, I1
-        .fp_eq  (N2, 0.000000, EQ2)
+        .fp_eq_pasm  (N2, 0.000000, EQ2)
         print "not "
 EQ2:    print "ok 2\\n"
 
@@ -189,13 +189,13 @@ pasm_output_is( <<"CODE", <<OUTPUT, "cosh" );
         .include 'include/fp_equality.pasm'
         set N1, 1.0
         cosh N2, N1
-        .fp_eq  (N2, 1.543081, EQ1)
+        .fp_eq_pasm  (N2, 1.543081, EQ1)
         print "not "
 EQ1:    print "ok 1\\n"
 
         set I1, 1
         cosh N2, I1
-        .fp_eq  (N2, 1.543081, EQ2)
+        .fp_eq_pasm  (N2, 1.543081, EQ2)
         print "not "
 EQ2:    print "ok 2\\n"
 
@@ -209,13 +209,13 @@ pasm_output_is( <<"CODE", <<OUTPUT, "sinh" );
         .include 'include/fp_equality.pasm'
         set N1, 1.0
         sinh N2, N1
-        .fp_eq  (N2, 1.175201, EQ1)
+        .fp_eq_pasm  (N2, 1.175201, EQ1)
         print "not "
 EQ1:    print "ok 1\\n"
 
         set I1, 1
         sinh N2, I1
-        .fp_eq  (N2, 1.175201, EQ2)
+        .fp_eq_pasm  (N2, 1.175201, EQ2)
         print "not "
 EQ2:    print "ok 2\\n"
 
@@ -229,13 +229,13 @@ pasm_output_is( <<"CODE", <<OUTPUT, "tanh" );
         .include 'include/fp_equality.pasm'
         set N1, 1.0
         tanh N2, N1
-        .fp_eq  (N2, 0.761594, EQ1)
+        .fp_eq_pasm  (N2, 0.761594, EQ1)
         print "not "
 EQ1:    print "ok 1\\n"
 
         set I1, 1
         tanh N2, I1
-        .fp_eq  (N2, 0.761594, EQ2)
+        .fp_eq_pasm  (N2, 0.761594, EQ2)
         print "not "
 EQ2:    print "ok 2\\n"
 
@@ -249,13 +249,13 @@ pasm_output_is( <<"CODE", <<OUTPUT, "sech" );
         .include 'include/fp_equality.pasm'
         set N1, 1.0
         sech N2, N1
-        .fp_eq  (N2, 0.648054, EQ1)
+        .fp_eq_pasm  (N2, 0.648054, EQ1)
         print "not "
 EQ1:    print "ok 1\\n"
 
         set I1, 1
         sech N2, I1
-        .fp_eq  (N2, 0.648054, EQ2)
+        .fp_eq_pasm  (N2, 0.648054, EQ2)
         print "not "
 EQ2:    print "ok 2\\n"
 
@@ -277,82 +277,82 @@ pasm_output_is( <<"CODE", <<OUTPUT, "atan2" );
         set N3, -1.0
 
         atan N4, N1, N2
-        .fp_eq  (N4, 0.785398, EQ1)
+        .fp_eq_pasm  (N4, 0.785398, EQ1)
         print "not "
 EQ1:    print "ok 1\\n"
 
         atan N4, N1, I2
-        .fp_eq  (N4, 0.785398, EQ2)
+        .fp_eq_pasm  (N4, 0.785398, EQ2)
         print "not "
 EQ2:    print "ok 2\\n"
 
         atan N4, I1, N2
-        .fp_eq  (N4, 0.785398, EQ3)
+        .fp_eq_pasm  (N4, 0.785398, EQ3)
         print "not "
 EQ3:    print "ok 3\\n"
 
         atan N4, I1, I2
-        .fp_eq  (N4, 0.785398, EQ4)
+        .fp_eq_pasm  (N4, 0.785398, EQ4)
         print "not "
 EQ4:    print "ok 4\\n"
 
         atan N4, N3, 1.0
-        .fp_eq   (N4, -0.785398, EQ5)
+        .fp_eq_pasm   (N4, -0.785398, EQ5)
         print "not "
 EQ5:    print "ok 5\\n"
 
         atan N4, N1, 0
-        .fp_eq   (N4, 1.570796, EQ6)
+        .fp_eq_pasm   (N4, 1.570796, EQ6)
         print "not "
 EQ6:    print "ok 6\\n"
 
         atan N4, I3, 0.0
-        .fp_eq   (N4, -1.570796, EQ7)
+        .fp_eq_pasm   (N4, -1.570796, EQ7)
         print "not "
 EQ7:    print "ok 7\\n"
 
         atan N4, I3, -1
-        .fp_eq   (N4, -2.356194, EQ8)
+        .fp_eq_pasm   (N4, -2.356194, EQ8)
         print "not "
 EQ8:    print "ok 8\\n"
 
         atan N4, 1.0, N3
-        .fp_eq   (N4, 2.356194, EQ9)
+        .fp_eq_pasm   (N4, 2.356194, EQ9)
         print "not "
 EQ9:    print "ok 9\\n"
 
         atan N4, 1.0, I0
-        .fp_eq   (N4, 1.570796, EQ10)
+        .fp_eq_pasm   (N4, 1.570796, EQ10)
         print "not "
 EQ10:   print "ok 10\\n"
 
         atan N4, 1, N1
-        .fp_eq   (N4, 0.785398, EQ11)
+        .fp_eq_pasm   (N4, 0.785398, EQ11)
         print "not "
 EQ11:   print "ok 11\\n"
 
         atan N4, 1, I1
-        .fp_eq   (N4, 0.785398, EQ12)
+        .fp_eq_pasm   (N4, 0.785398, EQ12)
         print "not "
 EQ12:   print "ok 12\\n"
 
         atan N4, 0.0, 1.0
-        .fp_eq   (N4, 0.000000, EQ13)
+        .fp_eq_pasm   (N4, 0.000000, EQ13)
         print "not "
 EQ13:   print "ok 13\\n"
 
         atan N4, -1.0, 0
-        .fp_eq   (N4, -1.570796, EQ14)
+        .fp_eq_pasm   (N4, -1.570796, EQ14)
         print "not "
 EQ14:   print "ok 14\\n"
 
         atan N4, 1, -1.0
-        .fp_eq   (N4, 2.356194, EQ15)
+        .fp_eq_pasm   (N4, 2.356194, EQ15)
         print "not "
 EQ15:   print "ok 15\\n"
 
         atan N4, 0, 1
-        .fp_eq   (N4, 0.000000, EQ16)
+        .fp_eq_pasm   (N4, 0.000000, EQ16)
         print "not "
 EQ16:   print "ok 16\\n"
         end
@@ -381,7 +381,7 @@ local $TODO = 'fails on netbsd' if $^O =~ /netbsd/;
 pasm_output_is( <<"CODE", <<'OUTPUT', 'atan, part 2' );
         .include 'include/fp_equality.pasm'
         atan N4, -0.0, -0.0
-        .fp_eq   (N4, -3.1415926, EQ1)
+        .fp_eq_pasm   (N4, -3.1415926, EQ1)
         print "not "
         print N4
 EQ1:    print "ok 1\\n"
@@ -396,13 +396,13 @@ pasm_output_is( <<"CODE", <<OUTPUT, "log2" );
         .include 'include/fp_equality.pasm'
         set N1, 10.0
         log2 N2, N1
-        .fp_eq  (N2, 3.321928, EQ1)
+        .fp_eq_pasm  (N2, 3.321928, EQ1)
         print "not "
 EQ1:    print "ok 1\\n"
 
         set I1, 10
         log2 N2, I1
-        .fp_eq  (N2, 3.321928, EQ2)
+        .fp_eq_pasm  (N2, 3.321928, EQ2)
         print "not "
 EQ2:    print "ok 2\\n"
 
@@ -416,13 +416,13 @@ pasm_output_is( <<"CODE", <<OUTPUT, "log10" );
         .include 'include/fp_equality.pasm'
         set N1, 15.0
         log10 N2, N1
-        .fp_eq  (N2, 1.176091, EQ1)
+        .fp_eq_pasm  (N2, 1.176091, EQ1)
         print "not "
 EQ1:    print "ok 1\\n"
 
         set I1, 15
         log10 N2, I1
-        .fp_eq  (N2, 1.176091, EQ2)
+        .fp_eq_pasm  (N2, 1.176091, EQ2)
         print "not "
 EQ2:    print "ok 2\\n"
 
@@ -436,13 +436,13 @@ pasm_output_is( <<"CODE", <<OUTPUT, "ln" );
         .include 'include/fp_equality.pasm'
         set N1, 10.0
         ln N2, N1
-        .fp_eq  (N2, 2.302585, EQ1)
+        .fp_eq_pasm  (N2, 2.302585, EQ1)
         print "not "
 EQ1:    print "ok 1\\n"
 
         set I1, 10
         ln N2, I1
-        .fp_eq  (N2, 2.302585, EQ2)
+        .fp_eq_pasm  (N2, 2.302585, EQ2)
         print "not "
 EQ2:    print "ok 2\\n"
         end
@@ -455,13 +455,13 @@ pasm_output_is( <<"CODE", <<OUTPUT, "exp" );
         .include 'include/fp_equality.pasm'
         set N1, 10.0
         exp N2, N1
-        .fp_eq  (N2, 22026.465795, EQ1)
+        .fp_eq_pasm  (N2, 22026.465795, EQ1)
         print "not "
 EQ1:    print "ok 1\\n"
 
         set I1, 10
         exp N2, I1
-        .fp_eq (N2, 22026.465795, EQ2)
+        .fp_eq_pasm (N2, 22026.465795, EQ2)
         print "not "
 EQ2:    print "ok 2\\n"
         end
@@ -477,22 +477,22 @@ pasm_output_is( <<"CODE", <<OUTPUT, "pow" );
         set N2, 5.0
         set I2, 5
         pow N3, N1, N2
-        .fp_eq  (N3, 243.0, EQ1)
+        .fp_eq_pasm  (N3, 243.0, EQ1)
         print "not "
 EQ1:    print "ok 1\\n"
 
         pow N3, N1, I2
-        .fp_eq  (N3, 243.0, EQ2)
+        .fp_eq_pasm  (N3, 243.0, EQ2)
         print "not "
 EQ2:    print "ok 2\\n"
 
         pow N3, I1, N2
-        .fp_eq  (N3, 243.0, EQ3)
+        .fp_eq_pasm  (N3, 243.0, EQ3)
         print "not "
 EQ3:    print "ok 3\\n"
 
         pow N3, I1, I2
-        .fp_eq  (N3, 243.0, EQ4)
+        .fp_eq_pasm  (N3, 243.0, EQ4)
         print "not "
 EQ4:    print "ok 4\\n"
 
@@ -503,62 +503,62 @@ EQ4:    print "ok 4\\n"
         set N2, 4.0
         set I2, 4
         pow N3, N2, 2.5
-        .fp_eq  (N3, 32.0, EQ5)
+        .fp_eq_pasm  (N3, 32.0, EQ5)
         print "not "
 EQ5:    print "ok 5\\n"
 
         pow N3, N2, -2
-        .fp_eq  (N3, 0.0625, EQ6)
+        .fp_eq_pasm  (N3, 0.0625, EQ6)
         print "not "
 EQ6:    print "ok 6\\n"
 
         pow N3, I2, 0.5
-        .fp_eq  (N3, 2.0, EQ7)
+        .fp_eq_pasm  (N3, 2.0, EQ7)
         print "not "
 EQ7:    print "ok 7\\n"
 
         pow N3, I2, 0
-        .fp_eq  (N3, 1.0, EQ8)
+        .fp_eq_pasm  (N3, 1.0, EQ8)
         print "not "
 EQ8:    print "ok 8\\n"
 
         pow N3, 0.0, N2
-        .fp_eq  (N3, 0.0, EQ9)
+        .fp_eq_pasm  (N3, 0.0, EQ9)
         print "not "
 EQ9:    print "ok 9\\n"
 
         pow N3, 2.5, 0.0
-        .fp_eq  (N3, 1.0, EQ10)
+        .fp_eq_pasm  (N3, 1.0, EQ10)
         print "not "
 EQ10:   print "ok 10\\n"
 
         pow N3, 2.5, I2
-        .fp_eq  (N3, 39.0625, EQ11)
+        .fp_eq_pasm  (N3, 39.0625, EQ11)
         print "not "
 EQ11:   print "ok 11\\n"
 
         pow N3, 2.0, -4
-        .fp_eq  (N3, 0.0625, EQ12)
+        .fp_eq_pasm  (N3, 0.0625, EQ12)
         print "not "
 EQ12:   print "ok 12\\n"
 
         pow N3, 0, N2
-        .fp_eq  (N3, 0.0, EQ13)
+        .fp_eq_pasm  (N3, 0.0, EQ13)
         print "not "
 EQ13:   print "ok 13\\n"
 
         pow N3, 4, -0.5
-        .fp_eq  (N3, 0.5, EQ14)
+        .fp_eq_pasm  (N3, 0.5, EQ14)
         print "not "
 EQ14:   print "ok 14\\n"
 
         pow N3, 4, I2
-        .fp_eq  (N3, 256.0, EQ15)
+        .fp_eq_pasm  (N3, 256.0, EQ15)
         print "not "
 EQ15:   print "ok 15\\n"
 
         pow N3, 4, -1
-        .fp_eq  (N3, 0.25, EQ16)
+        .fp_eq_pasm  (N3, 0.25, EQ16)
         print "not "
 EQ16:   print "ok 16\\n"
         end
@@ -585,13 +585,13 @@ pasm_output_is( <<"CODE", <<OUTPUT, "sqrt" );
        .include 'include/fp_equality.pasm'
        set N1, 9.0
        sqrt N2, N1
-       .fp_eq  (N2, 3.0, EQ1)
+       .fp_eq_pasm  (N2, 3.0, EQ1)
        print "not "
 EQ1:   print "ok 1\\n"
 
        set I1, 9
        sqrt N2, I1
-       .fp_eq  (N2, 3.0, EQ2)
+       .fp_eq_pasm  (N2, 3.0, EQ2)
        print "not "
 EQ2:   print "ok 2\\n"
 

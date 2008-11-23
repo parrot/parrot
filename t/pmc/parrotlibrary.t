@@ -21,7 +21,7 @@ Tests the ParrotLibrary PMC.
 
     plan(1)
 
-    new P0, 'ParrotLibrary'
+    new $P0, 'ParrotLibrary'
     ok(1, 'Instantiated .ParrotLibrary')
 .end
 

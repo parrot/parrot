@@ -1054,15 +1054,15 @@ pir_output_is( <<'CODE', <<'OUTPUT', "xrange iterator" );
 .sub main
     .include "iterator.pasm"
         # xrange(10, 14)
-    new P2, 'Slice' [10 .. 14]
-    new P1, 'Iterator',  P2
+    new $P2, 'Slice' [10 .. 14]
+    new $P1, 'Iterator',  $P2
 
-    set P1, .ITERATE_FROM_START
+    set $P1, .ITERATE_FROM_START
 #    I0 = P1."len"()
 iter_loop:
-        unless P1, iter_end
-    shift I1, P1
-    print I1
+        unless $P1, iter_end
+    shift $I1, $P1
+    print $I1
     print "\n"
     branch iter_loop
 iter_end:
@@ -1082,15 +1082,15 @@ pir_output_is( <<'CODE', <<'OUTPUT', "xrange iterator ..n" );
 .sub main
     .include "iterator.pasm"
         # xrange(4)
-    new P2, 'Slice' [ .. 4]
-    new P1, 'Iterator',  P2
+    new $P2, 'Slice' [ .. 4]
+    new $P1, 'Iterator',  $P2
 
-    set P1, .ITERATE_FROM_START
+    set $P1, .ITERATE_FROM_START
 #    I0 = P1."len"()
 iter_loop:
-        unless P1, iter_end
-    shift I1, P1
-    print I1
+        unless $P1, iter_end
+    shift $I1, $P1
+    print $I1
     print "\n"
     branch iter_loop
 iter_end:
@@ -1226,13 +1226,13 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'xrange iterator, get_iter' );
 .sub main
     .include "iterator.pasm"
         # xrange(10, 14)
-    new P2, 'Slice' [10 .. 14]
-    P1 = iter  P2
+    new $P2, 'Slice' [10 .. 14]
+    $P1 = iter  $P2
 #    I0 = P1."len"()
 iter_loop:
-        unless P1, iter_end
-    shift I1, P1
-    print I1
+        unless $P1, iter_end
+    shift $I1, $P1
+    print $I1
     print "\n"
     branch iter_loop
 iter_end:

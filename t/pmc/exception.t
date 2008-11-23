@@ -196,11 +196,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', ".get_results() - PIR" );
 .sub main :main
     print "main\n"
     push_eh _handler
-    new P1, 'Exception'
-    new P2, 'String'
-    set P2, "just pining"
-    setattribute P1, 'message', P2
-    throw P1
+    new $P1, 'Exception'
+    new $P2, 'String'
+    set $P2, "just pining"
+    setattribute $P1, 'message', $P2
+    throw $P1
     print "not reached\n"
     end
 _handler:
@@ -209,12 +209,12 @@ _handler:
     .get_results (e)
     s = e
     print "caught it\n"
-    typeof S1, e
-    print S1
+    typeof $S1, e
+    print $S1
     print "\n"
     print s
     print "\n"
-    null P5
+    null $P5
 .end
 CODE
 main
@@ -605,46 +605,46 @@ pir_output_is(<<'CODE', <<'OUTPUT', "taking a continuation promotes RetCs", todo
 ## prematurely.  For some reason, it is necessary to signal the error in order
 ## to expose the bug.
 .sub main :main
-	.local int redux
-	.local pmc cont
-	## debug 0x80
-	redux = 0
-	print "calling test\n"
-	cont = test()
-	print "back from test\n"
-	if redux goto done
-	redux = 1
-	print "calling cont\n"
-	cont()
-	print "never.\n"
+    .local int redux
+    .local pmc cont
+    ## debug 0x80
+    redux = 0
+    print "calling test\n"
+    cont = test()
+    print "back from test\n"
+    if redux goto done
+    redux = 1
+    print "calling cont\n"
+    cont()
+    print "never.\n"
 done:
-	print "done.\n"
+    print "done.\n"
 .end
 .sub test
-	## Push a handler around the foo() call.
-	push_eh handle_errs
-	print "  calling foo\n"
-	.local pmc cont
-	cont = foo()
-	pop_eh
-	print "  returning from test.\n"
-	.return (cont)
+    ## Push a handler around the foo() call.
+    push_eh handle_errs
+    print "  calling foo\n"
+    .local pmc cont
+    cont = foo()
+    pop_eh
+    print "  returning from test.\n"
+    .return (cont)
 handle_errs:
-	print "  test:  caught error\n"
-	.return (cont)
+    print "  test:  caught error\n"
+    .return (cont)
 .end
 .sub foo
-	## Take a continuation.
-	.local pmc cont
-	cont = new 'Continuation'
-	set_addr cont, over_there
-	print "    returning from foo\n"
-	.return (cont)
+    ## Take a continuation.
+    .local pmc cont
+    cont = new 'Continuation'
+    set_addr cont, over_there
+    print "    returning from foo\n"
+    .return (cont)
 over_there:
-	print "    got over there.\n"
-	.local pmc ex
-	ex = new 'Exception'
-	throw ex
+    print "    got over there.\n"
+    .local pmc ex
+    ex = new 'Exception'
+    throw ex
 .end
 CODE
 calling test

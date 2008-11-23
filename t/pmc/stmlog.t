@@ -21,7 +21,7 @@ Tests the STMLog PMC.
 
     plan(1)
 
-    new P0, 'STMLog'
+    new $P0, 'STMLog'
     ok(1, 'Instantiated .STMLog')
 .end
 

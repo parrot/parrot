@@ -21,7 +21,7 @@ Tests the RetContinuation PMC.
 
     plan(1)
 
-    new P0, 'RetContinuation'
+    new $P0, 'RetContinuation'
     ok(1, 'Instantiated .RetContinuation')
 .end
 

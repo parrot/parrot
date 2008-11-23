@@ -12,6 +12,29 @@ This file provides two macros to determine if a pair of PIR nums are equivalent.
 =cut
 
 .macro fp_eq (  J, K, L )
+    set $N10, .J
+    set $N11, .K
+    sub $N12, $N11, $N10
+    abs $N12, $N12
+    gt  $N12, 0.000001, .$FPEQNOK
+
+    branch  .L
+.label $FPEQNOK:
+.endm
+
+
+.macro fp_ne(   J,K,L)
+    set $N10, .J
+    set $N11, .K
+    sub $N12, $N11, $N10
+    abs $N12, $N12
+    lt  $N12, 0.000001, .$FPNENOK
+
+    branch  .L
+.label $FPNENOK:
+.endm
+
+.macro fp_eq_pasm (  J, K, L )
     set N10, .J
     set N11, .K
     sub N12, N11, N10
@@ -23,7 +46,7 @@ This file provides two macros to determine if a pair of PIR nums are equivalent.
 .endm
 
 
-.macro fp_ne(   J,K,L)
+.macro fp_ne_pasm(   J,K,L)
     set N10, .J
     set N11, .K
     sub N12, N11, N10
@@ -33,7 +56,6 @@ This file provides two macros to determine if a pair of PIR nums are equivalent.
     branch  .L
 .label $FPNENOK:
 .endm
-
 
 # Local Variables:
 #   mode: pir

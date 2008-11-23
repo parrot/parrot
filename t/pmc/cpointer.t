@@ -26,7 +26,7 @@ Tests the CPointer PMC.
 
 
 .sub instantiate
-    new P0, 'CPointer'
+    new $P0, 'CPointer'
     ok(1, 'Instantiated CPointer')
 .end
 

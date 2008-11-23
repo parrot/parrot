@@ -266,8 +266,8 @@ pir_output_is( <<'CODE', 'Coroutine', "Coro new - type" );
 .sub main :main
     .local pmc c
     c = global "coro"
-    typeof S0, c
-    print S0
+    typeof $S0, c
+    print $S0
 .end
 .sub coro
     .local pmc x

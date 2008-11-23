@@ -21,7 +21,7 @@ Tests the AddrRegistry PMC.
 
     plan(1)
 
-    new P0, 'AddrRegistry'
+    new $P0, 'AddrRegistry'
     ok(1, 'Instantiated .AddrRegistry')
 .end
 

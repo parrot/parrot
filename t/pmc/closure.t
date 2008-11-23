@@ -27,9 +27,9 @@ Tests the Closure PMC.
 .end
 
 .sub new_closure
-    new P0, 'Closure'
+    new $P0, 'Closure'
     ok( 1, 'Created new Closure' )
-    isa_ok( P0, 'Closure' )
+    isa_ok( $P0, 'Closure' )
 .end
 
 .sub sweep_closures

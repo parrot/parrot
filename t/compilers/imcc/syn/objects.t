@@ -111,8 +111,8 @@ pir_output_is( <<'CODE', <<'OUT', "meth call syntax, string" );
     newclass class, "Foo"
     obj = new "Foo"
     obj."_meth"()
-    set S10, "_meth"
-    obj.S10()
+    set $S10, "_meth"
+    obj.$S10()
     set $S10, "_meth"
     obj.$S10()
     print "done\n"
@@ -131,12 +131,12 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "initializer" );
 .sub test :main
-    newclass P1, "Foo"
-    subclass P2, P1, "Bar"
-    subclass P3, P2, "Baz"
-    P3 = new "Baz"
-    get_global P0, "_sub"
-    invokecc P0
+    newclass $P1, "Foo"
+    subclass $P2, $P1, "Bar"
+    subclass $P3, $P2, "Baz"
+    $P3 = new "Baz"
+    get_global $P0, "_sub"
+    invokecc $P0
     print "done\n"
     end
 .end

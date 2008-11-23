@@ -15,14 +15,14 @@
     # set a test plan
     plan(NUM_OF_TESTS)
 
-    new P0, 'Pair'
+    new $P0, 'Pair'
     ok(1, "still alive")
-    new P1, 'Integer'
-    set P1, 42
-    set P0["key"], P1
+    new $P1, 'Integer'
+    set $P1, 42
+    set $P0["key"], $P1
     ok(1, "still alive")
-    set P2, P0["key"]
-    is(P2, 42, "fetching value")
+    set $P2, $P0["key"]
+    is($P2, 42, "fetching value")
 
     .local pmc p, kv
     new p, 'Pair'

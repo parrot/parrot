@@ -304,10 +304,7 @@ SP              [ ]
     }
 
 
-<*>[ISNP]{DIGIT}{DIGIT}? {
-        valp->s = str_dup(yytext);
-        return REG;
-    }
+
 
 <INITIAL,emit,macro>^"=" {
         IMCC_INFO(interp)->in_pod = 1;
@@ -529,33 +526,7 @@ SP              [ ]
         }
     }
 
-<emit,INITIAL>{ID} {
-        if (!is_def) {
-            SymReg *r = find_sym(interp, yytext);
 
-            if (r && (r->type & (VTIDENTIFIER|VT_CONSTP))) {
-                valp->sr = r;
-                return VAR;
-            }
-
-            if (IMCC_INFO(interp)->cur_unit
-            &&  IMCC_INFO(interp)->cur_unit->instructions
-            && (r = IMCC_INFO(interp)->cur_unit->instructions->symregs[0])
-            &&  r->pcc_sub)
-            {
-                if (((r->pcc_sub->pragma & P_METHOD)
-                ||   (IMCC_INFO(interp)->cur_unit->is_vtable_method))
-                &&   !strcmp(yytext, "self")) {
-                    valp->sr = mk_ident(interp, "self", 'P');
-                    IMCC_INFO(interp)->cur_unit->type |= IMC_HAS_SELF;
-                    return VAR;
-                }
-            }
-        }
-
-        valp->s = str_dup(yytext);
-        return (!is_def && is_op(interp, valp->s) ? PARROT_OP : IDENTIFIER);
-    }
 
 <*>{FLOATNUM}         DUP_AND_RET(valp, FLOATC);
 <*>{SIGN}?{DIGIT}+    DUP_AND_RET(valp, INTC);
@@ -653,6 +624,44 @@ SP              [ ]
             "'%s' is not a valid register name", yytext);
     }
 
+<emit,INITIAL>[ISNP]{DIGIT}{DIGIT}? {
+        if (valp) valp->s = str_dup(yytext);
+
+        if (IMCC_INFO(interp)->state->pasm_file == 0)
+            IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+            "'%s' is only a valid register name in PASM mode", yytext);
+
+        return REG;
+    }
+
+<emit,INITIAL>{ID} {
+        if (!is_def) {
+            SymReg *r = find_sym(interp, yytext);
+
+            if (r && (r->type & (VTIDENTIFIER|VT_CONSTP))) {
+                valp->sr = r;
+                return VAR;
+            }
+
+            if (IMCC_INFO(interp)->cur_unit
+            &&  IMCC_INFO(interp)->cur_unit->instructions
+            && (r = IMCC_INFO(interp)->cur_unit->instructions->symregs[0])
+            &&  r->pcc_sub)
+            {
+                if (((r->pcc_sub->pragma & P_METHOD)
+                ||   (IMCC_INFO(interp)->cur_unit->is_vtable_method))
+                &&   !strcmp(yytext, "self")) {
+                    valp->sr = mk_ident(interp, "self", 'P');
+                    IMCC_INFO(interp)->cur_unit->type |= IMC_HAS_SELF;
+                    return VAR;
+                }
+            }
+        }
+
+        valp->s = str_dup(yytext);
+        return (!is_def && is_op(interp, valp->s) ? PARROT_OP : IDENTIFIER);
+    }
+
 
 <emit,INITIAL>{WS}+ /* skip */;
 
@@ -722,6 +731,8 @@ SP              [ ]
 
 <macro>^{WS}+                       /* skip leading ws */;
 <macro>{WS}+                        DUP_AND_RET(valp, ' ');
+<macro>[SNIP]{DIGITS}               DUP_AND_RET(valp, REG);
+<macro>"$"[SNIP]{DIGITS}            DUP_AND_RET(valp, REG);
 <macro>{ID}                         DUP_AND_RET(valp, IDENTIFIER);
 <macro>{DOT}{ID}                    DUP_AND_RET(valp, MACRO);
 <macro>.                            DUP_AND_RET(valp, yytext[0]);

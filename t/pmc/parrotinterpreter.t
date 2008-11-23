@@ -25,7 +25,7 @@ Tests the ParrotInterpreter PMC.
 
 pir_output_is( <<'CODE', <<'OUT', 'create new interpreter' );
 .sub 'test' :main
-    new P0, 'ParrotInterpreter'
+    new $P0, 'ParrotInterpreter'
     print "ok 1\n"
 .end
 CODE

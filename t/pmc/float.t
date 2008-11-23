@@ -29,22 +29,22 @@ pasm_output_is( <<"CODE", <<OUTPUT, "basic assignment" );
     new P0, 'Float'
 
     set P0, 0.001
-    .fp_eq( P0, 0.001, EQ1)
+    .fp_eq_pasm( P0, 0.001, EQ1)
     print "not "
 EQ1:    print "ok 1\\n"
 
         set P0, 1000
-        .fp_eq( P0, 1000.0, EQ2)
+        .fp_eq_pasm( P0, 1000.0, EQ2)
     print "not "
 EQ2:    print "ok 2\\n"
 
         set P0, "12.5"
-        .fp_eq( P0, 12.5, EQ3)
+        .fp_eq_pasm( P0, 12.5, EQ3)
     print "not "
 EQ3:    print "ok 3\\n"
 
         set P0, "Twelve point five"
-        .fp_eq( P0, 0.0, EQ4)
+        .fp_eq_pasm( P0, 0.0, EQ4)
     print "not "
 EQ4:    print "ok 4\\n"
 
@@ -56,7 +56,7 @@ EQ5:    print "ok 5\\n"
 
         set P0, 123.45
         set N0, P0
-        .fp_eq(N0, 123.45, EQ6)
+        .fp_eq_pasm(N0, 123.45, EQ6)
     print "not "
 EQ6:    print "ok 6\\n"
 
@@ -82,7 +82,7 @@ pasm_output_is( <<"CODE", <<OUTPUT, "add number to self" );
     new P0, 'Float'
     set P0, 0.001
     add P0, P0, P0
-    .fp_eq( P0, 0.002, EQ1)
+    .fp_eq_pasm( P0, 0.002, EQ1)
     print P0
     print "not "
 EQ1:    print "ok 1\\n"
@@ -96,7 +96,7 @@ pasm_output_is( <<"CODE", <<OUTPUT, "sub number from self" );
     new P0, 'Float'
     set P0, -1000.2
     sub P0, P0, P0
-    .fp_eq( P0, 0.0, EQ1)
+    .fp_eq_pasm( P0, 0.0, EQ1)
     print P0
     print "not "
 EQ1:    print "ok 1\\n"
@@ -110,7 +110,7 @@ pasm_output_is( <<"CODE", <<OUTPUT, "multiply number by self" );
     new P0, 'Float'
     set P0, 123.4
     mul P0, P0, P0
-    .fp_eq( P0, 15227.56, EQ1)
+    .fp_eq_pasm( P0, 15227.56, EQ1)
     print P0
     print "not "
 EQ1:    print "ok 1\\n"
@@ -124,7 +124,7 @@ pasm_output_is( <<"CODE", <<OUTPUT, "divide number by self" );
     new P0, 'Float'
     set P0, 1829354.988
     div P0, P0, P0
-    .fp_eq( P0, 1.0, EQ1)
+    .fp_eq_pasm( P0, 1.0, EQ1)
     print P0
     print "not "
 EQ1:    print "ok 1\\n"
@@ -135,13 +135,13 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "divide by zero" );
 .sub _main :main
-    P0 = new 'Float'
-    set P0, "12.0"
-    P1 = new 'Float'
-    P2 = new 'Float'
-    set P2, "0.0"
+    $P0 = new 'Float'
+    set $P0, "12.0"
+    $P1 = new 'Float'
+    $P2 = new 'Float'
+    set $P2, "0.0"
     push_eh OK
-    P1 = P0 / P2
+    $P1 = $P0 / $P2
     print "fail\n"
     pop_eh
 OK:
@@ -269,13 +269,13 @@ pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: addition" );
     new P0, 'Float'
     set P0, 0.001
     add P0, 1
-    .fp_eq(P0, 1.001, EQ1)
+    .fp_eq_pasm(P0, 1.001, EQ1)
     print P0
     print "not "
 EQ1:    print "ok 1\\n"
 
     add P0, -2
-    .fp_eq(P0, -0.999, EQ2)
+    .fp_eq_pasm(P0, -0.999, EQ2)
     print P0
     print "not "
 EQ2:    print "ok 2\\n"
@@ -290,13 +290,13 @@ pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: subtraction" 
     new P0, 'Float'
     set P0, 103.45
     sub P0, 77
-    .fp_eq(P0, 26.45, EQ1)
+    .fp_eq_pasm(P0, 26.45, EQ1)
     print P0
     print "not "
 EQ1:    print "ok 1\\n"
 
     sub P0, -24
-    .fp_eq(P0, 50.45, EQ2)
+    .fp_eq_pasm(P0, 50.45, EQ2)
     print P0
     print "not "
 EQ2:    print "ok 2\\n"
@@ -311,19 +311,19 @@ pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: multiplicatio
     new P0, 'Float'
     set P0, 0.001
     mul P0, 10000
-    .fp_eq(P0, 10.0, EQ1)
+    .fp_eq_pasm(P0, 10.0, EQ1)
     print P0
     print "not "
 EQ1:    print "ok 1\\n"
 
     mul P0, -1
-    .fp_eq(P0, -10.0, EQ2)
+    .fp_eq_pasm(P0, -10.0, EQ2)
     print P0
     print "not "
 EQ2:    print "ok 2\\n"
 
     mul P0, 0
-    .fp_eq(P0, 0.0, EQ3)
+    .fp_eq_pasm(P0, 0.0, EQ3)
     print P0
     print "not "
 EQ3:    print "ok 3\\n"
@@ -339,13 +339,13 @@ pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: division" );
     new P0, 'Float'
     set P0, 1e8
     div P0, 10000
-    .fp_eq(P0, 10000.0, EQ1)
+    .fp_eq_pasm(P0, 10000.0, EQ1)
     print P0
     print "not "
 EQ1:    print "ok 1\\n"
 
     div P0, 1000000
-    .fp_eq(P0, 0.01, EQ2)
+    .fp_eq_pasm(P0, 0.01, EQ2)
     print P0
     print "not "
 EQ2:    print "ok 2\\n"
@@ -360,13 +360,13 @@ pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: addition" );
     new P0, 'Float'
     set P0, 0.001
     add P0, 1.2
-    .fp_eq(P0, 1.201, EQ1)
+    .fp_eq_pasm(P0, 1.201, EQ1)
     print P0
     print "not "
 EQ1:    print "ok 1\\n"
 
     add P0, -2.4
-    .fp_eq(P0, -1.199, EQ2)
+    .fp_eq_pasm(P0, -1.199, EQ2)
     print P0
     print "not "
 EQ2:    print "ok 2\\n"
@@ -381,13 +381,13 @@ pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: subtraction" 
     new P0, 'Float'
     set P0, 103.45
     sub P0, 3.46
-    .fp_eq(P0, 99.99, EQ1)
+    .fp_eq_pasm(P0, 99.99, EQ1)
     print P0
     print "not "
 EQ1:    print "ok 1\\n"
 
     sub P0, -0.01
-    .fp_eq(P0, 100.00, EQ2)
+    .fp_eq_pasm(P0, 100.00, EQ2)
     print P0
     print "not "
 EQ2:    print "ok 2\\n"
@@ -402,19 +402,19 @@ pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: multiplicatio
     new P0, 'Float'
     set P0, 0.001
     mul P0, 123.5
-    .fp_eq(P0, 0.1235, EQ1)
+    .fp_eq_pasm(P0, 0.1235, EQ1)
     print P0
     print "not "
 EQ1:    print "ok 1\\n"
 
     mul P0, -2.6
-    .fp_eq(P0, -0.3211, EQ2)
+    .fp_eq_pasm(P0, -0.3211, EQ2)
     print P0
     print "not "
 EQ2:    print "ok 2\\n"
 
     mul P0, 0
-    .fp_eq(P0, 0.0, EQ3)
+    .fp_eq_pasm(P0, 0.0, EQ3)
     print P0
     print "not "
 EQ3:    print "ok 3\\n"
@@ -430,13 +430,13 @@ pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: division" );
     new P0, 'Float'
     set P0, 1e8
     div P0, 0.5
-    .fp_eq(P0, 2e8, EQ1)
+    .fp_eq_pasm(P0, 2e8, EQ1)
     print P0
     print "not "
 EQ1:    print "ok 1\\n"
 
     div P0, 4000.0
-    .fp_eq(P0, 50000.0, EQ2)
+    .fp_eq_pasm(P0, 50000.0, EQ2)
     print P0
     print "not "
 EQ2:    print "ok 2\\n"
@@ -451,25 +451,25 @@ pasm_output_is( << "CODE", << 'OUTPUT', "Increment & decrement" );
     new P0, 'Float'
     set P0, 0.5
     inc P0
-    .fp_eq(P0, 1.5, EQ1)
+    .fp_eq_pasm(P0, 1.5, EQ1)
     print P0
     print "not "
 EQ1:    print "ok 1\\n"
 
     dec P0
-    .fp_eq(P0, 0.5, EQ2)
+    .fp_eq_pasm(P0, 0.5, EQ2)
     print P0
     print "not "
 EQ2:    print "ok 2\\n"
 
     dec P0
-    .fp_eq(P0, -0.5, EQ3)
+    .fp_eq_pasm(P0, -0.5, EQ3)
     print P0
     print "not "
 EQ3:    print "ok 3\\n"
 
     inc P0
-    .fp_eq(P0, 0.5, EQ4)
+    .fp_eq_pasm(P0, 0.5, EQ4)
     print P0
     print "not "
 EQ4:    print "ok 4\\n"
@@ -486,14 +486,14 @@ pasm_output_is( << "CODE", << 'OUTPUT', "Neg" );
     new P0, 'Float'
     set P0, 0.5
     neg P0
-    .fp_eq(P0, -0.5, EQ1)
+    .fp_eq_pasm(P0, -0.5, EQ1)
     print P0
     print "not "
 EQ1:    print "ok 1\\n"
 
         new P1, 'Float'
     neg P1, P0
-    .fp_eq(P1, 0.5, EQ2)
+    .fp_eq_pasm(P1, 0.5, EQ2)
     print P1
     print "not "
 EQ2:    print "ok 2\\n"
@@ -608,7 +608,7 @@ OK1:    print "ok 1\\n"
 
         set P0, -1.0
         abs P0
-    .fp_eq(P0, 1.0, OK2)
+    .fp_eq_pasm(P0, 1.0, OK2)
     print P0
     print "not "
 OK2:    print "ok 2\\n"
@@ -616,7 +616,7 @@ OK2:    print "ok 2\\n"
         new P1, 'Float'
         set P0, -5.0
         abs P1, P0
-        .fp_eq(P1, 5.0, OK3)
+        .fp_eq_pasm(P1, 5.0, OK3)
     print P1
     print "not "
 OK3:    print "ok 3\\n"

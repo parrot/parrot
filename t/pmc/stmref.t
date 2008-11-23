@@ -21,7 +21,7 @@ Tests the STMRef PMC.
 
     plan(1)
 
-    new P0, 'STMRef'
+    new $P0, 'STMRef'
     ok(1, 'Instantiated .STMRef')
 .end
 

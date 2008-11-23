@@ -122,13 +122,13 @@ OUTPUT
 # RT #46843
 pir_output_is( <<'CODE', <<'OUTPUT', "get_fd()/fdopen" );
 .sub main :main
-    getstdout P0
-    I0 = P0.'get_fd'()
-    fdopen P1, I0, ">"
-    defined I0, P1
-    unless I0, nok
-    print P1, "ok\n"
-    close P1
+    getstdout $P0
+    $I0 = $P0.'get_fd'()
+    fdopen $P1, $I0, ">"
+    defined $I0, $P1
+    unless $I0, nok
+    print $P1, "ok\n"
+    close $P1
     end
 nok:
     print "fdopen failed\n"
@@ -140,12 +140,12 @@ OUTPUT
 # RT #46843
 pir_output_is( <<'CODE', <<'OUTPUT', 'fdopen - no close' );
 .sub main :main
-    getstdout P0
-    I0 = P0.'get_fd'()
-    fdopen P1, I0, ">"
-    defined I0, P1
-    unless I0, nok
-    print P1, "ok\n"
+    getstdout $P0
+    $I0 = $P0.'get_fd'()
+    fdopen $P1, $I0, ">"
+    defined $I0, $P1
+    unless $I0, nok
+    print $P1, "ok\n"
     end
 nok:
     print "fdopen failed\n"
@@ -463,19 +463,19 @@ OUTPUT
 # RT #46843
 pir_output_is( <<'CODE', <<'OUT', 'standard file descriptors' );
 .sub main :main
-    getstdin P0
-    I0 = P0.'get_fd'()
+    getstdin $P0
+    $I0 = $P0.'get_fd'()
     # I0 is 0 on Unix and non-Null on stdio and win32
     print "ok 1\n"
-    getstdout P1
-    I1 = P1.'get_fd'()
-    if I1, OK_2
+    getstdout $P1
+    $I1 = $P1.'get_fd'()
+    if $I1, OK_2
     print "not "
 OK_2:
     say "ok 2"
-    getstderr P2
-    I2 = P2.'get_fd'()
-    if I2, OK_3
+    getstderr $P2
+    $I2 = $P2.'get_fd'()
+    if $I2, OK_3
     print "not "
 OK_3:
     say "ok 3"

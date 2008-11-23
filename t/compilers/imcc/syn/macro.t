@@ -43,8 +43,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'macro, one unused parameter, register term
 .macro answer(A)
     print    42
 .endm
-    set    I0, 43
-    .answer(I0)
+    set    $I0, 43
+    .answer($I0)
     print    "\n"
     end
 .end
@@ -70,8 +70,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'macro, one used parameter, register' );
 .macro answer(A)
     print    .A
 .endm
-    set    I0,42
-    .answer(I0)
+    set    $I0,42
+    .answer($I0)
     print    "\n"
     end
 .end
@@ -86,9 +86,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'macro, one used parameter, called twice' )
     print    "\n"
     inc    .A
 .endm
-    set    I0,42
-    .answer(I0)
-    .answer(I0)
+    set    $I0,42
+    .answer($I0)
+    .answer($I0)
     end
 .end
 CODE
@@ -99,13 +99,13 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', 'macro, one used parameter, label' );
 .sub test :main
 .macro answer(A)
-    ne    I0,42,.$done
+    ne    $I0,42,.$done
     print    .A
     print    "\n"
 .label $done:
 .endm
-    set    I0,42
-    .answer(I0)
+    set    $I0,42
+    .answer($I0)
     end
 .end
 CODE
@@ -115,16 +115,16 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', 'macro, one used parameter run thrice, label' );
 .sub test :main
 .macro answer(A)
-    ne    I0,42,.$done
+    ne    $I0,42,.$done
     print    .A
     print    "\n"
 .label $done:
 .endm
-    set    I0,42
-    .answer(I0)
-    .answer(I0)
-    inc I0
-    .answer(I0)
+    set    $I0,42
+    .answer($I0)
+    .answer($I0)
+    inc $I0
+    .answer($I0)
 .end
 CODE
 42
@@ -173,7 +173,7 @@ pir_output_is( <<'CODE', 'Hello', 'macro_const string in PIR' );
 CODE
 
 pir_output_is( <<'CODE', 'Hello', 'macro_const register in PIR' );
-.macro_const firstreg S0
+.macro_const firstreg $S0
 .sub main :main
     .firstreg = "Hello"
     print .firstreg

@@ -21,7 +21,7 @@ Tests the ParrotThread PMC.
 
     plan(1)
 
-    new P0, 'ParrotThread'
+    new $P0, 'ParrotThread'
     ok(1, 'Instantiated .ParrotThread')
 .end
 

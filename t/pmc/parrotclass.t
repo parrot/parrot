@@ -21,7 +21,7 @@ Tests the Class PMC.
 
     plan(1)
 
-    new P0, 'Class'
+    new $P0, 'Class'
     ok(1, 'Instantiated .Class')
 .end
 

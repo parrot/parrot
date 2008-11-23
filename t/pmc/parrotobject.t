@@ -25,7 +25,7 @@ Tests the Object PMC.
 
 pir_error_output_like( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    new P0, 'Object'
+    new $P0, 'Object'
     print "ok 1\n"
 .end
 CODE

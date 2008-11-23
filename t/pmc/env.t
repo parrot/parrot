@@ -76,8 +76,8 @@ end:
 .sub gone_delete
     new $P0, 'Env'
     set $P0['PARROT_TMP'], 'hello polly'
-    exists I0, $P0['PARROT_TMP']
-    if I0, ok1
+    exists $I0, $P0['PARROT_TMP']
+    if $I0, ok1
     ok(0, "expected element doesn't exist")
 ok1:
     ok(1, 'expected element exists')
@@ -94,19 +94,19 @@ ok2:
     set $P0["PARROT_1"], "hello"
     set $P0["PARROT_2"], "polly"
     iter $P1, $P0
-    set I0, 0
+    set $I0, 0
 loop:
     unless $P1, loopend
-    shift S2, $P1
-    eq S2, "PARROT_1", gotit
-    eq S2, "PARROT_2", gotit
+    shift $S2, $P1
+    eq $S2, "PARROT_1", gotit
+    eq $S2, "PARROT_2", gotit
     branch notit
 gotit:
-    inc I0
+    inc $I0
 notit:
     branch loop
 loopend:
-    is(I0, 2, 'assigned env vars showed up in the iterator')
+    is($I0, 2, 'assigned env vars showed up in the iterator')
 .end
 
     # This will not work on our unsetenv implementation

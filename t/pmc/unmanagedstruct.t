@@ -21,7 +21,7 @@ Tests the UnManagedStruct PMC.
 
     plan(1)
 
-    new P0, 'UnManagedStruct'
+    new $P0, 'UnManagedStruct'
     ok(1, 'Instantiated .UnManagedStruct')
 .end
 

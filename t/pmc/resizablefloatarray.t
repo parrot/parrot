@@ -212,7 +212,7 @@ pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
 OK1: print "ok 1\\n"
 
      set N0, P0[1]
-     .fp_eq(N0, 2.5, OK2)
+     .fp_eq_pasm(N0, 2.5, OK2)
      print "not "
 OK2: print "ok 2\\n"
 
@@ -249,7 +249,7 @@ OK1: print "ok 1\\n"
 
      set P2, 128
      set N0, P0[P2]
-     .fp_eq(N0, 10.2, OK2)
+     .fp_eq_pasm(N0, 10.2, OK2)
      print "not "
 OK2: print "ok 2\\n"
 
@@ -281,17 +281,17 @@ pasm_output_is( <<"CODE", <<'OUTPUT', 'basic push' );
      push P0, 2.0
      push P0, 3.0
      set N0, P0[0]
-     .fp_eq(N0, 1.0, OK1)
+     .fp_eq_pasm(N0, 1.0, OK1)
      print "not "
 OK1: print "ok 1\\n"
 
      set N0, P0[1]
-     .fp_eq(N0, 2.0, OK2)
+     .fp_eq_pasm(N0, 2.0, OK2)
      print "not "
 OK2: print "ok 2\\n"
 
      set N0, P0[2]
-     .fp_eq(N0, 3.0, OK3)
+     .fp_eq_pasm(N0, 3.0, OK3)
      print "not "
 OK3: print "ok 3\\n"
      end
@@ -311,7 +311,7 @@ L1:  set N0, I0
      lt I0, 100000, L1
 
      set N0, P0[99999]
-     .fp_eq(N0, 99999.0, OK1)
+     .fp_eq_pasm(N0, 99999.0, OK1)
      print N0
      print "not "
 OK1: print "ok 1\\n"
@@ -327,17 +327,17 @@ pasm_output_is( <<"CODE", <<'OUTPUT', 'basic pop' );
      set P0[1], 2.0
      set P0[2], 3.0
      pop N0, P0
-     .fp_eq(N0, 3.0, OK1)
+     .fp_eq_pasm(N0, 3.0, OK1)
      print "not "
 OK1: print "ok 1\\n"
 
      pop N0, P0
-     .fp_eq(N0, 2.0, OK2)
+     .fp_eq_pasm(N0, 2.0, OK2)
      print "not "
 OK2: print "ok 2\\n"
 
      pop N0, P0
-     .fp_eq(N0, 1.0, OK3)
+     .fp_eq_pasm(N0, 1.0, OK3)
      print "not "
 OK3: print "ok 3\\n"
      end
@@ -359,7 +359,7 @@ L1:  set N0, I0
 L2:  dec I0
      set N1, I0
      pop N0, P0
-     .fp_eq(N0, N1, OK)
+     .fp_eq_pasm(N0, N1, OK)
      branch NOT_OK
 OK:  gt I0, 0, L2
      print "ok\\n"
@@ -382,7 +382,7 @@ pasm_output_is( <<"CODE", <<'OUTPUT', 'push/pop' );
      push P0, 2.0
      push P0, 3.0
      pop N0, P0
-     .fp_eq(N0, 3.0, OK1)
+     .fp_eq_pasm(N0, 3.0, OK1)
      print "not "
 OK1: print "ok 1\\n"
      end

@@ -207,7 +207,7 @@ pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
 OK1: print "ok 1\\n"
 
      set N0, P0[1]
-     .fp_eq(N0, 1.0, OK2)
+     .fp_eq_pasm(N0, 1.0, OK2)
      print "not "
 OK2: print "ok 2\\n"
 
@@ -244,7 +244,7 @@ OK1: print "ok 1\\n"
 
      set P2, 128
      set N0, P0[P2]
-     .fp_eq(N0, 1.0, OK2)
+     .fp_eq_pasm(N0, 1.0, OK2)
      print "not "
 OK2: print "ok 2\\n"
 
@@ -386,8 +386,8 @@ OUTPUT
 
 pir_error_output_like( << 'CODE', << 'OUTPUT', "pop bounds checking" );
 .sub 'test' :main
-       P0 = new 'ResizableBooleanArray'
-       pop I0, P0
+       $P0 = new 'ResizableBooleanArray'
+       pop $I0, $P0
 .end
 CODE
 /ResizableBooleanArray: Can't pop from an empty array!.*/
@@ -518,8 +518,8 @@ OUTPUT
 
 pir_error_output_like( << 'CODE', << 'OUTPUT', "shift bounds checking" );
 .sub 'test' :main
-       P0 = new 'ResizableBooleanArray'
-       shift I0, P0
+       $P0 = new 'ResizableBooleanArray'
+       shift $I0, $P0
 .end
 CODE
 /ResizableBooleanArray: Can't shift from an empty array!.*/

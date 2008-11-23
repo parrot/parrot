@@ -21,7 +21,7 @@ Tests the VtableCache PMC.
 
     plan(1)
 
-    new P0, 'VtableCache'
+    new $P0, 'VtableCache'
     ok(1, 'Instantiated .VtableCache')
 .end
 

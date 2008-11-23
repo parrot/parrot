@@ -25,7 +25,7 @@ Tests the Slice PMC.
 
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    new P0, 'Slice'
+    new $P0, 'Slice'
     print "ok 1\n"
 .end
 CODE

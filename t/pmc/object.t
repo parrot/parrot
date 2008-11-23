@@ -25,7 +25,7 @@ Tests the Object PMC.
     plan(1)
 
     push_eh cant_instantiate
-      new P0, 'Object'
+      new $P0, 'Object'
     pop_eh
     ok(0, 'Able to instantiate Object')
     goto done_1

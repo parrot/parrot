@@ -993,7 +993,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', 'multiple :load' );
     load_bytecode "$l1_pir"
     load_bytecode "$l2_pir"
     say "main 2"
-    load_bytecode "$l1_pbc"	# these have to be ignored
+    load_bytecode "$l1_pbc" # these have to be ignored
     load_bytecode "$l2_pbc"
     say "main 3"
 .end
@@ -1077,11 +1077,11 @@ pir_output_is( <<'CODE', <<'OUTPUT', "__get_regs_used 2" );
     .local pmc m
     .include "interpinfo.pasm"
     m = interpinfo .INTERPINFO_CURRENT_SUB
-    set N0, 1.0
-    set N7, 1.0
-    add N7, N7, N0
-    set I9, 1
-    add I10, I9, I9
+    set $N0, 1.0
+    set $N7, 1.0
+    add $N7, $N7, $N0
+    set $I9, 1
+    add $I10, $I9, $I9
     $I0 = m."__get_regs_used"('N')
     print $I0
     $I0 = m."__get_regs_used"('I')
@@ -1106,8 +1106,8 @@ pir_output_like(
     _f1()
 .end
 .sub _f1
-    P0 = new 'Undef'
-    print P0
+    \$P0 = new 'Undef'
+    print \$P0
 .end
 CODE
 /uninit/
@@ -1117,8 +1117,8 @@ pir_output_is( <<"CODE", <<'OUTPUT', 'warn on in sub' );
 .sub 'test' :main
 .include "warnings.pasm"
     _f1()
-    P0 = new 'Undef'
-    print P0
+    \$P0 = new 'Undef'
+    print \$P0
     say "ok"
 .end
 .sub _f1
@@ -1133,16 +1133,16 @@ pir_output_like(
 .sub 'test' :main
 .include "warnings.pasm"
     _f1()
-    P0 = new 'Undef'
+    \$P0 = new 'Undef'
     say "back"
-    print P0
+    print \$P0
     say "ok"
 .end
 .sub _f1
     warningson .PARROT_WARNINGS_UNDEF_FLAG
     _f2()
-    P0 = new 'Undef'
-    print P0
+    \$P0 = new 'Undef'
+    print \$P0
 .end
 .sub _f2
     warningsoff .PARROT_WARNINGS_UNDEF_FLAG

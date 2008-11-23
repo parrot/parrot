@@ -21,7 +21,7 @@ Tests the Bound_NCI PMC.
 
     plan(1)
 
-    new P0, 'Bound_NCI'
+    new $P0, 'Bound_NCI'
     ok(1, 'Instantiated .Bound_NCI')
 .end
 
