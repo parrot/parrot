@@ -405,14 +405,14 @@ for my $op ( "/", "%" ) {
     for my $type ( "BigInt", "Integer" ) {
         pir_output_is( <<"CODE", <<OUTPUT, "bigint $op by zero $type" );
 .sub _main :main
-    P0 = new 'BigInt'
-    set P0, "1000000000000000000000"
-    P1 = new 'BigInt'
+    \$P0 = new 'BigInt'
+    set \$P0, "1000000000000000000000"
+    \$P1 = new 'BigInt'
     ## divide by a zero $type
-    P2 = new '$type'
-    set P2, 0
+    \$P2 = new '$type'
+    set \$P2, 0
     push_eh OK
-    P1 = P0 $op P2
+    \$P1 = \$P0 $op \$P2
     print "fail\\n"
     pop_eh
 OK:
