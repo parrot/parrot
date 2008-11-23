@@ -321,6 +321,7 @@ SP              [ ]
 
 <pod>{EOL}      { IMCC_INFO(interp)->line++; }
 
+<*>".line"               return TK_LINE;
 <INITIAL,emit>".lex"     return LEXICAL;
 ".arg"                   return ARG;
 ".set_arg"               return ARG;
@@ -1386,6 +1387,32 @@ IMCC_print_inc(PARROT_INTERP)
 
         old = f->s.file;
     }
+}
+
+/*
+
+void
+set_filename(PARROT_INTERP, char * const filename)
+
+Function to set the C<filename> as specified using the C<.line> directive.
+The parser needs to call back into the lexer (this file), because the
+parser does not have access to the lexer's private bits.
+
+*/
+void
+set_filename(PARROT_INTERP, char * const filename) {
+    IMCC_INFO(interp)->frames->s.file = filename;
+    IMCC_INFO(interp)->frames->s.file_needs_free = 1;
+
+    /* in case .line is used outside a .sub, then this
+     * can't be done; hence the check.
+     * The str_dup() is done, as the original #line implementation
+     * duplicated the string twice as well; one for the
+     * frames->s.file and one for cur_unit->file.
+     * During the parse, the STRINGC is already str_dup()ed once.
+     */
+    if (IMCC_INFO(interp)->cur_unit)
+        IMCC_INFO(interp)->cur_unit->file = str_dup(filename);
 }
 
 /* Functions to set and get yyin, as we can't decorate it for export

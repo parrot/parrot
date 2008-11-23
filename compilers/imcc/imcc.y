@@ -697,7 +697,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %nonassoc '\n'
 %nonassoc <t> PARAM
 
-%token <t> HLL HLL_MAP
+%token <t> HLL HLL_MAP TK_LINE
 %token <t> GOTO ARG IF UNLESS PNULL
 %token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL ADV_OPT_FLAG ADV_NAMED ADV_ARROW
 %token <t> NEW ADV_INVOCANT
@@ -801,6 +801,7 @@ compilation_unit:
          }
    | MACRO '\n'                { $$ = 0; }
    | pragma                    { $$ = 0; }
+   | line_directive            { $$ = 0; }
    | '\n'                      { $$ = 0; }
    ;
 
@@ -811,6 +812,14 @@ pragma:
            $$ = 0;
            do_loadlib(interp, $2);
            mem_sys_free($2);
+         }
+   ;
+
+line_directive:
+     TK_LINE INTC COMMA STRINGC '\n'
+         {
+           IMCC_INFO(interp)->line = atoi($2);
+           set_filename(interp, $4);
          }
    ;
 
@@ -1400,6 +1409,7 @@ statement:
    | MACRO '\n'                { $$ = 0; }
    | FILECOMMENT               { $$ = 0; }
    | LINECOMMENT               { $$ = 0; }
+   | line_directive            { $$ = 0; }
    ;
 
 labels:
