@@ -70,9 +70,9 @@ documentation at L<http://www.json.org/>.
    .tailcall result()
 
   failed:
-   P0 = new 'Exception'
-   P0[0] = "invalid JSON value"
-   throw P0
+   $P0 = new 'Exception'
+   $P0[0] = "invalid JSON value"
+   throw $P0
 .end
 
 # Local Variables:

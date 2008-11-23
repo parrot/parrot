@@ -81,14 +81,14 @@ SKIP: {
 .sub main :main
     .local pmc threadfunc
     .local pmc thread
-    I5 = 10
+    $I5 = 10
     threadfunc = global "foo"
     thread = new 'ParrotThread'
     thread.'run_clone'(threadfunc)
 
     sleep 1
     print "main "
-    print I5
+    print $I5
     print "\n"
     # get tid of thread
     $I0 = thread
@@ -98,12 +98,12 @@ SKIP: {
 
 .sub foo
     # check if vars are fresh
-    inc I5
+    inc $I5
     print "thread"
     # print I5 # not done because registers aren't guaranteed to be
                # initialized to anything in particular
     print "\n"
-    set I3, 0   # no retval
+    set $I3, 0   # no retval
     returncc    # ret and be done with thread
 .end
 # output from threads could be reversed
@@ -124,14 +124,14 @@ loop:
 .sub main
     .local pmc threadfunc
     .local pmc thread
-    I5 = 10
+    $I5 = 10
     threadfunc = global "foo"
     thread = new 'ParrotThread'
     thread.'run_clone'(threadfunc)
 
     sleep 1
     print "main "
-    print I5
+    print $I5
     print "\n"
     # get tid of thread
     $I0 = thread
@@ -141,12 +141,12 @@ loop:
 
 .sub foo
     # check if vars are fresh
-    inc I5
+    inc $I5
     print "thread"
     # print I5 # not done because registers aren't guaranteed to be
                # initialized to anything in particular
     print "\n"
-    set I3, 0   # no retval
+    set $I3, 0   # no retval
     returncc    # ret and be done with thread
 .end
 # output from threads could be reversed
@@ -163,32 +163,32 @@ SKIP: {
 
 pir_output_is( <<'CODE', <<'OUTPUT', "thread type 2" );
 .sub main :main
-    set I5, 10
+    set $I5, 10
     .local pmc thread
     .local pmc threadsub
-    S5 = " interp\n"
-    P6 = new 'String'
-    P6 = 'from '
+    $S5 = " interp\n"
+    $P6 = new 'String'
+    $P6 = 'from '
 
     print "ok 1\n"
     threadsub = global "foo"
     thread = new 'ParrotThread'
-    thread.'run_clone'(threadsub, P6)
+    thread.'run_clone'(threadsub, $P6)
     sleep 1 # to let the thread run
-    print P6
-    print I5
-    print S5
+    print $P6
+    print $I5
+    print $S5
     thread.'join'()
 .end
 
 .sub foo
     .param pmc passed
-    inc I5
-    S5 = " thread\n"
+    inc $I5
+    $S5 = " thread\n"
     passed = 'hello from'
     print passed
     # print I5 # not done because register initialization is not guaranteed
-    print S5
+    print $S5
     $P0 = getinterp
     $S0 = typeof $P0
     print $S0
