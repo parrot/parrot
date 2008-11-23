@@ -5,8 +5,10 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
 use Test::More;
 use Parrot::Test tests => 10;
+use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME
 
@@ -32,50 +34,52 @@ CODE
 ok 1 - $P0 = new 'FileHandle'
 OUT
 
+my (undef, $temp_file) = create_tempfile( UNLINK => 1 );
+
 # L<PDD22/I\/O PMC API/=item open.*=item close>
-pir_output_is( <<'CODE', <<'OUT', 'open and close - synchronous' );
+pir_output_is( <<"CODE", <<'OUT', 'open and close - synchronous' );
 .sub 'test' :main
-    $P1 = new 'FileHandle'
-    $P1.'open'('README')
-    say 'ok 1 - $P1.open($S1)'
+    \$P1 = new 'FileHandle'
+    \$P1.'open'('README')
+    say 'ok 1 - \$P1.open(\$S1)'
 
-    $P1.'close'()
-    say 'ok 2 - $P1.close()'
+    \$P1.'close'()
+    say 'ok 2 - \$P1.close()'
 
-    $P3 = new 'FileHandle'
-    $P3.'open'('README', 'rw')
-    say 'ok 3 - $P3.open($S1, $S2) # rw mode'
-    $P3.'close'()
+    \$P3 = new 'FileHandle'
+    \$P3.'open'('README', 'rw')
+    say 'ok 3 - \$P3.open(\$S1, \$S2) # rw mode'
+    \$P3.'close'()
 
-    $P3.'open'()
-    say 'ok 4 - $P3.open()         # reopening'
-    $P3.'close'()
+    \$P3.'open'()
+    say 'ok 4 - \$P3.open()         # reopening'
+    \$P3.'close'()
 
   test_5:
-    $P5 = new 'FileHandle'
+    \$P5 = new 'FileHandle'
     push_eh eh_bad_file_1
-    $P5.'open'('bad.file')
+    \$P5.'open'('bad.file')
     pop_eh
 
   test_6:
-    $P6 = new 'FileHandle'
+    \$P6 = new 'FileHandle'
     push_eh eh_bad_file_2
-    $P6.'open'('bad.file', 'r')
+    \$P6.'open'('bad.file', 'r')
     pop_eh
 
   test_7:
-    $P7 = new 'FileHandle'
-    $P7.'open'('temp.file', 'w')
-    say 'ok 7 - $P7.open($S1, $S2) # new file, write mode succeeds'
+    \$P7 = new 'FileHandle'
+    \$P7.'open'('$temp_file', 'w')
+    say 'ok 7 - \$P7.open(\$S1, \$S2) # new file, write mode succeeds'
 
     goto end
 
   eh_bad_file_1:
-    say 'ok 5 - $P5.open($S1)      # with bad file'
+    say 'ok 5 - \$P5.open(\$S1)      # with bad file'
     goto test_6
 
   eh_bad_file_2:
-    say "ok 6 - $P6.open($S1, $S2) # with bad file"
+    say "ok 6 - \$P6.open(\$S1, \$S2) # with bad file"
     goto test_7
 
   end:
@@ -89,9 +93,6 @@ ok 5 - $P5.open($S1)      # with bad file
 ok 6 - $P6.open($S1, $S2) # with bad file
 ok 7 - $P7.open($S1, $S2) # new file, write mode succeeds
 OUT
-
-# should be in the PIR code
-unlink ('temp.file');
 
 # RT #46827 test open file, close file, delete file, reopen previously opened stream
 
@@ -152,43 +153,43 @@ ok 2 - $S0 = $P1.read($I2) # again on same stream
 OUT
 
 # L<PDD22/I\/O PMC API/=item print>
-pir_output_is( <<'CODE', <<'OUT', 'print - synchronous' );
+pir_output_is( <<"CODE", <<'OUT', 'print - synchronous' );
 .sub 'test' :main
 
-    $P0 = new 'FileHandle'
-    $P0.'open'('temp.file', 'w')
+    \$P0 = new 'FileHandle'
+    \$P0.'open'('$temp_file', 'w')
 
-    $P0.'print'(123)
-    say 'ok 1 - $P0.print($I1)'
-    $P0.'print'(456.789)
-    say 'ok 2 - $P0.print($N1)'
-    $P0.'print'("squawk\n")
-    say 'ok 3 - $P0.print($S1)'
-    $P1 = new 'Integer'
-    $P1 = 42
-    $P0.'print'($P1)
-    say 'ok 4 - $P0.print($P1)'
+    \$P0.'print'(123)
+    say 'ok 1 - \$P0.print(\$I1)'
+    \$P0.'print'(456.789)
+    say 'ok 2 - \$P0.print(\$N1)'
+    \$P0.'print'("squawk\\n")
+    say 'ok 3 - \$P0.print(\$S1)'
+    \$P1 = new 'Integer'
+    \$P1 = 42
+    \$P0.'print'(\$P1)
+    say 'ok 4 - \$P0.print(\$P1)'
 
-    $P0.'close'()
+    \$P0.'close'()
 
-    $P1 = new 'FileHandle'
-    $P1.'open'('temp.file', 'r')
+    \$P1 = new 'FileHandle'
+    \$P1.'open'('$temp_file', 'r')
 
-    $S0 = $P1.'read'(3) # bytes
-    if $S0 == "123" goto ok_5
+    \$S0 = \$P1.'read'(3) # bytes
+    if \$S0 == "123" goto ok_5
     print 'not '
   ok_5:
     say 'ok 5 - read integer back from file'
 
-    $S0 = $P1.'read'(16) # bytes
-    if $S0 == "456.789squawk\n42" goto ok_6
-    print $S0
-    print "\n"
+    \$S0 = \$P1.'read'(16) # bytes
+    if \$S0 == "456.789squawk\\n42" goto ok_6
+    say \$S0
+
     print 'not '
   ok_6:
     say 'ok 6 - read string back from file'
 
-    $P1.'close'()
+    \$P1.'close'()
 .end
 CODE
 ok 1 - $P0.print($I1)
@@ -199,47 +200,43 @@ ok 5 - read integer back from file
 ok 6 - read string back from file
 OUT
 
-unlink ('temp.file');
+(undef, $temp_file) = create_tempfile( UNLINK => 1 );
 
 # L<PDD22/I\/O PMC API/=item print.*=item readline>
-pir_output_is(
-    <<'CODE', <<'OUT', 'readline - synchronous' );
+pir_output_is( <<"CODE", <<'OUT', 'readline - synchronous' );
 .sub 'test' :main
     load_bytecode 'String/Utils.pbc'
     .local pmc chomp
                chomp = get_global ['String';'Utils'], 'chomp'
 
-    $P0 = new 'FileHandle'
-    $P0.'open'('temp.file', 'w')
-    $P0.'print'("foobarbaz\n42")
-    $P0.'close'()
+    \$P0 = new 'FileHandle'
+    \$P0.'open'('$temp_file', 'w')
+    \$P0.'print'("foobarbaz\\n42")
+    \$P0.'close'()
 
-    $P1 = new 'FileHandle'
-    $P1.'open'('temp.file')
+    \$P1 = new 'FileHandle'
+    \$P1.'open'('$temp_file')
 
-    $S0 = $P1.'readline'()
-    $S0 = chomp( $S0 )
-    if $S0 == 'foobarbaz' goto ok_1
+    \$S0 = \$P1.'readline'()
+    \$S0 = chomp( \$S0 )
+    if \$S0 == 'foobarbaz' goto ok_1
     print 'not '
   ok_1:
-    say 'ok 1 - $S0 = $P1.readline()'
+    say 'ok 1 - \$S0 = \$P1.readline()'
 
-    $S0 = $P1.'readline'()
-    $S0 = chomp( $S0 )
-    if $S0 == '42' goto ok_2
+    \$S0 = \$P1.'readline'()
+    \$S0 = chomp( \$S0 )
+    if \$S0 == '42' goto ok_2
     print 'not '
   ok_2:
-    say 'ok 2 - $S0 = $P1.readline() # again on same stream'
+    say 'ok 2 - \$S0 = \$P1.readline() # again on same stream'
 
-    $P1.'close'()
+    \$P1.'close'()
 .end
 CODE
 ok 1 - $S0 = $P1.readline()
 ok 2 - $S0 = $P1.readline() # again on same stream
 OUT
-
-unlink ('temp.file');
-
 
 # RT #46833 test reading/writing code points once supported
 
@@ -325,40 +322,42 @@ OUT
 # change buffer size while it contains data
 # try with all 'buffer_type' modes
 
-pir_output_is( <<'CODE', <<'OUT', 'buffer_size' );
+(undef, $temp_file) = create_tempfile( UNLINK => 1 );
+
+pir_output_is( <<"CODE", <<'OUT', 'buffer_size' );
 .sub 'test' :main
-    $P0 = new 'FileHandle'
+    \$P0 = new 'FileHandle'
 
-    $P0.'buffer_type'('full-buffered')
-    $P0.'buffer_size'(42)
-    say 'ok 1 - $P0.buffer_size(42)     # set buffer size'
+    \$P0.'buffer_type'('full-buffered')
+    \$P0.'buffer_size'(42)
+    say 'ok 1 - \$P0.buffer_size(42)     # set buffer size'
 
-    $I0 = $P0.'buffer_size'()
+    \$I0 = \$P0.'buffer_size'()
 
     # The set buffer size is a minimum, the I/O subsystem may scale it upward
     # to a round block, so test that the buffer size is equal or greater than
     # the set size.
-    if $I0 >= 42 goto ok_2
+    if \$I0 >= 42 goto ok_2
     print 'not '
   ok_2:
-    say 'ok 2 - $I0 = $P0.buffer_size() # get buffer size'
+    say 'ok 2 - \$I0 = \$P0.buffer_size() # get buffer size'
 
-    $P0.'open'('temp.file', 'w')
+    \$P0.'open'('$temp_file', 'w')
 
-    $P0.'print'(1234567890)
-    $P0.'close'()
+    \$P0.'print'(1234567890)
+    \$P0.'close'()
 
-    $P1 = new 'FileHandle'
-    $P1.'open'('temp.file')
+    \$P1 = new 'FileHandle'
+    \$P1.'open'('$temp_file')
 
-    $S0 = $P1.'readline'()
+    \$S0 = \$P1.'readline'()
 
-    if $S0 == '1234567890' goto ok_3
+    if \$S0 == '1234567890' goto ok_3
     print 'not '
   ok_3:
-    say 'ok 3 - $S0 = $P0.readline()    # buffer flushed'
+    say 'ok 3 - \$S0 = \$P0.readline()    # buffer flushed'
 
-    $P1.'close'()
+    \$P1.'close'()
 
 .end
 CODE
@@ -387,8 +386,6 @@ pir_output_is( <<'CODE', <<'OUT', 'mode' );
 CODE
 ok 1 - $S0 = $P0.mode() # get read mode
 OUT
-
-unlink("temp.file");
 
 # RT #46843
 # L<PDD22/I\/O PMC API/=item get_fd>
