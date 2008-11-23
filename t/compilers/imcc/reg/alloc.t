@@ -86,8 +86,8 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "Explicit large register: S, PIR" );
 .sub main
-  S32 = "ok\n"
-  print S32
+  $S32 = "ok\n"
+  print $S32
 .end
 CODE
 ok
@@ -95,8 +95,8 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "Explicit large register: N, PIR" );
 .sub main
-  N32 = 3.8
-  print N32
+  $N32 = 3.8
+  print $N32
   print "\n"
 .end
 CODE
@@ -105,8 +105,8 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "Explicit large register: I, PIR" );
 .sub main
-  I32 = 123
-  print I32
+  $I32 = 123
+  print $I32
   print "\n"
 .end
 CODE
@@ -115,9 +115,9 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "Explicit large register: P, PIR" );
 .sub main
-  P32 = new 'String'
-  P32 = "ok\n"
-  print P32
+  $P32 = new 'String'
+  $P32 = "ok\n"
+  print $P32
 .end
 CODE
 ok
