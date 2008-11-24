@@ -366,7 +366,7 @@ exception. Other exceptions at the run-loop level are also generally
 resumable.
 
 You resume from an exception by invoking the return continuation stored
-in the 'resume' field of the exception.
+in the 'resume' attribute of the exception.
 
   push_eh handler
   $P0 = new 'Exception'          # create new exception object
