@@ -40,7 +40,7 @@ PMC * constant_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void dod_register_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
+void dod_register_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -76,7 +76,7 @@ INTVAL pmc_register(PARROT_INTERP, ARGIN(STRING *name))
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC* pmc_reuse(PARROT_INTERP,
+PMC * pmc_reuse(PARROT_INTERP,
     ARGIN(PMC *pmc),
     INTVAL new_type,
     NULLOK(UINTVAL flags))
@@ -93,15 +93,15 @@ INTVAL pmc_type_p(PARROT_INTERP, ARGIN(PMC *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void dod_unregister_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
+void dod_unregister_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
-PMC * temporary_pmc_new(PARROT_INTERP, INTVAL base_type)
+void temporary_pmc_free(PARROT_INTERP, PMC *pmc)
         __attribute__nonnull__(1);
 
-void temporary_pmc_free(PARROT_INTERP, PMC *pmc)
+PARROT_CANNOT_RETURN_NULL
+PMC * temporary_pmc_new(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
