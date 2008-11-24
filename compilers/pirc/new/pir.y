@@ -2000,7 +2000,19 @@ symbol      : reg
                            if (sym == NULL) {
                                yypirerror(yyscanner, lexer, "symbol '%s' not declared", $1);
 
-                                   /* make sure sym is not NULL */
+                               /* maybe user tried to use PASM register? */
+                               if ($1[0] == 'S' || $1[0] == 'N' || $1[0] == 'I' || $1[0] == 'P') {
+                                   /* if all subsequent characters are digits, then it was
+                                    * the format of a PASM register.
+                                    */
+                                   if ((strlen($1) > 1) /* make sure string is longer than 1 char */
+                                   &&  (strspn($1 + 1, "0123456789") == strlen($1 + 1)))
+                                       fprintf(stderr,
+                                         "PASM registers ('%s') are not allowed in PIR code\n", $1);
+
+                               }
+
+                               /* make sure sym is not NULL */
                                sym = new_symbol(lexer, $1, UNKNOWN_TYPE);
                            }
                            $$ = target_from_symbol(lexer, sym);
