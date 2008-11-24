@@ -365,10 +365,20 @@ execution at the opcode immediately after the one that threw the
 exception. Other exceptions at the run-loop level are also generally
 resumable.
 
-  $P0 = new 'String'
-  $P0 = "something bad happened"
-  $P1 = new 'Exception', $P0   # create new exception object
-  throw $P1                      # throw it
+You resume from an exception by invoking the return continuation stored
+in the 'resume' field of the exception.
+
+  push_eh handler
+  $P0 = new 'Exception'          # create new exception object
+  throw $P0                      # throw it
+  pop_eh
+  say "Everything is just fine."
+  .return()
+ handler:
+  .local pmc exception, continuation
+  .get_results (exception)
+  continuation = exception['resume']
+  continuation()
 
 =head1 ATTACHMENTS
 
