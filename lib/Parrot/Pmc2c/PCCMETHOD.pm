@@ -437,7 +437,7 @@ END
         PObj_get_FLAGS(_ccont) &= ~SUB_FLAG_TAILCALL;
         --_ctx->recursion_depth;
         _ctx->caller_ctx      = _caller_ctx->caller_ctx;
-        Parrot_free_context(interp, _caller_ctx, 0);
+        Parrot_free_context(interp, _caller_ctx, 1);
         interp->current_args = NULL;
     }
     /* BEGIN PARMS SCOPE */

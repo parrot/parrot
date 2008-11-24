@@ -597,7 +597,7 @@ op get_params(inconst PMC) :flow {
         ctx->caller_ctx = caller_ctx->caller_ctx;
         /* ordinarily, this will free the context immediately, but not if the
            sub created a closure (or continuation, or . . .).  */
-        Parrot_free_context(interp, caller_ctx, 0);
+        Parrot_free_context(interp, caller_ctx, 1);
         interp->current_args = NULL;
     }
     argc = SIG_ELEMS(signature);

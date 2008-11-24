@@ -476,7 +476,7 @@ Store a context for the handler iterator.
 
         /* contexts are refcounted; increment and decrement appropriately */
         if (core_struct->handler_ctx)
-            Parrot_free_context(interp, core_struct->handler_ctx, 0);
+            Parrot_free_context(interp, core_struct->handler_ctx, 1);
         core_struct->handler_ctx = Parrot_context_ref(interp,
                                        (Parrot_Context *)context);
     }

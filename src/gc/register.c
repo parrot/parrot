@@ -381,7 +381,7 @@ Parrot_pop_context(PARROT_INTERP)
     }
 #endif
     ctx->ref_count = 0;
-    Parrot_free_context(interp, ctx, 0);
+    Parrot_free_context(interp, ctx, 1);
 
     /* restore old, set cached interpreter base pointers */
     CONTEXT(interp)      = old;

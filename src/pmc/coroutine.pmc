@@ -90,7 +90,7 @@ Destroys the coroutine.
         Parrot_coro * const sub = PMC_coro(SELF);
 
         if (sub->ctx)
-            Parrot_free_context(interp, sub->ctx, 0);
+            Parrot_free_context(interp, sub->ctx, 1);
 
         SUPER();
     }

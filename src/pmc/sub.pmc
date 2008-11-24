@@ -308,7 +308,7 @@ Invokes the subroutine.
                 PObj_get_FLAGS(ccont) &= ~SUB_FLAG_TAILCALL;
                 context->caller_ctx    = caller_ctx->caller_ctx;
 
-                Parrot_free_context(INTERP, caller_ctx, 0);
+                Parrot_free_context(INTERP, caller_ctx, 1);
             }
         }
 

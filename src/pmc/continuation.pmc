@@ -110,7 +110,7 @@ Destroys the continuation.
 
 #endif
             if (cc->from_ctx)
-                Parrot_free_context(interp, cc->from_ctx, 0);
+                Parrot_free_context(interp, cc->from_ctx, 1);
 
             mem_sys_free(cc);
             PMC_struct_val(SELF) = NULL;

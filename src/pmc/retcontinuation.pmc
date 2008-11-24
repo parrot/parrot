@@ -91,7 +91,7 @@ Transfers control to the calling context, and frees the current context.
 
         Parrot_continuation_check(interp, SELF, cc);
         Parrot_continuation_rewind_environment(interp, SELF, cc);
-        Parrot_free_context(INTERP, from_ctx, 0);
+        Parrot_free_context(INTERP, from_ctx, 1);
 
 #ifdef NDEBUG
         /* the continuation is dead - delete and destroy it */
