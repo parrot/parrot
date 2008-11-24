@@ -398,6 +398,7 @@ struct parrot_interp_t {
 
     MMD_table *binop_mmd_funcs;               /* Table of MMD functions */
     UINTVAL    n_binop_mmd_funcs;             /* MMD function count */
+    MMD_Cache *op_mmd_cache;                  /* MMD cache for builtins. */
 
     struct _Caches * caches;                  /* see caches.h */
 

@@ -319,6 +319,10 @@ Parrot_dod_trace_root(PARROT_INTERP, int trace_stack)
     if (interp->thread_data && interp->thread_data->stm_log)
         Parrot_STM_mark_transaction(interp);
 
+    /* Mark the MMD cache. */
+    if (interp->op_mmd_cache)
+        Parrot_mmd_cache_mark(interp, interp->op_mmd_cache);
+
     /* Walk the iodata */
     Parrot_IOData_mark(interp, interp->piodata);
 

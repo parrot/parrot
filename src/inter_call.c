@@ -2032,9 +2032,9 @@ count_signature_elements(PARROT_INTERP, ARGIN(const char *signature),
 
 =item C<static void commit_last_arg_sig_object>
 
-Called by Parrot_pcc_invoke_sub_from_sig_object when it reaches the end of each arg
-in the arg signature.  See C<Parrot_pcc_invoke_sub_from_sig_object> for signature
-syntax.
+Called by Parrot_pcc_invoke_sub_from_sig_object when it reaches the end of each
+arg in the arg signature.  See C<Parrot_pcc_invoke_sub_from_sig_object> for
+signature syntax.
 
 =cut
 
@@ -2606,8 +2606,8 @@ Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     /* create the signature string, and the various PMCs that are needed to
        store all the parameters and parameter counts. */
     char *signature         = string_to_cstring(interp, VTABLE_get_string(interp, sig_obj));
-    PMC * const args_sig    = pmc_new(interp, enum_class_FixedIntegerArray);
-    PMC * const results_sig = pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC * const args_sig    = temporary_pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC * const results_sig = temporary_pmc_new(interp, enum_class_FixedIntegerArray);
     PMC * const ret_cont    = new_ret_continuation_pmc(interp, NULL);
     PMC * const result_list = VTABLE_get_attr_str(interp, sig_obj, CONST_STRING(interp, "returns"));
 
@@ -2676,8 +2676,8 @@ Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
        caller's context */
     set_context_sig_returns(interp, ctx, indexes, ret_x, result_list);
 
-    PObj_live_CLEAR(args_sig);
-    PObj_live_CLEAR(results_sig);
+    temporary_pmc_free(interp, args_sig);
+    temporary_pmc_free(interp, results_sig);
 
     interp->current_args   = save_current_args;
     interp->args_signature = save_args_signature;

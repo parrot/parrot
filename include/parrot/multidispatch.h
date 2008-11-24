@@ -51,6 +51,7 @@ typedef struct _multi_func_list {
         funcptr_t func_ptr;
 } multi_func_list;
 
+#define MMD_Cache Hash
 
 /* HEADERIZER BEGIN: src/multidispatch.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -196,6 +197,34 @@ PMC * Parrot_mmd_sort_manhattan_by_sig_pmc(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
+
+PARROT_EXPORT
+MMD_Cache *
+Parrot_mmd_cache_create(PARROT_INTERP);
+
+PARROT_EXPORT
+PMC *
+Parrot_mmd_cache_lookup_by_values(PARROT_INTERP, MMD_Cache *cache, const char *name, PMC *values);
+
+PARROT_EXPORT
+void
+Parrot_mmd_cache_store_by_values(PARROT_INTERP, MMD_Cache *cache, const char *name, PMC *values, PMC *chosen);
+
+PARROT_EXPORT
+PMC *
+Parrot_mmd_cache_lookup_by_types(PARROT_INTERP, MMD_Cache *cache, const char *name, PMC *types);
+
+PARROT_EXPORT
+void
+Parrot_mmd_cache_store_by_types(PARROT_INTERP, MMD_Cache *cache, const char *name, PMC *types, PMC *chosen);
+
+PARROT_EXPORT
+void
+Parrot_mmd_cache_mark(PARROT_INTERP, MMD_Cache *cache);
+
+PARROT_EXPORT
+void
+Parrot_mmd_cache_destroy(PARROT_INTERP, MMD_Cache *cache);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/multidispatch.c */

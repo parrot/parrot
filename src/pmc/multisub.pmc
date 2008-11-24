@@ -60,30 +60,20 @@ pmclass MultiSub extends ResizablePMCArray need_ext provides array {
     }
 
     VTABLE opcode_t *invoke(void *next) {
-        PMC * const list = Parrot_mmd_sort_manhattan(interp, SELF);
-        PMC *func;
+        PMC * const func = Parrot_mmd_sort_manhattan(interp, SELF);
 
-        if (PMC_IS_NULL(list))
+        if (PMC_IS_NULL(func))
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
 
-        func = VTABLE_get_pmc_keyed_int(interp, list, 0);
         return VTABLE_invoke(INTERP, func, next);
     }
 
     VTABLE PMC *get_iter() {
-        PMC * const list = Parrot_mmd_sort_manhattan(INTERP, SELF);
+        PMC * const sub = Parrot_mmd_sort_manhattan(INTERP, SELF);
 
-        if (PMC_IS_NULL(list))
+        if (PMC_IS_NULL(sub))
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
         return SUPER();
-    }
-
-    VTABLE PMC *get_pmc() {
-        PMC *list = Parrot_mmd_sort_manhattan(INTERP, SELF);
-
-        if (PMC_IS_NULL(list))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
-        return list;
     }
 
     /* I don't really know how to implement these if they need something
@@ -91,15 +81,15 @@ pmclass MultiSub extends ResizablePMCArray need_ext provides array {
        ResizablePMCArray's VTABLE methods of the same names. Hopefully we
        don't need anything beyond that. */
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        PMC *list = Parrot_mmd_sort_manhattan(INTERP, SELF);
-        if (PMC_IS_NULL(list))
+        PMC *sub = Parrot_mmd_sort_manhattan(INTERP, SELF);
+        if (PMC_IS_NULL(sub))
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
         return SUPER(key);
     }
 
     VTABLE PMC *get_pmc_keyed_string(STRING *s) {
-        PMC *list = Parrot_mmd_sort_manhattan(INTERP, SELF);
-        if (PMC_IS_NULL(list))
+        PMC *sub = Parrot_mmd_sort_manhattan(INTERP, SELF);
+        if (PMC_IS_NULL(sub))
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
         return SUPER(s);
     }

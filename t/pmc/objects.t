@@ -166,7 +166,7 @@ Tests the object/class subsystem.
     isa $I0, $P1, $S0
     is( $I0, 1, 'Boolean isa scalar $S0' )
 .end
- 
+
 .sub does_scalar
     new $P1, 'Boolean'
 
@@ -216,14 +216,14 @@ Tests the object/class subsystem.
     new $P2, $P1
     set $S0, $P1    # class
     is( $S0, "Foo9", 'new object from Foo9 class as a string is Foo9' )
-    
+
     typeof $S0, $P2 # object
     is( $S0, 'Foo9', 'typeof obj is Foo9' )
 
     class $P3, $P1
     set $S0, $P1    # class
     is( $S0, 'Foo9', 'class of obj is Foo9' )
-    
+
     typeof $S0, $P2 # object
     is( $S0, 'Foo9', 'typeof obj is Foo9' )
 
@@ -306,7 +306,7 @@ l1:
     newclass $P1, "Foo12"
     addattribute $P1, "foo_i"
     ok( 1, 'addattribute to Foo12' )
-    
+
     subclass $P2, $P1, "Bar12"
     addattribute $P2, "bar_i"
     ok( 1, 'addattribute to subclass of Foo12' )
@@ -343,7 +343,9 @@ l1:
     $P0 = getattribute o, 'k'
     is( $P0, 'Bar32.k', 'subclass attrib init-ed' )
 .end
+
 .namespace ['Bar32']
+
 .sub init :vtable :method
     $P0 = new 'String'
     $P0 = 'Foo32.i'
@@ -446,7 +448,7 @@ l1:
 
     getattribute $P6, $P2, "i"
     is( $P6, 11, 'setattrib with a PMC holds actual PMC not copy' )
-    
+
     getattribute $P6, $P2, "j"
     is( $P6, 11, '...so changes to the PMC appear through the attrib' )
 
@@ -494,7 +496,7 @@ l1:
     setattribute $P3, ".l", $P10
 
     # retrieve attribs
-    getattribute $P11, $P3, ".i" 
+    getattribute $P11, $P3, ".i"
     is( $P11, "i", 'string attribute get/set on parent' )
 
     getattribute $P11, $P3, ".j"
@@ -530,6 +532,7 @@ l1:
 .end
 
 .namespace ["MyInt1"]
+
 .sub add :multi(MyInt1, MyInt1, MyInt1)
     .param pmc self
     .param pmc right
@@ -550,7 +553,7 @@ l1:
     typeof $S0, $P0
     is( $S0, "Class", 'typeof for a Class PMC is "Class"' )
 .end
- 
+
 .sub typeof_objects
     newclass $P0, "A"
     newclass $P1, "B"
@@ -627,7 +630,7 @@ l1:
     set $S0, $P1
     is( $S0, '', 'anonymous subclass has no name' )
 .end
- 
+
 .sub get_attrib_by_name
     newclass $P1, "Foo18"
     addattribute $P1, "i"
@@ -721,11 +724,11 @@ l1:
     .local pmc MyInt4
     get_class $P0, "Integer"
     ok( 1, 'able to get_class of Integer' )
-    
+
     subclass MyInt4, $P0, "MyInt4"
     addattribute MyInt4, ".i"
     ok( 1, 'able to addattribute to subclass' )
-    
+
     .local pmc i
     i = new "MyInt4"
     ok( 1, 'able to instantiate obj of subclass w/ attribute' )
@@ -734,18 +737,18 @@ l1:
 .sub PMC_as_classes__methods
     .local pmc MyInt5
     get_class $P0, "Integer"
-    
+
     subclass MyInt5, $P0, "MyInt5"
     addattribute MyInt5, "intval"
-    
+
     .local pmc i, i2
     i = new "MyInt5"
     i2 = new "Integer"
     i2 = 43
-    
+
     i = 42    # set_integer is inherited from Integer
     ok( 1, 'able to assign int to MyInt' )
-    
+
     $I0 = i   # get_integer is overridden below
     is( $I0, 42, 'get_integer is overridden for MyInt5' )
 
@@ -827,10 +830,10 @@ l1:
   i = new "MyInt8_2"
   $I0 = isa i, "Integer"
   ok( $I0, 'obj isa grandparent (Integer)' )
-  
+
   $I0 = isa i, "MyInt8"
   ok( $I0, 'obj isa parent (MyInt8)' )
- 
+
   $I0 = isa i, "MyInt8_2"
   ok( $I0, 'obj isa its class (MyInt8_2)' )
 
@@ -872,7 +875,7 @@ l1:
   .local pmc MyInt9
   .local pmc MyInt9_2
   get_class $P0, "Integer"
- 
+
   subclass MyInt9, $P0, "MyInt9"
   addattribute MyInt9, 'intval'
   get_class $P1, "MyInt9"
@@ -890,7 +893,7 @@ l1:
   i = 42    # set_integer is overridden below
   $I0 = i   # get_integer is overridden below
   is( $I0, 43, 'set/get_integer overridden' )
-  
+
   $S0 = i   # get_string is overridden below
   is( $S0, 'MyInt9_2(42)', 'set/get_string overridden' )
 .end
@@ -994,7 +997,7 @@ l1:
     .local pmc o
     o = new "Foo33"
     ok( 1, 'able to instantiate subclass of Class' )
-    
+
     $S0 = typeof o
     is( $S0, 'Foo33', 'object returns correct class' )
 .end
@@ -1209,7 +1212,7 @@ l1:
 .end
 
 .namespace []   # revert to root for next test
- 
+
 .sub new_keyed_2
     .local pmc c1, c2, o1, o2
     c1 = newclass ['Foo37';'Bar37']
@@ -1232,7 +1235,7 @@ l1:
 .end
 
 .namespace []   # revert to root for next test
- 
+
 .sub new_keyed_3
     .local pmc c1, c2, c3, o1, o2, o3
     c1 = newclass ['Foo38';'Bar38']
@@ -1347,7 +1350,7 @@ l1:
 .end
 
 .namespace []   # revert to root for next test
- 
+
 #RT #39056
 .sub vtable_override_once_removed
     .local pmc base
@@ -1370,7 +1373,7 @@ l1:
 .end
 
 .namespace []   # revert to root for next test
- 
+
 #RT #40626
 .sub vtable_fails_for_subclasses_of_core_classes
     $P0 = subclass 'Hash', 'Foo41'
@@ -1398,7 +1401,7 @@ l1:
 .end
 
 .namespace []   # revert to root for next test
- 
+
 #RT #3901
 .sub super___init_called_twice
     $P0 = newclass 'Foo42'
@@ -1415,13 +1418,13 @@ l1:
     isnull $I1, $P0
     ok( $I1, 'should be null' )
 
-    $P1 = new "Integer"         
+    $P1 = new "Integer"
     setattribute self, "i", $P1  # i won't be null if init called again
     .return ()
 .end
 
 .namespace []   # revert to root for next test
- 
+
 .sub using_class_object_from_typeof_op_with_new
     $P0 = newclass [ "Monkey" ; "Banana" ]
     $P0 = $P0.'new'()
@@ -1465,7 +1468,7 @@ handler:
     .exception_is( "No such attribute 'bar'" )
 end:
 .end
- 
+
 .sub setting_non_existent_attribute_by_name
     newclass $P1, "Foo47"
     new $P2, $P1
@@ -1480,7 +1483,7 @@ handler:
     .exception_is( "No such attribute 'no_such' in class 'Foo47'" )
 end:
 .end
- 
+
 # RT #46845
 .sub getting_null_attribute
     newclass $P1, "Foo51"
@@ -1491,7 +1494,7 @@ end:
     isnull $I0, $P3
     is($I0, 1, "null attribute is null")
 .end
- 
+
 .sub getting_non_existent_attribute
     newclass $P1, "Foo52"
     $P2 = $P1.'new'()
@@ -1505,7 +1508,7 @@ handler:
     .exception_is( "No such attribute 'bar'" )
 end:
 .end
- 
+
 .sub addparent_exceptions_1
     newclass $P0, "Astronomical Object 2"
     new $P1, 'String'
@@ -1519,7 +1522,7 @@ handler:
     .exception_is( "Parent isn't a Class." )
 end:
 .end
- 
+
 .sub addparent_exceptions_2
     new $P0, 'Hash'
     newclass $P1, "Trashcan"
@@ -1532,7 +1535,7 @@ handler:
     .exception_is( "Only classes can be subclassed" )
 end:
 .end
- 
+
 .sub subclassing_a_non_existent_class
     push_eh handler
         subclass $P1, "Character", "Nemo"
@@ -1543,7 +1546,7 @@ handler:
     .exception_is( "Class 'Character' doesn't exist" )
 end:
 .end
- 
+
 .sub anon_subclass_of_non_existent_class
     push_eh handler
         subclass $P1, "Character"
@@ -1554,7 +1557,7 @@ handler:
     .exception_is( "Class 'Character' doesn't exist" )
 end:
 .end
- 
+
 .sub addattribute_duplicate
     newclass $P1, "Foo53"
     addattribute $P1, "i"
@@ -1568,7 +1571,7 @@ handler:
     .exception_is( "Attribute 'i' already exists in 'Foo53'." )
 end:
 .end
- 
+
 .sub wrong_way_to_create_new_objects
     push_eh handler
         new $P0, 'Object'
@@ -1579,7 +1582,7 @@ handler:
     .exception_is( "Object must be created by a class." )
 end:
 .end
- 
+
 .sub attribute_values__subclassing_access_meths
     newclass $P1, "Foo54"
     # must add attributes before object instantiation
