@@ -382,8 +382,7 @@ Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
         const INTVAL       mid    = (low + high) / 2;
         const char * const meth_c = Parrot_vtable_slot_names[mid];
 
-        /* RT #45965 slot_names still have __ in front */
-        const INTVAL cmp = strcmp(name_c, meth_c + 2);
+        const INTVAL cmp = strcmp(name_c, meth_c);
 
         if (cmp == 0) {
             string_cstring_free(name_c);

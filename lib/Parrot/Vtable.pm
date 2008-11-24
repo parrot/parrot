@@ -231,7 +231,7 @@ EOM
     for my $entry ( @{$vtable} ) {
         my $uc_meth = uc $entry->[1];
         $macros .= <<"EOM";
-#define PARROT_VTABLE_${uc_meth}_METHNAME \"__$entry->[1]\"
+#define PARROT_VTABLE_${uc_meth}_METHNAME \"$entry->[1]\"
 EOM
 
     }
@@ -266,7 +266,7 @@ EOM
         next if ( $entry->[4] =~ /MMD_/ );
         $num_vtable_funcs++;
         $macros .= <<"EOM";
-        \"__$entry->[1]\",
+        \"$entry->[1]\",
 EOM
     }
     $macros .= <<"EOM";
@@ -310,7 +310,7 @@ EOM
         next if ( $entry->[4] =~ /_STR$/ );
         next if ( $entry->[4] =~ /_FLOAT$/ );
         $macros .= <<"EOM";
-        \"__$entry->[1]\",
+        \"$entry->[1]\",
 EOM
     }
     $macros .= <<"EOM";
