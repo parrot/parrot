@@ -100,25 +100,25 @@ pasm_output_is( <<"CODE", <<'OUT', "set int, get double" );
      new P0, 'BigInt'
      set P0, 999999
      set N1, P0
-     .fp_eq(N1, 999999.0, OK1)
+     .fp_eq_pasm(N1, 999999.0, OK1)
      print "not "
 OK1: print "ok 1\\n"
 
      set P0, -999999
      set N1, P0
-     .fp_eq(N1, -999999.0, OK2)
+     .fp_eq_pasm(N1, -999999.0, OK2)
      print "not "
 OK2: print "ok 2\\n"
 
      set P0, 2147483646
      set N1, P0
-     .fp_eq(N1, 2.147483646e9, OK3)
+     .fp_eq_pasm(N1, 2.147483646e9, OK3)
      print "not "
 OK3: print "ok 3\\n"
 
      set P0, -2147483646
      set N1, P0
-     .fp_eq(N1, -2.147483646e9, OK4)
+     .fp_eq_pasm(N1, -2.147483646e9, OK4)
      print "not "
 OK4: print "ok 4\\n"
      end
