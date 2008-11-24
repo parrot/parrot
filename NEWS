@@ -3,6 +3,12 @@
 New in December 2008 Release
 - Deprecations
   + PARROT_API is now PARROT_EXPORT
+  + :lexid is now :subid
+- Compilers
+  + PIRC
+    - add macro handling to PASM mode
+    - disable vanilla register allocation in PASM mode, but do allow optimization
+    - add tests and bug fixes
 
 New in 0.8.1
 - Implementation
