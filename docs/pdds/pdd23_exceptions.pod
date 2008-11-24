@@ -205,7 +205,7 @@ Gets a Hash containing any bytecode annotations in effect at the point where
 the exception was thrown. If none were in effect, returns an empty Hash. See
 the PIR PDD for syntax for declaring and semantics of bytecode annotations.
 
-=item B<PMC *annotation(STRING *name)>
+=item B<PMC *annotations(STRING *name)>
 
 Returns a PMC representing the bytecode annotation with the key specified in
 C<name> at the point where the exception was thrown. If there was no such
