@@ -385,6 +385,18 @@ REGISTER       "$"[SNIP]{DIGITS}
                     return TK_LABEL;
                   }
 
+[SNIP]{DIGIT}+    { /* give a warning when using PASM registers as PIR identifiers */
+                    lexer_state * const lexer = yyget_extra(yyscanner);
+
+                    if (TEST_FLAG(lexer->flags, LEXER_FLAG_WARNINGS))
+                        pirwarning(lexer, yypirget_lineno(yyscanner),
+                                   "Use of PASM register identifier ('%s') "
+                                   "is not encouraged for readable code", yytext);
+
+                    yylval->sval = dupstr(yyget_extra(yyscanner), yytext);
+                    return TK_IDENT;
+                  }
+
 {IDENT}           { /* identifier; can be a global (sub or const), local or parrot op */
                     yylval->sval = dupstr(yyget_extra(yyscanner), yytext);
                     return TK_IDENT;

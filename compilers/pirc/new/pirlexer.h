@@ -498,7 +498,7 @@ extern int yypirlex \
 #undef YY_DECL
 #endif
 
-#line 1008 "pir.l"
+#line 1020 "pir.l"
 
 
 #line 505 "pirlexer.h"
