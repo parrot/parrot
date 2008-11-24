@@ -375,13 +375,14 @@ Parrot_pop_context(PARROT_INTERP)
     Parrot_Context * const old = ctx->caller_ctx;
 
 #if CTX_LEAK_DEBUG
-    if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
+    if (ctx->ref_count > 0 &&
+            Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
         fprintf(stderr, "[force recycle of context %p (%d refs)]\n",
             (void *)ctx, ctx->ref_count);
     }
 #endif
     ctx->ref_count = 0;
-    Parrot_free_context(interp, ctx, 1);
+    Parrot_free_context(interp, ctx, 0);
 
     /* restore old, set cached interpreter base pointers */
     CONTEXT(interp)      = old;
