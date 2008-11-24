@@ -376,10 +376,10 @@ find_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
 /*
 
 =item C<static int
-use_register(lexer_state * const lexer, pir_type type, int regno)>
+use_register(lexer_state * const lexer, pir_type type, int regno, int pasmregno)>
 
 This function registers (no pun intended) register C<regno> of type
-C<type>; a new (PASM) register is allocated to it; each subsequent
+C<type>; it uses register C<pasmregno>; each subsequent
 reference to register C<regno> of type C<type> can then find this
 register (and its allocated PASM register) through the C<find_register>
 function.
@@ -390,13 +390,13 @@ The function returns the allocated PASM register.
 
 */
 static int
-use_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
+use_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno, int pasmregno) {
     pir_reg *reg;
 
     /* create a new node representing this PIR register */
     reg = new_pir_reg(lexer, type, regno);
     /* get a new PASM register for this PIR register. */
-    reg->color = next_register(lexer, type);
+    reg->color = pasmregno;
 
     /* create a new live interval for this symbolic register */
     reg->interval = new_live_interval(lexer->lsr, lexer->stmt_counter, type);
@@ -465,8 +465,13 @@ color_reg(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
         return reg->color;
     }
 
-    /* we're still here, so the register was not used yet; do that now. */
-    return use_register(lexer, type, regno);
+    if (TEST_FLAG(lexer->flags, LEXER_FLAG_PASMFILE)) { /* PASM mode */
+        return use_register(lexer, type, regno, regno);
+    }
+    else {
+        /* we're still here, so the register was not used yet; do that now. */
+        return use_register(lexer, type, regno, next_register(lexer, type));
+    }
 }
 
 
