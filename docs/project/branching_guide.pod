@@ -19,7 +19,7 @@ To create a branch, use the C<svn copy> command.
 
   $ svn copy https://svn.perl.org/parrot/trunk \
          https://svn.perl.org/parrot/branches/<yourbranchname> \
-         -m "Creating branch for <purpose of branch>."
+         -m "Created branch for <purpose of branch>."
 
 Record the revision number of the branch (in a text file or otherwise), you
 will need it later for branch synchronization and for merging your branch back
@@ -37,12 +37,12 @@ Check out your branch for working:
 
 On a regular basis (at least weekly, more often for heavy changes), synchronize
 your branch with the changes in trunk. For this you will need the revision
-number of your last synchronization (or the revision number of the initial
-branch creation if this is the first synchronization), and the current highest
-revision in trunk (you can get this by running C<svn update>).
+number of your most recent synchronization (or the revision number of the
+initial branch creation if this is the first synchronization), and the current
+highest revision in trunk (you can get this by running C<svn update>).
 
 Make sure you don't have any outstanding changes in your working copy (use
-C<svn status>)
+C<svn status>).
 
 Use the C<svn merge> command from the root directory of your branch checkout to
 add all changes from trunk to your working copy of the branch. In the C<-r>
@@ -54,7 +54,7 @@ all changes committed between those two revision numbers.
 
 Check for conflicts in the merged code:
 
-   $ svn status | grep "^C" | less
+   $ svn status -q | grep "^C" | less
 
 Manually edit any conflicting files to remove the conflict markers. It may be
 helpful to look at the svn log for a particular file in branch and trunk to
@@ -63,7 +63,7 @@ trunk. When you've resolved all conflicts, mark the file as resolved with:
 
   $ svn resolved <filename>
 
-(In the case of a completely disasterous merge, you can C<svn revert> your
+(In the case of a completely disastrous merge, you can C<svn revert> your
 whole checkout using the C<--recursive> option and start over.)
 
 Commit the merged code.
@@ -72,7 +72,7 @@ Commit the merged code.
 
 Use a meaningful commit message, something like:
 
-  [<yourbranchname>] Bringing the <yourbranchname> branch up-to-date
+  [<yourbranchname>] Brought the <yourbranchname> branch up-to-date
   with trunk r30371.
 
 Record the revision number of the trunk version you synchronized to, for later
@@ -98,7 +98,7 @@ until you hear an explicit "Yes, it's working" answer.
 =item 2
 
 Let people know what tests you ran, so they can determine if you didn't run the
-tests for their language or tool (or, didn't run *all* the tests for their
+tests for their language or tool (or, didn't run I<all> the tests for their
 language or tool if they have some unusual testing configuration).
 
 =item 3
@@ -116,26 +116,26 @@ want tested.
 When you're ready to merge your changes back into trunk, use the C<svn merge>
 command again. This time run it in the root directory of a checkout of trunk.
 (Make sure you don't have any outstanding trunk changes in your working copy.)
-In the C<-r> option pass it the revision number where the branch was created,
-and C<HEAD> to tell it to grab all changes committed in the branch from the
-time you created the branch to the most recent change.
+In the C<-r> option pass the revision number where the branch was created, and
+C<HEAD> to tell it to grab all changes committed in the branch from the time
+you created the branch to the most recent change.
 
   svn merge -r30235:HEAD https://svn.perl.org/parrot/branches/<yourbranchname>/
 
 (If you didn't keep the revision number when you created the branch, you can
-find it by clever dective work. But, its definitely easier to just keep it in a
-text file.)
+find it by clever detective work in C<svn log>.  It's easier just to keep it in
+a text file.)
 
 Check for conflicts as in branch synchronization, then commit your changes with
 C<svn commit>. Use a meaningful commit message something like:
 
-  [<yourbranchname>] Merging the <yourbranchname> branch into trunk for
+  [<yourbranchname>] Merged the <yourbranchname> branch into trunk for
   r30235 to r31667.
 
 Delete your branch from the repository:
 
   svn delete https://svn.perl.org/parrot/branches/<yourbranchname> \
-          -m "Removing <describe branch> from the repository"
+          -m "Removed <describe branch> from the repository."
 
 =head2 Announcing a Merge
 
@@ -148,7 +148,7 @@ in the C interface.
 If there was a specific language, tool, or platform that you wanted tested
 before merging but couldn't get any response from the responsible person, you
 may want to include some warning in the annoucement that you weren't able to
-fully test that piece.
+test that piece fully.
 
 =cut
 
