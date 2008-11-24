@@ -2105,6 +2105,8 @@ pasm_line                 : pasm_statement
                           | namespace_decl "\n"
                           | lex_decl                /* lex_decl rule has already a "\n" token */
                           | location_directive "\n"
+                          | macro_definition "\n"
+                          | macro_expansion
                           ;
 
 pasm_statement            : TK_LABEL opt_pasm_instruction
