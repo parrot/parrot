@@ -347,15 +347,51 @@ For example, with this code snippet:
 
 all subroutines for language I<Foo> would use a dynamic lexpad pmc.
 
-=item .line <integer>, <string>
+=item .line <integer>
 
-Set the line number and filename to the value specified. This is useful in
-case the PIR code is generated from some source file, and error messages
-should print the source file, not the line number and filename of the
-generated file.
+Set the current PIR line number to the value specified. This is useful in
+case the PIR code is generated from some source PIR files, and error messages
+should print the source file's line number, not the line number of the
+generated file. Note that line numbers increment per line of PIR; if you
+are trying to store High Level Language debug information, you should instead
+be using the C<.annotate> directive.
+
+=item .file <quoted_string>
+
+Set the current PIR file name to the value specified. This is useful in case
+the PIR code is generated from some source PIR files, and error messages
+should print the source file's name, not the name of the generated file.
 
 {{ DEPRECATION NOTE: was C<<#line <integer> <string>>>. See [RT#45857],
 [RT#43269], and [RT#47141]. }}
+
+=item .annotate <key> <value>
+
+Makes an entry in the bytecode annotations table. This is used to store high
+level language debug information. Examples:
+
+  .annotate "file" "aardvark.p6"
+  .annotate "line" 5
+  .annotate "column" 24
+
+An annotation stays in effect until the next annotation with the same key or
+the end of the current compilation unit (that is, if you use a tool such as
+C<pbc_merge> to link multiple bytecode files, then annotations will not spill
+over from one mergee's bytecode to another).
+
+One annotation covers many PIR instructions. If the result of compiling one
+line of HLL code is 15 lines of PIR, you only need to emit one annotation
+before the first of those 15 lines to set the line number.
+
+  .annotate "line" 42
+
+The key must always be a quoted string. The value may be an integer, a number
+or a quoted string. Note that integer values are stored most compactly; should
+you instead of the above annotate directive emit:
+
+  .annotate "line" "42"
+
+Then you're asking for a bigger bytecode file as a result.
 
 =item .namespace <identifier> [deprecated: See RT #48737]
 
