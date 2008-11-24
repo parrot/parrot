@@ -199,6 +199,18 @@ type(s).  See the table of standard exception classes for examples.
 Set an attribute on the Exception. All exceptions will have at least
 C<message>, C<severity>, and C<payload> attributes.
 
+=item B<PMC *annotations()>
+
+Gets a Hash containing any bytecode annotations in effect at the point where
+the exception was thrown. If none were in effect, returns an empty Hash. See
+the PIR PDD for syntax for declaring and semantics of bytecode annotations.
+
+=item B<PMC *annotation(STRING *name)>
+
+Returns a PMC representing the bytecode annotation with the key specified in
+C<name> at the point where the exception was thrown. If there was no such
+annotation in effect, a NULL PMC will be returned.
+
 =back
 
 =head2 Standard Parrot Exceptions
