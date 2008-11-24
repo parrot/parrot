@@ -55,6 +55,11 @@ See RT #47976.
 
 See RT #58410.
 
+=item * C<open> opcode mode string [post 0.8.2]
+
+The C<open> opcode will change from Perl-style mode-strings to 'r' for read,
+'w' for write, 'a' for append, and 'p' for pipe.
+
 =back
 
 =head1 Class Features
