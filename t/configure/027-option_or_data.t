@@ -6,16 +6,12 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More tests => 7;
 use Carp;
 use lib qw( lib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use_ok(
-    'Parrot::Configure::Step::List', qw|
-        get_steps_list
-        |
-);
+use Parrot::Configure::Step::List qw( get_steps_list );
 
 $| = 1;
 is( $|, 1, "output autoflush is set" );

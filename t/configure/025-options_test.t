@@ -9,16 +9,11 @@ use Carp;
 use Cwd;
 use Data::Dumper;
 use File::Temp qw( tempdir );
-use Test::More tests =>  9;
-#use Test::More qw( no_plan );
+use Test::More tests =>  7;
 use lib qw( lib );
 use IO::CaptureOutput qw| capture |;
-use_ok(
-    'Parrot::Configure::Options', qw|
-        process_options
-        |
-);
-use_ok('Parrot::Configure::Options::Test');
+use Parrot::Configure::Options qw| process_options |;
+use Parrot::Configure::Options::Test;
 
 my ( $args, $step_list_ref ) = process_options(
     {

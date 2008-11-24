@@ -5,16 +5,14 @@
 use strict;
 use warnings;
 
-use Test::More tests =>  9;
+use Test::More tests =>  8;
 use Carp;
 use Cwd;
 use File::Temp 0.13 qw/ tempdir /;
 use lib qw( lib t/configure/testlib );
 use IO::CaptureOutput qw| capture |;
 
-BEGIN {
-    use_ok('Parrot::Configure::Utils');
-}
+BEGIN { use Parrot::Configure::Utils; }
 
 my $cwd = cwd();
 my $command;

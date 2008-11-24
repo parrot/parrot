@@ -6,14 +6,14 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests =>  6;
 use Carp;
-use_ok('Cwd');
-use_ok('File::Copy');
-use_ok( 'File::Temp', qw| tempdir | );
+use Cwd;
+use File::Copy;
+use File::Temp qw| tempdir |;
 use lib qw( lib t/configure/testlib );
 use Parrot::BuildUtil;
-use_ok( 'Make_VERSION_File', qw| make_VERSION_file | );
+use Make_VERSION_File qw| make_VERSION_file |;
 
 my $cwd = cwd();
 my $errstr;

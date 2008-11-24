@@ -6,11 +6,11 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 6;
 use Carp;
-use_ok('Cwd');
-use_ok('File::Copy');
-use_ok( 'File::Temp', qw| tempdir | );
+use Cwd;
+use File::Copy;
+use File::Temp qw| tempdir |;
 use lib qw( lib );
 use Parrot::BuildUtil;
 

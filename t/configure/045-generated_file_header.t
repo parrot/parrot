@@ -5,9 +5,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 12;
 use Carp;
-use_ok( 'File::Temp', qw| tempfile | );
+use File::Temp qw| tempfile |;
 use lib qw( lib );
 use Parrot::BuildUtil;
 

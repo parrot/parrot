@@ -6,14 +6,12 @@
 use strict;
 use warnings;
 use Carp;
-use Test::More tests => 11;
+use Test::More tests => 10;
 use lib qw( lib );
-use_ok(
-    'Parrot::Configure::Messages', qw|
-        print_introduction
-        print_conclusion
-        |
-);
+use Parrot::Configure::Messages qw|
+    print_introduction
+    print_conclusion
+|;
 use IO::CaptureOutput qw| capture |;
 
 my $parrot_version = '0.4.10';

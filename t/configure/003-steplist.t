@@ -5,14 +5,10 @@
 
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 3;
 use Carp;
 use lib qw( lib );
-use_ok(
-    'Parrot::Configure::Step::List', qw|
-        get_steps_list
-        |
-);
+use Parrot::Configure::Step::List qw| get_steps_list |;
 
 my @steps;
 ok( @steps = get_steps_list(), "non-zero number of steps located" );
