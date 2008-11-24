@@ -260,9 +260,9 @@ NEXT:
   concat code,  "end\n"
 
   # Now actually run it
-  P1 = compreg "PASM"
-  P0 = P1( code )
-  P0()
+  $P1 = compreg "PASM"
+  $P0 = $P1( code )
+  $P0()
   end
 
 debug:

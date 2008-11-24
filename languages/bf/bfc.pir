@@ -250,9 +250,9 @@ NEXT:
   # printerr "\n"
 
   # Now actually run it
-  compreg P1, "PASM"
-  P0 = P1( code )
-  P0()
+  compreg $P1, "PASM"
+  $P0 = $P1( code )
+  $P0()
 .end
 
 # Local Variables:
