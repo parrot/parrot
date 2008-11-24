@@ -466,10 +466,16 @@ color_reg(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     }
 
     if (TEST_FLAG(lexer->flags, LEXER_FLAG_PASMFILE)) { /* PASM mode */
+        /* In PASM mode, the user-specified regno is also the final PASM
+         * register, so don't use the vanilla register allocator here.
+         */
         return use_register(lexer, type, regno, regno);
     }
     else {
-        /* we're still here, so the register was not used yet; do that now. */
+        /* we're still here, so the register was not used yet; allocate
+         * a new PASM register through the vanilla reg. allocator and
+         * store the register as "used".
+         */
         return use_register(lexer, type, regno, next_register(lexer, type));
     }
 }
