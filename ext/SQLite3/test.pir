@@ -1,5 +1,5 @@
 #../../parrot -t5 test.pir
-.sub 'main' 
+.sub 'main'
 load_bytecode 'SQLite3'
 
 $P0 = get_global [ 'SQLite' ], 'open'
@@ -14,3 +14,9 @@ $P5 = $P4 ($P3)
 $P6 = get_global [ 'SQLite' ], 'finalize'
 $P7 = $P6 ($P3)
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

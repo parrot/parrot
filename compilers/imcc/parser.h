@@ -36,6 +36,8 @@ EXTERN int is_def;
 typedef void* yyscan_t;
 #endif
 
+void set_filename(PARROT_INTERP, char * const filename);
+
 SymReg * macro(PARROT_INTERP, char *name);
 
 PARROT_EXPORT int yyparse(yyscan_t, PARROT_INTERP);

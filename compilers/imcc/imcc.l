@@ -1400,7 +1400,8 @@ parser does not have access to the lexer's private bits.
 
 */
 void
-set_filename(PARROT_INTERP, char * const filename) {
+set_filename(PARROT_INTERP, char * const filename)
+{
     IMCC_INFO(interp)->frames->s.file = filename;
     IMCC_INFO(interp)->frames->s.file_needs_free = 1;
 

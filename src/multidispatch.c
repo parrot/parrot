@@ -1947,7 +1947,7 @@ mmd_cache_key_from_values(PARROT_INTERP, const char *name, PMC *values)
     INTVAL num_values = VTABLE_elements(interp, values);
     INTVAL name_len   = name ? strlen(name) + 1: 0;
     INTVAL *type_ids  = (INTVAL *)mem_sys_allocate(num_values
-                            * sizeof(INTVAL) + name_len);
+                            * sizeof (INTVAL) + name_len);
     STRING *key;
 
     for (i = 0; i < num_values; i++) {
@@ -1961,7 +1961,7 @@ mmd_cache_key_from_values(PARROT_INTERP, const char *name, PMC *values)
         strcpy((char *)(type_ids + num_values), name);
 
     key = string_from_cstring(interp, (char *)type_ids,
-                             num_values * sizeof(INTVAL) + name_len);
+                             num_values * sizeof (INTVAL) + name_len);
     mem_sys_free(type_ids);
 
     return key;
@@ -2004,7 +2004,8 @@ it into the cache.
 
 PARROT_EXPORT
 void
-Parrot_mmd_cache_store_by_values(PARROT_INTERP, MMD_Cache *cache, const char *name, PMC *values, PMC *chosen)
+Parrot_mmd_cache_store_by_values(PARROT_INTERP,
+    MMD_Cache *cache, const char *name, PMC *values, PMC *chosen)
 {
     STRING *key = mmd_cache_key_from_values(interp, name, values);
 
@@ -2032,7 +2033,7 @@ mmd_cache_key_from_types(PARROT_INTERP, const char *name, PMC *types)
     INTVAL  num_types = VTABLE_elements(interp, types);
     INTVAL  name_len  = name ? strlen(name) + 1: 0;
     INTVAL *type_ids  = (INTVAL *)mem_sys_allocate(num_types
-                                                   * sizeof(INTVAL) + name_len);
+                                                   * sizeof (INTVAL) + name_len);
     INTVAL  i;
 
     for (i = 0; i < num_types; i++) {
@@ -2045,7 +2046,7 @@ mmd_cache_key_from_types(PARROT_INTERP, const char *name, PMC *types)
     }
     if (name)
         strcpy((char*)(type_ids + num_types), name);
-    key = string_from_cstring(interp, (char*)type_ids, num_types * sizeof(INTVAL) + name_len);
+    key = string_from_cstring(interp, (char*)type_ids, num_types * sizeof (INTVAL) + name_len);
     mem_sys_free(type_ids);
     return key;
 }
@@ -2089,7 +2090,8 @@ tied to an individual multi can be null.
 
 PARROT_EXPORT
 void
-Parrot_mmd_cache_store_by_types(PARROT_INTERP, MMD_Cache *cache, const char *name, PMC *types, PMC *chosen)
+Parrot_mmd_cache_store_by_types(PARROT_INTERP,
+    MMD_Cache *cache, const char *name, PMC *types, PMC *chosen)
 {
     STRING *key = mmd_cache_key_from_types(interp, name, types);
     if (key != NULL)
