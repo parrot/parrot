@@ -607,7 +607,7 @@ Parrot_free_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctx), int deref)
         ptr             = ctx;
         slot            = CALCULATE_SLOT_NUM(ctx->regs_mem_size);
 
-#if CTX_DEBUG_LEAK_FULL
+#if CTX_LEAK_DEBUG_FULL
         slot = 0;
 #endif
 
