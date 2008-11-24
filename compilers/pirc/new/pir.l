@@ -898,7 +898,7 @@ REGISTER       "$"[SNIP]{DIGITS}
 
 /* PASM tokens.
  *
- * do not mix with other tokens, using <state1, state2> notation.
+ * do not mix with other tokens, using <state1,state2> notation.
  * This becomes unmanageable
  */
 %}
@@ -917,80 +917,56 @@ REGISTER       "$"[SNIP]{DIGITS}
 <PASM>".pcc_sub"        { return TK_PCC_SUB; }
 <PASM>".lex"            { return TK_LEX; }
 <PASM>".namespace"      { return TK_NAMESPACE; }
+
 <PASM>".macro"          {
                           yy_push_state(MACROHEAD, yyscanner);
                           return TK_MACRO;
                         }
-<PASM>".macro_const"    { yypirerror(yyscanner, yypirget_extra(yyscanner),
-                                     "macro constants are not supported in PASM mode");
+
+<PASM>".macro_const"    {
+                          yy_push_state(MACROCONST, yyscanner);
+                          return TK_MACRO_CONST;
                         }
 
 <PASM>".line"           { return TK_LINE; }
 <PASM>".file"           { return TK_FILE; }
 
-%{ /*
-<PASM>"."{IDENT}        { yypirerror(yyscanner, yypirget_extra(yyscanner),
-                                     "macro expansion or directive '%s' not supported in PASM mode",
-                                     yytext);
+
+<PASM>"."{IDENT}        { /* macro expansion in PASM mode. */
+                          lexer_state * const lexer = yyget_extra(yyscanner);
+                          macro_def   * const macro = find_macro(lexer->macros, yytext + 1);
+
+                          if (macro == NULL) { /* it's not a macro */
+                              yypirerror(yyscanner, lexer, "cannot find macro '%s'",
+                                         yytext + 1);
+                          }
+                          else { /* it's a macro */
+                              /* store current buffer at this point, because we'll be
+                               * scanning a string buffer later on. Saving must be done
+                               * in the lexer specification, otherwise YY_CURRENT_BUFFER
+                               * cannot be used (it's a macro).
+                               */
+                              lexer->buffer = YY_CURRENT_BUFFER;
+
+                              /* if it's a .macro, (not .macro_const), then go into
+                               * MACROEXPAND state, to correctly parse the arguments.
+                               * For .macro_const, we don't want this, because a .macro_const
+                               * is expanded here, hidden from the parser.
+                               */
+                              if (macro->takes_args) {
+                                  yylval->mval = macro;
+                                  yy_push_state(MACROEXPAND, yyscanner);
+                                  return TK_MACRO_IDENT;
+                              }
+                              else { /* expand the .macro_const here; no need for
+                                      * adding this to the grammar. */
+                                  /* goto SCANSTR state, and scan macro->body */
+                                  yy_push_state(SCANSTR, yyscanner);
+                                  yy_scan_string(macro->body, yyscanner);
+                              }
+                          }
                         }
-     */
 
-%}
-
-<PASM>"."{IDENT}        { /* .foo; it can be a macro, macro_local, or just $P0.foo(),
-                                * but we need to check that.
-                                */
-                               lexer_state * const lexer = yyget_extra(yyscanner);
-                               macro_def   * const macro = find_macro(lexer->macros, yytext + 1);
-
-                               if (macro == NULL) { /* it's not a macro */
-
-                                   /* it may be a .macro_local */
-                                   macro_table *table = peek_macro_table(lexer);
-
-                                   if (table->thismacro != NULL) { /* not expanding a macro */
-
-                                       if (is_macro_local(table->thismacro, yytext + 1)) {
-                                           yylval->sval = munge_id(yytext + 1, lexer);
-                                           return TK_IDENT;
-                                       }
-                                       /* else fall through */
-                                   }
-
-                                   /* table->thismacro == NULL || is_macro_local() == FALSE */
-                                   yyless(1); /* return all but first character */
-                                   return '.';
-
-                               }
-                               else { /* it's a macro */
-                                   /* fprintf(stderr, "found .ident: %s\n", yytext + 1); */
-
-                                   /* store current buffer at this point, because we'll be
-                                    * scanning a string buffer later on. Saving must be done
-                                    * in the lexer specification, otherwise YY_CURRENT_BUFFER
-                                    * cannot be used (it's a macro).
-                                    */
-                                   lexer->buffer = YY_CURRENT_BUFFER;
-
-                                   /* if it's a .macro, (not .macro_const), then go into
-                                    * MACROEXPAND state, to correctly parse the arguments.
-                                    * For .macro_const, we don't want this, because a .macro_const
-                                    * is expanded here, hidden from the parser.
-                                    */
-                                   if (macro->takes_args) {
-                                       yylval->mval = macro;
-                                       yy_push_state(MACROEXPAND, yyscanner);
-                                       return TK_MACRO_IDENT;
-                                   }
-                                   else { /* expand the .macro_const here; no need for
-                                           * adding this to the grammar. */
-                                       /* goto SCANSTR state, and scan macro->body */
-                                       yy_push_state(SCANSTR, yyscanner);
-                                       yy_scan_string(macro->body, yyscanner);
-                                   }
-                               }
-
-                           }
 <PASM>{IDENT}":"        { /* a label in PASM */
                           yylval->sval = dupstrn(yypirget_extra(yyscanner), yytext, yyleng - 1);
                           return TK_LABEL;
