@@ -32,6 +32,14 @@ Define the the core subsystem for exceptions.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_CANNOT_RETURN_NULL
+static PMC * build_exception_from_args(PARROT_INTERP,
+    int ex_type,
+    ARGIN(const char *format),
+    va_list arglist)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC * find_exception_handler(PARROT_INTERP, ARGIN(PMC *exception))

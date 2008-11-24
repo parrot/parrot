@@ -108,8 +108,7 @@ static PMC* create_lexinfo(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static subs_t * find_global_label(
-    PARROT_INTERP,
+static subs_t * find_global_label(PARROT_INTERP,
     ARGIN(const char *name),
     ARGIN(const subs_t *sym),
     ARGOUT(int *pc))
@@ -143,9 +142,10 @@ static int get_old_size(PARROT_INTERP, ARGOUT(int *ins_line))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*ins_line);
 
-static void imcc_globals_destroy(SHIM_INTERP,
+static void imcc_globals_destroy(PARROT_INTERP,
     SHIM(int ex),
-    SHIM(void *param));
+    SHIM(void *param))
+        __attribute__nonnull__(1);
 
 static void make_new_sub(PARROT_INTERP, ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -158,7 +158,7 @@ static void make_pmc_const(PARROT_INTERP, ARGMOD(SymReg *r))
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
-static PMC * mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
+static PMC* mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -583,7 +583,7 @@ store_key_const(PARROT_INTERP, ARGIN(const char *str), int idx)
 
 /*
 
-=item C<static int get_codesize>
+=item C<static size_t get_codesize>
 
 Stores globals for later fixup, returning the code size in number of ops.
 

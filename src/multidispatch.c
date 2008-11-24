@@ -85,6 +85,16 @@ static PMC* mmd_build_type_tuple_from_type_list(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static STRING * mmd_cache_key_from_types(PARROT_INTERP,
+    const char *name,
+    PMC *types)
+        __attribute__nonnull__(1);
+
+static STRING * mmd_cache_key_from_values(PARROT_INTERP,
+    const char *name,
+    PMC *values)
+        __attribute__nonnull__(1);
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC* mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
@@ -179,14 +189,6 @@ static PMC * Parrot_mmd_sort_candidates(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
-
-PARROT_EXPORT
-MMD_Cache *
-Parrot_mmd_cache_create(PARROT_INTERP);
-
-PARROT_EXPORT
-void
-Parrot_mmd_cache_destroy(PARROT_INTERP, MMD_Cache *cache);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -1908,7 +1910,7 @@ Parrot_mmd_add_multi_list_from_c_args(PARROT_INTERP,
 
 /*
 
-=item C<MMD_Cache* Parrot_mmd_cache_create>
+=item C<MMD_Cache * Parrot_mmd_cache_create>
 
 Creates and returns a new MMD cache.
 
@@ -1936,9 +1938,9 @@ Generates an MMD cache key from an array of values.
 
 */
 
-static
-STRING *
-mmd_cache_key_from_values(PARROT_INTERP, const char *name, PMC *values) {
+static STRING *
+mmd_cache_key_from_values(PARROT_INTERP, const char *name, PMC *values)
+{
     /* Build array of type IDs, which we'll then use as a string to key into
      * the hash. */
     INTVAL i;
@@ -1978,7 +1980,8 @@ Takes an array of values for the call and does a lookup in the MMD cache.
 
 PARROT_EXPORT
 PMC *
-Parrot_mmd_cache_lookup_by_values(PARROT_INTERP, MMD_Cache *cache, const char *name, PMC *values) {
+Parrot_mmd_cache_lookup_by_values(PARROT_INTERP, MMD_Cache *cache, const char *name, PMC *values)
+{
     STRING *key = mmd_cache_key_from_values(interp, name, values);
 
     if (key)
@@ -2001,7 +2004,8 @@ it into the cache.
 
 PARROT_EXPORT
 void
-Parrot_mmd_cache_store_by_values(PARROT_INTERP, MMD_Cache *cache, const char *name, PMC *values, PMC *chosen) {
+Parrot_mmd_cache_store_by_values(PARROT_INTERP, MMD_Cache *cache, const char *name, PMC *values, PMC *chosen)
+{
     STRING *key = mmd_cache_key_from_values(interp, name, values);
 
     if (key)
@@ -2019,9 +2023,9 @@ Generates an MMD cache key from an array of values.
 
 */
 
-static
-STRING *
-mmd_cache_key_from_types(PARROT_INTERP, const char *name, PMC *types) {
+static STRING *
+mmd_cache_key_from_types(PARROT_INTERP, const char *name, PMC *types)
+{
     /* Build array of type IDs, which we'll then use as a string to key into
      * the hash. */
     STRING *key;
@@ -2060,7 +2064,8 @@ Takes an array of types for the call and does a lookup in the MMD cache.
 PARROT_EXPORT
 PMC *
 Parrot_mmd_cache_lookup_by_types(PARROT_INTERP, MMD_Cache *cache,
-    const char *name, PMC *types) {
+    const char *name, PMC *types)
+{
     STRING *key = mmd_cache_key_from_types(interp, name, types);
 
     if (key)
@@ -2084,7 +2089,8 @@ tied to an individual multi can be null.
 
 PARROT_EXPORT
 void
-Parrot_mmd_cache_store_by_types(PARROT_INTERP, MMD_Cache *cache, const char *name, PMC *types, PMC *chosen) {
+Parrot_mmd_cache_store_by_types(PARROT_INTERP, MMD_Cache *cache, const char *name, PMC *types, PMC *chosen)
+{
     STRING *key = mmd_cache_key_from_types(interp, name, types);
     if (key != NULL)
         parrot_hash_put(interp, cache, key, chosen);
@@ -2103,7 +2109,8 @@ GC-marks an MMD cache.
 
 PARROT_EXPORT
 void
-Parrot_mmd_cache_mark(PARROT_INTERP, MMD_Cache *cache) {
+Parrot_mmd_cache_mark(PARROT_INTERP, MMD_Cache *cache)
+{
     /* As a small future optimization, note that we only *really* need to mark keys -
      * the candidates will be referenced outside the cache, provided it's invalidated
      * properly. */
@@ -2123,7 +2130,8 @@ Destroys an MMD cache.
 
 PARROT_EXPORT
 void
-Parrot_mmd_cache_destroy(PARROT_INTERP, MMD_Cache *cache) {
+Parrot_mmd_cache_destroy(PARROT_INTERP, MMD_Cache *cache)
+{
     parrot_hash_destroy(interp, cache);
 }
 
