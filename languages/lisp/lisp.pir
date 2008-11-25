@@ -135,8 +135,7 @@ DEBUGGER:
     .local string msgtype
     .local pmc e
 
-    # TODO: is P5 still the exception ?
-    e = P5
+    .get_results (e)
 
     message = e
 

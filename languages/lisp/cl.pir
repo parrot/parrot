@@ -735,7 +735,7 @@ EVAL_DONE:
 
 
 CLEANUP_HANDLER:
-    error = P5                                   # Caught an exception - save it
+    .get_results (error)                         # Caught an exception - save it
     goto CLEANUP                                 # and clean up before rethrow
 
 CLEANUP:
@@ -762,7 +762,7 @@ CLEANUP_DONE:
     goto DONE
 
 CLEANUP_RETHROW:
-    rethrow P5
+    rethrow error
     goto DONE
 
 # VALID_IN_PARROT_0_2_0 ERROR_BADSPEC:
@@ -1047,58 +1047,58 @@ DONE:
 
    llen = _LIST_LENGTH(args)                    # Get # values we're returning
 
-   P16 = args                                   # Pointer to argument list
+   $P16 = args                                   # Pointer to argument list
 
    if llen == 0 goto DONE
 
-   P5  = P16[0]
-   P16 = P16[1]
+   $P5  = $P16[0]
+   $P16 = $P16[1]
    if llen == 1 goto DONE
 
-   P6  = P16[0]
-   P16 = P16[1]
+   $P6  = $P16[0]
+   $P16 = $P16[1]
    if llen == 2 goto DONE
 
-   P7  = P16[0]
-   P16 = P16[1]
+   $P7  = $P16[0]
+   $P16 = $P16[1]
    if llen == 3 goto DONE
 
-   P8  = P16[0]
-   P16 = P16[1]
+   $P8  = $P16[0]
+   $P16 = $P16[1]
    if llen == 4 goto DONE
 
-   P9  = P16[0]
-   P16 = P16[1]
+   $P9  = $P16[0]
+   $P16 = $P16[1]
    if llen == 5 goto DONE
 
-   P10 = P16[0]
-   P16 = P16[1]
+   $P10 = $P16[0]
+   $P16 = $P16[1]
    if llen == 6 goto DONE
 
-   P11 = P16[0]
-   P16 = P16[1]
+   $P11 = $P16[0]
+   $P16 = $P16[1]
    if llen == 7 goto DONE
 
-   P12 = P16[0]
-   P16 = P16[1]
+   $P12 = $P16[0]
+   $P16 = $P16[1]
    if llen == 8 goto DONE
 
-   P13 = P16[0]
-   P16 = P16[1]
+   $P13 = $P16[0]
+   $P16 = $P16[1]
    if llen == 9 goto DONE
 
-   P14 = P16[0]
-   P16 = P16[1]
+   $P14 = $P16[0]
+   $P16 = $P16[1]
    if llen == 10 goto DONE
 
-   P15 = P16[0]
-   P16 = P16[1]
+   $P15 = $P16[0]
+   $P16 = $P16[1]
    if llen == 11 goto DONE
 
    size = llen - 11                             # Size of the overflow array
 
-   P3 = new 'Array'                             # Allocate overflow array
-   P3 = size
+   $P3 = new 'Array'                             # Allocate overflow array
+   $P3 = size
 
   .local pmc elem
   .local int indx
@@ -1107,12 +1107,12 @@ DONE:
 OVERFLOW_LOOP:
    if indx == size goto DONE_OVERFLOW
 
-   elem = P16[0]
+   elem = $P16[0]
 
-   P3[indx] = elem                              # Set next overflow element
+   $P3[indx] = elem                              # Set next overflow element
    inc indx
 
-   P16 = P16[1]                                 # Set next element in list
+   $P16 = $P16[1]                                 # Set next element in list
    goto OVERFLOW_LOOP
 
 DONE_OVERFLOW:
