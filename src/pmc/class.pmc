@@ -694,6 +694,25 @@ Adds the given sub PMC as a method with the given name.
 
 /*
 
+=item C<void remove_method(STRING *name, PMC *sub)>
+
+Removes the method with the given name.
+
+=cut
+
+*/
+    VTABLE void remove_method(STRING *name) {
+        Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
+        if (VTABLE_exists_keyed_str(interp, _class->methods, name))
+            VTABLE_delete_keyed_str(interp, _class->methods, name);
+        else
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "No method named '%S' to remove in class '%S'.",
+                name, VTABLE_get_string(interp, SELF));
+    }
+
+/*
+
 =item C<void add_vtable_override(STRING *name, PMC *sub)>
 
 Adds the given sub PMC as a vtable override with the given name.
@@ -1663,6 +1682,20 @@ C<add_method> vtable method.
         /* Provided it's not anonymous, add it to the methods list. */
         if (!has_anon || !anon)
             SELF.add_method(name, sub);
+    }
+
+/*
+
+=item C<void remove_method(STRING *name)>
+
+Removes the method with the given name.
+
+=cut
+
+*/
+    METHOD remove_method(STRING *name)
+    {
+        VTABLE_remove_method(interp, SELF, name);
     }
 
 /*
