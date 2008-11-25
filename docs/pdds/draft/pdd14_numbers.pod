@@ -3,19 +3,55 @@
 
 =head1 NAME
 
-docs/pdds/pdd14_bignum.pod - Big Numbers
+docs/pdds/pdd14_numbers.pod - Parrot Numbers
 
 =head1 ABSTRACT
 
-{{ NOTE: needs to be compared to current behavior of bignum library.
-Future directions?}}
-
-This document describes the big number library, the functionality it provides
-and some internal details of interest to people making use of the library.
-Some of the areas in which the big number library meet with the rest of Parrot
-are also discussed.
+This PDD describes Parrot's numeric data types.
 
 =head1 DESCRIPTION
+
+This PDD details the basic numeric datatypes that the Parrot core knows how to
+deal with, including the core numeric PMCs.
+
+=head2 Integer data types
+
+Parrot provides a native integer data type, generally known as an "Int". The
+size of the integer is chosen at Parrot configuration time, the same size as
+platform-native integers. In C, the typedefs C<INTVAL> and C<UINTVAL> are
+native signed and unsigned integers respectively. The semantics of native
+integer data types are the same as the semantics of their C equivalents.
+
+Integer data types have a dedicated register set. In PIR, the C<I> register
+variables (C<$I0>, etc.) and C<.param>s or C<.local>s declared with the C<int>
+type are native integers. Native unsigned integers are not accessibly directly
+in PIR. Many opcodes or vtable functions are defined with variants that take
+native integer arguments. When passed to a subroutine or method call, a native
+integer may be autoboxed as an C<Integer> PMC, or as an HLL type mapped to
+C<Integer>.
+
+
+=head2 Floating-point data types
+
+Parrot provides a native floating-point data type, generally known as a "Num".
+The size of the float is chosen at Parrot configuration time, the same size as
+platform-native floats. In C, the typedef C<FLOATVAL> is a native float data
+type. The semantics of the native float data type are the same as the semantics
+of the C equivalent.
+
+Float data types have a dedicated register set. In PIR, the C<N> register
+variables (C<$N0>, etc.) and C<.param>s or C<.local>s declared with the C<num>
+type are native floats. Many opcodes or vtable functions are defined with
+variants that take native float arguments. When passed to a subroutine or
+method call, a native float may be autoboxed as a C<Float> PMC, or as an HLL
+type mapped to C<Float>.
+
+
+=head2 Integer PMC
+
+=head2 Float PMC
+
+=head2 BigNum PMC
 
 The big number library provides Parrot with both a collection of (nearly)
 infinite precision numeric types and an implementation of an extended decimal
@@ -378,48 +414,9 @@ from floating point types, sprintf output of bignumbers.
 IBM's Standard Decimal Arithmetic, with tests
 L<http://www2.hursley.ibm.com/decimal/>
 
-Perl's Math::Big* modules.
+The Perl modules Math::BigInt and Math::BigFloat.
 
-=head1 VERSION
-
-=head2 CURRENT
-
-    Maintainer: Alex Gough (alex@earth.li)
-    Class: Internals
-    PDD Number: 14
-    Version: $Id$
-    Status: Informational
-    Last Modified: $Id$
-    PDD Format: 1
-    Language: English
-
-=head2 HISTORY
-
-=over 4
-
-=item version 1.1
-
-The first version is more a description of the state of the art than a plan
-for the future.  The author believes this is akin to learning how to crawl
-before trying to run.  Leaving the ground is considered Right Out with
-attempts being left as an exercise for the interested reader.
-
-=back
-
-=head1 CHANGES
-
-=over 4
-
-=item Version 1.0
-
-None. First version
-
-=item Version 1.1
-
-Special values added, exception handling updated to suit EDA, more rounding
-types added, TODO added.  PDD number bagged.
-
-=back
+Alex Gough's suggestions for bigint/bignum implementation.
 
 =cut
 
