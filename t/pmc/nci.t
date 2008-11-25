@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 68;
+use Parrot::Test tests => 69;
 use Parrot::Config qw(%PConfig);
 
 =head1 NAME
@@ -2702,6 +2702,26 @@ CODE
 1
 1
 1
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "nci_vV - char** out parameter" );
+.sub test :main
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib  library_name
+
+    .local pmc nci_vV
+    nci_vV = dlfunc libnci_test, "nci_vV", "vV"
+
+    .local pmc char_s_s
+    char_s_s = new 'Pointer'
+    nci_vV(char_s_s)
+    $S0 = char_s_s
+    print $S0
+.end
+CODE
+Hello bright new world
 OUTPUT
 
 # Local Variables:

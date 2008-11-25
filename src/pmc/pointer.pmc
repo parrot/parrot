@@ -116,6 +116,21 @@ Returns the pointer value as a floating-point number.
 
 /*
 
+=item C<STRING *get_repr()>
+
+Returns the pointer value as a Parrot string.
+
+=cut
+
+*/
+
+    VTABLE STRING *get_repr() {
+        return Parrot_sprintf_c(INTERP, "Pointer = 0x%p", PMC_data(SELF));
+    }
+
+
+/*
+
 =item C<STRING *get_string()>
 
 Returns the pointer value as a Parrot string.
@@ -125,11 +140,7 @@ Returns the pointer value as a Parrot string.
 */
 
     VTABLE STRING *get_string() {
-        char buffer[64];
-        const size_t len   = snprintf(buffer, sizeof (buffer), "Pointer = 0x%p", PMC_data(SELF));
-        STRING * const ret = string_make(INTERP, buffer, len, "iso-8859-1", 0);
-
-        return ret;
+        return Parrot_sprintf_c(INTERP, "%s", PMC_data(SELF));
     }
 
 /*
