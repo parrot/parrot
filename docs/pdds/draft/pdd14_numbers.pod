@@ -120,8 +120,8 @@ native integer storage auto-promotes the C<Integer> to a C<BigInt>.
 purely internally (perhaps by swapping vtables), rather than converting to a
 different PMC type.}}
 
-=item i_[add|subtract|multiply|divide|floor_divide|modulus|pow]_float(INTVAL
-      b)
+=item
+   i_[add|subtract|multiply|divide|floor_divide|modulus|pow]_float(INTVAL b)
 
 Add/subtract/multiply/divide/modulus/exponent an integer value with the
 C<Integer> PMC, and set the C<Integer> to the resulting value, morphing it
