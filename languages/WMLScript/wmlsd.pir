@@ -42,7 +42,7 @@ wmls2pir, wmls2pbc, wmlsi
     push_eh _handler
     script = loader.'load'(content)
     script['filename'] = filename
-    script.dump()
+    script.'dump'()
     end
   _handler:
     .local pmc e
