@@ -214,6 +214,7 @@ struct Parrot_Context {
     INTVAL *n_regs_used;                /* INSP in PBC points to Sub */
     size_t regs_mem_size;               /* memory occupied by registers */
     int ref_count;                      /* how often refered to */
+    int gc_mark;                        /* marked in gc run */
 
     PMC      *lex_pad;                  /* LexPad PMC */
     struct Parrot_Context *outer_ctx;   /* outer context, if a closure */

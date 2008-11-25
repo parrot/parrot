@@ -409,7 +409,6 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
             if (copy->type == PFC_PMC) {
                 switch (copy->u.key->vtable->base_type) {
                     case enum_class_Sub:
-                    case enum_class_Closure:
                     case enum_class_Coroutine:
                         {
                         Parrot_sub * const sub = PMC_sub(copy->u.key);

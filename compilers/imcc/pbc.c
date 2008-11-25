@@ -1095,8 +1095,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
 
     INTVAL               type         =
         (r->pcc_sub->calls_a_sub & ITPCCYIELD) ?
-            enum_class_Coroutine :
-                unit->outer ? enum_class_Closure : enum_class_Sub;
+            enum_class_Coroutine : enum_class_Sub;
 
     int                  i;
     int                  ns_const = -1;

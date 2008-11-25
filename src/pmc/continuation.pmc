@@ -86,6 +86,8 @@ Marks the continuation as live.
 
         if (cc->to_ctx)
             mark_context(INTERP, cc->to_ctx);
+        if (cc->from_ctx)
+            mark_context(INTERP, cc->from_ctx);
     }
 
 /*

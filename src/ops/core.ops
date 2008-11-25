@@ -460,6 +460,10 @@ continuation.
 
 Return from the sub or method via the current continuation.
 
+=item B<capture_lex>(invar PMC)
+
+Capture the current lexical state of the inner subroutine PMC.
+
 =item B<newclosure>(out PMC, invar PMC)
 
 Create a closure of the given subroutine PMC by cloning the sub's state.
@@ -509,6 +513,10 @@ inline op returncc() :flow {
     opcode_t * const dest = (opcode_t *)p->vtable->invoke(interp,
             p, expr NEXT());
     goto ADDRESS(dest);
+}
+
+inline op capture_lex(invar PMC) {
+    Parrot_capture_lex(interp, $1);
 }
 
 inline op newclosure(out PMC, invar PMC) {

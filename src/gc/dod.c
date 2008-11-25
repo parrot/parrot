@@ -255,8 +255,10 @@ Parrot_dod_trace_root(PARROT_INTERP, int trace_stack)
 {
     Arenas           * const arena_base = interp->arena_base;
     Parrot_Context   *ctx;
+    PObj             *obj;
 
     /* note: adding locals here did cause increased DOD runs */
+    mark_context_start();
 
     if (trace_stack == 2) {
         trace_system_areas(interp);
@@ -275,6 +277,11 @@ Parrot_dod_trace_root(PARROT_INTERP, int trace_stack)
 
     /* mark it as used  */
     pobject_lives(interp, (PObj *)interp->iglobals);
+
+    /* mark the current continuation */
+    obj = (PObj *)interp->current_cont;
+    if (obj && obj != (PObj *)NEED_CONTINUATION)
+        pobject_lives(interp, obj);
 
     /* mark the current context. */
     ctx = CONTEXT(interp);

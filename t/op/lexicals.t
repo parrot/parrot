@@ -1270,6 +1270,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'Double-inner scope called from closure (RT
 .sub 'bar' :outer('foo')
     .param pmc b
     .lex '$b', b
+    .const 'Sub' $P0 = 'bar_inner'
+    capture_lex $P0
     .local pmc a
     a = find_lex '$a'
     print a
