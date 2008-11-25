@@ -7,21 +7,22 @@ Z<CHP-5>
 X<Parrot Assembly Language;;(see PASM)>
 X<PASM (Parrot assembly language)>
 Parrot assembly (PASM) is an assembly language written for Parrot's
-virtual CPU.  PASM is an interesting language with a mix of
-features. As an assembly language it is decidedly low-level with many such
-aspects: flow control based on branches and jumps; and direct manipulation
-of values in the software registers and on the stacks.  Basic register
-operations or branches generally translate into a single CPU instruction.
-N<This means the JIT run time has a performance of up to one PASM instruction
-per processor cycle.> On the other hand, because it's designed to
-implement dynamic high-level languages, it has support for many advanced
-features such as lexical and global variables, objects, garbage collection,
-continuations, coroutines, and much more.
+virtual CPU. Basic register operations or branches in PASM generally
+translate into a single CPU instruction. N<This means the JIT run time
+has a performance of up to one PASM instruction per processor cycle.>
+On the other hand, because it's designed to implement dynamic
+high-level languages, it has support for many advanced features such as
+lexical and global variables, objects, garbage collection,
+continuations, coroutines, and much more. PASM is very similar in
+many respects to PIR which we've already discussed, and in almost all
+cases PIR should be used instead of using PASM directly. However, all
+PASM syntax is also valid PIR syntax, so it's helpful to have an
+understanding of the underlying operations in PASM.
 
 X<.pasm files> A file with a F<.pasm> extension is treated as pure PASM
 code by Parrot, as is any file run with the C<-a> command-line option.
 This mode is mainly used for running pure PASM tests from the test suite,
-and is not likely to be useful for most developers.  
+and is not likely to be useful for most developers.
 
 Some people may ask why we have PASM at all, especially with PIR which
 has much nicer syntax. The answer is that PASM, like all assembly languages
@@ -60,10 +61,12 @@ destination argument cannot be constant.
 
 X<PASM (Parrot assembly language);labels>
 A label names a line of code so other instructions can refer to it.
-Label names consist of letters, numbers, and underscores. Simple
-labels are often all caps to make them stand out from the rest of the
-sourace code more clearly.  A label definition is simply the name of the
-label followed by a colon. It can be on its own line:
+Label names consist of letters, numbers, and underscores, exactly the
+same syntax as is used for labels in PIR. Simple labels are often all
+capital letters to make them stand out from the rest of the source code
+more clearly. A label definition is simply the name of the label
+followed by a colon. It can be on its own line N<In fact, we recommend
+that it be on it's own line, for readability.>:
 
   LABEL:
       print "Norwegian Blue\n"
@@ -73,22 +76,22 @@ or before a statement on the same line:
   LABEL: print "Norwegian Blue\n"
 
 X<PASM (Parrot assembly language);comments>
-Comments are marked with the hash sign (C<#>) and continue to the end
-of the line.
-
-POD (plain old documentation) markers are ignored by Parrot. An equals
-sign in the first column marks the start of a POD block, and a C<=cut>
-marks the end of a POD block.
+POD (plain old documentation) is also allowed in PASM like it is in PIR.
+An equals sign in the first column marks the start of a POD block, and
+a C<=cut> marker signals the end of a POD block.
 
   =head1
-  ...
+
+  This is POD documentation, and is treated like a
+  comment. The PASM interpreter ignores this.
+
   =cut
 
-Besides POD, there are also ordinary 1-line comments using the # sign:
+Besides POD, there are also ordinary 1-line comments using the # sign,
+which is the same in PIR:
 
   LABEL:                        # This is a comment for a label
     print 'Norwegian Blue\n"    # Print a color
-
 
 =head2 Constants
 
@@ -106,7 +109,6 @@ or C<0B>, and hexadecimal integers are preceded by C<0x> or C<0X>:
   print 0x2A       # hexadecimal integer
   print 0b1101     # binary integer
   print -0b101     # binary integer with sign
-
 
 Floating-point constants can also be positive or negative. Scientific
 notation provides an exponent, marked with C<e> or C<E> (the sign of
@@ -154,17 +156,20 @@ Integer and number registers hold values, while string and PMC
 registers contain pointers to allocated memory for a string header or
 a Parrot object.
 
-The length of strings is limited only by your system's virtual memory
-and by the size of integers on the particular platform. Parrot can
-work with strings of different character types and encodings. It
-automatically converts string operands with mixed characteristics to
-Unicode.N<This conversion isn't fully implemented yet. We're working on it.>
-X<PMCs (Parrot Magic Cookies)>
-X<Parrot Magic Cookies;;(see PMCs)>
-Parrot Magic Cookies (PMCs) are Parrot's low-level objects. They can
-represent data of any arbitrary type. The operations (methods) for
-each PMC class are defined in a fixed vtable, which is a structure
-containing function pointers that implement each operation.
+In Chapter 3 we mentioned that a register name was a dollar-sign followed
+by a type identifier and then a number. Now we're naming registers with
+only a letter and number, not a dollar sign. Why the difference? The
+dollar sign indicates to Parrot that the register names are not literal,
+and that the register allocator should assign the identifier to a
+physical memory location. Without the dollar sign, the register number
+is an actual offset into the register array. C<N2000> is going to point
+to the two thousandth register, while C<$N2000> can point to any
+memory location that the register allocator determines to be free. Since
+PIR attempts to protect the programmer from some of the darkest details,
+Parrot requires that registers in PIR use the C<$> form. In PASM you can
+use either form, but we still recommend using the C<$> form so you don't
+have to worry about register allocations (and associated performance
+penalties) yourself.
 
 =head3 Register assignment
 
@@ -208,9 +213,11 @@ new string, leaving the old string untouched. So strings act like simple
 values on the user level, even though they're implemented as pointers.
 
 Unlike strings, assignment to a PMC doesn't automatically create a new
-object; it only calls the PMC's vtable method for assignment. So,
-rewriting the same example using a PMC has a completely different
-result:
+object; it only calls the PMC's VTABLE method for assignment N<and depending
+on implementation the VTABLE assignment operation might not actually
+assign anything. For now though, we can assume most VTABLE interfaces
+do what they say they do.>. So, rewriting the same example using a PMC
+has a completely different result:
 
   new P0, "String"
   set P0, "Ford"
@@ -255,99 +262,14 @@ register, C<typeof> returns the name of the type:
 
 In this example, C<typeof> returns the type name "String".
 
-When the source argument is a PMC and the destination is an integer
-register, C<typeof> returns the integer representation of the type:
-
-  new P0, "String"
-  typeof I0, P0               # I0 is 36
-  print I0
-  print "\n"
-  end
-
-This example returns the integer representation of C<String>,
-which is 36.
-
-When C<typeof>'s source argument is an integer, it returns the name of
-the type represented by that integer:
-
-  set I1, -100
-  typeof S0, I1               # S0 is "INTVAL"
-  print S0
-  print "\n"
-  end
-
-In this example C<typeof> returns the type name "INTVAL" because the
-integer representation of a built-in integer value is -100.
-
-The source argument to C<find_type> is always a string containing a
-type name, and the destination register is always an integer. It
-returns the integer representation of the type with that name:
-
-  find_type I1, "String"  # I1 is 36
-  print I1
-  print "\n"
-  find_type I2, "INTVAL"      # I2 is -100
-  print I2
-  print "\n"
-  end
-
-Here, the name "String" returns 36, and the name "INTVAL" returns
--100.
-
 X<PMCs (Parrot Magic Cookies);inheritance>
 X<Parrot;classes;inheritance>
 X<inheritance;with PMCs>
-All Parrot classes inherit from the class C<default>, which has the
-type number 0. The C<default>X<default PMC> class provides some
+All Parrot classes inherit from the class C<default>. The
+C<default>X<default PMC> class provides some
 default functionality, but mainly throws exceptions when the default
 variant of a method is called (meaning the subclass didn't define the
-method).  Type number 0 returns the type name "illegal", since no
-object should ever be created from the C<default> class:
-
-  find_type I1, "fancy_super_long_double" # I1 is 0
-  print I1
-  print "\n"
-  typeof S0, I1                           # S0 is "illegal"
-  print S0
-  print "\n"
-  end
-
-The type numbers are not fixed values. They change whenever a new
-class is added to Parrot or when the class hierarchy is altered. An
-include file containing an enumeration of
-X<PMCs (Parrot Magic Cookies);types;include file> PMC types
-(F<runtime/parrot/include/pmctypes.pasm>X<pmctypes.pasm file>) is
-generated during the configuration of the Parrot source tree. Internal
-data types and their names are specified in
-F<runtime/parrot/include/datatypes.pasm>X<datatypes.pasm file>.
-
-X<PMCs (Parrot Magic Cookies);types;generating list of>
-Once the F<parrot> executable has been built, You can generate a complete and
-current list of valid PMC types by running this command within the main Parrot
-source directory:
-
-  $ perl tools/dev/pmctree.pl src/pmc/*.pmc
-
-which produces output like:
-
-  Array
-      default
-  Boolean
-      Int
-	  perlscalar
-	      scalar
-		  default
-  Closure
-      Sub
-	  default
-  ...
-
-The output traces the class hierarchy for each class: C<Boolean>
-inherits from C<Int>X<Int PMC>, which is derived from the
-abstract C<perlscalar>X<perlscalar PMC>, C<scalar>X<scalar PMC>, and
-C<default> classes (abstract classes are listed in lowercase). The
-actual classnames and their hierarchy may have changed by the time you
-read this.
+method).
 
 =head3 Type morphing
 
@@ -583,8 +505,7 @@ for multibyte encoded strings:
   print "\n"
   end
 
-Currently, C<length> doesn't have an equivalent for PMC strings, but
-it probably will be implemented in the future.
+C<length> doesn't have an equivalent for PMC strings.
 
 =head3 Substrings
 
@@ -1878,18 +1799,6 @@ possible. You've seen how many ways Parrot has of storing values. The
 critical point is that the caller and the called subroutine have to
 agree on all the answers.
 
-=head3 Reserved registers
-
-Z<CHP-5-SECT-7.1.1>
-
-X<registers;reserved>
-A very simple system would be to declare that the caller uses
-registers through 15, and the subroutine uses 16 through 31. This
-works in a small program with light register usage. But what about a
-subroutine call from within another subroutine or a recursive call?
-The solution doesn't extend to a large scale.
-
-
 =head3 Parrot calling conventions
 
 Z<CHP-5-SECT-7.1.2>
@@ -1898,187 +1807,22 @@ Internal subroutines can use whatever calling convention serves them
 best. Externally visible subroutines and methods need stricter rules.
 Since these routines may be called as part of an included library or
 module and even from a different high level language, it's important
-to have a consistent interface. 
+to have a consistent interface.
 
-Under the X<subroutines;calling conventions;Parrot>
-X<Parrot;subroutine calling conventions> Parrot calling conventions
-the caller is responsible for preserving its own registers. The first
-11 arguments of each register type are passed in Parrot registers, as
-are several other pieces of information.
-X<registers;usage for subroutine calls> Register usage for subroutine
-calls is listed in A<CHP-5-TABLE-4>Table 5-4.
-X<parameters;in PASM>
-
-=begin table picture Calling and return conventions
-
-Z<CHP-5-TABLE-4>
-
-=headrow
-
-=row
-
-=cell Register
-
-=cell Usage
-
-=bodyrows
-
-=row
-
-=cell C<P0>
-
-=cell Subroutine/Method object.
-
-=row
-
-=cell C<P1>
-
-=cell Return continuation if applicable.
-
-=row
-
-=cell C<P2>
-
-=cell Object for a method call (invocant) or NULL for a subroutine call.
-
-=row
-
-=cell C<P3>
-
-=cell Array with overflow parameters/return values.
-
-=row
-
-=cell C<S0>
-
-=cell Fully qualified method name, if it's a method call.
-
-=row
-
-=cell C<I0>
-
-=cell True for prototyped parameters.
-
-=row
-
-=cell C<I1>
-
-=cell Number of integer arguments/return results.
-
-=row
-
-=cell C<I2>
-
-=cell Number of string arguments/return results.
-
-=row
-
-=cell C<I3>
-
-=cell Number of PMC arguments/return results.
-
-=row
-
-=cell C<I4>
-
-=cell Number of float arguments/return results.
-
-=row
-
-=cell C<I5> ... C<I15>
-
-=cell First 11 integer arguments/return results.
-
-=row
-
-=cell C<N5> ... C<N15>
-
-=cell First 11 float arguments/return results.
-
-=row
-
-=cell C<S5> ... C<S15>
-
-=cell First 11 string arguments/return results.
-
-=row
-
-=cell C<P5> ... C<P15>
-
-=cell First 11 PMC arguments/return results.
-
-=end table
-
-If there are more than 11 arguments or return values of one type for
-the subroutine, overflow parameters are passed in an array in C<P3>.
-Subroutines without a prototype pass all their arguments or return
-values in C<P> registers and if needed in the overflow
-array.N<Prototyped subroutines have a defined signature.>
-
-The C<_inc> subroutine from above can be rewritten as a prototyped
-subroutine:
-
-    set I16, 42                 # use local regs from 16..31
-    newsub P0, .Sub, _inc       # create a new Sub object
-    set I5, I16                 # first integer argument
-    set I0, 1                   # prototype used
-    set I1, 1                   # one integer argument
-    null I2                     # no string arguments
-    null I3                     # no PMC arguments
-    null I4                     # no numeric arguments
-    null P2                     # no object (invocant)
-    pushtopi                    # preserve top I register frame
-    invokecc                    # call function object in P0
-    poptopi                     # restore registers
-    print I5
-    print "\n"
-    # I16 is still valid here, whatever the subroutine did
-    end
-
-  .pcc_sub _inc:
-    inc I5                      # do all the work
-    set I0, 1                   # prototyped return
-    set I1, 1                   # one retval in I5
-    null I2                     # nothing else
-    null I3
-    null I4
-    invoke P1                   # return from the sub
-
-Instead of using a simple C<bsr>, this set of conventions uses a
-subroutine object. There are several kinds of subroutine-like objects,
-but C<Sub> is a class for PASM subroutines.
-
-The C<.pcc_sub> directive defines globally accessible subroutine
-objects. The C<_inc> function above can be found as:
-
-  find_global P20, "_inc"
+The C<.sub> directive defines globally accessible subroutine
+objects.
 
 Subroutine objects of all kinds can be called with the
-C<invoke>X<invoke opcode (PASM)> opcode. With no arguments, it calls the
-subroutine in C<P0>, which is the standard for the Parrot calling
-conventions. There is also an C<invoke> C<PR<x>> instruction for
-calling objects held in a different register.
+C<invoke>X<invoke opcode (PASM)> opcode. There is also an C<invoke>
+C<PR<x>> instruction for calling objects held in a different register.
 
 The C<invokecc>X<invokecc opcode (PASM)> opcode is like C<invoke>, but it
-also creates and stores a new return continuation in C<P1>. When the
+also creates and stores a new return continuation. When the
 called subroutine invokes this return continuation, it returns control
 to the instruction after the function call. This kind of call is known
 as Continuation Passing Style (CPS).
 X<CPS (Continuation Passing Style)>
 X<Continuation Passing Style (CPS)>
-
-In a simple example like this it isn't really necessary to set up all
-the registers to obey to the Parrot calling conventions. But when you
-call into library code, the subroutine is likely to check the number
-and type of arguments passed to it. So it's always a good idea to
-follow the full conventions. This is equally true for return values.
-The caller might check how many arguments the subroutine really
-returned.
-
-Setting all these registers for every subroutine call might look
-wasteful at first glance, and it does increase the size of the
-bytecode, but you don't need to worry about execution time: the I<JIT>
-system executes each register setup opcode in one CPU cycle.
 
 =head2 Native Call Interface
 
@@ -2252,85 +1996,6 @@ Z<CHP-5-TABLE-5>
 
 For more information on callback functions, read the documentation in
 F<docs/pdds/pdd16_native_call.pod> and F<docs/pmc/struct.pod>.
-
-=head2 Closures
-
-Z<CHP-5-SECT-7.3>
-
-X<closures>
-X<subroutines;closures>
-A closure is a subroutine that retains values from the lexical scope
-where it was defined, even when it's called from an entirely different
-scope.  The closure shown here is equivalent to this Perl 5 code
-snippet:
-
-    #   sub foo {
-    #       my ($n) = @_;
-    #       sub {$n += shift}
-    #   }
-    #   my $closure = foo(10);
-    #   print &$closure(3), "\n";
-    #   print &$closure(20), "\n";
-
-    # call _foo
-    newsub P16, .Sub, _foo  # new subroutine object at address _foo
-    new P17, "Int"          # value for $n
-    set P17, 10             # we use local vars from P16 ...
-    set P0, P16             # the subroutine
-    set P5, P17             # first argument
-    pushtopp                # save registers
-    invokecc                # call foo
-    poptopp                 # restore registers
-    set P18, P5             # the returned closure
-
-    # call _closure
-    new P19, "Int"          # argument to closure
-    set P19, 3
-    set P0, P18             # the closure
-    set P5, P19             # one argument
-    pushtopp                # save registers
-    invokecc                # call closure(3)
-    poptopp
-    print P5                # prints 13
-    print "\n"
-
-    # call _closure
-    set P19, 20             # and again
-    set P5, P19
-    set P0, P18
-    pushtopp
-    invokecc                # call closure(20)
-    poptopp
-    print P5                # prints 33
-    print "\n"
-    end
-
-  _foo:
-    new_pad 0               # push a new pad
-    store_lex -1, "$n", P5  # store $n
-    newsub P5, .Closure, _closure
-                            # P5 has the lexical "$n" in the pad
-    invoke P1               # return
-
-  _closure:
-    find_lex P16, "$n"      # invoking the closure pushes the lexical pad
-                            # of the closure on the pad stack
-    add P16, P5             # $n += shift
-    set P5, P16             # set return value
-    invoke P1               # return
-
-That's quite a lot of PASM code for such a little bit of Perl 5 code,
-but anonymous subroutines and closures hide a lot of magic under that
-simple interface. The core of this example is that when the new
-subroutine is created in C<_foo> with:
-
-  newsub P5, .Closure, _closure
-
-it inherits and stores the current lexical scratchpad--the topmost
-scratchpad on the pad stack at the time. Later, when C<_closure> is
-invoked from the main body of code, the stored pad is automatically
-pushed onto the pad stack. So, all the lexical variables that were
-available when C<_closure> was defined are available when it's called.
 
 =head2 Coroutines
 
@@ -2632,7 +2297,6 @@ SIGINT, the signal handler catches it, prints out "caught SIGINT" and
 ends.N<Currently, only Linux installs a C<SIGINT> C<sigaction>
 handler, so this example won't work on other platforms.>
 
-
 =head1 Threads
 
 Z<CHP-5-SECT-10>
@@ -2802,7 +2466,7 @@ argument: the name of the bytecode file to load. So, if you create a
 file named F<file.pasm> containing a single subroutine:
 
   # file.pasm
-  .pcc_sub _sub2:               # .pcc_sub stores a global sub
+  .sub _sub2:               # .sub stores a global sub
      print "in sub2\n"
      invoke P1
 
@@ -2814,7 +2478,7 @@ You can then load the compiled bytecode into F<main.pasm> and directly
 call the subroutine defined in F<file.pasm>:
 
   # main.pasm
-  _main:
+  main:
     load_bytecode "file.pbc"    # compiled file.pasm
     find_global P0, "_sub2"
     invokecc
@@ -2824,7 +2488,7 @@ The C<load_bytecode> opcode also works with source files, as long as
 Parrot has a compiler registered for that type of file:
 
   # main2.pasm
-  _main:
+  main:
     load_bytecode "file.pasm"  # PASM source code
     find_global P0, "_sub2"
     invokecc
@@ -2836,26 +2500,26 @@ subroutine marked with C<@MAIN> will always run first, no matter what
 name you give it or where you define it in the file.
 
   # file3.pasm
-  .pcc_sub @LOAD _entry:        # mark the sub as to be run
+  .sub :load                    # mark the sub as to be run
     print "file3\n"
     invoke P1                   # return
 
   # main3.pasm
-  _first:                       # first is never invoked
+  first:                        # first is never invoked
     print "never\n"
     invoke P1
 
-  .pcc_sub @MAIN _main:         # because _main is marked as the
+  .sub :main                    # because _main is marked as the
     print "main\n"              # MAIN entry of program execution
     load_bytecode "file3.pasm"
     print "back\n"
     end
 
-This example uses both C<@LOAD> and C<@MAIN>. Because the C<_main>
-subroutine is defined with C<@MAIN> it will execute first even though
-another subroutine comes before it in the file. C<_main> prints a
+This example uses both C<:load> and C<:main>. Because the C<main>
+subroutine is defined with C<:main> it will execute first even though
+another subroutine comes before it in the file. C<main> prints a
 line, loads the PASM source file, and then prints another line.
-Because C<_entry> in F<file3.pasm> is marked with C<@LOAD> it runs
+Because C<_entry> in F<file3.pasm> is marked with C<:load> it runs
 before C<load_bytecode> returns, so the final output is:
 
   main
@@ -3018,7 +2682,7 @@ double underscore "__". The following code defines a method named
 C<__init> in the C<Foo> class that initializes the first attribute of
 the object with an integer:
 
-  .pcc_sub __init:
+  .sub __init:
     classoffset I0, P2, "Foo"     # lookup first attribute position
     new P6, "Int"                 # create storage for the attribute
     setattribute P2, I0, P6       # store the first attribute
@@ -3089,7 +2753,7 @@ incrementing it:
 
   .namespace [ "Bar" ]
 
-  .pcc_sub __increment:
+  .sub __increment:
     classoffset I0, P2, "Foo"     # get Foo's attribute slot offset
     getattribute P10, P2, I0      # get the first Foo attribute
     dec P10                       # the evil line
@@ -3338,25 +3002,25 @@ Z<CHP-5-SECT-12.6>
 
   .namespace [ "Foo" ]
 
-  .pcc_sub __init:
+  .sub __init:
     classoffset I0, P2, "Foo"     # lookup first attribute position
     new P6, "Int"                 # create a store for the attribute
     setattribute P2, I0, P6       # store the first attribute
     invoke P1                     # return
 
-  .pcc_sub __set_integer_native:
+  .sub __set_integer_native:
     classoffset I0, P2, "Foo"
     getattribute P10, P2, I0
     set P10, I5                   # assign passed in value
     invoke P1
 
-  .pcc_sub __get_integer:
+  .sub __get_integer:
     classoffset I0, P2, "Foo"
     getattribute P10, P2, I0
     set I5, P10                   # return value
     invoke P1
 
-  .pcc_sub __get_string:
+  .sub __get_string:
     classoffset I0, P2, "Foo"
     getattribute P10, P2, I0
     set I5, P10
@@ -3366,13 +3030,13 @@ Z<CHP-5-SECT-12.6>
   ok:
     invoke P1
 
-  .pcc_sub __increment:
+  .sub __increment:
     classoffset I0, P2, "Foo"
     getattribute P10, P2, I0      # as with all aggregates, this
     inc P10                       # has reference semantics - no
     invoke P1                     # setattribute needed
 
-  .pcc_sub __add:
+  .sub __add:
     classoffset I0, P2, "Foo"
     getattribute P10, P2, I0      # object
     getattribute P11, P5, I0      # argument
@@ -3380,7 +3044,7 @@ Z<CHP-5-SECT-12.6>
     add P12, P10, P11
     invoke P1
 
-  .pcc_sub _half:                 # I5 = _half(self)
+  .sub _half:                 # I5 = _half(self)
     classoffset I0, P2, "Foo"
     getattribute P10, P2, I0
     set I5, P10                   # get value
@@ -3390,7 +3054,7 @@ Z<CHP-5-SECT-12.6>
 
   .namespace [ "Bar" ]
 
-  .pcc_sub __increment:
+  .sub __increment:
     classoffset I0, P2, "Foo"     # get Foo's attribute slot offset
     getattribute P10, P2, I0      # get the first Foo attribute
     dec P10                       # the evil line
