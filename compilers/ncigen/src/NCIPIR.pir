@@ -273,7 +273,7 @@ Return pir for an operation node.
   iseq $I1, $S0, 'short' #short *
   unless $I1, LL15
     .return("V")
-  LL15: #struct *, typedef *, 
+  LL15: #struct *, typedef *,
     say "ERROR"
     say $S0
     say "what is this"
