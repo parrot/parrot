@@ -49,14 +49,14 @@
   language = opt["language"]
 
   # Get the input as a string, don't care about buffer overflow yet
-  read S0, 1000000
+  read $S0, 1000000
 
   # Assume that the input is PASM and compile it
-  compreg P1, language
-  P0 = P1( S0 )
+  compreg $P1, language
+  $P0 = $P1( $S0 )
 
   # invoke the compiled code
-  P0()
+  $P0()
 
 .end
 
