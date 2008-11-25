@@ -73,7 +73,8 @@ Set the C<Integer> to the integer value of the PMC argument.
 
 Set the C<Integer> to the passed-in integer value.
 
-=item set_number_native(FLOATVAL value), set_bool(INTVAL value), set_bigint_int(INTVAL value), set_string_native(STRING *value)
+=item set_number_native(FLOATVAL value), set_bool(INTVAL value), set_bigint_int(INTVAL value),
+      set_string_native(STRING *value)
 
 Morphs the C<Integer> PMC to a C<Float>, C<Boolean>, C<BigInt>, or C<String>
 PMC, and sets the value from the passed in value.
