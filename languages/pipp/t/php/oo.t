@@ -35,7 +35,7 @@ CODE
 After class definition.
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'class constant', todo => 'not implemented yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'class constant' );
 <?php
 
 class Foo {

@@ -15,7 +15,18 @@ Implement PHP.
 Support well behaving PHP extensions.
 
 A secondary goal is to provide a side by side comparison
-of different parsing and tree transformation techniques. 
+of different parsing and tree transformation techniques.
+
+=head1 Divergences of Pipp
+
+=over 4
+
+=item builtin function pipp_defined().
+
+=cut
+
+=head1 Variants
+
 Therefore there are currently three variants of Pipp:
 
 =over
