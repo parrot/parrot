@@ -49,9 +49,172 @@ type mapped to C<Float>.
 
 =head2 Integer PMC
 
+The C<Integer> PMC is a high-level integer type, providing the features of a
+integer data type appropriate for use in a high-level language. Some languages
+may be able to use Parrot's C<Integer> directly as their integer data type,
+others may subclass C<Integer> to add their own functionality, and others may
+implement their own high-level integer data type.
+
+The C<Integer> PMC has a single attribute, the integer value.
+
+=head3 Integer Vtable Functions
+
+=over 4
+
+=item init()
+
+Initialize the C<Integer> to 0.
+
+=item set_pmc(PMC *value) and set_integer_same(PMC* value)
+
+Set the C<Integer> to the integer value of the PMC argument.
+
+=item set_integer_native(INTVAL value)
+
+Set the C<Integer> to the passed-in integer value.
+
+=item set_number_native(FLOATVAL value), set_bool(INTVAL value), set_bigint_int(INTVAL value), set_string_native(STRING *value)
+
+Morphs the C<Integer> PMC to a C<Float>, C<Boolean>, C<BigInt>, or C<String>
+PMC, and sets the value from the passed in value.
+
+{{NOTE: the morphing behavior is currently under consideration and may be
+rejected.}}
+
+=item get_integer()
+
+Retrieves the integer value of the C<Integer>.
+
+=item get_bool()
+
+Returns the boolean value of the C<Integer> (false if 0, true otherwise).
+
+=item get_number()
+
+Returns the integer value of the C<Integer> as a floating-point number.
+
+=item get_bignum()
+
+Returns the integer value of the C<Integer> in a new C<BigInt> PMC.
+
+=item get_string() and get_repr()
+
+Returns the integer value of the C<Integer> as a string.
+
+=item [add|subtract|multiply|divide|floor_divide|modulus|pow]_int(INTVAL b, PMC *dest)
+
+Add/subtract/multiply/divide/modulus/exponent an integer value with the
+C<Integer> PMC, and return the result as a new PMC (the C<dest> parameter is
+unused). Overflow of the native integer storage auto-promotes the result PMC
+to a C<BigInt>.
+
+=item i_[add|subtract|multiply|divide|floor_divide|modulus|pow]_int(INTVAL b)
+
+Add/subtract/multiply/divide/modulus/exponent an integer value with the
+C<Integer> PMC, and set the C<Integer> to the resulting value. Overflow of the
+native integer storage auto-promotes the C<Integer> to a C<BigInt>.
+
+{{NOTE: there is some discussion of having this promotion of storage happen
+purely internally (perhaps by swapping vtables), rather than converting to a
+different PMC type.}}
+
+=item i_[add|subtract|multiply|divide|floor_divide|modulus|pow]_float(INTVAL b)
+
+Add/subtract/multiply/divide/modulus/exponent an integer value with the
+C<Integer> PMC, and set the C<Integer> to the resulting value, morphing it to a
+C<Float>.
+
+=item increment()
+
+Add 1 to the value of the integer.
+
+=item decrement()
+
+Subtract 1 from the value of the integer.
+
+=item absolute()
+
+Return an C<Integer> PMC set to the absolute value of the current C<Integer>.
+
+=item i_absolute()
+
+Set the C<Integer> to the absolute value of itself.
+
+=item freeze()
+
+Freeze the C<Integer> PMC for storage.
+
+=item thaw()
+
+Thaw the C<Integer> PMC from storage.
+
+
+=back
+
+=head3 Integer Multis
+
+Many of the math vtable functions are defined instead as multiple dispatch
+functions.
+
+=over 4
+
+=item [add|subtract|multiply|divide|floor_divide|modulus|pow](PMC *value, PMC *dest)
+
+Perform the addition/subtraction/multiplication/division/modulus/exponent
+operation, and return a new PMC containing the resulting value. Multiple
+dispatch variants are defined for C<Integer>, C<Complex>, C<BigInt>, C<String>,
+and C<DEFAULT>.
+
+Overflow of the native integer storage auto-promotes the result PMC to a
+C<BigInt>.
+
+=item i_[add|subtract|multiply|divide|floor_divide|modulus|pow](PMC *value)
+
+Perform the addition/subtraction/multiplication/division/modulus/exponent
+operation, morphing the C<Integer> to the passed in type, and setting it to the
+result. Multiple dispatch variants are defined for C<Integer>, C<Complex>,
+C<BigInt>, and C<DEFAULT>.
+
+Overflow of the native integer storage auto-promotes the C<Integer> to a
+C<BigInt>.
+
+=item is_equal(PMC *value)
+
+Compare the C<Integer> to the passed in PMC, return true (1) if they are equal,
+and false (0) otherwise. Multiple dispatch variants are defined for C<BigInt>
+and C<DEFAULT>. {{NOTE: Presumably the C<String>, C<Integer>, and C<Float>
+cases are all covered by C<DEFAULT>.}}
+
+=item cmp(PMC *value)
+
+Compare the C<Integer> to the passed in PMC, return 1 if C<Integer> is greater,
+-1 if the PMC is greater, and 0 if they are equal. Multiple dispatch variants
+are defined for C<String>, C<Float>, and C<DEFAULT>. {{NOTE: Presumably the
+C<Integer> and C<BigInt> cases are covered by C<DEFAULT>.}}
+
+=item cmp_num(PMC *value)
+
+Compare the C<Integer> to the passed in PMC, return 1 if C<Integer> is greater,
+-1 if the PMC is greater, and 0 if they are equal. Multiple dispatch variants
+are defined for C<String>, C<Float>, and C<DEFAULT>. {{NOTE: Presumably the
+C<Integer> and C<BigInt> cases are covered by C<DEFAULT>.}}
+
+=back
+
+=head3 Integer Methods
+
+=over 4
+
+=item get_as_base(INTVAL base)
+
+Convert the decimal integer to another base (anything from base 2 to base 36).
+Return the result as a string.
+
+=back
+
 =head2 Float PMC
 
-=head2 BigNum PMC
+=head2 BigInt PMC
 
 The big number library provides Parrot with both a collection of (nearly)
 infinite precision numeric types and an implementation of an extended decimal
@@ -394,7 +557,7 @@ The possible exceptions are detailed in the extended decimal arithmetic.
 =head1 Tests
 
 The Standard Decimal Arithmetic provides a collection of tests for both its
-base and extended behaviour.  Initially it is hoped that this library can pass
+base and extended behavior.  Initially it is hoped that this library can pass
 all base tests, with extended tests to be included at a later date as it is
 extended to cope with values such as +Inf.
 
