@@ -379,3 +379,6 @@ i    ppppiiiiii
 
 # Testing OpenGL
 v    fff
+
+# Testing Pointer PMC use
+v    V
