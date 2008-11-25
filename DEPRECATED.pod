@@ -182,4 +182,15 @@ RT #60048.
 
 =back
 
+=head1 Compiler Tools
+
+=over 4
+
+=item 'get_string', 'get_bool', etc. named vtable functions [post 0.8.1]
+
+All of the named vtable functions in PCT and PGE will lose
+their names and effectively become anonymous.  See RT #60384.
+
+=back
+
 =cut
