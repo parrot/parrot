@@ -36,8 +36,8 @@ C<Integer>.
 Parrot provides a native floating-point data type, generally known as a "Num".
 The size of the float is chosen at Parrot configuration time, the same size as
 platform-native floats. In C, the typedef C<FLOATVAL> is a native float data
-type. The semantics of the native float data type are the same as the semantics
-of the C equivalent.
+type. The semantics of the native float data type are the same as the
+semantics of the C equivalent.
 
 Float data types have a dedicated register set. In PIR, the C<N> register
 variables (C<$N0>, etc.) and C<.param>s or C<.local>s declared with the C<num>
@@ -73,8 +73,8 @@ Set the C<Integer> to the integer value of the PMC argument.
 
 Set the C<Integer> to the passed-in integer value.
 
-=item set_number_native(FLOATVAL value), set_bool(INTVAL value), set_bigint_int(INTVAL value),
-      set_string_native(STRING *value)
+=item set_number_native(FLOATVAL value), set_bool(INTVAL value),
+      set_bigint_int(INTVAL value), set_string_native(STRING *value)
 
 Morphs the C<Integer> PMC to a C<Float>, C<Boolean>, C<BigInt>, or C<String>
 PMC, and sets the value from the passed in value.
@@ -102,7 +102,8 @@ Returns the integer value of the C<Integer> in a new C<BigInt> PMC.
 
 Returns the integer value of the C<Integer> as a string.
 
-=item [add|subtract|multiply|divide|floor_divide|modulus|pow]_int(INTVAL b, PMC *dest)
+=item [add|subtract|multiply|divide|floor_divide|modulus|pow]_int(INTVAL b,
+      PMC *dest)
 
 Add/subtract/multiply/divide/modulus/exponent an integer value with the
 C<Integer> PMC, and return the result as a new PMC (the C<dest> parameter is
@@ -119,11 +120,12 @@ native integer storage auto-promotes the C<Integer> to a C<BigInt>.
 purely internally (perhaps by swapping vtables), rather than converting to a
 different PMC type.}}
 
-=item i_[add|subtract|multiply|divide|floor_divide|modulus|pow]_float(INTVAL b)
+=item i_[add|subtract|multiply|divide|floor_divide|modulus|pow]_float(INTVAL
+      b)
 
 Add/subtract/multiply/divide/modulus/exponent an integer value with the
-C<Integer> PMC, and set the C<Integer> to the resulting value, morphing it to a
-C<Float>.
+C<Integer> PMC, and set the C<Integer> to the resulting value, morphing it
+to a C<Float>.
 
 =item increment()
 
@@ -159,12 +161,13 @@ functions.
 
 =over 4
 
-=item [add|subtract|multiply|divide|floor_divide|modulus|pow](PMC *value, PMC *dest)
+=item [add|subtract|multiply|divide|floor_divide|modulus|pow](PMC *value,
+      PMC *dest)
 
 Perform the addition/subtraction/multiplication/division/modulus/exponent
 operation, and return a new PMC containing the resulting value. Multiple
-dispatch variants are defined for C<Integer>, C<Complex>, C<BigInt>, C<String>,
-and C<DEFAULT>.
+dispatch variants are defined for C<Integer>, C<Complex>, C<BigInt>,
+C<String>, and C<DEFAULT>.
 
 Overflow of the native integer storage auto-promotes the result PMC to a
 C<BigInt>.
@@ -172,8 +175,8 @@ C<BigInt>.
 =item i_[add|subtract|multiply|divide|floor_divide|modulus|pow](PMC *value)
 
 Perform the addition/subtraction/multiplication/division/modulus/exponent
-operation, morphing the C<Integer> to the passed in type, and setting it to the
-result. Multiple dispatch variants are defined for C<Integer>, C<Complex>,
+operation, morphing the C<Integer> to the passed in type, and setting it to
+the result. Multiple dispatch variants are defined for C<Integer>, C<Complex>,
 C<BigInt>, and C<DEFAULT>.
 
 Overflow of the native integer storage auto-promotes the C<Integer> to a
@@ -181,24 +184,24 @@ C<BigInt>.
 
 =item is_equal(PMC *value)
 
-Compare the C<Integer> to the passed in PMC, return true (1) if they are equal,
-and false (0) otherwise. Multiple dispatch variants are defined for C<BigInt>
-and C<DEFAULT>. {{NOTE: Presumably the C<String>, C<Integer>, and C<Float>
-cases are all covered by C<DEFAULT>.}}
+Compare the C<Integer> to the passed in PMC, return true (1) if they are
+equal, and false (0) otherwise. Multiple dispatch variants are defined for
+C<BigInt> and C<DEFAULT>. {{NOTE: Presumably the C<String>, C<Integer>,
+and C<Float> cases are all covered by C<DEFAULT>.}}
 
 =item cmp(PMC *value)
 
-Compare the C<Integer> to the passed in PMC, return 1 if C<Integer> is greater,
--1 if the PMC is greater, and 0 if they are equal. Multiple dispatch variants
-are defined for C<String>, C<Float>, and C<DEFAULT>. {{NOTE: Presumably the
-C<Integer> and C<BigInt> cases are covered by C<DEFAULT>.}}
+Compare the C<Integer> to the passed in PMC, return 1 if C<Integer> is
+greater, -1 if the PMC is greater, and 0 if they are equal. Multiple dispatch
+variants are defined for C<String>, C<Float>, and C<DEFAULT>. {{NOTE:
+Presumably the C<Integer> and C<BigInt> cases are covered by C<DEFAULT>.}}
 
 =item cmp_num(PMC *value)
 
-Compare the C<Integer> to the passed in PMC, return 1 if C<Integer> is greater,
--1 if the PMC is greater, and 0 if they are equal. Multiple dispatch variants
-are defined for C<String>, C<Float>, and C<DEFAULT>. {{NOTE: Presumably the
-C<Integer> and C<BigInt> cases are covered by C<DEFAULT>.}}
+Compare the C<Integer> to the passed in PMC, return 1 if C<Integer> is
+greater, -1 if the PMC is greater, and 0 if they are equal. Multiple dispatch
+variants are defined for C<String>, C<Float>, and C<DEFAULT>. {{NOTE:
+Presumably the C<Integer> and C<BigInt> cases are covered by C<DEFAULT>.}}
 
 =back
 
@@ -588,4 +591,4 @@ __END__
 Local Variables:
   fill-column:78
 End:
-vim: expandtab shiftwidth=4:
+vim: expandtab tw=78 shiftwidth=4:
