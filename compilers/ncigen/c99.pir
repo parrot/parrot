@@ -93,7 +93,7 @@ USAGE
 
   err_past:
     $S0 = typeof source
-    .return self.'panic'('Unable to obtain c99AST from ', $S0)
+    .tailcall self.'panic'('Unable to obtain c99AST from ', $S0)
 .end
 
 .sub 'gen_nci_pir' :method

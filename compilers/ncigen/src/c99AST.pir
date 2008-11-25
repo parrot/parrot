@@ -59,7 +59,7 @@ Accessor method -- sets/returns the return type for the invocant.
 .sub 'returns' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('returns', value, has_value)
+    .tailcall self.'attr'('returns', value, has_value)
 .end
 
 
@@ -73,7 +73,7 @@ for the node.
 .sub 'arity' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('arity', value, has_value)
+    .tailcall self.'attr'('arity', value, has_value)
 .end
 
 
@@ -87,7 +87,7 @@ associated with the argument.
 .sub 'named' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('named', value, has_value)
+    .tailcall self.'attr'('named', value, has_value)
 .end
 
 
@@ -100,7 +100,7 @@ Accessor method -- sets/returns the "flatten" flag on arguments.
 .sub 'flat' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('flat', value, has_value)
+    .tailcall self.'attr'('flat', value, has_value)
 .end
 
 
@@ -125,7 +125,7 @@ Get/set the constant value for this node.
 .sub 'value' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('value', value, has_value)
+    .tailcall self.'attr'('value', value, has_value)
 .end
 
 =back
@@ -152,49 +152,49 @@ parameter, and array/hash variables respectively.
 .sub 'type' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('type', value, has_value)
+    .tailcall self.'attr'('type', value, has_value)
 .end
 
 .sub 'extern' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('extern', value, has_value)
+    .tailcall self.'attr'('extern', value, has_value)
 .end
 
 .sub 'pointer' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('pointer', value, has_value)
+    .tailcall self.'attr'('pointer', value, has_value)
 .end
 
 .sub 'builtin_type' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('builtin_type', value, has_value)
+    .tailcall self.'attr'('builtin_type', value, has_value)
 .end
 
 .sub 'complex' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('complex', value, has_value)
+    .tailcall self.'attr'('complex', value, has_value)
 .end
 
 .sub 'primitive_type' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('primitive_type', value, has_value)
+    .tailcall self.'attr'('primitive_type', value, has_value)
 .end
 
 .sub 'pointer_cnt' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('pointer_cnt', value, has_value)
+    .tailcall self.'attr'('pointer_cnt', value, has_value)
 .end
 
 .sub 'scope' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('scope', value, has_value)
+    .tailcall self.'attr'('scope', value, has_value)
 .end
 
 
@@ -210,7 +210,7 @@ Otherwise, the node refers to a lexical variable from an outer scope.
 .sub 'isdecl' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('isdecl', value, has_value)
+    .tailcall self.'attr'('isdecl', value, has_value)
 .end
 
 
@@ -224,7 +224,7 @@ variable is being used in an lvalue context.
 .sub 'lvalue' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('lvalue', value, has_value)
+    .tailcall self.'attr'('lvalue', value, has_value)
 .end
 
 
@@ -239,7 +239,7 @@ of 'package'.
 .sub 'namespace' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('namespace', value, has_value)
+    .tailcall self.'attr'('namespace', value, has_value)
 .end
 
 
@@ -255,7 +255,7 @@ passed in).
 .sub 'slurpy' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('slurpy', value, has_value)
+    .tailcall self.'attr'('slurpy', value, has_value)
 .end
 
 
@@ -270,7 +270,7 @@ implementation) a c99AST tree to create the value.
 .sub 'viviself' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('viviself', value, has_value)
+    .tailcall self.'attr'('viviself', value, has_value)
 .end
 
 
@@ -285,7 +285,7 @@ attribute.
 .sub 'vivibase' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .return self.'attr'('vivibase', value, has_value)
+    .tailcall self.'attr'('vivibase', value, has_value)
 .end
 
 

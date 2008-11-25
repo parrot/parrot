@@ -57,7 +57,7 @@ NCIPIR::Compiler defines a compiler that converts a c99AST tree into PIR
     newself.'pir'(ast)
 
     ##  and return whatever code was generated
-    .return newself.'code'()
+    .tailcall newself.'code'()
 .end
 
 .sub 'gen_preamble' :method
@@ -215,7 +215,9 @@ Return pir for an operation node.
   .param pmc node
   .param int returncode :optional
   $I0 = node.'pointer'()
+  $I2 = node.'pointer_cnt'()
   $S0 = node.'primitive_type'()
+
 
   if $I0, LPOINTER
 
@@ -245,14 +247,41 @@ Return pir for an operation node.
     .return("p")
 
   LPOINTER:
-  iseq $I1, $S0, 'char'
+  isgt $I3, $I2, 1
+  if $I3, LL18 # pointer_cnt > 1
+
+  iseq $I1, $S0, 'void' #void *
   unless $I1, LL7
-  $I0 = node.'pointer_cnt'()
-  iseq $I1, $I0, 1
-  unless $I1, LL7
-    .return("t")
-  LL7:
+  if returncode, LL111
     .return("p")
+  LL111:
+    .return("p")
+#    .return("V") #probably should be this
+  LL7:
+  iseq $I1, $S0, 'char' #char *
+  unless $I1, LL8
+    .return("t")
+  LL8:
+  iseq $I1, $S0, 'int' #int *
+  unless $I1, LL13
+    .return("V")
+  LL13:
+  iseq $I1, $S0, 'long' #long *
+  unless $I1, LL14
+    .return("V")
+  LL14:
+  iseq $I1, $S0, 'short' #short *
+  unless $I1, LL15
+    .return("V")
+  LL15: #struct *, typedef *, 
+    say "ERROR"
+    say $S0
+    say "what is this"
+    .return("p")
+
+#something **
+  LL18:
+    .return("V")
 .end
 
 =item pir(POST::Label node)
@@ -264,7 +293,7 @@ Generate a label.
 .sub 'pir' :method :multi(_, ['c99AST';'TypeDef'])
     .param pmc node
     .return ('')
-    .return pir_dump(node)
+    .tailcall pir_dump(node)
 .end
 
 =item pir(POST::Label node)
@@ -276,7 +305,7 @@ Generate a label.
 .sub 'pir' :method :multi(_, ['c99AST';'VarDecl'])
     .param pmc node
     .return ('')
-    .return pir_dump(node)
+    .tailcall pir_dump(node)
 .end
 
 =item pir(POST::Label node)
