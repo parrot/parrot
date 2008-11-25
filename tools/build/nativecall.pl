@@ -702,9 +702,9 @@ $put_pointer
 #if defined(CAN_BUILD_CALL_FRAMES)
     /* Try if JIT code can build that signature. If yes, we are done */
 
-    jit_key_name = string_from_literal(interp, "_XJIT_");
-    jit_key_name = string_append(interp, jit_key_name, signature);
-    b = VTABLE_get_pmc_keyed_str(interp, HashPointer, jit_key_name);
+    jit_key_name = CONST_STRING(interp, "_XJIT_");
+    jit_key_name = string_concat(interp, jit_key_name, signature, 0);
+    b            = VTABLE_get_pmc_keyed_str(interp, HashPointer, jit_key_name);
 
     if (b && b->vtable->base_type == enum_class_ManagedStruct) {
         *jitted = 1;

@@ -1853,9 +1853,9 @@ Parrot_mmd_add_multi_from_c_args(PARROT_INTERP,
         ARGIN(funcptr_t multi_func_ptr))
 {
         STRING *comma          = CONST_STRING(interp, ",");
-        STRING *sub_name_str   = string_from_cstring(interp, sub_name, 0);
-        STRING *long_sig_str   = string_from_cstring(interp, long_sig, 0);
-        STRING *short_sig_str  = string_from_cstring(interp, short_sig, 0);
+        STRING *sub_name_str   = const_string(interp, sub_name);
+        STRING *long_sig_str   = const_string(interp, long_sig);
+        STRING *short_sig_str  = const_string(interp, short_sig);
         PMC    *type_list      = string_split(interp, comma, long_sig_str);
         STRING *namespace_name = VTABLE_get_string_keyed_int(interp, type_list, 0);
         /* Create an NCI sub for the C function */
