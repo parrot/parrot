@@ -9,6 +9,10 @@ docs/pdds/pdd14_numbers.pod - Parrot Numbers
 
 This PDD describes Parrot's numeric data types.
 
+=head1 VERSION
+
+$Revision$
+
 =head1 DESCRIPTION
 
 This PDD details the basic numeric datatypes that the Parrot core knows how to
