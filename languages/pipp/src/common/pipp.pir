@@ -105,6 +105,7 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
     # import PGE::Util::die into Pipp::Grammar
     $P0 = get_hll_global ['PGE';'Util'], 'die'
     set_hll_global ['Pipp';'Grammar'], 'die', $P0
+    set_hll_global ['Pipp'], 'die', $P0
 
     # register and set up the the HLLCompiler
     $P1 = new [ 'PCT';'HLLCompiler' ]
@@ -381,13 +382,25 @@ NO_REST:
     set_hll_global 'pipp_ini', pipp_ini
 .end
 
-# there is a distinction between predifined vars and superglobals
+# there is a distinction between predefined variables and superglobals
 .sub set_predefined_variables
 
     .local pmc php_errormsg
     php_errormsg = new 'PhpString'
     php_errormsg = ''
     set_hll_global '$php_errormsg', php_errormsg
+
+    .local pmc included_files
+    included_files = new 'PhpArray'
+    set_hll_global '$INC', included_files
+
+    .local pmc include_path, include_dir
+    include_path = new 'PhpArray'
+    include_dir = new 'PhpString'
+    include_dir = '.'
+    push include_path, include_dir
+    set_hll_global '$INCLUDE_PATH', include_path
+    
 
 .end
 

@@ -176,7 +176,8 @@ build:           build-pct
 
 build-all:       build-pct build-phc build-antlr3
 
-build-common:    pmc src/common/pipplib.pbc pipp.pbc $(PHP_EXT) Test.pir
+#build-common:    pmc src/common/pipplib.pbc pipp.pbc $(PHP_EXT) Test.pir
+build-common:    pmc src/common/pipplib.pbc pipp.pbc $(PHP_EXT)
 
 build-pct:       build-common
 

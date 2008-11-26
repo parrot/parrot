@@ -25,6 +25,10 @@ of different parsing and tree transformation techniques.
 
 =item Loading of Parrot libs will be supported
 
+=item Support for global variable $INC, list of included files
+
+=item Support for global variable $INCLUDE_PATH
+
 =cut
 
 =head1 Variants

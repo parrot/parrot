@@ -145,7 +145,7 @@ rule namespace_statement {
 }
 
 token require_once_statement {
-    'require_once' <.ws_char> <quote> <ws> <.statement_delimiter>
+    'require_once' <.ws_char>+ <quote> <ws> <.statement_delimiter>
     {*}
 }
 

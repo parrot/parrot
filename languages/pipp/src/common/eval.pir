@@ -34,7 +34,7 @@ The code originates from Rakudo's eval.pir.
     lang = options['lang']
     if lang == 'Parrot' goto lang_parrot
     if lang goto lang_compile
-    lang = 'PHP'
+    lang = 'Pipp'
   lang_compile:
     .local pmc compiler
     compiler = compreg lang
@@ -68,28 +68,30 @@ The code originates from Rakudo's eval.pir.
 
   have_name:
     ##  see if we loaded this already
-    .local pmc inc_hash
-    inc_hash = get_hll_global '%INC'
-    $I0 = exists inc_hash[name]
+    .local pmc included_files
+    included_files = get_hll_global '$INC'
+    $I0 = exists included_files[name]
     unless $I0 goto require_name
-    $I0 = defined inc_hash[name]
+    $I0 = defined included_files[name]
     .return ($I0)
 
   require_name:
-    ##  loop through @INC
+    ##  loop through $INCLUDE_PATH
     .local pmc inc_it
-    $P0 = get_hll_global '@INC'
+    $P0 = get_hll_global '$INCLUDE_PATH'
     inc_it = iter $P0
   inc_loop:
     unless inc_it goto inc_end
     .local string basename, realfilename
     $S0 = shift inc_it
-    basename = concat $S0, '/'
+    # for some reason 0 is shifted for inc_it
+    #basename = concat $S0, '/'
+    basename = concat '.', '/'
     basename .= name
     if ismodule goto try_module
     realfilename = basename
     $I0 = stat realfilename, 0
-    if $I0 goto eval_perl6
+    if $I0 goto eval_pipp
     goto inc_loop
   try_module:
     realfilename = concat basename, '.pbc'
@@ -100,23 +102,23 @@ The code originates from Rakudo's eval.pir.
     if $I0 goto eval_parrot
     realfilename = concat basename, '.pm'
     $I0 = stat realfilename, 0
-    if $I0 goto eval_perl6
+    if $I0 goto eval_pipp
     goto inc_loop
   inc_end:
     $S0 = concat "Can't find ", basename
-    concat $S0, ' in @INC'
+    concat $S0, ' in $INCLUDE_PATH'
     'die'($S0)
     .return (0)
 
   eval_parrot:
     .local pmc result
-    inc_hash[name] = realfilename
+    included_files[name] = realfilename
     result = 'evalfile'(realfilename, 'lang'=>'Parrot')
     goto done
 
-  eval_perl6:
-    inc_hash[name] = realfilename
-    result = 'evalfile'(realfilename, 'lang'=>'PHP')
+  eval_pipp:
+    included_files[name] = realfilename
+    result = 'evalfile'(realfilename, 'lang'=>'Pipp')
 
   done:
     .return (result)
