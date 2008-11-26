@@ -400,7 +400,7 @@ NO_REST:
     include_dir = '.'
     push include_path, include_dir
     set_hll_global '$INCLUDE_PATH', include_path
-    
+
 
 .end
 
