@@ -20,12 +20,22 @@ See L<http://www.php.net/manual/en/ref.?.php>.
 
 use strict;
 use warnings;
-
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 4;
-use Parrot::Test;
+use Parrot::Test  tests => 5;
+
+language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'whitespace after echo' );
+<?php
+  echo 'one space', "\n";
+  echo  'two spaces', "\n";
+  echo   'three spaces', "\n";
+?>
+CODE
+one space
+two spaces
+three spaces
+OUTPUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'constants' );
 <?php
