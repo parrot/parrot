@@ -3,6 +3,8 @@
 .loadlib 'php_group'
 
 .include 'languages/pipp/src/common/php_MACRO.pir'
+.include 'languages/pipp/src/common/guts.pir'
+.include 'languages/pipp/src/common/eval.pir'
 
 # steal builtins from Perl6
 .sub 'print'

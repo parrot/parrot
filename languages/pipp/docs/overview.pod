@@ -23,6 +23,8 @@ of different parsing and tree transformation techniques.
 
 =item builtin function pipp_defined().
 
+=item Loading of Parrot libs will be supported
+
 =cut
 
 =head1 Variants

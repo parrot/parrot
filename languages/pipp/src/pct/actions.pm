@@ -126,6 +126,17 @@ method namespace_statement($/) {
     make $past;
 }
 
+method require_once_statement($/) {
+    my $past := PAST::Op.new(
+                   :name('require'),
+                   :pasttype('call'),
+                   :node( $/ ),
+                   $( $/<quote> )
+               );
+
+    make $past;
+}
+
 method echo_statement($/) {
     my $past := $( $<arguments> );
     $past.name( 'echo' );

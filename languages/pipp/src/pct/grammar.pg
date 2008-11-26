@@ -119,17 +119,18 @@ rule block {
 }
 
 rule statement {
-      <namespace_statement>   {*}  #= namespace_statement
-    | <echo_statement>        {*}  #= echo_statement
-    | <expression_statement>  {*}  #= expression_statement
-    | <if_statement>          {*}  #= if_statement
-    | <while_statement>       {*}  #= while_statement
-    | <for_statement>         {*}  #= for_statement
-    | <inline_sea_short_tag>  {*}  #= inline_sea_short_tag
-    | <inline_sea_script_tag> {*}  #= inline_sea_script_tag
-    | <var_assign>            {*}  #= var_assign
-    | <function_definition>   {*}  #= function_definition
-    | <class_definition>      {*}  #= class_definition
+      <namespace_statement>     {*}  #= namespace_statement
+    | <require_once_statement>  {*}  #= require_once_statement
+    | <echo_statement>          {*}  #= echo_statement
+    | <expression_statement>    {*}  #= expression_statement
+    | <if_statement>            {*}  #= if_statement
+    | <while_statement>         {*}  #= while_statement
+    | <for_statement>           {*}  #= for_statement
+    | <inline_sea_short_tag>    {*}  #= inline_sea_short_tag
+    | <inline_sea_script_tag>   {*}  #= inline_sea_script_tag
+    | <var_assign>              {*}  #= var_assign
+    | <function_definition>     {*}  #= function_definition
+    | <class_definition>        {*}  #= class_definition
 }
 
 rule statement_delimiter {
@@ -140,6 +141,11 @@ rule statement_delimiter {
 
 rule namespace_statement {
     'namespace' <NAMESPACE_NAME> ';'
+    {*}
+}
+
+token require_once_statement {
+    'require_once' <.ws_char> <quote> <ws> <.statement_delimiter>
     {*}
 }
 
