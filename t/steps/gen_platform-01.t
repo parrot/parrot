@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 20;
+use Test::More tests => 19;
 use Carp;
 use Cwd;
 use File::Copy;
@@ -47,11 +47,6 @@ $conf->data->set_p5( archname => 'foo-bar' );
 my $verbose = 0;
 
 ########## _get_platform() ##########
-
-$conf->options->set( miniparrot => 1 );
-is( $step->_get_platform( $conf, $verbose ), q{ansi},
-    "Got expected platform for miniparrot");
-$conf->options->set( miniparrot => undef );
 
 $conf->data->set_p5( OSNAME => 'msys' );
 is( $step->_get_platform( $conf, $verbose ), q{win32},
