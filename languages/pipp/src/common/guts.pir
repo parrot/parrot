@@ -12,6 +12,18 @@ Stolen from Rakudo.
 
 =over 4
 
+=item C<bool pipp_defined(string constant_name)>
+
+Check whether a Parrot register is defined.
+
+=cut
+
+.sub 'pipp_defined'
+    .param pmc x
+    $I0 = defined x
+    .return ($I0)
+.end
+
 =item !EXPORT(symbols, from :named('from') [, to :named('to')] )
 
 Export symbols in namespace C<from> to the namespace given by C<to>.

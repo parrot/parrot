@@ -145,18 +145,6 @@ Check whether a constant exists
     .RETURN_BOOL($I0)
 .end
 
-=item C<bool pipp_defined(string constant_name)>
-
-Check whether a Parrot register is defined.
-
-=cut
-
-.sub 'pipp_defined'
-    .param pmc x
-    $I0 = defined x
-    .return ($I0)
-.end
-
 =item C<array each(array arr)>
 
 Return the currently pointed key..value pair in the passed array, and advance the pointer to the next element
