@@ -55,11 +55,13 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 .namespace [ 'PAST';'Compiler' ]
 
 .sub '__onload' :anon :load :init
+
+    # Pipp uses the Parrot Compiler Toolkit
     load_bytecode 'PCT.pbc'
 
-    ##  %valflags specifies when PAST::Val nodes are allowed to
-    ##  be used as a constant.  The 'e' flag indicates that the
-    ##  value must be quoted+escaped in PIR code.
+    #  %valflags specifies when PAST::Val nodes are allowed to
+    #  be used as a constant.  The 'e' flag indicates that the
+    #  value must be quoted+escaped in PIR code.
     .local pmc valflags
     valflags = get_global '%valflags'
     valflags['PhpString']   = 's~*e'
@@ -115,9 +117,9 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 .sub pipp :main
     .param pmc argv
 
-    .local string rest
+    .local string prog, rest
     .local pmc    opt
-    ( opt, rest ) = parse_options(argv)
+    (prog, opt, rest) = parse_options(argv)
 
     # Find the name of the input file
     .local string source_fn
@@ -200,7 +202,12 @@ VARIANT_PCT:
     .local pmc pipp_compiler
     pipp_compiler = compreg 'Pipp'
 
-    .tailcall pipp_compiler.'evalfiles'( source_fn, 'target' => target, 'output' => output )
+    .local pmc args
+    args = new 'ResizableStringArray'
+    push args, prog
+    push args, rest
+
+    .tailcall pipp_compiler.'command_line'( args, 'target' => target, 'output' => output )
 
 VARIANT_PHC:
     .local string phc_src_dir
@@ -364,7 +371,7 @@ n_help:
     rest = argv[argc]
 NO_REST:
 
-    .return (opt, rest )
+    .return (prog, opt, rest)
 .end
 
 # keep arguments from the command line and from ini-file
@@ -376,10 +383,12 @@ NO_REST:
 
 # there is a distinction between predifined vars and superglobals
 .sub set_predefined_variables
+
     .local pmc php_errormsg
     php_errormsg = new 'PhpString'
     php_errormsg = ''
     set_hll_global '$php_errormsg', php_errormsg
+
 .end
 
 # Most of the superglobals are not initialized yet
