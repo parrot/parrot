@@ -10,7 +10,6 @@ src/spf_render.c    -{-Wformat-nonliteral}   # noisy
 src/tsq.c           -{@optimize@}           # never optimize tsq.c!
 src/ops/core_ops_cg.c      -{@optimize@}    # takes too long
 src/ops/core_ops_switch.c  -{@optimize@}    # Overwhelms some compilers.
-src/py_func.c       +{-Ipmc}             # include pmc_default.h
 
 # io should be -Wunused clean
 {^src/io/}              s/-Wno-unused/-Wunused/
@@ -27,4 +26,5 @@ compilers/imcc/instructions.c -{-Wformat-nonliteral} # noisy
 compilers/imcc/debug.c        -{-Wformat-nonliteral} # noisy
 compilers/imcc/optimizer.c    -{-Wformat-nonliteral} # noisy
 compilers/imcc/parser_util.c  -{-Wformat-nonliteral} # noisy
-compilers/imcc/imclexer       -{-Wunused}  # noisy
+compilers/imcc/imclexer.c     -{-Wunused}  # noisy
+compilers/imcc/imclexer.c     -{-Wswitch-default}  # occurs in generated code

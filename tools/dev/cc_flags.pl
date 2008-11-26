@@ -17,7 +17,7 @@ tools/dev/cc_flags.pl - Process compiler flags
 This script is used in a F<Makefile> to process the flags to pass to the
 compiler for each C file.
 
-See F<config/gen/cflags/root.in> for the transformation file format.
+See F<config/gen/makefiles/CFLAGS.in> for the transformation file format.
 
 =head1 SEE ALSO
 
