@@ -39,7 +39,7 @@ sub cc_preprocess {
 
 sub gen_NCI_signatures {
   my ( $file, $more_args ) = @_;
-  return execit("make; $PARROT c99.pbc $more_args $file");
+  return execit("make; $PARROT ncigen.pbc $more_args $file");
 }
 
 sub execit {

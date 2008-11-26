@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib ('./lib', '../../lib');
-use Parrot::Test::C99AST;
+use Parrot::Test::NCIGENAST;
 
 plan tests => 1;
 ast(<<'CODE');
@@ -15,4 +15,4 @@ typedef struct SPITupleTable
 } SPITupleTable;
 CODE
 
-contains("<complex> => PMC 'c99AST;Struct'");
+contains("<complex> => PMC 'NCIGENAST;Struct'");

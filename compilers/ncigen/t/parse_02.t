@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use lib ('./lib', '../../lib');
-use Parrot::Test::C99AST;
+use Parrot::Test::NCIGENAST;
 
 plan tests => 2;
 

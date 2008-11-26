@@ -27,15 +27,15 @@ PCT           = $(BUILD_DIR)/runtime/parrot/library/PCT.pbc
 
 PMC_DIR       = src/pmc
 
-all: c99.pbc
+all: ncigen.pbc
 
 C_GROUP = $(PMC_DIR)/c_group$(LOAD_EXT)
 
-SOURCES = c99.pir \
+SOURCES = ncigen.pir \
   src/gen_grammar.pir \
   src/gen_actions.pir \
   src/gen_builtins.pir \
-  src/c99AST.pir \
+  src/NCIGENAST.pir \
   src/NCIPIR.pir \
 #  $(C_GROUP)
 
@@ -46,8 +46,8 @@ BUILTINS_PIR = \
 # PMC_SOURCES = $(PMC_DIR)/c.pmc
 
 # the default target
-c99.pbc: $(PARROT) $(SOURCES)
-	$(PARROT) $(PARROT_ARGS) -o c99.pbc c99.pir
+ncigen.pbc: $(PARROT) $(SOURCES)
+	$(PARROT) $(PARROT_ARGS) -o ncigen.pbc ncigen.pir
 
 src/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg
 	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
@@ -72,7 +72,7 @@ help:
 	@echo ""
 	@echo "Following targets are available for the user:"
 	@echo ""
-	@echo "  all:               c.pbc"
+	@echo "  all:               ncigen.pbc"
 	@echo "                     This is the default."
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
@@ -94,7 +94,7 @@ test: all
 testclean:
 
 CLEANUPS = \
-  c99.pbc \
+  ncigen.pbc \
   src/gen_grammar.pir \
   src/gen_actions.pir \
   src/gen_builtins.pir \

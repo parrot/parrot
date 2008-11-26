@@ -1,11 +1,14 @@
 #!/usr/bin/perl
 
 use lib ('./lib', '../../lib');
-use Parrot::Test::C99AST;
+use Parrot::Test::NCIGENAST;
 
 plan tests => 10;
 ast('extern void AtEOSubXact_SPI(bool isCommit, SubTransactionId mySubid);');
+SKIP: {
+skip("This feature is commented out");
 contains("Parent isCommit bool not defined");
+}
 
 ast('typedef void * void_pointer_type;');
 istypedef;

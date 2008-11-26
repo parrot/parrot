@@ -1,10 +1,10 @@
 =head1 NAME
 
-NCIPIR::Compiler - NCI PIR Compiler for c99AST trees.
+NCIPIR::Compiler - NCI PIR Compiler for NCIGENAST trees.
 
 =head1 DESCRIPTION
 
-NCIPIR::Compiler defines a compiler that converts a c99AST tree into PIR
+NCIPIR::Compiler defines a compiler that converts a NCIGENAST tree into PIR
 
 =head1 METHODS
 
@@ -41,9 +41,9 @@ NCIPIR::Compiler defines a compiler that converts a c99AST tree into PIR
     newself.'code'(code)
 
     ##  if the root node isn't a Sub, wrap it
-    $I0 = isa ast, ['c99AST';'Decls']
+    $I0 = isa ast, ['NCIGENAST';'Decls']
     if $I0 goto have_sub
-    $P0 = get_hll_global ['c99AST'], 'Decls'
+    $P0 = get_hll_global ['NCIGENAST'], 'Decls'
     ast = $P0.'new'(ast, 'name'=>'anon')
   have_sub:
 
@@ -172,7 +172,7 @@ Return pir for an operation node.
 
 =cut
 
-.sub 'pir' :method :multi(_,['c99AST';'FuncDecl'])
+.sub 'pir' :method :multi(_,['NCIGENAST';'FuncDecl'])
     .param pmc node
 
     ##  get list of arguments to operation
@@ -290,7 +290,7 @@ Generate a label.
 
 =cut
 
-.sub 'pir' :method :multi(_, ['c99AST';'TypeDef'])
+.sub 'pir' :method :multi(_, ['NCIGENAST';'TypeDef'])
     .param pmc node
     .return ('')
     .tailcall pir_dump(node)
@@ -302,7 +302,7 @@ Generate a label.
 
 =cut
 
-.sub 'pir' :method :multi(_, ['c99AST';'VarDecl'])
+.sub 'pir' :method :multi(_, ['NCIGENAST';'VarDecl'])
     .param pmc node
     .return ('')
     .tailcall pir_dump(node)

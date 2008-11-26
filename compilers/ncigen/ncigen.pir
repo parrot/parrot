@@ -3,15 +3,15 @@
 
 =head1 TITLE
 
-c99.pir - A C99 compiler.
+ncigen.pir - A NCI stub compiler.
 
 =head2 Description
 
-This is the base file for the C99 compiler.
+This is the base file for the NCI stub compiler.
 
 This file includes the parsing and grammar rules from
 the src/ directory, loads the relevant PGE libraries,
-and registers the compiler under the name 'C99'.
+and registers the compiler under the name 'NCIGEN'.
 
 =head2 Functions
 
@@ -24,18 +24,18 @@ object.
 
 =cut
 
-.namespace [ 'C99';'Compiler' ]
+.namespace [ 'NCIGEN';'Compiler' ]
 
-.loadlib 'c99_group'
+.loadlib 'ncigen_group'
 
 .sub 'onload' :anon :load :init
     load_bytecode 'PCT.pbc'
 
     $P0 = get_hll_global ['PCT'], 'HLLCompiler'
     $P1 = $P0.'new'()
-    $P1.'language'('C99')
+    $P1.'language'('NCIGEN')
     $P1.'parsegrammar'('C99::Grammar')
-    $P1.'parseactions'('C99::Grammar::Actions')
+    $P1.'parseactions'('NCIGEN::Grammar::Actions')
 .end
 
 =item main(args :slurpy)  :main
@@ -48,7 +48,7 @@ to the C compiler.
 .sub 'main' :main
     .param pmc args
 
-    $P0 = compreg 'C99'
+    $P0 = compreg 'NCIGEN'
     $P1 = split ' ', 'parse nci_ast gen_nci_pir'
     setattribute $P0, '@stages', $P1
     $P1 = split ' ', 'e=s help|h target=s trace|t=s encoding=s output|o=s combine version|v libname|l=s nsname|n=s raw|r'
@@ -87,13 +87,13 @@ USAGE
     .local pmc ast
     ast = source.'item'()
     pop_eh
-    $I0 = isa ast, ['c99AST';'Decls']
+    $I0 = isa ast, ['NCIGENAST';'Decls']
     unless $I0 goto err_past
     .return (ast)
 
   err_past:
     $S0 = typeof source
-    .tailcall self.'panic'('Unable to obtain c99AST from ', $S0)
+    .tailcall self.'panic'('Unable to obtain NCIGENAST from ', $S0)
 .end
 
 .sub 'gen_nci_pir' :method
@@ -107,7 +107,7 @@ USAGE
 .end
 
 
-.include 'src/c99AST.pir'
+.include 'src/NCIGENAST.pir'
 .include 'src/NCIPIR.pir'
 .include 'src/gen_builtins.pir'
 .include 'src/gen_grammar.pir'

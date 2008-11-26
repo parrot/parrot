@@ -1,52 +1,52 @@
 =head1 NAME
 
-c99AST - c99 abstract syntax tree
+NCIGENAST - NCIGEN abstract syntax tree
 
 =head1 DESCRIPTION
 
 This file implements the various abstract syntax tree nodes
-for compiling c99 programs.
+for doing syntax analysis on c99 programs.
 
 =cut
 
-.namespace [ 'c99AST';'Node' ]
+.namespace [ 'NCIGENAST';'Node' ]
 
 .sub 'onload' :anon :load :init
-    ##   create the c99AST::Node base class
+    ##   create the NCIGENAST::Node base class
     .local pmc p6meta, base, vardecl
     p6meta = new 'P6metaclass'
-    base = p6meta.'new_class'('c99AST::Node', 'parent'=>'PCT::Node')
+    base = p6meta.'new_class'('NCIGENAST::Node', 'parent'=>'PCT::Node')
 
-    vardecl = p6meta.'new_class'('c99AST::VarDecl', 'parent'=>base)
-    p6meta.'new_class'('c99AST::Decls',     'parent'=>base)
+    vardecl = p6meta.'new_class'('NCIGENAST::VarDecl', 'parent'=>base)
+    p6meta.'new_class'('NCIGENAST::Decls',     'parent'=>base)
 
-    p6meta.'new_class'('c99AST::TypeDef',   'parent'=>vardecl)
-    p6meta.'new_class'('c99AST::FuncDecl',  'parent'=>vardecl)
-    p6meta.'new_class'('c99AST::Param',     'parent'=>vardecl)
-    p6meta.'new_class'('c99AST::Struct',    'parent'=>vardecl)
-    p6meta.'new_class'('c99AST::Union',     'parent'=>vardecl)
+    p6meta.'new_class'('NCIGENAST::TypeDef',   'parent'=>vardecl)
+    p6meta.'new_class'('NCIGENAST::FuncDecl',  'parent'=>vardecl)
+    p6meta.'new_class'('NCIGENAST::Param',     'parent'=>vardecl)
+    p6meta.'new_class'('NCIGENAST::Struct',    'parent'=>vardecl)
+    p6meta.'new_class'('NCIGENAST::Union',     'parent'=>vardecl)
 
     .return ()
 .end
 
-=head1 c99AST Node types
+=head1 NCIGENAST Node types
 
-=head2 c99AST::Node
+=head2 NCIGENAST::Node
 
-C<c99AST::Node> is the base class for all c99AST nodes, and is
+C<NCIGENAST::Node> is the base class for all NCIGENAST nodes, and is
 derived from PCT::Node.  A node has an array component to
 hold its children, and a hash component for its attributes.
 However, we tend to use accessor methods for accessing the node's
 attributes instead of accessing the hash directly.
 
-Every c99AST node inherits C<name>, C<source>, and C<pos> attributes
+Every NCIGENAST node inherits C<name>, C<source>, and C<pos> attributes
 from C<PCT::Node>.  The C<name> attribute is the node's name, if
 any, while C<source> and C<pos> are used to identify the location
 in the original source code for the node.  The C<source> and C<pos>
 values are generally set by the C<node> method inherited from
 C<PCT::Node>.
 
-Other node attributes are generally defined by subclasses of C<c99AST::Node>.
+Other node attributes are generally defined by subclasses of C<NCIGENAST::Node>.
 
 =over 4
 
@@ -106,9 +106,9 @@ Accessor method -- sets/returns the "flatten" flag on arguments.
 
 =back
 
-=head2 c99AST::TypeDef
+=head2 NCIGENAST::TypeDef
 
-C<c99AST::Val> nodes represent constant values in the abstract
+C<NCIGENAST::Val> nodes represent constant values in the abstract
 syntax tree.  The C<name> attribute represents the value of the
 node.
 
@@ -120,7 +120,7 @@ Get/set the constant value for this node.
 
 =cut
 
-.namespace [ 'c99AST';'TypeDef' ]
+.namespace [ 'NCIGENAST';'TypeDef' ]
 
 .sub 'value' :method
     .param pmc value           :optional
@@ -130,9 +130,9 @@ Get/set the constant value for this node.
 
 =back
 
-=head2 c99AST::Var
+=head2 NCIGENAST::Var
 
-C<c99AST::Var> nodes represent variables within the abstract
+C<NCIGENAST::Var> nodes represent variables within the abstract
 syntax tree.  The variable name (if any) is given as the node's
 C<name> attribute.
 
@@ -140,14 +140,14 @@ C<name> attribute.
 
 =item scope([value])
 
-Get/set the c99AST::Var node's "scope" (i.e., how the variable
+Get/set the NCIGENAST::Var node's "scope" (i.e., how the variable
 is accessed or set).  Allowable values include "package", "lexical",
 "parameter", and "keyed", representing HLL global, lexical, block
 parameter, and array/hash variables respectively.
 
 =cut
 
-.namespace [ 'c99AST';'VarDecl' ]
+.namespace [ 'NCIGENAST';'VarDecl' ]
 
 .sub 'type' :method
     .param pmc value           :optional
@@ -263,7 +263,7 @@ passed in).
 
 If the variable needs to be instantiated, then C<type> indicates
 either the type of the value to create for the node or (future
-implementation) a c99AST tree to create the value.
+implementation) a NCIGENAST tree to create the value.
 
 =cut
 
@@ -291,9 +291,9 @@ attribute.
 
 =back
 
-=head2 c99AST::Op
+=head2 NCIGENAST::Op
 
-C<c99AST::Op> nodes represent the operations in an abstract syntax
+C<NCIGENAST::Op> nodes represent the operations in an abstract syntax
 tree.  The primary function of the node is given by its C<pasttype>,
 secondary functions may be given by the node's C<name>, C<pirop>,
 or other attributes.

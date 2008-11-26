@@ -1,7 +1,7 @@
 # $Id$
 # Copyright (C) 2006-2008, The Perl Foundation.
 
-package Parrot::Test::C99AST;
+package Parrot::Test::NCIGENAST;
 
 
 use strict;
@@ -79,7 +79,7 @@ sub like {
 }
 
 sub istypedef {
-  return like( qr/c99AST;TypeDef/, @_);
+  return like( qr/NCIGENAST;TypeDef/, @_);
 }
 sub ispointer {
   return like( qr/<pointer> => 1/, @_);
@@ -113,7 +113,7 @@ sub parse_success {
 }
 
 sub ncigenit {
-    my ( $self, $code, $c99args ) = @_;
+    my ( $self, $code, $ncigenargs ) = @_;
 
     my $count = $self->{builder}->current_test + 1;
     my $parrotdir       = dirname $self->{parrot};
@@ -125,7 +125,7 @@ sub ncigenit {
 
     my $args = $ENV{TEST_PROG_ARGS} || '';
 
-    my $cmd       = "$self->{parrot} $args $parrotdir/compilers/ncigen/c99.pbc $c99args $lang_f";
+    my $cmd       = "$self->{parrot} $args $parrotdir/compilers/ncigen/ncigen.pbc $ncigenargs $lang_f";
     my $exit_code = Parrot::Test::run_command(
             $cmd,
             CD     => $self->{relpath},
@@ -147,7 +147,7 @@ sub testit {
     my ( $self, $method, $code, $cmd, $output, $exit_code, $count, $expected, $desc ) = @_;
     #print "$cmd, $exit_code, $count, $expected, $desc \n";
 
-    $desc = "C99AST Test $count" unless $desc;
+    $desc = "NCIGENAST Test $count" unless $desc;
     my $pass = $self->{builder}->$method( $output, $expected, $desc );
     if ($exit_code or not $pass)  {
       $self->{builder}->diag("'$cmd' failed with exit code $exit_code") if $exit_code or not $pass;
