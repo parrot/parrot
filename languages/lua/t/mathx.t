@@ -22,7 +22,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 use Parrot::Config;
 use Test::More;
 use Parrot::Test::Lua;
@@ -32,6 +32,13 @@ require 'mathx'
 print(math.pi)
 CODE
 /^3\.14/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function log2' );
+require 'mathx'
+print(math.log2(47))
+CODE
+/^5\.554/
 OUTPUT
 
 
