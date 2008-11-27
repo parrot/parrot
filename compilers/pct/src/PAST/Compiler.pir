@@ -68,6 +68,7 @@ any value type.
     piropsig['concat']     = 'PP~'
     piropsig['div']        = 'PP+'
     piropsig['fdiv']       = 'PP+'
+    piropsig['getprop']    = 'P~P'
     piropsig['mod']        = 'PP+'
     piropsig['mul']        = 'PP+'
     piropsig['n_neg']      = 'PP'
