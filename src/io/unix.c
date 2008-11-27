@@ -650,44 +650,47 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
     /* Child - exec process */
     if (pid == 0) {
-        char *argv[10], *p, *c, *cmd;
-        int n;
+        char *argv[10], *p, *c, *cmd, *orig_cmd;
+        int   n;
 
         if (flags & PIO_F_WRITE) {
             /* the other end is writing - we read from the pipe */
             close(STDIN_FILENO);
             close(fds[1]);
-            if (Parrot_dup(fds[0]) != STDIN_FILENO) {
+
+            if (Parrot_dup(fds[0]) != STDIN_FILENO)
                 exit(EXIT_SUCCESS);
-            }
         }
         else {
             /* XXX redirect stdout, stderr to pipe */
             close(STDIN_FILENO);
             close(STDOUT_FILENO);
             close(STDERR_FILENO);
+
             if (Parrot_dup(fds[0]) != STDIN_FILENO
-             || Parrot_dup(fds[1]) != STDOUT_FILENO
-             || Parrot_dup(fds[1]) != STDERR_FILENO)
-            {
+            ||  Parrot_dup(fds[1]) != STDOUT_FILENO
+            ||  Parrot_dup(fds[1]) != STDERR_FILENO)
                 exit(EXIT_SUCCESS);
-            }
         }
-        /*
-         * XXX ugly hack to be able to pass some arguments
-         *     split cmd at blanks
-         */
-        cmd = string_to_cstring(interp, command);
-        c = strdup(cmd);
+
+        /* XXX ugly hack to be able to pass some arguments
+         *     split cmd at blanks */
+        orig_cmd = cmd = string_to_cstring(interp, command);
+        c        = strdup(cmd);
+
         for (n = 0, p = strtok(c, " "); n < 9 && p; p = strtok(NULL, " ")) {
             if (n == 0)
                 cmd = p;
             argv[n++] = p;
         }
+
         argv[n] = NULL;
+
         string_cstring_free(c); /* done with C string */
         execv(cmd, argv);       /* XXX use execvp ? */
+
         /* Will never reach this unless exec fails. */
+        string_cstring_free(orig_cmd);
         perror("execvp");
         exit(EXIT_FAILURE);
     }
