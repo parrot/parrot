@@ -213,7 +213,7 @@ by PHC from PHP source code. It generates an XML representation of a PAST data s
 </xsl:template>
 
 <xsl:template match="phc:Token_null" >
-  <past:Val returns="PhpUndef" >
+  <past:Val returns="PhpNull" >
     <xsl:attribute name="value" >0</xsl:attribute>
   </past:Val>
 </xsl:template>

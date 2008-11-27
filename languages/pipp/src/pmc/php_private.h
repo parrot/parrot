@@ -13,7 +13,7 @@ extern INTVAL dynpmc_PhpBoolean;
 extern INTVAL dynpmc_PhpFloat;
 extern INTVAL dynpmc_PhpInteger;
 extern INTVAL dynpmc_PhpString;
-extern INTVAL dynpmc_PhpUndef;
+extern INTVAL dynpmc_PhpNull;
 
 #endif /* PARROT_PHP_PRIVATE_H_GUARD */
 

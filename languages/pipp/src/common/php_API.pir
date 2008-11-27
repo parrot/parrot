@@ -208,7 +208,7 @@ STILL INCOMPLETE (see parse_arg_impl).
     unless c == 'l' goto not_long
     $I0 = isa arg, 'PhpInteger'
     if $I0 goto L5
-    $I0 = isa arg, 'PhpUndef'
+    $I0 = isa arg, 'PhpNull'
     if $I0 goto L11
     $I0 = isa arg, 'PhpFloat'
     if $I0 goto L11
@@ -235,7 +235,7 @@ STILL INCOMPLETE (see parse_arg_impl).
     unless c == 'd' goto not_double
     $I0 = isa arg, 'PhpFloat'
     if $I0 goto L5
-    $I0 = isa arg, 'PhpUndef'
+    $I0 = isa arg, 'PhpNull'
     if $I0 goto L21
     $I0 = isa arg, 'PhpInteger'
     if $I0 goto L21
@@ -263,7 +263,7 @@ STILL INCOMPLETE (see parse_arg_impl).
 #    $I0 = isa arg, 'PhpString'
     $I0 = isa arg, 'String'
     if $I0 goto L5
-    $I0 = isa arg, 'PhpUndef'
+    $I0 = isa arg, 'PhpNull'
     if $I0 goto L31
     $I0 = isa arg, 'PhpFloat'
     if $I0 goto L31
@@ -285,7 +285,7 @@ STILL INCOMPLETE (see parse_arg_impl).
     unless c == 'b' goto not_boolean
     $I0 = isa arg, 'PhpBoolean'
     if $I0 goto L5
-    $I0 = isa arg, 'PhpUndef'
+    $I0 = isa arg, 'PhpNull'
     if $I0 goto L41
     $I0 = isa arg, 'PhpFloat'
     if $I0 goto L41
@@ -305,7 +305,7 @@ STILL INCOMPLETE (see parse_arg_impl).
     unless c == 'r' goto not_resource
     $I0 = isa arg, 'PhpResource'
     if $I0 goto L5
-    $I0 = isa arg, 'PhpUndef'
+    $I0 = isa arg, 'PhpNull'
     unless $I0 goto L51
     unless return_null goto L51
     goto L5
@@ -315,7 +315,7 @@ STILL INCOMPLETE (see parse_arg_impl).
     unless c == 'a' goto not_array
     $I0 = isa arg, 'PhpArray'
     if $I0 goto L5
-    $I0 = isa arg, 'PhpUndef'
+    $I0 = isa arg, 'PhpNull'
     unless $I0 goto L61
     unless return_null goto L61
     goto L5
@@ -325,7 +325,7 @@ STILL INCOMPLETE (see parse_arg_impl).
     unless c == 'h' goto not_hash
     $I0 = isa arg, 'PhpArray'
     if $I0 goto L5
-    $I0 = isa arg, 'PhpUndef'
+    $I0 = isa arg, 'PhpNull'
     unless $I0 goto L71
     unless return_null goto L71
     goto L5

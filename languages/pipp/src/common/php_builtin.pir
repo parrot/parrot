@@ -103,7 +103,7 @@ STILL INCOMPLETE.
     if $I0 goto L4
     $I0 = isa $P2, 'PhpResource'
     if $I0 goto L4
-    $I0 = isa $P2, 'PhpUndef'
+    $I0 = isa $P2, 'PhpNull'
     if $I0 goto L4
     $I0 = isa $P2, 'PhpObject'
     unless $I0 goto L5

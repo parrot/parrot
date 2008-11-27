@@ -147,7 +147,7 @@ Returns true if variable is null
 
 .sub 'is_null'
     .param pmc args :slurpy
-    .IS_TYPE('PhpUndef', args)
+    .IS_TYPE('PhpNull', args)
 .end
 
 =item C<bool is_numeric(mixed value)>

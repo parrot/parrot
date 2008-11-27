@@ -106,7 +106,7 @@ php_MACRO.pir - PHP API macros
 =cut
 
 .macro RETURN_NULL()
-    new $P0, 'PhpUndef'
+    new $P0, 'PhpNull'
     .return ($P0)
 .endm
 

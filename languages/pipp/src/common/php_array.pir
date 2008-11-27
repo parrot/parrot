@@ -678,7 +678,7 @@ STILL INCOMPLETE.
     if $I0 goto L1
     .RETURN_NULL()
   L1:
-    $I0 = isa array, 'PhpUndef'
+    $I0 = isa array, 'PhpNull'
     unless $I0 goto L2
     .RETURN_LONG(0)
   L2:

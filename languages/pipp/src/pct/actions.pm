@@ -372,7 +372,7 @@ method FALSE($/) {
 method NULL($/) {
     make PAST::Val.new(
              :value( 0 ),
-             :returns('PhpUndef'),
+             :returns('PhpNull'),
              :node($/)
          );
 }

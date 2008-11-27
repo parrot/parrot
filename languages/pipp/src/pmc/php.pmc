@@ -25,7 +25,7 @@ INTVAL dynpmc_PhpBoolean;
 INTVAL dynpmc_PhpFloat;
 INTVAL dynpmc_PhpInteger;
 INTVAL dynpmc_PhpString;
-INTVAL dynpmc_PhpUndef;
+INTVAL dynpmc_PhpNull;
 
 static PMC * Php_PMC;
 
@@ -52,8 +52,8 @@ pmclass Php
               const_string(INTERP, "PhpInteger"));
             dynpmc_PhpString = pmc_type(INTERP,
               const_string(INTERP, "PhpString"));
-            dynpmc_PhpUndef = pmc_type(INTERP,
-              const_string(INTERP, "PhpUndef"));
+            dynpmc_PhpNull = pmc_type(INTERP,
+              const_string(INTERP, "PhpNull"));
         }
     }
 

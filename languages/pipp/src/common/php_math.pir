@@ -664,7 +664,7 @@ Formats a number with grouped thousands
     $P2 = shift args
     $I2 = $P2
     $P3 = shift args
-    $I0 = isa $P3, 'PhpUndef'
+    $I0 = isa $P3, 'PhpNull'
     if $I0 goto L4
     dec_point = $P3
     $I3 = length dec_point
@@ -672,7 +672,7 @@ Formats a number with grouped thousands
     dec_point =substr dec_point, 0, 1
   L4:
     $P4 = shift args
-    $I0 = isa $P4, 'PhpUndef'
+    $I0 = isa $P4, 'PhpNull'
     if $I0 goto L5
     thousand_sep = $P4
     $I4 = length thousand_sep

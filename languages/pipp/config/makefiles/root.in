@@ -36,7 +36,7 @@ PMCS = \
  phpinteger \
  phpresource \
  phpstring \
- phpundef
+ phpnull
 
 PMC_SOURCES = \
  $(PMCDIR)/php.pmc \
@@ -46,7 +46,7 @@ PMC_SOURCES = \
  $(PMCDIR)/phpinteger.pmc \
  $(PMCDIR)/phpresource.pmc \
  $(PMCDIR)/phpstring.pmc \
- $(PMCDIR)/phpundef.pmc
+ $(PMCDIR)/phpnull.pmc
 
 HASH_SOURCES = $(HASHDIR)/pipp_hash.c
 

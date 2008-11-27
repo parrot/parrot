@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/pmc/phpundef.pmc - PHP Undef
+src/pmc/phpnull.pmc - PHP Null
 
 =head1 DESCRIPTION
 
@@ -18,7 +18,7 @@ src/pmc/phpundef.pmc - PHP Undef
 
 #include "php_private.h"
 
-pmclass PhpUndef
+pmclass PhpNull
     extends  Undef
     dynpmc
     group    php_group

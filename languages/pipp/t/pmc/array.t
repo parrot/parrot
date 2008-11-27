@@ -4,11 +4,11 @@
 
 =head1 NAME
 
-languages/pipp/t/pmc/array.t - test the PhpArray PMC
+t/pmc/array.t - test the PhpArray PMC
 
 =head1 SYNOPSIS
 
-% prove languages/pipp/t/pmc/array.t
+    perl t/harness t/pmc/array.t
 
 =head1 DESCRIPTION
 
