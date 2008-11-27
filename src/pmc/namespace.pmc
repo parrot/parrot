@@ -255,15 +255,18 @@ really a public API.
               add_to_class(INTERP, nsinfo, classobj, key, value);
         }
 
-        /* If it's a multi-sub... */
-        if (!PMC_IS_NULL(value) && VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "MultiSub"))) {
+        /* If it's a multi-sub and the first in this NS... */
+        if (!PMC_IS_NULL(value)
+        &&  !old
+        &&   VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "MultiSub"))) {
 
             if (VTABLE_elements(interp, value) > 0) {
                 Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
                 PMC * const classobj = VTABLE_get_class(interp, SELF);
 
                 /* Extract the first alternate and check if it is a method */
-                Parrot_sub * const sub = PMC_sub(VTABLE_get_pmc_keyed_int(interp, value, 0));
+                PMC *pmc_sub = VTABLE_get_pmc_keyed_int(interp, value, 0);
+                Parrot_sub * const sub = PMC_sub(pmc_sub);
 
                 if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
                     add_to_class(INTERP, nsinfo, classobj, key, value);
