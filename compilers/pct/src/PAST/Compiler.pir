@@ -481,7 +481,7 @@ generating a constant or an appropriate register setting.
     $S0 = options['rtype']
     .tailcall self.'coerce'($P0, $S0)
 .end
-    
+
 .sub 'as_post' :method :multi(_, Float)
     .param pmc node
     .param pmc options         :slurpy :named
@@ -490,7 +490,7 @@ generating a constant or an appropriate register setting.
     $S0 = options['rtype']
     .tailcall self.'coerce'($P0, $S0)
 .end
-    
+
 .sub 'as_post' :method :multi(_, String)
     .param pmc node
     .param pmc options         :slurpy :named
