@@ -1943,25 +1943,27 @@ mmd_cache_key_from_values(PARROT_INTERP, const char *name, PMC *values)
 {
     /* Build array of type IDs, which we'll then use as a string to key into
      * the hash. */
-    INTVAL i;
-    INTVAL num_values = VTABLE_elements(interp, values);
-    INTVAL name_len   = name ? strlen(name) + 1: 0;
-    INTVAL *type_ids  = (INTVAL *)mem_sys_allocate(num_values
-                            * sizeof (INTVAL) + name_len);
+    INTVAL  num_values = VTABLE_elements(interp, values);
+    INTVAL  name_len   = name ? strlen(name) + 1: 0;
+    size_t  id_size    = num_values * sizeof (INTVAL) + name_len;
+    INTVAL *type_ids   = (INTVAL *)mem_sys_allocate(id_size);
     STRING *key;
+    INTVAL  i;
 
     for (i = 0; i < num_values; i++) {
         INTVAL id = VTABLE_type(interp, VTABLE_get_pmc_keyed_int(interp, values, i));
-        if (id == 0)
+        if (id == 0) {
+            mem_sys_free(type_ids);
             return NULL;
+        }
+
         type_ids[i] = id;
     }
 
     if (name)
         strcpy((char *)(type_ids + num_values), name);
 
-    key = string_from_cstring(interp, (char *)type_ids,
-                             num_values * sizeof (INTVAL) + name_len);
+    key = string_from_cstring(interp, (char *)type_ids, id_size);
     mem_sys_free(type_ids);
 
     return key;
@@ -2032,21 +2034,26 @@ mmd_cache_key_from_types(PARROT_INTERP, const char *name, PMC *types)
     STRING *key;
     INTVAL  num_types = VTABLE_elements(interp, types);
     INTVAL  name_len  = name ? strlen(name) + 1: 0;
-    INTVAL *type_ids  = (INTVAL *)mem_sys_allocate(num_types
-                                                   * sizeof (INTVAL) + name_len);
+    size_t  id_size   = num_types * sizeof (INTVAL) + name_len;
+    INTVAL *type_ids  = (INTVAL *)mem_sys_allocate(id_size);
     INTVAL  i;
 
     for (i = 0; i < num_types; i++) {
-        INTVAL id   = VTABLE_get_integer_keyed_int(interp, types, i);
+        INTVAL id = VTABLE_get_integer_keyed_int(interp, types, i);
 
-        if (id == 0)
+        if (id == 0) {
+            mem_sys_free(type_ids);
             return NULL;
+        }
 
         type_ids[i] = id;
     }
+
     if (name)
-        strcpy((char*)(type_ids + num_types), name);
-    key = string_from_cstring(interp, (char*)type_ids, num_types * sizeof (INTVAL) + name_len);
+        strcpy((char *)(type_ids + num_types), name);
+
+    key = string_from_cstring(interp, (char *)type_ids, id_size);
+
     mem_sys_free(type_ids);
     return key;
 }
