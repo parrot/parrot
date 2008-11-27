@@ -1,5 +1,8 @@
 <?php
 
+# Copyright (C) 2008, The Perl Foundation.
+# $Id$
+
 require_once 'Test.php';
 
 plan( 4 );
