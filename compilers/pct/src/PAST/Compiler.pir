@@ -56,6 +56,7 @@ any value type.
     piropsig = new 'Hash'
     piropsig['isa']        = 'IP~'
     piropsig['isfalse']    = 'IP'
+    piropsig['isnull']     = 'IP'
     piropsig['issame']     = 'IPP'
     piropsig['istrue']     = 'IP'
     piropsig['newclosure'] = 'PP'
@@ -77,7 +78,7 @@ any value type.
     piropsig['pow']        = 'NN+'
     piropsig['print']      = 'v*'
     piropsig['set']        = 'PP'
-    piropsig['isnull']     = 'IP'
+    piropsig['setprop']    = 'vP~P'
     set_global '%piropsig', piropsig
 
     ##  %valflags specifies when PAST::Val nodes are allowed to
@@ -368,6 +369,8 @@ third and subsequent children can be any value they wish.
     cpost = self.'as_post'(cpast, 'rtype'=>rtype)
     cpost = self.'coerce'(cpost, rtype)
     ops.'push'(cpost)
+    $I0 = isa cpast, ['PAST';'Node']
+    unless $I0 goto cpost_pos
     .local pmc isflat
     isflat = cpast.'flat'()
     if rtype != ':' goto iter_pos
@@ -390,6 +393,7 @@ third and subsequent children can be any value they wish.
     goto iter_rtype
   iter_pos:
     if isflat goto flat_pos
+  cpost_pos:
     push posargs, cpost
     goto iter_rtype
   flat_pos:
@@ -456,7 +460,49 @@ Return an empty POST node that can be used to hold a (PMC) result.
     .tailcall $P0.'new'('result'=>result)
 .end
 
-=item as_post(String class)
+
+=item as_post(Integer)
+
+=item as_post(Float)
+
+=item as_post(String)
+
+Handle Integer, Float, and String nodes in the PAST tree, by
+generating a constant or an appropriate register setting.
+
+=cut
+
+.sub 'as_post' :method :multi(_, Integer)
+    .param pmc node
+    .param pmc options         :slurpy :named
+    $P0 = get_hll_global ['POST'], 'Ops'
+    $P0 = $P0.'new'( 'result'=>node )
+    $S0 = options['rtype']
+    .tailcall self.'coerce'($P0, $S0)
+.end
+    
+.sub 'as_post' :method :multi(_, Float)
+    .param pmc node
+    .param pmc options         :slurpy :named
+    $P0 = get_hll_global ['POST'], 'Ops'
+    $P0 = $P0.'new'( 'result'=>node )
+    $S0 = options['rtype']
+    .tailcall self.'coerce'($P0, $S0)
+.end
+    
+.sub 'as_post' :method :multi(_, String)
+    .param pmc node
+    .param pmc options         :slurpy :named
+    .local string value
+    value = self.'escape'(node)
+    $P0 = get_hll_global ['POST'], 'Ops'
+    $P0 = $P0.'new'( 'result'=>value )
+    $S0 = options['rtype']
+    .tailcall self.'coerce'($P0, $S0)
+.end
+
+
+=item as_vivipost(String class)
 
 Generate POST to create a new object of type C<class>.  This
 is typically invoked by the various vivification methods below
@@ -464,7 +510,7 @@ is typically invoked by the various vivification methods below
 
 =cut
 
-.sub 'as_post' :method :multi(_, String)
+.sub 'as_vivipost' :method :multi(_, String)
     .param pmc node
     .param pmc options         :slurpy :named
 
@@ -473,6 +519,16 @@ is typically invoked by the various vivification methods below
     result = self.'uniquereg'('P')
     $S0 = self.'escape'(node)
     .tailcall $P0.'new'(result, $S0, 'pirop'=>'new', 'result'=>result)
+.end
+
+=item as_vivipost(PAST::Node node)
+
+=cut
+
+.sub 'as_vivipost' :method :multi(_, _)
+    .param pmc node
+    .param pmc options         :slurpy :named
+    .tailcall self.'as_post'(node, options :flat :named)
 .end
 
 =item as_post(PAST::Node node)
@@ -1261,7 +1317,7 @@ to C<ResizablePMCArray> if not set.
   have_returns:
 
     .local pmc listpost, iter
-    listpost = self.'as_post'(returns, 'rtype'=>'P')
+    listpost = self.'as_vivipost'(returns, 'rtype'=>'P')
     ops.'result'(listpost)
     ops.'push'(listpost)
     iter = new 'Iterator', posargs
@@ -1698,7 +1754,7 @@ attribute.
 
     .local pmc viviself, vivipost, vivilabel
     viviself = node.'viviself'()
-    vivipost = self.'as_post'(viviself, 'rtype'=>'P')
+    vivipost = self.'as_vivipost'(viviself, 'rtype'=>'P')
     ops.'result'(vivipost)
     ops.'push'(fetchop)
     unless viviself goto vivipost_done
@@ -1740,7 +1796,7 @@ attribute.
     .local pmc viviself, vivipost, vivilabel
     viviself = node.'viviself'()
     unless viviself goto param_required
-    vivipost = self.'as_post'(viviself, 'rtype'=>'P')
+    vivipost = self.'as_vivipost'(viviself, 'rtype'=>'P')
     $P0 = get_hll_global ['POST'], 'Label'
     vivilabel = $P0.'new'('name'=>'optparam_')
     subpost.'add_param'(pname, 'named'=>named, 'optional'=>1)
@@ -1834,7 +1890,7 @@ attribute.
     ops = $P0.'new'('node'=>node)
     .local pmc viviself, vivipost
     viviself = node.'viviself'()
-    vivipost = self.'as_post'(viviself, 'rtype'=>'P')
+    vivipost = self.'as_vivipost'(viviself, 'rtype'=>'P')
     ops.'push'(vivipost)
     ops.'push_pirop'('.lex', name, vivipost)
     ops.'result'(vivipost)
@@ -1985,7 +2041,7 @@ attribute.
     .local pmc viviself, vivipost
     viviself = node.'viviself'()
     unless viviself goto end
-    vivipost = self.'as_post'(viviself, 'rtype'=>'P')
+    vivipost = self.'as_vivipost'(viviself, 'rtype'=>'P')
     ops.'push'(vivipost)
     ops.'push_pirop'('set', ops, vivipost)
     goto end
