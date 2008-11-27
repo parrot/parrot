@@ -84,9 +84,7 @@ The code originates from Rakudo's eval.pir.
     unless inc_it goto inc_end
     .local string basename, realfilename
     $S0 = shift inc_it
-    # for some reason 0 is shifted for inc_it
-    #basename = concat $S0, '/'
-    basename = concat '.', '/'
+    basename = concat $S0, '/'
     basename .= name
     if ismodule goto try_module
     realfilename = basename

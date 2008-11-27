@@ -394,13 +394,10 @@ NO_REST:
     included_files = new 'PhpArray'
     set_hll_global '$INC', included_files
 
-    .local pmc include_path, include_dir
-    include_path = new 'PhpArray'
-    include_dir = new 'PhpString'
-    include_dir = '.'
-    push include_path, include_dir
-    set_hll_global '$INCLUDE_PATH', include_path
-
+    .local string default_include_path
+    default_include_path = constant('DEFAULT_INCLUDE_PATH')
+    $P0 = split ':', default_include_path
+    set_hll_global '$INCLUDE_PATH', $P0
 
 .end
 

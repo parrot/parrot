@@ -131,6 +131,7 @@ Check whether a constant exists
 
 .sub 'defined'
     .param pmc args :slurpy
+
     .local int argc
     argc = args
     unless argc != 1 goto L1
@@ -143,6 +144,34 @@ Check whether a constant exists
     .GET_CONSTANTS(cst)
     $I0 = exists cst[$S1]
     .RETURN_BOOL($I0)
+.end
+
+
+=item C<mixed constant(string const_name)>
+
+Given the name of a constant this function will return the constants associated value
+
+=cut
+
+.sub 'constant'
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $S1 = $P1
+    .local pmc cst
+    .GET_CONSTANTS(cst)
+    $I0 = exists cst[$S1]
+    unless $I0 goto L2
+    $P0 = cst[$S1]
+    .return ($P0)
+  L2:
+    error(E_WARNING, "Couldn't find constant ", $S1)
+    .RETURN_NULL()
 .end
 
 =item C<array each(array arr)>
@@ -392,6 +421,7 @@ Get the resource type name for a given resource
 
 .sub 'get_resource_type'
     .param pmc args :slurpy
+
     .local int argc
     argc = args
     unless argc != 1 goto L1
@@ -549,6 +579,7 @@ Binary safe string comparison
 
 .sub 'strcmp'
     .param pmc args :slurpy
+
     .local int argc
     argc = args
     unless argc != 2 goto L1
@@ -571,6 +602,7 @@ Get string length
 
 .sub 'strlen'
     .param pmc args :slurpy
+
     .local int argc
     argc = args
     unless argc != 1 goto L1

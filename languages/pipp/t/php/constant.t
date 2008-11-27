@@ -23,7 +23,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test   tests => 21;
+use Parrot::Test   tests => 22;
 use Parrot::Config qw( %PConfig );
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'define() and constant(), string' );
@@ -185,6 +185,10 @@ language_output_is( 'Pipp', <<'CODE', '5', 'PHP_MAJOR_VERSION' );
 echo PHP_MAJOR_VERSION;
 CODE
 
+language_output_is( 'Pipp', <<'CODE', '.', 'DEFAULT_INCLUDE_PATH' );
+<?php
+echo DEFAULT_INCLUDE_PATH;
+CODE
 
 # Local Variables:
 #   mode: cperl

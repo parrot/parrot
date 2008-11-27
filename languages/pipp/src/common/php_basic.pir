@@ -85,33 +85,6 @@ NOT IMPLEMENTED.
     not_implemented()
 .end
 
-=item C<mixed constant(string const_name)>
-
-Given the name of a constant this function will return the constants associated value
-
-=cut
-
-.sub 'constant'
-    .param pmc args :slurpy
-    .local int argc
-    argc = args
-    unless argc != 1 goto L1
-    wrong_param_count()
-    .RETURN_NULL()
-  L1:
-    $P1 = shift args
-    $S1 = $P1
-    .local pmc cst
-    .GET_CONSTANTS(cst)
-    $I0 = exists cst[$S1]
-    unless $I0 goto L2
-    $P0 = cst[$S1]
-    .return ($P0)
-  L2:
-    error(E_WARNING, "Couldn't find constant ", $S1)
-    .RETURN_NULL()
-.end
-
 =item C<array error_get_last()>
 
 Get the last occurred error as associative array. Returns NULL if there hasn't been an error yet.
@@ -218,6 +191,7 @@ STILL INCOMPLETE.
 
 .sub 'getenv'
     .param pmc args :slurpy
+
     .local string varname
     ($I0, varname) = parse_parameters('s', args :flat)
     if $I0 goto L1
@@ -597,6 +571,7 @@ Delay for a given number of seconds
 
 .sub 'sleep'
     .param pmc args :slurpy
+
     .local int seconds
     ($I0, seconds) = parse_parameters('l', args :flat)
     if $I0 goto L1
