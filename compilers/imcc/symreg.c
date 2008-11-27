@@ -853,9 +853,11 @@ _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int un
         _store_symreg(hsh, r);
     }
     else {
-        char *sub_name = (uniq == U_add_uniq_sub)
+        /* Aux var to avoid the need of const casts */
+        char *aux_name = NULL;
+        const char * const sub_name = (uniq == U_add_uniq_sub)
                        /* remember to free this name; add_ns malloc()s it */
-                       ? add_ns(interp, name)
+                       ? (aux_name= add_ns(interp, name))
                        : name;
 
         r = _get_sym(hsh, sub_name);
@@ -866,7 +868,7 @@ _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int un
                 IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                     "Label '%s' already defined\n", sub_name);
             else if (uniq == U_add_uniq_sub) {
-                mem_sys_free(sub_name);
+                mem_sys_free(aux_name);
                 IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                         "Subroutine '%s' already defined\n", name);
             }
@@ -878,7 +880,7 @@ _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int un
         if (uniq) {
             r->lhs_use_count++;
             if (uniq == U_add_uniq_sub)
-                mem_sys_free(sub_name);
+                mem_sys_free(aux_name);
         }
     }
 
