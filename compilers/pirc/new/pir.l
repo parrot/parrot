@@ -304,6 +304,7 @@ REGISTER       "$"[SNIP]{DIGITS}
 "pmc"             { return TK_PMC; }
 "string"          { return TK_STRING; }
 
+".annotate"       { return TK_ANNOTATE; }
 ".set_arg"        { return TK_SET_ARG; }
 ".const"          { return TK_CONST; }
 ".end"            { return TK_END; }
@@ -753,6 +754,11 @@ REGISTER       "$"[SNIP]{DIGITS}
                                   char *unquoted = (char *)mem_sys_allocate_zeroed(
                                                                         (len - 1) * sizeof (char));
                                   /* remove the quotes */
+                                  if (param->body[0] != '"')
+                                      yypirerror(yyscanner, lexer,
+                                         "value of macro argument '%s' must be a quoted string",
+                                         yytext);
+
                                   strncpy(unquoted, param->body + 1, len - 2);
                                   yylval->sval = munge_id(unquoted, lexer);
 
@@ -854,10 +860,12 @@ REGISTER       "$"[SNIP]{DIGITS}
                                  unsigned len   = strlen(param->body);
                                  char *unquoted = (char *)mem_sys_allocate_zeroed(
                                                                        (len - 1) * sizeof (char));
-                                 /* unquote the string; which reminds me: XXX we need to make
-                                  * sure that macro arguments used as label or local ids are
-                                  * in fact quoted strings.
-                                  */
+                                 /* unquote the string */
+                                 if (param->body[0] != '"')
+                                     yypirerror(yyscanner, lexer,
+                                         "value of macro argument '%s' must be a quoted string",
+                                         yytext);
+
                                  strncpy(unquoted, param->body + 1, len - 2);
                                  yylval->sval = munge_id(unquoted, lexer);
                                  mem_sys_free(unquoted);
@@ -949,8 +957,7 @@ REGISTER       "$"[SNIP]{DIGITS}
                           macro_def   * const macro = find_macro(lexer->macros, yytext + 1);
 
                           if (macro == NULL) { /* it's not a macro */
-                              yypirerror(yyscanner, lexer, "cannot find macro '%s'",
-                                         yytext + 1);
+                              yypirerror(yyscanner, lexer, "cannot find macro '%s'", yytext + 1);
                           }
                           else { /* it's a macro */
                               /* store current buffer at this point, because we'll be

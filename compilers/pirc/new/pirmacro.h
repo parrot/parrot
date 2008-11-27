@@ -106,6 +106,8 @@ void declare_macro_local(macro_def * const macro, char const * const name);
 
 int is_macro_local(macro_def * const macro, char const * const name);
 
+void delete_macro_table(macro_table * table);
+
 #endif /* PARROT_PIR_PIRMACRO_H_GUARD */
 
 

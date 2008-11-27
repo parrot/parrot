@@ -438,7 +438,7 @@ yypirerror(yyscan_t yyscanner, NOTNULL(lexer_state * const lexer),
     char const * const current_token = yypirget_text(yyscanner);
     va_list arg_ptr;
 
-    fprintf(stderr, "\nError in file '%s' (line %d)\n\n", lexer->filename,
+    fprintf(stderr, "\nError in file '%s' (line %d)\n\t", lexer->filename,
             yypirget_lineno(yyscanner));
 
     va_start(arg_ptr, message);
@@ -449,7 +449,7 @@ yypirerror(yyscan_t yyscanner, NOTNULL(lexer_state * const lexer),
 
     /* print current token if it doesn't contain a newline token. */
     if (!strstr(current_token, "\n"))
-        fprintf(stderr, "\ncurrent token: '%s'", current_token);
+        fprintf(stderr, "\n\tcurrent token: '%s'", current_token);
 
     fprintf(stderr, "\n\n");
 

@@ -284,6 +284,7 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
        TK_GET_RESULT        ".get_result"
        TK_NCI_CALL          ".nci_call"
        TK_TAILCALL          ".tailcall"
+       TK_ANNOTATE          ".annotate"
 
 %token <sval> TK_NL         "\n"
 
@@ -566,6 +567,7 @@ pir_chunk         : sub_def
                   | hll_mapping
                   | loadlib
                   | location_directive
+                  | annotation
                   | macro_definition
                   ;
 
@@ -644,6 +646,9 @@ location_directive: ".line" TK_INTC
                         { yypirset_lineno ($2, yyscanner); }
                   | ".file" TK_STRINGC
                         { lexer->filename = $2; }
+                  ;
+
+annotation        : ".annotate" TK_STRINGC ',' TK_STRINGC
                   ;
 
 /* HLL stuff      */
