@@ -10,7 +10,7 @@ This file implements match objects returned by the Parrot Grammar Engine.
 
 .namespace [ 'PGE';'Match' ]
 
-.sub '__onload' :load
+.sub '' :load
     load_bytecode 'P6object.pbc'
     load_bytecode 'Parrot/Capture_PIR.pbc'
     load_bytecode 'PGE/Dumper.pir'                 # FIXME, XXX, etc.
@@ -327,7 +327,7 @@ the position of the match object to C<cutvalue>.
 .end
 
 
-=item C<__get_bool()>
+=item C<get_bool()>
 
 Returns 1 if this object successfully matched the target string,
 0 otherwise.
@@ -341,7 +341,7 @@ Returns 1 if this object successfully matched the target string,
     .return ($I1)
 .end
 
-=item C<__get_integer()>
+=item C<get_integer()>
 
 Returns the integer value of this match.
 
@@ -352,7 +352,7 @@ Returns the integer value of this match.
     .return ($I0)
 .end
 
-=item C<__get_number()>
+=item C<get_number()>
 
 Returns the numeric value of this match.
 
@@ -363,7 +363,7 @@ Returns the numeric value of this match.
     .return ($N0)
 .end
 
-=item C<__get_string()>
+=item C<get_string()>
 
 Returns the portion of the target string matched by this object.
 
