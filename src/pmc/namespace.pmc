@@ -33,7 +33,8 @@ static void add_to_class(
         Parrot_NameSpace_attributes * const nsinfo,
         PMC * const classobj,
         STRING *key,
-        PMC *value) {
+        PMC *value)
+{
     /* Insert it in class, if there is a class */
     if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
         VTABLE_add_method(interp, classobj, key, value);
@@ -48,6 +49,52 @@ static void add_to_class(
         /* Insert it. */
         VTABLE_set_pmc_keyed_str(interp, nsinfo->methods, key, value);
     }
+}
+
+static int
+ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING *key, PMC *value)
+{
+    Parrot_NameSpace_attributes * const nsinfo   = PARROT_NAMESPACE(self);
+    PMC              *       vtable   = nsinfo->vtable;
+    Parrot_sub       * const sub      = PMC_sub(value);
+    PMC              * const classobj = VTABLE_get_class(interp, self);
+
+    /* Handle vtable methods with two underscores at the start. */
+    if (sub->vtable_index == -1) {
+        if (string_str_index(interp, key,
+            CONST_STRING(interp, "__"), 0) == 0) {
+            STRING * const meth_name = string_substr(interp, key, 2,
+                (INTVAL)(string_length(interp, key) - 2), NULL, 0);
+            sub->vtable_index        =
+                Parrot_get_vtable_index(interp, meth_name);
+        }
+    }
+
+    if (sub->vtable_index != -1) {
+        /* Insert it in class, if there is a class */
+        if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
+            VTABLE_add_vtable_override(interp, classobj, key, value);
+
+        /* Otherwise, store it in the namespace for the class to
+         * retrieve later */
+        else {
+            /* If we don't have a place to hang vtable methods, make one. */
+            if (PMC_IS_NULL(vtable))
+                nsinfo->vtable = vtable = pmc_new(interp, enum_class_Hash);
+
+            /* Insert it. */
+            VTABLE_set_pmc_keyed_int(interp, vtable, sub->vtable_index, value);
+        }
+    }
+
+    if (sub->comp_flags & SUB_COMP_FLAG_METHOD)
+        add_to_class(interp, nsinfo, classobj, key, value);
+
+    /* If it's anonymous, we're done. */
+    if (PObj_get_FLAGS(value) & SUB_FLAG_PF_ANON)
+        return 1;
+
+    return 0;
 }
 
 /*
@@ -191,47 +238,11 @@ really a public API.
 
         /* If it's a sub... */
         if (!PMC_IS_NULL(value) && VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Sub"))) {
-            Parrot_NameSpace_attributes * const nsinfo   = PARROT_NAMESPACE(SELF);
-            PMC              *       vtable   = nsinfo->vtable;
-            Parrot_sub       * const sub      = PMC_sub(value);
-            PMC              * const classobj = VTABLE_get_class(interp, SELF);
-
-            /* Handle vtable methods with two underscores at the start. */
-            if (sub->vtable_index == -1) {
-                if (string_str_index(interp, key,
-                    CONST_STRING(interp, "__"), 0) == 0) {
-                    STRING * const meth_name = string_substr(interp, key, 2,
-                        (INTVAL)(string_length(interp, key) - 2), NULL, 0);
-                    sub->vtable_index        =
-                        Parrot_get_vtable_index(interp, meth_name);
-                }
-            }
-
-            if (sub->vtable_index != -1) {
-                /* Insert it in class, if there is a class */
-                if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
-                    VTABLE_add_vtable_override(interp, classobj, key, value);
-
-                /* Otherwise, store it in the namespace for the class to
-                 * retrieve later */
-                else {
-                    /* If we don't have a place to hang vtable methods, make one. */
-                    if (PMC_IS_NULL(vtable))
-                        nsinfo->vtable = vtable = pmc_new(interp, enum_class_Hash);
-
-                    /* Insert it. */
-                    VTABLE_set_pmc_keyed_int(INTERP, vtable, sub->vtable_index, value);
-                }
-            }
-
-            if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
-              add_to_class(INTERP, nsinfo, classobj, key, value);
-            }
-
-            /* If it's anonymous, we're done. */
-            if (PObj_get_FLAGS(value) & SUB_FLAG_PF_ANON)
+            int all_done = ns_insert_sub_keyed_str(interp, SELF, key, value);
+            if (all_done)
                 return;
         }
+
 
         /* If it's an NCI method */
         if (value->vtable->base_type == enum_class_NCI) {
