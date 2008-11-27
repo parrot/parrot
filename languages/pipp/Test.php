@@ -23,9 +23,10 @@ function isnt($got, $expected, $desc, $count) {
 }
 
 function proclaim($cond, $desc, $count) {
-    if ( $cond ) {
-        echo "ok $count - $desc\n";  
+    if ( ! $cond ) {
+       echo 'not ';
     }
+    echo "ok $count - $desc\n";  
 }
 
 ?>

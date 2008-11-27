@@ -49,7 +49,7 @@ $count++;
 is( $thrice[2], 6, "thrice[2]", $count);
 $count++;
 
-is( "3 times 3 equals $thrice[3]", "3 time 3 equals 9", "3 times 3 equals 9", $count);
+is( "3 times 3 equals $thrice[3]", "3 times 3 equals 9", "3 times 3 equals 9", $count);
 $count++;
 
 is( count($hello), 3, 'count of $hello', $count );
