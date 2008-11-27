@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 78;
+use Test::More tests => 69;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -19,11 +19,11 @@ use Parrot::Configure::Test qw(
 );
 use IO::CaptureOutput qw| capture |;
 
-########### --miniparrot ###########
+########### regular ###########
 
 my ($args, $step_list_ref) = process_options(
     {
-        argv => [ q{--miniparrot} ],
+        argv => [ ],
         mode => q{configure},
     }
 );
@@ -39,30 +39,8 @@ my $pkg = q{auto::memalign};
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
-my $ret = $step->runstep($conf);
-ok( $ret, "runstep() returned true value" );
-is($step->result(), q{skipped}, "Expected result was set");
-is($conf->data->get('memalign'),
-    q{},
-    "memalign set to empty string as expected"
-);
-
-$conf->replenish($serialized);
-
-########### regular ###########
-
-($args, $step_list_ref) = process_options(
-    {
-        argv => [ ],
-        mode => q{configure},
-    }
-);
-rerun_defaults_for_testing($conf, $args );
-$conf->add_steps($pkg);
-$conf->options->set( %{$args} );
-$step = test_step_constructor_and_description($conf);
 $conf->data->set( memalign => 'memalign');
-$ret = $step->runstep($conf);
+my $ret = $step->runstep($conf);
 ok( $ret, "runstep() returned true value" );
 is($step->result(), q{already set}, "Expected result was set");
 is($conf->data->get('memalign'),
