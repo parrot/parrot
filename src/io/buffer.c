@@ -226,14 +226,16 @@ The buffer layer's C<Fill> function.
 size_t
 Parrot_io_fill_readbuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
-    size_t got;
-    PIOOFF_T pos = Parrot_io_get_file_position(interp, filehandle);
-    STRING fake, *s;
+    size_t   got;
+    STRING   fake;
+    STRING  *s    = &fake;
+    PIOOFF_T pos  = Parrot_io_get_file_position(interp, filehandle);
+
     fake.strstart = (char *)Parrot_io_get_buffer_start(interp, filehandle);
     fake.bufused  = Parrot_io_get_buffer_size(interp, filehandle);
-    s = &fake;
 
-    got = PIO_READ(interp, filehandle, &s);
+    got           = PIO_READ(interp, filehandle, &s);
+
     /* buffer-filling does not change fileposition */
     Parrot_io_set_file_position(interp, filehandle, pos);
 
@@ -380,8 +382,8 @@ size_t
 Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         ARGOUT(STRING **buf))
 {
-    size_t len = 1;
-    size_t avail = 0;
+    UINTVAL len   = 1;
+    size_t  avail = 0;
 
     INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
     unsigned char *buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
