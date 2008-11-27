@@ -853,26 +853,33 @@ _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int un
         _store_symreg(hsh, r);
     }
     else {
-        if (uniq == U_add_uniq_sub)
-            name = add_ns(interp, name);
+        char *sub_name = (uniq == U_add_uniq_sub)
+                       /* remember to free this name; add_ns malloc()s it */
+                       ? add_ns(interp, name)
+                       : name;
 
-        r = _get_sym(hsh, name);
+        r = _get_sym(hsh, sub_name);
 
         /* we use this for labels/subs */
         if (uniq && r && r->type == VTADDRESS && r->lhs_use_count) {
             if (uniq == U_add_uniq_label)
                 IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
-                    "Label '%s' already defined\n", name);
-            else if (uniq == U_add_uniq_sub)
+                    "Label '%s' already defined\n", sub_name);
+            else if (uniq == U_add_uniq_sub) {
+                mem_sys_free(sub_name);
                 IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                         "Subroutine '%s' already defined\n", name);
+            }
         }
 
-        r       = _mk_symreg(hsh, name, 0);
+        r       = _mk_symreg(hsh, sub_name, 0);
         r->type = VTADDRESS;
 
-        if (uniq)
+        if (uniq) {
             r->lhs_use_count++;
+            if (uniq == U_add_uniq_sub)
+                mem_sys_free(sub_name);
+        }
     }
 
     return r;
