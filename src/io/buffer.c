@@ -331,31 +331,34 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
     /* (re)fill the readbuffer */
     if (!(buffer_flags & PIO_BF_READBUF)) {
         size_t got;
+
         if (len >= Parrot_io_get_buffer_size(interp, filehandle)) {
-            STRING fake;
+            STRING  fake;
             STRING *sf = &fake;
 
             fake.strstart = (char *)out_buf;
             fake.bufused  = len;
-            got = PIO_READ(interp, filehandle, &sf);
-            s->strlen = s->bufused = current + got;
-            Parrot_io_set_file_position(interp, filehandle, (got +
-                    Parrot_io_get_file_position(interp, filehandle)));
+            got           = PIO_READ(interp, filehandle, &sf);
+            s->strlen     = s->bufused = current + got;
+
+            Parrot_io_set_file_position(interp, filehandle,
+                    (got + Parrot_io_get_file_position(interp, filehandle)));
             return current + got;
         }
 
         got = Parrot_io_fill_readbuf(interp, filehandle);
-
         len = len < got ? len : got;
     }
 
     /* read from the read_buffer */
+
     memcpy(out_buf, buffer_next, len);
-    s->strlen = s->bufused = current + len;
+    s->strlen    = s->bufused = current + len;
     buffer_next += len;
+
     Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-    Parrot_io_set_file_position(interp, filehandle, (len +
-            Parrot_io_get_file_position(interp, filehandle)));
+    Parrot_io_set_file_position(interp, filehandle,
+            (len + Parrot_io_get_file_position(interp, filehandle)));
 
     /* is the buffer is completely empty ? */
     if (buffer_next == buffer_end) {
@@ -365,6 +368,7 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         Parrot_io_set_buffer_end(interp, filehandle, NULL);
         Parrot_io_set_buffer_next(interp, filehandle, buffer_start);
     }
+
     return current + len;
 }
 
@@ -417,8 +421,11 @@ ret_string:
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Can't peek at unbuffered I/O");
 
+        /* Parrot_io_fill_readbuf() can return -1, but len should be positive */
         got = Parrot_io_fill_readbuf(interp, filehandle);
-        len = (len < got) ? len : got;
+        len = (len < got)
+            ? len
+            : (got > 0) ? got : 0;
     }
 
     /* if we got any data, then copy out the next byte */
