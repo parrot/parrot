@@ -148,13 +148,14 @@ NOT IMPLEMENTED.
 =item C<string get_include_path()>
 
 Get the current include_path configuration option
+Currently only the current include path is returned.
 
-NOT IMPLEMENTED.
+STILL INCOMPLETE.
 
 =cut
 
 .sub 'get_include_path'
-    not_implemented()
+    .tailcall constant('DEFAULT_INCLUDE_PATH')
 .end
 
 =item C<int get_magic_quotes_gpc(void)>

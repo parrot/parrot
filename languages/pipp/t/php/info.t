@@ -20,12 +20,10 @@ See L<http://www.php.net/manual/en/ref.?.php>.
 
 use strict;
 use warnings;
-
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 8;
-use Parrot::Test;
+use Parrot::Test tests => 9;
 
 
 language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'php_egg_logo_guid()' );
@@ -91,6 +89,12 @@ language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'zend_logo_guid()' );
 CODE
 PHPE9568F35-D428-11d2-A769-00AA001ACF42
 OUTPUT
+
+language_output_is( 'Pipp', <<'CODE', '.', 'get_include_path()' );
+<?php
+  echo get_include_path();
+?>
+CODE
 
 
 # Local Variables:
