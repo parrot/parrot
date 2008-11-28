@@ -27,6 +27,33 @@ NOT IMPLEMENTED.
     not_implemented()
 .end
 
+=item C<mixed constant(string const_name)>
+
+Given the name of a constant this function will return the constants associated value
+
+=cut
+
+.sub 'constant'
+    .param pmc args :slurpy
+    .local int argc
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P1 = shift args
+    $S1 = $P1
+    .local pmc cst
+    .GET_CONSTANTS(cst)
+    $I0 = exists cst[$S1]
+    unless $I0 goto L2
+    $P0 = cst[$S1]
+    .return ($P0)
+  L2:
+    error(E_WARNING, "Couldn't find constant ", $S1)
+    .RETURN_NULL()
+.end
+
 =item C<string create_function(string args, string code)>
 
 Creates an anonymous function, and returns its name (funny, eh?)
@@ -146,33 +173,6 @@ Check whether a constant exists
     .RETURN_BOOL($I0)
 .end
 
-
-=item C<mixed constant(string const_name)>
-
-Given the name of a constant this function will return the constants associated value
-
-=cut
-
-.sub 'constant'
-    .param pmc args :slurpy
-    .local int argc
-    argc = args
-    unless argc != 1 goto L1
-    wrong_param_count()
-    .RETURN_NULL()
-  L1:
-    $P1 = shift args
-    $S1 = $P1
-    .local pmc cst
-    .GET_CONSTANTS(cst)
-    $I0 = exists cst[$S1]
-    unless $I0 goto L2
-    $P0 = cst[$S1]
-    .return ($P0)
-  L2:
-    error(E_WARNING, "Couldn't find constant ", $S1)
-    .RETURN_NULL()
-.end
 
 =item C<array each(array arr)>
 
