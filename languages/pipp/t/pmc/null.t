@@ -21,9 +21,10 @@ Tests C<PhpNull> PMC.
 
 .sub 'main' :main
     .include "include/test_more.pir"
-    plan(1)
+    plan(2)
 
     truth_tests()
+    stringification_tests()
 .end
 
 .sub truth_tests
@@ -32,6 +33,17 @@ Tests C<PhpNull> PMC.
     null_value = new 'PhpNull'
 
     nok(null_value,"PhpNull isn't")
+.end
+
+.sub stringification_tests
+    .local pmc null_value
+    .local string s
+    .local int is_ok
+
+    null_value = new 'PhpNull'
+    s = null_value
+    is_ok = s == 'NULL'
+    ok( is_ok, 'stringification' )
 .end
 
 # Local Variables:

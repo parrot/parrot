@@ -265,7 +265,7 @@ method array_elem($/) {
              $past_var_name,
              $( $<expression> ),
              :scope('keyed'),
-             :viviself('Undef'),
+             :viviself('PhpNull'),
              :lvalue(1)
          );
 }
@@ -276,10 +276,11 @@ method var($/,$key) {
 
 method VAR_NAME($/) {
     our $?PIPP_CURRENT_SCOPE;
+
     make PAST::Var.new(
              :scope( $?PIPP_CURRENT_SCOPE ?? $?PIPP_CURRENT_SCOPE !! 'package' ),
              :name(~$/),
-             :viviself('Undef'),
+             :viviself('PhpNull'),
              :lvalue(1),
          );
 }
