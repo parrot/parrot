@@ -42,7 +42,7 @@ Tests C<PhpNull> PMC.
 
     null_value = new 'PhpNull'
     s = null_value
-    is_ok = s == 'NULL'
+    is_ok = s == ''
     ok( is_ok, 'stringification' )
 .end
 

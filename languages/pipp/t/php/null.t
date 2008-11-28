@@ -30,7 +30,7 @@ language_output_is( 'Pipp', <<'CODE', <<'OUT', 'Stringification of an undefined 
 echo $undefined_var;
 echo "\n";
 CODE
-NULL
+
 OUT
 
 # Local Variables:

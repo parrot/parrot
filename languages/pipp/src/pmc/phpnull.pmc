@@ -42,22 +42,6 @@ Return the string 'NULL'.
 
 /*
 
-=item C<STRING *get_string()>
-
-Returns the string 'NULL'.
-
-=cut
-
-*/
-
-    VTABLE STRING *get_string() {
-        return const_string(INTERP, "NULL");
-    }
-
-
-
-/*
-
 =back
 
 =head2 non-Vtable Methods
