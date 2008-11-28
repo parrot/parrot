@@ -28,7 +28,7 @@ use Test::More     tests => 39;
 use Parrot::Test;
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'abs' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'abs' );
 <?php
   echo abs(-3), "\n";
   echo abs(-3.14), "\n";
@@ -67,225 +67,225 @@ CODE
 0
 0
 
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'acos' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'acos' );
 <?php
   echo acos(0.5), "\n";
 ?>
 CODE
 /^1\.047/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'acosh' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'acosh' );
 <?php
   echo acosh(1.5), "\n";
 ?>
 CODE
 /^0\.962/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'asin' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'asin' );
 <?php
   echo asin(0.5), "\n";
 ?>
 CODE
 /^0\.523/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'asinh' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'asinh' );
 <?php
   echo asinh(0.5), "\n";
 ?>
 CODE
 /^0\.481/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'atan' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'atan' );
 <?php
   echo atan(0.5), "\n";
 ?>
 CODE
 /^0\.463/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'atanh' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'atanh' );
 <?php
   echo atanh(0.5), "\n";
 ?>
 CODE
 /^0\.549/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'atan2' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'atan2' );
 <?php
   echo atan2(1, 2), "\n";
 ?>
 CODE
 /^0\.463/
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'base_convert' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'base_convert' );
 <?php
   echo base_convert(126, 10, 16), "\n";
 ?>
 CODE
 7e
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'bindec' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'bindec' );
 <?php
   echo bindec('0101'), "\n";
 ?>
 CODE
 5
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'ceil' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'ceil' );
 <?php
   echo ceil(3.14), "\n";
 ?>
 CODE
 4
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'cos' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'cos' );
 <?php
   echo cos(0.5), "\n";
 ?>
 CODE
 /^0\.877/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'cosh' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'cosh' );
 <?php
   echo cosh(0.5), "\n";
 ?>
 CODE
 /^1\.127/
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'decbin' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'decbin' );
 <?php
   echo decbin(126), "\n";
 ?>
 CODE
 1111110
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'dechex' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'dechex' );
 <?php
   echo dechex(126), "\n";
 ?>
 CODE
 7e
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'decoct' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'decoct' );
 <?php
   echo decoct(126), "\n";
 ?>
 CODE
 176
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'deg2rad' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'deg2rad' );
 <?php
   echo deg2rad(90), "\n";
 ?>
 CODE
 /^1\.570/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'exp' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'exp' );
 <?php
   echo exp(0.5), "\n";
 ?>
 CODE
 /^1\.648/
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'floor' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'floor' );
 <?php
   echo floor(3.14), "\n";
 ?>
 CODE
 3
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'fmod' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'fmod' );
 <?php
   echo fmod(3.14, 2.5), "\n";
 ?>
 CODE
 0.64
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'hexdec' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'hexdec' );
 <?php
   echo hexdec('7E'), "\n";
 ?>
 CODE
 126
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'hypot' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'hypot' );
 <?php
   echo hypot(1, 2), "\n";
 ?>
 CODE
 /^2\.236/
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'is_finite' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'is_finite' );
 <?php
   echo is_finite(3.14), "\n";
 ?>
 CODE
 1
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'is_infinite' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'is_infinite' );
 <?php
   echo is_infinite(3.14), "\n";
 ?>
 CODE
 
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'is_nan' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'is_nan' );
 <?php
   echo is_nan(3.14), "\n";
 ?>
 CODE
 
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'log' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'log' );
 <?php
   echo log(10), "\n";
 ?>
 CODE
 /^2\.302/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'log' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'log' );
 <?php
   echo log(10, 2), "\n";
 ?>
 CODE
 /^3\.321/
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'log10' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'log10' );
 <?php
   echo log10(100), "\n";
 ?>
 CODE
 2
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'number_format' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'number_format' );
 <?php
   echo number_format(42), "\n";
   echo number_format(-4096), "\n";
@@ -297,25 +297,25 @@ CODE
 -4,096
 123,456,789
 3.14
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'octdec' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'octdec' );
 <?php
   echo octdec('0777'), "\n";
 ?>
 CODE
 511
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'pi' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'pi' );
 <?php
   echo pi(), "\n";
 ?>
 CODE
 /^3\.14/
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'pow' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'pow' );
 <?php
   echo pow(2, 3), "\n";
   echo pow(1.5, 2), "\n";
@@ -323,17 +323,17 @@ language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'pow' );
 CODE
 8
 2.25
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'rad2deg' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'rad2deg' );
 <?php
   echo rad2deg(0.5), "\n";
 ?>
 CODE
 /^28\.6/
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'round' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'round' );
 <?php
   echo round(3.14159), "\n";
   echo round(3.14159, 2), "\n";
@@ -343,47 +343,47 @@ CODE
 3
 3.14
 3.1416
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'sin' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'sin' );
 <?php
   echo sin(0.5), "\n";
 ?>
 CODE
 /^0\.479/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'sinh' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'sinh' );
 <?php
   echo sinh(0.5), "\n";
 ?>
 CODE
 /^0\.521/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'sqrt' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'sqrt' );
 <?php
   echo sqrt(0.5), "\n";
 ?>
 CODE
 /^0\.707/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'tan' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'tan' );
 <?php
   echo tan(0.5), "\n";
 ?>
 CODE
 /^0\.546/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'tanh' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'tanh' );
 <?php
   echo tanh(0.5), "\n";
 ?>
 CODE
 /^0\.462/
-OUTPUT
+OUT
 
 # Local Variables:
 #   mode: cperl

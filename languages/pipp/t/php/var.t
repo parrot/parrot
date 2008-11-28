@@ -28,7 +28,7 @@ use Test::More     tests => 4;
 use Parrot::Test;
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'var_dump() with string key', skip => 'excessive memory usage' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'var_dump() with string key', skip => 'excessive memory usage' );
 <?php
 $foo['bar'] = 'asdf';
 echo $foo['bar'];
@@ -40,9 +40,9 @@ array(1) {
   ["bar"]=>
   string(4) "asdf"
 }
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'var_dump() with int key', skip => 'excessive memory usage' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'var_dump() with int key', skip => 'excessive memory usage' );
 <?php
 $twice[1] = 2;
 echo $twice[1];
@@ -54,9 +54,9 @@ array(1) {
   [1]=>
   int(2)
 }
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'increment' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'increment' );
 <?php
 $a = 10;
 var_dump($a);
@@ -70,9 +70,9 @@ int(11)
 int(11)
 int(11)
 int(12)
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'decrement' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'decrement' );
 <?php
 $a = 10;
 var_dump($a);
@@ -86,7 +86,7 @@ int(9)
 int(9)
 int(9)
 int(8)
-OUTPUT
+OUT
 
 # Local Variables:
 #   mode: cperl

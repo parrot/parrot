@@ -28,156 +28,156 @@ use Test::More     tests => 20;
 use Parrot::Test;
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'getrandmax()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'getrandmax()' );
 <?php
   echo getrandmax(), "\n";
 ?>
 CODE
 2147483647
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'getrandmax(wrong param)' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'getrandmax(wrong param)' );
 <?php
   echo getrandmax(42);
 ?>
 CODE
 /Wrong parameter count for getrandmax\(\)/
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'mt_getrandmax()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'mt_getrandmax()' );
 <?php
   echo mt_getrandmax(), "\n";
 ?>
 CODE
 2147483647
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'mt_rand()' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'mt_rand()' );
 <?php
   echo mt_rand();
 ?>
 CODE
 /\d+/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'mt_rand(min, max)' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'mt_rand(min, max)' );
 <?php
   echo mt_rand(1, 10);
 ?>
 CODE
 /\d/
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'mt_srand()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'mt_srand()' );
 <?php
   mt_srand();
 ?>
 CODE
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'mt_srand(seed)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'mt_srand(seed)' );
 <?php
   mt_srand(42);
 ?>
 CODE
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'rand()' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'rand()' );
 <?php
   echo rand();
 ?>
 CODE
 /\d+/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'rand(min, max)' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'rand(min, max)' );
 <?php
   echo rand(1, 10);
 ?>
 CODE
 /\d/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'rand(too few arg)' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'rand(too few arg)' );
 <?php
   echo rand(1);
 ?>
 CODE
 /rand\(\) expects exactly 2 parameters, 1 given/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'rand(too many arg)' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'rand(too many arg)' );
 <?php
   echo rand(1, 10, 100);
 ?>
 CODE
 /rand\(\) expects exactly 2 parameters, 3 given/
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'srand()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'srand()' );
 <?php
   srand();
 ?>
 CODE
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'srand(seed)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'srand(seed)' );
 <?php
   srand(42);
 ?>
 CODE
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'srand(too many arg)' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'srand(too many arg)' );
 <?php
   echo srand(42, 12);
 ?>
 CODE
 /srand\(\) expects at most 1 parameter, 2 given/
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'srand("42")' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'srand("42")' );
 <?php
   srand('42');
 ?>
 CODE
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'srand(" 42")' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'srand(" 42")' );
 <?php
   srand(' 42');
 ?>
 CODE
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'srand(" 42 ")' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'srand(" 42 ")' );
 <?php
   srand(' 42 ');
 ?>
 CODE
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'srand(" str ")' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'srand(" str ")' );
 <?php
   srand('str');
 ?>
 CODE
 /srand\(\) expects parameter 1 to be long, string given/
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'srand(TRUE)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'srand(TRUE)' );
 <?php
   srand(TRUE);
 ?>
 CODE
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'srand(NULL)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'srand(NULL)' );
 <?php
   srand(NULL);
 ?>
 CODE
-OUTPUT
+OUT
 
 # Local Variables:
 #   mode: cperl

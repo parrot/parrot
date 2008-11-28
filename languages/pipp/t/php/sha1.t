@@ -28,23 +28,23 @@ use Test::More     tests => 5;
 use Parrot::Test;
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'sha1(msg)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'sha1(msg)' );
 <?php
   echo sha1('message digest'), "\n";
 ?>
 CODE
 c12252ceda8be8994d5fa0290a47231c1d16aae3
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'sha1(msg, FALSE)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'sha1(msg, FALSE)' );
 <?php
   echo sha1('message digest', FALSE), "\n";
 ?>
 CODE
 c12252ceda8be8994d5fa0290a47231c1d16aae3
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'sha1(msg, TRUE)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'sha1(msg, TRUE)' );
 <?php
   $md = sha1('message digest', TRUE);
   echo gettype($md), "\n";
@@ -53,30 +53,30 @@ language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'sha1(msg, TRUE)' );
 CODE
 string
 20
-OUTPUT
+OUT
 
 unlink 'file.txt' if -f 'file.txt';
 open my $X, '>', 'file.txt';
 print {$X} 'message digest';
 close $X;
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'sha1_file(file)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'sha1_file(file)' );
 <?php
   echo sha1_file('file.txt'), "\n";
 ?>
 CODE
 c12252ceda8be8994d5fa0290a47231c1d16aae3
-OUTPUT
+OUT
 
 unlink 'file.txt' if -f 'file.txt';
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'sha1_file(nofile)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'sha1_file(nofile)' );
 <?php
   echo sha1_file('nofile.txt'), "\n";
 ?>
 CODE
 
-OUTPUT
+OUT
 
 # Local Variables:
 #   mode: cperl

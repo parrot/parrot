@@ -28,23 +28,23 @@ use Test::More     tests => 5;
 use Parrot::Test;
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'md5(msg)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'md5(msg)' );
 <?php
   echo md5('message digest'), "\n";
 ?>
 CODE
 f96b697d7cb7938d525a2f31aaf161d0
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'md5(msg, FALSE)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'md5(msg, FALSE)' );
 <?php
   echo md5('message digest', FALSE), "\n";
 ?>
 CODE
 f96b697d7cb7938d525a2f31aaf161d0
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'md5(msg, TRUE)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'md5(msg, TRUE)' );
 <?php
   $md = md5('message digest', TRUE);
   echo gettype($md), "\n";
@@ -53,30 +53,30 @@ language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'md5(msg, TRUE)' );
 CODE
 string
 16
-OUTPUT
+OUT
 
 unlink 'file.txt' if -f 'file.txt';
 open my $X, '>', 'file.txt';
 print {$X} 'message digest';
 close $X;
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'md5_file(file)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'md5_file(file)' );
 <?php
   echo md5_file('file.txt'), "\n";
 ?>
 CODE
 f96b697d7cb7938d525a2f31aaf161d0
-OUTPUT
+OUT
 
 unlink 'file.txt' if -f 'file.txt';
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'md5_file(nofile)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'md5_file(nofile)' );
 <?php
   echo md5_file('nofile.txt'), "\n";
 ?>
 CODE
 
-OUTPUT
+OUT
 
 # Local Variables:
 #   mode: cperl

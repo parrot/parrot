@@ -36,7 +36,7 @@ else {
 }
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'constants' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'constants' );
 <?php
   echo PREG_NO_ERROR, "\n";
   echo PREG_INTERNAL_ERROR, "\n";
@@ -50,17 +50,17 @@ CODE
 2
 3
 4
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'version' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'version' );
 <?php
   echo PCRE_VERSION;
 ?>
 CODE
 /^\d\.\d/
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'preg_match()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'preg_match()' );
 <?php
   echo preg_match('/b/', 'abc'), "\n";
   echo preg_match('/b/', 'aaa'), "\n";
@@ -72,47 +72,47 @@ CODE
 0
 1
 1
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'preg_match() empty regex' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'preg_match() empty regex' );
 <?php
   echo preg_match('   ', 'abc'), "\n";
 ?>
 CODE
 /Empty regular expression/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'preg_match() bad delim' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'preg_match() bad delim' );
 <?php
   echo preg_match(' 7b7', 'abc'), "\n";
 ?>
 CODE
 /Delimiter must not be alphanumeric or backslash/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'preg_match() no end' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'preg_match() no end' );
 <?php
   echo preg_match(' |b', 'abc'), "\n";
 ?>
 CODE
 / No ending delimiter '|' found/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'preg_match() unknown modif' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'preg_match() unknown modif' );
 <?php
   echo preg_match(' /b/ia', 'abc'), "\n";
 ?>
 CODE
 /Unknown modifier 'a'/
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'preg_quote()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'preg_quote()' );
 <?php
   echo preg_quote('{}[]()'), "\n";
 ?>
 CODE
 \{\}\[\]\(\)
-OUTPUT
+OUT
 
 # Local Variables:
 #   mode: cperl

@@ -28,26 +28,26 @@ use Test::More     tests => 9;
 use Parrot::Test;
 
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'get_resource_type()' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'get_resource_type()' );
 <?php
   $fp = fopen('file.txt', 'w');
   echo get_resource_type($fp);
 ?>
 CODE
 /^(stream|ParrotIO)$/
-OUTPUT
+OUT
 
 unlink 'pipp/file.txt' if (-f 'pipp/file.txt');
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'get_resource_type() bad arg' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'get_resource_type() bad arg' );
 <?php
   echo get_resource_type('bad');
 ?>
 CODE
 /Supplied argument is not a valid resource handle/
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'strcmp()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'strcmp()' );
 <?php
   echo strcmp('ABC', 'ABC'), "\n";
   echo strcmp('ABC', 'BCD'), "\n";
@@ -57,55 +57,55 @@ CODE
 0
 -1
 1
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'strlen()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'strlen()' );
 <?php
   echo strlen('str'), "\n";
 ?>
 CODE
 3
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'strlen() empty string' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'strlen() empty string' );
 <?php
   echo strlen(''), "\n";
 ?>
 CODE
 0
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'strlen() no arg' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'strlen() no arg' );
 <?php
   echo strlen(), "\n";
 ?>
 CODE
 /Wrong parameter count for strlen\(\)/
-OUTPUT
+OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUTPUT', 'strlen() too many arg' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'strlen() too many arg' );
 <?php
   echo strlen('str', 42), "\n";
 ?>
 CODE
 /Wrong parameter count for strlen\(\)/
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'extension_loaded() returns FALSE, echo' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'extension_loaded() returns FALSE, echo' );
 <?php
   echo extension_loaded("asdf");
 ?>
 CODE
-OUTPUT
+OUT
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'extension_loaded() returns FALSE, var_dump' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'extension_loaded() returns FALSE, var_dump' );
 <?php
   var_dump( extension_loaded("asdf") );
 ?>
 CODE
 bool(false)
-OUTPUT
+OUT
 
 
 # Local Variables:

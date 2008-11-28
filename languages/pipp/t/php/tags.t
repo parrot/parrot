@@ -27,49 +27,49 @@ use Test::More     tests => 8;
 use Parrot::Test;
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'short tags w/ close' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'short tags w/ close' );
 <?echo "hello world\n";?>
 CODE
 hello world
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'short tags w/o close' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'short tags w/o close' );
 <?echo "hello world\n";
 CODE
 hello world
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'short php tags w/ close' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'short php tags w/ close' );
 <?php echo "hello world\n";
 CODE
 hello world
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'short echoing tags' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'short echoing tags' );
 <?= "hello world\n";
 CODE
 hello world
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'clean script tags, single quotes' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'clean script tags, single quotes' );
 <script language='php'> echo "hello world\n"; </script>
 CODE
 hello world
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'clean script tags, double quotes' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'clean script tags, double quotes' );
 <script language="php"> echo "hello world\n"; </script>
 CODE
 hello world
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'broken script tag' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'broken script tag' );
 <scriptlanguage="php"> echo "hello world\n"; </script>
 CODE
 <scriptlanguage="php"> echo "hello world\n"; </script>
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'messy script tags' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'messy script tags' );
 <script          
        language      = 
     'php'
@@ -78,7 +78,7 @@ language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'messy script tags' );
     </script            >
 CODE
 hello world
-OUTPUT
+OUT
 
 # Local Variables:
 #   mode: cperl

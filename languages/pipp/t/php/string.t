@@ -28,31 +28,31 @@ use Test::More     tests => 14;
 use Parrot::Test;
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'bin2hex' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'bin2hex' );
 <?php
   echo bin2hex('Ab3'), "\n";
 ?>
 CODE
 416233
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'chr' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'chr' );
 <?php
   echo chr(65), "\n";
 ?>
 CODE
 A
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'ltrim' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'ltrim' );
 <?php
   echo ltrim('  abc'), "\n";
 ?>
 CODE
 abc
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'ord' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'ord' );
 <?php
   echo ord('A'), "\n";
   echo ord(''), "\n";
@@ -60,17 +60,17 @@ language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'ord' );
 CODE
 65
 0
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'rtrim' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'rtrim' );
 <?php
   echo rtrim('  abc  '), "\n";
 ?>
 CODE
   abc
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'str_repeat' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'str_repeat' );
 <?php
   echo str_repeat('Ab', 3), "\n";
   echo str_repeat('Ab', 0), "\n";
@@ -82,9 +82,9 @@ AbAbAb
 
 Ab
 
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'strchr' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'strchr' );
 <?php
   echo strchr('abcdef', 'cd'), "\n";
   echo strchr('abcdef', 'g'), "\n";
@@ -92,9 +92,9 @@ language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'strchr' );
 CODE
 cdef
 
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'strpos' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'strpos' );
 <?php
   echo strpos('abcdef', 'cd'), "\n";
   echo strpos('abcdef', 'g'), "\n";
@@ -104,9 +104,9 @@ CODE
 2
 
 4
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'strstr' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'strstr' );
 <?php
   echo strstr('abcdef', 'cd'), "\n";
   echo strstr('abcdef', 'g'), "\n";
@@ -114,25 +114,25 @@ language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'strstr' );
 CODE
 cdef
 
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'strtolower' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'strtolower' );
 <?php
   echo strtolower('aBc'), "\n";
 ?>
 CODE
 abc
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'strtoupper' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'strtoupper' );
 <?php
   echo strtoupper('aBc'), "\n";
 ?>
 CODE
 ABC
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'substr' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'substr' );
 <?php
   echo substr('abcdef', 2), "\n";
   echo substr('abcdef', 2, 2), "\n";
@@ -144,9 +144,9 @@ cdef
 cd
 ef
 e
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'trim' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'trim' );
 <?php
   echo trim('  abc  '), "\n";
   echo trim('   '), "\n";
@@ -158,15 +158,15 @@ abc
 
 
 bc
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'ucfirst' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'ucfirst' );
 <?php
   echo ucfirst('abc'), "\n";
 ?>
 CODE
 Abc
-OUTPUT
+OUT
 
 # Local Variables:
 #   mode: cperl

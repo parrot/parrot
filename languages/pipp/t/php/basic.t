@@ -25,7 +25,7 @@ use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
 use Parrot::Test  tests => 5;
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'whitespace after echo' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'whitespace after echo' );
 <?php
   echo 'one space', "\n";
   echo  'two spaces', "\n";
@@ -35,9 +35,9 @@ CODE
 one space
 two spaces
 three spaces
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'constants' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'constants' );
 <?php
   echo SEEK_SET, "\n";
   echo SEEK_CUR, "\n";
@@ -47,32 +47,32 @@ CODE
 0
 1
 2
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'getenv()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'getenv()' );
 <?php
   echo getenv('PARROT_TMP'), "\n";
 ?>
 CODE
 
-OUTPUT
+OUT
 
 $ENV{PARROT_TMP} = 'GETENV_PARROT';
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'getenv()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'getenv()' );
 <?php
   echo getenv('PARROT_TMP'), "\n";
 ?>
 CODE
 GETENV_PARROT
-OUTPUT
+OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUTPUT', 'sleep()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'sleep()' );
 <?php
   sleep(1);
 ?>
 CODE
-OUTPUT
+OUT
 
 
 # Local Variables:
