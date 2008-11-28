@@ -102,10 +102,8 @@ Dumps a string representation of variable to output
 
        .return()
 
-L1:
-
+  L1:
     unless type_of_pmc == 'array' goto L2
-
         .local int num_elements
         num_elements = elements a
         string_len = elements a
@@ -144,20 +142,16 @@ iter_end:
         say '}'
        .return()
 
-L2:
-
+  L2:
     unless type_of_pmc == 'integer' goto L3
-
         print 'int('
         print a
         say ')'
 
        .return()
 
-L3:
-
+  L3:
     unless type_of_pmc == 'boolean' goto L4
-
         print 'bool('
         if a goto a_is_true
             print 'false'
@@ -168,8 +162,14 @@ a_is_true:
             say ')'
            .return()
 
-L4:
-
+  L4:
+    unless type_of_pmc == 'NULL' goto L5
+        say 'NULL'
+        .return()
+  
+  L5:
+    # this should never happen
+    say type_of_pmc
     _dumper(a)
 
     .return()
