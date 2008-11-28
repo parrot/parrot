@@ -89,7 +89,7 @@ Dumps a string representation of variable to output
     .local string type_of_pmc
     type_of_pmc = typeof a
 
-    ne type_of_pmc, 'string', not_a_string
+    unless type_of_pmc == 'string' goto L1
         .local int string_len
 
         string_len = elements a
@@ -102,9 +102,9 @@ Dumps a string representation of variable to output
 
        .return()
 
-not_a_string:
+L1:
 
-    ne type_of_pmc, 'array', not_a_hash
+    unless type_of_pmc == 'array' goto L2
 
         .local int num_elements
         num_elements = elements a
@@ -119,7 +119,7 @@ not_a_string:
         indent = '  '
         it = iter a
 iter_loop:
-    unless it, iter_end
+    unless it goto iter_end
         shift key, it
         key_str = key
         key_starts_with_digit = is_cclass .CCLASS_NUMERIC, key_str, 0
@@ -144,9 +144,9 @@ iter_end:
         say '}'
        .return()
 
-not_a_hash:
+L2:
 
-    ne type_of_pmc, 'integer', not_a_integer
+    unless type_of_pmc == 'integer' goto L3
 
         print 'int('
         print a
@@ -154,9 +154,9 @@ not_a_hash:
 
        .return()
 
-not_a_integer:
+L3:
 
-    ne type_of_pmc, 'boolean', not_a_bool
+    unless type_of_pmc == 'boolean' goto L4
 
         print 'bool('
         if a goto a_is_true
@@ -168,7 +168,7 @@ a_is_true:
             say ')'
            .return()
 
-not_a_bool:
+L4:
 
     _dumper(a)
 
