@@ -20,12 +20,11 @@ See L<http://www.php.net/manual/en/ref.var.php>.
 
 use strict;
 use warnings;
-
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Test::More     tests => 18;
-use Parrot::Test;
+use Test::More;
+use Parrot::Test   tests => 18;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'floatval()' );
 <?php
@@ -134,33 +133,52 @@ OUT
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'is_bool(TRUE)' );
 <?php
   echo is_bool(TRUE), "\n";
+  echo is_bool(FALSE), "\n";
+  echo is_bool(NULL), "\n";
 ?>
 CODE
 1
+1
+
 OUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'is_float(3.14)' );
 <?php
   echo is_float(3.14), "\n";
+  echo is_float(''), "\n";
+  echo is_float(3), "\n";
 ?>
 CODE
 1
+
+
 OUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'is_long(42)' );
 <?php
   echo is_long(42), "\n";
+  echo is_long(''), "\n";
+  echo is_long(3.14), "\n";
 ?>
 CODE
 1
+
+
 OUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'is_null(NULL)' );
 <?php
+
   echo is_null(NULL), "\n";
+  echo is_null($undef_var), "\n";
+  $a = 'first letter';
+  echo is_null($a), "\n";
+  
 ?>
 CODE
 1
+1
+
 OUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'is_numeric()' );
