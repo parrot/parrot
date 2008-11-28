@@ -38,10 +38,6 @@ sub runstep {
         has_sigaction      => undef,
         has_setitimer      => undef
     );
-    if ( defined $conf->options->get('miniparrot') ) {
-        $self->set_result('skipped');
-        return 1;
-    }
 
     my $verbose = $conf->options->get('verbose');
 

@@ -32,12 +32,6 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    if ( $conf->options->get('miniparrot') ) {
-        $conf->data->set( memalign => '' );
-        $self->set_result('skipped');
-        return 1;
-    }
-
     if ( defined $conf->data->get('memalign') ) {
 
         # already set; leave it alone

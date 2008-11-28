@@ -33,11 +33,6 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    if ( $conf->options->get('miniparrot') ) {
-        $self->set_result('skipped');
-        return 1;
-    }
-
     my $verbose = $conf->options->get('verbose');
 
     $conf->data->add( ' ', TEMP_atomic_o => '' );    # assure a default

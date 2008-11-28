@@ -379,10 +379,6 @@ E.g.
 Use this option if you want imcc's parser and lexer files to be generated.
 Needs a working parser and lexer.
 
-=item C<--miniparrot>
-
-Build parrot assuming only pure ANSI C is available.
-
 =back
 
 =head1 CONFIGURATION-FILE INTERFACE
@@ -570,7 +566,6 @@ configuration file.
     init::manifest nomanicheck
     init::defaults
     init::install
-    init::miniparrot
     init::hints verbose-step
     init::headers
     inter::progs

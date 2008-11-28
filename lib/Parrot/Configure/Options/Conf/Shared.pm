@@ -50,7 +50,6 @@ our @shared_valid_options = qw{
     make
     maintainer
     mandir
-    miniparrot
     nomanicheck
     oldincludedir
     opcode

@@ -812,8 +812,6 @@ $(PERL6) : compilers $(PBC_TO_EXE)
 	$(CHMOD) 0755 $(PERL6)
 	$(PERL6) -e"say 'Hello, world.'"
 
-
-# TODO build the real miniparrot
 $(MINIPARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm $(SRC_DIR)/null_config$(O)
 	$(LINK) @ld_out@$@ $(SRC_DIR)/main$(O) $(SRC_DIR)/null_config$(O) \

@@ -32,31 +32,6 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    if ( defined $conf->options->get('miniparrot') ) {
-        $conf->data->set(
-            doublesize       => 8,
-            numvalsize       => 8,
-            nvsize           => 8,
-            floatsize        => 4,
-            opcode_t_size    => 4,
-            ptrsize          => 4,
-            intvalsize       => 4,
-            intsize          => 4,
-            longsize         => 4,
-            shortsize        => 2,
-            hugeintval       => 'long',
-            hugeintvalsize   => 4,
-            hugefloatval     => 'double',
-            hugefloatvalsize => 8,
-            int2_t           => 'int',
-            int4_t           => 'int',
-            float4_t         => 'double',
-            float8_t         => 'double',
-        );
-        $self->set_result('using miniparrot defaults');
-        return 1;
-    }
-
     $conf->cc_gen('config/auto/sizes/test_c.in');
     $conf->cc_build();
     my %results = eval $conf->cc_run();

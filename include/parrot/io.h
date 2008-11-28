@@ -22,17 +22,13 @@
 #include <stdio.h>
 
 /* which OS are we on? (this should be moved into Configure-land) */
-#ifdef MINIPARROT
-#  define PIO_OS_STDIO
+#ifdef _WIN32
+#  define PIO_OS_WIN32
 #else
-#  ifdef _WIN32
-#    define PIO_OS_WIN32
+#  ifdef PARROT_HAS_HEADER_UNISTD
+#    define PIO_OS_UNIX
 #  else
-#    ifdef PARROT_HAS_HEADER_UNISTD
-#      define PIO_OS_UNIX
-#    else
-#      define PIO_OS_STDIO
-#    endif
+#    define PIO_OS_STDIO
 #  endif
 #endif
 

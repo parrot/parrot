@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 14;
+use Test::More tests => 15;
 use Carp;
 use Cwd;
 use File::Temp 0.13 qw/ tempdir /;
@@ -85,13 +85,14 @@ like(
     print $IN q{#perl\nuse strict;\n$something = 'something';\n};
     print $IN <<'END_DUMMY';
 #perl
-if (@miniparrot@) { sprint "Hello world\n"; }
+if (@verbose@) { sprint "Hello world\n"; }
 END_DUMMY
     close $IN or croak "Unable to close temp file";
     my ($stdout, $stderr);
     capture ( sub { eval { $conf->genfile( $dummy => 'CFLAGS', feature_file => 1, ) } },
         \$stdout, \$stderr );
     ok( $stderr, "Error message caught" );
+    like( $stderr, qr/sprint/, "Error message had expected content" );
     ok( $@,     "Bad Perl code caught by genfile()" );
 
     unlink $dummy or croak "Unable to delete file after testing";

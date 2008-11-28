@@ -280,10 +280,6 @@ the child classes and instantiated objects.
 
 =item *
 
-building miniparrot is broken
-
-=item *
-
 GC issue (copying collector) - immobile strings/buffers get freed during GC.
 
 =item *

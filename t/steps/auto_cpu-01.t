@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  30;
+use Test::More tests =>  22;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -19,14 +19,12 @@ use Parrot::Configure::Test qw(
 );
 use IO::CaptureOutput qw( capture );
 
-########### --miniparrot ###########
+########### --verbose ###########
 
-my ($args, $step_list_ref) = process_options(
-    {
-        argv => [ q{--miniparrot} ],
-        mode => q{configure},
-    }
-);
+my ($args, $step_list_ref) = process_options( {
+    argv => [ q{--verbose} ],
+    mode => q{configure},
+} );
 
 my $conf = Parrot::Configure->new;
 
@@ -35,26 +33,9 @@ my $serialized = $conf->pcfreeze();
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
 
 my $pkg = q{auto::cpu};
-
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
-my $ret = $step->runstep($conf);
-ok( $ret, "runstep() returned true value" );
-is($step->result(), q{skipped}, "Got expected result");
-
-$conf->replenish($serialized);
-
-########### --verbose ###########
-
-($args, $step_list_ref) = process_options( {
-    argv => [ q{--verbose} ],
-    mode => q{configure},
-} );
-rerun_defaults_for_testing($conf, $args );
-$conf->add_steps($pkg);
-$conf->options->set( %{$args} );
-$step = test_step_constructor_and_description($conf);
 {
     $conf->data->set('cpuarch' => 'foobar');
     my ($ret, $stdout);
@@ -83,7 +64,7 @@ $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
 $conf->data->set('cpuarch' => 'foobar');
-$ret = $step->runstep($conf);
+my $ret = $step->runstep($conf);
 ok($ret, "runstep() returned true value" );
 ok(! $step->result(), "Got (default) false result as expected");
 

@@ -31,11 +31,6 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    if ( $conf->options->get('miniparrot') ) {
-        $self->set_result('skipped');
-        return 1;
-    }
-
     my $test = _probe_for_cgoto( $conf );
 
     $self->_evaluate_cgoto($conf, $test);

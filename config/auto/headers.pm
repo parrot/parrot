@@ -30,11 +30,6 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    if ( $conf->options->get('miniparrot') ) {
-        $self->set_result('skipped');
-        return 1;
-    }
-
     _set_from_Config($conf);
 
     my @extra_headers = _list_extra_headers($conf);

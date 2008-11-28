@@ -31,11 +31,6 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = ( shift, shift );
 
-    if ( $conf->options->get('miniparrot') ) {
-        $self->set_result('skipped');
-        return 1;
-    }
-
     my $result_str = '';
     my $align;
     if ( defined( $conf->data->get('ptr_alignment') ) ) {

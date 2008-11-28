@@ -81,7 +81,7 @@ The flags are of two types:
 =item 1 class
 
 The classification of ops is intended to facilitate the selection of
-suitable ops for a Parrot safe mode, or for inclusion in miniparrot.
+suitable ops for a Parrot safe mode.
 
 =item 2 behavior
 

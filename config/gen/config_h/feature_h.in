@@ -10,16 +10,6 @@
 
 print OUT <<'END_PRINT';
 
-/* from config/init/miniparrot */
-END_PRINT
-if (@miniparrot@) {
-    print OUT <<'END_PRINT';
-#define MINIPARROT 1
-END_PRINT
-}
-
-print OUT <<'END_PRINT';
-
 /* from config/auto/memalign */
 END_PRINT
 if (@memalign@ eq 'posix_memalign') {

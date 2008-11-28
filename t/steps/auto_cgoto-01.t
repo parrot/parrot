@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  64;
+use Test::More tests =>  56;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -19,41 +19,26 @@ use Parrot::Configure::Test qw(
 );
 use IO::CaptureOutput qw( capture );
 
-########### --miniparrot  ###########
 
-my ($args, $step_list_ref) = process_options(
-    {
-        argv => [ q{--miniparrot} ],
-        mode => q{configure},
-    }
-);
+########### regular ###########
+
+my ($args, $step_list_ref) = process_options( {
+    argv => [ ],
+    mode => q{configure},
+} );
 
 my $conf = Parrot::Configure->new;
 
 my $serialized = $conf->pcfreeze();
 
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
+
 my $pkg = q{auto::cgoto};
+
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
 my $ret = $step->runstep($conf);
-ok( $ret, "runstep() returned true value" );
-is($step->result(), q{skipped}, "Expected result was set");
-
-$conf->replenish($serialized);
-
-########### regular ###########
-
-($args, $step_list_ref) = process_options( {
-    argv => [ ],
-    mode => q{configure},
-} );
-rerun_defaults_for_testing($conf, $args );
-$conf->add_steps($pkg);
-$conf->options->set( %{$args} );
-$step = test_step_constructor_and_description($conf);
-$ret = $step->runstep($conf);
 ok( $ret, "runstep() returned true value" );
 ok(defined($step->result()), "A result was defined");
 ok(defined($conf->data->get('TEMP_cg_h')), "An attribute has been defined");

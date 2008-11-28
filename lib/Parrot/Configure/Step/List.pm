@@ -11,7 +11,6 @@ my @steps = qw(
     init::manifest
     init::defaults
     init::install
-    init::miniparrot
     init::hints
     init::headers
     inter::progs

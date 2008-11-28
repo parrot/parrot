@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 50;
+use Test::More qw(no_plan); # tests => 42;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -19,11 +19,12 @@ use Parrot::Configure::Test qw(
 );
 use IO::CaptureOutput qw | capture |;
 
-########## --miniparrot ##########
+
+########## _handle_intval_ptrsize_discrepancy() ##########
 
 my ($args, $step_list_ref) = process_options(
     {
-        argv => [ q{--miniparrot} ],
+        argv => [ ],
         mode => q{configure},
     }
 );
@@ -39,29 +40,6 @@ my $pkg = q{auto::sizes};
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
-
-my $ret = $step->runstep($conf);
-ok( $ret, "runstep() returned true value" );
-is($step->result(), q{using miniparrot defaults}, "Expected result was set");
-
-$conf->replenish($serialized);
-
-########## _handle_intval_ptrsize_discrepancy() ##########
-
-($args, $step_list_ref) = process_options(
-    {
-        argv => [ ],
-        mode => q{configure},
-    }
-);
-
-rerun_defaults_for_testing($conf, $args );
-
-$pkg = q{auto::sizes};
-
-$conf->add_steps($pkg);
-$conf->options->set( %{$args} );
-$step = test_step_constructor_and_description($conf);
 {
     my $stdout;
     my %results = (

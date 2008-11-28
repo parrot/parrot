@@ -126,7 +126,6 @@ Other Options (may not be implemented):
 
    --maintainer         Create imcc's parser and lexer files. Needs a working
                         parser and lexer.
-   --miniparrot         Build parrot assuming only pure ANSI C is available
 
 Install Options:
 

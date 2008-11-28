@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 22;
+use Test::More tests => 17;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -17,11 +17,12 @@ use Parrot::Configure::Test qw(
     test_step_constructor_and_description
 );
 
-########## --miniparrot ##########
+
+########## regular; singular ##########
 
 my ($args, $step_list_ref) = process_options(
     {
-        argv => [ q{--miniparrot} ],
+        argv => [ ],
         mode => q{configure},
     }
 );
@@ -30,35 +31,15 @@ my $conf = Parrot::Configure->new;
 
 my $serialized = $conf->pcfreeze();
 
-
 test_step_thru_runstep( $conf, q{init::defaults}, $args );
 
 my $pkg = q{auto::alignptrs};
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
-
-my $ret = $step->runstep($conf);
-ok( $ret, "runstep() returned true value" );
-is($step->result(), q{skipped}, "Expected result was set");
-
-$conf->replenish($serialized);
-
-########## regular; singular ##########
-
-($args, $step_list_ref) = process_options(
-    {
-        argv => [ ],
-        mode => q{configure},
-    }
-);
-
-$conf->add_steps($pkg);
-$conf->options->set( %{$args} );
-$step = test_step_constructor_and_description($conf);
 my $align = 1;
 $conf->data->set('ptr_alignment' => $align);
-$ret = $step->runstep($conf);
+my $ret = $step->runstep($conf);
 ok( $ret, "runstep() returned true value" );
 is($step->result(), qq{configured:  $align byte}, "Expected result was set");
 

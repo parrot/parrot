@@ -17,7 +17,6 @@ ld=/usr/bin/g++
 init::manifest nomanicheck
 init::defaults
 init::install
-init::miniparrot
 init::hints verbose-step
 init::headers
 inter::progs

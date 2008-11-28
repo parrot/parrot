@@ -80,7 +80,6 @@ sub new {
             $self->new_item( '', 'tools/build/pmc2c.pl' ),
             $self->new_item( '', 'tools/dev/install_files.pl' ),
             $self->new_item( '', 'tools/dev/mk_manifest_and_skip.pl' ),
-            $self->new_item( '', 'tools/dev/rebuild_miniparrot.pl' ),
             $self->new_item( '', 'tools/dev/symlink.pl' ),
         ),
         $self->new_group( 'Testing', '', $self->new_item( '', 'tools/dev/mk_native_pbc' ), ),
@@ -102,7 +101,6 @@ sub new {
             'Possibly obsolete',
             '',
             $self->new_item( '', 'tools/dev/gen_charset_tables.pl' ),
-            $self->new_item( '', 'tools/dev/rebuild_miniparrot.pl' ),
         ),
     );
 }

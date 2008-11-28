@@ -91,23 +91,13 @@ sub _evaluate_gcc {
     $conf->data->set( sym_export => '__attribute__ ((visibility("default")))' )
         if $gccversion >= 4.0;
 
-    if ( defined $conf->options->get('miniparrot') ) {
-        # make the compiler act as ANSIish as possible, and avoid enabling
-        # support for GCC-specific features.
-        $conf->data->set(
-            ccwarn     => "-ansi -pedantic",
-            gccversion => undef
-        );
-    }
-    else {
-        $conf->data->set(
-            ccwarn              => "$ccwarn",
-            gccversion          => $gccversion,
-            HAS_aligned_funcptr => 1
-        );
-        $conf->data->set( HAS_aligned_funcptr => 0 )
-            if $conf->data->get_p5('OSNAME') eq 'hpux';
-    }
+    $conf->data->set(
+        ccwarn              => "$ccwarn",
+        gccversion          => $gccversion,
+        HAS_aligned_funcptr => 1
+    );
+    $conf->data->set( HAS_aligned_funcptr => 0 )
+        if $conf->data->get_p5('OSNAME') eq 'hpux';
     return 1;
 }
 
