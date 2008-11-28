@@ -175,7 +175,7 @@ DUMMY IMPLEMENTATION.
        set_hll_global 'php_errorreporting', level
     L1:
     get_hll_global $P0, 'php_errorreporting'
-   
+
     .return($P0)
 .end
 
