@@ -19,11 +19,10 @@ See L<http://www.php.net/manual/en/language.constants.php>.
 
 use strict;
 use warnings;
-
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test   tests => 22;
+use Parrot::Test   tests => 23;
 use Parrot::Config qw( %PConfig );
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'define() and constant(), string' );
@@ -179,6 +178,13 @@ language_output_is( 'Pipp', <<'CODE', '0', 'PHP_ZTS' );
 <?php
 echo constant("PHP_ZTS");
 CODE
+
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'NOT_DEFINED' );
+<?php
+echo constant("NOT_DEFINED");
+CODE
+/Couldn't find constant NOT_DEFINED/
+OUT
 
 language_output_is( 'Pipp', <<'CODE', '5', 'PHP_MAJOR_VERSION' );
 <?php

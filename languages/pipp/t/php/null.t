@@ -22,7 +22,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'Stringification of an undefined var' );
@@ -31,6 +31,25 @@ echo $undefined_var;
 echo "\n";
 CODE
 
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'redefinition of NULL', todo => 'implemented incorrectly' );
+<?php
+error_reporting(E_ERROR);
+echo NULL;
+echo "\n";
+echo constant('NULL');
+echo "\n";
+define('NULL','NULL was redefined' );
+echo NULL;
+echo "\n";
+echo constant('NULL');
+echo "\n";
+CODE
+
+
+
+NULL was redefined
 OUT
 
 # Local Variables:

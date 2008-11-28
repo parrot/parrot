@@ -16,9 +16,23 @@ php_API.pir - PHP API Library
 .include 'languages/pipp/src/common/php_MACRO.pir'
 
 .sub '__onload' :anon :load :init
+
     # symbol table for constants
     new $P0, 'Hash'
     set_hll_global 'php_constants', $P0
+
+    # set up error codes
+    .local pmc cst
+    .GET_CONSTANTS(cst)
+    .REGISTER_LONG_CONSTANT(cst, 'E_ERROR', E_ERROR)
+    .REGISTER_LONG_CONSTANT(cst, 'E_WARNING', E_WARNING)
+    .REGISTER_LONG_CONSTANT(cst, 'E_CORE', E_CORE)
+
+    # set up default error_reporting
+    $P1 = new 'PhpInteger'
+    $I1 = E_ERROR | E_WARNING
+    $P1 = $I1
+    error_reporting( $P1 )
 .end
 
 =item C<error>
@@ -28,10 +42,18 @@ php_API.pir - PHP API Library
 .sub 'error'
     .param int level
     .param pmc args :slurpy
-    .local string msg
-    msg = join '', args
-    msg .= "\n"
-    printerr msg
+
+    ($P0) = error_reporting()
+    $P1 = new 'PhpInteger'
+    $P1 = level
+    $P2 = $P0 & $P1      # check the mask for error reporting
+    unless $P2 goto L1
+        .local string msg
+        msg = join '', args
+        msg .= "\n"
+
+        printerr msg
+  L1:     # print no message
 .end
 
 
@@ -42,6 +64,7 @@ php_API.pir - PHP API Library
 .sub 'fetch_resource'
     .param pmc val
     .param string type
+
     $I0 = isa val, 'PhpResource'
     if $I0 goto L1
     $P0 = getinterp
@@ -71,6 +94,7 @@ DUMMY IMPLEMENTATION.
 
 .sub 'get_module_version'
     .param string ext
+
     .return ('')
 .end
 
@@ -82,8 +106,9 @@ STILL INCOMPLETE (see parse_arg_impl).
 =cut
 
 .sub 'parse_parameters'
-   .param string fmt
-   .param pmc args :slurpy
+    .param string fmt
+    .param pmc args :slurpy
+
     .local int num_args
     .local int min_num_args
     .local int max_num_args

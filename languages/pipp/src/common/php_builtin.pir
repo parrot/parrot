@@ -168,7 +168,15 @@ DUMMY IMPLEMENTATION.
 =cut
 
 .sub 'error_reporting'
-    .RETURN_LONG(0)
+    .param pmc level       :optional
+    .param int has_level   :opt_flag
+
+    unless has_level goto L1
+       set_hll_global 'php_errorreporting', level
+    L1:
+    get_hll_global $P0, 'php_errorreporting'
+   
+    .return($P0)
 .end
 
 =item C<bool extension_loaded(string extension_name)>
