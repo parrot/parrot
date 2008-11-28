@@ -360,7 +360,7 @@ token EXIT_FUNCTION_DEF {
 }
 
 rule param_list {
-    '(' [ <VAR_NAME> [',' <VAR_NAME>]* ]? ')'
+    '(' [ '&'? <VAR_NAME> [',' '&'? <VAR_NAME>]* ]? ')'
     {*}
 }
 

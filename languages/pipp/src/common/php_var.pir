@@ -166,7 +166,7 @@ a_is_true:
     unless type_of_pmc == 'NULL' goto L5
         say 'NULL'
         .return()
-  
+
   L5:
     # this should never happen
     say type_of_pmc
