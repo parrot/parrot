@@ -7,7 +7,7 @@ t/php/pcre.t - Library pcre
 
 =head1 SYNOPSIS
 
-    % perl -I../lib pipp/t/php/pcre.t
+    % perl t/harness t/php/pcre.t
 
 =head1 DESCRIPTION
 

@@ -3,7 +3,11 @@
 
 =head1 NAME
 
-functions.t - testing functions
+t/php/functions.t - testing functions
+
+=head1 SYNOPSIS
+
+    perl t/harness t/php/functions.t
 
 =head1 DESCRIPTION
 

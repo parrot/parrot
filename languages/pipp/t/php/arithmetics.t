@@ -2,7 +2,11 @@
 
 =head1 NAME
 
-pipp/t/arithmetics.t - tests for Pipp
+t/php/arithmetics.t - tests for Pipp
+
+=head1 SYNOPSIS
+
+    perl t/harness t/php/arithmetics.t
 
 =head1 DESCRIPTION
 

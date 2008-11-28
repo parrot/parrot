@@ -7,7 +7,7 @@ t/php/sha1.t - Standard Library sha1
 
 =head1 SYNOPSIS
 
-    % perl php/sha1.t
+    % perl t/harness t/php/sha1.t
 
 =head1 DESCRIPTION
 

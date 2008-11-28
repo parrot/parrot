@@ -3,7 +3,12 @@
 
 =head1 NAME
 
-pipp/t/comments.t - tests for Pipp
+t/php/comments.t - tests for Pipp
+
+
+=head1 SYNOPSIS
+
+    perl t/harness t/php/comments.t
 
 =head1 DESCRIPTION
 

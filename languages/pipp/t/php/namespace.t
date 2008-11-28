@@ -3,7 +3,11 @@
 
 =head1 NAME
 
-namespace.t - testing packages, aka namespaces
+t/php/namespace.t - testing packages, aka namespaces
+
+=head1 SYNOPSIS
+
+    perl t/harness t/php/namespace.t
 
 =head1 DESCRIPTION
 
@@ -49,7 +53,7 @@ echo A\B\FOO;
 echo \FOO;
 
 namespace \;
- 
+
 echo FOO;
 echo A\B\FOO;
 echo \FOO;
@@ -72,7 +76,7 @@ namespace A\B;
 const FOO  = "FOO in a::b\n";
 
 namespace \;
- 
+
 echo A\B\FOO;
 echo A\b\FOO;
 echo a\B\FOO;
@@ -100,7 +104,7 @@ echo $A\B\FOO;
 echo $\FOO;
 
 namespace \;
- 
+
 echo $FOO;
 echo $A\B\FOO;
 echo $\FOO;
@@ -121,15 +125,15 @@ language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with class', todo => '
 namespace A\B;
 
 class Dings {
-    
+
     function bums() {
         echo "The function bums() in class A\\Dings has been called.\n";
     }
 }
- 
+
 $dings = new A\Dings;
 $dings->bums();
- 
+
 ?>
 CODE
 The function bums() in class A\Dings has been called.

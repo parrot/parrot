@@ -7,7 +7,7 @@ t/php/ctype.t - Library ctype
 
 =head1 SYNOPSIS
 
-    % perl -I../lib pipp/t/php/ctype.t
+    perl t/harness t/php/ctype.t
 
 =head1 DESCRIPTION
 

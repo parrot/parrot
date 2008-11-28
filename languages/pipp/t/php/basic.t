@@ -7,7 +7,7 @@ t/php/basic.t - Standard Library basic
 
 =head1 SYNOPSIS
 
-    % perl -I../lib pipp/t/php/basic.t
+    perl t/harness t/php/basic.t
 
 =head1 DESCRIPTION
 

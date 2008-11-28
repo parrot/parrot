@@ -7,7 +7,7 @@ t/php/var.t - Standard Library var
 
 =head1 SYNOPSIS
 
-    % perl -I../lib pipp/t/php/var.t
+    perl t/harness t/php/var.t
 
 =head1 DESCRIPTION
 

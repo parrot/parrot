@@ -7,7 +7,7 @@ t/php/base64.t - Standard Library base64
 
 =head1 SYNOPSIS
 
-    % perl -I../lib pipp/t/php/base64.t
+    perl t/harness t/php/base64.t
 
 =head1 DESCRIPTION
 

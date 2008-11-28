@@ -3,7 +3,11 @@
 
 =head1 NAME
 
-pipp/t/superglobals.t - tests for Pipp
+t/php/superglobals.t - tests for Pipp
+
+=head1 SYNOPSIS
+
+    perl t/harness t/php/superglobals.t
 
 =head1 DESCRIPTION
 
@@ -18,7 +22,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Config (); 
+use Parrot::Config ();
 use Parrot::Test;
 use Test::More     tests => 3;
 

@@ -7,7 +7,7 @@ t/php/gmp.t - Library gmp
 
 =head1 SYNOPSIS
 
-    % perl -I../lib pipp/t/php/gmp.t
+    perl t/harness t/php/gmp.t
 
 =head1 DESCRIPTION
 

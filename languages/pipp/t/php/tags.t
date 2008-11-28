@@ -7,7 +7,7 @@ t/php/tags.t - PHP code tags
 
 =head1 SYNOPSIS
 
-    % perl -I../lib pipp/t/php/tags.t
+    % perl t/harness t/php/tags.t
 
 =head1 DESCRIPTION
 

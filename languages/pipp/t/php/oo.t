@@ -3,7 +3,11 @@
 
 =head1 NAME
 
-oo.t - testing object oriented features
+t/php/oo.t - testing object oriented features
+
+=head1 SYNOPSIS
+
+    perl t/harness t/php/oo.t
 
 =head1 DESCRIPTION
 
@@ -22,14 +26,14 @@ language_output_is( 'Pipp', <<'CODE', <<'OUT', 'definition of a class' );
 <?php
 
 class Dings {
-    
+
     function bums() {
         echo "The function bums() in class Dings has been called.\n";
     }
 }
 
 echo "After class definition.\n"
- 
+
 ?>
 CODE
 After class definition.
@@ -39,12 +43,12 @@ language_output_is( 'Pipp', <<'CODE', <<'OUT', 'class constant' );
 <?php
 
 class Foo {
-    
-    const bar = "constant bar in class Foo\n"; 
+
+    const bar = "constant bar in class Foo\n";
 }
 
 echo Foo::bar;
- 
+
 ?>
 CODE
 constant bar in class Foo
@@ -54,15 +58,15 @@ language_output_is( 'Pipp', <<'CODE', <<'OUT', 'calling an instance method' );
 <?php
 
 class Dings {
-    
+
     function bums() {
         echo "The function bums() in class Dings has been called.\n";
     }
 }
- 
+
 $dings = new Dings;
 $dings->bums();
- 
+
 ?>
 CODE
 The function bums() in class Dings has been called.
@@ -73,15 +77,15 @@ language_output_is( 'Pipp', <<'CODE', <<'OUT', 'class with a public member' );
 
 class Dings {
     public $foo_member = 'a member of Foo';
-    
+
     function bums() {
         echo "The function bums() in class Dings has been called.\n";
     }
 }
- 
+
 $dings = new Dings;
 $dings->bums();
- 
+
 ?>
 CODE
 The function bums() in class Dings has been called.
@@ -92,20 +96,20 @@ language_output_is( 'Pipp', <<'CODE', <<'OUT', 'calling a method within a method
 <?php
 
 class Foo {
-    
+
     function bar() {
         echo "The method bar() of class Foo has been called.\n";
     }
-    
+
     function baz() {
         echo "The method baz() of class Foo has been called.\n";
         $this->bar();
     }
 }
- 
+
 $foo = new Foo;
 $foo->baz();
- 
+
 ?>
 CODE
 The method baz() of class Foo has been called.
@@ -116,11 +120,11 @@ OUT
 
 class Foo {
 
-    has $.member is rw; 
+    has $.member is rw;
 
     # default value for members is not implemented yet in Rakudo
     method set_member() {
-        $.member = 'a member of Foo'; 
+        $.member = 'a member of Foo';
     }
 
     method echo_member() {
@@ -128,7 +132,7 @@ class Foo {
         print "\n";
     }
 }
- 
+
 my Foo $foo .= new();
 $foo.set_member();
 $foo.echo_member();
@@ -140,16 +144,16 @@ language_output_is( 'Pipp', <<'CODE', <<'OUT', 'accessing an attribute', todo =>
 
 class Foo {
     public $member = 'a member of Foo';
-    
+
     function echo_member() {
         echo $this->member;
         echo "\n";
     }
 }
- 
+
 $foo = new Foo;
 $foo->echo_menber();
- 
+
 ?>
 CODE
 a member of Foo

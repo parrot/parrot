@@ -7,7 +7,7 @@ t/php/info.t - Standard Library info
 
 =head1 SYNOPSIS
 
-    % perl -I../lib pipp/t/php/info.t
+    perl t/harness t/php/info.t
 
 =head1 DESCRIPTION
 

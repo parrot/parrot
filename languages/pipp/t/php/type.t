@@ -7,7 +7,7 @@ t/php/type.t - Standard Library type
 
 =head1 SYNOPSIS
 
-    % perl -I../lib pipp/t/php/type.t
+    perl t/harness t/php/type.t
 
 =head1 DESCRIPTION
 

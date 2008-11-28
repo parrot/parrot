@@ -7,7 +7,7 @@ t/php/md5.t - Standard Library md5
 
 =head1 SYNOPSIS
 
-    % perl t/php/md5.t
+    % perl t/harness t/php/md5.t
 
 =head1 DESCRIPTION
 

@@ -9,6 +9,10 @@
 
 t/in_php/array.t - tests for the PhpArray type
 
+=head1 SYNOPSIS
+
+    perl t/harness t/in_php/array.t
+
 =head1 DESCRIPTION
 
 Test array.

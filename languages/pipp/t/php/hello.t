@@ -3,7 +3,11 @@
 
 =head1 NAME
 
-pipp/t/hello.t - tests for Pipp
+t/php/hello.t - tests for Pipp
+
+=head1 SYNOPSIS
+
+    perl t/harness t/php/hello.t
 
 =head1 DESCRIPTION
 

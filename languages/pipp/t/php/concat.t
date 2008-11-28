@@ -3,7 +3,11 @@
 
 =head1 NAME
 
-concat.t - testing concatenation
+t/php/concat.t - testing concatenation
+
+=head1 SYNOPSIS
+
+    perl t/harness t/php/concat.t
 
 =head1 DESCRIPTION
 

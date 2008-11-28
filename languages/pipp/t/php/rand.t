@@ -7,7 +7,7 @@ t/php/rand.t - Standard Library rand
 
 =head1 SYNOPSIS
 
-    % perl -I../lib pipp/t/php/rand.t
+    % perl t/harness t/php/rand.t
 
 =head1 DESCRIPTION
 

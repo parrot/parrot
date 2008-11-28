@@ -3,7 +3,11 @@
 
 =head1 NAME
 
-pipp/t/strings.t - tests for Pipp
+t/php/strings.t - tests for Pipp
+
+=head1 SYNOPSIS
+
+    perl t/harness t/php/strings.t
 
 =head1 DESCRIPTION
 

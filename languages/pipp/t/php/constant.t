@@ -7,7 +7,7 @@ t/php/constant.t - Test for constants
 
 =head1 SYNOPSIS
 
-    % perl -I../lib pipp/t/php/constant.t
+    % perl t/harness t/php/constant.t
 
 =head1 DESCRIPTION
 

@@ -3,7 +3,11 @@
 
 =head1 NAME
 
-closures.t - testing closures
+t/php/closures.t - testing closures
+
+=head1 SYNOPSIS
+
+    perl t/harness t/php/closures.t
 
 =head1 DESCRIPTION
 

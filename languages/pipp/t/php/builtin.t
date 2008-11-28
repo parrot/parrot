@@ -7,7 +7,7 @@ t/php/builtin.t - Standard Library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib pipp/t/php/builtin.t
+    % perl t/harness t/php/builtin.t
 
 =head1 DESCRIPTION
 

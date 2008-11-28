@@ -3,7 +3,11 @@
 
 =head1 NAME
 
-references.t - testing references
+t/php/references.t - testing references
+
+=head1 SYNOPSIS
+
+    perl t/harness t/php/references.t
 
 =head1 DESCRIPTION
 

@@ -7,7 +7,7 @@ t/php/filestat.t - Standard Library filestat
 
 =head1 SYNOPSIS
 
-    % perl t/php/filestat.t
+    perl t/harness t/php/filestat.t
 
 =head1 DESCRIPTION
 

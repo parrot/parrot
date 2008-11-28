@@ -7,7 +7,7 @@ t/php/file.t - Standard Library file
 
 =head1 SYNOPSIS
 
-    % perl -I../lib pipp/t/php/file.t
+    perl t/harness t/php/file.t
 
 =head1 DESCRIPTION
 

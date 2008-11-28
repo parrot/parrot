@@ -7,7 +7,7 @@ t/php/string.t - Standard Library string
 
 =head1 SYNOPSIS
 
-    % perl -I../lib pipp/t/php/string.t
+    perl t/harness t/php/string.t
 
 =head1 DESCRIPTION
 

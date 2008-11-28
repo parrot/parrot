@@ -7,7 +7,7 @@ t/php/math.t - Standard Library math
 
 =head1 SYNOPSIS
 
-    % perl -I../lib pipp/t/php/math.t
+    perl t/harness t/php/math.t
 
 =head1 DESCRIPTION
 
