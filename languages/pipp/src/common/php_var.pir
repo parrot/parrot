@@ -86,90 +86,92 @@ Dumps a string representation of variable to output
 .sub var_dump
     .param pmc a
 
+    if null a goto set_null_type
+
     .local string type_of_pmc
     type_of_pmc = typeof a
-
     unless type_of_pmc == 'string' goto L1
-        .local int string_len
+    .local int string_len
 
-        string_len = elements a
-        print 'string('
-        print string_len
-        print ') "'
-        print a
-        print '"'
-        say ''
+    string_len = elements a
+    print 'string('
+    print string_len
+    print ') "'
+    print a
+    print '"'
+    say ''
 
-       .return()
+    .return()
 
   L1:
     unless type_of_pmc == 'array' goto L2
-        .local int num_elements
-        num_elements = elements a
-        string_len = elements a
-        print 'array('
-        print num_elements
-        say ') {'
+    .local int num_elements
+    num_elements = elements a
+    string_len = elements a
+    print 'array('
+    print num_elements
+    say ') {'
 
-        .local pmc    it, val, key
-        .local string indent, key_str
-        .local int    key_starts_with_digit
-        indent = '  '
-        it = iter a
-iter_loop:
+    .local pmc    it, val, key
+    .local string indent, key_str
+    .local int    key_starts_with_digit
+    indent = '  '
+    it = iter a
+  iter_loop:
     unless it goto iter_end
-        shift key, it
-        key_str = key
-        key_starts_with_digit = is_cclass .CCLASS_NUMERIC, key_str, 0
-        print indent
-        print '['
-        if key_starts_with_digit goto key_is_an_integer_1
-            print '"'
-key_is_an_integer_1:
-        print key
-        if key_starts_with_digit goto key_is_an_integer_2
-            print '"'
-key_is_an_integer_2:
-        say ']=>'
-        print indent
-        val = a[key]
-        var_dump(val)
+    shift key, it
+    key_str = key
+    key_starts_with_digit = is_cclass .CCLASS_NUMERIC, key_str, 0
+    print indent
+    print '['
+    if key_starts_with_digit goto key_is_an_integer_1
+    print '"'
+  key_is_an_integer_1:
+    print key
+    if key_starts_with_digit goto key_is_an_integer_2
+    print '"'
+  key_is_an_integer_2:
+    say ']=>'
+    print indent
+    val = a[key]
+    var_dump(val)
 
-        branch iter_loop
-iter_end:
-
-
-        say '}'
-       .return()
-
+    branch iter_loop
+  iter_end:
+    say '}'
+    .return()
   L2:
     unless type_of_pmc == 'integer' goto L3
-        print 'int('
-        print a
-        say ')'
+    print 'int('
+    print a
+    say ')'
 
-       .return()
-
+    .return()
   L3:
     unless type_of_pmc == 'boolean' goto L4
-        print 'bool('
-        if a goto a_is_true
-            print 'false'
-            say ')'
-           .return()
-a_is_true:
-            print 'true'
-            say ')'
-           .return()
+    print 'bool('
+    if a goto a_is_true
+    print 'false'
+    say ')'
 
+    .return()
+  a_is_true:
+    print 'true'
+    say ')'
+
+    .return()
+  set_null_type:
+    type_of_pmc = 'NULL'
   L4:
     unless type_of_pmc == 'NULL' goto L5
-        say 'NULL'
-        .return()
+    say type_of_pmc
 
+    .return()
   L5:
     # this should never happen
-    say type_of_pmc
+    print 'unexpectedly encountered a ' 
+    print type_of_pmc
+    print " PMC\n"
     _dumper(a)
 
     .return()

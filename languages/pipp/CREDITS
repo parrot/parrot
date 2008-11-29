@@ -18,3 +18,8 @@ D: Generate the Makefile from Makefile.in
 N: Bernhard Schmalhofer
 E: Bernhard.Schmalhofer@gmx.de
 D: Maintainer
+
+N: Jimmy Zhuo
+E: zhuomingliang@yahoo.com.cn
+D: Various patches
+D: Code beautification and bugfix in php_var.pir
