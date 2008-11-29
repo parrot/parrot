@@ -41,26 +41,12 @@
 #include "imc.h"
 #include "parser.h"
 
-#define MAX_PARAM 16
-
 typedef struct yyguts_t       yyguts_t;
 typedef struct parser_state_t parser_state_t;
 
-typedef struct params_t {
-    char *name[MAX_PARAM];
-    int   num_param;
-} params_t;
-
-typedef struct macro_t {
-    char    *expansion;
-    int      line;
-    params_t params;
-} macro_t;
-
 /* parser state structure
  * the first few items are common to struct parser_state, but
- * we AFAIK need this hack as flex doesn't export YY_BUFFER_STATE
- */
+ * we AFAIK need this hack as flex doesn't export YY_BUFFER_STATE */
 typedef struct macro_frame_t {
     struct parser_state_t s;
 
@@ -914,8 +900,6 @@ read_params(YYSTYPE *valp, PARROT_INTERP, params_t *params,
     /* See http://rt.perl.org/rt3/Ticket/Display.html?id=50920 for the saga of this bug. */
     /* For some reason, we have to use a dupe of the macro name to pass in to */
     /* read_params, or we get a segfault. XXX Make it stop. */
-    macro_name = str_dup(macro_name);
-
     while (c != ')') {
         if (YYSTATE == heredoc2)
             IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
@@ -1006,12 +990,15 @@ read_macro(YYSTYPE *valp, PARROT_INTERP, void *yyscanner)
     }
 
     while (c != ENDM) {
-        int elem_len;
+        char *old_s = valp->s;
+        int   elem_len;
 
-        if (c <= 0)
+        if (c <= 0) {
+            mem_sys_free(valp->s);
             IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                         "File ended before macro '%s' was complete",
                         IMCC_INFO(interp)->cur_macro_name);
+        }
 
         PARROT_ASSERT(valp->s);
         elem_len = strlen(valp->s);
@@ -1032,12 +1019,12 @@ read_macro(YYSTYPE *valp, PARROT_INTERP, void *yyscanner)
             IMCC_INFO(interp)->macro_buffer =
                 (char *)mem_sys_allocate_zeroed(buffer_size);
         }
+
         strcat(IMCC_INFO(interp)->macro_buffer, valp->s);
         buffer_used += elem_len;
-        mem_sys_free(valp->s);
-        valp->s = NULL;
 
         c = yylex(valp, yyscanner, interp);
+        mem_sys_free(old_s);
     }
 
     mem_sys_free(valp->s);
@@ -1049,7 +1036,7 @@ read_macro(YYSTYPE *valp, PARROT_INTERP, void *yyscanner)
                  &params, IMCC_INFO(interp)->macro_buffer, start_line);
 
     mem_sys_free(IMCC_INFO(interp)->macro_buffer);
-    IMCC_INFO(interp)->macro_buffer = NULL;
+    IMCC_INFO(interp)->macro_buffer   = NULL;
     IMCC_INFO(interp)->cur_macro_name = NULL;
 
     return MACRO;

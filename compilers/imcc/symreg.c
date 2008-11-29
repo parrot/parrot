@@ -858,7 +858,7 @@ _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int un
         const char * const sub_name = (uniq == U_add_uniq_sub)
                        /* remember to free this name; add_ns malloc()s it */
                        ? (aux_name= add_ns(interp, name))
-                       : name;
+                       : (char *)name;
 
         r = _get_sym(hsh, sub_name);
 

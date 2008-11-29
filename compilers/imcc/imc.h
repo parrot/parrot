@@ -533,6 +533,20 @@ typedef struct _imc_info_t {
     opcode_t              npc;
 } imc_info_t;
 
+/* macro structs */
+#define MAX_PARAM 16
+
+typedef struct params_t {
+    char *name[MAX_PARAM];
+    int   num_param;
+} params_t;
+
+typedef struct macro_t {
+    char    *expansion;
+    int      line;
+    params_t params;
+} macro_t;
+
 #define IMCC_INFO(i) (((Parrot_Interp)(i))->imc_info)
 
 #define IMC_TRACE      0
