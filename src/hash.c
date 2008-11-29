@@ -898,6 +898,39 @@ parrot_chash_destroy(PARROT_INTERP, ARGMOD(Hash *hash))
     parrot_hash_destroy(interp, hash);
 }
 
+
+/*
+
+=item C<void parrot_chash_destroy_values>
+
+Delete the specified hash by freeing the memory allocated to all the key-value
+pairs, calling the provided callback to free the values, and finally the hash
+itself.
+
+The callback returns C<void> and takes a C<void *>.
+
+=cut
+
+*/
+
+void
+parrot_chash_destroy_values(PARROT_INTERP, ARGMOD(Hash *hash),
+    ARGIN(value_free func))
+{
+    UINTVAL i;
+
+    for (i = 0; i <= hash->mask; i++) {
+        HashBucket *bucket = hash->bi[i];
+        while (bucket) {
+            mem_sys_free(bucket->key);
+            func(bucket->value);
+            bucket = bucket->next;
+        }
+    }
+
+    parrot_hash_destroy(interp, hash);
+}
+
 /*
 
 =item C<void parrot_new_hash_x>

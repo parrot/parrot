@@ -71,6 +71,8 @@ struct _hash {
     hash_hash_key_fn hash_val;  /* generate a hash value for key */
 };
 
+typedef void (*value_free)(void *);
+
 /* HEADERIZER BEGIN: src/hash.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -212,6 +214,13 @@ size_t key_hash_int(SHIM_INTERP, ARGIN(const void *value), size_t seed)
 void parrot_chash_destroy(PARROT_INTERP, ARGMOD(Hash *hash))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        FUNC_MODIFIES(*hash);
+
+void parrot_chash_destroy_values(PARROT_INTERP, ARGMOD(Hash *hash),
+    ARGIN(value_free func))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*hash);
 
 void parrot_new_hash_x(
