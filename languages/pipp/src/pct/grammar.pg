@@ -266,12 +266,12 @@ rule constructor_call {
 }
 
 token TRUE {
-    'TRUE'
+    [:i 'TRUE' ]
     {*}
 }
 
 token FALSE {
-    'FALSE'
+    [:i 'FALSE']
     {*}
 }
 

@@ -29,6 +29,10 @@ use Parrot::Test   tests => 18;
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'floatval()' );
 <?php
   echo floatval(TRUE), "\n";
+  echo floatval(tRUE), "\n";
+  echo floatval(TrUE), "\n";
+  echo floatval(tRue), "\n";
+  echo floatval(true), "\n";
   echo floatval(NULL), "\n";
   echo floatval(3), "\n";
   echo floatval('3.14'), "\n";
@@ -37,6 +41,10 @@ language_output_is( 'Pipp', <<'CODE', <<'OUT', 'floatval()' );
   echo floatval('str'), "\n";
 ?>
 CODE
+1
+1
+1
+1
 1
 0
 3
