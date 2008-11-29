@@ -35,6 +35,8 @@ used and not per subroutine or even opcode, it works per bytecode segment.
 #include "parrot/packfile.h"
 #include "parrot/oplib/ops.h"
 
+#define JIT_SEGS 0
+
 extern int jit_op_count(void);
 /*
  * s. jit/$jitcpuarch/jit_emit.h for the meaning of these defs
@@ -1406,8 +1408,8 @@ parrot_build_asm(PARROT_INTERP, ARGIN(opcode_t *code_start), ARGIN(opcode_t *cod
      * register allocation information inside.
      * See imcc/jit.c for more
      */
-#if 0
-    /* RT#45055
+#if JIT_SEGS
+    /* RT #45055
      * JIT segs are currently not built
      * the find_segments also segfaults on PPC eval_2
      * maybe something not initialized correctly
@@ -1421,16 +1423,16 @@ parrot_build_asm(PARROT_INTERP, ARGIN(opcode_t *code_start), ARGIN(opcode_t *cod
 #else
     jit_seg = NULL;
 #endif
-    /*
-     * remember register usage
-     */
+
+    /* remember register usage */
     n_regs_used = CONTEXT(interp)->n_regs_used;
     set_reg_usage(interp, code_start);
 
-    if (jit_seg)
-        optimize_imcc_jit(interp, jit_info, code_start, code_end, jit_seg);
-    else
-        optimize_jit(interp, jit_info, code_start, code_end);
+#if JIT_SEGS
+    optimize_imcc_jit(interp, jit_info, code_start, code_end, jit_seg);
+#else
+    optimize_jit(interp, jit_info, code_start, code_end);
+#endif
 
     /* Byte code size in opcode_t's */
     jit_info->arena.map_size = (code_end - code_start) + 1;
