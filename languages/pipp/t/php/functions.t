@@ -81,6 +81,21 @@ before: 22
 after: 22
 OUT
 
+=for perl6
+
+sub thrice( $a is rw )  {
+  print "$a times 3 is ";
+  $a = $a * 3;
+  print "$a.\n";
+}
+
+my $a = 22;
+print "before: $a\n";
+thrice( $a );
+print "after: $a\n";
+
+=cut
+
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'pass by reference', todo => 'not implemented yet' );
 <?php
 
