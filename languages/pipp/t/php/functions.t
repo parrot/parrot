@@ -169,6 +169,17 @@ CODE
 12 asdf -1
 OUT
 
+=for perl6
+
+sub return_100( )  {
+  return 100;
+}
+
+my $a = return_100();
+print "$a\n";
+
+=cut
+
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'return an integer', todo => 'not implemented yet' );
 <?php
 
