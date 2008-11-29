@@ -5380,6 +5380,13 @@ yylex_skip(YYSTYPE *valp, PARROT_INTERP, const char *skip, void *yyscanner)
         while (*p && c != *p)
             p++;
 
+        /* leave loop early if it gets found */
+        if (*p == '\0')
+            break;
+
+        /* free any str_dup()ed strings */
+        if (yytext)
+            mem_sys_free(valp->s);
     } while (*p != '\0');
 
     if (c)
@@ -5438,9 +5445,6 @@ read_params(YYSTYPE *valp, PARROT_INTERP, params_t *params,
 
     params->num_param = 0;
 
-    /* See http://rt.perl.org/rt3/Ticket/Display.html?id=50920 for the saga of this bug. */
-    /* For some reason, we have to use a dupe of the macro name to pass in to */
-    /* read_params, or we get a segfault. XXX Make it stop. */
     while (c != ')') {
         if (YYSTATE == heredoc2)
             IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
