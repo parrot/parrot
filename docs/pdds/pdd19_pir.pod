@@ -105,8 +105,7 @@ through named local variables declared with C<.local>.
   .local pmc foo
 
 The type of a named variable can be C<int>, C<num>, C<string> or C<pmc>,
-corresponding to the types of registers. No other types are used. [See
-RT#42769]
+corresponding to the types of registers. No other types are used.
 
 The second way of referencing a register is through a register variable
 C<$In>, C<$Sn>, C<$Nn>, or C<$Pn>. The capital letter indicates the type
@@ -115,9 +114,6 @@ digit(s) only. There is no limit on the size of I<n>. There is no direct
 correspondence between the value of I<n> and the position of the
 register in the register set, C<$P42> may be stored in the zeroth PMC
 register, if it is the only register in the subroutine.
-
-{{DEPRECATION NOTE: PIR will no longer support the old PASM-style syntax
-for registers without dollar signs: C<In>, C<Sn>, C<Nn>, C<Pn>. RT#57638}}
 
 =head2 Constants
 
@@ -597,7 +593,7 @@ outside of a loop and the call is done inside a loop.
 Directive to specify the object for a method call. Use it in combination
 with C<.meth_call>.
 
-=item  .meth_call
+=item .meth_call
 
 Directive to do a method call. It calls the specified method on the object
 that was specified with the C<.invocant> directive.
@@ -609,19 +605,11 @@ The specified subroutine must be loaded using the <dlfunc> op that takes
 the library, function name and function signature as arguments.
 See L<docs/pdds/pdd16_native_call> for details.
 
-=item .return <var> [:<flag>]*
-
-{{ Deprecated; use .set_return instead. See RT#58236. }}
-
 =item .set_return <var> [:<flag>]*
 
 Between C<.begin_return> and C<.end_return>, specify one or
 more of the return value(s) of the current subroutine.  Available
 flags: C<:flat>, C<:named>.
-
-=item .yield <var> [:<flag>]*
-
-{{ Deprecated; use .set_yield instead. See RT#58236. }}
 
 =item .set_yield <var> [:<flag>]*
 
@@ -629,18 +617,10 @@ Between C<.begin_yield> and C<.end_yield>, specify one or
 more of the yield value(s) of the current subroutine.  Available
 flags: C<:flat>, C<:named>.
 
-=item .arg <var> [:<flag>]*
-
-{{ Deprecated. Use .set_arg instead. See RT#58236. }}
-
 =item .set_arg <var> [:<flag>]*
 
 Between C<.begin_call> and C<.call>, specify an argument to be
 passed.  Available flags: C<:flat>, C<:named>.
-
-=item .result <var> [:<flag>]*
-
-{{ Deprecated. Use .get_result instead. See RT#58236. }}
 
 =item .get_result <var> [:<flag>]*
 
@@ -859,15 +839,6 @@ a I<reg>.
 =item .return ([<var> [:<flag> ...], ...])
 
 Return from the current subroutine with zero or more values.
-
-The parentheses surrounding the arguments are mandatory. Besides making
-sequence break more conspicuous, this is necessary to distinguish this
-syntax from other uses of the C<.return> directive that will be probably
-deprecated.
-
-{{ Since .return is deprecated in .begin_/end_return, do we still need and/or
-   want the parentheses?
-}}
 
 =item .tailcall <var>(args)
 
