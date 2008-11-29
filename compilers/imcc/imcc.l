@@ -1006,31 +1006,33 @@ read_macro(YYSTYPE *valp, PARROT_INTERP, void *yyscanner)
                         IMCC_INFO(interp)->cur_macro_name);
         }
 
-        PARROT_ASSERT(valp->s);
-        elem_len = strlen(valp->s);
+        if (valp->s) {
+            elem_len = strlen(valp->s);
 
-        if (buffer_used) {
-            if (buffer_used + elem_len > buffer_size) {
-                buffer_size += elem_len;
-                buffer_size <<= 1;
+            if (buffer_used) {
+                if (buffer_used + elem_len > buffer_size) {
+                    buffer_size += elem_len;
+                    buffer_size <<= 1;
+
+                    IMCC_INFO(interp)->macro_buffer =
+                        (char *)mem_sys_realloc(IMCC_INFO(interp)->macro_buffer,
+                            buffer_size);
+                }
+            }
+            else {
+                buffer_size = (elem_len << 1) > 1024 ? elem_len << 1 : 1024;
 
                 IMCC_INFO(interp)->macro_buffer =
-                    (char *)mem_sys_realloc(IMCC_INFO(interp)->macro_buffer,
-                        buffer_size);
+                    (char *)mem_sys_allocate_zeroed(buffer_size);
             }
+
+            strcat(IMCC_INFO(interp)->macro_buffer, valp->s);
+            buffer_used += elem_len;
+
+            mem_sys_free(valp->s);
+            valp->s = NULL;
         }
-        else {
-            buffer_size = (elem_len << 1) > 1024 ? elem_len << 1 : 1024;
-
-            IMCC_INFO(interp)->macro_buffer =
-                (char *)mem_sys_allocate_zeroed(buffer_size);
-        }
-
-        strcat(IMCC_INFO(interp)->macro_buffer, valp->s);
-        buffer_used += elem_len;
-
         c = yylex(valp, yyscanner, interp);
-        mem_sys_free(old_s);
     }
 
     mem_sys_free(valp->s);
