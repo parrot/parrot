@@ -466,7 +466,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'test that macros labels names can have the
 CODE
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', 'invalid label syntax', todo => 'RT #47978, RT #51104');
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'invalid label syntax' );
 .sub test :main
     .macro m()
         .local $iter_loop:
