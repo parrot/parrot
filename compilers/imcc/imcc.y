@@ -698,7 +698,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %nonassoc <t> PARAM
 
 %token <t> HLL HLL_MAP TK_LINE
-%token <t> GOTO ARG IF UNLESS PNULL SET_RETURN
+%token <t> GOTO ARG IF UNLESS PNULL SET_RETURN SET_YIELD
 %token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL ADV_OPT_FLAG ADV_NAMED ADV_ARROW
 %token <t> NEW ADV_INVOCANT
 %token <t> NAMESPACE ENDNAMESPACE DOT_METHOD
@@ -731,7 +731,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %type <i> labels _labels label  statement sub_call
 %type <i> pcc_sub_call
 %type <sr> sub_param sub_params pcc_arg pcc_result pcc_args pcc_results sub_param_type_def
-%type <sr> pcc_returns pcc_return pcc_call arg arglist the_sub multi_type
+%type <sr> pcc_returns pcc_yields pcc_return pcc_call arg arglist the_sub multi_type
 %type <t> argtype_list argtype paramtype_list paramtype
 %type <t> pcc_return_many
 %type <t> proto sub_proto sub_proto_list multi multi_types outer
@@ -740,7 +740,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %type <i> if_statement unless_statement
 %type <i> func_assign get_results
 %type <i> opt_invocant
-%type <sr> target targetlist reg const var string result
+%type <sr> target targetlist reg const var string result pcc_set_yield
 %type <sr> keylist keylist_force _keylist key maybe_ns
 %type <sr> vars _vars var_or_i _var_or_i label_op sub_label_op sub_label_op_c
 %type <i> pasmcode pasmline pasm_inst
@@ -1295,15 +1295,9 @@ paramtype:
 
 
 pcc_ret:
-     PCC_BEGIN_RETURN '\n'
-         {
-           begin_return_or_yield(interp, 0);
-         }
-     pcc_returns PCC_END_RETURN
-         {
-           $$ = 0;
-           IMCC_INFO(interp)->asm_state = AsmDefault;
-         }
+     PCC_BEGIN_RETURN '\n'     { begin_return_or_yield(interp, 0); }
+     pcc_returns
+     PCC_END_RETURN            { $$ = 0; IMCC_INFO(interp)->asm_state = AsmDefault; }
    | pcc_return_many
          {
            IMCC_INFO(interp)->asm_state = AsmDefault;
@@ -1313,7 +1307,7 @@ pcc_ret:
 
 pcc_yield:
      PCC_BEGIN_YIELD '\n'      { begin_return_or_yield(interp, 1); }
-     pcc_returns
+     pcc_yields
      PCC_END_YIELD             { $$ = 0; IMCC_INFO(interp)->asm_state = AsmDefault; }
    ;
 
@@ -1331,8 +1325,26 @@ pcc_returns:
          }
    ;
 
+pcc_yields:
+     /* empty */                { $$ = 0; }
+   | pcc_yields '\n'
+         {
+           if ($1)
+               add_pcc_result(IMCC_INFO(interp)->sr_return, $1);
+         }
+   | pcc_yields pcc_set_yield '\n'
+         {
+           if ($2)
+               add_pcc_result(IMCC_INFO(interp)->sr_return, $2);
+         }
+   ;
+
 pcc_return:
      SET_RETURN var argtype_list   { $$ = $2; $$->type |= $3; }
+   ;
+
+pcc_set_yield:
+     SET_YIELD var argtype_list    { $$ = $2; $$->type |= $3; }
    ;
 
 pcc_return_many:

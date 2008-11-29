@@ -342,6 +342,7 @@ SP              [ ]
 ".get_result"                  return RESULT;
 ".get_results"             return GET_RESULTS;
 ".yield"                   return YIELDT;
+".set_yield"               return SET_YIELD;
 ".return"                  return RETURN;
 ".set_return"              return SET_RETURN;
 ".tailcall"                return TAILCALL;

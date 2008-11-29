@@ -50,112 +50,113 @@
      UNLESS = 266,
      PNULL = 267,
      SET_RETURN = 268,
-     ADV_FLAT = 269,
-     ADV_SLURPY = 270,
-     ADV_OPTIONAL = 271,
-     ADV_OPT_FLAG = 272,
-     ADV_NAMED = 273,
-     ADV_ARROW = 274,
-     NEW = 275,
-     ADV_INVOCANT = 276,
-     NAMESPACE = 277,
-     ENDNAMESPACE = 278,
-     DOT_METHOD = 279,
-     SUB = 280,
-     SYM = 281,
-     LOCAL = 282,
-     LEXICAL = 283,
-     CONST = 284,
-     INC = 285,
-     DEC = 286,
-     GLOBAL_CONST = 287,
-     PLUS_ASSIGN = 288,
-     MINUS_ASSIGN = 289,
-     MUL_ASSIGN = 290,
-     DIV_ASSIGN = 291,
-     CONCAT_ASSIGN = 292,
-     BAND_ASSIGN = 293,
-     BOR_ASSIGN = 294,
-     BXOR_ASSIGN = 295,
-     FDIV = 296,
-     FDIV_ASSIGN = 297,
-     MOD_ASSIGN = 298,
-     SHR_ASSIGN = 299,
-     SHL_ASSIGN = 300,
-     SHR_U_ASSIGN = 301,
-     SHIFT_LEFT = 302,
-     SHIFT_RIGHT = 303,
-     INTV = 304,
-     FLOATV = 305,
-     STRINGV = 306,
-     PMCV = 307,
-     LOG_XOR = 308,
-     RELOP_EQ = 309,
-     RELOP_NE = 310,
-     RELOP_GT = 311,
-     RELOP_GTE = 312,
-     RELOP_LT = 313,
-     RELOP_LTE = 314,
-     GLOBALOP = 315,
-     RESULT = 316,
-     RETURN = 317,
-     TAILCALL = 318,
-     YIELDT = 319,
-     GET_RESULTS = 320,
-     POW = 321,
-     SHIFT_RIGHT_U = 322,
-     LOG_AND = 323,
-     LOG_OR = 324,
-     COMMA = 325,
-     ESUB = 326,
-     DOTDOT = 327,
-     PCC_BEGIN = 328,
-     PCC_END = 329,
-     PCC_CALL = 330,
-     PCC_SUB = 331,
-     PCC_BEGIN_RETURN = 332,
-     PCC_END_RETURN = 333,
-     PCC_BEGIN_YIELD = 334,
-     PCC_END_YIELD = 335,
-     NCI_CALL = 336,
-     METH_CALL = 337,
-     INVOCANT = 338,
-     MAIN = 339,
-     LOAD = 340,
-     INIT = 341,
-     IMMEDIATE = 342,
-     POSTCOMP = 343,
-     METHOD = 344,
-     ANON = 345,
-     OUTER = 346,
-     NEED_LEX = 347,
-     MULTI = 348,
-     VTABLE_METHOD = 349,
-     LOADLIB = 350,
-     SUB_INSTANCE_OF = 351,
-     SUB_LEXID = 352,
-     UNIQUE_REG = 353,
-     LABEL = 354,
-     EMIT = 355,
-     EOM = 356,
-     IREG = 357,
-     NREG = 358,
-     SREG = 359,
-     PREG = 360,
-     IDENTIFIER = 361,
-     REG = 362,
-     MACRO = 363,
-     ENDM = 364,
-     STRINGC = 365,
-     INTC = 366,
-     FLOATC = 367,
-     USTRINGC = 368,
-     PARROT_OP = 369,
-     VAR = 370,
-     LINECOMMENT = 371,
-     FILECOMMENT = 372,
-     DOT = 373,
-     CONCAT = 374
+     SET_YIELD = 269,
+     ADV_FLAT = 270,
+     ADV_SLURPY = 271,
+     ADV_OPTIONAL = 272,
+     ADV_OPT_FLAG = 273,
+     ADV_NAMED = 274,
+     ADV_ARROW = 275,
+     NEW = 276,
+     ADV_INVOCANT = 277,
+     NAMESPACE = 278,
+     ENDNAMESPACE = 279,
+     DOT_METHOD = 280,
+     SUB = 281,
+     SYM = 282,
+     LOCAL = 283,
+     LEXICAL = 284,
+     CONST = 285,
+     INC = 286,
+     DEC = 287,
+     GLOBAL_CONST = 288,
+     PLUS_ASSIGN = 289,
+     MINUS_ASSIGN = 290,
+     MUL_ASSIGN = 291,
+     DIV_ASSIGN = 292,
+     CONCAT_ASSIGN = 293,
+     BAND_ASSIGN = 294,
+     BOR_ASSIGN = 295,
+     BXOR_ASSIGN = 296,
+     FDIV = 297,
+     FDIV_ASSIGN = 298,
+     MOD_ASSIGN = 299,
+     SHR_ASSIGN = 300,
+     SHL_ASSIGN = 301,
+     SHR_U_ASSIGN = 302,
+     SHIFT_LEFT = 303,
+     SHIFT_RIGHT = 304,
+     INTV = 305,
+     FLOATV = 306,
+     STRINGV = 307,
+     PMCV = 308,
+     LOG_XOR = 309,
+     RELOP_EQ = 310,
+     RELOP_NE = 311,
+     RELOP_GT = 312,
+     RELOP_GTE = 313,
+     RELOP_LT = 314,
+     RELOP_LTE = 315,
+     GLOBALOP = 316,
+     RESULT = 317,
+     RETURN = 318,
+     TAILCALL = 319,
+     YIELDT = 320,
+     GET_RESULTS = 321,
+     POW = 322,
+     SHIFT_RIGHT_U = 323,
+     LOG_AND = 324,
+     LOG_OR = 325,
+     COMMA = 326,
+     ESUB = 327,
+     DOTDOT = 328,
+     PCC_BEGIN = 329,
+     PCC_END = 330,
+     PCC_CALL = 331,
+     PCC_SUB = 332,
+     PCC_BEGIN_RETURN = 333,
+     PCC_END_RETURN = 334,
+     PCC_BEGIN_YIELD = 335,
+     PCC_END_YIELD = 336,
+     NCI_CALL = 337,
+     METH_CALL = 338,
+     INVOCANT = 339,
+     MAIN = 340,
+     LOAD = 341,
+     INIT = 342,
+     IMMEDIATE = 343,
+     POSTCOMP = 344,
+     METHOD = 345,
+     ANON = 346,
+     OUTER = 347,
+     NEED_LEX = 348,
+     MULTI = 349,
+     VTABLE_METHOD = 350,
+     LOADLIB = 351,
+     SUB_INSTANCE_OF = 352,
+     SUB_LEXID = 353,
+     UNIQUE_REG = 354,
+     LABEL = 355,
+     EMIT = 356,
+     EOM = 357,
+     IREG = 358,
+     NREG = 359,
+     SREG = 360,
+     PREG = 361,
+     IDENTIFIER = 362,
+     REG = 363,
+     MACRO = 364,
+     ENDM = 365,
+     STRINGC = 366,
+     INTC = 367,
+     FLOATC = 368,
+     USTRINGC = 369,
+     PARROT_OP = 370,
+     VAR = 371,
+     LINECOMMENT = 372,
+     FILECOMMENT = 373,
+     DOT = 374,
+     CONCAT = 375
    };
 #endif
 /* Tokens.  */
@@ -170,112 +171,113 @@
 #define UNLESS 266
 #define PNULL 267
 #define SET_RETURN 268
-#define ADV_FLAT 269
-#define ADV_SLURPY 270
-#define ADV_OPTIONAL 271
-#define ADV_OPT_FLAG 272
-#define ADV_NAMED 273
-#define ADV_ARROW 274
-#define NEW 275
-#define ADV_INVOCANT 276
-#define NAMESPACE 277
-#define ENDNAMESPACE 278
-#define DOT_METHOD 279
-#define SUB 280
-#define SYM 281
-#define LOCAL 282
-#define LEXICAL 283
-#define CONST 284
-#define INC 285
-#define DEC 286
-#define GLOBAL_CONST 287
-#define PLUS_ASSIGN 288
-#define MINUS_ASSIGN 289
-#define MUL_ASSIGN 290
-#define DIV_ASSIGN 291
-#define CONCAT_ASSIGN 292
-#define BAND_ASSIGN 293
-#define BOR_ASSIGN 294
-#define BXOR_ASSIGN 295
-#define FDIV 296
-#define FDIV_ASSIGN 297
-#define MOD_ASSIGN 298
-#define SHR_ASSIGN 299
-#define SHL_ASSIGN 300
-#define SHR_U_ASSIGN 301
-#define SHIFT_LEFT 302
-#define SHIFT_RIGHT 303
-#define INTV 304
-#define FLOATV 305
-#define STRINGV 306
-#define PMCV 307
-#define LOG_XOR 308
-#define RELOP_EQ 309
-#define RELOP_NE 310
-#define RELOP_GT 311
-#define RELOP_GTE 312
-#define RELOP_LT 313
-#define RELOP_LTE 314
-#define GLOBALOP 315
-#define RESULT 316
-#define RETURN 317
-#define TAILCALL 318
-#define YIELDT 319
-#define GET_RESULTS 320
-#define POW 321
-#define SHIFT_RIGHT_U 322
-#define LOG_AND 323
-#define LOG_OR 324
-#define COMMA 325
-#define ESUB 326
-#define DOTDOT 327
-#define PCC_BEGIN 328
-#define PCC_END 329
-#define PCC_CALL 330
-#define PCC_SUB 331
-#define PCC_BEGIN_RETURN 332
-#define PCC_END_RETURN 333
-#define PCC_BEGIN_YIELD 334
-#define PCC_END_YIELD 335
-#define NCI_CALL 336
-#define METH_CALL 337
-#define INVOCANT 338
-#define MAIN 339
-#define LOAD 340
-#define INIT 341
-#define IMMEDIATE 342
-#define POSTCOMP 343
-#define METHOD 344
-#define ANON 345
-#define OUTER 346
-#define NEED_LEX 347
-#define MULTI 348
-#define VTABLE_METHOD 349
-#define LOADLIB 350
-#define SUB_INSTANCE_OF 351
-#define SUB_LEXID 352
-#define UNIQUE_REG 353
-#define LABEL 354
-#define EMIT 355
-#define EOM 356
-#define IREG 357
-#define NREG 358
-#define SREG 359
-#define PREG 360
-#define IDENTIFIER 361
-#define REG 362
-#define MACRO 363
-#define ENDM 364
-#define STRINGC 365
-#define INTC 366
-#define FLOATC 367
-#define USTRINGC 368
-#define PARROT_OP 369
-#define VAR 370
-#define LINECOMMENT 371
-#define FILECOMMENT 372
-#define DOT 373
-#define CONCAT 374
+#define SET_YIELD 269
+#define ADV_FLAT 270
+#define ADV_SLURPY 271
+#define ADV_OPTIONAL 272
+#define ADV_OPT_FLAG 273
+#define ADV_NAMED 274
+#define ADV_ARROW 275
+#define NEW 276
+#define ADV_INVOCANT 277
+#define NAMESPACE 278
+#define ENDNAMESPACE 279
+#define DOT_METHOD 280
+#define SUB 281
+#define SYM 282
+#define LOCAL 283
+#define LEXICAL 284
+#define CONST 285
+#define INC 286
+#define DEC 287
+#define GLOBAL_CONST 288
+#define PLUS_ASSIGN 289
+#define MINUS_ASSIGN 290
+#define MUL_ASSIGN 291
+#define DIV_ASSIGN 292
+#define CONCAT_ASSIGN 293
+#define BAND_ASSIGN 294
+#define BOR_ASSIGN 295
+#define BXOR_ASSIGN 296
+#define FDIV 297
+#define FDIV_ASSIGN 298
+#define MOD_ASSIGN 299
+#define SHR_ASSIGN 300
+#define SHL_ASSIGN 301
+#define SHR_U_ASSIGN 302
+#define SHIFT_LEFT 303
+#define SHIFT_RIGHT 304
+#define INTV 305
+#define FLOATV 306
+#define STRINGV 307
+#define PMCV 308
+#define LOG_XOR 309
+#define RELOP_EQ 310
+#define RELOP_NE 311
+#define RELOP_GT 312
+#define RELOP_GTE 313
+#define RELOP_LT 314
+#define RELOP_LTE 315
+#define GLOBALOP 316
+#define RESULT 317
+#define RETURN 318
+#define TAILCALL 319
+#define YIELDT 320
+#define GET_RESULTS 321
+#define POW 322
+#define SHIFT_RIGHT_U 323
+#define LOG_AND 324
+#define LOG_OR 325
+#define COMMA 326
+#define ESUB 327
+#define DOTDOT 328
+#define PCC_BEGIN 329
+#define PCC_END 330
+#define PCC_CALL 331
+#define PCC_SUB 332
+#define PCC_BEGIN_RETURN 333
+#define PCC_END_RETURN 334
+#define PCC_BEGIN_YIELD 335
+#define PCC_END_YIELD 336
+#define NCI_CALL 337
+#define METH_CALL 338
+#define INVOCANT 339
+#define MAIN 340
+#define LOAD 341
+#define INIT 342
+#define IMMEDIATE 343
+#define POSTCOMP 344
+#define METHOD 345
+#define ANON 346
+#define OUTER 347
+#define NEED_LEX 348
+#define MULTI 349
+#define VTABLE_METHOD 350
+#define LOADLIB 351
+#define SUB_INSTANCE_OF 352
+#define SUB_LEXID 353
+#define UNIQUE_REG 354
+#define LABEL 355
+#define EMIT 356
+#define EOM 357
+#define IREG 358
+#define NREG 359
+#define SREG 360
+#define PREG 361
+#define IDENTIFIER 362
+#define REG 363
+#define MACRO 364
+#define ENDM 365
+#define STRINGC 366
+#define INTC 367
+#define FLOATC 368
+#define USTRINGC 369
+#define PARROT_OP 370
+#define VAR 371
+#define LINECOMMENT 372
+#define FILECOMMENT 373
+#define DOT 374
+#define CONCAT 375
 
 
 
@@ -291,7 +293,7 @@ typedef union YYSTYPE
     Instruction *i;
 }
 /* Line 1489 of yacc.c.  */
-#line 295 "compilers/imcc/imcparser.h"
+#line 297 "compilers/imcc/imcparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
