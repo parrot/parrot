@@ -133,7 +133,7 @@ CODE
 8
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'var_dump() with string key', skip => 'excessive memory usage' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'var_dump() with string key' );
 <?php
 $foo['bar'] = 'asdf';
 echo $foo['bar'];
@@ -147,7 +147,7 @@ array(1) {
 }
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'var_dump() with int key', skip => 'excessive memory usage' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'var_dump() with int key' );
 <?php
 $twice[1] = 2;
 echo $twice[1];
