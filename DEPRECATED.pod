@@ -86,13 +86,6 @@ one or both of these flags.
 
 =over 4
 
-=item * old-style PASM registers [post 0.6.4]
-
-Old-style PASM registers without the C<$> character are deprecated; use
-PIR-style registers only.
-
-See RT #57638.
-
 =item * C<global> keyword [post 0.6.4]
 
 See RT #48016
@@ -131,30 +124,6 @@ Will have to be:
 
     print $S0
     substr $P0, 1, 2, "x"
-
-=item * C<.return> in C<.begin_return> / C<.end_return> [post 0.7.2]
-
-The C<.return> directive in a C<.begin_return> sequence will be replaced by
-the C<.set_return> directive. Likewise, C<.yield> in a C<.begin_yield>
-sequence will be replaced by C<.set_yield>.
-
-See RT #58980.
-
-=item * C<.arg> will become C<.set_arg> [post 0.7.2]
-
-In a C<.begin_call> sequence, the C<.arg> directive will be replaced by
-C<.set_arg>.
-
-See RT #58976.
-
-=item * C<.result> will become C<.get_result> [post 0.7.2]
-
-In a C<.begin_call> sequence, the C<.result> direcive will be replaced by
-the more descriptive C<.get_result>.
-
-See RT #58978.
-
-See RT #60592.
 
 =item * Exception Handlers won't automatically be disabled [post 0.8.1]
 
