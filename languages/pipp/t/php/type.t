@@ -142,9 +142,15 @@ language_output_is( 'Pipp', <<'CODE', <<'OUT', 'is_bool(TRUE)' );
 <?php
   echo is_bool(TRUE), "\n";
   echo is_bool(FALSE), "\n";
+  echo is_bool(fALSE), "\n";
+  echo is_bool(falsE), "\n";
+  echo is_bool(false), "\n";
   echo is_bool(NULL), "\n";
 ?>
 CODE
+1
+1
+1
 1
 1
 
