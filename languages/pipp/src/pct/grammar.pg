@@ -120,6 +120,7 @@ rule block {
 
 rule statement {
       <namespace_statement>     {*}  #= namespace_statement
+    | <return_statement>        {*}  #= return_statement
     | <require_once_statement>  {*}  #= require_once_statement
     | <echo_statement>          {*}  #= echo_statement
     | <expression_statement>    {*}  #= expression_statement
@@ -141,6 +142,12 @@ rule statement_delimiter {
 
 rule namespace_statement {
     'namespace' <NAMESPACE_NAME> ';'
+    {*}
+}
+
+# return can appear inside and outside functions
+token return_statement {
+    'return' <.ws_char> <expression> <.statement_delimiter>
     {*}
 }
 

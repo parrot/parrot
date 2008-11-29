@@ -102,6 +102,25 @@ it understands how to properly merge C<MultiSub> PMCs.
     die $S0
 .end
 
+
+.include 'except_types.pasm'
+.include 'except_severity.pasm'
+
+.sub 'return'
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+
+    if has_value goto have_value
+    value = 'list'()
+  have_value:
+    $P0         = new 'Exception'
+    $P0['type'] = .CONTROL_RETURN
+    setattribute $P0, 'payload', value
+    throw $P0
+    .return (value)
+.end
+
+
 =back
 
 =cut

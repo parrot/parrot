@@ -126,6 +126,17 @@ method namespace_statement($/) {
     make $past;
 }
 
+method return_statement($/) {
+    my $past := PAST::Op.new(
+                   :name('return'),
+                   :pasttype('call'),
+                   :node( $/ ),
+                   $( $/<expression> )
+               );
+
+    make $past;
+}
+
 method require_once_statement($/) {
     my $past := PAST::Op.new(
                    :name('require'),

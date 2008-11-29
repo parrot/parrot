@@ -20,7 +20,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 15;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'function with no args' );
 <?php
@@ -171,26 +171,132 @@ OUT
 
 =for perl6
 
-sub return_100( )  {
+sub func_with_return( )  {
   return 100;
 }
 
-my $a = return_100();
+my $a = func_with_return();
 print "$a\n";
 
 =cut
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'return an integer', todo => 'not implemented yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'return an integer' );
 <?php
 
-function return_100 ( )  {
+function func_with_return ( )  {
   return 100;
 }
 
-$a = return_100();
+$a = func_with_return();
 echo "$a\n";
 
 ?>
 CODE
 100
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'return a string' );
+<?php
+
+function func_with_return ( )  {
+  return 'I am a string.';
+}
+
+$a = func_with_return();
+echo "$a\n";
+
+?>
+CODE
+I am a string.
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'return a number' );
+<?php
+
+function func_with_return ( )  {
+  return 3.14;
+}
+
+$a = func_with_return();
+echo "$a\n";
+
+?>
+CODE
+3.14
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'return TRUE' );
+<?php
+
+function func_with_return ( )  {
+  return TRUE;
+}
+
+$a = func_with_return();
+echo "returned: $a\n";
+
+?>
+CODE
+returned: 1
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'return FALSE' );
+<?php
+
+function func_with_return ( )  {
+  return FALSE;
+}
+
+$a = func_with_return();
+echo "returned:'$a'\n";
+
+?>
+CODE
+returned:''
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'return 0' );
+<?php
+
+function func_with_return ( )  {
+  return 0;
+}
+
+$a = func_with_return();
+echo "$a\n";
+
+?>
+CODE
+0
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'return NULL' );
+<?php
+
+function func_with_return ( )  {
+  return NULL;
+}
+
+$a = func_with_return();
+echo "returned:'$a'\n";
+
+?>
+CODE
+returned:''
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'return a variable', todo => 'not working yet' );
+<?php
+
+function func_with_return ( )  {
+  $local_var = 'I was a variable';
+  return $local_var;
+}
+
+$a = func_with_return();
+echo "$a\n";
+
+?>
+CODE
+I was a variable.
 OUT
