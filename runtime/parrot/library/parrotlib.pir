@@ -94,7 +94,7 @@ This function returns the absolute filename of the requested file.
     $S0 = find_file_path( name, $P0 )
 
     .begin_return
-    .return $S0
+    .set_return $S0
     .end_return
 .end
 
@@ -114,7 +114,7 @@ This function returns the absolute filename of the requested file.
     $S0 = find_file_path( name, $P0 )
 
     .begin_return
-    .return $S0
+    .set_return $S0
     .end_return
 .end
 
@@ -155,7 +155,7 @@ Returns the location of a dynamic extension.
 
 END:
     .begin_return
-    .return name
+    .set_return name
     .end_return
 .end
 
@@ -178,7 +178,7 @@ NEXT:
     if_null ret, NEXT
 END:
     .begin_return
-    .return ret
+    .set_return ret
     .end_return
 .end
 
@@ -198,7 +198,7 @@ END:
     null $S0
 OK:
     .begin_return
-    .return $S0
+    .set_return $S0
     .end_return
 .end
 

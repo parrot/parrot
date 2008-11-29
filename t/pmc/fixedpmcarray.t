@@ -348,7 +348,7 @@ done:
     compares = global "compares"
     inc compares
     .begin_return
-    .return $I0
+    .set_return $I0
     .end_return
 .end
 CODE

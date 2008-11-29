@@ -926,8 +926,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "optional returns, void ret" );
     f = global "foo"
     .begin_call
     .call f
-    .result   $P0 :optional
-    .result   $I0 :opt_flag
+    .get_result   $P0 :optional
+    .get_result   $I0 :opt_flag
     .end_call
     unless $I0,  ex
     print "not "

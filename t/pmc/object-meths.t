@@ -356,7 +356,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "methods: self w arg and ret" );
     B."blah"()
     self."blah"()
     .begin_return
-    .return B
+    .set_return B
     .end_return
 
 .end

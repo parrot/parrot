@@ -66,11 +66,11 @@ LOOP:
     branch LOOP
 END:
     .begin_return
-    .return 0
+    .set_return 0
     .end_return
 IS:
     .begin_return
-    .return 1
+    .set_return 1
     .end_return
 .end
 

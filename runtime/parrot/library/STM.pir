@@ -53,7 +53,7 @@ restart_tx:
     stm_start
     .begin_call
     .call $P0
-    .result the_result :slurpy
+    .get_result the_result :slurpy
     .end_call
 done_tx:
     #stm_depth $I0

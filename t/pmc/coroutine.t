@@ -65,7 +65,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example" );
     loop:
         .begin_call
             .call itr, return
-            .result counter
+            .get_result counter
         .end_call
 
         print counter
@@ -86,7 +86,7 @@ return_here:
     x = 0
     iloop:
         .begin_yield
-        .return x
+        .set_return x
         .end_yield
         x = x + 1
     if x <= 10 goto iloop
@@ -288,8 +288,8 @@ pir_output_is( <<'CODE', '01234', "Coro new - yield" );
 loop:
     .begin_call
     .call c
-    .result   $P0 :optional
-    .result   $I0 :opt_flag
+    .get_result   $P0 :optional
+    .get_result   $I0 :opt_flag
     .end_call
     unless $I0,  ex
     print $P0

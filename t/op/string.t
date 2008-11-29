@@ -2679,7 +2679,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'join: get_string returns a null string' );
 
     null ret
     .begin_return
-    .return ret
+    .set_return ret
     .end_return
 .end
 CODE

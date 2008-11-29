@@ -287,7 +287,7 @@ loop:
     le from, to, loop
 
     .begin_return
-    .return sum
+    .set_return sum
     .end_return
 .end
 CODE

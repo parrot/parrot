@@ -21,7 +21,7 @@ pir_output_is( <<'CODE', <<'OUT', "low-level syntax" );
     .set_arg y
     .call sub
     .local string z
-    .result z
+    .get_result z
     .end_call
     print z
     end

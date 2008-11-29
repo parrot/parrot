@@ -309,7 +309,6 @@ SP              [ ]
 
 <*>".line"               return TK_LINE;
 <INITIAL,emit>".lex"     return LEXICAL;
-".arg"                   return ARG;
 ".set_arg"               return ARG;
 ".sub"                   return SUB;
 ".end"                   return ESUB;
@@ -340,10 +339,11 @@ SP              [ ]
 ":instanceof"              return SUB_INSTANCE_OF;
 ":subid"                   return SUB_LEXID;
 
-".result"                  return RESULT;
+".get_result"                  return RESULT;
 ".get_results"             return GET_RESULTS;
 ".yield"                   return YIELDT;
 ".return"                  return RETURN;
+".set_return"              return SET_RETURN;
 ".tailcall"                return TAILCALL;
 <emit,INITIAL>".loadlib"   return LOADLIB;
 

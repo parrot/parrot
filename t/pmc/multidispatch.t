@@ -137,7 +137,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "INTVAL return numeq" );
     .param pmc left
     .param pmc right
     .begin_return
-    .return -42
+    .set_return -42
     .end_return
 .end
 CODE
@@ -164,7 +164,7 @@ nok:
     .param pmc left
     .param pmc right
     .begin_return
-    .return -42
+    .set_return -42
     .end_return
 .end
 CODE
@@ -198,7 +198,7 @@ nok:
     .param pmc left
     .param pmc right
     .begin_return
-    .return -42
+    .set_return -42
     .end_return
 .end
 CODE

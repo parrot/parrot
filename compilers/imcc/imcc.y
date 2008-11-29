@@ -698,7 +698,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %nonassoc <t> PARAM
 
 %token <t> HLL HLL_MAP TK_LINE
-%token <t> GOTO ARG IF UNLESS PNULL
+%token <t> GOTO ARG IF UNLESS PNULL SET_RETURN
 %token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL ADV_OPT_FLAG ADV_NAMED ADV_ARROW
 %token <t> NEW ADV_INVOCANT
 %token <t> NAMESPACE ENDNAMESPACE DOT_METHOD
@@ -1332,7 +1332,7 @@ pcc_returns:
    ;
 
 pcc_return:
-     RETURN var argtype_list   { $$ = $2; $$->type |= $3; }
+     SET_RETURN var argtype_list   { $$ = $2; $$->type |= $3; }
    ;
 
 pcc_return_many:

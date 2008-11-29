@@ -93,7 +93,7 @@ pir_output_is( <<'CODE', <<'OUT', "meth call ret = o.m(arg)" );
     print "in meth\n"
     print s
     .begin_return
-    .return "done\n"
+    .set_return "done\n"
     .end_return
 .end
 CODE
@@ -257,7 +257,7 @@ pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax, args" );
     .set_arg "\n"
     .invocant obj
     .meth_call "_meth"
-    .result $S0
+    .get_result $S0
     .end_call
     print $S0
     print "done\n"
@@ -272,7 +272,7 @@ pir_output_is( <<'CODE', <<'OUT', "explicit meth call syntax, args" );
     print p1
     print p2
     .begin_return
-    .return "ok\n"
+    .set_return "ok\n"
     .end_return
 .end
 CODE

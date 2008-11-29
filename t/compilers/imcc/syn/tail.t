@@ -236,9 +236,9 @@ doit:
     $P1 = new 'Integer'
     $P1 = arg1 + arg2
     .begin_return
-    .return $P1
-    .return arg1
-    .return arg2
+    .set_return $P1
+    .set_return arg1
+    .set_return arg2
     .end_return
 .end
 CODE
