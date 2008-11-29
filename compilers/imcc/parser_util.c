@@ -1485,6 +1485,14 @@ static void
 imcc_destroy_macro_values(void *value)
 {
     macro_t *m = (macro_t *)value;
+    int      i;
+
+    for (i = 0; i < m->params.num_param; ++i) {
+        char *name = m->params.name[i];
+        if (name)
+            mem_sys_free(name);
+    }
+
     mem_sys_free(m->expansion);
     mem_sys_free(m);
 }
