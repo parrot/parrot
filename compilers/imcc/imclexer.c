@@ -5616,7 +5616,7 @@ define_macro(PARROT_INTERP, ARGIN(const char *name), ARGIN(const params_t *param
 
         if (!IMCC_INFO(interp)->macros)
             parrot_new_cstring_hash(interp, &IMCC_INFO(interp)->macros);
-        parrot_hash_put(interp, IMCC_INFO(interp)->macros, str_dup(name), m);
+        parrot_hash_put(interp, IMCC_INFO(interp)->macros, name, m);
     }
 
     if (params)
