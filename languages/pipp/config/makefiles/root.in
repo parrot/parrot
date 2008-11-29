@@ -305,7 +305,7 @@ clean-common: clean-pmc
   src/common/pipplib.pbc \
   src/common/*.pbc \
   pipp.pbc \
-  pipp.c pipp.o pipp
+  pipp.c pipp.o pipp$(EXE)
 
 clean-pmc:
 	$(RM_F) "$(PMCDIR)/*dump" "$(PMCDIR)/*.c" "$(PMCDIR)/pmc_*h" "$(PMCDIR)/php_group.h" "$(PMCDIR)/*$(O)" "$(PMCDIR)/*$(LOAD_EXT)"
