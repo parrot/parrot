@@ -23,7 +23,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test  tests => 10;
+use Parrot::Test  tests => 12;
 
 =for perl6
 
@@ -160,6 +160,24 @@ array(1) {
   int(2)
 }
 OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'var_dump() with null and undefined key' );
+<?php
+var_dump(var_dump($a));
+CODE
+NULL
+NULL
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'var_dump() with null and int key' );
+<?php
+$a = 11;
+var_dump(var_dump($a));
+CODE
+int(11)
+NULL
+OUT
+
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'increment' );
 <?php
