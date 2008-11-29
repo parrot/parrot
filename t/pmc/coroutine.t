@@ -86,7 +86,7 @@ return_here:
     x = 0
     iloop:
         .begin_yield
-        .set_return x
+        .set_yield x
         .end_yield
         x = x + 1
     if x <= 10 goto iloop
