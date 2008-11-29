@@ -20,7 +20,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'function with no args' );
 <?php
@@ -169,3 +169,17 @@ CODE
 12 asdf -1
 OUT
 
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'return an integer', todo => 'not implemented yet' );
+<?php
+
+function return_100 ( )  {
+  return 100;
+}
+
+$a = return_100();
+echo "$a\n";
+
+?>
+CODE
+100
+OUT
