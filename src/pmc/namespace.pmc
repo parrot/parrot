@@ -86,8 +86,13 @@ ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING *key, PMC *value)
         }
     }
 
-    if (sub->comp_flags & SUB_COMP_FLAG_METHOD)
-        add_to_class(interp, nsinfo, classobj, key, value);
+    if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
+        STRING *method_name = key;
+
+        if (0 != string_equal(interp, sub->method_name, CONST_STRING(interp, "")))
+            method_name = sub->method_name;
+        add_to_class(interp, nsinfo, classobj, method_name, value);
+    }
 
     /* If it's anonymous, we're done. */
     if (PObj_get_FLAGS(value) & SUB_FLAG_PF_ANON)
@@ -269,7 +274,12 @@ really a public API.
                 Parrot_sub * const sub = PMC_sub(pmc_sub);
 
                 if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
-                    add_to_class(INTERP, nsinfo, classobj, key, value);
+                    STRING *method_name = key;
+
+                    if (0 != string_equal(interp, sub->method_name, CONST_STRING(interp, "")))
+                        method_name = sub->method_name;
+
+                    add_to_class(INTERP, nsinfo, classobj, method_name, value);
 
                     SUPER(key, value);
                 }

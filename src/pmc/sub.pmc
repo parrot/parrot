@@ -441,6 +441,10 @@ Marks the sub as live.
 
         if (sub->name)
             pobject_lives(INTERP, (PObj *) sub->name);
+        if (sub->method_name)
+            pobject_lives(INTERP, (PObj *) sub->method_name);
+        if (sub->ns_entry_name)
+            pobject_lives(INTERP, (PObj *) sub->ns_entry_name);
         if (!PMC_IS_NULL(sub->namespace_name))
             pobject_lives(INTERP, (PObj *) sub->namespace_name);
         if (!PMC_IS_NULL(sub->multi_signature))
@@ -528,6 +532,8 @@ Archives the subroutine.
          * - segment TODO ???
          * - flags  (i.e. :load pragma and such)
          * - name of the sub's label
+         * - method name
+         * - ns entry name
          * - namespace
          * - HLL_id
          * - multi_signature
@@ -544,10 +550,17 @@ Archives the subroutine.
 
         VTABLE_push_string(INTERP, io, sub->name);
 
+        if (!sub->method_name)
+            sub->method_name = CONST_STRING(INTERP, "");
+        VTABLE_push_string(INTERP, io, sub->method_name);
+
+        if (!sub->ns_entry_name)
+            sub->ns_entry_name = CONST_STRING(INTERP, "");
+        VTABLE_push_string(INTERP, io, sub->ns_entry_name);
+
         hll_name = Parrot_get_HLL_name(INTERP, sub->HLL_id);
         if (!hll_name)
             hll_name = CONST_STRING(INTERP, "");
-
         VTABLE_push_string(INTERP, io, hll_name);
 
         VTABLE_push_integer(INTERP, io, (INTVAL)sub->comp_flags);
@@ -587,11 +600,13 @@ Unarchives the subroutine.
 
             PObj_get_FLAGS(SELF) |= flags & SUB_FLAG_PF_MASK;
 
-            sub->name         = VTABLE_shift_string(INTERP, io);
-            sub->HLL_id       = Parrot_get_HLL_id(INTERP,
+            sub->name           = VTABLE_shift_string(INTERP, io);
+            sub->method_name    = VTABLE_shift_string(INTERP, io);
+            sub->ns_entry_name  = VTABLE_shift_string(INTERP, io);
+            sub->HLL_id         = Parrot_get_HLL_id(INTERP,
                 VTABLE_shift_string(INTERP, io));
-            sub->comp_flags   = VTABLE_shift_integer(INTERP, io);
-            sub->vtable_index = VTABLE_shift_integer(INTERP, io);
+            sub->comp_flags     = VTABLE_shift_integer(INTERP, io);
+            sub->vtable_index   = VTABLE_shift_integer(INTERP, io);
 
             for (i = 0; i < 4; ++i)
                 sub->n_regs_used[i] = VTABLE_shift_integer(INTERP, io);

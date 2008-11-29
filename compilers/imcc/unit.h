@@ -64,7 +64,11 @@ struct _IMC_Unit {
     SymReg           *outer;
     PMC              *sub_pmc;          /* this sub */
     int               is_vtable_method; /* 1 if a v-table method */
+    int               is_method;        /* 1 if a method */
+    int               has_ns_entry_name;/* 1 if in ns */
     char             *vtable_name;      /* v-table method name, if any */
+    char             *method_name;      /* method name, if any */
+    char             *ns_entry_name;    /* ns entry name, if any */
     char             *instance_of;      /* PMC or class this is an instance of
                                          * if any */
     SymReg           *subid;            /* Unique subroutine id */

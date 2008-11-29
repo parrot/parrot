@@ -716,6 +716,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
 %token <t> MAIN LOAD INIT IMMEDIATE POSTCOMP METHOD ANON OUTER NEED_LEX
 %token <t> MULTI VTABLE_METHOD LOADLIB SUB_INSTANCE_OF SUB_LEXID
+%token <t> NS_ENTRY
 %token <t> UNIQUE_REG
 %token <s> LABEL
 %token <t> EMIT EOM
@@ -736,6 +737,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %type <t> pcc_return_many
 %type <t> proto sub_proto sub_proto_list multi multi_types outer
 %type <t> vtable instanceof subid
+%type <t> method ns_entry_name
 %type <i> instruction assignment conditional_statement labeled_inst opt_label op_assign
 %type <i> if_statement unless_statement
 %type <i> func_assign get_results
@@ -1070,6 +1072,34 @@ vtable:
          }
    ;
 
+method:
+     METHOD
+         {
+           $$ = P_METHOD;
+           IMCC_INFO(interp)->cur_unit->method_name = NULL;
+           IMCC_INFO(interp)->cur_unit->is_method = 1;
+         }
+   | METHOD '(' STRINGC ')'
+         {
+           $$ = P_METHOD;
+           IMCC_INFO(interp)->cur_unit->method_name = $3;
+           IMCC_INFO(interp)->cur_unit->is_method = 1;
+         }
+   ;
+
+ns_entry_name:
+    NS_ENTRY
+         {
+           IMCC_INFO(interp)->cur_unit->ns_entry_name = NULL;
+           IMCC_INFO(interp)->cur_unit->has_ns_entry_name = 1;
+         }
+   | NS_ENTRY '(' STRINGC ')'
+         {
+           IMCC_INFO(interp)->cur_unit->ns_entry_name = $3;
+           IMCC_INFO(interp)->cur_unit->has_ns_entry_name = 1;
+         }
+   ;
+
 instanceof:
      SUB_INSTANCE_OF '(' STRINGC ')'
          {
@@ -1199,11 +1229,12 @@ proto:
    | IMMEDIATE                 { $$ = P_IMMEDIATE; }
    | POSTCOMP                  { $$ = P_POSTCOMP; }
    | ANON                      { $$ = P_ANON; }
-   | METHOD                    { $$ = P_METHOD; }
    | NEED_LEX                  { $$ = P_NEED_LEX; }
    | multi
    | outer
    | vtable
+   | method
+   | ns_entry_name
    | instanceof
    | subid
    ;

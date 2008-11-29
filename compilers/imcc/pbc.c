@@ -1226,6 +1226,28 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         sub->vtable_index = vtable_index;
     }
 
+    if (unit->is_method == 1) {
+        /* Work out the name of the method. */
+        if (unit->method_name)
+            sub->method_name = string_from_cstring(interp, unit->method_name, 0);
+        else
+            sub->method_name = sub->name;
+    }
+    else
+      sub->method_name = string_from_cstring(interp, "", 0);
+
+
+    if (unit->has_ns_entry_name == 1) {
+        /* Work out the name of the ns entry. */
+        if (unit->ns_entry_name)
+            sub->ns_entry_name = string_from_cstring(interp, unit->ns_entry_name, 0);
+        else
+            sub->ns_entry_name = sub->name;
+    }
+    else
+        sub->ns_entry_name = sub->name;
+
+
     Parrot_store_sub_in_namespace(interp, sub_pmc);
 
     pfc->type     = PFC_PMC;

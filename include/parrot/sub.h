@@ -153,6 +153,8 @@ typedef struct Parrot_sub {
                                   */
     PMC      *namespace_stash;   /* the actual hash, HLL::namespace */
     STRING   *name;              /* name of the sub */
+    STRING   *method_name;       /* method name of the sub */
+    STRING   *ns_entry_name;     /* ns entry name of the sub */
     STRING   *subid;             /* The ID of the sub. */
     INTVAL   vtable_index;       /* index in Parrot_vtable_slot_names */
     PMC      *multi_signature;   /* list of types for MMD */
@@ -186,6 +188,8 @@ typedef struct Parrot_coro {
                                   */
     PMC      *namespace_stash;   /* the actual hash, HLL::namespace */
     STRING   *name;              /* name of the sub */
+    STRING   *method_name;       /* method name of the sub */
+    STRING   *ns_entry_name;     /* ns entry name of the sub */
     STRING   *subid;             /* The ID of the sub. */
     INTVAL   vtable_index;       /* index in Parrot_vtable_slot_names */
     PMC      *multi_signature;   /* list of types for MMD */

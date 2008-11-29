@@ -720,8 +720,8 @@ If no multisub by that name currently exists, we create one.
 static void
 store_sub_in_multi(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(PMC *ns))
 {
-    STRING * const subname = PMC_sub(sub)->name;
-    PMC    *multisub = VTABLE_get_pmc_keyed_str(interp, ns, subname);
+    STRING * const ns_entry_name = PMC_sub(sub)->ns_entry_name;
+    PMC    *multisub = VTABLE_get_pmc_keyed_str(interp, ns, ns_entry_name);
 
     /* is there an existing MultiSub PMC? or do we need to create one? */
     if (PMC_IS_NULL(multisub)) {
@@ -729,7 +729,7 @@ store_sub_in_multi(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(PMC *ns))
         /* we have to push the sub onto the MultiSub before we try to store
         it because storing requires information from the sub */
         VTABLE_push_pmc(interp, multisub, sub);
-        VTABLE_set_pmc_keyed_str(interp, ns, subname, multisub);
+        VTABLE_set_pmc_keyed_str(interp, ns, ns_entry_name, multisub);
     }
     else
         VTABLE_push_pmc(interp, multisub, sub);
@@ -768,15 +768,15 @@ Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub))
         store_sub_in_multi(interp, sub, ns);
     /* store other subs (as long as they're not :anon) */
     else if (!(PObj_get_FLAGS(sub) & SUB_FLAG_PF_ANON)) {
-        STRING * const name   = PMC_sub(sub)->name;
-        PMC    * const nsname = PMC_sub(sub)->namespace_name;
+        STRING * const ns_entry_name = PMC_sub(sub)->ns_entry_name;
+        PMC    * const nsname        = PMC_sub(sub)->namespace_name;
 
-        Parrot_store_global_n(interp, ns, name, sub);
+        Parrot_store_global_n(interp, ns, ns_entry_name, sub);
 
         /* TEMPORARY HACK - cache invalidation should be a namespace function */
         if (!PMC_IS_NULL(nsname)) {
             STRING * const nsname_s = VTABLE_get_string(interp, nsname);
-            Parrot_invalidate_method_cache(interp, nsname_s, name);
+            Parrot_invalidate_method_cache(interp, nsname_s, ns_entry_name);
         }
     }
 
