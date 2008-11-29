@@ -84,8 +84,16 @@ Dumps a string representation of variable to output
 
 # TODO: pass in indent_level, proper escaping
 .sub var_dump
-    .param pmc a
+    .param pmc args :slurpy
+    .local int argc
 
+    argc = args
+    unless argc != 1 goto L0
+    wrong_param_count()
+    .return()
+  L0:
+    .local pmc a
+    a = shift args
     if null a goto set_null_type
 
     .local string type_of_pmc

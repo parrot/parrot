@@ -19,9 +19,38 @@ Check whether a Parrot register is defined.
 =cut
 
 .sub 'pipp_defined'
-    .param pmc x
-    $I0 = defined x
+    .param pmc args :slurpy
+    .local int argc
+
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .RETURN_NULL()
+  L1:
+    $P0 = shift args
+    $I0 = defined $P0
     .return ($I0)
+.end
+
+=item C<void pipp_var_dump(mixed var)>
+
+Dump a PMC
+
+=cut
+
+.sub 'pipp_var_dump'
+    .param pmc args :slurpy
+    .local int argc
+
+    argc = args
+    unless argc != 1 goto L1
+    wrong_param_count()
+    .return()
+  L1:
+    $P0 = shift args
+    _dumper($P0)
+
+    .return ()
 .end
 
 =item !EXPORT(symbols, from :named('from') [, to :named('to')] )
