@@ -155,9 +155,11 @@ Caching that only ever applied to 4 opcodes, one of which has now been removed.
 The files (and all functions in them) are deprecated, and will be removed. See
 RT #60048.
 
-=item * C<:vtable> and C<:method> will not place the sub in a namespace by default. [post 0.8.1]
+=item * Subs marked with C<:vtable>/C<:method> aren't in namespace [post 0.8.2]
 
-See RT #60586.
+Subs marked with C<:vtable> or C<:method> flags are no longer given a 
+namespace entry by default.  Use the C<:nsentry> flag to cause this
+to happen.  See RT #60586 and RT #53302.
 
 =item * Bytecode packfile segment will use subid not sub name [post 0.8.1]
 
