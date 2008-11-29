@@ -177,7 +177,7 @@ Dumps a string representation of variable to output
     .return()
   L5:
     # this should never happen
-    print 'unexpectedly encountered a ' 
+    print 'unexpectedly encountered a '
     print type_of_pmc
     print " PMC\n"
     _dumper(a)
