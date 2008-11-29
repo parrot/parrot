@@ -15,7 +15,6 @@ C<LuaAny> provides an abstract base class for some Lua types.
  Class                  Parents
  -----------------------------------------------
  LuaBoolean             LuaAny, Default
- LuaClosure             Closure, LuaAny, Default
  LuaFunction            Sub, LuaAny, Default
  LuaNil                 LuaAny, Default
  LuaNumber              LuaAny, Default
@@ -32,7 +31,6 @@ C<LuaAny> provides an abstract base class for some Lua types.
      default value      nil             nil             NULL
  ------------------------------------------------------------------
  LuaBoolean             nil             -               -
- LuaClosure             nil             yes             -
  LuaFunction            nil             yes             -
  LuaNil                 nil             -               -
  LuaNumber              nil             -               -
@@ -65,7 +63,7 @@ find_meth(PARROT_INTERP, PMC *obj, const char *name) {
                                     const_string(interp, "mt_string"));
     }
 
-    if (dynpmc_LuaClosure != type && dynpmc_LuaFunction != type) {
+    if (dynpmc_LuaFunction != type) {
         if (obj->pmc_ext)
             meta = PMC_metadata(obj);
 
@@ -160,8 +158,7 @@ Throws an exception.
         PMC *meth = find_meth(INTERP, SELF, "__index");
 
         if (meth) {
-            if (dynpmc_LuaClosure  == PMC_type(meth)
-            ||  dynpmc_LuaFunction == PMC_type(meth)) {
+            if (dynpmc_LuaFunction == PMC_type(meth)) {
                 PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                        SELF, key);
                 if (retval)
@@ -193,8 +190,7 @@ Throws an exception.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to index a %Ss value", SELF.name());
 
-        if (dynpmc_LuaClosure  == PMC_type(meth)
-        ||  dynpmc_LuaFunction == PMC_type(meth)) {
+        if (dynpmc_LuaFunction == PMC_type(meth)) {
             Parrot_runops_fromc_args(INTERP, meth, "vPPP",
                                      SELF, key, value);
         }

@@ -140,7 +140,6 @@ There are eight basic types in Lua, each of them is implemented by a PMC.
 =item * string F<languages/lua/src/pmc/luastring.pmc>
 
 =item * function F<languages/lua/src/pmc/luafunction.pmc>
-& F<languages/lua/src/pmc/luaclosure.pmc>
 
 =item * userdata F<languages/lua/src/pmc/luauserdata.pmc>
 

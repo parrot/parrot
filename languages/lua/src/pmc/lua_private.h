@@ -9,7 +9,6 @@
 #include "parrot/parrot.h"
 
 extern INTVAL dynpmc_LuaBoolean;
-extern INTVAL dynpmc_LuaClosure;
 extern INTVAL dynpmc_LuaFunction;
 extern INTVAL dynpmc_LuaNil;
 extern INTVAL dynpmc_LuaNumber;

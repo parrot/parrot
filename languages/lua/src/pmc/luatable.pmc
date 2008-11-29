@@ -509,8 +509,7 @@ C<table> accessor.
         else {
             PMC *meth = find_meth(INTERP, SELF, "__index");
             if (meth) {
-                if (dynpmc_LuaClosure  == PMC_type(meth)
-                ||  dynpmc_LuaFunction == PMC_type(meth)) {
+                if (dynpmc_LuaFunction == PMC_type(meth)) {
                     value = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                  SELF, key);
                 }
@@ -538,8 +537,7 @@ C<table> mutator.
         if (! lua_get(INTERP, PMC_hash(SELF), key)) {
             PMC *meth = find_meth(INTERP, SELF, "__newindex");
             if (meth) {
-                if (dynpmc_LuaClosure  == PMC_type(meth)
-                ||  dynpmc_LuaFunction == PMC_type(meth)) {
+                if (dynpmc_LuaFunction == PMC_type(meth)) {
                     Parrot_runops_fromc_args(INTERP, meth, "vPPP", SELF,
                             key, value);
                 }

@@ -10,10 +10,6 @@ pmc/luafunction.pmc - Lua Function
 
 C<LuaFunction> extends C<Parrot Sub> and C<LuaAny> to provide a class
 with the behaviour of the Lua C<Function> type.
-C<LuaFunction> is used by standard libraries
-written in PIR.
-
-See also: F<languages/lua/pmc/luaclosure.pmc>
 
 =head2 Overloaded Methods
 
@@ -36,6 +32,27 @@ pmclass LuaFunction
     group    lua_group
     hll      Lua
     maps     Sub {
+
+/*
+
+=item C<void init_pmc(PMC *sub)>
+
+=cut
+
+*/
+    VTABLE void init_pmc(PMC *sub) {
+        if (VTABLE_isa(INTERP, sub, const_string(INTERP, "Sub"))) {
+            PMC_struct_val(SELF) = mem_allocate_zeroed_typed(Parrot_sub);
+            PMC_pmc_val(SELF)    = NULL;
+            PMC_metadata(SELF)   = NULL;
+            PObj_custom_mark_destroy_SETALL(SELF);
+            /* copy the sub struct */
+            memcpy(PMC_sub(SELF), PMC_sub(sub), sizeof (Parrot_sub));
+        }
+        else
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "not a Sub (%Ss)", SELF->vtable->whoami);
+    }
 
 /*
 

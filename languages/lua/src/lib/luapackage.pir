@@ -439,8 +439,6 @@ any loader for the module, then C<require> signals an error.
   L4:
     new $P1, 'LuaNil'
     $P1 = $P0(modname)  # call it
-    $I0 = isa $P1 , 'LuaClosure'
-    if $I0 goto L5
     $I0 = isa $P1 , 'LuaFunction'
     if $I0 goto L5
     $I0 = isa $P1 , 'LuaString'

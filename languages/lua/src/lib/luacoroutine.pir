@@ -70,8 +70,8 @@ Returns this new coroutine, an object with type C<"thread">.
     .param pmc extra :slurpy
     .local pmc res
     lua_checktype(1, f, 'function')
-    $I0 = isa f, 'LuaClosure'
-    if $I0 goto L1
+    $P0 = f.'get_outer'()
+    unless null $P0 goto L1
     lua_argerror(1, 'Lua function expected')
   L1:
     new res, 'LuaThread', f

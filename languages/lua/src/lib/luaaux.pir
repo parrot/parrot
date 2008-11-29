@@ -436,10 +436,8 @@ Returns 1 if the value is a function, and 0 otherwise.
     .local int res
     res = 0
     if null val goto L1
-    res = isa val, 'LuaClosure'
-    if res goto L1
     res = isa val, 'LuaFunction'
-L1:
+  L1:
     new $P0, 'LuaBoolean'
     set $P0, res
     .return ($P0)
@@ -481,7 +479,7 @@ and 0 otherwise.
     if res goto L1
     $P0 = val.'tonumber'()
     res = isa $P0, 'LuaNumber'
-L1:
+  L1:
     new $P0, 'LuaBoolean'
     set $P0, res
     .return ($P0)
@@ -503,7 +501,7 @@ to a string), and 0 otherwise.
     res = isa val, 'LuaString'
     if res goto L1
     res = isa val, 'LuaNumber'
-L1:
+  L1:
     new $P0, 'LuaBoolean'
     set $P0, res
     .return ($P0)
