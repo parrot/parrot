@@ -34,6 +34,10 @@ CODE
 /^3\.14/
 OUTPUT
 
+SKIP:
+{
+    skip "skipped on win32" => 2 if ( $^O eq 'MSWin32' );
+
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'infinity' );
 require 'mathx'
 print(type(math.infinity))
@@ -51,6 +55,7 @@ CODE
 number
 nan
 OUTPUT
+}
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function log2' );
 require 'mathx'
