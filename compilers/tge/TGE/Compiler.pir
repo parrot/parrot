@@ -243,7 +243,7 @@ err_no_rule:
     infile = get_global '$!infile'
     $P2 = node[0]
     (lineno) = $P2.'line_number'()
-    value.'emit'('.line %0, %1', lineno, infile)
+    value.'emit'('#line %0 %1', lineno, infile)
     value .= $P2
     .return (value)
 .end
