@@ -224,13 +224,6 @@ SP              [ ]
         }
     }
 
-
-<*>^"#line"{SP}{DIGITS}{SP}["] {
-        yy_push_state(cmt2, yyscanner);
-        IMCC_INFO(interp)->line = atoi(yytext+6);
-        return LINECOMMENT;
-    }
-
 <cmt2>[^"]+ {
         yy_pop_state(yyscanner);
         yy_push_state(cmt3, yyscanner);
