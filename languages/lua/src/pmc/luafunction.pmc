@@ -92,7 +92,6 @@ Return the string "function".
     VTABLE PMC* clone() {
         PMC* ret = SUPER();
         PMC_metadata(ret) = PMC_metadata(SELF);
-        PObj_custom_mark_SET(ret);
         return ret;
     }
 
