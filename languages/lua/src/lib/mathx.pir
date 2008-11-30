@@ -73,12 +73,14 @@ LIST
     lua_register($P1, _mathx, $P2)
 
     new $P0, 'LuaNumber'
-    set $P0, 0 # TODO
+    set $N0, 'Inf'
+    set $P0, $N0
     set $P1, 'infinity'
     _mathx[$P1] = $P0
 
     new $P0, 'LuaNumber'
-    set $P0, 0 # TODO
+    set $N0, 'NaN'
+    set $P0, $N0
     set $P1, 'nan'
     _mathx[$P1] = $P0
 
