@@ -107,7 +107,7 @@ PARROT_EXPORT void   nci_vVi(Opaque**, int);
 PARROT_EXPORT void   nci_vp(Opaque*);
 PARROT_EXPORT char * nci_ttt(char *, char *);
 PARROT_EXPORT void   nci_vfff(float, float, float);
-PARROT_EXPORT void   nci_vV(char **);
+PARROT_EXPORT void   nci_vV(const char **);
 
 /* Declarations for callback tests */
 
@@ -1165,7 +1165,7 @@ Returns the result of C<l1> / C<l2>.
 */
 
 PARROT_EXPORT void
-nci_vV(char **ptr)
+nci_vV(const char **ptr)
 {
   *ptr = "Hello bright new world\n";
 }
