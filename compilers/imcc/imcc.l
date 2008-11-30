@@ -328,7 +328,7 @@ SP              [ ]
 <emit,INITIAL>":outer"     return OUTER;
 <emit,INITIAL>":lex"       return NEED_LEX;
 <emit,INITIAL>":vtable"    return VTABLE_METHOD;
-<emit,INITIAL>":ns_entry"  return NS_ENTRY;
+<emit,INITIAL>":nsentry"   return NS_ENTRY;
 ":unique_reg"              return UNIQUE_REG;
 ":instanceof"              return SUB_INSTANCE_OF;
 ":subid"                   return SUB_LEXID;
