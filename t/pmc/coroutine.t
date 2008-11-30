@@ -265,7 +265,7 @@ pir_output_is( <<'CODE', 'Coroutine', "Coro new - type" );
 
 .sub main :main
     .local pmc c
-    c = global "coro"
+    c = get_global "coro"
     typeof $S0, c
     print $S0
 .end
@@ -284,7 +284,7 @@ pir_output_is( <<'CODE', '01234', "Coro new - yield" );
 
 .sub main :main
     .local pmc c
-    c = global "coro"
+    c = get_global "coro"
 loop:
     .begin_call
     .call c
@@ -311,7 +311,7 @@ pir_output_like(
     <<'CODE', <<'OUTPUT', "Call an exited coroutine", todo => 'goes one iteration too far.' );
 .sub main :main
     .local pmc c
-    c = global "coro"
+    c = get_global "coro"
 loop:
     $P0 = c()
     print $P0

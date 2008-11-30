@@ -87,7 +87,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "_func() syntax with var - global" );
 .sub test :main
     .local pmc the_sub
-    the_sub = global "_sub"
+    the_sub = get_global "_sub"
     the_sub(10, 20)
     end
 .end

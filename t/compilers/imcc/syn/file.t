@@ -178,7 +178,7 @@ pir_output_is( <<"CODE", <<'OUT', 'call sub in external pbc' );
     say "sub1"
     load_bytecode "$temp_pbc"
     say "loaded"
-    \$P0 = find_global "_sub2"
+    \$P0 = get_global "_sub2"
     .begin_call
     .call \$P0
     ret:
@@ -212,7 +212,7 @@ pir_output_is( <<"CODE", <<'OUT', 'call sub in external pbc, return' );
     say "sub1"
     load_bytecode "$temp_pbc"
     say "loaded"
-    \$P0 = find_global "_sub2"
+    \$P0 = get_global "_sub2"
     .begin_call
     .call \$P0
     ret:
@@ -249,7 +249,7 @@ pir_output_is( <<"CODE", <<'OUT', 'call sub in external pbc with 2 subs' );
     say "sub1"
     load_bytecode "$temp_pbc"
     say "loaded"
-    \$P0 = find_global "_sub2"
+    \$P0 = get_global "_sub2"
     .begin_call
     .call \$P0
     ret:
@@ -279,7 +279,7 @@ pir_output_is( <<"CODE", <<'OUT', 'call sub in external pir, return' );
     say "sub1"
     load_bytecode "$temp_pir"
     say "loaded"
-    \$P0 = find_global "_sub2"
+    \$P0 = get_global "_sub2"
     .begin_call
     .call \$P0
     ret:
@@ -296,7 +296,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'call internal sub like external' );
 .sub _sub1
     print "sub1\n"
-    $P0 = find_global "_sub2"
+    $P0 = get_global "_sub2"
     .begin_call
     .call $P0
     ret:
@@ -321,7 +321,7 @@ OUT
 print $FOO <<'ENDF';
 .sub _sub1
     say "sub1"
-    $P0 = find_global "_sub2"
+    $P0 = get_global "_sub2"
     .begin_call
     .call $P0
     ret:
@@ -412,7 +412,7 @@ SKIP:
     print "sub1\n"
     load_bytecode "$temp_pir"
     print "loaded\n"
-    $P0 = find_global "_sub2"
+    $P0 = get_global "_sub2"
     .begin_call
     .call $P0
     ret:
@@ -421,7 +421,7 @@ SKIP:
     print "sub1 again\n"
     load_bytecode "$temp_pir"
     print "loaded again\n"
-    $P0 = find_global "_sub2"
+    $P0 = get_global "_sub2"
     .begin_call
     .call $P0
     ret_again:
