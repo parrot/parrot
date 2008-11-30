@@ -368,7 +368,7 @@ error in with normal return values. }}
 
 =head2 Exception Object Interface
 
-=head2 Retrieving the Exception Message
+=head3 Retrieving the Exception Message
 
 The exception message is stored in the 'message' attribute:
 
