@@ -287,6 +287,15 @@ children of the node.  Defined values of C<pasttype> are:
 
 =over 4
 
+=item chain
+
+A short-circuiting chain of operations.  In a sequence of nodes
+with pasttype 'chain', the right operand of a node serves as
+the left operand of its parent.  Each node is evaluated only
+once, and the first false result short-circuits the chain.
+In other words,  C<<  $x < $y < $z >>  is true only if
+$x < $y and $y < $z, but $y only gets evaluated once.
+
 =item copy
 
 Copy the value of the node's second child into the variable
@@ -389,6 +398,11 @@ not.
 Execute the sequence of PIR statements given by the
 node's C<inline> attribute (a string).  See the C<inline>
 method below for details.
+
+=item return
+
+Generate a return exception, using the first child (if any) as
+a return value.
 
 =item try
 
