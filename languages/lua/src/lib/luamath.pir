@@ -256,8 +256,7 @@ LIST
     .param pmc extra :slurpy
     .local pmc res
     lua_checknumber(1, x)
-    new $P0, 'Lua'
-    res = $P0.'frexp'(x)
+    res = x.'frexp'()
     .return (res :flat)
 .end
 
@@ -269,8 +268,7 @@ LIST
     .local pmc res
     lua_checknumber(1, x)
     lua_checknumber(2, nexp)
-    new $P0, 'Lua'
-    res = $P0.'ldexp'(x, nexp)
+    res = x.'ldexp'(nexp)
     .return (res)
 .end
 
@@ -356,8 +354,7 @@ LIST
     .param pmc extra :slurpy
     .local pmc res
     lua_checknumber(1, x)
-    new $P0, 'Lua'
-    res = $P0.'modf'(x)
+    res = x.'modf'()
     .return (res :flat)
 .end
 

@@ -873,6 +873,68 @@ Decrements the number.
 
 =over 4
 
+=item C<PMC* frexp()>
+
+=cut
+
+*/
+    METHOD PMC* frexp() {
+        PMC *y      = pmc_new(INTERP, dynpmc_LuaNumber);
+        PMC *expn   = pmc_new(INTERP, dynpmc_LuaNumber);
+        PMC *retval = pmc_new(INTERP, enum_class_Array);
+        int  e;
+
+        VTABLE_set_number_native(INTERP, y,
+                                 frexp(VTABLE_get_number(INTERP, SELF), &e));
+        VTABLE_set_integer_native(INTERP, expn, e);
+        VTABLE_set_integer_native(INTERP, retval, 2);
+        VTABLE_set_pmc_keyed_int(INTERP, retval, 0, y);
+        VTABLE_set_pmc_keyed_int(INTERP, retval, 1, expn);
+
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* ldexp(PMC *x, PMC *expn)>
+
+=cut
+
+*/
+    METHOD PMC* ldexp(PMC *expn) {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+
+        VTABLE_set_number_native(INTERP, retval,
+                                 ldexp(VTABLE_get_number(INTERP, SELF),
+                                       VTABLE_get_integer(INTERP, expn)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* modf()>
+
+=cut
+
+*/
+    METHOD PMC* modf() {
+        PMC     *y      = pmc_new(INTERP, dynpmc_LuaNumber);
+        PMC     *d      = pmc_new(INTERP, dynpmc_LuaNumber);
+        PMC     *retval = pmc_new(INTERP, enum_class_Array);
+        FLOATVAL _d;
+
+        VTABLE_set_number_native(INTERP, y,
+                                 modf(VTABLE_get_number(INTERP, SELF), &_d));
+        VTABLE_set_number_native(INTERP, d, _d);
+        VTABLE_set_integer_native(INTERP, retval, 2);
+        VTABLE_set_pmc_keyed_int(INTERP, retval, 0, d);
+        VTABLE_set_pmc_keyed_int(INTERP, retval, 1, y);
+
+        RETURN(PMC *retval);
+    }
+
+/*
+
 =item C<PMC *rawequal(PMC *value)>
 
 =cut
