@@ -55,11 +55,11 @@ consumption which should be resolved soon.
 
     .local pmc f
     f = find_global "Digest", "_md5sum"
-    global "_md5sum"    = f
+    store_global "_md5sum", f
     f = find_global "Digest", "_md5_hex"
-    global "_md5_hex"   = f
+    store_global "_md5_hex", f
     f = find_global "Digest", "_md5_print"
-    global "_md5_print" = f
+    store_global "_md5_print", f
 .end
 
 ###########################################################################
