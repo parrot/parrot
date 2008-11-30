@@ -680,6 +680,9 @@ stored in the exception.
    continuation()
    ...
 
+See L<PDD23|pdds/pdd23_exceptions.pod> for accessing the various attributes
+of the exception object.
+
 =head2 Syntactic Sugar
 
 Any PASM opcode is a valid PIR instruction. In addition, PIR defines some

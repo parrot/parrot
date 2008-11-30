@@ -226,10 +226,20 @@ throw them too.
 Base class of all standard exceptions.  Provides no special functionality.
 Exists for the purpose of C<isa> testing.
 
+=item B<exception;death>
+
+Exception type that is thrown by the C<die> opcode. See the description of
+the C<die> opcode in this document.
+
 =item B<exception;errno>
 
 A system error as reported in the C variable C<errno>.  Payload is an integer.
 Message is the return value of the standard C function C<strerror()>.
+
+=item B<exception;exit>
+
+Exception type that is thrown by the C<exit> opcode. See the description of
+the C<exit> opcode in this document.
 
 =item B<exception;math>
 
@@ -356,7 +366,22 @@ exceptional opcodes, instead of needing to be defined for each one. And,
 it still keeps the error information out-of-band, instead of mixing the
 error in with normal return values. }}
 
-=head2 Resuming after Exceptions
+=head2 Exception Object Interface
+
+=head2 Retrieving the Exception Message
+
+The exception message is stored in the 'message' attribute:
+
+  ...
+ handler:
+  .local pmc exception
+  .local string message
+  .get_results (exception)
+  message = exception['message']
+  say message
+
+
+=head3 Resuming after Exceptions
 
 Exceptions thrown by standard Parrot opcodes (like the one thrown by
 C<get_hll_global> above or by the C<throw> opcode) are always resumable,
