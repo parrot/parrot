@@ -242,7 +242,7 @@ really a public API.
                               :value->vtable->base_type == enum_class_NameSpace;
 
         /* don't need this everywhere yet */
-        PMC * const old       = (PMC *)parrot_hash_get(INTERP, NS_HASH(SELF), key);
+        PMC *old = (PMC *)parrot_hash_get(INTERP, NS_HASH(SELF), key);
 
         /* If it's a sub... */
         if (!PMC_IS_NULL(value) && VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Sub"))) {
@@ -262,7 +262,6 @@ really a public API.
 
         /* If it's a multi-sub and the first in this NS... */
         if (!PMC_IS_NULL(value)
-        &&  !old
         &&   VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "MultiSub"))) {
 
             if (VTABLE_elements(interp, value) > 0) {
