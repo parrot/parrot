@@ -84,9 +84,6 @@ CODE
 5040
 OUT
 
-TODO: {
-    local $TODO = 'once time ago, this test pass';
-
 language_output_is( 'lua', <<'CODE', <<'OUT', 'with args', params => "abc def"  );
 print(#arg)
 print(...)
@@ -94,7 +91,6 @@ CODE
 2
 abc	def
 OUT
-}
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'man or boy' );
 --[[

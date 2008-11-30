@@ -133,9 +133,6 @@ CODE
 1234
 OUTPUT
 
-TODO: {
-    local $TODO = 'require calls the loader with a single argument: modname';
-
 unlink('../foo.lua') if ( -f '../foo.lua' );
 open $X, '>', '../foo.lua';
 print {$X} 'print("in foo.lua", ...)';
@@ -146,7 +143,6 @@ require "foo"
 CODE
 in foo.lua	foo
 OUTPUT
-}
 
 # clean up foo.lua
 unlink('../foo.lua') if ( -f '../foo.lua' );
