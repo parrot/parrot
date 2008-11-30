@@ -396,9 +396,9 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
         Parrot_STM_destroy(interp);
     }
 
-    if (interp->parent_interpreter &&
-        interp->thread_data &&
-        (interp->thread_data->state & THREAD_STATE_JOINED)) {
+    if (interp->parent_interpreter
+    &&  interp->thread_data
+    && (interp->thread_data->state & THREAD_STATE_JOINED)) {
         Parrot_merge_header_pools(interp->parent_interpreter, interp);
         Parrot_merge_memory_pools(interp->parent_interpreter, interp);
     }
@@ -460,28 +460,33 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
         parrot_free_vtables(interp);
         Parrot_mmd_destroy(interp);
 
+        /* dynop libs */
+        if (interp->n_libs > 0)
+            mem_sys_free(interp->op_info_table);
+
         MUTEX_DESTROY(interpreter_array_mutex);
         mem_sys_free(interp);
-        /*
-         * finally free other globals
-         */
+
+        /* finally free other globals */
         mem_sys_free(interpreter_array);
         interpreter_array = NULL;
     }
 
     else {
         /* don't free a thread interpreter, if it isn't joined yet */
-        if (!interp->thread_data || (
-                    interp->thread_data &&
-                    (interp->thread_data->state & THREAD_STATE_JOINED))) {
+        if (!interp->thread_data
+        || (interp->thread_data
+        && (interp->thread_data->state & THREAD_STATE_JOINED))) {
             if (interp->thread_data) {
                 mem_sys_free(interp->thread_data);
                 interp->thread_data = NULL;
             }
+
             mem_sys_free(interp);
         }
     }
 }
+
 
 /*
 
