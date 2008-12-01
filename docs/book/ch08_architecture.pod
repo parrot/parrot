@@ -98,8 +98,8 @@ passed into the optimizer module, which processes the bytecode and
 produces bytecode that is hopefully faster than what the compiler
 emitted. Finally, the bytecode is handed off to the interpreter
 module, which interprets the bytecode. Since compilation and execution
-are so tightly woven in Perl, the control may well end up back at the
-parser to parse more code.
+are so tightly woven in dynamic languages such as Perl and Python, the
+control may well flow back to the parser to parse more code.
 
 X<Parrot;compiler module>
 Parrot's compiler module also has the capability to freeze bytecode to
@@ -115,9 +115,9 @@ small section.
 
 Z<CHP-7-SECT-2.1>
 
-The X<parser, Parrot>
+X<parser, Parrot>
 X<Parrot;parser module>
-parser module is responsible for source code in PASM, PIR, or one of
+The parser module is responsible for source code in PASM, PIR, or one of
 the high-level languages, and turning it into an X<AST (Abstract Syntax
 Tree)> X<Abstract Syntax Tree (AST)> Abstract Syntax Tree (AST). An AST
 is a digested form of the program, one that's much easier for Parrot to
@@ -165,18 +165,19 @@ appropriate way to describe things.
 Parrot does support independent parsers for cases where the Perl 6
 grammar engine isn't the appropriate choice. A language might already
 have an existing parser available, or different techniques might be in
-order. The Perl 5 parsing engine may get embedded this way, as it's
-easier to embed a quirky existing parser than it is to recreate all
-the quirks in a new parser.
+order. The quirky parsing engines such as the one for Perl 5 may get
+embedded this way, as it's easier to embed some quirky parsers than it
+is to recreate all the quirks in a new parser.
 
 =head2 Compiler
 
 Z<CHP-7-SECT-2.2>
 
-The parser outputs data in a form called an Abstract Syntax Tree (AST).
-The X<Parrot;compiler module>
+
+X<Parrot;compiler module>
 X<compiler module, Parrot>
-compiler module takes this AST and converts it into bytecode that the
+The parser outputs data in a form called an Abstract Syntax Tree (AST).
+The compiler module takes this AST and converts it into bytecode that the
 interpreter engine can execute. This translation is very straightforward
 and isn't too expensive in terms of operating time and resources. The
 tree is flattened, and is passed into a series of substitutions and
@@ -217,37 +218,38 @@ standard optimizer would turn that code into the single line:
   $a = 10000;
 
 and remove the loop entirely. Unfortunately, that's not necessarily
-appropriate for Perl. C<$a> could easily be tied, perhaps representing
-the state of some external hardware. If incrementing the variable
-ten thousand times smoothly moves a stepper motor from 0 to 10000 in
-increments of one, just assigning a value of 10000 to the variable
-might whip the motor forward in one step, damaging the hardware. A
-tied variable might also keep track of the number of times it has been
-accessed or modified. Either way, optimizing the loop away changes the
-semantics of the program in ways the original programmer didn't want.
+appropriate for these dynamic languages. C<$a> could easily be an
+active value, which creates side effects when it is accessed or
+incremented. If incrementing the variable ten thousand times causes
+a hardware stepper motor to rotate smoothly, then just assigning a
+value of 10000 to the variable might not only be incorrect but actually
+dangerous to bystanders. An active variable like this might also keep
+track of the number of times it has been accessed or modified. Either
+way, optimizing the loop away changes the semantics of the program in
+ways the original programmer didn't want.
 
 Because of the potential for active or tied data, especially for
-languages as dynamically typed as Perl, optimizing is a non-trivial
-task. Other languages, such as C or Pascal, are more statically typed
-and lack active data, so an aggressive optimizer is in order for them.
-Breaking out the optimizer into a separate module allows us to add in
-optimizations piecemeal without affecting the compiler.  There's a lot
-of exciting work going into the problem of optimizing dynamic
-languages, and we fully expect to take advantage of it where we can.
+languages as dynamically typed as Perl, Python, Ruby, and PHP,
+optimizing is a non-trivial task. Other languages, such as C or Pascal,
+are more statically typed and lack active data, so an aggressive
+optimizer is in order for them. Breaking out the optimizer into a
+separate module allows us to add in optimizations piecemeal without
+affecting the compiler.  There's a lot of exciting work going into
+the problem of optimizing dynamic languages, and we fully expect to
+take advantage of it where we can.
 
 Optimization is potentially an expensive operation, which is another
 good reason to have it in a separate module. Spending ten seconds
 optimizing a program that will run in five seconds is a huge waste of
-time when using Perl's traditional compile-and-go model--optimizing
-the code will make the program run slower. On the other hand, spending
-ten seconds to optimize a program makes sense if you save the
-optimized version to disk and use it over and over again. Even if you
-save only one second per program run, it doesn't take long for the
-ten-second optimization time to pay off. The default is to optimize
-heavily when freezing bytecode to disk and lightly when running
-directly, but this can be changed with a command-line switch.
+time. On the other hand, spending ten seconds to optimize a program
+makes sense if you save the optimized version to disk and use it over
+and over again. Even if you save only one second per program run, it
+doesn't take long for the ten-second optimization time to pay off. The
+default is to optimize heavily when freezing bytecode to disk and
+lightly when running directly, but this can be changed with a
+command-line switch.
 
-Perl 5, Python, and Ruby all lack a robust optimizer (outside their
+Perl, Python, and Ruby all lack a robust optimizer (outside their
 regular expression engines), so any optimizations we add will increase
 their performance. In fact, optimizations that we add might
 help improve the performance of all high-level languages that run on
@@ -255,14 +257,15 @@ Parrot. This, we feel, is a good thing.
 
 =head2 Interpreter
 
-Z<CHP-7-SECT-2.4>
+Z<CHP-8-SECT-2.4>
 
 The interpreter module is the part of the engine that executes the
 generated bytecode. Calling it an interpreter is something of a
 misnomer, since Parrot's core includes both a traditional bytecode
 interpreter module as well as a high-performance just-in-time (JIT)
 compiler engine, but that's a detail of the implementation that we
-don't need to discuss here at length.
+don't need to discuss here at length N<At least, we won't discuss it
+yet>.
 
 All the interesting things happen inside the interpreter, and the
 remainder of the chapter is dedicated to the interpreter and the
@@ -273,11 +276,12 @@ to feed bytecode to the interpreter.
 
 =head2 Bytecode Loader
 
-Z<CHP-7-SECT-2.5>
+Z<CHP-8-SECT-2.5>
 
-The X<Parrot;bytecode loader>
+X<Parrot;bytecode loader>
 X<bytecode, Parrot;loader>
-bytecode loader isn't part of our block diagram, but it is interesting
+The bytecode loader isn't part of our block diagram, but it is
+interesting 
 enough to warrant brief coverage.
 
 The bytecode loader handles loading in bytecode that's been frozen to
@@ -359,17 +363,15 @@ correct design decision.
 Z<CHP-7-SECT-3.1>
 
 X<interpreter, Parrot;registers>
-Parrot has four basic types of registers: PMC, string, integer, and
-floating-point numbers, one for each of the core data types in Parrot.
-PMCs, short for Parrot Magic Cookies, are the structures that represent high
-level variables such as arrays, hashes, scalars, and objects. We
-separate the register types for ease of implementation, garbage
-collection, and space efficiency. Since PMCs and strings are
-garbage-collectable entities, restricting what can access
-them--strings in string registers and PMCs in PMC registers--makes the
-garbage collector a bit faster and simpler. Having integers and floats
-in separate register sets makes sense from a space standpoint, since
-floats are normally larger than integers.
+As we've seen in previous chapers, Parrot has four basic types of
+registers: PMC, string, integer, and floating-point numbers, one for
+each of the core data types. We separate the register types for ease
+of implementation, garbage collection, and space efficiency. Since
+PMCs and strings are garbage-collectable entities, restricting what
+can access them--strings in string registers and PMCs in PMC registers
+--makes the garbage collector a bit faster and simpler. Integers and
+floats map directly to low-level machine data types and can be stored
+in sequential arrays to save space and increase access speed.
 
 =head2 Strings
 
@@ -378,29 +380,29 @@ Z<CHP-7-SECT-3.3>
 X<strings;Parrot>
 X<interpreter, Parrot;strings>
 Text data is deceptively complex, so Parrot has strings as a
-fundamental data type. We do this out of sheer practicality. We know
-strings are complex and error-prone, so we implement them only once.
-All languages that target Parrot can share the same implementation,
-and don't have to make their own mistakes.
+fundamental data type and tackles the problems head-on. We do this
+out of sheer practicality, because we know how complex and error-prone
+strings can get. We implement them one, and all languages that target
+Parrot can share that same implementation.
 
 The big problem with text is the vast number of human languages and
 the variety of conventions around the world for dealing with it. Long
-ago, 7-bit ASCII with 127 characters was sufficient. Computers were
-limited and mostly used in English, regardless of the user's native
-language. These heavy restrictions were acceptable because the
-machines of the day were so limited that any other option was too
-slow. Also, most people using computers at the time were fluent in
-English either as their native language or a comfortable second
-language.
+ago, 7-bit ASCII with 127 characters was sufficient N<And if that wasn't
+sufficient, too bad. It's all you had.>. Computers were limited and
+mostly used in English, regardless of the user's native language. These
+heavy restrictions were acceptable because the machines of the day were
+so limited that any other option was too slow. Also, most people using
+computers at the time were fluent in English either as their native or
+comfortable second language.
 
 That day passed quite a few years ago. Many different ways of
 representing text have sprung up, from the various multibyte Japanese
-and Chinese representations--designed for languages with many
-thousands of characters--to a half dozen or so European
-representations, which take only a byte but disagree on what
-characters fit into that byte. The Unicode consortium has been working
-for years on the Unicode standard to try and unify all the different
-schemes, but full unification is still years away, if it ever happens.
+and Chinese representations--designed for languages with many thousands
+of characters--to a half dozen or so European representations, which
+take only a byte but disagree on what characters fit into that byte.
+The Unicode consortium has been working for years on the Unicode standard
+to try and unify all the different schemes, but full unification is still
+years away, if it ever happens.
 
 In the abstract, strings are a series of integers with meaning
 attached to them, but getting from real-world data to abstract
@@ -435,7 +437,7 @@ exploit Parrot's core string capabilities, so any language that uses
 Parrot's built-in string functionality gets this for free. Since
 properly implementing even a single system like Unicode is fraught
 with peril, this makes the job of people writing languages that target
-Parrot (including Perl 6) much easier.
+Parrot much easier.
 
 While Parrot provides these facilities, languages aren't required to
 make use of them. Perl 6, for example, generally mandates that all
@@ -478,13 +480,11 @@ constructs.
 The first big issue that Parrot had to face was implementing these
 constructs. The second was doing it in a way that allowed Perl code to
 use Ruby objects, Ruby code to use Python objects, and Lisp code to
-use both.N<Or vice-versa> Parrot's solution is the PMC, or Parrot Magic
-Cookie.
+use both.N<Or vice-versa> Parrot's solution is the PMC datatype.
 
-A PMC is an abstract variable and a base data type--the same way that
-integers and floating-point numbers are base data types for hardware
-CPUs. The languages we're working to support--Perl, Python, and
-Ruby--have base variables that are far more complex than just an
+A PMC, as we've seen in previous chapers, is an abstract variable type.
+The languages we're working to support--Perl, Python, and Ruby for
+example--have base variables that are far more complex than just an
 integer or floating-point number.  If we want them to exchange any
 sort of real data, they must have a common base variable type. Parrot
 provides that with the PMC construct. Each language can build on this
@@ -496,13 +496,13 @@ variable should be able to do. You should, for example, be able to
 load or store a value, add or subtract it from another variable, call
 a method or set a property on it, get its integer or floating-point
 representation, and so on. What we did was make a list of these
-functions and make them mandatory.
+functions and turn them into a mandatory interface called the VTABLE.
 
-Each PMC has a vtable (short for "virtual table") attached to it. This
-table of function pointers is fixed--the list of functions, and where
-they are in the table, is the same for each PMC. All the common
-operations a program might perform on a variable--as well as all the
-operators that might be overloaded for a PMC--have vtable entries.
+Each PMC has a VTABLE attached to it. This table of function pointers
+is fixed--the list of functions, and where they are in the table, is
+the same for each PMC. All the common operations a program might
+perform on a variable, as well as all the operators that might be
+overloaded for a PMC, have VTABLE entries.
 
 =head2 Bytecode
 
