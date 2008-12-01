@@ -292,6 +292,10 @@ Update the next planned release date on the wiki at L<http://www.perlfoundation.
 
 Update the Wikipedia entry at L<http://en.wikipedia.org/wiki/Parrot_virtual_machine>.
 
+=item f
+
+Update the C2 wiki entry at L<http://c2.com/cgi/wiki?ParrotCode>.
+
 =back
 
 =item 12.
