@@ -262,7 +262,7 @@ void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
             Parrot_ex_throw_from_c_args(interp, NULL, -1,
                     "PHPArray corruption: ht->internalPointer doesn't point to "
                     "an element of this PHPArray.");
-        dprintf("internalPointer points at position #%d (0 being the beginngin)\n", ip_pos);
+        dprintf("internalPointer points at position #%d (0 being the beginning)\n", ip_pos);
     }
     else
         dprintf("internalPointer is NULL, which is just fine\n");
