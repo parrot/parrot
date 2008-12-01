@@ -30,6 +30,9 @@
 #  define YY_ALWAYS_INTERACTIVE 0
 #endif
 
+#include <stdlib.h> /* for size_t */
+typedef size_t yy_size_t;
+#define YY_TYPEDEF_YY_SIZE_T
 
 }
 
@@ -1288,7 +1291,7 @@ expand_macro(yyscan_t yyscanner, macro_def * const macro, macro_param * args) {
 /*
 
 =item C<void *
-yyalloc(size_t bytes, yyscan_t yyscanner)>
+yyalloc(yy_size_t bytes, yyscan_t yyscanner)>
 
 Allocate C<bytes> of memory; the C<yyscanner> argument is not used.
 
@@ -1297,14 +1300,14 @@ Allocate C<bytes> of memory; the C<yyscanner> argument is not used.
 */
 PARROT_MALLOC
 void *
-yyalloc(size_t bytes, yyscan_t yyscanner) {
+yyalloc(yy_size_t bytes, yyscan_t yyscanner) {
     return mem_sys_allocate(bytes);
 }
 
 /*
 
 =item C<void *
-yyrealloc(void * ptr, size_t bytes, yyscan_t yyscanner)>
+yyrealloc(void * ptr, yy_size_t bytes, yyscan_t yyscanner)>
 
 Reallocate memory pointed to by C<ptr>. The new memory region is C<bytes> in size;
 the C<yyscanner> argument is not used.
@@ -1313,7 +1316,7 @@ the C<yyscanner> argument is not used.
 
 */
 void *
-yyrealloc(void * ptr, size_t bytes, yyscan_t yyscanner) {
+yyrealloc(void * ptr, yy_size_t bytes, yyscan_t yyscanner) {
     return mem_sys_realloc(ptr, bytes);
 }
 
