@@ -26,8 +26,7 @@ PIR or an Eval PMC (bytecode).
     $P0 = new 'ResizablePMCArray'
     set_global '@!subcode', $P0
 
-    $P0 = new 'String'
-    $P0 = '[]'
+    $P0 = box '[]'
     set_global '$?NAMESPACE', $P0
     .return ()
 .end

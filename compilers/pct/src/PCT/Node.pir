@@ -22,8 +22,7 @@ and opcode syntax tree (POST) nodes in the Parrot Compiler Toolkit.
     p6meta = new 'P6metaclass'
     p6meta.'new_class'('PCT::Node', 'parent'=>'Capture_PIR')
 
-    $P0 = new 'Integer'
-    $P0 = 10
+    $P0 = box 10
     set_hll_global ['PCT';'Node'], '$!serno', $P0
 
     .return ()

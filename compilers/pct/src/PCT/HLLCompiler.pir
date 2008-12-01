@@ -32,8 +32,7 @@ running compilers from a command line.
     $P0 = split ' ', 'e=s help|h target=s trace|t=s encoding=s output|o=s combine version|v'
     setattribute self, '@cmdoptions', $P0
 
-    $P1 = new 'String'
-    $P1 = <<'    USAGE'
+    $P1 = box <<'    USAGE'
   This compiler is based on PCT::HLLCompiler.
 
   Options:
@@ -57,8 +56,7 @@ running compilers from a command line.
     $S0  = $P0['revision']
   _handler:
     pop_eh
-    $P2 = new 'String'
-    $P2  = 'This compiler is built with the Parrot Compiler Toolkit, parrot revision '
+    $P2  = box 'This compiler is built with the Parrot Compiler Toolkit, parrot revision '
     $P2 .= $S0
     $P2 .= '.'
     setattribute self, '$version', $P2
@@ -756,8 +754,7 @@ Generic method for compilers invoked from a shell command line.
     if $S0 goto eval_line
 
     .local pmc result
-    result = new 'String'
-    result = ''
+    result = box ''
     unless args goto interactive
     $I0 = adverbs['combine']
     if $I0 goto combine

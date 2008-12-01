@@ -95,8 +95,7 @@ any value type.
     $P0 = new 'CodeString'
     set_global '%!codestring', $P0
 
-    $P0 = new 'Integer'
-    $P0 = 11
+    $P0 = box 11
     set_global '$!serno', $P0
 
     .return ()
@@ -1313,8 +1312,7 @@ to C<ResizablePMCArray> if not set.
     .local pmc returns
     returns = node.'returns'()
     if returns goto have_returns
-    returns = new 'String'
-    returns = 'ResizablePMCArray'
+    returns = box 'ResizablePMCArray'
   have_returns:
 
     .local pmc listpost, iter
@@ -1993,8 +1991,7 @@ attribute.
     ops = call_on
     goto invocant_done
   use_self:
-    call_on = new 'String'
-    call_on = 'self'
+    call_on = box 'self'
     ops = $P0.'new'('node'=>node)
   invocant_done:
 
