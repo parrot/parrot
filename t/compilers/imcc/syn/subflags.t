@@ -66,8 +66,8 @@ t/compilers/imcc/syn/subflags.t  - test flags on PIR subs
     .const 'Sub' $P30 = 'method1'
     isa_ok($P30, 'Sub', ":method sub found w/.const")
     $P0 = get_global 'method1'
-    todo(0, ":method sub not found in namespace")
-    #is_same($P0, pmcnull, ":method sub not found in namespace")
+    $I0 = isnull $P0
+    todo($I0, ":method sub not found in namespace")
 .end
 
 
