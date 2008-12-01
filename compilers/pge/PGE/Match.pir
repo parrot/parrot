@@ -124,11 +124,9 @@ is set or implied.
     .local pmc mob, mfrom, mpos
     mob = new grammar_class
     setattribute mob, '$.target', target
-    mfrom = new 'Integer'
-    mfrom = pos
+    mfrom = box pos
     setattribute mob, '$.from', mfrom
-    mpos = new 'Integer'
-    mpos = -1
+    mpos = box -1
     setattribute mob, '$.pos', mpos
 
     .return (mob, pos, target, mfrom, mpos, iscont)
