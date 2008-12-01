@@ -31,11 +31,9 @@ object.
 .sub 'onload' :anon :load :init
     load_bytecode 'PCT.pbc'
 
-    $P0 = get_hll_global ['PCT'], 'HLLCompiler'
-    $P1 = $P0.'new'()
-    $P1.'language'('NCIGEN')
-    $P1.'parsegrammar'('C99::Grammar')
-    $P1.'parseactions'('NCIGEN::Grammar::Actions')
+    .local pmc p6meta
+    p6meta = new 'P6metaclass'
+    p6meta.'new_class'('NCIGEN::Compiler', 'parent'=>'PCT::HLLCompiler')
 .end
 
 =item main(args :slurpy)  :main
@@ -45,18 +43,18 @@ to the C compiler.
 
 =cut
 
-.sub 'main' :main
-    .param pmc args
-
-    $P0 = compreg 'NCIGEN'
-    $P1 = split ' ', 'parse nci_ast gen_nci_pir'
-    setattribute $P0, '@stages', $P1
-    $P1 = split ' ', 'e=s help|h target=s trace|t=s encoding=s output|o=s combine version|v libname|l=s nsname|n=s raw|r'
-    setattribute $P0, '@cmdoptions', $P1
+.sub 'init' :vtable :method
+    self.'language'('NCIGEN')
+    self.'parsegrammar'('C99::Grammar')
+    self.'parseactions'('NCIGEN::Grammar::Actions')
+    $P0 = split ' ', 'parse nci_ast gen_nci_pir'
+    setattribute self, '@stages', $P0
+    $P0 = split ' ', 'e=s help|h target=s trace|t=s encoding=s output|o=s combine version|v libname|l=s nsname|n=s raw|r'
+    setattribute self, '@cmdoptions', $P0
 
     ##  set the $usage attribute
-    $P2 = new 'String'
-    $P2 = <<'USAGE'
+    $P0 = new 'String'
+    $P0 = <<'USAGE'
 Usage: ncigen [switches] [--] [preprocessedfile] [arguments]
   -l, --libname        library to load symbols from
   -n  --nsname         pir namepsace to place symbols into
@@ -71,8 +69,12 @@ Standard HLLCompiler Options:
   -o, --output=[name]  specify name of output file
   -v, --version        display version information
 USAGE
-    setattribute $P0, '$usage', $P2
+    setattribute self, '$usage', $P0
+.end
 
+.sub 'main' :main
+    .param pmc args
+    $P0 = compreg 'NCIGEN'
     $P2 = $P0.'command_line'(args)
 .end
 
