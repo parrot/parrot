@@ -50,6 +50,19 @@ Overrides the default to do nothing.
         return 0;
     }
 
+/*
+
+=item C<INTVAL is_same(PMC *value)>
+
+Returns true if value is also a null PMC, false otherwise.
+
+=cut
+
+*/
+    VTABLE INTVAL is_same(PMC *value) {
+        return PMC_IS_NULL(value);
+    }
+
 }
 
 /*
