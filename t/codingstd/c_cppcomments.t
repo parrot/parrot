@@ -34,6 +34,7 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 my $DIST = Parrot::Distribution->new();
 my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
+@files = grep { $_->name !~ /.l$/ } @files;
 
 
 Parrot::Test::Util::Runloop->testloop(
