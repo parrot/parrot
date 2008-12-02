@@ -6,11 +6,7 @@
 #ifndef PARROT_BCGEN_H_GUARD
 #define PARROT_BCGEN_H_GUARD
 
-/* temporary */
-#define INTVAL  int
-#define NUMVAL  double
-#define STRING  char
-#define PMC     void
+
 
 /* the type name is exported, but not its private bits */
 struct bytecode;
