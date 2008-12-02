@@ -12,28 +12,11 @@
 
 /* private bits of the bytecode generator */
 
-typedef enum bc_const_types {
-    BC_INT_CONST_TYPE,
-    BC_NUM_CONST_TYPE,
-    BC_STR_CONST_TYPE,
-    BC_PMC_CONST_TYPE
-
-} bc_const_type;
-
-typedef union const_value {
-    INTVAL    ival;
-    FLOATVAL  nval;
-    STRING   *sval;
-    PMC      *pval;
-
-} const_value;
 
 typedef struct bc_const {
-    bc_const_type     type;  /* type of constant */
-    int               index; /* index into constant table */
-    const_value       value; /* this constant's value */
-
-    struct bc_const * next;  /* linked list */
+    int                index; /* index into constant table */
+    PackFile_Constant *value;
+    struct bc_const   *next;  /* linked list */
 
 } bc_const;
 
@@ -63,28 +46,46 @@ static bc_const * new_const(bytecode * const bc);
 
 */
 
+
+/*
+
+Create a new constant node in the linked list of constants.
+A pointer to the node is returned.
+
+*/
 static bc_const *
 new_const(bytecode * const bc) {
     bc_const *bcc = (bc_const *)mem_sys_allocate(sizeof (bc_const));
+    bcc->value    = PackFile_Constant_new(bc->interp);
     bcc->index    = bc->num_constants++;
     bcc->next     = bc->constants;
     bc->constants = bcc;
     return bcc;
 }
 
+/*
+
+Add a PMC constant to the constants list.
+
+*/
 bc_const *
 add_pmc_const(bytecode * const bc, PMC * pmc) {
-    bc_const *bcc   = new_const(bc);
-    bcc->type       = BC_PMC_CONST_TYPE;
-    bcc->value.pval = pmc;
+    bc_const *bcc     = new_const(bc);
+    bcc->value->type  = PFC_PMC;
+    bcc->value->u.key = pmc;
     return bcc;
 }
 
+/*
+
+Add a String constant to the constants list.
+
+*/
 bc_const *
 add_string_const(bytecode * const bc, char const * const str) {
-    bc_const *bcc   = new_const(bc);
-    bcc->type       = BC_STR_CONST_TYPE;
-    bcc->value.sval = string_make(bc->interp, str, strlen(str), "ascii", PObj_constant_FLAG);
+    bc_const *bcc        = new_const(bc);
+    bcc->value->type     = PFC_STRING;
+    bcc->value->u.string = string_make(bc->interp, str, strlen(str), "ascii", PObj_constant_FLAG);
     return bcc;
 }
 
@@ -110,29 +111,49 @@ new_bytecode(Interp *interp, char const * const filename) {
 
     Parrot_loadbc(interp, bc->packfile);
 
+    /* create segments */
     interp->code      = PF_create_default_segs(interp, filename, 1);
-    self              = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_INTERPRETER);
 
+    /* add interpreter globals to bytecode (?) */
+    self              = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_INTERPRETER);
     add_pmc_const(bc, self);
 
     interp->code->base.data = (opcode_t *)mem_sys_realloc(interp->code->base.data, bytes);
     interp->code->base.size = 3;
 
-    bc->opcursor   = (opcode_t *)interp->code->base.data;
+    /* initialize the cursor to write opcodes into the code segment */
+    bc->opcursor = (opcode_t *)interp->code->base.data;
 
     return bc;
 }
 
+/*
+
+Write an op into the bytecode stream.
+
+*/
 void
 emit_opcode(bytecode * const bc, opcode_t op) {
     *bc->opcursor++ = op;
 }
 
+/*
+
+Write an integer argument into the bytecode stream.
+
+*/
 void
 emit_int_arg(bytecode * const bc, int intval) {
     *bc->opcursor++ = intval;
 }
 
+/*
+
+Emit the opcode by name. C<opname> must be a valid, signatured opname.
+So, "print" is not valid, whereas "print_ic" is. The opcode of the
+opname is looked up and written into the bytecode stream.
+
+*/
 void
 emit_op_by_name(bytecode * const bc, char const * const opname) {
     int op = bc->interp->op_lib->op_code(opname, 1);
@@ -145,6 +166,11 @@ emit_op_by_name(bytecode * const bc, char const * const opname) {
 }
 
 
+/*
+
+Add a sub PMC to the constant table. This function initializes the sub PMC.
+
+*/
 static void
 add_sub_pmc(bytecode * const bc, char const * const subname) {
     Interp     *interp    = bc->interp;
@@ -168,9 +194,9 @@ add_sub_pmc(bytecode * const bc, char const * const subname) {
     for (i = 0; i < 4; ++i)
         sub->n_regs_used[i] = 0;
 
-    sub->name          = subid->value.sval;
-    sub->ns_entry_name = subid->value.sval;
-    sub->subid         = subid->value.sval;
+    sub->name          = subid->value->u.string;
+    sub->ns_entry_name = subid->value->u.string;
+    sub->subid         = subid->value->u.string;
 
     subconst = add_pmc_const(bc, sub_pmc);
 
@@ -179,6 +205,11 @@ add_sub_pmc(bytecode * const bc, char const * const subname) {
     */                                                           /* doesn't work?? */
 }
 
+/*
+
+Walk the list of constants and store them in the constants segment of the packfile.
+
+*/
 static void
 emit_constants(bytecode * const bc) {
     bc_const *iter = bc->constants;
@@ -191,36 +222,7 @@ emit_constants(bytecode * const bc) {
 
     /* walk the list and put all of them into the constant table. */
     while (iter) {
-        fprintf(stderr, "constant (%d)...\n", iter->index);
-
-
-        bc->interp->code->const_table->constants[iter->index] = PackFile_Constant_new(bc->interp);
-
-        assert(bc->interp->code->const_table->constants[iter->index]);
-        switch (iter->type) {
-            /*
-            case BC_NUM_CONST_TYPE:
-                bc->interp->code->const_table->constants[iter->index]->type  = 0;;
-                bc->interp->code->const_table->constants[iter->index]->u.key = iter->value.nval;
-                break;
-                */
-            case BC_STR_CONST_TYPE:
-                bc->interp->code->const_table->constants[iter->index]->type     = PFC_STRING;
-                bc->interp->code->const_table->constants[iter->index]->u.string = iter->value.sval;
-                break;
-            case BC_PMC_CONST_TYPE:
-                bc->interp->code->const_table->constants[iter->index]->type  = PFC_PMC;
-                bc->interp->code->const_table->constants[iter->index]->u.key = iter->value.pval;
-                break;
-            /*
-            case BC_INT_CONST_TYPE:
-                break;
-            */
-            default:
-                /* error */
-                fprintf(stderr, "wrong constant type!\n");
-                break;
-        }
+        bc->interp->code->const_table->constants[iter->index] = iter->value;
         iter = iter->next;
     }
 }
@@ -237,16 +239,15 @@ write_pbc_file(bytecode * const bc, char const * const filename) {
     FILE     *fp;
     int       result;
 
-    assert(bc->interp->code->base.pf);
-
+    /* store the list of constants in the constants segment */
     emit_constants(bc);
 
-    fprintf(stderr, "constants written...\n");
+    /* pack the packfile */
     size   = PackFile_pack_size(bc->interp, bc->interp->code->base.pf) * sizeof (opcode_t);
     packed = (opcode_t*) mem_sys_allocate(size);
-
     PackFile_pack(bc->interp, bc->interp->code->base.pf, packed);
 
+    /* write to file */
     fp = fopen(filename, "wb");
 
     if (fp == NULL)
@@ -258,6 +259,8 @@ write_pbc_file(bytecode * const bc, char const * const filename) {
         fprintf(stderr, "Couldn't write %s\n", filename);
 
     fclose(fp);
+
+    /* done! */
 }
 
 
