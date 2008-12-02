@@ -15,6 +15,7 @@
 #include "pirlexer.h"
 #include "pirheredoc.h"
 #include "pirregalloc.h"
+#include "piremit.h"
 
 /* global variable to set parser in debug mode.
  * It is not clear to me whether the global can be replaced
@@ -66,8 +67,9 @@ print_help(char const * const program_name)
 {
     fprintf(stderr, "Usage: %s [options] <file>\n", program_name);
     fprintf(stderr, "Options:\n\n"
-    "  -E        run heredoc and macro preprocessors only\n"
+    "  -b        generate bytecode\n"
     "  -d        show debug messages of parser\n"
+    "  -E        run heredoc and macro preprocessors only\n"
     "  -h        show this help message\n"
     "  -H        heredoc preprocessing only\n"
     "  -m <size> specify initial macro buffer size; default is 4096 bytes\n"
@@ -187,12 +189,14 @@ parse_file(int flexdebug, FILE *infile, char * const filename, int flags, int th
             fprintf(stdout, "ok\n");
         else if (TEST_FLAG(lexer->flags, LEXER_FLAG_PREPROCESS))
             emit_pir_subs(lexer);
-        else {
+        else if (TEST_FLAG(lexer->flags, LEXER_FLAG_OUTPUTPBC))
+            emit_pbc(lexer);
+        else
             /*
             fprintf(stderr, "Parse successful!\n");
             */
             print_subs(lexer);
-        }
+
 
         fclose(lexer->outfile);
 
@@ -269,6 +273,9 @@ main(int argc, char *argv[]) {
      * the standard funtion for that, right now. This is a TODO. */
     while (argc > 0 && argv[0][0] == '-') {
         switch (argv[0][1]) {
+            case 'b':
+                SET_FLAG(flags, LEXER_FLAG_OUTPUTPBC);
+                break;
             case 'E':
                 SET_FLAG(flags, LEXER_FLAG_PREPROCESS);
                 break;

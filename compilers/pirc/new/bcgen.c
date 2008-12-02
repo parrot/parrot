@@ -6,9 +6,9 @@
 #include <assert.h>
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
-/*
+
 #include "bcgen.h"
-*/
+
 
 /* private bits of the bytecode generator */
 
@@ -32,7 +32,8 @@ struct bytecode {
 
 };
 
-typedef struct bytecode bytecode;
+/*typedef struct bytecode bytecode;
+*/
 
 static bc_const * new_const(bytecode * const bc);
 
@@ -190,6 +191,7 @@ emit_op_by_name(bytecode * const bc, char const * const opname) {
         emit_opcode(bc, op);
 }
 
+static STRING *add_string_const_from_cstring(bytecode * const bc, char const * const str);
 /*
 
 XXX think of better name.
@@ -208,7 +210,7 @@ add_string_const_from_cstring(bytecode * const bc, char const * const str) {
 Add a sub PMC to the constant table. This function initializes the sub PMC.
 
 */
-static void
+void
 add_sub_pmc(bytecode * const bc,
             char const * const subname, /* .sub foo --> "foo" */
             char const * const nsentry, /* .sub foo :nsentry('bar') --> "bar" */
@@ -342,6 +344,7 @@ write_pbc_file(bytecode * const bc, char const * const filename) {
 Test driver.
 
 */
+/*
 int
 main(int argc, char **argv) {
     Interp *interp = Parrot_new(NULL);
@@ -358,6 +361,8 @@ main(int argc, char **argv) {
     write_pbc_file(bc, "test.pbc");
     fprintf(stderr, "written pbc file\n");
 }
+
+*/
 
 
 /*

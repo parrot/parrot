@@ -36,7 +36,8 @@ typedef enum lexer_flags {
     LEXER_FLAG_HEREDOCONLY         = 1 << 5, /* preprocess heredocs only */
     LEXER_FLAG_NOOUTPUT            = 1 << 6, /* don't print anything on success, except 'ok' */
     LEXER_FLAG_REGALLOC            = 1 << 7, /* use register allocation optimizer */
-    LEXER_FLAG_PASMFILE            = 1 << 8  /* the input is PASM, not PIR code */
+    LEXER_FLAG_PASMFILE            = 1 << 8, /* the input is PASM, not PIR code */
+    LEXER_FLAG_OUTPUTPBC         = 1 << 9  /* generate PBC file */
 
 } lexer_flags;
 
@@ -140,6 +141,9 @@ typedef struct lexer_state {
 
     /* register allocation */
     lsr_allocator            *lsr;
+
+    /* bytecode generation */
+    struct bytecode                 *bc;
 
 } lexer_state;
 

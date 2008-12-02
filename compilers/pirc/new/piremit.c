@@ -9,15 +9,14 @@
 
 #include <stdio.h>
 
+#include "bcgen.h"
+
 
 /*
 
 =head1 FUNCTIONS
 
 This file contains emit functions.
-
-XXX Take the print_* function as a template to create the
-PBC-generating functions.
 
 =over 4
 
@@ -379,6 +378,7 @@ emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
 
     /* emit the opcode */
 
+    emit_opcode(lexer->bc, instr->opcode);
 
     /* emit the arguments */
 
@@ -430,6 +430,12 @@ emit_pbc(lexer_state * const lexer) {
     if (lexer->subs == NULL)
         return;
 
+
+    /* XXX fix the numbers here */
+    lexer->bc = new_bytecode(lexer->interp, lexer->filename,
+                             lexer->instr_counter * 4, lexer->instr_counter);
+
+
     subiter = lexer->subs->next;
 
     /* initialize data structures in which PBC is going to be emitted. */
@@ -437,10 +443,15 @@ emit_pbc(lexer_state * const lexer) {
 
     /* iterate over all instructions and emit them */
     do {
+        add_sub_pmc(lexer->bc, subiter->sub_name, NULL, NULL, -1, subiter->regs_used);
+
         emit_pbc_instructions(lexer, subiter);
         subiter = subiter->next;
     }
     while (subiter != lexer->subs->next);
+
+    /* write the output to a file. */
+    write_pbc_file(lexer->bc, "a.pbc");
 }
 
 /*
