@@ -53,6 +53,7 @@ fpclassify
 gamma
 hypot
 ilogb
+isfinite
 isinf
 isnan
 isnormal
@@ -88,267 +89,363 @@ LIST
 .end
 
 
-=item C<math.acosh ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.acosh (x)>
 
 =cut
 
 .sub 'acosh'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'acosh'()
+    .return (res)
 .end
 
 
-=item C<math.asinh ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.asinh (x)>
 
 =cut
 
 .sub 'asinh'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'asinh'()
+    .return (res)
 .end
 
 
-=item C<math.atanh ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.atanh (x)>
 
 =cut
 
 .sub 'atanh'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'atanh'()
+    .return (res)
 .end
 
 
-=item C<math.cbrt ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.cbrt (x)>
 
 =cut
 
 .sub 'cbrt'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'cbrt'()
+    .return (res)
 .end
 
 
-=item C<math.copysign ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.copysign (x, y)>
 
 =cut
 
 .sub 'copysign'
+    .param pmc x :optional
+    .param pmc y :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    lua_checknumber(2, y)
+    res = x.'copysign'(y)
+    .return (res)
 .end
 
 
-=item C<math.erf ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.erf (x)>
 
 =cut
 
 .sub 'erf'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'erf'()
+    .return (res)
 .end
 
 
-=item C<math.erfc ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.erfc (x)>
 
 =cut
 
 .sub 'erfc'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'erfc'()
+    .return (res)
 .end
 
 
-=item C<math.exp2 ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.exp2 (x)>
 
 =cut
 
 .sub 'exp2'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'exp2'()
+    .return (res)
 .end
 
 
-=item C<math.expm1 ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.expm1 (x)>
 
 =cut
 
 .sub 'expm1'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'expm1'()
+    .return (res)
 .end
 
 
-=item C<math.fdim ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.fdim (x, y)>
 
 =cut
 
 .sub 'fdim'
+    .param pmc x :optional
+    .param pmc y :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    lua_checknumber(2, y)
+    res = x.'fdim'(y)
+    .return (res)
 .end
 
 
-=item C<math.fma ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.fma (x, y, z)>
 
 =cut
 
 .sub 'fma'
+    .param pmc x :optional
+    .param pmc y :optional
+    .param pmc z :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    lua_checknumber(2, y)
+    lua_checknumber(3, z)
+    res = x.'fma'(y, z)
+    .return (res)
 .end
 
 
-=item C<math.fmax ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.fmax (x1, x2, ..., xn)>
 
 =cut
 
 .sub 'fmax'
-    .param pmc extra :slurpy
-    not_implemented()
+    .param pmc argv :slurpy
+    .local int argc
+    .local int i
+    .local pmc m, y
+    argc = argv
+    $P0 = argv[0]
+    i = 1
+    lua_checknumber(i, $P0)
+    m = clone $P0
+  L1:
+    if i >= argc goto L2
+    $P0 = argv[i]
+    inc i
+    lua_checknumber(i, $P0)
+    y = clone $P0
+    m = m.'fmax'(y)
+    goto L1
+  L2:
+    $P0 = clone m
+    .return ($P0)
 .end
 
 
 =item C<math.fmin ()>
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub 'fmin'
-    .param pmc extra :slurpy
-    not_implemented()
+    .param pmc argv :slurpy
+    .local int argc
+    .local int i
+    .local pmc m, y
+    argc = argv
+    $P0 = argv[0]
+    i = 1
+    lua_checknumber(i, $P0)
+    m = clone $P0
+  L1:
+    if i >= argc goto L2
+    $P0 = argv[i]
+    inc i
+    lua_checknumber(i, $P0)
+    y = clone $P0
+    m = m.'fmin'(y)
+    goto L1
+  L2:
+    $P0 = clone m
+    .return ($P0)
 .end
 
 
-=item C<math.fpclassify ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.fpclassify (x)>
 
 =cut
 
 .sub 'fpclassify'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'fpclassify'()
+    .return (res)
 .end
 
 
-=item C<math.gamma ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.gamma (x)>
 
 =cut
 
 .sub 'gamma'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'tgamma'()
+    .return (res)
 .end
 
 
-=item C<math.hypot ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.hypot (x, y)>
 
 =cut
 
 .sub 'hypot'
+    .param pmc x :optional
+    .param pmc y :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    lua_checknumber(2, y)
+    res = x.'hypot'(y)
+    .return (res)
 .end
 
 
-=item C<math.ilogb ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.ilogb (x)>
 
 =cut
 
 .sub 'ilogb'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'ilogb'()
+    .return (res)
 .end
 
 
-=item C<math.isinf ()>
+=item C<math.isfinite (x)>
 
-NOT YET IMPLEMENTED.
+=cut
+
+.sub 'isfinite'
+    .param pmc x :optional
+    .param pmc extra :slurpy
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'isfinite'()
+    .return (res)
+.end
+
+
+=item C<math.isinf (x)>
 
 =cut
 
 .sub 'isinf'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'isinf'()
+    .return (res)
 .end
 
 
-=item C<math.isnan ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.isnan (x)>
 
 =cut
 
 .sub 'isnan'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'isnan'()
+    .return (res)
 .end
 
 
-=item C<math.isnormal ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.isnormal (x)>
 
 =cut
 
 .sub 'isnormal'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'isnormal'()
+    .return (res)
 .end
 
 
-=item C<math.lgamma ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.lgamma (x)>
 
 =cut
 
 .sub 'lgamma'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'lgamma'()
+    .return (res)
 .end
 
 
-=item C<math.log1p ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.log1p (x)>
 
 =cut
 
 .sub 'log1p'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'log1p'()
+    .return (res)
 .end
 
 
@@ -368,123 +465,151 @@ NOT YET IMPLEMENTED.
 .end
 
 
-=item C<math.logb ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.logb (x)>
 
 =cut
 
 .sub 'logb'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'logb'()
+    .return (res)
 .end
 
 
-=item C<math.nearbyint ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.nearbyint (x)>
 
 =cut
 
 .sub 'nearbyint'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'nearbyint'()
+    .return (res)
 .end
 
 
-=item C<math.nextafter ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.nextafter (x, y)>
 
 =cut
 
 .sub 'nextafter'
+    .param pmc x :optional
+    .param pmc y :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    lua_checknumber(2, y)
+    res = x.'nextafter'(y)
+    .return (res)
 .end
 
 
-=item C<math.nexttoward ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.nexttoward (x, y)>
 
 =cut
 
 .sub 'nexttoward'
+    .param pmc x :optional
+    .param pmc y :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    lua_checknumber(2, y)
+    res = x.'nexttoward'(y)
+    .return (res)
 .end
 
 
-=item C<math.remainder ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.remainder (x, y)>
 
 =cut
 
 .sub 'remainder'
+    .param pmc x :optional
+    .param pmc y :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    lua_checknumber(2, y)
+    res = x.'remainder'(y)
+    .return (res)
 .end
 
 
-=item C<math.rint ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.rint (x)>
 
 =cut
 
 .sub 'rint'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'rint'()
+    .return (res)
 .end
 
 
-=item C<math.round ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.round (x)>
 
 =cut
 
 .sub 'round'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'round'()
+    .return (res)
 .end
 
 
-=item C<math.scalbn ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.scalbn (x, ex)>
 
 =cut
 
 .sub 'scalbn'
+    .param pmc x :optional
+    .param pmc ex :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    lua_checknumber(2, ex)
+    res = x.'scalbn'(ex)
+    .return (res)
 .end
 
 
-=item C<math.signbit ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.signbit (x)>
 
 =cut
 
 .sub 'signbit'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'signbit'()
+    .return (res)
 .end
 
 
-=item C<math.trunc ()>
-
-NOT YET IMPLEMENTED.
+=item C<math.trunc (x)>
 
 =cut
 
 .sub 'trunc'
+    .param pmc x :optional
     .param pmc extra :slurpy
-    not_implemented()
+    .local pmc res
+    lua_checknumber(1, x)
+    res = x.'trunc'()
+    .return (res)
 .end
 
 

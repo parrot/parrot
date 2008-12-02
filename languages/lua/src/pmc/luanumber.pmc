@@ -873,6 +873,217 @@ Decrements the number.
 
 =over 4
 
+=item C<PMC* acosh()>
+
+=cut
+
+*/
+    METHOD PMC* acosh() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 acosh(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* asinh()>
+
+=cut
+
+*/
+    METHOD PMC* asinh() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 asinh(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* atanh()>
+
+=cut
+
+*/
+    METHOD PMC* atanh() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 atanh(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* cbrt()>
+
+=cut
+
+*/
+    METHOD PMC* cbrt() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 cbrt(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* copysign(PMC* y)>
+
+=cut
+
+*/
+    METHOD PMC* copysign(PMC* y) {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 copysign(VTABLE_get_number(INTERP, SELF),
+                                          VTABLE_get_number(INTERP, y)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* erf()>
+
+=cut
+
+*/
+    METHOD PMC* erf() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 erf(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* erfc()>
+
+=cut
+
+*/
+    METHOD PMC* erfc() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 erfc(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* exp2()>
+
+=cut
+
+*/
+    METHOD PMC* exp2() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 exp2(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* expm1()>
+
+=cut
+
+*/
+    METHOD PMC* expm1() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 expm1(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* fdim(PMC* y)>
+
+=cut
+
+*/
+    METHOD PMC* fdim(PMC* y) {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 fdim(VTABLE_get_number(INTERP, SELF),
+                                      VTABLE_get_number(INTERP, y)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* fma(PMC* y, PMC* z)>
+
+=cut
+
+*/
+    METHOD PMC* fma(PMC* y, PMC* z) {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 fma(VTABLE_get_number(INTERP, SELF),
+                                     VTABLE_get_number(INTERP, y),
+                                     VTABLE_get_number(INTERP, z)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* fmax(PMC* y)>
+
+=cut
+
+*/
+    METHOD PMC* fmax(PMC* y) {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 fmax(VTABLE_get_number(INTERP, SELF),
+                                      VTABLE_get_number(INTERP, y)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* fmin(PMC* y)>
+
+=cut
+
+*/
+    METHOD PMC* fmin(PMC* y) {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 fmin(VTABLE_get_number(INTERP, SELF),
+                                      VTABLE_get_number(INTERP, y)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* fpclassify()>
+
+=cut
+
+*/
+    METHOD PMC* fpclassify() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaString);
+        const char *p;
+        switch (fpclassify(VTABLE_get_number(INTERP, SELF))) {
+        case FP_INFINITE:       p = "inf";              break;
+        case FP_NAN:            p = "nan";              break;
+        case FP_NORMAL:         p = "normal";           break;
+        case FP_SUBNORMAL:      p = "subnormal";        break;
+        case FP_ZERO:           p = "zero";             break;
+        default:                p = "bad fpclassify";
+        }
+        VTABLE_set_string_native(INTERP, retval,
+                                 const_string(INTERP, p));
+        RETURN(PMC *retval);
+    }
+
+/*
+
 =item C<PMC* frexp()>
 
 =cut
@@ -896,6 +1107,91 @@ Decrements the number.
 
 /*
 
+=item C<PMC* hypot(PMC* y)>
+
+=cut
+
+*/
+    METHOD PMC* hypot(PMC* y) {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 hypot(VTABLE_get_number(INTERP, SELF),
+                                       VTABLE_get_number(INTERP, y)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* ilogb()>
+
+=cut
+
+*/
+    METHOD PMC* ilogb() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 ilogb(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* isfinite()>
+
+=cut
+
+*/
+    METHOD PMC* isfinite() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
+        VTABLE_set_bool(INTERP, retval,
+                        isfinite(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* isinf()>
+
+=cut
+
+*/
+    METHOD PMC* isinf() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
+        VTABLE_set_bool(INTERP, retval,
+                        isinf(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* isnan()>
+
+=cut
+
+*/
+    METHOD PMC* isnan() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
+        VTABLE_set_bool(INTERP, retval,
+                        isnan(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* isnormal()>
+
+=cut
+
+*/
+    METHOD PMC* isnormal() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
+        VTABLE_set_bool(INTERP, retval,
+                        isnormal(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
 =item C<PMC* ldexp(PMC *x, PMC *expn)>
 
 =cut
@@ -907,6 +1203,62 @@ Decrements the number.
         VTABLE_set_number_native(INTERP, retval,
                                  ldexp(VTABLE_get_number(INTERP, SELF),
                                        VTABLE_get_integer(INTERP, expn)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* lgamma()>
+
+=cut
+
+*/
+    METHOD PMC* lgamma() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 lgamma(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* log1p()>
+
+=cut
+
+*/
+    METHOD PMC* log1p() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 log1p(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* log2()>
+
+=cut
+
+*/
+    METHOD PMC* log2() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 log2(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* logb()>
+
+=cut
+
+*/
+    METHOD PMC* logb() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 logb(VTABLE_get_number(INTERP, SELF)));
         RETURN(PMC *retval);
     }
 
@@ -935,6 +1287,50 @@ Decrements the number.
 
 /*
 
+=item C<PMC* nearbyint()>
+
+=cut
+
+*/
+    METHOD PMC* nearbyint() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 nearbyint(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* nextafter(PMC* y)>
+
+=cut
+
+*/
+    METHOD PMC* nextafter(PMC* y) {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 nextafter(VTABLE_get_number(INTERP, SELF),
+                                           VTABLE_get_number(INTERP, y)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* nexttoward(PMC* y)>
+
+=cut
+
+*/
+    METHOD PMC* nexttoward(PMC* y) {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 nexttoward(VTABLE_get_number(INTERP, SELF),
+                                            VTABLE_get_number(INTERP, y)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
 =item C<PMC *rawequal(PMC *value)>
 
 =cut
@@ -949,6 +1345,106 @@ Decrements the number.
         else
             VTABLE_set_integer_native(INTERP, retval, 0);
 
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* remainder(PMC* y)>
+
+=cut
+
+*/
+    METHOD PMC* remainder(PMC* y) {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 remainder(VTABLE_get_number(INTERP, SELF),
+                                           VTABLE_get_number(INTERP, y)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* rint()>
+
+=cut
+
+*/
+    METHOD PMC* rint() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 rint(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* round()>
+
+=cut
+
+*/
+    METHOD PMC* round() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 round(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* scalbn(PMC* ex)>
+
+=cut
+
+*/
+    METHOD PMC* scalbn(PMC* ex) {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 scalbn(VTABLE_get_number(INTERP, SELF),
+                                        VTABLE_get_number(INTERP, ex)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* signbit()>
+
+=cut
+
+*/
+    METHOD PMC* signbit() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 signbit(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* tgamma()>
+
+=cut
+
+*/
+    METHOD PMC* tgamma() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 tgamma(VTABLE_get_number(INTERP, SELF)));
+        RETURN(PMC *retval);
+    }
+
+/*
+
+=item C<PMC* trunc()>
+
+=cut
+
+*/
+    METHOD PMC* trunc() {
+        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        VTABLE_set_number_native(INTERP, retval,
+                                 trunc(VTABLE_get_number(INTERP, SELF)));
         RETURN(PMC *retval);
     }
 

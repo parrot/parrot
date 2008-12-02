@@ -22,7 +22,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 23;
 use Parrot::Config;
 use Test::More;
 use Parrot::Test::Lua;
@@ -57,11 +57,144 @@ nan
 OUTPUT
 }
 
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function acosh' );
+require 'mathx'
+print(math.acosh(2))
+CODE
+/^1\.316/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function asinh' );
+require 'mathx'
+print(math.asinh(0.5))
+CODE
+/^0\.481/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function atanh' );
+require 'mathx'
+print(math.atanh(0.5))
+CODE
+/^0\.549/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function cbrt' );
+require 'mathx'
+print(math.cbrt(2))
+CODE
+/^1\.259/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function erf' );
+require 'mathx'
+print(math.erf(2))
+CODE
+/^0\.995/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function erfc' );
+require 'mathx'
+print(math.erfc(2))
+CODE
+/^0\.004/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function exp2' );
+require 'mathx'
+print(math.exp2(3))
+CODE
+/^8$/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function expm1' );
+require 'mathx'
+print(math.expm1(2))
+CODE
+/^6\.389/
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function fpclassify' );
+require 'mathx'
+print(math.fpclassify(1))
+CODE
+normal
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function gamma' );
+require 'mathx'
+print(math.gamma(0.5))
+CODE
+/^1\.772/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function hypot' );
+require 'mathx'
+print(math.hypot(2, 3))
+CODE
+/^3\.605/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function ilogb' );
+require 'mathx'
+print(math.ilogb(47))
+CODE
+/^5$/
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function isfinite' );
+require 'mathx'
+print(math.isfinite(1))
+CODE
+true
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function isinf' );
+require 'mathx'
+print(math.isinf(1))
+CODE
+false
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function isnan' );
+require 'mathx'
+print(math.isnan(1))
+CODE
+false
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function isnormal' );
+require 'mathx'
+print(math.isnormal(1))
+CODE
+true
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function lgamma' );
+require 'mathx'
+print(math.lgamma(0.5))
+CODE
+/^0\.572/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function log1p' );
+require 'mathx'
+print(math.log1p(47))
+CODE
+/^3\.871/
+OUTPUT
+
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function log2' );
 require 'mathx'
 print(math.log2(47))
 CODE
 /^5\.554/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function logb' );
+require 'mathx'
+print(math.logb(47))
+CODE
+/^5$/
 OUTPUT
 
 
