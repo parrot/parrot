@@ -24,11 +24,11 @@ typedef struct bc_const {
 /* Note that typedef of struct bytecode is already done in the header file */
 
 struct bytecode {
-    int          num_constants;
-    bc_const    *constants;
-    PackFile    *packfile;
-    opcode_t    *opcursor;
-    Interp      *interp;
+    int          num_constants;  /* for assigning indices to the constants, also counter. */
+    bc_const    *constants;      /* list of constants */
+    PackFile    *packfile;       /* the actual packfile */
+    opcode_t    *opcursor;       /* for writing ops into the code segment */
+    Interp      *interp;         /* parrot interpreter */
 
 };
 
@@ -91,6 +91,32 @@ add_string_const(bytecode * const bc, char const * const str) {
 
 /*
 
+Add a number constant to the constants list.
+
+*/
+bc_const *
+add_num_const(bytecode * const bc, FLOATVAL f) {
+    bc_const *bcc        = new_const(bc);
+    bcc->value->type     = PFC_NUMBER;
+    bcc->value->u.number = f;
+    return bcc;
+}
+
+/*
+
+Add a key constant to the constants list.
+
+*/
+bc_const *
+add_key_const(bytecode * const bc, PMC *key) {
+    bc_const *bcc     = new_const(bc);
+    bcc->value->type  = PFC_KEY;
+    bcc->value->u.key = key;
+    return bcc;
+}
+
+/*
+
 =item new_bytecode
 
 Create a new bytecode struct and return a pointer to it.
@@ -99,10 +125,9 @@ Create a new bytecode struct and return a pointer to it.
 
 */
 bytecode *
-new_bytecode(Interp *interp, char const * const filename) {
+new_bytecode(Interp *interp, char const * const filename, int bytes, int codesize) {
     PMC      *self;
     bytecode *bc      = (bytecode *)mem_sys_allocate(sizeof (bytecode));
-    int bytes         = 12;
 
     bc->packfile      = PackFile_new(interp, 0);
     bc->constants     = NULL;
@@ -119,7 +144,7 @@ new_bytecode(Interp *interp, char const * const filename) {
     add_pmc_const(bc, self);
 
     interp->code->base.data = (opcode_t *)mem_sys_realloc(interp->code->base.data, bytes);
-    interp->code->base.size = 3;
+    interp->code->base.size = codesize;
 
     /* initialize the cursor to write opcodes into the code segment */
     bc->opcursor = (opcode_t *)interp->code->base.data;
@@ -165,6 +190,18 @@ emit_op_by_name(bytecode * const bc, char const * const opname) {
         emit_opcode(bc, op);
 }
 
+/*
+
+XXX think of better name.
+Add a string constant to the constants list, and return the STRING variant
+
+*/
+static STRING *
+add_string_const_from_cstring(bytecode * const bc, char const * const str) {
+    bc_const *strconst = add_string_const(bc, str);
+    return strconst->value->u.string;
+}
+
 
 /*
 
@@ -172,14 +209,26 @@ Add a sub PMC to the constant table. This function initializes the sub PMC.
 
 */
 static void
-add_sub_pmc(bytecode * const bc, char const * const subname) {
+add_sub_pmc(bytecode * const bc,
+            char const * const subname, /* .sub foo --> "foo" */
+            char const * const nsentry, /* .sub foo :nsentry('bar') --> "bar" */
+            char const * const subid,   /* .sub foo :subid('baz') --> "baz" */
+            int vtable_index,           /* vtable entry index */
+            int regs_used[])            /* register usage */
+{
     Interp     *interp    = bc->interp;
     PMC        *sub_pmc   = pmc_new(bc->interp, enum_class_Sub);
     Parrot_sub *sub       = PMC_sub(sub_pmc);
     bc_const   *subconst;
+    bc_const   *subname_const;
+
 
     int i;
-    bc_const *subid       = add_string_const(bc, subname);
+
+
+
+    subname_const = add_string_const(bc, subname);
+
 
     sub->start_offs       = 0;
     sub->end_offs         = 3;
@@ -188,21 +237,45 @@ add_sub_pmc(bytecode * const bc, char const * const subname) {
 
     sub->lex_info         = NULL;
     sub->outer_sub        = NULL;
-    sub->vtable_index     = -1;
+    sub->vtable_index     = vtable_index;
     sub->multi_signature  = NULL;
 
     for (i = 0; i < 4; ++i)
-        sub->n_regs_used[i] = 0;
+        sub->n_regs_used[i] = regs_used[i];
 
-    sub->name          = subid->value->u.string;
-    sub->ns_entry_name = subid->value->u.string;
-    sub->subid         = subid->value->u.string;
+    sub->name = subname_const->value->u.string;
 
-    subconst = add_pmc_const(bc, sub_pmc);
+    /* If there was a :nsentry, add it to the constants table, and set
+     * the ns_entry_name attribute to that STRING. Default value is the sub's name.
+     */
+    if (nsentry)
+        sub->ns_entry_name = add_string_const_from_cstring(bc, nsentry);
+    else
+        sub->ns_entry_name = subname_const->value->u.string;
+
+    /* if there was a :subid, add it to the constants table, and set the subid
+     * attribute to that STRING. Default value is the sub's name.
+     */
+    if (subid)
+        sub->subid = add_string_const_from_cstring(bc, subid);
+    else
+        sub->subid = subname_const->value->u.string;
+
+
 
     Parrot_store_sub_in_namespace(bc->interp, sub_pmc);
-    /* PackFile_FixupTable_new_entry(bc->interp, subname, enum_fixup_sub, subconst->index);
-    */                                                           /* doesn't work?? */
+    subconst      = add_pmc_const(bc, sub_pmc);
+
+    fprintf(stderr, "subconst index: %d\n", subconst->index);
+
+    /* doesn't work?? */
+
+    /* this /does/ work in pirc/bctest.c!! Why not here??
+    */
+    /*
+    PackFile_FixupTable_new_entry(bc->interp, "main", enum_fixup_sub, subconst->index);
+    */
+
 }
 
 /*
@@ -272,13 +345,14 @@ Test driver.
 int
 main(int argc, char **argv) {
     Interp *interp = Parrot_new(NULL);
-    bytecode *bc   = new_bytecode(interp, "test.pir");
+    bytecode *bc   = new_bytecode(interp, "test.pir", 12, 3);
+    int regs_used[4] = {0,0,0,0};
 
-
+    add_sub_pmc(bc, "main", NULL, NULL, -1, regs_used);
     emit_op_by_name(bc, "print_ic");
     emit_int_arg(bc, 42);
     emit_op_by_name(bc, "end");
-    add_sub_pmc(bc, "main");
+
 
     fprintf(stderr, "writing pbc...");
     write_pbc_file(bc, "test.pbc");
