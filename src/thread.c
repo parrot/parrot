@@ -455,16 +455,16 @@ thread_func(ARGIN_NULLOK(void *arg))
     sub_arg            = PMC_pmc_val(self);
 
     if (setjmp(jump_point.resume)) {
-        PMC *exception = Parrot_cx_peek_task(interp);
         /* caught exception */
         /* XXX what should we really do here */
+        /* PMC *exception = Parrot_cx_peek_task(interp);
         PIO_eprintf(interp,
                     "Unhandled exception in thread with tid %d "
                     "(message=%Ss, number=%d)\n",
                     interp->thread_data->tid,
                     VTABLE_get_string(interp, exception),
                     VTABLE_get_integer_keyed_str(interp, exception,
-                        const_string(interp, "type")));
+                        const_string(interp, "type"))); */
 
         ret_val = PMCNULL;
     }
