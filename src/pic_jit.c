@@ -130,7 +130,9 @@ static int returns_match_results(
 
 =item C<static opcode_t * pic_test_func>
 
-RT#48260: Not yet documented!!!
+Determines whether the given subroutine C<sub> can be JIT'd. Counts the
+number of registers used by the sub, and returns C<0> if more registers
+are used then JIT supports. Returns 1 if it does not use too many registers.
 
 =cut
 
@@ -285,7 +287,8 @@ returns_match_results(ARGIN(const PMC *sig_ret), ARGIN(const PMC *sig_result))
 
 =item C<static int call_is_safe>
 
-RT#48260: Not yet documented!!!
+Returns C<1> if the passed arguments match the subroutine's parameter list.
+Returns C<0> otherwise.
 
 =cut
 
@@ -334,7 +337,8 @@ call_is_safe(ARGIN(const PMC *sub), ARGMOD(opcode_t **set_args))
 
 =item C<static int ops_jittable>
 
-RT#48260: Not yet documented!!!
+Returns 1 if the return values match the returned results. Returns C<0>
+otherwise.
 
 =cut
 
