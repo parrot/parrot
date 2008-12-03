@@ -1165,6 +1165,7 @@ free_sym(ARGMOD(SymReg *r))
         }
     }
 
+    mem_sys_free(r->subid);
     mem_sys_free(r->name);
     mem_sys_free(r);
 }

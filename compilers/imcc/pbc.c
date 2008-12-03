@@ -664,10 +664,11 @@ find_global_label(PARROT_INTERP, ARGIN(const char *name),
         SymReg * const r = s->unit->instructions->symregs[0];
 
         /* if names and namespaces are matching - ok */
-        if (r && (strcmp(r->name, name) == 0)
+        if (r && ((r->subid && (strcmp(r->subid, name) == 0)) 
+                    || (r->name && (strcmp(r->name, name) == 0)))
               && ((sym->unit->_namespace && s->unit->_namespace
-              &&  (strcmp(sym->unit->_namespace->name, s->unit->_namespace->name) == 0))
-              || (!sym->unit->_namespace && !s->unit->_namespace)))
+                        && (strcmp(sym->unit->_namespace->name, s->unit->_namespace->name) == 0))
+                    || (!sym->unit->_namespace && !s->unit->_namespace)))
             return s;
 
         *pc += s->size;
@@ -1229,7 +1230,8 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     if (unit->is_method == 1) {
         /* Work out the name of the method. */
         if (unit->method_name)
-            sub->method_name = string_from_cstring(interp, unit->method_name, 0);
+            sub->method_name = string_from_cstring(interp, unit->method_name + 1,
+                 strlen(unit->method_name) - 2);
         else
             sub->method_name = sub->name;
     }
@@ -1240,7 +1242,8 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     if (unit->has_ns_entry_name == 1) {
         /* Work out the name of the ns entry. */
         if (unit->ns_entry_name)
-            sub->ns_entry_name = string_from_cstring(interp, unit->ns_entry_name, 0);
+            sub->ns_entry_name = string_from_cstring(interp, unit->ns_entry_name +1,
+                 strlen(unit->ns_entry_name) - 2);
         else
             sub->ns_entry_name = sub->name;
     }

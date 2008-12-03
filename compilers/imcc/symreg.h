@@ -65,6 +65,7 @@ enum USAGE {
 
 typedef struct _SymReg {
     char                *name;
+    char                *subid;
     INTVAL               type;          /* Variable type */
     INTVAL               usage;         /* s. USAGE above */
     int                  set;           /* parent register set/file */

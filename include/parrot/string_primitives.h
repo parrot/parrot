@@ -29,6 +29,12 @@ char * str_dup(ARGIN(const char *old))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+char * str_dup_remove_quotes(ARGIN(const char *old))
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 void string_set_data_directory(PARROT_INTERP, ARGIN(const char *dir))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

@@ -26,7 +26,7 @@ t/compilers/imcc/syn/subflags.t  - test flags on PIR subs
     test_namespace.'export_to'(curr_namespace, exports)
 
     ##  set our plan
-    plan(15)
+    plan(18)
 
     .local pmc pmcnull
     null pmcnull
@@ -68,7 +68,17 @@ t/compilers/imcc/syn/subflags.t  - test flags on PIR subs
     $P0 = get_global 'method1'
     $I0 = isnull $P0
     todo($I0, ":method sub not found in namespace")
-.end
+
+    ## :subid subs
+    .const 'Sub' $P40 = 'subid1'
+    isa_ok($P40, 'Sub', ':subid found w/.const')
+    $P0 = get_global 'subid1'
+    $I0 = isnull $P0
+    ok($I0, ":subid not found in namespace")
+    $P0 = get_global '_subid1_'
+    $I0 = issame $P40, $P0
+    ok($I0, ":subid found under sub's name in namespace")
+ .end
 
 
 .sub 'is_same'
@@ -108,3 +118,6 @@ t/compilers/imcc/syn/subflags.t  - test flags on PIR subs
 .end
 
 
+.sub '_subid1_' :subid('subid1')
+    .return ('subid1')
+.end
