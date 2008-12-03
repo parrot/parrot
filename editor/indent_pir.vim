@@ -1,6 +1,7 @@
 " Description:  imcc indenter
 " Author:   Andrew Rodland <arodland@entermail.net>
-" Last Change: 2004 Aug 3
+" Maintainer: Jimmy Zhuo <zhuomingliang@yahoo.com.cn>
+" Last Change: 2008 Dec 3
 
 " As usual, we want to be alone
 if exists("b:did_indent")
@@ -29,8 +30,8 @@ fun! PIRIndent()
         return -1
     endif
 
-    let LABEL_OR_COMMENT = '^\s*\k\+:\s*$\|^#'
-    if thisline =~? LABEL_OR_COMMENT
+    let COMMENT = '^#'
+    if thisline =~? COMMENT
         return 0
     endif
 
@@ -39,7 +40,7 @@ fun! PIRIndent()
         let lnum = prevnonblank(lnum-1)
         let prevline = getline(lnum)
 
-        if prevline !~? LABEL_OR_COMMENT
+        if prevline !~? COMMENT
             if !InPOD(lnum)
                 break
             endif
@@ -52,9 +53,10 @@ fun! PIRIndent()
 
     let ind = indent(lnum)
 
-    let SUB = '^\s*\.pcc_sub\s\+\|^\s*\.sub\s\+'
+    let SUB = '^\s*\.pcc_sub\s\+\|^\s*\.sub\s\+\|^\s*\.macro\s\+'
     let RETURNBLOCK = '\s*\.begin_return\s*$'
-    let END = '^\s*\.end\s*$\|^\s*\.end_return\s*$'
+    let END = '^\s*\.end\s*$\|^\s*\.end_return\s*\|^\s*\.endm$'
+    let LABEL = '^\s*\k\+:\s*$'
 
     if prevline =~? SUB
         let ind = ind + &sw
@@ -64,8 +66,16 @@ fun! PIRIndent()
         let ind = ind + &sw
     endif
 
+    if prevline =~? LABEL
+        let ind = ind + 2
+    endif
+
     if thisline =~? END
         let ind = ind - &sw
+    endif
+
+    if thisline =~? LABEL
+        let ind = ind - 2
     endif
 
     return ind
