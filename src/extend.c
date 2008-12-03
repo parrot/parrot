@@ -999,7 +999,10 @@ Parrot_call_method(PARROT_INTERP, Parrot_PMC sub, Parrot_PMC obj,
 
 =item C<Parrot_Int Parrot_call_method_ret_int>
 
-Call a parrot method for the given object.
+Call the parrot subroutine C<sub> as a method on PMC object C<obj>. The method
+should have the name C<method> as a Parrot_string, and should have a function
+signature C<signature>. Any arguments to the method can be passed at the end
+as a variadic argument list.
 
 =cut
 
