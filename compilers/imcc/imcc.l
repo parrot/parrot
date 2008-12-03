@@ -1065,6 +1065,8 @@ static void
 define_macro(PARROT_INTERP, ARGIN(const char *name), ARGIN(const params_t *params),
              ARGIN(const char *expansion), int start_line)
 {
+    DECL_CONST_CAST;
+
     macro_t *m = find_macro(interp, name);
 
     if (m) {
@@ -1076,7 +1078,8 @@ define_macro(PARROT_INTERP, ARGIN(const char *name), ARGIN(const params_t *param
 
         if (!IMCC_INFO(interp)->macros)
             parrot_new_cstring_hash(interp, &IMCC_INFO(interp)->macros);
-        parrot_hash_put(interp, IMCC_INFO(interp)->macros, name, m);
+        parrot_hash_put(interp, IMCC_INFO(interp)->macros,
+            PARROT_const_cast(char *, name), m);
     }
 
     if (params)
