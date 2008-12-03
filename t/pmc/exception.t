@@ -595,9 +595,7 @@ something broke
 current inst/
 OUTPUT
 
-SKIP: {
-    skip("TODO test causes infinite loop in new exception implementation", 1);
-pir_output_is(<<'CODE', <<'OUTPUT', "taking a continuation promotes RetCs", todo => 'see RT #56458');
+pir_output_is(<<'CODE', <<'OUTPUT', "taking a continuation promotes RetCs");
 ## This test creates a continuation in a inner sub and re-invokes it later.  The
 ## re-invocation signals an error, which is caught by an intermediate sub.
 ## Returning from the "test" sub the second time failed in r28794; invoking
@@ -626,10 +624,10 @@ done:
     print "  calling foo\n"
     .local pmc cont
     cont = foo()
-    pop_eh
     print "  returning from test.\n"
     .return (cont)
 handle_errs:
+    pop_eh
     print "  test:  caught error\n"
     .return (cont)
 .end
@@ -658,7 +656,6 @@ calling cont
 back from test
 done.
 OUTPUT
-}
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler" );
 .sub main :main
