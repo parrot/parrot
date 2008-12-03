@@ -17,7 +17,7 @@ Tests all non-branching conditional operators.
 =cut
 
 
-.const int TESTS = 88
+.const int TESTS = 90
 
 .macro EXP()
   exp_nok:
@@ -61,6 +61,7 @@ Tests all non-branching conditional operators.
     'iseq'()
     'isne'()
     'cmp'()
+    'trac#11'()
 .end
 
 
@@ -1184,6 +1185,21 @@ EXP
 
     is(exp, res, desc)
 .end
+
+
+.sub 'trac#11'
+    $P0 = new 'String'
+    assign $P0, 'foo'
+
+    null $P1
+    $I0 = issame $P0, $P1
+    is($I0, 0, 'issame String,Null')
+
+    $P1 = split ' ', 'parrot speaks your language'
+    $I0 = issame $P0, $P1
+    is($I0, 0, 'issame String,ResizableStringArray')
+.end
+
 
 # Local Variables:
 #   mode: pir
