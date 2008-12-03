@@ -44,11 +44,7 @@ sol10-sparc-gcc_4.0.2        B4*4 Y    -    -     Y   Y   Y    Y/1   ?  20080510
 sol10-sparc-gcc_4.0.2        B8   Y    -    -     Y   Y   Y    Y/2   ?  20080518
 tru64-alpha-compaq_c6.5       8   ?    ?    ?     Y   ?   Y    Y/2   ?  20060203
 win32-x86-mingw_gcc3.4.5          Y    Y    -     -   -   Y    Y     Y  20080917
-win32-x86-mingw_gcc4.2.1          Y    Y    -     -   -   Y    Y/11  ?  20080520
-win32-x86-msvc_6.0                -    Y    -     Y   -   Y    Y/5   ?  20080520
-win32-x86-msvc_7.1                -    Y    -     Y   -   Y    Y/11  ?  20080520
-win32-x86-msvc_8.0                -    Y    -     Y   -   Y    Y/1   ?  20080520
-win32-x86-msvc_9.0                -    Y    -     Y   -   Y    Y/1   ?  20080520
+win32-x86-msvc_9.0                -    Y    -     Y   -   Y    Y/4   ?  20081203
 
 
 Extra Platforms:
@@ -71,7 +67,8 @@ openbsd-zaurus-gcc3.3.5           Y    -    -     Y   Y   Y    ?     ?  20070309
 sol10-x86-cc_5.9              4   -    -    -     -   -   Y    Y     ?  20071010
 sol11-x86-cc_5.8                  -    -    -     -   -   -    Y/121 ?  20070821
 opensolaris-x86-gcc_4.0.3     4   Y    Y    ?     ?   ?   Y    Y/2   ?  20080325
-win32-x86_64-msvc_8.0             -    N    -     -   -   N    N     ?  20080520
+win32-x86-mingw_gcc4.3.0          Y    Y    -     -   -   Y    Y/88  ?  20081203
+win32-x64-msvc_9.0            8   -    N    -     -   -   Y    Y/51  ?  20081203
 
 
 Legend:
