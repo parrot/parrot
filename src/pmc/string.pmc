@@ -506,7 +506,7 @@ class and their strings are aliases of the same internal string.
                 const STRING * const v = VTABLE_get_string(INTERP, value);
                 return (INTVAL)(s == v);
             }
-	    else
+            else
                 return 0;
         }
     }

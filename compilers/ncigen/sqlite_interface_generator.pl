@@ -1,5 +1,7 @@
-#!/home/tewk/srcs/parrot/perl6 
+#!/home/tewk/srcs/parrot/perl6
+
 use v6;
+
 evalfile('./ncigen.pbc', lang => 'Parrot');
 evalfile('./compreg.pir', lang => 'Parrot');
 

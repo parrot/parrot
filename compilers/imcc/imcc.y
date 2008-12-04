@@ -1115,7 +1115,7 @@ subid:
          {
            $$ = 0;
            IMCC_INFO(interp)->cur_unit->subid = NULL;
-           /* 
+           /*
            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid = str_dup_remove_quotes($3);
            mem_sys_free($3);
            */

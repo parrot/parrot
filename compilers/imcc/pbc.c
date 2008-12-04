@@ -664,7 +664,7 @@ find_global_label(PARROT_INTERP, ARGIN(const char *name),
         SymReg * const r = s->unit->instructions->symregs[0];
 
         /* if names and namespaces are matching - ok */
-        if (r && ((r->subid && (strcmp(r->subid, name) == 0)) 
+        if (r && ((r->subid && (strcmp(r->subid, name) == 0))
                     || (r->name && (strcmp(r->name, name) == 0)))
               && ((sym->unit->_namespace && s->unit->_namespace
                         && (strcmp(sym->unit->_namespace->name, s->unit->_namespace->name) == 0))
@@ -1125,7 +1125,7 @@ end positions.
   do { \
     mem_sys_free((x)); \
     (x) = NULL; \
-  } while(0);
+  } while (0);
 
 static int
 add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
