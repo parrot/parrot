@@ -26,7 +26,7 @@ t/compilers/imcc/syn/subflags.t  - test flags on PIR subs
     test_namespace.'export_to'(curr_namespace, exports)
 
     ##  set our plan
-    plan(24)
+    plan(25)
 
     .local pmc pmcnull
     null pmcnull
@@ -98,7 +98,18 @@ t/compilers/imcc/syn/subflags.t  - test flags on PIR subs
     $P0 = get_global unicode:"nsentry\u2462"
     $I0 = issame $P60, $P0
     ok($I0, "nsentry3 found in namespace")
- .end
+
+    ## subid from a different namespace
+    push_eh subid4_err
+    .const 'Sub' $P70 = 'subid4'
+    goto subid4_done
+  subid4_err:
+    $P70 = new 'Undef'
+  subid4_done:
+    pop_eh
+    $I0 = isa $P70, 'Sub'
+    todo($I0, 'subid4 in another ns found w/.const')
+.end
 
 
 .sub 'is_same'
@@ -150,4 +161,10 @@ t/compilers/imcc/syn/subflags.t  - test flags on PIR subs
 
 .sub 'anon3' :nsentry(unicode:"nsentry\u2462") :subid('subid3')
     .return ('anon3')
+.end
+
+.namespace ['OtherNameSpace']
+
+.sub 'anon4' :subid('subid4')
+    .return ('anon4')
 .end
