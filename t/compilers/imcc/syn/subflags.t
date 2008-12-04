@@ -26,7 +26,7 @@ t/compilers/imcc/syn/subflags.t  - test flags on PIR subs
     test_namespace.'export_to'(curr_namespace, exports)
 
     ##  set our plan
-    plan(18)
+    plan(24)
 
     .local pmc pmcnull
     null pmcnull
@@ -78,6 +78,26 @@ t/compilers/imcc/syn/subflags.t  - test flags on PIR subs
     $P0 = get_global '_subid1_'
     $I0 = issame $P40, $P0
     ok($I0, ":subid found under sub's name in namespace")
+
+    ## test all flags
+    .const 'Sub' $P50 = 'subid2'
+    isa_ok($P50, 'Sub', 'subid2 found w/.const')
+    $P0 = get_global 'subid2'
+    $I0 = isnull $P0
+    ok($I0, "subid2 not found in namespace")
+    $P0 = get_global 'nsentry2'
+    $I0 = issame $P50, $P0
+    ok($I0, "nsentry2 found in namespace")
+    $P0 = get_global 'method2'
+    $I0 = isnull $P0
+    ok($I0, "method2 not found in namespace")
+
+    ## unicode nsentry
+    .const 'Sub' $P60 = 'subid3'
+    isa_ok($P60, 'Sub', 'subid3 found w/.const')
+    $P0 = get_global unicode:"nsentry\u2462"
+    $I0 = issame $P60, $P0
+    ok($I0, "nsentry3 found in namespace")
  .end
 
 
@@ -120,4 +140,14 @@ t/compilers/imcc/syn/subflags.t  - test flags on PIR subs
 
 .sub '_subid1_' :subid('subid1')
     .return ('subid1')
+.end
+
+
+.sub 'anon2' :nsentry('nsentry2') :method('method2') :subid('subid2')
+    .return ('anon2')
+.end
+
+
+.sub 'anon3' :nsentry(unicode:"nsentry\u2462") :subid('subid3')
+    .return ('anon3')
 .end

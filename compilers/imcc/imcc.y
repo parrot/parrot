@@ -715,7 +715,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD NCI_CALL METH_CALL INVOCANT
 %token <t> MAIN LOAD INIT IMMEDIATE POSTCOMP METHOD ANON OUTER NEED_LEX
-%token <t> MULTI VTABLE_METHOD LOADLIB SUB_INSTANCE_OF SUB_LEXID
+%token <t> MULTI VTABLE_METHOD LOADLIB SUB_INSTANCE_OF SUBID
 %token <t> NS_ENTRY
 %token <t> UNIQUE_REG
 %token <s> LABEL
@@ -1079,7 +1079,7 @@ method:
            IMCC_INFO(interp)->cur_unit->method_name = NULL;
            IMCC_INFO(interp)->cur_unit->is_method = 1;
          }
-   | METHOD '(' STRINGC ')'
+   | METHOD '(' any_string ')'
          {
            $$ = P_METHOD;
            IMCC_INFO(interp)->cur_unit->method_name = $3;
@@ -1094,7 +1094,7 @@ ns_entry_name:
            IMCC_INFO(interp)->cur_unit->ns_entry_name = NULL;
            IMCC_INFO(interp)->cur_unit->has_ns_entry_name = 1;
          }
-   | NS_ENTRY '(' STRINGC ')'
+   | NS_ENTRY '(' any_string ')'
          {
            $$ = 0;
            IMCC_INFO(interp)->cur_unit->ns_entry_name = $3;
@@ -1111,9 +1111,19 @@ instanceof:
    ;
 
 subid:
-     SUB_LEXID '(' STRINGC ')'
+     SUBID
          {
            $$ = 0;
+           IMCC_INFO(interp)->cur_unit->subid = NULL;
+           /* 
+           IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid = str_dup_remove_quotes($3);
+           mem_sys_free($3);
+           */
+         }
+   | SUBID '(' any_string ')'
+         {
+           $$ = 0;
+           /* IMCC_INFO(interp)->cur_unit->subid = $3; */
            IMCC_INFO(interp)->cur_unit->subid = mk_const(interp, $3, 'S');
            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid = str_dup_remove_quotes($3);
            mem_sys_free($3);

@@ -145,7 +145,7 @@
      VTABLE_METHOD = 350,
      LOADLIB = 351,
      SUB_INSTANCE_OF = 352,
-     SUB_LEXID = 353,
+     SUBID = 353,
      NS_ENTRY = 354,
      UNIQUE_REG = 355,
      LABEL = 356,
@@ -267,7 +267,7 @@
 #define VTABLE_METHOD 350
 #define LOADLIB 351
 #define SUB_INSTANCE_OF 352
-#define SUB_LEXID 353
+#define SUBID 353
 #define NS_ENTRY 354
 #define UNIQUE_REG 355
 #define LABEL 356

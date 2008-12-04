@@ -43,6 +43,12 @@ STRING * IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+STRING * IMCC_string_from__STRINGC(PARROT_INTERP, ARGIN(const char *buf))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 opcode_t * make_jit_info(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
