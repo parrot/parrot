@@ -26,7 +26,7 @@ Testing Perl 6 objects.
     test_namespace.'export_to'(curr_namespace, exports)
 
     ##  set our plan
-    plan(233)
+    plan(234)
 
     ##  make sure we can load the P6object library
     push_eh load_fail
