@@ -6,6 +6,10 @@ New in December 2008 Release
     - add macro handling to PASM mode
     - disable vanilla register allocation in PASM mode, but do allow optimization
     - add tests and bug fixes
+- Languages
+  + Pipp
+    - added support for a return value from user defined functions
+    - added incomplete implemention of 'require_once'
 - Deprecations
   + PARROT_API is now PARROT_EXPORT
   + :lexid is now :subid
@@ -45,8 +49,8 @@ New in 0.8.1
     - added initial support for MAIN subs
     - added .PARROT method
   + Pipp
-    - added some predefined constants.
-    - added implemention of the function basename().
+    - added some predefined constants
+    - added implemention of the function basename()
   + Cardinal (Ruby)
     - Added initial support for the classes Proc, Continuation, Queue, Dir, File, and FileStat
     - fixed various minor bugs
