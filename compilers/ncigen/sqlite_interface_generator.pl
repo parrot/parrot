@@ -6,7 +6,6 @@
 use v6;
 
 evalfile('./ncigen.pbc', lang => 'Parrot');
-evalfile('./compreg.pir', lang => 'Parrot');
 
 my $fn = @*ARGS[0];
 my $pp_fn = mktempfile('ptemp');
@@ -20,7 +19,10 @@ for $ast.item() -> $x {
   say $x;
 }
 
-
+sub compreg {
+  my $a = q:PIR { %r = compreg 'NCIGEN' };
+  return $a;
+}
 
 sub mktempfile($prefix) {
   sub nonce() { ".{$*PID}." ~ int 1000.rand }
