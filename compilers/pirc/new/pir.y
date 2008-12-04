@@ -468,6 +468,7 @@ static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
              augmented_op
              unique_reg_flag
              int_or_num
+             parameters
 
 %type <invo> long_invocation
              long_invocation_stat
@@ -740,18 +741,26 @@ multi_type        : identifier
 
 parameter_list    : parameters
                          { /* XXX */
-                           /* generate_get_params(lexer); */
-                           set_instr(lexer, "get_params");
-                           /* don't infer the signatured opname from arguments, it's always same:
-                            * get_params_pc (this is one of the special 4 instructions for
-                            * sub invocation).
-                            */
-                           update_op(lexer, CURRENT_INSTRUCTION(lexer), PARROT_OP_get_params_pc);
+                           /* if there are parameters, then emit a get_params instruction. */
+                           if ($1 > 0) {
+
+                               set_instr(lexer, "get_params");
+                               /* don't infer the signatured opname from arguments,
+                                * it's always same: get_params_pc
+                                * (this is one of the special 4 instructions for sub invocation).
+                                */
+
+                               update_op(lexer, CURRENT_INSTRUCTION(lexer),
+                                         PARROT_OP_get_params_pc);
+                           }
+
                          }
                   ;
 
 parameters        : /* empty */
+                        { $$ = 0; }
                   | parameters parameter
+                        { ++$$; /* count number of parameters */ }
                   ;
 
 parameter         : ".param" param param_flags "\n"

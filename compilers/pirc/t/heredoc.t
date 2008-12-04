@@ -29,7 +29,6 @@ HI
 CODE
 .namespace []
 main:
-    get_params
     set_args "\nthis is a simple single-line heredoc.\n", "\nthis is a simple\nmulti\nline\nheredoc\n.\n", "\nand yet another\nmulti\nline\nheredoc\nstring.\n"
     get_results ""
     find_sub_not_null P0, "foo"
@@ -76,7 +75,6 @@ B
 CODE
 .namespace []
 main:
-    get_params
     set S0, "\nthis is a simple assigned heredoc string to $S0.\n"
     set S1, "\nthis is a simple assigned heredoc string to string s.\n"
     set_returns

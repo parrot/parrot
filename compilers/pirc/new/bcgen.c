@@ -216,7 +216,10 @@ add_sub_pmc(bytecode * const bc,
             char const * const nsentry, /* .sub foo :nsentry('bar') --> "bar" */
             char const * const subid,   /* .sub foo :subid('baz') --> "baz" */
             int vtable_index,           /* vtable entry index */
-            int regs_used[])            /* register usage */
+            unsigned regs_used[],            /* register usage */
+            int startoffset,
+            int endoffset
+            )
 {
     Interp     *interp    = bc->interp;
     PMC        *sub_pmc   = pmc_new(bc->interp, enum_class_Sub);
@@ -232,8 +235,8 @@ add_sub_pmc(bytecode * const bc,
     subname_const = add_string_const(bc, subname);
 
 
-    sub->start_offs       = 0;
-    sub->end_offs         = 3;
+    sub->start_offs       = startoffset;
+    sub->end_offs         = endoffset;
     sub->namespace_name   = NULL;
     sub->HLL_id           = CONTEXT(interp)->current_HLL;
 
@@ -274,6 +277,7 @@ add_sub_pmc(bytecode * const bc,
 
     /* this /does/ work in pirc/bctest.c!! Why not here??
     */
+
     /*
     PackFile_FixupTable_new_entry(bc->interp, "main", enum_fixup_sub, subconst->index);
     */

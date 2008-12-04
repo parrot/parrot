@@ -19,7 +19,6 @@ pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "macro");
 CODE
 .namespace []
 main:
-    get_params
     set P0, 1
     set S0, "hi"
     set I0, 42
@@ -41,7 +40,6 @@ Z:
 CODE
 .namespace []
 main:
-    get_params
     lt I0, I1, 2
     le I1, I0, 1
 X:
@@ -64,7 +62,6 @@ L:
 CODE
 .namespace []
 int:
-    get_params
     lt I1, I0, 1
 goto:
 L:
@@ -81,7 +78,6 @@ pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "sub call not in this compilation unit");
 CODE
 .namespace []
 main:
-    get_params
     set_args ""
     get_results ""
     find_sub_not_null P0, "foo"
@@ -101,7 +97,6 @@ pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "sub call in this compilation unit");
 CODE
 .namespace []
 main:
-    get_params
     set_args ""
     get_results ""
     set P0, 0
@@ -110,7 +105,6 @@ main:
     returncc
 .namespace []
 foo:
-    get_params
     set_returns
     returncc
 OUTPUT

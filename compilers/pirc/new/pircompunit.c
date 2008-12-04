@@ -1904,21 +1904,6 @@ generate_unique_pir_reg(lexer_state * const lexer, pir_type type) {
 }
 
 
-/*
-
-=item C<void
-generate_get_params(lexer_state * const lexer)>
-
-Generate an instruction to retrieve parameters. This function can be called
-after parsing the parameters.
-
-=cut
-
-*/
-void
-generate_get_params(lexer_state * const lexer) {
-    set_instr(lexer, "get_params_pc");
-}
 
 /*
 
@@ -1997,7 +1982,6 @@ Convert an C<invocation> structure into a series of instructions.
 */
 void
 convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
-
     switch (inv->type) {
         case CALL_PCC:
             new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc");
@@ -2152,7 +2136,9 @@ fixup_local_labels(lexer_state * const lexer) {
         return;
 
     do {
+/*
         expression *label = NULL;
+*/
 
         iter = iter->next; /* init pointer to first instruction */
 

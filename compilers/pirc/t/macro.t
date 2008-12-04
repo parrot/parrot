@@ -16,7 +16,6 @@ pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "simple macro without parameters");
 CODE
 .namespace []
 main:
-    get_params
     print "hello"
     set_returns
     returncc
@@ -37,7 +36,6 @@ pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "expansion w/ parameters and nested macro_c
 CODE
 .namespace []
 main:
-    get_params
     say 42
     say "hi"
     set_returns

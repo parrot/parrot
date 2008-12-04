@@ -327,18 +327,6 @@ emit_pir_instruction(lexer_state * const lexer, instruction * const instr) {
     }
 }
 
-static void
-emit_pir_statement(lexer_state * const lexer, subroutine * const sub) {
-    if (sub->statements != NULL) {
-        instruction *statiter = sub->statements->next;
-
-        do {
-            emit_pir_instruction(lexer, statiter);
-            statiter = statiter->next;
-        }
-        while (statiter != sub->statements->next);
-    }
-}
 
 
 
@@ -376,25 +364,58 @@ static void
 emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
     int i;
 
+    expression *operand;
+
     /* emit the opcode */
 
-    emit_opcode(lexer->bc, instr->opcode);
+    if (instr->opinfo) {
+        fprintf(stderr, "emit_pbc: %s\n", instr->opname);
+        emit_opcode(lexer->bc, instr->opcode);
 
-    /* emit the arguments */
+        /* emit the arguments */
 
-    /* note that opinfo->op_count counts all operands plus the op itself;
-     * so substract 1 for the op itself.
-     */
-    for (i = 0; i < instr->opinfo->op_count - 1; ++i) {
-        /*
-        switch () {
+        /* note that opinfo->op_count counts all operands plus the op itself;
+         * so substract 1 for the op itself.
+         */
+        if (instr->opinfo->op_count > 1) {
+            operand = instr->operands->next;
 
+            for (i = 0; i < instr->opinfo->op_count - 1; ++i) {
+
+                switch (operand->type) {
+                    case EXPR_CONSTANT:
+                        switch (operand->expr.c->type) {
+                            case INT_TYPE:
+                                emit_int_arg(lexer->bc, operand->expr.c->val.ival);
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                operand = operand->next;
+            }
         }
-        */
-
     }
 
 }
+
+static void
+emit_pir_statement(lexer_state * const lexer, subroutine * const sub) {
+    if (sub->statements != NULL) {
+        instruction *statiter = sub->statements->next;
+
+        do {
+            emit_pir_instruction(lexer, statiter);
+            statiter = statiter->next;
+        }
+        while (statiter != sub->statements->next);
+    }
+}
+
 
 static void
 emit_pbc_instructions(lexer_state * const lexer, subroutine * const sub) {
@@ -402,9 +423,12 @@ emit_pbc_instructions(lexer_state * const lexer, subroutine * const sub) {
     if (sub->statements == NULL)
         return;
 
-    iter = sub->statements;
 
+    iter = sub->statements->next;
+
+    assert(iter != sub->statements->next);
     do {
+        fprintf(stderr, "pbc_instr: ");
         emit_pbc_instr(lexer, iter);
         iter = iter->next;
     }
@@ -431,10 +455,14 @@ emit_pbc(lexer_state * const lexer) {
         return;
 
 
+    /* TEMP HACK */ ++lexer->instr_counter; /* HACK ALERT */
+
+
     /* XXX fix the numbers here */
     lexer->bc = new_bytecode(lexer->interp, lexer->filename,
                              lexer->instr_counter * 4, lexer->instr_counter);
 
+    fprintf(stderr, "lexer->instr_counter = %d\n", lexer->instr_counter);
 
     subiter = lexer->subs->next;
 
@@ -443,7 +471,7 @@ emit_pbc(lexer_state * const lexer) {
 
     /* iterate over all instructions and emit them */
     do {
-        add_sub_pmc(lexer->bc, subiter->sub_name, NULL, NULL, -1, subiter->regs_used);
+        add_sub_pmc(lexer->bc, subiter->sub_name, NULL, NULL, -1, subiter->regs_used, 0, 3);
 
         emit_pbc_instructions(lexer, subiter);
         subiter = subiter->next;
@@ -452,6 +480,7 @@ emit_pbc(lexer_state * const lexer) {
 
     /* write the output to a file. */
     write_pbc_file(lexer->bc, "a.pbc");
+    fprintf(stderr, "done writing pbc\n");
 }
 
 /*

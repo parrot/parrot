@@ -63,8 +63,7 @@ int add_int_const(bytecode * const bc, INTVAL i);
 
 /* some functions to update constants */
 
-void update_pmc_const(bytecode * const bc, int pmc_const_index
-/* what kind of value arg? */);
+void update_pmc_const(bytecode * const bc, int pmc_const_index, PMC * newvalue);
 
 void update_string_const(bytecode * const bc, int str_const_index, STRING *s);
 /* XXX and other types... */
@@ -79,7 +78,7 @@ void remove_const(bytecode * const bc, int const_index);
 
 void add_sub_pmc(bytecode * const bc,
             char const * const subname, char const * const nsentry, char const * const subid,
-            int vtable_index, int regs_used[]);
+            int vtable_index, unsigned regs_used[], int startoffset, int endoffset);
 
 
 #endif /* PARROT_BCGEN_H_GUARD */

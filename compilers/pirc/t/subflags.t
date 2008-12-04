@@ -12,7 +12,6 @@ pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "test for :main");
 CODE
 .namespace []
 .pcc_sub :main main:
-    get_params
     end
 OUTPUT
 
