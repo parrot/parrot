@@ -1,5 +1,7 @@
 #!/home/tewk/srcs/parrot/perl6
 
+# $Id$
+
 use v6;
 
 evalfile('./ncigen.pbc', lang => 'Parrot');
