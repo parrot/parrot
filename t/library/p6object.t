@@ -160,103 +160,15 @@ Testing Perl 6 objects.
     $S0 = jklobj.'bar'()
     is($S0, 'ABC::foo', 'JKL.bar via add_method')
     
-
-=for never
-
-    isa_ok(mnoproto, 'Float', 'MNO proto')
-    isa_ok(mnoproto, 'ABC', 'MNO proto')
-    isa_ok(mnoproto, 'P6object', 'MNO proto')
-    isa_ok(mnoproto, 'P6protoobject', 'MNO proto')
-    mno = mnoproto.'new'()
-    isa_ok(mno, 'Float', 'MNO object')
-    isa_ok(mno, 'ABC', 'MNO object')
-    isa_ok(mno, 'P6object', 'MNO object')
-    $I0 = isa mno, 'P6protoobject'
-    nok($I0, 'MNO object not isa P6protoobject')
-
-    ##  create a subclass from a protoobject reference
-    .local pmc pqrproto, pqr
-    p6meta.'new_class'('PQR', 'parent'=>mnoproto)
-    pqrproto = get_hll_global 'PQR'
-    isa_ok(pqrproto, 'PQR', 'PQR proto')
-    isa_ok(pqrproto, 'MNO', 'PQR proto')
-    isa_ok(pqrproto, 'Float', 'PQR proto')
-
-    ##  use the :name option to set a class name
-    .local pmc p6objproto, p6obj
-    p6meta.'new_class'('Perl6Object', 'name'=>'Object')
-    p6objproto = get_hll_global 'Object'
-    isa_ok(p6objproto, 'Perl6Object', 'Object proto')
-    isa_ok(p6objproto, 'P6object', 'Object proto')
-    isa_ok(p6objproto, 'P6protoobject', 'Object proto')
-    $S0 = p6objproto
-    is($S0, 'Object', 'Object.WHAT eq "Object"')
-    $P0 = get_hll_global 'Perl6Object'
-    isa_nok($P0, 'P6protoobject', 'Perl6Object')
-    p6obj = p6objproto.'new'()
-    isa_ok(p6obj, 'Perl6Object', 'Object instance')
-    $P0 = p6obj.'WHAT'()
-    $I0 = issame $P0, p6objproto
-    ok($I0, 'obj.WHAT =:= Object.WHAT')
-
-    ## make sure it works for array-based names
-    .local pmc stuproto
-    $P0 = split '::', 'Foo::STU'
-    $P0 = p6meta.'new_class'($P0)
-    stuproto = get_hll_global ['Foo'], 'STU'
-    $I0 = issame stuproto, $P0
-    ok($I0, 'Foo::STU proto =:= return value from .new_class()')
-    $P0 = get_class ['Foo';'STU']
-    isa_ok(stuproto, $P0, 'Foo::STU proto')
-    isa_ok(stuproto, 'P6object', 'Foo::STU proto')
-    isa_ok(stuproto, 'P6protoobject', 'Foo::STU proto')
-    $P0 = stuproto.'WHAT'()
-    $I0 = issame stuproto, $P0
-    ok($I0, 'Foo::STU proto .WHAT identity')
-    $S0 = stuproto
-    is($S0, 'STU', 'Foo::STU.WHAT eq "STU"')
-    $P0 = stuproto.'HOW'()
-    isa_ok($P0, 'P6metaclass', 'Foo::STU proto .HOW')
-    $I0 = defined stuproto
-    nok($I0, 'Foo::STU proto undefined')
-
-    ##  remapping ResizablePMCArray to List
-    .local pmc listproto
-    listproto = p6meta.'new_class'('List', 'parent'=>'ResizablePMCArray')
-    p6meta.'register'('ResizablePMCArray', 'parent'=>listproto, 'protoobject'=>listproto)
-    $P0 = new 'List'
-    $I0 = can $P0, 'elems'
-    ok($I0, 'List can elems')
-    $P0 = new 'ResizablePMCArray'
-    $I0 = can $P0, 'elems'
-    ok($I0, 'ResizablePMCArray inherits List methods')
-
-    ##  building a class from another hll namespace
-    $P0 = get_root_namespace ['foo';'XYZ';'Bar']
-    .local pmc barproto, barobj
-    barproto = p6meta.'new_class'($P0)
-    $P0 = get_root_global ['foo';'XYZ'], 'Bar'
-    $I0 = issame $P0, barproto
-    ok($I0, 'XYZ::Bar protoobject created in foo HLL namespace')
-    $P0 = get_hll_global ['XYZ'], 'Bar'
-    $I0 = isnull $P0
-    ok($I0, 'XYZ::Bar protoobject not created in parrot HLL namespace')
-    barobj = barproto.'new'()
-    $S0 = barobj.'hello'()
-    is($S0, 'XYZ::Bar::hello', 'method call to XYZ::Bar object works')
-
-    .local pmc wtfproto, dostuff
-    dostuff = get_root_global ['foo'], 'dostuff'
-    wtfproto = dostuff(p6meta)
-    $P0 = get_root_global ['foo';'WTF'], 'Lol'
-    $I0 = issame $P0, wtfproto
-    ok($I0, 'WTF::Lol protoobject created in foo HLL namespace')
-
-=cut
-
     .local pmc hll_tests
     hll_tests = get_root_global ['myhll'], 'hll_tests'
     hll_tests()
+
+    .local pmc omgproto, omgprotoexport
+    $P0 = p6meta.'new_class'('OMG::Lol')
+    omgproto = get_hll_global ['OMG'], 'Lol'
+    omgprotoexport = get_hll_global ['OMG';'EXPORT';'ALL'], 'Lol'
+    is_same(omgproto,omgprotoexport,'protoobject added to ["EXPORT";"ALL"] subnamespace') 
 
     .return ()
 .end
