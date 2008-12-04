@@ -176,6 +176,20 @@ Destroys the exception.
 
 /*
 
+=item C<STRING *get_bool()>
+
+Return true.
+
+=cut
+
+*/
+
+    VTABLE INTVAL *get_bool() {
+        return (INTVAL)1;
+    }
+
+/*
+
 =item C<STRING *get_string()>
 
 Return the exception message.
