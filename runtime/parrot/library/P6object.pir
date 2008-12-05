@@ -500,10 +500,10 @@ Multimethod helper to return the parrotclass for C<x>.
     $S0 = typeof x
     if $S0 == 'Class' goto done
     if $S0 == 'PMCProxy' goto done
-    $I0 = isa x, 'P6object'
-    if $I0 goto x_p6object
     $I0 = isa x, 'String'
     if $I0 goto x_string
+    $I0 = isa x, 'P6object'
+    if $I0 goto x_p6object
     $P0 = typeof x
     .return ($P0)
   x_p6object:
@@ -511,6 +511,8 @@ Multimethod helper to return the parrotclass for C<x>.
     parrotclass = getattribute $P0, 'parrotclass'
     .return (parrotclass)
   x_string:
+    $I0 = isa x, 'P6protoobject'
+    if $I0 goto x_p6object
     parrotclass = get_class x
     unless null parrotclass goto done
     $S0 = x
