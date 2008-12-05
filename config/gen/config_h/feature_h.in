@@ -145,7 +145,10 @@ END_PRINT
 if (defined @backtrace@) {
     print OUT <<"END_PRINT";
 #define PARROT_HAS_BACKTRACE
-#define __USE_GNU
+#ifndef __USE_GNU
+#  define __USE_GNU
+#endif
+#include <dlfcn.h>
 END_PRINT
 }
 

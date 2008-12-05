@@ -291,8 +291,9 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     }
 
     if (Interp_debug_TEST(interp, PARROT_BACKTRACE_DEBUG_FLAG)) {
-        int exitcode = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "exit_code"));
-        STRING *msg = VTABLE_get_string(interp, exception);
+        STRING *msg      = VTABLE_get_string(interp, exception);
+        int     exitcode = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "exit_code"));
+
         PIO_eprintf(interp,
             "Parrot_ex_throw_from_c (severity:%d error:%d): %Ss\n",
             EXCEPT_error, exitcode, msg);
@@ -542,21 +543,20 @@ Parrot_print_backtrace(void)
             size, BACKTRACE_DEPTH);
 #  ifndef BACKTRACE_VERBOSE
     for (i = 0; i < size; i++) {
-        Dl_info frameInfo;
-        int found;
+        Dl_info   frameInfo;
+        const int found  = dladdr(array[i], &frameInfo);
 
         /* always indent */
-        const int indent = 2 + (2*i);
+        const int indent = 2 + ( 2 * i);
 
         fprintf(stderr, "%*s", indent, "");
-        found = dladdr(array[i], &frameInfo);
-        if (0 == found || NULL == frameInfo.dli_sname) {
-            fprintf(stderr, "(unknown)\n");
-        }
-        else {
+
+        if (found && frameInfo.dli_sname)
             fprintf(stderr, "%s\n", frameInfo.dli_sname);
-        }
+        else
+            fprintf(stderr, "(unknown)\n");
     }
+
 #  else
     { /* Scope for strings */
         char ** strings = backtrace_symbols(array, size);
