@@ -23,5 +23,13 @@ class DBDI::PreparedStatement { }
 
 class DBDI::ResultSet {
     has $.statement;
-    method next { $.statement.next(); }
+    method next() { return $.statement.next(); }
+    multi method getCol(Num $col) {
+        $.statement.getCol($col);
+    }
+    multi method getCol(Str $col) {
+        my $n = $.statement.lookupCol($col);
+        if ($n > -1) { return self.getCol($n) }
+        die "Couldn't find column "~$col;
+    }
 }

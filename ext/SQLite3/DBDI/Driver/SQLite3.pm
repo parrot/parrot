@@ -28,12 +28,12 @@ class DBDI::Statement::SQLite3 is DBDI::Statement {
 
     method executeQuery($sql) {
         my $temp_statement = $connection.prepareStatement($sql);
-        return DBDI::ResultSet(:statement($temp_statement));
+        return DBDI::ResultSet.new(:statement($temp_statement));
     }
 
     method executeUpdate($sql) {
         my $temp_statement = $connection.prepareStatement($sql);
-        $temp_statement.step();
+        $temp_statement.next();
         $temp_statement.finalize();
     }
 }
@@ -42,10 +42,12 @@ class DBDI::PreparedStatement::SQLite3 is DBDI::PreparedStatement {
     has $connection;
     has $stHandle;
     has @columns;
+    has %columns;
+    has @bind_params;
     has $!sql;
 
     method executeUpdate() {
-        self.step();
+        self.next();
         self.finalize();
     }
 
@@ -56,18 +58,40 @@ class DBDI::PreparedStatement::SQLite3 is DBDI::PreparedStatement {
         return $res;
     }
 
-    method step () { 
+    my method fillColumns () {
+        # Won't work in any useful way at the moment
+        #my $cn; my $i =0;
+        #while ($cn = SQLite::column_name($stHandle, $i)) {
+        #    %columns{$cn} = $i++;
+        #    push @columns, $cn; 
+        #}
+    }
+
+    method next () { 
         SQLite::step($stHandle);
-        return self!errorCheck();
+        if (! +@columns) { self!fillColumns(); }
+        my $res = self!errorCheck();
+        return $res == 100;
     }
     method finalize () {
         SQLite::finalize($stHandle);
         return self!errorCheck();
     }
     
-    method setColumn($num, $data) { 
-        @columns[$num] = $data; 
+    method bind($num, $data) { 
+        @bind_params[$num] = $data; 
         SQLite::bind_text($stHandle, $num, $data, chars($data), -1);
         return self!errorCheck();
     }
+
+    method lookupCol ($name) { 
+        # This should be a hash but ...
+        my $i = 0; my $cn;
+        while ($cn = SQLite::column_name($stHandle, $i)) {
+            if $cn eq $name { return $i }
+        }
+        return -1;
+    }
+
+    method getCol ($num) { return SQLite::column_text($stHandle, $num); }
 }

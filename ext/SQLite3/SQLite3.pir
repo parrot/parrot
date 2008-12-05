@@ -57,6 +57,10 @@
     push sqlite_funcs, 'ipid'
     push sqlite_funcs, 'bind_text'
     push sqlite_funcs, 'ipitii'
+    push sqlite_funcs, 'column_name'
+    push sqlite_funcs, 'tpi'
+    push sqlite_funcs, 'column_text'
+    push sqlite_funcs, 'tpi'
 
     function  = dlfunc libname, 'sqlite3_open', 'itV'
     set_global 'open_raw', function
