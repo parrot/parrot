@@ -351,7 +351,7 @@ Implementation of ECMAScript 3 (a JavaScript standard)
 =item Status
 
 Parser is complete. Simple arithmetic and function calls work.
-Much work needed on parse actions and data types (PMCs or classes.
+Much work needed on parse actions and data types (PMCs or classes).
 
 =item Last verified with parrot version
 
