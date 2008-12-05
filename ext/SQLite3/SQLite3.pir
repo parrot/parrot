@@ -35,9 +35,28 @@
 .sub '_sqlite_init' :load
     .local pmc libname
     .local pmc function
+    .local pmc sqlite_funcs
 
     libname = loadlib 'libsqlite3'
     set_global '_sqlite3', libname
+
+    sqlite_funcs = new 'ResizableStringArray'
+    push sqlite_funcs, 'step'
+    push sqlite_funcs, 'ip'
+    push sqlite_funcs, 'finalize'
+    push sqlite_funcs, 'ip'
+    push sqlite_funcs, 'close'
+    push sqlite_funcs, 'ip'
+    push sqlite_funcs, 'errmsg'
+    push sqlite_funcs, 'tp'
+    push sqlite_funcs, 'errcode'
+    push sqlite_funcs, 'ip'
+    push sqlite_funcs, 'bind_int'
+    push sqlite_funcs, 'ipii'
+    push sqlite_funcs, 'bind_double'
+    push sqlite_funcs, 'ipid'
+    push sqlite_funcs, 'bind_text'
+    push sqlite_funcs, 'ipitii'
 
     function  = dlfunc libname, 'sqlite3_open', 'itV'
     set_global 'open_raw', function
@@ -45,14 +64,22 @@
     function  = dlfunc libname, 'sqlite3_prepare_v2', 'iptiVp'
     set_global 'prepare_raw', function
 
-    function  = dlfunc libname, 'sqlite3_step', 'ip'
-    set_global 'step', function
+    .local pmc list_iter
+    list_iter = iter sqlite_funcs
+    .local string func_name, signature
+    .local pmc    function
 
-    function  = dlfunc libname, 'sqlite3_finalize', 'ip'
-    set_global 'finalize', function
+  list_loop:
+    unless list_iter goto done
+    func_name = shift list_iter
+    signature = shift list_iter
+    $S0 = concat 'sqlite3_', func_name
+    function  = dlfunc libname, $S0, signature
+    set_global func_name, function
+    goto list_loop
 
-    function  = dlfunc libname, 'sqlite3_close', 'ip'
-    set_global 'close', function
+  done:
+
 .end
 
 .sub 'open'
