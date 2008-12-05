@@ -40,8 +40,8 @@ Z:
 CODE
 .namespace []
 main:
-    lt I0, I1, 2
-    le I1, I0, 1
+    lt I0, I1, 8
+    le I1, I0, 4
 X:
 Y:
 Z:
@@ -62,7 +62,7 @@ L:
 CODE
 .namespace []
 int:
-    lt I1, I0, 1
+    lt I1, I0, 4
 goto:
 L:
     set_returns

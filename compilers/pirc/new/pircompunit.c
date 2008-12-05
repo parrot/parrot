@@ -383,7 +383,21 @@ new_statement(lexer_state * const lexer, char const * const opname) {
     /* Each instruction has a sequence number to be able to
      * calculate offsets for label branches.
      */
-    instr->offset = lexer->instr_counter++;
+
+    /* the codesize so far will be the offset of this instruction. */
+    instr->offset = lexer->codesize;
+
+
+    /* XXX instr_counter still needed? Think so, for lin.scan.reg.alloc.
+       can instr->offset be used for that? or is it already used?
+       instr->offset is now just incremented in bigger steps...
+     */
+    lexer->instr_counter++;
+    /*instr->offset = lexer->instr_counter++;*/
+
+    /*
+    fprintf(stderr, "offset of %s is: %d\n", opname, instr->offset);
+    */
 
     if (CURRENT_INSTRUCTION(lexer) == NULL)
         instr->next = instr;
@@ -2191,22 +2205,14 @@ fixup_local_labels(lexer_state * const lexer) {
 
                 if (TEST_FLAG(iter->oplabelbits, BIT(flag))) {
                     /* the current operand is a label; fix it up. No, not a date. */
-                    char const * labelid = operand->expr.id;
-                    unsigned     offset  = find_local_label(lexer, labelid);
+                    char const * labelid    = operand->expr.id;
+                    unsigned     offset     = find_local_label(lexer, labelid);
+                    unsigned     curr_instr = iter->offset;
 
                     /* fprintf(stderr, "operand %d is a label\n", BIT(flag)); */
-
-                    if (offset) { /* label was found */
-                        unsigned curr_instr = iter->offset;
-
-                        /* convert the label identifier into a real label object */
-                        operand->expr.l = new_label(lexer, labelid, offset - curr_instr);
-                        operand->type   = EXPR_LABEL;
-                    }
-                    else {
-                        yypirerror(lexer->yyscanner, lexer,
-                                   "cannot fix up reference to label '%s'", labelid);
-                    }
+                    /* convert the label identifier into a real label object */
+                    operand->expr.l = new_label(lexer, labelid, offset - curr_instr);
+                    operand->type   = EXPR_LABEL;
                 }
 
                 ++flag;
