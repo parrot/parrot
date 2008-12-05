@@ -338,7 +338,6 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
     char         *cur_spot;      /* Where we're currently copying to */
 
     Small_Object_Arena *cur_buffer_arena;
-    INTVAL             *ref_count  = NULL;
     Arenas * const      arena_base = interp->arena_base;
 
     /* Bail if we're blocked */
@@ -421,6 +420,8 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
             UINTVAL i;
 
             for (i = cur_buffer_arena->used; i; --i) {
+                INTVAL *ref_count = NULL;
+
                 /* ! (on_free_list | constant | external | sysmem) */
                 if (PObj_buflen(b) && PObj_is_movable_TESTALL(b)) {
                     ptrdiff_t offset = 0;
@@ -488,13 +489,17 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
                             /* Finally, let the tail know that we've moved, so
                              * that any other references can know to look for
                              * us and not re-copy */
-                            *ref_count |= Buffer_moved_FLAG;
+                            if (ref_count)
+                                *ref_count |= Buffer_moved_FLAG;
                         }
+
                         PObj_bufstart(b) = cur_spot;
+
                         if (PObj_is_string_TEST(b)) {
                             ((STRING *)b)->strstart = (char *)PObj_bufstart(b) +
                                     offset;
                         }
+
                         cur_spot += PObj_buflen(b);
                     }
                 }
