@@ -14,9 +14,6 @@ struct bytecode;
 
 typedef struct bytecode bytecode;
 
-struct bc_const;
-
-
 bytecode *new_bytecode(Interp *interp, char const * const filename, int bytes, int codesize);
 
 /* call this to write the PBC file */
@@ -43,10 +40,10 @@ void emit_num_arg(bytecode * const bc, int num_const_index);
 void emit_string_arg(bytecode * const bc, int string_const_index);
 */
 
-struct bc_const * add_key_const(bytecode * const bc, PMC *key);
-struct bc_const * add_num_const(bytecode * const bc, FLOATVAL f);
-struct bc_const * add_string_const(bytecode * const bc, char const * const str);
-struct bc_const * add_pmc_const(bytecode * const bc, PMC * pmc) ;
+int add_key_const(bytecode * const bc, PMC *key);
+int add_num_const(bytecode * const bc, double f);
+int add_string_const(bytecode * const bc, char const * const str);
+int add_pmc_const(bytecode * const bc, PMC * pmc) ;
 
 /* for adding constants */
 

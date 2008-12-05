@@ -304,11 +304,16 @@ typedef struct subroutine {
     char const         *sub_name;      /* this sub's name */
     char const         *outer_sub;     /* this sub's outer subroutine, if any */
     char const         *subid;         /* this sub's subid, if any */
-    char const         *vtable_method; /* name of vtable method that this sub's overriding if any */
+    int                 vtable_index;  /* index of vtable method this sub's overriding, if any */
     char const         *instanceof;    /* XXX document this XXX */
     char const         *nsentry;       /* name by which the sub is stored in the namespace */
     char const         *methodname;    /* name of this sub by which it's stored as a method */
     int                 flags;         /* this sub's flags */
+    unsigned            codesize;      /* total number of integers to store for this sub:
+                                          1 for each op and 1 for each operand.
+                                        */
+    int                 startoffset;   /* start offset in bytecode where this sub starts */
+    int                 endoffset;     /* end offset in bytecode where this sub ends */
 
     /* XXX the whole multi stuff must be implemented */
     char              **multi_types;   /* data types of parameters if this is a multi sub */

@@ -69,12 +69,12 @@ new_const(bytecode * const bc) {
 Add a PMC constant to the constants list.
 
 */
-bc_const *
+int
 add_pmc_const(bytecode * const bc, PMC * pmc) {
     bc_const *bcc     = new_const(bc);
     bcc->value->type  = PFC_PMC;
     bcc->value->u.key = pmc;
-    return bcc;
+    return bcc->index;
 }
 
 /*
@@ -82,12 +82,12 @@ add_pmc_const(bytecode * const bc, PMC * pmc) {
 Add a String constant to the constants list.
 
 */
-bc_const *
+int
 add_string_const(bytecode * const bc, char const * const str) {
     bc_const *bcc        = new_const(bc);
     bcc->value->type     = PFC_STRING;
     bcc->value->u.string = string_make(bc->interp, str, strlen(str), "ascii", PObj_constant_FLAG);
-    return bcc;
+    return bcc->index;
 }
 
 /*
@@ -95,12 +95,14 @@ add_string_const(bytecode * const bc, char const * const str) {
 Add a number constant to the constants list.
 
 */
-bc_const *
-add_num_const(bytecode * const bc, FLOATVAL f) {
+int
+add_num_const(bytecode * const bc, double f) {
+    /* STRING * const str   = string_from_cstring(interp, number_cstring, 0); */
     bc_const *bcc        = new_const(bc);
     bcc->value->type     = PFC_NUMBER;
+    /* bcc->value->u.number = string_to_num(interp, str); */
     bcc->value->u.number = f;
-    return bcc;
+    return bcc->index;
 }
 
 /*
@@ -108,12 +110,29 @@ add_num_const(bytecode * const bc, FLOATVAL f) {
 Add a key constant to the constants list.
 
 */
-bc_const *
+int
 add_key_const(bytecode * const bc, PMC *key) {
     bc_const *bcc     = new_const(bc);
     bcc->value->type  = PFC_KEY;
     bcc->value->u.key = key;
-    return bcc;
+    return bcc->index;
+}
+
+/*
+
+Get the PackFile_Constant on index C<key>.
+XXX not efficient.
+
+*/
+PackFile_Constant *
+get_const(bytecode * const bc, int key) {
+    bc_const *iter = bc->constants;
+    while (iter) {
+        if (iter->index == key)
+            return iter->value;
+        iter = iter->next;
+    }
+    return NULL;
 }
 
 /*
@@ -200,9 +219,11 @@ Add a string constant to the constants list, and return the STRING variant
 */
 static STRING *
 add_string_const_from_cstring(bytecode * const bc, char const * const str) {
-    bc_const *strconst = add_string_const(bc, str);
-    return strconst->value->u.string;
+    int index = add_string_const(bc, str);
+    return get_const(bc, index)->u.string;
 }
+
+
 
 
 /*
@@ -218,22 +239,22 @@ add_sub_pmc(bytecode * const bc,
             int vtable_index,           /* vtable entry index */
             unsigned regs_used[],            /* register usage */
             int startoffset,
-            int endoffset
-            )
+            int endoffset)
 {
     Interp     *interp    = bc->interp;
     PMC        *sub_pmc   = pmc_new(bc->interp, enum_class_Sub);
     Parrot_sub *sub       = PMC_sub(sub_pmc);
-    bc_const   *subconst;
-    bc_const   *subname_const;
+    int   subconst_index;
+    int   subname_index;
 
 
     int i;
 
 
+    PackFile_Constant *subname_const;
 
-    subname_const = add_string_const(bc, subname);
-
+    subname_index = add_string_const(bc, subname);
+    subname_const = get_const(bc, subname_index);
 
     sub->start_offs       = startoffset;
     sub->end_offs         = endoffset;
@@ -245,10 +266,11 @@ add_sub_pmc(bytecode * const bc,
     sub->vtable_index     = vtable_index;
     sub->multi_signature  = NULL;
 
+    /* store register usage of this sub. */
     for (i = 0; i < 4; ++i)
         sub->n_regs_used[i] = regs_used[i];
 
-    sub->name = subname_const->value->u.string;
+    sub->name = subname_const->u.string;
 
     /* If there was a :nsentry, add it to the constants table, and set
      * the ns_entry_name attribute to that STRING. Default value is the sub's name.
@@ -256,7 +278,7 @@ add_sub_pmc(bytecode * const bc,
     if (nsentry)
         sub->ns_entry_name = add_string_const_from_cstring(bc, nsentry);
     else
-        sub->ns_entry_name = subname_const->value->u.string;
+        sub->ns_entry_name = subname_const->u.string;
 
     /* if there was a :subid, add it to the constants table, and set the subid
      * attribute to that STRING. Default value is the sub's name.
@@ -264,14 +286,14 @@ add_sub_pmc(bytecode * const bc,
     if (subid)
         sub->subid = add_string_const_from_cstring(bc, subid);
     else
-        sub->subid = subname_const->value->u.string;
+        sub->subid = subname_const->u.string;
 
 
 
     Parrot_store_sub_in_namespace(bc->interp, sub_pmc);
-    subconst      = add_pmc_const(bc, sub_pmc);
+    subconst_index = add_pmc_const(bc, sub_pmc);
 
-    fprintf(stderr, "subconst index: %d\n", subconst->index);
+    fprintf(stderr, "subconst index: %d\n", subconst_index);
 
     /* doesn't work?? */
 
@@ -287,6 +309,12 @@ add_sub_pmc(bytecode * const bc,
 /*
 
 Walk the list of constants and store them in the constants segment of the packfile.
+Instead of updating the constants table one by one, it's neater to add them in one go.
+This prevents memory re-allocations, which are generally not the cheapest operations.
+
+XXX check out if we can count the number of needed constants during the parse; that
+would prevent the linked list thing. OTOH, that makes this API less flexible; client-code
+doesn't want to be so inflexible.
 
 */
 static void

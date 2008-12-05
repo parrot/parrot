@@ -143,7 +143,8 @@ typedef struct lexer_state {
     lsr_allocator            *lsr;
 
     /* bytecode generation */
-    struct bytecode                 *bc;
+    struct bytecode          *bc;
+    unsigned                  codesize;
 
 } lexer_state;
 

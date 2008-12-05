@@ -1275,12 +1275,15 @@ assignment        : target '=' TK_INTC
                           set_instrf(lexer, $3, "%T%E", $1, $4);
                           get_opinfo(yyscanner);
                         }
-                  | target '=' target binop target
+                  | target '=' target binop expression
                         {
                           if (targets_equal($1, $3)) /* $P0 = $P0 + $P1 ==> $P0 += $P1 */
-                              set_instrf(lexer, opnames[$4], "%T%T", $1, $5);
+                              set_instrf(lexer, opnames[$4], "%T%E", $1, $5);
                           else
-                              set_instrf(lexer, opnames[$4], "%T%T%T", $1, $3, $5);
+                              set_instrf(lexer, opnames[$4], "%T%T%E", $1, $3, $5);
+
+                          /* XXX this do_strength_reduction() doesn't work properly yet. */
+                          do_strength_reduction(yyscanner);
 
                           get_opinfo(yyscanner);
                         }

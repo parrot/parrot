@@ -3,14 +3,11 @@
  * Copyright (C) 2008, The Perl Foundation.
  */
 
+#include <stdio.h>
 #include "piremit.h"
 #include "pircompunit.h"
 #include "pircompiler.h"
-
-#include <stdio.h>
-
 #include "bcgen.h"
-
 
 /*
 
@@ -24,10 +21,6 @@ This file contains emit functions.
 
 */
 
-
-/*
-#define out lexer->outfile
-*/
 
 #define out stdout
 
@@ -111,6 +104,7 @@ print_target(lexer_state *lexer, target * const t) {
 }
 
 /*
+
 =item C<void
 print_constant(constant *c)>
 
@@ -360,6 +354,65 @@ emit_pir_subs(lexer_state * const lexer) {
     }
 }
 
+/*
+
+Emit a constant argument into the bytecode. An integer is emitted
+inline in the bytecode; other types are stored in the constant table,
+and their index in the constant table is emitted into the bytecode.
+
+XXX doesn't work yet for strings and numbers. (pmc prob. neither)
+
+*/
+static void
+emit_pbc_const_arg(lexer_state * const lexer, constant * const c) {
+    switch (c->type) {
+        case INT_TYPE:
+            emit_int_arg(lexer->bc, c->val.ival);
+            break;
+        case NUM_TYPE: {
+            int index = add_num_const(lexer->bc, c->val.nval);
+            emit_int_arg(lexer->bc, index);
+            break;
+        }
+        case STRING_TYPE: {
+            int index = add_string_const(lexer->bc, c->val.sval);
+            fprintf(stderr, "index of string const: %d\n", index);
+            emit_int_arg(lexer->bc, index);
+            break;
+        }
+        case PMC_TYPE:
+        default:
+            break;
+    }
+}
+
+/*
+
+Emit the assigned register of target C<t>. The assigned register is
+stored in the C<color> field, of either the C<pir_reg> or C<symbol>
+structure, depending on whether C<t> is a register or a symbol,
+respectively.
+
+*/
+static void
+emit_pbc_target_arg(lexer_state * const lexer, target * const t) {
+    if (TEST_FLAG(t->flags, TARGET_FLAG_IS_REG))
+        emit_int_arg(lexer->bc, t->s.reg->color);
+    else
+        emit_int_arg(lexer->bc, t->s.sym->color);
+}
+
+/*
+
+XXX TODO: label offsets must be bytecode offsets, so also count arguments.
+
+*/
+static void
+emit_pbc_label_arg(lexer_state * const lexer, label * const l) {
+    emit_int_arg(lexer->bc, l->offset);
+    /* fprintf(stderr, "labeloffset: %d\n", l->offset); */
+}
+
 static void
 emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
     int i;
@@ -384,13 +437,13 @@ emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
 
                 switch (operand->type) {
                     case EXPR_CONSTANT:
-                        switch (operand->expr.c->type) {
-                            case INT_TYPE:
-                                emit_int_arg(lexer->bc, operand->expr.c->val.ival);
-                                break;
-                            default:
-                                break;
-                        }
+                        emit_pbc_const_arg(lexer, operand->expr.c);
+                        break;
+                    case EXPR_TARGET:
+                        emit_pbc_target_arg(lexer, operand->expr.t);
+                        break;
+                    case EXPR_LABEL:
+                        emit_pbc_label_arg(lexer, operand->expr.l);
                         break;
                     default:
                         break;
@@ -441,8 +494,7 @@ emit_pbc_instructions(lexer_state * const lexer, subroutine * const sub) {
 emit_pbc(lexer_state * const lexer)>
 
 Generate Parrot Byte Code from the abstract syntax tree. This is the top-level
-function; it initializes the data structures (code segment), and then starts
-emitting byte code (by means of helper functions).
+function.
 
 =cut
 
@@ -455,23 +507,25 @@ emit_pbc(lexer_state * const lexer) {
         return;
 
 
-    /* TEMP HACK */ ++lexer->instr_counter; /* HACK ALERT */
-
-
-    /* XXX fix the numbers here */
     lexer->bc = new_bytecode(lexer->interp, lexer->filename,
-                             lexer->instr_counter * 4, lexer->instr_counter);
-
-    fprintf(stderr, "lexer->instr_counter = %d\n", lexer->instr_counter);
+                             lexer->codesize * 4, lexer->codesize);
 
     subiter = lexer->subs->next;
 
-    /* initialize data structures in which PBC is going to be emitted. */
-
-
     /* iterate over all instructions and emit them */
     do {
-        add_sub_pmc(lexer->bc, subiter->sub_name, NULL, NULL, -1, subiter->regs_used, 0, 3);
+        fprintf(stderr, "%d integers needed for storing this sub\n", subiter->codesize);
+        fprintf(stderr, "start offset of sub '%s' is: %d\tend offest: %d\n",
+                    subiter->sub_name, subiter->startoffset, subiter->endoffset);
+
+        add_sub_pmc(lexer->bc,
+                    subiter->sub_name,
+                    subiter->nsentry,
+                    subiter->subid,
+                    subiter->vtable_index,
+                    subiter->regs_used,
+                    subiter->startoffset,
+                    subiter->endoffset);
 
         emit_pbc_instructions(lexer, subiter);
         subiter = subiter->next;
