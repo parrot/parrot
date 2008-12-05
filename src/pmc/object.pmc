@@ -691,9 +691,9 @@ Creates a clone of the object.
                 if (cur_class->vtable->base_type == enum_class_PMCProxy) {
                     /* Clone this PMC too. */
                     STRING *proxy         = CONST_STRING(interp, "proxy");
-                    VTABLE_set_attr_str(interp, cloned, proxy,
+                    VTABLE_set_attr_keyed(interp, cloned, cur_class, proxy,
                         VTABLE_clone(interp,
-                            VTABLE_get_attr_keyed(interp, pmc, cur_class, proxy)));
+                            VTABLE_get_attr_keyed(interp, cloned, cur_class, proxy)));
                 }
             }
         }
