@@ -257,6 +257,10 @@ Returns whether the class is or inherits from C<*classname>.
         if (string_equal(interp, classname, VTABLE_get_string(interp, SELF)) == 0)
             return 1;
 
+        /* Look in the isa hash. */
+        if (parrot_hash_exists(interp, interp->vtables[_proxy->id]->isa_hash, classname))
+            return 1;
+
         /* Iterate over all the parents and check if they respond true
          * for 'isa' on the original comparison. */
         num_classes = VTABLE_elements(interp, _proxy->parents);
