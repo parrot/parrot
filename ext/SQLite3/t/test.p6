@@ -3,18 +3,18 @@
 use DBDI;
 use Test;
 
-plan 1;
+plan 5;
 
 my $conn = DBDI::DriverManager.getConnection("dbdi:SQLite3:test.db", "", "");
-### isa_ok($conn, 'DBDI::DriverManager');
+isa_ok($conn, DBDI::Driver::SQLite3);
 my $stm = $conn.createStatement();
-### isa_ok($stm, 'DBDI::Statement');
+isa_ok($stm, DBDI::Statement);
 my $rs = $stm.executeUpdate("CREATE TABLE foo (bar, baz)");
 ### ok( $rs->success, 'Created foo OK');
 ### I'd also add a test that a SELECT works and returns 0 rows
 
 my $stm = $conn.prepareStatement("INSERT INTO foo (bar, baz) VALUES (?, ?)");
-### isa_ok( $stm, 'DBDI::PreparedStatement');
+isa_ok( $stm, DBDI::PreparedStatement);
 $stm.bind(1, 123);
 $stm.bind(2, "Thingy");
 $stm.executeUpdate();
@@ -23,9 +23,9 @@ $stm.executeUpdate();
 my $stm2 = $conn.createStatement();
 my $rs = $stm2.executeQuery("SELECT baz, bar FROM foo");
 while ($rs.next()) {
-    if (($rs.getCol(1) eq "Thingy") && ($rs.getCol("baz") = 123)) {
-        ok(1, 'select equals insert');
-    }
+    ok(($rs.getCol("baz") eq "Thingy"), "baz == Thingy");
+    ok(($rs.getCol(1) = 123), "col1 == 123");
+    #say $rs.getCol("bas"); #segfaults
 }
 
 # vim: ft=perl6:

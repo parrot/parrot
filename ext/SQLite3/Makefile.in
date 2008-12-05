@@ -64,13 +64,16 @@ SHARED_LIB = $(TARGET_NAME)$(SHARE_EXT)
 .c$(O) :
 	@$(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
 
+#PERL6=../../perl6
+PERL6=../../parrot ../../languages/perl6/perl6.pbc
 
 all :
 	cd ../..; make perl6
-	cd ../../compilers/ncigen/; ../../parrot ../../languages/perl6/perl6.pbc gen_sqlite3.pl /usr/include/sqlite3.h > ../../ext/SQLite3/genSQLite3.pir
+	cd ../../compilers/ncigen/; $(PERL6) gen_sqlite3.pl /usr/include/sqlite3.h > ../../ext/SQLite3/genSQLite3.pir
 
 test:
-	../../parrot ../../languages/perl6/perl6.pbc test.p6
+	$(RM_F) test.db t/test.db
+	PERL6LIB=../../languages/perl6 $(PERL6) t/test.p6
 	
 
 $(SHARED_LIB) : $(C_FILES)
