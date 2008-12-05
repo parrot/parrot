@@ -669,6 +669,8 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
         sub_data->start_offs = 0;
         sub_data->end_offs   = new_cs->base.size;
         sub_data->name       = string_from_cstring(interp, name, 0);
+
+        *error_message = NULL;
     }
     else {
         *error_message = IMCC_INFO(interp)->error_message;
@@ -693,7 +695,8 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     yylex_destroy(yyscanner);
 
     /* Now run any :load/:init subs. */
-    PackFile_fixup_subs(interp, PBC_MAIN, sub);
+    if (!*error_message)
+        PackFile_fixup_subs(interp, PBC_MAIN, sub);
 
     /* restore old byte_code, */
     if (old_cs)
