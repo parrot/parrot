@@ -64,6 +64,15 @@ SHARED_LIB = $(TARGET_NAME)$(SHARE_EXT)
 .c$(O) :
 	@$(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
 
+
+all :
+	cd ../..; make perl6
+	cd ../../compilers/ncigen/; ../../parrot ../../languages/perl6/perl6.pbc gen_sqlite3.pl /usr/include/sqlite3.h > ../../ext/SQLite3/genSQLite3.pir
+
+test:
+	../../parrot ../../languages/perl6/perl6.pbc test.p6
+	
+
 $(SHARED_LIB) : $(C_FILES)
 	$(MKPATH) @blib_dir@
 	$(CC) $(CC_INC) $(LD_SHARE_FLAGS) $(LDFLAGS) @ld_out@$@ \
@@ -71,7 +80,6 @@ $(SHARED_LIB) : $(C_FILES)
 		$(C_FILES) $(C_LIBS) $(ICU_SHARED)
 #CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 
-all : $(SHARED_LIB)
 
 clean : 
 	$(RM_F) $(SHARED_LIB) @blib_dir@ $(O_FILES) Makefile

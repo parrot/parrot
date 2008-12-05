@@ -1,6 +1,10 @@
 # Andy the time-strapped test fairy says:
 # If this were Perl 5, I'd put in tests roughly like the following:
 use DBDI;
+use Test;
+
+plan 1;
+
 my $conn = DBDI::DriverManager.getConnection("dbdi:SQLite3:test.db", "", "");
 ### isa_ok($conn, 'DBDI::DriverManager');
 my $stm = $conn.createStatement();
@@ -19,7 +23,9 @@ $stm.executeUpdate();
 my $stm2 = $conn.createStatement();
 my $rs = $stm2.executeQuery("SELECT baz, bar FROM foo");
 while ($rs.next()) {
-    say $rs.getCol(1);
-    say $rs.getCol("baz");
+    if (($rs.getCol(1) eq "Thingy") && ($rs.getCol("baz") = 123)) {
+        ok(1, 'select equals insert');
+    }
 }
-### Check that we got back exactly one row.
+
+# vim: ft=perl6:
