@@ -1138,30 +1138,6 @@ Creates a new PMC object of the type of the class and calls init().
             }
         }
 
-        /* If we have parents that are out of this class universe, find them
-         * in the MRO and create instances of them. */
-        if (CLASS_has_alien_parents_TEST(SELF)) {
-            const INTVAL mro_length = VTABLE_elements(interp, _class->all_parents);
-            int i;
-
-            for (i = 0; i < mro_length; i++) {
-                PMC * const class_check = VTABLE_get_pmc_keyed_int(interp,
-                    _class->all_parents, i);
-
-                if (!VTABLE_isa(interp, class_check, class_str)) {
-                    /* From another universe. Create instance... */
-                    PMC * const parent_ins = VTABLE_instantiate(interp, class_check, PMCNULL);
-
-                    /* Associate it with this class as the real self. */
-                    parent_ins->real_self = object;
-
-                    /* ...and tack on end of the attribute store (after all the
-                     * slots for attributes). */
-                    VTABLE_push_pmc(interp, obj_guts->attrib_store, parent_ins);
-                }
-            }
-        }
-
         /* Check for overrides on the init or init_pmc vtable function and call
          * them if they exist */
         if (PMC_IS_NULL(init))
