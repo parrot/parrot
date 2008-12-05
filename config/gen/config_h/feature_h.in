@@ -1,6 +1,4 @@
-/*
- * feature.h - arch specific defines resulting from some tests
- */
+/* feature.h - arch specific defines resulting from some tests */
 
 
 #ifndef PARROT_FEATURE_H_GUARD
@@ -147,6 +145,7 @@ END_PRINT
 if (defined @backtrace@) {
     print OUT <<"END_PRINT";
 #define PARROT_HAS_BACKTRACE
+#define __USE_GNU
 END_PRINT
 }
 
