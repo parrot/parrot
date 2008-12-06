@@ -1,3 +1,6 @@
+/* $Id *
+ * Copyright (C) 2008 The Perl Foundation
+ */
 #ifndef PARROT_COMPILERS_NCIGEN_K_GUARD
 #define PARROT_COMPILERS_NCIGEN_K_GUARD
 
