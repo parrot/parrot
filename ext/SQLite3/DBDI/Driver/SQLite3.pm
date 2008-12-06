@@ -1,3 +1,7 @@
+# SQLite3 Database Backend for DBDI
+# $Id$
+# Copyright (C) 2008 The Perl Foundation
+
 use SQLite3;
 use DBDI;
 
