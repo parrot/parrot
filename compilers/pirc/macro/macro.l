@@ -635,6 +635,7 @@ Returns a non-zero value if the specified name is a PIR directive.
 XXX It might be worthwhile to enter the PIR directives as rules; this saves a lot
 of checking; these rules should just return TK_ANY.
 
+=cut
 
 */
 PARROT_PURE_FUNCTION

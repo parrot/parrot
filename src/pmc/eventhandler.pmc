@@ -153,6 +153,8 @@ Marks this PMC and any of its contents as live.
 
 Frees any memory held by this PMC.
 
+=cut
+
 */
 
     VTABLE void destroy() {

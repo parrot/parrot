@@ -244,6 +244,8 @@ main(int argc, char *argv[])
 
 Adds a default exception handler to PDB.
 
+=cut
+
 */
 
 static void

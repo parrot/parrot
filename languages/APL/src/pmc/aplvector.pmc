@@ -19,6 +19,8 @@ These are the vtable functions for the APL Vector class.
 
 =item INTVAL size_of_shape(INTERP, PMC)
 
+=cut
+
 */
 
 #include "parrot/parrot.h"

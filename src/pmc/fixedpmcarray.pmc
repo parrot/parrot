@@ -709,6 +709,8 @@ C<offset>.
 This throws an exception if any of the spliced in values are out of the range
 of this array.
 
+=cut
+
 */
 
     void splice(PMC *value, INTVAL offset, INTVAL count) {

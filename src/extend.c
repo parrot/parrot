@@ -1162,6 +1162,8 @@ Parrot_set_numreg(PARROT_INTERP, Parrot_Int regnum,
 
 Set the value of an S register.
 
+=cut
+
 */
 
 PARROT_EXPORT

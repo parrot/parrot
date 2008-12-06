@@ -68,9 +68,9 @@ new_target(char *name)
 
 RT#48260: Not yet documented!!!
 
-=cut
-
 =back
+
+=cut
 
 */
 

@@ -634,6 +634,8 @@ parrot_new_closure(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
 Verifies that the provided continuation is sane.
 
+=cut
+
 */
 
 void
@@ -660,6 +662,8 @@ Parrot_continuation_check(PARROT_INTERP, ARGIN(PMC *pmc),
 =item C<void Parrot_continuation_rewind_environment>
 
 Restores the appropriate context for the continuation.
+
+=cut
 
 */
 

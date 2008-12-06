@@ -703,6 +703,8 @@ was doing, once you boil away the useless macros. This will need to change to
 support the Strings PDD, but is left as-is for now, for a smooth transition to
 the new architecture.
 
+=cut
+
 */
 
 static INTVAL

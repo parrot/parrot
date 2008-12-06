@@ -461,6 +461,8 @@ Set this capture to hold the value of another.
 
 =over 4
 
+=cut
+
 */
 
     METHOD list() {

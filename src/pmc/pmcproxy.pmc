@@ -47,6 +47,8 @@ and is populated with the current class.
 
 NOTE: No doubt we will need other things later; this is a start.
 
+=cut
+
 */
 
 #include "parrot/parrot.h"

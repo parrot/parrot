@@ -378,6 +378,8 @@ utf8_skip_backward(ARGIN(const void *ptr), UINTVAL n)
 The UTF-8 implementation of the string iterator's C<get_and_advance>
 function.
 
+=cut
+
 */
 
 static UINTVAL
