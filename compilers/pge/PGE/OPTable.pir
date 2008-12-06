@@ -112,9 +112,9 @@ Adds (or replaces) a syntactic category's defaults.
     $P0 = new 'Iterator', args
   args_loop:
     unless $P0 goto args_end
-    $P1 = shift $P0
-    $P2 = $P0[$P1]
-    token[$P1] = $P2
+    $S1 = shift $P0
+    $P2 = $P0[$S1]
+    token[$S1] = $P2
     goto args_loop
   args_end:
 
