@@ -74,6 +74,7 @@ OutputBaseFilename=setup-parrot-$version
 Compression=lzma
 SolidCompression=yes
 ChangesAssociations=yes
+PrivilegesRequired=none
 
 [Files]
 Source: "$prefix\\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
