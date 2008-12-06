@@ -547,7 +547,7 @@ Parrot_print_backtrace(void)
         const int found  = dladdr(array[i], &frameInfo);
 
         /* always indent */
-        const int indent = 2 + ( 2 * i);
+        const int indent = 2 + (2 * i);
 
         fprintf(stderr, "%*s", indent, "");
 
