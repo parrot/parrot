@@ -147,6 +147,103 @@ they're stored in typed integer variables. The C<fact> subroutine
 uses C<.param> and the C<.return> directives for retrieving parameters
 and returning results. The final printed result is 120.
 
+=head3 Named Parameters
+
+Parameters that are passed in a strict order like we've seen above are
+called '''positional arguments'''. Positional arguments are
+differentiated from one another by their position in the function call.
+Putting positional arguments in a different order will produce different
+effects, or may cause errors. Parrot supports a second type of parameter,
+a '''named parameter'''. Instead of passing parameters by their position
+in the string, parameters are passed by name and can be in any order.
+Here's an example:
+
+ .sub 'MySub'
+    .param int yrs :named("age")
+    .param string call :named("name")
+    $S0 = "Hello " . call
+    $S1 = "You are " . yrs
+    $S1 = $S1 . " years old
+    print $S0
+    print $S1
+ .end
+ 
+ .sub main :main
+    'MySub'("age" => 42, "name" => "Bob")
+ .end
+
+In the example above, we could have easily reversed the order too:
+
+ .sub main :main
+    'MySub'("name" => "Bob", "age" => 42)    # Same!
+ .end
+
+Named arguments can be a big help because you don't have to worry about
+the exact order of variables, especially as argument lists get very long.
+
+=head3 Optional Parameters
+
+Sometimes there are parameters to a function that don't always need to be
+passed, or values for a parameter which should be given a default value
+if a different value hasn't been explicitly provided. Parrot provides
+a mechanism for allowing optional parameters to be specifed, so an
+error won't be raised if the parameter isn't provided. Parrot also
+provides a flag value that can be tested to determine if an optional
+parameter has been provided or not, so a default value can be supplied.
+
+Optional parameters are actually treated like two parameters: The value
+that may or may not be passed, and the flag value to determine if it
+has been or not. Here's an example declaration of an optional paramter:
+
+  .param string name :optional
+  .param int has_name :opt_flag
+
+The C<:optional> flag specifies that the given parameter is optional and
+does not necessarily need to be provided. The C<:opt_flag> specifies that
+an integer parameter contains a boolean flag. This flag is true if the
+value was passed, and false otherwise. This means we can use logic like
+this to provide a default value:
+
+  .param string name :optional
+  .param int has_name :opt_flag
+  if has_name goto we_have_a_name
+    name = "Default value"
+  we_have_a_name:
+
+Optional parameters can be positional or named parameters. When using them
+with positional parameters, they must appear at the end of the list of
+postional parameters. Also, the C<:opt_flag> parameter must always appear
+directly after the C<:optional> parameter.
+
+  .sub 'Foo'
+    .param int optvalue :optional
+    .param int hasvalue :opt_flag
+    .param pmc notoptional          # WRONG!
+    ...
+
+  .sub 'Bar'
+     .param int hasvalue :opt_flag
+     .param int optvalue :optional  # WRONG!
+     ...
+
+  .sub 'Baz'
+    .param int optvalue :optional
+    .param pmc notoptional
+    .param int hasvalue :opt_flag   # WRONG!
+    ...
+
+Optional parameters can also be mixed with named parameters:
+
+  .sub 'MySub'
+    .param int value :named("answer") :optional
+    .param int has_value :opt_flag
+    ...
+
+This could be called in two ways:
+
+  'MySub'("answer" => 42)  # with a value
+  'MySub'()                # without
+
 =head2 Continuation Passing Style
 
 Continuations are snapshots, a frozen image of the current execution
