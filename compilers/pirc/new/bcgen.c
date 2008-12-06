@@ -315,17 +315,16 @@ Add a sub PMC to the constant table. This function initializes the sub PMC.
 */
 void
 add_sub_pmc(bytecode * const bc,
-            char const * const subname, /* .sub foo --> "foo" */
-            char const * const nsentry, /* .sub foo :nsentry('bar') --> "bar" */
-            char const * const subid,   /* .sub foo :subid('baz') --> "baz" */
-            int vtable_index,           /* vtable entry index */
-            unsigned regs_used[],            /* register usage */
+            char const * const subname,
+            char const * const nsentry,
+            char const * const subid,
+            int vtable_index,
+            unsigned regs_used[],
             int startoffset,
             int endoffset)
 {
-    Interp     *interp    = bc->interp;
     PMC        *sub_pmc;
-    Parrot_sub *sub       = PMC_sub(sub_pmc);
+    Parrot_sub *sub;
     int         subconst_index;
     int         subname_index;
     int         i;
@@ -338,8 +337,9 @@ add_sub_pmc(bytecode * const bc,
      * If that should be changed into something else, fix that here (e.g. "Coroutine").
      */
     sub_pmc       = pmc_new(bc->interp, enum_class_Sub);
+    sub           = PMC_sub(sub_pmc);
     subname_index = add_string_const(bc, subname);
-    subname_const = interp->code->const_table->constants[subname_index];
+    subname_const = bc->interp->code->const_table->constants[subname_index];
 
     /* set start and end offset of this sub in the bytecode. This is calculated during
      * the parsing phase.
@@ -351,7 +351,7 @@ add_sub_pmc(bytecode * const bc,
     sub->namespace_name   = NULL;
 
     /* XXX does this work properly? is "current_HLL" really "current"? */
-    sub->HLL_id           = CONTEXT(interp)->current_HLL;
+    sub->HLL_id           = CONTEXT(bc->interp)->current_HLL;
 
     /* XXX fix lex stuff */
     sub->lex_info         = NULL;
