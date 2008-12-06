@@ -282,7 +282,7 @@ Z<CHP-4-SECT-1.2>
 The example above could have been written using simple labels instead
 of separate compilation units:
 
-  .sub _main
+  .sub main
       $I1 = 5         # counter
       call fact       # same as bsr fact
       print $I0
