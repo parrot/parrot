@@ -28,19 +28,9 @@ Its main features are:
 
 =head3 Windows using Microsoft Visual Studio
 
-The Makefile doesn't work perfectly; compilation is fine, but linking doesn't work,
-so that needs to be done manually.
+To compile PIRC on windows using MSVC:
 
-To compile:
-
- cd compilers\pirc
- nmake pirc
-
-To link:
-
- link /out:pirc.exe /nodefaultlib main.obj pircompunit.obj pirlexer.obj pirparser.obj \
-   pirsymbol.obj pircompiler.obj pirmacro.obj hdocprep.obj \
-   kernel32.lib msvcrt.lib ..\..\libparrot.lib
+   nmake
 
 When running PIRC, it needs the shared library C<libparrot>; an easy way to do
 this is copy C<libparrot.dll> in the Parrot root directory to C<compilers/pirc/new>.
@@ -300,12 +290,9 @@ declared C<.local> or C<.param> symbol, and each PIR register ($Px, $Sx, $Ix, $N
 is assigned a unique PASM register, that is associated with the original symbol
 or PIR register throughout the subroutine.
 
-Any further optimizations on register usage can be implemented by writing a
-register allocator that takes this initial register allocation as input, and
-generating a more optimized register usage. Research and benchmarking is needed
-to decide whether this yields more efficient bytecode. In the end it is a choice
-between compile-time overhead (register allocation) or runtime memory overhead
-(more register space needed per sub).
+PIRC has a register optimizer, which can optimize the register usage. Run PIRC
+with the C<-r> option to activate this. The register optimizer is implemented
+using a Linear Scan Register allocator.
 
 The implementation of the vanilla register allocator is done in the PIR symbol
 management module (C<pirsymbol.c>).
@@ -326,7 +313,9 @@ The directory compilers/pirc has a number of subdirectories:
 
 =item doc - contains documentation.
 
-=item heredoc - contains the implementation of the heredoc preprocessor
+=item heredoc - contains the implementation of the heredoc preprocessor. This is now
+integrated with pirc/new. It now only has a driver program to build a stand-alone
+heredoc preprocessor.
 
 =item new - contains the Bison/Flex implementation of PIRC
 
@@ -339,6 +328,32 @@ Note that this is no longer maintained at the moment.
 integrated with pirc/new.
 
 =back
+
+=head1 MAKING CHANGES
+
+If you want to make changes to the lexer of parser files, you will need the Flex
+and/or Bison programs. There are ports available for Windows, but I don't know
+whether they're any good. I use Cygwin's tools.
+
+=head2 Updating the lexer
+
+The heredoc preprocessor is implemented in C<hdocprep.l>, and can be regenerated
+using:
+
+   cd compilers/pirc/new
+   flex hdocprep.l
+
+PIRC's normal lexer is implemented in C<pir.l>, and can be regenerated using:
+
+   cd compilers/pirc/new
+   flex pir.l
+
+=head2 Updating the parser
+
+The parser is implemented in C<pir.y>, and can be regenerated using:
+
+   cd compilers/pirc/new
+   bison pir.y
 
 =head1 NOTES
 
@@ -379,11 +394,6 @@ when replacing IMCC with PIRC:
 
 =over 4
 
-=item * PIR sub storage
-
-PIR subs are stored as PMC constants in the constant table, but it is not clear
-how exactly this is to be done.
-
 =item * bytecode generation
 
 There must be a proper bytecode API for PIRC to use.
@@ -401,19 +411,6 @@ that'd be helpful:
 =over 4
 
 =item * how are named args/params handled/represented in bytecode?
-
-=item * the Makefile (generated from config/gen/makefiles/pirc.in) must be fixed for Windows.
-
-=back
-
-The following are some ideas for the near future:
-
-=over 4
-
-=item * when parsing is done, we know the total number of instructions (or we can easily count this,
-by incrementing a counter in the instruction constructor). Then we can create an array, and convert
-the linked list of instructions into an array of instructions. This would allow to easily index
-this array and calculate offsets (labels etc.) and such.
 
 =back
 
