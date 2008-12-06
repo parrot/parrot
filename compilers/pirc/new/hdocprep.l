@@ -275,7 +275,7 @@ EOL            \r?\n
 DQ_STRING       \"(\\.|[^"\\\n])*\"
 SQ_STRING       \'[^'\n]*\'
 Q_STRING       {SQ_STRING}|{DQ_STRING}
-LINECOMMENT    [#].*{EOL}
+LINECOMMENT    [#].*{EOL}?
 
 %%
 
