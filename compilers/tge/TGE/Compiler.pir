@@ -113,7 +113,8 @@ err_no_tree:
     .local pmc result
 
     .local pmc iter
-    iter = new 'Iterator', node    # setup iterator for node
+    $P0 = node.'hash'()
+    iter = new 'Iterator', $P0    # setup iterator for node
     iter = 0
   iter_loop:
     unless iter, iter_end         # while (entries) ...
@@ -135,7 +136,8 @@ err_no_tree:
     rule = new 'Hash'
 
     .local pmc iter
-    iter = new 'Iterator', node    # setup iterator for node
+    $P0 = node.'hash'()
+    iter = new 'Iterator', $P0    # setup iterator for node
     iter = 0
   iter_loop:
     unless iter, iter_end         # while (entries) ...
@@ -169,7 +171,8 @@ err_no_rule:
     decl = new 'Hash'
 
     .local pmc iter
-    iter = new 'Iterator', node    # setup iterator for node
+    $P0 = node.'hash'()
+    iter = new 'Iterator', $P0    # setup iterator for node
     iter = 0
   iter_loop:
     unless iter, iter_end         # while (entries) ...
