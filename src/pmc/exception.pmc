@@ -176,7 +176,7 @@ Destroys the exception.
 
 /*
 
-=item C<STRING *get_bool()>
+=item C<INTVAL get_bool()>
 
 Return true.
 
@@ -184,8 +184,8 @@ Return true.
 
 */
 
-    VTABLE INTVAL *get_bool() {
-        return (INTVAL)1;
+    VTABLE INTVAL get_bool() {
+        return 1;
     }
 
 /*
