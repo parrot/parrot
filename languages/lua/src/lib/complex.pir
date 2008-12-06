@@ -234,9 +234,7 @@ LIST
     .param pmc z :optional
     .param pmc extra :slurpy
     $P1 = get(1, z)
-    $N0 = $P1.'abs'()
-    new $P0, 'LuaNumber'
-    set $P0, $N0
+    $P0 = abs $P1
     .return ($P0)
 .end
 
@@ -441,7 +439,6 @@ NOT YET IMPLEMENTED.
 =cut
 
 .sub 'pow'
-    .param pmc extra :slurpy
     .param pmc z :optional
     .param pmc w :optional
     .param pmc extra :slurpy
