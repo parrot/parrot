@@ -22,7 +22,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 37;
 use Parrot::Config;
 use Test::More;
 use Parrot::Test::Lua;
@@ -85,6 +85,13 @@ CODE
 /^1\.259/
 OUTPUT
 
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function copysign' );
+require 'mathx'
+print(math.copysign(3.14, -2))
+CODE
+/^-3\.14/
+OUTPUT
+
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function erf' );
 require 'mathx'
 print(math.erf(2))
@@ -111,6 +118,42 @@ require 'mathx'
 print(math.expm1(2))
 CODE
 /^6\.389/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function fdim' );
+require 'mathx'
+print(math.fdim(7, 3))
+CODE
+/^4$/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function fma' );
+require 'mathx'
+print(math.fma(2, 3, 4))
+CODE
+/^10$/
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function fmax' );
+require 'mathx'
+print(math.fmax(1))
+print(math.fmax(1, 2))
+print(math.fmax(1, 2, 3, -4))
+CODE
+1
+2
+3
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function fmin' );
+require 'mathx'
+print(math.fmin(1))
+print(math.fmin(1, 2))
+print(math.fmin(1, 2, 3, -4))
+CODE
+1
+1
+-4
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function fpclassify' );
@@ -195,6 +238,71 @@ require 'mathx'
 print(math.logb(47))
 CODE
 /^5$/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function nearbyint' );
+require 'mathx'
+print(math.nearbyint(3.14))
+CODE
+/^3$/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function nextafter' );
+require 'mathx'
+print(math.nextafter(3.14, 5))
+CODE
+/^3\.14$/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function nexttoward' );
+require 'mathx'
+print(math.nexttoward(3.14, 5))
+CODE
+/^3\.14$/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function remainder' );
+require 'mathx'
+print(math.remainder(4, 3))
+CODE
+/^1$/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function rint' );
+require 'mathx'
+print(math.rint(3.14))
+CODE
+/^3$/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function round' );
+require 'mathx'
+print(math.round(3.14))
+CODE
+/^3$/
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function scalbn' );
+require 'mathx'
+print(math.scalbn(2, 3))
+CODE
+/^16$/
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function signbit' );
+require 'mathx'
+print(math.signbit(3.14))
+print(math.signbit(-3.14))
+CODE
+0
+1
+OUTPUT
+
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function trunc' );
+require 'mathx'
+print(math.trunc(3.14))
+CODE
+/^3$/
 OUTPUT
 
 

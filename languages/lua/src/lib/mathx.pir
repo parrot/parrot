@@ -264,18 +264,16 @@ LIST
     $P0 = argv[0]
     i = 1
     lua_checknumber(i, $P0)
-    m = clone $P0
+    m = $P0
   L1:
     if i >= argc goto L2
     $P0 = argv[i]
     inc i
     lua_checknumber(i, $P0)
-    y = clone $P0
-    m = m.'fmax'(y)
+    m = m.'fmax'($P0)
     goto L1
   L2:
-    $P0 = clone m
-    .return ($P0)
+    .return (m)
 .end
 
 
@@ -292,18 +290,16 @@ LIST
     $P0 = argv[0]
     i = 1
     lua_checknumber(i, $P0)
-    m = clone $P0
+    m = $P0
   L1:
     if i >= argc goto L2
     $P0 = argv[i]
     inc i
     lua_checknumber(i, $P0)
-    y = clone $P0
-    m = m.'fmin'(y)
+    m = m.'fmin'($P0)
     goto L1
   L2:
-    $P0 = clone m
-    .return ($P0)
+    .return (m)
 .end
 
 
