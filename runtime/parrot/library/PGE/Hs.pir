@@ -51,8 +51,6 @@ whole thing may be taken out or refactored away at any moment.
 .namespace [ "PGE";"Hs" ]
 
 .const string PGE_FAIL = "PGE_Fail"
-.const string PGE_SUB_POS = "@!list"
-.const string PGE_SUB_NAMED = "%!hash"
 
 .sub "__onload" :load
     .local pmc load
@@ -181,8 +179,8 @@ END:
     out .= " ["
 
   subpats:
-    capt = getattribute self, PGE_SUB_POS
-    if_null capt, subrules
+    capt = self.'list'()
+    unless capt goto subrules
     spi = 0
     spc = elements capt
     goto subpats_body
