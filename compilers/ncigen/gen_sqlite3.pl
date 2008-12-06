@@ -1,6 +1,6 @@
 #!/home/tewk/srcs/parrot/perl6
 
-# $Id: sqlite_interface_generator.pl 33506 2008-12-05 12:39:55Z tewk $
+# $Id$
 # Copyright (C) 2008, The Perl Foundation.
 
 use v6;
