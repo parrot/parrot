@@ -60,11 +60,11 @@ class DBDI::PreparedStatement::SQLite3 is DBDI::PreparedStatement {
 
     my method fillColumns () {
         # Won't work in any useful way at the moment
-        #my $cn; my $i =0;
-        #while ($cn = SQLite::column_name($stHandle, $i)) {
-        #    %columns{$cn} = $i++;
-        #    push @columns, $cn; 
-        #}
+        my $cn; my $i =0;
+        while ($cn = SQLite::column_name($stHandle, $i)) {
+            %columns{$cn} = $i++;
+            push @columns, $cn; 
+        }
     }
 
     method next () { 
@@ -84,14 +84,7 @@ class DBDI::PreparedStatement::SQLite3 is DBDI::PreparedStatement {
         return self!errorCheck();
     }
 
-    method lookupCol ($name) { 
-        # This should be a hash but ...
-        my $i = 0; my $cn;
-        while ($cn = SQLite::column_name($stHandle, $i)) {
-            if $cn eq $name { return $i }
-        }
-        return -1;
-    }
+    method lookupCol ($name) { return %columns{$name} // -1; }
 
     method getCol ($num) { return SQLite::column_text($stHandle, $num); }
 }

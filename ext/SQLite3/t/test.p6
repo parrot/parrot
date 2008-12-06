@@ -1,18 +1,19 @@
-# Andy the time-strapped test fairy says:
-# If this were Perl 5, I'd put in tests roughly like the following:
 use DBDI;
 use Test;
 
-plan 5;
+plan 7;
 
 my $conn = DBDI::DriverManager.getConnection("dbdi:SQLite3:test.db", "", "");
 isa_ok($conn, DBDI::Driver::SQLite3);
 my $stm = $conn.createStatement();
 isa_ok($stm, DBDI::Statement);
 my $rs = $stm.executeUpdate("CREATE TABLE foo (bar, baz)");
-### ok( $rs->success, 'Created foo OK');
 ### I'd also add a test that a SELECT works and returns 0 rows
 
+try {
+    $rs = $stm.executeUpdate("CREATE TABLE foo (bar, baz)");
+};
+ok($! eq "table foo already exists", "Can't create again (and did create first time)");
 my $stm = $conn.prepareStatement("INSERT INTO foo (bar, baz) VALUES (?, ?)");
 isa_ok( $stm, DBDI::PreparedStatement);
 $stm.bind(1, 123);
@@ -25,7 +26,10 @@ my $rs = $stm2.executeQuery("SELECT baz, bar FROM foo");
 while ($rs.next()) {
     ok(($rs.getCol("baz") eq "Thingy"), "baz == Thingy");
     ok(($rs.getCol(1) = 123), "col1 == 123");
-    #say $rs.getCol("bas"); #segfaults
+    try { 
+        $rs.getCol("bas");
+    };
+    ok($! eq "Couldn't find column bas", "Non-existent columns");
 }
 
 # vim: ft=perl6:
