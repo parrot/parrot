@@ -7,26 +7,38 @@
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
-#include "bcgen.h"
+#include "bcgen.h" /* XXX future maybe parrot/bcgen.h */
 
 
-/* private bits of the bytecode generator */
+/*
 
+=head1 DESCRIPTION
 
-/* Note that typedef of struct bytecode is already done in the header file */
+This file implements an API for generating bytecode. All gory details
+are hidden. In order to improve modularity, all bytecode generating
+functions take a C<bytecode> struct parameter, which keeps track of
+the I<state>; this includes a Parrot interpreter.
+
+Since this state is private, the bytecode struct is declared in this
+C file, not in the header file. It is, however, declared in the header
+file as a struct, so you can use it as a type, but not touch its
+private bits. Everything you need to know should be accessible through
+accessor functions.
+
+=cut
+
+*/
+
 
 struct bytecode {
-    int          num_constants;  /* for assigning indices to the constants, also counter. */
     PackFile    *packfile;       /* the actual packfile */
     opcode_t    *opcursor;       /* for writing ops into the code segment */
     Interp      *interp;         /* parrot interpreter */
-
 };
 
-/*typedef struct bytecode bytecode;
-*/
 
 static int new_const(bytecode * const bc);
+
 
 /*
 
@@ -39,7 +51,19 @@ static int new_const(bytecode * const bc);
 */
 
 
+/*
 
+=item C<static int
+new_const(bytecode * const bc)>
+
+Add a new constant to the constant table.
+
+XXX This function needs to be cleaned up, as it's not really efficient: constant table
+is resized each time a constant is added.
+
+=cut
+
+*/
 static int
 new_const(bytecode * const bc)
 {
@@ -76,7 +100,14 @@ new_const(bytecode * const bc)
 
 /*
 
-Add a PMC constant to the constants list.
+=item C<int
+add_pmc_const(bytecode * const bc, PMC * pmc)>
+
+Add the PMC constant C<pmc> to the constant table. This
+function returns the index in the constant table where C<pmc>
+is stored.
+
+=cut
 
 */
 int
@@ -90,7 +121,16 @@ add_pmc_const(bytecode * const bc, PMC * pmc) {
 
 /*
 
-Add a String constant to the constants list.
+=item C<int
+add_string_const(bytecode * const bc, char const * const str)>
+
+Add the string constant C<str> to the constant table. This function
+returns the index in the constant table where C<str> is stored.
+
+XXX what to do with encoding-thingy "ascii"? Probably should be an extra parameter?
+Or should it be a STRING at this point already?
+
+=cut
 
 */
 int
@@ -106,7 +146,15 @@ add_string_const(bytecode * const bc, char const * const str) {
 
 /*
 
-Add a number constant to the constants list.
+=item c<int
+add_num_const(bytecode * const bc, double f)>
+
+XXX should f be a FLOATVAL?
+
+Add a number constant to the constants list. The index in the constant
+table where C<f> is stored is returned.
+
+=cut
 
 */
 int
@@ -120,7 +168,13 @@ add_num_const(bytecode * const bc, double f) {
 
 /*
 
+=item C<int
+add_key_const(bytecode * const bc, PMC *key)>
+
 Add a key constant to the constants list.
+XXX Implement this.
+
+=cut
 
 */
 int
@@ -131,7 +185,10 @@ add_key_const(bytecode * const bc, PMC *key) {
 
 /*
 
-=item new_bytecode
+=item C<bytecode *
+new_bytecode(Interp *interp, char const * const filename, int bytes, int codesize)>
+
+Create a new bytecode struct, representing the bytecode for file C<filename>
 
 Create a new bytecode struct and return a pointer to it.
 
@@ -143,20 +200,23 @@ new_bytecode(Interp *interp, char const * const filename, int bytes, int codesiz
     PMC      *self;
     bytecode *bc      = (bytecode *)mem_sys_allocate(sizeof (bytecode));
 
+    /* Create a new packfile and load it into the parrot interpreter */
     bc->packfile      = PackFile_new(interp, 0);
-
-    bc->interp        = interp;
-    bc->num_constants = 0;
-
     Parrot_loadbc(interp, bc->packfile);
+
+    /* store a pointer to the parrot interpreter, which saves passing around
+     * the interp as an extra argument.
+     */
+    bc->interp        = interp;
 
     /* create segments */
     interp->code      = PF_create_default_segs(interp, filename, 1);
 
-    /* add interpreter globals to bytecode (?) */
+    /* add interpreter globals to bytecode. XXX Why is this? */
     self              = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_INTERPRETER);
     add_pmc_const(bc, self);
 
+    /* allocate enough space. XXX I *think* bytes is /always/ codesize * 4. */
     interp->code->base.data = (opcode_t *)mem_sys_realloc(interp->code->base.data, bytes);
     interp->code->base.size = codesize;
 
@@ -168,7 +228,12 @@ new_bytecode(Interp *interp, char const * const filename, int bytes, int codesiz
 
 /*
 
-Write an op into the bytecode stream.
+=item C<void
+emit_opcode(bytecode * const bc, opcode_t op)>
+
+Write the opcode C<op> into the bytecode stream.
+
+=cut
 
 */
 void
@@ -179,6 +244,8 @@ emit_opcode(bytecode * const bc, opcode_t op) {
 /*
 
 Write an integer argument into the bytecode stream.
+XXX Possibly use 1 function for emitting opcodes and ints; they're
+the same anyway?
 
 */
 void
@@ -188,9 +255,17 @@ emit_int_arg(bytecode * const bc, int intval) {
 
 /*
 
+=item C<void
+emit_op_by_name(bytecode * const bc, char const * const opname)>
+
 Emit the opcode by name. C<opname> must be a valid, signatured opname.
-So, "print" is not valid, whereas "print_ic" is. The opcode of the
-opname is looked up and written into the bytecode stream.
+So, C<print> is not valid, whereas C<print_ic> is. The opcode of the
+opname is looked up and written into the bytecode stream. If C<opname>
+is not valid, an error message is written.
+
+XXX Possibly bail out if error? No need to continue.
+
+=cut
 
 */
 void
@@ -205,6 +280,7 @@ emit_op_by_name(bytecode * const bc, char const * const opname) {
 }
 
 static STRING *add_string_const_from_cstring(bytecode * const bc, char const * const str);
+
 /*
 
 XXX think of better name.
@@ -222,7 +298,19 @@ add_string_const_from_cstring(bytecode * const bc, char const * const str) {
 
 /*
 
+=item C<void
+add_sub_pmc(bytecode * const bc,
+            char const * const subname,  -- the name of this sub
+            char const * const nsentry,  -- the value of the :nsentry flag
+            char const * const subid,    -- the value of the :subid flag
+            int vtable_index,            -- vtable index, or -1 if no :vtable
+            unsigned regs_used[],        -- register usage of this sub
+            int startoffset,             -- start offset of this sub in bytecode
+            int endoffset)>              -- end offset of this sub in bytecode
+
 Add a sub PMC to the constant table. This function initializes the sub PMC.
+
+=cut
 
 */
 void
@@ -236,34 +324,54 @@ add_sub_pmc(bytecode * const bc,
             int endoffset)
 {
     Interp     *interp    = bc->interp;
-    PMC        *sub_pmc   = pmc_new(bc->interp, enum_class_Sub);
+    PMC        *sub_pmc;
     Parrot_sub *sub       = PMC_sub(sub_pmc);
-    int   subconst_index;
-    int   subname_index;
-
-
-    int i;
+    int         subconst_index;
+    int         subname_index;
+    int         i;
 
 
     PackFile_Constant *subname_const;
 
+
+    /* The .sub is represented by a "Sub" PMC.
+     * If that should be changed into something else, fix that here (e.g. "Coroutine").
+     */
+    sub_pmc       = pmc_new(bc->interp, enum_class_Sub);
     subname_index = add_string_const(bc, subname);
     subname_const = interp->code->const_table->constants[subname_index];
 
+    /* set start and end offset of this sub in the bytecode. This is calculated during
+     * the parsing phase.
+     */
     sub->start_offs       = startoffset;
     sub->end_offs         = endoffset;
+
+    /* XXX fix namespace stuff */
     sub->namespace_name   = NULL;
+
+    /* XXX does this work properly? is "current_HLL" really "current"? */
     sub->HLL_id           = CONTEXT(interp)->current_HLL;
 
+    /* XXX fix lex stuff */
     sub->lex_info         = NULL;
+
+    /* XXX fix outer stuff */
     sub->outer_sub        = NULL;
+
+    /* Set the vtable index; if this .sub was declared as :vtable, its vtable
+     * index was found during the parse; otherwise it's -1.
+     */
     sub->vtable_index     = vtable_index;
+
+    /* XXX fix multi stuff */
     sub->multi_signature  = NULL;
 
     /* store register usage of this sub. */
     for (i = 0; i < 4; ++i)
         sub->n_regs_used[i] = regs_used[i];
 
+    /* store the name of this sub; it's stored in the constant table. */
     sub->name = subname_const->u.string;
 
     /* If there was a :nsentry, add it to the constants table, and set
@@ -283,18 +391,25 @@ add_sub_pmc(bytecode * const bc,
         sub->subid = subname_const->u.string;
 
 
-
+    /* store the sub in a namespace. XXX why, and in what namespace? sub->namespace_name?
+     * XXX must this be done always? (this w.r.t. the recent discussion about :vtable/:method
+     * and being :anon etc.
+     */
     Parrot_store_sub_in_namespace(bc->interp, sub_pmc);
     subconst_index = add_pmc_const(bc, sub_pmc);
 
-
+    /* Add a new fixup entry in the fixup table for this sub. */
     PackFile_FixupTable_new_entry(bc->interp, subname, enum_fixup_sub, subconst_index);
 }
 
 
 /*
 
-Write the bytecode to the file C<filename>.
+=item C<void
+write_pbc_file(bytecode * const bc, char const * const filename)>
+
+Write the generated bytecode (stored somewhere in a packfile)
+to the file C<filename>.
 
 */
 void
@@ -303,10 +418,6 @@ write_pbc_file(bytecode * const bc, char const * const filename) {
     opcode_t *packed;
     FILE     *fp;
     int       result;
-
-    /* store the list of constants in the constants segment */
-   /* emit_constants(bc);
-   */
 
     /* pack the packfile */
     size   = PackFile_pack_size(bc->interp, bc->interp->code->base.pf) * sizeof (opcode_t);
@@ -328,32 +439,6 @@ write_pbc_file(bytecode * const bc, char const * const filename) {
 
     /* done! */
 }
-
-
-/*
-
-Test driver.
-
-*/
-/*
-int
-main(int argc, char **argv) {
-    Interp *interp = Parrot_new(NULL);
-    bytecode *bc   = new_bytecode(interp, "test.pir", 12, 3);
-    int regs_used[4] = {0,0,0,0};
-
-    add_sub_pmc(bc, "main", NULL, NULL, -1, regs_used);
-    emit_op_by_name(bc, "print_ic");
-    emit_int_arg(bc, 42);
-    emit_op_by_name(bc, "end");
-
-
-    fprintf(stderr, "writing pbc...");
-    write_pbc_file(bc, "test.pbc");
-    fprintf(stderr, "written pbc file\n");
-}
-
-*/
 
 
 /*

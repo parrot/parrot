@@ -41,8 +41,11 @@ void emit_string_arg(bytecode * const bc, int string_const_index);
 */
 
 int add_key_const(bytecode * const bc, PMC *key);
+
 int add_num_const(bytecode * const bc, double f);
+
 int add_string_const(bytecode * const bc, char const * const str);
+
 int add_pmc_const(bytecode * const bc, PMC * pmc) ;
 
 /* for adding constants */
@@ -58,20 +61,12 @@ int add_num_const(bytecode * const bc, FLOATVAL f);
 int add_int_const(bytecode * const bc, INTVAL i);
   */
 
-/* some functions to update constants */
-
-void update_pmc_const(bytecode * const bc, int pmc_const_index, PMC * newvalue);
-
-void update_string_const(bytecode * const bc, int str_const_index, STRING *s);
-/* XXX and other types... */
 
 /* XXX todo: define some API functions for finding values, etc. like this: */
 int get_string_const_index(bytecode * const bc, STRING *s);
 /* retrieves the index of s in the constant table */
 
-/* for sake of completeness.. */
-void remove_const(bytecode * const bc, int const_index);
-/* removes constant in slot C<const_index> from constant table */
+
 
 void add_sub_pmc(bytecode * const bc,
             char const * const subname, char const * const nsentry, char const * const subid,
