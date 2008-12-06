@@ -23,7 +23,7 @@ for (parse_ast($fn).kv) -> $k,$v {
         my $suffix_name .= subst( /sqlite3_/, '' );
 
         my $pirname = %rename_table{$suffix_name} || $suffix_name;
-        
+
         say format_func_decl($pirname, |@result);
     }
 }

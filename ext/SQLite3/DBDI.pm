@@ -8,7 +8,7 @@ class DBDI::DriverManager {
 
         my $c2 = $rurl.index(":");
         my $driver = "DBDI::Driver::"~substr($rurl, 0, $c2);
-        eval "use "~$driver; 
+        eval "use "~$driver;
         if ($!) { die "Couldn't load "~$driver~": "~$!; }
 
         my $r = substr($rurl, $c2+1);

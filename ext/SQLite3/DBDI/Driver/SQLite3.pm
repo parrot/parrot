@@ -12,11 +12,11 @@ class DBDI::Driver::SQLite3 is DBDI::Driver {
         return $o;
     }
 
-    method createStatement() { 
-        return DBDI::Statement::SQLite3.new(:connection(self)); 
+    method createStatement() {
+        return DBDI::Statement::SQLite3.new(:connection(self));
     }
 
-    method prepareStatement($sql) { 
+    method prepareStatement($sql) {
         my $sth := SQLite::prepare($.dbHandle, $sql);
         my $p = DBDI::PreparedStatement::SQLite3.new(:connection(self), :sql($sql), :stHandle($sth));
         return $p;
@@ -24,7 +24,7 @@ class DBDI::Driver::SQLite3 is DBDI::Driver {
 }
 
 class DBDI::Statement::SQLite3 is DBDI::Statement {
-    has $connection; 
+    has $connection;
 
     method executeQuery($sql) {
         my $temp_statement = $connection.prepareStatement($sql);
@@ -38,7 +38,7 @@ class DBDI::Statement::SQLite3 is DBDI::Statement {
     }
 }
 
-class DBDI::PreparedStatement::SQLite3 is DBDI::PreparedStatement { 
+class DBDI::PreparedStatement::SQLite3 is DBDI::PreparedStatement {
     has $connection;
     has $stHandle;
     has @columns;
@@ -63,11 +63,11 @@ class DBDI::PreparedStatement::SQLite3 is DBDI::PreparedStatement {
         my $cn; my $i =0;
         while ($cn = SQLite::column_name($stHandle, $i)) {
             %columns{$cn} = $i++;
-            push @columns, $cn; 
+            push @columns, $cn;
         }
     }
 
-    method next () { 
+    method next () {
         SQLite::step($stHandle);
         if (! +@columns) { self!fillColumns(); }
         my $res = self!errorCheck();
@@ -77,9 +77,9 @@ class DBDI::PreparedStatement::SQLite3 is DBDI::PreparedStatement {
         SQLite::finalize($stHandle);
         return self!errorCheck();
     }
-    
-    method bind($num, $data) { 
-        @bind_params[$num] = $data; 
+
+    method bind($num, $data) {
+        @bind_params[$num] = $data;
         SQLite::bind_text($stHandle, $num, $data, chars($data), -1);
         return self!errorCheck();
     }

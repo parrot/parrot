@@ -38,7 +38,7 @@ sub gen_preamble($nsname, $libname) {
         $fmt ~= "\$P1 = null\ngoto has_lib\n";
     }
 
-    $fmt ~= 
+    $fmt ~=
         qq{{\$P2 = new 'Exception'
 \$P2[0] = 'error loading $libname - loadlib failed'
 throw \$P2
@@ -68,7 +68,7 @@ multi sub pir($node) {
 =end
 
 #multi sub pir(NCIGENAST::TypeDef $node) { return ""; }
-#multi sub pir(NCIGENAST::VarDecl $node) { return ""; } 
+#multi sub pir(NCIGENAST::VarDecl $node) { return ""; }
 multi sub pir(NCIGENAST::FuncDecl $node) {
 ## return type
     my $type = param_to_code($node, 1);
@@ -93,13 +93,13 @@ sub param_to_code($node, $returncode = 0) {
         given $pt {
           when 'void' {
             if ($returncode) { return "p"; } #probably should be "V"
-            else { return "p"; } 
+            else { return "p"; }
           }
           when 'int'    { return "V"; }
           when 'long'   { return "V"; }
           when 'char'   { return "t"; }
           when 'short'  { return "V"; }
-          default { 
+          default {
 =begin
             say "ERROR";
             say $node.perl;
@@ -136,6 +136,6 @@ sub pir_children($node) {
 #   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab ft=perl6 shiftwidth=2 
+# vim: expandtab ft=perl6 shiftwidth=2
 
 
