@@ -27,7 +27,10 @@ and how they are used.
 
 =head2 F<Config.fpmc>
 
-
+C<Config.fpmc> is generated during the build process. The file defines a
+hash PMC that contains information about the system where Parrot was
+built. By accessing the data in this PMC, you can determine how Parrot
+was compiled and what features and libraries it has available.
 
 =head1 Perl-Inspired Libraries
 
@@ -65,9 +68,16 @@ sources.
 
 =head2 PCRE
 
+PCRE is a library that implements regular expressions using Perl 5 syntax.
+
+
 =head2 NCurses
 
+NCurses is a library for manipulating the console and the cursor.
+
 =head2 OpenGL
+
+OpenGL is a 3D graphics library.
 
 =head2 Postgres SQL
 

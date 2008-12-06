@@ -1022,18 +1022,6 @@ sub_param_type_def:
            $$->type |= $3;
            mem_sys_free($2);
           }
-
-   /* don't free $2 here; adv_named_set uses the pointer directly */
-   | type STRINGC ADV_ARROW IDENTIFIER paramtype_list
-          {
-            if ($5 & VT_UNIQUE_REG)
-                $$ = mk_ident_ur(interp, $4, $1);
-            else
-                $$ = mk_ident(interp, $4, $1);
-            $$->type |= $5;
-            adv_named_set(interp, $2);
-            mem_sys_free($4);
-          }
    ;
 
 
