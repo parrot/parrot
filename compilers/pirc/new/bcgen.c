@@ -13,19 +13,10 @@
 /* private bits of the bytecode generator */
 
 
-typedef struct bc_const {
-    int                index; /* index into constant table */
-    PackFile_Constant *value;
-    struct bc_const   *next;  /* linked list */
-
-} bc_const;
-
-
 /* Note that typedef of struct bytecode is already done in the header file */
 
 struct bytecode {
     int          num_constants;  /* for assigning indices to the constants, also counter. */
-    bc_const    *constants;      /* list of constants */
     PackFile    *packfile;       /* the actual packfile */
     opcode_t    *opcursor;       /* for writing ops into the code segment */
     Interp      *interp;         /* parrot interpreter */
@@ -35,7 +26,7 @@ struct bytecode {
 /*typedef struct bytecode bytecode;
 */
 
-static bc_const * new_const(bytecode * const bc);
+static int new_const(bytecode * const bc);
 
 /*
 
@@ -48,20 +39,39 @@ static bc_const * new_const(bytecode * const bc);
 */
 
 
-/*
 
-Create a new constant node in the linked list of constants.
-A pointer to the node is returned.
+static int
+new_const(bytecode * const bc)
+{
+    Interp *interp = bc->interp;
+    size_t oldcount;
+    size_t newcount;
 
-*/
-static bc_const *
-new_const(bytecode * const bc) {
-    bc_const *bcc = (bc_const *)mem_sys_allocate(sizeof (bc_const));
-    bcc->value    = PackFile_Constant_new(bc->interp);
-    bcc->index    = bc->num_constants++;
-    bcc->next     = bc->constants;
-    bc->constants = bcc;
-    return bcc;
+    fprintf(stderr, "add const table %d\n", interp->code->const_table->const_count);
+
+    assert(interp->code->const_table);
+    oldcount = interp->code->const_table->const_count;
+    newcount = oldcount + 1;
+
+    /* Allocate a new constant */
+    {
+        PackFile_Constant *new_constant = PackFile_Constant_new(interp);
+
+        /* Update the constant count and reallocate */
+        if (interp->code->const_table->constants)
+            interp->code->const_table->constants =
+                mem_realloc_n_typed(interp->code->const_table->constants,
+                    newcount, PackFile_Constant *);
+        else
+            interp->code->const_table->constants =
+                mem_allocate_n_typed(newcount, PackFile_Constant *);
+
+        interp->code->const_table->constants[oldcount] = new_constant;
+        interp->code->const_table->const_count         = newcount;
+    }
+
+    fprintf(stderr, "newconst: %d\n", oldcount);
+    return oldcount;
 }
 
 /*
@@ -71,10 +81,11 @@ Add a PMC constant to the constants list.
 */
 int
 add_pmc_const(bytecode * const bc, PMC * pmc) {
-    bc_const *bcc     = new_const(bc);
-    bcc->value->type  = PFC_PMC;
-    bcc->value->u.key = pmc;
-    return bcc->index;
+    int index                   = new_const(bc);
+    PackFile_Constant *constant = bc->interp->code->const_table->constants[index];
+    constant->type              = PFC_PMC;
+    constant->u.key             = pmc;
+    return index;
 }
 
 /*
@@ -84,11 +95,14 @@ Add a String constant to the constants list.
 */
 int
 add_string_const(bytecode * const bc, char const * const str) {
-    bc_const *bcc        = new_const(bc);
-    bcc->value->type     = PFC_STRING;
-    bcc->value->u.string = string_make(bc->interp, str, strlen(str), "ascii", PObj_constant_FLAG);
-    return bcc->index;
+    int                index    = new_const(bc);
+    PackFile_Constant *constant = bc->interp->code->const_table->constants[index];
+
+    constant->type     = PFC_STRING;
+    constant->u.string = string_make(bc->interp, str, strlen(str), "ascii", PObj_constant_FLAG);
+    return index;
 }
+
 
 /*
 
@@ -97,12 +111,11 @@ Add a number constant to the constants list.
 */
 int
 add_num_const(bytecode * const bc, double f) {
-    /* STRING * const str   = string_from_cstring(interp, number_cstring, 0); */
-    bc_const *bcc        = new_const(bc);
-    bcc->value->type     = PFC_NUMBER;
-    /* bcc->value->u.number = string_to_num(interp, str); */
-    bcc->value->u.number = f;
-    return bcc->index;
+    int index                   = new_const(bc);
+    PackFile_Constant *constant = bc->interp->code->const_table->constants[index];
+    constant->type              = PFC_NUMBER;
+    constant->u.number          = f;
+    return index;
 }
 
 /*
@@ -112,28 +125,9 @@ Add a key constant to the constants list.
 */
 int
 add_key_const(bytecode * const bc, PMC *key) {
-    bc_const *bcc     = new_const(bc);
-    bcc->value->type  = PFC_KEY;
-    bcc->value->u.key = key;
-    return bcc->index;
+    return 0;
 }
 
-/*
-
-Get the PackFile_Constant on index C<key>.
-XXX not efficient.
-
-*/
-PackFile_Constant *
-get_const(bytecode * const bc, int key) {
-    bc_const *iter = bc->constants;
-    while (iter) {
-        if (iter->index == key)
-            return iter->value;
-        iter = iter->next;
-    }
-    return NULL;
-}
 
 /*
 
@@ -150,7 +144,7 @@ new_bytecode(Interp *interp, char const * const filename, int bytes, int codesiz
     bytecode *bc      = (bytecode *)mem_sys_allocate(sizeof (bytecode));
 
     bc->packfile      = PackFile_new(interp, 0);
-    bc->constants     = NULL;
+
     bc->interp        = interp;
     bc->num_constants = 0;
 
@@ -204,7 +198,7 @@ emit_op_by_name(bytecode * const bc, char const * const opname) {
     int op = bc->interp->op_lib->op_code(opname, 1);
     if (op < 0) {
         /* error */
-        fprintf(stderr, "'%s' is not an op", opname);
+        fprintf(stderr, "Error: '%s' is not an op\n", opname);
     }
     else
         emit_opcode(bc, op);
@@ -220,7 +214,7 @@ Add a string constant to the constants list, and return the STRING variant
 static STRING *
 add_string_const_from_cstring(bytecode * const bc, char const * const str) {
     int index = add_string_const(bc, str);
-    return get_const(bc, index)->u.string;
+    return bc->interp->code->const_table->constants[index]->u.string;
 }
 
 
@@ -254,7 +248,7 @@ add_sub_pmc(bytecode * const bc,
     PackFile_Constant *subname_const;
 
     subname_index = add_string_const(bc, subname);
-    subname_const = get_const(bc, subname_index);
+    subname_const = interp->code->const_table->constants[subname_index];
 
     sub->start_offs       = startoffset;
     sub->end_offs         = endoffset;
@@ -293,46 +287,10 @@ add_sub_pmc(bytecode * const bc,
     Parrot_store_sub_in_namespace(bc->interp, sub_pmc);
     subconst_index = add_pmc_const(bc, sub_pmc);
 
-    fprintf(stderr, "subconst index: %d\n", subconst_index);
 
-    /* doesn't work?? */
-
-    /* this /does/ work in pirc/bctest.c!! Why not here??
-    */
-
-    /*
-    PackFile_FixupTable_new_entry(bc->interp, "main", enum_fixup_sub, subconst->index);
-    */
-
+    PackFile_FixupTable_new_entry(bc->interp, subname, enum_fixup_sub, subconst_index);
 }
 
-/*
-
-Walk the list of constants and store them in the constants segment of the packfile.
-Instead of updating the constants table one by one, it's neater to add them in one go.
-This prevents memory re-allocations, which are generally not the cheapest operations.
-
-XXX check out if we can count the number of needed constants during the parse; that
-would prevent the linked list thing. OTOH, that makes this API less flexible; client-code
-doesn't want to be so inflexible.
-
-*/
-static void
-emit_constants(bytecode * const bc) {
-    bc_const *iter = bc->constants;
-
-    /* allocate enough space */
-
-    fprintf(stderr, "allocating space for %d constants\n", bc->num_constants);
-    bc->interp->code->const_table->constants
-                                   = mem_allocate_n_typed(bc->num_constants, PackFile_Constant *);
-
-    /* walk the list and put all of them into the constant table. */
-    while (iter) {
-        bc->interp->code->const_table->constants[iter->index] = iter->value;
-        iter = iter->next;
-    }
-}
 
 /*
 
@@ -347,7 +305,8 @@ write_pbc_file(bytecode * const bc, char const * const filename) {
     int       result;
 
     /* store the list of constants in the constants segment */
-    emit_constants(bc);
+   /* emit_constants(bc);
+   */
 
     /* pack the packfile */
     size   = PackFile_pack_size(bc->interp, bc->interp->code->base.pf) * sizeof (opcode_t);
