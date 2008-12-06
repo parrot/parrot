@@ -29,7 +29,7 @@ These are the vtable functions for the Capture PMC.
     if (!PARROT_CAPTURE(obj)->hash) \
         PARROT_CAPTURE(obj)->hash = pmc_new((i), enum_class_Hash);
 
-pmclass Capture need_ext provides array provides hash {
+pmclass Capture need_ext {
     ATTR PMC *array;
     ATTR PMC *hash;
 
@@ -123,25 +123,29 @@ Retrieves a value in the array component of the Capture.
 */
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
-        CAPTURE_array_CREATE(INTERP, SELF);
+        if (!(PARROT_CAPTURE(SELF)->array))
+            return 0.0;
         return VTABLE_get_number_keyed_int(INTERP, PARROT_CAPTURE(SELF)->array,
                                            key);
     }
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
-        CAPTURE_array_CREATE(INTERP, SELF);
+        if (!(PARROT_CAPTURE(SELF)->array))
+            return 0;
         return VTABLE_get_integer_keyed_int(INTERP, PARROT_CAPTURE(SELF)->array,
                                             key);
     }
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
-        CAPTURE_array_CREATE(INTERP, SELF);
+        if (!(PARROT_CAPTURE(SELF)->array))
+            return PMCNULL;
         return VTABLE_get_pmc_keyed_int(INTERP, PARROT_CAPTURE(SELF)->array,
                                         key);
     }
 
     VTABLE STRING *get_string_keyed_int(INTVAL key) {
-        CAPTURE_array_CREATE(INTERP, SELF);
+        if (!(PARROT_CAPTURE(SELF)->array))
+            return CONST_STRING(INTERP, "");
         return VTABLE_get_string_keyed_int(INTERP, PARROT_CAPTURE(SELF)->array,
                                            key);
     }
@@ -380,23 +384,27 @@ Retrieves a value from the hash component of the Capture.
 */
 
     VTABLE FLOATVAL get_number_keyed(PMC *key) {
-        CAPTURE_hash_CREATE(INTERP, SELF);
+        if (!(PARROT_CAPTURE(SELF)->hash))
+            return 0.0;
         return VTABLE_get_number_keyed(INTERP, PARROT_CAPTURE(SELF)->hash, key);
     }
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
-        CAPTURE_hash_CREATE(INTERP, SELF);
+        if (!(PARROT_CAPTURE(SELF)->hash))
+            return 0;
         return VTABLE_get_integer_keyed(INTERP, PARROT_CAPTURE(SELF)->hash,
                                         key);
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        CAPTURE_hash_CREATE(INTERP, SELF);
+        if (!(PARROT_CAPTURE(SELF)->hash))
+            return PMCNULL;
         return VTABLE_get_pmc_keyed(INTERP, PARROT_CAPTURE(SELF)->hash, key);
     }
 
     VTABLE STRING *get_string_keyed(PMC *key) {
-        CAPTURE_hash_CREATE(INTERP, SELF);
+        if (!(PARROT_CAPTURE(SELF)->hash))
+            return CONST_STRING(INTERP, "");
         return VTABLE_get_string_keyed(INTERP, PARROT_CAPTURE(SELF)->hash, key);
     }
 
@@ -437,14 +445,19 @@ Delete the element corresponding to C<key> in the hash component.
 
 =item C<void set_pmc(PMC *capture)>
 
-Set this capture to hold the value of another.
+Set this capture to hold the value of another.  If set to PMCNULL,
+erase the contents of the array and hash components.
 
 =cut
 
 */
 
     void set_pmc(PMC *capture) {
-        if (VTABLE_isa(INTERP, capture, CONST_STRING(INTERP, "Capture"))) {
+        if (PMC_IS_NULL(capture)) {
+            PARROT_CAPTURE(SELF)->array = NULL;
+            PARROT_CAPTURE(SELF)->hash = NULL;
+        }
+        else if (VTABLE_isa(INTERP, capture, CONST_STRING(INTERP, "Capture"))) {
             PARROT_CAPTURE(SELF)->array = PARROT_CAPTURE(capture)->array;
             PARROT_CAPTURE(SELF)->hash  = PARROT_CAPTURE(capture)->hash;
         }
