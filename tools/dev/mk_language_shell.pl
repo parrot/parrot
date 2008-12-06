@@ -364,9 +364,9 @@ rule value {
     | <quote> {*}                                #= quote
 }
 
-rule integer { \d+ {*} }
+token integer { \d+ {*} }
 
-rule quote {
+token quote {
     [ \' <string_literal: '\'' > \' | \" <string_literal: '"' > \" ]
     {*}
 }
@@ -535,10 +535,11 @@ use Parrot::Test::Harness language => '@lang@',
 
 __t/00-sanity.t__
 # This just checks that the basic parsing and call to builtin say() works.
-say '1..3';
+say '1..4';
 say 'ok 1';
 say 'ok ', 2;
 say 'ok ', 2 + 1;
+say 'ok', ' ', 4;
 
 __DATA__
 
