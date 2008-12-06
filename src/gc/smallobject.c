@@ -133,7 +133,10 @@ Parrot_is_const_pmc(PARROT_INTERP, ARGIN(const PMC *pmc))
     Small_Object_Pool * const pool = interp->arena_base->constant_pmc_pool;
     const               int   c    = contained_in_pool(pool, pmc);
 
-    /* some paranoia first */
+    /* some paranoia first. */
+    /* I wonder if it would save any machine cycles to write
+       !(PObj_constant_TEST(pmc) ^ c)
+       instead. */
     PARROT_ASSERT(!!PObj_constant_TEST(pmc) == !!c);
 
     return c;
