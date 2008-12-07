@@ -52,8 +52,6 @@ not highest type in table.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static INTVAL distance_cmp(SHIM_INTERP, INTVAL a, INTVAL b);
-static void dump_mmd(PARROT_INTERP, INTVAL function)
-        __attribute__nonnull__(1);
 
 static void mmd_add_multi_global(PARROT_INTERP,
     ARGIN(STRING *sub_name),
@@ -203,64 +201,6 @@ static PMC * Parrot_mmd_sort_candidates(PARROT_INTERP,
 
 
 #define MMD_DEBUG 0
-
-#ifndef NDEBUG
-/*
-
-=item C<static void dump_mmd>
-
-RT #48260: Not yet documented!!!
-
-=cut
-
-*/
-
-static void
-dump_mmd(PARROT_INTERP, INTVAL function)
-{
-    UINTVAL x, y;
-    UINTVAL offset;
-    MMD_table * const table = interp->binop_mmd_funcs + function;
-    funcptr_t func;
-    const UINTVAL x_funcs = table->x;
-    const UINTVAL y_funcs = table->y;
-
-    printf("    ");
-    for (x = 0; x < x_funcs; ++x) {
-        if (x % 10)
-            printf(" ");
-        else
-            printf("%d", (int) x / 10);
-    }
-
-    printf("\n");
-
-    for (y = 0; y < y_funcs; ++y) {
-        printf("%3d ", (int)y);
-        for (x = 0; x < x_funcs; ++x) {
-            offset = x_funcs * y + x;
-            func   = table->mmd_funcs[offset];
-
-            printf("%c",
-                    (UINTVAL)func & 1 ?  'P' :
-                    !func  ? '0' : 'F');
-        }
-
-        printf("\n");
-    }
-
-    for (y = 0; y < y_funcs; ++y) {
-        for (x = 0; x < x_funcs; ++x) {
-            offset = x_funcs * y + x;
-            func   = table->mmd_funcs[offset];
-
-            if (func && !((UINTVAL) func & 1))
-                printf("%3d %3d: %p\n", (int)x, (int)y, (void*) func);
-        }
-    }
-}
-#endif
-
 
 /*
 
