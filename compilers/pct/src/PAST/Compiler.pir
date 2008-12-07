@@ -92,6 +92,16 @@ any value type.
     valflags['Float']    = 'n+*:'
     set_global '%valflags', valflags
 
+    ##  %!controltypes holds the list of exception types for each
+    ##  type of exception handler we support
+    .local pmc controltypes
+    controltypes = new 'Hash'
+    $P0 = split ' ', '.CONTROL_RETURN .CONTROL_OK .CONTROL_BREAK .CONTROL_CONTINUE .CONTROL_ERROR .CONTROL_TAKE .CONTROL_LOOP_NEXT .CONTROL_LOOP_LAST .CONTROL_LOOP_REDO'
+    controltypes['CONTROL']   = $P0
+    $P0 = split ' ', '.CONTROL_TAKE'
+    controltypes['GATHER']   = $P0
+    set_global '%!controltypes', controltypes
+
     $P0 = new 'CodeString'
     set_global '%!codestring', $P0
 
@@ -556,6 +566,124 @@ nodes of type C<PAST::Stmts>.
     ops = self.'post_children'(node, 'signature'=>$S0)
     $P0 = ops[-1]
     ops.'result'($P0)
+    .local pmc eh, iter
+    eh = node.'handlers'()
+    unless eh, no_eh
+    ops = self.'wrap_handlers'(ops,eh,'rtype'=>rtype)
+  no_eh:
+    .return (ops)
+.end
+
+=head3 C<PAST::Control>
+
+=over 4
+
+=item as_post(PAST::Control node)
+
+Return the POST representation of a C<PAST::Control>.
+
+=cut
+
+.sub 'as_post' :method :multi(_, ['PAST';'Control'])
+    .param pmc node
+    .param pmc options         :slurpy :named
+
+    .local pmc ops, children, ishandled, nothandled
+    .local string handled
+    $P0 = get_hll_global ['POST'], 'Label'
+    $S0 = self.'unique'('handled_')
+    ishandled = $P0.'new'('result'=>$S0)
+    $S0 = self.'unique'('nothandled_')
+    nothandled = $P0.'new'('result'=>$S0)
+    $P0 = get_hll_global ['POST'], 'Ops'
+    ops = $P0.'new'('node'=>node)
+    .local string rtype
+    rtype = options['rtype']
+    $P0 = node.'list'()
+    $I0 = elements $P0
+    $S0 = repeat 'v', $I0
+    concat $S0, rtype
+    ops.'push_pirop'('.local pmc exception')
+    ops.'push_pirop'('.get_results (exception)')
+    children = self.'post_children'(node, 'signature'=>$S0)
+    ops.'push'(children)
+    handled = self.'uniquereg'('I')
+    ops.'push_pirop'('set', handled, 'exception["handled"]')
+    ops.'push_pirop'('ne', handled, 1, nothandled)
+    ops.'push'(ishandled)
+    ops.'push_pirop'('return', 'exception')
+    ops.'push'(nothandled)
+    ops.'push_pirop'('rethrow', 'exception')
+    .return (ops)
+.end
+
+.sub 'wrap_handlers' :method
+    .param pmc child
+    .param pmc ehs
+    .param pmc options         :slurpy :named
+
+    .local string rtype
+    rtype = options['rtype']
+
+    .local pmc iter, node, ops, pops, tail, skip
+    $P0 = get_hll_global ['POST'], 'Ops'
+    ops = $P0.'new'('node'=>node)
+    $P0 = get_hll_global ['POST'], 'Ops'
+    pops = $P0.'new'('node'=>node)
+    $P0 = get_hll_global ['POST'], 'Ops'
+    tail = $P0.'new'('node'=>node)
+    $P0 = get_hll_global ['POST'], 'Label'
+    $S0 = self.'unique'('skip_handler_')
+    skip = $P0.'new'('result'=>$S0)
+
+    iter = new 'Iterator', ehs
+  handler_loop:
+    unless iter, handler_loop_done
+    node = shift iter
+
+    .local pmc ehpir, types, label
+    .local string ehreg, type
+    $P0 = get_hll_global ['POST'], 'Label'
+    $S0 = self.'unique'('control_')
+    label = $P0.'new'('result'=>$S0)
+
+    ehreg = self.'uniquereg'('P')
+    ops.'push_pirop'('new', ehreg, "'ExceptionHandler'")
+    ops.'push_pirop'('set_addr', ehreg, label)
+    $P0 = get_global '%!controltypes'
+    type = node.'handle_types'()
+    unless type, no_handle_types
+    types = $P0[type]
+    unless type, no_handle_types
+    ops.'push_pirop'('callmethod', '"handle_types"', ehreg, types :flat)
+  no_handle_types:
+    type = node.'handle_types_except'()
+    unless type, no_handle_types_except
+    types = $P0[type]
+    unless type, no_handle_types_except
+    ops.'push_pirop'('callmethod', '"handle_types_except"', ehreg, types :flat)
+  no_handle_types_except:
+    ops.'push_pirop'('push_eh', ehreg)
+
+    # Add one pop_eh for every handler we push_eh
+    pops.'push_pirop'('pop_eh')
+
+    # Push the handler itself
+    tail.'push'(label)
+    ehpir = self.'as_post'(node, 'rtype'=>rtype)
+    tail.'push'(ehpir)
+
+    goto handler_loop
+  handler_loop_done:
+
+    ops.'push'(child)
+
+
+    ops.'push'(pops)
+    ops.'push_pirop'('goto', skip)
+    ops.'push'(tail)
+    ops.'push'(skip)
+
     .return (ops)
 .end
 

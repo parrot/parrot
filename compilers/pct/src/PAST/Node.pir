@@ -22,6 +22,7 @@ for compiling programs in Parrot.
     p6meta.'new_class'('PAST::Val', 'parent'=>base)
     p6meta.'new_class'('PAST::Var', 'parent'=>base)
     p6meta.'new_class'('PAST::Block', 'parent'=>base)
+    p6meta.'new_class'('PAST::Control', 'parent'=>base)
     p6meta.'new_class'('PAST::VarList', 'parent'=>base)
 
     .return ()
@@ -99,6 +100,12 @@ Accessor method -- sets/returns the "flatten" flag on arguments.
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .tailcall self.'attr'('flat', value, has_value)
+.end
+
+.sub 'handlers' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('handle_types', value, has_value)
 .end
 
 
@@ -636,6 +643,21 @@ Get/set any pirflags for this block.
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .tailcall self.'attr'('pirflags', value, has_value)
+.end
+
+
+.namespace [ 'PAST';'Control' ]
+
+.sub 'handle_types' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('handle_types', value, has_value)
+.end
+
+.sub 'handle_types_except' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('handle_types_except', value, has_value)
 .end
 
 
