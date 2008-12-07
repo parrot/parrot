@@ -1878,9 +1878,10 @@ arguments_to_operands(lexer_state * const lexer, argument * const args) {
 
             switch (argvalue->type) {
                 case EXPR_TARGET:
-                    if (argvalue->expr.t->s.sym == NULL && argvalue->expr.t->s.reg == NULL)
-                        fprintf(stderr, "No sym or reg!\n");
-                    flag |= argvalue->expr.t->s.sym->type;
+                    if (TEST_FLAG(argvalue->expr.t->flags, TARGET_FLAG_IS_REG))
+                        flag |= argvalue->expr.t->s.reg->type;
+                    else
+                        flag |= argvalue->expr.t->s.sym->type;
                     break;
                 case EXPR_CONSTANT:
                     flag |= argvalue->expr.c->type;

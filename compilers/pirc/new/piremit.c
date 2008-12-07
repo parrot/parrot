@@ -217,7 +217,7 @@ print_instruction(lexer_state * const lexer, instruction *ins) {
             print_expressions(lexer, ins->operands);
         }
         else {
-            fprintf(out, "%u   %s ", ins->offset, ins->opname);
+            fprintf(out, "%04u   %s ", ins->offset, ins->opname);
 
             print_expressions(lexer, ins->operands);
 
@@ -275,6 +275,7 @@ print_subs(struct lexer_state * const lexer) {
     if (lexer->subs != NULL) {
         /* set iterator to first item */
         subroutine *subiter = lexer->subs->next;
+
 
         do {
 
