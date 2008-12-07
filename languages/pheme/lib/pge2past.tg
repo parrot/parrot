@@ -27,7 +27,8 @@ transform past (ROOT) :language('PIR') {
 
 transform past (pheme_list) :language('PIR') {
     .local pmc iter
-    iter = new 'Iterator', node
+    $P0 = node.'hash'()
+    iter = new 'Iterator', $P0
 
     .local string key_name
     key_name = shift iter
@@ -92,7 +93,8 @@ transform past (pheme_list) :language('PIR') {
 
 transform past (list_item) :language('PIR') {
     .local pmc iter
-    iter = new 'Iterator', node
+    $P0 = node.'hash'()
+    iter = new 'Iterator', $P0
 
     .local string key_name
     key_name = shift iter
@@ -174,7 +176,8 @@ transform cons (PAST;Op) :language('PIR') {
 
 transform make_cons (list) :language('PIR') {
     .local pmc iter
-    iter = new 'Iterator', node
+    $P0 = node.'hash'()
+    iter = new 'Iterator', $P0
 
     .local pmc cons
     cons = new ['PAST';'Op']
