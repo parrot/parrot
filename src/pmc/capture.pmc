@@ -452,7 +452,7 @@ erase the contents of the array and hash components.
 
 */
 
-    void set_pmc(PMC *capture) {
+    VTABLE void set_pmc(PMC *capture) {
         if (PMC_IS_NULL(capture)) {
             PARROT_CAPTURE(SELF)->array = NULL;
             PARROT_CAPTURE(SELF)->hash = NULL;
