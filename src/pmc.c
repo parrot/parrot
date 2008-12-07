@@ -36,13 +36,19 @@ static PMC * get_new_pmc_header(PARROT_INTERP,
     UINTVAL flags)
         __attribute__nonnull__(1);
 
-static void pmc_free(PARROT_INTERP, PMC *pmc)
-        __attribute__nonnull__(1);
+static void pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pmc);
 
 static void pmc_free_to_pool(PARROT_INTERP,
-    PMC *pmc,
-    Small_Object_Pool *pool)
-        __attribute__nonnull__(1);
+    ARGMOD(PMC *pmc),
+    ARGMOD(Small_Object_Pool *pool))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pmc)
+        FUNC_MODIFIES(*pool);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -64,7 +70,7 @@ Tests if the given pmc is null.
 
 PARROT_EXPORT
 INTVAL
-PMC_is_null(SHIM_INTERP, NULLOK(const PMC *pmc))
+PMC_is_null(SHIM_INTERP, ARGIN_NULLOK(const PMC *pmc))
 {
 #if PARROT_CATCH_NULL
     return pmc == PMCNULL || pmc == NULL;
@@ -458,7 +464,8 @@ tempted to use this.
 */
 
 static void
-pmc_free_to_pool(PARROT_INTERP, PMC *pmc, Small_Object_Pool *pool)
+pmc_free_to_pool(PARROT_INTERP, ARGMOD(PMC *pmc),
+    ARGMOD(Small_Object_Pool *pool))
 {
     if (PObj_active_destroy_TEST(pmc))
         VTABLE_destroy(interp, pmc);
@@ -471,15 +478,16 @@ pmc_free_to_pool(PARROT_INTERP, PMC *pmc, Small_Object_Pool *pool)
     pool->num_free_objects++;
 }
 
+
 void
-temporary_pmc_free(PARROT_INTERP, PMC *pmc)
+temporary_pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     Small_Object_Pool *pool = interp->arena_base->constant_pmc_pool;
     pmc_free_to_pool(interp, pmc, pool);
 }
 
 static void
-pmc_free(PARROT_INTERP, PMC *pmc)
+pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     Small_Object_Pool *pool = interp->arena_base->pmc_pool;
     pmc_free_to_pool(interp, pmc, pool);

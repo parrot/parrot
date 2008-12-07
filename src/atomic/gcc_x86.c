@@ -48,8 +48,8 @@ C<expect> to C<update>. Otherwise sets C<update> to C<ptr>.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void *
-parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
-                                        void *update)
+parrot_i386_cmpxchg(ARGMOD(void *volatile *ptr), ARGIN(void *expect),
+                                        ARGIN(void *update))
 {
 #if defined(PARROT_HAS_X86_64_GCC_CMPXCHG)
     __asm__ __volatile__("lock\n"
@@ -81,7 +81,7 @@ C<l> = C<result>;
 
 PARROT_EXPORT
 long
-parrot_i386_xadd(volatile long *l, long amount)
+parrot_i386_xadd(ARGIN(volatile long *l), long amount)
 {
     long result = amount;
 #if defined(PARROT_HAS_X86_64_GCC_CMPXCHG)

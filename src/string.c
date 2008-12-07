@@ -2110,6 +2110,7 @@ string_to_cstring(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
       return string_to_cstring_nullable(interp, s);
 }
 
+
 /*
 
 =item C<char * string_to_cstring_nullable>
@@ -2124,12 +2125,12 @@ a memory leak.
 
 PARROT_EXPORT
 PARROT_MALLOC
+PARROT_CAN_RETURN_NULL
 char *
 string_to_cstring_nullable(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
-    if (! s) {
+    if (!s)
       return NULL;
-    }
     else {
         char *p = (char *)mem_sys_allocate(s->bufused + 1);
         memcpy(p, s->strstart, s->bufused);

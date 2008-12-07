@@ -634,18 +634,21 @@ Helper function to trace references when CTX_LEAK_DEBUG is set.
 */
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 Parrot_Context *
-Parrot_context_ref_trace(PARROT_INTERP,
-        ARGMOD(Parrot_Context *ctx),
+Parrot_context_ref_trace(PARROT_INTERP, ARGMOD(Parrot_Context *ctx),
         ARGIN(const char *file), int line)
 {
     if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
         const char *name = "unknown";
+
         if (ctx->current_sub)
             name = (char *)(PMC_sub(ctx->current_sub)->name->strstart);
+
         fprintf(stderr, "[reference to context %p ('%s') taken at %s:%d]\n",
                 (void *)ctx, name, file, line);
     }
+
     ctx->ref_count++;
     return ctx;
 }

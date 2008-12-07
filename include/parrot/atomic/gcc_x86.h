@@ -20,10 +20,18 @@
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-void * parrot_i386_cmpxchg(void *volatile *ptr, void *expect, void *update);
+void * parrot_i386_cmpxchg(
+    ARGMOD(void *volatile *ptr),
+    ARGIN(void *expect),
+    ARGIN(void *update))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*ptr);
 
 PARROT_EXPORT
-long parrot_i386_xadd(volatile long *l, long amount);
+long parrot_i386_xadd(ARGIN(volatile long *l), long amount)
+        __attribute__nonnull__(1);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/atomic/gcc_x86.c */

@@ -49,7 +49,7 @@ void Parrot_create_mro(PARROT_INTERP, INTVAL type)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-INTVAL PMC_is_null(SHIM_INTERP, NULLOK(const PMC *pmc));
+INTVAL PMC_is_null(SHIM_INTERP, ARGIN_NULLOK(const PMC *pmc));
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -97,8 +97,10 @@ void dod_unregister_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void temporary_pmc_free(PARROT_INTERP, PMC *pmc)
-        __attribute__nonnull__(1);
+void temporary_pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pmc);
 
 PARROT_CANNOT_RETURN_NULL
 PMC * temporary_pmc_new(PARROT_INTERP, INTVAL base_type)

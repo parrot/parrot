@@ -80,6 +80,7 @@ void Parrot_clear_s(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 Parrot_Context * Parrot_context_ref_trace(PARROT_INTERP,
     ARGMOD(Parrot_Context *ctx),
     ARGIN(const char *file),

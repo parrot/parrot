@@ -473,6 +473,7 @@ char * string_to_cstring(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 
 PARROT_EXPORT
 PARROT_MALLOC
+PARROT_CAN_RETURN_NULL
 char * string_to_cstring_nullable(PARROT_INTERP,
     ARGIN_NULLOK(const STRING *s))
         __attribute__nonnull__(1);
