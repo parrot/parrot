@@ -1858,11 +1858,85 @@ static void
 arguments_to_operands(lexer_state * const lexer, argument * const args) {
     argument *argiter;
 
+    /* create a FixedIntegerArray object as first argument, which encodes
+     * the number of arguments and their flags.
+     */
+
+    /* XXX in compilers/imcc/pcc.c there's a maximum number of 15 values;
+     * do the same here to Get Things To Work, but fix later.
+     */
+    int flags_arg[15];
+    int index         = 0;
+    int forindex      = 0;
+    int len;
+    char *flagsstring, *strwriter;
+
     if (args == NULL) {
         push_operand(lexer, expr_from_const(lexer, new_const(lexer, PMC_TYPE, "")));
         return;
     }
+    else {
+        int numargs = 0;
+        argiter = args;
+        do {
+            int flag = 0;
+            expression *argvalue;
 
+            argiter  = argiter->next;
+            argvalue = argiter->value;
+            /*
+            fprintf(stderr, "converting arg to operand %d\n", ++numargs);
+            */
+
+            switch (argvalue->type) {
+                case EXPR_TARGET:
+                    if (TEST_FLAG(argvalue->expr.t->flags, TARGET_FLAG_IS_REG))
+                        flag |= argvalue->expr.t->s.reg->type;
+                    else
+                        flag |= argvalue->expr.t->s.sym->type;
+                    break;
+                case EXPR_CONSTANT:
+                    flag |= argvalue->expr.c->type;
+                    break;
+                default:
+                    yypirerror(lexer->yyscanner, lexer, "invalid expression type for argument");
+                    break;
+            }
+            /* store the flag for this argument */
+            flags_arg[index++] = flag;
+        }
+        while (argiter != args);
+
+        /* allocate space for each flag, + commas (index - 1) and 2 quotes */
+        strwriter = flagsstring = (char *)mem_sys_allocate((index + index - 1 + 2) * sizeof (char));
+        *strwriter++ = '"';
+
+        while (forindex < index) {
+            sprintf(strwriter++, "%d", flags_arg[forindex]);
+
+            if (forindex < index - 1) {
+                *strwriter++ = ',';
+            }
+
+            ++forindex;
+        }
+        /* write closing quote and NULL character */
+        *strwriter++ = '"';
+        *strwriter++ = '\0';
+
+        /*
+        fprintf(stderr, "args2operands: [%s]\n", flagsstring);
+        */
+
+        /* don't add it now, it will break tests.
+        push_operand(lexer, expr_from_const(lexer, new_const(lexer, STRING_TYPE, flagsstring)));
+        */
+
+        /* XXX Yes, this is a hacky attempt. Cleanups will follow. */
+    }
+
+
+    /* go over the arguments again, and add them as operands */
     argiter = args;
 
     do {
