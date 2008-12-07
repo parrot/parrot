@@ -104,7 +104,6 @@ typedef struct lexer_state {
     int            curregister[4]; /* for register allocation */
     int            pir_reg_generator; /* for unique PIR register allocator, for temp. PIR regs. */
 
-    unsigned       instr_counter;  /* to assign an index to each instruction */
     unsigned       stmt_counter;   /* to count "logical" statements, even if multi-line. */
 
     Interp        *interp;         /* parrot interpreter */

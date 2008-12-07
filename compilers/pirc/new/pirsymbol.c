@@ -461,7 +461,7 @@ color_reg(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
      */
     if (reg) {
         /* update end point of interval */
-        reg->interval->endpoint = lexer->instr_counter;
+        reg->interval->endpoint = lexer->stmt_counter;
         return reg->color;
     }
 

@@ -387,14 +387,6 @@ new_statement(lexer_state * const lexer, char const * const opname) {
     /* the codesize so far will be the offset of this instruction. */
     instr->offset = lexer->codesize;
 
-
-    /* XXX instr_counter still needed? Think so, for lin.scan.reg.alloc.
-       can instr->offset be used for that? or is it already used?
-       instr->offset is now just incremented in bigger steps...
-     */
-    lexer->instr_counter++;
-    /*instr->offset = lexer->instr_counter++;*/
-
     /*
     fprintf(stderr, "offset of %s is: %d\n", opname, instr->offset);
     */
@@ -831,12 +823,7 @@ set_label(lexer_state * const lexer, char const * const labelname) {
      *     goto L3
      *
      * jumping to L1 is equivalent to jumping to L2 or L3; so when calculating
-     * branch offsets, all three labels must yield the same offset. Therefore,
-     * if no instruction was set on the current node, the instruction counter
-     * must not count that node (hence the decrement).
-     */
-    if (instr->opname == NULL)
-        --lexer->instr_counter;
+     * branch offsets, all three labels must yield the same offset.
 
     /* store the labelname and its offset */
     store_local_label(lexer, labelname, instr->offset);
@@ -1888,12 +1875,12 @@ arguments_to_operands(lexer_state * const lexer, argument * const args) {
             fprintf(stderr, "converting arg to operand %d\n", ++numargs);
             */
 
+
             switch (argvalue->type) {
                 case EXPR_TARGET:
-                    if (TEST_FLAG(argvalue->expr.t->flags, TARGET_FLAG_IS_REG))
-                        flag |= argvalue->expr.t->s.reg->type;
-                    else
-                        flag |= argvalue->expr.t->s.sym->type;
+                    if (argvalue->expr.t->s.sym == NULL && argvalue->expr.t->s.reg == NULL)
+                        fprintf(stderr, "No sym or reg!\n");
+                    flag |= argvalue->expr.t->s.sym->type;
                     break;
                 case EXPR_CONSTANT:
                     flag |= argvalue->expr.c->type;
@@ -1928,9 +1915,11 @@ arguments_to_operands(lexer_state * const lexer, argument * const args) {
         fprintf(stderr, "args2operands: [%s]\n", flagsstring);
         */
 
-        /* don't add it now, it will break tests.
+        /* don't add it now, it will break tests. */
+        /*
         push_operand(lexer, expr_from_const(lexer, new_const(lexer, STRING_TYPE, flagsstring)));
         */
+
 
         /* XXX Yes, this is a hacky attempt. Cleanups will follow. */
     }
