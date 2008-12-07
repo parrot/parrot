@@ -216,7 +216,8 @@ void parrot_chash_destroy(PARROT_INTERP, ARGMOD(Hash *hash))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*hash);
 
-void parrot_chash_destroy_values(PARROT_INTERP, ARGMOD(Hash *hash),
+void parrot_chash_destroy_values(PARROT_INTERP,
+    ARGMOD(Hash *hash),
     ARGIN(value_free func))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

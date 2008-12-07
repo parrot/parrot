@@ -85,8 +85,9 @@ static int add_const_table_key(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int add_const_table_pmc(PARROT_INTERP, PMC *pmc)
-        __attribute__nonnull__(1);
+static int add_const_table_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static opcode_t build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
         __attribute__nonnull__(1)
@@ -285,7 +286,7 @@ Adds a PMC to the const table, returning its position.
 */
 
 static int
-add_const_table_pmc(PARROT_INTERP, PMC *pmc)
+add_const_table_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     int newitem = add_const_table(interp);
 

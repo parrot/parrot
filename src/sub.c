@@ -27,7 +27,7 @@ Subroutines, continuations, co-routines and other fun stuff...
 
 /*
 
-=item C<void  mark_context_start>
+=item C<void mark_context_start>
 
 Indicate that a new round of context marking is about to take place.
 

@@ -121,46 +121,71 @@ PMC* Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 MMD_Cache * Parrot_mmd_cache_create(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_mmd_cache_destroy(PARROT_INTERP, MMD_Cache *cache)
-        __attribute__nonnull__(1);
+void Parrot_mmd_cache_destroy(PARROT_INTERP, ARGMOD(MMD_Cache *cache))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*cache);
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_mmd_cache_lookup_by_types(PARROT_INTERP,
-    MMD_Cache *cache,
-    const char *name,
-    PMC *types)
-        __attribute__nonnull__(1);
+    ARGMOD(MMD_Cache *cache),
+    ARGIN(const char *name),
+    ARGIN(PMC *types))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*cache);
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_mmd_cache_lookup_by_values(PARROT_INTERP,
-    MMD_Cache *cache,
-    const char *name,
-    PMC *values)
-        __attribute__nonnull__(1);
+    ARGMOD(MMD_Cache *cache),
+    ARGIN(const char *name),
+    ARGIN(PMC *values))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*cache);
 
 PARROT_EXPORT
-void Parrot_mmd_cache_mark(PARROT_INTERP, MMD_Cache *cache)
-        __attribute__nonnull__(1);
+void Parrot_mmd_cache_mark(PARROT_INTERP, ARGMOD(MMD_Cache *cache))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*cache);
 
 PARROT_EXPORT
 void Parrot_mmd_cache_store_by_types(PARROT_INTERP,
-    MMD_Cache *cache,
-    const char *name,
-    PMC *types,
-    PMC *chosen)
-        __attribute__nonnull__(1);
+    ARGMOD(MMD_Cache *cache),
+    ARGIN(const char *name),
+    ARGIN(PMC *types),
+    ARGIN(PMC *chosen))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*cache);
 
 PARROT_EXPORT
 void Parrot_mmd_cache_store_by_values(PARROT_INTERP,
-    MMD_Cache *cache,
-    const char *name,
-    PMC *values,
-    PMC *chosen)
-        __attribute__nonnull__(1);
+    ARGMOD(MMD_Cache *cache),
+    ARGIN(const char *name),
+    ARGIN(PMC *values),
+    ARGIN(PMC *chosen))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*cache);
 
 PARROT_EXPORT
 void Parrot_mmd_destroy(PARROT_INTERP)

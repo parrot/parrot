@@ -359,8 +359,8 @@ str_dup(ARGIN(const char *old))
 
 =item C<char * str_dup>
 
-Duplicate a C string.  Just like strdup(), except it dies if it runs
-out of memory.
+Duplicates a C string.  Just like strdup(), except it dies if it runs out of
+memory.
 
 =cut
 
@@ -370,13 +370,17 @@ PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 char *
-str_dup_remove_quotes(ARGIN(const char * old))
+str_dup_remove_quotes(ARGIN(const char *old))
 {
     const size_t oldlen = strlen(old) + 1;
-    const size_t newlen = oldlen - 2; /* 2 for the beginning and ending quote chars */
-    char * const copy = (char *)mem_sys_allocate(newlen);
-    memcpy(copy, old+1, newlen);
+
+    /* 2 for the beginning and ending quote chars */
+    const size_t newlen = oldlen - 2;
+    char * const copy   = (char *)mem_sys_allocate(newlen);
+
+    memcpy(copy, old + 1, newlen);
     copy[newlen - 1] = 0;
+
     return copy;
 }
 

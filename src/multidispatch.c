@@ -85,15 +85,21 @@ static PMC* mmd_build_type_tuple_from_type_list(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING * mmd_cache_key_from_types(PARROT_INTERP,
-    const char *name,
-    PMC *types)
-        __attribute__nonnull__(1);
+    ARGIN(const char *name),
+    ARGIN(PMC *types))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
+PARROT_CANNOT_RETURN_NULL
 static STRING * mmd_cache_key_from_values(PARROT_INTERP,
-    const char *name,
-    PMC *values)
-        __attribute__nonnull__(1);
+    ARGIN(const char *name),
+    ARGIN(PMC *values))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -147,6 +153,7 @@ static void Parrot_mmd_ensure_writable(PARROT_INTERP,
     ARGIN_NULLOK(const PMC *pmc))
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
 static PMC * Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -183,6 +190,7 @@ static PMC* Parrot_mmd_search_scopes(PARROT_INTERP, ARGIN(STRING *meth))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 static PMC * Parrot_mmd_sort_candidates(PARROT_INTERP,
     ARGIN(PMC *arg_tuple),
     ARGIN(PMC *cl))
@@ -1397,6 +1405,7 @@ mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
     return ar;
 }
 
+PARROT_CANNOT_RETURN_NULL
 static PMC *
 Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub))
 {
@@ -1566,6 +1575,7 @@ candidate.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static PMC *
 Parrot_mmd_sort_candidates(PARROT_INTERP, ARGIN(PMC *arg_tuple), ARGIN(PMC *cl))
 {
@@ -1919,6 +1929,7 @@ Creates and returns a new MMD cache.
 */
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 MMD_Cache *
 Parrot_mmd_cache_create(PARROT_INTERP) {
     /* String hash. */
@@ -1938,8 +1949,10 @@ Generates an MMD cache key from an array of values.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING *
-mmd_cache_key_from_values(PARROT_INTERP, const char *name, PMC *values)
+mmd_cache_key_from_values(PARROT_INTERP, ARGIN(const char *name),
+    ARGIN(PMC *values))
 {
     /* Build array of type IDs, which we'll then use as a string to key into
      * the hash. */
@@ -1981,8 +1994,10 @@ Takes an array of values for the call and does a lookup in the MMD cache.
 */
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_mmd_cache_lookup_by_values(PARROT_INTERP, MMD_Cache *cache, const char *name, PMC *values)
+Parrot_mmd_cache_lookup_by_values(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
+    ARGIN(const char *name), ARGIN(PMC *values))
 {
     STRING *key = mmd_cache_key_from_values(interp, name, values);
 
@@ -2006,8 +2021,8 @@ it into the cache.
 
 PARROT_EXPORT
 void
-Parrot_mmd_cache_store_by_values(PARROT_INTERP,
-    MMD_Cache *cache, const char *name, PMC *values, PMC *chosen)
+Parrot_mmd_cache_store_by_values(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
+    ARGIN(const char *name), ARGIN(PMC *values), ARGIN(PMC *chosen))
 {
     STRING *key = mmd_cache_key_from_values(interp, name, values);
 
@@ -2018,16 +2033,18 @@ Parrot_mmd_cache_store_by_values(PARROT_INTERP,
 
 /*
 
-=item C<static STRING * mmd_cache_key_from_values>
+=item C<static STRING * mmd_cache_key_from_types>
 
-Generates an MMD cache key from an array of values.
+Generates an MMD cache key from an array of types.
 
 =cut
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 static STRING *
-mmd_cache_key_from_types(PARROT_INTERP, const char *name, PMC *types)
+mmd_cache_key_from_types(PARROT_INTERP, ARGIN(const char *name),
+    ARGIN(PMC *types))
 {
     /* Build array of type IDs, which we'll then use as a string to key into
      * the hash. */
@@ -2070,9 +2087,10 @@ Takes an array of types for the call and does a lookup in the MMD cache.
 */
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_mmd_cache_lookup_by_types(PARROT_INTERP, MMD_Cache *cache,
-    const char *name, PMC *types)
+Parrot_mmd_cache_lookup_by_types(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
+    ARGIN(const char *name), ARGIN(PMC *types))
 {
     STRING *key = mmd_cache_key_from_types(interp, name, types);
 
@@ -2097,11 +2115,12 @@ tied to an individual multi can be null.
 
 PARROT_EXPORT
 void
-Parrot_mmd_cache_store_by_types(PARROT_INTERP,
-    MMD_Cache *cache, const char *name, PMC *types, PMC *chosen)
+Parrot_mmd_cache_store_by_types(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
+    ARGIN(const char *name), ARGIN(PMC *types), ARGIN(PMC *chosen))
 {
     STRING *key = mmd_cache_key_from_types(interp, name, types);
-    if (key != NULL)
+
+    if (key)
         parrot_hash_put(interp, cache, key, chosen);
 }
 
@@ -2118,11 +2137,12 @@ GC-marks an MMD cache.
 
 PARROT_EXPORT
 void
-Parrot_mmd_cache_mark(PARROT_INTERP, MMD_Cache *cache)
+Parrot_mmd_cache_mark(PARROT_INTERP, ARGMOD(MMD_Cache *cache))
 {
-    /* As a small future optimization, note that we only *really* need to mark keys -
-     * the candidates will be referenced outside the cache, provided it's invalidated
-     * properly. */
+
+    /* As a small future optimization, note that we only *really* need to mark
+    * keys - the candidates will be referenced outside the cache, provided it's
+    * invalidated properly. */
     parrot_mark_hash(interp, cache);
 }
 
@@ -2139,7 +2159,7 @@ Destroys an MMD cache.
 
 PARROT_EXPORT
 void
-Parrot_mmd_cache_destroy(PARROT_INTERP, MMD_Cache *cache)
+Parrot_mmd_cache_destroy(PARROT_INTERP, ARGMOD(MMD_Cache *cache))
 {
     parrot_hash_destroy(interp, cache);
 }

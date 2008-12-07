@@ -287,7 +287,7 @@ void mark_context(PARROT_INTERP, ARGMOD(Parrot_Context* ctx))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(* ctx);
 
-void  mark_context_start(void);
+void mark_context_start(void);
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Parrot_sub * new_closure(PARROT_INTERP)
