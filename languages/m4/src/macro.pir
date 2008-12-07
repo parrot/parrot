@@ -178,14 +178,7 @@ NO_TOKEN_TEXT:
 TOKEN_FUNC:
   .local pmc func
   func = symbol['func']
-  # indirect call of subs, seems to need elaborate PIR syntax
-  .begin_call
-    .set_arg state
-    .set_arg arguments
-  .call func
-    ret_func_1:
-    .result text
-  .end_call
+  (text) = func( state, arguments )
 
 FINISH_CALL_MACRO:
   .return ( text )
