@@ -204,8 +204,7 @@ init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)
                 "Failed to set namespace for class.");
 
         /* Set the name of the class to the name of the innermost namespace
-         * associated with the class.
-         */
+         * associated with the class.  */
         new_name = VTABLE_get_string(interp, new_namespace);
 
         if (STRING_IS_NULL(new_name) || STRING_IS_EMPTY(new_name))
@@ -1161,7 +1160,6 @@ Returns whether the class is or inherits from C<*class>.
 
     VTABLE INTVAL isa_pmc(PMC *lookup) {
         Parrot_Class_attributes * const _class    = PARROT_CLASS(SELF);
-        STRING       *classname, *self_name;
         PMC          *classobj;
         INTVAL        i, num_classes;
 
@@ -1179,21 +1177,26 @@ Returns whether the class is or inherits from C<*class>.
         /* Check if the class object is the same as self's class object */
         if (VTABLE_is_same(interp, SELF, classobj))
             return 1;
+        else {
+            STRING *classname = VTABLE_get_string(interp, classobj);
+            INTVAL  is_proxy  = SELF->vtable->base_type == enum_class_PMCProxy
+                               ? 1 : 0;
 
-        classname = VTABLE_get_string(interp, classobj);
+            /* avoid the expensive string copy, if possible */
+            STRING *self_name = is_proxy
+                               ? VTABLE_get_string(interp, SELF)
+                               : make_class_name(interp, SELF);
 
-        /* avoid the expensive string copy, if possible */
-        self_name = SELF->vtable->base_type != enum_class_PMCProxy
-                  ? make_class_name(interp, SELF)
-                  : VTABLE_get_string(interp, SELF);
+            /* Check if the passed name is the same as the stored short name. */
+            INTVAL name_match = string_equal(interp, classname, self_name) == 0;
 
-        /* Check if the passed name is the same as the stored short name. */
-        if (string_equal(interp, classname, self_name) == 0)
-            return 1;
+            string_free(interp, classname);
+            if (is_proxy)
+                string_free(interp, self_name);
 
-        /* Check if the passed name is the same as the fully qualified name. */
-        if (string_equal(interp, classname, VTABLE_get_string(interp, SELF)) == 0)
-            return 1;
+            if (name_match)
+                return 1;
+        }
 
         /* Iterate over all the parents and check if they respond true
          * for 'isa' on the original comparison. */
