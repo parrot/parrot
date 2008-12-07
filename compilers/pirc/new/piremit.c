@@ -13,7 +13,11 @@
 
 =head1 FUNCTIONS
 
-This file contains emit functions.
+This file contains emit functions. Depending on the requested output,
+the appropriate emit functions are used. Options are:
+
+ -p     for PASM output
+ -b     for bytecode output
 
 =over 4
 
@@ -321,8 +325,18 @@ emit_pir_instruction(lexer_state * const lexer, instruction * const instr) {
     }
 }
 
+static void
+emit_pir_statement(lexer_state * const lexer, subroutine * const sub) {
+    if (sub->statements != NULL) {
+        instruction *statiter = sub->statements->next;
 
-
+        do {
+            emit_pir_instruction(lexer, statiter);
+            statiter = statiter->next;
+        }
+        while (statiter != sub->statements->next);
+    }
+}
 
 void
 emit_pir_subs(lexer_state * const lexer) {
@@ -331,7 +345,6 @@ emit_pir_subs(lexer_state * const lexer) {
         subroutine *subiter = lexer->subs->next;
 
         do {
-
             int i;
             fprintf(out, "\n.namespace ");
             print_key(lexer, subiter->name_space);
@@ -354,13 +367,18 @@ emit_pir_subs(lexer_state * const lexer) {
     }
 }
 
+
+
 /*
+
+=item C<static void
+emit_pbc_const_arg(lexer_state * const lexer, constant * const c)>
 
 Emit a constant argument into the bytecode. An integer is emitted
 inline in the bytecode; other types are stored in the constant table,
 and their index in the constant table is emitted into the bytecode.
 
-XXX doesn't work yet for strings and numbers. (pmc prob. neither)
+=cut
 
 */
 static void
@@ -380,7 +398,18 @@ emit_pbc_const_arg(lexer_state * const lexer, constant * const c) {
             emit_int_arg(lexer->bc, index);
             break;
         }
-        case PMC_TYPE:
+        case PMC_TYPE: {
+            /*
+
+            int index = add_pmc_const(lexer->bc, c->val.pval);
+
+            XXX create a new PMC here using the name in c->val.pval?
+
+            emit_int_arg(lexer->bc, index);
+
+            */
+            break;
+        }
         default:
             break;
     }
@@ -388,10 +417,15 @@ emit_pbc_const_arg(lexer_state * const lexer, constant * const c) {
 
 /*
 
+=item C<static void
+emit_pbc_target_arg(lexer_state * const lexer, target * const t)>
+
 Emit the assigned register of target C<t>. The assigned register is
 stored in the C<color> field, of either the C<pir_reg> or C<symbol>
 structure, depending on whether C<t> is a register or a symbol,
 respectively.
+
+=cut
 
 */
 static void
@@ -404,25 +438,38 @@ emit_pbc_target_arg(lexer_state * const lexer, target * const t) {
 
 /*
 
-XXX TODO: label offsets must be bytecode offsets, so also count arguments.
+=item C<static void
+emit_pbc_label_arg(lexer_state * const lexer, label * const l)>
+
+Emit the value of the label offset of label C<l>.
+
+=cut
 
 */
 static void
 emit_pbc_label_arg(lexer_state * const lexer, label * const l) {
     emit_int_arg(lexer->bc, l->offset);
-    /* fprintf(stderr, "labeloffset: %d\n", l->offset); */
 }
 
+
+/*
+
+=item C<static void
+emit_pbc_instr(lexer_state * const lexer, instruction * const instr)>
+
+Emit PBC for one instruction.
+
+=cut
+
+*/
 static void
 emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
-    int i;
-
+    int         i;
     expression *operand;
 
     /* emit the opcode */
 
     if (instr->opinfo) {
-        fprintf(stderr, "emit_pbc: %s\n", instr->opname);
         emit_opcode(lexer->bc, instr->opcode);
 
         /* emit the arguments */
@@ -431,6 +478,9 @@ emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
          * so substract 1 for the op itself.
          */
         if (instr->opinfo->op_count > 1) {
+            /* operands are stored in a circular linked list; instr->operands points
+             * to the *last* operand, its next pointer points to the first operand.
+             */
             operand = instr->operands->next;
 
             for (i = 0; i < instr->opinfo->op_count - 1; ++i) {
@@ -456,32 +506,28 @@ emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
 
 }
 
+
+/*
+
+=item C<static void
+emit_pbc_sub(lexer_state * const lexer, subroutine * const sub)>
+
+Emit bytecode for the subroutine C<sub>.
+
+=cut
+
+*/
 static void
-emit_pir_statement(lexer_state * const lexer, subroutine * const sub) {
-    if (sub->statements != NULL) {
-        instruction *statiter = sub->statements->next;
-
-        do {
-            emit_pir_instruction(lexer, statiter);
-            statiter = statiter->next;
-        }
-        while (statiter != sub->statements->next);
-    }
-}
-
-
-static void
-emit_pbc_instructions(lexer_state * const lexer, subroutine * const sub) {
+emit_pbc_sub(lexer_state * const lexer, subroutine * const sub) {
     instruction *iter;
+
     if (sub->statements == NULL)
         return;
 
-
+    /* initialize iter to first instruction */
     iter = sub->statements->next;
 
-    assert(iter != sub->statements->next);
     do {
-        fprintf(stderr, "pbc_instr: ");
         emit_pbc_instr(lexer, iter);
         iter = iter->next;
     }
@@ -506,7 +552,6 @@ emit_pbc(lexer_state * const lexer) {
     if (lexer->subs == NULL)
         return;
 
-
     lexer->bc = new_bytecode(lexer->interp, lexer->filename,
                              lexer->codesize * 4, lexer->codesize);
 
@@ -527,13 +572,15 @@ emit_pbc(lexer_state * const lexer) {
                     subiter->startoffset,
                     subiter->endoffset);
 
-        emit_pbc_instructions(lexer, subiter);
+        emit_pbc_sub(lexer, subiter);
         subiter = subiter->next;
     }
     while (subiter != lexer->subs->next);
 
     /* write the output to a file. */
     write_pbc_file(lexer->bc, "a.pbc");
+
+    /* XXX just make sure no seg. faults  happened */
     fprintf(stderr, "done writing pbc\n");
 }
 

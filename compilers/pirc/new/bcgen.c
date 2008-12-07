@@ -65,36 +65,29 @@ is resized each time a constant is added.
 
 */
 static int
-new_const(bytecode * const bc)
-{
+new_const(bytecode * const bc) {
     Interp *interp = bc->interp;
     size_t oldcount;
     size_t newcount;
+    PackFile_Constant *new_constant;
 
-    fprintf(stderr, "add const table %d\n", interp->code->const_table->const_count);
-
-    assert(interp->code->const_table);
     oldcount = interp->code->const_table->const_count;
     newcount = oldcount + 1;
 
-    /* Allocate a new constant */
-    {
-        PackFile_Constant *new_constant = PackFile_Constant_new(interp);
+    new_constant = PackFile_Constant_new(interp);
 
-        /* Update the constant count and reallocate */
-        if (interp->code->const_table->constants)
-            interp->code->const_table->constants =
-                mem_realloc_n_typed(interp->code->const_table->constants,
-                    newcount, PackFile_Constant *);
-        else
-            interp->code->const_table->constants =
-                mem_allocate_n_typed(newcount, PackFile_Constant *);
+    /* Update the constant count and reallocate */
+    if (interp->code->const_table->constants)
+        interp->code->const_table->constants =
+            mem_realloc_n_typed(interp->code->const_table->constants,
+                newcount, PackFile_Constant *);
+    else
+        interp->code->const_table->constants =
+            mem_allocate_n_typed(newcount, PackFile_Constant *);
 
-        interp->code->const_table->constants[oldcount] = new_constant;
-        interp->code->const_table->const_count         = newcount;
-    }
+    interp->code->const_table->constants[oldcount] = new_constant;
+    interp->code->const_table->const_count         = newcount;
 
-    fprintf(stderr, "newconst: %d\n", oldcount);
     return oldcount;
 }
 
@@ -243,9 +236,14 @@ emit_opcode(bytecode * const bc, opcode_t op) {
 
 /*
 
+=item C<void
+emit_int_arg(bytecode * const bc, int intval)>
+
 Write an integer argument into the bytecode stream.
 XXX Possibly use 1 function for emitting opcodes and ints; they're
 the same anyway?
+
+=cut
 
 */
 void
@@ -323,13 +321,11 @@ add_sub_pmc(bytecode * const bc,
             int startoffset,
             int endoffset)
 {
-    PMC        *sub_pmc;
-    Parrot_sub *sub;
-    int         subconst_index;
-    int         subname_index;
-    int         i;
-
-
+    PMC               *sub_pmc;
+    Parrot_sub        *sub;
+    int                subconst_index;
+    int                subname_index;
+    int                i;
     PackFile_Constant *subname_const;
 
 
