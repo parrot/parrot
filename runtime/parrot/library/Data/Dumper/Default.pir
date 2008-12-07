@@ -404,6 +404,76 @@ Dumps a Null PMC.
     .return ( 1 )
 .end
 
+
+=cut
+
+=item Capture dumpe
+
+Dump a capture object.
+
+=cut
+
+.namespace ['Capture']
+.sub '__dump' :method
+    .param pmc dumper
+    .param string label
+    .local int hasstuff
+    hasstuff = 0
+
+    .local string subindent, indent
+    (subindent, indent) = dumper.'newIndent'()
+
+    .local pmc hash, iter
+    hash = self.'hash'()
+    iter = new 'Iterator', hash
+  dump_hash_loop:
+    unless iter goto dump_hash_end
+    if hasstuff goto dump_hash_1
+    print " {"
+    hasstuff = 1
+  dump_hash_1:
+    print "\n"
+    print subindent
+    .local string key
+    .local pmc val
+    key = shift iter
+    val = hash[key]
+    print "<"
+    print key
+    print "> => "
+    dumper.'dump'(label, val)
+    goto dump_hash_loop
+  dump_hash_end:
+
+    .local pmc array
+    array = self.'list'()
+    if null array goto dump_array_end
+    $I1 = elements array
+    $I0 = 0
+  dump_array_loop:
+    if $I0 >= $I1 goto dump_array_end
+    if hasstuff goto dump_array_1
+    print " {"
+    hasstuff = 1
+  dump_array_1:
+    print "\n"
+    print subindent
+    val = array[$I0]
+    print "["
+    print $I0
+    print "] => "
+    dumper.'dump'(label, val)
+    inc $I0
+    goto dump_array_loop
+  dump_array_end:
+    unless hasstuff goto end
+    print "\n"
+    print indent
+    print '}'
+  end:
+    dumper.'deleteIndent'()
+.end
+
 =back
 
 =head1 AUTHOR
