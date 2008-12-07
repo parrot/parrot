@@ -94,7 +94,7 @@ retrieves returned values from the call.
 
 X<.param directive>
 In addition to syntax for subroutine calls, PIR provides syntax for
-subroutine definitions. Subrtroutines are defined with the C<.sub>
+subroutine definitions. Subroutines are defined with the C<.sub>
 directive, and end with the C<.end> directive. We've already seen
 this syntax in our earlier examples. The C<.param> defines input
 parameters and creates local named variables for them:
@@ -167,7 +167,7 @@ Here's an example:
     print $S0
     print $S1
  .end
- 
+
  .sub main :main
     'MySub'("age" => 42, "name" => "Bob")
  .end
@@ -193,7 +193,7 @@ parameter has been provided or not, so a default value can be supplied.
 
 Optional parameters are actually treated like two parameters: The value
 that may or may not be passed, and the flag value to determine if it
-has been or not. Here's an example declaration of an optional paramter:
+has been or not. Here's an example declaration of an optional parameter:
 
   .param string name :optional
   .param int has_name :opt_flag
@@ -251,7 +251,7 @@ state of the VM. Once we have a continuation we can invoke it to
 return to the point where the continuation was first created. It's
 like a magical timewarp that allows the developer to arbitrarily move
 control flow back to any previous point in the program N<there's actually
-no magic involved, just a lot of interesting ideas and involved code>. 
+no magic involved, just a lot of interesting ideas and involved code>.
 
 Continuations are not a new concept, they've been boggling the minds
 of Lisp and Scheme programmers for many years. However, despite all
@@ -277,7 +277,7 @@ a X<tailcall> tailcall, and is important in PIR. Here's a contrived
 example in pseudocode:
 
  call add_two(5)
- 
+
  subroutine add_two(value)
 	 value = add_one(value)
 	 return add_one(value)
@@ -327,7 +327,7 @@ programming language, where this kind of construct is not uncommon:
           // x, y, and z are all visible here
       }
       // only x and y are visible here
-  {
+  }
 
 The code above illustrates this idea perfectly without having to get into a
 detailed and convoluted example: In the inner block, we define the variable
@@ -349,7 +349,7 @@ we can use lexical subroutines to simulate this behavior that HLLs require:
       'MyInner'()
       # only x and y are visible here
   .end
-  
+
   .sub 'MyInner' :outer('MyOuter')
       .lex int z
       #x, y, and z are all visible here
@@ -365,7 +365,7 @@ multisubs, which we will discuss soon>, we can use the C<:subid> flag on the
 outer subroutine to give it a different--and unique--name that the lexical
 subroutines can reference in their C<:outer> declarations. Within lexical
 subroutines, the C<.lex> command defines a local variable that follows these
-scoping rules. 
+scoping rules.
 
 Sound confusing? It's not so bad. The basics are that we use C<:outer> to
 define a lexically-scoped subroutine, and we use C<.lex> to define lexically
@@ -664,14 +664,14 @@ be used directly in PIR code as methods, in addition to being used by Parrot
 as VTABLE interfaces. This means we can have the following:
 
   .namespace [ "MyClass" ]
-  
+
   .sub 'ToString' :vtable('get_string') :method
       $S0 = "hello!"
       .return($S0)
   .end
-  
+
   .namespace [ "OtherClass" ]
-  
+
   .local pmc myclass = new "MyClass"
   say myclass                 # say converts to string internally
   $S0 = myclass               # Convert to a string, store in SS0
@@ -748,7 +748,7 @@ MultiSubs (also called "Multis") must all differ from one another in
 the number and/or type of arguments passed to the function. Having
 two multisubs with the same function signature could result in a
 parsing error, or the later function could overwrite the former one
-in the multi. 
+in the multi.
 
 Multisubs are defined like this:
 
@@ -830,7 +830,7 @@ a multi is used.
 #  Tables
 #  ......
 #  A 2x2 table with top header row looks like this:
-#  
+#
 #  =begin table An Example Table
 #  =headrow
 #  =row

@@ -1,4 +1,4 @@
-=pod 
+=pod
 
 =head0 Parrot Intermediate Representation
 
@@ -16,7 +16,7 @@ the Parrot developers specifically want to keep in that way for a
 number of reasons. PASM, the Parrot assembly language on which PIR is
 based, is discussed in more detail in A<CHP-5>Chapter 5.
 
-X<.pir files> As a convention, files containing pure PIR code generally 
+X<.pir files> As a convention, files containing pure PIR code generally
 have a F<.pir> extension. Parrot will treat a file with any other
 extension, besides F<.pasm> as a PIR file in mixed mode. This means that
 the file can contain PIR and PASM code interchangably, with a few caveats
@@ -31,7 +31,7 @@ implementation. The other PIR compiler, PIRC, has it's own documentation
 that is slowly maturing. This is a useful source of information too. The
 test suite in F<imcc/t> shows examples of proper working code. In fact,
 the test suite is the definitive PIR resource, because it shows how PIR
-I<actually works>, even when the documentation may be out of date. 
+I<actually works>, even when the documentation may be out of date.
 
 =head1 Statements
 
@@ -131,7 +131,7 @@ in the code with numeric constants.
   $N0 = 3.14     # Numbers can have a decimal point
   $N1 = 4        # ...or they don't
   $N2 = -1.2e+4  # Numbers can also use scientific notation.
-  
+
 String literals are enclosed in single or double-quotes:
 
   $S0 = "This is a valid literal string"
@@ -147,12 +147,12 @@ quotes:
 Or, if you need more flexibility, you can use a heredoc:
 
   $S2 = << "End_Token"
-  
+
   This is a multi-line string literal. Notice that
   it doesn't use quotation marks. The string continues
   until the ending token (the thing in quotes next to
   the << above) is found.
-  
+
   End_Token
 
 =head2 Named Variables
@@ -274,7 +274,7 @@ about it for now. We will talk more about PASM and it's instruction
 set in X<CHP-5> Chapter 5.
 
 PIR also provides automatic assignment operators such as C<+=>, C<-=>,
-and C<<< >>= >>>. These operators help programmers to peform common
+and C<<< >>= >>>. These operators help programmers to perform common
 manipulations on a data value in place, and save a few keystrokes while
 doing them.
 
@@ -293,8 +293,8 @@ times. Labels and jump operations (which we will discuss a little bit
 later) are one of the primary methods to change control flow in PIR, so
 it is well worth understanding.
 
-PIR code can contain both local and global labels. Global labels start 
-with an underscore. The name of a global label has to be unique since 
+PIR code can contain both local and global labels. Global labels start
+with an underscore. The name of a global label has to be unique since
 it can be called at any point in the program. Local labels start with a
 letter. A local label is accessible only in the function where it is
 defined. The name has to be unique within that function, but the same
@@ -358,7 +358,7 @@ at the main function and continues until the end of that function only.
 If you want to do more stuff if your program, you will need to call
 other functions explicitly.
 
-A<CHP-04>Chapter 4 goes into much more detail about compilation units 
+A<CHP-04>Chapter 4 goes into much more detail about compilation units
 and their uses.
 
 =head1 Flow Control
@@ -374,9 +374,9 @@ virtual processor. High level control structures are invariably linked
 to the language in which they are used, so any attempt by Parrot to
 provide these structures would work for some languages but not by
 others. The only way to make sure all languages and their control
-structures can be equally accomdated is to simply give them the most
+structures can be equally accomodated is to simply give them the most
 simple and fundamental building blocks to work with. Language
-agnosticism is an important design goal in Parrot. 
+agnosticism is an important design goal in Parrot.
 
 X<goto instruction (PIR)>
 The most basic branching instruction is the unconditional branch:
@@ -561,7 +561,7 @@ these libraries in more detail in A<CHP-6> "PIR Standard Library".
 #  Tables
 #  ......
 #  A 2x2 table with top header row looks like this:
-#  
+#
 #  =begin table An Example Table
 #  =headrow
 #  =row

@@ -179,7 +179,7 @@ the exceptions system, or the concurrency scheduler.
 
 =item Compiler Developer
 
-Compiler Develoeprs develop and maintain one or more Parrot front-end
+Compiler Developers develop and maintain one or more Parrot front-end
 compilers such as IMCC, PIRC, PGE and TGE.
 
 =item High Level Language Developer
@@ -363,7 +363,7 @@ Parrot information you need to get started:
 #  Tables
 #  ......
 #  A 2x2 table with top header row looks like this:
-#  
+#
 #  =begin table An Example Table
 #  =headrow
 #  =row
