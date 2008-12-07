@@ -217,19 +217,9 @@ a C<Match> object and obtains source/position information from that.
 
 .sub 'node' :method
     .param pmc node
-    $I0 = isa node, ['PAST';'Node']
-    if $I0 goto clone_past
-  clone_pge:
-    $S0 = node
-    $I0 = node.'from'()
-    self['source'] = $S0
-    self['pos'] = $I0
-    .return ()
-  clone_past:
-    $P0 = node['source']
-    $P1 = node['pos']
-    self['source'] = $P0
-    self['pos'] = $P1
+     ## Do nothing for now.  When we're in a better position to
+     ## handle source line information (RT #43269 and others)
+     ## we'll figure out what to do here.
     .return ()
 .end
 
