@@ -73,8 +73,8 @@ loop:
     a = 0
     a = new 'STMRef', a
 
-    _incr = global "incr"
-    _waiter = global "waiter"
+    _incr = find_global "incr"
+    _waiter = find_global "waiter"
 
     wThr = new 'ParrotThread'
     wThr.'run_clone'(_waiter, a)
@@ -139,8 +139,8 @@ loop:
     a = ""
     a = new 'STMRef', a
 
-    _incr = global "incr"
-    _waiter = global "waiter"
+    _incr = find_global "incr"
+    _waiter = find_global "waiter"
 
     wThr = new 'ParrotThread'
     wThr.'run_clone'(_waiter, a)

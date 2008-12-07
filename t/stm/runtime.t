@@ -100,7 +100,7 @@ pir_output_is( $choice_test . <<'CODE', <<'OUTPUT', "choice (one thread)" );
     $P0 = new 'STMVar', $P0
     values[1] = $P0
     .local pmc _thread_main
-    _thread_main = global 'do_choice'
+    _thread_main = find_global 'do_choice'
 
     $I0 = _thread_main(values)
     $I1 = _thread_main(values)
@@ -141,7 +141,7 @@ SKIP: {
     .local pmc transaction
     .local pmc real_sub
     transaction = get_hll_global ['STM'], 'transaction'
-    real_sub = global '_wakeup_func'
+    real_sub = find_global '_wakeup_func'
     transaction(real_sub, values)
     .return (0)
 .end
@@ -170,12 +170,12 @@ SKIP: {
     $P0 = new 'STMVar', $P0
     values[1] = $P0
     .local pmc _thread_main
-    _thread_main = global 'do_choice'
+    _thread_main = find_global 'do_choice'
     thread_one.'run_clone'(_thread_main, values)
     thread_two.'run_clone'(_thread_main, values)
     thread_three.'run_clone'(_thread_main, values)
     .local pmc _wakeup_thread_main
-    _wakeup_thread_main = global 'wakeup_func'
+    _wakeup_thread_main = find_global 'wakeup_func'
     wakeup_thread.'run_clone'(_wakeup_thread_main, values)
     $I0 = thread_one.'join'()
     $I1 = thread_two.'join'()
@@ -288,7 +288,7 @@ do_retry:
     .local pmc transaction
     .local pmc real_sub
     transaction = get_hll_global ['STM'], 'transaction'
-    real_sub = global '_wakeup_func'
+    real_sub = find_global '_wakeup_func'
     transaction(real_sub, what)
     .return (0)
 .end
@@ -392,7 +392,7 @@ loop:
     .param int blockp
 
     $P0 = get_hll_global ['STM'], 'transaction'
-    $P1 = global '_fetchHead'
+    $P1 = find_global '_fetchHead'
     .tailcall $P0($P1, self, removep, blockp)
 .end
 
@@ -447,7 +447,7 @@ normal_return:
     .param int blockp
 
     $P0 = get_hll_global ['STM'], 'transaction'
-    $P1 = global '_addTail'
+    $P1 = find_global '_addTail'
     $P2 = $P0($P1, self, what, blockp)
     .return ($P2)
 .end
@@ -550,8 +550,8 @@ not_okay:
     $P0 = get_hll_global ['STMQueue'], '__onload'
     $P0()
 
-    _add = global "adder"
-    _remove = global "remover"
+    _add = find_global "adder"
+    _remove = find_global "remover"
 
     addThread = new 'ParrotThread'
     removeThread = new 'ParrotThread'
@@ -605,7 +605,7 @@ fail:
     queue = $P0.'new'('length' => SIZE)
 
     $P0 = get_hll_global ['STM'], 'transaction'
-    $P1 = global '_test'
+    $P1 = find_global '_test'
     $P0($P1, queue)
 
     print "ok\n"

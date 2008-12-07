@@ -304,15 +304,15 @@ pir_output_like(
      bounds 1
      compares = new 'Integer'
      compares = 0
-     global "compares" = compares
-    cmp_fun = global "cmp_fun"
+     store_global "compares", compares
+    cmp_fun = find_global "cmp_fun"
      sort_ar()
      sort_ar(cmp_fun)
 .end
 .sub sort_ar
     .param pmc cmp_fun :optional
     .local pmc compares
-    compares = global "compares"
+    compares = find_global "compares"
     compares = 0
     .local pmc ar
     new ar, 'FixedPMCArray'
@@ -345,7 +345,7 @@ done:
     .param pmc b
     $I0 = cmp a, b
     .local pmc compares
-    compares = global "compares"
+    compares = find_global "compares"
     inc compares
     .begin_return
     .set_return $I0

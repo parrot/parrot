@@ -923,7 +923,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "optional returns, void ret" );
 .sub main :main
     .local pmc f
     $I0 = 99
-    f = global "foo"
+    f = find_global "foo"
     .begin_call
     .call f
     .get_result   $P0 :optional
