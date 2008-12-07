@@ -47,7 +47,7 @@
 
 .sub 'VERSION' :method
     .local pmc version
-    version= global 'VERSION'
+    version= get_global 'VERSION'
     .return( version )
 .end
 

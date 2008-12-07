@@ -709,7 +709,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %token <t> SHR_ASSIGN SHL_ASSIGN SHR_U_ASSIGN
 %token <t> SHIFT_LEFT SHIFT_RIGHT INTV FLOATV STRINGV PMCV LOG_XOR
 %token <t> RELOP_EQ RELOP_NE RELOP_GT RELOP_GTE RELOP_LT RELOP_LTE
-%token <t> GLOBALOP RESULT RETURN TAILCALL YIELDT GET_RESULTS
+%token <t> RESULT RETURN TAILCALL YIELDT GET_RESULTS
 %token <t> POW SHIFT_RIGHT_U LOG_AND LOG_OR
 %token <t> COMMA ESUB DOTDOT
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
@@ -1632,10 +1632,6 @@ assignment:
             { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 3, $1, $4, $6); }
    | target '=' NEW var '[' keylist ']'
             { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 3, $1, $4, $6); }
-   | target '=' GLOBALOP string
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "find_global", 2, $1, $4);}
-   | GLOBALOP string '=' var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "store_global", 2, $2, $4); }
        /* NEW is here because it is both PIR and PASM keywords so we
         * have to handle the token here (or badly hack the lexer). */
    | NEW target COMMA var

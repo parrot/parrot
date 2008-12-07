@@ -365,7 +365,6 @@ SP              [ ]
 "int"                         return INTV;
 "num"                         return FLOATV;
 "new"                         return NEW;
-"global"                      return GLOBALOP;
 "pmc"                         return PMCV;
 "string"                      return STRINGV;
 "<<"                          return SHIFT_LEFT;

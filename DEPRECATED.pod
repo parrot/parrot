@@ -86,11 +86,6 @@ one or both of these flags.
 
 =over 4
 
-=item * C<global> keyword [post 0.6.4]
-
-See RT #48016
-and RT #48018.
-
 =item * C<#line> [post 0.6.4]
 
 Will be replaced by C<.line> to be more consistent with other PIR syntax.
