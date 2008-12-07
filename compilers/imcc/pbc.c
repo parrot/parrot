@@ -81,8 +81,9 @@ static int add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))
 static int add_const_table(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static int add_const_table_key(PARROT_INTERP, PMC *key)
-        __attribute__nonnull__(1);
+static int add_const_table_key(PARROT_INTERP, ARGIN(PMC *key))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static int add_const_table_pmc(PARROT_INTERP, PMC *pmc)
         __attribute__nonnull__(1);
@@ -306,7 +307,7 @@ Adds a key to the const table, returning its position.
 */
 
 static int
-add_const_table_key(PARROT_INTERP, PMC *key)
+add_const_table_key(PARROT_INTERP, ARGIN(PMC *key))
 {
     int newitem = add_const_table(interp);
 

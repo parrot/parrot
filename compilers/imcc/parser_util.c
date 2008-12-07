@@ -65,6 +65,10 @@ static void * imcc_compile_file(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*error_message);
 
+static void imcc_destroy_macro_values(ARGMOD(void *value))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*value);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static const char * try_rev_cmp(ARGIN(const char *name), ARGMOD(SymReg **r))
@@ -87,10 +91,6 @@ static Instruction * var_arg_ins(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*r);
-
-static void imcc_destroy_macro_values(ARGIN(void *value))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*value);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -1485,7 +1485,7 @@ A callback for parrot_chash_destroy_values() to free all macro-allocated memory.
 */
 
 static void
-imcc_destroy_macro_values(void *value)
+imcc_destroy_macro_values(ARGMOD(void *value))
 {
     macro_t *m = (macro_t *)value;
     int      i;

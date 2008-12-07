@@ -71,7 +71,9 @@ static char * add_ns(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static int int_overflows(const SymReg *r);
+static int int_overflows(ARGIN(const SymReg *r))
+        __attribute__nonnull__(1);
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static SymReg * mk_pmc_const_2(PARROT_INTERP,
@@ -735,7 +737,7 @@ _mk_const(ARGMOD(SymHash *hsh), ARGIN(const char *name), int t)
 }
 
 static int
-int_overflows(const SymReg *r)
+int_overflows(ARGIN(const SymReg *r))
 {
     INTVAL i;
     errno = 0;
