@@ -468,6 +468,22 @@ erase the contents of the array and hash components.
 
 /*
 
+=item C<STRING get_string()>
+
+Return a string representation of the hash, showing class
+and memory address.
+
+=cut
+
+*/
+
+    VTABLE STRING *get_string() {
+        STRING *classname = VTABLE_name(INTERP, SELF);
+        return Parrot_sprintf_c(INTERP, "%S[0x%x]", classname, SELF);
+    }
+
+/*
+
 =back
 
 =head2 Methods

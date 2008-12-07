@@ -13,14 +13,9 @@ and opcode syntax tree (POST) nodes in the Parrot Compiler Toolkit.
 
 .sub 'onload' :anon :load :init
     ##   create the PCT::Node base class
-    ##   FIXME: Eventually we want this to be a subclass of
-    ##   Capture, but as of now Capture isn't working so we
-    ##   use the Capture_PIR class for now.
-    load_bytecode 'Parrot/Capture_PIR.pbc'
-
     .local pmc p6meta
     p6meta = new 'P6metaclass'
-    p6meta.'new_class'('PCT::Node', 'parent'=>'Capture_PIR')
+    p6meta.'new_class'('PCT::Node', 'parent'=>'Capture')
 
     $P0 = box 10
     set_hll_global ['PCT';'Node'], '$!serno', $P0
@@ -316,6 +311,17 @@ method. If so, return 1, else return 0.
     $P0 = self.'HOW'()
     $I0 = $P0.'isa'(self, type)
     .return ($I0)
+.end
+
+
+=item VTABLE get_bool()
+
+Return true since the node is defined.
+
+=cut
+
+.sub '' :vtable('get_bool') :method
+    .return (1)
 .end
 
 
