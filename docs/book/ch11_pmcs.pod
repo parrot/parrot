@@ -79,7 +79,7 @@ for them:
       /* Attributes defined here */
 
       /* VTABLE and METHODs defined here. */
-  
+
   }
 
 The C<extends> keyword is optional, but allows us to specify that this
@@ -116,7 +116,7 @@ Here's an example:
   pmclass Foo {
     ATTR INTVAL bar;
 	ATTR PMC baz;
-	
+
 	...
   }
 
@@ -128,7 +128,7 @@ using a macro with the same name as the PMC, but all upper-case:
   attrs->baz = pmc_new( ... )     /* It's a PMC */
 
 Notice how the type name of the attributes structure is C<Parrot_>,
-followed by the name of the PMC with the same capitalzation as is used
+followed by the name of the PMC with the same capitalization as is used
 in the C<pmclass> definition, followed by C<_Attributes>. The macro to
 return this structure is C<PARROT_> followed by the name of the PMC in
 all caps.
@@ -294,7 +294,7 @@ cannot define.
 #  Tables
 #  ......
 #  A 2x2 table with top header row looks like this:
-#  
+#
 #  =begin table An Example Table
 #  =headrow
 #  =row

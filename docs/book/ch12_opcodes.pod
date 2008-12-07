@@ -9,7 +9,7 @@ but is in fact the opcode. Opcodes in PASM, like opcodes in other assembly langu
 are individual instructions that implement low-level operations in Parrot N<In the
 world of microprocessors, the word "opcode" typically refers to the numeric identifier
 for each instructions. The human-readable word used in the associated assembly language
-is called the "mnemonic". An assembler, among other tasks, is responsble for converting
+is called the "mnemonic". An assembler, among other tasks, is responsible for converting
 mnemonics into opcodes for execution. In Parrot, instead of referring to an instruction
 by different names depending on what form it's in, we just call them all "opcodes">. Of
 course the list of things that qualify as "low-level" in Parrot can be pretty advanced
@@ -35,8 +35,8 @@ Parrot has multiple runcores. Some are useful for particular maintenance tasks, 
 only available as optimizations in certain compilers, some are intended for general use,
 and some are just interesing flights of fancy with no practical benefits. One runcore that
 we've already seen is the debugging runcore which prompts the user for commands between
-executing each opcode. Another valuable mainteance runcore is the GC dubug core (which runs a
-full sweep of the garbage collector between each opcode). 
+executing each opcode. Another valuable maintenance runcore is the GC dubug core (which runs a
+full sweep of the garbage collector between each opcode).
 
 =over 4
 
@@ -47,7 +47,7 @@ at the C level. Each function is called, and returns the address of the next opc
 to be called by the core. The slow core performs bounds checking to ensure that the next
 opcode to be called is properly in bounds. Because of this modular approach where opcodes
 are treated as separate executable entities many other runcores, especially diagnostic and
-maintenance cores are based on this design. 
+maintenance cores are based on this design.
 
 =item* Fast Core
 
@@ -57,7 +57,7 @@ updating that the slow core does.
 =item* Computed Goto Core
 
 I<Computed Goto> is a feature of some C compilers where a label is treated as a piece of
-data that can be stored in an array. Each opcode is simply a lable in a very large
+data that can be stored in an array. Each opcode is simply a label in a very large
 function, and the labels are stored in an array. Calling an opcode is as easy as taking
 that opcode's number as the index of the label array, and calling the associated label.
 Sound complicated? It is a little, especially to C programmers who are not used to these
@@ -105,7 +105,7 @@ Opcode script. There are a few neat additions that make writing Opcodes easier.
 
 =head3 Opcode Control Flow
 
-=head2 The Opcode Compiler 
+=head2 The Opcode Compiler
 
 =head2 Dynops
 
@@ -176,7 +176,7 @@ Opcode script. There are a few neat additions that make writing Opcodes easier.
 #  Tables
 #  ......
 #  A 2x2 table with top header row looks like this:
-#  
+#
 #  =begin table An Example Table
 #  =headrow
 #  =row

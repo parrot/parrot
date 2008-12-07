@@ -370,7 +370,7 @@ X<PASM (Parrot assembly language);math operations;binary>
 Binary opcodes have two source arguments and a destination argument.
 As we mentioned before, most binary math opcodes have a two-argument
 form in which the first argument is both a source and the destination.
-Parrot provides C<add>X<add opcode (PASM)> (addition), 
+Parrot provides C<add>X<add opcode (PASM)> (addition),
 C<sub>X<sub opcode (PASM)> (subtraction), C<mul>X<mul opcode (PASM)>
 (multiplication), C<div>X<div opcode (PASM)> (division), and C<pow>X<pow
 opcode (PASM)> (exponent) opcodes, as well as two different modulus
@@ -1101,7 +1101,7 @@ arguments. They're often used to make decisions on control flow.
 Logical operations are implemented for integers and PMCs. Numeric
 values are false if they're 0, and true otherwise. Strings are false
 if they're the empty string or a single character "0", and true
-otherwise. PMCs are true when their 
+otherwise. PMCs are true when their
 C<get_bool>X<get_bool vtable method (PASM)> vtable method returns a
 nonzero value.
 
@@ -1142,7 +1142,7 @@ true:
   not P0, P1
 
 The X<bitwise;opcodes (PASM)> bitwise opcodes operate on their values
-a single bit at a time. C<band>X<band opcode (PASM)>, 
+a single bit at a time. C<band>X<band opcode (PASM)>,
 C<bor>X<bor opcode (PASM)>, and C<bxor>X<bxor opcode (PASM)> return a
 value that is the logical AND, OR, or XOR of each bit in the source
 arguments. They each take a destination register and two source
@@ -1210,7 +1210,7 @@ Z<CHP-5-SECT-3.1.1>
 
 X<PMCs (Parrot Magic Cookies);arrays>
 The C<Array>X<Array PMC> PMC is an ordered aggregate with
-zero-baed integer keys. The syntax for X<keyed access to PMCs> keyed access to a
+zero-based integer keys. The syntax for X<keyed access to PMCs> keyed access to a
 PMC puts the key in square brackets after the register name:
 
   new P0, "Array"     # obtain a new array object
@@ -1234,7 +1234,7 @@ length of an array may have changed. The change would separate array
 allocation (how much storage the array provides) from the actual
 element count. The currently proposed syntax uses C<set> to set or
 retrieve the allocated size of an array, and an C<elements>
-X<elements opcode (PASM)> opcode to set or retreive the count of
+X<elements opcode (PASM)> opcode to set or retrieve the count of
 elements stored in the array.
 
   set P0, 100         # allocate store for 100 elements
@@ -1731,7 +1731,7 @@ elements can be stored either by name or by numeric index.
 Z<CHP-5-SECT-6.2.1>
 
 To store a lexical variable in the current scope pad, use C<store_lex>.
-Likewise, use C<find_lex> to retrieve a variable from the current pad pad.
+Likewise, use C<find_lex> to retrieve a variable from the current pad.
 
   new P0, "Int"            # create a variable
   set P0, 10               # assign value to it
@@ -2494,9 +2494,9 @@ Parrot has a compiler registered for that type of file:
     invokecc
     end
 
-Subroutines marked with C<@LOAD> run as soon as they're loaded (before
+Subroutines marked with C<:load> run as soon as they're loaded (before
 C<load_bytecode> returns), rather than waiting to be called. A
-subroutine marked with C<@MAIN> will always run first, no matter what
+subroutine marked with C<:main> will always run first, no matter what
 name you give it or where you define it in the file.
 
   # file3.pasm
@@ -3140,7 +3140,7 @@ This example prints out:
 #  Tables
 #  ......
 #  A 2x2 table with top header row looks like this:
-#  
+#
 #  =begin table An Example Table
 #  =headrow
 #  =row
