@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 98;
+use Parrot::Test tests => 93;
 
 =head1 NAME
 
@@ -1939,91 +1939,6 @@ CODE
 ok
 OUTPUT
 
-## Named
-pir_output_is( <<'CODE', <<'OUTPUT', " 'foo' => d syntax for parameters" );
-.sub main :main
-        foo ('a'=>20,'b'=>10)
-        print "ok\n"
-
-        end
-.end
-
-.sub foo
-        .param int "b" => d
-        .param int "a" => c
-
-        print d
-        print ' '
-        print c
-        print "\n"
-
-        .return ()
-.end
-CODE
-10 20
-ok
-OUTPUT
-
-## Named
-pir_output_is( <<'CODE', <<'OUTPUT', " 'foo' => d syntax for target list" );
-.sub main :main
-        ("b" => $I0 , "a" => $I1) = foo( "b" => 10 , "a" => 20)
-        print $I0
-        print ' '
-        print $I1
-        print "\n"
-        print "ok\n"
-
-        end
-.end
-
-.sub foo
-        .param int "a" => c
-        .param int "b" => d
-
-        print d
-        print ' '
-        print c
-        print "\n"
-
-        .return ( 10 :named("a"), 20 :named("b"))
-.end
-CODE
-10 20
-20 10
-ok
-OUTPUT
-
-## Named
-pir_output_is( <<'CODE', <<'OUTPUT', " 'foo' => d syntax for return" );
-.sub main :main
-        ("b" => $I0 , "a" => $I1) = foo( "b" => 10 , "a" => 20)
-        print $I0
-        print ' '
-        print $I1
-        print "\n"
-        print "ok\n"
-
-        end
-.end
-
-.sub foo
-        .param int "a" => c
-        .param int "b" => d
-
-        print d
-        print ' '
-        print c
-        print "\n"
-
-        .return ( "a" => 10, "b" => 20 )
-.end
-CODE
-10 20
-20 10
-ok
-OUTPUT
-
 pir_error_output_like( <<'CODE', <<'OUTPUT', "named => pos passing" );
 .sub main :main
         foo( "b" => 10 , "a" => 20)
@@ -2048,25 +1963,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "named optional - set" );
 .sub foo
         .param int d :named('b')
         .param int c :named('a') :optional
-        print d
-        print ' '
-        print c
-        print "\n"
-.end
-CODE
-10 20
-ok
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "named optional - set" );
-.sub main :main
-        foo ('a'=>20,'b'=>10)
-        print "ok\n"
-.end
-
-.sub foo
-        .param int 'b' => d
-        .param int 'a' => c  :optional
         print d
         print ' '
         print c
@@ -2156,21 +2052,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "named flat/slurpy" );
 CODE
 20 10
 ok
-OUTPUT
-
-pir_error_output_like( <<'CODE', <<'OUTPUT', "param .. 'a' => v :named('foo')" );
-.sub main :main
-        foo( "b" => 10, "a" => 20)
-        print "never\n"
-        end
-.end
-
-.sub foo
-        .param int "a" => c :named("foo")
-        .param int "b" => d
-.end
-CODE
-/Named parameter with more than one name/
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "param .. 'a' => v :named('foo')" );
