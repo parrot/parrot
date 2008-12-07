@@ -1999,7 +1999,7 @@ Create a new instruction node, and initialize the opcode and opinfo on that
 node. This function can be used to create an instruction of which the signature
 is known beforehand, without the need to compute the signature during runtime.
 This is useful for generating special subroutine instructions, such as
-C<get_params> etc.
+C<get_params_pc> etc.
 
 =cut
 
@@ -2009,6 +2009,8 @@ new_sub_instr(lexer_state * const lexer, int opcode, char const * const opname, 
     new_statement(lexer, opname);
     CURRENT_INSTRUCTION(lexer)->opinfo = &lexer->interp->op_info_table[opcode];
     CURRENT_INSTRUCTION(lexer)->opcode = opcode;
+
+    /* XXX how to calculate size of var-arg ops? */
 
     /* count number of ints needed to store this instruction in bytecode */
     lexer->codesize += CURRENT_INSTRUCTION(lexer)->opinfo->op_count;
@@ -2033,12 +2035,9 @@ update_op(NOTNULL(lexer_state * const lexer), NOTNULL(instruction * const instr)
      */
     if (instr->opinfo)
         lexer->codesize -= instr->opinfo->op_count;
-    /*
-    else
-        fprintf(stderr, "instr (%s)had no opinfo yet...\n", instr->opname);
-    */
+    /* else the instruction was already set; decrement the codesize, as it was added already */
 
-    /* now get the */
+    /* now get the opinfo structure, update the name, and update the opcode. */
     instr->opinfo = &lexer->interp->op_info_table[newop];
     instr->opname = instr->opinfo->full_name;
     instr->opcode = newop;
@@ -2079,6 +2078,16 @@ save_global_reference(lexer_state * const lexer, instruction * const instr, char
 convert_inv_to_instr(lexer_state * const lexer, invocation * const inv)>
 
 Convert an C<invocation> structure into a series of instructions.
+
+XXX Some of the conversion should be done during emit_pbc(), because only at that
+point is there a bytecode object around, in which PMCs can be emitted.
+Subs are stored as PMCs, and we need to look up the PMC constant and emit
+its index as an operand. Also, the first operands of the special PCC instructions
+must be generated once the bytecode object is around, because they use a FixedIntegerArray
+to encode flags/types of the rest of the operands.
+
+One solution would be to mark these instructions, and fix them during emitting bytecode.
+This needs more thought.
 
 =cut
 
@@ -2239,10 +2248,6 @@ fixup_local_labels(lexer_state * const lexer) {
         return;
 
     do {
-/*
-        expression *label = NULL;
-*/
-
         iter = iter->next; /* init pointer to first instruction */
 
         /* depending on what kind of branching instruction, get the right operand
@@ -2260,11 +2265,11 @@ fixup_local_labels(lexer_state * const lexer) {
             /* Note that since oplabelbits has at least 1 bit set (otherwise it wouldn't
              * have been evaluated as "true" in the if statement above), we can be
              * sure there's at least one operand. Don't do silly tests here anymore.
+             * (hence the do-while statement, no initial test.)
              */
             int flag = 0;
 
             do {
-
                 operand = operand->next;
 
                 if (TEST_FLAG(iter->oplabelbits, BIT(flag))) {
@@ -2273,7 +2278,6 @@ fixup_local_labels(lexer_state * const lexer) {
                     unsigned     offset     = find_local_label(lexer, labelid);
                     unsigned     curr_instr = iter->offset;
 
-                    /* fprintf(stderr, "operand %d is a label\n", BIT(flag)); */
                     /* convert the label identifier into a real label object */
                     operand->expr.l = new_label(lexer, labelid, offset - curr_instr);
                     operand->type   = EXPR_LABEL;
@@ -2285,7 +2289,6 @@ fixup_local_labels(lexer_state * const lexer) {
             while (operand != iter->operands);
 
         }
-
 
     }
     while (iter != lexer->subs->statements); /* iterate over all instructions */
@@ -2361,10 +2364,21 @@ into their offsets.
 void
 close_sub(lexer_state * const lexer) {
     int opcode;
+
+    /* a :main-marked sub ends with the "end" instruction;
+     * otherwise it's this pair:
+     *
+     *    set_returns_pc
+     *    returncc
+     */
+
+
     if (TEST_FLAG(lexer->subs->flags, SUB_FLAG_MAIN)) {
         new_sub_instr(lexer, PARROT_OP_end, "end");
     }
     else {
+        /* XXX if there was already a return sequence explicitly, we shouldn't do this. */
+
         new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc");
         new_sub_instr(lexer, PARROT_OP_returncc, "returncc");
     }
