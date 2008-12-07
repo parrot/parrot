@@ -31,7 +31,7 @@ the appropriate emit functions are used. Options are:
 /* the order of these letters match with the pir_type enumeration.
  * These are used for human-readable PASM output.
  */
-static char const pir_register_types[5] = {'I', 'N', 'S', 'P', '?'};
+static char const pir_register_types[5] = {'I', 'S', 'P', 'N', '?'};
 
 static void emit_pir_statement(lexer_state * const lexer, subroutine * const sub);
 static void emit_pir_instruction(lexer_state * const lexer, instruction * const instr);

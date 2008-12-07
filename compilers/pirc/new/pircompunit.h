@@ -13,16 +13,15 @@
 #ifndef PARROT_PIR_PIRCOMPUNIT_H_GUARD
 #define PARROT_PIR_PIRCOMPUNIT_H_GUARD
 
-/* the 4 parrot types; use explicit values, they are used to index an array,
- * so this way we can be sure that works properly.
- * (don't assume enum's start counting at 0).
+/* the 4 parrot types; use explicit values that match the values in
+ * PDD03_calling_conventions.pod.
  */
 typedef enum pir_types {
     INT_TYPE     = 0,
-    NUM_TYPE     = 1,
-    STRING_TYPE  = 2,
-    PMC_TYPE     = 3,
-    UNKNOWN_TYPE = 4  /* for uninitialized types */
+    STRING_TYPE  = 1,
+    PMC_TYPE     = 2,
+    NUM_TYPE     = 3,
+    UNKNOWN_TYPE = 4  /* for uninitialized types, handy to detect missing initializations. */
 
 } pir_type;
 

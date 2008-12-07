@@ -515,10 +515,10 @@ static int get_opinfo(yyscan_t yyscanner);
 static void undeclared_symbol(yyscan_t yyscanner, lexer_state * const lexer,
                               char const * const symbol);
 
-/* names of the Parrot types. Note that pir_type_namwes is global,
+/* names of the Parrot types. Note that pir_type_names is (file-)global,
  * but it's read-only, so that's fine.
  */
-static char const * const pir_type_names[] = { "int", "num", "string", "pmc" };
+static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
 
 
 /* enable debugging of generated parser */
@@ -4852,6 +4852,13 @@ yyreturn:
 
 
 
+
+/* the order of these letters match with the pir_type enumeration.
+ * These are used for generating the full opname (set I0, 10 -> set_i_ic).
+ */
+static char const type_codes[5] = {'i', 's', 'p', 'n', '?'};
+
+
 /*
 
 =head1 FUNCTIONS
@@ -5957,10 +5964,6 @@ get_signature_length(NOTNULL(expression * const e)) {
 }
 
 
-/* the order of these letters match with the pir_type enumeration.
- * These are used for generating the full opname (set I0, 10 -> set_i_ic).
- */
-static char const type_codes[5] = {'i', 'n', 's', 'p', '?'};
 
 
 /*
