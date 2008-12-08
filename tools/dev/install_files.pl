@@ -202,8 +202,10 @@ while (<>) {
         # --pkgconfigdir option.
         $dest = File::Spec->catdir( $options{libdir}, 'pkgconfig', $dest );
     }
+    elsif ( /\[library]/ ) {
+        $dest =~ s/^runtime/$options{libdir}/;
+    }
     else {
-        $dest =~ s/^runtime/lib/ if /\[library]/;
         $dest = File::Spec->catdir( $options{prefix}, $dest );
     }
 
