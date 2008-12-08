@@ -113,12 +113,15 @@ PARROT_CAN_RETURN_NULL
 static subs_t * find_global_label(PARROT_INTERP,
     ARGIN(const char *name),
     ARGIN(const subs_t *sym),
-    ARGOUT(int *pc))
+    ARGOUT(int *pc),
+    ARGOUT(int *sub_id))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
         FUNC_MODIFIES(*pc);
+        FUNC_MODIFIES(*sub_id);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -656,7 +659,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static subs_t *
 find_global_label(PARROT_INTERP, ARGIN(const char *name),
-    ARGIN(const subs_t *sym), ARGOUT(int *pc))
+    ARGIN(const subs_t *sym), ARGOUT(int *pc), ARGOUT(int *subid_matched))
 {
     subs_t *s;
 
@@ -665,10 +668,12 @@ find_global_label(PARROT_INTERP, ARGIN(const char *name),
     for (s = IMCC_INFO(interp)->globals->cs->first; s; s = s->next) {
         SymReg * const r = s->unit->instructions->symregs[0];
 
+        *subid_matched = r && (r->subid && (strcmp(r->subid, name) == 0));
+
         /* if names and namespaces are matching - ok */
-        if (r && ((r->subid && (strcmp(r->subid, name) == 0))
+        if (r && ( *subid_matched 
                     || (r->name && (strcmp(r->name, name) == 0)))
-              && ((sym->unit->_namespace && s->unit->_namespace
+                && ((sym->unit->_namespace && s->unit->_namespace
                         && (strcmp(sym->unit->_namespace->name, s->unit->_namespace->name) == 0))
                     || (!sym->unit->_namespace && !s->unit->_namespace)))
             return s;
@@ -706,9 +711,10 @@ fixup_globals(PARROT_INTERP)
             for (fixup = hsh->data[i]; fixup; fixup = fixup->next) {
                 int pc, pmc_const;
                 int addr = jumppc + fixup->color;
+                int subid_matched = 0;
 
                 /* check in matching namespace */
-                subs_t *s1 = find_global_label(interp, fixup->name, s, &pc);
+                subs_t *s1 = find_global_label(interp, fixup->name, s, &pc, &subid_matched);
 
                 /*
                  * if failed change opcode:
@@ -732,7 +738,7 @@ fixup_globals(PARROT_INTERP)
                         PARROT_ASSERT(pcc_sub);
 
                         /* if the sub is multi, don't insert constant */
-                        if (pcc_sub->nmulti)
+                        if (pcc_sub->nmulti && !subid_matched)
                             s1 = NULL;
                     }
                 }

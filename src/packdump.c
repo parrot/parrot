@@ -308,13 +308,19 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                             "\tclass => %Ss,\n"
                             "\tstart_offs => %d,\n"
                             "\tend_offs => %d,\n"
-                            "\tname => '%Ss',\n"
+                            "\tname    => '%Ss',\n"
+                            "\tsubid   => '%Ss',\n"
+                            "\tmethod  => '%Ss',\n"
+                            "\tnsentry => '%Ss',\n"
                             "\tnamespace => %Ss\n"
                             "\tHLL_id => %d,\n",
                             pmc->vtable->whoami,
                             sub->start_offs,
                             sub->end_offs,
                             sub->name,
+                            sub->subid,
+                            sub->method_name,
+                            sub->ns_entry_name,
                             namespace_description,
                             sub->HLL_id);
                     break;

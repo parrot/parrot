@@ -26,7 +26,7 @@ t/compilers/imcc/syn/subflags.t  - test flags on PIR subs
     test_namespace.'export_to'(curr_namespace, exports)
 
     ##  set our plan
-    plan(25)
+    plan(27)
 
     .local pmc pmcnull
     null pmcnull
@@ -109,8 +109,23 @@ t/compilers/imcc/syn/subflags.t  - test flags on PIR subs
     pop_eh
     $I0 = isa $P70, 'Sub'
     todo($I0, 'subid4 in another ns found w/.const')
+
+    ## find multis via subid
+    .const 'Sub' $P0 = 'above'
+    $P0(3)
+    ok(1, "multi found via subid 'above'")
+    .const 'Sub' $P1 = 'below'
+    $P1('3')
+    ok(1, "multi found via subid 'below'")
 .end
 
+.sub 'xyz' :multi(Integer) :subid('above')
+    .return('xyz above')
+.end
+
+.sub 'xyz' :multi(String) :subid('below')
+    .return('xyz below')
+.end
 
 .sub 'is_same'
     .param pmc x
