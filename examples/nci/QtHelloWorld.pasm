@@ -11,7 +11,7 @@ examples/nci/QtHelloWorld.pasm - Qt Example
 
 =head1 DESCRIPTION
 
-Sample "Hello World" with Qt, via Parrot Native Call API (nci). See
+Sample "Hello World" with Qt, via Parrot Native Call Interface (nci). See
 F<docs/pdds/pdd03_calling_conventions.pod>.
 
 Qt is a multiplatform C++ GUI application framework

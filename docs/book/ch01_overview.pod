@@ -253,7 +253,7 @@ X<Spier, Robert>
 Last, but not least, is the glue that holds the project together.
 BjE<oslash>rn Hansen and Robert Spier manage the email, revision
 control, and bug-tracking systems, as well as the web sites for Parrot,
-U<http://www.parrot.org> and now U<http://www.parrot.org>. Without
+U<http://www.parrotcode.org> and now U<http://www.parrot.org>. Without
 these systems, the project would grind to a screeching halt.
 
 In the end, it is the developers themselves who hold the project
@@ -285,7 +285,7 @@ Parrot information you need to get started:
 
 =over 4
 
-=item * U<http://www.parrotcode.org>
+=item * U<http://www.parrot.org>
 
 =item * U<http://dev.perl.org/perl6>
 
