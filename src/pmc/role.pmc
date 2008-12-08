@@ -336,6 +336,24 @@ Adds the given sub PMC as a method with the given name.
         }
     }
 
+/*
+
+=item C<void remove_method(STRING *name, PMC *sub)>
+
+Removes the method with the given name.
+
+=cut
+
+*/
+    VTABLE void remove_method(STRING *name) {
+        Parrot_Role_attributes * const role = PARROT_ROLE(SELF);
+        if (VTABLE_exists_keyed_str(interp, role->methods, name))
+            VTABLE_delete_keyed_str(interp, role->methods, name);
+        else
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "No method named '%S' to remove in role '%S'.",
+                name, VTABLE_get_string(interp, SELF));
+    }
 
 /*
 
@@ -663,6 +681,20 @@ Adds the given sub PMC as a method with the given name.
 */
     METHOD add_method(STRING *name, PMC *sub) {
         VTABLE_add_method(interp, SELF, name, sub);
+    }
+
+/*
+
+=item C<void remove_method(STRING *name)>
+
+Removes the method with the given name.
+
+=cut
+
+*/
+    METHOD remove_method(STRING *name)
+    {
+        VTABLE_remove_method(interp, SELF, name);
     }
 
 
