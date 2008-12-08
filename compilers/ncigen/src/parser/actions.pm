@@ -128,9 +128,13 @@ sub countpointer($/) {
 
 sub ispointer($/, $ast) {
     if $/ {
-        if $<declarator><pointer> {
+        if ($<declarator><pointer>)  {
             $ast.pointer(1);
             $ast.pointer_cnt(countpointer($<declarator><pointer>));
+        }
+        if ($<abstract_declarator><pointer>)  {
+            $ast.pointer(1);
+            $ast.pointer_cnt(countpointer($<abstract_declarator><pointer>));
         }
     }
 

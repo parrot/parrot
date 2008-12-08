@@ -69,7 +69,7 @@ PERL6=../../parrot ../../languages/perl6/perl6.pbc
 
 all :
 	cd ../..; make perl6
-	cd ../../compilers/ncigen/; $(PERL6) gen_sqlite3.pl /usr/include/sqlite3.h > ../../ext/SQLite3/genSQLite3.pir
+	cd ../../compilers/ncigen; $(PERL6) ../../ext/SQLite3/gen_sqlite3.pl /usr/include/sqlite3.h > ../../ext/SQLite3/genSQLite3.pir
 
 test:
 	$(RM_F) test.db t/test.db

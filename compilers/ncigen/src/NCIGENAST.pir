@@ -149,6 +149,12 @@ parameter, and array/hash variables respectively.
 
 .namespace [ 'NCIGENAST';'VarDecl' ]
 
+.sub 'source' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('source', value, has_value)
+.end
+
 .sub 'type' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag

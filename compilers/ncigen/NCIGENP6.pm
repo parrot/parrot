@@ -77,7 +77,7 @@ multi sub pir(NCIGENAST::FuncDecl $node) {
     for ($node.list()) -> $x {
         $type ~= param_to_code($x);
     }
-    return ($node.name, $type);
+    return ($node.name, $type, $node.source());
 }
 
 sub format_func_decl($pirname, $cname, $type) {
@@ -99,6 +99,8 @@ sub param_to_code($node, $returncode = 0) {
           when 'long'   { return "V"; }
           when 'char'   { return "t"; }
           when 'short'  { return "V"; }
+          when 'double' { return "V"; }
+          when 'floag'  { return "V"; }
           default {
 =begin
             say "ERROR";
@@ -119,6 +121,8 @@ sub param_to_code($node, $returncode = 0) {
             when 'long'     { return "l"; }
             when 'char'     { return "c"; }
             when 'short'    { return "s"; }
+            when 'double'   { return "d"; }
+            when 'floag'    { return "f"; }
             default         { return "p"; }
         }
     }
