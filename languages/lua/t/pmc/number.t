@@ -20,7 +20,7 @@ Tests C<LuaNumber> PMC
 use strict;
 use warnings;
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 13;
 use Test::More;
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check inheritance' );
@@ -205,6 +205,42 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL & .const' );
 .end
 CODE
 3.14
+1
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', 'check box float' );
+.HLL 'Lua'
+.loadlib 'lua_group'
+.sub _main
+    .local pmc pmc1
+    box pmc1, 3.14
+    print pmc1
+    print "\n"
+    .local int bool1
+    bool1 = isa pmc1, 'LuaNumber'
+    print bool1
+    print "\n"
+.end
+CODE
+3.14
+1
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', 'check box integer' );
+.HLL 'Lua'
+.loadlib 'lua_group'
+.sub _main
+    .local pmc pmc1
+    box pmc1, -2
+    print pmc1
+    print "\n"
+    .local int bool1
+    bool1 = isa pmc1, 'LuaNumber'
+    print bool1
+    print "\n"
+.end
+CODE
+-2
 1
 OUTPUT
 

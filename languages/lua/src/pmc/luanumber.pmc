@@ -32,6 +32,7 @@ pmclass LuaNumber
     dynpmc
     group    lua_group
     hll      Lua
+    maps     Integer
     maps     Float {
 
 /*
