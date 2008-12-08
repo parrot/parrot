@@ -120,7 +120,7 @@ static subs_t * find_global_label(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
-        FUNC_MODIFIES(*pc);
+        FUNC_MODIFIES(*pc)
         FUNC_MODIFIES(*sub_id);
 
 PARROT_WARN_UNUSED_RESULT
@@ -671,7 +671,7 @@ find_global_label(PARROT_INTERP, ARGIN(const char *name),
         *subid_matched = r && (r->subid && (strcmp(r->subid, name) == 0));
 
         /* if names and namespaces are matching - ok */
-        if (r && ( *subid_matched 
+        if (r && (*subid_matched
                     || (r->name && (strcmp(r->name, name) == 0)))
                 && ((sym->unit->_namespace && s->unit->_namespace
                         && (strcmp(sym->unit->_namespace->name, s->unit->_namespace->name) == 0))

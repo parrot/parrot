@@ -76,7 +76,7 @@ qq{
     .param string signature
     .local pmc    function
 
-    function  = dlfunc lib, cname, signature 
+    function  = dlfunc lib, cname, signature
     set_global pirname, function
 .end
 
