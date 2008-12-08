@@ -427,8 +427,7 @@ Integer 2147483647.
 
 .sub '_lang_maxInt' :anon
     .local pmc res
-    new res, 'WmlsInteger'
-    set res, 2147483647
+    box res, 2147483647
     .return (res)
 .end
 
@@ -447,8 +446,7 @@ Integer -2147483648.
 
 .sub '_lang_minInt' :anon
     .local pmc res
-    new res, 'WmlsInteger'
-    set res, -2147483648
+    box res, -2147483648
     .return (res)
 .end
 
@@ -577,8 +575,7 @@ If value is less than zero (0), the function returns C<invalid>.
     $N0 = $P0
     $N0 = mul $I0
     $I0 = $N0
-    new res, 'WmlsInteger'
-    set res, $I0
+    box res, $I0
     goto L3
   L2:
     new res, 'WmlsInvalid'
@@ -654,8 +651,7 @@ Integer.
 
 .sub '_lang_characterSet' :anon
     .local pmc res
-    new res, 'WmlsInteger'
-    res = 4     # latin1
+    box res, 4     # latin1
     .return (res)
 .end
 

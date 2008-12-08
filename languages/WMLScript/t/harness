@@ -7,7 +7,7 @@ BEGIN {
     # Check that we have the WMLScript compiler.
     my $check = `wmlsc -h`;
     unless ($check =~ /wmlsc/) {
-        die "You need the WMLScript compiler in your path to build the test.\n";
+        die "You need the WMLScript compiler in your path to build the test.\n\tcpan WAP::wmls\n";
     }
 }
 

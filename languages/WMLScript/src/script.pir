@@ -183,9 +183,7 @@ PIRCODE
     pir = "  .local pmc const"
     $S0 = idx
     pir .= $S0
-    pir .= "\n  new const"
-    pir .= $S0
-    pir .= ", 'WmlsInteger'\n  set const"
+    pir .= "\n  box const"
     pir .= $S0
     pir .= ", "
     $S0 = self
@@ -207,12 +205,15 @@ PIRCODE
     pir = "  .local pmc const"
     $S0 = idx
     pir .= $S0
-    pir .= "\n  new const"
-    pir .= $S0
-    pir .= ", 'WmlsFloat'\n  set const"
+    pir .= "\n  box const"
     pir .= $S0
     pir .= ", "
-    $S0 = self
+    # need a representation that always contains a dot,
+    # unless box a WmlsInteger
+    new $P0, 'FixedPMCArray'
+    set $P0, 1
+    $P0[0] = self
+    $S0 = sprintf "%f", $P0 # need a better precision
     pir .= $S0
     pir .= "\n"
     .return (pir)
@@ -235,9 +236,7 @@ PIRCODE
     pir = "  .local pmc const"
     $S0 = idx
     pir .= $S0
-    pir .= "\n  new const"
-    pir .= $S0
-    pir .= ", 'WmlsString'\n  set const"
+    pir .= "\n  box const"
     pir .= $S0
     pir .= ", unicode:\""
     $S0 = self
@@ -282,9 +281,7 @@ PIRCODE
     pir = "  .local pmc const"
     $S0 = idx
     pir .= $S0
-    pir .= "\n  new const"
-    pir .= $S0
-    pir .= ", 'WmlsString'\n  set const"
+    pir .= "\n  box const"
     pir .= $S0
     pir .= ", \""
     $S0 = self
@@ -545,14 +542,12 @@ PIRCODE
     goto L5
   L6:
 
-    unless number_of_local_variables goto L7
-    pir .= "  new $P0, 'WmlsString'\n"
   L7:
     unless idx < number_of_variables goto L8
-    pir .= "  local"
+    pir .= "  new local"
     $S0 = idx
     pir .= $S0
-    pir .= " = $P0\n"
+    pir .= ", 'WmlsString'\n"
     inc idx
     goto L7
   L8:

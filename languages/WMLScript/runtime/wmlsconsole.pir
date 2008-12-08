@@ -53,8 +53,7 @@ Number or invalid.
     $S0 = str
     print $S0
     $I0 = length $S0
-    new res, 'WmlsInteger'
-    set res, $I0
+    box res, $I0
     goto L2
   L1:
     new res, 'WmlsInvalid'
@@ -87,8 +86,7 @@ Number or invalid.
     print $S0
     print "\n"
     $I0 = length $S0
-    new res, 'WmlsInteger'
-    set res, $I0
+    box res, $I0
     goto L2
   L1:
     new res, 'WmlsInvalid'
