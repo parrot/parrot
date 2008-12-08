@@ -44,9 +44,7 @@ noarg:
 .sub fib :method
     .param pmc n
     if n >= 2 goto rec
-    .begin_return
-    .return n
-    .end_return
+    .return (n)
 rec:
     .local pmc n1
     .local pmc n2
@@ -60,17 +58,13 @@ rec:
     r2 = self."fibB"(n2)
     n = new 'Integer'
     n = r1 + r2
-    .begin_return
-    .return n
-    .end_return
+    .return (n)
 .end
 
 .sub fibA :method
     .param pmc n
     if n >= 2 goto rec
-    .begin_return
-    .return n
-    .end_return
+    .return (n)
 rec:
     .local pmc n1
     .local pmc n2
@@ -84,9 +78,7 @@ rec:
     r2 = self."fibB"(n2)
     n = new 'Integer'
     n = r1 + r2
-    .begin_return
-    .return n
-    .end_return
+    .return (n)
 .end
 
 .namespace ["B"]
@@ -94,9 +86,7 @@ rec:
 .sub fibB :method
     .param pmc n
     if n >= 2 goto rec
-    .begin_return
-    .return n
-    .end_return
+    .return (n)
 rec:
     .local pmc n1
     .local pmc n2
@@ -110,9 +100,7 @@ rec:
     r2 = self."fibA"(n2)
     n = new 'Integer'
     n = r1 + r2
-    .begin_return
-    .return n
-    .end_return
+    .return (n)
 .end
 
 # Local Variables:
