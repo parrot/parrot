@@ -304,7 +304,7 @@ Read a line from the filehandle and return it in a string.
 #else
         UINTVAL len;
 
-        if (got_prompt) 
+        if (got_prompt)
             fprintf(stderr, "%s", prompt->strstart);
 
         if (!(PARROT_FILEHANDLE(SELF)->flags & PIO_F_LINEBUF))
@@ -316,7 +316,7 @@ Read a line from the filehandle and return it in a string.
         len = string_length(INTERP, string_result);
         if (len < 1)
             RETURN(PMC *PMCNULL);
-        while (len > 0 && 
+        while (len > 0 &&
                 (((char*)string_result->strstart)[len - 1] == '\n' ||
                  ((char*)string_result->strstart)[len - 1] == '\r')) {
             --len;
