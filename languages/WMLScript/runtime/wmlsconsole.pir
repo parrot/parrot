@@ -83,8 +83,7 @@ Number or invalid.
     $I0 = isa str, 'WmlsInvalid'
     if $I0 goto L1
     $S0 = str
-    print $S0
-    print "\n"
+    say $S0
     $I0 = length $S0
     box res, $I0
     goto L2
