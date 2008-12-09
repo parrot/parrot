@@ -301,6 +301,7 @@ SP              [ ]
 <pod>{EOL}      { IMCC_INFO(interp)->line++; }
 
 <*>".line"               return TK_LINE;
+<*>".file"               return TK_FILE;
 <INITIAL,emit>".lex"     return LEXICAL;
 ".set_arg"               return ARG;
 ".sub"                   return SUB;
