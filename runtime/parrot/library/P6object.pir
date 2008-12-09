@@ -252,6 +252,26 @@ Add C<method> with C<name> to C<parrotclass>.
 .end
 
 
+=item add_role(role, [, 'to'=>parrotclass])
+
+Add C<role> to C<parrotclass>.
+
+=cut
+
+.sub 'add_role' :method
+    .param pmc role
+    .param pmc options         :slurpy :named
+
+    $P0 = options['to']
+    unless null $P0 goto have_to
+    $P0 = self
+  have_to:
+    .local pmc parrotclass
+    parrotclass = self.'get_parrotclass'($P0)
+    parrotclass.'add_role'(role)
+.end
+
+
 =item register(parrotclass [, 'name'=>name] [, 'protoobject'=>proto] [, 'parent'=>parentclass] [, 'hll'=>hll])
 
 Sets objects of type C<parrotclass> to use C<protoobject>,

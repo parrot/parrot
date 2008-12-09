@@ -109,6 +109,20 @@ Accessor method -- sets/returns the "flatten" flag on arguments.
 .end
 
 
+=item lvalue([flag])
+
+Get/set the C<lvalue> attribute, which indicates whether this
+variable is being used in an lvalue context.
+
+=cut
+
+.sub 'lvalue' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('lvalue', value, has_value)
+.end
+
+
 =back
 
 =head2 PAST::Val
@@ -130,6 +144,22 @@ Get/set the constant value for this node.
 .sub 'value' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
+    .tailcall self.'attr'('value', value, has_value)
+.end
+
+=item lvalue([value])
+
+Throw an exception if we try to make a PAST::Val into an lvalue.
+
+=cut
+
+.sub 'lvalue' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    unless has_value goto normal
+    unless value goto normal
+    die "Unable to set lvalue on PAST::Val node"
+  normal:
     .tailcall self.'attr'('value', value, has_value)
 .end
 
@@ -175,20 +205,6 @@ Otherwise, the node refers to a lexical variable from an outer scope.
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .tailcall self.'attr'('isdecl', value, has_value)
-.end
-
-
-=item lvalue([flag])
-
-Get/set the C<lvalue> attribute, which indicates whether this
-variable is being used in an lvalue context.
-
-=cut
-
-.sub 'lvalue' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('lvalue', value, has_value)
 .end
 
 
