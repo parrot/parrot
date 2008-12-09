@@ -55,7 +55,7 @@ Parrot Virtual Machine development headers and libraries.
     --sysconfdir=%{_sysconfdir} \
     --infodir=%{_datadir}/info \
     --mandir=%{_mandir} \
-    --cc=%{__cc} \
+    --cc="%{__cc}" \
     --cxx=%{__cxx} \
     --optimize="$RPM_OPT_FLAGS -maccumulate-outgoing-args" \
     --parrot_is_shared \

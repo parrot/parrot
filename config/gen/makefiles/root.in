@@ -2180,9 +2180,11 @@ release : MANIFEST MANIFEST.generated
 	rm parrot-$(VERSION)
 
 rpms : release
-	sudo cp parrot-$(VERSION).tar.gz /usr/src/*/SOURCES
-	sudo cp parrot.spec /usr/src/*/SPECS
-	cd /usr/src/*/SPECS @make_and@ sudo rpmbuild -ba parrot.spec
+	mkdir -p rpmbuild/SOURCES rpmbuild/SPEC rpmbuild/BUILD rpmbuild/RPMS rpmbuild/SRPMS
+	cp parrot-$(VERSION).tar.gz rpmbuild/SOURCES
+	cp parrot.spec rpmbuild/SPEC
+	echo '%_topdir '`pwd`'/rpmbuild' > .rpmmacros
+	HOME=`pwd`; rpmbuild -ba parrot.spec
 
 win32-inno-installer : world installable
 	$(PERL) tools/dev/mk_inno.pl
