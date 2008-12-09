@@ -62,22 +62,20 @@ identifiers.
 
 Opcode names are not reserved words in PIR, and may be used as variable names.
 For example, you can define a local variable named C<print>.  [See RT #24251]
-Note that by using an opcode name as a local variable name, the variable will
-I<hide> the opcode name, effectively making the opcode unusable.
+Note that currently, by using an opcode name as a local variable name, the
+variable will I<hide> the opcode name, effectively making the opcode unusable.
+In the future this will be resolved.
 
-In contrast to opcode names, PIR keywords I<are> reserved, and cannot be used
-as identifiers. Some opcode names are, in fact, PIR keywords, which therefore
-cannot be used as identifiers.
+The PIR language is designed to have as few reserved keywords as possible.
+Currently, in contrast to opcode names, PIR keywords I<are> reserved, and cannot
+be used as identifiers. Some opcode names are, in fact, PIR keywords, which
+therefore cannot be used as identifiers. This, too, will be resolved in a
+future re-implementation of the PIR compiler.
 
 The following are PIR keywords, and cannot be used as identifiers:
 
  goto      if       int         null
  num       pmc      string      unless
-
-
-{{ NOTE: compilers/pirc does not have any reserved words; all keywords and ops
-   can be used as identifiers.
-}}
 
 =head3 Labels
 
@@ -162,7 +160,9 @@ A heredoc as an argument:
   ...
  EOS
 
-You may have multiple heredocs within a single statement or directive:
+Although currently not possible, a future implementation of the PIR
+language will allow you to use multiple heredocs within a single
+statement or directive:
 
    function(<<'INPUT', <<'OUTPUT', 'some test')
    ...
@@ -265,9 +265,10 @@ given this preamble:
 =item .const <type> <identifier> = <const>
 
 Define a constant named I<identifier> of type I<type> and assign value
-I<const> to it. The I<type> may be either an integer value or a string
-constant. The constant is stored in the constant table of the current
-bytecode file.
+I<const> to it. The I<type> must be C<int>, C<num>, C<string> or a string
+constant indicating the PMC type. This allows you to create PMC constants
+representing Subroutines.
+The constant is stored in the constant table of the current bytecode file.
 
 =item .globalconst <type> <identifier> = <const>
 
@@ -323,7 +324,7 @@ loaded again in C<:load>, so there is no need to call C<loadlib> at runtime.
 Define the HLL for the current file. Takes one string constant, the name
 of the HLL.
 
-=item .HLL_map <core_type> = <user_type> [unimplemented: RT #57430]
+=item .HLL_map <core_type> = <user_type>
 
 Whenever Parrot has to create PMCs inside C code on behalf of the running
 user program, it consults the current type mapping for the executing HLL
