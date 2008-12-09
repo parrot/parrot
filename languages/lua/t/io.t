@@ -363,10 +363,6 @@ CODE
 15
 OUTPUT
 
-TODO:
-{
-    local $TODO = 'buffer_type & buffer_size are not implemented';
-
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'file:setvbuf "no"' );
 f = io.open("file.txt")
 print(f:setvbuf("no"))
@@ -390,7 +386,7 @@ f:close()
 CODE
 true
 OUTPUT
-}
+
 # clean up file.txt
 unlink('../file.txt') if ( -f '../file.txt' );
 

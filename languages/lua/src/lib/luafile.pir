@@ -285,8 +285,6 @@ or there is any input from some special files (such as a terminal device).
 For the last two cases, sizes specifies the size of the buffer, in bytes.
 The default is an appropriate size.
 
-NOT YET IMPLEMENTED.
-
 =cut
 
 .sub 'setvbuf' :method
@@ -300,15 +298,10 @@ NOT YET IMPLEMENTED.
     $S1 = lua_checkstring(1, mode)
     $I1 = lua_checkoption(1, $S1, 'no full line')
     $I2 = lua_optint(2, size, 512)     # LUAL_BUFFERSIZE
-    new mode, 'FixedIntegerArray'
-    set mode, 3
-    mode[0] = 0     # PIO_NONBUF
-    mode[1] = 2     # PIO_FULLBUF
-    mode[2] = 1     # PIO_LINEBUF
+    mode = split ' ', 'unbuffered full-buffered line-buffered'
+    $S0 = mode[$I1]
     f = getattribute self, 'data'
-    $I0 = mode[$I1]
-    # not_implemented
-    f.'buffer_type'($I0)
+    f.'buffer_type'($S0)
     if $I1 == 0 goto L1
     f.'buffer_size'($I2)
   L1:
