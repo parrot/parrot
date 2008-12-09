@@ -133,11 +133,12 @@ helper for CALL_URL* opcodes.
 
 .sub 'load_script'
     .param string filename
-    .local pmc pio
+    .local pmc fh
     .local string content
-    pio = new 'ParrotIO'
-    push_eh _handler
-    content = pio.'slurp'(filename)
+    fh = new 'FileHandle'
+#    push_eh _handler
+    content = fh.'readall'(filename)
+#    pop_eh
     if content goto L1
     $S0 = err
     print "Can't slurp '"
@@ -147,7 +148,7 @@ helper for CALL_URL* opcodes.
     print ")\n"
   L1:
   _handler:
-    .return (content)
+    .return(content)
 .end
 
 .sub 'save_pbc'
@@ -155,21 +156,23 @@ helper for CALL_URL* opcodes.
     .param string filename
     .local string output
     .local pmc fh
+    fh = new 'FileHandle'
     output = concat filename, '.pbc'
-    fh = open output, '>'
-    if fh goto L1
-    $S0 = err
+    push_eh _handler
+    fh.'open'(output, 'w')
+    pop_eh
+    fh.'print'(pbc_out)
+    fh.'close'()
+    .return (output)
+  _handler:
+    .local pmc e
+    .get_results (e)
+    $S0 = e
     print "Can't open '"
     print output
     print "' ("
     print $S0
     print ")\n"
-    goto L2
-  L1:
-    print fh, pbc_out
-    close fh
-  L2:
-    .return (output)
 .end
 
 .sub 'save_pir'
@@ -177,20 +180,23 @@ helper for CALL_URL* opcodes.
     .param string filename
     .local string output
     .local pmc fh
+    fh = new 'FileHandle'
     output = concat filename, '.pir'
-    fh = open output, '>'
-    if fh goto L1
-    $S0 = err
+    push_eh _handler
+    fh.'open'(output, 'w')
+    pop_eh
+    fh.'print'(gen_pir)
+    fh.'close'()
+    .return ()
+  _handler:
+    .local pmc e
+    .get_results (e)
+    $S0 = e
     print "Can't open '"
     print output
     print "' ("
     print $S0
     print ")\n"
-    goto L2
-  L1:
-    print fh, gen_pir
-    close fh
-  L2:
 .end
 
 =back

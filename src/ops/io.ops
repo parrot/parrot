@@ -1,5 +1,6 @@
 /*
  * $Id$
+ * Copyright (C) 2002-2008, The Perl Foundation.
 ** io.ops
 */
 
@@ -38,7 +39,7 @@ Close IO object $1
 =cut
 
 inline op close(invar PMC) :base_io {
-  PIO_close(interp, $1);
+  Parrot_io_close(interp, $1);
 }
 
 ########################################
@@ -53,19 +54,9 @@ RT#42373: integral file descriptors might not exist outside of the UNIX
 =cut
 
 inline op fdopen(out PMC, in INT, in STR) :filesys_open {
-    /* These char * need to go away soon */
-    char * const mode = string_to_cstring(interp, $3);
-
-    $1 = PIO_fdopen(interp, NULL, (PIOHANDLE)$2, mode);
+    $1 = Parrot_io_fdopen(interp, PMCNULL, (PIOHANDLE)$2, $3);
     if (!$1)
         $1 = pmc_new(interp, enum_class_Undef);
-
-    /* RT#42374 all results from string_to_cstring() need freeing
-     but this generates ugly warnings WRT discarding the const
-     qualifier -lt
-    */
-
-    string_cstring_free(mode);
 }
 
 =item B<getstdin>(out PMC)
@@ -99,21 +90,6 @@ inline op getstderr(out PMC) :base_io {
 
 #########################################
 
-=item B<pioctl>(out INT, invar PMC, in INT, in INT)
-
-Perform an operation an an IO object. This is a general purpose
-hook for setting various flags, modes, etc.
-Examples: setting the record separator or setting the buffering
-
-=cut
-
-inline op pioctl(out INT, invar PMC, in INT, in INT) :advanced_io :deprecated {
-  $1 = PIO_pioctl(interp, $2, $3, $4);
-}
-
-
-#########################################
-
 =item B<open>(out PMC, in STR, in STR)
 
 Open URL (file, address, database, in core image) named $2 with
@@ -127,37 +103,25 @@ read/write mode and create an IO object in $1.
 =cut
 
 inline op open(out PMC, in STR, in STR) :filesys_open {
-    /* These char * need to go away soon */
     if (STRING_IS_NULL($2) || STRING_IS_NULL($3)) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_UNEXPECTED_NULL, "Invalid open");
         goto ADDRESS(handler);
     }
     else {
-        char * const path = string_to_cstring(interp, $2);
-        char * const mode = string_to_cstring(interp, $3);
-
-        $1 = PIO_open(interp, NULL, path, mode);
-
-        string_cstring_free(mode);
-        string_cstring_free(path);
+        $1 = Parrot_io_open(interp, PMCNULL, $2, $3);
         PARROT_ASSERT(! PMC_IS_NULL($1));
     }
 }
 
 inline op open(out PMC, in STR) :filesys_open {
-    /* These char * need to go away soon */
     if (STRING_IS_NULL($2)) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_UNEXPECTED_NULL, "Invalid open");
         goto ADDRESS(handler);
     }
     else {
-        char * const path = string_to_cstring(interp, $2);
-
-        $1 = PIO_open(interp, NULL, path, "+<");
-
-        string_cstring_free(path);
+        $1 = Parrot_io_open(interp, PMCNULL, $2, NULL);
         PARROT_ASSERT(! PMC_IS_NULL($1));
     }
 }
@@ -177,24 +141,24 @@ Print $1 to standard output.
 =cut
 
 inline op print(in INT) :base_io {
-  PIO_printf(interp, INTVAL_FMT, (INTVAL)$1);
+  Parrot_io_printf(interp, INTVAL_FMT, (INTVAL)$1);
 }
 
 inline op print(in NUM) :base_io {
-  PIO_printf(interp, FLOATVAL_FMT, $1);
+  Parrot_io_printf(interp, FLOATVAL_FMT, $1);
 }
 
 op print(in STR) :base_io {
   STRING * const s = $1;
   if (s && string_length(interp, s))
-    PIO_putps(interp, _PIO_STDOUT(interp), s);
+    Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
 }
 
 op print(invar PMC) :base_io {
   PMC * const p = $1;
   STRING * const s = (VTABLE_get_string(interp, p));
   if (s)
-    PIO_putps(interp, _PIO_STDOUT(interp), s);
+    Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
 }
 
 =item B<say>(in INT)
@@ -210,18 +174,18 @@ Print $1 to standard output with a trailing newline.
 =cut
 
 inline op say(in INT) :base_io {
-  PIO_printf(interp, INTVAL_FMT "\n", (INTVAL)$1);
+  Parrot_io_printf(interp, INTVAL_FMT "\n", (INTVAL)$1);
 }
 
 inline op say(in NUM) :base_io {
-  PIO_printf(interp, FLOATVAL_FMT "\n", $1);
+  Parrot_io_printf(interp, FLOATVAL_FMT "\n", $1);
 }
 
 op say(in STR) :base_io {
   STRING * const s = $1;
   if (s && string_length(interp, s))
-    PIO_putps(interp, _PIO_STDOUT(interp), s);
-  PIO_puts(interp, _PIO_STDOUT(interp), "\n");
+    Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+  Parrot_io_puts(interp, _PIO_STDOUT(interp), "\n");
 }
 
 op say(invar PMC) :base_io {
@@ -236,8 +200,8 @@ op say(invar PMC) :base_io {
     else {
         STRING * const s = VTABLE_get_string(interp, p);
         if (s)
-            PIO_putps(interp, _PIO_STDOUT(interp), s);
-        PIO_puts(interp, _PIO_STDOUT(interp), "\n");
+            Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+        Parrot_io_puts(interp, _PIO_STDOUT(interp), "\n");
     }
 }
 
@@ -259,24 +223,24 @@ Print $1 to standard error.
 =cut
 
 op printerr(in INT) :base_io {
-  PIO_eprintf(interp, INTVAL_FMT, $1);
+  Parrot_io_eprintf(interp, INTVAL_FMT, $1);
 }
 
 op printerr(in NUM) :base_io {
-  PIO_eprintf(interp, FLOATVAL_FMT, $1);
+  Parrot_io_eprintf(interp, FLOATVAL_FMT, $1);
 }
 
 op printerr(in STR) :base_io {
   STRING * const s = $1;
   if (s && string_length(interp, s))
-    PIO_putps(interp, _PIO_STDERR(interp), s);
+    Parrot_io_putps(interp, _PIO_STDERR(interp), s);
 }
 
 op printerr(invar PMC) :base_io {
   PMC * const p = $1;
   STRING * const s = (VTABLE_get_string(interp, p));
   if (s)
-    PIO_putps(interp, _PIO_STDERR(interp), s);
+    Parrot_io_putps(interp, _PIO_STDERR(interp), s);
 }
 
 ##########################################
@@ -296,27 +260,27 @@ Print $2 on the IO stream object $1.
 op print(invar PMC, in INT) :base_io {
   if ($1) {
     STRING * const s = Parrot_sprintf_c(interp, INTVAL_FMT, $2);
-    PIO_putps(interp, $1, s);
+    Parrot_io_putps(interp, $1, s);
   }
 }
 
 op print(invar PMC, in NUM) :base_io {
   if ($1) {
     STRING * const s = Parrot_sprintf_c(interp, FLOATVAL_FMT, $2);
-    PIO_putps(interp, $1, s);
+    Parrot_io_putps(interp, $1, s);
   }
 }
 
 op print(invar PMC, in STR) :base_io {
   if ($2 && $1) {
-    PIO_putps(interp, $1, $2);
+    Parrot_io_putps(interp, $1, $2);
   }
 }
 
 op print(invar PMC, invar PMC) :base_io {
   if ($2 && $1) {
     STRING * const s = VTABLE_get_string(interp, $2);
-    PIO_putps(interp, $1, s);
+    Parrot_io_putps(interp, $1, s);
   }
 }
 
@@ -333,11 +297,11 @@ Read up to N bytes from IO PMC stream.
 =cut
 
 op read(out STR, in INT) :base_io {
-  $1 = PIO_reads(interp, _PIO_STDIN(interp), (size_t)$2);
+  $1 = Parrot_io_reads(interp, _PIO_STDIN(interp), (size_t)$2);
 }
 
 op read(out STR, invar PMC, in INT) :base_io {
-  $1 = PIO_reads(interp, $2, (size_t)$3);
+  $1 = Parrot_io_reads(interp, $2, (size_t)$3);
 }
 
 =item B<readline>(out STR, invar PMC)
@@ -353,24 +317,24 @@ inline op readline(out STR, invar PMC) :base_io {
      * io stuff are methods
      */
     opcode_t *dest = expr NEXT();
-    if (pio->vtable->base_type != enum_class_ParrotIO) {
+    if (pio->vtable->base_type != enum_class_FileHandle) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, dest,
             EXCEPTION_PIO_ERROR,
             "Cannot read line from empty filehandle");
         goto ADDRESS(handler);
     }
     else {
-        ParrotIO *io = (ParrotIO *)PMC_data(pio);
-        if (!io) {
+        INTVAL flags = Parrot_io_get_flags(interp, pio);
+        if (Parrot_io_is_closed(interp, pio)) {
             opcode_t *handler = Parrot_ex_throw_from_op_args(interp, dest,
                 EXCEPTION_PIO_ERROR,
                 "Cannot read line from empty filehandle");
             goto ADDRESS(handler);
         }
 
-        if (!(io->flags & PIO_F_LINEBUF))
-            PIO_setlinebuf(interp, pio);
-        $1 = PIO_reads(interp, pio, 0);
+        if (!(flags & PIO_F_LINEBUF))
+            Parrot_io_setlinebuf(interp, pio);
+        $1 = Parrot_io_reads(interp, pio, 0);
     }
 }
 
@@ -392,14 +356,14 @@ op peek(out STR) :base_io {
   STRING ** const s = &$1;
 
   *s = NULL;
-  PIO_peek(interp, _PIO_STDIN(interp), s);
+  Parrot_io_peek(interp, _PIO_STDIN(interp), s);
 }
 
 op peek(out STR, invar PMC) :base_io {
   STRING ** const s = &$1;
 
   *s = NULL;
-  PIO_peek(interp, $2, s);
+  Parrot_io_peek(interp, $2, s);
 }
 
 ##########################################
@@ -454,7 +418,7 @@ INTVALS.
 
 op seek(invar PMC, in INT, in INT) :base_io {
     if ($1) {
-        if (PIO_seek(interp, $1, PIO_make_offset($2), $3) < 0) {
+        if (Parrot_io_seek(interp, $1, Parrot_io_make_offset($2), $3) < 0) {
             opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_PIO_ERROR,
                 "seek failed (32bit)");
@@ -465,7 +429,7 @@ op seek(invar PMC, in INT, in INT) :base_io {
 
 op seek(invar PMC, in INT, in INT, in INT) :base_io {
     if ($1) {
-        if (PIO_seek(interp, $1, PIO_make_offset32($2, $3), $4) < 0) {
+        if (Parrot_io_seek(interp, $1, Parrot_io_make_offset32($2, $3), $4) < 0) {
             opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_PIO_ERROR,
                 "seek failed (64bit)");
@@ -491,78 +455,16 @@ Get the current file positon of stream $3 in two parts of 32-bit each
 
 op tell(out INT, invar PMC) :base_io {
   if ($2)
-    $1 = (INTVAL)PIO_tell(interp, $2);
+    $1 = (INTVAL)Parrot_io_tell(interp, $2);
 }
 
 op tell(out INT, out INT, invar PMC) :base_io {
   if ($3) {
     PIOOFF_T pos;
-    pos = PIO_tell(interp, $3);
+    pos = Parrot_io_tell(interp, $3);
     $1 = (INTVAL)(pos >> 31);
     $2 = (INTVAL)(pos & 0xffffffff);
   }
-}
-
-########################################
-
-=item B<socket>(out PMC, in INT, in INT, in INT)
-
-=item B<sockaddr>(out STR, in INT, in STR)
-
-=item B<connect>(out INT, invar PMC, in STR)
-
-=item B<recv>(out INT, invar PMC, out STR)
-
-=item B<send>(out INT, invar PMC, in STR)
-
-=item B<poll>(out INT, invar PMC, in INT, in INT, in INT)
-
-=item B<bind>(out INT, invar PMC, in STR)
-
-=item B<listen>(out INT, invar PMC, in INT)
-
-=item B<accept>(out PMC, invar PMC)
-
-=cut
-
-op socket(out PMC, in INT, in INT, in INT) :base_network {
-  $1 = PIO_socket(interp, $2, $3, $4);
-  if (!$1)
-    $1 = pmc_new(interp, enum_class_Undef);
-}
-
-op sockaddr(out STR, in INT, in STR) :base_network {
-    $1 = PIO_sockaddr_in(interp, (unsigned short)$2, $3);
-}
-
-op connect(out INT, invar PMC, in STR) :base_network {
-    $1 = (INTVAL)PIO_connect(interp, $2, $3);
-}
-
-op recv(out INT, invar PMC, out STR) :base_network {
-    STRING *dest = $3;
-    $1 = (INTVAL)PIO_recv(interp, $2, &dest);
-    $3 = dest;
-}
-
-op send(out INT, invar PMC, in STR) :base_network {
-    $1 = (INTVAL)PIO_send(interp, $2, $3);
-}
-
-op poll(out INT, invar PMC, in INT, in INT, in INT) :base_network {
-    $1 = (INTVAL)PIO_poll(interp, $2, $3, $4, $5);
-}
-
-op bind(out INT, invar PMC, in STR) :base_network {
-    $1 = (INTVAL)PIO_bind(interp, $2, $3);
-}
-
-op listen(out INT, invar PMC, in INT) :base_network {
-    $1 = (INTVAL)PIO_listen(interp, $2, $3);
-}
-
-op accept(out PMC, invar PMC) :base_network {
-    $1 = PIO_accept(interp, $2);
 }
 
 ########################################
@@ -573,18 +475,6 @@ op accept(out PMC, invar PMC) :base_network {
 
 
 ###############################################################################
-
-=head1 COPYRIGHT
-
-Copyright (C) 2001-2008, The Perl Foundation.
-
-=head1 LICENSE
-
-This program is free software. It is subject to the same license
-as the Parrot interpreter itself.
-
-=cut
-
 
 /*
  * Local variables:

@@ -654,7 +654,7 @@ This function only loads the chunk; it does not run it.
     f = open filename, '<'
     unless f goto L3
   L2:
-    $S0 = f.'slurp'('')
+    $S0 = f.'readall'()
     if filename == '' goto L4
     close f
   L4:

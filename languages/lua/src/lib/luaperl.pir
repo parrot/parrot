@@ -75,7 +75,7 @@ It's a temporary work. Waiting for the real PIR compiler/interpreter.
     .local string content
     pio = new 'ParrotIO'
     push_eh _handler
-    content = pio.'slurp'(filename)
+    content = pio.'readall'(filename)
     pop_eh
     if content goto L1
     $S0 = err
@@ -108,7 +108,7 @@ It's a temporary work. Waiting for the real PIR compiler/interpreter.
     pir = load_script($S1)
     if pir goto L1
     $P0 = new 'ParrotIO'
-    $S0 = $P0.'slurp'(out)
+    $S0 = $P0.'readall'(out)
     unlink(out)  # cleaning up the temporary file
     die $S0
   L1:

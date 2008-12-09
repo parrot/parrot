@@ -90,7 +90,7 @@ runops_cgoto_core(PARROT_INTERP, ARGIN(opcode_t *pc))
     return pc;
 #else
     UNUSED(pc);
-    PIO_eprintf(interp,
+    Parrot_io_eprintf(interp,
             "Computed goto unavailable in this configuration.\n");
     Parrot_exit(interp, 1);
 #endif
@@ -147,14 +147,14 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
          * see trace_system_areas() in src/cpu_dep.c */
         debugger->lo_var_ptr = interp->lo_var_ptr;
 
-        pio = PIO_STDERR(debugger);
+        pio = Parrot_io_STDERR(debugger);
 
-        if (PIO_isatty(debugger, pio))
-            PIO_setlinebuf(debugger, pio);
+        if (Parrot_io_is_tty(debugger, pio))
+            Parrot_io_setlinebuf(debugger, pio);
         else {
             /* this is essential (100 x faster!)  and should probably
              * be in init/open code */
-            PIO_setbuf(debugger, pio, 8192);
+            Parrot_io_setbuf(debugger, pio, 8192);
         }
     }
     else
@@ -173,16 +173,16 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
         if (dod != arena_base->dod_runs) {
             dod = arena_base->dod_runs;
-            PIO_eprintf(debugger, "       DOD\n");
+            Parrot_io_eprintf(debugger, "       DOD\n");
         }
 
         if (gc != arena_base->collect_runs) {
             gc = arena_base->collect_runs;
-            PIO_eprintf(debugger, "       GC\n");
+            Parrot_io_eprintf(debugger, "       GC\n");
         }
     }
 
-    PIO_flush(debugger, PIO_STDERR(debugger));
+    Parrot_io_flush(debugger, Parrot_io_STDERR(debugger));
 
     return pc;
 }

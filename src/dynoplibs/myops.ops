@@ -61,7 +61,7 @@ Support for writing a very short quine.
 =cut
 
 op q() :flow {
-    PIO_printf(interp, ".loadlib \"myops_ops\"\nq\n");
+    Parrot_io_printf(interp, ".loadlib \"myops_ops\"\nq\n");
     HALT();
 }
 

@@ -593,7 +593,7 @@ the result.
 =head1 TODO
 
 In the future, it may be deemed desirable to similarly vtable-ize
-appending things to the string, allowing for faster C<PIO_printf()> &c,
+appending things to the string, allowing for faster C<Parrot_io_printf()> &c,
 as well as a version that writes directly to a C string. However, at
 this point neither of those is needed.
 

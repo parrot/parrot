@@ -458,7 +458,7 @@ thread_func(ARGIN_NULLOK(void *arg))
         /* caught exception */
         /* XXX what should we really do here */
         /* PMC *exception = Parrot_cx_peek_task(interp);
-        PIO_eprintf(interp,
+        Parrot_io_eprintf(interp,
                     "Unhandled exception in thread with tid %d "
                     "(message=%Ss, number=%d)\n",
                     interp->thread_data->tid,
@@ -643,7 +643,7 @@ PMC *
 pt_transfer_sub(ARGOUT(Parrot_Interp d), ARGIN(Parrot_Interp s), ARGIN(PMC *sub))
 {
 #if defined THREAD_DEBUG && THREAD_DEBUG
-    PIO_eprintf(s, "copying over subroutine [%Ss]\n",
+    Parrot_io_eprintf(s, "copying over subroutine [%Ss]\n",
         Parrot_full_sub_name(s, sub));
 #endif
     return make_local_copy(d, s, sub);

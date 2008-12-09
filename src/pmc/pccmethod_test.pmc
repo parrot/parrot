@@ -18,21 +18,21 @@ pmclass PCCMETHOD_Test need_ext provides hash {
     METHOD test_method()
     {
         UNUSED(SELF);
-        PIO_printf(interp, "test_method\n");
+        Parrot_io_printf(interp, "test_method\n");
     }
 
     METHOD test_method0(int a1)
     {
         UNUSED(SELF);
-        PIO_printf(interp, "test_method0\n");
-        PIO_printf(interp, "%d\n", a1);
+        Parrot_io_printf(interp, "test_method0\n");
+        Parrot_io_printf(interp, "%d\n", a1);
     }
 
     METHOD test_method1(int a1, int a2, int a3, int a4, int a5, int a6)
     {
         UNUSED(SELF);
-        PIO_printf(interp, "test_method1\n");
-        PIO_printf(interp, "%d,%d,%d,%d,%d,%d\n", a1, a2, a3, a4, a5, a6);
+        Parrot_io_printf(interp, "test_method1\n");
+        Parrot_io_printf(interp, "%d,%d,%d,%d,%d,%d\n", a1, a2, a3, a4, a5, a6);
     }
 
     METHOD test_method2(int a1 :optional, int a1o :opt_flag,
@@ -40,8 +40,8 @@ pmclass PCCMETHOD_Test need_ext provides hash {
     {
         STRING *kevin = CONST_STRING(interp, "KEVIN");
         UNUSED(SELF);
-        PIO_printf(interp, "test_method2\n");
-        PIO_printf(interp, "%d, %d, %Ss %Ss\n", a1, a1o,
+        Parrot_io_printf(interp, "test_method2\n");
+        Parrot_io_printf(interp, "%d, %d, %Ss %Ss\n", a1, a1o,
             VTABLE_name(interp, slurpy_pos),
             VTABLE_get_repr(interp, slurpy_pos));
 
@@ -51,8 +51,8 @@ pmclass PCCMETHOD_Test need_ext provides hash {
     METHOD test_method3(PMC *a1 :named("a1name"), PMC *a2  :named("a2name"))
     {
         UNUSED(SELF);
-        PIO_printf(interp, "test_method3\n");
-        PIO_printf(interp, "%Ps, %Ps\n", a1, a2);
+        Parrot_io_printf(interp, "test_method3\n");
+        Parrot_io_printf(interp, "%Ps, %Ps\n", a1, a2);
     }
 
     METHOD test_method4(int george :optional, int g_f :opt_flag,
@@ -63,7 +63,7 @@ pmclass PCCMETHOD_Test need_ext provides hash {
         UNUSED(g_f);
         UNUSED(slurpy_pos);
         UNUSED(slurpy_named);
-        PIO_printf(interp, "test_method4\n");
+        Parrot_io_printf(interp, "test_method4\n");
     }
 }
 

@@ -148,7 +148,7 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 
     /* PANIC will fail until this is done */
     interp->piodata = NULL;
-    PIO_init(interp);
+    Parrot_io_init(interp);
 
     if (is_env_var_set("PARROT_GC_DEBUG")) {
 #if ! DISABLE_GC_DEBUG
@@ -237,7 +237,7 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     setup_default_compreg(interp);
 
     /* setup stdio PMCs */
-    PIO_init(interp);
+    Parrot_io_init(interp);
 
     /* init IMCC compiler */
     imcc_init(interp);
@@ -331,12 +331,12 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
         interp->arena_base->GC_block_level = 0;
 
     if (Interp_trace_TEST(interp, ~0)) {
-        PIO_eprintf(interp, "ParrotIO objects (like stdout and stderr)"
+        Parrot_io_eprintf(interp, "FileHandle objects (like stdout and stderr)"
             "are about to be closed, so clearing trace flags.\n");
         Interp_trace_CLEAR(interp, ~0);
     }
 
-    /* Destroys all PMCs, even constants and the ParrotIO objects for
+    /* Destroys all PMCs, even constants and the FileHandle objects for
      * std{in, out, err}, so don't be verbose about DOD'ing. */
     if (interp->thread_data)
         interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
@@ -362,16 +362,17 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     imcc_destroy(interp);
 
     /* Now the PIOData gets also cleared */
-    PIO_finish(interp);
+    Parrot_io_finish(interp);
 
     /*
      * now all objects that need timely destruction should be finalized
      * so terminate the event loop
      */
-    if (!interp->parent_interpreter) {
+ /*   if (!interp->parent_interpreter) {
         PIO_internal_shutdown(interp);
-/*        Parrot_kill_event_loop(interp); */
+        Parrot_kill_event_loop(interp);
     }
+  */
 
     /* we destroy all child interpreters and the last one too,
      * if the --leak-test commandline was given

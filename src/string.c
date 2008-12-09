@@ -159,7 +159,7 @@ Parrot_make_COW_reference(PARROT_INTERP, ARGMOD(STRING *s))
         if (n_interpreters > 1 && PObj_is_movable_TESTALL(s) &&
                 !Parrot_in_memory_pool(interp, PObj_bufstart(s))) {
             Parrot_unmake_COW(interp, d);
-            PIO_eprintf(interp, "cross-interpreter copy of "
+            Parrot_io_eprintf(interp, "cross-interpreter copy of "
                                      "relocatable string '%Ss' into tid %d\n",
                         d,
                         interp->thread_data->tid);

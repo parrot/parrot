@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 8;
 
 =head1 NAME
 
@@ -45,14 +45,13 @@ ending
 OUTPUT
 }
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'runinterp - works without printing' );
+pir_output_is( <<'CODE', <<'OUTPUT', 'runinterp - works with printing' );
 .sub 'test' :main
     .local string actual
     .local pmc test_interp
                test_interp = new 'ParrotInterpreter'
     .local pmc stdout
                stdout = getstdout
-    push stdout, 'string'
 
     print "uno\n"
     runinterp test_interp, pasm
@@ -62,7 +61,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'runinterp - works without printing' );
     $S0 = readline stdout
     actual .= $S0
     if $S0 goto get_stdout
-    $S0 = pop stdout
 
     print actual
     goto pasm_end
@@ -74,40 +72,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'runinterp - works without printing' );
 .end
 CODE
 uno
-dos
-OUTPUT
-
-pir_output_is(
-    <<'CODE', <<'OUTPUT', 'runinterp - works with printing', todo => 'something funky here' );
-.sub 'test' :main
-    .local string actual
-    .local pmc test_interp
-               test_interp = new 'ParrotInterpreter'
-    .local pmc stdout
-               stdout = getstdout
-    push stdout, 'string'
-
-    print "uno\n"
-    runinterp test_interp, pasm
-    print "dos\n"
-
-  get_stdout:
-    $S0 = readline stdout
-    actual .= $S0
-    if $S0 goto get_stdout
-    $S0 = pop stdout
-
-    print actual
-    goto pasm_end
-
-  pasm:
-    print "y uno es igual a\n"
-    end
-  pasm_end:
-.end
-CODE
-uno
-y uno es igual a
 dos
 OUTPUT
 

@@ -134,7 +134,7 @@ C source tests are usually located in F<t/src/*.t>.  A simple test looks like:
     OUTPUT
 
 Note that it's always a good idea to output "done" to confirm that the compiled
-code executed completely. When mixing C<printf> and C<PIO_printf> always append
+code executed completely. When mixing C<printf> and C<Parrot_io_printf> always append
 a C<fflush(stdout);> after the former.
 
 =head2 Testing Perl5 components

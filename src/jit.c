@@ -873,8 +873,8 @@ debug_sections(PARROT_INTERP,
     while (cur_section) {
         Parrot_jit_register_usage_t *ru = cur_section->ru;
 
-        PIO_eprintf(interp, "\nSection:\n");
-        PIO_eprintf(interp, "%s block %d\n",
+        Parrot_io_eprintf(interp, "\nSection:\n");
+        Parrot_io_eprintf(interp, "%s block %d\n",
                 (cur_section->isjit) ? "JITTED" : "NOT JITTED",
                 cur_section->block);
         for (cur_op = cur_section->begin; cur_op <= cur_section->end;) {
@@ -883,48 +883,48 @@ debug_sections(PARROT_INTERP,
             op_info = &interp->op_info_table[op];
             PDB_disassemble_op(interp, instr, sizeof (instr),
                     op_info, cur_op, NULL, code_start, 0);
-            PIO_eprintf(interp, "\t\tOP%vu: ext %3d\t%s\n",
+            Parrot_io_eprintf(interp, "\t\tOP%vu: ext %3d\t%s\n",
                     cur_op - code_start, op_jit[*cur_op].extcall, instr);
             n = op_info->op_count;
             ADD_OP_VAR_PART(interp, interp->code, cur_op, n);
 #  if JIT_DEBUG > 1
-            PIO_eprintf(interp, "\t\t\tmap_branch: ");
+            Parrot_io_eprintf(interp, "\t\t\tmap_branch: ");
             for (i = 0; i < n; i++)
-                PIO_eprintf(interp, "%02x ", map[cur_op-code_start+i]);
-            PIO_eprintf(interp, "\n");
+                Parrot_io_eprintf(interp, "%02x ", map[cur_op-code_start+i]);
+            Parrot_io_eprintf(interp, "\n");
 #  endif
             cur_op += n;
         }
-        PIO_eprintf(interp, "\tbegin:\t%#p\t(%Ou)\n",
+        Parrot_io_eprintf(interp, "\tbegin:\t%#p\t(%Ou)\n",
                 cur_section->begin, *cur_section->begin);
-        PIO_eprintf(interp, "\tend:\t%#p\t(%Ou)\n",
+        Parrot_io_eprintf(interp, "\tend:\t%#p\t(%Ou)\n",
                 cur_section->end, *cur_section->end);
 
         for (j = 0; j < sizeof (types_to_list)/sizeof (int); j++) {
             char t;
             typ = types_to_list[j];
             t = types[typ];
-            PIO_eprintf(interp, "\t%c registers used:\t%i\n",
+            Parrot_io_eprintf(interp, "\t%c registers used:\t%i\n",
                     t, ru[typ].registers_used);
             if (ru[typ].registers_used) {
-                PIO_eprintf(interp, "\t%c register count:\t", t);
+                Parrot_io_eprintf(interp, "\t%c register count:\t", t);
                 for (i = 0; i < NUM_REGISTERS; i++)
-                    PIO_eprintf(interp, "%i ", ru[typ].reg_count[i]);
-                PIO_eprintf(interp, "\n\t%c register usage:\t", t);
+                    Parrot_io_eprintf(interp, "%i ", ru[typ].reg_count[i]);
+                Parrot_io_eprintf(interp, "\n\t%c register usage:\t", t);
                 for (i = 0; i < NUM_REGISTERS; i++)
-                    PIO_eprintf(interp, "%i ", ru[typ].reg_usage[i]);
-                PIO_eprintf(interp, "\n\t%c register direction:\t", t);
+                    Parrot_io_eprintf(interp, "%i ", ru[typ].reg_usage[i]);
+                Parrot_io_eprintf(interp, "\n\t%c register direction:\t", t);
                 for (i = 0; i < NUM_REGISTERS; i++)
-                    PIO_eprintf(interp, "%i ", (int)ru[typ].reg_dir[i]);
-                PIO_eprintf(interp, "\n");
+                    Parrot_io_eprintf(interp, "%i ", (int)ru[typ].reg_dir[i]);
+                Parrot_io_eprintf(interp, "\n");
             }
         }
-        PIO_eprintf(interp, "\tJit opcodes:\t%u\n",
+        Parrot_io_eprintf(interp, "\tJit opcodes:\t%u\n",
                 cur_section->jit_op_count);
-        PIO_eprintf(interp, "\tTotal opcodes:\t%u\n",
+        Parrot_io_eprintf(interp, "\tTotal opcodes:\t%u\n",
                 cur_section->op_count);
         if (cur_section->branch_target)
-            PIO_eprintf(interp, "\tBranch target:\tOP%u\n",
+            Parrot_io_eprintf(interp, "\tBranch target:\tOP%u\n",
                     cur_section->branch_target->begin - code_start);
 
         cur_section = cur_section->next;
@@ -1700,7 +1700,7 @@ parrot_build_asm(PARROT_INTERP, ARGIN(opcode_t *code_start), ARGIN(opcode_t *cod
     jit_info->arena.size =
         (ptrdiff_t)(jit_info->native_ptr - jit_info->arena.start);
 #if JIT_DEBUG
-    PIO_eprintf(interp, "\nTotal size %u bytes\n",
+    Parrot_io_eprintf(interp, "\nTotal size %u bytes\n",
             (unsigned int)(jit_info->native_ptr - jit_info->arena.start));
 #endif
 

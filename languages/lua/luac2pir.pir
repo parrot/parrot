@@ -62,11 +62,11 @@ Francois Perrad.
 
 .sub 'load_file' :anon
     .param string filename
-    .local pmc pio
+    .local pmc fh
     .local string content
-    pio = new 'ParrotIO'
+    fh = new 'FileHandle'
     push_eh _handler
-    content = pio.'slurp'(filename)
+    content = fh.'readall'(filename)
     pop_eh
     if content goto L1
     $S0 = err

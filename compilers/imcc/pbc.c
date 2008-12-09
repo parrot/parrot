@@ -1923,7 +1923,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
     int        op, i;
 
 #if IMC_TRACE_HIGH
-    PIO_eprintf(NULL, "e_pbc_emit\n");
+    Parrot_io_eprintf(NULL, "e_pbc_emit\n");
 #endif
 
     /* first instruction, do initialisation ... */
@@ -1980,7 +1980,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
         if (ins->symregs[0] && ins->symregs[0]->pcc_sub) {
 
 #if IMC_TRACE
-            PIO_eprintf(NULL, "pbc.c: e_pbc_emit (pcc_sub=%s)\n",
+            Parrot_io_eprintf(NULL, "pbc.c: e_pbc_emit (pcc_sub=%s)\n",
                         ins->symregs[0]->name);
 #endif
 
@@ -2010,7 +2010,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
         opcode_t last_label = 1;
 
 #if IMC_TRACE_HIGH
-        PIO_eprintf(NULL, "emit_pbc: op [%d %s]\n", ins->opnum, ins->opname);
+        Parrot_io_eprintf(NULL, "emit_pbc: op [%d %s]\n", ins->opnum, ins->opname);
 #endif
 
         if ((ins->type & ITBRANCH)

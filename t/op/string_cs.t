@@ -490,16 +490,18 @@ OUTPUT
 
 SKIP: {
     skip( 'no ICU lib', 16 ) unless $PConfig{has_icu};
-    pasm_output_is( <<'CODE', <<"OUTPUT", "unicode downcase" );
-    set S0, iso-8859-1:"TÖTSCH"
-    find_charset I0, "unicode"
-    trans_charset S1, S0, I0
-    downcase S1
-    getstdout P0          # need to convert back to utf8
-    push P0, "utf8"       # push utf8 output layer
-    print S1
+    pir_output_is( <<'CODE', <<"OUTPUT", "unicode downcase" );
+.sub main :main
+    set $S0, iso-8859-1:"TÖTSCH"
+    find_charset $I0, "unicode"
+    trans_charset $S1, $S0, $I0
+    downcase $S1
+    getstdout $P0           # need to convert back to utf8
+    $P0.'encoding'("utf8")  # set utf8 output
+    print $S1
     print "\n"
     end
+.end
 CODE
 t\xc3\xb6tsch
 OUTPUT
@@ -690,28 +692,32 @@ CODE
 6
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<"OUTPUT", "unicode upcase" );
-    set S0, iso-8859-1:"tötsch"
-    find_charset I0, "unicode"
-    trans_charset S1, S0, I0
-    upcase S1
-    getstdout P0          # need to convert back to utf8
-    push P0, "utf8"       # push utf8 output layer
-    print S1
+    pir_output_is( <<'CODE', <<"OUTPUT", "unicode upcase" );
+.sub main :main
+    set $S0, iso-8859-1:"tötsch"
+    find_charset $I0, "unicode"
+    trans_charset $S1, $S0, $I0
+    upcase $S1
+    getstdout $P0         # need to convert back to utf8
+    $P0.'encoding'("utf8") # set utf8 output
+    print $S1
     print "\n"
     end
+.end
 CODE
 T\x{c3}\x{96}TSCH
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<"OUTPUT", "unicode upcase to combined char" );
-    set S1, unicode:"hacek j \u01f0"
-    upcase S1
-    getstdout P0          # need to convert back to utf8
-    push P0, "utf8"       # push utf8 output layer
-    print S1
+    pir_output_is( <<'CODE', <<"OUTPUT", "unicode upcase to combined char" );
+.sub main :main
+    set $S1, unicode:"hacek j \u01f0"
+    upcase $S1
+    getstdout $P0          # need to convert back to utf8
+    $P0.'encoding'("utf8") # set utf8 output
+    print $S1
     print "\n"
     end
+.end
 CODE
 HACEK J J\xcc\x8c
 OUTPUT
@@ -732,54 +738,60 @@ OUTPUT
     # (gdb) x /8h src->strstart
     # 0x844fb60:      0x005f  0x005f  0x005f  0x004a  0x030c  0x0031  0x0032  0x0000
 
-    pasm_output_is( <<'CODE', <<"OUTPUT", "unicode upcase to combined char 3.2 bug?" );
-    set S1, unicode:"___\u01f0123"
-    upcase S1
-    getstdout P0          # need to convert back to utf8
-    push P0, "utf8"       # push utf8 output layer
-    print S1
+    pir_output_is( <<'CODE', <<"OUTPUT", "unicode upcase to combined char 3.2 bug?" );
+.sub main :main
+    set $S1, unicode:"___\u01f0123"
+    upcase $S1
+    getstdout $P0          # need to convert back to utf8
+    $P0.'encoding'("utf8") # set utf8 output
+    print $S1
     print "\n"
     end
+.end
 CODE
 ___J\xcc\x8c123
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<"OUTPUT", "unicode titlecase" );
-    set S0, iso-8859-1:"tötsch leo"
-    find_charset I0, "unicode"
-    trans_charset S1, S0, I0
-    titlecase S1
-    getstdout P0          # need to convert back to utf8
-    push P0, "utf8"       # push utf8 output layer
-    print S1
+    pir_output_is( <<'CODE', <<"OUTPUT", "unicode titlecase" );
+.sub main :main
+    set $S0, iso-8859-1:"tötsch leo"
+    find_charset $I0, "unicode"
+    trans_charset $S1, $S0, $I0
+    titlecase $S1
+    getstdout $P0          # need to convert back to utf8
+    $P0.'encoding'("utf8") # set utf8 output
+    print $S1
     print "\n"
     end
+.end
 CODE
 T\x{c3}\x{b6}tsch Leo
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<OUTPUT, "combose combined char" );
-    set S1, unicode:"___\u01f0___"
-    length I0, S1
-    upcase S1        # decompose J+hacek
-    length I1, S1    # 1 longer
-    downcase S1      # j+hacek
-    length I2, S1
-    compose S1, S1
-    length I3, S1    # back at original string
-    getstdout P0          # need to convert back to utf8
-    push P0, "utf8"       # push utf8 output layer
-    print S1
+    pir_output_is( <<'CODE', <<OUTPUT, "combose combined char" );
+.sub main :main
+    set $S1, unicode:"___\u01f0___"
+    length $I0, $S1
+    upcase $S1         # decompose J+hacek
+    length $I1, $S1    # 1 longer
+    downcase $S1       # j+hacek
+    length $I2, $S1
+    compose $S1, $S1
+    length $I3, $S1        # back at original string
+    getstdout $P0          # need to convert back to utf8
+    $P0.'encoding'("utf8") # set utf8 output
+    print $S1
     print "\n"
-    print I0
+    print $I0
     print ' '
-    print I1
+    print $I1
     print ' '
-    print I2
+    print $I2
     print ' '
-    print I3
+    print $I3
     print "\n"
     end
+.end
 CODE
 ___\x{c7}\x{b0}___
 7 8 8 7

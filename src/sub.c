@@ -677,7 +677,7 @@ Parrot_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc),
     if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG)) {
         PMC *sub = to_ctx->current_sub;
 
-        PIO_eprintf(interp, "# Back in sub '%Ss', env %p\n",
+        Parrot_io_eprintf(interp, "# Back in sub '%Ss', env %p\n",
                     Parrot_full_sub_name(interp, sub),
                     interp->dynamic_env);
     }

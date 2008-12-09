@@ -450,7 +450,7 @@ the_test(Parrot_Interp interp, opcode_t *cur_op, opcode_t *start)
     Parrot_eprintf(interp, "back\\n");
 
     /* win32 seems to buffer stderr ? */
-    PIO_flush(interp, PIO_STDERR(interp));
+    Parrot_io_flush(interp, Parrot_io_STDERR(interp));
 
     name = const_string(interp, "_sub2");
     sub  = Parrot_find_global_cur(interp, name);

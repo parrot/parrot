@@ -32,8 +32,8 @@ the low-level synchronization.
 #define STM_DEBUG 0
 
 #if STM_DEBUG
-#  define STM_TRACE(x...) PIO_fprintf(interp, PIO_STDERR(interp), x); \
-                                   PIO_fprintf(interp, PIO_STDERR(interp), "\n")
+#  define STM_TRACE(x...) Parrot_io_fprintf(interp, Parrot_io_STDERR(interp), x); \
+                                   Parrot_io_fprintf(interp, Parrot_io_STDERR(interp), "\n")
 #  undef fprintf
 #  define STM_TRACE_SAFE(x...) fprintf(stderr, x); fprintf(stderr, "\n");
 #else

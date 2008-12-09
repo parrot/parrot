@@ -154,7 +154,7 @@ char_offset_key(PARROT_INTERP, PMC *pmc, PMC *key, int *type)
     max  = (size_t)VTABLE_get_integer_keyed_int(interp, init, ix + 1);
 
 #ifdef STRUCT_DEBUG
-    PIO_eprintf(interp, " count = %d ix = %d max = %d\n",
+    Parrot_io_eprintf(interp, " count = %d ix = %d max = %d\n",
             (int)count, (int)ix, (int)max);
 #endif
 
@@ -177,7 +177,7 @@ char_offset_key(PARROT_INTERP, PMC *pmc, PMC *key, int *type)
             offs = PMC_int_val(init);
 
 #ifdef STRUCT_DEBUG
-            PIO_eprintf(interp, "offs = %d\n", (int)offs);
+            Parrot_io_eprintf(interp, "offs = %d\n", (int)offs);
 #endif
 
             p += offs * count;

@@ -956,7 +956,7 @@ debug_trace_find_meth(PARROT_INTERP, ARGIN(const PMC *_class),
         result = "no";
 
     tracer = interp->debugger ? interp->debugger : interp;
-    PIO_eprintf(tracer, "# find_method class '%Ss' method '%Ss': %s\n",
+    Parrot_io_eprintf(tracer, "# find_method class '%Ss' method '%Ss': %s\n",
             class_name, name, result);
 }
 

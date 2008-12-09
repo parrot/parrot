@@ -537,7 +537,7 @@ specifies the encoding to use for the input (e.g., "utf8").
     encoding = adverbs['encoding']
     if encoding == 'fixed_8' goto interactive_loop
     unless encoding goto interactive_loop
-    push stdin, encoding
+    stdin.'encoding'(encoding)
   interactive_loop:
     .local pmc code
     unless stdin goto interactive_end
@@ -660,13 +660,11 @@ options are passed to the evaluator.
     .local string iname
     .local pmc ifh
     iname = shift iter
-    ifh = open iname, '<'
-    unless ifh goto err_infile
-    if encoding == 'fixed_8' goto iter_loop_1
-    unless encoding goto iter_loop_1
-    push ifh, encoding
+    ifh = new 'FileHandle'
+    unless encoding == 'utf8' goto iter_loop_1
+    ifh.'encoding'(encoding)
   iter_loop_1:
-    $S0 = ifh.'slurp'('')
+    $S0 = ifh.'readall'(iname)
     code .= $S0
     close ifh
     goto iter_loop
@@ -783,7 +781,7 @@ Generic method for compilers invoked from a shell command line.
     output = adverbs['output']
     if output == '' goto save_output_1
     if output == '-' goto save_output_1
-    ofh = open output, '>'
+    ofh = open output, 'w'
     unless ofh goto err_output
   save_output_1:
     print ofh, result

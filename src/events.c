@@ -805,7 +805,7 @@ io_thread_ready_rd(ARGMOD(pending_io_events *ios), int ready_rd)
     for (i = 0; i < ios->n; ++i) {
         parrot_event * const ev  = ios->events[i];
         PMC          * const pio = ev->u.io_event.pio;
-        const int            fd  = PIO_getfd(NULL, pio);
+        const int            fd  = Parrot_io_getfd(NULL, pio);
 
         if (fd == ready_rd) {
             /* remove from event list */
@@ -909,7 +909,7 @@ io_thread(SHIM(void *data))
                                 case IO_THR_MSG_ADD_SELECT_RD:
                                     {
                                         PMC * const pio = buf.ev->u.io_event.pio;
-                                        const int fd = PIO_getfd(NULL, pio);
+                                        const int fd = Parrot_io_getfd(NULL, pio);
                                         if (FD_ISSET(fd, &act_rfds)) {
                                             mem_sys_free(buf.ev);
                                             break;

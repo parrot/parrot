@@ -36,7 +36,7 @@ static INTVAL print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
 
 =item C<void print_pbc_location>
 
-Prints the bytecode location of the warning or error to C<PIO_STDERR>.
+Prints the bytecode location of the warning or error to C<Parrot_io_STDERR>.
 
 =cut
 
@@ -47,7 +47,7 @@ void
 print_pbc_location(PARROT_INTERP)
 {
     Interp * const tracer = interp->debugger ? interp->debugger : interp;
-    PIO_eprintf(tracer, "%Ss\n",
+    Parrot_io_eprintf(tracer, "%Ss\n",
             Parrot_Context_infostr(interp,
                 CONTEXT(interp)));
 }
@@ -66,11 +66,11 @@ static INTVAL
 print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
 {
     if (!msg)
-        PIO_puts(interp, PIO_STDERR(interp), "Unknown warning\n");
+        Parrot_io_puts(interp, Parrot_io_STDERR(interp), "Unknown warning\n");
     else {
-        PIO_putps(interp, PIO_STDERR(interp), msg);
+        Parrot_io_putps(interp, Parrot_io_STDERR(interp), msg);
         if (string_ord(interp, msg, -1) != '\n')
-            PIO_eprintf(interp, "%c", '\n');
+            Parrot_io_eprintf(interp, "%c", '\n');
     }
     print_pbc_location(interp);
     return 1;

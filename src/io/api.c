@@ -32,20 +32,10 @@ is used in Parrot ops.
 /* HEADERIZER HFILE: include/parrot/io.h */
 
 /*
-        The standard streams are:
-
-                interp->piodata->table[PIO_STD*_FILENO].
-*/
-
-
-/* PIOOFF_T piooffsetzero; */
-
-
-/*
 
 =back
 
-=head2 Generic top-level I/O interface
+=head2 Generic I/O interface
 
 =over 4
 
@@ -234,7 +224,8 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t len)
     INTVAL                ignored;
 
     if (Parrot_io_is_closed(interp, pmc))
-        return new_string_header(interp, 0);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Cannot read from a closed filehandle");
 
     if (Parrot_io_get_buffer_flags(interp, pmc) & PIO_BF_MMAP) {
         res           = new_string_header(interp, 0);
@@ -247,7 +238,11 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t len)
     }
 
     res->bufused = len;
-    ignored      = Parrot_io_read_buffer(interp, pmc, &res);
+
+    if (Parrot_io_is_encoding(interp, pmc, CONST_STRING(interp, "utf8")))
+        ignored = Parrot_io_read_utf8(interp, pmc, &res);
+    else
+        ignored = Parrot_io_read_buffer(interp, pmc, &res);
     UNUSED(ignored);
 
     return res;
@@ -275,6 +270,10 @@ Parrot_io_read(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(char *buffer), size_t len)
 
     res->strstart = buffer;
     res->bufused = len;
+
+    if (Parrot_io_is_encoding(interp, pmc, CONST_STRING(interp, "utf8")))
+        return Parrot_io_read_utf8(interp, pmc, &res);
+
     return Parrot_io_read_buffer(interp, pmc, &res);
 }
 
@@ -305,6 +304,10 @@ Parrot_io_write(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const void *buffer), size
         fake.strlen = fake.bufused = len;
         fake.charset = Parrot_default_charset_ptr;
         fake.encoding = Parrot_default_encoding_ptr;
+
+        if (Parrot_io_is_encoding(interp, pmc, CONST_STRING(interp, "utf8")))
+            return Parrot_io_write_utf8(interp, pmc, &fake);
+
         return Parrot_io_write_buffer(interp, pmc, &fake);
     }
     else
@@ -438,11 +441,15 @@ Parrot_io_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD_NULLOK(STRING *s))
     if (PMC_IS_NULL(pmc)
     || !VTABLE_isa(interp, pmc, CONST_STRING(interp, "FileHandle")))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "Cannot put to non-IO PMC");
+            "Cannot write to non-IO PMC");
 
     if (Parrot_io_is_closed(interp, pmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "Cannot put to a closed I/O handle");
+            "Cannot write to a closed filehandle");
+
+    if (!(Parrot_io_get_flags(interp, pmc) & PIO_F_WRITE))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Cannot write to a filehandle not opened for write");
 
     if (STRING_IS_NULL(s))
         return 0;
@@ -452,6 +459,9 @@ Parrot_io_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD_NULLOK(STRING *s))
     if (0 && GC_DEBUG(interp))
         Parrot_do_dod_run(interp, GC_trace_stack_FLAG);
 #endif
+
+    if (Parrot_io_is_encoding(interp, pmc, CONST_STRING(interp, "utf8")))
+        return Parrot_io_write_utf8(interp, pmc, s);
 
     return Parrot_io_write_buffer(interp, pmc, s);
 }
@@ -540,7 +550,7 @@ Parrot_io_eprintf(NULLOK(PARROT_INTERP), ARGIN(const char *s), ...)
     if (interp) {
         STRING * const str = Parrot_vsprintf_c(interp, s, args);
 
-        ret = PIO_putps(interp, _PIO_STDERR(interp), str);
+        ret = Parrot_io_putps(interp, _PIO_STDERR(interp), str);
     }
     else {
         /* Be nice about this...
@@ -574,7 +584,7 @@ Parrot_io_getfd(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<INTVAL Parrot_io_isatty>
+=item C<INTVAL Parrot_io_is_tty>
 
 Returns a boolean value indicating whether C<*pmc> is a console/tty.
 

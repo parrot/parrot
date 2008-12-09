@@ -488,7 +488,7 @@ Parrot_find_global_n(PARROT_INTERP, ARGIN_NULLOK(PMC *ns), ARGIN_NULLOK(STRING *
 
 #if DEBUG_GLOBAL
     if (globalname)
-        PIO_printf(interp, "find_global name '%Ss'\n", globalname);
+        Parrot_io_printf(interp, "find_global name '%Ss'\n", globalname);
 #endif
 
     if (PMC_IS_NULL(ns))
@@ -601,7 +601,7 @@ Parrot_store_global_n(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
 {
 #if DEBUG_GLOBAL
     if (globalname)
-        PIO_printf(interp, "store_global name '%Ss'\n", globalname);
+        Parrot_io_printf(interp, "store_global name '%Ss'\n", globalname);
 #endif
 
     if (PMC_IS_NULL(ns))

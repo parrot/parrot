@@ -7,7 +7,8 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 45;
+use Parrot::Test tests => 43;
+use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME
@@ -157,11 +158,18 @@ OUTPUT
 my (undef, $no_such_file) = create_tempfile( UNLINK => 1, OPEN => 0 );
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "get_bool" );
+    push_eh read_non_existent_file
     open P0, "$no_such_file", "<"
-    unless P0, ok1
+
     print "Huh: '$no_such_file' exists? - not "
 ok1:
     say "ok 1"
+
+    open P0, "$temp_file", ">"
+    print P0, "a line\\n"
+    print P0, "a line\\n"
+    close P0
+
     open P0, "$temp_file", "<"
     if P0, ok2
     print "not "
@@ -184,6 +192,9 @@ ok5:    say "ok 5"
     print "not "
 ok6:    say "ok 6"
     end
+read_non_existent_file:
+    pop_eh
+    branch ok1
 CODE
 ok 1
 ok 2
@@ -193,38 +204,38 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "read on invalid fh should throw exception" );
-    open P0, "no_such_file", "<"
-    unless P0, ok1
-    print "Huh: 'no_such_file' exists? - not "
-ok1:
-    print "ok 1\n"
+pasm_output_is( <<"CODE", <<'OUTPUT', "read on invalid fh should throw exception" );
+    new P0, 'FileHandle'
 
-        push_eh _readline_handler
-        readline S0, P0 # Currently segfaults
-        print "not "
+    push_eh _readline_handler
+    readline S0, P0
+    print "not "
+
 _readline_handler:
-        print "ok 2\n"
-    branch fin
+        print "ok 1\\n"
+        pop_eh
 
-        push_eh _read_handler
-        read S0, P0, 1
-        print "not "
+    push_eh _read_handler
+    read S0, P0, 1
+    print "not "
+
 _read_handler:
-        print "ok 3\n"
+        print "ok 2\\n"
+        pop_eh
 
-        push_eh _print_handler
-        print P0, "kill me now\n"
-        print "not "
+    push_eh _print_handler
+    print P0, "kill me now\\n"
+    print "not "
+
 _print_handler:
-fin:
-        print "ok 4\n"
+        print "ok 3\\n"
+        pop_eh
 
-        end
+    end
 CODE
 ok 1
 ok 2
-ok 4
+ok 3
 OUTPUT
 
 SKIP: {
@@ -287,7 +298,7 @@ pasm_output_is( <<"CODE", <<'OUTPUT', "open & print" );
    new P0, 'String'
    set P0, "Bar\\n"
 
-   open P1, "$temp_file"
+   open P1, "$temp_file", "w"
    print P1, I0
    print P1, N0
    print P1, S0
@@ -309,23 +320,36 @@ close $FOO;
 
 # write to file opened for reading
 pasm_output_is( <<"CODE", <<'OUTPUT', "3-arg open" );
-   open P1, "$temp_file", "<"
+   open P1, "$temp_file", ">"
    print P1, "Foobar\\n"
    close P1
+
+   push_eh _print_to_read_only
+
+   open P2, "$temp_file", "<"
+   print P2, "baz\\n"
+   say "skipped"
+
+_print_to_read_only:
+   say "caught writing to file opened for reading"
+   pop_eh
+
+   close P2
 
    open P3, "$temp_file", "<"
    readline S1, P3
    close P3
-
    print S1
-   say "writing to file opened for reading"
+
+
    end
 CODE
-writing to file opened for reading
+caught writing to file opened for reading
+Foobar
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', 'open and close' );
-   open P1, "$temp_file"
+   open P1, "$temp_file", "w"
    print P1, "Hello, World!\\n"
    close P1
    say "done"
@@ -361,7 +385,7 @@ file_content_is( $temp_file, <<'OUTPUT', 'file contents' );
 Parrot overwrites
 OUTPUT
 
-pasm_output_is( <<"CODE", '', "PIO_flush on buffer full" );
+pasm_output_is( <<"CODE", '', "Parrot_io_flush on buffer full" );
    set I0, 0
    set I1, 10000
 
@@ -382,21 +406,26 @@ file_content_is( $temp_file, <<'OUTPUT' x 10000, 'buffered file contents' );
 words
 OUTPUT
 
-pasm_output_is( <<"CODE", '0', "turn off buffering" );
-   open P0, "$temp_file", ">"
+pir_output_is( <<"CODE", <<'OUTPUT', "turn off buffering" );
+.sub main :main
+   open \$P0, "$temp_file", ">"
 
-#  PIOCTL_CMDSETBUFTYPE, PIOCTL_NONBUF
-   pioctl I0, P0, 3, 0
+#  set buffer type
+   \$P0.'buffer_type'('unbuffered')
 
-#  PIOCTL_CMDGETBUFTYPE, <dummy value>
-   pioctl I0, P0, 4, 0
-   print I0
+#  get buffer type
+   \$S0 = \$P0.'buffer_type'()
+   print \$S0
+   print "\\n"
 
-   print P0, "Howdy World\\n"
+   print \$P0, "Howdy World\\n"
 
-   close P0
+   close \$P0
    end
+.end
 CODE
+unbuffered
+OUTPUT
 
 file_content_is( $temp_file, <<'OUTPUT', 'unbuffered file contents' );
 Howdy World
@@ -622,49 +651,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "layer names" );
-    getstdin P0
-    set S0, P0[0]
-    print S0
-    print "-"
-    set S0, P0[1]
-    print S0
-    print "-"
-    set S0, P0[-1]
-    print S0
-    print "-"
-    set S0, P0[-2]
-    print S0
-    print "-"
-    set S0, P0[-3]
-    print S0
-    print "-"
-    end
-CODE
-/^(unix|win32|stdio)-buf-buf-\1--$/
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "layer push, pop" );
-    getstdin P0
-    push P0, "utf8"
-    set S0, P0[-1]
-    print S0
-    print "\n"
-    pop S1, P0
-    print S1
-    print "\n"
-    set S0, P0[-1]
-    print S0
-    print "\n"
-    end
-CODE
-utf8
-utf8
-buf
-OUTPUT
-
 pir_output_is( <<"CODE", <<'OUTPUT', "substr after reading from file" );
-
 .sub _main
     # Write something into a file
     .local pmc out
@@ -746,7 +733,7 @@ OUT
 print $FOO "T\xc3\xb6tsch\n";
 close $FOO;
 
-pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read layer" );
+pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read enabled" );
 .sub main :main
     .local pmc pio
     .local int len
@@ -755,7 +742,7 @@ pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read layer" );
     f = '$temp_file'
     len = stat f, .STAT_FILESIZE
     pio = open f, "<"
-    push pio, "utf8"
+    pio.'encoding'("utf8")
     \$S0 = read pio, len
     close pio
     \$I1 = charset \$S0
@@ -776,13 +763,13 @@ utf8
 T\xf6tsch
 OUTPUT
 
-pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read layer - readline" );
+pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read enabled - readline" );
 .sub main :main
     .local pmc pio
     .local string f
     f = '$temp_file'
     pio = open f, "<"
-    push pio, "utf8"
+    pio.'encoding'("utf8")
     \$S0 = readline pio
     close pio
     \$I1 = charset \$S0
@@ -803,7 +790,7 @@ utf8
 T\xf6tsch
 OUTPUT
 
-pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read layer, read parts" );
+pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read enabled, read parts" );
 .sub main :main
     .local pmc pio
     .local int len
@@ -812,7 +799,7 @@ pir_output_is( <<"CODE", <<"OUTPUT", "utf8 read layer, read parts" );
     f = '$temp_file'
     len = stat f, .STAT_FILESIZE
     pio = open f, "<"
-    push pio, "utf8"
+    pio.'encoding'("utf8")
     \$S0 = read pio, 2
     len -= 2
     \$S1 = read pio, len
@@ -836,32 +823,28 @@ utf8
 T\xf6tsch
 OUTPUT
 
-pir_output_is( <<'CODE', <<"OUTPUT", "string read/write layer" );
+pir_output_is( <<'CODE', <<"OUTPUT", "string read/write handle", todo => "no stringhandle yet" );
 .sub main :main
     .local pmc    pio
     .local string greeting
     .local string layer
 
-    pio = getstdout
-    push pio, "string"
-    print "Hello"
-    print ", "
-    print "world!"
-    print "\n"
+    pio = new 'StringHandle'
+    print pio, "Hello"
+    print pio, ", "
+    print pio, "world!"
+    print pio, "\n"
 
     greeting = read pio, 1024
-    pop layer, pio
 
     print greeting
-    print layer
     print "\n"
 .end
 CODE
 Hello, world!
-string
 OUTPUT
 
-pir_output_is( <<"CODE", <<"OUTPUT", "PIO.slurp() - classmeth" );
+pir_output_is( <<"CODE", <<"OUTPUT", "PIO.readall() - classmeth" );
 .sub main :main
     \$S0 = <<"EOS"
 line 1
@@ -872,8 +855,8 @@ EOS
     pio = open    "$temp_file", ">"
     print pio, \$S0
     close pio
-    cl = new 'ParrotIO'
-    \$S1 = cl.'slurp'('$temp_file')
+    cl = new 'FileHandle'
+    \$S1 = cl.'readall'('$temp_file')
     if \$S0 == \$S1 goto ok
     print "not "
 ok:
@@ -883,7 +866,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is( <<"CODE", <<"OUTPUT", "PIO.slurp() - object" );
+pir_output_is( <<"CODE", <<"OUTPUT", "PIO.readall() - object" );
 .sub main :main
     \$S0 = <<"EOS"
 line 1
@@ -895,7 +878,7 @@ EOS
     print pio, \$S0
     close pio
     pio2 = open    "$temp_file", "<"
-    \$S1 = pio2.'slurp'('dummy')
+    \$S1 = pio2.'readall'()
     if \$S0 == \$S1 goto ok
     print "not "
 ok:

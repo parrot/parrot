@@ -598,13 +598,13 @@ Parrot_dod_sweep(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 #if GC_VERBOSE
     if (Interp_trace_TEST(interp, 1)) {
         Interp * const tracer = interp->debugger;
-        PMC *pio       = PIO_STDERR(interp);
+        PMC *pio       = Parrot_io_STDERR(interp);
 
-        PIO_flush(interp, pio);
+        Parrot_io_flush(interp, pio);
 
         if (tracer) {
-            pio = PIO_STDERR(tracer);
-            PIO_flush(tracer, pio);
+            pio = Parrot_io_STDERR(tracer);
+            Parrot_io_flush(tracer, pio);
         }
     }
 #endif

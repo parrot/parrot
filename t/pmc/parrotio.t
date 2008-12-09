@@ -10,7 +10,7 @@ use Parrot::Test tests => 6;
 
 =head1 NAME
 
-t/pmc/parrotio.t - test the ParrotIO PMC
+t/pmc/parrotio.t - test the FileHandle PMC
 
 =head1 SYNOPSIS
 
@@ -18,24 +18,24 @@ t/pmc/parrotio.t - test the ParrotIO PMC
 
 =head1 DESCRIPTION
 
-Tests the ParrotIO PMC.
+Tests the FileHandle PMC.
 
 =cut
 
 # L<PDD22/I\/O PMC API/=item new>
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    new $P0, 'ParrotIO'
-    say "ok 1 - $P0 = new 'ParrotIO'"
+    new $P0, 'FileHandle'
+    say "ok 1 - $P0 = new 'FileHandle'"
 .end
 CODE
-ok 1 - $P0 = new 'ParrotIO'
+ok 1 - $P0 = new 'FileHandle'
 OUT
 
 # L<PDD22/I\/O PMC API/=item open.*=item close>
 pir_output_is( <<'CODE', <<'OUT', 'open and close - synchronous', todo => 'not yet implemented' );
 .sub 'test' :main
-    $P0 = new 'ParrotIO'
+    $P0 = new 'FileHandle'
     $P0.open('README')
     say 'ok 1 - $P0.open($S1)'
 
@@ -89,7 +89,7 @@ SKIP: {
     pir_output_is( <<'CODE', <<'OUT', 'open and close - asynchronous' );
 .sub 'test' :main
     $P1 = # RT #46831 create a callback here
-    $P0 = new 'ParrotIO'
+    $P0 = new 'FileHandle'
 
     $P0.open('README')
     say 'ok 1 - $P0.open($S1)'
@@ -123,7 +123,7 @@ pir_output_is(
     .local pmc chomp
                chomp = get_global ['String';'Utils'], 'chomp'
 
-    $P0 = new 'ParrotIO'
+    $P0 = new 'FileHandle'
     $P0.open('README')
 
     $S0 = $P0.read(14) # bytes
@@ -177,7 +177,7 @@ OUT
 # L<PDD22/I\/O PMC API/=item record_separator>
 pir_output_is( <<'CODE', <<'OUT', 'record_separator', todo => 'not yet implemented' );
 .sub 'test' :main
-    $P0 = new 'ParrotIO'
+    $P0 = new 'FileHandle'
 
     $S0 = $P0.record_separator()
     if $S0 == "\n" goto ok_1
@@ -215,7 +215,7 @@ pir_output_is( <<'CODE', <<'OUT', 'buffer_type', todo => 'not yet implemented' )
 .sub 'test' :main
     .include 'io_buffer_types.pasm'
 
-    $P0 = new 'ParrotIO'
+    $P0 = new 'FileHandle'
 
     $P0.buffer_type('unbuffered')
     $I0 = $P0.buffer_type()

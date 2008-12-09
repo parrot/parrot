@@ -187,7 +187,7 @@ op_fullname(ARGOUT(char *dest), ARGIN(const char *name),
 
 #if IMC_TRACE_HIGH
     char *full = dest;
-    PIO_eprintf(NULL, "op %s", name);
+    Parrot_io_eprintf(NULL, "op %s", name);
 #endif
 
     strcpy(dest, name);
@@ -198,7 +198,7 @@ op_fullname(ARGOUT(char *dest), ARGIN(const char *name),
         *dest++ = '_';
         if (args[i]->type == VTADDRESS) {
 #if IMC_TRACE_HIGH
-            PIO_eprintf(NULL, " (address)%s", args[i]->name);
+            Parrot_io_eprintf(NULL, " (address)%s", args[i]->name);
 #endif
             *dest++ = 'i';
             *dest++ = 'c';
@@ -207,7 +207,7 @@ op_fullname(ARGOUT(char *dest), ARGIN(const char *name),
         /* if one ever wants num keys, they go with 'S' */
         if (keyvec & KEY_BIT(i)) {
 #if IMC_TRACE_HIGH
-            PIO_eprintf(NULL, " (key)%s", args[i]->name);
+            Parrot_io_eprintf(NULL, " (key)%s", args[i]->name);
 #endif
             *dest++ = 'k';
             if (args[i]->set=='S' || args[i]->set=='N' || args[i]->set=='K') {
@@ -225,18 +225,20 @@ op_fullname(ARGOUT(char *dest), ARGIN(const char *name),
 
         if (args[i]->type & (VTCONST|VT_CONSTP)) {
 #if IMC_TRACE_HIGH
-            PIO_eprintf(NULL, " (%cc)%s", tolower((unsigned char)args[i]->set), args[i]->name);
+            Parrot_io_eprintf(NULL, " (%cc)%s",
+                    tolower((unsigned char)args[i]->set), args[i]->name);
 #endif
             *dest++ = 'c';
         }
 #if IMC_TRACE_HIGH
         else
-            PIO_eprintf(NULL, " (%c)%s", tolower((unsigned char)args[i]->set), args[i]->name);
+            Parrot_io_eprintf(NULL, " (%c)%s",
+                    tolower((unsigned char)args[i]->set), args[i]->name);
 #endif
     }
     *dest = '\0';
 #if IMC_TRACE_HIGH
-    PIO_eprintf(NULL, " -> %s\n", full);
+    Parrot_io_eprintf(NULL, " -> %s\n", full);
 #endif
 }
 

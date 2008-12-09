@@ -70,11 +70,11 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    PIO_eprintf(interp, "main\n");
+    Parrot_io_eprintf(interp, "main\n");
 
     Parrot_run_native(interp, the_test);
 
-    PIO_eprintf(interp, "back\n");
+    Parrot_io_eprintf(interp, "back\n");
     Parrot_exit(interp, 0);
     return 0;
 }
@@ -87,7 +87,7 @@ the_test(Interp *interp,
     UNUSED(start);
 
     /* tests go here */
-    PIO_eprintf(interp, "ok\n");
+    Parrot_io_eprintf(interp, "ok\n");
 
     return NULL; /* always return 0 or bad things may happen */
 }

@@ -445,7 +445,7 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                 exit(EX_USAGE);
                 break;
             case OPT_RUNTIME_PREFIX:
-                PIO_printf(interp, "%Ss\n",
+                Parrot_io_printf(interp, "%Ss\n",
                     Parrot_get_runtime_path(interp));
                 exit(EXIT_SUCCESS);
             case 'V':

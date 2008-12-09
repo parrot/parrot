@@ -52,7 +52,6 @@ not highest type in table.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static INTVAL distance_cmp(SHIM_INTERP, INTVAL a, INTVAL b);
-
 static void mmd_add_multi_global(PARROT_INTERP,
     ARGIN(STRING *sub_name),
     ARGIN(PMC *sub_obj))
@@ -1494,7 +1493,7 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
             else {
                 s2 = interp->vtables[type_call]->whoami;
             }
-            PIO_eprintf(interp, "arg %d: dist %d sig %Ss arg %Ss\n",
+            Parrot_io_eprintf(interp, "arg %d: dist %d sig %Ss arg %Ss\n",
                 i, dist, s1, s2);
         }
 #endif

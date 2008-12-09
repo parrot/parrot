@@ -218,7 +218,7 @@ PackFile_find_in_const(PARROT_INTERP,
         else if (type == PFC_NUMBER && ct->constants[i]->u.number ==
                  PMC_num_val(key))
             return i;
-    PIO_eprintf(NULL, "find_in_const: couldn't find const for key\n");
+    Parrot_io_eprintf(NULL, "find_in_const: couldn't find const for key\n");
     Parrot_exit(interp, 1);
 }
 
@@ -325,7 +325,7 @@ PackFile_Constant_pack(PARROT_INTERP,
                     *cursor++ = PMC_int_val(key);
                     break;
                 default:
-                    PIO_eprintf(NULL, "PackFile_Constant_pack: "
+                    Parrot_io_eprintf(NULL, "PackFile_Constant_pack: "
                             "unsupported constant type\n");
                     Parrot_exit(interp, 1);
             }
@@ -334,7 +334,7 @@ PackFile_Constant_pack(PARROT_INTERP,
         break;
 
     default:
-        PIO_eprintf(NULL, "PackFile_Constant_pack: unsupported constant\n");
+        Parrot_io_eprintf(NULL, "PackFile_Constant_pack: unsupported constant\n");
         Parrot_exit(interp, 1);
         break;
     }

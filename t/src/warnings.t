@@ -71,26 +71,26 @@ main(int argc, char* argv[])
     PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
 
     error_val = Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG, "all");
-    PIO_eprintf(interp, "%d\n", error_val);
+    Parrot_io_eprintf(interp, "%d\n", error_val);
 
     /* warnings are on, this should return an error */
     error_val = Parrot_warn(interp, PARROT_WARNINGS_NONE_FLAG, "none");
-    PIO_eprintf(interp, "%d\n", error_val);
+    Parrot_io_eprintf(interp, "%d\n", error_val);
 
     error_val = Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG, "undef");
-    PIO_eprintf(interp, "%d\n", error_val);
+    Parrot_io_eprintf(interp, "%d\n", error_val);
 
     error_val = Parrot_warn(interp, PARROT_WARNINGS_IO_FLAG, "io");
-    PIO_eprintf(interp, "%d\n", error_val);
+    Parrot_io_eprintf(interp, "%d\n", error_val);
 
     error_val = Parrot_warn(interp, PARROT_WARNINGS_PLATFORM_FLAG, "platform");
-    PIO_eprintf(interp, "%d\n", error_val);
+    Parrot_io_eprintf(interp, "%d\n", error_val);
 
     error_val = Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG, "dynext");
-    PIO_eprintf(interp, "%d\n", error_val);
+    Parrot_io_eprintf(interp, "%d\n", error_val);
 
     error_val = Parrot_warn(interp, 0, "eek"); /* should return error */
-    PIO_eprintf(interp, "%d\n", error_val);
+    Parrot_io_eprintf(interp, "%d\n", error_val);
 
     Parrot_exit(interp, 0);
     return 0;

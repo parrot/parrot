@@ -268,7 +268,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "x = can" );
 .sub test :main
-    $P0 = new 'ParrotIO'
+    $P0 = new 'FileHandle'
     $I0 = can $P0, "puts"
     print $I0
     print "\n"

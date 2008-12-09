@@ -250,6 +250,15 @@ resizing it without flushing would truncate the buffer.
 Accessor (get only) for the I/O stream's read mode. This returns the mode
 string used to open the I/O stream.
 
+=item C<encoding>
+
+  $S0 = $P1.encoding()
+  $P0.encoding($S1)
+
+Accessor (get and set) for the I/O stream's encoding attribute. Currently,
+the only valid value to set is 'utf8' which turns on UTF-8 reading/writing
+mode for the stream. The default behavior is fixed-width 8-bit characters.
+
 =item C<get_fd> [RT #48312]
 
   $I0 = $P1.get_fd()

@@ -434,7 +434,7 @@ PF_fetch_opcode(ARGIN_NULLOK(const PackFile *pf), ARGMOD(const opcode_t **stream
     if (!pf || !pf->fetch_op)
         return *(*stream)++;
 #if TRACE_PACKFILE == 2
-    PIO_eprintf(NULL, "PF_fetch_opcode: Reordering.\n");
+    Parrot_io_eprintf(NULL, "PF_fetch_opcode: Reordering.\n");
 #endif
     o = (pf->fetch_op)(*((const unsigned char **)stream));
     *((const unsigned char **) (stream)) += pf->header->wordsize;
@@ -567,7 +567,7 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
     double d;
     if (!pf || !pf->fetch_nv) {
 #if TRACE_PACKFILE
-        PIO_eprintf(NULL, "PF_fetch_number: Native [%d bytes]\n",
+        Parrot_io_eprintf(NULL, "PF_fetch_number: Native [%d bytes]\n",
                 sizeof (FLOATVAL));
 #endif
         memcpy(&f, (const char*)*stream, sizeof (FLOATVAL));
@@ -577,7 +577,7 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
     }
     f = (FLOATVAL) 0;
 #if TRACE_PACKFILE
-    PIO_eprintf(NULL, "PF_fetch_number: Byteordering..\n");
+    Parrot_io_eprintf(NULL, "PF_fetch_number: Byteordering..\n");
 #endif
     /* Here is where the size transforms get messy */
     if (NUMVAL_SIZE == 8 && ! pf->header->floattype) {
@@ -671,10 +671,10 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
 
 /* #define TRACE_PACKFILE 1 */
 #if TRACE_PACKFILE
-    PIO_eprintf(NULL, "PF_fetch_string(): flags are 0x%04x...\n", flags);
-    PIO_eprintf(NULL, "PF_fetch_string(): charset_nr is %ld...\n",
+    Parrot_io_eprintf(NULL, "PF_fetch_string(): flags are 0x%04x...\n", flags);
+    Parrot_io_eprintf(NULL, "PF_fetch_string(): charset_nr is %ld...\n",
            charset_nr);
-    PIO_eprintf(NULL, "PF_fetch_string(): size is %ld...\n", size);
+    Parrot_io_eprintf(NULL, "PF_fetch_string(): size is %ld...\n", size);
 #endif
 
 
@@ -682,9 +682,9 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
     s = string_make(interp, (const char *)*cursor, size, charset_name, flags);
 
 #if TRACE_PACKFILE
-    PIO_eprintf(NULL, "PF_fetch_string(): string is: ");
-    PIO_putps(interp, PIO_STDERR(interp), s);
-    PIO_eprintf(NULL, "\n");
+    Parrot_io_eprintf(NULL, "PF_fetch_string(): string is: ");
+    Parrot_io_putps(interp, Parrot_io_STDERR(interp), s);
+    Parrot_io_eprintf(NULL, "\n");
 #endif
 
 /*    s = string_make(interp, *cursor, size,
@@ -714,7 +714,7 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
     opcode_t padded_size = s->bufused;
     char *charcursor;
 
-/*    PIO_eprintf(NULL, "PF_store_string(): size is %ld...\n", s->bufused); */
+/*    Parrot_io_eprintf(NULL, "PF_store_string(): size is %ld...\n", s->bufused); */
 
     if (padded_size % sizeof (opcode_t)) {
         padded_size += sizeof (opcode_t) - (padded_size % sizeof (opcode_t));

@@ -394,14 +394,14 @@ Parrot_readbc(PARROT_INTERP, ARGIN_NULLOK(const char *fullname))
 
         /* can't read a file that doesn't exist */
         if (!Parrot_stat_info_intval(interp, fs, STAT_EXISTS)) {
-            PIO_eprintf(interp, "Parrot VM: Can't stat %s, code %i.\n",
+            Parrot_io_eprintf(interp, "Parrot VM: Can't stat %s, code %i.\n",
                     fullname, errno);
             return NULL;
         }
 
         /* we may need to relax this if we want to read bytecode from pipes */
         if (!Parrot_stat_info_intval(interp, fs, STAT_ISREG)) {
-            PIO_eprintf(interp, "Parrot VM: '%s', is not a regular file %i.\n",
+            Parrot_io_eprintf(interp, "Parrot VM: '%s', is not a regular file %i.\n",
                     fullname, errno);
             return NULL;
         }
@@ -412,7 +412,7 @@ Parrot_readbc(PARROT_INTERP, ARGIN_NULLOK(const char *fullname))
         io = fopen(fullname, "rb");
 
         if (!io) {
-            PIO_eprintf(interp, "Parrot VM: Can't open %s, code %i.\n",
+            Parrot_io_eprintf(interp, "Parrot VM: Can't open %s, code %i.\n",
                     fullname, errno);
             return NULL;
         }
@@ -442,7 +442,7 @@ again:
                 (char *)mem_sys_realloc(program_code, program_size + chunk_size);
 
             if (!program_code) {
-                PIO_eprintf(interp,
+                Parrot_io_eprintf(interp,
                             "Parrot VM: Could not reallocate buffer "
                             "while reading packfile from PIO.\n");
                 return NULL;
@@ -452,7 +452,7 @@ again:
         }
 
         if (ferror(io)) {
-            PIO_eprintf(interp, "Parrot VM: Problem reading packfile from PIO:  code %d.\n",
+            Parrot_io_eprintf(interp, "Parrot VM: Problem reading packfile from PIO:  code %d.\n",
                         ferror(io));
             return NULL;
         }
@@ -472,7 +472,7 @@ again:
         fd = open(fullname, O_RDONLY | O_BINARY);
 
         if (!fd) {
-            PIO_eprintf(interp, "Parrot VM: Can't open %s, code %i.\n",
+            Parrot_io_eprintf(interp, "Parrot VM: Can't open %s, code %i.\n",
                     fullname, errno);
             return NULL;
         }
@@ -488,7 +488,7 @@ again:
             /* try again, now with IO reading the file */
             io = fopen(fullname, "rb");
             if (!io) {
-                PIO_eprintf(interp, "Parrot VM: Can't open %s, code %i.\n",
+                Parrot_io_eprintf(interp, "Parrot VM: Can't open %s, code %i.\n",
                         fullname, errno);
                 return NULL;
             }
@@ -498,7 +498,7 @@ again:
 
 #else   /* PARROT_HAS_HEADER_SYSMMAN */
 
-        PIO_eprintf(interp, "Parrot VM: uncaught error occurred reading "
+        Parrot_io_eprintf(interp, "Parrot VM: uncaught error occurred reading "
                     "file or mmap not available.\n");
         return NULL;
 
@@ -512,7 +512,7 @@ again:
 
     if (!PackFile_unpack(interp, pf, (opcode_t *)program_code,
             (size_t)program_size)) {
-        PIO_eprintf(interp, "Parrot VM: Can't unpack packfile %s.\n",
+        Parrot_io_eprintf(interp, "Parrot VM: Can't unpack packfile %s.\n",
                 fullname);
         return NULL;
     }
@@ -551,7 +551,7 @@ void
 Parrot_loadbc(PARROT_INTERP, NOTNULL(PackFile *pf))
 {
     if (pf == NULL) {
-        PIO_eprintf(interp, "Invalid packfile\n");
+        Parrot_io_eprintf(interp, "Invalid packfile\n");
         return;
     }
 
@@ -578,7 +578,7 @@ setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
     PMC   *userargv;
 
     if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
-        PIO_eprintf(interp,
+        Parrot_io_eprintf(interp,
             "*** Parrot VM: Setting up ARGV array.  Current argc: %d ***\n",
             argc);
     }
@@ -598,7 +598,7 @@ setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
                 PObj_external_FLAG);
 
         if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG))
-            PIO_eprintf(interp, "\t%vd: %s\n", i, argv[i]);
+            Parrot_io_eprintf(interp, "\t%vd: %s\n", i, argv[i]);
 
         VTABLE_push_string(interp, userargv, arg);
     }
@@ -722,10 +722,10 @@ print_profile(PARROT_INTERP, SHIM(int status), SHIM(void *p))
         FLOATVAL       sum_time   = 0.0;
         const FLOATVAL empty      = calibrate(interp);
 
-        PIO_printf(interp,
+        Parrot_io_printf(interp,
                    "Calibration: overhead = %.6f ms/op\n", 1000.0 * empty);
 
-        PIO_printf(interp,
+        Parrot_io_printf(interp,
                    " Code J Name                         "
                    "Calls  Total/s       Avg/ms\n");
 
@@ -762,7 +762,7 @@ print_profile(PARROT_INTERP, SHIM(int status), SHIM(void *p))
                     op_jit[k - PARROT_PROF_EXTRA].extcall != 1)
                     jit = 'j';
 #endif
-                PIO_printf(interp, " %4d %c %-25s %8vu  %10vf  %10.6vf\n",
+                Parrot_io_printf(interp, " %4d %c %-25s %8vu  %10vf  %10.6vf\n",
                         k - PARROT_PROF_EXTRA,
                         jit,
                         op_name(interp, k),
@@ -772,7 +772,7 @@ print_profile(PARROT_INTERP, SHIM(int status), SHIM(void *p))
             }
         }
 
-        PIO_printf(interp, " %4vu - %-25s %8vu  %10vf  %10.6vf\n",
+        Parrot_io_printf(interp, " %4vu - %-25s %8vu  %10vf  %10.6vf\n",
                 op_count,
                 "-",
                 call_count,
@@ -798,7 +798,7 @@ print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
     if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {
         /* Give souls brave enough to activate debugging an earful about GC. */
 
-        PIO_eprintf(interp, "*** Parrot VM: Dumping GC info ***\n");
+        Parrot_io_eprintf(interp, "*** Parrot VM: Dumping GC info ***\n");
         PDB_info(interp);
     }
 }
@@ -881,50 +881,50 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(char **argv))
     PMC *userargv, *main_sub;
 
     if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG))
-        PIO_eprintf(interp,
+        Parrot_io_eprintf(interp,
                 "*** Parrot VM: Setting stack top. ***\n");
 
     /* Debugging mode nonsense. */
     if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
         if (Interp_flags_TEST(interp, PARROT_BOUNDS_FLAG)) {
-            PIO_eprintf(interp,
+            Parrot_io_eprintf(interp,
                     "*** Parrot VM: Bounds checking enabled. ***\n");
         }
 
         if (Interp_trace_TEST(interp, PARROT_TRACE_OPS_FLAG))
-            PIO_eprintf(interp, "*** Parrot VM: Tracing enabled. ***\n");
+            Parrot_io_eprintf(interp, "*** Parrot VM: Tracing enabled. ***\n");
 
-        PIO_eprintf(interp, "*** Parrot VM: ");
+        Parrot_io_eprintf(interp, "*** Parrot VM: ");
 
         switch (interp->run_core) {
             case PARROT_SLOW_CORE:
-                PIO_eprintf(interp, "Slow core");
+                Parrot_io_eprintf(interp, "Slow core");
                 break;
             case PARROT_FAST_CORE:
-                PIO_eprintf(interp, "Fast core");
+                Parrot_io_eprintf(interp, "Fast core");
                 break;
             case PARROT_SWITCH_CORE:
             case PARROT_SWITCH_JIT_CORE:
-                PIO_eprintf(interp, "Switch core");
+                Parrot_io_eprintf(interp, "Switch core");
                 break;
             case PARROT_CGP_CORE:
             case PARROT_CGP_JIT_CORE:
-                PIO_eprintf(interp, "CGP core");
+                Parrot_io_eprintf(interp, "CGP core");
                 break;
             case PARROT_CGOTO_CORE:
-                PIO_eprintf(interp, "CGoto core");
+                Parrot_io_eprintf(interp, "CGoto core");
                 break;
             case PARROT_JIT_CORE:
-                PIO_eprintf(interp, "JIT core");
+                Parrot_io_eprintf(interp, "JIT core");
                 break;
             case PARROT_EXEC_CORE:
-                PIO_eprintf(interp, "EXEC core");
+                Parrot_io_eprintf(interp, "EXEC core");
                 break;
             default:
                 Parrot_ex_throw_from_c_args(interp, NULL, 1, "Unknown run core");
         }
 
-        PIO_eprintf(interp, " ***\n");
+        Parrot_io_eprintf(interp, " ***\n");
     }
 
     /* Set up @ARGS (or whatever this language calls it) in userargv. */
@@ -1032,20 +1032,20 @@ Parrot_disassemble(PARROT_INTERP)
     line   = pdb->file->line;
     debugs = (interp->code->debugs != NULL);
 
-    PIO_printf(interp, "%12s-%12s", "Seq_Op_Num", "Relative-PC");
+    Parrot_io_printf(interp, "%12s-%12s", "Seq_Op_Num", "Relative-PC");
 
     if (debugs) {
-        PIO_printf(interp, " %6s:\n", "SrcLn#");
+        Parrot_io_printf(interp, " %6s:\n", "SrcLn#");
         num_mappings = interp->code->debugs->num_mappings;
     }
     else {
-        PIO_printf(interp, "\n");
+        Parrot_io_printf(interp, "\n");
     }
 
     while (line->next) {
         const char *c;
 
-        /* PIO_printf(interp, "%i < %i %i == %i \n", curr_mapping,
+        /* Parrot_io_printf(interp, "%i < %i %i == %i \n", curr_mapping,
          * num_mappings, op_code_seq_num,
          * interp->code->debugs->mappings[curr_mapping]->offset); */
 
@@ -1053,29 +1053,31 @@ Parrot_disassemble(PARROT_INTERP)
             if (op_code_seq_num == interp->code->debugs->mappings[curr_mapping]->offset) {
                 const int filename_const_offset =
                     interp->code->debugs->mappings[curr_mapping]->u.filename;
-                PIO_printf(interp, "Current Source Filename %Ss\n",
+                Parrot_io_printf(interp, "Current Source Filename %Ss\n",
                         interp->code->const_table->constants[filename_const_offset]->u.string);
                 curr_mapping++;
             }
         }
 
-        PIO_printf(interp, "%012i-%012i", op_code_seq_num, line->opcode - interp->code->base.data);
+        Parrot_io_printf(interp, "%012i-%012i",
+                op_code_seq_num, line->opcode - interp->code->base.data);
 
         if (debugs)
-            PIO_printf(interp, " %06i: ", interp->code->debugs->base.data[op_code_seq_num]);
+            Parrot_io_printf(interp, " %06i: ",
+                    interp->code->debugs->base.data[op_code_seq_num]);
 
         /* If it has a label print it */
         if (line->label)
-            PIO_printf(interp, "L%li:\t", line->label->number);
+            Parrot_io_printf(interp, "L%li:\t", line->label->number);
         else
-            PIO_printf(interp, "\t");
+            Parrot_io_printf(interp, "\t");
 
         c = pdb->file->source + line->source_offset;
 
         while (c && *c != '\n')
-            PIO_printf(interp, "%c", *(c++));
+            Parrot_io_printf(interp, "%c", *(c++));
 
-        PIO_printf(interp, "\n");
+        Parrot_io_printf(interp, "\n");
         line = line->next;
         op_code_seq_num++;
     }

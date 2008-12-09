@@ -560,7 +560,7 @@ Parrot_free_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctx), int deref)
 #ifndef NDEBUG
         if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)
             && ctx->current_sub) {
-            /* can't probably PIO_eprintf here */
+            /* can't probably Parrot_io_eprintf here */
             const Parrot_sub * const doomed = PMC_sub(ctx->current_sub);
 
             if (doomed) {

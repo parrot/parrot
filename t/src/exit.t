@@ -44,7 +44,7 @@ ex2(Parrot_Interp interp, int x, void*p)
 void
 ex3(Parrot_Interp interp, int x, void*p)
 {
-    PIO_printf(interp, "ex3\n");
+    Parrot_io_printf(interp, "ex3\n");
 }
 
 int

@@ -23,127 +23,147 @@ Tests Parrot unicode string system.
 
 =cut
 
-pasm_output_is( <<'CODE', <<OUTPUT, "angstrom" );
-    getstdout P0
-    push P0, "utf8"
-    chr S0, 0x212B
-    print P0, S0
-    print P0, "\n"
+pir_output_is( <<'CODE', <<OUTPUT, "angstrom" );
+.sub main :main
+    getstdout $P0
+    $P0.'encoding'("utf8")
+    chr $S0, 0x212B
+    print $P0, $S0
+    print $P0, "\n"
     end
+.end
 CODE
 \xe2\x84\xab
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "escaped angstrom" );
-    getstdout P0
-    push P0, "utf8"
-    set S0, unicode:"\x{212b}"
-    print S0
+pir_output_is( <<'CODE', <<OUTPUT, "escaped angstrom" );
+.sub main :main
+    getstdout $P0
+    $P0.'encoding'("utf8")
+    set $S0, unicode:"\x{212b}"
+    print $S0
     print "\n"
     end
+.end
 CODE
 \xe2\x84\xab
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "escaped angstrom 2" );
-    getstdout P0
-    push P0, "utf8"
-    set S0, unicode:"aaaaaa\x{212b}"
-    print S0
+pir_output_is( <<'CODE', <<OUTPUT, "escaped angstrom 2" );
+.sub main :main
+    getstdout $P0
+    $P0.'encoding'("utf8")
+    set $S0, unicode:"aaaaaa\x{212b}"
+    print $S0
     print "\n"
     end
+.end
 CODE
 aaaaaa\xe2\x84\xab
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "escaped angstrom 3" );
-    getstdout P0
-    push P0, "utf8"
-    set S0, unicode:"aaaaaa\x{212b}-aaaaaa"
-    print S0
+pir_output_is( <<'CODE', <<OUTPUT, "escaped angstrom 3" );
+.sub main :main
+    getstdout $P0
+    $P0.'encoding'("utf8")
+    set $S0, unicode:"aaaaaa\x{212b}-aaaaaa"
+    print $S0
     print "\n"
     end
+.end
 CODE
 aaaaaa\xe2\x84\xab-aaaaaa
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, 'escaped angstrom 3 \uhhhh' );
-    getstdout P0
-    push P0, "utf8"
-    set S0, unicode:"aaaaaa\u212b-aaaaaa"
-    print S0
+pir_output_is( <<'CODE', <<OUTPUT, 'escaped angstrom 3 \uhhhh' );
+.sub main :main
+    getstdout $P0
+    $P0.'encoding'("utf8")
+    set $S0, unicode:"aaaaaa\u212b-aaaaaa"
+    print $S0
     print "\n"
     end
+.end
 CODE
 aaaaaa\xe2\x84\xab-aaaaaa
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "MATHEMATICAL BOLD CAPITAL A" );
-    getstdout P0
-    push P0, "utf8"
-    set S0, unicode:"aaaaaa\x{1d400}-aaaaaa"
-    print S0
+pir_output_is( <<'CODE', <<OUTPUT, "MATHEMATICAL BOLD CAPITAL A" );
+.sub main :main
+    getstdout $P0
+    $P0.'encoding'("utf8")
+    set $S0, unicode:"aaaaaa\x{1d400}-aaaaaa"
+    print $S0
     print "\n"
     end
+.end 
 CODE
 aaaaaa\xf0\x9d\x90\x80-aaaaaa
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, 'MATHEMATICAL BOLD CAPITAL A \U' );
-    getstdout P0
-    push P0, "utf8"
-    set S0, unicode:"aaaaaa\U0001d400-aaaaaa"
-    print S0
+pir_output_is( <<'CODE', <<OUTPUT, 'MATHEMATICAL BOLD CAPITAL A \U' );
+.sub main :main
+    getstdout $P0
+    $P0.'encoding'("utf8")
+    set $S0, unicode:"aaaaaa\U0001d400-aaaaaa"
+    print $S0
     print "\n"
     end
+.end
 CODE
 aaaaaa\xf0\x9d\x90\x80-aaaaaa
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "two upscales" );
-    getstdout P0
-    push P0, "utf8"
-    set S0, unicode:"aaaaaa\x{212b}-bbbbbb\x{1d400}-cccccc"
-    print S0
+pir_output_is( <<'CODE', <<OUTPUT, "two upscales" );
+.sub main :main
+    getstdout $P0
+    $P0.'encoding'("utf8")
+    set $S0, unicode:"aaaaaa\x{212b}-bbbbbb\x{1d400}-cccccc"
+    print $S0
     print "\n"
-    length I0, S0
-    print I0
+    length $I0, $S0
+    print $I0
     print "\n"
     end
+.end
 CODE
 aaaaaa\xe2\x84\xab-bbbbbb\xf0\x9d\x90\x80-cccccc
 22
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "two upscales - don't downscale" );
-    getstdout P0
-    push P0, "utf8"
-    set S0, unicode:"aaaaaa\x{1d400}-bbbbbb\x{212b}-cccccc"
-    print S0
+pir_output_is( <<'CODE', <<OUTPUT, "two upscales - don't downscale" );
+.sub main :main
+    getstdout $P0
+    $P0.'encoding'("utf8")
+    set $S0, unicode:"aaaaaa\x{1d400}-bbbbbb\x{212b}-cccccc"
+    print $S0
     print "\n"
-    length I0, S0
-    print I0
+    length $I0, $S0
+    print $I0
     print "\n"
     end
+.end
 CODE
 aaaaaa\xf0\x9d\x90\x80-bbbbbb\xe2\x84\xab-cccccc
 22
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, '\cX, \ooo' );
-    getstdout P0
-    push P0, "utf8"
-    set S0, "ok 1\cJ"
-    print S0
-    set S0, "ok 2\012"
-    print S0
-    set S0, "ok 3\12"
-    print S0
-    set S0, "ok 4\x0a"
-    print S0
-    set S0, "ok 5\xa"
-    print S0
+pir_output_is( <<'CODE', <<OUTPUT, '\cX, \ooo' );
+.sub main :main
+    getstdout $P0
+    $P0.'encoding'("utf8")
+    set $S0, "ok 1\cJ"
+    print $S0
+    set $S0, "ok 2\012"
+    print $S0
+    set $S0, "ok 3\12"
+    print $S0
+    set $S0, "ok 4\x0a"
+    print $S0
+    set $S0, "ok 5\xa"
+    print $S0
     end
+.end
 CODE
 ok 1
 ok 2

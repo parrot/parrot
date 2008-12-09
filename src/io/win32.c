@@ -224,8 +224,10 @@ Parrot_io_open_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
         PMC *io;
         if (PMC_IS_NULL(filehandle))
             io = Parrot_io_new_pmc(interp, flags);
-        else
+        else {
             io = filehandle;
+            Parrot_io_set_flags(interp, io, flags);
+        }
 
         Parrot_io_set_os_handle(interp, io, fd);
         return io;
@@ -266,8 +268,10 @@ Parrot_io_fdopen_win32(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
 
     if (PMC_IS_NULL(filehandle))
         io = Parrot_io_new_pmc(interp, flags);
-    else
+    else {
         io = filehandle;
+        Parrot_io_set_flags(interp, io, flags);
+    }
 
     Parrot_io_set_os_handle(interp, io, fd);
     return io;

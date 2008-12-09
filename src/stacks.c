@@ -456,7 +456,7 @@ get_entry_type(ARGIN(const Stack_Entry_t *entry))
 =item C<void Parrot_dump_dynamic_environment>
 
 Print a representation of the dynamic stack to the standard error (using
-C<PIO_eprintf>).  This is used only temporarily for debugging.
+C<Parrot_io_eprintf>).  This is used only temporarily for debugging.
 
 =cut
 
@@ -474,7 +474,7 @@ Parrot_dump_dynamic_environment(PARROT_INTERP, ARGIN(Stack_Chunk_t *dynamic_env)
         if (! e)
             Parrot_ex_throw_from_c_args(interp, NULL, 1, "Dynamic environment stack damaged");
 
-        PIO_eprintf(interp, "[%4d:  chunk %p entry %p "
+        Parrot_io_eprintf(interp, "[%4d:  chunk %p entry %p "
                                  "type %d cleanup %p]\n",
                     height, dynamic_env, e,
                     e->entry_type, e->cleanup);
@@ -482,18 +482,18 @@ Parrot_dump_dynamic_environment(PARROT_INTERP, ARGIN(Stack_Chunk_t *dynamic_env)
                 || e->entry_type == STACK_ENTRY_ACTION) {
             PMC * const thing = UVal_pmc(e->entry);
 
-            PIO_eprintf(interp, "[        PMC %p type %d => %Ss]\n",
+            Parrot_io_eprintf(interp, "[        PMC %p type %d => %Ss]\n",
                         thing, thing->vtable->base_type,
                         VTABLE_get_string(interp, thing));
         }
         else if (e->entry_type == STACK_ENTRY_MARK) {
-            PIO_eprintf(interp, "[        mark %d]\n",
+            Parrot_io_eprintf(interp, "[        mark %d]\n",
                         UVal_int(e->entry));
         }
         dynamic_env = dynamic_env->prev;
         height--;
     }
-    PIO_eprintf(interp, "[%4d:  chunk %p %s base]\n",
+    Parrot_io_eprintf(interp, "[%4d:  chunk %p %s base]\n",
                 height, dynamic_env, dynamic_env->name);
 }
 

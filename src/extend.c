@@ -95,7 +95,7 @@ Parrot_vfprintf(PARROT_INTERP, ARGIN(Parrot_PMC pio),
 
     PARROT_CALLIN_START(interp);
     str = Parrot_vsprintf_c(interp, s, args);
-    retval = PIO_putps(interp, pio, str);
+    retval = Parrot_io_putps(interp, pio, str);
     PARROT_CALLIN_END(interp);
 
     return retval;
@@ -125,11 +125,11 @@ Parrot_printf(NULLOK_INTERP, ARGIN(const char *s), ...)
     va_start(args, s);
 
     if (interp) {
-        retval = Parrot_vfprintf(interp, PIO_STDOUT(interp), s, args);
+        retval = Parrot_vfprintf(interp, Parrot_io_STDOUT(interp), s, args);
     }
     else {
         /* Be nice about this...
-         **   XXX BD Should this use the default PIO_STDOUT or something?
+         **   XXX BD Should this use the default Parrot_io_STDOUT or something?
          */
         retval = vfprintf(stdout, s, args);
     }
@@ -148,11 +148,11 @@ Parrot_eprintf(NULLOK_INTERP, ARGIN(const char *s), ...)
     va_start(args, s);
 
     if (interp) {
-        retval = Parrot_vfprintf(interp, PIO_STDERR(interp), s, args);
+        retval = Parrot_vfprintf(interp, Parrot_io_STDERR(interp), s, args);
     }
     else {
         /* Be nice about this...
-         **   XXX BD Should this use the default PIO_STDOUT or something?
+         **   XXX BD Should this use the default Parrot_io_STDOUT or something?
          */
         retval=vfprintf(stderr, s, args);
     }

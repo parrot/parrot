@@ -65,9 +65,9 @@ Dump the constant table.
 static void
 const_dump(PARROT_INTERP, const PackFile_Segment *segp)
 {
-    PIO_printf(interp, "%s => [\n", segp->name);
+    Parrot_io_printf(interp, "%s => [\n", segp->name);
     PackFile_ConstTable_dump(interp, (const PackFile_ConstTable *)segp);
-    PIO_printf(interp, "],\n");
+    Parrot_io_printf(interp, "],\n");
 }
 
 /*
@@ -84,9 +84,9 @@ Dump the fixup table.
 static void
 fixup_dump(PARROT_INTERP, const PackFile_Segment *segp)
 {
-    PIO_printf(interp, "%s => [\n", segp->name);
+    Parrot_io_printf(interp, "%s => [\n", segp->name);
     PackFile_Fixup_dump(interp, (const PackFile_FixupTable *)segp);
-    PIO_printf(interp, "],\n");
+    Parrot_io_printf(interp, "],\n");
 }
 
 /*
@@ -105,24 +105,24 @@ disas_dump(PARROT_INTERP, const PackFile_Segment *self)
 {
     opcode_t *pc;
     size_t i, n;
-    PIO_printf(interp, "%s => [ # %d ops at offs 0x%x\n",
+    Parrot_io_printf(interp, "%s => [ # %d ops at offs 0x%x\n",
             self->name, (int)self->size, (int)self->file_offset + 4);
     pc = self->data;
     while (pc < self->data + self->size) {
         /* trace_op_dump(interp, self->pf->src, pc); */
-        PIO_printf(interp, " %04x:  ", (int) (pc - self->data));
+        Parrot_io_printf(interp, " %04x:  ", (int) (pc - self->data));
         n = (size_t)interp->op_info_table[*pc].op_count;
         for (i = 0; i < 6; i++)
             if (i < n)
-                PIO_printf(interp, "%08lx ", (unsigned long) pc[i]);
+                Parrot_io_printf(interp, "%08lx ", (unsigned long) pc[i]);
             else
-                PIO_printf(interp, "         ");
-        PIO_printf(interp, "%s\n",
+                Parrot_io_printf(interp, "         ");
+        Parrot_io_printf(interp, "%s\n",
                 interp->op_info_table[*pc].full_name);
         ADD_OP_VAR_PART(interp, interp->code, pc, n);
         pc += n;
     }
-    PIO_printf(interp, "]\n");
+    Parrot_io_printf(interp, "]\n");
 }
 
 /*
@@ -139,23 +139,23 @@ Dump the header.
 static void
 PackFile_header_dump(PARROT_INTERP, PackFile *pf)
 {
-    PIO_printf(interp, "HEADER => [\n");
-    PIO_printf(interp, "\twordsize  = %d", pf->header->wordsize);
-    PIO_printf(interp, "\t(interpreter's wordsize    = %d)\n",
+    Parrot_io_printf(interp, "HEADER => [\n");
+    Parrot_io_printf(interp, "\twordsize  = %d", pf->header->wordsize);
+    Parrot_io_printf(interp, "\t(interpreter's wordsize    = %d)\n",
             sizeof (opcode_t));
-    PIO_printf(interp, "\t(interpreter's INTVAL size = %d)\n",
+    Parrot_io_printf(interp, "\t(interpreter's INTVAL size = %d)\n",
             sizeof (INTVAL));
-    PIO_printf(interp, "\tbyteorder = %d", pf->header->byteorder);
-    PIO_printf(interp, "\t(interpreter's byteorder   = %d)\n",
+    Parrot_io_printf(interp, "\tbyteorder = %d", pf->header->byteorder);
+    Parrot_io_printf(interp, "\t(interpreter's byteorder   = %d)\n",
             PARROT_BIGENDIAN);
-    PIO_printf(interp, "\tfloattype = %d", pf->header->floattype);
-    PIO_printf(interp, "\t(interpreter's NUMVAL_SIZE = %d)\n", NUMVAL_SIZE);
-    PIO_printf(interp, "\t%s endianize, %s opcode, %s numval transform\n",
+    Parrot_io_printf(interp, "\tfloattype = %d", pf->header->floattype);
+    Parrot_io_printf(interp, "\t(interpreter's NUMVAL_SIZE = %d)\n", NUMVAL_SIZE);
+    Parrot_io_printf(interp, "\t%s endianize, %s opcode, %s numval transform\n",
             pf->need_endianize ? "**need**" : "no",
             pf->need_wordsize ? "**need**" : "no",
             pf->fetch_nv ? "**need**" : "no");
-    PIO_printf(interp, "\tdirformat = %d\n", pf->header->dir_format);
-    PIO_printf(interp, "]\n");
+    Parrot_io_printf(interp, "\tdirformat = %d\n", pf->header->dir_format);
+    Parrot_io_printf(interp, "]\n");
 }
 
 /*

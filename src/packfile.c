@@ -345,7 +345,7 @@ void
 PackFile_destroy(PARROT_INTERP, ARGMOD_NULLOK(PackFile *pf))
 {
     if (!pf) {
-        PIO_eprintf(NULL, "PackFile_destroy: pf == NULL!\n");
+        Parrot_io_eprintf(NULL, "PackFile_destroy: pf == NULL!\n");
         return;
     }
 
@@ -695,7 +695,7 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
     PackFile_ConstTable * const ct = self->const_table;
 
 #if TRACE_PACKFILE
-    PIO_eprintf(NULL, "PackFile: do_sub_pragmas (action=%d)\n", action);
+    Parrot_io_eprintf(NULL, "PackFile: do_sub_pragmas (action=%d)\n", action);
 #endif
 
     for (i = 0; i < ft->fixup_count; i++) {
@@ -773,7 +773,7 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
 
     /* Ensure the magic is correct. */
     if (memcmp(header->magic, "\376PBC\r\n\032\n", 8) != 0) {
-        PIO_eprintf(NULL, "PackFile_unpack: "
+        Parrot_io_eprintf(NULL, "PackFile_unpack: "
             "This is not a valid Parrot bytecode file\n");
         return 0;
     }
@@ -782,39 +782,39 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
      * support bytecode versions matching the current one. */
     if (header->bc_major != PARROT_PBC_MAJOR
     &&  header->bc_minor != PARROT_PBC_MINOR) {
-        PIO_eprintf(NULL, "PackFile_unpack: This Parrot cannot read bytecode "
+        Parrot_io_eprintf(NULL, "PackFile_unpack: This Parrot cannot read bytecode "
             "files with version %d.%d.\n", header->bc_major, header->bc_minor);
         return 0;
     }
 
     /* Check wordsize, byte order and floating point number type are valid. */
     if (header->wordsize != 4 && header->wordsize != 8) {
-        PIO_eprintf(NULL, "PackFile_unpack: Invalid wordsize %d\n",
+        Parrot_io_eprintf(NULL, "PackFile_unpack: Invalid wordsize %d\n",
                     header->wordsize);
         return 0;
     }
 
     if (header->byteorder != 0 && header->byteorder != 1) {
-        PIO_eprintf(NULL, "PackFile_unpack: Invalid byte ordering %d\n",
+        Parrot_io_eprintf(NULL, "PackFile_unpack: Invalid byte ordering %d\n",
                     header->byteorder);
         return 0;
     }
 
     if (header->floattype != 0 && header->floattype != 1) {
-        PIO_eprintf(NULL, "PackFile_unpack: Invalid floattype %d\n",
+        Parrot_io_eprintf(NULL, "PackFile_unpack: Invalid floattype %d\n",
                     header->floattype);
         return 0;
     }
 
     /* Describe what was read for debugging. */
 #if TRACE_PACKFILE
-    PIO_eprintf(NULL, "PackFile_unpack: Wordsize %d.\n", header->wordsize);
-    PIO_eprintf(NULL, "PackFile_unpack: Floattype %d (%s).\n",
+    Parrot_io_eprintf(NULL, "PackFile_unpack: Wordsize %d.\n", header->wordsize);
+    Parrot_io_eprintf(NULL, "PackFile_unpack: Floattype %d (%s).\n",
                 header->floattype,
                 header->floattype ?
                   "x86 little endian 12 byte long double" :
                   "IEEE-754 8 byte double");
-    PIO_eprintf(NULL, "PackFile_unpack: Byteorder %d (%sendian).\n",
+    Parrot_io_eprintf(NULL, "PackFile_unpack: Byteorder %d (%sendian).\n",
                 header->byteorder, header->byteorder ? "big " : "little-");
 #endif
 
@@ -836,7 +836,7 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     }
     else {
         /* Don't know this UUID type. */
-        PIO_eprintf(NULL, "PackFile_unpack: Invalid UUID type %d\n",
+        Parrot_io_eprintf(NULL, "PackFile_unpack: Invalid UUID type %d\n",
                     header->uuid_type);
     }
 
@@ -854,7 +854,7 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     header->dir_format = PF_fetch_opcode(self, &cursor);
 
     if (header->dir_format != PF_DIR_FORMAT) {
-        PIO_eprintf(NULL, "PackFile_unpack: Dir format was %d not %d\n",
+        Parrot_io_eprintf(NULL, "PackFile_unpack: Dir format was %d not %d\n",
                     header->dir_format, PF_DIR_FORMAT);
         return 0;
     }
@@ -866,7 +866,7 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     UNUSED(padding);
 
 #if TRACE_PACKFILE
-    PIO_eprintf(NULL, "PackFile_unpack: Directory read, offset %d.\n",
+    Parrot_io_eprintf(NULL, "PackFile_unpack: Directory read, offset %d.\n",
                 (INTVAL)cursor - (INTVAL)packed);
 #endif
 
@@ -891,7 +891,7 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
 #endif
 
 #if TRACE_PACKFILE
-    PIO_eprintf(NULL, "PackFile_unpack: Unpack done.\n");
+    Parrot_io_eprintf(NULL, "PackFile_unpack: Unpack done.\n");
 #endif
 
     return cursor - packed;
@@ -1240,7 +1240,7 @@ default_unpack(ARGMOD(PackFile_Segment *self), ARGIN(const opcode_t *cursor))
     self->data = mem_allocate_n_typed(self->size, opcode_t);
 
     if (!self->data) {
-        PIO_eprintf(NULL, "PackFile_unpack: Unable to allocate data memory!\n");
+        Parrot_io_eprintf(NULL, "PackFile_unpack: Unable to allocate data memory!\n");
         self->size = 0;
         return NULL;
     }
@@ -1254,7 +1254,7 @@ default_unpack(ARGMOD(PackFile_Segment *self), ARGIN(const opcode_t *cursor))
         for (i = 0; i < (int)self->size; i++) {
             self->data[i] = PF_fetch_opcode(self->pf, &cursor);
 #if TRACE_PACKFILE
-            PIO_eprintf(NULL, "op[#%d] %u\n", i, self->data[i]);
+            Parrot_io_eprintf(NULL, "op[#%d] %u\n", i, self->data[i]);
 #endif
         }
     }
@@ -1276,9 +1276,9 @@ The default dump header function.
 void
 default_dump_header(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 {
-    PIO_printf(interp, "%s => [ # offs 0x%x(%d)",
+    Parrot_io_printf(interp, "%s => [ # offs 0x%x(%d)",
             self->name, (int)self->file_offset, (int)self->file_offset);
-    PIO_printf(interp, " = op_count %d, itype %d, id %d, size %d, ...",
+    Parrot_io_printf(interp, " = op_count %d, itype %d, id %d, size %d, ...",
             (int)self->op_count, (int)self->itype,
             (int)self->id, (int)self->size);
 }
@@ -1302,19 +1302,19 @@ default_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
     default_dump_header(interp, self);
 
     if (i % 8)
-        PIO_printf(interp, "\n %04x:  ", (int) i);
+        Parrot_io_printf(interp, "\n %04x:  ", (int) i);
 
     for (; i < (self->data ? self->size :
             self->file_offset + self->op_count); i++) {
 
         if (i % 8 == 0)
-            PIO_printf(interp, "\n %04x:  ", (int) i);
+            Parrot_io_printf(interp, "\n %04x:  ", (int) i);
 
-        PIO_printf(interp, "%08lx ", (unsigned long)
+        Parrot_io_printf(interp, "%08lx ", (unsigned long)
                 self->data ? self->data[i] : self->pf->src[i]);
     }
 
-    PIO_printf(interp, "\n]\n");
+    Parrot_io_printf(interp, "\n]\n");
 }
 
 
@@ -1683,22 +1683,22 @@ directory_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 
     default_dump_header(interp, self);
 
-    PIO_printf(interp, "\n\t# %d segments\n", dir->num_segments);
+    Parrot_io_printf(interp, "\n\t# %d segments\n", dir->num_segments);
 
     for (i = 0; i < dir->num_segments; i++) {
         const PackFile_Segment * const seg = dir->segments[i];
 
-        PIO_printf(interp,
+        Parrot_io_printf(interp,
 
                 "\ttype %d\t%s\t", (int)seg->type, seg->name);
-        PIO_printf(interp,
+        Parrot_io_printf(interp,
                 " offs 0x%x(0x%x)\top_count %d\n",
                 (int)seg->file_offset,
                 (int)seg->file_offset * sizeof (opcode_t),
                 (int)seg->op_count);
     }
 
-    PIO_printf(interp, "]\n");
+    Parrot_io_printf(interp, "]\n");
 
     for (i = 0; i < dir->num_segments; i++)
         PackFile_Segment_dump(interp, dir->segments[i]);
@@ -1740,13 +1740,13 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
             type = PF_UNKNOWN_SEG;
 
 #if TRACE_PACKFILE
-        PIO_eprintf(NULL, "Segment type %d.\n", type);
+        Parrot_io_eprintf(NULL, "Segment type %d.\n", type);
 #endif
         /* get name */
         name = PF_fetch_cstring(pf, &cursor);
 
 #if TRACE_PACKFILE
-        PIO_eprintf(NULL, "Segment name \"%s\".\n", name);
+        Parrot_io_eprintf(NULL, "Segment name \"%s\".\n", name);
 #endif
 
         /* create it */
@@ -2433,52 +2433,52 @@ pf_debug_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 
     default_dump_header(interp, self);
 
-    PIO_printf(interp, "\n  mappings => [\n");
+    Parrot_io_printf(interp, "\n  mappings => [\n");
     for (i = 0; i < debug->num_mappings; i++) {
-        PIO_printf(interp, "    #%d\n    [\n", i);
-        PIO_printf(interp, "        OFFSET => %d,\n",
+        Parrot_io_printf(interp, "    #%d\n    [\n", i);
+        Parrot_io_printf(interp, "        OFFSET => %d,\n",
                    debug->mappings[i]->offset);
         switch (debug->mappings[i]->mapping_type) {
             case PF_DEBUGMAPPINGTYPE_NONE:
-                PIO_printf(interp, "        MAPPINGTYPE => NONE\n");
+                Parrot_io_printf(interp, "        MAPPINGTYPE => NONE\n");
                 break;
             case PF_DEBUGMAPPINGTYPE_FILENAME:
                 {
                 char *filename;
 
-                PIO_printf(interp, "        MAPPINGTYPE => FILENAME,\n");
+                Parrot_io_printf(interp, "        MAPPINGTYPE => FILENAME,\n");
                 filename = string_to_cstring(interp, PF_CONST(debug->code,
                            debug->mappings[i]->u.filename)->u.string);
-                PIO_printf(interp, "        FILENAME => %s\n", filename);
+                Parrot_io_printf(interp, "        FILENAME => %s\n", filename);
                 string_cstring_free(filename);
                 }
                 break;
             case PF_DEBUGMAPPINGTYPE_SOURCESEG:
-                PIO_printf(interp, "        MAPPINGTYPE => SOURCESEG,\n");
-                PIO_printf(interp, "        SOURCESEG => %d\n",
+                Parrot_io_printf(interp, "        MAPPINGTYPE => SOURCESEG,\n");
+                Parrot_io_printf(interp, "        SOURCESEG => %d\n",
                            debug->mappings[i]->u.source_seg);
                 break;
             default:
                 break;
         }
-        PIO_printf(interp, "    ],\n");
+        Parrot_io_printf(interp, "    ],\n");
     }
 
-    PIO_printf(interp, "  ]\n");
+    Parrot_io_printf(interp, "  ]\n");
 
     j = self->data ? 0: self->file_offset + 4;
     if (j % 8)
-        PIO_printf(interp, "\n %04x:  ", (int) j);
+        Parrot_io_printf(interp, "\n %04x:  ", (int) j);
 
     for (; j < (self->data ? self->size :
             self->file_offset + self->op_count); j++) {
         if (j % 8 == 0) {
-            PIO_printf(interp, "\n %04x:  ", (int) j);
+            Parrot_io_printf(interp, "\n %04x:  ", (int) j);
         }
-        PIO_printf(interp, "%08lx ", (unsigned long)
+        Parrot_io_printf(interp, "%08lx ", (unsigned long)
                 self->data ? self->data[j] : self->pf->src[j]);
     }
-    PIO_printf(interp, "\n]\n");
+    Parrot_io_printf(interp, "\n]\n");
 }
 
 /*
@@ -2714,7 +2714,7 @@ Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
     if (really && Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG)) {
         Interp * const tracer = interp->debugger ?
             interp->debugger : interp;
-        PIO_eprintf(tracer, "*** switching to %s\n",
+        Parrot_io_eprintf(tracer, "*** switching to %s\n",
                 new_cs->base.name);
     }
     interp->code = new_cs;
@@ -2903,7 +2903,7 @@ PackFile_FixupTable_clear(PARROT_INTERP, ARGMOD(PackFile_FixupTable *self))
 {
     opcode_t i;
     if (!self) {
-        PIO_eprintf(interp, "PackFile_FixupTable_clear: self == NULL!\n");
+        Parrot_io_eprintf(interp, "PackFile_FixupTable_clear: self == NULL!\n");
         return;
     }
 
@@ -3059,7 +3059,7 @@ fixup_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg), ARGIN(const opcode_t *
     PackFile_FixupTable * const self = (PackFile_FixupTable *)seg;
 
     if (!self) {
-        PIO_eprintf(interp, "PackFile_FixupTable_unpack: self == NULL!\n");
+        Parrot_io_eprintf(interp, "PackFile_FixupTable_unpack: self == NULL!\n");
         return NULL;
     }
 
@@ -3073,7 +3073,7 @@ fixup_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg), ARGIN(const opcode_t *
             self->fixup_count * sizeof (PackFile_FixupEntry *));
 
         if (!self->fixups) {
-            PIO_eprintf(interp,
+            Parrot_io_eprintf(interp,
                     "PackFile_FixupTable_unpack: Could not allocate "
                     "memory for array!\n");
             self->fixup_count = 0;
@@ -3095,7 +3095,7 @@ fixup_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg), ARGIN(const opcode_t *
             case enum_fixup_none:
                 break;
             default:
-                PIO_eprintf(interp,
+                Parrot_io_eprintf(interp,
                         "PackFile_FixupTable_unpack: Unknown fixup type %d!\n",
                         entry->type);
                 return NULL;
@@ -3302,7 +3302,7 @@ PackFile_ConstTable_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *seg),
     self->const_count = PF_fetch_opcode(pf, &cursor);
 
 #if TRACE_PACKFILE
-    PIO_eprintf(interp,
+    Parrot_io_eprintf(interp,
             "PackFile_ConstTable_unpack: Unpacking %ld constants\n",
             self->const_count);
 #endif
@@ -3315,7 +3315,7 @@ PackFile_ConstTable_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *seg),
         self->const_count * sizeof (PackFile_Constant *));
 
     if (!self->constants) {
-        PIO_eprintf(interp,
+        Parrot_io_eprintf(interp,
                 "PackFile_ConstTable_unpack: Could not allocate "
                 "memory for array!\n");
         self->const_count = 0;
@@ -3324,7 +3324,7 @@ PackFile_ConstTable_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *seg),
 
     for (i = 0; i < self->const_count; i++) {
 #if TRACE_PACKFILE
-        PIO_eprintf(interp,
+        Parrot_io_eprintf(interp,
                 "PackFile_ConstTable_unpack(): Unpacking constant %ld\n", i);
 #endif
 
@@ -3481,7 +3481,7 @@ PackFile_Constant_pack_size(PARROT_INTERP, ARGIN(const PackFile_Constant *self))
             break;
 
         default:
-            PIO_eprintf(NULL,
+            Parrot_io_eprintf(NULL,
                     "Constant_packed_size: Unrecognized type '%c'!\n",
                     (char)self->type);
             return 0;
@@ -3518,7 +3518,7 @@ PackFile_Constant_unpack(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
 
 /* #define TRACE_PACKFILE 1 */
 #if TRACE_PACKFILE
-    PIO_eprintf(NULL, "PackFile_Constant_unpack(): Type is %ld ('%c')...\n",
+    Parrot_io_eprintf(NULL, "PackFile_Constant_unpack(): Type is %ld ('%c')...\n",
             type, (char)type);
 #endif
 
@@ -3543,7 +3543,7 @@ PackFile_Constant_unpack(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
                 self, cursor);
         break;
     default:
-        PIO_eprintf(NULL,
+        Parrot_io_eprintf(NULL,
                 "Constant_unpack: Unrecognized type '%c' during unpack!\n",
                 (char)type);
         return NULL;

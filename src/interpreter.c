@@ -794,7 +794,7 @@ runops_cgp(PARROT_INTERP, ARGIN(opcode_t *pc))
 
 #else
     UNUSED(pc);
-    PIO_eprintf(interp,
+    Parrot_io_eprintf(interp,
             "Computed goto unavailable in this configuration.\n");
     Parrot_exit(interp, 1);
 #endif

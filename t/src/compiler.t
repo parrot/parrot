@@ -52,7 +52,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
     PMC    *comp    = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
 
     if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
-        PIO_eprintf(interp, "Pir compiler not loaded");
+        Parrot_io_eprintf(interp, "Pir compiler not loaded");
         exit(EXIT_FAILURE);
     }
 
@@ -60,7 +60,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
     prog = imcc_compile_pir(interp, c_src);
 
     if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
-        PIO_eprintf(interp, "Pir compiler returned no prog");
+        Parrot_io_eprintf(interp, "Pir compiler returned no prog");
         exit(EXIT_FAILURE);
     }
 
@@ -136,7 +136,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
     PMC    *comp   = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
 
     if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
-        PIO_eprintf(interp, "Pir compiler not loaded");
+        Parrot_io_eprintf(interp, "Pir compiler not loaded");
         exit(EXIT_FAILURE);
     }
 
@@ -144,7 +144,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
     prog = Parrot_compile_string(interp, pir, c_src, &error);
 
     if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
-        PIO_eprintf(interp, "Pir compiler returned no prog");
+        Parrot_io_eprintf(interp, "Pir compiler returned no prog");
         exit(EXIT_FAILURE);
     }
 
@@ -211,7 +211,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
     PMC      *prog = Parrot_compile_string(interp, type, src, &error);
 
     if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
-        PIO_eprintf(interp, "Pir compiler returned no prog");
+        Parrot_io_eprintf(interp, "Pir compiler returned no prog");
         exit(EXIT_FAILURE);
     }
 
@@ -251,7 +251,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
     PMC    *comp    = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
 
     if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
-        PIO_eprintf(interp, "Pir compiler not loaded");
+        Parrot_io_eprintf(interp, "Pir compiler not loaded");
         exit(EXIT_FAILURE);
     }
 
@@ -304,7 +304,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
     PMC      *prog = Parrot_compile_string(interp, type, src, &error);
 
     if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
-        PIO_eprintf(interp, "Pir compiler returned no prog\n");
+        Parrot_io_eprintf(interp, "Pir compiler returned no prog\n");
         return;
     }
 
@@ -344,7 +344,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
     PMC    *comp    = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
 
     if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
-        PIO_eprintf(interp, "Pir compiler not loaded");
+        Parrot_io_eprintf(interp, "Pir compiler not loaded");
         return NULL;
     }
 
@@ -397,7 +397,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
     PMC      *prog = Parrot_compile_string(interp, type, src, &error);
 
     if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
-        PIO_eprintf(interp, "Pir compiler returned no prog\n");
+        Parrot_io_eprintf(interp, "Pir compiler returned no prog\n");
         return;
     }
 
@@ -436,7 +436,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
     PMC    *comp    = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
 
     if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
-        PIO_eprintf(interp, "Pir compiler not loaded");
+        Parrot_io_eprintf(interp, "Pir compiler not loaded");
         return NULL;
     }
 
@@ -489,7 +489,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
     PMC      *prog = Parrot_compile_string(interp, type, src, &error);
 
     if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
-        PIO_eprintf(interp, "Pir compiler returned no prog\n");
+        Parrot_io_eprintf(interp, "Pir compiler returned no prog\n");
         return;
     }
 
@@ -527,7 +527,7 @@ run(Parrot_Interp interp, int argc, char *argv[])
     PMC    *comp    = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
 
     if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
-        PIO_eprintf(interp, "Pir compiler not loaded");
+        Parrot_io_eprintf(interp, "Pir compiler not loaded");
         return NULL;
     }
 
