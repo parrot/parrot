@@ -115,9 +115,9 @@ Here's an example:
 
   pmclass Foo {
     ATTR INTVAL bar;
-	ATTR PMC baz;
+    ATTR PMC baz;
 
-	...
+    ...
   }
 
 The attributes are stored in a custom data structure that can be accessed
@@ -217,9 +217,6 @@ Enter methods, which are ways to extend the functionality of your PMC
 in ways that the PMC needs. Methods allow the developer to add all sorts
 of arbitrary functionality to a PMC that the VTABLE functions themselves
 cannot define.
-
-
-
 
 =head2 Dynpmcs
 
