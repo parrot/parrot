@@ -21,6 +21,17 @@ The FileHandle PMC performs I/O operations on a source or destination file.
 #include "parrot/parrot.h"
 #include "../src/io/io_private.h"
 
+#ifdef PARROT_HAS_READLINE
+#ifdef __cplusplus
+extern "C" {
+#endif
+    char *readline(const char *);
+    void add_history(const char*);
+#ifdef __cplusplus
+}
+#endif
+#endif
+
 
 pmclass FileHandle need_ext {
     ATTR INTVAL flags;                /* Filehandle flags             */
@@ -261,6 +272,36 @@ Read a line from the filehandle and return it in a string.
             Parrot_io_setlinebuf(INTERP, SELF);
 
         string_result = Parrot_io_reads(INTERP, SELF, 0);
+
+        RETURN(STRING *string_result);
+    }
+
+/*
+
+=item C<METHOD readline_interactive(STRING *prompt)>
+
+Read a line from the filehandle and return it in a string.
+
+=cut
+
+*/
+
+    METHOD readline_interactive(STRING *prompt :optional, INTVAL got_prompt :opt_flag) {
+        STRING *string_result;
+#ifdef PARROT_HAS_READLINE
+        char * const r = readline(got_prompt ? prompt->strstart : NULL);
+
+        if (r) {
+            if (*r)
+                add_history(r);
+
+            string_result = string_from_cstring(INTERP, r, 0);
+            mem_sys_free(r);
+            RETURN(STRING *string_result);
+        }
+#endif
+
+        string_result = CONST_STRING(INTERP, "");
 
         RETURN(STRING *string_result);
     }
