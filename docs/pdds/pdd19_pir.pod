@@ -67,10 +67,10 @@ variable will I<hide> the opcode name, effectively making the opcode unusable.
 In the future this will be resolved.
 
 The PIR language is designed to have as few reserved keywords as possible.
-Currently, in contrast to opcode names, PIR keywords I<are> reserved, and cannot
-be used as identifiers. Some opcode names are, in fact, PIR keywords, which
-therefore cannot be used as identifiers. This, too, will be resolved in a
-future re-implementation of the PIR compiler.
+Currently, in contrast to opcode names, PIR keywords I<are> reserved, and
+cannot be used as identifiers. Some opcode names are, in fact, PIR keywords,
+which therefore cannot be used as identifiers. This, too, will be resolved
+in a future re-implementation of the PIR compiler.
 
 The following are PIR keywords, and cannot be used as identifiers:
 
