@@ -68,6 +68,7 @@ helper for CALL_LIB* opcodes.
     push_eh _handler
     $P1 = $P0[lindex]
     $P2 = $P1[findex]
+    pop_eh
     .return ($P2)
   _handler:
     .const 'Sub' not_implemented = 'not_implemented'
@@ -89,7 +90,7 @@ helper for CALL_URL* opcodes.
     .local pmc loader
     .local pmc script
     new loader, 'WmlsBytecode'
-    push_eh _handler_1
+    push_eh _handler
     script = loader.'load'(content)
     script['filename'] = url
     .local string gen_pir
@@ -101,26 +102,14 @@ helper for CALL_URL* opcodes.
     $P0 = pbc_out[0]
     $P0()
     pop_eh
-#    push_eh _handler_2
     .local pmc entry
     $S0 = url
     $S0 .= ':'
     $S0 .= function
     entry = get_hll_global $S0
-    if_null entry, _handler_2
+    if_null entry, L2
     .return (entry)
-  _handler_1:
-    .local pmc e
-    .local string msg
-    .get_results (e)
-    msg = e
-    print msg
-    print "\n"
-    $S0 = "verification failed (can't translate '"
-    $S0 .= url
-    $S0 .= "')"
-    die $S0
-  _handler_2:
+  L2:
     $S0 = "external function '"
     $S0 .= function
     $S0 .= "' not found in '"
@@ -129,6 +118,17 @@ helper for CALL_URL* opcodes.
     die $S0
   L1:
     die "unable to load compilation unit"
+  _handler:
+    .local pmc e
+    .local string msg
+    .get_results (e)
+    msg = e
+    say msg
+    $S0 = "verification failed (can't translate '"
+    $S0 .= url
+    $S0 .= "')"
+    e = $S0
+    rethrow e
 .end
 
 .sub 'load_script'
@@ -136,10 +136,11 @@ helper for CALL_URL* opcodes.
     .local pmc fh
     .local string content
     fh = new 'FileHandle'
-#    push_eh _handler
+    push_eh _handler
     content = fh.'readall'(filename)
-#    pop_eh
-    if content goto L1
+    pop_eh
+    .return (content)
+  _handler:
     $S0 = err
     print "Can't slurp '"
     print filename
@@ -147,8 +148,7 @@ helper for CALL_URL* opcodes.
     print $S0
     print ")\n"
   L1:
-  _handler:
-    .return(content)
+    .return ('')
 .end
 
 .sub 'save_pbc'
@@ -165,9 +165,7 @@ helper for CALL_URL* opcodes.
     fh.'close'()
     .return (output)
   _handler:
-    .local pmc e
-    .get_results (e)
-    $S0 = e
+    $S0 = err
     print "Can't open '"
     print output
     print "' ("
@@ -189,9 +187,7 @@ helper for CALL_URL* opcodes.
     fh.'close'()
     .return ()
   _handler:
-    .local pmc e
-    .get_results (e)
-    $S0 = e
+    $S0 = err
     print "Can't open '"
     print output
     print "' ("

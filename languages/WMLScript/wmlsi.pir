@@ -74,19 +74,19 @@ wmlsd, wmls2pir, wmls2pbc
     end
   L4:
     entry(params :flat)
-    end
-  _handler:
-    .local pmc e
-    .local string s
-    .get_results (e)
-    s = e
-    print s
-    print "\n"
+    pop_eh
   L1:
     end
   USAGE:
     printerr "Usage: parrot wmlsi.pbc filename entry\n"
     exit -1
+  _handler:
+    .local pmc e
+    .local string msg
+    .get_results (e)
+    msg = e
+    say msg
+    end
 .end
 
 

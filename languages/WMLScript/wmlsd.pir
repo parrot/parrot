@@ -41,21 +41,21 @@ wmls2pir, wmls2pbc, wmlsi
     new loader, 'WmlsBytecode'
     push_eh _handler
     script = loader.'load'(content)
+    pop_eh
     script['filename'] = filename
     script.'dump'()
-    end
-  _handler:
-    .local pmc e
-    .local string msg
-    .get_results (e)
-    msg = e
-    print msg
-    print "\n"
   L1:
     end
   USAGE:
     printerr "Usage: parrot wmlsd.pbc filename\n"
     exit -1
+  _handler:
+    .local pmc e
+    .local string msg
+    .get_results (e)
+    msg = e
+    say msg
+    end
 .end
 
 
