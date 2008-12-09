@@ -533,7 +533,8 @@ specifies the encoding to use for the input (e.g., "utf8").
     .local pmc stdin
     .local int has_readline
     stdin = getstdin
-    has_readline = stdin.'set_readline_interactive'(1)
+    has_readline = -1
+    # has_readline = stdin.'set_readline_interactive'(1)
     encoding = adverbs['encoding']
     if encoding == 'fixed_8' goto interactive_loop
     unless encoding goto interactive_loop
@@ -554,7 +555,7 @@ specifies the encoding to use for the input (e.g., "utf8").
     if has_readline != -1 goto interactive_read
     printerr prompt
   interactive_read:
-    code = stdin.'readline'(prompt)
+    code = stdin.'readline'()
     if null code goto interactive_end
     unless code goto interactive_loop
     concat code, "\n"
