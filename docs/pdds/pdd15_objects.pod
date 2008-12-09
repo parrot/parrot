@@ -297,7 +297,7 @@ To make this work all Classes need the following vtable entries.
 
 =over 4
 
-=item new()
+=item instantiate()
 
 Instantiate a new object from the class. Set the instantiated flag on the
 class.
