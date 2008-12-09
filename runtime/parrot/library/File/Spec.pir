@@ -97,7 +97,7 @@ called as object methods.
     ## set modules['dos'], 'OS2'
     ## set modules['cygwin'], 'Cygwin'
 
-    store_global '_modules', modules
+    set_global '_modules', modules
 .end
 
 
@@ -107,7 +107,7 @@ called as object methods.
     .local pmc modules
     modules= new 'Hash'
 
-    modules= find_global '_modules'
+    modules= get_global '_modules'
 
     .local string module
     module= modules[ osname ]
