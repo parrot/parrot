@@ -299,14 +299,33 @@ Read a line from the filehandle and return it in a string.
             mem_sys_free(r);
             RETURN(STRING *string_result);
         }
-#endif
+
+        RETURN(PMC *PMCNULL);
+#else
+        UINTVAL len;
+
+        if (got_prompt) 
+            fprintf(stderr, "%s", prompt->strstart);
 
         if (!(PARROT_FILEHANDLE(SELF)->flags & PIO_F_LINEBUF))
             Parrot_io_setlinebuf(INTERP, SELF);
 
         string_result = Parrot_io_reads(INTERP, SELF, 0);
+        if (!string_result)
+            RETURN(PMC *PMCNULL);
+        len = string_length(INTERP, string_result);
+        if (len < 1)
+            RETURN(PMC *PMCNULL);
+        while (len > 0 && 
+                (((char*)string_result->strstart)[len - 1] == '\n' ||
+                 ((char*)string_result->strstart)[len - 1] == '\r')) {
+            --len;
+            --string_result->strlen;
+            --string_result->bufused;
+        }
 
         RETURN(STRING *string_result);
+#endif
     }
 
 /*
