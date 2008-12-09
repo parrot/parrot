@@ -301,7 +301,10 @@ Read a line from the filehandle and return it in a string.
         }
 #endif
 
-        string_result = CONST_STRING(INTERP, "");
+        if (!(PARROT_FILEHANDLE(SELF)->flags & PIO_F_LINEBUF))
+            Parrot_io_setlinebuf(INTERP, SELF);
+
+        string_result = Parrot_io_reads(INTERP, SELF, 0);
 
         RETURN(STRING *string_result);
     }
