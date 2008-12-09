@@ -44,8 +44,7 @@ cl.pir - Set up the package 'COMMON-LISP'
     .DEFVAR(symbol, package, "*STANDARD-INPUT*", value)
 
     getstdout stream
-    .local int res
-    pioctl res, stream, 3, 0
+    stream.'buffer_type'('unbuffered')
     .STREAM(value,stream)
     .DEFVAR(symbol, package, "*STANDARD-OUTPUT*", value)
 
