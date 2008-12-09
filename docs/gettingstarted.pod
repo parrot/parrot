@@ -77,7 +77,7 @@ Run C<make> to compile everything and build parrot.
 
 =item 3
 
-Run C<make test> to run the test suite and verify that everything works on 
+Run C<make test> to run the test suite and verify that everything works on
 your system.
 
 =back
@@ -145,31 +145,31 @@ opposed to a verbatim translation of code.
 =head2 Where can I find the main developer mailing list?
 
 Most of the Parrot-related development discussion occurs on the
-parrot-porters (aka perl6-internals) mailing list. There are a variety
-of interfaces to the list:
+parrot-dev (previously known as parrot-porters and perl6-internals) mailing
+list. There are a variety of interfaces to the list:
 
 =over 4
 
 =item * Developer Mailing List Interface (subscribing, unsubscribing, etc)
 
-L<http://lists.perl.org/showlist.cgi?name=perl6-internals>
+L<http://lists.parrot.org/mailman/listinfo/parrot-dev>
 
 =item * Parrot NNTP Interface
 
-L<news://nntp.perl.org/perl.perl6.internals>
+L<nntp://news.gmane.org/gmane.comp.compilers.parrot.devel>
 
-L<http://nntp.x.perl.org/group/perl.perl6.internals>
+=item * Parrot Archives, RSS
 
-=item * Parrot Archives, RSS 
+L<http://groups.google.com/group/parrot-dev> provides archives, search,
+and RSS feeds.
 
-L<http://groups.google.com/group/perl.perl6.internals/about> provides
-archives, search, and RSS feeds.
+L<http://news.gmane.org/gmane.comp.compilers.parrot.devel>
 
-L<http://www.nntp.perl.org/group/perl.perl6.internals>
+L<http://lists.parrot.org/pipermail/parrot-dev/>
 
 =back
 
-In addition, there is a mailing list which logs all commits to the Parrot SVN 
+In addition, there is a mailing list which logs all commits to the Parrot SVN
 repository. If you're interested in Parrot development, you might find it very
 helpful to subscribe and keep up on changes that people are making.
 
@@ -177,19 +177,19 @@ helpful to subscribe and keep up on changes that people are making.
 
 =item * Mailing List Interface (subscribing, unsubscribing, etc)
 
-L<http://lists.perl.org/showlist.cgi?name=cvs-parrot>
+L<http://lists.parrot.org/mailman/listinfo/parrot-commits>
 
 =item * Parrot Commits NNTP Interface
 
-L<news://nntp.perl.org/perl.cvs.parrot>
+L<...>
 
-L<http://nntp.x.perl.org/group/perl.cvs.parrot>
+L<...>
 
 =item * Commit List Archives, RSS
 
-L<http://groups.google.com/group/perl.cvs.parrot/about>
+L<...>
 
-L<http://www.nntp.perl.org/group/perl.cvs.parrot>
+L<http://lists.parrot.org/pipermail/parrot-commits/>
 
 =back
 
@@ -206,12 +206,12 @@ L<irc.rhizomatic.net> and L<irc.pobox.com>.
 
 =head2 I've developed a patch. What should I do with it?
 
-There's a lot of traffic that goes through the mailing list, and it's quite 
-possible that if you send patches directly to the mailing list, they will get 
+There's a lot of traffic that goes through the mailing list, and it's quite
+possible that if you send patches directly to the mailing list, they will get
 lost in the mailboxes of those with commit access.
 
-As such, a better solution would be to submit your patch to RT, the request 
-tracker system that maintains bugs and patches for the Parrot project. To 
+As such, a better solution would be to submit your patch to RT, the request
+tracker system that maintains bugs and patches for the Parrot project. To
 visit RT, go here:
 
 L<https://rt.perl.org/rt3/>
@@ -219,7 +219,7 @@ L<https://rt.perl.org/rt3/>
 Or if you want to submit a patch, send an email to
 C<parrotbug@parrotcode.org> with the moniker [PATCH] (including the brackets)
 at the start of the subject so that it can be appropriately tagged in the RT
-system. Please note that you do B<not> have to CC C<parrot-porters@perl.org>
+system. Please note that you do B<not> have to CC C<parrot-dev@parrot.org>
 when reporting a bug. The RT system will correctly handle that on its own.
 
 A listing of the pending patches can be found here:
@@ -252,6 +252,6 @@ L<http://www.parrotcode.org/resources>
 
 Located at:
 
-L<http://www.parrotcode.org/wiki>
+L<http://trac.parrot.org/parrot/wiki>
 
 =back
