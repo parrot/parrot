@@ -86,16 +86,6 @@ one or both of these flags.
 
 =over 4
 
-=item * C<#line> [post 0.6.4]
-
-Will be replaced by C<.line> to be more consistent with other PIR syntax.
-
-See RT #45857, RT #43269, and RT #47141.
-
-=item * C<<.namespace <identifier> >> syntax [post 0.5.1]
-
-See RT #48737.
-
 =item * C<.namespace [ "a" .. "b" ]> [post 0.5.0]
 
 See RT #46715.
@@ -152,7 +142,7 @@ RT #60048.
 
 =item * Subs marked with C<:vtable>/C<:method> aren't in namespace [post 0.8.2]
 
-Subs marked with C<:vtable> or C<:method> flags are no longer given a 
+Subs marked with C<:vtable> or C<:method> flags are no longer given a
 namespace entry by default.  Use the C<:nsentry> flag to cause this
 to happen.  See RT #60586 and RT #53302.
 

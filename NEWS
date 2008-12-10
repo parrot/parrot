@@ -23,6 +23,7 @@ New in December 2008 Release
     - .result is now .get_result
     - .yield (in .begin/end_yield) is now .set_yield
     - .return (in .begin/end_return) is now .set_return
+    - .namespace x / .endnamespace x syntax is removed
 
 New in 0.8.1
 - Implementation
