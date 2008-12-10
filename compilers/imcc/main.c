@@ -591,7 +591,6 @@ do_pre_process(PARROT_INTERP)
             case RESULT:        printf(".result "); break;
             case RETURN:        printf(".return "); break;
             case NAMESPACE:     printf(".namespace "); break;
-            case ENDNAMESPACE:  printf(".endnamespace"); break;
             case CONST:         printf(".const "); break;
             case PARAM:         printf(".param "); break;
             /* RT#46147: print out more information about the macro */
