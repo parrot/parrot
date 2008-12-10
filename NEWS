@@ -2,21 +2,27 @@
 
 New in December 2008 Release
 - Compilers
+  + IMCC
+    - removed undocumented .param int <stringc> => <ident> syntax
+    - .line directive now only takes an integer argument
+    - new .file directive to specify the file name being compiled
   + PIRC
     - add macro handling to PASM mode
     - disable vanilla register allocation in PASM mode, but do allow optimization
     - add tests and bug fixes
+    - first bits of bytecode generation. No sub calling/returning yet.
 - Languages
   + Pipp
     - added support for a return value from user defined functions
     - added incomplete implemention of 'require_once'
 - Deprecations
   + PARROT_API is now PARROT_EXPORT
-  + :lexid is now :subid
-  + .arg is now .set_arg
-  + .result is now .get_result
-  + .yield (in .begin/end_yield) is now .set_yield
-  + .return (in .begin/end_return) is now .set_return
+  + PIR
+    - :lexid is now :subid
+    - .arg is now .set_arg
+    - .result is now .get_result
+    - .yield (in .begin/end_yield) is now .set_yield
+    - .return (in .begin/end_return) is now .set_return
 
 New in 0.8.1
 - Implementation
