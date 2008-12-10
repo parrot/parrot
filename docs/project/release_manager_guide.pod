@@ -295,7 +295,7 @@ to the next milestone; non-critical tickets can have their milestone unset.
 
 =item 13.
 
-Add the version to trac so new bug reports can be file against your
+Add the version to trac so new bug reports can be filed against your
 buggy code. L<https://trac.parrot.org/parrot/admin/ticket/versions>
 
 Remove any sufficiently old versions listed there.
