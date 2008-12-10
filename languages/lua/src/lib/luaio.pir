@@ -150,60 +150,10 @@ LIST
 .end
 
 
-.sub 'getmode' :anon
-    .param string mode
-    .local string res
-    unless mode == 'r' goto L1
-    res = '<'
-    goto L9
-  L1:
-    unless mode == 'w' goto L2
-    res = '>'
-    goto L9
-  L2:
-    unless mode == 'a' goto L3
-    res = '>>'
-    goto L9
-  L3:
-    unless mode == 'r+' goto L4
-    res = '+<'
-    goto L9
-  L4:
-    unless mode == 'w+' goto L5
-    res = '+>'
-    goto L9
-  L5:
-    unless mode == 'a+' goto L6
-    res = '+>>'
-    goto L9
-  L6:
-    res = ''
-  L9:
-    .return (res)
-.end
-
-
-.sub 'pgetmode' :anon
-    .param string mode
-    .local string res
-    unless mode == 'r' goto L1
-    res = '-|'
-    goto L9
-  L1:
-    unless mode == 'w' goto L2
-    res = '|-'
-    goto L9
-  L2:
-    res = ''
-  L9:
-    .return (res)
-.end
-
-
 .sub 'newfile' :anon
     .param pmc f
     .local pmc file
-    $P0 = lua_getmetatable('ParrotIO')
+    $P0 = lua_getmetatable('FileHandle')
     file = lua_newuserdata(f, $P0)
     .return (file)
 .end
@@ -309,7 +259,7 @@ LIST
     mt = file.'get_metatable'()
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = get_hll_global '_REGISTRY'
-    .const 'LuaString' key = 'ParrotIO'
+    .const 'LuaString' key = 'FileHandle'
     mt_file = _lua__REGISTRY[key]
     unless mt == mt_file goto L1
     res = getattribute file, 'data'
@@ -423,10 +373,10 @@ error code.
     $I1 = isa file, 'LuaString'
     unless $I1 goto L2
     $S1 = file
-    f = open $S1, '<'
-    unless null f goto L3
-    lua_argerror(1, file)
-  L3:
+    f = new 'FileHandle'
+    push_eh _handler
+    f.'open'($S1, 'r')
+    pop_eh
     $P0 = newfile(f)
     setiofile(IO_INPUT, $P0)
     goto L1
@@ -437,6 +387,8 @@ error code.
   L1:
     res = getiofile(IO_INPUT)
     .return (res)
+  _handler:
+    lua_argerror(1, file)
 .end
 
 
@@ -470,12 +422,14 @@ input file. In this case it does not close the file when the loop ends.
     .tailcall $P0(file)
   L1:
     $S1 = lua_checkstring(1, filename)
-    f = open $S1, '<'
-    unless null f goto L2
-    lua_argerror(1, $S1)
-  L2:
+    f = new 'FileHandle'
+    push_eh _handler
+    f.'open'($S1, 'r')
+    pop_eh
     file = newfile(f)
     .tailcall aux_lines(file, 1)
+  _handler:
+    lua_argerror(1, $S1)
 .end
 
 
@@ -529,13 +483,13 @@ in the standard C function C<fopen>.
     .local pmc res
     $S1 = lua_checkstring(1, filename)
     $S2 = lua_optstring(2, mode, 'r')
-    $S0 = getmode($S2)
-    if $S0 == '' goto L1
-    f = open $S1, $S0
-    unless f goto L1
+    f = new 'FileHandle'
+    push_eh _handler
+    f.'open'($S1, $S2)
+    pop_eh
     res = newfile(f)
     .return (res)
-  L1:
+  _handler:
     new res, 'LuaNil'
     .local pmc msg
     new msg, 'LuaString'
@@ -563,10 +517,10 @@ Similar to C<io.input>, but operates over the default output file.
     $I1 = isa file, 'LuaString'
     unless $I1 goto L2
     $S1 = file
-    f = open $S1, '>'
-    unless null f goto L3
-    lua_argerror(1, file)
-  L3:
+    f = new 'FileHandle'
+    push_eh _handler
+    f.'open'($S1, 'w')
+    pop_eh
     $P0 = newfile(f)
     setiofile(IO_OUTPUT, $P0)
     goto L1
@@ -576,6 +530,8 @@ Similar to C<io.input>, but operates over the default output file.
   L1:
     res = getiofile(IO_OUTPUT)
     .return (res)
+  _handler:
+    lua_argerror(1, file)
 .end
 
 
@@ -587,6 +543,8 @@ or to write data to this program (if C<mode> is C<"w">).
 
 This function is system dependent and is not available on all platforms.
 
+NOT YET IMPLEMENTED.
+
 =cut
 
 .sub 'popen'
@@ -597,13 +555,12 @@ This function is system dependent and is not available on all platforms.
     .local pmc res
     $S1 = lua_checkstring(1, prog)
     $S2 = lua_optstring(2, mode, 'r')
-    $S0 = pgetmode($S2)
-    if $S0 == '' goto L1
-    f = open $S1, $S0
-    unless f goto L1
+    not_implemented()
+#    f = open $S1, $S0
+#    unless f goto L1
     res = newfile(f)
     .return (res)
-  L1:
+  _handler:
     new res, 'LuaNil'
     .local pmc msg
     new msg, 'LuaString'
@@ -644,13 +601,15 @@ it is automatically removed when the program ends.
     .local pmc res
     new $P0, 'Lua'
     $S0 = $P0.'tmpname'()
-    f = open $S0, '+>'
-    unless f goto L1
+    f = new 'FileHandle'
+    push_eh _handler
+    f.'open'($S0, 'w+')
+    pop_eh
     res = newfile(f)
     new $P0, 'OS'
     $P0.'rm'($S0)
     .return (res)
-  L1:
+  _handler:
     new res, 'LuaNil'
     .local pmc msg
     new msg, 'LuaString'
@@ -681,7 +640,7 @@ handle, and B<nil> if C<obj> is not a file handle.
     mt = obj.'get_metatable'()
     .local pmc _lua__REGISTRY
     _lua__REGISTRY = get_hll_global '_REGISTRY'
-    .const 'LuaString' key = 'ParrotIO'
+    .const 'LuaString' key = 'FileHandle'
     mt_file = _lua__REGISTRY[key]
     if mt == mt_file goto L1
     new res, 'LuaNil'
@@ -733,7 +692,7 @@ Equivalent to C<io.output():write>.
     .local pmc f
     .local pmc res
     f = tofilep(file)
-    close f
+    f.'close'()
     null f
     setattribute file, 'data', f
     new res, 'LuaBoolean'

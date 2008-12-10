@@ -24,7 +24,7 @@ See F<languages/lua/lib/luaio.pir>.
     _lua__GLOBAL = get_hll_global '_G'
 
     .local pmc _file
-    _file = lua_newmetatable('ParrotIO')
+    _file = lua_newmetatable('FileHandle')
 
     new $P1, 'LuaString'
     set $P1, '__index'

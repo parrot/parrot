@@ -81,7 +81,7 @@ LIST
     .param pmc fh
     .param string funcname
     .local pmc res
-    res = lua_checkudata(narg, fh, 'ParrotIO')
+    res = lua_checkudata(narg, fh, 'FileHandle')
     unless null res goto L1
     lua_error(funcname, ": closed file")
   L1:
