@@ -742,7 +742,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %type <i> if_statement unless_statement
 %type <i> func_assign get_results
 %type <i> opt_invocant
-%type <sr> target targetlist reg const var string result pcc_set_yield
+%type <sr> target targetlist reg const var result pcc_set_yield
 %type <sr> keylist keylist_force _keylist key maybe_ns
 %type <sr> vars _vars var_or_i _var_or_i label_op sub_label_op sub_label_op_c
 %type <i> pasmcode pasmline pasm_inst
@@ -2059,10 +2059,6 @@ const:
    | USTRINGC                  { $$ = mk_const(interp, $1, 'U'); mem_sys_free($1); }
    ;
 
-string:
-     SREG                      { $$ = mk_symreg(interp, $1, 'S'); mem_sys_free($1); }
-   | STRINGC                   { $$ = mk_const(interp, $1, 'S');  mem_sys_free($1); }
-   ;
 
 
 /* The End */

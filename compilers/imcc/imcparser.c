@@ -5078,7 +5078,7 @@ yyreturn:
 }
 
 
-#line 2069 "compilers/imcc/imcc.y"
+#line 2065 "compilers/imcc/imcc.y"
 
 
 /* I need this prototype somewhere... */
