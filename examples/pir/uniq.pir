@@ -57,32 +57,32 @@ Converted to PIR by Bernhard Schmalhofer.
 
 SOURCE:
   # set up flag registers
-  I10 = 0
-  I11 = 0
-  I12 = 0
+  $I10 = 0
+  $I11 = 0
+  $I12 = 0
   # do some simple option parsing
   .local string option
   option = shift argv
 
   ne option, "-c", NOTC
-  I10 = 1 # count mode
+  $I10 = 1 # count mode
   option = shift argv
 
 NOTC:
   ne option, "-d", NOTD
-  I11 = 1 # duplicate mode
+  $I11 = 1 # duplicate mode
   option = shift argv
 
 NOTD:
   ne option, "-u", GO
-  I12 = 1 # unique mode
+  $I12 = 1 # unique mode
   option = shift argv
 
 GO:
   .local string file_name
   file_name = option
 
-  I1 = 1 # count
+  $I1 = 1 # count
   .local pmc in_fh
   in_fh = open file_name, "<"
   unless in_fh, ERR
@@ -97,38 +97,38 @@ SOURCE_LOOP:
 
   # different line
 
-  unless I10, NOTC2
+  unless $I10, NOTC2
   # count mode
   # we go to some lengths to make the count pretty
-  set S3, I1
-  length I2, S3
-  sub I2, 7, I2
-  set S3, " "
-  repeat S3, S3, I2
-  print S3
-  print I1
+  set $S3, $I1
+  length $I2, $S3
+  sub $I2, 7, $I2
+  set $S3, " "
+  repeat $S3, $S3, $I2
+  print $S3
+  print $I1
   print " "
   print prev_line
   branch RESET
 
 NOTC2:
-  unless I11, NOTD2
+  unless $I11, NOTD2
 
   # show duplicates mode
-  eq 1, I1, RESET
+  eq 1, $I1, RESET
   print prev_line
   branch RESET
 
 ERR:
   print "Couldn't read "
-  print S0
+  print $S0
   exit 1
 
 NOTD2:
-  unless I12, NOTU2
+  unless $I12, NOTU2
 
   # don't show lines that are duplicated mode
-  ne 1, I1, RESET
+  ne 1, $I1, RESET
   print prev_line
   branch RESET
 
@@ -139,11 +139,11 @@ NOTU2:
   branch RESET
 
 RESET:
-  set I1, 1
+  set $I1, 1
   branch LOOP
 
 MATCH:
-  inc I1
+  inc $I1
   # fall through
 
 LOOP:

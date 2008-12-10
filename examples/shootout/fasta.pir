@@ -162,7 +162,7 @@ endfor:
 	.local int n
 	# stdout is linebuffered per default - make it block buffered
 	stdout = getstdout
-	stdout.'setbuf'(40960)
+	stdout.'buffer_size'(40960)
 	$I0 = argv
 	if $I0 > 1 goto argsok
 	n = 1000

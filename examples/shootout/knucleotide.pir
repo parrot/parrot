@@ -80,7 +80,7 @@ iter_loop_1:
 	goto iter_loop_1
 iter_end_1:
 
-	$P0 = global "sort"
+	$P0 = get_global "sort"
 	array."sort"($P0)
 
 	$I0 = array

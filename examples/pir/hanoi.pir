@@ -72,7 +72,7 @@ In pseudocode:
 
 =head1 TODO
 
-Replace I6 etc. with mnemonic register names.
+Replace $I6 etc. with mnemonic register names.
 
 =head1 HISTORY
 
@@ -106,8 +106,8 @@ Replace I6 etc. with mnemonic register names.
         # Check number of command line arguments
         $I0 = argv
         if $I0 < 2 goto USE_DEFAULT_SIZE
-        S5 = argv[1]
-        size = S5
+        $S5 = argv[1]
+        size = $S5
         if size < 1 goto INVALID_SIZE
         print "Building a tower of size "
         print size
@@ -128,18 +128,18 @@ SIZE_IS_NOW_KNOWN:
         .lex "towers", towers
         new towers, 'FixedPMCArray'
         set towers, 3
-        new P1, 'ResizableIntegerArray'
-        new P2, 'ResizableIntegerArray'
-        new P3, 'ResizableIntegerArray'
-        set towers[0], P1
-        set towers[1], P2
-        set towers[2], P3
+        new $P1, 'ResizableIntegerArray'
+        new $P2, 'ResizableIntegerArray'
+        new $P3, 'ResizableIntegerArray'
+        set towers[0], $P1
+        set towers[1], $P2
+        set towers[2], $P3
         ## towers = [[],[],[]]
 
         .local int i
         i = size
 loop_populate:
-        push P1, i
+        push $P1, i
         dec i
         if i > 0 goto loop_populate
         ## towers = [[...,3,2,1],[],[]]
@@ -177,12 +177,12 @@ loop_cols:
         disk_size = stack[i]                 # disk_size = towers[j][i]
 print_it:
         n_spaces = tower_size - disk_size
-        repeat S0, " ", n_spaces
-        print S0
-        I6 = mul disk_size, 2                # I6 = disk_size * 2
-        repeat S1, "=", I6
-        print S1
-        print S0
+        repeat $S0, " ", n_spaces
+        print $S0
+        $I6 = mul disk_size, 2                # $I6 = disk_size * 2
+        repeat $S1, "=", $I6
+        print $S1
+        print $S0
 
         inc j
         if j == 3 goto done_loop

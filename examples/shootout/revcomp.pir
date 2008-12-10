@@ -35,7 +35,7 @@ loop:
 	stdin = getstdin
 	stdout = getstdout
 	# stdout is linebuffered per default - make it block buffered
-	stdout.'setbuf'(8192)
+	stdout.'buffer_size'(8192)
 
 	seq = ''
 

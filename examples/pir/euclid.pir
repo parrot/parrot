@@ -32,16 +32,16 @@ Page 2:
 =cut
 
 .sub 'example' :main
-        I1 = 96
-        I2 = 64
+        $I1 = 96
+        $I2 = 64
         print  "Algorithm E (Euclid's algorithm)\n"
-e1:     I4 = mod I1, I2
-e2:     unless I4 goto done
-e3:     I1 = I2
-        I2 = I4
+e1:     $I4 = mod $I1, $I2
+e2:     unless $I4 goto done
+e3:     $I1 = $I2
+        $I2 = $I4
         branch e1
 done:   print "The greatest common denominator of 96 and 64 is "
-        print  I2
+        print  $I2
         print  ".\n"
 .end
 

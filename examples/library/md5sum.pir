@@ -51,20 +51,12 @@ next_iter:
     # Get size of file
     size = stat file, .STAT_FILESIZE
     .local pmc pio, cl
-    cl = new "ParrotIO"
+    cl = new 'FileHandle'
     # slurp the file into memory
-    pio = cl."open"(file, "<", "mmap")
-    # pio = open file, "<"
-    defined $I2, pio
-    if $I2 goto found
-    printerr file
-    printerr ": Cannot find\n"
-    goto iter_cont
-found:
-    read $S1, pio, size
-    close pio
+    .local string contents
+    contents = cl.'readall'(file)
 
-    $I2 = length $S1
+    $I2 = length contents
     if $I2 == size goto size_ok
 
     printerr file
@@ -73,7 +65,7 @@ found:
 
 size_ok:
 
-    $P0 = _md5sum ($S1)
+    $P0 = _md5sum (contents)
     _md5_print ($P0)
     print "\t"
     print file
