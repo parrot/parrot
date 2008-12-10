@@ -290,11 +290,17 @@ Update the C2 wiki entry at L<http://c2.com/cgi/wiki?ParrotCode>.
 
 =item 12.
 
-Close any release-related tickets in RT. If they are not yet resolved,
-migrate the critical ones to the next milestone release ticket.
-Non-critical unresolved tickets can be simply unlinked.
+Close any release-related tickets in trac. Migrate any critical tickets
+to the next milestone; non-critical tickets can have their milestone unset.
 
 =item 13.
+
+Add the version to trac so new bug reports can be file against your
+buggy code. L<https://trac.parrot.org/parrot/admin/ticket/versions>
+
+Remove any sufficiently old versions listed there.
+
+=item 14.
 
 You're done! Help yourself to a beer, cola, or other celebratory drink.
 
