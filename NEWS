@@ -12,6 +12,17 @@ New in December 2008 Release
     - add tests and bug fixes
     - first bits of bytecode generation. No sub calling/returning yet.
 - Languages
+  + Rakudo
+    - refactored subtypes implementation
+    - support for quotes with multi-character delimiters
+    - implemented list slices
+    - list assignment
+    - reduction meta operators
+    - hyper meta operators
+    - cross meta operators
+    - more builtin functions
+    - basic support for protos
+    - iterator on filehandle objects
   + Pipp
     - added support for a return value from user defined functions
     - added incomplete implemention of 'require_once'
