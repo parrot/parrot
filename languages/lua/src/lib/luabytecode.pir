@@ -331,9 +331,7 @@ PIRCODE
     pir = "    .local pmc k_"
     $S0 = i
     pir .= $S0
-    pir .= "\n    new k_"
-    pir .= $S0
-    pir .= ", 'LuaNumber'\n    set k_"
+    pir .= "\n    box k_"
     pir .= $S0
     pir .= ", "
     $S0 = self
@@ -362,9 +360,7 @@ PIRCODE
     pir = "    .local pmc k_"
     $S0 = i
     pir .= $S0
-    pir .= "\n    new k_"
-    pir .= $S0
-    pir .= ", 'LuaString'\n    set k_"
+    pir .= "\n    box k_"
     pir .= $S0
     pir .= ", \""
     $S0 = self

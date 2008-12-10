@@ -986,8 +986,7 @@ PIR
         format => 'ABC',
         synopsis => 'R(A)[(C-1)*FPF+i] := R(A+i), 1 <= i <= B',
         pir => <<'PIR',
-    ${INS} = concat "  new ${PTEMP}0, 'LuaNumber'\n"
-    ${INS} = concat "  set ${PTEMP}0, "
+    ${INS} = concat "  box ${PTEMP}0, "
     $I0 = ${C} - 1
     $I0 *= ${FPF}
     inc $I0
