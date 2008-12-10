@@ -701,7 +701,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %token <t> GOTO ARG IF UNLESS PNULL SET_RETURN SET_YIELD
 %token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL ADV_OPT_FLAG ADV_NAMED ADV_ARROW
 %token <t> NEW ADV_INVOCANT
-%token <t> NAMESPACE ENDNAMESPACE DOT_METHOD
+%token <t> NAMESPACE DOT_METHOD
 %token <t> SUB SYM LOCAL LEXICAL CONST
 %token <t> INC DEC GLOBAL_CONST
 %token <t> PLUS_ASSIGN MINUS_ASSIGN MUL_ASSIGN DIV_ASSIGN CONCAT_ASSIGN
@@ -1457,7 +1457,7 @@ statement:
    | MACRO '\n'                { $$ = 0; }
    | FILECOMMENT               { $$ = 0; }
    | LINECOMMENT               { $$ = 0; }
-   | location_directive            { $$ = 0; }
+   | location_directive        { $$ = 0; }
    ;
 
 labels:
@@ -1526,8 +1526,6 @@ opt_unique_reg:
 labeled_inst:
      assignment
    | conditional_statement
-   | NAMESPACE IDENTIFIER      { push_namespace(interp, $2); mem_sys_free($2); }
-   | ENDNAMESPACE IDENTIFIER   { pop_namespace(interp, $2); mem_sys_free($2); }
    | LOCAL { is_def=1; } type id_list
          {
            IdList *l = $4;

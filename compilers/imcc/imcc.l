@@ -354,7 +354,7 @@ SP              [ ]
 <emit,INITIAL>".namespace"    return NAMESPACE;
 <emit,INITIAL>".HLL"          return HLL;
 <emit,INITIAL>".HLL_map"      return HLL_MAP;
-".endnamespace"               return ENDNAMESPACE;
+
 ".local"                      return LOCAL;
 <emit,INITIAL>".const"        return CONST;
 ".globalconst"                return GLOBAL_CONST;
