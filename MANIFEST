@@ -445,7 +445,6 @@ config/inter/progs.pm                                       []
 config/inter/shlibs.pm                                      []
 config/inter/types.pm                                       []
 config/inter/yacc.pm                                        []
-docs/ROADMAP.pod                                            [devel]doc
 docs/book/README                                            [main]doc
 docs/book/appendix.pod                                      [main]doc
 docs/book/ch01_overview.pod                                 [main]doc

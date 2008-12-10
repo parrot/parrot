@@ -151,7 +151,6 @@ sub _get_special {
         RESPONSIBLE_PARTIES                             [main]doc
         TODO                                            [main]doc
         parrot-config                                   [main]bin
-        docs/ROADMAP.pod                                [devel]doc
         docs/compiler_faq.pod                           [devel]doc
         docs/configuration.pod                          [devel]doc
         docs/debug.pod                                  [devel]doc
