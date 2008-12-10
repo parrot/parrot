@@ -90,10 +90,6 @@ one or both of these flags.
 
 See RT #46715.
 
-=item * vtable name .constants and __vtable overrides [post 0.5.2]
-
-See RT #48877.
-
 =item * Assignment syntax with opcodes [post 0.8.2]
 
 See RT #36283.  When the first argument of an opcode is C<OUT>, then
