@@ -213,7 +213,7 @@ print {$X} <<'PIR';
 .sub 'luaopen_mod_foo'
 #    print "luaopen_mod_foo\n"
     .local pmc _lua__GLOBAL
-    _lua__GLOBAL = global '_G'
+    _lua__GLOBAL = get_hll_global '_G'
     new $P1, 'LuaString'
     .local pmc _mod_foo
     new _mod_foo, 'LuaTable'
