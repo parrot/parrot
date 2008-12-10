@@ -59,20 +59,20 @@ most of the day (starting at around 10am GMT) to answer questions.
 No experience with parrot necessary.
 
 --From: @wiki.root@@wiki.bugday@--
-There's a milestone ticket here:
 
-@rt.root@@rt.tracking@
+Check the list at:
 
-Which contains all the tickets I'd like to see resolved in @version@. If
-you just want to view the unresolved tickets, you can use this saved
-search:
+https://trac.parrot.org/parrot/report/3
 
-@rt.saved_search@
+Which contains all the tickets I'd like to see resolved in @version@. To
+see all the open tickets, use:
+
+https://trac.parrot.org/parrot/report
 
 If you've got something you're working on that you think you'll be
 getting done before the release, please
 - add a ticket for it (if necessary);
-- add it as a dependency for this ticket
+- set its milestone to this release.
 
 Thanks in advance for your patches and commits. ^_^
 

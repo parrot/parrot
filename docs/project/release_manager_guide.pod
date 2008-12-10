@@ -85,16 +85,6 @@ The date of the next release is in L<Appendix 2|"Appendix 2 - Upcoming releases"
 
 Enter the date of the Saturday before the next release.
 
-=item C<rt.tracking>
-
-Create a new RT-ticket for the next release.
-Please use the release month in the ticket, and *do not*
-use the release number. Releases are date-based, while release numbers are
-feature-based. Project team members agree on the release number near the
-actual release, based on the features available in trunk at the time.
-Mark the ticket for the next release as dependent on the current release. 
-Change the URL fragment in rt.tracking to use the number of the ticket for the next release.
-
 =item C<wiki.bugday>
 
 Update the date part of the link to the wiki page for the next bugday.

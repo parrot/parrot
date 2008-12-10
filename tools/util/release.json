@@ -13,9 +13,6 @@
     "bugday.day"       : "Saturday",
     "bugday.date"      : "13 Dec 2008",
 
-    "rt.root"          : "https://rt.perl.org/rt3/",
-    "rt.tracking"      : "Ticket/Display.html?id=60656",
-
     "wiki.root"        : "http://www.perlfoundation.org/parrot/index.cgi?",
     "wiki.bugday"      : "bug_day_2008_12_13",
 
