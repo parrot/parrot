@@ -399,6 +399,20 @@ filehandle when finished.
 
 /*
 
+=item C<METHOD flush()>
+
+Flushes the filehandle.
+
+=cut
+
+*/
+
+    METHOD flush() {
+        Parrot_io_flush(interp, SELF);
+    }
+
+/*
+
 =item C<METHOD print([INTVAL|FLOATVAL|STRING *|PMC*] value)>
 
 Print the passed in integer, number, string, or PMC to the filehandle.
