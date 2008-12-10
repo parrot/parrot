@@ -651,21 +651,22 @@ This function only loads the chunk; it does not run it.
     goto L2
   L1:
     chunkname = filename
-    f = open filename, '<'
-    unless f goto L3
+    f = new 'FileHandle'
+    push_eh _handler
+    f.'open'(filename, 'r')
+    pop_eh
   L2:
     $S0 = f.'readall'()
     if filename == '' goto L4
-    close f
+    f.'close'()
   L4:
     .tailcall lua_load($S0, chunkname)
-  L3:
+  _handler:
     $S0 = 'cannot open '
     $S0 .= filename
     $S0 .= ': '
     $S1 = err
     $S0 .= $S1
-  L5:
     null $P0
     .return ($P0, $S0)
 .end
