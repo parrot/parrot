@@ -120,11 +120,9 @@ helper for CALL_URL* opcodes.
     die "unable to load compilation unit"
   _handler:
     .local pmc e
-    .local string msg
     .get_results (e)
-    msg = e
-    say msg
-    $S0 = "verification failed (can't translate '"
+    $S0 = e
+    $S0 .= "\nverification failed (can't translate '"
     $S0 .= url
     $S0 .= "')"
     e = $S0
@@ -141,13 +139,13 @@ helper for CALL_URL* opcodes.
     pop_eh
     .return (content)
   _handler:
-    $S0 = err
-    print "Can't slurp '"
-    print filename
-    print "' ("
-    print $S0
-    print ")\n"
-  L1:
+    $S0 = "Can't slurp '"
+    $S0 .= filename
+    $S0 .= "' ("
+    $S1 = err
+    $S0 .= $S1
+    $S0 .= ")\n"
+    printerr $S0
     .return ('')
 .end
 
@@ -165,12 +163,16 @@ helper for CALL_URL* opcodes.
     fh.'close'()
     .return (output)
   _handler:
-    $S0 = err
-    print "Can't open '"
-    print output
-    print "' ("
-    print $S0
-    print ")\n"
+    .local pmc e
+    .get_results (e)
+    $S0 = "Can't open '"
+    $S0 .= output
+    $S0 .= "' ("
+    $S1 = err
+    $S0 .= $S1
+    $S0 .= ")\n"
+    e = $S0
+    rethrow e
 .end
 
 .sub 'save_pir'
@@ -187,12 +189,16 @@ helper for CALL_URL* opcodes.
     fh.'close'()
     .return ()
   _handler:
-    $S0 = err
-    print "Can't open '"
-    print output
-    print "' ("
-    print $S0
-    print ")\n"
+    .local pmc e
+    .get_results (e)
+    $S0 = "Can't open '"
+    $S0 .= output
+    $S0 .= "' ("
+    $S1 = err
+    $S0 .= $S1
+    $S0 .= ")\n"
+    e = $S0
+    rethrow e
 .end
 
 =back
