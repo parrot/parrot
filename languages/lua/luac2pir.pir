@@ -35,10 +35,9 @@ Francois Perrad.
     if argc != 2 goto USAGE
     progname = shift argv
     filename = shift argv
-    content = load_file(filename)
-    unless content goto L1
-    .local pmc script
     push_eh _handler
+    content = load_file(filename)
+    .local pmc script
     new $P0, 'LuaBytecode'
     script = $P0.'undump'(content)
     .local string gen_pir
@@ -46,18 +45,16 @@ Francois Perrad.
     save_pir(gen_pir, filename)
     pop_eh
     end
+  USAGE:
+    printerr "Usage: parrot luac2pir.pir filename\n"
+    exit -1
   _handler:
     .local pmc e
     .local string msg
     .get_results (e)
     msg = e
-    print msg
-    print "\n"
-  L1:
+    say msg
     end
-  USAGE:
-    printerr "Usage: parrot luad.pir filename\n"
-    exit -1
 .end
 
 .sub 'load_file' :anon
@@ -68,37 +65,44 @@ Francois Perrad.
     push_eh _handler
     content = fh.'readall'(filename)
     pop_eh
-    if content goto L1
-    $S0 = err
-    print "Can't slurp '"
-    print filename
-    print "' ("
-    print $S0
-    print ")\n"
-  L1:
-  _handler:
     .return (content)
+  _handler:
+    .local pmc e
+    .get_results (e)
+    $S0 = "Can't slurp '"
+    $S0 .= filename
+    $S0 .= "' ("
+    $S1 = err
+    $S0 .= $S1
+    $S0 .= ")\n"
+    e = $S0
+    rethrow e
 .end
 
-.sub 'save_pir' :anon
+.sub 'save_pir'
     .param string gen_pir
     .param string filename
     .local string output
     .local pmc fh
+    fh = new 'FileHandle'
     output = concat filename, '.pir'
-    fh = open output, '>'
-    if fh goto L1
-    $S0 = err
-    print "Can't open '"
-    print output
-    print "' ("
-    print $S0
-    print ")\n"
-    goto L2
-  L1:
-    print fh, gen_pir
-    close fh
-  L2:
+    push_eh _handler
+    fh.'open'(output, 'w')
+    pop_eh
+    fh.'print'(gen_pir)
+    fh.'close'()
+    .return ()
+  _handler:
+    .local pmc e
+    .get_results (e)
+    $S0 = "Can't open '"
+    $S0 .= output
+    $S0 .= "' ("
+    $S1 = err
+    $S0 .= $S1
+    $S0 .= ")\n"
+    e = $S0
+    rethrow e
 .end
 
 .include 'languages/lua/src/lib/luabytecode.pir'

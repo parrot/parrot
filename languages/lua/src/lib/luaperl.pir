@@ -53,42 +53,48 @@ It's a temporary work. Waiting for the real PIR compiler/interpreter.
     .param string code
     .param string filename
     .local pmc fh
-    fh = open filename, '>'
-    if fh goto L1
-    $S0 = err
-    print "Can't open '"
-    print filename
-    print "' ("
-    print $S0
-    print ")\n"
-    goto L2
-  L1:
-    print fh, code
-    close fh
-  L2:
+    fh = new 'FileHandle'
+    push_eh _handler
+    fh.'open'(filename, 'w')
+    pop_eh
+    fh.'print'(code)
+    fh.'close'()
+    .return ()
+  _handler:
+    .local pmc e
+    .get_results (e)
+    $S0 = "Can't open '"
+    $S0 .= filename
+    $S0 .= "' ("
+    $S1 = err
+    $S0 .= $S1
+    $S0 .= ")\n"
+    e = $S0
+    rethrow e
 .end
 
 
 .sub 'load_script' :anon
     .param string filename
-    .local pmc pio
+    .local pmc fh
     .local string content
-    pio = new 'ParrotIO'
+    fh = new 'FileHandle'
     push_eh _handler
-    content = pio.'readall'(filename)
+    content = fh.'readall'(filename)
     pop_eh
-    if content goto L1
-    $S0 = err
-    print "Can't slurp '"
-    print filename
-    print "' ("
-    print $S0
-    print ")\n"
-  L1:
-  _handler:
     .return (content)
+  _handler:
+    .local pmc e
+    .get_results (e)
+    $S0 = "Can't slurp '"
+    $S0 .= filename
+    $S0 .= "' ("
+    $S1 = err
+    $S0 .= $S1
+    $S0 .= ")\n"
+    e = $S0
+    rethrow e
 .end
-
 
 .sub 'compile_file' :anon
     .param string filename
@@ -105,18 +111,22 @@ It's a temporary work. Waiting for the real PIR compiler/interpreter.
     $S0 .= out
     $I0 = spawnw $S0
     .local string pir
+    push_eh _handler
     pir = load_script($S1)
-    if pir goto L1
-    $P0 = new 'ParrotIO'
-    $S0 = $P0.'readall'(out)
-    unlink(out)  # cleaning up the temporary file
-    die $S0
-  L1:
+    pop_eh
     unlink(out)  # cleaning up the temporary file
     .local pmc pir_comp
     pir_comp = compreg 'PIR'
     $P0 = pir_comp(pir)
     .return ($P0)
+  _handler:
+    .local pmc e
+    .get_results (e)
+    $P0 = new 'FileHandle'
+    $S0 = $P0.'readall'(out)
+    printerr $S0
+    unlink(out)  # cleaning up the temporary file
+    rethrow e
 .end
 
 
