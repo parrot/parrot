@@ -14,6 +14,18 @@ tickets in Parrot's RT system.  It is targeted at Parrot developers and "Ticket
 Wranglers" and is I<not> intended as advice or instruction for end users.  Ticket
 filing procedures for end users are documented in F<docs/submissions.pod>.
 
+=head1 WHAT ABOUT TRAC?
+
+Our preferred method of bug tracking at this point is trac:
+L<https://trac.parrot.org/>
+
+We still have several hundred tickets at the old RT system (see below), but
+our goal is to close out those tickets and (if necessary), replace them
+with trac tickets.
+
+Most of the document below still makes sense in terms of activities in trac,
+but the specifics are of course different with the new system.
+
 =head1 WHAT IS A TICKET WRANGLER?
 
 A developer with sufficient permissions to modify the tickets in Parrot's RT
@@ -206,7 +218,7 @@ or
 
     Hi,
 
-    Can you resubmit this patch different against SVN trunk?
+    Can you resubmit this patch against SVN trunk?
 
     Thanks,
 
