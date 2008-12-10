@@ -566,7 +566,7 @@ nodes of type C<PAST::Stmts>.
     ops = self.'post_children'(node, 'signature'=>$S0)
     $P0 = ops[-1]
     ops.'result'($P0)
-    .local pmc eh, iter
+    .local pmc eh
     eh = node.'handlers'()
     unless eh, no_eh
     ops = self.'wrap_handlers'(ops,eh,'rtype'=>rtype)
@@ -825,12 +825,22 @@ Return the POST representation of a C<PAST::Block>.
     $S0 = repeat 'v', $I0
     concat $S0, '*'
     ##  convert children to post
-    .local pmc ops
+    .local pmc ops, retval
     ops = self.'post_children'(node, 'signature'=>$S0)
-    bpost.'push'(ops)
+    ##  wrap the child with appropriate exception handlers, if any
+    .local pmc eh
+    eh = node.'handlers'()
+    unless eh, no_eh
+    $S0 = options['rtype']
+    retval = ops[-1]
+    ops = self.'wrap_handlers'(ops,eh,'rtype'=>$S0)
+    goto had_eh
+  no_eh:
     ##  result of last child is return from block
-    $P0 = ops[-1]
-    bpost.'push_pirop'('return', $P0)
+    retval = ops[-1]
+  had_eh:
+    bpost.'push'(ops)
+    bpost.'push_pirop'('return', retval)
 
     unless ctrlpast goto sub_done
     bpost.'push'(ctrllabel)

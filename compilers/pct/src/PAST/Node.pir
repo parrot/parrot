@@ -105,7 +105,7 @@ Accessor method -- sets/returns the "flatten" flag on arguments.
 .sub 'handlers' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .tailcall self.'attr'('handle_types', value, has_value)
+    .tailcall self.'attr'('handlers', value, has_value)
 .end
 
 
