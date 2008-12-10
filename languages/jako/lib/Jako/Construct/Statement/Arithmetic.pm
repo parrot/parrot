@@ -164,7 +164,7 @@ sub compile {
 
         $compiler->emit("  $pmc_reg = new '$pmc_type'");
         $compiler->emit("  $pmc_reg = $dest");
-        $compiler->emit("  global \"$dest_name\" = $pmc_reg");
+        $compiler->emit("  set_global \"$dest_name\", $pmc_reg");
     }
 
     return 1;

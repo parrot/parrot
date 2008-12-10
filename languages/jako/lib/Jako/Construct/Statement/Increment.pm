@@ -57,7 +57,7 @@ sub compile {
         my $pmc_reg  = $compiler->temp_pmc();
         $compiler->emit("  $pmc_reg = new '$pmc_type'");
         $compiler->emit("  $pmc_reg = $ident");
-        $compiler->emit("  global \"$ident_name\" = $pmc_reg");
+        $compiler->emit("  set_global \"$ident_name\", $pmc_reg");
     }
 
     return 1;

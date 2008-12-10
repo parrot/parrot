@@ -158,7 +158,7 @@ sub compile {
         $compiler->emit("  $temp_pmc = $dest");
 
         my $dest_name = $dest_ident->value;
-        $compiler->emit("  global \"$dest_name\" = $temp_pmc");
+        $compiler->emit("  set_global \"$dest_name\", $temp_pmc");
     }
 
     return 1;

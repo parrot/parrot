@@ -60,7 +60,7 @@ sub compile {
 
         $compiler->emit("  $temp_pmc = new '$pmc_type'");
         $compiler->emit("  $temp_pmc = $right");
-        $compiler->emit("  global \"$left\" = $temp_pmc");
+        $compiler->emit("  set_global \"$left\", $temp_pmc");
     }
     else {
         $compiler->emit("  $left = $right");
