@@ -656,7 +656,7 @@ static void
 insert_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit), ARGMOD(Instruction *ins),
         ARGMOD(SymReg *sub), ARGIN(SymReg *meth))
 {
-    SymReg *regs[2];
+    SymReg *regs[3];
 
     if (meth) {
         regs[0] = sub->pcc_sub->object;
