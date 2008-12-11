@@ -965,7 +965,7 @@ the following is not allowed:
 
  EOS
 
-{{ NOTE: This is likely because the parsing of heredocs happens later than the
+{{ NOTE: This is because the parsing of heredocs happens later than the
 preprocessing of macros. Might be nice if we could parse heredocs at the macro
 level, but not a high priority. compilers/pirc/new can do this. }}
 
@@ -1136,7 +1136,7 @@ C<.macro_local> instead of C<.local> to take advantage of the name munging.
 
 =head2 Subroutine Call
 
-  .const .Sub $P0 = "_sub_label"
+  .const "Sub" $P0 = "_sub_label"
   $P1 = new 'Continuation'
   set_addr $P1, ret_addr
   ...
@@ -1178,7 +1178,7 @@ This also works for NCI calls, as the subroutine PMC will be
 a NCI sub, and on invocation will do the Right Thing.
 Instead of the label a subroutine object can be used too:
 
-   find_global $P0, "_sub_label"
+   get_global $P0, "_sub_label"
    $P0(args)
 
 
@@ -1278,7 +1278,28 @@ argument count.
 =head1 IMPLEMENTATION
 
 There are multiple implementations of PIR, each of which will meet this
-specification for the syntax.
+specification for the syntax. Currently there are the following
+implementations:
+
+=over 4
+
+=item * compilers/imcc
+
+This is the current implementation being used in Parrot.
+
+=item * compilers/pirc
+
+This is a new implementation which will fix several of
+IMCC's shortcomings. It will replace IMCC in the not too
+distant future.
+
+=item * languages/PIR
+
+This is a PGE-based implementation, but needs to be updated
+and completed.
+
+=back
+
 
 =head1 ATTACHMENTS
 
