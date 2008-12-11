@@ -20,17 +20,17 @@ If the data is not valid, an exception will be thrown.
 
     # Slurp in the file
     .local string text
-    .local pmc pio
+    .local pmc fh
 
-    pio = open filename, '<'
-    if pio goto slurp_file
+    fh = open filename, '<'
+    if fh goto slurp_file
     $P0 = new 'Exception'
     $S0 = concat "can't open file: ", filename
     $P0 = $S0
     throw $P0
 
   slurp_file:
-    text = pio.'slurp'(filename)
+    text = fh.'readall'()
 
     # convert the text to an object and return it.
     load_bytecode 'compilers/json/JSON.pbc'
