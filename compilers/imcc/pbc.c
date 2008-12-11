@@ -113,15 +113,12 @@ PARROT_CAN_RETURN_NULL
 static subs_t * find_global_label(PARROT_INTERP,
     ARGIN(const char *name),
     ARGIN(const subs_t *sym),
-    ARGOUT(int *pc),
-    ARGOUT(int *sub_id))
+    ARGOUT(int *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
-        FUNC_MODIFIES(*pc)
-        FUNC_MODIFIES(*sub_id);
+        FUNC_MODIFIES(*pc);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -562,6 +559,9 @@ store_fixup(PARROT_INTERP, ARGIN(const SymReg *r), int pc, int offset)
     if (r->type & VT_ENCODED)
         fixup->type |= VT_ENCODED;
 
+    if (r->usage & U_SUBID_LOOKUP)
+      fixup->usage = U_SUBID_LOOKUP;
+
     /* set_p_pc   = 2  */
     fixup->color  = pc;
     fixup->offset = offset;
@@ -659,7 +659,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static subs_t *
 find_global_label(PARROT_INTERP, ARGIN(const char *name),
-    ARGIN(const subs_t *sym), ARGOUT(int *pc), ARGOUT(int *subid_matched))
+    ARGIN(const subs_t *sym), ARGOUT(int *pc))
 {
     subs_t *s;
 
@@ -668,11 +668,8 @@ find_global_label(PARROT_INTERP, ARGIN(const char *name),
     for (s = IMCC_INFO(interp)->globals->cs->first; s; s = s->next) {
         SymReg * const r = s->unit->instructions->symregs[0];
 
-        *subid_matched = r && (r->subid && (strcmp(r->subid, name) == 0));
-
         /* if names and namespaces are matching - ok */
-        if (r && (*subid_matched
-                    || (r->name && (strcmp(r->name, name) == 0)))
+        if (r && r->name && (strcmp(r->name, name) == 0)
                 && ((sym->unit->_namespace && s->unit->_namespace
                         && (strcmp(sym->unit->_namespace->name, s->unit->_namespace->name) == 0))
                     || (!sym->unit->_namespace && !s->unit->_namespace)))
@@ -680,10 +677,37 @@ find_global_label(PARROT_INTERP, ARGIN(const char *name),
 
         *pc += s->size;
     }
-
     return NULL;
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static subs_t *
+find_sub_by_subid(PARROT_INTERP, ARGIN(const char *lookup),
+    ARGIN(const subs_t *sym), ARGOUT(int *pc))
+{
+    subs_t *s;
+
+    *pc = 0;
+
+    for (s = IMCC_INFO(interp)->globals->cs->first; s; s = s->next) {
+        SymReg * const r = s->unit->instructions->symregs[0];
+
+        /* if subid matches - ok */
+        if (r && (r->subid && (strcmp(r->subid, lookup) == 0)))
+            return s;
+
+        /* if names and namespaces are matching - ok */
+        if (r && r->name && (strcmp(r->name, lookup) == 0)
+                && ((sym->unit->_namespace && s->unit->_namespace
+                        && (strcmp(sym->unit->_namespace->name, s->unit->_namespace->name) == 0))
+                    || (!sym->unit->_namespace && !s->unit->_namespace)))
+            return s;
+
+        *pc += s->size;
+    }
+    return NULL;
+}
 
 /*
 
@@ -711,10 +735,17 @@ fixup_globals(PARROT_INTERP)
             for (fixup = hsh->data[i]; fixup; fixup = fixup->next) {
                 int pc, pmc_const;
                 int addr = jumppc + fixup->color;
-                int subid_matched = 0;
+                int subid_lookup = 0;
+                subs_t *s1;
 
                 /* check in matching namespace */
-                subs_t *s1 = find_global_label(interp, fixup->name, s, &pc, &subid_matched);
+                if (fixup->usage & U_SUBID_LOOKUP) {
+                    subid_lookup = 1;
+                    /* s1 = find_sub_by_subid(interp, fixup->name, &pc); */
+                    s1 = find_sub_by_subid(interp, fixup->name, s, &pc);
+                }
+                else
+                    s1 = find_global_label(interp, fixup->name, s, &pc);
 
                 /*
                  * if failed change opcode:
@@ -738,7 +769,7 @@ fixup_globals(PARROT_INTERP)
                         PARROT_ASSERT(pcc_sub);
 
                         /* if the sub is multi, don't insert constant */
-                        if (pcc_sub->nmulti && !subid_matched)
+                        if (pcc_sub->nmulti && !subid_lookup)
                             s1 = NULL;
                     }
                 }

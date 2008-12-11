@@ -325,7 +325,7 @@ mk_pmc_const(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *type),
             if (!ascii)
                 rhs->type |= VT_ENCODED;
 
-            rhs->usage    = U_FIXUP;
+            rhs->usage    = U_FIXUP | U_SUBID_LOOKUP;;
             break;
         default:
             rhs = mk_const(interp, name, 'P');
@@ -381,7 +381,7 @@ mk_pmc_const_named(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
         if (!ascii)
             rhs->type |= VT_ENCODED;
 
-        rhs->usage    = U_FIXUP;
+        rhs->usage    = U_FIXUP | U_SUBID_LOOKUP;
     }
     else {
         rhs = mk_const(interp, const_name, 'P');
@@ -992,7 +992,14 @@ sub:
          {
            iSUBROUTINE(interp, IMCC_INFO(interp)->cur_unit, $3);
          }
-     sub_proto '\n'            { IMCC_INFO(interp)->cur_call->pcc_sub->pragma = $5; }
+     sub_proto '\n'            
+        { 
+          IMCC_INFO(interp)->cur_call->pcc_sub->pragma = $5; 
+          if (!IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid) {
+            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid = str_dup(
+            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->name);
+          }
+        }
      sub_params
      sub_body  ESUB            { $$ = 0; IMCC_INFO(interp)->cur_call = NULL; }
    ;
@@ -1107,15 +1114,10 @@ subid:
          {
            $$ = 0;
            IMCC_INFO(interp)->cur_unit->subid = NULL;
-           /*
-           IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid = str_dup_remove_quotes($3);
-           mem_sys_free($3);
-           */
          }
    | SUBID '(' any_string ')'
          {
            $$ = 0;
-           /* IMCC_INFO(interp)->cur_unit->subid = $3; */
            IMCC_INFO(interp)->cur_unit->subid = mk_const(interp, $3, 'S');
            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid = str_dup_remove_quotes($3);
            mem_sys_free($3);

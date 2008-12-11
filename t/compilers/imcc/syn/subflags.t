@@ -108,7 +108,7 @@ t/compilers/imcc/syn/subflags.t  - test flags on PIR subs
   subid4_done:
     pop_eh
     $I0 = isa $P70, 'Sub'
-    todo($I0, 'subid4 in another ns found w/.const')
+    ok($I0, 'subid4 in another ns found w/.const')
 
     ## find multis via subid
     .const 'Sub' $P0 = 'above'
