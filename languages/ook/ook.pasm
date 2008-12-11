@@ -9,7 +9,7 @@ ook.pasm - An implementation of ook in PASM
 # First, read the file.
         get_params "0", P5
         set S20, P5[1]      # Name of the Ook source.
-        open P20, S20, "<"  # P20 = file descriptor
+        open P20, S20, "r"  # P20 = file descriptor
         set S21, ""         # S21 = accumulator
 READ:
         read S22, P20, 256
