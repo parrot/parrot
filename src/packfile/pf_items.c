@@ -541,8 +541,7 @@ PARROT_CONST_FUNCTION
 size_t
 PF_size_integer(void)
 {
-    const size_t s = sizeof (INTVAL) / sizeof (opcode_t);
-    return s ? s : 1;
+    return sizeof (INTVAL) / sizeof (opcode_t);
 }
 
 /*
