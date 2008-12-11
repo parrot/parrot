@@ -85,7 +85,7 @@ STILL INCOMPLETE (see open_stream).
   L1:
     .local pmc f, md, res
     $I0 = REPORT_ERRORS | ENFORCE_SAFE_MODE
-    f = stream_open(filename, '<', $I0)
+    f = stream_open(filename, 'r', $I0)
     unless f goto L2
     new md, 'SHA1'
     md.'Init'()

@@ -34,7 +34,7 @@ language_output_like( 'Pipp', <<'CODE', <<'OUT', 'get_resource_type()' );
   echo get_resource_type($fp);
 ?>
 CODE
-/^(stream|ParrotIO)$/
+/^(stream|FileHandle)$/
 OUT
 
 unlink 'pipp/file.txt' if (-f 'pipp/file.txt');

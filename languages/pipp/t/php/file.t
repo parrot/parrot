@@ -103,7 +103,7 @@ language_output_like( 'Pipp', <<'CODE', <<'OUT', 'fclose() bad arg' );
   fclose('bad');
 ?>
 CODE
-/fclose\(\): supplied argument is not a valid (stream|ParrotIO) resource/
+/fclose\(\): supplied argument is not a valid (stream|FileHandle) resource/
 OUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'fpassthru()' );

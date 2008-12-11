@@ -13,7 +13,7 @@ php_file.pir - PHP file Standard Library
 
 =cut
 
-.const string STREAM_PMC = 'ParrotIO'
+.const string STREAM_PMC = 'FileHandle'
 
 .const int SEEK_SET = 0
 .const int SEEK_CUR = 1
@@ -226,6 +226,7 @@ STILL INCOMPLETE.
 
 .sub 'file_get_contents'
     .param pmc args :slurpy
+
     .local string filename
     .local int use_include_path
     .local pmc context
@@ -249,11 +250,11 @@ STILL INCOMPLETE.
     unless use_include_path goto L3
     $I0 |= USE_PATH
   L3:
-    stream = stream_open(filename, '<', $I0, context)
+    stream = stream_open(filename, 'r', $I0, context)
     if stream goto L4
     .RETURN_FALSE()
   L4:
-    $S0 = stream.'slurp'('')
+    $S0 = stream.'readall'()
     close stream
     .RETURN_STRING($S0)
 .end

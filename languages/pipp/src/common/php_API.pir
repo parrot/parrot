@@ -429,7 +429,10 @@ STILL INCOMPLETE (see parse_arg_impl).
     .param string mode
     .param int options
     .param pmc context :optional
-    $P0 = open path, mode
+
+    $P0 = new 'FileHandle'
+    $P0.'open'( path, mode )
+
     .return ($P0)
 .end
 
