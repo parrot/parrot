@@ -413,7 +413,7 @@ DONE:
   .CAR(fname2,args)
    fname1 = fname2
 
-   open fd, fname1, "<"
+   open fd, fname1, "r"
    unless fd, OPEN_FAILED
 
   .STREAM(stream, fd)
