@@ -15,19 +15,12 @@ Platform                     B8    Runloops      Feature Comp Test Inst YYYYMMDD
 --------------------------------------------------------------------------------
 cygwin1.5.24-x86-gcc3.4.4     4   Y    Y    -     -   -   Y    Y/6*1 ?  20071016
 cygwin1.5.25-x86-gcc3.4.4     4   Y    Y    -     -   -   Y    Y/6*1 ?  20080513
-darwin7.9.0-ppc-3.3          B    Y    Y    -     Y   Y   Y    Y/5   Y  20060808
-darwin8.6.0-ppc-gcc4.0.1     B    ?    ?    ?     ?   ?   ?    Y/4   ?  20060807
 darwin8.8.0-ppc-gcc4.0.1     B    Y/2  ?    ?     ?   ?   Y    Y     ?  20070116
-darwin8.6.0-x86-gcc4.0.1          ?    -    ?     ?   ?   Y    Y     ?  20060607
 darwin8.8.1-x86-gcc4.0.1          Y/2  ?    ?     ?   ?   Y    Y     ?  20070116
 darwin8.11.1-x86-gcc4.0.1         Y    ?    ?     ?   ?   Y    Y/7   ?  20080220
 freebsd-x86-gcc-3.4.6             Y    ?    ?     ?   ?   Y    Y     ?  20080519
 linux-x86-gcc3.3.3.20040412       Y/2  ?    ?     ?   ?   Y    Y     ?  20070116
-linux-x86-gcc3.3.5.2005013        Y    Y    Y     Y   Y   Y    Y     ?  20060618
 linux-x86-gcc3.4.5                Y    Y    Y     ?   ?   Y    Y     ?  20071016
-linux-x86-gcc4.0.2                Y    Y    Y     Y   Y   Y    Y     ?  20060514
-linux-x86-gcc4.0.3                Y    Y    Y     Y   Y   Y    Y     ?  20060707
-linux-x86-gcc4.1.0                Y    Y    Y     Y   Y   Y    Y     Y  20060306
 linux-x86-gcc4.1.2                Y    Y    ?     Y   Y   Y    Y     ?  20080617
 linux-x86-gcc4.1.3                Y    Y    ?     Y   Y   Y    Y     ?  20080414
 linux-x86-gcc4.2.3                Y    Y    ?     Y   Y   Y    Y     ?  20080715
@@ -37,12 +30,10 @@ linux-x86-icc9.1                  Y    Y    Y     ?   ?   Y    Y     ?  20071014
 linux-x86-llvm-gcc-4.2            Y    Y    ?     ?   ?   Y    Y     ?  20080801
 sol8-sparc-cc                B    -    -    -     -   -   -    Y/85  ?  20080818
 sol8-sparc-gcc_4.1.0         B    -    -    -     -   -   -    Y/87  ?  20080818
-sol10-sparc-cc_5.8           B    Y    -    -     Y   Y   Y    Y/9   ?  20060807
-sol10-sparc-cc_5.9           B4*4 Y    -    -     Y   Y   Y    Y     ?  20080510
+sol10-sparc-cc_5.9           B4*3 Y    -    -     Y   Y   Y    Y     ?  20080510
 sol10-sparc-cc_5.9           B8   Y    -    -     Y   Y   Y    Y/2   ?  20080518
-sol10-sparc-gcc_4.0.2        B4*4 Y    -    -     Y   Y   Y    Y/1   ?  20080510
+sol10-sparc-gcc_4.0.2        B4*3 Y    -    -     Y   Y   Y    Y/1   ?  20080510
 sol10-sparc-gcc_4.0.2        B8   Y    -    -     Y   Y   Y    Y/2   ?  20080518
-tru64-alpha-compaq_c6.5       8   ?    ?    ?     Y   ?   Y    Y/2   ?  20060203
 win32-x86-mingw_gcc3.4.5          Y    Y    -     -   -   Y    Y     Y  20080917
 win32-x86-msvc_9.0                -    Y    -     Y   -   Y    Y/4   ?  20081203
 
@@ -53,14 +44,12 @@ Platform                     B8    Runloops      Feature Comp Test Inst YYYYMMDD
                                 CGoto JIT EXEC   Thr Sig
 --------------------------------------------------------------------------------
 aix5.3-power-gcc4.2          B8   -    -    -             Y    ?     ?  20080510
-freebsd-amd64-gcc3.4.6            Y    Y*3  ?     ?   ?   Y    Y     ?  20071008
+freebsd-amd64-gcc3.4.6            Y    Y*2  ?     ?   ?   Y    Y     ?  20071008
 freebsd-x86-gcc-3.4.6             Y    ?    ?     ?   ?   Y    Y     ?  20080519
 linux-ppc-gcc3.4.5                Y    Y    Y     ?   ?   Y    Y     ?  20080519
 linux-ps3-gcc4.1.1           B    Y    Y    Y     Y   Y   Y    Y/3   -  20070308
 linux-s390x-gcc4.1.2         B4   ?    -    -     Y   Y   Y    Y/2   ?  20080908
-linux-x86_64-gcc3.4.3         8   Y    -    -     Y   Y   Y    Y     ?  20060618
 linux-x86_64-gcc4.1.0         8   Y    -    -     Y   Y   Y    Y     ?  20070116
-linux-x86_64-gcc4.1.0         4   Y    -    -     Y   Y   Y    Y/2   ?  20060807
 linux-x86_64-gcc4.1.2         8   Y    -    -     Y   Y   Y    Y     ?  20080220
 linux-x86_64-gcc4.3.2         8   Y    -    -     Y   Y   Y    Y     ?  20081118
 openbsd-zaurus-gcc3.3.5           Y    -    -     Y   Y   Y    ?     ?  20070309
@@ -98,9 +87,8 @@ YYYYMMDD  The date tested.
 
 Remarks:
 *1 need PATH=$PATH:$PWD/blib/lib to locate DLL
-*2 some tests fail intermittently when building x86 on xeon processor
-*3 You must run Configure.pl with --jitcapable
-*4 gcc and cc defaults to 32bits on solaris
+*2 You must run Configure.pl with --jitcapable
+*3 gcc and cc defaults to 32bits on solaris
 
 The following configurations are also working on x86/linux (and possibly
 other platforms):
