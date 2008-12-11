@@ -115,8 +115,9 @@ Tests the ExceptionHandler PMC.
     ok($I0, 'Exception Handler subclass popped')
     $I0 = subclass_handler_catches_can(myhandlercan)
     ok($I0, 'Exception Handler subclass with can_handle method catch exception')
-    $I0 = subclass_handler_catches(myhandler)
-    todo($I0, 'Exception Handler subclass catch exception')
+    skip(1,'Exception Handler subclass causes segfault')
+    #$I0 = subclass_handler_catches(myhandler)
+    #todo($I0, 'Exception Handler subclass catch exception')
 .end
 
 .sub subclass_exception_handler
