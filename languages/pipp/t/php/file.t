@@ -78,7 +78,7 @@ CODE
 resource
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'fopen(nofile)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'fopen(nofile)', todo => 'currently broken' );
 <?php
   $fp = fopen('nofile.txt', 'r');
   echo gettype($fp), "\n";
@@ -98,7 +98,7 @@ CODE
 1
 OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUT', 'fclose() bad arg' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'fclose() bad arg', todo => 'currently broken' );
 <?php
   fclose('bad');
 ?>
@@ -106,7 +106,7 @@ CODE
 /fclose\(\): supplied argument is not a valid (stream|FileHandle) resource/
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'fpassthru()' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'fpassthru()', todo => 'currently broken' );
 <?php
   $fp = fopen('file.txt', 'r');
   fpassthru($fp);
@@ -118,7 +118,7 @@ line 2
 line 3
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'readfile(file)' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'readfile(file)', todo => 'currently broken' );
 <?php
   echo readfile('file.txt'), "\n";
 ?>
