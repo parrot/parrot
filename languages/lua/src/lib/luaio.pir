@@ -388,7 +388,11 @@ error code.
     res = getiofile(IO_INPUT)
     .return (res)
   _handler:
-    lua_argerror(1, file)
+    .local pmc e
+    .get_results (e)
+    $S0 = lua_x_argerror(1, file)
+    e = $S0
+    rethrow e
 .end
 
 
@@ -429,7 +433,11 @@ input file. In this case it does not close the file when the loop ends.
     file = newfile(f)
     .tailcall aux_lines(file, 1)
   _handler:
-    lua_argerror(1, $S1)
+    .local pmc e
+    .get_results (e)
+    $S0 = lua_x_argerror(1, $S1)
+    e = $S0
+    rethrow e
 .end
 
 
@@ -531,7 +539,11 @@ Similar to C<io.input>, but operates over the default output file.
     res = getiofile(IO_OUTPUT)
     .return (res)
   _handler:
-    lua_argerror(1, file)
+    .local pmc e
+    .get_results (e)
+    $S0 = lua_x_argerror(1, file)
+    e = $S0
+    rethrow e
 .end
 
 

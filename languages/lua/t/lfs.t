@@ -111,16 +111,12 @@ nil
 No such file or directory
 OUT
 
-SKIP: {
-skip("lfs.dir: infinite loop", 1);
-
 language_output_like( 'lua', <<'CODE', <<'OUT', 'function lfs.dir' );
 require "lfs"
 lfs.dir("xptoo")
 CODE
 /^[^:]+: [^:]+:\d+: cannot open xptoo: No such file or directory\nstack traceback:\n/
 OUT
-}
 
 mkdir '../xpto' unless -d '../xpto';
 

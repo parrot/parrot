@@ -27,15 +27,24 @@ the call stack:
 
 This function never returns.
 
+CAUTION: don't used it in an exception handler, but lua_x_argerror & rethrow.
+
 =cut
 
 .sub 'lua_argerror'
     .param int narg
     .param pmc extramsg :slurpy
+    $S0 = lua_x_argerror(narg, extramsg :flat)
+    lua_error($S0)
+.end
+
+.sub 'lua_x_argerror'
+    .param int narg
+    .param pmc extramsg :slurpy
     $S1 = narg
     new $P0, 'Lua'
     $S0 = $P0.'caller'()
-    lua_error("bad argument #", $S1, " to '", $S0, "' (", extramsg :flat, ")")
+    .tailcall lua_x_error("bad argument #", $S1, " to '", $S0, "' (", extramsg :flat, ")")
 .end
 
 
@@ -199,14 +208,21 @@ Raises an error.
 
 This function never returns.
 
+CAUTION: don't used it in an exception handler, but lua_x_error & rethrow.
+
 =cut
 
 .sub 'lua_error'
     .param pmc message :slurpy
-    $S0 = join '', message
+    $S0 = lua_x_error(message :flat)
     die $S0
 .end
 
+.sub 'lua_x_error'
+    .param pmc message :slurpy
+    $S0 = join '', message
+    .return ($S0)
+.end
 
 =item C<lua_findtable (t, fname)>
 

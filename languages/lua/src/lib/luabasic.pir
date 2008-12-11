@@ -291,7 +291,11 @@ default for C<f> is 1.
   L2:
     .return (f)
   _handler:
-    lua_argerror(1, "invalid level")
+    .local pmc e
+    .get_results (e)
+    $S0 = lua_x_argerror(1, "invalid level")
+    e = $S0
+    rethrow e
 .end
 
 =item C<getmetatable (object)>

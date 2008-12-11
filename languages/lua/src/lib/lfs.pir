@@ -495,10 +495,12 @@ when there is no more entries. Raises an error if C<path> is not a directory.
     .return (res)
   _handler:
     .local pmc e
-    .local string s
+    .local string msg
     .get_results (e)
-    s = e
-    lua_error("cannot open ", $S0, ": ", s)
+    msg = e
+    $S0 = lua_x_error("cannot open ", $S0, ": ", msg)
+    e = $S0
+    rethrow e
 .end
 
 .sub 'dir_aux' :anon :lex :outer(dir)
