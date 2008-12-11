@@ -359,9 +359,6 @@ Set the current PIR file name to the value specified. This is useful in case
 the PIR code is generated from some source PIR files, and error messages
 should print the source file's name, not the name of the generated file.
 
-{{ DEPRECATION NOTE: was C<<#line <integer> <string>>>. See [RT#45857],
-[RT#43269], and [RT#47141]. }}
-
 =item .annotate <key> <value>
 
 Makes an entry in the bytecode annotations table. This is used to store high
@@ -389,33 +386,6 @@ you instead of the above annotate directive emit:
   .annotate "line" "42"
 
 Then you're asking for a bigger bytecode file as a result.
-
-=item .namespace <identifier> [deprecated: See RT #48737]
-
-{{ DEPRECATION NOTE: this variation of C<.namespace> and
-C<.endnamespace> are deprecated.  They were a hackish attempt at
-implementing scopes in Parrot, but didn't actually turn out to be
-useful.}}
-
-Open a new scope block. This "namespace" is not the same as the
-.namespace [ <identifier> ] syntax, which is used for storing subroutines
-in a particular namespace in the global symbol table.
-This directive is useful in cases such as (pseudocode):
-
-  local x = 1;
-  print(x);       # prints 1
-  do              # open a new namespace/scope block
-    local x = 2;  # this x hides the previous x
-    print(x);     # prints 2
-  end             # close the current namespace
-  print(x);       # prints 1 again
-
-All types of common language constructs such as if, for, while, repeat and
-such that have nested scopes, can use this directive.
-
-=item .endnamespace <identifier> [deprecated: RT #48737]
-
-Closes the scope block that was opened with .namespace <identifier>.
 
 =back
 
@@ -480,7 +450,7 @@ abbreviated) definition:
 This code is run at compile time, and the returned C<tr_array> is stored
 in the bytecode file in place of the sub.  Other subs may then do:
 
-    .const .Sub tr_00 = 'tr_00_init'
+    .const 'Sub' tr_00 = 'tr_00_init'
 
 in order to fetch the constant.
 
@@ -811,10 +781,6 @@ becomes:
 
 Note that this only works for opcodes that have have a leading C<OUT>
 parameter. [this restriction unimplemented: RT #36283]
-
-=item global "string" = <var> [deprecated: RT #48016]
-
-=item <var> = global "string" [deprecated: RT #48018]
 
 =item ([<var1> [:<flag1> ...], ...]) = <var2>([<arg1> [:<flag2> ...], ...])
 
