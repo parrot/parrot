@@ -369,6 +369,23 @@ token reserved_word {
     <keyword> | <future_reserved_word>
 }
 
+token singlelinecomment { '//' \N* }    # end of line comment like Unix shell and C++
+
+token multilinecomment  { '/*' .*?  '*/' }         # C-like multiline comment
+
+token ws_all {
+    | \h
+    | \v
+    | <singlelinecomment>
+    | <multilinecomment>
+}
+
+# whitespace rule used implicity by rules
+token ws {
+    | <!ww> <ws_all>+
+    | <ws_all>*
+}
+
 #### whitespace
 #token ws {
 #    | <.whitespace>
@@ -390,18 +407,19 @@ token reserved_word {
 
 #token comment {
 #    <.singlelinecomment>
+#    <.multilinecomment>
 #}
 
 
 ## comments
 
-token multilinecomment {
-    '/*' .*? '*/'
-}
+#token multilinecomment {
+#    '/*' .*? '*/'
+#}
 
-token singlelinecomment {
-    '//' \N* \n
-}
+#token singlelinecomment {
+#    '//' \N* \n
+#}
 
 rule expression {
     <assignment_expression> [',' <assignment_expression>]*
