@@ -469,7 +469,7 @@ pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, ARGMOD(void *vinfo)
     move_info_t      *info    = (move_info_t *)vinfo;
     SymReg           *src     = NULL;
     SymReg           *dest    = NULL;
-    SymReg           *regs[2];
+    SymReg           *regs[3];
 
     if (d == 255) {
         int t;
