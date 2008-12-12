@@ -37,7 +37,7 @@ Initializates the allocator, and returns it.
 
 */
 lsr_allocator *
-new_linear_scan_register_allocator(void) {
+new_linear_scan_register_allocator(struct lexer_state *lexer) {
     lsr_allocator *lsr = (lsr_allocator *)mem_sys_allocate_zeroed(sizeof (lsr_allocator));
     int i;
 
@@ -50,6 +50,8 @@ new_linear_scan_register_allocator(void) {
      */
     for (i = 0; i < 4; ++i)
         lsr->r[i] = 1;
+
+    lsr->lexer = lexer;
 
     return lsr;
 }
@@ -428,8 +430,10 @@ linear_scan_register_allocation(lsr_allocator * const lsr) {
     live_interval * i;
     pir_type type = 0; /* types run from 0 to 4; see pircompunit.h */
 
-
     for (type = 0; type < 4; ++type) { /* handle each of the 4 parrot types separately. */
+
+        /* intialize active intervals list to NULL */
+        lsr->active[type] = NULL;
 
         /* fprintf(stderr, "Lin.scan.reg.alloc.: %u variables to be mapped\n",
            lengthi(lsr->intervals[type]));
@@ -449,7 +453,11 @@ linear_scan_register_allocation(lsr_allocator * const lsr) {
             add_interval_to_active(lsr, i, type);
         }
 
+        /* clear list of intervals */
+        lsr->intervals[type] = NULL;
     }
+
+
 }
 
 

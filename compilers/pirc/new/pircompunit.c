@@ -2388,6 +2388,10 @@ close_sub(lexer_state * const lexer) {
 
     /* store end offset in bytecode of this subroutine */
     CURRENT_SUB(lexer)->endoffset = lexer->codesize;
+
+     /* if register allocation was requested, do that now */
+    if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC))
+        linear_scan_register_allocation(lexer->lsr);
 }
 
 

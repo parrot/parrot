@@ -181,10 +181,6 @@ parse_file(int flexdebug, FILE *infile, char * const filename, int flags, int th
             lexer->outfile = stdout;
         }
 
-        /* if register allocation was requested, do that now */
-        if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC))
-            linear_scan_register_allocation(lexer->lsr);
-
         if (TEST_FLAG(lexer->flags, LEXER_FLAG_NOOUTPUT)) /* handy for testing the compiler */
             fprintf(stdout, "ok\n");
         else if (TEST_FLAG(lexer->flags, LEXER_FLAG_PREPROCESS))

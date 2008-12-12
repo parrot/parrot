@@ -56,7 +56,8 @@ typedef struct free_reg {
 
 } free_reg;
 
-
+/* forward declaration */
+struct lexer_state;
 
 typedef struct linear_scan_register_allocator {
     unsigned       r[4];
@@ -70,9 +71,11 @@ typedef struct linear_scan_register_allocator {
     /* list of free_reg objects that we can re-use, to save memory allocations. */
     free_reg      *cached_regs;
 
+    struct lexer_state *lexer;
+
 } lsr_allocator;
 
-lsr_allocator *new_linear_scan_register_allocator(void);
+lsr_allocator *new_linear_scan_register_allocator(struct lexer_state *lexer);
 
 void destroy_linear_scan_regiser_allocator(lsr_allocator *lsr);
 
