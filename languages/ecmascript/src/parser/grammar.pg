@@ -51,6 +51,8 @@ rule formal_parameter_list {
 ##
 
 rule statement {
+##tewk  added function_expression, don't know if it should go here though
+    | <function_expression> {*}   #= function_expression
     | <expression_statement> {*}  #= expression_statement
     | <block> {*}                 #= block
     | <variable_statement> {*}    #= variable_statement
@@ -187,6 +189,8 @@ rule empty_statement {
 
 rule expression_statement {
     ##<!['{'|'function']> ## is this necessary? isn't this fixed automatically by PGE?
+    #<!before \w>
+    <!['{'|'function']>
     <expression> ';'
     {*}
 }
@@ -244,6 +248,57 @@ rule primary_expression {
     | <identifier> {*}          #= identifier
     | <object_literal> {*}      #= object_literal
     | '(' <expression> ')' {*}  #= expression
+    | <regular_expression_literal> {*} #= regular_expression_literal
+}
+
+#RegularExpressionLiteral :: See section 7.8.5
+#/ RegularExpressionBody / RegularExpressionFlags
+token regular_expression_literal {
+  '/' <regular_expression_body> '/' <regular_expression_flags>? {*}
+}
+#RegularExpressionBody :: See section 7.8.5
+#RegularExpressionFirstChar RegularExpressionChars
+token regular_expression_body {
+  <regular_expression_first_char> <regular_expression_char>*
+}
+
+#RegularExpressionChars :: See section 7.8.5
+#[empty]
+#RegularExpressionChars RegularExpressionChar
+
+#RegularExpressionFirstChar :: See section 7.8.5
+#NonTerminator but not * or \ or /
+#BackslashSequence
+token regular_expression_first_char {
+  | <-[\n*\\/]>
+  | '\\' \N
+}
+
+#RegularExpressionChar :: See section 7.8.5
+#NonTerminator but not \ or /
+#BackslashSequence
+token regular_expression_char {
+  | <-[\n\\/]>
+  | '\\' \N
+}
+
+#BackslashSequence :: See section 7.8.5
+#\ NonTerminator
+#token backslash_sequence {
+#  '\\' \N
+#}
+#
+#token NonTerminator :: See section 7.8.5
+#SourceCharacter but not LineTerminator
+#token non_terminator {
+#  \N
+#}
+
+#RegularExpressionFlags :: See section 7.8.5
+#[empty]
+#RegularExpressionFlags IdentifierPart
+token regular_expression_flags {
+  <identifier_part>+
 }
 
 token this { 'this' {*} }
@@ -259,18 +314,22 @@ rule array_literal {
 }
 
 rule element_list {
-    <elision> <assignment_expression> [',' <elision> <assignment_expression>]*
+    <elision>? <assignment_expression> [',' <elision>? <assignment_expression>]*
     {*}
 }
 
 rule elision {
-    [$<comma>=',']* {*}
+    [$<comma>=',']+ {*}
 }
 
 token identifier {
     <!reserved_word>
     <alpha> [<alpha>|<digit>|_]*
     {*}
+}
+
+token <identifier_part> {
+    [<alpha>|<digit>|_]
 }
 
 token literal {
@@ -307,8 +366,8 @@ token property_name {
 }
 
 token numeric_literal {
-    | <decimal_literal> {*}        #= decimal_literal
     | <hex_integer_literal> {*}    #= hex_integer_literal
+    | <decimal_literal> {*}        #= decimal_literal
 }
 
 token hex_integer_literal {
@@ -318,13 +377,13 @@ token hex_integer_literal {
 token hex_digits { <[0..9 a..f A..F]> }
 
 token decimal_literal {
-    | <integer_number> {*}         #= integer_number
     | <floating_point_number> {*}  #= floating_point_number
+    | <integer_number> {*}         #= integer_number
 }
 
 token floating_point_number {
     [
-    | <decimal_integer_literal> '.' <digit>+? <exponent_part>?
+    | <decimal_integer_literal> '.' <digit>* <exponent_part>?
     | '.' <digit>+ <exponent_part>?
     ]
     {*}

@@ -395,6 +395,10 @@ method primary_expression($/, $key) {
     make $( $/{$key} );
 }
 
+method regular_expression_literal ($/) {
+    make PAST::Val.new( :value( ~$<regular_expression_literal> ), :node($/) );
+}
+
 method this($/) {
     ## XXX wait for PAST support for 'self'
     ## load 'self' into a register; when this PAST node is used as a child somewhere
@@ -546,7 +550,7 @@ method lhs_expression($/, $key) {
     make $( $/{$key} );
 }
 
-method member_expression($/) {
+method member_expressionX($/) {
     my $member := $( $<member_prefix> );
 
     ## if there are any arguments, $member is invoked with these arguments.
