@@ -2881,6 +2881,8 @@ PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
         }
     }
 
+    fclose(file);
+
     pdb->state |= PDB_SRC_LOADED;
     pdb->file   = pfile;
 
