@@ -992,9 +992,9 @@ sub:
          {
            iSUBROUTINE(interp, IMCC_INFO(interp)->cur_unit, $3);
          }
-     sub_proto '\n'            
-        { 
-          IMCC_INFO(interp)->cur_call->pcc_sub->pragma = $5; 
+     sub_proto '\n'
+        {
+          IMCC_INFO(interp)->cur_call->pcc_sub->pragma = $5;
           if (!IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid) {
             IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid = str_dup(
             IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->name);
