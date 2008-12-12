@@ -22,7 +22,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin";
 
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 26;
 use Parrot::Config;
 use Test::More;
 use Parrot::Test::Lua;
@@ -83,6 +83,14 @@ require 'complex'
 print(complex.real('str'))
 CODE
 /^[^:]+: [^:]+:\d+: bad argument #1 to 'real' \(number expected, got string\)\nstack traceback:\n/
+OUTPUT
+
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'complex __unm' );
+require 'complex'
+z = complex.new(3, 4)
+print(-z)
+CODE
+-3-4i
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function abs' );

@@ -221,8 +221,9 @@ LIST
     .param pmc z :optional
     .param pmc extra :slurpy
     $P1 = get(1, z)
-    $P0 = new $P1
-    .tailcall newcomplex($P0)
+    $P0 = neg $P1
+    $P0 = newcomplex($P0)
+    .return ($P0)
 .end
 
 
