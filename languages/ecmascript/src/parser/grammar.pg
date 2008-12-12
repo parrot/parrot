@@ -59,9 +59,9 @@ rule statement {
     | <while_statement> {*}       #= while_statement
     | <do_while_statement> {*}    #= do_while_statement
     | <for1_statement> {*}        #= for1_statement
-    #| <for2_statement> {*}        #= for2_statement
-    #| <for3_statement> {*}        #= for3_statement
-    #| <for4_statement> {*}        #= for4_statement
+    | <for2_statement> {*}        #= for2_statement
+    | <for3_statement> {*}        #= for3_statement
+    | <for4_statement> {*}        #= for4_statement
     | <continue_statement> {*}    #= continue_statement
     | <break_statement> {*}       #= break_statement
     | <return_statement> {*}      #= return_statement
@@ -171,6 +171,11 @@ rule variable_statement {
     {*}
 }
 
+rule variable_declaration_list {
+    <variable_declaration> [',' <variable_declaration>]*
+    {*}
+}
+
 rule variable_declaration {
     <identifier> ['=' <assignment_expression>]?
     {*}
@@ -187,7 +192,7 @@ rule expression_statement {
 }
 
 token return_statement {
-    'return' \N <expression>?  ';'
+    'return' [\N <expression>]?  ';'
     {*}
 }
 
@@ -426,25 +431,40 @@ rule expression {
     {*}
 }
 
-rule assignment_expression {
-    [<lhs_expression> <assignop>]* <conditional_expression>
-    {*}
-}
+#rule assignment_expression {
+#   [<lhs_expression> <assignop>]* <conditional_expression>
+#    {*}
+#}
 
-token assignop {
-    $<op>=['='|'*='|'/='|'%='|'+='|'-='|'<<='|'>>='|'>>>='|'&='|'^='|'|=']
-}
+#token assignop {
+#    $<op>=['='|'*='|'/='|'%='|'+='|'-='|'<<='|'>>='|'>>>='|'&='|'^='|'|=']
+#}
 
-rule conditional_expression {
-    <logical_or_expression>
-    ['?' $<then>=<assignment_expression>
-     ':' $<else>=<assignment_expression>]?
-    {*}
-}
+#rule conditional_expression {
+#    <logical_or_expression>
+#    ['?' $<then>=<assignment_expression>
+#     ':' $<else>=<assignment_expression>]?
+#    {*}
+#}
 
-rule 'logical_or_expression' is optable { ... }
+rule 'assignment_expression' is optable { ... }
 
-proto 'infix:||'  is precedence('1') is pasttype('unless') { ... }
+proto 'infix:=' is precedence('1') is pasttype('copy') is lvalue(1)     { ... }
+
+proto 'infix:+=' is equiv('infix:=') { ... } 
+proto 'infix:-=' is equiv('infix:=') { ... } 
+proto 'infix:/=' is equiv('infix:=') is pirop('div')        { ... } 
+proto 'infix:*=' is equiv('infix:=') is pirop('mul')        { ... } 
+proto 'infix:%=' is equiv('infix:=') is pirop('mul')        { ... } 
+proto 'infix:|=' is equiv('infix:=')    { ... } 
+proto 'infix:&=' is equiv('infix:=')    { ... } 
+proto 'infix:~=' is equiv('infix:=')    { ... } 
+proto infix:«>>=» is equiv('infix:=') is pirop('rsh')       { ... } 
+proto infix:«<<=» is equiv('infix:=') is pirop('lsh')       { ... } 
+proto infix:«>>>=» is equiv('infix:=') is pirop('rsh')       { ... } 
+proto 'ternary:? :' is tighter('infix:=') is pirop('if')      { ... } 
+
+proto 'infix:||'  is tighter('ternary:? :') is pasttype('unless') { ... }
 
 proto 'infix:&&'  is tighter('infix:||') is pasttype('if') { ... }
 
@@ -454,23 +474,23 @@ proto 'infix:^'   is tighter('infix:|')  { ... }
 
 proto 'infix:&'   is tighter('infix:^')  { ... }
 
-proto 'infix:=='  is tighter('infix:&')  { ... }
-proto 'infix:!='  is equiv('infix:==')   { ... }
-proto 'infix:===' is equiv('infix:==')   { ... }
-proto 'infix:!==' is equiv('infix:==')   { ... }
+proto 'infix:!='  is tighter('infix:&')  { ... }
+proto 'infix:=='  is equiv('infix:!=')   { ... }
+proto 'infix:===' is equiv('infix:!=')   { ... }
+proto 'infix:!==' is equiv('infix:!=')   { ... }
 
-proto 'infix:<'   is tighter('infix:==') { ... }
-proto 'infix:>'   is equiv('infix:<')    { ... }
-proto 'infix:<='  is equiv('infix:<')    { ... }
-proto 'infix:>='  is equiv('infix:<')    { ... }
-proto 'infix:instanceof' is equiv('infix:<') { ... }
-proto 'infix:in'  is equiv('infix:<')    { ... }
+proto infix:«<»   is tighter('infix:!=') { ... }
+proto infix:«>»   is equiv(infix:«<»)    { ... }
+proto infix:«<=»  is equiv(infix:«<»)    { ... }
+proto infix:«>=»  is equiv(infix:«<»)    { ... }
+proto 'infix:instanceof' is equiv(infix:«<») { ... }
+proto 'infix:in'  is equiv(infix:«<»)    { ... }
 
-proto 'infix:<<'  is tighter('infix:<')  { ... }
-proto 'infix:>>'  is equiv('infix:<<')   { ... }
-proto 'infix:>>>' is equiv('infix:<<')   { ... }
+proto infix:«<<»  is tighter(infix:«<»)  { ... }
+proto infix:«>>»  is equiv(infix:«<<»)   { ... }
+proto infix:«>>>» is equiv(infix:«<<»)   { ... }
 
-proto 'infix:+' is tighter('infix:<<') is pirop('add') { ... }
+proto 'infix:+' is tighter(infix:«<<») is pirop('add') { ... }
 proto 'infix:-' is equiv('infix:+')    is pirop('sub') { ... }
 
 proto 'infix:*' is tighter('infix:+')  is pirop('mul') { ... }
@@ -500,18 +520,20 @@ rule lhs_expression {
 }
 
 rule new_expression {
-    [$<sym>='new']* <member_expression>
+    [$<sym>='new']* <member_expression> <arguments>?
     {*}
 }
 
 rule member_expression {
-    [ 'new' <member> <arguments>
-    | <member>
-    ]
-    {*}
+    <member_prefix> <member_suffix>* {*}
 }
 
-rule index {
+rule member_prefix {
+    | <primary_expression> {*}      #= primary_expression
+    | <function_expression> {*}     #= function_expression
+}
+
+rule member_suffix {
     | '[' <expression> ']' {*} #= expression
     | <identifier_field> {*}   #= identifier_field
 }
@@ -520,24 +542,14 @@ rule identifier_field {
     '.' <identifier> {*}
 }
 
-rule member {
-    <member_prefix> <index>*
-    {*}
-}
-
-rule member_prefix {
-    | <primary_expression> {*}      #= primary_expression
-    | <function_expression> {*}     #= function_expression
-}
-
 rule call_expression {
     <member_expression> <arguments> <post_call_expr>*
     {*}
 }
 
 rule post_call_expr {
-    | <arguments> {*}   #= arguments
-    | <index> {*}       #= index
+    | <arguments>     {*}   #= arguments
+    | <member_suffix> {*}   #= member_suffix
 }
 
 

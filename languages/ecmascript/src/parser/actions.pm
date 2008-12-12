@@ -430,7 +430,7 @@ method post_call_expr($/, $key) {
     make $( $/{$key} );
 }
 
-method assignment_expression($/) {
+method assignment_expression_X($/) {
     my $past := $( $<conditional_expression> );
 
     ## get number of lhs_expressions
@@ -547,7 +547,7 @@ method lhs_expression($/, $key) {
 }
 
 method member_expression($/) {
-    my $member := $( $<member> );
+    my $member := $( $<member_prefix> );
 
     ## if there are any arguments, $member is invoked with these arguments.
     if $<arguments> {
@@ -563,14 +563,14 @@ method member_expression($/) {
     }
 }
 
-method member($/) {
+method member_expression($/) {
     my $past := $( $<member_prefix> );
 
     ## for each index, $past acts as the invocant or main object on
     ## which some operation is executed; therefore $past must be the
     ## first child, so unshift it. Then, $past is assigned this result
     ## preparing for either the next index or as argument for 'make'.
-    for $<index> {
+    for $<member_suffix> {
         my $idx := $( $_ );
         $idx.unshift($past);
         $past := $idx;
@@ -583,7 +583,7 @@ method member_prefix($/, $key) {
     make $( $/{$key} );
 }
 
-method index($/, $key) {
+method member_suffix($/, $key) {
     ## get the index expression
     my $idx := $( $/{$key} );
 
@@ -737,7 +737,8 @@ method decimal_literal($/, $key) {
     make $( $/{$key} );
 }
 
-method logical_or_expression($/, $key) {
+#method logical_or_expression($/, $key) {
+method assignment_expression($/, $key) {
     ## Handle the operator table
     ##
     if ($key eq 'end') {
