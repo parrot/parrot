@@ -309,7 +309,8 @@ LIST
     unless $I0 goto L1
     .local pmc toclose
     toclose = find_lex 'upvar_toclose'
-    unless toclose goto L1
+    $I0 = toclose
+    unless $I0 goto L1
     aux_close(file)
   L1:
     .return (res)
@@ -604,6 +605,8 @@ Equivalent to C<io.input():read>.
 
 Returns a handle for a temporary file. This file is open in update mode and
 it is automatically removed when the program ends.
+
+TODO: rewrite with a StringHandle
 
 =cut
 
