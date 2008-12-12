@@ -611,7 +611,7 @@ mk_pmc_const_2(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *left),
         ARGMOD(SymReg *rhs))
 {
     /* XXX This always returns NULL.  Probably shouldn't return anything then. */
-    SymReg *r[2];
+    SymReg *r[3];
     char   *name;
     int     len;
 
