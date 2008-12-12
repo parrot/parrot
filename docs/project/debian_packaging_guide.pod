@@ -9,9 +9,9 @@ information. The Ubuntu Packaging Guide is also a good resource
 (http://doc.ubuntu.com/ubuntu/packagingguide/C/).
 
 This guide assumes that you're running in a chroot environment set up as in:
-L<http://www.perlfoundation.org/parrot/index.cgi?debian_chroot_setup>.  For
-other configurations, see that page for a list of Debian packages you will need
-to install before building the Parrot packages.
+L<https://trac.parrot.org/parrot/wiki/ChrootSetup>. For other configurations,
+see that page for a list of Debian packages you will need to install before
+building the Parrot packages.
 
 To package Parrot for Debian:
 
