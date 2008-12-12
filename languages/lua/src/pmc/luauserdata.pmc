@@ -204,7 +204,7 @@ The C<==> operation. Compares reference (not in depth).
 =cut
 
 */
-    MULTI INTVAL is_equal(LuaUserdate value) {
+    MULTI INTVAL is_equal(LuaUserdata value) {
         PMC *meth = find_meth(INTERP, SELF, "__eq");
         if (meth) {
             PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
