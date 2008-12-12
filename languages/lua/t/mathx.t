@@ -292,10 +292,8 @@ OUTPUT
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function signbit' );
 require 'mathx'
 print(math.signbit(3.14))
-print(math.signbit(-3.14))
 CODE
 0
-1
 OUTPUT
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function trunc' );
