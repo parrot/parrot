@@ -987,14 +987,14 @@ This function never returns.
     .return (0, $P0)
   _handler:
     .local pmc ex
-    .local string msg
     .get_results (ex)
-    msg = ex
     $P0 = getattribute ex, 'severity'
     if null $P0 goto L1
     $I0 = $P0
     if $I0 == .EXCEPT_EXIT goto L2
   L1:
+    .local string msg
+    msg = ex
     .local int lineno
     .local string traceback, where
     (traceback, where) = 'traceback'()
@@ -1009,6 +1009,9 @@ This function never returns.
 .end
 
 .sub 'traceback'
+    # dummy implementation
+    .return ("stack traceback:\n\tdummy\n", "_._:0:")
+    # previous one that segfaults (see RT #60206)
     .local pmc obj
     .local string traceback, where
     new obj, 'Lua'
