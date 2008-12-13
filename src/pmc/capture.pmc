@@ -68,6 +68,31 @@ Free structures.
 
 /*
 
+=item C<PMC *clone()>
+
+Creates an identical copy of the Capture.
+
+=cut
+
+*/
+
+    VTABLE PMC *clone() {
+        PMC *array, *hash;
+        PMC *dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        GET_ATTR_array(INTERP, SELF, array);
+        GET_ATTR_hash(INTERP, SELF, hash);
+        if (array)
+             array = VTABLE_clone(INTERP, array);
+        if (hash)
+             hash = VTABLE_clone(INTERP, hash);
+        SET_ATTR_array(INTERP, dest, array);
+        SET_ATTR_hash(INTERP, dest, hash);
+
+        return dest;
+    }
+
+/*
+
 =item C<void set_number_keyed_int(INTVAL key, FLOATVAL value)>
 
 =item C<void set_integer_keyed_int(INTVAL key, INTVAL value)>
