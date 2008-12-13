@@ -295,7 +295,7 @@ mk_pmc_const(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *type),
     const int type_enum = atoi(type);
     const int ascii = (*constant == '\'' || *constant == '"');
     SymReg *rhs;
-    SymReg *r[2];
+    SymReg *r[3];
     char   *name;
 
     if (left->type == VTADDRESS) {      /* IDENTIFIER */
@@ -347,7 +347,7 @@ mk_pmc_const_named(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
     ARGIN(const char *name), ARGMOD(SymReg *left), ARGIN(const char *constant))
 {
     SymReg *rhs;
-    SymReg *r[2];
+    SymReg *r[3];
     char   *const_name;
     const int ascii       = (*constant == '\'' || *constant == '"');
     char   *unquoted_name = str_dup(name + 1);
