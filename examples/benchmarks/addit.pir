@@ -62,9 +62,7 @@ FIN:
         add sum, a2
         add sum, a3
         add sum, a4
-        .begin_return
-    .return sum
-    .end_return
+    .return (sum)
 .end
 
 =head1 SEE ALSO
