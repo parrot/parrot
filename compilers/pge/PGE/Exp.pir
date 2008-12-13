@@ -128,6 +128,15 @@ tree as a PIR code object that can be compiled.
     name = code.'escape'(name)
     namecorou = code.'escape'(namecorou)
 
+    .local string subid
+    subid = ''
+    $P0 = adverbs['subid']
+    if null $P0 goto have_subid
+    $S0 = code.'escape'($P0)
+    subid = concat ':subid(', $S0
+    concat subid, ')'
+  have_subid:
+
     ##   Perform reduction/optimization on the
     ##   expression tree before generating PIR.
     .local pmc exp
@@ -151,17 +160,17 @@ tree as a PIR code object that can be compiled.
     ##   Generate the initial PIR code for a backtracking (uncut) rule.
     .local string returnop
     returnop = '.yield'
-    code.'emit'(<<"        CODE", name, namecorou, .INTERPINFO_CURRENT_SUB)
-      .sub %0 :method
+    code.'emit'(<<"        CODE", name, subid, namecorou, .INTERPINFO_CURRENT_SUB)
+      .sub %0 :method %1
           .param pmc adverbs   :slurpy :named
           .local pmc mob
-          .const 'Sub' corou = %1
+          .const 'Sub' corou = %2
           $P0 = corou
           $P0 = clone $P0
           mob = $P0(self, adverbs)
           .return (mob)
       .end
-      .sub %1
+      .sub '' :subid(%2)
           .param pmc mob       :unique_reg
           .param pmc adverbs   :unique_reg
           .local string target :unique_reg
@@ -169,7 +178,7 @@ tree as a PIR code object that can be compiled.
           .local int cpos, iscont :unique_reg
           $P0 = get_hll_global ['PGE'], 'Match'
           (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(mob, adverbs :flat :named)
-          $P0 = interpinfo %2
+          $P0 = interpinfo %3
           setattribute mob, '&!corou', $P0
           .local int lastpos
           lastpos = length target
@@ -180,8 +189,8 @@ tree as a PIR code object that can be compiled.
   code_cutrule:
     ##   Initial code for a rule that cannot be backtracked into.
     returnop = '.return'
-    code.'emit'(<<"        CODE", name)
-      .sub %0 :method
+    code.'emit'(<<"        CODE", name, subid)
+      .sub %0 :method %1
           .param pmc adverbs      :unique_reg :slurpy :named
           .local pmc mob
           .local string target    :unique_reg
