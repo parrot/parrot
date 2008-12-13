@@ -61,7 +61,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'check_it_works' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-    $I0 = obj.check_it_works()
+    $I0 = obj."check_it_works"()
     print $I0
     print "\n"
 .end

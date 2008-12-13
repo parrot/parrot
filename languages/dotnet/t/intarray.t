@@ -90,7 +90,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'sbyte' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.test_sbyte()
+	$I0 = obj."test_sbyte"()
 	print $I0
 	print "\n"
 .end
@@ -103,7 +103,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'byte' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.test_byte()
+	$I0 = obj."test_byte"()
 	print $I0
 	print "\n"
 .end
@@ -116,7 +116,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'short' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.test_short()
+	$I0 = obj."test_short"()
 	print $I0
 	print "\n"
 .end
@@ -129,7 +129,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'ushort' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.test_ushort()
+	$I0 = obj."test_ushort"()
 	print $I0
 	print "\n"
 .end
@@ -142,7 +142,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'int' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.test_int()
+	$I0 = obj."test_int"()
 	print $I0
 	print "\n"
 .end

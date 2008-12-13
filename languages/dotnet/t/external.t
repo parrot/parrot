@@ -68,7 +68,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'create_monkey' );
     load_bytecode "external.pbc"
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$P0 = obj.create_monkey()
+	$P0 = obj."create_monkey"()
     unless null $P0 goto IS_OK
     print "busted\n"
 IS_OK:
@@ -84,8 +84,8 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'monkey_age_doubled' );
     load_bytecode "external.pbc"
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$P0 = obj.create_monkey()
-    $I0 = obj.monkey_age_doubled($P0)
+	$P0 = "obj.create_monkey"()
+    $I0 = obj."monkey_age_doubled"($P0)
     print $I0
     print "\n"
 .end
@@ -99,8 +99,8 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'monkey_talk' );
     load_bytecode "external.pbc"
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$P0 = obj.create_monkey()
-    $S0 = obj.monkey_talk($P0)
+	$P0 = obj."create_monkey"()
+    $S0 = obj."monkey_talk"($P0)
     print $S0
     print "\n"
 .end

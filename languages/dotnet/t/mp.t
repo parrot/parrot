@@ -106,7 +106,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'local ints' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.local_ints()
+	$I0 = obj."local_ints"()
 	print $I0
 	print "\n"
 .end
@@ -119,7 +119,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'local floats' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$N0 = obj.local_floats()
+	$N0 = obj."local_floats"()
 	print $N0
 	print "\n"
 .end
@@ -132,7 +132,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'param ints' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.param_ints(5, 10, 20, 40, 80, 160)
+	$I0 = obj."param_ints"(5, 10, 20, 40, 80, 160)
 	print $I0
 	print "\n"
 .end
@@ -145,7 +145,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'param floats' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$N0 = obj.param_floats(5.5, 7.5)
+	$N0 = obj."param_floats"(5.5, 7.5)
 	print $N0
 	print "\n"
 .end
@@ -158,7 +158,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'element' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.element()
+	$I0 = obj."element"()
 	print $I0
 	print "\n"
 .end
@@ -171,7 +171,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'field' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.field()
+	$I0 = obj."field"()
 	print $I0
 	print "\n"
 .end

@@ -40,7 +40,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'ret_null' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$P0 = obj.ret_null()
+	$P0 = obj."ret_null"()
     if null $P0 goto IS_NULL
 	print "not null\n"
 IS_NULL:
@@ -55,8 +55,8 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'comp_null' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-    $P0 = obj.ret_null()
-	$I0 = obj.comp_null($P0)
+    $P0 = obj."ret_null"()
+	$I0 = obj."comp_null"($P0)
     print $I0
     print "\n"
 .end
@@ -69,7 +69,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'comp_null' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.comp_null(obj)
+	$I0 = obj."comp_null"(obj)
     print $I0
     print "\n"
 .end

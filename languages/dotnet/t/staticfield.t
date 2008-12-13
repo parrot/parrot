@@ -49,7 +49,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'set_x' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	obj.set_x(26)
+	obj."set_x"(26)
     $P0 = new 'Integer'
     $P0 = get_hll_global [ "Testing" ; "Test" ], "x"
 	print $P0
@@ -65,7 +65,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'set_y' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	obj.set_y(16)
+	obj."set_y"(16)
     $P0 = new 'Integer'
     $P0 = get_hll_global [ "Testing" ; "Test" ], "y"
 	print $P0
@@ -80,9 +80,9 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'add' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	obj.set_x(26)
-	obj.set_y(16)
-    $I0 = obj.add()
+	obj."set_x"(26)
+	obj."set_y"(16)
+    $I0 = obj."add"()
 	print $I0
 	print "\n"
 .end

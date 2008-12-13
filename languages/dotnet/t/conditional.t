@@ -58,19 +58,19 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'clip' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.clip(0)
+	$I0 = obj."clip"(0)
 	print $I0
 	print "\n"
-	$I0 = obj.clip(1)
+	$I0 = obj."clip"(1)
 	print $I0
 	print "\n"
-	$I0 = obj.clip(-1)
+	$I0 = obj."clip"(-1)
 	print $I0
 	print "\n"
-	$I0 = obj.clip(-500)
+	$I0 = obj."clip"(-500)
 	print $I0
 	print "\n"
-	$I0 = obj.clip(42)
+	$I0 = obj."clip"(42)
 	print $I0
 	print "\n"
 .end
@@ -87,22 +87,22 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'band_pass' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.band_pass(1)
+	$I0 = obj."band_pass"(1)
 	print $I0
 	print "\n"
-	$I0 = obj.band_pass(2)
+	$I0 = obj."band_pass"(2)
 	print $I0
 	print "\n"
-	$I0 = obj.band_pass(3)
+	$I0 = obj."band_pass"(3)
 	print $I0
 	print "\n"
-	$I0 = obj.band_pass(4)
+	$I0 = obj."band_pass"(4)
 	print $I0
 	print "\n"
-	$I0 = obj.band_pass(5)
+	$I0 = obj."band_pass"(5)
 	print $I0
 	print "\n"
-	$I0 = obj.band_pass(6)
+	$I0 = obj."band_pass"(6)
 	print $I0
 	print "\n"
 .end
@@ -120,16 +120,16 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'is_42' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.is_42(99)
+	$I0 = obj."is_42"(99)
 	print $I0
 	print "\n"
-	$I0 = obj.is_42(-2)
+	$I0 = obj."is_42"(-2)
 	print $I0
 	print "\n"
-	$I0 = obj.is_42(42)
+	$I0 = obj."is_42"(42)
 	print $I0
 	print "\n"
-	$I0 = obj.is_42(-42)
+	$I0 = obj."is_42"(-42)
 	print $I0
 	print "\n"
 .end

@@ -36,11 +36,11 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'set_long' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$P0 = obj.set_long()
-    $I0 = $P0.get_high_bits()
+	$P0 = obj."set_long"()
+    $I0 = $P0."get_high_bits"()
 	print $I0
 	print "\n"
-    $I0 = $P0.get_low_bits()
+    $I0 = $P0."get_low_bits"()
 	print $I0
 	print "\n"
 .end

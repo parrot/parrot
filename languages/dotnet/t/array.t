@@ -67,7 +67,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'create_array' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$P0 = obj.create_array()
+	$P0 = obj."create_array"()
 	print $P0
 	print "\n"
 .end
@@ -80,8 +80,8 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'array_length' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$P0 = obj.create_array()
-	$I1 = obj.array_length($P0)
+	$P0 = obj."create_array"()
+	$I1 = obj."array_length"($P0)
 	print $I1
 	print "\n"
 .end
@@ -94,7 +94,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'create_and_length' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.create_and_length()
+	$I0 = obj."create_and_length"()
 	print $I0
 	print "\n"
 .end
@@ -107,7 +107,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'loadstore_test' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.loadstore_test()
+	$I0 = obj."loadstore_test"()
 	print $I0
 	print "\n"
 .end

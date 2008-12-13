@@ -94,7 +94,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'one_arg_i' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.one_arg_i()
+	$I0 = obj."one_arg_i"()
     print $I0
     print "\n"
 .end
@@ -107,7 +107,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'two_args_ii' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.two_args_ii()
+	$I0 = obj."two_args_ii"()
     print $I0
     print "\n"
 .end
@@ -120,7 +120,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'two_args_if' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.two_args_if()
+	$I0 = obj."two_args_if"()
     print $I0
     print "\n"
 .end
@@ -133,7 +133,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'test_obj_1' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.test_obj_1()
+	$I0 = obj."test_obj_1"()
     print $I0
     print "\n"
 .end
@@ -146,7 +146,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'test_obj_2' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.test_obj_2()
+	$I0 = obj."test_obj_2"()
     print $I0
     print "\n"
 .end

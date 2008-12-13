@@ -45,7 +45,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'ret_string' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$S0 = obj.ret_string()
+	$S0 = obj."ret_string"()
 	print $S0
 .end
 PIR
@@ -57,7 +57,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'ret_string_with_quotes' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$S0 = obj.ret_string_with_quotes()
+	$S0 = obj."ret_string_with_quotes"()
 	print $S0
 .end
 PIR
@@ -69,7 +69,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'ret_string_with_quotes_s' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$S0 = obj.ret_string_with_quotes_s()
+	$S0 = obj."ret_string_with_quotes_s"()
 	print $S0
 .end
 PIR

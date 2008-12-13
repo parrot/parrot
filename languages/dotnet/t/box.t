@@ -58,7 +58,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'box_1' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.box_1()
+	$I0 = obj."box_1"()
 	print $I0
     print "\n"
 .end
@@ -71,7 +71,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'box_2' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.box_2()
+	$I0 = obj."box_2"()
 	print $I0
     print "\n"
 .end

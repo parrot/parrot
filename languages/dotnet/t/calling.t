@@ -71,7 +71,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'call_no_args' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.call_no_args(29)
+	$I0 = obj."call_no_args"(29)
     print $I0
     print "\n"
 .end
@@ -84,7 +84,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'call_one_arg' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.call_one_arg()
+	$I0 = obj."call_one_arg"()
     print $I0
     print "\n"
 .end
@@ -97,7 +97,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'call_many_args' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.call_many_args(2, 3)
+	$I0 = obj."call_many_args"(2, 3)
     print $I0
     print "\n"
 .end
@@ -110,7 +110,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'is_void' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.call_void()
+	$I0 = obj."call_void"()
     print $I0
     print "\n"
 .end

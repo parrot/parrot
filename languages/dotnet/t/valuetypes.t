@@ -104,7 +104,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'locals_1' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.locals_1()
+	$I0 = obj."locals_1"()
 	print $I0
     print "\n"
 .end
@@ -117,7 +117,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'locals_2' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.locals_2()
+	$I0 = obj."locals_2"()
 	print $I0
     print "\n"
 .end
@@ -130,7 +130,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'locals_3' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.locals_3()
+	$I0 = obj."locals_3"()
 	print $I0
     print "\n"
 .end
@@ -143,7 +143,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'pass' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.pass()
+	$I0 = obj."pass"()
 	print $I0
     print "\n"
 .end
@@ -156,7 +156,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'pass ref' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.pass_ref()
+	$I0 = obj."pass_ref"()
 	print $I0
     print "\n"
 .end

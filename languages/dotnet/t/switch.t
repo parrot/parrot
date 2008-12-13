@@ -42,16 +42,16 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'switch' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.test(0)
+	$I0 = obj."test"(0)
 	print $I0
 	print "\n"
-    $I0 = obj.test(1)
+    $I0 = obj."test"(1)
 	print $I0
 	print "\n"
-    $I0 = obj.test(2)
+    $I0 = obj."test"(2)
 	print $I0
 	print "\n"
-    $I0 = obj.test(3)
+    $I0 = obj."test"(3)
 	print $I0
 	print "\n"
 .end

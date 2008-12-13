@@ -54,7 +54,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'float' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$N0 = obj.test_float()
+	$N0 = obj."test_float"()
 	print $N0
 	print "\n"
 .end
@@ -67,7 +67,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'double' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$N0 = obj.test_double()
+	$N0 = obj."test_double"()
 	print $N0
 	print "\n"
 .end

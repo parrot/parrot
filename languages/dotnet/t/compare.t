@@ -60,16 +60,16 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'is_same' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.is_same(0, 0)
+	$I0 = obj."is_same"(0, 0)
 	print $I0
 	print "\n"
-    $I0 = obj.is_same(0, 1)
+    $I0 = obj."is_same"(0, 1)
 	print $I0
 	print "\n"
-    $I0 = obj.is_same(1, 0)
+    $I0 = obj."is_same"(1, 0)
 	print $I0
 	print "\n"
-    $I0 = obj.is_same(42, 42)
+    $I0 = obj."is_same"(42, 42)
 	print $I0
 	print "\n"
 .end
@@ -85,16 +85,16 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'is_lt' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.is_lt(0, 0)
+	$I0 = obj."is_lt"(0, 0)
 	print $I0
 	print "\n"
-    $I0 = obj.is_lt(0, 1)
+    $I0 = obj."is_lt"(0, 1)
 	print $I0
 	print "\n"
-    $I0 = obj.is_lt(1, 0)
+    $I0 = obj."is_lt"(1, 0)
 	print $I0
 	print "\n"
-    $I0 = obj.is_lt(42, 42)
+    $I0 = obj."is_lt"(42, 42)
 	print $I0
 	print "\n"
 .end
@@ -110,16 +110,16 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'is_lt_un' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.is_lt_un(0, 0)
+	$I0 = obj."is_lt_un"(0, 0)
 	print $I0
 	print "\n"
-    $I0 = obj.is_lt_un(0, 1)
+    $I0 = obj."is_lt_un"(0, 1)
 	print $I0
 	print "\n"
-    $I0 = obj.is_lt_un(1, 0)
+    $I0 = obj."is_lt_un"(1, 0)
 	print $I0
 	print "\n"
-    $I0 = obj.is_lt_un(42, 42)
+    $I0 = obj."is_lt_un"(42, 42)
 	print $I0
 	print "\n"
 .end
@@ -135,16 +135,16 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'is_gt' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.is_gt(0, 0)
+	$I0 = obj."is_gt"(0, 0)
 	print $I0
 	print "\n"
-    $I0 = obj.is_gt(0, 1)
+    $I0 = obj."is_gt"(0, 1)
 	print $I0
 	print "\n"
-    $I0 = obj.is_gt(1, 0)
+    $I0 = obj."is_gt"(1, 0)
 	print $I0
 	print "\n"
-    $I0 = obj.is_gt(42, 42)
+    $I0 = obj."is_gt"(42, 42)
 	print $I0
 	print "\n"
 .end
@@ -160,16 +160,16 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'is_gt_un' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.is_gt_un(0, 0)
+	$I0 = obj."is_gt_un"(0, 0)
 	print $I0
 	print "\n"
-    $I0 = obj.is_gt_un(0, 1)
+    $I0 = obj."is_gt_un"(0, 1)
 	print $I0
 	print "\n"
-    $I0 = obj.is_gt_un(1, 0)
+    $I0 = obj."is_gt_un"(1, 0)
 	print $I0
 	print "\n"
-    $I0 = obj.is_gt_un(42, 42)
+    $I0 = obj."is_gt_un"(42, 42)
 	print $I0
 	print "\n"
 .end

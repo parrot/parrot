@@ -59,7 +59,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'pos' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.pos()
+	$I0 = obj."pos"()
     print $I0
     print "\n"
 .end
@@ -72,7 +72,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'neg' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.neg()
+	$I0 = obj."neg"()
     print $I0
     print "\n"
 .end

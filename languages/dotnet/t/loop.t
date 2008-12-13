@@ -57,19 +57,19 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'add_hundred' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.add_hundred(0)
+	$I0 = obj."add_hundred"(0)
 	print $I0
 	print "\n"
-	$I0 = obj.add_hundred(21)
+	$I0 = obj."add_hundred"(21)
 	print $I0
 	print "\n"
-	$I0 = obj.add_hundred(-1)
+	$I0 = obj."add_hundred"(-1)
 	print $I0
 	print "\n"
-	$I0 = obj.add_hundred(-500)
+	$I0 = obj."add_hundred"(-500)
 	print $I0
 	print "\n"
-	$I0 = obj.add_hundred(42)
+	$I0 = obj."add_hundred"(42)
 	print $I0
 	print "\n"
 .end
@@ -86,16 +86,16 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'multiply' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.multiply(4,5)
+	$I0 = obj."multiply"(4,5)
 	print $I0
 	print "\n"
-	$I0 = obj.multiply(6,3)
+	$I0 = obj."multiply"(6,3)
 	print $I0
 	print "\n"
-	$I0 = obj.multiply(0,1)
+	$I0 = obj."multiply"(0,1)
 	print $I0
 	print "\n"
-	$I0 = obj.multiply(9,0)
+	$I0 = obj."multiply"(9,0)
 	print $I0
 	print "\n"
 .end

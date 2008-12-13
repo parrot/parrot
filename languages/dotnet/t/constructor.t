@@ -77,7 +77,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'cc_no_args' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.cc_no_args()
+	$I0 = obj."cc_no_args"()
     print $I0
     print "\n"
 .end
@@ -90,7 +90,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'cc_args' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$N0 = obj.cc_args(10, 2.45)
+	$N0 = obj."cc_args"(10, 2.45)
     print $N0
     print "\n"
 .end

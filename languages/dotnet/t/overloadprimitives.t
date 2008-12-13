@@ -118,7 +118,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'int' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.m_int()
+	$I0 = obj."m_int"()
     print $I0
     print "\n"
 .end
@@ -131,7 +131,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'uint' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.m_uint()
+	$I0 = obj."m_uint"()
     print $I0
     print "\n"
 .end
@@ -144,7 +144,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'sbyte' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.m_sbyte()
+	$I0 = obj."m_sbyte"()
     print $I0
     print "\n"
 .end
@@ -157,7 +157,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'byte' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.m_byte()
+	$I0 = obj."m_byte"()
     print $I0
     print "\n"
 .end
@@ -170,7 +170,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'short' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.m_short()
+	$I0 = obj."m_short"()
     print $I0
     print "\n"
 .end
@@ -183,7 +183,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'ushort' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.m_ushort()
+	$I0 = obj."m_ushort"()
     print $I0
     print "\n"
 .end
@@ -196,7 +196,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'float' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.m_float()
+	$I0 = obj."m_float"()
     print $I0
     print "\n"
 .end
@@ -209,7 +209,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'double' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.m_double()
+	$I0 = obj."m_double"()
     print $I0
     print "\n"
 .end

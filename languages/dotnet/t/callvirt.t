@@ -53,7 +53,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'mummy' );
 	load_bytecode "t.pbc"
 	obj1 = new [ "Testing" ; "Test" ]
     obj2 = new [ "Testing" ; "mummy" ]
-	$I0 = obj1.test_call(obj2)
+	$I0 = obj1."test_call"(obj2)
     print $I0
     print "\n"
 .end
@@ -67,7 +67,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'baby' );
 	load_bytecode "t.pbc"
 	obj1 = new [ "Testing" ; "Test" ]
     obj2 = new [ "Testing" ; "baby" ]
-	$I0 = obj1.test_call(obj2)
+	$I0 = obj1."test_call"(obj2)
     print $I0
     print "\n"
 .end

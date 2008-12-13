@@ -105,7 +105,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'u1' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.u1(200)
+	$I0 = obj."u1"(200)
 	print $I0
 	print "\n"
 .end
@@ -119,7 +119,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'u1' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$I0 = obj.u1(300)
+	$I0 = obj."u1"(300)
 	print "failed\n"
     end
 handler:
@@ -136,7 +136,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'u1' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$I0 = obj.u1(-5)
+	$I0 = obj."u1"(-5)
 	print "failed\n"
     end
 handler:
@@ -152,7 +152,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i1' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.i1(100)
+	$I0 = obj."i1"(100)
 	print $I0
 	print "\n"
 .end
@@ -165,7 +165,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i1' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.i1(-5)
+	$I0 = obj."i1"(-5)
 	print $I0
     print "\n"
     end
@@ -180,7 +180,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i1' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$I0 = obj.i1(128)
+	$I0 = obj."i1"(128)
 	print "failed\n"
     end
 handler:
@@ -197,7 +197,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i1' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$I0 = obj.i1(-129)
+	$I0 = obj."i1"(-129)
 	print "failed\n"
     end
 handler:
@@ -213,7 +213,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'u2' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.u2(33000)
+	$I0 = obj."u2"(33000)
 	print $I0
 	print "\n"
 .end
@@ -227,7 +227,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'u2' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$I0 = obj.u2(68000)
+	$I0 = obj."u2"(68000)
 	print "failed\n"
     end
 handler:
@@ -244,7 +244,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'u2' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$I0 = obj.u2(-5)
+	$I0 = obj."u2"(-5)
 	print "failed\n"
     end
 handler:
@@ -260,7 +260,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i2' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.i2(10000)
+	$I0 = obj."i2"(10000)
 	print $I0
 	print "\n"
 .end
@@ -273,7 +273,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i2' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.i2(-5)
+	$I0 = obj."i2"(-5)
 	print $I0
     print "\n"
     end
@@ -288,7 +288,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i2' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$I0 = obj.i2(32768)
+	$I0 = obj."i2"(32768)
 	print "failed\n"
     end
 handler:
@@ -305,7 +305,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i2' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$I0 = obj.i2(-32769)
+	$I0 = obj."i2"(-32769)
 	print "failed\n"
     end
 handler:
@@ -321,7 +321,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'u4' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.u4(5000000)
+	$I0 = obj."u4"(5000000)
 	print $I0
 	print "\n"
 .end
@@ -335,7 +335,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'u4' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$I0 = obj.u4(-5)
+	$I0 = obj."u4"(-5)
 	print "failed\n"
     end
 handler:
@@ -351,7 +351,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'u1_un' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.u1_un(200)
+	$I0 = obj."u1_un"(200)
 	print $I0
 	print "\n"
 .end
@@ -365,7 +365,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'u1_un' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$I0 = obj.u1_un(300)
+	$I0 = obj."u1_un"(300)
 	print "failed\n"
     end
 handler:
@@ -381,7 +381,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i1_un' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.i1_un(100)
+	$I0 = obj."i1_un"(100)
 	print $I0
 	print "\n"
 .end
@@ -395,7 +395,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i1_un' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$I0 = obj.i1_un(128)
+	$I0 = obj."i1_un"(128)
 	print "failed\n"
     end
 handler:
@@ -412,7 +412,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i1_un' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$I0 = obj.i1_un(-1)
+	$I0 = obj."i1_un"(-1)
 	print "failed\n"
     end
 handler:
@@ -428,7 +428,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'u2_un' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.u2_un(33000)
+	$I0 = obj."u2_un"(33000)
 	print $I0
 	print "\n"
 .end
@@ -442,7 +442,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'u2_un' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$I0 = obj.u2_un(68000)
+	$I0 = obj."u2_un"(68000)
 	print "failed\n"
     end
 handler:
@@ -458,7 +458,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i2_un' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.i2_un(10000)
+	$I0 = obj."i2_un"(10000)
 	print $I0
 	print "\n"
 .end
@@ -472,7 +472,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i2_un' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$I0 = obj.i2_un(32768)
+	$I0 = obj."i2_un"(32768)
 	print "failed\n"
     end
 handler:
@@ -489,7 +489,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i2_un' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$I0 = obj.i2_un(-1)
+	$I0 = obj."i2_un"(-1)
 	print "failed\n"
     end
 handler:
@@ -505,7 +505,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i4_un' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.i4_un(5000000)
+	$I0 = obj."i4_un"(5000000)
 	print $I0
 	print "\n"
 .end
@@ -519,7 +519,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i4_un' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$I0 = obj.i4_un(-5)
+	$I0 = obj."i4_un"(-5)
 	print "failed\n"
     end
 handler:
@@ -535,7 +535,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'u1_f' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$N0 = obj.u1_f(200.0)
+	$N0 = obj."u1_f"(200.0)
 	print $N0
 	print "\n"
 .end
@@ -549,7 +549,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'u1_f' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$N0 = obj.u1_f(300.0)
+	$N0 = obj."u1_f"(300.0)
 	print "failed\n"
     end
 handler:
@@ -566,7 +566,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'u1_f' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$N0 = obj.u1_f(-5.0)
+	$N0 = obj."u1_f"(-5.0)
 	print "failed\n"
     end
 handler:
@@ -582,7 +582,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i1_f' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$N0 = obj.i1_f(100.0)
+	$N0 = obj."i1_f"(100.0)
 	print $N0
 	print "\n"
 .end
@@ -595,7 +595,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i1_f' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$N0 = obj.i1_f(-5.0)
+	$N0 = obj."i1_f"(-5.0)
 	print $N0
     print "\n"
     end
@@ -610,7 +610,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i1_f' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$N0 = obj.i1_f(128.0)
+	$N0 = obj."i1_f"(128.0)
 	print "failed\n"
     end
 handler:
@@ -627,7 +627,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i1_f' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$N0 = obj.i1_f(-129.0)
+	$N0 = obj."i1_f"(-129.0)
 	print "failed\n"
     end
 handler:
@@ -643,7 +643,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'u2_f' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$N0 = obj.u2_f(33000.0)
+	$N0 = obj."u2_f"(33000.0)
 	print $N0
 	print "\n"
 .end
@@ -657,7 +657,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'u2_f' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$N0 = obj.u2_f(68000.0)
+	$N0 = obj."u2_f"(68000.0)
 	print "failed\n"
     end
 handler:
@@ -674,7 +674,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'u2_f' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$N0 = obj.u2_f(-5.0)
+	$N0 = obj."u2_f"(-5.0)
 	print "failed\n"
     end
 handler:
@@ -690,7 +690,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i2_f' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$N0 = obj.i2_f(10000.0)
+	$N0 = obj."i2_f"(10000.0)
 	print $N0
 	print "\n"
 .end
@@ -703,7 +703,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i2_f' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$N0 = obj.i2_f(-5.0)
+	$N0 = obj."i2_f"(-5.0)
 	print $N0
     print "\n"
     end
@@ -718,7 +718,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i2_f' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$N0 = obj.i2_f(32768.0)
+	$N0 = obj."i2_f"(32768.0)
 	print "failed\n"
     end
 handler:
@@ -735,7 +735,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'i2_f' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh handler
-	$N0 = obj.i2_f(-32769.0)
+	$N0 = obj."i2_f"(-32769.0)
 	print "failed\n"
     end
 handler:

@@ -97,7 +97,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'value' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.value()
+	$I0 = obj."value"()
 	print $I0
     print "\n"
 .end
@@ -110,7 +110,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'or' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.or()
+	$I0 = obj."or"()
 	print $I0
     print "\n"
 .end
@@ -123,7 +123,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'or_int' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.or_int()
+	$I0 = obj."or_int"()
 	print $I0
     print "\n"
 .end
@@ -136,10 +136,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'cond_1' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.cond_1(0)
+	$I0 = obj."cond_1"(0)
 	print $I0
     print "\n"
-    $I0 = obj.cond_1(42)
+    $I0 = obj."cond_1"(42)
 	print $I0
     print "\n"
 .end
@@ -153,10 +153,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'cond_2' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.cond_2(2)
+	$I0 = obj."cond_2"(2)
 	print $I0
     print "\n"
-    $I0 = obj.cond_2(0)
+    $I0 = obj."cond_2"(0)
 	print $I0
     print "\n"
 .end
@@ -170,10 +170,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'argument' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.argument(1)
+	$I0 = obj."argument"(1)
 	print $I0
     print "\n"
-    $I0 = obj.argument(0)
+    $I0 = obj."argument"(0)
 	print $I0
     print "\n"
 .end

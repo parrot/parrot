@@ -47,7 +47,7 @@ namespace Testing
 				return 1;
 			else
 				return 0;
-        }		
+        }
     }
 }
 CSHARP
@@ -61,19 +61,19 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'lt' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.lt(5,7)
+	$I0 = obj."lt"(5,7)
 	print $I0
 	print "\n"
-	$I0 = obj.lt(400,8)
+	$I0 = obj."lt"(400,8)
 	print $I0
 	print "\n"
-	$I0 = obj.lt(5,-7)
+	$I0 = obj."lt"(5,-7)
 	print $I0
 	print "\n"
-	$I0 = obj.lt(-400,8123)
+	$I0 = obj."lt"(-400,8123)
 	print $I0
 	print "\n"
-	$I0 = obj.lt(4,4)
+	$I0 = obj."lt"(4,4)
 	print $I0
 	print "\n"
 .end
@@ -90,19 +90,19 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'le' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.le(5,7)
+	$I0 = obj."le"(5,7)
 	print $I0
 	print "\n"
-	$I0 = obj.le(400,8)
+	$I0 = obj."le"(400,8)
 	print $I0
 	print "\n"
-	$I0 = obj.le(5,-7)
+	$I0 = obj."le"(5,-7)
 	print $I0
 	print "\n"
-	$I0 = obj.le(-400,8123)
+	$I0 = obj."le"(-400,8123)
 	print $I0
 	print "\n"
-	$I0 = obj.le(4,4)
+	$I0 = obj."le"(4,4)
 	print $I0
 	print "\n"
 .end
@@ -119,19 +119,19 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'gt' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.gt(5,7)
+	$I0 = obj."gt"(5,7)
 	print $I0
 	print "\n"
-	$I0 = obj.gt(400,8)
+	$I0 = obj."gt"(400,8)
 	print $I0
 	print "\n"
-	$I0 = obj.gt(5,-7)
+	$I0 = obj."gt"(5,-7)
 	print $I0
 	print "\n"
-	$I0 = obj.gt(-400,8123)
+	$I0 = obj."gt"(-400,8123)
 	print $I0
 	print "\n"
-	$I0 = obj.gt(4,4)
+	$I0 = obj."gt"(4,4)
 	print $I0
 	print "\n"
 .end
@@ -148,19 +148,19 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'ge' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.ge(5,7)
+	$I0 = obj."ge"(5,7)
 	print $I0
 	print "\n"
-	$I0 = obj.ge(400,8)
+	$I0 = obj."ge"(400,8)
 	print $I0
 	print "\n"
-	$I0 = obj.ge(5,-7)
+	$I0 = obj."ge"(5,-7)
 	print $I0
 	print "\n"
-	$I0 = obj.ge(-400,8123)
+	$I0 = obj."ge"(-400,8123)
 	print $I0
 	print "\n"
-	$I0 = obj.ge(4,4)
+	$I0 = obj."ge"(4,4)
 	print $I0
 	print "\n"
 .end

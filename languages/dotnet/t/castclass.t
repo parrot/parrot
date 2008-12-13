@@ -56,7 +56,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'pos' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.pos()
+	$I0 = obj."pos"()
     print $I0
     print "\n"
 .end
@@ -70,7 +70,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'neg' );
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
     push_eh caught
-	$I0 = obj.neg()
+	$I0 = obj."neg"()
     print "not "
 caught:
     print "ok\n"

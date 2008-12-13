@@ -37,7 +37,7 @@ namespace Testing
         {
             return x / y;
         }
-		
+
 		public int rem(int x, int y)
         {
             return x % y;
@@ -60,10 +60,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'add' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.add(500,72)
+	$I0 = obj."add"(500,72)
 	print $I0
 	print "\n"
-	$I0 = obj.add(500,-72)
+	$I0 = obj."add"(500,-72)
 	print $I0
 	print "\n"
 .end
@@ -94,10 +94,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'mul' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.mul(50,7)
+	$I0 = obj."mul"(50,7)
 	print $I0
 	print "\n"
-	$I0 = obj.mul(-7,-6)
+	$I0 = obj."mul"(-7,-6)
 	print $I0
 	print "\n"
 .end
@@ -111,13 +111,13 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'div' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.div(12,3)
+	$I0 = obj."div"(12,3)
 	print $I0
 	print "\n"
-	$I0 = obj.div(15,14)
+	$I0 = obj."div"(15,14)
 	print $I0
 	print "\n"
-	$I0 = obj.div(-121,11)
+	$I0 = obj."div"(-121,11)
 	print $I0
 	print "\n"
 .end
@@ -132,10 +132,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'rem' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.rem(13,3)
+	$I0 = obj."rem"(13,3)
 	print $I0
 	print "\n"
-	$I0 = obj.rem(-15,13)
+	$I0 = obj."rem"(-15,13)
 	print $I0
 	print "\n"
 .end
@@ -149,10 +149,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'neg' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.neg(100)
+	$I0 = obj."neg"(100)
 	print $I0
 	print "\n"
-	$I0 = obj.neg(-15)
+	$I0 = obj."neg"(-15)
 	print $I0
 	print "\n"
 .end

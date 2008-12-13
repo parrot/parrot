@@ -182,7 +182,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'simple no exception' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.simple(0)
+	$I0 = obj."simple"(0)
     print $I0
     print "\n"
 .end
@@ -195,7 +195,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'simple exception' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.simple(1)
+	$I0 = obj."simple"(1)
     print $I0
     print "\n"
 .end
@@ -208,10 +208,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'typed exception handler' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.typed(1)
+	$I0 = obj."typed"(1)
     print $I0
     print "\n"
-    $I0 = obj.typed(0)
+    $I0 = obj."typed"(0)
     print $I0
     print "\n"
 .end
@@ -225,10 +225,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'nested 1' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.nested1(0)
+	$I0 = obj."nested1"(0)
     print $I0
     print "\n"
-    $I0 = obj.nested1(1)
+    $I0 = obj."nested1"(1)
     print $I0
     print "\n"
 .end
@@ -242,10 +242,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'nested 2' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.nested2(0)
+	$I0 = obj."nested2"(0)
     print $I0
     print "\n"
-    $I0 = obj.nested2(1)
+    $I0 = obj."nested2"(1)
     print $I0
     print "\n"
 .end
@@ -259,10 +259,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'nested 3' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.nested3(0)
+	$I0 = obj."nested3"(0)
     print $I0
     print "\n"
-    $I0 = obj.nested3(1)
+    $I0 = obj."nested3"(1)
     print $I0
     print "\n"
 .end
@@ -276,10 +276,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'nested 4' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.nested4(0)
+	$I0 = obj."nested4"(0)
     print $I0
     print "\n"
-    $I0 = obj.nested4(1)
+    $I0 = obj."nested4"(1)
     print $I0
     print "\n"
 .end
@@ -293,10 +293,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'nested 5' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.nested5(0)
+	$I0 = obj."nested5"(0)
     print $I0
     print "\n"
-    $I0 = obj.nested5(1)
+    $I0 = obj."nested5"(1)
     print $I0
     print "\n"
 .end

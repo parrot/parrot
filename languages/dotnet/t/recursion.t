@@ -38,16 +38,16 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'factorial' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.factorial(0)
+	$I0 = obj."factorial"(0)
     print $I0
     print "\n"
-    $I0 = obj.factorial(1)
+    $I0 = obj."factorial"(1)
     print $I0
     print "\n"
-    $I0 = obj.factorial(2)
+    $I0 = obj."factorial"(2)
     print $I0
     print "\n"
-    $I0 = obj.factorial(10)
+    $I0 = obj."factorial"(10)
     print $I0
     print "\n"
 .end

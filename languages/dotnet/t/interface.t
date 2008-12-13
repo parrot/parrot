@@ -130,7 +130,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'abstract method call' );
     addparent cls, prt
 	obj = new "badness"
     push_eh handler
-    obj.kick()
+    obj."kick"()
     print "not "
 handler:
     print "ok\n"
@@ -144,9 +144,9 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'methods' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-    obj.setup()
-    obj.kick_da_brother(10)
-    $I0 = obj.ready_to_sell()
+    obj."setup"()
+    obj."kick_da_brother"(10)
+    $I0 = obj."ready_to_sell"()
     print $I0
     print "\n"
 .end
@@ -159,9 +159,9 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'methods' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-    obj.setup()
-    obj.kick_da_brother(1000) # ouch!
-    $I0 = obj.ready_to_sell()
+    obj."setup"()
+    obj."kick_da_brother"(1000) # ouch!
+    $I0 = obj."ready_to_sell"()
     print $I0
     print "\n"
 .end

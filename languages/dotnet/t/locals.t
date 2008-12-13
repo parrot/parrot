@@ -67,7 +67,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'no_locals' );
         .local pmc obj
         load_bytecode "t.pbc"
         obj = new [ "Testing" ; "Test" ]
-        $I0 = obj.no_locals()
+        $I0 = obj."no_locals"()
         print $I0
         print "\n"
 .end
@@ -80,7 +80,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'few_locals' );
         .local pmc obj
         load_bytecode "t.pbc"
         obj = new [ "Testing" ; "Test" ]
-        $I0 = obj.few_locals()
+        $I0 = obj."few_locals"()
         print $I0
         print "\n"
 .end
@@ -93,7 +93,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'fib_locals' );
         .local pmc obj
         load_bytecode "t.pbc"
         obj = new [ "Testing" ; "Test" ]
-        $I0 = obj.fib_locals()
+        $I0 = obj."fib_locals"()
         print $I0
         print "\n"
 .end
@@ -106,7 +106,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'locals_with_args' );
         .local pmc obj
         load_bytecode "t.pbc"
         obj = new [ "Testing" ; "Test" ]
-        $I0 = obj.locals_with_args(2,3)
+        $I0 = obj."locals_with_args"(2,3)
         print $I0
         print "\n"
 .end

@@ -72,19 +72,19 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'uge' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.uge(500, 800)
+	$I0 = obj."uge"(500, 800)
 	print $I0
 	print "\n"
-	$I0 = obj.uge(42, -20202)
+	$I0 = obj."uge"(42, -20202)
 	print $I0
 	print "\n"
-	$I0 = obj.uge(800, 500)
+	$I0 = obj."uge"(800, 500)
 	print $I0
 	print "\n"
-	$I0 = obj.uge(-20202, 42)
+	$I0 = obj."uge"(-20202, 42)
 	print $I0
 	print "\n"
-	$I0 = obj.uge(5, 5)
+	$I0 = obj."uge"(5, 5)
 	print $I0
 	print "\n"
 .end
@@ -101,19 +101,19 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'ugt' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.ugt(500, 800)
+	$I0 = obj."ugt"(500, 800)
 	print $I0
 	print "\n"
-	$I0 = obj.ugt(42, -20202)
+	$I0 = obj."ugt"(42, -20202)
 	print $I0
 	print "\n"
-	$I0 = obj.ugt(800, 500)
+	$I0 = obj."ugt"(800, 500)
 	print $I0
 	print "\n"
-	$I0 = obj.ugt(-20202, 42)
+	$I0 = obj."ugt"(-20202, 42)
 	print $I0
 	print "\n"
-	$I0 = obj.ugt(5, 5)
+	$I0 = obj."ugt"(5, 5)
 	print $I0
 	print "\n"
 .end
@@ -130,19 +130,19 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'ule' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.ule(500, 800)
+	$I0 = obj."ule"(500, 800)
 	print $I0
 	print "\n"
-	$I0 = obj.ule(42, -20202)
+	$I0 = obj."ule"(42, -20202)
 	print $I0
 	print "\n"
-	$I0 = obj.ule(800, 500)
+	$I0 = obj."ule"(800, 500)
 	print $I0
 	print "\n"
-	$I0 = obj.ule(-20202, 42)
+	$I0 = obj."ule"(-20202, 42)
 	print $I0
 	print "\n"
-	$I0 = obj.ule(5, 5)
+	$I0 = obj."ule"(5, 5)
 	print $I0
 	print "\n"
 .end
@@ -159,19 +159,19 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'ult' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.ult(500, 800)
+	$I0 = obj."ult"(500, 800)
 	print $I0
 	print "\n"
-	$I0 = obj.ult(42, -20202)
+	$I0 = obj."ult"(42, -20202)
 	print $I0
 	print "\n"
-	$I0 = obj.ult(800, 500)
+	$I0 = obj."ult"(800, 500)
 	print $I0
 	print "\n"
-	$I0 = obj.ult(-20202, 42)
+	$I0 = obj."ult"(-20202, 42)
 	print $I0
 	print "\n"
-	$I0 = obj.ult(5, 5)
+	$I0 = obj."ult"(5, 5)
 	print $I0
 	print "\n"
 .end
@@ -188,10 +188,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'udiv' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.udiv(84,2)
+	$I0 = obj."udiv"(84,2)
 	print $I0
 	print "\n"
-	$I0 = obj.udiv(5,3)
+	$I0 = obj."udiv"(5,3)
 	print $I0
 	print "\n"
 .end
@@ -205,10 +205,10 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'urem' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.urem(84,2)
+	$I0 = obj."urem"(84,2)
 	print $I0
 	print "\n"
-	$I0 = obj.urem(5,3)
+	$I0 = obj."urem"(5,3)
 	print $I0
 	print "\n"
 .end

@@ -57,7 +57,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'ldc.i4.(0..8)' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.zero2eight()
+	$I0 = obj."zero2eight"()
 	print $I0
 	print "\n"
 .end
@@ -70,7 +70,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'minus one' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.m1()
+	$I0 = obj."m1"()
 	print $I0
 	print "\n"
 .end
@@ -83,7 +83,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'bigger_consts' );
 	.local pmc obj
 	load_bytecode "t.pbc"
 	obj = new [ "Testing" ; "Test" ]
-	$I0 = obj.bigger_consts()
+	$I0 = obj."bigger_consts"()
 	print $I0
 	print "\n"
 .end

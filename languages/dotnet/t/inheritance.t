@@ -92,7 +92,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'test_2_up' );
 	load_bytecode "t.pbc"
 	obj1 = new [ "Testing" ; "Test" ]
     obj2 = new [ "Testing" ; "baby" ]
-	$I0 = obj1.test_2_up(obj2)
+	$I0 = obj1."test_2_up"(obj2)
     print $I0
     print "\n"
 .end
@@ -106,7 +106,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'test_1_up' );
 	load_bytecode "t.pbc"
 	obj1 = new [ "Testing" ; "Test" ]
     obj2 = new [ "Testing" ; "baby" ]
-	$I0 = obj1.test_1_up(obj2)
+	$I0 = obj1."test_1_up"(obj2)
     print $I0
     print "\n"
 .end
@@ -120,7 +120,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'test_cur' );
 	load_bytecode "t.pbc"
 	obj1 = new [ "Testing" ; "Test" ]
     obj2 = new [ "Testing" ; "baby" ]
-	$I0 = obj1.test_cur(obj2)
+	$I0 = obj1."test_cur"(obj2)
     print $I0
     print "\n"
 .end
@@ -134,7 +134,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'override 1' );
 	load_bytecode "t.pbc"
 	obj1 = new [ "Testing" ; "Test" ]
     obj2 = new [ "Testing" ; "mummy" ]
-	$I0 = obj1.test(obj2)
+	$I0 = obj1."test"(obj2)
     print $I0
     print "\n"
 .end
@@ -148,7 +148,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'override 2' );
 	load_bytecode "t.pbc"
 	obj1 = new [ "Testing" ; "Test" ]
     obj2 = new [ "Testing" ; "baby" ]
-	$I0 = obj1.test(obj2)
+	$I0 = obj1."test"(obj2)
     print $I0
     print "\n"
 .end
