@@ -298,6 +298,8 @@ the sub.
 
     options['target'] = 'pir'
     options['grammar'] = ''
+    $P0 = node.'subid'()
+    options['subid'] = $P0
     .local pmc source, compiler, pir
     source = node[0]
     $S0 = node.'compiler'()
