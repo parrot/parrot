@@ -685,7 +685,7 @@ method property($/) {
     my $key  := $( $<property_name> );
 
     ## XXX my $key  := PAST::Val.new( $prop, :returns('String'), :node($/) );
-    my $val  := $( $<expression> );
+    my $val  := $( $<assignment_expression> );
 
     $val.named($key);
     make $val;

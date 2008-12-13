@@ -190,7 +190,7 @@ rule empty_statement {
 rule expression_statement {
     ##<!['{'|'function']> ## is this necessary? isn't this fixed automatically by PGE?
     #<!before \w>
-    <!['{'|'function']>
+    #<!['{'|'function']>
     <expression> ';'
     {*}
 }
@@ -304,12 +304,7 @@ token regular_expression_flags {
 token this { 'this' {*} }
 
 rule array_literal {
-    '['
-    [
-    | <elision>
-    | <element_list> [',' <elision>]?
-    ]
-    ']'
+    '[' <elision>? <element_list>? [',' <elision>]?  ']'
     {*}
 }
 
@@ -350,12 +345,12 @@ token false { 'false' {*} }
 token null { 'null' {*} }
 
 rule object_literal {
-    '{' [<property> [',' <property>]* ]? '}'
+    '{' [ <property> [',' <property> ]* ]? '}'
     {*}
 }
 
 rule property {
-    <property_name> ':' <expression>
+    <property_name> ':' <assignment_expression>
     {*}
 }
 
