@@ -228,6 +228,18 @@ filehandle, rather than modifying the invocant).
 
 /*
 
+=item C<METHOD isatty()>
+
+=cut
+
+*/
+    METHOD isatty() {
+        INTVAL isatty = (PARROT_FILEHANDLE(SELF)->flags & PIO_F_CONSOLE) == PIO_F_CONSOLE;
+        RETURN(INTVAL isatty);
+    }
+
+/*
+
 =item C<METHOD close()>
 
 Close the filehandle.
