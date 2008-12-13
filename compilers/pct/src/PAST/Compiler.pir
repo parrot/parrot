@@ -737,7 +737,9 @@ Return the POST representation of a C<PAST::Block>.
     if ns goto block_ns
     blockref = concat ".const 'Sub' ", blockreg
     concat blockref, ' = '
-    concat blockref, name
+    $P0 = bpost.'subid'()
+    $S0 = self.'escape'($P0)
+    concat blockref, $S0
     goto have_blockref
   block_ns:
     $P0 = get_global '%!codestring'
