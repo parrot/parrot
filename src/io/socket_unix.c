@@ -98,8 +98,8 @@ Parrot_io_sockaddr_in(PARROT_INTERP, unsigned short port, ARGIN(STRING *addr))
         struct hostent *he = gethostbyname(s);
         /* XXX FIXME - Handle error condition better */
         if (!he) {
-            string_cstring_free(s);
             fprintf(stderr, "gethostbyname failure [%s]\n", s);
+            string_cstring_free(s);
             return NULL;
         }
         memcpy((char*)&sa.sin_addr, he->h_addr, sizeof (sa.sin_addr));
