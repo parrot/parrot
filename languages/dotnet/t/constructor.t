@@ -95,7 +95,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'cc_args' );
     print "\n"
 .end
 PIR
-12.450000
+12.45
 OUTPUT
 
 ## Clean up.

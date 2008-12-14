@@ -178,6 +178,10 @@ CSHARP
 ## Attempt to translate.
 ok( translate( "t.dll", "t.pbc" ), 'translate' );
 
+SKIP:
+{
+skip( "infinite loop (missing pop_eh)", 6);
+
 ## Tests.
 is( run_pir(<<'PIR'), <<'OUTPUT', 'unwind over' );
 .sub main
@@ -264,6 +268,7 @@ PIR
 31
 23
 OUTPUT
+}
 
 ## Clean up.
 unlink qw(t.dll t.pbc);

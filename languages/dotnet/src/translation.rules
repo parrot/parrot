@@ -1544,11 +1544,11 @@ pir = <<PIR
 (${PTEMP0}, ${ITEMP0}) = field_info_from_token(${ASSEMBLY}, ${ARG0})
 
 # Build attribute access.
-${INS} = concat "$P1000000 = new "
+${INS} = concat "$P1000000 = new \""
 ${PTEMP1} = ${DTYPES}[0]
 ${STEMP0} = ${PTEMP1}["reg_type_pmc"]
 ${INS} = concat ${STEMP0}
-${INS} = concat "\n$P1000000 = getattribute "
+${INS} = concat "\"\n$P1000000 = getattribute "
 ${INS} = concat ${STACK0}
 ${INS} = concat ", \""
 ${STEMP0} = ${PTEMP0}
@@ -1582,11 +1582,11 @@ pir = <<PIR
 (${PTEMP0}, ${ITEMP0}, ${STEMP1}) = field_info_from_token(${ASSEMBLY}, ${ARG0})
 
 # Build attribute access.
-${INS} = concat "$P1000000 = new "
+${INS} = concat "$P1000000 = new \""
 ${PTEMP1} = ${DTYPES}[0]
 ${STEMP0} = ${PTEMP1}["reg_type_pmc"]
 ${INS} = concat ${STEMP0}
-${INS} = concat "\n$P1000000 = get_hll_global "
+${INS} = concat "\"\n$P1000000 = get_hll_global "
 ${STEMP1} = namespace_to_key(${STEMP1})
 ${INS} = concat ${STEMP1}
 ${INS} = concat ", \""
@@ -1622,13 +1622,13 @@ pir = <<PIR
 (${PTEMP0}, ${ITEMP0}) = field_info_from_token(${ASSEMBLY}, ${ARG0})
 
 # Build attribute store.
-${INS} = concat "$P1000000 = new "
+${INS} = concat "$P1000000 = new \""
 ${ITEMP0} = elements ${STYPES}
 dec ${ITEMP0}
 ${PTEMP1} = ${STYPES}[${ITEMP0}]
 ${STEMP0} = ${PTEMP1}["reg_type_pmc"]
 ${INS} = concat ${STEMP0}
-${INS} = concat "\n$P1000000 = "
+${INS} = concat "\"\n$P1000000 = "
 ${INS} = concat ${STACK0}
 ${INS} = concat "\nsetattribute "
 ${INS} = concat ${STACK1}
@@ -1650,13 +1650,13 @@ pir = <<PIR
 ${STEMP1} = namespace_to_key(${STEMP1})
 
 # Build static field store.
-${INS} = concat "$P1000000 = new "
+${INS} = concat "$P1000000 = new \""
 ${ITEMP0} = elements ${STYPES}
 dec ${ITEMP0}
 ${PTEMP1} = ${STYPES}[${ITEMP0}]
 ${STEMP0} = ${PTEMP1}["reg_type_pmc"]
 ${INS} = concat ${STEMP0}
-${INS} = concat "\n$P1000000 = "
+${INS} = concat "\"\n$P1000000 = "
 ${INS} = concat ${STACK0}
 ${INS} = concat "\nset_hll_global "
 ${INS} = concat ${STEMP1}
@@ -1908,7 +1908,7 @@ pop = 1
 arguments = ttype
 instruction = <<INS
 $P1000000 = ${STACK0}.'load_pmc'()
-$P1000000.__init()
+$P1000000.'init'()
 INS
 typeinfo = # None
 
@@ -1964,20 +1964,20 @@ ${INS} = concat "\n"
 goto stobj_DONE
 
 stobj_INT:
-${INS} = concat "$P1000000 = new .Integer\n$P1000000 = "
+${INS} = concat "$P1000000 = new 'Integer'\n$P1000000 = "
 ${INS} = concat ${STACK0}
 ${INS} = concat "\n"
 goto stobj_DONE
 
 stobj_NUM:
-${INS} = concat "$P1000000 = new .Float\n$P1000000 = "
+${INS} = concat "$P1000000 = new 'Float'\n$P1000000 = "
 ${INS} = concat ${STACK0}
 ${INS} = concat "\n"
 goto stobj_DONE
 
 stobj_DONE:
 ${INS} = concat ${STACK1}
-${INS} = concat ".store_pmc($P1000000)\n"
+${INS} = concat ".'store_pmc'($P1000000)\n"
 PIR
 typeinfo = # None
 
@@ -1999,7 +1999,7 @@ if ${ITEMP0} != ELEMENT_TYPE_VALUETYPE goto box_NOT_VAL_TYPE
 ${INS} = concat ${DEST0}
 ${INS} = concat " = clone "
 ${INS} = concat ${STACK0}
-${INS} = concat "\n$P1000000 = new .Integer\n$P1000000 = 1\nsetprop "
+${INS} = concat "\n$P1000000 = new 'Integer'\n$P1000000 = 1\nsetprop "
 ${INS} = concat ${DEST0}
 ${INS} = concat ", \"boxed\", $P1000000\n"
 goto box_DONE
@@ -2021,61 +2021,61 @@ ${PTEMP0}["_message"] = "Attempt to box non-value type"
 throw ${PTEMP0}
 box_I4:
 ${STEMP0} = "System.Int32"
-${INS} = concat "$P1000000 = new Integer\n$P1000000 = "
+${INS} = concat "$P1000000 = new 'Integer'\n$P1000000 = "
 ${INS} = concat ${STACK0}
 ${INS} = concat "\n"
 goto box_EMIT
 box_U4:
 ${STEMP0} = "System.UInt32"
-${INS} = concat "$P1000000 = new Integer\n$P1000000 = "
+${INS} = concat "$P1000000 = new 'Integer'\n$P1000000 = "
 ${INS} = concat ${STACK0}
 ${INS} = concat "\n"
 goto box_EMIT
 box_I2:
 ${STEMP0} = "System.Int16"
-${INS} = concat "$P1000000 = new Integer\n$P1000000 = "
+${INS} = concat "$P1000000 = new 'Integer'\n$P1000000 = "
 ${INS} = concat ${STACK0}
 ${INS} = concat "\n"
 goto box_EMIT
 box_U2:
 ${STEMP0} = "System.UInt16"
-${INS} = concat "$P1000000 = new Integer\n$P1000000 = "
+${INS} = concat "$P1000000 = new 'Integer'\n$P1000000 = "
 ${INS} = concat ${STACK0}
 ${INS} = concat "\n"
 goto box_EMIT
 box_I1:
 ${STEMP0} = "System.SByte"
-${INS} = concat "$P1000000 = new Integer\n$P1000000 = "
+${INS} = concat "$P1000000 = new 'Integer'\n$P1000000 = "
 ${INS} = concat ${STACK0}
 ${INS} = concat "\n"
 goto box_EMIT
 box_U1:
 ${STEMP0} = "System.Byte"
-${INS} = concat "$P1000000 = new Integer\n$P1000000 = "
+${INS} = concat "$P1000000 = new 'Integer'\n$P1000000 = "
 ${INS} = concat ${STACK0}
 ${INS} = concat "\n"
 goto box_EMIT
 box_I:
 ${STEMP0} = "System.IntPtr"
-${INS} = concat "$P1000000 = new Integer\n$P1000000 = "
+${INS} = concat "$P1000000 = new 'Integer'\n$P1000000 = "
 ${INS} = concat ${STACK0}
 ${INS} = concat "\n"
 goto box_EMIT
 box_U:
 ${STEMP0} = "System.UIntPtr"
-${INS} = concat "$P1000000 = new Integer\n$P1000000 = "
+${INS} = concat "$P1000000 = new 'Integer'\n$P1000000 = "
 ${INS} = concat ${STACK0}
 ${INS} = concat "\n"
 goto box_EMIT
 box_R4:
 ${STEMP0} = "System.Single"
-${INS} = concat "$P1000000 = new Float\n$P1000000 = "
+${INS} = concat "$P1000000 = new 'Float'\n$P1000000 = "
 ${INS} = concat ${STACK0}
 ${INS} = concat "\n"
 goto box_EMIT
 box_R8:
 ${STEMP0} = "System.Double"
-${INS} = concat "$P1000000 = new Float\n$P1000000 = "
+${INS} = concat "$P1000000 = new 'Float'\n$P1000000 = "
 ${INS} = concat ${STACK0}
 ${INS} = concat "\n"
 goto box_EMIT
@@ -2134,13 +2134,13 @@ ${PTEMP0} = new "Exception"
 ${PTEMP0}["_message"] = "Attempt to unbox unknown built-in."
 throw ${PTEMP0}
 unbox_integer:
-${INS} = concat "$P1000000 = new Integer\n$I1000000 = "
+${INS} = concat "$P1000000 = new 'Integer'\n$I1000000 = "
 ${INS} = concat ${STACK0}
 ${INS} = concat "\n$P1000000 = $I1000000\n"
 ${STACK0} = "$P1000000"
 goto unbox_EMIT
 unbox_float:
-${INS} = concat "$P1000000 = new Float\n$N1000000 = "
+${INS} = concat "$P1000000 = new 'Float'\n$N1000000 = "
 ${INS} = concat ${STACK0}
 ${INS} = concat "\n$P1000000 = $N1000000\n"
 ${STACK0} = "$P1000000"
@@ -2246,7 +2246,7 @@ arguments = ttype
 pir = <<PIR
 # Always start with the same thing.
 ${INS} = concat ${DEST0}
-${INS} = concat " = new ."
+${INS} = concat " = new \""
 
 # Now decide on array type to use.
 ${PTEMP0} = ${DTYPES}[0]
@@ -2279,7 +2279,7 @@ goto newarr_FINAL
 
 # Now do final stuff.
 newarr_FINAL:
-${INS} = concat "\n"
+${INS} = concat "\"\n"
 ${INS} = concat ${DEST0}
 ${INS} = concat " = "
 ${INS} = concat ${STACK0}
@@ -3353,7 +3353,7 @@ ${STEMP0} = ${ARG0}
 ${INS} = concat ${STEMP0}
 ${INS} = concat "\n"
 ${INS} = concat ${DEST0}
-${INS} = concat ".set_high_bits("
+${INS} = concat ".'set_high_bits'("
 ${STEMP0} = ${ARG1}
 ${INS} = concat ${STEMP0}
 ${INS} = concat ")\n"

@@ -41,7 +41,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'int reg' );
     # Get register's value indirectly, increment it and store back indirectly.
     tmp = ptr."load_int"()
     inc tmp
-    ptr.store_int(tmp)
+    ptr."store_int"(tmp)
 .end
 PIR
 Jonathan will be 21 years old tomorrow! :-O
@@ -76,7 +76,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'float reg' );
     ptr."store_float"(tmp)
 .end
 PIR
-4.800000
+4.8
 OUTPUT
 
 is( run_pir(<<'PIR'), <<'OUTPUT', 'pmc reg' );
@@ -105,7 +105,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'pmc reg' );
     .local int tmp2
 
     # Get register's value indirectly, increment it and store back indirectly.
-    tmp = ptr.load_pmc()
+    tmp = ptr."load_pmc"()
     tmp2 = tmp
     tmp = new 'Integer'
     tmp = tmp2
@@ -179,8 +179,8 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'float element' );
     print "\n"
 .end
 PIR
-5.900000
-11.800000
+5.9
+11.8
 OUTPUT
 
 is( run_pir(<<'PIR'), <<'OUTPUT', 'pmc element' );
@@ -293,7 +293,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'float field' );
     print " meters tall.\n"
 .end
 PIR
-The monkey was 1.790000 meters tall.
+The monkey was 1.79 meters tall.
 The monkey is now 1.82 meters tall.
 OUTPUT
 
@@ -315,7 +315,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'pmc field' );
     ptr = net_ldflda obj, "name"
 
     # Use the pointer to get the name attribute and change it.
-    the_test = ptr.load_pmc()
+    the_test = ptr."load_pmc"()
     print "The monkey was called "
     print the_test
     print ".\n"

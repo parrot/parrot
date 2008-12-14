@@ -80,7 +80,7 @@ is( run_pir(<<'PIR'), <<'OUTPUT', 'add' );
 	obj = new [ "Testing" ; "Test" ]
 	obj."set_x"(28)
 	obj."set_y"(14)
-    $I0 = obj.add()
+    $I0 = obj."add"()
 	print $I0
 	print "\n"
 .end

@@ -115,7 +115,7 @@ EXISTS:
 .end
 .sub ".ctor" :method :multi("System.String", string)
     .param string s
-    $P0 = new .String
+    $P0 = new "String"
     $P0 = s
     setattribute self, "Chars", $P0
 .end
@@ -327,6 +327,8 @@ FEND:
     pir_output = concat ", \".cctor\"\n$P0()\n"
 
     # This is the end of the on load type setup sub.
+    pir_output = concat "pop_eh\n"
+    pir_output = concat "pop_eh\n"
     pir_output = concat "FAILED:\n.end\n\n"
 
     # If it's an interface, emit code to prevent it being instantiated.
@@ -334,7 +336,7 @@ FEND:
     is_interface = band flags, 0x20
     if is_interface == 0 goto NOT_INTERFACE
     pir_output = concat <<"PIR"
-.sub __init :method
+.sub 'init' :method :vtable
     $P0 = class self
     $S0 = classname $P0
 PIR
@@ -356,7 +358,7 @@ NOT_INTERFACE:
     is_abstract = band flags, 0x80
     if is_abstract == 0 goto NOT_ABSTRACT
     pir_output = concat <<"PIR"
-.sub __init :method
+.sub 'init' :method :vtable
     $P0 = class self
     $S0 = classname $P0
 PIR
@@ -544,7 +546,7 @@ INT_TYPE:
     goto DONE_INIT
 
 FLOAT_TYPE:
-    init_body = concat "$P0 = new .Float\n$P0 = 0.0\nsetattribute self, \""
+    init_body = concat "$P0 = new 'Float'\n$P0 = 0.0\nsetattribute self, \""
     init_body = concat name
     init_body = concat "\", $P0\n"
     goto DONE_INIT
@@ -567,11 +569,11 @@ DONE_INIT:
 ILOOP_END:
 
     # Build the code.
-    pir_output = ".sub __init :method\n"
+    pir_output = ".sub 'init' :method :vtable\n"
     pir_output = concat init_body
     pir_output = concat <<"PIR"
 .end
-.sub __clone :method
+.sub 'clone' :method :vtable
 .local pmc cpy
 $P0 = class self
 $P1 = classname $P0
@@ -585,29 +587,29 @@ PIR
     # enums.
     if parent != "[ \"System\" ; \"Enum\" ]" goto NOT_ENUM
     pir_output = concat <<"PIR"
-.sub __get_integer
+.sub 'get_integer' :vtable
     .param pmc s
     $P0 = getattribute s, "value__"
     $I0 = $P0
     .return($I0)
 .end
-.sub __set_integer_native
+.sub 'set_integer_native' :vtable
     .param pmc s
     .param int i
     $P0 = new 'Integer'
     $P0 = i
     setattribute s, "value__", $P0
 .end
-.sub __get_number
+.sub 'get_number' :vtable
     .param pmc s
     $P0 = getattribute s, "value__"
     $N0 = $P0
     .return($N0)
 .end
-.sub __set_number_native
+.sub 'set_number_native' :vtable
     .param pmc s
     .param num i
-    $P0 = new Float
+    $P0 = new 'Float'
     $P0 = i
     setattribute s, "value__", $P0
 .end
