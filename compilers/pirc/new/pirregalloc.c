@@ -476,7 +476,6 @@ register; this can be one that was just expired.
 void
 linear_scan_register_allocation(lsr_allocator * const lsr) {
     live_interval * i;
-    live_interval *tmp;
     pir_type type = 0; /* types run from 0 to 4; see pircompunit.h */
 
     reset_register_count(lsr);
@@ -514,8 +513,8 @@ linear_scan_register_allocation(lsr_allocator * const lsr) {
         }
 
          /* cache the objects on the list for reuse */
-        for (tmp = lsr->intervals[type]; tmp != NULL; tmp = tmp->nexti)
-            cache_interval_object(lsr, tmp);
+        for (i = lsr->intervals[type]; i != NULL; i = i->nexti)
+            cache_interval_object(lsr, i);
 
         /* clear list of intervals */
         lsr->intervals[type] = NULL;
