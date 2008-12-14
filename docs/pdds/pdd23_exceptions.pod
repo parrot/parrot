@@ -41,23 +41,21 @@ These are the opcodes relevant to exceptions and exception handlers:
 
 =item B<push_eh I<LABEL>>
 
-=item B<push_eh I<INVOCABLE_PMC>>
+=item B<push_eh I<EXCEPTIONHANDLER_PMC>>
 
-Push an invocable PMC -- usually a closure or, in rarer cases, a subroutine or
-continuation -- onto the exception handler stack.
+Push an exception handler pmc onto the exception handler stack.
 
 When an exception is thrown, Parrot walks up the stack of active exception
 handlers, invoking each one in turn, but still in the dynamic context of the
 exception (i.e. the call stack is I<not> unwound first).  See below for more
 detail.
 
-If a I<LABEL> is provided, Parrot creates and pushes a continuation that
-resumes execution at I<LABEL> if invoked, which has the effect of
+If a I<LABEL> is provided, Parrot creates and pushes an exception handler
+that resumes execution at I<LABEL> if invoked, which has the effect of
 unconditionally handling all errors, and unwinding the stack to that label.
 
-If a I<INVOCABLE_PMC> is provided, Parrot pushes the pmc which will execute
-if invoked, which has the effect of unconditionally handling all errors,
-replacing the stack with that execution context of the invocable pmc.
+If an I<EXCEPTIONHANDLER_PMC> is provided, Parrot pushes that pmc itself
+onto the exception handler stack.
 
 =item B<pop_eh>
 
@@ -69,15 +67,16 @@ stack.
 Throw an exception consisting of the given I<EXCEPTION> PMC, after taking a
 continuation at the next opcode. When a I<CONTINUATION> is passed in, it will
 use that instead of generating a new continuation. Active exception handlers
-(if any) will be invoked with I<EXCEPTION> as the only parameter, and the
-return continuation stored within that exception object.
+(if any) will be invoked with I<EXCEPTION> as the only parameter. The
+I<CONTINUATION> is stored in the 'resume' slot of the I<EXCEPTION>.
 
 PMCs other than Parrot's Exception PMC may also be thrown, but they must
 support the interface of an Exception PMC. An HLL may implement throwing any
-arbitrary type of PMC, by storing that PMC as the payload of an Exception PMC.
+arbitrary type of PMC, by storing that PMC in the 'payload' slot of the
+Exception PMC.
 
-Exception handlers can resume execution immediately after the C<throw> opcode
-by invoking the resume continuation which is stored in the exception object.
+Exception handlers can resume execution after handling the exception by
+invoking the continuation stored in the 'resume' slot of the exception object.
 That continuation must be invoked with no parameters; in other words, C<throw>
 never returns a value.
 
@@ -91,13 +90,16 @@ is not handled behaves the same as an unhandled C<throw>n exception.
 
 =item B<die [ I<MESSAGE> ]>
 
-The C<die> opcode throws an exception of type C<exception;death> with a
-payload of I<MESSAGE>.  If I<MESSAGE> is a string register, the exception
-payload is a C<String> PMC containing I<MESSAGE>; if I<MESSAGE> is a PMC, it
-is used directly as the exception payload.
+The C<die> opcode throws an exception of type C<exception;death> and severity
+C<EXCEPT_error> with a payload of I<MESSAGE>.  The exception payload is a
+C<String> PMC containing I<MESSAGE>.
+
+{{NOTE: Exception classes NYI.  Currently throws CONTROL_ERROR}}
 
 The default when no I<MESSAGE> is given is "Fatal exception at LINE in
 FILE." followed by a backtrace.
+
+{{NOTE: Not yet implemented.}}
 
 If this exception is not handled, it results in Parrot returning an error
 indication and the stringification of I<MESSAGE> to its embedding environment.
@@ -110,9 +112,14 @@ to shut down the interpreter cleanly.
 Throw an exception of type C<exception;exit> with a payload of I<EXITCODE>,
 which defaults to zero, as an Integer PMC.
 
+{{NOTE: Exception classes NYI. Currently throws a type based on the EXITCODE.}}
+
 If not handled, this exception results in Parrot returning I<EXITCODE>
 as a status to its embedded environment, or when running standalone,
 to execute the C function C<exit(I<EXITCODE>)>.
+
+{{NOTE: This is not currently the case.  Parrot now stores the EXITCODE
+argument in the type, not the payload}}
 
 =back
 
@@ -149,7 +156,7 @@ Invoke the handler (note: this is still in the thrower's dynamic
 context).
 
 =item 4
-If the handler is C<rethrow>n, repeat steps 1-3 above, finding the next
+If the exception is C<rethrow>n, repeat steps 1-3 above, finding the next
 exception handler.
 
 =item 5
@@ -158,6 +165,8 @@ warning), and there is a continuation in the exception record (because
 the throwing opcode was C<throw>), invoke the continuation (resume
 execution). Whether to resume or die when an exception isn't handled is
 determined by the severity of the exception.
+
+{{NOTE: Not yet implemented, but should be easy}}
 
 =item 6
 Otherwise terminate the program like C<die>.
@@ -184,11 +193,17 @@ this interface as well.
 =item B<PMC *get_attr_str(STRING *name)>
 
 Retreive an attribute from the Exception. All exceptions will have at least
-C<message>, C<severity>, and C<payload> attributes.
+C<message>, C<severity>, C<resume>, and C<payload> attributes.
 
 The C<message> is an exception's human-readable self-description.  Note that
 the type of the returned PMC isn't required to be C<String>, but you should
 still be able to stringify and print it.
+
+The C<severity> is an integer from an internal Parrot enum of exception
+severities.
+
+The C<resume> is a continuation that you can invoke to resume normal execution
+of the program.
 
 The C<payload> more specifically identifies the detailed cause/nature of
 the exception.  Each exception class will have its own specific payload
@@ -197,7 +212,7 @@ type(s).  See the table of standard exception classes for examples.
 =item B<PMC *set_attr_str(STRING *name, PMC *value)>
 
 Set an attribute on the Exception. All exceptions will have at least
-C<message>, C<severity>, and C<payload> attributes.
+C<message>, C<severity>, C<resume>, and C<payload> attributes.
 
 =item B<PMC *annotations()>
 
@@ -205,11 +220,15 @@ Gets a Hash containing any bytecode annotations in effect at the point where
 the exception was thrown. If none were in effect, returns an empty Hash. See
 the PIR PDD for syntax for declaring and semantics of bytecode annotations.
 
+{{NOTE: Not yet implemented}}
+
 =item B<PMC *annotations(STRING *name)>
 
 Returns a PMC representing the bytecode annotation with the key specified in
 C<name> at the point where the exception was thrown. If there was no such
 annotation in effect, a NULL PMC will be returned.
+
+{{NOTE: Not yet implemented}}
 
 =back
 
@@ -218,6 +237,10 @@ annotation in effect, a NULL PMC will be returned.
 Parrot comes with a small hierarchy of classes designed for use as exceptions.
 Parrot throws them when internal Parrot errors occur, but any user code can
 throw them too.
+
+{{NOTE: Currently NYI.  Parrot currently uses integers to represent exception types.}}
+
+{{NOTE: Questions about how this interoperates with custom HLL exception classes}}
 
 =over
 
@@ -390,6 +413,8 @@ execution at the opcode immediately after the one that threw the
 exception. Other exceptions at the run-loop level are also generally
 resumable.
 
+{{NOTE: Currently only implemented for the actual throwing opcodes, throw, die, exit.}}
+
 You resume from an exception by invoking the return continuation stored
 in the 'resume' attribute of the exception.
 
@@ -417,6 +442,8 @@ None.
 
   src/ops/core.ops
   src/exceptions.c
+  src/pmc/exception.pmc
+  src/pmc/exceptionhandler.pmc
 
 =cut
 
