@@ -2394,6 +2394,24 @@ close_sub(lexer_state * const lexer) {
         linear_scan_register_allocation(lexer->lsr);
 }
 
+/*
+
+=item C<void
+update_sub_register_usage(lexer_state * const lexer, unsigned reg_usage[4])>
+
+Update register usage for the current subroutine with the register usage
+information in C<reg_usage>.
+
+=cut
+
+*/
+void
+update_sub_register_usage(lexer_state * const lexer, unsigned reg_usage[4]) {
+    int i;
+    for (i = 0; i < 4; ++i)
+        CURRENT_SUB(lexer)->regs_used[i] = reg_usage[i];
+}
+
 
 /*
 

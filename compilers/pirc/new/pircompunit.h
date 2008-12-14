@@ -451,6 +451,8 @@ void fixup_global_labels(struct lexer_state * const lexer);
 void set_op_labelflag(struct lexer_state * const lexer, int flag);
 void convert_inv_to_instr(struct lexer_state * const lexer, invocation * const inv);
 
+void update_sub_register_usage(struct lexer_state * const lexer, unsigned reg_usage[4]);
+
 void panic(struct lexer_state * lexer, char const * const message);
 
 #endif /* PARROT_PIR_PIRCOMPUNIT_H_GUARD */

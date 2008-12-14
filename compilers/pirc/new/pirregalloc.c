@@ -457,6 +457,7 @@ linear_scan_register_allocation(lsr_allocator * const lsr) {
         lsr->intervals[type] = NULL;
     }
 
+    update_sub_register_usage(lsr->lexer, lsr->r);
 
 }
 
