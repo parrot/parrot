@@ -19,25 +19,6 @@ get to the I<first> item on the list, you select C<<node->next>>.
 Due to this organization, adding an element to a list can be done in
 O(c) (constant) time.
 
-Currently, no Parrot Byte Code is generated; instead, the generated
-data structure can be printed, which results in a PASM representation
-of the parsed PIR code. Through the symbol management, which is done
-in F<pirsymbol.c>, a vanilla register allocator is implemented.
-
-
-
-=head1 TODO
-
-=over 4
-
-=item * calculate offsets for global (sub) labels.
-
-=item * fix local label offset calculation: make this work for all :flow (PARROT_JUMP_RELATIVE) ops.
-
-=item * generate PackFiles (PBC).
-
-=back
-
 =cut
 
 */
@@ -2365,14 +2346,9 @@ emit_sub_leaving_instructions(lexer_state * const lexer) {
      *    set_returns_pc
      *    returncc
      */
-
-
-    if (TEST_FLAG(lexer->subs->flags, SUB_FLAG_MAIN)) {
+    if (TEST_FLAG(lexer->subs->flags, SUB_FLAG_MAIN))
         new_sub_instr(lexer, PARROT_OP_end, "end");
-    }
     else {
-        /* XXX if there was already a return sequence explicitly, we shouldn't do this. */
-
         new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc");
         new_sub_instr(lexer, PARROT_OP_returncc, "returncc");
     }
