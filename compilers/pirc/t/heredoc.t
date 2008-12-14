@@ -58,8 +58,6 @@ foo:
     yield
     set_returns "\n Some text returned through return\n"
     returncc
-    set_returns
-    returncc
 OUTPUT
 
 pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "heredoc string assignment");

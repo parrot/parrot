@@ -1862,7 +1862,7 @@ arguments_to_operands(lexer_state * const lexer, argument * const args) {
         return;
     }
     else {
-        int numargs = 0;
+
         argiter = args;
         do {
             int flag = 0;
@@ -2347,23 +2347,18 @@ fixup_global_labels(lexer_state * const lexer) {
 
 /*
 
-=item C<void
-close_sub(lexer_state * const lexer)>
+=item C<static void
+emit_sub_leaving_instructions(lexer_state * const lexer)>
 
-Finalize the subroutine. Generate the final instructions in the current
-subroutine; if the C<:main> flag was set on the subroutine, this is the
-C<end> instruction; otherwise, a I<normal> C<return> sequence is generated.
-
-Then, all local labels are fixed up; i.e., all label identifiers are converted
-into their offsets.
+Emit final instructions for the current subroutine. In case
+this is a C<:main> sub, the "end" instruction is emitted,
+otherwise it's a standard return sequence.
 
 =cut
 
 */
-void
-close_sub(lexer_state * const lexer) {
-    int opcode;
-
+static void
+emit_sub_leaving_instructions(lexer_state * const lexer) {
     /* a :main-marked sub ends with the "end" instruction;
      * otherwise it's this pair:
      *
@@ -2381,6 +2376,43 @@ close_sub(lexer_state * const lexer) {
         new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc");
         new_sub_instr(lexer, PARROT_OP_returncc, "returncc");
     }
+}
+
+/*
+
+=item C<void
+close_sub(lexer_state * const lexer)>
+
+Finalize the subroutine. Generate the final instructions in the current
+subroutine; if the C<:main> flag was set on the subroutine, this is the
+C<end> instruction; otherwise, a I<normal> C<return> sequence is generated.
+
+Then, all local labels are fixed up; i.e., all label identifiers are converted
+into their offsets.
+
+=cut
+
+*/
+void
+close_sub(lexer_state * const lexer) {
+    int need_leaving_instr = 1;
+
+    /* don't generate leaving instructions if the last instruction was already
+     * leaving the sub.
+     */
+    if (CURRENT_INSTRUCTION(lexer)) {
+        switch (CURRENT_INSTRUCTION(lexer)->opcode) {
+            case PARROT_OP_end:
+            case PARROT_OP_returncc:
+                need_leaving_instr = 0;
+                break;
+            default:
+                break;
+        }
+    }
+
+    if (need_leaving_instr)
+        emit_sub_leaving_instructions(lexer);
 
     /* fix up all local branch labels */
     fixup_local_labels(lexer);
