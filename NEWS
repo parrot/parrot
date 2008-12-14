@@ -118,6 +118,7 @@ New in 0.8.1
   + Tests
     - further improvements to parallel tests
     - tests no longer leave filesystem breadcrumbs
+    - more thorough testing of Parrot::Test itself
 
 New in 0.8.0
 - Implementation
