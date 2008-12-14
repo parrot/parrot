@@ -1357,7 +1357,6 @@ op dlfunc(out PMC, invar PMC, in STR, in STR) {
 op dlvar(out PMC, invar PMC, in STR) {
     char * const name = string_to_cstring(interp, ($3));
     void * const p = Parrot_dlsym(PMC_IS_NULL($2) ? NULL : PMC_data($2), name);
-    string_cstring_free(name);
     if (p == NULL) {
         const char * const err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
@@ -1370,6 +1369,7 @@ op dlvar(out PMC, invar PMC, in STR) {
         $1 = pmc_new(interp, enum_class_UnManagedStruct);
         PMC_data($1) = p;
     }
+    string_cstring_free(name);
 }
 
 inline op compreg(in STR, invar PMC) {
