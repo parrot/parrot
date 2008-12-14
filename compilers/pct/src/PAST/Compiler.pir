@@ -732,7 +732,6 @@ Return the POST representation of a C<PAST::Block>.
 
     ##  pir-encode name and namespace
     .local string blockreg, blockref
-    name = self.'escape'(name)
     blockreg = self.'uniquereg'('P')
     if ns goto block_ns
     blockref = concat ".const 'Sub' ", blockreg
@@ -743,13 +742,13 @@ Return the POST representation of a C<PAST::Block>.
     goto have_blockref
   block_ns:
     $P0 = get_global '%!codestring'
-    ns = $P0.'key'(ns)
     blockref = concat 'get_hll_global ', blockreg
+    $S0 = $P0.'key'(ns)
     concat blockref, ', '
-    $S0 = ns
     concat blockref, $S0
+    $S0 = self.'escape'(name)
     concat blockref, ', '
-    concat blockref, name
+    concat blockref, $S0
   have_blockref:
 
     ##  determine the outer POST::Sub for the new one
@@ -880,9 +879,9 @@ Return the POST representation of a C<PAST::Block>.
     .local pmc lisub
     $P0 = get_hll_global ['POST'], 'Sub'
     lisub = $P0.'new'('outer'=>bpost, 'pirflags'=>':load :init')
+    lisub.'push_pirop'(blockref)
     lisub.'push_pirop'('.local pmc', 'block')
-    lisub.'push_pirop'('interpinfo', '$P20', .INTERPINFO_CURRENT_SUB)
-    lisub.'push_pirop'('callmethod', '"get_outer"', '$P20', 'result'=>'block')
+    lisub.'push_pirop'('set', 'block', blockreg)
     .local pmc lipast, lipost
     lipast = node.'loadinit'()
     lipost = self.'as_post'(lipast, 'rtype'=>'v')
