@@ -23,6 +23,9 @@ New in December 2008 Release
     - more builtin functions
     - basic support for protos
     - iterator on filehandle objects
+  + Lua
+    - added complex & mathx libraries
+    - merge LuaClosure & LuaFunction PMC
   + Pipp
     - added support for a return value from user defined functions
     - added incomplete implemention of 'require_once'
