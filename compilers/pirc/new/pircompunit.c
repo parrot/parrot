@@ -297,7 +297,6 @@ new_subr(lexer_state * const lexer, char const * const subname) {
     newsub->parameters  = NULL;
     newsub->statements  = NULL;
     newsub->flags       = 0;
-    newsub->codesize    = 0;
     newsub->startoffset = lexer->codesize; /* start offset in bytecode */
 
     init_hashtable(lexer, &newsub->symbols, HASHTABLE_SIZE_INIT);

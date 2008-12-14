@@ -560,7 +560,6 @@ emit_pbc(lexer_state * const lexer) {
 
     /* iterate over all instructions and emit them */
     do {
-        fprintf(stderr, "%d integers needed for storing this sub\n", subiter->codesize);
         fprintf(stderr, "start offset of sub '%s' is: %d\tend offest: %d\n",
                     subiter->sub_name, subiter->startoffset, subiter->endoffset);
 

@@ -308,9 +308,6 @@ typedef struct subroutine {
     char const         *nsentry;       /* name by which the sub is stored in the namespace */
     char const         *methodname;    /* name of this sub by which it's stored as a method */
     int                 flags;         /* this sub's flags */
-    unsigned            codesize;      /* total number of integers to store for this sub:
-                                          1 for each op and 1 for each operand.
-                                        */
     int                 startoffset;   /* start offset in bytecode where this sub starts */
     int                 endoffset;     /* end offset in bytecode where this sub ends */
 
