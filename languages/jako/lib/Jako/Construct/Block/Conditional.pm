@@ -66,11 +66,9 @@ sub compile {
         $compiler->emit("${prefix}_THEN:");
 
         if ( $self->content ) {
-            $compiler->emit(".namespace ${namespace}_THEN");
             $compiler->indent;
             $self->SUPER::compile($compiler);
             $compiler->outdent;
-            $compiler->emit(".endnamespace ${namespace}_THEN");
         }
 
         $compiler->emit("  goto ${prefix}_LAST");
@@ -79,11 +77,9 @@ sub compile {
         $compiler->emit("${prefix}_ELSE:");
 
         if ( $self->content ) {
-            $compiler->emit(".namespace ${namespace}_ELSE");
             $compiler->indent;
             $self->SUPER::compile($compiler);
             $compiler->outdent;
-            $compiler->emit(".endnamespace ${namespace}_ELSE");
         }
 
         $compiler->emit("${prefix}_LAST:");

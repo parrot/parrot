@@ -55,22 +55,18 @@ sub compile {
         $compiler->emit("${prefix}_REDO:");
 
         if ( $self->content ) {
-            $compiler->emit(".namespace ${namespace}");
             $compiler->indent;
             $self->SUPER::compile($compiler);
             $compiler->outdent;
-            $compiler->emit(".endnamespace ${namespace}");
         }
     }
     elsif ( $kind eq 'continue' ) {
         $compiler->emit("${prefix}_CONT:");
 
         if ( $self->content ) {
-            $compiler->emit(".namespace ${namespace}_CONT");
             $compiler->indent;
             $self->SUPER::compile($compiler);
             $compiler->outdent;
-            $compiler->emit(".endnamespace ${namespace}_CONT");
         }
 
         $compiler->emit("  goto ${prefix}_NEXT");

@@ -30,11 +30,9 @@ sub compile {
     my $namespace = "BARE";    # TODO: Don't we need to do better than this?
 
     if ( $self->content ) {
-        $compiler->emit(".namespace ${namespace}");
         $compiler->indent;
         $self->SUPER::compile($compiler);
         $compiler->outdent;
-        $compiler->emit(".endnamespace ${namespace}");
     }
 
     return 1;
