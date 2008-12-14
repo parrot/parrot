@@ -1,11 +1,21 @@
 # $Id$
 
 New in December 2008 Release
+- Implementation
+  + fixed lexical semantics
+  + added the 'capture_lex' opcode
 - Compilers
   + IMCC
     - removed undocumented .param int <stringc> => <ident> syntax
     - .line directive now only takes an integer argument
     - new .file directive to specify the file name being compiled
+  + PCT
+    - properly handles lexical generation and closure semantics
+    - uses :subid instead of name lookups to reference PAST::Block nodes
+    - added PAST::Control node type (exception handlers)
+  + PGE
+    - add support for <?{{...}}> and <!{{...}}> assertions
+    - Match objects use Capture PMC instead of Capture_PIR
   + PIRC
     - add macro handling to PASM mode
     - disable vanilla register allocation in PASM mode, but do allow optimization
@@ -13,14 +23,16 @@ New in December 2008 Release
     - first bits of bytecode generation. No sub calling/returning yet.
 - Languages
   + Rakudo
+    - fixed lexical handling and recursion
     - refactored subtypes implementation
     - support for quotes with multi-character delimiters
-    - implemented list slices
+    - implemented list slices (Positional role)
     - list assignment
     - reduction meta operators
     - hyper meta operators
     - cross meta operators
     - more builtin functions
+    - added Nil type
     - basic support for protos
     - iterator on filehandle objects
   + Lua
@@ -38,6 +50,7 @@ New in December 2008 Release
     - .yield (in .begin/end_yield) is now .set_yield
     - .return (in .begin/end_return) is now .set_return
     - .namespace x / .endnamespace x syntax is removed
+  + Capture_PIR (runtime/parrot/library/Parrot/Capture_PIR.pir)
 
 New in 0.8.1
 - Implementation
