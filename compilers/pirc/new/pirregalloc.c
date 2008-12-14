@@ -24,11 +24,35 @@ the algorithm is modified in some places.
 
 */
 
+/*
+
+=item C<static void
+reset_register_count(lsr_allocator * const lsr)>
+
+Reset the register counters; there's one counter for each register
+type (string, num, int, pmc).
+
+=cut
+
+*/
+static void
+reset_register_count(lsr_allocator * const lsr) {
+    int i;
+    /* the "r" field keeps track of the number of registers that must be allocated by
+     * parrot. In the original implementation, "r" is constant, and indicates the number
+     * of available registers. In parrot, this is flexible, so we increment it only
+     * if necessary. However, the minimum value for "r" must be 1, in order for the
+     * algorithm to work properly. After all, having 0 registers doesn't make sense.
+     * Initialize r for each type to 1 here:
+     */
+    for (i = 0; i < 4; ++i)
+        lsr->r[i] = 1;
+}
 
 /*
 
 =item C<lsr_allocator *
-new_linear_scan_register_allocator(void)>
+new_linear_scan_register_allocator(struct lexer_state * lexer)>
 
 Constructor for a linear scan register allocator.
 Initializates the allocator, and returns it.
@@ -39,17 +63,6 @@ Initializates the allocator, and returns it.
 lsr_allocator *
 new_linear_scan_register_allocator(struct lexer_state *lexer) {
     lsr_allocator *lsr = (lsr_allocator *)mem_sys_allocate_zeroed(sizeof (lsr_allocator));
-    int i;
-
-    /* the "r" field keeps track of the number of registers that must be allocated by
-     * parrot. In the original implementation, "r" is constant, and indicates the number
-     * of available registers. In parrot, this is flexible, so we increment it only
-     * if necessary. However, the minimum value for "r" must be 1, in order for the
-     * algorithm to work properly. After all, having 0 registers doesn't make sense.
-     * Initialize r for each type to 1 here:
-     */
-    for (i = 0; i < 4; ++i)
-        lsr->r[i] = 1;
 
     lsr->lexer = lexer;
 
@@ -135,15 +148,31 @@ PARROT_MALLOC
 PARROT_WARN_UNUSED_RESULT
 live_interval *
 new_live_interval(lsr_allocator * const lsr, unsigned firstuse_location, pir_type type) {
-    live_interval *i = (live_interval *)mem_sys_allocate_zeroed(sizeof (live_interval));
-    static int count = 0;
+    live_interval *i;
+    /* check whether there's an interval object that we can re-use, to prevent
+     * memory malloc() and free()s.
+     */
+    if (lsr->cached_intervals) {
+
+        i = lsr->cached_intervals;
+        lsr->cached_intervals = i->nextc;
+
+        /* clear fields */
+        i->nexti = i->previ   = NULL;
+        i->nexta = i->preva   = NULL;
+        i->nextc = NULL;
+    }
+    else {
+        /* there's no interval object to be re-used (none allocated yet, or all are used). */
+        i = (live_interval *)mem_sys_allocate_zeroed(sizeof (live_interval));
+    }
 
     /* this is the first usage of the register, and up to now also the last */
     i->startpoint = i->endpoint = firstuse_location;
 
-    /*fprintf(stderr, "Live interval %d (location: %u)\n", ++count, firstuse_location);*/
     add_live_interval(lsr, i, type);
     return i;
+
 }
 
 /*
@@ -242,6 +271,7 @@ add_interval_to_active(lsr_allocator *lsr, live_interval * const i, pir_type typ
         return;
     }
 
+    /* look for the right place to insert; sort on increasing end point */
     while (iter->nexta && iter->endpoint < i->endpoint) {
         iter = iter->nexta;
     }
@@ -415,6 +445,24 @@ expire_old_intervals(lsr_allocator * const lsr, live_interval * const i, pir_typ
 
 /*
 
+=item C<static void
+cache_interval_objects(lsr_allocator * const lsr, live_interval * interval)>
+
+Store the interval C<interval> on a caching list; whenever a new C<live_interval>
+object is requested, these interval objects can be re-used, instead of malloc()ing
+a new one.
+
+=cut
+
+*/
+static void
+cache_interval_object(lsr_allocator * const lsr, live_interval * interval) {
+    interval->nextc = lsr->cached_intervals;
+    lsr->cached_intervals = interval;
+}
+
+/*
+
 =item C<void
 linear_scan_register_allocation(lsr_allocator * const lsr)>
 
@@ -428,9 +476,16 @@ register; this can be one that was just expired.
 void
 linear_scan_register_allocation(lsr_allocator * const lsr) {
     live_interval * i;
+    live_interval *tmp;
     pir_type type = 0; /* types run from 0 to 4; see pircompunit.h */
 
+    reset_register_count(lsr);
+
     for (type = 0; type < 4; ++type) { /* handle each of the 4 parrot types separately. */
+
+        /* cache the objects on the active list for reuse */
+        for (i = lsr->active[type]; i != NULL; i = i->nexta)
+            cache_interval_object(lsr, i);
 
         /* intialize active intervals list to NULL */
         lsr->active[type] = NULL;
@@ -440,6 +495,11 @@ linear_scan_register_allocation(lsr_allocator * const lsr) {
         */
         for (i = lsr->intervals[type]; i != NULL; i = i->nexti) {
 
+            /* expire all intervals whose endpoint is smaller than i's start
+             * point; that means that i can be mapped to a register that was
+             * previously assigned to one of the expired intervals; that one
+             * is no longer needed (hence it expired).
+             */
             expire_old_intervals(lsr, i, type);
 
             /* get a free register */
@@ -453,10 +513,15 @@ linear_scan_register_allocation(lsr_allocator * const lsr) {
             add_interval_to_active(lsr, i, type);
         }
 
+         /* cache the objects on the list for reuse */
+        for (tmp = lsr->intervals[type]; tmp != NULL; tmp = tmp->nexti)
+            cache_interval_object(lsr, tmp);
+
         /* clear list of intervals */
         lsr->intervals[type] = NULL;
     }
 
+    /* update the register usage in the current subroutine structure. */
     update_sub_register_usage(lsr->lexer, lsr->r);
 
 }
