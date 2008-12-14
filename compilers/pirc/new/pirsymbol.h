@@ -20,10 +20,18 @@
 #include "pircompunit.h"
 #include "pirregalloc.h"
 
+/* core info of all symbols and PIR registers ($I42, etc.). */
+typedef struct syminfo {
+    int            color;
+    pir_type       type;
+    live_interval *interval;
+
+} syminfo;
 
 
 /* structure to represent a declared local variable or parameter */
 typedef struct symbol {
+    syminfo        info;
     int            color;
     pir_type       type;
     live_interval *interval;
@@ -38,6 +46,7 @@ typedef struct symbol {
 
 /* structure to represent a PIR register. */
 typedef struct pir_reg {
+    syminfo         info;
     int             color;
     pir_type        type;
     live_interval  *interval;

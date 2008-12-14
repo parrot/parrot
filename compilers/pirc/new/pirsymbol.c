@@ -48,6 +48,8 @@ Globally defined constants are stored in yet another separate list.
 */
 
 
+#define NO_REG_ALLOCATED    -1
+
 /*
 
 =item C<static int
@@ -167,7 +169,7 @@ new_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name),
     symbol *sym = pir_mem_allocate_zeroed_typed(lexer, symbol);
     sym->name   = name;
     sym->type   = type;
-    sym->color  = -1; /* -1 means no PASM reg has been allocated yet for this symbol */
+    sym->color  = NO_REG_ALLOCATED;
 
     sym->next   = NULL;
     return sym;
@@ -253,7 +255,7 @@ check_unused_symbols(NOTNULL(lexer_state * const lexer)) {
         for (i = 0; i < symbols->size; i++) {
             bucket *b = get_bucket(symbols, i);
             while (b) {
-                if (bucket_symbol(b)->color == -1)
+                if (bucket_symbol(b)->color == NO_REG_ALLOCATED)
                     fprintf(stderr, "Warning: in sub '%s': symbol '%s' declared but not used\n",
                                     subiter->sub_name, bucket_symbol(b)->name);
 
@@ -291,7 +293,7 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
         symbol *sym = bucket_symbol(buck);
 
         if (STREQ(sym->name, name)) {
-            if (sym->color == -1)  /* no PASM register assigned yet */
+            if (sym->color == NO_REG_ALLOCATED)  /* no PASM register assigned yet */
                 /* get a new reg from vanilla reg. allocator */
                 assign_vanilla_register(lexer, sym);
             else  /* update end point of interval */
@@ -328,7 +330,7 @@ new_pir_reg(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     pir_reg *r = pir_mem_allocate_zeroed_typed(lexer, pir_reg);
 
     r->type    = type;
-    r->color   = -1; /* -1 means no PASM register is allocated for this PIR register. */
+    r->color   = NO_REG_ALLOCATED;
 
     r->regno   = regno;
     r->next    = NULL;
