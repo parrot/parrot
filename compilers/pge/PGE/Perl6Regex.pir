@@ -218,7 +218,9 @@ needed for compiling regexes.
     optable.'newtok'('term:<commit>', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Cut')
 
     $P0 = get_global 'parse_closure'
-    optable.'newtok'("term:{{",       'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'("term:{{",   'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'("term:<?{{", 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'("term:<!{{", 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
     $P0 = get_global 'parse_action'
     optable.'newtok'("term:{*}",      'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
@@ -1078,6 +1080,8 @@ Parse a modifier.
 
 .sub 'parse_closure'
     .param pmc mob
+    .local pmc key
+    key = mob['KEY']
     .local string target
     .local int pos, len
     (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Closure')
@@ -1089,8 +1093,19 @@ Parse a modifier.
     inc pos
     goto init
   body:
-    $S0 = repeat "}", len
-    $I0 = index target, $S0, pos
+    .local string close
+    close = repeat "}", len
+    if key == '<?{{' goto assert_pos
+    if key == '<!{{' goto assert_neg
+    goto have_close
+  assert_neg:
+    mob['isnegated'] = 1
+  assert_pos:
+    mob['iszerowidth'] = 1
+    concat close, '>'
+    inc len
+  have_close:
+    $I0 = index target, close, pos
     if $I0 < pos goto err_noclose
     $I1 = $I0 - pos
     $S1 = substr target, pos, $I1

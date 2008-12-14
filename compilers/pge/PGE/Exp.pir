@@ -1432,25 +1432,44 @@ tree as a PIR code object that can be compiled.
     ##  two different compilers.  Also, if the sources can be lengthy
     ##  we might be well served to use a hashed representation of
     ##  the source.
-    code.'emit'(<<"        CODE", label, next, lang, value)
+    code.'emit'(<<"        CODE", label, lang, value)
         %0: # closure
-          $S1 = %3
+          $S1 = %2
           $P0 = get_hll_global ['PGE';'Match'], '%!cache'
           $P1 = $P0[$S1]
           unless null $P1 goto %0_1
-          $P1 = compreg %2
+          $P1 = compreg %1
           $P1 = $P1($S1)
           $P0[$S1] = $P1
         %0_1:
+        CODE
+    $I0 = self['iszerowidth']
+    if $I0 goto closure_zerowidth
+    code.'emit'(<<"        CODE", next)
           mpos = pos
           ($P0 :optional, $I0 :opt_flag) = $P1(mob)
-          if $I0 == 0 goto %1
+          if $I0 == 0 goto %0
           mob.'result_object'($P0)
           push ustack, pos
           local_branch cstack, succeed
           pos = pop ustack
           null $P0
           mob.'result_object'($P0)
+          goto fail
+        CODE
+    .return ()
+  closure_zerowidth:
+    ##  we're doing a <?{{ or <!{{ assertion.
+    .local string test
+    test = 'if'
+    $I0 = self['isnegated']
+    unless $I0 goto have_test
+    test = 'unless'
+  have_test:
+    code.'emit'(<<"        CODE", test, next)
+          mpos = pos
+          $P0 = $P1(mob)
+          %0 $P0 goto %1
           goto fail
         CODE
     .return ()
