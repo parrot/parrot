@@ -1511,7 +1511,7 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
     /* Unreachable instructions */
 
-    for (last = unit->instructions, ins=last->next;
+    for (last = unit->instructions, last && (ins = last->next);
          last && ins;
          ins = ins->next) {
         if ((last->type & IF_goto) && !(ins->type & ITLABEL) &&
