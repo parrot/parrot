@@ -98,6 +98,7 @@ objects are destroyed as well.
 void
 destroy_linear_scan_regiser_allocator(lsr_allocator *lsr) {
     pir_type type;
+    live_interval *i;
 
     for (type = 0; type < 4; ++type) {
         live_interval *iter = lsr->intervals[type];
@@ -105,6 +106,14 @@ destroy_linear_scan_regiser_allocator(lsr_allocator *lsr) {
             iter = iter->nexti;
             mem_sys_free(iter->previ);
         }
+    }
+
+    /* free all cached interval objects */
+    i = lsr->cached_intervals;
+    while (i != NULL) {
+        live_interval *tmp = i;
+        i = i->nextc;
+        mem_sys_free(tmp);
     }
 
     mem_sys_free(lsr);
