@@ -1356,8 +1356,6 @@ string_chopn_inplace(PARROT_INTERP, ARGMOD(STRING *s), INTVAL n)
     UINTVAL new_length, uchar_size;
     String_iter iter;
 
-    Parrot_unmake_COW(interp, s);
-
     if (n < 0) {
         new_length = -n;
         if (new_length > s->strlen)
@@ -1376,6 +1374,8 @@ string_chopn_inplace(PARROT_INTERP, ARGMOD(STRING *s), INTVAL n)
         s->bufused = s->strlen = 0;
         return;
     }
+
+    Parrot_unmake_COW(interp, s);
 
     uchar_size = s->bufused / s->strlen;
     s->strlen  = new_length;
