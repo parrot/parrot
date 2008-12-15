@@ -247,7 +247,6 @@ the STRING elsewhere.
 
 */
 
-PARROT_INLINE
 void
 string_free(PARROT_INTERP, ARGIN(STRING *s))
 {
