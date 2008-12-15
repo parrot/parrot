@@ -495,11 +495,11 @@ like($@, qr/I don't know how to redirect 'STDJ' yet!/,
 my $dn = File::Spec->devnull();
 ( $out, $err, $chdir ) = Parrot::Test::_handle_test_options( {
     STDOUT  => '',
-    STDERR  => '/dev/null',
+    STDERR  => ($^O eq 'MSWin32')? 'nul' : '/dev/null',
     CD      => '',
 } );
 is($out, '', "Got expected value for STDOUT");
-is($err, $dn, "Got expected value for STDERR using /dev/null");
+is($err, $dn, "Got expected value for STDERR using null device");
 is($chdir, '', "Got expected value for working directory");
 
 ( $out, $err, $chdir ) = Parrot::Test::_handle_test_options( {
