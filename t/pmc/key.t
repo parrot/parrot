@@ -19,12 +19,12 @@ Tests the C<Key> PMC.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(7)
+    plan(8)
 
     traverse_key_chain()
     extract_int_from_string_keys()
     extract_string_from_int_keys()
-    #do_not_collect_string_keys_early_rt_60128()
+    do_not_collect_string_keys_early_rt_60128()
     todo(0, 'register and non-register string keys should be COW (RT #60128)' )
 .end
 

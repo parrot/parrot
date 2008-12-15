@@ -246,9 +246,11 @@ really a public API.
 
         /* If it's a sub... */
         if (!PMC_IS_NULL(value) && VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Sub"))) {
-            int all_done = ns_insert_sub_keyed_str(interp, SELF, key, value);
-            if (all_done)
-                return;
+            /* TT #10; work around that Sub doesn't use PMC ATTRs */
+            if (value->vtable->base_type != enum_class_Object) {
+                if (ns_insert_sub_keyed_str(interp, SELF, key, value))
+                    return;
+            }
         }
 
         /* If it's an NCI method */
@@ -264,7 +266,9 @@ really a public API.
         if (!PMC_IS_NULL(value)
         &&   VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "MultiSub"))) {
 
-            if (VTABLE_elements(interp, value) > 0) {
+            /* TT #10; work around that Sub doesn't use PMC ATTRs */
+            if (value->vtable->base_type != enum_class_Object
+            && VTABLE_elements(interp, value) > 0) {
                 Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
                 PMC * const classobj = VTABLE_get_class(interp, SELF);
 
