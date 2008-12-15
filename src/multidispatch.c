@@ -313,17 +313,6 @@ Parrot_mmd_find_multi_from_sig_obj(PARROT_INTERP, ARGIN(STRING *name), ARGIN(PMC
     mmd_search_global(interp, name, candidate_list);
 
     return Parrot_mmd_sort_manhattan_by_sig_pmc(interp, candidate_list, invoke_sig);
-
-    if (PMC_IS_NULL(candidate_list))
-        return PMCNULL;
-
-#if MMD_DEBUG
-    fprintf(stderr, "there were '%d' elements in the candidate_list\n",
-            (int) VTABLE_elements(interp, candidate_list));
-#endif
-
-    return VTABLE_get_pmc_keyed_int(interp, candidate_list, 0);
-
 }
 
 
