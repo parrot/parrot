@@ -548,13 +548,15 @@ is( Parrot::Test::_handle_command($command_orig), $command_orig,
     "Array ref holding multiple commands unchanged as expected");
 
 {
-    my $oldvalgrind = $ENV{VALGRIND};
-    $command_orig = 'ls';
-    my $foo = 'foobar';
+    my $oldvalgrind      = defined $ENV{VALGRIND} ? $ENV{VALGRIND} : '';
+    $command_orig        = 'ls';
+    my $foo              = 'foobar';
     local $ENV{VALGRIND} = $foo;
-    my $ret = Parrot::Test::_handle_command($command_orig);
+    my $ret              = Parrot::Test::_handle_command($command_orig);
+
     is( $ret->[0], "$foo $command_orig",
         "Got expected value in Valgrind environment");
+
     $ENV{VALGRIND} = $oldvalgrind;
 }
 
