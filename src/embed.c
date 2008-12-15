@@ -454,6 +454,7 @@ again:
         if (ferror(io)) {
             Parrot_io_eprintf(interp, "Parrot VM: Problem reading packfile from PIO:  code %d.\n",
                         ferror(io));
+            mem_sys_free(program_code);
             return NULL;
         }
         fclose(io);
