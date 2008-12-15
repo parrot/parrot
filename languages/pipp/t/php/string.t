@@ -477,5 +477,3 @@ OUT
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-# Copyright (C) 2008, The Perl Foundation.
-# $Id$
