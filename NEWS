@@ -4,6 +4,7 @@ New in December 2008 Release
 - Implementation
   + fixed lexical semantics
   + added the 'capture_lex' opcode
+  + added automatic resume for nonfatal exceptions
 - Compilers
   + IMCC
     - removed undocumented .param int <stringc> => <ident> syntax
@@ -35,6 +36,8 @@ New in December 2008 Release
     - added Nil type
     - basic support for protos
     - iterator on filehandle objects
+    - basic support for exception handlers
+    - warn
   + Lua
     - added complex & mathx libraries
     - merge LuaClosure & LuaFunction PMC
