@@ -166,8 +166,6 @@ the throwing opcode was C<throw>), invoke the continuation (resume
 execution). Whether to resume or die when an exception isn't handled is
 determined by the severity of the exception.
 
-{{NOTE: Not yet implemented, but should be easy}}
-
 =item 6
 Otherwise terminate the program like C<die>.
 
