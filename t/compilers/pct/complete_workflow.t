@@ -60,7 +60,7 @@ OUT
 thingy
 IN
 token TOP   { 'thingy' {*}  #= key_for_thingy
-            | 'stuff'  {*}  #= key_for_stuff  
+            | 'stuff'  {*}  #= key_for_stuff
             }
 GRAMMAR
 
@@ -158,15 +158,15 @@ token TOP {
 }
 token scope_a {
     <.INIT_SCOPE_A>
-    '<a>' 
+    '<a>'
     <thingy>
-    '</a>'  {*} 
+    '</a>'  {*}
 }
 token scope_b {
     <.INIT_SCOPE_B>
-    '<b>' 
+    '<b>'
     <thingy>
-    '</b>'  {*} 
+    '</b>'  {*}
 }
 token INIT_SCOPE_A {
   {*}
@@ -196,11 +196,11 @@ method scope_b($/) {
 }
 
 method INIT_SCOPE_A($/) {
-   our $?MY_OUR_VAR := 'scope a'; 
+   our $?MY_OUR_VAR := 'scope a';
 }
 
 method INIT_SCOPE_B($/) {
-   our $?MY_OUR_VAR := 'scope b'; 
+   our $?MY_OUR_VAR := 'scope b';
 }
 
 method thingy($/) {
@@ -229,23 +229,23 @@ token TOP {
 }
 token thingy_or_stuff {
       <THINGY> {*}  #= THINGY
-    | <STUFF>  {*}  #= STUFF  
+    | <STUFF>  {*}  #= STUFF
 }
 token THINGY {
     'thingy'
     {*}
-} 
+}
 token STUFF {
     'stuff'
     {*}
-} 
+}
 GRAMMAR
 
 method TOP($/) {
     my $past := PAST::Stmts.new();
     for $<thingy_or_stuff> {
         $past.push( $( $_ ) );
-    } 
+    }
 
     our $?MY_OUR_VAR;
     $past.unshift( $?MY_OUR_VAR );
