@@ -194,6 +194,7 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
     if (PMC_IS_NULL(handler)) {
         STRING * const message     = VTABLE_get_string(interp, exception);
         const INTVAL   severity    = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
+        PMC *dead;
         if (severity < EXCEPT_error) {
             PMC *resume = VTABLE_get_attr_str(interp, exception,
                     CONST_STRING(interp, "resume"));
@@ -212,7 +213,7 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
                 return VTABLE_invoke(interp, resume, NULL);
             }
         }
-        die_from_exception(interp, exception);
+        dead = die_from_exception(interp, exception);
     }
 
     address    = VTABLE_invoke(interp, handler, dest);
@@ -292,7 +293,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     RunProfile * const profile      = interp->profile;
     Parrot_runloop    *return_point = interp->current_runloop;
     if (PMC_IS_NULL(handler)) {
-        die_from_exception(interp, exception);
+        PMC *dead = die_from_exception(interp, exception);
     }
 
     /* If profiling, remember end time of lastop and generate entry for
