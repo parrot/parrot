@@ -745,8 +745,10 @@ Generic method for compilers invoked from a shell command line.
     $I0 = adverbs['version']
     if $I0 goto version
 
+    
     $S0 = adverbs['e']
-    if $S0 goto eval_line
+    $I0 = exists adverbs['e']
+    if $I0 goto eval_line
 
     .local pmc result
     result = box ''
