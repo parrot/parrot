@@ -2,6 +2,8 @@
 # $Id$
 # Copyright (C) 2008 The Perl Foundation
 
+use v6;
+
 use SQLite3;
 use DBDI;
 

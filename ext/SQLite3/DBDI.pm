@@ -2,6 +2,8 @@
 # $Id$
 # Copyright (C) 2008 The Perl Foundation
 
+use v6;
+
 class DBDI::DriverManager {
     method getConnection($url, $login, $password) {
         my $c1 = $url.index(":");
