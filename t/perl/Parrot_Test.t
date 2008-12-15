@@ -24,6 +24,7 @@ use File::Spec;
 use lib qw( lib );
 use Parrot::Config;
 use IO::CaptureOutput qw| capture |;
+use Parrot::Config '%PConfig';
 
 BEGIN {
     eval "use Test::Builder::Tester;";
@@ -597,8 +598,9 @@ is( Parrot::Test::_handle_command($command_orig), $command_orig,
 }
 
 {
+    my $q = $PConfig{PQ};
     my $text = q{Hello, world};
-    my $cmd = "$^X -e 'print qq{$text\n};'";
+    my $cmd = "$^X -e ${q}print qq{$text\n};${q}";
     my $exit_message;
     my ($stdout, $stderr);
     capture(
