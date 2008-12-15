@@ -300,7 +300,7 @@ queue_broadcast(ARGMOD(QUEUE *queue))
 
 =item C<void queue_signal>
 
-XXX Needs a description
+RT#48260: Document this!
 
 =cut
 
