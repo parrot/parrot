@@ -202,12 +202,12 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
                 Parrot_io_eprintf(interp, "%S\n", message);
             }
             else {
-                Parrot_io_eprintf(interp, "%S\n", CONST_STRING(interp,"Warning"));
+                Parrot_io_eprintf(interp, "%S\n", CONST_STRING(interp, "Warning"));
             }
 
             /* caution against output swap (with PDB_backtrace) */
             fflush(stderr);
-            //PDB_backtrace(interp);
+            /* PDB_backtrace(interp); */
 
             if (!PMC_IS_NULL(resume)) {
                 return VTABLE_invoke(interp, resume, NULL);
