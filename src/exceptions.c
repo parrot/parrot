@@ -196,8 +196,7 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
         const INTVAL   severity    = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
         PMC *dead;
         if (severity < EXCEPT_error) {
-            PMC *resume = VTABLE_get_attr_str(interp, exception,
-                    CONST_STRING(interp, "resume"));
+            PMC *resume = VTABLE_get_attr_str(interp, exception, CONST_STRING(interp, "resume"));
             if (string_equal(interp, message, CONST_STRING(interp, "")) == 1) {
                 Parrot_io_eprintf(interp, "%S\n", message);
             }
