@@ -316,6 +316,8 @@ hello from foo_2
 2 1 1 1
 OUTPUT
 
+TODO: {
+    local $TODO = "cannot 'rm' an open file on windows" if $^O eq 'MSWin32';
 pir_output_is( <<"CODE", <<'OUTPUT', "eval.get_string - same file" );
 .sub main :main
 
@@ -356,6 +358,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "eval.get_string - same file" );
 CODE
 hello from foo_1
 OUTPUT
+}
 
 my (undef, $temp_file) = create_tempfile( UNLINK => 1 );
 
