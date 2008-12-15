@@ -112,7 +112,8 @@ to shut down the interpreter cleanly.
 Throw an exception of type C<exception;exit> with a payload of I<EXITCODE>,
 which defaults to zero, as an Integer PMC.
 
-{{NOTE: Exception classes NYI. Currently throws a type based on the EXITCODE.}}
+{{NOTE: Exception classes NYI. Currently throws a type based on the
+EXITCODE.}}
 
 If not handled, this exception results in Parrot returning I<EXITCODE>
 as a status to its embedded environment, or when running standalone,
@@ -236,9 +237,11 @@ Parrot comes with a small hierarchy of classes designed for use as exceptions.
 Parrot throws them when internal Parrot errors occur, but any user code can
 throw them too.
 
-{{NOTE: Currently NYI.  Parrot currently uses integers to represent exception types.}}
+{{NOTE: Currently NYI.  Parrot currently uses integers to represent exception
+types.}}
 
-{{NOTE: Questions about how this interoperates with custom HLL exception classes}}
+{{NOTE: Questions about how this interoperates with custom HLL exception
+classes}}
 
 =over
 
@@ -411,7 +414,8 @@ execution at the opcode immediately after the one that threw the
 exception. Other exceptions at the run-loop level are also generally
 resumable.
 
-{{NOTE: Currently only implemented for the actual throwing opcodes, throw, die, exit.}}
+{{NOTE: Currently only implemented for the actual throwing opcodes, throw,
+die, exit.}}
 
 You resume from an exception by invoking the return continuation stored
 in the 'resume' attribute of the exception.
