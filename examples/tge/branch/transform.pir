@@ -4,7 +4,8 @@ transform - transform a sample tree of Branch and Leaf nodes
 
 =head1 SYNOPSIS
 
-  $ parrot transform.pir branch.g
+  # must be run from this directory ...
+  $ ../../../parrot transform.pir branch.g 
 
 =head1 DESCRIPTION
 
