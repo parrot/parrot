@@ -80,7 +80,7 @@ be removed.
 
 See RT #48014. This will be removed once all core PMCs have been updated.
 
-=item :anon and :vtable named parameters to add_method [post 0.8.2]
+=item * :anon and :vtable named parameters to add_method [post 0.8.2]
 
 If you want to override a vtable method/function when building a Class, then
 use the method C<add_vtable_override> instead of calling C<add_method> with
