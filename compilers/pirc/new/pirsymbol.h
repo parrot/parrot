@@ -38,8 +38,9 @@ typedef struct syminfo {
 typedef struct symbol {
     syminfo        info;
     int            color;
+    /*
     pir_type       type;
-    /* live_interval *interval;
+    live_interval *interval;
     */
 
     char const    *name;  /* name of this symbol */
@@ -54,8 +55,9 @@ typedef struct symbol {
 typedef struct pir_reg {
     syminfo         info;
     int             color;
+    /*
     pir_type        type;
-    /* live_interval  *interval;
+    live_interval  *interval;
     */
     int             regno; /* symbolic (PIR) register number */
 

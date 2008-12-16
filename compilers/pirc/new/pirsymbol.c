@@ -80,9 +80,9 @@ Assign a new register to symbol C<sym>, and create a new live interval for C<sym
 */
 void
 assign_vanilla_register(NOTNULL(lexer_state * const lexer), symbol * const sym) {
-    sym->color    = next_register(lexer, sym->type);
+    sym->color    = next_register(lexer, sym->info.type);
 
-    sym->info.interval = new_live_interval(lexer->lsr, lexer->stmt_counter, sym->type);
+    sym->info.interval = new_live_interval(lexer->lsr, lexer->stmt_counter, sym->info.type);
 
     /* set the reference of the interval to the symbol's color */
     sym->info.interval->color = &sym->color;
@@ -169,7 +169,7 @@ new_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name),
     symbol *sym = pir_mem_allocate_zeroed_typed(lexer, symbol);
     /* XXX remove the next 3 statements */
     sym->name   = name;
-    sym->type   = type;
+
     sym->color  = NO_REG_ALLOCATED;
 
     sym->info.id.name = name;
@@ -227,7 +227,7 @@ declare_local(NOTNULL(lexer_state * const lexer), pir_type type,
             b = new_bucket(lexer);
             bucket_symbol(b) = iter;
             store_bucket(table, b, hash);
-            iter->type  = type;
+            iter->info.type  = type;
         }
 
 
@@ -335,7 +335,7 @@ new_pir_reg(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     pir_reg *r = pir_mem_allocate_zeroed_typed(lexer, pir_reg);
 
     /* XXX remove next 3 statements */
-    r->type    = type;
+
     r->color   = NO_REG_ALLOCATED;
     r->regno   = regno;
 

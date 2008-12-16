@@ -647,12 +647,12 @@ set_param_flag(lexer_state * const lexer, target * const param, target_flag flag
      */
 
     /* :slurpy can only be set on a PMC parameter */
-    if (TEST_FLAG(flag, TARGET_FLAG_SLURPY) && param->s.sym->type != PMC_TYPE)
+    if (TEST_FLAG(flag, TARGET_FLAG_SLURPY) && param->s.sym->info.type != PMC_TYPE)
         yypirerror(lexer->yyscanner, lexer,
                    "cannot set :slurpy flag on non-pmc %s", param->s.sym->name);
 
     /* :opt_flag can only be set on a int parameter */
-    if (TEST_FLAG(flag, TARGET_FLAG_OPT_FLAG) && param->s.sym->type != INT_TYPE)
+    if (TEST_FLAG(flag, TARGET_FLAG_OPT_FLAG) && param->s.sym->info.type != INT_TYPE)
         yypirerror(lexer->yyscanner, lexer,
                    "cannot set :opt_flag flag on non-int %s", param->s.sym->name);
 
@@ -1862,9 +1862,9 @@ arguments_to_operands(lexer_state * const lexer, argument * const args) {
             switch (argvalue->type) {
                 case EXPR_TARGET:
                     if (TEST_FLAG(argvalue->expr.t->flags, TARGET_FLAG_IS_REG))
-                        flag |= argvalue->expr.t->s.reg->type;
+                        flag |= argvalue->expr.t->s.reg->info.type;
                     else
-                        flag |= argvalue->expr.t->s.sym->type;
+                        flag |= argvalue->expr.t->s.sym->info.type;
                     break;
                 case EXPR_CONSTANT:
                     flag |= argvalue->expr.c->type;
