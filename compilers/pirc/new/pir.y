@@ -3299,43 +3299,21 @@ static char *
 write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
     switch (iter->type) {
         case EXPR_TARGET:
-            if (TEST_FLAG(iter->expr.t->flags, TARGET_FLAG_IS_REG))
-                *instr_writer++ = type_codes[iter->expr.t->info->type];
-            else
-                *instr_writer++ = type_codes[iter->expr.t->info->type];
+            *instr_writer++ = type_codes[iter->expr.t->info->type];
 
             if (iter->expr.t->key) {
                 *instr_writer++ = '_';
                 *instr_writer++ = 'k';
-                /* XXX fix this mess. */
+
                 if ((iter->expr.t->key->expr->type == EXPR_TARGET)
-                    &&
-                    (  (iter->expr.t->key->expr->expr.t->flags & TARGET_FLAG_IS_REG)
-                     ?
-                       (iter->expr.t->key->expr->expr.t->info->type == PMC_TYPE)
-                     :
-                       (iter->expr.t->key->expr->expr.t->info->type == PMC_TYPE)
-                    )
-                   ) {
+                &&  (iter->expr.t->key->expr->expr.t->info->type == PMC_TYPE)) {
                     /* the key is a target, and its type is a PMC. In that case, do not
                      * print the signature; 'kp' is not valid.
                      */
                 }
                 else {
-                    if (
-                       (iter->expr.t->key->expr->type == EXPR_TARGET)
-                       &&
-
-
-                       (
-                       (iter->expr.t->key->expr->expr.t->flags & TARGET_FLAG_IS_REG)
-                       ?
-                       (iter->expr.t->key->expr->expr.t->info->type == INT_TYPE)
-                       :
-                       (iter->expr.t->key->expr->expr.t->info->type == INT_TYPE)
-                       )
-                       )
-
+                    if ((iter->expr.t->key->expr->type == EXPR_TARGET)
+                    &&  (iter->expr.t->key->expr->expr.t->info->type == INT_TYPE))
                     {
                        *instr_writer++ = 'i';
                     }

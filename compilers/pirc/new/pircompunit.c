@@ -518,9 +518,8 @@ PARROT_CANNOT_RETURN_NULL
 target *
 target_from_symbol(lexer_state * const lexer, symbol * const sym) {
     target *t  = new_target(lexer);
-    /* t->s.sym   = sym; *//* set a pointer from target to symbol */
-    t->flags   = sym->flags; /* copy the flags */
 
+    t->flags   = sym->flags; /* copy the flags */
     t->info    = &sym->info;
 
     return t;
@@ -1863,10 +1862,7 @@ arguments_to_operands(lexer_state * const lexer, argument * const args) {
 
             switch (argvalue->type) {
                 case EXPR_TARGET:
-                    if (TEST_FLAG(argvalue->expr.t->flags, TARGET_FLAG_IS_REG))
-                        flag |= argvalue->expr.t->info->type;
-                    else
-                        flag |= argvalue->expr.t->info->type;
+                    flag |= argvalue->expr.t->info->type;
                     break;
                 case EXPR_CONSTANT:
                     flag |= argvalue->expr.c->type;

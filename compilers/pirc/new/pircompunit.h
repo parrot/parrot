@@ -195,15 +195,7 @@ typedef struct key {
  * return values, it's a local variable (or register).
  */
 typedef struct target {
-
-    /*
-    union sym_union {
-        struct symbol  *sym;
-        struct pir_reg *reg;
-    } s;
-    */
-
-    struct syminfo *info;
+    struct syminfo *info;           /* pointer to symbol/pir_reg's information */
     target_flag     flags;          /* flags like :slurpy etc. */
     char const     *alias;          /* if this is a named parameter, this is the alias */
     char const     *lex_name;       /* if this is a lexical, this field contains the name */

@@ -5988,43 +5988,21 @@ static char *
 write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
     switch (iter->type) {
         case EXPR_TARGET:
-            if (TEST_FLAG(iter->expr.t->flags, TARGET_FLAG_IS_REG))
-                *instr_writer++ = type_codes[iter->expr.t->info->type];
-            else
-                *instr_writer++ = type_codes[iter->expr.t->info->type];
+            *instr_writer++ = type_codes[iter->expr.t->info->type];
 
             if (iter->expr.t->key) {
                 *instr_writer++ = '_';
                 *instr_writer++ = 'k';
-                /* XXX fix this mess. */
+
                 if ((iter->expr.t->key->expr->type == EXPR_TARGET)
-                    &&
-                    (  (iter->expr.t->key->expr->expr.t->flags & TARGET_FLAG_IS_REG)
-                     ?
-                       (iter->expr.t->key->expr->expr.t->info->type == PMC_TYPE)
-                     :
-                       (iter->expr.t->key->expr->expr.t->info->type == PMC_TYPE)
-                    )
-                   ) {
+                &&  (iter->expr.t->key->expr->expr.t->info->type == PMC_TYPE)) {
                     /* the key is a target, and its type is a PMC. In that case, do not
                      * print the signature; 'kp' is not valid.
                      */
                 }
                 else {
-                    if (
-                       (iter->expr.t->key->expr->type == EXPR_TARGET)
-                       &&
-
-
-                       (
-                       (iter->expr.t->key->expr->expr.t->flags & TARGET_FLAG_IS_REG)
-                       ?
-                       (iter->expr.t->key->expr->expr.t->info->type == INT_TYPE)
-                       :
-                       (iter->expr.t->key->expr->expr.t->info->type == INT_TYPE)
-                       )
-                       )
-
+                    if ((iter->expr.t->key->expr->type == EXPR_TARGET)
+                    &&  (iter->expr.t->key->expr->expr.t->info->type == INT_TYPE))
                     {
                        *instr_writer++ = 'i';
                     }
@@ -6235,9 +6213,8 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
 
             if (sym) {
                 operand->expr.t        = new_target(lexer);
-                //operand->expr.t->s.sym = sym;  /* target's pointer set to symbol */
-                operand->expr.t->info  =
-                &sym->info;
+                /* operand->expr.t->s.sym = sym;  */ /* target's pointer set to symbol */
+                operand->expr.t->info  = &sym->info;
                 operand->type          = EXPR_TARGET; /* convert operand node into EXPR_TARGET */
             }
             else { /* it must be a label */
