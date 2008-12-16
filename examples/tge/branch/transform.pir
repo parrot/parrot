@@ -28,7 +28,7 @@ specified type.
     # Compile a grammar from the source grammar file
     .local pmc grammar
     grammar = new 'TGE'
-    grammar.agcompile(source)
+    grammar.'agcompile'(source)
 
     # Build up the tree for testing
     .local pmc tree
@@ -36,10 +36,10 @@ specified type.
 
     # Apply the grammar to the test tree
     .local pmc AGI
-    AGI = grammar.apply(tree)
+    AGI = grammar.'apply'(tree)
 
     # Retrieve the value of a top level attribute
-    $P4 = AGI.get('gmin')
+    $P4 = AGI.'get'('gmin')
     print "----\nthe global minimum attribute value is: "
     print $P4
     print " of type: "
@@ -48,7 +48,7 @@ specified type.
     print "\n"
 
     # Rerieve the transformed tree
-    $P5 = AGI.get('result')
+    $P5 = AGI.'get'('result')
 #    $S5 = typeof $P5
 #    print $S5
 #    print "\n"
