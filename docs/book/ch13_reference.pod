@@ -1834,17 +1834,6 @@ I<Arguments: SR>
 
 See also: C<unpin>.
 
-=head3 pioctl
-
-X<pioctl opcode (PASM)>
-
-  pioctl R<DEST>, R<PIO>, R<VAL>, R<VAL>
-
-Perform an operation on an IO object. This is a general purpose
-hook for setting various flags, modes, etc.
-
-I<Arguments: IR, P, I, I>
-
 =head3 pop
 
 X<pop opcode (PASM)>
