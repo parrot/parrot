@@ -80,12 +80,12 @@ Assign a new register to symbol C<sym>, and create a new live interval for C<sym
 */
 void
 assign_vanilla_register(NOTNULL(lexer_state * const lexer), symbol * const sym) {
-    sym->color    = next_register(lexer, sym->info.type);
+    sym->info.color    = next_register(lexer, sym->info.type);
 
     sym->info.interval = new_live_interval(lexer->lsr, lexer->stmt_counter, sym->info.type);
 
     /* set the reference of the interval to the symbol's color */
-    sym->info.interval->color = &sym->color;
+    sym->info.interval->color = &sym->info.color;
 
     /* mark the interval, so that its register is not reused, if the :unique_reg
      * flag was set.
@@ -169,8 +169,6 @@ new_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name),
     symbol *sym = pir_mem_allocate_zeroed_typed(lexer, symbol);
     /* XXX remove the next 3 statements */
     sym->name   = name;
-
-    sym->color  = NO_REG_ALLOCATED;
 
     sym->info.id.name = name;
     sym->info.type    = type;
@@ -260,7 +258,7 @@ check_unused_symbols(NOTNULL(lexer_state * const lexer)) {
         for (i = 0; i < symbols->size; i++) {
             bucket *b = get_bucket(symbols, i);
             while (b) {
-                if (bucket_symbol(b)->color == NO_REG_ALLOCATED)
+                if (bucket_symbol(b)->info.color == NO_REG_ALLOCATED)
                     fprintf(stderr, "Warning: in sub '%s': symbol '%s' declared but not used\n",
                                     subiter->sub_name, bucket_symbol(b)->name);
 
@@ -298,7 +296,7 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
         symbol *sym = bucket_symbol(buck);
 
         if (STREQ(sym->name, name)) {
-            if (sym->color == NO_REG_ALLOCATED)  /* no PASM register assigned yet */
+            if (sym->info.color == NO_REG_ALLOCATED)  /* no PASM register assigned yet */
                 /* get a new reg from vanilla reg. allocator */
                 assign_vanilla_register(lexer, sym);
             else  /* update end point of interval */
@@ -335,8 +333,6 @@ new_pir_reg(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     pir_reg *r = pir_mem_allocate_zeroed_typed(lexer, pir_reg);
 
     /* XXX remove next 3 statements */
-
-    r->color   = NO_REG_ALLOCATED;
     r->regno   = regno;
 
     r->info.type     = type;
@@ -408,12 +404,12 @@ use_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno, int p
     /* create a new node representing this PIR register */
     reg = new_pir_reg(lexer, type, regno);
     /* get a new PASM register for this PIR register. */
-    reg->color = pasmregno;
+    reg->info.color = pasmregno;
 
     /* create a new live interval for this symbolic register */
     reg->info.interval = new_live_interval(lexer->lsr, lexer->stmt_counter, type);
     /* let the interval have a pointer to this symbolic register */
-    reg->info.interval->color = &reg->color;
+    reg->info.interval->color = &reg->info.color;
 
 
     /* link this register into the list of "colored" registers; each of
@@ -443,7 +439,7 @@ use_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno, int p
     **/
 
     /* return newly allocated register */
-    return reg->color;
+    return reg->info.color;
 }
 
 
@@ -474,7 +470,7 @@ color_reg(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     if (reg) {
         /* update end point of interval */
         reg->info.interval->endpoint = lexer->stmt_counter;
-        return reg->color;
+        return reg->info.color;
     }
 
     if (TEST_FLAG(lexer->flags, LEXER_FLAG_PASMFILE)) { /* PASM mode */

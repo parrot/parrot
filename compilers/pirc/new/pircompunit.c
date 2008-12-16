@@ -2087,7 +2087,7 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
 
             /* if the target is a register, invoke that. */
             if (TEST_FLAG(inv->sub->flags, TARGET_FLAG_IS_REG)) {
-                target *sub = new_reg(lexer, PMC_TYPE, inv->sub->s.reg->color);
+                target *sub = new_reg(lexer, PMC_TYPE, inv->sub->s.reg->info.color);
                 if (inv->retcc) { /* return continuation present? */
                     new_sub_instr(lexer, PARROT_OP_invoke_p_p, "invoke_p_p");
                     add_operands(lexer, "%T%T", inv->sub, inv->retcc);
