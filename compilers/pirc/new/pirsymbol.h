@@ -26,6 +26,11 @@ typedef struct syminfo {
     pir_type       type;
     live_interval *interval;
 
+    union sym_id {  /* identification of this symbol/reg */
+        char const *name;
+        int         regno;
+    } id;
+
 } syminfo;
 
 

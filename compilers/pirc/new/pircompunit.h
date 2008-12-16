@@ -196,17 +196,18 @@ typedef struct key {
  */
 typedef struct target {
 
-    union sym_union {
+    union sym_union {                /* XXX this union will be replaced by syminfo */
         struct symbol  *sym;
         struct pir_reg *reg;
     } s;
 
-    target_flag    flags;          /* flags like :slurpy etc. */
-    char const    *alias;          /* if this is a named parameter, this is the alias */
-    char const    *lex_name;       /* if this is a lexical, this field contains the name */
-    struct key    *key;            /* the key of this target, i.e. $P0[$P1], $P1 is key. */
+    struct syminfo *syminfo;
+    target_flag     flags;          /* flags like :slurpy etc. */
+    char const     *alias;          /* if this is a named parameter, this is the alias */
+    char const     *lex_name;       /* if this is a lexical, this field contains the name */
+    struct key     *key;            /* the key of this target, i.e. $P0[$P1], $P1 is key. */
 
-    struct target *next;
+    struct target  *next;
 
 } target;
 
