@@ -22,8 +22,6 @@ Tests the I/O Iterator PMC described in PDD22.
 
 =cut
 
-# RT #46849 create helper functions to put data in an i/o pmc
-
 # L<PDD22/I\/O Iterator PMC API/=item new>
 pir_output_is( <<'CODE', <<'OUT', 'new', todo => 'not yet implemented' );
 .sub 'test' :main
