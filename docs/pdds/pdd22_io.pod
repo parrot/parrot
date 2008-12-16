@@ -492,8 +492,7 @@ string of bytes.
   $P0 = readline $P1, $P2
 
 Retrieves a single line from a stream into a string. Calling
-C<readline> flags the stream as operating in line-buffer mode (see
-C<pioctl> below).
+C<readline> flags the stream as operating in line-buffer mode.
 
 The asynchronous version takes an additional final PMC callback
 argument, and only returns a status object. When the readline operation
@@ -572,52 +571,6 @@ This opcode is inherently synchronous (poll is "synchronous I/O
 multiplexing"), but it can retrieve status information from a stream or
 socket object whether the object is being used synchronously or
 asynchronously.
-
-=back
-
-=head3 Deprecated opcodes
-
-=over
-
-=item *
-
-C<pioctl> provides low-level access to the attributes of a stream
-object. It takes a stream object, an integer flag to select a command,
-and a single integer argument for the command. It returns an integer
-indicating the success or failure of the command.
-
-This opcode has been replaced with methods on the FileHandle object, but
-is kept here for reference. See RT #48589
-
-The following constants are defined for the commands that C<pioctl> can
-execute:
-
-  0    PIOCTL_CMDRESERVED
-           No documentation available.
-  1    PIOCTL_CMDSETRECSEP
-           Set the record separator. [This doesn't actually work at the
-           moment.]
-  2    PIOCTL_CMDGETRECSEP
-           Get the record separator.
-  3    PIOCTL_CMDSETBUFTYPE
-           Set the buffer type.
-  4    PIOCTL_CMDGETBUFTYPE
-           Get the buffer type
-  5    PIOCTL_CMDSETBUFSIZE
-           Set the buffer size.
-  6    PIOCTL_CMDGETBUFSIZE
-           Get the buffer size.
-
-The following constants are defined as argument/return values for the
-buffer-type commands:
-
-  0    PIOCTL_NONBUF
-           Unbuffered I/O. Bytes are sent as soon as possible.
-  1    PIOCTL_LINEBUF
-           Line buffered I/O. Bytes are sent when a newline is
-           encountered.
-  2    PIOCTL_BLKBUF
-           Fully buffered I/O. Bytes are sent when the buffer is full.
 
 =back
 
