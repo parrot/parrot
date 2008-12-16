@@ -35,10 +35,6 @@ See RT #47011.
 
 =over 4
 
-=item * C<pioctl> [post 0.5.1]
-
-See RT #48589.
-
 =item * C<store_global> [post 0.5.0]
 
 See RT #48016. Replace usage with set_[hll,root]_global variants.
