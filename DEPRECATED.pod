@@ -64,6 +64,12 @@ The C<open> opcode will change from Perl-style mode-strings to 'r' for read,
 
 These opcodes were only used by the old MMD system. See TT #7.
 
+=item * C<slice> [post 0.8.2]
+
+The C<slice> opcode's implementation is experimental. Its use cases and
+implementation should be reconsidered. The current implementation will
+be removed.
+
 =back
 
 =head1 Class Features
@@ -85,6 +91,14 @@ one or both of these flags.
 =head1 PIR syntax
 
 =over 4
+
+=item * String indexing [post 0.8.2]
+
+String indexing sugar is deprecated. This means you can no longer write
+
+  $S0[1]
+
+to mean substr, $S0, 1, 1. Use the C<substr> op instead.
 
 =item * C<.namespace [ "a" .. "b" ]> [post 0.5.0]
 
