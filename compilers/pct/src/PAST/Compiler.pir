@@ -96,10 +96,41 @@ any value type.
     ##  type of exception handler we support
     .local pmc controltypes
     controltypes = new 'Hash'
-    $P0 = split ' ', '.CONTROL_RETURN .CONTROL_OK .CONTROL_BREAK .CONTROL_CONTINUE .CONTROL_ERROR .CONTROL_TAKE .CONTROL_LOOP_NEXT .CONTROL_LOOP_LAST .CONTROL_LOOP_REDO'
+    $P0 = new 'ResizablePMCArray'
+    $P0.'push'(.CONTROL_RETURN)
+    $P0.'push'(.CONTROL_OK)
+    $P0.'push'(.CONTROL_BREAK)
+    $P0.'push'(.CONTROL_CONTINUE)
+    $P0.'push'(.CONTROL_ERROR)
+    $P0.'push'(.CONTROL_TAKE)
+    $P0.'push'(.CONTROL_LOOP_NEXT)
+    $P0.'push'(.CONTROL_LOOP_LAST)
+    $P0.'push'(.CONTROL_LOOP_REDO)
     controltypes['CONTROL']   = $P0
-    $P0 = split ' ', '.CONTROL_TAKE'
+    $P0 = new 'ResizablePMCArray'
+    $P0.'push'(.CONTROL_TAKE)
     controltypes['GATHER']   = $P0
+    $P0 = new 'ResizablePMCArray'
+    $P0.'push'(.CONTROL_OK)
+    controltypes['OK'] = $P0
+    $P0 = new 'ResizablePMCArray'
+    $P0.'push'(.CONTROL_BREAK)
+    controltypes['BREAK'] = $P0
+    $P0 = new 'ResizablePMCArray'
+    $P0.'push'(.CONTROL_CONTINUE)
+    controltypes['CONTINUE'] = $P0
+    $P0 = new 'ResizablePMCArray'
+    $P0.'push'(.CONTROL_ERROR)
+    controltypes['ERROR'] = $P0
+    $P0 = new 'ResizablePMCArray'
+    $P0.'push'(.CONTROL_LOOP_NEXT)
+    controltypes['NEXT'] = $P0
+    $P0 = new 'ResizablePMCArray'
+    $P0.'push'(.CONTROL_LOOP_LAST)
+    controltypes['LAST'] = $P0
+    $P0 = new 'ResizablePMCArray'
+    $P0.'push'(.CONTROL_LOOP_REDO)
+    controltypes['REDO'] = $P0
     set_global '%!controltypes', controltypes
 
     $P0 = new 'CodeString'
