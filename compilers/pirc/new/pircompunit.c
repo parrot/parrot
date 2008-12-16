@@ -56,9 +56,6 @@ Function to emit a final last cry that something's wrong and exit.
 =cut
 
 */
-/*
-PARROT_DOES_NOT_RETURN
-*/
 void
 panic(lexer_state * lexer, char const * const message) {
     fprintf(stderr, "Fatal: %s\n", message);
@@ -283,7 +280,7 @@ new_subr(lexer_state * const lexer, char const * const subname) {
     init_hashtable(lexer, &newsub->symbols, HASHTABLE_SIZE_INIT);
     init_hashtable(lexer, &newsub->labels, HASHTABLE_SIZE_INIT);
 
-    for (index = 0; index < 4; index++) { /* 4 is the number of Parrot types. */
+    for (index = 0; index < NUM_PARROT_TYPES; ++index) {
         newsub->registers[index] = NULL; /* set all "register" tables to NULL */
         newsub->regs_used[index] = 0;    /* set all register counts to 0 */
     }
@@ -1651,7 +1648,10 @@ push_operand(lexer_state * const lexer, NOTNULL(expression * const operand)) {
 =item C<void
 remove_all_operands(lexer_state * const lexer)>
 
-Remove all operands of the current instruction.
+Remove all operands of the current instruction. This is done
+by simply setting the pointer to the operands to NULL; all
+memory for the operands is allocated through PIRC memory
+functions, which is automatically freed after compilation.
 
 =cut
 
@@ -1668,6 +1668,7 @@ remove_all_operands(NOTNULL(lexer_state * const lexer)) {
 expr_from_key(key * const k)>
 
 Wraps the key C<k> in an C<expression> node and returns that.
+The returned expression node has type EXPR_KEY.
 
 =cut
 
@@ -2360,11 +2361,10 @@ emit_sub_leaving_instructions(lexer_state * const lexer) {
 close_sub(lexer_state * const lexer)>
 
 Finalize the subroutine. Generate the final instructions in the current
-subroutine; if the C<:main> flag was set on the subroutine, this is the
-C<end> instruction; otherwise, a I<normal> C<return> sequence is generated.
-
-Then, all local labels are fixed up; i.e., all label identifiers are converted
-into their offsets.
+subroutine, if needed. Then, all local labels are fixed up; i.e., all
+label identifiers are converted into their offsets. The endoffset of this
+subroutine is stored.
+If register optimization was requested, this is invoked here.
 
 =cut
 
@@ -2404,7 +2404,7 @@ close_sub(lexer_state * const lexer) {
 /*
 
 =item C<void
-update_sub_register_usage(lexer_state * const lexer, unsigned reg_usage[4])>
+update_sub_register_usage(lexer_state * const lexer, unsigned reg_usage[NUM_PARROT_TYPES])>
 
 Update register usage for the current subroutine with the register usage
 information in C<reg_usage>.
@@ -2413,9 +2413,9 @@ information in C<reg_usage>.
 
 */
 void
-update_sub_register_usage(lexer_state * const lexer, unsigned reg_usage[4]) {
+update_sub_register_usage(lexer_state * const lexer, unsigned reg_usage[NUM_PARROT_TYPES]) {
     int i;
-    for (i = 0; i < 4; ++i)
+    for (i = 0; i < NUM_PARROT_TYPES; ++i)
         CURRENT_SUB(lexer)->regs_used[i] = reg_usage[i];
 }
 
