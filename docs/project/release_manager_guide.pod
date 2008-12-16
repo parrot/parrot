@@ -172,6 +172,10 @@ See also L<Appendix 1|"Appendix 1 - Releasing from a branch"> below.
 
 =item 8.
 
+=over 4
+
+=item a. CPAN
+
 In PAUSE, assign yourself co-maintainer permissions on all modules owned by
 PARROTRE.
 
@@ -188,6 +192,29 @@ added in this release will list your PAUSE ID as the "owner". Change the owner
 to PARROTRE.
 
 See F<docs/project/pause_guide.pod> for more details.
+
+=item b. FTP
+
+SSH to ftp-osl.osuosl.org. (If you don't have the necessary login information,
+get it from one of the previous release managers.)
+
+Make a new directory for the new release named "a.b.c" after the version
+number. If the release is in the stable series (1.0, 1.5, 2.0, 2.5, etc) create
+the new directory in F<ftp/releases/stable>, if the release is a monthly
+release between stable versions, create the directory in F<ftp/releases/devel>.
+
+Copy the tarball into the new directory. (Using C<scp> or C<wget> or whatever
+tool you prefer.)
+
+When you're finished making changes, run the trigger script to push the changes
+out to the FTP mirrors.
+
+  ~/trigger-parrot
+
+Check your changes at F<ftp://ftp.parrot.org/pub/parrot/releases>. It should
+only take a few minutes for the mirrors to sync.
+
+=back
 
 =item 9.
 
@@ -237,9 +264,9 @@ are checked.
 
 =item e
 
-Send an email to webmaster@parrotcode.org requesting that they update the
-C</.htredirects> file for release/devel to point to the proper CPAN URL. [This
-step will change in the near future.]
+Under "Administer" -> "Site building" -> "URL Redirects", change the URL for
+"release/current" to the FTP directory for the new release (for example,
+F<ftp://ftp.parrot.org/pub/parrot/releases/devel/0.8.1>).
 
 =back
 
