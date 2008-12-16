@@ -78,13 +78,13 @@ Initializes a newly created FileHandle object.
 
         /* Initialize the os_handle to the platform-specific value for closed. */
 #ifdef PIO_OS_WIN32
-        data_struct->os_handle    = (PIOHANDLE)INVALID_HANDLE_VALUE;
+    data_struct->os_handle    = (PIOHANDLE)INVALID_HANDLE_VALUE;
 #endif
 #ifdef PIO_OS_UNIX
-        data_struct->os_handle    = (PIOHANDLE)-1;
+    data_struct->os_handle    = (PIOHANDLE)-1;
 #endif
 #ifdef PIO_OS_STDIO
-        data_struct->os_handle    = (PIOHANDLE)NULL;
+    data_struct->os_handle    = (PIOHANDLE)NULL;
 #endif
 
         PObj_custom_mark_SET(SELF);
