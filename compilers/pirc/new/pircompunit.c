@@ -444,9 +444,9 @@ targets_equal(target const * const left, target const * const right) {
 
     if (TEST_FLAG(left->flags, TARGET_FLAG_IS_REG)) {      /* if left is a reg */
         if (TEST_FLAG(right->flags, TARGET_FLAG_IS_REG)) { /* then right must be a reg */
-            if ((left->s.reg->type == right->s.reg->type)        /* types must match */
-            &&  (left->s.reg->regno == right->s.reg->regno           /* PIR regno must match */
-            &&  (left->s.reg->color == right->s.reg->color)))    /* PASM regno must match */
+            if ((left->info->type  == right->info->type)       /* types must match */
+            &&  (left->info->id.regno == right->info->id.regno /* PIR regno must match */
+            &&  (left->info->color == right->info->color)))    /* PASM regno must match */
                 return TRUE;
         }
         else /* left is a reg, right is not */
@@ -456,8 +456,8 @@ targets_equal(target const * const left, target const * const right) {
     else { /* left is not a reg */
 
         if (!TEST_FLAG(right->flags, TARGET_FLAG_IS_REG)  /* right must not be a reg */
-        && (left->s.sym->name && right->s.sym->name       /* both must have a name */
-        && STREQ(left->s.sym->name, right->s.sym->name))) /* and they must be equal */
+        && (left->info->id.name && right->info->id.name       /* both must have a name */
+        && STREQ(left->info->id.name, right->info->id.name))) /* and they must be equal */
             return TRUE;
     }
 
@@ -520,6 +520,8 @@ target_from_symbol(lexer_state * const lexer, symbol * const sym) {
     target *t  = new_target(lexer);
     t->s.sym   = sym; /* set a pointer from target to symbol */
     t->flags   = sym->flags; /* copy the flags */
+
+    t->info    = &sym->info;
 
     return t;
 }

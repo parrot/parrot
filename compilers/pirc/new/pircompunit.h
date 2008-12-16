@@ -201,7 +201,7 @@ typedef struct target {
         struct pir_reg *reg;
     } s;
 
-    struct syminfo *syminfo;
+    struct syminfo *info;
     target_flag     flags;          /* flags like :slurpy etc. */
     char const     *alias;          /* if this is a named parameter, this is the alias */
     char const     *lex_name;       /* if this is a lexical, this field contains the name */

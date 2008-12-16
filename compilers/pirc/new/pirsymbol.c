@@ -167,9 +167,14 @@ PARROT_CANNOT_RETURN_NULL
 symbol *
 new_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name), pir_type type) {
     symbol *sym = pir_mem_allocate_zeroed_typed(lexer, symbol);
+    /* XXX remove the next 3 statements */
     sym->name   = name;
     sym->type   = type;
     sym->color  = NO_REG_ALLOCATED;
+
+    sym->info.id.name = name;
+    sym->info.type    = type;
+    sym->info.color   = NO_REG_ALLOCATED;
 
     sym->next   = NULL;
     return sym;
@@ -329,10 +334,15 @@ static pir_reg *
 new_pir_reg(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     pir_reg *r = pir_mem_allocate_zeroed_typed(lexer, pir_reg);
 
+    /* XXX remove next 3 statements */
     r->type    = type;
     r->color   = NO_REG_ALLOCATED;
-
     r->regno   = regno;
+
+    r->info.type     = type;
+    r->info.color    = NO_REG_ALLOCATED;
+    r->info.id.regno = regno;
+
     r->next    = NULL;
 
     return r;
