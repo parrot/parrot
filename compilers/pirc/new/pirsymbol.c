@@ -167,8 +167,6 @@ PARROT_CANNOT_RETURN_NULL
 symbol *
 new_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name), pir_type type) {
     symbol *sym = pir_mem_allocate_zeroed_typed(lexer, symbol);
-    /* XXX remove the next 3 statements */
-    sym->name   = name;
 
     sym->info.id.name = name;
     sym->info.type    = type;
@@ -203,7 +201,7 @@ declare_local(NOTNULL(lexer_state * const lexer), pir_type type,
     /* store all symbols in the list and set the type on each symbol. */
     while (iter != NULL) {
 
-        unsigned long hash = get_hashcode(iter->name, table->size);
+        unsigned long hash = get_hashcode(iter->info.id.name, table->size);
 
         /* look up this symbol; if it exists already, that's an error.
          * don't use find_symbol, as that will update the live_interval of the symbol.
@@ -213,8 +211,9 @@ declare_local(NOTNULL(lexer_state * const lexer), pir_type type,
         bucket *b = get_bucket(table, hash);
         while (b) {
             symbol *s = bucket_symbol(b);
-            if (STREQ(s->name, iter->name)) {
-                yypirerror(lexer->yyscanner, lexer, "symbol '%s' already declared", iter->name);
+            if (STREQ(s->info.id.name, iter->info.id.name)) {
+                yypirerror(lexer->yyscanner, lexer, "symbol '%s' already declared",
+                iter->info.id.name);
                 break; /* out of the loop */
             }
             b = b->next;
@@ -260,7 +259,7 @@ check_unused_symbols(NOTNULL(lexer_state * const lexer)) {
             while (b) {
                 if (bucket_symbol(b)->info.color == NO_REG_ALLOCATED)
                     fprintf(stderr, "Warning: in sub '%s': symbol '%s' declared but not used\n",
-                                    subiter->sub_name, bucket_symbol(b)->name);
+                                    subiter->sub_name, bucket_symbol(b)->info.id.name);
 
                 b = b->next;
             }
@@ -295,7 +294,7 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
     while (buck) {
         symbol *sym = bucket_symbol(buck);
 
-        if (STREQ(sym->name, name)) {
+        if (STREQ(sym->info.id.name, name)) {
             if (sym->info.color == NO_REG_ALLOCATED)  /* no PASM register assigned yet */
                 /* get a new reg from vanilla reg. allocator */
                 assign_vanilla_register(lexer, sym);
@@ -304,7 +303,7 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
 
 
             if (TEST_FLAG(lexer->flags, LEXER_FLAG_VERBOSE))
-                fprintf(stderr, "live range of variable %s: (%d, %d)\n", sym->name,
+                fprintf(stderr, "live range of variable %s: (%d, %d)\n", sym->info.id.name,
                         sym->info.interval->startpoint, sym->info.interval->endpoint);
 
             return sym;
@@ -331,9 +330,6 @@ PARROT_CANNOT_RETURN_NULL
 static pir_reg *
 new_pir_reg(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     pir_reg *r = pir_mem_allocate_zeroed_typed(lexer, pir_reg);
-
-    /* XXX remove next 3 statements */
-    r->regno   = regno;
 
     r->info.type     = type;
     r->info.color    = NO_REG_ALLOCATED;
@@ -363,7 +359,7 @@ find_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
      */
     pir_reg *iter = CURRENT_SUB(lexer)->registers[type];
     while (iter != NULL) {
-        if (iter->regno == regno) {
+        if (iter->info.id.regno == regno) {
             /* update the end point of this register's live interval */
             iter->info.interval->endpoint = lexer->stmt_counter;
             return iter;

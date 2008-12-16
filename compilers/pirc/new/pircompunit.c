@@ -649,12 +649,12 @@ set_param_flag(lexer_state * const lexer, target * const param, target_flag flag
     /* :slurpy can only be set on a PMC parameter */
     if (TEST_FLAG(flag, TARGET_FLAG_SLURPY) && param->s.sym->info.type != PMC_TYPE)
         yypirerror(lexer->yyscanner, lexer,
-                   "cannot set :slurpy flag on non-pmc %s", param->s.sym->name);
+                   "cannot set :slurpy flag on non-pmc %s", param->s.sym->info.id.name);
 
     /* :opt_flag can only be set on a int parameter */
     if (TEST_FLAG(flag, TARGET_FLAG_OPT_FLAG) && param->s.sym->info.type != INT_TYPE)
         yypirerror(lexer->yyscanner, lexer,
-                   "cannot set :opt_flag flag on non-int %s", param->s.sym->name);
+                   "cannot set :opt_flag flag on non-int %s", param->s.sym->info.id.name);
 
     return param;
 }
@@ -2099,7 +2099,7 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
             }
             else { /* find the global label in the current file, or find it during runtime */
                 target *sub        = generate_unique_pir_reg(lexer, PMC_TYPE);
-                global_label *glob = find_global_label(lexer, inv->sub->s.sym->name);
+                global_label *glob = find_global_label(lexer, inv->sub->s.sym->info.id.name);
 
                 if (glob) {
                     /* XXX fix pmc const stuff */
@@ -2110,7 +2110,7 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
                     new_sub_instr(lexer, PARROT_OP_find_sub_not_null_p_sc,
                                   "find_sub_not_null_p_sc");
 
-                    add_operands(lexer, "%T%s", sub, inv->sub->s.sym->name);
+                    add_operands(lexer, "%T%s", sub, inv->sub->s.sym->info.id.name);
 
                     /* save the current instruction in a list; entries in this list will be
                      * fixed up, if possible, after the parsing phase.
@@ -2127,7 +2127,8 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
                      *   find_sub_not_null_p_sc
                      *
                      */
-                    save_global_reference(lexer, CURRENT_INSTRUCTION(lexer), inv->sub->s.sym->name);
+                    save_global_reference(lexer, CURRENT_INSTRUCTION(lexer),
+                                          inv->sub->s.sym->info.id.name);
                 }
 
                 new_sub_instr(lexer, PARROT_OP_invokecc_p, "invokecc_p");

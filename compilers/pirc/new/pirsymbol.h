@@ -41,9 +41,9 @@ typedef struct symbol {
     int            color;
     pir_type       type;
     live_interval *interval;
+    char const    *name;
     */
 
-    char const    *name;  /* name of this symbol */
     target_flag    flags;
 
     struct symbol *next;
@@ -58,8 +58,8 @@ typedef struct pir_reg {
     int             color;
     pir_type        type;
     live_interval  *interval;
+    int             regno;
     */
-    int             regno; /* symbolic (PIR) register number */
 
     struct pir_reg *next;
 

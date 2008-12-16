@@ -3040,7 +3040,7 @@ yyreduce:
                                if ((yyvsp[(1) - (2)].targ)->s.sym->info.type != PMC_TYPE)
                                    yypirerror(yyscanner, lexer,
                                            "indexed object '%s' is not of type 'pmc'",
-                                           (yyvsp[(1) - (2)].targ)->s.sym->name);
+                                           (yyvsp[(1) - (2)].targ)->s.sym->info.id.name);
 
                                /* create a target node based on the symbol node;
                                 * sym already has a PASM register, so through
@@ -3756,7 +3756,7 @@ yyreduce:
 
                               if ((yyvsp[(4) - (5)].targ)->s.sym->info.type != PMC_TYPE) /* a .lex must be a PMC */
                                   yypirerror(yyscanner, lexer, "lexical '%s' must be of type 'pmc'",
-                                             (yyvsp[(4) - (5)].targ)->s.sym->name);
+                                             (yyvsp[(4) - (5)].targ)->s.sym->info.id.name);
                           }
                           set_lex_flag((yyvsp[(4) - (5)].targ), (yyvsp[(2) - (5)].sval));
                         ;}
@@ -3893,14 +3893,14 @@ yyreduce:
                              }
                              else { /* is not a register but a symbol */
 
-                                 symbol *sym = find_symbol(lexer, (yyvsp[(1) - (4)].targ)->s.sym->name);
+                                 symbol *sym = find_symbol(lexer, (yyvsp[(1) - (4)].targ)->s.sym->info.id.name);
                                  if (sym == NULL)
                                      yypirerror(yyscanner, lexer,
-                                             "symbol '%s' was not declared", (yyvsp[(1) - (4)].targ)->s.sym->name);
+                                             "symbol '%s' was not declared", (yyvsp[(1) - (4)].targ)->s.sym->info.id.name);
                                  else if ((yyvsp[(1) - (4)].targ)->s.sym->info.type != PMC_TYPE)
                                      yypirerror(yyscanner, lexer,
                                              "cannot invoke method: '%s' is not of type 'pmc'",
-                                             (yyvsp[(1) - (4)].targ)->s.sym->name);
+                                             (yyvsp[(1) - (4)].targ)->s.sym->info.id.name);
 
                                  /* get a target based on the symbol, it contains a register */
                                  invocant = (yyvsp[(1) - (4)].targ);
