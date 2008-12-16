@@ -434,7 +434,9 @@ the constant table of the bytecode file.  This makes it possible to build
 constants at compile time, provided that (a) the generated constant can be
 computed at compile time (i.e. doesn't depend on the runtime environment), and
 (b) the constant value is of a PMC class that supports saving in a bytecode
-file [need a freeze/thaw reference].
+file.
+
+{{ TODO: need a freeze/thaw reference }}.
 
 For example, C<examples/shootout/revcomp.pir> contains the following (slightly
 abbreviated) definition:
@@ -735,13 +737,15 @@ C<&>, C<|>, C<~>, C<E<lt>E<lt>>, C<E<gt>E<gt>> or C<E<gt>E<gt>E<gt>>.
 A keyed C<set> operation for PMCs or a substring operation for string
 arguments and an integer key.
 
-{{ DEPRECATION NOTE: Possibly deprecate the substring variant. }}
+{{ DEPRECATION NOTE: The substring operation for string arguments is
+   deprecated, and will be removed after the 0.8.2 release. }}
 
 =item <var> = <var> [ <key> ]
 
 {{ NOTE: keyed assignment is still valid in PIR, but the C<..> notation in
 keys is deprecated [See RT #48561], so this syntactic sugar for slices is also
-deprecated. See the (currently experimental) C<slice> opcode instead. }}
+deprecated. See the (currently experimental) C<slice> opcode instead, but
+this, too, is deprecated. }}
 
 where C<key> is:
 
@@ -944,16 +948,17 @@ written as:
 
 can also be expanded by writing either C<.foo> or C<.foo()>.
 
-{{ NOTE: this is a change from the current implementation, which requires the
-definition and call of a zero-parameter macro to match in the use of
-parentheses. }}
+B<Note: IMCC requires you to write parentheses if the macro was declared with
+(empty) parentheses. Likewise, when no parentheses were written (implying an
+empty parameter list), no parentheses may be used in the expansion.>
 
 =over
 
 =item * Heredoc arguments
 
-Heredoc arguments are not allowed when expanding a macro. This means that
-the following is not allowed:
+Heredoc arguments are not allowed when expanding a macro. The next
+implementation of PIR ("PIRC") will be able to handle this correctly.
+This means that, currently, when using IMCC, the following is not allowed:
 
    .macro foo(bar)
    ...
@@ -965,9 +970,6 @@ the following is not allowed:
 
  EOS
 
-{{ NOTE: This is because the parsing of heredocs happens later than the
-preprocessing of macros. Might be nice if we could parse heredocs at the macro
-level, but not a high priority. compilers/pirc/new can do this. }}
 
 Using braces, { }, allows you to span multiple lines for an argument.
 See runtime/parrot/include/hllmacros.pir for examples and possible usage.
@@ -1015,6 +1017,8 @@ the value of a macro parameter, like so:
 
 
 =head3 Unique local variables
+
+B<Note: this is not yet implemented in IMCC>.
 
 Within the macro body, the user can declare a local variable with a unique
 name.
@@ -1123,62 +1127,73 @@ C<.macro_local> instead of C<.local> to take advantage of the name munging.
 
 =head2 Subroutine Definition
 
-  .sub _sub_label [<subflag>]*
-   .param int a
-   .param int b
-   .param int c
-  ...
-  .begin_return
-   .set_return xy
-  .end_return
-  ...
-  .end
+A simple subroutine, marked with C<:main>, indicating it's the entry point
+in the file. Other sub flags include C<:load>, C<:init>, etc.
+
+    .sub sub_label :main
+      .param int a
+      .param int b
+      .param int c
+
+      .begin_return
+        .set_return xy
+      .end_return
+
+    .end
 
 =head2 Subroutine Call
 
-  .const "Sub" $P0 = "_sub_label"
-  $P1 = new 'Continuation'
-  set_addr $P1, ret_addr
-  ...
-  .local int x
-  .local num y
-  .local str z
-  .begin_call
-  .set_arg x
-  .set_arg y
-  .set_arg z
-  .call $P0, $P1    # r = _sub_label(x, y, z)
+Invocation of a subroutine. In this case a continuation subroutine is
+created.
+
+    .const "Sub" $P0 = "sub_label"
+    $P1 = new 'Continuation'
+    set_addr $P1, ret_addr
+    # ...
+    .local int x
+    .local num y
+    .local string z
+    .begin_call
+      .set_arg x
+      .set_arg y
+      .set_arg z
+      .call $P0, $P1    # r = _sub_label(x, y, z)
   ret_addr:
-  .local int r  # optional - new result var
-  .get_result r
-  .end_call
+      .local int r      # optional - new result var
+      .get_result r
+    .end_call
 
 =head2 NCI Call
 
-  load_lib $P0, "libname"
-  dlfunc $P1, $P0, "funcname", "signature"
-  ...
-  .begin_call
-  .set_arg x
-  .set_arg y
-  .set_arg z
-  .nci_call $P1 # r = funcname(x, y, z)
-  .local int r  # optional - new result var
-  .get_result r
-  .end_call
+    load_lib $P0, "libname"
+    dlfunc $P1, $P0, "funcname", "signature"
+    # ...
+    .begin_call
+      .set_arg x
+      .set_arg y
+      .set_arg z
+      .nci_call $P1 # r = funcname(x, y, z)
+      .local int r  # optional - new result var
+      .get_result r
+    .end_call
 
 =head2 Subroutine Call Syntactic Sugar
 
-  ...  # variable decls
-  r = _sub_label(x, y, z)
-  (r1[, r2 ...]) = _sub_label(x, y, z)
-  _sub_label(x, y, z)
+Below there are three different ways to invoke the subroutine C<sub_label>.
+The first retrieves a single return value, the second retrieves 3 return
+values, whereas the last discards any return values.
+
+  .local int r0, r1, r2
+  r0 = sub_label($I0, $I1, $I2)
+  (r0, r1, r2) = sub_label($I0, $I1, $I2)
+  sub_label($I0, $I1, $I2)
 
 This also works for NCI calls, as the subroutine PMC will be
 a NCI sub, and on invocation will do the Right Thing.
+
 Instead of the label a subroutine object can be used too:
 
-   get_global $P0, "_sub_label"
+   get_global $P0, "sub_label"
    $P0(args)
 
 
@@ -1187,16 +1202,16 @@ Instead of the label a subroutine object can be used too:
   .namespace [ "Foo" ]
 
   .sub _sub_label :method [,Subpragma, ...]
-   .param int a
-   .param int b
-   .param int c
-   ...
-   self."_other_meth"()
-  ...
-  .begin_return
-   .set_return xy
-  .end_return
-  ...
+    .param int a
+    .param int b
+    .param int c
+    # ...
+    self."_other_meth"()
+    # ...
+    .begin_return
+    .set_return xy
+    .end_return
+    ...
   .end
 
 The variable "self" automatically refers to the invocating object, if the
@@ -1205,21 +1220,22 @@ subroutine declaration contains "method".
 =head2 Calling Methods
 
 The syntax is very similar to subroutine calls. The call is done with
-C<meth_call> which must immediately be preceded by the C<.invocant>:
+C<.meth_call> which must immediately be preceded by the C<.invocant>:
 
-   .local pmc class
-   .local pmc obj
+   .local int x, y, z
+   .local pmc class, obj
    newclass class, "Foo"
    new obj, class
-  .begin_call
-  .set_arg x
-  .set_arg y
-  .set_arg z
-  .invocant obj
-  .meth_call "_method" [, $P1 ] # r = obj."_method"(x, y, z)
-  .local int r  # optional - new result var
-  .get_result r
-  .end_call
+   .begin_call
+   .set_arg x
+   .set_arg y
+   .set_arg z
+   .invocant obj
+   .meth_call "method" [, $P1 ] # r = obj."method"(x, y, z)
+   .local int r  # optional - new result var
+   .get_result r
+   .end_call
+   ...
 
 The return continuation is optional. The method can be a string
 constant or a string variable.
@@ -1241,40 +1257,6 @@ Similarly, one can yield using the .yield directive
   .yield ()            # yield with no value
 
 
-=head2 Stack calling conventions
-
-Arguments are B<save>d in reverse order onto the user stack:
-
-   .set_arg y   # save args in reversed order
-   .set_arg x
-   call _foo    #(r, s) = _foo(x,y)
-   .local int r
-   .local int s
-   .get_result r    # restore results in order
-   .get_result s    #
-
-and return values are B<restore>d in argument order from there.
-
-
-
- .sub _foo      # sub foo(int a, int b)
-   saveall
-   .param int a         # receive arguments from left to right
-   .param int b
-   ...
-
-   .return mi       # return (pl, mi), push results
-   .return pl       # in reverse order
-   restoreall
-   ret
- .end
-
-Pushing arguments in reversed order on the user stack makes the left
-most argument the top of stack entry. This allows for a variable
-number of function arguments (and return values), where the left most
-argument before a variable number of following arguments is the
-argument count.
-
 =head1 IMPLEMENTATION
 
 There are multiple implementations of PIR, each of which will meet this
@@ -1285,13 +1267,14 @@ implementations:
 
 =item * compilers/imcc
 
-This is the current implementation being used in Parrot.
+This is the current implementation being used in Parrot. Some of the
+specified syntactic constructs in this PDD are not implemented in
+IMCC; these constructs are marked with notes saying so.
 
 =item * compilers/pirc
 
-This is a new implementation which will fix several of
-IMCC's shortcomings. It will replace IMCC in the not too
-distant future.
+This is a new implementation which will fix several of IMCC's
+shortcomings. It will replace IMCC in the not too distant future.
 
 =item * languages/PIR
 
