@@ -196,10 +196,12 @@ typedef struct key {
  */
 typedef struct target {
 
-    union sym_union {                /* XXX this union will be replaced by syminfo */
+    /*
+    union sym_union {
         struct symbol  *sym;
         struct pir_reg *reg;
     } s;
+    */
 
     struct syminfo *info;
     target_flag     flags;          /* flags like :slurpy etc. */

@@ -518,7 +518,7 @@ PARROT_CANNOT_RETURN_NULL
 target *
 target_from_symbol(lexer_state * const lexer, symbol * const sym) {
     target *t  = new_target(lexer);
-    t->s.sym   = sym; /* set a pointer from target to symbol */
+    /* t->s.sym   = sym; *//* set a pointer from target to symbol */
     t->flags   = sym->flags; /* copy the flags */
 
     t->info    = &sym->info;
@@ -595,7 +595,8 @@ add_param(lexer_state * const lexer, pir_type type, char const * const name) {
     assign_vanilla_register(lexer, sym);
 
     /* set a pointer from the target to the symbol object */
-    targ->s.sym = sym;
+    /* targ->s.sym = sym; */
+    targ->info = &sym->info;
 
     return targ;
 }
@@ -647,14 +648,14 @@ set_param_flag(lexer_state * const lexer, target * const param, target_flag flag
      */
 
     /* :slurpy can only be set on a PMC parameter */
-    if (TEST_FLAG(flag, TARGET_FLAG_SLURPY) && param->s.sym->info.type != PMC_TYPE)
+    if (TEST_FLAG(flag, TARGET_FLAG_SLURPY) && param->info->type != PMC_TYPE)
         yypirerror(lexer->yyscanner, lexer,
-                   "cannot set :slurpy flag on non-pmc %s", param->s.sym->info.id.name);
+                   "cannot set :slurpy flag on non-pmc %s", param->info->id.name);
 
     /* :opt_flag can only be set on a int parameter */
-    if (TEST_FLAG(flag, TARGET_FLAG_OPT_FLAG) && param->s.sym->info.type != INT_TYPE)
+    if (TEST_FLAG(flag, TARGET_FLAG_OPT_FLAG) && param->info->type != INT_TYPE)
         yypirerror(lexer->yyscanner, lexer,
-                   "cannot set :opt_flag flag on non-int %s", param->s.sym->info.id.name);
+                   "cannot set :opt_flag flag on non-int %s", param->info->id.name);
 
     return param;
 }
@@ -1363,7 +1364,8 @@ new_reg(lexer_state * const lexer, pir_type type, int regno) {
 
     color_reg(lexer, type, regno);
     reg = find_register(lexer, type, regno);
-    t->s.reg = reg;
+    /* XXX t->s.reg = reg; */
+    t->info = &reg->info;
 
     /* set a flag on this target node saying it's a register */
     SET_FLAG(t->flags, TARGET_FLAG_IS_REG);
@@ -1862,9 +1864,9 @@ arguments_to_operands(lexer_state * const lexer, argument * const args) {
             switch (argvalue->type) {
                 case EXPR_TARGET:
                     if (TEST_FLAG(argvalue->expr.t->flags, TARGET_FLAG_IS_REG))
-                        flag |= argvalue->expr.t->s.reg->info.type;
+                        flag |= argvalue->expr.t->info->type;
                     else
-                        flag |= argvalue->expr.t->s.sym->info.type;
+                        flag |= argvalue->expr.t->info->type;
                     break;
                 case EXPR_CONSTANT:
                     flag |= argvalue->expr.c->type;
@@ -2087,7 +2089,7 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
 
             /* if the target is a register, invoke that. */
             if (TEST_FLAG(inv->sub->flags, TARGET_FLAG_IS_REG)) {
-                target *sub = new_reg(lexer, PMC_TYPE, inv->sub->s.reg->info.color);
+                target *sub = new_reg(lexer, PMC_TYPE, inv->sub->info->color);
                 if (inv->retcc) { /* return continuation present? */
                     new_sub_instr(lexer, PARROT_OP_invoke_p_p, "invoke_p_p");
                     add_operands(lexer, "%T%T", inv->sub, inv->retcc);
@@ -2099,7 +2101,7 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
             }
             else { /* find the global label in the current file, or find it during runtime */
                 target *sub        = generate_unique_pir_reg(lexer, PMC_TYPE);
-                global_label *glob = find_global_label(lexer, inv->sub->s.sym->info.id.name);
+                global_label *glob = find_global_label(lexer, inv->sub->info->id.name);
 
                 if (glob) {
                     /* XXX fix pmc const stuff */
@@ -2110,7 +2112,7 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
                     new_sub_instr(lexer, PARROT_OP_find_sub_not_null_p_sc,
                                   "find_sub_not_null_p_sc");
 
-                    add_operands(lexer, "%T%s", sub, inv->sub->s.sym->info.id.name);
+                    add_operands(lexer, "%T%s", sub, inv->sub->info->id.name);
 
                     /* save the current instruction in a list; entries in this list will be
                      * fixed up, if possible, after the parsing phase.
@@ -2128,7 +2130,7 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
                      *
                      */
                     save_global_reference(lexer, CURRENT_INSTRUCTION(lexer),
-                                          inv->sub->s.sym->info.id.name);
+                                          inv->sub->info->id.name);
                 }
 
                 new_sub_instr(lexer, PARROT_OP_invokecc_p, "invokecc_p");

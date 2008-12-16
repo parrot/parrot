@@ -3037,10 +3037,10 @@ yyreduce:
                            if (TEST_FLAG((yyvsp[(1) - (2)].targ)->flags, TARGET_FLAG_IS_REG))
                                (yyval.targ) = (yyvsp[(1) - (2)].targ);
                            else { /* it's not a register, so it must be a declared symbol */
-                               if ((yyvsp[(1) - (2)].targ)->s.sym->info.type != PMC_TYPE)
+                               if ((yyvsp[(1) - (2)].targ)->info->type != PMC_TYPE)
                                    yypirerror(yyscanner, lexer,
                                            "indexed object '%s' is not of type 'pmc'",
-                                           (yyvsp[(1) - (2)].targ)->s.sym->info.id.name);
+                                           (yyvsp[(1) - (2)].targ)->info->id.name);
 
                                /* create a target node based on the symbol node;
                                 * sym already has a PASM register, so through
@@ -3754,9 +3754,9 @@ yyreduce:
     { /* if $4 is not a register, it must be a declared symbol */
                           if (!TEST_FLAG((yyvsp[(4) - (5)].targ)->flags, TARGET_FLAG_IS_REG)) {
 
-                              if ((yyvsp[(4) - (5)].targ)->s.sym->info.type != PMC_TYPE) /* a .lex must be a PMC */
+                              if ((yyvsp[(4) - (5)].targ)->info->type != PMC_TYPE) /* a .lex must be a PMC */
                                   yypirerror(yyscanner, lexer, "lexical '%s' must be of type 'pmc'",
-                                             (yyvsp[(4) - (5)].targ)->s.sym->info.id.name);
+                                             (yyvsp[(4) - (5)].targ)->info->id.name);
                           }
                           set_lex_flag((yyvsp[(4) - (5)].targ), (yyvsp[(2) - (5)].sval));
                         ;}
@@ -3893,14 +3893,14 @@ yyreduce:
                              }
                              else { /* is not a register but a symbol */
 
-                                 symbol *sym = find_symbol(lexer, (yyvsp[(1) - (4)].targ)->s.sym->info.id.name);
+                                 symbol *sym = find_symbol(lexer, (yyvsp[(1) - (4)].targ)->info->id.name);
                                  if (sym == NULL)
                                      yypirerror(yyscanner, lexer,
-                                             "symbol '%s' was not declared", (yyvsp[(1) - (4)].targ)->s.sym->info.id.name);
-                                 else if ((yyvsp[(1) - (4)].targ)->s.sym->info.type != PMC_TYPE)
+                                             "symbol '%s' was not declared", (yyvsp[(1) - (4)].targ)->info->id.name);
+                                 else if ((yyvsp[(1) - (4)].targ)->info->type != PMC_TYPE)
                                      yypirerror(yyscanner, lexer,
                                              "cannot invoke method: '%s' is not of type 'pmc'",
-                                             (yyvsp[(1) - (4)].targ)->s.sym->info.id.name);
+                                             (yyvsp[(1) - (4)].targ)->info->id.name);
 
                                  /* get a target based on the symbol, it contains a register */
                                  invocant = (yyvsp[(1) - (4)].targ);
@@ -5989,9 +5989,9 @@ write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
     switch (iter->type) {
         case EXPR_TARGET:
             if (TEST_FLAG(iter->expr.t->flags, TARGET_FLAG_IS_REG))
-                *instr_writer++ = type_codes[iter->expr.t->s.reg->info.type];
+                *instr_writer++ = type_codes[iter->expr.t->info->type];
             else
-                *instr_writer++ = type_codes[iter->expr.t->s.sym->info.type];
+                *instr_writer++ = type_codes[iter->expr.t->info->type];
 
             if (iter->expr.t->key) {
                 *instr_writer++ = '_';
@@ -6001,9 +6001,9 @@ write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
                     &&
                     (  (iter->expr.t->key->expr->expr.t->flags & TARGET_FLAG_IS_REG)
                      ?
-                       (iter->expr.t->key->expr->expr.t->s.reg->info.type == PMC_TYPE)
+                       (iter->expr.t->key->expr->expr.t->info->type == PMC_TYPE)
                      :
-                       (iter->expr.t->key->expr->expr.t->s.sym->info.type == PMC_TYPE)
+                       (iter->expr.t->key->expr->expr.t->info->type == PMC_TYPE)
                     )
                    ) {
                     /* the key is a target, and its type is a PMC. In that case, do not
@@ -6019,9 +6019,9 @@ write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
                        (
                        (iter->expr.t->key->expr->expr.t->flags & TARGET_FLAG_IS_REG)
                        ?
-                       (iter->expr.t->key->expr->expr.t->s.reg->info.type == INT_TYPE)
+                       (iter->expr.t->key->expr->expr.t->info->type == INT_TYPE)
                        :
-                       (iter->expr.t->key->expr->expr.t->s.sym->info.type == INT_TYPE)
+                       (iter->expr.t->key->expr->expr.t->info->type == INT_TYPE)
                        )
                        )
 
@@ -6235,7 +6235,9 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
 
             if (sym) {
                 operand->expr.t        = new_target(lexer);
-                operand->expr.t->s.sym = sym;  /* target's pointer set to symbol */
+                //operand->expr.t->s.sym = sym;  /* target's pointer set to symbol */
+                operand->expr.t->info  =
+                &sym->info;
                 operand->type          = EXPR_TARGET; /* convert operand node into EXPR_TARGET */
             }
             else { /* it must be a label */
