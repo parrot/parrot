@@ -1764,6 +1764,12 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
             if (pf->header->wordsize == 8)
                 pos = pf->src + seg->file_offset * 2;
 #endif
+            else
+            {
+                fprintf(stderr, "directory_unpack failed: invalid wordsize %d\n",
+                        pf->header->wordsize);
+                return 0;
+            }
         }
         else
             pos = pf->src + seg->file_offset;
