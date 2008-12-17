@@ -101,10 +101,6 @@ String indexing sugar is deprecated. This means you can no longer write
 
 to mean substr, $S0, 1, 1. Use the C<substr> op instead.
 
-=item * C<.namespace [ "a" .. "b" ]> [post 0.5.0]
-
-See RT #46715.
-
 =item * Assignment syntax with opcodes [post 0.8.2]
 
 See RT #36283.  When the first argument of an opcode is C<OUT>, then
