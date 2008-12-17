@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 23;
 
 =head1 NAME
 
@@ -624,17 +624,6 @@ pir_output_is( <<'CODE', <<'OUT', "get_class retrieves a class object that doesn
 .end
 CODE
 Class isn't defined.
-OUT
-
-pir_error_output_like( <<'CODE', <<'OUT', 'Cannot instantiate class from slice key' );
-.sub 'main' :main
-    $P0 = new 'String'
-    $P0 = "something bad happened"
-    $P1 = new ['parrot','exception'], $P0  # note the comma
-    throw $P1
-.end
-CODE
-/Slice not allowed in namespace/
 OUT
 
 pir_error_output_like(<<'CODE', <<'OUT', 'Instantiate class from invalid key');
