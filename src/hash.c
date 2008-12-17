@@ -1001,7 +1001,8 @@ PARROT_EXPORT
 void
 parrot_new_pointer_hash(PARROT_INTERP, ARGOUT(Hash **hptr))
 {
-    parrot_new_hash_x(interp, hptr, enum_type_ptr, Hash_key_type_ptr, pointer_compare, key_hash_pointer);
+    parrot_new_hash_x(interp, hptr, enum_type_ptr, Hash_key_type_ptr,
+            pointer_compare, key_hash_pointer);
 }
 
 /*
