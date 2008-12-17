@@ -51,7 +51,7 @@ ok( !$d->file_for_perl_module('Parrot::Dummy'), 'Perl module file not there' );
 my %pmc_source_file_directories = map { $_->path => 1 } $d->pmc_source_file_directories();
 
 my @old_directory_list = (
-    'compilers/bcg/src/pmc',   'languages/APL/src/pmc',
+    'languages/APL/src/pmc',
     'languages/WMLScript/pmc',
     'languages/dotnet/pmc',    'languages/lua/src/pmc',
     'languages/perl6/src/pmc',
