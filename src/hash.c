@@ -31,7 +31,7 @@ don't apply.
 
 #define INITIAL_BUCKETS 16
 
-#define N_BUCKETS(n) ((n) - (n)/4)
+#define N_BUCKETS(n) (n)
 #define HASH_ALLOC_SIZE(n) (N_BUCKETS(n) * sizeof (HashBucket) + \
                              (n) * sizeof (HashBucket *))
 
