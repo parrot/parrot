@@ -654,7 +654,7 @@ Creates a clone of the object.
 
         /* See if we have a custom override of the method first. */
         const int num_classes = VTABLE_elements(interp, _class->all_parents);
-        int i;
+        int i, num_attrs;
         for (i = 0; i < num_classes; i++) {
             /* Get the class. */
             PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
@@ -681,6 +681,14 @@ Creates a clone of the object.
         cloned_guts->_class       = obj->_class;
         cloned_guts->attrib_store = VTABLE_clone(INTERP, obj->attrib_store);
         PMC_data(cloned)          = cloned_guts;
+        num_attrs                 = VTABLE_elements(INTERP, cloned_guts->attrib_store);
+        for (i = 0; i < num_attrs; i++) {
+            PMC *to_clone = VTABLE_get_pmc_keyed_int(INTERP, cloned_guts->attrib_store, i);
+            if (!PMC_IS_NULL(to_clone)) {
+                VTABLE_set_pmc_keyed_int(INTERP, cloned_guts->attrib_store, i,
+                        VTABLE_clone(INTERP, to_clone));
+            }
+        }
 
         /* Some of the attributes may have been the PMCs providing storage for any
          * PMCs we inherited from; also need to clone those. */
