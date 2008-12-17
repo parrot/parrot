@@ -384,7 +384,7 @@ SP              [ ]
 
 {WS}+"."{WS}+          return CONCAT;
 "."                    return DOT;
-<emit,INITIAL>".."     return DOTDOT;
+
 "+="                   return PLUS_ASSIGN;
 "-="                   return MINUS_ASSIGN;
 "*="                   return MUL_ASSIGN;
