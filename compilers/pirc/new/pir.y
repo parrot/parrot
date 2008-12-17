@@ -1282,10 +1282,8 @@ assignment        : target '=' TK_INTC
                           else
                               set_instrf(lexer, opnames[$4], "%T%T%E", $1, $3, $5);
 
-                          /* XXX this do_strength_reduction() doesn't work properly yet. */
-                          do_strength_reduction(yyscanner);
-
                           get_opinfo(yyscanner);
+                          do_strength_reduction(yyscanner);
                         }
                   | keyword keylist '=' expression
                         {
@@ -3092,6 +3090,7 @@ do_strength_reduction(yyscan_t yyscanner) {
     if (newop == -1)
         return;
 
+
     /* if there's more than 2 operands, do strength reduction. op_count also
      * counts the operand itself, so compare with 3, not 2.
      */
@@ -3213,12 +3212,14 @@ check_first_arg_direction(yyscan_t yyscanner, NOTNULL(char const * const opname)
     if (!CURRENT_INSTRUCTION(lexer)->opinfo->dirs)
         fprintf(stderr, "no opinfo->dirs!\n");
     else {
-        op_info_t *opinfo =     CURRENT_INSTRUCTION(lexer)->opinfo;
-        if (opinfo)
+        op_info_t *opinfo = CURRENT_INSTRUCTION(lexer)->opinfo;
 
+        if (opinfo)
             dir_first_arg = CURRENT_INSTRUCTION(lexer)->opinfo->dirs[0];
-        else
+        else {
             fprintf(stderr, " no opinfo!\n");
+            return;
+        }
     }
 
     /* direction cannot be IN or INOUT */
