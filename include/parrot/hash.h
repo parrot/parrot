@@ -225,25 +225,29 @@ void parrot_chash_destroy_values(PARROT_INTERP,
         FUNC_MODIFIES(*hash);
 
 void parrot_new_hash_x(
+    PARROT_INTERP,
     ARGOUT(Hash **hptr),
     PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type,
     NOTNULL(hash_comp_fn compare),
     NOTNULL(hash_hash_key_fn keyhash))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(4)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(5)
+        __attribute__nonnull__(6)
         FUNC_MODIFIES(*hptr);
 
 void parrot_new_pmc_hash_x(
+    PARROT_INTERP,
     ARGMOD(PMC *container),
     PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type,
     NOTNULL(hash_comp_fn compare),
     NOTNULL(hash_hash_key_fn keyhash))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(4)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(5)
+        __attribute__nonnull__(6)
         FUNC_MODIFIES(*container);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

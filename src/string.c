@@ -283,6 +283,13 @@ string_init(PARROT_INTERP)
     const size_t n_parrot_cstrings =
         sizeof (parrot_cstrings) / sizeof (parrot_cstrings[0]);
 
+    /* TODO: hash_seed should be randomized on a per-interp basis.  Before this
+     * can happen, shared STRINGs need to always be marked as such.  
+     * See RT #59810 and #59472
+     */
+    interp->hash_seed = 3793;
+    /*interp->hash_seed = Parrot_uint_rand(0);*/
+
     /* Set up the cstring cache, then load the basic encodings and charsets */
     if (!interp->parent_interpreter) {
         parrot_new_cstring_hash(interp, &const_cstring_hash);
@@ -2279,11 +2286,11 @@ C<< s->hashval >>.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 size_t
-string_hash(PARROT_INTERP, ARGMOD_NULLOK(STRING *s), size_t seed)
+string_hash(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
 {
     register size_t h;
+    UINTVAL         seed = interp->hash_seed;
 
-    /* TODO: #59810 (using seed != 3793 breaks things) */
     if (!s)
         return seed;
 

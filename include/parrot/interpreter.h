@@ -377,6 +377,8 @@ struct parrot_interp_t {
     /* per interpreter global vars */
     INTVAL world_inited;                      /* world_init_once() is done */
 
+    UINTVAL hash_seed;                        /* STRING hash seed */
+
     PMC *iglobals;                            /* SArray of PMCs, containing: */
     /* 0:   PMC *Parrot_base_classname_hash; hash containing name->base_type */
     /* 1:   PMC *Parrot_compreg_hash;    hash containing assembler/compilers */

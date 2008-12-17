@@ -374,7 +374,7 @@ PippBucket* pipp_hash_get_bucket(PARROT_INTERP, PippHashTable *ht, STRING *key){
     INTVAL key_hash, bucket_idx;
     PippBucket *bucket;
 
-    key_hash = string_hash(interp, key, PIPP_HASH_SEED);
+    key_hash = string_hash(interp, key);
     bucket   = ht->buckets[key_hash & ht->hashMask];
     dprintf("pipp_hash_get_bucket called with key '%Ss', has hash 0x%X\n",
             key, key_hash);
@@ -427,7 +427,7 @@ PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *p_
     PippBucket *first_bucket, *curr_bucket;
     INTVAL      key_hash, bucket_idx;
 
-    key_hash     = string_hash(interp, key, PIPP_HASH_SEED);
+    key_hash     = string_hash(interp, key);
     bucket_idx   = key_hash & ht->hashMask;
     curr_bucket  = ht->buckets[bucket_idx];
     first_bucket = curr_bucket;
@@ -563,7 +563,7 @@ PippBucket* pipp_hash_push(PARROT_INTERP, PippHashTable *ht, PMC *p_val){
     }
 
     s_key    = string_from_int(interp, ht->nextIndex);
-    key_hash = string_hash(interp, s_key, PIPP_HASH_SEED);
+    key_hash = string_hash(interp, s_key);
     bkt      = mem_allocate_zeroed_typed(PippBucket);
 
     bkt->key       = s_key;
@@ -640,7 +640,7 @@ PippBucket* pipp_hash_unshift(PARROT_INTERP, PippHashTable *ht, PMC *p_val){
     }
 
     s_key    = string_from_int(interp, 0);
-    key_hash = string_hash(interp, s_key, PIPP_HASH_SEED);
+    key_hash = string_hash(interp, s_key);
     bkt      = mem_allocate_zeroed_typed(PippBucket);
 
     bkt->key       = s_key;

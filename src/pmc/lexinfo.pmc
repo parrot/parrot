@@ -65,7 +65,7 @@ subroutine.
         PARROT_ASSERT(PObj_constant_TEST(SELF));
         PMC_pmc_val(SELF) = sub;
 
-        parrot_new_pmc_hash_x(SELF,
+        parrot_new_pmc_hash_x(INTERP, SELF,
             (PARROT_DATA_TYPE)enum_hash_int,
             Hash_key_type_STRING,
             (hash_comp_fn)string_equal,     /* STRING compare */

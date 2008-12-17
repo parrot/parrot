@@ -44,12 +44,14 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PARROT_MALLOC
 static Hash * create_hash(
+    PARROT_INTERP,
     PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type,
     ARGIN(hash_comp_fn compare),
     ARGIN(hash_hash_key_fn keyhash))
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -146,11 +148,11 @@ PARROT_WARN_UNUSED_RESULT
 static size_t
 key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), size_t seed)
 {
-    if (s->hashval) {
-        return s->hashval;
+    if (PObj_is_shared_TEST(s) || s->hashval == 0) {
+        return string_hash(interp, s);
     }
 
-    return string_hash(interp, s, seed);
+    return s->hashval;
 }
 
 /*
@@ -730,9 +732,10 @@ Returns a new Parrot STRING hash in C<hptr>.
 
 PARROT_EXPORT
 void
-parrot_new_hash(SHIM_INTERP, ARGOUT(Hash **hptr))
+parrot_new_hash(PARROT_INTERP, ARGOUT(Hash **hptr))
 {
-    parrot_new_hash_x(hptr,
+    parrot_new_hash_x(interp,
+            hptr,
             enum_type_PMC,
             Hash_key_type_STRING,
             STRING_compare,     /* STRING compare */
@@ -751,9 +754,10 @@ Create a new Parrot STRING hash in PMC_struct_val(container)
 
 PARROT_EXPORT
 void
-parrot_new_pmc_hash(SHIM_INTERP, ARGOUT(PMC *container))
+parrot_new_pmc_hash(PARROT_INTERP, ARGOUT(PMC *container))
 {
-    parrot_new_pmc_hash_x(container,
+    parrot_new_pmc_hash_x(interp,
+            container,
             enum_type_PMC,
             Hash_key_type_STRING,
             STRING_compare,     /* STRING compare */
@@ -772,9 +776,10 @@ Returns a new C string hash in C<hptr>.
 
 PARROT_EXPORT
 void
-parrot_new_cstring_hash(SHIM_INTERP, ARGOUT(Hash **hptr))
+parrot_new_cstring_hash(PARROT_INTERP, ARGOUT(Hash **hptr))
 {
-    parrot_new_hash_x(hptr,
+    parrot_new_hash_x(interp,
+            hptr,
             enum_type_PMC,
             Hash_key_type_cstring,
             (hash_comp_fn)cstring_compare,     /* cstring compare */
@@ -799,7 +804,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PARROT_MALLOC
 static Hash *
-create_hash(PARROT_DATA_TYPE val_type, Hash_key_type hkey_type,
+create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_type,
         ARGIN(hash_comp_fn compare), ARGIN(hash_hash_key_fn keyhash))
 {
     size_t      i;
@@ -812,8 +817,7 @@ create_hash(PARROT_DATA_TYPE val_type, Hash_key_type hkey_type,
     hash->entry_type = val_type;
     hash->key_type   = hkey_type;
 
-    /* RT #59472 - randomize */
-    hash->seed = 3793;
+    hash->seed = interp->hash_seed;
 
     PARROT_ASSERT(INITIAL_BUCKETS % 4 == 0);
 
@@ -952,13 +956,14 @@ marked properly.
 */
 
 void
-parrot_new_hash_x(ARGOUT(Hash **hptr),
+parrot_new_hash_x(PARROT_INTERP,
+        ARGOUT(Hash **hptr),
         PARROT_DATA_TYPE val_type,
         Hash_key_type hkey_type,
         NOTNULL(hash_comp_fn compare),
         NOTNULL(hash_hash_key_fn keyhash))
 {
-    *hptr = create_hash(val_type, hkey_type, compare, keyhash);
+    *hptr = create_hash(interp, val_type, hkey_type, compare, keyhash);
 }
 
 /*
@@ -974,13 +979,14 @@ in PMC_struct_val(container).
 */
 
 void
-parrot_new_pmc_hash_x(ARGMOD(PMC *container),
+parrot_new_pmc_hash_x(PARROT_INTERP,
+        ARGMOD(PMC *container),
         PARROT_DATA_TYPE val_type,
         Hash_key_type hkey_type,
         NOTNULL(hash_comp_fn compare),
         NOTNULL(hash_hash_key_fn keyhash))
 {
-    Hash * const hash = create_hash(val_type, hkey_type, compare, keyhash);
+    Hash * const hash = create_hash(interp, val_type, hkey_type, compare, keyhash);
     PMC_struct_val(container) = hash;
     hash->container = container;
 }
@@ -997,9 +1003,9 @@ Create a new HASH with void * keys and values.
 
 PARROT_EXPORT
 void
-parrot_new_pointer_hash(SHIM_INTERP, ARGOUT(Hash **hptr))
+parrot_new_pointer_hash(PARROT_INTERP, ARGOUT(Hash **hptr))
 {
-    parrot_new_hash_x(hptr, enum_type_ptr, Hash_key_type_ptr, pointer_compare, key_hash_pointer);
+    parrot_new_hash_x(interp, hptr, enum_type_ptr, Hash_key_type_ptr, pointer_compare, key_hash_pointer);
 }
 
 /*
@@ -1024,7 +1030,8 @@ Parrot_new_INTVAL_hash(PARROT_INTERP, UINTVAL flags)
             ? constant_pmc_new_noinit(interp, enum_class_Hash)
             : pmc_new_noinit(interp, enum_class_Hash);
 
-    parrot_new_pmc_hash_x(h, enum_type_INTVAL, Hash_key_type_int, int_compare, key_hash_int);
+    parrot_new_pmc_hash_x(interp, h, enum_type_INTVAL, Hash_key_type_int,
+            int_compare, key_hash_int);
     PObj_active_destroy_SET(h);
     return h;
 }

@@ -291,7 +291,7 @@ STRING * string_grow(PARROT_INTERP, ARGMOD(STRING *s), UINTVAL addlen)
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-size_t string_hash(PARROT_INTERP, ARGMOD_NULLOK(STRING *s), size_t seed)
+size_t string_hash(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT

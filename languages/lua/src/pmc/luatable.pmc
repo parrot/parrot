@@ -101,7 +101,7 @@ static Node *mainposition(PARROT_INTERP, const LuaHash *t, PMC *key)
         h = PMC_int_val(key);
     }
     else if (PMC_type(key) == dynpmc_LuaString) {
-        h = string_hash(interp, VTABLE_get_string(interp, key), 3793);
+        h = string_hash(interp, VTABLE_get_string(interp, key));
     }
     else {
         h = (unsigned long)PMC_struct_val(key);
@@ -117,7 +117,7 @@ static Node *mainposition(PARROT_INTERP, const LuaHash *t, PMC *key)
 /* specialized version for strings */
 static PMC** lua_getstr(PARROT_INTERP, const LuaHash *t, STRING *key)
 {
-    unsigned long h = string_hash(interp, key, 3793);
+    unsigned long h = string_hash(interp, key);
     Node         *n = &t->node[h&(t->size-1)];
 
     do {
