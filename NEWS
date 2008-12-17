@@ -1,6 +1,6 @@
 # $Id$
 
-New in December 2008 Release
+New in 0.8.2
 - Implementation
   + fixed lexical semantics
   + added the 'capture_lex' opcode

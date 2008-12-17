@@ -1,9 +1,9 @@
 {
-    "release.version"  : "0.8.1",
-    "release.name"     : "Tio Richie",
+    "release.version"  : "0.8.2",
+    "release.name"     : "Feliz Loro",
     "release.day"      : "Tuesday",
-    "release.date"     : "18 Nov 2008",
-    "release.nextdate" : "16 Dec 2008",
+    "release.date"     : "16 Dec 2008",
+    "release.nextdate" : "20 January 2009",
 
     "web.root"         : "http://parrotcode.org/",
     "web.source"       : "source.html",
@@ -11,10 +11,10 @@
     "web.repository"   : "https://svn.perl.org/parrot/trunk/",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "13 Dec 2008",
+    "bugday.date"      : "17 Jan 2009",
 
     "wiki.root"        : "http://www.perlfoundation.org/parrot/index.cgi?",
-    "wiki.bugday"      : "bug_day_2008_12_13",
+    "wiki.bugday"      : "bug_day_2009_01_17",
 
     "cpan.search"      : "http://search.cpan.org/dist/parrot",
     "subversion.root"  : "http://subversion.tigris.org/",
