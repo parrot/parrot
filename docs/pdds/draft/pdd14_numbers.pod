@@ -582,8 +582,8 @@ from floating point types, sprintf output of bignumbers.
 
 =head1 REFERENCES
 
-IBM's Standard Decimal Arithmetic, with tests (sadly, link appears to have
-disappeared)
+IBM's Standard Decimal Arithmetic, with tests
+(L<http://speleotrove.com/decimal/>)
 
 The Perl modules Math::BigInt and Math::BigFloat.
 
