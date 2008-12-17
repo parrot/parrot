@@ -740,7 +740,7 @@ multi_type        : identifier
                   ;
 
 parameter_list    : parameters
-                         { /* XXX */
+                         {
                            /* if there are parameters, then emit a get_params instruction. */
                            if ($1 > 0) {
 
@@ -753,7 +753,6 @@ parameter_list    : parameters
                                update_op(lexer, CURRENT_INSTRUCTION(lexer),
                                          PARROT_OP_get_params_pc);
                            }
-
                          }
                   ;
 

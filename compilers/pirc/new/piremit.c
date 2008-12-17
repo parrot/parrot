@@ -92,15 +92,7 @@ printed as well. Examples:
 */
 void
 print_target(lexer_state *lexer, target * const t) {
-
-    if (TEST_FLAG(t->flags, TARGET_FLAG_IS_REG)) {
-        if (t->info == NULL)
-            fprintf(stderr, "reg target has no pir_reg ptr!\n");
-
-        fprintf(out, "%c%d", pir_register_types[t->info->type], t->info->color);
-    }
-    else
-        fprintf(out, "%c%d", pir_register_types[t->info->type], t->info->color);
+    fprintf(out, "%c%d", pir_register_types[t->info->type], t->info->color);
 
     /* if the target has a key, print that too */
     if (t->key)
@@ -431,10 +423,7 @@ respectively.
 */
 static void
 emit_pbc_target_arg(lexer_state * const lexer, target * const t) {
-    if (TEST_FLAG(t->flags, TARGET_FLAG_IS_REG))
-        emit_int_arg(lexer->bc, t->info->color);
-    else
-        emit_int_arg(lexer->bc, t->info->color);
+    emit_int_arg(lexer->bc, t->info->color);
 }
 
 /*
