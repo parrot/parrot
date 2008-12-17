@@ -2020,12 +2020,6 @@ _keylist:
            IMCC_INFO(interp)->keys[IMCC_INFO(interp)->nkeys++] = $3;
            $$ = IMCC_INFO(interp)->keys[0];
          }
-   | _keylist COMMA            { IMCC_INFO(interp)->in_slice = 1; }
-     key
-         {
-           IMCC_INFO(interp)->keys[IMCC_INFO(interp)->nkeys++] = $4;
-           $$ = IMCC_INFO(interp)->keys[0];
-         }
    ;
 
 key:
@@ -2035,15 +2029,6 @@ key:
                $1->type |= VT_START_SLICE | VT_END_SLICE;
            $$ = $1;
          }
-   | var DOTDOT var
-         {
-           $1->type |= VT_START_SLICE;
-           $3->type |= VT_END_SLICE;
-           IMCC_INFO(interp)->keys[IMCC_INFO(interp)->nkeys++] = $1;
-           $$ = $3;
-         }
-   | DOTDOT var                { $2->type |= VT_START_ZERO | VT_END_SLICE; $$ = $2; }
-   | var DOTDOT                { $1->type |= VT_START_SLICE | VT_END_INF; $$ = $1; }
    ;
 
 reg:
