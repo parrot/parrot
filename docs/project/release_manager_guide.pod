@@ -198,25 +198,23 @@ See F<docs/project/pause_guide.pod> for more details.
 SSH to ftp-osl.osuosl.org. (If you don't have the necessary login information,
 get it from one of the previous release managers.)
 
- $ ssh -l <USERNAME> ftp-osl-osuosl.org
- $ cd /data/ftp/.2/parrot/releases
+ $ ssh -l <USERNAME> ftp-osl.osuosl.org
 
-If the release is a monthly point release, create a new directory under
-F<ftp/devel>.
+If the release is a monthly development release, create a new directory under
+F<~/ftp/releases/devel>.
 
- $ cd devel
- $ mkdir a.b.c
- $ cd a.b.c
+ $ mkdir ~/ftp/releases/devel/a.b.c
 
 If the release is in the stable series (1.0, 1.5, 2.0, 2.5, etc) create
-the new directory in F<ftp/releases/stable> instead.
+the new directory in F<~/ftp/releases/stable> instead.
 
- $ cd stable
- $ mkdir a.b.c
- $ cd a.b.c
+ $ mkdir ~/ftp/releases/stable/a.b.c
 
-Copy the tarball into the new directory. (Using C<scp> or C<wget> or whatever
-tool you prefer.)
+Copy the tarball from your machine into the new directory.
+
+ $ scp parrot-a.b.c.tar.gz ftp-osl.osuosl.org:~/ftp/releases/devel/a.b.c/.
+
+(Or using C<wget> or whatever tool you prefer.)
 
 When you're finished making changes, run the trigger script to push the changes
 out to the FTP mirrors.
