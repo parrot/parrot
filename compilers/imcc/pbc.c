@@ -697,13 +697,6 @@ find_sub_by_subid(PARROT_INTERP, ARGIN(const char *lookup),
         if (r && (r->subid && (strcmp(r->subid, lookup) == 0)))
             return s;
 
-        /* if names and namespaces are matching - ok */
-        if (r && r->name && (strcmp(r->name, lookup) == 0)
-                && ((sym->unit->_namespace && s->unit->_namespace
-                        && (strcmp(sym->unit->_namespace->name, s->unit->_namespace->name) == 0))
-                    || (!sym->unit->_namespace && !s->unit->_namespace)))
-            return s;
-
         *pc += s->size;
     }
     return NULL;
