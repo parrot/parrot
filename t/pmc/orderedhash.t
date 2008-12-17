@@ -651,10 +651,6 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "set/get compound key" );
     print "--\n"
     set P2, P0[0]
     print P2
-    set P2, P0[1, 'foo']
-    print P2
-    set P2, P0[1, 'quux']
-    print P2
     end
 CODE
 bar
@@ -662,8 +658,6 @@ baz
 xyzzy
 --
 Foo
-baz
-xyzzy
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "exists compound key" );
@@ -732,7 +726,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "delete compound key" );
     exists I0, P0[2]
     print I0
     print "\n--\n"
-    delete P0[1, 'quux']
+    delete P0[1; 'quux']
     exists I0, P0['b'; 'quux']
     print I0
     exists I0, P0[1; 'quux']
