@@ -44,6 +44,8 @@ New in December 2008 Release
   + Pipp
     - added support for a return value from user defined functions
     - added incomplete implemention of 'require_once'
+  + Ecmascript
+    - parser fixes, parses spidermonkey's top level test/shell.js
 - Deprecations
   + PARROT_API is now PARROT_EXPORT
   + PIR
