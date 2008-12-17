@@ -5,6 +5,10 @@ New in December 2008 Release
   + fixed lexical semantics
   + added the 'capture_lex' opcode
   + added automatic resume for nonfatal exceptions
+  + added multidispatch cache
+  + applied miscellaneous performance improvements, including startup time
+  + fixed several bugs and leaks found by Coverity Scan
+  + removed race conditions from parallel testing
 - Compilers
   + IMCC
     - removed undocumented .param int <stringc> => <ident> syntax
@@ -40,7 +44,7 @@ New in December 2008 Release
     - warn
   + Lua
     - added complex & mathx libraries
-    - merge LuaClosure & LuaFunction PMC
+    - merged LuaClosure & LuaFunction PMC
   + Pipp
     - added support for a return value from user defined functions
     - added incomplete implemention of 'require_once'
