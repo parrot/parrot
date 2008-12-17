@@ -360,12 +360,6 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     ||  (STREQ(name, "set_returns")))
         return var_arg_ins(interp, unit, name, r, n, emit);
 
-#if 0
-    ins = multi_keyed(interp, unit, name, r, n, keyvec, emit);
-    if (ins)
-        return ins;
-#endif
-
     op_fullname(fullname, name, r, n, keyvec);
     op = interp->op_lib->op_code(fullname, 1);
 
@@ -1202,120 +1196,6 @@ try_rev_cmp(ARGIN(const char *name), ARGMOD(SymReg **r))
     return NULL;
 }
 
-/*
-
-=item C<Instruction * multi_keyed>
-
-TODO: Needs to be documented!!!
-
-=cut
-
-*/
-
-PARROT_CAN_RETURN_NULL
-Instruction *
-multi_keyed(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
-            ARGIN(SymReg **r), int nr, int keyvec, int emit)
-{
-    int i, keyf, n;
-    SymReg      *preg[3];    /* px, py, pz */
-    SymReg      *nreg[3];
-    Instruction *ins       = 0;
-    Instruction *unused_ins = 0;
-    static      int p       = 0;
-
-    /* count keys in keyvec */
-    int kv = keyvec;
-
-    for (i = keyf = 0; i < nr; i++, kv >>= 1)
-        if (kv & 1)
-            keyf++;
-
-    if (keyf <= 1)
-        return NULL;
-
-    /* XXX what to do, if we don't emit instruction? */
-    PARROT_ASSERT(emit);
-    UNUSED(emit);
-
-    /* OP  _p_k    _p_k_p_k =>
-     * set      py, p_k
-     * set      pz,     p_k
-     * new px, .Undef
-     * OP  px, py, pz
-     * set _p_k_px
-     */
-
-    kv = keyvec;
-    for (i = n = 0; i < nr; i++, kv >>= 1, n++) {
-        char buf[16];
-
-        if (kv & 1)
-            IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "illegal key operand\n");
-
-        /* make a new P symbol */
-        do {
-            snprintf(buf, sizeof (buf), "$P%d", ++p);
-        } while (get_sym(interp, buf));
-
-        preg[n] = mk_symreg(interp, buf, 'P');
-        kv    >>= 1;
-
-        if (kv & 1) {
-            /* we have a keyed operand */
-            if (r[i]->set != 'P')
-                IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "not an aggregate\n");
-
-            /* don't emit LHS yet */
-            if (i == 0) {
-                nreg[0] = r[i];
-                nreg[1] = r[i+1];
-                nreg[2] = preg[n];
-
-                /* set p_k px */
-                ins     = INS(interp, unit, "set", 0, nreg, 3, KEY_BIT(1), 0);
-            }
-            else {
-                nreg[0] = preg[n];
-                nreg[1] = r[i];
-                nreg[2] = r[i+1];
-
-                /* set py|z p_k */
-                INS(interp, unit, "set", 0, nreg, 3, KEY_BIT(2), 1);
-            }
-
-            i++;
-        }
-        /* non keyed */
-        else {
-            if (i == 0) {
-                nreg[0] = r[i];
-                nreg[1] = preg[n];
-
-                /* set n, px */
-                ins     = INS(interp, unit, "set", 0, nreg, 2, 0, 0);
-            }
-            else {
-                nreg[0] = preg[n];
-                nreg[1] = r[i];
-
-                /* set px, n */
-                INS(interp, unit, "set", 0, nreg, 2, 0, 1);
-            }
-        }
-    }
-    /* make a new undef */
-    unused_ins = iNEW(interp, unit, preg[0], str_dup("Undef"), NULL, 1);
-    UNUSED(unused_ins);
-
-    /* emit the operand */
-    INS(interp, unit, name, 0, preg, 3, 0, 1);
-
-    /* emit the LHS op */
-    emitb(interp, unit, ins);
-
-    return ins;
-}
 
 /*
 
