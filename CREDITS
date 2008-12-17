@@ -73,8 +73,9 @@ D: typo squisher
 E: yDNA@cpan.org
 
 N: Andrew Whitworth
-D: PDD09 Garbage Collector
+D: Internals development
 D: Documentation
+D: Release manager for 0.8.2
 E: wknight8111@gmail.com
 
 N: Andy Dougherty

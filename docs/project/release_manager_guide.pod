@@ -403,7 +403,6 @@ the 3rd Tuesday of each month. Version numbers for each release will be
 determined each month, and will depend on the features actually present in
 that release.
 
- - December 16th, 2008  - Andrew Whitworth
  - January 20th, 2009   - chromatic
 
 =cut
