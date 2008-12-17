@@ -198,10 +198,22 @@ See F<docs/project/pause_guide.pod> for more details.
 SSH to ftp-osl.osuosl.org. (If you don't have the necessary login information,
 get it from one of the previous release managers.)
 
-Make a new directory for the new release named "a.b.c" after the version
-number. If the release is in the stable series (1.0, 1.5, 2.0, 2.5, etc) create
-the new directory in F<ftp/releases/stable>, if the release is a monthly
-release between stable versions, create the directory in F<ftp/releases/devel>.
+ $ ssh -l <USERNAME> ftp-osl-osuosl.org
+ $ cd /data/ftp/.2/parrot/releases
+
+If the release is a monthly point release, create a new directory under
+F<ftp/devel>.
+
+ $ cd devel
+ $ mkdir a.b.c
+ $ cd a.b.c
+
+If the release is in the stable series (1.0, 1.5, 2.0, 2.5, etc) create
+the new directory in F<ftp/releases/stable> instead.
+
+ $ cd stable
+ $ mkdir a.b.c
+ $ cd a.b.c
 
 Copy the tarball into the new directory. (Using C<scp> or C<wget> or whatever
 tool you prefer.)
