@@ -51,7 +51,6 @@ my @steps = qw(
     auto::signal
     auto::socklen_t
     auto::env
-    auto::aio
     auto::gmp
     auto::readline
     auto::gdbm

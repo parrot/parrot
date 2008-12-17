@@ -168,7 +168,7 @@ Used in combination with C<--step=gen::languages> to regenerate makefiles.
 
 =item C<--ask>
 
-This turns on the user prompts during configuraion.  Available only in
+This turns on the user prompts during configuration.  Available only in
 Command-Line interface.  Not available in Configuration-File interface.
 
 =item C<--test>
@@ -606,7 +606,6 @@ configuration file.
     auto::signal
     auto::socklen_t
     auto::env
-    auto::aio
     auto::gmp
     auto::readline
     auto::gdbm
