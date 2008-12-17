@@ -583,8 +583,7 @@ the clone via integers has different indices, if items were deleted.
         Hash * const h_dest = (Hash *)PMC_struct_val(dest);
         UINTVAL     i;
 
-        /* see N_BUCKETS in src/hash.c; 3/4 of the available bucket slots */
-        for (i = 0; i <= ((hash->mask - 1) * 3 / 4); i++) {
+        for (i = 0; i <= N_BUCKETS(hash->mask+1); i++) {
             HashBucket * const b      = hash->bs + i;
             void       * const key    = b->key;
 

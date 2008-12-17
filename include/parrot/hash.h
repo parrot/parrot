@@ -38,6 +38,10 @@ typedef struct _hash_entry {
 typedef UINTVAL BucketIndex;
 #define INITBucketIndex ((BucketIndex)-2)
 
+#define N_BUCKETS(n) ((n) - (n)/4)
+#define HASH_ALLOC_SIZE(n) (N_BUCKETS(n) * sizeof (HashBucket) + \
+                                     (n) * sizeof (HashBucket *))
+
 typedef int (*hash_comp_fn)(PARROT_INTERP, const void*const, const void*const);
 typedef void (*hash_mark_key_fn)(PARROT_INTERP, PObj *);
 typedef size_t (*hash_hash_key_fn)(PARROT_INTERP, ARGIN(const void *), size_t seed);
