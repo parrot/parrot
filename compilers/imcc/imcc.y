@@ -475,13 +475,6 @@ static Instruction *
 iINDEXFETCH(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *r0), ARGIN(SymReg *r1),
         ARGIN(SymReg *r2))
 {
-    /*
-    if (r0->set == 'S' && r1->set == 'S' && r2->set == 'I') {
-        SymReg * const r3 = mk_const(interp, "1", 'I');
-        return MK_I(interp, unit, "substr %s, %s, %s, 1", 4, r0, r1, r2, r3);
-    }
-    */
-
     IMCC_INFO(interp) -> keyvec |= KEY_BIT(2);
     return MK_I(interp, unit, "set %s, %s[%s]", 3, r0, r1, r2);
 }
@@ -495,13 +488,6 @@ static Instruction *
 iINDEXSET(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *r0), ARGIN(SymReg *r1),
         ARGIN(SymReg *r2))
 {
-    /*
-    if (r0->set == 'S' && r1->set == 'I' && r2->set == 'S') {
-        SymReg * const r3 = mk_const(interp, "1", 'I');
-        MK_I(interp, unit, "substr %s, %s, %s, %s", 4, r0, r1, r3, r2);
-    }
-    else
-    */
     if (r0->set == 'P') {
         IMCC_INFO(interp)->keyvec |= KEY_BIT(1);
         MK_I(interp, unit, "set %s[%s], %s", 3, r0, r1, r2);

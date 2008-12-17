@@ -734,42 +734,16 @@ C<&>, C<|>, C<~>, C<E<lt>E<lt>>, C<E<gt>E<gt>> or C<E<gt>E<gt>E<gt>>.
 
 =item <var> = <var> [ <var> ]
 
-A keyed C<set> operation for PMCs or a substring operation for string
-arguments and an integer key.
+A keyed C<set> operation for PMCs to retrieve a value from an aggregate.
+This maps to:
 
-{{ DEPRECATION NOTE: The substring operation for string arguments is
-   deprecated, and will be removed after the 0.8.2 release. }}
-
-=item <var> = <var> [ <key> ]
-
-{{ NOTE: keyed assignment is still valid in PIR, but the C<..> notation in
-keys is deprecated [See RT #48561], so this syntactic sugar for slices is also
-deprecated. See the (currently experimental) C<slice> opcode instead, but
-this, too, is deprecated. }}
-
-where C<key> is:
-
- <var1> .. <var2>
-
-returns a slice defined starting at C<var1> and ending at C<var2>.
-
- .. <var2>
-
-returns a slice starting at the first element, and ending at C<var2>.
-
- <var1> ..
-
-returns a slice starting at C<var1> to the end of the array.
-
-see src/pmc/slice.pmc
-and t/pmc/slice.t.
+  set <var>, <var> [ <var> ]
 
 =item <var> [ <var> ] = <var>
 
-A keyed C<set> operation.
+A keyed C<set> operation to set a value in an aggregate. This maps to:
 
-{{ DEPRECATION NOTE: this syntactic sugar will no longer be used for the
-assign C<substr> op with a length of 1. }}
+  set <var> [ <var> ], <var>
 
 =item <var> = <opcode> <arguments>
 

@@ -93,14 +93,6 @@ one or both of these flags.
 
 =over 4
 
-=item * String indexing [post 0.8.2]
-
-String indexing sugar is deprecated. This means you can no longer write
-
-  $S0[1]
-
-to mean substr, $S0, 1, 1. Use the C<substr> op instead.
-
 =item * Assignment syntax with opcodes [post 0.8.2]
 
 See RT #36283.  When the first argument of an opcode is C<OUT>, then
