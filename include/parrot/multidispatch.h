@@ -78,12 +78,6 @@ PMC* Parrot_build_sig_object_from_varargs(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_mmd_add_function(PARROT_INTERP,
-    INTVAL func_nr,
-    NULLOK(funcptr_t function))
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 void Parrot_mmd_add_multi_from_c_args(PARROT_INTERP,
     ARGIN(const char *sub_name),
     ARGIN(const char *short_sig),

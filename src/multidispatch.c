@@ -506,44 +506,6 @@ Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
 
 /*
 
-=item C<void mmd_add_function>
-
-Add a new binary MMD function to the list of functions the MMD system knows
-of. C<func_num> is the number of the new function. C<function> is ignored.
-
-RT #45941 change this to a MMD register interface that takes a function *name*.
-
-{{**DEPRECATE**}}
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_mmd_add_function(PARROT_INTERP, INTVAL func_nr, SHIM(funcptr_t function))
-{
-    /* XXX Something looks wrong here.  n_binop_mmd_funcs gets incremented,
-     * but the function doesn't get saved */
-    if (func_nr >= (INTVAL)interp->n_binop_mmd_funcs) {
-        INTVAL i;
-        mem_realloc_n_typed(interp->binop_mmd_funcs, func_nr+1, MMD_table);
-
-        for (i = interp->n_binop_mmd_funcs; i <= func_nr; ++i)  {
-            MMD_table * const table = interp->binop_mmd_funcs + i;
-
-            table->x         = 0;
-            table->y         = 0;
-            table->mmd_funcs = NULL;
-        }
-
-        interp->n_binop_mmd_funcs = func_nr + 1;
-    }
-}
-
-
-/*
-
 =item C<static void mmd_expand_x>
 
 Expands the function table in the X dimension to include C<new_x>.
