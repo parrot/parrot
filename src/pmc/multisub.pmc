@@ -8,8 +8,8 @@ src/pmc/multisub.pmc - A container for multi-dispatched subs
 
 =head1 DESCRIPTION
 
-This class inherits from ResizablePMCArray and provides an Array of
-Sub PMCs with the same short name, but different long names.
+This class contains an Array of Sub PMCs with the same short name, but
+different long names.
 
 =head2 Functions
 
@@ -22,26 +22,70 @@ Sub PMCs with the same short name, but different long names.
 #include "parrot/parrot.h"
 
 
-pmclass MultiSub extends ResizablePMCArray need_ext provides array {
+pmclass MultiSub need_ext provides array {
+    ATTR PMC *subs;
 
-    void push_pmc(PMC *value) {
-        STRING * const _sub = CONST_STRING(interp, "Sub");
-        STRING * const _nci = CONST_STRING(interp, "NCI");
+    VTABLE void init() {
+        Parrot_MultiSub_attributes * const ms =
+            mem_allocate_zeroed_typed(Parrot_MultiSub_attributes);
+
+        /* no mark() necessary; everything is constant */
+        PObj_active_destroy_SET(SELF);
+
+        PMC_data(SELF) = ms;
+        ms->subs       = constant_pmc_new(interp, enum_class_ResizablePMCArray);
+    }
+
+    VTABLE void destroy() {
+        Parrot_MultiSub_attributes * const ms = PARROT_MULTISUB(SELF);
+
+        if (ms)
+            mem_sys_free(ms);
+
+        PMC_data(SELF) = NULL;
+    }
+
+    VTABLE INTVAL elements() {
+        Parrot_MultiSub_attributes * const ms = PARROT_MULTISUB(SELF);
+        return VTABLE_elements(interp, ms->subs);
+    }
+
+    VTABLE PMC *get_attr_str(STRING *name) {
+        Parrot_MultiSub_attributes * const ms = PARROT_MULTISUB(SELF);
+
+        if (string_equal(interp, name, CONST_STRING(interp, "candidates")) ==0 )
+            return ms->subs;
+
+        return PMCNULL;
+    }
+
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
+        Parrot_MultiSub_attributes * const ms = PARROT_MULTISUB(SELF);
+        return VTABLE_get_pmc_keyed_int(interp, ms->subs, key);
+    }
+
+    VTABLE void push_pmc(PMC *value) {
+        STRING                     * const _sub = CONST_STRING(interp, "Sub");
+        STRING                     * const _nci = CONST_STRING(interp, "NCI");
+        Parrot_MultiSub_attributes * const ms   = PARROT_MULTISUB(SELF);
 
         if (!VTABLE_isa(interp, value, _sub)
         &&  !VTABLE_isa(interp, value, _nci))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                    "attempt to push non Sub PMC");
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION, "attempt to push non Sub PMC");
 
-        SUPER(value);
+        VTABLE_push_pmc(interp, ms->subs, value);
     }
 
     VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
-        STRING *_sub = CONST_STRING(interp, "Sub");
+        STRING                     * const _sub = CONST_STRING(interp, "Sub");
+        Parrot_MultiSub_attributes * const ms   = PARROT_MULTISUB(SELF);
+
         if (!VTABLE_isa(interp, value, _sub))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                    "attempt to set non Sub PMC");
-        SUPER(key, value);
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION, "attempt to set non Sub PMC");
+
+        VTABLE_set_pmc_keyed_int(interp, ms->subs, key, value);
     }
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
@@ -60,20 +104,27 @@ pmclass MultiSub extends ResizablePMCArray need_ext provides array {
     }
 
     VTABLE opcode_t *invoke(void *next) {
-        PMC * const func = Parrot_mmd_sort_manhattan(interp, SELF);
+        Parrot_MultiSub_attributes * const ms   = PARROT_MULTISUB(SELF);
+        PMC                        * const func =
+                                    Parrot_mmd_sort_manhattan(interp, ms->subs);
 
         if (PMC_IS_NULL(func))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                EXCEPTION_METH_NOT_FOUND, "No applicable methods.\n");
 
         return VTABLE_invoke(INTERP, func, next);
     }
 
     VTABLE PMC *get_iter() {
-        PMC * const sub = Parrot_mmd_sort_manhattan(INTERP, SELF);
+        Parrot_MultiSub_attributes * const ms  = PARROT_MULTISUB(SELF);
+        PMC                        * const sub =
+                                    Parrot_mmd_sort_manhattan(INTERP, ms->subs);
 
         if (PMC_IS_NULL(sub))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
-        return SUPER();
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                EXCEPTION_METH_NOT_FOUND, "No applicable methods.\n");
+
+        return VTABLE_get_iter(interp, ms->subs);
     }
 
     /* I don't really know how to implement these if they need something
@@ -81,17 +132,27 @@ pmclass MultiSub extends ResizablePMCArray need_ext provides array {
        ResizablePMCArray's VTABLE methods of the same names. Hopefully we
        don't need anything beyond that. */
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        PMC *sub = Parrot_mmd_sort_manhattan(INTERP, SELF);
+        Parrot_MultiSub_attributes * const ms  = PARROT_MULTISUB(SELF);
+        PMC                        * const sub =
+                                    Parrot_mmd_sort_manhattan(INTERP, ms->subs);
+
         if (PMC_IS_NULL(sub))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
-        return SUPER(key);
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                EXCEPTION_METH_NOT_FOUND, "No applicable methods.\n");
+
+        return VTABLE_get_pmc_keyed(interp, ms->subs, key);
     }
 
     VTABLE PMC *get_pmc_keyed_string(STRING *s) {
-        PMC *sub = Parrot_mmd_sort_manhattan(INTERP, SELF);
+        Parrot_MultiSub_attributes * const ms  = PARROT_MULTISUB(SELF);
+        PMC                        * const sub =
+                                    Parrot_mmd_sort_manhattan(INTERP, ms->subs);
+
         if (PMC_IS_NULL(sub))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
-        return SUPER(s);
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                EXCEPTION_METH_NOT_FOUND, "No applicable methods.\n");
+
+        return VTABLE_get_pmc_keyed_string(interp, ms->subs, s);
     }
 
     /* get_iter method should take one of two inputs: either an array of
@@ -111,7 +172,8 @@ pmclass MultiSub extends ResizablePMCArray need_ext provides array {
             /* TODO: What goes here? */
         }
         else
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION,
                     "attempt to call get_iter method with invalid arg type.\n");
     }
 }
