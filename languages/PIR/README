@@ -31,7 +31,7 @@ the edit-compile-test cycle faster.
 
 Instead of .include-ing the generated files in the main file
 (pirc.pir), the generated .pir files are compiled to bytecode
-(.pbc) and loaded in pirc.pir. This prevends compiling all the
+(.pbc) and loaded in pirc.pir. This prevents compiling all the
 included files when compiling pirc.pir (which would really be
 s l o w).
 
