@@ -1122,8 +1122,11 @@ assignment        : target '=' TK_INTC
                         {
                           symbol *sym = find_symbol(lexer, $3);
                           if (sym) {
-                              set_instrf(lexer, "set", "%T%T", $1, target_from_symbol(lexer, sym));
-                              get_opinfo(yyscanner);
+                              target *rhs = target_from_symbol(lexer, sym);
+                              if (!targets_equal($1, rhs)) {
+                                  set_instrf(lexer, "set", "%T%T", $1, rhs);
+                                  get_opinfo(yyscanner);
+                              }
                           }
                           else { /* not a symbol */
                               if (is_parrot_op(lexer, $3)) {
@@ -1140,8 +1143,11 @@ assignment        : target '=' TK_INTC
                         {
                           symbol *sym = find_symbol(lexer, $3);
                           if (sym) {
-                              set_instrf(lexer, "set", "%T%T", $1, target_from_symbol(lexer, sym));
-                              get_opinfo(yyscanner);
+                              target *rhs = target_from_symbol(lexer, sym);
+                              if (!targets_equal($1, rhs)) {
+                                  set_instrf(lexer, "set", "%T%T", $1, rhs);
+                                  get_opinfo(yyscanner);
+                              }
                           }
                           else { /* not a symbol */
                               if (is_parrot_op(lexer, $3)) {
