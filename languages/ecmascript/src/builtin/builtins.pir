@@ -242,23 +242,31 @@
 .sub 'infix:<'
     .param pmc left
     .param pmc right
+    $I0 = islt left, right
+    .return ($I0)
 .end
 
 
 .sub 'infix:>'
     .param pmc left
     .param pmc right
+    $I0 = isgt left, right
+    .return ($I0)
 .end
 
 .sub 'infix:<='
     .param pmc left
     .param pmc right
+    $I0 = isle left, right
+    .return ($I0)
 .end
 
 
 .sub 'infix:>='
     .param pmc left
     .param pmc right
+    $I0 = isge left, right
+    .return ($I0)
 .end
 
 
