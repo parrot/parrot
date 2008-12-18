@@ -61,10 +61,10 @@ print $OUT qq{
 [Setup]
 AppName=Parrot
 AppVerName=Parrot-$version
-AppPublisher=The Perl Foundation
-AppPublisherURL=http://www.parrotcode.org/
-AppSupportURL=http://www.parrotcode.org/
-AppUpdatesURL=http://www.parrotcode.org/
+AppPublisher=The Parrot Foundation
+AppPublisherURL=http://www.parrot.org/
+AppSupportURL=http://www.parrot.org/
+AppUpdatesURL=http://www.parrot.org/
 DefaultDirName={sd}$prefix
 DefaultGroupName=Parrot
 AllowNoIcons=yes
