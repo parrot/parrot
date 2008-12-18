@@ -666,7 +666,7 @@ options are passed to the evaluator.
     close ifh
     goto iter_loop
   iter_end:
-    $P0 = self.'eval'(code, adverbs :flat :named)
+    $P0 = self.'eval'(code, args :flat, adverbs :flat :named)
     if target == '' goto end
     if target == 'pir' goto end
     '_dumper'($P0, target)
@@ -755,7 +755,7 @@ Generic method for compilers invoked from a shell command line.
     unless args goto interactive
     $I0 = adverbs['combine']
     if $I0 goto combine
-    $S0 = shift args
+    $S0 = args[0]
     result = self.'evalfiles'($S0, args :flat, adverbs :flat :named)
     goto save_output
   combine:

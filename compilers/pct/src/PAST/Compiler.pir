@@ -59,8 +59,6 @@ any value type.
     piropsig['isnull']     = 'IP'
     piropsig['issame']     = 'IPP'
     piropsig['istrue']     = 'IP'
-    piropsig['newclosure'] = 'PP'
-    piropsig['n_abs']      = 'PP'
     piropsig['add']        = 'PP+'
     piropsig['band']       = 'PPP'
     piropsig['bnot']       = 'PP'
@@ -68,10 +66,13 @@ any value type.
     piropsig['concat']     = 'PP~'
     piropsig['div']        = 'PP+'
     piropsig['fdiv']       = 'PP+'
+    piropsig['find_name']  = 'P~'
     piropsig['getprop']    = 'P~P'
     piropsig['mod']        = 'PP+'
     piropsig['mul']        = 'PP+'
+    piropsig['n_abs']      = 'PP'
     piropsig['n_neg']      = 'PP'
+    piropsig['newclosure'] = 'PP'
     piropsig['not']        = 'PP'
     piropsig['shl']        = 'PP+'
     piropsig['shr']        = 'PP+'
@@ -785,14 +786,12 @@ Return the POST representation of a C<PAST::Block>.
     ##  determine the outer POST::Sub for the new one
     .local pmc outerpost
     outerpost = get_global '$?SUB'
-    $P0 = node.'lexical'()
-    if $P0 goto outer_block
-    null $P0
-    set_global '$?SUB', $P0
-    goto outer_done
-  outer_block:
-    bpost.'outer'(outerpost)
     set_global '$?SUB', bpost
+
+    .local int islexical
+    islexical = node.'lexical'()
+    unless islexical goto outer_done
+    bpost.'outer'(outerpost)
 
     ##  add block setup code (cpost) to outer block if needed
     if null outerpost goto outer_done
@@ -933,6 +932,7 @@ Return the POST representation of a C<PAST::Block>.
     $P0 = get_hll_global ['POST'], 'Ops'
     bpost = $P0.'new'( bpost, 'node'=>node, 'result'=>blockreg)
     bpost.'push_pirop'( blockref, 'result'=>blockreg )
+    unless islexical goto block_done
     bpost.'push_pirop'('capture_lex', blockreg)
     goto block_done
 
@@ -946,7 +946,9 @@ Return the POST representation of a C<PAST::Block>.
     $P0 = get_hll_global ['POST'], 'Ops'
     bpost = $P0.'new'(bpost, 'node'=>node, 'result'=>result)
     bpost.'push_pirop'(blockref)
+    unless islexical goto block_immediate_capture_skip
     bpost.'push_pirop'('capture_lex', blockreg)
+  block_immediate_capture_skip:
     bpost.'push_pirop'('call', blockreg, arglist :flat, 'result'=>result)
 
   block_done:

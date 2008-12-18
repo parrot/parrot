@@ -606,10 +606,8 @@ favor of the C<symbol> method above.
 
 =item lexical([flag])
 
-Get/set whether the block is a lexical block.  A block
-with this attribute set to false is not lexically scoped
-inside of its parent, and will not act as an outer lexical
-scope for any nested blocks within it.
+Get/set whether the block is lexically nested within
+the block that contains it.
 
 =cut
 

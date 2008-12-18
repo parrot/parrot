@@ -2,17 +2,17 @@
 
 # check module
 
-say('1..1');
-
-our $value := 'ok 2';
+XYZ::sayfoo();
+XYZ::foo('ok 3');
+XYZ::sayfoo();
 
 module XYZ {
-    our $value := 'not ok 1';
+    our $value := 'ok 1';
     sub foo($x) { $value := $x; }
     sub sayfoo() { say($value); }
+    say('1..3');
+    sayfoo();
+    foo('ok 2');
 }
-
-XYZ::foo('ok 1');
-XYZ::sayfoo();
 
 
