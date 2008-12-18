@@ -216,23 +216,6 @@ void Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-void Parrot_mmd_register(PARROT_INTERP,
-    INTVAL func_nr,
-    INTVAL left_type,
-    INTVAL right_type,
-    NULLOK(funcptr_t funcptr))
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_mmd_register_sub(PARROT_INTERP,
-    INTVAL func_nr,
-    INTVAL left_type,
-    INTVAL right_type,
-    ARGIN(const PMC *sub))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(5);
-
-PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_MMD_search_default_infix(PARROT_INTERP,
