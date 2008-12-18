@@ -51,42 +51,6 @@ upgrade_self_to_bignum(PARROT_INTERP, PMC *self)
     return self;
 }
 
-static PMC*
-overflow_p(PARROT_INTERP, PMC *self, PMC *val, PMC *dest, const char *mmd_name)
-{
-    maybe_throw_overflow_error(interp);
-
-    if (self == dest) {
-        /*
-        PMC *result = PMCNULL;
-        self = upgrade_self_to_bignum(interp, self);
-        Parrot_mmd_multi_dispatch_from_c_args(interp,
-                mmd_name, "PPP->P",
-                self, val, dest, &result);
-        return result;
-        */
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ERR_OVERFLOW,
-            "This should never appear!!!");
-    }
-    else {
-        PMC * const temp = VTABLE_get_bignum(interp, self);
-        PMC *result = PMCNULL;
-        Parrot_mmd_multi_dispatch_from_c_args(interp,
-                mmd_name, "PPP->P",
-                temp, val, dest, &result);
-        return result;
-    }
-}
-
-static PMC*
-overflow(PARROT_INTERP, PMC *self, INTVAL b, PMC *dest, const char *mmd_name) {
-    PMC *value = pmc_new(interp, enum_class_Integer);
-    VTABLE_set_integer_native(interp, value, b);
-
-    return overflow_p(interp, self, value, dest, mmd_name);
-}
-
-
 pmclass Integer extends scalar provides integer provides scalar {
 
 /*
@@ -376,8 +340,12 @@ MULTI PMC *add(Integer value, PMC *dest) {
         VTABLE_set_integer_native(INTERP, dest, c);
         return dest;
     }
-    else
-        return overflow_p(INTERP, SELF, value, dest, "add");
+    else {
+        PMC * temp;
+        maybe_throw_overflow_error(interp);
+        temp = VTABLE_get_bignum(interp, SELF);
+        return VTABLE_add(interp, temp, value, dest);
+    }
 }
 
 
@@ -395,7 +363,10 @@ MULTI PMC *add(Complex value, PMC *dest) {
 
 
 MULTI PMC *add(BigInt value, PMC *dest) {
-    return overflow_p(INTERP, SELF, value, dest, "add");
+    PMC *temp;
+    maybe_throw_overflow_error(interp);
+    temp = VTABLE_get_bignum(interp, SELF);
+    return VTABLE_add(interp, temp, value, dest);
 }
 
 
@@ -418,8 +389,12 @@ VTABLE PMC *add_int(INTVAL b, PMC *dest) {
         VTABLE_set_integer_native(INTERP, dest, c);
         return dest;
     }
-    else
-        return overflow(INTERP, SELF, b, dest, "add");
+    else {
+        PMC *temp;
+        maybe_throw_overflow_error(interp);
+        temp = VTABLE_get_bignum(interp, SELF);
+        return VTABLE_add_int(interp, temp, b, dest);
+    }
 }
 
 
@@ -463,8 +438,12 @@ VTABLE void i_add_int(INTVAL b) {
 
     if ((c^a) >= 0 || (c^b) >= 0)
         VTABLE_set_integer_native(INTERP, SELF, c);
-    else
-        overflow(INTERP, SELF, b, SELF, "add");
+    else {
+        PMC *temp;
+        maybe_throw_overflow_error(interp);
+        temp = VTABLE_get_bignum(interp, SELF);
+        VTABLE_i_add_int(interp, temp, b);
+    }
 }
 
 
@@ -498,8 +477,12 @@ MULTI PMC *subtract(Integer value, PMC *dest) {
         VTABLE_set_integer_native(INTERP, dest, c);
         return dest;
     }
-    else
-        return overflow(INTERP, SELF, b, dest, "subtract");
+    else {
+        PMC *temp;
+        maybe_throw_overflow_error(interp);
+        temp = VTABLE_get_bignum(interp, SELF);
+        return VTABLE_subtract(interp, temp, value, dest);
+    }
 }
 
 
@@ -517,7 +500,10 @@ MULTI PMC *subtract(Complex value, PMC *dest) {
 
 
 MULTI PMC *subtract(BigInt value, PMC *dest) {
-    return overflow_p(INTERP, SELF, value, dest, "subtract");
+    PMC *temp;
+    maybe_throw_overflow_error(interp);
+    temp = VTABLE_get_bignum(interp, SELF);
+    return VTABLE_subtract(interp, temp, value, dest);
 }
 
 
@@ -549,8 +535,12 @@ VTABLE PMC *subtract_int(INTVAL b, PMC *dest) {
         VTABLE_set_integer_native(INTERP, dest, c);
         return dest;
     }
-    else
-        return overflow(INTERP, SELF, b, dest, "subtract");
+    else {
+        PMC *temp;
+        maybe_throw_overflow_error(interp);
+        temp = VTABLE_get_bignum(interp, SELF);
+        return VTABLE_subtract_int(interp, temp, b, dest);
+    }
 }
 
 
@@ -575,8 +565,11 @@ MULTI void i_subtract(Integer value) {
 
     if ((c^a) >= 0 || (c^~b) >= 0)
         VTABLE_set_integer_native(INTERP, SELF, c);
-    else
-        overflow(INTERP, SELF, b, SELF, "subtract");
+    else {
+        maybe_throw_overflow_error(interp);
+        SELF = upgrade_self_to_bignum(interp, SELF);
+        VTABLE_i_subtract(interp, SELF, value);
+    }
 }
 
 
@@ -603,8 +596,11 @@ VTABLE void i_subtract_int(INTVAL b) {
 
     if ((c^a) >= 0 || (c^~b) >= 0)
         VTABLE_set_integer_native(INTERP, SELF, c);
-    else
-        overflow(INTERP, SELF, b, SELF, "subtract");
+    else {
+        maybe_throw_overflow_error(INTERP);
+        SELF = upgrade_self_to_bignum(INTERP, SELF);
+        VTABLE_i_subtract_int(INTERP, SELF, b);
+    }
 }
 
 
@@ -638,8 +634,12 @@ MULTI PMC *multiply(Integer value, PMC *dest) {
         VTABLE_set_integer_native(INTERP, dest, c);
         return dest;
     }
-    else
-        return overflow_p(INTERP, SELF, value, dest, "multiply");
+    else {
+        PMC *temp;
+        maybe_throw_overflow_error(INTERP);
+        temp = VTABLE_get_bignum(INTERP, SELF);
+        return VTABLE_multiply(INTERP, temp, value, dest);
+    }
 }
 
 
@@ -679,12 +679,12 @@ VTABLE PMC *multiply_int(INTVAL b, PMC *dest) {
         return dest;
     }
     else {
-        PMC *temp = pmc_new(interp, enum_class_Integer);
-        VTABLE_set_integer_native(interp, temp, b);
-        return overflow_p(INTERP, SELF, temp, dest, "multiply");
+        PMC *temp;
+        maybe_throw_overflow_error(INTERP);
+        temp = VTABLE_get_bignum(INTERP, SELF);
+        return VTABLE_multiply_int(INTERP, temp, b, dest);
     }
 }
-
 
 /*
 
@@ -729,14 +729,9 @@ VTABLE void i_multiply_int(INTVAL b) {
     if ((double) c == cf)
         SELF.set_integer_native(c);
     else {
-        /*
-        PMC * temp = pmc_new(interp, enum_class_Integer);
-        VTABLE_set_integer_native(interp, temp, b);
-        overflow_p(INTERP, SELF, temp, SELF, "multiply");
-        */
-        maybe_throw_overflow_error(interp);
-        upgrade_self_to_bignum(interp, SELF);
-        VTABLE_i_multiply_int(interp, SELF, b);
+        maybe_throw_overflow_error(INTERP);
+        upgrade_self_to_bignum(INTERP, SELF);
+        VTABLE_i_multiply_int(INTERP, SELF, b);
     }
 }
 
@@ -770,9 +765,11 @@ Divides C<SELF> by C<value> inplace.
 */
 
 MULTI PMC *divide(BigInt value, PMC *dest) {
-    return overflow_p(INTERP, SELF, value, dest, "divide");
+    PMC *temp;
+    maybe_throw_overflow_error(INTERP);
+    temp = VTABLE_get_bignum(INTERP, SELF);
+    return VTABLE_divide(INTERP, temp, value, dest);
 }
-
 
 MULTI PMC *divide(DEFAULT value, PMC *dest) {
     FLOATVAL d = VTABLE_get_number(INTERP, value);
@@ -788,10 +785,9 @@ MULTI PMC *divide(DEFAULT value, PMC *dest) {
 
 
 MULTI void i_divide(BigInt value) {
-    maybe_throw_overflow_error(interp);
-    SELF = upgrade_self_to_bignum(interp, SELF);
-    VTABLE_i_divide(interp, SELF, value);
-    /* overflow_p(INTERP, SELF, value, SELF, "divide"); */
+    maybe_throw_overflow_error(INTERP);
+    SELF = upgrade_self_to_bignum(INTERP, SELF);
+    VTABLE_i_divide(INTERP, SELF, value);
 }
 
 
@@ -829,7 +825,10 @@ Divides C<SELF> by C<value> inplace.
 */
 
 MULTI PMC *floor_divide(BigInt value, PMC *dest) {
-    return overflow_p(INTERP, SELF, value, dest, "floor_divide");
+    PMC *temp;
+    maybe_throw_overflow_error(INTERP);
+    temp = VTABLE_get_bignum(INTERP, SELF);
+    return VTABLE_floor_divide(INTERP, temp, value, dest);
 }
 
 
@@ -864,7 +863,6 @@ VTABLE PMC *floor_divide_int(INTVAL value, PMC *dest) {
     return dest;
 }
 
-
 VTABLE PMC *floor_divide_float(FLOATVAL value, PMC *dest) {
     FLOATVAL f;
 
@@ -880,14 +878,11 @@ VTABLE PMC *floor_divide_float(FLOATVAL value, PMC *dest) {
     return dest;
 }
 
-
 MULTI void i_floor_divide(BigInt value) {
-    maybe_throw_overflow_error(interp);
-    SELF = upgrade_self_to_bignum(interp, SELF);
-    VTABLE_i_floor_divide(interp, SELF, value);
-    /* overflow_p(INTERP, SELF, value, SELF, "floor_divide"); */
+    maybe_throw_overflow_error(INTERP);
+    SELF = upgrade_self_to_bignum(INTERP, SELF);
+    VTABLE_i_floor_divide(INTERP, SELF, value);
 }
-
 
 MULTI void i_floor_divide(DEFAULT value) {
     FLOATVAL d = VTABLE_get_number(INTERP, value);
@@ -952,7 +947,10 @@ Calculates modulus in place.
 
 
 MULTI PMC *modulus(BigInt value, PMC *dest) {
-    return overflow_p(INTERP, SELF, value, dest, "modulus");
+    PMC *temp;
+    maybe_throw_overflow_error(INTERP);
+    temp = VTABLE_get_bignum(INTERP, SELF);
+    return VTABLE_modulus(INTERP, temp, value, dest);
 }
 
 
@@ -998,10 +996,9 @@ VTABLE PMC *modulus_float(FLOATVAL value, PMC *dest) {
 
 
 MULTI void i_modulus(BigInt value) {
-    maybe_throw_overflow_error(interp);
-    SELF = upgrade_self_to_bignum(interp, SELF);
-    VTABLE_i_modulus(interp, SELF, value);
-    /* overflow_p(INTERP, SELF, value, SELF, "i_modulus"); */
+    maybe_throw_overflow_error(INTERP);
+    SELF = upgrade_self_to_bignum(INTERP, SELF);
+    VTABLE_i_modulus(INTERP, SELF, value);
 }
 
 
@@ -1085,8 +1082,12 @@ VTABLE PMC *pow_int(INTVAL b, PMC *dest) {
             INTVAL prev = r;
             if (b & 1) {
                 r *= temp;
-                if (r / temp != prev)
-                    return overflow(INTERP, SELF, orig_b, dest, "pow");
+                if (r / temp != prev) {
+                    PMC *temp;
+                    maybe_throw_overflow_error(INTERP);
+                    temp = VTABLE_get_bignum(INTERP, SELF);
+                    return VTABLE_pow_int(INTERP, temp, orig_b, dest);
+                }
             }
 
             b >>= 1;
@@ -1096,8 +1097,12 @@ VTABLE PMC *pow_int(INTVAL b, PMC *dest) {
             prev  = temp;
             temp *= temp;
 
-            if (prev != 0 && temp / prev != prev)
-                return overflow(INTERP, SELF, orig_b, dest, "pow");
+            if (prev != 0 && temp / prev != prev) {
+                PMC *temp;
+                maybe_throw_overflow_error(INTERP);
+                temp = VTABLE_get_bignum(INTERP, SELF);
+                return VTABLE_pow_int(INTERP, temp, orig_b, dest);
+            }
         }
     }
 
@@ -1234,8 +1239,8 @@ VTABLE void increment() {
     if ((c^a) >= 0 || (c^1) >= 0)
         VTABLE_set_integer_native(interp, SELF, c);
     else {
-        VTABLE_morph(interp, SELF, enum_class_BigInt);
-        VTABLE_set_integer_native(interp, SELF, a);
+        VTABLE_morph(INTERP, SELF, enum_class_BigInt);
+        VTABLE_set_integer_native(INTERP, SELF, a);
         VTABLE_increment(interp, SELF);
     }
 }
