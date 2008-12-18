@@ -284,7 +284,7 @@ string_init(PARROT_INTERP)
         sizeof (parrot_cstrings) / sizeof (parrot_cstrings[0]);
 
     /* TODO: hash_seed should be randomized on a per-interp basis.  Before this
-     * can happen, shared STRINGs need to always be marked as such.  
+     * can happen, shared STRINGs need to always be marked as such.
      * See RT #59810 and #59472
      */
     interp->hash_seed = 3793;
