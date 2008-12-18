@@ -5,7 +5,7 @@
 use lib "../../lib";
 use Parrot::Test tests => 5;
 
-pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "macro");
+pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "assignments");
 .sub main
     .local pmc x, y, z
     .local string a, b, c
@@ -55,6 +55,7 @@ pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "if statement with keywords");
 .sub int
     .local int if, int, goto
     .local pmc pmc, null
+    if int > if goto goto
     if int > if goto L
 goto:
 L:
@@ -62,6 +63,7 @@ L:
 CODE
 .namespace []
 int:
+    lt I1, I0, 8
     lt I1, I0, 4
 goto:
 L:

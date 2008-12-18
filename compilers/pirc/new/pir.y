@@ -46,12 +46,6 @@ condition evaluates to I<true> during compile time) or it may become a C<noop>
 
 =cut
 
-TODO:
-1. test the parser.
-2. generate PBC, using Parrot_PackFile (and related) data structures.
-3. handle branch/invoke instructions to calculate offsets etc.
-4. handle freezing of PMC constants (representing subs)
-
 */
 
 #include <stdio.h>
@@ -528,7 +522,7 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
  *   action.
  */
 
-/* Top-level rule */
+/* start rule */
 %start TOP
 
 
@@ -1119,11 +1113,54 @@ assignment        : target '=' TK_INTC
                           set_instrf(lexer, "set", "%T%s", $1, $3);
                           get_opinfo(yyscanner);
                         }
+                  | target '=' reg
+                        {
+                          set_instrf(lexer, "set", "%T%T", $1, $3);
+                          get_opinfo(yyscanner);
+                        }
+                  | target '=' TK_IDENT
+                        {
+                          symbol *sym = find_symbol(lexer, $3);
+                          if (sym) {
+                              set_instrf(lexer, "set", "%T%T", $1, target_from_symbol(lexer, sym));
+                              get_opinfo(yyscanner);
+                          }
+                          else { /* not a symbol */
+                              if (is_parrot_op(lexer, $3)) {
+                                  set_instrf(lexer, $3, "%T", $1);
+                                  get_opinfo(yyscanner);
+                              }
+                              else {
+                                  yypirerror(yyscanner, lexer, "'%s' is neither a declared symbol "
+                                             "nor a parrot opcode", $3);
+                              }
+                          }
+                        }
+                  | target '=' keyword
+                        {
+                          symbol *sym = find_symbol(lexer, $3);
+                          if (sym) {
+                              set_instrf(lexer, "set", "%T%T", $1, target_from_symbol(lexer, sym));
+                              get_opinfo(yyscanner);
+                          }
+                          else { /* not a symbol */
+                              if (is_parrot_op(lexer, $3)) {
+                                  set_instrf(lexer, $3, "%T", $1);
+                                  get_opinfo(yyscanner);
+                              }
+                              else {
+                                  yypirerror(yyscanner, lexer, "'%s' is neither a declared symbol "
+                                             "nor a parrot opcode", $3);
+                              }
+                          }
+                        }
                   | target '=' binary_expr
                         {
                           unshift_operand(lexer, expr_from_target(lexer, $1));
                           get_opinfo(yyscanner);
                         }
+                  /*********
+                  XXX I think this can be removed alltogether. Fix later.
                   | target '=' parrot_op
                         {
                           symbol *sym = find_symbol(lexer, $3);
@@ -1131,13 +1168,13 @@ assignment        : target '=' TK_INTC
                               if (!is_parrot_op(lexer, $3))
                                   yypirerror(yyscanner, lexer, "'%s' is neither a declared symbol "
                                                                "nor a parrot opcode", $3);
-                              else { /* handle it as an op */
+                              else {
                                   unshift_operand(lexer, expr_from_target(lexer, $1));
                                   get_opinfo(yyscanner);
                                   check_first_arg_direction(yyscanner, $3);
                               }
                           }
-                          else { /* handle it as a symbol */
+                          else {
                               update_instr(lexer, "set");
                               unshift_operand(lexer, expr_from_target(lexer,
                                                      target_from_symbol(lexer, sym)));
@@ -1145,6 +1182,7 @@ assignment        : target '=' TK_INTC
                               get_opinfo(yyscanner);
                           }
                         }
+                  *********/
                   | target '=' parrot_op keylist
                         {
                           /*   $P0 = foo ["bar"]
@@ -2021,7 +2059,6 @@ symbol      : reg
                                sym = new_symbol(lexer, $1, UNKNOWN_TYPE);
                            }
                            $$ = target_from_symbol(lexer, sym);
-
                          }
             ;
 
