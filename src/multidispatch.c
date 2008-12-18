@@ -782,9 +782,7 @@ Parrot_mmd_find_multi_from_long_sig(PARROT_INTERP, ARGIN(STRING *name),
 
     type_tuple = mmd_build_type_tuple_from_long_sig(interp, long_sig);
 
-    candidate_list = VTABLE_clone(interp, multi_sub);
-
-    return Parrot_mmd_sort_candidates(interp, type_tuple, candidate_list);
+    return Parrot_mmd_sort_candidates(interp, type_tuple, multi_sub);
 }
 
 
@@ -868,7 +866,6 @@ Parrot_mmd_sort_manhattan(PARROT_INTERP, ARGIN(PMC *candidates))
         return PMCNULL;
 
     arg_tuple  = Parrot_mmd_arg_tuple_func(interp);
-    candidates = VTABLE_clone(interp, candidates);
 
     return Parrot_mmd_sort_candidates(interp, arg_tuple, candidates);
 }
