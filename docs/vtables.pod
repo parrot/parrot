@@ -80,21 +80,25 @@ the beautifully non-existent Fooby language:
 
     % perl tools/dev/gen_class.pl FoobyNumber > src/pmc/foobynumber.pmc
 
-This will produce a skeleton C file (to be preprocessed by the
-F<tools/build/pmc2c.pl> program) with stubs for all the methods you need to
-fill in. The function C<init> allows you to set up anything you need to set up.
-Comment out the C<namespace> method from the automatically generated set
-of methods (otherwise, the compile will fail).
+This will produce a skeleton PMC file (to be preprocessed into ordinary C
+code by the F<tools/build/pmc2c.pl> program) with stubs for all the methods
+you need to fill in. N<Actually, there are more stubs here then you probably
+I<need> to fill in. Your PMC isn't going to want to support all these
+methods, and in many cases you may want to fall back to default behavior
+instead of implementing a dummy method.> The function C<init> allows you to
+set up anything you need to set up. 
 
 Now you'll have to do something a little different depending on whether you're
-writing a built-in class or an extension class. If you're writing a built-in
-class, then you'll see a reference to C<enum_class_FoobyNumber> in the C<init>
-function. For built-in classes, this is automatically defined in F<pmc.h> when
-you run F<Configure.pl>.  If you're not writing a built-in class, you need to
-indicate this by using the 'extension' keyword after the 'pmclass YOURCLASS'
-declaration in F<src/pmc/YOURCLASS.pmc>. Then, change the type of the C<init>
-function to return C<VTABLE>, and then return C<temp_base_vtable> instead of
-assigning to the interpreter specific C<vtables> array.
+writing a built-in class or an extension class. If you're writing a non-core
+PMC, called a "dynpmc", you need to add the argument C<dynpmc> to the line
+that starts with C<pmclass>. Here's an example:
+
+	pmclass FooByNumber dynpmc {
+		...
+
+This alerts the PMC compiler that the PMC type should not be hard-coded into
+Parrot, and that the PMC definition needs to be loaded in to Parrot
+dynamically when the user requires it.
 
 To finish up adding a built-in class:
 
@@ -102,11 +106,11 @@ To finish up adding a built-in class:
 
 =item 1.
 
-Add src/pmc/YOURCLASS.pmc to the MANIFEST
+Add src/pmc/YOURCLASS.pmc to the MANIFEST.
 
 =item 2.
 
-Run C<make realclean>, and rerun F<Configure.pl> to add your new PMC to
+Run C<make realclean>, and then run F<Configure.pl> to add your new PMC to
 the set of built-in PMCs.
 
 =back
@@ -120,8 +124,7 @@ data type needs to use that, and then also define some user-defined flags.
 Flags are accessed by C<< pmc->flags >>. Most of the bits in the flag word are
 reserved for use by parrot itself, but a number of them have been assigned for
 general use by individual classes. These are referred to as
-C<Pobj_private0_FLAG> .. C<Pobj_private7_FLAG>. (The '7' may change during the
-early development of parrot, but will become pretty fixed at some point.)
+C<Pobj_private0_FLAG> .. C<Pobj_private7_FLAG>.
 
 Normally, you will want to alias these generic bit names to something more
 meaningful within your class:
@@ -132,12 +135,10 @@ meaningful within your class:
         ....
     };
 
-You're quite at liberty to declare these in a separate header file, but I find
-it more convenient to keep everything together in F<foobynumber.c>.  To
-manipulate the flags, use the macros listed in F<pobj.h>.
+To manipulate the flags, use the macros listed in F<pobj.h>.
 
-You may also use the C<cache> union in the PMC structure to remove some
-extraneous dereferences in your code if that would help.
+PMCs also have the ability to store an arbitrary number of user-defined
+attribute values using the C<ATTR> keyword. 
 
 =head2 Multimethods
 
@@ -156,10 +157,10 @@ break the class abstraction to save a couple of dereferences - if you want to.
 Similar shortcuts exist for strings, (C<native> and C<same>) and floating point
 numbers.
 
-=head2 Implementing methods
+=head2 Implementing VTABLE Interfaces
 
-The master list of vtable methods can be found in F<src/vtable.tbl> in the root
-directory of the Parrot source, with documentation in
+The master list of VTABLE interfaces can be found in F<src/vtable.tbl> in
+the root directory of the Parrot source, with documentation in
 F<docs/pdds/pdd02_vtables.pod>. A few of these are very important, for
 instance:
 
@@ -253,11 +254,6 @@ multimethod.
 
 Set yourself to the passed-in string. This is a string multimethod.
 
-=item C<set_value>
-
-Set your private data to the raw pointer passed in. This will only be used in
-exceptional circumstances.
-
 =item C<add>
 
 Fetch the number part of C<value> and add your numeric value to it, storing the
@@ -304,10 +300,10 @@ C<dest>.
 
 If any method doesn't fit into your class, just don't implement it and don't
 provide an empty function body. The default class, which all classes inherit
-from, will throw an exception, if this method would be called.
+from will throw an exception if the missing method ever gets called.
 
 If your class is a modification of an existing class, you may wish to use
-inheritance. At the beginning of your vtable specification in
+inheritance. At the beginning of your VTABLE specification in
 src/pmc/YOURCLASS.pmc, add the C<extends SUPERCLASS> phrase. For example:
 
   pmclass PackedArray extends Array { ...
