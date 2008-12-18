@@ -172,15 +172,6 @@ static void Parrot_mmd_search_classes(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC* Parrot_mmd_search_default(PARROT_INTERP,
-    ARGIN(STRING *meth),
-    ARGIN(PMC *arg_tuple))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC* Parrot_mmd_search_scopes(PARROT_INTERP, ARGIN(STRING *meth))
@@ -551,35 +542,6 @@ Parrot_mmd_find_multi_from_long_sig(PARROT_INTERP, ARGIN(STRING *name),
 
 /*
 
-=item C<PMC * Parrot_MMD_search_default_infix>
-
-RT #48260: Not yet documented!!!
-
-{{**DEPRECATE**}}
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-Parrot_MMD_search_default_infix(PARROT_INTERP, ARGIN(STRING *meth),
-        INTVAL left_type, INTVAL right_type)
-{
-    PMC * const arg_tuple = pmc_new(interp, enum_class_FixedIntegerArray);
-
-    VTABLE_set_integer_native(interp,    arg_tuple, 2);
-    VTABLE_set_integer_keyed_int(interp, arg_tuple, 0, left_type);
-    VTABLE_set_integer_keyed_int(interp, arg_tuple, 1, right_type);
-
-    return Parrot_mmd_search_default(interp, meth, arg_tuple);
-}
-
-
-/*
-
 =item C<PMC * Parrot_mmd_sort_manhattan_by_sig_pmc>
 
 Given an array PMC (usually a MultiSub) and a CallSignature PMC, sorts the mmd
@@ -738,61 +700,6 @@ Parrot_mmd_arg_tuple_func(PARROT_INTERP)
 
 
     return arg_tuple;
-}
-
-
-/*
-
-=item C<static PMC* Parrot_mmd_search_default>
-
-Default implementation of MMD search. Search scopes for candidates, walk the
-class hierarchy, sort all candidates by their Manhattan distance, and return
-result
-
-{{**DEPRECATE?? **}}
-
-=cut
-
-*/
-
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC*
-Parrot_mmd_search_default(PARROT_INTERP, ARGIN(STRING *meth), ARGIN(PMC *arg_tuple))
-{
-    /* 2) create a list of matching functions */
-    PMC * const candidate_list = Parrot_mmd_search_scopes(interp, meth);
-
-    /*
-     * 3) if list is empty fail
-     *    if the first found function is a plain Sub: finito
-     */
-    INTVAL n = VTABLE_elements(interp, candidate_list);
-
-    if (n == 1) {
-        PMC    * const pmc  = VTABLE_get_pmc_keyed_int(interp, candidate_list, 0);
-        STRING * const _sub = CONST_STRING(interp, "Sub");
-
-        if (VTABLE_isa(interp, pmc, _sub))
-            return pmc;
-    }
-
-    /*
-     * 4) first was a MultiSub - go through all found MultiSubs and check
-     *    the first arguments MRO, add all MultiSubs and plain methods,
-     *    where the first argument matches
-     */
-    Parrot_mmd_search_classes(interp, meth, arg_tuple, candidate_list, 0);
-    n = VTABLE_elements(interp, candidate_list);
-    if (!n)
-        return NULL;
-
-    /* 5) sort the list */
-
-    if (n > 1)
-        return Parrot_mmd_sort_candidates(interp, arg_tuple, candidate_list);
-
-    return VTABLE_get_pmc_keyed_int(interp, candidate_list, 0);
 }
 
 

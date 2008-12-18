@@ -212,16 +212,6 @@ void Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC * Parrot_MMD_search_default_infix(PARROT_INTERP,
-    ARGIN(STRING *meth),
-    INTVAL left_type,
-    INTVAL right_type)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_mmd_sort_manhattan(PARROT_INTERP, ARGIN(PMC *candidates))
