@@ -182,10 +182,6 @@ void Parrot_mmd_cache_store_by_values(PARROT_INTERP,
         FUNC_MODIFIES(*cache);
 
 PARROT_EXPORT
-void Parrot_mmd_destroy(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_mmd_find_multi_from_long_sig(PARROT_INTERP,

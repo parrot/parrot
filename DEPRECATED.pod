@@ -126,7 +126,7 @@ See RT #60640.
 
 =item Old-style MMD functions [post 0.7.1]
 
-Parrot_mmd_destroy, Parrot_MMD_search_default_infix,
+Parrot_MMD_search_default_infix,
 Parrot_mmd_search_default, mmd_cvt_to_types.
 
 See RT #60626.

@@ -517,36 +517,6 @@ mmd_expand_y(PARROT_INTERP, INTVAL func_nr, INTVAL new_y)
 
 /*
 
-=item C<void mmd_destroy>
-
-Frees all the memory allocated used the MMD subsystem.
-
-{{**DEPRECATE**}}
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_mmd_destroy(PARROT_INTERP)
-{
-    if (interp->n_binop_mmd_funcs) {
-        UINTVAL i;
-        for (i = 0; i <interp->n_binop_mmd_funcs; ++i) {
-            if (interp->binop_mmd_funcs[i].mmd_funcs) {
-                mem_sys_free(interp->binop_mmd_funcs[i].mmd_funcs);
-                interp->binop_mmd_funcs[i].mmd_funcs = NULL;
-            }
-        }
-    }
-    mem_sys_free(interp->binop_mmd_funcs);
-    interp->binop_mmd_funcs = NULL;
-}
-
-
-/*
-
 =item C<PMC * Parrot_mmd_find_multi_from_long_sig>
 
 Find the best candidate multi for a given sub name and signature. The signature

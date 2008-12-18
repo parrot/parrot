@@ -456,7 +456,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
         /* free vtables */
         parrot_free_vtables(interp);
-        Parrot_mmd_destroy(interp);
 
         /* dynop libs */
         if (interp->n_libs > 0) {
