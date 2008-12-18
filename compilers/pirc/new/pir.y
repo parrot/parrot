@@ -1165,30 +1165,6 @@ assignment        : target '=' TK_INTC
                           unshift_operand(lexer, expr_from_target(lexer, $1));
                           get_opinfo(yyscanner);
                         }
-                  /*********
-                  XXX I think this can be removed alltogether. Fix later.
-                  | target '=' parrot_op
-                        {
-                          symbol *sym = find_symbol(lexer, $3);
-                          if (sym == NULL) {
-                              if (!is_parrot_op(lexer, $3))
-                                  yypirerror(yyscanner, lexer, "'%s' is neither a declared symbol "
-                                                               "nor a parrot opcode", $3);
-                              else {
-                                  unshift_operand(lexer, expr_from_target(lexer, $1));
-                                  get_opinfo(yyscanner);
-                                  check_first_arg_direction(yyscanner, $3);
-                              }
-                          }
-                          else {
-                              update_instr(lexer, "set");
-                              unshift_operand(lexer, expr_from_target(lexer,
-                                                     target_from_symbol(lexer, sym)));
-                              unshift_operand(lexer, expr_from_target(lexer, $1));
-                              get_opinfo(yyscanner);
-                          }
-                        }
-                  *********/
                   | target '=' parrot_op keylist
                         {
                           /*   $P0 = foo ["bar"]
