@@ -329,7 +329,7 @@ loop:
    result = is_cclass .CCLASS_WHITESPACE, s, i
    print result
    if result goto ok
-   \$S0 = s[i]
+   \$S0 = substr s, i
    \$I0 = ord \$S0
    \$P0 = new 'ResizablePMCArray'
    push \$P0, \$I0
