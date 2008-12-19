@@ -398,6 +398,7 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
              braced_contents
              braced_arg
              braced_item
+             rhs_ident
 
 %type <targ> sub
              pmc_object
@@ -1090,6 +1091,10 @@ parrot_op_assign  : target '=' parrot_op op_arg_expr ',' parrot_op_args
 assignment_stat   : assignment "\n"
                   ;
 
+rhs_ident         : TK_IDENT
+                  | keyword
+                  ;
+
 assignment        : target '=' TK_INTC
                         {
                           if ($3 == 0)
@@ -1118,28 +1123,7 @@ assignment        : target '=' TK_INTC
                           set_instrf(lexer, "set", "%T%T", $1, $3);
                           get_opinfo(yyscanner);
                         }
-                  | target '=' TK_IDENT
-                        {
-                          symbol *sym = find_symbol(lexer, $3);
-                          if (sym) {
-                              target *rhs = target_from_symbol(lexer, sym);
-                              if (!targets_equal($1, rhs)) {
-                                  set_instrf(lexer, "set", "%T%T", $1, rhs);
-                                  get_opinfo(yyscanner);
-                              }
-                          }
-                          else { /* not a symbol */
-                              if (is_parrot_op(lexer, $3)) {
-                                  set_instrf(lexer, $3, "%T", $1);
-                                  get_opinfo(yyscanner);
-                              }
-                              else {
-                                  yypirerror(yyscanner, lexer, "'%s' is neither a declared symbol "
-                                             "nor a parrot opcode", $3);
-                              }
-                          }
-                        }
-                  | target '=' keyword
+                  | target '=' rhs_ident
                         {
                           symbol *sym = find_symbol(lexer, $3);
                           if (sym) {
