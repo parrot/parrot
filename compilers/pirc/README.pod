@@ -319,9 +319,6 @@ heredoc preprocessor.
 
 =item new - contains the Bison/Flex implementation of PIRC
 
-=item src - contains the hand-written, recursive-descent implementation of PIRC.
-Note that this is no longer maintained at the moment.
-
 =item t - for tests. No tests yet at this point.
 
 =item macro - contains the old implementation of the macro preprocessor. This is now
@@ -405,16 +402,6 @@ C<:immediate> flag must be run immediately after compilation.
 
 =back
 
-At this moment, the following things are unclear to me; if anybody can answer these,
-that'd be helpful:
-
-=over 4
-
-=item * how are named args/params handled/represented in bytecode?
-
-=back
-
-
 =head1 SEE ALSO
 
 See also:
@@ -422,8 +409,6 @@ See also:
 =over 4
 
 =item * C<languages/PIR> for a PGE based implementation.
-
-=item * C<compilers/pirc/src>, a hand-written, recursive-descent PIR parser.
 
 =item * C<compilers/imcc>, the current I<standard> PIR implementation.
 
