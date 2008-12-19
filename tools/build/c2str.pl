@@ -131,21 +131,35 @@ HEADER
 
     # There is a chance that the same __LINE__ will reoccur if #line directives
     # are used.
+    my $prev_line;
     my %lines_seen;
+
     while (<$IN>) {
         if (m/^\s*#\s*line\s+(\d+)/) {
 
             # #line directive
             $line = $1 - 1;
+            $prev_line = $_;
             next;
         }
         $line++;
-        next if m/^\s*#/;    # otherwise ignore preprocessor
-        next unless s/.*\bCONST_STRING(_GEN)?\s*\(\w+\s*,//;
+        # otherwise ignore preprocessor
+
+        do { $prev_line = $_; next } if m/^\s*#/;
+        do { $prev_line = $_; next }
+            unless s/.*\bCONST_STRING(_GEN)?\s*\(\w+\s*,//;
+
         my $const_string = defined $1 ? 'CONST_STRING_GEN' : 'CONST_STRING';
 
         if ( $lines_seen{"$line:$const_string"}++ ) {
             die "Seen line $line before in $infile - can't continue";
+        }
+
+        # semicolons, blank lines, opening braces, closing parens, #directives
+        # comments, labels, else keyword
+        if ($prev_line !~ /([{});:]|\*\/|\w+:|else)$/
+        &&  $prev_line !~ /^\s*(#.*)?$/) {
+            die "CONST_STRING split across lines at $line in $infile\n";
         }
 
         my $str = extract_delimited;    # $_, '"';
@@ -161,8 +175,10 @@ HEADER
                 print "#define _${const_string}_$line $n\n";
             }
             $this_file_seen{"$const_string:$str"} = $line;
+            $prev_line = $_;
             next;
         }
+
         my $len               = get_length($str);
         my $hashval           = hash_val($str);
         push @all_strings, [ $len, $hashval, $str ];
