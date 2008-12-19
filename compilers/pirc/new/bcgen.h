@@ -16,6 +16,9 @@ typedef struct bytecode bytecode;
 
 bytecode *new_bytecode(Interp *interp, char const * const filename, int bytes, int codesize);
 
+
+void create_codesegment(bytecode * const bc, int codesize);
+
 /* call this to write the PBC file */
 void write_pbc_file(bytecode * const bc, char const * const filename) ;
 

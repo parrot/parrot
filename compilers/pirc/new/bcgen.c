@@ -209,15 +209,45 @@ new_bytecode(Interp *interp, char const * const filename, int bytes, int codesiz
     self              = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_INTERPRETER);
     add_pmc_const(bc, self);
 
-    /* allocate enough space. XXX I *think* bytes is /always/ codesize * 4. */
-    interp->code->base.data = (opcode_t *)mem_sys_realloc(interp->code->base.data, bytes);
-    interp->code->base.size = codesize;
-
-    /* initialize the cursor to write opcodes into the code segment */
-    bc->opcursor = (opcode_t *)interp->code->base.data;
+    create_codesegment(bc, codesize);
 
     return bc;
 }
+
+/*
+
+Create a code segment of size C<codesize>.
+
+*/
+void
+create_codesegment(bytecode * const bc, int codesize) {
+    /* allocate enough space. XXX I *think* bytes is /always/ codesize * 4. */
+    bc->interp->code->base.data = (opcode_t *)mem_sys_realloc(bc->interp->code->base.data,
+                                                              codesize * 4);
+
+    bc->interp->code->base.size = codesize;
+
+    /* initialize the cursor to write opcodes into the code segment */
+    bc->opcursor = (opcode_t *)bc->interp->code->base.data;
+}
+
+/*
+
+=item C<void
+destroy_bytecode(bytecode * bc)>
+
+Destructor for bytecode struct; frees all memory.
+
+=cut
+
+*/
+void
+destroy_bytecode(bytecode * bc) {
+    /* XXX should we do this? Not Parrot? */
+    mem_sys_free(bc->interp->code->base.data);
+    mem_sys_free(bc);
+}
+
 
 /*
 

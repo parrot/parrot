@@ -82,10 +82,12 @@ void
 assign_vanilla_register(NOTNULL(lexer_state * const lexer), symbol * const sym) {
     sym->info.color    = next_register(lexer, sym->info.type);
 
-    sym->info.interval = new_live_interval(lexer->lsr, lexer->stmt_counter, sym->info.type);
+    if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC)) {
+        sym->info.interval = new_live_interval(lexer->lsr, lexer->stmt_counter, sym->info.type);
 
-    /* set the reference of the interval to the symbol's color */
-    sym->info.interval->color = &sym->info.color;
+        /* set the reference of the interval to the symbol's color */
+        sym->info.interval->color = &sym->info.color;
+    }
 
     /* mark the interval, so that its register is not reused, if the :unique_reg
      * flag was set.
@@ -299,7 +301,8 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
                 /* get a new reg from vanilla reg. allocator */
                 assign_vanilla_register(lexer, sym);
             else  /* update end point of interval */
-                sym->info.interval->endpoint = lexer->stmt_counter;
+                if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC))
+                    sym->info.interval->endpoint = lexer->stmt_counter;
 
 
             if (TEST_FLAG(lexer->flags, LEXER_FLAG_VERBOSE))
@@ -361,7 +364,9 @@ find_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     while (iter != NULL) {
         if (iter->info.id.regno == regno) {
             /* update the end point of this register's live interval */
-            iter->info.interval->endpoint = lexer->stmt_counter;
+            if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC))
+                iter->info.interval->endpoint = lexer->stmt_counter;
+
             return iter;
         }
 
@@ -403,9 +408,12 @@ use_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno, int p
     reg->info.color = pasmregno;
 
     /* create a new live interval for this symbolic register */
-    reg->info.interval = new_live_interval(lexer->lsr, lexer->stmt_counter, type);
-    /* let the interval have a pointer to this symbolic register */
-    reg->info.interval->color = &reg->info.color;
+    if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC)) {
+        reg->info.interval = new_live_interval(lexer->lsr, lexer->stmt_counter, type);
+
+        /* let the interval have a pointer to this symbolic register */
+        reg->info.interval->color = &reg->info.color;
+    }
 
 
     /* link this register into the list of "colored" registers; each of
@@ -465,7 +473,9 @@ color_reg(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
      */
     if (reg) {
         /* update end point of interval */
-        reg->info.interval->endpoint = lexer->stmt_counter;
+        if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC))
+            reg->info.interval->endpoint = lexer->stmt_counter;
+
         return reg->info.color;
     }
 
@@ -678,7 +688,7 @@ find_local_label(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const 
 
     /* no label found, emit an error message. */
     yypirerror(lexer->yyscanner, lexer, "in sub '%s': cannot find offset for label '%s'",
-             CURRENT_SUB(lexer)->sub_name, labelname);
+               CURRENT_SUB(lexer)->sub_name, labelname);
 
     return 0;
 }

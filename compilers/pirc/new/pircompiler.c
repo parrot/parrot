@@ -181,8 +181,9 @@ new_lexer(NULLOK(char * const filename), int flags) {
     lexer->macros     = new_macro_table(NULL);
     lexer->macro_size = INIT_MACRO_SIZE;
 
-    /* create a new linear scan register allocator */
-    lexer->lsr        = new_linear_scan_register_allocator(lexer);
+    /* create a new linear scan register allocator, if requested */
+    if (TEST_FLAG(flags, LEXER_FLAG_REGALLOC))
+        lexer->lsr = new_linear_scan_register_allocator(lexer);
 
     return lexer;
 }
