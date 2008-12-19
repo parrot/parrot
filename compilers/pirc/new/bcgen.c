@@ -25,6 +25,30 @@ file as a struct, so you can use it as a type, but not touch its
 private bits. Everything you need to know should be accessible through
 accessor functions.
 
+=head1 SYNOPSIS
+
+  // create a bytecode object
+  bytecode *bc = new_bytecode(interp, "foo.pir", codesize, bytes);
+
+  while ( ... ) {
+
+      // write opcodes
+      int opcode = ...
+
+      emit_opcode(bc, opcode);
+      // emit constants
+      int mystring = add_string_const(bc, "hello");
+
+      // emit the constant index into bytecode stream
+      emit_int_arg(bc, mystring);
+  }
+
+  // write the pbc file
+  write_pbc_file(bc, "foo.pbc");
+
+  // clean up
+  destroy_bytecode(bc);
+
 =cut
 
 */
@@ -307,6 +331,7 @@ emit_op_by_name(bytecode * const bc, char const * const opname) {
         emit_opcode(bc, op);
 }
 
+/* XXX remove or update prototype once the XXX below has been resolved. */
 static STRING *add_string_const_from_cstring(bytecode * const bc, char const * const str);
 
 /*
