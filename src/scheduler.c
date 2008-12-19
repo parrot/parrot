@@ -130,8 +130,7 @@ Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
         else if (string_equal(interp, type, CONST_STRING(interp, "event")) == 0) {
             PMC * const handler = Parrot_cx_find_handler_for_task(interp, task);
             if (!PMC_IS_NULL(handler)) {
-                PMC * handler_sub =
-                    VTABLE_get_attr_str(interp, handler, CONST_STRING(interp, "code"));
+                PMC * handler_sub = VTABLE_get_attr_str(interp, handler, CONST_STRING(interp, "code"));
                 Parrot_runops_fromc_args_event(interp, handler_sub,
                     "vPP", handler, task);
             }
@@ -409,6 +408,7 @@ PMC *
 Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)
 {
     if (interp->scheduler) {
+        STRING *suspend_str = CONST_STRING(interp, "suspend_for_gc");
         Parrot_Scheduler_attributes * sched_struct = PARROT_SCHEDULER(interp->scheduler);
         INTVAL num_tasks, index;
 
@@ -425,8 +425,8 @@ Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)
         for (index = 0; index < num_tasks; index++) {
             PMC *message = VTABLE_get_pmc_keyed_int(interp, sched_struct->messages, index);
             if (!PMC_IS_NULL(message)
-                    && string_equal(interp, VTABLE_get_string(interp, message),
-                    CONST_STRING(interp, "suspend_for_gc")) == 0) {
+            &&   string_equal(interp, VTABLE_get_string(interp, message),
+                        suspend_str) == 0) {
                 VTABLE_delete_keyed_int(interp, sched_struct->messages, index);
                 UNLOCK(sched_struct->msg_lock);
                 return message;
@@ -491,18 +491,21 @@ Parrot_cx_delete_handler_local(PARROT_INTERP, ARGIN(STRING *handler_type))
         VTABLE_shift_pmc(interp, handlers);
     else {
         /* Loop from newest handler to oldest handler. */
-        INTVAL index;
-        const INTVAL elements = VTABLE_elements(interp, handlers);
+        STRING      *exception_str = CONST_STRING(interp, "exception");
+        STRING      *event_str     = CONST_STRING(interp, "event");
+        STRING      *handler_str   = CONST_STRING(interp, "ExceptionHandler");
+        const INTVAL elements      = VTABLE_elements(interp, handlers);
+        INTVAL       index;
         typedef enum { Hunknown,  Hexception, Hevent } Htype;
+
         const Htype htype =
-            (string_equal(interp, handler_type, CONST_STRING(interp, "exception")) == 0) ?
+            (string_equal(interp, handler_type, exception_str) == 0) ?
             Hexception :
-            (string_equal(interp, handler_type, CONST_STRING(interp, "event")) == 0) ?
+            (string_equal(interp, handler_type, event_str) == 0) ?
                 Hevent :
                 Hunknown;
         STRING * const handler_name = (htype == Hexception) ?
-            CONST_STRING(interp, "ExceptionHandler") :
-            (STRING *) NULL;
+            handler_str : (STRING *) NULL;
 
         for (index = 0; index < elements; ++index) {
             PMC *handler = VTABLE_get_pmc_keyed_int(interp, handlers, index);
@@ -573,8 +576,7 @@ Parrot_cx_delete_handler_typed(PARROT_INTERP, ARGIN(STRING *handler_type))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Scheduler was not initialized for this interpreter.\n");
 
-    Parrot_PCCINVOKE(interp, interp->scheduler,
-            CONST_STRING(interp, "delete_handler"), "S->", handler_type);
+    Parrot_PCCINVOKE(interp, interp->scheduler, CONST_STRING(interp, "delete_handler"), "S->", handler_type);
 }
 
 /*
@@ -598,8 +600,7 @@ Parrot_cx_count_handlers_typed(PARROT_INTERP, ARGIN(STRING *handler_type))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Scheduler was not initialized for this interpreter.\n");
 
-    Parrot_PCCINVOKE(interp, interp->scheduler,
-            CONST_STRING(interp, "count_handlers"), "S->I", handler_type, count);
+    Parrot_PCCINVOKE(interp, interp->scheduler, CONST_STRING(interp, "count_handlers"), "S->I", handler_type, count);
 
     return count;
 }
@@ -712,8 +713,7 @@ Parrot_cx_find_handler_for_task(PARROT_INTERP, ARGIN(PMC *task))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Scheduler was not initialized for this interpreter.\n");
 
-    Parrot_PCCINVOKE(interp, interp->scheduler,
-            CONST_STRING(interp, "find_handler"), "P->P", task, &handler);
+    Parrot_PCCINVOKE(interp, interp->scheduler, CONST_STRING(interp, "find_handler"), "P->P", task, &handler);
 
 #if CX_DEBUG
     fprintf(stderr, "done searching for handler\n");
@@ -739,13 +739,15 @@ PMC *
 Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
 {
     Parrot_Context *context;
-    PMC *iter = PMCNULL;
+    PMC            *iter        = PMCNULL;
+    STRING * const  handled_str = CONST_STRING(interp, "handled");
+    STRING * const  iter_str    = CONST_STRING(interp, "handler_iter");
 
     /* Exceptions store the handler iterator for rethrow, other kinds of
      * tasks don't (though they could). */
-    if (task->vtable->base_type == enum_class_Exception &&
-            VTABLE_get_integer_keyed_str(interp, task, CONST_STRING(interp, "handled")) == -1) {
-        iter    = VTABLE_get_attr_str(interp, task, CONST_STRING(interp, "handler_iter"));
+    if (task->vtable->base_type == enum_class_Exception
+    && VTABLE_get_integer_keyed_str(interp, task, handled_str) == -1) {
+        iter    = VTABLE_get_attr_str(interp, task, iter_str);
         context = (Parrot_Context *)VTABLE_get_pointer(interp, task);
     }
     else {
@@ -962,7 +964,9 @@ static void
 scheduler_process_messages(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
     Parrot_Scheduler_attributes * sched_struct = PARROT_SCHEDULER(scheduler);
-    PMC *message;
+
+    PMC    *message;
+    STRING *suspend_str = CONST_STRING(interp, "suspend_for_gc");
 
 #if CX_DEBUG
     fprintf(stderr, "processing messages [interp=%p]\n", interp);
@@ -979,8 +983,8 @@ scheduler_process_messages(PARROT_INTERP, ARGMOD(PMC *scheduler))
 #endif
         UNLOCK(sched_struct->msg_lock);
         if (!PMC_IS_NULL(message)
-                && string_equal(interp, VTABLE_get_string(interp, message),
-                CONST_STRING(interp, "suspend_for_gc")) == 0) {
+         && string_equal(interp, VTABLE_get_string(interp, message),
+                suspend_str) == 0) {
 #if CX_DEBUG
     fprintf(stderr, "found a suspend, suspending [interp=%p]\n", interp);
 #endif

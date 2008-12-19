@@ -92,14 +92,10 @@ handler to care
             code = data;
         }
         else if (VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Hash"))) {
-            code =
-                VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "code"));
-            interpreter =
-                VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "interp"));
-            type =
-                VTABLE_get_string_keyed_str(INTERP, data, CONST_STRING(INTERP, "type"));
-            priority =
-                VTABLE_get_integer_keyed_str(INTERP, data, CONST_STRING(INTERP, "priority"));
+            code = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "code"));
+            interpreter = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "interp"));
+            type = VTABLE_get_string_keyed_str(INTERP, data, CONST_STRING(INTERP, "type"));
+            priority = VTABLE_get_integer_keyed_str(INTERP, data, CONST_STRING(INTERP, "priority"));
         }
         else {
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,

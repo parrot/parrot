@@ -88,8 +88,7 @@ Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self), ARGIN(
        return;
 
     /* Import any methods. */
-    Parrot_PCCINVOKE(interp, ns,
-        CONST_STRING(interp, "get_associated_methods"), "->P", &methods);
+    Parrot_PCCINVOKE(interp, ns, CONST_STRING(interp, "get_associated_methods"), "->P", &methods);
 
     if (!PMC_IS_NULL(methods)) {
         PMC * const iter = VTABLE_get_iter(interp, methods);
@@ -103,8 +102,7 @@ Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self), ARGIN(
     }
 
     /* Import any vtable methods. */
-    Parrot_PCCINVOKE(interp, ns,
-        CONST_STRING(interp, "get_associated_vtable_methods"), "->P", &vtable_overrides);
+    Parrot_PCCINVOKE(interp, ns, CONST_STRING(interp, "get_associated_vtable_methods"), "->P", &vtable_overrides);
 
     if (!PMC_IS_NULL(vtable_overrides)) {
         PMC * const iter = VTABLE_get_iter(interp, vtable_overrides);
@@ -119,8 +117,7 @@ Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self), ARGIN(
             STRING     *vtable_name   = string_from_cstring(interp, meth_c, 0);
 
             /* Strip leading underscores in the vtable name */
-            if (string_str_index(interp, vtable_name,
-                CONST_STRING(interp, "__"), 0) == 0) {
+            if (string_str_index(interp, vtable_name, CONST_STRING(interp, "__"), 0) == 0) {
                 vtable_name = string_substr(interp, vtable_name, 2,
                     string_length(interp, vtable_name) - 2, NULL, 0);
             }
@@ -820,8 +817,7 @@ Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *metho
 
 
     if (!string_equal(interp, method_name, CONST_STRING(interp, "__get_string")))
-        return find_method_direct_1(interp, _class,
-            CONST_STRING(interp, "__get_repr"));
+        return find_method_direct_1(interp, _class, CONST_STRING(interp, "__get_repr"));
 
     return PMCNULL;
 }
@@ -1208,8 +1204,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
             return;
 
     /* Get the methods from the role. */
-    Parrot_PCCINVOKE(interp, role,
-        CONST_STRING(interp, "methods"), "->P", &methods);
+    Parrot_PCCINVOKE(interp, role, CONST_STRING(interp, "methods"), "->P", &methods);
 
     if (PMC_IS_NULL(methods))
         return;
@@ -1325,8 +1320,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
      * that it did itself. Note that we already have the correct methods
      * as roles "flatten" the methods they get from other roles into their
      * own method list. */
-    Parrot_PCCINVOKE(interp, role,
-        CONST_STRING(interp, "roles"), "->P", &roles_of_role);
+    Parrot_PCCINVOKE(interp, role, CONST_STRING(interp, "roles"), "->P", &roles_of_role);
     roles_of_role_count = VTABLE_elements(interp, roles_of_role);
 
     for (i = 0; i < roles_of_role_count; i++) {

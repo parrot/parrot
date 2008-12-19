@@ -459,13 +459,15 @@ PMCNULL.
 */
 
     METHOD find_handler(PMC *task) {
-        PMC *iter;
+        STRING * const handled_str = CONST_STRING(interp, "handled");
+        STRING * const iter_str    = CONST_STRING(interp, "handler_iter");
+        PMC    *iter;
 
         /* Exceptions store the handler iterator for rethrow, other kinds of
          * tasks don't (though they could). */
         if (task->vtable->base_type == enum_class_Exception
-        &&  VTABLE_get_integer_keyed_str(interp, task, CONST_STRING(interp, "handled")) == -1) {
-            iter = VTABLE_get_attr_str(interp, task, CONST_STRING(interp, "handler_iter"));
+        &&  VTABLE_get_integer_keyed_str(interp, task, handled_str) == -1) {
+            iter = VTABLE_get_attr_str(interp, task, iter_str);
         }
         else {
             PMC *handlers;
@@ -473,7 +475,7 @@ PMCNULL.
             iter = VTABLE_get_iter(interp, handlers);
 
             if (task->vtable->base_type == enum_class_Exception)
-                VTABLE_set_attr_str(interp, task, CONST_STRING(interp, "handler_iter"), iter);
+                VTABLE_set_attr_str(interp, task, iter_str, iter);
         }
 
         /* Loop from newest handler to oldest handler. */

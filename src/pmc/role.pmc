@@ -631,8 +631,7 @@ providing a set of key/value pairs describing the attribute.
 
 */
     METHOD attributes() {
-        PMC *ret_attrib_metadata =
-            VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "attributes"));
+        PMC *ret_attrib_metadata = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "attributes"));
         RETURN(PMC *ret_attrib_metadata);
     }
 

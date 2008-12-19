@@ -1427,8 +1427,10 @@ void
 Parrot_mmd_add_multi_from_long_sig(PARROT_INTERP,
         ARGIN(STRING *sub_name), ARGIN(STRING *long_sig), ARGIN(PMC *sub_obj))
 {
-    PMC    *type_list = string_split(interp, CONST_STRING(interp, ","), long_sig);
-    STRING *ns_name   = VTABLE_get_string_keyed_int(interp, type_list, 0);
+    PMC    *type_list   = string_split(interp, CONST_STRING(interp, ","), long_sig);
+    STRING *ns_name     = VTABLE_get_string_keyed_int(interp, type_list, 0);
+    STRING *sub_str     = CONST_STRING(interp, "Sub");
+    STRING *closure_str = CONST_STRING(interp, "Closure");
 
     /* Attach a type tuple array to the sub for multi dispatch */
     PMC    *multi_sig = mmd_build_type_tuple_from_type_list(interp, type_list);
@@ -1436,8 +1438,8 @@ Parrot_mmd_add_multi_from_long_sig(PARROT_INTERP,
     if (sub_obj->vtable->base_type == enum_class_NCI) {
         PMC_pmc_val(sub_obj) = multi_sig;
     }
-    else if (VTABLE_isa(interp, sub_obj, CONST_STRING(interp, "Sub"))
-         ||  VTABLE_isa(interp, sub_obj, CONST_STRING(interp, "Closure"))) {
+    else if (VTABLE_isa(interp, sub_obj, sub_str)
+         ||  VTABLE_isa(interp, sub_obj, closure_str)) {
         PMC_sub(sub_obj)->multi_signature = multi_sig;
     }
 

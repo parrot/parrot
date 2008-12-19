@@ -111,8 +111,12 @@ Initializes the exception with supplied values.
 */
 
     VTABLE void init_pmc(PMC *values) {
+        STRING * const severity = CONST_STRING(interp, "severity");
+        STRING * const message  = CONST_STRING(interp, "message");
+
         Parrot_Exception_attributes * const core_struct =
             mem_allocate_zeroed_typed(Parrot_Exception_attributes);
+
         INTVAL ishash = VTABLE_isa(interp, values, CONST_STRING(interp, 'Hash'));
 
         /* Set flags for custom DOD mark and destroy. */
@@ -121,13 +125,13 @@ Initializes the exception with supplied values.
 
         /* Set up the core struct and default values for the exception object. */
         PMC_data(SELF)            = core_struct;
-        core_struct->severity     = ishash ?
-            VTABLE_get_integer_keyed_str(interp, values, CONST_STRING(interp, 'severity')) :
-            EXCEPT_error;
+        core_struct->severity     = ishash
+            ? VTABLE_get_integer_keyed_str(interp, values, severity)
+            : EXCEPT_error;
         core_struct->handled      = 0;
-        core_struct->message      = ishash ?
-            VTABLE_get_string_keyed_str(interp, values, CONST_STRING(interp, 'message')) :
-            VTABLE_get_string(interp, values);
+        core_struct->message      = ishash
+            ? VTABLE_get_string_keyed_str(interp, values, message)
+            : VTABLE_get_string(interp, values);
         core_struct->payload      = PMCNULL;
         core_struct->resume       = PMCNULL;
         core_struct->backtrace    = PMCNULL;
@@ -523,8 +527,10 @@ exit_code.
 
 */
     VTABLE INTVAL is_equal(PMC *value) {
+        STRING * const exception_str = CONST_STRING(INTERP, "Exception");
+
         if (value->vtable->base_type == SELF->vtable->base_type
-        &&  VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Exception"))) {
+        &&  VTABLE_isa(INTERP, value, exception_str)) {
             INTVAL self_compare, value_compare;
             GET_ATTR_type(interp, SELF, self_compare);
             GET_ATTR_type(interp, value, value_compare);

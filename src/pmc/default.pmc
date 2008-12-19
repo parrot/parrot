@@ -41,8 +41,10 @@ Returns a C string for the name of C<*pmc>.
 static STRING *
 caller(PARROT_INTERP, PMC *pmc /*NULLOK*/)
 {
-    return pmc && pmc->vtable && pmc->vtable->whoami ?
-        VTABLE_name(interp, pmc) : CONST_STRING(interp, "(null)");
+    STRING * const null_str = CONST_STRING(interp, "(null)");
+
+    return pmc && pmc->vtable && pmc->vtable->whoami
+                ? VTABLE_name(interp, pmc) : null_str;
 }
 
 /*

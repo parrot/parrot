@@ -245,9 +245,10 @@ Throws an exception if an unknown PMC type is passed.
 */
 
     METHOD globals(PMC *glb :optional, int got_glb :opt_flag) {
-        STRING          *s_str  = CONST_STRING(interp, "String");
-        STRING          *s_arr  = CONST_STRING(interp, "array");
-        STRING          *s_hash = CONST_STRING(interp, "hash");
+        STRING * const s_str   = CONST_STRING(interp, "String");
+        STRING * const s_arr   = CONST_STRING(interp, "array");
+        STRING * const s_hash  = CONST_STRING(interp, "hash");
+        STRING * const s_space = CONST_STRING(interp, " ");
 
         if (got_glb) {
             STRING * const s_empty      = CONST_STRING(interp, "");
@@ -261,9 +262,8 @@ Throws an exception if an unknown PMC type is passed.
                 INTVAL n, i;
 
                 if (VTABLE_isa(interp, glb, s_str))
-                    glb_array = string_split(interp,
-                            CONST_STRING(interp, " "),
-                            VTABLE_get_string(interp, glb));
+                    glb_array = string_split(interp, s_space,
+                        VTABLE_get_string(interp, glb));
                 else
                     glb_array = glb;
 

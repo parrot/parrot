@@ -396,8 +396,7 @@ PMC *
 Parrot_ns_get_name(PARROT_INTERP, ARGIN(PMC *_namespace))
 {
     PMC *names;
-    Parrot_PCCINVOKE(interp, _namespace,
-            CONST_STRING(interp, "get_name"), "->P", &names);
+    Parrot_PCCINVOKE(interp, _namespace, CONST_STRING(interp, "get_name"), "->P", &names);
     return names;
 }
 

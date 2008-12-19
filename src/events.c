@@ -1357,9 +1357,10 @@ event_to_exception(PARROT_INTERP, ARGIN(const parrot_event* event))
              * installed: set severity to EXCEPT_exit
              */
             {
-                PMC *exception = Parrot_ex_build_exception(interp,
-                        EXCEPT_exit, exit_code,
-                        CONST_STRING(interp, "Caught signal."));
+                STRING * const message = CONST_STRING(interp, "Caught signal.");
+                PMC           *exception = Parrot_ex_build_exception(interp,
+                                        EXCEPT_exit, exit_code, message);
+
                 Parrot_ex_throw_from_c(interp, exception);
             }
             break;

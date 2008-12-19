@@ -891,10 +891,9 @@ slurpy arguments).
     }
 
     METHOD arity() {
-        PMC *pos_required =
-            VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "pos_required"));
-        PMC *named_required =
-            VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "named_required"));
+        PMC *pos_required = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "pos_required"));
+        PMC *named_required = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "named_required"));
+
         INTVAL arity = VTABLE_get_integer(INTERP, pos_required) +
             VTABLE_get_integer(INTERP, named_required);
 

@@ -191,13 +191,15 @@ Report whether the exception handler can handle a particular type of exception.
 */
 
     METHOD can_handle(PMC *exception) {
+        STRING * const sev    = CONST_STRING(interp, "severity");
+        STRING * const ex_str = CONST_STRING(interp, "Exception");
+
         Parrot_ExceptionHandler_attributes * const core_struct =
                     PARROT_EXCEPTIONHANDLER(SELF);
-        INTVAL severity =
-            VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
+        INTVAL severity = VTABLE_get_integer_keyed_str(interp, exception, sev);
 
         if (exception->vtable->base_type == enum_class_Exception
-        ||  VTABLE_isa(INTERP, exception, CONST_STRING(INTERP, "Exception"))) {
+        ||  VTABLE_isa(INTERP, exception, ex_str)) {
 
             if (severity < core_struct->min_severity) {
                 RETURN(INTVAL 0);
