@@ -1439,9 +1439,10 @@ Set the args of an invocation onto the current invocation object.
 =cut
 
 */
-void
+invocation *
 set_invocation_args(invocation * const inv, argument * const args) {
     inv->arguments = args;
+    return inv;
 }
 
 /*
@@ -1454,9 +1455,10 @@ Set the invocation results on the invocation object C<inv>.
 =cut
 
 */
-void
+invocation *
 set_invocation_results(invocation * const inv, target * const results) {
     inv->results = results;
+    return inv;
 }
 
 /*
@@ -1469,9 +1471,10 @@ Set the invocation type on the invocation object C<inv>.
 =cut
 
 */
-void
+invocation *
 set_invocation_type(invocation * const inv, invoke_type type) {
     inv->type = type;
+    return inv;
 }
 
 /*

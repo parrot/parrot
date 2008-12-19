@@ -1603,8 +1603,7 @@ long_invocation_stat : ".begin_call" "\n"
                        ".end_call" "\n"
                             { /* $4 contains an invocation object */
                               set_invocation_args($4, $3);
-                              set_invocation_results($4, $6);
-                              $$ = $4;
+                              $$ = set_invocation_results($4, $6);
                             }
                      ;
 
@@ -1649,10 +1648,10 @@ long_results         : long_result
                            { $$ = $1; }
                      | long_results long_result
                            {
-                               if ($2)
-                                   $$ = add_target(lexer, $1, $2);
-                               else
-                                   $$ = $1
+                             if ($2)
+                                 $$ = add_target(lexer, $1, $2);
+                             else
+                                 $$ = $1
                            }
                      ;
 
@@ -1667,17 +1666,11 @@ short_invocation_stat: short_invocation "\n"
 
 
 short_invocation     : opt_target_list '=' simple_invocation
-                           { set_invocation_results($3, $1);
-                             $$ = $3;
-                           }
+                           { $$ = set_invocation_results($3, $1); }
                      | target '=' simple_invocation
-                           { set_invocation_results($3, $1);
-                             $$ = $3;
-                           }
+                           { $$ = set_invocation_results($3, $1); }
                      | simple_invocation
-                           { set_invocation_results($1, NULL);
-                             $$ = $1;
-                           }
+                           {  $$ = set_invocation_results($1, NULL); }
                      ;
 
 simple_invocation    : subcall
@@ -1686,13 +1679,8 @@ simple_invocation    : subcall
 
 methodcall           : pmc_object '.' method arguments
                            {
-                             target *invocant;
-
                              /* if $1 is not a register, check whether the symbol was declared */
-                             if (TEST_FLAG($1->flags, TARGET_FLAG_IS_REG)) {
-                                invocant = $1;
-                             }
-                             else { /* is not a register but a symbol */
+                             if (!TEST_FLAG($1->flags, TARGET_FLAG_IS_REG)) {
 
                                  symbol *sym = find_symbol(lexer, $1->info->id.name);
                                  if (sym == NULL)
@@ -1702,12 +1690,9 @@ methodcall           : pmc_object '.' method arguments
                                      yypirerror(yyscanner, lexer,
                                              "cannot invoke method: '%s' is not of type 'pmc'",
                                              $1->info->id.name);
-
-                                 /* get a target based on the symbol, it contains a register */
-                                 invocant = $1;
                              }
 
-                             $$ = invoke(lexer, CALL_METHOD, invocant, $3);
+                             $$ = invoke(lexer, CALL_METHOD, $1, $3);
                              set_invocation_args($$, $4);
                            }
                      ;
@@ -1723,11 +1708,12 @@ sub                  : pmc_object
                            { $$ = $1; }
                      | TK_STRINGC
                            {
-                               symbol *sym = find_symbol(lexer, $1);
-                               if (sym == NULL)
-                                   sym = new_symbol(lexer, $1, PMC_TYPE);
+                             symbol *sym = find_symbol(lexer, $1);
+                             if (sym == NULL)
+                                 sym = new_symbol(lexer, $1, PMC_TYPE);
 
-                               $$ = target_from_symbol(lexer, sym); }
+                             $$ = target_from_symbol(lexer, sym);
+                           }
                      ;
 
 method               : identifier
@@ -2732,7 +2718,7 @@ evaluate_s(NOTNULL(char * const s)) {
                                 no need to do expensive string comparison; it must be true. */
             if (STREQ(s, "0") || STREQ(s, ".0") || STREQ(s, "0.") || STREQ(s, "0.0"))
                 return 0;
-            else  /* short string but not equal to "0.0" or a variant */
+            else
                 return 1;
         }
         else /* strlen > 3, so does not contain "0.0" or a variant */
