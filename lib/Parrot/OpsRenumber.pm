@@ -86,7 +86,7 @@ sub renum_op_map_file {
         # (b) the first 7, never-to-be-altered opcodes.
         # Below that line are all the remaining opcodes.  All opcode lines
         # match the pattern /^(\w+)\s+(\d+)$/.  Everything above the line gets
-        # pushed into @lines and, if it's an opcode line, get's split and
+        # pushed into @lines and, if it's an opcode line, gets split and
         # pushed into %fixed as well.  Nothing happens to the (opcode) lines
         # below the DYNAMIC line.
 
