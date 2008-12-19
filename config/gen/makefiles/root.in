@@ -1431,7 +1431,7 @@ SRC_TEST_FILES = \
 TOOLS_TEST_FILES = \
     t/tools/*.t
 PMC2CUTILS_DIR = t/tools/pmc2cutils
-OPS2PMUTILS_DIR = t/tools/ops2pmutils
+OPS2PMUTILS_DIR = t/tools/ops2pm
 OPS2CUTILS_DIR = t/tools/ops2cutils
 REVISIONUTILS_DIR = t/tools/revision
 HARNESS_DIR = t/pharness

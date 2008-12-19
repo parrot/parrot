@@ -52,7 +52,7 @@ than> the object-oriented methods provided by Parrot::Ops2pm.
 
 Extraction of the subroutines exported by this package from
 F<tools/build/ops2pm.pl> facilitates the testing of their functionality by the
-tests in F<t/tools/ops2pmutils/*.t>.
+tests in F<t/tools/ops2pm/*.t>.
 
 =head1 SUBROUTINES
 

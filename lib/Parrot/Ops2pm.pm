@@ -429,7 +429,7 @@ END_C
 =head1 NOTE ON TESTING
 
 A suite of test files to accompany this package is found in
-F<t/tools/ops2pmutils>.  This suite has been developed to maximize its
+F<t/tools/ops2pm>.  This suite has been developed to maximize its
 coverage of the code of Parrot::Ops2pm (as measured by Perl module
 Devel::Cover).  Should you wish to refactor this package, it is recommended
 that you do so in a B<test-driven> manner:
@@ -455,7 +455,7 @@ Test the new code and debug.  The tests in the suite should be run B<after>
 Parrot's F<Configure.pl> has run but B<before> F<make> has run.  Example:
 
     $> perl Configure.pl
-    $> prove -v t/tools/ops2pmutils/*.t
+    $> prove -v t/tools/ops2pm/*.t
     $> make
 
 =item 5

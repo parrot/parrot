@@ -186,7 +186,7 @@ configuration has begun.
 =item C<--test=build>
 
 Run tests found in F<t/postconfigure/>, F<t/tools/pmc2cutils/>,
-F<t/tools/ops2cutils/> and F<t/tools/ops2pmutils/> I<after> configuration has
+F<t/tools/ops2cutils/> and F<t/tools/ops2pm/> I<after> configuration has
 completed.  These tests demonstrate (a) that certain of Parrot's configuration
 tools are working properly post-configuration; and (b) that certain of
 Parrot's build tools will work properly once you call F<make>.

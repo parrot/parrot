@@ -82,7 +82,7 @@ Most of the functionality in this program is now held in Parrot::Ops2pm::Util
 methods and a small number of Parrot::Ops2pm::Auxiliary subroutines.
 See those modules' documentation for discussion of those functions.
 Revisions to the functionality should be made in those packages and tested
-against tests found in F<t/tools/ops2pmutils/>.
+against tests found in F<t/tools/ops2pm/>.
 
 =head1 WARNING
 

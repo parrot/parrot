@@ -33,7 +33,7 @@ sub get_postconfiguration_tests {
         glob("t/postconfigure/*.t"),
         glob("t/tools/pmc2cutils/*.t"),
         glob("t/tools/ops2cutils/*.t"),
-        glob("t/tools/ops2pmutils/*.t"),
+        glob("t/tools/ops2pm/*.t"),
         glob("t/pharness/*.t"),
     );
     return @postconfiguration_tests;
@@ -137,7 +137,7 @@ Returns a list of the tests found in these directories:
     t/postconfigure/
     t/tools/pmc2cutils/
     t/tools/ops2cutils/
-    t/tools/ops2pmutils/
+    t/tools/ops2pm/
     t/pharness/
 
 =back
