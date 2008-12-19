@@ -606,6 +606,8 @@ nodes of type C<PAST::Stmts>.
     .return (ops)
 .end
 
+=back
+
 =head3 C<PAST::Control>
 
 =over 4
@@ -1864,7 +1866,7 @@ node with a 'pasttype' of inline.
 
 =over 4
 
-=item as_post(PAST::Block node)
+=item as_post(PAST::Var node)
 
 Return the POST representation of a C<PAST::Var>.  Generally we
 redispatch to an appropriate handler based on the node's 'scope'
