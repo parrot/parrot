@@ -1358,7 +1358,7 @@ imcc_init(PARROT_INTERP)
 
 /*
 
-=imcc C<void imcc_destroy_macro_values(void *)>
+=item C<void imcc_destroy_macro_values(void *)>
 
 A callback for parrot_chash_destroy_values() to free all macro-allocated memory.
 
