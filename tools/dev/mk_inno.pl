@@ -75,6 +75,7 @@ Compression=lzma
 SolidCompression=yes
 ChangesAssociations=yes
 PrivilegesRequired=none
+ChangesEnvironment=yes
 
 [Files]
 Source: "$prefix\\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
@@ -83,6 +84,9 @@ ${dll_section}
 
 [Icons]
 Name: "{group}\\{cm:UninstallProgram,parrot}"; Filename: "{uninstallexe}"
+
+[Registry]
+Root: HKLM; SubKey: "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\\"; ValueType: string; ValueName: "Path"; ValueData: "{reg:HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\\,Path};{app}\\bin"
 };
 
 close $OUT;
