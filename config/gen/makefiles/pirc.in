@@ -65,7 +65,7 @@ pirc$(EXE): $(OBJS)
 	@rpath_blib@ @libparrot_ldflags@ $(C_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 
 new/pirparser$(O): new/pirparser.c new/pirparser.h
-new/pirlexer$(O): new/pirlexer.c src/pirlexer.h
+new/pirlexer$(O): new/pirlexer.c new/pirlexer.h
 new/pircompunit$(O): new/pircompunit.c new/pircompunit.h
 new/pircompiler$(O): new/pircompiler.c new/pircompiler.h
 new/pirsymbol$(O): new/pirsymbol.c new/pirsymbol.h
