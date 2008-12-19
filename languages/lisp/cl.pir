@@ -311,7 +311,7 @@ DONE:
   if k > leng goto BOUNDS
   if k < 0 goto BOUNDS
 
-  sstr = str[k]
+  sstr = substr str, k, 1
   retval = new 'LispString'
   retval = sstr
   goto DONE
