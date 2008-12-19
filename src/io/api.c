@@ -33,8 +33,6 @@ is used in Parrot ops.
 
 /*
 
-=back
-
 =head2 Generic I/O interface
 
 =over 4
