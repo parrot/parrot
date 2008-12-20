@@ -57,8 +57,6 @@ transform post (PAST::Block) :language('PIR') {
   L3:
     set_hll_global ['Lua';'POST'], '$?SUB', outerpost
     set_hll_global ['Lua';'POST'], '@endlabels', endlabels
-    .local string esc_name
-    esc_name = post.'escape'(name)
     if null outerpost goto L4
     .local pmc ops_subr
     ops_subr = outerpost.'ops_subr'()
@@ -76,7 +74,8 @@ PIRCODE
     ops = $P0.'new'('node'=>node)
     ops.'push'(post)
     $S0 = post.'unique'('fct_')
-    ops.'push_pirop'('inline', $S0, esc_name, 'inline'=>'    .const "Sub" %0 = %1')
+    $S1 = post.'subid'()
+    ops.'push_pirop'('inline', $S0, $S1, 'inline'=>'    .const "Sub" %0 = "%1"')
     .local string result
     result = ops.'unique'('$P')
     ops.'push_pirop'('newclosure', result, $S0)
@@ -89,7 +88,8 @@ PIRCODE
     .local pmc start
     $P0 = get_hll_global ['Lua'; 'POST'], 'Sub'
     start = $P0.'new'('name'=>'&start', 'pirflags'=>':anon :main')
-    start.'push_pirop'('inline', esc_name, 'inline'=><<'PIRCODE')
+    $S0 = post.'subid'()
+    start.'push_pirop'('inline', $S0, 'inline'=><<'PIRCODE')
     .param pmc args :optional
 #    print "start\n"
     load_bytecode "languages/lua/lua.pbc"
@@ -98,7 +98,7 @@ PIRCODE
     env = get_hll_global "_G"
     .local pmc vararg
     vararg = argstolua(env, args)
-    .const "Sub" main = %0
+    .const "Sub" main = "%0"
     main."setfenv"(env)
     ($I0, $P0) = docall(main, vararg :flat)
     unless $I0 goto L1
