@@ -17,7 +17,7 @@ use Fcntl qw( :DEFAULT :flock );
 use Text::Balanced qw(extract_delimited);
 use Math::BigInt ();
 use Getopt::Long ();
-use IO::File;
+use IO::File ();
 
 my $outfile          = 'all_cstring.str';
 my $string_private_h = 'src/string_private_cstring.h';
