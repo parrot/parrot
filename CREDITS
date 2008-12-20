@@ -30,6 +30,9 @@ D: Named arguments support and recovery support on PIR parser
 S: Braga, Portugal
 W: http://alfarrabio.di.uminho.pt/~albie/
 
+N: Ahmed Zawawi
+D: Rakudo builtins
+
 N: Aldo Calpini
 D: Debugging tutorial
 D: Porting to PDA
@@ -200,6 +203,8 @@ E: ckuskie@sterling.net
 
 N: Cory Spencer
 D: Peek opcode and PIO implementation
+D: Rakudo builtins
+E: cspencer@sprocket.org
 
 N: Curtis Rawls
 D: imcc optimizer and register allocator patches and tests
