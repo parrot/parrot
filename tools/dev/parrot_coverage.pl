@@ -35,7 +35,7 @@ my $DEBUG   = 1;
 
 if ( $ARGV[0] && $ARGV[0] =~ /recompile/ ) {
 
-    # clean up remnants of prior biulds
+    # clean up remnants of prior builds
     File::Find::find(
         {
             wanted => sub {
