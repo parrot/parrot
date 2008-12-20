@@ -68,7 +68,7 @@ php_API.pir - PHP API Library
     $I0 = isa val, 'PhpResource'
     if $I0 goto L1
     $P0 = getinterp
-    $P1 = $P0['sub', 1]
+    $P1 = $P0['sub'; 1]
     error(E_WARNING, $P1, "(): supplied argument is not a valid ", type, " resource")
     null $P0
     .return ($P0)
@@ -79,7 +79,7 @@ php_API.pir - PHP API Library
     .return ($P0)
   L2:
     $P0 = getinterp
-    $P1 = $P0['sub', 1]
+    $P1 = $P0['sub'; 1]
     error(E_WARNING, $P1, "(): supplied resource is not a valid ", type, " resource")
     null $P0
     .return ($P0)
@@ -131,7 +131,7 @@ STILL INCOMPLETE (see parse_arg_impl).
     $I0 = index '!/', $S0
     if $I0 > -1 goto L1
     $P0 = getinterp
-    $P1 = $P0['sub', 1]
+    $P1 = $P0['sub'; 1]
     error(E_WARNING, $P1, '(): bad type specifier while parsing parameters')
     .return (0)
   L2:
@@ -143,7 +143,7 @@ STILL INCOMPLETE (see parse_arg_impl).
     goto L7
   L6:
     $P0 = getinterp
-    $P1 = $P0['sub', 1]
+    $P1 = $P0['sub'; 1]
     unless min_num_args == max_num_args goto L8
     $S1 = 'exactly'
     goto L9
@@ -200,7 +200,7 @@ STILL INCOMPLETE (see parse_arg_impl).
     (expected_type, $P1, $I2) = parse_arg_impl(arg, fmt, ifmt)
     if expected_type == '' goto L1
     $P0 = getinterp
-    $P1 = $P0['sub', 2]
+    $P1 = $P0['sub'; 2]
     $S3 = typeof arg
     error(E_WARNING, $P1, '() expects parameter ', iarg, ' to be ', expected_type, ', ', $S3, ' given')
     .return (0)
@@ -391,7 +391,7 @@ STILL INCOMPLETE (see parse_arg_impl).
 
 .sub 'wrong_param_count'
     $P0 = getinterp
-    $P1 = $P0['sub', 1]
+    $P1 = $P0['sub'; 1]
     error(E_WARNING, 'Wrong parameter count for ', $P1, '()')
 .end
 
