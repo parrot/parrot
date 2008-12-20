@@ -226,7 +226,7 @@ your email should also include a good description about what you changed
 and why.
 
 It's important that you create your patches from a checked-out subversion
-repository, not from a tarball or or snapshot. This way, you can ensure
+repository, not from a tarball or a snapshot. This way, you can ensure
 that your diff is made against the latest version of the files. If you patch
 an old version, the problem may have already been resolved! Make sure
 the paths listed in the patch match those in the repository. There are two
