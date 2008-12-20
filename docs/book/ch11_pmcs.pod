@@ -107,7 +107,7 @@ and then Parrot will enable us to write things like C<$P0[2]> in PIR
 code to access the PMC using integer indices. C<provides hash> means
 that we can use string and PMC keys to access values in the PMC. These
 C<provides> each correspond to a series of VTABLE interfaces that the
-PMC must provide, or must inherit. Without the necessary VABLE
+PMC must provide, or must inherit. Without the necessary VTABLE
 interfaces available, Parrot may try to perform illegal operations and
 things will go badly. We'll talk about all the available C<provides>
 interfaces and the VTABLE interfaces that they must define.

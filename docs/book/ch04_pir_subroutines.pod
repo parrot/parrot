@@ -18,7 +18,7 @@ single stand-alone unit for reuse. PIR is a subroutine-based language
 in that all code in PIR must exist in a subroutine. Execution starts,
 as we have seen, in the C<:main> subroutine, and others can be called
 to perform the tasks of a program. From subroutines we can construct
-more elaborate chunks of code reusability: methods and objects. In
+more elaborate chunks of code reusability methods and objects. In
 this chapter we will talk about how subroutines work in PIR, and how
 they can be used by developers to create programs for Parrot.
 
@@ -564,14 +564,14 @@ first method:
     .local pmc obj
     newclass class, "Foo"       # create a new Foo class
     new obj, "Foo"              # instantiate a Foo object
-    obj."meth"()                # call obj."_meth" which is actually
-    print "done\n"              # "_meth" in the "Foo" namespace
+    obj."meth"()                # call obj."meth" which is actually
+    print "done\n"              # in the "Foo" namespace
     end
   .end
 
   .namespace [ "Foo" ]          # start namespace "Foo"
 
-  .sub meth :method             # define Foo::_meth global
+  .sub meth :method             # define Foo::meth global
      print "in meth\n"
      $S0 = "other_meth"         # method names can be in a register too
      self.$S0()                 # self is the invocant
