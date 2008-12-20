@@ -144,7 +144,7 @@ PARROT_WARN_UNUSED_RESULT
 static size_t
 key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), size_t seed)
 {
-    if (PObj_is_shared_TEST(s) || s->hashval == 0) {
+    if (s->hashval == 0) {
         return string_hash(interp, s);
     }
 
