@@ -745,6 +745,13 @@ u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
     if (flags == enum_cclass_any)
         return 1;
 
+    /* All codepoints from u+0100 to u+02af are alphabetic, so we
+     * cheat on the WORD and ALPHABETIC properties to include these
+     * (and incorrectly exclude all others).  This is a stopgap until
+     * ICU is everywhere, or we have better non-ICU unicode support. */
+    if (flags == enum_cclass_word || flags == enum_cclass_alphabetic)
+        return (codepoint < 0x2b0);
+
     if (flags & enum_cclass_whitespace) {
         /* from http://www.unicode.org/Public/UNIDATA/PropList.txt */
         switch (codepoint) {
