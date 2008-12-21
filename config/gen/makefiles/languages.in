@@ -108,7 +108,7 @@ clean: \
     scheme.clean squaak.clean \
     urm.clean \
     WMLScript.clean \
-    Zcode.clean \
+    Zcode.clean
 
 realclean: \
     abc.realclean APL.realclean \
