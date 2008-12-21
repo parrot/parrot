@@ -1478,11 +1478,11 @@ enum { JIT_X86BRANCH, JIT_X86JUMP, JIT_X86CALL };
 #  undef Parrot_jit_vtable_unlessp_op
 #  undef Parrot_jit_vtable_newp_ic_op
 
-#  define CONST(i) (int *)(jit_info->cur_op[i] * \
+#  define JIT_CONST(i) (int *)(jit_info->cur_op[i] * \
        sizeof (PackFile_Constant) + \
        offsetof(PackFile_Constant, u))
 
-#  define CALL(f) Parrot_exec_add_text_rellocation_func(jit_info->objfile, \
+#  define JIT_CALL(f) Parrot_exec_add_text_rellocation_func(jit_info->objfile, \
        jit_info->native_ptr, (f)); \
        emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
 /* emit a call to a vtable func
@@ -1493,23 +1493,9 @@ enum { JIT_X86BRANCH, JIT_X86JUMP, JIT_X86CALL };
 #  include "parrot/oplib/ops.h"
 EXTERN INTVAL Parrot_FixedIntegerArray_get_integer_keyed_int(Interp*, PMC*, INTVAL);
 EXTERN void Parrot_FixedIntegerArray_set_integer_keyed_int(Interp*, PMC*, INTVAL, INTVAL);
-#  define ROFFS_PMC(x) REG_OFFS_PMC(jit_info->cur_op[(x)])
-#  define ROFFS_INT(x) REG_OFFS_INT(jit_info->cur_op[(x)])
+#  define JIT_ROFFS_PMC(x) REG_OFFS_PMC(jit_info->cur_op[(x)])
+#  define JIT_ROFFS_INT(x) REG_OFFS_INT(jit_info->cur_op[(x)])
 #  define NATIVECODE jit_info->native_ptr
-
-
-#  undef ROFFS_PMC
-#  undef ROFFS_INT
-#  undef NATIVECODE
-
-/*
-#  undef IREG
-#  undef NREG
-#  undef SREG
-#  undef PREG
-#  undef CONST
-#  undef CALL
-*/
 
 #endif /* JIT_VTABLE_OPS */
 

@@ -903,7 +903,7 @@ jit_set_i_p_ki(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset)
      * cmp Parrot_FixedIntegerArray_get_integer_keyed_int, %esi
      * jne L1
      */
-    jit_emit_mov_RM_i(interp, NATIVECODE, emit_EDI, ROFFS_PMC(2));
+    jit_emit_mov_RM_i(interp, NATIVECODE, emit_EDI, JIT_ROFFS_PMC(2));
     emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EDI, emit_None, 1,
             offsetof(struct PMC, vtable));
     emitm_movl_m_r(interp, NATIVECODE, emit_ESI, emit_EAX, emit_None, 1, offset);
@@ -924,7 +924,7 @@ jit_set_i_p_ki(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset)
         jit_emit_mov_rr_i(NATIVECODE, emit_ECX, MAP(3));
     }
     else {
-        jit_emit_mov_RM_i(interp, NATIVECODE, emit_ECX, ROFFS_INT(3));
+        jit_emit_mov_RM_i(interp, NATIVECODE, emit_ECX, JIT_ROFFS_INT(3));
     }
     /*  range check */
     jit_emit_cmp_ri_i(interp, NATIVECODE, emit_ECX, 0);
@@ -965,7 +965,7 @@ jit_set_p_ki_i(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset)
      * cmp Parrot_FixedIntegerArray_set_integer_keyed_int, %esi
      * jne L1
      */
-    jit_emit_mov_RM_i(interp, NATIVECODE, emit_EDI, ROFFS_PMC(1));
+    jit_emit_mov_RM_i(interp, NATIVECODE, emit_EDI, JIT_ROFFS_PMC(1));
     emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EDI, emit_None, 1,
             offsetof(struct PMC, vtable));
     emitm_movl_m_r(interp, NATIVECODE, emit_ESI, emit_EAX, emit_None, 1, offset);
@@ -986,7 +986,7 @@ jit_set_p_ki_i(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset)
         jit_emit_mov_rr_i(NATIVECODE, emit_ECX, MAP(2));
     }
     else {
-        jit_emit_mov_RM_i(interp, NATIVECODE, emit_ECX, ROFFS_INT(2));
+        jit_emit_mov_RM_i(interp, NATIVECODE, emit_ECX, JIT_ROFFS_INT(2));
     }
     /*  range check */
     jit_emit_cmp_ri_i(interp, NATIVECODE, emit_ECX, 0);
@@ -1010,7 +1010,7 @@ jit_set_p_ki_i(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset)
         jit_emit_mov_rr_i(NATIVECODE, emit_EDX, MAP(3));
     }
     else {
-        jit_emit_mov_RM_i(interp, NATIVECODE, emit_EDX, ROFFS_INT(3));
+        jit_emit_mov_RM_i(interp, NATIVECODE, emit_EDX, JIT_ROFFS_INT(3));
     }
     emitm_movl_r_m(interp, NATIVECODE, emit_EDX, emit_EAX, emit_ECX, 4, 0);
 
@@ -1101,7 +1101,7 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                  */
 #  if EXEC_CAPABLE
                 if (jit_info->objfile) {
-                    jit_emit_fload_m_n(interp, jit_info->native_ptr, CONST(i));
+                    jit_emit_fload_m_n(interp, jit_info->native_ptr, JIT_CONST(i));
                     Parrot_exec_add_text_rellocation(jit_info->objfile,
                             jit_info->native_ptr, RTYPE_DATA, "const_table", -4);
                 }
@@ -1127,7 +1127,7 @@ store:
             case PARROT_ARG_SC:
 #  if EXEC_CAPABLE
                 if (jit_info->objfile) {
-                    emitm_pushl_m(jit_info->native_ptr, CONST(i));
+                    emitm_pushl_m(jit_info->native_ptr, JIT_CONST(i));
                     Parrot_exec_add_text_rellocation(jit_info->objfile,
                             jit_info->native_ptr, RTYPE_DATA, "const_table", -4);
                 }
@@ -1142,7 +1142,7 @@ store:
             case PARROT_ARG_PC:
 #  if EXEC_CAPABLE
                 if (jit_info->objfile) {
-                    emitm_pushl_m(jit_info->native_ptr, CONST(i));
+                    emitm_pushl_m(jit_info->native_ptr, JIT_CONST(i));
                     Parrot_exec_add_text_rellocation(jit_info->objfile,
                             jit_info->native_ptr, RTYPE_DATA,
                             "const_table", -4);
@@ -1385,7 +1385,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     emitm_pushl_r(jit_info->native_ptr, emit_ECX);
 #  if EXEC_CAPABLE
     if (jit_info->objfile) {
-        CALL("pmc_new_noinit");
+        JIT_CALL("pmc_new_noinit");
     }
     else
 #  endif
@@ -1592,10 +1592,10 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
             break;
         case PARROT_ARG_FLOATVAL|PARROT_ARG_CONSTANT:
             if (recursive) {
-                jit_emit_mov_ri_n(interp, NATIVECODE, FSR1, &CONST(2)->u.number);
+                jit_emit_mov_ri_n(interp, NATIVECODE, FSR1, &JI_CONST(2)->u.number);
             }
             else {
-                jit_emit_mov_ri_n(interp, NATIVECODE, FSR1, &CONST(2)->u.number);
+                jit_emit_mov_ri_n(interp, NATIVECODE, FSR1, &JIT_CONST(2)->u.number);
                 jit_emit_fstore_mb_n(interp, NATIVECODE, emit_EAX, 0);
             }
             break;
@@ -1705,7 +1705,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
                 break;
             case PARROT_ARG_FLOATVAL|PARROT_ARG_CONSTANT:
                 jit_emit_mov_ri_n(interp, NATIVECODE, params_map,
-                        &CONST(2 + i)->u.number);
+                        &JIT_CONST(2 + i)->u.number);
                 break;
             default:
                 Parrot_ex_throw_from_c_args(interp, NULL, 1,
