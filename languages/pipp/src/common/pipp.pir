@@ -92,14 +92,6 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 
 .end
 
-# TODO: call 'pipp'
-.sub 'eval_string'
-
-   say '# eval_string() was called'
-
-   .return (1)
-.end
-
 .sub 'pipp' :main
     .param pmc argv
 

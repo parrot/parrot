@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-t/embed/eval_string.t - Testing the PhpNull PMC
+t/embed/eval.t - Testing the sub 'eval'.
 
 =head1 SYNOPSIS
 
@@ -11,7 +11,7 @@ t/embed/eval_string.t - Testing the PhpNull PMC
 
 =head1 DESCRIPTION
 
-Tests the sub 'eval_string' used for supporting embedding Pipp in other applications.
+Tests the sub 'eval' used for supporting embedding Pipp in other applications.
 
 =cut
 
@@ -28,11 +28,11 @@ Tests the sub 'eval_string' used for supporting embedding Pipp in other applicat
     ok( 1, 'no tests implemented yet')
     # TODO:
     # find sub 'eval_string'
-    .local pmc eval_string_sub
+    .local pmc eval_sub
     .local int ret
-    eval_string_sub = get_hll_global [ 'Pipp' ], 'eval_string'
+    eval_sub = get_hll_global [ 'Pipp' ], 'eval'
     # call it with test output
-    eval_string_sub()
+    eval_sub()
 
     # define a function
     # call it from here
