@@ -2166,7 +2166,7 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
     /* emit jump past exit code, dummy offset
      * this assumes exit code is not longer then a short jump (126 bytes) */
     emitm_jxs(jit_info->native_ptr, emitm_jnz, 0);
-    Parrot_end_jit(jit_info, interp);
+    jit_emit_end(jit_info->native_ptr);
     /* fixup above jump */
     sav_ptr = jit_info->native_ptr;
     jit_info->native_ptr = jmp_ptr;
