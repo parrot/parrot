@@ -102,6 +102,7 @@ all: \
  alarm.pbc \
  base64.pbc \
  bc.pbc \
+ bit.pbc \
  bitlib.pbc \
  complex.pbc \
  $(LIBPATH)/gl.pbc \
@@ -205,6 +206,9 @@ base64.pbc: $(LIBPATH)/base64.pir
 
 bc.pbc: $(LIBPATH)/bc.pir
 	-$(PARROT) --output=bc.pbc $(LIBPATH)/bc.pir
+
+bit.pbc: $(LIBPATH)/bit.pir
+	-$(PARROT) --output=bit.pbc $(LIBPATH)/bit.pir
 
 bitlib.pbc: $(LIBPATH)/bitlib.pir
 	-$(PARROT) --output=bitlib.pbc $(LIBPATH)/bitlib.pir

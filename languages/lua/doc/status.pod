@@ -218,6 +218,8 @@ These libraries are loaded dynamically with the Lua function C<require>.
 
 =item * big number library F<languages/lua/src/lib/bc.pir>
 
+=item * bitwise operation library F<languages/lua/src/lib/bit.pir>
+
 =item * bitwise operation library F<languages/lua/src/lib/bitlib.pir>
 
 =item * complex library F<languages/lua/src/lib/complex.pir>
