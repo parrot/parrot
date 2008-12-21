@@ -10,6 +10,7 @@ use Test::More 'tests' => 58;
 
 use Parrot::Distribution;
 use File::Spec::Functions ':ALL';
+use File::Temp qw/tempdir/;
 
 =head1 NAME
 
@@ -37,6 +38,14 @@ to ensure nothing is broken.
 # Path is really only an abstract superclass but there are a few things we
 # can do with it.
 BEGIN { use_ok('Parrot::IO::Path') }
+
+my $file_temp_work_path = tempdir(
+	'PARROT_IO_XXXX',
+	TMPDIR => 1,
+	CLEANUP => 1
+);
+# you can sort of count on the var below being the unique part of the temp dir
+my $file_temp_dir = (splitdir($file_temp_work_path))[-1];
 
 my $suffix   = 'txt';
 my $name     = 'file';
@@ -79,7 +88,9 @@ ok( $r, 'new' );
 isa_ok( $r, 'Parrot::IO::Directory' );
 ok( !$r->parent(), 'root has no parent' );
 
-my $d = Parrot::IO::Directory->tmp_directory('t');
+my $d = Parrot::IO::Directory->tmp_directory(
+	catfile($file_temp_dir, 't')
+);
 ok( $d, 'tmp_directory' );
 
 # Create a file in a directory that does not exist.
@@ -90,7 +101,7 @@ my $d1 = $d->directory_with_name('one');
 my $d2 = $d1->directory_with_name('two');
 ok( $d1 && $d2, 'directory_with_name' );
 
-my $f = Parrot::IO::File->tmp_file($fullname);
+my $f = Parrot::IO::File->tmp_file(catfile($file_temp_dir, $fullname));
 ok( $f, 'tmp_file' );
 
 # Check the instance got re-blessed.
@@ -201,7 +212,7 @@ sub teardown {
 
 # tmp_dir_path(@dirs)
 sub tmp_dir_path {
-    return catdir( tmpdir, @_ );
+    return catdir( $file_temp_work_path, @_ );
 }
 
 # tmp_file_path(@dirs, $file)
