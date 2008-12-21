@@ -690,13 +690,8 @@ help :
 	@echo "  examples_tests:    Test the example scripts."
 	@echo ""
 	@echo "Smoke Testing:"
-	@echo "  smoke:             Run the test suite and send smoke.html to "
-	@echo "                     http:////smoke.parrotcode.org//"
-	@echo "  smokej:            Same as smoke, but with JIT runcore"
-	@echo "  smokeexec:         Same as smoke, but generate first executables"
-	@echo "                     with the exec runcore"
-	@echo "  smoke-clean:       clean up smoke.html"
 	@echo "  smolder_test:      Run the test suite and send report to the smolder server"
+	@echo "  smoke:             Alias for smolder_test"
 	@echo ""
 	@echo "Benchmarks:"
 	@echo "  mopsbench:         Million operations"
@@ -725,7 +720,6 @@ help :
 	@echo "  languages-test:    Proxy for target 'test' of languages/Makefile"
 	@echo "  languages-test-unified:  Proxy for target 'test-unified' of languages/Makefile"
 	@echo "  languages-test-separate: Proxy for target 'test-separate' of languages/Makefile"
-	@echo "  languages-smoke:   Proxy for target 'smoke' of languages/Makefile"
 	@echo "  languages-clean:   Proxy for target 'clean' of languages/Makefile"
 	@echo ""
 	@echo "Fetch from source repository:"
@@ -1376,9 +1370,6 @@ languages-test-unified :
 languages-test-separate :
 	$(MAKE) languages test-separate
 
-languages-smoke :
-	$(MAKE) languages smoke
-
 languages-clean :
 	$(MAKE) languages clean
 
@@ -1474,10 +1465,11 @@ test : test_prep
 smolder_test : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --archive --send-to-smolder
 
+smoke : smolder_test
+
 # "core tests" -- test basic functionality but not ancillaries
 coretest : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --core-tests
-
 
 # automake compatibility
 check : test
@@ -1613,7 +1605,6 @@ clean : \
     examples-clean \
     imcc-clean \
     compilers-clean \
-    smoke-clean \
 #INVERSE_CONDITIONED_LINE(win32):    cover-clean \
     editor-clean
 	@TEMP_cg_r@
@@ -2272,27 +2263,6 @@ apilist: $(SRC_DIR)/core_pmcs.c
 
 malloclist: $(SRC_DIR)/core_pmcs.c
 	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl --macro=PARROT_MALLOC $(HEADERIZER_O_FILES)
-
-###############################################################################
-#
-# smoke:
-#
-###############################################################################
-
-smoke : all
-	$(PERL) t/harness --html $(EXTRA_TEST_ARGS)
-	$(PERL) tools/util/smokeserv-client.pl smoke.html
-
-smokej : all
-	$(PERL) t/harness --html $(EXTRA_TEST_ARGS) -j
-	$(PERL) tools/util/smokeserv-client.pl smoke.html
-
-smokeexec: all
-	$(PERL) t/harness --html $(EXTRA_TEST_ARGS) --run-exec $(RUNCORE_TEST_FILES)
-	$(PERL) tools/util/smokeserv-client.pl smoke.html
-
-smoke-clean :
-	$(RM_F) smoke.html
 
 #
 # Local variables:

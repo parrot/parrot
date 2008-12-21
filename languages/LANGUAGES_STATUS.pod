@@ -10,9 +10,6 @@ No author information is given here. This is because maintainers
 should be tracked in the respective languages/*/MAINTAINER files, and we
 don't want to repeat ourselves.
 
-For current status of some languages see also
-L<http://smoke.parrotcode.org/smoke/>
-
 Languages that work with the unified languages test suite
 will have their test results listed under the smokes marked
 'languages'.

@@ -50,12 +50,6 @@ help:
 	@echo ""
 	@echo "  help:          Print this help message."
 	@echo ""
-	@echo "  smoke:         Run the unified test suite and send smoke.html to "
-	@echo "                 http:////smoke.parrotcode.org//"
-	@echo ""
-	@echo "  smoke-clean:   clean up smoke.html"
-	@echo ""
-	@echo ""
 	@echo "Following languages are available:"
 	@echo "  $(LANGUAGES)"
 	@echo ""
@@ -96,14 +90,6 @@ test-separate: all \
     WMLScript.test \
     Zcode.test
 
-
-smoke:  all
-	$(PERL) t/harness --html
-	$(PERL) ../tools/util/smokeserv-client.pl languages_smoke.html
-
-smoke-clean :
-	$(RM_F) languages_smoke.html
-
 clean: \
     abc.clean APL.clean \
     BASIC.clean befunge.clean bf.clean \
@@ -123,7 +109,6 @@ clean: \
     urm.clean \
     WMLScript.clean \
     Zcode.clean \
-    smoke-clean
 
 realclean: \
     abc.realclean APL.realclean \

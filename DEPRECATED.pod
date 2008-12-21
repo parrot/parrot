@@ -165,17 +165,4 @@ is deprecated and will be removed.
 
 =back
 
-=head1 Misc.
-
-=over 4
-
-=item 'make smoke' [post 0.8.2]
-
-The functionality currently provided by "make smoke" will be changing to
-be an alias for "make smolder_test". We're moving towards smolder as our
-single point of online test reporting, and will keep the make target to
-simplify the switch for anyone currently smoking parrot.  See RT #49276.
-
-=back
-
 =cut

@@ -26,14 +26,6 @@ or
 
     cd languages && make test
 
-=item Smoke testing
-
-    make languages-smoke
-
-or
-
-    cd languages && make smoke
-
 =item Selected languages
 
     cd languages && perl t/harness --languages=m4,punie
@@ -66,14 +58,12 @@ called by languages/Makefile with an explicit perl.
 
 
 # Step 0: handle command line args
-my $do_gen_html;       # smoke testing
 my $languages_list;    # select a subset of languages
-my $result = GetOptions( 'html'          => \$do_gen_html,
-                         'languages=s'   => \$languages_list );
+my $result = GetOptions( 'languages=s'   => \$languages_list );
 
 # Step 1: find harness files for testable languages
 
-# Various languages are not yet in smoke testing, some will never be.
+# Various languages are not yet in smoke testing; some will never be.
 #
 # BASIC                No t/harness, two implementations
 # ecmascript           No t/harness
@@ -124,74 +114,7 @@ foreach my $harness (@harnesses) {
 chomp(@tests);
 
 # Step 3: test.
-
-if ( ! $do_gen_html ) {
-    Test::Harness::runtests(@tests);
-}
-else {
-    my $html_fn = "languages_smoke.html";
-    my @smoke_config_vars = qw(
-      osname archname cc build_dir cpuarch revision VERSION optimize DEVEL
-    );
-
-    eval {
-        require Test::TAP::HTMLMatrix;
-        require Test::TAP::Model::Visual;
-    };
-    die "You must have Test::TAP::HTMLMatrix installed.\n\n$@"
-        if $@;
-
-    {
-        no warnings qw/redefine once/;
-        *Test::TAP::Model::run_tests = sub {
-            my $self = shift;
-
-            $self->_init;
-            $self->{meat}{start_time} = time();
-
-            my %stats;
-
-            foreach my $file (@_) {
-                my $data;
-                print STDERR "- $file\n";
-                $data = $self->run_test($file);
-                $stats{tests} += $data->{results}{max} || 0;
-                $stats{ok}    += $data->{results}{ok}  || 0;
-            }
-
-            printf STDERR "%s OK from %s tests (%.2f%% ok)\n\n",
-            $stats{ok},
-            $stats{tests},
-            $stats{ok} / $stats{tests} * 100;
-
-            $self->{meat}{end_time} = time();
-        };
-
-        my $start = time();
-        my $model = Test::TAP::Model::Visual->new_with_tests(@tests);
-        my $end   = time();
-
-        my $duration = $end - $start;
-        my $languages = join( q{ }, @unified_testable_languages );
-        my $v = Test::TAP::HTMLMatrix->new(
-            $model,
-            join("\n",
-                 "languages: $languages",
-                 "duration: $duration",
-                 "branch: unknown",
-                 "harness_args: languages",
-                 map { "$_: $PConfig{$_}" } sort @smoke_config_vars),
-        );
-
-        $v->has_inline_css(1); # no separate css file
-
-        open HTML, '>', $html_fn;
-        print HTML $v->html();
-        close HTML;
-
-        print "$html_fn has been generated.\n";
-    }
-}
+Test::Harness::runtests(@tests);
 
 # Local Variables:
 #   mode: cperl

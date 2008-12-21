@@ -22,7 +22,6 @@ use Parrot::Harness::Options qw(
     Usage
 );
 use Parrot::Harness::Smoke qw(
-    generate_html_smoke_report
     send_archive_to_smolder
     collect_test_environment_data
 );
@@ -60,64 +59,57 @@ my @default_tests = get_default_tests(
 my @tests;
 if ($longopts->{code}) {
     @tests = @developing_tests;
-} else {
+}
+else {
     @tests = map { glob($_) } (@ARGV ? @ARGV : @default_tests);
 }
 
-if ($longopts->{html}) {
-    generate_html_smoke_report(
+my $harness;
+if ($longopts->{archive}) {
+    eval { require TAP::Harness::Archive };
+    if ($@) {
+        die "\n" . ('-' x 55) . "\nCould not load TAP::Harness::Archive."
+            . "\nPlease install it if you want to create TAP archives.\n"
+            . ('-' x 55) . "\n\n$@\n";
+    }
+    # for extra_properties we need TAP::Harness::Archive >= .10
+    if ($TAP::Harness::Archive::VERSION < .10) {
+        die "\n" . ('-' x 55) . "\nWe need TAP::Harness::Archive >= .10."
+            . "\nPlease install it if you want to create TAP archives.\n"
+            . ('-' x 55) . "\n";
+    }
+
+    my %env_data = collect_test_environment_data();
+    $harness = TAP::Harness::Archive->new(
         {
-            tests => \@tests,
-            args  => $args,
-            file  => 'smoke.html',
+            verbosity        => $ENV{HARNESS_VERBOSE},
+            archive          => 'parrot_test_run.tar.gz',
+            merge            => 1,
+            extra_properties => \%env_data,
         }
     );
-} else {
-    my $harness;
-    if ($longopts->{archive}) {
-        eval { require TAP::Harness::Archive };
-        if ($@) {
-            die "\n" . ('-' x 55) . "\nCould not load TAP::Harness::Archive."
-                . "\nPlease install it if you want to create TAP archives.\n"
-                . ('-' x 55) . "\n\n$@\n";
-        }
-        # for extra_properties we need TAP::Harness::Archive >= .10
-        if ($TAP::Harness::Archive::VERSION < .10) {
-            die "\n" . ('-' x 55) . "\nWe need TAP::Harness::Archive >= .10."
-                . "\nPlease install it if you want to create TAP archives.\n"
-                . ('-' x 55) . "\n";
-        }
+    $harness->runtests(@tests);
+    send_archive_to_smolder(%env_data) if $longopts->{send_to_smolder};
 
-        my %env_data = collect_test_environment_data();
-        $harness = TAP::Harness::Archive->new(
-            {
-                verbosity        => $ENV{HARNESS_VERBOSE},
-                archive          => 'parrot_test_run.tar.gz',
-                merge            => 1,
-                extra_properties => \%env_data,
-            }
-        );
-        $harness->runtests(@tests);
-        send_archive_to_smolder(%env_data) if $longopts->{send_to_smolder};
-
-    } else {
-        eval { require TAP::Harness };
-        if ($@) {
-            Test::Harness::runtests(@tests);
-            exit;
-        } else {
-            $harness = TAP::Harness->new({
-                verbosity => $ENV{HARNESS_VERBOSE},
-                merge     => 0,
-                jobs      => $ENV{TEST_JOBS} || 1,
-                directives => 1,
-            });
-        }
-        my $results = $harness->runtests(@tests);
-
-        # a non-zero code stops make after test failures (RT #60116)
-        exit ( $results->all_passed() ? 0 : 1 );
+}
+else {
+    eval { require TAP::Harness };
+    if ($@) {
+        Test::Harness::runtests(@tests);
+        exit;
     }
+    else {
+        $harness = TAP::Harness->new({
+            verbosity => $ENV{HARNESS_VERBOSE},
+            merge     => 0,
+            jobs      => $ENV{TEST_JOBS} || 1,
+            directives => 1,
+        });
+    }
+    my $results = $harness->runtests(@tests);
+
+    # a non-zero code stops make after test failures (RT #60116)
+    exit ( $results->all_passed() ? 0 : 1 );
 }
 
 =head1 NAME
@@ -193,10 +185,6 @@ Some test scripts run more quickly when this is set.
 =item C<--gc-debug>
 
 Invoke parrot with '--gc-debug'.
-
-=item C<--html>
-
-Emit a C<smoke.html> file instead of displaying results.
 
 =item C<--code-tests>
 

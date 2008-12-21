@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Parrot::Harness::Smoke - Subroutines used by harness-skripts to generate smoke reports
+Parrot::Harness::Smoke - Subroutines used by harness-scripts to generate smoke reports
 
 =head1 DESCRIPTION
 
@@ -11,12 +11,6 @@ This package exports on request subroutines used by the root F<t/harness>
 and by language implementation F<t/harness> to generate smoke reports.
 
 Following subroutines are supported:
-
-    generate_html_smoke_report (
-        tests       => \@tests,
-        args        => $args,
-        file        => 'smoke.html',
-    );
 
     my %env_data = collect_test_environment_data();
 
@@ -33,7 +27,6 @@ use lib qw( . lib ../lib ../../lib );
 use Parrot::Config qw/%PConfig/;
 use base qw( Exporter );
 our @EXPORT_OK = qw(
-    generate_html_smoke_report
     collect_test_environment_data
     send_archive_to_smolder
 );
@@ -117,73 +110,6 @@ sub _get_compiler_version {
         $compiler .= " $PConfig{gccversion}";
     }
     return $compiler;
-}
-
-sub generate_html_smoke_report {
-    my $argsref = shift;
-    my $html_fn = $argsref->{file};
-    my @smoke_config_vars = qw(
-        osname archname cc build_dir cpuarch revision VERSION optimize DEVEL
-    );
-
-    eval {
-        require Test::TAP::HTMLMatrix;
-        require Test::TAP::Model::Visual;
-    };
-    die "You must have Test::TAP::HTMLMatrix installed.\n\n$@"
-        if $@;
-
-    {
-      no warnings qw/redefine once/;
-      *Test::TAP::Model::run_tests = sub {
-        my $self = shift;
-
-        $self->_init;
-        $self->{meat}{start_time} = time();
-
-        my %stats;
-
-        foreach my $file (@_) {
-            my $data;
-            print STDERR "- $file\n";
-            $data = $self->run_test($file);
-            $stats{tests} += $data->{results}{max} || 0;
-            $stats{ok}    += $data->{results}{ok}  || 0;
-        }
-
-        printf STDERR "%s OK from %s tests (%.2f%% ok)\n\n",
-            $stats{ok},
-            $stats{tests},
-            $stats{ok} / $stats{tests} * 100;
-
-        $self->{meat}{end_time} = time();
-      };
-
-      my $start = time();
-      my $model = Test::TAP::Model::Visual->new();
-      $model->run_tests( @{ $argsref->{tests} } );
-
-      my $end = time();
-
-      my $duration = $end - $start;
-
-      my $v = Test::TAP::HTMLMatrix->new(
-        $model,
-        join("\n",
-             "duration: $duration",
-             "branch: unknown",
-             "harness_args: " . (($argsref->{args}) ? $argsref->{args} : "N/A"),
-             map { "$_: $PConfig{$_}" } sort @smoke_config_vars),
-      );
-
-      $v->has_inline_css(1); # no separate css file
-
-      open my $HTML, '>', $html_fn;
-      print {$HTML} $v->html();
-      close $HTML;
-
-      print "$html_fn has been generated.\n";
-    }
 }
 
 1;
