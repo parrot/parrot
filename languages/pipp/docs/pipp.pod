@@ -14,9 +14,6 @@ In short, Pipp in Parrot's PHP.
 Implement PHP.
 Support well behaving PHP extensions.
 
-A secondary goal is to provide a side by side comparison
-of different parsing and tree transformation techniques.
-
 =head1 Divergences of Pipp
 
 =over 4
@@ -31,15 +28,13 @@ of different parsing and tree transformation techniques.
 
 =head1 Variants
 
-Therefore there are currently three variants of Pipp:
+There are currently two variants of Pipp:
 
 =over
 
 =item pct       - Parrot compiler toolkit, this is the default
 
 =item phc       - take XML output from phc and munge it with XSLT
-
-=item antlr3    - ANTLR3, converted from languages/bc, started
 
 =back
 
@@ -54,10 +49,6 @@ No current status available.
 =item phc
 
 xsltproc and phc need to be in PATH.
-
-=item antlr3
-
-ANTLR3 generating Java code.
 
 =back
 
