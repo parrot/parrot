@@ -171,8 +171,15 @@ rule arguments {
     {*}
 }
 
+rule conditional_expression {
+    '(' <expression> ')' <block>
+    {*}
+}
+
 rule if_statement {
-    'if' '(' <expression> ')' <block> <else_clause>?
+    'if' <conditional_expression>
+    [<elseif_clause>]*
+    [<else_clause>]?
     {*}
 }
 
@@ -181,13 +188,13 @@ rule else_clause {
     {*}
 }
 
-rule elsif_clause {
-    'elsif' '(' <expression> ')' <block>
+rule elseif_clause {
+    'elseif' <conditional_expression>
     {*}
 }
 
 rule while_statement {
-    'while' '(' <expression> ')' <block>
+    'while' <conditional_expression>
     {*}
 }
 

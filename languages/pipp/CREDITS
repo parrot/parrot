@@ -24,3 +24,6 @@ E: zhuomingliang@yahoo.com.cn
 D: Bugfixes
 D: Implementation of functions
 D: Code beautification
+
+N: Daniel Keane
+D: Implementation of 'elsif'

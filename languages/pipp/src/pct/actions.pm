@@ -232,20 +232,59 @@ method arguments($/) {
     make $past;
 }
 
-method if_statement($/) {
+method conditional_expression($/) {
     my $past := PAST::Op.new(
                     $( $<expression> ),
                     $( $<block> ),
-                    :pasttype('if'),
                     :node($/)
                 );
-    for $<else_clause> {
-        $past.push( $( $_ ) );
-    }
-
     make $past;
 }
 
+method if_statement($/) {
+    my $past := $($<conditional_expression>);
+    $past.pasttype('if');
+        
+    my $else := undef;
+    if +$<else_clause> != 0 {
+            $else := $($<else_clause>[0]);
+    }
+    my $firsteif := undef;
+    if(+$<elseif_clause> != 0) {
+        my $count := +$<elseif_clause> - 1;
+        $firsteif := $($<elseif_clause>[$count]);
+        while $count != 0 {
+                my $eif := $($<elseif_clause>[$count]);
+                $count--;
+                my $eifchild := $($<elseif_clause>[$count]);
+                if($else) {
+                        $eif.push($else);
+                }
+                $eif.push($eifchild);
+        }
+        if($else && +$<elseif_clause> == 1) {
+                $firsteif.push($else);
+        }
+     }
+
+     if($firsteif) {
+             $past.push($firsteif);
+     }
+     elsif($else) {
+             $past.push($else);
+     }
+     make $past;
+}
+
+method else_clause($/) {
+        make $($<block>);
+}
+
+method elseif_clause($/) {
+        my $past := $($<conditional_expression>);
+        $past.pasttype('if');
+        make $past;
+}
 method var_assign($/) {
     make PAST::Op.new(
              $( $<var> ),
@@ -295,18 +334,11 @@ method member($/) {
          );
 }
 
-method else_clause($/) {
-    make $( $<block> );
-}
 
 method while_statement($/) {
-    my $cond  := $( $<expression> );
-    my $block := $( $<block> );
-
-    make PAST::Op.new( $cond,
-                       $block,
-                       :pasttype('while'),
-                       :node($/) );
+    my $past := $($<conditional_expression>);
+    $past.pasttype('while');
+    make $past;
 }
 
 method for_statement($/) {

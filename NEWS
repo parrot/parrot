@@ -9,6 +9,9 @@ New in January 2009 release
   + PIRC
     - refactoring of data structures
     - various bug fixes and updates
+- Languages
+  + Pipp
+    - added support for 'elsif'
 
 New in 0.8.2
 - Implementation

@@ -24,7 +24,7 @@ use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
 use Parrot::Config ();
 use Parrot::Test;
-use Test::More     tests => 15;
+use Test::More     tests => 16;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'if, one statement in block' );
 <?php
@@ -75,7 +75,7 @@ CODE
 if block
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'i/else taking else-branchf' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'if/else taking else-branch' );
 <?php
 if (0)
 {
@@ -88,6 +88,25 @@ else
 ?>
 CODE
 else block
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'if/elseif/else taking elseif-branch' );
+<?php
+$x = 1;
+if($x ==0)
+{
+  echo "if block\n";
+}
+elseif($x == 1)
+{
+  echo "elseif block\n";
+}
+else
+{
+  echo "else block\n";
+}
+CODE
+elseif block
 OUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT' . q{  }, 'positive int' );
