@@ -167,7 +167,9 @@ PIRCODE
     $S0 = i
     pir .= "    .param pmc loc_"
     pir .= $S0
-    pir .= " :optional\n"
+    pir .= " :optional\n    .param int has_loc_"
+    pir .= $S0
+    pir .= " :opt_flag\n"
     inc i
     goto L1
   L2:
@@ -184,7 +186,7 @@ PIRCODE
   L5:
     unless i < numparams goto L6
     $S0 = i
-    pir .= "    unless_null loc_"
+    pir .= "    if has_loc_"
     pir .= $S0
     pir .= ", vivify_"
     pir .= $S0

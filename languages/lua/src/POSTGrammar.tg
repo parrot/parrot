@@ -931,7 +931,8 @@ transform parameter (PAST::Var) :language('PIR') {
     ops.'push_pirop'('.lex', $S0, pname)
     .local string vivilabel
     vivilabel = ops.'unique'('vivify_')
-    ops.'push_pirop'('unless_null', pname, vivilabel)
+    $S0 = concat 'has_', pname
+    ops.'push_pirop'('if', $S0, vivilabel)
     ops.'push_pirop'('new', pname, '"LuaNil"')
     $P0 = get_hll_global ['POST'], 'Label'
     $P0 = $P0.'new'('result'=>vivilabel)
