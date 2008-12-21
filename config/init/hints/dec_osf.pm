@@ -27,9 +27,6 @@ sub runstep {
     if ( $libs !~ /-lpthread/ ) {
         $libs .= ' -lpthread';
     }
-    if ( $libs !~ /-laio/ ) {
-        $libs .= ' -laio';
-    }
     $conf->data->set( libs => $libs );
 
     for my $ldflags (qw(ld_load_flags ld_share_flags)) {
