@@ -19,6 +19,7 @@ use warnings;
 
 use base qw(Parrot::Configure::Step);
 
+use File::Spec ();
 use Parrot::Configure::Utils ':inter';
 
 

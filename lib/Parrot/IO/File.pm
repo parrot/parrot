@@ -27,6 +27,7 @@ use warnings;
 use base qw( Parrot::IO::Path );
 
 use FileHandle;
+use File::Spec ();
 use Parrot::IO::Directory;
 
 =item C<tmp_file($path)>

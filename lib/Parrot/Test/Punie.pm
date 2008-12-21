@@ -8,6 +8,7 @@ use strict;
 use warnings;
 
 use File::Basename;
+use File::Spec ();
 
 =head1 NAME
 

@@ -2,12 +2,13 @@
 
 package Parrot::Test::APL;
 
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 
 use strict;
 use warnings;
 
 use File::Basename;
+use File::Spec ();
 
 =head1 NAME
 

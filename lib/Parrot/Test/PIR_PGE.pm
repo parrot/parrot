@@ -1,6 +1,6 @@
 # $Id$
 
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 
 package Parrot::Test::PIR_PGE;
 
@@ -8,6 +8,7 @@ use strict;
 use warnings;
 
 use File::Basename;
+use File::Spec ();
 
 =head1 NAME
 

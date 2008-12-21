@@ -25,7 +25,7 @@ use strict;
 use warnings;
 
 use File::Path;
-use File::Spec;
+use File::Spec ();
 
 # qw() to avoid the export because we have a stat() method.
 use File::stat qw();

@@ -28,7 +28,7 @@ use base qw( Parrot::IO::Path );
 
 use DirHandle;
 use File::Path;
-use File::Spec;
+use File::Spec ();
 use Parrot::IO::File;
 
 =item C<directory_class()>

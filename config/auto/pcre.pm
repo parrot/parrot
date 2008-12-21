@@ -15,7 +15,6 @@ package auto::pcre;
 
 use strict;
 use warnings;
-use File::Spec;
 
 use base qw(Parrot::Configure::Step);
 
