@@ -94,7 +94,7 @@ sub trans {
     return $1  if $char =~ /([ISP])/;
     return 'N' if $char eq 'F';
     return 'v' if $type eq 'void';
-    return 'V' if $type =~ /void\s*\*\s*/;
+    return 'V' if $type =~ /void\s*\*/;
     return 'P' if $type =~ /opcode_t\*/;
     return 'I' if $type =~ /int(val)?/i;
     return '?';
