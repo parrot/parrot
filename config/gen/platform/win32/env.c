@@ -54,16 +54,11 @@ Parrot_setenv(const char *name, const char *value)
         const int value_len = strlen(value);
 
         {
-            char * const envstring = malloc(
+            char * const envstring = mem_internal_allocate(
                     name_len     /* name  */
                     + 1          /* '='   */
                     + value_len  /* value */
                     + 1);        /* string terminator */
-
-            if (envstring == NULL) {
-                /* RT#48276: Shouldn't we tell anyone that we failed? */
-                return;
-            }
 
             /* Save a bit of time, by using the fact we already have the
             lengths, avoiding strcat */
@@ -73,11 +68,13 @@ Parrot_setenv(const char *name, const char *value)
 
             if (_putenv(envstring) == 0) {
                 /* success */
+                mem_sys_free(envstring);
             }
             else {
-                /* RT#48276: Shouldn't we tell anyone that we failed? */
+                mem_sys_free(envstring);
+                exit_fatal(1, "Unable to set environment variable %s=%s",
+                    name, value);
             }
-            free(envstring);
         }
     }
 }
