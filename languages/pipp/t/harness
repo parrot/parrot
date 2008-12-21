@@ -63,7 +63,8 @@ if ( $files_flag ) {
     my @files = grep { ! m/in_php/ && ! m/pmc/ } glob( File::Spec->catfile( $dir, '*/*.t' ) );
     print join( "\n", @files );
     print "\n" if scalar(@files);
-} else { 
+}
+else { 
     my $path_to_parrot = Parrot::Test::path_to_parrot();
     my @cmd = ( "$path_to_parrot/parrot$PConfig{exe}", "$path_to_parrot/languages/pipp/pipp.pbc" );
     $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::PCT';
@@ -80,7 +81,8 @@ if ( $files_flag ) {
     if ( scalar(@ARGV) ) {
         # Someone specified tests for me to run.
         @files = grep { -f $_ } @ARGV
-    } else {
+    }
+    else {
         ( undef, undef, my $current_dir ) = File::Spec->splitpath( Cwd::getcwd() );
         if ( $current_dir eq 'languages' ) {
             @files = glob( File::Spec->catfile( $hll, 't', '*/*.t' ) );
@@ -136,10 +138,6 @@ if ( $files_flag ) {
         $harness->runtests(@files);
     }
 }
-
-=head1 HISTORY
-
-Mostly taken from bc/t/harness.
 
 =head1 SEE ALSO
 

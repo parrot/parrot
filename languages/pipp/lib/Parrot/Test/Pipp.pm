@@ -14,8 +14,6 @@ use File::Spec;
 
 use Parrot::Test;
 use Parrot::Test::Pipp::PHP;
-use Parrot::Test::Pipp::Phc;
-use Parrot::Test::Pipp::Antlr3;
 use Parrot::Test::Pipp::PCT;
 
 =head1 NAME
@@ -37,8 +35,7 @@ Use the executable B<pipp> in smoke testing.
 =cut
 
 sub new {
-    my $test_module =  $ENV{PARROT_PIPP_TEST_MODULE}
-                    || 'Parrot::Test::Pipp::PCT';
+    my $test_module =  $ENV{PARROT_PIPP_TEST_MODULE} || 'Parrot::Test::Pipp::PCT';
 
     return bless {}, $test_module;
 }
