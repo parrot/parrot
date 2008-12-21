@@ -24,7 +24,6 @@
 #include "parrot/hash.h"
 #include "parrot/oplib/ops.h"
 
-
 #if defined HAVE_COMPUTED_GOTO && defined __GNUC__ && PARROT_I386_JIT_CGP
 #  define JIT_CGP
 #endif
@@ -347,14 +346,12 @@ extern UINTVAL ld(UINTVAL);
 #  define jit_emit_mul_rir_i(pc, dest, imm, src) \
        (pc) = opt_mul(interp, (pc), (dest), (imm), (src))
 
-
 #  define jit_emit_mul_ri_i(pc, r, imm) jit_emit_mul_rir_i((pc), (r), (imm), (r))
 
 #  define jit_emit_mul_RIM_ii(pc, reg, imm, ofs) \
     emitm_alul_r_m((pc), 0x69, (reg), emit_EBX, emit_None, 1, (ofs)); \
     *(long *)(pc) = (long)(imm); \
     (pc) += 4;
-
 
 /* NEG */
 
@@ -431,6 +428,7 @@ extern UINTVAL ld(UINTVAL);
 #  define jit_emit_not_M_i(interp, pc, offs) emitm_notl_m((pc), emit_EBX, 0, 1, (offs))
 
 /* XCHG */
+
 #  define jit_emit_xchg_rr_i(interp, pc, r1, r2) { \
     if ((r1) != (r2)) { \
     *((pc)++) = (char) 0x87; \
@@ -510,7 +508,6 @@ extern UINTVAL ld(UINTVAL);
 
 #  define jit_emit_ror_ri_i(interp, pc, reg, imm) \
     { (pc) = emit_shift_i_r((interp), (pc), emit_b001, (imm), (reg)); }
-
 
 /* interface, shift r1 by r2 bits */
 
@@ -1341,7 +1338,7 @@ extern unsigned char *lastpc;
 
 
 /* ST(i) %= MEM
- * please note the hardccded jumps */
+ * please note the hardcoded jumps */
 #  define jit_emit_cmod_RM_n(interp, pc, r, offs)  \
     if (r)  \
       emitm_fxch((pc), (r)); \
@@ -1378,7 +1375,6 @@ extern unsigned char *lastpc;
     emitm_sahf(pc); \
 }
 
-
 /* compare mem <-> ST(r) */
 #  define jit_emit_cmp_mi_n(interp, pc, mem, r) { \
     jit_emit_fload_m_n((interp), (pc), (mem)); \
@@ -1407,7 +1403,6 @@ extern unsigned char *lastpc;
       } \
     } \
 }
-
 
 #  define jit_emit_neg_M_i(interp, pc, offs) \
     emitm_negl_m((pc), emit_EBX, emit_None, 1, (long)(offs))
@@ -1439,19 +1434,19 @@ extern unsigned char *lastpc;
 #  define jit_emit_bxor_MI_i(pc, offs, imm) \
     emitm_xorl_i_m((pc), (imm), emit_EBX, emit_None, 1, (offs))
 
-
 #  define jit_emit_div_rr_i(interp, pc, r1, r2) (pc) = opt_div_rr((interp), jit_info, (r1), (r2), 1)
+
 #  define jit_emit_cmod_rr_i(interp, pc, r1, r2) (pc) = opt_div_rr((interp), jit_info, (r1), (r2), 0)
 
-
 #  define jit_emit_div_ri_i(pc, r1, imm) (pc) = opt_div_ri(interp, jit_info, (r1), (imm), 1)
+
 #  define jit_emit_cmod_ri_i(pc, r1, imm) (pc) = opt_div_ri(interp, jit_info, (r1), (imm), 0)
 
 #  define jit_emit_div_RM_i(interp, pc, r, m)  (pc) = opt_div_RM((interp), jit_info, (r), (m), 1)
+
 #  define jit_emit_cmod_RM_i(interp, pc, r, m) (pc) = opt_div_RM((interp), jit_info, (r), (m), 0)
 
 enum { JIT_X86BRANCH, JIT_X86JUMP, JIT_X86CALL };
-
 
 #  define jit_emit_stack_frame_enter(pc) do { \
     emitm_pushl_r((pc), emit_EBP); \
@@ -1462,8 +1457,6 @@ enum { JIT_X86BRANCH, JIT_X86JUMP, JIT_X86CALL };
     jit_emit_mov_rr_i((pc), emit_ESP, emit_EBP); \
     emitm_popl_r((pc), emit_EBP); \
 } while (0)
-
-
 
 #if JIT_VTABLE_OPS
 
@@ -1606,36 +1599,7 @@ EXTERN void Parrot_FixedIntegerArray_set_integer_keyed_int(Interp*, PMC*, INTVAL
 #  define JUMP_ALIGN 0
 #  define SUB_ALIGN 0
 
-#if JIT_EMIT == 0
-
-
-#endif
-
-#if JIT_EMIT == 2
-/* generate code just once */
-
-
-
-
-#  ifdef JIT_CGP
-/*
- * XXX needs some fixing
- * s. t/sub/pmc_{8,9}.t: the 2 print in tail call without that 'end'
- *    are recogniced as one non JIIted block
- */
-
-#  else /* JIT_CGP */
 extern int jit_op_count(void);
-
-
-#  endif /* JIT_CGP */
-
-
-#  undef Parrot_jit_restart_op
-
-#endif
-
-#if JIT_EMIT == 0
 
 #  define REQUIRES_CONSTANT_POOL 0
 /*
@@ -1677,11 +1641,8 @@ extern const char i_map[];
 #    define INTERP_BP_OFFS -16
 #  endif
 
-#endif  /* JIT_EMIT */
-
 #undef INT_REGISTERS_TO_MAP
 #endif /* PARROT_I386_JIT_EMIT_H_GUARD */
-
 
 /*
  * Local variables:
