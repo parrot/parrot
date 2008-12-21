@@ -1,5 +1,5 @@
 # Copyright (C) 2008, The Perl Foundation.
-# $Id: null.t 34021 2008-12-17 13:41:30Z Whiteknight $
+# $Id$
 
 =head1 NAME
 
