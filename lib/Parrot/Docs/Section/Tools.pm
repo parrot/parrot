@@ -95,7 +95,6 @@ sub new {
             $self->new_item( '', 'tools/dev/gen_class.pl' ),
             $self->new_item( '', 'tools/dev/nm.pl' ),
             $self->new_item( '', 'tools/util/ncidef2pasm.pl' ),
-            $self->new_item( '', 'tools/util/smokeserv-README.pod' ),
         ),
         $self->new_group(
             'Possibly obsolete',
