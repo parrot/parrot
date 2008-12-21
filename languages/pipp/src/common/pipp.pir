@@ -12,8 +12,6 @@ pipp.pir - driver for Pipp
 
    ./pipp t.php
 
-   ./pipp --run-nqp        t.nqp
-
 =head1 DESCRIPTION
 
 pipp.pbc is the driver for Pipp.
@@ -94,7 +92,15 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 
 .end
 
-.sub pipp :main
+# TODO: call 'pipp'
+.sub 'eval_string'
+
+   say '# eval_string() was called'
+   
+   .return (1)
+.end
+
+.sub 'pipp' :main
     .param pmc argv
 
     .local string prog, rest

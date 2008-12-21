@@ -60,7 +60,7 @@ if ( $files_flag ) {
     # Only the Makefile in 'parrot/languages' uses --files for unified testing
     my $dir = File::Spec->catfile( $hll, 't' );
     # unified testing can't handle test scripts written in PHP
-    my @files = grep { ! m/in_php/ && ! m/pmc/ } glob( File::Spec->catfile( $dir, '*/*.t' ) );
+    my @files = grep { ! m!in_php|pmc|embed! } glob( File::Spec->catfile( $dir, '*/*.t' ) );
     print join( "\n", @files );
     print "\n" if scalar(@files);
 }
@@ -98,6 +98,9 @@ else {
     my $exec_sub
         = sub {
               my ( $harness, $test_file ) = @_;
+
+              # the directory t/embed contains only PIR test files
+              return [ "$path_to_parrot/parrot$PConfig{exe}", $test_file ] if $test_file =~ m!t/embed/.*[.]t$!;
 
               # the directory t/pmc contains only PIR test files
               return [ "$path_to_parrot/parrot$PConfig{exe}", $test_file ] if $test_file =~ m!t/pmc/.*[.]t$!;
