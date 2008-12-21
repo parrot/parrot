@@ -2006,6 +2006,8 @@ Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info)
     jit_emit_finit(jit_info->native_ptr);
 }
 
+#  ifdef JIT_CGP
+
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
@@ -2070,71 +2072,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
     }
 }
 
-void
-Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP)
-{
-    int cur_op = *jit_info->cur_op;
-    static int check;
-
-    if (cur_op >= jit_op_count()) {
-        cur_op = CORE_OPS_wrapper__;
-    }
-
-    if ((++check & 0x7) == 0) {
-        /*
-         * every 8 ??? normal ops, we emit a check for event processing
-         */
-
-/*
- * There is an optimization to reuse arguments on the stack.  Compilers may
- * decide to reuse the argument space though.  If you are *absolutely sure*
- * this does not happen define PARROT_JIT_STACK_REUSE_INTERP.
- */
-#    ifdef PARROT_JIT_STACK_REUSE_INTERP
-        /*
-        * op functions have the signature (cur_op, interp)
-        * we use the interpreter already on stack and only push the
-        * cur_op
-        */
-#    else
-        /* push interpreter */
-        Parrot_jit_emit_get_INTERP(interp, jit_info->native_ptr, emit_ECX);
-        emitm_pushl_r(jit_info->native_ptr, emit_ECX);
-#    endif
-
-        emitm_pushl_i(jit_info->native_ptr, CORE_OPS_check_events);
-
-        call_func(jit_info,
-            (void (*) (void)) (interp->op_func_table[CORE_OPS_check_events]));
-#    ifdef PARROT_JIT_STACK_REUSE_INTERP
-        emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
-#    else
-        emitm_addb_i_r(jit_info->native_ptr, 8, emit_ESP);
-#    endif
-    }
-
-#    ifdef PARROT_JIT_STACK_REUSE_INTERP
-    /*
-    * op functions have the signature (cur_op, interp)
-    * we use the interpreter already on stack and only push the
-    * cur_op
-    */
-#    else
-    Parrot_jit_emit_get_INTERP(interp, jit_info->native_ptr, emit_ECX);
-    emitm_pushl_r(jit_info->native_ptr, emit_ECX);
-#    endif
-
-    emitm_pushl_i(jit_info->native_ptr, jit_info->cur_op);
-
-    call_func(jit_info,
-            (void (*) (void))(interp->op_func_table[cur_op]));
-#    ifdef PARROT_JIT_STACK_REUSE_INTERP
-    emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
-#    else
-    emitm_addb_i_r(jit_info->native_ptr, 8, emit_ESP);
-#    endif
-}
+#  else
 
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
@@ -2201,6 +2139,8 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
     emitm_addb_i_r(jit_info->native_ptr, 8, emit_ESP);
 #    endif
 }
+
+#  endif /* JIT_CGP */
 
 void
 Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,

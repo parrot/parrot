@@ -1828,10 +1828,6 @@ void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
 extern int jit_op_count(void);
 
-void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
-void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
-
 void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
 void Parrot_end_jit(Parrot_jit_info_t *jit_info, PARROT_INTERP);
