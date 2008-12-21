@@ -63,7 +63,7 @@ my $result = GetOptions( 'languages=s'   => \$languages_list );
 
 # Step 1: find harness files for testable languages
 
-# Various languages are not yet in smoke testing; some will never be.
+# Various languages are not yet in unified testing; some will never be.
 #
 # BASIC                No t/harness, two implementations
 # ecmascript           No t/harness
