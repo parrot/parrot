@@ -28,7 +28,7 @@ Tests the sub 'eval' used for supporting embedding Pipp in other applications.
     ok( 1, 'no tests implemented yet')
     # TODO:
     # find sub 'eval_string'
-    .local pmc eval_sub
+    .local pmc eval_sub, no_args_sub
     .local int ret
     eval_sub = get_hll_global [ 'Pipp' ], 'eval'
     # call it with TAP diagnostics
@@ -38,6 +38,8 @@ Tests the sub 'eval' used for supporting embedding Pipp in other applications.
 
     # define a function
     # call it from here
+    no_args_sub = get_hll_global 'no_args'
+    no_args_sub()
 .end
 
 # Local Variables:
