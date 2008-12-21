@@ -1502,13 +1502,14 @@ EXTERN void Parrot_FixedIntegerArray_set_integer_keyed_int(Interp*, PMC*, INTVAL
 #  undef ROFFS_INT
 #  undef NATIVECODE
 
-
+/*
 #  undef IREG
 #  undef NREG
 #  undef SREG
 #  undef PREG
 #  undef CONST
 #  undef CALL
+*/
 
 #endif /* JIT_VTABLE_OPS */
 
