@@ -13,8 +13,11 @@ In short, Pipp in Parrot's PHP.
 
 Implement PHP.
 Support well behaving PHP extensions.
+See also L<../ROADMAP>.
 
 =head1 Divergences of Pipp
+
+A listing of things that Pipp does differently from the standard PHP.
 
 =over 4
 
@@ -26,15 +29,9 @@ Support well behaving PHP extensions.
 
 =cut
 
-=head1 Variants
+=head1 Implementation
 
-There are currently two variants of Pipp:
-
-=over
-
-=item pct       - Parrot compiler toolkit, this is the default
-
-=item phc       - take XML output from phc and munge it with XSLT
+Pipp is based on the Parrot Compiler Toolkit.
 
 =back
 
@@ -46,9 +43,7 @@ No current status available.
 
 =over
 
-=item phc
-
-xsltproc and phc need to be in PATH.
+=item Parrot 0.8.2.
 
 =back
 
@@ -59,6 +54,8 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 =head1 SEE ALSO
 
 =over 4
+
+=item L<http://pipp.org>
 
 =item L<http://www.perlfoundation.org/parrot/index.cgi?pipp>
 

@@ -11,12 +11,6 @@ languages/pipp/t/harness - A harness for Pipp
 
   cd languages/pipp && perl t/harness 
 
-  cd languages/pipp && perl t/harness --with-phc
-
-  cd languages/pipp && perl t/harness --with-antlr3
-
-  cd languages/pipp && perl t/harness --with-pct
-
   cd languages/pipp && perl t/harness --verbose t/hello.t 
 
 =head1 DESCRIPTION
@@ -28,9 +22,6 @@ This list is one per line, and is relative to the languages dir.
 If I'm called with no args, I run the complete suite.
 
 Otherwise I run the tests that were passed on the command line.
-The options C<--with-pct>, C<--with-phc> and C<--with-antlr3> select
-the variant of Pipp. Default is the PCT variant, using the
-Parrot Compiler Toolkit.
 
 =cut
 
@@ -50,16 +41,14 @@ use Parrot::Harness::Smoke;
 use Parrot::Test;
 
 my ( $files_flag, $master_flag, $send_to_smolder_flag, $archive_flag, $verbose_flag );
-my ( $php_flag, $pct_flag, $antlr3_flag, $phc_flag );
+my ( $php_flag, $pct_flag);
 GetOptions(
     'files'           => \$files_flag,
     'master'          => \$master_flag,          # unused, but passed by languages/t/harness
     'send-to-smolder' => \$send_to_smolder_flag,
     'archive'         => \$archive_flag,
     'verbose'         => \$verbose_flag,
-    'with-antlr3'     => \$antlr3_flag,
     'with-pct'        => \$pct_flag,
-    'with-phc'        => \$phc_flag,
     'with-php'        => \$php_flag,
 );
 
@@ -83,17 +72,8 @@ if ( $files_flag ) {
          $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::PHP';
          @cmd = qw{ php-cgi -q -C -n } ;
     }
-    elsif ( $phc_flag ) {
-        $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::Phc';
-        push @cmd, '--variant=phc';
-    }
-    elsif ( $antlr3_flag ) {
-        $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::Antlr3';
-        push @cmd, '--variant=antlr3';
-    }
     elsif ( $pct_flag ) {
         $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::PCT';
-        push @cmd, '--variant=pct';
     }
 
     my @files;
