@@ -27,9 +27,9 @@ const char intval_map[INT_REGISTERS_TO_MAP] =
          *  R15     for INTERP
          */
         R12,
-#  ifndef USE_OP_MAP_AND_CODE_START
+#ifndef USE_OP_MAP_AND_CODE_START
         R13, R14,
-#  endif
+#endif
         /* Unpreserved */
         RCX, RSI, RDI, R8, R9, R10, RDX
     };
@@ -58,13 +58,13 @@ const jit_arch_info arch_info = {
         /* JIT_CODE_FILE */
         {
             Parrot_jit_begin,   /* emit code prologue */
-#  ifdef USE_OP_MAP_AND_CODE_START
+#ifdef USE_OP_MAP_AND_CODE_START
             7,
             1,
-#  else
+#else
             9,                 /* mapped int */
             3,                  /* preserved int */
-#  endif
+#endif
             intval_map,         /* which ints mapped */
             14,                 /* mapped float  */
             0,                  /* preserved float */
@@ -127,14 +127,14 @@ void
 Parrot_emit_jump_to_rax(Parrot_jit_info_t *jit_info, Interp *interp)
 {
     if (!jit_info->objfile) {
-#  ifdef USE_OP_MAP_AND_CODE_START
+#ifdef USE_OP_MAP_AND_CODE_START
         /* Get interp->code->base.data */
         jit_emit_load_code_start(jit_info->native_ptr);
         emit_sub_r_r(jit_info->native_ptr, RAX, CODE_START);
 
         /* Get interp->code->jit_info->arena->op_map */
         jit_emit_load_op_map(jit_info->native_ptr);
-#  else
+#else
         /* emit code that gets interp->code->base.data */
         emit_mov_r_mr(jit_info->native_ptr, RCX, INTERP, (long)offsetof(Interp, code));
         emit_mov_r_mr(jit_info->native_ptr, RDX, RCX, (long)offsetof(PackFile_Segment, data));
@@ -144,16 +144,16 @@ Parrot_emit_jump_to_rax(Parrot_jit_info_t *jit_info, Interp *interp)
         emit_mov_r_mr(jit_info->native_ptr, RDX, RCX, (long)offsetof(PackFile_ByteCode, jit_info));
         emit_lea_r_mr(jit_info->native_ptr, RDX, RDX, (long)offsetof(Parrot_jit_info_t, arena));
         emit_mov_r_mr(jit_info->native_ptr, RDX, RDX, (long)offsetof(Parrot_jit_arena_t, op_map));
-#  endif
+#endif
     }
     /* Base pointer */
     emit_mov_r_mr(jit_info->native_ptr, RBX, INTERP, (long)offsetof(Interp, ctx.bp));
 
-#  ifdef USE_OP_MAP_AND_CODE_START
+#ifdef USE_OP_MAP_AND_CODE_START
     emit_jmp_r_r(jit_info->native_ptr, RAX, OP_MAP);
-#  else
+#else
     emit_jmp_r_r(jit_info->native_ptr, RAX, RDX);
-#  endif
+#endif
 }
 
 void
@@ -210,7 +210,7 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
     /* Quick fixup, but we know it's 12, anyway it needs to be a byte */
     emit_jcc(jit_info->native_ptr, jcc_jnz, 0x00);
     sav_ptr = (char *)(jit_info->native_ptr - 1);
-    //Parrot_end_jit(jit_info, interp);
+    /* Parrot_end_jit(jit_info, interp); */
     jit_emit_end(jit_info->native_ptr);
     *sav_ptr = (char)(jit_info->native_ptr - sav_ptr - 1);
 

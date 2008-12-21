@@ -96,7 +96,7 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 .sub 'eval_string'
 
    say '# eval_string() was called'
-   
+
    .return (1)
 .end
 

@@ -846,7 +846,7 @@ typedef enum {
 }
 /*********************************************************/
 
-#  ifdef USE_OP_MAP_AND_CODE_START
+#ifdef USE_OP_MAP_AND_CODE_START
 /* These two can be mixed together just like in the i386 jit.  All the places I
  * can see this being called require it to be included, but for the moment I'm
  * keeping it as these macros. */
@@ -854,7 +854,7 @@ typedef enum {
  * emit code that gets interp->code->jit_info->arena->op_map
  * and sets the OP_MAP register
  */
-#    define jit_emit_load_op_map(pc) { \
+#  define jit_emit_load_op_map(pc) { \
         emit_mov_r_mr((pc), OP_MAP, INTERP, (long)offsetof(Interp, code)); \
         emit_mov_r_mr((pc), OP_MAP, OP_MAP, (long)offsetof(PackFile_ByteCode, jit_info)); \
         emit_lea_r_mr((pc), OP_MAP, OP_MAP, (long)offsetof(Parrot_jit_info_t, arena)); \
@@ -865,12 +865,12 @@ typedef enum {
  * emit code that gets interp->code->base.data
  * and sets the CODE_START register
  */
-#    define jit_emit_load_code_start(pc) { \
+#  define jit_emit_load_code_start(pc) { \
         emit_mov_r_mr((pc), CODE_START, INTERP, (long)offsetof(Interp, code)); \
         emit_mov_r_mr((pc), CODE_START, CODE_START, (long)offsetof(PackFile_Segment, data)); \
 }
 
-#  endif /* USE_OP_MAP_AND_CODE_START */
+#endif /* USE_OP_MAP_AND_CODE_START */
 
 void call_func(Parrot_jit_info_t *jit_info, void *addr);
 void Parrot_emit_jump_to_rax(Parrot_jit_info_t *jit_info, Interp *interp);
@@ -887,7 +887,7 @@ extern int jit_op_count(void);
 /*
  * release stack frame end exit see core.jit
  */
-//extern static void Parrot_end_jit(Parrot_jit_info_t *, Interp *);
+/* extern static void Parrot_end_jit(Parrot_jit_info_t *, Interp *); */
 
 #  undef Parrot_jit_restart_op
 
