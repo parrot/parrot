@@ -1,5 +1,5 @@
 
-#  include <assert.h>
+#include <assert.h>
 #include "parrot/parrot.h"
 #include "parrot/hash.h"
 #include "parrot/oplib/ops.h"
@@ -9,7 +9,7 @@
 /*
  * helper funcs - get argument n
  */
-static INTVAL
+INTVAL
 get_nci_I(PARROT_INTERP, ARGMOD(call_state *st), int n)
 {
     if (n >= st->src.n)
@@ -21,7 +21,7 @@ get_nci_I(PARROT_INTERP, ARGMOD(call_state *st), int n)
     return UVal_int(st->val);
 }
 
-static FLOATVAL
+FLOATVAL
 get_nci_N(PARROT_INTERP, ARGMOD(call_state *st), int n)
 {
     if (n >= st->src.n)
@@ -35,7 +35,7 @@ get_nci_N(PARROT_INTERP, ARGMOD(call_state *st), int n)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static STRING*
+STRING*
 get_nci_S(PARROT_INTERP, ARGMOD(call_state *st), int n)
 {
     /* TODO or act like below? */
@@ -50,7 +50,7 @@ get_nci_S(PARROT_INTERP, ARGMOD(call_state *st), int n)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static PMC*
+PMC*
 get_nci_P(PARROT_INTERP, ARGMOD(call_state *st), int n)
 {
     /*
@@ -68,7 +68,7 @@ get_nci_P(PARROT_INTERP, ARGMOD(call_state *st), int n)
 /*
  * set return value
  */
-static void
+void
 set_nci_I(PARROT_INTERP, ARGOUT(call_state *st), INTVAL val)
 {
     Parrot_init_ret_nci(interp, st, "I");
@@ -79,7 +79,7 @@ set_nci_I(PARROT_INTERP, ARGOUT(call_state *st), INTVAL val)
     }
 }
 
-static void
+void
 set_nci_N(PARROT_INTERP, ARGOUT(call_state *st), FLOATVAL val)
 {
     Parrot_init_ret_nci(interp, st, "N");
@@ -90,7 +90,7 @@ set_nci_N(PARROT_INTERP, ARGOUT(call_state *st), FLOATVAL val)
     }
 }
 
-static void
+void
 set_nci_S(PARROT_INTERP, ARGOUT(call_state *st), STRING *val)
 {
     Parrot_init_ret_nci(interp, st, "S");
@@ -101,7 +101,7 @@ set_nci_S(PARROT_INTERP, ARGOUT(call_state *st), STRING *val)
     }
 }
 
-static void
+void
 set_nci_P(PARROT_INTERP, ARGOUT(call_state *st), PMC* val)
 {
     Parrot_init_ret_nci(interp, st, "P");
@@ -112,13 +112,13 @@ set_nci_P(PARROT_INTERP, ARGOUT(call_state *st), PMC* val)
     }
 }
 
-static int
+int
 emit_is8bit(long disp)
 {
     return disp >= -128 && disp <= 127;
 }
 
-static char *
+char *
 emit_disp8_32(char *pc, int disp)
 {
     if (emit_is8bit(disp)) {
@@ -131,7 +131,7 @@ emit_disp8_32(char *pc, int disp)
     }
 }
 
-static void
+void
 emit_sib(PARROT_INTERP, char *pc, int scale, int i, int base)
 {
     int scale_byte;
@@ -159,7 +159,7 @@ emit_sib(PARROT_INTERP, char *pc, int scale, int i, int base)
             emit_reg_Base(base));
 }
 
-static char *
+char *
 emit_r_X(PARROT_INTERP, char *pc, int reg_opcode, int base, int i, int scale, long disp)
 {
     if (i && !scale)
@@ -213,7 +213,7 @@ emit_r_X(PARROT_INTERP, char *pc, int reg_opcode, int base, int i, int scale, lo
     return pc;
 }
 
-static char *
+char *
 emit_shift_i_r(PARROT_INTERP, char *pc, int opcode, int imm, int reg)
 {
     if (opcode == emit_b000 && imm < 0) {
@@ -241,7 +241,7 @@ emit_shift_i_r(PARROT_INTERP, char *pc, int opcode, int imm, int reg)
     return pc;
 }
 
-static char *
+char *
 emit_shift_i_m(PARROT_INTERP, char *pc, int opcode, int imm,
                int base, int i, int scale, long disp)
 {
@@ -265,7 +265,7 @@ emit_shift_i_m(PARROT_INTERP, char *pc, int opcode, int imm,
     return pc;
 }
 
-static char *
+char *
 emit_shift_r_r(PARROT_INTERP, char *pc, int opcode, int reg1, int reg2)
 {
     if (reg1 != emit_ECX)
@@ -278,7 +278,7 @@ emit_shift_r_r(PARROT_INTERP, char *pc, int opcode, int reg1, int reg2)
     return pc;
 }
 
-static char *
+char *
 emit_shift_r_m(PARROT_INTERP, char *pc, int opcode, int reg,
                int base, int i, int scale, long disp)
 {
@@ -292,7 +292,7 @@ emit_shift_r_m(PARROT_INTERP, char *pc, int opcode, int reg,
     return pc;
 }
 
-static char *
+char *
 emit_pushl_m(PARROT_INTERP, char *pc, int base, int i, int scale, long disp)
 {
     *(pc++) = (char) 0xff;
@@ -301,7 +301,7 @@ emit_pushl_m(PARROT_INTERP, char *pc, int base, int i, int scale, long disp)
 
 /* POPs */
 
-static char *
+char *
 emit_popl_r(char *pc, int reg)
 {
 /* XXX kwoo:  I side with valgrind.  Is it safe to remove the obsolete code? */
@@ -316,7 +316,7 @@ emit_popl_r(char *pc, int reg)
 }
 
 
-static char *
+char *
 emit_popl_m(PARROT_INTERP, char *pc, int base, int i, int scale, long disp)
 {
     *(pc++) = (char) 0x8f;
@@ -325,7 +325,7 @@ emit_popl_m(PARROT_INTERP, char *pc, int base, int i, int scale, long disp)
 
 /* MOVes */
 
-static char *
+char *
 emit_movb_r_r(char *pc, int reg1, int reg2)
 {
     *(pc++) = (char) 0x88;
@@ -334,7 +334,7 @@ emit_movb_r_r(char *pc, int reg1, int reg2)
 }
 
 
-static char *
+char *
 emit_movb_i_r(char *pc, char imm, int reg)
 {
     *(pc++) = (char)(0xb0 | (reg - 1));
@@ -342,8 +342,7 @@ emit_movb_i_r(char *pc, char imm, int reg)
     return pc;
 }
 
-
-static char *
+char *
 emit_movb_i_m(PARROT_INTERP, char *pc, char imm, int base, int i, int scale, long disp)
 {
     *(pc++) = (char) 0xc6;
@@ -352,8 +351,7 @@ emit_movb_i_m(PARROT_INTERP, char *pc, char imm, int base, int i, int scale, lon
     return pc;
 }
 
-
-static char *
+char *
 opt_mul(PARROT_INTERP, char *pc, int dest, INTVAL imm, int src)
 {
     UINTVAL ld2 = ld((UINTVAL) imm);
@@ -408,7 +406,7 @@ opt_mul(PARROT_INTERP, char *pc, int dest, INTVAL imm, int src)
     return pc;
 }
 
-static int
+int
 intreg_is_used(Parrot_jit_info_t *jit_info, char reg)
 {
     int i;
@@ -425,7 +423,7 @@ intreg_is_used(Parrot_jit_info_t *jit_info, char reg)
     return 0;
 }
 
-static char *
+char *
 opt_shift_rr(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int count, int op)
 {
     char *pc = jit_info->native_ptr;
@@ -461,7 +459,8 @@ opt_shift_rr(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int count, in
     }
     return pc;
 }
-static char *
+
+char *
 opt_shift_rm(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int offs, int op)
 {
     char *pc = jit_info->native_ptr;
@@ -492,7 +491,7 @@ opt_shift_rm(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int offs, int
 unsigned char *lastpc;
 
 /* ST(r1) /= ST(r2) */
-static char *
+char *
 div_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r1)
 {
     char *L1;
@@ -516,7 +515,7 @@ div_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r1)
     return pc;
 }
 
-static char *
+char *
 mod_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r)
 {
     char *L1;
@@ -549,7 +548,7 @@ mod_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r)
 /* dest /= src
  * edx:eax /= src, quotient => eax, rem => edx
  */
-static char *
+char *
 opt_div_rr(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int src, int is_div)
 {
     char *pc = jit_info->native_ptr;
@@ -662,8 +661,7 @@ opt_div_rr(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int src, int is
     return pc;
 }
 
-
-static char *
+char *
 opt_div_ri(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, INTVAL imm, int is_div)
 {
     char *pc = jit_info->native_ptr;
@@ -692,7 +690,7 @@ opt_div_ri(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, INTVAL imm, int
     return pc;
 }
 
-static char *
+char *
 opt_div_RM(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int offs, int is_div)
 {
     char *pc = jit_info->native_ptr;
@@ -751,7 +749,7 @@ opt_div_RM(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int offs, int i
     return pc;
 }
 
-static void
+void
 jit_emit_jcc(Parrot_jit_info_t *jit_info, int code, opcode_t disp)
 {
     long offset;
@@ -792,7 +790,7 @@ jit_emit_jcc(Parrot_jit_info_t *jit_info, int code, opcode_t disp)
     emitm_jxl(jit_info->native_ptr, code, 0xc0def00d);
 }
 
-static void
+void
 emit_jump(Parrot_jit_info_t *jit_info, opcode_t disp)
 {
     long offset;
@@ -823,7 +821,7 @@ emit_jump(Parrot_jit_info_t *jit_info, opcode_t disp)
     emitm_jumpl(jit_info->native_ptr, 0xc0def00d);
 }
 
-static void
+void
 Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
                    PARROT_INTERP)
 {
@@ -881,8 +879,7 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
             sizeof (*jit_info->arena.op_map) / 4, 0);
 }
 
-
-static void call_func(Parrot_jit_info_t *jit_info, void (*addr) (void))
+void call_func(Parrot_jit_info_t *jit_info, void (*addr) (void))
 {
     Parrot_jit_newfixup(jit_info);
     jit_info->arena.fixups->type = JIT_X86CALL;
@@ -890,12 +887,12 @@ static void call_func(Parrot_jit_info_t *jit_info, void (*addr) (void))
     emitm_calll(jit_info->native_ptr, 0xdeafc0de);
 }
 
-static void jit_emit_real_exception(Parrot_jit_info_t *jit_info)
+void jit_emit_real_exception(Parrot_jit_info_t *jit_info)
 {
     call_func(jit_info, (void (*) (void)) & Parrot_ex_throw_from_c_args);
 }
 
-static char*
+char*
 jit_set_i_p_ki(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset)
 {
     char *L1, *L2, *L3, *L4;
@@ -957,7 +954,7 @@ jit_set_i_p_ki(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset)
     return L4;
 }
 
-static char*
+char*
 jit_set_p_ki_i(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset)
 {
     char *L1, *L2, *L3, *L4;
@@ -1029,7 +1026,7 @@ jit_set_p_ki_i(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset)
 /*
  * for vtable calls registers are already saved back
  */
-static void
+void
 Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 PARROT_INTERP, int n, int *args)
 {
@@ -1188,7 +1185,7 @@ store:
         L4[1] = (char)(jit_info->native_ptr - L4 - 2);
 }
 
-static void
+void
 Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
 {
@@ -1222,7 +1219,7 @@ Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
 /* emit a call to a vtable func
  * $1->vtable(interp, $1)
  */
-static void
+void
 Parrot_jit_vtable1_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
 {
@@ -1233,7 +1230,7 @@ Parrot_jit_vtable1_op(Parrot_jit_info_t *jit_info,
 /* emit a call to a vtable func
  * $1 = $2->vtable(interp, $2)
  */
-static void
+void
 Parrot_jit_vtable1r_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
 {
@@ -1246,7 +1243,7 @@ Parrot_jit_vtable1r_op(Parrot_jit_info_t *jit_info,
 /* emit a call to a vtable func
  * $1 = $2->vtable(interp, $2, $3)
  */
-static void
+void
 Parrot_jit_vtable_1r223_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
 {
@@ -1258,7 +1255,7 @@ Parrot_jit_vtable_1r223_op(Parrot_jit_info_t *jit_info,
 /* emit a call to a vtable func
  * $1 = $3->vtable(interp, $3, $2)
  */
-static void
+void
 Parrot_jit_vtable_1r332_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
 {
@@ -1266,10 +1263,11 @@ Parrot_jit_vtable_1r332_op(Parrot_jit_info_t *jit_info,
     Parrot_jit_vtable_n_op(jit_info, interp, 2, a);
     Parrot_jit_store_retval(jit_info, interp);
 }
+
 /* emit a call to a vtable func
  * $1->vtable(interp, $1, $2)
  */
-static void
+void
 Parrot_jit_vtable_112_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
 {
@@ -1280,17 +1278,18 @@ Parrot_jit_vtable_112_op(Parrot_jit_info_t *jit_info,
 /* emit a call to a vtable func
  * $1->vtable(interp, $1, $1)
  */
-static void
+void
 Parrot_jit_vtable_111_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
 {
     int a[] = { 1, 1 };
     Parrot_jit_vtable_n_op(jit_info, interp, 2, a);
 }
+
 /* emit a call to a vtable func
  * $2->vtable(interp, $2, $1)
  */
-static void
+void
 Parrot_jit_vtable_221_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
 {
@@ -1301,7 +1300,7 @@ Parrot_jit_vtable_221_op(Parrot_jit_info_t *jit_info,
 /* emit a call to a vtable func
  * $2->vtable(interp, $2, $3, $1)
  */
-static void
+void
 Parrot_jit_vtable_2231_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
 {
@@ -1312,7 +1311,7 @@ Parrot_jit_vtable_2231_op(Parrot_jit_info_t *jit_info,
 /* emit a call to a vtable func
  * $1->vtable(interp, $1, $2, $3)
  */
-static void
+void
 Parrot_jit_vtable_1123_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
 {
@@ -1323,7 +1322,7 @@ Parrot_jit_vtable_1123_op(Parrot_jit_info_t *jit_info,
 /* emit a call to a vtable func
  * $1->vtable(interp, $1, $2, $1)
  */
-static void
+void
 Parrot_jit_vtable_1121_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
 {
@@ -1331,9 +1330,8 @@ Parrot_jit_vtable_1121_op(Parrot_jit_info_t *jit_info,
     Parrot_jit_vtable_n_op(jit_info, interp, 3, a);
 }
 
-
 /* if_p_ic, unless_p_ic */
-static void
+void
 Parrot_jit_vtable_if_unless_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP, int unless)
 {
@@ -1347,7 +1345,7 @@ Parrot_jit_vtable_if_unless_op(Parrot_jit_info_t *jit_info,
 }
 
 /* unless_p_ic */
-static void
+void
 Parrot_jit_vtable_unlessp_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
 {
@@ -1355,7 +1353,7 @@ Parrot_jit_vtable_unlessp_op(Parrot_jit_info_t *jit_info,
 }
 
 /* if_p_ic */
-static void
+void
 Parrot_jit_vtable_ifp_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
 {
@@ -1363,7 +1361,7 @@ Parrot_jit_vtable_ifp_op(Parrot_jit_info_t *jit_info,
 }
 
 /* new_p_ic */
-static void
+void
 Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
 {
@@ -1411,7 +1409,7 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     emitm_addb_i_r(jit_info->native_ptr, 16, emit_ESP);
 }
 
-static void
+void
 jit_get_params_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 {
     PMC *sig_pmc;
@@ -1447,7 +1445,7 @@ jit_get_params_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP)
  * preserve registers
  * a) all callee saved on function entry
  */
-static void
+void
 jit_save_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 {
     int i, used_i, save_i;
@@ -1462,7 +1460,7 @@ jit_save_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 }
 
 /* restore saved regs, see above */
-static void
+void
 jit_restore_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 {
 
@@ -1487,7 +1485,7 @@ jit_restore_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP)
  *      use jit_emit_mov_RM_{in} functions (load/store base indexed)
  *      and a macro to retrive sp
  */
-static int
+int
 jit_save_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP, int skip)
 {
     int i, used_i, used_n;
@@ -1516,7 +1514,7 @@ jit_save_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP, int skip)
     return used_n;
 }
 
-static void
+void
 jit_restore_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP,
         int skip)
 {
@@ -1547,7 +1545,7 @@ jit_restore_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP,
             (used_i * sizeof (INTVAL) + used_n * sizeof (FLOATVAL)));
 }
 
-static void
+void
 jit_set_returns_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
         int recursive)
 {
@@ -1608,7 +1606,7 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
     }
 }
 
-static void
+void
 jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
         int recursive)
 {
@@ -1717,7 +1715,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
     }
 }
 
-static void
+void
 Parrot_jit_dofixup(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 {
     Parrot_jit_fixup_t *fixup, *next;
@@ -1794,7 +1792,7 @@ static int control_word = 0x27f;
  *
  */
 
-static void
+void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
                  PARROT_INTERP)
 {
@@ -1838,7 +1836,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 }
 
 #  else /* JIT_CGP */
-static void
+void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
                  PARROT_INTERP)
 {
@@ -1897,7 +1895,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
  *   args[n + 1] .. opcode_t* next - ususally just returned
  */
 
-static void
+void
 Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
                  PARROT_INTERP)
 {
@@ -1964,13 +1962,13 @@ no_result:
 }
 
 
-static void
+void
 Parrot_jit_begin_sub(Parrot_jit_info_t *jit_info,
                  PARROT_INTERP)
 {
 }
 
-static void
+void
 jit_mov_mr_n_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
         int base_reg, INTVAL offs, int src_reg)
 {
@@ -1978,7 +1976,7 @@ jit_mov_mr_n_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
     jit_emit_fstore_mb_n(interp, jit_info->native_ptr, base_reg, offs);
 }
 
-static void
+void
 jit_mov_mr_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
         int base_reg, INTVAL offs, int src_reg)
 {
@@ -1986,7 +1984,7 @@ jit_mov_mr_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
             src_reg, base_reg, emit_None, 1, offs);
 }
 
-static void
+void
 jit_mov_rm_n_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
         int dst_reg, int base_reg, INTVAL offs)
 {
@@ -1994,7 +1992,7 @@ jit_mov_rm_n_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
     emitm_fstp(jit_info->native_ptr, (dst_reg+1));
 }
 
-static void
+void
 jit_mov_rm_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
         int dst_reg, int base_reg, INTVAL offs)
 {
@@ -2002,7 +2000,7 @@ jit_mov_rm_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
             dst_reg, base_reg, emit_None, 1, offs);
 }
 
-static void
+void
 Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info)
 {
     jit_emit_finit(jit_info->native_ptr);
@@ -2071,8 +2069,6 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
          */
     }
 }
-
-extern int jit_op_count(void);
 
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
@@ -2214,10 +2210,7 @@ Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
     Parrot_emit_jump_to_eax(jit_info, interp);
 }
 
-
 /* autogened inside core.ops */
-static void
-Parrot_end_jit(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
 void
 Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
@@ -2250,7 +2243,7 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
  * the needed register number
  * TODO handel overflow params
  */
-static int
+int
 count_regs(PARROT_INTERP, char *sig, char *sig_start)
 {
     const char *typs[] = {
@@ -2282,7 +2275,7 @@ count_regs(PARROT_INTERP, char *sig, char *sig_start)
     return first_reg;
 }
 
-static size_t
+size_t
 calc_signature_needs(const char *sig, int *strings)
 {
     size_t stack_size = 0;
@@ -2304,6 +2297,7 @@ calc_signature_needs(const char *sig, int *strings)
     return stack_size;
 
 }
+
 /*
  * The function generated here is called as func(interp, nci_info)
  * interp   ...  8(%ebp)
