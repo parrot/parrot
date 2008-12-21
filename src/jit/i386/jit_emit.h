@@ -1552,9 +1552,8 @@ EXTERN void Parrot_FixedIntegerArray_set_integer_keyed_int(Interp*, PMC*, INTVAL
 
 #  define NATIVECODE jit_info->native_ptr
 #  define CUR_OPCODE jit_info->cur_op
-#  define CONST(i) PCONST(jit_info->cur_op[(i)])
+#  define JIT_CONST(i) PCONST(jit_info->cur_op[(i)])
 
-#  undef CONST
 /*
  * if jit_emit_noop is defined, it does align a jump target
  * to 1 << JUMP_ALIGN

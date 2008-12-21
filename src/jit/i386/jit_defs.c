@@ -1592,7 +1592,7 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
             break;
         case PARROT_ARG_FLOATVAL|PARROT_ARG_CONSTANT:
             if (recursive) {
-                jit_emit_mov_ri_n(interp, NATIVECODE, FSR1, &JI_CONST(2)->u.number);
+                jit_emit_mov_ri_n(interp, NATIVECODE, FSR1, &JIT_CONST(2)->u.number);
             }
             else {
                 jit_emit_mov_ri_n(interp, NATIVECODE, FSR1, &JIT_CONST(2)->u.number);
