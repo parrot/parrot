@@ -23,6 +23,7 @@
 #include "parrot/parrot.h"
 #include "parrot/hash.h"
 #include "parrot/oplib/ops.h"
+#include "jit.h"
 
 #if defined HAVE_COMPUTED_GOTO && defined __GNUC__ && PARROT_I386_JIT_CGP
 #  define JIT_CGP
