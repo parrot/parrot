@@ -31,8 +31,10 @@ Tests the sub 'eval' used for supporting embedding Pipp in other applications.
     .local pmc eval_sub
     .local int ret
     eval_sub = get_hll_global [ 'Pipp' ], 'eval'
-    # call it with test output
-    eval_sub()
+    # call it with TAP diagnostics
+    eval_sub("# only sea, not islands\n")
+
+    eval_sub('<?php function no_args () { echo "# no_args was called\n"; } no_args(); ?>')
 
     # define a function
     # call it from here

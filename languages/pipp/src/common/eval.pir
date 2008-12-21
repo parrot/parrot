@@ -20,9 +20,14 @@ The code originates from Rakudo's eval.pir.
 
 .sub 'eval'
 
-   say '# eval() was called'
+    .param pmc code
 
-   .return (1)
+    $P0 = get_hll_global 'Str'
+
+    .local pmc compiler
+    compiler = compreg 'Pipp'
+
+    .tailcall compiler.'eval'(code)
 .end
 
 .namespace []
