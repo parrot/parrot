@@ -1,13 +1,7 @@
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 package Parrot::Test::WMLScript;
-
-use strict;
-use warnings;
-
-use Data::Dumper;
-use File::Basename;
 
 require Parrot::Test;
 
@@ -26,6 +20,11 @@ Call WMLScript compiler, translator and parrot.
 Yet another constructor.
 
 =cut
+
+use strict;
+use warnings;
+
+use File::Spec;
 
 sub new {
     return bless {};
@@ -51,15 +50,15 @@ foreach my $func ( keys %language_test_map ) {
         my $params   = $options{params}   || q{};
 
         # flatten filenames (don't use directories)
-        my $lang_fn = Parrot::Test::per_test( '.wmls',  $count );
-        my $bin_fn  = Parrot::Test::per_test( '.wmlsc', $count );
-        my $out_fn  = Parrot::Test::per_test( '.out',   $count );
+        my $lang_fn = File::Spec->rel2abs( Parrot::Test::per_test( '.wmls',  $count ) );
+        my $bin_fn  = File::Spec->rel2abs( Parrot::Test::per_test( '.wmlsc', $count ) );
+        my $out_fn  = File::Spec->rel2abs( Parrot::Test::per_test( '.out',   $count ) );
 
         # This does not create byte code, but WMLScript code
         Parrot::Test::write_code_to_file( $code, $lang_fn );
 
         Parrot::Test::run_command(
-            "wmlsc $cflags languages/${lang_fn}",
+            "wmlsc $cflags ${lang_fn}",
             CD     => $self->{relpath},
             STDOUT => $out_fn,
             STDERR => $out_fn,
@@ -67,9 +66,9 @@ foreach my $func ( keys %language_test_map ) {
 
         my @test_prog = (
 
-            #            "wmlsc $cflags languages/${lang_fn}",
-            #            "$self->{parrot} languages/WMLScript/wmls2pir.pir languages/${bin_fn}",
-            "$self->{parrot} languages/WMLScript/wmlsi.pir languages/${bin_fn} $function $params",
+            #            "wmlsc $cflags ${lang_fn}",
+            #            "$self->{parrot} languages/WMLScript/wmls2pir.pir ${bin_fn}",
+            "$self->{parrot} languages/WMLScript/wmlsi.pir ${bin_fn} $function $params",
         );
 
         # STDERR is written into same output file
