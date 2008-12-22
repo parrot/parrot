@@ -8,7 +8,7 @@ t/md5.t - md5 library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/md5.t
+    % perl t/md5.t
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,7 @@ Tests md5
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test;
 use Parrot::Config;

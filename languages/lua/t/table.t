@@ -8,7 +8,7 @@ t/table.t - Lua Table Library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/table.t
+    % perl t/table.t
 
 =head1 DESCRIPTION
 
@@ -25,7 +25,7 @@ See "Programming in Lua", section 19 "The Table Library".
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 18;
 use Test::More;

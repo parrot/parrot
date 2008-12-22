@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ t/tables.t - Lua tables
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/tables.t
+    % perl t/tables.t
 
 =head1 DESCRIPTION
 
@@ -19,7 +19,7 @@ See "Programming in Lua", section 2.5 "Tables".
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 9;
 use Test::More;

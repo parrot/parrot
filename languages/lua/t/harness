@@ -38,26 +38,38 @@ Otherwise I run the tests that were passed on the command line.
 
 use strict;
 use warnings;
-use lib '..';
+use FindBin ();
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
-use Cwd();
-use Data::Dumper;
-use File::Spec;
+use Cwd                     ();
+use File::Spec              ();
+use TAP::Harness            3.12;     # support closures for the 'exec' option
+use TAP::Harness::Archive   0.12;
+use Parrot::Config          qw( %PConfig );
 use Getopt::Long;
-use Test::Harness();
+use Parrot::Harness::Smoke;
+use Parrot::Test;
 
 my $language = 'lua';
 
-my $opt_files;
-my ($use_orig_lua, $use_luac_pl, $use_lua_pbc);
+my ( $files_flag, $master_flag, $send_to_smolder_flag, $archive_flag, $verbose_flag );
+my ( $use_orig_lua, $use_luac_pl, $use_lua_pbc );
 GetOptions(
-    'files' => \$opt_files,
+    'files' => \$files_flag,
+    'master' => \$master_flag,          # unused, but passed by languages/t/harness
+    'send-to-smolder' => \$send_to_smolder_flag,
+    'archive' => \$archive_flag,
+    'verbose'         => \$verbose_flag,
+    # Lua specific part
     'use-lua' => \$use_orig_lua,
     'use-luac-pl' => \$use_luac_pl,
     'use-lua-pbc' => \$use_lua_pbc,
 );
 
-if ( $opt_files ) {
+my $verbosity = $verbose_flag ? 1 : $ENV{HARNESS_VERBOSE};
+$verbosity ||= 0;
+
+if ( $files_flag ) {
 
     # Only the Makefile in 'parrot/languages' uses --files
     my $dir = File::Spec->catfile( $language, 't' );
@@ -104,7 +116,43 @@ else {
         $ENV{PARROT_LUA_TEST_PROG} = 'lua.pbc';
     }
 
-    Test::Harness::runtests(@files) if scalar(@files);
+    my $exec_sub
+        = sub {
+              my ( $harness, $test_file ) = @_;
+
+              # all other directories contain test scripts written in Perl
+              return [ $PConfig{perl}, $test_file ];
+        };
+
+    if ( $archive_flag ) {
+        my %env_data = Parrot::Harness::Smoke::collect_test_environment_data();
+
+        my $report_file = ['lua_test_run.tar.gz'];
+        my $harness = TAP::Harness::Archive->new(
+            {
+                exec             => $exec_sub,
+                verbosity        => $verbosity,
+                archive          => $report_file->[0],
+                merge            => 1,
+                extra_properties => \%env_data,
+            }
+        );
+        $harness->runtests(@files);
+
+        if ( $send_to_smolder_flag ) {
+            $env_data{report_file} = $report_file;
+            $env_data{project_id}  = 10;
+            Parrot::Harness::Smoke::send_archive_to_smolder(%env_data);
+        }
+    } else {
+        my $harness = TAP::Harness->new(
+            {
+                exec       => $exec_sub,
+                verbosity  => $verbosity,
+            }
+        );
+        $harness->runtests(@files);
+    }
 }
 
 =head1 HISTORY

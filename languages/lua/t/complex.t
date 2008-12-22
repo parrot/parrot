@@ -8,7 +8,7 @@ t/complex.t - complex library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/complex.t
+    % perl t/complex.t
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,7 @@ Tests complex
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 26;
 use Parrot::Config;

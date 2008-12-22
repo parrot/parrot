@@ -8,7 +8,7 @@ t/shootout.t - The Computer Language Shootout
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/shootout.t
+    % perl t/shootout.t
 
 =head1 DESCRIPTION
 
@@ -19,7 +19,7 @@ See L<http://shootout.alioth.debian.org>.
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 19;
 use Test::More;

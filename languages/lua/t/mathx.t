@@ -8,7 +8,7 @@ t/mathx.t - mathx library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/mathx.t
+    % perl t/mathx.t
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,7 @@ Tests mathx
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 37;
 use Parrot::Config;

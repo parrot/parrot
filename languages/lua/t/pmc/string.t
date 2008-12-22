@@ -8,7 +8,7 @@ t/pmc/string.t - LuaString
 
 =head1 SYNOPSIS
 
-    % perl -I../../lib t/pmc/string.t
+    % perl t/pmc/string.t
 
 =head1 DESCRIPTION
 
@@ -19,6 +19,8 @@ Tests C<LuaString> PMC
 
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
 
 use Parrot::Test tests => 15;
 use Test::More;

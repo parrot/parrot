@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ t/repeat.t - Lua repeat statement
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/repeat.t
+    % perl t/repeat.t
 
 =head1 DESCRIPTION
 
@@ -22,7 +22,7 @@ See "Programming in Lua", section 4.3 "Control Structures".
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 2;
 use Test::More;

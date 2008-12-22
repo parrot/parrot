@@ -8,7 +8,7 @@ t/luad.t - Lua Disassembler test
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/luad.t
+    % perl t/luad.t
 
 =head1 DESCRIPTION
 
@@ -23,7 +23,7 @@ by Kein-Hong Man
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test;
 use Test::More;
@@ -77,7 +77,7 @@ CODE
 OUT
 
 language_output_is( 'Luad', <<'CODE', <<'OUT', 'loading constants' );
-local a,b,d,e 
+local a,b,d,e
 local c=0
 CODE
 ; source chunk: luad_3.luac
@@ -180,7 +180,7 @@ OUT
 language_output_is( 'Luad', <<'CODE', <<'OUT', 'upvalues and globals' );
 local a;
 function b()
-  a = 1 
+  a = 1
   return a
 end
 CODE
@@ -599,7 +599,7 @@ CODE
 OUT
 
 language_output_is( 'Luad', <<'CODE', <<'OUT', 'jumps and calls' );
-local a = function(...) 
+local a = function(...)
   local a,b,c = ...
 end
 CODE

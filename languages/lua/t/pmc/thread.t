@@ -8,7 +8,7 @@ t/pmc/thread.t - Lua thread
 
 =head1 SYNOPSIS
 
-    % perl -I../../lib t/pmc/thread.t
+    % perl t/pmc/thread.t
 
 =head1 DESCRIPTION
 
@@ -19,6 +19,8 @@ Tests Lua C<thread> type
 
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
 
 use Parrot::Test tests => 9;
 use Test::More;

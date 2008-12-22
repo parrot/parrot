@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ t/function.t - Lua functions
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/function.t
+    % perl t/function.t
 
 =head1 DESCRIPTION
 
@@ -22,7 +22,7 @@ See "Programming in Lua", section 5 "Functions".
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 16;
 use Test::More;

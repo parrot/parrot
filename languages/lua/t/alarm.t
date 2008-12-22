@@ -8,7 +8,7 @@ t/alarm.t - Lua Alarm Library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/alarm.t
+    % perl t/alarm.t
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,7 @@ Tests Lua Alarm Library
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test;
 use Test::More;

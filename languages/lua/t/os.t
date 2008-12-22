@@ -8,7 +8,7 @@ t/os.t - Lua Operating System Library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/os.t
+    % perl t/os.t
 
 =head1 DESCRIPTION
 
@@ -25,7 +25,7 @@ See "Programming in Lua", section 22 "The Operating System Library".
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 26;
 use Test::More;

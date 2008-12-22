@@ -8,7 +8,7 @@ t/debug.t - Lua Debug Library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/debug.t
+    % perl t/debug.t
 
 =head1 DESCRIPTION
 
@@ -25,7 +25,7 @@ See "Programming in Lua", section 23 "The Debug Library".
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 10;
 use Test::More;

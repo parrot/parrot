@@ -8,7 +8,7 @@ t/sha1.t - sha1 library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/sha1.t
+    % perl t/sha1.t
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,7 @@ Tests sha1
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test;
 use Parrot::Config;

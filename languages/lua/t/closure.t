@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ t/closure.t - Lua closures
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/closure.t
+    % perl t/closure.t
 
 =head1 DESCRIPTION
 
@@ -22,7 +22,7 @@ See "Programming in Lua", section 6.1 "Closures".
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 4;
 use Test::More;

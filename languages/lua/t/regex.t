@@ -8,7 +8,7 @@ t/regex.t - Lua Regex Compiler
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/regex.t
+    % perl t/regex.t
 
 =head1 DESCRIPTION
 
@@ -45,7 +45,7 @@ Description of the test.
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 150;
 use Test::More;

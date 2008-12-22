@@ -8,7 +8,7 @@ t/bc.t - bc library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/bc.t
+    % perl t/bc.t
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,7 @@ Tests bc
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test;
 use Parrot::Config;

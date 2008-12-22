@@ -8,7 +8,7 @@ t/base64.t - base64 library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/base64.t
+    % perl t/base64.t
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,7 @@ Tests base64
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test;
 use Test::More;

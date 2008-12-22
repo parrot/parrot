@@ -8,7 +8,7 @@ t/lfs.t - Lua File System Library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/lfs.t
+    % perl t/lfs.t
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,7 @@ Tests Lua File System Library
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 18;
 use Test::More;

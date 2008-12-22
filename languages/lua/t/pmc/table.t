@@ -8,7 +8,7 @@ t/pmc/table.t - Lua Table
 
 =head1 SYNOPSIS
 
-    % perl -I../../lib t/pmc/table.t
+    % perl t/pmc/table.t
 
 =head1 DESCRIPTION
 
@@ -19,6 +19,8 @@ Tests C<table> type
 
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
 
 use Parrot::Test tests => 14;
 use Test::More;

@@ -8,7 +8,7 @@ t/lpeg.t - LPeg library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/lpeg.t
+    % perl t/lpeg.t
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,7 @@ Tests LPeg
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 14;
 use Test::More;

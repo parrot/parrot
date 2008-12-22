@@ -8,7 +8,7 @@ t/pmc/nil.t - LuaNil
 
 =head1 SYNOPSIS
 
-    % perl -I../../lib t/pmc/nil.t
+    % perl t/pmc/nil.t
 
 =head1 DESCRIPTION
 
@@ -19,6 +19,8 @@ Tests C<LuaNil> PMC
 
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
 
 use Parrot::Test tests => 10;
 use Test::More;

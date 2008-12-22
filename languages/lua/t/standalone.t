@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ t/standalone.t
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/standalone.t
+    % perl t/standalone.t
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,7 @@ L<http://www.lua.org/manual/5.1/manual.html#6>.
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 22;
 use Test::More;

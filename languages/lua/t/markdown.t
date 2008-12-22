@@ -8,7 +8,7 @@ t/markdown.t - Markdown library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/markdown.t
+    % perl t/markdown.t
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,7 @@ Tests Markdown
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test;
 use Test::More;

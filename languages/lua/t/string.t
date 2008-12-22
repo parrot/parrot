@@ -8,7 +8,7 @@ t/string.t - Lua String Library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/string.t
+    % perl t/string.t
 
 =head1 DESCRIPTION
 
@@ -25,7 +25,7 @@ See "Programming in Lua", section 20 "The String Library".
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 34;
 use Test::More;

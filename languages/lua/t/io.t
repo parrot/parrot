@@ -8,7 +8,7 @@ t/io.t - Lua Input/Output Library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/io.t
+    % perl t/io.t
 
 =head1 DESCRIPTION
 
@@ -25,7 +25,7 @@ See "Programming in Lua", section 21 "The I/O Library".
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 41;
 use Test::More;

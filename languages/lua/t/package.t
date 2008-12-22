@@ -8,7 +8,7 @@ t/package.t - Lua Package Library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/package.t
+    % perl t/package.t
 
 =head1 DESCRIPTION
 
@@ -23,7 +23,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 16;
 use Test::More;

@@ -8,7 +8,7 @@ t/pmc/boolean.t - LuaBoolean
 
 =head1 SYNOPSIS
 
-    % perl -I../../lib t/pmc/boolean.t
+    % perl t/pmc/boolean.t
 
 =head1 DESCRIPTION
 
@@ -19,6 +19,8 @@ Tests C<LuaBoolean> PMC
 
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
 
 use Parrot::Test tests => 8;
 use Test::More;

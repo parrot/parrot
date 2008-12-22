@@ -8,7 +8,7 @@ t/bitlib.t - bitwise operations library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/bitlib.t
+    % perl t/bitlib.t
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,7 @@ Tests bitlib
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test;
 use Test::More;

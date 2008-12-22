@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ t/userdata.t - Lua userdata & coercion
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/userdata.t
+    % perl t/userdata.t
 
 =head1 DESCRIPTION
 
@@ -17,7 +17,7 @@ t/userdata.t - Lua userdata & coercion
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 24;
 use Test::More;

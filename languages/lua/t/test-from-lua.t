@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ t/test-from-lua.t - simple tests from Lua distribution
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/test-from-lua.t
+    % perl t/test-from-lua.t
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ Here is a one-line summary of each program:
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 12;
 use Test::More;
@@ -88,7 +88,7 @@ language_output_is( 'lua', $code, $out, 'cf' );
 $code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'echo.lua' ));
 language_output_like( 'lua', $code, << 'OUTPUT', 'echo', params => 'arg1 arg2' );
 /^
-0\tlanguages.lua.t.test-from-lua_3\.(lua|pir|luac\.pir)\n
+0\t.*languages.lua.t.test-from-lua_3\.(lua|pir|luac\.pir)\n
 1\targ1\n
 2\targ2\n
 /x

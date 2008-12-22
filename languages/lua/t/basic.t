@@ -8,7 +8,7 @@ t/basic.t - Lua Basic Library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/basic.t
+    % perl t/basic.t
 
 =head1 DESCRIPTION
 
@@ -23,7 +23,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.1>.
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 54;
 use Test::More;

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ t/number.t - Lua number & coercion
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/number.t
+    % perl t/number.t
 
 =head1 DESCRIPTION
 
@@ -17,7 +17,7 @@ t/number.t - Lua number & coercion
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 53;
 use Test::More;

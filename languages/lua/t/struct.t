@@ -8,7 +8,7 @@ t/struct.t - struct library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/struct.t
+    % perl t/struct.t
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,7 @@ Tests struct
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 3;
 use Test::More;

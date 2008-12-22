@@ -8,7 +8,7 @@ t/gl.t - OpenGL library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/gl.t
+    % perl t/gl.t
 
 =head1 DESCRIPTION
 
@@ -21,7 +21,7 @@ and F<languages/lua/src/lib/glut.pir>).
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test;
 use Test::More;

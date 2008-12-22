@@ -8,7 +8,7 @@ t/pmc/userdata.t - Lua Userdata
 
 =head1 SYNOPSIS
 
-    % perl -I../../lib t/pmc/userdata.t
+    % perl t/pmc/userdata.t
 
 =head1 DESCRIPTION
 
@@ -19,6 +19,8 @@ Tests C<userdata> type
 
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
 
 use Parrot::Test tests => 9;
 use Test::More;

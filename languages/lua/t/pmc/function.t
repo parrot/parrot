@@ -8,7 +8,7 @@ t/pmc/function.t - LuaFunction
 
 =head1 SYNOPSIS
 
-    % perl -I../lib lua/t/pmc/function.t
+    % perl t/pmc/function.t
 
 =head1 DESCRIPTION
 
@@ -19,6 +19,8 @@ Tests C<LuaFunction> PMC
 
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
 
 use Parrot::Test tests => 20;
 use Test::More;

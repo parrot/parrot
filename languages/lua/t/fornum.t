@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ t/fornum.t - Lua for statement
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Ilua/t lua/t/fornum.t
+    % perl t/fornum.t
 
 =head1 DESCRIPTION
 
@@ -22,7 +22,7 @@ See "Programming in Lua", section 4.3 "Control Structures".
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 14;
 use Test::More;
