@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ t/libfloat.t - WMLScript Float library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib WMLScript/t/libfloat.t
+    % perl t/libfloat.t
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,7 @@ Tests WMLScript Float Library
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 8;
 use Test::More;

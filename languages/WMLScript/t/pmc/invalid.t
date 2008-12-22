@@ -8,7 +8,7 @@ t/pmc/invalid.t - WmlsInvalid
 
 =head1 SYNOPSIS
 
-    % perl -I../../lib t/pmc/invalid.t
+    % perl t/pmc/invalid.t
 
 =head1 DESCRIPTION
 
@@ -19,6 +19,9 @@ Tests C<WmlsInvalid> PMC
 
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
+
 use Parrot::Test tests => 9;
 use Test::More;
 

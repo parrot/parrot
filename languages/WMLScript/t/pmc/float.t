@@ -8,7 +8,7 @@ t/pmc/float.t - WmlsFloat
 
 =head1 SYNOPSIS
 
-    % perl -I../../lib t/pmc/float.t
+    % perl t/pmc/float.t
 
 =head1 DESCRIPTION
 
@@ -19,6 +19,9 @@ Tests C<WmlsFloat> PMC
 
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
+
 use Parrot::Test tests => 11;
 use Test::More;
 

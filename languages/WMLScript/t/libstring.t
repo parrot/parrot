@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ t/libstring.t - WMLScript String library
 
 =head1 SYNOPSIS
 
-    % perl -I../lib WMLScript/t/libstring.t
+    % perl t/libstring.t
 
 =head1 DESCRIPTION
 
@@ -20,7 +20,7 @@ Tests WMLScript String Library
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 24;
 use Test::More;
@@ -496,7 +496,7 @@ extern function main()
 CODE
 Hello
 2
- Bye Jon . See you! 
+ Bye Jon . See you!
 2
 OUT
 

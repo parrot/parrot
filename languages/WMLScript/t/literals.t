@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ t/literals.t - WMLScript literals
 
 =head1 SYNOPSIS
 
-    % perl -I../lib WMLScript/t/literals.t
+    % perl t/literals.t
 
 =head1 DESCRIPTION
 
@@ -19,7 +19,7 @@ See "WMLScript Specification", section 6.1.5 "Literals".
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 9;
 use Test::More;

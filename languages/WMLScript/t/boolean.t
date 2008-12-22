@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ t/boolean.t - WMLScript boolean & conversion
 
 =head1 SYNOPSIS
 
-    % perl -I../lib WMLScript/t/boolean.t
+    % perl t/boolean.t
 
 =head1 DESCRIPTION
 
@@ -17,7 +17,7 @@ t/boolean.t - WMLScript boolean & conversion
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 40;
 use Test::More;

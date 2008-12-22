@@ -8,7 +8,7 @@ t/pmc/integer.t - WmlsInteger
 
 =head1 SYNOPSIS
 
-    % perl -I../../lib t/pmc/integer.t
+    % perl t/pmc/integer.t
 
 =head1 DESCRIPTION
 
@@ -19,6 +19,9 @@ Tests C<WmlsInteger> PMC
 
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
+
 use Parrot::Test tests => 11;
 use Test::More;
 

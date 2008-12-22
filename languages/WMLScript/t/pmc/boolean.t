@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ t/pmc/boolean.t - WmlsBoolean
 
 =head1 SYNOPSIS
 
-    % perl -I../../lib t/pmc/boolean.t
+    % perl t/pmc/boolean.t
 
 =head1 DESCRIPTION
 
@@ -19,6 +19,9 @@ Tests C<WmlsBoolean> PMC
 
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
+
 use Parrot::Test tests => 9;
 use Test::More;
 

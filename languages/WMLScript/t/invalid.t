@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ t/invalid.t - WMLScript invalid & conversion
 
 =head1 SYNOPSIS
 
-    % perl -I../lib WMLScript/t/invalid.t
+    % perl t/invalid.t
 
 =head1 DESCRIPTION
 
@@ -17,7 +17,7 @@ t/invalid.t - WMLScript invalid & conversion
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 23;
 use Test::More;

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,7 +8,7 @@ t/logical.t - Logical operators
 
 =head1 SYNOPSIS
 
-    % perl -I../lib WMLScript/t/logical.t
+    % perl t/logical.t
 
 =head1 DESCRIPTION
 
@@ -19,7 +19,7 @@ Test opcodes C<SCAND> and C<SCOR>.
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 18;
 use Test::More;

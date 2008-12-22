@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -8,12 +8,15 @@ t/runtime.t - WMLScript Runtime Libraries
 
 =head1 SYNOPSIS
 
-    % perl -I../../lib t/runtime.t
+    % perl t/runtime.t
 
 =cut
 
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../../lib";
+
 use Parrot::Test tests => 2;
 use Test::More;
 

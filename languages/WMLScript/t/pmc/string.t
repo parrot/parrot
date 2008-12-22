@@ -8,7 +8,7 @@ t/pmc/string.t - WmlsString
 
 =head1 SYNOPSIS
 
-    % perl -I../../lib t/pmc/string.t
+    % perl t/pmc/string.t
 
 =head1 DESCRIPTION
 
@@ -19,6 +19,9 @@ Tests C<WmlsString> PMC
 
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../../../lib";
+
 use Parrot::Test tests => 13;
 use Test::More;
 
