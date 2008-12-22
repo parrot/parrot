@@ -929,22 +929,23 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
     };
 
     size_t i;
-    char fmt[64], op[20];
+    const char *fmt;
+    char op[20];
     const char *debug_fmt = NULL;   /* gcc -O uninit warn */
     int found, branched;
 
     /* construct a FLOATVAL_FMT with needed precision */
     switch (NUMVAL_SIZE) {
         case 8:
-            strcpy(fmt, "%0.16g");
+            fmt = "%0.16g";
             break;
         case 12:
-            strcpy(fmt, "%0.18Lg");
+            fmt = "%0.18Lg";
             break;
         default:
             IMCC_warning(interp, "subs_constants",
                     "used default FLOATVAL_FMT\n");
-            strcpy(fmt, FLOATVAL_FMT);
+            fmt = FLOATVAL_FMT;
             break;
     }
 
