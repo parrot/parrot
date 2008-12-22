@@ -7,7 +7,7 @@ use lib ("lib/");
 use Parrot::OpLib::core;
 use Parrot::OpsFile;
 use File::Spec;
-use IO::File;
+use IO::File ();
 
 =head1 NAME
 

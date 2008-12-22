@@ -48,7 +48,7 @@ use warnings;
 
 use Carp;
 use Test::More;
-use IO::File;
+use IO::File ();
 
 sub testloop {
     my ($self, %args) = @_;
