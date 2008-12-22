@@ -214,7 +214,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_mmd_find_multi_from_sig_obj(PARROT_INTERP, ARGIN(STRING *name), ARGIN(PMC *invoke_sig))
 {
-    PMC *candidate_list = pmc_new(interp, enum_class_ResizablePMCArray);
+    PMC * const candidate_list = pmc_new(interp, enum_class_ResizablePMCArray);
 
     mmd_search_by_sig_obj(interp, name, invoke_sig, candidate_list);
     mmd_search_global(interp, name, candidate_list);
@@ -279,7 +279,7 @@ Parrot_build_sig_object_from_varargs(PARROT_INTERP, ARGIN(const char *sig), va_l
     VTABLE_set_string_native(interp, call_object, string_sig);
 
     for (i = 0; i < sig_len; ++i) {
-        INTVAL type = string_index(interp, string_sig, i);
+        const INTVAL type = string_index(interp, string_sig, i);
 
         /* Only create the returns array if it's needed */
         if (in_return_sig && PMC_IS_NULL(returns)) {
@@ -288,10 +288,10 @@ Parrot_build_sig_object_from_varargs(PARROT_INTERP, ARGIN(const char *sig), va_l
         }
 
         if (in_return_sig) {
-            STRING *signature = CONST_STRING(interp, "signature");
+            STRING * const signature = CONST_STRING(interp, "signature");
             /* Returns store the original passed-in pointer, so they can pass
              * the result back to the caller. */
-            PMC *val_pointer = pmc_new(interp, enum_class_CPointer);
+            PMC * const val_pointer = pmc_new(interp, enum_class_CPointer);
             VTABLE_push_pmc(interp, returns, val_pointer);
 
             switch (type) {
@@ -331,7 +331,7 @@ Parrot_build_sig_object_from_varargs(PARROT_INTERP, ARGIN(const char *sig), va_l
                     break;
                 case 'P':
                 {
-                    PMC *pmc_arg = va_arg(args, PMC *);
+                    PMC * const pmc_arg = va_arg(args, PMC *);
                     VTABLE_push_pmc(interp, call_object, pmc_arg);
                     break;
                 }
@@ -529,12 +529,12 @@ Parrot_mmd_find_multi_from_long_sig(PARROT_INTERP, ARGIN(STRING *name),
     STRING * const multi_str = CONST_STRING(interp, "MULTI");
     PMC    * const ns        = Parrot_make_namespace_keyed_str(interp,
                                     interp->root_namespace, multi_str);
-    PMC           *multi_sub = Parrot_get_global(interp, ns, name);
+    PMC    * const multi_sub = Parrot_get_global(interp, ns, name);
 
     if (PMC_IS_NULL(multi_sub))
         return PMCNULL;
     else {
-        PMC *type_tuple = mmd_build_type_tuple_from_long_sig(interp, long_sig);
+        PMC * const type_tuple = mmd_build_type_tuple_from_long_sig(interp, long_sig);
         return Parrot_mmd_sort_candidates(interp, type_tuple, multi_sub);
     }
 }
@@ -559,7 +559,7 @@ PMC *
 Parrot_mmd_sort_manhattan_by_sig_pmc(PARROT_INTERP, ARGIN(PMC *candidates),
         ARGIN(PMC *invoke_sig))
 {
-    INTVAL n         = VTABLE_elements(interp, candidates);
+    const INTVAL n = VTABLE_elements(interp, candidates);
 
     if (!n)
         return PMCNULL;
@@ -585,10 +585,10 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_mmd_sort_manhattan(PARROT_INTERP, ARGIN(PMC *candidates))
 {
-    INTVAL n = VTABLE_elements(interp, candidates);
+    const INTVAL n = VTABLE_elements(interp, candidates);
 
     if (n) {
-        PMC *arg_tuple = Parrot_mmd_arg_tuple_func(interp);
+        PMC * const arg_tuple = Parrot_mmd_arg_tuple_func(interp);
         return Parrot_mmd_sort_candidates(interp, arg_tuple, candidates);
     }
 
@@ -1560,15 +1560,15 @@ mmd_cache_key_from_values(PARROT_INTERP, ARGIN(const char *name),
 {
     /* Build array of type IDs, which we'll then use as a string to key into
      * the hash. */
-    INTVAL  num_values = VTABLE_elements(interp, values);
-    INTVAL  name_len   = name ? strlen(name) + 1: 0;
-    size_t  id_size    = num_values * sizeof (INTVAL) + name_len;
-    INTVAL *type_ids   = (INTVAL *)mem_sys_allocate(id_size);
+    const INTVAL num_values = VTABLE_elements(interp, values);
+    const INTVAL name_len   = name ? strlen(name) + 1: 0;
+    const size_t id_size    = num_values * sizeof (INTVAL) + name_len;
+    INTVAL *type_ids        = (INTVAL *)mem_sys_allocate(id_size);
     STRING *key;
     INTVAL  i;
 
     for (i = 0; i < num_values; i++) {
-        INTVAL id = VTABLE_type(interp, VTABLE_get_pmc_keyed_int(interp, values, i));
+        const INTVAL id = VTABLE_type(interp, VTABLE_get_pmc_keyed_int(interp, values, i));
         if (id == 0) {
             mem_sys_free(type_ids);
             return NULL;
@@ -1603,7 +1603,7 @@ PMC *
 Parrot_mmd_cache_lookup_by_values(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     ARGIN(const char *name), ARGIN(PMC *values))
 {
-    STRING *key = mmd_cache_key_from_values(interp, name, values);
+    STRING * const key = mmd_cache_key_from_values(interp, name, values);
 
     if (key)
         return (PMC *)parrot_hash_get(interp, cache, key);
@@ -1628,7 +1628,7 @@ void
 Parrot_mmd_cache_store_by_values(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     ARGIN(const char *name), ARGIN(PMC *values), ARGIN(PMC *chosen))
 {
-    STRING *key = mmd_cache_key_from_values(interp, name, values);
+    STRING * const key = mmd_cache_key_from_values(interp, name, values);
 
     if (key)
         parrot_hash_put(interp, cache, key, chosen);
@@ -1652,15 +1652,16 @@ mmd_cache_key_from_types(PARROT_INTERP, ARGIN(const char *name),
 {
     /* Build array of type IDs, which we'll then use as a string to key into
      * the hash. */
+    const INTVAL num_types  = VTABLE_elements(interp, types);
+    const INTVAL name_len   = name ? strlen(name) + 1: 0;
+    const size_t id_size    = num_types * sizeof (INTVAL) + name_len;
+    INTVAL * const type_ids = (INTVAL *)mem_sys_allocate(id_size);
+
     STRING *key;
-    INTVAL  num_types = VTABLE_elements(interp, types);
-    INTVAL  name_len  = name ? strlen(name) + 1: 0;
-    size_t  id_size   = num_types * sizeof (INTVAL) + name_len;
-    INTVAL *type_ids  = (INTVAL *)mem_sys_allocate(id_size);
     INTVAL  i;
 
     for (i = 0; i < num_types; i++) {
-        INTVAL id = VTABLE_get_integer_keyed_int(interp, types, i);
+        const INTVAL id = VTABLE_get_integer_keyed_int(interp, types, i);
 
         if (id == 0) {
             mem_sys_free(type_ids);
@@ -1696,7 +1697,7 @@ PMC *
 Parrot_mmd_cache_lookup_by_types(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     ARGIN(const char *name), ARGIN(PMC *types))
 {
-    STRING *key = mmd_cache_key_from_types(interp, name, types);
+    STRING * const key = mmd_cache_key_from_types(interp, name, types);
 
     if (key)
         return (PMC *)parrot_hash_get(interp, cache, key);
@@ -1722,7 +1723,7 @@ void
 Parrot_mmd_cache_store_by_types(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     ARGIN(const char *name), ARGIN(PMC *types), ARGIN(PMC *chosen))
 {
-    STRING *key = mmd_cache_key_from_types(interp, name, types);
+    STRING * const key = mmd_cache_key_from_types(interp, name, types);
 
     if (key)
         parrot_hash_put(interp, cache, key, chosen);
