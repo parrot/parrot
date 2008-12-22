@@ -28,8 +28,7 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 
 =cut
 
-
-.namespace [ 'PAST';'Compiler' ]
+.namespace [ 'Pipp' ]
 
 .sub '__onload' :anon :load :init
 
@@ -40,11 +39,9 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
     #  be used as a constant.  The 'e' flag indicates that the
     #  value must be quoted+escaped in PIR code.
     .local pmc valflags
-    valflags = get_global '%valflags'
+    valflags = get_hll_global ['PAST';'Compiler'], '%valflags'
     valflags['PhpString']   = 's~*e'
 .end
-
-.namespace [ 'Pipp' ]
 
 .const string VERSION = "0.0.1"
 
@@ -277,7 +274,7 @@ NO_REST:
 .sub set_ini
     .param pmc pipp_ini
 
-    set_hll_global 'pipp_ini', pipp_ini
+    set_root_global ['pipp'], 'pipp_ini', pipp_ini
 .end
 
 # there is a distinction between predefined variables and superglobals
@@ -286,16 +283,17 @@ NO_REST:
     .local pmc php_errormsg
     php_errormsg = new 'PhpString'
     php_errormsg = ''
-    set_hll_global '$php_errormsg', php_errormsg
+    set_root_global ['pipp'], '$php_errormsg', php_errormsg
 
     .local pmc included_files
     included_files = new 'PhpArray'
-    set_hll_global '$INC', included_files
+    set_root_global ['pipp'], '$INC', included_files
 
     .local string default_include_path
-    default_include_path = constant('DEFAULT_INCLUDE_PATH')
+    $P0 = get_root_global ['pipp'], 'constant'
+    default_include_path = $P0('DEFAULT_INCLUDE_PATH')
     $P0 = split ':', default_include_path
-    set_hll_global '$INCLUDE_PATH', $P0
+    set_root_global ['pipp'], '$INCLUDE_PATH', $P0
 
 .end
 
@@ -306,40 +304,40 @@ NO_REST:
     .local pmc parse_get_sub, superglobal_GET
     parse_get_sub       = get_hll_global [ 'CGI'; 'QueryHash' ], 'parse_get'
     ( superglobal_GET ) = parse_get_sub()
-    set_hll_global '$_GET', superglobal_GET
+    set_root_global ['pipp'], '$_GET', superglobal_GET
 
     .local pmc parse_post_sub, superglobal_POST
     parse_post_sub       = get_hll_global [ 'CGI'; 'QueryHash' ], 'parse_post'
     ( superglobal_POST ) = parse_post_sub()
-    set_hll_global '$_POST', superglobal_POST
+    set_root_global ['pipp'], '$_POST', superglobal_POST
 
     .local pmc superglobal_SERVER
     superglobal_SERVER = new 'PhpArray'
-    set_hll_global '$_SERVER', superglobal_SERVER
+    set_root_global ['pipp'], '$_SERVER', superglobal_SERVER
 
     .local pmc superglobal_GLOBALS
     superglobal_GLOBALS = new 'PhpArray'
-    set_hll_global '$_GLOBALS', superglobal_GLOBALS
+    set_root_global ['pipp'], '$_GLOBALS', superglobal_GLOBALS
 
     .local pmc superglobal_FILES
     superglobal_FILES = new 'PhpArray'
-    set_hll_global '$_FILES', superglobal_FILES
+    set_root_global ['pipp'], '$_FILES', superglobal_FILES
 
     .local pmc superglobal_COOKIE
     superglobal_COOKIE = new 'PhpArray'
-    set_hll_global '$_COOKIE', superglobal_COOKIE
+    set_root_global ['pipp'], '$_COOKIE', superglobal_COOKIE
 
     .local pmc superglobal_SESSION
     superglobal_SESSION = new 'PhpArray'
-    set_hll_global '$_SESSION', superglobal_SESSION
+    set_root_global ['pipp'], '$_SESSION', superglobal_SESSION
 
     .local pmc superglobal_REQUEST
     superglobal_REQUEST = new 'PhpArray'
-    set_hll_global '$_REQUEST', superglobal_REQUEST
+    set_root_global ['pipp'], '$_REQUEST', superglobal_REQUEST
 
     .local pmc superglobal_ENV
     superglobal_ENV = new 'PhpArray'
-    set_hll_global '$_ENV', superglobal_ENV
+    set_root_global ['pipp'], '$_ENV', superglobal_ENV
 
 .end
 

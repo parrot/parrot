@@ -16,21 +16,17 @@ The code originates from Rakudo's eval.pir.
 
 =cut
 
-.namespace [ 'Pipp' ]
+.HLL 'Pipp'
 
 .sub 'eval'
 
     .param pmc code
-
-    $P0 = get_hll_global 'Str'
 
     .local pmc compiler
     compiler = compreg 'Pipp'
 
     .tailcall compiler.'eval'(code)
 .end
-
-.namespace []
 
 .sub 'evalfile' :method :multi(_)
     .param pmc options         :slurpy :named
@@ -53,8 +49,6 @@ The code originates from Rakudo's eval.pir.
     .return (1)
 .end
 
-
-.namespace []
 .sub 'require' :multi(_)
     .param string name
     .param pmc options         :named :slurpy

@@ -1,5 +1,7 @@
 # $Id$
 
+.HLL 'Pipp'
+
 .loadlib 'php_group'
 
 .include 'languages/pipp/src/common/php_MACRO.pir'

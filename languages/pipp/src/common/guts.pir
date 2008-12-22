@@ -62,7 +62,6 @@ it understands how to properly merge C<MultiSub> PMCs.
 
 =cut
 
-.namespace []
 .sub '!EXPORT'
     .param string symbols
     .param pmc from            :named('from')

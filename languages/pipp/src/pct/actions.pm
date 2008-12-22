@@ -20,13 +20,12 @@ value of the comment is passed as the second argument to the method.
 class Pipp::Grammar::Actions;
 
 method TOP($/) {
-    my $past := PAST::Stmts.new( :node($/) );
-
+    my $past := PAST::Block.new( :node($/) );
     for $<sea_or_code> {
         $past.push( $($_) );
     }
 
-    make $past;
+    make PAST::Stmts.new( $past, PAST::Op.new( :inline( "_block11()\n.end\n.HLL 'Pipp'\n.sub 'anon'" ) ));
 }
 
 method sea_or_code($/,$key) {
@@ -257,13 +256,13 @@ method if_statement($/) {
                 my $eif := $($<elseif_clause>[$count]);
                 $count--;
                 my $eifchild := $($<elseif_clause>[$count]);
-                if($else) {
-                        $eif.push($else);
+                if ($else) {
+                   $eif.push($else);
                 }
                 $eif.push($eifchild);
         }
-        if($else && +$<elseif_clause> == 1) {
-                $firsteif.push($else);
+        if ($else && +$<elseif_clause> == 1) {
+            $firsteif.push($else);
         }
      }
 
@@ -496,7 +495,7 @@ method class_definition($/) {
                     :pirflags( ':init :load' ),
                     PAST::Stmts.new(
                         PAST::Op.new(
-                            :inline(   "$P0 = get_hll_global 'P6metaclass'\n"
+                            :inline(   "$P0 = get_root_global ['parrot'], 'P6metaclass'\n"
                                      ~ "$P2 = $P0.'new_class'('" ~ $<CLASS_NAME> ~ "')\n" ),
                             :pasttype( 'inline' )
                         )

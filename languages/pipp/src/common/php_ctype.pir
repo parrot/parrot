@@ -13,6 +13,8 @@ php_ctype.pir - PHP ctype Library
 
 =cut
 
+.HLL 'Pipp'
+
 .include 'languages/pipp/src/common/php_MACRO.pir'
 .include 'cclass.pasm'
 

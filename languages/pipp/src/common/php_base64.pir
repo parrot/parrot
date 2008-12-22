@@ -36,7 +36,7 @@ STILL INCOMPLETE.
     if $I0 goto L1
     .RETURN_NULL()
   L1:
-    $P0 = get_hll_global [ 'MIME'; 'Base64' ], 'decode_base64'
+    $P0 = get_root_global ['parrot';'MIME';'Base64'], 'decode_base64'
     $S0 = $P0(str)
     .RETURN_STRING($S0)
 .end
@@ -55,7 +55,7 @@ Encodes string using MIME base64 algorithm
     if $I0 goto L1
     .RETURN_NULL()
   L1:
-    $P0 = get_hll_global ['MIME'; 'Base64'], 'encode_base64'
+    $P0 = get_root_global ['parrot';'MIME';'Base64'], 'encode_base64'
     $S0 = $P0(str)
     if $S0 == '' goto L2
     .RETURN_STRING($S0)
