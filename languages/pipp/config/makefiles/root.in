@@ -29,24 +29,24 @@ CFLAGS        = @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ 
 TOUCH         = @touch@
 
 PMCS = \
- php \
- phparray \
- phpboolean \
- phpfloat \
- phpinteger \
- phpresource \
- phpstring \
- phpnull
+  php \
+  phparray \
+  phpboolean \
+  phpfloat \
+  phpinteger \
+  phpresource \
+  phpstring \
+  phpnull
 
 PMC_SOURCES = \
- $(PMCDIR)/php.pmc \
- $(PMCDIR)/phparray.pmc \
- $(PMCDIR)/phpboolean.pmc \
- $(PMCDIR)/phpfloat.pmc \
- $(PMCDIR)/phpinteger.pmc \
- $(PMCDIR)/phpresource.pmc \
- $(PMCDIR)/phpstring.pmc \
- $(PMCDIR)/phpnull.pmc
+  $(PMCDIR)/php.pmc \
+  $(PMCDIR)/phparray.pmc \
+  $(PMCDIR)/phpboolean.pmc \
+  $(PMCDIR)/phpfloat.pmc \
+  $(PMCDIR)/phpinteger.pmc \
+  $(PMCDIR)/phpresource.pmc \
+  $(PMCDIR)/phpstring.pmc \
+  $(PMCDIR)/phpnull.pmc
 
 HASH_SOURCES = $(HASHDIR)/pipp_hash.c
 
@@ -144,7 +144,7 @@ help:
 	@echo "  test-antlr3:       Run the test suite for 'Pipp antlr3'."
 	@echo "  test-pct:          Run the test suite for 'Pipp pct'."
 	@echo "  test-pmc:          Run the test suite for Pipp's PMCs."
-	@echo "  smolder_test:      Run the PCT test suite and send report to the smolder server" 
+	@echo "  smoke:             Run the PCT test suite and send report to the smolder server" 
 	@echo ""
 	@echo "Cleaning:"
 	@echo "  clean:             Clean up."
@@ -256,7 +256,8 @@ test-pct:
 	- $(PERL) t/harness --with-pct
 
 # run the test suite, create a TAP archive and send it off to smolder
-smolder_test : build
+smolder_test : smoke
+smoke : build
 	- $(PERL) t/harness --with-pct --archive --send-to-smolder
 
 
@@ -278,8 +279,8 @@ t/pcc-testsuite:
 # Make sue that php 5.3 is in $PATH,
 # e.g export PATH=~/devel/PHP/php5/sapi/cli:$PATH
 test-php-qa-testsuite: pipp \
- t/php_qa_testsuite/php5/run-tests.php \
- t/php_qa_testsuite/php5/tests 
+  t/php_qa_testsuite/php5/run-tests.php \
+  t/php_qa_testsuite/php5/tests 
  #t/php_qa_testsuite/php5/Zend/tests
 	cd t/php_qa_testsuite/php5 && cvs update tests run-tests.php
 	cd t/php_qa_testsuite/php5 && \
