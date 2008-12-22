@@ -30,7 +30,7 @@ Tests the sub 'eval' used for supporting embedding Pipp in other applications.
     # find sub 'eval_string'
     .local pmc eval_sub, no_args_sub
     .local int ret
-    eval_sub = get_hll_global [ 'Pipp' ], 'eval'
+    eval_sub = get_root_global [ 'parrot'; 'Pipp' ], 'eval'
     # call it with TAP diagnostics
     eval_sub("# only sea, not islands\n")
 
@@ -40,6 +40,17 @@ Tests the sub 'eval' used for supporting embedding Pipp in other applications.
     # call it from here
     no_args_sub = get_hll_global 'no_args'
     no_args_sub()
+
+    no_args_sub = get_root_global [ 'parrot' ], 'no_args'
+    no_args_sub()
+    # $P3 = get_namespace
+    # say $P3
+
+    # $P4 = get_hll_namespace
+    # say $P4
+
+    # $P5 = get_root_namespace
+    # say $P5
 .end
 
 # Local Variables:
