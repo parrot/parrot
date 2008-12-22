@@ -24,7 +24,7 @@ use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
 use Parrot::Config ();
 use Parrot::Test;
-use Test::More     tests => 16;
+use Test::More     tests => 18;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'if, one statement in block' );
 <?php
@@ -206,6 +206,43 @@ language_output_is( 'Pipp', <<'CODE', <<'OUT', 'while with negated expression' )
 
 $count = 0;
 while ( ! ( $count >= 10 ) ) { $count++; echo "round $count\n"; }
+CODE
+round 1
+round 2
+round 3
+round 4
+round 5
+round 6
+round 7
+round 8
+round 9
+round 10
+OUT
+
+language_output_is('Pipp', <<'CODE', <<'OUT', 'do-while loop');
+<?php
+
+$count = 0;
+do { echo "round $count\n"; $count++; } while ($count <= 10);
+CODE
+round 0
+round 1
+round 2
+round 3
+round 4
+round 5
+round 6
+round 7
+round 8
+round 9
+round 10
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'do-while with negated expression');
+<?php
+
+$count = 0;
+do { $count++; echo "round $count\n"; } while (!($count >= 10));
 CODE
 round 1
 round 2

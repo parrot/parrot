@@ -12,6 +12,8 @@ New in January 2009 release
 - Languages
   + Pipp
     - added support for 'elsif'
+    - added support for 'do-while'
+
 
 New in 0.8.2
 - Implementation

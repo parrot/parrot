@@ -84,7 +84,7 @@ via the C<get_root_namespace> opcode. For example:
 
   $P0 = get_root_namespace
 
-This root namespace is called C<'parrot'>.
+This root namespace stringifies to the empty string.
 
 =item HLL Root Namespaces
 
@@ -97,6 +97,8 @@ An HLL root namespace must be stored at the first level in Parrot's namespace
 hierarchy.  These top-level namespaces should also be specified in a standard
 unicode encoding.  The reasons for these restrictions is to allow compilers
 to remain completely ignorant of each other.
+
+Parrot internals are stored in the default HLL root namespace C<parrot>.
 
 =item HLL Implementation Namespaces
 

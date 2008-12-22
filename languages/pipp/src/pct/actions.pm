@@ -225,7 +225,7 @@ method arguments($/) {
                     :node($/)
                 );
     for $<expression> {
-        $past.push($($_));
+        $past.push( $($_) );
     }
 
     make $past;
@@ -240,8 +240,18 @@ method conditional_expression($/) {
     make $past;
 }
 
+method do_while_statement($/) {
+    my $past := PAST::Op.new(
+                    $( $<expression> ),
+                    $( $<block> ),
+                    :pasttype('repeat_while'),
+                    :node($/)
+                );
+    make $past;
+}
+
 method if_statement($/) {
-    my $past := $($<conditional_expression>);
+    my $past := $( $<conditional_expression> );
     $past.pasttype('if');
         
     my $else := undef;
@@ -253,7 +263,7 @@ method if_statement($/) {
         my $count := +$<elseif_clause> - 1;
         $first_eif := $( $<elseif_clause>[$count] );
         while $count != 0 {
-            my $eif := $($<elseif_clause>[$count]);
+            my $eif := $( $<elseif_clause>[$count] );
             $count--;
             my $eifchild := $( $<elseif_clause>[$count] );
             if ($else) {
@@ -277,11 +287,11 @@ method if_statement($/) {
 }
 
 method else_clause($/) {
-    make $($<block>);
+    make $( $<block> );
 }
 
 method elseif_clause($/) {
-    my $past := $($<conditional_expression>);
+    my $past := $( $<conditional_expression> );
     $past.pasttype('if');
 
     make $past;
@@ -338,7 +348,7 @@ method member($/) {
 
 
 method while_statement($/) {
-    my $past := $($<conditional_expression>);
+    my $past := $( $<conditional_expression> );
     $past.pasttype('while');
     make $past;
 }
@@ -361,7 +371,7 @@ method for_statement($/) {
 # Handle the operator precedence table.
 method expression($/, $key) {
     if ($key eq 'end') {
-        make $($<expr>);
+        make $( $<expr> );
     }
     else {
         my $past := PAST::Op.new( :name($<type>),
@@ -508,7 +518,7 @@ method class_definition($/) {
     # nothing to do for $<const_definition,
     # setup of class constants is done in the 'loadinit' node
     for $<class_constant_definition> {
-       $past.push($($_));
+       $past.push( $($_) );
     }
 
     my $methods_block

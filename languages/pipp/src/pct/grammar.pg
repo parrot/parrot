@@ -126,6 +126,7 @@ rule statement {
     | <expression_statement>    {*}  #= expression_statement
     | <if_statement>            {*}  #= if_statement
     | <while_statement>         {*}  #= while_statement
+    | <do_while_statement>      {*}  #= do_while_statement
     | <for_statement>           {*}  #= for_statement
     | <inline_sea_short_tag>    {*}  #= inline_sea_short_tag
     | <inline_sea_script_tag>   {*}  #= inline_sea_script_tag
@@ -195,6 +196,11 @@ rule elseif_clause {
 
 rule while_statement {
     'while' <conditional_expression>
+    {*}
+}
+
+rule do_while_statement {
+    'do' <block> 'while' '(' <expression> ')' <.statement_delimiter>
     {*}
 }
 
