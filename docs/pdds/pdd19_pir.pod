@@ -321,8 +321,8 @@ loaded again in C<:load>, so there is no need to call C<loadlib> at runtime.
 
 =item .HLL <hll_name>
 
-Define the HLL for the current file. Takes one string constant, the name
-of the HLL.
+Define the HLL namespace for the current file. Takes one string constant,
+the name of the HLL. By default, the HLL namespace is 'parrot'.
 
 =item .HLL_map <core_type> = <user_type>
 

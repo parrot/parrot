@@ -84,6 +84,8 @@ via the C<get_root_namespace> opcode. For example:
 
   $P0 = get_root_namespace
 
+This root namespace is called C<'parrot'>.
+
 =item HLL Root Namespaces
 
 Each HLL must store public items in a namespace named with the lowercased
