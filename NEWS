@@ -13,6 +13,10 @@ New in January 2009 release
   + Pipp
     - added support for 'elsif'
     - added support for 'do-while'
+- Miscellaneous
+  + Infrastructure
+    - 'make smoke' now generates Smolder reports sent to
+      http://smolder.plusthree.com/app/public_projects/smoke_reports/8
 
 
 New in 0.8.2
