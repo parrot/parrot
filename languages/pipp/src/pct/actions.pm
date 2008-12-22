@@ -245,45 +245,48 @@ method if_statement($/) {
     $past.pasttype('if');
         
     my $else := undef;
-    if +$<else_clause> != 0 {
-            $else := $($<else_clause>[0]);
+    if +$<else_clause> {
+        $else := $( $<else_clause>[0] );
     }
-    my $firsteif := undef;
-    if(+$<elseif_clause> != 0) {
+    my $first_eif := undef;
+    if +$<elseif_clause> {
         my $count := +$<elseif_clause> - 1;
-        $firsteif := $($<elseif_clause>[$count]);
+        $first_eif := $( $<elseif_clause>[$count] );
         while $count != 0 {
-                my $eif := $($<elseif_clause>[$count]);
-                $count--;
-                my $eifchild := $($<elseif_clause>[$count]);
-                if ($else) {
-                   $eif.push($else);
-                }
-                $eif.push($eifchild);
+            my $eif := $($<elseif_clause>[$count]);
+            $count--;
+            my $eifchild := $( $<elseif_clause>[$count] );
+            if ($else) {
+                $eif.push($else);
+            }
+            $eif.push($eifchild);
         }
-        if ($else && +$<elseif_clause> == 1) {
-            $firsteif.push($else);
+        if $else && +$<elseif_clause> == 1 {
+            $first_eif.push($else);
         }
      }
 
-     if($firsteif) {
-             $past.push($firsteif);
+     if $first_eif {
+         $past.push($first_eif);
      }
-     elsif($else) {
-             $past.push($else);
+     elsif $else {
+         $past.push($else);
      }
+
      make $past;
 }
 
 method else_clause($/) {
-        make $($<block>);
+    make $($<block>);
 }
 
 method elseif_clause($/) {
-        my $past := $($<conditional_expression>);
-        $past.pasttype('if');
-        make $past;
+    my $past := $($<conditional_expression>);
+    $past.pasttype('if');
+
+    make $past;
 }
+
 method var_assign($/) {
     make PAST::Op.new(
              $( $<var> ),
