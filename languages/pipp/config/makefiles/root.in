@@ -212,11 +212,11 @@ src/pct/gen_actions.pir: $(NQP) $(PCT) src/pct/actions.pm
   --target=pir src/pct/actions.pm
 
 pipp.pbc: \
-    src/common/pipp.pir \
-    src/pct/gen_grammar.pir \
-    src/pct/gen_actions.pir \
-    src/pct/quote_expression.pir
-	$(PARROT) -o pipp.pbc src/common/pipp.pir
+  src/pipp.pir \
+  src/pct/gen_grammar.pir \
+  src/pct/gen_actions.pir \
+  src/pct/quote_expression.pir
+	$(PARROT) -o pipp.pbc src/pipp.pir
 
 Test.pir: Test.php pipp.pbc
 	$(PARROT) pipp.pbc --target=pir --output=Test.pir Test.php
