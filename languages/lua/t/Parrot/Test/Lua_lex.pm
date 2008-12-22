@@ -3,11 +3,6 @@
 
 package Parrot::Test::Lua_lex;
 
-use strict;
-
-use Data::Dumper;
-use File::Basename;
-
 require Parrot::Test;
 
 =head1 NAME
@@ -28,6 +23,8 @@ Yet another constructor.
 
 use strict;
 use warnings;
+
+use File::Spec;
 
 sub new {
     return bless {};
@@ -51,10 +48,10 @@ foreach my $func ( keys %language_test_map ) {
         my $params = $options{params} || q{};
 
         # flatten filenames (don't use directories)
-        my $lang_fn = Parrot::Test::per_test( '.lua', $count );
-        my $lua_out_fn = Parrot::Test::per_test( '.parrot_out', $count );
+        my $lang_fn = File::Spec->rel2abs( Parrot::Test::per_test( '.lua', $count ) );
+        my $lua_out_fn = File::Spec->rel2abs( Parrot::Test::per_test( '.parrot_out', $count ) );
         my @test_prog = (
-            "$self->{parrot} languages/lua/test_lex.pir languages/${lang_fn}",
+            "$self->{parrot} languages/lua/test_lex.pir ${lang_fn}",
         );
 
         # This does not create byte code, but lua code

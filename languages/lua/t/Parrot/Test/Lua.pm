@@ -3,10 +3,6 @@
 
 package Parrot::Test::Lua;
 
-use strict;
-
-use File::Basename;
-
 require Parrot::Test;
 
 =head1 NAME
@@ -27,6 +23,8 @@ Yet another constructor.
 
 use strict;
 use warnings;
+
+use File::Spec;
 
 sub new {
     return bless {};
@@ -55,13 +53,13 @@ foreach my $func ( keys %language_test_map ) {
 
         # flatten filenames (don't use directories)
         my $lua_test = get_test_prog();
-        my $lang_fn = Parrot::Test::per_test( '.lua', $count );
-        my $pir_fn  = Parrot::Test::per_test( '.pir', $count );
-        my $lua_out_fn =
-            Parrot::Test::per_test( $lua_test eq 'lua' ? '.orig_out' : '.parrot_out', $count );
+        my $lang_fn = File::Spec->rel2abs( Parrot::Test::per_test( '.lua', $count ) );
+        my $pir_fn  = File::Spec->rel2abs( Parrot::Test::per_test( '.pir', $count ) );
+        my $lua_out_fn = File::Spec->rel2abs(
+            Parrot::Test::per_test( $lua_test eq 'lua' ? '.orig_out' : '.parrot_out', $count ) );
         my $test_prog_args = $ENV{TEST_PROG_ARGS} || q{};
         my @test_prog;
-        my $src = (defined $code) ? 'languages/' . $lang_fn : q{};
+        my $src = (defined $code) ? $lang_fn : q{};
         if ( $lua_test eq 'lua' ) {
             @test_prog = (
                 "lua $test_prog_args $src $params",
@@ -69,14 +67,14 @@ foreach my $func ( keys %language_test_map ) {
         }
         elsif ( $lua_test eq 'luac.pl' ) {
             @test_prog = (
-                "perl -Ilanguages/lua languages/lua/luac.pl $src",
-                "$self->{parrot} languages/${pir_fn} $params",
+                "perl languages/lua/luac.pl $src",
+                "$self->{parrot} ${pir_fn} $params",
             );
         }
         elsif ( $lua_test eq 'luap.pir' ) {
             @test_prog = (
-                "$self->{parrot} languages/lua/luap.pir -o languages/${pir_fn} --target=pir $src",
-                "$self->{parrot} languages/${pir_fn} $params",
+                "$self->{parrot} languages/lua/luap.pir -o ${pir_fn} --target=pir $src",
+                "$self->{parrot} ${pir_fn} $params",
             );
         }
         elsif ( $lua_test eq 'luac2pir.pir' ) {
@@ -110,7 +108,7 @@ foreach my $func ( keys %language_test_map ) {
         my $builder_func = $language_test_map{$func};
 
         # set a todo-item for Test::Builder to find
-        my $call_pkg = $self->{builder}->exported_to() || '';
+        my $call_pkg = $self->{builder}->exported_to() || q{};
 
         local *{ $call_pkg . '::TODO' } = ## no critic Variables::ProhibitConditionalDeclarations
                         \$options{todo} if defined $options{todo};
