@@ -8,14 +8,14 @@ t/20-emphasis.t - Markdown emphasis
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Imarkdown/t markdown/t/20-emphasis.t
+    % perl t/20-emphasis.t
 
 =cut
 
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 4;
 use Test::More;

@@ -8,7 +8,7 @@ t/examples.t - some Markdown examples
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Imarkdown/t markdown/t/00-sanity.t
+    % perl t/00-sanity.t
 
 =head1 DESCRIPTION
 
@@ -19,7 +19,7 @@ First tests in order to check infrastructure.
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 1;
 use Test::More;

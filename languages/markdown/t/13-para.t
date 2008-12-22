@@ -8,14 +8,14 @@ t/13-para.t - Markdown para
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Imarkdown/t markdown/t/13-para.t
+    % perl t/13-para.t
 
 =cut
 
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 2;
 use Test::More;

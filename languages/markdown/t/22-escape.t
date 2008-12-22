@@ -8,14 +8,14 @@ t/22-escape.t - Markdown escapes
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Imarkdown/t markdown/t/22-escape.t
+    % perl t/22-escape.t
 
 =cut
 
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 3;
 use Test::More;

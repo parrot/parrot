@@ -8,14 +8,14 @@ t/10-heading.t - Markdown heading
 
 =head1 SYNOPSIS
 
-    % perl -I../lib -Imarkdown/t markdown/t/10-heading.t
+    % perl t/10-heading.t
 
 =cut
 
 use strict;
 use warnings;
 use FindBin;
-use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin";
 
 use Parrot::Test tests => 4;
 use Test::More;
