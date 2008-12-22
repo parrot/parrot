@@ -140,12 +140,11 @@ Parrot_init_HLL(PARROT_INTERP)
 
 =item C<INTVAL Parrot_register_HLL>
 
-Register HLL C<hll_name> within Parrot core.  If C<hll_lib> isn't a NULL
-STRING, load the shared language support library.  Creates a root namespace for
-the HLL named C<hll_name>.  Returns a type ID for this HLL or 0 on error.
+Return the HLL id if C<hll_name> is already registered in the interpreter.
 
-If C<hll_name> is NULL, only the library is loaded.  The C<.loadlib> pragma
-uses this.
+Otherwise register the HLL C<hll_name> within the interpreter.
+Creates a root namespace for the HLL named C<hll_name>.
+Returns a type ID for this HLL or 0 on error.
 
 =cut
 
