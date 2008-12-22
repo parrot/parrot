@@ -184,15 +184,15 @@ op_fullname(ARGOUT(char *dest), ARGIN(const char *name),
     ARGIN(SymReg * const *args), int narg, int keyvec)
 {
     int i;
+    const size_t namelen = strlen(name);
 
 #if IMC_TRACE_HIGH
-    char *full = dest;
+    const char * const full = dest;
     Parrot_io_eprintf(NULL, "op %s", name);
 #endif
 
-    strcpy(dest, name);
-
-    dest += strlen(name);
+    memcpy(dest, name, namelen+1);
+    dest += namelen;
 
     for (i = 0; i < narg && args[i]; i++) {
         *dest++ = '_';
