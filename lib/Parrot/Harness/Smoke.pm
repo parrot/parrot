@@ -57,6 +57,8 @@ sub send_archive_to_smolder {
           . '/app/developer_projects/process_add_report/'
           . $project_id;
     my $ua = LWP::UserAgent->new();
+    $ua->agent( 'Parrot::Harness::Smoke' );
+    $ua->env_proxy();
 
     # create our tags based off the test environment information
     my $tags = join(',',
