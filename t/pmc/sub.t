@@ -1414,17 +1414,17 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'arity()' );
 .end
 
 .sub some_named
-    .param int a :named
     .param int b
-    .param int c :named
+    .param int a :named('a')
+    .param int c :named('c')
 .end
 
 .sub allsorts
-    .param int a :named
+    .param int c
     .param int b :optional
     .param int bo :opt_flag
-    .param int c
     .param pmc s :slurpy
+    .param int a :named('a')
 .end
 CODE
 0

@@ -733,15 +733,17 @@ The number of optional named arguments
                         else
                             sub->arg_info->pos_slurpy = 1;
                     }
-                    else if (PARROT_ARG_OPTIONAL_ISSET(sig_item)) {
-                        if (PARROT_ARG_NAME_ISSET(sig_item))
+                    else if (PARROT_ARG_NAME_ISSET(sig_item)) {
+                        i++;
+                        sig_item = SIG_ITEM(sig, i);
+                        if (PARROT_ARG_OPTIONAL_ISSET(sig_item))
                             sub->arg_info->named_optional++;
-                        else
-                            sub->arg_info->pos_optional++;
+                        else 
+                            sub->arg_info->named_required++;
                     }
                     else if (!PARROT_ARG_OPT_FLAG_ISSET(sig_item)) {
-                        if (PARROT_ARG_NAME_ISSET(sig_item))
-                            sub->arg_info->named_required++;
+                        if (PARROT_ARG_OPTIONAL_ISSET(sig_item)) 
+                            sub->arg_info->pos_optional++;
                         else
                             sub->arg_info->pos_required++;
                     }
