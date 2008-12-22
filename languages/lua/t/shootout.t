@@ -29,7 +29,6 @@ my $test_prog = Parrot::Test::Lua::get_test_prog();
 my $code;
 my $out;
 my $in;
-my @dir = ( 'lua', 't', 'shootout' );
 
 #
 #   k-nucleotide
@@ -40,9 +39,9 @@ TODO:
 {
     local $TODO = 'k-nucleotide';
 
-$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'knucleotide_lua-2.lua' ));
-$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'knucleotide-output.txt' ));
-$in = File::Spec->catfile( 'languages', @dir, 'knucleotide-input.txt' );
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/knucleotide_lua-2.lua" );
+$out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/knucleotide-output.txt" );
+$in = "$FindBin::Bin/shootout/knucleotide-input.txt";
 language_output_is( 'lua', $code, $out, 'k-nucleotide', params => "< $in" );
 }
 
@@ -51,8 +50,8 @@ language_output_is( 'lua', $code, $out, 'k-nucleotide', params => "< $in" );
 #       Naive iterative summation: power sin cos
 #
 
-$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'partialsums_lua-3.lua' ));
-$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'partialsums-output.txt' ));
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/partialsums_lua-3.lua" );
+$out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/partialsums-output.txt" );
 language_output_is( 'lua', $code, $out, 'partial-sums', params => '25000');
 
 #
@@ -64,8 +63,8 @@ TODO:
 {
     local $TODO = 'broken';
 
-$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'fasta_lua-2.lua' ));
-$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'fasta-output.txt' ));
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/fasta_lua-2.lua" );
+$out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/fasta-output.txt" );
 language_output_is( 'lua', $code, $out, 'fasta', params => '1000' );
 }
 
@@ -78,8 +77,8 @@ TODO:
 {
     local $TODO = 'pb with loadstring ?';
 
-$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'pidigits_lua-2.lua' ));
-$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'pidigits-output.txt' ));
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/pidigits_lua-2.lua" );
+$out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/pidigits-output.txt" );
 language_output_is( 'lua', $code, $out, 'pidigits', params => '27' );
 }
 
@@ -88,8 +87,8 @@ language_output_is( 'lua', $code, $out, 'pidigits', params => '27' );
 #       Indexed-access to boolean-sequence
 #
 
-$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'nsieve_lua-3.lua' ));
-$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'nsieve-output.txt' ));
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/nsieve_lua-3.lua" );
+$out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/nsieve-output.txt" );
 language_output_is( 'lua', $code, $out, 'nsieve' );
 
 #
@@ -101,9 +100,9 @@ TODO:
 {
     local $TODO = 'pb with string.gsub ?';
 
-$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'regexdna_lua-3.lua' ));
-$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'regexdna-output.txt' ));
-$in = File::Spec->catfile( 'languages', @dir, 'regexdna-input.txt' );
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/regexdna_lua-3.lua" );
+$out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/regexdna-output.txt" );
+$in = "$FindBin::Bin/shootout/regexdna-input.txt";
 language_output_is( 'lua', $code, $out, 'regex-dna', params => "< $in" );
 }
 
@@ -116,8 +115,8 @@ TODO:
 {
     local $TODO = 'broken';
 
-$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'nsievebits.lua' ));
-$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'nsievebits-output.txt' ));
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/nsievebits.lua" );
+$out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/nsievebits-output.txt" );
 language_output_is( 'lua', $code, $out, 'nsieve-bits' );
 }
 
@@ -130,8 +129,8 @@ SKIP:
 {
     skip('low memory', 1) unless ($test_prog eq 'lua');
 
-$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'recursive.lua' ));
-$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'recursive-output.txt' ));
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/recursive.lua" );
+$out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/recursive-output.txt" );
 language_output_is( 'lua', $code, $out, 'recursive', params => '3' );
 }
 
@@ -140,8 +139,8 @@ language_output_is( 'lua', $code, $out, 'recursive', params => '3' );
 #       Generate Mandelbrot set portable bitmap file
 #
 
-$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'mandelbrot_lua-2.lua' ));
-$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'mandelbrot-output.txt' ));
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/mandelbrot_lua-2.lua" );
+$out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/mandelbrot-output.txt" );
 language_output_is( 'lua', $code, $out, 'mandelbrot', params => '200' );
 
 #
@@ -149,8 +148,8 @@ language_output_is( 'lua', $code, $out, 'mandelbrot', params => '200' );
 #       Double-precision N-body simulation
 #
 
-$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'nbody_lua-2.lua' ));
-$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'nbody-output.txt' ));
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/nbody_lua-2.lua" );
+$out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/nbody-output.txt" );
 language_output_is( 'lua', $code, $out, 'n-body', params => '1000' );
 
 #
@@ -162,8 +161,8 @@ SKIP:
 {
     skip('maximum recursion depth exceeded', 1) unless ($test_prog eq 'lua');
 
-$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'message_lua-2.lua' ));
-$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'message-output.txt' ));
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/message_lua-2.lua" );
+$out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/message-output.txt" );
 language_output_is( 'lua', $code, $out, 'cheap-concurrency', params => '10' );
 }
 
@@ -176,8 +175,8 @@ TODO:
 {
     local $TODO = 'broken';
 
-$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'spectralnorm_lua-3.lua' ));
-$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'spectralnorm-output.txt' ));
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/spectralnorm_lua-3.lua" );
+$out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/spectralnorm-output.txt" );
 language_output_is( 'lua', $code, $out, 'spectral-norm', params => '100' );
 }
 
@@ -190,8 +189,8 @@ TODO:
 {
     local $TODO = 'broken';
 
-$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'chameneos.lua' ));
-$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'chameneos-output.txt' ));
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/chameneos.lua" );
+$out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/chameneos-output.txt" );
 language_output_is( 'lua', $code, $out, 'chameneos', params => '100' );
 }
 
@@ -204,9 +203,9 @@ TODO:
 {
     local $TODO = 'reverse-complement';
 
-$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'revcomp_lua-3.lua' ));
-$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'revcomp-output.txt' ));
-$in = File::Spec->catfile( 'languages', @dir, 'revcomp-input.txt' );
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/revcomp_lua-3.lua" );
+$out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/revcomp-output.txt" );
+$in = "$FindBin::Bin/shootout/revcomp-input.txt";
 language_output_is( 'lua', $code, $out, 'reverse-complement', params => "< $in" );
 }
 
@@ -219,8 +218,8 @@ SKIP:
 {
     skip('low memory', 1) unless ($test_prog eq 'lua');
 
-$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'binarytrees_lua-3.lua' ));
-$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'binarytrees-output.txt' ));
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/binarytrees_lua-3.lua" );
+$out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/binarytrees-output.txt" );
 language_output_is( 'lua', $code, $out, 'binary-trees', params => '10' );
 }
 
@@ -229,8 +228,8 @@ language_output_is( 'lua', $code, $out, 'binary-trees', params => '10' );
 #       Indexed-access to tiny integer-sequence
 #
 
-$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'fannkuch_lua-3.lua' ));
-$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'fannkuch-output.txt' ));
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/fannkuch_lua-3.lua" );
+$out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/fannkuch-output.txt" );
 language_output_is( 'lua', $code, $out, 'fannkuch', params => '7' );
 
 #
@@ -238,9 +237,9 @@ language_output_is( 'lua', $code, $out, 'fannkuch', params => '7' );
 #       Read lines, parse and sum integers
 #
 
-$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'sumcol.lua' ));
-$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'sumcol-output.txt' ));
-$in = File::Spec->catfile( 'languages', @dir, 'sumcol-input.txt' );
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/sumcol.lua" );
+$out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/sumcol-output.txt" );
+$in = "$FindBin::Bin/shootout/sumcol-input.txt";
 language_output_is( 'lua', $code, $out, 'sum-file', params => "< $in" );
 
 #
@@ -248,8 +247,8 @@ language_output_is( 'lua', $code, $out, 'sum-file', params => "< $in" );
 #       Measure 'hello world' program startup time
 #
 
-$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'hello.lua' ));
-$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'hello-output.txt' ));
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/hello.lua" );
+$out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/hello-output.txt" );
 language_output_is( 'lua', $code, $out, 'startup' );
 
 #
@@ -261,8 +260,8 @@ TODO:
 {
     local $TODO = 'pb with loadstring ?';
 
-$code = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'meteor_lua-4.lua' ));
-$out = Parrot::Test::slurp_file(File::Spec->catfile( @dir, 'meteor-output.txt' ));
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/meteor_lua-4.lua" );
+$out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/meteor-output.txt" );
 language_output_is( 'lua', $code, $out, 'meteor' );
 }
 

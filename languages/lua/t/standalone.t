@@ -53,8 +53,8 @@ CODE
 /^lua[^:]*: [^:]+:\d+: /
 OUT
 
-unlink('../hello.lua') if ( -f '../hello.lua' );
-open my $X, '>', '../hello.lua';
+unlink("$FindBin::Bin/../../../hello.lua") if ( -f "$FindBin::Bin/../../../hello.lua" );
+open my $X, '>', "$FindBin::Bin/../../../hello.lua";
 print {$X} "print 'Hello World'\n";
 close $X;
 
@@ -65,20 +65,20 @@ OUTPUT
 SKIP: {
 skip("need luac", 1) unless (`luac -v` =~ /^Lua 5\.1/);
 
-system("luac -o ../hello.luac ../hello.lua");
+system("luac -o $FindBin::Bin/../../../hello.luac $FindBin::Bin/../../../hello.lua");
 
 language_output_is( 'lua', undef, << 'OUTPUT', 'bytecode translation', params => "hello.luac"  );
 Hello World
 OUTPUT
 
-unlink('../hello.luac') if ( -f '../hello.luac' );
+unlink("$FindBin::Bin/../../../hello.luac") if ( -f "$FindBin::Bin/../../../hello.luac" );
 }
 
 language_output_is( 'lua', undef, << 'OUTPUT', 'redirect', params => "< hello.lua"  );
 Hello World
 OUTPUT
 
-unlink('../hello.lua') if ( -f '../hello.lua' );
+unlink("$FindBin::Bin/../../../hello.lua") if ( -f "$FindBin::Bin/../../../hello.lua" );
 
 language_output_like( 'lua', undef, << 'OUTPUT', 'no file', params => "no_file.lua"  );
 /^lua[^:]*: cannot open no_file.lua: No such file or directory$/
@@ -109,8 +109,8 @@ CODE
 OUT
 delete $ENV{LUA_INIT};
 
-unlink('../boot.lua') if ( -f '../boot.lua' );
-open $X, '>', '../boot.lua';
+unlink("$FindBin::Bin/../../../boot.lua") if ( -f "$FindBin::Bin/../../../boot.lua" );
+open $X, '>', "$FindBin::Bin/../../../boot.lua";
 print {$X} "print 'boot from boot.lua by LUA_INIT'\n";
 close $X;
 
@@ -122,8 +122,8 @@ boot from boot.lua by LUA_INIT
 Hello World
 OUT
 
-unlink('../boot.lua') if ( -f '../boot.lua' );
-open $X, '>', '../boot.lua';
+unlink("$FindBin::Bin/../../../boot.lua") if ( -f "$FindBin::Bin/../../../boot.lua" );
+open $X, '>', "$FindBin::Bin/../../../boot.lua";
 print {$X} '?syntax error?';
 close $X;
 
@@ -134,7 +134,7 @@ CODE
 /^lua[^:]*: [^:]+:\d+: /
 OUT
 
-unlink('../boot.lua');
+unlink("$FindBin::Bin/../../../boot.lua");
 
 $ENV{LUA_INIT} = '@no_file.lua';
 language_output_like( 'lua', <<'CODE', <<'OUT', 'LUA_INIT no file' );

@@ -63,7 +63,7 @@ my %todo_info = (
 my $test_number = 0;
 
 foreach (@test_files) {
-    my $filename = File::Spec->catfile( 'lua', 't', $_ );
+    my $filename = "$FindBin::Bin/$_" ;
     open my $FH, '<', $filename
             or die "can't open $filename ($!)\n";
     while (<$FH>) {

@@ -105,7 +105,7 @@ CODE
 GETENV_PARROT
 OUTPUT
 
-open my $X, '>', '../file.rm';
+open my $X, '>', "$FindBin::Bin/../../../file.rm";
 print {$X} 'file to remove';
 close $X;
 
@@ -116,8 +116,8 @@ CODE
 true
 OUTPUT
 
-ok( !-e '../file.rm', 'Test that the file is removed' );
-unlink('../file.rm') if ( -e '../file.rm' );
+ok( !-e "$FindBin::Bin/../../../file.rm", 'Test that the file is removed' );
+unlink("$FindBin::Bin/../../../file.rm") if ( -e "$FindBin::Bin/../../../file.rm" );
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.remove' );
 r, msg = os.remove("file.rm")
@@ -128,7 +128,7 @@ nil
 file.rm: No such file or directory
 OUTPUT
 
-open $X, '>', '../file.old';
+open $X, '>', "$FindBin::Bin/../../../file.old";
 print {$X} 'file to rename';
 close $X;
 
@@ -139,10 +139,10 @@ CODE
 true
 OUTPUT
 
-ok( !-e '../file.old', 'Test that old file is missing' );
-ok( -e '../file.new', 'Test that new file is here' );
-unlink('../file.old') if ( -e '../file.old' );
-unlink('../file.new') if ( -e '../file.new' );
+ok( !-e "$FindBin::Bin/../../../file.old", 'Test that old file is missing' );
+ok( -e "$FindBin::Bin/../../../file.new", 'Test that new file is here' );
+unlink("$FindBin::Bin/../../../file.old") if ( -e "$FindBin::Bin/../../../file.old" );
+unlink("$FindBin::Bin/../../../file.new") if ( -e "$FindBin::Bin/../../../file.new" );
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function os.rename' );
 r, msg = os.rename("file.old", "file.new")

@@ -397,7 +397,7 @@ f1\n
 /x
 OUTPUT
 
-open my $X, '>', '../foo.pir';
+open my $X, '>', "$FindBin::Bin/../../../../foo.pir";
 print {$X} q{
   .HLL 'Lua'
   .loadlib 'lua_group'
@@ -437,7 +437,7 @@ f1\n
 /x
 OUTPUT
 
-system("../parrot -o ../foo.pbc ../foo.pir");
+system("$FindBin::Bin/../../../../parrot -o $FindBin::Bin/../../../../foo.pbc $FindBin::Bin/../../../../foo.pir");
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'from PBC load_bytecode' );
 .HLL 'Lua'
@@ -461,8 +461,8 @@ f1\n
 /x
 OUTPUT
 
-unlink '../foo.pir';
-unlink '../foo.pbc';
+unlink "$FindBin::Bin/../../../../foo.pir";
+unlink "$FindBin::Bin/../../../../foo.pbc";
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'from compilation' );
 .HLL 'Lua'

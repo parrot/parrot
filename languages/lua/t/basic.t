@@ -78,9 +78,9 @@ CODE
 /^[^:]+: [^:]+:\d+: bad argument #1 to 'collectgarbage' \(invalid option 'unknown'\)\nstack traceback:\n/
 OUTPUT
 
-unlink('../lib1.lua') if ( -f '../lib1.lua' );
+unlink("$FindBin::Bin/../../../lib1.lua") if ( -f "$FindBin::Bin/../../../lib1.lua" );
 my $X;
-open $X, '>', '../lib1.lua';
+open $X, '>', "$FindBin::Bin/../../../lib1.lua";
 print {$X} << 'CODE';
 function norm (x, y)
     return (x^2 + y^2)^0.5
@@ -109,7 +109,7 @@ CODE
 OUTPUT
 
 # clean up lib1.lua
-unlink('../lib1.lua') if ( -f '../lib1.lua' );
+unlink("$FindBin::Bin/../../../lib1.lua") if ( -f "$FindBin::Bin/../../../lib1.lua" );
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function dofile (no file)' );
 dofile("no_file.lua")
@@ -117,8 +117,8 @@ CODE
 /^[^:]+:( [^:]+:\d+:)? cannot open no_file.lua: No such file or directory\nstack traceback:\n/
 OUTPUT
 
-unlink('../foo.lua') if ( -f '../foo.lua' );
-open $X, '>', '../foo.lua';
+unlink("$FindBin::Bin/../../../foo.lua") if ( -f "$FindBin::Bin/../../../foo.lua" );
+open $X, '>', "$FindBin::Bin/../../../foo.lua";
 print {$X} '?syntax error?';
 close $X;
 
@@ -129,7 +129,7 @@ CODE
 OUTPUT
 
 # clean up foo.lua
-unlink('../foo.lua') if ( -f '../foo.lua' );
+unlink("$FindBin::Bin/../../../foo.lua") if ( -f "$FindBin::Bin/../../../foo.lua" );
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'function getfenv' );
 local function f () end
@@ -180,8 +180,8 @@ function	table	0
 nil	nil
 OUTPUT
 
-unlink('../foo.lua') if ( -f '../foo.lua' );
-open $X, '>', '../foo.lua';
+unlink("$FindBin::Bin/../../../foo.lua") if ( -f "$FindBin::Bin/../../../foo.lua" );
+open $X, '>', "$FindBin::Bin/../../../foo.lua";
 print {$X} << 'CODE';
 function foo (x)
     print(x)
@@ -210,7 +210,7 @@ ok
 OUTPUT
 
 # clean up foo.lua
-unlink('../foo.lua') if ( -f '../foo.lua' );
+unlink("$FindBin::Bin/../../../foo.lua") if ( -f "$FindBin::Bin/../../../foo.lua" );
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function loadfile (no file)' );
 f, msg = loadfile("no_file.lua")
@@ -219,8 +219,8 @@ CODE
 /^nil\t.*cannot open no_file.lua: No such file or directory/
 OUTPUT
 
-unlink('../foo.lua') if ( -f '../foo.lua' );
-open $X, '>', '../foo.lua';
+unlink("$FindBin::Bin/../../../foo.lua") if ( -f "$FindBin::Bin/../../../foo.lua" );
+open $X, '>', "$FindBin::Bin/../../../foo.lua";
 print {$X} '?syntax error?';
 close $X;
 
@@ -232,7 +232,7 @@ CODE
 OUTPUT
 
 # clean up foo.lua
-unlink('../foo.lua') if ( -f '../foo.lua' );
+unlink("$FindBin::Bin/../../../foo.lua") if ( -f "$FindBin::Bin/../../../foo.lua" );
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function loadstring' );
 f = loadstring("i = i + 1")
@@ -654,7 +654,7 @@ false	not a back trace
 OUTPUT
 
 # clean up temporary files
-map { unlink("../tmp1.$_") if ( -f "../tmp1.$_" ) } qw(lua pbc pir);
+map { unlink("$FindBin::Bin/../../../tmp1.$_") if ( -f "$FindBin::Bin/../../../tmp1.$_" ) } qw(lua pbc pir);
 
 # Local Variables:
 #   mode: cperl

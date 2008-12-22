@@ -49,9 +49,9 @@ CODE
 hello world
 OUTPUT
 
-unlink('../complex.lua') if ( -f '../complex.lua' );
+unlink("$FindBin::Bin/../../../complex.lua") if ( -f "$FindBin::Bin/../../../complex.lua" );
 my $X;
-open $X, '>', '../complex.lua';
+open $X, '>', "$FindBin::Bin/../../../complex.lua";
 print {$X} << 'CODE';
 
 complex = {}
@@ -96,7 +96,7 @@ CODE
 OUTPUT
 
 # clean up complex.lua
-unlink('../complex.lua') if ( -f '../complex.lua' );
+unlink("$FindBin::Bin/../../../complex.lua") if ( -f "$FindBin::Bin/../../../complex.lua" );
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function require (no module)' );
 require "no_module"
@@ -104,8 +104,8 @@ CODE
 /^[^:]+: [^:]+:\d+: module 'no_module' not found:\n(\t.*\n)+stack traceback:\n/
 OUTPUT
 
-unlink('../foo.lua') if ( -f '../foo.lua' );
-open $X, '>', '../foo.lua';
+unlink("$FindBin::Bin/../../../foo.lua") if ( -f "$FindBin::Bin/../../../foo.lua" );
+open $X, '>', "$FindBin::Bin/../../../foo.lua";
 print {$X} '?syntax error?';
 close $X;
 
@@ -116,7 +116,7 @@ CODE
 OUTPUT
 
 # clean up foo.lua
-unlink('../foo.lua') if ( -f '../foo.lua' );
+unlink("$FindBin::Bin/../../../foo.lua") if ( -f "$FindBin::Bin/../../../foo.lua" );
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function require & package.preload' );
 foo = {}
@@ -133,8 +133,8 @@ CODE
 1234
 OUTPUT
 
-unlink('../foo.lua') if ( -f '../foo.lua' );
-open $X, '>', '../foo.lua';
+unlink("$FindBin::Bin/../../../foo.lua") if ( -f "$FindBin::Bin/../../../foo.lua" );
+open $X, '>', "$FindBin::Bin/../../../foo.lua";
 print {$X} 'print("in foo.lua", ...)';
 close $X;
 
@@ -145,10 +145,10 @@ in foo.lua	foo
 OUTPUT
 
 # clean up foo.lua
-unlink('../foo.lua') if ( -f '../foo.lua' );
+unlink("$FindBin::Bin/../../../foo.lua") if ( -f "$FindBin::Bin/../../../foo.lua" );
 
-unlink('../complex.lua') if ( -f '../complex.lua' );
-open $X, '>', '../complex.lua';
+unlink("$FindBin::Bin/../../../complex.lua") if ( -f "$FindBin::Bin/../../../complex.lua" );
+open $X, '>', "$FindBin::Bin/../../../complex.lua";
 print {$X} << 'CODE';
 -- print("complex.lua", ...)
 -- module(...)
@@ -191,15 +191,15 @@ CODE
 OUTPUT
 
 # clean up complex.lua
-unlink('../complex.lua') if ( -f '../complex.lua' );
+unlink("$FindBin::Bin/../../../complex.lua") if ( -f "$FindBin::Bin/../../../complex.lua" );
 
 SKIP:
 {
 skip('only with Parrot', 1) if ($test_prog eq 'lua');
 
-unlink('../mod_foo.pbc') if ( -f '../mod_foo.pbc' );
-unlink('../mod_foo.pir') if ( -f '../mod_foo.pir' );
-open $X, '>', '../mod_foo.pir';
+unlink("$FindBin::Bin/../../../mod_foo.pbc") if ( -f "$FindBin::Bin/../../../mod_foo.pbc" );
+unlink("$FindBin::Bin/../../../mod_foo.pir") if ( -f "$FindBin::Bin/../../../mod_foo.pir" );
+open $X, '>', "$FindBin::Bin/../../../mod_foo.pir";
 print {$X} <<'PIR';
 .HLL 'Lua'
 .loadlib 'lua_group'
@@ -246,8 +246,8 @@ OUTPUT
 }
 
 # clean up mod_foo.pbc and/or mod_foo.pir if necessary
-unlink('../mod_foo.pbc') if ( -f '../mod_foo.pbc' );
-unlink('../mod_foo.pir') if ( -f '../mod_foo.pir' );
+unlink("$FindBin::Bin/../../../mod_foo.pbc") if ( -f "$FindBin::Bin/../../../mod_foo.pbc" );
+unlink("$FindBin::Bin/../../../mod_foo.pir") if ( -f "$FindBin::Bin/../../../mod_foo.pir" );
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'table package.loaded' );
 t = {}
@@ -323,7 +323,7 @@ hello
 OUTPUT
 
 # clean up temporary files
-map { unlink("../tmp1.$_") if ( -f "../tmp1.$_" ) } qw(lua pbc pir);
+map { unlink("$FindBin::Bin/../../../tmp1.$_") if ( -f "$FindBin::Bin/../../../tmp1.$_" ) } qw(lua pbc pir);
 
 # Local Variables:
 #   mode: cperl

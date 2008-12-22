@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -7,13 +7,15 @@ languages/lua/t/harness - A harness for Parrot Lua
 
 =head1 SYNOPSIS
 
-    cd languages && perl -I../lib -Ilua/t lua/t/harness --files
+    perl t/harness --files
 
-    cd languages && perl -I../lib -Ilua/t lua/t/harness
+    perl t/harness
 
-    cd languages && perl -I../lib -Ilua/t lua/t/harness lua/t/examples.t
+    perl t/harness --archive --send-to-smolder
 
-    cd languages && perl -I../lib lua/t/harness lua/t/pmc/nil.t
+    perl t/harness lua/t/examples.t
+
+    perl t/harness lua/t/pmc/nil.t
 
 =head1 DESCRIPTION
 
@@ -73,8 +75,8 @@ if ( $files_flag ) {
 
     # Only the Makefile in 'parrot/languages' uses --files
     my $dir = File::Spec->catfile( $language, 't' );
-    my @files = glob( File::Spec->catfile( $dir, 'pmc', '*.t' ) );
-    push @files, glob( File::Spec->catfile( $dir, 'type', '*.t' ) );
+    my @files;
+    push @files, glob( File::Spec->catfile( $dir, 'pmc', '*.t' ) );
     push @files, glob( File::Spec->catfile( $dir, '*.t' ) );
     print join( "\n", @files );
     print "\n" if scalar(@files);
@@ -98,11 +100,9 @@ else {
             $dir = 't';
         }
         if ($dir) {
-            @files = glob( File::Spec->catfile( $dir, '*.t' ) );
             push @files, glob( File::Spec->catfile( $dir, 'pmc', '*.t' ) )
                 unless ($use_orig_lua);
-            push @files, glob( File::Spec->catfile( $dir, 'type', '*.t' ) )
-                unless ($use_orig_lua);
+            push @files, glob( File::Spec->catfile( $dir, '*.t' ) );
         }
     }
 
