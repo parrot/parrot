@@ -158,11 +158,6 @@ See RT #60590.
 All of the named vtable functions in PCT and PGE will lose
 their names and effectively become anonymous.  See RT #60384.
 
-=item Capture_PIR class [post 0.8.2]
-
-The Capture_PIR class in runtime/parrot/library/Parrot/Capture_PIR.pir
-is deprecated and will be removed.
-
 =back
 
 =cut

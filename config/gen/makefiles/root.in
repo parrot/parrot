@@ -257,7 +257,6 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/P6object.pbc \
     $(LIBRARY_DIR)/parrotlib.pbc \
     $(LIBRARY_DIR)/pcre.pbc \
-    $(LIBRARY_DIR)/Parrot/Capture_PIR.pbc \
     $(LIBRARY_DIR)/Parrot/Coroutine.pbc \
     $(LIBRARY_DIR)/Parrot/Exception.pbc \
     $(LIBRARY_DIR)/PGE/Dumper.pbc \
