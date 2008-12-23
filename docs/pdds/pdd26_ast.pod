@@ -497,6 +497,11 @@ blocks that do not explicitly provide a namespace).  C<Value>
 may either be a simple string or an array of strings representing
 a nested namespace.
 
+=item hll([value])
+
+Get/set the HLL namespace for this block (and any nested blocks
+that do not explicitly provide a C<hll>).
+
 =item symbol(name, [attr1 => val1, attr2 => val2, ...])
 
 Each PAST::Block node can use the C<symbol> method to maintain
@@ -522,9 +527,9 @@ syntax tree can use this method on a top-level C<PAST::Block>
 to specify the C<scope> attribute to be used for all
 variable nodes that don't otherwise provide one.
 
-=item pir_pragma([value])
+=item pirflags([value])
 
-Get/set any PIR pragmas to be used when generating the block.
+Get/set any PIR flags to be used when generating the block.
 
 =item compiler([compiler_name])
 
