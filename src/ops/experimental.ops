@@ -297,17 +297,6 @@ inline op pow(out NUM, in NUM, in INT) :base_core {
 
 ########################################
 
-=item B<add_io_event>(invar PMC, invar PMC, invar PMC, inconst INT)
-
-Call the sub $2 for PIO $1 with user data $3 on ready state of $4.
-RT#42376 The only handled $4 = IO_THR_MSG_ADD_SELECT_RD aka 2 for now.
-
-=cut
-
-op add_io_event(invar PMC, invar PMC, invar PMC, inconst INT) {
-    Parrot_event_add_io_event(interp, $1, $2, $3, $4);
-}
-
 =item B<need_finalize>(invar PMC)
 
 The ParrotObject $1 needs the __finalize method during GC.

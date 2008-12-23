@@ -332,7 +332,8 @@ runnloop.
 add_lp:
     conn = active[i]
     sock = conn.'socket'()
-    add_io_event sock, req_handler, conn, .IO_THR_MSG_ADD_SELECT_RD
+    # XXX: this opcode is long gone; need something else
+    # add_io_event sock, req_handler, conn, .IO_THR_MSG_ADD_SELECT_RD
     ## self.'debug'('**select ', i, "\n")
     inc i
     if i < n goto add_lp

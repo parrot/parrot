@@ -66,11 +66,6 @@ The C<slice> opcode's implementation is experimental. Its use cases and
 implementation should be reconsidered. The current implementation will
 be removed.
 
-=item * C<add_io_event> [post 0.8.2]
-
-The C<add_io_event> opcode is experimental and non-functional. The current
-implementation will be removed.
-
 =back
 
 =head1 Class Features
