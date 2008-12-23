@@ -148,7 +148,7 @@ Parrot_find_encoding(SHIM_INTERP, ARGIN(const char *encodingname))
 =item C<const ENCODING * Parrot_load_encoding>
 
 Loads an encoding. Currently throws an exception because we cannot load
-encodings. See RT#58186.
+encodings. See RT #58186.
 
 =cut
 
@@ -156,11 +156,14 @@ encodings. See RT#58186.
 
 /* Yep, this needs to be a char * parameter -- it's tough to load in
    encodings and such for strings if we can't be sure we've got enough
-   info set up to actually build strings... */
+   info set up to actually build strings...
+
+    Also remember to use PARROT_WARN_UNUSED_RESULT and
+    PARROT_CANNOT_RETURN_NULL when this actually works.
+ */
 
 PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_DOES_NOT_RETURN
 const ENCODING *
 Parrot_load_encoding(PARROT_INTERP, ARGIN(const char *encodingname))
 {
@@ -418,13 +421,14 @@ throws an exception.
 */
 
 PARROT_EXPORT
+PARROT_DOES_NOT_RETURN
 encoding_converter_t
 Parrot_find_encoding_converter(PARROT_INTERP, ARGIN(ENCODING *lhs), ARGIN(ENCODING *rhs))
 {
     UNUSED(lhs);
     UNUSED(rhs);
 
-    /* XXX Apparently unwritten RT#58188 */
+    /* XXX Apparently unwritten RT #58188 */
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
         "Can't find encoding converters yet.");
 }

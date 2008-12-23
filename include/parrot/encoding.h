@@ -111,6 +111,7 @@ const ENCODING * Parrot_find_encoding(SHIM_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_DOES_NOT_RETURN
 encoding_converter_t Parrot_find_encoding_converter(PARROT_INTERP,
     ARGIN(ENCODING *lhs),
     ARGIN(ENCODING *rhs))
@@ -124,8 +125,7 @@ PARROT_CAN_RETURN_NULL
 const ENCODING* Parrot_get_encoding(SHIM_INTERP, INTVAL number_of_encoding);
 
 PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_DOES_NOT_RETURN
 const ENCODING * Parrot_load_encoding(PARROT_INTERP,
     ARGIN(const char *encodingname))
         __attribute__nonnull__(1)
