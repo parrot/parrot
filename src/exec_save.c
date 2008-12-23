@@ -49,13 +49,12 @@ Save the C<Parrot_exec_objfile_t> to C<file>.
 void
 Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
 {
-    FILE *fp;
-    int i;
+    FILE * fp = fopen(file, "w");
+    int    i;
     struct exec header;
     struct relocation_info rellocation;
     struct nlist symlst;
 
-    fp = fopen(file, "w");
 
     header.a_midmag = 0x07018600;
     header.a_text = obj->text.size;
@@ -76,8 +75,8 @@ Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
         fprintf(fp, "%c", obj->data.code[i]);
     /* Text rellocations */
     for (i = obj->text_rellocation_count - 1; i >= 0; i--) {
-        bzero(&rellocation, sizeof (struct relocation_info));
-        rellocation.r_address = obj->text_rellocation_table[i].offset;
+        memset(&rellocation, 0, sizeof (struct relocation_info));
+        rellocation.r_address   = obj->text_rellocation_table[i].offset;
         rellocation.r_symbolnum = obj->text_rellocation_table[i].symbol_number;
         switch (obj->text_rellocation_table[i].type) {
             case RTYPE_FUNC:
@@ -100,7 +99,7 @@ Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
     }
     /* Symbol table */
     for (i = 0; i < obj->symbol_count; i++) {
-        bzero(&symlst, sizeof (struct nlist));
+        memset(&symlst, 0, sizeof (struct nlist));
         symlst.n_un.n_strx = obj->symbol_table[i].offset_list;
         switch (obj->symbol_table[i].type) {
             case STYPE_FUNC:
@@ -163,19 +162,19 @@ Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
  * e = Entry size
  */
 #  define sh_add(n, t, f, s, l, i, a, e) { \
-    bzero(&sechdr, sizeof (Elf32_Ehdr)); \
+    memset(&sechdr, 0, sizeof (Elf32_Shdr)); \
     sechdr.sh_name = shste - shst; \
     shste += sprintf(shste, "%s", (n)); \
     shste++; \
-    sechdr.sh_type = (t); \
-    sechdr.sh_flags = (f); \
-    sechdr.sh_addr = 0; \
-    sechdr.sh_offset = current_offset; \
-    sechdr.sh_size = (s); \
-    sechdr.sh_link = (l); \
-    sechdr.sh_info = (i); \
+    sechdr.sh_type      = (t); \
+    sechdr.sh_flags     = (f); \
+    sechdr.sh_addr      = 0; \
+    sechdr.sh_offset    = current_offset; \
+    sechdr.sh_size      = (s); \
+    sechdr.sh_link      = (l); \
+    sechdr.sh_info      = (i); \
     sechdr.sh_addralign = (a); \
-    sechdr.sh_entsize = (e); \
+    sechdr.sh_entsize   = (e); \
     save_struct(fp, &sechdr, sizeof (Elf32_Shdr)); \
     current_offset += (s); \
     if ((s) % 4) \
@@ -192,82 +191,87 @@ Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
 void
 Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
 {
+    FILE      *fp = fopen(file, "w");
+    char      *shste;
+    char       shst[SHSTRTABSIZE];
+
     Elf32_Ehdr header;
     Elf32_Shdr sechdr;
-    Elf32_Rel rellocation;
+    Elf32_Rel  rellocation;
     Elf32_Rela rel_addend;
-    Elf32_Sym symlst;
-    Elf32_Off current_offset;
-    FILE *fp;
-    int i;
-    char shst[SHSTRTABSIZE], *shste;
+    Elf32_Sym  symlst;
+    Elf32_Off  current_offset;
+    int        i;
 
-    fp = fopen(file, "w");
-
-    bzero(&header, sizeof (Elf32_Ehdr));
-    header.e_ident[0] = ELFMAG0;
-    header.e_ident[1] = ELFMAG1;
-    header.e_ident[2] = ELFMAG2;
-    header.e_ident[3] = ELFMAG3;
-    header.e_ident[4] = ELFCLASS32;
+    memset(&header, 0, sizeof (Elf32_Ehdr));
+    header.e_ident[0]  = ELFMAG0;
+    header.e_ident[1]  = ELFMAG1;
+    header.e_ident[2]  = ELFMAG2;
+    header.e_ident[3]  = ELFMAG3;
+    header.e_ident[4]  = ELFCLASS32;
 #  if PARROT_BIGENDIAN
-    header.e_ident[5] = ELFDATA2MSB;
+    header.e_ident[5]  = ELFDATA2MSB;
 #  else /* PARROT_BIGENDIAN */
-    header.e_ident[5] = ELFDATA2LSB;
+    header.e_ident[5]  = ELFDATA2LSB;
 #  endif /* PARROT_BIGENDIAN */
-    header.e_ident[6] = EV_CURRENT;
+    header.e_ident[6]  = EV_CURRENT;
 #  ifdef PARROT_EXEC_OS_FREEBSD
-    header.e_ident[7] = ELFOSABI_FREEBSD;
+    header.e_ident[7]  = ELFOSABI_FREEBSD;
 #  endif
 #  ifdef PARROT_EXEC_OS_NETBSD
-    header.e_ident[7] = ELFOSABI_NETBSD;
+    header.e_ident[7]  = ELFOSABI_NETBSD;
 #  endif
 #  if defined(PARROT_EXEC_OS_LINUX) && defined(ELFOSABI_LINUX) && \
      !defined(PARROT_PPC) && !defined(PARROT_ARM)
-    header.e_ident[7] = ELFOSABI_LINUX;
+    header.e_ident[7]  = ELFOSABI_LINUX;
 #  endif
 
-    header.e_type = ET_REL;
+    header.e_type      = ET_REL;
 #  ifdef PARROT_I386
-    header.e_machine = EM_386;
+    header.e_machine   = EM_386;
 #  endif
 #  ifdef PARROT_PPC
-    header.e_machine = EM_PPC;
+    header.e_machine   = EM_PPC;
 #  endif
 #  ifdef PARROT_ARM
-    header.e_ident[7] = ELFOSABI_ARM;
-    header.e_machine = EM_ARM;
+    header.e_ident[7]  = ELFOSABI_ARM;
+    header.e_machine   = EM_ARM;
 #  endif
-    header.e_version = EV_CURRENT;
-    header.e_entry = 0;
-    header.e_phoff = 0;
-    header.e_shoff = sizeof (Elf32_Ehdr);
-    header.e_flags = 0;
-    header.e_ehsize = sizeof (Elf32_Ehdr);
+    header.e_version   = EV_CURRENT;
+    header.e_entry     = 0;
+    header.e_phoff     = 0;
+    header.e_shoff     = sizeof (Elf32_Ehdr);
+    header.e_flags     = 0;
+    header.e_ehsize    = sizeof (Elf32_Ehdr);
     header.e_phentsize = 0;
-    header.e_phnum = 0;
+    header.e_phnum     = 0;
     header.e_shentsize = sizeof (Elf32_Shdr);
-    header.e_shnum = NSECTIONS;
-    header.e_shstrndx = 1;
+    header.e_shnum     = NSECTIONS;
+    header.e_shstrndx  = 1;
 
     save_struct(fp, &header, sizeof (Elf32_Ehdr));
 
     current_offset = sizeof (Elf32_Ehdr) + NSECTIONS * sizeof (Elf32_Shdr);
 
     /* Sections */
-    bzero(&shst, SHSTRTABSIZE);
+    memset(&shst, 0, SHSTRTABSIZE);
     shste = shst + 1;
+
     /* NULL */
-    bzero(&sechdr, sizeof (Elf32_Ehdr));
+    memset(&sechdr, 0, sizeof (Elf32_Shdr));
     save_struct(fp, &sechdr, sizeof (Elf32_Shdr));
+
     /* Section Header String Table */
     sh_add(".shstrtab", SHT_STRTAB, 0, SHSTRTABSIZE, 0, 0, 1, 0);
+
     /* Text */
     sh_add(".text", SHT_PROGBITS, SHF_ALLOC | SHF_EXECINSTR, obj->text.size,
         0, 0, 4, 0);
+
     /* Data */
     sh_add(".data", SHT_PROGBITS, SHF_WRITE | SHF_ALLOC, obj->data.size,
         0, 0, 4, 0);
+
     /* Bss */
     sh_add(".bss", SHT_NOBITS, SHF_WRITE | SHF_ALLOC, obj->bss.size,
         0, 0, 4, 0);
@@ -305,7 +309,8 @@ Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
     /* Text rellocations */
     for (i = 0; i < obj->text_rellocation_count; i++) {
 #  ifdef PARROT_I386
-        bzero(&rellocation, sizeof (Elf32_Rel));
+        memset(&rellocation, 0, sizeof (Elf32_Rel));
+
         rellocation.r_offset = obj->text_rellocation_table[i].offset;
         switch (obj->text_rellocation_table[i].type) {
             case RTYPE_FUNC:
@@ -330,7 +335,7 @@ Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
         save_struct(fp, &rellocation, sizeof (Elf32_Rel));
 #  endif
 #  ifdef PARROT_PPC
-        bzero(&rel_addend, sizeof (Elf32_Rela));
+        memset(&rel_addend, 0, sizeof (Elf32_Rela));
         rel_addend.r_offset = obj->text_rellocation_table[i].offset;
         switch (obj->text_rellocation_table[i].type) {
             case RTYPE_FUNC:
@@ -372,7 +377,7 @@ Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
         save_struct(fp, &rel_addend, sizeof (Elf32_Rela));
 #  endif
 #  ifdef PARROT_ARM
-        bzero(&rellocation, sizeof (Elf32_Rel));
+        memset(&rellocation, 0, sizeof (Elf32_Rel));
         rellocation.r_offset = obj->text_rellocation_table[i].offset;
         switch (obj->text_rellocation_table[i].type) {
             case RTYPE_FUNC:
@@ -398,26 +403,29 @@ Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
     }
     /* Symbol table */
     /* zero */
-    bzero(&symlst, sizeof (Elf32_Sym));
+    memset(&symlst, 0, sizeof (Elf32_Sym));
     save_struct(fp, &symlst, sizeof (Elf32_Sym));
+
     /* Text */
-    bzero(&symlst, sizeof (Elf32_Sym));
+    memset(&symlst, 0, sizeof (Elf32_Sym));
     symlst.st_info = ELF32_ST_INFO(STB_LOCAL, STT_SECTION);
     symlst.st_shndx = 2;
     save_struct(fp, &symlst, sizeof (Elf32_Sym));
+
     /* Data */
-    bzero(&symlst, sizeof (Elf32_Sym));
+    memset(&symlst, 0, sizeof (Elf32_Sym));
     symlst.st_info = ELF32_ST_INFO(STB_LOCAL, STT_SECTION);
     symlst.st_shndx = 3;
     save_struct(fp, &symlst, sizeof (Elf32_Sym));
+
     /* Bss */
-    bzero(&symlst, sizeof (Elf32_Sym));
+    memset(&symlst, 0, sizeof (Elf32_Sym));
     symlst.st_info = ELF32_ST_INFO(STB_LOCAL, STT_SECTION);
     symlst.st_shndx = 4;
     save_struct(fp, &symlst, sizeof (Elf32_Sym));
 
     for (i = 0; i < obj->symbol_count; i++) {
-        bzero(&symlst, sizeof (Elf32_Sym));
+        memset(&symlst, 0, sizeof (Elf32_Sym));
         symlst.st_name = obj->symbol_table[i].offset_list + 1;
         switch (obj->symbol_table[i].type) {
             case STYPE_FUNC:
