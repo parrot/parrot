@@ -28,8 +28,7 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 
 =cut
 
-# TODO: .HLL '_pipp'
-.namespace [ 'Pipp' ]
+.HLL '_pipp'
 
 .const string VERSION = "0.0.1"
 
@@ -56,7 +55,8 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 
     # determine location of libs from the Parrot config
     .local pmc cfg
-    cfg  = _config()
+    $P0 = get_root_global ['parrot'], '_config'
+    cfg  = $P0()
     .local string lib_dir, pbc_fn
     lib_dir = cfg['build_dir']
     lib_dir .= '/languages/pipp/src/common'
@@ -113,7 +113,8 @@ GOT_PHP_SOURCE_FN:
 
     # config stuff
     .local pmc cfg
-    cfg  = _config()
+    $P0 = get_root_global ['parrot'], '_config'
+    cfg  = $P0()
     .local string build_dir
     build_dir = cfg['build_dir']
 
@@ -169,7 +170,8 @@ ERROR:
 
     # config stuff
     .local pmc cfg
-    cfg  = _config()
+    $P0 = get_root_global ['parrot'], '_config'
+    cfg  = $P0()
     .local string build_dir
     build_dir = cfg['build_dir']
 
@@ -338,6 +340,8 @@ NO_REST:
     set_root_global ['pipp'], '$_ENV', superglobal_ENV
 
 .end
+
+.HLL 'parrot'
 
 .include 'src/pct/gen_grammar.pir'
 .include 'src/pct/gen_actions.pir'
