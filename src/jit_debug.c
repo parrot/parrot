@@ -167,11 +167,14 @@ write_types(FILE *stabs, PARROT_INTERP)
     fprintf(stabs, ".stabs \"PMCType:T(0,%d)=e", i++);
     for (j = 0; j < interp->n_vtable_max; ++j) {
         if (interp->vtables[j] && interp->vtables[j]->whoami) {
-            STRING* name = interp->vtables[j]->whoami;
-            fwrite(name->strstart, name->strlen, 1, stabs);
+            STRING *name  = interp->vtables[j]->whoami;
+            size_t  items = fwrite(name->strstart, name->strlen, 1, stabs);
+            if (!items)
+                fprintf(stderr, "Error writing stabs!\n");
             fprintf(stabs, ":%d,", j);
         }
     }
+
     fprintf(stabs, ";\"," N_LSYM ",0,0,0\n");
 
     /* PMC type */
@@ -356,12 +359,15 @@ Parrot_jit_debug_stabs(PARROT_INTERP)
     fprintf(stabs, ".stabs \"\"," N_FUN ",0,1,%p\n",
             (char *) jit_info->arena.size);
     fclose(stabs);
+
     /* run the stabs file through C<as> generating file.o */
     cmd = Parrot_sprintf_c(interp, "as %Ss -o %Ss", stabsfile, ofile);
 
     {
-        char *temp = string_to_cstring(interp, cmd);
-        system(temp);
+        char *temp   = string_to_cstring(interp, cmd);
+        int   status = system(temp);
+        if (status)
+            fprintf(stderr, "Assembly failed: %d\n%s\n", status, temp);
         string_cstring_free(temp);
     }
 }

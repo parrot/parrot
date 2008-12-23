@@ -358,13 +358,13 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
 
     /* get load_func */
     if (lib_name) {
-        STRING * const load_func_name = Parrot_sprintf_c(interp,
+        STRING * const load_name  = Parrot_sprintf_c(interp,
                                         "Parrot_lib_%Ss_load", lib_name);
-        char * const cload_func_name = string_to_cstring(interp, load_func_name);
+        char   * const cload_func_name = string_to_cstring(interp, load_name);
         STRING *init_func_name;
 
         load_func    = (PMC * (*)(PARROT_INTERP))
-            (Parrot_dlsym(handle, cload_func_name));
+            D2FPTR(Parrot_dlsym(handle, cload_func_name));
 
         string_cstring_free(cload_func_name);
 
