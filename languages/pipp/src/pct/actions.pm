@@ -19,32 +19,40 @@ value of the comment is passed as the second argument to the method.
 
 class Pipp::Grammar::Actions;
 
-method TOP($/) {
-    my $past := PAST::Block.new(
-                    :node($/),
-                    :hll('pipp')
-                );
-    
-    # set up scope 'package' for the superglobals
-    $past.symbol( :scope('package'), '$_GET' );
-    $past.symbol( :scope('package'), '$_POST' );
-    $past.symbol( :scope('package'), '$_SERVER' );
-    $past.symbol( :scope('package'), '$_GLOBALS' );
-    $past.symbol( :scope('package'), '$_FILES' );
-    $past.symbol( :scope('package'), '$_COOKIE' );
-    $past.symbol( :scope('package'), '$_SESSION' );
-    $past.symbol( :scope('package'), '$_REQUEST' );
-    $past.symbol( :scope('package'), '$_ENV' );
-
-    # a PHP script consists of a list of statements
-    for $<sea_or_code> {
-        $past.push( $($_) );
+method TOP($/, $key) {
+    our $?BLOCK;
+    our @?BLOCK; # keep track of the current block
+   
+    if $key eq 'open' {
+        $?BLOCK := PAST::Block.new(
+                        :node($/),
+                        :hll('pipp')
+                    );
+        
+        # set up scope 'package' for the superglobals
+        # TODO: use a loop
+        $?BLOCK.symbol_defaults( :scope('lexical') );
+        $?BLOCK.symbol( :scope('package'), '$_GET' );
+        $?BLOCK.symbol( :scope('package'), '$_POST' );
+        $?BLOCK.symbol( :scope('package'), '$_SERVER' );
+        $?BLOCK.symbol( :scope('package'), '$_GLOBALS' );
+        $?BLOCK.symbol( :scope('package'), '$_FILES' );
+        $?BLOCK.symbol( :scope('package'), '$_COOKIE' );
+        $?BLOCK.symbol( :scope('package'), '$_SESSION' );
+        $?BLOCK.symbol( :scope('package'), '$_REQUEST' );
+        $?BLOCK.symbol( :scope('package'), '$_ENV' );
     }
+    elsif $key eq 'close' {
+        # a PHP script consists of a list of statements
+        for $<sea_or_code> {
+            $?BLOCK.push( $($_) );
+        }
 
-    make $past;
+        make $?BLOCK;
+    }
 }
 
-method sea_or_code($/,$key) {
+method sea_or_code($/, $key) {
     make $( $/{$key} );
 }
 
@@ -101,7 +109,7 @@ method block($/) {
     make $past;
 }
 
-method statement($/,$key) {
+method statement($/, $key) {
     make $( $/{$key} );
 }
 
@@ -335,12 +343,26 @@ method array_elem($/) {
          );
 }
 
-method var($/,$key) {
+method var($/, $key) {
     make $( $/{$key} );
 }
 
 method VAR_NAME($/) {
     our $?PIPP_CURRENT_SCOPE;
+    our $?BLOCK;
+
+    my $isdecl;
+    if $?BLOCK.symbol( ~$/ ) {
+        # symbol is already present
+        $isdecl := 0;
+    }
+    else {
+        $isdecl := 1;
+        $?BLOCK.symbol(
+            ~$/,
+            :scope( $?PIPP_CURRENT_SCOPE ?? $?PIPP_CURRENT_SCOPE !! 'package' )
+        );
+    }
 
     make PAST::Var.new(
              :scope( $?PIPP_CURRENT_SCOPE ?? $?PIPP_CURRENT_SCOPE !! 'package' ),
@@ -404,11 +426,11 @@ method expression($/, $key) {
 }
 
 
-method term($/,$key) {
+method term($/, $key) {
     make $( $/{$key} );
 }
 
-method literal($/,$key) {
+method literal($/, $key) {
     make $( $/{$key} );
 }
 

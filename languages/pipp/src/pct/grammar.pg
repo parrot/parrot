@@ -6,7 +6,11 @@
 grammar Pipp::Grammar is PCT::Grammar;
 
 # the starting rule
-token TOP { ^ <sea_or_code>+ {*} }
+token TOP {
+     {*}                              #= open
+     ^ <sea_or_code>+
+     {*}                              #= close
+}
 
 # Whitespace and comments
 
