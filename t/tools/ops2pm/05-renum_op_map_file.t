@@ -27,8 +27,7 @@ my $samplesdir = File::Spec->catdir( $cwd,
 );;
 ok(-d $samplesdir, "Able to locate samples directory");
 
-TODO: {
-    local $TODO = 'Changes to Parrot::OpsRenumber have borked these tests';
+{
     ##### Prepare temporary directory for testing #####
 
     my $tdir = tempdir( CLEANUP => 1 );
@@ -59,9 +58,9 @@ TODO: {
         $numoutput,
         $major_version,
     );
-    is($lastcode, q{bxors_s_sc_sc},
+    is($lastcode, q{bxors_s_s_sc},
         "Stage 1:  Got expected last opcode");
-    is($lastnumber, 190,
+    is($lastnumber, 177,
         "Stage 1:  Got expected last opcode number");
 
     ###### Stage 2:  Delete some opcodes and regenerate ops.num #####
@@ -76,13 +75,16 @@ TODO: {
         $numoutput,
         $major_version,
     );
-    is($lastcode, q{bxor_i_ic_ic},
+
+    is($lastcode, q{bxor_i_i_ic},
         "Stage 2:  Got expected last opcode");
-    is($lastnumber, 184,
+    is($lastnumber, 172,
         "Stage 2:  Got expected last opcode number");
 
     ##### Stage 3:  Add some opcodes and regenerate ops.num #####
 
+  TODO: {
+        local $TODO = 'Post 1.0 regeneration problematic';
     my @stage3 = qw( pic_ops.orig );
     copy_into_position($samplesdir, \@stage3, q{orig}, $opsdir);
     ($lastcode, $lastnumber) = run_test_stage(
@@ -99,6 +101,7 @@ TODO: {
         "Stage 3:  Got expected last opcode");
     is($lastnumber, 189,
         "Stage 3:  Got expected last opcode number");
+  }
 
     ##### Stage 4:  Again generate ops.num de novo #####
 
@@ -120,10 +123,10 @@ TODO: {
         $numoutput,
         $major_version,
     );
-    is($lastcode, q{bxors_s_sc_sc},
-        "Stage 4:  Got expected last opcode");
-    is($lastnumber, 190,
-        "Stage 4:  Got expected last opcode number");
+    is($lastcode, q{bxors_s_s_sc},
+        "Stage 1:  Got expected last opcode");
+    is($lastnumber, 177,
+        "Stage 1:  Got expected last opcode number");
 
     ##### Test post-Parrot 1.0 case
     $major_version = 1;
@@ -140,10 +143,10 @@ TODO: {
         $numoutput,
         $major_version,
     );
-    is($lastcode, q{bxors_s_sc_sc},
-        "Stage 5:  Got expected last opcode:  deletion no longer permitted");
-    is($lastnumber, 190,
-        "Stage 5:  Got expected last opcode number:  deletion no longer permitted");
+    is($lastcode, q{bxor_i_ic_ic},
+        "Stage 2:  Got expected last opcode");
+    is($lastnumber, 189,
+        "Stage 2:  Got expected last opcode number");
 
     ##### Stage 6:  Add some opcodes and regenerate ops.num #####
 
@@ -161,7 +164,7 @@ TODO: {
     ($lastcode, $lastnumber) = get_last_opcode($numoutput);
     is($lastcode, q{pic_callr___pc},
         "Stage 6:  Got expected last opcode:  additions permitted");
-    is($lastnumber, 195,
+    is($lastnumber, 194,
         "Stage 6:  Got expected last opcode number:  additions permitted");
 
     # Go back where we started to activate cleanup
