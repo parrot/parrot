@@ -39,6 +39,7 @@ sub _init {
     my @potential_warnings = qw(
         -falign-functions=16
         -fvisibility=hidden
+        -funit-at-a-time
         -maccumulate-outgoing-args
         -W
         -Wall
