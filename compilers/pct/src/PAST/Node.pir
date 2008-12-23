@@ -538,6 +538,19 @@ can be either a string or an array of strings.
 .end
 
 
+=item hll([hll])
+
+Get/set the C<hll> for this block.
+
+=cut
+
+.sub 'hll' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('hll', value, has_value)
+.end
+
+
 =item symbol(name, [attr1 => val1, attr2 => val2, ...])
 
 If called with named arguments, sets the symbol hash corresponding
