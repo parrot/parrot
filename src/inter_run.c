@@ -217,7 +217,7 @@ runops_args(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj),
 
         new_sig[0] = 'O';
         /* -1 from the end, +1 for the nul at the end */
-        memcpy(new_sig+1, sig+1, len-1+1);
+        memcpy(new_sig+1, sig+1, len);
         sig_p = new_sig;
     }
 
