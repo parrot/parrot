@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-pipp.pir - driver for Pipp
+pipp.pir - driver program for Pipp
 
 =head1 SYNOPSIS
 
@@ -10,7 +10,7 @@ pipp.pir - driver for Pipp
 
    make pipp
 
-   ./pipp t.php
+   ./pipp t/in_php/01_sea_only.t
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,10 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 
 =cut
 
+# TODO: .HLL '_pipp'
 .namespace [ 'Pipp' ]
+
+.const string VERSION = "0.0.1"
 
 .sub '__onload' :anon :load :init
 
@@ -39,13 +42,8 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
     #  be used as a constant.  The 'e' flag indicates that the
     #  value must be quoted+escaped in PIR code.
     .local pmc valflags
-    valflags = get_hll_global ['PAST';'Compiler'], '%valflags'
+    valflags = get_root_global ['parrot';'PAST';'Compiler'], '%valflags'
     valflags['PhpString']   = 's~*e'
-.end
-
-.const string VERSION = "0.0.1"
-
-.sub '__onload' :load :init
 
     load_bytecode 'config.pbc'
 
@@ -77,7 +75,7 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
     load_bytecode 'Getopt/Obj.pbc'
 
     # import PGE::Util::die into Pipp::Grammar
-    $P0 = get_hll_global ['PGE';'Util'], 'die'
+    $P0 = get_root_global ['parrot';'PGE';'Util'], 'die'
     set_hll_global ['Pipp';'Grammar'], 'die', $P0
     set_hll_global ['Pipp'], 'die', $P0
 
@@ -302,12 +300,12 @@ NO_REST:
 
     # the superglobals _GET and _POST need to be set up
     .local pmc parse_get_sub, superglobal_GET
-    parse_get_sub       = get_hll_global [ 'CGI'; 'QueryHash' ], 'parse_get'
+    parse_get_sub       = get_root_global ['parrot';'CGI'; 'QueryHash'], 'parse_get'
     ( superglobal_GET ) = parse_get_sub()
     set_root_global ['pipp'], '$_GET', superglobal_GET
 
     .local pmc parse_post_sub, superglobal_POST
-    parse_post_sub       = get_hll_global [ 'CGI'; 'QueryHash' ], 'parse_post'
+    parse_post_sub       = get_root_global ['parrot';'CGI';'QueryHash'], 'parse_post'
     ( superglobal_POST ) = parse_post_sub()
     set_root_global ['pipp'], '$_POST', superglobal_POST
 

@@ -22,7 +22,7 @@ class Pipp::Grammar::Actions;
 method TOP($/) {
     my $past := PAST::Block.new(
                     :node($/),
-                    :hll('Pipp')
+                    :hll('pipp')
                 );
     for $<sea_or_code> {
         $past.push( $($_) );

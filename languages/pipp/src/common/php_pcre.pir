@@ -13,7 +13,7 @@ php_pcre.pir - PHP pcre  Library
 
 =cut
 
-.HLL 'Pipp'
+.HLL 'pipp'
 
 .include 'languages/pipp/src/common/php_MACRO.pir'
 .include 'cclass.pasm'

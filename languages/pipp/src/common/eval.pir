@@ -16,7 +16,7 @@ The code originates from Rakudo's eval.pir.
 
 =cut
 
-.HLL 'Pipp'
+.HLL 'pipp'
 
 .sub 'eval'
 

@@ -17,7 +17,7 @@ The good way is by a full NCI wrapper over the GMP library.
 
 =cut
 
-.HLL 'Pipp'
+.HLL 'pipp'
 
 .include 'languages/pipp/src/common/php_MACRO.pir'
 

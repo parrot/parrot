@@ -1,6 +1,6 @@
 # $Id$
 
-.HLL 'Pipp'
+.HLL 'pipp'
 
 .loadlib 'php_group'
 
