@@ -187,6 +187,13 @@ Get/set the opcode type for this node.
 .end
 
 
+.sub 'hll' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('hll', value, has_value)
+.end
+
+
 .sub 'outer' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag

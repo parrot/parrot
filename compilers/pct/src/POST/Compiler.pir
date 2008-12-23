@@ -26,6 +26,8 @@ PIR or an Eval PMC (bytecode).
     $P0 = new 'ResizablePMCArray'
     set_global '@!subcode', $P0
 
+    $P0 = new 'String'
+    set_global '$?HLL', $P0
     $P0 = box '[]'
     set_global '$?NAMESPACE', $P0
     .return ()
@@ -237,6 +239,14 @@ the sub.
     concat pirflags, ')'
   pirflags_done:
 
+    .local pmc outerhll, hll
+    outerhll = get_global '$?HLL'
+    hll = node.'hll'()
+    if hll goto have_hll
+    hll = outerhll
+  have_hll:
+    set_global '$?HLL', hll
+
     .local pmc outerns, ns, nskey
     outerns = get_global '$?NAMESPACE'
     nskey = outerns
@@ -259,6 +269,10 @@ the sub.
     goto subpir_done
 
   subpir_post:
+    unless hll goto subpir_ns
+    $P0 = code.'escape'(hll)
+    code.'emit'("\n.HLL %0", $P0)
+  subpir_ns:
     code.'emit'("\n.namespace %0", nskey)
     $S0 = code.'escape'(name)
     code.'emit'(".sub %0 %1", $S0, pirflags)
@@ -286,6 +300,7 @@ the sub.
     $P0 .= code
 
     set_global '$?NAMESPACE', outerns
+    set_global '$?HLL', outerhll
 
     code = new 'CodeString'
     .return (code)
