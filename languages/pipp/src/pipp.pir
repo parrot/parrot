@@ -280,6 +280,7 @@ NO_REST:
 # there is a distinction between predefined variables and superglobals
 .sub set_predefined_variables
 
+    # TODO: these should probably be lexicals
     .local pmc php_errormsg
     php_errormsg = new 'PhpString'
     php_errormsg = ''
@@ -298,6 +299,7 @@ NO_REST:
 .end
 
 # Most of the superglobals are not initialized yet
+# When adding superglobals, please alse add then in the rule TOP of actions.pm
 .sub set_superglobals
 
     # the superglobals _GET and _POST need to be set up

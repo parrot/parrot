@@ -24,6 +24,19 @@ method TOP($/) {
                     :node($/),
                     :hll('pipp')
                 );
+    
+    # set up scope 'package' for the superglobals
+    $past.symbol( :scope('package'), '$_GET' );
+    $past.symbol( :scope('package'), '$_POST' );
+    $past.symbol( :scope('package'), '$_SERVER' );
+    $past.symbol( :scope('package'), '$_GLOBALS' );
+    $past.symbol( :scope('package'), '$_FILES' );
+    $past.symbol( :scope('package'), '$_COOKIE' );
+    $past.symbol( :scope('package'), '$_SESSION' );
+    $past.symbol( :scope('package'), '$_REQUEST' );
+    $past.symbol( :scope('package'), '$_ENV' );
+
+    # a PHP script consists of a list of statements
     for $<sea_or_code> {
         $past.push( $($_) );
     }
@@ -492,6 +505,7 @@ method param_list($/) {
         $past.push($param);
 
         # enter the parameter as a lexical into the block's symbol table
+        # TODO: lexical by default
         $past.symbol(
              :scope('lexical'),
              $param.name()
@@ -524,12 +538,12 @@ method class_definition($/) {
        $past.push( $($_) );
     }
 
-    my $methods_block
-        := PAST::Block.new(
-                    :blocktype('immediate'),
-           );
+    my $methods_block := PAST::Block.new( :blocktype('immediate') );
     for $<class_member_definition> {
-        $methods_block.symbol( ~$_<VAR_NAME><ident>, :scope('attribute') );
+        $methods_block.symbol(
+            ~$_<VAR_NAME><ident>,
+            :scope('attribute')
+        );
     }
     for $<class_method_definition> {
         $methods_block.push( $($_) );
