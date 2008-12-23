@@ -43,7 +43,7 @@ typedef enum {
                           | SUB_FLAG_PF_MAIN
                           | SUB_FLAG_PF_LOAD
                           | SUB_FLAG_PF_IMMEDIATE
-                          | SUB_FLAG_PF_POSTCOMP,
+                          | SUB_FLAG_PF_POSTCOMP
 } sub_flags_enum;
 
 #define SUB_FLAG_get_FLAGS(o) (PObj_get_FLAGS(o))
