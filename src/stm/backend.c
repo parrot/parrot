@@ -32,6 +32,8 @@ the low-level synchronization.
 #define STM_DEBUG 0
 
 #if STM_DEBUG
+/* XXX: TT#83 Variadic macros were added in C99, and are not well-supported
+        by all C89 compilers. */
 #  define STM_TRACE(x...) Parrot_io_fprintf(interp, Parrot_io_STDERR(interp), x); \
                                    Parrot_io_fprintf(interp, Parrot_io_STDERR(interp), "\n")
 #  undef fprintf
