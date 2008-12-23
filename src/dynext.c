@@ -372,8 +372,8 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
         init_func_name  = Parrot_sprintf_c(interp, "Parrot_lib_%Ss_init",
                                           lib_name);
         cinit_func_name = string_to_cstring(interp, init_func_name);
-        init_func      = (void (*)(PARROT_INTERP, PMC *))(Parrot_dlsym(handle,
-                    cinit_func_name));
+        init_func       = (void (*)(PARROT_INTERP, PMC *))
+            D2FPTR(Parrot_dlsym(handle, cinit_func_name));
         string_cstring_free(cinit_func_name);
     }
     else {
