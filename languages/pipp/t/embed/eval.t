@@ -26,29 +26,24 @@ Tests the sub 'eval' used for supporting embedding Pipp in other applications.
     plan(1)
 
     ok( 1, 'no tests implemented yet')
-    # TODO:
+
     # find sub 'eval_string'
-    #.local pmc eval_sub, no_args_sub
-    #.local int ret
-    #eval_sub = get_root_global ['pipp'], 'eval'
+    .local pmc eval_sub, no_args_sub
+    .local int ret
+    eval_sub = get_root_global ['pipp'], 'eval'
     # call it with TAP diagnostics
-    #eval_sub("# only sea, not islands\n")
+    eval_sub("# only sea, not islands\n")
 
-    #eval_sub('<?php function no_args () { echo "# no_args was called\n"; } no_args(); ?>')
+    # define a function in Pipp-land
+    eval_sub('<?php function no_args () { echo "# no_args was called\n"; } no_args(); ?>')
 
-    # define a function
-    # call it from here
-    #no_args_sub = get_hll_global 'no_args'
-    #no_args_sub()
+    no_args_sub = get_root_global ['pipp'], 'no_args'
+    no_args_sub()
 
-    #no_args_sub = get_root_global [ 'parrot' ], 'no_args'
-    #no_args_sub()
     # $P3 = get_namespace
     # say $P3
-
     # $P4 = get_hll_namespace
     # say $P4
-
     # $P5 = get_root_namespace
     # say $P5
 .end
