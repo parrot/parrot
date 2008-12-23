@@ -20,12 +20,15 @@ value of the comment is passed as the second argument to the method.
 class Pipp::Grammar::Actions;
 
 method TOP($/) {
-    my $past := PAST::Block.new( :node($/) );
+    my $past := PAST::Block.new(
+                    :node($/),
+                    :hll('Pipp')
+                );
     for $<sea_or_code> {
         $past.push( $($_) );
     }
 
-    make PAST::Stmts.new( $past, PAST::Op.new( :inline( "_block11()\n.end\n.HLL 'Pipp'\n.sub 'anon'" ) ));
+    make $past;
 }
 
 method sea_or_code($/,$key) {
