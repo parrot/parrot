@@ -34,8 +34,8 @@ typedef struct syminfo {
 } syminfo;
 
 /* accessors for easy typing; X must be a pointer to a syminfo struct. */
-#define sym_name(X)     X->id.name
-#define sym_regno(X)    X->id.regno
+#define sym_name(X)     (X)->id.name
+#define sym_regno(X)    (X)->id.regno
 
 
 /* structure to represent a declared local variable or parameter */
