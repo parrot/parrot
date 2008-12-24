@@ -7,9 +7,10 @@ grammar Pipp::Grammar is PCT::Grammar;
 
 # the starting rule
 token TOP {
-     {*}                              #= open
-     ^ <sea_or_code>+
-     {*}                              #= close
+     {*}                                     #= open
+     <sea_or_code>*
+     [ $ || <.panic: 'Syntax error'> ]
+     {*}                                     #= close
 }
 
 # Whitespace and comments
@@ -34,7 +35,7 @@ token ws {
 
 # text or PHP-code
 token sea_or_code {
-      <code_echo_tag>   {*}    #= code_echo_tag
+    | <code_echo_tag>   {*}    #= code_echo_tag
     | <code_short_tag>  {*}    #= code_short_tag
     | <code_script_tag> {*}    #= code_script_tag
     | <SEA>             {*}    #= SEA

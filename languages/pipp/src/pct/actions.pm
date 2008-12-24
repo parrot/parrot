@@ -20,8 +20,8 @@ value of the comment is passed as the second argument to the method.
 class Pipp::Grammar::Actions;
 
 method TOP($/, $key) {
-    our $?BLOCK;
-    our @?BLOCK; # keep track of the current block
+    our @?BLOCK; # A stack of PAST::Block
+    our $?BLOCK; # The current block. Used for managing the symbol table. 
    
     if $key eq 'open' {
         $?BLOCK := PAST::Block.new(
@@ -41,14 +41,19 @@ method TOP($/, $key) {
         $?BLOCK.symbol( :scope('package'), '$_SESSION' );
         $?BLOCK.symbol( :scope('package'), '$_REQUEST' );
         $?BLOCK.symbol( :scope('package'), '$_ENV' );
+        @?BLOCK.unshift($?BLOCK);
     }
-    elsif $key eq 'close' {
+    else {
+        # retrieve the block created in the "if" section in this method.
+        #my $past := @?BLOCK.shift(); # for some reason @?BLOCK can be empty
+        my $past := $?BLOCK;
+
         # a PHP script consists of a list of statements
         for $<sea_or_code> {
-            $?BLOCK.push( $($_) );
+            $past.push( $($_) );
         }
 
-        make $?BLOCK;
+        make $past;
     }
 }
 
@@ -481,6 +486,7 @@ method function_definition($/) {
 
     # note that $<param_list> creates a new PAST::Block.
     my $past := $( $<param_list> );
+    # TODO: set $?BLOCK
 
     $past.name( ~$<FUNCTION_NAME> );
     $past.control('return_pir');
@@ -505,6 +511,7 @@ method class_method_definition($/) {
 
     # note that $<param_list> creates a new PAST::Block.
     my $past := $( $<param_list> );
+    # TODO: set $?BLOCK
 
     $past.name( ~$<METHOD_NAME> );
     $past.blocktype( 'method' );
@@ -520,6 +527,7 @@ method param_list($/) {
                     :blocktype('declaration'),
                     :node($/)
                 );
+    # TODO: set $?BLOCK
     my $arity := 0;
     for $<VAR_NAME> {
         my $param := $( $_ );
@@ -540,6 +548,7 @@ method param_list($/) {
 }
 
 method class_definition($/) {
+    # TODO: set $?BLOCK
     my $past := PAST::Block.new(
                     :node($/),
                     :namespace( $<CLASS_NAME><ident> ),
@@ -560,6 +569,7 @@ method class_definition($/) {
        $past.push( $($_) );
     }
 
+    # TODO: set $?BLOCK
     my $methods_block := PAST::Block.new( :blocktype('immediate') );
     for $<class_member_definition> {
         $methods_block.symbol(
@@ -584,6 +594,7 @@ method quote_expression($/, $key) {
     my $past;
     if $key eq 'quote_regex' {
         our $?NS;
+        # TODO: set $?BLOCK
         $past := PAST::Block.new(
             $<quote_regex>,
             :compiler('PGE::Perl6Regex'),

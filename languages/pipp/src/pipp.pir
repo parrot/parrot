@@ -37,19 +37,15 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
     # Pipp uses the Parrot Compiler Toolkit
     load_bytecode 'PCT.pbc'
 
-    #  %valflags specifies when PAST::Val nodes are allowed to
-    #  be used as a constant.  The 'e' flag indicates that the
-    #  value must be quoted+escaped in PIR code.
+    # %valflags specifies when PAST::Val nodes are allowed to
+    # be used as a constant.  The 'e' flag indicates that the
+    # value must be quoted+escaped in PIR code.
     .local pmc valflags
     valflags = get_root_global ['parrot';'PAST';'Compiler'], '%valflags'
     valflags['PhpString']   = 's~*e'
 
+    # for accessing config info
     load_bytecode 'config.pbc'
-
-    load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Text.pbc'
-    load_bytecode 'PGE/Util.pbc'
-    load_bytecode 'PGE/Dumper.pbc'
 
     load_bytecode 'P6object.pbc'
 
@@ -79,8 +75,12 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
     set_hll_global ['Pipp';'Grammar'], 'die', $P0
     set_hll_global ['Pipp'], 'die', $P0
 
+    # Initialize the stack @?BLOCK
+    $P0 = new 'ResizablePMCArray'
+    set_root_global ['parrot';'Pipp';'Grammar';'Actions'], '@?BLOCK', $P0
+
     # register and set up the the HLLCompiler
-    $P1 = new [ 'PCT';'HLLCompiler' ]
+    $P1 = new ['PCT';'HLLCompiler']
     $P1.'language'('Pipp')
     $P1.'parsegrammar'('Pipp::Grammar')
     $P1.'parseactions'('Pipp::Grammar::Actions')
