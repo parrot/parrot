@@ -25,9 +25,9 @@ method TOP($/, $key) {
    
     if $key eq 'open' {
         $?BLOCK := PAST::Block.new(
-                        :node($/),
-                        :hll('pipp')
-                    );
+                       :node($/),
+                       :hll('pipp')
+                   );
         
         # set up scope 'package' for the superglobals
         # TODO: use a loop
@@ -45,8 +45,7 @@ method TOP($/, $key) {
     }
     else {
         # retrieve the block created in the "if" section in this method.
-        #my $past := @?BLOCK.shift(); # for some reason @?BLOCK can be empty
-        my $past := $?BLOCK;
+        my $past := @?BLOCK.shift();
 
         # a PHP script consists of a list of statements
         for $<sea_or_code> {
@@ -230,7 +229,7 @@ method class_constant($/) {
 
 # class constants could probably also be set in a class init block
 method class_constant_definition($/) {
-    my $past := PAST::Block.new( :name( 'class_constant_definition' ) );
+    my $past := PAST::Block.new( :name('class_constant_definition') );
     my $loadinit := $past.loadinit();
     $loadinit.unshift(
        PAST::Op.new(
@@ -547,42 +546,53 @@ method param_list($/) {
     make $past;
 }
 
-method class_definition($/) {
-    # TODO: set $?BLOCK
-    my $past := PAST::Block.new(
-                    :node($/),
-                    :namespace( $<CLASS_NAME><ident> ),
-                    :blocktype('declaration'),
-                    :pirflags( ':init :load' ),
-                    PAST::Stmts.new(
+method class_definition($/, $key) {
+    our @?BLOCK; # A stack of PAST::Block
+    our $?BLOCK; # The current block. Used for managing the symbol table. 
+
+    if $key eq 'open' {
+        # TODO: set $?BLOCK
+    }
+    else {
+        # TODO: put this into the 'if' branch
+        $?BLOCK := PAST::Block.new(
+                       :node($/),
+                       :blocktype('declaration'),
+                       :pirflags( ':init :load' )
+                   );
+        @?BLOCK.unshift($?BLOCK);
+        my $past := @?BLOCK.shift();
+        $past.namespace( $<CLASS_NAME><ident> );
+        $past.push( PAST::Stmts.new(
                         PAST::Op.new(
                             :inline(   "$P0 = get_root_global ['parrot'], 'P6metaclass'\n"
                                      ~ "$P2 = $P0.'new_class'('" ~ $<CLASS_NAME> ~ "')\n" ),
                             :pasttype( 'inline' )
                         )
                     )
-                );
-
-    # nothing to do for $<const_definition,
-    # setup of class constants is done in the 'loadinit' node
-    for $<class_constant_definition> {
-       $past.push( $($_) );
-    }
-
-    # TODO: set $?BLOCK
-    my $methods_block := PAST::Block.new( :blocktype('immediate') );
-    for $<class_member_definition> {
-        $methods_block.symbol(
-            ~$_<VAR_NAME><ident>,
-            :scope('attribute')
         );
-    }
-    for $<class_method_definition> {
-        $methods_block.push( $($_) );
-    }
-    $past.push( $methods_block );
 
-    make $past;
+        # nothing to do for $<const_definition,
+        # setup of class constants is done in the 'loadinit' node
+        for $<class_constant_definition> {
+           $past.push( $($_) );
+        }
+
+        # TODO: set $?BLOCK
+        my $methods_block := PAST::Block.new( :blocktype('immediate') );
+        for $<class_member_definition> {
+            $methods_block.symbol(
+                ~$_<VAR_NAME><ident>,
+                :scope('attribute')
+            );
+        }
+        for $<class_method_definition> {
+            $methods_block.push( $($_) );
+        }
+        $past.push( $methods_block );
+
+        make $past;
+    }
 }
 
 

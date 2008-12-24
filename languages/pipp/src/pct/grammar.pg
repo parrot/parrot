@@ -404,12 +404,13 @@ rule method_declaration {
 }
 
 rule class_definition {
+    {*}                                     #= open
     'class' <CLASS_NAME> [ 'implements' <INTERFACE_NAME> ]? '{'
         <class_constant_definition>*
         <class_member_definition>*
         <class_method_definition>*
     '}'
-    {*}
+    {*}                                     #= close
 }
 
 rule class_constant_definition {
