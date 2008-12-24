@@ -12,6 +12,6 @@ use Parrot::Test tests => 1;
   language_output_is( 'm4', <<'CODE', <<'OUT', 'errprint with three args' );
 before errprint(   `Should',     `be', `printed on STDERR') after
 CODE
-Should be printed on STDERRbefore  after
+before Should be printed on STDERR after
 OUT
 }
