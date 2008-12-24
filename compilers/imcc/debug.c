@@ -94,7 +94,7 @@ IMCC_fatal_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
     va_list ap;
 
     va_start(ap, fmt);
-    imcc_vfprintf(interp, stderr, fmt, ap);
+    imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
     va_end(ap);
     Parrot_exit(interp, code);
 }
@@ -120,7 +120,7 @@ IMCC_fataly_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
 
     va_start(ap, fmt);
     fprintf(stderr, "error:imcc:");
-    imcc_vfprintf(interp, stderr, fmt, ap);
+    imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
     va_end(ap);
     IMCC_print_inc(interp);
     Parrot_exit(interp, code);
@@ -146,7 +146,7 @@ IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...)
         return;
 
     va_start(ap, fmt);
-    imcc_vfprintf(interp, stderr, fmt, ap);
+    imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
     va_end(ap);
 }
 
@@ -171,7 +171,7 @@ IMCC_info(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
         return;
 
     va_start(ap, fmt);
-    imcc_vfprintf(interp, stderr, fmt, ap);
+    imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
     va_end(ap);
 }
 
@@ -194,7 +194,7 @@ IMCC_debug(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
     if (!(level & IMCC_INFO(interp)->debug))
         return;
     va_start(ap, fmt);
-    imcc_vfprintf(interp, stderr, fmt, ap);
+    imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
     va_end(ap);
 }
 

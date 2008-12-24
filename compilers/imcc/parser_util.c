@@ -1201,113 +1201,17 @@ try_rev_cmp(ARGIN(const char *name), ARGMOD(SymReg **r))
 
 =item C<int imcc_vfprintf>
 
-TODO: Needs to be documented!!!
+Formats a given series of arguments per a given format string and prints it to
+the given Parrot IO PMC.
 
 =cut
 
 */
 
 int
-imcc_vfprintf(PARROT_INTERP, ARGMOD(FILE *fd), ARGIN(const char *format), va_list ap)
+imcc_vfprintf(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const char *format), va_list ap)
 {
-    int len = 0;
-    const char *fmt = format;
-    char buf[128];
-
-    for (;;) {
-        const char *cp = fmt;
-        int         ch = 0;
-        size_t      n;
-
-        for (n = 0; (ch = *fmt) && ch != '%'; fmt++, n++) {/*Empty body*/};
-
-        /* print prev string */
-        if (n) {
-            fwrite(cp, 1, n, fd);
-            len += n;
-            continue;
-        }
-
-        /* finished? */
-        if (!ch)
-            break;
-
-        /* ok, we have a format spec */
-        /* % */
-        ch = *++fmt;
-
-        /* print it */
-        if (ch == '%') {
-            fwrite(fmt, 1, 1, fd);
-            len += 1;
-            ++fmt;
-            continue;
-        }
-
-        /* look for end of format spec */
-        for (; ch && strchr("diouxXeEfFgGcspI", ch) == NULL; ch = *++fmt)
-            ;
-
-        if (!ch) {
-            /* no fatal here, else we get recursion */
-            fprintf(stderr, "illegal format at %s\n", cp);
-            exit(EXIT_FAILURE);
-        }
-
-        /* ok, we have a valid format char */
-        ++fmt;
-        switch (ch) {
-            case 'd':
-            case 'i':
-            case 'o':
-            case 'u':
-            case 'x':
-            case 'X':
-            case 'p':
-            case 'c':
-                {
-                const int _int = va_arg(ap, int);
-                memcpy(buf, cp, n = (fmt - cp));
-                buf[n] = '\0';
-                len += fprintf(fd, buf, _int);
-                }
-                break;
-            case 'e':
-            case 'E':
-            case 'f':
-            case 'F':
-            case 'g':
-            case 'G':
-                {
-                const double _double = va_arg(ap, double);
-                memcpy(buf, cp, n = (fmt - cp));
-                buf[n] = '\0';
-                len += fprintf(fd, buf, _double);
-                }
-                break;
-            case 's':
-                {
-                const char * const _string = va_arg(ap, char *);
-                memcpy(buf, cp, n = (fmt - cp));
-                PARROT_ASSERT(n<128);
-                buf[n] = '\0';
-                len += fprintf(fd, buf, _string);
-                }
-                break;
-            /* this is the reason for the whole mess */
-            case 'I':
-                {
-                Instruction * const _ins = va_arg(ap, Instruction *);
-                len += fprintf(fd, "%s ", _ins->opname);
-                len += ins_print(interp, fd, _ins);
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-    return len;
+    return Parrot_io_putps(interp, io, Parrot_vsprintf_c(interp, format, ap));
 }
 
 /* Utility functions */
