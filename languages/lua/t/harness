@@ -34,6 +34,10 @@ compiler written in Perl5).
 If I'm called with "--use-lua-pbc", I run with C<lua.pbc> (the Lua interpreter
 written in PIR).
 
+If I'm called with "--use-luap-pir", I run with C<luap.pir>.
+
+If I'm called with "--use-luac2pir-pir", I run with C<luac2pir.pir>.
+
 Otherwise I run the tests that were passed on the command line.
 
 =cut
@@ -55,7 +59,7 @@ use Parrot::Test;
 my $language = 'lua';
 
 my ( $files_flag, $master_flag, $send_to_smolder_flag, $archive_flag, $verbose_flag );
-my ( $use_orig_lua, $use_luac_pl, $use_lua_pbc );
+my ( $use_orig_lua, $use_luac_pl, $use_lua_pbc, $use_luap_pir, $use_luac2pir_pir );
 GetOptions(
     'files' => \$files_flag,
     'master' => \$master_flag,          # unused, but passed by languages/t/harness
@@ -66,6 +70,8 @@ GetOptions(
     'use-lua' => \$use_orig_lua,
     'use-luac-pl' => \$use_luac_pl,
     'use-lua-pbc' => \$use_lua_pbc,
+    'use-luap-pir' => \$use_luap_pir,
+    'use-luac2pir-pir' => \$use_luac2pir_pir,
 );
 
 my $verbosity = $verbose_flag ? 1 : $ENV{HARNESS_VERBOSE};
@@ -115,6 +121,12 @@ else {
     elsif ($use_lua_pbc) {
         $ENV{PARROT_LUA_TEST_PROG} = 'lua.pbc';
     }
+    elsif ($use_luap_pir) {
+        $ENV{PARROT_LUA_TEST_PROG} = 'luap.pir';
+    }
+    elsif ($use_luac2pir_pir) {
+        $ENV{PARROT_LUA_TEST_PROG} = 'luac2pir.pir';
+    }
 
     my $exec_sub
         = sub {
@@ -141,10 +153,12 @@ else {
 
         if ( $send_to_smolder_flag ) {
             $env_data{report_file} = $report_file;
-            $env_data{project_id}  = 10;
+            $env_data{project_id}  = 999;
+            $env_data{test_prog}   = $ENV{PARROT_LUA_TEST_PROG};
             Parrot::Harness::Smoke::send_archive_to_smolder(%env_data);
         }
-    } else {
+    }
+    else {
         my $harness = TAP::Harness->new(
             {
                 exec       => $exec_sub,

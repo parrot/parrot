@@ -274,6 +274,7 @@ help:
 	@echo "                     This is the default."
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
+	@echo "  smoke:             Run the test suite and send report to the smolder server"
 	@echo "  testclean:         Clean up test results."
 	@echo ""
 	@echo "Cleaning:"
@@ -288,6 +289,9 @@ help:
 test: all
 	cd .. && $(PERL) t/harness --languages=lua
 
+# run the test suite, create a TAP archive and send it off to smolder
+smoke : all
+	-$(PERL) t/harness --archive --send-to-smolder
 
 TEST_CLEANERS = \
  "t/pmc/*.pir" \
