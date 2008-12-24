@@ -1266,13 +1266,14 @@ Generate a standard loop with NEXT/LAST/REDO exception handling.
     $S0 = concat loopname, '_handler'
     handlabel = $P0.'new'('result'=>$S0)
 
-    .local pmc testpost, prepost, bodypost
+    .local pmc testpost, prepost, bodypost, nextpost
     .local string testop
     .local int bodyfirst
     testop = options['testop']
     testpost = options['test']
     prepost  = options['pre']
     bodypost = options['body']
+    nextpost = options['next']
     bodyfirst = options['bodyfirst']
 
     if testop goto have_testop
@@ -1306,6 +1307,9 @@ Generate a standard loop with NEXT/LAST/REDO exception handling.
     ops.'push'(bodypost)
   body_done:
     ops.'push'(nextlabel)
+    if null nextpost goto next_done
+    ops.'push'(nextpost)
+  next_done:
     ops.'push_pirop'('goto', testlabel)
     ops.'push'(handlabel)
     ops.'push_pirop'('.local pmc exception')
@@ -1335,11 +1339,12 @@ Return the POST representation of a C<while> or C<until> loop.
 .sub 'while' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
-    .local pmc exprpast, bodypast
+    .local pmc exprpast, bodypast, nextpast
     exprpast = node[0]
     bodypast = node[1]
+    nextpast = node[2]
 
-    .local pmc exprpost, bodypost   
+    .local pmc exprpost, bodypost, nextpost
     exprpost = self.'as_post'(exprpast, 'rtype'=>'r') 
 
     .local pmc arglist
@@ -1350,13 +1355,18 @@ Return the POST representation of a C<while> or C<until> loop.
   have_arglist:
     bodypost = self.'as_post'(bodypast, 'rtype'=>'v', 'arglist'=>arglist)
 
+    null nextpost
+    if null nextpast goto have_nextpost
+    nextpost = self.'as_post'(nextpast, 'rtype'=>'v')
+  have_nextpost:
+
     .local string testop
     testop = options['testop']
     .local int bodyfirst
     bodyfirst = options['bodyfirst']
 
     .local pmc ops
-    ops = self.'loop_gen'('testop'=>testop, 'test'=>exprpost, 'body'=>bodypost, 'bodyfirst'=>bodyfirst)
+    ops = self.'loop_gen'('testop'=>testop, 'test'=>exprpost, 'body'=>bodypost, 'bodyfirst'=>bodyfirst, 'next'=>nextpost)
     ops.'result'(exprpost)
     ops.'node'(node)
     .return (ops)
