@@ -61,7 +61,7 @@ run:
     .local pmc prog, e
 
     create_globals()
-    e = global "I"
+    e = get_global "I"
     prog = parse(in)
     ## _dumper( prog, "prog" )
     e = append(e, prog)
@@ -112,8 +112,8 @@ put:
     .param pmc church
 
     .local pmc e, Zero, Inc, result
-    Inc = global "Inc"
-    Zero = global "Zero"
+    Inc = get_global "Inc"
+    Zero = get_global "Zero"
     e = new_apply(church, Inc)
     e = new_apply(e, Zero)
     result = eval(e)
@@ -129,7 +129,7 @@ err:
 .sub car
     .param pmc list
     .local pmc k
-    k = global "K"
+    k = get_global "K"
     .tailcall new_apply(list, k)
 .end
 
@@ -137,7 +137,7 @@ err:
 .sub cdr
     .param pmc list
     .local pmc ki
-    ki = global "KI"
+    ki = get_global "KI"
     .tailcall new_apply(list, ki)
 .end
 
@@ -147,36 +147,36 @@ err:
     .local pmc e, NUL, K, S, KS, I, KI
     null NUL
     K = new_expr(expK, NUL, NUL)
-    global "K" = K
+    set_global "K", K
     S = new_expr(expS, NUL, NUL)
-    global "S" = S
+    set_global "S", S
     I = new_expr(expI, NUL, NUL)
-    global "I" = I
+    set_global "I", I
     KI = new_expr(expK1, I, NUL)
-    global "KI" = KI
+    set_global "KI", KI
     e = new_expr(expS1, I, NUL)
-    global "SI" = e
+    set_global "SI", e
     KS = new_expr(expK1, S, NUL)
-    global "KS" = KS
+    set_global "KS", KS
     e = new_expr(expK1, K, NUL)
-    global "KK" = e
+    set_global "KK", e
     e = new_expr(expS2, KS, K)
-    global "SKSK" = e
+    set_global "SKSK", e
     e = new_expr(expS2, I, KS)
-    global "SIKS" = e
+    set_global "SIKS", e
 
     e = new_expr(expInc, NUL, NUL)
-    global "Inc" = e
+    set_global "Inc", e
     $P0 = new 'Integer'
     e = new_expr(expNum, $P0, NUL)
-    global "Zero" = e
+    set_global "Zero", e
 
     .local pmc cache
     cache = new 'FixedPMCArray'
     cache = 257
     cache[0] = KI
     cache[1] = I
-    global "church_cache" = cache
+    set_global "church_cache", cache
 
 .end
 
@@ -212,9 +212,9 @@ err:
     .local string ch
     .local pmc op, arg, NUL
     .local pmc I, K, S
-    I = global "I"
-    K = global "K"
-    S = global "S"
+    I = get_global "I"
+    K = get_global "K"
+    S = get_global "S"
     null NUL
 loop:
     ch = read io, 1
@@ -271,7 +271,7 @@ ret_e:
     .param int i
 
     .local pmc cached, e
-    cached = global "church_cache"
+    cached = get_global "church_cache"
     if i < 0 goto i256
     if i > 256 goto i256
     goto ok
@@ -281,7 +281,7 @@ ok:
     e = cached[i]
     unless_null e,  ret
 	.local pmc sksk, e, cm1
-	sksk = global "SKSK"
+	sksk = get_global "SKSK"
 	$I0 = i - 1
 	cm1 = int2church($I0)
 	e = new_expr(expS2, sksk, cm1)
@@ -361,7 +361,7 @@ not_s1:
 	$I0 = ord s
     eof:
 	cc = int2church($I0)
-	i = global "I"
+	i = get_global "I"
 	k1c = new_expr(expK1, cc, NUL)
 	s2ik1 = new_expr(expS2, i, k1c)
 	lhs[1] = s2ik1

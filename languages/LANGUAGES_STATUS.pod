@@ -513,7 +513,9 @@ See also L<http://homepages.cwi.nl/~tromp/cl/lazy-k.html>
 
 =item Status
 
-Working, but not complete. Part of languages smoke testing.
+Broken with Parrot 0.8.2.devel.
+Not complete.
+Part of languages smoke testing.
 A new maintainer is sought.
 
 =item Last verified with parrot version
