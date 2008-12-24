@@ -757,7 +757,7 @@ static char *output;
 
 =item C<static int e_file_open>
 
-Prints a me
+Prints a message to STDOUT.
 
 =cut
 
@@ -768,8 +768,13 @@ e_file_open(PARROT_INTERP, ARGIN(void *param))
 {
     char * const file = (char *) param;
 
-    if (!STREQ(file, "-"))
-        freopen(file, "w", stdout);
+    if (!STREQ(file, "-")) {
+        FILE *newfile = freopen(file, "w", stdout);
+        if (!newfile)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                "Cannot reopen stdout: %s'\n", strerror(errno));
+    }
+
     output = file;
     Parrot_io_printf(interp, "# IMCC does produce b0rken PASM files\n");
     Parrot_io_printf(interp, "# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392\n");
