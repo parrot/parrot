@@ -1239,7 +1239,7 @@ imcc_init(PARROT_INTERP)
 
 /*
 
-=item C<void imcc_destroy_macro_values(void *)>
+=item C<static void imcc_destroy_macro_values>
 
 A callback for parrot_chash_destroy_values() to free all macro-allocated memory.
 
@@ -1250,11 +1250,13 @@ A callback for parrot_chash_destroy_values() to free all macro-allocated memory.
 static void
 imcc_destroy_macro_values(ARGMOD(void *value))
 {
-    macro_t *m = (macro_t *)value;
-    int      i;
+    macro_t *  const m      = (macro_t *)value;
+    params_t * const params = &m->params;
 
-    for (i = 0; i < m->params.num_param; ++i) {
-        char *name = m->params.name[i];
+    int i;
+
+    for (i = 0; i < params->num_param; ++i) {
+        char * const name = params->name[i];
         if (name)
             mem_sys_free(name);
     }
