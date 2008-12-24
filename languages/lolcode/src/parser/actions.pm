@@ -42,7 +42,6 @@ method statement ($/, $key) {
 
 method declare($/) {
     our $?BLOCK;
-    our @?BLOCK;
 
     my $name := ~$<variable><identifier>;
 
@@ -103,7 +102,6 @@ method function($/,$key) {
         my $block := $( $<block> );
         $block.blocktype('declaration');
         $?BLOCK.symbol(~$<variable><identifier>, :arity($block.arity()));
-
 
         my $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'), :isdecl(1));
         $block[1].unshift($it);
@@ -359,7 +357,6 @@ method variable ($/) {
     }
     else {
         our $?BLOCK;
-        our @?BLOCK;
 
         my $var := PAST::Var.new( :name( $<identifier> ),
                             :scope('lexical'),
