@@ -157,7 +157,7 @@ method try_statement($/) {
 
     ## get the exception identifier;
     my $exc := $( $<exception> );
-    $exc.isdecl( PAST::Val.new( :value(1) ) );
+    $exc.isdecl(1);
     $exc.scope('lexical');
     $exc.viviself( PAST::Val.new( :value(0) ) );
 
