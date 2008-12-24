@@ -25,7 +25,7 @@ groundwork for the next version, "Perl 6", and the Python team was
 working hard on a spec for "Python 3000". The Perl 6 project started
 moving in two different directions at once: the underlying interpreter
 architecture and the language grammar and semantics. As people
-realized that the two projects could become completely indepent, it
+realized that the two projects could become completely independent, it
 was decided to create a proper language-agnostic virtual machine to
 support the high-level efforts. The virtual machine was later dubbed
 "Parrot" in a fitting turn of life imitating art.
@@ -105,7 +105,7 @@ and documentation of project subcomponents may be delegated to other
 members of the Project Team, or may be held jointly. The Architect also
 works with the Release Managers to develop and maintain the release
 schedule. Allison RandalX<Randal, Allison> currently leads the Parrot
-project aschief architect.
+project as chief architect.
 
 =item Release Managers
 
@@ -166,7 +166,7 @@ X<Committers>
 Contributors who submit numerous, high-quality patches may be
 considered to become a Committer. Committers have commit access to the
 full Parrot repository, but generally work only on one or more
-subprojects; Committer categories are described below. Contributors may
+subprojects; Committer categories are described below. Contributors may be
 considered for commit access either by being nominated by another
 Committer, or by requesting it.
 
@@ -194,7 +194,7 @@ release.
 =item Build Manager
 
 Build Managers maintain and extend configuration and build subsystems.
-They reviews smoke reports and attempt to extend platform support.
+They review smoke reports and attempt to extend platform support.
 
 =item Lead Tester
 
@@ -225,7 +225,7 @@ X<Contributors>
 
 Parrot's cage, the development working environment, has a tendency to
 get messy and disorganized over time. It's the responsibility of the
-aptly-named Cage Cleaners to ensure coding standards are followed, that
+aptly-named Cage Cleaners to ensure that coding standards are followed, that
 documentation is complete and accurate, that all tests are functioning
 properly, and that there are plenty of coding examples for new users to
 learn from. A class of tickets in the RT tracking system has been created

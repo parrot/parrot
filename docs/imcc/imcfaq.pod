@@ -146,9 +146,9 @@ simple, with no arguments or returns. Line comments are allowed in IMC using #.
 
 For more examples see the PIR tutorial in F<examples/tutorial>.
 
-=head2 How do I compile and run an PIR module?
+=head2 How do I compile and run a PIR module?
 
-Parrot uses the filename extension to detect whether the file is an PIR file
+Parrot uses the filename extension to detect whether the file is a PIR file
 (.pir), a Parrot Assembly file (.pasm) or a pre-compiled
 bytecode file (.pbc).
 
