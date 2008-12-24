@@ -15,7 +15,27 @@
     print $P1
     goto print_loop
   end_print_loop:
+    print "\n"
 .end
+
+.sub 'version'
+    .param pmc version :optional
+    .param int has_version :opt_flag
+
+    $P1 = get_global '+$VERSION'
+    if_null $P1, unnullit
+    unless has_version goto ret
+    set_global '+$VERSION', version
+  ret:
+    .return ($P1)
+  unnullit:
+#    $P1 = new 'Integer'
+    $P1 = box 0
+    set_global '+$VERSION', $P1
+    .return ($P1)
+.end
+
+
 
 ## constructor for a object literals. It takes advantages of
 ## the Parrot Calling Conventions using :slurpy and :named flags,
@@ -313,6 +333,14 @@
 
 .sub 'prefix:typeof'
     .param pmc op
+    $S0 = typeof op
+
+    $S1 = 'unknown'
+    ne $S0, 'Sub', n1
+    $S1 = 'function'
+    n1:
+
+    .return ($S1)
 .end
 
 .sub 'prefix:+'

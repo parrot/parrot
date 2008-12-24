@@ -441,8 +441,18 @@ token ws_all {
 
 # whitespace rule used implicity by rules
 token ws {
-    | <!ww> <ws_all>+
-    | <ws_all>*
+  | <?{{  $P0 = get_global '$!ws'
+          if null $P0 goto noshort
+          $P1 = $P0.'to'()
+          $P2 = match.'to'()
+          if $P1 != $P2 goto noshort
+          .return (1)
+        noshort:
+          set_global '$!ws', match
+          .return (0)
+  }}>
+  | <!ww> <ws_all>+
+  | <ws_all>*
 }
 
 #### whitespace
@@ -597,8 +607,7 @@ rule identifier_field {
 }
 
 rule call_expression {
-    <member_expression> <arguments> <post_call_expr>*
-    {*}
+    <member_expression> <arguments> <post_call_expr>* {*}
 }
 
 rule post_call_expr {

@@ -650,17 +650,21 @@ method builtin_literal($/, $key) {
 
 method true($/) {
     # XXX change this into type a ECMAScript type, 'Boolean' or whatever
-    make PAST::Val.new( :returns('Integer'), :value('1'), :node($/) );
+#    make PAST::Val.new( :returns('Integer'), :value('1'), :node($/) );
+    make PAST::Var.new( :name(~$/), :namespace('JSBoolean'), :scope('package'), :node($/) );
+
 }
 
 method false($/) {
     # XXX change this into type 'Boolean' or whatever
-    make PAST::Val.new( :returns('Integer'), :value('0'), :node($/) );
+#    make PAST::Val.new( :returns('Integer'), :value('0'), :node($/) );
+    make PAST::Var.new( :name(~$/), :namespace('JSBoolean'), :scope('package'), :node($/) );
 }
 
 method null($/) {
     # XXX would this work?
     make PAST::Var.new( :name('null'), :scope('package'), :node($/) );
+#    make PAST::Var.new( :name(~$/), :namespace('Null'), :node($/) );
 }
 
 method object_literal($/) {
