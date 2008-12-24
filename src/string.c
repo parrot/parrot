@@ -578,7 +578,7 @@ string_append(PARROT_INTERP, ARGMOD_NULLOK(STRING *a), ARGIN_NULLOK(STRING *b))
     total_length = a->bufused + b->bufused;
 
     /* make sure A's big enough for both  */
-    if (total_length >= a_capacity)
+    if (total_length > a_capacity)
         Parrot_reallocate_string(interp, a, total_length << 1);
 
     /* A is now ready to receive the contents of B */
@@ -2446,7 +2446,7 @@ string_escape_string_delimited(PARROT_INTERP,
         charlen = PObj_buflen(result);
         dp      = (unsigned char *)result->strstart;
 
-        PARROT_ASSERT(i < charlen);
+        PARROT_ASSERT(i <= charlen);
     }
 
     result->bufused = result->strlen = i;
