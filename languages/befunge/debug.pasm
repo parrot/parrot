@@ -7,10 +7,10 @@
 #         when reaching it, or a location "y,x", or a column "c:nn"
 #         or a row "r:nn"
 DEBUG_INITIALIZE:
-        new P3, .ResizablePMCArray
+        new P3, 'ResizablePMCArray'
         set P3[0], 1          # Stop at first step.
         repeat S10, "0", 128  # No char to break on.
-        new P4, .Hash
+        new P4, 'Hash'
         set P3[1], P4         # The breakpoints.
         ret
 
