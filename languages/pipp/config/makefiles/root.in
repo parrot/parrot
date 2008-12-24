@@ -11,7 +11,7 @@ LIBRARY_DIR   = $(BUILD_DIR)/runtime/parrot/library
 INCLUDE_DIR   = $(BUILD_DIR)/include
 PMCDIR        = src/pmc
 PIPPDIR       = $(BUILD_DIR)/languages/pipp
-HASHDIR       = $(PIPPDIR)/src
+HASHDIR       = $(PIPPDIR)/src/pmc
 PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
 
 # Set up commands
@@ -49,10 +49,8 @@ PMC_SOURCES = \
   $(PMCDIR)/phpnull.pmc
 
 HASH_SOURCES = $(HASHDIR)/pipp_hash.c
-
-HASH_H = $(HASHDIR)/pipp_hash.h
-
-HASH_OBJS = $(HASHDIR)/pipp_hash$(O)
+HASH_H       = $(HASHDIR)/pipp_hash.h
+HASH_OBJS    = $(HASHDIR)/pipp_hash$(O)
 
 PHP_GROUP=$(PMCDIR)/php_group$(LOAD_EXT)
 
@@ -212,11 +210,11 @@ src/pct/gen_actions.pir: $(NQP) $(PCT) src/pct/actions.pm
   --target=pir src/pct/actions.pm
 
 pipp.pbc: \
-  src/pipp.pir \
+  pipp.pir \
   src/pct/gen_grammar.pir \
   src/pct/gen_actions.pir \
   src/pct/quote_expression.pir
-	$(PARROT) -o pipp.pbc src/pipp.pir
+	$(PARROT) -o pipp.pbc pipp.pir
 
 Test.pir: Test.php pipp.pbc
 	$(PARROT) pipp.pbc --target=pir --output=Test.pir Test.php
@@ -333,7 +331,7 @@ clean-test:
   pipp_antlr_past.nqp  pipp_antlr_past.pir
 
 clean-hash:
-	$(RM_F) "$(HASHDIR)/pipp_hash$(O)"
+	$(RM_F) "$(HASH_OBJS)"
 
 realclean: clean
 	$(RM_F) Makefile

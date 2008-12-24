@@ -17,7 +17,7 @@ src/pmc/phparray.pmc - PHP Array
 */
 
 #include "php_private.h"
-#include "src/pipp_hash.h"
+#include "src/pmc/pipp_hash.h"
 
 pmclass PhpArray
     dynpmc
