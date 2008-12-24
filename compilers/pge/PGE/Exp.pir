@@ -176,7 +176,7 @@ tree as a PIR code object that can be compiled.
           .local string target :unique_reg
           .local pmc mfrom, mpos :unique_reg
           .local int cpos, iscont :unique_reg
-          $P0 = get_hll_global ['PGE'], 'Match'
+          $P0 = get_hll_global ['PGE'], '$!MATCH'
           (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(mob, adverbs :flat :named)
           $P0 = interpinfo %3
           setattribute mob, '&!corou', $P0
@@ -196,7 +196,7 @@ tree as a PIR code object that can be compiled.
           .local string target    :unique_reg
           .local pmc mfrom, mpos  :unique_reg
           .local int cpos, iscont :unique_reg
-          $P0 = get_hll_global ['PGE'], 'Match'
+          $P0 = get_hll_global ['PGE'], '$!MATCH'
           (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(self, adverbs :flat :named)
           .local int lastpos
           lastpos = length target
