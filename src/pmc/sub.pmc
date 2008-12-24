@@ -738,11 +738,11 @@ The number of optional named arguments
                         sig_item = SIG_ITEM(sig, i);
                         if (PARROT_ARG_OPTIONAL_ISSET(sig_item))
                             sub->arg_info->named_optional++;
-                        else 
+                        else
                             sub->arg_info->named_required++;
                     }
                     else if (!PARROT_ARG_OPT_FLAG_ISSET(sig_item)) {
-                        if (PARROT_ARG_OPTIONAL_ISSET(sig_item)) 
+                        if (PARROT_ARG_OPTIONAL_ISSET(sig_item))
                             sub->arg_info->pos_optional++;
                         else
                             sub->arg_info->pos_required++;

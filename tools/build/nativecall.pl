@@ -39,8 +39,8 @@ print_head( \@ARGV );
 
 
 my %sig_table = (
-    p => { 
-        as_proto => "void *", 
+    p => {
+        as_proto => "void *",
         other_decl => "PMC * const final_destination = pmc_new(interp, enum_class_UnManagedStruct);",
         sig_char => "P",
         ret_assign => "PMC_data(final_destination) = return_data;    set_nci_P(interp, &st, final_destination);",
@@ -51,13 +51,13 @@ my %sig_table = (
     s => { as_proto => "short",  sig_char => "I" },
     f => { as_proto => "float",  sig_char => "N" },
     d => { as_proto => "double", sig_char => "N" },
-    t => { as_proto => "char *", 
-           other_decl => "STRING *final_destination;", 
+    t => { as_proto => "char *",
+           other_decl => "STRING *final_destination;",
            ret_assign => "final_destination = string_from_cstring(interp, return_data, 0);\n    set_nci_S(interp, &st, final_destination);",
            sig_char => "S" },
-    v => { as_proto => "void", 
-           return_type => "void *", 
-           sig_char => "v", 
+    v => { as_proto => "void",
+           return_type => "void *",
+           sig_char => "v",
            ret_assign => "",
            func_call_assign => ""
          },
@@ -70,11 +70,11 @@ my %sig_table = (
     b => { as_proto => "void *", as_return => "", sig_char => "S" },
     B => { as_proto => "void **", as_return => "", sig_char => "S" },
     # These should be replaced by modifiers in the future
-    2 => { as_proto => "short *",  sig_char => "P", 
+    2 => { as_proto => "short *",  sig_char => "P",
            ret_assign => "set_nci_I(interp, &st, *return_data);" },
-    3 => { as_proto => "int *",  sig_char => "P", 
+    3 => { as_proto => "int *",  sig_char => "P",
            ret_assign => "set_nci_I(interp, &st, *return_data);" },
-    4 => { as_proto => "long *",  sig_char => "P", 
+    4 => { as_proto => "long *",  sig_char => "P",
            ret_assign => "set_nci_I(interp, &st, *return_data);" },
     L => { as_proto => "long *", as_return => "" },
     T => { as_proto => "char **", as_return => "" },
@@ -82,10 +82,10 @@ my %sig_table = (
     '@' => { as_proto => "PMC *", as_return => "", cname => "xAT_", sig_char => '@' },
 );
 
-for (values %sig_table) { 
-    if (not exists $_->{as_return}) { $_->{as_return} = $_->{as_proto} } 
-    if (not exists $_->{return_type}) { $_->{return_type} = $_->{as_proto} } 
-    if (not exists $_->{return_type_decl}) { $_->{return_type_decl} = $_->{return_type} } 
+for (values %sig_table) {
+    if (not exists $_->{as_return}) { $_->{as_return} = $_->{as_proto} }
+    if (not exists $_->{return_type}) { $_->{return_type} = $_->{as_proto} }
+    if (not exists $_->{return_type_decl}) { $_->{return_type_decl} = $_->{return_type} }
     if (not exists $_->{ret_assign} and exists $_->{sig_char}) {
         $_->{ret_assign} = "set_nci_".$_->{sig_char}."(interp, &st, return_data);";
     }
@@ -352,7 +352,7 @@ sub make_arg {
         push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_P($reg_num);";
         return "(void**)&PMC_data(t_$temp_num)";
     };
-    /[ilIscfdNS]/ && do { 
+    /[ilIscfdNS]/ && do {
         my $ret_type = $sig_table{$_}{return_type};
         push @{$temps_ref},          "$ret_type t_$temp_num;";
         push @{$extra_preamble_ref}, "t_$temp_num = ($ret_type)GET_NCI_$sig_table{$_}{sig_char}($reg_num);";

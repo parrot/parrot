@@ -1322,7 +1322,7 @@ Generate a standard loop with NEXT/LAST/REDO exception handling.
     ops.'push_pirop'('pop_eh')
     .return (ops)
 .end
-  
+
 
 =item while(PAST::Op node)
 
@@ -1345,7 +1345,7 @@ Return the POST representation of a C<while> or C<until> loop.
     nextpast = node[2]
 
     .local pmc exprpost, bodypost, nextpost
-    exprpost = self.'as_post'(exprpast, 'rtype'=>'r') 
+    exprpost = self.'as_post'(exprpast, 'rtype'=>'r')
 
     .local pmc arglist
     arglist = new 'ResizablePMCArray'
