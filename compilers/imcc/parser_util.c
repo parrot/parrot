@@ -1199,29 +1199,6 @@ try_rev_cmp(ARGIN(const char *name), ARGMOD(SymReg **r))
 
 /*
 
-=item C<int imcc_fprintf>
-
-TODO: Needs to be documented!!!
-
-=cut
-
-*/
-
-int
-imcc_fprintf(PARROT_INTERP, ARGMOD(FILE *fd), ARGIN(const char *fmt), ...)
-{
-    va_list ap;
-    int len;
-
-    va_start(ap, fmt);
-    len = imcc_vfprintf(interp, fd, fmt, ap);
-    va_end(ap);
-
-    return len;
-}
-
-/*
-
 =item C<int imcc_vfprintf>
 
 TODO: Needs to be documented!!!

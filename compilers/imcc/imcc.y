@@ -1755,9 +1755,11 @@ the_sub:
         {
             /* disallow bareword method names; SREG name constants are fine */
             char *name = $3->name;
-            if (!($3->type & VTREG) && (*name != '\'' || *name != '\"')) {
-                IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
-                    "Bareword method name '%s' not allowed in PIR", $3->name);
+            if (!($3->type & VTREG)) {
+                if (*name != '\'' || *name != '\"')
+                    IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+                        "Bareword method name '%s' not allowed in PIR",
+                        $3->name);
             }
 
             IMCC_INFO(interp)->cur_obj = $1;

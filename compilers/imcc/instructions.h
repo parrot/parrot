@@ -160,12 +160,11 @@ void imcc_init_tables(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 int ins_print(PARROT_INTERP,
-    ARGMOD(FILE *fd),
+    ARGIN(PMC *io),
     ARGIN(const Instruction *ins))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*fd);
+        __attribute__nonnull__(3);
 
 int ins_writes2(ARGIN(const Instruction *ins), int t)
         __attribute__nonnull__(1);

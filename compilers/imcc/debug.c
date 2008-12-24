@@ -24,6 +24,7 @@ handle info/error/warning messages from imcc
 */
 
 #include "imc.h"
+#include "parrot/io.h"
 
 /* HEADERIZER HFILE: compilers/imcc/debug.h */
 
@@ -211,18 +212,20 @@ void
 dump_instructions(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 {
     const Instruction *ins;
-    int pc;
+    int                pc;
 
-    fprintf(stderr,
+    Parrot_io_fprintf(interp, Parrot_io_STDERR(interp),
             "\nDumping the instructions status:"
             "\n-------------------------------\n");
-    fprintf(stderr,
+    Parrot_io_fprintf(interp, Parrot_io_STDERR(interp),
             "nins line blck deep flags\t    type opnr size   pc  X ins\n");
+
     for (pc = 0, ins = unit->instructions; ins; ins = ins->next) {
         const Basic_block * const bb = unit->bb_list[ins->bbindex];
 
         if (bb) {
-             fprintf(stderr, "%4i %4d %4d %4d\t%x\t%8x %4d %4d %4d  %c ",
+            Parrot_io_fprintf(interp, Parrot_io_STDERR(interp),
+                    "%4i %4d %4d %4d\t%x\t%8x %4d %4d %4d  %c ",
                      ins->index, ins->line, bb->index, bb->loop_depth,
                      ins->flags, (ins->type & ~ITEXT), ins->opnum,
                      ins->opsize, pc, ins->type & ITEXT ? 'X' : ' ');
@@ -231,10 +234,12 @@ dump_instructions(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
              fprintf(stderr, "\t");
         }
 
-        imcc_fprintf(interp, stderr, "%I\n", ins);
+        Parrot_io_fprintf(interp, Parrot_io_STDERR(interp), "%s\n", ins->opname);
+        ins_print(interp, Parrot_io_STDERR(interp), ins);
         pc += ins->opsize;
     }
-    fprintf(stderr, "\n");
+
+    Parrot_io_fprintf(interp, Parrot_io_STDERR(interp), "\n");
 }
 
 /*

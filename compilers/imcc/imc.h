@@ -249,15 +249,6 @@ PMC * IMCC_compile_pir_s(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*error_message);
 
-int imcc_fprintf(PARROT_INTERP,
-    ARGMOD(FILE *fd),
-    ARGIN(const char *fmt),
-    ...)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*fd);
-
 int imcc_vfprintf(PARROT_INTERP,
     ARGMOD(FILE *fd),
     ARGIN(const char *format),

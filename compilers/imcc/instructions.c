@@ -639,7 +639,7 @@ Print details of instruction ins in file fd.
 
 #define REGB_SIZE 256
 int
-ins_print(PARROT_INTERP, ARGMOD(FILE *fd), ARGIN(const Instruction *ins))
+ins_print(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const Instruction *ins))
 {
     char regb[IMCC_MAX_FIX_REGS][REGB_SIZE];
     /* only long key constants can overflow */
@@ -653,7 +653,7 @@ ins_print(PARROT_INTERP, ARGMOD(FILE *fd), ARGIN(const Instruction *ins))
 
     /* comments, labels and such */
     if (!ins->symregs[0] || !strchr(ins->format, '%'))
-        return fprintf(fd, "%s", ins->format);
+        return Parrot_io_fprintf(interp, io, "%s", ins->format);
 
     for (i = 0; i < ins->symreg_count; i++) {
         const SymReg *p = ins->symregs[i];
@@ -719,29 +719,30 @@ ins_print(PARROT_INTERP, ARGMOD(FILE *fd), ARGIN(const Instruction *ins))
     switch (ins->opsize-1) {
         case -1:        /* labels */
         case 1:
-            len = fprintf(fd, ins->format, regstr[0]);
+            len = Parrot_io_fprintf(interp, io, ins->format, regstr[0]);
             break;
         case 2:
-            len = fprintf(fd, ins->format, regstr[0], regstr[1]);
+            len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1]);
             break;
         case 3:
-            len = fprintf(fd, ins->format, regstr[0], regstr[1], regstr[2]);
+            len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2]);
             break;
         case 4:
-            len = fprintf(fd, ins->format, regstr[0], regstr[1], regstr[2],
+            len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2],
                     regstr[3]);
             break;
         case 5:
-            len = fprintf(fd, ins->format, regstr[0], regstr[1], regstr[2],
+            len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2],
                     regstr[3], regstr[4]);
             break;
         case 6:
-            len = fprintf(fd, ins->format, regstr[0], regstr[1], regstr[2],
+            len = Parrot_io_fprintf(interp, io, ins->format, regstr[0], regstr[1], regstr[2],
                     regstr[3], regstr[4], regstr[5]);
             break;
         default:
-            fprintf(stderr, "unhandled: opsize (%d), op %s, fmt %s\n",
-                    ins->opsize, ins->opname, ins->format);
+            Parrot_io_fprintf(interp, Parrot_io_STDERR(interp),
+                "unhandled: opsize (%d), op %s, fmt %s\n",
+                ins->opsize, ins->opname, ins->format);
             exit(EXIT_FAILURE);
             break;
     }
@@ -763,15 +764,15 @@ Prints a me
 */
 
 static int
-e_file_open(SHIM_INTERP, ARGIN(void *param))
+e_file_open(PARROT_INTERP, ARGIN(void *param))
 {
     char * const file = (char *) param;
 
     if (!STREQ(file, "-"))
         freopen(file, "w", stdout);
     output = file;
-    printf("# IMCC does produce b0rken PASM files\n");
-    printf("# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392\n");
+    Parrot_io_printf(interp, "# IMCC does produce b0rken PASM files\n");
+    Parrot_io_printf(interp, "# see http://guest@rt.perl.org/rt3/Ticket/Display.html?id=32392\n");
     return 1;
 }
 
@@ -814,11 +815,13 @@ e_file_emit(PARROT_INTERP,
     Parrot_io_eprintf(NULL, "e_file_emit\n");
 #endif
     if ((ins->type & ITLABEL) || ! *ins->opname)
-        ins_print(interp, stdout, ins);
+        ins_print(interp, Parrot_io_STDOUT(interp), ins);
     else {
-        imcc_fprintf(interp, stdout, "\t%I ", ins);
+        Parrot_io_fprintf(interp, Parrot_io_STDOUT(interp), "\t%s ", ins->opname);
+        ins_print(interp, Parrot_io_STDOUT(interp), ins);
     }
-    printf("\n");
+
+    Parrot_io_printf(interp, "\n");
     return 0;
 }
 
