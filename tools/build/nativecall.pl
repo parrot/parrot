@@ -37,160 +37,63 @@ open my $NCI, '>', 'src/nci.c' or die "Can't create nci.c: $!";
 
 print_head( \@ARGV );
 
-my %ret_type = (
-    p => "void *",
-    i => "int",
-    3 => "int *",
-    l => "long",
-    4 => "long *",
-    c => "char",
-    s => "short",
-    2 => "short *",
-    f => "float",
-    d => "double",
-    t => "char *",
-    v => "void",
 
-    #      b => "void *",
-    #      B => "void **",
-    P => "PMC *",
-    S => "STRING *",
-    I => "INTVAL",
-    N => "FLOATVAL",
+my %sig_table = (
+    p => { 
+        as_proto => "void *", 
+        other_decl => "PMC * const final_destination = pmc_new(interp, enum_class_UnManagedStruct);",
+        sig_char => "P",
+        ret_assign => "PMC_data(final_destination) = return_data;    set_nci_P(interp, &st, final_destination);",
+    },
+    i => { as_proto => "int",    sig_char => "I" },
+    l => { as_proto => "long",   sig_char => "I" },
+    c => { as_proto => "char",   sig_char => "I" },
+    s => { as_proto => "short",  sig_char => "I" },
+    f => { as_proto => "float",  sig_char => "N" },
+    d => { as_proto => "double", sig_char => "N" },
+    t => { as_proto => "char *", 
+           other_decl => "STRING *final_destination;", 
+           ret_assign => "final_destination = string_from_cstring(interp, return_data, 0);\n    set_nci_S(interp, &st, final_destination);",
+           sig_char => "S" },
+    v => { as_proto => "void", 
+           return_type => "void *", 
+           sig_char => "v", 
+           ret_assign => "",
+           func_call_assign => ""
+         },
+    P => { as_proto => "PMC *", sig_char => "P" },
+    O => { as_proto => "PMC *", returns => "", sig_char => "P" },
+    J => { as_proto => "PARROT_INTERP", returns => "", sig_char => "" },
+    S => { as_proto => "STRING *", sig_char => "S" },
+    I => { as_proto => "INTVAL", sig_char => "I" },
+    N => { as_proto => "FLOATVAL", sig_char => "N" },
+    b => { as_proto => "void *", as_return => "", sig_char => "S" },
+    B => { as_proto => "void **", as_return => "", sig_char => "S" },
+    # These should be replaced by modifiers in the future
+    2 => { as_proto => "short *",  sig_char => "P", 
+           ret_assign => "set_nci_I(interp, &st, *return_data);" },
+    3 => { as_proto => "int *",  sig_char => "P", 
+           ret_assign => "set_nci_I(interp, &st, *return_data);" },
+    4 => { as_proto => "long *",  sig_char => "P", 
+           ret_assign => "set_nci_I(interp, &st, *return_data);" },
+    L => { as_proto => "long *", as_return => "" },
+    T => { as_proto => "char **", as_return => "" },
+    V => { as_proto => "void **", as_return => "", sig_char => "P" },
+    '@' => { as_proto => "PMC *", as_return => "", cname => "xAT_", sig_char => '@' },
 );
 
-my %proto_type = (
-    p   => "void *",
-    i   => "int",
-    3   => "int *",
-    l   => "long",
-    4   => "long *",
-    c   => "char",
-    s   => "short",
-    2   => "short *",
-    f   => "float",
-    d   => "double",
-    t   => "char *",
-    v   => "void",
-    J   => "PARROT_INTERP",
-    P   => "PMC *",
-    O   => "PMC *",           # object
-    S   => "STRING *",
-    I   => "INTVAL",
-    N   => "FLOATVAL",
-    b   => "void *",
-    B   => "void **",
-    L   => "long *",
-    T   => "char **",
-    V   => "void **",
-    '@' => "PMC *",           # slurpy array
-);
+for (values %sig_table) { 
+    if (not exists $_->{as_return}) { $_->{as_return} = $_->{as_proto} } 
+    if (not exists $_->{return_type}) { $_->{return_type} = $_->{as_proto} } 
+    if (not exists $_->{return_type_decl}) { $_->{return_type_decl} = $_->{return_type} } 
+    if (not exists $_->{ret_assign} and exists $_->{sig_char}) {
+        $_->{ret_assign} = "set_nci_".$_->{sig_char}."(interp, &st, return_data);";
+    }
+    if (not exists $_->{func_call_assign}) {
+        $_->{func_call_assign} = "return_data = "
+    }
+}
 
-# to fix up signatures that don't translate directly
-# to C function names
-my %fix_name = ( '@' => 'xAT_' );
-
-my %other_decl = (
-    p => "PMC * const final_destination = pmc_new(interp, enum_class_UnManagedStruct);",
-    t => "STRING *final_destination;"
-
-        #     b => "Buffer *final_destination =
-        #     new_buffer_header(interp);\nPObj_external_SET(final_destination)",
-        #     B => "Buffer *final_destination =
-        #     new_buffer_header(interp);\nPObj_external_SET(final_destination)",
-);
-
-my %ret_type_decl = (
-    p => "void *",
-    i => "int",
-    3 => "int *",
-    l => "long",
-    4 => "long *",
-    c => "char",
-    s => "short",
-    2 => "short *",
-    f => "float",
-    d => "double",
-    t => "char *",
-    v => "void *",
-
-    #      b => "void *",
-    #      B => "void **",
-    P => "PMC *",
-    S => "STRING *",
-    I => "INTVAL",
-    N => "FLOATVAL",
-);
-
-my %ret_assign = (
-    p => "PMC_data(final_destination) = return_data;    set_nci_P(interp, &st, final_destination);",
-    i => "set_nci_I(interp, &st, return_data);",
-    I => "set_nci_I(interp, &st, return_data);",
-    l => "set_nci_I(interp, &st, return_data);",
-    s => "set_nci_I(interp, &st, return_data);",
-    c => "set_nci_I(interp, &st, return_data);",
-    4 => "set_nci_I(interp, &st, *return_data);",
-    3 => "set_nci_I(interp, &st, *return_data);",
-    2 => "set_nci_I(interp, &st, *return_data);",
-    f => "set_nci_N(interp, &st, return_data);",
-    d => "set_nci_N(interp, &st, return_data);",
-    N => "set_nci_N(interp, &st, return_data);",
-    P => "set_nci_P(interp, &st, return_data);",
-    S => "set_nci_S(interp, &st, return_data);",
-    v => "",
-    t =>
-"final_destination = string_from_cstring(interp, return_data, 0);\n    set_nci_S(interp, &st, final_destination);",
-
-#      b => "PObj_bufstart(final_destination) = return_data;\n    set_nci_S(interp, &st, final_destination);",
-#      B => "PObj_bufstart(final_destination) = *return_data;\n    set_nci_S(interp, &st, final_destination);",
-);
-
-my %func_call_assign = (
-    p => "return_data = ",
-    i => "return_data = ",
-    3 => "return_data = ",
-    2 => "return_data = ",
-    4 => "return_data = ",
-    l => "return_data = ",
-    c => "return_data = ",
-    s => "return_data = ",
-    f => "return_data = ",
-    d => "return_data = ",
-    b => "return_data = ",
-    t => "return_data = ",
-    P => "return_data = ",
-    S => "return_data = ",
-    I => "return_data = ",
-    N => "return_data = ",
-
-    #      B => "return_data = ",
-    v => "",
-);
-
-my %sig_char = (
-    p   => "P",
-    i   => "I",
-    3   => "P",
-    2   => "P",
-    4   => "P",
-    l   => "I",
-    c   => "I",
-    s   => "I",
-    f   => "N",
-    d   => "N",
-    b   => "S",
-    t   => "S",
-    P   => "P",
-    O   => "P",
-    S   => "S",
-    I   => "I",
-    N   => "N",
-    B   => "S",
-    v   => "v",
-    V   => "P",
-    J   => "",
-    '@' => '@',
-);
 
 my $temp_cnt = 0;
 my @put_pointer;
@@ -208,7 +111,7 @@ while (<>) {
     $args = '' if not defined $args;
 
     die "Invalid return signature char '$ret' on line $. of $ARGV\n"
-        unless exists $ret_assign{$ret};
+        unless exists $sig_table{$ret}{ret_assign};
 
     if ( ( $seen{"$ret$args"} ||= $. ) != $. ) {
         warn sprintf "Ignored signature '%s' on line %d (previously seen on line %d) of $ARGV",
@@ -227,23 +130,25 @@ while (<>) {
     if ( defined $args and not $args =~ m/^\s*$/ ) {
         foreach ( split m//, $args ) {
             die "Invalid argument signature char '$_' on line $. of $ARGV"
-                unless exists $sig_char{$_};
+                unless exists $sig_table{$_}{sig_char};
             push @arg,
                 make_arg( $_, $reg_num++, \$temp_cnt, \@temps, \@extra_preamble,
                 \@extra_postamble );
-            $sig .= $sig_char{$_};
+            $sig .= $sig_table{$_}{sig_char};
             $_ eq 'J' && $reg_num--;
         }
     }
 
+    my $ret_sig = $sig_table{$ret};
+
     print_function(
         $sig, $ret,
         $args, [@arg],
-        $ret_type{$ret},         $ret_type_decl{$ret},
-        $func_call_assign{$ret}, $other_decl{$ret},
-        $ret_assign{$ret},       \@temps,
+        $ret_sig->{as_return}, $ret_sig->{return_type_decl},
+        $ret_sig->{func_call_assign}, $ret_sig->{other_decl},
+        $ret_sig->{ret_assign}, \@temps,
         \@extra_preamble, \@extra_postamble,
-        \@put_pointer,    \%proto_type
+        \@put_pointer
     );
 }
 
@@ -447,60 +352,17 @@ sub make_arg {
         push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_P($reg_num);";
         return "(void**)&PMC_data(t_$temp_num)";
     };
-    /i/ && do {
-        push @{$temps_ref},          "int t_$temp_num;";
-        push @{$extra_preamble_ref}, "t_$temp_num = (int)GET_NCI_I($reg_num);";
+    /[ilIscfdNS]/ && do { 
+        my $ret_type = $sig_table{$_}{return_type};
+        push @{$temps_ref},          "$ret_type t_$temp_num;";
+        push @{$extra_preamble_ref}, "t_$temp_num = ($ret_type)GET_NCI_$sig_table{$_}{sig_char}($reg_num);";
         return "t_$temp_num";
     };
-    /3/ && do {
+    /[234]/ && do {
+        my $ret_type = $sig_table{$_}{return_type};
         push @{$temps_ref},          "PMC *t_$temp_num;";
         push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_P($reg_num);";
-        return "(int*)&PMC_int_val(t_$temp_num)";
-    };
-    /l/ && do {
-        push @{$temps_ref},          "long t_$temp_num;";
-        push @{$extra_preamble_ref}, "t_$temp_num = (long)GET_NCI_I($reg_num);";
-        return "t_$temp_num";
-    };
-    /I/ && do {
-        push @{$temps_ref},          "INTVAL t_$temp_num;";
-        push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_I($reg_num);";
-        return "t_$temp_num";
-    };
-    /4/ && do {
-        push @{$temps_ref},          "PMC *t_$temp_num;";
-        push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_P($reg_num);";
-        return "(long*)&PMC_int_val(t_$temp_num)";
-    };
-    /s/ && do {
-        push @{$temps_ref},          "short t_$temp_num;";
-        push @{$extra_preamble_ref}, "t_$temp_num = (short)GET_NCI_I($reg_num);";
-        return "t_$temp_num";
-    };
-    /c/ && do {
-        push @{$temps_ref},          "char t_$temp_num;";
-        push @{$extra_preamble_ref}, "t_$temp_num = (char)GET_NCI_I($reg_num);";
-        return "t_$temp_num";
-    };
-    /2/ && do {
-        push @{$temps_ref},          "PMC* t_$temp_num;";
-        push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_P($reg_num);";
-        return "(short*)&PMC_int_val(t_$temp_num)";
-    };
-    /f/ && do {
-        push @{$temps_ref},          "float t_$temp_num;";
-        push @{$extra_preamble_ref}, "t_$temp_num = (float)GET_NCI_N($reg_num);";
-        return "t_$temp_num";
-    };
-    /d/ && do {
-        push @{$temps_ref},          "double t_$temp_num;";
-        push @{$extra_preamble_ref}, "t_$temp_num = (double)GET_NCI_N($reg_num);";
-        return "t_$temp_num";
-    };
-    /N/ && do {
-        push @{$temps_ref},          "FLOATVAL t_$temp_num;";
-        push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_N($reg_num);";
-        return "t_$temp_num";
+        return "($ret_type)&PMC_int_val(t_$temp_num)";
     };
     /t/ && do {
         push @{$temps_ref}, "char *t_$temp_num;";
@@ -529,11 +391,6 @@ sub make_arg {
         push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_P($reg_num);";
         return "PMC_IS_NULL(t_$temp_num) ? NULL : t_$temp_num";
     };
-    /S/ && do {
-        push @{$temps_ref},          "STRING *t_$temp_num;";
-        push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_S($reg_num);";
-        return "t_$temp_num";
-    };
     return;
 }
 
@@ -542,7 +399,7 @@ sub print_function {
         $sig,          $return,        $params,             $args,
         $ret_type,     $ret_type_decl, $return_assign,      $other_decl,
         $final_assign, $temps_ref,     $extra_preamble_ref, $extra_postamble_ref,
-        $put_pointer_ref, $proto_type_ref
+        $put_pointer_ref,
     ) = @_;
 
     $other_decl ||= "";
@@ -555,10 +412,10 @@ sub print_function {
         "$return_assign $final_assign" =~ /return_data/
         ? qq{$ret_type_decl return_data;}
         : q{};
-    my $fix_params = join '', map { $fix_name{$_} || $_ } split m//, $params;
+    my $fix_params = join '', map { $sig_table{$_}{cname} || $_ } split m//, $params;
 
     if ( length $params ) {
-        my $proto = join ', ', map { $proto_type_ref->{$_} } split( m//, $params );
+        my $proto = join ', ', map { $sig_table{$_}{as_proto} } split( m//, $params );
 
         # This is an after-the-fact hack: real fix would be in make_arg
         # or somewhere at that level.  The main point being that one cannot
