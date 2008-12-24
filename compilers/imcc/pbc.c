@@ -687,6 +687,7 @@ find_sub_by_subid(PARROT_INTERP, ARGIN(const char *lookup),
     ARGIN(const subs_t *sym), ARGOUT(int *pc))
 {
     subs_t *s;
+    UNUSED(sym);
 
     *pc = 0;
 

@@ -83,6 +83,8 @@ e.g. eliminate new Px .PerlUndef because Px where different before
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+#if DO_LOOP_OPTIMIZATION
+
 PARROT_WARN_UNUSED_RESULT
 static int _is_ins_save(
     ARGIN(const IMC_Unit *unit),
@@ -92,6 +94,8 @@ static int _is_ins_save(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
+
+#endif
 
 static int branch_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -149,6 +153,8 @@ static int if_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
+#if DO_LOOP_OPTIMIZATION
+
 PARROT_WARN_UNUSED_RESULT
 static int is_ins_save(PARROT_INTERP,
     ARGIN(const IMC_Unit *unit),
@@ -159,6 +165,7 @@ static int is_ins_save(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
+#endif
 
 static int strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -1512,9 +1519,13 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
     /* Unreachable instructions */
 
-    for (last = unit->instructions, last && (ins = last->next);
+
+    for (last = unit->instructions, ins = last->next;
          last && ins;
          ins = ins->next) {
+         if (!last && !ins)
+            break;
+
         if ((last->type & IF_goto) && !(ins->type & ITLABEL) &&
             STREQ(last->opname, "branch")) {
             IMCC_debug(interp, DEBUG_OPT1,
@@ -1523,6 +1534,7 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
             unit->ostat.deleted_ins++;
             changed++;
         }
+
         /*
          *   branch L1     => --
          * L1: ...            L1:
