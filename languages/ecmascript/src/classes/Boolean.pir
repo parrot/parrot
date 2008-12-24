@@ -1,4 +1,4 @@
-## $Id: Bool.pir 32793 2008-11-18 03:21:53Z particle $
+## $Id$
 
 =head1 TITLE
 

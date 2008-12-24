@@ -1,4 +1,4 @@
-## $Id: Completion.pir 33898 2008-12-14 19:56:12Z pmichaud $
+## $Id$
 
 =head1 NAME
 

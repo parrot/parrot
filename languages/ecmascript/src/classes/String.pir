@@ -1,4 +1,4 @@
-## $Id: Str.pir 33714 2008-12-09 16:57:49Z pmichaud $
+## $Id$
 
 =head1 TITLE
 
