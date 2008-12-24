@@ -1384,8 +1384,6 @@ string_chopn_inplace(PARROT_INTERP, ARGMOD(STRING *s), INTVAL n)
         return;
     }
 
-    Parrot_unmake_COW(interp, s);
-
     uchar_size = s->bufused / s->strlen;
     s->strlen  = new_length;
 
