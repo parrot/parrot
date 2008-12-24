@@ -1242,9 +1242,91 @@ a 'pasttype' of if/unless.
 .end
 
 
+=item loop_gen(...)
+
+Generate a standard loop with NEXT/LAST/REDO exception handling.
+
+=cut
+
+.sub 'loop_gen' :method
+    .param pmc options         :slurpy :named
+
+    .local pmc testlabel, prelabel, redolabel, nextlabel, donelabel, handlabel
+    $P0 = get_hll_global ['POST'], 'Label'
+    .local string loopname
+    loopname = self.'unique'('loop')
+    $S0 = concat loopname, '_test'
+    testlabel = $P0.'new'('result'=>$S0)
+    $S0 = concat loopname, '_redo'
+    redolabel = $P0.'new'('result'=>$S0)
+    $S0 = concat loopname, '_next'
+    nextlabel = $P0.'new'('result'=>$S0)
+    $S0 = concat loopname, '_done'
+    donelabel = $P0.'new'('result'=>$S0)
+    $S0 = concat loopname, '_handler'
+    handlabel = $P0.'new'('result'=>$S0)
+
+    .local pmc testpost, prepost, bodypost
+    .local string testop
+    .local int bodyfirst
+    testop = options['testop']
+    testpost = options['test']
+    prepost  = options['pre']
+    bodypost = options['body']
+    bodyfirst = options['bodyfirst']
+
+    if testop goto have_testop
+    testop = 'unless'
+  have_testop:
+
+    .local pmc ops
+    $P0 = get_hll_global ['POST'], 'Ops'
+    ops = $P0.'new'()
+
+    .local string handreg
+    handreg = self.'uniquereg'('P')
+    ops.'push_pirop'('new', handreg, "'ExceptionHandler'")
+    ops.'push_pirop'('set_addr', handreg, handlabel)
+    ops.'push_pirop'('callmethod', '"handle_types"', handreg, .CONTROL_LOOP_NEXT, .CONTROL_LOOP_REDO, .CONTROL_LOOP_LAST)
+    ops.'push_pirop'('push_eh', handreg)
+
+    unless bodyfirst goto bodyfirst_done
+    ops.'push_pirop'('goto', redolabel)
+  bodyfirst_done:
+    ops.'push'(testlabel)
+    if null testpost goto test_done
+    ops.'push'(testpost)
+    ops.'push_pirop'(testop, testpost, donelabel)
+  test_done:
+    if null prepost goto pre_done
+    ops.'push'(prepost)
+  pre_done:
+    ops.'push'(redolabel)
+    if null bodypost goto body_done
+    ops.'push'(bodypost)
+  body_done:
+    ops.'push'(nextlabel)
+    ops.'push_pirop'('goto', testlabel)
+    ops.'push'(handlabel)
+    ops.'push_pirop'('.local pmc exception')
+    ops.'push_pirop'('.get_results (exception)')
+    $S0 = self.'uniquereg'('P')
+    ops.'push_pirop'('getattribute', $S0, 'exception', "'type'")
+    ops.'push_pirop'('eq', $S0, .CONTROL_LOOP_NEXT, nextlabel)
+    ops.'push_pirop'('eq', $S0, .CONTROL_LOOP_REDO, redolabel)
+    ops.'push'(donelabel)
+    ops.'push_pirop'('pop_eh')
+    .return (ops)
+.end
+  
+
 =item while(PAST::Op node)
 
 =item until(PAST::Op node)
+
+=item repeat_while(PAST::Op node)
+
+=item repeat_until(PAST::Op node)
 
 Return the POST representation of a C<while> or C<until> loop.
 
@@ -1253,126 +1335,49 @@ Return the POST representation of a C<while> or C<until> loop.
 .sub 'while' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
-
-    .local string pasttype
-    pasttype = node.'pasttype'()
-
-    .local pmc ops
-    $P0 = get_hll_global ['POST'], 'Ops'
-    ops = $P0.'new'('node'=>node)
-
-    .local pmc exprpast, exprpost
-    .local pmc bodypast, bodypost
+    .local pmc exprpast, bodypast
     exprpast = node[0]
     bodypast = node[1]
 
-    .local pmc looplabel, endlabel
-    $P0 = get_hll_global ['POST'], 'Label'
-    $S0 = concat pasttype, '_'
-    $S0 = self.'unique'($S0)
-    looplabel = $P0.'new'('result'=>$S0)
-    $S0 = concat $S0, '_end'
-    endlabel = $P0.'new'('result'=>$S0)
-
-    ##  determine if we need an 'if' or an 'unless'
-    ##  on the conditional (while => if, until => unless)
-    .local string iftype
-    iftype = 'if'
-    if pasttype == 'until' goto have_iftype
-    iftype = 'unless'
-  have_iftype:
-
-    .local string rtype, exprrtype
-    rtype = options['rtype']
-    exprrtype = 'r'
-    if rtype != 'v' goto have_exprrtype
-    exprrtype = '*'
-  have_exprrtype:
-
-    exprpost = self.'as_post'(exprpast, 'rtype'=>exprrtype)
+    .local pmc exprpost, bodypost   
+    exprpost = self.'as_post'(exprpast, 'rtype'=>'r') 
 
     .local pmc arglist
     arglist = new 'ResizablePMCArray'
     $I0 = bodypast.'arity'()
-    unless $I0 goto have_arglist
+    if $I0 < 1 goto have_arglist
     push arglist, exprpost
   have_arglist:
-
-    ops.'push'(looplabel)
-    ops.'push'(exprpost)
-    ops.'push_pirop'(iftype, exprpost, endlabel)
     bodypost = self.'as_post'(bodypast, 'rtype'=>'v', 'arglist'=>arglist)
-    ops.'push'(bodypost)
-    ops.'push_pirop'('goto', looplabel)
-    ops.'push'(endlabel)
+
+    .local string testop
+    testop = options['testop']
+    .local int bodyfirst
+    bodyfirst = options['bodyfirst']
+
+    .local pmc ops
+    ops = self.'loop_gen'('testop'=>testop, 'test'=>exprpost, 'body'=>bodypost, 'bodyfirst'=>bodyfirst)
     ops.'result'(exprpost)
+    ops.'node'(node)
     .return (ops)
 .end
 
 .sub 'until' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
-    .tailcall self.'while'(node, options :flat :named)
+    .tailcall self.'while'(node, options :flat :named, 'testop'=>'if')
 .end
-
-=item repeat_while(PAST::Op node)
-
-=item repeat_until(PAST::Op node)
-
-Return the POST representation of a C<repeat_while> or C<repeat_until> loop.
-
-=cut
 
 .sub 'repeat_while' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
-
-    .local string pasttype
-    pasttype = node.'pasttype'()
-
-    .local pmc ops
-    $P0 = get_hll_global ['POST'], 'Ops'
-    ops = $P0.'new'('node'=>node)
-
-    .local pmc exprpast, exprpost
-    .local pmc bodypast, bodypost
-    exprpast = node[0]
-    bodypast = node[1]
-
-    .local pmc looplabel
-    $P0 = get_hll_global ['POST'], 'Label'
-    $S0 = concat pasttype, '_'
-    looplabel = $P0.'new'('name'=>$S0)
-
-    ##  determine if we need an 'if' or an 'unless'
-    ##  on the conditional (repeat_while => if, repeat_until => unless)
-    .local string iftype
-    iftype = 'if'
-    if pasttype != 'repeat_until' goto have_iftype
-    iftype = 'unless'
-  have_iftype:
-
-    .local string rtype, exprrtype
-    rtype = options['rtype']
-    exprrtype = 'r'
-    if rtype != 'v' goto have_exprrtype
-    exprrtype = '*'
-  have_exprrtype:
-
-    ops.'push'(looplabel)
-    bodypost = self.'as_post'(bodypast, 'rtype'=>'v')
-    ops.'push'(bodypost)
-    exprpost = self.'as_post'(exprpast, 'rtype'=>exprrtype)
-    ops.'push'(exprpost)
-    ops.'push_pirop'(iftype, exprpost, looplabel)
-    ops.'result'(exprpost)
-    .return (ops)
+    .tailcall self.'while'(node, options :flat :named, 'bodyfirst'=>1)
 .end
 
 .sub 'repeat_until' :method :multi(_, ['PAST';'Op'])
     .param pmc node
     .param pmc options         :slurpy :named
-    .tailcall self.'repeat_while'(node, options :flat :named)
+    .tailcall self.'while'(node, options :flat :named, 'testop'=>'if', 'bodyfirst'=>1)
 .end
 
 
@@ -1387,45 +1392,33 @@ by C<node>.
     .param pmc node
     .param pmc options         :slurpy :named
 
-    .local pmc ops
+    .local pmc ops, prepost, testpost
     $P0 = get_hll_global ['POST'], 'Ops'
-    ops = $P0.'new'('node'=>node)
+    ops      = $P0.'new'('node'=>node)
+    prepost  = $P0.'new'()
+    $S0      = self.'uniquereg'('P')
+    testpost = $P0.'new'('result'=>$S0)
 
-    .local pmc looplabel, nextlabel, endlabel, undeflabel
-    $P0 = get_hll_global ['POST'], 'Label'
-    $S0 = self.'unique'('for_')
-    looplabel = $P0.'new'('result'=>$S0)
-    $S1 = concat $S0, '_next'
-    nextlabel = $P0.'new'('result'=>$S1)
-    $S2 = concat $S0, '_end'
-    endlabel = $P0.'new'('result'=>$S2)
-    $S3 = concat $S0, '_undef_iter'
-    undeflabel = $P0.'new'('result'=>$S3)
-
-    .local pmc collpast, collpost
+    .local pmc collpast, bodypast
     collpast = node[0]
+    bodypast = node[1]
+
+    .local pmc collpost, testpost
     collpost = self.'as_post'(collpast, 'rtype'=>'P')
     ops.'push'(collpost)
 
-    .local string iter, next_handler
-    iter = self.'uniquereg'('P')
-    ops.'result'(iter)
+    ##  don't try to iterate undefined values
+    .local pmc undeflabel
+    $P0 = get_hll_global ['POST'], 'Label'
+    undeflabel = $P0.'new'('name'=>'for_undef_')
     $S0 = self.'uniquereg'('I')
     ops.'push_pirop'('defined', $S0, collpost)
     ops.'push_pirop'('unless', $S0, undeflabel)
-    next_handler = self.'uniquereg'('P')
-    ops.'push_pirop'('new', next_handler, "'ExceptionHandler'")
-    ops.'push_pirop'('set_addr', next_handler, nextlabel)
-    ops.'push_pirop'('callmethod', '"handle_types"', next_handler, .CONTROL_LOOP_NEXT)
-    ops.'push_pirop'('push_eh', next_handler)
-    ops.'push_pirop'('iter', iter, collpost)
-    ops.'push'(looplabel)
-    ops.'push_pirop'('unless', iter, endlabel)
 
-    .local pmc subpast
-    subpast = node[1]
+    ops.'push_pirop'('iter', testpost, collpost)
 
-    ##  determine the number of elements to take at each iteration
+    ##  determine the arity of the loop.  We check arity of the 'for'
+    ##  node itself, and if not set we use the arity of the body.
     .local int arity
     arity = 1
     $P0 = node.'arity'()
@@ -1434,37 +1427,34 @@ by C<node>.
     arity = $P0
     goto have_arity
   arity_child:
-    $P0 = subpast.'arity'()
+    $P0 = bodypast.'arity'()
     $I0 = defined $P0
     unless $I0 goto have_arity
     arity = $P0
   have_arity:
 
+    ##  build the argument list to pass to the body
     .local pmc arglist
     arglist = new 'ResizablePMCArray'
   arity_loop:
-    .local string nextval
-    nextval = self.'uniquereg'('P')
-    ops.'push_pirop'('shift', nextval, iter)
+    .local string nextarg
+    nextarg = self.'uniquereg'('P')
+    prepost.'push_pirop'('shift', nextarg, testpost)
     if arity < 1 goto arity_end
-    push arglist, nextval
+    push arglist, nextarg
     dec arity
     if arity > 0 goto arity_loop
   arity_end:
 
-    .local pmc subpost
-    subpast.'blocktype'('immediate')                       # FIXME
-    subpost = self.'as_post'(subpast, 'rtype'=>'P', 'arglist'=>arglist)
-    ops.'push'(subpost)
-    ops.'push_pirop'('goto', looplabel)
-    ops.'push'(nextlabel)
-    ops.'push_pirop'('.local pmc exception')
-    ops.'push_pirop'('.get_results (exception)')
-    ops.'push_pirop'('set', next_handler, 0)
-    ops.'push_pirop'('goto', looplabel)
-    ops.'push'(endlabel)
-    ops.'push_pirop'('pop_eh')
+    ##  now build the body itself
+    .local pmc bodypost
+    bodypost = self.'as_post'(bodypast, 'rtype'=>'v', 'arglist'=>arglist)
+
+    ##  generate the loop and return
+    $P0 = self.'loop_gen'('test'=>testpost, 'pre'=>prepost, 'body'=>bodypost)
+    ops.'push'($P0)
     ops.'push'(undeflabel)
+    ops.'result'(testpost)
     .return (ops)
 .end
 
