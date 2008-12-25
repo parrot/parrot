@@ -87,7 +87,7 @@ PIRCODE
   L4:
     .local pmc start
     $P0 = get_hll_global ['Lua'; 'POST'], 'Sub'
-    start = $P0.'new'('name'=>'&start', 'pirflags'=>':anon :main')
+    start = $P0.'new'('name'=>'&start', 'pirflags'=>':anon :main', 'hll'=>'lua')
     $S0 = post.'subid'()
     start.'push_pirop'('inline', $S0, 'inline'=><<'PIRCODE')
     .param pmc args :optional
@@ -111,7 +111,6 @@ PIRCODE
     $P0 = get_hll_global ['Lua'; 'POST'], 'Chunk'
     .tailcall $P0.'new'(start, 'node'=>node, 'prologue'=><<'PIRCODE')
 .include "interpinfo.pasm"
-.HLL "lua"
 .loadlib "lua_group"
 PIRCODE
 }
