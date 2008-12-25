@@ -114,7 +114,7 @@ invalid
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
-.HLL "WMLScript"
+.HLL "wmlscript"
 .loadlib "wmls_group"
 .sub _main
     .local pmc pmc1
@@ -134,7 +134,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check istrue' );
 .loadlib "wmls_ops"
-.HLL "WMLScript"
+.HLL "wmlscript"
 .loadlib "wmls_group"
 .sub _main
     .local pmc cst1
@@ -156,7 +156,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check typeof' );
 .loadlib "wmls_ops"
-.HLL "WMLScript"
+.HLL "wmlscript"
 .loadlib "wmls_group"
 .sub _main
     .local pmc cst1
@@ -178,7 +178,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check defined' );
 .loadlib "wmls_ops"
-.HLL "WMLScript"
+.HLL "wmlscript"
 .loadlib "wmls_group"
 .sub _main
     .local pmc cst1

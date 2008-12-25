@@ -21,7 +21,7 @@ use Parrot::Test tests => 2;
 use Test::More;
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'WMLScript.pbc' );
-.HLL 'WMLScript'
+.HLL 'wmlscript'
 .loadlib 'wmls_group'
 .loadlib 'wmls_ops'
 
@@ -58,7 +58,7 @@ Hello World!
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'alternate way' );
-.HLL 'WMLScript'
+.HLL 'wmlscript'
 .loadlib 'wmls_group'
 .loadlib 'wmls_ops'
 

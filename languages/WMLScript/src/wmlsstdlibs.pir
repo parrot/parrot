@@ -23,7 +23,7 @@ See "WMLScript Standard Libraries Specification".
 
 =cut
 
-.HLL 'WMLScript'
+.HLL 'wmlscript'
 .loadlib 'wmls_group'
 .loadlib 'wmls_ops'
 

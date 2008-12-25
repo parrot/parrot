@@ -19,7 +19,7 @@ wmlsd, wmls2pir, wmlsi
 
 =cut
 
-.HLL 'WMLScript'
+.HLL 'wmlscript'
 .loadlib 'wmls_group'
 .loadlib 'wmls_ops'
 

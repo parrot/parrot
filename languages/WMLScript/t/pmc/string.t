@@ -147,7 +147,7 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
-.HLL "WMLScript"
+.HLL "wmlscript"
 .loadlib "wmls_group"
 .sub _main
     .local pmc pmc1
@@ -167,7 +167,7 @@ simple string
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL & .const' );
-.HLL "WMLScript"
+.HLL "wmlscript"
 .loadlib "wmls_group"
 .sub _main
     .const "WmlsString" cst1 = "simple string"
@@ -184,7 +184,7 @@ simple string
 OUTPUT
 
     pir_output_is( << 'CODE', << 'OUTPUT', '.const & empty string' );
-.HLL "WMLScript"
+.HLL "wmlscript"
 .loadlib "wmls_group"
 .sub _main
     .const "WmlsString" cst1 = ""
@@ -202,7 +202,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check istrue' );
 .loadlib "wmls_ops"
-.HLL "WMLScript"
+.HLL "wmlscript"
 .loadlib "wmls_group"
 .sub _main
     .const "WmlsString" cst1 = "simple string"
@@ -223,7 +223,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check typeof' );
 .loadlib "wmls_ops"
-.HLL "WMLScript"
+.HLL "wmlscript"
 .loadlib "wmls_group"
 .sub _main
     .const "WmlsString" cst1 = "simple string"
@@ -244,7 +244,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check defined' );
 .loadlib "wmls_ops"
-.HLL "WMLScript"
+.HLL "wmlscript"
 .loadlib "wmls_group"
 .sub _main
     .const "WmlsString" cst1 = "simple string"
@@ -264,7 +264,7 @@ WmlsBoolean
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check box' );
-.HLL "WMLScript"
+.HLL "wmlscript"
 .loadlib "wmls_group"
 .loadlib "wmls_ops"
 .sub _main

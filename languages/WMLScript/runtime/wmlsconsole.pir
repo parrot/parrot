@@ -13,7 +13,7 @@ See "WMLScript Reference UP.SDK R4.B3 - October 1999".
 
 =cut
 
-.HLL 'WMLScript'
+.HLL 'wmlscript'
 .loadlib 'wmls_group'
 .loadlib 'wmls_ops'
 

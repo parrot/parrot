@@ -48,7 +48,7 @@ pmclass WmlsFloat
     provides float
     dynpmc
     group wmls_group
-    hll WMLScript maps Float {
+    hll wmlscript maps Float {
 
 /* Class initialization. Caches constant strings that will be used later.
 */

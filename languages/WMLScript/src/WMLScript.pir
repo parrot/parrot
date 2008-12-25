@@ -1,7 +1,7 @@
 # Copyright (C) 2006-2008, The Perl Foundation.
 # $Id$
 
-.HLL 'WMLScript'
+.HLL 'wmlscript'
 .loadlib 'wmls_group'
 .loadlib 'wmls_ops'
 
