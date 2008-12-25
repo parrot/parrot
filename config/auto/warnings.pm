@@ -117,7 +117,6 @@ sub _init {
         -Wno-multichar
         -Wno-pointer-sign
         -Wold-style-definition
-        -Wpadded
         -Wredundant-decls
         -Wswitch-enum
         -Wsystem-headers
@@ -127,6 +126,10 @@ sub _init {
         -Wunused-parameter
         -Wunused-value
         -Wunused-variable
+    );
+
+    my @may_not_even_be_interesting = qw(
+        -Wpadded
     );
 
     my @nice_to_have_but_too_noisy_for_now = qw(
