@@ -111,7 +111,7 @@ PIRCODE
     $P0 = get_hll_global ['Lua'; 'POST'], 'Chunk'
     .tailcall $P0.'new'(start, 'node'=>node, 'prologue'=><<'PIRCODE')
 .include "interpinfo.pasm"
-.HLL "Lua"
+.HLL "lua"
 .loadlib "lua_group"
 PIRCODE
 }

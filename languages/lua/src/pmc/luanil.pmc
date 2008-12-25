@@ -36,7 +36,7 @@ pmclass LuaNil
     provides scalar
     dynpmc
     group    lua_group
-    hll      Lua {
+    hll      lua {
 
 /*
 

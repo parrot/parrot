@@ -93,7 +93,7 @@ show version information.
 .include 'languages/lua/src/lib/luaregex.pir'
 
 
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 
 .sub 'main' :anon :main

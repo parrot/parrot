@@ -30,7 +30,7 @@ pmclass LuaFunction
     dynpmc
     need_ext
     group    lua_group
-    hll      Lua
+    hll      lua
     maps     Sub {
 
 /*

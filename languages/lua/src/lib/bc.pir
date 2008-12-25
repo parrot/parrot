@@ -20,7 +20,7 @@ Use PMC BigFloat when available.
 
 =cut
 
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .namespace [ 'bc' ]
 

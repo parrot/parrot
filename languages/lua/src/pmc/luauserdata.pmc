@@ -56,7 +56,7 @@ pmclass LuaUserdata
     dynpmc
     need_ext
     group    lua_group
-    hll      Lua {
+    hll      lua {
 
     ATTR PMC    *val;
     ATTR PMC    *env;

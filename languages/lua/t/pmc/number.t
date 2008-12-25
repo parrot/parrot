@@ -153,7 +153,7 @@ boolean
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .sub _main
     .local pmc pmc1
@@ -173,7 +173,7 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL (autoboxing)' );
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .sub _main
     .local pmc pmc1
@@ -194,7 +194,7 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL & .const' );
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .sub _main
     .const 'LuaNumber' cst1 = '3.14'
@@ -211,7 +211,7 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check box float' );
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .sub _main
     .local pmc pmc1
@@ -229,7 +229,7 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check box integer' );
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .sub _main
     .local pmc pmc1
@@ -247,7 +247,7 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tostring' );
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .sub _main
     .const 'LuaNumber' cst1 = '3.14'
@@ -267,7 +267,7 @@ string
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .sub _main
     .const 'LuaNumber' cst1 = '3.14'

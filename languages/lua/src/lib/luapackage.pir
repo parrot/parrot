@@ -17,7 +17,7 @@ L<http://www.lua.org/manual/5.1/manual.html#5.3>.
 
 =cut
 
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .namespace [ 'package' ]
 

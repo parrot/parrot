@@ -29,7 +29,7 @@ pmclass LuaString
     provides string
     dynpmc
     group    lua_group
-    hll      Lua
+    hll      lua
     maps     String {
 
 /*

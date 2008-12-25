@@ -31,7 +31,7 @@ pmclass LuaBoolean
     provides integer
     dynpmc
     group    lua_group
-    hll      Lua
+    hll      lua
     maps     Boolean {
 
 /*

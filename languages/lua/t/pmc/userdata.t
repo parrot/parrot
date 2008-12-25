@@ -140,7 +140,7 @@ boolean
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .sub _main
     .local pmc val1
@@ -159,7 +159,7 @@ CODE
 OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'check tostring' );
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .sub _main
     .local pmc val1
@@ -185,7 +185,7 @@ string\n
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .sub _main
     .local pmc val1

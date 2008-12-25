@@ -201,7 +201,7 @@ unlink("$FindBin::Bin/../../../mod_foo.pbc") if ( -f "$FindBin::Bin/../../../mod
 unlink("$FindBin::Bin/../../../mod_foo.pir") if ( -f "$FindBin::Bin/../../../mod_foo.pir" );
 open $X, '>', "$FindBin::Bin/../../../mod_foo.pir";
 print {$X} <<'PIR';
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 
 .sub '__onload' :anon :load

@@ -90,7 +90,7 @@ pmclass LuaAny
     abstract
     dynpmc
     group lua_group
-    hll Lua {
+    hll lua {
 /*
 
 =item C<void morph(INTVAL type)>

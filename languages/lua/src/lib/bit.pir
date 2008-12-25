@@ -15,7 +15,7 @@ See original on L<http://bitop.luajit.org/>
 
 =cut
 
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .namespace [ 'bit' ]
 

@@ -17,7 +17,7 @@ See original on L<http://www.tecgraf.puc-rio.br/~lhf/ftp/lua/#lalarm/>
 
 =cut
 
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .namespace [ 'alarm' ]
 

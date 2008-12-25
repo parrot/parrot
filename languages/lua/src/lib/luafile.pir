@@ -15,7 +15,7 @@ See F<languages/lua/lib/luaio.pir>.
 
 =cut
 
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .namespace [ 'io'; 'file' ]
 

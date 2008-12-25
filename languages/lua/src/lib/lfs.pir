@@ -21,7 +21,7 @@ See original on L<http://luaforge.net/projects/luafilesystem/>
 
 =cut
 
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .namespace [ 'lfs' ]
 

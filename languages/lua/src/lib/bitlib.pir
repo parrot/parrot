@@ -20,7 +20,7 @@ that can be used in bitwise operations, and the following functions:
 
 =cut
 
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .namespace [ 'bitlib' ]
 

@@ -13,7 +13,7 @@ lib/_helpers.pir - library
 
 =cut
 
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .namespace []
 

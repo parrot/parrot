@@ -141,7 +141,7 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL' );
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .sub _main
     .local pmc pmc1
@@ -161,7 +161,7 @@ simple string
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL (autoboxing)' );
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .sub _main
     .local pmc pmc1
@@ -182,7 +182,7 @@ simple string
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check HLL & .const' );
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .sub _main
     .const 'LuaString' cst1 = "simple string"
@@ -199,7 +199,7 @@ simple string
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', '.const & empty string' );
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .sub _main
     .const 'LuaString' cst1 = ''
@@ -216,7 +216,7 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check box' );
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .sub _main
     .local pmc pmc1
@@ -234,7 +234,7 @@ simple string
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check is_equal (RT #60292)' );
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .sub _main
     new $P1, 'LuaString'
@@ -250,7 +250,7 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tostring' );
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .sub _main
     .local pmc pmc1
@@ -272,7 +272,7 @@ string
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tonumber' );
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .sub _main
     .local pmc pmc1
@@ -294,7 +294,7 @@ number
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'check tobase' );
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .sub _main
     .local pmc pmc1

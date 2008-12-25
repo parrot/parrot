@@ -19,7 +19,7 @@ See on L<http://www.inf.puc-rio.br/~roberto/lpeg.html#intro>
 
 =cut
 
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .namespace [ 'lpeg' ]
 

@@ -13,7 +13,7 @@ See original on L<http://www.tecgraf.puc-rio.br/~lhf/ftp/lua/#lmathx>.
 
 =cut
 
-.HLL 'Lua'
+.HLL 'lua'
 .loadlib 'lua_group'
 .namespace [ 'mathx' ]
 
