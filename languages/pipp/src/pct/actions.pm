@@ -478,22 +478,29 @@ method NUMBER($/) {
          );
 }
 
-method function_definition($/) {
+method function_definition($/, $key) {
+    our @?BLOCK; # A stack of PAST::Block
+    our $?BLOCK; # The current block. Used for managing the symbol table. 
 
-    # PHP has two scopes: local to functions and global
-    our $?PIPP_CURRENT_SCOPE := 'lexical';
+    if $key eq 'open' {
+        # note that $<param_list> creates a new PAST::Block.
+        my $?BLOCK := $( $<param_list> );
+        @?BLOCK.unshift($?BLOCK);
+    }
+    else {
+        # PHP has two scopes: local to functions and global
+        our $?PIPP_CURRENT_SCOPE := 'lexical';
 
-    # note that $<param_list> creates a new PAST::Block.
-    my $past := $( $<param_list> );
-    # TODO: set $?BLOCK
+        my $past := @?BLOCK.shift();
 
-    $past.name( ~$<FUNCTION_NAME> );
-    $past.control('return_pir');
-    $past.push( $( $<block> ) );
+        $past.name( ~$<FUNCTION_NAME> );
+        $past.control('return_pir');
+        $past.push( $( $<block> ) );
 
-    $?PIPP_CURRENT_SCOPE := '';
+        $?PIPP_CURRENT_SCOPE := '';
 
-    make $past;
+        make $past;
+    }
 }
 
 # nested functions are not supported yet
@@ -506,18 +513,25 @@ method EXIT_FUNCTION_DEF($/) {
     $?PIPP_CURRENT_SCOPE := 'package';
 }
 
-method class_method_definition($/) {
+method class_method_definition($/, $key) {
+    our @?BLOCK; # A stack of PAST::Block
+    our $?BLOCK; # The current block. Used for managing the symbol table. 
 
-    # note that $<param_list> creates a new PAST::Block.
-    my $past := $( $<param_list> );
-    # TODO: set $?BLOCK
+    if $key eq 'open' {
+        # note that $<param_list> creates a new PAST::Block.
+        my $?BLOCK := $( $<param_list> );
+        @?BLOCK.unshift($?BLOCK);
+    }
+    else {
+        my $past := @?BLOCK.shift();
 
-    $past.name( ~$<METHOD_NAME> );
-    $past.blocktype( 'method' );
-    $past.control('return_pir');
-    $past.push( $( $<block> ) );
+        $past.name( ~$<METHOD_NAME> );
+        $past.blocktype( 'method' );
+        $past.control('return_pir');
+        $past.push( $( $<block> ) );
 
-    make $past;
+        make $past;
+    }
 }
 
 method param_list($/) {
@@ -526,7 +540,6 @@ method param_list($/) {
                     :blocktype('declaration'),
                     :node($/)
                 );
-    # TODO: set $?BLOCK
     my $arity := 0;
     for $<VAR_NAME> {
         my $param := $( $_ );
@@ -551,16 +564,14 @@ method class_definition($/, $key) {
     our $?BLOCK; # The current block. Used for managing the symbol table. 
 
     if $key eq 'open' {
-        # TODO: set $?BLOCK
-    }
-    else {
-        # TODO: put this into the 'if' branch
         $?BLOCK := PAST::Block.new(
                        :node($/),
                        :blocktype('declaration'),
                        :pirflags( ':init :load' )
                    );
         @?BLOCK.unshift($?BLOCK);
+    }
+    else {
         my $past := @?BLOCK.shift();
         $past.namespace( $<CLASS_NAME><ident> );
         $past.push( PAST::Stmts.new(
@@ -578,7 +589,6 @@ method class_definition($/, $key) {
            $past.push( $($_) );
         }
 
-        # TODO: set $?BLOCK
         my $methods_block := PAST::Block.new( :blocktype('immediate') );
         for $<class_member_definition> {
             $methods_block.symbol(
@@ -604,7 +614,6 @@ method quote_expression($/, $key) {
     my $past;
     if $key eq 'quote_regex' {
         our $?NS;
-        # TODO: set $?BLOCK
         $past := PAST::Block.new(
             $<quote_regex>,
             :compiler('PGE::Perl6Regex'),

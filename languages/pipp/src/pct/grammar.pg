@@ -7,10 +7,10 @@ grammar Pipp::Grammar is PCT::Grammar;
 
 # the starting rule
 token TOP {
-     {*}                                     #= open
-     <sea_or_code>*
-     [ $ || <.panic: 'Syntax error'> ]
-     {*}                                     #= close
+    {*}                                     #= open
+    <sea_or_code>*
+    [ $ || <.panic: 'Syntax error'> ]
+    {*}                                     #= close
 }
 
 # Whitespace and comments
@@ -370,8 +370,11 @@ rule term {
 
 # declarations
 rule function_definition {
-    'function' <FUNCTION_NAME> <.ENTER_FUNCTION_DEF> <param_list> <block> <.EXIT_FUNCTION_DEF>
-    {*}
+    'function' <FUNCTION_NAME> <.ENTER_FUNCTION_DEF> <param_list>
+    {*}                                     #= open
+    <block>
+    {*}                                     #= close
+    <.EXIT_FUNCTION_DEF>
 }
 
 # special subrule for marking variable scope
@@ -404,8 +407,8 @@ rule method_declaration {
 }
 
 rule class_definition {
-    {*}                                     #= open
     'class' <CLASS_NAME> [ 'implements' <INTERFACE_NAME> ]? '{'
+    {*}                                     #= open
         <class_constant_definition>*
         <class_member_definition>*
         <class_method_definition>*
@@ -423,8 +426,10 @@ rule class_member_definition {
 }
 
 rule class_method_definition {
-    'function' <METHOD_NAME> <param_list> <block>
-    {*}
+    'function' <METHOD_NAME> <param_list>
+    {*}                                     #= open
+    <block>
+    {*}                                     #= close
 }
 
 
