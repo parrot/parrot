@@ -307,8 +307,8 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     }
 
     if (Interp_debug_TEST(interp, PARROT_BACKTRACE_DEBUG_FLAG)) {
-        STRING *msg      = VTABLE_get_string(interp, exception);
-        int     exitcode = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "exit_code"));
+        STRING * const msg = VTABLE_get_string(interp, exception);
+        int exitcode       = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "exit_code"));
 
         Parrot_io_eprintf(interp,
             "Parrot_ex_throw_from_c (severity:%d error:%d): %Ss\n",
@@ -381,7 +381,7 @@ C<exit_fatal()>.
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 void
-Parrot_ex_throw_from_c_args(PARROT_INTERP, ARGIN_NULLOK(void *ret_addr),
+Parrot_ex_throw_from_c_args(PARROT_INTERP, SHIM(void *ret_addr),
         int exitcode, ARGIN(const char *format), ...)
 {
     PMC *exception;
@@ -472,13 +472,13 @@ PARROT_EXPORT
 size_t
 Parrot_ex_calc_handler_offset(PARROT_INTERP)
 {
-    PMC *exception = VTABLE_pop_pmc(interp, interp->scheduler);
+    PMC * const exception = VTABLE_pop_pmc(interp, interp->scheduler);
 
     /* now fill rest of exception, locate handler and get
      * destination of handler */
-    opcode_t *handler_address = Parrot_ex_throw_from_op(interp, exception, NULL);
+    opcode_t * const handler_address = Parrot_ex_throw_from_op(interp, exception, NULL);
 
-    if (!handler_address)
+    if (handler_address == NULL)
         PANIC(interp, "Unable to calculate opcode address for exception handler");
 
     /* return the *offset* of the handler */
