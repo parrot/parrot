@@ -242,7 +242,8 @@ no_pg:
     test.'ok'(1, 'notice receiver called')
     # res ought to be a PGresult struct
     $S0 = typeof res
-    test.'is'($S0, 'UnManagedStruct', 'notice callback got a struct')
+    $I0 = $S0 == 'UnManagedStruct'
+    test.'ok'($I0, 'notice callback got a struct')
 
     .local pmc st
     st = get_root_global ['parrot';'Pg'], 'PQresultStatus'
