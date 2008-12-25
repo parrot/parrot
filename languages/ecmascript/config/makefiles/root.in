@@ -133,7 +133,7 @@ help:
 	@echo ""
 
 test: all
-	$(PERL) t/harness t
+	$(PERL) t/harness
 
 testclean:
 	$(RM_F) "t/*.js" "t/*.out"

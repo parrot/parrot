@@ -1,3 +1,0 @@
-print(true);
-print(false);
-

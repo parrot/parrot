@@ -120,6 +120,16 @@
 ## built-in operators
 ##
 
+.sub 'prefix:?' :multi(_)
+    .param pmc a
+    if a goto a_true
+    $P0 = get_hll_global ['JSBoolean'], 'false'
+    .return ($P0)
+  a_true:
+    $P0 = get_hll_global ['JSBoolean'], 'true'
+    .return ($P0)
+.end
+
 .sub 'infix:='
     .param pmc lhs
     .param pmc rhs
@@ -235,7 +245,7 @@
     .param pmc left
     .param pmc right
     iseq $I0, left, right
-    .return ($I0)
+    .tailcall 'prefix:?'($I0)
 .end
 
 

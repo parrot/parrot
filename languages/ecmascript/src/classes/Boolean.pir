@@ -43,6 +43,13 @@ symbols for C<Boolean::True> and C<Boolean::False>.
   .return ("false")
 .end
 
+.sub 'get_integer1' #:vtable
+  .param pmc self
+   $I0 = self
+  .return ($I0)
+.end
+
+
 .sub 'ACCEPTS' :method
     .param pmc topic
     .return (self)
