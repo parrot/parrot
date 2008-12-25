@@ -352,3 +352,10 @@ Parrot_jit_init(Interp *interp)
 {
     return &arch_info;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
