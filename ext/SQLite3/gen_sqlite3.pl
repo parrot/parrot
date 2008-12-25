@@ -15,7 +15,7 @@ my %rename_table = (
 
 print preamble();
 
-for (parse_ast($fn).kv) -> $k,$v {
+for (parse_ast($fn).hash().kv) -> $k,$v {
     #dump_node($v);
     if ($v.WHAT eq "FuncDecl") {
         my @result = pir($v);
