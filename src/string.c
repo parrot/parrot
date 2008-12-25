@@ -251,7 +251,7 @@ void
 string_free(PARROT_INTERP, ARGIN(STRING *s))
 {
     if (!PObj_constant_TEST(s)) {
-        Small_Object_Pool *pool = interp->arena_base->string_header_pool;
+        Small_Object_Pool * const pool = interp->arena_base->string_header_pool;
         pool->add_free_object(interp, pool, s);
     }
 }
@@ -312,7 +312,8 @@ string_init(PARROT_INTERP)
 
     for (i = 0; i < n_parrot_cstrings; ++i) {
         DECL_CONST_CAST;
-        STRING *s = string_make_direct(interp,
+        STRING * const s =
+            string_make_direct(interp,
                 parrot_cstrings[i].string,
                 parrot_cstrings[i].len,
                 PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
@@ -663,7 +664,7 @@ const_string(PARROT_INTERP, ARGIN(const char *buffer))
 {
     DECL_CONST_CAST;
     STRING *s;
-    Hash   *cstring_cache = (Hash *)interp->const_cstring_hash;
+    Hash   * const cstring_cache = (Hash *)interp->const_cstring_hash;
 
     PARROT_ASSERT(buffer);
 
@@ -1363,7 +1364,6 @@ void
 string_chopn_inplace(PARROT_INTERP, ARGMOD(STRING *s), INTVAL n)
 {
     UINTVAL new_length, uchar_size;
-    String_iter iter;
 
     if (n < 0) {
         new_length = -n;
@@ -1394,6 +1394,8 @@ string_chopn_inplace(PARROT_INTERP, ARGMOD(STRING *s), INTVAL n)
         s->bufused = new_length * uchar_size;
     }
     else {
+        String_iter iter;
+
         ENCODING_ITER_INIT(interp, s, &iter);
         iter.set_position(interp, &iter, new_length);
         s->bufused = iter.bytepos;
@@ -2155,12 +2157,12 @@ PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 char *
-string_to_cstring_nullable(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
+string_to_cstring_nullable(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     if (!s)
-      return NULL;
+        return NULL;
     else {
-        char *p = (char *)mem_sys_allocate(s->bufused + 1);
+        char * const p = (char *)mem_sys_allocate(s->bufused + 1);
         memcpy(p, s->strstart, s->bufused);
         p[s->bufused] = '\0';
         return p;
@@ -2289,7 +2291,7 @@ size_t
 string_hash(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
 {
     register size_t h;
-    UINTVAL         seed = interp->hash_seed;
+    const UINTVAL seed = interp->hash_seed;
 
     if (!s)
         return seed;
@@ -2488,7 +2490,7 @@ string_unescape_cstring(PARROT_INTERP,
     UINTVAL         offs, d;
 
     /* we are constructing const table strings here */
-    UINTVAL        flags = PObj_constant_FLAG;
+    const UINTVAL   flags = PObj_constant_FLAG;
 
     if (delimiter && clength)
         --clength;
@@ -2737,8 +2739,7 @@ string_increment(PARROT_INTERP, ARGIN(const STRING *s))
 
     o = (UINTVAL)string_ord(interp, s, 0);
 
-    if ((o >= 'A' && o < 'Z') ||
-            (o >= 'a' && o < 'z')) {
+    if ((o >= 'A' && o < 'Z') || (o >= 'a' && o < 'z')) {
         ++o;
         /* TODO increment in place */
         return string_chr(interp, o);
@@ -3008,10 +3009,9 @@ string_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
     res = s ? string_copy(interp, s) : NULL;
 
     for (i = 1; i < ar_len; ++i) {
-        STRING *next;
+        STRING * const next = VTABLE_get_string_keyed_int(interp, ar, i);
 
         res  = string_append(interp, res, j);
-        next = VTABLE_get_string_keyed_int(interp, ar, i);
         res  = string_append(interp, res, next);
     }
 
@@ -3107,10 +3107,7 @@ PMC*
 Parrot_string_split(PARROT_INTERP,
     ARGIN_NULLOK(STRING *delim), ARGIN_NULLOK(STRING *str))
 {
-    if (! delim || ! str)
-        return PMCNULL;
-    else
-        return string_split(interp, delim, str);
+    return (delim && str) ? string_split(interp, delim, str) : NULL;
 }
 
 /*
