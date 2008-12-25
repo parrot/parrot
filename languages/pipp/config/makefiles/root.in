@@ -142,7 +142,7 @@ help:
 	@echo "  test-antlr3:       Run the test suite for 'Pipp antlr3'."
 	@echo "  test-pct:          Run the test suite for 'Pipp pct'."
 	@echo "  test-pmc:          Run the test suite for Pipp's PMCs."
-	@echo "  smoke:             Run the PCT test suite and send report to the smolder server" 
+	@echo "  smoke:             Run the PCT test suite and send report to the smolder server"
 	@echo ""
 	@echo "Cleaning:"
 	@echo "  clean:             Clean up."
@@ -278,7 +278,7 @@ t/pcc-testsuite:
 # e.g export PATH=~/devel/PHP/php5/sapi/cli:$PATH
 test-php-qa-testsuite: pipp \
   t/php_qa_testsuite/php5/run-tests.php \
-  t/php_qa_testsuite/php5/tests 
+  t/php_qa_testsuite/php5/tests
  #t/php_qa_testsuite/php5/Zend/tests
 	cd t/php_qa_testsuite/php5 && cvs update tests run-tests.php
 	cd t/php_qa_testsuite/php5 && \
@@ -287,7 +287,7 @@ test-php-qa-testsuite: pipp \
  php run-tests.php -v --keep-all | tee run_tests.log
 
 t/php_qa_testsuite/php5/run-tests.php:
-	cd t/php_qa_testsuite && cvs -d :pserver:cvsread@cvs.php.net:/repository checkout -r PHP_5_3 php5/run-tests.php  
+	cd t/php_qa_testsuite && cvs -d :pserver:cvsread@cvs.php.net:/repository checkout -r PHP_5_3 php5/run-tests.php
 
 t/php_qa_testsuite/php5/tests:
 	cd t/php_qa_testsuite && cvs -d :pserver:cvsread@cvs.php.net:/repository checkout -r PHP_5_3 php5/tests
@@ -307,7 +307,7 @@ clean-common: clean-pmc
   pipp.c pipp.o pipp$(EXE)
 
 clean-pmc:
-	$(RM_F) "$(PMCDIR)/*dump" "$(PMCDIR)/*.c" "$(PMCDIR)/pmc_*h" "$(PMCDIR)/php_group.h" "$(PMCDIR)/*$(O)" "$(PMCDIR)/*$(LOAD_EXT)"
+	$(RM_F) "$(PMCDIR)/*dump" "$(PMCDIR)/php*.c" "$(PMCDIR)/pmc_*h" "$(PMCDIR)/php_group.h" "$(PMCDIR)/*$(O)" "$(PMCDIR)/*$(LOAD_EXT)"
 
 clean-pct:
 	$(RM_F) \
