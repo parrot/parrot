@@ -128,6 +128,15 @@ Adds (or replaces) a syntactic category's defaults.
     token['wb'] = 1
   with_wb:
 
+    ##  handle key scanning
+    unless key goto with_skipkey
+    $I0 = exists token['skipkey']
+    if $I0 goto with_skipkey
+    $P0 = token['parsed']
+    if null $P0 goto with_skipkey
+    token['skipkey'] = 1
+  with_skipkey:
+
     $S0 = token['match']
     if $S0 > '' goto with_match
     token['match'] = 'PGE::Match'
@@ -547,10 +556,13 @@ Adds (or replaces) a syntactic category's defaults.
     goto token_match_success
   token_match_sub:
     $P0 = token['parsed']
-    $I0 = length key
-    $I0 += pos
     mob['KEY'] = key
-    mpos = $I0
+    mpos = pos
+    $I0 = token['skipkey']
+    unless $I0 goto token_match_sub_1
+    $I0 = length key
+    mpos += $I0
+  token_match_sub_1:
     oper = $P0(mob, 'action'=>action)
     delete mob['KEY']
     $P0 = oper.'from'()
