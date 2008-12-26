@@ -133,7 +133,7 @@ inline op wrapper__() :internal :flow {
 }
 
 inline op prederef__() :internal :flow {
-    opcode_t *_this = CUR_OPCODE;
+    const opcode_t * const _this = CUR_OPCODE;
     if (interp->run_core & PARROT_CGOTO_CORE) {
         /* must be CGP then - check for events in not yet prederefed code */
         Parrot_cx_runloop_wake(interp, interp->scheduler);
@@ -1332,7 +1332,7 @@ inline op loadlib(out PMC, in STR) {
 
 op dlfunc(out PMC, invar PMC, in STR, in STR) {
     char * const name = string_to_cstring(interp, ($3));
-    void *ptr         = Parrot_dlsym(
+    void * const ptr  = Parrot_dlsym(
                             PMC_IS_NULL($2) ? NULL :
                             VTABLE_defined(interp, $2) ? PMC_data($2) :
                             NULL,
