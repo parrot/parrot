@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use lib qw( t . lib ../lib ../../lib ../../../lib );
 use Test::More;
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 37;
 
 optable_output_is( 'a',     'term:a',                                   'Simple term' );
 optable_output_is( 'a+b',   'infix:+(term:a, term:b)',                  'Simple infix' );
@@ -41,6 +41,9 @@ optable_output_is( 'a++', 'postfix:++(term:a)', 'postfix' );
 optable_output_is( 'a--', 'postfix:--(term:a)', 'postfix' );
 optable_output_is( '++a', 'prefix:++(term:a)',  'prefix' );
 optable_output_is( '--a', 'prefix:--(term:a)',  'prefix' );
+
+optable_output_is( '-a',  'prefix:-(term:a)',   'prefix ltm');
+optable_output_is( '->a', 'term:->a',           'prefix ltm');
 
 optable_output_is(
     'a*(b+c)',
@@ -109,6 +112,7 @@ sub optable_output_is {
     optable.'newtok'('prefix:--', 'equiv'=>'prefix:++')
     optable.'newtok'('postfix:++', 'equiv'=>'prefix:++')
     optable.'newtok'('postfix:--', 'equiv'=>'prefix:++')
+    optable.'newtok'('prefix:-', 'equiv'=>'prefix:++')
 
     .local pmc ident
     ident = get_global ['PGE';'Match'], 'ident'
@@ -117,6 +121,11 @@ sub optable_output_is {
     optable.'newtok'('circumfix:[ ]', 'equiv'=>'term:')
     optable.'newtok'('postcircumfix:( )', 'looser'=>'term:', 'nows'=>1, 'nullterm'=>1)
     optable.'newtok'('postcircumfix:[ ]', 'equiv'=>'postcircumfix:( )', 'nows'=>1)
+
+    .local pmc arrow
+    $P0 = compreg 'PGE::Perl6Regex'
+    arrow = $P0("'->' <ident>")
+    optable.'newtok'('term:->', 'equiv'=>'term:', 'parsed'=>arrow, 'skipkey'=>0)
 
     .local string test
     test = "<<test>>"
@@ -148,6 +157,7 @@ sub optable_output_is {
     type = match['type']
     print type
     if type == 'term:' goto print_term
+    if type == 'term:->' goto print_term_arrow
     print '('
     .local pmc iter
     $P0 = match.'list'()
@@ -171,6 +181,10 @@ sub optable_output_is {
     goto end
   print_term:
     print match
+    goto end
+  print_term_arrow:
+    $S0 = match['ident']
+    print $S0
   end:
     .return ()
 .end
