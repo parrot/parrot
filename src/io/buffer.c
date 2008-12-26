@@ -395,13 +395,11 @@ size_t
 Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         ARGOUT(STRING **buf))
 {
-    UINTVAL len   = 1;
-    size_t  avail = 0;
-
-    INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
     unsigned char *buffer_next;
-
-    STRING * const s = Parrot_io_make_string(interp, buf, 1);
+    STRING * const s            = Parrot_io_make_string(interp, buf, 1);
+    UINTVAL        len          = 1;
+    size_t         avail        = 0;
+    INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
 
     /* write buffer flush */
     if (buffer_flags & PIO_BF_WRITEBUF) {
@@ -414,10 +412,12 @@ Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
     /* (re)fill the buffer */
     if (! (buffer_flags & PIO_BF_READBUF)) {
         size_t got;
-        /* exception if we're unbuffered */
-        if (Parrot_io_get_buffer_size(interp, filehandle) == 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Can't peek at unbuffered I/O");
+
+        /* promote to buffered if unbuffered */
+        if (Parrot_io_get_buffer_size(interp, filehandle) == 0) {
+            Parrot_io_setbuf(interp, filehandle, 1);
+            return Parrot_io_peek_buffer(interp, filehandle, buf);
+        }
 
         /* Parrot_io_fill_readbuf() can return -1, but len should be positive */
         got = Parrot_io_fill_readbuf(interp, filehandle);
@@ -432,10 +432,12 @@ Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
     }
 
     /* if we got any data, then copy out the next byte */
-    memcpy(s->strstart, buffer_next, len);
+    memmove(s->strstart, buffer_next, len);
     s->bufused = s->strlen = len;
+
     return len;
 }
+
 
 /*
 
