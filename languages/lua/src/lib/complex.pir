@@ -147,7 +147,8 @@ LIST
     $P1 = get(1, z)
     $P2 = get(2, w)
     $P0 = add $P1, $P2
-    .tailcall newcomplex($P0)
+    $P0 = newcomplex($P0)
+    .return ($P0)
 .end
 
 
@@ -162,7 +163,8 @@ LIST
     $P1 = get(1, z)
     $P2 = get(2, w)
     $P0 = div $P1, $P2
-    .tailcall newcomplex($P0)
+    $P0 = newcomplex($P0)
+    .return ($P0)
 .end
 
 
@@ -194,7 +196,8 @@ LIST
     $P1 = get(1, z)
     $P2 = get(2, w)
     $P0 = mul $P1, $P2
-    .tailcall newcomplex($P0)
+    $P0 = newcomplex($P0)
+    .return ($P0)
 .end
 
 
@@ -209,7 +212,8 @@ LIST
     $P1 = get(1, z)
     $P2 = get(2, w)
     $P0 = sub $P1, $P2
-    .tailcall newcomplex($P0)
+    $P0 = newcomplex($P0)
+    .return ($P0)
 .end
 
 
