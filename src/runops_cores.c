@@ -126,7 +126,6 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
     static size_t dod, gc;
     Arenas * const arena_base = interp->arena_base;
     Interp *debugger;
-    PMC* pio;
 
     dod = arena_base->dod_runs;
     gc = arena_base->collect_runs;
