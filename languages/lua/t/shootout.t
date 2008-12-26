@@ -59,14 +59,9 @@ language_output_is( 'lua', $code, $out, 'partial-sums', params => '25000');
 #       Generate and write random DNA sequences
 #
 
-TODO:
-{
-    local $TODO = 'broken';
-
 $code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/fasta_lua-2.lua" );
 $out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/fasta-output.txt" );
 language_output_is( 'lua', $code, $out, 'fasta', params => '1000' );
-}
 
 #
 #   pidigits
@@ -111,14 +106,9 @@ language_output_is( 'lua', $code, $out, 'regex-dna', params => "< $in" );
 #       Indexed-access to bit-values
 #
 
-TODO:
-{
-    local $TODO = 'broken';
-
 $code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/nsievebits.lua" );
 $out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/nsievebits-output.txt" );
 language_output_is( 'lua', $code, $out, 'nsieve-bits' );
-}
 
 #
 #   recursive
@@ -171,9 +161,9 @@ language_output_is( 'lua', $code, $out, 'cheap-concurrency', params => '10' );
 #       Eigenvalue using the power method
 #
 
-TODO:
+SKIP:
 {
-    local $TODO = 'broken';
+    skip('low memory', 1) unless ($test_prog eq 'lua');
 
 $code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/spectralnorm_lua-3.lua" );
 $out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/spectralnorm-output.txt" );
@@ -185,14 +175,9 @@ language_output_is( 'lua', $code, $out, 'spectral-norm', params => '100' );
 #       Symmetrical thread rendez-vous requests
 #
 
-TODO:
-{
-    local $TODO = 'broken';
-
 $code = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/chameneos.lua" );
 $out = Parrot::Test::slurp_file( "$FindBin::Bin/shootout/chameneos-output.txt" );
 language_output_is( 'lua', $code, $out, 'chameneos', params => '100' );
-}
 
 #
 #   reverse-complement

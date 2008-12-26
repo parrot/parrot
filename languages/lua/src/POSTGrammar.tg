@@ -976,6 +976,9 @@ transform lexical (PAST::Var) :language('PIR') {
     ops.'push_pirop'('.local pmc', pname)
     ops.'push_pirop'('.lex', lname, pname, 'result'=>pname)
     storage_lex[name] = pname
+    ops.'push_pirop'('set', pname, 'node'=>node)
+    ops.'result'(pname)
+    .return (ops)
   L3:
     ops.'push_pirop'('store_lex', lname, 'node'=>node)
     ops.'result'(lname)
