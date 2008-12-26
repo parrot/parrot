@@ -388,21 +388,10 @@ rule term {
 
 # declarations
 rule function_definition {
-    'function' <FUNCTION_NAME> <.ENTER_FUNCTION_DEF> <param_list>
+    'function' <FUNCTION_NAME> <param_list>
     {*}                                     #= open
     <block>
     {*}                                     #= close
-    <.EXIT_FUNCTION_DEF>
-}
-
-# special subrule for marking variable scope
-token ENTER_FUNCTION_DEF {
-    {*}
-}
-
-# ditto
-token EXIT_FUNCTION_DEF {
-    {*}
 }
 
 rule param_list {

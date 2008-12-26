@@ -372,23 +372,19 @@ method var_assign($/) {
 
 method array_elem($/) {
     our $?BLOCK;
-
-    my $isdecl;
-    if $?BLOCK.symbol( ~$/ ) {
-        # symbol is already present
-        $isdecl := 0;
-    }
-    else {
-        $isdecl := 1;
-        $?BLOCK.symbol(
-            ~$/,
-            :scope('package')
+    unless $?BLOCK.symbol( ~$<VAR_NAME> ) {
+        $?BLOCK.symbol( ~$<VAR_NAME>, :scope('lexical') );
+        $?BLOCK.push(
+            PAST::Var.new(
+                :name(~$<VAR_NAME>),
+                :viviself('PhpArray'),
+                :isdecl(1)
+            )
         );
     }
 
     my $past_var_name := 
         PAST::Var.new(
-            :scope('package'),
             :name(~$<VAR_NAME>),
             :viviself('PhpArray'),
             :lvalue(1),
@@ -404,24 +400,19 @@ method array_elem($/) {
 }
 
 method simple_var($/) {
-    our $?PIPP_CURRENT_SCOPE;
     our $?BLOCK;
-
-    my $isdecl;
-    if $?BLOCK.symbol( ~$/ ) {
-        # symbol is already present
-        $isdecl := 0;
-    }
-    else {
-        $isdecl := 1;
-        $?BLOCK.symbol(
-            ~$<VAR_NAME>,
-            :scope( $?PIPP_CURRENT_SCOPE ?? $?PIPP_CURRENT_SCOPE !! 'package' )
+    unless $?BLOCK.symbol( ~$<VAR_NAME> ) {
+        $?BLOCK.symbol( ~$<VAR_NAME>, :scope('lexical') );
+        $?BLOCK.push(
+            PAST::Var.new(
+                :name(~$<VAR_NAME>),
+                :viviself('PhpNull'),
+                :isdecl(1)
+            )
         );
     }
 
     make PAST::Var.new(
-             :scope( $?PIPP_CURRENT_SCOPE ?? $?PIPP_CURRENT_SCOPE !! 'package' ),
              :name(~$<VAR_NAME>),
              :viviself('PhpNull'),
              :lvalue(1),
@@ -544,29 +535,14 @@ method function_definition($/, $key) {
         @?BLOCK.unshift($?BLOCK);
     }
     else {
-        # PHP has two scopes: local to functions and global
-        our $?PIPP_CURRENT_SCOPE := 'lexical';
-
         my $past := @?BLOCK.shift();
 
         $past.name( ~$<FUNCTION_NAME> );
         $past.control('return_pir');
         $past.push( $( $<block> ) );
 
-        $?PIPP_CURRENT_SCOPE := '';
-
         make $past;
     }
-}
-
-# nested functions are not supported yet
-method ENTER_FUNCTION_DEF($/) {
-    our $?PIPP_CURRENT_SCOPE;
-    $?PIPP_CURRENT_SCOPE := 'lexical';
-}
-method EXIT_FUNCTION_DEF($/) {
-    our $?PIPP_CURRENT_SCOPE;
-    $?PIPP_CURRENT_SCOPE := 'package';
 }
 
 method class_method_definition($/, $key) {
@@ -598,21 +574,6 @@ method param_list($/) {
                 );
     my $arity := 0;
     for $<VAR_NAME> {
-        our $?BLOCK;
-
-        my $isdecl;
-        if $?BLOCK.symbol( ~$_ ) {
-            # symbol is already present
-            $isdecl := 0;
-        }
-        else {
-            $isdecl := 1;
-            $?BLOCK.symbol(
-                ~$_,
-                :scope('parameter')
-            );
-        }
-
         my $param :=
             PAST::Var.new(
                 :scope('parameter'),
@@ -621,13 +582,6 @@ method param_list($/) {
                 :lvalue(1),
             );
         $past.push($param);
-
-        # enter the parameter as a lexical into the block's symbol table
-        # TODO: lexical by default
-        $past.symbol(
-             :scope('lexical'),
-             $param.name()
-        );
         $arity++;
     }
     $past.arity( $arity );
