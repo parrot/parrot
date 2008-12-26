@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # Copyright (C) 2008, The Perl Foundation.
-# $Id: 03-boolean.t 33314 2008-11-28 16:28:50Z bernhard $
+# $Id$
 
 use strict;
 use warnings;

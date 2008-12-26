@@ -1,4 +1,4 @@
-# $Id: JS.pm 34193 2008-12-21 11:50:25Z bernhard $
+# $Id$
 
 # Copyright (C) 2008, The Perl Foundation.
 

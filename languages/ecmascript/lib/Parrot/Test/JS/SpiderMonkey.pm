@@ -1,4 +1,4 @@
-# $Id: SpiderMonkey.pm 29200 2008-07-09 14:40:19Z bernhard $
+# $Id$
 
 # Copyright (C) 2008, The Perl Foundation.
 
