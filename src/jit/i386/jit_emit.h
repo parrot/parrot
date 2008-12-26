@@ -171,8 +171,6 @@ extern UINTVAL ld(UINTVAL);
 #define emit_r_m(interp, pc, reg1, b, i, s, d) \
     emit_r_X((interp), (pc), emit_reg((reg1)-1), (b), (i), (s), (d))
 
-
-
 #define emit_alu_X_r(X, reg) ((emit_b11 << 6) | ((X) << 3) | ((reg) - 1))
 
 #define emit_alu_r_r(reg1, reg2) emit_alu_X_r(((reg1) - 1), (reg2))
@@ -246,59 +244,36 @@ emit_shift_r_m(PARROT_INTERP, char *pc, int opcode, int reg,
 #endif /* EXEC_CAPABLE */
 
 
-static char *
+char *
 emit_pushl_m(PARROT_INTERP, char *pc, int base, int i, int scale, long disp)
-{
-    *(pc++) = (char) 0xff;
-    return emit_r_X(interp, pc, emit_reg(emit_b110), base, i, scale, disp);
-}
+;
 
 /* POPs */
 
-static char *
+char *
 emit_popl_r(char *pc, int reg)
-{
-/* XXX kwoo:  I side with valgrind.  Is it safe to remove the obsolete code? */
-#if 0
-    /* valgrind doesn't like this and the version below is smaller anyway */
-    *(pc++) = (char) 0x8f;
-    *(pc++) = (char) emit_alu_X_r(emit_b000, reg);
-#else
-    *(pc++) = (char)(0x58 | (reg - 1));
-#endif /* 0 */
-    return pc;
-}
+;
 
 #  define emitm_popl_r(pc, reg) \
     (pc) = emit_popl_r((pc), (reg))
 
-static char *
+char *
 emit_popl_m(PARROT_INTERP, char *pc, int base, int i, int scale, long disp)
-{
-    *(pc++) = (char) 0x8f;
-    return emit_r_X(interp, pc, emit_reg(emit_b000), base, i, scale, disp);
-}
+;
 
 /* MOVes */
 
 static char *
 emit_movb_r_r(char *pc, int reg1, int reg2)
-{
-    *(pc++) = (char) 0x88;
-    *(pc++) = (char) emit_alu_r_r(reg1, reg2);
-    return pc;
-}
+;
+
 #  define jit_emit_mov_rr_i(pc, reg2, reg1) if ((reg1) != (reg2)) { \
     *((pc)++) = (char) 0x89; \
     *((pc)++) = (char) emit_alu_r_r((reg1), (reg2)); }
 
 static char *
 emit_movb_i_r(char *pc, char imm, int reg)
-{
-    *(pc++) = (char)(0xb0 | (reg - 1));
-    *(pc++) = imm;
-    return pc;
-}
+;
 
 #  define jit_emit_mov_ri_i(interp, pc, reg, imm) { \
     *((pc)++) = (char)(0xb8 | ((reg) - 1)); \
@@ -348,12 +323,7 @@ emit_movb_i_r(char *pc, char imm, int reg)
 
 static char *
 emit_movb_i_m(PARROT_INTERP, char *pc, char imm, int base, int i, int scale, long disp)
-{
-    *(pc++) = (char) 0xc6;
-    pc = emit_r_X(interp, pc, emit_reg(emit_b000), base, i, scale, disp);
-    *(pc++) = imm;
-    return pc;
-}
+;
 
 #  define emitm_movl_i_m(pc, imm, b, i, s, d) { \
     *((pc)++) = (char) 0xc7; \
@@ -472,60 +442,10 @@ emit_movb_i_m(PARROT_INTERP, char *pc, char imm, int base, int i, int scale, lon
     *(pc)++ = 0xf; \
     emitm_alul_r_m((pc), 0xaf, (reg1), (b), (i), (s), (d)); }
 
-static char *
+char *
 opt_mul(PARROT_INTERP, char *pc, int dest, INTVAL imm, int src)
-{
-    UINTVAL ld2 = ld((UINTVAL) imm);
+;
 
-    if (imm == 0) {
-        jit_emit_mov_ri_i(interp, pc, dest, 0);
-    }
-    else if (imm > 0 && !(imm & (imm - 1))) {
-        /* positive power of 2 - do a shift */
-        jit_emit_mov_rr_i(pc, dest, src);
-        pc = emit_shift_i_r(interp, pc, emit_b100, ld2, dest);
-    }
-    else {
-        /* special small numbers */
-        switch (imm) {
-            case 3:
-                /* LEA dest, base, index, scale, displace
-                 * note: src may be dest, so can't be reused
-                 *
-                 * dest = src + src*2 */
-                emitm_lea_m_r(interp, pc, dest, src, src, 2, 0);
-                break;
-            case 5:      /* dest = src + src*4 */
-                emitm_lea_m_r(interp, pc, dest, src, src, 4, 0);
-                break;
-            case 6:     /* dest = src*3; dest += dest */
-                emitm_lea_m_r(interp, pc, dest, src, src, 2, 0);
-                jit_emit_add_rr_i(interp, pc, dest, dest);
-                break;
-            case 9:      /* dest = src + src*8 */
-                emitm_lea_m_r(interp, pc, dest, src, src, 8, 0);
-                break;
-            case 10:      /* dest = src + src*4 ; dest+= dest */
-                emitm_lea_m_r(interp, pc, dest, src, src, 4, 0);
-                jit_emit_add_rr_i(interp, pc, dest, dest);
-                break;
-            case 12:     /* dest= src*3; dest <<= 2 */
-                emitm_lea_m_r(interp, pc, dest, src, src, 2, 0);
-                pc = emit_shift_i_r(interp, pc, emit_b100, 2, dest);
-                break;
-            case 100:      /* dest = src + src*4 ; dest <<= 2; dest = 5*dest*/
-                emitm_lea_m_r(interp, pc, dest, src, src, 4, 0);
-                pc = emit_shift_i_r(interp, pc, emit_b100, 2, dest);
-                emitm_lea_m_r(interp, pc, dest, dest, dest, 4, 0);
-                break;
-            default:
-                emitm_alul_r_r(pc, 0x69, dest, src);
-                *(long *)(pc) = (long)imm;
-                pc += 4;
-        }
-    }
-    return pc;
-}
 #  define jit_emit_mul_rir_i(pc, dest, imm, src) \
        (pc) = opt_mul(interp, (pc), (dest), (imm), (src))
 
