@@ -418,7 +418,6 @@ Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
         /* if we have data available, copy out the next byte */
         if (avail) {
-ret_string:
             memcpy(s->strstart, buffer_next, len);
             s->bufused = s->strlen = len;
             return len;
@@ -446,7 +445,9 @@ ret_string:
     }
 
     /* if we got any data, then copy out the next byte */
-    goto ret_string;
+    memcpy(s->strstart, buffer_next, len);
+    s->bufused = s->strlen = len;
+    return len;
 }
 
 /*
