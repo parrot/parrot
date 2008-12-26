@@ -182,6 +182,43 @@ method function_call($/) {
     make $past;
 }
 
+method instantiate_array($/) {
+    my $past := PAST::Op.new(
+                    :pasttype( 'call' ),
+                    :name( 'array' ),
+                    :node( $/ )
+                );
+  
+                #for $<expression> {
+                #$past.push( $($_) );
+                #}
+
+                #for $<key_value_pair> {
+                #$past.push( $($_) );
+                #}
+    for $<array_arguments> {
+        $past.push( $($_) );
+    }   
+
+    make $past;
+}
+
+method array_arguments($/, $key) {
+    make $( $/{$key} );
+}
+
+method key_value_pair($/) { 
+   my $past := PAST::Op.new(
+                    :node( $/ ),
+                    :pasttype( 'call' ),
+                    :name( 'infix:=>' ),
+                    :returns( 'Array' ),
+                    $( $<key> ),
+                    $( $<value> )
+            );
+   make $past;
+}
+
 method method_call($/) {
     my $past := PAST::Op.new(
                     :name( ~$<METHOD_NAME> ),

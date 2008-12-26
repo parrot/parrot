@@ -61,6 +61,32 @@ php_array.pir - PHP array Standard Library
     .REGISTER_LONG_CONSTANT(cst, 'COUNT_RECURSIVE', COUNT_RECURSIVE)
 .end
 
+.sub 'array'
+    .param pmc args :slurpy
+    .local pmc array, iter
+    array = new 'PhpArray'
+    iter = new 'Iterator', args
+    $I1 = 0
+    args_loop:
+        unless iter goto args_end
+        $P0 = shift iter
+        $I0 = isa $P0, 'ResizablePMCArray'
+        unless $I0 goto add_var
+        $P1 = $P0[0]
+        $P2 = $P0[1]
+        array[$P1] = $P2
+        goto args_loop
+    add_var:
+        array[$I1] = $P0
+        $I1 = $I1 + 1
+        goto end
+    end:
+        goto args_loop
+    args_end:
+    .return(array)
+.end
+
+
 =item C<array array_change_key_case(array input [, int case=CASE_LOWER])>
 
 Retuns an array with all string keys lowercased [or uppercased]

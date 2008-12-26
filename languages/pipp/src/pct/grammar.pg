@@ -278,6 +278,21 @@ rule function_call {
     {*}
 }
 
+rule instantiate_array {
+	'array' '(' [ <array_arguments> [  [',' <array_arguments> ]* [',' <array_arguments> ]?  ]? ','?  ]?  ')'
+	{*}
+}
+
+rule array_arguments {	
+	| <key_value_pair>	{*}	#= key_value_pair
+	| <expression>		{*}	#= expression
+}
+
+rule key_value_pair {
+	<key=expression> '=>' <value=expression>
+	{*}
+}
+
 rule constructor_call {
     'new' <CLASS_NAME>
     {*}
@@ -358,6 +373,7 @@ rule literal {
 rule term {
       <method_call>            {*}   #= method_call
     | <function_call>          {*}   #= function_call
+	| <instantiate_array>	   {*}	 #= instantiate_array
     | <constructor_call>       {*}   #= constructor_call
     | '(' <expression> {*} ')'       #= expression
     | <literal>                {*}   #= literal

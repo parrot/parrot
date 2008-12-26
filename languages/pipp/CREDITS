@@ -29,3 +29,4 @@ N: Daniel Keane
 E: keane.dp@gmail.com
 D: Implementation of 'elsif'
 D: Implementation of 'do-while'
+D: Implementation of 'array()'
