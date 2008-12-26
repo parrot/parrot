@@ -103,7 +103,6 @@ sub _init {
 
     my @cage_warnings = qw(
         -std=c89
-        -Wconversion
         -Werror-implicit-function-declaration
         -Wformat=2
         -Wlarger-than-4096
@@ -117,7 +116,6 @@ sub _init {
         -Wno-multichar
         -Wno-pointer-sign
         -Wold-style-definition
-        -Wredundant-decls
         -Wswitch-enum
         -Wsystem-headers
         -Wunreachable-code
@@ -130,10 +128,12 @@ sub _init {
 
     my @may_not_even_be_interesting = qw(
         -Wpadded
+        -Wredundant-decls
     );
 
     my @nice_to_have_but_too_noisy_for_now = qw(
         -pedantic
+        -Wconversion
         -Wint-to-pointer-cast
         -Wshadow
         -Wunused-macros
