@@ -178,7 +178,7 @@ Parrot_io_make_string(PARROT_INTERP, ARGMOD(STRING **buf), size_t len)
 
 =item C<void Parrot_io_set_os_handle>
 
-Set the C<os_handle> attribute of the FileHandle object, which stores the
+Sets the C<os_handle> attribute of the FileHandle object, which stores the
 low-level filehandle for the OS.
 
 Currently, this pokes directly into the C struct of the FileHandle PMC. This

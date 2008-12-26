@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, The Perl Foundation.
+Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -80,11 +80,12 @@ convert_flags_to_stdio(INTVAL flags)
     }
 }
 
+
 /*
 
 =item C<INTVAL Parrot_io_init_portable>
 
-Setup standard streams, etc.
+Sets up standard streams, etc.
 
 =cut
 
@@ -109,11 +110,12 @@ Parrot_io_init_portable(PARROT_INTERP)
     return 0;
 }
 
+
 /*
 
 =item C<PMC * Parrot_io_open_portable>
 
-Open a new FileHandle PMC from a given path.
+Opens a new FileHandle PMC from a given STRING path with the provided modes.
 
 =cut
 
@@ -126,7 +128,7 @@ Parrot_io_open_portable(PARROT_INTERP, ARGMOD(PMC *filehandle),
               ARGIN(STRING *path), INTVAL flags)
 {
     const char *oflags;
-    FILE *fptr;
+    FILE       *fptr;
 
     if ((flags & (PIO_F_WRITE | PIO_F_READ)) == 0)
         return NULL;
@@ -138,17 +140,18 @@ Parrot_io_open_portable(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
     { /* scope for temporary C string */
         const char *spath = string_to_cstring(interp, path);
-        /* Try opening the file- note that this can't really handle O_EXCL, etc. */
+        /* Try opening the file
+         * note that this can't really handle O_EXCL, etc. */
         fptr = fopen(spath, oflags);
 
-        if (fptr == NULL && errno == ENOENT && (flags & PIO_F_WRITE)) {
+        if (fptr == NULL && errno == ENOENT && (flags & PIO_F_WRITE))
             fptr = fopen(spath, "w+b");
-        }
+
         string_cstring_free(spath);
     }
 
     /* File open */
-    if (fptr != NULL) {
+    if (fptr) {
         PMC *io;
         if (io_is_tty_portable((PIOHANDLE)fptr))
             flags |= PIO_F_CONSOLE;
@@ -170,7 +173,7 @@ Parrot_io_open_portable(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
 =item C<PMC * Parrot_io_fdopen_portable>
 
-RT#48260: Not yet documented!!!
+Associates an IO PMC with a file descriptor.
 
 =cut
 
@@ -196,6 +199,7 @@ Parrot_io_fdopen_portable(PARROT_INTERP, ARGMOD(PMC *filehandle),
         io = filehandle;
 
     Parrot_io_set_os_handle(interp, filehandle, (PIOHANDLE)fptr);
+
     return io;
 }
 
@@ -204,7 +208,7 @@ Parrot_io_fdopen_portable(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
 =item C<INTVAL Parrot_io_close_portable>
 
-RT#48260: Not yet documented!!!
+Closes the underlying filehandle of a given IO PMC.
 
 =cut
 
@@ -213,19 +217,22 @@ RT#48260: Not yet documented!!!
 INTVAL
 Parrot_io_close_portable(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
-    FILE * const fptr = (FILE*) Parrot_io_get_os_handle(interp, filehandle);
+    FILE * const fptr = (FILE *)Parrot_io_get_os_handle(interp, filehandle);
 
-    if (fptr != NULL)
+    if (fptr)
         fclose(fptr);
+
     Parrot_io_set_os_handle(interp, filehandle, (PIOHANDLE)NULL);
+
     return 0;
 }
+
 
 /*
 
 =item C<INTVAL Parrot_io_is_closed_portable>
 
-Test whether the filehandle has been closed.
+Tests whether the filehandle has been closed.
 
 =cut
 
@@ -245,7 +252,7 @@ Parrot_io_is_closed_portable(PARROT_INTERP, ARGIN(PMC *filehandle))
 
 =item C<static INTVAL io_is_tty_portable>
 
-RT#48260: Not yet documented!!!
+Tests whether the given file descriptor is attached to a tty.
 
 =cut
 
@@ -260,11 +267,12 @@ io_is_tty_portable(PIOHANDLE fptr)
     return 0;
 }
 
+
 /*
 
 =item C<size_t Parrot_io_peek_portable>
 
-Retrieve the next character in the stream without modifying the stream.
+Retrieves the next character in the stream without modifying the stream.
 
 =cut
 
@@ -275,16 +283,16 @@ Parrot_io_peek_portable(PARROT_INTERP,
         ARGIN(PMC *filehandle),
         ARGIN(STRING **buf))
 {
-    FILE * const fptr = (FILE *) Parrot_io_get_os_handle(interp, filehandle);
-    STRING * const s = Parrot_io_make_string(interp, buf, 1);
+    FILE   * const fptr  = (FILE *)Parrot_io_get_os_handle(interp, filehandle);
+    STRING * const s     = Parrot_io_make_string(interp, buf, 1);
 
     /* read the next byte into the buffer */
-    const size_t bytes = fread(s->strstart, 1, 1, fptr);
+    const size_t   bytes = fread(s->strstart, 1, 1, fptr);
 
     /* if we got anything from the stream, push it back on */
     if (bytes) {
         s->bufused = s->strlen = 1;
-        ungetc(*(char*)s->strstart, fptr);
+        ungetc(*(char *)s->strstart, fptr);
     }
     else
         s->bufused = s->strlen = 1;
@@ -297,7 +305,7 @@ Parrot_io_peek_portable(PARROT_INTERP,
 
 =item C<INTVAL Parrot_io_getblksize_portable>
 
-RT#48260: Not yet documented!!!
+Returns the block size of the given file descriptor.
 
 =cut
 
@@ -317,7 +325,7 @@ Parrot_io_getblksize_portable(PIOHANDLE fptr)
 
 =item C<INTVAL Parrot_io_flush_portable>
 
-RT#48260: Not yet documented!!!
+Flushes the underlying file descriptor of the given IO PMC.
 
 =cut
 
@@ -326,7 +334,7 @@ RT#48260: Not yet documented!!!
 INTVAL
 Parrot_io_flush_portable(SHIM_INTERP, SHIM(PMC *filehandle))
 {
-    return fflush((FILE*)Parrot_io_get_os_handle(interp, filehandle));
+    return fflush((FILE *)Parrot_io_get_os_handle(interp, filehandle));
 }
 
 
@@ -334,7 +342,8 @@ Parrot_io_flush_portable(SHIM_INTERP, SHIM(PMC *filehandle))
 
 =item C<size_t Parrot_io_read_portable>
 
-RT#48260: Not yet documented!!!
+Reads from the given filehandle into the provided STRING, returning the number
+of bytes read.
 
 =cut
 
@@ -344,20 +353,18 @@ size_t
 Parrot_io_read_portable(PARROT_INTERP, SHIM(PMC *filehandle),
               ARGIN(STRING **buf))
 {
-    FILE * const fptr = (FILE *)Parrot_io_get_os_handle(interp, filehandle);
-    STRING * const s = Parrot_io_make_string(interp, buf, 2048);
-    const size_t len = s->bufused;
-    void * const buffer = s->strstart;
-
-    const size_t bytes = fread(buffer, 1, len, fptr);
+    FILE   * const fptr   = (FILE *)Parrot_io_get_os_handle(interp, filehandle);
+    STRING * const s      = Parrot_io_make_string(interp, buf, 2048);
+    void   * const buffer = s->strstart;
+    const   size_t len    = s->bufused;
+    const   size_t bytes  = fread(buffer, 1, len, fptr);
 
     s->bufused = s->strlen = bytes;
 
     if (bytes != len) {
-        if (feof(fptr)) {
+        if (feof(fptr))
             Parrot_io_set_flags(interp, filehandle,
-                                (Parrot_io_get_flags(interp, filehandle) | PIO_F_EOF));
-        }
+                (Parrot_io_get_flags(interp, filehandle) | PIO_F_EOF));
     }
 
     return bytes;
@@ -368,7 +375,7 @@ Parrot_io_read_portable(PARROT_INTERP, SHIM(PMC *filehandle),
 
 =item C<size_t Parrot_io_write_portable>
 
-RT#48260: Not yet documented!!!
+Writes the given STRING to the provided IO PMC.
 
 =cut
 
@@ -379,14 +386,15 @@ Parrot_io_write_portable(PARROT_INTERP, ARGIN(PMC *filehandle), ARGMOD(STRING *s
 {
     void * const buffer = s->strstart;
     return fwrite(buffer, 1, s->bufused,
-                  (FILE*)Parrot_io_get_os_handle(interp, filehandle));
+                  (FILE *)Parrot_io_get_os_handle(interp, filehandle));
 }
+
 
 /*
 
 =item C<PIOOFF_T Parrot_io_seek_portable>
 
-RT#48260: Not yet documented!!!
+Seeks to the given offset and position within the provided IO PMC.
 
 =cut
 
@@ -399,21 +407,23 @@ Parrot_io_seek_portable(PARROT_INTERP, ARGMOD(PMC *filehandle),
     PIOOFF_T pos;
     errno = 0;
 
-    if ((pos = fseek((FILE*)Parrot_io_get_os_handle(interp, filehandle),
+    if ((pos = fseek((FILE *)Parrot_io_get_os_handle(interp, filehandle),
                     (long)offset, whence)) >= 0)
         Parrot_io_set_file_position(interp, filehandle, pos);
 
     /* Seek clears EOF */
     Parrot_io_set_flags(interp, filehandle,
             (Parrot_io_get_flags(interp, filehandle) & ~PIO_F_EOF));
+
     return pos;
 }
+
 
 /*
 
 =item C<PIOOFF_T Parrot_io_tell_portable>
 
-RT#48260: Not yet documented!!!
+Returns the current position of the given IO PMC.
 
 =cut
 
@@ -422,14 +432,15 @@ RT#48260: Not yet documented!!!
 PIOOFF_T
 Parrot_io_tell_portable(PARROT_INTERP, ARGIN(PMC *filehandle))
 {
-    return (ftell((FILE*)Parrot_io_get_os_handle(interp, filehandle)));
+    return (ftell((FILE *)Parrot_io_get_os_handle(interp, filehandle)));
 }
+
 
 /*
 
 =item C<PMC * Parrot_io_open_pipe_portable>
 
-Open a pipe. Not implemented for this platform.
+Opens a pipe. Not implemented for this platform.
 
 =cut
 
