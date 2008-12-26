@@ -1,4 +1,4 @@
-" Description:  imcc indenter
+" Description:  PIR indenter
 " Author:   Andrew Rodland <arodland@entermail.net>
 " Maintainer: Jimmy Zhuo <zhuomingliang@yahoo.com.cn>
 " Last Change: 2008 Dec 3
