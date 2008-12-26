@@ -104,6 +104,10 @@ static int returns_match_results(
 #  include "parrot/exec.h"
 #  include "jit.h"
 
+extern const jit_arch_info *
+Parrot_jit_init(PARROT_INTERP);
+
+
 #  ifdef PIC_TEST
 /*
  * just for testing the whole scheme ...

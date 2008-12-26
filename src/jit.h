@@ -312,11 +312,6 @@ typedef struct jit_arch_info_t {
 } jit_arch_info;
 
 /*
- * return the jit_arch_info for the given JIT_CODE type
- */
-const jit_arch_info * Parrot_jit_init(Interp *);
-
-/*
  * interface to create JIT code
  */
 Parrot_jit_info_t *
