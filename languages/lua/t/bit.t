@@ -32,7 +32,7 @@ if ( $test_prog eq 'lua' ) {
     plan skip_all => "parrot only";
 }
 else {
-    plan tests => 6;
+    plan tests => 8;
 }
 
 language_output_is( 'lua', << 'CODE', << "OUTPUT", 'require' );
@@ -69,7 +69,22 @@ OUTPUT
 language_output_is( 'lua', << 'CODE', << "OUTPUT", 'bit.bswap' );
 m = require "bit"
 assert(bit.bswap(0x12345678) == 0x78563412)
+assert(bit.bswap(0x9ABCDEF0) == 0xF0DEBC9A)
 CODE
+OUTPUT
+
+my $code;
+
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/bit/bittest.lua" );
+$code .= "\nprint 'ok'\n";
+language_output_is( 'lua', $code, << "OUTPUT", 'bittest' );
+ok
+OUTPUT
+
+$code = Parrot::Test::slurp_file( "$FindBin::Bin/bit/nsievebits.lua" );
+$code .= "\nprint 'ok'\n";
+language_output_is( 'lua', $code, << "OUTPUT", 'nsievebits' );
+ok
 OUTPUT
 
 

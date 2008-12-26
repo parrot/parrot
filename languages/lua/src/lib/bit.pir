@@ -211,7 +211,6 @@ Only the lower 5 bits of the rotate count are used (reduces to the range [0..31]
     $I1 = lua_checknumber(1, x)
     $I2 = lua_checknumber(2, n)
     band $I2, 31
-    neg $I2
     rot $I0, $I1, $I2, 32
     .BRET($I0)
 .end
@@ -223,6 +222,7 @@ Only the lower 5 bits of the rotate count are used (reduces to the range [0..31]
     $I1 = lua_checknumber(1, x)
     $I2 = lua_checknumber(2, n)
     band $I2, 31
+    neg $I2
     rot $I0, $I1, $I2, 32
     .BRET($I0)
 .end
@@ -239,8 +239,8 @@ little-endian 32 bit numbers to big-endian 32 bit numbers or vice versa.
     .param pmc x :optional
     .param pmc extra :slurpy
     $I1 = lua_checknumber(1, x)
-    $I0 = $I1 >> 24
-    $I2 = $I1 >> 8
+    $I0 = $I1 >>> 24
+    $I2 = $I1 >>> 8
     $I2 &= 0x0000ff00
     $I0 |= $I2
     $I3 = $I1 & 0x0000ff00
