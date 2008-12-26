@@ -467,3 +467,239 @@ opt_mul(PARROT_INTERP, char *pc, int dest, INTVAL imm, int src)
     return pc;
 }
 
+int
+intreg_is_used(Parrot_jit_info_t *jit_info, char reg)
+{
+    int i;
+    const jit_arch_regs *reg_info;
+    Parrot_jit_register_usage_t *ru = jit_info->optimizer->cur_section->ru;
+
+    reg_info = jit_info->arch_info->regs + jit_info->code_type;
+
+    for (i = 0; i < ru[0].registers_used; ++i) {
+        if (reg_info->map_I[i] == reg) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+#  define jit_emit_xchg_rr_i(interp, pc, r1, r2) { \
+    if ((r1) != (r2)) { \
+    *((pc)++) = (char) 0x87; \
+    *((pc)++) = (char) emit_alu_r_r((r1), (r2)); \
+    } \
+}
+
+#  define emitm_popl_r(pc, reg) \
+    (pc) = emit_popl_r((pc), (reg))
+
+#define emitm_pushl_r(pc, reg) \
+    *((pc)++) = (char) 0x50 | ((reg) - 1)
+	
+#  define emitm_movl_m_r(interp, pc, reg1, b, i, s, d) \
+    emitm_movX_Y_Z((interp), 0x8b, (pc), (reg1), (b), (i), (s), (d))
+
+char *
+opt_shift_rr(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int count, int op)
+{
+    char *pc = jit_info->native_ptr;
+    if (count == emit_ECX) {
+        pc = emit_shift_r_r(interp, pc, op, count, dest);
+    }
+    else {
+        int saved = 0;
+        PARROT_ASSERT(count != emit_EAX);
+        if (dest == emit_EAX) {
+            if (intreg_is_used(jit_info, emit_ECX)) {
+                emitm_pushl_r(pc, emit_ECX);
+                saved = 1;
+            }
+            jit_emit_mov_rr_i(pc, emit_ECX, count);
+            pc = emit_shift_r_r(interp, pc, op, emit_ECX, dest);
+            if (saved) {
+                emitm_popl_r(pc, emit_ECX);
+            }
+
+        }
+        else if (dest == emit_ECX) {
+            jit_emit_xchg_rr_i(interp, pc, dest, count);
+            pc = emit_shift_r_r(interp, pc, op, dest, count);
+            jit_emit_xchg_rr_i(interp, pc, dest, count);
+        }
+        else {
+            jit_emit_mov_rr_i(pc, emit_EAX, emit_ECX);
+            jit_emit_mov_rr_i(pc, emit_ECX, count);
+            pc = emit_shift_r_r(interp, pc, op, emit_ECX, dest);
+            jit_emit_mov_rr_i(pc, emit_ECX, emit_EAX);
+        }
+    }
+    return pc;
+}
+
+char *
+opt_shift_rm(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int offs, int op)
+{
+    char *pc = jit_info->native_ptr;
+    int saved = 0;
+    /* if ECX is mapped, save it */
+    if (dest != emit_ECX && intreg_is_used(jit_info, emit_ECX)) {
+        emitm_pushl_r(pc, emit_ECX);
+        saved = 1;
+    }
+    if (dest == emit_ECX) {
+        /* jit_emit_mov_RM_i(pc, emit_EAX, count); */
+        emitm_movl_m_r(interp, pc, emit_EAX, emit_EBX, emit_None, 1, offs);
+        jit_emit_xchg_rr_i(interp, pc, dest, emit_EAX);
+        pc = emit_shift_r_r(interp, pc, op, emit_ECX, emit_EAX);
+        jit_emit_xchg_rr_i(interp, pc, dest, emit_EAX);
+    }
+    else {
+        /* jit_emit_mov_RM_i(pc, emit_ECX, count); */
+        emitm_movl_m_r(interp, pc, emit_ECX, emit_EBX, emit_None, 1, offs);
+        pc = emit_shift_r_r(interp, pc, op, emit_ECX, dest);
+    }
+    if (saved) {
+        emitm_popl_r(pc, emit_ECX);
+    }
+    return pc;
+}
+
+#  define emitm_jnz  5
+#  define emitm_jp  10
+
+/* test r for zero */
+#  define jit_emit_test_r_n(pc, r) { \
+    if (r) { \
+      emitm_fxch((pc), (r)); \
+    } \
+    emitm_fxam(pc); \
+    emitm_fstw(pc); \
+    emitm_sahf(pc); \
+    if (r) { \
+      emitm_fxch((pc), (r)); \
+    } \
+}
+
+#define INTERP_BP_OFFS -16
+
+#define Parrot_jit_emit_get_INTERP(interp, pc, dest) \
+    emitm_movl_m_r((interp), (pc), (dest), emit_EBP, emit_None, 1, INTERP_BP_OFFS)
+
+#define emitm_pushl_i(pc, imm) { \
+    *((pc)++) = (char) 0x68; \
+    *(long *)(pc) = (long)(imm); \
+    (pc) += 4; }
+
+/* Short jump - 8 bit disp */
+#  define emitm_jxs(pc, code, disp) { \
+    *((pc)++) = (char)(0x70 | (code)); \
+    *((pc)++) = (char)(disp); }
+
+/* FXCH ST, ST(i) , optimize 2 consecutive fxch with same reg */
+#  define emitm_fxch(pc, sti) { \
+    emitm_fl_3((pc), emit_b001, emit_b001, (sti)); \
+}
+
+#  define emitm_fxam(pc)  { *((pc)++) = (char) 0xd9; *((pc)++) = (char) 0xe5; }
+
+/* Ops Needed to support loading EFLAGs for conditional branches */
+#  define emitm_fstw(pc) emitm_fl_3((pc), emit_b111, emit_b100, emit_b000)
+
+#  define emitm_sahf(pc) *((pc)++) = (char) 0x9e
+
+#  define emitm_calll(pc, disp) { \
+    *((pc)++) = (char) 0xe8; \
+    *(long *)(pc) = (disp); (pc) += 4; }
+	
+enum { JIT_X86BRANCH, JIT_X86JUMP, JIT_X86CALL };
+
+void call_func(Parrot_jit_info_t *jit_info, void (*addr) (void))
+{
+    Parrot_jit_newfixup(jit_info);
+    jit_info->arena.fixups->type = JIT_X86CALL;
+    jit_info->arena.fixups->param.fptr = D2FPTR(addr);
+    emitm_calll(jit_info->native_ptr, 0xdeafc0de);
+}
+
+void jit_emit_real_exception(Parrot_jit_info_t *jit_info)
+{
+    call_func(jit_info, (void (*) (void)) & Parrot_ex_throw_from_c_args);
+}
+
+#  define emitm_floatop 0xd8  /* 11011000 */
+
+#  define emitm_fl_3(pc, d_p_opa, opb_r, sti) { \
+    *((pc)++) = (char)(emitm_floatop | (d_p_opa)); \
+    *((pc)++) = (char)(0xc0 | ((opb_r) << 3) | (sti)); }
+
+/* FDIVP Div ST(i) = ST(0) / ST(i); POP ST(0) */
+#  define emitm_fdivp(pc, sti) emitm_fl_3((pc), emit_b110, emit_b111, (sti))
+
+/* FSTP ST(i) = ST, POP */
+#  define emitm_fstp(pc, sti) { \
+    lastpc = (unsigned char*) (pc); \
+    emitm_fl_3((pc), emit_b101, emit_b011, (sti)); \
+}
+
+#  define emitm_fprem(pc) { *(pc)++ = 0xd9; *(pc)++ = 0xF8; }
+
+unsigned char *lastpc;
+
+/* ST(r1) /= ST(r2) */
+char *
+div_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r1)
+{
+    char *L1;
+    static const char div_by_zero[] = "Divide by zero";
+    char *pc = jit_info->native_ptr;
+
+    jit_emit_test_r_n(pc, (char)0);   /* TOS */
+    L1 = pc;
+    emitm_jxs(pc, emitm_jnz, 0);
+    emitm_pushl_i(pc, div_by_zero);
+    emitm_pushl_i(pc, EXCEPTION_DIV_BY_ZERO);
+    emitm_pushl_i(pc, 0);    /* NULL */
+    Parrot_jit_emit_get_INTERP(interp, pc, emit_ECX);
+    emitm_pushl_r(pc, emit_ECX);
+    jit_info->native_ptr = pc;
+    jit_emit_real_exception(jit_info);
+    pc = jit_info->native_ptr;
+    /* L1: */
+    L1[1] = (char)(pc - L1 - 2);
+    emitm_fdivp(pc, (r1+1));
+    return pc;
+}
+
+char *
+mod_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r)
+{
+    char *L1;
+    static const char div_by_zero[] = "Divide by zero";
+    char *pc = jit_info->native_ptr;
+
+    jit_emit_test_r_n(pc, (char)0);   /* TOS */
+    L1 = pc;
+    emitm_jxs(pc, emitm_jnz, 0);
+    emitm_pushl_i(pc, div_by_zero);
+    emitm_pushl_i(pc, EXCEPTION_DIV_BY_ZERO);
+    emitm_pushl_i(pc, 0);    /* NULL */
+    Parrot_jit_emit_get_INTERP(interp, pc, emit_ECX);
+    emitm_pushl_r(pc, emit_ECX);
+    jit_info->native_ptr = pc;
+    jit_emit_real_exception(jit_info);
+    pc = jit_info->native_ptr;
+    /* L1: */
+    L1[1] = (char)(pc - L1 - 2);
+    /* L2: */
+    emitm_fxch(pc, (char)1);
+    emitm_fprem(pc);
+    emitm_fstw(pc);
+    emitm_sahf(pc);
+    emitm_jxs(pc, emitm_jp, -7); /* jo L2 */
+    emitm_fstp(pc, (r+1));
+    return pc;
+}
+
+
+

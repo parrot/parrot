@@ -71,9 +71,9 @@ set_nci_P(PARROT_INTERP, ARGOUT(call_state *st), PMC* val)
 #  define JIT_CGP
 #endif
 
-static void call_func(Parrot_jit_info_t *jit_info, void (*addr) (void));
+void call_func(Parrot_jit_info_t *jit_info, void (*addr) (void));
 
-static void jit_emit_real_exception(Parrot_jit_info_t *jit_info);
+void jit_emit_real_exception(Parrot_jit_info_t *jit_info);
 
 /*
  * get the register frame pointer
@@ -613,86 +613,17 @@ opt_mul(PARROT_INTERP, char *pc, int dest, INTVAL imm, int src)
 #  define jit_emit_ror_ri_i(interp, pc, reg, imm) \
     { (pc) = emit_shift_i_r((interp), (pc), emit_b001, (imm), (reg)); }
 
-static int
+int
 intreg_is_used(Parrot_jit_info_t *jit_info, char reg)
-{
-    int i;
-    const jit_arch_regs *reg_info;
-    Parrot_jit_register_usage_t *ru = jit_info->optimizer->cur_section->ru;
+;
 
-    reg_info = jit_info->arch_info->regs + jit_info->code_type;
-
-    for (i = 0; i < ru[0].registers_used; ++i) {
-        if (reg_info->map_I[i] == reg) {
-            return 1;
-        }
-    }
-    return 0;
-}
-
-static char *
+char *
 opt_shift_rr(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int count, int op)
-{
-    char *pc = jit_info->native_ptr;
-    if (count == emit_ECX) {
-        pc = emit_shift_r_r(interp, pc, op, count, dest);
-    }
-    else {
-        int saved = 0;
-        PARROT_ASSERT(count != emit_EAX);
-        if (dest == emit_EAX) {
-            if (intreg_is_used(jit_info, emit_ECX)) {
-                emitm_pushl_r(pc, emit_ECX);
-                saved = 1;
-            }
-            jit_emit_mov_rr_i(pc, emit_ECX, count);
-            pc = emit_shift_r_r(interp, pc, op, emit_ECX, dest);
-            if (saved) {
-                emitm_popl_r(pc, emit_ECX);
-            }
+;
 
-        }
-        else if (dest == emit_ECX) {
-            jit_emit_xchg_rr_i(interp, pc, dest, count);
-            pc = emit_shift_r_r(interp, pc, op, dest, count);
-            jit_emit_xchg_rr_i(interp, pc, dest, count);
-        }
-        else {
-            jit_emit_mov_rr_i(pc, emit_EAX, emit_ECX);
-            jit_emit_mov_rr_i(pc, emit_ECX, count);
-            pc = emit_shift_r_r(interp, pc, op, emit_ECX, dest);
-            jit_emit_mov_rr_i(pc, emit_ECX, emit_EAX);
-        }
-    }
-    return pc;
-}
-static char *
+char *
 opt_shift_rm(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int offs, int op)
-{
-    char *pc = jit_info->native_ptr;
-    int saved = 0;
-    /* if ECX is mapped, save it */
-    if (dest != emit_ECX && intreg_is_used(jit_info, emit_ECX)) {
-        emitm_pushl_r(pc, emit_ECX);
-        saved = 1;
-    }
-    if (dest == emit_ECX) {
-        /* jit_emit_mov_RM_i(pc, emit_EAX, count); */
-        emitm_movl_m_r(interp, pc, emit_EAX, emit_EBX, emit_None, 1, offs);
-        jit_emit_xchg_rr_i(interp, pc, dest, emit_EAX);
-        pc = emit_shift_r_r(interp, pc, op, emit_ECX, emit_EAX);
-        jit_emit_xchg_rr_i(interp, pc, dest, emit_EAX);
-    }
-    else {
-        /* jit_emit_mov_RM_i(pc, emit_ECX, count); */
-        emitm_movl_m_r(interp, pc, emit_ECX, emit_EBX, emit_None, 1, offs);
-        pc = emit_shift_r_r(interp, pc, op, emit_ECX, dest);
-    }
-    if (saved) {
-        emitm_popl_r(pc, emit_ECX);
-    }
-    return pc;
-}
+;
 
 /* interface, shift r1 by r2 bits */
 
@@ -865,7 +796,7 @@ opt_shift_rm(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int offs, int
 }
 
 /* FLD ST, ST(i), optimized FSTP(N+1);FLD(N) => FST(N+1)  */
-static unsigned char *lastpc;
+extern unsigned char *lastpc;
 #  define emitm_fld(pc, sti) do { \
      if ((unsigned char *)(pc) == (lastpc + 2) && \
        (int)(*lastpc) == (int)0xDD && \
@@ -1505,29 +1436,9 @@ static unsigned char *lastpc;
 }
 
 /* ST(r1) /= ST(r2) */
-static char *
+char *
 div_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r1)
-{
-    char *L1;
-    static const char div_by_zero[] = "Divide by zero";
-    char *pc = jit_info->native_ptr;
-
-    jit_emit_test_r_n(pc, (char)0);   /* TOS */
-    L1 = pc;
-    emitm_jxs(pc, emitm_jnz, 0);
-    emitm_pushl_i(pc, div_by_zero);
-    emitm_pushl_i(pc, EXCEPTION_DIV_BY_ZERO);
-    emitm_pushl_i(pc, 0);    /* NULL */
-    Parrot_jit_emit_get_INTERP(interp, pc, emit_ECX);
-    emitm_pushl_r(pc, emit_ECX);
-    jit_info->native_ptr = pc;
-    jit_emit_real_exception(jit_info);
-    pc = jit_info->native_ptr;
-    /* L1: */
-    L1[1] = (char)(pc - L1 - 2);
-    emitm_fdivp(pc, (r1+1));
-    return pc;
-}
+;
 
 #  define jit_emit_div_rr_n(interp, pc, r1, r2) \
     emitm_fld((pc), (r2)); \
@@ -1544,35 +1455,9 @@ div_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r1)
     jit_info->native_ptr = (pc); \
     (pc) = div_rr_n((interp), jit_info, (r))
 
-static char *
+char *
 mod_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r)
-{
-    char *L1;
-    static const char div_by_zero[] = "Divide by zero";
-    char *pc = jit_info->native_ptr;
-
-    jit_emit_test_r_n(pc, (char)0);   /* TOS */
-    L1 = pc;
-    emitm_jxs(pc, emitm_jnz, 0);
-    emitm_pushl_i(pc, div_by_zero);
-    emitm_pushl_i(pc, EXCEPTION_DIV_BY_ZERO);
-    emitm_pushl_i(pc, 0);    /* NULL */
-    Parrot_jit_emit_get_INTERP(interp, pc, emit_ECX);
-    emitm_pushl_r(pc, emit_ECX);
-    jit_info->native_ptr = pc;
-    jit_emit_real_exception(jit_info);
-    pc = jit_info->native_ptr;
-    /* L1: */
-    L1[1] = (char)(pc - L1 - 2);
-    /* L2: */
-    emitm_fxch(pc, (char)1);
-    emitm_fprem(pc);
-    emitm_fstw(pc);
-    emitm_sahf(pc);
-    emitm_jxs(pc, emitm_jp, -7); /* jo L2 */
-    emitm_fstp(pc, (r+1));
-    return pc;
-}
+;
 
 /* ST(i) %= MEM
  * please note the hardccded jumps */
@@ -2027,21 +1912,6 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
     jit_emit_mov_rr_i((pc), emit_ESP, emit_EBP); \
     emitm_popl_r((pc), emit_EBP); \
 } while (0)
-
-
-
-static void call_func(Parrot_jit_info_t *jit_info, void (*addr) (void))
-{
-    Parrot_jit_newfixup(jit_info);
-    jit_info->arena.fixups->type = JIT_X86CALL;
-    jit_info->arena.fixups->param.fptr = D2FPTR(addr);
-    emitm_calll(jit_info->native_ptr, 0xdeafc0de);
-}
-
-static void jit_emit_real_exception(Parrot_jit_info_t *jit_info)
-{
-    call_func(jit_info, (void (*) (void)) & Parrot_ex_throw_from_c_args);
-}
 
 #if JIT_VTABLE_OPS
 
