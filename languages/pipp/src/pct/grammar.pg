@@ -258,14 +258,11 @@ token METHOD_NAME              { <ident> }
 
 # namespace support
 
-token NAMESPACE_SEPARATOR { '\\' }
+token NAMESPACE_SEPARATOR      { '\\' }
 
-token NAMESPACE_NAME { <ident>? [ <.NAMESPACE_SEPARATOR> <ident> ]* }
+token NAMESPACE_NAME           { <ident>? [ <.NAMESPACE_SEPARATOR> <ident> ]* }
 
-token VAR_NAME {
-    '$' <ident>
-    {*}
-}
+token VAR_NAME                 { '$' <ident> }
 
 # terms
 rule method_call {

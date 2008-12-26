@@ -371,29 +371,6 @@ method var_assign($/) {
 }
 
 method array_elem($/) {
-    my $past_var_name := $( $<VAR_NAME> );
-    $past_var_name.scope('package');
-    $past_var_name.viviself('PhpArray');
-
-    make PAST::Var.new(
-             $past_var_name,
-             $( $<expression> ),
-             :scope('keyed'),
-             :viviself('PhpNull'),
-             :lvalue(1)
-         );
-}
-
-method simple_var($/) {
-    make $( $<VAR_NAME> );
-}
-
-method var($/, $key) {
-    make $( $/{$key} );
-}
-
-method VAR_NAME($/) {
-    our $?PIPP_CURRENT_SCOPE;
     our $?BLOCK;
 
     my $isdecl;
@@ -405,16 +382,54 @@ method VAR_NAME($/) {
         $isdecl := 1;
         $?BLOCK.symbol(
             ~$/,
+            :scope('package')
+        );
+    }
+
+    my $past_var_name := 
+        PAST::Var.new(
+            :scope('package'),
+            :name(~$<VAR_NAME>),
+            :viviself('PhpArray'),
+            :lvalue(1),
+        );
+
+    make PAST::Var.new(
+             $past_var_name,
+             $( $<expression> ),
+             :scope('keyed'),
+             :viviself('PhpNull'),
+             :lvalue(1)
+         );
+}
+
+method simple_var($/) {
+    our $?PIPP_CURRENT_SCOPE;
+    our $?BLOCK;
+
+    my $isdecl;
+    if $?BLOCK.symbol( ~$/ ) {
+        # symbol is already present
+        $isdecl := 0;
+    }
+    else {
+        $isdecl := 1;
+        $?BLOCK.symbol(
+            ~$<VAR_NAME>,
             :scope( $?PIPP_CURRENT_SCOPE ?? $?PIPP_CURRENT_SCOPE !! 'package' )
         );
     }
 
     make PAST::Var.new(
              :scope( $?PIPP_CURRENT_SCOPE ?? $?PIPP_CURRENT_SCOPE !! 'package' ),
-             :name(~$/),
+             :name(~$<VAR_NAME>),
              :viviself('PhpNull'),
              :lvalue(1),
          );
+}
+
+method var($/, $key) {
+    make $( $/{$key} );
 }
 
 method this($/) {
@@ -583,8 +598,28 @@ method param_list($/) {
                 );
     my $arity := 0;
     for $<VAR_NAME> {
-        my $param := $( $_ );
-        $param.scope('parameter');
+        our $?BLOCK;
+
+        my $isdecl;
+        if $?BLOCK.symbol( ~$_ ) {
+            # symbol is already present
+            $isdecl := 0;
+        }
+        else {
+            $isdecl := 1;
+            $?BLOCK.symbol(
+                ~$_,
+                :scope('parameter')
+            );
+        }
+
+        my $param :=
+            PAST::Var.new(
+                :scope('parameter'),
+                :name(~$_),
+                :viviself('PhpNull'),
+                :lvalue(1),
+            );
         $past.push($param);
 
         # enter the parameter as a lexical into the block's symbol table
