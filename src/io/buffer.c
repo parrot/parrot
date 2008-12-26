@@ -399,7 +399,7 @@ Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
     size_t  avail = 0;
 
     INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
-    unsigned char *buffer_next, *buffer_end;
+    unsigned char *buffer_next;
 
     STRING * const s = Parrot_io_make_string(interp, buf, 1);
 
@@ -410,19 +410,6 @@ Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
     }
 
     buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
-    buffer_end   = Parrot_io_get_buffer_end(interp, filehandle);
-
-    /* read Data from buffer */
-    if (buffer_flags & PIO_BF_READBUF) {
-        avail = buffer_end - buffer_next;
-
-        /* if we have data available, copy out the next byte */
-        if (avail) {
-            memcpy(s->strstart, buffer_next, len);
-            s->bufused = s->strlen = len;
-            return len;
-        }
-    }
 
     /* (re)fill the buffer */
     if (! (buffer_flags & PIO_BF_READBUF)) {
