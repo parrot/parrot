@@ -28,7 +28,7 @@ integer data types are the same as the semantics of their C equivalents.
 
 Integer data types have a dedicated register set. In PIR, the C<I> register
 variables (C<$I0>, etc.) and C<.param>s or C<.local>s declared with the C<int>
-type are native integers. Native unsigned integers are not accessibly directly
+type are native integers. Native unsigned integers are not accessible directly
 in PIR. Many opcodes or vtable functions are defined with variants that take
 native integer arguments. When passed to a subroutine or method call, a native
 integer may be autoboxed as an C<Integer> PMC, or as an HLL type mapped to
