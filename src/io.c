@@ -158,9 +158,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_io_make_string(PARROT_INTERP, ARGMOD(STRING **buf), size_t len)
 {
-    /*
-     * when we get a NULL string, we read a default len
-     */
+    /* when we get a NULL string, we read a default len */
     if (*buf == NULL) {
         *buf = string_make_empty(interp, enum_stringrep_one, len);
         return *buf;
@@ -168,7 +166,7 @@ Parrot_io_make_string(PARROT_INTERP, ARGMOD(STRING **buf), size_t len)
     else {
         STRING *s = *buf;
         if (s->bufused < len)
-            Parrot_allocate_string(interp, s, len);
+            Parrot_reallocate_string(interp, s, len);
         return s;
     }
 }
