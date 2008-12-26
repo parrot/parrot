@@ -99,7 +99,7 @@ void stack_destroy(SHIM(Stack_Chunk_t *top));
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-Stack_Entry_t * stack_entry(PARROT_INTERP,
+Stack_Entry_t * stack_entry(SHIM_INTERP,
     ARGIN(Stack_Chunk_t *stack),
     INTVAL depth)
         __attribute__nonnull__(1)
