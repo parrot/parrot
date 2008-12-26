@@ -792,7 +792,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw obj of class w Hash attrs" );
 
 .namespace [ "OPTable" ]
 
-.sub "__init" :method
+.sub "init" :method :vtable
     .local pmc keytable, klentable
     keytable = new 'Hash'
     klentable = new 'Hash'
