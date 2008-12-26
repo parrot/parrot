@@ -384,6 +384,10 @@ method array_elem($/) {
          );
 }
 
+method simple_var($/) {
+    make $( $<VAR_NAME> );
+}
+
 method var($/, $key) {
     make $( $/{$key} );
 }

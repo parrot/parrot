@@ -355,10 +355,15 @@ rule array_elem {
     {*}
 }
 
+token simple_var {
+    <VAR_NAME>
+    {*}
+}
+
 token var {
       <this>        {*}   #= this
     | <array_elem>  {*}   #= array_elem
-    | <VAR_NAME>    {*}   #= VAR_NAME
+    | <simple_var>  {*}   #= simple_var
 }
 
 rule literal {
