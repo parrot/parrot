@@ -112,13 +112,17 @@ statement for the next opcode.
 =item* Computed Goto Core
 
 I<Computed Goto> is a feature of some C compilers where a label is
-treated as a piece of data that can be stored in an array. Each opcode
-is simply a label in a very large function, and the labels are stored
-in an array. Calling an opcode is as easy as taking that opcode's number
-as the index of the label array, and calling the associated label.
-Sound complicated? It is a little, especially to C programmers who are
-not used to these kinds of features, and who have been taught that the
-C<goto> keyword is to be avoided.
+treated as a piece of data that can be stored as a C<void *> pointer. Each
+opcode becomes simply a label in a very large function, and pointers to the
+labels are stored in a large array. Calling an opcode is as easy as taking
+that opcode's number as the index of the label array, and calling the
+associated label. Sound complicated? It is a little, especially to C
+programmers who are not used to using labels, much less treating them as
+first class data items.
+
+Notice that computed goto is a feature only available in some compilers
+such as GCC, and will not be available in every distribution of Parrot,
+depending what compilers were used to build it.
 
 As was mentioned earlier, not all compilers support computed goto, which
 means that this core will not be built on platforms that don't support it.
@@ -165,9 +169,11 @@ it isn't optimized as aggressively as is possible.
 
 =item* Precomputed Goto Core
 
-The precomputed goto core is an amazingly optimized fast core that uses
+The precomputed goto core is an amazingly fast optimized core that uses
 the same computed goto feature, but performs the array dereferencing
-before the core even starts. In the computed goto core, you have this
+before the core even starts. The compiled bytecode is fed into a
+preprocessor that converts the bytecode instruction numbers into lable
+pointer values. In the computed goto core, you have this
 operation to move to the next opcode:
 
   goto *my_labels[*(current_opcode += 1)];
@@ -176,26 +182,31 @@ This single line of code is deceptively complex. A number of machine code
 operations must be performed to complete this step: The value of
 C<current_opcode> must be incremented to the next value, that value must
 be dereferenced to find the opcode value. In C, arrays are pointers, so
-C<my_labels> gets dereferenced and an offset is taken according to find
+C<my_labels> gets dereferenced and an offset is taken from it to find
 the stored label reference. That label reference is then dereferenced, and
 the jump is performed.
 
 That's a lot of steps to execute before we can jump to the next opcode.
-Now, what, if each opcode value was replaced with the value of the jump
-label beforehand? If C<current_opcode> points to a label referenced
-already, we don't need the array at all. We can replace that entire mess
-above with this line:
+What if each opcode value was replaced with the value of the jump
+label beforehand? If C<current_opcode> points to a label pointer directly,
+we don't need to perform an additional dereference on the array at all. We
+can replace that entire mess above with this line:
 
   goto **(current_opcode += 1);
 
 That's far fewer machine instructions to execute before we can move to the
 next opcode, which means faster throughput. Remember that whatever dispatch
-mechanism is used will be called after every singly opcode, and some large
+mechanism is used will be called after every single opcode, and some large
 programs may have millions of opcodes! Every single machine instruction
 that can be cut out of the dispatch mechanism could increase the execution
-speed of Parrot in a significant and noticable way. The precomputed goto
-core, while not available on all compilers, takes the idea of optimization
-to the extreme.
+speed of Parrot in a significant and noticable way. N<The dispatch mechanism
+used by the various runcores is hardly the largest performance bottleneck in
+Parrot anyway, but we like to use faster cores to shave every little bit of
+speed out of the system>.
+
+The caveat of course is that the predereferenced computed goto core is only
+available with compilers that support computed goto, such as GCC. Parrot
+will not have access to this core if it is built with a different compiler.
 
 =item* Tracing Core
 
