@@ -184,7 +184,7 @@ print {$Y} << 'DATA';
 DATA
 close $Y;
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io:read *number', params => '< number.txt', todo => 'can\'t peek stdin, see RT #61290');
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'io:read *number', params => '< number.txt' );
 while true do
     local n1, n2, n3 = io.read("*number", "*number", "*number")
     if not n1 then break end
