@@ -1809,8 +1809,37 @@ is_parrot_op(lexer_state * const lexer, char const * const name) {
 
 }
 
+/*
 
+=item C<static int
+generate_signature_pmc(lexer_state * const lexer)>
 
+Create a FixedPMCArray
+
+[[ XXXX sholdn't that be a FixedIntegerArray? Can't resize the fixedintarray... ]]
+
+PMC object that encodes the types and flags
+of parameters and add it to the PBC constant table. The index in that
+PBC constant table is returned.
+
+=cut
+
+*/
+static int
+generate_signature_pmc(lexer_state * const lexer) { /* XXX add params later if needed */
+    PMC *fixed_int_array;
+    int  array_index;
+
+    fixed_int_array = pmc_new(lexer->interp, enum_class_FixedPMCArray);
+
+    /* XXX set length to 0 for now. */
+    VTABLE_set_integer_native(lexer->interp, fixed_int_array, 0);
+
+    array_index     = add_pmc_const(lexer->bc, fixed_int_array);
+
+    return array_index;
+
+}
 
 
 
@@ -1834,18 +1863,8 @@ arguments_to_operands(lexer_state * const lexer, argument * const args) {
      * the number of arguments and their flags.
      */
 
-    PMC *fixed_int_array;
-    int  array_index;
-
-    fixed_int_array = pmc_new(lexer->interp, enum_class_FixedPMCArray);
-
-    /* XXX set length to 0 for now. */
-    VTABLE_set_integer_native(lexer->interp, fixed_int_array, 0);
-
-    array_index     = add_pmc_const(lexer->bc, fixed_int_array);
-
+    int  array_index = generate_signature_pmc(lexer);
     push_operand(lexer, expr_from_const(lexer, new_const(lexer, INT_TYPE, array_index)));
-
     return; /* XXX just handle no-args calls/returns for now */
 
 
@@ -1956,20 +1975,10 @@ static void
 targets_to_operands(lexer_state * const lexer, target * const targets) {
     target *iter;
 
-
-    PMC *fixed_int_array;
-    int  array_index;
-
-    fixed_int_array = pmc_new(lexer->interp, enum_class_FixedPMCArray);
-
-    /* XXX set length to 0 for now. */
-    VTABLE_set_integer_native(lexer->interp, fixed_int_array, 0);
-
-    array_index     = add_pmc_const(lexer->bc, fixed_int_array);
-
+    int  array_index = generate_signature_pmc(lexer);
     push_operand(lexer, expr_from_const(lexer, new_const(lexer, INT_TYPE, array_index)));
-
     return; /* XXX just handle no-args calls/returns for now */
+
 
 { /* XXXXXXXXX */
 
@@ -2392,7 +2401,10 @@ emit_sub_leaving_instructions(lexer_state * const lexer) {
     if (TEST_FLAG(lexer->subs->flags, SUB_FLAG_MAIN))
         new_sub_instr(lexer, PARROT_OP_end, "end");
     else {
+        int array_index = generate_signature_pmc(lexer);
         new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc");
+        push_operand(lexer, expr_from_const(lexer, new_const(lexer, INT_TYPE, array_index)));
+
         new_sub_instr(lexer, PARROT_OP_returncc, "returncc");
     }
 }
