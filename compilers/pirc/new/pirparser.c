@@ -5987,11 +5987,37 @@ write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
                 *instr_writer++ = '_';
                 *instr_writer++ = 'k';
 
+                /* XXX this switch replaces the messy code below. double-check before delete. */
+                switch (iter->expr.t->key->expr->type) {
+                    case EXPR_TARGET:
+                        switch (iter->expr.t->key->expr->expr.t->info->type) {
+                            case PMC_TYPE:
+                                /* the key is a target, and its type is a PMC. In that
+                                 * case, do not print the signature; 'kp' is not valid.
+                                 */
+                                break;
+                            case INT_TYPE:
+                                *instr_writer++ = 'i';
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case EXPR_CONSTANT:
+                        *instr_writer++ = 'c';
+                        break;
+                    default:
+                        /* XXX does this ever happen? */
+                        fprintf(stderr, "write_signature: non-constant key\n");
+                        instr_writer = write_signature(iter->expr.t->key->expr, instr_writer);
+                        break;
+                }
+
+
+                /*
                 if ((iter->expr.t->key->expr->type == EXPR_TARGET)
                 &&  (iter->expr.t->key->expr->expr.t->info->type == PMC_TYPE)) {
-                    /* the key is a target, and its type is a PMC. In that case, do not
-                     * print the signature; 'kp' is not valid.
-                     */
+
                 }
                 else {
                     if ((iter->expr.t->key->expr->type == EXPR_TARGET)
@@ -6000,9 +6026,7 @@ write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
                        *instr_writer++ = 'i';
                     }
                     else
-                    /*
-                    instr_writer = write_signature(iter->expr.t->key->expr, instr_writer);
-                    */
+
                     switch (iter->expr.t->key->expr->type) {
                         case EXPR_CONSTANT:
                             *instr_writer++ = 'c';
@@ -6012,7 +6036,8 @@ write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
                             instr_writer = write_signature(iter->expr.t->key->expr, instr_writer);
                             break;
                     }
-                }
+                }*/
+
             }
             break;
         case EXPR_CONSTANT:
@@ -6228,7 +6253,6 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
         expression *iter = CURRENT_INSTRUCTION(lexer)->operands;
         opinfo           = CURRENT_INSTRUCTION(lexer)->opinfo;
 
-
         PARROT_ASSERT(opinfo);
 
         opcount = opinfo->op_count - 1; /* according to op.h, opcount also counts the op itself. */
@@ -6262,13 +6286,10 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
                  * which one to fix.
                  */
 
-                /*
-                fprintf(stderr, "setting %dth label flag on instruction %s\n", BIT(i),
-                        CURRENT_INSTRUCTION(lexer)->opname);
-                 */
+                /* fprintf(stderr, "setting %dth label flag on instruction %s\n", BIT(i),
+                        CURRENT_INSTRUCTION(lexer)->opname); */
 
                 SET_FLAG(CURRENT_INSTRUCTION(lexer)->oplabelbits, BIT(i));
-
             }
 
             ++i;
