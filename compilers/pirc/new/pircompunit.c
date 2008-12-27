@@ -1834,9 +1834,27 @@ arguments_to_operands(lexer_state * const lexer, argument * const args) {
      * the number of arguments and their flags.
      */
 
+    PMC *fixed_int_array;
+    int  array_index;
+
+    fixed_int_array = pmc_new(lexer->interp, enum_class_FixedPMCArray);
+
+    /* XXX set length to 0 for now. */
+    VTABLE_set_integer_native(lexer->interp, fixed_int_array, 0);
+
+    array_index     = add_pmc_const(lexer->bc, fixed_int_array);
+
+    push_operand(lexer, expr_from_const(lexer, new_const(lexer, INT_TYPE, array_index)));
+
+    return; /* XXX just handle no-args calls/returns for now */
+
+
+{   /* XXXXXXXXX */
+
     /* XXX in compilers/imcc/pcc.c there's a maximum number of 15 values;
      * do the same here to Get Things To Work, but fix later.
      */
+
     int flags_arg[15];
     int index         = 0;
     int forindex      = 0;
@@ -1917,6 +1935,9 @@ arguments_to_operands(lexer_state * const lexer, argument * const args) {
         push_operand(lexer, argiter->value);
     }
     while (argiter != args);
+
+} /* XXXXXXXXX */
+
 }
 
 /*
@@ -1935,6 +1956,23 @@ static void
 targets_to_operands(lexer_state * const lexer, target * const targets) {
     target *iter;
 
+
+    PMC *fixed_int_array;
+    int  array_index;
+
+    fixed_int_array = pmc_new(lexer->interp, enum_class_FixedPMCArray);
+
+    /* XXX set length to 0 for now. */
+    VTABLE_set_integer_native(lexer->interp, fixed_int_array, 0);
+
+    array_index     = add_pmc_const(lexer->bc, fixed_int_array);
+
+    push_operand(lexer, expr_from_const(lexer, new_const(lexer, INT_TYPE, array_index)));
+
+    return; /* XXX just handle no-args calls/returns for now */
+
+{ /* XXXXXXXXX */
+
     if (targets == NULL) {
         push_operand(lexer, expr_from_const(lexer, new_const(lexer, PMC_TYPE, "")));
         return;
@@ -1947,6 +1985,8 @@ targets_to_operands(lexer_state * const lexer, target * const targets) {
         push_operand(lexer, expr_from_target(lexer, iter));
     }
     while (iter != targets);
+
+}
 }
 
 
