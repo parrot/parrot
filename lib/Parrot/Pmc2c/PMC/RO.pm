@@ -97,12 +97,15 @@ EOC
             $self->add_method($ro_method);
         }
         elsif ( $parent->vtable_method_does_write($vt_method_name) ) {
+            my @parameters = split( /\s*,\s*/, $vt_method->parameters );
+            @parameters = map { "SHIM($_)" } @parameters;
+
             my $ro_method = Parrot::Pmc2c::Method->new(
                 {
                     name        => $vt_method_name,
                     parent_name => $parent->name,
                     return_type => $vt_method->return_type,
-                    parameters  => $vt_method->parameters,
+                    parameters  => join( ', ', @parameters ),
                     type        => Parrot::Pmc2c::Method::VTABLE,
                 }
             );
