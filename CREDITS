@@ -1,3 +1,4 @@
+=pod
 ﻿# $Id$
 
     Following in the steps of other open source projects that
@@ -6,7 +7,8 @@
     works.  It is sorted by name and formatted to allow easy
     grepping and beautification by scripts.
     The fields are: name (N), email (E), web-address (W),
-    description (D) and snail-mail address (S).
+    description (D), subversion username (U) and snail-mail
+    address (S).
 
         Thanks,
 
@@ -16,6 +18,8 @@
 
 ----------
 N: Aaron Sherman
+U: ajs
+E: ajs@ajs.com
 D: rand and srand ops
 
 N: Abhijit A. Mahabal
@@ -25,6 +29,7 @@ N: Adam Thomason
 D: Building on various platforms.
 
 N: Alberto Manuel Brandao Simoes
+U: ambs
 E: ambs@cpan.org
 D: Named arguments support and recovery support on PIR parser
 S: Braga, Portugal
@@ -43,19 +48,28 @@ D: Fixed object vtable method overrides in PIR
 
 N: Alex Gough
 D: bignum
+E: alex@earth.li
+U: ajgough
+
+N: Alexandre Buisse
+U: heimdall
+E: Nattfodd@gmail.com
 
 N: Allison Randal
 D: Lead Designer
 D: TGE, Punie (Perl 1), P6C
 E: allison@perl.org
+U: allison
 
 N: Amir Karger
+U: amirkarger
 D: editor bugfixes
 E: akarger@cgr.harvard.edu
 
 N: Amos Robinson
 D: IMCC Optimizer patches
 D: ParTcl builtins
+U: azuroth
 E: amos@coscom.net
 
 N: Anders Nor Berle
@@ -80,13 +94,17 @@ D: Internals development
 D: Documentation
 D: Release manager for 0.8.2
 E: wknight8111@gmail.com
+U: Whiteknight
 
 N: Andy Dougherty
+U: doughera
+E: doughera@lafayette.edu
 D: Config and building.
 
 N: Andy Lester
 D: consting, cleanups, and Chief Cage Cleaner
 E: andy@petdance.com
+U: petdance
 
 N: Angel Faus
 D: CFG and live analysis.
@@ -100,10 +118,15 @@ D: Trying to ride a Ponie - build and compat fixes.
 N: Arvindh Rajesh Tamilmani
 D: Buffered IO fix
 
-N: Ask Bjoern Hansen
+U: ask
+N: Ask Bjørn Hansen
 D: Keeps us running
+E: ask@develooper.com
 
 N: Audrey Tang
+U: audreyt
+U: autrijus
+E: audreyt@audreyt.org
 D: Pugs, a Perl6->Parrot implementation.
 
 N: Benjamin Goldberg
@@ -113,6 +136,7 @@ N: Bernd Ulmann
 D: Fixes for VMS
 
 N: Bernhard Schmalhofer
+U: bernhard
 D: Bugfixes
 D: Eclectus, Scheme on Parrot
 D: Parrot m4
@@ -128,6 +152,7 @@ D: patch regarding macro argument expansion
 N: Bob Rogers
 D: Random small bug fixes, including one for the linguine bug.
 E: rogers-perl6@rgrjr.dyndns.org
+U: rgrjr
 
 N: Bob Wilkinson
 D: Numerous document typos.
@@ -144,15 +169,20 @@ N: Bram Geron
 D: IMCC documentation update
 E: bgeron@gmail.com
 
+U: brentdax
 N: Brent Royal-Gordon
 D: Configure, Parrot_sprintf, embedding, early regex engine.
 D: Early contributions under the name Brent Dax.
 E: brent@brentdax.com
 W: http://www.brentdax.com/
 
+U: bdwheele
 N: Brian Wheeler
+E: bdwheele@indiana.edu
 
 N: Bruce Gray
+U: util
+E: bruce.gray@acm.org
 D: debugging tutorial remarks
 
 N: Bryan C. Warnock
@@ -161,8 +191,17 @@ D: Little things here and there in pre-Parrot days.
 D: And, yes, {sigh}, *that* Warnock.
 E: bwarnock@raba.com
 
+N: Carl Masak
+E: cmasak@gmail.com
+U: masak
+
+N: Charles Reiss
+U: creiss
+E: creiss@cc.gatech.edu
+
 N: Chip Salzenberg
 D: Pumpking (0.4.6 - ... ) and demagogue
+U: chip
 E: chip@pobox.com
 
 N: Chris Davaz
@@ -170,6 +209,7 @@ D: Rakudo builtins
 E: cdavaz@gmail.com
 
 N: Chris Dolan
+U: cdolan
 D: TAP language author, Parrot Bug fixes and Rakudo patches
 E: cdolan@cpan.org
 
@@ -177,12 +217,14 @@ N: Chris Fields (cjfields)
 D: Rakudo patches
 
 N: Christoph Otto a.k.a. cotto
+U: cotto
 D: Patch for key flags in pdd08
 D: Range check in Env PMC
 D: Pipp
 E: christoph@mksig.org
 
 N: chromatic
+U: chromatic
 D: SDL library and examples; PIR Test::*; test suite cleanup; Parrot::Embed
 D: freaky bugs; cool features; Pheme
 E: chromatic@wgz.org
@@ -192,31 +234,43 @@ N: Clayton O'Neill
 D: Fix for parrot linking issue on Solaris 8
 
 N: Clinton A. Pierce
+U: clintp
+E: clintp@geeksalad.org
 D: Many PIR tests and fixes
 D: A small XML parser in PASM
 D: Interpreter and compiler for BASIC
 
 N: Colin Kuskie
+U: colink
 D: nqp hackery
 D: PIR tutorial updates, docs/test cleanups
 E: ckuskie@sterling.net
 
 N: Cory Spencer
+U: cspencer
 D: Peek opcode and PIO implementation
 D: Rakudo builtins
 E: cspencer@sprocket.org
 
 N: Curtis Rawls
+U: cgrawls
 D: imcc optimizer and register allocator patches and tests
 E: cgrawls@gmail.com
 
+N: Damian Miles Knopp
+U: dmknopp
+E: dmknopp@loyola.edu
+
 N: Dan Sugalski
+U: dan
 D: The big cheese emeritus
 E: dan@sidhe.org
 W: http://www.sidhe.org/~dan/blog/
 
 N: Daniel Grunblatt
 D: JIT and EXEC subsystems
+E: daniel@grunblatt.com.ar
+U: grunblatt
 
 N: Danny Werner
 D: Test for literals
@@ -225,7 +279,9 @@ N: Dave Woldrich
 D: Win32 build fixes
 E: dave@woldrich.com
 
-N: David M. Loyd
+N: David M. Lloyd
+U: dmlloyd
+E: dmlloyd@tds.net
 
 N: David Romano
 D: PGE tests and fixes
@@ -262,6 +318,8 @@ N: Flavio Poletti
 D: SmartLink patch for Moose after 0.43
 
 N: Florian Ragwitz
+U: rafl
+U: flora
 E: rafl@debianforum.de
 W: http://www.tu-chemnitz.de/~rafl/
 D: Debian packaging
@@ -270,6 +328,7 @@ S: Chemnitz, Germany
 N: François Perrad
 E: francois.perrad@gadz.org
 W: http://fperrad.googlepages.com/home
+U: fperrad
 D: build fixes for MinGW
 D: a patch to remove slash_exec from config
 D: language Lua
@@ -280,6 +339,8 @@ N: Garrett Rooney
 D: Fix typo in PARROT_BIGENDIAN case
 
 N: Geoff Broadwell (japhb)
+U: japhb
+E: geoff@broadwell.org
 D: OpenGL binding and examples
 D: Disassembly/source weaver
 D: Miscellaneous fixes
@@ -299,6 +360,7 @@ D: Unified PMC/PObj accessors
 N: Greg Bacon
 D: Memory reallocation test and patch
 
+U: gregor
 N: Gregor N. Purdy
 D: Early Parrot core, including packfile and op processing code,
 D: first predereferencing core, first Parrot-targetted compiler
@@ -327,11 +389,15 @@ N: isop
 D: various Pynie patches
 
 N: James E Keenan (Jim)
+E: jkeenan@cpan.org
+U: jkeenan
 D: Testing of configuration and build tools
 W: http://thenceforward.net/parrot/
 S:  Brooklyn, NY, USA
 
 N: Jarkko Hietaniemi
+U: jhi
+E: jhi@iki.fi
 D: packfile and Tru64 fixes
 D: lot of general hints and patches to improve portability
 
@@ -342,9 +408,12 @@ D: PPC JIT patches, ICU support, string handling
 
 N: Jeff Goff
 D: Release pumpking for 0.0.5-0.0.8
+U: jgoff
+E: jgoff@speakeasy.net
 
 N: Jeff Horwitz
 E: jeff@smashing.org
+U: jhorwitz
 D: Various bug fixes and tests
 
 N: Jeffrey Dik
@@ -354,17 +423,24 @@ N: Jens Rieks
 D: Several libraries, examples and patches.
 D: Tetris with SDL
 E: parrot@jensbeimsurfen.de
+U: jrieks
 S: Wuppertal, Germany
 
 N: Jerome Quelin
 D: parrotbug, befunge interpreter, ook compiler.
 E: jquelin@cpan.org
+U: jquelin
 S: Lyon, France
 
 N: Jerry Gay a.k.a. particle
+U: particle
 E: Jerry.Gay@gmail.com
 D: test suite, compiler tools, perl6, TAP language, entropy reduction, ECMAScript
 S: Seattle, WA
+
+N: Jesse Vincent
+U: jesse
+E: jesse@fsck.com
 
 N: Jimmy Zhuo
 E: zhuomingliang@yahoo.com.cn
@@ -377,12 +453,17 @@ D: coding standard tests
 N: John Paul Wallington
 D: pir-mode.el: fix for xemacs plus bugfixes and cleanups
 
+N: Jonathan Scott Duff
+U: duff
+E: duff@pobox.com
+
 N: Jonathan Sillito
 D: Lexical pads, CPS.
 
 N: Jonathan Stowe
 
 N: Jonathan Worthington
+U: jonathan
 D: Bits of Win32 support, PBC utilities, debug segment work, .Net
 D: to PIR translator, some Rakudo stuff and various other patches
 E: jnthn@jnthn.net
@@ -397,21 +478,32 @@ D: fortytwo opcode
 N: Josh McAdams
 D: Allow git checkouts to pass some tests that require an svn checkout
 
+U: josh
 N: Josh Wilmes
+E: josh-perl6@hitchhiker.org
 
 N: Joshua Gatcomb
 D: updated version of parrotbench.pl
 
 N: Joshua Hoblitt
 E: jhoblitt@cpan.org
+U: jhoblitt
 D: bug wrangling, doc & makefile cleanups, and Pod tests
 D: mucking around with Configure
 
-N: Joshua Isom, a.k.a jisom
+N: Joshua Isom
+E: loneowl@ritalin.shout.net
+U: jisom
 D: Getopt/Obj.pir
 
-N: Juergen Boemmels
+N: Jürgen Bömmels
+U: boemmels
+E: boemmels@web.de
 D: Parrot I/O; macro stuff in assembler.
+
+N: Julian Albo
+U: julianalbo
+E: julian.notfound@gmail.com
 
 N: Julian Fondren
 E: ayrnieu@gmail.com
@@ -431,6 +523,8 @@ D: yield and other PIR improvements
 N: Kevin Falcone
 
 N: Kevin Tew
+U: tewk
+E: tewk@tewk.com
 D: Cardinal(Ruby on Parrot), ECMAScript PGE grammar,
 D: Python PGE grammar, C99 PGE Grammar
 D: Various Config Fixes, Compiler Warnings, etc
@@ -440,18 +534,27 @@ D: clean-ups of compilers/imcc and its documentation.
 D: compilers/pirc and languages/PIR.
 D: various updates to PCT-based languages (C99,Punie,Cardinal,Ecmascript)
 D: languages/json
+U: kjs
 E: parrotcode@gmail.com
+
+N: Larry Wall
+E: larry@wall.org
+U: larry
 
 N: Lars Balker Rasmussen
 D: FreeBSD and other build fixes
 
 N: Lee Duhem
 D: Debug patch
+U: leed
 E: lee.duhem@gmail.com
 
 N: Leon Brocard
+U: acme
+E: acme@astray.com
 
 N: Leopold Toetsch
+U: leo
 D: Patchmonster & pumpking emeritus (0.0.13 - 0.4.5)
 E: lt@toetsch.at
 S: Herrnbaumgarten, Austria
@@ -462,6 +565,8 @@ E: lu_zero@gentoo.org
 
 
 N: Luke Palmer
+E: luke@luqui.org
+U: luqui
 D: Many fixes
 
 N: Marcelo Serra Castilhos
@@ -472,6 +577,7 @@ N: Marcus Thiesen
 D: URM language, bugfixes
 
 N: Mark Glines a.k.a. Infinoid
+U: infinoid
 D: Cage cleaning, random bugfixes, report bugs
 E: mark@glines.org
 S: South Lake Tahoe, CA, USA
@@ -487,6 +593,8 @@ N: Markus Mays
 D: Implementation of the Rational PMC
 
 N: Matt Diephouse
+U: mdiep
+E: matt@diephouse.com
 D: Turn off buffering layer in forth.pasm
 D: Various patches for pmc2c.pl
 D: Run Tcl test suite in partcl, and add various partcl bits
@@ -501,6 +609,7 @@ N: Mattia Barbon
 D: Win32 fixes, dynamic PMC creation and loading
 
 N: Melvin Smith
+U: mrjoltcola
 D: Parrot core, various ops, IO, subs, continuations, COW stacks
 D: IMCC, Cola
 E: melvin.smith@mindspring.com
@@ -518,6 +627,7 @@ D: Getting Started Guide for Parrot, many doc fixes
 D: Mac OS X build fixes
 D: HTML documentation for Parrot
 E: michael_scott@mac.com
+U: mikescott
 W: http://xrl.us/sml
 
 N: Michael Stevens
@@ -527,6 +637,8 @@ N: Michal J Wallace
 D: Pie-thon hammering PIR
 
 N: Mike Lambert
+U: mongo
+E: perl-dev@jall.org
 
 N: Mike Mattie
 E: codermattie@gmail.com
@@ -536,11 +648,14 @@ N: Mitchell N Charity
 
 N: Moritz A Lenz
 E: moritz@faui2k3.org
+U: moritz
 D: Test infrastructure for languages/perl6/ and Perl 6 in general
 
 N: Neil Conway
 
 N: Nicholas Clark
+U: nicholas
+E: nick@ccl4.org
 D: Building and platform compat and more.
 
 N: Nick Glencross
@@ -548,6 +663,7 @@ D: Various low hanging bug fixes
 D: Build and smoke fixes for HP-UX and cygwin
 D: Some examples, such as circle.pir and MD5.pir
 E: nick.glencross@gmail.com
+U: nickg
 
 N: Nick Kostirya
 D: Win32, FreeBSD build fixes
@@ -567,6 +683,7 @@ D: Bugfixing and cage cleaning.
 E: julian.notfound@gmail.com
 
 N: Nuno 'smash' Carvalho
+U: smash
 D: PGE/perl6/abc debugging and testing
 E: mestre.smash@gmail.com
 
@@ -588,6 +705,7 @@ D: Ruby recursive expression support.
 E: pat.eyler@gmail.com
 
 N: Patrick R. Michaud
+U: pmichaud
 D: Parrot Grammar Engine
 D: Perl 6 (Rakudo Perl) pumpking
 D: NQP, PCT, PAST, POST
@@ -596,21 +714,26 @@ D: Pynie
 E: pmichaud@pobox.com
 
 N: Paul Cochrane
+U: paultcochrane
 D: Changing the newspaper in the parrot cage
 E: paultcochrane@gmail.com
 
 N: Peter Gibbs
+U: petergibbs
+E: peter@emkel.co.za
 D: String subsystem
 
 N: Philip Taylor
 D: Win32 ICC support
 
 N: Piers Cawley
+U: pdcawley
 D: The Second Perl 6 Summarizer after Bryan C. Warnock
 E: pdcawley@bofh.org.uk
 W: http://www.bofh.org.uk:8080/
 
 N: Reini Urban
+U: rurban
 E: rurban@cpan.org
 D: cygwin fixes
 
@@ -629,14 +752,20 @@ D: language Lua bugfix (64bits).
 
 N: Robert Spier
 D: Keeps us running
+U: robert
+E: robert@perl.org
 
 N: Roger Browne
+E: roger@eiffel.demon.co.uk
+U: eiffel
 D: Author of Amber; bug fixes and tests
 
 N: Roland Illing
 D: Building Parrot with pkgsrc
 
 N: Ron Blaschke
+U: rblasch
+E: ron@rblasch.org
 D: Win32 patches
 
 N: Ruben Fonseca
@@ -644,25 +773,33 @@ D: opcode test coverage script
 E: fonseka@gmail.com
 
 N: Sam Ruby
+E: rubys@intertwingly.net
+U: rubys
 D: Pythonic and OO patches
 
 N: Sam Vilain
 D: Prototype object model and tests
 
 N: Sean O'Rourke
+E: educated_foo@yahoo.com
+U: educated_foo
 D: Original Perl6 compiler
 
 N: Sebastian Riedel
 
 N: Shawn M Moore
+U: sartak
 D: Cage cleaner
 D: ops summary script
 E: sartak@gmail.com
 
 N: Simon Cozens
+U: simon
+E: simon@simon-cozens.org
 D: Release pumpking for 0.0.1-0.0.4
 
 N: Simon Glover
+U: scog
 D: Tests, docs and misc. bugfixes
 E: scog@aip.de
 S: Potsdam, Germany
@@ -677,6 +814,8 @@ N: Stéphane Payrard
 D: Various code fixes and improvements
 
 N: Stéphane Peiry
+U: stephane
+E: stephane@modxml.org
 D: Lot of JIT/sun patches
 
 N: Sterling Hughes
@@ -686,6 +825,7 @@ N: Steve Clark
 D: Bugfixes
 
 N: Steve Fink
+U: sfink
 D: Release pumpking for 0.0.9-0.0.11
 E: steve@fink.com
 S: San Carlos, CA, USA
@@ -705,11 +845,20 @@ D: Patch to repair 'make clean'
 N: Stuart Jansen
 D: lolcode patches
 
-N: tene
+N: Tanton Gibbs
+U: thgibbs
+E: thgibbs@deltafarms.com
+
+N: Stephen Weeks
+U: tene
 D: Cardinal, a Ruby compiler
 D: ChitChat, a Smalltalk compiler
 D: Minor Rakudo patches
 E: tene@allalone.org
+
+N: Tim Bunce
+E: Tim.Bunce@pobox.com
+U: timbo
 
 N: Thilo Planz
 D: partcl tests and inspiration
@@ -721,6 +870,8 @@ N: TOGoS
 D: Some FAQ questions and answers
 
 N: Tom Hughes
+E: tom@compton.nu
+U: tom
 
 E: tom@nekomimists.ddo.jp
 D: Nicer command line handling in ops2c.pl
@@ -737,12 +888,14 @@ D: Core and Rakudo patches
 
 N: Vishal Soni
 E: vishalrsoni@gmail.com
+U: vsoni
 D: Bug fixes in IMCC, ECMAScript
 
 N: Vladimir Lipsky
 D: Win32, IO fixes
 
 N: Will "Coke" Coleda
+U: coke
 E: will@coleda.com
 D: Tcl language (partcl), APL, website, various languages/ upkeep, misc.
 
@@ -751,3 +904,28 @@ N: Zach Lipton
 N: Zach Morgan
 E: zpmorgan@gmail.com
 D: Rakudo patch
+
+N: cvsdummy
+U: cvsdummy
+E: cvs@perl.org
+
+N: svn
+U: svn
+E: svn@perl.org
+
+=cut
+
+# This makes a "svn authors" file for git svn
+
+open my $fh, "<", $0 or die "can't open $0: $!";
+my %n;
+while (<$fh>) {
+    #warn "[$_]";
+    if (m/^\s*$/) {
+        printf "%-10s = %s <%s>\n", $n{U}, $n{N}, $n{E} if $n{U};
+        %n = ();
+    }
+    next unless m/^([NEDUSW]): (.*)/;
+    my ($f, $v) = ($1, $2);
+    $n{$f} = $v unless $n{$f};  # doesn't do the right thing for the multiline fields
+}
