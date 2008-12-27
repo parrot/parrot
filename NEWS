@@ -7,8 +7,9 @@ New in January 2009 release
     - removed slice syntax, e.g. $P0[1..2]
     - removed .namespace <ident>/.endnamespace <ident> pair
   + PIRC
-    - refactoring of data structures
+    - refactoring of various data structures
     - various bug fixes and updates
+    - basic bytecode generation for calling conventions
 - Languages
   + Pipp
     - added support for 'elsif'
