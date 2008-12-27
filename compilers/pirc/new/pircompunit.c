@@ -80,10 +80,9 @@ types).
 void
 reset_register_allocator(lexer_state * const lexer) {
     /* set register allocator to 0 for all register types. */
-    lexer->curregister[INT_TYPE]    = 0;
-    lexer->curregister[NUM_TYPE]    = 0;
-    lexer->curregister[PMC_TYPE]    = 0;
-    lexer->curregister[STRING_TYPE] = 0;
+    int i;
+    for (i = 0; i < NUM_PARROT_TYPES; ++i)
+        lexer->curregister[i] = 0;
 }
 
 
@@ -2103,7 +2102,6 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
                 global_label *glob = find_global_label(lexer, inv->sub->info->id.name);
 
                 if (glob) {
-                    /* XXX fix pmc const stuff */
                     new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc");
                     add_operands(lexer, "%T%i", sub, glob->const_table_index);
                 }
