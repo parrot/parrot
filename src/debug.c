@@ -2748,7 +2748,7 @@ Frees any allocated source files.
 */
 
 void
-PDB_free_file(PARROT_INTERP, ARGIN_NULLOK(PDB_file_t *file))
+PDB_free_file(SHIM_INTERP, ARGIN_NULLOK(PDB_file_t *file))
 {
     while (file) {
         /* Free all of the allocated line structures */
