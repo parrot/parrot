@@ -780,11 +780,18 @@ tree as a PIR code object that can be compiled.
     .local string subarg
     subarg = ''
     $I0 = exists self['arg']
-    if $I0 == 0 goto subarg_end
+    if $I0 == 0 goto subarg_dba
     subarg = self['arg']
     subarg = code.'escape'(subarg)
     subarg = concat ', ', subarg
     args['A'] = $S0
+  subarg_dba:
+    $I0 = exists self['dba']
+    if $I0 == 0 goto subarg_end
+    $S0 = self['dba']
+    $S0 = code.'escape'($S0)
+    subarg .= ", 'dba'=>"
+    subarg .= $S0
   subarg_end:
 
     .local string cname, captgen, captsave, captback

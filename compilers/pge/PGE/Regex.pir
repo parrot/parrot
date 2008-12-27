@@ -433,6 +433,29 @@ potentially very inefficient, but it "works" for now.
     .return (mob)
 .end
 
+=item FAILGOAL(pmc mob, string goal [, 'dba'=>dba])
+
+Throw an exception when parsing fails in goal matching.
+
+=cut
+
+.sub 'FAILGOAL' :method
+    .param string goal
+    .param pmc options         :slurpy :named
+    .local string dba
+    dba = options['dba']
+    if dba goto have_dba
+    $P0 = getinterp
+    $P0 = $P0['sub'; 1]
+    dba = $P0
+  have_dba:
+    .local string message
+    message = concat "Unable to parse ", dba
+    message .= ", couldn't find final "
+    message .= goal
+    die message
+.end
+
 =back
 
 =head2  Support subroutines

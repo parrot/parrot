@@ -130,15 +130,16 @@ the corresponding parse tree.
     .param pmc mob
     .param pmc adverbs         :slurpy :named
 
-    .local string stop
+    .local string stop, tighter
     .local pmc stopstack, optable, match
 
     stopstack = get_global '@!stopstack'
     optable = get_global '$optable'
 
     stop = adverbs['stop']
+    tighter = adverbs['tighter']
     push stopstack, stop
-    match = optable.'parse'(mob, 'stop'=>stop)
+    match = optable.'parse'(mob, 'stop'=>stop, 'tighter'=>tighter)
     $S0 = pop stopstack
 
     .return (match)
@@ -211,6 +212,9 @@ needed for compiling regexes.
 
     $P0 = get_global 'parse_quoted_literal'
     optable.'newtok'("term:'",  'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
+
+    $P0 = get_global 'parse_goal'
+    optable.'newtok'('term:~', 'equiv'=>'term:', 'parsed'=>$P0)
 
     optable.'newtok'('term:::',  'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Cut')
     optable.'newtok'('term::::', 'equiv'=>'term:', 'nows'=>1, 'match'=>'PGE::Exp::Cut')
@@ -1037,6 +1041,56 @@ Parses '...' literals.
 .end
 
 
+=item C<parse_goal>
+
+Parse a goal.
+
+=cut
+
+.sub 'parse_goal'
+    .param pmc mob
+    .local int pos, lastpos
+    .local string target
+    (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Concat')
+    lastpos = length target
+    ##  skip any leading whitespace before goal
+    pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
+    .local pmc regex, goal, expr, alt, failsub
+    regex = get_global 'regex'
+    ##  parse the goal, down to concatenation precedence
+    mob.'to'(pos)
+    goal = regex(mob, 'tighter'=>'infix:')
+    unless goal goto fail_goal
+    goal = goal['expr']
+    pos = goal.'to'()
+    ##  skip any leading whitespace before expression
+    pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
+    ##  parse the goal, down to concatenation precedence
+    mob.'to'(pos)
+    expr = regex(mob, 'tighter'=>'infix:')
+    unless expr goto fail_expr
+    expr = expr['expr']
+    pos = expr.'to'()
+    mob.'to'(pos)
+    failsub = mob.'new'(mob, 'grammar'=>'PGE::Exp::Subrule')
+    failsub.'to'(pos)
+    failsub['subname'] = 'FAILGOAL'
+    $S0 = goal.'text'()
+    failsub['arg'] = $S0
+    alt = mob.'new'(mob, 'grammar'=>'PGE::Exp::Alt')
+    alt.'to'(pos)
+    push alt, goal
+    push alt, failsub
+    push mob, expr
+    push mob, alt
+    .return (mob)
+  fail_goal:
+    'parse_error'(mob, pos, 'Unable to parse goal after ~')
+  fail_expr:
+    'parse_error'(mob, pos, 'Unable to parse expression after ~')
+.end
+
+
 =item C<parse_modifier>
 
 Parse a modifier.
@@ -1387,6 +1441,8 @@ Parse a modifier.
     inc $I0
     pad['subpats'] = $I0
   end:
+    $S0 = pad['dba']
+    self['dba'] = $S0
     .return (self)
 .end
 
