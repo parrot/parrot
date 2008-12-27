@@ -220,6 +220,70 @@ parse_file(int flexdebug, FILE *infile, char * const filename, int flags, int th
 
 /*
 
+Parse a PIR string.
+
+*/
+void
+parse_string(char *pirstring, int flags, int pasminput, unsigned macro_size) {
+    yyscan_t yyscanner;
+    lexer_state *lexer = NULL;
+
+
+    /* create a yyscan_t object */
+    yypirlex_init(&yyscanner);
+
+    yypirset_debug(0, yyscanner);
+
+
+    /* set the extra parameter in the yyscan_t structure */
+    lexer = new_lexer("<pir string>", flags);
+    lexer->macro_size = macro_size;
+    yypirset_extra(lexer, yyscanner);
+    lexer->yyscanner = yyscanner;
+
+    /* initialize the scanner state */
+    init_scanner_state(yyscanner);
+
+    /* set the scanner to a string buffer and go parse */
+    yypir_scan_string(pirstring, yyscanner);
+
+    if (pasminput) { /* PASM mode */
+        SET_FLAG(lexer->flags, LEXER_FLAG_PASMFILE);
+    }
+
+
+    yypirparse(yyscanner, lexer);
+
+    if (lexer->parse_errors == 0) {
+
+        print_subs(lexer);
+
+        if (TEST_FLAG(lexer->flags, LEXER_FLAG_WARNINGS))
+            check_unused_symbols(lexer);
+    }
+
+    /* there may have been errors during the instruction generation, check again here. */
+    if (lexer->parse_errors > 0)
+        fprintf(stderr, "There were %d errors\n", lexer->parse_errors);
+
+    /* XXX just want to make sure pirc doesn't segfault when doing bytecode stuff. */
+    if (TEST_FLAG(lexer->flags, LEXER_FLAG_OUTPUTPBC)) {
+        emit_pbc(lexer);
+    }
+
+
+    fprintf(stderr, "ok\n");
+    /* clean up after playing */
+    release_resources(lexer);
+
+       /* clean up after playing */
+    yypirlex_destroy(yyscanner);
+
+
+}
+
+/*
+
 temporary function for the thread-testing code.
 Unpack the arguments and invoke parse_file().
 
@@ -268,6 +332,12 @@ main(int argc, char *argv[]) {
     argc--;
     argv++;
 
+
+    /* XXX test the parse_string() function. */
+    /*
+    parse_string(".sub main :main\nprint 42\n.end\n", LEXER_FLAG_OUTPUTPBC, 0, INIT_MACRO_SIZE);
+    return 0;
+    */
 
 
     /* XXX very basic argument handling; I'm too lazy to check out

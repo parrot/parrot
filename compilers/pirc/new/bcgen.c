@@ -227,6 +227,7 @@ new_bytecode(Interp *interp, char const * const filename, int bytes, int codesiz
     bc->interp        = interp;
 
     /* create segments */
+    PARROT_ASSERT(filename != NULL);
     interp->code      = PF_create_default_segs(interp, filename, 1);
 
     /* add interpreter globals to bytecode. XXX Why is this? */

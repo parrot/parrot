@@ -9,6 +9,8 @@
 #include "pircompiler.h"
 #include "bcgen.h"
 
+#include "assert.h"
+
 /*
 
 =head1 FUNCTIONS
@@ -542,11 +544,15 @@ emit_pbc(lexer_state * const lexer) {
     if (lexer->subs == NULL)
         return;
 
+    fprintf(stderr, "emit_pbc(): starting...\n");
+
     lexer->bc = new_bytecode(lexer->interp, lexer->filename,
                              lexer->codesize * 4, lexer->codesize);
 
+    fprintf(stderr, "ok 1\n");
     subiter = lexer->subs->next;
 
+    assert(subiter);
     /* iterate over all instructions and emit them */
     do {
         fprintf(stderr, "start offset of sub '%s' is: %d\tend offest: %d\n",
