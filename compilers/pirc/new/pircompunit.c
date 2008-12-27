@@ -2037,10 +2037,13 @@ new_sub_instr(lexer_state * const lexer, int opcode, char const * const opname, 
     CURRENT_INSTRUCTION(lexer)->opinfo = &lexer->interp->op_info_table[opcode];
     CURRENT_INSTRUCTION(lexer)->opcode = opcode;
 
-    /* XXX how to calculate size of var-arg ops? */
+    /* XXX how to calculate size of var-arg ops? that's 1 for the op,
+    1 for the fixed integer array, and n for the variable number of arguments.
+    So, 2 + n, where n is the number of arguments.
+    */
 
     /* count number of ints needed to store this instruction in bytecode */
-    lexer->codesize += CURRENT_INSTRUCTION(lexer)->opinfo->op_count;
+    lexer->codesize += CURRENT_INSTRUCTION(lexer)->opinfo->op_count /* + "number of args" */;
 }
 
 /*
@@ -2105,16 +2108,6 @@ save_global_reference(lexer_state * const lexer, instruction * const instr, char
 convert_inv_to_instr(lexer_state * const lexer, invocation * const inv)>
 
 Convert an C<invocation> structure into a series of instructions.
-
-XXX Some of the conversion should be done during emit_pbc(), because only at that
-point is there a bytecode object around, in which PMCs can be emitted.
-Subs are stored as PMCs, and we need to look up the PMC constant and emit
-its index as an operand. Also, the first operands of the special PCC instructions
-must be generated once the bytecode object is around, because they use a FixedIntegerArray
-to encode flags/types of the rest of the operands.
-
-One solution would be to mark these instructions, and fix them during emitting bytecode.
-This needs more thought.
 
 =cut
 
@@ -2306,6 +2299,9 @@ fixup_local_labels(lexer_state * const lexer) {
                     unsigned     curr_instr = iter->offset;
 
                     /* convert the label identifier into a real label object */
+                    /* The label offset is calculated deducting the current Program Counter
+                     * from the PC of the label.
+                     */
                     operand->expr.l = new_label(lexer, labelid, offset - curr_instr);
                     operand->type   = EXPR_LABEL;
                 }
@@ -2377,7 +2373,7 @@ fixup_global_labels(lexer_state * const lexer) {
 /*
 
 =item C<static void
-emit_sub_leaving_instructions(lexer_state * const lexer)>
+emit_sub_epilogue(lexer_state * const lexer)>
 
 Emit final instructions for the current subroutine. In case
 this is a C<:main> sub, the "end" instruction is emitted,
@@ -2387,7 +2383,7 @@ otherwise it's a standard return sequence.
 
 */
 static void
-emit_sub_leaving_instructions(lexer_state * const lexer) {
+emit_sub_epilogue(lexer_state * const lexer) {
     /* a :main-marked sub ends with the "end" instruction;
      * otherwise it's this pair:
      *
@@ -2397,6 +2393,7 @@ emit_sub_leaving_instructions(lexer_state * const lexer) {
     if (TEST_FLAG(lexer->subs->flags, SUB_FLAG_MAIN))
         new_sub_instr(lexer, PARROT_OP_end, "end");
     else {
+        /* default sub epilogue */
         int array_index = generate_signature_pmc(lexer, 0);
         new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc");
         push_operand(lexer, expr_from_const(lexer, new_const(lexer, INT_TYPE, array_index)));
@@ -2421,26 +2418,26 @@ If register optimization was requested, this is invoked here.
 */
 void
 close_sub(lexer_state * const lexer) {
-    int need_leaving_instr = 1;
+    int need_epilogue = 1;
     int sub_const_table_index;
     global_label *glob;
 
-    /* don't generate leaving instructions if the last instruction was already
+    /* don't generate the sub epilogue if the last instruction was already
      * leaving the sub.
      */
     if (CURRENT_INSTRUCTION(lexer)) {
         switch (CURRENT_INSTRUCTION(lexer)->opcode) {
             case PARROT_OP_end:
             case PARROT_OP_returncc:
-                need_leaving_instr = 0;
+                need_epilogue = 0;
                 break;
             default:
                 break;
         }
     }
 
-    if (need_leaving_instr)
-        emit_sub_leaving_instructions(lexer);
+    if (need_epilogue)
+        emit_sub_epilogue(lexer);
 
     /* fix up all local branch labels */
     fixup_local_labels(lexer);
