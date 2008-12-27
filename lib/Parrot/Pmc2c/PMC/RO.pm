@@ -25,14 +25,12 @@ use strict;
 use warnings;
 use base qw( Parrot::Pmc2c::PMC );
 
-use Parrot::Pmc2c::Emitter;
-use Parrot::Pmc2c::PMCEmitter;
-use Parrot::Pmc2c::Method;
-use Parrot::Pmc2c::MethodEmitter;
+use Parrot::Pmc2c::Emitter ();
+use Parrot::Pmc2c::PMCEmitter ();
+use Parrot::Pmc2c::Method ();
 use Parrot::Pmc2c::UtilFunctions
     qw( gen_ret dont_edit count_newlines dynext_load_code c_code_coda );
 use Text::Balanced 'extract_bracketed';
-use Parrot::Pmc2c::PCCMETHOD;
 
 =item C<make_RO($type)>
 
