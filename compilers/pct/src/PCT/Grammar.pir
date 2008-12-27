@@ -51,6 +51,28 @@ also included.
 .end
 
 
+=item FAILGOAL($goal [, 'dba'=>dba])
+
+Invoked when goal matching fails to find the goal.  Builds an appropriate
+error message and delegates the rest to C<panic>.
+
+=cut
+
+.sub 'FAILGOAL' :method
+    .param string goal
+    .param pmc options         :named :slurpy
+    .local string dba
+    dba = options['dba']
+    if dba goto have_dba
+    ##  if no dba supplied, use the name of the caller sub
+    $P0 = getinterp
+    $P0 = $P0['sub';1]
+    dba = $P0
+  have_dba:
+    .tailcall self.'panic'("Unable to parse ", dba, "; couldn't find final ", goal)
+.end
+    
+
 =item item()
 
 Here we overload the item() method from PGE::Match to
