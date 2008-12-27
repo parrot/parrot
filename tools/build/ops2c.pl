@@ -1,11 +1,12 @@
 #! perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
+
 use warnings;
 use strict;
 use lib 'lib';
 use Parrot::Ops2c::Auxiliary qw( Usage getoptions );
-use Parrot::Ops2c::Utils;
+use Parrot::Ops2c::Utils ();
 
 my $flagref = getoptions();
 if ( ( not defined $flagref )
