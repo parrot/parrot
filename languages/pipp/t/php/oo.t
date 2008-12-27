@@ -54,7 +54,7 @@ CODE
 constant bar in class Foo
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'calling an instance method', todo => '$dings declared in wrong block' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'calling an instance method' );
 <?php
 
 class Dings {
@@ -72,7 +72,7 @@ CODE
 The function bums() in class Dings has been called.
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'class with a public member', todo => '$dings declared in wrong block' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'class with a public member' );
 <?php
 
 class Dings {
@@ -92,7 +92,7 @@ The function bums() in class Dings has been called.
 OUT
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'calling a method within a method', todo => '$dings declared in wrong block' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'calling a method within a method' );
 <?php
 
 class Foo {

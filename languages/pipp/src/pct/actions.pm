@@ -21,38 +21,37 @@ class Pipp::Grammar::Actions;
 
 method TOP($/, $key) {
     our @?BLOCK; # A stack of PAST::Block
-    our $?BLOCK; # The current block. Used for managing the symbol table. 
    
     if $key eq 'open' {
-        $?BLOCK := PAST::Block.new(
-                       :node($/),
-                       :hll('pipp')
-                   );
+        my $block := PAST::Block.new(
+                         :node($/),
+                         :hll('pipp')
+                     );
         
         # set up scope 'package' for the superglobals
         # TODO: use a loop
-        $?BLOCK.symbol_defaults( :scope('lexical') );
-        $?BLOCK.symbol( :scope('package'), '$_GET' );
-        $?BLOCK.symbol( :scope('package'), '$_POST' );
-        $?BLOCK.symbol( :scope('package'), '$_SERVER' );
-        $?BLOCK.symbol( :scope('package'), '$_GLOBALS' );
-        $?BLOCK.symbol( :scope('package'), '$_FILES' );
-        $?BLOCK.symbol( :scope('package'), '$_COOKIE' );
-        $?BLOCK.symbol( :scope('package'), '$_SESSION' );
-        $?BLOCK.symbol( :scope('package'), '$_REQUEST' );
-        $?BLOCK.symbol( :scope('package'), '$_ENV' );
-        @?BLOCK.unshift($?BLOCK);
+        $block.symbol_defaults( :scope('lexical') );
+        $block.symbol( :scope('package'), '$_GET' );
+        $block.symbol( :scope('package'), '$_POST' );
+        $block.symbol( :scope('package'), '$_SERVER' );
+        $block.symbol( :scope('package'), '$_GLOBALS' );
+        $block.symbol( :scope('package'), '$_FILES' );
+        $block.symbol( :scope('package'), '$_COOKIE' );
+        $block.symbol( :scope('package'), '$_SESSION' );
+        $block.symbol( :scope('package'), '$_REQUEST' );
+        $block.symbol( :scope('package'), '$_ENV' );
+        @?BLOCK.unshift($block);
     }
     else {
         # retrieve the block created in the "if" section in this method.
-        my $past := @?BLOCK.shift();
+        my $block := @?BLOCK.shift();
 
         # a PHP script consists of a list of statements
         for $<sea_or_code> {
-            $past.push( $($_) );
+            $block.push( $($_) );
         }
 
-        make $past;
+        make $block;
     }
 }
 
@@ -371,10 +370,10 @@ method var_assign($/) {
 }
 
 method array_elem($/) {
-    our $?BLOCK;
-    unless $?BLOCK.symbol( ~$<VAR_NAME> ) {
-        $?BLOCK.symbol( ~$<VAR_NAME>, :scope('lexical') );
-        $?BLOCK.push(
+    our @?BLOCK;
+    unless @?BLOCK[0].symbol( ~$<VAR_NAME> ) {
+        @?BLOCK[0].symbol( ~$<VAR_NAME>, :scope('lexical') );
+        @?BLOCK[0].push(
             PAST::Var.new(
                 :name(~$<VAR_NAME>),
                 :viviself('PhpArray'),
@@ -400,10 +399,10 @@ method array_elem($/) {
 }
 
 method simple_var($/) {
-    our $?BLOCK;
-    unless $?BLOCK.symbol( ~$<VAR_NAME> ) {
-        $?BLOCK.symbol( ~$<VAR_NAME>, :scope('lexical') );
-        $?BLOCK.push(
+    our @?BLOCK;
+    unless @?BLOCK[0].symbol( ~$<VAR_NAME> ) {
+        @?BLOCK[0].symbol( ~$<VAR_NAME>, :scope('lexical') );
+        @?BLOCK[0].push(
             PAST::Var.new(
                 :name(~$<VAR_NAME>),
                 :viviself('PhpNull'),
@@ -527,111 +526,107 @@ method NUMBER($/) {
 
 method function_definition($/, $key) {
     our @?BLOCK; # A stack of PAST::Block
-    our $?BLOCK; # The current block. Used for managing the symbol table. 
 
     if $key eq 'open' {
         # note that $<param_list> creates a new PAST::Block.
-        my $?BLOCK := $( $<param_list> );
-        @?BLOCK.unshift($?BLOCK);
+        @?BLOCK.unshift( $( $<param_list> ) );
     }
     else {
-        my $past := @?BLOCK.shift();
+        my $block := @?BLOCK.shift();
 
-        $past.name( ~$<FUNCTION_NAME> );
-        $past.control('return_pir');
-        $past.push( $( $<block> ) );
+        $block.name( ~$<FUNCTION_NAME> );
+        $block.control('return_pir');
+        $block.push( $( $<block> ) );
 
-        make $past;
+        make $block;
     }
 }
 
 method class_method_definition($/, $key) {
     our @?BLOCK; # A stack of PAST::Block
-    our $?BLOCK; # The current block. Used for managing the symbol table. 
 
     if $key eq 'open' {
         # note that $<param_list> creates a new PAST::Block.
-        my $?BLOCK := $( $<param_list> );
-        @?BLOCK.unshift($?BLOCK);
+        @?BLOCK.unshift( $( $<param_list> ) );
     }
     else {
-        my $past := @?BLOCK.shift();
+        my $block := @?BLOCK.shift();
 
-        $past.name( ~$<METHOD_NAME> );
-        $past.blocktype( 'method' );
-        $past.control('return_pir');
-        $past.push( $( $<block> ) );
+        $block.name( ~$<METHOD_NAME> );
+        $block.blocktype( 'method' );
+        $block.control('return_pir');
+        $block.push( $( $<block> ) );
 
-        make $past;
+        make $block;
     }
 }
 
 method param_list($/) {
 
-    my $past := PAST::Block.new(
-                    :blocktype('declaration'),
-                    :node($/)
-                );
+    my $block :=
+        PAST::Block.new(
+            :blocktype('declaration'),
+            :node($/)
+        );
     my $arity := 0;
     for $<VAR_NAME> {
         my $param :=
             PAST::Var.new(
-                :scope('parameter'),
                 :name(~$_),
+                :scope('parameter'),
                 :viviself('PhpNull'),
                 :lvalue(1),
             );
-        $past.push($param);
+        $block.push($param);
         $arity++;
+        $block.symbol( ~$_, :scope('lexical') ); 
     }
-    $past.arity( $arity );
+    $block.arity( $arity );
 
-    make $past;
+    make $block;
 }
 
 method class_definition($/, $key) {
     our @?BLOCK; # A stack of PAST::Block
-    our $?BLOCK; # The current block. Used for managing the symbol table. 
 
     if $key eq 'open' {
-        $?BLOCK := PAST::Block.new(
-                       :node($/),
-                       :blocktype('declaration'),
-                       :pirflags( ':init :load' )
-                   );
-        @?BLOCK.unshift($?BLOCK);
+        @?BLOCK.unshift(
+            PAST::Block.new(
+                :node($/),
+                :blocktype('declaration'),
+                :pirflags( ':init :load' )
+            )
+        );
     }
     else {
-        my $past := @?BLOCK.shift();
-        $past.namespace( $<CLASS_NAME><ident> );
-        $past.push( PAST::Stmts.new(
-                        PAST::Op.new(
-                            :inline(   "$P0 = get_root_global ['parrot'], 'P6metaclass'\n"
-                                     ~ "$P2 = $P0.'new_class'('" ~ $<CLASS_NAME> ~ "')\n" ),
-                            :pasttype( 'inline' )
-                        )
-                    )
+        my $block := @?BLOCK.shift();
+        $block.namespace( $<CLASS_NAME><ident> );
+        $block.push(
+            PAST::Stmts.new(
+                PAST::Op.new(
+                    :inline(   "$P0 = get_root_global ['parrot'], 'P6metaclass'\n"
+                             ~ "$P2 = $P0.'new_class'('" ~ $<CLASS_NAME> ~ "')\n" ),
+                    :pasttype( 'inline' )
+                )
+            )
         );
 
         # nothing to do for $<const_definition,
         # setup of class constants is done in the 'loadinit' node
         for $<class_constant_definition> {
-           $past.push( $($_) );
+           $block.push( $($_) );
         }
 
         my $methods_block := PAST::Block.new( :blocktype('immediate') );
         for $<class_member_definition> {
-            $methods_block.symbol(
-                ~$_<VAR_NAME><ident>,
-                :scope('attribute')
-            );
+            $methods_block.symbol( ~$_<VAR_NAME><ident>, :scope('attribute') );
         }
         for $<class_method_definition> {
             $methods_block.push( $($_) );
         }
-        $past.push( $methods_block );
+        $block.push( $methods_block );
 
-        make $past;
+        make $block;
     }
 }
 
