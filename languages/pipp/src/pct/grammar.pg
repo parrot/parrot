@@ -116,14 +116,10 @@ token close_short_tag {
     }} <.fail>
 }
 
-# block and statements
-rule block {
-    '{' <statement_list> '}'
-    {*}
-}
+# statements
 
 rule statement {
-      <namespace_statement>     {*}  #= namespace_statement
+    | <namespace_statement>     {*}  #= namespace_statement
     | <return_statement>        {*}  #= return_statement
     | <require_once_statement>  {*}  #= require_once_statement
     | <echo_statement>          {*}  #= echo_statement
@@ -144,7 +140,7 @@ rule statement_list {
 }
 
 rule statement_delimiter {
-      ';'
+    | ';'
     | <before '?'>
     | $
 }
@@ -181,7 +177,7 @@ rule arguments {
 }
 
 rule conditional_expression {
-    '(' <expression> ')' <block>
+    '(' <expression> ')' '{' <statement_list> '}'
     {*}
 }
 
@@ -193,8 +189,7 @@ rule if_statement {
 }
 
 rule else_clause {
-    'else' <block>
-    {*}
+    'else' '{' <statement_list> '}'
 }
 
 rule elseif_clause {
@@ -208,12 +203,12 @@ rule while_statement {
 }
 
 rule do_while_statement {
-    'do' <block> 'while' '(' <expression> ')' <.statement_delimiter>
+    'do' '{' <statement_list> '}' 'while' '(' <expression> ')' <.statement_delimiter>
     {*}
 }
 
 rule for_statement {
-    'for' '(' <var_assign> <expression> ';' <expression> ')' <block>
+    'for' '(' <var_assign> <expression> ';' <expression> ')' '{' <statement_list> '}'
     {*}
 }
 
@@ -393,7 +388,7 @@ rule term {
 rule function_definition {
     'function' <FUNCTION_NAME> <param_list>
     {*}                                     #= open
-    <block>
+    '{' <statement_list> '}'
     {*}                                     #= close
 }
 
@@ -438,7 +433,7 @@ rule class_member_definition {
 rule class_method_definition {
     'function' <METHOD_NAME> <param_list>
     {*}                                     #= open
-    <block>
+    '{' <statement_list> '}'
     {*}                                     #= close
 }
 

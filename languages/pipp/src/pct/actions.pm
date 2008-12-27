@@ -62,12 +62,12 @@ method sea_or_code($/, $key) {
 # The sea, text, surrounding the island, code, is printed out
 method SEA($/) {
     make PAST::Op.new(
+             :name('echo'),
+             :node($/),
              PAST::Val.new(
                  :value(~$/),
                  :returns('PhpString')
-             ),
-             :name('echo'),
-             :node($/)
+             )
          );
 }
 
@@ -87,10 +87,6 @@ method code_echo_tag($/) {
 }
 
 method code_script_tag($/) {
-    make $( $<statement_list> );
-}
-
-method block($/) {
     make $( $<statement_list> );
 }
 
@@ -285,22 +281,22 @@ method arguments($/) {
 }
 
 method conditional_expression($/) {
-    my $past := PAST::Op.new(
-                    $( $<expression> ),
-                    $( $<block> ),
-                    :node($/)
-                );
-    make $past;
+    make
+        PAST::Op.new(
+            :node($/),
+            $( $<expression> ),
+            $( $<statement_list> )
+        );
 }
 
 method do_while_statement($/) {
-    my $past := PAST::Op.new(
-                    $( $<expression> ),
-                    $( $<block> ),
-                    :pasttype('repeat_while'),
-                    :node($/)
-                );
-    make $past;
+    make
+        PAST::Op.new(
+            :pasttype('repeat_while'),
+            :node($/),
+            $( $<expression> ),
+            $( $<statement_list> )
+        );
 }
 
 method if_statement($/) {
@@ -309,7 +305,7 @@ method if_statement($/) {
         
     my $else := undef;
     if +$<else_clause> {
-        $else := $( $<else_clause>[0] );
+        $else := $( $<else_clause>[0]<statement_list> );
     }
     my $first_eif := undef;
     if +$<elseif_clause> {
@@ -337,10 +333,6 @@ method if_statement($/) {
      }
 
      make $past;
-}
-
-method else_clause($/) {
-    make $( $<block> );
 }
 
 method elseif_clause($/) {
@@ -432,9 +424,9 @@ method while_statement($/) {
 
 method for_statement($/) {
     my $init  := $( $<var_assign> );
+
     my $cond  := $( $<expression>[0] );
-    my $work  := PAST::Stmts.new( $( $<block> ), $( $<expression>[1] ) );
-    
+    my $work  := PAST::Stmts.new( $( $<statement_list> ), $( $<expression>[1] ) );
     my $while := PAST::Op.new(
                        $cond,
                        $work,
@@ -525,7 +517,7 @@ method function_definition($/, $key) {
 
         $block.name( ~$<FUNCTION_NAME> );
         $block.control('return_pir');
-        $block.push( $( $<block> ) );
+        $block.push( $( $<statement_list> ) );
 
         make $block;
     }
@@ -560,7 +552,7 @@ method class_method_definition($/, $key) {
         $block.name( ~$<METHOD_NAME> );
         $block.blocktype( 'method' );
         $block.control('return_pir');
-        $block.push( $( $<block> ) );
+        $block.push( $( $<statement_list> ) );
 
         make $block;
     }
