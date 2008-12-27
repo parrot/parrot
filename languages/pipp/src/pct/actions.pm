@@ -72,48 +72,39 @@ method SEA($/) {
 }
 
 method code_short_tag($/) {
-    my $past := PAST::Stmts.new( :node($/) );
-    for $<statement> {
-        $past.push( $($_) );
-    }
-
-    make $past;
+    make $( $<statement_list> );
 }
 
 method code_echo_tag($/) {
-    my $past := PAST::Stmts.new( :node($/) );
+    my $stmts := $( $<statement_list> );
 
     my $echo := $( $<arguments> );
     $echo.name( 'echo' );
-    $past.push( $echo );
 
-    for $<statement> {
-        $past.push( $($_) );
-    }
+    $stmts.unshift( $echo );
 
-    make $past;
+    make $stmts;
 }
 
 method code_script_tag($/) {
-    my $past := PAST::Stmts.new( :node($/) );
-    for $<statement> {
-        $past.push( $($_) );
-    }
-
-    make $past;
+    make $( $<statement_list> );
 }
 
 method block($/) {
-    my $past := PAST::Stmts.new( :node($/) );
-    for $<statement> {
-        $past.push( $($_) );
-    }
-
-    make $past;
+    make $( $<statement_list> );
 }
 
 method statement($/, $key) {
     make $( $/{$key} );
+}
+
+method statement_list($/) {
+    my $stmts := PAST::Stmts.new( :node($/) );
+    for $<statement> {
+        $stmts.push( $($_) );
+    }
+
+    make $stmts;
 }
 
 method inline_sea_short_tag($/) {

@@ -49,21 +49,21 @@ regex SEA {
 
 rule code_echo_tag {
     <.CODE_START_ECHO_TAG> <arguments> <.statement_delimiter>
-        <statement>*
+        <statement_list>
     <.close_short_tag>?
     {*}
 }
 
 rule code_script_tag {
     <.open_script_tag>
-        <statement>*
+        <statement_list>
     <.close_script_tag>?
     {*}
 }
 
 rule code_short_tag {
     <.open_short_tag>
-        <statement>*
+        <statement_list>
     <.close_short_tag>?
     {*}
 }
@@ -118,7 +118,7 @@ token close_short_tag {
 
 # block and statements
 rule block {
-    '{' <statement>* '}'
+    '{' <statement_list> '}'
     {*}
 }
 
@@ -137,6 +137,10 @@ rule statement {
     | <var_assign>              {*}  #= var_assign
     | <function_definition>     {*}  #= function_definition
     | <class_definition>        {*}  #= class_definition
+}
+
+rule statement_list {
+    <statement>* {*}            
 }
 
 rule statement_delimiter {
