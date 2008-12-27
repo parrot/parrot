@@ -368,15 +368,7 @@ Add a sub PMC to the constant table. This function initializes the sub PMC.
 
 */
 void
-add_sub_pmc(bytecode * const bc,
-            char const * const subname,
-            char const * const nsentry,
-            char const * const subid,
-            int vtable_index,
-            unsigned regs_used[],
-            int startoffset,
-            int endoffset)
-{
+add_sub_pmc(bytecode * const bc, sub_info *info) {
     PMC               *sub_pmc;
     Parrot_sub        *sub;
     int                subconst_index;
@@ -390,14 +382,14 @@ add_sub_pmc(bytecode * const bc,
      */
     sub_pmc       = pmc_new(bc->interp, enum_class_Sub);
     sub           = PMC_sub(sub_pmc);
-    subname_index = add_string_const(bc, subname);
+    subname_index = add_string_const(bc, info->subname);
     subname_const = bc->interp->code->const_table->constants[subname_index];
 
     /* set start and end offset of this sub in the bytecode. This is calculated during
      * the parsing phase.
      */
-    sub->start_offs       = startoffset;
-    sub->end_offs         = endoffset;
+    sub->start_offs       = info->startoffset;
+    sub->end_offs         = info->endoffset;
 
     /* XXX fix namespace stuff */
     sub->namespace_name   = NULL;
@@ -414,14 +406,14 @@ add_sub_pmc(bytecode * const bc,
     /* Set the vtable index; if this .sub was declared as :vtable, its vtable
      * index was found during the parse; otherwise it's -1.
      */
-    sub->vtable_index     = vtable_index;
+    sub->vtable_index     = info->vtable_index;
 
     /* XXX fix multi stuff */
     sub->multi_signature  = NULL;
 
     /* store register usage of this sub. */
     for (i = 0; i < 4; ++i)
-        sub->n_regs_used[i] = regs_used[i];
+        sub->n_regs_used[i] = info->regs_used[i];
 
     /* store the name of this sub; it's stored in the constant table. */
     sub->name = subname_const->u.string;
@@ -429,16 +421,16 @@ add_sub_pmc(bytecode * const bc,
     /* If there was a :nsentry, add it to the constants table, and set
      * the ns_entry_name attribute to that STRING. Default value is the sub's name.
      */
-    if (nsentry)
-        sub->ns_entry_name = add_string_const_from_cstring(bc, nsentry);
+    if (info->nsentry)
+        sub->ns_entry_name = add_string_const_from_cstring(bc, info->nsentry);
     else
         sub->ns_entry_name = subname_const->u.string;
 
     /* if there was a :subid, add it to the constants table, and set the subid
      * attribute to that STRING. Default value is the sub's name.
      */
-    if (subid)
-        sub->subid = add_string_const_from_cstring(bc, subid);
+    if (info->subid)
+        sub->subid = add_string_const_from_cstring(bc, info->subid);
     else
         sub->subid = subname_const->u.string;
 
@@ -451,7 +443,7 @@ add_sub_pmc(bytecode * const bc,
     subconst_index = add_pmc_const(bc, sub_pmc);
 
     /* Add a new fixup entry in the fixup table for this sub. */
-    PackFile_FixupTable_new_entry(bc->interp, subname, enum_fixup_sub, subconst_index);
+    PackFile_FixupTable_new_entry(bc->interp, info->subname, enum_fixup_sub, subconst_index);
 }
 
 

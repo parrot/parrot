@@ -523,13 +523,13 @@ yypirerror(yyscan_t yyscanner, NOTNULL(lexer_state * const lexer),
     vfprintf(stderr, message, arg_ptr);
     va_end(arg_ptr);
 
-    ++lexer->parse_errors;
-
     /* print current token if it doesn't contain a newline token. */
     if (!strstr(current_token, "\n"))
         fprintf(stderr, "\n\tcurrent token: '%s'", current_token);
 
     fprintf(stderr, "\n\n");
+
+    ++lexer->parse_errors;
 
     return 0;
 }
