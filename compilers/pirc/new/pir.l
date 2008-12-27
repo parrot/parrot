@@ -402,8 +402,18 @@ REGISTER       "$"[SNIP]{DIGITS}
                   }
 
 {IDENT}           { /* identifier; can be a global (sub or const), local or parrot op */
-                    yylval->sval = dupstr(yyget_extra(yyscanner), yytext);
-                    return TK_IDENT;
+                    lexer_state * const lexer = yyget_extra(yyscanner);
+                    constant *c = find_global_constant(lexer, yytext);
+
+                    /* XXX bleh. this is expensive; an const lookup for each identifier */
+                    if (c) {
+                        yylval->cval = c;
+                        return TK_CONST_VALUE;
+                    }
+                    else {
+                        yylval->sval = dupstr(yyget_extra(yyscanner), yytext);
+                        return TK_IDENT;
+                    }
                   }
 
 {FLOATNUM}        { yylval->dval = atof(yytext); return TK_NUMC; }

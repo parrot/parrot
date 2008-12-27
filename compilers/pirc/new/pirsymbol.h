@@ -57,15 +57,15 @@ typedef struct pir_reg {
 
 /* structure to represent a global label */
 typedef struct global_label {
-    char const          *name;
-    int                  const_table_index;
+    char const * name;              /* name of the global label a.k.a. sub */
+    int          const_table_index; /* index in PBC const table where this sub PMC is stored */
 
 } global_label;
 
 /* structure to represent a local label */
 typedef struct local_label {
-    char const         *name;
-    unsigned            offset;
+    char const * name;      /* name of the local label */
+    unsigned     offset;    /* offset in bytecode where this label points to. */
 
 } local_label;
 

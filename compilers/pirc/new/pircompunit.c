@@ -1357,12 +1357,11 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 target *
 new_reg(lexer_state * const lexer, pir_type type, int regno) {
-    target *t       = new_target(lexer);
+    target  *t = new_target(lexer);
     pir_reg *reg;
 
     color_reg(lexer, type, regno);
-    reg = find_register(lexer, type, regno);
-    /* XXX t->s.reg = reg; */
+    reg     = find_register(lexer, type, regno);
     t->info = &reg->info;
 
     /* set a flag on this target node saying it's a register */

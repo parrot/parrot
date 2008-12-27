@@ -301,6 +301,7 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
        <ival> TK_NREG       "number register"
        <ival> TK_SREG       "string register"
        <ival> TK_IREG       "integer register"
+       <cval> TK_CONST_VALUE "constant-value"
 
 %token TK_ARROW             "=>"
        TK_NE                "!="
@@ -1170,7 +1171,8 @@ assignment        : target '=' TK_INTC
                                   get_opinfo(yyscanner);
                               }
                               else
-                                  yypirerror(yyscanner, lexer, "indexed object '%s' not declared", $3);
+                                  yypirerror(yyscanner, lexer,
+                                             "indexed object '%s' not declared", $3);
 
                               /* create a symbol node anyway, so we can continue with instr. gen. */
                               sym = new_symbol(lexer, $3, PMC_TYPE);
@@ -1977,6 +1979,7 @@ expression  : target         { $$ = expr_from_target(lexer, $1); }
 constant    : TK_STRINGC     { $$ = new_const(lexer, STRING_TYPE, $1); }
             | TK_INTC        { $$ = new_const(lexer, INT_TYPE, $1); }
             | TK_NUMC        { $$ = new_const(lexer, NUM_TYPE, $1); }
+            | TK_CONST_VALUE { $$ = $1; }
             ;
 
 rel_op      : "!="           { $$ = OP_NE; }
@@ -2003,10 +2006,9 @@ target      : symbol     { set_curtarget(lexer, $1);  }
 
 symbol      : reg
             | identifier { /* a symbol must have been declared; check that at this point. */
-                           symbol *sym = find_symbol(lexer, $1);
+                           symbol * sym = find_symbol(lexer, $1);
                            if (sym == NULL) {
                                undeclared_symbol(yyscanner, lexer, $1);
-
                                /* make sure sym is not NULL */
                                sym = new_symbol(lexer, $1, UNKNOWN_TYPE);
                            }

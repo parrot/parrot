@@ -575,11 +575,14 @@ Store the globally defined constant C<c> in the constant table.
 */
 void
 store_global_constant(NOTNULL(lexer_state * const lexer), NOTNULL(constant * const c)) {
-    hashtable    *table = &lexer->constants;
-    unsigned long hash  = get_hashcode(c->name, table->size);
-    bucket *b           = new_bucket(lexer);
-    bucket_constant(b)  = c;
+    hashtable    *table  = &lexer->constants;
+    unsigned long hash   = get_hashcode(c->name, table->size);
+    bucket *b            = new_bucket(lexer);
+    bucket_constant(b)   = c;
     store_bucket(table, b, hash);
+
+    /* add it as a constant in the PBC constant table */
+    c->const_table_index = emit_pbc_const(lexer, c);
 }
 
 /*
