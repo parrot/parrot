@@ -388,10 +388,6 @@ STILL INCOMPLETE (see traceback in lua.pmc).
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad
-
 =cut
 
 

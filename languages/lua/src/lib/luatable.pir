@@ -506,10 +506,6 @@ the given order may have their relative positions changed by the sort.
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad
-
 =cut
 
 

@@ -933,10 +933,6 @@ error, C<xpcall> returns false plus the result from C<err>.
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad.
-
 =cut
 
 

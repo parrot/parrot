@@ -507,12 +507,6 @@ PIRCODE
 
 .include 'languages/lua/src/lib/luabytecode_gen.pir'
 
-=head1 AUTHOR
-
-Francois Perrad.
-
-=cut
-
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

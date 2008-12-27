@@ -1193,10 +1193,6 @@ L<http://pdos.csail.mit.edu/%7Ebaford/packrat/popl04/peg-popl04.pdf>
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad
-
 =cut
 
 

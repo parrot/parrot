@@ -92,12 +92,6 @@ and imports many definitions from the full Lua compiler
     .return ()
 .end
 
-=head1 AUTHOR
-
-Francois Perrad
-
-=cut
-
 
 # Local Variables:
 #   mode: pir

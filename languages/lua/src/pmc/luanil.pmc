@@ -176,10 +176,6 @@ Return always C<false>.
 
 =back
 
-=head1 AUTHORS
-
-Original code by Klaas-Jan Stol.
-
 =cut
 
 */

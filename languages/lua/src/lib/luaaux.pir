@@ -1071,10 +1071,6 @@ end of table constructor with argv
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad
-
 =cut
 
 

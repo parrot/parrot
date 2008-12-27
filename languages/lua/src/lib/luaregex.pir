@@ -178,10 +178,6 @@ A pattern cannot contain embedded zeros. Use C<%z> instead.
 
 Mostly taken from F<compilers/pge/PGE/P5Regex.pir>.
 
-=head1 AUTHOR
-
-Francois Perrad
-
 =cut
 
 .sub '__onload' :anon :load :init

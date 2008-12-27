@@ -134,9 +134,5 @@ transform past (Lua::TestLex::Number) :language('PIR') {
 
 =back
 
-=head1 AUTHOR
-
-Francois Perrad
-
 =cut
 

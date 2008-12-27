@@ -655,10 +655,6 @@ Common implementation (use C<__tostring> or C<get_string>).
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad.
-
 =cut
 
 */

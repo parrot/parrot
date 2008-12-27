@@ -156,10 +156,6 @@ Compile C<source>.
 
 =back
 
-=head1 AUTHOR
-
-Francois Perrad
-
 =cut
 
 

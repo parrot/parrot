@@ -378,10 +378,6 @@ The C<==> operation. Compares reference (not in depth).
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad.
-
 =cut
 
 */

@@ -523,10 +523,6 @@ USAGE
 
 F<languages/lua/doc/status.pod>
 
-=head1 AUTHORS
-
-Francois Perrad
-
 =cut
 
 

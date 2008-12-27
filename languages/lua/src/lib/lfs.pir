@@ -686,10 +686,6 @@ NOT YET IMPLEMENTED.
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad
-
 =cut
 
 

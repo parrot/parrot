@@ -82,9 +82,5 @@ Display version.
 
 =head1 DESCRIPTION
 
-=head1 AUTHOR
-
-Francois Perrad
-
 =cut
 

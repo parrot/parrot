@@ -254,10 +254,6 @@ little-endian 32 bit numbers to big-endian 32 bit numbers or vice versa.
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad
-
 =cut
 
 

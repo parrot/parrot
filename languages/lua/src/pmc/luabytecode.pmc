@@ -395,10 +395,6 @@ Loads Lua 5.1 VM bytecode.
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad
-
 =cut
 
 */

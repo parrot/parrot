@@ -1063,10 +1063,3 @@ transform keyed (PAST::Var) :language('PIR') {
     .tailcall tree.'get'('package', node)
 }
 
-
-=head1 AUTHORS
-
-Francois Perrad
-
-=cut
-

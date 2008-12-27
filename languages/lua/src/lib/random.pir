@@ -220,10 +220,6 @@ LIST
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad
-
 =cut
 
 

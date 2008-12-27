@@ -717,10 +717,6 @@ Equivalent to C<io.output():write>.
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad.
-
 =cut
 
 

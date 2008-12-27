@@ -508,10 +508,6 @@ nor the option C<c0>.
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad
-
 =cut
 
 

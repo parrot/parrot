@@ -616,10 +616,6 @@ long bracket. Long comments are frequently used to disable code temporarily.
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad
-
 =cut
 
 

@@ -92,10 +92,6 @@ foreach my $func ( keys %language_test_map ) {
 
 F<languages/lua/t/Parrot/Test/Lua.pm>
 
-=head1 AUTHOR
-
-Francois Perrad
-
 =cut
 
 1;

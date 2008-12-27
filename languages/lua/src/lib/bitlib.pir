@@ -261,10 +261,6 @@ returns C<a> shifted arithmetically right C<b> places
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad
-
 =cut
 
 

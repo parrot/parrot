@@ -17,10 +17,6 @@ B<luad> disassembles Lua 5.1 bytecode produced by C<luac>.
 
 L<http://luaforge.net/projects/chunkspy/>
 
-=head1 AUTHOR
-
-Francois Perrad.
-
 =cut
 
 .loadlib 'lua_group'

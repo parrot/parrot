@@ -1088,12 +1088,6 @@ Throws an exception unless C<value> is a LuaString.
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad.
-
-Klaas-Jan Stol.
-
 =cut
 
 */

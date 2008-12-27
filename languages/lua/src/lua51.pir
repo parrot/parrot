@@ -277,12 +277,6 @@ used in F<languages/lua/src/POSTGrammar.tg>
 
 =back
 
-=head1 AUTHORS
-
-Klaas-Jan Stol <parrotcode@gmail.com>
-
-Francois Perrad
-
 =cut
 
 

@@ -261,12 +261,6 @@ Any arguments to C<yield> are passed as extra results to C<resume>.
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad.
-
-Bob Rogers.
-
 =cut
 
 

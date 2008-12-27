@@ -177,10 +177,6 @@ Mostly taken from F<languages/bc/t/harness>.
 
 F<languages/scheme/t/harness>, F<languages/m4/t/harness>, F<languages/python/t/harness>
 
-=head1 AUTHOR
-
-Francois Perrad
-
 =cut
 
 # Local Variables:

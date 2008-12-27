@@ -17,10 +17,6 @@ B<luac2pir> translates a Lua 5.1 VM bytecode file to Parrot PIR.
 
 luad
 
-=head1 AUTHOR
-
-Francois Perrad.
-
 =cut
 
 .loadlib 'lua_group'

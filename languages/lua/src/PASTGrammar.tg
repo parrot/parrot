@@ -804,11 +804,3 @@ transform past (Lua::Grammar::string) :language('PIR') {
     .tailcall $P0.'new'('node'=>node, 'name'=>'LuaString', 'value'=>$S0)
 }
 
-=head1 AUTHORS
-
-Klaas-Jan Stol <parrotcode@gmail.com>
-
-Francois Perrad
-
-=cut
-

@@ -1,0 +1,128 @@
+﻿# $Id$
+
+List of people who have contributes to Lua.
+----------
+
+N: Alberto Manuel Brandao Simoes
+U: ambs
+D: fix SVN properties
+
+N: Allison Randal
+U: allison
+D: Update Lua to use keyed classnames for TGE.
+
+N: Andy Lester
+U: petdance
+D: wrapped macro arguments
+
+N: Audrey Tang
+U: audreyt
+D: Prefix all hash.h API calls with "parrot_"
+
+N: Bernhard Schmalhofer
+U: bernhard
+D: RT#38235 Rename (dyn)?classes to (dyn)?pmc
+D: Rename Parrot::Test::generate_code() to the more appropriate write_code_to_file()
+D: fix SVN properties
+
+N: Bob Rogers
+D: co-routine support
+
+N: Christoph Otto
+U: cotto
+D: remove the seed arg from string_hash()
+
+U: chromatic
+D: Use typedefs for Parrot-defined structs outside of headers
+D: Updated copyrights in all files modified in 2007
+D: Changed string_from_cstring() calls to string_from_literal()
+D: Made test target depend on successful build of everything else.
+D: Fix memory leaks in PMC
+D: Fixed a GC bug in LuaThread
+D: Cleaned up Lua* PMC.
+D: Added TODO to Parrot::Test::Lua so that Lua can have TODO tests.
+D: Changed CONTEXT(interp->ctx) to CONTEXT(interp), see RT#41881
+D: fix SVN properties
+
+N: James E Keenan
+D: fix coding standard
+
+N: Jerry Gay
+U: particle
+D: fix coding standards
+D: fix pod formatting error
+D: fix SVN properties
+
+N: Jonathan Worthington
+U: jonathan
+D: Remove use of Parrot_PMC_typenum from Lua PMCs, replacing it with pmc_type, so they build
+D: Remove UFlags argument from string_append, as requested in ticket #40523.
+D: Resolve bug in NCI method name mangling that broke Lua
+
+N: Julian Albo
+U: julianalbo
+D: Fixed luatable problem with Hash and clean warnings in other pmc
+D: rename pmc attributes RT#48014
+D: rename Parrot_Context
+
+N: Kevin Tew
+U: tewk
+D: s/clear_eh/pop_eh
+
+N: Klaas-Jan Stol
+U: kjs
+D: initial PMC (from Monkey 0.2.2)
+D: initial PGE grammar & PAST transformation
+D: change "float" into "num" preparing removal of "float" as type.
+D: many improvement with PCT
+
+N: Mark Glines
+U: infinoid
+D: fix coding standards
+D: fix RT#53072
+D: fix some tests on linux/amd64
+
+N: Moritz Lenz
+U: moritz
+D: fix SVN properties
+
+N: Nuno Carvalho
+U: smash
+D: fix SVN properties
+
+N: Paul Cochrane
+U: paultcochrane
+D: Converted 'perl -w' to 'use warnings' where appropriate
+D: Tidied Perl source with perltidy
+D: Converted dos line endings to unix line endings
+D: fix SVN properties
+D: Cleanup of temporary files created when test suite is run
+D: Changed filenames to use the 'one dot filename' style
+D: fix coding standard
+
+N: Peter Gibbs
+U: petergibbs
+D: minor improvement in PMC
+
+N: Robert G. Jakabosky
+D: many fix (see RT#57568)
+
+N: Stephen Weeks
+U: tene
+D: Remove the second argument passed to exception handlers
+
+U: Whiteknight
+D: updating to use ".namespace []" as per rt#48549
+D: updating function and macro names to satisfy pdd09 deprecation notes. rt#55364
+
+N: Will "Coke" Coleda
+U: coke
+D: #39217 - copyright cleanup
+D: replace_slashes is now the default for make files
+D: fix SVN properties
+D: remove use of deprecated classname op
+D: fix coding standards
+D: MACOSX_DEPLOYMENT_TARGET
+D: remove deprecated getclass opcode (RT#47942)
+D: bare method names are [DEPRECATED]
+

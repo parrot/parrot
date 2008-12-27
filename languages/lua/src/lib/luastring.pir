@@ -998,10 +998,6 @@ of what is a lowercase letter depends on the current locale.
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad
-
 =cut
 
 

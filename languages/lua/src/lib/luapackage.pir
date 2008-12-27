@@ -562,10 +562,6 @@ environment. To be used as an option to function C<module>.
 
 =back
 
-=head1 AUTHORS
-
-Francois Perrad
-
 =cut
 
 
