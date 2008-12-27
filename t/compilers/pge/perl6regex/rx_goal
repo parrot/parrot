@@ -1,0 +1,7 @@
+##   Goal tests
+'(' ~ ')' \d+		(123)		y	basic goal syntax
+'(' ~ ')' \d+		(123		/couldn't find final/	missing goal
+'(' ~ ')' \d+		(123abc)	/couldn't find final/	stuff before goal
+'(' ~ ')' \d+		(abc)		n	can't match internal stuff
+'(' ~ ')' \d+		()		n	missing internal stuff
+:dba('zz') '(' ~ ')' \d+	(123		/zz/	:dba adverb
