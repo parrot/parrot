@@ -63,10 +63,6 @@ Instruction * IMCC_subst_constants_umix(PARROT_INTERP,
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*r);
 
-PARROT_WARN_UNUSED_RESULT
-int max_loop_depth(ARGIN(const IMC_Unit *unit))
-        __attribute__nonnull__(1);
-
 int move_ins_out(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),
     ARGMOD(Instruction **ins),

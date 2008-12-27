@@ -179,6 +179,10 @@ static int loop_optimization(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
+PARROT_WARN_UNUSED_RESULT
+static int max_loop_depth(ARGIN(const IMC_Unit *unit))
+        __attribute__nonnull__(1);
+
 static int strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -956,19 +960,14 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
     int found, branched;
 
     /* construct a FLOATVAL_FMT with needed precision */
-    switch (NUMVAL_SIZE) {
-        case 8:
-            fmt = "%0.16g";
-            break;
-        case 12:
-            fmt = "%0.18Lg";
-            break;
-        default:
-            IMCC_warning(interp, "subs_constants",
-                    "used default FLOATVAL_FMT\n");
-            fmt = FLOATVAL_FMT;
-            break;
-    }
+#if NUMVAL_SIZE == 8
+    fmt = "%0.16g";
+#elif NUMVAL_SIZE == 12
+    fmt = "%0.18Lg";
+#else
+    fmt = FLOATVAL_FMT;
+    IMCC_warning(interp, "subs_constants", "used default FLOATVAL_FMT\n");
+#endif
 
     tmp = NULL;
     found = 0;
@@ -1081,8 +1080,9 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
                 break;
             case 'S':
             {
-                char *name = string_to_cstring(interp, REG_STR(interp, 0));
-                r[1]       = mk_const(interp, name, r[0]->set);
+                char * const name = string_to_cstring(interp, REG_STR(interp, 0));
+
+                r[1] = mk_const(interp, name, r[0]->set);
 
                 snprintf(b, sizeof (b), "%p", REG_STR(interp, 0));
                 string_cstring_free(name);
@@ -1445,14 +1445,14 @@ unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                 used = 1;
 #else
             else {
-                Instruction *ins2;
-                SymReg      *addr;
-                int          j;
-
+                int j;
                 for (j=0; unit->bb_list[j]; j++) {
                     /* a branch can be the first ins in a block
                      * (if prev ins was a label)
                      * or the last ins in a block */
+                    Instruction *ins2;
+                    SymReg      *addr;
+
                     ins2 = unit->bb_list[j]->start;
                     if ((ins2->type & ITBRANCH) &&
                             (addr = get_branch_reg(ins2)) != 0) {
@@ -1742,7 +1742,7 @@ is_ins_save(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGIN(const Instruction 
 
 /*
 
-=item C<int max_loop_depth>
+=item C<static int max_loop_depth>
 
 RT #48260: Not yet documented!!!
 
@@ -1751,7 +1751,7 @@ RT #48260: Not yet documented!!!
 */
 
 PARROT_WARN_UNUSED_RESULT
-int
+static int
 max_loop_depth(ARGIN(const IMC_Unit *unit))
 {
     int i;
