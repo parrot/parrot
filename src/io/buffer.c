@@ -398,7 +398,6 @@ Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
     unsigned char *buffer_next;
     STRING * const s            = Parrot_io_make_string(interp, buf, 1);
     UINTVAL        len          = 1;
-    size_t         avail        = 0;
     INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
 
     /* write buffer flush */
@@ -556,13 +555,13 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(STRING *s))
 {
     size_t avail;
     void * const buffer = s->strstart;
-    size_t len = s->bufused;
+    const size_t len = s->bufused;
     int need_flush;
 
-    INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
-    unsigned char *buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
-    unsigned char *buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
-    size_t         buffer_size  = Parrot_io_get_buffer_size(interp, filehandle);
+    INTVAL                buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
+    unsigned char * const buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
+    unsigned char *       buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
+    const size_t          buffer_size  = Parrot_io_get_buffer_size(interp, filehandle);
 
     if (len <= 0)
         return 0;
