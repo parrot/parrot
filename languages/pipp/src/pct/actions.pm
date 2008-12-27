@@ -182,14 +182,14 @@ method instantiate_array($/) {
                 #for $<key_value_pair> {
                 #$past.push( $($_) );
                 #}
-    for $<array_arguments> {
+    for $<array_argument> {
         $past.push( $($_) );
     }   
 
     make $past;
 }
 
-method array_arguments($/, $key) {
+method array_argument($/, $key) {
     make $( $/{$key} );
 }
 

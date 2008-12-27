@@ -183,8 +183,8 @@ rule conditional_expression {
 
 rule if_statement {
     'if' <conditional_expression>
-    [<elseif_clause>]*
-    [<else_clause>]?
+    <elseif_clause>*
+    <else_clause>?
     {*}
 }
 
@@ -273,12 +273,13 @@ rule function_call {
     {*}
 }
 
+# a trailing ',' is allowed
 rule instantiate_array {
-    'array' '(' [ <array_arguments> [  [',' <array_arguments> ]* [',' <array_arguments> ]?  ]? ','?  ]?  ')'
+    'array' '(' [ <array_argument> [ ',' <array_argument> ]* ]? ','? ')'
     {*}
 }
 
-rule array_arguments {
+rule array_argument {
     | <key_value_pair>  {*}    #= key_value_pair
     | <expression>      {*}    #= expression
 }
