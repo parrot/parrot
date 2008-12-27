@@ -2,6 +2,8 @@
 #include "parrot/parrot.h"
 #include "jit_emit.h"
 
+/* HEADERIZER HFILE: none */
+
 /*
  * enumerate these mapped registers
  * please note that you have to preserve registers in
