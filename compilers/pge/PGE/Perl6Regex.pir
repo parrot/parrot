@@ -251,7 +251,7 @@ needed for compiling regexes.
     optable.'newtok'('infix:=', 'tighter'=>'infix:', 'assoc'=>'right', 'match'=>'PGE::Exp::Alias')
 
     $P0 = get_global 'parse_modifier'
-    optable.'newtok'('prefix::', 'looser'=>'infix:|', 'nows'=>1, 'parsed'=>$P0)
+    optable.'newtok'('prefix::', 'looser'=>'infix:|', 'parsed'=>$P0)
 
     optable.'newtok'('close:}',  'precedence'=>'<', 'nows'=>1)
 
@@ -337,7 +337,12 @@ Return a failed match if the stoptoken is found.
     .tailcall 'parse_term_ws'(mob)
 
   end_noterm:
+    $S0 = substr target, pos, 1
+    if $S0 == ':' goto err_cut
     (mob) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
+    .return (mob)
+  err_cut:
+    'parse_error'(mob, pos, 'Quantifier follows nothing in regex')
     .return (mob)
 .end
 
@@ -1056,7 +1061,7 @@ Parse a modifier.
   name:
     pos = find_not_cclass .CCLASS_WORD, target, pos, lastpos
     $I1 = pos - $I0
-    if $I1 == 0 goto err_null_cut
+    if $I1 == 0 goto fail
     $S0 = substr target, $I0, $I1
     mob['key'] = $S0
     mob.'result_object'(value)
@@ -1072,8 +1077,7 @@ Parse a modifier.
     ### XXX pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
     mob.'to'(pos)
     .return (mob)
-  err_null_cut:
-    'parse_quant_error'(mob)
+  fail:
     .return (mob)
 .end
 
