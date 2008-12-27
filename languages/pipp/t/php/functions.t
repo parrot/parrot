@@ -158,11 +158,11 @@ OUT
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'function with three args' );
 <?php
 
-function echo_two_args( $arg_1, $arg_2, $arg_3 )  {
+function echo_three_args( $arg_1, $arg_2, $arg_3 )  {
   echo "$arg_1 $arg_2 $arg_3\n";
 }
 
-echo_two_args( 12, 'asdf', -1 );
+echo_three_args( 12, 'asdf', -1 );
 
 ?>
 CODE
