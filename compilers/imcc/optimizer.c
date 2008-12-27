@@ -83,8 +83,6 @@ e.g. eliminate new Px .PerlUndef because Px where different before
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-#if DO_LOOP_OPTIMIZATION
-
 PARROT_WARN_UNUSED_RESULT
 static int _is_ins_save(
     ARGIN(const IMC_Unit *unit),
@@ -94,8 +92,6 @@ static int _is_ins_save(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
-
-#endif /* DO_LOOP_OPTIMIZATION */
 
 static int branch_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -153,8 +149,6 @@ static int if_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-#if DO_LOOP_OPTIMIZATION
-
 PARROT_WARN_UNUSED_RESULT
 static int is_ins_save(PARROT_INTERP,
     ARGIN(const IMC_Unit *unit),
@@ -166,7 +160,24 @@ static int is_ins_save(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
-#endif /* DO_LOOP_OPTIMIZATION */
+static int is_invariant(PARROT_INTERP,
+    ARGIN(const IMC_Unit *unit),
+    ARGIN(const Instruction *ins))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_WARN_UNUSED_RESULT
+static int loop_one(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int bnr)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
+
+PARROT_WARN_UNUSED_RESULT
+static int loop_optimization(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*unit);
 
 static int strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -188,8 +199,6 @@ static int used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 /* HEADERIZER END: static */
 
 #if DO_LOOP_OPTIMIZATION
-int loop_optimization(Interp *, IMC_Unit *);
-
 PARROT_WARN_UNUSED_RESULT
 int _is_ins_save(
     ARGIN(const IMC_Unit *unit),
@@ -688,12 +697,11 @@ even though sometimes it may be safe.
 static int
 constant_propagation(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    Instruction *ins, *ins2, *tmp, *prev;
-    int i;
+    Instruction *ins;
     SymReg *c, *o;
     int any = 0;
 
-    o = c = NULL; /* silence compiler uninit warning */
+    o = c = NULL; /* silence compiler uninit warning, but XXX better to handle flow well */
 
     IMCC_info(interp, 2, "\tconstant_propagation\n");
     for (ins = unit->instructions; ins; ins = ins->next) {
@@ -713,9 +721,12 @@ constant_propagation(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                before it gets to us */
 
         if (found) {
+            Instruction *ins2;
+
             IMCC_debug(interp, DEBUG_OPT2,
                     "propagating constant %I => \n", ins);
             for (ins2 = ins->next; ins2; ins2 = ins2->next) {
+                int i;
                 if (ins2->bbindex != ins->bbindex)
                     /* restrict to within a basic block */
                     goto next_constant;
@@ -726,7 +737,9 @@ constant_propagation(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                         if (instruction_writes(ins2, ins2->symregs[i]))
                             goto next_constant;
                         else if (instruction_reads(ins2, ins2->symregs[i])) {
+                            Instruction *tmp;
                             SymReg *old;
+
                             IMCC_debug(interp, DEBUG_OPT2,
                                     "\tpropagating into %I register %i",
                                     ins2, i);
@@ -737,7 +750,7 @@ constant_propagation(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
                                 unit, ins2->opname, ins2->symregs, ins2->opsize,
                                 &found);
                             if (found) {
-                                prev = ins2->prev;
+                                const Instruction * const prev = ins2->prev;
                                 if (prev) {
                                     subst_ins(unit, ins2, tmp, 1);
                                     any = 1;
@@ -1752,7 +1765,7 @@ max_loop_depth(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<int is_invariant>
+=item C<static int is_invariant>
 
 RT #48260: Not yet documented!!!
 
@@ -1760,26 +1773,24 @@ RT #48260: Not yet documented!!!
 
 */
 
-int
+static int
 is_invariant(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGIN(const Instruction *ins))
 {
-    int ok = 0;
-    int what = 0;
+    int what;
 
     if (STREQ(ins->opname, "new")) {
-        ok = 1;
         what = CHK_INV_NEW;
     }
     /* only, if once assigned and not changed */
     else if (STREQ(ins->opname, "set") &&
             !(ins->symregs[0]->usage & U_KEYED) &&
             ins->symregs[1]->type & VTCONST) {
-        ok = 1;
         what = CHK_INV_SET;
     }
-    if (ok)
-        return is_ins_save(interp, unit, ins, ins->symregs[0], what);
-    return 0;
+    else {
+        return 0;
+    }
+    return is_ins_save(interp, unit, ins, ins->symregs[0], what);
 }
 
 #  define MOVE_INS_1_BL
@@ -1871,7 +1882,7 @@ move_ins_out(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
 
 /*
 
-=item C<int loop_one>
+=item C<static int loop_one>
 
 RT #48260: Not yet documented!!!
 
@@ -1879,7 +1890,8 @@ RT #48260: Not yet documented!!!
 
 */
 
-int
+PARROT_WARN_UNUSED_RESULT
+static int
 loop_one(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int bnr)
 {
     Basic_block * const bb = unit->bb_list[bnr];
@@ -1909,7 +1921,7 @@ loop_one(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int bnr)
 
 /*
 
-=item C<int loop_optimization>
+=item C<static int loop_optimization>
 
 RT #48260: Not yet documented!!!
 
@@ -1917,7 +1929,8 @@ RT #48260: Not yet documented!!!
 
 */
 
-int
+PARROT_WARN_UNUSED_RESULT
+static int
 loop_optimization(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     int l;
