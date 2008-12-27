@@ -13,6 +13,10 @@
 #ifndef PARROT_PIR_PIRCOMPUNIT_H_GUARD
 #define PARROT_PIR_PIRCOMPUNIT_H_GUARD
 
+/* needed for sub_info structure definition */
+#include "bcgen.h"
+
+
 /* the 4 parrot types; use explicit values that match the values in
  * PDD03_calling_conventions.pod.
  */
@@ -162,7 +166,7 @@ typedef struct label {
  * or key nodes, such as ["x";42].
  */
 typedef struct expression {
-    union __expression_union {
+    union expression_union {
         struct target  *t;
         constant       *c;
         char const     *id;
@@ -263,7 +267,7 @@ typedef struct instruction {
 
 /* a hashtable bucket for storing something */
 typedef struct bucket {
-    union __bucket_union {
+    union bucket_union {
         char const          *str;
         struct symbol       *sym;
         struct local_label  *loc;
@@ -307,6 +311,8 @@ typedef struct subroutine {
     int                 flags;         /* this sub's flags */
     int                 startoffset;   /* start offset in bytecode where this sub starts */
     int                 endoffset;     /* end offset in bytecode where this sub ends */
+
+    sub_info            info;
 
     /* XXX the whole multi stuff must be implemented */
     char              **multi_types;   /* data types of parameters if this is a multi sub */

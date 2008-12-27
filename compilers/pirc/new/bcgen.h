@@ -14,6 +14,20 @@ struct bytecode;
 
 typedef struct bytecode bytecode;
 
+/* sub info structure, containing all info about a sub that a bytecode
+ * generator needs to know.
+ */
+typedef struct sub_info {
+    char const * const subname;
+    char const * const nsentry;
+    char const * const subid;
+    int vtable_index;
+    unsigned regs_used[4];
+    int startoffset;
+    int endoffset;
+
+} sub_info;
+
 bytecode *new_bytecode(Interp *interp, char const * const filename, int bytes, int codesize);
 
 

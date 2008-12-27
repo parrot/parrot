@@ -9,8 +9,6 @@
  * a pir_reg object represents a PIR symbolic register ($I0, $S1, etc.).
  * For each symbol/pir-reg in a sub, there is only one corresponding
  * symbol/pir_reg object.
- * References to these symbols are stored as target nodes (during the
- * parse), which will point to these symbol or pir_reg objects.
  */
 
 #ifndef PARROT_PIR_PIRSYMBOL_H_GUARD
