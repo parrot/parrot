@@ -84,7 +84,7 @@ int get_string_const_index(bytecode * const bc, STRING *s);
 /* retrieves the index of s in the constant table */
 
 
-void add_sub_pmc(bytecode * const bc, sub_info *info);
+void add_sub_pmc(bytecode * const bc, sub_info * const info);
 
 
 #endif /* PARROT_BCGEN_H_GUARD */

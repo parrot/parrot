@@ -13,13 +13,15 @@
 
 /*
 
-=head1 FUNCTIONS
+=head1 DESCRIPTION
 
 This file contains emit functions. Depending on the requested output,
 the appropriate emit functions are used. Options are:
 
  -p     for PASM output
  -b     for bytecode output
+
+=head1 FUNCTIONS
 
 =over 4
 

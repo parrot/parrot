@@ -354,7 +354,7 @@ add_string_const_from_cstring(bytecode * const bc, char const * const str) {
 /*
 
 =item C<void
-add_sub_pmc(bytecode * const bc, sub_info *info)>
+add_sub_pmc(bytecode * const bc, sub_info * const info)>
 
 Add a sub PMC to the constant table. This function initializes the sub PMC.
 
@@ -362,7 +362,7 @@ Add a sub PMC to the constant table. This function initializes the sub PMC.
 
 */
 void
-add_sub_pmc(bytecode * const bc, sub_info *info) {
+add_sub_pmc(bytecode * const bc, sub_info * const info) {
     PMC               *sub_pmc;
     Parrot_sub        *sub;
     int                subconst_index;
