@@ -511,7 +511,7 @@ static global_label *
 new_global_label(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)) {
     global_label *glob = pir_mem_allocate_zeroed_typed(lexer, global_label);
     glob->name         = name;
-    glob->const_nr     = 0;
+    glob->const_table_index = 0;
     return glob;
 }
 

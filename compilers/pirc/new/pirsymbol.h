@@ -58,7 +58,7 @@ typedef struct pir_reg {
 /* structure to represent a global label */
 typedef struct global_label {
     char const          *name;
-    int                  const_nr;
+    int                  const_table_index;
 
 } global_label;
 

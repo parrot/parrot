@@ -559,8 +559,6 @@ emit_pbc(lexer_state * const lexer) {
         fprintf(stderr, "start offset of sub '%s' is: %d\tend offest: %d\n",
                     subiter->info.subname, subiter->info.startoffset, subiter->info.endoffset);
 
-        add_sub_pmc(lexer->bc, &subiter->info);
-
         emit_pbc_sub(lexer, subiter);
         subiter = subiter->next;
     }

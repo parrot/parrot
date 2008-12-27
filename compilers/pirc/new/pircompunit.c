@@ -2105,7 +2105,7 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
                 if (glob) {
                     /* XXX fix pmc const stuff */
                     new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc");
-                    add_operands(lexer, "%T%i", sub, glob->const_nr);
+                    add_operands(lexer, "%T%i", sub, glob->const_table_index);
                 }
                 else { /* find it during runtime (hopefully, otherwise exception) */
                     new_sub_instr(lexer, PARROT_OP_find_sub_not_null_p_sc,
@@ -2318,7 +2318,8 @@ fixup_global_labels(lexer_state * const lexer) {
              */
 
             /* create an operand that refers to a constant PMC */
-            new_second_operand = expr_from_const(lexer, new_const(lexer, INT_TYPE, glob->const_nr));
+            new_second_operand = expr_from_const(lexer, new_const(lexer, INT_TYPE,
+                                                                  glob->const_table_index));
             /* link it into the list of operands; the /current/ second operand should be removed,
              * so insert the new expression as second operand, and make sure the old second
              * operand is no longer in the list.
@@ -2403,6 +2404,8 @@ close_sub(lexer_state * const lexer) {
      /* if register allocation was requested, do that now */
     if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC))
         linear_scan_register_allocation(lexer->lsr);
+
+    add_sub_pmc(lexer->bc, &CURRENT_SUB(lexer)->info);
 }
 
 /*
