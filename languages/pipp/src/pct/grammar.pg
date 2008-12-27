@@ -2,7 +2,6 @@
 # $Id$
 
 # PHP grammar for Pipp PCT
-
 grammar Pipp::Grammar is PCT::Grammar;
 
 # the starting rule
@@ -276,18 +275,18 @@ rule function_call {
 }
 
 rule instantiate_array {
-	'array' '(' [ <array_arguments> [  [',' <array_arguments> ]* [',' <array_arguments> ]?  ]? ','?  ]?  ')'
-	{*}
+    'array' '(' [ <array_arguments> [  [',' <array_arguments> ]* [',' <array_arguments> ]?  ]? ','?  ]?  ')'
+    {*}
 }
 
-rule array_arguments {	
-	| <key_value_pair>	{*}	#= key_value_pair
-	| <expression>		{*}	#= expression
+rule array_arguments {
+    | <key_value_pair>  {*}    #= key_value_pair
+    | <expression>      {*}    #= expression
 }
 
 rule key_value_pair {
-	<key=expression> '=>' <value=expression>
-	{*}
+    <key=expression> '=>' <value=expression>
+    {*}
 }
 
 rule constructor_call {
@@ -375,7 +374,7 @@ rule literal {
 rule term {
       <method_call>            {*}   #= method_call
     | <function_call>          {*}   #= function_call
-	| <instantiate_array>	   {*}	 #= instantiate_array
+    | <instantiate_array>      {*}   #= instantiate_array
     | <constructor_call>       {*}   #= constructor_call
     | '(' <expression> {*} ')'       #= expression
     | <literal>                {*}   #= literal
