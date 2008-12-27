@@ -416,7 +416,7 @@ int
 emit_pbc_const(lexer_state * const lexer, constant * const pirconst) {
     switch (pirconst->type) {
         case INT_TYPE:
-            /* XXX ? */
+
             break;
         case NUM_TYPE:
             return add_num_const(lexer->bc, pirconst->val.nval);
@@ -425,7 +425,7 @@ emit_pbc_const(lexer_state * const lexer, constant * const pirconst) {
             return add_string_const(lexer->bc, pirconst->val.sval);
 
         case PMC_TYPE:
-            /* XXX ? */
+
             break;
     }
 }

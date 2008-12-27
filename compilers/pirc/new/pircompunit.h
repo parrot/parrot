@@ -144,7 +144,11 @@ typedef struct constant {
     char const      *name;     /* name of the constant, if declared as a constant */
     pir_type         type;     /* type of the constant */
     value            val;      /* value of the constant */
+
+    /* XXX this needed? think not. --kjs 12/27/2008.
     int              const_table_index;
+    */
+
     struct constant *next;
 
 } constant;

@@ -582,7 +582,9 @@ store_global_constant(NOTNULL(lexer_state * const lexer), NOTNULL(constant * con
     store_bucket(table, b, hash);
 
     /* add it as a constant in the PBC constant table */
+    /* XXX is this necessary? Seems not. 12/27/2008. --kjs
     c->const_table_index = emit_pbc_const(lexer, c);
+    */
 }
 
 /*
