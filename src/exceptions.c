@@ -40,12 +40,6 @@ static PMC * build_exception_from_args(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC * die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_CAN_RETURN_NULL
 static opcode_t * pass_exception_args(PARROT_INTERP,
     ARGIN(const char *sig),
@@ -89,7 +83,7 @@ Parrot_ex_build_exception(PARROT_INTERP, INTVAL severity,
 
 /*
 
-=item C<static PMC * die_from_exception>
+=item C<void die_from_exception>
 
 Print a stack trace for C<exception>, a message if there is one, and then exit.
 
@@ -97,9 +91,8 @@ Print a stack trace for C<exception>, a message if there is one, and then exit.
 
 */
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC *
+PARROT_DOES_NOT_RETURN
+void
 die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
 {
     STRING * const message     = VTABLE_get_string(interp, exception);
@@ -194,9 +187,8 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
     if (PMC_IS_NULL(handler)) {
         STRING * const message     = VTABLE_get_string(interp, exception);
         const INTVAL   severity    = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
-        PMC *dead;
         if (severity < EXCEPT_error) {
-            PMC *resume = VTABLE_get_attr_str(interp, exception, CONST_STRING(interp, "resume"));
+            PMC * const resume = VTABLE_get_attr_str(interp, exception, CONST_STRING(interp, "resume"));
             if (string_equal(interp, message, CONST_STRING(interp, "")) == 1) {
                 Parrot_io_eprintf(interp, "%S\n", message);
             }
@@ -212,7 +204,7 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
                 return VTABLE_invoke(interp, resume, NULL);
             }
         }
-        dead = die_from_exception(interp, exception);
+        die_from_exception(interp, exception);
     }
 
     address    = VTABLE_invoke(interp, handler, dest);
@@ -253,9 +245,10 @@ build_exception_from_args(PARROT_INTERP, int ex_type,
         ARGIN(const char *format), va_list arglist)
 {
     /* Make and set exception message. */
-    STRING *msg = strchr(format, '%') ?
-        Parrot_vsprintf_c(interp, format, arglist) :
-        string_make(interp, format, strlen(format), NULL, 0);
+    STRING * const msg =
+        strchr(format, '%')
+            ? Parrot_vsprintf_c(interp, format, arglist)
+            : string_make(interp, format, strlen(format), NULL, 0);
 
     return Parrot_ex_build_exception(interp, EXCEPT_error, ex_type, msg);
 }
@@ -292,7 +285,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     RunProfile * const profile      = interp->profile;
     Parrot_runloop    *return_point = interp->current_runloop;
     if (PMC_IS_NULL(handler)) {
-        PMC *dead = die_from_exception(interp, exception);
+        die_from_exception(interp, exception);
     }
 
     /* If profiling, remember end time of lastop and generate entry for
