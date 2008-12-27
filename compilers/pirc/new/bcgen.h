@@ -28,7 +28,7 @@ typedef struct sub_info {
 
 } sub_info;
 
-bytecode *new_bytecode(Interp *interp, char const * const filename, int bytes, int codesize);
+bytecode *new_bytecode(Interp *interp, char const * const filename);
 
 
 void create_codesegment(bytecode * const bc, int codesize);

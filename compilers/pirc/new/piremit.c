@@ -546,8 +546,7 @@ emit_pbc(lexer_state * const lexer) {
 
     fprintf(stderr, "emit_pbc(): starting...\n");
 
-    lexer->bc = new_bytecode(lexer->interp, lexer->filename,
-                             lexer->codesize * 4, lexer->codesize);
+    create_codesegment(lexer->bc, lexer->codesize);
 
     fprintf(stderr, "ok 1\n");
     subiter = lexer->subs->next;

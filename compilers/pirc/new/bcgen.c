@@ -203,17 +203,15 @@ add_key_const(bytecode * const bc, PMC *key) {
 /*
 
 =item C<bytecode *
-new_bytecode(Interp *interp, char const * const filename, int bytes, int codesize)>
+new_bytecode(Interp *interp, char const * const filename)>
 
 Create a new bytecode struct, representing the bytecode for file C<filename>
-
-Create a new bytecode struct and return a pointer to it.
 
 =cut
 
 */
 bytecode *
-new_bytecode(Interp *interp, char const * const filename, int bytes, int codesize) {
+new_bytecode(Interp *interp, char const * const filename) {
     PMC      *self;
     bytecode *bc      = (bytecode *)mem_sys_allocate(sizeof (bytecode));
 
@@ -234,14 +232,17 @@ new_bytecode(Interp *interp, char const * const filename, int bytes, int codesiz
     self              = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_INTERPRETER);
     add_pmc_const(bc, self);
 
-    create_codesegment(bc, codesize);
-
     return bc;
 }
 
 /*
 
+=item C<void
+create_codesegment(bytecode * const bc, int codesize)>
+
 Create a code segment of size C<codesize>.
+
+=cut
 
 */
 void
@@ -353,14 +354,7 @@ add_string_const_from_cstring(bytecode * const bc, char const * const str) {
 /*
 
 =item C<void
-add_sub_pmc(bytecode * const bc,
-            char const * const subname,  -- the name of this sub
-            char const * const nsentry,  -- the value of the :nsentry flag
-            char const * const subid,    -- the value of the :subid flag
-            int vtable_index,            -- vtable index, or -1 if no :vtable
-            unsigned regs_used[],        -- register usage of this sub
-            int startoffset,             -- start offset of this sub in bytecode
-            int endoffset)>              -- end offset of this sub in bytecode
+add_sub_pmc(bytecode * const bc, sub_info *info)>
 
 Add a sub PMC to the constant table. This function initializes the sub PMC.
 
