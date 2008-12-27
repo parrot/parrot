@@ -76,8 +76,7 @@ new/pirregalloc$(O): new/pirregalloc.c new/pirregalloc.h
 new/bcgen$(O): new/bcgen.c new/bcgen.h
 
 test: all
-	podchecker $(SOURCES) \	
-	README.pod
+	podchecker $(SOURCES) README.pod
 	perl t/harness
 
 # regenerate the Makefile
