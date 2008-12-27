@@ -301,16 +301,11 @@ struct label;
 /* a sub */
 typedef struct subroutine {
     key                *name_space;    /* this sub's namespace */
-    char const         *sub_name;      /* this sub's name */
+
     char const         *outer_sub;     /* this sub's outer subroutine, if any */
-    char const         *subid;         /* this sub's subid, if any */
-    int                 vtable_index;  /* index of vtable method this sub's overriding, if any */
     char const         *instanceof;    /* XXX document this XXX */
-    char const         *nsentry;       /* name by which the sub is stored in the namespace */
     char const         *methodname;    /* name of this sub by which it's stored as a method */
     int                 flags;         /* this sub's flags */
-    int                 startoffset;   /* start offset in bytecode where this sub starts */
-    int                 endoffset;     /* end offset in bytecode where this sub ends */
 
     sub_info            info;
 
@@ -324,7 +319,6 @@ typedef struct subroutine {
     hashtable           labels;        /* local labels */
 
     struct pir_reg     *registers[4];  /* used PIR registers in this sub (1 list for each type) */
-    unsigned            regs_used[4];  /* number of PASM registers allocated for this sub */
 
     struct subroutine  *next;          /* pointer to next subroutine in the list */
 

@@ -63,7 +63,7 @@ This is the vanilla register allocator.
 */
 static int
 next_register(NOTNULL(lexer_state * const lexer), pir_type type) {
-    CURRENT_SUB(lexer)->regs_used[type]++; /* count number of registers used */
+    CURRENT_SUB(lexer)->info.regs_used[type]++; /* count number of registers used */
     return lexer->curregister[type]++;
 }
 
@@ -261,7 +261,7 @@ check_unused_symbols(NOTNULL(lexer_state * const lexer)) {
             while (b) {
                 if (bucket_symbol(b)->info.color == NO_REG_ALLOCATED)
                     fprintf(stderr, "Warning: in sub '%s': symbol '%s' declared but not used\n",
-                                    subiter->sub_name, bucket_symbol(b)->info.id.name);
+                                    subiter->info.subname, bucket_symbol(b)->info.id.name);
 
                 b = b->next;
             }
@@ -688,7 +688,7 @@ find_local_label(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const 
 
     /* no label found, emit an error message. */
     yypirerror(lexer->yyscanner, lexer, "in sub '%s': cannot find offset for label '%s'",
-               CURRENT_SUB(lexer)->sub_name, labelname);
+               CURRENT_SUB(lexer)->info.subname, labelname);
 
     return 0;
 }

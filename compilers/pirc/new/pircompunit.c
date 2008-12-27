@@ -140,7 +140,7 @@ set_sub_vtable(lexer_state * const lexer, char const * vtablename) {
     int vtable_index;
 
     if (vtablename == NULL)  /* the sub's name I<is> the vtablename */
-        vtablename = CURRENT_SUB(lexer)->sub_name;
+        vtablename = CURRENT_SUB(lexer)->info.subname;
 
     /* get the index number of this vtable method */
     vtable_index = Parrot_get_vtable_index(lexer->interp,
@@ -152,7 +152,7 @@ set_sub_vtable(lexer_state * const lexer, char const * vtablename) {
         yypirerror(lexer->yyscanner, lexer,
                    "'%s' is not a vtable method but was used with :vtable flag", vtablename);
     else {
-        CURRENT_SUB(lexer)->vtable_index = vtable_index;
+        CURRENT_SUB(lexer)->info.vtable_index = vtable_index;
         SET_FLAG(lexer->subs->flags, SUB_FLAG_VTABLE);
     }
 }
@@ -169,7 +169,7 @@ Set the name specified in the :subid flag on the sub.
 */
 void
 set_sub_subid(lexer_state * const lexer, char const * const subid) {
-    CURRENT_SUB(lexer)->subid = subid;
+    CURRENT_SUB(lexer)->info.subid = subid;
     SET_FLAG(lexer->subs->flags, SUB_FLAG_SUBID);
 }
 
@@ -189,7 +189,7 @@ set_sub_methodname(lexer_state * const lexer, char const * const methodname) {
     if (methodname) /* :method("foo") */
         CURRENT_SUB(lexer)->methodname = methodname;
     else /* :method without a value defaults to the subname. */
-        CURRENT_SUB(lexer)->methodname = CURRENT_SUB(lexer)->sub_name;
+        CURRENT_SUB(lexer)->methodname = CURRENT_SUB(lexer)->info.subname;
 
     SET_FLAG(lexer->subs->flags, SUB_FLAG_METHOD);
 }
@@ -223,7 +223,7 @@ by which the sub is stored in the namespace.
 */
 void
 set_sub_nsentry(lexer_state * const lexer, char const * const nsentry) {
-    CURRENT_SUB(lexer)->nsentry = nsentry;
+    CURRENT_SUB(lexer)->info.nsentry = nsentry;
 }
 
 /*
@@ -264,25 +264,25 @@ new_subr(lexer_state * const lexer, char const * const subname) {
     int index;
 
     /* set the sub fields */
-    newsub->sub_name    = subname;
+    newsub->info.subname     = subname;
 
     /* set default lexid */
-    newsub->subid       = subname;
+    newsub->info.subid       = subname;
 
     /* take namespace of this sub of the lexer, which keeps track of that */
-    newsub->name_space  = lexer->current_ns;
+    newsub->name_space       = lexer->current_ns;
 
-    newsub->parameters  = NULL;
-    newsub->statements  = NULL;
-    newsub->flags       = 0;
-    newsub->startoffset = lexer->codesize; /* start offset in bytecode */
+    newsub->parameters       = NULL;
+    newsub->statements       = NULL;
+    newsub->flags            = 0;
+    newsub->info.startoffset = lexer->codesize; /* start offset in bytecode */
 
     init_hashtable(lexer, &newsub->symbols, HASHTABLE_SIZE_INIT);
     init_hashtable(lexer, &newsub->labels, HASHTABLE_SIZE_INIT);
 
     for (index = 0; index < NUM_PARROT_TYPES; ++index) {
-        newsub->registers[index] = NULL; /* set all "register" tables to NULL */
-        newsub->regs_used[index] = 0;    /* set all register counts to 0 */
+        newsub->registers[index]      = NULL; /* set all "register" tables to NULL */
+        newsub->info.regs_used[index] = 0;    /* set all register counts to 0 */
     }
 
     /* link the new sub node into the list of subroutines */
@@ -318,7 +318,7 @@ Set the current subroutine's name to C<subname>.
 */
 void
 set_sub_name(struct lexer_state * const lexer, char const * const subname) {
-    CURRENT_SUB(lexer)->sub_name = subname;
+    CURRENT_SUB(lexer)->info.subname = subname;
 }
 
 
@@ -2398,7 +2398,7 @@ close_sub(lexer_state * const lexer) {
     fixup_local_labels(lexer);
 
     /* store end offset in bytecode of this subroutine */
-    CURRENT_SUB(lexer)->endoffset = lexer->codesize;
+    CURRENT_SUB(lexer)->info.endoffset = lexer->codesize;
 
      /* if register allocation was requested, do that now */
     if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC))
@@ -2420,7 +2420,7 @@ void
 update_sub_register_usage(lexer_state * const lexer, unsigned reg_usage[NUM_PARROT_TYPES]) {
     int i;
     for (i = 0; i < NUM_PARROT_TYPES; ++i)
-        CURRENT_SUB(lexer)->regs_used[i] = reg_usage[i];
+        CURRENT_SUB(lexer)->info.regs_used[i] = reg_usage[i];
 }
 
 

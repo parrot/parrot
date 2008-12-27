@@ -297,7 +297,7 @@ print_subs(struct lexer_state * const lexer) {
 
             }
 
-            fprintf(out, "%s:\n", subiter->sub_name);
+            fprintf(out, "%s:\n", subiter->info.subname);
             print_statement(lexer, subiter);
             subiter = subiter->next;
         }
@@ -344,7 +344,7 @@ emit_pir_subs(lexer_state * const lexer) {
             fprintf(out, "\n.namespace ");
             print_key(lexer, subiter->name_space);
 
-            fprintf(out, "\n.sub %s", subiter->sub_name);
+            fprintf(out, "\n.sub %s", subiter->info.subname);
 
             for (i = 0; i < BIT(i); i++) {
                 if (TEST_FLAG(subiter->flags, BIT(i))) {
@@ -556,16 +556,16 @@ emit_pbc(lexer_state * const lexer) {
     /* iterate over all instructions and emit them */
     do {
         fprintf(stderr, "start offset of sub '%s' is: %d\tend offest: %d\n",
-                    subiter->sub_name, subiter->startoffset, subiter->endoffset);
+                    subiter->info.subname, subiter->info.startoffset, subiter->info.endoffset);
 
         add_sub_pmc(lexer->bc,
-                    subiter->sub_name,
-                    subiter->nsentry,
-                    subiter->subid,
-                    subiter->vtable_index,
-                    subiter->regs_used,
-                    subiter->startoffset,
-                    subiter->endoffset);
+                    subiter->info.subname,
+                    subiter->info.nsentry,
+                    subiter->info.subid,
+                    subiter->info.vtable_index,
+                    subiter->info.regs_used,
+                    subiter->info.startoffset,
+                    subiter->info.endoffset);
 
         emit_pbc_sub(lexer, subiter);
         subiter = subiter->next;

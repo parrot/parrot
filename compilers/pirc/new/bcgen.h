@@ -18,13 +18,13 @@ typedef struct bytecode bytecode;
  * generator needs to know.
  */
 typedef struct sub_info {
-    char const * const subname;
-    char const * const nsentry;
-    char const * const subid;
-    int vtable_index;
-    unsigned regs_used[4];
-    int startoffset;
-    int endoffset;
+    char const * subname;
+    char const * nsentry;
+    char const * subid;
+    int          vtable_index;
+    unsigned     regs_used[4];
+    int          startoffset;
+    int          endoffset;
 
 } sub_info;
 
