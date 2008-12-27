@@ -71,7 +71,7 @@ error message and delegates the rest to C<panic>.
   have_dba:
     .tailcall self.'panic'("Unable to parse ", dba, "; couldn't find final ", goal)
 .end
-    
+
 
 =item item()
 
