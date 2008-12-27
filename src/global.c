@@ -101,10 +101,8 @@ PARROT_CAN_RETURN_NULL
 static PMC *
 internal_ns_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc_key), int flags)
 {
-    PMC *sub_ns;
     PMC *ns = base_ns;
     INTVAL i, n;
-    static const INTVAL max_intval = (INTVAL)((~(UINTVAL)0) >> 1); /*2s comp*/
 
     if (pmc_key->vtable->base_type == enum_class_String) {
         STRING *str_key = VTABLE_get_string(interp, pmc_key);
@@ -118,6 +116,8 @@ internal_ns_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc_key), int f
 
     for (i = 0; i < n; ++i) {
         STRING *part;
+        PMC *sub_ns;
+
         if (!pmc_key)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "Passed a NULL pmc_key into VTABLE_get_string_keyed_int");

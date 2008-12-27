@@ -344,8 +344,7 @@ void
 Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
         INTVAL core_type, INTVAL hll_type)
 {
-    PMC  *entry, *type_hash, *instantiated;
-    Hash *hash;
+    PMC  *entry, *type_hash;
     PMC  *hll_info = interp->HLL_info;
     const INTVAL n = VTABLE_elements(interp, hll_info);
 

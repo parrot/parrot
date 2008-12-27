@@ -2625,7 +2625,6 @@ Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     /* args_sig, results_sig */
     PMC *sigs[2];
 
-    const char *x;
     const char *ret_x  = NULL;
 
     indexes[0] = arg_indexes;
