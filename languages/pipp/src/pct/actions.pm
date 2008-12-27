@@ -219,12 +219,10 @@ method key_value_pair($/) {
 }
 
 method method_call($/) {
-    my $past := PAST::Op.new(
-                    :name( ~$<METHOD_NAME> ),
-                    :pasttype( 'callmethod' ),
-                    :name( ~$<METHOD_NAME> ),
-                    $( $<var> )
-                );
+    my $past := $( $<arguments> );
+    $past.name( ~$<METHOD_NAME> );
+    $past.pasttype( 'callmethod' );
+    $past.unshift( $( $<var> ) );
 
     make $past;
 }
@@ -547,7 +545,23 @@ method class_method_definition($/, $key) {
 
     if $key eq 'open' {
         # note that $<param_list> creates a new PAST::Block.
-        @?BLOCK.unshift( $( $<param_list> ) );
+        my $block := $( $<param_list> );
+        $block.unshift(
+            PAST::Op.new(
+                :pasttype('bind'),                                            
+                PAST::Var.new(
+                    :name('$this'),
+                    :scope('lexical'),                                        
+                    :isdecl(1)                                               
+                ),                                                               
+                PAST::Var.new(
+                    :name('self'),                                            
+                    :scope('register')                                       
+                )                                                               
+            )
+        );                  
+
+        @?BLOCK.unshift( $block );
     }
     else {
         my $block := @?BLOCK.shift();

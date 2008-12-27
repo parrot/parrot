@@ -20,7 +20,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 8;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'definition of a class' );
 <?php
@@ -157,5 +157,65 @@ $foo->echo_menber();
 ?>
 CODE
 a member of Foo
+OUT
+
+
+=for perl6
+
+class Foo {
+    method one_arg($arg_1) {
+        print $arg_1;
+        print "\n";
+    }
+}
+
+my $foo = Foo.new();
+$foo.one_arg('the first argument');
+
+=cut
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'method with one parameter' );
+<?php
+
+class Foo {
+    function one_arg($arg_1) {
+        echo $arg_1;
+        echo "\n";
+    }
+}
+
+$foo = new Foo;
+$foo->one_arg('the first argument');
+
+?>
+CODE
+the first argument
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'method with one parameter' );
+<?php
+
+class Foo {
+    function four_args($arg_1, $arg_2, $arg_3, $arg_4) {
+        echo $arg_1;
+        echo "\n";
+        echo $arg_2;
+        echo "\n";
+        echo $arg_3;
+        echo "\n";
+        echo $arg_4;
+        echo "\n";
+    }
+}
+
+$foo = new Foo;
+$foo->four_args( 'one', 'two', 'three', 'four' );
+
+?>
+CODE
+one
+two
+three
+four
 OUT
 
