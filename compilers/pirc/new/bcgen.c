@@ -357,11 +357,12 @@ add_string_const_from_cstring(bytecode * const bc, char const * const str) {
 add_sub_pmc(bytecode * const bc, sub_info * const info)>
 
 Add a sub PMC to the constant table. This function initializes the sub PMC.
+The index where the PMC is stored in the constant table is returned.
 
 =cut
 
 */
-void
+int
 add_sub_pmc(bytecode * const bc, sub_info * const info) {
     PMC               *sub_pmc;
     Parrot_sub        *sub;
@@ -438,6 +439,9 @@ add_sub_pmc(bytecode * const bc, sub_info * const info) {
 
     /* Add a new fixup entry in the fixup table for this sub. */
     PackFile_FixupTable_new_entry(bc->interp, info->subname, enum_fixup_sub, subconst_index);
+
+    /* return the index in the constant table where this sub PMC is stored */
+    return subconst_index;
 }
 
 

@@ -2377,6 +2377,8 @@ If register optimization was requested, this is invoked here.
 void
 close_sub(lexer_state * const lexer) {
     int need_leaving_instr = 1;
+    int sub_const_table_index;
+    global_label *glob;
 
     /* don't generate leaving instructions if the last instruction was already
      * leaving the sub.
@@ -2405,7 +2407,15 @@ close_sub(lexer_state * const lexer) {
     if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC))
         linear_scan_register_allocation(lexer->lsr);
 
-    add_sub_pmc(lexer->bc, &CURRENT_SUB(lexer)->info);
+    /* store the subroutine in the bytecode constant table. */
+    sub_const_table_index = add_sub_pmc(lexer->bc, &CURRENT_SUB(lexer)->info);
+
+    /* store the sub PMC index in the constant table with the global label,
+     * so that invoking ops can find this index.
+     */
+    glob = find_global_label(lexer, CURRENT_SUB(lexer)->info.subname);
+    PARROT_ASSERT(glob != NULL); /* it was stored in new_subr(), so must be there. */
+    glob->const_table_index = sub_const_table_index;
 }
 
 /*
