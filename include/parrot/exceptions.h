@@ -183,7 +183,7 @@ void Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 void Parrot_ex_throw_from_c_args(PARROT_INTERP,
-    ARGIN_NULLOK(void *ret_addr),
+    SHIM(void *ret_addr),
     int exitcode,
     ARGIN(const char *format),
     ...)

@@ -126,6 +126,7 @@ const ENCODING* Parrot_get_encoding(SHIM_INTERP, INTVAL number_of_encoding);
 
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
+PARROT_CANNOT_RETURN_NULL
 const ENCODING * Parrot_load_encoding(PARROT_INTERP,
     ARGIN(const char *encodingname))
         __attribute__nonnull__(1)

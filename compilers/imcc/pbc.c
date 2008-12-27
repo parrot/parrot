@@ -126,6 +126,18 @@ static PMC* find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static subs_t * find_sub_by_subid(PARROT_INTERP,
+    ARGIN(const char *lookup),
+    ARGIN(const subs_t *sym),
+    ARGOUT(int *pc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*pc);
+
 static void fixup_globals(PARROT_INTERP)
         __attribute__nonnull__(1);
 

@@ -39,8 +39,7 @@ don't apply.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PARROT_MALLOC
-static Hash * create_hash(
-    PARROT_INTERP,
+static Hash * create_hash(PARROT_INTERP,
     PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type,
     ARGIN(hash_comp_fn compare),

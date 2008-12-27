@@ -102,7 +102,6 @@ PARROT_WARN_UNUSED_RESULT
 Stack_Entry_t * stack_entry(SHIM_INTERP,
     ARGIN(Stack_Chunk_t *stack),
     INTVAL depth)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT

@@ -164,6 +164,7 @@ encodings. See RT #58186.
 
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
+PARROT_CANNOT_RETURN_NULL
 const ENCODING *
 Parrot_load_encoding(PARROT_INTERP, ARGIN(const char *encodingname))
 {

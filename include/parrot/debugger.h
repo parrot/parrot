@@ -298,9 +298,7 @@ PDB_breakpoint_t * PDB_find_breakpoint(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_free_file(PARROT_INTERP, ARGIN_NULLOK(PDB_file_t *file))
-        __attribute__nonnull__(1);
-
+void PDB_free_file(SHIM_INTERP, ARGIN_NULLOK(PDB_file_t *file));
 void PDB_get_command(PARROT_INTERP)
         __attribute__nonnull__(1);
 

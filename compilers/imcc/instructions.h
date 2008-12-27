@@ -159,9 +159,7 @@ int get_branch_regno(ARGIN(const Instruction *ins))
 void imcc_init_tables(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-int ins_print(PARROT_INTERP,
-    ARGIN(PMC *io),
-    ARGIN(const Instruction *ins))
+int ins_print(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const Instruction *ins))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

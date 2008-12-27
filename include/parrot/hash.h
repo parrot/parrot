@@ -179,12 +179,14 @@ void parrot_mark_hash(PARROT_INTERP, ARGIN(Hash *hash))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void parrot_new_cstring_hash(SHIM_INTERP, ARGOUT(Hash **hptr))
+void parrot_new_cstring_hash(PARROT_INTERP, ARGOUT(Hash **hptr))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*hptr);
 
 PARROT_EXPORT
-void parrot_new_hash(SHIM_INTERP, ARGOUT(Hash **hptr))
+void parrot_new_hash(PARROT_INTERP, ARGOUT(Hash **hptr))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*hptr);
 
@@ -195,12 +197,14 @@ PMC* Parrot_new_INTVAL_hash(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void parrot_new_pmc_hash(SHIM_INTERP, ARGOUT(PMC *container))
+void parrot_new_pmc_hash(PARROT_INTERP, ARGOUT(PMC *container))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*container);
 
 PARROT_EXPORT
-void parrot_new_pointer_hash(SHIM_INTERP, ARGOUT(Hash **hptr))
+void parrot_new_pointer_hash(PARROT_INTERP, ARGOUT(Hash **hptr))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*hptr);
 
@@ -228,8 +232,7 @@ void parrot_chash_destroy_values(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*hash);
 
-void parrot_new_hash_x(
-    PARROT_INTERP,
+void parrot_new_hash_x(PARROT_INTERP,
     ARGOUT(Hash **hptr),
     PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type,
@@ -241,8 +244,7 @@ void parrot_new_hash_x(
         __attribute__nonnull__(6)
         FUNC_MODIFIES(*hptr);
 
-void parrot_new_pmc_hash_x(
-    PARROT_INTERP,
+void parrot_new_pmc_hash_x(PARROT_INTERP,
     ARGMOD(PMC *container),
     PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type,

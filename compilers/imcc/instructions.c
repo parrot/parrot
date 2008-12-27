@@ -50,7 +50,8 @@ static int e_file_emit(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
-static int e_file_open(SHIM_INTERP, ARGIN(void *param))
+static int e_file_open(PARROT_INTERP, ARGIN(void *param))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
