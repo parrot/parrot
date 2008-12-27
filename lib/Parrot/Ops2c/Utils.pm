@@ -6,7 +6,7 @@ use warnings;
 use lib ("lib/");
 use Parrot::OpLib::core;
 use Parrot::OpsFile;
-use File::Spec;
+use File::Spec ();
 use IO::File ();
 
 =head1 NAME
@@ -945,7 +945,7 @@ static int get_op(const char * name, int full) {
 }
 static void hop_init(void) {
     size_t i;
-    op_info_t * info = $self->{bs}op_lib.op_info_table;
+    op_info_t * const info = $self->{bs}op_lib.op_info_table;
     /* store full names */
     for (i = 0; i < $self->{bs}op_lib.op_count; i++)
         store_op(info + i, 1);

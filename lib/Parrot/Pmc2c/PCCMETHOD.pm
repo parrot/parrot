@@ -393,15 +393,15 @@ sub rewrite_pccmethod {
     my $set_params  = make_arg_pmc($params_flags, '_param_sig');
 
     $e->emit( <<"END", __FILE__, __LINE__ + 1 );
-    INTVAL   _n_regs_used[]       = { $n_regs_used };
+    const INTVAL _n_regs_used[]   = { $n_regs_used };
     opcode_t _param_indexes[]     = { $params_indexes };
     opcode_t *_return_indexes;
     opcode_t *_current_args;
-    PMC      *_param_sig          = pmc_new(interp, enum_class_FixedIntegerArray);
+    PMC      * const _param_sig   = pmc_new(interp, enum_class_FixedIntegerArray);
     PMC      *_return_sig         = PMCNULL;
 
     Parrot_Context *_caller_ctx   = CONTEXT(interp);
-    PMC *_ret_cont                = new_ret_continuation_pmc(interp, NULL);
+    PMC * const _ret_cont         = new_ret_continuation_pmc(interp, NULL);
     Parrot_Context *_ctx          = Parrot_push_context(interp, _n_regs_used);
     PMC *_ccont                   = PMCNULL;
 
