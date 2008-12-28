@@ -90,7 +90,7 @@ typedef struct lexer_state {
     int            flags;          /* general flags, e.g. warnings level */
     unsigned       parse_errors;
     char const    *filename;       /* name of input file */
-    FILE          *outfile;        /* name of output file */
+    FILE          *outfile;        /* output file */
 
     subroutine    *subs;           /* list of subs; always points to the current sub. */
 

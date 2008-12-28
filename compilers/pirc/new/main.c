@@ -74,8 +74,7 @@ print_help(char const * const program_name)
     "  -H        heredoc preprocessing only\n"
     "  -m <size> specify initial macro buffer size; default is 4096 bytes\n"
     "  -n        no output, only print 'ok' if successful\n"
-    "  -o <file> write output to the specified file. "
-    "Currently only works in combination with '-E' option\n"
+    "  -o <file> write output to the specified file.\n"
     "  -p        pasm output\n"
     "  -r        activate the register allocator for improved register usage\n"
     "  -S        do not perform strength reduction\n"
@@ -136,7 +135,8 @@ typedef struct parser_args {
 
 This will be the proper declaration after testing for thread-safety:
 
-void parse_file(int flexdebug, FILE *infile, char * const filename, int flags)
+void parse_file(int flexdebug, FILE *infile, char * const filename, int flags,
+                char * const outputfile)
 
 */
 
@@ -144,7 +144,7 @@ void init_scanner_state(yyscan_t yyscanner);
 
 void
 parse_file(int flexdebug, FILE *infile, char * const filename, int flags, int thr_id,
-           unsigned macro_size)
+           unsigned macro_size, char * const outputfile)
 {
     yyscan_t     yyscanner;
     lexer_state *lexer     = NULL;
@@ -184,7 +184,7 @@ parse_file(int flexdebug, FILE *infile, char * const filename, int flags, int th
         if (TEST_FLAG(lexer->flags, LEXER_FLAG_NOOUTPUT)) /* handy for testing the compiler */
             fprintf(stdout, "ok\n");
         else if (TEST_FLAG(lexer->flags, LEXER_FLAG_PREPROCESS))
-            emit_pir_subs(lexer);
+            emit_pir_subs(lexer, outputfile);
         else if (TEST_FLAG(lexer->flags, LEXER_FLAG_OUTPUTPBC))
             emit_pbc(lexer);
         else
@@ -300,7 +300,7 @@ process_file(void *a) {
     int          thr_id    = args->thr_id;
     int          flags     = args->flags;
 
-    parse_file(flexdebug, infile, filename, flags, thr_id, INIT_MACRO_SIZE);
+    parse_file(flexdebug, infile, filename, flags, thr_id, INIT_MACRO_SIZE, NULL);
 
     return NULL;
 }
@@ -325,6 +325,7 @@ main(int argc, char *argv[]) {
     int                flags        = 0;
     char              *filename     = NULL;
     char              *outputfile   = NULL;
+    char              *hdocoutfile  = NULL;
     unsigned           macrosize    = INIT_MACRO_SIZE;
 
 
@@ -469,17 +470,26 @@ main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    /* if user requested only to process heredocs, send output to stdout and return. */
-    if (TEST_FLAG(flags, LEXER_FLAG_HEREDOCONLY)) {
+    if (outputfile != NULL && TEST_FLAG(flags, LEXER_FLAG_HEREDOCONLY)) {
+        file = open_file(outputfile, "w");
+        process_heredocs(argv[0], file);
+        fclose(file);
+        return 0;
+    }
+    else if (TEST_FLAG(flags, LEXER_FLAG_HEREDOCONLY)) {
         process_heredocs(argv[0], stdout);
         return 0;
     }
+    else {
+        hdocoutfile = _tempnam(NULL, "hdoc");
+        file = open_file(hdocoutfile, "w");
+        process_heredocs(argv[0], file);
+        fclose(file);
+    }
 
-    file = fopen("heredoc.out", "w");
-    process_heredocs(argv[0], file);
-    fclose(file);
+
     /* done handling arguments, open the file */
-    file     = open_file("heredoc.out", "r");
+    file     = open_file(hdocoutfile, "r");
     filename = argv[0];
 
     if (file == NULL) {
@@ -487,7 +497,7 @@ main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    parse_file(flexdebug, file, filename, flags, 0, macrosize);
+    parse_file(flexdebug, file, filename, flags, 0, macrosize, outputfile);
 
 }
 #endif

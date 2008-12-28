@@ -44,7 +44,7 @@ static char const * const subflag_names[] = {
     "lexid"
 };
 
-#define out stdout
+#define out lexer->outfile
 
 /* the order of these letters match with the pir_type enumeration.
  * These are used for human-readable PASM output.
@@ -377,10 +377,16 @@ in the C<lexer>.
 
 */
 void
-emit_pir_subs(lexer_state * const lexer) {
+emit_pir_subs(lexer_state * const lexer, char const * const outfile) {
     if (lexer->subs != NULL) {
         /* set iterator to first item */
         subroutine *subiter = lexer->subs->next;
+
+        if (outfile)
+            lexer->outfile = fopen(outfile, "w");
+        else
+            lexer->outfile = stdout;
+
 
         do {
             int i;
@@ -589,26 +595,30 @@ emit_pbc(lexer_state * const lexer) {
 
     if (lexer->subs == NULL)
         return;
-
+/*
     fprintf(stderr, "emit_pbc(): starting...\n");
-
+*/
     create_codesegment(lexer->bc, lexer->codesize);
 
+/*
     fprintf(stderr, "ok 1\n");
+*/
     subiter = lexer->subs->next;
 
     assert(subiter);
     /* iterate over all instructions and emit them */
     do {
+/*
         fprintf(stderr, "start offset of sub '%s' is: %d\tend offest: %d\n",
                     subiter->info.subname, subiter->info.startoffset, subiter->info.endoffset);
-
+*/
         emit_pbc_sub(lexer, subiter);
         subiter = subiter->next;
     }
     while (subiter != lexer->subs->next);
 
     /* write the output to a file. */
+
     write_pbc_file(lexer->bc, "a.pbc");
 
     /* XXX just make sure no seg. faults  happened */

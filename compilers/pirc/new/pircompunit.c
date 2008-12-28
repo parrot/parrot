@@ -655,12 +655,12 @@ set_param_flag(lexer_state * const lexer, target * const param, target_flag flag
     /* :slurpy can only be set on a PMC parameter */
     if (TEST_FLAG(flag, TARGET_FLAG_SLURPY) && param->info->type != PMC_TYPE)
         yypirerror(lexer->yyscanner, lexer,
-                   "cannot set :slurpy flag on non-pmc %s", param->info->id.name);
+                   "cannot set :slurpy flag on non-pmc parameter '%s'", param->info->id.name);
 
     /* :opt_flag can only be set on a int parameter */
     if (TEST_FLAG(flag, TARGET_FLAG_OPT_FLAG) && param->info->type != INT_TYPE)
         yypirerror(lexer->yyscanner, lexer,
-                   "cannot set :opt_flag flag on non-int %s", param->info->id.name);
+                   "cannot set :opt_flag flag on non-int parameter '%s'", param->info->id.name);
 
     return param;
 }
