@@ -182,13 +182,6 @@ method instantiate_array($/) {
                     :node( $/ )
                 );
   
-                #for $<expression> {
-                #$past.push( $($_) );
-                #}
-
-                #for $<key_value_pair> {
-                #$past.push( $($_) );
-                #}
     for $<array_argument> {
         $past.push( $($_) );
     }   
@@ -201,15 +194,15 @@ method array_argument($/, $key) {
 }
 
 method key_value_pair($/) { 
-   my $past := PAST::Op.new(
-                    :node( $/ ),
-                    :pasttype( 'call' ),
-                    :name( 'infix:=>' ),
-                    :returns( 'Array' ),
-                    $( $<key> ),
-                    $( $<value> )
-            );
-   make $past;
+   make 
+       PAST::Op.new(
+           :node( $/ ),
+           :pasttype( 'call' ),
+           :name( 'infix:=>' ),
+           :returns( 'Array' ),
+           $( $<key> ),
+           $( $<value> )
+       );
 }
 
 method method_call($/) {
@@ -222,16 +215,15 @@ method method_call($/) {
 }
 
 method constructor_call($/) {
-    my $past := PAST::Op.new(
-                    :name( 'new' ),
-                    :pasttype( 'callmethod' ),
-                    PAST::Var.new(
-                        :name( ~$<CLASS_NAME> ),
-                        :scope( 'package' ),
-                    )
-                );
-
-    make $past;
+    make
+        PAST::Op.new(
+            :name( 'new' ),
+            :pasttype( 'callmethod' ),
+            PAST::Var.new(
+                :name( ~$<CLASS_NAME> ),
+                :scope( 'package' ),
+            )
+        );
 }
 
 method constant($/) {

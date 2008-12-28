@@ -78,7 +78,7 @@ php_array.pir - PHP array Standard Library
         goto args_loop
     add_var:
         array[$I1] = $P0
-        $I1 = $I1 + 1
+        inc $I1
         goto end
     end:
         goto args_loop
