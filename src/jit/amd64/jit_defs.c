@@ -1,3 +1,7 @@
+/*
+Copyright (C) 2008, The Perl Foundation.
+$Id$
+*/
 
 #include "parrot/parrot.h"
 #include "jit_emit.h"
