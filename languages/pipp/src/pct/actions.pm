@@ -163,7 +163,7 @@ method expression_statement($/) {
 
 method closure_call($/) {
     my $past := $( $<arguments> );
-    $past.push( $( $<var> ) );
+    $past.unshift( $( $<var> ) );
 
     make $past;
 }
