@@ -172,6 +172,12 @@ sub is_dynamic {
     return 1;
 }
 
+sub export {
+    my ( $self ) = @_;
+
+    return $self->is_dynamic ? 'PARROT_DYNEXT_EXPORT' : 'PARROT_EXPORT';
+}
+
 sub implements_vtable {
     my ( $self, $vt_meth ) = @_;
     return 0 unless $self->has_method($vt_meth);

@@ -49,7 +49,7 @@ sub generate_body {
         $self->rewrite_nci_method($pmc);
     }
 
-    $emit->( ( $pmc->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_EXPORT ') . $self->decl( $pmc, 'CFILE' ) );
+    $emit->( $pmc->export . ' ' . $self->decl( $pmc, 'CFILE' ) );
     $emit->("{\n");
     $emit->($body);
     $emit->("}\n");
@@ -103,11 +103,12 @@ sub decl {
     my ( $decorators, $export, $extern, $newl, $semi, $interp, $pmcvar );
     $decorators = join($/, @$decs, '');
     if ( $for_header eq 'HEADER' ) {
-        $export = $pmc->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_EXPORT ';
+        $export = $pmc->export;
         $extern = '';
         $newl   = ' ';
         $semi   = ';';
-        $interp = $pmcvar = '';
+        $interp = '';
+        $pmcvar = '';
     }
     else {
         $export = '';
@@ -119,7 +120,7 @@ sub decl {
     }
 
     return <<"EOC";
-$decorators$export$extern$ret${newl}Parrot_${pmcname}_$meth(PARROT_INTERP, PMC *$pmcvar$args)$semi
+$decorators$export $extern$ret${newl}Parrot_${pmcname}_$meth(PARROT_INTERP, PMC *$pmcvar$args)$semi
 EOC
 }
 
