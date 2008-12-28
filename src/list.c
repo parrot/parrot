@@ -652,30 +652,33 @@ alloc_next_size(PARROT_INTERP, ARGMOD(List *list), int where, UINTVAL idx)
     int do_sparse = (INTVAL)idx - (INTVAL)list->cap >= 10 * MAX_ITEMS;
 
     if (list->item_type == enum_type_sized) {
-        items = list->items_per_chunk;
-        size = items * list->item_size;
+        do_sparse = 0;
+        items     = list->items_per_chunk;
+        size      = items * list->item_size;
+
         list->grow_policy = items == MAX_ITEMS ?
             enum_grow_fixed : enum_grow_mixed;
-        do_sparse = 0;
     }
     else if (do_sparse) {
         PARROT_ASSERT(where);
         /* don't add sparse chunk at start of list */
         if (!list->n_chunks) {
-            list->grow_policy = enum_grow_fixed;
-            /* if wee need more, the next allocation will allocate the rest */
-            items = MAX_ITEMS;
-            size = items * list->item_size;
             do_sparse = 0;
+            items     = MAX_ITEMS;
+
+            /* if we need more, the next allocation will allocate the rest */
+            size = items * list->item_size;
+            list->grow_policy = enum_grow_fixed;
         }
         else {
+            /* allocate a dummy chunk holding many items virtually */
+            size  = list->item_size;
             items = idx - list->cap - 1;
+
             /* round down this function will then be called again, to add the
              * final real chunk, with the rest of the needed size */
             items &= ~(MAX_ITEMS - 1);
             list->grow_policy = enum_grow_mixed;
-            /* allocate a dummy chunk holding many items virtually */
-            size = list->item_size;
         }
     }
     /* initial size for empty lists grow_policy is not yet known or was
@@ -752,9 +755,10 @@ add_chunk(PARROT_INTERP, ARGMOD(List *list), int where, UINTVAL idx)
     if (where) {                /* at end */
         if (chunk)
             chunk->next = new_chunk;
-        list->last = new_chunk;
         if (!list->first)
             list->first = new_chunk;
+
+        list->last = new_chunk;
     }
     else {
         new_chunk->next = chunk;

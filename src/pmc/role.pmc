@@ -296,8 +296,8 @@ Enters the attribute in the C<attributes> array.
 */
 
     VTABLE void add_attribute(STRING *name, PMC *type) {
-        Parrot_Role_attributes * const role          = PARROT_ROLE(SELF);
-        PMC         * const new_attribute = pmc_new(interp, enum_class_Hash);
+        Parrot_Role_attributes * const role  = PARROT_ROLE(SELF);
+        PMC           * const new_attribute  = pmc_new(interp, enum_class_Hash);
 
         /* Set name and type. */
         VTABLE_set_string_keyed_str(interp, new_attribute, CONST_STRING(interp, "name"), name);
@@ -486,7 +486,7 @@ Return the name of the role (without the HLL namespace).
 
     VTABLE STRING *get_string() {
         Parrot_Role_attributes * const role  = PARROT_ROLE(SELF);
-        PMC         * const _namespace = role->_namespace;
+        PMC               * const _namespace = role->_namespace;
 
         if (!PMC_IS_NULL(_namespace)) {
             /* Call the 'get_name' method on the role's associated namespace
@@ -586,7 +586,7 @@ Sets the name of the role, and updates the namespace accoringly.
 
     METHOD name(STRING *name :optional, int got_name :opt_flag) {
         Parrot_Role_attributes *role     = PARROT_ROLE(SELF);
-        STRING      *ret_name = NULL;
+        STRING                 *ret_name = NULL;
 
         if (got_name) {
             /* We'll build a hash just containing the name, then give this to
@@ -613,8 +613,8 @@ Gets the namespace associated with this role, if any.
 */
 
     METHOD get_namespace() {
-        Parrot_Role_attributes *role          = PARROT_ROLE(SELF);
-        PMC         *ret_namespace = role->_namespace;
+        Parrot_Role_attributes *role = PARROT_ROLE(SELF);
+        PMC           *ret_namespace = role->_namespace;
         RETURN(PMC *ret_namespace);
     }
 
