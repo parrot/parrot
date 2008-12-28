@@ -498,7 +498,7 @@ main(int argc, char *argv[]) {
     }
 
     parse_file(flexdebug, file, filename, flags, 0, macrosize, outputfile);
-
+    fprintf(stderr, "done\n");
 }
 #endif
 

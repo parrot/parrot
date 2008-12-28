@@ -189,14 +189,17 @@ add_num_const(bytecode * const bc, double f) {
 add_key_const(bytecode * const bc, PMC *key)>
 
 Add a key constant to the constants list.
-XXX Implement this.
 
 =cut
 
 */
 int
 add_key_const(bytecode * const bc, PMC *key) {
-    return 0;
+    int index                   = new_const(bc);
+    PackFile_Constant *constant = bc->interp->code->const_table->constants[index];
+    constant->type              = PFC_KEY;
+    constant->u.key             = key;
+    return index;
 }
 
 

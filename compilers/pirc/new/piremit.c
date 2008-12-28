@@ -286,6 +286,8 @@ print_subs(struct lexer_state * const lexer) {
         /* set iterator to first item */
         subroutine *subiter = lexer->subs->next;
 
+        /* XXX for now this works */
+        lexer->outfile = stderr;
 
         do {
 
@@ -382,10 +384,12 @@ emit_pir_subs(lexer_state * const lexer, char const * const outfile) {
         /* set iterator to first item */
         subroutine *subiter = lexer->subs->next;
 
-        if (outfile)
+        if (outfile) {
             lexer->outfile = fopen(outfile, "w");
-        else
+        }
+        else {
             lexer->outfile = stdout;
+        }
 
 
         do {
@@ -496,6 +500,11 @@ emit_pbc_label_arg(lexer_state * const lexer, label * const l) {
 }
 
 
+static void
+build_key(lexer_state * const lexer, key * const k) {
+
+}
+
 /*
 
 =item C<static void
@@ -576,6 +585,10 @@ emit_pbc_sub(lexer_state * const lexer, subroutine * const sub) {
         iter = iter->next;
     }
     while (iter != sub->statements->next);
+
+    if (TEST_FLAG(sub->flags, SUB_FLAG_IMMEDIATE)) {
+        PackFile_fixup_subs(lexer->interp, PBC_IMMEDIATE, NULL);
+    }
 }
 
 /*
