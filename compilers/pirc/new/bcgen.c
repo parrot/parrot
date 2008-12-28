@@ -429,6 +429,36 @@ generate_multi_signature(bytecode * const bc, struct key * const multi_types, un
     return multi_signature;
 }
 
+static PMC *
+create_lexinfo(bytecode * const bc, PMC * sub, int lexflag) {
+
+    STRING *lex_name;
+    int outer; /* change type of this */
+
+    const INTVAL lex_info_id = Parrot_get_ctx_HLL_type(bc->interp, enum_class_LexInfo);
+
+    PMC * lex_info = pmc_new_noinit(bc->interp, lex_info_id);
+
+    VTABLE_init_pmc(bc->interp, lex_info, sub);
+
+/* for ... { */
+    Parrot_PCCINVOKE(bc->interp, lex_info,
+                            string_from_literal(bc->interp, "declare_lex_preg"),
+                            "SI->", lex_name, 0 /* color */);
+
+
+/* ... } */
+
+    if (lex_info == NULL && (outer || lexflag)) {
+        lex_info = pmc_new_noinit(bc->interp, lex_info_id);
+        VTABLE_init_pmc(bc->interp, lex_info, sub);
+    }
+
+    return lex_info;
+}
+
+
+
 /*
 
 =item C<void
