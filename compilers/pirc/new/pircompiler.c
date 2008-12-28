@@ -185,6 +185,7 @@ new_lexer(NULLOK(char * const filename), int flags) {
     if (TEST_FLAG(flags, LEXER_FLAG_REGALLOC))
         lexer->lsr = new_linear_scan_register_allocator(lexer);
 
+    /* create a bytecode object for bytecode generation */
     lexer->bc = new_bytecode(lexer->interp, filename);
 
     return lexer;

@@ -312,6 +312,8 @@ Write the opcode C<op> into the bytecode stream.
 void
 emit_opcode(bytecode * const bc, opcode_t op) {
     *bc->opcursor++ = op;
+/*    fprintf(stderr, "[%d]", op);
+*/
 }
 
 /*
@@ -329,6 +331,8 @@ the same anyway?
 void
 emit_int_arg(bytecode * const bc, int intval) {
     *bc->opcursor++ = intval;
+/*    fprintf(stderr, "[%d]", intval);
+*/
 }
 
 /*

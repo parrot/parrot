@@ -1723,6 +1723,8 @@ void
 push_operand(lexer_state * const lexer, NOTNULL(expression * const operand)) {
     PARROT_ASSERT(lexer->subs->statements);
 
+    fprintf(stderr, "push_operand() current op: %s\n", CURRENT_INSTRUCTION(lexer)->opname);
+
     if (CURRENT_INSTRUCTION(lexer)->operands) {
         operand->next = CURRENT_INSTRUCTION(lexer)->operands->next;
         CURRENT_INSTRUCTION(lexer)->operands->next = operand;
@@ -1967,7 +1969,8 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
     /* add the index (of the signature PMC) in the PBC constant table as operand */
     push_operand(lexer, expr_from_int(lexer, array_index));
 
-    fprintf(stderr, "args2ops: %u arguments\n", num_arguments);
+/*    fprintf(stderr, "args2ops: %u arguments\n", num_arguments);
+*/
 
     /* no need to continue if there's no arguments */
     if (num_arguments == 0)
@@ -1976,9 +1979,9 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
     /* retrieve the signature array PMC */
     signature_array = get_pmc_const(lexer->bc, array_index);
 
-    fprintf(stderr, "signature array has size: %d\n",
+/*    fprintf(stderr, "signature array has size: %d\n",
             VTABLE_get_integer(lexer->interp, signature_array));
-
+*/
 
     /* initialize the argument iterator for the loop */
     argiter = args->next;
@@ -1988,7 +1991,7 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
         /* calculate the right flags for the current argument */
         SET_FLAG(flag, get_expression_pirtype(argiter->value));
 
-        fprintf(stderr, "Setting flag %d on argument %u\n", flag, i);
+/*        fprintf(stderr, "Setting flag %d on argument %u\n", flag, i); */
 
         /* set the flags for this argument in the right position in the array */
         VTABLE_set_integer_keyed_int(lexer->interp, signature_array, i, flag);
@@ -1999,7 +2002,7 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
         argiter = argiter->next;
     }
 
-    fprintf(stderr, "args2ops done\n");
+/*    fprintf(stderr, "args2ops done\n"); */
 
 }
 
@@ -2099,9 +2102,12 @@ new_sub_instr(lexer_state * const lexer, int opcode, char const * const opname,
      */
 
     /* count number of ints needed to store this instruction in bytecode */
-    lexer->codesize += CURRENT_INSTRUCTION(lexer)->opinfo->op_count + num_var_args;
+    lexer->codesize += CURRENT_INSTRUCTION(lexer)->opinfo->op_count;
 
-    fprintf(stderr, "new_sub_instr(): extra args for '%s': %u\n", opname, num_var_args);
+    fprintf(stderr, "opcount for '%s' is %d\n", opname, CURRENT_INSTRUCTION(lexer)->opinfo->op_count);
+    lexer->codesize += num_var_args;
+
+    fprintf(stderr, "new_sub_instr(): extra args for '%s': %u (codesize: %u)\n", opname, num_var_args, lexer->codesize);
 }
 
 /*
@@ -2123,6 +2129,8 @@ update_op(NOTNULL(lexer_state * const lexer), NOTNULL(instruction * const instr)
      */
     if (instr->opinfo)
         lexer->codesize -= instr->opinfo->op_count;
+
+    fprintf(stderr, "updateop(): %s\n", CURRENT_INSTRUCTION(lexer)->opname);
     /* else the instruction was already set; decrement the codesize, as it was added already */
 
     /* now get the opinfo structure, update the name, and update the opcode. */

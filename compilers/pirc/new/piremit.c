@@ -446,6 +446,7 @@ emit_pbc_const_arg(lexer_state * const lexer, constant * const c) {
             emit_int_arg(lexer->bc, index);
 
             */
+            fprintf(stderr, "emit_pbc_const_arg: pmc type\n");
             break;
         }
         default:
@@ -453,6 +454,7 @@ emit_pbc_const_arg(lexer_state * const lexer, constant * const c) {
     }
 }
 
+/***
 int
 emit_pbc_const(lexer_state * const lexer, constant * const pirconst) {
     switch (pirconst->type) {
@@ -470,6 +472,7 @@ emit_pbc_const(lexer_state * const lexer, constant * const pirconst) {
             break;
     }
 }
+***/
 
 /*
 
@@ -536,8 +539,7 @@ emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
              */
             operand = instr->operands->next;
 
-            for (i = 0; i < instr->opinfo->op_count - 1; ++i) {
-
+            do {
                 switch (operand->type) {
                     case EXPR_CONSTANT:
                         emit_pbc_const_arg(lexer, operand->expr.c);
@@ -554,6 +556,7 @@ emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
 
                 operand = operand->next;
             }
+            while (operand != instr->operands->next);
         }
     }
 
