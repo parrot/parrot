@@ -48,7 +48,7 @@ regex SEA {
 }
 
 rule code_echo_tag {
-    <.CODE_START_ECHO_TAG> <arguments> <.statement_delimiter>
+    <.CODE_START_ECHO_TAG> <argument_list> <.statement_delimiter>
         <statement_list>
     <.close_short_tag>?
     {*}
@@ -72,7 +72,7 @@ regex open_script_tag {
     '<script' <ws_char>+: 'language' <ws_char>*: '=' <ws_char>*: <quoted_lang_name> <ws_char>*: '>'
     {{ $P0 = new 'String'
        $P0 = "script"
-        set_global "tag_type", $P0
+       set_global "tag_type", $P0
     }}
 }
 
@@ -93,7 +93,7 @@ token CODE_START_ECHO_TAG {
     '<?=' 
     {{ $P0 = new 'String'
        $P0 = "short"
-        set_global "tag_type", $P0
+       set_global "tag_type", $P0
     }}
 }
 
@@ -101,7 +101,7 @@ token open_short_tag {
     '<?' 'php'?  
     {{ $P0 = new 'String'
        $P0 = "short"
-        set_global "tag_type", $P0
+       set_global "tag_type", $P0
     }}
 }
 
@@ -162,7 +162,7 @@ token require_once_statement {
 }
 
 token echo_statement {
-    'echo' <.ws_char> <arguments> <ws> <.statement_delimiter>
+    'echo' <.ws_char> <argument_list> <ws> <.statement_delimiter>
     {*}
 }
 
@@ -171,7 +171,7 @@ rule expression_statement {
     {*}
 }
 
-rule arguments {
+rule argument_list {
     [ <expression> [',' <expression>]* ]?
     {*}
 }
@@ -264,17 +264,17 @@ token VAR_NAME                 { '$' <ident> }
 
 # terms
 rule method_call {
-    <var> '->' <METHOD_NAME> '(' <arguments> ')'
+    <var> '->' <METHOD_NAME> '(' <argument_list> ')'
     {*}
 }
 
 rule closure_call {
-    <var> '(' <arguments> ')'
+    <var> '(' <argument_list> ')'
     {*}
 }
 
 rule function_call {
-    <FUNCTION_NAME> '(' <arguments> ')'
+    <FUNCTION_NAME> '(' <argument_list> ')'
     {*}
 }
 
@@ -362,13 +362,13 @@ token simple_var {
 }
 
 token var {
-      <this>        {*}   #= this
+    | <this>        {*}   #= this
     | <array_elem>  {*}   #= array_elem
     | <simple_var>  {*}   #= simple_var
 }
 
 rule literal {
-      <TRUE>    {*}    #= TRUE
+    | <TRUE>    {*}    #= TRUE
     | <FALSE>   {*}    #= FALSE
     | <NULL>    {*}    #= NULL
     | <NUMBER>  {*}    #= NUMBER
@@ -455,8 +455,6 @@ rule class_method_definition {
     '{' <statement_list> '}'
     {*}                                     #= close
 }
-
-
 
 token curly_interpolation {
     '{' <var> '}'

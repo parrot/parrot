@@ -78,7 +78,7 @@ method code_short_tag($/) {
 method code_echo_tag($/) {
     my $stmts := $( $<statement_list> );
 
-    my $echo := $( $<arguments> );
+    my $echo := $( $<argument_list> );
     $echo.name( 'echo' );
 
     $stmts.unshift( $echo );
@@ -151,7 +151,7 @@ method require_once_statement($/) {
 }
 
 method echo_statement($/) {
-    my $past := $( $<arguments> );
+    my $past := $( $<argument_list> );
     $past.name( 'echo' );
 
     make $past;
@@ -162,14 +162,14 @@ method expression_statement($/) {
 }
 
 method closure_call($/) {
-    my $past := $( $<arguments> );
+    my $past := $( $<argument_list> );
     $past.unshift( $( $<var> ) );
 
     make $past;
 }
 
 method function_call($/) {
-    my $past := $( $<arguments> );
+    my $past := $( $<argument_list> );
     $past.name( ~$<FUNCTION_NAME> );
 
     make $past;
@@ -206,7 +206,7 @@ method key_value_pair($/) {
 }
 
 method method_call($/) {
-    my $past := $( $<arguments> );
+    my $past := $( $<argument_list> );
     $past.name( ~$<METHOD_NAME> );
     $past.pasttype( 'callmethod' );
     $past.unshift( $( $<var> ) );
@@ -267,7 +267,7 @@ method class_constant_definition($/) {
     make $past;
 }
 
-method arguments($/) {
+method argument_list($/) {
     my $past := PAST::Op.new(
                     :pasttype('call'),
                     :node($/)
