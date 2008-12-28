@@ -45,10 +45,9 @@ extern int yydebug;
 
 static void compile_to_bytecode(PARROT_INTERP,
     ARGIN(const char * const sourcefile),
-    ARGIN(const char * const output_file))
+    ARGIN_NULLOK(const char * const output_file))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 static void determine_input_file_type(PARROT_INTERP,
     ARGIN(const char * const sourcefile))
@@ -77,11 +76,10 @@ static void imcc_get_optimization_description(
 
 static void imcc_run_pbc(PARROT_INTERP,
     int obj_file,
-    ARGIN(const char *output_file),
+    ARGIN_NULLOK(const char *output_file),
     int argc,
     ARGIN(char **argv))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
         __attribute__nonnull__(5);
 
 static void imcc_write_pbc(PARROT_INTERP, ARGIN(const char *output_file))
@@ -764,7 +762,7 @@ Write out or run Parrot bytecode.
 */
 
 static void
-imcc_run_pbc(PARROT_INTERP, int obj_file, ARGIN(const char *output_file),
+imcc_run_pbc(PARROT_INTERP, int obj_file, ARGIN_NULLOK(const char *output_file),
         int argc, ARGIN(char **argv))
 {
     if (IMCC_INFO(interp)->imcc_warn)
@@ -917,7 +915,7 @@ Compile source code into bytecode (or die trying).
 static void
 compile_to_bytecode(PARROT_INTERP,
                     ARGIN(const char * const sourcefile),
-                    ARGIN(const char * const output_file))
+                    ARGIN_NULLOK(const char * const output_file))
 {
     PackFile *pf;
     yyscan_t  yyscanner = IMCC_INFO(interp)->yyscanner;
