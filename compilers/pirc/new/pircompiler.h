@@ -14,9 +14,6 @@
 #include "parrot/embed.h"
 
 
-#define TRUE    1
-#define FALSE   0
-
 #include <stdio.h> /* for FILE * */
 
 

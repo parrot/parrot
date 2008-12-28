@@ -27,17 +27,20 @@ O(c) (constant) time.
 #include "pircompiler.h"
 #include "pirsymbol.h"
 #include "piryy.h"
+#include "pirdefines.h"
+#include "bcgen.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <assert.h>
 
 #include "parrot/oplib/ops.h"
 #include "parrot/string_funcs.h"
 #include "parrot/dynext.h"
 
-#include <assert.h>
+
 
 static unsigned const prime_numbers[] = {113 /* XXX think of more primes */ };
 
@@ -230,7 +233,9 @@ set_sub_nsentry(lexer_state * const lexer, char const * const nsentry) {
 =item C<void
 set_sub_flag(lexer_state * const lexer, sub_flag flag)>
 
-Set a subroutine flag on the current sub.
+Set a subroutine flag on the current sub. The C<flag> parameter may encode
+multiple flags. If it encodes the C<:vtable> or C<:method> flag, an extra
+parameter named C<self> is added to the current subroutine.
 
 =cut
 
@@ -396,7 +401,7 @@ set_curtarget(lexer_state * const lexer, target * const t) {
 /*
 
 =item C<argument *
-set_curarg(lexer_state * const lexer, argument *arg)>
+set_curarg(lexer_state * const lexer, argument * const arg)>
 
 Sets the argument C<arg> as the current argument in C<lexer>
 to make it accessible to other parse actions. C<arg> is returned.

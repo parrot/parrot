@@ -13,9 +13,8 @@
 #ifndef PARROT_PIR_PIRCOMPUNIT_H_GUARD
 #define PARROT_PIR_PIRCOMPUNIT_H_GUARD
 
-/* needed for sub_info structure definition */
+#include "pirdefines.h"
 #include "bcgen.h"
-
 
 /* the 4 parrot types; use explicit values that match the values in
  * PDD03_calling_conventions.pod.
@@ -29,8 +28,6 @@ typedef enum pir_types {
 
 } pir_type;
 
-/* Parrot has 4 types */
-#define NUM_PARROT_TYPES    4
 
 
 /* selector values for the expression value union */
@@ -303,6 +300,8 @@ typedef struct hashtable {
 struct symbol;
 struct label;
 
+
+
 /* a sub */
 typedef struct subroutine {
     key                *name_space;    /* this sub's namespace */
@@ -312,7 +311,7 @@ typedef struct subroutine {
     char const         *methodname;    /* name of this sub by which it's stored as a method */
     int                 flags;         /* this sub's flags */
 
-    sub_info            info;
+    struct sub_info     info;
 
     /* XXX the whole multi stuff must be implemented */
     char              **multi_types;   /* data types of parameters if this is a multi sub */
@@ -323,7 +322,7 @@ typedef struct subroutine {
     hashtable           symbols;
     hashtable           labels;        /* local labels */
 
-    struct pir_reg     *registers[4];  /* used PIR registers in this sub (1 list for each type) */
+    struct pir_reg     *registers[NUM_PARROT_TYPES];  /* used PIR registers in this sub */
 
     struct subroutine  *next;          /* pointer to next subroutine in the list */
 

@@ -8,6 +8,7 @@
 
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
+#include "pirdefines.h"
 
 /* the type name is exported, but not its private bits */
 struct bytecode;
@@ -22,7 +23,7 @@ typedef struct sub_info {
     char const * nsentry;
     char const * subid;
     int          vtable_index;
-    unsigned     regs_used[4];
+    unsigned     regs_used[NUM_PARROT_TYPES];
     int          startoffset;
     int          endoffset;
 
