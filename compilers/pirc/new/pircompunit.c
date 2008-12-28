@@ -1725,9 +1725,7 @@ Add an operand at the end of the list of operands of the current instruction.
 */
 void
 push_operand(lexer_state * const lexer, NOTNULL(expression * const operand)) {
-    PARROT_ASSERT(lexer->subs->statements);
-
-    fprintf(stderr, "push_operand() current op: %s\n", CURRENT_INSTRUCTION(lexer)->opname);
+    PARROT_ASSERT(CURRENT_INSTRUCTION(lexer));
 
     if (CURRENT_INSTRUCTION(lexer)->operands) {
         operand->next = CURRENT_INSTRUCTION(lexer)->operands->next;
@@ -1927,28 +1925,49 @@ generate_signature_pmc(lexer_state * const lexer, unsigned size) {
 
 }
 
+
 /*
 
-=item C<static pir_type
-get_expression_pirtype(expression * const expr)>
+=item C<static int
+calculate_argument_flags(argument * const arg)>
 
-Get the PIR type of the expression C<expr>.
+Calculate the Parrot Calling Conventions flags for the
+argument C<arg>. An int encoding the flags is returned.
 
 =cut
 
 */
-static pir_type
-get_expression_pirtype(expression * const expr) {
-    switch (expr->type) {
+static int
+calculate_argument_flags(argument * const arg) {
+    int flag = 0;
+
+    switch (arg->value->type) {
         case EXPR_TARGET:
-            return expr->expr.t->info->type;
+            /* copy the type of the target */
+            SET_FLAG(flag, arg->value->expr.t->info->type);
+            break;
         case EXPR_CONSTANT:
-            return expr->expr.c->type;
+            /* copy the type of the constant */
+            SET_FLAG(flag, arg->value->expr.c->type);
+            /* set the flag indicating the argument is a constant literal, not a register. */
+            SET_FLAG(flag, PARROT_ARG_CONSTANT);
+            break;
         default:
-            PARROT_ASSERT(0); /* should never happen */
-            return UNKNOWN_TYPE;
+            break;
     }
+
+    /* if the argument has a :flat flag, copy that */
+    if (TEST_FLAG(arg->flags, ARG_FLAG_FLAT))
+        SET_FLAG(flag, PARROT_ARG_FLATTEN);
+
+    /* if the argument has a :named flag, copy that */
+    if (TEST_FLAG(arg->flags, ARG_FLAG_NAMED))
+        SET_FLAG(flag, PARROT_ARG_NAME);
+
+    return flag;
 }
+
+
 
 /*
 
@@ -1988,9 +2007,7 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
     argiter = args->next;
 
     for (i = 0; i < num_arguments; ++i) {
-        int flag = 0;
-        /* calculate the right flags for the current argument */
-        SET_FLAG(flag, get_expression_pirtype(argiter->value));
+        int flag = calculate_argument_flags(argiter);
 
         /* set the flags for this argument in the right position in the array */
         VTABLE_set_integer_keyed_int(lexer->interp, signature_array, i, flag);
@@ -2143,7 +2160,9 @@ update_op(NOTNULL(lexer_state * const lexer), NOTNULL(instruction * const instr)
     if (instr->opinfo)
         lexer->codesize -= instr->opinfo->op_count;
 
+/*
     fprintf(stderr, "updateop(): %s\n", CURRENT_INSTRUCTION(lexer)->opname);
+*/
     /* else the instruction was already set; decrement the codesize, as it was added already */
 
     /* now get the opinfo structure, update the name, and update the opcode. */

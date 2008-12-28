@@ -112,9 +112,9 @@ typedef enum invoke_types {
 
 /* macros to set the i-th bit */
 #define BIT(i)          (1 << (i))
-#define SET_BIT(M,B)    SET_FLAG(M,B)
-#define TEST_BIT(M,B)   TEST_FLAG(M,B)
-#define CLEAR_BIT(M,B)  CLEAR_FLAG(M,B)
+#define SET_BIT(M,B)    SET_FLAG((M),(B))
+#define TEST_BIT(M,B)   TEST_FLAG((M),(B))
+#define CLEAR_BIT(M,B)  CLEAR_FLAG((M),(B))
 
 #define NOT(X)          !(X)
 
@@ -141,11 +141,6 @@ typedef struct constant {
     char const      *name;     /* name of the constant, if declared as a constant */
     pir_type         type;     /* type of the constant */
     value            val;      /* value of the constant */
-
-    /* XXX this needed? think not. --kjs 12/27/2008.
-    int              const_table_index;
-    */
-
     struct constant *next;
 
 } constant;
@@ -158,10 +153,10 @@ typedef struct label {
 } label;
 
 
-#define CONST_INTVAL(c) c->val.ival
-#define CONST_NUMVAL(c) c->val.nval
-#define CONST_PMCVAL(c) c->val.pval
-#define CONST_STRVAL(c) c->val.sval
+#define CONST_INTVAL(c) (c)->val.ival
+#define CONST_NUMVAL(c) (c)->val.nval
+#define CONST_PMCVAL(c) (c)->val.pval
+#define CONST_STRVAL(c) (c)->val.sval
 
 /* The expression node is used as a wrapper to represent target nodes (like .param, .local
  * and registers), constant nodes (either named or anonymous), label identifiers,
