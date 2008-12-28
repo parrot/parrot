@@ -54,6 +54,7 @@ static char const pir_register_types[5] = {'I', 'S', 'P', 'N', '?'};
 static void emit_pir_statement(lexer_state * const lexer, subroutine * const sub);
 static void emit_pir_instruction(lexer_state * const lexer, instruction * const instr);
 
+static void emit_pbc_key(lexer_state * const lexer, key * const k);
 
 /* prototype declaration */
 void print_expr(lexer_state * const lexer, expression * const expr);
@@ -380,39 +381,43 @@ in the C<lexer>.
 */
 void
 emit_pir_subs(lexer_state * const lexer, char const * const outfile) {
-    if (lexer->subs != NULL) {
-        /* set iterator to first item */
-        subroutine *subiter = lexer->subs->next;
+    subroutine *subiter;
 
-        if (outfile) {
-            lexer->outfile = fopen(outfile, "w");
-        }
-        else {
-            lexer->outfile = stdout;
-        }
+    if (lexer->subs == NULL)
+        return;
 
+    /* set iterator to first item */
+    subiter = lexer->subs->next;
 
-        do {
-            int i;
-            fprintf(out, "\n.namespace ");
-            print_key(lexer, subiter->name_space);
-
-            fprintf(out, "\n.sub %s", subiter->info.subname);
-
-            for (i = 0; i < BIT(i); i++) {
-                if (TEST_FLAG(subiter->flags, BIT(i))) {
-                    fprintf(out, " :%s", subflag_names[i]);
-                }
-            }
-
-            fprintf(out, "\n");
-            emit_pir_statement(lexer, subiter);
-            fprintf(out, ".end\n");
-
-            subiter = subiter->next;
-        }
-        while (subiter != lexer->subs->next);
+    if (outfile) {
+        lexer->outfile = fopen(outfile, "w");
     }
+    else {
+        lexer->outfile = stdout;
+    }
+
+
+    do {
+        int i;
+        fprintf(out, "\n.namespace ");
+        print_key(lexer, subiter->name_space);
+
+        fprintf(out, "\n.sub %s", subiter->info.subname);
+
+        for (i = 0; i < BIT(i); i++) {
+            if (TEST_FLAG(subiter->flags, BIT(i))) {
+                fprintf(out, " :%s", subflag_names[i]);
+            }
+        }
+
+        fprintf(out, "\n");
+        emit_pir_statement(lexer, subiter);
+        fprintf(out, ".end\n");
+
+        subiter = subiter->next;
+    }
+    while (subiter != lexer->subs->next);
+
 }
 
 
@@ -484,6 +489,9 @@ emit_pbc_target_arg(lexer_state * const lexer, target * const t) {
     emit_int_arg(lexer->bc, t->info->color);
 }
 
+
+
+
 /*
 
 =item C<static void
@@ -502,7 +510,54 @@ emit_pbc_label_arg(lexer_state * const lexer, label * const l) {
 
 static void
 build_key(lexer_state * const lexer, key * const k) {
+    /* XXX TODO
+     *
+     * who can help? :-)
+     */
+}
 
+
+
+static void
+emit_pbc_expr(lexer_state * const lexer, expression * const operand) {
+    switch (operand->type) {
+        case EXPR_CONSTANT:
+            emit_pbc_const_arg(lexer, operand->expr.c);
+            break;
+        case EXPR_TARGET:
+            emit_pbc_target_arg(lexer, operand->expr.t);
+
+            if (operand->expr.t->key)
+                emit_pbc_key(lexer, operand->expr.t->key);
+
+            break;
+        case EXPR_LABEL:
+            emit_pbc_label_arg(lexer, operand->expr.l);
+            break;
+        /*
+        case EXPR_KEY:
+            fprintf(stderr, "emit pbc isntr key arg\n");
+            break;
+        */
+        default:
+            break;
+    }
+}
+
+/*
+
+=item C<static void
+emit_pbc_key(lexer_state * const lexer, key * const k)>
+
+Emit bytecode for the key C<k>.
+
+=cut
+
+*/
+static void
+emit_pbc_key(lexer_state * const lexer, key * const k) {
+    emit_pbc_expr(lexer, k->expr);
+    /* XXX finish this. */
 }
 
 /*
@@ -522,40 +577,29 @@ emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
 
     /* emit the opcode */
 
-    if (instr->opinfo) {
-        emit_opcode(lexer->bc, instr->opcode);
+    if (instr->opinfo == NULL)
+        return;
 
-        /* emit the arguments */
+    emit_opcode(lexer->bc, instr->opcode);
 
-        /* note that opinfo->op_count counts all operands plus the op itself;
-         * so substract 1 for the op itself.
+    /* emit the arguments */
+
+    /* note that opinfo->op_count counts all operands plus the op itself;
+     * so substract 1 for the op itself.
+     */
+    if (instr->opinfo->op_count > 1) {
+        /* operands are stored in a circular linked list; instr->operands points
+         * to the *last* operand, its next pointer points to the first operand.
          */
-        if (instr->opinfo->op_count > 1) {
-            /* operands are stored in a circular linked list; instr->operands points
-             * to the *last* operand, its next pointer points to the first operand.
-             */
-            operand = instr->operands->next;
+        operand = instr->operands->next;
 
-            do {
-                switch (operand->type) {
-                    case EXPR_CONSTANT:
-                        emit_pbc_const_arg(lexer, operand->expr.c);
-                        break;
-                    case EXPR_TARGET:
-                        emit_pbc_target_arg(lexer, operand->expr.t);
-                        break;
-                    case EXPR_LABEL:
-                        emit_pbc_label_arg(lexer, operand->expr.l);
-                        break;
-                    default:
-                        break;
-                }
-
-                operand = operand->next;
-            }
-            while (operand != instr->operands->next);
+        do {
+            emit_pbc_expr(lexer, operand);
+            operand = operand->next;
         }
+        while (operand != instr->operands->next);
     }
+
 
 }
 
