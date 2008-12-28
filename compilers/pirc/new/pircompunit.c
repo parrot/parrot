@@ -49,7 +49,7 @@ static unsigned const prime_numbers[] = {113 /* XXX think of more primes */ };
 
 
 =item C<void
-panic(lexer_state * lexer, char * const message)>
+panic(lexer_state * lexer, char const * const message)>
 
 Function to emit a final last cry that something's wrong and exit.
 
@@ -106,7 +106,7 @@ set_namespace(lexer_state * const lexer, key * const ns) {
 /*
 
 =item C<void
-set_sub_outer(lexer_state * const lexer, char * const outersub)>
+set_sub_outer(lexer_state * const lexer, char const * const outersub)>
 
 Set the lexically enclosing sub for the current sub.
 Thus, set the :outer() argument to the current subroutine.
@@ -124,7 +124,7 @@ set_sub_outer(lexer_state * const lexer, char const * const outersub) {
 /*
 
 =item C<void
-set_sub_vtable(lexer_state * const lexer, char const *vtablename)>
+set_sub_vtable(lexer_state * const lexer, char const * vtablename)>
 
 Set the :vtable() flag argument to the current subroutine. If C<vtablename>
 is NULL, the name of the current sub is taken to be the vtable method name.
@@ -159,7 +159,7 @@ set_sub_vtable(lexer_state * const lexer, char const * vtablename) {
 /*
 
 =item C<void
-set_sub_subid(lexer_state * const lexer, char * const subid)>
+set_sub_subid(lexer_state * const lexer, char const * const subid)>
 
 Set the name specified in the :subid flag on the sub.
 
@@ -175,7 +175,7 @@ set_sub_subid(lexer_state * const lexer, char const * const subid) {
 /*
 
 =item C<void
-set_sub_methodname(lexer_state * const lexer, char * const methodname)>
+set_sub_methodname(lexer_state * const lexer, char const * const methodname)>
 
 Set the :method flag on a sub; if C<methodname> is not NULL, then it contains
 the name by which the sub is stored as a method.
@@ -196,7 +196,7 @@ set_sub_methodname(lexer_state * const lexer, char const * const methodname) {
 /*
 
 =item C<void
-set_sub_instanceof(lexer_state * const lexer, char * const classname)>
+set_sub_instanceof(lexer_state * const lexer, char const * const classname)>
 
 Set the value of the C<:instanceof> flag on a sub. Note that this flag
 is experimental, and not actually used at this point.
@@ -248,7 +248,7 @@ set_sub_flag(lexer_state * const lexer, sub_flag flag) {
 /*
 
 =item C<void
-new_subr(lexer_state * const lexer, char * const subname)>
+new_subr(lexer_state * const lexer, char const * const subname)>
 
 Create a new subroutine node, and set it as the "current"
 subroutine, on which all other sub-related operations do
@@ -306,7 +306,7 @@ new_subr(lexer_state * const lexer, char const * const subname) {
 /*
 
 =item C<void
-set_sub_name(struct lexer_state * const lexer, char const * const subname)>
+set_sub_name(lexer_state * const lexer, char const * const subname)>
 
 Set the current subroutine's name to C<subname>.
 
@@ -314,7 +314,7 @@ Set the current subroutine's name to C<subname>.
 
 */
 void
-set_sub_name(struct lexer_state * const lexer, char const * const subname) {
+set_sub_name(lexer_state * const lexer, char const * const subname) {
     CURRENT_SUB(lexer)->info.subname = subname;
 }
 
@@ -322,7 +322,7 @@ set_sub_name(struct lexer_state * const lexer, char const * const subname) {
 /*
 
 =item C<static instruction *
-new_instruction(char * const opname)>
+new_instruction(lexer_state * const lexer, char const * const opname)>
 
 Create a new instruction node and set C<opname> as the instruction.
 
@@ -342,7 +342,7 @@ new_instruction(lexer_state * const lexer, char const * const opname) {
 /*
 
 =item C<static void
-new_statement(lexer_state * const lexer)>
+new_statement(lexer_state * const lexer, char const * const opname)>
 
 Constructor for a statement. The newly allocated statement will be inserted
 into the current subroutine's statements list.
@@ -551,7 +551,7 @@ add_target(lexer_state * const lexer, target *last, target * const t) {
 /*
 
 =item C<target *
-add_param(lexer_state * const lexer, pir_type type, char * const name)>
+add_param(lexer_state * const lexer, pir_type type, char const * const name)>
 
 Add a parameter of type C<type> and named C<name> to the current
 subroutine. The parameter will be declared as a local symbol in the
@@ -600,7 +600,7 @@ add_param(lexer_state * const lexer, pir_type type, char const * const name) {
 /*
 
 =item C<void
-set_param_alias(lexer_state * const lexer, char * const alias)>
+set_param_alias(lexer_state * const lexer, char const * const alias)>
 
 Set the argument of the :named flag for the current target
 (parameter). Returns the current target (parameter).
@@ -659,7 +659,7 @@ set_param_flag(lexer_state * const lexer, target * const param, target_flag flag
 /*
 
 =item C<argument *
-new_argument(expression * const expr)>
+new_argument(lexer_state * const lexer, expression * const expr)>
 
 Create a new argument node which wraps C<expr>.
 
@@ -729,7 +729,7 @@ set_arg_flag(argument * const arg, arg_flag flag) {
 /*
 
 =item C<void
-set_arg_alias(lexer_state * const lexer, char * const alias)>
+set_arg_alias(lexer_state * const lexer, char const * const alias)>
 
 Set the alias specified in C<alias> on the current argument, accessible
 through C<lexer>. The alias is the name under which the argument is passed
@@ -752,7 +752,7 @@ set_arg_alias(lexer_state * const lexer, char const * const alias) {
 /*
 
 =item C<void
-load_library(lexer_state * const lexer, char * const library)>
+load_library(lexer_state * const lexer, char const * const library)>
 
 Load the library indicated by C<library>.
 
@@ -772,7 +772,7 @@ load_library(lexer_state * const lexer, char const * const library) {
 /*
 
 =item C<void
-set_label(lexer_state * const lexer, char * const label)>
+set_label(lexer_state * const lexer, char const * const label)>
 
 Set the label C<label> on the current instruction.
 
@@ -1151,6 +1151,8 @@ get_operands(lexer_state * const lexer, int bitmask, ...) {
 get_operand_count(lexer_state * const lexer)>
 
 Returns the number of operands of the I<current> instruction.
+This function assumes there is an instruction in place
+(in CURRENT_INSTRUCTION(lexer)).
 
 =cut
 
@@ -1160,6 +1162,8 @@ unsigned
 get_operand_count(lexer_state * const lexer) {
     unsigned count = 0;
     expression *first, *operand;
+
+    PARROT_ASSERT(CURRENT_INSTRUCTION(lexer));
 
     /* if no operands, return 0 */
     if (CURRENT_INSTRUCTION(lexer)->operands == NULL)
@@ -1219,7 +1223,6 @@ create_const(lexer_state * const lexer, pir_type type, char const * const name, 
 }
 
 /*
-
 
 =item C<constant *
 new_named_const(lexer_state * const lexer, pir_type type, char * const name, ...)>
@@ -1372,7 +1375,8 @@ new_reg(lexer_state * const lexer, pir_type type, int regno) {
 =item C<expression *
 expr_from_target(target *t)>
 
-convert a target to an expression node
+Wrap a target in an expression node; the expression node is
+returned.
 
 =cut
 
@@ -1529,7 +1533,7 @@ invoke(lexer_state * const lexer, invoke_type type, ...) {
 /*
 
 =item C<void
-set_lex_flag(target *t, char * const name)>
+set_lex_flag(target * const t, char const * const name)>
 
 Set the lexical name C<name> on target C<t>.
 
@@ -2202,11 +2206,40 @@ convert_pcc_return(lexer_state * const lexer, invocation * const inv) {
     new_sub_instr(lexer, PARROT_OP_returncc, "returncc");
 }
 
+/*
+
+=item C<static void
+convert_nci_call(lexer_state * const lexer, invocation * const inv)>
+
+Generate instructions for a function invocation using the Native Call
+Interface (NCI). The sequence of instructions is:
+
+XXX complete this.
+
+ invokecc_p
+
+=cut
+
+*/
 static void
 convert_nci_call(lexer_state * const lexer, invocation * const inv) {
     set_instr(lexer, "invokecc_p");
 }
 
+/*
+
+=item C<static void
+convert_pcc_yield(lexer_state * const lexer, invocation * const inv)>
+
+Generate instructions for a yield statement using the Parrot Calling Conventions.
+The sequence of instructions is:
+
+ set_returns_pc
+ yield
+
+=cut
+
+*/
 static void
 convert_pcc_yield(lexer_state * const lexer, invocation * const inv) {
     new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc");
@@ -2215,6 +2248,20 @@ convert_pcc_yield(lexer_state * const lexer, invocation * const inv) {
     new_sub_instr(lexer, PARROT_OP_yield, "yield");
 }
 
+/*
+
+=item C<static void
+convert_pcc_tailcall(lexer_state * const lexer, invocation * const inv)>
+
+Generate instructions for a tailcall using the Parrot Calling Conventions (PCC).
+The sequence of instructions is:
+
+ set_args_pc
+ tailcall_pc
+
+=cut
+
+*/
 static void
 convert_pcc_tailcall(lexer_state * const lexer, invocation * const inv) {
     new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc");
@@ -2223,6 +2270,21 @@ convert_pcc_tailcall(lexer_state * const lexer, invocation * const inv) {
     new_sub_instr(lexer, PARROT_OP_tailcall_p, "tailcall_pc");
 }
 
+/*
+
+=item C<static void
+convert_pcc_methodcall(lexer_state * const lexer, invocation * const inv)>
+
+Generate instructions for a method call using the Parrot Calling Conventions (PCC).
+The sequence of instructions is:
+
+ set_args_pc
+ get_results_pc
+ callmethodcc_p_sc
+
+=cut
+
+*/
 static void
 convert_pcc_methodcall(lexer_state * const lexer, invocation * const inv) {
     new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc");
@@ -2237,6 +2299,20 @@ convert_pcc_methodcall(lexer_state * const lexer, invocation * const inv) {
     add_operands(lexer, "%T%E", inv->sub, inv->method);
 }
 
+/*
+
+=item C<static void
+convert_pcc_methodtailcall(lexer_state * const lexer, invocation * const inv)>
+
+Generate instructions for a method tailcall, using the Parrot Calling Conventions (PCC).
+The sequence of instructions is:
+
+ set_args_pc
+ tailcallmethod_p_p / tailcallmethod_p_sc
+
+=cut
+
+*/
 static void
 convert_pcc_methodtailcall(lexer_state * const lexer, invocation * const inv) {
     new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc");
@@ -2257,7 +2333,9 @@ convert_pcc_methodtailcall(lexer_state * const lexer, invocation * const inv) {
 =item C<void
 convert_inv_to_instr(lexer_state * const lexer, invocation * const inv)>
 
-Convert an C<invocation> structure into a series of instructions.
+Convert an C<invocation> structure into a series of instructions. This is the
+dispatch function, which calls the appropriate conversion function, based
+on the type of C<inv>.
 
 =cut
 
@@ -2298,7 +2376,9 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
 =item C<static label *
 new_label(lexer_state * const lexer, char const * const labelid, int offset)>
 
-Constructor for a label operand.
+Constructor for a label struct node. A new C<label> object is created,
+initialized with the label id specified in C<labelid>, and the bytecode
+offset in C<offset>. A pointer to the label node is returned.
 
 =cut
 
@@ -2337,12 +2417,10 @@ fixup_local_labels(lexer_state * const lexer) {
     do {
         iter = iter->next; /* init pointer to first instruction */
 
-        /* depending on what kind of branching instruction, get the right operand
-         * that contains the label.
+        /* Do a quick global check if any label bits have been set
+         * if no label at all, skip this whole block.
          */
-        if (iter->oplabelbits) { /* this is a quick global check if any label bits have been set
-                                  * if no label at all, skip this whole block.
-                                  */
+        if (iter->oplabelbits) {
 
             /* now check for each operand */
             expression *operand = iter->operands;
@@ -2365,9 +2443,9 @@ fixup_local_labels(lexer_state * const lexer) {
                     unsigned     offset     = find_local_label(lexer, labelid);
                     unsigned     curr_instr = iter->offset;
 
-                    /* convert the label identifier into a real label object */
-                    /* The label offset is calculated deducting the current Program Counter
-                     * from the PC of the label.
+                    /* convert the label identifier into a real label object.
+                     * The label offset is calculated deducting the current
+                     * Program Counter from the PC of the label.
                      */
                     operand->expr.l = new_label(lexer, labelid, offset - curr_instr);
                     operand->type   = EXPR_LABEL;
@@ -2407,7 +2485,7 @@ fixup_global_labels(lexer_state * const lexer) {
         global_label *glob = find_global_label(lexer, iter->label);
 
         /* if found, then fix it; if not, that's fine, the right instruction to find the
-         * sub during runtime is in place already.
+         * sub during runtime is in place already (i.e. "find_sub_not_null").
          */
         if (glob) {
             expression *new_second_operand;
@@ -2460,7 +2538,7 @@ emit_sub_epilogue(lexer_state * const lexer) {
     if (TEST_FLAG(lexer->subs->flags, SUB_FLAG_MAIN))
         new_sub_instr(lexer, PARROT_OP_end, "end");
     else {
-        /* default sub epilogue */
+        /* default sub epilogue; no return values, hence 0 */
         int array_index = generate_signature_pmc(lexer, 0);
         new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc");
         push_operand(lexer, expr_from_const(lexer, new_const(lexer, INT_TYPE, array_index)));
@@ -2491,6 +2569,8 @@ close_sub(lexer_state * const lexer) {
 
     /* don't generate the sub epilogue if the last instruction was already
      * leaving the sub.
+     * XXX add all instructions that make the sub epilogue unnecessary.
+     * XXX should all branching instructions prevent generation of the epilogue?
      */
     if (CURRENT_INSTRUCTION(lexer)) {
         switch (CURRENT_INSTRUCTION(lexer)->opcode) {
@@ -2523,7 +2603,9 @@ close_sub(lexer_state * const lexer) {
      * so that invoking ops can find this index.
      */
     glob = find_global_label(lexer, CURRENT_SUB(lexer)->info.subname);
+
     PARROT_ASSERT(glob != NULL); /* it was stored in new_subr(), so must be there. */
+
     glob->const_table_index = sub_const_table_index;
 }
 
