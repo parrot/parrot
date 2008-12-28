@@ -232,6 +232,7 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
 %union {
     double              dval;
     int                 ival;
+    unsigned            uval;
     char   const       *sval;
     struct constant    *cval;
     struct instruction *instr;
@@ -464,7 +465,8 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
              augmented_op
              unique_reg_flag
              int_or_num
-             parameters
+
+%type <uval> parameters
 
 %type <invo> long_invocation
              long_invocation_stat
@@ -738,17 +740,8 @@ multi_type        : identifier
 parameter_list    : parameters
                          {
                            /* if there are parameters, then emit a get_params instruction. */
-                           if ($1 > 0) {
-
-                               set_instr(lexer, "get_params");
-                               /* don't infer the signatured opname from arguments,
-                                * it's always same: get_params_pc
-                                * (this is one of the special 4 instructions for sub invocation).
-                                */
-
-                               update_op(lexer, CURRENT_INSTRUCTION(lexer),
-                                         PARROT_OP_get_params_pc);
-                           }
+                           if ($1 > 0)
+                               generate_parameters_instr(lexer, $1);
                          }
                   ;
 

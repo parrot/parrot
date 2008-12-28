@@ -454,6 +454,8 @@ void convert_inv_to_instr(struct lexer_state * const lexer, invocation * const i
 void update_sub_register_usage(struct lexer_state * const lexer,
                                unsigned reg_usage[NUM_PARROT_TYPES]);
 
+void generate_parameters_instr(struct lexer_state * const lexer, unsigned num_parameters);
+
 void panic(struct lexer_state * lexer, char const * const message);
 
 #endif /* PARROT_PIR_PIRCOMPUNIT_H_GUARD */

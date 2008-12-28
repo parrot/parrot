@@ -1418,6 +1418,44 @@ expr_from_const(lexer_state * const lexer, constant * const c) {
 /*
 
 =item C<expression *
+expr_from_int(lexer_state * const lexer, int ival)>
+
+Create an expression node from an integer constant. This is a wrapper
+function, which uses C<expr_from_const()> and C<new_const()>.
+Creating an expression from an integer constant is a common operation,
+so using this wrapper function makes the rest of the code slightly cleaner.
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+expression *
+expr_from_int(lexer_state * const lexer, int ival) {
+    return expr_from_const(lexer, new_const(lexer, INT_TYPE, ival));
+}
+
+/*
+
+=item C<expression *
+expr_from_num(lexer_state * const lexer, double nval)>
+
+Same as C<expr_from_int()>, except it takes a C<double> parameter,
+not an C<int>.
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+expression *
+expr_from_num(lexer_state * const lexer, double nval) {
+    return expr_from_const(lexer, new_const(lexer, NUM_TYPE, nval));
+}
+
+/*
+
+=item C<expression *
 expr_from_ident(char * const id)>
 
 Convert a ident to an expression node and returns it.
@@ -1714,7 +1752,7 @@ remove_all_operands(NOTNULL(lexer_state * const lexer)) {
 /*
 
 =item C<expression *
-expr_from_key(key * const k)>
+expr_from_key(lexer_state * const lexer, key * const k)>
 
 Wraps the key C<k> in an C<expression> node and returns that.
 The returned expression node has type EXPR_KEY.
@@ -1732,7 +1770,7 @@ expr_from_key(NOTNULL(lexer_state * const lexer), NOTNULL(key * const k)) {
 /*
 
 =item C<key *
-new_key(expression * const expr)>
+new_key(lexer_state * const lexer, expression * const expr)>
 
 Wraps the expression C<expr> in a key node and returns that.
 
@@ -1905,14 +1943,12 @@ get_expression_pirtype(expression * const expr) {
             return UNKNOWN_TYPE;
     }
 }
+
 /*
 
 =item C<static void
 arguments_to_operands(lexer_state * const lexer, argument * const args)>
 
-part of inv->instr conversion.
-
-Add arguments as operands on the current instruction.
 
 =cut
 
@@ -1929,7 +1965,7 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
      */
     array_index = generate_signature_pmc(lexer, num_arguments);
     /* add the index (of the signature PMC) in the PBC constant table as operand */
-    push_operand(lexer, expr_from_const(lexer, new_const(lexer, INT_TYPE, array_index)));
+    push_operand(lexer, expr_from_int(lexer, array_index));
 
     fprintf(stderr, "args2ops: %u arguments\n", num_arguments);
 
@@ -1972,9 +2008,6 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
 =item C<static void
 targets_to_operands(lexer_state * const lexer, target * const targets)>
 
-Convert a list of targets pointed to by C<targets> into operands; each
-C<target> node is added as an operand to the current instruction. If
-C<targets> is NULL, an empty string is added as an operand.
 
 =cut
 
@@ -2003,7 +2036,7 @@ targets_to_operands(lexer_state * const lexer, target * const targets, unsigned 
 
         VTABLE_set_integer_keyed_int(lexer->interp, signature_array, i, flag);
 
-        push_operand(lexer, expr_from_const(lexer, new_const(lexer, INT_TYPE, iter->info->color)));
+        push_operand(lexer, expr_from_int(lexer, iter->info->color));
 
         iter = iter->next;
     }
@@ -2067,6 +2100,8 @@ new_sub_instr(lexer_state * const lexer, int opcode, char const * const opname,
 
     /* count number of ints needed to store this instruction in bytecode */
     lexer->codesize += CURRENT_INSTRUCTION(lexer)->opinfo->op_count + num_var_args;
+
+    fprintf(stderr, "new_sub_instr(): extra args for '%s': %u\n", opname, num_var_args);
 }
 
 /*
@@ -2099,6 +2134,24 @@ update_op(NOTNULL(lexer_state * const lexer), NOTNULL(instruction * const instr)
     lexer->codesize += instr->opinfo->op_count;
 }
 
+
+/*
+
+=item C<void
+generate_parameters_instr(lexer_state * const lexer, unsigned num_parameters)>
+
+Generate the "get_params" instruction, taking <num_parameters> variable arguments;
+this is the number of parameters of this function.
+
+=cut
+
+*/
+void
+generate_parameters_instr(lexer_state * const lexer, unsigned num_parameters) {
+    new_sub_instr(lexer, PARROT_OP_get_params_pc, "get_params_pc", num_parameters);
+    /* convert the parameter list into operands. Parameters are stored as target nodes. */
+    targets_to_operands(lexer, CURRENT_SUB(lexer)->parameters, num_parameters);
+}
 
 
 /*
@@ -2292,7 +2345,7 @@ convert_pcc_tailcall(lexer_state * const lexer, invocation * const inv) {
     new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc", inv->num_arguments);
     arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
 
-    new_sub_instr(lexer, PARROT_OP_tailcall_p, "tailcall_pc", 0);
+    new_sub_instr(lexer, PARROT_OP_tailcall_p, "tailcall_p", 0);
 }
 
 /*
@@ -2347,7 +2400,7 @@ convert_pcc_methodtailcall(lexer_state * const lexer, invocation * const inv) {
     if (inv->method->type == EXPR_TARGET)
         new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_p, "tailcallmethod_p_p", 0);
     else if (inv->method->type == EXPR_CONSTANT)
-        new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_p, "tailcallmethod_p_sc", 0);
+        new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_sc, "tailcallmethod_p_sc", 0);
     else
         panic(lexer, "unknown expression type in tailcallmethod instruction");
 
@@ -2554,12 +2607,7 @@ otherwise it's a standard return sequence.
 */
 static void
 emit_sub_epilogue(lexer_state * const lexer) {
-    /* a :main-marked sub ends with the "end" instruction;
-     * otherwise it's this pair:
-     *
-     *    set_returns_pc
-     *    returncc
-     */
+
     if (TEST_FLAG(lexer->subs->flags, SUB_FLAG_MAIN))
         new_sub_instr(lexer, PARROT_OP_end, "end", 0);
     else {
