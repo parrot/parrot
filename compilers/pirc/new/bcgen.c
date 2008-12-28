@@ -364,8 +364,8 @@ Write the opcode C<op> into the bytecode stream.
 void
 emit_opcode(bytecode * const bc, opcode_t op) {
     *bc->opcursor++ = op;
-/*    fprintf(stderr, "[%d]", op);
-*/
+    fprintf(stderr, "[%d]", op);
+
 }
 
 /*
@@ -383,8 +383,8 @@ the same anyway?
 void
 emit_int_arg(bytecode * const bc, int intval) {
     *bc->opcursor++ = intval;
-/*    fprintf(stderr, "[%d]", intval);
-*/
+    fprintf(stderr, "[%d]", intval);
+
 }
 
 
@@ -405,7 +405,29 @@ add_string_const_from_cstring(bytecode * const bc, char const * const str) {
 }
 
 
+/*
 
+=item C<PMC *
+generate_multi_signature(bytecode * const bc)>
+
+Generate a PMC for the multi signature, based on the types defined in C<multi_types>
+C<type_count> indicates the number of types in the list.
+
+=cut
+
+*/
+static PMC *
+generate_multi_signature(bytecode * const bc, struct key * const multi_types, unsigned type_count) {
+    unsigned i;
+    PMC * const multi_signature = pmc_new(bc->interp, enum_class_FixedPMCArray);
+    VTABLE_set_integer_native(bc->interp, multi_signature, type_count);
+
+    for (i = 0; i < type_count; ++i) {
+
+
+    }
+    return multi_signature;
+}
 
 /*
 

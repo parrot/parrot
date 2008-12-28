@@ -556,6 +556,7 @@ Emit bytecode for the key C<k>.
 */
 static void
 emit_pbc_key(lexer_state * const lexer, key * const k) {
+    fprintf(stderr, "emit pbc key\n");
     emit_pbc_expr(lexer, k->expr);
     /* XXX finish this. */
 }

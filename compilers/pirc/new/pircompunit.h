@@ -279,11 +279,11 @@ typedef struct bucket {
 } bucket;
 
 /* accessors for the bucket union */
-#define bucket_string(B)    B->u.str
-#define bucket_symbol(B)    B->u.sym
-#define bucket_local(B)     B->u.loc
-#define bucket_global(B)    B->u.glob
-#define bucket_constant(B)  B->u.cons
+#define bucket_string(B)    (B)->u.str
+#define bucket_symbol(B)    (B)->u.sym
+#define bucket_local(B)     (B)->u.loc
+#define bucket_global(B)    (B)->u.glob
+#define bucket_constant(B)  (B)->u.cons
 
 /* hashtable structure */
 typedef struct hashtable {
@@ -326,8 +326,8 @@ typedef struct subroutine {
 } subroutine;
 
 /* accessors for current sub and current instruction; makes code a bit more readable */
-#define CURRENT_SUB(L)          L->subs
-#define CURRENT_INSTRUCTION(L)  L->subs->statements
+#define CURRENT_SUB(L)          (L)->subs
+#define CURRENT_INSTRUCTION(L)  (L)->subs->statements
 
 /* forward declaration */
 struct lexer_state;
