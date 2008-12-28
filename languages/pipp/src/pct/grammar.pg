@@ -130,7 +130,7 @@ rule statement {
     | <for_statement>           {*}  #= for_statement
     | <inline_sea_short_tag>    {*}  #= inline_sea_short_tag
     | <inline_sea_script_tag>   {*}  #= inline_sea_script_tag
-    | <var_assign>              {*}  #= var_assign
+    | [ <var_assign> ';' ]      {*}  #= var_assign
     | <function_definition>     {*}  #= function_definition
     | <class_definition>        {*}  #= class_definition
 }
@@ -208,7 +208,7 @@ rule do_while_statement {
 }
 
 rule for_statement {
-    'for' '(' <var_assign> <expression> ';' <expression> ')' '{' <statement_list> '}'
+    'for' '(' <var_assign> ';' <expression> ';' <expression> ')' '{' <statement_list> '}'
     {*}
 }
 
@@ -231,7 +231,7 @@ regex SEA_empty_allowed {
 }
 
 rule var_assign {
-    <var> '=' <expression> <.statement_delimiter>
+    <var> '=' <expression>
     {*}
 }
 
@@ -383,6 +383,7 @@ rule term {
     | <function_call>          {*}   #= function_call
     | <instantiate_array>      {*}   #= instantiate_array
     | <constructor_call>       {*}   #= constructor_call
+    | '(' <var_assign> ')'     {*}   #= var_assign
     | '(' <expression> ')'     {*}   #= expression
     | <literal>                {*}   #= literal
     | <class_constant>         {*}   #= class_constant
