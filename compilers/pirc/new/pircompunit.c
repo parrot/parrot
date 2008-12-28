@@ -259,15 +259,13 @@ their thing.
 */
 void
 new_subr(lexer_state * const lexer, char const * const subname) {
-    subroutine *newsub  = pir_mem_allocate_zeroed_typed(lexer, subroutine);
-    int index;
+    subroutine *newsub       = pir_mem_allocate_zeroed_typed(lexer, subroutine);
+    int         index;
 
     /* set the sub fields */
     newsub->info.subname     = subname;
-
     /* set default lexid */
     newsub->info.subid       = subname;
-
     /* take namespace of this sub of the lexer, which keeps track of that */
     newsub->name_space       = lexer->current_ns;
 
@@ -276,6 +274,7 @@ new_subr(lexer_state * const lexer, char const * const subname) {
     newsub->flags            = 0;
     newsub->info.startoffset = lexer->codesize; /* start offset in bytecode */
 
+    /* initialize hashtables for .local and label identifiers */
     init_hashtable(lexer, &newsub->symbols, HASHTABLE_SIZE_INIT);
     init_hashtable(lexer, &newsub->labels, HASHTABLE_SIZE_INIT);
 
@@ -290,8 +289,8 @@ new_subr(lexer_state * const lexer, char const * const subname) {
     }
     else { /* there is at least 1 other subroutine */
         /* lexer->subs points to "end of list", to the last added one */
-        newsub->next             = CURRENT_SUB(lexer)->next; /* set newsub's next to the
-                                                                first item in the list */
+        newsub->next = CURRENT_SUB(lexer)->next; /* set newsub's next to the
+                                                    first item in the list */
         CURRENT_SUB(lexer)->next = newsub;    /* set current sub's next to the new sub. */
     }
     CURRENT_SUB(lexer) = newsub;
@@ -301,7 +300,6 @@ new_subr(lexer_state * const lexer, char const * const subname) {
 
     /* vanilla register allocator is reset for each sub */
     reset_register_allocator(lexer);
-
 
 }
 
@@ -2104,6 +2102,158 @@ save_global_reference(lexer_state * const lexer, instruction * const instr, char
 
 /*
 
+=item C<static void
+convert_pcc_call(lexer_state * const lexer, invocation * const inv)>
+
+Generate instructions for a normal invocation using the Parrot Calling
+Conventions (PCC). This is the sequence of the following instructions:
+
+For $P0():
+
+ set_args_pc
+ get_results_pc
+ invokecc_p / invoke_p_p
+
+For "foo"() and foo():
+
+ set_args_pc
+ get_results_pc
+ set_p_pc / find_sub_not_null_p_sc
+ invokecc_p
+
+=cut
+
+*/
+static void
+convert_pcc_call(lexer_state * const lexer, invocation * const inv) {
+    new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc");
+    arguments_to_operands(lexer, inv->arguments);
+
+    new_sub_instr(lexer, PARROT_OP_get_results_pc, "get_results_pc");
+    targets_to_operands(lexer, inv->results);
+
+    /* if the target is a register, invoke that. */
+    if (TEST_FLAG(inv->sub->flags, TARGET_FLAG_IS_REG)) {
+        target *sub = new_reg(lexer, PMC_TYPE, inv->sub->info->color);
+
+        if (inv->retcc) { /* return continuation present? */
+            new_sub_instr(lexer, PARROT_OP_invoke_p_p, "invoke_p_p");
+            add_operands(lexer, "%T%T", inv->sub, inv->retcc);
+        }
+        else {
+            new_sub_instr(lexer, PARROT_OP_invokecc_p, "invokecc_p");
+            add_operands(lexer, "%T", sub);
+        }
+    }
+    else { /* find the global label in the current file, or find it during runtime */
+        target *sub        = generate_unique_pir_reg(lexer, PMC_TYPE);
+        global_label *glob = find_global_label(lexer, inv->sub->info->id.name);
+
+        if (glob) {
+            new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc");
+            add_operands(lexer, "%T%i", sub, glob->const_table_index);
+        }
+        else { /* find it during runtime (hopefully, otherwise exception) */
+            new_sub_instr(lexer, PARROT_OP_find_sub_not_null_p_sc, "find_sub_not_null_p_sc");
+
+            add_operands(lexer, "%T%s", sub, inv->sub->info->id.name);
+
+            /* save the current instruction in a list; entries in this list will be
+             * fixed up, if possible, after the parsing phase.
+             *
+             * Instead of the instruction
+             *
+             *   set_p_pc
+             *
+             * that is generated when the global label C<glob> was found (see above),
+             * another instructions is generated. After the parse, we'll re-try
+             * to find the global label that is referenced. For now, just generate
+             * this instruction to do the resolving of the label during runtime:
+             *
+             *   find_sub_not_null_p_sc
+             */
+            save_global_reference(lexer, CURRENT_INSTRUCTION(lexer), inv->sub->info->id.name);
+        }
+
+        new_sub_instr(lexer, PARROT_OP_invokecc_p, "invokecc_p");
+        add_operands(lexer, "%T", sub);
+
+    }
+}
+
+/*
+
+=item C<static void
+convert_pcc_return(lexer_state * const lexer, invocation * const inv)>
+
+Generate instructions for a normal return statement using the Parrot Calling
+Conventions (PCC). The sequence of instructions is:
+
+ set_returns_pc
+ returncc
+
+=cut
+
+*/
+static void
+convert_pcc_return(lexer_state * const lexer, invocation * const inv) {
+    new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc");
+    arguments_to_operands(lexer, inv->arguments);
+    new_sub_instr(lexer, PARROT_OP_returncc, "returncc");
+}
+
+static void
+convert_nci_call(lexer_state * const lexer, invocation * const inv) {
+    set_instr(lexer, "invokecc_p");
+}
+
+static void
+convert_pcc_yield(lexer_state * const lexer, invocation * const inv) {
+    new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc");
+    arguments_to_operands(lexer, inv->arguments);
+
+    new_sub_instr(lexer, PARROT_OP_yield, "yield");
+}
+
+static void
+convert_pcc_tailcall(lexer_state * const lexer, invocation * const inv) {
+    new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc");
+    arguments_to_operands(lexer, inv->arguments);
+
+    new_sub_instr(lexer, PARROT_OP_tailcall_p, "tailcall_pc");
+}
+
+static void
+convert_pcc_methodcall(lexer_state * const lexer, invocation * const inv) {
+    new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc");
+    arguments_to_operands(lexer, inv->arguments);
+    /* in a methodcall, the invocant object is passed as the first argument */
+    unshift_operand(lexer, expr_from_target(lexer, inv->sub));
+
+    new_sub_instr(lexer, PARROT_OP_get_results_pc, "get_results_pc");
+    targets_to_operands(lexer, inv->results);
+
+    new_sub_instr(lexer, PARROT_OP_callmethodcc_p_sc, "callmethodcc_p_sc");
+    add_operands(lexer, "%T%E", inv->sub, inv->method);
+}
+
+static void
+convert_pcc_methodtailcall(lexer_state * const lexer, invocation * const inv) {
+    new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc");
+    arguments_to_operands(lexer, inv->arguments);
+
+    /* check out the type of the method expression; it may be a PMC or a STRING. */
+    if (inv->method->type == EXPR_TARGET)
+        new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_p, "tailcallmethod_p_p");
+    else if (inv->method->type == EXPR_CONSTANT)
+        new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_p, "tailcallmethod_p_sc");
+    else
+        panic(lexer, "unknown expression type in tailcallmethod instruction");
+
+}
+
+/*
+
 =item C<void
 convert_inv_to_instr(lexer_state * const lexer, invocation * const inv)>
 
@@ -2116,108 +2266,25 @@ void
 convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
     switch (inv->type) {
         case CALL_PCC:
-            new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc");
-            arguments_to_operands(lexer, inv->arguments);
-
-            new_sub_instr(lexer, PARROT_OP_get_results_pc, "get_results_pc");
-            targets_to_operands(lexer, inv->results);
-
-            /* if the target is a register, invoke that. */
-            if (TEST_FLAG(inv->sub->flags, TARGET_FLAG_IS_REG)) {
-                target *sub = new_reg(lexer, PMC_TYPE, inv->sub->info->color);
-                if (inv->retcc) { /* return continuation present? */
-                    new_sub_instr(lexer, PARROT_OP_invoke_p_p, "invoke_p_p");
-                    add_operands(lexer, "%T%T", inv->sub, inv->retcc);
-                }
-                else {
-                    new_sub_instr(lexer, PARROT_OP_invokecc_p, "invokecc_p");
-                    add_operands(lexer, "%T", sub);
-                }
-            }
-            else { /* find the global label in the current file, or find it during runtime */
-                target *sub        = generate_unique_pir_reg(lexer, PMC_TYPE);
-                global_label *glob = find_global_label(lexer, inv->sub->info->id.name);
-
-                if (glob) {
-                    new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc");
-                    add_operands(lexer, "%T%i", sub, glob->const_table_index);
-                }
-                else { /* find it during runtime (hopefully, otherwise exception) */
-                    new_sub_instr(lexer, PARROT_OP_find_sub_not_null_p_sc,
-                                  "find_sub_not_null_p_sc");
-
-                    add_operands(lexer, "%T%s", sub, inv->sub->info->id.name);
-
-                    /* save the current instruction in a list; entries in this list will be
-                     * fixed up, if possible, after the parsing phase.
-                     *
-                     * Instead of the instruction
-                     *
-                     *   set_p_pc
-                     *
-                     * that is generated when the global label C<glob> was found (see above),
-                     * another instructions is generated. After the parse, we'll re-try
-                     * to find the global label that is referenced. For now, just generate
-                     * this instruction to do the resolving of the label during runtime:
-                     *
-                     *   find_sub_not_null_p_sc
-                     *
-                     */
-                    save_global_reference(lexer, CURRENT_INSTRUCTION(lexer),
-                                          inv->sub->info->id.name);
-                }
-
-                new_sub_instr(lexer, PARROT_OP_invokecc_p, "invokecc_p");
-                add_operands(lexer, "%T", sub);
-
-            }
+            convert_pcc_call(lexer, inv);
             break;
         case CALL_RETURN:
-            new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc");
-            arguments_to_operands(lexer, inv->arguments);
-
-            new_sub_instr(lexer, PARROT_OP_returncc, "returncc");
+            convert_pcc_return(lexer, inv);
             break;
         case CALL_NCI:
-            set_instr(lexer, "invokecc_p");
+            convert_nci_call(lexer, inv);
             break;
         case CALL_YIELD:
-            new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc");
-            arguments_to_operands(lexer, inv->arguments);
-
-            new_sub_instr(lexer, PARROT_OP_yield, "yield");
+            convert_pcc_yield(lexer, inv);
             break;
         case CALL_TAILCALL:
-            new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc");
-            arguments_to_operands(lexer, inv->arguments);
-
-            new_sub_instr(lexer, PARROT_OP_tailcall_p, "tailcall_pc");
+            convert_pcc_tailcall(lexer, inv);
             break;
         case CALL_METHOD:
-            new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc");
-            arguments_to_operands(lexer, inv->arguments);
-            /* in a methodcall, the invocant object is passed as the first argument */
-            unshift_operand(lexer, expr_from_target(lexer, inv->sub));
-
-            new_sub_instr(lexer, PARROT_OP_get_results_pc, "get_results_pc");
-            targets_to_operands(lexer, inv->results);
-
-            new_sub_instr(lexer, PARROT_OP_callmethodcc_p_sc, "callmethodcc_p_sc");
-            add_operands(lexer, "%T%E", inv->sub, inv->method);
-
+            convert_pcc_methodcall(lexer, inv);
             break;
         case CALL_METHOD_TAILCALL:
-            new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc");
-            arguments_to_operands(lexer, inv->arguments);
-
-            /* check out the type of the method expression; it may be a PMC or a STRING. */
-            if (inv->method->type == EXPR_TARGET)
-                new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_p, "tailcallmethod_p_p");
-            else if (inv->method->type == EXPR_CONSTANT)
-                new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_p, "tailcallmethod_p_sc");
-            else
-                panic(lexer, "unknown expression type in tailcallmethod instruction");
-
+            convert_pcc_methodtailcall(lexer, inv);
             break;
         default:
             panic(lexer, "Unknown invocation type in convert_inv_to_instr()");

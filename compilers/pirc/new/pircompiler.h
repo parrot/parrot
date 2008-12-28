@@ -37,7 +37,7 @@ typedef enum lexer_flags {
     LEXER_FLAG_NOOUTPUT            = 1 << 6, /* don't print anything on success, except 'ok' */
     LEXER_FLAG_REGALLOC            = 1 << 7, /* use register allocation optimizer */
     LEXER_FLAG_PASMFILE            = 1 << 8, /* the input is PASM, not PIR code */
-    LEXER_FLAG_OUTPUTPBC         = 1 << 9  /* generate PBC file */
+    LEXER_FLAG_OUTPUTPBC           = 1 << 9  /* generate PBC file */
 
 } lexer_flags;
 
@@ -80,6 +80,7 @@ typedef void * yyscan_t;
 #endif
 
 /* macros can store up to 4K characters, after which the buffer must be resized.
+ * This value is the default, and can be changed through PIRC's command line option.
  */
 #define INIT_MACRO_SIZE     4096
 
@@ -148,7 +149,7 @@ typedef struct lexer_state {
 } lexer_state;
 
 /* accessor for current macro; always first on the list. */
-#define CURRENT_MACRO(X)    X->macros->definitions
+#define CURRENT_MACRO(X)    (X)->macros->definitions
 
 
 /* constructor for a lexer_state object */
