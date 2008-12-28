@@ -174,7 +174,7 @@ range_end:
  * next range PMC in Key chain
  */
 static void
-set_slice_next(PARROT_INTERP, PMC *self, PMC *agg)
+set_slice_next(PARROT_INTERP, ARGMOD(PMC *self))
 {
     parrot_range_t * const r = (parrot_range_t *)PMC_struct_val(self);
 
@@ -396,7 +396,7 @@ advance to next position in the range, depending on what.
 
                 /* we are passed now the new PMC we created above */
             case ITERATE_GET_NEXT:
-                set_slice_next(INTERP, SELF, agg);
+                set_slice_next(INTERP, SELF);
                 break;
             default:
                 Parrot_ex_throw_from_c_args(INTERP, NULL,
