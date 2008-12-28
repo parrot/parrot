@@ -110,10 +110,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Context * Parrot_push_context(PARROT_INTERP,
-    ARGMOD(INTVAL *n_regs_used))
+    ARGIN(const INTVAL *n_regs_used))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*n_regs_used);
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 void Parrot_set_context_threshold(SHIM_INTERP, SHIM(Parrot_Context *ctx));
@@ -127,19 +126,17 @@ void destroy_context(PARROT_INTERP)
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Parrot_Context * Parrot_alloc_context(PARROT_INTERP,
-    ARGMOD(INTVAL *number_regs_used),
+    ARGIN(const INTVAL *number_regs_used),
     ARGIN_NULLOK(Parrot_Context *old))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*number_regs_used);
+        __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Parrot_Context * Parrot_set_new_context(PARROT_INTERP,
-    ARGMOD(INTVAL *number_regs_used))
+    ARGIN(const INTVAL *number_regs_used))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*number_regs_used);
+        __attribute__nonnull__(2);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/register.c */

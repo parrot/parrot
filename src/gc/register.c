@@ -342,7 +342,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Context *
-Parrot_push_context(PARROT_INTERP, ARGMOD(INTVAL *n_regs_used))
+Parrot_push_context(PARROT_INTERP, ARGIN(const INTVAL *n_regs_used))
 {
     Parrot_Context * const old = CONTEXT(interp);
     Parrot_Context * const ctx = Parrot_set_new_context(interp, n_regs_used);
@@ -408,7 +408,7 @@ the init flag to indicate whether you want to initialize the new context
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Parrot_Context *
-Parrot_alloc_context(PARROT_INTERP, ARGMOD(INTVAL *number_regs_used),
+Parrot_alloc_context(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used),
     ARGIN_NULLOK(Parrot_Context *old))
 {
     Parrot_Context *ctx;
@@ -505,7 +505,7 @@ register usage C<n_regs_used> is copied.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Parrot_Context *
-Parrot_set_new_context(PARROT_INTERP, ARGMOD(INTVAL *number_regs_used))
+Parrot_set_new_context(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used))
 {
     Parrot_Context *old = CONTEXT(interp);
     Parrot_Context *ctx = Parrot_alloc_context(interp, number_regs_used, old);
