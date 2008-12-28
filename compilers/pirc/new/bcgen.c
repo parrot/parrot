@@ -202,6 +202,27 @@ add_key_const(bytecode * const bc, PMC *key) {
 
 /*
 
+static void
+check_requested_constant(bytecode * const bc, unsigned index, int expectedtype)>
+
+Perform a sanity check on a requested constant. The constant at index C<index>
+is requested; this function checks whether the index is valid. Then, if so, the
+constant is checked for its type, which must be C<expectedtype>. This must be one
+of: PFC_PMC, PFC_NUMBER, PFC_STRING.
+
+=cut
+
+*/
+static void
+check_requested_constant(bytecode * const bc, unsigned index, int expectedtype) {
+    /* make sure the requested PMC exists. */
+    PARROT_ASSERT(index < bc->interp->code->const_table->const_count);
+    /* make sure the requested constant is a PMC */
+    PARROT_ASSERT(bc->interp->code->const_table->constants[index]->type == expectedtype);
+}
+
+/*
+
 =item C<PMC *
 get_pmc_const(bytecode * const bc, unsigned index)>
 
@@ -212,12 +233,40 @@ Get the PMC constant at index C<index> in the PBC constant table.
 */
 PMC *
 get_pmc_const(bytecode * const bc, unsigned index) {
-    /* make sure the requested PMC exists. */
-    PARROT_ASSERT(index < bc->interp->code->const_table->const_count);
-    /* make sure the requested constant is a PMC */
-    PARROT_ASSERT(bc->interp->code->const_table->constants[index]->type == PFC_PMC);
-
+    check_requested_constant(bc, index, PFC_PMC);
     return bc->interp->code->const_table->constants[index]->u.key;
+}
+
+/*
+
+=item C<FLOATVAL
+get_num_const(bytecode * const bc, unsigned index)>
+
+Get the FLOATVAL constant at index C<index> in the PBC constant table.
+
+=cut
+
+*/
+FLOATVAL
+get_num_const(bytecode * const bc, unsigned index) {
+    check_requested_constant(bc, index, PFC_NUMBER);
+    return bc->interp->code->const_table->constants[index]->u.number;
+}
+
+/*
+
+=item C<STRING *
+get_string_const(bytecode * const bc, unsigned index)>
+
+Get the STRING constant at index C<index> in the PBC constant table.
+
+=cut
+
+*/
+STRING *
+get_string_const(bytecode * const bc, unsigned index) {
+    check_requested_constant(bc, index, PFC_STRING);
+    return bc->interp->code->const_table->constants[index]->u.string;
 }
 
 /*
@@ -335,31 +384,7 @@ emit_int_arg(bytecode * const bc, int intval) {
 */
 }
 
-/*
 
-=item C<void
-emit_op_by_name(bytecode * const bc, char const * const opname)>
-
-Emit the opcode by name. C<opname> must be a valid, signatured opname.
-So, C<print> is not valid, whereas C<print_ic> is. The opcode of the
-opname is looked up and written into the bytecode stream. If C<opname>
-is not valid, an error message is written.
-
-XXX Possibly bail out if error? No need to continue.
-
-=cut
-
-*/
-void
-emit_op_by_name(bytecode * const bc, char const * const opname) {
-    int op = bc->interp->op_lib->op_code(opname, 1);
-    if (op < 0) {
-        /* error */
-        fprintf(stderr, "Error: '%s' is not an op\n", opname);
-    }
-    else
-        emit_opcode(bc, op);
-}
 
 /* XXX remove or update prototype once the XXX below has been resolved. */
 static STRING *add_string_const_from_cstring(bytecode * const bc, char const * const str);

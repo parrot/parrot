@@ -50,13 +50,7 @@ void emit_op_by_name(bytecode * const bc, char const * const name);
 
 void emit_int_arg(bytecode * const bc, int argvalue);
 
-/*
-void emit_pmc_arg(bytecode * const bc, int pmc_const_index);
-
-void emit_num_arg(bytecode * const bc, int num_const_index);
-
-void emit_string_arg(bytecode * const bc, int string_const_index);
-*/
+/* storing constants in constant table */
 
 int add_key_const(bytecode * const bc, PMC *key);
 
@@ -68,23 +62,19 @@ int add_pmc_const(bytecode * const bc, PMC * pmc) ;
 
 PMC *get_pmc_const(bytecode * const bc, unsigned index);
 
-/* for adding constants */
+FLOATVAL get_num_const(bytecode * const bc, unsigned index);
 
-/* returns the id in the constant table */
+STRING *get_string_const(bytecode * const bc, unsigned index);
+
+
 /*
-int add_pmc_const(bytecode * const bc);
 
 int add_string_const(bytecode * const bc, STRING *s);
 
 int add_num_const(bytecode * const bc, FLOATVAL f);
 
-int add_int_const(bytecode * const bc, INTVAL i);
-  */
+*/
 
-
-/* XXX todo: define some API functions for finding values, etc. like this: */
-int get_string_const_index(bytecode * const bc, STRING *s);
-/* retrieves the index of s in the constant table */
 
 int add_sub_pmc(bytecode * const bc, sub_info * const info);
 

@@ -60,8 +60,12 @@ Function to emit a final last cry that something's wrong and exit.
 
 */
 void
-panic(lexer_state * lexer, char const * const message) {
-    fprintf(stderr, "Fatal: %s\n", message);
+panic(lexer_state * lexer, char const * const message, ...) {
+    va_list arg_ptr;
+    fprintf(stderr, "Fatal: ");
+    va_start(arg_ptr, message);
+    vfprintf(stderr, message, arg_ptr);
+    va_end(arg_ptr);
     release_resources(lexer);
     exit(EXIT_FAILURE);
 }
@@ -1951,6 +1955,10 @@ get_expression_pirtype(expression * const expr) {
 =item C<static void
 arguments_to_operands(lexer_state * const lexer, argument * const args)>
 
+Convert a list of C<argument> nodes into operands. Before the operands are
+added to the I<current> instruction, a FixedIntegerArray PMC is created
+which will hold one integer for each argument in the list. The integer
+at index C<i> encodes the type and flags (such as C<:flat>) for operand C<i>.
 
 =cut
 
@@ -1969,19 +1977,12 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
     /* add the index (of the signature PMC) in the PBC constant table as operand */
     push_operand(lexer, expr_from_int(lexer, array_index));
 
-/*    fprintf(stderr, "args2ops: %u arguments\n", num_arguments);
-*/
-
     /* no need to continue if there's no arguments */
     if (num_arguments == 0)
         return;
 
     /* retrieve the signature array PMC */
     signature_array = get_pmc_const(lexer->bc, array_index);
-
-/*    fprintf(stderr, "signature array has size: %d\n",
-            VTABLE_get_integer(lexer->interp, signature_array));
-*/
 
     /* initialize the argument iterator for the loop */
     argiter = args->next;
@@ -1991,8 +1992,6 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
         /* calculate the right flags for the current argument */
         SET_FLAG(flag, get_expression_pirtype(argiter->value));
 
-/*        fprintf(stderr, "Setting flag %d on argument %u\n", flag, i); */
-
         /* set the flags for this argument in the right position in the array */
         VTABLE_set_integer_keyed_int(lexer->interp, signature_array, i, flag);
 
@@ -2001,9 +2000,6 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
 
         argiter = argiter->next;
     }
-
-/*    fprintf(stderr, "args2ops done\n"); */
-
 }
 
 /*
@@ -2011,6 +2007,11 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
 =item C<static void
 targets_to_operands(lexer_state * const lexer, target * const targets)>
 
+Convert a list of C<target> nodes into operands. Before the operands
+are added to the I<current> instruction, a FixedIntegerArray is created,
+which contains one integer for each target (to be converted into an operand).
+The integer encodes the type of the target (operand) and other flags, such
+as C<:slurpy> etc.
 
 =cut
 
@@ -2022,25 +2023,38 @@ targets_to_operands(lexer_state * const lexer, target * const targets, unsigned 
     PMC     *signature_array;
     unsigned i;
 
+    /* generate a FixedIntegerArray of the right size to encode the signature */
     array_index = generate_signature_pmc(lexer, num_targets);
-    push_operand(lexer, expr_from_const(lexer, new_const(lexer, INT_TYPE, array_index)));
+    /* add the index in the constant table of this signature PMC as an operand */
+    push_operand(lexer, expr_from_int(lexer, array_index));
 
+    /* no need to continue if there's no target nodes */
     if (num_targets == 0)
         return;
 
+    /* retrieve the FixedIntegerArray PMC */
     signature_array = get_pmc_const(lexer->bc, array_index);
 
+    /* initialize the iterator */
     iter = targets->next;
 
     for (i = 0; i < num_targets; ++i) {
         int flag = 0;
 
+        /* calculate the flags for the current target node */
         SET_FLAG(flag, iter->info->type);
 
+        /* store the flag at position i in the array */
         VTABLE_set_integer_keyed_int(lexer->interp, signature_array, i, flag);
 
+        /* add the current target as an operand; these targets have already
+         * got an assigned register, so we're emitting that register number.
+         */
+
+        PARROT_ASSERT(iter->info->color != NO_REG_ALLOCATED);
         push_operand(lexer, expr_from_int(lexer, iter->info->color));
 
+        /* go to next target in list */
         iter = iter->next;
     }
 
@@ -2104,10 +2118,9 @@ new_sub_instr(lexer_state * const lexer, int opcode, char const * const opname,
     /* count number of ints needed to store this instruction in bytecode */
     lexer->codesize += CURRENT_INSTRUCTION(lexer)->opinfo->op_count;
 
-    fprintf(stderr, "opcount for '%s' is %d\n", opname, CURRENT_INSTRUCTION(lexer)->opinfo->op_count);
+    /* add the var. number of args for the PCC instructions. */
     lexer->codesize += num_var_args;
 
-    fprintf(stderr, "new_sub_instr(): extra args for '%s': %u (codesize: %u)\n", opname, num_var_args, lexer->codesize);
 }
 
 /*
