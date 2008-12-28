@@ -202,6 +202,26 @@ add_key_const(bytecode * const bc, PMC *key) {
 
 /*
 
+=item C<PMC *
+get_pmc_const(bytecode * const bc, unsigned index)>
+
+Get the PMC constant at index C<index> in the PBC constant table.
+
+=cut
+
+*/
+PMC *
+get_pmc_const(bytecode * const bc, unsigned index) {
+    /* make sure the requested PMC exists. */
+    PARROT_ASSERT(index < bc->interp->code->const_table->const_count);
+    /* make sure the requested constant is a PMC */
+    PARROT_ASSERT(bc->interp->code->const_table->constants[index]->type == PFC_PMC);
+
+    return bc->interp->code->const_table->constants[index]->u.key;
+}
+
+/*
+
 =item C<bytecode *
 new_bytecode(Interp *interp, char const * const filename)>
 

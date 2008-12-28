@@ -66,6 +66,8 @@ int add_string_const(bytecode * const bc, char const * const str);
 
 int add_pmc_const(bytecode * const bc, PMC * pmc) ;
 
+PMC *get_pmc_const(bytecode * const bc, unsigned index);
+
 /* for adding constants */
 
 /* returns the id in the constant table */

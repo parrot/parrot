@@ -1883,8 +1883,28 @@ generate_signature_pmc(lexer_state * const lexer, unsigned size) {
 
 }
 
+/*
 
+=item C<static pir_type
+get_expression_pirtype(expression * const expr)>
 
+Get the PIR type of the expression C<expr>.
+
+=cut
+
+*/
+static pir_type
+get_expression_pirtype(expression * const expr) {
+    switch (expr->type) {
+        case EXPR_TARGET:
+            return expr->expr.t->info->type;
+        case EXPR_CONSTANT:
+            return expr->expr.c->type;
+        default:
+            PARROT_ASSERT(0); /* should never happen */
+            return UNKNOWN_TYPE;
+    }
+}
 /*
 
 =item C<static void
@@ -1901,6 +1921,8 @@ static void
 arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned num_arguments) {
     argument *argiter;
     int       array_index;
+    unsigned  i;
+    PMC      *signature_array;
 
     /* create a FixedIntegerArray object as first argument, which encodes
      * the number of arguments and their flags.
@@ -1909,97 +1931,39 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
     /* add the index (of the signature PMC) in the PBC constant table as operand */
     push_operand(lexer, expr_from_const(lexer, new_const(lexer, INT_TYPE, array_index)));
 
-    return; /* XXX just handle no-args calls/returns for now */
+    fprintf(stderr, "args2ops: %u arguments\n", num_arguments);
 
-
-{   /* XXXXXXXXX */
-
-    /* XXX in compilers/imcc/pcc.c there's a maximum number of 15 values;
-     * do the same here to Get Things To Work, but fix later.
-     */
-
-    int flags_arg[15];
-    int index         = 0;
-    int forindex      = 0;
-    int len;
-    char *flagsstring, *strwriter;
-
-    if (args == NULL) {
-        push_operand(lexer, expr_from_const(lexer, new_const(lexer, PMC_TYPE, "")));
+    /* no need to continue if there's no arguments */
+    if (num_arguments == 0)
         return;
-    }
-    else {
 
-        argiter = args;
-        do {
-            int flag = 0;
-            expression *argvalue;
+    /* retrieve the signature array PMC */
+    signature_array = get_pmc_const(lexer->bc, array_index);
 
-            argiter  = argiter->next;
-            argvalue = argiter->value;
-            /*
-            fprintf(stderr, "converting arg to operand %d\n", ++numargs);
-            */
+    fprintf(stderr, "signature array has size: %d\n",
+            VTABLE_get_integer(lexer->interp, signature_array));
 
 
-            switch (argvalue->type) {
-                case EXPR_TARGET:
-                    flag |= argvalue->expr.t->info->type;
-                    break;
-                case EXPR_CONSTANT:
-                    flag |= argvalue->expr.c->type;
-                    break;
-                default:
-                    yypirerror(lexer->yyscanner, lexer, "invalid expression type for argument");
-                    break;
-            }
-            /* store the flag for this argument */
-            flags_arg[index++] = flag;
-        }
-        while (argiter != args);
+    /* initialize the argument iterator for the loop */
+    argiter = args->next;
 
-        /* allocate space for each flag, + commas (index - 1) and 2 quotes */
-        strwriter = flagsstring = (char *)mem_sys_allocate((index + index - 1 + 2) * sizeof (char));
-        *strwriter++ = '"';
+    for (i = 0; i < num_arguments; ++i) {
+        int flag = 0;
+        /* calculate the right flags for the current argument */
+        SET_FLAG(flag, get_expression_pirtype(argiter->value));
 
-        while (forindex < index) {
-            sprintf(strwriter++, "%d", flags_arg[forindex]);
+        fprintf(stderr, "Setting flag %d on argument %u\n", flag, i);
 
-            if (forindex < index - 1) {
-                *strwriter++ = ',';
-            }
+        /* set the flags for this argument in the right position in the array */
+        VTABLE_set_integer_keyed_int(lexer->interp, signature_array, i, flag);
 
-            ++forindex;
-        }
-        /* write closing quote and NULL character */
-        *strwriter++ = '"';
-        *strwriter++ = '\0';
-
-        /*
-        fprintf(stderr, "args2operands: [%s]\n", flagsstring);
-        */
-
-        /* don't add it now, it will break tests. */
-        /*
-        push_operand(lexer, expr_from_const(lexer, new_const(lexer, STRING_TYPE, flagsstring)));
-        */
-
-
-        /* XXX Yes, this is a hacky attempt. Cleanups will follow. */
-    }
-
-
-    /* go over the arguments again, and add them as operands */
-    argiter = args;
-
-    do {
-        argiter = argiter->next;
-        /* how to handle named args? */
+        /* and add the current argument as an operand; operands are always expression nodes. */
         push_operand(lexer, argiter->value);
-    }
-    while (argiter != args);
 
-} /* XXXXXXXXX */
+        argiter = argiter->next;
+    }
+
+    fprintf(stderr, "args2ops done\n");
 
 }
 
@@ -2017,29 +1981,33 @@ C<targets> is NULL, an empty string is added as an operand.
 */
 static void
 targets_to_operands(lexer_state * const lexer, target * const targets, unsigned num_targets) {
-    target *iter;
+    target  *iter;
+    int      array_index;
+    PMC     *signature_array;
+    unsigned i;
 
-    int  array_index = generate_signature_pmc(lexer, num_targets);
+    array_index = generate_signature_pmc(lexer, num_targets);
     push_operand(lexer, expr_from_const(lexer, new_const(lexer, INT_TYPE, array_index)));
-    return; /* XXX just handle no-args calls/returns for now */
 
-
-{ /* XXXXXXXXX */
-
-    if (targets == NULL) {
-        push_operand(lexer, expr_from_const(lexer, new_const(lexer, PMC_TYPE, "")));
+    if (num_targets == 0)
         return;
-    }
 
-    iter = targets;
+    signature_array = get_pmc_const(lexer->bc, array_index);
 
-    do {
+    iter = targets->next;
+
+    for (i = 0; i < num_targets; ++i) {
+        int flag = 0;
+
+        SET_FLAG(flag, iter->info->type);
+
+        VTABLE_set_integer_keyed_int(lexer->interp, signature_array, i, flag);
+
+        push_operand(lexer, expr_from_const(lexer, new_const(lexer, INT_TYPE, iter->info->color)));
+
         iter = iter->next;
-        push_operand(lexer, expr_from_target(lexer, iter));
     }
-    while (iter != targets);
 
-}
 }
 
 
@@ -2068,7 +2036,8 @@ generate_unique_pir_reg(lexer_state * const lexer, pir_type type) {
 /*
 
 =item C<static void
-new_sub_instr(lexer_state * const lexer, int opcode, char * const opname)>
+new_sub_instr(lexer_state * const lexer, int opcode, char const * const opname,
+              unsigned num_var_args)>
 
 Create a new instruction node, and initialize the opcode and opinfo on that
 node. This function can be used to create an instruction of which the signature
@@ -2076,22 +2045,28 @@ is known beforehand, without the need to compute the signature during runtime.
 This is useful for generating special subroutine instructions, such as
 C<get_params_pc> etc.
 
+The parameter C<num_var_args> passes the number of variable arguments (if any)
+that C<opcode> has.
+
 =cut
 
 */
 static void
-new_sub_instr(lexer_state * const lexer, int opcode, char const * const opname, ...) {
+new_sub_instr(lexer_state * const lexer, int opcode, char const * const opname,
+              unsigned num_var_args)
+
+{
     new_statement(lexer, opname);
     CURRENT_INSTRUCTION(lexer)->opinfo = &lexer->interp->op_info_table[opcode];
     CURRENT_INSTRUCTION(lexer)->opcode = opcode;
 
-    /* XXX how to calculate size of var-arg ops? that's 1 for the op,
-    1 for the fixed integer array, and n for the variable number of arguments.
-    So, 2 + n, where n is the number of arguments.
-    */
+    /* The size of a var-arg op (get_params, etc.) is 1 for the op,
+     * 1 for the fixed integer array, and n for the variable number of arguments.
+     * So, 2 + n, where n is the number of arguments.
+     */
 
     /* count number of ints needed to store this instruction in bytecode */
-    lexer->codesize += CURRENT_INSTRUCTION(lexer)->opinfo->op_count /* + "number of args" */;
+    lexer->codesize += CURRENT_INSTRUCTION(lexer)->opinfo->op_count + num_var_args;
 }
 
 /*
@@ -2129,7 +2104,8 @@ update_op(NOTNULL(lexer_state * const lexer), NOTNULL(instruction * const instr)
 /*
 
 =item C<static void
-save_global_reference(lexer_state * const lexer, instruction *instr, char * const label)>
+save_global_reference(lexer_state * const lexer, instruction * const instr,
+                      char const * const label)>
 
 Store the instruction C<instr>, which references the global label C<label> in a list.
 After the parse phase, this instruction can be patched, if C<label> can be resolved
@@ -2139,7 +2115,10 @@ during compile time.
 
 */
 static void
-save_global_reference(lexer_state * const lexer, instruction * const instr, char const * const label) {
+save_global_reference(lexer_state * const lexer, instruction * const instr,
+                      char const * const label)
+
+{
     global_fixup *ref = pir_mem_allocate_zeroed_typed(lexer, global_fixup);
 
     ref->instr = instr;
@@ -2176,10 +2155,10 @@ For "foo"() and foo():
 */
 static void
 convert_pcc_call(lexer_state * const lexer, invocation * const inv) {
-    new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc");
+    new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc", inv->num_arguments);
     arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
 
-    new_sub_instr(lexer, PARROT_OP_get_results_pc, "get_results_pc");
+    new_sub_instr(lexer, PARROT_OP_get_results_pc, "get_results_pc", inv->num_results);
     targets_to_operands(lexer, inv->results, inv->num_results);
 
     /* if the target is a register, invoke that. */
@@ -2187,11 +2166,11 @@ convert_pcc_call(lexer_state * const lexer, invocation * const inv) {
         target *sub = new_reg(lexer, PMC_TYPE, inv->sub->info->color);
 
         if (inv->retcc) { /* return continuation present? */
-            new_sub_instr(lexer, PARROT_OP_invoke_p_p, "invoke_p_p");
+            new_sub_instr(lexer, PARROT_OP_invoke_p_p, "invoke_p_p", 0);
             add_operands(lexer, "%T%T", inv->sub, inv->retcc);
         }
         else {
-            new_sub_instr(lexer, PARROT_OP_invokecc_p, "invokecc_p");
+            new_sub_instr(lexer, PARROT_OP_invokecc_p, "invokecc_p", 0);
             add_operands(lexer, "%T", sub);
         }
     }
@@ -2200,11 +2179,11 @@ convert_pcc_call(lexer_state * const lexer, invocation * const inv) {
         global_label *glob = find_global_label(lexer, inv->sub->info->id.name);
 
         if (glob) {
-            new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc");
+            new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc", 0);
             add_operands(lexer, "%T%i", sub, glob->const_table_index);
         }
         else { /* find it during runtime (hopefully, otherwise exception) */
-            new_sub_instr(lexer, PARROT_OP_find_sub_not_null_p_sc, "find_sub_not_null_p_sc");
+            new_sub_instr(lexer, PARROT_OP_find_sub_not_null_p_sc, "find_sub_not_null_p_sc", 0);
 
             add_operands(lexer, "%T%s", sub, inv->sub->info->id.name);
 
@@ -2225,7 +2204,7 @@ convert_pcc_call(lexer_state * const lexer, invocation * const inv) {
             save_global_reference(lexer, CURRENT_INSTRUCTION(lexer), inv->sub->info->id.name);
         }
 
-        new_sub_instr(lexer, PARROT_OP_invokecc_p, "invokecc_p");
+        new_sub_instr(lexer, PARROT_OP_invokecc_p, "invokecc_p", 0);
         add_operands(lexer, "%T", sub);
 
     }
@@ -2247,9 +2226,9 @@ Conventions (PCC). The sequence of instructions is:
 */
 static void
 convert_pcc_return(lexer_state * const lexer, invocation * const inv) {
-    new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc");
+    new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc", inv->num_arguments);
     arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
-    new_sub_instr(lexer, PARROT_OP_returncc, "returncc");
+    new_sub_instr(lexer, PARROT_OP_returncc, "returncc", 0);
 }
 
 /*
@@ -2288,10 +2267,10 @@ The sequence of instructions is:
 */
 static void
 convert_pcc_yield(lexer_state * const lexer, invocation * const inv) {
-    new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc");
+    new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc", inv->num_arguments);
     arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
 
-    new_sub_instr(lexer, PARROT_OP_yield, "yield");
+    new_sub_instr(lexer, PARROT_OP_yield, "yield", 0);
 }
 
 /*
@@ -2310,10 +2289,10 @@ The sequence of instructions is:
 */
 static void
 convert_pcc_tailcall(lexer_state * const lexer, invocation * const inv) {
-    new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc");
+    new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc", inv->num_arguments);
     arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
 
-    new_sub_instr(lexer, PARROT_OP_tailcall_p, "tailcall_pc");
+    new_sub_instr(lexer, PARROT_OP_tailcall_p, "tailcall_pc", 0);
 }
 
 /*
@@ -2333,15 +2312,15 @@ The sequence of instructions is:
 */
 static void
 convert_pcc_methodcall(lexer_state * const lexer, invocation * const inv) {
-    new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc");
+    new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc", inv->num_arguments);
     arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
     /* in a methodcall, the invocant object is passed as the first argument */
     unshift_operand(lexer, expr_from_target(lexer, inv->sub));
 
-    new_sub_instr(lexer, PARROT_OP_get_results_pc, "get_results_pc");
+    new_sub_instr(lexer, PARROT_OP_get_results_pc, "get_results_pc", inv->num_results);
     targets_to_operands(lexer, inv->results, inv->num_results);
 
-    new_sub_instr(lexer, PARROT_OP_callmethodcc_p_sc, "callmethodcc_p_sc");
+    new_sub_instr(lexer, PARROT_OP_callmethodcc_p_sc, "callmethodcc_p_sc", 0);
     add_operands(lexer, "%T%E", inv->sub, inv->method);
 }
 
@@ -2361,14 +2340,14 @@ The sequence of instructions is:
 */
 static void
 convert_pcc_methodtailcall(lexer_state * const lexer, invocation * const inv) {
-    new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc");
+    new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc", inv->num_arguments);
     arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
 
     /* check out the type of the method expression; it may be a PMC or a STRING. */
     if (inv->method->type == EXPR_TARGET)
-        new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_p, "tailcallmethod_p_p");
+        new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_p, "tailcallmethod_p_p", 0);
     else if (inv->method->type == EXPR_CONSTANT)
-        new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_p, "tailcallmethod_p_sc");
+        new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_p, "tailcallmethod_p_sc", 0);
     else
         panic(lexer, "unknown expression type in tailcallmethod instruction");
 
@@ -2582,14 +2561,14 @@ emit_sub_epilogue(lexer_state * const lexer) {
      *    returncc
      */
     if (TEST_FLAG(lexer->subs->flags, SUB_FLAG_MAIN))
-        new_sub_instr(lexer, PARROT_OP_end, "end");
+        new_sub_instr(lexer, PARROT_OP_end, "end", 0);
     else {
         /* default sub epilogue; no return values, hence 0 */
         int array_index = generate_signature_pmc(lexer, 0);
-        new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc");
+        new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc", 0);
         push_operand(lexer, expr_from_const(lexer, new_const(lexer, INT_TYPE, array_index)));
 
-        new_sub_instr(lexer, PARROT_OP_returncc, "returncc");
+        new_sub_instr(lexer, PARROT_OP_returncc, "returncc", 0);
     }
 }
 
