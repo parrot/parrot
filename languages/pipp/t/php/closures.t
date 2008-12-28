@@ -20,7 +20,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 5;
 
 =for perl6
 
@@ -84,4 +84,43 @@ $anon_three_args('one', 'two', 'three');
 ?>
 CODE
 'one', 'two', 'three' was passed to anon_three_args().
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'create an anonymous sub' );
+<?php
+
+function generator () {
+
+    $anon_no_arg = function ()  {
+        echo "anon_no_arg() was called.\n";
+    };
+}
+
+$sub = generator();
+
+$sub();
+
+?>
+CODE
+anon_no_arg() was called.
+OUT
+
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'create an anonymous sub with two args' );
+<?php
+
+function generator () {
+
+    $anon_no_arg = function ($arg_1, $arg_2)  {
+        echo "'$arg_1', '$arg_2' was passed to anon_two_args().\n";
+    };
+}
+
+$sub = generator();
+
+$sub('one', 'two');
+
+?>
+CODE
+'one', 'two' was passed to anon_two_args().
 OUT
