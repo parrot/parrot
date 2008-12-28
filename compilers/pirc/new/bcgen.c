@@ -419,9 +419,12 @@ C<type_count> indicates the number of types in the list.
 static PMC *
 generate_multi_signature(bytecode * const bc, struct key * const multi_types, unsigned type_count) {
     unsigned i;
+    /* create a FixedPMCArray to store all multi types */
     PMC * const multi_signature = pmc_new(bc->interp, enum_class_FixedPMCArray);
+    /* set its size as specified in type_count */
     VTABLE_set_integer_native(bc->interp, multi_signature, type_count);
 
+    /* add all multi types to the PMC array */
     for (i = 0; i < type_count; ++i) {
 
 
@@ -429,6 +432,18 @@ generate_multi_signature(bytecode * const bc, struct key * const multi_types, un
     return multi_signature;
 }
 
+/*
+
+=item C<static PMC *
+create_lexinfo()>
+
+Create a lexinfo PMC for the sub C<sub>. If there are no lexicals,
+but the C<:lex> flag was specified, or the sub has an C<:outer> flag,
+then a lexinfo is created after all. The created lexinfo is returned.
+
+=cut
+
+*/
 static PMC *
 create_lexinfo(bytecode * const bc, PMC * sub, int lexflag) {
 
@@ -439,16 +454,20 @@ create_lexinfo(bytecode * const bc, PMC * sub, int lexflag) {
 
     PMC * lex_info = pmc_new_noinit(bc->interp, lex_info_id);
 
+    STRING * const declare_method = string_from_literal(bc->interp, "declare_lex_preg");
+
     VTABLE_init_pmc(bc->interp, lex_info, sub);
 
 /* for ... { */
-    Parrot_PCCINVOKE(bc->interp, lex_info,
-                            string_from_literal(bc->interp, "declare_lex_preg"),
-                            "SI->", lex_name, 0 /* color */);
+    Parrot_PCCINVOKE(bc->interp, lex_info, declare_method, "SI->", lex_name, 0 /* color */);
 
 
 /* ... } */
 
+    /* if lex_info is still NULL, that means that the sub has no .lexicals,
+     * and doesn't need a lex_info. If the sub has an :outer or a :lex flag,
+     * then create the lex_info anyway.
+     */
     if (lex_info == NULL && (outer || lexflag)) {
         lex_info = pmc_new_noinit(bc->interp, lex_info_id);
         VTABLE_init_pmc(bc->interp, lex_info, sub);
