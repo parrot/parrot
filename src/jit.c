@@ -366,7 +366,7 @@ set_register_usage(PARROT_INTERP,
                     else if (flags & KEY_string_FLAG)
                         typ = 2;
 
-                    if ( ( n < NUM_REGISTERS ) && !ru[typ].reg_count[n]++)
+                    if (n < NUM_REGISTERS && !ru[typ].reg_count[n]++)
                         ru[typ].reg_dir[n] |= PARROT_ARGDIR_IN;
                 }
                 key = key_next(interp, key);
