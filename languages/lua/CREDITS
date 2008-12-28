@@ -10,6 +10,13 @@ D: fix SVN properties
 N: Allison Randal
 U: allison
 D: Update Lua to use keyed classnames for TGE.
+D: in ppd25cx branch
+D: in ppd17pmc branch
+
+N: Andrew Whitworth
+U: Whiteknight
+D: updating to use ".namespace []" as per rt#48549
+D: updating function and macro names to satisfy pdd09 deprecation notes. rt#55364
 
 N: Andy Lester
 U: petdance
@@ -26,6 +33,7 @@ D: Rename Parrot::Test::generate_code() to the more appropriate write_code_to_fi
 D: fix SVN properties
 
 N: Bob Rogers
+U: rgrjr
 D: co-routine support
 
 N: Christoph Otto
@@ -43,9 +51,16 @@ D: Cleaned up Lua* PMC.
 D: Added TODO to Parrot::Test::Lua so that Lua can have TODO tests.
 D: Changed CONTEXT(interp->ctx) to CONTEXT(interp), see RT#41881
 D: fix SVN properties
+D: in ppd25cx branch
+D: in ppd17pmc branch
 
 N: James E Keenan
+U: jkeenan
 D: fix coding standard
+
+N: Jérome Quelin
+U: jquelin
+D: find_type removal (in ppd15oo branch)
 
 N: Jerry Gay
 U: particle
@@ -111,10 +126,6 @@ N: Stephen Weeks
 U: tene
 D: Remove the second argument passed to exception handlers
 
-U: Whiteknight
-D: updating to use ".namespace []" as per rt#48549
-D: updating function and macro names to satisfy pdd09 deprecation notes. rt#55364
-
 N: Will "Coke" Coleda
 U: coke
 D: #39217 - copyright cleanup
@@ -125,4 +136,5 @@ D: fix coding standards
 D: MACOSX_DEPLOYMENT_TARGET
 D: remove deprecated getclass opcode (RT#47942)
 D: bare method names are [DEPRECATED]
+D: Update all usages of ".const .foo" to ".const 'foo'" (in branch type_ids)
 
