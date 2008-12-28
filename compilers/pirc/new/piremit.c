@@ -29,6 +29,20 @@ the appropriate emit functions are used. Options are:
 
 */
 
+static char const * const subflag_names[] = {
+    "method",
+    "init",
+    "load",
+    "outer",
+    "main",
+    "anon",
+    "postcomp",
+    "immediate",
+    "vtable",
+    "lex",
+    "multi",
+    "lexid"
+};
 
 #define out stdout
 
@@ -44,16 +58,16 @@ static void emit_pir_instruction(lexer_state * const lexer, instruction * const 
 /* prototype declaration */
 void print_expr(lexer_state * const lexer, expression * const expr);
 void print_key(lexer_state * const lexer, key *k);
-void print_target(lexer_state *lexer, target * const t);
+void print_target(lexer_state * const lexer, target * const t);
 void print_constant(lexer_state * const lexer, constant * const c);
 void print_expressions(lexer_state * const lexer, expression * const expr);
-void print_instruction(lexer_state * const lexer, instruction *ins);
+void print_instruction(lexer_state * const lexer, instruction * const ins);
 void print_statement(lexer_state * const lexer, subroutine * const sub);
 
 /*
 
 =item C<void
-print_key(key *k)>
+print_key(lexer_state * const lexer, key *k)>
 
 Print the key C<k>. The total key is enclosed in square brackets,
 and different key elements are separated by semicolons. Example:
@@ -84,7 +98,7 @@ print_key(lexer_state * const lexer, key *k) {
 /*
 
 =item C<void
-print_target(target * const t)>
+print_target(lexer_state * const lexer, target * const t)>
 
 Print the target C<t>; if C<t> has a key, that key is
 printed as well. Examples:
@@ -95,7 +109,7 @@ printed as well. Examples:
 
 */
 void
-print_target(lexer_state *lexer, target * const t) {
+print_target(lexer_state * const lexer, target * const t) {
     fprintf(out, "%c%d", pir_register_types[t->info->type], t->info->color);
 
     /* if the target has a key, print that too */
@@ -106,7 +120,7 @@ print_target(lexer_state *lexer, target * const t) {
 /*
 
 =item C<void
-print_constant(constant *c)>
+print_constant(lexer_state * const lexer, constant * const c)>
 
 Print the value of constant C<c>.
 
@@ -193,9 +207,16 @@ print_expressions(lexer_state * const lexer, expression * const expr) {
     }
 }
 
+/*
 
+=item C<void
+print_instruction(lexer_state * const lexer, instruction * const ins)>
+
+=cut
+
+*/
 void
-print_instruction(lexer_state * const lexer, instruction *ins) {
+print_instruction(lexer_state * const lexer, instruction * const ins) {
     PARROT_ASSERT(ins != NULL);
 
     if (ins->label) {
@@ -225,6 +246,16 @@ print_instruction(lexer_state * const lexer, instruction *ins) {
     }
 }
 
+/*
+
+=item C<void
+print_statement(lexer_state * const lexer, subroutine * const sub)>
+
+XXX
+
+=cut
+
+*/
 void
 print_statement(lexer_state * const lexer, subroutine * const sub) {
     if (sub->statements != NULL) {
@@ -239,29 +270,12 @@ print_statement(lexer_state * const lexer, subroutine * const sub) {
 
 }
 
-
-static char const * const subflag_names[] = {
-    "method",
-    "init",
-    "load",
-    "outer",
-    "main",
-    "anon",
-    "postcomp",
-    "immediate",
-    "vtable",
-    "lex",
-    "multi",
-    "lexid"
-};
-
-
-
-
 /*
 
 =item C<void
 print_subs(struct lexer_state * const lexer)>
+
+XXX
 
 =cut
 
@@ -307,21 +321,37 @@ print_subs(struct lexer_state * const lexer) {
     }
 }
 
+/*
 
+=item C<static void
+emit_pir_instruction(lexer_state * const lexer, instruction * const instr)>
+
+Print the PIR representation of C<instr>.
+
+=cut
+
+*/
 static void
 emit_pir_instruction(lexer_state * const lexer, instruction * const instr) {
 
     if (instr->label)
         fprintf(out, "  %s:\n", instr->label);
+
     if (instr->opinfo) {
-        fprintf(out, "    %-10s\t", instr->opinfo->name);   /* set_p_pc became 'chopn'... XXX!!! */
-
+        fprintf(out, "    %-10s\t", instr->opinfo->name);
         print_expressions(lexer, instr->operands);
-
         fprintf(out, "\n");
     }
 }
 
+/*
+
+=item C<static void
+emit_pir_statement(lexer_state * const lexer, subroutine * const sub)>
+
+=cut
+
+*/
 static void
 emit_pir_statement(lexer_state * const lexer, subroutine * const sub) {
     if (sub->statements != NULL) {
@@ -335,6 +365,17 @@ emit_pir_statement(lexer_state * const lexer, subroutine * const sub) {
     }
 }
 
+/*
+
+=item C<void
+emit_pir_subs(lexer_state * const lexer)>
+
+Print the PIR representation of all subroutines stored
+in the C<lexer>.
+
+=cut
+
+*/
 void
 emit_pir_subs(lexer_state * const lexer) {
     if (lexer->subs != NULL) {
@@ -551,8 +592,8 @@ emit_pbc_sub(lexer_state * const lexer, subroutine * const sub) {
 =item C<void
 emit_pbc(lexer_state * const lexer)>
 
-Generate Parrot Byte Code from the abstract syntax tree. This is the top-level
-function.
+Generate Parrot Byte Code from the abstract syntax tree.
+This is the top-level function.
 
 =cut
 

@@ -23,7 +23,7 @@ main:
     set S0, "hi"
     set I0, 42
     set N0, 3.140000
-    set_returns
+    set_returns 1
     returncc
 OUTPUT
 
@@ -45,7 +45,7 @@ main:
 X:
 Y:
 Z:
-    set_returns
+    set_returns 1
     returncc
 OUTPUT
 
@@ -67,7 +67,7 @@ int:
     lt I1, I0, 4
 goto:
 L:
-    set_returns
+    set_returns 1
     returncc
 OUTPUT
 
@@ -80,11 +80,11 @@ pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "sub call not in this compilation unit");
 CODE
 .namespace []
 main:
-    set_args ""
-    get_results ""
+    set_args 1
+    get_results 2
     find_sub_not_null P0, "foo"
     invokecc P0
-    set_returns
+    set_returns 3
     returncc
 OUTPUT
 
@@ -99,15 +99,15 @@ pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "sub call in this compilation unit");
 CODE
 .namespace []
 main:
-    set_args ""
-    get_results ""
-    set P0, 0
+    set_args 1
+    get_results 2
+    set P0, 10
     invokecc P0
-    set_returns
+    set_returns 3
     returncc
 .namespace []
 foo:
-    set_returns
+    set_returns 7
     returncc
 OUTPUT
 

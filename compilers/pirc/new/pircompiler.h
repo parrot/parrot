@@ -99,7 +99,7 @@ typedef struct lexer_state {
     target        *curtarget;      /* access to current target node being parsed, if any */
     argument      *curarg;         /* access to current argument node being parsed, if any */
 
-    int            curregister[4]; /* for register allocation */
+    int            curregister[NUM_PARROT_TYPES]; /* for register allocation */
     int            pir_reg_generator; /* for unique PIR register allocator, for temp. PIR regs. */
 
     unsigned       stmt_counter;   /* to count "logical" statements, even if multi-line. */

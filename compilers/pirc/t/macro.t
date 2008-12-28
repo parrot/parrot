@@ -17,7 +17,7 @@ CODE
 .namespace []
 main:
     print "hello"
-    set_returns
+    set_returns 1
     returncc
 OUTPUT
 
@@ -38,7 +38,7 @@ CODE
 main:
     say 42
     say "hi"
-    set_returns
+    set_returns 1
     returncc
 OUTPUT
 

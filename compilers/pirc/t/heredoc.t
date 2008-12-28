@@ -29,11 +29,11 @@ HI
 CODE
 .namespace []
 main:
-    set_args "\nthis is a simple single-line heredoc.\n", "\nthis is a simple\nmulti\nline\nheredoc\n.\n", "\nand yet another\nmulti\nline\nheredoc\nstring.\n"
-    get_results ""
+    set_args 1
+    get_results 2
     find_sub_not_null P0, "foo"
     invokecc P0
-    set_returns
+    set_returns 3
     returncc
 OUTPUT
 
@@ -54,9 +54,9 @@ CODE
 .namespace []
 foo:
     get_params
-    set_returns "\n This is some text returned through .yield!\n\n"
+    set_returns 1
     yield
-    set_returns "\n Some text returned through return\n"
+    set_returns 2
     returncc
 OUTPUT
 
@@ -75,7 +75,7 @@ CODE
 main:
     set S0, "\nthis is a simple assigned heredoc string to $S0.\n"
     set S1, "\nthis is a simple assigned heredoc string to string s.\n"
-    set_returns
+    set_returns 1
     returncc
 OUTPUT
 
