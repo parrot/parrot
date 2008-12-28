@@ -1618,7 +1618,7 @@ long_argument        : ".set_arg" short_arg "\n"
                             { $$ = $2; }
                      ;
 
-long_invocation      : ".call" pmc_object opt_ret_cont
+long_invocation      : ".call" sub opt_ret_cont
                            { $$ = invoke(lexer, CALL_PCC, $2, $3); }
                      | ".nci_call" pmc_object
                            { $$ = invoke(lexer, CALL_NCI, $2); }
