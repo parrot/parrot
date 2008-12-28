@@ -1929,7 +1929,7 @@ generate_signature_pmc(lexer_state * const lexer, unsigned size) {
 /*
 
 =item C<static int
-calculate_argument_flags(argument * const arg)>
+calculate_pcc_argument_flags(argument * const arg)>
 
 Calculate the Parrot Calling Conventions flags for the
 argument C<arg>. An int encoding the flags is returned.
@@ -1938,7 +1938,7 @@ argument C<arg>. An int encoding the flags is returned.
 
 */
 static int
-calculate_argument_flags(argument * const arg) {
+calculate_pcc_argument_flags(argument * const arg) {
     int flag = 0;
 
     switch (arg->value->type) {
@@ -1963,6 +1963,41 @@ calculate_argument_flags(argument * const arg) {
     /* if the argument has a :named flag, copy that */
     if (TEST_FLAG(arg->flags, ARG_FLAG_NAMED))
         SET_FLAG(flag, PARROT_ARG_NAME);
+
+    return flag;
+}
+
+
+/*
+
+=item C<static int
+calculate_pcc_target_flags(target * const result)>
+
+Calculate Parrot Calling Conventions flags for the target node
+C<result>.
+
+=cut
+
+*/
+static int
+calculate_pcc_target_flags(target * const result) {
+    int flag = 0;
+
+
+    SET_FLAG(flag, result->info->type);
+
+    if (TEST_FLAG(result->flags, TARGET_FLAG_SLURPY))
+        SET_FLAG(flag, PARROT_ARG_SLURPY_ARRAY);
+
+    if (TEST_FLAG(result->flags, TARGET_FLAG_NAMED))
+        SET_FLAG(flag, PARROT_ARG_NAME);
+
+    if (TEST_FLAG(result->flags, TARGET_FLAG_OPT_FLAG))
+        SET_FLAG(flag, PARROT_ARG_OPT_FLAG);
+
+    if (TEST_FLAG(result->flags, TARGET_FLAG_OPTIONAL))
+        SET_FLAG(flag, PARROT_ARG_OPTIONAL);
+
 
     return flag;
 }
@@ -2007,7 +2042,7 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
     argiter = args->next;
 
     for (i = 0; i < num_arguments; ++i) {
-        int flag = calculate_argument_flags(argiter);
+        int flag = calculate_pcc_argument_flags(argiter);
 
         /* set the flags for this argument in the right position in the array */
         VTABLE_set_integer_keyed_int(lexer->interp, signature_array, i, flag);
@@ -2056,10 +2091,7 @@ targets_to_operands(lexer_state * const lexer, target * const targets, unsigned 
     iter = targets->next;
 
     for (i = 0; i < num_targets; ++i) {
-        int flag = 0;
-
-        /* calculate the flags for the current target node */
-        SET_FLAG(flag, iter->info->type);
+        int flag = calculate_pcc_target_flags(iter);
 
         /* store the flag at position i in the array */
         VTABLE_set_integer_keyed_int(lexer->interp, signature_array, i, flag);
@@ -2067,8 +2099,8 @@ targets_to_operands(lexer_state * const lexer, target * const targets, unsigned 
         /* add the current target as an operand; these targets have already
          * got an assigned register, so we're emitting that register number.
          */
-
         PARROT_ASSERT(iter->info->color != NO_REG_ALLOCATED);
+
         push_operand(lexer, expr_from_int(lexer, iter->info->color));
 
         /* go to next target in list */
