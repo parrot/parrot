@@ -394,10 +394,14 @@ rule term {
 
 # declarations
 rule closure {
-    'function' <param_list>
+    'function' <bind_list>? <param_list> 
     {*}                                     #= open
     '{' <statement_list> '}'
     {*}                                     #= close
+}
+
+rule bind_list {
+    'use' '(' [ '&'? <VAR_NAME> [',' '&'? <VAR_NAME>]* ]? ')'
 }
 
 rule function_definition {

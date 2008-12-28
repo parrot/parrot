@@ -517,7 +517,15 @@ method closure($/, $key) {
 
     if $key eq 'open' {
         # note that $<param_list> creates a new PAST::Block.
-        @?BLOCK.unshift( $( $<param_list> ) );
+        my $block := $( $<param_list> );
+
+        # declare the bound vars a lexical
+        if +$<bind_list> == 1 {
+            for $<bind_list>[0]<VAR_NAME> {
+                $block.symbol( ~$_, :scope('lexical') ); 
+            }
+        }
+        @?BLOCK.unshift( $block );
     }
     else {
         my $block := @?BLOCK.shift();
