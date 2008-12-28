@@ -245,6 +245,8 @@ typedef struct invocation {
     target             *retcc;         /* return continuation, if any */
     target             *results;       /* targets that will receive return values */
     argument           *arguments;     /* values passed into the sub, or return values */
+    unsigned            num_results;   /* number of result target nodes */
+    unsigned            num_arguments; /* number of argument nodes */
 
 } invocation;
 
