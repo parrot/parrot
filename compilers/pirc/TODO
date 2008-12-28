@@ -7,25 +7,30 @@ PIR compiler, IMCC.
 
 Fairly randomly sorted, the tasks are:
 
-1.  Emit the actual bytecodes into a PackFile/codesegment.
+[DONE] 1.  Emit the actual bytecodes into a PackFile/codesegment.
 
-2.  Create a PMC constant for strings, numbers, keys and
-    subroutines.
+[DONE] 2.a Create a PMC constant for strings, numbers and
+             subroutines.
+[TODO] 2.b Create a PMC constant for keys
 
-3.  Complete PASM output, so it can actually be parsed and run.
+[TODO] 3.  Complete PASM output, so it can actually be parsed and run.
 
-4.  Handle :multi flag properly.
+[TODO] 4.  Handle :multi flag properly.
 
-5.  Handle nested macro expansions.
+[TODO] 5.  Handle nested macro expansions.
 
-6.  Fix all memory leaks. this should be trivial, given PIR's built-in
-    allocated-memory-pointer-registering infrastructure. In some
-    places this is not used yet, and in others, it's not necessary
-    to use it (but in those mem_sys_free() must be called explicitly).
+[TODO] 6.  Fix all memory leaks. this should be trivial, given PIR's built-in
+           allocated-memory-pointer-registering infrastructure. In some
+           places this is not used yet, and in others, it's not necessary
+           to use it (but in those mem_sys_free() must be called explicitly).
 
-7.  Figure out how :named argument passing works in bytecode.
+[TODO] 7.  Figure out how :named argument passing works in bytecode.
 
-8.  Finish the parrot calling conventions ops in the back-end
-    (var.args must be fixed).
+[DONE] 8.  Finish the parrot calling conventions ops in the back-end
+           (var.args must be fixed).
+
+[TODO] 9.  Handle :slurpy and :flat flags properly in bytecode.
+
+[TODO] 10. Handle indexed assignments in bytecode.
 
 More tasks will be added as I think of them. --kjs
