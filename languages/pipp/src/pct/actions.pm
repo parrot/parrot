@@ -161,6 +161,13 @@ method expression_statement($/) {
     make $( $<expression> );
 }
 
+method closure_call($/) {
+    my $past := $( $<arguments> );
+    $past.push( $( $<var> ) );
+
+    make $past;
+}
+
 method function_call($/) {
     my $past := $( $<arguments> );
     $past.name( ~$<FUNCTION_NAME> );
@@ -503,6 +510,23 @@ method NUMBER($/) {
              :returns('PhpFloat'),
              :node($/)
          );
+}
+
+method closure($/, $key) {
+    our @?BLOCK; # A stack of PAST::Block
+
+    if $key eq 'open' {
+        # note that $<param_list> creates a new PAST::Block.
+        @?BLOCK.unshift( $( $<param_list> ) );
+    }
+    else {
+        my $block := @?BLOCK.shift();
+
+        $block.control('return_pir');
+        $block.push( $( $<statement_list> ) );
+
+        make $block;
+    }
 }
 
 method function_definition($/, $key) {

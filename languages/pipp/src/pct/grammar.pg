@@ -268,6 +268,11 @@ rule method_call {
     {*}
 }
 
+rule closure_call {
+    <var> '(' <arguments> ')'
+    {*}
+}
+
 rule function_call {
     <FUNCTION_NAME> '(' <arguments> ')'
     {*}
@@ -372,11 +377,13 @@ rule literal {
 }
 
 rule term {
-      <method_call>            {*}   #= method_call
+    | <method_call>            {*}   #= method_call
+    | <closure>                {*}   #= closure
+    | <closure_call>           {*}   #= closure_call
     | <function_call>          {*}   #= function_call
     | <instantiate_array>      {*}   #= instantiate_array
     | <constructor_call>       {*}   #= constructor_call
-    | '(' <expression> {*} ')'       #= expression
+    | '(' <expression> ')'     {*}   #= expression
     | <literal>                {*}   #= literal
     | <class_constant>         {*}   #= class_constant
     | <constant>               {*}   #= constant
@@ -386,6 +393,13 @@ rule term {
 
 
 # declarations
+rule closure {
+    'function' <param_list>
+    {*}                                     #= open
+    '{' <statement_list> '}'
+    {*}                                     #= close
+}
+
 rule function_definition {
     'function' <FUNCTION_NAME> <param_list>
     {*}                                     #= open
