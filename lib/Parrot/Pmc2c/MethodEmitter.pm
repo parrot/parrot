@@ -24,8 +24,6 @@ package Parrot::Pmc2c::Method;
 use strict;
 use warnings;
 use Parrot::Pmc2c::Emitter ();
-use Parrot::Pmc2c::UtilFunctions
-    qw( gen_ret dont_edit count_newlines dynext_load_code c_code_coda );
 use Parrot::Pmc2c::PCCMETHOD ();
 
 =item C<generate_body($pmc)>

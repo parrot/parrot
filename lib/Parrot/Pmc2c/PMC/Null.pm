@@ -11,7 +11,6 @@ package Parrot::Pmc2c::PMC::Null;
 use base 'Parrot::Pmc2c::PMC';
 use strict;
 use warnings;
-use Parrot::Pmc2c::UtilFunctions qw( gen_ret );
 
 =item C<pre_method_gen($method, $line, $out_name)>
 
