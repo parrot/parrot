@@ -51,7 +51,7 @@ undefined values) is undefined, and may be rather funky.
     conf_file = interpinfo .INTERPINFO_RUNTIME_PREFIX
     conf_file .= "/runtime/parrot/include/config.fpmc"
 
-    open CONF, conf_file, "<"
+    open CONF, conf_file, 'r'
     $I0 = defined CONF
     if $I0 goto ok1
     printerr "Can't read '"

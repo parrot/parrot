@@ -47,7 +47,7 @@ Warning! With -install there must be no directory prefix in the first arg yet.
 
   open_outfile:
     .local pmc outfh
-    outfh = open cfile, '>'
+    outfh = open cfile, 'w'
     if outfh goto args_handled
     die "infile not specified"
 
@@ -142,7 +142,7 @@ proper_args:
     .param string infile
 
     .local pmc infh
-               infh = open infile, '<'
+               infh = open infile, 'r'
 
     if infh goto file_open
     die "cannot open infile"
