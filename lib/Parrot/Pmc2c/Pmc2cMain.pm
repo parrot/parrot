@@ -9,7 +9,7 @@ use Parrot::PMC ();
 use Parrot::Pmc2c::VTable ();
 use Parrot::Pmc2c::Dumper;
 use Parrot::Pmc2c::Library ();
-use Parrot::Pmc2c::UtilFunctions qw( slurp spew filename );
+use Parrot::Pmc2c::UtilFunctions qw( filename );
 use Parrot::Pmc2c::PCCMETHOD ();
 use Parrot::Pmc2c::PMC::default ();
 use Parrot::Pmc2c::PMC::delegate ();
