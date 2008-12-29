@@ -124,7 +124,7 @@ Thus, set the :outer() argument to the current subroutine.
 void
 set_sub_outer(lexer_state * const lexer, char const * const outersub) {
     CURRENT_SUB(lexer)->outer_sub = outersub;
-    SET_FLAG(lexer->subs->flags, SUB_FLAG_OUTER);
+    SET_FLAG(lexer->subs->flags, PIRC_SUB_FLAG_HAS_OUTER);
 }
 
 
@@ -208,7 +208,7 @@ set_sub_vtable(lexer_state * const lexer, char const * vtablename) {
                    "'%s' is not a vtable method but was used with :vtable flag", vtablename);
     else {
         CURRENT_SUB(lexer)->info.vtable_index = vtable_index;
-        SET_FLAG(lexer->subs->flags, SUB_FLAG_VTABLE);
+        SET_FLAG(lexer->subs->flags, PIRC_SUB_FLAG_VTABLE);
     }
 }
 
@@ -225,7 +225,7 @@ Set the name specified in the :subid flag on the sub.
 void
 set_sub_subid(lexer_state * const lexer, char const * const subid) {
     CURRENT_SUB(lexer)->info.subid = subid;
-    SET_FLAG(lexer->subs->flags, SUB_FLAG_SUBID);
+    SET_FLAG(lexer->subs->flags, PIRC_SUB_FLAG_SUBID);
 }
 
 /*
@@ -246,7 +246,7 @@ set_sub_methodname(lexer_state * const lexer, char const * const methodname) {
     else /* :method without a value defaults to the subname. */
         CURRENT_SUB(lexer)->methodname = CURRENT_SUB(lexer)->info.subname;
 
-    SET_FLAG(lexer->subs->flags, SUB_FLAG_METHOD);
+    SET_FLAG(lexer->subs->flags, PIRC_SUB_FLAG_METHOD);
 }
 
 /*
@@ -299,7 +299,7 @@ set_sub_flag(lexer_state * const lexer, sub_flag flag) {
     SET_FLAG(CURRENT_SUB(lexer)->flags, flag);
 
     /* if the sub is a method or a :vtable method, then also add a "self" parameter */
-    if (TEST_FLAG(flag, (SUB_FLAG_VTABLE | SUB_FLAG_METHOD)))
+    if (TEST_FLAG(flag, (PIRC_SUB_FLAG_VTABLE | PIRC_SUB_FLAG_METHOD)))
         add_param(lexer, PMC_TYPE, "self");
 }
 
@@ -2758,7 +2758,7 @@ otherwise it's a standard return sequence.
 static void
 emit_sub_epilogue(lexer_state * const lexer) {
 
-    if (TEST_FLAG(lexer->subs->flags, SUB_FLAG_MAIN))
+    if (TEST_FLAG(lexer->subs->flags, PIRC_SUB_FLAG_MAIN))
         new_sub_instr(lexer, PARROT_OP_end, "end", 0);
     else {
         /* default sub epilogue; no return values, hence 0 */
@@ -2821,7 +2821,7 @@ close_sub(lexer_state * const lexer) {
 
     /* store the subroutine in the bytecode constant table. */
     sub_const_table_index = add_sub_pmc(lexer->bc, &CURRENT_SUB(lexer)->info,
-                                        TEST_FLAG(CURRENT_SUB(lexer)->flags, SUB_FLAG_LEX));
+                                        TEST_FLAG(CURRENT_SUB(lexer)->flags, PIRC_SUB_FLAG_LEX));
 
     /* store the sub PMC index in the constant table with the global label,
      * so that invoking ops can find this index.

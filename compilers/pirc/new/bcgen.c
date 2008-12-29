@@ -423,6 +423,7 @@ generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned
     multi_type * iter;
     PMC        * multi_signature;
 
+    /* cancel if there's no :multi flag */
     if (type_count == 0)
         return NULL;
 

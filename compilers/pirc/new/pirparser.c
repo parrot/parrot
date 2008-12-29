@@ -2713,42 +2713,42 @@ yyreduce:
 
   case 56:
 #line 709 "pir.y"
-    { set_sub_flag(lexer, SUB_FLAG_ANON);;}
+    { set_sub_flag(lexer, PIRC_SUB_FLAG_ANON);;}
     break;
 
   case 57:
 #line 711 "pir.y"
-    { set_sub_flag(lexer, SUB_FLAG_INIT); ;}
+    { set_sub_flag(lexer, PIRC_SUB_FLAG_INIT); ;}
     break;
 
   case 58:
 #line 713 "pir.y"
-    { set_sub_flag(lexer, SUB_FLAG_LOAD); ;}
+    { set_sub_flag(lexer, PIRC_SUB_FLAG_LOAD); ;}
     break;
 
   case 59:
 #line 715 "pir.y"
-    { set_sub_flag(lexer, SUB_FLAG_MAIN); ;}
+    { set_sub_flag(lexer, PIRC_SUB_FLAG_MAIN); ;}
     break;
 
   case 60:
 #line 717 "pir.y"
-    { set_sub_flag(lexer, SUB_FLAG_LEX); ;}
+    { set_sub_flag(lexer, PIRC_SUB_FLAG_LEX); ;}
     break;
 
   case 61:
 #line 719 "pir.y"
-    { set_sub_flag(lexer, SUB_FLAG_POSTCOMP); ;}
+    { set_sub_flag(lexer, PIRC_SUB_FLAG_POSTCOMP); ;}
     break;
 
   case 62:
 #line 721 "pir.y"
-    { set_sub_flag(lexer, SUB_FLAG_IMMEDIATE); ;}
+    { set_sub_flag(lexer, PIRC_SUB_FLAG_IMMEDIATE); ;}
     break;
 
   case 63:
 #line 723 "pir.y"
-    { set_sub_flag(lexer, SUB_FLAG_MULTI); ;}
+    { set_sub_flag(lexer, PIRC_SUB_FLAG_MULTI); ;}
     break;
 
   case 64:

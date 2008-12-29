@@ -706,21 +706,21 @@ sub_flags         : /* empty */
                   ;
 
 sub_flag          : ":anon"
-                         { set_sub_flag(lexer, SUB_FLAG_ANON);}
+                         { set_sub_flag(lexer, PIRC_SUB_FLAG_ANON);}
                   | ":init"
-                         { set_sub_flag(lexer, SUB_FLAG_INIT); }
+                         { set_sub_flag(lexer, PIRC_SUB_FLAG_INIT); }
                   | ":load"
-                         { set_sub_flag(lexer, SUB_FLAG_LOAD); }
+                         { set_sub_flag(lexer, PIRC_SUB_FLAG_LOAD); }
                   | ":main"
-                         { set_sub_flag(lexer, SUB_FLAG_MAIN); }
+                         { set_sub_flag(lexer, PIRC_SUB_FLAG_MAIN); }
                   | ":lex"
-                         { set_sub_flag(lexer, SUB_FLAG_LEX); }
+                         { set_sub_flag(lexer, PIRC_SUB_FLAG_LEX); }
                   | ":postcomp"
-                         { set_sub_flag(lexer, SUB_FLAG_POSTCOMP); }
+                         { set_sub_flag(lexer, PIRC_SUB_FLAG_POSTCOMP); }
                   | ":immediate"
-                         { set_sub_flag(lexer, SUB_FLAG_IMMEDIATE); }
+                         { set_sub_flag(lexer, PIRC_SUB_FLAG_IMMEDIATE); }
                   | ":multi" multi_type_list
-                         { set_sub_flag(lexer, SUB_FLAG_MULTI); }
+                         { set_sub_flag(lexer, PIRC_SUB_FLAG_MULTI); }
                   | ":outer" '(' sub_id ')'
                          { set_sub_outer(lexer, $3); }
                   | ":method" opt_paren_string
