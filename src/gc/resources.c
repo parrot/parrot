@@ -776,9 +776,8 @@ Parrot_reallocate_string(PARROT_INTERP, ARGMOD(STRING *str), size_t newsize)
         PObj_constant_TEST(str)
             ? interp->arena_base->constant_string_pool
             : interp->arena_base->memory_pool;
-    /*
-     * if the requested size is smaller then buflen, we are done
-     */
+
+    /* if the requested size is smaller then buflen, we are done */
     if (newsize <= PObj_buflen(str))
         return;
 
@@ -789,26 +788,28 @@ Parrot_reallocate_string(PARROT_INTERP, ARGMOD(STRING *str), size_t newsize)
      */
     new_size = aligned_string_size(newsize);
     old_size = aligned_string_size(PObj_buflen(str));
-    needed = new_size - old_size;
-    if (pool->top_block->free >= needed &&
-            pool->top_block->top == (char*)PObj_bufstart(str) +
-            old_size) {
+    needed   = new_size - old_size;
+
+    if (pool->top_block->free >= needed
+    &&  pool->top_block->top  == (char *)PObj_bufstart(str) + old_size) {
         pool->top_block->free -= needed;
         pool->top_block->top  += needed;
         PObj_buflen(str) = new_size - sizeof (void*);
         return;
     }
+
     PARROT_ASSERT(str->bufused <= newsize);
+
     /* only copy used memory, not total string buffer */
     copysize = str->bufused;
 
-    if (!PObj_COW_TEST(str)) {
+    if (!PObj_COW_TEST(str))
         pool->guaranteed_reclaimable += PObj_buflen(str);
-    }
+
     pool->possibly_reclaimable += PObj_buflen(str);
 
     mem = (char *)mem_allocate(interp, new_size, pool);
-    mem += sizeof (void*);
+    mem += sizeof (void *);
 
     /* copy mem from strstart, *not* bufstart */
     oldmem             = str->strstart;
@@ -818,9 +819,8 @@ Parrot_reallocate_string(PARROT_INTERP, ARGMOD(STRING *str), size_t newsize)
 
     /* We shouldn't ever have a 0 from size, but we do. If we can track down
      * those bugs, this can be removed which would make things cheaper */
-    if (copysize) {
+    if (copysize)
         memcpy(mem, oldmem, copysize);
-    }
 }
 
 /*

@@ -15,7 +15,7 @@ src/stm/waitlist.c
 
 =head1 DESCRIPTION
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =head2 Functions
 
@@ -91,7 +91,7 @@ static void waitlist_signal_one(ARGMOD(struct waitlist_entry *who))
 
 =item C<static struct waitlist_thread_data * get_thread>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -120,7 +120,7 @@ get_thread(PARROT_INTERP)
 
 =item C<static struct waitlist_thread_data * get_thread_noalloc>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -139,7 +139,7 @@ get_thread_noalloc(PARROT_INTERP)
 
 =item C<static struct waitlist_entry * alloc_entry>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -182,7 +182,7 @@ alloc_entry(PARROT_INTERP)
 
 =item C<static void add_entry>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -211,7 +211,7 @@ add_entry(ARGMOD(STM_waitlist *waitlist), ARGIN(struct waitlist_entry *entry))
 
 =item C<static int remove_first>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -236,7 +236,7 @@ remove_first(ARGMOD(STM_waitlist *waitlist), ARGIN(struct waitlist_entry *expect
 
 =item C<static void waitlist_remove>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -294,7 +294,7 @@ waitlist_remove(ARGMOD_NULLOK(STM_waitlist *waitlist), ARGIN(struct waitlist_ent
 
 =item C<static void waitlist_remove_check>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -322,7 +322,7 @@ waitlist_remove_check(ARGMOD_NULLOK(STM_waitlist *waitlist), ARGIN(struct waitli
 
 =item C<static void waitlist_signal_one>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -350,7 +350,7 @@ waitlist_signal_one(ARGMOD(struct waitlist_entry *who))
 
 =item C<static void waitlist_signal_all>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -396,7 +396,7 @@ waitlist_signal_all(ARGMOD(STM_waitlist *list))
 
 =item C<void Parrot_STM_waitlist_add_self>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -419,7 +419,7 @@ Parrot_STM_waitlist_add_self(PARROT_INTERP, ARGMOD(STM_waitlist *waitlist))
 
 =item C<void Parrot_STM_waitlist_signal>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -438,7 +438,7 @@ Parrot_STM_waitlist_signal(PARROT_INTERP, ARGMOD(STM_waitlist *waitlist))
 
 =item C<void Parrot_STM_waitlist_remove_all>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -476,7 +476,7 @@ Parrot_STM_waitlist_remove_all(PARROT_INTERP)
 
 =item C<void Parrot_STM_waitlist_wait>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -507,7 +507,7 @@ Parrot_STM_waitlist_wait(PARROT_INTERP)
 
 =item C<void Parrot_STM_waitlist_init>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -525,7 +525,7 @@ Parrot_STM_waitlist_init(PARROT_INTERP, ARGMOD(STM_waitlist *waitlist))
 
 =item C<void Parrot_STM_waitlist_destroy_thread>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -556,7 +556,7 @@ Parrot_STM_waitlist_destroy_thread(PARROT_INTERP)
 
 =item C<static STM_tx_log * Parrot_STM_tx_log_alloc>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 
@@ -600,7 +600,7 @@ Parrot_STM_tx_log_alloc(PARROT_INTERP, size_t size)
 
 =item C<STM_tx_log * Parrot_STM_tx_log_get>
 
-RT#48260: Not yet documented!!!
+RT #48260: Not yet documented!!!
 
 =cut
 

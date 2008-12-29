@@ -333,7 +333,7 @@ These functions return 0 if no arguments are present, or 1 on success.
 PARROT_EXPORT
 int
 Parrot_init_arg_indexes_and_sig_pmc(SHIM_INTERP, ARGIN(Parrot_Context *ctx),
-        ARGIN_NULLOK(opcode_t *indexes), ARGIN_NULLOK(PMC* sig_pmc),
+        ARGIN_NULLOK(opcode_t *indexes), ARGIN_NULLOK(PMC *sig_pmc),
         ARGMOD(call_state_item *sti))
 {
     if (!sig_pmc && indexes) {
@@ -1415,7 +1415,7 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
 
             /*
              * Workaround for several argument passing problems
-             * RT#54860 y otros
+             * RT #54860 y otros
              * Save current value while setting the optional
              */
             UnionVal old_value;
@@ -1623,7 +1623,7 @@ PARROT_EXPORT
 void
 parrot_pass_args(PARROT_INTERP,
         ARGMOD(Parrot_Context *src_ctx), ARGMOD(Parrot_Context *dest_ctx),
-        ARGMOD(opcode_t *src_indexes),     ARGMOD(opcode_t *dest_indexes),
+        ARGMOD(opcode_t *src_indexes),   ARGMOD(opcode_t *dest_indexes),
         arg_pass_t param_or_result)
 {
     call_state st;
