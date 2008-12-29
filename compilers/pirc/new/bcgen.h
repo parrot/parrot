@@ -56,6 +56,7 @@ typedef struct sub_info {
     char const         * subname;
     char const         * nsentry;
     char const         * subid;
+    char const         * outersub;
     int                  vtable_index;
     unsigned             regs_used[NUM_PARROT_TYPES];
     int                  startoffset;

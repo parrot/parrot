@@ -123,7 +123,7 @@ Thus, set the :outer() argument to the current subroutine.
 */
 void
 set_sub_outer(lexer_state * const lexer, char const * const outersub) {
-    CURRENT_SUB(lexer)->outer_sub = outersub;
+    CURRENT_SUB(lexer)->info.outersub = outersub;
     SET_FLAG(lexer->subs->flags, PIRC_SUB_FLAG_HAS_OUTER);
 }
 

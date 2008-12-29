@@ -304,7 +304,6 @@ struct label;
 typedef struct subroutine {
     key                *name_space;    /* this sub's namespace */
 
-    char const         *outer_sub;     /* this sub's outer subroutine, if any */
     char const         *instanceof;    /* XXX document this XXX */
     char const         *methodname;    /* name of this sub by which it's stored as a method */
     int                 flags;         /* this sub's flags */

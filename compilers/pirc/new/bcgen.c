@@ -517,8 +517,8 @@ create_lexinfo(bytecode * const bc, PMC * sub, lexical * const lexicals, int lex
     }
 
     /* if lex_info is still NULL, that means that the sub has no .lexicals,
-     * and doesn't need a lex_info. If the sub has an :outer or a :lex flag,
-     * then create the lex_info anyway.
+     * and doesn't need a lex_info. If, however, the sub has an :outer or a
+     * :lex flag, then create the lex_info anyway.
      */
     if (lex_info == NULL && (outer || lexflag)) {
         lex_info = pmc_new_noinit(bc->interp, lex_info_id);
@@ -528,6 +528,45 @@ create_lexinfo(bytecode * const bc, PMC * sub, lexical * const lexicals, int lex
     return lex_info;
 }
 
+/*
+
+Find the outer sub that has name C<outername>.
+If not found, NULL is returned.
+
+*/
+static PMC *
+find_outer_sub(bytecode * const bc, char const * const outername) {
+    PMC    *current;
+    STRING *cur_name;
+    size_t  len;
+
+    /* if sub has no :outer, leave */
+    if (outername == NULL)
+        return NULL;
+
+
+    len = strlen(outername);
+    if (len == 0)
+        return NULL;
+
+
+    /* XXX go here through the global labels, and check whether it can be found */
+
+    /* could be eval too; check if :outer is the current sub */
+    current = CONTEXT(bc->interp)->current_sub;
+
+    if (current == NULL) {
+        fprintf(stderr, "cannot find :outer sub '%s'\n", outername); /* XXX exception ? */
+        return NULL;
+    }
+
+    cur_name = PMC_sub(current)->name;
+
+    if (cur_name->strlen == len && (memcmp((char *)cur_name->strstart, outername, len) == 0))
+        return current;
+
+    return NULL;
+}
 
 
 /*
@@ -543,21 +582,21 @@ The index where the PMC is stored in the constant table is returned.
 */
 int
 add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex) {
-    PMC               *sub_pmc;
-    Parrot_sub        *sub;
-    int                subconst_index;
-    int                subname_index;
-    int                i;
-    PackFile_Constant *subname_const;
+    PMC                   * sub_pmc;
+    Parrot_sub            * sub;
+    int                     subconst_index;
+    int                     subname_index;
+    int                     i;
+    PackFile_Constant     * subname_const;
 
 
     /* The .sub is represented by a "Sub" PMC.
      * If that should be changed into something else, fix that here (e.g. "Coroutine").
      */
-    sub_pmc       = pmc_new(bc->interp, enum_class_Sub);
-    sub           = PMC_sub(sub_pmc);
-    subname_index = add_string_const(bc, info->subname);
-    subname_const = bc->interp->code->const_table->constants[subname_index];
+    sub_pmc               = pmc_new(bc->interp, enum_class_Sub);
+    sub                   = PMC_sub(sub_pmc);
+    subname_index         = add_string_const(bc, info->subname);
+    subname_const         = bc->interp->code->const_table->constants[subname_index];
 
     /* set start and end offset of this sub in the bytecode. This is calculated during
      * the parsing phase.
@@ -573,8 +612,7 @@ add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex) {
 
     sub->lex_info         = create_lexinfo(bc, sub_pmc, info->lexicals, needlex);
 
-    /* XXX fix outer stuff */
-    sub->outer_sub        = NULL;
+    sub->outer_sub        = find_outer_sub(bc, info->outersub);
 
     /* Set the vtable index; if this .sub was declared as :vtable, its vtable
      * index was found during the parse; otherwise it's -1.
