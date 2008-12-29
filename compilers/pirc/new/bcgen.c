@@ -419,6 +419,8 @@ C<type_count> indicates the number of types in the list.
 static PMC *
 generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned type_count) {
     unsigned i;
+    multi_type *iter;
+
     /* create a FixedPMCArray to store all multi types */
     PMC * const multi_signature = pmc_new(bc->interp, enum_class_FixedPMCArray);
     /* set its size as specified in type_count */
@@ -435,12 +437,37 @@ generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned
         return multi_signature;
     }
 
+    iter = types;
     /* add all multi types to the PMC array */
     for (i = 0; i < type_count; ++i) {
+        PMC *sig_pmc;
 
+        switch (iter->entry_type) {
+            case MULTI_TYPE_IDENT: {
+                /* add the string to the constant table, retrieve a pointer to the STRING */
+                STRING * typestring = add_string_const_from_cstring(bc, iter->u.ident);
+                /* create a new String PMC. */
+                sig_pmc = pmc_new(bc->interp, enum_class_String);
+                /* set the STRING in the String PMC */
+                VTABLE_set_string_native(bc->interp, sig_pmc, typestring);
+                break;
+            }
+            case MULTI_TYPE_KEYED:
+                /* XXX implement this */
+                break;
+            default:
+                fprintf(stderr, "invalid multi entry type");
+                break; /* XXX fatal; throw excpetion? */
+        }
 
+        /* store the signature PMC in the array */
+        VTABLE_set_pmc_keyed_int(bc->interp, multi_signature, i, sig_pmc);
+
+        /* go to next :multi type */
+        iter = iter->next;
     }
     return multi_signature;
+
 }
 
 /*
