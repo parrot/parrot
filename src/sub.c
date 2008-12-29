@@ -488,7 +488,6 @@ Parrot_Context_infostr(PARROT_INTERP, ARGIN(const Parrot_Context *ctx))
 
     Parrot_block_GC_mark(interp);
     if (Parrot_Context_get_info(interp, ctx, &info)) {
-        static const char unknown_file[] = "(unknown file)";
         DECL_CONST_CAST;
 
         res = Parrot_sprintf_c(interp,
@@ -668,14 +667,14 @@ Restores the appropriate context for the continuation.
 */
 
 void
-Parrot_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc),
+Parrot_continuation_rewind_environment(PARROT_INTERP, SHIM(PMC *pmc),
         ARGIN(Parrot_cont *cc))
 {
-    Parrot_Context *to_ctx = cc->to_ctx;
+    Parrot_Context * const to_ctx = cc->to_ctx;
 
     /* debug print before context is switched */
     if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG)) {
-        PMC *sub = to_ctx->current_sub;
+        PMC * const sub = to_ctx->current_sub;
 
         Parrot_io_eprintf(interp, "# Back in sub '%Ss', env %p\n",
                     Parrot_full_sub_name(interp, sub),
