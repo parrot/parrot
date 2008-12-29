@@ -35,7 +35,7 @@ sub dump_pbc_output_like {
     my $PARROT   = ".$PConfig{slash}$PConfig{test_prog}";
     system( "$PARROT --output $pbc_fn $pir_fn" );
     my $cmd = File::Spec->catfile( qw{. tools util dump_pbc.pl} );
-    my $out = `perl $cmd $pbc_fn`;
+    my $out = `$PConfig{perl} $cmd $pbc_fn`;
 
     like( $out, $snippet, $desc );
 
