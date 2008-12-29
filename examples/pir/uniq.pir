@@ -84,7 +84,7 @@ GO:
 
   $I1 = 1 # count
   .local pmc in_fh
-  in_fh = open file_name, "<"
+  in_fh = open file_name, 'r'
   unless in_fh, ERR
   .local string prev_line, curr_line
   prev_line = readline in_fh

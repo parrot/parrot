@@ -40,7 +40,7 @@ NO_NAME:
 
     # create a file stream
     file = new "Stream::ParrotIO"
-    file."open"( name, "<" )
+    file."open"( name, 'r' )
 
     # process it one line per read
     lines = new "Stream::Lines"

@@ -20,7 +20,7 @@ You should check where the file is going to be before you run this.
 .sub 'example' :main
     .local string test_fn
     test_fn = "tmp_example_io.tmp"
-    $P0 = open test_fn, ">"
+    $P0 = open test_fn, 'w'
     seek $P0, 300, 0
     # 64bit version of seek with high 32bits = 0
     #seek $IO, $P0, 0, 400, 0
@@ -32,7 +32,7 @@ You should check where the file is going to be before you run this.
     print $P0, "test5\n"
     close $P0
 
-    $P0 = open test_fn, "<"
+    $P0 = open test_fn, 'r'
     $S0 = read $P0, 1024
     print $S0
 
