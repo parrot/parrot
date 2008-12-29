@@ -36,7 +36,7 @@ Tests features related to the creation, addition, and execution of OO methods.
     .local string filename
 
     filename = "method_library.pir"
-    file = open filename, ">"
+    file = open filename, 'w'
 
     $S0 = <<'END'
     .namespace['Foo']

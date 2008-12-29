@@ -349,7 +349,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "freeze class" );
     print "\n"
     freeze S11, P10
     print "ok 1\n"
-    open P3, "temp.fpmc", ">"
+    open P3, "temp.fpmc", 'w'
     print P3, S11
     close P3
     print "ok 2\n"
@@ -368,7 +368,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class into new interpreter" );
     print "stat failed\n"
     exit 1
 ok1:
-    open P3, S3, "<"
+    open P3, S3, 'r'
     read S3, P3, I0
     close P3
     print "ok 1\n"
@@ -411,7 +411,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "freeze class w attr" );
     print "\n"
     freeze S11, P10
     print "ok 1\n"
-    open P3, "temp.fpmc", ">"
+    open P3, "temp.fpmc", 'w'
     print P3, S11
     close P3
     print "ok 2\n"
@@ -430,7 +430,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr into new interpreter" )
     print "stat failed\n"
     exit 1
 ok1:
-    open P3, S3, "<"
+    open P3, S3, 'r'
     read S3, P3, I0
     close P3
     # print S3
@@ -468,7 +468,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr same interp" );
     print S10
     print "\n"
     freeze S3, P10
-    open P3, "temp.fpmc", ">"
+    open P3, "temp.fpmc", 'w'
     print P3, S3
     close P3
 
@@ -515,7 +515,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter"
     new P10, "Foo"
     print S10
     freeze S3, P10
-    open P3, "temp.fpmc", ">"
+    open P3, "temp.fpmc", 'w'
     print P3, S3
     close P3
     print "ok 1\n"
@@ -557,7 +557,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into new interpreter" 
     print "stat failed\n"
     exit 1
 ok1:
-    open P3, S3, "<"
+    open P3, S3, 'r'
     read S3, P3, I0
     close P3
 

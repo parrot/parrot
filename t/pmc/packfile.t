@@ -79,7 +79,7 @@ my $get_uuid_pbc = <<'EOF';
     $S0  = interpinfo .INTERPINFO_RUNTIME_PREFIX
     $S0 .= "/runtime/parrot/library/uuid.pbc"
     $I0  = stat $S0, .STAT_FILESIZE
-    pio  = open $S0, "<"
+    pio  = open $S0, 'r'
     $S0  = read pio, $I0
     close pio
     pf   = $S0

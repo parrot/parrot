@@ -125,7 +125,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
     # Open the test file
     .local pmc file_handle   # currently open file
-               file_handle = open test_file, '<'
+               file_handle = open test_file, 'r'
 
     unless file_handle goto bad_file
 

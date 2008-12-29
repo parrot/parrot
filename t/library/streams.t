@@ -350,7 +350,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::ParrotIO" );
 
     # create a file stream
     file = new "Stream::ParrotIO"
-    file."open"( name, "<" )
+    file."open"( name, 'r' )
 
     # process it one line per read
     lines = new "Stream::Lines"
@@ -948,7 +948,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::ParrotIO" );
     stream = new "Stream::ParrotIO"
 
     # open this file
-    stream."open"( "t/library/perlhist.txt", "<" )
+    stream."open"( "t/library/perlhist.txt", 'r' )
 
     # you can specifiy a custom block size with
     # stream."blockSize"( 10 )

@@ -251,12 +251,12 @@ pir_output_is( <<"CODE", <<'OUTPUT', "eval.get_string" );
   .local pmc io
   f1 = compi("foo_1", "hello from foo_1")
   \$S0 = f1
-  io = open "$temp_pbc", ">"
+  io = open "$temp_pbc", 'w'
   print io, \$S0
   close io
   load_bytecode "$temp_pbc"
   f2 = compi("foo_2", "hello from foo_2")
-  io = open "$temp2_pbc", ">"
+  io = open "$temp2_pbc", 'w'
   print io, f2
   close io
   load_bytecode "$temp2_pbc"
@@ -325,14 +325,14 @@ pir_output_is( <<"CODE", <<'OUTPUT', "eval.get_string - same file" );
   .local pmc io, os
   f1 = compi("foo_1", "hello from foo_1")
   \$S0 = f1
-  io = open "$temp_pbc", ">"
+  io = open "$temp_pbc", 'w'
   print io, \$S0
   close io
   load_bytecode "$temp_pbc"
   os = new 'OS'
   os.'rm'("$temp_pbc")
   f2 = compi("foo_2", "hello from foo_2")
-  io = open "$temp_pbc", ">"
+  io = open "$temp_pbc", 'w'
   print io, f2
   close io
   load_bytecode "$temp_pbc"
@@ -368,7 +368,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "eval.freeze" );
   .local pmc io
   f = compi("foo_1", "hello from foo_1")
   \$S0 = freeze f
-  io = open "$temp_file", ">"
+  io = open "$temp_file", 'w'
   print io, \$S0
   close io
   say "written"
@@ -403,7 +403,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "eval.thaw" );
     file = "$temp_file"
     .include "stat.pasm"
     size = stat file, .STAT_FILESIZE
-    io = open file, "<"
+    io = open file, 'r'
     \$S0 = read io, size
     close io
     e = thaw \$S0
@@ -422,7 +422,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "eval.freeze+thaw" );
   .local pmc io
   f = compi("foo_1", "hello from foo_1")
   \$S0 = freeze f
-  io = open "$temp_file", ">"
+  io = open "$temp_file", 'w'
   print io, \$S0
   close io
   say "written"
@@ -460,7 +460,7 @@ MORE
     file = "$temp_file"
     .include "stat.pasm"
     size = stat file, .STAT_FILESIZE
-    io = open file, "<"
+    io = open file, 'r'
     \$S0 = read io, size
     close io
     e = thaw \$S0

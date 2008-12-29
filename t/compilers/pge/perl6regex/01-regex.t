@@ -137,7 +137,7 @@ Description of the test.
     test_file = test_dir . test_name
 
     # Open the test file
-    file_handle = open test_file, '<'
+    file_handle = open test_file, 'r'
     $S0 = typeof file_handle
     if $S0 == 'Undef' goto bad_file
 
