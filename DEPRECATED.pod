@@ -51,11 +51,6 @@ See RT #47976.
 
 See RT #58410.
 
-=item * C<open> opcode mode string [post 0.8.2]
-
-The C<open> opcode will change from Perl-style mode-strings to 'r' for read,
-'w' for write, 'a' for append, and 'p' for pipe.
-
 =item * C<infix> and C<n_infix> opcodes [post 0.8.2]
 
 These opcodes were only used by the old MMD system. See TT #7.

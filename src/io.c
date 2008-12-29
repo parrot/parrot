@@ -73,51 +73,6 @@ Parrot_io_parse_open_flags(PARROT_INTERP, ARGIN_NULLOK(STRING *mode_str))
         }
     }
 
-    /* These comparisons are put in place for backward compatibility, and will
-     * be removed after a deprecation cycle. */
-    if (flags == 0) {
-        INTVAL first = string_index(interp, mode_str, 0);
-        INTVAL second = string_index(interp, mode_str, 1);
-        switch (first) {
-            case '+':
-                flags |= (PIO_F_WRITE | PIO_F_READ);
-                switch (second) {
-                    case '<':
-                        break;
-                    case '>':
-                        flags |= PIO_F_TRUNC;
-                        break;
-                    default:
-                        return 0;
-                }
-                break;
-            case '<':
-                flags |= PIO_F_READ;
-                break;
-            case '>':
-                flags |= PIO_F_WRITE;
-                if (second == '>') {
-                    flags |= PIO_F_APPEND;
-                }
-                else {
-                    flags |= PIO_F_TRUNC;
-                }
-                break;
-            case '-':       /* -| read from pipe */
-                if (second == '|') {
-                    flags |= PIO_F_PIPE | PIO_F_READ;
-                }
-                break;
-            case '|':       /* |- write to pipe */
-                if (second == '-') {
-                    flags |= PIO_F_PIPE | PIO_F_WRITE;
-                }
-                break;
-            default:
-                return 0;
-        }
-    }
-
     return flags;
 }
 
