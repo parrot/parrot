@@ -21,6 +21,11 @@ the appropriate emit functions are used. Options are:
  -p     for PASM output
  -b     for bytecode output
 
+The functions in this file walk the data structure that is built during
+the parse phase. During the traversal, bytecode for instructions and
+their operands are emitted through the C<bcgen> module.
+
+
 =head1 FUNCTIONS
 
 =over 4
@@ -308,9 +313,9 @@ print_subs(struct lexer_state * const lexer) {
 
                 fprintf(out, ".pcc_sub ");
 
-                if (TEST_FLAG(subiter->flags, SUB_FLAG_MAIN))
+                if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_MAIN))
                     fprintf(out, ":main ");
-                if (TEST_FLAG(subiter->flags, SUB_FLAG_METHOD))
+                if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_METHOD))
                     fprintf(out, ":method ");
                     /* XXX and so on; check which ones are available in PASM mode. */
 
@@ -631,7 +636,8 @@ emit_pbc_sub(lexer_state * const lexer, subroutine * const sub) {
     }
     while (iter != sub->statements->next);
 
-    if (TEST_FLAG(sub->flags, SUB_FLAG_IMMEDIATE)) {
+    /* XXX why does this not work? */
+    if (TEST_FLAG(sub->flags, PIRC_SUB_FLAG_IMMEDIATE)) {
         PackFile_fixup_subs(lexer->interp, PBC_IMMEDIATE, NULL);
     }
 }
@@ -642,7 +648,8 @@ emit_pbc_sub(lexer_state * const lexer, subroutine * const sub) {
 emit_pbc(lexer_state * const lexer)>
 
 Generate Parrot Byte Code from the abstract syntax tree.
-This is the top-level function.
+This is the top-level function. After all instructions
+have been emitted, the PBC is written to a file.
 
 =cut
 

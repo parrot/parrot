@@ -509,6 +509,11 @@ create_lexinfo(bytecode * const bc, PMC * sub, lexical * const lexicals, int lex
         STRING *lexname = string_from_cstring(bc->interp, lexiter->name, strlen(lexiter->name));
 
         /* declare the .lex as such */
+/*
+        fprintf(stderr, "Create lexinfo: color of .lex '%s' is: %d\n", lexiter->name,
+                lexiter->info->color);
+
+*/
         Parrot_PCCINVOKE(bc->interp, lex_info, method, "SI->", lexname, lexiter->info->color);
 
         lexiter = lexiter->next;

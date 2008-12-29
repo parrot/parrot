@@ -1689,8 +1689,9 @@ invoke(lexer_state * const lexer, invoke_type type, ...) {
 =item C<void
 set_lex_flag(lexer_state * const lexer, target * const t, char const * const name)>
 
-Set the lexical name C<name> on target C<t>, and store it
-as a lexical in the sub_info struct.
+Store target C<t> as a lexical in the sub_info struct. The lexical node
+stores a pointer to the target's syminfo structure, so it can access
+the allocated register.
 
 =cut
 
@@ -1704,8 +1705,6 @@ set_lex_flag(lexer_state * const lexer, target * const t, char const * const nam
     /* link this lex node in the list of lexicals */
     lex->next = CURRENT_SUB(lexer)->info.lexicals;
     CURRENT_SUB(lexer)->info.lexicals = lex;
-
-    t->lex_name = name;
 }
 
 /*
