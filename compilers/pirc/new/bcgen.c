@@ -424,6 +424,17 @@ generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned
     /* set its size as specified in type_count */
     VTABLE_set_integer_native(bc->interp, multi_signature, type_count);
 
+
+    if (type_count == 1) { /* no actual types, just empty :multi() flag. */
+        STRING * const sig     = string_from_literal(bc->interp, "__VOID");
+        PMC    * const sig_pmc = pmc_new(bc->interp, enum_class_String);
+
+        VTABLE_set_string_native(bc->interp, sig_pmc, sig);
+        VTABLE_set_pmc_keyed_int(bc->interp, multi_signature, 0, sig_pmc);
+
+        return multi_signature;
+    }
+
     /* add all multi types to the PMC array */
     for (i = 0; i < type_count; ++i) {
 

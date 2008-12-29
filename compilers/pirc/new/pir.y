@@ -740,14 +740,17 @@ multi_type_list   : '(' opt_multi_types ')'
                   ;
 
 opt_multi_types   : /* empty */
-                        { $$ = 0; }
+                        { $$ = 1; /* n=1 means :multi() -- without any types. */ }
                   | multi_types
                         { $$ = $1; }
                   ;
 
 multi_types       : multi_type
                         {
-                          $$ = 1; /* start counting multi types */
+                          $$ = 2; /* start counting multi types; always 1 higher than actual number
+                                   * so that n=0 means no :multi, n=1 means :multi(), n=2 means
+                                   * :multi(Type1), n=3 means :multi(Type1,Type2), etc.
+                                   */
                           add_sub_multi_type(lexer, $1);
                         }
                   | multi_types ',' multi_type
