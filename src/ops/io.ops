@@ -100,7 +100,7 @@ The mode consists of a string of characters specified in any order:
  r : read
  w : write
  a : append (Note: you must specify "wa", not just "a")
- p : pipe 
+ p : pipe
 
 =item B<open>(out PMC, in STR)
 
