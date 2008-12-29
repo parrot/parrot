@@ -60,12 +60,6 @@ The C<open> opcode will change from Perl-style mode-strings to 'r' for read,
 
 These opcodes were only used by the old MMD system. See TT #7.
 
-=item * C<slice> [post 0.8.2]
-
-The C<slice> opcode's implementation is experimental. Its use cases and
-implementation should be reconsidered. The current implementation will
-be removed.
-
 =back
 
 =head1 Class Features
