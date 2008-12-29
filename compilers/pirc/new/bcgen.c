@@ -445,7 +445,7 @@ generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned
         switch (iter->entry_type) {
             case MULTI_TYPE_IDENT: {
                 /* add the string to the constant table, retrieve a pointer to the STRING */
-                STRING * typestring = add_string_const_from_cstring(bc, iter->u.ident);
+                STRING * typestring = add_string_const_from_cstring(bc, types[i].u.ident);
                 /* create a new String PMC. */
                 sig_pmc = pmc_new(bc->interp, enum_class_String);
                 /* set the STRING in the String PMC */
@@ -463,8 +463,6 @@ generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned
         /* store the signature PMC in the array */
         VTABLE_set_pmc_keyed_int(bc->interp, multi_signature, i, sig_pmc);
 
-        /* go to next :multi type */
-        iter = iter->next;
     }
     return multi_signature;
 

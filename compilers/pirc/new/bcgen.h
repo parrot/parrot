@@ -32,13 +32,11 @@ typedef struct multi_key_type {
 typedef struct multi_type {
 
     union multi_union {
-        char           * ident;
-        multi_key_type * key;
+        char const     * ident;
+        multi_key_type   key;
     } u;
 
     multi_entry entry_type;
-
-    struct multi_type * next;
 
 } multi_type;
 

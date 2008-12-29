@@ -444,6 +444,8 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
              method
              op_arg_expr
              multi_type
+             opt_multi_types
+             multi_types
 
 %type <key>  keys
              keylist
@@ -468,8 +470,6 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
              int_or_num
 
 %type <uval> parameters
-             opt_multi_types
-             multi_types
 
 %type <invo> long_invocation
              long_invocation_stat
@@ -736,27 +736,35 @@ sub_flag          : ":anon"
                   ;
 
 multi_type_list   : '(' opt_multi_types ')'
-                        { set_sub_multi_arity(lexer, $2); }
+                        { set_sub_multi_types(lexer, $2); }
                   ;
 
 opt_multi_types   : /* empty */
-                        { $$ = 1; /* n=1 means :multi() -- without any types. */ }
+                        {
+                          CURRENT_SUB(lexer)->info.num_multi_types = 1;
+                          /* n=1 means :multi() -- without any types. */
+                        }
                   | multi_types
                         { $$ = $1; }
                   ;
 
 multi_types       : multi_type
                         {
-                          $$ = 2; /* start counting multi types; always 1 higher than actual number
-                                   * so that n=0 means no :multi, n=1 means :multi(), n=2 means
-                                   * :multi(Type1), n=3 means :multi(Type1,Type2), etc.
-                                   */
-                          add_sub_multi_type(lexer, $1);
+                          CURRENT_SUB(lexer)->info.num_multi_types = 2;
+                          /* start counting multi types; always 1 higher than actual number
+                           * so that n=0 means no :multi, n=1 means :multi(), n=2 means
+                           * :multi(Type1), n=3 means :multi(Type1,Type2), etc.
+                           */
+                           $$ = $1;
                         }
                   | multi_types ',' multi_type
                         {
-                          ++$$;
-                          add_sub_multi_type(lexer, $3);
+                          ++CURRENT_SUB(lexer)->info.num_multi_types;
+                          /* link the multi types in reverse other. That's fine,
+                           * as long as you remember that it's reversed.
+                           */
+                          $3->next = $1;
+                          $$ = $3;
                         }
                   ;
 

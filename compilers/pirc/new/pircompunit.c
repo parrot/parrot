@@ -127,25 +127,12 @@ set_sub_outer(lexer_state * const lexer, char const * const outersub) {
     SET_FLAG(lexer->subs->flags, SUB_FLAG_OUTER);
 }
 
-/*
 
-=item C<void
-set_sub_multi_arity(lexer_state * const lexer, unsigned num_multi_types)>
-
-Set the number of :multi types on the current sub.
-
-=cut
-
-*/
-void
-set_sub_multi_arity(lexer_state * const lexer, unsigned num_multi_types) {
-    CURRENT_SUB(lexer)->info.num_multi_types = num_multi_types;
-}
 
 /*
 
 =item C<void
-add_sub_multi_type(lexer_state * const lexer, expression * const multitype)>
+set_sub_multi_type(lexer_state * const lexer, expression * const multitype)>
 
 Add the multi-method signature type in C<multitype> to the current subroutine.
 
@@ -153,18 +140,41 @@ Add the multi-method signature type in C<multitype> to the current subroutine.
 
 */
 void
-add_sub_multi_type(lexer_state * const lexer, expression * const multitype) {
+set_sub_multi_types(lexer_state * const lexer, expression * const multitype) {
+    /* info.num_types is 1 higher than the actual number of types; n=1 means :multi() without
+     * any types.
+     */
+    unsigned num_types = CURRENT_SUB(lexer)->info.num_multi_types - 1;
 
-    switch (multitype->type) {
-        case EXPR_CONSTANT:
-        case EXPR_IDENT:
-        case EXPR_KEY:
-            break;
-        default:
-            break;
+    /* create an array of sufficient size, in which the multi type info is copied */
+    CURRENT_SUB(lexer)->info.multi_types
+                          = (multi_type *)pir_mem_allocate(lexer, num_types * sizeof (multi_type));
+
+
+    /* add types from end to beginning, as the list is in reversed order. */
+    while (num_types-- > 0) {
+        /* get a pointer to the multi_type in the current index, for easy reference */
+        multi_type *mtype = &CURRENT_SUB(lexer)->info.multi_types[num_types];
+
+        switch (multitype->type) {
+            case EXPR_CONSTANT:
+                mtype->u.ident    = multitype->expr.c->val.sval;
+                mtype->entry_type = MULTI_TYPE_IDENT;
+                break;
+            case EXPR_IDENT:
+                mtype->u.ident    = multitype->expr.id;
+                mtype->entry_type = MULTI_TYPE_IDENT;
+                break;
+            case EXPR_KEY:
+                /* mtype->u.key      = XXX todo */
+                mtype->entry_type = MULTI_TYPE_KEYED;
+                break;
+            default:
+                break;
+        }
+
     }
 
-    /* CURRENT_SUB(lexer)->info. */
 }
 
 /*
