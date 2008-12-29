@@ -7,7 +7,7 @@ Z<CHP-6>
 PIR and PASM are both very low-level languages by any programming
 standards, even though they support some important features of
 high-level dynamic languages,and PIR has some symbolic syntax features.
-Important reoccuring programming tasks in these lanuages have been
+Important re-occurring programming tasks in these lanuages have been
 extracted out into a series of runtime libraries to help make these
 tasks easier. Libraries written in PIR or PASM can be easily included
 and used from any of the high-level language compilers that target

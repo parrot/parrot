@@ -910,6 +910,10 @@ N: Zach Morgan
 E: zpmorgan@gmail.com
 D: Rakudo patch
 
+N: Saleem Ansari
+E: tuxdna@gmail.com
+D: Fixed typos in documentation
+
 N: cvsdummy
 U: cvsdummy
 E: cvs@perl.org

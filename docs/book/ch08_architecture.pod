@@ -183,7 +183,7 @@ and isn't too expensive in terms of operating time and resources. The
 tree is flattened, and is passed into a series of substitutions and
 transformations. The compiler is the least interesting part or Parrot,
 little more than a simple rule-based filter module. It is simple, but
-it's a necessart part of Parrot.
+it's a necessary part of Parrot.
 
 For many languages the parser and compiler are essentially a single
 unit. Like the parser, the compiler is modular, so you can load
