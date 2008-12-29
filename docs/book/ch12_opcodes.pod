@@ -76,7 +76,7 @@ how the slow core works:
 The fast core is a bare-bones core that doesn't do any of the
 bounds-checking or context updating that the slow core does. The fast
 core is the way Parrot should run, and is used to find and debug places
-where execution strays outside of it's normal bounds. In pseudocode, the
+where execution strays outside of its normal bounds. In pseudocode, the
 fast core is very much like the slow core except it doesn't do the bounds
 checking between each instruction, and doesn't update the interpreter's
 current context for each dispatch.
@@ -88,7 +88,7 @@ current context for each dispatch.
 
 =item* Switch Core
 
-As it's name implies, the switch core uses a gigantic C C<switch / case>
+As its name implies, the switch core uses a gigantic C C<switch / case>
 structure to execute opcodes. Here's a brief example of how this
 architecture works:
 
@@ -306,7 +306,7 @@ This opcode could be called like this:
 
 When Parrot parses through the file and sees the C<Foo> operation, it
 converts it to the real name C<Foo_i_n>. The real name of an opcode
-is it's name followed by an underscore-separated ordered list of
+is its name followed by an underscore-separated ordered list of
 the parameters to that opcode. This is how Parrot appears to use
 polymorphism: It translates the overloaded opcode common names into
 longer unique names depending on the parameter list of that opcode. Here
@@ -322,7 +322,7 @@ is a list of some of the variants of the C<add> opcode:
 This isn't a complete list, but you should get the picture. Each different
 combination of parameters translates to a different unique operation, and
 each operation is remarkably simple to implement. In some cases, Parrot
-can even use it's multi-method dispatch system to call opcodes which are
+can even use its multi-method dispatch system to call opcodes which are
 heavily overloaded, or for which there is no exact fit but the parameters
 could be coerced into different types to complete the operation. For
 instance, attempting to add a STRING to a PMC might coerce the string into

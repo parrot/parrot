@@ -252,6 +252,11 @@ D: Peek opcode and PIO implementation
 D: Rakudo builtins
 E: cspencer@sprocket.org
 
+N: Curtis 'Ovid' Poe
+U: Ovid
+D: docs/test cleanups/Makefile fixes
+E: ovid@cpan.org
+
 N: Curtis Rawls
 U: cgrawls
 D: imcc optimizer and register allocator patches and tests

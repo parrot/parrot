@@ -66,7 +66,7 @@ same syntax as is used for labels in PIR. Simple labels are often all
 capital letters to make them stand out from the rest of the source code
 more clearly. A label definition is simply the name of the label
 followed by a colon. It can be on its own line N<In fact, we recommend
-that it be on it's own line, for readability.>:
+that it be on its own line, for readability.>:
 
   LABEL:
       print "Norwegian Blue\n"

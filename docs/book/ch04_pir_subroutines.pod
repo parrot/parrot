@@ -284,7 +284,7 @@ example in pseudocode:
 
 In this example, the subroutine C<add_two> makes two calls to
 c<add_one>. The second call to C<add_one> is used as the return
-value. C<add_one> is called and it's result is immediately returned
+value. C<add_one> is called and its result is immediately returned
 to the caller of C<add_two>, it is never stored anywhere. We can
 optimize this situation is we realize that the second call to
 C<add_one> is returning to the same place that C<add_two> is. The
@@ -308,7 +308,7 @@ As we've mentioned above, Parrot offers support for lexical subroutines.
 What this means is that we can define a subroutine by name inside a
 larger subroutine, and our "inner" subroutine is only visible and callable
 from the "outer" subroutine. Plus, the "inner" subroutine inherits all the
-lexical variables from the outer subroutine, but is able to define it's
+lexical variables from the outer subroutine, but is able to define its
 own lexical variables that cannot be seen or modified by the outer subroutine.
 
 =head3 Scope and HLLs

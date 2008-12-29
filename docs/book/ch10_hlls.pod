@@ -14,11 +14,11 @@ dynamic programming languages, they've had a more difficult time
 interoperating with each other then compiled languages have because
 compiled languages operate at the same machine-code level and typically
 can make use of the same application binary interface (ABI). With the
-right compiler settings, programs written in Visual Basic and interoperate
+right compiler settings, programs written in Visual Basic can interoperate
 with programs written in C N<On some systems anyway>, which can call
-functions written in C++, in Ada, Fortran, and Pascal. To try to mix
+functions written in C++, in Ada, Fortran, Pascal and so on. To try to mix
 two common dynamic languages, like Perl and Python, or Ruby and PHP, you
-would need to custom write some kind of "glue" function to try to include
+would need to write some kind of custom "glue" function to try to include
 an interpreter object from one language as a library for another language,
 and then write code to try and get the parser for one to interact nicely
 with the parser for the other. It's a nightmare, frankly, and you don't
@@ -33,7 +33,7 @@ code snippets from other languages inline in the same file. We can write
 a binding for a popular library such as opengl or xlib once, and include
 that library into any language that needs it. Compare this to the current
 situation where a library like Gtk2 needs to have bindings for every
-language that wants to use it.In short, Parrot should make interoperation
+language that wants to use it. In short, Parrot should make interoperation
 easier for everybody.
 
 This chapter is going to talk about HLLs, the way they operate, and the
@@ -122,7 +122,7 @@ embedding. We've touched on one related topic above, that of creating
 the compiler fakecutables. The fakecutables contain a link to C<libparrot>,
 which contains all the necessary guts of Parrot. When the fakecutable is
 executed, a small driver program loads the PBC data into libparrot through
-it's API functions. The Parrot executable is just one small example of how
+its API functions. The Parrot executable is just one small example of how
 Parrot's functionality can be implemented, and we will talk about a few other
 ways here too.
 
@@ -135,7 +135,7 @@ is known as I<embedding parrot>, and is a great way to interoperate
 =head3 Creating and Interoperating Interpreters
 
 Parrot's executable, which is the interface which most users are going
-to be familiar with uses a single interpreter structure to perform a
+to be familiar with, uses a single interpreter structure to perform a
 single execution task. However, this isn't the only supported structural
 model that Parrot supports. In fact, the interpreter structure is not a
 singleton, and multiple interpreters can be created by a single program.
@@ -160,7 +160,7 @@ most programming languages, and are typically limited to use in very
 specific environments (such as within a single program) are called
 I<Domain-Specific Languages> (DSL). DSLs are a very popular topic because
 a DSL allows developers to create a custom language that makes dealing
-with a given problem space or data set very easy. Parrot and it's suite
+with a given problem space or data set very easy. Parrot and its suite
 of compiler tools in turn make creating the DSLs very easy. It's all
 about ease of use.
 

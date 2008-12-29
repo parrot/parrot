@@ -5,7 +5,7 @@
 Z<CHP-8>
 
 So far we've talked a lot about low-level Parrot programming with
-PIR and PASM. However, the true power of Parrot is it's ability to
+PIR and PASM. However, the true power of Parrot is its ability to
 host programs written in high level languages such as Perl 6,
 Python, Ruby, Tcl, and PHP. In order to write code in these languages
 developers need there to be compilers that convert from the language
@@ -185,7 +185,7 @@ some specific places where the behavior will be different.
 
 A recursive descent parser, like the one used in PGE, is a top-down
 parser. This means it attempts to start at the highest-level rule and
-work it's way down to the individual input tokens in order to match
+work its way down to the individual input tokens in order to match
 the given input. Once the parser has matched the entire input N<a
 source code file, or a line of input at the terminal in interactive
 mode> the parse is considered successful and the generated AST is
@@ -342,7 +342,7 @@ helpful to distinguish which combination we matched:
     'Skywalker'
  }
 
-This is the same rule, except now it passes two arguments to it's
+This is the same rule, except now it passes two arguments to its
 action method: the match object and the name of the person who
 got matched.
 
@@ -371,7 +371,7 @@ C programming language:
 Notice that an C<if_statement> can contain a list of C<statement>s, and
 that each statement may itself be an C<if_statement>? This is called
 I<recursion> X<Recursion>, and is part of where the "Recursive Descent"
-algorithm gets it's name from.
+algorithm gets its name from.
 
 Now, let's look at a more direct example of a comma-separated list of
 integer digits to form an array. We can define this recursively as
@@ -450,7 +450,7 @@ are optimized for use with expressions and equations. The "things" in an
 equation are split into two subtypes: I<terms> and I<operators>. Operators
 themselves are split into a number of types including postfix (C<-a>),
 suffix (C<i++>), infix (C<x + y>), circumfix (C<[z]>), postcircumix
-(C<a[b]>), and list (C<1, 2, 3>). Each operator gets it's own precidence
+(C<a[b]>), and list (C<1, 2, 3>). Each operator gets its own precidence
 number that specifies how closely it binds to the terms. In the example above,
 the expression is parsed
 
@@ -478,8 +478,8 @@ rules and tokens are used throughout the rest of the grammar. A proto is a way
 of saying that the rule is overridable dynamically, and that it might be defined
 somewhere else. In this case, PCT takes information from the proto declaration
 and fills in the details for us. On another note, this also means that the HLL
-itself can modify it's own grammar at run time, by overriding the proto
-definitions for it's operator table. Some languages call this process "operator
+itself can modify its own grammar at run time, by overriding the proto
+definitions for its operator table. Some languages call this process "operator
 overloading".
 
 A proto is defined like this, taking some of our grammar rules above:

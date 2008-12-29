@@ -27,7 +27,7 @@ PIR is well documented, both in traditional documentation and in
 instructional code examples. The documentation for the PIR compiler IMCC
 in F<docs/imcc/> or the project documentation in F<docs/> are good
 sources for information about the current syntax, semantics, and
-implementation. The other PIR compiler, PIRC, has it's own documentation
+implementation. The other PIR compiler, PIRC, has its own documentation
 that is slowly maturing. This is a useful source of information too. The
 test suite in F<t/compilers/imcc/> shows examples of proper working code. In fact,
 the test suite is the definitive PIR resource, because it shows how PIR
@@ -268,7 +268,7 @@ example snippet:
 The statement C<sum = $I42 + 5> translates to something like
 C<add I16, I17, 5> in PASM. The exact translation isn't too important
 N<Unless you're hacking on IMCC or PIRC!>, so we don't have to worry
-about it for now. We will talk more about PASM and it's instruction
+about it for now. We will talk more about PASM and its instruction
 set in X<CHP-5> Chapter 5.
 
 PIR also provides automatic assignment operators such as C<+=>, C<-=>,
