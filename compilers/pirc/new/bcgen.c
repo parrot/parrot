@@ -31,6 +31,9 @@ accessor functions.
   // create a bytecode object
   bytecode *bc = new_bytecode(interp, "foo.pir", codesize, bytes);
 
+  // add a subroutine PMC
+  add_sub_pmc(bc, sub->info, sub->needlex);
+
   while ( ... ) {
 
       // write opcodes

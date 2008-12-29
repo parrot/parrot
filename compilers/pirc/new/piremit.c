@@ -9,6 +9,7 @@
 #include "pircompiler.h"
 #include "bcgen.h"
 
+#include "parrot/oplib/ops.h"
 #include "assert.h"
 
 /*
@@ -585,6 +586,37 @@ emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
 
     if (instr->opinfo == NULL)
         return;
+
+
+    /* optimize, if possible.
+     * XXX is this a good place to do that?
+     */
+    switch (instr->opcode) {
+        case PARROT_OP_box_p_ic: {
+            /* box P0, 42 --> set P0, <Integer PMC const with value 42> */
+
+            /* the last operand, which is the second in this case */
+            expression *second_operand = instr->operands;
+            PMC *intconst = pmc_new(lexer->interp,
+                                    Parrot_get_ctx_HLL_type(lexer->interp, enum_class_Integer));
+            int index     = add_pmc_const(lexer->bc, intconst);
+            VTABLE_set_integer_native(lexer->interp, intconst, second_operand->expr.c->val.ival);
+
+            instr->opcode = PARROT_OP_set_p_pc;
+
+            /* replace 2nd operand with the new one. */
+            second_operand->expr.c->val.ival = index;
+
+            break;
+        }
+        case PARROT_OP_box_p_nc:
+            break;
+        case PARROT_OP_box_p_sc:
+            break;
+        default:
+            break;
+    }
+
 
     emit_opcode(lexer->bc, instr->opcode);
 
