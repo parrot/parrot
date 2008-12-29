@@ -293,6 +293,7 @@ typedef struct hashtable {
 
 } hashtable;
 
+
 /* forward declaration of structs */
 struct symbol;
 struct label;
@@ -424,7 +425,7 @@ void remove_operand(struct lexer_state * const lexer, unsigned index);
 void remove_all_operands(struct lexer_state * const lexer);
 
 
-void set_lex_flag(target * const t, char const * const lexname);
+void set_lex_flag(struct lexer_state * const lexer, target * const t, char const * const lexname);
 char const *get_inverse(char const * const instr);
 void invert_instr(struct lexer_state * const lexer);
 

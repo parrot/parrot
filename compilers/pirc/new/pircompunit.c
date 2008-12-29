@@ -332,6 +332,8 @@ new_subr(lexer_state * const lexer, char const * const subname) {
     newsub->flags            = 0;
     newsub->info.startoffset = lexer->codesize; /* start offset in bytecode */
 
+
+
     /* initialize hashtables for .local and label identifiers */
     init_hashtable(lexer, &newsub->symbols, HASHTABLE_SIZE_INIT);
     init_hashtable(lexer, &newsub->labels, HASHTABLE_SIZE_INIT);
@@ -1685,15 +1687,24 @@ invoke(lexer_state * const lexer, invoke_type type, ...) {
 /*
 
 =item C<void
-set_lex_flag(target * const t, char const * const name)>
+set_lex_flag(lexer_state * const lexer, target * const t, char const * const name)>
 
-Set the lexical name C<name> on target C<t>.
+Set the lexical name C<name> on target C<t>, and store it
+as a lexical in the sub_info struct.
 
 =cut
 
 */
 void
-set_lex_flag(target * const t, char const * const name) {
+set_lex_flag(lexer_state * const lexer, target * const t, char const * const name) {
+    lexical *lex = (lexical *)pir_mem_allocate(lexer, sizeof (lexical));
+    lex->name    = name;
+    lex->info    = t->info;
+
+    /* link this lex node in the list of lexicals */
+    lex->next = CURRENT_SUB(lexer)->info.lexicals;
+    CURRENT_SUB(lexer)->info.lexicals = lex;
+
     t->lex_name = name;
 }
 
@@ -2809,7 +2820,8 @@ close_sub(lexer_state * const lexer) {
         linear_scan_register_allocation(lexer->lsr);
 
     /* store the subroutine in the bytecode constant table. */
-    sub_const_table_index = add_sub_pmc(lexer->bc, &CURRENT_SUB(lexer)->info);
+    sub_const_table_index = add_sub_pmc(lexer->bc, &CURRENT_SUB(lexer)->info,
+                                        TEST_FLAG(CURRENT_SUB(lexer)->flags, SUB_FLAG_LEX));
 
     /* store the sub PMC index in the constant table with the global label,
      * so that invoking ops can find this index.

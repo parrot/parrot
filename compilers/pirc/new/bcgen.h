@@ -41,6 +41,12 @@ typedef struct multi_type {
 } multi_type;
 
 
+typedef struct lexical {
+    char const     * name;
+    struct syminfo * info;
+    struct lexical * next;
+
+} lexical;
 
 
 /* sub info structure, containing all info about a sub that a bytecode
@@ -56,6 +62,7 @@ typedef struct sub_info {
     int                  endoffset;
     unsigned             num_multi_types;
     multi_type         * multi_types;   /* data types of parameters if this is a multi sub */
+    lexical            * lexicals;
 
 } sub_info;
 
@@ -106,7 +113,7 @@ int add_num_const(bytecode * const bc, FLOATVAL f);
 */
 
 
-int add_sub_pmc(bytecode * const bc, sub_info * const info);
+int add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex);
 
 
 #endif /* PARROT_BCGEN_H_GUARD */

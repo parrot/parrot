@@ -9,6 +9,7 @@
 
 #include "bcgen.h" /* XXX future maybe parrot/bcgen.h */
 
+#include "pirsymbol.h" /* XXX remove this dependency somehow. */
 
 /*
 
@@ -61,7 +62,7 @@ struct bytecode {
 };
 
 
-static int new_const(bytecode * const bc);
+static int new_pbc_const(bytecode * const bc);
 
 
 /*
@@ -78,7 +79,7 @@ static int new_const(bytecode * const bc);
 /*
 
 =item C<static int
-new_const(bytecode * const bc)>
+new_pbc_const(bytecode * const bc)>
 
 Add a new constant to the constant table.
 
@@ -89,16 +90,16 @@ is resized each time a constant is added.
 
 */
 static int
-new_const(bytecode * const bc) {
+new_pbc_const(bytecode * const bc) {
     Interp *interp = bc->interp;
     size_t oldcount;
     size_t newcount;
-    PackFile_Constant *new_constant;
+    PackFile_Constant *new_pbc_constant;
 
     oldcount = interp->code->const_table->const_count;
     newcount = oldcount + 1;
 
-    new_constant = PackFile_Constant_new(interp);
+    new_pbc_constant = PackFile_Constant_new(interp);
 
     /* Update the constant count and reallocate */
     if (interp->code->const_table->constants)
@@ -109,7 +110,7 @@ new_const(bytecode * const bc) {
         interp->code->const_table->constants =
             mem_allocate_n_typed(newcount, PackFile_Constant *);
 
-    interp->code->const_table->constants[oldcount] = new_constant;
+    interp->code->const_table->constants[oldcount] = new_pbc_constant;
     interp->code->const_table->const_count         = newcount;
 
     return oldcount;
@@ -129,7 +130,7 @@ is stored.
 */
 int
 add_pmc_const(bytecode * const bc, PMC * pmc) {
-    int index                   = new_const(bc);
+    int index                   = new_pbc_const(bc);
     PackFile_Constant *constant = bc->interp->code->const_table->constants[index];
     constant->type              = PFC_PMC;
     constant->u.key             = pmc;
@@ -152,7 +153,7 @@ Or should it be a STRING at this point already?
 */
 int
 add_string_const(bytecode * const bc, char const * const str) {
-    int                index    = new_const(bc);
+    int                index    = new_pbc_const(bc);
     PackFile_Constant *constant = bc->interp->code->const_table->constants[index];
 
     constant->type     = PFC_STRING;
@@ -176,7 +177,7 @@ table where C<f> is stored is returned.
 */
 int
 add_num_const(bytecode * const bc, double f) {
-    int index                   = new_const(bc);
+    int index                   = new_pbc_const(bc);
     PackFile_Constant *constant = bc->interp->code->const_table->constants[index];
     constant->type              = PFC_NUMBER;
     constant->u.number          = f;
@@ -195,7 +196,7 @@ Add a key constant to the constants list.
 */
 int
 add_key_const(bytecode * const bc, PMC *key) {
-    int index                   = new_const(bc);
+    int index                   = new_pbc_const(bc);
     PackFile_Constant *constant = bc->interp->code->const_table->constants[index];
     constant->type              = PFC_KEY;
     constant->u.key             = key;
@@ -418,11 +419,15 @@ C<type_count> indicates the number of types in the list.
 */
 static PMC *
 generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned type_count) {
-    unsigned    i;
-    multi_type *iter;
+    unsigned     i;
+    multi_type * iter;
+    PMC        * multi_signature;
+
+    if (type_count == 0)
+        return NULL;
 
     /* create a FixedPMCArray to store all multi types */
-    PMC * const multi_signature = pmc_new(bc->interp, enum_class_FixedPMCArray);
+    multi_signature = pmc_new(bc->interp, enum_class_FixedPMCArray);
     /* set its size as specified in type_count */
     VTABLE_set_integer_native(bc->interp, multi_signature, type_count);
 
@@ -445,7 +450,7 @@ generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned
 
     /* add all multi types to the PMC array */
     for (i = 0; i < type_count; ++i) {
-        PMC *sig_pmc;
+        PMC *sig_pmc = NULL;
 
         switch (iter->entry_type) {
             case MULTI_TYPE_IDENT: {
@@ -459,6 +464,7 @@ generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned
             }
             case MULTI_TYPE_KEYED:
                 /* XXX implement this */
+
                 break;
             default:
                 fprintf(stderr, "invalid multi entry type");
@@ -486,24 +492,28 @@ then a lexinfo is created after all. The created lexinfo is returned.
 
 */
 static PMC *
-create_lexinfo(bytecode * const bc, PMC * sub, int lexflag) {
+create_lexinfo(bytecode * const bc, PMC * sub, lexical * const lexicals, int lexflag) {
+    lexical *lexiter;
 
-    STRING *lex_name;
-    int outer; /* change type of this */
+    int      outer = 0; /* change type of this */
 
-    const INTVAL lex_info_id = Parrot_get_ctx_HLL_type(bc->interp, enum_class_LexInfo);
 
-    PMC * lex_info = pmc_new_noinit(bc->interp, lex_info_id);
+    INTVAL const lex_info_id      = Parrot_get_ctx_HLL_type(bc->interp, enum_class_LexInfo);
 
-    STRING * const declare_method = string_from_literal(bc->interp, "declare_lex_preg");
+    STRING * const method         = string_from_literal(bc->interp, "declare_lex_preg");
 
+    PMC * lex_info                = pmc_new_noinit(bc->interp, lex_info_id);
     VTABLE_init_pmc(bc->interp, lex_info, sub);
 
-/* for ... { */
-    Parrot_PCCINVOKE(bc->interp, lex_info, declare_method, "SI->", lex_name, 0 /* color */);
+    lexiter = lexicals;
+    while (lexiter) {
+        STRING *lexname = string_from_cstring(bc->interp, lexiter->name, strlen(lexiter->name));
 
+        /* declare the .lex as such */
+        Parrot_PCCINVOKE(bc->interp, lex_info, method, "SI->", lexname, lexiter->info->color);
 
-/* ... } */
+        lexiter = lexiter->next;
+    }
 
     /* if lex_info is still NULL, that means that the sub has no .lexicals,
      * and doesn't need a lex_info. If the sub has an :outer or a :lex flag,
@@ -522,7 +532,7 @@ create_lexinfo(bytecode * const bc, PMC * sub, int lexflag) {
 /*
 
 =item C<void
-add_sub_pmc(bytecode * const bc, sub_info * const info)>
+add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex)>
 
 Add a sub PMC to the constant table. This function initializes the sub PMC.
 The index where the PMC is stored in the constant table is returned.
@@ -531,7 +541,7 @@ The index where the PMC is stored in the constant table is returned.
 
 */
 int
-add_sub_pmc(bytecode * const bc, sub_info * const info) {
+add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex) {
     PMC               *sub_pmc;
     Parrot_sub        *sub;
     int                subconst_index;
@@ -560,8 +570,7 @@ add_sub_pmc(bytecode * const bc, sub_info * const info) {
     /* XXX does this work properly? is "current_HLL" really "current"? */
     sub->HLL_id           = CONTEXT(bc->interp)->current_HLL;
 
-    /* XXX fix lex stuff */
-    sub->lex_info         = NULL;
+    sub->lex_info         = create_lexinfo(bc, sub_pmc, info->lexicals, needlex);
 
     /* XXX fix outer stuff */
     sub->outer_sub        = NULL;
@@ -571,7 +580,6 @@ add_sub_pmc(bytecode * const bc, sub_info * const info) {
      */
     sub->vtable_index     = info->vtable_index;
 
-    /* XXX fix multi stuff */
     sub->multi_signature  = generate_multi_signature(bc, info->multi_types, info->num_multi_types);
 
     /* store register usage of this sub. */

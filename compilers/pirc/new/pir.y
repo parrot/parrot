@@ -1615,7 +1615,7 @@ lex_decl          : ".lex" TK_STRINGC ',' pmc_object "\n"
                                   yypirerror(yyscanner, lexer, "lexical '%s' must be of type 'pmc'",
                                              $4->info->id.name);
                           }
-                          set_lex_flag($4, $2);
+                          set_lex_flag(lexer, $4, $2);
                         }
                   ;
 

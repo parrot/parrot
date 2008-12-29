@@ -229,7 +229,6 @@ declare_local(NOTNULL(lexer_state * const lexer), pir_type type,
             iter->info.type  = type;
         }
 
-
         iter = iter->next;
     }
 
