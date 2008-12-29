@@ -343,6 +343,8 @@ void set_sub_instanceof(struct lexer_state * const lexer, char const * const cla
 void set_sub_nsentry(struct lexer_state * const lexer, char const * const nsentry);
 void set_sub_methodname(struct lexer_state * const lexer, char const * const methodname);
 
+void set_sub_multi_arity(struct lexer_state * const lexer, unsigned num_multi_types) ;
+
 /* install a new subroutine node */
 void new_subr(struct lexer_state * const lexer, char const * const subname);
 

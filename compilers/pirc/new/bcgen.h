@@ -26,6 +26,7 @@ typedef struct sub_info {
     unsigned     regs_used[NUM_PARROT_TYPES];
     int          startoffset;
     int          endoffset;
+    unsigned     num_multi_types;
 
 } sub_info;
 

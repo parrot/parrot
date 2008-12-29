@@ -127,6 +127,20 @@ set_sub_outer(lexer_state * const lexer, char const * const outersub) {
     SET_FLAG(lexer->subs->flags, SUB_FLAG_OUTER);
 }
 
+/*
+
+=item C<void
+set_sub_multi_arity(lexer_state * const lexer, unsigned num_multi_types)>
+
+Set the number of :multi types on the current sub.
+
+=cut
+
+*/
+void
+set_sub_multi_arity(lexer_state * const lexer, unsigned num_multi_types) {
+    CURRENT_SUB(lexer)->info.num_multi_types = num_multi_types;
+}
 
 /*
 

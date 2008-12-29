@@ -467,6 +467,8 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
              int_or_num
 
 %type <uval> parameters
+             opt_multi_types
+             multi_types
 
 %type <invo> long_invocation
              long_invocation_stat
@@ -716,7 +718,7 @@ sub_flag          : ":anon"
                          { set_sub_flag(lexer, SUB_FLAG_POSTCOMP); }
                   | ":immediate"
                          { set_sub_flag(lexer, SUB_FLAG_IMMEDIATE); }
-                  | ":multi"
+                  | ":multi" multi_type_list
                          { set_sub_flag(lexer, SUB_FLAG_MULTI); }
                   | ":outer" '(' sub_id ')'
                          { set_sub_outer(lexer, $3); }
@@ -730,6 +732,22 @@ sub_flag          : ":anon"
                          { set_sub_instanceof(lexer, $2); }
                   | ":nsentry" paren_string
                          { set_sub_nsentry(lexer, $2); }
+                  ;
+
+multi_type_list   : '(' opt_multi_types ')'
+                        { set_sub_multi_arity(lexer, $2); }
+                  ;
+
+opt_multi_types   : /* empty */
+                        { $$ = 0; }
+                  | multi_types
+                        { $$ = $1; }
+                  ;
+
+multi_types       : multi_type
+                        { $$ = 1; /* start counting multi types */ }
+                  | multi_types ',' multi_type
+                        { ++$$; }
                   ;
 
 multi_type        : identifier
