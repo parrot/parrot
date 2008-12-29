@@ -27,7 +27,7 @@ Set up tests in an array, like in arithmetics.t
 
 require_once 'Test.php';
 
-plan(11);
+plan(8);
 $count = 1;
 
 $hello['world'] = 'hi';
@@ -60,19 +60,6 @@ is( count($hello), 3, 'count of $hello', $count );
 $count++;
 is( count($thrice), 2, 'count of $thrice', $count );
 $count++;
-
-#test array() function
-
-$arrayfunc = array(0, "key" => "key", 1);
-
-is( $arrayfunc[0], 0, 'arrayfunc[0]', $count );
-$count++;
-is( $arrayfunc[1], 1, 'arrayfunc[1]', $count );
-$count++;
-is( $arrayfunc["key"], 'key', 'arrayfunc[key]', $count );
-$count++;
-
-
 
 # vim: expandtab shiftwidth=4 ft=php:
 ?>

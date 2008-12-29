@@ -71,7 +71,7 @@
 
 ## symbolic unary
 .sub 'prefix:-' :multi(_)
-    .param num a
+    .param pmc a
 
     neg a
 

@@ -61,6 +61,12 @@ php_array.pir - PHP array Standard Library
     .REGISTER_LONG_CONSTANT(cst, 'COUNT_RECURSIVE', COUNT_RECURSIVE)
 .end
 
+=item C<array array([mixed $...])>
+
+Creates an array
+
+=cut
+
 .sub 'array'
     .param pmc args :slurpy
     .local pmc array, iter
@@ -199,12 +205,34 @@ NOT IMPLEMENTED.
 
 Create an array containing num elements starting with index start_key each initialized to val
 
-NOT IMPLEMENTED.
-
 =cut
 
 .sub 'array_fill'
-    not_implemented()
+    .param pmc args :slurpy
+    .local pmc array, index, value
+    .local int count
+    array = new 'PhpArray'
+    ($I0, index, count, value) = parse_parameters('llz', args :flat)
+    unless $I0 goto L4
+    unless count >= 0 goto L3
+    #set start index then continue from 0
+    unless index < 0 goto L1
+    array[index] = value
+    index = 0
+    $I0 = 1
+    goto L2
+  L1:
+    $I0 = 0
+  L2:
+    inc $I0
+    unless $I0 <= count goto L4
+    array[index] = value
+    inc index
+    goto L2
+  L3:
+    error(E_WARNING, "Warning: array_fill(): Number of elements must be positive")
+  L4:
+    .return(array)
 .end
 
 =item C<array array_fill_keys(array keys, mixed val)>
