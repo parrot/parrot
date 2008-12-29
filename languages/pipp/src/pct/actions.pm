@@ -409,11 +409,16 @@ method this($/) {
 }
 
 method member($/) {
-    make PAST::Op.new(
-             :inline( "%r = self" )
-         );
+    make
+        PAST::Op.new(
+            :pasttype('callmethod'),
+            :name('member'),
+            PAST::Var.new(
+                :name('$this'),
+                :scope('lexical')
+            )
+        );
 }
-
 
 method while_statement($/) {
     my $past := $( $<conditional_expression> );
@@ -639,12 +644,42 @@ method class_definition($/, $key) {
         }
 
         my $methods_block := PAST::Block.new( :blocktype('immediate') );
+
+        # declare the attributes
         for $<class_member_definition> {
             $methods_block.symbol( ~$_<VAR_NAME><ident>, :scope('attribute') );
+            $methods_block.push(
+                PAST::Var.new(
+                    :name(~$_<VAR_NAME><ident>),
+                    :scope('attribute'),
+                    :isdecl(1)
+                )
+            );
         }
+
+        # add the methods
         for $<class_method_definition> {
             $methods_block.push( $($_) );
         }
+
+        # add accessors for the attributes
+        for $<class_member_definition> {
+            $methods_block.push(
+                PAST::Block.new(
+                    :blocktype('declaration'),
+                    :name(~$_<VAR_NAME><ident>),
+                    :pirflags(':method'),
+                    :node( $/ ),
+                    PAST::Stmts.new(
+                        PAST::Var.new(
+                            :name(~$_<VAR_NAME><ident>),
+                            :scope('attribute')
+                        )
+                    )
+                )
+            );
+        }
+
         $block.push( $methods_block );
 
         make $block;

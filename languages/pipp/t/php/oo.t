@@ -152,7 +152,7 @@ class Foo {
 }
 
 $foo = new Foo;
-$foo->echo_menber();
+$foo->echo_member();
 
 ?>
 CODE
