@@ -93,12 +93,19 @@ inline op getstderr(out PMC) :base_io {
 =item B<open>(out PMC, in STR, in STR)
 
 Open URL (file, address, database, in core image) named $2 with
-Perl style mode string in $3 and create an IO object in $1.
+a mode string in $3 and create an IO object in $1.
+
+The mode consists of a string of characters specified in any order:
+
+ r : read
+ w : write
+ a : append (Note: you must specify "wa", not just "a")
+ p : pipe 
 
 =item B<open>(out PMC, in STR)
 
 Open URL (file, address, database, in core image) named $2 with
-read/write mode and create an IO object in $1.
+read mode and create an IO object in $1.
 
 =cut
 
