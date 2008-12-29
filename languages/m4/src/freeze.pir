@@ -40,7 +40,7 @@ Dump a state file.
   .local string    text
 
   .local pmc frozen_fh
-  frozen_fh = open frozen_file, ">"
+  frozen_fh = open frozen_file, 'w'
   .local pmc iterator
   iterator = new 'Iterator', symtab
   iterator = .ITERATE_FROM_START
@@ -86,7 +86,7 @@ For now we just worry about the flags 'F', 'T' and 'V'.
   .local string content
   # TODO: M4PATH
   .local pmc frozen_fh
-  frozen_fh = open frozen_file, "<"
+  frozen_fh = open frozen_file, 'r'
   if frozen_fh goto READ_CONTENT
     printerr "'"
     printerr frozen_file

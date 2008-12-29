@@ -2339,7 +2339,7 @@ notexist:
 
     #say filename
 
-    open file, filename, '<'
+    open file, filename, 'r'
 
     linecount = 0
 nextline:
@@ -2377,7 +2377,7 @@ fatal:
     .local pmc file
     .local pmc program
 
-    open file, filename, '>'
+    open file, filename, 'w'
 
     self.'list'(0, 0, file)
 

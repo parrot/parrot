@@ -574,7 +574,7 @@ STILL INCOMPLETE (see stream_open)
     unless use_include_path goto L2
     $I0 |= USE_PATH
   L2:
-    stream = stream_open(filename, '<', $I0, context)
+    stream = stream_open(filename, 'r', $I0, context)
     unless stream goto L3
     $I0 = stream_passthru(stream)
     close stream

@@ -8,7 +8,7 @@
 # ordinal values of the content of the file, 80x25.
 LOAD:
         restore S0              # Fetch the filename
-        open P0, S0, "<"
+        open P0, S0, 'r'
         set S1, ""              # S1 = accumulator
 
 # Read the file.

@@ -371,7 +371,7 @@ MAIN:
 	# SMALL FILES ONLY.  SMALL.  SMALL.  SMALL.  Parrots I/O
 	# GC does not play nice with read().
 	set S10, ""
-	open P0, "examples/pasm/small.xml", "<"
+	open P0, "examples/pasm/small.xml", 'r'
 	if P0, READ
 	print "Couldn't open small.xml\n"
 	exit 1

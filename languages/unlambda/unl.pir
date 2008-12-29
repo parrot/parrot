@@ -28,7 +28,7 @@ L<http://www.madore.org/~david/programs/unlambda/>
     goto run
 open_file:
     $S0 = argv[1]
-    in = open $S0, "<"
+    in = open $S0, 'r'
     $I0 = defined in
     if $I0 goto run
     printerr "can't open '"

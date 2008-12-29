@@ -108,7 +108,7 @@ specified type.
   fromfile:
     # Read in the source file
     filename = argv[1]
-    filehandle = open filename, "<"
+    filehandle = open filename, 'r'
 
   grabline:
     $S1 = read filehandle, 65535

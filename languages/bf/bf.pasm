@@ -23,7 +23,7 @@ SOURCE:
   set I3, 1     # optimize switch
   set S0, P5[2]
 no_o:
-  open P1, S0, "<"
+  open P1, S0, 'r'
   defined I0, P1
   unless I0, usage
 SOURCE_LOOP:

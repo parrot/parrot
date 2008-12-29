@@ -36,7 +36,7 @@ usage:
 
   # Read the file into S1
 SOURCE:
-  open $P1, filename, "<"
+  open $P1, filename, 'r'
   defined $I0, $P1
   if $I0, SOURCE_LOOP
   print filename

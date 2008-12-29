@@ -579,7 +579,7 @@ nocol:
     err  = "File not found " . file
 
     .local pmc io
-    open io, file, "<"
+    open io, file, 'r'
     $I0 = defined io
     unless $I0 goto nok
     null err

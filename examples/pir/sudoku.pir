@@ -237,7 +237,7 @@ err:
     .local string line, result, c
     .local int i, len
     result = ""
-    io = open file_name, "<"
+    io = open file_name, 'r'
     $I0 = defined io
     unless $I0 goto err
 loop:

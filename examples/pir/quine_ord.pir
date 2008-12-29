@@ -1433,9 +1433,9 @@ push code_as_data, 109
 push code_as_data, 101
 push code_as_data, 44
 push code_as_data, 32
-push code_as_data, 34
-push code_as_data, 60
-push code_as_data, 34
+push code_as_data, 39
+push code_as_data, 114 
+push code_as_data, 39
 push code_as_data, 10
 push code_as_data, 32
 push code_as_data, 32
@@ -3532,7 +3532,7 @@ DO_QUINE:
     .local pmc code_fh
     .local int size
     size = stat program_name, .STAT_FILESIZE
-    code_fh = open program_name, "<"
+    code_fh = open program_name, 'r'
     .local string code
     code = read code_fh, size
 

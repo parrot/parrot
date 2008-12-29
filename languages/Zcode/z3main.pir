@@ -97,7 +97,7 @@ done:
   setattribute self, "Zmachine\0file", pfile
   .include "stat.pasm"
   $I0 = stat file, .STAT_FILESIZE
-  io = open file, "<"
+  io = open file, 'r'
   $S0 = read io, $I0
   close io
   im = new 'String'

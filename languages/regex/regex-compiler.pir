@@ -48,7 +48,7 @@ pir_to_pbc:
         .local string result
         .local string buffer
         result = ""
-        file = open filename, "<"
+        file = open filename, 'r'
 loop:   buffer = read file, 65536
         $I0 = length buffer
         le $I0, 0, done

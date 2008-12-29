@@ -51,7 +51,7 @@ iter_end:
     .param pmc ar
     #concat me, "x"         # test output is in source.pirx
     .local pmc file
-    open file, me, ">"
+    open file, me, 'w'
     unless file, err_write
     .local pmc iter
     iter = new 'Iterator', ar
@@ -204,7 +204,7 @@ iter_end:
 .sub _read          # read in source code of script
     .param string me
     .local pmc file
-    open file, me, "<"
+    open file, me, 'r'
     unless file, err_open
     .local pmc ar
     .local string line

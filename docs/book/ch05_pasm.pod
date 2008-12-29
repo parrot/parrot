@@ -1024,11 +1024,11 @@ and a modestring. It returns a C<ParrotIO>X<ParrotIO object> object on
 success and a C<Undef>X<Undef PMC> X<I/O;failure> object on
 failure. The C<ParrotIO> object hides OS-specific details.
 
-  open P0, "people.txt", "<"
+  open P0, "people.txt", "r"
 
 The modestring specifies whether the file is opened in read-only
-(C<E<lt>>), write-only (C<E<gt>>), read-write (C<+E<lt>>), or append
-mode (C<E<gt>E<gt>>).
+(C<r>), write-only (C<w>), read-write (C<rw>), or append
+mode (C<wa>).
 
 The C<close>X<close opcode (PASM)> opcode closes a C<ParrotIO> object:
 

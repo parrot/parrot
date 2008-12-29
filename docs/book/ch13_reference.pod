@@ -1771,7 +1771,7 @@ X<open opcode (PASM)>
   open R<DEST>, R<FILENAME>
   open R<DEST>, R<FILENAME>, R<MODE>
 
-Open a file in the specified mode ("E<lt>", "E<gt>", etc.) and return
+Open a file in the specified mode ("r", "w", etc.) and return
 a filehandle. Without the mode it defaults to read/write.
 
 I<Arguments: P, S, S or P, S>

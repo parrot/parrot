@@ -207,7 +207,7 @@ SERVE_GET:
 SERVE_file:
     # try to open the file in url
     concat url, doc_root, url
-    fp = open url, "<"
+    fp = open url, 'r'
     unless fp goto SERVE_404
     len = stat url, .STAT_FILESIZE
     read file_content, fp, len
