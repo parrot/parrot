@@ -570,6 +570,86 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
 /*
 
 =item C<static void
+optimize_instr(lexer_state * const lexer, instruction * const instr)>
+
+Optimize the instruction C<instr>. Currently, these instructions are optimized:
+
+ box_p_ic  --> set_p_pc
+ box_p_nc  --> set_p_pc
+ box_p_sc  --> set_p_pc
+
+=cut
+
+*/
+static void
+optimize_instr(lexer_state * const lexer, instruction * const instr) {
+
+    switch (instr->opcode) {
+        case PARROT_OP_box_p_ic: {
+            /* box P0, 42 --> set P0, <Integer PMC const with value 42> */
+
+            /* the last operand, which is the second in this case */
+            expression *second_operand = instr->operands;
+            PMC *intconst = pmc_new(lexer->interp,
+                                    Parrot_get_ctx_HLL_type(lexer->interp, enum_class_Integer));
+            int index     = add_pmc_const(lexer->bc, intconst);
+            VTABLE_set_integer_native(lexer->interp, intconst, second_operand->expr.c->val.ival);
+
+            instr->opcode = PARROT_OP_set_p_pc;
+
+            /* replace 2nd operand with the new one. */
+            second_operand->expr.c->val.ival = index;
+
+            break;
+        }
+        case PARROT_OP_box_p_nc: {
+            /* box P0, 3.14 --> set P0, <Integer PMC const with value 3.14> */
+
+            /* the last operand, which is the second in this case */
+            expression *second_operand = instr->operands;
+            PMC *numconst = pmc_new(lexer->interp,
+                                    Parrot_get_ctx_HLL_type(lexer->interp, enum_class_Float));
+            int index     = add_pmc_const(lexer->bc, numconst);
+            VTABLE_set_number_native(lexer->interp, numconst, second_operand->expr.c->val.nval);
+
+            instr->opcode = PARROT_OP_set_p_pc;
+
+            /* replace 2nd operand with the new one. */
+            second_operand->expr.c->val.ival = index;
+            second_operand->expr.c->type     = INT_TYPE;
+
+            break;
+        }
+        case PARROT_OP_box_p_sc: {
+            /* box P0, "hi" --> set P0, <String PMC const with value "hi"> */
+
+            /* the last operand, which is the second in this case */
+            expression *second_operand = instr->operands;
+            PMC *strconst = pmc_new(lexer->interp,
+                                    Parrot_get_ctx_HLL_type(lexer->interp, enum_class_String));
+            int index     = add_pmc_const(lexer->bc, strconst);
+
+            VTABLE_set_string_native(lexer->interp, strconst,
+                                     string_from_cstring(lexer->interp,
+                                                         second_operand->expr.c->val.sval,
+                                                         strlen(second_operand->expr.c->val.sval)));
+
+            instr->opcode = PARROT_OP_set_p_pc;
+
+            /* replace 2nd operand with the new one. */
+            second_operand->expr.c->val.ival = index;
+            second_operand->expr.c->type     = INT_TYPE;
+
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+/*
+
+=item C<static void
 emit_pbc_instr(lexer_state * const lexer, instruction * const instr)>
 
 Emit PBC for one instruction.
@@ -591,31 +671,7 @@ emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
     /* optimize, if possible.
      * XXX is this a good place to do that?
      */
-    switch (instr->opcode) {
-        case PARROT_OP_box_p_ic: {
-            /* box P0, 42 --> set P0, <Integer PMC const with value 42> */
-
-            /* the last operand, which is the second in this case */
-            expression *second_operand = instr->operands;
-            PMC *intconst = pmc_new(lexer->interp,
-                                    Parrot_get_ctx_HLL_type(lexer->interp, enum_class_Integer));
-            int index     = add_pmc_const(lexer->bc, intconst);
-            VTABLE_set_integer_native(lexer->interp, intconst, second_operand->expr.c->val.ival);
-
-            instr->opcode = PARROT_OP_set_p_pc;
-
-            /* replace 2nd operand with the new one. */
-            second_operand->expr.c->val.ival = index;
-
-            break;
-        }
-        case PARROT_OP_box_p_nc:
-            break;
-        case PARROT_OP_box_p_sc:
-            break;
-        default:
-            break;
-    }
+    optimize_instr(lexer, instr);
 
 
     emit_opcode(lexer->bc, instr->opcode);
