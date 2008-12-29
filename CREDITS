@@ -28,15 +28,15 @@ D: P6C update
 N: Adam Thomason
 D: Building on various platforms.
 
+N: Ahmed Zawawi
+D: Rakudo builtins
+
 N: Alberto Manuel Brandao Simoes
 U: ambs
 E: ambs@cpan.org
 D: Named arguments support and recovery support on PIR parser
 S: Braga, Portugal
 W: http://alfarrabio.di.uminho.pt/~albie/
-
-N: Ahmed Zawawi
-D: Rakudo builtins
 
 N: Aldo Calpini
 D: Debugging tutorial
@@ -398,7 +398,7 @@ E: jkeenan@cpan.org
 U: jkeenan
 D: Testing of configuration and build tools
 W: http://thenceforward.net/parrot/
-S:  Brooklyn, NY, USA
+S: Brooklyn, NY, USA
 
 N: Jarkko Hietaniemi
 U: jhi
@@ -501,11 +501,6 @@ E: loneowl@ritalin.shout.net
 U: jisom
 D: Getopt/Obj.pir
 
-N: Jürgen Bömmels
-U: boemmels
-E: boemmels@web.de
-D: Parrot I/O; macro stuff in assembler.
-
 N: Julian Albo
 U: julianalbo
 E: julian.notfound@gmail.com
@@ -514,6 +509,11 @@ N: Julian Fondren
 E: ayrnieu@gmail.com
 D: Standardize and add languages/*/MAINTAINER files
 D: a patch to catch exception in Lua
+
+N: Jürgen Bömmels
+U: boemmels
+E: boemmels@web.de
+D: Parrot I/O; macro stuff in assembler.
 
 N: Karl Forner
 D: shootout examples testing
@@ -567,7 +567,6 @@ S: Herrnbaumgarten, Austria
 N: Luca Barbato
 D: fix to make installable
 E: lu_zero@gentoo.org
-
 
 N: Luke Palmer
 E: luke@luqui.org
@@ -777,6 +776,10 @@ N: Ruben Fonseca
 D: opcode test coverage script
 E: fonseka@gmail.com
 
+N: Saleem Ansari
+E: tuxdna@gmail.com
+D: Fixed typos in documentation
+
 N: Sam Ruby
 E: rubys@intertwingly.net
 U: rubys
@@ -826,6 +829,13 @@ D: Lot of JIT/sun patches
 N: Sterling Hughes
 D: Questions for the FAQ
 
+N: Stephen Weeks
+U: tene
+D: Cardinal, a Ruby compiler
+D: ChitChat, a Smalltalk compiler
+D: Minor Rakudo patches
+E: tene@allalone.org
+
 N: Steve Clark
 D: Bugfixes
 
@@ -854,22 +864,15 @@ N: Tanton Gibbs
 U: thgibbs
 E: thgibbs@deltafarms.com
 
-N: Stephen Weeks
-U: tene
-D: Cardinal, a Ruby compiler
-D: ChitChat, a Smalltalk compiler
-D: Minor Rakudo patches
-E: tene@allalone.org
-
-N: Tim Bunce
-E: Tim.Bunce@pobox.com
-U: timbo
-
 N: Thilo Planz
 D: partcl tests and inspiration
 
 N: Thomas Kratz
 D: Fixes for VMS
+
+N: Tim Bunce
+E: Tim.Bunce@pobox.com
+U: timbo
 
 N: TOGoS
 D: Some FAQ questions and answers
@@ -909,10 +912,6 @@ N: Zach Lipton
 N: Zach Morgan
 E: zpmorgan@gmail.com
 D: Rakudo patch
-
-N: Saleem Ansari
-E: tuxdna@gmail.com
-D: Fixed typos in documentation
 
 N: cvsdummy
 U: cvsdummy
