@@ -5,7 +5,7 @@ package Parrot::Pmc2c::UtilFunctions;
 use strict;
 use warnings;
 use base qw( Exporter );
-our @EXPORT_OK = qw( count_newlines gen_ret dont_edit dynext_load_code
+our @EXPORT_OK = qw( count_newlines return_statement dont_edit dynext_load_code
     c_code_coda slurp spew splat open_file filename escape_filename
     args_from_parameter_list
     passable_args_from_parameter_list
@@ -84,7 +84,7 @@ sub dont_edit {
 EOC
 }
 
-=item C<gen_ret($method, $body)>
+=item C<return_statement($method, $body)>
 
 Generate the C code for a C<return> statement, if the body is empty then
 make a cast if needed.
@@ -93,7 +93,7 @@ This method is imported by subclasses.
 
 =cut
 
-sub gen_ret {
+sub return_statement {
     my ( $method, $body ) = @_;
 
     my $return_type = $method->return_type;

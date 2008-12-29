@@ -1,4 +1,4 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =head1 Parrot::Pmc2c::PMC::default Instance Methods
@@ -10,7 +10,7 @@
 package Parrot::Pmc2c::PMC::default;
 use strict;
 use warnings;
-use Parrot::Pmc2c::UtilFunctions qw( gen_ret );
+use Parrot::Pmc2c::UtilFunctions qw( return_statement );
 use base qw( Parrot::Pmc2c::PMC );
 
 =item C<pre_method_gen()>
@@ -33,7 +33,7 @@ sub pre_method_gen {
             }
         );
 
-        my $ret = gen_ret($method);
+        my $ret = return_statement($method);
         $new_default_method->body( Parrot::Pmc2c::Emitter->text(<<"EOC") );
     cant_do_method(interp, pmc, "$vt_method_name");
     $ret

@@ -28,8 +28,7 @@ use base qw( Parrot::Pmc2c::PMC );
 use Parrot::Pmc2c::Emitter ();
 use Parrot::Pmc2c::PMCEmitter ();
 use Parrot::Pmc2c::Method ();
-use Parrot::Pmc2c::UtilFunctions
-    qw( gen_ret dont_edit count_newlines dynext_load_code c_code_coda );
+use Parrot::Pmc2c::UtilFunctions qw( return_statement );
 use Text::Balanced 'extract_bracketed';
 
 =item C<make_RO($type)>
@@ -97,6 +96,8 @@ EOC
             $self->add_method($ro_method);
         }
         elsif ( $parent->vtable_method_does_write($vt_method_name) ) {
+            # All parameters passed in are shims, because we're
+            # creating an exception-thrower.
             my @parameters = split( /\s*,\s*/, $vt_method->parameters );
             @parameters = map { "SHIM($_)" } @parameters;
 
@@ -110,7 +111,7 @@ EOC
                 }
             );
             my $pmcname = $parent->name;
-            my $ret     = gen_ret($ro_method);
+            my $ret     = return_statement($ro_method);
             my $body    = <<EOC;
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_WRITE_TO_CONSTCLASS,
             "$vt_method_name() in read-only instance of $pmcname");

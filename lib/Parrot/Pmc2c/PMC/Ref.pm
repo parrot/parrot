@@ -1,4 +1,4 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 =head1 Parrot::Pmc2c::Ref Instance Methods
@@ -11,7 +11,7 @@ package Parrot::Pmc2c::PMC::Ref;
 use base 'Parrot::Pmc2c::PMC';
 use strict;
 use warnings;
-use Parrot::Pmc2c::UtilFunctions qw( gen_ret passable_args_from_parameter_list );
+use Parrot::Pmc2c::UtilFunctions qw( return_statement passable_args_from_parameter_list );
 
 =item C<prederef($method)>
 
@@ -81,7 +81,7 @@ sub pre_method_gen {
         if ( $method->return_type ne 'void' ) {
             $ret_def    = $method->return_type . ' ret_val;';
             $ret_assign = 'ret_val = ';
-            $ret        = gen_ret( $method, 'ret_val' );
+            $ret        = return_statement( $method, 'ret_val' );
         }
         my $body = <<EOC;
     $ret_def

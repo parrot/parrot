@@ -1,12 +1,12 @@
 package Parrot::Pmc2c::PMC::deleg_pmc;
 
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2008, The Perl Foundation.
 # $Id$
 
 use base 'Parrot::Pmc2c::PMC';
 use strict;
 use warnings;
-use Parrot::Pmc2c::UtilFunctions qw( gen_ret passable_args_from_parameter_list );
+use Parrot::Pmc2c::UtilFunctions qw( return_statement passable_args_from_parameter_list );
 
 =over 4
 
@@ -36,7 +36,7 @@ sub pre_method_gen {
         );
 
         my $arg  = passable_args_from_parameter_list( $method->parameters );
-        my $ret  = gen_ret( $method, "VTABLE_$vt_method_name(interp, attr$arg)" );
+        my $ret  = return_statement( $method, "VTABLE_$vt_method_name(interp, attr$arg)" );
         $new_method->body( Parrot::Pmc2c::Emitter->text(<<"EOC") );
     PMC * const attr = get_attrib_num(PMC_data_typed(pmc, SLOTTYPE *), 0);
     $ret
