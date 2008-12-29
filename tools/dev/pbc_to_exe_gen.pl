@@ -11,6 +11,9 @@ print do { local $/; <DATA> };
 __END__
 #! parrot
 
+# DO NOT EDIT; your changes will be lost.
+# This file was generated automatically by tools/dev/pbc_to_exe_gen.pl
+
 =head1 TITLE
 
 pbc_to_exe
