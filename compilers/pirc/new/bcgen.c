@@ -418,7 +418,7 @@ C<type_count> indicates the number of types in the list.
 */
 static PMC *
 generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned type_count) {
-    unsigned i;
+    unsigned    i;
     multi_type *iter;
 
     /* create a FixedPMCArray to store all multi types */
@@ -427,7 +427,10 @@ generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned
     VTABLE_set_integer_native(bc->interp, multi_signature, type_count);
 
 
-    if (type_count == 1) { /* no actual types, just empty :multi() flag. */
+    /* A type_count of 1 means there was a :multi flag, but no :multi types.
+     * therefore, create a special signature and return that.
+     */
+    if (type_count == 1) {
         STRING * const sig     = string_from_literal(bc->interp, "__VOID");
         PMC    * const sig_pmc = pmc_new(bc->interp, enum_class_String);
 
@@ -438,6 +441,8 @@ generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned
     }
 
     iter = types;
+    --type_count; /* type count is 1 too high, fix that now. */
+
     /* add all multi types to the PMC array */
     for (i = 0; i < type_count; ++i) {
         PMC *sig_pmc;

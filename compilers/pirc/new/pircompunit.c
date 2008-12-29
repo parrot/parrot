@@ -141,8 +141,8 @@ Add the multi-method signature type in C<multitype> to the current subroutine.
 */
 void
 set_sub_multi_types(lexer_state * const lexer, expression * const multitype) {
-    /* info.num_types is 1 higher than the actual number of types; n=1 means :multi() without
-     * any types.
+    /* info.num_types is 1 higher than the actual number of types;
+     * n=1 means :multi() without any types; therefore, subtract 1 for actual number.
      */
     unsigned num_types = CURRENT_SUB(lexer)->info.num_multi_types - 1;
 
