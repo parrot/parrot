@@ -494,19 +494,17 @@ then a lexinfo is created after all. The created lexinfo is returned.
 */
 static PMC *
 create_lexinfo(bytecode * const bc, PMC * sub, lexical * const lexicals, int lexflag) {
-    lexical *lexiter;
+    lexical      * lexiter     = lexicals;
+    INTVAL   const lex_info_id = Parrot_get_ctx_HLL_type(bc->interp, enum_class_LexInfo);
+    STRING * const method      = string_from_literal(bc->interp, "declare_lex_preg");
 
     int      outer = 0; /* change type of this */
 
-
-    INTVAL const lex_info_id      = Parrot_get_ctx_HLL_type(bc->interp, enum_class_LexInfo);
-
-    STRING * const method         = string_from_literal(bc->interp, "declare_lex_preg");
-
-    PMC * lex_info                = pmc_new_noinit(bc->interp, lex_info_id);
+    /* create a lexinfo PMC */
+    PMC * lex_info             = pmc_new_noinit(bc->interp, lex_info_id);
     VTABLE_init_pmc(bc->interp, lex_info, sub);
 
-    lexiter = lexicals;
+    /* walk through the list of lexicals and register them */
     while (lexiter) {
         STRING *lexname = string_from_cstring(bc->interp, lexiter->name, strlen(lexiter->name));
 
@@ -569,6 +567,19 @@ find_outer_sub(bytecode * const bc, char const * const outername) {
 }
 
 
+
+/*
+
+Get the namespace PMC.
+
+*/
+static PMC *
+get_namespace_pmc(bytecode * const bc, multi_type * const ns) {
+
+    return NULL;
+}
+
+
 /*
 
 =item C<void
@@ -604,14 +615,10 @@ add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex) {
     sub->start_offs       = info->startoffset;
     sub->end_offs         = info->endoffset;
 
-    /* XXX fix namespace stuff */
-    sub->namespace_name   = NULL;
+    sub->namespace_name   = get_namespace_pmc(bc, info->name_space);
 
-    /* XXX does this work properly? is "current_HLL" really "current"? */
     sub->HLL_id           = CONTEXT(bc->interp)->current_HLL;
-
     sub->lex_info         = create_lexinfo(bc, sub_pmc, info->lexicals, needlex);
-
     sub->outer_sub        = find_outer_sub(bc, info->outersub);
 
     /* Set the vtable index; if this .sub was declared as :vtable, its vtable

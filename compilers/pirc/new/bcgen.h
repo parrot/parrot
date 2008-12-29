@@ -64,6 +64,7 @@ typedef struct sub_info {
     unsigned             num_multi_types;
     multi_type         * multi_types;   /* data types of parameters if this is a multi sub */
     lexical            * lexicals;
+    multi_type         * name_space; /* can be a string or key */
 
 } sub_info;
 
