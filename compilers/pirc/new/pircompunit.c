@@ -145,6 +145,31 @@ set_sub_multi_arity(lexer_state * const lexer, unsigned num_multi_types) {
 /*
 
 =item C<void
+add_sub_multi_type(lexer_state * const lexer, expression * const multitype)>
+
+Add the multi-method signature type in C<multitype> to the current subroutine.
+
+=cut
+
+*/
+void
+add_sub_multi_type(lexer_state * const lexer, expression * const multitype) {
+
+    switch (multitype->type) {
+        case EXPR_CONSTANT:
+        case EXPR_IDENT:
+        case EXPR_KEY:
+            break;
+        default:
+            break;
+    }
+
+    /* CURRENT_SUB(lexer)->info. */
+}
+
+/*
+
+=item C<void
 set_sub_vtable(lexer_state * const lexer, char const * vtablename)>
 
 Set the :vtable() flag argument to the current subroutine. If C<vtablename>
@@ -1470,6 +1495,24 @@ expression *
 expr_from_num(lexer_state * const lexer, double nval) {
     return expr_from_const(lexer, new_const(lexer, NUM_TYPE, nval));
 }
+
+/*
+
+=item C<expression *
+expr_from_string(lexer_state * const lexer, char const * const sval)>
+
+Same as C<expr_from_int()>, except it takes a C<string> parameter.
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+expression *
+expr_from_string(lexer_state * const lexer, char const * const sval) {
+    return expr_from_const(lexer, new_const(lexer, STRING_TYPE, sval));
+}
+
 
 /*
 

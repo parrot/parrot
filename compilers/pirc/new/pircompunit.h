@@ -310,9 +310,6 @@ typedef struct subroutine {
 
     struct sub_info     info;
 
-    /* XXX the whole multi stuff must be implemented */
-    char              **multi_types;   /* data types of parameters if this is a multi sub */
-
     target             *parameters;    /* parameters of this sub */
     instruction        *statements;    /* statements of this sub */
 
@@ -344,6 +341,7 @@ void set_sub_nsentry(struct lexer_state * const lexer, char const * const nsentr
 void set_sub_methodname(struct lexer_state * const lexer, char const * const methodname);
 
 void set_sub_multi_arity(struct lexer_state * const lexer, unsigned num_multi_types) ;
+void add_sub_multi_type(struct lexer_state * const lexer, expression * const multitype);
 
 /* install a new subroutine node */
 void new_subr(struct lexer_state * const lexer, char const * const subname);
@@ -367,6 +365,7 @@ expression *expr_from_const(struct lexer_state * const lexer, constant * const c
 expression *expr_from_target(struct lexer_state * const lexer, target * const t);
 expression *expr_from_ident(struct lexer_state * const lexer, char const * const name);
 expression *expr_from_key(struct lexer_state * const lexer, key * const k);
+expression *expr_from_string(struct lexer_state * const lexer, char const * const sval);
 
 /* functions for argument node creation and storing */
 argument *new_argument(struct lexer_state * const lexer, expression * const expr);

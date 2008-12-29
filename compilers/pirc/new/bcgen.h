@@ -15,18 +15,49 @@ struct bytecode;
 
 typedef struct bytecode bytecode;
 
+/* selector values for multi_union */
+typedef enum multi_entry {
+    MULTI_TYPE_KEYED,
+    MULTI_TYPE_IDENT
+
+} multi_entry;
+
+typedef struct multi_key_type {
+
+    struct multi_key_type * next;
+} multi_key_type;
+
+
+/* for multi-method signature types */
+typedef struct multi_type {
+
+    union multi_union {
+        char           * ident;
+        multi_key_type * key;
+    } u;
+
+    multi_entry entry_type;
+
+    struct multi_type * next;
+
+} multi_type;
+
+
+
+
 /* sub info structure, containing all info about a sub that a bytecode
  * generator needs to know.
  */
 typedef struct sub_info {
-    char const * subname;
-    char const * nsentry;
-    char const * subid;
-    int          vtable_index;
-    unsigned     regs_used[NUM_PARROT_TYPES];
-    int          startoffset;
-    int          endoffset;
-    unsigned     num_multi_types;
+    char const         * subname;
+    char const         * nsentry;
+    char const         * subid;
+    int                  vtable_index;
+    unsigned             regs_used[NUM_PARROT_TYPES];
+    int                  startoffset;
+    int                  endoffset;
+    unsigned             num_multi_types;
+    multi_type         * multi_types;   /* data types of parameters if this is a multi sub */
 
 } sub_info;
 

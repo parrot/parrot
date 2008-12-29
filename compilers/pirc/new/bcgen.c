@@ -417,7 +417,7 @@ C<type_count> indicates the number of types in the list.
 
 */
 static PMC *
-generate_multi_signature(bytecode * const bc, struct key * const multi_types, unsigned type_count) {
+generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned type_count) {
     unsigned i;
     /* create a FixedPMCArray to store all multi types */
     PMC * const multi_signature = pmc_new(bc->interp, enum_class_FixedPMCArray);
@@ -531,7 +531,7 @@ add_sub_pmc(bytecode * const bc, sub_info * const info) {
     sub->vtable_index     = info->vtable_index;
 
     /* XXX fix multi stuff */
-    sub->multi_signature  = NULL;
+    sub->multi_signature  = generate_multi_signature(bc, info->multi_types, info->num_multi_types);
 
     /* store register usage of this sub. */
     for (i = 0; i < 4; ++i)

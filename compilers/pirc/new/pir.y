@@ -443,6 +443,7 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
              namespace_slice
              method
              op_arg_expr
+             multi_type
 
 %type <key>  keys
              keylist
@@ -745,14 +746,23 @@ opt_multi_types   : /* empty */
                   ;
 
 multi_types       : multi_type
-                        { $$ = 1; /* start counting multi types */ }
+                        {
+                          $$ = 1; /* start counting multi types */
+                          add_sub_multi_type(lexer, $1);
+                        }
                   | multi_types ',' multi_type
-                        { ++$$; }
+                        {
+                          ++$$;
+                          add_sub_multi_type(lexer, $3);
+                        }
                   ;
 
 multi_type        : identifier
+                        { $$ = expr_from_ident(lexer, $1); }
                   | TK_STRINGC
+                        { $$ = expr_from_string(lexer, $1); }
                   | keylist
+                        { $$ = expr_from_key(lexer, $1); }
                   ;
 
 parameter_list    : parameters
