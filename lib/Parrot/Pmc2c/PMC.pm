@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2008, The Perl Foundation.
 # $Id$
 #
 
@@ -27,7 +27,6 @@ use base qw( Exporter );
 our @EXPORT_OK = qw();
 use Storable ();
 use Parrot::PMC;
-use Parrot::Pmc2c::UtilFunctions qw(spew);
 use Parrot::Pmc2c::Method;
 
 sub create {

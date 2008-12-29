@@ -25,8 +25,7 @@ use warnings;
 use Parrot::Pmc2c::Emitter;
 use Parrot::Pmc2c::Method;
 use Parrot::Pmc2c::MethodEmitter;
-use Parrot::Pmc2c::UtilFunctions
-    qw( gen_ret dont_edit count_newlines dynext_load_code c_code_coda );
+use Parrot::Pmc2c::UtilFunctions qw( dont_edit dynext_load_code c_code_coda );
 use Text::Balanced 'extract_bracketed';
 use Parrot::Pmc2c::PCCMETHOD;
 use Parrot::Pmc2c::MULTI;
