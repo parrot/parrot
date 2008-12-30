@@ -981,6 +981,9 @@ mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
             if (type == enum_type_undef)
                 return PMCNULL;
         }
+        else if (sig_elem->vtable->base_type == enum_class_Integer) {
+            type = VTABLE_get_integer(interp, sig_elem);
+        }
         else
             type = pmc_type_p(interp, sig_elem);
 

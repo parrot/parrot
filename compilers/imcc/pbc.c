@@ -979,12 +979,11 @@ PARROT_MALLOC
 static PMC*
 mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
 {
-    PMC              *multi_sig;
-    pcc_sub_t * const pcc_sub = r->pcc_sub;
-    const INTVAL      n       = pcc_sub->nmulti;
-    INTVAL            i;
-
     PackFile_ConstTable *ct;
+    PMC                 *multi_sig;
+    pcc_sub_t * const    pcc_sub = r->pcc_sub;
+    const INTVAL         n       = pcc_sub->nmulti;
+    INTVAL               i;
 
     /* a :multi sub with no arguments */
     if (!pcc_sub->multi[0])
@@ -1001,9 +1000,17 @@ mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
         r = pcc_sub->multi[i];
 
         if (r->set == 'S') {
-            sig_pmc = pmc_new(interp, enum_class_String);
-            VTABLE_set_string_native(interp, sig_pmc,
-                    ct->constants[r->color]->u.string);
+            STRING *type_name = ct->constants[r->color]->u.string;
+            INTVAL  type_num  = pmc_type(interp, type_name);
+
+            if (type_num == enum_type_undef) {
+                sig_pmc = pmc_new(interp, enum_class_String);
+                VTABLE_set_string_native(interp, sig_pmc, type_name);
+            }
+            else {
+                sig_pmc = pmc_new(interp, enum_class_Integer);
+                VTABLE_set_integer_native(interp, sig_pmc, type_num);
+            }
         }
         else {
             PARROT_ASSERT(r->set == 'K');
