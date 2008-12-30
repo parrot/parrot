@@ -475,6 +475,37 @@ C<value>.
 
 /*
 
+=item C<STRING *get_repr()>
+
+Returns the Parrot string representation C<key>.
+
+=cut
+
+*/
+
+    VTABLE STRING *get_repr() {
+        STRING *res    = CONST_STRING(INTERP, "[ ");
+        const INTVAL n = SELF.get_integer();
+        INTVAL  j;
+
+        for (j = 0; j < n; ++j) {
+            PMC * const val = SELF.get_pmc_keyed_int(j);
+            res = string_append(INTERP, res, CONST_STRING(INTERP, "\""));
+            res = string_append(INTERP, res, VTABLE_get_repr(INTERP, val));
+            res = string_append(INTERP, res, CONST_STRING(INTERP, "\""));
+
+            if (j < n - 1)
+                res = string_append(INTERP, res, CONST_STRING(INTERP, ", "));
+        }
+
+        res = string_append(INTERP, res, CONST_STRING(INTERP, " ]"));
+        return res;
+    }
+
+
+
+/*
+
 =back
 
 =head2 Freeze/thaw Interface

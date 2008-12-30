@@ -977,7 +977,7 @@ Checks if the ascii STRING C<str> is just an integer.
     }
 
     VTABLE STRING* get_repr() {
-        return key_set_to_string(INTERP, SELF);
+        return VTABLE_get_string(INTERP, SELF);
     }
 
 /*
