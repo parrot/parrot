@@ -62,6 +62,7 @@ Parrot_io_parse_open_flags(PARROT_INTERP, ARGIN_NULLOK(STRING *mode_str))
                 break;
             case 'a':
                 flags |= PIO_F_APPEND;
+                flags |= PIO_F_WRITE;
                 if ((flags & PIO_F_TRUNC)) /* don't truncate if appending */
                     flags &= ~PIO_F_TRUNC;
                 break;
