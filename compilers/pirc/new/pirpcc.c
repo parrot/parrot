@@ -240,7 +240,7 @@ targets_to_operands(lexer_state * const lexer, target * const targets, unsigned 
 
 /*
 
-=item C<static void
+=item C<void
 emit_sub_epilogue(lexer_state * const lexer)>
 
 Emit final instructions for the current subroutine. In case

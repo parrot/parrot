@@ -1989,26 +1989,13 @@ int
 is_parrot_op(lexer_state * const lexer, char const * const name) {
     int opcode = lexer->interp->op_lib->op_code(name, 0); /* check short name, e.g. "set" */
 
-    /* if not found, try long name, e.g. "set_i_ic" */
-    if (opcode < 0)
-        opcode = lexer->interp->op_lib->op_code(name, 1); /* check long name */
-
-    if (opcode >= 0)
-        return TRUE;
-    else
-        return FALSE;
-
+    /* do *NOT* check for the "long" name variant, such as "set_i_ic";
+     * signatures (such as the _i_ic part) will be calculated by PIRC,
+     * adding it already will generate e.g. "set_i_ic_i_ic", which is
+     * incorrect, obviously.
+     */
+    return (opcode >= 0);
 }
-
-
-
-
-
-
-
-
-
-
 
 
 /*
@@ -2053,7 +2040,7 @@ new_sub_instr(lexer_state * const lexer, int opcode, char const * const opname,
 
 /*
 
-=item C<static void
+=item C<void
 update_op(lexer_state * const lexer, instruction * const instr, int newop)>
 
 Update the instruction C<instr>; it is replaced by the op with opcode C<newop>.
