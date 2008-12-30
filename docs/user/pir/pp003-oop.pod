@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Programming Parrot -- Using objects
 
 Yes, you've read correctly. Parrot has the ability to create
