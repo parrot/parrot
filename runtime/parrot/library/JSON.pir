@@ -274,8 +274,7 @@ iter_loop:
   goto iter_loop
 
 done_iter:
-  $P0 = find_global 'Data::Sort', 'simple'
-  $P0( keys )
+  keys.'sort'()
 
   .local string result,separator
 
