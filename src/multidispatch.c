@@ -111,12 +111,6 @@ static UINTVAL mmd_distance(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void mmd_expand_x(PARROT_INTERP, INTVAL func_nr, INTVAL new_x)
-        __attribute__nonnull__(1);
-
-static void mmd_expand_y(PARROT_INTERP, INTVAL func_nr, INTVAL new_y)
-        __attribute__nonnull__(1);
-
 static void mmd_search_by_sig_obj(PARROT_INTERP,
     ARGIN(STRING *name),
     ARGIN(PMC *sig_obj),
@@ -143,11 +137,6 @@ static int mmd_search_local(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC* Parrot_mmd_arg_tuple_func(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-static void Parrot_mmd_ensure_writable(PARROT_INTERP,
-    INTVAL function,
-    ARGIN_NULLOK(const PMC *pmc))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
@@ -220,27 +209,6 @@ Parrot_mmd_find_multi_from_sig_obj(PARROT_INTERP, ARGIN(STRING *name), ARGIN(PMC
     mmd_search_global(interp, name, candidate_list);
 
     return Parrot_mmd_sort_manhattan_by_sig_pmc(interp, candidate_list, invoke_sig);
-}
-
-
-/*
-
-=item C<static void Parrot_mmd_ensure_writable>
-
-Make sure C<pmc> is writable enough for C<function>.
-
-{{**DEPRECATE**}}
-
-=cut
-
-*/
-
-static void
-Parrot_mmd_ensure_writable(PARROT_INTERP, INTVAL function, ARGIN_NULLOK(const PMC *pmc))
-{
-    if (!PMC_IS_NULL(pmc) && (pmc->vtable->flags & VTABLE_IS_READONLY_FLAG))
-        Parrot_ex_throw_from_c_args(interp, 0, 1, "%s applied to read-only argument",
-            Parrot_MMD_method_name(interp, function));
 }
 
 
@@ -408,101 +376,6 @@ Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
 
     Parrot_pcc_invoke_sub_from_sig_object(interp, sub, sig_object);
     dod_unregister_pmc(interp, sig_object);
-}
-
-
-/*
-
-=item C<static void mmd_expand_x>
-
-Expands the function table in the X dimension to include C<new_x>.
-
-{{**DEPRECATE**}}
-
-=cut
-
-*/
-
-static void
-mmd_expand_x(PARROT_INTERP, INTVAL func_nr, INTVAL new_x)
-{
-    funcptr_t *new_table;
-    UINTVAL x;
-    UINTVAL y;
-    UINTVAL i;
-    char *src_ptr, *dest_ptr;
-    size_t old_dp, new_dp;
-    MMD_table * const table = interp->binop_mmd_funcs + func_nr;
-
-    /* Is the Y 0? If so, nothing to expand, so just set the X for later use */
-    if (table->y == 0) {
-        table->x = new_x;
-        return;
-    }
-
-    /* The Y is not zero. Bleah. This means we have to expand the
-       table in an unpleasant way. */
-
-    x = table->x;
-    y = table->y;
-
-    /* First, fill in the whole new table with the default function
-       pointer. We only really need to do the new part, but... */
-    new_table = mem_allocate_n_zeroed_typed(y * new_x, funcptr_t);
-
-    /* Then copy the old table over. We have to do this row by row,
-       because the rows in the old and new tables are different lengths */
-    src_ptr  = (char *)table->mmd_funcs;
-    dest_ptr = (char *)new_table;
-    old_dp   = sizeof (funcptr_t) * x;
-    new_dp   = sizeof (funcptr_t) * new_x;
-
-    for (i = 0; i < y; i++) {
-        STRUCT_COPY_N(dest_ptr, src_ptr, x);
-        src_ptr  += old_dp;
-        dest_ptr += new_dp;
-    }
-
-    if (table->mmd_funcs)
-        mem_sys_free(table->mmd_funcs);
-
-    table->x = new_x;
-
-    /* Set the old table to point to the new table */
-    table->mmd_funcs = new_table;
-}
-
-
-/*
-
-=item C<static void mmd_expand_y>
-
-Expands the function table in the Y direction.
-
-{{**DEPRECATE**}}
-
-=cut
-
-*/
-
-static void
-mmd_expand_y(PARROT_INTERP, INTVAL func_nr, INTVAL new_y)
-{
-    UINTVAL           new_size, old_size;
-    MMD_table * const table = interp->binop_mmd_funcs + func_nr;
-
-    PARROT_ASSERT(table->x);
-
-    old_size = sizeof (funcptr_t) * table->x * table->y;
-    new_size = sizeof (funcptr_t) * table->x * new_y;
-
-    if (table->mmd_funcs)
-        table->mmd_funcs = (funcptr_t *)mem_sys_realloc_zeroed(
-            table->mmd_funcs, new_size, old_size);
-    else
-        table->mmd_funcs = (funcptr_t *)mem_sys_allocate_zeroed(new_size);
-
-    table->y = new_y;
 }
 
 
