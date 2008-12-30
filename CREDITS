@@ -593,8 +593,9 @@ D: Clean up some tests
 N: Markus Amsler
 D: httpd.imc, bugfixes
 
-N: Markus Mays
+N: Markus Mayr
 D: Implementation of the Rational PMC
+D: Fixing SDL-bindings and examples
 
 N: Matt Diephouse
 U: mdiep

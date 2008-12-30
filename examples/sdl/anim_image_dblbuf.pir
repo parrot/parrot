@@ -21,7 +21,7 @@ To run this file, run the following command from the Parrot root directory:
 
     .local pmc app
     app = new 'SDL::App'
-    app.init( 'height' => 480, 'width' => 640, 'bpp' => 0, 'flags' => 1073741825 )
+    app.'init'( 'height' => 480, 'width' => 640, 'bpp' => 0, 'flags' => 1073741825 )
 
     .local pmc main_screen
     main_screen = app.'surface'()

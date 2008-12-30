@@ -87,23 +87,19 @@ In fact, don't count on it sticking around.  It may not.  Then again, it might.
     .local pmc sdl_function
 
     loadlib libsdl, 'libSDL'
-    $I0 = typeof libsdl
-    if $I0 != .Undef goto OK
+    if libsdl goto OK
 
     # second try
     loadlib libsdl, 'libSDL-1.2'
-    $I0 = typeof libsdl
-    if $I0 != .Undef goto OK_HINT1
+    if libsdl goto OK_HINT1
 
     # third try
     loadlib libsdl, 'libSDL-1.2.so.0'
-    $I0 = typeof libsdl
-    if $I0 != .Undef goto OK_HINT2
+    if libsdl goto OK_HINT2
 
     # cygwin
     loadlib libsdl, 'cygSDL-1-2-0'
-    $I0 = typeof libsdl
-    if $I0 != .Undef goto OK
+    if libsdl goto OK
 
     # failed to load libSDL
     $P0 = new 'Exception'
@@ -180,20 +176,16 @@ SDL::Image library anyway, which calls this for you.
     .local pmc nci_sub
 
     loadlib image_lib, 'libSDL_image'
-    $I0 = typeof image_lib
-    if $I0 != .Undef goto OK
+    if image_lib goto OK
 
     loadlib image_lib, 'libSDL_image-1.2'
-    $I0 = typeof image_lib
-    if $I0 != .Undef goto OK_HINT1
+    if image_lib goto OK_HINT1
 
     loadlib image_lib, 'libSDL_image-1.2.so.0'
-    $I0 = typeof image_lib
-    if $I0 != .Undef goto OK_HINT2
+    if image_lib goto OK_HINT2
 
     loadlib image_lib, 'cygSDL_image-1-2-0'
-    $I0 = typeof image_lib
-    if $I0 != .Undef goto OK
+    if image_lib goto OK
 
     # failed to load libSDL
     $P0 = new 'Exception'

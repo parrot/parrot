@@ -127,7 +127,7 @@ requiring an argument.  This may change in the future.
     .param int incoming_type
 
     .local pmc event_types
-    event_types = new OrderedHash
+    event_types = new 'OrderedHash'
 
     event_types[  0 ] = 'no_event'
     event_types[  1 ] = 'active_event'

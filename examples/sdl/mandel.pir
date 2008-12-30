@@ -258,7 +258,7 @@ get:
     flags |= .PARROT_CLONE_CLASSES
     thr.'run'(flags, raw_calc_f, h2, h, args)
     raw_calc(0, h2, args)
-    thr.join()
+    thr.'join'()
     main_screen.'unlock'()
     .return()
 plain:
