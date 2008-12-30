@@ -571,7 +571,6 @@ sub _run_test_file {
         my $exec_f = per_test( '_pbcexe', $test_no );    # Make cleanup and svn:ignore more simple
         $exe_f =~ s@[\\/:]@$PConfig{slash}@g;
 
-        # RT#43751 put this into sub generate_pbc()
         run_command(
             qq{$parrot $args -o $pbc_f "$code_f"},
             CD     => $path_to_parrot,
