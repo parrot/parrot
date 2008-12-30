@@ -277,7 +277,6 @@ int
 parrot_PIC_op_is_cached(int op_code)
 {
     switch (op_code) {
-        case PARROT_OP_infix_ic_p_p:
         case PARROT_OP_get_params_pc:
         case PARROT_OP_set_returns_pc:
         case PARROT_OP_set_args_pc:
@@ -824,11 +823,6 @@ parrot_PIC_prederef(PARROT_INTERP, opcode_t op, ARGOUT(void **pc_pred), int core
     }
 
     switch (op) {
-        case PARROT_OP_infix_ic_p_p:
-            mic->m.func_nr = (INTVAL)cur_opcode[1];
-            pc_pred[1]     = (void *)mic;
-            op             = PARROT_OP_pic_infix___ic_p_p;
-            break;
         case PARROT_OP_get_params_pc:
             if (is_pic_param(interp, pc_pred, mic, op)) {
                 pc_pred[1] = (void *)mic;

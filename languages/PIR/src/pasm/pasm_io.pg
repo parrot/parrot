@@ -37,9 +37,7 @@ rule math_op {
   #
   # Math ops
   #
-  infix               <simple_expr> \, <var> \, <simple_expr>
-| n_infix             <simple_expr> \, <var> \, <var> \, <simple_expr>
-| abs                 <var>
+  abs                 <var>
 | n_abs               <var> \, <simple_expr>
 | add                 <var> \, <simple_expr> [ \, <simple_expr> ]?
 | cmod                <var> \, <simple_expr> \, <simple_expr>

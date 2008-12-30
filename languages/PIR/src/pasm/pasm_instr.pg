@@ -130,7 +130,6 @@ token pasm_instruction {
 | n_repeat          
 | n_not                          
 | n_neg             
-| n_infix           
 | n_concat          
 | n_bnots           
 | n_bnot            
@@ -176,7 +175,6 @@ token pasm_instruction {
 | invokecc          
 | invoke            
 | interpinfo        
-| infix             
 | index             
 | inc               
 | if_null           
