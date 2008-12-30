@@ -162,13 +162,13 @@ Returns the global dumper instance used by the non object interface.
 TYPE_OK:
 
     errorsoff .PARROT_ERRORS_GLOBALS_FLAG
-    find_global self, "YAML::Dumper", "global"
+    self = get_global ['YAML::Dumper'], 'global'
     errorson .PARROT_ERRORS_GLOBALS_FLAG
     if null self goto create_type
 
 create_type:
     new self, "YAML::Dumper"
-    store_global "YAML::Dumper", "global", self
+    set_global ['YAML::Dumper'], 'global', self
 
 END:
     .return( self )
