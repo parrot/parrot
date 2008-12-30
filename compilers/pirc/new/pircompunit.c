@@ -608,6 +608,7 @@ add_target(lexer_state * const lexer, target *last, target * const t) {
     return t;
 }
 
+
 /*
 
 =item C<target *
@@ -629,15 +630,11 @@ add_param(lexer_state * const lexer, pir_type type, char const * const name) {
 
     PARROT_ASSERT(CURRENT_SUB(lexer));
 
-    if (CURRENT_SUB(lexer)->parameters == NULL) {
+    if (CURRENT_SUB(lexer)->parameters == NULL)
         CURRENT_SUB(lexer)->parameters = targ;
-        targ->next = targ;
-    }
-    else {
-        targ->next = CURRENT_SUB(lexer)->parameters->next;
-        CURRENT_SUB(lexer)->parameters->next = targ;
-        CURRENT_SUB(lexer)->parameters       = targ;
-    }
+    else
+        add_target(lexer, CURRENT_SUB(lexer)->parameters, targ);
+
 
     /* set the parameter just added as curtarget */
     lexer->curtarget = targ;
@@ -650,8 +647,7 @@ add_param(lexer_state * const lexer, pir_type type, char const * const name) {
      */
     assign_vanilla_register(lexer, sym);
 
-    /* set a pointer from the target to the symbol object */
-    /* targ->s.sym = sym; */
+    /* set a pointer from the target to the symbol info object */
     targ->info = &sym->info;
 
     return targ;
@@ -663,7 +659,9 @@ add_param(lexer_state * const lexer, pir_type type, char const * const name) {
 set_param_alias(lexer_state * const lexer, char const * const alias)>
 
 Set the argument of the :named flag for the current target
-(parameter). Returns the current target (parameter).
+(parameter). Returns the current target (parameter). This function assumes
+that lexer->curtarget points to the target (parameter) node on which
+this alias (and the :named flag) is set.
 
 =cut
 
@@ -702,6 +700,18 @@ set_param_flag(lexer_state * const lexer, target * const param, target_flag flag
      * Therefore it's safe to reference param->s.sym, without checking for not
      * being a register.
      */
+
+    if (TEST_FLAG(flag, TARGET_FLAG_NAMED)) { /* the :named flag was set */
+        /*
+        fprintf(stderr, "alias of parameter %s is %s\n", param->info->id.name, param->alias);
+        */
+
+        /* insert an extra parameter, which is a constant string, holding the
+         * alias, i.e. the value of the :named flag.
+         */
+
+    }
+
 
     /* :slurpy can only be set on a PMC parameter */
     if (TEST_FLAG(flag, TARGET_FLAG_SLURPY) && param->info->type != PMC_TYPE)
@@ -2196,7 +2206,21 @@ targets_to_operands(lexer_state * const lexer, target * const targets, unsigned 
     iter = targets->next;
 
     for (i = 0; i < num_targets; ++i) {
-        int flag = calculate_pcc_target_flags(iter);
+        int flag;
+
+
+        if (TEST_FLAG(iter->flags, TARGET_FLAG_NAMED)) {
+            VTABLE_set_integer_keyed_int(lexer->interp, signature_array, i,
+                                         PARROT_ARG_NAME | PARROT_ARG_SC);
+
+            push_operand(lexer, expr_from_string(lexer, iter->alias));
+            ++i;
+
+            /* clear flag on the target that was marked :named XXX is this correct? */
+            CLEAR_FLAG(iter->flags, TARGET_FLAG_NAMED);
+        }
+
+        flag = calculate_pcc_target_flags(iter);
 
         /* store the flag at position i in the array */
         VTABLE_set_integer_keyed_int(lexer->interp, signature_array, i, flag);

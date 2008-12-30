@@ -455,6 +455,9 @@ void generate_parameters_instr(struct lexer_state * const lexer, unsigned num_pa
 
 void panic(struct lexer_state * lexer, char const * const message, ...);
 
+
+
+
 #endif /* PARROT_PIR_PIRCOMPUNIT_H_GUARD */
 
 /*
