@@ -21,13 +21,13 @@ class Pipp::Grammar::Actions;
 
 method TOP($/, $key) {
     our @?BLOCK; # A stack of PAST::Block
-   
+
     if $key eq 'open' {
         my $block := PAST::Block.new(
                          :node($/),
                          :hll('pipp')
                      );
-        
+
         # set up scope 'package' for the superglobals
         # TODO: use a loop
         $block.symbol_defaults( :scope('lexical') );
@@ -110,7 +110,7 @@ method inline_sea_short_tag($/) {
 }
 
 method namespace_statement($/) {
-    our $?NS := ~$<NAMESPACE_NAME>; 
+    our $?NS := ~$<NAMESPACE_NAME>;
     my $past := PAST::Op.new(
                     :pasttype('call'),
                     :name('echo'),
@@ -176,10 +176,10 @@ method instantiate_array($/) {
                     :name( 'array' ),
                     :node( $/ )
                 );
-  
+
     for $<array_argument> {
         $past.push( $($_) );
-    }   
+    }
 
     make $past;
 }
@@ -188,8 +188,8 @@ method array_argument($/, $key) {
     make $( $/{$key} );
 }
 
-method key_value_pair($/) { 
-   make 
+method key_value_pair($/) {
+   make
        PAST::Op.new(
            :node( $/ ),
            :pasttype( 'call' ),
@@ -296,7 +296,7 @@ method do_while_statement($/) {
 method if_statement($/) {
     my $past := $( $<conditional_expression> );
     $past.pasttype('if');
-        
+
     my $else := undef;
     if +$<else_clause> {
         $else := $( $<else_clause>[0]<statement_list> );
@@ -357,7 +357,7 @@ method array_elem($/) {
         );
     }
 
-    my $past_var_name := 
+    my $past_var_name :=
         PAST::Var.new(
             :name(~$<VAR_NAME>),
             :viviself('PhpArray'),
@@ -514,7 +514,7 @@ method closure($/, $key) {
         # declare the bound vars a lexical
         if +$<bind_list> == 1 {
             for $<bind_list>[0]<VAR_NAME> {
-                $block.symbol( ~$_, :scope('lexical') ); 
+                $block.symbol( ~$_, :scope('lexical') );
             }
         }
         @?BLOCK.unshift( $block );
@@ -555,18 +555,18 @@ method class_method_definition($/, $key) {
         my $block := $( $<param_list> );
         $block.unshift(
             PAST::Op.new(
-                :pasttype('bind'),                                            
+                :pasttype('bind'),
                 PAST::Var.new(
                     :name('$this'),
-                    :scope('lexical'),                                        
-                    :isdecl(1)                                               
-                ),                                                               
+                    :scope('lexical'),
+                    :isdecl(1)
+                ),
                 PAST::Var.new(
-                    :name('self'),                                            
-                    :scope('register')                                       
-                )                                                               
+                    :name('self'),
+                    :scope('register')
+                )
             )
-        );                  
+        );
 
         @?BLOCK.unshift( $block );
     }
@@ -600,7 +600,7 @@ method param_list($/) {
             );
         $block.push($param);
         $arity++;
-        $block.symbol( ~$_, :scope('lexical') ); 
+        $block.symbol( ~$_, :scope('lexical') );
     }
     $block.arity( $arity );
 
@@ -626,7 +626,7 @@ method class_definition($/, $key) {
             PAST::Stmts.new(
                 PAST::Op.new(
                     :inline(   "$P0 = get_root_global ['parrot'], 'P6metaclass'\n"
-                             ~ "$P2 = $P0.'new_class'('" ~ $<CLASS_NAME> ~ "')\n" ),
+                             ~ "$P0.'new_class'('" ~ $<CLASS_NAME> ~ "')\n" ),
                     :pasttype( 'inline' )
                 )
             )
@@ -642,10 +642,11 @@ method class_definition($/, $key) {
 
         # declare the attributes
         for $<class_member_definition> {
-            $methods_block.symbol( ~$_<VAR_NAME><ident>, :scope('attribute') );
+            my $member_name := ~$_<VAR_NAME><ident>;
+            $methods_block.symbol( $member_name, :scope('attribute') );
             $methods_block.push(
                 PAST::Var.new(
-                    :name(~$_<VAR_NAME><ident>),
+                    :name(~$member_name),
                     :scope('attribute'),
                     :isdecl(1)
                 )
