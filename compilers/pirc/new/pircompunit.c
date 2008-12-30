@@ -1559,18 +1559,25 @@ C<inv> object.
 */
 invocation *
 set_invocation_args(invocation * const inv, argument * const args) {
-    argument *count_iter;
+    argument *arg_iter;
     unsigned  arg_count = 0;
 
     inv->arguments = args;
 
     if (args) {
-        count_iter = args->next;
+        arg_iter = args->next;
         do {
-            count_iter = count_iter->next;
-            ++arg_count;
+            arg_iter = arg_iter->next;
+
+            /* count :named arguments twice, once for the argument,
+             * once for the :named flag value.
+             */
+            if (TEST_FLAG(arg_iter->flags, TARGET_FLAG_NAMED))
+                arg_count += 2;
+            else
+                ++arg_count;
         }
-        while (count_iter != args->next);
+        while (arg_iter != args->next);
     }
 
     /* fprintf(stderr, "invocation has %u args\n", arg_count); */
