@@ -976,16 +976,6 @@ mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
             if (!sig)
                 return PMCNULL;
 
-            /* yes, this is horrible and ugly */
-            if (memcmp(sig->strstart, "__VOID", 6) == 0) {
-                if (PMC_IS_NULL(ar)) {
-                    ar = pmc_new(interp, enum_class_FixedIntegerArray);
-                    VTABLE_set_integer_native(interp, ar, n);
-                }
-                PMC_int_val(ar)--;  /* RT #45951 */
-                break;
-            }
-
             type = pmc_type(interp, sig);
 
             if (type == enum_type_undef)

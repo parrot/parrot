@@ -979,27 +979,20 @@ PARROT_MALLOC
 static PMC*
 mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
 {
-    PMC       * const multi_sig = pmc_new(interp, enum_class_FixedPMCArray);
-    pcc_sub_t * const pcc_sub   = r->pcc_sub;
-    const INTVAL      n         = pcc_sub->nmulti;
+    PMC              *multi_sig;
+    pcc_sub_t * const pcc_sub = r->pcc_sub;
+    const INTVAL      n       = pcc_sub->nmulti;
     INTVAL            i;
 
     PackFile_ConstTable *ct;
 
+    /* a :multi sub with no arguments */
+    if (!pcc_sub->multi[0])
+        return pmc_new(interp, enum_class_FixedIntegerArray);
+
+    multi_sig = pmc_new(interp, enum_class_FixedPMCArray);
     VTABLE_set_integer_native(interp, multi_sig, n);
-
-    /* :multi() n = 1, reg = NULL */
-    if (!pcc_sub->multi[0]) {
-        STRING * const sig     = string_from_literal(interp, "__VOID");
-        PMC    * const sig_pmc = pmc_new(interp, enum_class_String);
-
-        VTABLE_set_string_native(interp, sig_pmc, sig);
-        VTABLE_set_pmc_keyed_int(interp, multi_sig, 0, sig_pmc);
-
-        return multi_sig;
-    }
-
-    ct = interp->code->const_table;
+    ct        = interp->code->const_table;
 
     for (i = 0; i < n; ++i) {
         /* multi[i] can be a Key too -

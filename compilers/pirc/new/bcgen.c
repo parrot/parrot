@@ -423,31 +423,23 @@ C<type_count> indicates the number of types in the list.
 static PMC *
 generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned type_count) {
     unsigned     i;
-    multi_type * iter;
-    PMC        * multi_signature;
+    multi_type *iter;
+    PMC        *multi_signature;
 
     /* cancel if there's no :multi flag */
     if (type_count == 0)
-        return NULL;
+        return PMCNULL;
+
+    /* A type_count of 1 means there was a :multi flag, but no :multi types.
+     * therefore, create a special signature and return that.  */
+    if (type_count == 1)
+        return pmc_new(interp, enum_class_FixedIntegerArray);
 
     /* create a FixedPMCArray to store all multi types */
     multi_signature = pmc_new(bc->interp, enum_class_FixedPMCArray);
+
     /* set its size as specified in type_count */
     VTABLE_set_integer_native(bc->interp, multi_signature, type_count);
-
-
-    /* A type_count of 1 means there was a :multi flag, but no :multi types.
-     * therefore, create a special signature and return that.
-     */
-    if (type_count == 1) {
-        STRING * const sig     = string_from_literal(bc->interp, "__VOID");
-        PMC    * const sig_pmc = pmc_new(bc->interp, enum_class_String);
-
-        VTABLE_set_string_native(bc->interp, sig_pmc, sig);
-        VTABLE_set_pmc_keyed_int(bc->interp, multi_signature, 0, sig_pmc);
-
-        return multi_signature;
-    }
 
     iter = types;
     --type_count; /* type count is 1 too high, fix that now. */
@@ -477,11 +469,11 @@ generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned
 
         /* store the signature PMC in the array */
         VTABLE_set_pmc_keyed_int(bc->interp, multi_signature, i, sig_pmc);
-
     }
-    return multi_signature;
 
+    return multi_signature;
 }
+
 
 /*
 
