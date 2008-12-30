@@ -43,10 +43,6 @@ See RT #48016. Replace usage with set_[hll,root]_global variants.
 
 See RT #48018. Replace usage with get_[hll,root]_global variants.
 
-=item * C<get_mro> [post 0.5.0]
-
-See RT #47976.
-
 =item * C<n_*> math opcode variants [post 0.7.1]
 
 See RT #58410.

@@ -44,5 +44,4 @@ rule pmc_op {
 | register            <arg_hack> #
 | unregister          <arg_hack> #
 | hash                <arg_hack> #
-| get_mro             <arg_hack> #
 }

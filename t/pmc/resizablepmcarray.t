@@ -446,7 +446,7 @@ done:
 
 .sub get_mro_tests
     new $P0, 'ResizablePMCArray'
-    get_mro $P1, $P0
+    $P1 = inspect $P0, 'mro'
     ok(1, "get_mro didn't explode")
     elements $I1, $P1
     null $I0

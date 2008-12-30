@@ -569,16 +569,6 @@ op unregister(invar PMC) {
   dod_unregister_pmc(interp, $1);
 }
 
-=item B<get_mro>(out PMC, invar PMC)
-
-Set $1 to the mro array of the PMC $2. Please note that this is a
-direct reference so messing with it can do harm to the method lookup.
-
-=cut
-
-op get_mro(out PMC, invar PMC) :deprecated {
-  $1 = $2->vtable->mro;
-}
 
 ########################################
 

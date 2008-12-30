@@ -200,7 +200,6 @@ token pasm_instruction {
 | get_repr          
 | get_params        
 | get_namespace     
-| get_mro           
 | get_hll_namespace 
 | get_hll_global    
 | get_global        
