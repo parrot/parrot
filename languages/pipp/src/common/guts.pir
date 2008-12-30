@@ -57,6 +57,12 @@ Dump a PMC
 .include 'except_types.pasm'
 .include 'except_severity.pasm'
 
+=head2 return
+
+For returning a value from a function.
+
+=cut
+
 .sub 'return'
     .param pmc value           :optional
     .param int has_value       :opt_flag
@@ -69,6 +75,24 @@ Dump a PMC
     setattribute $P0, 'payload', value
     throw $P0
     .return (value)
+.end
+
+=item pipp_create_class(name)
+
+Internal helper method to create a class.
+See C<!keyword_class> in Rakudo.
+
+=cut
+
+.sub 'pipp_create_class'
+    .param string name
+    .local pmc class
+
+    # Create class.
+    $P0 = get_root_global ['parrot'], 'P6metaclass'
+    class = $P0.'new_class'(name)
+
+    .return (class)
 .end
 
 

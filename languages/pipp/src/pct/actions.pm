@@ -623,11 +623,19 @@ method class_definition($/, $key) {
         my $block := @?BLOCK.shift();
         $block.namespace( $<CLASS_NAME><ident> );
         $block.push(
-            PAST::Stmts.new(
+            # Start of class definition; make PAST to create class object if
+            # we're creating a new class.
+            PAST::Op.new(
+                :pasttype('bind'),
+                PAST::Var.new(
+                    :name('def'),
+                    :scope('register'),
+                    :isdecl(1)
+                ),
                 PAST::Op.new(
-                    :inline(   "$P0 = get_root_global ['parrot'], 'P6metaclass'\n"
-                             ~ "$P0.'new_class'('" ~ $<CLASS_NAME> ~ "')\n" ),
-                    :pasttype( 'inline' )
+                    :pasttype('call'),
+                    :name('pipp_create_class'),
+                    ~$<CLASS_NAME><ident> 
                 )
             )
         );
