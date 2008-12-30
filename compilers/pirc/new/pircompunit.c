@@ -590,7 +590,9 @@ add_target(lexer_state * const lexer, target *last, target * const t)>
 
 Add a new target to the list pointed to by C<list>. C<list> points to
 the last element, C<<last->next>> points to the first. The list is
-circular linked. The newly added target C<t> is returned.
+circular linked. The newly added target C<t> is returned, which is also
+the "root" pointer of the list (pointing to the last element, through
+its "next" pointer you get the first item in the list.)
 
 =cut
 
@@ -744,7 +746,7 @@ add_arg(argument *last, argument * const newarg)>
 
 Add argument C<newarg> at the end of the list pointed to by C<last>.
 The list is circular linked, and C<last> points to the last item.
-Being circular linked, C<<arg1->next>> points to the first item.
+Being circular linked, C<<last->next>> points to the first item.
 
 After adding the element, the I<root> pointer (that points to the last
 element of the list) is updated, and returned.
