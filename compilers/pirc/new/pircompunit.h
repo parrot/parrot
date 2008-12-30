@@ -364,6 +364,7 @@ expression *expr_from_target(struct lexer_state * const lexer, target * const t)
 expression *expr_from_ident(struct lexer_state * const lexer, char const * const name);
 expression *expr_from_key(struct lexer_state * const lexer, key * const k);
 expression *expr_from_string(struct lexer_state * const lexer, char const * const sval);
+expression *expr_from_int(struct lexer_state * const lexer, int ival);
 
 /* functions for argument node creation and storing */
 argument *new_argument(struct lexer_state * const lexer, expression * const expr);
@@ -451,12 +452,13 @@ void convert_inv_to_instr(struct lexer_state * const lexer, invocation * const i
 void update_sub_register_usage(struct lexer_state * const lexer,
                                unsigned reg_usage[NUM_PARROT_TYPES]);
 
-void generate_parameters_instr(struct lexer_state * const lexer, unsigned num_parameters);
+
 
 void panic(struct lexer_state * lexer, char const * const message, ...);
 
 
-
+void new_sub_instr(struct lexer_state * const lexer, int opcode, char const * const opname,
+              unsigned num_var_args);
 
 #endif /* PARROT_PIR_PIRCOMPUNIT_H_GUARD */
 

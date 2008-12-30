@@ -52,12 +52,15 @@ condition evaluates to I<true> during compile time) or it may become a C<noop>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+
 #include "parrot/oplib/ops.h"
+
 #include "pircompiler.h"
 #include "pircompunit.h"
 #include "pirsymbol.h"
 #include "piryy.h"
 #include "pirmacro.h"
+#include "pirpcc.h"
 
 /* #defines to prevent declarations of malloc() and free() in pirparser.h */
 #define YYMALLOC
