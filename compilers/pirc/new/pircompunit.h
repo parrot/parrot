@@ -387,8 +387,11 @@ void set_target_key(target * const t, key * const k);
 /* functions for creating an invocation node and setting various fields */
 invocation *invoke(struct lexer_state * const lexer, invoke_type, ...);
 invocation *set_invocation_type(invocation * const inv, invoke_type type);
-invocation *set_invocation_args(invocation * const inv, argument * const args);
-invocation *set_invocation_results(invocation * const inv, target * const results);
+invocation *set_invocation_args(struct lexer_state * const lexer, invocation * const inv,
+                                argument * const args);
+
+invocation *set_invocation_results(struct lexer_state * const lexer, invocation * const inv,
+                                   target * const results);
 
 /* conversion functions that wrap their arguments into a target node */
 target *target_from_symbol(struct lexer_state * const lexer, struct symbol * const sym);

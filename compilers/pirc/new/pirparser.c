@@ -3857,8 +3857,8 @@ yyreduce:
   case 242:
 #line 1647 "pir.y"
     { /* $4 contains an invocation object */
-                              set_invocation_args((yyvsp[(4) - (8)].invo), (yyvsp[(3) - (8)].argm));
-                              (yyval.invo) = set_invocation_results((yyvsp[(4) - (8)].invo), (yyvsp[(6) - (8)].targ));
+                              set_invocation_args(lexer, (yyvsp[(4) - (8)].invo), (yyvsp[(3) - (8)].argm));
+                              (yyval.invo) = set_invocation_results(lexer, (yyvsp[(4) - (8)].invo), (yyvsp[(6) - (8)].targ));
                             ;}
     break;
 
@@ -3949,17 +3949,17 @@ yyreduce:
 
   case 260:
 #line 1712 "pir.y"
-    { (yyval.invo) = set_invocation_results((yyvsp[(3) - (3)].invo), (yyvsp[(1) - (3)].targ)); ;}
+    { (yyval.invo) = set_invocation_results(lexer, (yyvsp[(3) - (3)].invo), (yyvsp[(1) - (3)].targ)); ;}
     break;
 
   case 261:
 #line 1714 "pir.y"
-    { (yyval.invo) = set_invocation_results((yyvsp[(3) - (3)].invo), (yyvsp[(1) - (3)].targ)); ;}
+    { (yyval.invo) = set_invocation_results(lexer, (yyvsp[(3) - (3)].invo), (yyvsp[(1) - (3)].targ)); ;}
     break;
 
   case 262:
 #line 1716 "pir.y"
-    {  (yyval.invo) = set_invocation_results((yyvsp[(1) - (1)].invo), NULL); ;}
+    {  (yyval.invo) = set_invocation_results(lexer, (yyvsp[(1) - (1)].invo), NULL); ;}
     break;
 
   case 265:
@@ -3979,7 +3979,7 @@ yyreduce:
                              }
 
                              (yyval.invo) = invoke(lexer, CALL_METHOD, (yyvsp[(1) - (4)].targ), (yyvsp[(3) - (4)].expr));
-                             set_invocation_args((yyval.invo), (yyvsp[(4) - (4)].argm));
+                             set_invocation_args(lexer, (yyval.invo), (yyvsp[(4) - (4)].argm));
                            ;}
     break;
 
@@ -3987,7 +3987,7 @@ yyreduce:
 #line 1744 "pir.y"
     {
                              (yyval.invo) = invoke(lexer, CALL_PCC, (yyvsp[(1) - (2)].targ), NULL);
-                             set_invocation_args((yyval.invo), (yyvsp[(2) - (2)].argm));
+                             set_invocation_args(lexer, (yyval.invo), (yyvsp[(2) - (2)].argm));
                            ;}
     break;
 
@@ -4131,7 +4131,7 @@ yyreduce:
 #line 1854 "pir.y"
     {
                               (yyval.invo) = invoke(lexer, CALL_RETURN);
-                              set_invocation_args((yyval.invo), (yyvsp[(2) - (3)].argm));
+                              set_invocation_args(lexer, (yyval.invo), (yyvsp[(2) - (3)].argm));
                             ;}
     break;
 
@@ -4151,7 +4151,7 @@ yyreduce:
 #line 1870 "pir.y"
     {
                               (yyval.invo) = invoke(lexer, CALL_YIELD);
-                              set_invocation_args((yyval.invo), (yyvsp[(2) - (3)].argm));
+                              set_invocation_args(lexer, (yyval.invo), (yyvsp[(2) - (3)].argm));
                             ;}
     break;
 
@@ -4199,7 +4199,7 @@ yyreduce:
 #line 1911 "pir.y"
     {
                               (yyval.invo) = invoke(lexer, CALL_RETURN);
-                              set_invocation_args((yyval.invo), (yyvsp[(3) - (5)].argm));
+                              set_invocation_args(lexer, (yyval.invo), (yyvsp[(3) - (5)].argm));
                             ;}
     break;
 
@@ -4207,7 +4207,7 @@ yyreduce:
 #line 1920 "pir.y"
     {
                               (yyval.invo) = invoke(lexer, CALL_YIELD);
-                              set_invocation_args((yyval.invo), (yyvsp[(3) - (5)].argm));
+                              set_invocation_args(lexer, (yyval.invo), (yyvsp[(3) - (5)].argm));
                             ;}
     break;
 

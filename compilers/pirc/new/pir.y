@@ -1645,8 +1645,8 @@ long_invocation_stat : ".begin_call" "\n"
                        opt_long_results
                        ".end_call" "\n"
                             { /* $4 contains an invocation object */
-                              set_invocation_args($4, $3);
-                              $$ = set_invocation_results($4, $6);
+                              set_invocation_args(lexer, $4, $3);
+                              $$ = set_invocation_results(lexer, $4, $6);
                             }
                      ;
 
@@ -1709,11 +1709,11 @@ short_invocation_stat: short_invocation "\n"
 
 
 short_invocation     : opt_target_list '=' simple_invocation
-                           { $$ = set_invocation_results($3, $1); }
+                           { $$ = set_invocation_results(lexer, $3, $1); }
                      | target '=' simple_invocation
-                           { $$ = set_invocation_results($3, $1); }
+                           { $$ = set_invocation_results(lexer, $3, $1); }
                      | simple_invocation
-                           {  $$ = set_invocation_results($1, NULL); }
+                           {  $$ = set_invocation_results(lexer, $1, NULL); }
                      ;
 
 simple_invocation    : subcall
@@ -1736,14 +1736,14 @@ methodcall           : pmc_object '.' method arguments
                              }
 
                              $$ = invoke(lexer, CALL_METHOD, $1, $3);
-                             set_invocation_args($$, $4);
+                             set_invocation_args(lexer, $$, $4);
                            }
                      ;
 
 subcall              : sub arguments
                            {
                              $$ = invoke(lexer, CALL_PCC, $1, NULL);
-                             set_invocation_args($$, $2);
+                             set_invocation_args(lexer, $$, $2);
                            }
                      ;
 
@@ -1853,7 +1853,7 @@ return_instr         : short_return_stat
 short_return_stat    : ".return" arguments "\n"
                             {
                               $$ = invoke(lexer, CALL_RETURN);
-                              set_invocation_args($$, $2);
+                              set_invocation_args(lexer, $$, $2);
                             }
                      | ".tailcall" simple_invocation "\n"
                             { /* was the invocation a method call? then it becomes a method tail
@@ -1869,7 +1869,7 @@ short_return_stat    : ".return" arguments "\n"
 short_yield_stat     : ".yield" arguments "\n"
                             {
                               $$ = invoke(lexer, CALL_YIELD);
-                              set_invocation_args($$, $2);
+                              set_invocation_args(lexer, $$, $2);
                             }
                      ;
 
@@ -1910,7 +1910,7 @@ long_return_stat     : ".begin_return" "\n"
                        ".end_return" "\n"
                             {
                               $$ = invoke(lexer, CALL_RETURN);
-                              set_invocation_args($$, $3);
+                              set_invocation_args(lexer, $$, $3);
                             }
                      ;
 
@@ -1919,7 +1919,7 @@ long_yield_stat      : ".begin_yield" "\n"
                        ".end_yield" "\n"
                             {
                               $$ = invoke(lexer, CALL_YIELD);
-                              set_invocation_args($$, $3);
+                              set_invocation_args(lexer, $$, $3);
                             }
                      ;
 
