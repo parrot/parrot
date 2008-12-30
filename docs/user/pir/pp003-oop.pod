@@ -40,13 +40,13 @@ is some code to illustrate this example:
     .namespace [ "Person" ]
 
     .sub run
-        print "Run Forrest, Run!\n"
+        say "Run Forrest, Run!"
     .end
 
     .namespace [ "Process" ]
 
     .sub run
-        print "Running process #53\n"
+        say "Running process #53"
     .end
 
 As you might guess, the C<.namespace> directive tells Parrot
