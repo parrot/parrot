@@ -123,18 +123,15 @@ plain:
 .end
 
 .sub '_json_string'
-  .param pmc thing
+  .param string thing
   .param int pretty
   .param int indent
 
   .local string result
 
-  $S0 = thing
-  .local pmc escaper
-  escaper = find_global "Data::Escape", "String"
-  $S0 = escaper($S0,'"')
+  thing = escape thing
 
-  result = '"' . $S0
+  result = '"' . thing
   result = result . '"'
 
   unless pretty goto plain
