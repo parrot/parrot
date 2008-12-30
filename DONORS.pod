@@ -33,6 +33,7 @@ whose financial contributions help support the development of Parrot.
 =head1 ERRATA
 
 Information will be added to this file as it becomes available.
-For errors and omissions, please contact Will Coleda <will@coleda.com>.
+For errors and omissions, please contact the directors of the Parrot
+Foundation <directors at lists.parrot.org>
 
 =cut
