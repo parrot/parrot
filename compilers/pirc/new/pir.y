@@ -417,6 +417,7 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
              opt_list
              target_list
              keyaccess
+             parameter
 
 
 %type <symb> local_id
@@ -787,11 +788,18 @@ parameter_list    : parameters
 parameters        : /* empty */
                         { $$ = 0; }
                   | parameters parameter
-                        { ++$$; /* count number of parameters */ }
+                        {
+                          ++$$; /* count number of parameters */
+                          /* if the :named flag was set, there's an extra
+                           * constant string argument for the name. count that too.
+                           */
+                          if (TEST_FLAG($2->flags, TARGET_FLAG_NAMED))
+                              ++$$;
+                        }
                   ;
 
 parameter         : ".param" param param_flags "\n"
-                         { set_param_flag(lexer, $2, $3); }
+                         { $$ = set_param_flag(lexer, $2, $3); }
                   ;
 
 param             : type identifier

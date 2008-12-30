@@ -8,20 +8,22 @@
 
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
-#include "pirdefines.h"
+
 
 /* the type name is exported, but not its private bits */
 struct bytecode;
 
+/* typedef it here, so the shortname can be used in this header file as well. */
 typedef struct bytecode bytecode;
 
 /* selector values for multi_union */
 typedef enum multi_entry {
-    MULTI_TYPE_KEYED,
-    MULTI_TYPE_IDENT
+    MULTI_TYPE_KEYED,       /* complex type, such as ['Foo';'Bar'] */
+    MULTI_TYPE_IDENT        /* simple type, such as 'Integer' */
 
 } multi_entry;
 
+/* struct to represent a MULTI_TYPE_KEYED multi_type */
 typedef struct multi_key_type {
 
     struct multi_key_type * next;
@@ -41,6 +43,10 @@ typedef struct multi_type {
 } multi_type;
 
 
+/* structure to store lexicals per sub; for each lexical in a sub,
+ * there is one instance of the lexical struct in a list of the
+ * sub.
+ */
 typedef struct lexical {
     char const     * name;
     struct syminfo * info;
@@ -58,11 +64,11 @@ typedef struct sub_info {
     char const         * subid;
     char const         * outersub;
     int                  vtable_index;
-    unsigned             regs_used[NUM_PARROT_TYPES];
+    unsigned             regs_used[4];
     int                  startoffset;
     int                  endoffset;
-    unsigned             num_multi_types;
-    multi_type         * multi_types;   /* data types of parameters if this is a multi sub */
+    unsigned             num_multi_types; /* number of multi types */
+    multi_type         * multi_types;   /* array with :multi data types, if this is a multi sub */
     lexical            * lexicals;
     multi_type         * name_space; /* can be a string or key */
 
