@@ -789,11 +789,12 @@ parameters        : /* empty */
                         { $$ = 0; }
                   | parameters parameter
                         {
-                          ++$$; /* count number of parameters */
                           /* if the :named flag was set, there's an extra
                            * constant string argument for the name. count that too.
                            */
                           if (TEST_FLAG($2->flags, TARGET_FLAG_NAMED))
+                              $$ += 2;
+                          else
                               ++$$;
                         }
                   ;
