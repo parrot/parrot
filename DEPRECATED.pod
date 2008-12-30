@@ -118,10 +118,6 @@ Subs marked with C<:vtable> or C<:method> flags are no longer given a
 namespace entry by default.  Use the C<:nsentry> flag to cause this
 to happen.  See RT #60586 and RT #53302.
 
-=item * Bytecode packfile segment will use subid not sub name [post 0.8.1]
-
-See RT #60590.
-
 =back
 
 =cut
