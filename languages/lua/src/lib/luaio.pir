@@ -606,8 +606,6 @@ Equivalent to C<io.input():read>.
 Returns a handle for a temporary file. This file is open in update mode and
 it is automatically removed when the program ends.
 
-TODO: rewrite with a StringHandle
-
 =cut
 
 .sub 'tmpfile'
@@ -616,13 +614,11 @@ TODO: rewrite with a StringHandle
     .local pmc res
     new $P0, 'Lua'
     $S0 = $P0.'tmpname'()
-    f = new 'FileHandle'
+    f = new 'StringHandle'
     push_eh _handler
     f.'open'($S0, 'w+')
     pop_eh
     res = newfile(f)
-    new $P0, 'OS'
-    $P0.'rm'($S0)
     .return (res)
   _handler:
     new res, 'LuaNil'
