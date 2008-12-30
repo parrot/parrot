@@ -212,12 +212,9 @@ method method_call($/) {
 method constructor_call($/) {
     make
         PAST::Op.new(
-            :name( 'new' ),
-            :pasttype( 'callmethod' ),
-            PAST::Var.new(
-                :name( ~$<CLASS_NAME> ),
-                :scope( 'package' ),
-            )
+            # :inline( "$S1 = 'member'\n$P2 = new 'PhpString'\n$P2 = 'workaround in actions.pm:215'\n%r = new %0\nsetattribute %r, $S1, $P2" ),
+            :inline( "%r = new %0" ),                                                   
+            ~$<CLASS_NAME>
         );
 }
 
@@ -621,7 +618,8 @@ method class_definition($/, $key) {
     }
     else {
         my $block := @?BLOCK.shift();
-        $block.namespace( $<CLASS_NAME><ident> );
+        my $class_name := ~$<CLASS_NAME><ident>;
+        $block.namespace( $class_name );
         $block.push(
             # Start of class definition; make PAST to create class object if
             # we're creating a new class.
@@ -635,7 +633,7 @@ method class_definition($/, $key) {
                 PAST::Op.new(
                     :pasttype('call'),
                     :name('pipp_create_class'),
-                    ~$<CLASS_NAME><ident> 
+                    PAST::Val.new( :value($class_name) )
                 )
             )
         );
@@ -651,12 +649,21 @@ method class_definition($/, $key) {
         # declare the attributes
         for $<class_member_definition> {
             my $member_name := ~$_<VAR_NAME><ident>;
-            $methods_block.symbol( $member_name, :scope('attribute') );
-            $methods_block.push(
-                PAST::Var.new(
-                    :name(~$member_name),
-                    :scope('attribute'),
-                    :isdecl(1)
+            $methods_block.symbol(
+                $member_name,
+                :scope('attribute'),
+                :default( $( $_<literal> ) )
+            );
+
+            $block.push(
+                PAST::Op.new(
+                    :pasttype('call'),
+                    :name('pipp_add_attribute'),
+                    PAST::Var.new(
+                        :name('def'),
+                        :scope('register')
+                    ),
+                    PAST::Val.new( :value($member_name) )
                 )
             );
         }

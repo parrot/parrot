@@ -86,14 +86,30 @@ See C<!keyword_class> in Rakudo.
 
 .sub 'pipp_create_class'
     .param string name
-    .local pmc class
 
-    # Create class.
-    $P0 = get_root_global ['parrot'], 'P6metaclass'
-    class = $P0.'new_class'(name)
+    .local pmc class
+    class = newclass name
 
     .return (class)
 .end
+
+
+=item tipp_add_attribute(class, attr_name, attr_value)
+
+Adds an attribute with the given name to the class or role.
+See C<!keyword_has> in Rakudo.
+
+=cut
+
+.sub 'pipp_add_attribute'
+    .param pmc class
+    .param string attr_name
+
+    addattribute class, attr_name
+
+    .return ()
+.end
+
 
 
 =back
