@@ -319,30 +319,7 @@ This switches the filehandle to linebuffer-mode.
 =cut
 
 inline op readline(out STR, invar PMC) :base_io {
-    PMC * const pio = $2;
-    /* this ugly error handling will go away, when all the
-     * io stuff are methods
-     */
-    opcode_t *dest = expr NEXT();
-    if (pio->vtable->base_type != enum_class_FileHandle) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, dest,
-            EXCEPTION_PIO_ERROR,
-            "Cannot read line from empty filehandle");
-        goto ADDRESS(handler);
-    }
-    else {
-        INTVAL flags = Parrot_io_get_flags(interp, pio);
-        if (Parrot_io_is_closed(interp, pio)) {
-            opcode_t *handler = Parrot_ex_throw_from_op_args(interp, dest,
-                EXCEPTION_PIO_ERROR,
-                "Cannot read line from empty filehandle");
-            goto ADDRESS(handler);
-        }
-
-        if (!(flags & PIO_F_LINEBUF))
-            Parrot_io_setlinebuf(interp, pio);
-        $1 = Parrot_io_reads(interp, pio, 0);
-    }
+    $1 = Parrot_io_readline(interp, $2);
 }
 
 ##########################################

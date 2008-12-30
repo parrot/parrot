@@ -1,0 +1,589 @@
+/*
+Copyright (C) 2008, The Perl Foundation.
+$Id: stringhandle.pmc 34469 2008-12-28 07:01:50Z allison $
+
+=head1 NAME
+
+src/pmc/stringhandle.pmc - StringHandle PMC
+
+=head1 DESCRIPTION
+
+The StringHandle PMC performs I/O operations, but on an internal string rather
+than an external file. Commonly used as a mock FileHandle for testing.
+
+=head2 Vtable Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "../src/io/io_private.h"
+
+pmclass StringHandle need_ext {
+    ATTR INTVAL  flags;               /* Filehandle flags             */
+    ATTR STRING *stringhandle;        /* The string data              */
+    ATTR STRING *mode;                /* The mode string used in open */
+    ATTR STRING *encoding;            /* The encoding for read/write  */
+    ATTR STRING *filename;            /* A mock path and filename     */
+    ATTR INTVAL  read_offset;         /* Position, for reading bytes  */
+
+/*
+
+=item C<void init()>
+
+Initializes a newly created StringHandle object.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        Parrot_StringHandle_attributes *data_struct =
+                mem_allocate_typed(Parrot_StringHandle_attributes);
+
+        PMC_data(SELF)            = data_struct;
+        data_struct->flags        = 0;
+        data_struct->stringhandle = NULL;
+        data_struct->mode         = NULL;
+        data_struct->encoding     = NULL;
+        data_struct->filename     = NULL;
+        data_struct->read_offset  = 0;
+
+        PObj_custom_mark_SET(SELF);
+        PObj_active_destroy_SET(SELF);
+    }
+
+/*
+
+=item C<PMC *clone()>
+
+Create a copy of the stringhandle.
+
+=cut
+
+*/
+
+    VTABLE PMC *clone() {
+        Parrot_StringHandle_attributes * const old_struct  = PARROT_STRINGHANDLE(SELF);
+        PMC * const copy = pmc_new(INTERP, enum_class_StringHandle);
+        Parrot_StringHandle_attributes * const data_struct = PARROT_STRINGHANDLE(copy);
+
+        data_struct->flags        = old_struct->flags;
+        data_struct->stringhandle = string_copy(INTERP, old_struct->stringhandle);
+        data_struct->mode         = string_copy(INTERP, old_struct->mode);
+        data_struct->encoding     = string_copy(INTERP, old_struct->encoding);
+
+        return copy;
+    }
+
+/*
+
+=item C<void mark()>
+
+Mark active stringhandle data as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        Parrot_StringHandle_attributes * const data_struct = PARROT_STRINGHANDLE(SELF);
+        if (data_struct->stringhandle)
+            pobject_lives(interp, (PObj *)data_struct->stringhandle);
+        if (data_struct->mode)
+            pobject_lives(interp, (PObj *)data_struct->mode);
+        if (data_struct->encoding)
+            pobject_lives(interp, (PObj *)data_struct->encoding);
+        if (data_struct->filename)
+            pobject_lives(interp, (PObj *)data_struct->filename);
+    }
+
+/*
+
+=item C<void destroy()>
+
+Free structures.
+
+=cut
+
+*/
+    VTABLE void destroy() {
+        if (PARROT_STRINGHANDLE(SELF)) {
+            mem_sys_free(PARROT_STRINGHANDLE(SELF));
+            PMC_data(SELF) = NULL;
+        }
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns whether the StringHandle has reached the end of the file.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_bool() {
+        STRING *stringhandle;
+        GET_ATTR_stringhandle(INTERP, SELF, stringhandle);
+
+        if (STRING_IS_NULL(stringhandle))
+            return 0;
+
+        return 1;
+    }
+
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<METHOD open(STRING *filename :optional, STRING *mode :optional)>
+
+Opens a string handle with the given mode. The filename is not used, but is
+stored for mocking.
+
+=cut
+
+*/
+
+    METHOD open(STRING *filename :optional, INTVAL got_filename :opt_flag,
+                STRING *mode :optional, INTVAL got_mode :opt_flag) {
+        STRING *open_mode, *old_string, *new_string, *encoding;
+        INTVAL flags;
+
+        if (got_mode && !STRING_IS_NULL(mode))
+            SET_ATTR_mode(INTERP, SELF, string_copy(INTERP, mode));
+
+        if (got_filename && !STRING_IS_NULL(filename))
+            SET_ATTR_filename(INTERP, SELF, string_copy(INTERP, filename));
+
+
+        /* If StringHandle hasn't already been initialized, create a new string. */
+        GET_ATTR_stringhandle(INTERP, SELF, old_string);
+        if (STRING_IS_NULL(old_string)) {
+            GET_ATTR_encoding(INTERP, SELF, encoding);
+            if (!STRING_IS_NULL(encoding) &&
+                    string_equal(INTERP, encoding, const_string(INTERP, "utf8")) == 0)
+                new_string = string_make(INTERP, "", 0, "unicode", 0);
+            else
+                new_string = string_from_cstring(INTERP, "", 0);
+
+            SET_ATTR_stringhandle(INTERP, SELF, new_string);
+        }
+
+        /* Set a default mode of read-only. */
+        GET_ATTR_mode(INTERP, SELF, open_mode);
+        if (STRING_IS_NULL(open_mode)) {
+            open_mode = const_string(INTERP, "r");
+            SET_ATTR_mode(INTERP, SELF, open_mode);
+        }
+
+        flags = Parrot_io_parse_open_flags(interp, open_mode);
+        SET_ATTR_flags(INTERP, SELF, flags);
+
+        RETURN(PMC *SELF);
+    }
+
+/*
+
+=item C<METHOD is_tty()>
+
+StringHandles are never tty's, returns false.
+
+=cut
+
+*/
+    METHOD is_tty() {
+        RETURN(INTVAL 0);
+    }
+
+/*
+
+=item C<METHOD close()>
+
+Reset some core data for the StringHandle, but don't delete the string data, as
+it may be wanted later (for capturing the results).
+
+=cut
+
+*/
+
+    METHOD close() {
+        SET_ATTR_read_offset(INTERP, SELF, 0);
+        RETURN(INTVAL 0);
+    }
+
+/*
+
+=item C<METHOD is_closed()>
+
+Check if the StringHandle is open.
+
+=cut
+
+*/
+
+    METHOD is_closed() {
+        STRING *stringhandle;
+        GET_ATTR_stringhandle(INTERP, SELF, stringhandle);
+
+        if (STRING_IS_NULL(stringhandle))
+            RETURN(INTVAL 1);
+
+        RETURN(INTVAL 0);
+    }
+
+/*
+
+=item C<METHOD read(INTVAL bytes)>
+
+Read the entire contents of the stringhandle and return it in a string. The
+C<bytes> argument is currently ignored.
+
+=cut
+
+*/
+
+    METHOD read(INTVAL length) {
+        STRING *string_result, *string_orig;
+        INTVAL offset;
+
+        GET_ATTR_stringhandle(INTERP, SELF, string_orig);
+        if (STRING_IS_NULL(string_orig))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Cannot read from a closed filehandle");
+
+        if (length == 0)
+            string_result = string_copy(INTERP, string_orig);
+        else {
+            INTVAL orig_length, read_length;
+            read_length = length;
+            orig_length = string_length(INTERP, string_orig);
+
+            GET_ATTR_read_offset(INTERP, SELF, offset);
+
+            /* Only read to the end of the string data. */
+            if (offset + read_length > orig_length)
+                read_length = orig_length - offset;
+
+            string_result = string_substr(INTERP, string_orig, offset,
+                    read_length, NULL, 0);
+            SET_ATTR_read_offset(INTERP, SELF, offset + read_length);
+        }
+
+        RETURN(STRING *string_result);
+    }
+
+/*
+
+=item C<METHOD readline()>
+
+Read a line from the stringhandle and return it in a string. (Currently only
+responds to "\n" newlines.)
+
+=cut
+
+*/
+
+    METHOD readline() {
+        STRING *string_result;
+        INTVAL offset, newline_pos, read_length, orig_length;
+
+        GET_ATTR_stringhandle(INTERP, SELF, string_result);
+        if (STRING_IS_NULL(string_result))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Cannot read from a closed filehandle");
+
+        orig_length = string_length(INTERP, string_result);
+        GET_ATTR_read_offset(INTERP, SELF, offset);
+        newline_pos = string_str_index(INTERP, string_result,
+                const_string(INTERP, "\n"), offset);
+
+        /* No newline found, read the rest of the string. */
+        if (newline_pos == -1)
+            read_length = orig_length - offset;
+        else
+            read_length = newline_pos - offset + 1; /* +1 to include the newline */
+
+        string_result = string_substr(INTERP, string_result, offset,
+                read_length, NULL, 0);
+        SET_ATTR_read_offset(INTERP, SELF, newline_pos + 1);
+
+        RETURN(STRING *string_result);
+    }
+
+/*
+
+=item METHOD readall(STRING *name);
+
+Read the entire contents of the StringHandle into a Parrot string. On a
+StringHandle object that isn't opened yet, returns an empty string.
+
+=cut
+
+*/
+
+    METHOD readall(STRING *name :optional, INTVAL got_name :opt_flag) {
+        STRING *string_result;
+
+        GET_ATTR_stringhandle(INTERP, SELF, string_result);
+        if (STRING_IS_NULL(string_result)) {
+            STRING *encoding;
+            GET_ATTR_encoding(INTERP, SELF, encoding);
+            if (!STRING_IS_NULL(encoding) &&
+                    string_equal(INTERP, encoding, const_string(INTERP, "utf8")) == 0)
+                string_result = string_make(INTERP, "", 0, "unicode", 0);
+            else
+                string_result = const_string(INTERP, "");
+        }
+        else
+            string_result = string_copy(INTERP, string_result);
+
+        RETURN(STRING *string_result);
+    }
+
+/*
+
+=item C<METHOD flush()>
+
+Clear the StringHandle by resetting it to a null value.
+
+=cut
+
+*/
+
+    METHOD flush() {
+        SET_ATTR_stringhandle(INTERP, SELF, NULL);
+    }
+
+/*
+
+=item C<METHOD print([INTVAL|FLOATVAL|STRING *|PMC*] value)>
+
+Print the passed in integer, number, string, or PMC to the stringhandle.
+(Integers, numbers, and strings are auto-boxed as PMCs.)
+
+=cut
+
+*/
+
+    METHOD print(PMC *to_print) {
+        STRING *string_to_print = VTABLE_get_string(INTERP, to_print);
+
+        Parrot_io_putps(interp, SELF, string_to_print);
+    }
+
+/*
+
+=item C<METHOD puts(STRING *value)>
+
+Print the string to the stringhandle.
+
+=cut
+
+*/
+
+    METHOD puts(STRING *to_print) {
+        INTVAL flags, status;
+        STRING *old_string, *new_string;
+
+        GET_ATTR_stringhandle(INTERP, SELF, old_string);
+        if (STRING_IS_NULL(old_string))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Cannot write to a closed filehandle");
+
+        GET_ATTR_flags(INTERP, SELF, flags);
+        if (!(flags & PIO_F_WRITE))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Cannot write to a filehandle not opened for write");
+
+        new_string = string_append(interp, old_string, to_print);
+
+        SET_ATTR_stringhandle(INTERP, SELF, new_string);
+
+        status = string_length(interp, new_string);
+        RETURN(INTVAL status);
+    }
+
+/*
+
+=item C<METHOD buffer_type(STRING *new_type :optional)>
+
+Set or retrieve the buffering attribute for the stringhandle. This attribute is
+ignored, but stored for mocking.
+
+=cut
+
+*/
+
+    METHOD buffer_type(STRING *new_type :optional, INTVAL got_type :opt_flag) {
+        INTVAL flags;
+        STRING *nobuffer_string   = const_string(INTERP, "unbuffered");
+        STRING *linebuffer_string = const_string(INTERP, "line-buffered");
+        STRING *fullbuffer_string = const_string(INTERP, "full-buffered");
+
+        GET_ATTR_flags(INTERP, SELF, flags);
+
+        if (got_type) {
+            if (string_equal(INTERP, new_type, nobuffer_string) == 0) {
+                flags &= ~ PIO_F_LINEBUF;
+                flags &= ~ PIO_F_BLKBUF;
+            }
+            else if (string_equal(INTERP, new_type, linebuffer_string) == 0) {
+                flags |=   PIO_F_LINEBUF;
+                flags &= ~ PIO_F_BLKBUF;
+            }
+            else if (string_equal(INTERP, new_type, fullbuffer_string) == 0) {
+                flags &= ~ PIO_F_LINEBUF;
+                flags |=   PIO_F_BLKBUF;
+            }
+
+            SET_ATTR_flags(INTERP, SELF, flags);
+        }
+
+        if (flags & PIO_F_LINEBUF)
+            RETURN(STRING *linebuffer_string);
+        else if (flags & PIO_F_BLKBUF)
+            RETURN(STRING *fullbuffer_string);
+        RETURN(STRING *nobuffer_string);
+    }
+
+/*
+
+=item C<METHOD buffer_size(INTVAL new_size :optional)>
+
+Returns the current size of the stringhandle.
+
+=cut
+
+*/
+
+    METHOD buffer_size(INTVAL new_size :optional, INTVAL got_size :opt_flag) {
+        INTVAL buffer_size;
+        STRING *stringhandle;
+
+        GET_ATTR_stringhandle(INTERP, SELF, stringhandle);
+
+        if (STRING_IS_NULL(stringhandle))
+            RETURN(INTVAL 0);
+        buffer_size = string_length(interp, stringhandle);
+
+        RETURN(INTVAL buffer_size);
+
+    }
+
+/*
+
+=item C<METHOD mode()>
+
+Retrieve the read mode string for the stringhandle.
+
+=cut
+
+*/
+
+    METHOD mode() {
+        STRING *mode, *mode_copy;
+
+        GET_ATTR_mode(INTERP, SELF, mode);
+        mode_copy = string_copy(INTERP, mode);
+
+        RETURN(STRING *mode_copy);
+
+    }
+
+/*
+
+=item C<METHOD encoding(STRING *new_encoding)>
+
+Set or retrieve the encoding attribute (a string name of the selected encoding
+scheme) for the stringhandle.
+
+=cut
+
+*/
+
+    METHOD encoding(STRING *new_encoding :optional, INTVAL got_encoding :opt_flag) {
+        STRING *encoding;
+        STRING *encoding_copy = NULL;
+
+        if (got_encoding) {
+            if (!STRING_IS_NULL(new_encoding))
+                encoding_copy = string_copy(INTERP, new_encoding);
+            SET_ATTR_encoding(INTERP, SELF, encoding_copy);
+            RETURN(STRING *new_encoding);
+        }
+
+        GET_ATTR_encoding(INTERP, SELF, encoding);
+        if (!STRING_IS_NULL(encoding))
+            encoding_copy = string_copy(INTERP, encoding);
+
+        RETURN(STRING *encoding_copy);
+
+    }
+
+/*
+
+=item C<METHOD eof()>
+
+Check if the StringHandle is at end-of-file (if it has read to the end of the
+string data).
+
+=cut
+
+*/
+
+    METHOD eof() {
+        STRING *stringhandle;
+        INTVAL offset;
+        GET_ATTR_stringhandle(INTERP, SELF, stringhandle);
+        GET_ATTR_read_offset(INTERP, SELF, offset);
+
+        if (offset >= string_length(INTERP, stringhandle))
+            RETURN(INTVAL 1);
+
+        RETURN(INTVAL 0);
+    }
+
+
+/*
+
+=item C<METHOD get_fd()>
+
+StringHandles do not use integer file descriptors, so always returns an error
+value.
+
+=cut
+
+*/
+
+    METHOD get_fd() {
+        RETURN(INTVAL -1);
+    }
+
+
+/*
+
+=back
+
+=cut
+
+*/
+
+} /* end pmclass */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

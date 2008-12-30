@@ -4,11 +4,11 @@ $Id$
 
 =head1 NAME
 
-src/io.c - Common I/O utility functions
+src/io/filehandle.c - FileHandle utility functions
 
 =head1 DESCRIPTION
 
-This file defines a set of utility functions for I/O operations used by all
+This file defines a set of utility functions for the FileHandle PMC used by all
 operating systems. For the primary public I/O API, see F<src/io/api.c>.
 
 =cut
@@ -16,8 +16,8 @@ operating systems. For the primary public I/O API, see F<src/io/api.c>.
 */
 
 #include "parrot/parrot.h"
-#include "io/io_private.h"
-#include "pmc/pmc_filehandle.h"
+#include "io_private.h"
+#include "../pmc/pmc_filehandle.h"
 
 /* HEADERIZER HFILE: include/parrot/io.h */
 
@@ -113,7 +113,9 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_io_make_string(PARROT_INTERP, ARGMOD(STRING **buf), size_t len)
 {
-    /* when we get a NULL string, we read a default len */
+    /*
+     * when we get a NULL string, we read a default len
+     */
     if (*buf == NULL) {
         *buf = string_make_empty(interp, enum_stringrep_one, len);
         return *buf;
@@ -148,7 +150,7 @@ buffer and file positions) to their default values.
 
 PARROT_EXPORT
 void
-Parrot_io_set_os_handle(PARROT_INTERP, ARGIN(PMC *filehandle), PIOHANDLE file_descriptor)
+Parrot_io_set_os_handle(SHIM_INTERP, ARGIN(PMC *filehandle), PIOHANDLE file_descriptor)
 {
     PARROT_FILEHANDLE(filehandle)->os_handle = file_descriptor;
 }
@@ -171,7 +173,7 @@ it can be cleanly changed later.
 
 PARROT_EXPORT
 PIOHANDLE
-Parrot_io_get_os_handle(PARROT_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_get_os_handle(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
     return PARROT_FILEHANDLE(filehandle)->os_handle;
 }
@@ -194,7 +196,7 @@ it can be cleanly changed later.
 
 PARROT_EXPORT
 void
-Parrot_io_set_flags(PARROT_INTERP, ARGIN(PMC *filehandle), INTVAL flags)
+Parrot_io_set_flags(SHIM_INTERP, ARGIN(PMC *filehandle), INTVAL flags)
 {
     Parrot_FileHandle_attributes *handle_struct = PARROT_FILEHANDLE(filehandle);
     handle_struct->flags = flags;
@@ -218,7 +220,7 @@ it can be cleanly changed later.
 
 PARROT_EXPORT
 INTVAL
-Parrot_io_get_flags(PARROT_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_get_flags(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
     Parrot_FileHandle_attributes *handle_struct = PARROT_FILEHANDLE(filehandle);
     INTVAL flags = handle_struct->flags;
@@ -243,7 +245,7 @@ it can be cleanly changed later.
 
 PARROT_EXPORT
 void
-Parrot_io_set_file_size(PARROT_INTERP, ARGIN(PMC *filehandle), PIOOFF_T file_size)
+Parrot_io_set_file_size(SHIM_INTERP, ARGIN(PMC *filehandle), PIOOFF_T file_size)
 {
     PARROT_FILEHANDLE(filehandle)->file_size = file_size;
 }
@@ -268,7 +270,7 @@ it can be cleanly changed later.
 
 PARROT_EXPORT
 PIOOFF_T
-Parrot_io_get_file_size(PARROT_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_get_file_size(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
     return PARROT_FILEHANDLE(filehandle)->file_size;
 }
@@ -290,7 +292,7 @@ it can be cleanly changed later.
 */
 
 void
-Parrot_io_set_buffer_start(PARROT_INTERP, ARGIN(PMC *filehandle),
+Parrot_io_set_buffer_start(SHIM_INTERP, ARGIN(PMC *filehandle),
         ARGIN_NULLOK(unsigned char *new_start))
 {
     PARROT_FILEHANDLE(filehandle)->buffer_start = new_start;
@@ -315,7 +317,7 @@ it can be cleanly changed later.
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 unsigned char *
-Parrot_io_get_buffer_start(PARROT_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_get_buffer_start(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
     return PARROT_FILEHANDLE(filehandle)->buffer_start;
 }
@@ -339,7 +341,7 @@ it can be cleanly changed later.
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 unsigned char *
-Parrot_io_get_buffer_next(PARROT_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_get_buffer_next(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
     return PARROT_FILEHANDLE(filehandle)->buffer_next;
 }
@@ -361,7 +363,7 @@ it can be cleanly changed later.
 */
 
 void
-Parrot_io_set_buffer_next(PARROT_INTERP, ARGIN(PMC *filehandle),
+Parrot_io_set_buffer_next(SHIM_INTERP, ARGIN(PMC *filehandle),
         ARGIN_NULLOK(unsigned char *new_next))
 {
     PARROT_FILEHANDLE(filehandle)->buffer_next = new_next;
@@ -386,7 +388,7 @@ it can be cleanly changed later.
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 unsigned char *
-Parrot_io_get_buffer_end(PARROT_INTERP, ARGIN_NULLOK(PMC *filehandle))
+Parrot_io_get_buffer_end(SHIM_INTERP, ARGIN_NULLOK(PMC *filehandle))
 {
     return PARROT_FILEHANDLE(filehandle)->buffer_end;
 }
@@ -408,7 +410,7 @@ it can be cleanly changed later.
 */
 
 void
-Parrot_io_set_buffer_end(PARROT_INTERP, ARGIN(PMC *filehandle),
+Parrot_io_set_buffer_end(SHIM_INTERP, ARGIN(PMC *filehandle),
         ARGIN_NULLOK(unsigned char *new_end))
 {
     PARROT_FILEHANDLE(filehandle)->buffer_end = new_end;
@@ -432,7 +434,7 @@ it can be cleanly changed later.
 
 PARROT_CAN_RETURN_NULL
 INTVAL
-Parrot_io_get_buffer_flags(PARROT_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_get_buffer_flags(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
     return PARROT_FILEHANDLE(filehandle)->buffer_flags;
 }
@@ -454,7 +456,7 @@ it can be cleanly changed later.
 */
 
 void
-Parrot_io_set_buffer_flags(PARROT_INTERP, ARGIN(PMC *filehandle), INTVAL new_flags)
+Parrot_io_set_buffer_flags(SHIM_INTERP, ARGIN(PMC *filehandle), INTVAL new_flags)
 {
     PARROT_FILEHANDLE(filehandle)->buffer_flags = new_flags;
 }
@@ -477,7 +479,7 @@ it can be cleanly changed later.
 
 PARROT_CAN_RETURN_NULL
 size_t
-Parrot_io_get_buffer_size(PARROT_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_get_buffer_size(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
     return PARROT_FILEHANDLE(filehandle)->buffer_size;
 }
@@ -499,7 +501,7 @@ it can be cleanly changed later.
 */
 
 void
-Parrot_io_set_buffer_size(PARROT_INTERP, ARGIN(PMC *filehandle), size_t new_size)
+Parrot_io_set_buffer_size(SHIM_INTERP, ARGIN(PMC *filehandle), size_t new_size)
 {
     PARROT_FILEHANDLE(filehandle)->buffer_size = new_size;
 }
@@ -521,7 +523,7 @@ it can be cleanly changed later.
 
 PARROT_CAN_RETURN_NULL
 void
-Parrot_io_clear_buffer(PARROT_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_clear_buffer(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
     Parrot_FileHandle_attributes *io = PARROT_FILEHANDLE(filehandle);
     if (io->buffer_start && (io->flags & PIO_BF_MALLOC)) {
@@ -548,7 +550,7 @@ it can be cleanly changed later.
 
 PARROT_EXPORT
 PIOOFF_T
-Parrot_io_get_file_position(PARROT_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_get_file_position(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
     return PARROT_FILEHANDLE(filehandle)->file_pos;
 }
@@ -571,7 +573,7 @@ it can be cleanly changed later.
 
 PARROT_EXPORT
 PIOOFF_T
-Parrot_io_get_last_file_position(PARROT_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_get_last_file_position(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
     return PARROT_FILEHANDLE(filehandle)->last_pos;
 }
@@ -595,7 +597,7 @@ it can be cleanly changed later.
 
 PARROT_EXPORT
 void
-Parrot_io_set_file_position(PARROT_INTERP, ARGIN(PMC *filehandle), PIOOFF_T file_pos)
+Parrot_io_set_file_position(SHIM_INTERP, ARGIN(PMC *filehandle), PIOOFF_T file_pos)
 {
     Parrot_FileHandle_attributes *handle_struct = PARROT_FILEHANDLE(filehandle);
     handle_struct->last_pos = handle_struct->file_pos;
@@ -633,6 +635,72 @@ Parrot_io_is_encoding(PARROT_INTERP, ARGIN(PMC *filehandle), ARGIN(STRING *value
     return 0;
 }
 
+/*
+
+=item C<INTVAL Parrot_io_close_filehandle>
+
+Flushes and closes the C<FileHandle> PMC C<*pmc>, but leaves the object intact
+to be reused or collected.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+INTVAL
+Parrot_io_close_filehandle(PARROT_INTERP, ARGMOD(PMC *pmc))
+{
+    INTVAL result;
+
+    if (Parrot_io_is_closed_filehandle(interp, pmc))
+        return -1;
+
+    Parrot_io_flush_buffer(interp, pmc);
+    PIO_FLUSH(interp, pmc);
+
+    result = PIO_CLOSE(interp, pmc);
+    Parrot_io_clear_buffer(interp, pmc);
+
+    return result;
+}
+
+/*
+
+=item C<INTVAL Parrot_io_is_closed_filehandle>
+
+Test whether a filehandle is closed.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+INTVAL
+Parrot_io_is_closed_filehandle(PARROT_INTERP, ARGMOD(PMC *pmc))
+{
+    return PIO_IS_CLOSED(interp, pmc);
+}
+
+/*
+
+=item C<void Parrot_io_flush_filehandle>
+
+Flushes the C<FileHandle> PMC C<*pmc>.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_io_flush_filehandle(PARROT_INTERP, ARGMOD(PMC *pmc))
+{
+    if (Parrot_io_is_closed(interp, pmc))
+        return;
+
+    Parrot_io_flush_buffer(interp, pmc);
+    PIO_FLUSH(interp, pmc);
+}
 
 /*
 

@@ -360,7 +360,7 @@ IO_O_FILES = \
     $(IO_DIR)/unix$(O) \
     $(IO_DIR)/win32$(O) \
     $(IO_DIR)/portable$(O) \
-    $(SRC_DIR)/io$(O)
+    $(IO_DIR)/filehandle$(O)
 
 INTERP_O_FILES = \
     $(SRC_DIR)/string$(O) \
@@ -1197,7 +1197,7 @@ $(SRC_DIR)/charset$(O) : $(SRC_DIR)/charset.c $(GENERAL_H_FILES)
 
 $(SRC_DIR)/pbc_merge$(O) : $(SRC_DIR)/pbc_merge.c $(GENERAL_H_FILES)
 
-$(SRC_DIR)/io$(O) : $(SRC_DIR)/pmc/pmc_filehandle.h $(SRC_DIR)/io/io_private.h
+$(IO_DIR)/filehandle$(O) : $(SRC_DIR)/pmc/pmc_filehandle.h $(SRC_DIR)/io/io_private.h
 
 $(OPS_DIR)/core_ops$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops.c
 

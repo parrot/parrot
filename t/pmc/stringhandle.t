@@ -1,54 +1,50 @@
 #!perl
 # Copyright (C) 2006-2008, The Perl Foundation.
-# $Id$
+# $Id: stringhandle.t 33695 2008-12-09 05:16:33Z allison $
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 17;
-use Parrot::Test::Util 'create_tempfile';
-use Parrot::Test::Util 'create_tempfile';
+use Parrot::Test tests => 18;
 
 =head1 NAME
 
-t/pmc/filehandle.t - test the FileHandle PMC
+t/pmc/stringhandle.t - test the StringHandle PMC
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/filehandle.t
+    % prove t/pmc/stringhandle.t
 
 =head1 DESCRIPTION
 
-Tests the FileHandle PMC.
+Tests the StringHandle PMC.
 
 =cut
 
 # L<PDD22/I\/O PMC API/=item new>
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    new $P0, 'FileHandle'
-    say "ok 1 - $P0 = new 'FileHandle'"
+    new $P0, 'StringHandle'
+    say "ok 1 - $P0 = new 'StringHandle'"
 .end
 CODE
-ok 1 - $P0 = new 'FileHandle'
+ok 1 - $P0 = new 'StringHandle'
 OUT
-
-my (undef, $temp_file) = create_tempfile( UNLINK => 1 );
 
 # L<PDD22/I\/O PMC API/=item open.*=item close>
 pir_output_is( <<"CODE", <<'OUT', 'open and close - synchronous' );
 .sub 'test' :main
-    \$P1 = new 'FileHandle'
+    \$P1 = new 'StringHandle'
     \$P1.'open'('README')
     say 'ok 1 - \$P1.open(\$S1)'
 
     \$P1.'close'()
     say 'ok 2 - \$P1.close()'
 
-    \$P3 = new 'FileHandle'
-    \$P3.'open'('$temp_file', 'rw')
+    \$P3 = new 'StringHandle'
+    \$P3.'open'('temp_file', 'rw')
     say 'ok 3 - \$P3.open(\$S1, \$S2) # rw mode'
     \$P3.'close'()
 
@@ -56,32 +52,12 @@ pir_output_is( <<"CODE", <<'OUT', 'open and close - synchronous' );
     say 'ok 4 - \$P3.open()         # reopening'
     \$P3.'close'()
 
-  test_5:
-    \$P5 = new 'FileHandle'
-    push_eh eh_bad_file_1
-    \$P5.'open'('bad.file')
-    pop_eh
-
-  test_6:
-    \$P6 = new 'FileHandle'
-    push_eh eh_bad_file_2
-    \$P6.'open'('bad.file', 'r')
-    pop_eh
-
   test_7:
-    \$P7 = new 'FileHandle'
-    \$P7.'open'('$temp_file', 'w')
+    \$P7 = new 'StringHandle'
+    \$P7.'open'('temp_file', 'w')
     say 'ok 7 - \$P7.open(\$S1, \$S2) # new file, write mode succeeds'
 
     goto end
-
-  eh_bad_file_1:
-    say 'ok 5 - \$P5.open(\$S1)      # with bad file'
-    goto test_6
-
-  eh_bad_file_2:
-    say "ok 6 - \$P6.open(\$S1, \$S2) # with bad file"
-    goto test_7
 
   end:
 .end
@@ -90,8 +66,6 @@ ok 1 - $P1.open($S1)
 ok 2 - $P1.close()
 ok 3 - $P3.open($S1, $S2) # rw mode
 ok 4 - $P3.open()         # reopening
-ok 5 - $P5.open($S1)      # with bad file
-ok 6 - $P6.open($S1, $S2) # with bad file
 ok 7 - $P7.open($S1, $S2) # new file, write mode succeeds
 OUT
 
@@ -103,7 +77,7 @@ SKIP: {
     pir_output_is( <<'CODE', <<'OUT', 'open and close - asynchronous' );
 .sub 'test' :main
     $P1 = # RT #46831 create a callback here
-    $P0 = new 'FileHandle'
+    $P0 = new 'StringHandle'
 
     $P0.'open'('README')
     say 'ok 1 - $P0.open($S1)'
@@ -133,7 +107,13 @@ OUT
 pir_output_is(
     <<'CODE', <<'OUT', 'read - synchronous' );
 .sub 'test' :main
-    $P0 = new 'FileHandle'
+    $P0 = new 'StringHandle'
+    $P0.'open'('README', 'w')
+
+    $P0.'print'("This is Parrot, version")
+
+    $P0.'close'()
+
     $P0.'open'('README')
 
     $S0 = $P0.'read'(14) # bytes
@@ -153,12 +133,40 @@ ok 1 - $S0 = $P1.read($I2)
 ok 2 - $S0 = $P1.read($I2) # again on same stream
 OUT
 
+pir_output_is(
+    <<'CODE', <<'OUT', 'read opcode' );
+.sub 'test' :main
+    $P0 = new 'StringHandle'
+    $P0.'open'('README', 'w')
+
+    print $P0, "This is Parrot, version"
+    close $P0
+
+    $P0.'open'('README')
+
+    $S0 = read $P0, 14 # bytes
+    if $S0 == 'This is Parrot' goto ok_1
+    print 'not '
+  ok_1:
+    say 'ok 1 - $S0 = read $P1, $I2'
+
+    $S0 = read $P0, 9  # bytes
+    if $S0 == ', version' goto ok_2
+    print 'not '
+  ok_2:
+    say 'ok 2 - $S0 = read $P1, $I2 # again on same stream'
+.end
+CODE
+ok 1 - $S0 = read $P1, $I2
+ok 2 - $S0 = read $P1, $I2 # again on same stream
+OUT
+
 # L<PDD22/I\/O PMC API/=item print>
 pir_output_is( <<"CODE", <<'OUT', 'print - synchronous' );
 .sub 'test' :main
 
-    \$P0 = new 'FileHandle'
-    \$P0.'open'('$temp_file', 'w')
+    \$P0 = new 'StringHandle'
+    \$P0.'open'('temp_file', 'w')
 
     \$P0.'print'(123)
     say 'ok 1 - \$P0.print(\$I1)'
@@ -173,16 +181,15 @@ pir_output_is( <<"CODE", <<'OUT', 'print - synchronous' );
 
     \$P0.'close'()
 
-    \$P1 = new 'FileHandle'
-    \$P1.'open'('$temp_file', 'r')
+    \$P0.'open'('temp_file', 'r')
 
-    \$S0 = \$P1.'read'(3) # bytes
+    \$S0 = \$P0.'read'(3) # bytes
     if \$S0 == "123" goto ok_5
     print 'not '
   ok_5:
     say 'ok 5 - read integer back from file'
 
-    \$S0 = \$P1.'read'(16) # bytes
+    \$S0 = \$P0.'read'(16) # bytes
     if \$S0 == "456.789squawk\\n42" goto ok_6
     say \$S0
 
@@ -190,7 +197,7 @@ pir_output_is( <<"CODE", <<'OUT', 'print - synchronous' );
   ok_6:
     say 'ok 6 - read string back from file'
 
-    \$P1.'close'()
+    \$P0.'close'()
 .end
 CODE
 ok 1 - $P0.print($I1)
@@ -201,8 +208,6 @@ ok 5 - read integer back from file
 ok 6 - read string back from file
 OUT
 
-(undef, $temp_file) = create_tempfile( UNLINK => 1 );
-
 # L<PDD22/I\/O PMC API/=item print.*=item readline>
 pir_output_is( <<"CODE", <<'OUT', 'readline - synchronous' );
 .sub 'test' :main
@@ -210,82 +215,87 @@ pir_output_is( <<"CODE", <<'OUT', 'readline - synchronous' );
     .local pmc chomp
                chomp = get_global ['String';'Utils'], 'chomp'
 
-    \$P0 = new 'FileHandle'
-    \$P0.'open'('$temp_file', 'w')
+    \$P0 = new 'StringHandle'
+    \$P0.'open'('temp_file', 'w')
     \$P0.'print'("foobarbaz\\n42")
     \$P0.'close'()
 
-    \$P1 = new 'FileHandle'
-    \$P1.'open'('$temp_file')
+    \$P0.'open'('temp_file')
 
-    \$S0 = \$P1.'readline'()
+    \$S0 = \$P0.'readline'()
     \$S0 = chomp( \$S0 )
     if \$S0 == 'foobarbaz' goto ok_1
     print 'not '
   ok_1:
-    say 'ok 1 - \$S0 = \$P1.readline()'
+    say 'ok 1 - \$S0 = \$P0.readline()'
 
-    \$S0 = \$P1.'readline'()
+    \$S0 = \$P0.'readline'()
     \$S0 = chomp( \$S0 )
     if \$S0 == '42' goto ok_2
     print 'not '
   ok_2:
-    say 'ok 2 - \$S0 = \$P1.readline() # again on same stream'
+    say 'ok 2 - \$S0 = \$P0.readline() # again on same stream'
 
-    \$P1.'close'()
+    \$P0.'close'()
 .end
 CODE
-ok 1 - $S0 = $P1.readline()
-ok 2 - $S0 = $P1.readline() # again on same stream
+ok 1 - $S0 = $P0.readline()
+ok 2 - $S0 = $P0.readline() # again on same stream
 OUT
 
-my $LINES;
-($LINES, $temp_file) = create_tempfile( UNLINK => 1 );
-
-for my $counter (1 .. 10000) {
-    print $LINES $counter, "\n";
-}
-close $LINES;
-
-pir_output_is( <<"CODE", <<'OUT', 'readline 10,000 lines' );
+pir_output_is( <<'CODE', <<'OUT', 'readline 10,000 lines' );
 .sub 'test' :main
     load_bytecode 'String/Utils.pbc'
     .local pmc chomp
                chomp = get_global ['String';'Utils'], 'chomp'
     .local string test_line
-    .local pmc filehandle
+    .local pmc stringhandle
     .local int counter
-    filehandle = new 'FileHandle'
-    filehandle.'open'('$temp_file')
+    stringhandle = new 'StringHandle'
+
+    stringhandle.'open'('temp_file', 'w')
+
+    counter = 0
+  write_loop:
+    inc counter 
+    if counter > 10000 goto end_write_loop
+
+    stringhandle.'print'(counter)
+    stringhandle.'print'("\n")
+
+    goto write_loop
+  end_write_loop:
+    stringhandle.'close'()
+    stringhandle.'open'('temp_file')
 
     counter = 0
   read_loop:
     inc counter 
     # read in the file one line at a time...
-    \$I0 = filehandle.'eof'()
-    if \$I0 goto end_read_loop
+    $I0 = stringhandle.'eof'()
+    if $I0 goto end_read_loop
 
-    test_line = readline filehandle
+    test_line = readline stringhandle
     if test_line == "" goto end_read_loop
     test_line = chomp( test_line )
-    \$I1 = test_line
-    if \$I1 == counter goto read_loop
+    $I1 = test_line
+    if $I1 == counter goto read_loop
       print "not "
 ## the following lines provide more extensive debugging
 ## output on a readline failure
 #      print counter
 #      print " = "
-#      print \$I1
-#      print "\\n"
-#      counter = \$I1
+#      print $I1
+#      print "\n"
+#      counter = $I1
 #      goto read_loop
 
   end_read_loop:
-    if counter > 1 goto read_something
+    if counter > 9000 goto read_something
       print "not "
   read_something:
     say 'ok 1 - read 10,000 lines'
-    filehandle.'close'()
+    stringhandle.'close'()
 .end
 CODE
 ok 1 - read 10,000 lines
@@ -301,7 +311,7 @@ OUT
 # L<PDD22/I\/O PMC API/=item record_separator>
 pir_output_is( <<'CODE', <<'OUT', 'record_separator', todo => 'not yet implemented' );
 .sub 'test' :main
-    $P0 = new 'FileHandle'
+    $P0 = new 'StringHandle'
 
     $S0 = $P0.'record_separator'()
     if $S0 == "\n" goto ok_1
@@ -337,7 +347,7 @@ OUT
 # L<PDD22/I\/O PMC API/=item buffer_type>
 pir_output_is( <<'CODE', <<'OUT', 'buffer_type' );
 .sub 'test' :main
-    $P0 = new 'FileHandle'
+    $P0 = new 'StringHandle'
 
     $P0.'buffer_type'('unbuffered')
     $S0 = $P0.'buffer_type'()
@@ -376,42 +386,38 @@ OUT
 # change buffer size while it contains data
 # try with all 'buffer_type' modes
 
-(undef, $temp_file) = create_tempfile( UNLINK => 1 );
-
 pir_output_is( <<"CODE", <<'OUT', 'buffer_size' );
 .sub 'test' :main
-    \$P0 = new 'FileHandle'
+    \$P0 = new 'StringHandle'
 
     \$P0.'buffer_type'('full-buffered')
     \$P0.'buffer_size'(42)
     say 'ok 1 - \$P0.buffer_size(42)     # set buffer size'
+
+    \$P0.'open'('temp_file', 'w')
+    \$P0.'print'(1234567890)
 
     \$I0 = \$P0.'buffer_size'()
 
     # The set buffer size is a minimum, the I/O subsystem may scale it upward
     # to a round block, so test that the buffer size is equal or greater than
     # the set size.
-    if \$I0 >= 42 goto ok_2
+    if \$I0 == 10 goto ok_2
     print 'not '
   ok_2:
     say 'ok 2 - \$I0 = \$P0.buffer_size() # get buffer size'
 
-    \$P0.'open'('$temp_file', 'w')
-
-    \$P0.'print'(1234567890)
     \$P0.'close'()
 
-    \$P1 = new 'FileHandle'
-    \$P1.'open'('$temp_file')
-
-    \$S0 = \$P1.'readline'()
+    \$P0.'open'('temp_file')
+    \$S0 = \$P0.'readline'()
 
     if \$S0 == '1234567890' goto ok_3
     print 'not '
   ok_3:
     say 'ok 3 - \$S0 = \$P0.readline()    # buffer flushed'
 
-    \$P1.'close'()
+    \$P0.'close'()
 
 .end
 CODE
@@ -423,7 +429,7 @@ OUT
 # L<PDD22/I\/O PMC API/=item encoding>
 pir_output_is( <<'CODE', <<'OUT', 'encoding' );
 .sub 'test' :main
-    $P0 = new 'FileHandle'
+    $P0 = new 'StringHandle'
 
     $P0.'encoding'('utf8')
     $S0 = $P0.'encoding'()
@@ -437,14 +443,12 @@ CODE
 ok 1 - $S0 = $P1.encoding() # utf8
 OUT
 
-(undef, $temp_file) = create_tempfile( UNLINK => 1 );
-
 pir_output_is( <<"CODE", <<'OUT', 'encoding - read/write' );
 .sub 'test' :main
-    \$P0 = new 'FileHandle'
+    \$P0 = new 'StringHandle'
     \$P0.'encoding'('utf8')
 
-    \$P0.'open'('$temp_file', 'w')
+    \$P0.'open'('temp_file', 'w')
 
     \$P0.'print'(1234567890)
     \$P0.'print'("\\n")
@@ -452,40 +456,35 @@ pir_output_is( <<"CODE", <<'OUT', 'encoding - read/write' );
     \$P0.'print'(\$S0)
     \$P0.'close'()
 
-    \$P1 = new 'FileHandle'
-    \$P1.'encoding'('utf8')
+    \$P0.'open'('temp_file')
 
-    \$P1.'open'('$temp_file')
-
-    \$S1 = \$P1.'readline'()
+    \$S1 = \$P0.'readline'()
     if \$S1 == "1234567890\\n" goto ok_1
 print \$S1
     print 'not '
   ok_1:
-    say 'ok 1 - \$S1 = \$P1.readline() # read with utf8 encoding on'
+    say 'ok 1 - \$S1 = \$P0.readline() # read with utf8 encoding on'
 
-    \$S2 = \$P1.'readline'()
+    \$S2 = \$P0.'readline'()
     if \$S2 == \$S0 goto ok_2
 print \$S2
     print 'not '
   ok_2:
-    say 'ok 2 - \$S2 = \$P1.readline() # read iso-8859-1 string'
+    say 'ok 2 - \$S2 = \$P0.readline() # read iso-8859-1 string'
 
-    \$P1.'close'()
+    \$P0.'close'()
 
 .end
 CODE
-ok 1 - $S1 = $P1.readline() # read with utf8 encoding on
-ok 2 - $S2 = $P1.readline() # read iso-8859-1 string
+ok 1 - $S1 = $P0.readline() # read with utf8 encoding on
+ok 2 - $S2 = $P0.readline() # read iso-8859-1 string
 OUT
 
-
-(undef, $temp_file) = create_tempfile( UNLINK => 1 );
 
 # L<PDD22/I\/O PMC API/=item mode>
 pir_output_is( <<'CODE', <<'OUT', 'mode' );
 .sub 'test' :main
-    $P0 = new 'FileHandle'
+    $P0 = new 'StringHandle'
 
     $P0.'open'('README')
     $S0 = $P0.'mode'()
@@ -502,7 +501,7 @@ CODE
 ok 1 - $S0 = $P0.mode() # get read mode
 OUT
 
-pir_output_is( <<"CODE", <<"OUTPUT", "readall - closed filehandle" );
+pir_output_is( <<"CODE", <<"OUTPUT", "readall - closed stringhandle" );
 .sub main :main
     \$S0 = <<"EOS"
 line 1
@@ -510,12 +509,12 @@ line 2
 line 3
 EOS
     .local pmc pio, pio2
-    pio = new 'FileHandle'
-    pio.'open'("$temp_file", "w")
+    pio = new 'StringHandle'
+    pio.'open'("temp_file", "w")
     pio.'print'(\$S0)
     pio.'close'()
-    pio2 = new 'FileHandle'
-    \$S1 = pio2.'readall'('$temp_file')
+    pio.'open'("temp_file")
+    \$S1 = pio.'readall'('temp_file')
     if \$S0 == \$S1 goto ok
     print "not "
 ok:
@@ -525,7 +524,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is( <<"CODE", <<"OUTPUT", "readall() - opened filehandle" );
+pir_output_is( <<"CODE", <<"OUTPUT", "readall() - opened stringhandle" );
 .sub main :main
     \$S0 = <<"EOS"
 line 1
@@ -533,14 +532,13 @@ line 2
 line 3
 EOS
     .local pmc pio, pio2
-    pio = new 'FileHandle'
-    pio.'open'("$temp_file", "w")
+    pio = new 'StringHandle'
+    pio.'open'("temp_file", "w")
     pio.'print'(\$S0)
     pio.'close'()
 
-    pio2 = new 'FileHandle'
-    pio2.'open'("$temp_file", "r")
-    \$S1 = pio2.'readall'()
+    pio.'open'("temp_file", "r")
+    \$S1 = pio.'readall'()
     if \$S0 == \$S1 goto ok
     print "not "
 ok:
@@ -550,13 +548,13 @@ CODE
 ok
 OUTPUT
 
-pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on closed filehandle" );
+pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on closed stringhandle" );
 .sub 'main'
     .local pmc ifh
-    ifh = new 'FileHandle'
+    ifh = new 'StringHandle'
     ifh.'encoding'('utf8')
    
-    \$S0 = ifh.'readall'('$temp_file')
+    \$S0 = ifh.'readall'('temp_file')
 
     \$I0 = encoding \$S0
     \$S1 = encodingname \$I0
@@ -567,12 +565,12 @@ CODE
 utf8
 OUTPUT
 
-pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on opened filehandle" );
+pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on opened stringhandle" );
 .sub 'main'
     .local pmc ifh
-    ifh = new 'FileHandle'
+    ifh = new 'StringHandle'
     ifh.'encoding'('utf8')
-    ifh.'open'('$temp_file')
+    ifh.'open'('temp_file')
 
     \$S0 = ifh.'readall'()
 
