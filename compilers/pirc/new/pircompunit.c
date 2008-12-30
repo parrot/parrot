@@ -740,10 +740,10 @@ new_argument(lexer_state * const lexer, expression * const expr) {
 /*
 
 =item C<argument *
-add_arg(argument *arg1, argument * const arg2)>
+add_arg(argument *last, argument * const newarg)>
 
-Add argument C<arg2> at the end of the list pointed to by C<arg1>.
-The list is circular linked, and C<arg1> points to the last item.
+Add argument C<newarg> at the end of the list pointed to by C<last>.
+The list is circular linked, and C<last> points to the last item.
 Being circular linked, C<<arg1->next>> points to the first item.
 
 After adding the element, the I<root> pointer (that points to the last
@@ -755,15 +755,15 @@ element of the list) is updated, and returned.
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 argument *
-add_arg(argument *arg1, argument * const arg2) {
-    PARROT_ASSERT(arg1);
-    PARROT_ASSERT(arg2);
+add_arg(argument *last, argument * const newarg) {
+    PARROT_ASSERT(last);
+    PARROT_ASSERT(newarg);
 
-    arg2->next = arg1->next; /* arg2->next is last one, must point to first item */
-    arg1->next = arg2;
-    arg1       = arg2;
+    newarg->next = last->next; /* arg2->next is last one, must point to first item */
+    last->next   = newarg;
+    last         = newarg;
 
-    return arg1;
+    return last;
 }
 
 /*
