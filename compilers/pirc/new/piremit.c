@@ -202,16 +202,19 @@ if C<expr> is not NULL. Expressions are separated by commas.
 */
 void
 print_expressions(lexer_state * const lexer, expression * const expr) {
-    if (expr) {
-        expression *iter = expr->next;
+    expression *iter;
+    if (expr == NULL)
+        return;
 
-        do {
-            print_expr(lexer, iter);
-            iter = iter->next;
-            if (iter != expr->next) fprintf(out, ", ");
-        }
-        while (iter != expr->next);
+    iter = expr->next;
+
+    do {
+        print_expr(lexer, iter);
+        iter = iter->next;
+        if (iter != expr->next) fprintf(out, ", ");
     }
+    while (iter != expr->next);
+
 }
 
 /*
@@ -265,16 +268,18 @@ XXX
 */
 void
 print_statement(lexer_state * const lexer, subroutine * const sub) {
-    if (sub->statements != NULL) {
-        instruction *statiter = sub->statements->next;
+    instruction *statiter;
 
-        do {
-            print_instruction(lexer, statiter);
-            statiter = statiter->next;
-        }
-        while (statiter != sub->statements->next);
+    if (sub->statements == NULL)
+        return;
+
+    statiter = sub->statements->next;
+
+    do {
+        print_instruction(lexer, statiter);
+        statiter = statiter->next;
     }
-
+    while (statiter != sub->statements->next);
 }
 
 /*
@@ -289,45 +294,49 @@ XXX
 */
 void
 print_subs(struct lexer_state * const lexer) {
-    if (lexer->subs != NULL) {
-        /* set iterator to first item */
-        subroutine *subiter = lexer->subs->next;
+    subroutine *subiter;
 
-        /* XXX for now this works */
-        lexer->outfile = stderr;
+    if (lexer->subs == NULL)
+        return;
 
-        do {
+    /* set iterator to first item */
+    subiter = lexer->subs->next;
 
-            /*
-            fprintf(out, "# subroutine '%s' register usage\n", subiter->sub_name);
-            fprintf(out, "#   int   : %d\n", subiter->regs_used[INT_TYPE]);
-            fprintf(out, "#   num   : %d\n", subiter->regs_used[NUM_TYPE]);
-            fprintf(out, "#   string: %d\n", subiter->regs_used[STRING_TYPE]);
-            fprintf(out, "#   pmc   : %d\n", subiter->regs_used[PMC_TYPE]);
-            */
-            fprintf(out, ".namespace ");
-            print_key(lexer, subiter->name_space);
-            fprintf(out, "\n");
+    /* XXX for now this works */
+    lexer->outfile = stderr;
 
-            if (subiter->flags) {
+    do {
+
+        /*
+        fprintf(out, "# subroutine '%s' register usage\n", subiter->sub_name);
+        fprintf(out, "#   int   : %d\n", subiter->regs_used[INT_TYPE]);
+        fprintf(out, "#   num   : %d\n", subiter->regs_used[NUM_TYPE]);
+        fprintf(out, "#   string: %d\n", subiter->regs_used[STRING_TYPE]);
+        fprintf(out, "#   pmc   : %d\n", subiter->regs_used[PMC_TYPE]);
+        */
+        fprintf(out, ".namespace ");
+        print_key(lexer, subiter->name_space);
+        fprintf(out, "\n");
+
+        if (subiter->flags) {
 
 
-                fprintf(out, ".pcc_sub ");
+            fprintf(out, ".pcc_sub ");
 
-                if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_MAIN))
-                    fprintf(out, ":main ");
-                if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_METHOD))
-                    fprintf(out, ":method ");
-                    /* XXX and so on; check which ones are available in PASM mode. */
+            if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_MAIN))
+                fprintf(out, ":main ");
+            if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_METHOD))
+                fprintf(out, ":method ");
+                /* XXX and so on; check which ones are available in PASM mode. */
 
-            }
-
-            fprintf(out, "%s:\n", subiter->info.subname);
-            print_statement(lexer, subiter);
-            subiter = subiter->next;
         }
-        while (subiter != lexer->subs->next);
+
+        fprintf(out, "%s:\n", subiter->info.subname);
+        print_statement(lexer, subiter);
+        subiter = subiter->next;
     }
+    while (subiter != lexer->subs->next);
+
 }
 
 /*
@@ -363,15 +372,19 @@ emit_pir_statement(lexer_state * const lexer, subroutine * const sub)>
 */
 static void
 emit_pir_statement(lexer_state * const lexer, subroutine * const sub) {
-    if (sub->statements != NULL) {
-        instruction *statiter = sub->statements->next;
+    instruction *statiter;
 
-        do {
-            emit_pir_instruction(lexer, statiter);
-            statiter = statiter->next;
-        }
-        while (statiter != sub->statements->next);
+    if (sub->statements == NULL)
+        return;
+
+    statiter = sub->statements->next;
+
+    do {
+        emit_pir_instruction(lexer, statiter);
+        statiter = statiter->next;
     }
+    while (statiter != sub->statements->next);
+
 }
 
 /*
@@ -496,8 +509,6 @@ emit_pbc_target_arg(lexer_state * const lexer, target * const t) {
 }
 
 
-
-
 /*
 
 =item C<static void
@@ -514,6 +525,14 @@ emit_pbc_label_arg(lexer_state * const lexer, label * const l) {
 }
 
 
+/*
+
+=item C<static void
+build_key(lexer_state * const lexer, key * const k)>
+
+=cut
+
+*/
 static void
 build_key(lexer_state * const lexer, key * const k) {
     /* XXX TODO
@@ -679,7 +698,7 @@ emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
     /* emit the arguments */
 
     /* note that opinfo->op_count counts all operands plus the op itself;
-     * so substract 1 for the op itself.
+     * so count 1 for the op itself.
      */
     if (instr->opinfo->op_count > 1) {
         /* operands are stored in a circular linked list; instr->operands points
