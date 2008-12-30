@@ -31,15 +31,10 @@ method TOP($/, $key) {
         # set up scope 'package' for the superglobals
         # TODO: use a loop
         $block.symbol_defaults( :scope('lexical') );
-        $block.symbol( :scope('package'), '$_GET' );
-        $block.symbol( :scope('package'), '$_POST' );
-        $block.symbol( :scope('package'), '$_SERVER' );
-        $block.symbol( :scope('package'), '$_GLOBALS' );
-        $block.symbol( :scope('package'), '$_FILES' );
-        $block.symbol( :scope('package'), '$_COOKIE' );
-        $block.symbol( :scope('package'), '$_SESSION' );
-        $block.symbol( :scope('package'), '$_REQUEST' );
-        $block.symbol( :scope('package'), '$_ENV' );
+        for ( '$_GET', '$_POST', '$_SERVER', '$_GLOBALS',
+              '$_FILES', '$_COOKIE', '$_SESSION', '$_REQUEST', '$_ENV' ) {
+            $block.symbol( :scope('package'), $_ );
+        }
         @?BLOCK.unshift($block);
     }
     else {
