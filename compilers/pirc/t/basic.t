@@ -53,7 +53,7 @@ OUTPUT
 
 
 pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "test sub with sub pragmas");
-.sub main :load :init :immediate :postcomp :anon :multi
+.sub main :load :init :immediate :postcomp :anon :multi()
 .end
 CODE
 .namespace []
