@@ -1,6 +1,6 @@
 #!perl
 # Copyright (C) 2006-2008, The Perl Foundation.
-# $Id: stringhandle.t 33695 2008-12-09 05:16:33Z allison $
+# $Id$
 
 use strict;
 use warnings;
