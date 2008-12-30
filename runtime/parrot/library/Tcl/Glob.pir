@@ -86,18 +86,18 @@ or the resulting PIR code (target='PIR').
     load_bytecode 'PCT/HLLCompiler.pbc'
 
     optable = new ['PGE';'OPTable']
-    store_global '$optable', optable
+    set_global '$optable', optable
 
-    $P0 = find_global 'glob_literal'
+    $P0 = get_global 'glob_literal'
     optable.'newtok'('term:', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
 
-    $P0 = find_global 'glob_quest'
+    $P0 = get_global 'glob_quest'
     optable.'newtok'('term:?', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    $P0 = find_global 'glob_star'
+    $P0 = get_global 'glob_star'
     optable.'newtok'('term:*', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    $P0 = find_global 'glob_enum'
+    $P0 = get_global 'glob_enum'
     optable.'newtok'('term:[', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
     optable.'newtok'('infix:', 'looser'=>'term:', 'assoc'=>'list', 'nows'=>1, 'match'=>'PGE::Exp::Concat')
@@ -127,7 +127,7 @@ parse C<PGE::Match> object.
     .param pmc adverbs         :slurpy :named
 
     .local pmc optable, match
-    optable = find_global ['Tcl';'Glob'], '$optable'
+    optable = get_global '$optable'
     match = optable.'parse'(mob)
     .return (match)
 .end
