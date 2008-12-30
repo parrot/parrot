@@ -98,7 +98,7 @@ CODE
 1
 OUT
 
-language_output_like( 'Pipp', <<'CODE', <<'OUT', 'fclose() bad arg', todo => 'currently broken' );
+language_output_like( 'Pipp', <<'CODE', <<'OUT', 'fclose() bad arg' );
 <?php
   fclose('bad');
 ?>
