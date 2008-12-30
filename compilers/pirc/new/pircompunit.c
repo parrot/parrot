@@ -1564,9 +1564,10 @@ set_invocation_args(lexer_state * const lexer, invocation * const inv, argument 
     inv->arguments = args;
 
     if (args) {
-        arg_iter = args->next;
+
+        arg_iter = args;
+
         do {
-            arg_iter = arg_iter->next;
 
             /* count :named arguments twice, once for the argument,
              * once for the :named flag value. Also, add an extra
@@ -1586,7 +1587,6 @@ set_invocation_args(lexer_state * const lexer, invocation * const inv, argument 
                 /* set the :named flag on this extra argument. XXX is this correct? */
                 SET_FLAG(arg->flags, TARGET_FLAG_NAMED);
 
-
                 /* we just inserted an extra argument for the value of :named() flag;
                  * but it need not be handled here; so skip it now:
                  */
@@ -1596,8 +1596,11 @@ set_invocation_args(lexer_state * const lexer, invocation * const inv, argument 
             }
             else
                 ++arg_count;
+
+            arg_iter = arg_iter->next;
+
         }
-        while (arg_iter != args->next);
+        while (arg_iter != args);
     }
 
     /* fprintf(stderr, "invocation has %u args\n", arg_count); */
@@ -1627,12 +1630,32 @@ set_invocation_results(lexer_state * const lexer, invocation * const inv, target
     inv->results = results;
 
     if (results) {
-        result_iter = results->next;
+        result_iter = results;
         do {
+
+            if (TEST_FLAG(result_iter->flags, TARGET_FLAG_NAMED)) {
+
+                target * targ = new_target(lexer);
+
+                CLEAR_FLAG(result_iter->flags, TARGET_FLAG_NAMED);
+
+                SET_FLAG(targ->flags, TARGET_FLAG_NAMED);
+
+                /* XXX thius is not working:: */
+                add_target(lexer, result_iter, targ);
+
+
+                result_iter = result_iter->next;
+
+                result_count += 2;
+            }
+            else
+                ++result_count;
+
             result_iter = result_iter->next;
-            ++result_count;
+
         }
-        while (result_iter != results->next);
+        while (result_iter != results);
     }
 
     /* fprintf(stderr, "invocation has %u results\n", result_count); */
