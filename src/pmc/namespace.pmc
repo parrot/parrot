@@ -535,6 +535,25 @@ Return the name of this namespace part.
 
 /*
 
+=item C<METHOD make_namespace(PMC* key)>
+
+Create and retrieve the namespace given by C<key>.  If the namespace
+already exists, only retrieve it.
+
+=cut
+
+*/
+
+    METHOD make_namespace(PMC *key) {
+        PMC *ns = Parrot_get_namespace_keyed(INTERP, SELF, key);
+        if (PMC_IS_NULL(ns)) {
+            ns = Parrot_make_namespace_keyed(INTERP, SELF, key);
+        }
+        RETURN(PMC *ns);
+    }
+
+/*
+
 =item C<METHOD add_namespace(STRING *name, PMC *namespace)>
 
 Stores the given namespace under this namespace, with the given name.  Throws

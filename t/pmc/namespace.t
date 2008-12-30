@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 65;
+use Parrot::Test tests => 66;
 use Parrot::Config;
 
 =head1 NAME
@@ -1769,6 +1769,24 @@ foo
 OK
 OUT
 
+pir_output_is( <<'CODE', <<'OUT', "make_namespace method");
+.sub 'main' :main
+    $P0 = split ';', 'perl6;Foo;Bar'
+    $P1 = get_root_namespace
+    $P2 = $P1.'make_namespace'($P0)
+    $I0 = isa $P2, 'NameSpace'
+    say $I0
+    $P3 = get_root_namespace ['perl6';'Foo';'Bar']
+    $I0 = isnull $P3
+    say $I0
+    $I0 = issame $P2, $P3
+    say $I0
+.end
+CODE
+1
+0
+1
+OUT
 
 # Local Variables:
 #   mode: cperl
