@@ -1,0 +1,3 @@
+This directory contains implementations of programming languages based on Parrot.
+
+See F<LANGUAGES_STATUS.pod> and L<https://trac.parrot.org/parrot/wiki/Languages>.
