@@ -171,8 +171,8 @@ stored for mocking.
         GET_ATTR_stringhandle(INTERP, SELF, old_string);
         if (STRING_IS_NULL(old_string)) {
             GET_ATTR_encoding(INTERP, SELF, encoding);
-            if (!STRING_IS_NULL(encoding) &&
-                    string_equal(INTERP, encoding, const_string(INTERP, "utf8")) == 0)
+            if (!STRING_IS_NULL(encoding)
+            &&  string_equal(INTERP, encoding, CONST_STRING(INTERP, "utf8")) == 0)
                 new_string = string_make(INTERP, "", 0, "unicode", 0);
             else
                 new_string = string_from_cstring(INTERP, "", 0);
@@ -305,8 +305,7 @@ responds to "\n" newlines.)
 
         orig_length = string_length(INTERP, string_result);
         GET_ATTR_read_offset(INTERP, SELF, offset);
-        newline_pos = string_str_index(INTERP, string_result,
-                const_string(INTERP, "\n"), offset);
+        newline_pos = string_str_index(INTERP, string_result, CONST_STRING(INTERP, "\n"), offset);
 
         /* No newline found, read the rest of the string. */
         if (newline_pos == -1)

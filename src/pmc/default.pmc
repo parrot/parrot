@@ -946,6 +946,9 @@ Provides introspection of a specific piece of information about the PMC.
                     (INTVAL)PObj_get_FLAGS(SELF));
             return found;
         }
+        else if (string_equal(interp, name, CONST_STRING(interp, "mro")) == 0) {
+            return VTABLE_clone(interp, SELF->vtable->mro);
+        }
         else
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Unknown introspection value '%S'", name);
