@@ -85,6 +85,19 @@ Will have to be:
     print $S0
     substr $P0, 1, 2, "x"
 
+=item * named class/pmc lookup in pir syntax such as new, isa, subclass, get_class, etc
+
+Class PMC name resolution will be the following.
+
+if the arg is a STRING
+  Relative to the current Namespace
+
+if the arg is a ResizableStringArray
+  Relative to the current HLL Namespace
+
+if the arg is a Namespace or Class PMC
+  The passed in class or the class attatched to the passed in namespace.
+
 =back
 
 =head1 Functions
