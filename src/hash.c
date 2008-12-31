@@ -93,7 +93,9 @@ static size_t key_hash_pointer(SHIM_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-static size_t key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), size_t seed)
+static size_t key_hash_STRING(PARROT_INTERP,
+    ARGMOD(STRING *s),
+    SHIM(size_t seed))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*s);
@@ -141,7 +143,7 @@ Return the hashed value of the key C<value>.  See also string.c.
 
 PARROT_WARN_UNUSED_RESULT
 static size_t
-key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), size_t seed)
+key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), SHIM(size_t seed))
 {
     if (s->hashval == 0) {
         return string_hash(interp, s);
@@ -334,9 +336,6 @@ parrot_mark_hash(PARROT_INTERP, ARGIN(Hash *hash))
 {
     int mark_key   = 0;
     int mark_value = 0;
-
-    INTVAL i;
-    UINTVAL entries;
 
     if (hash->entry_type == (PARROT_DATA_TYPE) enum_hash_string
     ||  hash->entry_type == (PARROT_DATA_TYPE) enum_hash_pmc)

@@ -113,7 +113,7 @@ PARROT_EXPORT
 int Parrot_init_arg_indexes_and_sig_pmc(SHIM_INTERP,
     ARGIN(Parrot_Context *ctx),
     ARGIN_NULLOK(opcode_t *indexes),
-    ARGIN_NULLOK(PMC* sig_pmc),
+    ARGIN_NULLOK(PMC *sig_pmc),
     ARGMOD(call_state_item *sti))
         __attribute__nonnull__(2)
         __attribute__nonnull__(5)
