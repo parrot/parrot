@@ -2,11 +2,9 @@
 DESCRIPTION="Parrot Virtual Machine"
 HOMEPAGE="http://www.parrotcode.org/"
 # The release managers change with every release. Check this link
-#SRC_URI=$(lwp-request -m HEAD -x -e "http://www.parrotcode.org/release/devel" 2>&1 | \
-#	    grep "/authors/id" | tail -n1 | perl -ane 'print $F[2]')
-# or:
-SRC_URI=${SRC_URI:-"http://search.cpan.org/CPAN/authors/id/P/M/PMIC/parrot-${PV}.tar.gz"}
-# SRC_URI="http://search.cpan.org/dist/${PN}/${PN}-${PV}.tar.gz"
+#SRC_URI=$(lwp-request -m HEAD -x -e "http://www.parrotcode.org/release/devel" 2>&1 | grep "/authors/id" | tail -n1 | perl -ane 'print $F[2]')
+# or since 0.8.2 at:
+SRC_URI="ftp://ftp.parrot.org/pub/${PN}/releases/devel/${PV}/${PN}-${PV}.tar.gz"
 # SRC_DIR="parrot-${PV}"
 LICENSE="Artistic2"
 DIFF_EXCLUDES="MANIFEST.* parrot.pc myconfig config_lib.pasm Makefile TAGS"
@@ -21,8 +19,9 @@ parrot_exists_check() {
 	   /usr/lib/libparrot.dll.a /usr/local/lib/libparrot.dll.a
   do
     if [ -e $d ]; then
-      echo "Testing with $d is not yet supported! Remove or rename first"
-      exit
+      echo "Testing with $d is brave and might not work"
+#      echo "Testing with $d is not yet supported! Remove or rename first"
+#      exit
     fi
   done
 }
@@ -35,9 +34,9 @@ src_compile() {
   test -e config_lib.pasm && make realclean
 
   # stable by irc:#parrot
-  lang_stable="abc cardinal eclectus lolcode lua perl6 pipp punie pynie squaak"
+  lang_stable="abc cardinal eclectus lolcode perl6 pipp punie pynie squaak"
   # 100% ok by make smoke
-  lang_alltests_ok="bf lazy-k regex unlambda"
+  lang_alltests_ok="bf regex unlambda"
   perl Configure.pl --prefix=/usr --optimize --mandir=/usr/share/man 
   # -Ddoc_dir=/usr/share/doc/${P} needs to be patched for cygwin. 
   # cygwin-1.7 will have this changed.
@@ -195,11 +194,10 @@ PKG_CONTENTS[0]=" \
 --exclude=usr/lib/parrot/dynext/lua_*.dll \
 --exclude=usr/lib/parrot/dynext/perl6_*.dll \
 --exclude=usr/lib/parrot/dynext/php_*.dll \
---exclude=usr/lib/parrot/dynext/tcl_*.dll \
 --exclude=usr/lib/parrot/dynext/wmls_*.dll \
 --exclude=usr/lib/parrot/library/php_*.pbc \
 --exclude=usr/lib/parrot/library/pipplib.pbc \
---exclude=usr/lib/parrot/library/tcllib.pbc \
+--exclude=usr/lib/parrot/library/P6object.pbc \
 --exclude=usr/share/doc/${P}/languages \
 --exclude=usr/share/doc/${P}/docs/dev \
 --exclude=usr/share/doc/${P}/docs/project \
@@ -244,6 +242,7 @@ usr/share/doc/${P}/docs/project \
 # parrot-perl6
 PKG_CONTENTS[3]=" \
 usr/bin/perl6.exe \
+usr/lib/parrot/library/P6object.pbc \
 usr/lib/parrot/dynext/perl6_*.dll \
 usr/share/doc/${P}/languages/perl6 \
 usr/share/man/man1/perl6.1.gz \
@@ -256,13 +255,14 @@ usr/bin/parrot-*.exe \
 usr/lib/parrot/dynext/apl_*.dll \
 usr/lib/parrot/dynext/dotnet*.dll \
 usr/lib/parrot/dynext/eclectus_*.dll \
-usr/lib/parrot/dynext/lua_*.dll \
 usr/lib/parrot/dynext/php_*.dll \
-usr/lib/parrot/dynext/tcl_*.dll \
 usr/lib/parrot/dynext/wmls_*.dll \
 usr/lib/parrot/library/php_*.pbc \
 usr/lib/parrot/library/pipplib.pbc \
-usr/lib/parrot/library/tcllib.pbc \
 usr/share/doc/${P}/languages \
 usr/share/man/man1/parrot-*1.gz \
 "
+
+#broken:
+#usr/lib/parrot/dynext/lua_*.dll \
+

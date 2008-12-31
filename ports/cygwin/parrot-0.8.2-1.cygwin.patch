@@ -1,0 +1,934 @@
+--- origsrc/parrot-0.8.2/CYGWIN-PATCHES/README	1970-01-01 00:00:00.000000000 +0000
++++ src/parrot-0.8.2/CYGWIN-PATCHES/README	2008-12-29 16:21:33.115375000 +0000
+@@ -0,0 +1,889 @@
++parrot
++----------------------------------
++Parrot is a virtual machine designed to efficiently compile and
++execute bytecode for interpreted languages. Parrot is a target for Perl 6 
++and a lot of other languages.
++
++Runtime requirements:
++  libparrot0 libreadline6 libncurses8 libintl8 libicu38 libgmp3 libgdbm4
++
++Optional requirements:
++  w32api pcre libpq5 openssl
++
++Build requirements:
++  readline libncurses-devel libicu-devel libgmp-devel libgdbm-devel perl 
++  make gcc
++
++Optional build requirements:
++  pcre-devel openssl-devel
++
++Optional test packages:
++  perl L<Test::TAP::HTMLMatrix> if you want to run the language 
++    smoke tests with C<make languages-smoke>.
++  perl L<Test::Base> for some APL language tests.
++  perl L<Moose> for smartlink
++  perl L<Test::Perl::Critic> and L<Perl::Critic>
++
++Canonical homepage:
++  http://www.parrotcode.org/
++
++Canonical download:
++  http://www.parrotcode.org/release/devel
++
++-------------------------------------------------------------------------------
++
++Build instructions:
++
++  cd /usr/src
++  cygport parrot-<VER>-<REL>.cygport all
++
++This will create:
++  /usr/src/parrot-<VER>-<REL>-src.tar.bz2
++  /usr/src/parrot-<VER>-<REL>.tar.bz2
++  /usr/src/libparrot0-<VER>-<REL>.tar.bz2
++  /usr/src/libparrot-devel-<VER>-<REL>.tar.bz2
++  /usr/src/parrot-perl6-<VER>-<REL>.tar.bz2
++  /usr/src/parrot-languages-<VER>-<REL>.tar.bz2
++
++Or use 'cygport parrot-<VER>-<REL>.cygport prep' to get a patched 
++source directory.
++
++-------------------------------------------------------------------------------
++
++Files included in the =parrot= package:
++
++  /etc/postinstall/parrot.sh
++  /etc/preremove/parrot.sh
++  /usr/bin/parrot.exe
++  /usr/bin/parrot_config.exe
++  /usr/bin/parrot_debugger.exe
++  /usr/bin/pbc_info.exe
++  /usr/bin/pbc_merge.exe
++  /usr/bin/pbc_to_exe.exe
++  /usr/bin/pdump.exe
++  /usr/lib/parrot/config_lib.pasm
++  /usr/lib/parrot/myconfig
++  /usr/lib/parrot/parrotbug
++  /usr/lib/parrot/VERSION
++  /usr/lib/parrot/dynext/digest_group.dll
++  /usr/lib/parrot/dynext/dynlexpad.dll
++  /usr/lib/parrot/dynext/gdbmhash.dll
++  /usr/lib/parrot/dynext/libglutcb.dll
++  /usr/lib/parrot/dynext/libnci_test.dll
++  /usr/lib/parrot/dynext/match_group.dll
++  /usr/lib/parrot/dynext/rational.dll
++  /usr/lib/parrot/dynext/subproxy.dll
++  /usr/lib/parrot/include/interpinfo.pasm
++  /usr/lib/parrot/include/config.fpmc
++  /usr/lib/parrot/library/CGI/QueryHash.pbc
++  /usr/lib/parrot/library/CGI/QueryHash.pir
++  /usr/lib/parrot/library/Config/JSON.pir
++  /usr/lib/parrot/library/Crow.pir
++  /usr/lib/parrot/library/Data/Dumper.pbc
++  /usr/lib/parrot/library/Data/Dumper.pir
++  /usr/lib/parrot/library/Data/Dumper/Base.pbc
++  /usr/lib/parrot/library/Data/Dumper/Base.pir
++  /usr/lib/parrot/library/Data/Dumper/Default.pbc
++  /usr/lib/parrot/library/Data/Dumper/Default.pir
++  /usr/lib/parrot/library/Data/Escape.pbc
++  /usr/lib/parrot/library/Data/Escape.pir
++  /usr/lib/parrot/library/Data/Replace.pir
++  /usr/lib/parrot/library/Data/Sort.pbc
++  /usr/lib/parrot/library/Data/Sort.pir
++  /usr/lib/parrot/library/Digest/MD5.pir
++  /usr/lib/parrot/library/File/Spec.pir
++  /usr/lib/parrot/library/File/Spec/Unix.pir
++  /usr/lib/parrot/library/File/Spec/Win32.pir
++  /usr/lib/parrot/library/Getopt/Obj.pbc
++  /usr/lib/parrot/library/Getopt/Obj.pir
++  /usr/lib/parrot/library/HTTP/Daemon.pir
++  /usr/lib/parrot/library/Iter.pir
++  /usr/lib/parrot/library/JSON.pir
++  /usr/lib/parrot/library/MIME/Base64.pbc
++  /usr/lib/parrot/library/MIME/Base64.pir
++  /usr/lib/parrot/library/Math/Random/mt19937ar.pir
++  /usr/lib/parrot/library/NCI/call_toolkit_init.pbc
++  /usr/lib/parrot/library/NCI/call_toolkit_init.pir
++  /usr/lib/parrot/library/OpenGL.pbc
++  /usr/lib/parrot/library/OpenGL.pir
++  /usr/lib/parrot/library/OpenGL_funcs.pir
++  /usr/lib/parrot/library/P6object.pbc
++  /usr/lib/parrot/library/P6object.pir
++  /usr/lib/parrot/library/PCT.pbc
++  /usr/lib/parrot/library/PCT/Grammar.pbc
++  /usr/lib/parrot/library/PCT/HLLCompiler.pbc
++  /usr/lib/parrot/library/PCT/PAST.pbc
++  /usr/lib/parrot/library/PCT/README
++  /usr/lib/parrot/library/PGE.pbc
++  /usr/lib/parrot/library/PGE/Dumper.pbc
++  /usr/lib/parrot/library/PGE/Dumper.pir
++  /usr/lib/parrot/library/PGE/Glob.pbc
++  /usr/lib/parrot/library/PGE/Glob.pir
++  /usr/lib/parrot/library/PGE/Hs.pir
++  /usr/lib/parrot/library/PGE/Perl6Grammar.pir
++  /usr/lib/parrot/library/PGE/Text.pbc
++  /usr/lib/parrot/library/PGE/Text.pir
++  /usr/lib/parrot/library/PGE/Util.pbc
++  /usr/lib/parrot/library/PGE/Util.pir
++  /usr/lib/parrot/library/Parrot/Capture_PIR.pbc
++  /usr/lib/parrot/library/Parrot/Capture_PIR.pir
++  /usr/lib/parrot/library/Parrot/Coroutine.pbc
++  /usr/lib/parrot/library/Parrot/Coroutine.pir
++  /usr/lib/parrot/library/Parrot/Exception.pbc
++  /usr/lib/parrot/library/Parrot/Exception.pir
++  /usr/lib/parrot/library/Pg.pir
++  /usr/lib/parrot/library/Protoobject.pbc
++  /usr/lib/parrot/library/Protoobject.pir
++  /usr/lib/parrot/library/Range.pir
++  /usr/lib/parrot/library/SDL.pir
++  /usr/lib/parrot/library/SDL/App.pir
++  /usr/lib/parrot/library/SDL/Button.pir
++  /usr/lib/parrot/library/SDL/Color.pir
++  /usr/lib/parrot/library/SDL/Constants.pir
++  /usr/lib/parrot/library/SDL/Event.pir
++  /usr/lib/parrot/library/SDL/EventHandler.pir
++  /usr/lib/parrot/library/SDL/Font.pir
++  /usr/lib/parrot/library/SDL/Image.pir
++  /usr/lib/parrot/library/SDL/LCD.pir
++  /usr/lib/parrot/library/SDL/LCD.png
++  /usr/lib/parrot/library/SDL/Rect.pir
++  /usr/lib/parrot/library/SDL/Sprite.pir
++  /usr/lib/parrot/library/SDL/StopWatch.pir
++  /usr/lib/parrot/library/SDL/Surface.pir
++  /usr/lib/parrot/library/STM.pir
++  /usr/lib/parrot/library/Stream/Base.pbc
++  /usr/lib/parrot/library/Stream/Base.pir
++  /usr/lib/parrot/library/Stream/Combiner.pbc
++  /usr/lib/parrot/library/Stream/Combiner.pir
++  /usr/lib/parrot/library/Stream/Coroutine.pbc
++  /usr/lib/parrot/library/Stream/Coroutine.pir
++  /usr/lib/parrot/library/Stream/Filter.pbc
++  /usr/lib/parrot/library/Stream/Filter.pir
++  /usr/lib/parrot/library/Stream/Lines.pbc
++  /usr/lib/parrot/library/Stream/Lines.pir
++  /usr/lib/parrot/library/Stream/ParrotIO.pbc
++  /usr/lib/parrot/library/Stream/ParrotIO.pir
++  /usr/lib/parrot/library/Stream/Replay.pbc
++  /usr/lib/parrot/library/Stream/Replay.pir
++  /usr/lib/parrot/library/Stream/Sub.pbc
++  /usr/lib/parrot/library/Stream/Sub.pir
++  /usr/lib/parrot/library/Stream/Writer.pbc
++  /usr/lib/parrot/library/Stream/Writer.pir
++  /usr/lib/parrot/library/String/Utils.pir
++  /usr/lib/parrot/library/TGE.pbc
++  /usr/lib/parrot/library/Tcl/Glob.pir
++  /usr/lib/parrot/library/Test/Builder.pir
++  /usr/lib/parrot/library/Test/Builder/Output.pir
++  /usr/lib/parrot/library/Test/Builder/Test.pir
++  /usr/lib/parrot/library/Test/Builder/TestPlan.pir
++  /usr/lib/parrot/library/Test/Builder/Tester.pir
++  /usr/lib/parrot/library/Test/Class.pir
++  /usr/lib/parrot/library/Test/More.pir
++  /usr/lib/parrot/library/YAML/Dumper.pir
++  /usr/lib/parrot/library/YAML/Dumper/Base.pir
++  /usr/lib/parrot/library/YAML/Dumper/Default.pir
++  /usr/lib/parrot/library/YAML/Parser/Syck.pir
++  /usr/lib/parrot/library/dumper.pbc
++  /usr/lib/parrot/library/dumper.pir
++  /usr/lib/parrot/library/libpcre.pir
++  /usr/lib/parrot/library/ncurses.declarations
++  /usr/lib/parrot/library/ncurses.pasm
++  /usr/lib/parrot/library/ncurses.pbc
++  /usr/lib/parrot/library/ncurses.pir
++  /usr/lib/parrot/library/parrotlib.pbc
++  /usr/lib/parrot/library/parrotlib.pir
++  /usr/lib/parrot/library/pcore.pir
++  /usr/lib/parrot/library/pcre.pbc
++  /usr/lib/parrot/library/pcre.pir
++  /usr/lib/parrot/library/postgres.declarations
++  /usr/lib/parrot/library/postgres.pasm
++  /usr/lib/parrot/library/postgres.pir
++  /usr/lib/parrot/library/random_lib.pir
++  /usr/lib/parrot/library/tcpstream.pir
++  /usr/lib/parrot/library/uuid.pir
++  /usr/lib/parrot/library/yaml_dumper.pir
++  /usr/share/doc/parrot-0.8.2/LICENSE
++  /usr/share/doc/parrot-0.8.2/RESPONSIBLE_PARTIES
++  /usr/share/doc/parrot-0.8.2/TODO
++  /usr/share/doc/parrot-0.8.2/docs/art/pp001-intro.pod
++  /usr/share/doc/parrot-0.8.2/docs/art/pp002-pmc.pod
++  /usr/share/doc/parrot-0.8.2/docs/art/pp003-oop.pod
++  /usr/share/doc/parrot-0.8.2/docs/book/appendix.pod
++  /usr/share/doc/parrot-0.8.2/docs/book/ch01_overview.pod
++  /usr/share/doc/parrot-0.8.2/docs/book/ch02_getting_started.pod
++  /usr/share/doc/parrot-0.8.2/docs/book/ch03_pir_basics.pod
++  /usr/share/doc/parrot-0.8.2/docs/book/ch04_pir_subroutines.pod
++  /usr/share/doc/parrot-0.8.2/docs/book/ch05_pasm.pod
++  /usr/share/doc/parrot-0.8.2/docs/book/ch06_testing.pod
++  /usr/share/doc/parrot-0.8.2/docs/book/ch07_architecture.pod
++  /usr/share/doc/parrot-0.8.2/docs/book/ch08_reference.pod
++  /usr/share/doc/parrot-0.8.2/docs/book/figs/p6e_0801.png
++  /usr/share/doc/parrot-0.8.2/docs/debugger.pod
++  /usr/share/doc/parrot-0.8.2/docs/dev/byteorder.pod
++  /usr/share/doc/parrot-0.8.2/docs/dev/debugging_with_msvc.pod
++  /usr/share/doc/parrot-0.8.2/docs/dev/headerizer.pod
++  /usr/share/doc/parrot-0.8.2/docs/dev/jit_i386.pod
++  /usr/share/doc/parrot-0.8.2/docs/dev/longopt.pod
++  /usr/share/doc/parrot-0.8.2/docs/dev/optimizer.pod
++  /usr/share/doc/parrot-0.8.2/docs/dev/parrot_api.pod
++  /usr/share/doc/parrot-0.8.2/docs/dev/pcc_state.pod
++  /usr/share/doc/parrot-0.8.2/docs/dev/pccmethods.pod
++  /usr/share/doc/parrot-0.8.2/docs/dev/pmc_obj_design_meeting_notes.pod
++  /usr/share/doc/parrot-0.8.2/docs/dev/seatbelts.pod
++  /usr/share/doc/parrot-0.8.2/docs/embed.pod
++  /usr/share/doc/parrot-0.8.2/docs/extend.pod
++  /usr/share/doc/parrot-0.8.2/docs/faq.pod
++  /usr/share/doc/parrot-0.8.2/docs/gettingstarted.pod
++  /usr/share/doc/parrot-0.8.2/docs/glossary.pod
++  /usr/share/doc/parrot-0.8.2/docs/imcc/README
++  /usr/share/doc/parrot-0.8.2/docs/imcc/imcfaq.pod
++  /usr/share/doc/parrot-0.8.2/docs/imcc/operation.pod
++  /usr/share/doc/parrot-0.8.2/docs/intro.pod
++  /usr/share/doc/parrot-0.8.2/docs/jit.pod
++  /usr/share/doc/parrot-0.8.2/docs/memory_internals.pod
++  /usr/share/doc/parrot-0.8.2/docs/mmd.pod
++  /usr/share/doc/parrot-0.8.2/docs/native_exec.pod
++  /usr/share/doc/parrot-0.8.2/docs/ops/bit.pod
++  /usr/share/doc/parrot-0.8.2/docs/ops/cmp.pod
++  /usr/share/doc/parrot-0.8.2/docs/ops/core.pod
++  /usr/share/doc/parrot-0.8.2/docs/ops/debug.pod
++  /usr/share/doc/parrot-0.8.2/docs/ops/experimental.pod
++  /usr/share/doc/parrot-0.8.2/docs/ops/io.pod
++  /usr/share/doc/parrot-0.8.2/docs/ops/math.pod
++  /usr/share/doc/parrot-0.8.2/docs/ops/object.pod
++  /usr/share/doc/parrot-0.8.2/docs/ops/obscure.pod
++  /usr/share/doc/parrot-0.8.2/docs/ops/pic.pod
++  /usr/share/doc/parrot-0.8.2/docs/ops/pmc.pod
++  /usr/share/doc/parrot-0.8.2/docs/ops/set.pod
++  /usr/share/doc/parrot-0.8.2/docs/ops/string.pod
++  /usr/share/doc/parrot-0.8.2/docs/ops/sys.pod
++  /usr/share/doc/parrot-0.8.2/docs/ops/var.pod
++  /usr/share/doc/parrot-0.8.2/docs/optable.pod
++  /usr/share/doc/parrot-0.8.2/docs/overview.pod
++  /usr/share/doc/parrot-0.8.2/docs/parrot.pod
++  /usr/share/doc/parrot-0.8.2/docs/parrotbyte.pod
++  /usr/share/doc/parrot-0.8.2/docs/parrothist.pod
++  /usr/share/doc/parrot-0.8.2/docs/pct/gettingstarted.pod
++  /usr/share/doc/parrot-0.8.2/docs/pct/past_building_blocks.pod
++  /usr/share/doc/parrot-0.8.2/docs/pct/pct_optable_guide.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/README
++  /usr/share/doc/parrot-0.8.2/docs/pdds/draft/pdd01_overview.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/draft/pdd04_datatypes.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/draft/pdd05_opfunc.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/draft/pdd06_pasm.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/draft/pdd08_keys.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/draft/pdd10_embedding.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/draft/pdd11_extending.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/draft/pdd14_bignum.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/draft/pdd16_native_call.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/draft/pdd19_pir.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/draft/pdd29_compiler_tools.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/draft/pdd30_install.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd00_pdd.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd03_calling_conventions.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd07_codingstd.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd09_gc.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd13_bytecode.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd15_object_metamodel.png
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd15_object_metamodel.svg
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd15_objects.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd17_pmc.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd18_security.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd20_lexical_vars.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd21_namespaces.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd22_io.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd23_exceptions.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd24_events.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd25_concurrency.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd26_ast.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd27_multiple_dispatch.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd28_strings.pod
++  /usr/share/doc/parrot-0.8.2/docs/pdds/pdd_template.pod
++  /usr/share/doc/parrot-0.8.2/docs/pmc.pod
++  /usr/share/doc/parrot-0.8.2/docs/pmc/array.pod
++  /usr/share/doc/parrot-0.8.2/docs/pmc/documentation.pod
++  /usr/share/doc/parrot-0.8.2/docs/pmc/struct.pod
++  /usr/share/doc/parrot-0.8.2/docs/pmc/subs.pod
++  /usr/share/doc/parrot-0.8.2/docs/pmc2c.pod
++  /usr/share/doc/parrot-0.8.2/docs/porting_intro.pod
++  /usr/share/doc/parrot-0.8.2/docs/project/cage_cleaners_guide.pod
++  /usr/share/doc/parrot-0.8.2/docs/project/committer_guide.pod
++  /usr/share/doc/parrot-0.8.2/docs/project/debian_packaging_guide.pod
++  /usr/share/doc/parrot-0.8.2/docs/project/metacommitter_guide.pod
++  /usr/share/doc/parrot-0.8.2/docs/project/pause_guide.pod
++  /usr/share/doc/parrot-0.8.2/docs/project/release_manager_guide.pod
++  /usr/share/doc/parrot-0.8.2/docs/project/roles_responsibilities.pod
++  /usr/share/doc/parrot-0.8.2/docs/project/ticket_wrangler_guide.pod
++  /usr/share/doc/parrot-0.8.2/docs/req/model_users.pod
++  /usr/share/doc/parrot-0.8.2/docs/resources/favicon.ico
++  /usr/share/doc/parrot-0.8.2/docs/resources/parrot_small.png
++  /usr/share/doc/parrot-0.8.2/docs/resources/perl.css
++  /usr/share/doc/parrot-0.8.2/docs/resources/up.gif
++  /usr/share/doc/parrot-0.8.2/docs/running.pod
++  /usr/share/doc/parrot-0.8.2/docs/stability.pod
++  /usr/share/doc/parrot-0.8.2/docs/stm/atomic.pod
++  /usr/share/doc/parrot-0.8.2/docs/stm/howto.pod
++  /usr/share/doc/parrot-0.8.2/docs/stm/internals.pod
++  /usr/share/doc/parrot-0.8.2/docs/stm/stm_frontend.pod
++  /usr/share/doc/parrot-0.8.2/docs/stm/thread-issues.pod
++  /usr/share/doc/parrot-0.8.2/docs/submissions.pod
++  /usr/share/doc/parrot-0.8.2/docs/tests.pod
++  /usr/share/doc/parrot-0.8.2/docs/vtables.pod
++  /usr/share/doc/parrot-0.8.2/examples/README
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/addit.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/addit.pir
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/addit.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/addit.rb
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/addit2.pir
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/array_access.pir
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/arriter.pir
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/arriter.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/arriter.rb
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/arriter_o1.pir
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/bench_newp.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/fib.pir
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/fib.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/fib.py
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/fib.rb
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/float4.pir
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/freeze.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/freeze.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/gc_alloc_new.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/gc_alloc_reuse.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/gc_generations.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/gc_header_new.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/gc_header_reuse.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/gc_waves_headers.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/gc_waves_sizeable_data.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/gc_waves_sizeable_headers.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/mops.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/mops.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/mops_intval.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo1.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo1.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo1.py
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo1.rb
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo2.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo2.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo2.py
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo2.rb
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo3.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo3.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo3.py
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo3.rb
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo4.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo4.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo4.py
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo4.rb
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo5.pir
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo5.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo5.py
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo5.rb
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo6.pir
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo6.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo6.py
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oo6.rb
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oofib.pir
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oofib.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oofib.py
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oofib.rb
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/oon.txt
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/overload.pir
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/overload.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/primes.c
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/primes.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/primes.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/primes2.c
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/primes2.pir
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/primes2.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/primes2.py
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/primes2.rb
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/primes2_i.pir
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/primes_i.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/shared_ref.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/shared_ref.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/stress.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/stress.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/stress.rb
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/stress1.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/stress1.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/stress2.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/stress2.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/stress2.rb
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/stress3.pasm
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/vpm.pir
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/vpm.pl
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/vpm.py
++  /usr/share/doc/parrot-0.8.2/examples/benchmarks/vpm.rb
++  /usr/share/doc/parrot-0.8.2/examples/c/nanoparrot.c
++  /usr/share/doc/parrot-0.8.2/examples/c/test_main.c
++  /usr/share/doc/parrot-0.8.2/examples/compilers/Makefile
++  /usr/share/doc/parrot-0.8.2/examples/compilers/japhc.c
++  /usr/share/doc/parrot-0.8.2/examples/io/async_select.pir
++  /usr/share/doc/parrot-0.8.2/examples/io/echo_client.pir
++  /usr/share/doc/parrot-0.8.2/examples/io/http.pir
++  /usr/share/doc/parrot-0.8.2/examples/io/httpd.pir
++  /usr/share/doc/parrot-0.8.2/examples/io/httpd2.pir
++  /usr/share/doc/parrot-0.8.2/examples/io/net_smtp.pasm
++  /usr/share/doc/parrot-0.8.2/examples/io/pioctl.pasm
++  /usr/share/doc/parrot-0.8.2/examples/io/pipe2.pir
++  /usr/share/doc/parrot-0.8.2/examples/io/pipe3.pir
++  /usr/share/doc/parrot-0.8.2/examples/japh/README
++  /usr/share/doc/parrot-0.8.2/examples/japh/japh1.pasm
++  /usr/share/doc/parrot-0.8.2/examples/japh/japh2.pasm
++  /usr/share/doc/parrot-0.8.2/examples/japh/japh3.pasm
++  /usr/share/doc/parrot-0.8.2/examples/japh/japh4.pasm
++  /usr/share/doc/parrot-0.8.2/examples/japh/japh5.pasm
++  /usr/share/doc/parrot-0.8.2/examples/library/acorn.l
++  /usr/share/doc/parrot-0.8.2/examples/library/getopt_demo.pir
++  /usr/share/doc/parrot-0.8.2/examples/library/md5sum.pir
++  /usr/share/doc/parrot-0.8.2/examples/library/ncurses_life.pir
++  /usr/share/doc/parrot-0.8.2/examples/library/pcre.pir
++  /usr/share/doc/parrot-0.8.2/examples/mops/README
++  /usr/share/doc/parrot-0.8.2/examples/mops/mops.c
++  /usr/share/doc/parrot-0.8.2/examples/mops/mops.cs
++  /usr/share/doc/parrot-0.8.2/examples/mops/mops.il
++  /usr/share/doc/parrot-0.8.2/examples/mops/mops.p6
++  /usr/share/doc/parrot-0.8.2/examples/mops/mops.pl
++  /usr/share/doc/parrot-0.8.2/examples/mops/mops.ps
++  /usr/share/doc/parrot-0.8.2/examples/mops/mops.py
++  /usr/share/doc/parrot-0.8.2/examples/mops/mops.rb
++  /usr/share/doc/parrot-0.8.2/examples/mops/mops.scheme
++  /usr/share/doc/parrot-0.8.2/examples/namespace/namespace_dump.pir
++  /usr/share/doc/parrot-0.8.2/examples/nci/PQt.C
++  /usr/share/doc/parrot-0.8.2/examples/nci/QtHelloWorld.pasm
++  /usr/share/doc/parrot-0.8.2/examples/nci/ls.pir
++  /usr/share/doc/parrot-0.8.2/examples/nci/sdl_blue_rectangle.pir
++  /usr/share/doc/parrot-0.8.2/examples/nci/win32api.pir
++  /usr/share/doc/parrot-0.8.2/examples/opengl/shapes.pir
++  /usr/share/doc/parrot-0.8.2/examples/opengl/triangle.pir
++  /usr/share/doc/parrot-0.8.2/examples/pasm/cat.pasm
++  /usr/share/doc/parrot-0.8.2/examples/pasm/fact.pasm
++  /usr/share/doc/parrot-0.8.2/examples/pasm/hello.pasm
++  /usr/share/doc/parrot-0.8.2/examples/pasm/nanoforth.pasm
++  /usr/share/doc/parrot-0.8.2/examples/pasm/nanoforth2.pasm
++  /usr/share/doc/parrot-0.8.2/examples/pasm/small.xml
++  /usr/share/doc/parrot-0.8.2/examples/pasm/trace.pasm
++  /usr/share/doc/parrot-0.8.2/examples/pasm/xml_parser.pasm
++  /usr/share/doc/parrot-0.8.2/examples/past/01-sub.pir
++  /usr/share/doc/parrot-0.8.2/examples/past/blocktype_immediate.pir
++  /usr/share/doc/parrot-0.8.2/examples/past/four_plus_one.pir
++  /usr/share/doc/parrot-0.8.2/examples/pge/README
++  /usr/share/doc/parrot-0.8.2/examples/pge/TAP_grammar.pg
++  /usr/share/doc/parrot-0.8.2/examples/pge/benchmarks/ambs1/Makefile
++  /usr/share/doc/parrot-0.8.2/examples/pge/benchmarks/ambs1/ambs1.pg
++  /usr/share/doc/parrot-0.8.2/examples/pge/benchmarks/ambs1/main.pir
++  /usr/share/doc/parrot-0.8.2/examples/pge/benchmarks/ambs1/mktestcase
++  /usr/share/doc/parrot-0.8.2/examples/pge/grammars/IO.pg
++  /usr/share/doc/parrot-0.8.2/examples/pge/grammars/PatchGrammar.pg
++  /usr/share/doc/parrot-0.8.2/examples/pge/simple.pir
++  /usr/share/doc/parrot-0.8.2/examples/pir/circle.pir
++  /usr/share/doc/parrot-0.8.2/examples/pir/euclid.pir
++  /usr/share/doc/parrot-0.8.2/examples/pir/hanoi.pir
++  /usr/share/doc/parrot-0.8.2/examples/pir/hello-dwim.pir
++  /usr/share/doc/parrot-0.8.2/examples/pir/io.pir
++  /usr/share/doc/parrot-0.8.2/examples/pir/levenshtein.pir
++  /usr/share/doc/parrot-0.8.2/examples/pir/life.pir
++  /usr/share/doc/parrot-0.8.2/examples/pir/local_label.pir
++  /usr/share/doc/parrot-0.8.2/examples/pir/mandel.pir
++  /usr/share/doc/parrot-0.8.2/examples/pir/queens_r.pir
++  /usr/share/doc/parrot-0.8.2/examples/pir/quine_ord.pir
++  /usr/share/doc/parrot-0.8.2/examples/pir/readline.pir
++  /usr/share/doc/parrot-0.8.2/examples/pir/substr.pir
++  /usr/share/doc/parrot-0.8.2/examples/pir/sudoku.pir
++  /usr/share/doc/parrot-0.8.2/examples/pir/thr-primes.pir
++  /usr/share/doc/parrot-0.8.2/examples/pir/uniq.pir
++  /usr/share/doc/parrot-0.8.2/examples/sdl/blue_rect.pl
++  /usr/share/doc/parrot-0.8.2/examples/sdl/mandel.pir
++  /usr/share/doc/parrot-0.8.2/examples/sdl/minesweeper/README
++  /usr/share/doc/parrot-0.8.2/examples/sdl/minesweeper/eventhandler.pir
++  /usr/share/doc/parrot-0.8.2/examples/sdl/minesweeper/field.pir
++  /usr/share/doc/parrot-0.8.2/examples/sdl/minesweeper/mines.pir
++  /usr/share/doc/parrot-0.8.2/examples/sdl/minesweeper/mines.png
++  /usr/share/doc/parrot-0.8.2/examples/sdl/minesweeper/mines_debug.png
++  /usr/share/doc/parrot-0.8.2/examples/sdl/minesweeper/smiley.png
++  /usr/share/doc/parrot-0.8.2/examples/sdl/tetris/README
++  /usr/share/doc/parrot-0.8.2/examples/sdl/tetris/app.pir
++  /usr/share/doc/parrot-0.8.2/examples/sdl/tetris/block.pir
++  /usr/share/doc/parrot-0.8.2/examples/sdl/tetris/blockdata.pir
++  /usr/share/doc/parrot-0.8.2/examples/sdl/tetris/blocks.pir
++  /usr/share/doc/parrot-0.8.2/examples/sdl/tetris/board.pir
++  /usr/share/doc/parrot-0.8.2/examples/sdl/tetris/boarddata.pir
++  /usr/share/doc/parrot-0.8.2/examples/sdl/tetris/eventhandler.pir
++  /usr/share/doc/parrot-0.8.2/examples/sdl/tetris/tetris.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/README
++  /usr/share/doc/parrot-0.8.2/examples/shootout/ack.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/ack.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/shootout/ack.py
++  /usr/share/doc/parrot-0.8.2/examples/shootout/binarytrees.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/binarytrees.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/shootout/fannkuch.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/fannkuch.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/shootout/fannkuch.py
++  /usr/share/doc/parrot-0.8.2/examples/shootout/fasta.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/fasta.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/shootout/harmonic.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/knucleotide.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/knucleotide.pir_input
++  /usr/share/doc/parrot-0.8.2/examples/shootout/knucleotide.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/shootout/mandelbrot.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/mandelbrot.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/shootout/nbody.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/nbody.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/shootout/nsieve-bits-2.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/nsieve-bits-2.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/shootout/nsieve-bits.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/nsieve-bits.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/shootout/nsieve.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/nsieve.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/shootout/partialsums-2.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/partialsums-2.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/shootout/partialsums.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/partialsums.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/shootout/pidigits.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/pidigits.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/shootout/pidigits.py
++  /usr/share/doc/parrot-0.8.2/examples/shootout/random.pasm
++  /usr/share/doc/parrot-0.8.2/examples/shootout/random.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/recursive-2.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/recursive-2.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/shootout/recursive.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/recursive.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/shootout/regexdna.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/regexdna.pir_input
++  /usr/share/doc/parrot-0.8.2/examples/shootout/regexdna.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/shootout/revcomp.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/revcomp.pir_input
++  /usr/share/doc/parrot-0.8.2/examples/shootout/revcomp.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/shootout/spectralnorm.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/spectralnorm.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/shootout/sumcol.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/sumcol.pir_input
++  /usr/share/doc/parrot-0.8.2/examples/shootout/sumcol.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/shootout/takfp.pir
++  /usr/share/doc/parrot-0.8.2/examples/shootout/takfp.pir_output
++  /usr/share/doc/parrot-0.8.2/examples/streams/Bytes.pir
++  /usr/share/doc/parrot-0.8.2/examples/streams/Combiner.pir
++  /usr/share/doc/parrot-0.8.2/examples/streams/Coroutine.pir
++  /usr/share/doc/parrot-0.8.2/examples/streams/FileLines.pir
++  /usr/share/doc/parrot-0.8.2/examples/streams/Filter.pir
++  /usr/share/doc/parrot-0.8.2/examples/streams/Include.pir
++  /usr/share/doc/parrot-0.8.2/examples/streams/Lines.pir
++  /usr/share/doc/parrot-0.8.2/examples/streams/ParrotIO.pir
++  /usr/share/doc/parrot-0.8.2/examples/streams/Replay.pir
++  /usr/share/doc/parrot-0.8.2/examples/streams/SubCounter.pir
++  /usr/share/doc/parrot-0.8.2/examples/streams/SubHello.pir
++  /usr/share/doc/parrot-0.8.2/examples/streams/Writer.pir
++  /usr/share/doc/parrot-0.8.2/examples/subs/bsr_ret.pasm
++  /usr/share/doc/parrot-0.8.2/examples/subs/coroutine.pasm
++  /usr/share/doc/parrot-0.8.2/examples/subs/jsr_ret.pasm
++  /usr/share/doc/parrot-0.8.2/examples/subs/multi_retvals.pir
++  /usr/share/doc/parrot-0.8.2/examples/subs/no_retval.pir
++  /usr/share/doc/parrot-0.8.2/examples/subs/pasm_sub1.pasm
++  /usr/share/doc/parrot-0.8.2/examples/subs/single_retval.pir
++  /usr/share/doc/parrot-0.8.2/examples/tge/README
++  /usr/share/doc/parrot-0.8.2/examples/tge/branch/branch.g
++  /usr/share/doc/parrot-0.8.2/examples/tge/branch/lib/Branch.pir
++  /usr/share/doc/parrot-0.8.2/examples/tge/branch/lib/Leaf.pir
++  /usr/share/doc/parrot-0.8.2/examples/tge/branch/transform.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/00_README.pod
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/01_temp_var.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/02_local_var.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/03_temp_var_basic_pmcs.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/04_pod_comments.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/10_math_ops.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/11_math_ops_self_mod.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/12_math_ops_pasm.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/13_logical_ops.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/20_string_ops.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/21_string_ops_repeat.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/22_string_ops_length.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/23_string_ops_substr.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/24_string_ops_clone.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/30_arrays_basic.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/31_array_ops_split.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/32_array_ops_sprintf.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/33_hashes.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/34_multikey.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/40_file_ops.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/50_goto.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/51_if_unless.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/52_if_compare.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/53_loop.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/55_iterator.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/56_defined.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/57_exists.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/60_subroutines.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/61_namespaces.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/62_namespaces.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/70_class_object.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/80_closure.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/81_continuation.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/82_coroutine.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/83_external_libraries.pir
++  /usr/share/doc/parrot-0.8.2/examples/tutorial/90_writing_tests.pir
++  /usr/share/emacs/site-lisp/parrot.el
++  /usr/share/emacs/site-lisp/parrot.README
++  /usr/share/emacs/site-lisp/pasm.el
++  /usr/share/emacs/site-lisp/pir-mode.el
++  /usr/share/man/man1/parrot.1.gz
++  /usr/share/man/man1/parrot_debugger.1.gz
++  /usr/share/man/man1/pbc_disassemble.1.gz
++  /usr/share/man/man1/pbc_info.1.gz
++  /usr/share/man/man1/pbc_merge.1.gz
++  /usr/share/man/man1/pbc_to_exe.1.gz
++  /usr/share/vim/vimfiles/ftplugin/parrot.vim
++  /usr/share/vim/vimfiles/syntax/pasm.vim
++  /usr/share/vim/vimfiles/syntax/pir.vim
++  /usr/share/vim/vimfiles/syntax/pmc.vim
++
++Files included in the =libparrot0= package:
++
++  /usr/bin/cygparrot0.8.2.dll
++
++Files included in the =libparrot-devel= package:
++
++  /usr/bin/parrot-config
++  /usr/include/parrot.h
++  /usr/include/parrot/atomic.h
++  /usr/include/parrot/atomic/fallback.h
++  /usr/include/parrot/atomic/gcc_pcc.h
++  /usr/include/parrot/atomic/gcc_x86.h
++  /usr/include/parrot/atomic/sparc.h
++  /usr/include/parrot/builtin.h
++  /usr/include/parrot/caches.h
++  /usr/include/parrot/cclass.h
++  /usr/include/parrot/charset.h
++  /usr/include/parrot/compiler.h
++  /usr/include/parrot/config.h
++  /usr/include/parrot/core_pmcs.h
++  /usr/include/parrot/datatypes.h
++  /usr/include/parrot/debug.h
++  /usr/include/parrot/dod.h
++  /usr/include/parrot/dynext.h
++  /usr/include/parrot/embed.h
++  /usr/include/parrot/encoding.h
++  /usr/include/parrot/enums.h
++  /usr/include/parrot/events.h
++  /usr/include/parrot/exceptions.h
++  /usr/include/parrot/exec.h
++  /usr/include/parrot/exit.h
++  /usr/include/parrot/extend.h
++  /usr/include/parrot/extend_vtable.h
++  /usr/include/parrot/feature.h
++  /usr/include/parrot/global.h
++  /usr/include/parrot/global_setup.h
++  /usr/include/parrot/has_header.h
++  /usr/include/parrot/hash.h
++  /usr/include/parrot/headers.h
++  /usr/include/parrot/hll.h
++  /usr/include/parrot/imcc.h
++  /usr/include/parrot/inter_call.h
++  /usr/include/parrot/interpreter.h
++  /usr/include/parrot/intlist.h
++  /usr/include/parrot/io.h
++  /usr/include/parrot/jit_emit.h
++  /usr/include/parrot/key.h
++  /usr/include/parrot/library.h
++  /usr/include/parrot/list.h
++  /usr/include/parrot/longopt.h
++  /usr/include/parrot/memory.h
++  /usr/include/parrot/misc.h
++  /usr/include/parrot/mmd.h
++  /usr/include/parrot/nci.h
++  /usr/include/parrot/oo.h
++  /usr/include/parrot/oo_private.h
++  /usr/include/parrot/op.h
++  /usr/include/parrot/oplib.h
++  /usr/include/parrot/oplib/core_ops.h
++  /usr/include/parrot/oplib/core_ops_cg.h
++  /usr/include/parrot/oplib/core_ops_cgp.h
++  /usr/include/parrot/oplib/core_ops_switch.h
++  /usr/include/parrot/oplib/ops.h
++  /usr/include/parrot/packfile.h
++  /usr/include/parrot/parrot.h
++  /usr/include/parrot/pic.h
++  /usr/include/parrot/platform.h
++  /usr/include/parrot/platform_interface.h
++  /usr/include/parrot/pmc.h
++  /usr/include/parrot/pmc_freeze.h
++  /usr/include/parrot/pobj.h
++  /usr/include/parrot/register.h
++  /usr/include/parrot/resources.h
++  /usr/include/parrot/scheduler.h
++  /usr/include/parrot/scheduler_private.h
++  /usr/include/parrot/settings.h
++  /usr/include/parrot/slice.h
++  /usr/include/parrot/smallobject.h
++  /usr/include/parrot/stacks.h
++  /usr/include/parrot/stat.h
++  /usr/include/parrot/stm/backend.h
++  /usr/include/parrot/string.h
++  /usr/include/parrot/string_funcs.h
++  /usr/include/parrot/string_primitives.h
++  /usr/include/parrot/string_private_cstring.h
++  /usr/include/parrot/sub.h
++  /usr/include/parrot/thr_pthread.h
++  /usr/include/parrot/thr_windows.h
++  /usr/include/parrot/thread.h
++  /usr/include/parrot/tsq.h
++  /usr/include/parrot/vtable.h
++  /usr/include/parrot/vtables.h
++  /usr/include/parrot/warnings.h
++  /usr/lib/libparrot.dll.a
++  /usr/lib/parrot/include/call_bits.pasm
++  /usr/lib/parrot/include/cclass.pasm
++  /usr/lib/parrot/include/datatypes.pasm
++  /usr/lib/parrot/include/errors.pasm
++  /usr/lib/parrot/include/except_severity.pasm
++  /usr/lib/parrot/include/except_types.pasm
++  /usr/lib/parrot/include/hllmacros.pir
++  /usr/lib/parrot/include/iglobals.pasm
++  /usr/lib/parrot/include/interpcores.pasm
++  /usr/lib/parrot/include/interpdebug.pasm
++  /usr/lib/parrot/include/interpflags.pasm
++  /usr/lib/parrot/include/interptrace.pasm
++  /usr/lib/parrot/include/iotypes.pasm
++  /usr/lib/parrot/include/iterator.pasm
++  /usr/lib/parrot/include/longopt.pasm
++  /usr/lib/parrot/include/mmd.pasm
++  /usr/lib/parrot/include/opengl_defines.pasm
++  /usr/lib/parrot/include/parrotlib.pbc
++  /usr/lib/parrot/include/pmctypes.pasm
++  /usr/lib/parrot/include/signal.pasm
++  /usr/lib/parrot/include/sockets.pasm
++  /usr/lib/parrot/include/stat.pasm
++  /usr/lib/parrot/include/stdio.pasm
++  /usr/lib/parrot/include/stringinfo.pasm
++  /usr/lib/parrot/include/sysinfo.pasm
++  /usr/lib/parrot/include/test_more.pir
++  /usr/lib/parrot/include/timer.pasm
++  /usr/lib/parrot/include/tm.pasm
++  /usr/lib/parrot/include/warnings.pasm
++  /usr/lib/parrot/src/glut_callbacks.c
++  /usr/lib/parrot/src/install_config.o
++  /usr/lib/parrot/src/nci.c
++  /usr/lib/parrot/src/null_config.o
++  /usr/lib/parrot/src/ops/core_ops_cgp.c
++  /usr/lib/parrot/src/ops/core_ops_switch.c
++  /usr/lib/parrot/src/parrot_config.o
++  /usr/lib/pkgconfig/parrot.pc
++
++Files included in the =parrot-perl6= package:
++
++  /usr/bin/perl6.exe
++  /usr/lib/parrot/dynext/perl6_group.dll
++  /usr/share/doc/parrot-0.8.2/languages/perl6/*
++
++Files included in the =parrot-languages= package:
++
++  /usr/bin/parrot-APL.exe
++  /usr/bin/parrot-abc.exe
++  /usr/bin/parrot-bf.exe
++  /usr/bin/parrot-bfc.exe
++  /usr/bin/parrot-bfco.exe
++  /usr/bin/parrot-c99.exe
++  /usr/bin/parrot-cardinal.exe
++  /usr/bin/parrot-chitchat.exe
++  /usr/bin/parrot-forth.exe
++  /usr/bin/parrot-hq9plus.exe
++  /usr/bin/parrot-lisp.exe
++  /usr/bin/parrot-lolcode.exe
++  /usr/bin/parrot-lua.exe
++  /usr/bin/parrot-m4.exe
++  /usr/bin/parrot-ook.exe
++  /usr/bin/parrot-pheme.exe
++  /usr/bin/parrot-pipp.exe
++  /usr/bin/parrot-punie.exe
++  /usr/bin/parrot-pynie.exe
++  /usr/bin/parrot-squaak.exe
++  /usr/bin/parrot-tcl.exe
++  /usr/lib/parrot/dynext/apl_group.dll
++  /usr/lib/parrot/dynext/eclectus_group.dll
++  /usr/lib/parrot/dynext/dotnet.dll
++  /usr/lib/parrot/dynext/dotnet_ops.dll
++  /usr/lib/parrot/dynext/dotnet_ops_cg.dll
++  /usr/lib/parrot/dynext/dotnet_ops_cgp.dll
++  /usr/lib/parrot/dynext/dotnet_ops_switch.dll
++  /usr/lib/parrot/dynext/dotnet_runtime.dll
++  /usr/lib/parrot/dynext/lua_group.dll
++  /usr/lib/parrot/dynext/tcl_group.dll
++  /usr/lib/parrot/dynext/wmls_group.dll
++  /usr/lib/parrot/dynext/wmls_ops.dll
++  /usr/lib/parrot/dynext/wmls_ops_cg.dll
++  /usr/lib/parrot/dynext/wmls_ops_cgp.dll
++  /usr/lib/parrot/dynext/wmls_ops_switch.dll
++  /usr/lib/parrot/library/php_*.pbc
++  /usr/lib/parrot/library/pipplib.pbc
++  /usr/lib/parrot/library/tcllib.pbc
++  /usr/share/doc/parrot-0.8.2/languages/*
++
++-------------------------------------------------------------------------------
++
++Port Notes:
++
++----- version parrot-0.8.2-1 -----
++* merged from branches/pdd30install_stage3
++
++----- version parrot-0.8.0-1 -----
++* building and testing with already installed parrot supported
++* includes the patches from 0.7.1-1, plus
++* a merge from the branch pdd30_install, without the languages/jvm
++
++----- version parrot-0.7.1-1 -----
++* building with already installed parrot now supported, testing not.
++* includes the patches from 0.7.0-1, plus
++* a merge from the branch cygwin070patches,
++  without the languages/jvm
++
++----- version parrot-0.7.0-1 -----
++* removed /usr/runtime and its preremove and postinstall scripts
++* added parrot_exists_check to .cygport. Already installed parrot 
++  still not supported, despite my #39742 patch
++* other minor .cygport improvements: export PATH in seperate lines to fix check
++* new patches: 
++  [perl #39742] [BUG]   installed conflict
++  [perl #58034] [TODO]  config_args
++  [perl #56996] [TODO]  FHS runtime paths
++* enhanced patch: 
++  [perl #56554] [TODO]  make install -C languages
++* upstream fixed patches:
++  [perl #56544] [PATCH] install_files.pl
++  [perl #56998] [TODO]  rename cygwin dll to cygparrot$MAJOR_$MINOR_$PATCH.dll
++  [perl #57006] [PATCH] add cygwin opengl config quirks
++  [perl #57296] [TODO]  make install -C languages
++* fixed pipp, perl6, pheme, tcl installables. added pcbc's to library  
++
++----- version parrot-0.6.4-2 -----
++* fixed invalid parrot languages and perl6 paths referencing the build_dir
++* fixed runtime lib_path to favor FHS compliant paths
++* temp. add a /usr/runtime symlink. will be removed soon
++* added myconfig parrotbug VERSION to /usr/lib/parrot
++* moved language dll's to parrot-languages
++* added more sublanguage exe's: bfc, bfco
++* added usr/lib/parrot/include/config.fpmc usr/lib/parrot/include/interpinfo.pasm 
++  to parrot
++
++----- version parrot-0.6.4-1 -----
++* libparrot.dll renamed to cygparrot0_6_4.dll
++* moved examples to from libparrot-devel to parrot
++* Added list of local patches to myconfig
++     [perl #51944] [DOCS]  Cygwin Readme
++     [perl #56544] [PATCH] install_files.pl
++     [perl #56558] [PATCH] pdb rename to parrot_debugger
++     [perl #56562] [PATCH] root.in: add cygwin importlib
++     [perl #56998] [TODO]  rename cygwin dll to cygparrot$MAJOR_$MINOR_$PATCH.dll
++     [perl #57006] [PATCH] add cygwin opengl config quirks
++     [perl #57110] [PATCH] ncurses for cygwin
++     [perl #57112] [PATCH] postgres for cygwin
++     [perl #57114] [PATCH] urm RealBin issue
++
++----- version parrot-0.6.3-1 -----
++* first port, with the help from #parrot, fedora spec, 
++  gentoo ebuild and freebsd ports.
++* the php implementation plumhead is still named plumhead.
++  will be renamed to pipp from the next release 0.6.4 on.
++
++Cygwin port maintained by: Reini Urban <rurban@x-ray.at>
++Please address all questions to the Cygwin mailing list 
++at <cygwin@cygwin.com>
+--- origsrc/parrot-0.8.2/CYGWIN-PATCHES/libparrot-devel.hint	1970-01-01 00:00:00.000000000 +0000
++++ src/parrot-0.8.2/CYGWIN-PATCHES/libparrot-devel.hint	2008-12-24 18:31:58.397125000 +0000
+@@ -0,0 +1,5 @@
++sdesc: "Parrot Virtual Machine development headers and libraries"
++ldesc: "Libraries and headers needed for development against Parrot"
++category: Libs
++requires: parrot readline libncurses-devel libicu-devel libgmp-devel libgdbm-devel perl pcre-devel
++external-source: parrot
+--- origsrc/parrot-0.8.2/CYGWIN-PATCHES/libparrot0.hint	1970-01-01 00:00:00.000000000 +0000
++++ src/parrot-0.8.2/CYGWIN-PATCHES/libparrot0.hint	2008-12-24 18:31:58.397125000 +0000
+@@ -0,0 +1,4 @@
++sdesc: "libparrot dll"
++category: Libs
++external-source: parrot
++requires: libreadline6 libintl8 libicu38 libgmp3 libgdbm4
+--- origsrc/parrot-0.8.2/CYGWIN-PATCHES/parrot-languages.hint	1970-01-01 00:00:00.000000000 +0000
++++ src/parrot-0.8.2/CYGWIN-PATCHES/parrot-languages.hint	2008-12-24 18:31:58.397125000 +0000
+@@ -0,0 +1,6 @@
++sdesc: "Various language implementions on Parrot"
++ldesc: "parrot-APL parrot-abc parrot-bf parrot-c99 parrot-cardinal parrot-chitchat 
++parrot-forth parrot-hq9plus parrot-lisp parrot-lolcode parrot-lua parrot-m4 parrot-ook 
++parrot-pheme parrot-pipp parrot-punie parrot-pynie parrot-squaak parrot-tcl"
++category: Interpreters
++requires: parrot
+--- origsrc/parrot-0.8.2/CYGWIN-PATCHES/parrot-perl6.hint	1970-01-01 00:00:00.000000000 +0000
++++ src/parrot-0.8.2/CYGWIN-PATCHES/parrot-perl6.hint	2008-12-24 18:31:58.412750000 +0000
+@@ -0,0 +1,6 @@
++sdesc: "Rakudo Perl6 via Parrot"
++ldesc: "This is the Perl 6 compiler for Parrot, called 'Rakudo Perl 6,'
++or "Rakudo" for short.  It's still fairly primitive -- only simple
++expressions and functions are available, but it's rapidly expanding."
++category: Libs
++requires: parrot
+--- origsrc/parrot-0.8.2/CYGWIN-PATCHES/parrot.hint	1970-01-01 00:00:00.000000000 +0000
++++ src/parrot-0.8.2/CYGWIN-PATCHES/parrot.hint	2008-12-24 18:31:58.412750000 +0000
+@@ -0,0 +1,6 @@
++sdesc: "Parrot Virtual Machine"
++ldesc: "Parrot is a virtual machine designed to efficiently compile and
++execute bytecode for interpreted languages. Parrot is a target for Perl 6 
++and a lot of other languages"
++category: Interpreters
++requires: cygwin libparrot0 w32api opengl
