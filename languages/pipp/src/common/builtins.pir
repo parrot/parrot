@@ -6,6 +6,7 @@
 
 .include 'languages/pipp/src/common/php_MACRO.pir'
 .include 'languages/pipp/src/common/guts.pir'
+.include 'languages/pipp/src/classes/Object.pir'
 .include 'languages/pipp/src/common/eval.pir'
 
 # steal builtins from Perl6
