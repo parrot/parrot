@@ -259,6 +259,8 @@ void Parrot_print_backtrace(void);
 #  define PARROT_ASSERT(x) (x) ? ((void)0) : Parrot_confess(#x, __FILE__, __LINE__)
 #endif
 
+#define ASSERT_ARGS(a) ASSERT_ARGS_ ## a
+
 
 #endif /* PARROT_EXCEPTIONS_H_GUARD */
 
