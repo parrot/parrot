@@ -54,6 +54,9 @@ HASH_OBJS    = $(HASHDIR)/pipp_hash$(O)
 
 PHP_GROUP=$(PMCDIR)/php_group$(LOAD_EXT)
 
+INTERNALS_PIR= \
+  src/classes/Object.pir
+
 PHP_SRC_STD_EXT= \
   src/common/php_API.pir \
   src/common/php_array.pir \
@@ -189,7 +192,15 @@ build-antlr3:    build-common
 pipp$(EXE): build-common
 	$(PBC_TO_EXE) pipp.pbc
 
-src/common/pipplib.pbc: src/common/builtins.pir src/common/guts.pir src/common/eval.pir src/common/php_standard.pir $(PHP_SRC_STD_EXT) src/common/php_API.pir src/common/php_MACRO.pir
+src/common/pipplib.pbc: \
+  src/common/builtins.pir \
+  src/common/guts.pir \
+  src/common/eval.pir \
+  src/common/php_standard.pir \
+  $(INTERNALS_PIR) \
+  $(PHP_SRC_STD_EXT) \
+  src/common/php_API.pir \
+  src/common/php_MACRO.pir
 	$(PARROT) -o src/common/pipplib.pbc src/common/builtins.pir
 
 src/common/php_ctype.pbc: src/common/php_ctype.pir src/common/php_MACRO.pir
