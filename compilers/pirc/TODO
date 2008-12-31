@@ -24,12 +24,14 @@ Fairly randomly sorted, the tasks are:
            places this is not used yet, and in others, it's not necessary
            to use it (but in those mem_sys_free() must be called explicitly).
 
-[TODO] 7.  Figure out how :named argument passing works in bytecode.
+[DONE] 7.  Figure out how :named argument passing works in bytecode.
 
 [DONE] 8.  Finish the parrot calling conventions ops in the back-end
            (var.args must be fixed).
 
-[TODO] 9.  Handle :slurpy and :flat flags properly in bytecode.
+[DONE] 9.a Handle :slurpy
+
+[TODO] 9.b Handle :flat
 
 [TODO] 10. Handle indexed assignments in bytecode.
 

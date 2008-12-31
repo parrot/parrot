@@ -22,6 +22,8 @@ Its main features are:
 
 =item * allow multiple heredocs in subroutine invocations (like: foo(<<'A', <<'B', <<'C') )
 
+=item * register usage optimization
+
 =back
 
 =head2 Compiling and Running
@@ -297,13 +299,31 @@ using a Linear Scan Register allocator.
 The implementation of the vanilla register allocator is done in the PIR symbol
 management module (C<pirsymbol.c>).
 
+=head2 Register optimizer
+
+PIRC has a register optimizer, which uses a Linear Scan Register algorithm.
+For each symbolic register, a live-interval object is created, which has
+an I<start> and I<end> point, indicating the first and last usage of that
+symbolic register in the sub. The register optimizer figures out when
+symbolic registers don't overlap, in which case they can use the same
+register (assuming they're of the same type).
+
 =head2 Status
 
-The PIR parser is complete, but should be tested intensively. The back-end creates
-a data structure representing the input. Currently, only (almost working) PASM
-output is generated, but eventually a Parrot Byte Code (PBC) file should be generated.
-In order to do this, we need a proper API to generate the appropriate data structures
-(such as Parrot PackFile and friends).
+Bytecode generation is mostly done, except for:
+
+=over 4
+
+=item * :multi types
+
+=item * keys and indexed assignments
+
+=item * auto-boxing of return values doesn't work
+
+=item * :flat flag doesn't work
+
+=back
+
 
 =head1 IMPLEMENTATION
 
@@ -383,24 +403,6 @@ feedback even more :-)
 
 =back
 
-=head1 FUTURE WORK: HELP WANTED
-
-Eventually, either IMCC needs to be fixed rigorously, or, rewritten altogether.
-PIRC is an attempt to do the latter. The following things need to be considered
-when replacing IMCC with PIRC:
-
-=over 4
-
-=item * bytecode generation
-
-There must be a proper bytecode API for PIRC to use.
-
-=item * C<:immediate> and related flags
-
-Flags such as C<:immediate> must be implemented; a sub that is marked with the
-C<:immediate> flag must be run immediately after compilation.
-
-=back
 
 =head1 SEE ALSO
 
