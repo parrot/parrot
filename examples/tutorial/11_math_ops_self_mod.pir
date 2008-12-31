@@ -13,7 +13,7 @@ place.
     say $I0
 
     $N0 = 22.44
-    $N0 /= 0
+    $N0 /= 4
     say $N0
 
 .end
