@@ -44,10 +44,10 @@ Tests OO features related to names and namespaces.
     $P0.'name'('Object')
     pop_eh
     $S0 = $P0
-    ok (0, 'HLL obj created w/ same name as parrot obj')
+    ok (1, 'HLL obj created w/ same name as parrot obj')
     .return()
 OK_1:    
-    ok (1, 'HLL obj w/ same name as parrot obj not created')
+    ok (0, 'HLL obj w/ same name as parrot obj not created')
 .end
 
 # Local Variables:

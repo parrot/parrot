@@ -45,7 +45,7 @@ static void debug_trace_find_meth(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
+static INTVAL fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -494,48 +494,35 @@ interact with the old one until it does.
 
 */
 
-static void
+static INTVAL
 fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
 {
-    INTVAL      type;
+    PMC * const value = (PMC *)VTABLE_get_pointer_keyed(interp, interp->class_hash, name);
 
-    PMC * const classname_hash = interp->class_hash;
-    PMC * const type_pmc       = (PMC *)VTABLE_get_pointer_keyed(interp,
-                                        classname_hash, name);
+    if (PMC_IS_NULL(value))
+        return 0;
 
-    if (PMC_IS_NULL(type_pmc)
-    ||  type_pmc->vtable->base_type == enum_class_NameSpace)
-        type = 0;
-    else
-        type = VTABLE_get_integer(interp, type_pmc);
-
-    if (type > enum_type_undef) {
-        STRING *classname;
-
-        if (VTABLE_isa(interp, name, CONST_STRING(interp, "ResizableStringArray"))) {
-            PMC * const base_ns = VTABLE_get_pmc_keyed_int(interp,
-                                    interp->HLL_namespace,
-                                    CONTEXT(interp)->current_HLL);
-            PMC             *ns = Parrot_get_namespace_keyed(interp,
-                                    base_ns, name);
-
-            if (!PMC_IS_NULL(ns))
-                classname = VTABLE_get_string(interp, ns);
-            else
-                classname = CONST_STRING(interp, "");
-        }
-        else
-            classname = VTABLE_get_string(interp, name);
-
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-            "Class %Ss already registered!\n",
-            string_escape_string(interp, classname));
+    switch (VTABLE_type(interp, value)) {
+        case enum_class_NameSpace:
+            return 0;
+            break;
+        case enum_class_Integer:
+            {
+                const INTVAL type = VTABLE_get_integer(interp, value);
+                if (type < enum_type_undef)  {
+                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                            "native type with name '%s' already exists - "
+                            "can't register Class", data_types[type].name);
+                }
+                return type;
+            }
+            break;
+        default:
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERP_ERROR,
+                    "Unrecognized class name PMC type");
+            break;
     }
-
-    if (type < enum_type_undef)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-            "native type with name '%s' already exists - "
-            "can't register Class", data_types[type].name);
+    return 0;
 }
 
 
@@ -553,29 +540,35 @@ allows the new object metamodel to interact with the old one until it does.
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name))
+Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name), ARGIN(PMC *namespace))
 {
     INTVAL type;
-    PMC   *classname_hash, *item;
+    const INTVAL typeid_exists = fail_if_type_exists(interp, name);
 
-    fail_if_type_exists(interp, name);
+    PMC *classobj = VTABLE_get_class(interp, namespace);
+    if (!PMC_IS_NULL(classobj)) {
+        STRING *classname = VTABLE_get_string(interp, namespace);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Class %Ss already registered!\n",
+                string_escape_string(interp, classname));
+    }
 
     /* Type doesn't exist, so go ahead and register it. Lock interpreter so
      * pt_shared_fixup() can safely do a type lookup. */
     LOCK_INTERPRETER(interp);
-    classname_hash = interp->class_hash;
+    {
+        type = get_new_vtable_index(interp);
+    }
+    {
+        if (!typeid_exists) {
+            PMC    *classname_hash = interp->class_hash;
+            /* set entry in name->type hash */
+            PMC    *item      = pmc_new(interp, enum_class_Integer);
+            PMC_int_val(item) = type;
 
-    type = interp->n_vtable_max++;
-
-    /* Have we overflowed the table? */
-    if (type >= interp->n_vtable_alloced)
-        parrot_realloc_vtables(interp);
-
-    /* set entry in name->type hash */
-    item              = pmc_new(interp, enum_class_Integer);
-    PMC_int_val(item) = type;
-
-    VTABLE_set_pmc_keyed(interp, classname_hash, name, item);
+            VTABLE_set_pmc_keyed(interp, classname_hash, name, item);
+        }
+    }
     UNLOCK_INTERPRETER(interp);
 
     return type;

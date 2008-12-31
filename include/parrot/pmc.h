@@ -69,6 +69,10 @@ PARROT_CANNOT_RETURN_NULL
 PMC * pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 
+INTVAL
+get_new_vtable_index(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 PARROT_EXPORT
 INTVAL pmc_register(PARROT_INTERP, ARGIN(STRING *name))
         __attribute__nonnull__(1)

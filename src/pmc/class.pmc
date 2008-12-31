@@ -217,7 +217,7 @@ init_class_from_hash(PARROT_INTERP, PMC *self, PMC *info)
         CLASS_is_anon_CLEAR(self);
 
         /* Register a type number for the class. */
-        type_num   = Parrot_oo_register_type(interp, name_arg);
+        type_num   = Parrot_oo_register_type(interp, name_arg, new_namespace);
 
         /* Link the type number with the class's vtable. */
         new_vtable = Parrot_clone_vtable(interp, self->vtable);

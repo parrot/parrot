@@ -505,13 +505,21 @@ representing that type.
 =cut
 
 */
+INTVAL
+get_new_vtable_index(PARROT_INTERP) {
+    const INTVAL typeid = interp->n_vtable_max++;
+
+    /* Have we overflowed the table? */
+    if (typeid >= interp->n_vtable_alloced)
+        parrot_realloc_vtables(interp);
+
+    return typeid;
+}
 
 PARROT_EXPORT
 INTVAL
 pmc_register(PARROT_INTERP, ARGIN(STRING *name))
 {
-    PMC *classname_hash;
-
     /* If they're looking to register an existing class, return that
        class' type number */
     INTVAL type = pmc_type(interp, name);
@@ -523,15 +531,10 @@ pmc_register(PARROT_INTERP, ARGIN(STRING *name))
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
             "undefined type already exists - can't register PMC");
 
-    classname_hash = interp->class_hash;
-    type           = interp->n_vtable_max++;
-
-    /* Have we overflowed the table? */
-    if (type >= interp->n_vtable_alloced)
-        parrot_realloc_vtables(interp);
+    type = get_new_vtable_index(interp);
 
     /* set entry in name->type hash */
-    VTABLE_set_integer_keyed_str(interp, classname_hash, name, type);
+    VTABLE_set_integer_keyed_str(interp, interp->class_hash, name, type);
 
     return type;
 }
