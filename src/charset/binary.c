@@ -106,6 +106,27 @@ static void upcase_first(PARROT_INTERP, SHIM(STRING *source_string))
         __attribute__nonnull__(1);
 
 static UINTVAL validate(SHIM_INTERP, SHIM(STRING *source_string));
+#define ASSERT_ARGS_compare
+#define ASSERT_ARGS_compose assert(interp);
+#define ASSERT_ARGS_cs_index
+#define ASSERT_ARGS_cs_rindex
+#define ASSERT_ARGS_decompose assert(interp);
+#define ASSERT_ARGS_downcase assert(interp);
+#define ASSERT_ARGS_downcase_first assert(interp);
+#define ASSERT_ARGS_find_cclass
+#define ASSERT_ARGS_find_not_cclass
+#define ASSERT_ARGS_is_cclass
+#define ASSERT_ARGS_set_graphemes assert(interp); \
+                                  assert(source_string); \
+                                  assert(insert_string);
+#define ASSERT_ARGS_string_from_codepoint assert(interp);
+#define ASSERT_ARGS_titlecase assert(interp);
+#define ASSERT_ARGS_titlecase_first assert(interp);
+#define ASSERT_ARGS_to_charset assert(interp); \
+                               assert(src);
+#define ASSERT_ARGS_upcase assert(interp);
+#define ASSERT_ARGS_upcase_first assert(interp);
+#define ASSERT_ARGS_validate
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

@@ -40,6 +40,15 @@ void trace_op_dump(PARROT_INTERP,
 void trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_trace_key_dump assert(interp); \
+                                   assert(key);
+#define ASSERT_ARGS_trace_op assert(interp); \
+                             assert(code_start); \
+                             assert(code_end);
+#define ASSERT_ARGS_trace_op_dump assert(interp); \
+                                  assert(code_start); \
+                                  assert(pc);
+#define ASSERT_ARGS_trace_pmc_dump assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/trace.c */
 

@@ -81,6 +81,19 @@ static opcode_t fetch_op_mixed_le(ARGIN(const unsigned char *b))
 static opcode_t fetch_op_test(ARGIN(const unsigned char *b))
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_cvt_num12_num8 assert(dest); \
+                                   assert(src);
+#define ASSERT_ARGS_cvt_num12_num8_be assert(dest); \
+                                      assert(src);
+#define ASSERT_ARGS_cvt_num12_num8_le assert(dest); \
+                                      assert(src);
+#define ASSERT_ARGS_fetch_op_be_4 assert(b);
+#define ASSERT_ARGS_fetch_op_be_8 assert(b);
+#define ASSERT_ARGS_fetch_op_le_4 assert(b);
+#define ASSERT_ARGS_fetch_op_le_8 assert(b);
+#define ASSERT_ARGS_fetch_op_mixed_be assert(b);
+#define ASSERT_ARGS_fetch_op_mixed_le assert(b);
+#define ASSERT_ARGS_fetch_op_test assert(b);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

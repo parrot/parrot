@@ -44,6 +44,10 @@ static void scheduler_process_wait_list(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*scheduler);
 
+#define ASSERT_ARGS_scheduler_process_messages assert(interp); \
+                                               assert(scheduler);
+#define ASSERT_ARGS_scheduler_process_wait_list assert(interp); \
+                                                assert(scheduler);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

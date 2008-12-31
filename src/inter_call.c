@@ -230,6 +230,77 @@ static void too_many(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+#define ASSERT_ARGS_check_for_opt_flag assert(st);
+#define ASSERT_ARGS_check_named assert(interp); \
+                                assert(st);
+#define ASSERT_ARGS_clone_key_arg assert(interp); \
+                                  assert(st);
+#define ASSERT_ARGS_commit_last_arg assert(interp); \
+                                    assert(n_regs_used); \
+                                    assert(sigs); \
+                                    assert(indexes); \
+                                    assert(ctx); \
+                                    assert(list);
+#define ASSERT_ARGS_commit_last_arg_sig_object assert(interp); \
+                                               assert(n_regs_used); \
+                                               assert(sigs); \
+                                               assert(indexes); \
+                                               assert(ctx); \
+                                               assert(sig_obj);
+#define ASSERT_ARGS_convert_arg_from_int assert(interp); \
+                                         assert(st);
+#define ASSERT_ARGS_convert_arg_from_num assert(interp); \
+                                         assert(st);
+#define ASSERT_ARGS_convert_arg_from_pmc assert(interp); \
+                                         assert(st);
+#define ASSERT_ARGS_convert_arg_from_str assert(interp); \
+                                         assert(st);
+#define ASSERT_ARGS_count_signature_elements assert(interp); \
+                                             assert(signature); \
+                                             assert(args_sig); \
+                                             assert(results_sig);
+#define ASSERT_ARGS_fetch_arg_op assert(interp); \
+                                 assert(st);
+#define ASSERT_ARGS_fetch_arg_sig assert(interp); \
+                                  assert(st);
+#define ASSERT_ARGS_init_call_stats assert(st);
+#define ASSERT_ARGS_init_first_dest_named assert(interp); \
+                                          assert(st);
+#define ASSERT_ARGS_locate_named_named assert(interp); \
+                                       assert(st);
+#define ASSERT_ARGS_next_arg_sig assert(sti);
+#define ASSERT_ARGS_null_val assert(st);
+#define ASSERT_ARGS_set_context_sig_params assert(interp); \
+                                           assert(signature); \
+                                           assert(n_regs_used); \
+                                           assert(sigs); \
+                                           assert(indexes); \
+                                           assert(ctx); \
+                                           assert(sig_obj);
+#define ASSERT_ARGS_set_context_sig_returns assert(interp); \
+                                            assert(ctx); \
+                                            assert(indexes); \
+                                            assert(ret_x); \
+                                            assert(result_list);
+#define ASSERT_ARGS_set_context_sig_returns_varargs assert(interp); \
+                                                    assert(ctx); \
+                                                    assert(indexes); \
+                                                    assert(ret_x); \
+                                                    assert(returns);
+#define ASSERT_ARGS_set_retval_util assert(interp); \
+                                    assert(sig); \
+                                    assert(ctx); \
+                                    assert(st);
+#define ASSERT_ARGS_start_flatten assert(interp); \
+                                  assert(st); \
+                                  assert(p_arg);
+#define ASSERT_ARGS_store_arg assert(st);
+#define ASSERT_ARGS_too_few assert(interp); \
+                            assert(st); \
+                            assert(action);
+#define ASSERT_ARGS_too_many assert(interp); \
+                             assert(st); \
+                             assert(action);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

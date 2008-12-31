@@ -131,6 +131,10 @@ void Parrot_IOData_mark(PARROT_INTERP, ARGIN(ParrotIOData *piodata))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_Parrot_io_finish assert(interp);
+#define ASSERT_ARGS_Parrot_io_init assert(interp);
+#define ASSERT_ARGS_Parrot_IOData_mark assert(interp); \
+                                       assert(piodata);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/core.c */
 
@@ -319,6 +323,55 @@ PIOOFF_T Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
+#define ASSERT_ARGS_Parrot_io_close assert(interp); \
+                                    assert(pmc);
+#define ASSERT_ARGS_Parrot_io_eof assert(interp); \
+                                  assert(pmc);
+#define ASSERT_ARGS_Parrot_io_eprintf assert(s);
+#define ASSERT_ARGS_Parrot_io_fdopen assert(interp); \
+                                     assert(sflags);
+#define ASSERT_ARGS_Parrot_io_flush assert(interp); \
+                                    assert(pmc);
+#define ASSERT_ARGS_Parrot_io_fprintf assert(interp); \
+                                      assert(pmc); \
+                                      assert(s);
+#define ASSERT_ARGS_Parrot_io_getfd assert(interp); \
+                                    assert(pmc);
+#define ASSERT_ARGS_Parrot_io_is_closed assert(interp); \
+                                        assert(pmc);
+#define ASSERT_ARGS_Parrot_io_is_tty assert(interp); \
+                                     assert(pmc);
+#define ASSERT_ARGS_Parrot_io_make_offset
+#define ASSERT_ARGS_Parrot_io_new_pmc assert(interp);
+#define ASSERT_ARGS_Parrot_io_open assert(interp); \
+                                   assert(path);
+#define ASSERT_ARGS_Parrot_io_peek assert(interp); \
+                                   assert(pmc); \
+                                   assert(buffer);
+#define ASSERT_ARGS_Parrot_io_printf assert(interp); \
+                                     assert(s);
+#define ASSERT_ARGS_Parrot_io_putps assert(interp); \
+                                    assert(pmc);
+#define ASSERT_ARGS_Parrot_io_puts assert(interp); \
+                                   assert(pmc); \
+                                   assert(s);
+#define ASSERT_ARGS_Parrot_io_readline assert(interp); \
+                                       assert(pmc);
+#define ASSERT_ARGS_Parrot_io_reads assert(interp); \
+                                    assert(pmc);
+#define ASSERT_ARGS_Parrot_io_seek assert(interp); \
+                                   assert(pmc);
+#define ASSERT_ARGS_Parrot_io_STDERR assert(interp);
+#define ASSERT_ARGS_Parrot_io_STDIN assert(interp);
+#define ASSERT_ARGS_Parrot_io_STDOUT assert(interp);
+#define ASSERT_ARGS_Parrot_io_tell assert(interp); \
+                                   assert(pmc);
+#define ASSERT_ARGS_Parrot_io_write assert(interp); \
+                                    assert(pmc); \
+                                    assert(buffer);
+#define ASSERT_ARGS_Parrot_io_make_offset32
+#define ASSERT_ARGS_Parrot_io_make_offset_pmc assert(interp); \
+                                              assert(pmc);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/api.c */
 
@@ -393,6 +446,29 @@ size_t Parrot_io_write_buffer(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*filehandle);
 
+#define ASSERT_ARGS_Parrot_io_fill_readbuf assert(interp); \
+                                           assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_flush_buffer assert(interp); \
+                                           assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_init_buffer assert(interp);
+#define ASSERT_ARGS_Parrot_io_peek_buffer assert(interp); \
+                                          assert(filehandle); \
+                                          assert(buf);
+#define ASSERT_ARGS_Parrot_io_read_buffer assert(interp); \
+                                          assert(filehandle); \
+                                          assert(buf);
+#define ASSERT_ARGS_Parrot_io_readline_buffer assert(interp); \
+                                              assert(filehandle); \
+                                              assert(buf);
+#define ASSERT_ARGS_Parrot_io_seek_buffer assert(interp); \
+                                          assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_setbuf assert(interp); \
+                                     assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_setlinebuf assert(interp); \
+                                         assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_write_buffer assert(interp); \
+                                           assert(filehandle); \
+                                           assert(s);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/buffer.c */
 
@@ -418,6 +494,12 @@ size_t Parrot_io_write_utf8(PARROT_INTERP,
         FUNC_MODIFIES(*filehandle)
         FUNC_MODIFIES(*s);
 
+#define ASSERT_ARGS_Parrot_io_read_utf8 assert(interp); \
+                                        assert(filehandle); \
+                                        assert(buf);
+#define ASSERT_ARGS_Parrot_io_write_utf8 assert(interp); \
+                                         assert(filehandle); \
+                                         assert(s);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/utf8.c */
 
@@ -564,6 +646,38 @@ void Parrot_io_set_buffer_start(SHIM_INTERP,
     ARGIN_NULLOK(unsigned char *new_start))
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_Parrot_io_close_filehandle assert(interp); \
+                                               assert(pmc);
+#define ASSERT_ARGS_Parrot_io_flush_filehandle assert(interp); \
+                                               assert(pmc);
+#define ASSERT_ARGS_Parrot_io_get_buffer_end
+#define ASSERT_ARGS_Parrot_io_get_buffer_next assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_get_buffer_start assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_get_file_position assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_get_file_size assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_get_flags assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_get_last_file_position assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_get_os_handle assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_is_closed_filehandle assert(interp); \
+                                                   assert(pmc);
+#define ASSERT_ARGS_Parrot_io_is_encoding assert(interp); \
+                                          assert(filehandle); \
+                                          assert(value);
+#define ASSERT_ARGS_Parrot_io_parse_open_flags assert(interp);
+#define ASSERT_ARGS_Parrot_io_set_file_position assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_set_file_size assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_set_flags assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_set_os_handle assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_clear_buffer assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_get_buffer_flags assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_get_buffer_size assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_make_string assert(interp); \
+                                          assert(buf);
+#define ASSERT_ARGS_Parrot_io_set_buffer_end assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_set_buffer_flags assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_set_buffer_next assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_set_buffer_size assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_set_buffer_start assert(filehandle);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/filehandle.c */
 

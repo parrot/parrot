@@ -59,6 +59,14 @@ static int sweep_cb(PARROT_INTERP,
 static int trace_active_PMCs(PARROT_INTERP, int trace_stack)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_clear_live_bits assert(pool);
+#define ASSERT_ARGS_find_common_mask assert(interp);
+#define ASSERT_ARGS_mark_special assert(interp); \
+                                 assert(obj);
+#define ASSERT_ARGS_sweep_cb assert(interp); \
+                             assert(pool); \
+                             assert(arg);
+#define ASSERT_ARGS_trace_active_PMCs assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

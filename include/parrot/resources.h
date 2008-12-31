@@ -90,6 +90,23 @@ void Parrot_reallocate_string(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*str);
 
+#define ASSERT_ARGS_Parrot_allocate assert(interp); \
+                                    assert(buffer);
+#define ASSERT_ARGS_Parrot_allocate_aligned assert(interp); \
+                                            assert(buffer);
+#define ASSERT_ARGS_Parrot_allocate_string assert(interp); \
+                                           assert(str);
+#define ASSERT_ARGS_Parrot_destroy_memory_pools assert(interp);
+#define ASSERT_ARGS_Parrot_go_collect assert(interp);
+#define ASSERT_ARGS_Parrot_in_memory_pool assert(interp); \
+                                          assert(bufstart);
+#define ASSERT_ARGS_Parrot_initialize_memory_pools assert(interp);
+#define ASSERT_ARGS_Parrot_merge_memory_pools assert(dest_interp); \
+                                              assert(source_interp);
+#define ASSERT_ARGS_Parrot_reallocate assert(interp); \
+                                      assert(buffer);
+#define ASSERT_ARGS_Parrot_reallocate_string assert(interp); \
+                                             assert(str);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/resources.c */
 

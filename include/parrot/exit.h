@@ -39,6 +39,9 @@ void Parrot_on_exit(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_Parrot_exit assert(interp);
+#define ASSERT_ARGS_Parrot_on_exit assert(interp); \
+                                   assert(function);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/exit.c */
 

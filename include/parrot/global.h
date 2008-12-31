@@ -170,6 +170,36 @@ void Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_Parrot_find_global_cur assert(interp);
+#define ASSERT_ARGS_Parrot_find_global_k assert(interp); \
+                                         assert(globalname);
+#define ASSERT_ARGS_Parrot_find_global_n assert(interp);
+#define ASSERT_ARGS_Parrot_find_global_op assert(interp); \
+                                          assert(ns);
+#define ASSERT_ARGS_Parrot_find_global_s assert(interp);
+#define ASSERT_ARGS_Parrot_find_name_op assert(interp); \
+                                        assert(name);
+#define ASSERT_ARGS_Parrot_get_global assert(interp);
+#define ASSERT_ARGS_Parrot_get_namespace_autobase assert(interp);
+#define ASSERT_ARGS_Parrot_get_namespace_keyed assert(interp); \
+                                               assert(base_ns);
+#define ASSERT_ARGS_Parrot_get_namespace_keyed_str assert(interp); \
+                                                   assert(base_ns);
+#define ASSERT_ARGS_Parrot_make_namespace_autobase assert(interp);
+#define ASSERT_ARGS_Parrot_make_namespace_keyed assert(interp); \
+                                                assert(base_ns);
+#define ASSERT_ARGS_Parrot_make_namespace_keyed_str assert(interp); \
+                                                    assert(base_ns);
+#define ASSERT_ARGS_Parrot_ns_get_name assert(interp); \
+                                       assert(_namespace);
+#define ASSERT_ARGS_Parrot_set_global assert(interp);
+#define ASSERT_ARGS_Parrot_store_global_cur assert(interp);
+#define ASSERT_ARGS_Parrot_store_global_k assert(interp); \
+                                          assert(pmc_key);
+#define ASSERT_ARGS_Parrot_store_global_n assert(interp);
+#define ASSERT_ARGS_Parrot_store_global_s assert(interp);
+#define ASSERT_ARGS_Parrot_store_sub_in_namespace assert(interp); \
+                                                  assert(sub);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/global.c */
 

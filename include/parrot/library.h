@@ -91,6 +91,19 @@ STRING * parrot_split_path_ext(PARROT_INTERP,
         FUNC_MODIFIES(*wo_ext)
         FUNC_MODIFIES(*ext);
 
+#define ASSERT_ARGS_Parrot_add_library_path assert(interp); \
+                                            assert(path);
+#define ASSERT_ARGS_Parrot_get_runtime_path assert(interp);
+#define ASSERT_ARGS_Parrot_get_runtime_prefix assert(interp);
+#define ASSERT_ARGS_Parrot_locate_runtime_file assert(interp); \
+                                               assert(file_name);
+#define ASSERT_ARGS_Parrot_locate_runtime_file_str assert(interp); \
+                                                   assert(file);
+#define ASSERT_ARGS_parrot_init_library_paths assert(interp);
+#define ASSERT_ARGS_parrot_split_path_ext assert(interp); \
+                                          assert(in); \
+                                          assert(wo_ext); \
+                                          assert(ext);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/library.c */
 

@@ -50,6 +50,13 @@ static void pmc_free_to_pool(PARROT_INTERP,
         FUNC_MODIFIES(*pmc)
         FUNC_MODIFIES(*pool);
 
+#define ASSERT_ARGS_create_class_pmc assert(interp);
+#define ASSERT_ARGS_get_new_pmc_header assert(interp);
+#define ASSERT_ARGS_pmc_free assert(interp); \
+                             assert(pmc);
+#define ASSERT_ARGS_pmc_free_to_pool assert(interp); \
+                                     assert(pmc); \
+                                     assert(pool);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

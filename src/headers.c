@@ -61,6 +61,17 @@ static int sweep_cb_pmc(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
+#define ASSERT_ARGS_fix_pmc_syncs assert(dest_interp); \
+                                  assert(pool);
+#define ASSERT_ARGS_free_pool assert(pool);
+#define ASSERT_ARGS_get_free_buffer assert(interp); \
+                                    assert(pool);
+#define ASSERT_ARGS_new_pmc_ext assert(interp);
+#define ASSERT_ARGS_sweep_cb_buf assert(interp); \
+                                 assert(pool); \
+                                 assert(arg);
+#define ASSERT_ARGS_sweep_cb_pmc assert(interp); \
+                                 assert(pool);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

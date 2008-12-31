@@ -129,6 +129,22 @@ void parrot_PIC_prederef(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pc_pred);
 
+#define ASSERT_ARGS_parrot_PIC_alloc_mic
+#define ASSERT_ARGS_parrot_PIC_alloc_pic assert(interp);
+#define ASSERT_ARGS_parrot_PIC_alloc_store assert(cs);
+#define ASSERT_ARGS_parrot_pic_check_sig assert(sig1); \
+                                         assert(sig2); \
+                                         assert(type);
+#define ASSERT_ARGS_parrot_PIC_destroy assert(cs);
+#define ASSERT_ARGS_parrot_pic_find_infix_v_pp assert(interp); \
+                                               assert(left); \
+                                               assert(right); \
+                                               assert(mic); \
+                                               assert(cur_opcode);
+#define ASSERT_ARGS_parrot_PIC_op_is_cached
+#define ASSERT_ARGS_parrot_pic_opcode assert(interp);
+#define ASSERT_ARGS_parrot_PIC_prederef assert(interp); \
+                                        assert(pc_pred);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pic.c */
 
@@ -155,6 +171,13 @@ funcptr_t parrot_pic_JIT_sub(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_parrot_pic_is_safe_to_jit assert(interp); \
+                                              assert(sub); \
+                                              assert(sig_args); \
+                                              assert(sig_results); \
+                                              assert(flags);
+#define ASSERT_ARGS_parrot_pic_JIT_sub assert(interp); \
+                                       assert(sub);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pic_jit.c */
 

@@ -125,6 +125,32 @@ static int STRING_compare(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_create_hash assert(interp); \
+                                assert(compare); \
+                                assert(keyhash);
+#define ASSERT_ARGS_cstring_compare assert(a); \
+                                    assert(b);
+#define ASSERT_ARGS_expand_hash assert(interp); \
+                                assert(hash);
+#define ASSERT_ARGS_hash_freeze assert(interp); \
+                                assert(hash); \
+                                assert(info);
+#define ASSERT_ARGS_hash_thaw assert(interp); \
+                              assert(hash); \
+                              assert(info);
+#define ASSERT_ARGS_key_hash_cstring assert(value);
+#define ASSERT_ARGS_key_hash_pointer assert(value);
+#define ASSERT_ARGS_key_hash_STRING assert(interp); \
+                                    assert(s);
+#define ASSERT_ARGS_parrot_mark_hash_both assert(interp); \
+                                          assert(hash);
+#define ASSERT_ARGS_parrot_mark_hash_keys assert(interp); \
+                                          assert(hash);
+#define ASSERT_ARGS_parrot_mark_hash_values assert(interp); \
+                                            assert(hash);
+#define ASSERT_ARGS_pointer_compare
+#define ASSERT_ARGS_STRING_compare assert(interp); \
+                                   assert(search_key);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

@@ -48,6 +48,15 @@ void parrot_free_vtables(PARROT_INTERP)
 void parrot_realloc_vtables(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_Parrot_clone_vtable assert(interp); \
+                                        assert(base_vtable);
+#define ASSERT_ARGS_Parrot_destroy_vtable assert(interp); \
+                                          assert(vtable);
+#define ASSERT_ARGS_Parrot_new_vtable
+#define ASSERT_ARGS_mark_vtables assert(interp);
+#define ASSERT_ARGS_parrot_alloc_vtables assert(interp);
+#define ASSERT_ARGS_parrot_free_vtables assert(interp);
+#define ASSERT_ARGS_parrot_realloc_vtables assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/vtables.c */
 

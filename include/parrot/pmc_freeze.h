@@ -123,6 +123,16 @@ PMC* Parrot_thaw_constants(PARROT_INTERP, ARGIN(STRING* image))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_Parrot_clone assert(interp); \
+                                 assert(pmc);
+#define ASSERT_ARGS_Parrot_freeze assert(interp); \
+                                  assert(pmc);
+#define ASSERT_ARGS_Parrot_freeze_at_destruct assert(interp); \
+                                              assert(pmc);
+#define ASSERT_ARGS_Parrot_thaw assert(interp); \
+                                assert(image);
+#define ASSERT_ARGS_Parrot_thaw_constants assert(interp); \
+                                          assert(image);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pmc_freeze.c */
 

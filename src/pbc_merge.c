@@ -160,6 +160,36 @@ static void pbc_merge_write(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pf);
 
+#define ASSERT_ARGS_help assert(interp);
+#define ASSERT_ARGS_pbc_merge_begin assert(interp); \
+                                    assert(inputs);
+#define ASSERT_ARGS_pbc_merge_bytecode assert(interp); \
+                                       assert(inputs); \
+                                       assert(pf);
+#define ASSERT_ARGS_pbc_merge_constants assert(interp); \
+                                        assert(inputs); \
+                                        assert(pf); \
+                                        assert(bc);
+#define ASSERT_ARGS_pbc_merge_ctpointers assert(interp); \
+                                         assert(inputs); \
+                                         assert(bc);
+#define ASSERT_ARGS_pbc_merge_debugs assert(interp); \
+                                     assert(inputs); \
+                                     assert(pf); \
+                                     assert(bc);
+#define ASSERT_ARGS_pbc_merge_fixups assert(interp); \
+                                     assert(inputs); \
+                                     assert(pf); \
+                                     assert(bc);
+#define ASSERT_ARGS_pbc_merge_loadpbc assert(interp); \
+                                      assert(fullname);
+#define ASSERT_ARGS_pbc_merge_pic_index assert(interp); \
+                                        assert(inputs); \
+                                        assert(pf); \
+                                        assert(bc);
+#define ASSERT_ARGS_pbc_merge_write assert(interp); \
+                                    assert(pf); \
+                                    assert(filename);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

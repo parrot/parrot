@@ -39,6 +39,9 @@ static Parrot_Context * runops_args(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(5);
 
+#define ASSERT_ARGS_runops_args assert(interp); \
+                                assert(sub); \
+                                assert(sig);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

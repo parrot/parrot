@@ -36,6 +36,8 @@ static int is_env_var_set(ARGIN(const char* var))
 static void setup_default_compreg(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_is_env_var_set assert(var);
+#define ASSERT_ARGS_setup_default_compreg assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

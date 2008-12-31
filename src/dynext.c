@@ -93,6 +93,30 @@ static void store_lib_pmc(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
+#define ASSERT_ARGS_clone_string_into assert(d); \
+                                      assert(s); \
+                                      assert(value);
+#define ASSERT_ARGS_get_path assert(interp); \
+                             assert(lib); \
+                             assert(handle); \
+                             assert(wo_ext);
+#define ASSERT_ARGS_is_loaded assert(interp); \
+                              assert(path);
+#define ASSERT_ARGS_make_string_pmc assert(interp); \
+                                    assert(string);
+#define ASSERT_ARGS_run_init_lib assert(interp); \
+                                 assert(handle); \
+                                 assert(lib_name); \
+                                 assert(wo_ext);
+#define ASSERT_ARGS_set_cstring_prop assert(interp); \
+                                     assert(lib_pmc); \
+                                     assert(what); \
+                                     assert(name);
+#define ASSERT_ARGS_store_lib_pmc assert(interp); \
+                                  assert(lib_pmc); \
+                                  assert(path); \
+                                  assert(type); \
+                                  assert(lib_name);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

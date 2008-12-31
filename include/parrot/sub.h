@@ -341,6 +341,35 @@ PMC* Parrot_find_pad(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+#define ASSERT_ARGS_new_ret_continuation_pmc assert(interp);
+#define ASSERT_ARGS_Parrot_Context_get_info assert(interp); \
+                                            assert(ctx); \
+                                            assert(info);
+#define ASSERT_ARGS_Parrot_Context_infostr assert(interp); \
+                                           assert(ctx);
+#define ASSERT_ARGS_Parrot_full_sub_name assert(interp);
+#define ASSERT_ARGS_parrot_new_closure assert(interp); \
+                                       assert(sub_pmc);
+#define ASSERT_ARGS_invalidate_retc_context assert(interp); \
+                                            assert(cont);
+#define ASSERT_ARGS_mark_context assert(interp); \
+                                 assert(ctx);
+#define ASSERT_ARGS_mark_context_start
+#define ASSERT_ARGS_new_closure assert(interp);
+#define ASSERT_ARGS_new_continuation assert(interp);
+#define ASSERT_ARGS_new_coroutine assert(interp);
+#define ASSERT_ARGS_new_ret_continuation assert(interp);
+#define ASSERT_ARGS_new_sub assert(interp);
+#define ASSERT_ARGS_Parrot_capture_lex assert(interp); \
+                                       assert(sub_pmc);
+#define ASSERT_ARGS_Parrot_continuation_check assert(interp); \
+                                              assert(pmc); \
+                                              assert(cc);
+#define ASSERT_ARGS_Parrot_continuation_rewind_environment assert(interp); \
+                                                           assert(cc);
+#define ASSERT_ARGS_Parrot_find_pad assert(interp); \
+                                    assert(lex_name); \
+                                    assert(ctx);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/sub.c */
 

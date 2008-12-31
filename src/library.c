@@ -91,6 +91,23 @@ static STRING* try_load_path(PARROT_INTERP, ARGMOD(STRING* path))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(* path);
 
+#define ASSERT_ARGS_cnv_to_win32_filesep assert(path);
+#define ASSERT_ARGS_get_search_paths assert(interp);
+#define ASSERT_ARGS_is_abs_path assert(file);
+#define ASSERT_ARGS_path_append assert(interp); \
+                                assert(l_path); \
+                                assert(r_path);
+#define ASSERT_ARGS_path_concat assert(interp); \
+                                assert(l_path); \
+                                assert(r_path);
+#define ASSERT_ARGS_path_finalize assert(interp); \
+                                  assert(path);
+#define ASSERT_ARGS_path_guarantee_trailing_separator assert(interp); \
+                                                      assert(path);
+#define ASSERT_ARGS_try_bytecode_extensions assert(interp); \
+                                            assert(path);
+#define ASSERT_ARGS_try_load_path assert(interp); \
+                                  assert(path);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

@@ -95,6 +95,31 @@ size_t Parrot_io_write_portable(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*s);
 
+#define ASSERT_ARGS_Parrot_io_close_portable assert(interp); \
+                                             assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_fdopen_portable assert(interp); \
+                                              assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_flush_portable
+#define ASSERT_ARGS_Parrot_io_getblksize_portable
+#define ASSERT_ARGS_Parrot_io_init_portable assert(interp);
+#define ASSERT_ARGS_Parrot_io_is_closed_portable assert(interp); \
+                                                 assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_open_pipe_portable assert(interp);
+#define ASSERT_ARGS_Parrot_io_open_portable assert(interp); \
+                                            assert(filehandle); \
+                                            assert(path);
+#define ASSERT_ARGS_Parrot_io_peek_portable assert(interp); \
+                                            assert(filehandle); \
+                                            assert(buf);
+#define ASSERT_ARGS_Parrot_io_read_portable assert(interp); \
+                                            assert(buf);
+#define ASSERT_ARGS_Parrot_io_seek_portable assert(interp); \
+                                            assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_tell_portable assert(interp); \
+                                            assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_write_portable assert(interp); \
+                                             assert(filehandle); \
+                                             assert(s);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/portable.c */
 

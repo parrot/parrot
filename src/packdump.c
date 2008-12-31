@@ -38,6 +38,10 @@ static void PackFile_Constant_dump(PARROT_INTERP,
 static void pobj_flag_dump(PARROT_INTERP, ARGIN_NULLOK(long flags))
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_PackFile_Constant_dump assert(interp); \
+                                           assert(ct); \
+                                           assert(self);
+#define ASSERT_ARGS_pobj_flag_dump assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

@@ -216,6 +216,58 @@ PMC * Parrot_mmd_sort_manhattan_by_sig_pmc(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+#define ASSERT_ARGS_Parrot_build_sig_object_from_varargs assert(interp); \
+                                                         assert(sig);
+#define ASSERT_ARGS_Parrot_mmd_add_multi_from_c_args assert(interp); \
+                                                     assert(sub_name); \
+                                                     assert(short_sig); \
+                                                     assert(long_sig); \
+                                                     assert(multi_func_ptr);
+#define ASSERT_ARGS_Parrot_mmd_add_multi_from_long_sig assert(interp); \
+                                                       assert(sub_name); \
+                                                       assert(long_sig); \
+                                                       assert(sub_obj);
+#define ASSERT_ARGS_Parrot_mmd_add_multi_list_from_c_args assert(interp); \
+                                                          assert(mmd_info);
+#define ASSERT_ARGS_Parrot_mmd_build_type_tuple_from_sig_obj assert(interp); \
+                                                             assert(sig_obj);
+#define ASSERT_ARGS_Parrot_mmd_cache_create assert(interp);
+#define ASSERT_ARGS_Parrot_mmd_cache_destroy assert(interp); \
+                                             assert(cache);
+#define ASSERT_ARGS_Parrot_mmd_cache_lookup_by_types assert(interp); \
+                                                     assert(cache); \
+                                                     assert(name); \
+                                                     assert(types);
+#define ASSERT_ARGS_Parrot_mmd_cache_lookup_by_values assert(interp); \
+                                                      assert(cache); \
+                                                      assert(name); \
+                                                      assert(values);
+#define ASSERT_ARGS_Parrot_mmd_cache_mark assert(interp); \
+                                          assert(cache);
+#define ASSERT_ARGS_Parrot_mmd_cache_store_by_types assert(interp); \
+                                                    assert(cache); \
+                                                    assert(name); \
+                                                    assert(types); \
+                                                    assert(chosen);
+#define ASSERT_ARGS_Parrot_mmd_cache_store_by_values assert(interp); \
+                                                     assert(cache); \
+                                                     assert(name); \
+                                                     assert(values); \
+                                                     assert(chosen);
+#define ASSERT_ARGS_Parrot_mmd_find_multi_from_long_sig assert(interp); \
+                                                        assert(name); \
+                                                        assert(long_sig);
+#define ASSERT_ARGS_Parrot_mmd_find_multi_from_sig_obj assert(interp); \
+                                                       assert(name); \
+                                                       assert(invoke_sig);
+#define ASSERT_ARGS_Parrot_mmd_multi_dispatch_from_c_args assert(interp); \
+                                                          assert(name); \
+                                                          assert(sig);
+#define ASSERT_ARGS_Parrot_mmd_sort_manhattan assert(interp); \
+                                              assert(candidates);
+#define ASSERT_ARGS_Parrot_mmd_sort_manhattan_by_sig_pmc assert(interp); \
+                                                         assert(candidates); \
+                                                         assert(invoke_sig);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/multidispatch.c */
 

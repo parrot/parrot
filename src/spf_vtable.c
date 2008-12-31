@@ -121,6 +121,29 @@ static UHUGEINTVAL getuint_va(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+#define ASSERT_ARGS_getchr_pmc assert(interp); \
+                               assert(obj);
+#define ASSERT_ARGS_getchr_va assert(interp); \
+                              assert(obj);
+#define ASSERT_ARGS_getfloat_pmc assert(interp); \
+                                 assert(obj);
+#define ASSERT_ARGS_getfloat_va assert(interp); \
+                                assert(obj);
+#define ASSERT_ARGS_getint_pmc assert(interp); \
+                               assert(obj);
+#define ASSERT_ARGS_getint_va assert(interp); \
+                              assert(obj);
+#define ASSERT_ARGS_getptr_pmc assert(interp); \
+                               assert(obj);
+#define ASSERT_ARGS_getptr_va assert(obj);
+#define ASSERT_ARGS_getstring_pmc assert(interp); \
+                                  assert(obj);
+#define ASSERT_ARGS_getstring_va assert(interp); \
+                                 assert(obj);
+#define ASSERT_ARGS_getuint_pmc assert(interp); \
+                                assert(obj);
+#define ASSERT_ARGS_getuint_va assert(interp); \
+                               assert(obj);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

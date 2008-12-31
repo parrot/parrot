@@ -32,6 +32,8 @@ static void run_cleanup_action(PARROT_INTERP, ARGIN(Stack_Entry_t *e))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_run_cleanup_action assert(interp); \
+                                       assert(e);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

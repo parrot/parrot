@@ -175,6 +175,54 @@ static PMC * Parrot_mmd_sort_candidates(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+#define ASSERT_ARGS_distance_cmp
+#define ASSERT_ARGS_mmd_add_multi_global assert(interp); \
+                                         assert(sub_name); \
+                                         assert(sub_obj);
+#define ASSERT_ARGS_mmd_add_multi_to_namespace assert(interp); \
+                                               assert(ns_name); \
+                                               assert(sub_name); \
+                                               assert(sub_obj);
+#define ASSERT_ARGS_mmd_build_type_tuple_from_long_sig assert(interp); \
+                                                       assert(long_sig);
+#define ASSERT_ARGS_mmd_build_type_tuple_from_type_list assert(interp); \
+                                                        assert(type_list);
+#define ASSERT_ARGS_mmd_cache_key_from_types assert(interp); \
+                                             assert(name); \
+                                             assert(types);
+#define ASSERT_ARGS_mmd_cache_key_from_values assert(interp); \
+                                              assert(name); \
+                                              assert(values);
+#define ASSERT_ARGS_mmd_cvt_to_types assert(interp); \
+                                     assert(multi_sig);
+#define ASSERT_ARGS_mmd_distance assert(interp); \
+                                 assert(pmc); \
+                                 assert(arg_tuple);
+#define ASSERT_ARGS_mmd_search_by_sig_obj assert(interp); \
+                                          assert(name); \
+                                          assert(sig_obj); \
+                                          assert(candidates);
+#define ASSERT_ARGS_mmd_search_global assert(interp); \
+                                      assert(name); \
+                                      assert(cl);
+#define ASSERT_ARGS_mmd_search_local assert(interp); \
+                                     assert(name); \
+                                     assert(candidates);
+#define ASSERT_ARGS_Parrot_mmd_arg_tuple_func assert(interp);
+#define ASSERT_ARGS_Parrot_mmd_get_cached_multi_sig assert(interp); \
+                                                    assert(sub);
+#define ASSERT_ARGS_Parrot_mmd_maybe_candidate assert(interp); \
+                                               assert(pmc); \
+                                               assert(cl);
+#define ASSERT_ARGS_Parrot_mmd_search_classes assert(interp); \
+                                              assert(meth); \
+                                              assert(arg_tuple); \
+                                              assert(cl);
+#define ASSERT_ARGS_Parrot_mmd_search_scopes assert(interp); \
+                                             assert(meth);
+#define ASSERT_ARGS_Parrot_mmd_sort_candidates assert(interp); \
+                                               assert(arg_tuple); \
+                                               assert(cl);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

@@ -69,6 +69,20 @@ static void rec_climb_back_and_mark(
     ARGIN(parrot_prm_context* c))
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS__drand48
+#define ASSERT_ARGS__erand48
+#define ASSERT_ARGS__jrand48
+#define ASSERT_ARGS__lrand48
+#define ASSERT_ARGS__mrand48
+#define ASSERT_ARGS__nrand48
+#define ASSERT_ARGS__srand48
+#define ASSERT_ARGS_COMPARE assert(interp); \
+                            assert(a); \
+                            assert(b); \
+                            assert(cmp);
+#define ASSERT_ARGS_next_rand
+#define ASSERT_ARGS_process_cycle_without_exit assert(c);
+#define ASSERT_ARGS_rec_climb_back_and_mark assert(c);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

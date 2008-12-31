@@ -173,6 +173,44 @@ PARROT_CANNOT_RETURN_NULL
 static const void * utf8_skip_forward(ARGIN(const void *ptr), UINTVAL n)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_become_encoding assert(interp);
+#define ASSERT_ARGS_bytes assert(src);
+#define ASSERT_ARGS_codepoints assert(interp); \
+                               assert(src);
+#define ASSERT_ARGS_get_byte assert(src);
+#define ASSERT_ARGS_get_bytes assert(interp); \
+                              assert(src);
+#define ASSERT_ARGS_get_bytes_inplace assert(interp);
+#define ASSERT_ARGS_get_codepoint assert(interp); \
+                                  assert(src);
+#define ASSERT_ARGS_get_codepoints assert(interp); \
+                                   assert(src);
+#define ASSERT_ARGS_get_codepoints_inplace assert(interp); \
+                                           assert(src); \
+                                           assert(return_string);
+#define ASSERT_ARGS_iter_init assert(src); \
+                              assert(iter);
+#define ASSERT_ARGS_set_byte assert(interp); \
+                             assert(src);
+#define ASSERT_ARGS_set_bytes assert(interp);
+#define ASSERT_ARGS_set_codepoint assert(interp); \
+                                  assert(src);
+#define ASSERT_ARGS_set_codepoints assert(interp);
+#define ASSERT_ARGS_to_encoding assert(interp); \
+                                assert(src);
+#define ASSERT_ARGS_utf8_characters assert(interp); \
+                                    assert(ptr);
+#define ASSERT_ARGS_utf8_decode assert(interp); \
+                                assert(ptr);
+#define ASSERT_ARGS_utf8_decode_and_advance assert(interp); \
+                                            assert(i);
+#define ASSERT_ARGS_utf8_encode assert(interp); \
+                                assert(ptr);
+#define ASSERT_ARGS_utf8_encode_and_advance assert(interp); \
+                                            assert(i);
+#define ASSERT_ARGS_utf8_set_position assert(i);
+#define ASSERT_ARGS_utf8_skip_backward assert(ptr);
+#define ASSERT_ARGS_utf8_skip_forward assert(ptr);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

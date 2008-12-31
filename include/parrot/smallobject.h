@@ -189,6 +189,22 @@ void Parrot_small_object_pool_merge(PARROT_INTERP,
         FUNC_MODIFIES(*dest)
         FUNC_MODIFIES(*source);
 
+#define ASSERT_ARGS_contained_in_pool assert(pool); \
+                                      assert(ptr);
+#define ASSERT_ARGS_gc_pmc_ext_pool_init assert(pool);
+#define ASSERT_ARGS_new_small_object_pool
+#define ASSERT_ARGS_Parrot_add_to_free_list assert(interp); \
+                                            assert(pool); \
+                                            assert(arena);
+#define ASSERT_ARGS_Parrot_append_arena_in_pool assert(interp); \
+                                                assert(pool); \
+                                                assert(new_arena);
+#define ASSERT_ARGS_Parrot_gc_ms_init assert(interp);
+#define ASSERT_ARGS_Parrot_is_const_pmc assert(interp); \
+                                        assert(pmc);
+#define ASSERT_ARGS_Parrot_small_object_pool_merge assert(interp); \
+                                                   assert(dest); \
+                                                   assert(source);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/smallobject.c */
 

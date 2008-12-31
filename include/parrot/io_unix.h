@@ -110,6 +110,34 @@ size_t Parrot_io_write_unix(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*s);
 
+#define ASSERT_ARGS_Parrot_io_async_unix assert(interp); \
+                                         assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_close_unix assert(interp); \
+                                         assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_fdopen_unix assert(interp); \
+                                          assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_flush_unix assert(interp); \
+                                         assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_getblksize_unix
+#define ASSERT_ARGS_Parrot_io_init_unix assert(interp);
+#define ASSERT_ARGS_Parrot_io_is_closed_unix assert(interp); \
+                                             assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_open_pipe_unix assert(interp); \
+                                             assert(filehandle); \
+                                             assert(command);
+#define ASSERT_ARGS_Parrot_io_open_unix assert(interp); \
+                                        assert(path);
+#define ASSERT_ARGS_Parrot_io_peek_unix assert(interp);
+#define ASSERT_ARGS_Parrot_io_read_unix assert(interp); \
+                                        assert(filehandle); \
+                                        assert(buf);
+#define ASSERT_ARGS_Parrot_io_seek_unix assert(interp); \
+                                        assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_tell_unix assert(interp); \
+                                        assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_write_unix assert(interp); \
+                                         assert(filehandle); \
+                                         assert(s);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/unix.c */
 

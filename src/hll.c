@@ -43,6 +43,7 @@ PARROT_WARN_UNUSED_RESULT
 static PMC* new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_new_hll_entry assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

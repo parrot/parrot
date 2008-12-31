@@ -113,6 +113,33 @@ static void unshift_self(ARGIN(SymReg *sub), ARGIN(SymReg *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_insert_tail_call assert(interp); \
+                                     assert(unit); \
+                                     assert(ins); \
+                                     assert(sub); \
+                                     assert(meth);
+#define ASSERT_ARGS_insINS assert(interp); \
+                           assert(unit); \
+                           assert(ins); \
+                           assert(name); \
+                           assert(regs);
+#define ASSERT_ARGS_move_regs assert(interp); \
+                              assert(unit); \
+                              assert(ins); \
+                              assert(dest); \
+                              assert(src);
+#define ASSERT_ARGS_pcc_get_args assert(interp); \
+                                 assert(unit); \
+                                 assert(ins); \
+                                 assert(op_name);
+#define ASSERT_ARGS_pcc_reg_mov assert(interp); \
+                                assert(vinfo);
+#define ASSERT_ARGS_recursive_tail_call assert(interp); \
+                                        assert(unit); \
+                                        assert(ins); \
+                                        assert(sub);
+#define ASSERT_ARGS_unshift_self assert(sub); \
+                                 assert(obj);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

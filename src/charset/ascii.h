@@ -100,6 +100,29 @@ PARROT_CANNOT_RETURN_NULL
 const CHARSET * Parrot_charset_ascii_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_ascii_compare assert(interp); \
+                                  assert(lhs); \
+                                  assert(rhs);
+#define ASSERT_ARGS_ascii_compute_hash assert(source_string);
+#define ASSERT_ARGS_ascii_cs_index assert(interp); \
+                                   assert(source_string); \
+                                   assert(search_string);
+#define ASSERT_ARGS_ascii_cs_rindex assert(interp); \
+                                    assert(source_string); \
+                                    assert(search_string);
+#define ASSERT_ARGS_ascii_get_graphemes assert(interp); \
+                                        assert(source_string);
+#define ASSERT_ARGS_ascii_get_graphemes_inplace assert(interp); \
+                                                assert(source_string); \
+                                                assert(dest_string);
+#define ASSERT_ARGS_charset_cvt_ascii_to_binary assert(interp); \
+                                                assert(src);
+#define ASSERT_ARGS_charset_cvt_ascii_to_iso_8859_1 assert(interp); \
+                                                    assert(src);
+#define ASSERT_ARGS_mixed_cs_index assert(interp); \
+                                   assert(src); \
+                                   assert(search);
+#define ASSERT_ARGS_Parrot_charset_ascii_init assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/charset/ascii.c */
 

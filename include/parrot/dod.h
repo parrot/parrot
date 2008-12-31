@@ -134,6 +134,33 @@ void used_cow(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int cleanup)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
+#define ASSERT_ARGS_pobject_lives assert(interp); \
+                                  assert(obj);
+#define ASSERT_ARGS_clear_cow assert(interp); \
+                              assert(pool);
+#define ASSERT_ARGS_Parrot_do_dod_run assert(interp);
+#define ASSERT_ARGS_Parrot_dod_clear_live_bits assert(interp);
+#define ASSERT_ARGS_Parrot_dod_free_buffer assert(pool); \
+                                           assert(b);
+#define ASSERT_ARGS_Parrot_dod_free_buffer_malloc assert(b);
+#define ASSERT_ARGS_Parrot_dod_free_pmc assert(interp); \
+                                        assert(p);
+#define ASSERT_ARGS_Parrot_dod_free_sysmem assert(b);
+#define ASSERT_ARGS_Parrot_dod_ms_run assert(interp);
+#define ASSERT_ARGS_Parrot_dod_ms_run_init assert(interp);
+#define ASSERT_ARGS_Parrot_dod_profile_end assert(interp);
+#define ASSERT_ARGS_Parrot_dod_profile_start assert(interp);
+#define ASSERT_ARGS_Parrot_dod_sweep assert(interp); \
+                                     assert(pool);
+#define ASSERT_ARGS_Parrot_dod_trace_children assert(interp);
+#define ASSERT_ARGS_Parrot_dod_trace_pmc_data assert(interp); \
+                                              assert(p);
+#define ASSERT_ARGS_Parrot_dod_trace_root assert(interp);
+#define ASSERT_ARGS_Parrot_free_pmc_ext assert(interp); \
+                                        assert(p);
+#define ASSERT_ARGS_trace_mem_block assert(interp);
+#define ASSERT_ARGS_used_cow assert(interp); \
+                             assert(pool);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/dod.c */
 
@@ -144,6 +171,7 @@ void used_cow(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int cleanup)
 void trace_system_areas(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_trace_system_areas assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/cpu_dep.c */
 
@@ -190,6 +218,19 @@ void parrot_gc_gms_wb_key(PARROT_INTERP,
         __attribute__nonnull__(5)
         __attribute__nonnull__(6);
 
+#define ASSERT_ARGS_Parrot_gc_gms_init assert(interp);
+#define ASSERT_ARGS_parrot_gc_gms_pobject_lives assert(interp); \
+                                                assert(obj);
+#define ASSERT_ARGS_parrot_gc_gms_wb assert(interp); \
+                                     assert(agg); \
+                                     assert(old); \
+                                     assert(_new);
+#define ASSERT_ARGS_parrot_gc_gms_wb_key assert(interp); \
+                                         assert(agg); \
+                                         assert(old); \
+                                         assert(old_key); \
+                                         assert(_new); \
+                                         assert(new_key);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/gc_gms.c */
 
@@ -206,6 +247,10 @@ void Parrot_dod_ims_wb(PARROT_INTERP, ARGMOD(PMC *agg), ARGMOD(PMC *_new))
 void Parrot_gc_ims_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_Parrot_dod_ims_wb assert(interp); \
+                                      assert(agg); \
+                                      assert(_new);
+#define ASSERT_ARGS_Parrot_gc_ims_init assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/gc_ims.c */
 

@@ -96,6 +96,30 @@ size_t Parrot_io_write_win32(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+#define ASSERT_ARGS_Parrot_io_close_win32 assert(interp); \
+                                          assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_fdopen_win32 assert(interp);
+#define ASSERT_ARGS_Parrot_io_flush_win32 assert(interp); \
+                                          assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_getblksize_win32
+#define ASSERT_ARGS_Parrot_io_init_win32 assert(interp);
+#define ASSERT_ARGS_Parrot_io_is_closed_win32 assert(interp); \
+                                              assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_open_pipe_win32 assert(interp);
+#define ASSERT_ARGS_Parrot_io_open_win32 assert(interp); \
+                                         assert(filehandle); \
+                                         assert(path);
+#define ASSERT_ARGS_Parrot_io_peek_win32 assert(interp);
+#define ASSERT_ARGS_Parrot_io_read_win32 assert(interp); \
+                                         assert(filehandle); \
+                                         assert(buf);
+#define ASSERT_ARGS_Parrot_io_seek_win32 assert(interp); \
+                                         assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_tell_win32 assert(interp); \
+                                         assert(filehandle);
+#define ASSERT_ARGS_Parrot_io_write_win32 assert(interp); \
+                                          assert(filehandle); \
+                                          assert(s);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/win32.c */
 

@@ -84,6 +84,29 @@ int pre_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
+#define ASSERT_ARGS_cfg_optimize assert(interp); \
+                                 assert(unit);
+#define ASSERT_ARGS_find_outer assert(unit); \
+                               assert(blk);
+#define ASSERT_ARGS_get_neg_op assert(op); \
+                               assert(n);
+#define ASSERT_ARGS_IMCC_subst_constants assert(interp); \
+                                         assert(unit); \
+                                         assert(name); \
+                                         assert(r); \
+                                         assert(ok);
+#define ASSERT_ARGS_IMCC_subst_constants_umix assert(interp); \
+                                              assert(unit); \
+                                              assert(name); \
+                                              assert(r);
+#define ASSERT_ARGS_move_ins_out assert(interp); \
+                                 assert(unit); \
+                                 assert(ins); \
+                                 assert(bb);
+#define ASSERT_ARGS_optimize assert(interp); \
+                             assert(unit);
+#define ASSERT_ARGS_pre_optimize assert(interp); \
+                                 assert(unit);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/optimizer.c */
 

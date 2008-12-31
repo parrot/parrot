@@ -97,6 +97,12 @@ PARROT_CANNOT_RETURN_NULL
 IMC_Unit * imc_open_unit(PARROT_INTERP, IMC_Unit_Type t)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_imc_cleanup assert(interp);
+#define ASSERT_ARGS_imc_compile_all_units assert(interp);
+#define ASSERT_ARGS_imc_compile_unit assert(interp); \
+                                     assert(unit);
+#define ASSERT_ARGS_imc_close_unit assert(interp);
+#define ASSERT_ARGS_imc_open_unit assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/imc.c */
 
@@ -119,6 +125,11 @@ unsigned int ig_test(int i, int j, int N, ARGIN(unsigned int *graph))
 void imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_free_reglist assert(unit);
+#define ASSERT_ARGS_graph_coloring_reg_alloc assert(interp); \
+                                             assert(unit);
+#define ASSERT_ARGS_ig_test assert(graph);
+#define ASSERT_ARGS_imc_reg_alloc assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/reg_alloc.c */
 
@@ -323,6 +334,57 @@ int try_find_op(PARROT_INTERP,
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*r);
 
+#define ASSERT_ARGS_do_yylex_init assert(interp); \
+                                  assert(yyscanner);
+#define ASSERT_ARGS_imcc_destroy assert(interp);
+#define ASSERT_ARGS_imcc_init assert(interp);
+#define ASSERT_ARGS_check_op assert(interp); \
+                             assert(fullname); \
+                             assert(name); \
+                             assert(r);
+#define ASSERT_ARGS_imcc_compile assert(interp); \
+                                 assert(s); \
+                                 assert(error_message);
+#define ASSERT_ARGS_IMCC_compile_file assert(interp); \
+                                      assert(s);
+#define ASSERT_ARGS_IMCC_compile_file_s assert(interp); \
+                                        assert(s); \
+                                        assert(error_message);
+#define ASSERT_ARGS_imcc_compile_pasm assert(interp); \
+                                      assert(s);
+#define ASSERT_ARGS_imcc_compile_pasm_ex assert(interp); \
+                                         assert(s);
+#define ASSERT_ARGS_IMCC_compile_pasm_s assert(interp); \
+                                        assert(s); \
+                                        assert(error_message);
+#define ASSERT_ARGS_imcc_compile_pir assert(interp); \
+                                     assert(s);
+#define ASSERT_ARGS_imcc_compile_pir_ex assert(interp); \
+                                        assert(s);
+#define ASSERT_ARGS_IMCC_compile_pir_s assert(interp); \
+                                       assert(s); \
+                                       assert(error_message);
+#define ASSERT_ARGS_imcc_vfprintf assert(interp); \
+                                  assert(io); \
+                                  assert(format);
+#define ASSERT_ARGS_iNEW assert(interp); \
+                         assert(unit); \
+                         assert(r0); \
+                         assert(type);
+#define ASSERT_ARGS_INS assert(interp); \
+                        assert(unit); \
+                        assert(name); \
+                        assert(r);
+#define ASSERT_ARGS_is_op assert(interp); \
+                          assert(name);
+#define ASSERT_ARGS_op_fullname assert(dest); \
+                                assert(name); \
+                                assert(args);
+#define ASSERT_ARGS_register_compilers assert(interp);
+#define ASSERT_ARGS_try_find_op assert(interp); \
+                                assert(unit); \
+                                assert(name); \
+                                assert(r);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/parser_util.c */
 
@@ -371,6 +433,19 @@ SymReg* get_pasm_reg(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_expand_pcc_sub assert(interp); \
+                                   assert(unit); \
+                                   assert(ins);
+#define ASSERT_ARGS_expand_pcc_sub_call assert(interp); \
+                                        assert(unit); \
+                                        assert(ins);
+#define ASSERT_ARGS_expand_pcc_sub_ret assert(interp); \
+                                       assert(unit); \
+                                       assert(ins);
+#define ASSERT_ARGS_get_const assert(interp); \
+                              assert(name);
+#define ASSERT_ARGS_get_pasm_reg assert(interp); \
+                                 assert(name);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/pcc.c */
 

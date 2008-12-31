@@ -44,6 +44,11 @@ PMC * Parrot_load_lib(PARROT_INTERP,
     SHIM(PMC *initializer))
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_Parrot_clone_lib_into assert(d); \
+                                          assert(s); \
+                                          assert(lib_pmc);
+#define ASSERT_ARGS_Parrot_init_lib assert(interp);
+#define ASSERT_ARGS_Parrot_load_lib assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/dynext.c */
 

@@ -51,6 +51,12 @@ static opcode_t * pass_exception_args(PARROT_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
+#define ASSERT_ARGS_build_exception_from_args assert(interp); \
+                                              assert(format);
+#define ASSERT_ARGS_pass_exception_args assert(interp); \
+                                        assert(sig); \
+                                        assert(dest); \
+                                        assert(old_ctx);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

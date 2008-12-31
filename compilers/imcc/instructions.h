@@ -219,6 +219,40 @@ void subst_ins(
         FUNC_MODIFIES(*ins)
         FUNC_MODIFIES(*tmp);
 
+#define ASSERT_ARGS_emit_close assert(interp);
+#define ASSERT_ARGS_emit_flush assert(interp); \
+                               assert(unit);
+#define ASSERT_ARGS_emit_open assert(interp);
+#define ASSERT_ARGS__delete_ins assert(unit); \
+                                assert(ins);
+#define ASSERT_ARGS__mk_instruction assert(op); \
+                                    assert(fmt); \
+                                    assert(r);
+#define ASSERT_ARGS_delete_ins assert(unit); \
+                               assert(ins);
+#define ASSERT_ARGS_emitb assert(interp);
+#define ASSERT_ARGS_free_ins assert(ins);
+#define ASSERT_ARGS_get_branch_reg assert(ins);
+#define ASSERT_ARGS_get_branch_regno assert(ins);
+#define ASSERT_ARGS_imcc_init_tables assert(interp);
+#define ASSERT_ARGS_ins_print assert(interp); \
+                              assert(io); \
+                              assert(ins);
+#define ASSERT_ARGS_ins_writes2 assert(ins);
+#define ASSERT_ARGS_insert_ins assert(unit); \
+                               assert(tmp);
+#define ASSERT_ARGS_instruction_reads assert(ins); \
+                                      assert(r);
+#define ASSERT_ARGS_instruction_writes assert(ins); \
+                                       assert(r);
+#define ASSERT_ARGS_move_ins assert(unit); \
+                             assert(ins); \
+                             assert(to);
+#define ASSERT_ARGS_prepend_ins assert(unit); \
+                                assert(tmp);
+#define ASSERT_ARGS_subst_ins assert(unit); \
+                              assert(ins); \
+                              assert(tmp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/instructions.c */
 

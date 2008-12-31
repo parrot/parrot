@@ -98,6 +98,24 @@ static void usage(ARGMOD(FILE *fp))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*fp);
 
+#define ASSERT_ARGS_compile_to_bytecode assert(interp); \
+                                        assert(sourcefile);
+#define ASSERT_ARGS_determine_input_file_type assert(interp); \
+                                              assert(sourcefile);
+#define ASSERT_ARGS_determine_output_file_type assert(interp); \
+                                               assert(obj_file); \
+                                               assert(output_file);
+#define ASSERT_ARGS_do_pre_process assert(interp);
+#define ASSERT_ARGS_help
+#define ASSERT_ARGS_help_debug
+#define ASSERT_ARGS_imcc_get_optimization_description assert(opt_desc);
+#define ASSERT_ARGS_imcc_run_pbc assert(interp); \
+                                 assert(argv);
+#define ASSERT_ARGS_imcc_write_pbc assert(interp); \
+                                   assert(output_file);
+#define ASSERT_ARGS_is_all_hex_digits assert(s);
+#define ASSERT_ARGS_Parrot_version assert(interp);
+#define ASSERT_ARGS_usage assert(fp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

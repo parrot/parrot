@@ -41,6 +41,7 @@ static unsigned int parrot_config_size_stored = 0;
 static void parrot_set_config_hash_interpreter(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_parrot_set_config_hash_interpreter assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

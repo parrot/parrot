@@ -70,6 +70,22 @@ Set * set_union(ARGIN(const Set *s1), ARGIN(const Set *s2))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_set_add assert(s);
+#define ASSERT_ARGS_set_clear assert(s);
+#define ASSERT_ARGS_set_contains assert(s);
+#define ASSERT_ARGS_set_copy assert(s);
+#define ASSERT_ARGS_set_equal assert(s1); \
+                              assert(s2);
+#define ASSERT_ARGS_set_first_zero assert(s);
+#define ASSERT_ARGS_set_free assert(s);
+#define ASSERT_ARGS_set_intersec assert(s1); \
+                                 assert(s2);
+#define ASSERT_ARGS_set_intersec_inplace assert(s1); \
+                                         assert(s2);
+#define ASSERT_ARGS_set_make
+#define ASSERT_ARGS_set_make_full
+#define ASSERT_ARGS_set_union assert(s1); \
+                              assert(s2);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/sets.c */
 

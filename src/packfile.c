@@ -317,6 +317,85 @@ static int sub_pragma(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+#define ASSERT_ARGS_byte_code_destroy assert(self);
+#define ASSERT_ARGS_byte_code_new
+#define ASSERT_ARGS_clone_constant assert(interp); \
+                                   assert(old_const);
+#define ASSERT_ARGS_const_destroy assert(interp); \
+                                  assert(self);
+#define ASSERT_ARGS_const_new
+#define ASSERT_ARGS_create_seg assert(interp); \
+                               assert(dir); \
+                               assert(name); \
+                               assert(file_name);
+#define ASSERT_ARGS_default_destroy assert(self);
+#define ASSERT_ARGS_default_dump assert(interp); \
+                                 assert(self);
+#define ASSERT_ARGS_default_pack assert(self); \
+                                 assert(dest);
+#define ASSERT_ARGS_default_packed_size assert(self);
+#define ASSERT_ARGS_default_unpack assert(self); \
+                                   assert(cursor);
+#define ASSERT_ARGS_directory_destroy assert(interp); \
+                                      assert(self);
+#define ASSERT_ARGS_directory_dump assert(interp); \
+                                   assert(self);
+#define ASSERT_ARGS_directory_new
+#define ASSERT_ARGS_directory_pack assert(interp); \
+                                   assert(self); \
+                                   assert(cursor);
+#define ASSERT_ARGS_directory_packed_size assert(interp); \
+                                          assert(self);
+#define ASSERT_ARGS_directory_unpack assert(interp); \
+                                     assert(segp); \
+                                     assert(cursor);
+#define ASSERT_ARGS_do_1_sub_pragma assert(interp); \
+                                    assert(sub_pmc);
+#define ASSERT_ARGS_find_const_iter assert(interp); \
+                                    assert(seg);
+#define ASSERT_ARGS_find_constants assert(interp); \
+                                   assert(ct);
+#define ASSERT_ARGS_find_fixup assert(ft); \
+                               assert(name);
+#define ASSERT_ARGS_find_fixup_iter assert(interp); \
+                                    assert(seg); \
+                                    assert(user_data);
+#define ASSERT_ARGS_fixup_destroy assert(interp); \
+                                  assert(self);
+#define ASSERT_ARGS_fixup_new
+#define ASSERT_ARGS_fixup_pack assert(interp); \
+                               assert(self); \
+                               assert(cursor);
+#define ASSERT_ARGS_fixup_packed_size assert(interp); \
+                                      assert(self);
+#define ASSERT_ARGS_fixup_unpack assert(interp); \
+                                 assert(seg); \
+                                 assert(cursor);
+#define ASSERT_ARGS_make_code_pointers assert(seg);
+#define ASSERT_ARGS_mark_1_seg assert(interp); \
+                               assert(ct);
+#define ASSERT_ARGS_PackFile_append_pbc assert(interp);
+#define ASSERT_ARGS_PackFile_set_header assert(header);
+#define ASSERT_ARGS_pf_debug_destroy assert(self);
+#define ASSERT_ARGS_pf_debug_dump assert(interp); \
+                                  assert(self);
+#define ASSERT_ARGS_pf_debug_new
+#define ASSERT_ARGS_pf_debug_pack assert(self); \
+                                  assert(cursor);
+#define ASSERT_ARGS_pf_debug_packed_size assert(self);
+#define ASSERT_ARGS_pf_debug_unpack assert(interp); \
+                                    assert(self); \
+                                    assert(cursor);
+#define ASSERT_ARGS_pf_register_standard_funcs assert(interp); \
+                                               assert(pf);
+#define ASSERT_ARGS_run_sub assert(interp); \
+                            assert(sub_pmc);
+#define ASSERT_ARGS_segment_init assert(self); \
+                                 assert(pf); \
+                                 assert(name);
+#define ASSERT_ARGS_sort_segs assert(dir);
+#define ASSERT_ARGS_sub_pragma assert(interp); \
+                               assert(sub_pmc);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

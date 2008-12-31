@@ -37,6 +37,8 @@ PARROT_CANNOT_RETURN_NULL
 static const char * convert_flags_to_stdio(INTVAL flags);
 
 static INTVAL io_is_tty_portable(PIOHANDLE fptr);
+#define ASSERT_ARGS_convert_flags_to_stdio
+#define ASSERT_ARGS_io_is_tty_portable
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

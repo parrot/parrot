@@ -194,6 +194,41 @@ static int pass_str(PARROT_INTERP,
         __attribute__nonnull__(6)
         FUNC_MODIFIES(*dest_base);
 
+#define ASSERT_ARGS_is_pic_func assert(interp); \
+                                assert(pc); \
+                                assert(mic);
+#define ASSERT_ARGS_is_pic_param assert(interp); \
+                                 assert(pc); \
+                                 assert(mic);
+#define ASSERT_ARGS_parrot_pic_move assert(interp); \
+                                    assert(mic);
+#define ASSERT_ARGS_pass_int assert(sig); \
+                             assert(src_base); \
+                             assert(src); \
+                             assert(dest_base); \
+                             assert(dest);
+#define ASSERT_ARGS_pass_mixed assert(interp); \
+                               assert(sig); \
+                               assert(src_base); \
+                               assert(src); \
+                               assert(dest_base); \
+                               assert(dest);
+#define ASSERT_ARGS_pass_num assert(sig); \
+                             assert(src_base); \
+                             assert(src); \
+                             assert(dest_base); \
+                             assert(dest);
+#define ASSERT_ARGS_pass_pmc assert(sig); \
+                             assert(src_base); \
+                             assert(src); \
+                             assert(dest_base); \
+                             assert(dest);
+#define ASSERT_ARGS_pass_str assert(interp); \
+                             assert(sig); \
+                             assert(src_base); \
+                             assert(src); \
+                             assert(dest_base); \
+                             assert(dest);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

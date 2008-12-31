@@ -64,6 +64,18 @@ static void invalidate_all_caches(PARROT_INTERP)
 static void invalidate_type_caches(PARROT_INTERP, UINTVAL type)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_C3_merge assert(interp); \
+                             assert(merge_list);
+#define ASSERT_ARGS_debug_trace_find_meth assert(interp); \
+                                          assert(_class); \
+                                          assert(name);
+#define ASSERT_ARGS_fail_if_type_exists assert(interp); \
+                                        assert(name);
+#define ASSERT_ARGS_find_method_direct_1 assert(interp); \
+                                         assert(_class); \
+                                         assert(method_name);
+#define ASSERT_ARGS_invalidate_all_caches assert(interp);
+#define ASSERT_ARGS_invalidate_type_caches assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -483,7 +495,7 @@ Parrot_class_lookup_p(PARROT_INTERP, ARGIN(PMC *class_name))
 
 /*
 
-=item C<static void fail_if_type_exists>
+=item C<static INTVAL fail_if_type_exists>
 
 This function throws an exception if a PMC or class with the same name *
 already exists in the global type registry. The global type registry

@@ -86,6 +86,16 @@ void Parrot_STM_waitlist_signal(PARROT_INTERP,
 void Parrot_STM_waitlist_wait(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_Parrot_STM_tx_log_get assert(interp);
+#define ASSERT_ARGS_Parrot_STM_waitlist_add_self assert(interp); \
+                                                 assert(waitlist);
+#define ASSERT_ARGS_Parrot_STM_waitlist_destroy_thread assert(interp);
+#define ASSERT_ARGS_Parrot_STM_waitlist_init assert(interp); \
+                                             assert(waitlist);
+#define ASSERT_ARGS_Parrot_STM_waitlist_remove_all assert(interp);
+#define ASSERT_ARGS_Parrot_STM_waitlist_signal assert(interp); \
+                                               assert(waitlist);
+#define ASSERT_ARGS_Parrot_STM_waitlist_wait assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/stm/waitlist.c */
 

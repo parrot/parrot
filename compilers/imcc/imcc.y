@@ -221,6 +221,68 @@ static void set_lexical(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*r);
 
+#define ASSERT_ARGS_add_pcc_named_arg assert(interp); \
+                                      assert(cur_call); \
+                                      assert(name); \
+                                      assert(value);
+#define ASSERT_ARGS_add_pcc_named_param assert(interp); \
+                                        assert(cur_call); \
+                                        assert(name); \
+                                        assert(value);
+#define ASSERT_ARGS_add_pcc_named_result assert(interp); \
+                                         assert(cur_call); \
+                                         assert(name); \
+                                         assert(value);
+#define ASSERT_ARGS_add_pcc_named_return assert(interp); \
+                                         assert(cur_call); \
+                                         assert(name); \
+                                         assert(value);
+#define ASSERT_ARGS_adv_named_set assert(interp); \
+                                  assert(name);
+#define ASSERT_ARGS_begin_return_or_yield assert(interp);
+#define ASSERT_ARGS_clear_state assert(interp);
+#define ASSERT_ARGS_do_loadlib assert(interp); \
+                               assert(lib);
+#define ASSERT_ARGS_func_ins assert(interp); \
+                             assert(unit); \
+                             assert(lhs); \
+                             assert(op); \
+                             assert(r);
+#define ASSERT_ARGS_iINDEXFETCH assert(interp); \
+                                assert(unit); \
+                                assert(r0); \
+                                assert(r1); \
+                                assert(r2);
+#define ASSERT_ARGS_iINDEXSET assert(interp); \
+                              assert(unit); \
+                              assert(r0); \
+                              assert(r1); \
+                              assert(r2);
+#define ASSERT_ARGS_iLABEL assert(interp); \
+                           assert(r0);
+#define ASSERT_ARGS_inv_op assert(op);
+#define ASSERT_ARGS_iSUBROUTINE assert(interp); \
+                                assert(r);
+#define ASSERT_ARGS_MK_I assert(interp); \
+                         assert(unit); \
+                         assert(fmt);
+#define ASSERT_ARGS_mk_pmc_const assert(interp); \
+                                 assert(unit); \
+                                 assert(type); \
+                                 assert(left); \
+                                 assert(constant);
+#define ASSERT_ARGS_mk_pmc_const_named assert(interp); \
+                                       assert(unit); \
+                                       assert(name); \
+                                       assert(left); \
+                                       assert(constant);
+#define ASSERT_ARGS_mk_sub_address_fromc assert(interp); \
+                                         assert(name);
+#define ASSERT_ARGS_mk_sub_address_u assert(interp); \
+                                     assert(name);
+#define ASSERT_ARGS_set_lexical assert(interp); \
+                                assert(r); \
+                                assert(name);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

@@ -69,10 +69,6 @@ PARROT_CANNOT_RETURN_NULL
 PMC * pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 
-INTVAL
-get_new_vtable_index(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 PARROT_EXPORT
 INTVAL pmc_register(PARROT_INTERP, ARGIN(STRING *name))
         __attribute__nonnull__(1)
@@ -110,6 +106,29 @@ PARROT_CANNOT_RETURN_NULL
 PMC * temporary_pmc_new(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_constant_pmc_new assert(interp);
+#define ASSERT_ARGS_constant_pmc_new_init assert(interp);
+#define ASSERT_ARGS_constant_pmc_new_noinit assert(interp);
+#define ASSERT_ARGS_dod_register_pmc assert(interp); \
+                                     assert(pmc);
+#define ASSERT_ARGS_Parrot_create_mro assert(interp);
+#define ASSERT_ARGS_PMC_is_null
+#define ASSERT_ARGS_pmc_new assert(interp);
+#define ASSERT_ARGS_pmc_new_init assert(interp); \
+                                 assert(init);
+#define ASSERT_ARGS_pmc_new_noinit assert(interp);
+#define ASSERT_ARGS_pmc_register assert(interp); \
+                                 assert(name);
+#define ASSERT_ARGS_pmc_reuse assert(interp); \
+                              assert(pmc);
+#define ASSERT_ARGS_pmc_type assert(interp);
+#define ASSERT_ARGS_pmc_type_p assert(interp); \
+                               assert(name);
+#define ASSERT_ARGS_dod_unregister_pmc assert(interp); \
+                                       assert(pmc);
+#define ASSERT_ARGS_temporary_pmc_free assert(interp); \
+                                       assert(pmc);
+#define ASSERT_ARGS_temporary_pmc_new assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pmc.c */
 

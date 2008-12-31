@@ -188,6 +188,44 @@ static void * wait_for_version(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*log);
 
+#define ASSERT_ARGS_alloc_read assert(interp); \
+                               assert(log);
+#define ASSERT_ARGS_alloc_write assert(interp); \
+                                assert(log);
+#define ASSERT_ARGS_do_partial_abort assert(interp); \
+                                     assert(log); \
+                                     assert(inner);
+#define ASSERT_ARGS_do_real_abort assert(interp); \
+                                  assert(log); \
+                                  assert(inner);
+#define ASSERT_ARGS_do_real_commit assert(interp); \
+                                   assert(log);
+#define ASSERT_ARGS_find_write_record assert(interp);
+#define ASSERT_ARGS_force_sharing assert(interp);
+#define ASSERT_ARGS_get_read assert(log);
+#define ASSERT_ARGS_get_read_valid_depth assert(interp); \
+                                         assert(log);
+#define ASSERT_ARGS_get_sublog assert(log);
+#define ASSERT_ARGS_get_write assert(log);
+#define ASSERT_ARGS_is_aborted assert(log);
+#define ASSERT_ARGS_is_version assert(maybe_version);
+#define ASSERT_ARGS_local_pmc_copy assert(interp);
+#define ASSERT_ARGS_mark_read_record assert(interp); \
+                                     assert(read);
+#define ASSERT_ARGS_mark_write_record assert(interp); \
+                                      assert(write);
+#define ASSERT_ARGS_merge_transactions assert(interp); \
+                                       assert(log); \
+                                       assert(outer); \
+                                       assert(inner);
+#define ASSERT_ARGS_next_version assert(old_version);
+#define ASSERT_ARGS_replay_writes assert(interp); \
+                                  assert(log);
+#define ASSERT_ARGS_safe_to_clone assert(original);
+#define ASSERT_ARGS_setup_wait assert(interp); \
+                               assert(log);
+#define ASSERT_ARGS_wait_for_version assert(interp); \
+                                     assert(log);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

@@ -103,6 +103,26 @@ static opcode_t * wait_for_wakeup(PARROT_INTERP,
     ARGIN_NULLOK(opcode_t *next))
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_do_event assert(interp); \
+                             assert(event);
+#define ASSERT_ARGS_dup_entry assert(entry);
+#define ASSERT_ARGS_dup_entry_interval assert(entry);
+#define ASSERT_ARGS_event_thread assert(data);
+#define ASSERT_ARGS_event_to_exception assert(interp); \
+                                       assert(event);
+#define ASSERT_ARGS_init_events_all assert(interp);
+#define ASSERT_ARGS_init_events_first assert(interp);
+#define ASSERT_ARGS_io_thread
+#define ASSERT_ARGS_io_thread_ready_rd assert(ios);
+#define ASSERT_ARGS_Parrot_sigaction assert(handler);
+#define ASSERT_ARGS_Parrot_unblock_signal
+#define ASSERT_ARGS_process_events assert(event_q);
+#define ASSERT_ARGS_schedule_signal_event
+#define ASSERT_ARGS_sig_handler
+#define ASSERT_ARGS_stop_io_thread
+#define ASSERT_ARGS_store_io_event assert(ios); \
+                                   assert(ev);
+#define ASSERT_ARGS_wait_for_wakeup assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

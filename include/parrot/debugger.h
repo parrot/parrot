@@ -353,6 +353,66 @@ void PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_Parrot_debugger_break assert(interp); \
+                                          assert(cur_opcode);
+#define ASSERT_ARGS_Parrot_debugger_destroy assert(interp);
+#define ASSERT_ARGS_Parrot_debugger_init assert(interp);
+#define ASSERT_ARGS_Parrot_debugger_load assert(interp);
+#define ASSERT_ARGS_Parrot_debugger_start assert(interp); \
+                                          assert(cur_opcode);
+#define ASSERT_ARGS_PDB_load_source assert(interp); \
+                                    assert(command);
+#define ASSERT_ARGS_PDB_script_file assert(interp); \
+                                    assert(command);
+#define ASSERT_ARGS_PDB_add_label assert(file); \
+                                  assert(cur_opcode);
+#define ASSERT_ARGS_PDB_backtrace assert(interp);
+#define ASSERT_ARGS_PDB_break assert(interp);
+#define ASSERT_ARGS_PDB_check_condition assert(interp); \
+                                        assert(condition);
+#define ASSERT_ARGS_PDB_compile assert(interp); \
+                                assert(command);
+#define ASSERT_ARGS_PDB_cond assert(interp); \
+                             assert(command);
+#define ASSERT_ARGS_PDB_continue assert(interp);
+#define ASSERT_ARGS_PDB_delete_breakpoint assert(interp); \
+                                          assert(command);
+#define ASSERT_ARGS_PDB_delete_condition assert(breakpoint);
+#define ASSERT_ARGS_PDB_disable_breakpoint assert(interp); \
+                                           assert(command);
+#define ASSERT_ARGS_PDB_disassemble assert(interp);
+#define ASSERT_ARGS_PDB_disassemble_op assert(interp); \
+                                       assert(dest); \
+                                       assert(info); \
+                                       assert(op);
+#define ASSERT_ARGS_PDB_enable_breakpoint assert(interp); \
+                                          assert(command);
+#define ASSERT_ARGS_PDB_escape assert(string);
+#define ASSERT_ARGS_PDB_eval assert(interp); \
+                             assert(command);
+#define ASSERT_ARGS_PDB_find_breakpoint assert(interp); \
+                                        assert(command);
+#define ASSERT_ARGS_PDB_free_file
+#define ASSERT_ARGS_PDB_get_command assert(interp);
+#define ASSERT_ARGS_PDB_hasinstruction assert(c);
+#define ASSERT_ARGS_PDB_help assert(interp); \
+                             assert(command);
+#define ASSERT_ARGS_PDB_info assert(interp);
+#define ASSERT_ARGS_PDB_init assert(interp);
+#define ASSERT_ARGS_PDB_list assert(interp); \
+                             assert(command);
+#define ASSERT_ARGS_PDB_next assert(interp);
+#define ASSERT_ARGS_PDB_print assert(interp); \
+                              assert(command);
+#define ASSERT_ARGS_PDB_program_end assert(interp);
+#define ASSERT_ARGS_PDB_run_command assert(interp); \
+                                    assert(command);
+#define ASSERT_ARGS_PDB_set_break assert(interp);
+#define ASSERT_ARGS_PDB_skip_breakpoint assert(interp);
+#define ASSERT_ARGS_PDB_trace assert(interp);
+#define ASSERT_ARGS_PDB_unescape assert(string);
+#define ASSERT_ARGS_PDB_watchpoint assert(interp); \
+                                   assert(command);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/debug.c */
 

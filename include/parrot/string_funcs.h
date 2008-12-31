@@ -536,6 +536,113 @@ STRING* uint_to_str(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*tc);
 
+#define ASSERT_ARGS_const_string assert(interp); \
+                                 assert(buffer);
+#define ASSERT_ARGS_Parrot_make_COW_reference assert(interp); \
+                                              assert(s);
+#define ASSERT_ARGS_Parrot_reuse_COW_reference assert(s); \
+                                               assert(d);
+#define ASSERT_ARGS_Parrot_string_cstring assert(str);
+#define ASSERT_ARGS_Parrot_string_find_cclass assert(interp);
+#define ASSERT_ARGS_Parrot_string_find_not_cclass assert(interp);
+#define ASSERT_ARGS_Parrot_string_is_cclass assert(interp); \
+                                            assert(s);
+#define ASSERT_ARGS_Parrot_string_split assert(interp);
+#define ASSERT_ARGS_Parrot_string_trans_charset assert(interp);
+#define ASSERT_ARGS_Parrot_string_trans_encoding assert(interp);
+#define ASSERT_ARGS_Parrot_unmake_COW assert(interp); \
+                                      assert(s);
+#define ASSERT_ARGS_string_append assert(interp);
+#define ASSERT_ARGS_string_bitwise_and assert(interp);
+#define ASSERT_ARGS_string_bitwise_not assert(interp);
+#define ASSERT_ARGS_string_bitwise_or assert(interp);
+#define ASSERT_ARGS_string_bitwise_xor assert(interp);
+#define ASSERT_ARGS_string_bool assert(interp);
+#define ASSERT_ARGS_string_capacity assert(s);
+#define ASSERT_ARGS_string_chopn assert(interp); \
+                                 assert(s);
+#define ASSERT_ARGS_string_chopn_inplace assert(interp); \
+                                         assert(s);
+#define ASSERT_ARGS_string_chr assert(interp);
+#define ASSERT_ARGS_string_compare assert(interp);
+#define ASSERT_ARGS_string_compose assert(interp);
+#define ASSERT_ARGS_string_compute_strlen assert(interp); \
+                                          assert(s);
+#define ASSERT_ARGS_string_concat assert(interp);
+#define ASSERT_ARGS_string_copy assert(interp); \
+                                assert(s);
+#define ASSERT_ARGS_string_cstring_free
+#define ASSERT_ARGS_string_deinit assert(interp);
+#define ASSERT_ARGS_string_downcase assert(interp); \
+                                    assert(s);
+#define ASSERT_ARGS_string_downcase_inplace assert(interp); \
+                                            assert(s);
+#define ASSERT_ARGS_string_equal assert(interp);
+#define ASSERT_ARGS_string_escape_string assert(interp);
+#define ASSERT_ARGS_string_escape_string_delimited assert(interp);
+#define ASSERT_ARGS_string_from_cstring assert(interp);
+#define ASSERT_ARGS_string_from_int assert(interp);
+#define ASSERT_ARGS_string_from_num assert(interp);
+#define ASSERT_ARGS_string_grow assert(interp); \
+                                assert(s);
+#define ASSERT_ARGS_string_hash assert(interp);
+#define ASSERT_ARGS_string_increment assert(interp); \
+                                     assert(s);
+#define ASSERT_ARGS_string_index assert(interp); \
+                                 assert(s);
+#define ASSERT_ARGS_string_init assert(interp);
+#define ASSERT_ARGS_string_join assert(interp); \
+                                assert(ar);
+#define ASSERT_ARGS_string_length assert(s);
+#define ASSERT_ARGS_string_make assert(interp);
+#define ASSERT_ARGS_string_make_direct assert(interp); \
+                                       assert(encoding);
+#define ASSERT_ARGS_string_make_empty assert(interp);
+#define ASSERT_ARGS_string_max_bytes assert(s);
+#define ASSERT_ARGS_string_ord assert(interp);
+#define ASSERT_ARGS_string_pin assert(interp); \
+                               assert(s);
+#define ASSERT_ARGS_string_primary_encoding_for_representation assert(interp);
+#define ASSERT_ARGS_string_printf assert(interp); \
+                                  assert(format);
+#define ASSERT_ARGS_string_rep_compatible assert(a); \
+                                          assert(b); \
+                                          assert(e);
+#define ASSERT_ARGS_string_repeat assert(interp); \
+                                  assert(s);
+#define ASSERT_ARGS_string_replace assert(interp); \
+                                   assert(src); \
+                                   assert(rep);
+#define ASSERT_ARGS_string_set assert(interp); \
+                               assert(src);
+#define ASSERT_ARGS_string_split assert(interp); \
+                                 assert(delim); \
+                                 assert(str);
+#define ASSERT_ARGS_string_str_index assert(interp); \
+                                     assert(s); \
+                                     assert(s2);
+#define ASSERT_ARGS_string_substr assert(interp);
+#define ASSERT_ARGS_string_titlecase assert(interp); \
+                                     assert(s);
+#define ASSERT_ARGS_string_titlecase_inplace assert(interp); \
+                                             assert(s);
+#define ASSERT_ARGS_string_to_cstring assert(interp);
+#define ASSERT_ARGS_string_to_cstring_nullable
+#define ASSERT_ARGS_string_to_int
+#define ASSERT_ARGS_string_to_num assert(interp); \
+                                  assert(s);
+#define ASSERT_ARGS_string_unescape_cstring assert(interp); \
+                                            assert(cstring);
+#define ASSERT_ARGS_string_unpin assert(interp); \
+                                 assert(s);
+#define ASSERT_ARGS_string_upcase assert(interp);
+#define ASSERT_ARGS_string_upcase_inplace assert(interp);
+#define ASSERT_ARGS_int_to_str assert(interp); \
+                               assert(tc);
+#define ASSERT_ARGS_string_free assert(interp); \
+                                assert(s);
+#define ASSERT_ARGS_uint_to_str assert(interp); \
+                                assert(tc);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/string.c */
 

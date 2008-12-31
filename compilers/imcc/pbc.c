@@ -206,6 +206,61 @@ static void verify_signature(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+#define ASSERT_ARGS_add_1_const assert(interp); \
+                                assert(r);
+#define ASSERT_ARGS_add_const_key assert(interp); \
+                                  assert(key); \
+                                  assert(s_key);
+#define ASSERT_ARGS_add_const_num assert(interp);
+#define ASSERT_ARGS_add_const_pmc_sub assert(interp); \
+                                      assert(r);
+#define ASSERT_ARGS_add_const_str assert(interp); \
+                                  assert(r);
+#define ASSERT_ARGS_add_const_table assert(interp);
+#define ASSERT_ARGS_add_const_table_key assert(interp); \
+                                        assert(key);
+#define ASSERT_ARGS_add_const_table_pmc assert(interp); \
+                                        assert(pmc);
+#define ASSERT_ARGS_build_key assert(interp); \
+                              assert(key_reg);
+#define ASSERT_ARGS_constant_folding assert(interp); \
+                                     assert(unit);
+#define ASSERT_ARGS_create_lexinfo assert(interp); \
+                                   assert(unit); \
+                                   assert(sub);
+#define ASSERT_ARGS_find_global_label assert(interp); \
+                                      assert(name); \
+                                      assert(sym); \
+                                      assert(pc);
+#define ASSERT_ARGS_find_outer assert(interp); \
+                               assert(unit);
+#define ASSERT_ARGS_find_sub_by_subid assert(interp); \
+                                      assert(lookup); \
+                                      assert(sym); \
+                                      assert(pc);
+#define ASSERT_ARGS_fixup_globals assert(interp);
+#define ASSERT_ARGS_get_codesize assert(interp); \
+                                 assert(unit); \
+                                 assert(src_lines);
+#define ASSERT_ARGS_get_old_size assert(interp); \
+                                 assert(ins_line);
+#define ASSERT_ARGS_imcc_globals_destroy assert(interp);
+#define ASSERT_ARGS_make_new_sub assert(interp); \
+                                 assert(unit);
+#define ASSERT_ARGS_make_pmc_const assert(interp); \
+                                   assert(r);
+#define ASSERT_ARGS_mk_multi_sig assert(interp); \
+                                 assert(r);
+#define ASSERT_ARGS_old_blocks assert(interp);
+#define ASSERT_ARGS_slice_deb
+#define ASSERT_ARGS_store_fixup assert(interp); \
+                                assert(r);
+#define ASSERT_ARGS_store_key_const assert(interp); \
+                                    assert(str);
+#define ASSERT_ARGS_store_sub_size assert(interp);
+#define ASSERT_ARGS_verify_signature assert(interp); \
+                                     assert(ins); \
+                                     assert(pc);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

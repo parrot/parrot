@@ -118,6 +118,27 @@ QUEUE_ENTRY * wait_for_entry(ARGMOD(QUEUE *queue))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*queue);
 
+#define ASSERT_ARGS_insert_entry assert(queue); \
+                                 assert(entry);
+#define ASSERT_ARGS_nosync_insert_entry assert(queue); \
+                                        assert(entry);
+#define ASSERT_ARGS_nosync_pop_entry assert(queue);
+#define ASSERT_ARGS_peek_entry assert(queue);
+#define ASSERT_ARGS_pop_entry assert(queue);
+#define ASSERT_ARGS_push_entry assert(queue); \
+                               assert(entry);
+#define ASSERT_ARGS_queue_broadcast assert(queue);
+#define ASSERT_ARGS_queue_destroy assert(queue);
+#define ASSERT_ARGS_queue_init
+#define ASSERT_ARGS_queue_lock assert(queue);
+#define ASSERT_ARGS_queue_signal assert(queue);
+#define ASSERT_ARGS_queue_timedwait assert(queue); \
+                                    assert(abs_time);
+#define ASSERT_ARGS_queue_unlock assert(queue);
+#define ASSERT_ARGS_queue_wait assert(queue);
+#define ASSERT_ARGS_unshift_entry assert(queue); \
+                                  assert(entry);
+#define ASSERT_ARGS_wait_for_entry assert(queue);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/tsq.c */
 

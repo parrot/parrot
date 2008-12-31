@@ -162,6 +162,52 @@ void Parrot_cx_timer_invoke(PARROT_INTERP, ARGIN(PMC *timer))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_Parrot_cx_add_handler assert(interp); \
+                                          assert(handler);
+#define ASSERT_ARGS_Parrot_cx_add_handler_local assert(interp); \
+                                                assert(handler);
+#define ASSERT_ARGS_Parrot_cx_broadcast_message assert(interp); \
+                                                assert(messagetype);
+#define ASSERT_ARGS_Parrot_cx_count_handlers_typed assert(interp); \
+                                                   assert(handler_type);
+#define ASSERT_ARGS_Parrot_cx_delete_handler_local assert(interp); \
+                                                   assert(handler_type);
+#define ASSERT_ARGS_Parrot_cx_delete_handler_typed assert(interp); \
+                                                   assert(handler_type);
+#define ASSERT_ARGS_Parrot_cx_delete_suspend_for_gc assert(interp);
+#define ASSERT_ARGS_Parrot_cx_delete_task assert(interp); \
+                                          assert(task);
+#define ASSERT_ARGS_Parrot_cx_find_handler_for_task assert(interp); \
+                                                    assert(task);
+#define ASSERT_ARGS_Parrot_cx_find_handler_local assert(interp); \
+                                                 assert(task);
+#define ASSERT_ARGS_Parrot_cx_handle_tasks assert(interp); \
+                                           assert(scheduler);
+#define ASSERT_ARGS_Parrot_cx_peek_task assert(interp);
+#define ASSERT_ARGS_Parrot_cx_request_suspend_for_gc assert(interp);
+#define ASSERT_ARGS_Parrot_cx_runloop_end assert(interp);
+#define ASSERT_ARGS_Parrot_cx_schedule_callback assert(interp); \
+                                                assert(user_data); \
+                                                assert(ext_data);
+#define ASSERT_ARGS_Parrot_cx_schedule_repeat assert(interp); \
+                                              assert(task);
+#define ASSERT_ARGS_Parrot_cx_schedule_sleep assert(interp);
+#define ASSERT_ARGS_Parrot_cx_schedule_task assert(interp); \
+                                            assert(task);
+#define ASSERT_ARGS_Parrot_cx_schedule_timer assert(interp);
+#define ASSERT_ARGS_Parrot_cx_send_message assert(interp); \
+                                           assert(messagetype);
+#define ASSERT_ARGS_Parrot_cx_check_tasks assert(interp); \
+                                          assert(scheduler);
+#define ASSERT_ARGS_Parrot_cx_init_scheduler assert(interp);
+#define ASSERT_ARGS_Parrot_cx_invoke_callback assert(interp); \
+                                              assert(callback);
+#define ASSERT_ARGS_Parrot_cx_refresh_task_list assert(interp); \
+                                                assert(scheduler);
+#define ASSERT_ARGS_Parrot_cx_runloop_wake assert(interp); \
+                                           assert(scheduler);
+#define ASSERT_ARGS_Parrot_cx_timer_invoke assert(interp); \
+                                           assert(timer);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/scheduler.c */
 

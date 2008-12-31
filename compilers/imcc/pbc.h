@@ -53,6 +53,23 @@ opcode_t * make_jit_info(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_e_pbc_close assert(interp);
+#define ASSERT_ARGS_e_pbc_emit assert(interp); \
+                               assert(unit); \
+                               assert(ins);
+#define ASSERT_ARGS_e_pbc_end_sub assert(interp); \
+                                  assert(unit);
+#define ASSERT_ARGS_e_pbc_new_sub assert(interp); \
+                                  assert(unit);
+#define ASSERT_ARGS_e_pbc_open assert(interp);
+#define ASSERT_ARGS_IMCC_int_from_reg assert(interp); \
+                                      assert(r);
+#define ASSERT_ARGS_IMCC_string_from__STRINGC assert(interp); \
+                                              assert(buf);
+#define ASSERT_ARGS_IMCC_string_from_reg assert(interp); \
+                                         assert(r);
+#define ASSERT_ARGS_make_jit_info assert(interp); \
+                                  assert(unit);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/pbc.c */
 

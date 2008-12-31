@@ -48,6 +48,10 @@ static void init_context(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*ctx);
 
+#define ASSERT_ARGS_clear_regs assert(interp); \
+                               assert(ctx);
+#define ASSERT_ARGS_init_context assert(interp); \
+                                 assert(ctx);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

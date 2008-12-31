@@ -167,6 +167,38 @@ STRING * key_string(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_key_append assert(key1); \
+                               assert(key2);
+#define ASSERT_ARGS_key_integer assert(interp); \
+                                assert(key);
+#define ASSERT_ARGS_key_mark assert(interp); \
+                             assert(key);
+#define ASSERT_ARGS_key_new assert(interp);
+#define ASSERT_ARGS_key_new_cstring assert(interp);
+#define ASSERT_ARGS_key_new_integer assert(interp);
+#define ASSERT_ARGS_key_new_number assert(interp);
+#define ASSERT_ARGS_key_new_pmc assert(interp); \
+                                assert(value);
+#define ASSERT_ARGS_key_new_string assert(interp); \
+                                   assert(value);
+#define ASSERT_ARGS_key_next assert(interp); \
+                             assert(key);
+#define ASSERT_ARGS_key_number assert(interp); \
+                               assert(key);
+#define ASSERT_ARGS_key_pmc assert(interp); \
+                            assert(key);
+#define ASSERT_ARGS_key_set_integer assert(key);
+#define ASSERT_ARGS_key_set_number assert(key);
+#define ASSERT_ARGS_key_set_pmc assert(interp); \
+                                assert(key); \
+                                assert(value);
+#define ASSERT_ARGS_key_set_register assert(key);
+#define ASSERT_ARGS_key_set_string assert(key); \
+                                   assert(value);
+#define ASSERT_ARGS_key_set_to_string assert(interp);
+#define ASSERT_ARGS_key_type assert(key);
+#define ASSERT_ARGS_key_string assert(interp); \
+                               assert(key);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/key.c */
 

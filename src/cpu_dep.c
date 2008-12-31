@@ -34,6 +34,7 @@ between two boundaries is located in C<src/gc/dod.c:trace_mem_block>.
 static void trace_system_stack(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_trace_system_stack assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

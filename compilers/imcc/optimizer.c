@@ -199,6 +199,47 @@ static int used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
+#define ASSERT_ARGS__is_ins_save assert(unit); \
+                                 assert(check_ins); \
+                                 assert(r);
+#define ASSERT_ARGS_branch_branch assert(interp); \
+                                  assert(unit);
+#define ASSERT_ARGS_branch_cond_loop assert(interp); \
+                                     assert(unit);
+#define ASSERT_ARGS_branch_cond_loop_swap assert(interp); \
+                                          assert(unit); \
+                                          assert(branch); \
+                                          assert(start); \
+                                          assert(cond);
+#define ASSERT_ARGS_branch_reorg assert(interp); \
+                                 assert(unit);
+#define ASSERT_ARGS_constant_propagation assert(interp); \
+                                         assert(unit);
+#define ASSERT_ARGS_dead_code_remove assert(interp); \
+                                     assert(unit);
+#define ASSERT_ARGS_eval_ins assert(interp); \
+                             assert(op); \
+                             assert(r);
+#define ASSERT_ARGS_if_branch assert(interp); \
+                              assert(unit);
+#define ASSERT_ARGS_is_ins_save assert(interp); \
+                                assert(unit); \
+                                assert(ins); \
+                                assert(r);
+#define ASSERT_ARGS_is_invariant assert(interp); \
+                                 assert(unit); \
+                                 assert(ins);
+#define ASSERT_ARGS_loop_one assert(interp); \
+                             assert(unit);
+#define ASSERT_ARGS_loop_optimization assert(interp); \
+                                      assert(unit);
+#define ASSERT_ARGS_max_loop_depth assert(unit);
+#define ASSERT_ARGS_strength_reduce assert(interp); \
+                                    assert(unit);
+#define ASSERT_ARGS_unused_label assert(interp); \
+                                 assert(unit);
+#define ASSERT_ARGS_used_once assert(interp); \
+                              assert(unit);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

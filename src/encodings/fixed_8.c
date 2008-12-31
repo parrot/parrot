@@ -156,6 +156,42 @@ static STRING * to_encoding(PARROT_INTERP,
     SHIM(STRING *dest))
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_become_encoding assert(interp);
+#define ASSERT_ARGS_bytes assert(source_string);
+#define ASSERT_ARGS_codepoints assert(interp); \
+                               assert(source_string);
+#define ASSERT_ARGS_fixed8_get_next assert(interp); \
+                                    assert(iter);
+#define ASSERT_ARGS_fixed8_set_next assert(interp); \
+                                    assert(iter);
+#define ASSERT_ARGS_fixed8_set_position assert(iter);
+#define ASSERT_ARGS_get_byte assert(interp); \
+                             assert(source_string);
+#define ASSERT_ARGS_get_bytes assert(interp); \
+                              assert(source_string);
+#define ASSERT_ARGS_get_bytes_inplace assert(interp); \
+                                      assert(source_string); \
+                                      assert(return_string);
+#define ASSERT_ARGS_get_codepoint assert(interp); \
+                                  assert(source_string);
+#define ASSERT_ARGS_get_codepoints assert(interp); \
+                                   assert(source_string);
+#define ASSERT_ARGS_get_codepoints_inplace assert(interp); \
+                                           assert(source_string); \
+                                           assert(dest_string);
+#define ASSERT_ARGS_iter_init assert(src); \
+                              assert(iter);
+#define ASSERT_ARGS_set_byte assert(interp); \
+                             assert(source_string);
+#define ASSERT_ARGS_set_bytes assert(interp); \
+                              assert(source_string); \
+                              assert(new_bytes);
+#define ASSERT_ARGS_set_codepoint assert(interp); \
+                                  assert(source_string);
+#define ASSERT_ARGS_set_codepoints assert(interp); \
+                                   assert(source_string); \
+                                   assert(new_codepoints);
+#define ASSERT_ARGS_to_encoding assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

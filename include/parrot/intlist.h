@@ -96,6 +96,24 @@ void intlist_unshift(PARROT_INTERP, ARGMOD(IntList **l), INTVAL val)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*l);
 
+#define ASSERT_ARGS_intlist_assign assert(interp); \
+                                   assert(l);
+#define ASSERT_ARGS_intlist_clone assert(interp); \
+                                  assert(list);
+#define ASSERT_ARGS_intlist_get assert(interp); \
+                                assert(list);
+#define ASSERT_ARGS_intlist_length assert(list);
+#define ASSERT_ARGS_intlist_mark assert(interp); \
+                                 assert(l);
+#define ASSERT_ARGS_intlist_new assert(interp);
+#define ASSERT_ARGS_intlist_pop assert(interp); \
+                                assert(l);
+#define ASSERT_ARGS_intlist_push assert(interp); \
+                                 assert(l);
+#define ASSERT_ARGS_intlist_shift assert(interp); \
+                                  assert(l);
+#define ASSERT_ARGS_intlist_unshift assert(interp); \
+                                    assert(l);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/intlist.c */
 

@@ -264,6 +264,44 @@ PMC * pt_transfer_sub(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(d);
 
+#define ASSERT_ARGS_Parrot_shared_DOD_block assert(interp);
+#define ASSERT_ARGS_Parrot_shared_DOD_unblock assert(interp);
+#define ASSERT_ARGS_pt_add_to_interpreters assert(interp);
+#define ASSERT_ARGS_pt_clone_code
+#define ASSERT_ARGS_pt_clone_globals
+#define ASSERT_ARGS_pt_DOD_mark_root_finished assert(interp);
+#define ASSERT_ARGS_pt_DOD_start_mark assert(interp);
+#define ASSERT_ARGS_pt_DOD_stop_mark assert(interp);
+#define ASSERT_ARGS_pt_free_pool assert(interp);
+#define ASSERT_ARGS_pt_join_threads assert(interp);
+#define ASSERT_ARGS_pt_shared_fixup assert(interp); \
+                                    assert(pmc);
+#define ASSERT_ARGS_pt_suspend_self_for_gc assert(interp);
+#define ASSERT_ARGS_pt_thread_detach
+#define ASSERT_ARGS_pt_thread_join assert(parent);
+#define ASSERT_ARGS_pt_thread_kill
+#define ASSERT_ARGS_pt_thread_prepare_for_run
+#define ASSERT_ARGS_pt_thread_run assert(interp); \
+                                  assert(dest_interp); \
+                                  assert(sub);
+#define ASSERT_ARGS_pt_thread_run_1 assert(interp); \
+                                    assert(dest_interp); \
+                                    assert(sub); \
+                                    assert(arg);
+#define ASSERT_ARGS_pt_thread_run_2 assert(interp); \
+                                    assert(dest_interp); \
+                                    assert(sub); \
+                                    assert(arg);
+#define ASSERT_ARGS_pt_thread_run_3 assert(interp); \
+                                    assert(dest_interp); \
+                                    assert(sub); \
+                                    assert(arg);
+#define ASSERT_ARGS_pt_thread_wait_with assert(interp); \
+                                        assert(mutex);
+#define ASSERT_ARGS_pt_thread_yield
+#define ASSERT_ARGS_pt_transfer_sub assert(d); \
+                                    assert(s); \
+                                    assert(sub);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/thread.c */
 

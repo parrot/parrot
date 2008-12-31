@@ -168,6 +168,28 @@ void Parrot_register_charset_converter(SHIM_INTERP,
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
+#define ASSERT_ARGS_Parrot_charset_c_name
+#define ASSERT_ARGS_Parrot_charset_name
+#define ASSERT_ARGS_Parrot_charset_number assert(interp); \
+                                          assert(charsetname);
+#define ASSERT_ARGS_Parrot_charset_number_of_str assert(src);
+#define ASSERT_ARGS_Parrot_charsets_encodings_deinit
+#define ASSERT_ARGS_Parrot_charsets_encodings_init assert(interp);
+#define ASSERT_ARGS_Parrot_default_charset
+#define ASSERT_ARGS_Parrot_find_charset assert(charsetname);
+#define ASSERT_ARGS_Parrot_find_charset_converter assert(lhs); \
+                                                  assert(rhs);
+#define ASSERT_ARGS_Parrot_get_charset
+#define ASSERT_ARGS_Parrot_load_charset assert(interp); \
+                                        assert(charsetname);
+#define ASSERT_ARGS_Parrot_make_default_charset assert(charset);
+#define ASSERT_ARGS_Parrot_new_charset
+#define ASSERT_ARGS_Parrot_register_charset assert(interp); \
+                                            assert(charsetname); \
+                                            assert(charset);
+#define ASSERT_ARGS_Parrot_register_charset_converter assert(lhs); \
+                                                      assert(rhs); \
+                                                      assert(func);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/charset.c */
 

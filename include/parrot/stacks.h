@@ -165,6 +165,35 @@ PARROT_PURE_FUNCTION
 Stack_entry_type get_entry_type(ARGIN(const Stack_Entry_t *entry))
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_cst_new_stack_chunk assert(interp); \
+                                        assert(chunk);
+#define ASSERT_ARGS_mark_stack assert(interp); \
+                               assert(chunk);
+#define ASSERT_ARGS_new_stack assert(interp); \
+                              assert(name);
+#define ASSERT_ARGS_Parrot_dump_dynamic_environment assert(interp); \
+                                                    assert(dynamic_env);
+#define ASSERT_ARGS_Parrot_pop_mark assert(interp);
+#define ASSERT_ARGS_Parrot_push_action assert(interp); \
+                                       assert(sub);
+#define ASSERT_ARGS_Parrot_push_mark assert(interp);
+#define ASSERT_ARGS_pop_dest assert(interp);
+#define ASSERT_ARGS_stack_destroy
+#define ASSERT_ARGS_stack_entry assert(stack);
+#define ASSERT_ARGS_stack_height assert(chunk);
+#define ASSERT_ARGS_stack_peek assert(interp); \
+                               assert(stack_base);
+#define ASSERT_ARGS_stack_pop assert(interp); \
+                              assert(stack_p);
+#define ASSERT_ARGS_stack_prepare_pop assert(interp); \
+                                      assert(stack_p);
+#define ASSERT_ARGS_stack_prepare_push assert(interp); \
+                                       assert(stack_p);
+#define ASSERT_ARGS_stack_push assert(interp); \
+                               assert(stack_p); \
+                               assert(thing);
+#define ASSERT_ARGS_stack_system_init
+#define ASSERT_ARGS_get_entry_type assert(entry);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/stacks.c */
 

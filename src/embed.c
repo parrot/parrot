@@ -53,6 +53,15 @@ static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+#define ASSERT_ARGS_calibrate assert(interp);
+#define ASSERT_ARGS_op_name assert(interp);
+#define ASSERT_ARGS_print_debug assert(interp);
+#define ASSERT_ARGS_print_profile assert(interp);
+#define ASSERT_ARGS_prof_sort_f assert(a); \
+                                assert(b);
+#define ASSERT_ARGS_set_current_sub assert(interp);
+#define ASSERT_ARGS_setup_argv assert(interp); \
+                               assert(argv);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

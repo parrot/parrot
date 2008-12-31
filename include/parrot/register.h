@@ -138,6 +138,26 @@ Parrot_Context * Parrot_set_new_context(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_Parrot_clear_i assert(interp);
+#define ASSERT_ARGS_Parrot_clear_n assert(interp);
+#define ASSERT_ARGS_Parrot_clear_p assert(interp);
+#define ASSERT_ARGS_Parrot_clear_s assert(interp);
+#define ASSERT_ARGS_Parrot_context_ref_trace assert(interp); \
+                                             assert(ctx); \
+                                             assert(file);
+#define ASSERT_ARGS_Parrot_free_context assert(interp); \
+                                        assert(ctx);
+#define ASSERT_ARGS_parrot_gc_context assert(interp);
+#define ASSERT_ARGS_Parrot_pop_context assert(interp);
+#define ASSERT_ARGS_Parrot_push_context assert(interp); \
+                                        assert(n_regs_used);
+#define ASSERT_ARGS_Parrot_set_context_threshold
+#define ASSERT_ARGS_create_initial_context assert(interp);
+#define ASSERT_ARGS_destroy_context assert(interp);
+#define ASSERT_ARGS_Parrot_alloc_context assert(interp); \
+                                         assert(number_regs_used);
+#define ASSERT_ARGS_Parrot_set_new_context assert(interp); \
+                                           assert(number_regs_used);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/register.c */
 

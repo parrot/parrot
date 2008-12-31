@@ -144,6 +144,40 @@ static void sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_analyse_life_block assert(bb); \
+                                       assert(r);
+#define ASSERT_ARGS_analyse_life_symbol assert(unit); \
+                                        assert(r);
+#define ASSERT_ARGS_bb_add_edge assert(unit); \
+                                assert(from); \
+                                assert(to);
+#define ASSERT_ARGS_bb_check_set_addr assert(interp); \
+                                      assert(unit); \
+                                      assert(bb); \
+                                      assert(label);
+#define ASSERT_ARGS_bb_findadd_edge assert(interp); \
+                                    assert(unit); \
+                                    assert(from); \
+                                    assert(label);
+#define ASSERT_ARGS_bb_remove_edge assert(unit); \
+                                   assert(edge);
+#define ASSERT_ARGS_check_invoke_type assert(interp); \
+                                      assert(unit); \
+                                      assert(ins);
+#define ASSERT_ARGS_free_dominance_frontiers assert(unit);
+#define ASSERT_ARGS_free_dominators assert(unit);
+#define ASSERT_ARGS_free_edge assert(unit);
+#define ASSERT_ARGS_free_loops assert(unit);
+#define ASSERT_ARGS_init_basic_blocks assert(unit);
+#define ASSERT_ARGS_make_basic_block assert(unit); \
+                                     assert(ins);
+#define ASSERT_ARGS_mark_loop assert(interp); \
+                              assert(unit); \
+                              assert(e);
+#define ASSERT_ARGS_propagate_need assert(bb); \
+                                   assert(r);
+#define ASSERT_ARGS_sort_loops assert(interp); \
+                               assert(unit);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

@@ -68,6 +68,9 @@ PARROT_EXPORT
 void print_pbc_location(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_Parrot_warn assert(interp); \
+                                assert(message);
+#define ASSERT_ARGS_print_pbc_location assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/warnings.c */
 

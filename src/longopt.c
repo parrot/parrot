@@ -48,6 +48,14 @@ static int longopt_get_shortopt(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(* info_buf);
 
+#define ASSERT_ARGS_longopt_get_longopt assert(interp); \
+                                        assert(argv[]); \
+                                        assert(options[]); \
+                                        assert(info_buf);
+#define ASSERT_ARGS_longopt_get_shortopt assert(interp); \
+                                         assert(argv[]); \
+                                         assert(options[]); \
+                                         assert(info_buf);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

@@ -91,6 +91,19 @@ static void resize_symhash(ARGMOD(SymHash *hsh))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*hsh);
 
+#define ASSERT_ARGS__get_sym_typed assert(hsh); \
+                                   assert(name);
+#define ASSERT_ARGS__mk_fullname assert(name);
+#define ASSERT_ARGS__mk_symreg assert(hsh); \
+                               assert(name);
+#define ASSERT_ARGS_add_ns assert(interp); \
+                           assert(name);
+#define ASSERT_ARGS_int_overflows assert(r);
+#define ASSERT_ARGS_mk_pmc_const_2 assert(interp); \
+                                   assert(unit); \
+                                   assert(left); \
+                                   assert(rhs);
+#define ASSERT_ARGS_resize_symhash assert(hsh);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

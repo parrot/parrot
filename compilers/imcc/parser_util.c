@@ -92,6 +92,19 @@ static Instruction * var_arg_ins(PARROT_INTERP,
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*r);
 
+#define ASSERT_ARGS_change_op assert(interp); \
+                              assert(unit); \
+                              assert(r);
+#define ASSERT_ARGS_imcc_compile_file assert(interp); \
+                                      assert(fullname); \
+                                      assert(error_message);
+#define ASSERT_ARGS_imcc_destroy_macro_values assert(value);
+#define ASSERT_ARGS_try_rev_cmp assert(name); \
+                                assert(r);
+#define ASSERT_ARGS_var_arg_ins assert(interp); \
+                                assert(unit); \
+                                assert(name); \
+                                assert(r);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

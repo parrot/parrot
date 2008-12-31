@@ -173,6 +173,25 @@ PARROT_CANNOT_RETURN_NULL
 static const char * skip_command(ARGIN(const char *str))
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_chop_newline assert(buf);
+#define ASSERT_ARGS_close_script_file assert(interp);
+#define ASSERT_ARGS_debugger_cmdline assert(interp);
+#define ASSERT_ARGS_dump_string assert(interp);
+#define ASSERT_ARGS_GDB_P assert(interp); \
+                          assert(s);
+#define ASSERT_ARGS_GDB_print_reg assert(interp);
+#define ASSERT_ARGS_nextarg
+#define ASSERT_ARGS_parse_command assert(command); \
+                                  assert(cmdP);
+#define ASSERT_ARGS_parse_int assert(str); \
+                              assert(intP);
+#define ASSERT_ARGS_parse_key assert(interp); \
+                              assert(str); \
+                              assert(keyP);
+#define ASSERT_ARGS_parse_string assert(interp); \
+                                 assert(str); \
+                                 assert(strP);
+#define ASSERT_ARGS_skip_command assert(str);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

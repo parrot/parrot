@@ -145,6 +145,44 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_compare assert(interp); \
+                            assert(lhs); \
+                            assert(rhs);
+#define ASSERT_ARGS_compose assert(interp); \
+                            assert(src);
+#define ASSERT_ARGS_compute_hash assert(interp); \
+                                 assert(src);
+#define ASSERT_ARGS_cs_rindex assert(interp);
+#define ASSERT_ARGS_decompose assert(interp);
+#define ASSERT_ARGS_downcase assert(interp); \
+                             assert(src);
+#define ASSERT_ARGS_downcase_first assert(interp);
+#define ASSERT_ARGS_find_cclass assert(interp); \
+                                assert(source_string);
+#define ASSERT_ARGS_find_not_cclass assert(interp); \
+                                    assert(source_string);
+#define ASSERT_ARGS_get_graphemes assert(interp); \
+                                  assert(source_string);
+#define ASSERT_ARGS_get_graphemes_inplace assert(interp); \
+                                          assert(source_string); \
+                                          assert(dest_string);
+#define ASSERT_ARGS_is_cclass assert(interp); \
+                              assert(source_string);
+#define ASSERT_ARGS_set_graphemes assert(interp); \
+                                  assert(source_string); \
+                                  assert(insert_string);
+#define ASSERT_ARGS_string_from_codepoint assert(interp);
+#define ASSERT_ARGS_titlecase assert(interp); \
+                              assert(src);
+#define ASSERT_ARGS_titlecase_first assert(interp);
+#define ASSERT_ARGS_to_charset assert(interp); \
+                               assert(src);
+#define ASSERT_ARGS_u_iscclass assert(interp);
+#define ASSERT_ARGS_upcase assert(interp); \
+                           assert(src);
+#define ASSERT_ARGS_upcase_first assert(interp);
+#define ASSERT_ARGS_validate assert(interp); \
+                             assert(src);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

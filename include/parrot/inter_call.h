@@ -256,6 +256,58 @@ STRING* set_retval_s(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+#define ASSERT_ARGS_Parrot_convert_arg assert(interp); \
+                                       assert(st);
+#define ASSERT_ARGS_Parrot_fetch_arg assert(interp); \
+                                     assert(st);
+#define ASSERT_ARGS_Parrot_fetch_arg_nci assert(interp); \
+                                         assert(st);
+#define ASSERT_ARGS_Parrot_init_arg_indexes_and_sig_pmc assert(ctx); \
+                                                        assert(sti);
+#define ASSERT_ARGS_Parrot_init_arg_nci assert(interp); \
+                                        assert(st); \
+                                        assert(sig);
+#define ASSERT_ARGS_Parrot_init_arg_op assert(interp); \
+                                       assert(ctx); \
+                                       assert(sti);
+#define ASSERT_ARGS_Parrot_init_arg_sig assert(ctx); \
+                                        assert(sig); \
+                                        assert(sti);
+#define ASSERT_ARGS_Parrot_init_ret_nci assert(interp); \
+                                        assert(st); \
+                                        assert(sig);
+#define ASSERT_ARGS_parrot_pass_args assert(interp); \
+                                     assert(src_ctx); \
+                                     assert(dest_ctx); \
+                                     assert(src_indexes); \
+                                     assert(dest_indexes);
+#define ASSERT_ARGS_Parrot_pcc_invoke_sub_from_c_args assert(interp); \
+                                                      assert(sub_obj); \
+                                                      assert(sig);
+#define ASSERT_ARGS_Parrot_pcc_invoke_sub_from_sig_object assert(interp); \
+                                                          assert(sub_obj); \
+                                                          assert(sig_obj);
+#define ASSERT_ARGS_Parrot_PCCINVOKE assert(interp); \
+                                     assert(pmc); \
+                                     assert(method_name); \
+                                     assert(signature);
+#define ASSERT_ARGS_Parrot_process_args assert(interp); \
+                                        assert(st);
+#define ASSERT_ARGS_Parrot_store_arg assert(st);
+#define ASSERT_ARGS_parrot_pass_args_fromc assert(interp); \
+                                           assert(sig); \
+                                           assert(dest); \
+                                           assert(old_ctxp);
+#define ASSERT_ARGS_set_retval assert(interp); \
+                               assert(ctx);
+#define ASSERT_ARGS_set_retval_f assert(interp); \
+                                 assert(ctx);
+#define ASSERT_ARGS_set_retval_i assert(interp); \
+                                 assert(ctx);
+#define ASSERT_ARGS_set_retval_p assert(interp); \
+                                 assert(ctx);
+#define ASSERT_ARGS_set_retval_s assert(interp); \
+                                 assert(ctx);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/inter_call.c */
 

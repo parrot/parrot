@@ -92,6 +92,24 @@ static int returns_match_results(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_args_match_params assert(sig_args); \
+                                      assert(seg); \
+                                      assert(start);
+#define ASSERT_ARGS_call_is_safe assert(sub); \
+                                 assert(set_args);
+#define ASSERT_ARGS_jit_can_compile_sub assert(interp); \
+                                        assert(sub);
+#define ASSERT_ARGS_ops_jittable assert(interp); \
+                                 assert(sub); \
+                                 assert(sig_results); \
+                                 assert(seg); \
+                                 assert(pc); \
+                                 assert(end); \
+                                 assert(flags);
+#define ASSERT_ARGS_pic_test_func assert(interp); \
+                                  assert(args);
+#define ASSERT_ARGS_returns_match_results assert(sig_ret); \
+                                          assert(sig_result);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

@@ -46,6 +46,11 @@ static void verify_CD(ARGIN(char *external_data), ARGMOD(PMC *user_data))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*user_data);
 
+#define ASSERT_ARGS_callback_CD assert(interp); \
+                                assert(external_data); \
+                                assert(user_data);
+#define ASSERT_ARGS_verify_CD assert(external_data); \
+                              assert(user_data);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

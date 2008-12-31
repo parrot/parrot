@@ -112,6 +112,32 @@ void dump_loops(ARGIN(const IMC_Unit *unit))
 void dump_symreg(ARGIN(const IMC_Unit *unit))
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_IMCC_debug assert(interp); \
+                               assert(fmt);
+#define ASSERT_ARGS_IMCC_fatal assert(interp); \
+                               assert(fmt);
+#define ASSERT_ARGS_IMCC_fatal_standalone assert(interp); \
+                                          assert(fmt);
+#define ASSERT_ARGS_IMCC_fataly assert(interp); \
+                                assert(fmt);
+#define ASSERT_ARGS_IMCC_fataly_standalone assert(interp); \
+                                           assert(fmt);
+#define ASSERT_ARGS_IMCC_info assert(interp); \
+                              assert(fmt);
+#define ASSERT_ARGS_IMCC_warning assert(interp); \
+                                 assert(fmt);
+#define ASSERT_ARGS_dump_cfg assert(unit);
+#define ASSERT_ARGS_dump_dominance_frontiers assert(unit);
+#define ASSERT_ARGS_dump_dominators assert(unit);
+#define ASSERT_ARGS_dump_instructions assert(interp); \
+                                      assert(unit);
+#define ASSERT_ARGS_dump_interference_graph assert(unit);
+#define ASSERT_ARGS_dump_labels assert(unit);
+#define ASSERT_ARGS_dump_liveness_status assert(unit);
+#define ASSERT_ARGS_dump_liveness_status_var assert(unit); \
+                                             assert(r);
+#define ASSERT_ARGS_dump_loops assert(unit);
+#define ASSERT_ARGS_dump_symreg assert(unit);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/debug.c */
 

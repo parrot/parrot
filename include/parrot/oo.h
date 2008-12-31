@@ -198,11 +198,60 @@ PMC * Parrot_oo_newclass_from_str(PARROT_INTERP, ARGIN(STRING *name))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name), ARGIN(PMC *name_space))
+INTVAL Parrot_oo_register_type(PARROT_INTERP,
+    ARGIN(PMC *name),
+    ARGIN(PMC *namespace))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+#define ASSERT_ARGS_Parrot_class_lookup assert(interp); \
+                                        assert(class_name);
+#define ASSERT_ARGS_Parrot_ComposeRole assert(interp); \
+                                       assert(role); \
+                                       assert(exclude); \
+                                       assert(alias); \
+                                       assert(methods_hash); \
+                                       assert(roles_list);
+#define ASSERT_ARGS_Parrot_ComputeMRO_C3 assert(interp); \
+                                         assert(_class);
+#define ASSERT_ARGS_Parrot_find_method_direct assert(interp); \
+                                              assert(_class); \
+                                              assert(method_name);
+#define ASSERT_ARGS_Parrot_find_method_with_cache assert(interp); \
+                                                  assert(_class); \
+                                                  assert(method_name);
+#define ASSERT_ARGS_Parrot_get_vtable_index assert(interp); \
+                                            assert(name);
+#define ASSERT_ARGS_Parrot_invalidate_method_cache assert(interp);
+#define ASSERT_ARGS_Parrot_MMD_method_name
+#define ASSERT_ARGS_Parrot_oo_get_class assert(interp); \
+                                        assert(key);
+#define ASSERT_ARGS_Parrot_oo_get_class_str assert(interp); \
+                                            assert(name);
+#define ASSERT_ARGS_Parrot_remove_parent assert(interp); \
+                                         assert(removed_class); \
+                                         assert(existing_class);
+#define ASSERT_ARGS_destroy_object_cache assert(interp);
+#define ASSERT_ARGS_init_object_cache assert(interp);
+#define ASSERT_ARGS_mark_object_cache assert(interp);
+#define ASSERT_ARGS_Parrot_class_lookup_p assert(interp); \
+                                          assert(class_name);
+#define ASSERT_ARGS_Parrot_oo_extract_methods_from_namespace assert(interp); \
+                                                             assert(self); \
+                                                             assert(ns);
+#define ASSERT_ARGS_Parrot_oo_find_vtable_override assert(interp); \
+                                                   assert(classobj); \
+                                                   assert(name);
+#define ASSERT_ARGS_Parrot_oo_find_vtable_override_for_class assert(interp); \
+                                                             assert(classobj); \
+                                                             assert(name);
+#define ASSERT_ARGS_Parrot_oo_get_namespace assert(classobj);
+#define ASSERT_ARGS_Parrot_oo_newclass_from_str assert(interp); \
+                                                assert(name);
+#define ASSERT_ARGS_Parrot_oo_register_type assert(interp); \
+                                            assert(name); \
+                                            assert(namespace);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/oo.c */
 

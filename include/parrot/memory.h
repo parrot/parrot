@@ -114,6 +114,17 @@ void * mem__internal_realloc_zeroed(
 void mem_setup_allocator(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_mem_sys_allocate
+#define ASSERT_ARGS_mem_sys_allocate_zeroed
+#define ASSERT_ARGS_mem_sys_free
+#define ASSERT_ARGS_mem_sys_realloc
+#define ASSERT_ARGS_mem_sys_realloc_zeroed
+#define ASSERT_ARGS_mem__internal_allocate assert(file);
+#define ASSERT_ARGS_mem__internal_allocate_zeroed assert(file);
+#define ASSERT_ARGS_mem__internal_free assert(file);
+#define ASSERT_ARGS_mem__internal_realloc assert(file);
+#define ASSERT_ARGS_mem__internal_realloc_zeroed assert(file);
+#define ASSERT_ARGS_mem_setup_allocator assert(interp);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/memory.c */
 

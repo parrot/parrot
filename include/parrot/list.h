@@ -224,6 +224,46 @@ PARROT_PURE_FUNCTION
 INTVAL list_length(SHIM_INTERP, ARGIN(const List *list))
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_ld
+#define ASSERT_ARGS_list_assign assert(interp); \
+                                assert(list); \
+                                assert(item);
+#define ASSERT_ARGS_list_clone assert(interp); \
+                               assert(other);
+#define ASSERT_ARGS_list_delete assert(interp); \
+                                assert(list);
+#define ASSERT_ARGS_list_get assert(interp); \
+                             assert(list);
+#define ASSERT_ARGS_list_insert assert(interp); \
+                                assert(list);
+#define ASSERT_ARGS_list_mark assert(interp); \
+                              assert(list);
+#define ASSERT_ARGS_list_new assert(interp);
+#define ASSERT_ARGS_list_new_init assert(interp); \
+                                  assert(init);
+#define ASSERT_ARGS_list_pmc_new assert(interp); \
+                                 assert(container);
+#define ASSERT_ARGS_list_pmc_new_init assert(interp); \
+                                      assert(container); \
+                                      assert(init);
+#define ASSERT_ARGS_list_pop assert(interp); \
+                             assert(list);
+#define ASSERT_ARGS_list_push assert(interp); \
+                              assert(list); \
+                              assert(item);
+#define ASSERT_ARGS_list_set_length assert(interp); \
+                                    assert(list);
+#define ASSERT_ARGS_list_shift assert(interp); \
+                               assert(list);
+#define ASSERT_ARGS_list_splice assert(interp); \
+                                assert(list);
+#define ASSERT_ARGS_list_unshift assert(interp); \
+                                 assert(list); \
+                                 assert(item);
+#define ASSERT_ARGS_list_visit assert(interp); \
+                               assert(list); \
+                               assert(pinfo);
+#define ASSERT_ARGS_list_length assert(list);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/list.c */
 

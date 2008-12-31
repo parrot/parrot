@@ -158,6 +158,43 @@ static void vanilla_reg_alloc(SHIM_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
+#define ASSERT_ARGS_allocate_lexicals assert(interp); \
+                                      assert(unit);
+#define ASSERT_ARGS_allocate_non_volatile assert(interp); \
+                                          assert(unit);
+#define ASSERT_ARGS_allocate_uniq assert(interp); \
+                                  assert(unit);
+#define ASSERT_ARGS_build_interference_graph assert(interp); \
+                                             assert(unit);
+#define ASSERT_ARGS_build_reglist assert(unit);
+#define ASSERT_ARGS_compute_du_chain assert(unit);
+#define ASSERT_ARGS_compute_one_du_chain assert(r); \
+                                         assert(unit);
+#define ASSERT_ARGS_first_avail assert(unit);
+#define ASSERT_ARGS_ig_allocate
+#define ASSERT_ARGS_ig_find_color assert(unit); \
+                                  assert(avail);
+#define ASSERT_ARGS_ig_get_word assert(graph); \
+                                assert(bit_ofs);
+#define ASSERT_ARGS_ig_set assert(graph);
+#define ASSERT_ARGS_imc_stat_init assert(unit);
+#define ASSERT_ARGS_interferes assert(interp); \
+                               assert(unit); \
+                               assert(r0); \
+                               assert(r1);
+#define ASSERT_ARGS_make_stat assert(unit);
+#define ASSERT_ARGS_map_colors assert(unit); \
+                               assert(graph); \
+                               assert(avail);
+#define ASSERT_ARGS_print_stat assert(interp); \
+                               assert(unit);
+#define ASSERT_ARGS_rebuild_reglist assert(unit);
+#define ASSERT_ARGS_reg_sort_f assert(a); \
+                               assert(b);
+#define ASSERT_ARGS_sort_reglist assert(unit);
+#define ASSERT_ARGS_try_allocate assert(interp); \
+                                 assert(unit);
+#define ASSERT_ARGS_vanilla_reg_alloc assert(unit);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

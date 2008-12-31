@@ -153,6 +153,26 @@ INTVAL Parrot_register_encoding(PARROT_INTERP,
 
 void parrot_deinit_encodings(void);
 void parrot_init_encodings_2(void);
+#define ASSERT_ARGS_Parrot_default_encoding
+#define ASSERT_ARGS_Parrot_encoding_c_name
+#define ASSERT_ARGS_Parrot_encoding_name
+#define ASSERT_ARGS_Parrot_encoding_number assert(interp); \
+                                           assert(encodingname);
+#define ASSERT_ARGS_Parrot_encoding_number_of_str assert(src);
+#define ASSERT_ARGS_Parrot_find_encoding assert(encodingname);
+#define ASSERT_ARGS_Parrot_find_encoding_converter assert(interp); \
+                                                   assert(lhs); \
+                                                   assert(rhs);
+#define ASSERT_ARGS_Parrot_get_encoding
+#define ASSERT_ARGS_Parrot_load_encoding assert(interp); \
+                                         assert(encodingname);
+#define ASSERT_ARGS_Parrot_make_default_encoding assert(encoding);
+#define ASSERT_ARGS_Parrot_new_encoding
+#define ASSERT_ARGS_Parrot_register_encoding assert(interp); \
+                                             assert(encodingname); \
+                                             assert(encoding);
+#define ASSERT_ARGS_parrot_deinit_encodings
+#define ASSERT_ARGS_parrot_init_encodings_2
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/encoding.c */
 

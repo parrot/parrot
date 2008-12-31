@@ -49,6 +49,14 @@ Parrot_UInt4 string_unescape_one(PARROT_INTERP,
         FUNC_MODIFIES(*offset)
         FUNC_MODIFIES(*string);
 
+#define ASSERT_ARGS_Parrot_char_digit_value
+#define ASSERT_ARGS_str_dup assert(old);
+#define ASSERT_ARGS_str_dup_remove_quotes assert(old);
+#define ASSERT_ARGS_string_set_data_directory assert(interp); \
+                                              assert(dir);
+#define ASSERT_ARGS_string_unescape_one assert(interp); \
+                                        assert(offset); \
+                                        assert(string);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/string_primitives.c */
 
