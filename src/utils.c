@@ -69,12 +69,6 @@ static void rec_climb_back_and_mark(
     ARGIN(parrot_prm_context* c))
         __attribute__nonnull__(2);
 
-static void swap(ARGMOD(void **x), ARGMOD(void **y))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*x)
-        FUNC_MODIFIES(*y);
-
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -849,17 +843,9 @@ Parrot_register_move(PARROT_INTERP,
     mem_sys_free(backup);
 }
 
-/* TODO: Macroize swap and COMPARE */
-static void
-swap(ARGMOD(void **x), ARGMOD(void **y))
-{
-    void *t = *x;
-    *x      = *y;
-    *y      =  t;
-}
-
 typedef INTVAL (*sort_func_t)(PARROT_INTERP, void *, void *);
 
+/* TODO: Macroize COMPARE */
 static INTVAL
 COMPARE(PARROT_INTERP, ARGIN(void *a), ARGIN(void *b), ARGIN(PMC *cmp))
 {
@@ -880,13 +866,16 @@ Parrot_quicksort(PARROT_INTERP, ARGMOD(void **data), UINTVAL n, ARGIN(PMC *cmp))
 {
     while (n > 1) {
         UINTVAL i, j, ln, rn;
+        void *temp;
 
-        swap(&data[0], &data[n / 2]);
+        /* Swap */
+        temp      = data[0];
+        data[0]   = data[n/2];
+        data[n/2] = temp;
 
         for (i = 0, j = n; ;) {
             do
                 --j;
-
             while (j > 0 && COMPARE(interp, data[j], data[0], cmp) > 0);
 
             do
@@ -896,10 +885,16 @@ Parrot_quicksort(PARROT_INTERP, ARGMOD(void **data), UINTVAL n, ARGIN(PMC *cmp))
             if (i >= j)
                 break;
 
-            swap(&data[i], &data[j]);
+            /* Swap */
+            temp    = data[i];
+            data[i] = data[j];
+            data[j] = temp;
         }
 
-        swap(&data[j], &data[0]);
+        /* Swap */
+        temp    = data[j];
+        data[j] = data[0];
+        data[0] = temp;
 
         ln = j;
         rn = n - ++j;
