@@ -846,6 +846,8 @@ Parrot_register_move(PARROT_INTERP,
 typedef INTVAL (*sort_func_t)(PARROT_INTERP, void *, void *);
 
 /* TODO: Macroize COMPARE */
+/* This is an awfully expensive function to call, what with all the */
+/* comparisons that never change. We ought to precompute everything. */
 static INTVAL
 COMPARE(PARROT_INTERP, ARGIN(void *a), ARGIN(void *b), ARGIN(PMC *cmp))
 {
