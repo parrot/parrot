@@ -680,7 +680,6 @@ set_param_alias(lexer_state * const lexer, char const * const alias) {
     PARROT_ASSERT(lexer->curtarget != NULL);
     lexer->curtarget->alias = alias;
     SET_FLAG(lexer->curtarget->flags, TARGET_FLAG_NAMED);
-    fprintf(stderr, "lexer->curtarget->alias = %s\n", lexer->curtarget->alias);
     return lexer->curtarget;
 }
 
@@ -810,10 +809,8 @@ PARROT_CANNOT_RETURN_NULL
 argument *
 set_arg_alias(lexer_state * const lexer, char const * const alias) {
     PARROT_ASSERT(lexer->curarg != NULL);
-    fprintf(stderr, "set arg_alias attempt...\n");
     lexer->curarg->alias = alias;
     SET_FLAG(lexer->curarg->flags, ARG_FLAG_NAMED);
-    fprintf(stderr, "set_arg_alias ok\n");
     return lexer->curarg;
 }
 
@@ -1627,6 +1624,7 @@ set_invocation_results(lexer_state * const lexer, invocation * const inv, target
 
 Set the invocation results on the invocation object C<inv>.
 The number of results is stored in the invocation object.
+The invocation object C<inv> is returned.
 
 =cut
 
@@ -1636,38 +1634,28 @@ set_invocation_results(lexer_state * const lexer, invocation * const inv, target
     target  *result_iter;
     unsigned result_count = 0;
 
-    inv->results = results;
-
-    if (results) {
-        result_iter = results;
-        do {
-
-            if (TEST_FLAG(result_iter->flags, TARGET_FLAG_NAMED)) {
-
-                target * targ = new_target(lexer);
-
-                CLEAR_FLAG(result_iter->flags, TARGET_FLAG_NAMED);
-
-                SET_FLAG(targ->flags, TARGET_FLAG_NAMED);
-
-                /* XXX thius is not working:: */
-                add_target(lexer, result_iter, targ);
-
-
-                result_iter = result_iter->next;
-
-                result_count += 2;
-            }
-            else
-                ++result_count;
-
-            result_iter = result_iter->next;
-
-        }
-        while (result_iter != results);
+    if (results == NULL) {
+        inv->results     = NULL;
+        inv->num_results = 0;
+        return inv;
     }
 
-    /* fprintf(stderr, "invocation has %u results\n", result_count); */
+    /* set the list of results in the invocation object */
+    inv->results = results;
+
+    /* count the number of operands for the "get_results" op; :named results are counted twice. */
+    result_iter  = results;
+    do {
+        /* count :named result targets twice for calculating number of operands */
+        if (TEST_FLAG(result_iter->flags, TARGET_FLAG_NAMED))
+            result_count += 2;
+        else
+            ++result_count;
+
+        result_iter = result_iter->next;
+    }
+    while (result_iter != results);
+
 
     inv->num_results = result_count;
 

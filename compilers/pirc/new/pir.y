@@ -1803,7 +1803,9 @@ pmc_object           : identifier
                      ;
 
 opt_target_list      : '(' opt_list ')'
-                           { $$ = $2; }
+                           {
+                             $$ = $2;
+                           }
                      ;
 
 opt_list             : /* empty */
@@ -1840,8 +1842,6 @@ target_flag          : ":optional"
                            {
                              $$ = TARGET_FLAG_NAMED;
                              set_param_alias(lexer, $2);
-                             if (TEST_FLAG(lexer->curtarget->flags, TARGET_FLAG_NAMED))
-                                fprintf(stderr, "alias: %s\n", lexer->curtarget->alias);
                            }
                      ;
 

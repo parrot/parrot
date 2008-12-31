@@ -1079,8 +1079,8 @@ static const yytype_uint16 yyrline[] =
     1642,  1643,  1646,  1658,  1659,  1663,  1665,  1669,  1673,  1675,
     1677,  1683,  1684,  1689,  1690,  1694,  1696,  1705,  1707,  1711,
     1715,  1717,  1719,  1723,  1724,  1727,  1747,  1754,  1756,  1766,
-    1783,  1785,  1787,  1791,  1800,  1805,  1810,  1811,  1815,  1817,
-    1821,  1823,  1828,  1829,  1833,  1835,  1837,  1839,  1851,  1855,
+    1783,  1785,  1787,  1791,  1800,  1805,  1812,  1813,  1817,  1819,
+    1823,  1825,  1830,  1831,  1835,  1837,  1839,  1841,  1851,  1855,
     1856,  1857,  1858,  1861,  1866,  1877,  1884,  1889,  1890,  1894,
     1896,  1900,  1901,  1904,  1908,  1912,  1916,  1925,  1935,  1936,
     1941,  1943,  1948,  1953,  1954,  1958,  1960,  1964,  1970,  1971,
@@ -4061,71 +4061,71 @@ yyreduce:
 
   case 275:
 #line 1806 "pir.y"
-    { (yyval.targ) = (yyvsp[(2) - (3)].targ); ;}
+    {
+                             (yyval.targ) = (yyvsp[(2) - (3)].targ);
+                           ;}
     break;
 
   case 276:
-#line 1810 "pir.y"
+#line 1812 "pir.y"
     { (yyval.targ) = NULL; ;}
     break;
 
   case 277:
-#line 1812 "pir.y"
+#line 1814 "pir.y"
     { (yyval.targ) = (yyvsp[(1) - (1)].targ); ;}
     break;
 
   case 278:
-#line 1816 "pir.y"
+#line 1818 "pir.y"
     { (yyval.targ) = (yyvsp[(1) - (1)].targ); ;}
     break;
 
   case 279:
-#line 1818 "pir.y"
+#line 1820 "pir.y"
     { (yyval.targ) = add_target(lexer, (yyvsp[(1) - (3)].targ), (yyvsp[(3) - (3)].targ)); ;}
     break;
 
   case 280:
-#line 1822 "pir.y"
+#line 1824 "pir.y"
     { (yyval.targ) = set_param_flag(lexer, (yyvsp[(1) - (2)].targ), (yyvsp[(2) - (2)].ival)); ;}
     break;
 
   case 281:
-#line 1824 "pir.y"
+#line 1826 "pir.y"
     { (yyval.targ) = set_param_alias(lexer, (yyvsp[(1) - (3)].sval)); ;}
     break;
 
   case 282:
-#line 1828 "pir.y"
+#line 1830 "pir.y"
     { (yyval.ival) = 0; ;}
     break;
 
   case 283:
-#line 1830 "pir.y"
+#line 1832 "pir.y"
     { SET_FLAG((yyval.ival), (yyvsp[(2) - (2)].ival)); ;}
     break;
 
   case 284:
-#line 1834 "pir.y"
+#line 1836 "pir.y"
     { (yyval.ival) = TARGET_FLAG_OPTIONAL; ;}
     break;
 
   case 285:
-#line 1836 "pir.y"
+#line 1838 "pir.y"
     { (yyval.ival) = TARGET_FLAG_OPT_FLAG; ;}
     break;
 
   case 286:
-#line 1838 "pir.y"
+#line 1840 "pir.y"
     { (yyval.ival) = TARGET_FLAG_SLURPY; ;}
     break;
 
   case 287:
-#line 1840 "pir.y"
+#line 1842 "pir.y"
     {
                              (yyval.ival) = TARGET_FLAG_NAMED;
                              set_param_alias(lexer, (yyvsp[(2) - (2)].sval));
-                             if (TEST_FLAG(lexer->curtarget->flags, TARGET_FLAG_NAMED))
-                                fprintf(stderr, "alias: %s\n", lexer->curtarget->alias);
                            ;}
     break;
 
