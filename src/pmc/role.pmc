@@ -578,7 +578,7 @@ Returns whether the class does the givne C<*role>.
 =item C<METHOD
     name(STRING *name :optional, int got_name :opt_flag)>
 
-Sets the name of the role, and updates the namespace accoringly.
+Sets the name of the role, and updates the namespace accordingly.
 
 =cut
 
