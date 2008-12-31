@@ -680,6 +680,7 @@ set_param_alias(lexer_state * const lexer, char const * const alias) {
     PARROT_ASSERT(lexer->curtarget != NULL);
     lexer->curtarget->alias = alias;
     SET_FLAG(lexer->curtarget->flags, TARGET_FLAG_NAMED);
+    fprintf(stderr, "lexer->curtarget->alias = %s\n", lexer->curtarget->alias);
     return lexer->curtarget;
 }
 
@@ -809,8 +810,10 @@ PARROT_CANNOT_RETURN_NULL
 argument *
 set_arg_alias(lexer_state * const lexer, char const * const alias) {
     PARROT_ASSERT(lexer->curarg != NULL);
+    fprintf(stderr, "set arg_alias attempt...\n");
     lexer->curarg->alias = alias;
     SET_FLAG(lexer->curarg->flags, ARG_FLAG_NAMED);
+    fprintf(stderr, "set_arg_alias ok\n");
     return lexer->curarg;
 }
 
@@ -1267,6 +1270,7 @@ create_const(lexer_state * const lexer, pir_type type, char const * const name, 
     c->type     = type;
     c->next     = NULL;
 
+    /* based on the indicated type, cast the variable argument to the right type. */
     switch (type) {
         case INT_TYPE:
             c->val.ival = va_arg(arg_ptr, int);
@@ -1374,10 +1378,6 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static invocation *
 new_invocation(lexer_state * const lexer) {
-    /*
-    invocation *inv = (invocation *)malloc(sizeof (invocation));
-    PARROT_ASSERT(inv);
-    */
     /* optimization: return the address of the cached object */
     invocation *inv = &lexer->obj_cache.inv_cache;
     /* clear all fields */
@@ -1414,7 +1414,9 @@ new_expr(lexer_state * const lexer, expr_type type) {
 =item C<target *
 new_reg(lexer_state * const lexer, int type, int regno)>
 
-Create a C<target> node from a register. Returns the newly created register.
+Create a C<target> node from a register. A new C<pir_reg> object is
+created of type C<type> and PIR register number C<regno>. The target
+node is returned.
 
 =cut
 
@@ -1428,6 +1430,7 @@ new_reg(lexer_state * const lexer, pir_type type, int regno) {
 
     color_reg(lexer, type, regno);
     reg     = find_register(lexer, type, regno);
+    /* set a pointer to the pir_reg's info field. */
     t->info = &reg->info;
 
     /* set a flag on this target node saying it's a register */
@@ -1934,7 +1937,8 @@ new_key(NOTNULL(lexer_state * const lexer), NOTNULL(expression * const expr)) {
 
 /*
 
-=item C<add_key(key *keylist, expression * const exprkey)>
+=item C<key *
+add_key(lexer_state * const lexer, key * keylist, expression * const exprkey)>
 
 Adds a new, nested key (in C<exprkey>) to the current key,
 pointed to by C<keylist>. C<keylist> is returned.
@@ -1962,7 +1966,7 @@ add_key(NOTNULL(lexer_state * const lexer), NOTNULL(key * keylist),
 /*
 
 =item C<symbol *
-add_local(symbol *list, symbol *local)>
+add_local(symbol * const list, symbol * const local)>
 
 Add local C<local> to the list pointed to by C<list>. The new object
 is inserted at the front of the list. C<list> is returned
@@ -2241,8 +2245,7 @@ fixup_global_labels(lexer_state * const lexer) {
              */
 
             /* create an operand that refers to a constant PMC */
-            new_second_operand = expr_from_const(lexer, new_const(lexer, INT_TYPE,
-                                                                  glob->const_table_index));
+            new_second_operand = expr_from_int(lexer, glob->const_table_index);
             /* link it into the list of operands; the /current/ second operand should be removed,
              * so insert the new expression as second operand, and make sure the old second
              * operand is no longer in the list.

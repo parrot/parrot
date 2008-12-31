@@ -117,7 +117,7 @@ printed as well. Examples:
 */
 void
 print_target(lexer_state * const lexer, target * const t) {
-    if (t->info)
+    PARROT_ASSERT(t->info);
     fprintf(out, "%c%d", pir_register_types[t->info->type], t->info->color);
 
     /* if the target has a key, print that too */

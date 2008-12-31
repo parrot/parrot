@@ -195,6 +195,8 @@ targets_to_operands(lexer_state * const lexer, target * const targets, unsigned 
     if (num_targets == 0)
         return;
 
+    fprintf(stderr, "targets 2 operands\n");
+
     /* retrieve the FixedIntegerArray PMC */
     signature_array = get_pmc_const(lexer->bc, array_index);
 
@@ -213,11 +215,24 @@ targets_to_operands(lexer_state * const lexer, target * const targets, unsigned 
             VTABLE_set_integer_keyed_int(lexer->interp, signature_array, i,
                                          PARROT_ARG_NAME | PARROT_ARG_SC);
 
-            push_operand(lexer, expr_from_string(lexer, iter->alias));
-            ++i;
+            PARROT_ASSERT(iter->alias);
+
+            if (iter->alias == NULL)
+                fprintf(stderr, "no alias!\n");
+            else {
+                fprintf(stderr, "alias: %s\n", iter->alias);
+                push_operand(lexer, expr_from_string(lexer, iter->alias));
+                ++i;
+
+            }
 
             /* clear flag on the target that was marked :named XXX is this correct? */
             CLEAR_FLAG(iter->flags, TARGET_FLAG_NAMED);
+        }
+        else {
+            if (iter->alias) {
+                fprintf(stderr, "no named flag but still an alias! (%s)\n", iter->alias);
+            }
         }
 
         flag = calculate_pcc_target_flags(iter);
@@ -236,6 +251,7 @@ targets_to_operands(lexer_state * const lexer, target * const targets, unsigned 
         iter = iter->next;
     }
 
+    fprintf(stderr, "targets 2 operands ok\n");
 }
 
 /*

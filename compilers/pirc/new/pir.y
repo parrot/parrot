@@ -1820,6 +1820,8 @@ target_list          : result_target
 
 result_target        : target target_flags
                            { $$ = set_param_flag(lexer, $1, $2); }
+                     | TK_STRINGC "=>" target
+                           { $$ = set_param_alias(lexer, $1); }
                      ;
 
 target_flags         : /* empty */
@@ -1838,6 +1840,8 @@ target_flag          : ":optional"
                            {
                              $$ = TARGET_FLAG_NAMED;
                              set_param_alias(lexer, $2);
+                             if (TEST_FLAG(lexer->curtarget->flags, TARGET_FLAG_NAMED))
+                                fprintf(stderr, "alias: %s\n", lexer->curtarget->alias);
                            }
                      ;
 

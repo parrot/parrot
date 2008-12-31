@@ -172,6 +172,7 @@ parse_file(int flexdebug, FILE *infile, char * const filename, int flags, int th
     /* go parse */
     yypirparse(yyscanner, lexer);
 
+
     if (lexer->parse_errors == 0) {
         char outfile[20];
         sprintf(outfile, "output_thr_%d", thr_id);
