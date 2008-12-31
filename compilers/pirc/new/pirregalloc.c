@@ -505,9 +505,6 @@ linear_scan_register_allocation(lsr_allocator * const lsr) {
         */
         for (i = lsr->intervals[type]; i != NULL; i = i->nexti) {
 
-            /* XXX temp. hack */
-            extern char const pir_register_types[5];
-
             /* expire all intervals whose endpoint is smaller than i's start
              * point; that means that i can be mapped to a register that was
              * previously assigned to one of the expired intervals; that one
@@ -518,11 +515,6 @@ linear_scan_register_allocation(lsr_allocator * const lsr) {
             /* get a free register */
             i->realreg = get_free_reg(lsr, type);
 
-
-            /*
-            fprintf(stderr, "Vanilla register %c%u (symbol %s) is mapped to %u\n",
-                     pir_register_types[type], *i->color, i->info->id.name, i->realreg);
-            */
 
             /* update the symbol/pir_reg with this newly allocated reg */
             *i->color = i->realreg;
@@ -537,7 +529,14 @@ linear_scan_register_allocation(lsr_allocator * const lsr) {
 
         /* clear list of intervals */
         lsr->intervals[type] = NULL;
+
+        /* lsr->r is 1 too high w.r.t. the actual register usage, subtract now,
+         * this is safe, because lsr->r[type] will no longer be used, as type will
+         * be incremented.
+         */
+        --lsr->r[type];
     }
+
 
     /* update the register usage in the current subroutine structure. */
     update_sub_register_usage(lsr->lexer, lsr->r);

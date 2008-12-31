@@ -155,6 +155,34 @@ generate_signature_pmc(lexer_state * const lexer, unsigned size) {
 }
 
 
+/*
+
+=item C<void
+emit_sub_epilogue(lexer_state * const lexer)>
+
+Emit final instructions for the current subroutine. In case
+this is a C<:main> sub, the "end" instruction is emitted,
+otherwise it's a standard return sequence.
+
+=cut
+
+*/
+void
+emit_sub_epilogue(lexer_state * const lexer) {
+
+    if (TEST_FLAG(lexer->subs->flags, PIRC_SUB_FLAG_MAIN))
+        new_sub_instr(lexer, PARROT_OP_end, "end", 0);
+    else {
+        /* default sub epilogue; no return values, hence 0 */
+        int array_index = generate_signature_pmc(lexer, 0);
+        new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc", 0);
+        push_operand(lexer, expr_from_const(lexer, new_const(lexer, INT_TYPE, array_index)));
+
+        new_sub_instr(lexer, PARROT_OP_returncc, "returncc", 0);
+    }
+}
+
+
 
 /*
 
@@ -244,52 +272,6 @@ targets_to_operands(lexer_state * const lexer, target * const targets, unsigned 
 
 }
 
-/*
-
-=item C<void
-emit_sub_epilogue(lexer_state * const lexer)>
-
-Emit final instructions for the current subroutine. In case
-this is a C<:main> sub, the "end" instruction is emitted,
-otherwise it's a standard return sequence.
-
-=cut
-
-*/
-void
-emit_sub_epilogue(lexer_state * const lexer) {
-
-    if (TEST_FLAG(lexer->subs->flags, PIRC_SUB_FLAG_MAIN))
-        new_sub_instr(lexer, PARROT_OP_end, "end", 0);
-    else {
-        /* default sub epilogue; no return values, hence 0 */
-        int array_index = generate_signature_pmc(lexer, 0);
-        new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc", 0);
-        push_operand(lexer, expr_from_const(lexer, new_const(lexer, INT_TYPE, array_index)));
-
-        new_sub_instr(lexer, PARROT_OP_returncc, "returncc", 0);
-    }
-}
-
-/*
-
-=item C<void
-generate_parameters_instr(lexer_state * const lexer, unsigned num_parameters)>
-
-Generate the "get_params" instruction, taking <num_parameters> variable arguments;
-this is the number of parameters of this function.
-
-=cut
-
-*/
-void
-generate_parameters_instr(lexer_state * const lexer, unsigned num_parameters) {
-    new_sub_instr(lexer, PARROT_OP_get_params_pc, "get_params_pc", num_parameters);
-    /* convert the parameter list into operands. Parameters are stored as target nodes. */
-    targets_to_operands(lexer, CURRENT_SUB(lexer)->parameters, num_parameters);
-}
-
-
 
 /*
 
@@ -331,6 +313,16 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
     for (i = 0; i < num_arguments; ++i) {
         int flag = calculate_pcc_argument_flags(argiter);
 
+        if (TEST_FLAG(argiter->flags, TARGET_FLAG_NAMED)) {
+
+            VTABLE_set_integer_keyed_int(lexer->interp, signature_array, i,
+                                         PARROT_ARG_NAME | PARROT_ARG_SC);
+
+            push_operand(lexer, expr_from_string(lexer, argiter->alias));
+
+            ++i;
+            CLEAR_FLAG(argiter->flags, TARGET_FLAG_NAMED);
+        }
         /* set the flags for this argument in the right position in the array */
         VTABLE_set_integer_keyed_int(lexer->interp, signature_array, i, flag);
 
@@ -339,6 +331,25 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
 
         argiter = argiter->next;
     }
+}
+
+
+/*
+
+=item C<void
+generate_parameters_instr(lexer_state * const lexer, unsigned num_parameters)>
+
+Generate the "get_params" instruction, taking <num_parameters> variable arguments;
+this is the number of parameters of this function.
+
+=cut
+
+*/
+void
+generate_parameters_instr(lexer_state * const lexer, unsigned num_parameters) {
+    new_sub_instr(lexer, PARROT_OP_get_params_pc, "get_params_pc", num_parameters);
+    /* convert the parameter list into operands. Parameters are stored as target nodes. */
+    targets_to_operands(lexer, CURRENT_SUB(lexer)->parameters, num_parameters);
 }
 /*
 

@@ -308,13 +308,13 @@ print_subs(struct lexer_state * const lexer) {
 
     do {
 
-       /*
+/*
         fprintf(out, "# subroutine '%s' register usage\n", subiter->info.subname);
         fprintf(out, "#   int   : %d\n", subiter->info.regs_used[INT_TYPE]);
         fprintf(out, "#   num   : %d\n", subiter->info.regs_used[NUM_TYPE]);
         fprintf(out, "#   string: %d\n", subiter->info.regs_used[STRING_TYPE]);
         fprintf(out, "#   pmc   : %d\n", subiter->info.regs_used[PMC_TYPE]);
-       */
+*/
 
         fprintf(out, ".namespace ");
         print_key(lexer, subiter->name_space);
