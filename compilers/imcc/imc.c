@@ -66,6 +66,7 @@ imc_compile_all_units(PARROT_INTERP)
 {
     /* compile all units created during the parse */
     IMC_Unit *unit;
+    ASSERT_ARGS(imc_compile_all_units);
 
 #if ! COMPILE_IMMEDIATE
     for (unit = IMCC_INFO(interp)->imc_units; unit;) {
@@ -113,6 +114,7 @@ PARROT_EXPORT
 void
 imc_compile_unit(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 {
+    ASSERT_ARGS(imc_compile_unit);
     /* Not much here for now except the allocator */
     IMCC_INFO(interp)->cur_unit = unit;
 
@@ -135,6 +137,7 @@ PARROT_EXPORT
 void
 imc_cleanup(PARROT_INTERP, ARGIN_NULLOK(void *yyscanner))
 {
+    ASSERT_ARGS(imc_cleanup);
     IMCC_pop_parser_state(interp, yyscanner);
     clear_globals(interp);
     mem_sys_free(IMCC_INFO(interp)->ghash.data);
@@ -158,6 +161,7 @@ static IMC_Unit *
 imc_new_unit(IMC_Unit_Type t)
 {
     IMC_Unit * const unit = mem_allocate_zeroed_typed(IMC_Unit);
+    ASSERT_ARGS(imc_new_unit);
     create_symhash(&unit->hash);
     unit->type = t;
     return unit;
@@ -182,6 +186,7 @@ imc_open_unit(PARROT_INTERP, IMC_Unit_Type t)
 {
     IMC_Unit   * const unit     = imc_new_unit(t);
     imc_info_t * const imc_info = IMCC_INFO(interp);
+    ASSERT_ARGS(imc_open_unit);
 
     if (!imc_info->imc_units)
         imc_info->imc_units = unit;
@@ -218,6 +223,7 @@ on the list of units.
 void
 imc_close_unit(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
 {
+    ASSERT_ARGS(imc_close_unit);
 #if COMPILE_IMMEDIATE
     if (unit)
         imc_compile_unit(interp, unit);
@@ -241,6 +247,7 @@ static void
 imc_free_unit(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     imc_info_t * const imc = IMCC_INFO(interp);
+    ASSERT_ARGS(imc_free_unit);
 
 #if IMC_TRACE_HIGH
     fprintf(stderr, "imc_free_unit()\n");

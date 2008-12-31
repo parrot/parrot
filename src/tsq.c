@@ -35,6 +35,7 @@ QUEUE_ENTRY *
 pop_entry(ARGMOD(QUEUE *queue))
 {
     QUEUE_ENTRY *returnval;
+    ASSERT_ARGS(pop_entry);
     queue_lock(queue);
     returnval = nosync_pop_entry(queue);
     queue_unlock(queue);
@@ -58,6 +59,7 @@ PARROT_WARN_UNUSED_RESULT
 QUEUE_ENTRY *
 peek_entry(ARGIN(const QUEUE *queue))
 {
+    ASSERT_ARGS(peek_entry);
     return queue->head;
 }
 
@@ -78,6 +80,7 @@ QUEUE_ENTRY *
 nosync_pop_entry(ARGMOD(QUEUE *queue))
 {
     QUEUE_ENTRY *returnval;
+    ASSERT_ARGS(nosync_pop_entry);
     if (!queue->head) {
         return NULL;
     }
@@ -109,6 +112,7 @@ QUEUE_ENTRY *
 wait_for_entry(ARGMOD(QUEUE *queue))
 {
     QUEUE_ENTRY *returnval;
+    ASSERT_ARGS(wait_for_entry);
 
     queue_lock(queue);
     while (queue->head == NULL) {
@@ -133,6 +137,7 @@ Does a synchronized insertion of C<entry> onto the tail of the queue.
 void
 push_entry(ARGMOD(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
 {
+    ASSERT_ARGS(push_entry);
     queue_lock(queue);
     /* Is there something in the queue? */
     if (queue->tail) {
@@ -161,6 +166,7 @@ void
 unshift_entry(ARGMOD(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
 {
     QUEUE_ENTRY *cur;
+    ASSERT_ARGS(unshift_entry);
 
     queue_lock(queue);
     cur = queue->head;
@@ -195,6 +201,7 @@ nosync_insert_entry(ARGMOD(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
     QUEUE_ENTRY *prev;
     parrot_event *event;
     FLOATVAL abs_time;
+    ASSERT_ARGS(nosync_insert_entry);
 
     PARROT_ASSERT(entry->type == QUEUE_ENTRY_TYPE_TIMED_EVENT);
     /*
@@ -242,6 +249,7 @@ Does a synchronized insert of C<entry>.
 void
 insert_entry(ARGMOD(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
 {
+    ASSERT_ARGS(insert_entry);
     queue_lock(queue);
     nosync_insert_entry(queue, entry);
     queue_signal(queue);
@@ -261,6 +269,7 @@ Locks the queue's mutex.
 void
 queue_lock(ARGMOD(QUEUE *queue))
 {
+    ASSERT_ARGS(queue_lock);
     LOCK(queue->queue_mutex);
 }
 
@@ -277,6 +286,7 @@ Unlocks the queue's mutex.
 void
 queue_unlock(ARGMOD(QUEUE *queue))
 {
+    ASSERT_ARGS(queue_unlock);
     UNLOCK(queue->queue_mutex);
 }
 
@@ -293,6 +303,7 @@ This function wakes up I<every> thread waiting on the queue.
 void
 queue_broadcast(ARGMOD(QUEUE *queue))
 {
+    ASSERT_ARGS(queue_broadcast);
     COND_BROADCAST(queue->queue_condition);
 }
 
@@ -309,6 +320,7 @@ RT#48260: Document this!
 void
 queue_signal(ARGMOD(QUEUE *queue))
 {
+    ASSERT_ARGS(queue_signal);
     COND_SIGNAL(queue->queue_condition);
 }
 
@@ -325,6 +337,7 @@ Instructs the queue to wait.
 void
 queue_wait(ARGMOD(QUEUE *queue))
 {
+    ASSERT_ARGS(queue_wait);
     COND_WAIT(queue->queue_condition, queue->queue_mutex);
 }
 
@@ -341,6 +354,7 @@ Instructs the queue to wait for C<abs_time> seconds (?).
 void
 queue_timedwait(ARGMOD(QUEUE *queue), ARGIN(const struct timespec *abs_time))
 {
+    ASSERT_ARGS(queue_timedwait);
     COND_TIMED_WAIT(queue->queue_condition, queue->queue_mutex, abs_time);
 }
 
@@ -360,6 +374,7 @@ QUEUE*
 queue_init(UINTVAL prio)
 {
     QUEUE * const queue = mem_allocate_typed(QUEUE);
+    ASSERT_ARGS(queue_init);
 
     queue->head = queue->tail = NULL;
     queue->max_prio = prio;
@@ -381,6 +396,7 @@ Destroys the queue, raising an exception if it is not empty.
 void
 queue_destroy(ARGMOD(QUEUE *queue))
 {
+    ASSERT_ARGS(queue_destroy);
     if (peek_entry(queue))
         exit_fatal(1, "Queue not empty on destroy");
 

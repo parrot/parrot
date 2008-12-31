@@ -156,6 +156,7 @@ destroy_context(PARROT_INTERP)
 {
     Parrot_Context *context = CONTEXT(interp);
     int             slot;
+    ASSERT_ARGS(destroy_context);
 
     while (context) {
         Parrot_Context * const prev = context->caller_ctx;
@@ -195,6 +196,7 @@ create_initial_context(PARROT_INTERP)
 {
     static INTVAL   num_regs[] = {32, 32, 32, 32};
     Parrot_Context *ignored;
+    ASSERT_ARGS(create_initial_context);
 
     /* Create some initial free_list slots. */
 
@@ -226,12 +228,14 @@ parrot_gc_context(PARROT_INTERP)
 {
 #if CHUNKED_CTX_MEM
     Parrot_Context ctx;
+    ASSERT_ARGS(parrot_gc_context);
 
     if (!interp->ctx_mem.threshold)
         return;
     LVALUE_CAST(char *, ctx.bp) = interp->ctx_mem.threshold
                                 - sizeof (parrot_regs_t);
 #else
+    ASSERT_ARGS(parrot_gc_context);
     UNUSED(interp);
 #endif
 }
@@ -253,6 +257,7 @@ static void
 clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
 {
     int i;
+    ASSERT_ARGS(clear_regs);
 
     /* NULL out registers - P/S have to be NULL for GC
      *
@@ -302,6 +307,7 @@ static void
 init_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctx),
         ARGIN_NULLOK(const Parrot_Context *old))
 {
+    ASSERT_ARGS(init_context);
     ctx->ref_count         = 0;    /* RT #46191 1 - Exceptions !!! */
     ctx->gc_mark           = 0;
     ctx->current_results   = NULL;
@@ -350,6 +356,7 @@ Parrot_push_context(PARROT_INTERP, ARGIN(const INTVAL *n_regs_used))
 {
     Parrot_Context * const old = CONTEXT(interp);
     Parrot_Context * const ctx = Parrot_set_new_context(interp, n_regs_used);
+    ASSERT_ARGS(Parrot_push_context);
 
     ctx->caller_ctx  = old;
 
@@ -378,6 +385,7 @@ Parrot_pop_context(PARROT_INTERP)
 {
     Parrot_Context * const ctx = CONTEXT(interp);
     Parrot_Context * const old = ctx->caller_ctx;
+    ASSERT_ARGS(Parrot_pop_context);
 
 #if CTX_LEAK_DEBUG
     if (ctx->ref_count > 0 &&
@@ -430,6 +438,7 @@ Parrot_alloc_context(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used),
 
     /* this gets attached to the context, which should free it */
     INTVAL * const n_regs_used = mem_allocate_n_zeroed_typed(4, INTVAL);
+    ASSERT_ARGS(Parrot_alloc_context);
     n_regs_used[REGNO_INT]     = number_regs_used[REGNO_INT];
     n_regs_used[REGNO_NUM]     = number_regs_used[REGNO_NUM];
     n_regs_used[REGNO_STR]     = number_regs_used[REGNO_STR];
@@ -513,6 +522,7 @@ Parrot_set_new_context(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used))
 {
     Parrot_Context *old = CONTEXT(interp);
     Parrot_Context *ctx = Parrot_alloc_context(interp, number_regs_used, old);
+    ASSERT_ARGS(Parrot_set_new_context);
 
     CONTEXT(interp)          = ctx;
     interp->ctx.bp.regs_i    = ctx->bp.regs_i;
@@ -538,6 +548,7 @@ PARROT_EXPORT
 void
 Parrot_free_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctx), int deref)
 {
+    ASSERT_ARGS(Parrot_free_context);
     /*
      * The context structure has a reference count, initially 0.
      * This field is incremented when something outside of the normal
@@ -643,6 +654,7 @@ Parrot_Context *
 Parrot_context_ref_trace(PARROT_INTERP, ARGMOD(Parrot_Context *ctx),
         ARGIN(const char *file), int line)
 {
+    ASSERT_ARGS(Parrot_context_ref_trace);
     if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
         const char *name = "unknown";
 
@@ -672,6 +684,7 @@ PARROT_EXPORT
 void
 Parrot_set_context_threshold(SHIM_INTERP, SHIM(Parrot_Context *ctx))
 {
+    ASSERT_ARGS(Parrot_set_context_threshold);
     /* nothing to do */
 }
 
@@ -698,6 +711,7 @@ void
 Parrot_clear_i(PARROT_INTERP)
 {
     int i;
+    ASSERT_ARGS(Parrot_clear_i);
     for (i = 0; i < CONTEXT(interp)->n_regs_used[REGNO_INT]; ++i)
         REG_INT(interp, i) = 0;
 }
@@ -718,6 +732,7 @@ void
 Parrot_clear_s(PARROT_INTERP)
 {
     int i;
+    ASSERT_ARGS(Parrot_clear_s);
     for (i = 0; i < CONTEXT(interp)->n_regs_used[REGNO_STR]; ++i)
         REG_STR(interp, i) = NULL;
 }
@@ -738,6 +753,7 @@ void
 Parrot_clear_p(PARROT_INTERP)
 {
     int i;
+    ASSERT_ARGS(Parrot_clear_p);
     for (i = 0; i < CONTEXT(interp)->n_regs_used[REGNO_PMC]; ++i)
         REG_PMC(interp, i) = PMCNULL;
 }
@@ -758,6 +774,7 @@ void
 Parrot_clear_n(PARROT_INTERP)
 {
     int i;
+    ASSERT_ARGS(Parrot_clear_n);
     for (i = 0; i < CONTEXT(interp)->n_regs_used[REGNO_NUM]; ++i)
         REG_NUM(interp, i) = 0.0;
 }

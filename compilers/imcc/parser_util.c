@@ -147,6 +147,7 @@ iNEW(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg *r0),
     int nargs;
     const int pmc_num = pmc_type(interp,
             string_from_cstring(interp, *type == '.' ? type + 1 : type, 0));
+    ASSERT_ARGS(iNEW);
 
     snprintf(fmt, sizeof (fmt), "%d", pmc_num);
     pmc = mk_const(interp, fmt, 'I');
@@ -203,6 +204,7 @@ op_fullname(ARGOUT(char *dest), ARGIN(const char *name),
     const char * const full = dest;
     Parrot_io_eprintf(NULL, "op %s", name);
 #endif
+    ASSERT_ARGS(op_fullname);
 
     memcpy(dest, name, namelen+1);
     dest += namelen;
@@ -270,6 +272,7 @@ int
 check_op(PARROT_INTERP, ARGOUT(char *fullname), ARGIN(const char *name),
         ARGIN(SymReg * const * r), int narg, int keyvec)
 {
+    ASSERT_ARGS(check_op);
     op_fullname(fullname, name, r, narg, keyvec);
 
     return interp->op_lib->op_code(fullname, 1);
@@ -289,6 +292,7 @@ PARROT_WARN_UNUSED_RESULT
 int
 is_op(PARROT_INTERP, ARGIN(const char *name))
 {
+    ASSERT_ARGS(is_op);
     return interp->op_lib->op_code(name, 0) >= 0
         || interp->op_lib->op_code(name, 1) >= 0;
 }
@@ -316,6 +320,7 @@ var_arg_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
 
     /* in constant */
     int dirs       = 1;
+    ASSERT_ARGS(var_arg_ins);
 
     r[0]           = mk_const(interp, r[0]->name, 'P');
     r[0]->pmc_type = enum_class_FixedIntegerArray;
@@ -366,6 +371,7 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     Instruction *ins;
     op_info_t   *op_info;
     char fullname[64], format[128];
+    ASSERT_ARGS(INS);
 
     if ((STREQ(name, "set_args"))
     ||  (STREQ(name, "get_results"))
@@ -563,6 +569,7 @@ int
 do_yylex_init(PARROT_INTERP, ARGOUT(yyscan_t* yyscanner))
 {
     const int retval = yylex_init(yyscanner);
+    ASSERT_ARGS(do_yylex_init);
 
     /* This way we can get the interpreter via yyscanner */
     if (!retval)
@@ -601,6 +608,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     Parrot_Context        *ignored;
     INTVAL regs_used[4] = {3, 3, 3, 3};
     INTVAL eval_number;
+    ASSERT_ARGS(imcc_compile);
 
     do_yylex_init(interp, &yyscanner);
 
@@ -733,6 +741,7 @@ PMC *
 imcc_compile_pasm(PARROT_INTERP, ARGIN(const char *s))
 {
     STRING *error_message;
+    ASSERT_ARGS(imcc_compile_pasm);
     return imcc_compile(interp, s, 1, &error_message);
 }
 
@@ -755,6 +764,7 @@ PMC *
 imcc_compile_pir(PARROT_INTERP, ARGIN(const char *s))
 {
     STRING *error_message;
+    ASSERT_ARGS(imcc_compile_pir);
     return imcc_compile(interp, s, 0, &error_message);
 }
 
@@ -774,6 +784,7 @@ PMC *
 IMCC_compile_pir_s(PARROT_INTERP, ARGIN(const char *s),
         ARGOUT(STRING **error_message))
 {
+    ASSERT_ARGS(IMCC_compile_pir_s);
     return imcc_compile(interp, s, 0, error_message);
 }
 
@@ -793,6 +804,7 @@ PMC *
 IMCC_compile_pasm_s(PARROT_INTERP, ARGIN(const char *s),
         ARGOUT(STRING **error_message))
 {
+    ASSERT_ARGS(IMCC_compile_pasm_s);
     return imcc_compile(interp, s, 1, error_message);
 }
 
@@ -814,6 +826,7 @@ imcc_compile_pasm_ex(PARROT_INTERP, ARGIN(const char *s))
     STRING *error_message;
 
     PMC * const sub = imcc_compile(interp, s, 1, &error_message);
+    ASSERT_ARGS(imcc_compile_pasm_ex);
 
     if (sub)
         return sub;
@@ -840,6 +853,7 @@ imcc_compile_pir_ex(PARROT_INTERP, ARGIN(const char *s))
     STRING *error_message;
 
     PMC * const sub = imcc_compile(interp, s, 0, &error_message);
+    ASSERT_ARGS(imcc_compile_pir_ex);
     if (sub)
         return sub;
 
@@ -873,6 +887,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
     /* need at least 3 regs for compilation of constant math e.g.
      * add_i_ic_ic - see also IMCC_subst_constants() */
     INTVAL regs_used[4] = {3, 3, 3, 3};
+    ASSERT_ARGS(imcc_compile_file);
 
     if (IMCC_INFO(interp)->last_unit) {
         /* a reentrant compile */
@@ -976,6 +991,7 @@ void *
 IMCC_compile_file(PARROT_INTERP, ARGIN(const char *s))
 {
     STRING *error_message;
+    ASSERT_ARGS(IMCC_compile_file);
     return imcc_compile_file(interp, s, &error_message);
 }
 
@@ -994,6 +1010,7 @@ void *
 IMCC_compile_file_s(PARROT_INTERP, ARGIN(const char *s),
         ARGOUT(STRING **error_message))
 {
+    ASSERT_ARGS(IMCC_compile_file_s);
     return imcc_compile_file(interp, s, error_message);
 }
 
@@ -1010,6 +1027,7 @@ Register additional compilers with the interpreter
 void
 register_compilers(PARROT_INTERP)
 {
+    ASSERT_ARGS(register_compilers);
     Parrot_compreg(interp, const_string(interp, "PASM"), imcc_compile_pasm_ex);
     Parrot_compreg(interp, const_string(interp, "PIR"),  imcc_compile_pir_ex);
 
@@ -1035,6 +1053,7 @@ static int
 change_op(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg **r), int num, int emit)
 {
     int changed = 0;
+    ASSERT_ARGS(change_op);
 
     if (r[num]->type & (VTCONST|VT_CONSTP)) {
         /* make a number const */
@@ -1093,6 +1112,7 @@ try_find_op(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
 {
     char fullname[64];
     int changed = 0;
+    ASSERT_ARGS(try_find_op);
     /*
      * eq_str, eq_num => eq
      * ...
@@ -1189,6 +1209,7 @@ try_rev_cmp(ARGIN(const char *name), ARGMOD(SymReg **r))
     };
 
     unsigned int i;
+    ASSERT_ARGS(try_rev_cmp);
 
     for (i = 0; i < N_ELEMENTS(br_pairs); i++) {
         if (STREQ(name, br_pairs[i].op)) {
@@ -1243,6 +1264,7 @@ PARROT_EXPORT
 void
 imcc_init(PARROT_INTERP)
 {
+    ASSERT_ARGS(imcc_init);
     PARROT_ASSERT(IMCC_INFO(interp) == NULL);
 
     IMCC_INFO(interp) = mem_allocate_zeroed_typed(imc_info_t);
@@ -1267,6 +1289,7 @@ imcc_destroy_macro_values(ARGMOD(void *value))
     params_t * const params = &m->params;
 
     int i;
+    ASSERT_ARGS(imcc_destroy_macro_values);
 
     for (i = 0; i < params->num_param; ++i) {
         char * const name = params->name[i];
@@ -1294,6 +1317,7 @@ void
 imcc_destroy(PARROT_INTERP)
 {
     Hash * const macros = IMCC_INFO(interp)->macros;
+    ASSERT_ARGS(imcc_destroy);
 
     if (macros)
         parrot_chash_destroy_values(interp, macros, imcc_destroy_macro_values);

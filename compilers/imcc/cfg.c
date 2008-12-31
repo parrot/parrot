@@ -203,6 +203,7 @@ static int
 check_invoke_type(PARROT_INTERP, ARGIN(const IMC_Unit    *unit),
                                  ARGIN(const Instruction *ins))
 {
+    ASSERT_ARGS(check_invoke_type);
     /* 1) pcc sub call or yield */
     if (ins->type & (ITPCCSUB | ITPCCYIELD))
         return INVOKE_SUB_CALL;
@@ -246,6 +247,7 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int first)
     const SymHash * const hsh = &unit->hash;
     int                   nu  = 0;
     unsigned int          i;
+    ASSERT_ARGS(find_basic_blocks);
 
     IMCC_info(interp, 2, "find_basic_blocks\n");
     init_basic_blocks(unit);
@@ -353,6 +355,7 @@ bb_check_set_addr(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
         ARGMOD(Basic_block *bb), ARGIN(const SymReg *label))
 {
     const Instruction *ins;
+    ASSERT_ARGS(bb_check_set_addr);
 
     for (ins = unit->instructions; ins; ins = ins->next) {
         if ((ins->opnum == PARROT_OP_set_addr_p_ic)
@@ -390,6 +393,7 @@ build_cfg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     Basic_block *last = NULL;
     unsigned int i;
     int changes;
+    ASSERT_ARGS(build_cfg);
 
     IMCC_info(interp, 2, "build_cfg\n");
 
@@ -531,6 +535,7 @@ bb_findadd_edge(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Basic_block *from),
 {
     Instruction         *ins;
     const SymReg * const r = find_sym(interp, label->name);
+    ASSERT_ARGS(bb_findadd_edge);
 
     if (r && (r->type & VTADDRESS) && r->first_ins)
         bb_add_edge(unit, from, unit->bb_list[r->first_ins->bbindex]);
@@ -570,6 +575,7 @@ blocks_are_connected(ARGIN(const Basic_block *from),
                      ARGIN(const Basic_block *to))
 {
     const Edge *pred = to->pred_list;
+    ASSERT_ARGS(blocks_are_connected);
 
     while (pred) {
         /*already linked*/
@@ -598,6 +604,7 @@ bb_add_edge(ARGMOD(IMC_Unit *unit), ARGIN(Basic_block  *from),
                                     ARGMOD(Basic_block *to))
 {
     Edge *e;
+    ASSERT_ARGS(bb_add_edge);
     if (blocks_are_connected(from, to))
         return;
 
@@ -638,6 +645,7 @@ Removes the given edge from the graph.
 static void
 bb_remove_edge(ARGMOD(IMC_Unit *unit), ARGMOD(Edge *edge))
 {
+    ASSERT_ARGS(bb_remove_edge);
     if (edge->from->succ_list == edge) {
         edge->from->succ_list = edge->succ_next;
     }
@@ -693,6 +701,7 @@ static void
 free_edge(ARGMOD(IMC_Unit *unit))
 {
     Edge *e;
+    ASSERT_ARGS(free_edge);
 
     for (e = unit->edge_list; e;) {
         Edge * const next = e->next;
@@ -720,7 +729,7 @@ edge_count(ARGIN(const IMC_Unit *unit))
 {
     Edge *e = unit->edge_list;
     int   i = 0;
-
+    ASSERT_ARGS(edge_count);
     while (e) {
         i++;
         e = e->next;
@@ -746,6 +755,7 @@ life_analysis(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 {
     SymReg  ** const reglist = unit->reglist;
     unsigned int     i;
+    ASSERT_ARGS(life_analysis);
 
     IMCC_info(interp, 2, "life_analysis\n");
 
@@ -768,6 +778,7 @@ static void
 analyse_life_symbol(ARGIN(const IMC_Unit *unit), ARGMOD(SymReg* r))
 {
     unsigned int i;
+    ASSERT_ARGS(analyse_life_symbol);
 
 #if IMC_TRACE_HIGH
     fprintf(stderr, "cfg.c: analyse_life_symbol(%s)\n", r->name);
@@ -829,6 +840,7 @@ Frees memory of the life analysis info structures.
 void
 free_life_info(ARGIN(const IMC_Unit *unit), ARGMOD(SymReg *r))
 {
+    ASSERT_ARGS(free_life_info);
 #if IMC_TRACE_HIGH
     fprintf(stderr, "free_life_into(%s)\n", r->name);
 #endif
@@ -864,6 +876,7 @@ analyse_life_block(ARGIN(const Basic_block* bb), ARGMOD(SymReg *r))
     Life_range  * const l        = make_life_range(r, bb->index);
     Instruction         *special = NULL;
     Instruction         *ins;
+    ASSERT_ARGS(analyse_life_block);
 
     for (ins = bb->start; ins; ins = ins->next) {
         int is_alias;
@@ -942,6 +955,7 @@ propagate_need(ARGMOD(Basic_block *bb), ARGIN(const SymReg *r), int i)
     Edge        *edge;
     Life_range  *l;
     Basic_block *pred;
+    ASSERT_ARGS(propagate_need);
 
     /* every predecessor of a LF_lv_in block must be in LF_lv_out
      * and, unless itself is LV_def, this should be propagated to its
@@ -1020,6 +1034,7 @@ compute_dominators(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     Set **dominators;
 
     const unsigned int n = unit->n_basic_blocks;
+    ASSERT_ARGS(compute_dominators);
     IMCC_info(interp, 2, "compute_dominators\n");
 
     unit->idoms          = mem_allocate_n_zeroed_typed(n, int);
@@ -1150,6 +1165,7 @@ compute_dominance_frontiers(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     const int    n                   = unit->n_basic_blocks;
     Set ** const dominance_frontiers = unit->dominance_frontiers =
         mem_allocate_n_typed(n, Set *);
+    ASSERT_ARGS(compute_dominance_frontiers);
 
     IMCC_info(interp, 2, "compute_dominance_frontiers\n");
 
@@ -1206,6 +1222,7 @@ Frees the memory in the given unit related to all dominators.
 static void
 free_dominators(ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(free_dominators);
     if (unit->dominators) {
         unsigned int i;
 
@@ -1233,6 +1250,7 @@ Frees the memory in the given unit related to all dominance frontiers.
 static void
 free_dominance_frontiers(ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(free_dominance_frontiers);
     if (unit->dominance_frontiers) {
         unsigned int i;
 
@@ -1265,6 +1283,7 @@ sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
     int          n_loops   = (int)unit->n_loops;
     int          i, k, changed;
     unsigned int j;
+    ASSERT_ARGS(sort_loops);
 
     for (i = 0; i < n_loops; i++) {
         loop_info[i]->size = 0;
@@ -1340,6 +1359,7 @@ void
 find_loops(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     unsigned int i;
+    ASSERT_ARGS(find_loops);
 
     IMCC_info(interp, 2, "find_loops\n");
 
@@ -1378,6 +1398,7 @@ natural_preheader(ARGIN(const IMC_Unit *unit), ARGIN(const Loop_info *loop_info)
 {
     Edge *edge;
     int   preheader = -1;
+    ASSERT_ARGS(natural_preheader);
 
     for (edge = unit->bb_list[loop_info->header]->pred_list;
          edge;
@@ -1424,6 +1445,7 @@ mark_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const Edge *e))
 
     unsigned int i;
     int n_loops;
+    ASSERT_ARGS(mark_loop);
 
     /* look from where loop was entered */
     for (i = 0, edge=header->pred_list; edge; edge=edge->pred_next)
@@ -1501,6 +1523,7 @@ static void
 free_loops(ARGMOD(IMC_Unit *unit))
 {
     int i;
+    ASSERT_ARGS(free_loops);
 
     for (i = 0; i < unit->n_loops; i++) {
         set_free(unit->loop_info[i]->loop);
@@ -1530,6 +1553,7 @@ void
 search_predecessors_not_in(ARGIN(const Basic_block *node), ARGMOD(Set *s))
 {
    Edge *edge;
+   ASSERT_ARGS(search_predecessors_not_in);
 
    for (edge = node->pred_list; edge; edge = edge->pred_next) {
         Basic_block * const pred = edge->from;
@@ -1557,6 +1581,8 @@ Initializes the basic blocks memory for this unit.
 static void
 init_basic_blocks(ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(init_basic_blocks);
+
     if (!unit->bb_list)
         clear_basic_blocks(unit);
 
@@ -1581,6 +1607,8 @@ Frees all of the blocks and CFG memory allocated for this unit.
 void
 clear_basic_blocks(ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(clear_basic_blocks);
+
     if (unit->bb_list) {
         unsigned int i;
 
@@ -1615,8 +1643,7 @@ make_basic_block(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins))
 {
     Basic_block * const bb = mem_allocate_typed(Basic_block);
     int                 n  = unit->n_basic_blocks;
-
-    PARROT_ASSERT(ins);
+    ASSERT_ARGS(make_basic_block);
 
     bb->start      = ins;
     bb->end        = ins;
@@ -1656,6 +1683,7 @@ Life_range *
 make_life_range(ARGMOD(SymReg *r), int idx)
 {
     Life_range * const l = mem_allocate_zeroed_typed(Life_range);
+    ASSERT_ARGS(make_life_range);
     r->life_info[idx]    = l;
 
     return l;

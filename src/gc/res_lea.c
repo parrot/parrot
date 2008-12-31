@@ -45,6 +45,7 @@ count.
 void
 Parrot_go_collect(PARROT_INTERP)
 {
+    ASSERT_ARGS(parrot_go_collect);
     if (interp->arena_base->GC_block_level) {
         return;
     }
@@ -66,6 +67,7 @@ static PARROT_INLINE void*
 xmalloc(size_t size)
 {
     void *p = malloc(size);
+    ASSERT_ARGS(xmalloc);
     if (!p)
         do_panic(NULL, "malloc: out of mem", __FILE__, __LINE__);
     return p;
@@ -86,6 +88,7 @@ static PARROT_INLINE void*
 xcalloc(size_t n, size_t size)
 {
     void * const p = calloc(n, size);
+    ASSERT_ARGS(xcalloc);
     if (!p)
         do_panic(NULL, "calloc: out of mem", __FILE__, __LINE__);
     return p;
@@ -106,6 +109,7 @@ static PARROT_INLINE void*
 xrealloc(void *p, size_t size)
 {
     void * const n = realloc(p, size);
+    ASSERT_ARGS(xrealloc);
     if (!n)
         do_panic(NULL, "realloc: out of mem", __FILE__, __LINE__);
     return n;
@@ -127,6 +131,7 @@ Parrot_reallocate(PARROT_INTERP, Buffer *buffer, size_t newsize)
 {
     const size_t oldlen = PObj_buflen(buffer);
     Buffer_alloc_unit *p;
+    ASSERT_ARGS(parrot_reallocate);
 
     if (!PObj_bufstart(buffer)) {
         Parrot_allocate_aligned(interp, buffer, newsize);
@@ -173,6 +178,7 @@ void
 Parrot_allocate_aligned(PARROT_INTERP, Buffer *buffer, size_t size)
 {
     Buffer_alloc_unit *p;
+    ASSERT_ARGS(parrot_allocate_aligned);
     p = (Buffer_alloc_unit *) xmalloc(Buffer_alloc_offset + size);
     p->ref_count = 0;
     PObj_bufstart(buffer) = p->buffer;
@@ -194,6 +200,7 @@ void
 Parrot_reallocate_string(PARROT_INTERP, STRING *str, size_t newsize)
 {
     Buffer_alloc_unit *p;
+    ASSERT_ARGS(parrot_reallocate_string);
 
     if (!PObj_bufstart(str)) {
         Parrot_allocate_string(interp, str, newsize);
@@ -221,6 +228,7 @@ void
 Parrot_allocate_string(PARROT_INTERP, STRING *str, size_t size)
 {
     Buffer_alloc_unit *p;
+    ASSERT_ARGS(parrot_allocate_string);
     p = (Buffer_alloc_unit *) xcalloc(Buffer_alloc_offset + size, 1);
     p->ref_count = 0;
     PObj_bufstart(str) = str->strstart = (char *) p->buffer;
@@ -240,6 +248,7 @@ Does nothing.
 void
 Parrot_initialize_memory_pools(PARROT_INTERP)
 {
+    ASSERT_ARGS(parrot_initialize_memory_pools);
 }
 
 /*
@@ -254,6 +263,7 @@ Does nothing.
 void
 Parrot_merge_memory_pools(Interp *dest, Interp *source)
 {
+    ASSERT_ARGS(parrot_merge_memory_pools);
 }
 
 /*
@@ -269,6 +279,7 @@ Does nothing.
 void
 Parrot_destroy_memory_pools(PARROT_INTERP)
 {
+    ASSERT_ARGS(parrot_destroy_memory_pools);
 }
 
 /*

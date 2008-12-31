@@ -46,6 +46,7 @@ PARROT_EXPORT
 void
 string_set_data_directory(PARROT_INTERP, ARGIN(const char *dir))
 {
+    ASSERT_ARGS(string_set_data_directory);
 #if PARROT_HAS_ICU
     u_setDataDirectory(dir);
 
@@ -88,6 +89,7 @@ string_unescape_one(PARROT_INTERP, ARGMOD(UINTVAL *offset),
     const UINTVAL len = string_length(interp, string);
     /* Well, not right now */
     UINTVAL codepoint = CHARSET_GET_BYTE(interp, string, *offset);
+    ASSERT_ARGS(string_unescape_one);
     ++*offset;
     switch (codepoint) {
         case 'x':
@@ -320,6 +322,7 @@ PARROT_CONST_FUNCTION
 INTVAL
 Parrot_char_digit_value(SHIM_INTERP, UINTVAL character)
 {
+    ASSERT_ARGS(Parrot_char_digit_value);
 #if PARROT_HAS_ICU
     return u_charDigitValue(character);
 #else
@@ -348,6 +351,7 @@ str_dup(ARGIN(const char *old))
 {
     const size_t bytes = strlen(old) + 1;
     char * const copy = (char *)mem_sys_allocate(bytes);
+    ASSERT_ARGS(str_dup);
     memcpy(copy, old, bytes);
 #ifdef MEMDEBUG
     debug(interp, 1, "line %d str_dup %s [%x]\n", line, old, copy);
@@ -377,6 +381,7 @@ str_dup_remove_quotes(ARGIN(const char *old))
     /* 2 for the beginning and ending quote chars */
     const size_t newlen = oldlen - 2;
     char * const copy   = (char *)mem_sys_allocate(newlen);
+    ASSERT_ARGS(str_dup_remove_quotes);
 
     memcpy(copy, old + 1, newlen);
     copy[newlen - 1] = 0;

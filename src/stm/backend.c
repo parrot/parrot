@@ -243,6 +243,7 @@ void
 Parrot_STM_destroy(PARROT_INTERP)
 {
     STM_tx_log *log;
+    ASSERT_ARGS(Parrot_STM_destroy);
 
     if (!interp->thread_data || !interp->thread_data->stm_log)
         return;
@@ -272,6 +273,7 @@ Parrot_STM_alloc(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 {
     Parrot_STM_PMC_handle_data *handle;
     Small_Object_Pool *ignored;
+    ASSERT_ARGS(Parrot_STM_alloc);
     STM_TRACE("Parrot_STM_alloc");
 
     ignored = make_bufferlike_pool(interp, sizeof (Parrot_STM_PMC_handle_data));
@@ -314,6 +316,7 @@ void
 Parrot_freeze_STM_PMC_handle(PARROT_INTERP, ARGMOD(IMAGE_IO *io),
             ARGIN(Parrot_STM_PMC_handle handle))
 {
+    ASSERT_ARGS(Parrot_freeze_STM_PMC_handle);
     VTABLE_push_pmc(interp, io, (PMC*) handle);
 }
 
@@ -331,6 +334,7 @@ Parrot_STM_PMC_handle
 Parrot_thaw_STM_PMC_handle(PARROT_INTERP, ARGIN(IMAGE_IO *io))
 {
     Parrot_STM_PMC_handle handle = (Parrot_STM_PMC_handle) VTABLE_shift_pmc(interp, io);
+    ASSERT_ARGS(Parrot_thaw_STM_PMC_handle);
     return handle;
 }
 
@@ -350,6 +354,7 @@ PARROT_CANNOT_RETURN_NULL
 static STM_write_record *
 get_write(SHIM_INTERP, ARGIN(STM_tx_log *log), int i)
 {
+    ASSERT_ARGS(get_write);
     PARROT_ASSERT(i >= 0);
     PARROT_ASSERT(i <= log->last_write);
     return &log->writes[i];
@@ -370,6 +375,7 @@ PARROT_CANNOT_RETURN_NULL
 static STM_read_record *
 get_read(SHIM_INTERP, ARGIN(STM_tx_log *log), int i)
 {
+    ASSERT_ARGS(get_read);
     PARROT_ASSERT(i >= 0);
     PARROT_ASSERT(i <= log->last_read);
     return &log->reads[i];
@@ -398,6 +404,7 @@ alloc_write(PARROT_INTERP, ARGMOD(STM_tx_log *log))
 {
     STM_write_record *write;
     const int         i = ++log->last_write;
+    ASSERT_ARGS(alloc_write);
 
     if (i >= log->writes_alloced) {
         log->writes_alloced *= 2;
@@ -428,6 +435,7 @@ alloc_read(PARROT_INTERP, ARGMOD(STM_tx_log *log))
 {
     STM_read_record *read;
     const int i = ++log->last_read;
+    ASSERT_ARGS(alloc_read);
 
     if (i >= log->reads_alloced) {
         log->reads_alloced *= 2;
@@ -457,6 +465,7 @@ static void *
 next_version(ARGIN(const void *old_version))
 {
     const UINTVAL v = PTR2UINTVAL(old_version) + 2;
+    ASSERT_ARGS(next_version);
 
     return UINTVAL2PTR(void *, v);
 }
@@ -476,6 +485,7 @@ static int
 is_version(ARGIN(const void *maybe_version))
 {
     const UINTVAL v = PTR2UINTVAL(maybe_version);
+    ASSERT_ARGS(is_version);
     return v & 1;
 }
 
@@ -494,6 +504,7 @@ PARROT_CANNOT_RETURN_NULL
 static STM_tx_log_sub *
 get_sublog(ARGIN(STM_tx_log *log), int i)
 {
+    ASSERT_ARGS(get_sublog);
     PARROT_ASSERT(i > 0);
     PARROT_ASSERT(i <= log->depth);
     return &log->inner[i - 1];
@@ -516,6 +527,7 @@ static int
 is_aborted(ARGIN(STM_tx_log *log))
 {
     int i;
+    ASSERT_ARGS(is_aborted);
 
     for (i = 1; i <= log->depth; ++i) {
         int status;
@@ -545,6 +557,7 @@ Parrot_STM_start_transaction(PARROT_INTERP)
 {
     STM_tx_log     * const log = Parrot_STM_tx_log_get(interp);
     STM_tx_log_sub *       newsub;
+    ASSERT_ARGS(Parrot_STM_start_transaction);
 
     ++log->depth;
     newsub = get_sublog(log, log->depth);
@@ -584,6 +597,7 @@ merge_transactions(PARROT_INTERP, ARGMOD(STM_tx_log *log),
     int i;
     int status;
     int need_abort = 0;
+    ASSERT_ARGS(merge_transactions);
 
     PARROT_ATOMIC_INT_GET(status, inner->status);
 
@@ -679,6 +693,7 @@ static PMC *
 force_sharing(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 {
     PMC *ret;
+    ASSERT_ARGS(force_sharing);
 
     if (PMC_IS_NULL(pmc))
         return PMCNULL;
@@ -705,6 +720,7 @@ get_read_valid_depth(PARROT_INTERP, ARGIN(STM_tx_log *log))
     int i;
     int validp    = 1;
     int cur_depth = 1;
+    ASSERT_ARGS(get_read_valid_depth);
 
     if (log->depth == 0)
         return 0;
@@ -763,6 +779,7 @@ do_real_commit(PARROT_INTERP, ARGIN(STM_tx_log *log)) {
     int i;
     int successp;
     STM_tx_log_sub *inner;
+    ASSERT_ARGS(do_real_commit);
 
     PARROT_ASSERT(log->depth == 1);
 
@@ -836,6 +853,7 @@ static void
 do_partial_abort(PARROT_INTERP, ARGIN(STM_tx_log *log), ARGIN(STM_tx_log_sub *inner))
 {
     int i;
+    ASSERT_ARGS(do_partial_abort);
 
     STM_TRACE_SAFE("partial abort");
     PARROT_ATOMIC_INT_SET(inner->status, STM_STATUS_ABORTED);
@@ -872,6 +890,7 @@ Does an abort. This is also used for inner transactions.
 static void
 do_real_abort(PARROT_INTERP, ARGMOD(STM_tx_log *log), ARGIN(STM_tx_log_sub *inner))
 {
+    ASSERT_ARGS(do_real_abort);
     STM_TRACE_SAFE("really aborting");
     do_partial_abort(interp, log, inner);
 
@@ -900,6 +919,7 @@ replay_writes(PARROT_INTERP, ARGIN(STM_tx_log *log), int from, int to)
     int i;
     int validp    = 1;
     int cur_depth = from;
+    ASSERT_ARGS(replay_writes);
 
     while (validp && cur_depth <= to) {
         int last_write;
@@ -956,6 +976,7 @@ Parrot_STM_commit(PARROT_INTERP)
     STM_tx_log     * const log = Parrot_STM_tx_log_get(interp);
     STM_tx_log_sub *cursub;
     int             successp;
+    ASSERT_ARGS(Parrot_STM_commit);
 
     STM_TRACE("commit");
 
@@ -1005,6 +1026,7 @@ Parrot_STM_abort(PARROT_INTERP)
 {
     STM_tx_log     * const log = Parrot_STM_tx_log_get(interp);
     STM_tx_log_sub *cursub;
+    ASSERT_ARGS(Parrot_STM_abort);
 
     STM_TRACE_SAFE("abort");
 
@@ -1037,6 +1059,7 @@ setup_wait(PARROT_INTERP, ARGMOD(STM_tx_log *log))
 {
     int need_wait = 1;
     int i;
+    ASSERT_ARGS(setup_wait);
 
     for (i = 0; need_wait && i <= log->last_read; ++i) {
         void *version;
@@ -1106,6 +1129,7 @@ Parrot_STM_wait(PARROT_INTERP)
 {
     STM_tx_log *log;
     int         need_wait;
+    ASSERT_ARGS(Parrot_STM_wait);
 
     STM_TRACE("%p: wait", interp);
 
@@ -1157,6 +1181,7 @@ Parrot_STM_validate(PARROT_INTERP)
     STM_tx_log_sub *inner;
     int             status;
     STM_tx_log     * const log = Parrot_STM_tx_log_get(interp);
+    ASSERT_ARGS(Parrot_STM_validate);
 
     if (log->depth == 0)
         return 1;
@@ -1184,6 +1209,7 @@ RT#48260: Not yet documented!!!
 static void
 mark_write_record(PARROT_INTERP, ARGMOD(STM_write_record *write))
 {
+    ASSERT_ARGS(mark_write_record);
     if (!PMC_IS_NULL(write->value))
         pobject_lives(interp, (PObj *) write->value);
 
@@ -1203,6 +1229,7 @@ RT#48260: Not yet documented!!!
 static void
 mark_read_record(PARROT_INTERP, ARGMOD(STM_read_record *read))
 {
+    ASSERT_ARGS(mark_read_record);
     if (!PMC_IS_NULL(read->value))
         pobject_lives(interp, (PObj *) read->value);
 
@@ -1225,6 +1252,7 @@ Parrot_STM_mark_transaction(PARROT_INTERP)
 {
     int         i;
     STM_tx_log *log;
+    ASSERT_ARGS(Parrot_STM_mark_transaction);
 
     STM_TRACE("mark txlog");
 
@@ -1252,6 +1280,7 @@ void
 Parrot_STM_mark_pmc_handle(PARROT_INTERP, Parrot_STM_PMC_handle handle)
 {
     PMC *value;
+    ASSERT_ARGS(Parrot_STM_mark_pmc_handle);
 
     if (!handle)
         return;
@@ -1283,6 +1312,7 @@ int
 Parrot_STM_transaction_depth(PARROT_INTERP)
 {
     const STM_tx_log * const log = Parrot_STM_tx_log_get(interp);
+    ASSERT_ARGS(Parrot_STM_transaction_depth);
 
     return log->depth;
 }
@@ -1311,6 +1341,7 @@ wait_for_version(PARROT_INTERP, ARGMOD(STM_tx_log *log), Parrot_STM_PMC_handle h
     Parrot_atomic_pointer *in_what    = &handle->owner_or_version;
     UINTVAL                wait_count = 0;
     FLOATVAL               start_wait = 0.0;
+    ASSERT_ARGS(wait_for_version);
 
     STM_TRACE("%p: wait for version");
     for (;;) {
@@ -1435,6 +1466,7 @@ Parrot_STM_read(PARROT_INTERP, Parrot_STM_PMC_handle handle)
     void              *check_version;
     int                i;
     STM_tx_log * const log = Parrot_STM_tx_log_get(interp);
+    ASSERT_ARGS(Parrot_STM_read);
 
     if (log->depth == 0) {
         /* special case outside of transaction */
@@ -1514,6 +1546,7 @@ PARROT_WARN_UNUSED_RESULT
 static int
 safe_to_clone(SHIM_INTERP, ARGIN(const PMC *original))
 {
+    ASSERT_ARGS(safe_to_clone);
     if (original->vtable->base_type == enum_class_Integer
         ||  original->vtable->base_type == enum_class_Float
         ||  original->vtable->base_type == enum_class_BigInt
@@ -1540,6 +1573,7 @@ PARROT_WARN_UNUSED_RESULT
 static PMC *
 local_pmc_copy(PARROT_INTERP, ARGIN_NULLOK(PMC *original))
 {
+    ASSERT_ARGS(local_pmc_copy);
     if (PMC_IS_NULL(original))
         return PMCNULL;
 
@@ -1580,6 +1614,7 @@ find_write_record(PARROT_INTERP, Parrot_STM_PMC_handle handle, int overwrite_p)
     STM_write_record *write          = NULL;
     int               i;
     STM_tx_log       *log;
+    ASSERT_ARGS(find_write_record);
 
     STM_TRACE("finding write record for %p", handle);
 
@@ -1724,6 +1759,7 @@ Parrot_STM_begin_update(PARROT_INTERP, Parrot_STM_PMC_handle handle)
 {
     STM_write_record   *write;
     const STM_tx_log * const log = Parrot_STM_tx_log_get(interp);
+    ASSERT_ARGS(Parrot_STM_begin_update);
 
     if (log->depth == 0)
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -1750,6 +1786,7 @@ Parrot_STM_write(PARROT_INTERP, Parrot_STM_PMC_handle handle, ARGIN_NULLOK(PMC* 
     /* XXX no transaction case */
     STM_write_record   *write;
     const STM_tx_log * const log = Parrot_STM_tx_log_get(interp);
+    ASSERT_ARGS(Parrot_STM_write);
 
     /* error for now */
     if (log->depth == 0)
@@ -1779,6 +1816,7 @@ Parrot_STM_extract(PARROT_INTERP)
     STM_saved_tx_log  *saved;
     STM_tx_log_sub    *cursub;
     STM_tx_log * const log = Parrot_STM_tx_log_get(interp);
+    ASSERT_ARGS(Parrot_STM_extract);
 
     if (log->depth == 0)
         return NULL;
@@ -1817,6 +1855,7 @@ in.
 void
 Parrot_STM_replay_extracted(PARROT_INTERP, ARGMOD_NULLOK(void *saved_log_data))
 {
+    ASSERT_ARGS(Parrot_STM_replay_extracted);
     if (saved_log_data) {
         STM_saved_tx_log * const saved = (STM_saved_tx_log *)saved_log_data;
         STM_tx_log * const       log   = Parrot_STM_tx_log_get(interp);
@@ -1861,6 +1900,7 @@ Mark GC-managed objects reachable through an extracted transaction log.
 void
 Parrot_STM_mark_extracted(PARROT_INTERP, ARGMOD_NULLOK(void *saved_log_data))
 {
+    ASSERT_ARGS(Parrot_STM_mark_extracted);
     if (saved_log_data) {
         STM_saved_tx_log * const saved = (STM_saved_tx_log *)saved_log_data;
         int i;
@@ -1886,6 +1926,7 @@ Free memory associated with an extracted transaction log.
 void
 Parrot_STM_destroy_extracted(SHIM_INTERP, ARGMOD_NULLOK(void *saved_log_data))
 {
+    ASSERT_ARGS(Parrot_STM_destroy_extracted);
     if (saved_log_data) {
         STM_saved_tx_log * const saved = (STM_saved_tx_log *)saved_log_data;
 
@@ -1914,6 +1955,7 @@ Parrot_STM_dump_profile(PARROT_INTERP)
     STM_tx_log       *log;
     STM_profile_data *profile;
     INTVAL            i;
+    ASSERT_ARGS(parrot_stm_dump_profile);
 
     Parrot_block_GC_mark(interp);
 
@@ -1968,6 +2010,7 @@ Parrot_STM_merge_profile(ARGOUT(Interp *d), ARGOUT(Interp *s))
 
     const STM_profile_date * const from = &PROFILE(Parrot_STM_tx_log_get(s));
     STM_profile_date * const to   = &PROFILE(Parrot_STM_tx_log_get(d));
+    ASSERT_ARGS(parrot_stm_merge_profile);
 
     to->attempted_commits += from->attempted_commits;
     to->failed_commits    += from->failed_commits;

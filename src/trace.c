@@ -56,6 +56,7 @@ static STRING*
 trace_class_name(ARGIN(const PMC* pmc))
 {
     STRING *class_name;
+    ASSERT_ARGS(trace_class_name);
     if (PObj_is_class_TEST(pmc)) {
         SLOTTYPE * const class_array = (SLOTTYPE *)PMC_data(pmc);
         PMC * const class_name_pmc = get_attrib_num(class_array,
@@ -81,6 +82,7 @@ void
 trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 {
     Interp * const debugger = interp->debugger;
+    ASSERT_ARGS(trace_pmc_dump);
 
     if (!pmc) {
         Parrot_io_eprintf(debugger, "(null)");
@@ -172,6 +174,7 @@ trace_key_dump(PARROT_INTERP, ARGIN(const PMC *key))
     Interp * const debugger = interp->debugger;
 
     int len = Parrot_io_eprintf(debugger, "[");
+    ASSERT_ARGS(trace_key_dump);
 
     while (key) {
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
@@ -259,6 +262,7 @@ trace_op_dump(PARROT_INTERP,
     int type;
     int len;
 #define ARGS_COLUMN 40
+    ASSERT_ARGS(trace_op_dump);
 
     PARROT_ASSERT(debugger);
     sig = NULL; /* silence compiler uninit warning */
@@ -466,6 +470,7 @@ trace_op(PARROT_INTERP,
         ARGIN(const opcode_t *code_end),
         ARGIN_NULLOK(const opcode_t *pc))
 {
+    ASSERT_ARGS(trace_op);
     if (!pc) {
         return;
     }

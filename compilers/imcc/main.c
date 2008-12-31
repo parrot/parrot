@@ -133,6 +133,7 @@ Outputs usage error message.
 static void
 usage(ARGMOD(FILE *fp))
 {
+    ASSERT_ARGS(usage);
     fprintf(fp,
             "parrot -[abcCEfgGhjprStvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
             "[-O [level]] [-o FILE] <file>\n");
@@ -151,6 +152,7 @@ Print out list of debugging flag values.
 static void
 help_debug(void)
 {
+    ASSERT_ARGS(help_debug);
     /* split printf for C89 compliance on string length */
     printf(
     "--imcc-debug -d [Flags] ...\n"
@@ -195,6 +197,7 @@ Print out "help" list of options.
 static void
 help(void)
 {
+    ASSERT_ARGS(help);
     /* split printf for C89 compliance on string length */
     printf(
     "parrot [Options] <file>\n"
@@ -252,6 +255,7 @@ Print out parrot version number.
 static void
 Parrot_version(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_version);
     printf("This is parrot version " PARROT_VERSION);
     printf(" built for " PARROT_ARCHNAME ".\n");
     printf("Copyright (C) 2001-2008, The Perl Foundation.\n\
@@ -328,6 +332,7 @@ PARROT_PURE_FUNCTION
 static int
 is_all_hex_digits(ARGIN(const char *s))
 {
+    ASSERT_ARGS(is_all_hex_digits);
     for (; *s; s++)
         if (!isxdigit(*s))
             return 0;
@@ -593,6 +598,7 @@ do_pre_process(PARROT_INTERP)
     YYSTYPE   val;
 
     const yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
+    ASSERT_ARGS(do_pre_process);
 
     IMCC_push_parser_state(interp);
     c = yylex(&val, yyscanner, interp); /* is reset at end of while loop */
@@ -711,6 +717,7 @@ static void
 imcc_get_optimization_description(const PARROT_INTERP, int opt_level, ARGMOD(char *opt_desc))
 {
     int i = 0;
+    ASSERT_ARGS(imcc_get_optimization_description);
 
     if (opt_level & (OPT_PRE | OPT_CFG))
             opt_desc[i++] = '2';
@@ -783,6 +790,7 @@ static void
 imcc_run_pbc(PARROT_INTERP, int obj_file, ARGIN_NULLOK(const char *output_file),
         int argc, ARGIN(char **argv))
 {
+    ASSERT_ARGS(imcc_run_pbc);
     if (IMCC_INFO(interp)->imcc_warn)
         PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
     else
@@ -821,6 +829,7 @@ imcc_write_pbc(PARROT_INTERP, ARGIN(const char *output_file))
     size_t    size;
     opcode_t *packed;
     FILE     *fp;
+    ASSERT_ARGS(imcc_write_pbc);
 
     IMCC_info(interp, 1, "Writing %s\n", output_file);
 
@@ -857,6 +866,7 @@ static void
 determine_input_file_type(PARROT_INTERP, ARGIN(const char * const sourcefile))
 {
     yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
+    ASSERT_ARGS(determine_input_file_type);
 
     /* Read in the source and check the file extension for the input type;
        a file extension .pbc means it's parrot bytecode;
@@ -901,6 +911,7 @@ determine_output_file_type(PARROT_INTERP,
     ARGMOD(int *obj_file), ARGIN(const char *output_file))
 {
     const char * const ext = strrchr(output_file, '.');
+    ASSERT_ARGS(determine_output_file_type);
 
     if (ext) {
         if (STREQ(ext, ".pbc"))
@@ -942,6 +953,7 @@ compile_to_bytecode(PARROT_INTERP,
 
     /* Shouldn't be more than five, but five extra is cheap */
     char opt_desc[10];
+    ASSERT_ARGS(compile_to_bytecode);
 
     imcc_get_optimization_description(interp, opt_level, opt_desc);
 

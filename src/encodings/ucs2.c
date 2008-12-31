@@ -209,6 +209,7 @@ to_encoding(PARROT_INTERP, ARGIN(STRING *src), ARGMOD(STRING *dest))
 {
     STRING * const result =
         Parrot_utf16_encoding_ptr->to_encoding(interp, src, dest);
+    ASSERT_ARGS(to_encoding);
 
     /* conversion to utf16 downgrads to ucs-2 if possible - check result */
     if (result->encoding == Parrot_utf16_encoding_ptr)
@@ -235,6 +236,7 @@ get_codepoint(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
     UChar * const s = (UChar*) src->strstart;
     return s[offset];
 #else
+    ASSERT_ARGS(get_codepoint);
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
         "no ICU lib loaded");
 #endif
@@ -257,6 +259,7 @@ set_codepoint(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL codepoi
     UChar * const s = (UChar*) src->strstart;
     s[offset] = codepoint;
 #else
+    ASSERT_ARGS(set_codepoint);
     UNUSED(src);
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
         "no ICU lib loaded");
@@ -276,6 +279,7 @@ Returns the byte in string C<src> at position C<offset>.
 static UINTVAL
 get_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset)
 {
+    ASSERT_ARGS(get_byte);
     UNIMPL;
 }
 
@@ -292,6 +296,7 @@ Sets, in string C<src> at position C<offset>, the byte C<byte>.
 static void
 set_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset, UINTVAL byte)
 {
+    ASSERT_ARGS(set_byte);
     UNIMPL;
 }
 
@@ -312,6 +317,7 @@ static STRING *
 get_codepoints(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
 {
     STRING * const return_string = Parrot_make_COW_reference(interp, src);
+    ASSERT_ARGS(get_codepoints);
 #if PARROT_HAS_ICU
     return_string->strstart = (char*)src->strstart + offset * sizeof (UChar);
     return_string->bufused = count * sizeof (UChar);
@@ -348,6 +354,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 get_bytes(PARROT_INTERP, SHIM(STRING *src), UINTVAL offset, UINTVAL count)
 {
+    ASSERT_ARGS(get_bytes);
     UNIMPL;
 }
 
@@ -369,7 +376,7 @@ static STRING *
 get_codepoints_inplace(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *dest_string))
 {
-
+    ASSERT_ARGS(get_codepoints_inplace);
     UNIMPL;
 }
 
@@ -390,6 +397,7 @@ static STRING *
 get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *return_string))
 {
+    ASSERT_ARGS(get_bytes_inplace);
     UNIMPL;
 }
 
@@ -408,6 +416,7 @@ static void
 set_codepoints(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *new_codepoints))
 {
+    ASSERT_ARGS(set_codepoints);
     UNIMPL;
 }
 
@@ -426,6 +435,7 @@ static void
 set_bytes(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *new_bytes))
 {
+    ASSERT_ARGS(set_bytes);
     UNIMPL;
 }
 
@@ -442,6 +452,7 @@ Unconditionally makes the string be in this encoding, if that's valid
 static void
 become_encoding(PARROT_INTERP, SHIM(STRING *src))
 {
+    ASSERT_ARGS(become_encoding);
     UNIMPL;
 }
 
@@ -460,6 +471,7 @@ PARROT_WARN_UNUSED_RESULT
 static UINTVAL
 codepoints(PARROT_INTERP, ARGIN(STRING *src))
 {
+    ASSERT_ARGS(codepoints);
 #if PARROT_HAS_ICU
     return src->bufused / sizeof (UChar);
 #else
@@ -482,6 +494,7 @@ PARROT_WARN_UNUSED_RESULT
 static UINTVAL
 bytes(PARROT_INTERP, ARGIN(STRING *src))
 {
+    ASSERT_ARGS(bytes);
     return src->bufused;
 }
 
@@ -506,6 +519,7 @@ ucs2_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
      *      iter versions
      */
     const UChar c = s[pos++];
+    ASSERT_ARGS(ucs2_decode_and_advance);
     i->charpos++;
     i->bytepos = pos * sizeof (UChar);
     return c;
@@ -527,6 +541,7 @@ ucs2_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
 {
     UChar * const s = (UChar*) i->str->strstart;
     UINTVAL pos = i->bytepos / sizeof (UChar);
+    ASSERT_ARGS(ucs2_encode_and_advance);
     s[pos++] = (UChar)c;
     i->charpos++;
     i->bytepos = pos * sizeof (UChar);
@@ -545,6 +560,7 @@ Moves the string iterator C<i> to the position C<n> in the string.
 static void
 ucs2_set_position(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL n)
 {
+    ASSERT_ARGS(ucs2_set_position);
     i->charpos = n;
     i->bytepos = n * sizeof (UChar);
 }
@@ -564,6 +580,7 @@ Initializes for string C<src> the string iterator C<iter>.
 static void
 iter_init(PARROT_INTERP, ARGIN(const STRING *src), ARGOUT(String_iter *iter))
 {
+    ASSERT_ARGS(iter_init);
 #if PARROT_HAS_ICU
     iter->str             = src;
     iter->bytepos         = 0;
@@ -612,6 +629,7 @@ Parrot_encoding_ucs2_init(PARROT_INTERP)
         bytes,
         iter_init
     };
+    ASSERT_ARGS(Parrot_encoding_ucs2_init);
     STRUCT_COPY_FROM_STRUCT(return_encoding, base_encoding);
     Parrot_register_encoding(interp, "ucs2", return_encoding);
     return return_encoding;

@@ -153,6 +153,7 @@ static void
 set_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
         UINTVAL offset, UINTVAL replace_count, ARGMOD(STRING *insert_string))
 {
+    ASSERT_ARGS(set_graphemes);
     ENCODING_SET_BYTES(interp, source_string, offset,
             replace_count, insert_string);
 }
@@ -174,6 +175,7 @@ to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
 {
     charset_converter_t conversion_func =
         Parrot_find_charset_converter(interp, src->charset, Parrot_binary_charset_ptr);
+    ASSERT_ARGS(to_charset);
 
     if (conversion_func)
          return conversion_func(interp, src, dest);
@@ -197,6 +199,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING*
 compose(PARROT_INTERP, SHIM(STRING *source_string))
 {
+    ASSERT_ARGS(compose);
     EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't compose binary data");
 }
 
@@ -215,6 +218,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING*
 decompose(PARROT_INTERP, SHIM(STRING *source_string))
 {
+    ASSERT_ARGS(decompose);
     EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't decompose binary data");
 }
 
@@ -232,6 +236,7 @@ upper case.
 static void
 upcase(PARROT_INTERP, SHIM(STRING *source_string))
 {
+    ASSERT_ARGS(upcase);
     EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't upcase binary data");
 }
 
@@ -249,6 +254,7 @@ lower-case.
 static void
 downcase(PARROT_INTERP, SHIM(STRING *source_string))
 {
+    ASSERT_ARGS(downcase);
     EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't downcase binary data");
 }
 
@@ -266,6 +272,7 @@ title case.
 static void
 titlecase(PARROT_INTERP, SHIM(STRING *source_string))
 {
+    ASSERT_ARGS(titlecase);
     EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't titlecase binary data");
 }
 
@@ -283,6 +290,7 @@ binary string to uppercase.
 static void
 upcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 {
+    ASSERT_ARGS(upcase_first);
     EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't upcase binary data");
 }
 
@@ -300,6 +308,7 @@ of the binary string to lowercase.
 static void
 downcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 {
+    ASSERT_ARGS(downcase_first);
     EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't downcase binary data");
 }
 
@@ -317,6 +326,7 @@ of binary data to title case.
 static void
 titlecase_first(PARROT_INTERP, SHIM(STRING *source_string))
 {
+    ASSERT_ARGS(titlecase_first);
     EXCEPTION(EXCEPTION_INVALID_CHARTYPE, "Can't titlecase binary data");
 }
 
@@ -333,6 +343,7 @@ Returns 0. We can't directly compare two binary buffers (yet).
 static INTVAL
 compare(SHIM_INTERP, SHIM(const STRING *lhs), SHIM(const STRING *rhs))
 {
+    ASSERT_ARGS(compare);
     return 0;
 }
 
@@ -351,6 +362,7 @@ static INTVAL
 cs_index(SHIM_INTERP, SHIM(STRING *source_string),
         SHIM(STRING *search_string), SHIM(UINTVAL offset))
 {
+    ASSERT_ARGS(cs_index);
     return -1;
 }
 
@@ -369,6 +381,7 @@ static INTVAL
 cs_rindex(SHIM_INTERP, SHIM(STRING *source_string),
         SHIM(STRING *search_string), SHIM(UINTVAL offset))
 {
+    ASSERT_ARGS(cs_rindex);
     return -1;
 }
 
@@ -386,6 +399,7 @@ Returns 1. All sequential data is valid binary data.
 static UINTVAL
 validate(SHIM_INTERP, SHIM(STRING *source_string))
 {
+    ASSERT_ARGS(validate);
     return 1;
 }
 
@@ -403,6 +417,7 @@ static INTVAL
 is_cclass(SHIM_INTERP, SHIM(INTVAL flags), SHIM(const STRING *source_string),
         SHIM(UINTVAL offset))
 {
+    ASSERT_ARGS(is_cclass);
     return 0;
 }
 
@@ -420,6 +435,7 @@ static INTVAL
 find_cclass(SHIM_INTERP, SHIM(INTVAL flags),
             SHIM(STRING *source_string), UINTVAL offset, UINTVAL count)
 {
+    ASSERT_ARGS(find_cclass);
     return offset + count;
 }
 
@@ -437,6 +453,7 @@ static INTVAL
 find_not_cclass(SHIM_INTERP, SHIM(INTVAL flags),
                SHIM(STRING *source_string), UINTVAL offset, UINTVAL count)
 {
+    ASSERT_ARGS(find_not_cclass);
     return offset + count;
 }
 
@@ -456,6 +473,7 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 {
     STRING *return_string;
     char real_codepoint = (char)codepoint;
+    ASSERT_ARGS(string_from_codepoint);
     return_string = string_make(interp, &real_codepoint, 1, "binary", 0);
     return return_string;
 }
@@ -502,6 +520,7 @@ Parrot_charset_binary_init(PARROT_INTERP)
         ascii_compute_hash,
         NULL
     };
+    ASSERT_ARGS(Parrot_charset_binary_init);
 
     STRUCT_COPY_FROM_STRUCT(return_set, base_set);
     return_set->preferred_encoding = Parrot_fixed_8_encoding_ptr;

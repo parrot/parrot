@@ -48,6 +48,7 @@ void
 print_pbc_location(PARROT_INTERP)
 {
     Interp * const tracer = interp->debugger ? interp->debugger : interp;
+    ASSERT_ARGS(print_pbc_location);
     Parrot_io_eprintf(tracer, "%Ss\n",
             Parrot_Context_infostr(interp,
                 CONTEXT(interp)));
@@ -66,6 +67,7 @@ Prints the warning message and the bytecode location.
 static INTVAL
 print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
 {
+    ASSERT_ARGS(print_warning);
     if (!msg)
         Parrot_io_puts(interp, Parrot_io_STDERR(interp), "Unknown warning\n");
     else {
@@ -102,7 +104,7 @@ INTVAL
 Parrot_warn(PARROT_INTERP, INTVAL warnclass,
             ARGIN(const char *message), ...)
 {
-    PARROT_ASSERT(interp);
+    ASSERT_ARGS(Parrot_warn);
     if (!PARROT_WARNINGS_test(interp, warnclass))
         return 2;
     else {

@@ -230,6 +230,7 @@ TODO - Only C<SIGHUP> is handled at the moment for testing
 static void
 sig_handler(int signum)
 {
+    ASSERT_ARGS(sig_handler);
     switch (signum) {
         case SIGINT:
             sig_int = 1;
@@ -260,6 +261,7 @@ Parrot_sigaction(int sig, ARGIN(void (*handler)(int)))
 #ifdef PARROT_HAS_SIGACTION
     struct sigaction action;
     sigset_t block_mask;
+    ASSERT_ARGS(Parrot_sigaction);
 
     /* install handler */
     action.sa_handler = handler;
@@ -272,6 +274,7 @@ Parrot_sigaction(int sig, ARGIN(void (*handler)(int)))
     sigaddset(&block_mask, sig);
     sigprocmask(SIG_BLOCK, &block_mask, NULL);
 #else
+    ASSERT_ARGS(Parrot_sigaction);
     UNUSED(sig);
     UNUSED(handler);
 #endif
@@ -293,11 +296,13 @@ Parrot_unblock_signal(int sig)
 {
 #ifdef PARROT_HAS_SIGACTION
     sigset_t block_mask;
+    ASSERT_ARGS(Parrot_unblock_signal);
 
     sigemptyset(&block_mask);
     sigaddset(&block_mask, sig);
     sigprocmask(SIG_UNBLOCK, &block_mask, NULL);
 #else
+    ASSERT_ARGS(Parrot_unblock_signal);
     UNUSED(sig);
 #endif
 }
@@ -318,6 +323,7 @@ PARROT_EXPORT
 void
 Parrot_init_signals(void)
 {
+    ASSERT_ARGS(Parrot_init_signals);
     /*
      * SIGFPE is architecture specific - some signal an error,
      * some don't, so we have to use direct checks if we are dividing
@@ -349,6 +355,7 @@ init_events_first(PARROT_INTERP)
 #ifndef WIN32
     Parrot_thread    io_handle;
 #endif
+    ASSERT_ARGS(init_events_first);
 
     /*
      * be sure all init is done only once
@@ -404,6 +411,7 @@ Init events for all interpreters.
 static void
 init_events_all(PARROT_INTERP)
 {
+    ASSERT_ARGS(init_events_all);
     /*
      * create per interpreter task queue
      */
@@ -424,6 +432,7 @@ PARROT_EXPORT
 void
 Parrot_init_events(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_init_events);
     if (!interp->parent_interpreter) {
         /* add the very first interpreter to the list of interps. */
         pt_add_to_interpreters(interp, NULL);
@@ -453,6 +462,7 @@ void
 Parrot_schedule_event(PARROT_INTERP, ARGMOD(parrot_event* ev))
 {
     QUEUE_ENTRY * const entry = mem_allocate_typed(QUEUE_ENTRY);
+    ASSERT_ARGS(Parrot_schedule_event);
     entry->next = NULL;
     ev->interp  = interp;
     entry->data = ev;
@@ -490,6 +500,7 @@ schedule_signal_event(int signum)
 {
     parrot_event* const ev    = mem_allocate_typed(parrot_event);
     QUEUE_ENTRY * const entry = mem_allocate_typed(QUEUE_ENTRY);
+    ASSERT_ARGS(schedule_signal_event);
 
     entry->next  = NULL;
     entry->type  = QUEUE_ENTRY_TYPE_EVENT;
@@ -521,6 +532,7 @@ Parrot_new_timer_event(PARROT_INTERP, ARGIN_NULLOK(PMC *timer), FLOATVAL diff,
     parrot_event* const ev = mem_allocate_typed(parrot_event);
 
     const FLOATVAL now = Parrot_floatval_time();
+    ASSERT_ARGS(Parrot_new_timer_event);
 
     ev->type                   = typ;
     ev->u.timer_event.timer    = timer;
@@ -551,6 +563,7 @@ Parrot_new_cb_event(PARROT_INTERP, ARGIN(PMC *cbi), ARGIN(char *ext))
 {
     parrot_event* const ev    = mem_allocate_typed(parrot_event);
     QUEUE_ENTRY*  const entry = mem_allocate_typed(QUEUE_ENTRY);
+    ASSERT_ARGS(Parrot_new_cb_event);
 
     entry->next = NULL;
     entry->data = ev;
@@ -576,6 +589,7 @@ void
 Parrot_del_timer_event(PARROT_INTERP, ARGIN(const PMC *timer))
 {
     QUEUE_ENTRY *entry;
+    ASSERT_ARGS(Parrot_del_timer_event);
 
     LOCK(event_queue->queue_mutex);
 
@@ -611,6 +625,7 @@ void
 Parrot_new_terminate_event(PARROT_INTERP)
 {
     parrot_event* const ev = mem_allocate_typed(parrot_event);
+    ASSERT_ARGS(Parrot_new_terminate_event);
     ev->type = EVENT_TYPE_TERMINATE;
     Parrot_schedule_event(interp, ev);
 }
@@ -632,6 +647,7 @@ Parrot_new_suspend_for_gc_event(PARROT_INTERP)
 {
     QUEUE_ENTRY *qe;
     parrot_event* const ev = mem_allocate_typed(parrot_event);
+    ASSERT_ARGS(Parrot_new_suspend_for_gc_event);
     ev->type = EVENT_TYPE_SUSPEND_FOR_GC;
     qe = mem_allocate_typed(QUEUE_ENTRY);
     qe->next = NULL;
@@ -658,6 +674,7 @@ void
 Parrot_kill_event_loop(PARROT_INTERP)
 {
     parrot_event* const ev = mem_allocate_typed(parrot_event);
+    ASSERT_ARGS(Parrot_kill_event_loop);
     ev->type = EVENT_TYPE_EVENT_TERMINATE;
     Parrot_schedule_event(interp, ev);
 }
@@ -678,6 +695,7 @@ void
 Parrot_schedule_interp_qentry(PARROT_INTERP, ARGIN(struct QUEUE_ENTRY *entry))
 {
     parrot_event * const event = (parrot_event *)entry->data;
+    ASSERT_ARGS(Parrot_schedule_interp_qentry);
     /*
      * sleep checks events when it awakes
      */
@@ -716,6 +734,7 @@ void
 Parrot_schedule_broadcast_qentry(ARGIN(struct QUEUE_ENTRY *entry))
 {
     parrot_event * const event = (parrot_event *)entry->data;
+    ASSERT_ARGS(Parrot_schedule_broadcast_qentry);
 
     switch (event->type) {
         case EVENT_TYPE_SIGNAL:
@@ -794,6 +813,7 @@ Stores an event in the event stack.  Allocates memory if necessary.
 static void
 store_io_event(ARGMOD(pending_io_events *ios), ARGIN(parrot_event *ev))
 {
+    ASSERT_ARGS(store_io_event);
     if (!ios->alloced) {
         ios->alloced = 16;
         ios->events  = mem_allocate_n_zeroed_typed(ios->alloced, parrot_event *);
@@ -821,6 +841,7 @@ static void
 io_thread_ready_rd(ARGMOD(pending_io_events *ios), int ready_rd)
 {
     size_t i;
+    ASSERT_ARGS(io_thread_ready_rd);
 
     for (i = 0; i < ios->n; ++i) {
         parrot_event * const ev  = ios->events[i];
@@ -861,6 +882,7 @@ io_thread(SHIM(void *data))
     int n_highest, i;
     int  running = 1;
     pending_io_events ios;
+    ASSERT_ARGS(io_thread);
 
     ios.n       = 0;
     ios.alloced = 0;
@@ -986,6 +1008,7 @@ stop_io_thread(void)
 {
 #ifndef WIN32
     io_thread_msg buf;
+    ASSERT_ARGS(stop_io_thread);
     /*
      * tell IO thread to stop
      */
@@ -1013,6 +1036,7 @@ Parrot_event_add_io_event(PARROT_INTERP,
 {
     io_thread_msg buf;
     parrot_event * const event = mem_allocate_typed(parrot_event);
+    ASSERT_ARGS(Parrot_event_add_io_event);
 
     event->type   = EVENT_TYPE_IO;
     event->interp = interp;
@@ -1057,6 +1081,7 @@ static QUEUE_ENTRY*
 dup_entry(ARGIN(const QUEUE_ENTRY *entry))
 {
     QUEUE_ENTRY * const new_entry = mem_allocate_typed(QUEUE_ENTRY);
+    ASSERT_ARGS(dup_entry);
 
     new_entry->next = NULL;
     new_entry->type = entry->type;
@@ -1083,6 +1108,7 @@ dup_entry_interval(ARGIN(QUEUE_ENTRY *entry), FLOATVAL now)
 {
     QUEUE_ENTRY  * const new_entry = dup_entry(entry);
     parrot_event * const event     = (parrot_event *)new_entry->data;
+    ASSERT_ARGS(dup_entry_interval);
 
     event->u.timer_event.abs_time  = now + event->u.timer_event.interval;
 
@@ -1105,6 +1131,7 @@ process_events(ARGMOD(QUEUE *event_q))
 {
     FLOATVAL     now;
     QUEUE_ENTRY *entry;
+    ASSERT_ARGS(process_events);
 
     while ((entry = peek_entry(event_q)) != NULL) {
         /*
@@ -1189,6 +1216,7 @@ event_thread(ARGMOD(void *data))
 {
     QUEUE * const event_q = (QUEUE *) data;
     int running = 1;
+    ASSERT_ARGS(event_thread);
 
     LOCK(event_q->queue_mutex);
     /*
@@ -1260,6 +1288,7 @@ static opcode_t *
 wait_for_wakeup(PARROT_INTERP, ARGIN_NULLOK(opcode_t *next))
 {
     QUEUE * const tq = interp->task_queue;
+    ASSERT_ARGS(wait_for_wakeup);
 
     interp->sleeping = 1;
 
@@ -1306,6 +1335,7 @@ PARROT_CAN_RETURN_NULL
 opcode_t *
 Parrot_sleep_on_event(PARROT_INTERP, FLOATVAL t, ARGIN_NULLOK(opcode_t *next))
 {
+    ASSERT_ARGS(Parrot_sleep_on_event);
 #if PARROT_HAS_THREADS
 
     if (interp->sleeping)
@@ -1348,6 +1378,7 @@ PARROT_CAN_RETURN_NULL
 opcode_t *
 Parrot_do_check_events(PARROT_INTERP, ARGIN_NULLOK(opcode_t *next))
 {
+    ASSERT_ARGS(Parrot_do_check_events);
     if (peek_entry(interp->task_queue))
         return Parrot_do_handle_events(interp, 0, next);
 
@@ -1368,6 +1399,7 @@ static void
 event_to_exception(PARROT_INTERP, ARGIN(const parrot_event* event))
 {
     const int exit_code = -event->u.signal;
+    ASSERT_ARGS(event_to_exception);
 
     switch (event->u.signal) {
         case SIGINT:
@@ -1408,6 +1440,7 @@ PARROT_CAN_RETURN_NULL
 static opcode_t *
 do_event(PARROT_INTERP, ARGIN(parrot_event* event), ARGIN_NULLOK(opcode_t *next))
 {
+    ASSERT_ARGS(do_event);
     edebug((stderr, "do_event %s\n", et(event)));
     switch (event->type) {
         case EVENT_TYPE_TERMINATE:
@@ -1471,6 +1504,7 @@ opcode_t *
 Parrot_do_handle_events(PARROT_INTERP, int restore, ARGIN_NULLOK(opcode_t *next))
 {
     QUEUE * const tq = interp->task_queue;
+    ASSERT_ARGS(Parrot_do_handle_events);
 
     if (restore)
         disable_event_checking(interp);

@@ -216,6 +216,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 to_encoding(PARROT_INTERP, SHIM(STRING *src), SHIM(STRING *dest))
 {
+    ASSERT_ARGS(to_encoding);
     UNIMPL;
 }
 
@@ -235,6 +236,7 @@ static UINTVAL
 get_codepoint(PARROT_INTERP, ARGIN(const STRING *source_string),
         UINTVAL offset)
 {
+    ASSERT_ARGS(get_codepoint);
     return get_byte(interp, source_string, offset);
 }
 
@@ -252,6 +254,7 @@ static void
 set_codepoint(PARROT_INTERP, ARGIN(STRING *source_string),
         UINTVAL offset, UINTVAL codepoint)
 {
+    ASSERT_ARGS(set_codepoint);
     set_byte(interp, source_string, offset, codepoint);
 }
 
@@ -270,6 +273,7 @@ static UINTVAL
 get_byte(PARROT_INTERP, ARGIN(const STRING *source_string), UINTVAL offset)
 {
     unsigned char *contents = (unsigned char *)source_string->strstart;
+    ASSERT_ARGS(get_byte);
 
     if (offset >= source_string->bufused) {
 /*        Parrot_ex_throw_from_c_args(interp, NULL, 0,
@@ -296,6 +300,7 @@ set_byte(PARROT_INTERP, ARGIN(const STRING *source_string),
         UINTVAL offset, UINTVAL byte)
 {
     unsigned char *contents;
+    ASSERT_ARGS(set_byte);
 
     if (offset >= source_string->bufused)
         Parrot_ex_throw_from_c_args(interp, NULL, 0,
@@ -324,6 +329,7 @@ get_codepoints(PARROT_INTERP, ARGIN(STRING *source_string),
 {
     STRING * const return_string = get_bytes(interp, source_string,
             offset, count);
+    ASSERT_ARGS(get_codepoints);
     return_string->charset = source_string->charset;
     return return_string;
 }
@@ -346,6 +352,7 @@ get_bytes(PARROT_INTERP, ARGIN(STRING *source_string), UINTVAL offset, UINTVAL c
 {
     STRING * const return_string = Parrot_make_COW_reference(interp,
             source_string);
+    ASSERT_ARGS(get_bytes);
     return_string->encoding = source_string->encoding;
     return_string->charset = source_string->charset;
 
@@ -376,7 +383,7 @@ static STRING *
 get_codepoints_inplace(PARROT_INTERP, ARGIN(STRING *source_string),
         UINTVAL offset, UINTVAL count, ARGMOD(STRING *dest_string))
 {
-
+    ASSERT_ARGS(get_codepoints_inplace);
     return get_bytes_inplace(interp, source_string, offset,
             count, dest_string);
 }
@@ -398,6 +405,7 @@ static STRING *
 get_bytes_inplace(PARROT_INTERP, ARGIN(STRING *source_string),
         UINTVAL offset, UINTVAL count, ARGMOD(STRING *return_string))
 {
+    ASSERT_ARGS(get_bytes_inplace);
     Parrot_reuse_COW_reference(interp, source_string, return_string);
 
     return_string->strstart = (char *)return_string->strstart + offset ;
@@ -423,6 +431,7 @@ static void
 set_codepoints(PARROT_INTERP, ARGIN(STRING *source_string),
         UINTVAL offset, UINTVAL count, ARGMOD(STRING *new_codepoints))
 {
+    ASSERT_ARGS(set_codepoints);
     set_bytes(interp, source_string, offset, count, new_codepoints);
 }
 
@@ -441,6 +450,7 @@ static void
 set_bytes(PARROT_INTERP, ARGIN(STRING *source_string),
         UINTVAL offset, UINTVAL count, ARGMOD(STRING *new_bytes))
 {
+    ASSERT_ARGS(set_bytes);
     string_replace(interp, source_string, offset, count, new_bytes, NULL);
 }
 
@@ -457,6 +467,7 @@ Unconditionally makes the string be in this encoding, if that's valid
 static void
 become_encoding(PARROT_INTERP, SHIM(STRING *source_string))
 {
+    ASSERT_ARGS(become_encoding);
     UNIMPL;
 }
 
@@ -474,6 +485,7 @@ Returns the number of codepoints in string C<src>.
 static UINTVAL
 codepoints(PARROT_INTERP, ARGIN(STRING *source_string))
 {
+    ASSERT_ARGS(codepoints);
     return bytes(interp, source_string);
 }
 
@@ -490,6 +502,7 @@ Returns the number of bytes in string C<src>.
 static UINTVAL
 bytes(SHIM_INTERP, ARGIN(STRING *source_string))
 {
+    ASSERT_ARGS(bytes);
     return source_string->bufused;
 }
 
@@ -511,6 +524,7 @@ static UINTVAL
 fixed8_get_next(PARROT_INTERP, ARGMOD(String_iter *iter))
 {
     const UINTVAL c = get_byte(interp, iter->str, iter->charpos++);
+    ASSERT_ARGS(fixed8_get_next);
     iter->bytepos++;
     return c;
 }
@@ -529,6 +543,7 @@ next position in the string.
 static void
 fixed8_set_next(PARROT_INTERP, ARGMOD(String_iter *iter), UINTVAL c)
 {
+    ASSERT_ARGS(fixed8_set_next);
     set_byte(interp, iter->str, iter->charpos++, c);
     iter->bytepos++;
 }
@@ -546,6 +561,7 @@ Moves the string iterator C<i> to the position C<n> in the string.
 static void
 fixed8_set_position(SHIM_INTERP, ARGMOD(String_iter *iter), UINTVAL pos)
 {
+    ASSERT_ARGS(fixed8_set_position);
     iter->bytepos = iter->charpos = pos;
     PARROT_ASSERT(pos <= PObj_buflen(iter->str));
 }
@@ -564,6 +580,7 @@ Initializes for string C<src> the string iterator C<iter>.
 static void
 iter_init(SHIM_INTERP, ARGIN(const STRING *src), ARGOUT(String_iter *iter))
 {
+    ASSERT_ARGS(iter_init);
     iter->str             = src;
     iter->bytepos         = iter->charpos        = 0;
     iter->get_and_advance = fixed8_get_next;
@@ -607,6 +624,7 @@ Parrot_encoding_fixed_8_init(PARROT_INTERP)
         iter_init
 
     };
+    ASSERT_ARGS(Parrot_encoding_fixed_8_init);
     STRUCT_COPY_FROM_STRUCT(return_encoding, base_encoding);
     Parrot_register_encoding(interp, "fixed_8", return_encoding);
     return return_encoding;

@@ -217,6 +217,7 @@ static void
 set_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
         UINTVAL offset, UINTVAL replace_count, ARGMOD(STRING *insert_string))
 {
+    ASSERT_ARGS(set_graphemes);
     ENCODING_SET_CODEPOINTS(interp, source_string, offset,
             replace_count, insert_string);
 }
@@ -238,6 +239,7 @@ static STRING *
 get_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
         UINTVAL offset, UINTVAL count)
 {
+    ASSERT_ARGS(get_graphemes);
     return ENCODING_GET_CODEPOINTS(interp, source_string, offset, count);
 }
 
@@ -258,6 +260,7 @@ static STRING *
 get_graphemes_inplace(PARROT_INTERP, ARGIN(STRING *source_string),
         UINTVAL offset, UINTVAL count, ARGMOD(STRING *dest_string))
 {
+    ASSERT_ARGS(get_graphemes_inplace);
     return ENCODING_GET_CODEPOINTS_INPLACE(interp, source_string,
             offset, count, dest_string);
 }
@@ -280,6 +283,7 @@ to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
     const charset_converter_t conversion_func =
             Parrot_find_charset_converter(interp, src->charset,
                     Parrot_unicode_charset_ptr);
+    ASSERT_ARGS(to_charset);
 
     if (conversion_func)
          return conversion_func(interp, src, dest);
@@ -309,6 +313,7 @@ compose(PARROT_INTERP, ARGIN(STRING *src))
     STRING *dest;
     int src_len, dest_len;
     UErrorCode err;
+    ASSERT_ARGS(compose);
     /*
        U_STABLE int32_t U_EXPORT2
        unorm_normalize(const UChar *source, int32_t sourceLength,
@@ -364,6 +369,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING*
 decompose(PARROT_INTERP, SHIM(STRING *src))
 {
+    ASSERT_ARGS(decompose);
     /* TODO: RT #59696 Implement this. */
     UNIMPL;
 }
@@ -389,6 +395,7 @@ upcase(PARROT_INTERP, ARGIN(STRING *src))
 
     UErrorCode err;
     int dest_len, src_len, needed;
+    ASSERT_ARGS(upcase);
 
     if (src->bufused  == src->strlen
     &&  src->encoding == Parrot_utf8_encoding_ptr) {
@@ -478,6 +485,7 @@ Throws an exception if ICU is not installed.
 static void
 downcase(PARROT_INTERP, ARGIN(STRING *src))
 {
+    ASSERT_ARGS(downcase);
     if (src->bufused  == src->strlen
     &&  src->encoding == Parrot_utf8_encoding_ptr) {
         Parrot_ascii_charset_ptr->downcase(interp, src);
@@ -545,6 +553,7 @@ titlecase(PARROT_INTERP, ARGIN(STRING *src))
 
     UErrorCode err;
     int dest_len, src_len;
+    ASSERT_ARGS(titlecase);
 
     if (src->bufused  == src->strlen
     &&  src->encoding == Parrot_utf8_encoding_ptr) {
@@ -607,6 +616,7 @@ grapheme supports it. Not implemented.
 static void
 upcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 {
+    ASSERT_ARGS(upcase_first);
     /* TODO: RT #59696 Implement this. */
     UNIMPL;
 }
@@ -626,6 +636,7 @@ the grapheme supports it. Not implemented
 static void
 downcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 {
+    ASSERT_ARGS(downcase_first);
     /* TODO: RT #59696 Implement this. */
     UNIMPL;
 }
@@ -645,6 +656,7 @@ string supports it. Not implemented.
 static void
 titlecase_first(PARROT_INTERP, SHIM(STRING *source_string))
 {
+    ASSERT_ARGS(titlecase_first);
     /* TODO: RT #59696 Implement this. */
     UNIMPL;
 }
@@ -666,6 +678,7 @@ compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
 {
     String_iter l_iter, r_iter;
     UINTVAL offs, cl, cr, min_len, l_len, r_len;
+    ASSERT_ARGS(compare);
 
     /* TODO make optimized equal - strings are equal length then already */
     ENCODING_ITER_INIT(interp, lhs, &l_iter);
@@ -709,6 +722,7 @@ static INTVAL
 cs_rindex(PARROT_INTERP, SHIM(STRING *source_string),
         SHIM(STRING *search_string), UINTVAL offset)
 {
+    ASSERT_ARGS(cs_rindex);
     /* TODO: RT #59696 Implement this. */
     UNIMPL;
 }
@@ -729,6 +743,7 @@ validate(PARROT_INTERP, ARGIN(STRING *src))
 {
     UINTVAL     offset;
     String_iter iter;
+    ASSERT_ARGS(validate);
 
     ENCODING_ITER_INIT(interp, src, &iter);
     for (offset = 0; offset < string_length(interp, src); ++offset) {
@@ -757,6 +772,7 @@ RT #48260: Not yet documented!!!
 static int
 u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
 {
+    ASSERT_ARGS(u_iscclass);
 #if PARROT_HAS_ICU
             /* XXX which one
                return u_charDigitValue(codepoint);
@@ -854,6 +870,7 @@ is_cclass(PARROT_INTERP, INTVAL flags,
           ARGIN(const STRING *source_string), UINTVAL offset)
 {
     UINTVAL codepoint;
+    ASSERT_ARGS(is_cclass);
 
     if (offset >= source_string->strlen)
         return 0;
@@ -885,8 +902,8 @@ find_cclass(PARROT_INTERP, INTVAL flags,
     UINTVAL     codepoint;
     UINTVAL     pos = offset;
     UINTVAL     end = offset + count;
+    ASSERT_ARGS(find_cclass);
 
-    PARROT_ASSERT(source_string != 0);
     ENCODING_ITER_INIT(interp, source_string, &iter);
 
     iter.set_position(interp, &iter, pos);
@@ -928,8 +945,8 @@ find_not_cclass(PARROT_INTERP, INTVAL flags,
     UINTVAL     pos = offset;
     UINTVAL     end = offset + count;
     int         bit;
+    ASSERT_ARGS(find_not_cclass);
 
-    PARROT_ASSERT(source_string);
     ENCODING_ITER_INIT(interp, source_string, &iter);
 
     if (pos)
@@ -975,6 +992,7 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 {
     String_iter    iter;
     STRING * const dest = string_make(interp, "", 1, "unicode", 0);
+    ASSERT_ARGS(string_from_codepoint);
 
     dest->strlen = 1;
 
@@ -1002,6 +1020,7 @@ compute_hash(PARROT_INTERP, ARGIN(const STRING *src), size_t seed)
     String_iter iter;
     UINTVAL     offs;
     size_t      hashval = seed;
+    ASSERT_ARGS(compute_hash);
 
     ENCODING_ITER_INIT(interp, src, &iter);
 
@@ -1056,6 +1075,7 @@ Parrot_charset_unicode_init(PARROT_INTERP)
         compute_hash,
         NULL
     };
+    ASSERT_ARGS(Parrot_charset_unicode_init);
 
     STRUCT_COPY_FROM_STRUCT(return_set, base_set);
 

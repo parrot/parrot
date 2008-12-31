@@ -37,6 +37,7 @@ PARROT_CANNOT_RETURN_NULL
 VTABLE *
 Parrot_new_vtable(SHIM_INTERP)
 {
+    ASSERT_ARGS(Parrot_new_vtable);
     return mem_allocate_zeroed_typed(VTABLE);
 }
 
@@ -57,6 +58,7 @@ VTABLE *
 Parrot_clone_vtable(PARROT_INTERP, ARGIN(const VTABLE *base_vtable))
 {
     VTABLE * const new_vtable = mem_allocate_typed(VTABLE);
+    ASSERT_ARGS(Parrot_clone_vtable);
 
     STRUCT_COPY(new_vtable, base_vtable);
 
@@ -86,9 +88,9 @@ PARROT_EXPORT
 void
 Parrot_destroy_vtable(PARROT_INTERP, ARGMOD(VTABLE *vtable))
 {
+    ASSERT_ARGS(Parrot_destroy_vtable);
     /* We sometimes get a type number allocated without any corresponding
      * vtable. E.g. if you load perl_group, perlscalar is this way.  */
-    PARROT_ASSERT(vtable);
 
     if (vtable->ro_variant_vtable) {
         VTABLE *ro_vtable = vtable->ro_variant_vtable;
@@ -126,6 +128,7 @@ Allocate memory for the vtables for all known classes (PMC types).
 void
 parrot_alloc_vtables(PARROT_INTERP)
 {
+    ASSERT_ARGS(parrot_alloc_vtables);
     interp->vtables          = mem_allocate_n_zeroed_typed(PARROT_MAX_CLASSES, VTABLE *);
     interp->n_vtable_max     = enum_class_core_max;
     interp->n_vtable_alloced = PARROT_MAX_CLASSES - 1;
@@ -150,6 +153,7 @@ parrot_realloc_vtables(PARROT_INTERP)
     const INTVAL new_max     = interp->n_vtable_alloced + 16;
     const INTVAL new_size    = new_max              * sizeof (VTABLE *);
     const INTVAL old_size    = interp->n_vtable_max * sizeof (VTABLE *);
+    ASSERT_ARGS(parrot_realloc_vtables);
 
     /* arrays start at zero, but we compare type numbers starting at 1 */
     interp->n_vtable_alloced = new_max - 1;
@@ -173,6 +177,7 @@ void
 parrot_free_vtables(PARROT_INTERP)
 {
     int i;
+    ASSERT_ARGS(parrot_free_vtables);
 
     for (i = 1; i < interp->n_vtable_max; i++)
         Parrot_destroy_vtable(interp, interp->vtables[i]);
@@ -194,6 +199,7 @@ void
 mark_vtables(PARROT_INTERP)
 {
     INTVAL i;
+    ASSERT_ARGS(mark_vtables);
 
     for (i = 1; i < interp->n_vtable_max; i++) {
         const VTABLE * const vtable = interp->vtables[i];

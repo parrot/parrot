@@ -60,6 +60,7 @@ PARROT_CAN_RETURN_NULL
 opcode_t *
 runops_fast_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
+    ASSERT_ARGS(runops_fast_core);
     while (pc) {
         DO_OP(pc, interp);
     }
@@ -87,6 +88,7 @@ PARROT_CAN_RETURN_NULL
 opcode_t *
 runops_cgoto_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
+    ASSERT_ARGS(runops_cgoto_core);
 #ifdef HAVE_COMPUTED_GOTO
     pc = cg_core(pc, interp);
     return pc;
@@ -128,6 +130,7 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
     static size_t dod, gc;
     Arenas * const arena_base = interp->arena_base;
     Interp *debugger;
+    ASSERT_ARGS(runops_trace_core);
 
     dod = arena_base->dod_runs;
     gc = arena_base->collect_runs;
@@ -205,6 +208,7 @@ PARROT_CAN_RETURN_NULL
 opcode_t *
 runops_slow_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
+    ASSERT_ARGS(runops_slow_core);
 
     if (Interp_trace_TEST(interp, PARROT_TRACE_OPS_FLAG))
         return runops_trace_core(interp, pc);
@@ -244,6 +248,7 @@ PARROT_CAN_RETURN_NULL
 opcode_t *
 runops_gc_debug_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
+    ASSERT_ARGS(runops_gc_debug_core);
     while (pc) {
         if (pc < code_start || pc >= code_end)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -280,6 +285,7 @@ runops_profile_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
     RunProfile * const profile = interp->profile;
     const opcode_t     old_op  = profile->cur_op;
+    ASSERT_ARGS(runops_profile_core);
 
     /* if reentering the runloop, remember old op and calc time 'til now */
     if (old_op)
@@ -325,6 +331,7 @@ PARROT_CAN_RETURN_NULL
 opcode_t *
 runops_debugger_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
+    ASSERT_ARGS(runops_debugger_core);
     /*fprintf(stderr, "Enter runops_debugger_core\n");*/
 
     PARROT_ASSERT(interp->pdb);
