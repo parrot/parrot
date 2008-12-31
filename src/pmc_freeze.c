@@ -83,9 +83,10 @@ static void do_action(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_INLINE
-static void do_thaw(PARROT_INTERP, ARGIN(PMC* pmc), ARGIN(visit_info *info))
+static void do_thaw(PARROT_INTERP,
+    ARGIN_NULLOK(PMC* pmc),
+    ARGIN(visit_info *info))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_INLINE
@@ -299,10 +300,9 @@ static void visit_todo_list(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 static void visit_todo_list_thaw(PARROT_INTERP,
-    ARGIN(PMC* old),
+    ARGIN_NULLOK(PMC* old),
     ARGIN(visit_info* info))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -1172,7 +1172,7 @@ C<seen> is false if this is the first time the PMC has been encountered.
 
 PARROT_INLINE
 static void
-do_thaw(PARROT_INTERP, ARGIN(PMC* pmc), ARGIN(visit_info *info))
+do_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGIN(visit_info *info))
 {
     UINTVAL id;
     INTVAL type;
@@ -1462,7 +1462,7 @@ Checks the seen PMC via the todo list.
 */
 
 static void
-visit_todo_list(PARROT_INTERP, ARGIN(PMC* pmc), ARGIN(visit_info* info))
+visit_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGIN(visit_info* info))
 {
     UINTVAL id;
     int seen;
@@ -1491,7 +1491,7 @@ Todo-list and seen handling is all in C<do_thaw()>.
 */
 
 static void
-visit_todo_list_thaw(PARROT_INTERP, ARGIN(PMC* old), ARGIN(visit_info* info))
+visit_todo_list_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC* old), ARGIN(visit_info* info))
 {
     do_thaw(interp, old, info);
 }

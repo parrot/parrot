@@ -340,11 +340,10 @@ STRING * string_make_direct(PARROT_INTERP,
     ARGIN_NULLOK(const char *buffer),
     UINTVAL len,
     ARGIN(const ENCODING *encoding),
-    ARGIN(const CHARSET *charset),
+    ARGIN_NULLOK(const CHARSET *charset),
     UINTVAL flags)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(4);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
