@@ -840,17 +840,16 @@ structures and algorithms, and anything that may be of interest to your
 successors, e.g. benchmarks of differing hash algorithms, essays on how to do
 integer arithmetic.
 
-=item HISTORY
-
-Record major changes to the file, e.g. "we moved from a linked list to a hash
-table implementation for storing Foos, as it was found to be much faster".
-
 =item SEE ALSO
 
 Links to pages and books that may contain useful information relevant to the
 stuff going on in the code -- e.g. the book you stole the hash function from.
 
 =back
+
+Don't include author information in individual files. Author information can be
+added to the CREDITS file. (Languages are an exception to this rule, and may
+follow whatever convention they choose.)
 
 =item Per-section comments
 
@@ -924,15 +923,13 @@ branch, e.g.
 
 =head2 Extensibility
 
-If Perl 5 is anything to go by, the lifetime of Perl 6 will be at least
-seven years. During this period, the source code will undergo many major
-changes never envisaged by its original authors -- c.f. threads, unicode in
-perl 5. To this end, your code should balance out the assumptions that make
-things possible, fast or small, with the assumptions that make it difficult
-to change things in future. This is especially important for parts of the
-code which are exposed through APIs -- the requirements of source or binary
-compatibility for such things as extensions can make it very hard to change
-things later on.
+Over the lifetime of Parrot, the source code will undergo many major changes
+never envisaged by its original authors. To this end, your code should balance
+out the assumptions that make things possible, fast or small, with the
+assumptions that make it difficult to change things in future. This is
+especially important for parts of the code which are exposed through APIs --
+the requirements of source or binary compatibility for such things as
+extensions can make it very hard to change things later on.
 
 For example, if you define suitable macros to set/test flags in a struct, then
 you can later add a second word of flags to the struct without breaking source
