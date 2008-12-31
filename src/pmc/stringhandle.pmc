@@ -543,7 +543,7 @@ string data).
 
     METHOD eof() {
         STRING *stringhandle;
-        INTVAL offset;
+        UINTVAL offset;
         GET_ATTR_stringhandle(INTERP, SELF, stringhandle);
         GET_ATTR_read_offset(INTERP, SELF, offset);
 
