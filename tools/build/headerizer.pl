@@ -295,6 +295,32 @@ sub attrs_from_args {
     return (@attrs,@mods);
 }
 
+sub asserts_from_args {
+    my @args = @_;
+    my @asserts;
+
+    for my $arg (@args) {
+        if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|NOTNULL)\((.+)\)} ) {
+            my $var = $2;
+            if($var =~ /\(*\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\)\s*\(/) {
+                # argument is a function pointer
+                $var = $1;
+            }
+            else {
+                # try to isolate the variable's name;
+                # strip off everything before the final space or asterisk.
+                $var =~ s[.+[* ]([^* ]+)$][$1];
+            }
+            push( @asserts, "assert($var);" );
+        }
+        if( $arg eq 'PARROT_INTERP' ) {
+            push( @asserts, "assert(interp);" );
+        }
+    }
+
+    return (@asserts);
+}
+
 sub make_function_decls {
     my @funcs = @_;
 
@@ -305,8 +331,8 @@ sub make_function_decls {
         my $decl = sprintf( "%s %s(", $func->{return_type}, $func->{name} );
         $decl = "static $decl" if $func->{is_static};
 
-        my @args = @{ $func->{args} };
-        my @attrs = attrs_from_args( $func, @args );
+        my @args    = @{ $func->{args} };
+        my @attrs   = attrs_from_args( $func, @args );
 
         for my $arg (@args) {
             if ( $arg =~ m{SHIM\((.+)\)} ) {
@@ -346,6 +372,18 @@ sub make_function_decls {
         $decl = join( "\n", @macros, $decl );
         $decl =~ s/\t/    /g;
         push( @decls, $decl );
+    }
+
+    foreach my $func (@funcs) {
+        my @args    = @{ $func->{args} };
+        my @asserts = asserts_from_args( @args );
+
+        my $assert = "#define ASSERT_ARGS_" . $func->{name};
+        if(@asserts) {
+            $assert .= ' ';
+            $assert .= join(" \\\n" . ' ' x length($assert), @asserts);
+        }
+        push(@decls, $assert);
     }
 
     return @decls;
