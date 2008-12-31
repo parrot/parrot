@@ -119,7 +119,6 @@ string for the signature ('P' for PMC, 'I' for integer, 'N' for number, and
 Return an iterator object of matching candidates, sorted from best matching to
 worst matching, for the current call arguments.
 
-
 =item invoke
 
 Return a function pointer to the best matching candidate for the current call

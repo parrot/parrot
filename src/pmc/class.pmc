@@ -123,13 +123,13 @@ build_attrib_index(PARROT_INTERP, PMC *self)
         if (PObj_is_class_TEST(cur_class)) {
             /* The attribute metadata hash. */
             Parrot_Class_attributes * const class_info = PARROT_CLASS(cur_class);
-            PMC          * const attribs    = class_info->attrib_metadata;
-            PMC          * const iter       = VTABLE_get_iter(interp, attribs);
+            PMC          * const attribs     = class_info->attrib_metadata;
+            PMC          * const iter        = VTABLE_get_iter(interp, attribs);
 
             /* Build a string representing the fully qualified class name. */
             /* Retrieve the fully qualified class name for the class. */
-            STRING * const fq_class         = VTABLE_get_string(interp, cur_class);
-            PMC    * const class_cache = pmc_new(interp, enum_class_Hash);
+            STRING       * const fq_class    = VTABLE_get_string(interp, cur_class);
+            PMC          * const class_cache = pmc_new(interp, enum_class_Hash);
             VTABLE_set_pmc_keyed_str(interp, cache, fq_class, class_cache);
 
             /* Iterate over the attributes. */
@@ -443,9 +443,9 @@ Initializes a Class PMC.
 
 =item C<void init_pmc(PMC *init_data)>
 
-The actual class creation code, called from C<newclass> opcode.  The C<init>
-argument may either be the name of the class, or a hash of initialization
-arguments.  The class is attatched to the current HLL namespace.
+The actual class creation code, called from C<newclass> opcode. The C<init_data>
+argument may be either the name of the class or a hash of initialization
+arguments. The class is attached to the current HLL namespace.
 
 =cut
 
@@ -499,6 +499,7 @@ arguments.  The class is attatched to the current HLL namespace.
             case enum_class_Key:
             case enum_class_ResizableStringArray:
             case enum_class_NameSpace:
+                /* set only the name property */
                 arg = pmc_new(interp, enum_class_Hash);
                 VTABLE_set_pmc_keyed_str(interp, arg, name_str, init_data);
                 break;
@@ -512,6 +513,7 @@ arguments.  The class is attatched to the current HLL namespace.
                 if (VTABLE_isa(interp, init_data, CONST_STRING(interp, "String"))
                 || VTABLE_isa(interp, init_data, CONST_STRING(interp, "Key"))
                 || VTABLE_isa(interp, init_data, CONST_STRING(interp, "ResizableStringArray"))) {
+                    /* set only the name property */
                     arg = pmc_new(interp, enum_class_Hash);
                     VTABLE_set_pmc_keyed_str(interp, arg, name_str, init_data);
                 }
@@ -1048,10 +1050,10 @@ Creates a new PMC object of the type of the class and calls init().
 
     VTABLE PMC *instantiate(PMC *init) {
         Parrot_Class_attributes  * const _class    = PARROT_CLASS(SELF);
-        STRING        * const class_str = CONST_STRING(interp, "Class");
+        STRING                   * const class_str = CONST_STRING(interp, "Class");
 
         Parrot_Object_attributes *obj_guts;
-        PMC           *object;
+        PMC                      *object;
 
         /* If we've not been instantiated before... */
         if (!_class->instantiated) {
@@ -1508,7 +1510,7 @@ Called after the class has been thawed.
 
 =item C<void name(STRING *name :optional, int has_name :opt_flag)>
 
-Sets the name of the class, and updates the namespace accoringly.
+Sets the name of the class, and updates the namespace accordingly.
 
 =cut
 
