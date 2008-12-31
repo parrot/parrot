@@ -847,9 +847,9 @@ stuff going on in the code -- e.g. the book you stole the hash function from.
 
 =back
 
-Don't include author information in individual files. Author information can be
-added to the CREDITS file. (Languages are an exception to this rule, and may
-follow whatever convention they choose.)
+Don't include author information in individual files. Author information
+can be added to the CREDITS file. (Languages are an exception to this rule,
+and may follow whatever convention they choose.)
 
 =item Per-section comments
 
