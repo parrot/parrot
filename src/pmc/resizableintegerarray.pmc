@@ -86,7 +86,7 @@ Resizes the array to C<size> elements.
     VTABLE void set_integer_native(INTVAL size) {
         if (size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    "ResizableStringArray: Can't resize!");
+                    "ResizableIntegerArray: Can't resize!");
 
         if (!PMC_data(SELF)) {
             /* empty - used fixed routine */
