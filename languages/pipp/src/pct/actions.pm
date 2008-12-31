@@ -638,27 +638,6 @@ method class_definition($/, $key) {
             )
         );
 
-        # It's a new class definition. Make proto-object.
-        $block.push(
-            PAST::Op.new(
-                :pasttype('call'),
-                :name('!PROTOINIT'),
-                PAST::Op.new(
-                    :pasttype('callmethod'),
-                    :name('register'),
-                    PAST::Var.new(
-                        :scope('package'),
-                        :name('$!P6META'),
-                        :namespace('PippObject')
-                    ),
-                    PAST::Var.new(
-                        :scope('register'),
-                        :name('def')
-                    )
-                )
-            )
-        );
-
         # nothing to do for $<const_definition,
         # setup of class constants is done in the 'loadinit' node
         for $<class_constant_definition> {
@@ -687,7 +666,46 @@ method class_definition($/, $key) {
                     PAST::Val.new( :value($member_name) )
                 )
             );
+            $block.push(
+                PAST::Op.new(
+                    :pasttype('call'),
+                    :name('!ADD_TO_WHENCE'),
+                    PAST::Var.new(
+                        :name('def'),
+                        :scope('register'),
+                    ),
+                    PAST::Val.new(
+                        :value($member_name)
+                    ),
+                    $( $_<literal> )
+                )
+            );
         }
+
+        # It's a new class definition. Make proto-object.
+        $block.push(
+            PAST::Op.new(
+                :pasttype('call'),
+                :name('!PROTOINIT'),
+                PAST::Op.new(
+                    :pasttype('callmethod'),
+                    :name('register'),
+                    PAST::Var.new(
+                        :scope('package'),
+                        :name('$!P6META'),
+                        :namespace('PippObject')
+                    ),
+                    PAST::Var.new(
+                        :scope('register'),
+                        :name('def')
+                    ),
+                    PAST::Val.new(
+                        :value('PippObject'),
+                        :named( PAST::Val.new( :value('parent') ) )
+                    )
+                )
+            )
+        );
 
         # add the methods
         for $<class_method_definition> {

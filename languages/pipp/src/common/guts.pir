@@ -110,6 +110,31 @@ See C<!keyword_has> in Rakudo.
     .return ()
 .end
 
+=item !ADD_TO_WHENCE
+
+Adds a key/value mapping to what will become the WHENCE on a proto-object (we
+don't have a proto-object to stick them on yet, so we put a property on the
+class temporarily, then attach it as the WHENCE clause later).
+
+=cut
+
+.sub '!ADD_TO_WHENCE'
+    .param pmc class
+    .param pmc attr_name
+    .param pmc value
+
+    # Get hash if we have it, if not make it.
+    .local pmc whence_hash
+    whence_hash = getprop '%!WHENCE', class
+    unless null whence_hash goto have_hash
+    whence_hash = new 'PhpArray'
+    setprop class, '%!WHENCE', whence_hash
+
+    # Make entry.
+  have_hash:
+    whence_hash[attr_name] = value
+.end
+
 
 =item !PROTOINIT
 
