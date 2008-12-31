@@ -114,10 +114,8 @@ INTVAL Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
 
 PARROT_EXPORT
 void Parrot_invalidate_method_cache(PARROT_INTERP,
-    ARGIN_NULLOK(STRING *_class),
-    ARGIN(STRING *meth))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+    ARGIN_NULLOK(STRING *_class))
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION

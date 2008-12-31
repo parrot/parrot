@@ -760,7 +760,7 @@ all classes are invalidated.
 
 PARROT_EXPORT
 void
-Parrot_invalidate_method_cache(PARROT_INTERP, ARGIN_NULLOK(STRING *_class), ARGIN(STRING *meth))
+Parrot_invalidate_method_cache(PARROT_INTERP, ARGIN_NULLOK(STRING *_class))
 {
     INTVAL type;
 
