@@ -26,7 +26,7 @@ typedef enum multi_entry {
 /* struct to represent a MULTI_TYPE_KEYED multi_type */
 typedef struct multi_key_type {
 
-    struct multi_key_type * next;
+    struct multi_key_type *next;
 } multi_key_type;
 
 
@@ -34,8 +34,8 @@ typedef struct multi_key_type {
 typedef struct multi_type {
 
     union multi_union {
-        char const     * ident;
-        multi_key_type   key;
+        char const     *ident;
+        multi_key_type  key;
     } u;
 
     multi_entry entry_type;
@@ -48,9 +48,9 @@ typedef struct multi_type {
  * sub.
  */
 typedef struct lexical {
-    char const     * name;
-    struct syminfo * info;
-    struct lexical * next;
+    char const     *name;
+    int            *color;
+    struct lexical *next;
 
 } lexical;
 
@@ -59,18 +59,18 @@ typedef struct lexical {
  * generator needs to know.
  */
 typedef struct sub_info {
-    char const         * subname;
-    char const         * nsentry;
-    char const         * subid;
-    char const         * outersub;
-    int                  vtable_index;
-    unsigned             regs_used[4];
-    int                  startoffset;
-    int                  endoffset;
-    unsigned             num_multi_types; /* number of multi types */
-    multi_type         * multi_types;   /* array with :multi data types, if this is a multi sub */
-    lexical            * lexicals;
-    multi_type         * name_space; /* can be a string or key */
+    char const    *subname;
+    char const    *nsentry;
+    char const    *subid;
+    char const    *outersub;
+    int            vtable_index;
+    unsigned       regs_used[4];
+    int            startoffset;
+    int            endoffset;
+    unsigned       num_multi_types; /* number of multi types */
+    multi_type    *multi_types;   /* array with :multi data types, if this is a multi sub */
+    lexical       *lexicals;
+    multi_type    *name_space; /* can be a string or key */
 
 } sub_info;
 

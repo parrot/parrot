@@ -4,12 +4,22 @@
  */
 #include <stdio.h>
 #include <assert.h>
+
+
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
+
+/* #include "parrot/interpreter.h" */
+
+/* #include "parrot/embed.h" */
 
 #include "bcgen.h" /* XXX future maybe parrot/bcgen.h */
 
-#include "pirsymbol.h" /* XXX remove this dependency somehow. */
+
+/* XXX Fix the build for now; #including parrot/interpreter.h that
+   defines this doesn't seem to help. */
+#ifndef PMCNULL
+#  define PMCNULL         ((PMC *)NULL)
+#endif
 
 /*
 
@@ -433,7 +443,7 @@ generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned
     /* A type_count of 1 means there was a :multi flag, but no :multi types.
      * therefore, create a special signature and return that.  */
     if (type_count == 1)
-        return pmc_new(interp, enum_class_FixedIntegerArray);
+        return pmc_new(bc->interp, enum_class_FixedIntegerArray);
 
     /* create a FixedPMCArray to store all multi types */
     multi_signature = pmc_new(bc->interp, enum_class_FixedPMCArray);
@@ -509,7 +519,7 @@ create_lexinfo(bytecode * const bc, PMC * sub, lexical * const lexicals, int lex
                 lexiter->info->color);
 
 */
-        Parrot_PCCINVOKE(bc->interp, lex_info, method, "SI->", lexname, lexiter->info->color);
+        Parrot_PCCINVOKE(bc->interp, lex_info, method, "SI->", lexname, lexiter->color);
 
         lexiter = lexiter->next;
     }

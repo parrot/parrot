@@ -638,7 +638,6 @@ add_param(lexer_state * const lexer, pir_type type, char const * const name) {
     else
         add_target(lexer, CURRENT_SUB(lexer)->parameters, targ);
 
-
     /* set the parameter just added as curtarget */
     lexer->curtarget = targ;
 
@@ -652,6 +651,8 @@ add_param(lexer_state * const lexer, pir_type type, char const * const name) {
 
     /* set a pointer from the target to the symbol info object */
     targ->info = &sym->info;
+
+
 
     return targ;
 }
@@ -1752,7 +1753,7 @@ void
 set_lex_flag(lexer_state * const lexer, target * const t, char const * const name) {
     lexical *lex = (lexical *)pir_mem_allocate(lexer, sizeof (lexical));
     lex->name    = name;
-    lex->info    = t->info;
+    lex->color   = &t->info->color;
 
     /* link this lex node in the list of lexicals */
     lex->next = CURRENT_SUB(lexer)->info.lexicals;

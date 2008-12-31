@@ -117,6 +117,7 @@ printed as well. Examples:
 */
 void
 print_target(lexer_state * const lexer, target * const t) {
+    if (t->info)
     fprintf(out, "%c%d", pir_register_types[t->info->type], t->info->color);
 
     /* if the target has a key, print that too */
@@ -770,11 +771,17 @@ emit_pbc(lexer_state * const lexer) {
 /*
     fprintf(stderr, "emit_pbc(): starting...\n");
 */
+
+    /* after everything is parsed we know how many instructions and operands
+     * there are, and thus how many bytes must be allocated for emitting
+     * the bytecode. At this point we can create the codesegment.
+     */
     create_codesegment(lexer->bc, lexer->codesize);
 
 /*
     fprintf(stderr, "ok 1\n");
 */
+    /* initialize iterator */
     subiter = lexer->subs->next;
 
     assert(subiter);
@@ -790,8 +797,7 @@ emit_pbc(lexer_state * const lexer) {
     while (subiter != lexer->subs->next);
 
     /* write the output to a file. */
-
-    write_pbc_file(lexer->bc, "a.pbc");
+    write_pbc_file(lexer->bc, "a.pbc");  /* XXX fix output file specified by user */
 
     /* XXX just make sure no seg. faults  happened */
     fprintf(stderr, "done writing pbc\n");
