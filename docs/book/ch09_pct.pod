@@ -139,7 +139,7 @@ attempt to combine them together into larger and larger patterns until
 they produce a top-level token.
 
 PGE itself is a top-down parser, although it also contains a bottom-up
-I<operator precidence> parser, for things like mathematical expressions
+I<operator precedence> parser, for things like mathematical expressions
 where bottom-up methods are more efficient. We'll discuss both, and the
 methods for switching between the two, throughout this chapter.
 
@@ -241,7 +241,7 @@ C<Jar Jar Binks>, but not the way you would expect: It would match the
 first "Jar" as C<< <first_name> >> and the second "Jar" as
 C<< <last_name> >> and wouldn't match "Binks" at all.
 
-In PGE. The top-level rule which starts the match process and must
+In PGE, the top-level rule which starts the match process and must
 successfully match in order for the compiler to continue is always
 called C<TOP>. Without a TOP rule, your compiler won't do anything
 N<Actually, it will print out an error saying that you have no
@@ -430,7 +430,7 @@ descent grammar, but it's one that's likely going to come up relatively
 often for new language designers, and one that is not always likely to
 generate useful error messages.
 
-=head3 Operator Precidence Parser
+=head3 Operator Precedence Parser
 
 Places where there are lots of little tokens in a statement, and where
 there are lots of possible options that a top-down parser will have to
@@ -443,29 +443,29 @@ have forms that are difficult to anticipate. Consider the expression:
 The recursive descent parser is going to have to recognize through
 significant trial and error how this statement should be parsed. For tasks
 like this, recursive descent parsers are not ideal, although a type of
-bottom-up parser called an I<operator precidence>
-X<Parser, Operator precidence> parser is. Operator precidence parsers
+bottom-up parser called an I<operator precedence>
+X<Parser, Operator precedence> parser is. Operator precedence parsers
 work similarly to more versatile bottom-up parsers such as Lex or Yacc, but
 are optimized for use with expressions and equations. The "things" in an
 equation are split into two subtypes: I<terms> and I<operators>. Operators
 themselves are split into a number of types including postfix (C<-a>),
 suffix (C<i++>), infix (C<x + y>), circumfix (C<[z]>), postcircumix
-(C<a[b]>), and list (C<1, 2, 3>). Each operator gets its own precidence
+(C<a[b]>), and list (C<1, 2, 3>). Each operator gets its own precedence
 number that specifies how closely it binds to the terms. In the example above,
 the expression is parsed
 
  a + (b * c) + d
 
-This is because the C<*> operator has a higher precidence and therefore binds
+This is because the C<*> operator has a higher precedence and therefore binds
 more tightly then the C<+> operator.
 
 To switch from the top-down recursive descent parser to the bottom-up
-operator precidence parser, a rule must be defined that is an C<optable>
+operator precedence parser, a rule must be defined that is an C<optable>
 X<Parser, optable>:
 
  rule expression is optable { ... }
 
-The C<...> ellipses aren't an editorial shortcut, it's the perl 6 operator
+The C<...> ellipses aren't an editorial shortcut, it's the Perl 6 operator
 that is used to define a function signature. The C<...> indicates that
 this is just a signature and that the actual guts of it will be filled in
 somewhere else. In this case, that "somewhere else" is in the definition of
@@ -490,7 +490,7 @@ The name of the operator, listed as C<< <proto_name> >> above, contains both a
 location part and an identifier part. The location is one of the places where
 the operator can be located, such as infix, postfix, prefix, circumfix, and
 postcircumfix. The name of the operator is the symbol used for the operator in
-any of the quotes that Perl6 understands:
+any of the quotes that Perl 6 understands:
 
  proto infix:<+>                  # a + b
  proto postfix:'--'               # i--
@@ -499,8 +499,8 @@ any of the quotes that Perl6 understands:
 The C<is> X<Parser, is> keyword defines a property of the rule. Some examples of
 this are:
 
- is precidence(1)     # Specifies an exact precidence
- is equiv('+')        # Has the same precidence as the "+" operator
+ is precedence(1)     # Specifies an exact precedence
+ is equiv('+')        # Has the same precedence as the "+" operator
  is assoc('right')    # Right associative. May also be "left" or "list"
  is pirop('add')      # Operands are passed to the PIR operator "and"
  is subname('mySub')  # Operands are passed to the function "mySub"

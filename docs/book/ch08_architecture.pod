@@ -733,10 +733,10 @@ which indicates that the process has tried to access memory that isn't
 part of your process. Most programmers will better know SIGSEGV as a
 "segmentation fault", something that should be avoided at all costs.
 There's no good way for Parrot to catch and handle these signals, since
-the occur at a lower level in the operating system and are typically
+they occur at a lower level in the operating system and are typically
 presented to Parrot long after anything can be done about it. These
 signals will therefore always kill Parrot and whatever programs were
-running on t. On some systems it's possible to catch some of
+running on it. On some systems it's possible to catch some of
 N<sometimes> the fatal signals, but Parrot code itself operates at too
 high a level for a user program to do anything with them. Any handlers
 for these kinds of signals would have to be written at the lowest levels
@@ -854,7 +854,7 @@ scheme. There's no possibility of data sharing at the user level, so
 there's no need to lock anything.
 
 In the second threading model, multiple threads run and pass messages
-back and forth between each other. Parrot supports this as well, via
+back and forth amongst themselves. Parrot supports this as well, via
 the event mechanism. The event queues are thread-safe, so one thread
 can safely inject an event into another thread's event queue. This is
 similar to a multiple-process model of programming, except that
@@ -862,7 +862,7 @@ communication between threads is much faster, and it's easier to pass
 around structured data.
 
 In the third threading model, multiple threads run and share data
-between themselves directly. While Parrot can't guarantee that data at
+among themselves directly. While Parrot can't guarantee that data at
 the user level remains consistent, it can make sure that access to shared
 data is at least safe. We do this with two mechanisms.
 
@@ -1011,8 +1011,7 @@ Parrot, so we can subclass Perl 5 style classes, and they can subclass
 Parrot classes. Being able to subclass C++ and Objective C classes is
 a potential bonus. Python, Ruby, and Perl 6 all share a common (but
 hidden) base class in Parrot's base object type, so they can inherit
-from each other without
-difficulty.
+from each other without difficulty.
 
 =head1 Advanced Features
 
