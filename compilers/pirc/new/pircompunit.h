@@ -56,8 +56,9 @@ typedef enum target_flags {
      * for another structure field. As soon as there is a need for 32 target flags, these
      * flags must be encoded into a different flag member.
      */
-    TARGET_FLAG_IS_REG      = 1 << 31 /* set if the target node represents a register; cleared if
-                                         it's a .local/.param. */
+    TARGET_FLAG_IS_INITIALIZED = 1 << 30, /* set if the target was written to */
+    TARGET_FLAG_IS_REG         = 1 << 31  /* set if the target node represents a register;
+                                             cleared if it's a .local/.param. */
 
 } target_flag;
 

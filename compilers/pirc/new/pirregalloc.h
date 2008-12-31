@@ -7,6 +7,7 @@
 #define PARROT_PIR_PIRREGALLOC_H_GUARD
 
 
+
 typedef enum interval_flags {
     INTERVAL_FLAG_UNIQUE_REG   = 1 << 0
 
@@ -26,15 +27,15 @@ typedef enum interval_flags {
  * list.
  */
 typedef struct live_interval {
-    unsigned symreg;            /* the interval is for this variable */
-    int      realreg;           /* the newly allocated register */
-    unsigned startpoint;        /* start point of the live range of the variable */
-    unsigned endpoint;          /* end point of the live range of the variable */
+    unsigned        symreg;            /* the interval is for this variable */
+    int             realreg;           /* the newly allocated register */
+    unsigned        startpoint;        /* start point of the live range of the variable */
+    unsigned        endpoint;          /* end point of the live range of the variable */
 
 
     /* pointer to the symbol or pir_reg, in order to update (re-color) the PASM register */
-    int           *color;
-    interval_flag  flags;
+    int            *color;
+    interval_flag   flags;
 
 /*    union next_union { */
         struct   live_interval *nexti;

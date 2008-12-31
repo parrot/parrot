@@ -47,6 +47,7 @@ Globally defined constants are stored in yet another separate list.
 
 */
 
+extern char const pir_register_types[5];
 
 #define NO_REG_ALLOCATED    -1
 
@@ -83,10 +84,12 @@ assign_vanilla_register(NOTNULL(lexer_state * const lexer), symbol * const sym) 
     sym->info.color    = next_register(lexer, sym->info.type);
 
     if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC)) {
+
         sym->info.interval = new_live_interval(lexer->lsr, lexer->stmt_counter, sym->info.type);
 
         /* set the reference of the interval to the symbol's color */
         sym->info.interval->color = &sym->info.color;
+
     }
 
     /* mark the interval, so that its register is not reused, if the :unique_reg
@@ -186,9 +189,7 @@ declare_local(lexer_state * const lexer, pir_type type, symbol * const list)>
 Declare the local variables in the list pointed to by C<list>, all of which
 are of the type C<type>. The variables are entered into the symbol table for
 the current subroutine that is being parsed (each subroutine has its
-own symbol table). Each symbol will be allocated a (PASM) register; in
-other words, afer invoking this function, each of the symbol nodes in C<list>
-will have been given a PASM register.
+own symbol table).
 
 =cut
 
@@ -296,15 +297,19 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
         symbol *sym = bucket_symbol(buck);
 
         if (STREQ(sym->info.id.name, name)) {
+            fprintf(stderr, "found symbol %c:%s\n", pir_register_types[sym->info.type], name);
+
             if (sym->info.color == NO_REG_ALLOCATED)  /* no PASM register assigned yet */
                 /* get a new reg from vanilla reg. allocator */
                 assign_vanilla_register(lexer, sym);
             else  /* update end point of interval */
-                if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC))
+                if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC)) {
+                    fprintf(stderr, "updating live of symbol %s\n", name);
                     sym->info.interval->endpoint = lexer->stmt_counter;
+                }
 
 
-            if (TEST_FLAG(lexer->flags, LEXER_FLAG_VERBOSE))
+            if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC))
                 fprintf(stderr, "live range of variable %s: (%d, %d)\n", sym->info.id.name,
                         sym->info.interval->startpoint, sym->info.interval->endpoint);
 
@@ -362,6 +367,8 @@ find_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     pir_reg *iter = CURRENT_SUB(lexer)->registers[type];
     while (iter != NULL) {
         if (iter->info.id.regno == regno) {
+
+            fprintf(stderr, "Found regster $%c%d\n", pir_register_types[type], regno);
             /* update the end point of this register's live interval */
             if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC))
                 iter->info.interval->endpoint = lexer->stmt_counter;
@@ -412,6 +419,7 @@ use_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno, int p
 
         /* let the interval have a pointer to this symbolic register */
         reg->info.interval->color = &reg->info.color;
+
     }
 
 
@@ -580,10 +588,6 @@ store_global_constant(NOTNULL(lexer_state * const lexer), NOTNULL(constant * con
     bucket_constant(b)   = c;
     store_bucket(table, b, hash);
 
-    /* add it as a constant in the PBC constant table */
-    /* XXX is this necessary? Seems not. 12/27/2008. --kjs
-    c->const_table_index = emit_pbc_const(lexer, c);
-    */
 }
 
 /*

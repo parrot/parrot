@@ -348,6 +348,7 @@ get_free_reg(lsr_allocator * const lsr, pir_type type) {
         available->next      = lsr->cached_regs;
         lsr->cached_regs     = available;
 
+        fprintf(stderr, "get_free_reg(): cached: %d\n", available->regno);
         return available->regno;
     }
     else {
@@ -357,6 +358,7 @@ get_free_reg(lsr_allocator * const lsr, pir_type type) {
          */
          unsigned reg = lsr->r[type] - 1;
          lsr->r[type]++;
+         fprintf(stderr, "get_free_reg(): non-cached: %d\n", reg);
          return reg;
     }
 }
@@ -503,6 +505,9 @@ linear_scan_register_allocation(lsr_allocator * const lsr) {
         */
         for (i = lsr->intervals[type]; i != NULL; i = i->nexti) {
 
+            /* XXX temp. hack */
+            extern char const pir_register_types[5];
+
             /* expire all intervals whose endpoint is smaller than i's start
              * point; that means that i can be mapped to a register that was
              * previously assigned to one of the expired intervals; that one
@@ -513,7 +518,12 @@ linear_scan_register_allocation(lsr_allocator * const lsr) {
             /* get a free register */
             i->realreg = get_free_reg(lsr, type);
 
-            /* fprintf(stderr, "Vanilla register %u is mapped to %u\n", *i->color, i->realreg); */
+
+            /*
+            fprintf(stderr, "Vanilla register %c%u (symbol %s) is mapped to %u\n",
+                     pir_register_types[type], *i->color, i->info->id.name, i->realreg);
+            */
+
             /* update the symbol/pir_reg with this newly allocated reg */
             *i->color = i->realreg;
 

@@ -232,7 +232,11 @@ targets_to_operands(lexer_state * const lexer, target * const targets, unsigned 
          */
         PARROT_ASSERT(iter->info->color != NO_REG_ALLOCATED);
 
-        push_operand(lexer, expr_from_int(lexer, iter->info->color));
+        /* be sure to push the target as a whole as operand, not just an integer
+         * constant for the assigned register; the register optimizer may
+         * update the register in the target.
+         */
+        push_operand(lexer, expr_from_target(lexer, iter));
 
         /* go to next target in list */
         iter = iter->next;
@@ -393,8 +397,10 @@ convert_pcc_call(lexer_state * const lexer, invocation * const inv) {
     new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc", inv->num_arguments);
     arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
 
+    /*
     new_sub_instr(lexer, PARROT_OP_get_results_pc, "get_results_pc", inv->num_results);
     targets_to_operands(lexer, inv->results, inv->num_results);
+*/
 
     /* if the target is a register, invoke that. */
     if (TEST_FLAG(inv->sub->flags, TARGET_FLAG_IS_REG)) {
@@ -438,6 +444,9 @@ convert_pcc_call(lexer_state * const lexer, invocation * const inv) {
              */
             save_global_reference(lexer, CURRENT_INSTRUCTION(lexer), inv->sub->info->id.name);
         }
+
+        new_sub_instr(lexer, PARROT_OP_get_results_pc, "get_results_pc", inv->num_results);
+        targets_to_operands(lexer, inv->results, inv->num_results);
 
         new_sub_instr(lexer, PARROT_OP_invokecc_p, "invokecc_p", 0);
         add_operands(lexer, "%T", sub);

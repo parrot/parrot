@@ -161,11 +161,17 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 lexer_state *
 new_lexer(NULLOK(char * const filename), int flags) {
-    lexer_state *lexer     = mem_allocate_zeroed_typed(lexer_state);
-    lexer->filename        = filename;
-    lexer->interp          = Parrot_new(NULL);
-    lexer->flags           = flags;
-    lexer->mem_allocations = new_mem_ptrs_block();
+    lexer_state *lexer       = mem_allocate_zeroed_typed(lexer_state);
+    lexer->filename          = filename;
+    lexer->interp            = Parrot_new(NULL);
+    lexer->flags             = flags;
+    lexer->mem_allocations   = new_mem_ptrs_block();
+
+    /* the PIR register generator must start counting at -2 (the value is pre-decremented
+     * before returning, hence -1), because -1 is the value for unassigned PASM
+     * registers.
+     */
+    lexer->pir_reg_generator = -1;
 
     if (!lexer->interp)
         panic(lexer, "Failed to create a Parrot interpreter structure.");

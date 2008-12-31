@@ -2319,6 +2319,8 @@ update_sub_register_usage(lexer_state * const lexer, unsigned reg_usage[NUM_PARR
 Update register usage for the current subroutine with the register usage
 information in C<reg_usage>.
 
+XXX the passed register usage info is 1 too high for each type.
+
 =cut
 
 */
