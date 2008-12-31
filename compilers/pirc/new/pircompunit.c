@@ -633,10 +633,15 @@ add_param(lexer_state * const lexer, pir_type type, char const * const name) {
 
     PARROT_ASSERT(CURRENT_SUB(lexer));
 
+    /* if this is the first parameter (current sub's parameters list is NULL),
+     * set this parameter as the first. Otherwise add it to the list through
+     * add_target(), which returns an updated pointer to the list (which is
+     * a pointer to the *last* object, whose "next" pointer is the first item.
+     */
     if (CURRENT_SUB(lexer)->parameters == NULL)
         CURRENT_SUB(lexer)->parameters = targ;
     else
-        add_target(lexer, CURRENT_SUB(lexer)->parameters, targ);
+        CURRENT_SUB(lexer)->parameters = add_target(lexer, CURRENT_SUB(lexer)->parameters, targ);
 
     /* set the parameter just added as curtarget */
     lexer->curtarget = targ;
@@ -651,8 +656,6 @@ add_param(lexer_state * const lexer, pir_type type, char const * const name) {
 
     /* set a pointer from the target to the symbol info object */
     targ->info = &sym->info;
-
-
 
     return targ;
 }
@@ -1753,9 +1756,13 @@ void
 set_lex_flag(lexer_state * const lexer, target * const t, char const * const name) {
     lexical *lex = (lexical *)pir_mem_allocate(lexer, sizeof (lexical));
     lex->name    = name;
+
+    /* get a pointer to the "color" field, so that the lexical struct knows
+     * the assigned PASM register.
+     */
     lex->color   = &t->info->color;
 
-    /* link this lex node in the list of lexicals */
+    /* link this lex node in the list of lexicals at the front; order doesn't matter. */
     lex->next = CURRENT_SUB(lexer)->info.lexicals;
     CURRENT_SUB(lexer)->info.lexicals = lex;
 }
