@@ -7,6 +7,7 @@
 #include "piremit.h"
 #include "pircompunit.h"
 #include "pircompiler.h"
+#include "pirerr.h"
 #include "bcgen.h"
 
 #include "parrot/oplib/ops.h"

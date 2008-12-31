@@ -36,7 +36,8 @@ new/piremit.c \
 new/hdocprep.c \
 new/pirmacro.c \
 new/pirregalloc.c \
-new/bcgen.c
+new/bcgen.c \
+new/pirerr.c
 
 OBJS          = \
 new/main$(O) \
@@ -50,7 +51,8 @@ new/hdocprep$(O) \
 new/pirmacro$(O) \
 new/pirregalloc$(O) \
 new/bcgen$(O) \
-new/pirpcc$(O)
+new/pirpcc$(O) \
+new/pirerr$(O)
 
 .c$(O) :
 	@$(PERL) ../../tools/dev/cc_flags.pl -v ../../CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
@@ -76,6 +78,7 @@ new/pirmacro$(O): new/pirmacro.c new/pirmacro.h
 new/pirregalloc$(O): new/pirregalloc.c new/pirregalloc.h
 new/bcgen$(O): new/bcgen.c new/bcgen.h
 new/pirpcc$(O): new/pirpcc.c new/pirpcc.h
+new/pirerr$(O): new/pirerr.c new/pirerr.h
 
 test: all
 	podchecker $(SOURCES) README.pod

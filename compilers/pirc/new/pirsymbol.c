@@ -6,6 +6,7 @@
 #include "pirsymbol.h"
 #include "pircompunit.h"
 #include "piryy.h"
+#include "pirerr.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

@@ -22,8 +22,7 @@ typedef void * yyscan_t;
 
 
 int yypirparse(yyscan_t yyscanner, struct lexer_state * const lexer);
-int yypirerror(yyscan_t yyscanner, struct lexer_state * const lexer,
-                                   char const * const message, ...);
+
 
 int yypirget_lineno(yyscan_t yyscanner);
 

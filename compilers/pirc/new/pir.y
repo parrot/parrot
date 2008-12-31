@@ -61,6 +61,7 @@ condition evaluates to I<true> during compile time) or it may become a C<noop>
 #include "piryy.h"
 #include "pirmacro.h"
 #include "pirpcc.h"
+#include "pirerr.h"
 
 /* #defines to prevent declarations of malloc() and free() in pirparser.h */
 #define YYMALLOC

@@ -22,6 +22,7 @@ Conventions.
 #include "pirpcc.h"
 #include "pircompunit.h"
 #include "pircompiler.h"
+#include "pirerr.h"
 
 #include "parrot/oplib/ops.h"
 
@@ -182,7 +183,18 @@ emit_sub_epilogue(lexer_state * const lexer) {
     }
 }
 
+/*
 
+=item C<static void
+add_alias_operand(lexer_state * const lexer, PMC *array, int index, char const * const alias)>
+
+Add an alias operand to current instruction; C<array> is the signature
+array, which must hold the right flags for this new operand (at position C<index>).
+The alias name is passed in C<alias>.
+
+=cut
+
+*/
 static void
 add_alias_operand(lexer_state * const lexer, PMC *array, int index, char const * const alias) {
     PARROT_ASSERT(alias);
@@ -245,20 +257,12 @@ targets_to_operands(lexer_state * const lexer, target * const targets, unsigned 
          * :named flag) of the target operand.
          */
         if (TEST_FLAG(iter->flags, TARGET_FLAG_NAMED)) {
-
             add_alias_operand(lexer, signature_array, i, iter->alias);
-
-
-            /*
-            VTABLE_set_integer_keyed_int(lexer->interp, signature_array, i,
-                                         PARROT_ARG_NAME | PARROT_ARG_SC);
-
-            push_operand(lexer, expr_from_string(lexer, iter->alias));
-            */
-
+            /* number of operands was already counted correctly,
+             * respecting the extra :named operand.
+             */
             ++i;
-
-            /* clear flag on the target that was marked :named XXX is this correct? */
+            /* clear flag on the target that was marked :named */
             CLEAR_FLAG(iter->flags, TARGET_FLAG_NAMED);
         }
 
@@ -267,9 +271,6 @@ targets_to_operands(lexer_state * const lexer, target * const targets, unsigned 
         /* store the flag at position i in the array */
         VTABLE_set_integer_keyed_int(lexer->interp, signature_array, i, flag);
 
-        /* add the current target as an operand; these targets have already
-         * got an assigned register, so we're emitting that register number.
-         */
         PARROT_ASSERT(iter->info->color != NO_REG_ALLOCATED);
 
         /* be sure to push the target as a whole as operand, not just an integer
@@ -326,16 +327,7 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
         int flag = calculate_pcc_argument_flags(argiter);
 
         if (TEST_FLAG(argiter->flags, TARGET_FLAG_NAMED)) {
-
-            /*
-            VTABLE_set_integer_keyed_int(lexer->interp, signature_array, i,
-                                         PARROT_ARG_NAME | PARROT_ARG_SC);
-
-            push_operand(lexer, expr_from_string(lexer, argiter->alias));
-            */
-
             add_alias_operand(lexer, signature_array, i, argiter->alias);
-
             ++i;
             CLEAR_FLAG(argiter->flags, TARGET_FLAG_NAMED);
         }

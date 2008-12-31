@@ -29,6 +29,7 @@ O(c) (constant) time.
 #include "piryy.h"
 #include "pirdefines.h"
 #include "pirpcc.h"
+#include "pirerr.h"
 #include "bcgen.h"
 
 #include <stdio.h>
@@ -42,7 +43,6 @@ O(c) (constant) time.
 #include "parrot/dynext.h"
 
 
-
 static unsigned const prime_numbers[] = {113 /* XXX think of more primes */ };
 
 /*
@@ -50,29 +50,6 @@ static unsigned const prime_numbers[] = {113 /* XXX think of more primes */ };
 =head1 FUNCTIONS
 
 =over 4
-
-
-=item C<void
-panic(lexer_state * lexer, char const * const message)>
-
-Function to emit a final last cry that something's wrong and exit.
-
-=cut
-
-*/
-void
-panic(lexer_state * lexer, char const * const message, ...) {
-    va_list arg_ptr;
-    fprintf(stderr, "Fatal: ");
-    va_start(arg_ptr, message);
-    vfprintf(stderr, message, arg_ptr);
-    va_end(arg_ptr);
-    release_resources(lexer);
-    exit(EXIT_FAILURE);
-}
-
-
-/*
 
 =item C<void
 reset_register_allocator(lexer_state * const lexer)>
@@ -2066,10 +2043,10 @@ update_op(NOTNULL(lexer_state * const lexer), NOTNULL(instruction * const instr)
     if (instr->opinfo)
         lexer->codesize -= instr->opinfo->op_count;
 
-/*
-    fprintf(stderr, "updateop(): %s\n", CURRENT_INSTRUCTION(lexer)->opname);
-*/
-    /* else the instruction was already set; decrement the codesize, as it was added already */
+    /* We cannot undo the counting of ops of var-arg ops such as get_params.
+     * Is that ever necessary? Don't think so, as they're added through new_sub_instr()
+     * which is special anyway.
+     */
 
     /* now get the opinfo structure, update the name, and update the opcode. */
     instr->opinfo = &lexer->interp->op_info_table[newop];
@@ -2079,11 +2056,6 @@ update_op(NOTNULL(lexer_state * const lexer), NOTNULL(instruction * const instr)
     /* add codesize needed for the new instruction. */
     lexer->codesize += instr->opinfo->op_count;
 }
-
-
-
-
-
 
 
 /*
@@ -2130,7 +2102,7 @@ fixup_local_labels(lexer_state * const lexer) {
         return;
 
     do {
-        iter = iter->next; /* init pointer to first instruction */
+        iter = iter->next; /* first time init pointer to first instruction */
 
         /* Do a quick global check if any label bits have been set
          * if no label at all, skip this whole block.

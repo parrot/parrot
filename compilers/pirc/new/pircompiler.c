@@ -13,6 +13,7 @@
 #include "piryy.h"
 #include "pirmacro.h"
 #include "pirregalloc.h"
+#include "pirerr.h"
 
 /* XXX count memory, so we can check out mem. savings of string reuse
  * Only temporarily used, so no need to "fix" this.

@@ -453,11 +453,6 @@ void convert_inv_to_instr(struct lexer_state * const lexer, invocation * const i
 void update_sub_register_usage(struct lexer_state * const lexer,
                                unsigned reg_usage[NUM_PARROT_TYPES]);
 
-
-
-void panic(struct lexer_state * lexer, char const * const message, ...);
-
-
 void new_sub_instr(struct lexer_state * const lexer, int opcode, char const * const opname,
               unsigned num_var_args);
 

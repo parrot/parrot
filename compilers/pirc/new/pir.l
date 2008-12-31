@@ -66,6 +66,7 @@ are processed by a different preprocessor; see F<hdocprep.l>.
 #include "pircompiler.h"
 #include "piryy.h"
 #include "pirmacro.h"
+#include "pirerr.h"
 
 /* define the type of the extra field in the yyscan_t object that is passed around;
  * this is the lexer_state structure, defined in "pircompiler.h"
