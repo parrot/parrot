@@ -502,6 +502,18 @@ pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
 }
 
 
+INTVAL
+get_new_vtable_index(PARROT_INTERP)
+{
+    const INTVAL typeid = interp->n_vtable_max++;
+
+    /* Have we overflowed the table? */
+    if (typeid >= interp->n_vtable_alloced)
+        parrot_realloc_vtables(interp);
+
+    return typeid;
+}
+
 /*
 
 =item C<INTVAL pmc_register>
@@ -512,16 +524,6 @@ representing that type.
 =cut
 
 */
-INTVAL
-get_new_vtable_index(PARROT_INTERP) {
-    const INTVAL typeid = interp->n_vtable_max++;
-
-    /* Have we overflowed the table? */
-    if (typeid >= interp->n_vtable_alloced)
-        parrot_realloc_vtables(interp);
-
-    return typeid;
-}
 
 PARROT_EXPORT
 INTVAL

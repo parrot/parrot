@@ -97,6 +97,9 @@ void dod_unregister_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+INTVAL get_new_vtable_index(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void temporary_pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -126,6 +129,7 @@ PMC * temporary_pmc_new(PARROT_INTERP, INTVAL base_type)
                                assert(name);
 #define ASSERT_ARGS_dod_unregister_pmc assert(interp); \
                                        assert(pmc);
+#define ASSERT_ARGS_get_new_vtable_index assert(interp);
 #define ASSERT_ARGS_temporary_pmc_free assert(interp); \
                                        assert(pmc);
 #define ASSERT_ARGS_temporary_pmc_new assert(interp);
