@@ -183,6 +183,14 @@ emit_sub_epilogue(lexer_state * const lexer) {
 }
 
 
+static void
+add_alias_operand(lexer_state * const lexer, PMC *array, int index, char const * const alias) {
+    PARROT_ASSERT(alias);
+    /* set flags for being a string constant, and being a :named operand. */
+    VTABLE_set_integer_keyed_int(lexer->interp, array, index, PARROT_ARG_NAME | PARROT_ARG_SC);
+    push_operand(lexer, expr_from_string(lexer, alias));
+}
+
 
 /*
 
@@ -237,13 +245,17 @@ targets_to_operands(lexer_state * const lexer, target * const targets, unsigned 
          * :named flag) of the target operand.
          */
         if (TEST_FLAG(iter->flags, TARGET_FLAG_NAMED)) {
-            /* set flags for being a string constant, and being a :named operand. */
+
+            add_alias_operand(lexer, signature_array, i, iter->alias);
+
+
+            /*
             VTABLE_set_integer_keyed_int(lexer->interp, signature_array, i,
                                          PARROT_ARG_NAME | PARROT_ARG_SC);
 
-            PARROT_ASSERT(iter->alias);
-
             push_operand(lexer, expr_from_string(lexer, iter->alias));
+            */
+
             ++i;
 
             /* clear flag on the target that was marked :named XXX is this correct? */
@@ -315,10 +327,14 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
 
         if (TEST_FLAG(argiter->flags, TARGET_FLAG_NAMED)) {
 
+            /*
             VTABLE_set_integer_keyed_int(lexer->interp, signature_array, i,
                                          PARROT_ARG_NAME | PARROT_ARG_SC);
 
             push_operand(lexer, expr_from_string(lexer, argiter->alias));
+            */
+
+            add_alias_operand(lexer, signature_array, i, argiter->alias);
 
             ++i;
             CLEAR_FLAG(argiter->flags, TARGET_FLAG_NAMED);
@@ -396,8 +412,8 @@ For $P0():
 For "foo"() and foo():
 
  set_args_pc
- get_results_pc
  set_p_pc / find_sub_not_null_p_sc
+ get_results_pc
  invokecc_p
 
 =cut
@@ -408,10 +424,6 @@ convert_pcc_call(lexer_state * const lexer, invocation * const inv) {
     new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc", inv->num_arguments);
     arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
 
-    /*
-    new_sub_instr(lexer, PARROT_OP_get_results_pc, "get_results_pc", inv->num_results);
-    targets_to_operands(lexer, inv->results, inv->num_results);
-*/
 
     /* if the target is a register, invoke that. */
     if (TEST_FLAG(inv->sub->flags, TARGET_FLAG_IS_REG)) {
@@ -517,6 +529,8 @@ The sequence of instructions is:
  set_returns_pc
  yield
 
+XXX This does not work; why?
+
 =cut
 
 */
@@ -524,7 +538,6 @@ static void
 convert_pcc_yield(lexer_state * const lexer, invocation * const inv) {
     new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc", inv->num_arguments);
     arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
-
     new_sub_instr(lexer, PARROT_OP_yield, "yield", 0);
 }
 
@@ -547,6 +560,9 @@ convert_pcc_tailcall(lexer_state * const lexer, invocation * const inv) {
     new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc", inv->num_arguments);
     arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
 
+    /* XXX this needs an argument; possibly refactor PCC_CALL code, so we can re-use
+     * the code to get the sub to invoke.
+     */
     new_sub_instr(lexer, PARROT_OP_tailcall_p, "tailcall_p", 0);
 }
 
@@ -599,13 +615,17 @@ convert_pcc_methodtailcall(lexer_state * const lexer, invocation * const inv) {
     arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
 
     /* check out the type of the method expression; it may be a PMC or a STRING. */
-    if (inv->method->type == EXPR_TARGET)
-        new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_p, "tailcallmethod_p_p", 0);
-    else if (inv->method->type == EXPR_CONSTANT)
-        new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_sc, "tailcallmethod_p_sc", 0);
-    else
-        panic(lexer, "unknown expression type in tailcallmethod instruction");
-
+    switch (inv->method->type) {
+        case EXPR_TARGET:
+            new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_p, "tailcallmethod_p_p", 0);
+            break;
+        case EXPR_CONSTANT:
+            new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_sc, "tailcallmethod_p_sc", 0);
+            break;
+        default:
+            panic(lexer, "unknown expression type in tailcallmethod instruction");
+            break;
+    }
 }
 
 

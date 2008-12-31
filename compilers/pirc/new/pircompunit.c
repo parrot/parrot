@@ -2260,6 +2260,10 @@ close_sub(lexer_state * const lexer) {
         switch (CURRENT_INSTRUCTION(lexer)->opcode) {
             case PARROT_OP_end:
             case PARROT_OP_returncc:
+            case PARROT_OP_yield:
+            case PARROT_OP_ret:
+            case PARROT_OP_branch_ic:
+            case PARROT_OP_exit_ic:
                 need_epilogue = 0;
                 break;
             default:
