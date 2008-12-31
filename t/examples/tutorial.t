@@ -249,15 +249,6 @@ foreach my $tutorial (sort keys %files) {
     }
 }
 
-
-
-# cleanup
-{
-
-    # The example '40_file_ops.pir' leave a temporary file.
-    unlink '40_file_ops_data.txt';
-}
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
