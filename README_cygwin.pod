@@ -6,36 +6,97 @@ README.cygwin - Parrot under Cygwin
 
 =head1 SYNOPSIS
 
-Parrot builds out of the box under Cygwin.  Some tweaks are needed for
-different names of dynamic loading of some dll's.
+Parrot builds out of the box under Cygwin after 
+C<export PATH=`pwd`/blib/lib:$PATH>
+
+There are official cygwin parrot packages available via
+L<http://cygwin.com/setup.exe>.
+
+  parrot libparrot0 libparrot-devel parrot-perl6 parrot-languages
+
+Some tweaks are needed for different names for the ffi to some dll's.
+See L</loadlib DLL versioning>
+
 
 =head1 Packages
 
-You'll need the following Cygwin packages to build Parrot.
+You'll need the following Cygwin packages to run and build Parrot 
+by your own.
+
+Runtime requirements:
+
+  libreadline6 ncurses libintl8 libgmp3 libgdbm4
+
+Optional requirements:
+
+  libicu38 libpq5 openssl
+
+  for opengl: w32api opengl or libglut3 xorg-x11-base xorg-x11-bin-dlls
+
+Build requirements:
+
+  gcc make perl parrot readline libncurses-devel libgmp-devel
+  libgdbm-devel pcre-devel 
+
+Optional build requirements:
+
+  libicu-devel openssl-devel 
+
+  for Cygwin/X opengl: freeglut libglut-devel xorg-x11-devel 
+
+Optional perl packages for testing: 
+
+  L<Test::TAP::HTMLMatrix> if you want to run the language smoke tests
+  with C<make languages-smoke>.
+
+  L<Test::Base> for some APL language tests.
+
+  perl L<Moose> for smartlink
+
+  perl L<Test::Perl::Critic> and L<Perl::Critic>
 
 =over 4
 
-=item gcc
-
-=item make
-
-=item perl
-
-=item subversion
+=item Cygwin subversion and perl
 
 If you use SVN to get a copy of Parrot, you should use the Cygwin SVN
 and not the TortoiseSVN client to avoid build errors.  Similarly you will
 need Cygwin Perl rather than ActiveState or Strawberry Perl.
 
-=item ICU
-
-This is no official Cygwin package yet.  However, icu4c-3_8 builds out of the
-box on Cygwin.
-
-  http://download.icu-project.org/files/icu4c/3.8/icu4c-3_8-src.tgz
+=item icu
 
 Note that ICU is now optional, you can build Parrot without it,
 by not installing it or asking Parrot to ignore it (C<--without-icu>).
+
+=item opengl
+
+You can use the w32api and opengl packages for native Windows opengl support,
+or the freeglut package for the X Server.
+
+Configure.pl will detect freeglut if freeglut is installed and DISPLAY 
+is set, otherwise it checks for w32api and opengl with GLUT.
+
+  Determining if your platform supports OpenGL.............yes, freeglut 3.4.
+  Determining if your platform supports OpenGL...................yes, GLUT 3.
+  Determining if your platform supports OpenGL............................no.
+
+Required packages:
+
+  w32api opengl
+
+or 
+
+  freeglut libglut-devel xorg-x11-devel xorg-x11-base xorg-x11-bin-dlls
+
+=item SDL
+
+SDL references F<cygSDL-1-2-0.dll>, which is only in cygports
+L<http://news.gmane.org/gmane.os.cygwin.ports.announce>
+
+=item aio
+
+libaio-devel "Linux-native asynchronous I/O access" is not available
+for cygwin, and as the name says it will never be :)
 
 =back
 
@@ -53,21 +114,25 @@ by not installing it or asking Parrot to ignore it (C<--without-icu>).
 
 =item Makefile tuning
 
-rename libparrot.dll to cygparrot.dll, create an interim libparrot.dll.a
+Rename libparrot.dll to cygparrot0_8_2.dll and create an interim
+libparrot.dll.a
 
-fix the blib/lib PATH issue
+  [perl #56998] [TODO]  rename cygwin dll to cygparrot$MAJOR_$MINOR_$PATCH.dll
+  [perl #56562] [PATCH] root.in: add cygwin importlib
 
-=item DLL versioning
+=item loadlib DLL versioning
 
-cyg*-1.1.dll instead of lib*.so.1.1
+Use cyg*-1.1.dll naming conventions instead of lib*.so.1.1 names for
+loadlib, the FFI.
 
-Thanks to the L<Windows DLL Hell / http://> and the impossibility of file
-hardlinks, windows dll names are versioned, so the loadlib function or the
-various pir's needs more logic.
+Thanks to the L<Windows DLL Hell> and the impossibility of
+file hardlinks, windows dll names are versioned, so the loadlib
+function or the various pir's needs more logic.
 
-Either add the version to each loadlib call, and stem the version from POSIX
-versions within get_path(), or add an optional version argument to loadlib for
-win32. Or just fix all the pir's.
+Either add the version to each loadlib call, and stem the version from
+POSIX versions within get_path(), or add an optional version argument
+to loadlib for win32. Or just fix all the pir's, which will be easier
+when exceptions work again.
 
 =item Features
 
@@ -79,7 +144,7 @@ Threads, Events, and Signals are missing.
 
 =over
 
-=item Reini Urban E<lt>rurban@cpan.orgE<gt>
+=item Reini Urban E<lt>rurban@x-ray.atE<gt>
 
 =back
 
@@ -89,6 +154,6 @@ Threads, Events, and Signals are missing.
 
 =head1 HISTORY
 
-Last updated: 1 June 2008
+Last updated: 20 July 2008
 
 =cut
