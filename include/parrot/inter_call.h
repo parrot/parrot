@@ -161,18 +161,14 @@ PARROT_EXPORT
 void parrot_pass_args(PARROT_INTERP,
     ARGMOD(Parrot_Context *src_ctx),
     ARGMOD(Parrot_Context *dest_ctx),
-    ARGMOD(opcode_t *src_indexes),
-    ARGMOD(opcode_t *dest_indexes),
+    ARGMOD_NULLOK(opcode_t *src_indexes),
+    ARGMOD_NULLOK(opcode_t *dest_indexes),
     arg_pass_t param_or_result)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
         FUNC_MODIFIES(*src_ctx)
-        FUNC_MODIFIES(*dest_ctx)
-        FUNC_MODIFIES(*src_indexes)
-        FUNC_MODIFIES(*dest_indexes);
+        FUNC_MODIFIES(*dest_ctx);
 
 PARROT_EXPORT
 void Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP,
@@ -278,9 +274,7 @@ STRING* set_retval_s(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
                                         assert(sig);
 #define ASSERT_ARGS_parrot_pass_args assert(interp); \
                                      assert(src_ctx); \
-                                     assert(dest_ctx); \
-                                     assert(src_indexes); \
-                                     assert(dest_indexes);
+                                     assert(dest_ctx);
 #define ASSERT_ARGS_Parrot_pcc_invoke_sub_from_c_args assert(interp); \
                                                       assert(sub_obj); \
                                                       assert(sig);

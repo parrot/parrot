@@ -170,12 +170,11 @@ static const char * set_context_sig_params(PARROT_INTERP,
 static void set_context_sig_returns(PARROT_INTERP,
     ARGMOD(Parrot_Context *ctx),
     ARGMOD(opcode_t **indexes),
-    ARGIN(const char *ret_x),
+    ARGIN_NULLOK(const char *ret_x),
     ARGMOD(PMC *result_list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*ctx)
         FUNC_MODIFIES(*indexes)
@@ -280,7 +279,6 @@ static void too_many(PARROT_INTERP,
 #define ASSERT_ARGS_set_context_sig_returns assert(interp); \
                                             assert(ctx); \
                                             assert(indexes); \
-                                            assert(ret_x); \
                                             assert(result_list);
 #define ASSERT_ARGS_set_context_sig_returns_varargs assert(interp); \
                                                     assert(ctx); \
@@ -1694,7 +1692,7 @@ PARROT_EXPORT
 void
 parrot_pass_args(PARROT_INTERP,
         ARGMOD(Parrot_Context *src_ctx), ARGMOD(Parrot_Context *dest_ctx),
-        ARGMOD(opcode_t *src_indexes),   ARGMOD(opcode_t *dest_indexes),
+        ARGMOD_NULLOK(opcode_t *src_indexes), ARGMOD_NULLOK(opcode_t *dest_indexes),
         arg_pass_t param_or_result)
 {
     call_state st;
@@ -2176,8 +2174,9 @@ for the return signature C<ret_x> and a list of return parameters C<result_list>
 */
 
 static void
-set_context_sig_returns(PARROT_INTERP, ARGMOD(Parrot_Context *ctx),
-    ARGMOD(opcode_t **indexes), ARGIN(const char *ret_x), ARGMOD(PMC *result_list))
+set_context_sig_returns(PARROT_INTERP,
+    ARGMOD(Parrot_Context *ctx), ARGMOD(opcode_t **indexes),
+    ARGIN_NULLOK(const char *ret_x), ARGMOD(PMC *result_list))
 {
     const char   *x;
     STRING       *empty_string = CONST_STRING(interp, "");
