@@ -29,6 +29,9 @@
 void init_scanner_state(yyscan_t yyscanner);
 
 
+static Parrot_mutex eval_nr_lock;
+static INTVAL       eval_nr  = 0;
+
 /*
 
 =item C<FILE *
@@ -66,8 +69,8 @@ void parse_file(int flexdebug, FILE *infile, char * const filename, int flags,
 
 
 void
-parse_file(int flexdebug, FILE *infile, char * const filename, int flags, int thr_id,
-           unsigned macro_size, char * const outputfile)
+parse_file(PARROT_INTERP, int flexdebug, FILE *infile, char * const filename, int flags,
+           int thr_id, unsigned macro_size, char * const outputfile)
 {
     yyscan_t     yyscanner;
     lexer_state *lexer     = NULL;
@@ -79,7 +82,7 @@ parse_file(int flexdebug, FILE *infile, char * const filename, int flags, int th
     /* set the input file */
     yypirset_in(infile, yyscanner);
     /* set the extra parameter in the yyscan_t structure */
-    lexer = new_lexer(filename, flags);
+    lexer = new_lexer(interp, filename, flags);
     lexer->macro_size = macro_size;
 
     /* initialize the scanner state */
@@ -149,10 +152,25 @@ Parse a PIR string.
 
 */
 void
-parse_string(char *pirstring, int flags, int pasminput, unsigned macro_size) {
-    yyscan_t yyscanner;
-    lexer_state *lexer = NULL;
+parse_string(PARROT_INTERP, char *pirstring, int flags, int pasminput, unsigned macro_size) {
+    yyscan_t            yyscanner;
+    lexer_state        *lexer = NULL;
+    char                name[64];
+    PackFile_ByteCode  *old_cs, *new_cs;
+    INTVAL              eval_number;
 
+
+    if (eval_nr == 0)
+        MUTEX_INIT(eval_nr_lock);
+
+    LOCK(eval_nr_lock);
+    eval_number = ++eval_nr;
+    UNLOCK(eval_nr_lock);
+
+    snprintf(name, sizeof (name), "EVAL_" INTVAL_FMT, eval_number);
+
+    new_cs = PF_create_default_segs(interp, name, 0);
+    old_cs = Parrot_switch_to_cs(interp, new_cs, 0);
 
     /* create a yyscan_t object */
     yypirlex_init(&yyscanner);
@@ -161,7 +179,7 @@ parse_string(char *pirstring, int flags, int pasminput, unsigned macro_size) {
 
 
     /* set the extra parameter in the yyscan_t structure */
-    lexer = new_lexer("<pir string>", flags);
+    lexer = new_lexer(interp, name, flags);
     lexer->macro_size = macro_size;
     yypirset_extra(lexer, yyscanner);
     lexer->yyscanner = yyscanner;

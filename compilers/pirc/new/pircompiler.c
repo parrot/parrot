@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2007-2008, The Perl Foundation.
+ * Copyright (C) 2007-2009, The Perl Foundation.
  */
 
 #include <stdlib.h>
@@ -161,12 +161,13 @@ PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 lexer_state *
-new_lexer(NULLOK(char * const filename), int flags) {
+new_lexer(PARROT_INTERP, NULLOK(char * const filename), int flags) {
     lexer_state *lexer       = mem_allocate_zeroed_typed(lexer_state);
     lexer->filename          = filename;
-    lexer->interp            = Parrot_new(NULL);
+    lexer->interp            = interp;
     lexer->flags             = flags;
     lexer->mem_allocations   = new_mem_ptrs_block();
+
 
     /* the PIR register generator must start counting at -2 (the value is pre-decremented
      * before returning, hence -1), because -1 is the value for unassigned PASM
@@ -174,8 +175,6 @@ new_lexer(NULLOK(char * const filename), int flags) {
      */
     lexer->pir_reg_generator = -1;
 
-    if (!lexer->interp)
-        panic(lexer, "Failed to create a Parrot interpreter structure.");
 
     /* create a hashtable to store all strings */
     init_hashtable(lexer, &lexer->strings, HASHTABLE_SIZE_INIT);

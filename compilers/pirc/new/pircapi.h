@@ -10,10 +10,10 @@
 
 FILE * open_file(char const * const filename, char const * const mode);
 
-void parse_string(char *pirstring, int flags, int pasminput, unsigned macro_size);
+void parse_string(PARROT_INTERP, char *pirstring, int flags, int pasminput, unsigned macro_size);
 
-void parse_file(int flexdebug, FILE *infile, char * const filename, int flags, int thr_id,
-                unsigned macro_size, char * const outputfile);
+void parse_file(PARROT_INTERP, int flexdebug, FILE *infile, char * const filename, int flags,
+                int thr_id, unsigned macro_size, char * const outputfile);
 
 #endif /* PARROT_PIR_PIRCAPI_H_GUARD */
 

@@ -748,7 +748,9 @@ emit_pbc_sub(lexer_state * const lexer, subroutine * const sub) {
 
     /* XXX why does this not work? */
     if (TEST_FLAG(sub->flags, PIRC_SUB_FLAG_IMMEDIATE)) {
+        fprintf(stderr, "running :immediate sub %s...", sub->info.subname);
         PackFile_fixup_subs(lexer->interp, PBC_IMMEDIATE, NULL);
+        fprintf(stderr, "done\n");
     }
 }
 

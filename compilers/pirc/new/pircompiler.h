@@ -150,7 +150,7 @@ typedef struct lexer_state {
 
 
 /* constructor for a lexer_state object */
-lexer_state *new_lexer(char * const filename, int flags);
+lexer_state *new_lexer(PARROT_INTERP, char * const filename, int flags);
 
 void release_resources(lexer_state *lexer);
 

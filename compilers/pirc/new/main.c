@@ -127,8 +127,9 @@ process_file(void *a) {
     char        *filename  = args->filename;
     int          thr_id    = args->thr_id;
     int          flags     = args->flags;
+    PARROT_INTERP          = Parrot_new(NULL);
 
-    parse_file(flexdebug, infile, filename, flags, thr_id, INIT_MACRO_SIZE, NULL);
+    parse_file(interp, flexdebug, infile, filename, flags, thr_id, INIT_MACRO_SIZE, NULL);
 
     return NULL;
 }
@@ -155,7 +156,7 @@ main(int argc, char *argv[]) {
     char              *outputfile   = NULL;
     char              *hdocoutfile  = NULL;
     unsigned           macrosize    = INIT_MACRO_SIZE;
-
+    PARROT_INTERP                   = Parrot_new(NULL);
 
     /* skip program name */
     argc--;
@@ -325,7 +326,7 @@ main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    parse_file(flexdebug, file, filename, flags, 0, macrosize, outputfile);
+    parse_file(interp, flexdebug, file, filename, flags, 0, macrosize, outputfile);
     fprintf(stderr, "done\n");
 }
 #endif
