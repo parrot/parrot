@@ -185,6 +185,7 @@ typedef struct expression {
 /* The key node is used to represent a key expression */
 typedef struct key {
     expression *expr;      /* value of this key */
+    int         index;     /* key value (if int) or index in constant table */
     struct key *next;      /* in ["x";"y"], there's 2 key nodes; 1 for "x", 1 for "y",
                               linked by "next" */
 } key;

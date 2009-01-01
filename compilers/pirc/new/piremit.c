@@ -529,16 +529,16 @@ emit_pbc_label_arg(lexer_state * const lexer, label * const l) {
 
 
 
-
-
-
-
 /*
 
 =item C<static void
 emit_pbc_key(lexer_state * const lexer, key * const k)>
 
 Emit bytecode for the key C<k>.
+
+XXX Not sure what to return. At what point is this function
+called? Do we want to return an index in the constant table?
+or an expression (operand) node.
 
 =cut
 
@@ -552,6 +552,7 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
     opcode_t    keysize;    /* total size of key in bytecode */
     opcode_t   *pc;         /* cursor to write into key array */
     expression *operand;
+    int         index;
 
     fprintf(stderr, "emit pbc key\n");
     emit_pbc_expr(lexer, k->expr);
@@ -598,11 +599,14 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
                 *pc++ = t->info->color;
                 break;
             }
+            /* XXX nested keys? */
             default:
+                panic(lexer, "unknown expression type");
                 break;
 
         }
-        /* count the number of keys */
+
+        /* count the number of keys*/
         ++keylength;
         iter = iter->next;
     }
@@ -614,9 +618,9 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
      */
     keysize = pc - key;
 
-    store_key_bytecode(lexer->bc, key);
+    index = store_key_bytecode(lexer->bc, key);
 
-    operand = expr_from_key(lexer, k);
+    operand = expr_from_int(lexer, index);
     return operand;
 
 }
@@ -645,11 +649,11 @@ emit_pbc_expr(lexer_state * const lexer, expression * const operand) {
         case EXPR_LABEL:
             emit_pbc_label_arg(lexer, operand->expr.l);
             break;
-        /*
+
         case EXPR_KEY:
-            fprintf(stderr, "emit pbc isntr key arg\n");
+            emit_pbc_key(lexer, operand->expr.k);
             break;
-        */
+
         default:
             break;
     }
