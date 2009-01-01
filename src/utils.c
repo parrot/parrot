@@ -168,19 +168,19 @@ floatval_mod(FLOATVAL n2, FLOATVAL n3)
 {
 #ifdef __LCC__
 
-  /* Another workaround for buggy code generation in the lcc compiler-
-   * adding a temporary variable makes it pass the test.
-   */
-  const FLOATVAL temp = n3 * floor(n2 / n3);
-  ASSERT_ARGS(floatval_mod);
+    /* Another workaround for buggy code generation in the lcc compiler-
+     * adding a temporary variable makes it pass the test.
+     */
+    const FLOATVAL temp = n3 * floor(n2 / n3);
+    ASSERT_ARGS(floatval_mod);
 
-  return !FLOAT_IS_ZERO(n3)
-     ? (n2 - temp)
-     : n2;
+    return !FLOAT_IS_ZERO(n3)
+      ? (n2 - temp)
+      : n2;
 #else
-  return !FLOAT_IS_ZERO(n3)
-     ? (n2 - n3 * floor(n2 / n3))
-     : n2;
+    return !FLOAT_IS_ZERO(n3)
+      ? (n2 - n3 * floor(n2 / n3))
+      : n2;
 #endif
 }
 
