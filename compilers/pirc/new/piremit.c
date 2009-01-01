@@ -60,8 +60,8 @@ char const pir_register_types[5] = {'I', 'S', 'P', 'N', '?'};
 
 static void emit_pir_statement(lexer_state * const lexer, subroutine * const sub);
 static void emit_pir_instruction(lexer_state * const lexer, instruction * const instr);
+static void emit_pbc_expr(lexer_state * const lexer, expression * const operand);
 
-static void emit_pbc_key(lexer_state * const lexer, key * const k);
 
 /* prototype declaration */
 void print_expr(lexer_state * const lexer, expression * const expr);
@@ -531,6 +531,104 @@ emit_pbc_label_arg(lexer_state * const lexer, label * const l) {
 
 
 
+
+
+/*
+
+=item C<static void
+emit_pbc_key(lexer_state * const lexer, key * const k)>
+
+Emit bytecode for the key C<k>.
+
+=cut
+
+*/
+static expression *
+emit_pbc_key(lexer_state * const lexer, key * const k) {
+    key        *iter      = k;
+    int         keylength = 0;
+
+    opcode_t    key[20];    /* XXX make length variable */
+    opcode_t    keysize;    /* total size of key in bytecode */
+    opcode_t   *pc;         /* cursor to write into key array */
+    expression *operand;
+
+    fprintf(stderr, "emit pbc key\n");
+    emit_pbc_expr(lexer, k->expr);
+
+    /* initialize cursor */
+    pc = &key[1]; /* slot 0 is used for length of key */
+
+    while (iter) {
+
+        switch (iter->expr->type) {
+            case EXPR_CONSTANT: {
+                constant *c = iter->expr->expr.c;
+                switch (c->type) {
+                    case INT_TYPE:
+                        *pc++ = PARROT_ARG_IC;
+                        *pc++ = c->val.ival;
+                        break;
+                    case STRING_TYPE:
+                        *pc++ = PARROT_ARG_SC;
+                        *pc++ = add_string_const(lexer->bc, c->val.sval);
+                        break;
+                    default:
+                        panic(lexer, "wrong type of key");
+                        break;
+                }
+
+                break;
+            }
+            case EXPR_TARGET: {
+                target *t = iter->expr->expr.t;
+
+                switch (t->info->type) {
+                    case INT_TYPE:
+                        *pc++ = PARROT_ARG_I;
+                        break;
+                    case STRING_TYPE:
+                        *pc++ = PARROT_ARG_S;
+                        break;
+                    default:
+                        panic(lexer, "wrong type of key");
+                        break;
+                }
+
+                *pc++ = t->info->color;
+                break;
+            }
+            default:
+                break;
+
+        }
+        /* count the number of keys */
+        ++keylength;
+        iter = iter->next;
+    }
+
+    /* store key length in slot 0 */
+    key[0]  = keylength;
+    /* calculate size of key in bytecode; each field has 2 INTVALs:
+     * flags/types and the register/constant index.
+     */
+    keysize = pc - key;
+
+    store_key_bytecode(lexer->bc, key);
+
+    operand = expr_from_key(lexer, k);
+    return operand;
+
+}
+
+/*
+
+=item C<static void
+emit_pbc_expr(lexer_state * const lexer, expression * const operand)>
+
+=cut
+
+*/
 static void
 emit_pbc_expr(lexer_state * const lexer, expression * const operand) {
     switch (operand->type) {
@@ -555,23 +653,6 @@ emit_pbc_expr(lexer_state * const lexer, expression * const operand) {
         default:
             break;
     }
-}
-
-/*
-
-=item C<static void
-emit_pbc_key(lexer_state * const lexer, key * const k)>
-
-Emit bytecode for the key C<k>.
-
-=cut
-
-*/
-static void
-emit_pbc_key(lexer_state * const lexer, key * const k) {
-    fprintf(stderr, "emit pbc key\n");
-    emit_pbc_expr(lexer, k->expr);
-    /* XXX finish this. */
 }
 
 /*

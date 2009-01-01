@@ -101,6 +101,8 @@ void emit_int_arg(bytecode * const bc, int argvalue);
 
 int add_key_const(bytecode * const bc, PMC *key);
 
+int store_key_bytecode(bytecode * const bc, opcode_t *keybytecode);
+
 int add_num_const(bytecode * const bc, double f);
 
 int add_string_const(bytecode * const bc, char const * const str);

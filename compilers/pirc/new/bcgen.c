@@ -404,14 +404,13 @@ emit_int_arg(bytecode * const bc, int intval) {
 
 /*
 
-=item C<static void
-build_key(lexer_state * const lexer, key * const k)>
+=item C<void()>
 
 =cut
 
 */
-static void
-build_key(bytecode * const bc, opcode_t * key) {
+int
+store_key_bytecode(bytecode * const bc, opcode_t * key) {
     PackFile_Constant   *pfc;
     const opcode_t      *rc;
     int                  index;
@@ -427,23 +426,9 @@ build_key(bytecode * const bc, opcode_t * key) {
 
     index = add_key_const(bc, pfc->u.key);
 
-
     mem_sys_free(pfc);
 
-
-/*
-    const SymReg * const r =
-        _get_sym(&IMCC_INFO(interp)->globals->cs->key_consts, s_key);
-
-
-    if (r)
-        return r->color;
-
-    store_key_const(interp, s_key, k);
-
-    return k;
-*/
-
+    return index;
 }
 
 /* XXX remove or update prototype once the XXX below has been resolved. */
@@ -640,7 +625,7 @@ get_namespace_pmc(bytecode * const bc, multi_type * const ns) {
 /*
 
 =item C<void
-add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex)>
+add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subpragmas)>
 
 Add a sub PMC to the constant table. This function initializes the sub PMC.
 The index where the PMC is stored in the constant table is returned.

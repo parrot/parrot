@@ -173,7 +173,7 @@ typedef struct expression {
 
     } expr;
 
-    expr_type          type;  /* selector for __expression_union */
+    expr_type          type;  /* selector for expression_union */
 
     struct expression *next;
 
