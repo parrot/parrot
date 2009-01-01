@@ -3129,7 +3129,7 @@ yyreduce:
            (yyval.i) = INS(interp, IMCC_INFO(interp)->cur_unit,
                     (yyvsp[(2) - (3)].s), 0, IMCC_INFO(interp)->regs,
                     IMCC_INFO(interp)->nargs, IMCC_INFO(interp) -> keyvec, 1);
-           /* XXX: can't seem to mem_sys_free($1) here */
+            mem_sys_free((yyvsp[(2) - (3)].s));
          }
     break;
 

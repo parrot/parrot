@@ -975,7 +975,7 @@ pasm_inst:                     { clear_state(interp); }
            $$ = INS(interp, IMCC_INFO(interp)->cur_unit,
                     $2, 0, IMCC_INFO(interp)->regs,
                     IMCC_INFO(interp)->nargs, IMCC_INFO(interp) -> keyvec, 1);
-           /* XXX: can't seem to mem_sys_free($1) here */
+            mem_sys_free($2);
          }
    | PCC_SUB
          {
