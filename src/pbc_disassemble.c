@@ -82,7 +82,7 @@ main(int argc, char *argv[])
 
 /*
 
-=item C<static void do_dis(Parrot_Interp interp)>
+=item C<static void do_dis(PARROT_INTERP)>
 
 Do the disassembling.
 
@@ -91,7 +91,7 @@ Do the disassembling.
 */
 
 static void
-do_dis(Parrot_Interp interp)
+do_dis(PARROT_INTERP)
 {
     Parrot_disassemble(interp);
 }

@@ -26,7 +26,7 @@ Functions for dealing with child processes and Execs.
 /*
 
 =item C<INTVAL
-Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)>
+Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)>
 
 Spawn the subprocess specified in C<command>.
 Waits for the process to complete, and then
@@ -37,7 +37,7 @@ returns the exit code in POSIX-compatibility mode.
 */
 
 INTVAL
-Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)
+Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
 {
     DWORD status = 0;
     STARTUPINFO si;
@@ -79,7 +79,7 @@ Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)
 /*
 
 =item C<INTVAL
-Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)>
+Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)>
 
 Spawns a subprocess with the arguments provided in the C<cmdargs> PMC array.
 The first array element should be the name of the process to spawn,
@@ -92,7 +92,7 @@ and returns the exit code in POSIX-compatibility mode.
 */
 
 INTVAL
-Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
+Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
 {
     DWORD status = 0;
     STARTUPINFO si;
@@ -152,7 +152,7 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
 /*
 
 =item C<void
-Parrot_Exec_OS_Command(Parrot_Interp interp, STRING *command)>
+Parrot_Exec_OS_Command(PARROT_INTERP, STRING *command)>
 
 Exits parrot and passes control to the specified process. Does not return. Raises an exception
 if the exec fails.
@@ -162,7 +162,7 @@ if the exec fails.
 */
 
 void
-Parrot_Exec_OS_Command(Parrot_Interp interp, STRING *command)
+Parrot_Exec_OS_Command(PARROT_INTERP, STRING *command)
 {
     int status;
     char *in = string_to_cstring(interp, command);

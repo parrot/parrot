@@ -83,7 +83,7 @@ VERSION = PARROT_VERSION;
 
 
 /* Overflow exception thrower. */
-static opcode_t* dotnet_OverflowException(Parrot_Interp interp, opcode_t *ret)
+static opcode_t* dotnet_OverflowException(PARROT_INTERP, opcode_t *ret)
 {
     PMC *ex_pmc = pmc_new(interp, enum_class_Exception);
     VTABLE_set_string_native(interp, ex_pmc,

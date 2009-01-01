@@ -59,7 +59,7 @@ static void build_interference_graph(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-static void build_reglist(Parrot_Interp interp, ARGMOD(IMC_Unit *unit))
+static void build_reglist(NULLOK_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
@@ -634,7 +634,7 @@ Run through them and allocate all that don't overlap in one bunch.
 */
 
 static void
-build_reglist(Parrot_Interp interp, ARGMOD(IMC_Unit *unit))
+build_reglist(NULLOK_INTERP, ARGMOD(IMC_Unit *unit))
 {
     SymHash  const *hsh = &unit->hash;
     unsigned int    i, count, unused, n_symbols;

@@ -184,7 +184,7 @@ c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_intval_intkey' );
 #include "parrot/extend.h"
 
 static opcode_t*
-the_test(Parrot_Interp interp, opcode_t *cur_op, opcode_t *start)
+the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
 {
     Parrot_Int type  = Parrot_PMC_typenum(interp, "ResizablePMCArray");
     Parrot_PMC array = Parrot_PMC_new(interp, type);
@@ -438,7 +438,7 @@ main(int argc, char *argv[])
  * so that buffering in PIO is not an issue */
 
 static opcode_t*
-the_test(Parrot_Interp interp, opcode_t *cur_op, opcode_t *start)
+the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
 {
     PackFile *pf = Parrot_readbc(interp, "$temp_pbc");
     STRING   *name = const_string(interp, "_sub1");
@@ -512,7 +512,7 @@ main(int argc, char *argv[])
  * so that buffering in PIO is not an issue */
 
 static opcode_t*
-the_test(Parrot_Interp interp, opcode_t *cur_op, opcode_t *start)
+the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
 {
     PackFile         *pf   = Parrot_readbc(interp, "$temp_pbc");
     STRING           *name = const_string(interp, "_sub1");
@@ -709,7 +709,7 @@ c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_new/Parrot_exit cycles' );
  */
 void interp_cleanup(Parrot_Interp, int);
 
-void interp_cleanup(Parrot_Interp interp, int status)
+void interp_cleanup(PARROT_INTERP, int status)
 {
     handler_node_t *node = interp->exit_handler_list;
 

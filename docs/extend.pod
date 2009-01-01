@@ -36,7 +36,7 @@ TODO
 
 =over 4
 
-=item C<Parrot_call_method(Parrot_Interp interp, Parrot_PMC sub
+=item C<Parrot_call_method(PARROT_INTERP, Parrot_PMC sub
        Parrot_PMC object, Parrot_String method, const char *signature, ...)>
 
 Calls a method on C<object> with the given signature and arguments. C<sub> is

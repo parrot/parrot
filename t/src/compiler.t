@@ -6,11 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test;
-
-$^O eq 'MSWin32'
-    ? plan( skip_all => 'linking problem' )
-    : plan( tests => 5 );
+use Parrot::Test tests => 5;
 
 =head1 NAME
 
@@ -35,7 +31,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Single call" );
 #include "parrot/extend.h"
 
 static opcode_t *
-run(Parrot_Interp interp, int argc, char *argv[])
+run(PARROT_INTERP, int argc, char *argv[])
 {
     const char *c_src = ".sub main :main\n" "    print \"ok\\n\"\n" ".end\n";
 
@@ -117,7 +113,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple Calls" );
 #include "parrot/extend.h"
 
 static void
-compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
+compile_run(PARROT_INTERP, const char *src, STRING *type, int argc,
             char *argv[])
 {
     STRING   *smain;
@@ -150,7 +146,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
 }
 
 static opcode_t *
-run(Parrot_Interp interp, int argc, char *argv[])
+run(PARROT_INTERP, int argc, char *argv[])
 {
     const char *c_src  = ".sub main :main\n" "    print \"ok\\n\"\n" ".end\n";
 
@@ -210,7 +206,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple 1st bad PIR" );
 #include "parrot/extend.h"
 
 static void
-compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
+compile_run(PARROT_INTERP, const char *src, STRING *type, int argc,
             char *argv[])
 {
     STRING   *smain;
@@ -243,7 +239,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
 }
 
 static opcode_t *
-run(Parrot_Interp interp, int argc, char *argv[])
+run(PARROT_INTERP, int argc, char *argv[])
 {
     const char *c_src  = ".sub main :main\n" "    print ok\\n\"\n" ".end\n";
 
@@ -303,7 +299,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple 2nd bad PIR" );
 #include "parrot/extend.h"
 
 static void
-compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
+compile_run(PARROT_INTERP, const char *src, STRING *type, int argc,
             char *argv[])
 {
     STRING   *smain;
@@ -336,7 +332,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
 }
 
 static opcode_t *
-run(Parrot_Interp interp, int argc, char *argv[])
+run(PARROT_INTERP, int argc, char *argv[])
 {
     const char *c_src  = ".sub main :main\n" "    print ok\\n\"\n" ".end\n";
 
@@ -395,7 +391,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple bad PIR" );
 #include "parrot/extend.h"
 
 static void
-compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
+compile_run(PARROT_INTERP, const char *src, STRING *type, int argc,
             char *argv[])
 {
     STRING   *smain;
@@ -428,7 +424,7 @@ compile_run(Parrot_Interp interp, const char *src, STRING *type, int argc,
 }
 
 static opcode_t *
-run(Parrot_Interp interp, int argc, char *argv[])
+run(PARROT_INTERP, int argc, char *argv[])
 {
     const char *c_src  = ".sub main :main\n" "    print ok\\n\"\n" ".end\n";
 

@@ -4,7 +4,7 @@
 
 Z<CHP-10>
 
-This chapter contains  a condensed list of PASM opcodes, PIR directives
+This chapter contains a condensed list of PASM opcodes, PIR directives
 and instructions, and Parrot command-line options, sorted alphabetically
 for easy reference. Any PASM opcode is valid in PIR code, so if you're
 looking up PIR syntax you should check A<CHP-10-SECT-1>"PASM Opcodes",

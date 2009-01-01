@@ -5,7 +5,7 @@
 
 =head1 Title
 
-FHS - Filesystem Hieararchy Standard and Parrot
+FHS - Filesystem Hierarchy Standard and Parrot
 
 =head1 AUTHOR
 

@@ -170,7 +170,7 @@ create_interp(PMC *self, Parrot_Interp parent)
 }
 
 static int
-recursion_limit(Parrot_Interp interp, PMC *self, int l)
+recursion_limit(PARROT_INTERP, PMC *self, int l)
 {
     const int ret           = interp->recursion_limit;
     interp->recursion_limit = l;

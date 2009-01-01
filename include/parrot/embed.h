@@ -64,7 +64,7 @@ PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 void Parrot_exit(Parrot_Interp, int status);
 
-PARROT_EXPORT void Parrot_run_native(Parrot_Interp interp, native_func_t func);
+PARROT_EXPORT void Parrot_run_native(PARROT_INTERP, native_func_t func);
 
 /* Parrot_set_config_hash exists in *_config.o (e.g install_config.o),
    so if you make this call then you will need to link with it in

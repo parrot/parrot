@@ -28,7 +28,7 @@ still clean, Parrot embedding.
 #define setopt(flag) Parrot_setflag(interp, (flag), (*argv)[0]+2);
 #define unsetopt(flag) Parrot_setflag(interp, (flag), 0)
 
-static char *parseflags(Parrot_Interp interp, int *argc, char **argv[]);
+static char *parseflags(PARROT_INTERP, int *argc, char **argv[]);
 
 #define OPT_GC_DEBUG     128
 #define OPT_DESTROY_FLAG 129
@@ -97,7 +97,7 @@ main(int argc, char *argv[])
 /*
 
 =item C<char *
-parseflags(Parrot_Interp interp, int *argc, char **argv[])>
+parseflags(PARROT_INTERP, int *argc, char **argv[])>
 
 Parses the command-line.
 
@@ -106,7 +106,7 @@ Parses the command-line.
 */
 
 static char *
-parseflags(Parrot_Interp interp, int *argc, char **argv[])
+parseflags(PARROT_INTERP, int *argc, char **argv[])
 {
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
 

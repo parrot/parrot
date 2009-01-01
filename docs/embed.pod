@@ -117,7 +117,7 @@ created with a NULL parent, and all subsequent interpreters in the same
 process should use the first interpreter as their parent.  Failure to do so
 may result in unpredictable errors.
 
-=item C<Parrot_set_flag(Parrot_Interp interp, Parrot_int flags)>
+=item C<Parrot_set_flag(PARROT_INTERP, Parrot_int flags)>
 
 Sets or unsets interpreter flags.  Flags should be OR'd together.  Valid
 flags include:
@@ -151,7 +151,7 @@ flags include:
 See F<interpreter.h> for the definition of these flags (TODO: document flag
 definitions here).
 
-=item C<void Parrot_set_run_core(Parrot_Interp interp, Parrot_Run_core_t core)>
+=item C<void Parrot_set_run_core(PARROT_INTERP, Parrot_Run_core_t core)>
 
 Sets the runcore for the interpreter.  Must be called before executing any
 bytecode.  Valid runcores include:
@@ -207,35 +207,35 @@ Z<>
 
 =back
 
-=item C<void Parrot_set_executable_name(Parrot_Interp interp, Parrot_string name)>
+=item C<void Parrot_set_executable_name(PARROT_INTERP, Parrot_string name)>
 
 Sets the executable name of the calling process.  Note that the name is a
 Parrot string, not a C string.
 
-=item C<void Parrot_destroy(Parrot_Interp interp)>
+=item C<void Parrot_destroy(PARROT_INTERP)>
 
 Destroys an interpreter.  At the time of this writing, this is a no-op.
 See <Parrot_really_destroy()>.
 
-=item C<void Parrot_really_destroy(Parrot_Interp interp, int exit_code)>
+=item C<void Parrot_really_destroy(PARROT_INTERP, int exit_code)>
 
 Destroys an interpreter, regardless of the environment.  The exit code is
 currently unused.
 
-=item C<void Parrot_exit(Parrot_Interp interp, int status)>
+=item C<void Parrot_exit(PARROT_INTERP, int status)>
 
 Destroys the interpreter and exits with an exit code of C<status>.  Before
 exiting, the function calls all registered exit handlers in LIFO order.
 C<Parrot_really_destroy()> is usually called as the last exit handler.
 
-=item C<void Parrot_on_exit(Parrot_Interp interp,
+=item C<void Parrot_on_exit(PARROT_INTERP,
                             void (*handler)(Parrot_Interp, int, void *), void *arg)>
 
 Registers an exit handler to be called from C<Parrot_exit()> in LIFO order.
 The handler function should accept as arguments an interpreter, an integer
 exit code, and an argument (which can be NULL).
 
-=item C<void imcc_init(Parrot_Interp interp)>
+=item C<void imcc_init(PARROT_INTERP)>
 
 Initializes the IMCC subsystem.  Required for compiling PIR.
 
@@ -245,27 +245,27 @@ Initializes the IMCC subsystem.  Required for compiling PIR.
 
 =over 4
 
-=item C<Parrot_PackFile Parrot_readbc(Parrot_Interp interp, const char *path)>
+=item C<Parrot_PackFile Parrot_readbc(PARROT_INTERP, const char *path)>
 
 Reads Parrot bytecode or PIR from the file referenced by C<path>.  Returns
 a packfile structure for use by C<Parrot_loadbc()>.
 
-=item C<void Parrot_loadbc(Parrot_Interp interp, Parrot_PackFile pf)>
+=item C<void Parrot_loadbc(PARROT_INTERP, Parrot_PackFile pf)>
 
 Loads a packfile into the interpreter.  After this operation the interpreter
 is ready to run the bytecode in the packfile.
 
-=item C<void Parrot_runcode(Parrot_Interp interp, int argc, char *argv[])>
+=item C<void Parrot_runcode(PARROT_INTERP, int argc, char *argv[])>
 
 Runs the bytecode associated with the interpreter.  Use C<argc> and C<argv[]>
 to pass arguments to the bytecode.
 
-=item C<Parrot_PackFile PackFile_new_dummy(Parrot_Interp interp, char *name)>
+=item C<Parrot_PackFile PackFile_new_dummy(PARROT_INTERP, char *name)>
 
 Creates a "dummy" packfile in lieu of actually creating one from a bytecode
 file on disk.
 
-=item C<void Parrot_load_bytecode(Parrot_Interp interp, const char *path)>
+=item C<void Parrot_load_bytecode(PARROT_INTERP, const char *path)>
 
 Reads and load Parrot bytecode or PIR from the file referenced by C<path>.
 You should create a dummy packfile beforehand; see C<PackFile_new_dummy> for
@@ -280,22 +280,22 @@ is unclear.
 
 =over 4
 
-=item C<int Parrot_PMC_typenum(Parrot_Interp interp, const char *type)>
+=item C<int Parrot_PMC_typenum(PARROT_INTERP, const char *type)>
 
 Returns the internal type number corresponding to C<type>.  Useful for
 instantiating various Parrot data types.
 
-=item C<char *string_to_cstring(Parrot_Interp interp)>
+=item C<char *string_to_cstring(PARROT_INTERP)>
 
 XXX needs to be a formal Parrot_* API.
 Returns the C string representation of a Parrot string.
 
-=item C<STRING *string_from_cstring(Parrot_Interp interp, const char *string, int len)>
+=item C<STRING *string_from_cstring(PARROT_INTERP, const char *string, int len)>
 
 XXX needs to be a formal Parrot_* API.
 Returns the Parrot string representation of a C string.
 
-=item C<string_from_literal(Parrot_Interp interp, const char *string)>
+=item C<string_from_literal(PARROT_INTERP, const char *string)>
 
 XXX needs to be a formal Parrot_* API.
 A macro for simplifying calls to C<string_from_cstring>.
@@ -306,7 +306,7 @@ A macro for simplifying calls to C<string_from_cstring>.
 
 =over 4
 
-=item C<Parrot_PMC Parrot_PMC_new(Parrot_Interp interp, int typenum)>
+=item C<Parrot_PMC Parrot_PMC_new(PARROT_INTERP, int typenum)>
 
 Creates a new PMC of the type identified by C<typenum>.  Use
 C<Parrot_PMC_typenum> to obtain the correct type number.
@@ -329,40 +329,40 @@ or risk memory leaks.
 
 =over 4
 
-=item C<Parrot_PMC Parrot_find_global_cur(Parrot_Interp interp, Parrot_String name)>
+=item C<Parrot_PMC Parrot_find_global_cur(PARROT_INTERP, Parrot_String name)>
 
 Find and return a global called C<name> in the current namespace.  Returns
 C<PMCNULL> if not found.
 
-=item C<Parrot_PMC Parrot_find_global_n(Parrot_Interp interp, Parrot_String namespace, Parrot_String name)>
+=item C<Parrot_PMC Parrot_find_global_n(PARROT_INTERP, Parrot_String namespace, Parrot_String name)>
 
 Not documented yet.
 
-=item C<Parrot_PMC Parrot_find_global_s(Parrot_Interp interp, Parrot_String namespace, Parrot_String name)>
+=item C<Parrot_PMC Parrot_find_global_s(PARROT_INTERP, Parrot_String namespace, Parrot_String name)>
 
 Find and return a global called C<name> in the namespace C<namespace>.  Returns
 C<PMCNULL> if not found.
 
-=item C<void Parrot_store_global_cur(Parrot_Interp interp, Parrot_String name, Parrot_PMC val)>
+=item C<void Parrot_store_global_cur(PARROT_INTERP, Parrot_String name, Parrot_PMC val)>
 
 Sets the value of a global called C<name> in the current namespace.  Does
 nothing if the global is not found.
 
-=item C<void Parrot_store_global_n(Parrot_Interp interp, Parrot_String namespace, Parrot_String name, Parrot_PMC val)>
+=item C<void Parrot_store_global_n(PARROT_INTERP, Parrot_String namespace, Parrot_String name, Parrot_PMC val)>
 
 Not documented yet.
 
-=item C<void Parrot_store_global_s(Parrot_Interp interp, Parrot_String namespace, Parrot_String name, Parrot_PMC val)>
+=item C<void Parrot_store_global_s(PARROT_INTERP, Parrot_String namespace, Parrot_String name, Parrot_PMC val)>
 
 Sets the value of a global called C<name> in the namespace C<namespace>.  Does
 nothing if the global is not found.
 
-=item C<Parrot_PMC Parrot_find_global_k(Parrot_Interp interp, Parrot_PMC namespace_key, Parrot_String name)>
+=item C<Parrot_PMC Parrot_find_global_k(PARROT_INTERP, Parrot_PMC namespace_key, Parrot_String name)>
 
 Find and return a global called C<name> in the keyed namespace C<namespace>.
 Returns C<PMCNULL> if not found.
 
-=item C<void Parrot_store_global_k(Parrot_Interp interp, Parrot_PMC namespace_key, Parrot_String name, Parrot_PMC val)>
+=item C<void Parrot_store_global_k(PARROT_INTERP, Parrot_PMC namespace_key, Parrot_String name, Parrot_PMC val)>
 
 Sets the value of a global called C<name> in the keyed namespace C<namespace>.
 Does nothing if the global is not found.
@@ -377,15 +377,15 @@ Not documented yet.
 
 =over 4
 
-=item C<void *Parrot_call_sub(Parrot_Interp interp, Parrot_PMC sub, const_char *signature)>
+=item C<void *Parrot_call_sub(PARROT_INTERP, Parrot_PMC sub, const_char *signature)>
 
 Call a Parrot subroutine that returns a pointer using the supplied signature.
 
-=item C<Parrot_Int Parrot_call_sub_ret_int(Parrot_Interp interp, Parrot_PMC sub, const_char *signature)>
+=item C<Parrot_Int Parrot_call_sub_ret_int(PARROT_INTERP, Parrot_PMC sub, const_char *signature)>
 
 Call a Parrot subroutine that returns an integer using the supplied signature.
 
-=item C<Parrot_Float Parrot_call_sub_ret_float(Parrot_Interp interp, Parrot_PMC sub, const_char *signature)>
+=item C<Parrot_Float Parrot_call_sub_ret_float(PARROT_INTERP, Parrot_PMC sub, const_char *signature)>
 
 Call a Parrot subroutine that returns an float using the supplied signature.
 
@@ -397,11 +397,11 @@ Call a Parrot subroutine that returns an float using the supplied signature.
 
 =over 4
 
-=item C<Parrot_PMC Parrot_oo_get_class(Parrot_Interp interp, Parrot_PMC namespace)>
+=item C<Parrot_PMC Parrot_oo_get_class(PARROT_INTERP, Parrot_PMC namespace)>
 
 Returns the class corresponding to the supplied namespace.
 
-=item C<Parrot_PMC Parrot_Class_instantiate(Parrot_Interp interp, Parrot_PMC the_class Parrot_PMC arg)>
+=item C<Parrot_PMC Parrot_Class_instantiate(PARROT_INTERP, Parrot_PMC the_class Parrot_PMC arg)>
 
 Instantiates a new object of class C<the_class>, which can be obtained from
 C<Parrot_oo_get_class()>.  Passes an optional PMC argument C<arg> to the

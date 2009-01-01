@@ -40,12 +40,12 @@ example compiler used by japh16.pasm
 #  define cdebug(x)
 #endif
 
-PMC* japh_compiler(Parrot_Interp interp, const char *s);
+PMC* japh_compiler(PARROT_INTERP, const char *s);
 
 /*
 
 =item C<void
-Parrot_lib_japhc_init(Parrot_Interp interp, PMC* lib)>
+Parrot_lib_japhc_init(PARROT_INTERP, PMC* lib)>
 
 loadlib calls the load and init hooks
 we use init to register the compiler
@@ -55,7 +55,7 @@ we use init to register the compiler
 */
 
 void
-Parrot_lib_japhc_init(Parrot_Interp interp, PMC* lib)
+Parrot_lib_japhc_init(PARROT_INTERP, PMC* lib)
 {
     STRING *cmp;
 
@@ -102,7 +102,7 @@ unescape(char *string)
 /*
 
 =item C<static int
-add_const_str(Parrot_Interp interp, PackFile_ConstTable *consts, char *str)>
+add_const_str(PARROT_INTERP, PackFile_ConstTable *consts, char *str)>
 
 add constant string to constant_table
 
@@ -111,7 +111,7 @@ add constant string to constant_table
 */
 
 static int
-add_const_str(Parrot_Interp interp, PackFile_ConstTable *consts, char *str)
+add_const_str(PARROT_INTERP, PackFile_ConstTable *consts, char *str)
 {
     int k, l;
     char *o;
@@ -156,7 +156,7 @@ add_const_str(Parrot_Interp interp, PackFile_ConstTable *consts, char *str)
 
 /*
 
-=item C<PMC* japh_compiler(Parrot_Interp interp, const char *program)>
+=item C<PMC* japh_compiler(PARROT_INTERP, const char *program)>
 
 simple compiler - no error checking
 
@@ -165,7 +165,7 @@ simple compiler - no error checking
 */
 
 PMC*
-japh_compiler(Parrot_Interp interp, const char *program)
+japh_compiler(PARROT_INTERP, const char *program)
 {
     PackFile_ByteCode *cur_cs, *old_cs;
     PackFile_ConstTable *consts;

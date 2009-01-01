@@ -27,7 +27,7 @@ system() stuff
 /*
 
 =item C<INTVAL
-Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)>
+Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)>
 
 Spawn off a subprocess and wait for the damn thing to complete,
 returning the return value of the process
@@ -37,7 +37,7 @@ returning the return value of the process
 */
 
 INTVAL
-Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)
+Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
 {
     pid_t child;
     child = fork();
@@ -72,7 +72,7 @@ Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)
 /*
 
 =item C<INTVAL
-Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)>
+Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)>
 
 RT#48260: Not yet documented!!!
 
@@ -81,7 +81,7 @@ RT#48260: Not yet documented!!!
 */
 
 INTVAL
-Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
+Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
 {
     pid_t child;
     int len = VTABLE_elements(interp, cmdargs);
@@ -133,7 +133,7 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
 /*
 
 =item C<void
-Parrot_Exec_OS_Command(Parrot_Interp interp, STRING *command)>
+Parrot_Exec_OS_Command(PARROT_INTERP, STRING *command)>
 
 RT #48260: Not yet documented!!!
 
@@ -142,7 +142,7 @@ RT #48260: Not yet documented!!!
 */
 
 void
-Parrot_Exec_OS_Command(Parrot_Interp interp, STRING *command)
+Parrot_Exec_OS_Command(PARROT_INTERP, STRING *command)
 {
     /* Be horribly profligate with memory, since we're
        about to be something else */

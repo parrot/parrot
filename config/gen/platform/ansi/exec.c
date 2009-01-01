@@ -23,7 +23,7 @@ RT#48264
 
 /*
 
-=item C<INTVAL Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)>
+=item C<INTVAL Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)>
 
 Spawn a subprocess
 
@@ -32,7 +32,7 @@ Spawn a subprocess
 */
 
 INTVAL
-Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)
+Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
 {
     Parrot_warn(NULL, PARROT_WARNINGS_PLATFORM_FLAG,
             "Parrot_Run_OS_Command not implemented");
@@ -41,7 +41,7 @@ Parrot_Run_OS_Command(Parrot_Interp interp, STRING *command)
 
 /*
 
-=item C<INTVAL Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)>
+=item C<INTVAL Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)>
 
 RT#48260: Not yet documented!!!
 
@@ -50,7 +50,7 @@ RT#48260: Not yet documented!!!
 */
 
 INTVAL
-Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
+Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
 {
     Parrot_warn(NULL, PARROT_WARNINGS_PLATFORM_FLAG,
             "Parrot_Run_OS_Command_Argv not implemented");
@@ -59,7 +59,7 @@ Parrot_Run_OS_Command_Argv(Parrot_Interp interp, PMC *cmdargs)
 
 /*
 
-=item C<void Parrot_Exec_OS_Comman(Parrot_Interp interp, STRING *command)>
+=item C<void Parrot_Exec_OS_Comman(PARROT_INTERP, STRING *command)>
 
 RT#48260: Not yet documented!!!
 
@@ -68,7 +68,7 @@ RT#48260: Not yet documented!!!
 */
 
 void
-Parrot_Exec_OS_Comman(Parrot_Interp interp, STRING *command)
+Parrot_Exec_OS_Comman(PARROT_INTERP, STRING *command)
 {
   Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NOSPAWN,
          "Exec not implemented");

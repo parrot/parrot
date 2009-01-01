@@ -115,7 +115,7 @@ and C<debug_break> ops in F<ops/debug.ops>.
 #include "parrot/debugger.h"
 
 static void PDB_printwelcome(void);
-static void PDB_run_code(Parrot_Interp interp, int argc, char *argv[]);
+static void PDB_run_code(PARROT_INTERP, int argc, char *argv[]);
 
 /*
 
@@ -249,7 +249,7 @@ Adds a default exception handler to PDB.
 */
 
 static void
-PDB_run_code(Parrot_Interp interp, int argc, char *argv[])
+PDB_run_code(PARROT_INTERP, int argc, char *argv[])
 {
     new_runloop_jump_point(interp);
     if (setjmp(interp->current_runloop->resume)) {

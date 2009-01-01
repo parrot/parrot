@@ -23,7 +23,7 @@ typedef struct PMC_struct
 } PMC_struct;
 
 Interpreter_struct*
-make_interp( pTHX_ SV *parent, Parrot_Interp interp )
+make_interp( pTHX_ SV *parent, PARROT_INTERP )
 {
 	Interpreter_struct *interp_struct;
 	if (interp == NULL)

@@ -115,7 +115,7 @@ C source tests are usually located in F<t/src/*.t>.  A simple test looks like:
     }
 
     static opcode_t*
-    the_test(Parrot_Interp interp,
+    the_test(PARROT_INTERP,
         opcode_t *cur_op, opcode_t *start)
     {
         /* Your test goes here. */
