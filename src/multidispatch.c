@@ -286,9 +286,6 @@ Parrot_build_sig_object_from_varargs(PARROT_INTERP, ARGIN(const char *sig), va_l
     INTVAL       in_return_sig = 0;
     INTVAL       i;
 
-    /* Protect call signature object from collection. */
-    dod_register_pmc(interp, call_object);
-
     if (!sig_len)
         return call_object;
 
@@ -423,7 +420,6 @@ Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
 #endif
 
     Parrot_pcc_invoke_sub_from_sig_object(interp, sub, sig_object);
-    dod_unregister_pmc(interp, sig_object);
 }
 
 
