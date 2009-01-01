@@ -88,11 +88,10 @@ PARROT_EXPORT
 void list_assign(PARROT_INTERP,
     ARGMOD(List *list),
     INTVAL idx,
-    ARGIN(void *item),
+    ARGIN_NULLOK(void *item),
     int type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
         FUNC_MODIFIES(*list);
 
 PARROT_EXPORT
@@ -172,11 +171,10 @@ void * list_pop(PARROT_INTERP, ARGMOD(List *list), int type)
 PARROT_EXPORT
 void list_push(PARROT_INTERP,
     ARGMOD(List *list),
-    ARGIN(void *item),
+    ARGIN_NULLOK(void *item),
     int type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         FUNC_MODIFIES(*list);
 
 PARROT_EXPORT
@@ -226,8 +224,7 @@ INTVAL list_length(SHIM_INTERP, ARGIN(const List *list))
 
 #define ASSERT_ARGS_ld
 #define ASSERT_ARGS_list_assign assert(interp); \
-                                assert(list); \
-                                assert(item);
+                                assert(list);
 #define ASSERT_ARGS_list_clone assert(interp); \
                                assert(other);
 #define ASSERT_ARGS_list_delete assert(interp); \
@@ -249,8 +246,7 @@ INTVAL list_length(SHIM_INTERP, ARGIN(const List *list))
 #define ASSERT_ARGS_list_pop assert(interp); \
                              assert(list);
 #define ASSERT_ARGS_list_push assert(interp); \
-                              assert(list); \
-                              assert(item);
+                              assert(list);
 #define ASSERT_ARGS_list_set_length assert(interp); \
                                     assert(list);
 #define ASSERT_ARGS_list_shift assert(interp); \

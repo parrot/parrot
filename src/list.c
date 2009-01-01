@@ -250,12 +250,11 @@ static void * list_item(PARROT_INTERP,
 
 static void list_set(PARROT_INTERP,
     ARGMOD(List *list),
-    ARGIN(void *item),
+    ARGIN_NULLOK(void *item),
     INTVAL type,
     INTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         FUNC_MODIFIES(*list);
 
 static UINTVAL rebuild_chunk_list(PARROT_INTERP, ARGMOD(List *list))
@@ -304,8 +303,7 @@ static void split_chunk(PARROT_INTERP,
 #define ASSERT_ARGS_list_item assert(interp); \
                               assert(list);
 #define ASSERT_ARGS_list_set assert(interp); \
-                             assert(list); \
-                             assert(item);
+                             assert(list);
 #define ASSERT_ARGS_rebuild_chunk_list assert(interp); \
                                        assert(list);
 #define ASSERT_ARGS_rebuild_chunk_ptrs assert(list);
@@ -1087,7 +1085,8 @@ Sets C<item> of type C<type> in chunk at C<idx>.
 */
 
 static void
-list_set(PARROT_INTERP, ARGMOD(List *list), ARGIN(void *item), INTVAL type, INTVAL idx)
+list_set(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(void *item),
+        INTVAL type, INTVAL idx)
 {
     const INTVAL oidx = idx;
     List_chunk *chunk = get_chunk(interp, list, (UINTVAL *)&idx);
@@ -1788,7 +1787,7 @@ Pushes C<item> of type C<type> on to the end of the list.
 
 PARROT_EXPORT
 void
-list_push(PARROT_INTERP, ARGMOD(List *list), ARGIN(void *item), int type)
+list_push(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(void *item), int type)
 {
     const INTVAL idx = list->start + list->length++;
 
@@ -1910,7 +1909,7 @@ Assigns C<item> of type C<type> to index C<idx>.
 
 PARROT_EXPORT
 void
-list_assign(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, ARGIN(void *item), int type)
+list_assign(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, ARGIN_NULLOK(void *item), int type)
 {
     const INTVAL length = list->length;
 
