@@ -48,7 +48,6 @@ Globally defined constants are stored in yet another separate list.
 
 */
 
-extern char const pir_register_types[5];
 
 #define NO_REG_ALLOCATED    -1
 
@@ -85,7 +84,6 @@ assign_vanilla_register(NOTNULL(lexer_state * const lexer), symbol * const sym) 
     sym->info.color    = next_register(lexer, sym->info.type);
 
     if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC)) {
-
         sym->info.interval = new_live_interval(lexer->lsr, lexer->stmt_counter, sym->info.type);
 
         /* set the reference of the interval to the symbol's color */
@@ -298,14 +296,12 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
         symbol *sym = bucket_symbol(buck);
 
         if (STREQ(sym->info.id.name, name)) {
-            fprintf(stderr, "found symbol %c:%s\n", pir_register_types[sym->info.type], name);
 
             if (sym->info.color == NO_REG_ALLOCATED)  /* no PASM register assigned yet */
                 /* get a new reg from vanilla reg. allocator */
                 assign_vanilla_register(lexer, sym);
             else  /* update end point of interval */
                 if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC)) {
-                    fprintf(stderr, "updating live of symbol %s\n", name);
                     sym->info.interval->endpoint = lexer->stmt_counter;
                 }
 
@@ -369,7 +365,10 @@ find_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
     while (iter != NULL) {
         if (iter->info.id.regno == regno) {
 
+            /*
             fprintf(stderr, "Found regster $%c%d\n", pir_register_types[type], regno);
+            */
+
             /* update the end point of this register's live interval */
             if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC))
                 iter->info.interval->endpoint = lexer->stmt_counter;
