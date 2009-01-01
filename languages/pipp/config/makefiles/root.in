@@ -10,8 +10,6 @@ BUILD_DIR     = @build_dir@
 LIBRARY_DIR   = $(BUILD_DIR)/runtime/parrot/library
 INCLUDE_DIR   = $(BUILD_DIR)/include
 PMC_DIR       = src/pmc
-PIPP_DIR      = $(BUILD_DIR)/languages/pipp
-HASH_DIR      = $(PIPP_DIR)/src/pmc
 PARROT_DYNEXT = $(BUILD_DIR)/runtime/parrot/dynext
 
 # Set up commands
@@ -48,9 +46,9 @@ PMC_SOURCES = \
   $(PMC_DIR)/phpstring.pmc \
   $(PMC_DIR)/phpnull.pmc
 
-HASH_SOURCES = $(HASH_DIR)/pipp_hash.c
-HASH_H       = $(HASH_DIR)/pipp_hash.h
-HASH_OBJS    = $(HASH_DIR)/pipp_hash$(O)
+HASH_SOURCES = $(PMC_DIR)/pipp_hash.c
+HASH_H       = $(PMC_DIR)/pipp_hash.h
+HASH_OBJS    = $(PMC_DIR)/pipp_hash$(O)
 
 PHP_GROUP = $(PMC_DIR)/php_group$(LOAD_EXT)
 
@@ -207,8 +205,8 @@ $(HASH_OBJS): $(HASH_SOURCES) $(HASH_H)
 	$(TOUCH) $(PMC_DIR)/phparray.pmc
 	$(CC) $(CFLAGS) -I$(INCLUDE_DIR) $(HASH_SOURCES) -c -g -o $(HASH_OBJS)
 
-export DYNPMC_INCLUDE=$(PIPP_DIR)
-export DYNPMC_LINK=$(HASH_OBJS)
+export DYNPMC_INCLUDE=$(BUILD_DIR)/languages/pipp
+export DYNPMC_LINK=$(BUILD_DIR)/languages/pipp/$(HASH_OBJS)
 
 $(PHP_GROUP): $(PMC_SOURCES)
 	@cd $(PMC_DIR) && $(PMCBUILD) generate $(PMCS)
