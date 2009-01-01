@@ -79,6 +79,7 @@ PARROT_EXPORT
 INTVAL
 PMC_is_null(SHIM_INTERP, ARGIN_NULLOK(const PMC *pmc))
 {
+    ASSERT_ARGS(PMC_is_null);
 #if PARROT_CATCH_NULL
     return pmc == PMCNULL || pmc == NULL;
 #else
@@ -105,6 +106,7 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 pmc_new(PARROT_INTERP, INTVAL base_type)
 {
+    ASSERT_ARGS(pmc_new);
     PARROT_ASSERT(interp->vtables[base_type]);
     {
         PMC *const classobj = interp->vtables[base_type]->pmc_class;
@@ -141,6 +143,7 @@ pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
 {
     VTABLE *new_vtable;
     INTVAL  has_ext, new_flags;
+    ASSERT_ARGS(pmc_reuse);
 
     if (pmc->vtable->base_type == new_type)
         return pmc;
@@ -229,6 +232,7 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
     PMC    *pmc;
     VTABLE *vtable = interp->vtables[base_type];
     UINTVAL vtable_flags;
+    ASSERT_ARGS(get_new_pmc_header);
 
     /* This is usually because you either didn't call init_world early enough,
      * you added a new PMC class without adding Parrot_(classname)_class_init
@@ -326,6 +330,7 @@ PMC *
 pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
 {
     PMC *const classobj = interp->vtables[base_type]->pmc_class;
+    ASSERT_ARGS(pmc_new_noinit);
 
     if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
         return VTABLE_instantiate(interp, classobj, PMCNULL);
@@ -349,6 +354,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 constant_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
 {
+    ASSERT_ARGS(constant_pmc_new_noinit);
     return get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
 }
 
@@ -369,6 +375,7 @@ PMC *
 constant_pmc_new(PARROT_INTERP, INTVAL base_type)
 {
     PMC * const pmc = get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
+    ASSERT_ARGS(constant_pmc_new);
     VTABLE_init(interp, pmc);
     return pmc;
 }
@@ -390,6 +397,7 @@ PMC *
 pmc_new_init(PARROT_INTERP, INTVAL base_type, ARGOUT(PMC *init))
 {
     PMC *const classobj = interp->vtables[base_type]->pmc_class;
+    ASSERT_ARGS(pmc_new_init);
 
     if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
         return VTABLE_instantiate(interp, classobj, init);
@@ -418,6 +426,7 @@ PMC *
 constant_pmc_new_init(PARROT_INTERP, INTVAL base_type, ARGIN_NULLOK(PMC *init))
 {
     PMC * const pmc = get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
+    ASSERT_ARGS(constant_pmc_new_init);
     VTABLE_init_pmc(interp, pmc, init);
     return pmc;
 }
@@ -452,6 +461,7 @@ PMC *
 temporary_pmc_new(PARROT_INTERP, INTVAL base_type)
 {
     PMC * const pmc = get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
+    ASSERT_ARGS(temporary_pmc_new);
     VTABLE_init(interp, pmc);
     return pmc;
 }
@@ -474,6 +484,7 @@ static void
 pmc_free_to_pool(PARROT_INTERP, ARGMOD(PMC *pmc),
     ARGMOD(Small_Object_Pool *pool))
 {
+    ASSERT_ARGS(pmc_free_to_pool);
     if (PObj_active_destroy_TEST(pmc))
         VTABLE_destroy(interp, pmc);
 
@@ -490,6 +501,7 @@ void
 temporary_pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     Small_Object_Pool *pool = interp->arena_base->constant_pmc_pool;
+    ASSERT_ARGS(temporary_pmc_free);
     pmc_free_to_pool(interp, pmc, pool);
 }
 
@@ -497,6 +509,7 @@ static void
 pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     Small_Object_Pool *pool = interp->arena_base->pmc_pool;
+    ASSERT_ARGS(pmc_free);
     pmc_free_to_pool(interp, pmc, pool);
 
 }
@@ -506,6 +519,7 @@ INTVAL
 get_new_vtable_index(PARROT_INTERP)
 {
     const INTVAL typeid = interp->n_vtable_max++;
+    ASSERT_ARGS(get_new_vtable_index);
 
     /* Have we overflowed the table? */
     if (typeid >= interp->n_vtable_alloced)
@@ -532,6 +546,7 @@ pmc_register(PARROT_INTERP, ARGIN(STRING *name))
     /* If they're looking to register an existing class, return that
        class' type number */
     INTVAL type = pmc_type(interp, name);
+    ASSERT_ARGS(pmc_register);
 
     if (type > enum_type_undef)
         return type;
@@ -564,6 +579,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 pmc_type(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
 {
+    ASSERT_ARGS(pmc_type);
     if (!name)
         return enum_type_undef;
     else {
@@ -600,6 +616,7 @@ pmc_type_p(PARROT_INTERP, ARGIN(PMC *name))
     PMC * const classname_hash = interp->class_hash;
     PMC * const item           =
         (PMC *)VTABLE_get_pointer_keyed(interp, classname_hash, name);
+    ASSERT_ARGS(pmc_type_p);
 
     if (!PMC_IS_NULL(item))
         return VTABLE_get_integer(interp, item);
@@ -632,6 +649,7 @@ create_class_pmc(PARROT_INTERP, INTVAL type)
      */
     PMC * const _class = get_new_pmc_header(interp, type,
                                            PObj_constant_FLAG);
+    ASSERT_ARGS(create_class_pmc);
 
     /* If we are a second thread, we may get the same object as the
      * original because we have a singleton. Just set the singleton to
@@ -676,6 +694,7 @@ Parrot_create_mro(PARROT_INTERP, INTVAL type)
     VTABLE *vtable   = interp->vtables[type];
     PMC    *mro_list = vtable->mro;
     INTVAL  i, count;
+    ASSERT_ARGS(Parrot_create_mro);
 
     /* this should never be PMCNULL */
     PARROT_ASSERT(!PMC_IS_NULL(mro_list));
@@ -742,6 +761,7 @@ PARROT_EXPORT
 void
 dod_register_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {
+    ASSERT_ARGS(dod_register_pmc);
     /* Better not trigger a DOD run with a potentially unanchored PMC */
     Parrot_block_GC_mark(interp);
 
@@ -765,6 +785,7 @@ Unregisters the PMC from the interpreter's DOD registry.
 void
 dod_unregister_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {
+    ASSERT_ARGS(dod_unregister_pmc);
     PARROT_ASSERT(interp->DOD_registry);
 
     VTABLE_delete_keyed(interp, interp->DOD_registry, pmc);

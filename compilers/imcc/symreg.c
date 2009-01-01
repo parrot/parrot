@@ -121,6 +121,7 @@ void
 push_namespace(SHIM_INTERP, ARGIN(const char *name))
 {
     Namespace * const ns = mem_allocate_zeroed_typed(Namespace);
+    ASSERT_ARGS(push_namespace);
 
     ns->parent = _namespace;
     ns->name   = str_dup(name);
@@ -143,6 +144,7 @@ void
 pop_namespace(PARROT_INTERP, ARGIN(const char *name))
 {
     Namespace * const ns = _namespace;
+    ASSERT_ARGS(pop_namespace);
 
     if (!ns)
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "pop() on empty namespace stack\n");
@@ -179,6 +181,7 @@ _get_sym_typed(ARGIN(const SymHash *hsh), ARGIN(const char *name), int t)
 {
     SymReg            *p;
     const unsigned int i = hash_str(name) % hsh->size;
+    ASSERT_ARGS(_get_sym_typed);
 
     for (p = hsh->data[i]; p; p = p->next) {
         if ((t == p->set) && STREQ(name, p->name))
@@ -207,6 +210,7 @@ static SymReg *
 _mk_symreg(ARGMOD(SymHash *hsh), ARGIN(const char *name), int t)
 {
     SymReg * r = _get_sym_typed(hsh, name, t);
+    ASSERT_ARGS(_mk_symreg);
 
     if (!r) {
         r             = mem_allocate_zeroed_typed(SymReg);
@@ -239,6 +243,7 @@ SymReg *
 mk_symreg(PARROT_INTERP, ARGIN(const char *name), int t)
 {
     IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
+    ASSERT_ARGS(mk_symreg);
     return _mk_symreg(&unit->hash, name, t);
 }
 
@@ -263,6 +268,7 @@ symreg_to_str(ARGIN(const SymReg *s))
      * may be included in the sprintf output (for now) */
     char * const buf = (char *)mem_sys_allocate(250 + strlen(s->name));
     const int    t   = s->type;
+    ASSERT_ARGS(symreg_to_str);
 
     sprintf(buf, "symbol [%s]  set [%c]  color [" INTVAL_FMT "]  type [",
                  s->name, s->set, s->color);
@@ -302,6 +308,7 @@ mk_temp_reg(PARROT_INTERP, int t)
 {
     char       buf[30];
     static int temp;
+    ASSERT_ARGS(mk_temp_reg);
 
     snprintf(buf, sizeof (buf), "__imcc_temp_%d", ++temp);
     return mk_symreg(interp, buf, t);
@@ -326,6 +333,7 @@ mk_pcc_sub(PARROT_INTERP, ARGIN(const char *name), int proto)
 {
     IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
     SymReg   * const r    = _mk_symreg(&unit->hash, name, proto);
+    ASSERT_ARGS(mk_pcc_sub);
 
     r->type    = VT_PCC_SUB;
     r->pcc_sub = mem_allocate_zeroed_typed(pcc_sub_t);
@@ -348,6 +356,7 @@ void
 add_namespace(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
     SymReg * const ns = IMCC_INFO(interp)->cur_namespace;
+    ASSERT_ARGS(add_namespace);
 
     if (!ns)
         return;
@@ -386,6 +395,7 @@ add_pcc_arg(ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
 {
     pcc_sub_t * const sub = r->pcc_sub;
     const int         n   = sub->nargs;
+    ASSERT_ARGS(add_pcc_arg);
 
     mem_realloc_n_typed(sub->args,      n + 1, SymReg *);
     mem_realloc_n_typed(sub->arg_flags, n + 1, int);
@@ -414,6 +424,7 @@ add_pcc_result(ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
 {
     pcc_sub_t * const sub = r->pcc_sub;
     const int         n   = sub->nret;
+    ASSERT_ARGS(add_pcc_result);
 
     mem_realloc_n_typed(sub->ret,       n + 1, SymReg *);
     mem_realloc_n_typed(sub->ret_flags, n + 1, int);
@@ -444,6 +455,7 @@ add_pcc_multi(ARGMOD(SymReg *r), ARGIN_NULLOK(SymReg *arg))
 {
     pcc_sub_t * const sub = r->pcc_sub;
     const int n           = sub->nmulti;
+    ASSERT_ARGS(add_pcc_multi);
 
     mem_realloc_n_typed(sub->multi, n + 1, SymReg *);
     sub->multi[n] = arg;
@@ -464,6 +476,7 @@ Sets the current sub in the given SymReg to the second SymReg.
 void
 add_pcc_sub(ARGMOD(SymReg *r), ARGIN(SymReg *arg))
 {
+    ASSERT_ARGS(add_pcc_sub);
     r->pcc_sub->sub = arg;
 }
 
@@ -481,6 +494,7 @@ Adds a continuation (?) to the current sub.
 void
 add_pcc_cc(ARGMOD(SymReg *r), ARGIN(SymReg *arg))
 {
+    ASSERT_ARGS(add_pcc_cc);
     r->pcc_sub->cc = arg;
 }
 
@@ -501,6 +515,7 @@ SymReg *
 mk_pasm_reg(PARROT_INTERP, ARGIN(const char *name))
 {
     SymReg *r    = _get_sym(&IMCC_INFO(interp)->cur_unit->hash, name);
+    ASSERT_ARGS(mk_pasm_reg);
 
     if (!r) {
         r        = mk_symreg(interp, name, *name);
@@ -535,6 +550,7 @@ PARROT_MALLOC
 static char *
 _mk_fullname(ARGIN_NULLOK(const Namespace *ns), ARGIN(const char *name))
 {
+    ASSERT_ARGS(_mk_fullname);
     if (ns) {
         const size_t len = strlen(name) + strlen(ns->name) + 3;
         char *result = (char *) mem_sys_allocate(len);
@@ -563,6 +579,7 @@ mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
 {
     char   * const fullname = _mk_fullname(_namespace, name);
     SymReg        *r        = mk_symreg(interp, fullname, t);
+    ASSERT_ARGS(mk_ident);
 
     r->type = VTIDENTIFIER;
 
@@ -601,6 +618,7 @@ SymReg*
 mk_ident_ur(PARROT_INTERP, ARGIN(const char *name), int t)
 {
     SymReg * const r = mk_ident(interp, name, t);
+    ASSERT_ARGS(mk_ident_ur);
     r->usage        |= U_NON_VOLATILE;
 
     return r;
@@ -627,6 +645,7 @@ mk_pmc_const_2(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *left),
     SymReg *r[3];
     char   *name;
     int     len;
+    ASSERT_ARGS(mk_pmc_const_2);
 
     if (IMCC_INFO(interp)->state->pasm_file)
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
@@ -680,6 +699,7 @@ mk_const_ident(PARROT_INTERP, ARGIN(const char *name), int t,
         ARGMOD(SymReg *val), int global)
 {
     SymReg *r;
+    ASSERT_ARGS(mk_const_ident);
 
     /*
      * Forbid assigning a string to anything other than a string
@@ -730,6 +750,7 @@ SymReg *
 _mk_const(ARGMOD(SymHash *hsh), ARGIN(const char *name), int t)
 {
     SymReg * const r = _mk_symreg(hsh, name, t);
+    ASSERT_ARGS(_mk_const);
     r->type          = VTCONST;
 
     if (t == 'U') {
@@ -753,6 +774,7 @@ static int
 int_overflows(ARGIN(const SymReg *r))
 {
     INTVAL i;
+    ASSERT_ARGS(int_overflows);
     errno = 0;
 
     if (r->type & VT_CONSTP)
@@ -790,6 +812,7 @@ SymReg *
 mk_const(PARROT_INTERP, ARGIN(const char *name), int t)
 {
     SymHash * const h = &IMCC_INFO(interp)->ghash;
+    ASSERT_ARGS(mk_const);
 
     if (!h->data)
         create_symhash(h);
@@ -816,6 +839,7 @@ add_ns(PARROT_INTERP, ARGIN(const char *name))
 {
     size_t len, l;
     char *ns_name, *p;
+    ASSERT_ARGS(add_ns);
 
     if (!IMCC_INFO(interp)->cur_namespace
     || (l = strlen(IMCC_INFO(interp)->cur_namespace->name)) <= 2)
@@ -860,6 +884,7 @@ SymReg *
 _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int uniq)
 {
     SymReg *r;
+    ASSERT_ARGS(_mk_address);
 
     if (uniq == U_add_all) {
         r       = mem_allocate_zeroed_typed(SymReg);
@@ -920,6 +945,7 @@ mk_sub_label(PARROT_INTERP, ARGIN(const char *name))
 {
     SymReg * const s = _mk_address(interp, &IMCC_INFO(interp)->ghash,
             name, U_add_uniq_sub);
+    ASSERT_ARGS(mk_sub_label);
 
     s->usage |= U_FIXUP;
 
@@ -944,6 +970,7 @@ mk_sub_address(PARROT_INTERP, ARGIN(const char *name))
 {
     SymReg * const s = _mk_address(interp, &IMCC_INFO(interp)->ghash,
             name, U_add_all);
+    ASSERT_ARGS(mk_sub_address);
 
     s->usage |= U_FIXUP;
 
@@ -967,6 +994,7 @@ SymReg *
 mk_local_label(PARROT_INTERP, ARGIN(const char *name))
 {
     IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
+    ASSERT_ARGS(mk_local_label);
     return _mk_address(interp, &unit->hash, name, U_add_uniq_label);
 }
 
@@ -987,6 +1015,7 @@ SymReg *
 mk_label_address(PARROT_INTERP, ARGIN(const char *name))
 {
     IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
+    ASSERT_ARGS(mk_label_address);
     return _mk_address(interp, &unit->hash, name, U_add_once);
 }
 
@@ -1041,6 +1070,7 @@ SymReg *
 dup_sym(ARGIN(const SymReg *r))
 {
     SymReg * const new_sym = mem_allocate_zeroed_typed(SymReg);
+    ASSERT_ARGS(dup_sym);
     STRUCT_COPY(new_sym, r);
     new_sym->name = str_dup(r->name);
 
@@ -1077,6 +1107,7 @@ link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
     SymHash * const h = IMCC_INFO(interp)->cur_unit
                       ? &IMCC_INFO(interp)->cur_unit->hash
                       : &IMCC_INFO(interp)->ghash;
+    ASSERT_ARGS(link_keys);
 
     if (nargs == 0)
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "link_keys: huh? no keys\n");
@@ -1161,6 +1192,7 @@ void
 free_sym(ARGMOD(SymReg *r))
 {
     pcc_sub_t * const sub = r->pcc_sub;
+    ASSERT_ARGS(free_sym);
 
     if (sub) {
         mem_sys_free(sub->multi);
@@ -1204,6 +1236,7 @@ Creates a symbol hash table with space for 16 entries.
 void
 create_symhash(ARGOUT(SymHash *hash))
 {
+    ASSERT_ARGS(create_symhash);
     hash->data    = mem_allocate_n_zeroed_typed(16, SymReg *);
     hash->size    = 16;
     hash->entries = 0;
@@ -1228,6 +1261,7 @@ resize_symhash(ARGMOD(SymHash *hsh))
     SymReg     **next_r   = mem_allocate_n_zeroed_typed(n_next, SymReg *);
     SymHash      nh;                        /* new symbol table */
     unsigned int i;
+    ASSERT_ARGS(resize_symhash);
 
     nh.data = mem_allocate_n_zeroed_typed(new_size, SymReg *);
 
@@ -1283,6 +1317,7 @@ void
 _store_symreg(ARGMOD(SymHash *hsh), ARGMOD(SymReg *r))
 {
     const int i = hash_str(r->name) % hsh->size;
+    ASSERT_ARGS(_store_symreg);
 #if IMC_TRACE_HIGH
     printf("    store [%s]\n", r->name);
 #endif
@@ -1309,6 +1344,7 @@ Stores a symbol in the hash.
 void
 store_symreg(PARROT_INTERP, ARGMOD(SymReg *r))
 {
+    ASSERT_ARGS(store_symreg);
     _store_symreg(&IMCC_INFO(interp)->cur_unit->hash, r);
 }
 
@@ -1330,6 +1366,7 @@ _get_sym(ARGIN(const SymHash *hsh), ARGIN(const char *name))
 {
     SymReg   *p;
     const unsigned int i = hash_str(name) % hsh->size;
+    ASSERT_ARGS(_get_sym);
 
     for (p = hsh->data[i]; p; p = p->next) {
 #if IMC_TRACE_HIGH
@@ -1357,6 +1394,7 @@ PARROT_WARN_UNUSED_RESULT
 SymReg *
 get_sym(PARROT_INTERP, ARGIN(const char *name))
 {
+    ASSERT_ARGS(get_sym);
     return _get_sym(&IMCC_INFO(interp)->cur_unit->hash, name);
 }
 
@@ -1379,6 +1417,7 @@ _find_sym(PARROT_INTERP, ARGIN_NULLOK(const Namespace *nspace),
 {
     const Namespace *ns;
     SymReg          *p;
+    ASSERT_ARGS(_find_sym);
 
     for (ns = nspace; ns; ns = ns->parent) {
         char * const fullname = _mk_fullname(ns, name);
@@ -1420,6 +1459,7 @@ PARROT_WARN_UNUSED_RESULT
 SymReg *
 find_sym(PARROT_INTERP, ARGIN(const char *name))
 {
+    ASSERT_ARGS(find_sym);
     if (IMCC_INFO(interp)->cur_unit)
         return _find_sym(interp, _namespace,
             &IMCC_INFO(interp)->cur_unit->hash, name);
@@ -1442,6 +1482,7 @@ void
 clear_sym_hash(ARGMOD(SymHash *hsh))
 {
     unsigned int i;
+    ASSERT_ARGS(clear_sym_hash);
 
     if (!hsh->data)
         return;
@@ -1479,6 +1520,7 @@ void
 debug_dump_sym_hash(ARGIN(const SymHash *hsh))
 {
     unsigned int i;
+    ASSERT_ARGS(debug_dump_sym_hash);
 
     for (i = 0; i < hsh->size; i++) {
         const SymReg *p = hsh->data[i];
@@ -1505,6 +1547,7 @@ clear_locals(ARGIN_NULLOK(IMC_Unit *unit))
 {
     SymHash * const hsh = &unit->hash;
     unsigned int    i;
+    ASSERT_ARGS(clear_locals);
 
     for (i = 0; i < hsh->size; i++) {
         SymReg *p;
@@ -1540,6 +1583,7 @@ void
 clear_globals(PARROT_INTERP)
 {
     SymHash * const hsh = &IMCC_INFO(interp)->ghash;
+    ASSERT_ARGS(clear_globals);
 
     if (hsh->data)
         clear_sym_hash(hsh);
@@ -1564,6 +1608,7 @@ hash_str(ARGIN(const char *str))
 {
     unsigned long  key = 0;
     const    char *s;
+    ASSERT_ARGS(hash_str);
 
     for (s = str; *s; s++)
         key = key * 65599 + *s;
