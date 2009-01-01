@@ -592,8 +592,6 @@ method param_list($/) {
             PAST::Var.new(
                 :name(~$_),
                 :scope('parameter'),
-                :viviself('PhpNull'),
-                :lvalue(1),
             );
         $block.push($param);
         $arity++;
