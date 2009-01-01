@@ -20,7 +20,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'definition of a class' );
 <?php
@@ -219,3 +219,18 @@ three
 four
 OUT
 
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'class with constructor', todo => 'constructor not called yet' )
+<?php
+
+class Foo {
+    function __construct() {
+        echo "method __construct() of class Foo was called.\n";
+    }
+}
+
+$foo = new Foo;
+
+?>
+CODE
+method __construct() of class Foo was called.
+OUT
