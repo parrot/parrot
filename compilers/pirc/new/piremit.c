@@ -528,21 +528,6 @@ emit_pbc_label_arg(lexer_state * const lexer, label * const l) {
 }
 
 
-/*
-
-=item C<static void
-build_key(lexer_state * const lexer, key * const k)>
-
-=cut
-
-*/
-static void
-build_key(lexer_state * const lexer, key * const k) {
-    /* XXX TODO
-     *
-     * who can help? :-)
-     */
-}
 
 
 

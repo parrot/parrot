@@ -63,6 +63,7 @@ typedef struct sub_info {
     char const    *nsentry;
     char const    *subid;
     char const    *outersub;
+    char const    *instanceof;
     int            vtable_index;
     unsigned       regs_used[4];
     int            startoffset;
@@ -71,6 +72,7 @@ typedef struct sub_info {
     multi_type    *multi_types;   /* array with :multi data types, if this is a multi sub */
     lexical       *lexicals;
     multi_type    *name_space; /* can be a string or key */
+    int            iscoroutine;
 
 } sub_info;
 

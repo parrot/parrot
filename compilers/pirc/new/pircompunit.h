@@ -79,14 +79,14 @@ typedef enum sub_flags {
     PIRC_SUB_FLAG_POSTCOMP   = SUB_FLAG_PF_POSTCOMP,  /* executed after compilation */
     PIRC_SUB_FLAG_IMMEDIATE  = SUB_FLAG_PF_IMMEDIATE,  /* similar to POSTCOMP above; check PDD19 */
 
-    PIRC_SUB_FLAG_METHOD     = 1 << 10,  /* the sub is a method */
-    PIRC_SUB_FLAG_HAS_OUTER  = 1 << 11,  /* the sub is lexically nested */
-    PIRC_SUB_FLAG_IS_OUTER   = 1 << 12,  /* the sub contains lexically nested subs. */
-    PIRC_SUB_FLAG_VTABLE     = 1 << 13,  /* this sub overrides a vtable method */
+    PIRC_SUB_FLAG_METHOD     = 1 << 10, /* the sub is a method */
+    PIRC_SUB_FLAG_HAS_OUTER  = 1 << 11, /* the sub is lexically nested */
+    PIRC_SUB_FLAG_IS_OUTER   = 1 << 12, /* the sub contains lexically nested subs. */
+    PIRC_SUB_FLAG_VTABLE     = 1 << 13, /* this sub overrides a vtable method */
     PIRC_SUB_FLAG_LEX        = 1 << 14, /* this sub needs a LexPad */
     PIRC_SUB_FLAG_MULTI      = 1 << 15, /* this sub is a multi method/sub */
     PIRC_SUB_FLAG_SUBID      = 1 << 16, /* this sub has a namespace-unaware identifier */
-    PIRC_SUB_FLAG_INSTANCEOF = 1 << 17  /* this sub has an :instanceof flag. XXX document this */
+    PIRC_SUB_FLAG_INSTANCEOF = 1 << 17  /* this sub has an :instanceof flag */
 
 } sub_flag;
 
@@ -234,7 +234,7 @@ typedef struct argument {
  * .return foo(), .return foo.bar(), .return x :flat
  */
 typedef struct invocation {
-    invoke_type         type;
+    invoke_type         type;          /* type of invocation (PCC, NCI, return/yield) */
     expression         *method;        /* method */
     target             *sub;           /* invoked sub, or the object on which method is invoked */
     target             *retcc;         /* return continuation, if any */
@@ -251,9 +251,9 @@ typedef struct instruction {
     char         const *label;        /* label of this instruction */
     char         const *opname;       /* name of the instruction, such as "print" and "set" */
     expression         *operands;     /* operands like "$I0" and "42" in "set $I0, 42" */
-    int                 oplabelbits;
+    int                 oplabelbits;  /* bits indicating which operands are labels */
     struct op_info_t   *opinfo;       /* pointer to the op_info containing this op's meta data */
-    int                 opcode;       /* the opcode of one of this op */
+    int                 opcode;       /* the opcode of this instruction */
 
     struct instruction *next;
 } instruction;
@@ -287,8 +287,8 @@ typedef struct bucket {
 
 /* hashtable structure */
 typedef struct hashtable {
-    bucket   **contents;
-    unsigned   size;
+    bucket   **contents;       /* array of bucket pointers */
+    unsigned   size;           /* number of slots in contents array */
     unsigned   obj_count;
 
 } hashtable;
@@ -303,12 +303,10 @@ struct label;
 /* a sub */
 typedef struct subroutine {
     key                *name_space;    /* this sub's namespace */
-
-    char const         *instanceof;    /* XXX document this XXX */
     char const         *methodname;    /* name of this sub by which it's stored as a method */
     int                 flags;         /* this sub's flags */
 
-    struct sub_info     info;
+    struct sub_info     info;          /* see bcgen.h */
 
     target             *parameters;    /* parameters of this sub */
     instruction        *statements;    /* statements of this sub */

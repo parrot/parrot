@@ -48,8 +48,8 @@ accessor functions.
 
       // write opcodes
       int opcode = ...
-
       emit_opcode(bc, opcode);
+
       // emit constants
       int mystring = add_string_const(bc, "hello");
 
@@ -402,6 +402,49 @@ emit_int_arg(bytecode * const bc, int intval) {
 }
 
 
+/*
+
+=item C<static void
+build_key(lexer_state * const lexer, key * const k)>
+
+=cut
+
+*/
+static void
+build_key(bytecode * const bc, opcode_t * key) {
+    PackFile_Constant   *pfc;
+    const opcode_t      *rc;
+    int                  index;
+
+    pfc   = mem_allocate_typed(PackFile_Constant);
+    rc    = PackFile_Constant_unpack_key(bc->interp, bc->interp->code->const_table, pfc, key);
+
+    if (!rc) {
+        mem_sys_free(pfc);
+        fprintf(stderr, "add_const_key: PackFile_Constant error\n");
+        exit(EXIT_FAILURE); /* XXX how to release memory? or maybe throw an exception? */
+    }
+
+    index = add_key_const(bc, pfc->u.key);
+
+
+    mem_sys_free(pfc);
+
+
+/*
+    const SymReg * const r =
+        _get_sym(&IMCC_INFO(interp)->globals->cs->key_consts, s_key);
+
+
+    if (r)
+        return r->color;
+
+    store_key_const(interp, s_key, k);
+
+    return k;
+*/
+
+}
 
 /* XXX remove or update prototype once the XXX below has been resolved. */
 static STRING *add_string_const_from_cstring(bytecode * const bc, char const * const str);
@@ -488,7 +531,7 @@ generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned
 /*
 
 =item C<static PMC *
-create_lexinfo()>
+create_lexinfo(bytecode * const bc, PMC * sub, lexical * const lexicals, int lexflag)>
 
 Create a lexinfo PMC for the sub C<sub>. If there are no lexicals,
 but the C<:lex> flag was specified, or the sub has an C<:outer> flag,
@@ -538,8 +581,12 @@ create_lexinfo(bytecode * const bc, PMC * sub, lexical * const lexicals, int lex
 
 /*
 
-Find the outer sub that has name C<outername>.
-If not found, NULL is returned.
+=item C<static PMC *
+find_outer_sub(bytecode * const bc, char const * const outername)>
+
+Find the outer sub that has name C<outername>. If not found, NULL is returned.
+
+=cut
 
 */
 static PMC *
@@ -603,18 +650,44 @@ The index where the PMC is stored in the constant table is returned.
 */
 int
 add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subpragmas) {
-    PMC                   * sub_pmc;
-    Parrot_sub            * sub;
-    int                     subconst_index;
-    int                     subname_index;
-    int                     i;
-    PackFile_Constant     * subname_const;
+    PMC                   *sub_pmc;
+    Parrot_sub            *sub;
+    int                    subconst_index;
+    int                    subname_index;
+    int                    i;
+    PackFile_Constant     *subname_const;
+    INTVAL                 type;
 
+    type = info->iscoroutine ? enum_class_Coroutine : enum_class_Sub;
 
-    /* The .sub is represented by a "Sub" PMC.
-     * If that should be changed into something else, fix that here (e.g. "Coroutine").
-     */
-    sub_pmc               = pmc_new(bc->interp, enum_class_Sub);
+    /* Do we have to create an instance of a specific type for this sub? */
+    if (info->instanceof) {
+        /* Look it up as a class and as a PMC type. */
+        STRING * const classname
+            = string_from_cstring(bc->interp, info->instanceof + 1, strlen(info->instanceof) - 2);
+
+        PMC * const classobj = Parrot_oo_get_class_str(bc->interp, classname);
+
+        if (!PMC_IS_NULL(classobj))
+            sub_pmc = VTABLE_instantiate(bc->interp, classobj, PMCNULL);
+        else {
+            const INTVAL type = pmc_type(bc->interp, classname);
+
+            if (type <= 0)
+                Parrot_ex_throw_from_c_args(bc->interp, NULL, EXCEPTION_NO_CLASS,
+                    "Requested sub class '%Ss' in :instanceof() not found", classname);
+
+            sub_pmc = pmc_new(bc->interp, type);
+        }
+    }
+    else {
+        /* use a possible type mapping for the Sub PMCs, and create it */
+        type = Parrot_get_ctx_HLL_type(bc->interp, type);
+
+        /* TODO create constant - see also src/packfile.c */
+        sub_pmc = pmc_new(bc->interp, type);
+    }
+
     sub                   = PMC_sub(sub_pmc);
     subname_index         = add_string_const(bc, info->subname);
     subname_const         = bc->interp->code->const_table->constants[subname_index];
@@ -637,6 +710,8 @@ add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subprag
     sub->vtable_index     = info->vtable_index;
 
     sub->multi_signature  = generate_multi_signature(bc, info->multi_types, info->num_multi_types);
+
+
 
     /* copy sub pragma flags such as :immediate etc. */
     PObj_get_FLAGS(sub_pmc)     |= subpragmas & SUB_FLAG_PF_MASK;

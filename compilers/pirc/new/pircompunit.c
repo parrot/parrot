@@ -240,7 +240,7 @@ is experimental, and not actually used at this point.
 */
 void
 set_sub_instanceof(lexer_state * const lexer, char const * const classname) {
-    CURRENT_SUB(lexer)->instanceof = classname;
+    CURRENT_SUB(lexer)->info.instanceof = classname;
 }
 
 /*
@@ -1675,8 +1675,11 @@ invoke(lexer_state * const lexer, invoke_type type, ...) {
             inv->sub    = va_arg(arg_ptr, target *);
             inv->method = va_arg(arg_ptr, expression *);
             break;
-        case CALL_RETURN:   /* no extra args */
         case CALL_YIELD: /* no extra args */
+            /* if there's a yield, the current subroutine is a coroutine */
+            CURRENT_SUB(lexer)->info.iscoroutine = TRUE;
+            break;
+        case CALL_RETURN:   /* no extra args */
         case CALL_TAILCALL:  /* no extra args */
         case CALL_METHOD_TAILCALL:
             break;
