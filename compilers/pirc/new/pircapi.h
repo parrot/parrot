@@ -15,6 +15,10 @@ void parse_string(PARROT_INTERP, char *pirstring, int flags, int pasminput, unsi
 void parse_file(PARROT_INTERP, int flexdebug, FILE *infile, char * const filename, int flags,
                 int thr_id, unsigned macro_size, char * const outputfile);
 
+
+
+PackFile_ByteCode *pirc_compile_file(PARROT_INTERP, const char *filename, STRING **error_message);
+
 #endif /* PARROT_PIR_PIRCAPI_H_GUARD */
 
 /*

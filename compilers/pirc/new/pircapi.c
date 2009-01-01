@@ -227,6 +227,15 @@ parse_string(PARROT_INTERP, char *pirstring, int flags, int pasminput, unsigned 
 
 
 
+PARROT_CANNOT_RETURN_NULL
+PackFile_ByteCode *
+pirc_compile_file(PARROT_INTERP, const char *filename, STRING **error_message) {
+    return NULL;
+}
+
+
+
+
 /*
 
 =back
