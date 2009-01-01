@@ -219,24 +219,26 @@ method constructor_call($/) {
 }
 
 method constant($/) {
-    make PAST::Op.new(
-             :name('constant'),
-             PAST::Val.new(
-                 :returns('PhpString'),
-                 :value( ~$<CONSTANT_NAME> ),
-             )
-         );
+    make
+        PAST::Op.new(
+            :name('constant'),
+            PAST::Val.new(
+                :returns('PhpString'),
+                :value( ~$<CONSTANT_NAME> ),
+            )
+        );
 }
 
-# can be mergerd with constant
+# TODO: merged with rule 'constant'
 method class_constant($/) {
-    make PAST::Op.new(
-             :name('constant'),
-             PAST::Val.new(
-                 :returns('PhpString'),
-                 :value( ~$/ ),
-             )
-         );
+    make
+        PAST::Op.new(
+            :name('constant'),
+            PAST::Val.new(
+                :returns('PhpString'),
+                :value( ~$/ ),
+            )
+        );
 }
 
 # class constants could probably also be set in a class init block
@@ -244,16 +246,16 @@ method class_constant_definition($/) {
     my $past := PAST::Block.new( :name('class_constant_definition') );
     my $loadinit := $past.loadinit();
     $loadinit.unshift(
-       PAST::Op.new(
-           :pasttype('call'),
-           :name('define'),
-           :node( $/ ),
-           PAST::Val.new(
-               :value( 'Foo::' ~ ~$<CONSTANT_NAME> ),
-               :returns('PhpString'),
-           ),
-           $( $<literal> ),
-       )
+        PAST::Op.new(
+            :pasttype('call'),
+            :name('define'),
+            :node( $/ ),
+            PAST::Val.new(
+                :value( 'Foo::' ~ ~$<CONSTANT_NAME> ),
+                :returns('PhpString'),
+            ),
+            $( $<literal> ),
+        )
     );
 
     make $past;
@@ -314,16 +316,16 @@ method if_statement($/) {
         if $else && +$<elseif_clause> == 1 {
             $first_eif.push($else);
         }
-     }
+    }
 
-     if $first_eif {
-         $past.push($first_eif);
-     }
-     elsif $else {
-         $past.push($else);
-     }
+    if $first_eif {
+        $past.push($first_eif);
+    }
+    elsif $else {
+        $past.push($else);
+    }
 
-     make $past;
+    make $past;
 }
 
 method elseif_clause($/) {
@@ -334,11 +336,12 @@ method elseif_clause($/) {
 }
 
 method var_assign($/) {
-    make PAST::Op.new(
-             $( $<var> ),
-             $( $<expression> ),
-             :pasttype('bind'),
-         );
+    make
+        PAST::Op.new(
+            :pasttype('bind'),
+            $( $<var> ),
+            $( $<expression> ),
+        );
 }
 
 method array_elem($/) {
@@ -354,20 +357,18 @@ method array_elem($/) {
         );
     }
 
-    my $past_var_name :=
+    make
         PAST::Var.new(
-            :name(~$<VAR_NAME>),
-            :viviself('PhpArray'),
+            :scope('keyed'),
+            :viviself('PhpNull'),
             :lvalue(1),
+            PAST::Var.new(
+                :name(~$<VAR_NAME>),
+                :viviself('PhpArray'),
+                :lvalue(1),
+            ),
+            $( $<expression> )
         );
-
-    make PAST::Var.new(
-             $past_var_name,
-             $( $<expression> ),
-             :scope('keyed'),
-             :viviself('PhpNull'),
-             :lvalue(1)
-         );
 }
 
 method simple_var($/) {
@@ -383,11 +384,12 @@ method simple_var($/) {
         );
     }
 
-    make PAST::Var.new(
-             :name(~$<VAR_NAME>),
-             :viviself('PhpNull'),
-             :lvalue(1),
-         );
+    make
+        PAST::Var.new(
+            :name(~$<VAR_NAME>),
+            :viviself('PhpNull'),
+            :lvalue(1),
+        );
 }
 
 method var($/, $key) {
@@ -395,9 +397,7 @@ method var($/, $key) {
 }
 
 method this($/) {
-    make PAST::Op.new(
-             :inline( "%r = self" )
-         );
+    make PAST::Op.new( :inline( "%r = self" ) );
 }
 
 method member($/) {
@@ -415,6 +415,7 @@ method member($/) {
 method while_statement($/) {
     my $past := $( $<conditional_expression> );
     $past.pasttype('while');
+
     make $past;
 }
 
@@ -448,6 +449,7 @@ method expression($/, $key) {
         for @($/) {
             $past.push( $($_) );
         }
+
         make $past;
     }
 }
@@ -580,7 +582,6 @@ method class_method_definition($/, $key) {
 }
 
 method param_list($/) {
-
     my $block :=
         PAST::Block.new(
             :blocktype('declaration'),

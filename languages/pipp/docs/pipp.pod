@@ -23,9 +23,11 @@ A listing of things that Pipp does differently from the standard PHP.
 
 =item builtin function pipp_defined().
 
-=item Loading of Parrot libs will be supported
+=item Loading of Parrot libs will be supported.
 
-=item Support for global variable $INC, list of included files
+=item Support for global variable $INC, list of included files.
+
+=item No old style constructors, where the constructor is named after the class.
 
 =cut
 
