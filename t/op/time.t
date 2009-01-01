@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -14,7 +14,7 @@ t/op/time.t - Time and Sleep
 
 =head1 SYNOPSIS
 
-        % prove t/op/time.t
+    % prove t/op/time.t
 
 =head1 DESCRIPTION
 
@@ -93,7 +93,7 @@ CODE
 OUT
 
 my $year;
-( undef, undef, undef, undef, undef, $year ) = gmtime(time);
+( undef, undef, undef, undef, undef, $year ) = localtime();
 $year += 1900;
 
 # don't run this test 1 tick before the year changes #'
