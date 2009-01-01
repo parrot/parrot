@@ -39,12 +39,11 @@ static void insert_tail_call(PARROT_INTERP,
     ARGIN(IMC_Unit *unit),
     ARGMOD(Instruction *ins),
     ARGMOD(SymReg *sub),
-    ARGIN(SymReg *meth))
+    ARGIN_NULLOK(SymReg *meth))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
         FUNC_MODIFIES(*ins)
         FUNC_MODIFIES(*sub);
 
@@ -116,8 +115,7 @@ static void unshift_self(ARGIN(SymReg *sub), ARGIN(SymReg *obj))
 #define ASSERT_ARGS_insert_tail_call assert(interp); \
                                      assert(unit); \
                                      assert(ins); \
-                                     assert(sub); \
-                                     assert(meth);
+                                     assert(sub);
 #define ASSERT_ARGS_insINS assert(interp); \
                            assert(unit); \
                            assert(ins); \
@@ -681,7 +679,7 @@ RT #48260: Not yet documented!!!
 
 static void
 insert_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit), ARGMOD(Instruction *ins),
-        ARGMOD(SymReg *sub), ARGIN(SymReg *meth))
+        ARGMOD(SymReg *sub), ARGIN_NULLOK(SymReg *meth))
 {
     SymReg *regs[3];
 
