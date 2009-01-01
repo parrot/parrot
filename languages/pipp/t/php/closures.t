@@ -133,7 +133,7 @@ language_output_is( 'Pipp', <<'CODE', <<'OUT', 'closure with one bound var' );
 
 function gen_indentor ( ) {
     $indention = ' ';
-    $indentor = function use ($indention) ($line)  {
+    $indentor = function ($line) use ($indention) {
         echo $indention . $line . "\n";
     };
 
@@ -159,7 +159,7 @@ language_output_is( 'Pipp', <<'CODE', <<'OUT', 'closure with a passed bound var'
 
 function gen_indentor ( $indention ) {
 
-    $indentor = function use ($indention) ($line)  {
+    $indentor = function ($line) use ($indention) {
         echo $indention . $line . "\n";
     };
 

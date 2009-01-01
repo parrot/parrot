@@ -395,7 +395,7 @@ rule term {
 
 # declarations
 rule closure {
-    'function' <bind_list>? <param_list> 
+    'function' <param_list> <bind_list>?
     {*}                                     #= open
     '{' <statement_list> '}'
     {*}                                     #= close
