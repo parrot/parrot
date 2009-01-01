@@ -329,7 +329,6 @@ MK_I(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *fmt), int n, ...)
     va_list ap;
     SymReg *r[IMCC_MAX_FIX_REGS];
     int i;
-    ASSERT_ARGS(mk_i);
 
     for (p = opname, q = fmt; *q && *q != ' ';)
         *p++ = *q++;
@@ -500,7 +499,6 @@ INS_LABEL(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGMOD(SymReg *r0), int 
 {
 
     Instruction * const ins = _mk_instruction("", "%s:", 1, &r0, 0);
-    ASSERT_ARGS(ins_label);
     ins->type               = ITLABEL;
     r0->first_ins           = ins;
 
@@ -515,7 +513,6 @@ static Instruction *
 iLABEL(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGMOD(SymReg *r0))
 {
     Instruction * const i = INS_LABEL(interp, unit, r0, 1);
-    ASSERT_ARGS(ilabel);
     i->line               = IMCC_INFO(interp)->line;
 
     clear_state(interp);
@@ -527,7 +524,6 @@ static Instruction *
 iSUBROUTINE(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGMOD(SymReg *r))
 {
     Instruction * const i = iLABEL(interp, unit, r);
-    ASSERT_ARGS(isubroutine);
 
     r->type    = (r->type & VT_ENCODED) ? VT_PCC_SUB|VT_ENCODED : VT_PCC_SUB;
     r->pcc_sub = mem_allocate_zeroed_typed(pcc_sub_t);
@@ -547,7 +543,6 @@ static Instruction *
 iINDEXFETCH(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *r0), ARGIN(SymReg *r1),
         ARGIN(SymReg *r2))
 {
-    ASSERT_ARGS(iindexfetch);
     IMCC_INFO(interp) -> keyvec |= KEY_BIT(2);
     return MK_I(interp, unit, "set %s, %s[%s]", 3, r0, r1, r2);
 }
@@ -561,7 +556,6 @@ static Instruction *
 iINDEXSET(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *r0), ARGIN(SymReg *r1),
         ARGIN(SymReg *r2))
 {
-    ASSERT_ARGS(iindexset);
     if (r0->set == 'P') {
         IMCC_INFO(interp)->keyvec |= KEY_BIT(1);
         MK_I(interp, unit, "set %s[%s], %s", 3, r0, r1, r2);
@@ -590,7 +584,6 @@ IMCC_create_itcall_label(PARROT_INTERP)
     char         name[128];
     SymReg      *r;
     Instruction *i;
-    ASSERT_ARGS(imcc_create_itcall_label);
 
     snprintf(name, sizeof (name), "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR,
         IMCC_INFO(interp)->cnr++);
@@ -634,7 +627,6 @@ mk_sub_address_u(PARROT_INTERP, ARGIN(const char *name))
 void
 IMCC_itcall_sub(PARROT_INTERP, ARGIN(SymReg *sub))
 {
-    ASSERT_ARGS(imcc_itcall_sub);
     IMCC_INFO(interp)->cur_call->pcc_sub->sub = sub;
     if (IMCC_INFO(interp)->cur_obj) {
         if (IMCC_INFO(interp)->cur_obj->set != 'P')

@@ -295,7 +295,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 678 "compilers/imcc/imcc.y"
+#line 757 "compilers/imcc/imcc.y"
 {
     IdList * idlist;
     int t;
@@ -303,7 +303,7 @@ typedef union YYSTYPE
     SymReg * sr;
     Instruction *i;
 }
-/* Line 1529 of yacc.c.  */
+/* Line 1489 of yacc.c.  */
 #line 297 "compilers/imcc/imcparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
