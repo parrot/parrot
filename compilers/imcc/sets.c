@@ -225,6 +225,8 @@ set_first_zero(ARGIN(const Set *s))
 {
     unsigned int i;
 
+    ASSERT_ARGS(set_first_zero);
+
     for (i = 0; i < NUM_BYTES(s->length); ++i) {
         const int set_byte = s->bmp[i];
         int j;
@@ -260,6 +262,8 @@ PARROT_PURE_FUNCTION
 int
 set_contains(ARGIN(const Set *s), unsigned int element)
 {
+    ASSERT_ARGS(set_contains);
+
     if (element > s->length)
         return 0;
     else {

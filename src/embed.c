@@ -587,6 +587,8 @@ setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
     INTVAL i;
     PMC   *userargv;
 
+    ASSERT_ARGS(setup_argv);
+
     if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
         Parrot_io_eprintf(interp,
             "*** Parrot VM: Setting up ARGV array.  Current argc: %d ***\n",
