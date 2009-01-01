@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2008, The Perl Foundation.
+ * Copyright (C) 2008-2009, The Perl Foundation.
  */
 
 #ifndef PARROT_PIR_PIRREGALLOC_H_GUARD
@@ -89,8 +89,6 @@ lsr_allocator *new_linear_scan_register_allocator(struct lexer_state *lexer);
 void destroy_linear_scan_regiser_allocator(lsr_allocator *lsr);
 
 live_interval * new_live_interval(lsr_allocator * const lsr, unsigned firstuse, pir_type type);
-
-void add_live_interval(lsr_allocator * const lra, live_interval * const i, pir_type type);
 
 void linear_scan_register_allocation(lsr_allocator * const lsr);
 

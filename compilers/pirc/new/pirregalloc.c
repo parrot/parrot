@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2008, The Perl Foundation.
+ * Copyright (C) 2008-2009, The Perl Foundation.
  */
 #include <stdio.h>
 #include "pircompiler.h"
@@ -15,6 +15,27 @@ This file contains functions implementing a somewhat modified version of the
 linear scan register allocation algorithm. This algorithm assumes there's a
 fixed number of registers, which is not the case for Parrot. Therefore,
 the algorithm is modified in some places.
+
+=head1 SYNOPSIS
+
+  // create a new lsr allocator
+  lsr_allocator *lsr = new_linear_scan_register_allocator(lexer);
+
+  for ( ... ) {
+      pir_type type = ... ;
+
+      // create a new live interval, specifying location/ID of first statement
+      live_interval *interval = new_live_interval(lsr, firstlocation, type);
+  }
+
+  // update live interval with more usage information about a variable
+  interval->endpoint = ... ;
+
+  // perform a linear scan
+  linear_scan_register_allocation(lsr);
+
+  // clean up
+  destroy_linear_scan_register_allocator(lsr);
 
 =head1 FUNCTIONS
 
@@ -87,7 +108,7 @@ print_list(char *msg, live_interval *i) {
 /*
 
 =item C<void
-destroy_linear_scan_regiser_allocator(lsr_allocator *lsr)>
+destroy_linear_scan_register_allocator(lsr_allocator *lsr)>
 
 Destructor for linear scan register allocator. All live_interval
 objects are destroyed as well.
@@ -96,7 +117,7 @@ objects are destroyed as well.
 
 */
 void
-destroy_linear_scan_regiser_allocator(lsr_allocator *lsr) {
+destroy_linear_scan_register_allocator(lsr_allocator *lsr) {
     pir_type type;
     live_interval *i;
 
@@ -136,57 +157,9 @@ lengthi(live_interval *list) {
     return len;
 }
 
-
-
 /*
 
-=item C<live_interval *
-new_live_interval(lsr_allocator * const lsr, unsigned firstuse_location, pir_type type)>
-
-Constructor for a live_interval struct object. After creating the new interval object,
-its startpoint and endpoint are initialized to the value in C<firstuse_location>. Note
-that an interval has a type; the register allocator keeps a list of interval for each
-type, because obviously you can't mix different types of registers.
-
-The newly created interval is added to the list of intervals.
-
-=cut
-
-*/
-PARROT_MALLOC
-PARROT_WARN_UNUSED_RESULT
-live_interval *
-new_live_interval(lsr_allocator * const lsr, unsigned firstuse_location, pir_type type) {
-    live_interval *i;
-    /* check whether there's an interval object that we can re-use, to prevent
-     * memory malloc() and free()s.
-     */
-    if (lsr->cached_intervals) {
-
-        i = lsr->cached_intervals;
-        lsr->cached_intervals = i->nextc;
-
-        /* clear fields */
-        i->nexti = i->previ   = NULL;
-        i->nexta = i->preva   = NULL;
-        i->nextc = NULL;
-    }
-    else {
-        /* there's no interval object to be re-used (none allocated yet, or all are used). */
-        i = (live_interval *)mem_sys_allocate_zeroed(sizeof (live_interval));
-    }
-
-    /* this is the first usage of the register, and up to now also the last */
-    i->startpoint = i->endpoint = firstuse_location;
-
-    add_live_interval(lsr, i, type);
-    return i;
-
-}
-
-/*
-
-=item C<void
+=item C<static void
 add_live_interval(lsr_allocator * const lsr, live_interval * const i, pir_type type)>
 
 Add live_interval C<i> to the list; this list is sorted on increasing
@@ -195,7 +168,7 @@ start point.
 =cut
 
 */
-void
+static void
 add_live_interval(lsr_allocator * const lsr, live_interval * const i, pir_type type) {
     live_interval *iter = lsr->intervals[type];
 
@@ -255,6 +228,55 @@ add_live_interval(lsr_allocator * const lsr, live_interval * const i, pir_type t
     /* fprintf(stderr, "live intervals: #%d\n", lengthi(lsr->intervals[type])); */
 
 }
+
+
+
+/*
+
+=item C<live_interval *
+new_live_interval(lsr_allocator * const lsr, unsigned firstuse_location, pir_type type)>
+
+Constructor for a live_interval struct object. After creating the new interval object,
+its startpoint and endpoint are initialized to the value in C<firstuse_location>. Note
+that an interval has a type; the register allocator keeps a list of interval for each
+type, because obviously you can't mix different types of registers.
+
+The newly created interval is added to the list of intervals.
+
+=cut
+
+*/
+PARROT_MALLOC
+PARROT_WARN_UNUSED_RESULT
+live_interval *
+new_live_interval(lsr_allocator * const lsr, unsigned firstuse_location, pir_type type) {
+    live_interval *i;
+    /* check whether there's an interval object that we can re-use, to prevent
+     * memory malloc() and free()s.
+     */
+    if (lsr->cached_intervals) {
+
+        i = lsr->cached_intervals;
+        lsr->cached_intervals = i->nextc;
+
+        /* clear fields */
+        i->nexti = i->previ   = NULL;
+        i->nexta = i->preva   = NULL;
+        i->nextc = NULL;
+    }
+    else {
+        /* there's no interval object to be re-used (none allocated yet, or all are used). */
+        i = (live_interval *)mem_sys_allocate_zeroed(sizeof (live_interval));
+    }
+
+    /* this is the first usage of the register, and up to now also the last */
+    i->startpoint = i->endpoint = firstuse_location;
+
+    add_live_interval(lsr, i, type);
+    return i;
+
+}
+
 
 
 
