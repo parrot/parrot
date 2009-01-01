@@ -9,10 +9,10 @@ EXE           = @exe@
 BUILD_DIR     = @build_dir@
 LIBRARY_DIR   = $(BUILD_DIR)/runtime/parrot/library
 INCLUDE_DIR   = $(BUILD_DIR)/include
-PMCDIR        = src/pmc
-PIPPDIR       = $(BUILD_DIR)/languages/pipp
-HASHDIR       = $(PIPPDIR)/src/pmc
-PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
+PMC_DIR       = src/pmc
+PIPP_DIR      = $(BUILD_DIR)/languages/pipp
+HASH_DIR      = $(PIPP_DIR)/src/pmc
+PARROT_DYNEXT = $(BUILD_DIR)/runtime/parrot/dynext
 
 # Set up commands
 PARROT        = $(BUILD_DIR)/parrot@exe@
@@ -39,25 +39,25 @@ PMCS = \
   phpnull
 
 PMC_SOURCES = \
-  $(PMCDIR)/php.pmc \
-  $(PMCDIR)/phparray.pmc \
-  $(PMCDIR)/phpboolean.pmc \
-  $(PMCDIR)/phpfloat.pmc \
-  $(PMCDIR)/phpinteger.pmc \
-  $(PMCDIR)/phpresource.pmc \
-  $(PMCDIR)/phpstring.pmc \
-  $(PMCDIR)/phpnull.pmc
+  $(PMC_DIR)/php.pmc \
+  $(PMC_DIR)/phparray.pmc \
+  $(PMC_DIR)/phpboolean.pmc \
+  $(PMC_DIR)/phpfloat.pmc \
+  $(PMC_DIR)/phpinteger.pmc \
+  $(PMC_DIR)/phpresource.pmc \
+  $(PMC_DIR)/phpstring.pmc \
+  $(PMC_DIR)/phpnull.pmc
 
-HASH_SOURCES = $(HASHDIR)/pipp_hash.c
-HASH_H       = $(HASHDIR)/pipp_hash.h
-HASH_OBJS    = $(HASHDIR)/pipp_hash$(O)
+HASH_SOURCES = $(HASH_DIR)/pipp_hash.c
+HASH_H       = $(HASH_DIR)/pipp_hash.h
+HASH_OBJS    = $(HASH_DIR)/pipp_hash$(O)
 
-PHP_GROUP=$(PMCDIR)/php_group$(LOAD_EXT)
+PHP_GROUP = $(PMC_DIR)/php_group$(LOAD_EXT)
 
-INTERNALS_PIR= \
+INTERNALS_PIR = \
   src/classes/Object.pir
 
-PHP_SRC_STD_EXT= \
+PHP_SRC_STD_EXT = \
   src/common/php_API.pir \
   src/common/php_array.pir \
   src/common/php_assert.pir \
@@ -111,7 +111,7 @@ PHP_SRC_STD_EXT= \
   src/common/php_var.pir \
   src/common/php_versioning.pir
 
-PHP_EXT= \
+PHP_EXT = \
   src/common/php_ctype.pbc \
   src/common/php_gmp.pbc \
   src/common/php_pcre.pbc
@@ -129,23 +129,14 @@ help:
 	@echo "                     This is the default."
 	@echo "  pipp$(EXE):        A fancy executable."
 	@echo "  build              Same as 'all'."
-	@echo "  build-all          Build all three variants"
-	@echo "  build-pct          Same as 'build', which is same as 'all'."
-	@echo "  build-phc          Build support for variant 'Pipp phc'."
-	@echo "                     Current this has nothing to do."
-	@echo "  build-antlr3       Build support for variant 'Pipp antlr3'."
-	@echo "                     Needs javac and a proper CLASSPATH."
-	@echo "  pmc                Build all PMCs."
+	@echo "  build-pmc          Build all PMCs."
 	@echo ""
 	@echo "Testing:"
-	@echo "  test:              Run the test suite for 'Pipp pct'."
-	@echo "  test-all:          Run the test suite for the reference and all variants."
+	@echo "  test:              Run the test suite for Pipp."
+	@echo "  test-all:          Run the test suite for reference implementation and for Pipp."
 	@echo "  test-php:          Run the test suite for the reference implementation."
-	@echo "  test-phc:          Run the test suite for 'Pipp phc'."
-	@echo "  test-antlr3:       Run the test suite for 'Pipp antlr3'."
-	@echo "  test-pct:          Run the test suite for 'Pipp pct'."
 	@echo "  test-pmc:          Run the test suite for Pipp's PMCs."
-	@echo "  smoke:             Run the PCT test suite and send report to the smolder server"
+	@echo "  smoke:             Run the test suite and send report to the smolder server"
 	@echo ""
 	@echo "Cleaning:"
 	@echo "  clean:             Clean up."
@@ -156,37 +147,15 @@ help:
 	@echo "Misc:"
 	@echo "  help:              Print this help message."
 	@echo ""
-	@echo "Only for maintainer:"
-	@echo "  maintain:          Maintainance for 'Pipp antlr3'."
-	@echo "                     The other variants need no maintainance."
-	@echo "  maintain-antlr3:   Generate Java source files with ANTLR 3."
-	@echo ""
 
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
 	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=pipp
 
-maintain: maintain-antlr3
+build:           build-common
 
-maintain-antlr3: src/antlr3/Pipp.g src/antlr3/GenPastNqp.g
-	@echo 'Be sure to set CLASSPATH first, see docs/antlr3.pod'
-	java org.antlr.Tool src/antlr3/Pipp.g
-	java org.antlr.Tool -lib src/antlr3 src/antlr3/GenPastNqp.g
-
-build:           build-pct
-
-build-all:       build-pct build-phc build-antlr3
-
-#build-common:    pmc src/common/pipplib.pbc pipp.pbc $(PHP_EXT) Test.pir
-build-common:    pmc src/common/pipplib.pbc pipp.pbc $(PHP_EXT)
-
-build-pct:       build-common
-
-build-phc:       build-common
-
-build-antlr3:    build-common
-	@echo 'Be sure to have set CLASSPATH as laid out in docs/antlr3.pod'
-	javac src/antlr3/*.java
+#build-common:    build-pmc src/common/pipplib.pbc pipp.pbc $(PHP_EXT) Test.pir
+build-common:    build-pmc src/common/pipplib.pbc pipp.pbc $(PHP_EXT)
 
 # Target for building a standalone Pipp.
 pipp$(EXE): build-common
@@ -217,8 +186,7 @@ src/pct/gen_grammar.pir: $(LIBRARY_DIR)/PGE/Perl6Grammar.pir src/pct/grammar.pg
             --output=src/pct/gen_grammar.pir src/pct/grammar.pg
 
 src/pct/gen_actions.pir: $(NQP) $(PCT) src/pct/actions.pm
-	$(PARROT) $(NQP) --output=src/pct/gen_actions.pir \
-  --target=pir src/pct/actions.pm
+	$(PARROT) $(NQP) --output=src/pct/gen_actions.pir --target=pir src/pct/actions.pm
 
 pipp.pbc: \
   pipp.pir \
@@ -231,43 +199,35 @@ Test.pir: Test.php pipp.pbc
 	$(PARROT) pipp.pbc --target=pir --output=Test.pir Test.php
 
 
-pmc: $(HASH_OBJS) $(PHP_GROUP)
+build-pmc: $(HASH_OBJS) $(PHP_GROUP)
 
 #Any change to the hash code means phparray needs to be relinked too.
 #Recompiling is close enough for now.
 $(HASH_OBJS): $(HASH_SOURCES) $(HASH_H)
-	$(TOUCH) $(PMCDIR)/phparray.pmc
+	$(TOUCH) $(PMC_DIR)/phparray.pmc
 	$(CC) $(CFLAGS) -I$(INCLUDE_DIR) $(HASH_SOURCES) -c -g -o $(HASH_OBJS)
 
-export DYNPMC_INCLUDE=$(PIPPDIR)
+export DYNPMC_INCLUDE=$(PIPP_DIR)
 export DYNPMC_LINK=$(HASH_OBJS)
 
 $(PHP_GROUP): $(PMC_SOURCES)
-	@cd $(PMCDIR) && $(PMCBUILD) generate $(PMCS)
-	@cd $(PMCDIR) && $(PMCBUILD) compile $(PMCS)
-	@cd $(PMCDIR) && $(PMCBUILD) linklibs $(PMCS)
-	@cd $(PMCDIR) && $(PMCBUILD) copy "--destination=$(PARROT_DYNEXT)" $(PMCS)
+	@cd $(PMC_DIR) && $(PMCBUILD) generate $(PMCS)
+	@cd $(PMC_DIR) && $(PMCBUILD) compile $(PMCS)
+	@cd $(PMC_DIR) && $(PMCBUILD) linklibs $(PMCS)
+	@cd $(PMC_DIR) && $(PMCBUILD) copy "--destination=$(PARROT_DYNEXT)" $(PMCS)
 
-test:     all test-pct
+test:     all
+	- $(PERL) t/harness
 
-test-all: all test-php test-phc test-antlr3 test-pct test-pmc
+test-all: all test-php test
 
 test-php:
 	- $(PERL) t/harness --with-php
 
-test-phc:
-	- $(PERL) t/harness --with-phc
-
-test-antlr3:
-	- $(PERL) t/harness --with-antlr3
-
-test-pct:
-	- $(PERL) t/harness --with-pct
-
 # run the test suite, create a TAP archive and send it off to smolder
 smolder_test : smoke
 smoke : build
-	- $(PERL) t/harness --with-pct --archive --send-to-smolder
+	- $(PERL) t/harness --archive --send-to-smolder
 
 
 # make sure debugging output is disabled while running the tests
@@ -308,29 +268,26 @@ t/php_qa_testsuite/php5/tests:
 
 
 # cleaning up
-clean: clean-common clean-pct clean-antlr3 clean-test clean-hash
-
-clean-common: clean-pmc
+clean: clean-pmc clean-test clean-hash
 	$(RM_F) \
   src/common/pipplib.pbc \
   src/common/*.pbc \
+  src/pct/gen_grammar.pir \
+  src/pct/gen_actions.pir \
   pipp.pbc \
-  pipp.c pipp.o pipp$(EXE)
+  pipp.c \
+  pipp.o \
+  pipp$(EXE)
 
 clean-pmc:
-	$(RM_F) "$(PMCDIR)/*dump" "$(PMCDIR)/php*.c" "$(PMCDIR)/pmc_*h" "$(PMCDIR)/php_group.h" "$(PMCDIR)/*$(O)" "$(PMCDIR)/*$(LOAD_EXT)"
-
-clean-pct:
 	$(RM_F) \
-  src/pct/gen_grammar.pir \
-  src/pct/gen_actions.pir
+  "$(PMC_DIR)/*dump" \
+  "$(PMC_DIR)/php*.c" \
+  "$(PMC_DIR)/pmc_*h" \
+  "$(PMC_DIR)/php_group.h" \
+  "$(PMC_DIR)/*$(O)" \
+  "$(PMC_DIR)/*$(LOAD_EXT)"
 
-clean-antlr3:
-	$(RM_F) \
-  src/antlr3/*.class \
-  src/antlr3/GenPastNqp.tokens \
-  src/antlr3/Pipp.tokens \
-  src/antlr3/Pipp__.g
 
 clean-test:
 	$(RM_F) \
@@ -338,9 +295,8 @@ clean-test:
   t/php/*.pir \
   t/php/*.out \
   t/pmc/*.pir \
-  pipp_phc_ast.xml pipp_phc_past.xml pipp_phc_past.nqp pipp_phc_past.pir \
-  pipp_antlr_past.nqp  pipp_antlr_past.pir
-
+  pipp_test_run.tar.gz
+  
 clean-hash:
 	$(RM_F) "$(HASH_OBJS)"
 
