@@ -140,6 +140,7 @@ set_cstring_prop(PARROT_INTERP, ARGMOD(PMC *lib_pmc), ARGIN(const char *what),
 {
     STRING * const key  = const_string(interp, what);
     PMC    * const prop = constant_pmc_new(interp, enum_class_String);
+    ASSERT_ARGS(set_cstring_prop);
 
     VTABLE_set_string_native(interp, prop, name);
     VTABLE_setprop(interp, lib_pmc, key, prop);
@@ -162,6 +163,7 @@ store_lib_pmc(PARROT_INTERP, ARGIN(PMC *lib_pmc), ARGIN(STRING *path),
     PMC * const iglobals = interp->iglobals;
     PMC * const dyn_libs = VTABLE_get_pmc_keyed_int(interp, iglobals,
             IGLOBALS_DYN_LIBS);
+    ASSERT_ARGS(store_lib_pmc);
 
     /* remember path/file in props */
     set_cstring_prop(interp, lib_pmc, "_filename", path);  /* XXX */
@@ -192,6 +194,7 @@ is_loaded(PARROT_INTERP, ARGIN(STRING *path))
     PMC * const iglobals = interp->iglobals;
     PMC * const dyn_libs = VTABLE_get_pmc_keyed_int(interp, iglobals,
             IGLOBALS_DYN_LIBS);
+    ASSERT_ARGS(is_loaded);
     if (!VTABLE_exists_keyed_str(interp, dyn_libs, path))
         return PMCNULL;
     return VTABLE_get_pmc_keyed_str(interp, dyn_libs, path);
@@ -222,6 +225,7 @@ get_path(PARROT_INTERP, ARGMOD(STRING *lib), ARGOUT(void **handle),
                                                      IGLOBALS_LIB_PATHS);
     PMC * const share_ext = VTABLE_get_pmc_keyed_int(interp, lib_paths,
                                                      PARROT_LIB_DYN_EXTS);
+    ASSERT_ARGS(get_path);
 
     if (lib == NULL) {
         *handle = Parrot_dlopen((char *)NULL);
@@ -336,6 +340,7 @@ Parrot_init_lib(PARROT_INTERP,
                 ARGIN_NULLOK(void (*init_func)(PARROT_INTERP, ARGIN_NULLOK(PMC *))))
 {
     PMC *lib_pmc = NULL;
+    ASSERT_ARGS(Parrot_init_lib);
 
     if (load_func)
         lib_pmc = (*load_func)(interp);
@@ -373,6 +378,7 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
     void (*init_func)(PARROT_INTERP, PMC *);
     char *cinit_func_name;
     PMC *lib_pmc;
+    ASSERT_ARGS(run_init_lib);
 
     /*
      * work around gcc 3.3.3 and other problem with dynpmcs
@@ -452,6 +458,7 @@ clone_string_into(ARGMOD(Interp *d), ARGIN(Interp *s), ARGIN(PMC *value))
         string_make_direct(d, raw_str, strlen(raw_str),
             PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
             PObj_constant_FLAG);
+    ASSERT_ARGS(clone_string_into);
     string_cstring_free(raw_str);
     return ret;
 }
@@ -474,6 +481,7 @@ make_string_pmc(PARROT_INTERP, ARGIN(STRING *string))
     PMC * const ret = VTABLE_new_from_string(interp,
         interp->vtables[enum_class_String]->pmc_class,
         string, PObj_constant_FLAG);
+    ASSERT_ARGS(make_string_pmc);
     return ret;
 }
 
@@ -506,6 +514,7 @@ Parrot_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_pmc))
     void * const handle = PMC_data(lib_pmc);
     STRING * const type =
         VTABLE_get_string(s, VTABLE_getprop(s, lib_pmc, type_str));
+    ASSERT_ARGS(Parrot_clone_lib_into);
 
     if (!string_equal(s, type, ops)) {
         /* we can't clone oplibs in the normal way, since they're actually
@@ -578,6 +587,7 @@ Parrot_load_lib(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), SHIM(PMC *initializer)
     STRING *path;
     STRING *lib_name, *wo_ext, *ext;    /* library stem without path
                                          * or extension.  */
+    ASSERT_ARGS(Parrot_load_lib);
     /* Find the pure library name, without path or extension.  */
     /*
      * TODO move the class_count_mutex here

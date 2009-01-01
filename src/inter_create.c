@@ -67,6 +67,7 @@ is_env_var_set(ARGIN(const char* var))
 {
     int free_it, retval;
     char* const value = Parrot_getenv(var, &free_it);
+    ASSERT_ARGS(is_env_var_set);
     if (value == NULL)
         retval = 0;
     else if (*value == '\0')
@@ -92,6 +93,7 @@ static void
 setup_default_compreg(PARROT_INTERP)
 {
     STRING * const pasm1 = CONST_STRING(interp, "PASM1");
+    ASSERT_ARGS(setup_default_compreg);
 
     /* register the nci compiler object */
     Parrot_compreg(interp, pasm1, (Parrot_compiler_func_t)PDB_compile);
@@ -113,6 +115,7 @@ Parrot_Interp
 make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 {
     Interp *interp;
+    ASSERT_ARGS(make_interpreter);
 
     /* Get an empty interpreter from system memory */
 #if EXEC_CAPABLE
@@ -288,6 +291,7 @@ PARROT_EXPORT
 void
 Parrot_destroy(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_destroy);
 #ifdef ATEXIT_DESTROY
     UNUSED(interp);
 #else
@@ -311,6 +315,7 @@ Note that C<exit_code> is ignored.
 void
 Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 {
+    ASSERT_ARGS(Parrot_really_destroy);
     /* wait for threads to complete if needed; terminate the event loop */
     if (!interp->parent_interpreter) {
         Parrot_cx_runloop_end(interp);

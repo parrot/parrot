@@ -126,6 +126,7 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGMOD(STRING *str),
         INTVAL is_int_type, ARGIN_NULLOK(STRING* prefix))
 {
     UINTVAL len = string_length(interp, str);
+    ASSERT_ARGS(handle_flags);
 
     if (is_int_type) {
         if (info->flags & FLAG_PREC && info->prec == 0 &&
@@ -231,6 +232,7 @@ static STRING*
 str_append_w_flags(PARROT_INTERP, ARGOUT(STRING *dest), ARGIN(const SpfInfo *info),
         ARGMOD(STRING *src), ARGIN_NULLOK(STRING *prefix))
 {
+    ASSERT_ARGS(str_append_w_flags);
     src = handle_flags(interp, info, src, 1, prefix);
     dest = string_append(interp, dest, src);
     return dest;
@@ -252,6 +254,7 @@ static void
 gen_sprintf_call(ARGOUT(char *out), ARGMOD(SpfInfo *info), int thingy)
 {
     int i    = 0;
+    ASSERT_ARGS(gen_sprintf_call);
     out[i++] = '%';
 
     if (info->flags) {
@@ -330,6 +333,7 @@ Parrot_sprintf_format(PARROT_INTERP,
      */
     STRING *substr = NULL;
     char tc[PARROT_SPRINTF_BUFFER_SIZE];
+    ASSERT_ARGS(Parrot_sprintf_format);
 
     for (i = 0; i < pat_len; i++) {
         if (string_ord(interp, pat, i) == '%') {        /* % */
