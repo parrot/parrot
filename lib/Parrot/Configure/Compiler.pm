@@ -210,16 +210,64 @@ enabled, and C<conditioned_lines> to enabled.
 Its value will be detected automatically by target file name unless you set
 it to a special value C<none>.
 
-=item conditioned_lines
+=item conditioned_lines #IF #UNLESS #ELSIF #ELSE
 
-If C<conditioned_lines> is true, then lines in the file that begin with:
-C<#CONDITIONED_LINE(var):> are skipped if the C<var> condition is false. Lines
-that begin with C<#INVERSE_CONDITIONED_LINE(var):> are skipped if
-the C<var> condition is true.  For instance:
+If conditioned_lines is true, then lines beginning in #IF, #UNLESS, #ELSIF, and
+#ELSE are evaluated conditionally, and the content after the C<:> is included
+or excluded, dependending on the evaluation of the expression.
 
-  #CONDITIONED_LINE(win32): $(SRC_DIR)/atomic/gcc_x86$(O)
+Lines beginning with C<#IF(expr):> are skipped if the expr condition is false,
+otherwise the content after the C<:> is inserted. Lines beginning with
+C<#UNLESS(expr):> are skipped if the expr condition is true, otherwise the
+content after the C<:> is inserted. Lines beginning with C<#ELSIF(expr):> or
+C<#ELSE:> are evaluated if the preceding C<#IF(expr):> evaluated to false.
 
-will be processed if the platform is win32.
+A condition expr may be:
+
+  * A single key, which is true if a config key is true,
+  * Equal to the platform name or the osname - case-sensitive,
+  * A C<key==value> expression, which is trun if the config key has the
+    expected value, or
+  * A logical combination of C<|>, C<OR>, C<&>, C<AND>, C<!>, C<NOT>.
+
+A key must only consist of the characters A-Z a-z 0-9 _ -, and is checked
+case-sensitively against the configuration key or the platform name. Truth is
+defined as any value that is not 0, an empty string, or C<undef>.
+
+The value in C<key==value> expressions may not contain spaces. Quotes in
+values are not supported.
+
+The word ops C<AND>, C<OR> and C<NOT> are case-insensitive. C<!> and C<NOT>
+bind closer than C<&>, C<AND>, C<|>, and C<OR>. The order of precedence for
+C<AND> and C<OR> is undefined.
+
+
+For instance:
+
+  #IF(win32): $(SRC_DIR)/atomic/gcc_x86$(O)
+
+will be included if the platform is win32.
+
+  #IF(cpuarch==i386): $(SRC_DIR)/atomic/gcc_x86$(O)
+
+will be included if the value of the config key "cpuarch" is "i386".
+
+  #IF(cpuarch==i386): $(SRC_DIR)/atomic/gcc_x86$(O)
+  #ELSIF(cpuarch==sparcv9): $(SRC_DIR)/atomic/sparc_v9.s
+  #ELSE:
+
+will include " $(SRC_DIR)/atomic/gcc_x86$(O)" if the config key "cpuarch" is
+ste to "i386", will include " $(SRC_DIR)/atomic/sparc_v9.s" instead if
+"cpuarch" is set to "sparcv9", and will include an empty line otherwise.
+
+  #IF(win32 and glut and not cygwin):
+
+will be used on "win32" and if "glut" is defined, but not on "cygwin".
+
+B<Legacy Syntax:>
+
+The old syntax #CONDITIONED_LINE(var): and
+#INVERSE_CONDITIONED_LINE(var): is still supported, but is deprecated.
 
 =item comment_type
 
@@ -360,6 +408,8 @@ sub genfile {
     # this loop can not be implemented as a foreach loop as the body
     # is dependent on <IN> being evaluated lazily
 
+    my $former_truth = -1;
+  LINE:
     while ( my $line = <$in> ) {
 
         # everything after the line starting with #perl is eval'ed
@@ -376,16 +426,46 @@ sub genfile {
             $text =~ s{ \@ (\w+) \@ }{\$conf->data->get("$1")}gx;
             eval $text;
             die $@ if $@;
-            last;
+            last LINE;
         }
         if ( $options{conditioned_lines} ) {
-            if ( $line =~ m/^#CONDITIONED_LINE\(([^)]+)\):(.*)/s ) {
-                next unless $conf->data->get($1);
-                $line = $2;
+            my ($op, $expr, $rest);
+            # allow multiple keys and nested parens here
+            if (($op,$expr,$rest)=($line =~ m/^#(IF|UNLESS|ELSIF)\((.+)\):(.*)/s)) {
+                if (($op eq 'ELSIF') and $former_truth) {
+                    next LINE;  # no useless check if former IF was true
+                }
+                my $truth = cond_eval($conf, $expr);
+                if ($op eq 'IF') {
+                    $former_truth = $truth;
+                    next LINE unless $truth;
+                }
+                elsif ($op eq 'UNLESS') {
+                    $former_truth = !$truth;
+                    next LINE if $truth;
+                }
+                elsif ($op eq 'ELSIF') {
+                    $former_truth = $truth;
+                    next LINE unless $truth;
+                }
+                $line = $rest;
             }
-            elsif ( $line =~ m/^#INVERSE_CONDITIONED_LINE\(([^)]+)\):(.*)/s ) {
-                next if $conf->data->get($1);
-                $line = $2;
+            elsif ( $former_truth != -1 and $line =~ m/^#ELSE:(.*)/s ) {
+                next LINE if $former_truth;
+                $line = $1;
+            }
+            # Legacy, DEPRECATED.
+            elsif (($expr,$rest)=($line =~ m/^#CONDITIONED_LINE\(([^)]+)\):(.*)/s)) {
+                next LINE unless cond_eval($conf, $expr);
+                $line = $rest;
+            }
+            elsif (($expr,$rest)=($line =~ m/^#INVERSE_CONDITIONED_LINE\(([^)]+)\):(.*)/s )) {
+                next LINE if cond_eval($conf, $expr);
+                $line = $rest;
+            }
+
+            else { # reset
+                $former_truth = -1; # ELSE must immediately follow a conditional.
             }
         }
 
@@ -483,6 +563,123 @@ sub genfile {
     close($out) or die "Can't close $target: $!";
 
     move_if_diff( "$target.tmp", $target, $options{ignore_pattern} );
+}
+
+# Return the next subexpression from the expression in $_[0]
+# and remove it from the input expression.
+# Allowed chars: A-Z a-z 0-9 _ -, so let's take [-\w].
+# E.g. "(not win32 and has_glut)"
+#        => not win32 => has_glut
+#      "(!win32&has_glut)|cygwin"   - perl-style
+#        !win32&has_glut => !win32 => &has_glut => |cygwin
+sub next_expr {
+    my $s = $_[0];
+    return "" unless $s;
+    # start of a subexpression?
+    if ($s =~ /^\((.+)\)\s*(.*)/o) {    # longest match to matching closing paren
+        $_[0] = $2 ? $2 : "";           # modify the 2nd arg
+        return $1;
+    }
+    else {
+        $s =~ s/^\s+//;                 # left-trim to make it more robust
+        if ($s =~ m/^([-\w=]+)\s*(.*)?/o) { # shortest match to next non-word char
+            # start with word expr
+            $_[0] = $2 ? $2 : "";       # modify the 2nd arg expr in the caller
+            return $1;
+        }
+        else {
+            # special case: start with non-word op (perl-syntax only)
+            $s =~ m/^([|&!])\s*(.*)?/o; # shortest match to next word char
+            $_[0] = $2 ? $2 : "";       # modify the 2nd arg expr in the caller
+            return $1;
+        }
+    }
+}
+
+# Checks the logical truth of the hash value: exists and not empty.
+# Also check the platform name, the 'osname' key, if the hash key does not exist.
+# Also check for key==value, like #IF(ld==gcc)
+sub cond_eval_single {
+    my $conf = $_[0];
+    my $key  = $_[1];
+    return unless defined $key;
+    if ($key =~ /^([-\w]+)==(.+)$/) {
+        return ($2 eq $conf->data->get($1));
+    }
+    else {
+        return exists($conf->data->{c}->{$key})
+            ? ($conf->data()->get($key) ? 1 : 0)
+            : $key eq $conf->data()->get('osname');
+    }
+}
+
+sub truth { $_[0] ? "true" : "false"; }
+
+# Recursively evaluate boolean expressions with multiple keys and | & ! ops.
+# Order of precedence: Just "!" and "NOT" binds tighter than AND and OR.
+# There's no precedence for AND over OR defined, just left to right.
+sub cond_eval {
+    my $conf = $_[0];
+    my $expr = $_[1];
+    my @count = split /[\s!&|\(]+/, $expr; # optimizable with tr
+    if (@count > 1) { # multiple keys: recurse into
+        my $truth = 0;
+        my $prevtruth = 0;
+        my $key = next_expr($expr);
+        my $op  = '';
+      LOOP:
+        while ($key) {
+            if (($key eq '!') or (uc($key) eq 'NOT')) {
+                # bind next key immediately
+                $op = 'NOT';
+                $key = next_expr($expr);
+            }
+            elsif ($truth and ($op eq 'OR')) {
+                # true OR: => true
+                last LOOP;
+            }
+            $prevtruth = $truth;
+            if (!$truth and ($op eq 'AND')) { # false AND: => false, skip rest
+                last LOOP;
+            }
+            $truth = cond_eval($conf, $key);
+            if ($op eq 'NOT') { # NOT *: invert
+                $truth = $truth ? 0 : 1;
+            }
+            elsif ($op eq 'AND' and !$truth) { # * AND false: => false
+                last LOOP;
+            }
+            # * OR false => * (keep $truth). true OR * already handled before
+            my $prevexpr = $expr;
+            $op  = next_expr($expr);
+            if ($op) {
+                if ($op eq '|' or uc($op) eq 'OR') {
+                    $op = 'OR';
+                }
+                elsif ($op eq '&' or uc($op) eq 'AND') {
+                    $op = 'AND';
+                }
+                elsif ($op eq '!' or uc($op) eq 'NOT') {
+                    $op = 'NOT';
+                }
+                else {
+                    die "invalid op \"$op\" in \"$_[1]\" at \"$prevexpr\".\n";
+                }
+                $key = next_expr($expr);
+            }
+            elsif ($prevexpr) {
+                die "Makefile conditional syntax error: missing op in \"$_[1]\" at \"$prevexpr\".\n";
+            }
+            else {
+                last LOOP; # end of expr, nothing left
+            }
+            if ($prevexpr eq $expr) {
+                die "Makefile conditional parser error in \"$_[1]\" at \"$prevexpr\".\n";
+            }
+        }
+        return $truth;
+    }
+    cond_eval_single($conf, $expr);
 }
 
 sub append_configure_log {
