@@ -372,7 +372,7 @@ method array_elem($/) {
 
 method simple_var($/) {
     our @?BLOCK;
-    unless @?BLOCK[0].symbol( ~$<VAR_NAME> ) {
+    unless ( @?BLOCK[0].symbol( ~$<VAR_NAME> ) || @?BLOCK[0].symbol( ~$<VAR_NAME> ~ '_hidden' ) ) {
         @?BLOCK[0].symbol( ~$<VAR_NAME>, :scope('lexical') );
         @?BLOCK[0].push(
             PAST::Var.new(
@@ -511,7 +511,7 @@ method closure($/, $key) {
         # declare the bound vars a lexical
         if +$<bind_list> == 1 {
             for $<bind_list>[0]<VAR_NAME> {
-                $block.symbol( ~$_, :scope('lexical') );
+                $block.symbol( ~$_ ~ '_hidden', :comment('bound with use') );
             }
         }
         @?BLOCK.unshift( $block );
@@ -588,12 +588,33 @@ method param_list($/) {
         );
     my $arity := 0;
     for $<VAR_NAME> {
-        my $param :=
+        $block.push(
             PAST::Var.new(
                 :name(~$_),
                 :scope('parameter'),
-            );
-        $block.push($param);
+            )
+        );
+#####        $block.push(
+#####            PAST::Op.new(
+#####                :pasttype('bind'),
+#####                PAST::Var.new(
+#####                    :name(~$_),
+#####                    :scope('lexical')
+#####                ),
+#####                PAST::Op.new(
+#####                    :inline(
+#####                        '#   %r = new "Perl6Scalar", %0',
+#####                        '#   $P0 = get_hll_global ["Bool"], "True"',
+#####                        '#   setprop %r, "readonly", $P0'
+#####                    ),
+#####                    PAST::Var.new(
+#####                        :name(~$_),
+#####                        :scope('lexical')
+#####                    )
+#####                )
+#####            )
+#####        );
+
         $arity++;
         $block.symbol( ~$_, :scope('lexical') );
     }
