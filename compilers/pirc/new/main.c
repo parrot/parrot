@@ -301,18 +301,18 @@ main(int argc, char *argv[]) {
 
     if (outputfile != NULL && TEST_FLAG(flags, LEXER_FLAG_HEREDOCONLY)) {
         file = open_file(outputfile, "w");
-        process_heredocs(argv[0], file);
+        process_heredocs(interp, argv[0], file);
         fclose(file);
         return 0;
     }
     else if (TEST_FLAG(flags, LEXER_FLAG_HEREDOCONLY)) {
-        process_heredocs(argv[0], stdout);
+        process_heredocs(interp, argv[0], stdout);
         return 0;
     }
     else {
         hdocoutfile = _tempnam(NULL, "hdoc");
         file = open_file(hdocoutfile, "w");
-        process_heredocs(argv[0], file);
+        process_heredocs(interp, argv[0], file);
         fclose(file);
     }
 

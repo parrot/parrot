@@ -28,7 +28,7 @@
 
 /*
  * $Id$
- * Copyright (C) 2007-2008, The Perl Foundation.
+ * Copyright (C) 2007-2009, The Perl Foundation.
  */
 
 /*
@@ -93,6 +93,8 @@ typedef struct global_state {
 
     FILE           *outfile;        /* output file; or STDOUT if no file is specified */
 
+    PARROT_INTERP;
+
 } global_state;
 
 /* accessor methods for setting and getting the lexer_state */
@@ -152,7 +154,7 @@ PARROT_MALLOC
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static global_state *
-init_global_state(NOTNULL(char * const filename), NOTNULL(FILE *outfile)) {
+init_global_state(PARROT_INTERP, NOTNULL(char * const filename), NOTNULL(FILE *outfile)) {
     global_state *state = (global_state *)mem_sys_allocate(sizeof (global_state));
     state->filename     = filename;
     state->heredoc      = NULL;
@@ -161,6 +163,7 @@ init_global_state(NOTNULL(char * const filename), NOTNULL(FILE *outfile)) {
     state->file_buffer  = NULL;
     state->errors       = 0;
     state->outfile      = outfile;
+    state->interp       = interp;
 
     return state;
 }
@@ -202,7 +205,7 @@ all resources are released.
 
 */
 void
-process_heredocs(NOTNULL(char * const filename), NOTNULL(FILE *outfile)) {
+process_heredocs(PARROT_INTERP, NOTNULL(char * const filename), NOTNULL(FILE *outfile)) {
     yyscan_t      yyscanner;
     global_state *state = NULL;
     FILE         *fp;
@@ -220,7 +223,7 @@ process_heredocs(NOTNULL(char * const filename), NOTNULL(FILE *outfile)) {
     /* set the scanner to a string buffer and go parse */
     yyset_in(fp, yyscanner);
 
-    state = init_global_state(filename, outfile);
+    state = init_global_state(interp, filename, outfile);
 
     yyset_extra(state, yyscanner);
 
@@ -515,7 +518,7 @@ LINECOMMENT    [#].*{EOL}?
                               fprintf(state->outfile, ".line 1\n");
                               fprintf(state->outfile, ".file %s\n", yytext); /* is quoted */
 
-                              process_heredocs(fullpath, state->outfile);
+                              process_heredocs(state->interp, fullpath, state->outfile);
 
                               /* restore the location information; we didn't count the "\n"
                                * yet that will come after the .include dir.; hence the + 1 now.

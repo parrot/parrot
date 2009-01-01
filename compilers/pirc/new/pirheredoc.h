@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2008, The Perl Foundation.
+ * Copyright (C) 2008-2009, The Perl Foundation.
  */
 
 
@@ -9,7 +9,7 @@
 
 #include <stdio.h> /* for FILE */
 
-void process_heredocs(char * const filename, FILE *outputfile);
+void process_heredocs(PARROT_INTERP, char * const filename, FILE *outputfile);
 
 #endif /* PARROT_PIR_PIRHEREDOC_H_GUARD */
 
