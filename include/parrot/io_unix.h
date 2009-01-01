@@ -74,7 +74,8 @@ PMC * Parrot_io_open_unix(PARROT_INTERP,
     ARGIN(STRING *path),
     INTVAL flags)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*filehandle);
 
 size_t Parrot_io_peek_unix(PARROT_INTERP,
     SHIM(PMC *filehandle),

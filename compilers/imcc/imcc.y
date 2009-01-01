@@ -146,6 +146,7 @@ static Instruction * iLABEL(PARROT_INTERP,
     ARGMOD(SymReg *r0))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
+        FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*r0);
 
 PARROT_WARN_UNUSED_RESULT
@@ -159,6 +160,7 @@ static Instruction * iSUBROUTINE(PARROT_INTERP,
     ARGMOD(SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
+        FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*r);
 
 PARROT_IGNORABLE_RESULT

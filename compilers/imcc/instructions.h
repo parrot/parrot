@@ -142,7 +142,8 @@ PARROT_CAN_RETURN_NULL
 Instruction * emitb(PARROT_INTERP,
     ARGMOD_NULLOK(IMC_Unit *unit),
     ARGIN_NULLOK(Instruction *i))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*unit);
 
 void free_ins(ARGMOD(Instruction *ins))
         __attribute__nonnull__(1)
@@ -174,6 +175,7 @@ void insert_ins(
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*ins)
         FUNC_MODIFIES(*tmp);
 
 int instruction_reads(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
@@ -205,6 +207,7 @@ void prepend_ins(
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*ins)
         FUNC_MODIFIES(*tmp);
 
 void subst_ins(

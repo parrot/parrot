@@ -30,7 +30,8 @@ PMC * Parrot_io_fdopen_win32(PARROT_INTERP,
     ARGMOD_NULLOK(PMC *filehandle),
     PIOHANDLE fd,
     INTVAL flags)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*filehandle);
 
 INTVAL Parrot_io_flush_win32(PARROT_INTERP, ARGMOD(PMC *filehandle))
         __attribute__nonnull__(1)

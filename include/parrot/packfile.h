@@ -363,7 +363,8 @@ INTVAL PackFile_add_segment(SHIM_INTERP,
 
 PARROT_EXPORT
 void PackFile_Constant_destroy(SHIM_INTERP,
-    ARGMOD_NULLOK(PackFile_Constant *self));
+    ARGMOD_NULLOK(PackFile_Constant *self))
+        FUNC_MODIFIES(*self);
 
 PARROT_EXPORT
 PARROT_MALLOC
@@ -436,7 +437,8 @@ const opcode_t * PackFile_ConstTable_unpack(PARROT_INTERP,
 
 PARROT_EXPORT
 void PackFile_destroy(PARROT_INTERP, ARGMOD_NULLOK(PackFile *pf))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*pf);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT

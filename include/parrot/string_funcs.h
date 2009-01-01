@@ -99,7 +99,9 @@ STRING* Parrot_string_trans_charset(PARROT_INTERP,
     ARGMOD_NULLOK(STRING *src),
     INTVAL charset_nr,
     ARGOUT_NULLOK(STRING *dest))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*src)
+        FUNC_MODIFIES(*dest);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -108,7 +110,8 @@ STRING* Parrot_string_trans_encoding(PARROT_INTERP,
     ARGIN_NULLOK(STRING *src),
     INTVAL encoding_nr,
     ARGOUT_NULLOK(STRING *dest))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*dest);
 
 PARROT_EXPORT
 void Parrot_unmake_COW(PARROT_INTERP, ARGMOD(STRING *s))
@@ -122,7 +125,8 @@ PARROT_CAN_RETURN_NULL
 STRING * string_append(PARROT_INTERP,
     ARGMOD_NULLOK(STRING *a),
     ARGIN_NULLOK(STRING *b))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*a);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -130,14 +134,16 @@ STRING * string_bitwise_and(PARROT_INTERP,
     ARGIN_NULLOK(const STRING *s1),
     ARGIN_NULLOK(const STRING *s2),
     ARGOUT_NULLOK(STRING **dest))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*dest);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING * string_bitwise_not(PARROT_INTERP,
     ARGIN_NULLOK(const STRING *s),
     ARGOUT_NULLOK(STRING **dest))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*dest);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -145,7 +151,8 @@ STRING * string_bitwise_or(PARROT_INTERP,
     ARGIN_NULLOK(const STRING *s1),
     ARGIN_NULLOK(const STRING *s2),
     ARGOUT_NULLOK(STRING **dest))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*dest);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -153,7 +160,8 @@ STRING * string_bitwise_xor(PARROT_INTERP,
     ARGIN_NULLOK(const STRING *s1),
     ARGIN_NULLOK(const STRING *s2),
     ARGOUT_NULLOK(STRING **dest))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*dest);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -292,7 +300,8 @@ STRING * string_grow(PARROT_INTERP, ARGMOD(STRING *s), UINTVAL addlen)
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 size_t string_hash(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*s);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -399,7 +408,8 @@ STRING * string_repeat(PARROT_INTERP,
     UINTVAL num,
     ARGOUT_NULLOK(STRING **d))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*d);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
@@ -411,7 +421,8 @@ STRING * string_replace(PARROT_INTERP,
     ARGOUT_NULLOK(STRING **d))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*d);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -449,7 +460,8 @@ STRING * string_substr(PARROT_INTERP,
     INTVAL length,
     ARGOUT_NULLOK(STRING **d),
     int replace_dest)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*d);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -509,7 +521,8 @@ STRING * string_upcase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 
 PARROT_EXPORT
 void string_upcase_inplace(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*s);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL

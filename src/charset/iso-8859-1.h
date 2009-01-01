@@ -22,7 +22,8 @@ STRING * charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP,
     ARGIN(STRING *src),
     ARGMOD_NULLOK(STRING *dest))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
 
 PARROT_CANNOT_RETURN_NULL
 const CHARSET * Parrot_charset_iso_8859_1_init(PARROT_INTERP)

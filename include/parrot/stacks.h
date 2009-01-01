@@ -116,7 +116,8 @@ void * stack_peek(PARROT_INTERP,
     ARGIN(Stack_Chunk_t *stack_base),
     ARGMOD_NULLOK(Stack_entry_type *type))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*type);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
@@ -126,7 +127,8 @@ void * stack_pop(PARROT_INTERP,
     Stack_entry_type type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*stack_p);
+        FUNC_MODIFIES(*stack_p)
+        FUNC_MODIFIES(*where);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT

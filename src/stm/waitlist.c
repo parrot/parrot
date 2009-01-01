@@ -66,12 +66,14 @@ static int remove_first(
 static void waitlist_remove(
     ARGMOD_NULLOK(STM_waitlist *waitlist),
     ARGIN(struct waitlist_entry *what))
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*waitlist);
 
 static void waitlist_remove_check(
     ARGMOD_NULLOK(STM_waitlist *waitlist),
     ARGIN(struct waitlist_entry *what))
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*waitlist);
 
 static void waitlist_signal_all(ARGMOD(STM_waitlist *list))
         __attribute__nonnull__(1)

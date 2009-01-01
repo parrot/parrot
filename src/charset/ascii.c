@@ -100,7 +100,8 @@ static STRING * to_ascii(PARROT_INTERP,
     ARGIN(STRING *src),
     ARGMOD_NULLOK(STRING *dest))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
 
 PARROT_CANNOT_RETURN_NULL
 static STRING * to_charset(PARROT_INTERP,
@@ -115,7 +116,8 @@ static STRING * to_unicode(PARROT_INTERP,
     ARGMOD_NULLOK(STRING *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*src);
+        FUNC_MODIFIES(*src)
+        FUNC_MODIFIES(*dest);
 
 static void upcase(SHIM_INTERP, ARGIN(STRING *source_string))
         __attribute__nonnull__(2);

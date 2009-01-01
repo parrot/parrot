@@ -128,7 +128,8 @@ static STRING * to_encoding(PARROT_INTERP,
     ARGMOD_NULLOK(STRING *dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*src);
+        FUNC_MODIFIES(*src)
+        FUNC_MODIFIES(*dest);
 
 static UINTVAL utf8_characters(PARROT_INTERP,
     ARGIN(const utf8_t *ptr),

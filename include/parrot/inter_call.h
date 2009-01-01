@@ -168,7 +168,9 @@ void parrot_pass_args(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*src_ctx)
-        FUNC_MODIFIES(*dest_ctx);
+        FUNC_MODIFIES(*dest_ctx)
+        FUNC_MODIFIES(*src_indexes)
+        FUNC_MODIFIES(*dest_indexes);
 
 PARROT_EXPORT
 void Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP,

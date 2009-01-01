@@ -76,7 +76,8 @@ static int first_avail(
     ARGIN(const IMC_Unit *unit),
     int reg_set,
     ARGOUT_NULLOK(Set **avail))
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*avail);
 
 PARROT_CANNOT_RETURN_NULL
 static unsigned int* ig_allocate(int N);
@@ -119,7 +120,9 @@ static void make_stat(
     ARGMOD_NULLOK(int *sets),
     ARGMOD_NULLOK(int *cols))
         __attribute__nonnull__(1)
-        FUNC_MODIFIES(*unit);
+        FUNC_MODIFIES(*unit)
+        FUNC_MODIFIES(*sets)
+        FUNC_MODIFIES(*cols);
 
 static void map_colors(
     ARGIN(const IMC_Unit* unit),

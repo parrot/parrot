@@ -271,7 +271,7 @@ sub attrs_from_args {
     my $n = 0;
     for my $arg (@args) {
         ++$n;
-        if ( $arg =~ m{ARG(?:MOD|OUT)\((.+?)\)} ) {
+        if ( $arg =~ m{ARG(?:MOD|OUT)(?:_NULLOK)?\((.+?)\)} ) {
             my $modified = $1;
             if ( $modified =~ s/.*\*/*/ ) {
                 # We're OK

@@ -246,7 +246,8 @@ INTVAL Parrot_io_putps(PARROT_INTERP,
     ARGMOD_NULLOK(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmc);
+        FUNC_MODIFIES(*pmc)
+        FUNC_MODIFIES(*s);
 
 PARROT_EXPORT
 INTVAL Parrot_io_puts(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s))
