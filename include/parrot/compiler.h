@@ -21,7 +21,7 @@
  * See <http://msdn2.microsoft.com/en-us/library/ms235402(VS.80).aspx>,
  * <http://msdn2.microsoft.com/en-us/library/dabb5z75(VS.80).aspx>.
  */
-#if defined(_MSC_VER) && (_MSC_VER > 1300)
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)
 #  define PARROT_HAS_SAL 1
 #  include <sal.h>
 #else
