@@ -99,6 +99,7 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
 {
     int     hi_prio;
     Arenas *arena_base;
+    ASSERT_ARGS(mark_special);
 
     /*
      * If the object is shared, we have to use the arena and dod
@@ -189,7 +190,7 @@ PARROT_EXPORT
 void
 pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
 {
-    PARROT_ASSERT(obj);
+    ASSERT_ARGS(pobject_lives);
 #if PARROT_GC_GMS
     do {
         if (!PObj_live_TEST(obj) && \
@@ -264,6 +265,7 @@ Parrot_dod_trace_root(PARROT_INTERP, int trace_stack)
     Arenas           * const arena_base = interp->arena_base;
     Parrot_Context   *ctx;
     PObj             *obj;
+    ASSERT_ARGS(Parrot_dod_trace_root);
 
     /* note: adding locals here did cause increased DOD runs */
     mark_context_start();
@@ -372,6 +374,7 @@ to proceed with GC.
 static int
 trace_active_PMCs(PARROT_INTERP, int trace_stack)
 {
+    ASSERT_ARGS(trace_active_PMCs);
     if (!Parrot_dod_trace_root(interp, trace_stack))
         return 0;
 
@@ -398,6 +401,7 @@ Parrot_dod_trace_children(PARROT_INTERP, size_t how_many)
     PMC           *current    = arena_base->dod_mark_start;
 
     const UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
+    ASSERT_ARGS(Parrot_dod_trace_children);
 
     /*
      * First phase of mark is finished. Now if we are the owner
@@ -483,6 +487,7 @@ Parrot_dod_trace_pmc_data(PARROT_INTERP, ARGIN(PMC *p))
 {
     /* malloced array of PMCs */
     PMC ** const data = PMC_data_typed(p, PMC **);
+    ASSERT_ARGS(Parrot_dod_trace_pmc_data);
 
     if (data) {
         INTVAL i;
@@ -510,6 +515,7 @@ clear_cow(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int cleanup)
 {
     const UINTVAL object_size = pool->object_size;
     Small_Object_Arena *cur_arena;
+    ASSERT_ARGS(clear_cow);
 
     /* clear refcount for COWable objects. */
     for (cur_arena = pool->last_Arena;
@@ -555,6 +561,7 @@ used_cow(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int cleanup)
 {
     const UINTVAL object_size = pool->object_size;
     Small_Object_Arena *cur_arena;
+    ASSERT_ARGS(used_cow);
 
     for (cur_arena = pool->last_Arena;
             NULL != cur_arena; cur_arena = cur_arena->prev) {
@@ -602,6 +609,7 @@ Parrot_dod_sweep(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
     Small_Object_Arena *cur_arena;
     dod_object_fn_type dod_object = pool->dod_object;
+    ASSERT_ARGS(Parrot_dod_sweep);
 
 #if GC_VERBOSE
     if (Interp_trace_TEST(interp, 1)) {
@@ -689,6 +697,7 @@ Parrot_dod_free_pmc(PARROT_INTERP, SHIM(Small_Object_Pool *pool),
 {
     PMC    * const pmc        = (PMC *)p;
     Arenas * const arena_base = interp->arena_base;
+    ASSERT_ARGS(Parrot_dod_free_pmc);
 
     /* TODO collect objects with finalizers */
     if (PObj_needs_early_DOD_TEST(p))
@@ -726,6 +735,7 @@ Parrot_free_pmc_ext(PARROT_INTERP, ARGMOD(PMC *p))
     /* if the PMC has a PMC_EXT structure, return it to the pool/arena */
     Arenas            * const arena_base = interp->arena_base;
     Small_Object_Pool * const ext_pool   = arena_base->pmc_ext_pool;
+    ASSERT_ARGS(Parrot_free_pmc_ext);
 
     if (PObj_is_PMC_shared_TEST(p) && PMC_sync(p)) {
         MUTEX_DESTROY(PMC_sync(p)->pmc_lock);
@@ -756,6 +766,7 @@ void
 Parrot_dod_free_sysmem(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
         ARGMOD(PObj *b))
 {
+    ASSERT_ARGS(Parrot_dod_free_sysmem);
     /* has sysmem allocated, e.g. string_pin */
     if (PObj_sysmem_TEST(b) && PObj_bufstart(b))
         mem_sys_free(PObj_bufstart(b));
@@ -780,7 +791,7 @@ void
 Parrot_dod_free_buffer_malloc(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
         ARGMOD(PObj *b))
 {
-
+    ASSERT_ARGS(Parrot_dod_free_buffer_malloc);
     /* free allocated space at (int *)bufstart - 1, but not if it used COW or is
      * external */
     PObj_buflen(b) = 0;
@@ -814,6 +825,7 @@ void
 Parrot_dod_free_buffer(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGMOD(PObj *b))
 {
     Memory_Pool * const mem_pool = (Memory_Pool *)pool->mem_pool;
+    ASSERT_ARGS(Parrot_dod_free_buffer);
 
     /* XXX Jarkko reported that on irix pool->mem_pool was NULL, which really
      * shouldn't happen */
@@ -846,6 +858,7 @@ find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
 {
     int       i;
     const int bound = sizeof (size_t) * 8;
+    ASSERT_ARGS(find_common_mask);
 
     /* Shifting a value by its size (in bits) or larger is undefined behaviour.
        So need an explicit check to return 0 if there is no prefix, rather than
@@ -895,6 +908,7 @@ trace_mem_block(PARROT_INTERP, size_t lo_var_ptr, size_t hi_var_ptr)
         find_common_mask(interp,
                          buffer_min < pmc_min ? buffer_min : pmc_min,
                          buffer_max > pmc_max ? buffer_max : pmc_max);
+    ASSERT_ARGS(trace_mem_block);
 
     if (!lo_var_ptr || !hi_var_ptr)
         return;
@@ -955,6 +969,7 @@ clear_live_bits(ARGIN(const Small_Object_Pool *pool))
 {
     Small_Object_Arena *arena;
     const UINTVAL object_size = pool->object_size;
+    ASSERT_ARGS(clear_live_bits);
 
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
         Buffer *b = (Buffer *)arena->start_objects;
@@ -984,6 +999,7 @@ void
 Parrot_dod_clear_live_bits(PARROT_INTERP)
 {
     Small_Object_Pool * const pool = interp->arena_base->pmc_pool;
+    ASSERT_ARGS(Parrot_dod_clear_live_bits);
     clear_live_bits(pool);
 }
 
@@ -1000,6 +1016,7 @@ Records the start time of a DOD run when profiling is enabled.
 void
 Parrot_dod_profile_start(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_dod_profile_start);
     if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG))
         interp->profile->dod_time = Parrot_floatval_time();
 }
@@ -1018,6 +1035,7 @@ enabled. Also record start time of next part.
 void
 Parrot_dod_profile_end(PARROT_INTERP, int what)
 {
+    ASSERT_ARGS(Parrot_dod_profile_end);
     if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG)) {
         RunProfile * const profile = interp->profile;
         const FLOATVAL     now     = Parrot_floatval_time();
@@ -1053,6 +1071,7 @@ void
 Parrot_dod_ms_run_init(PARROT_INTERP)
 {
     Arenas * const arena_base       = interp->arena_base;
+    ASSERT_ARGS(Parrot_dod_ms_run_init);
 
     arena_base->dod_trace_ptr       = NULL;
     arena_base->dod_mark_start      = NULL;
@@ -1077,6 +1096,7 @@ sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag,
     ARGMOD(void *arg))
 {
     int * const total_free = (int *) arg;
+    ASSERT_ARGS(sweep_cb);
 
 #ifdef GC_IS_MALLOC
     if (flag & POOL_BUFFER)
@@ -1115,6 +1135,7 @@ Parrot_dod_ms_run(PARROT_INTERP, UINTVAL flags)
 
     /* XXX these should go into the interpreter */
     int total_free     = 0;
+    ASSERT_ARGS(Parrot_dod_ms_run);
 
     if (arena_base->DOD_block_level)
         return;
@@ -1214,6 +1235,7 @@ headers.
 void
 Parrot_do_dod_run(PARROT_INTERP, UINTVAL flags)
 {
+    ASSERT_ARGS(Parrot_do_dod_run);
     interp->arena_base->do_gc_mark(interp, flags);
     parrot_gc_context(interp);
 }

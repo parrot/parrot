@@ -182,6 +182,7 @@ prederef_args(ARGMOD(void **pc_prederef), PARROT_INTERP,
     const int m = opinfo->op_count;
     int       n = opinfo->op_count;
     int       i;
+    ASSERT_ARGS(prederef_args);
 
     ADD_OP_VAR_PART(interp, interp->code, pc, n);
     for (i = 1; i < n; i++) {
@@ -370,6 +371,7 @@ turn_ev_check(PARROT_INTERP, int on)
 {
     const Prederef * const pi = &interp->code->prederef;
     size_t i;
+    ASSERT_ARGS(turn_ev_check);
 
     if (!pi->branches)
         return;
@@ -404,6 +406,7 @@ static oplib_init_f
 get_core_op_lib_init(PARROT_INTERP, int which)
 {
     oplib_init_f init_func;
+    ASSERT_ARGS(get_core_op_lib_init);
     switch (which) {
         case PARROT_SWITCH_CORE:
         case PARROT_SWITCH_JIT_CORE:
@@ -453,6 +456,7 @@ PARROT_CANNOT_RETURN_NULL
 static oplib_init_f
 get_dynamic_op_lib_init(SHIM_INTERP, ARGIN(const PMC *lib))
 {
+    ASSERT_ARGS(get_dynamic_op_lib_init);
     return (oplib_init_f)D2FPTR(PMC_struct_val(lib));
 }
 
@@ -473,6 +477,7 @@ load_prederef(PARROT_INTERP, int which)
     const oplib_init_f init_func = get_core_op_lib_init(interp, which);
 
     int (*get_op)(const char * name, int full);
+    ASSERT_ARGS(load_prederef);
 
     get_op          = interp->op_lib->op_code;
     interp->op_lib  = init_func(1);
@@ -500,6 +505,7 @@ Initialize: load prederef C<func_table>, file prederef.code.
 static void
 init_prederef(PARROT_INTERP, int which)
 {
+    ASSERT_ARGS(init_prederef);
     load_prederef(interp, which);
     if (!interp->code->prederef.code) {
         void        *pred_func;
@@ -567,6 +573,7 @@ for run-core changes, but we don't know the old run core.
 static void
 stop_prederef(PARROT_INTERP)
 {
+    ASSERT_ARGS(stop_prederef);
     interp->op_func_table = PARROT_CORE_OPLIB_INIT(1)->op_func_table;
 
     if (interp->evc_func_table) {
@@ -597,6 +604,7 @@ C<op_info_table>
 void
 exec_init_prederef(PARROT_INTERP, void *prederef_arena)
 {
+    ASSERT_ARGS(exec_init_prederef);
     load_prederef(interp, PARROT_CGP_CORE);
 
     if (!interp->code->prederef.code) {
@@ -630,6 +638,7 @@ init_jit(PARROT_INTERP, SHIM(opcode_t *pc))
     UINTVAL            code_size;          /* in opcodes */
     opcode_t          *code_end;
     Parrot_jit_info_t *jit_info;
+    ASSERT_ARGS(init_jit);
 
     if (interp->code->jit_info)
         return ((Parrot_jit_info_t *)interp->code->jit_info)->arena.start;
@@ -715,6 +724,7 @@ runops_jit(PARROT_INTERP, ARGIN(opcode_t *pc))
     /* AIX calling convention requires that function-call-by-ptr be made
        through the following struct: */
     struct ptrgl_t { jit_f functPtr; void *toc; void *env; } ptrgl_t;
+    ASSERT_ARGS(runops_jit);
 
     ptrgl_t.functPtr = (jit_f) D2FPTR(init_jit(interp, pc));
     ptrgl_t.env      = NULL;
@@ -755,6 +765,7 @@ runops_exec(PARROT_INTERP, ARGIN(opcode_t *pc))
     opcode_t *code_start;
     UINTVAL   code_size;          /* in opcodes */
     opcode_t *code_end;
+    ASSERT_ARGS(runops_exec);
 
     code_start = interp->code->base.data;
     code_size = interp->code->base.size;
@@ -808,6 +819,7 @@ runops_cgp(PARROT_INTERP, ARGIN(opcode_t *pc))
 #ifdef HAVE_COMPUTED_GOTO
     opcode_t * const code_start = (opcode_t *)interp->code->base.data;
     opcode_t        *pc_prederef;
+    ASSERT_ARGS(runops_cgp);
 
     init_prederef(interp, PARROT_CGP_CORE);
 
@@ -841,6 +853,7 @@ runops_switch(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
     opcode_t * const code_start = (opcode_t *)interp->code->base.data;
     opcode_t        *pc_prederef;
+    ASSERT_ARGS(runops_switch);
 
     init_prederef(interp, PARROT_SWITCH_CORE);
     pc_prederef = (opcode_t*)interp->code->prederef.code + (pc - code_start);
@@ -1161,6 +1174,7 @@ dynop_register_xx(PARROT_INTERP,
 
     oplib_init_f new_init_func;
     PMC *lib_variant;
+    ASSERT_ARGS(dynop_register_xx);
 
     if (cg_lib->flags & OP_FUNC_IS_ALLOCATED) {
         ops_addr = (op_func_t *)mem_sys_realloc(cg_lib->op_func_table,
@@ -1262,6 +1276,7 @@ static void
 dynop_register_switch(size_t n_old, size_t n_new)
 {
     op_lib_t * const lib = PARROT_CORE_SWITCH_OPLIB_INIT(1);
+    ASSERT_ARGS(dynop_register_switch);
     lib->op_count        = n_old + n_new;
 }
 
@@ -1280,6 +1295,7 @@ static void
 notify_func_table(PARROT_INTERP, ARGIN(op_func_t* table), int on)
 {
     const oplib_init_f init_func = get_core_op_lib_init(interp, interp->run_core);
+    ASSERT_ARGS(notify_func_table);
 
     init_func((long) table);
     switch (interp->run_core) {

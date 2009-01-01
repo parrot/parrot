@@ -475,6 +475,7 @@ static void
 parrot_gc_gms_deinit(PARROT_INTERP)
 {
     Arenas * const arena_base = interp->arena_base;
+    ASSERT_ARGS(parrot_gc_gms_deinit);
 
     /*
      * TODO free generations
@@ -498,6 +499,7 @@ C<more_objects>.
 static void
 gc_gms_pool_init(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
+    ASSERT_ARGS(gc_gms_pool_init);
     pool->add_free_object = gc_gms_add_free_object;
     pool->get_free_object = gc_gms_get_free_object;
     pool->alloc_objects   = gc_gms_alloc_objects;
@@ -526,6 +528,7 @@ void
 Parrot_gc_gms_init(PARROT_INTERP)
 {
     Arenas * const arena_base = interp->arena_base;
+    ASSERT_ARGS(Parrot_gc_gms_init);
 
     arena_base->gc_private = mem_sys_allocate_zeroed(sizeof (Gc_gms_private));
 
@@ -558,6 +561,7 @@ static void
 gc_gms_add_free_object(PARROT_INTERP, SHIM(Small_Object_Pool *pool),
         SHIM(PObj *to_add))
 {
+    ASSERT_ARGS(gc_gms_add_free_object);
     Parrot_ex_throw_from_c_args(interp, NULL, 1, "gms abuse");
 }
 
@@ -612,6 +616,7 @@ gc_gms_chain_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
 
     Gc_gms_hdr *p = new_arena->start_objects;
     Gc_gms_hdr * const marker = &pool->marker;
+    ASSERT_ARGS(gc_gms_chain_objects);
 
     PARROT_ASSERT(pool->free_list == marker);
 
@@ -667,6 +672,7 @@ gc_gms_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
     const size_t real_size = pool->object_size;
     Small_Object_Arena * const new_arena = mem_internal_allocate(sizeof (Small_Object_Arena));
     const size_t size = real_size * pool->objects_per_alloc;
+    ASSERT_ARGS(gc_gms_alloc_objects);
 
     new_arena->start_objects = mem_internal_allocate(size);
     /* insert arena in list */
@@ -696,6 +702,7 @@ Run a GC cycle or allocate new objects for the given pool.
 static void
 gc_gms_more_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
+    ASSERT_ARGS(gc_gms_more_objects);
     if (pool->skip)
         pool->skip = 0;
     else if (pool->last_Arena) {
@@ -729,6 +736,7 @@ gc_gms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
     PObj *ptr;
     Gc_gms_hdr *hdr;
+    ASSERT_ARGS(gc_gms_get_free_object);
 
     hdr = pool->free_list;
     if (hdr == &pool->marker)
@@ -780,6 +788,7 @@ static Gc_gms_gen *
 gc_gms_create_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), size_t gen_no)
 {
     Gc_gms_gen * const gen = mem_sys_allocate(sizeof (*gen));
+    ASSERT_ARGS(gc_gms_create_gen);
 
     gen->gen_no = gen_no;
     gen->pool = pool;
@@ -808,6 +817,7 @@ static void
 gc_gms_init_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
     Gc_gms_private *gmsp;
+    ASSERT_ARGS(gc_gms_init_gen);
     /*
      * Generations are numbered beginning at zero
      * 0 ... oldest
@@ -840,6 +850,7 @@ gc_gms_find_gen(PARROT_INTERP, ARGIN(const Gc_gms_hdr *h), UINTVAL gen_no)
 {
     Gc_gms_gen *gen;
     const Small_Object_Pool * const pool = h->gen->pool;
+    ASSERT_ARGS(gc_gms_find_gen);
 
     PARROT_ASSERT(pool);
 
@@ -876,6 +887,7 @@ gc_gms_promote(PARROT_INTERP, ARGIN(Gc_gms_hdr *h), UINTVAL gen_no)
     Gc_gms_gen *gen;
     Gc_gms_hdr *prev, *next;
     Small_Object_Pool * const pool = h->gen->pool;
+    ASSERT_ARGS(gc_gms_promote);
 
     /* unsnap from current generation */
     prev = h->prev;
@@ -921,6 +933,7 @@ static void
 gc_gms_store_hdr_list(PARROT_INTERP, ARGMOD(Gc_gms_hdr_list *l), ARGIN(Gc_gms_hdr *h))
 {
     Gc_gms_hdr_store * const s = l->last;
+    ASSERT_ARGS(gc_gms_store_hdr_list);
 
     /* if it's not created or if it's full allocate new store */
     if (!s || s->ptr == &s->store[GC_GMS_STORE_SIZE]) {
@@ -954,6 +967,7 @@ static void
 gc_gms_clear_hdr_list(PARROT_INTERP, ARGMOD(Gc_gms_hdr_list *l))
 {
     Gc_gms_hdr_store *s, *next;
+    ASSERT_ARGS(gc_gms_clear_hdr_list);
 
     for (s = l->first; s; s = next) {
         next = s->next;
@@ -977,6 +991,7 @@ gc_gms_store_igp(PARROT_INTERP, ARGIN(Gc_gms_hdr *h))
 {
     Gc_gms_gen * const gen = h->gen;
     Gc_gms_hdr_list * const igp = &gen->igp;
+    ASSERT_ARGS(gc_gms_store_igp);
 
     gc_gms_store_hdr_list(interp, igp, h);
 }
@@ -995,6 +1010,7 @@ static void
 gc_gms_clear_igp(PARROT_INTERP, ARGIN(Gc_gms_gen *gen))
 {
     Gc_gms_hdr_list * const igp = &gen->igp;
+    ASSERT_ARGS(gc_gms_clear_igp);
 
     gc_gms_clear_hdr_list(interp, igp);
 }
@@ -1018,6 +1034,7 @@ parrot_gc_gms_wb(PARROT_INTERP, ARGIN(PMC *agg), ARGIN(void *old),
 {
     Gc_gms_hdr * const nh = PObj_to_GMSH(_new);
     Gc_gms_hdr * const ah = PObj_to_GMSH(agg);
+    ASSERT_ARGS(parrot_gc_gms_wb);
 
     /* if this may be an aggregate store it in IGP list, thus making
      * it a possible root for this generation
@@ -1050,6 +1067,7 @@ parrot_gc_gms_wb_key(PARROT_INTERP, ARGIN(PMC *agg), ARGIN(void *old),
     ARGIN(void *old_key), ARGIN(void *_new), ARGIN(void *new_key))
 {
     Gc_gms_hdr *nh, *ah;
+    ASSERT_ARGS(parrot_gc_gms_wb_key);
 
     /* handle hash values */
     parrot_gc_gms_wb(interp, agg, old, _new);
@@ -1091,6 +1109,7 @@ gc_gms_merge_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
      */
     Gc_gms_gen * const gen = pool->last_gen;
     Gc_gms_gen * const prev = gen->prev;
+    ASSERT_ARGS(gc_gms_merge_gen);
 
     for (h = pool->black; h != pool->free_list; h = h->next) {
         h->gen = prev;
@@ -1120,6 +1139,7 @@ gc_gms_use_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
 {
     Gc_gms_gen *gen, *prev;
     UINTVAL next_gen;
+    ASSERT_ARGS(gc_gms_use_gen);
 
     /* set hdr pointers in last generation */
     gen        = pool->last_gen;
@@ -1154,6 +1174,7 @@ static int
 set_gen_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, ARGIN(void *arg))
 {
     Gc_gms_plan * const plan = (Gc_gms_plan *)arg;
+    ASSERT_ARGS(set_gen_cb);
 
     if (plan->merge_gen)
         gc_gms_merge_gen(interp, pool, flag, plan);
@@ -1177,6 +1198,7 @@ gc_gms_set_gen(PARROT_INTERP)
 {
     Gc_gms_plan plan;
     Gc_gms_private *gmsp;
+    ASSERT_ARGS(gc_gms_set_gen);
     /*
      * there are these basic plans
      * 1) Use the black as the next old generation
@@ -1292,6 +1314,7 @@ static void
 gc_gms_setto_gray(PARROT_INTERP, ARGIN(Gc_gms_hdr *h), int priority)
 {
     Small_Object_Pool * const pool = h->gen->pool;
+    ASSERT_ARGS(gc_gms_setto_gray);
     /*
      * TODO high_priority like in src/dod.c
      */
@@ -1354,6 +1377,7 @@ static void
 gc_gms_setto_black(PARROT_INTERP, ARGMOD(Gc_gms_hdr *h), int priority)
 {
     Small_Object_Pool * const pool = h->gen->pool;
+    ASSERT_ARGS(gc_gms_setto_black);
 
     /*
      * TODO high_priority like src/dod.c
@@ -1415,6 +1439,7 @@ parrot_gc_gms_pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
 {
     Gc_gms_hdr *h;
     int priority;
+    ASSERT_ARGS(parrot_gc_gms_pobject_lives);
 
     PObj_live_SET(obj);
     priority =  PObj_needs_early_DOD_TEST(obj);
@@ -1441,6 +1466,7 @@ RT #48260: Not yet documented!!!
 static int
 init_mark_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, ARGIN(void *arg))
 {
+    ASSERT_ARGS(init_mark_cb);
     pool->gray = pool->black = pool->black_fin = pool->white;
 #  if GC_GMS_DEBUG
     gms_debug_verify(interp, pool, "init_mark");
@@ -1462,6 +1488,7 @@ static void
 gc_gms_init_mark(PARROT_INTERP)
 {
     Arenas * const arena_base = interp->arena_base;
+    ASSERT_ARGS(gc_gms_init_mark);
 
     arena_base->dod_trace_ptr = NULL;
     arena_base->dod_mark_start = NULL;
@@ -1487,6 +1514,7 @@ trace_igp_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(void 
     Gc_gms_hdr_store *s;
     Gc_gms_gen * const gen = pool->last_gen;
     Gc_gms_hdr_list * const igp = &gen->igp;
+    ASSERT_ARGS(trace_igp_cb);
 
     for (s = igp->first; s; s = s->next) {
         const Gc_gms_hdr **p;
@@ -1512,6 +1540,7 @@ static int
 gc_gms_trace_root(PARROT_INTERP, int trace_stack)
 {
     const int ret = Parrot_dod_trace_root(interp, trace_stack);
+    ASSERT_ARGS(gc_gms_trace_root);
 
     if (ret == 0)
         return 0;
@@ -1536,6 +1565,7 @@ trace_children_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(
     const int lazy_dod = arena_base->lazy_dod;
     const UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
     Gc_gms_hdr *h;
+    ASSERT_ARGS(trace_children_cb);
 
     for (h = pool->gray; h != pool->white;) {
         PMC * const current = (PMC*)GMSH_to_PObj(h);
@@ -1596,6 +1626,7 @@ lazily.
 static int
 gc_gms_trace_children(PARROT_INTERP)
 {
+    ASSERT_ARGS(gc_gms_trace_children);
     return !Parrot_forall_header_pools(interp, POOL_PMC, 0,
             trace_children_cb);
 }
@@ -1617,6 +1648,7 @@ sweep_cb_pmc(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(void 
 {
     Gc_gms_hdr *h;
     Arenas * const arena_base = interp->arena_base;
+    ASSERT_ARGS(sweep_cb_pmc);
 
     /* TODO object stats */
 
@@ -1653,6 +1685,7 @@ static int
 sweep_cb_buf(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, SHIM(void *arg))
 {
     Gc_gms_hdr *h;
+    ASSERT_ARGS(sweep_cb_buf);
 
     /* TODO object stats */
 
@@ -1719,6 +1752,7 @@ Free unused resources, put white objects onto free_list.
 static void
 gc_gms_sweep(PARROT_INTERP)
 {
+    ASSERT_ARGS(gc_gms_sweep);
     Parrot_forall_header_pools(interp, POOL_PMC, 0, sweep_cb_pmc);
     Parrot_forall_header_pools(interp, POOL_BUFFER, 0, sweep_cb_buf);
 }
@@ -1737,6 +1771,7 @@ static int
 end_cycle_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, SHIM(void *arg))
 {
     Gc_gms_hdr *h;
+    ASSERT_ARGS(end_cycle_cb);
     /*
      * clear live flags
      * TODO just swap black and white
@@ -1762,6 +1797,7 @@ RT #48260: Not yet documented!!!
 static void
 gc_gms_end_cycle(PARROT_INTERP)
 {
+    ASSERT_ARGS(gc_gms_end_cycle);
     Parrot_forall_header_pools(interp, POOL_ALL, 0, end_cycle_cb);
 }
 
@@ -1790,6 +1826,7 @@ parrot_gc_gms_run(PARROT_INTERP, UINTVAL flags)
 {
     Arenas * const arena_base = interp->arena_base;
     Gc_gms_private *g_gms;
+    ASSERT_ARGS(parrot_gc_gms_run);
 
     if (arena_base->DOD_block_level) {
         return;
@@ -1845,6 +1882,7 @@ gms_debug_verify(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(const cha
     size_t i;
 
     const size_t n = pool->total_objects;
+    ASSERT_ARGS(gms_debug_verify);
 
     bf = gf = wf = ff = 0;
 

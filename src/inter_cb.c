@@ -81,6 +81,7 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
      */
     PMC * const interp_pmc = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
             (INTVAL) IGLOBALS_INTERPRETER);
+    ASSERT_ARGS(Parrot_make_cb);
 
     /* be sure __LINE__ is consistent */
     sc = CONST_STRING(interp, "_interpreter");
@@ -159,6 +160,7 @@ verify_CD(ARGIN(char *external_data), ARGMOD(PMC *user_data))
 {
     PARROT_INTERP = NULL;
     size_t i;
+    ASSERT_ARGS(verify_CD);
 
     /*
      * 1.) user_data is from external code so:
@@ -225,6 +227,7 @@ callback_CD(PARROT_INTERP, ARGIN(char *external_data), ARGMOD(PMC *user_data))
     int synchronous = 0;      /* cb is hitting this sub somewhen
                                * inmidst, or not */
     STRING *sc;
+    ASSERT_ARGS(callback_CD);
     /*
      * 3) check interpreter ...
      */
@@ -290,6 +293,7 @@ Parrot_run_callback(PARROT_INTERP,
     PMC     *p_param;
     void    *param = NULL;      /* avoid -Ox warning */
     STRING  *sc;
+    ASSERT_ARGS(Parrot_run_callback);
 
     sc        = CONST_STRING(interp, "_sub");
     sub       = VTABLE_getprop(interp, user_data, sc);
@@ -376,6 +380,7 @@ PARROT_EXPORT
 void
 Parrot_callback_C(ARGIN(char *external_data), ARGMOD(PMC *user_data))
 {
+    ASSERT_ARGS(Parrot_callback_C);
     verify_CD(external_data, user_data);
 }
 
@@ -383,6 +388,7 @@ PARROT_EXPORT
 void
 Parrot_callback_D(ARGMOD(PMC *user_data), ARGIN(char *external_data))
 {
+    ASSERT_ARGS(Parrot_callback_D);
     verify_CD(external_data, user_data);
 }
 

@@ -151,6 +151,7 @@ parrot_init_library_paths(PARROT_INTERP)
     PMC * const iglobals = interp->iglobals;
     /* create the lib_paths array */
     PMC * const lib_paths = pmc_new(interp, enum_class_FixedPMCArray);
+    ASSERT_ARGS(parrot_init_library_paths);
 
     VTABLE_set_integer_native(interp, lib_paths, PARROT_LIB_PATH_SIZE);
     VTABLE_set_pmc_keyed_int(interp, iglobals,
@@ -242,6 +243,7 @@ get_search_paths(PARROT_INTERP, enum_lib_paths which)
     PMC * const iglobals = interp->iglobals;
     PMC * const lib_paths = VTABLE_get_pmc_keyed_int(interp, iglobals,
             IGLOBALS_LIB_PATHS);
+    ASSERT_ARGS(get_search_paths);
     return VTABLE_get_pmc_keyed_int(interp, lib_paths, which);
 }
 
@@ -262,6 +264,7 @@ static int
 is_abs_path(ARGIN(const STRING *file))
 {
     const char * const file_name = file->strstart;
+    ASSERT_ARGS(is_abs_path);
     if (file->strlen <= 1)
         return 0;
     PARROT_ASSERT(file->encoding == Parrot_fixed_8_encoding_ptr ||
@@ -300,6 +303,7 @@ static void
 cnv_to_win32_filesep(ARGMOD(STRING *path))
 {
     char* cnv;
+    ASSERT_ARGS(cnv_to_win32_filesep);
 
     PARROT_ASSERT(path->encoding == Parrot_fixed_8_encoding_ptr ||
         path->encoding == Parrot_utf8_encoding_ptr);
@@ -336,6 +340,7 @@ path_finalize(PARROT_INTERP, ARGMOD(STRING *path))
      */
 
     STRING * const nul = string_chr(interp, '\0');
+    ASSERT_ARGS(path_finalize);
 
     path = string_append(interp, path, nul);
     path->bufused--;
@@ -366,6 +371,7 @@ static STRING*
 path_guarantee_trailing_separator(PARROT_INTERP, ARGMOD(STRING *path))
 {
     STRING * const path_separator_string = string_chr(interp, path_separator);
+    ASSERT_ARGS(path_guarantee_trailing_separator);
 
     /* make sure the path has a trailing slash before appending the file */
     if (string_index(interp, path , path->strlen - 1)
@@ -392,6 +398,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING*
 path_append(PARROT_INTERP, ARGMOD(STRING *l_path), ARGMOD(STRING *r_path))
 {
+    ASSERT_ARGS(path_append);
     l_path = path_guarantee_trailing_separator(interp, l_path);
     l_path = string_append(interp, l_path, r_path);
 
@@ -416,6 +423,7 @@ static STRING*
 path_concat(PARROT_INTERP, ARGMOD(STRING *l_path), ARGMOD(STRING *r_path))
 {
     STRING* join;
+    ASSERT_ARGS(path_concat);
 
     join = string_copy(interp, l_path);
     join = path_guarantee_trailing_separator(interp, join);
@@ -453,6 +461,7 @@ static STRING*
 try_load_path(PARROT_INTERP, ARGMOD(STRING* path))
 {
     STRING *final;
+    ASSERT_ARGS(try_load_path);
 
     final = string_copy(interp, path);
 
@@ -485,6 +494,7 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
     STRING *with_ext, *result;
 
     int guess;
+    ASSERT_ARGS(try_bytecode_extensions);
 
     /*
       First try the path without guessing the extension to ensure compatibility
@@ -540,6 +550,7 @@ Parrot_add_library_path(PARROT_INTERP,
         IGLOBALS_LIB_PATHS);
     PMC * paths = VTABLE_get_pmc_keyed_int(interp, lib_paths, which);
     STRING * const path_str = string_from_cstring(interp, path, 0);
+    ASSERT_ARGS(Parrot_add_library_path);
     VTABLE_push_string(interp, paths, path_str);
 }
 
@@ -576,6 +587,7 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, ARGMOD(STRING *file),
     STRING *full_name;
     PMC    *paths;
     INTVAL  i, n;
+    ASSERT_ARGS(Parrot_locate_runtime_file_str);
 
     /* if this is an absolute path return it as is */
     if (is_abs_path(file))
@@ -628,6 +640,7 @@ Parrot_locate_runtime_file(PARROT_INTERP, ARGIN(const char *file_name),
 {
     STRING * const file   = string_from_cstring(interp, file_name, 0);
     STRING * const result = Parrot_locate_runtime_file_str(interp, file, type);
+    ASSERT_ARGS(Parrot_locate_runtime_file);
     /*
      * XXX valgrind shows e.g.
      *     invalid read of size 8 inside a string of length 69
@@ -661,6 +674,7 @@ Parrot_get_runtime_prefix(PARROT_INTERP)
 {
     int     free_it;
     char * const env = Parrot_getenv("PARROT_RUNTIME", &free_it);
+    ASSERT_ARGS(Parrot_get_runtime_prefix);
 
     if (env)
         return free_it ? env : str_dup(env);
@@ -696,6 +710,7 @@ Parrot_get_runtime_path(PARROT_INTERP)
     int     free_it;
     char * const env = Parrot_getenv("PARROT_RUNTIME", &free_it);
     STRING *result;
+    ASSERT_ARGS(Parrot_get_runtime_path);
 
     if (env)
     {
@@ -741,6 +756,7 @@ parrot_split_path_ext(PARROT_INTERP, ARGMOD(STRING *in),
     const INTVAL len = string_length(interp, in);
     STRING *stem;
     INTVAL pos_sl, pos_dot;
+    ASSERT_ARGS(parrot_split_path_ext);
 
     pos_sl = CHARSET_RINDEX(interp, in, slash1, len);
     if (pos_sl == -1)

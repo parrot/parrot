@@ -286,6 +286,7 @@ static void
 imcc_globals_destroy(PARROT_INTERP, SHIM(int ex), SHIM(void *param))
 {
     code_segment_t *cs = IMCC_INFO(interp)->globals->cs;
+    ASSERT_ARGS(imcc_globals_destroy);
 
     while (cs) {
         subs_t         *s       = cs->subs;
@@ -325,6 +326,7 @@ add_const_table(PARROT_INTERP)
 
     /* Allocate a new constant */
     PackFile_Constant *new_constant = PackFile_Constant_new(interp);
+    ASSERT_ARGS(add_const_table);
 
     /* Update the constant count and reallocate */
     if (interp->code->const_table->constants)
@@ -356,6 +358,7 @@ static int
 add_const_table_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     int newitem = add_const_table(interp);
+    ASSERT_ARGS(add_const_table_pmc);
 
     interp->code->const_table->constants[newitem]->type  = PFC_PMC;
     interp->code->const_table->constants[newitem]->u.key = pmc;
@@ -378,6 +381,7 @@ static int
 add_const_table_key(PARROT_INTERP, ARGIN(PMC *key))
 {
     int newitem = add_const_table(interp);
+    ASSERT_ARGS(add_const_table_key);
 
     interp->code->const_table->constants[newitem]->type  = PFC_KEY;
     interp->code->const_table->constants[newitem]->u.key = key;
@@ -400,6 +404,7 @@ int
 e_pbc_open(PARROT_INTERP, SHIM(void *param))
 {
     code_segment_t *cs = mem_allocate_zeroed_typed(code_segment_t);
+    ASSERT_ARGS(e_pbc_open);
 
     if (!IMCC_INFO(interp)->globals)
         IMCC_INFO(interp)->globals = mem_allocate_zeroed_typed(imcc_globals);
@@ -467,6 +472,7 @@ old_blocks(PARROT_INTERP)
 {
     const  subs_t *s;
     size_t         size = 0;
+    ASSERT_ARGS(old_blocks);
 
     for (s = IMCC_INFO(interp)->globals->cs->subs; s; s = s->prev) {
         size += s->n_basic_blocks;
@@ -493,6 +499,7 @@ make_jit_info(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 {
     const size_t old  = old_blocks(interp);
     const size_t size = unit->n_basic_blocks + old;
+    ASSERT_ARGS(make_jit_info);
 
     if (!IMCC_INFO(interp)->globals->cs->jit_info) {
         const size_t len  =
@@ -539,6 +546,7 @@ static void
 make_new_sub(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 {
     subs_t * const s = mem_allocate_zeroed_typed(subs_t);
+    ASSERT_ARGS(make_new_sub);
 
     s->prev          = IMCC_INFO(interp)->globals->cs->subs;
     s->unit          = unit;
@@ -571,6 +579,7 @@ static int
 get_old_size(PARROT_INTERP, ARGOUT(int *ins_line))
 {
     size_t size = 0;
+    ASSERT_ARGS(get_old_size);
 
     *ins_line   = 0;
 
@@ -599,6 +608,7 @@ Sets the given size and line parameters for the current compilation unit.
 static void
 store_sub_size(PARROT_INTERP, size_t size, size_t ins_line)
 {
+    ASSERT_ARGS(store_sub_size);
     IMCC_INFO(interp)->globals->cs->subs->size     = size;
     IMCC_INFO(interp)->globals->cs->subs->ins_line = ins_line;
 }
@@ -619,6 +629,7 @@ store_fixup(PARROT_INTERP, ARGIN(const SymReg *r), int pc, int offset)
 {
     SymReg * const fixup = _mk_address(interp,
             &IMCC_INFO(interp)->globals->cs->subs->fixup, r->name, U_add_all);
+    ASSERT_ARGS(store_fixup);
 
     if (r->set == 'p')
         fixup->set = 'p';
@@ -650,6 +661,7 @@ store_key_const(PARROT_INTERP, ARGIN(const char *str), int idx)
 {
     SymReg * const c =
         _mk_const(&IMCC_INFO(interp)->globals->cs->key_consts, str, 0);
+    ASSERT_ARGS(store_key_const);
     c->color = idx;
 }
 
@@ -669,6 +681,7 @@ get_codesize(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(size_t *src_line
 {
     Instruction *ins = unit->instructions;
     size_t       code_size;
+    ASSERT_ARGS(get_codesize);
 
     /* run through instructions:
      * - sanity check
@@ -729,6 +742,7 @@ find_global_label(PARROT_INTERP, ARGIN(const char *name),
     ARGIN(const subs_t *sym), ARGOUT(int *pc))
 {
     subs_t *s;
+    ASSERT_ARGS(find_global_label);
 
     *pc = 0;
 
@@ -754,6 +768,7 @@ find_sub_by_subid(PARROT_INTERP, ARGIN(const char *lookup),
     ARGIN(const subs_t *sym), ARGOUT(int *pc))
 {
     subs_t *s;
+    ASSERT_ARGS(find_sub_by_subid);
     UNUSED(sym);
 
     *pc = 0;
@@ -785,6 +800,7 @@ fixup_globals(PARROT_INTERP)
 {
     subs_t *s;
     int     jumppc = 0;
+    ASSERT_ARGS(fixup_globals);
 
     for (s = IMCC_INFO(interp)->globals->cs->first; s; s = s->next) {
         const SymHash * const hsh = &s->fixup;
@@ -894,6 +910,7 @@ STRING *
 IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 {
     const char *buf = r->name;
+    ASSERT_ARGS(IMCC_string_from_reg);
 
     if (r->type & VT_ENCODED) {
         /*
@@ -936,6 +953,7 @@ STRING *
 IMCC_string_from__STRINGC(PARROT_INTERP, ARGIN(const char *buf))
 {
     const int ascii = (*buf == '\'' || *buf == '"');
+    ASSERT_ARGS(IMCC_string_from__STRINGC);
     if (!ascii) {
         /*
          * the lexer parses:   foo:"string"
@@ -987,6 +1005,7 @@ add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))
 {
     const int      k = add_const_table(interp);
     STRING * const s = IMCC_string_from_reg(interp, r);
+    ASSERT_ARGS(add_const_str);
 
     interp->code->const_table->constants[k]->type     = PFC_STRING;
     interp->code->const_table->constants[k]->u.string = s;
@@ -1011,6 +1030,7 @@ add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))
 {
     const int      k = add_const_table(interp);
     STRING * const s = string_from_cstring(interp, buf, 0);
+    ASSERT_ARGS(add_const_num);
 
     interp->code->const_table->constants[k]->type     = PFC_NUMBER;
     interp->code->const_table->constants[k]->u.number = string_to_num(interp, s);
@@ -1039,6 +1059,7 @@ mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
     pcc_sub_t * const    pcc_sub = r->pcc_sub;
     const INTVAL         n       = pcc_sub->nmulti;
     INTVAL               i;
+    ASSERT_ARGS(mk_multi_sig);
 
     /* a :multi sub with no arguments */
     if (!pcc_sub->multi[0])
@@ -1104,6 +1125,7 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub),
     const INTVAL        lex_info_id = Parrot_get_ctx_HLL_type(interp,
                                         enum_class_LexInfo);
     unsigned int        i;
+    ASSERT_ARGS(create_lexinfo);
 
     for (i = 0; i < hsh->size; i++) {
         SymReg *r;
@@ -1171,6 +1193,7 @@ find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
     PMC    *current;
     STRING *cur_name;
     size_t  len;
+    ASSERT_ARGS(find_outer);
 
     if (!unit->outer)
         return NULL;
@@ -1246,6 +1269,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
 
     int                  i;
     int                  ns_const = -1;
+    ASSERT_ARGS(add_const_pmc_sub);
 
     IMCC_INFO(interp)->globals->cs->subs->pmc_const = k;
 
@@ -1456,6 +1480,7 @@ add_const_key(PARROT_INTERP, ARGIN(const opcode_t *key), int size, ARGIN(const c
     const opcode_t      *rc;
     PackFile_Constant   *pfc;
     int                  k;
+    ASSERT_ARGS(add_const_key);
 
     if (r)
         return r->color;
@@ -1502,6 +1527,7 @@ PARROT_CANNOT_RETURN_NULL
 static const char *
 slice_deb(int bits)
 {
+    ASSERT_ARGS(slice_deb);
     if ((bits & VT_SLICE_BITS) == (VT_START_SLICE|VT_END_SLICE))
         return "start+end";
 
@@ -1555,6 +1581,7 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
 
     *s           = 0;
     reg          = key_reg->set == 'K' ? key_reg->nextkey : key_reg;
+    ASSERT_ARGS(build_key);
 
     for (key_length = 0; reg ; reg = reg->nextkey, key_length++) {
         SymReg *r = reg;
@@ -1666,6 +1693,7 @@ INTVAL
 IMCC_int_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 {
     INTVAL i;
+    ASSERT_ARGS(IMCC_int_from_reg);
 
     errno = 0;
 
@@ -1712,6 +1740,7 @@ make_pmc_const(PARROT_INTERP, ARGMOD(SymReg *r))
     PMC    *_class = interp->vtables[r->pmc_type]->pmc_class;
     STRING *s;
     PMC    *p;
+    ASSERT_ARGS(make_pmc_const);
 
     if (*r->name == '"')
         s = string_unescape_cstring(interp, r->name + 1, '"', NULL);
@@ -1742,6 +1771,7 @@ Adds a constant SymReg to the constant table, depending on its type.
 static void
 add_1_const(PARROT_INTERP, ARGMOD(SymReg *r))
 {
+    ASSERT_ARGS(add_1_const);
     if (r->color >= 0)
         return;
 
@@ -1800,6 +1830,7 @@ constant_folding(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 {
     const SymHash *hsh = &IMCC_INFO(interp)->ghash;
     unsigned int   i;
+    ASSERT_ARGS(constant_folding);
 
     /* go through all consts of current sub */
     for (i = 0; i < hsh->size; i++) {
@@ -1856,6 +1887,7 @@ has any instructions.
 int
 e_pbc_new_sub(PARROT_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
 {
+    ASSERT_ARGS(e_pbc_new_sub);
     if (!unit->instructions)
         return 0;
 
@@ -1880,6 +1912,7 @@ e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
 {
     Instruction *ins;
     int          pragma;
+    ASSERT_ARGS(e_pbc_end_sub);
 
     if (!unit->instructions)
         return 0;
@@ -1940,6 +1973,7 @@ verify_signature(PARROT_INTERP, ARGIN(const Instruction *ins), ARGIN(opcode_t *p
                            || ins->opnum == PARROT_OP_get_params_pc);
 
     INTVAL  i, n;
+    ASSERT_ARGS(verify_signature);
 
     PARROT_ASSERT(PObj_is_PMC_TEST(sig_arr));
     PARROT_ASSERT(sig_arr->vtable->base_type == enum_class_FixedIntegerArray);
@@ -2013,6 +2047,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
     op_info_t *op_info;
     int        ok = 0;
     int        op, i;
+    ASSERT_ARGS(e_pbc_emit);
 
 #if IMC_TRACE_HIGH
     Parrot_io_eprintf(NULL, "e_pbc_emit\n");
@@ -2241,6 +2276,7 @@ Closes this PMC unit.
 int
 e_pbc_close(PARROT_INTERP, SHIM(void *param))
 {
+    ASSERT_ARGS(e_pbc_close);
     fixup_globals(interp);
 
     return 0;
