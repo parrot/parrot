@@ -487,20 +487,11 @@ LINECOMMENT    [#].*{EOL}?
                                                                                 * sizeof (char));
                               char * fullpath;
 
-                              /* for now, create an interpreter when we need one;
-                               * XXX create the interpreter before invoking heredoc preprocessor,
-                               * so it can be passed as a parameter, and used here.
-                               */
-                          /*    Interp *interp = Parrot_new(NULL);
-
-                              if (interp == NULL)
-                                  fprintf(stderr, "No interpreter!\n");
-*/
                               strncpy(filename, yytext + 1, yyleng - 2);
 
                               /* fprintf(stderr, "locating runtime file: [%s]\n", filename); */
-                              fullpath = NULL; /*Parrot_locate_runtime_file(interp, filename,
-                                                                    PARROT_RUNTIME_FT_INCLUDE); */
+                              fullpath = Parrot_locate_runtime_file(state->interp, filename,
+                                                                    PARROT_RUNTIME_FT_INCLUDE);
 
                               if (fullpath == NULL) { /*
                                   fprintf(stderr, "Please make sure you're running pirc from "
@@ -530,7 +521,6 @@ LINECOMMENT    [#].*{EOL}?
                                   mem_sys_free(filename); /* only free one of them if they're
                                                                  same pointer */
                               mem_sys_free(fullpath);
-                          /*    Parrot_destroy(interp); */
                             }
 
 <INCLUDE>{EOL}              { /* after .include "foo.pir", go back to the state we were in */

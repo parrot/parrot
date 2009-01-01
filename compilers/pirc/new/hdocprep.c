@@ -642,7 +642,7 @@ static yyconst flex_int32_t yy_rule_can_match_eol[21] =
 static yyconst flex_int16_t yy_rule_linenum[20] =
     {   0,
       285,  287,  290,  294,  301,  304,  321,  333,  355,  374,
-      426,  445,  447,  477,  481,  483,  536,  540,  542
+      426,  445,  447,  477,  481,  483,  526,  530,  532
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -1566,20 +1566,11 @@ YY_RULE_SETUP
                                                                                 * sizeof (char));
                               char * fullpath;
 
-                              /* for now, create an interpreter when we need one;
-                               * XXX create the interpreter before invoking heredoc preprocessor,
-                               * so it can be passed as a parameter, and used here.
-                               */
-                          /*    Interp *interp = Parrot_new(NULL);
-
-                              if (interp == NULL)
-                                  fprintf(stderr, "No interpreter!\n");
-*/
                               strncpy(filename, yytext + 1, yyleng - 2);
 
                               /* fprintf(stderr, "locating runtime file: [%s]\n", filename); */
-                              fullpath = NULL; /*Parrot_locate_runtime_file(interp, filename,
-                                                                    PARROT_RUNTIME_FT_INCLUDE); */
+                              fullpath = Parrot_locate_runtime_file(state->interp, filename,
+                                                                    PARROT_RUNTIME_FT_INCLUDE);
 
                               if (fullpath == NULL) { /*
                                   fprintf(stderr, "Please make sure you're running pirc from "
@@ -1609,33 +1600,32 @@ YY_RULE_SETUP
                                   mem_sys_free(filename); /* only free one of them if they're
                                                                  same pointer */
                               mem_sys_free(fullpath);
-                          /*    Parrot_destroy(interp); */
                             }
     YY_BREAK
 case 17:
 /* rule 17 can match eol */
 YY_RULE_SETUP
-#line 536 "hdocprep.l"
+#line 526 "hdocprep.l"
 { /* after .include "foo.pir", go back to the state we were in */
                               yy_pop_state(yyscanner);
                             }
     YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 540 "hdocprep.l"
+#line 530 "hdocprep.l"
 { lex_error(yyscanner, "wrong scanner state\n"); }
     YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 542 "hdocprep.l"
+#line 532 "hdocprep.l"
 { fprintf(yyget_extra(yyscanner)->outfile, "%s", yytext); }
     YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 544 "hdocprep.l"
+#line 534 "hdocprep.l"
 ECHO;
     YY_BREAK
-#line 1639 "hdocprep.c"
+#line 1629 "hdocprep.c"
 case YY_STATE_EOF(INCLUDE):
 case YY_STATE_EOF(SAVE_REST_OF_LINE):
 case YY_STATE_EOF(SAVE_REST_AGAIN):
@@ -2888,7 +2878,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 /* %ok-for-header */
 
-#line 544 "hdocprep.l"
+#line 534 "hdocprep.l"
 
 
 
