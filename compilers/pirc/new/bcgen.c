@@ -602,7 +602,7 @@ The index where the PMC is stored in the constant table is returned.
 
 */
 int
-add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex) {
+add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subpragmas) {
     PMC                   * sub_pmc;
     Parrot_sub            * sub;
     int                     subconst_index;
@@ -637,6 +637,11 @@ add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex) {
     sub->vtable_index     = info->vtable_index;
 
     sub->multi_signature  = generate_multi_signature(bc, info->multi_types, info->num_multi_types);
+
+    /* copy sub pragma flags such as :immediate etc. */
+    PObj_get_FLAGS(sub_pmc)     |= subpragmas & SUB_FLAG_PF_MASK;
+    Sub_comp_get_FLAGS(sub_pmc) |= subpragmas & SUB_COMP_FLAG_MASK;
+
 
     /* store register usage of this sub. */
     for (i = 0; i < 4; ++i)

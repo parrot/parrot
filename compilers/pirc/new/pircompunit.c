@@ -2219,8 +2219,8 @@ If register optimization was requested, this is invoked here.
 */
 void
 close_sub(lexer_state * const lexer) {
-    int need_epilogue = 1;
-    int sub_const_table_index;
+    int           need_epilogue = 1;
+    int           sub_const_table_index;
     global_label *glob;
 
     /* don't generate the sub epilogue if the last instruction was already
@@ -2258,7 +2258,10 @@ close_sub(lexer_state * const lexer) {
 
     /* store the subroutine in the bytecode constant table. */
     sub_const_table_index = add_sub_pmc(lexer->bc, &CURRENT_SUB(lexer)->info,
-                                        TEST_FLAG(CURRENT_SUB(lexer)->flags, PIRC_SUB_FLAG_LEX));
+                                    TEST_FLAG(CURRENT_SUB(lexer)->flags, PIRC_SUB_FLAG_LEX),
+                                    CURRENT_SUB(lexer)->flags);
+
+
 
     /* store the sub PMC index in the constant table with the global label,
      * so that invoking ops can find this index.

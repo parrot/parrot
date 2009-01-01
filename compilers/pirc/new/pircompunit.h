@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2007-2008, The Perl Foundation.
+ * Copyright (C) 2007-2009, The Perl Foundation.
  */
 
 /*
@@ -72,21 +72,21 @@ typedef enum arg_flags {
 
 /* sub flags */
 typedef enum sub_flags {
-    PIRC_SUB_FLAG_METHOD     = 1 << 0,  /* the sub is a method */
-    PIRC_SUB_FLAG_INIT       = 1 << 1,  /* the sub is run before :main when starting up */
-    PIRC_SUB_FLAG_LOAD       = 1 << 2,  /* the sub is run when the bytecode is loaded */
-    PIRC_SUB_FLAG_HAS_OUTER  = 1 << 3,  /* the sub is lexically nested */
-    PIRC_SUB_FLAG_IS_OUTER   = 1 << 4,  /* the sub contains lexically nested subs. */
-    PIRC_SUB_FLAG_MAIN       = 1 << 5,  /* execution of the program will start at this sub */
-    PIRC_SUB_FLAG_ANON       = 1 << 6,  /* this sub is shy and will not be stored in the global
-                                           namespace */
-    PIRC_SUB_FLAG_POSTCOMP   = 1 << 7,  /* this sub will be executed after compilation */
-    PIRC_SUB_FLAG_IMMEDIATE  = 1 << 8,  /* similar to POSTCOMP above; check PDD19 for difference */
-    PIRC_SUB_FLAG_VTABLE     = 1 << 9,  /* this sub overrides a vtable method */
-    PIRC_SUB_FLAG_LEX        = 1 << 10, /* this sub needs a LexPad */
-    PIRC_SUB_FLAG_MULTI      = 1 << 11, /* this sub is a multi method/sub */
-    PIRC_SUB_FLAG_SUBID      = 1 << 12, /* this sub has a namespace-unaware identifier */
-    PIRC_SUB_FLAG_INSTANCEOF = 1 << 13  /* this sub has an :instanceof flag. XXX document this */
+    PIRC_SUB_FLAG_INIT       = SUB_COMP_FLAG_PF_INIT,  /*  run before :main when starting up */
+    PIRC_SUB_FLAG_LOAD       = SUB_FLAG_PF_LOAD,  /* run when the bytecode is loaded */
+    PIRC_SUB_FLAG_MAIN       = SUB_FLAG_PF_MAIN,  /* start at this sub */
+    PIRC_SUB_FLAG_ANON       = SUB_FLAG_PF_ANON,  /* sub is not stored in the global namespace */
+    PIRC_SUB_FLAG_POSTCOMP   = SUB_FLAG_PF_POSTCOMP,  /* executed after compilation */
+    PIRC_SUB_FLAG_IMMEDIATE  = SUB_FLAG_PF_IMMEDIATE,  /* similar to POSTCOMP above; check PDD19 */
+
+    PIRC_SUB_FLAG_METHOD     = 1 << 10,  /* the sub is a method */
+    PIRC_SUB_FLAG_HAS_OUTER  = 1 << 11,  /* the sub is lexically nested */
+    PIRC_SUB_FLAG_IS_OUTER   = 1 << 12,  /* the sub contains lexically nested subs. */
+    PIRC_SUB_FLAG_VTABLE     = 1 << 13,  /* this sub overrides a vtable method */
+    PIRC_SUB_FLAG_LEX        = 1 << 14, /* this sub needs a LexPad */
+    PIRC_SUB_FLAG_MULTI      = 1 << 15, /* this sub is a multi method/sub */
+    PIRC_SUB_FLAG_SUBID      = 1 << 16, /* this sub has a namespace-unaware identifier */
+    PIRC_SUB_FLAG_INSTANCEOF = 1 << 17  /* this sub has an :instanceof flag. XXX document this */
 
 } sub_flag;
 

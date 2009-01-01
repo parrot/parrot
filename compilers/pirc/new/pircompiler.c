@@ -183,7 +183,7 @@ new_lexer(PARROT_INTERP, NULLOK(char * const filename), int flags) {
     /* create a hashtable for storing .const declarations */
     init_hashtable(lexer, &lexer->constants, HASHTABLE_SIZE_INIT);
 
-    /* create a new symbol table for macros XXX why not a hashtable? XXX */
+    /* create a new symbol table for macros. */
     lexer->macros     = new_macro_table(NULL);
     lexer->macro_size = INIT_MACRO_SIZE;
 
