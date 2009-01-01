@@ -1,4 +1,4 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
 =begin comments
@@ -28,8 +28,8 @@ method TOP($/, $key) {
                          :hll('pipp')
                      );
 
+
         # set up scope 'package' for the superglobals
-        # TODO: use a loop
         $block.symbol_defaults( :scope('lexical') );
         for ( '$_GET', '$_POST', '$_SERVER', '$_GLOBALS',
               '$_FILES', '$_COOKIE', '$_SESSION', '$_REQUEST', '$_ENV' ) {
@@ -210,11 +210,16 @@ method method_call($/) {
 }
 
 method constructor_call($/) {
+    my $class_name := ~$<CLASS_NAME>;
+
     make
         PAST::Op.new(
-            # :inline( "$S1 = 'member'\n$P2 = new 'PhpString'\n$P2 = 'workaround in actions.pm:215'\n%r = new %0\nsetattribute %r, $S1, $P2" ),
-            :inline( "%r = new %0" ),                                                   
-            ~$<CLASS_NAME>
+            :inline('    %r = new %0',
+                    "    \$P0 = get_global ['" ~ $class_name ~ "'], '__construct'",
+                    '    if null $P0 goto no_constructor',
+                    '    $P0(%r)',
+                    '  no_constructor:'),                                                   
+            $class_name
         );
 }
 
@@ -229,7 +234,7 @@ method constant($/) {
         );
 }
 
-# TODO: merged with rule 'constant'
+# TODO: merge with rule 'constant'
 method class_constant($/) {
     make
         PAST::Op.new(
