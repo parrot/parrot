@@ -112,11 +112,22 @@ static void chop_newline(ARGMOD(char * buf))
 static void close_script_file(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+static unsigned short condition_regtype(ARGIN(const char *cmd))
+        __attribute__nonnull__(1);
+
+PARROT_CAN_RETURN_NULL
+static PDB_breakpoint_t * current_breakpoint(ARGIN(PDB_t * pdb))
+        __attribute__nonnull__(1);
+
 static void debugger_cmdline(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static void dump_string(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         __attribute__nonnull__(1);
+
+static int GDB_B(PARROT_INTERP, ARGIN(const char *s))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -175,8 +186,12 @@ static const char * skip_command(ARGIN(const char *str))
 
 #define ASSERT_ARGS_chop_newline assert(buf);
 #define ASSERT_ARGS_close_script_file assert(interp);
+#define ASSERT_ARGS_condition_regtype assert(cmd);
+#define ASSERT_ARGS_current_breakpoint assert(pdb);
 #define ASSERT_ARGS_debugger_cmdline assert(interp);
 #define ASSERT_ARGS_dump_string assert(interp);
+#define ASSERT_ARGS_GDB_B assert(interp); \
+                          assert(s);
 #define ASSERT_ARGS_GDB_P assert(interp); \
                           assert(s);
 #define ASSERT_ARGS_GDB_print_reg assert(interp);
@@ -1366,7 +1381,8 @@ PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     TRACEDEB_MSG("PDB_trace finished");
 }
 
-static unsigned short condition_regtype(ARGIN(const char *cmd)) /* HEADERIZER SKIP */
+static unsigned short
+condition_regtype(ARGIN(const char *cmd))
 {
     switch (*cmd) {
         case 'i':
@@ -2110,7 +2126,9 @@ or NULL if there is none.
 
 */
 
-static PDB_breakpoint_t * current_breakpoint(ARGIN(PDB_t * pdb)) /* HEADERIZER SKIP */
+PARROT_CAN_RETURN_NULL
+static PDB_breakpoint_t *
+current_breakpoint(ARGIN(PDB_t * pdb))
 {
     PDB_breakpoint_t *breakpoint = pdb->breakpoint;
     while (breakpoint) {
@@ -3427,7 +3445,8 @@ Returns break-point count, or -1 if point is out of bounds.
 */
 
 static int
-GDB_B(PARROT_INTERP, ARGIN(const char *s)) {
+GDB_B(PARROT_INTERP, ARGIN(const char *s))
+{
     if ((unsigned long)s < 0x10000) {
         /* HACK alarm pb 45 is passed as the integer not a string */
         /* RT #46145 check if in bounds */
