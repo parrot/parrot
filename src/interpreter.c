@@ -604,7 +604,6 @@ C<op_info_table>
 void
 exec_init_prederef(PARROT_INTERP, void *prederef_arena)
 {
-    ASSERT_ARGS(exec_init_prederef);
     load_prederef(interp, PARROT_CGP_CORE);
 
     if (!interp->code->prederef.code) {
@@ -638,7 +637,6 @@ init_jit(PARROT_INTERP, SHIM(opcode_t *pc))
     UINTVAL            code_size;          /* in opcodes */
     opcode_t          *code_end;
     Parrot_jit_info_t *jit_info;
-    ASSERT_ARGS(init_jit);
 
     if (interp->code->jit_info)
         return ((Parrot_jit_info_t *)interp->code->jit_info)->arena.start;
