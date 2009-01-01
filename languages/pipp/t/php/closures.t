@@ -153,6 +153,32 @@ CODE
  1c
 OUT
 
+=for perl6
+
+sub gen_indentor ( $indention ) {
+
+    my $indentor = sub ($line) {
+        print $indention ~ $line ~ "\n";
+    };
+
+    return $indentor;
+}
+
+my $sub_1 = gen_indentor(' ');
+my $sub_2 = gen_indentor('  ');
+my $sub_3 = gen_indentor('   ');
+
+$sub_1('1a');
+$sub_1('1b');
+$sub_1('1c');
+$sub_2('2a');
+$sub_2('2b');
+$sub_2('2c');
+$sub_3('3a');
+$sub_3('3b');
+$sub_3('3c');
+
+=cut
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'closure with a passed bound var', todo => 'broken' );
 <?php
