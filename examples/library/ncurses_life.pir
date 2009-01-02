@@ -106,8 +106,8 @@ Run faster.
     x_offs        = 0
     y_offs        = 0
 
-    ENDWIN   = global "ncurses::endwin"
-    CURS_SET = global "ncurses::curs_set"
+    ENDWIN   = get_global "ncurses::endwin"
+    CURS_SET = get_global "ncurses::curs_set"
     size     = 15 * sizef
 
     .local string err
@@ -116,21 +116,21 @@ Run faster.
     $I0 = argv
     if $I0 <= 1 goto def_world
 
-    (S15, err) = _load_file(argv, size)
+    ($S15, err) = _load_file(argv, size)
     length $I0, err
 
     if $I0, print_err
     goto start_curses
 
 def_world:
-    S15 = _def_world(sizef, size, COLLIDE)
+    $S15 = _def_world(sizef, size, COLLIDE)
 
 start_curses:
     STDSCR    = _init_curses()
     GEN_COUNT = 0
 
 loop:
-    _dump(S15, SUPRESS_PRINT, x_offs, y_offs, size, GEN_COUNT, STDSCR, delay)
+    _dump($S15, SUPRESS_PRINT, x_offs, y_offs, size, GEN_COUNT, STDSCR, delay)
 
     if GEN_COUNT >= MAX_GEN goto getout
     (stop, x_offs, y_offs, delay) = _check_key(stop, x_offs, y_offs, delay)
@@ -145,12 +145,12 @@ not_one:
 
 gen_one:
     inc GEN_COUNT
-    I31 = GEN_COUNT % 100
-    if I31 goto skip
+    $I31 = GEN_COUNT % 100
+    if $I31 goto skip
     printerr "."
 
 skip:
-    (S15, stop) = _generate(S15, size, stop)
+    ($S15, stop) = _generate($S15, size, stop)
 
 no_gen:
     branch loop
@@ -172,34 +172,34 @@ getout:
     print GPS
     say " generations/sec"
 
-    interpinfo I1, 1
+    interpinfo $I1, 1
     print "A total of "
-    print I1
+    print $I1
     say " bytes were allocated"
 
-    interpinfo I1, 2
+    interpinfo $I1, 2
     print "A total of "
-    print I1
+    print $I1
     say " DOD runs were made"
 
-    interpinfo I1, 3
+    interpinfo $I1, 3
     print "A total of "
-    print I1
+    print $I1
     say " collection runs were made"
 
-    interpinfo I1, 10
+    interpinfo $I1, 10
     print "Copying a total of "
-    print I1
+    print $I1
     say " bytes"
 
-    interpinfo I1, 5
+    interpinfo $I1, 5
     print "There are "
-    print I1
+    print $I1
     say " active Buffer structs"
 
-    interpinfo I1, 7
+    interpinfo $I1, 7
     print "There are "
-    print I1
+    print $I1
     say " total Buffer structs"
 
     end
@@ -230,10 +230,10 @@ print_err:
     .local pmc MVWADDCH
     .local pmc WREFRESH
 
-    WCLEAR     = global "ncurses::wclear"
-    MVWADDSTR  = global "ncurses::mvwaddstr"
-    MVWADDCH   = global "ncurses::mvwaddch"
-    WREFRESH   = global "ncurses::wrefresh"
+    WCLEAR     = get_global "ncurses::wclear"
+    MVWADDSTR  = get_global "ncurses::mvwaddstr"
+    MVWADDCH   = get_global "ncurses::mvwaddch"
+    WREFRESH   = get_global "ncurses::wrefresh"
 
     WCLEAR(STDSCR)
     MVWADDSTR(STDSCR, 0, 0, "Generation: ")
@@ -255,7 +255,7 @@ print_err:
     .local int cols
     .local int rows
     .local pmc ENV
-    ENV  = new Env
+    ENV  = new "Env"
 
     $S0  = ENV["COLUMNS"]
     cols = $S0
@@ -328,14 +328,14 @@ dumpend:
     .local pmc KEYPAD
     .local pmc STDSCR
 
-    INITSCR     = global "ncurses::initscr"
-    START_COLOR = global "ncurses::start_color"
-    INIT_PAIR   = global "ncurses::init_pair"
-    COLOR_PAIR  = global "ncurses::COLOR_PAIR"
-    WATTRON     = global "ncurses::wattron"
-    CURS_SET    = global "ncurses::curs_set"
-    NODELAY     = global "ncurses::nodelay"
-    KEYPAD      = global "ncurses::keypad"
+    INITSCR     = get_global "ncurses::initscr"
+    START_COLOR = get_global "ncurses::start_color"
+    INIT_PAIR   = get_global "ncurses::init_pair"
+    COLOR_PAIR  = get_global "ncurses::COLOR_PAIR"
+    WATTRON     = get_global "ncurses::wattron"
+    CURS_SET    = get_global "ncurses::curs_set"
+    NODELAY     = get_global "ncurses::nodelay"
+    KEYPAD      = get_global "ncurses::keypad"
 
     STDSCR = INITSCR()
 
@@ -497,72 +497,72 @@ dif:
     .param int sizef
     .param int size
     .param int COLLIDE
-    set S17,  "               "
+    set $S17,  "               "
     $I0 = sizef - 1
     unless $I0 goto nosize
-    S16 = ""
-    repeat S16, S17, $I0
+    $S16 = ""
+    repeat $S16, $S17, $I0
 
 nosize:
-    set S0,  "               "
-    set S1,  "               "
-    set S2,  "               "
-    set S3,  "               "
-    set S4,  "  **           "
-    set S5,  "*    *         "
-    set S6,  "      *        "
-    set S7,  "*     *        "
-    set S8,  " ******        "
-    set S9,  "               "
-    set S10, "               "
-    set S11, "               "
+    set $S0,  "               "
+    set $S1,  "               "
+    set $S2,  "               "
+    set $S3,  "               "
+    set $S4,  "  **           "
+    set $S5,  "*    *         "
+    set $S6,  "      *        "
+    set $S7,  "*     *        "
+    set $S8,  " ******        "
+    set $S9,  "               "
+    set $S10, "               "
+    set $S11, "               "
     if COLLIDE goto col
 
-    set S12, "               "
-    set S13, "               "
-    set S14, "               "
+    set $S12, "               "
+    set $S13, "               "
+    set $S14, "               "
     goto nocol
 
 col:
-    set S12, "             * "
-    set S13, "              *"
-    set S14, "            ***"
+    set $S12, "             * "
+    set $S13, "              *"
+    set $S14, "            ***"
 
 nocol:
     .local string world
-    world = S0
-    concat world, S16
-    concat world, S1
-    concat world, S16
-    concat world, S2
-    concat world, S16
-    concat world, S3
-    concat world, S16
-    concat world, S4
-    concat world, S16
-    concat world, S5
-    concat world, S16
-    concat world, S6
-    concat world, S16
-    concat world, S7
-    concat world, S16
-    concat world, S8
-    concat world, S16
-    concat world, S9
-    concat world, S16
-    concat world, S10
-    concat world, S16
-    concat world, S11
-    concat world, S16
-    concat world, S12
-    concat world, S16
-    concat world, S13
-    concat world, S16
-    concat world, S14
-    concat world, S16
+    world = $S0
+    concat world, $S16
+    concat world, $S1
+    concat world, $S16
+    concat world, $S2
+    concat world, $S16
+    concat world, $S3
+    concat world, $S16
+    concat world, $S4
+    concat world, $S16
+    concat world, $S5
+    concat world, $S16
+    concat world, $S6
+    concat world, $S16
+    concat world, $S7
+    concat world, $S16
+    concat world, $S8
+    concat world, $S16
+    concat world, $S9
+    concat world, $S16
+    concat world, $S10
+    concat world, $S16
+    concat world, $S11
+    concat world, $S16
+    concat world, $S12
+    concat world, $S16
+    concat world, $S13
+    concat world, $S16
+    concat world, $S14
+    concat world, $S16
     $I1 = size * $I0
-    repeat S16, S17, $I1
-    concat world, S16
+    repeat $S16, $S17, $I1
+    concat world, $S16
     .return(world)
 .end
 
@@ -606,7 +606,7 @@ loop:
     readline line, io
     length len, line
     unless len goto out
-    $S0 = line[0]
+    $S0 = substr line, 0,1
     eq $S0, "#", check_format
     chopn line, 1        # \n
     dec len
@@ -632,7 +632,7 @@ do_rel:
     s = 0
 get_d:
     if s >= len goto space
-    $S0 = line[s]
+    $S0 = substr line, s, 1
     ord $I0, $S0
     if $I0 == 32   goto space
     if $I0 == 9    goto space
@@ -679,7 +679,7 @@ not_rel:
     goto out
 
 check_format:
-    $S0 = line[1]
+    $S0 = substr line, 1, 1
     if $S0 == "C" goto loop    # comment
     if $S0 == "#" goto loop    # comment
     if $S0 == "N" goto loop    # name of pattern
@@ -776,7 +776,8 @@ lp2:
     c = x + c
 
     # TODO abs/rel and bounds checking
-    world[c] = "*"
+    #world[c] = "*"
+    substr world, c, 1, "*"
     if s < len goto lp2
 done:
 nok:
@@ -791,7 +792,7 @@ nok:
 
     .local int key
     .local pmc GETCH
-    GETCH = global "ncurses::getch"
+    GETCH = get_global "ncurses::getch"
     key   = GETCH()
 
     if key == KEY_LEFT  goto is_4
