@@ -60,6 +60,7 @@ my @steps = qw(
     auto::gettext
     auto::snprintf
     auto::perldoc
+    auto::pod2man
     auto::ctags
     auto::revision
     auto::icu
