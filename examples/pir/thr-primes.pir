@@ -161,8 +161,6 @@ ewhile:
 no_kid2:
 #       34 }
     # sleep 1   # turn on for watching memory usage
-   .begin_return
-   .end_return
 .end
 
 # Local Variables:
