@@ -783,8 +783,9 @@ If the C string argument end with a newline, delete it.
 static void
 chop_newline(ARGMOD(char * buf))
 {
+    size_t l;
     ASSERT_ARGS(chop_newline);
-    const size_t l = strlen(buf);
+    l = strlen(buf);
     if (l > 0 && buf [l - 1] == '\n')
         buf [l - 1] = '\0';
 }
