@@ -20,7 +20,7 @@ This is heavily based on Rakudo's Object.pir
 .sub '' :anon :init :load
     load_bytecode 'PCT.pbc'
 
-    # set up PippObject with P6 features 
+    # set up PippObject with P6 features
     $P0 = get_root_global ['parrot'], 'P6metaclass'
     $P0.'new_class'('PippObject', 'name' => 'Object')
 
