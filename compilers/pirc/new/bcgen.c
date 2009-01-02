@@ -42,7 +42,7 @@ accessor functions.
   bytecode *bc = new_bytecode(interp, "foo.pir", codesize, bytes);
 
   // add a subroutine PMC
-  add_sub_pmc(bc, sub->info, sub->needlex);
+  add_sub_pmc(bc, mysub->info, sub->needlex, mysub->pragmas);
 
   while ( ... ) {
 
@@ -458,7 +458,7 @@ the same anyway?
 void
 emit_int_arg(bytecode * const bc, int intval) {
     *bc->opcursor++ = intval;
-    fprintf(stderr, "[%d]", intval);
+    fprintf(stderr, "{%d}", intval);
 
 }
 
@@ -612,11 +612,11 @@ create_lexinfo(bytecode * const bc, PMC * sub, lexical * const lexicals, int lex
         STRING *lexname = string_from_cstring(bc->interp, lexiter->name, strlen(lexiter->name));
 
         /* declare the .lex as such */
-/*
+        /*
         fprintf(stderr, "Create lexinfo: color of .lex '%s' is: %d\n", lexiter->name,
                 lexiter->info->color);
+        */
 
-*/
         Parrot_PCCINVOKE(bc->interp, lex_info, method, "SI->", lexname, lexiter->color);
 
         lexiter = lexiter->next;
@@ -693,7 +693,10 @@ is passed in C<ns>.
 */
 static PMC *
 get_namespace_pmc(bytecode * const bc, multi_type * const ns) {
-    PMC *namespace_pmc = NULL;
+    PMC *namespace_pmc;
+
+    if (ns == NULL)
+        return NULL;
 
     switch (ns->entry_type) {
         case MULTI_TYPE_IDENT:
@@ -701,6 +704,9 @@ get_namespace_pmc(bytecode * const bc, multi_type * const ns) {
             PMC_str_val(namespace_pmc) = add_string_const_from_cstring(bc, ns->entry.ident);
             break;
         case MULTI_TYPE_KEYED:
+            namespace_pmc = NULL;
+            /* XXX implement this */
+
             break;
         default:
             fprintf(stderr, "unknown key type"); /* XXX exception? */
@@ -708,21 +714,7 @@ get_namespace_pmc(bytecode * const bc, multi_type * const ns) {
     }
     return namespace_pmc;
 }
-/*
-    if (ns_const >= 0 && ns_const < ct->const_count) {
-        switch (ct->constants[ns_const]->type) {
-            case PFC_KEY:
-                ns_pmc = ct->constants[ns_const]->u.key;
-                break;
-            case PFC_STRING:
-                ns_pmc = constant_pmc_new(interp, enum_class_String);
-                PMC_str_val(ns_pmc) = ct->constants[ns_const]->u.string;
-                break;
-            default:
-                break;
-        }
-    }
-    */
+
 
 /*
 
