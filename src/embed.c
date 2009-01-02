@@ -836,6 +836,7 @@ set_current_sub(PARROT_INTERP)
 {
     opcode_t i;
     PMC *sub_pmc;
+    ASSERT_ARGS(set_current_sub);
 
     PackFile_ByteCode   * const cur_cs = interp->code;
     PackFile_FixupTable * const ft     = cur_cs->fixups;
