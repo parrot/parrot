@@ -680,6 +680,55 @@ get_namespace_pmc(bytecode * const bc, multi_type * const ns) {
     return NULL;
 }
 
+/*
+
+=item C<static PMC *
+create_sub_pmc(bytecode * const bc, char const * const instanceof)>
+
+Create a Sub PMC. If C<instanceof> is not NULL, it indicates the name
+of a class to be used. If it's NULL, and C<iscoroutine> is true, a Coroutine
+sub PMC is created; otherwise it's a normal Sub. If there was a .HLL_map
+directive that maps either Coroutine or Sub to some user-defined class,
+then that mapped class is created.
+
+=cut
+
+*/
+static PMC *
+create_sub_pmc(bytecode * const bc, int iscoroutine, char const * const instanceof) {
+    INTVAL type;
+
+    /* Do we have to create an instance of a specific type for this sub? */
+    if (instanceof) {
+        /* Look it up as a class and as a PMC type. */
+        STRING * const classname
+                 = string_from_cstring(bc->interp, instanceof + 1, strlen(instanceof) - 2);
+
+        PMC * const classobj = Parrot_oo_get_class_str(bc->interp, classname);
+
+        if (!PMC_IS_NULL(classobj))
+            return VTABLE_instantiate(bc->interp, classobj, PMCNULL);
+        else {
+            const INTVAL type = pmc_type(bc->interp, classname);
+
+            if (type <= 0)
+                Parrot_ex_throw_from_c_args(bc->interp, NULL, EXCEPTION_NO_CLASS,
+                    "Requested sub class '%Ss' in :instanceof() not found", classname);
+
+            return pmc_new(bc->interp, type);
+        }
+
+    }
+
+    type = iscoroutine ? enum_class_Coroutine : enum_class_Sub;
+
+    /* use a possible type mapping for the Sub PMCs, and create it */
+    type = Parrot_get_ctx_HLL_type(bc->interp, type);
+
+    /* TODO create constant - see also src/packfile.c */
+    return pmc_new(bc->interp, type);
+}
+
 
 /*
 
@@ -702,36 +751,7 @@ add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subprag
     PackFile_Constant     *subname_const;
     INTVAL                 type;
 
-    type = info->iscoroutine ? enum_class_Coroutine : enum_class_Sub;
-
-    /* Do we have to create an instance of a specific type for this sub? */
-    if (info->instanceof) {
-        /* Look it up as a class and as a PMC type. */
-        STRING * const classname
-            = string_from_cstring(bc->interp, info->instanceof + 1, strlen(info->instanceof) - 2);
-
-        PMC * const classobj = Parrot_oo_get_class_str(bc->interp, classname);
-
-        if (!PMC_IS_NULL(classobj))
-            sub_pmc = VTABLE_instantiate(bc->interp, classobj, PMCNULL);
-        else {
-            const INTVAL type = pmc_type(bc->interp, classname);
-
-            if (type <= 0)
-                Parrot_ex_throw_from_c_args(bc->interp, NULL, EXCEPTION_NO_CLASS,
-                    "Requested sub class '%Ss' in :instanceof() not found", classname);
-
-            sub_pmc = pmc_new(bc->interp, type);
-        }
-    }
-    else {
-        /* use a possible type mapping for the Sub PMCs, and create it */
-        type = Parrot_get_ctx_HLL_type(bc->interp, type);
-
-        /* TODO create constant - see also src/packfile.c */
-        sub_pmc = pmc_new(bc->interp, type);
-    }
-
+    sub_pmc               = create_sub_pmc(bc, info->iscoroutine, info->instanceof);
     sub                   = PMC_sub(sub_pmc);
     subname_index         = add_string_const(bc, info->subname);
     subname_const         = bc->interp->code->const_table->constants[subname_index];
@@ -754,8 +774,6 @@ add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subprag
     sub->vtable_index     = info->vtable_index;
 
     sub->multi_signature  = generate_multi_signature(bc, info->multi_types, info->num_multi_types);
-
-
 
     /* copy sub pragma flags such as :immediate etc. */
     PObj_get_FLAGS(sub_pmc)     |= subpragmas & SUB_FLAG_PF_MASK;
