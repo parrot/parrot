@@ -507,6 +507,28 @@ of names separated by spaces.
 .end
 
 
+=item get_proto(name)
+
+Retrieve the protoobject for C<name>.  Return null if no
+protoobject exists, or whatever is present isn't a protoobject.
+
+=cut
+
+.sub 'get_proto' :method
+    .param string name
+    .local pmc ns, proto
+    ns = split '::', name
+    $S0 = pop ns
+    proto = get_hll_global ns, $S0
+    if null proto goto done
+    $I0 = isa proto, ['P6protoobject']
+    if $I0 goto done
+    null proto
+  done:
+    .return (proto)
+.end
+
+
 =item get_parrotclass(x)
 
 Multimethod helper to return the parrotclass for C<x>.
