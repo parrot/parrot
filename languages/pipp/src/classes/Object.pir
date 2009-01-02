@@ -74,6 +74,17 @@ Return the invocant's auto-vivification closure.
     .return ($P1)
 .end
 
+=item __construct
+
+A default constructor. Used for checking that there are no args.
+TODO: Should be a method.
+
+=cut
+
+.sub '__construct' # :method
+    .return ()
+.end
+
 =back
 
 =head2 Private methods

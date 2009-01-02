@@ -236,21 +236,17 @@ method constructor_call($/) {
         PAST::Stmts.new(
             PAST::Var.new( :name('obj'),  :scope('register'), :isdecl(1) ),
             PAST::Var.new( :name('cons'), :scope('register'), :isdecl(1) ),
-            PAST::Op.new(                    # check whether there is a constructor
+            # use default constructor when there is no explicit constructor
+            PAST::Op.new(
                 :pasttype('if'), 
                 PAST::Op.new(
                     :pirop('isnull'),
-                    PAST::Op.new(
-                        :inline("%r = get_global ['" ~ $class_name ~ "'], '__construct'", 'cons = %r')  # condition
-                    )
+                    PAST::Op.new( :inline("%r = get_global ['" ~ $class_name ~ "'], '__construct'") )  # condition
                 ),
-                PAST::Op.new(                                 # no constructor call needed
-                    :inline('%r = new %0',
-                            'obj = %r'),
-                    $class_name
-                ),
-                $cons_call                                    # call the constructor
+                PAST::Op.new( :inline("cons = get_global ['PippObject'], '__construct'") ),
+                PAST::Op.new( :inline("cons = get_global ['" ~ $class_name ~ "'], '__construct'") )
             ),
+            $cons_call,                                       # call the constructor
             PAST::Var.new( :name('obj'), :scope('register') ) # return the created object
         );
 }
