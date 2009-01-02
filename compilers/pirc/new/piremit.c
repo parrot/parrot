@@ -642,13 +642,28 @@ emit_pbc_target_arg(lexer_state * const lexer, target * const t) {
     emit_int_arg(lexer->bc, t->info->color);
 
     if (t->key) {
-
+        expression *key = t->key->head;
         /* XXX should do emit_pbc_key... always? */
-        /*emit_pbc_key(lexer, t->key);
-        */
-        /* this works for integers: */
-        emit_pbc_expr(lexer, t->key->head->expr);
+        emit_pbc_key(lexer, t->key);
 
+        /* this works for integers: */
+        /*
+        emit_pbc_expr(lexer, key->expr);
+        */
+        /*
+        switch (key->type) {
+            case EXPR_CONSTANT:
+              if (key->expr.c->type == INT_TYPE) {
+
+              }
+              else if (key->expr.c->type == STRING_TYPE) {
+
+              }
+              break;
+            default:
+              break;
+
+        */
     }
 }
 

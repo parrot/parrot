@@ -1863,6 +1863,17 @@ expr_from_key(NOTNULL(lexer_state * const lexer), NOTNULL(key * const k)) {
 }
 
 
+/*
+
+=item C<static key_entry *
+new_key_entry(lexer_state * const lexer, expression * const expr)>
+
+Constructor for a C<key_entry> node; sets its C<expr> field to C<expr>
+and returns the new entry.
+
+=cut
+
+*/
 static key_entry *
 new_key_entry(lexer_state * const lexer, expression * const expr) {
     key_entry *entry = pir_mem_allocate_zeroed_typed(lexer, key_entry);
