@@ -299,7 +299,41 @@ the parent function to make the tailcall.
 
 =head3 Creating and Using Continuations
 
-{{TODO: Write this section!}}
+Most often continuations are used implicitly in the other control-flow
+operations in Parrot. However, they can also be created and used explicitly
+when required. Continuations are like any other PMC, and can be created
+using the C<new> keyword:
+
+  $P0 = new 'Continuation'
+  
+The new continuation starts off in an undefined state. Attempting to invoke
+a new continuation after it's first been created will raise an exception. To
+prepare the continuation for use, a destination label must be assigned to it
+with the C<set_addr> opcode:
+
+  $P0 = new 'Continuation'
+  set_addr $P0, my_label
+ 
+ my_label:
+  ...
+
+To jump to the continuation's stored label and return the context to the
+state it was in when the continuation was created, use the C<invoke> opcode
+or the C<()> notaton:
+
+  invoke $P0  # Explicit using PASM-like opcodes
+  $P0()       # Same, but nicer syntax
+
+Notice that even though you can use the subroutine notation C<$P0()> to
+invoke the continuation, it doesn't make any sense to try and pass arguments
+to it or to try and return values from it:
+
+  $P0 = new 'Continuation'
+  set_addr $P0, my_label
+
+  $P0(1, 2)      # WRONG!
+  
+  $P1 = $P0()    # WRONG!
 
 =head2 Lexical Subroutines
 
@@ -310,6 +344,9 @@ larger subroutine, and our "inner" subroutine is only visible and callable
 from the "outer" subroutine. Plus, the "inner" subroutine inherits all the
 lexical variables from the outer subroutine, but is able to define its
 own lexical variables that cannot be seen or modified by the outer subroutine.
+This is important because PIR doesn't have anything corresponding to blocks
+or nested scopes like some other languages have. Lexical subroutines play
+the role of nested scopes when they are needed.
 
 =head3 Scope and HLLs
 
@@ -333,7 +370,24 @@ The code above illustrates this idea perfectly without having to get into a
 detailed and convoluted example: In the inner block, we define the variable
 C<z> which is only visible inside that block. The outer block has no
 knowledge of C<z> at all. However, the inner block does have access to the
-variables C<x> and C<y>.
+variables C<x> and C<y>. This is an example of nested scopes where the
+visibility of different data items can change in a single subroutine. As
+we've discussed above, Parrot does't have any direct analog for this
+situation: If we tried to write the code above directly, we would end up
+with this PIR code:
+
+  .param int x
+  .param int y
+  .param int z
+  x = 0
+  y = 1
+  z = 2
+  ...
+
+This PIR code is similar, but the handling of the variable C<z> is
+different: C<z> is visible throughout the entire current subroutine, where it
+is not visible throughout the entire C function. To help approximate this
+effect, PIR supplies lexical subroutines to create nested lexical scopes.
 
 =head3 PIR Scoping
 
