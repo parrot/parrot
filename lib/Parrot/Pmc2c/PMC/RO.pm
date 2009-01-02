@@ -118,7 +118,6 @@ EOC
 EOC
 
             # don't return after a Parrot_ex_throw_from_c_args
-            #      $body .= "    $ret\n" if $ret;
             $ro_method->body( Parrot::Pmc2c::Emitter->text($body) );
             $self->add_method($ro_method);
         }
