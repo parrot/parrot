@@ -98,24 +98,22 @@ sub decl {
     $args = ", $args" if $args =~ /\S/;
     $args =~ s/(\w+)\s*(\*)\s*/$1 $2/g;
 
-    my ( $export, $extern, $newl, $semi, $pmcvar );
+    my ( $export, $extern, $newl, $semi );
     if ( $for_header eq 'HEADER' ) {
         $export = $pmc->export;
-        $extern = '';
         $newl   = ' ';
         $semi   = ';';
-        $pmcvar = '';
     }
     else {
         $export = '';
-        $extern = '';
         $newl   = "\n";
         $semi   = '';
-        $pmcvar = 'pmc';
     }
+    my $pmcarg = 'PMC *pmc';
+    $pmcarg    = "SHIM($pmcarg)" if $self->pmc_unused;
 
     return <<"EOC";
-$decs$export $extern$ret${newl}Parrot_${pmcname}_$meth(PARROT_INTERP, PMC *$pmcvar$args)$semi
+$decs$export $ret${newl}Parrot_${pmcname}_$meth(PARROT_INTERP, $pmcarg$args)$semi
 EOC
 }
 

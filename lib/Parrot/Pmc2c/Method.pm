@@ -20,6 +20,7 @@ sub new {
             mmd_rights  => [],
             parent_name => "",
             decorators  => [],
+            pmc_unused  => 0,
             %{ $self_hash || {} }
         )
     };
@@ -76,6 +77,12 @@ sub is_multi {
 
     return 1 if $self->{MULTI};
     return 0;
+}
+
+sub pmc_unused {
+    my ($self) = @_;
+
+    return $self->{pmc_unused};
 }
 
 =head1 C<trans($type)>

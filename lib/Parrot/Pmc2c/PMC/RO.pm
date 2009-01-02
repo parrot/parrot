@@ -108,6 +108,7 @@ EOC
                     return_type => $vt_method->return_type,
                     parameters  => join( ', ', @parameters ),
                     type        => Parrot::Pmc2c::Method::VTABLE,
+                    pmc_unused  => 1,
                 }
             );
             my $pmcname = $parent->name;
