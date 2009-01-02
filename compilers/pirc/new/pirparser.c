@@ -319,7 +319,7 @@
 
 /*
  * $Id$
- * Copyright (C) 2007-2008, The Perl Foundation.
+ * Copyright (C) 2007-2009, The Perl Foundation.
  */
 
 /*
@@ -6043,11 +6043,20 @@ get_signature_length(NOTNULL(expression * const e)) {
                        ? get_signature_length(e->expr.t->key->head->expr) + 1 /* ... get its length. */
                        : 0);
         case EXPR_CONSTANT:
-            return 3;
+            return 3;    /* for _, 'k', 'c' */
         case EXPR_IDENT:
             return 3; /* 1 for '_', 1 for 'i', 1 for 'c' */
-        case EXPR_KEY: /* for '_', 'k' */
-            return 2 + get_signature_length(e->expr.k->head->expr);
+        case EXPR_KEY: { /* for '_', 'k' */
+            int n;
+            /* if the key is an integer constant, then signature becomes '_kic', otherwise _kc. */
+            if (e->expr.k->head->expr->type    == EXPR_CONSTANT
+            &&  e->expr.k->head->expr->expr.c->type == INT_TYPE)
+                n = 3;
+            else
+                n = 2;
+
+            return n + get_signature_length(e->expr.k->head->expr);
+        }
         default:
             fprintf(stderr, "wrong expression typein get_signature_length()\n");
             break;
@@ -6103,6 +6112,10 @@ write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
                         }
                         break;
                     case EXPR_CONSTANT:
+                        /* integer constant key results in '_kic' signature */
+                        if (iter->expr.c->type == INT_TYPE)
+                            *instr_writer++ = 'i';
+
                         *instr_writer++ = 'c';
                         break;
                     default:
@@ -6111,31 +6124,6 @@ write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
                         instr_writer = write_signature(iter->expr.t->key->head->expr, instr_writer);
                         break;
                 }
-
-
-                /*
-                if ((iter->expr.t->key->expr->type == EXPR_TARGET)
-                &&  (iter->expr.t->key->expr->expr.t->info->type == PMC_TYPE)) {
-
-                }
-                else {
-                    if ((iter->expr.t->key->expr->type == EXPR_TARGET)
-                    &&  (iter->expr.t->key->expr->expr.t->info->type == INT_TYPE))
-                    {
-                       *instr_writer++ = 'i';
-                    }
-                    else
-
-                    switch (iter->expr.t->key->expr->type) {
-                        case EXPR_CONSTANT:
-                            *instr_writer++ = 'c';
-                            break;
-                        default:
-                            fprintf(stderr, "write_signature: non-constant key\n");
-                            instr_writer = write_signature(iter->expr.t->key->expr, instr_writer);
-                            break;
-                    }
-                }*/
 
             }
             break;

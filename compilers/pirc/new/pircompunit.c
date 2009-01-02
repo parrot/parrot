@@ -1910,7 +1910,6 @@ add_key(NOTNULL(lexer_state * const lexer), NOTNULL(key * const keylist),
 {
     key_entry *newkey = new_key_entry(lexer, exprkey);
     key_entry *iter   = keylist->head;
-    key       *list   = keylist;
 
     /* goto end of list */
     while (iter->next != NULL)
@@ -1920,7 +1919,7 @@ add_key(NOTNULL(lexer_state * const lexer), NOTNULL(key * const keylist),
 
     ++keylist->keylength;
 
-    return list;
+    return keylist;
 }
 
 /*

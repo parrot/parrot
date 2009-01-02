@@ -185,7 +185,7 @@ typedef struct expression {
 /* The key_entry node is used to represent a key */
 typedef struct key_entry {
     expression       *expr;      /* value of this key */
-    struct key_entry *next;      /* in ["x";"y"], there's 2 key nodes; 1 for "x", 1 for "y",
+    struct key_entry *next;      /* in ["x";"y"], there's 2 key entries; 1 for "x", 1 for "y",
                                     linked by "next" */
 } key_entry;
 
@@ -197,8 +197,6 @@ typedef struct key {
     int        keylength; /* number of entries */
 
 } key;
-
-
 
 
 

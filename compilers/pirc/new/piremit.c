@@ -424,7 +424,6 @@ emit_pir_subs(lexer_state * const lexer, char const * const outfile) {
 
     do {
         int i;
-        fprintf(stderr, "emit pir subs\n");
         fprintf(out, "\n.namespace ");
         print_key(lexer, subiter->name_space);
 
@@ -498,23 +497,6 @@ emit_pbc_const_arg(lexer_state * const lexer, constant * const c) {
 
 
 
-/*
-
-=item C<static void
-emit_pbc_target_arg(lexer_state * const lexer, target * const t)>
-
-Emit the assigned register of target C<t>. The assigned register is
-stored in the C<color> field, of either the C<pir_reg> or C<symbol>
-structure, depending on whether C<t> is a register or a symbol,
-respectively.
-
-=cut
-
-*/
-static void
-emit_pbc_target_arg(lexer_state * const lexer, target * const t) {
-    emit_int_arg(lexer->bc, t->info->color);
-}
 
 
 /*
@@ -539,21 +521,20 @@ emit_pbc_label_arg(lexer_state * const lexer, label * const l) {
 =item C<static void
 emit_pbc_key(lexer_state * const lexer, key * const k)>
 
-Emit bytecode for the key C<k>.
+Emit bytecode for the key C<k>. First the bytecode is
+written to a temporary buffer, which is later unpacked
+in the actual PackFile. See C<store_key_bytecode()>.
 
-XXX Not sure what to return. At what point is this function
-called? Do we want to return an index in the constant table?
-or an expression (operand) node.
 
 =cut
 
 */
-static expression *
+static int
 emit_pbc_key(lexer_state * const lexer, key * const k) {
     key_entry  *iter      = k->head;
     int         keylength = 0;
 
-    opcode_t    key[20];    /* XXX make length variable */
+    opcode_t   *key;
     opcode_t    keysize;    /* total size of key in bytecode */
     opcode_t   *pc;         /* cursor to write into key array */
     expression *operand;
@@ -561,8 +542,15 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
 
     fprintf(stderr, "emit pbc key\n");
 
-    /* initialize cursor */
-    pc = &key[1]; /* slot 0 is used for length of key */
+    /* create an array of opcode_t for storing the bytecode
+     * representation of the key. Initialize the cursor (pc)
+     * to write into this buffer.
+     */
+    pc = key = (opcode_t *)pir_mem_allocate(lexer, k->keylength * sizeof (opcode_t));
+
+    /* store key length in slot 0 */
+    *pc++ = k->keylength;
+
 
     while (iter) {
 
@@ -603,7 +591,10 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
                 *pc++ = t->info->color;
                 break;
             }
-            /* XXX nested keys? */
+            case EXPR_KEY:
+                fprintf(stderr, "Nested keys are not supported.");
+                break;
+
             default:
                 panic(lexer, "unknown expression type");
                 break;
@@ -615,10 +606,11 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
         iter = iter->next;
     }
 
+/*
+    fprintf(stderr, "keylength is: %d, found keylength is: %d\n", k->keylength, keylength);
     assert(keylength == k->keylength);
+*/
 
-    /* store key length in slot 0 */
-    key[0]  = keylength;
     /* calculate size of key in bytecode; each field has 2 INTVALs:
      * flags/types and the register/constant index.
      */
@@ -626,9 +618,38 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
 
     index = store_key_bytecode(lexer->bc, key);
 
-    operand = expr_from_int(lexer, index);
-    return operand;
+    fprintf(stderr, "store_key_bytecode index=%d\n", index);
+    return index;
 
+}
+
+
+/*
+
+=item C<static void
+emit_pbc_target_arg(lexer_state * const lexer, target * const t)>
+
+Emit the assigned register of target C<t>. The assigned register is
+stored in the C<color> field, of either the C<pir_reg> or C<symbol>
+structure, depending on whether C<t> is a register or a symbol,
+respectively.
+
+=cut
+
+*/
+static void
+emit_pbc_target_arg(lexer_state * const lexer, target * const t) {
+    emit_int_arg(lexer->bc, t->info->color);
+
+    if (t->key) {
+
+        /* XXX should do emit_pbc_key... always? */
+        /*emit_pbc_key(lexer, t->key);
+        */
+        /* this works for integers: */
+        emit_pbc_expr(lexer, t->key->head->expr);
+
+    }
 }
 
 /*
