@@ -62,11 +62,11 @@ From C<perldoc perlthrtut>:
 .sub _main
     .param pmc argv
     .const int MAX = 500
-    .sym int max
-    .sym pmc kid
-    .sym pmc Check_num
-    .sym pmc stream
-    .sym int argc
+    .local int max
+    .local pmc kid
+    .local pmc Check_num
+    .local pmc stream
+    .local int argc
     argc = argv
     max = MAX
     if argc < 2 goto no_arg
@@ -76,16 +76,16 @@ no_arg:
 
     #sweepoff
 #       9  my $stream = new Thread::Queue;
-    stream = new TQueue
+    stream = new 'TQueue'
 #       10 my $kid    = new threads(\&check_num, $stream, 2);
-    Check_num = global "_check_num"
-    kid = new ParrotThread
+    Check_num = get_global "_check_num"
+    kid = new 'ParrotThread'
     $P2 = new 'Integer'
     $P2 = 2
     kid.'run_clone'(Check_num, Check_num, stream, $P2)
 
 #       12 for my $i ( 3 .. 1000 ) {
-    .sym int i
+    .local int i
     i = 3
 lp:
 #       13     $stream->enqueue($i);
@@ -97,7 +97,7 @@ lp:
 #       14 }
 
 #       16 $stream->enqueue(undef);
-    $P4 = new Undef
+    $P4 = new 'Undef'
     push stream, $P4
 
 #       17 $kid->join;
@@ -113,13 +113,13 @@ lp:
    .param pmc cur_prime
 
 #       21     my $kid;
-    .sym pmc kid
-    kid = new Undef
+    .local pmc kid
+    kid = new 'Undef'
 #       22     my $downstream = new Thread::Queue;
-    .sym pmc downstream
-    downstream = new TQueue
+    .local pmc downstream
+    downstream = new 'TQueue'
 #       23     while (my $num = $upstream->dequeue) {
-    .sym pmc Num        # num is a reserved word
+    .local pmc Num        # num is a reserved word
 lp:
     shift Num, upstream
     $I0 = defined Num
@@ -142,7 +142,7 @@ no_kid1:
     print "\n"
 
 #       29                $kid = new threads(\&check_num, $downstream, $num);
-    kid = new ParrotThread
+    kid = new 'ParrotThread'
     kid.'run_clone'(sub, sub, downstream, Num)
     goto lp
 #       31     }
@@ -152,7 +152,7 @@ ewhile:
     $I1 = defined kid
     unless $I1 goto no_kid2
 
-    $P4 = new Undef
+    $P4 = new 'Undef'
     push downstream, $P4
 
 #       33     $kid->join           if $kid;
