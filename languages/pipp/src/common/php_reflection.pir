@@ -1599,6 +1599,8 @@ NOT IMPLEMENTED.
     not_implemented()
 .end
 
+.namespace[]
+
 =back
 
 =cut
