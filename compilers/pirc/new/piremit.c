@@ -65,7 +65,7 @@ static void emit_pbc_expr(lexer_state * const lexer, expression * const operand)
 
 /* prototype declaration */
 void print_expr(lexer_state * const lexer, expression * const expr);
-void print_key(lexer_state * const lexer, key *k);
+void print_key(lexer_state * const lexer, key * const k);
 void print_target(lexer_state * const lexer, target * const t);
 void print_constant(lexer_state * const lexer, constant * const c);
 void print_expressions(lexer_state * const lexer, expression * const expr);
@@ -75,7 +75,7 @@ void print_statement(lexer_state * const lexer, subroutine * const sub);
 /*
 
 =item C<void
-print_key(lexer_state * const lexer, key *k)>
+print_key(lexer_state * const lexer, key * const k)>
 
 Print the key C<k>. The total key is enclosed in square brackets,
 and different key elements are separated by semicolons. Example:
@@ -88,16 +88,19 @@ has two elements: C<"hi"> and C<42>.
 
 */
 void
-print_key(lexer_state * const lexer, key *k) {
+print_key(lexer_state * const lexer, key * const k) {
+    key_entry *iter;
+
     fprintf(out, "[");
 
-    if (k && k->expr) {
-        print_expr(lexer, k->expr);
+    if (k && k->head) {
+        iter = k->head;
+        print_expr(lexer, iter->expr);
 
-        while (k->next) {
-            k = k->next;
+        while (iter->next) {
+            iter = iter->next;
             fprintf(out, ";");
-            print_expr(lexer, k->expr);
+            print_expr(lexer, iter->expr);
         }
     }
     fprintf(out, "]");
@@ -421,8 +424,10 @@ emit_pir_subs(lexer_state * const lexer, char const * const outfile) {
 
     do {
         int i;
+        fprintf(stderr, "emit pir subs\n");
         fprintf(out, "\n.namespace ");
         print_key(lexer, subiter->name_space);
+
 
         fprintf(out, "\n.sub %s", subiter->info.subname);
 
@@ -545,7 +550,7 @@ or an expression (operand) node.
 */
 static expression *
 emit_pbc_key(lexer_state * const lexer, key * const k) {
-    key        *iter      = k;
+    key_entry  *iter      = k->head;
     int         keylength = 0;
 
     opcode_t    key[20];    /* XXX make length variable */
@@ -555,7 +560,6 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
     int         index;
 
     fprintf(stderr, "emit pbc key\n");
-    emit_pbc_expr(lexer, k->expr);
 
     /* initialize cursor */
     pc = &key[1]; /* slot 0 is used for length of key */
@@ -610,6 +614,8 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
         ++keylength;
         iter = iter->next;
     }
+
+    assert(keylength == k->keylength);
 
     /* store key length in slot 0 */
     key[0]  = keylength;
@@ -816,11 +822,9 @@ emit_pbc_sub(lexer_state * const lexer, subroutine * const sub) {
     }
     while (iter != sub->statements->next);
 
-    /* XXX why does this not work? */
+
     if (TEST_FLAG(sub->flags, PIRC_SUB_FLAG_IMMEDIATE)) {
-        fprintf(stderr, "running :immediate sub %s...", sub->info.subname);
         PackFile_fixup_subs(lexer->interp, PBC_IMMEDIATE, NULL);
-        fprintf(stderr, "done\n");
     }
 }
 

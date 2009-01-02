@@ -1862,6 +1862,14 @@ expr_from_key(NOTNULL(lexer_state * const lexer), NOTNULL(key * const k)) {
     return e;
 }
 
+
+static key_entry *
+new_key_entry(lexer_state * const lexer, expression * const expr) {
+    key_entry *entry = pir_mem_allocate_zeroed_typed(lexer, key_entry);
+    entry->expr      = expr;
+    entry->next      = NULL;
+    return entry;
+}
 /*
 
 =item C<key *
@@ -1876,20 +1884,17 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 key *
 new_key(NOTNULL(lexer_state * const lexer), NOTNULL(expression * const expr)) {
-    key *k  = pir_mem_allocate_zeroed_typed(lexer, key);
-    k->expr = expr;
-    k->next = NULL;
+    key *k       = pir_mem_allocate_zeroed_typed(lexer, key);
+    k->head      = new_key_entry(lexer, expr);
+    k->keylength = 1;
     return k;
 }
-
-
-
 
 
 /*
 
 =item C<key *
-add_key(lexer_state * const lexer, key * keylist, expression * const exprkey)>
+add_key(lexer_state * const lexer, key * const keylist, expression * const exprkey)>
 
 Adds a new, nested key (in C<exprkey>) to the current key,
 pointed to by C<keylist>. C<keylist> is returned.
@@ -1900,17 +1905,21 @@ pointed to by C<keylist>. C<keylist> is returned.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 key *
-add_key(NOTNULL(lexer_state * const lexer), NOTNULL(key * keylist),
+add_key(NOTNULL(lexer_state * const lexer), NOTNULL(key * const keylist),
         NOTNULL(expression * const exprkey))
 {
-    key *newkey = new_key(lexer, exprkey);
-    key *list   = keylist;
+    key_entry *newkey = new_key_entry(lexer, exprkey);
+    key_entry *iter   = keylist->head;
+    key       *list   = keylist;
 
     /* goto end of list */
-    while (keylist->next != NULL)
-        keylist = keylist->next;
+    while (iter->next != NULL)
+        iter = iter->next;
 
-    keylist->next = newkey;
+    iter->next = newkey;
+
+    ++keylist->keylength;
+
     return list;
 }
 

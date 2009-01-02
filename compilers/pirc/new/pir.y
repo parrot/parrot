@@ -656,6 +656,7 @@ location_directive: ".line" TK_INTC
                   ;
 
 annotation        : ".annotate" TK_STRINGC ',' TK_STRINGC
+                        { /* XXX */ }
                   ;
 
 /* HLL stuff      */
@@ -685,7 +686,7 @@ namespace         : namespace_slice
                   ;
 
 namespace_slice   : TK_STRINGC
-                        { $$ = expr_from_const(lexer, new_const(lexer, STRING_TYPE, $1)); }
+                        { $$ = expr_from_string(lexer, $1); }
                   ;
 
 sub_def           : sub_head sub_flags "\n"
@@ -1045,9 +1046,6 @@ keylist_assignment: keylist '=' expression
 op_arg            : op_arg_expr
                          { push_operand(lexer, $1); }
                   | keylist
-                              /* XXX a keylist should become a PMC constant; I think we should
-                               * build the key constant here. XXX check out how. --kjs
-                               */
                          { push_operand(lexer, expr_from_key(lexer, $1)); }
                   ;
 
@@ -3300,14 +3298,14 @@ get_signature_length(NOTNULL(expression * const e)) {
     switch (e->type) {
         case EXPR_TARGET:
             return 2 + ((e->expr.t->key != NULL) /* if there's a key on this target ... */
-                       ? get_signature_length(e->expr.t->key->expr) + 1 /* ... get its length. */
+                       ? get_signature_length(e->expr.t->key->head->expr) + 1 /* ... get its length. */
                        : 0);
         case EXPR_CONSTANT:
             return 3;
         case EXPR_IDENT:
             return 3; /* 1 for '_', 1 for 'i', 1 for 'c' */
         case EXPR_KEY: /* for '_', 'k' */
-            return 2 + get_signature_length(e->expr.k->expr);
+            return 2 + get_signature_length(e->expr.k->head->expr);
         default:
             fprintf(stderr, "wrong expression typein get_signature_length()\n");
             break;
@@ -3347,9 +3345,9 @@ write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
                 *instr_writer++ = 'k';
 
                 /* XXX this switch replaces the messy code below. double-check before delete. */
-                switch (iter->expr.t->key->expr->type) {
+                switch (iter->expr.t->key->head->expr->type) {
                     case EXPR_TARGET:
-                        switch (iter->expr.t->key->expr->expr.t->info->type) {
+                        switch (iter->expr.t->key->head->expr->expr.t->info->type) {
                             case PMC_TYPE:
                                 /* the key is a target, and its type is a PMC. In that
                                  * case, do not print the signature; 'kp' is not valid.
@@ -3368,7 +3366,7 @@ write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
                     default:
                         /* XXX does this ever happen? */
                         fprintf(stderr, "write_signature: non-constant key\n");
-                        instr_writer = write_signature(iter->expr.t->key->expr, instr_writer);
+                        instr_writer = write_signature(iter->expr.t->key->head->expr, instr_writer);
                         break;
                 }
 
@@ -3410,7 +3408,7 @@ write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
         case EXPR_KEY:
             *instr_writer++ = 'k';
 
-            instr_writer    = write_signature(iter->expr.k->expr, instr_writer);
+            instr_writer    = write_signature(iter->expr.k->head->expr, instr_writer);
             /*
 
             switch (iter->expr.k->expr->type) {

@@ -182,13 +182,23 @@ typedef struct expression {
 #define EXPR_CONST_INTVAL(e)    CONST_INTVAL(e->expr.c)
 #define EXPR_CONST_NUMVAL(e)    CONST_NUMVAL(e->expr.c)
 
-/* The key node is used to represent a key expression */
+/* The key_entry node is used to represent a key */
+typedef struct key_entry {
+    expression       *expr;      /* value of this key */
+    struct key_entry *next;      /* in ["x";"y"], there's 2 key nodes; 1 for "x", 1 for "y",
+                                    linked by "next" */
+} key_entry;
+
+/* The key node represents a key as a whole; it's the "handle"
+ * by which to pass the key.
+ */
 typedef struct key {
-    expression *expr;      /* value of this key */
-    int         index;     /* key value (if int) or index in constant table */
-    struct key *next;      /* in ["x";"y"], there's 2 key nodes; 1 for "x", 1 for "y",
-                              linked by "next" */
+    key_entry *head;
+    int        keylength; /* number of entries */
+
 } key;
+
+
 
 
 
@@ -399,7 +409,7 @@ target *target_from_symbol(struct lexer_state * const lexer, struct symbol * con
 
 /* management functions for key nodes */
 key *new_key(struct lexer_state * const lexer, expression * const expr);
-key *add_key(struct lexer_state * const lexer, key *keylist, expression * const newkey);
+key *add_key(struct lexer_state * const lexer, key * const keylist, expression * const newkey);
 
 void load_library(struct lexer_state * const lexer, char const * const library);
 void set_hll(struct lexer_state * const lexer, char const * const hll);
