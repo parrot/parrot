@@ -34,7 +34,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['Reflection']
+.namespace ['Reflection']
 .sub 'export'
     not_implemented()
 .end
@@ -47,7 +47,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['Reflection']
+.namespace ['Reflection']
 .sub 'getModifierNames'
     not_implemented()
 .end
@@ -60,7 +60,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub '__construct' :method
     .param pmc name
 .end
@@ -73,7 +73,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub '__toString' :method
     not_implemented()
 .end
@@ -86,7 +86,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'export' :method
     not_implemented()
 .end
@@ -99,7 +99,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getConstant' :method
     not_implemented()
 .end
@@ -112,7 +112,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getConstants' :method
     not_implemented()
 .end
@@ -125,7 +125,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getConstructor' :method
     not_implemented()
 .end
@@ -138,7 +138,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getDefaultProperties' :method
     not_implemented()
 .end
@@ -151,7 +151,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getDocComment' :method
     not_implemented()
 .end
@@ -164,7 +164,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getEndLine' :method
     not_implemented()
 .end
@@ -177,7 +177,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getExtension' :method
     not_implemented()
 .end
@@ -190,7 +190,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getExtensionName' :method
     not_implemented()
 .end
@@ -203,7 +203,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getFileName' :method
     not_implemented()
 .end
@@ -216,7 +216,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getInterfaceNames' :method
     not_implemented()
 .end
@@ -229,7 +229,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getInterfaces' :method
     not_implemented()
 .end
@@ -242,7 +242,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getMethod' :method
     not_implemented()
 .end
@@ -255,7 +255,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getMethods' :method
     not_implemented()
 .end
@@ -268,7 +268,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getModifiers' :method
     not_implemented()
 .end
@@ -281,7 +281,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getName' :method
     .return ('Foo')
 .end
@@ -294,7 +294,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getParentClass' :method
     not_implemented()
 .end
@@ -307,7 +307,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getProperties' :method
     not_implemented()
 .end
@@ -320,7 +320,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getProperty' :method
     not_implemented()
 .end
@@ -333,7 +333,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getStartLine' :method
     not_implemented()
 .end
@@ -346,7 +346,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getStaticProperties' :method
     not_implemented()
 .end
@@ -359,7 +359,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'getStaticPropertyValue' :method
     not_implemented()
 .end
@@ -372,7 +372,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'hasConstant' :method
     not_implemented()
 .end
@@ -385,7 +385,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'hasMethod' :method
     not_implemented()
 .end
@@ -398,7 +398,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'hasProperty' :method
     not_implemented()
 .end
@@ -411,7 +411,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'implementsInterface' :method
     not_implemented()
 .end
@@ -424,7 +424,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'isAbstract' :method
     not_implemented()
 .end
@@ -437,7 +437,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'isFinal' :method
     not_implemented()
 .end
@@ -450,7 +450,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'isInstance' :method
     not_implemented()
 .end
@@ -463,7 +463,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'isInstantiable' :method
     not_implemented()
 .end
@@ -476,7 +476,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'isInterface' :method
     not_implemented()
 .end
@@ -489,7 +489,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'isInternal' :method
     not_implemented()
 .end
@@ -502,7 +502,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'isIterateable' :method
     not_implemented()
 .end
@@ -515,7 +515,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'isSubclassOf' :method
     not_implemented()
 .end
@@ -528,7 +528,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'isUserDefined' :method
     not_implemented()
 .end
@@ -541,7 +541,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'newInstance' :method
     not_implemented()
 .end
@@ -554,7 +554,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'newInstanceArgs' :method
     not_implemented()
 .end
@@ -567,7 +567,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionClass']
+.namespace ['ReflectionClass']
 .sub 'setStaticPropertyValue' :method
     not_implemented()
 .end
@@ -580,7 +580,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionExtension']
+.namespace ['ReflectionExtension']
 .sub '__construct' :method
     not_implemented()
 .end
@@ -593,7 +593,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionExtension']
+.namespace ['ReflectionExtension']
 .sub '__toString' :method
     not_implemented()
 .end
@@ -606,7 +606,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionExtension']
+.namespace ['ReflectionExtension']
 .sub 'export' :method
     not_implemented()
 .end
@@ -619,7 +619,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionExtension']
+.namespace ['ReflectionExtension']
 .sub 'getClassNames' :method
     not_implemented()
 .end
@@ -632,7 +632,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionExtension']
+.namespace ['ReflectionExtension']
 .sub 'getClasses' :method
     not_implemented()
 .end
@@ -645,7 +645,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionExtension']
+.namespace ['ReflectionExtension']
 .sub 'getConstants' :method
     not_implemented()
 .end
@@ -658,7 +658,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionExtension']
+.namespace ['ReflectionExtension']
 .sub 'getDependencies' :method
     not_implemented()
 .end
@@ -671,7 +671,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionExtension']
+.namespace ['ReflectionExtension']
 .sub 'getFunctions' :method
     not_implemented()
 .end
@@ -684,7 +684,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionExtension']
+.namespace ['ReflectionExtension']
 .sub 'getINIEntries' :method
     not_implemented()
 .end
@@ -697,7 +697,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionExtension']
+.namespace ['ReflectionExtension']
 .sub 'getName' :method
     not_implemented()
 .end
@@ -710,7 +710,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionExtension']
+.namespace ['ReflectionExtension']
 .sub 'getVersion' :method
     not_implemented()
 .end
@@ -723,7 +723,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionExtension']
+.namespace ['ReflectionExtension']
 .sub 'info' :method
     not_implemented()
 .end
@@ -736,7 +736,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub '__construct' :method
     not_implemented()
 .end
@@ -749,7 +749,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub '__toString' :method
     not_implemented()
 .end
@@ -762,7 +762,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub 'export' :method
     not_implemented()
 .end
@@ -775,7 +775,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub 'getDocComment' :method
     not_implemented()
 .end
@@ -788,7 +788,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub 'getEndLine' :method
     not_implemented()
 .end
@@ -801,7 +801,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub 'getExtension' :method
     not_implemented()
 .end
@@ -814,7 +814,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub 'getExtensionName' :method
     not_implemented()
 .end
@@ -827,7 +827,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub 'getFileName' :method
     not_implemented()
 .end
@@ -840,7 +840,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub 'getName' :method
     not_implemented()
 .end
@@ -853,7 +853,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub 'getNumberOfParameters' :method
     not_implemented()
 .end
@@ -866,7 +866,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub 'getNumberOfRequiredParameters' :method
     not_implemented()
 .end
@@ -879,7 +879,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub 'getParameters' :method
     not_implemented()
 .end
@@ -892,7 +892,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub 'getStartLine' :method
     not_implemented()
 .end
@@ -905,7 +905,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub 'getStaticVariables' :method
     not_implemented()
 .end
@@ -918,7 +918,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub 'invoke' :method
     not_implemented()
 .end
@@ -931,7 +931,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub 'invokeArgs' :method
     not_implemented()
 .end
@@ -944,7 +944,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub 'isDeprecated' :method
     not_implemented()
 .end
@@ -957,7 +957,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub 'isDisabled' :method
     not_implemented()
 .end
@@ -970,7 +970,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub 'isInternal' :method
     not_implemented()
 .end
@@ -983,7 +983,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub 'isUserDefined' :method
     not_implemented()
 .end
@@ -996,7 +996,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionFunction']
+.namespace ['ReflectionFunction']
 .sub 'returnsReference' :method
     not_implemented()
 .end
@@ -1009,7 +1009,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionMethod']
+.namespace ['ReflectionMethod']
 .sub '__construct' :method
     not_implemented()
 .end
@@ -1022,7 +1022,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionMethod']
+.namespace ['ReflectionMethod']
 .sub '__toString' :method
     not_implemented()
 .end
@@ -1035,7 +1035,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionMethod']
+.namespace ['ReflectionMethod']
 .sub 'export' :method
     not_implemented()
 .end
@@ -1048,7 +1048,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionMethod']
+.namespace ['ReflectionMethod']
 .sub 'getDeclaringClass' :method
     not_implemented()
 .end
@@ -1061,7 +1061,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionMethod']
+.namespace ['ReflectionMethod']
 .sub 'getModifiers' :method
     not_implemented()
 .end
@@ -1074,7 +1074,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionMethod']
+.namespace ['ReflectionMethod']
 .sub 'getPrototype' :method
     not_implemented()
 .end
@@ -1087,7 +1087,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionMethod']
+.namespace ['ReflectionMethod']
 .sub 'invoke' :method
     not_implemented()
 .end
@@ -1100,7 +1100,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionMethod']
+.namespace ['ReflectionMethod']
 .sub 'invokeArgs' :method
     not_implemented()
 .end
@@ -1113,7 +1113,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionMethod']
+.namespace ['ReflectionMethod']
 .sub 'isAbstract' :method
     not_implemented()
 .end
@@ -1126,7 +1126,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionMethod']
+.namespace ['ReflectionMethod']
 .sub 'isConstructor' :method
     not_implemented()
 .end
@@ -1139,7 +1139,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionMethod']
+.namespace ['ReflectionMethod']
 .sub 'isDestructor' :method
     not_implemented()
 .end
@@ -1152,7 +1152,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionMethod']
+.namespace ['ReflectionMethod']
 .sub 'isFinal' :method
     not_implemented()
 .end
@@ -1165,7 +1165,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionMethod']
+.namespace ['ReflectionMethod']
 .sub 'isPrivate' :method
     not_implemented()
 .end
@@ -1178,7 +1178,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionMethod']
+.namespace ['ReflectionMethod']
 .sub 'isProtected' :method
     not_implemented()
 .end
@@ -1191,7 +1191,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionMethod']
+.namespace ['ReflectionMethod']
 .sub 'isPublic' :method
     not_implemented()
 .end
@@ -1204,7 +1204,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionMethod']
+.namespace ['ReflectionMethod']
 .sub 'isStatic' :method
     not_implemented()
 .end
@@ -1217,7 +1217,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionObject']
+.namespace ['ReflectionObject']
 .sub '__construct' :method
     not_implemented()
 .end
@@ -1230,7 +1230,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionObject']
+.namespace ['ReflectionObject']
 .sub 'export' :method
     not_implemented()
 .end
@@ -1243,7 +1243,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionParameter']
+.namespace ['ReflectionParameter']
 .sub '__construct' :method
     not_implemented()
 .end
@@ -1256,7 +1256,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionParameter']
+.namespace ['ReflectionParameter']
 .sub '__toString' :method
     not_implemented()
 .end
@@ -1269,7 +1269,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionParameter']
+.namespace ['ReflectionParameter']
 .sub 'allowsNull' :method
     not_implemented()
 .end
@@ -1282,7 +1282,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionParameter']
+.namespace ['ReflectionParameter']
 .sub 'export' :method
     not_implemented()
 .end
@@ -1295,7 +1295,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionParameter']
+.namespace ['ReflectionParameter']
 .sub 'getClass' :method
     not_implemented()
 .end
@@ -1308,7 +1308,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionParameter']
+.namespace ['ReflectionParameter']
 .sub 'getDeclaringClass' :method
     not_implemented()
 .end
@@ -1321,7 +1321,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionParameter']
+.namespace ['ReflectionParameter']
 .sub 'getDeclaringFunction' :method
     not_implemented()
 .end
@@ -1334,7 +1334,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionParameter']
+.namespace ['ReflectionParameter']
 .sub 'getDefaultValue' :method
     not_implemented()
 .end
@@ -1347,7 +1347,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionParameter']
+.namespace ['ReflectionParameter']
 .sub 'getName' :method
     not_implemented()
 .end
@@ -1360,7 +1360,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionParameter']
+.namespace ['ReflectionParameter']
 .sub 'getPosition' :method
     not_implemented()
 .end
@@ -1373,7 +1373,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionParameter']
+.namespace ['ReflectionParameter']
 .sub 'isArray' :method
     not_implemented()
 .end
@@ -1386,7 +1386,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionParameter']
+.namespace ['ReflectionParameter']
 .sub 'isDefaultValueAvailable' :method
     not_implemented()
 .end
@@ -1399,7 +1399,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionParameter']
+.namespace ['ReflectionParameter']
 .sub 'isOptional' :method
     not_implemented()
 .end
@@ -1412,7 +1412,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionParameter']
+.namespace ['ReflectionParameter']
 .sub 'isPassedByReference' :method
     not_implemented()
 .end
@@ -1425,7 +1425,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionProperty']
+.namespace ['ReflectionProperty']
 .sub '__construct' :method
     not_implemented()
 .end
@@ -1438,7 +1438,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionProperty']
+.namespace ['ReflectionProperty']
 .sub '__toString' :method
     not_implemented()
 .end
@@ -1451,7 +1451,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionProperty']
+.namespace ['ReflectionProperty']
 .sub 'export' :method
     not_implemented()
 .end
@@ -1464,7 +1464,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionProperty']
+.namespace ['ReflectionProperty']
 .sub 'getDeclaringClass' :method
     not_implemented()
 .end
@@ -1477,7 +1477,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionProperty']
+.namespace ['ReflectionProperty']
 .sub 'getDocComment' :method
     not_implemented()
 .end
@@ -1490,7 +1490,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionProperty']
+.namespace ['ReflectionProperty']
 .sub 'getModifiers' :method
     not_implemented()
 .end
@@ -1503,7 +1503,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionProperty']
+.namespace ['ReflectionProperty']
 .sub 'getName' :method
     not_implemented()
 .end
@@ -1516,7 +1516,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionProperty']
+.namespace ['ReflectionProperty']
 .sub 'getValue' :method
     not_implemented()
 .end
@@ -1529,7 +1529,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionProperty']
+.namespace ['ReflectionProperty']
 .sub 'isDefault' :method
     not_implemented()
 .end
@@ -1542,7 +1542,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionProperty']
+.namespace ['ReflectionProperty']
 .sub 'isPrivate' :method
     not_implemented()
 .end
@@ -1555,7 +1555,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionProperty']
+.namespace ['ReflectionProperty']
 .sub 'isProtected' :method
     not_implemented()
 .end
@@ -1568,7 +1568,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionProperty']
+.namespace ['ReflectionProperty']
 .sub 'isPublic' :method
     not_implemented()
 .end
@@ -1581,7 +1581,7 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionProperty']
+.namespace ['ReflectionProperty']
 .sub 'isStatic' :method
     not_implemented()
 .end
@@ -1594,12 +1594,12 @@ NOT IMPLEMENTED.
 
 =cut
 
-.namespace['ReflectionProperty']
+.namespace ['ReflectionProperty']
 .sub 'setValue' :method
     not_implemented()
 .end
 
-.namespace[]
+.namespace []
 
 =back
 
