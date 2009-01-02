@@ -209,27 +209,25 @@ method method_call($/) {
     make $past;
 }
 
-# TODO: simplify
+# TODO: Call the default constructor without explicit check, inherit from PippObject instead
 method constructor_call($/) {
     my $class_name := ~$<CLASS_NAME>;
     # The constructor needs a list of it's arguments, or an empty list
     my $cons_call  := +$<argument_list> ??
                         $( $<argument_list>[0] )
                         !!
-                        PAST::Op.new( :pasttype('call') );
-    # The object is the first argument
+                        PAST::Op.new();
+    $cons_call.pasttype('callmethod');
+    # The object onto which the method is called
     $cons_call.unshift(
         PAST::Op.new(
             :inline('%r = new %0', 'obj = %r'),
             $class_name
         )
     );
-    # The function comes before the first argument
+    # The method comes before the first argument
     $cons_call.unshift(
-        PAST::Var.new(
-            :name('cons'),
-            :scope('register')
-        )
+        PAST::Var.new(:name('cons'), :scope('register'))
     );
 
     make
@@ -238,7 +236,7 @@ method constructor_call($/) {
             PAST::Var.new( :name('cons'), :scope('register'), :isdecl(1) ),
             # use default constructor when there is no explicit constructor
             PAST::Op.new(
-                :pasttype('if'), 
+                :pasttype('if'),
                 PAST::Op.new(
                     :pirop('isnull'),
                     PAST::Op.new( :inline("%r = get_global ['" ~ $class_name ~ "'], '__construct'") )  # condition

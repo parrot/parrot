@@ -81,7 +81,7 @@ TODO: Should be a method.
 
 =cut
 
-.sub '__construct' # :method
+.sub '__construct' :method
     .return ()
 .end
 
