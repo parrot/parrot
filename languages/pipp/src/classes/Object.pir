@@ -20,9 +20,11 @@ This is heavily based on Rakudo's Object.pir
 .sub '' :anon :init :load
     load_bytecode 'PCT.pbc'
 
+    # set up PippObject with P6 features 
     $P0 = get_root_global ['parrot'], 'P6metaclass'
-    $P0.'new_class'('PippObject', 'name'=>'Object')
+    $P0.'new_class'('PippObject', 'name' => 'Object')
 
+    # cache the metaobject of 'PippObject'
     .local pmc p6meta
     p6meta = $P0.'HOW'()
     set_hll_global ['PippObject'], '$!P6META', p6meta
@@ -33,6 +35,32 @@ This is heavily based on Rakudo's Object.pir
 =head2 Methods
 
 =over 4
+
+=item defined()
+
+Return true if the object is defined.
+Default to being defined.
+
+=cut
+
+.namespace ['PippObject']
+.sub 'defined' :method
+    $P0 = new 'PhpBoolean'
+    $P0 = 1
+
+    .return ($P0)
+.end
+
+=item true()
+
+Boolean value of object -- defaults to C<.defined> (S02).
+
+=cut
+
+.namespace ['PippObject']
+.sub 'true' :method
+    .tailcall self.'defined'()
+.end
 
 =item WHENCE()
 
@@ -59,6 +87,12 @@ Return the invocant's auto-vivification closure.
 =cut
 
 .namespace ['PippObject']
+
+.sub '' :vtable('get_bool') :method
+    $I0 = self.'true'()
+    .return ($I0)
+.end
+
 
 # Local Variables:
 #   mode: pir

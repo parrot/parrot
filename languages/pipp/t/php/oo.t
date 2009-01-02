@@ -239,7 +239,7 @@ method __construct() of class Foo was called.
 Dummy statement, so that $foo is not returned.
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'class with constructor, returning a PippObject', todo => 'PippObject has no get_bool' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'class with constructor, returning a PippObject' );
 <?php
 
 class Foo {
