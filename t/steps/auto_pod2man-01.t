@@ -1,6 +1,6 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: auto_pod2man-01.t 30640 2008-08-29 23:09:28Z jkeenan $
+# $Id$
 # auto_pod2man-01.t
 
 use strict;

@@ -1,5 +1,5 @@
 # Copyright (C) 2008, The Perl Foundation.
-# $Id: pod2man.pm 30367 2008-08-20 02:21:59Z rurban $
+# $Id$
 
 =head1 NAME
 
