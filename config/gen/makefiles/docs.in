@@ -35,8 +35,8 @@ doc-prep:
 	$(MKPATH) ops
 
 packfile-c.pod: ../src/packfile.c
-#CONDITIONED_LINE(new_perldoc):	$(PERLDOC) -ud packfile-c.pod ../src/packfile.c 
-#INVERSE_CONDITIONED_LINE(new_perldoc):	$(PERLDOC) -u ../src/packfile.c > packfile-c.pod
+#IF(new_perldoc):	$(PERLDOC) -ud packfile-c.pod ../src/packfile.c 
+#ELSE:	$(PERLDOC) -u ../src/packfile.c > packfile-c.pod
 
 clean:
 	$(RM_F) packfile-c.pod $(POD)
