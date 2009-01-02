@@ -14,30 +14,30 @@ PMCS = \
   dynlexpad \
   foo \
   rotest \
-#CONDITIONED_LINE(has_gdbm):  gdbmhash \
+#IF(has_gdbm):  gdbmhash \
   rational \
-#CONDITIONED_LINE(has_crypto):  md2 \
-#CONDITIONED_LINE(has_crypto):  md4 \
-#CONDITIONED_LINE(has_crypto):  md5 \
-#CONDITIONED_LINE(has_crypto):  ripemd160 \
-#CONDITIONED_LINE(has_crypto):  sha \
-#CONDITIONED_LINE(has_crypto):  sha1 \
-#CONDITIONED_LINE(has_crypto):  sha256 \
-#CONDITIONED_LINE(has_crypto):  sha512 \
+#IF(has_crypto):  md2 \
+#IF(has_crypto):  md4 \
+#IF(has_crypto):  md5 \
+#IF(has_crypto):  ripemd160 \
+#IF(has_crypto):  sha \
+#IF(has_crypto):  sha1 \
+#IF(has_crypto):  sha256 \
+#IF(has_crypto):  sha512 \
   subproxy 
 
 BUILD = $(PERL) @build_dir@/tools/build/dynpmc.pl
 
 # some *.pmc file are generated
 GEN_PMC_DEFINITIONS = \
-#CONDITIONED_LINE(has_crypto):  md2.pmc \
-#CONDITIONED_LINE(has_crypto):  md4.pmc \
-#CONDITIONED_LINE(has_crypto):  md5.pmc \
-#CONDITIONED_LINE(has_crypto):  ripemd160.pmc \
-#CONDITIONED_LINE(has_crypto):  sha.pmc \
-#CONDITIONED_LINE(has_crypto):  sha1.pmc \
-#CONDITIONED_LINE(has_crypto):  sha256.pmc \
-#CONDITIONED_LINE(has_crypto):  sha512.pmc
+#IF(has_crypto):  md2.pmc \
+#IF(has_crypto):  md4.pmc \
+#IF(has_crypto):  md5.pmc \
+#IF(has_crypto):  ripemd160.pmc \
+#IF(has_crypto):  sha.pmc \
+#IF(has_crypto):  sha1.pmc \
+#IF(has_crypto):  sha256.pmc \
+#IF(has_crypto):  sha512.pmc
 
 all :
 	@$(BUILD) generate $(PMCS)

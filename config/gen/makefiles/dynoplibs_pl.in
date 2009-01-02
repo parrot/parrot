@@ -32,7 +32,7 @@ our $O = q[@o@];
 our $CFLAGS = q[@ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@];
 
 our $LIBPARROT = q[];
-#CONDITIONED_LINE(parrot_is_shared):$LIBPARROT = q[@libparrot_ldflags@];
+#IF(parrot_is_shared):$LIBPARROT = q[@libparrot_ldflags@];
 
 # Here comes some stuff for Win32.
 our $PATHQUOTE = q[];
@@ -46,15 +46,15 @@ if ($^O eq 'MSWin32') {
 }
 
 # OPS2C Config
-our $OPS2C = "$PERL -I $PATHQUOTE" . 
+our $OPS2C = "$PERL -I $PATHQUOTE" .
              q[@build_dir@@slash@lib] .
              "$PATHQUOTE $PATHQUOTE" .
              q[@build_dir@@slash@tools@slash@build@slash@ops2c.pl] .
              $PATHQUOTE;
 our %cores = (
     C       => q[],
-#CONDITIONED_LINE(cg_flag):   CGP     => '_cgp',
-#CONDITIONED_LINE(cg_flag):   CGoto   => '_cg',
+#IF(cg_flag):   CGP     => '_cgp',
+#IF(cg_flag):   CGoto   => '_cg',
     CSwitch => '_switch'
 );
 
@@ -73,7 +73,7 @@ sub compile_cmd {
 
 sub partial_link_cmd {
     my ($target, $libs, $sources) = @_;
-    
+
     my $liblist;
     if ($^O =~ /mswin32/i) {
         # Need to put various libraries in the link line.
@@ -106,14 +106,14 @@ if ($mode eq 'generate') {
     # Convert X.ops -> ops_X.c, ops_X_cgp.c, ops_X_cg.c and ops_X_switch.c
     my $core;
     generate_c($_) foreach (@oplibs);
-} 
+}
 elsif ($mode eq 'compile') {
     # Convert X.c -> X.o for all X.c
     my $core_suffix;
     foreach $core_suffix (values %cores) {
         compile($_ . "_ops$core_suffix") foreach (@oplibs);
     }
-} 
+}
 elsif ($mode eq 'linklibs') {
     my @objs = grep { /$O$/} @oplibs;
     @oplibs  = grep {!/$O$/} @oplibs;
@@ -123,7 +123,7 @@ elsif ($mode eq 'linklibs') {
     foreach $core_suffix (values %cores) {
         partial_link({}, $_ . "_ops$core_suffix", @objs) foreach (@oplibs);
      }
-} 
+}
 elsif ($mode eq 'copy') {
     # Copy *.so -> destination, where destination is the first
     # argument, given as --destination=DIRECTORY

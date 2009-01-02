@@ -53,10 +53,10 @@ clean: \
 Parrot-Embed : Parrot-Embed.dummy
 
 Parrot-Embed.dummy:
-#CONDITIONED_LINE(win32):	- cd Parrot-Embed && $(PERL) Makefile.PL && nmake
-#INVERSE_CONDITIONED_LINE(win32):	- cd Parrot-Embed && $(PERL) Makefile.PL && $(MAKE)
+#IF(win32):	- cd Parrot-Embed && $(PERL) Makefile.PL && nmake
+#UNLESS(win32):	- cd Parrot-Embed && $(PERL) Makefile.PL && $(MAKE)
 
 Parrot-Embed.clean:
-#CONDITIONED_LINE(win32):	- cd Parrot-Embed && nmake clean
-#INVERSE_CONDITIONED_LINE(win32):	- cd Parrot-Embed && $(MAKE) clean
+#IF(win32):	- cd Parrot-Embed && nmake clean
+#UNLESS(win32):	- cd Parrot-Embed && $(MAKE) clean
 
