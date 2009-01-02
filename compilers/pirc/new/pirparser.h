@@ -83,78 +83,79 @@
      TK_NULL = 299,
      TK_GOTO = 300,
      TK_STRINGC = 301,
-     TK_INTC = 302,
-     TK_NUMC = 303,
-     TK_PREG = 304,
-     TK_NREG = 305,
-     TK_SREG = 306,
-     TK_IREG = 307,
-     TK_CONST_VALUE = 308,
-     TK_ARROW = 309,
-     TK_NE = 310,
-     TK_EQ = 311,
-     TK_LT = 312,
-     TK_LE = 313,
-     TK_GT = 314,
-     TK_GE = 315,
-     TK_USHIFT = 316,
-     TK_RSHIFT = 317,
-     TK_LSHIFT = 318,
-     TK_FDIV = 319,
-     TK_OR = 320,
-     TK_AND = 321,
-     TK_XOR = 322,
-     TK_CONC = 323,
-     TK_ASSIGN_USHIFT = 324,
-     TK_ASSIGN_RSHIFT = 325,
-     TK_ASSIGN_LSHIFT = 326,
-     TK_ASSIGN_INC = 327,
-     TK_ASSIGN_DEC = 328,
-     TK_ASSIGN_MUL = 329,
-     TK_ASSIGN_MOD = 330,
-     TK_ASSIGN_POW = 331,
-     TK_ASSIGN_DIV = 332,
-     TK_ASSIGN_BOR = 333,
-     TK_ASSIGN_BAND = 334,
-     TK_ASSIGN_FDIV = 335,
-     TK_ASSIGN_BNOT = 336,
-     TK_ASSIGN_CONC = 337,
-     TK_FLAG_INIT = 338,
-     TK_FLAG_LOAD = 339,
-     TK_FLAG_MAIN = 340,
-     TK_FLAG_ANON = 341,
-     TK_FLAG_METHOD = 342,
-     TK_FLAG_OUTER = 343,
-     TK_FLAG_VTABLE = 344,
-     TK_FLAG_LEX = 345,
-     TK_FLAG_MULTI = 346,
-     TK_FLAG_POSTCOMP = 347,
-     TK_FLAG_IMMEDIATE = 348,
-     TK_FLAG_SUBID = 349,
-     TK_FLAG_INSTANCEOF = 350,
-     TK_FLAG_NSENTRY = 351,
-     TK_FLAG_UNIQUE_REG = 352,
-     TK_FLAG_NAMED = 353,
-     TK_FLAG_SLURPY = 354,
-     TK_FLAG_FLAT = 355,
-     TK_FLAG_OPTIONAL = 356,
-     TK_FLAG_OPT_FLAG = 357,
-     TK_FLAG_INVOCANT = 358,
-     TK_MACRO = 359,
-     TK_ENDM = 360,
-     TK_MACRO_LOCAL = 361,
-     TK_MACRO_LABEL = 362,
-     TK_MACRO_CONST = 363,
-     TK_MACRO_LABEL_ID = 364,
-     TK_MACRO_LOCAL_ID = 365,
-     TK_MACRO_IDENT = 366,
-     TK_MACRO_ARG_IDENT = 367,
-     TK_MACRO_ARG_OTHER = 368,
-     TK_MACRO_CONST_VAL = 369,
-     TK_PASM_MARKER_START = 370,
-     TK_PIR_MARKER_START = 371,
-     TK_PCC_SUB = 372,
-     TK_PARROT_OP = 373
+     TK_USTRINGC = 302,
+     TK_INTC = 303,
+     TK_NUMC = 304,
+     TK_PREG = 305,
+     TK_NREG = 306,
+     TK_SREG = 307,
+     TK_IREG = 308,
+     TK_CONST_VALUE = 309,
+     TK_ARROW = 310,
+     TK_NE = 311,
+     TK_EQ = 312,
+     TK_LT = 313,
+     TK_LE = 314,
+     TK_GT = 315,
+     TK_GE = 316,
+     TK_USHIFT = 317,
+     TK_RSHIFT = 318,
+     TK_LSHIFT = 319,
+     TK_FDIV = 320,
+     TK_OR = 321,
+     TK_AND = 322,
+     TK_XOR = 323,
+     TK_CONC = 324,
+     TK_ASSIGN_USHIFT = 325,
+     TK_ASSIGN_RSHIFT = 326,
+     TK_ASSIGN_LSHIFT = 327,
+     TK_ASSIGN_INC = 328,
+     TK_ASSIGN_DEC = 329,
+     TK_ASSIGN_MUL = 330,
+     TK_ASSIGN_MOD = 331,
+     TK_ASSIGN_POW = 332,
+     TK_ASSIGN_DIV = 333,
+     TK_ASSIGN_BOR = 334,
+     TK_ASSIGN_BAND = 335,
+     TK_ASSIGN_FDIV = 336,
+     TK_ASSIGN_BNOT = 337,
+     TK_ASSIGN_CONC = 338,
+     TK_FLAG_INIT = 339,
+     TK_FLAG_LOAD = 340,
+     TK_FLAG_MAIN = 341,
+     TK_FLAG_ANON = 342,
+     TK_FLAG_METHOD = 343,
+     TK_FLAG_OUTER = 344,
+     TK_FLAG_VTABLE = 345,
+     TK_FLAG_LEX = 346,
+     TK_FLAG_MULTI = 347,
+     TK_FLAG_POSTCOMP = 348,
+     TK_FLAG_IMMEDIATE = 349,
+     TK_FLAG_SUBID = 350,
+     TK_FLAG_INSTANCEOF = 351,
+     TK_FLAG_NSENTRY = 352,
+     TK_FLAG_UNIQUE_REG = 353,
+     TK_FLAG_NAMED = 354,
+     TK_FLAG_SLURPY = 355,
+     TK_FLAG_FLAT = 356,
+     TK_FLAG_OPTIONAL = 357,
+     TK_FLAG_OPT_FLAG = 358,
+     TK_FLAG_INVOCANT = 359,
+     TK_MACRO = 360,
+     TK_ENDM = 361,
+     TK_MACRO_LOCAL = 362,
+     TK_MACRO_LABEL = 363,
+     TK_MACRO_CONST = 364,
+     TK_MACRO_LABEL_ID = 365,
+     TK_MACRO_LOCAL_ID = 366,
+     TK_MACRO_IDENT = 367,
+     TK_MACRO_ARG_IDENT = 368,
+     TK_MACRO_ARG_OTHER = 369,
+     TK_MACRO_CONST_VAL = 370,
+     TK_PASM_MARKER_START = 371,
+     TK_PIR_MARKER_START = 372,
+     TK_PCC_SUB = 373,
+     TK_PARROT_OP = 374
    };
 #endif
 /* Tokens.  */
@@ -202,78 +203,79 @@
 #define TK_NULL 299
 #define TK_GOTO 300
 #define TK_STRINGC 301
-#define TK_INTC 302
-#define TK_NUMC 303
-#define TK_PREG 304
-#define TK_NREG 305
-#define TK_SREG 306
-#define TK_IREG 307
-#define TK_CONST_VALUE 308
-#define TK_ARROW 309
-#define TK_NE 310
-#define TK_EQ 311
-#define TK_LT 312
-#define TK_LE 313
-#define TK_GT 314
-#define TK_GE 315
-#define TK_USHIFT 316
-#define TK_RSHIFT 317
-#define TK_LSHIFT 318
-#define TK_FDIV 319
-#define TK_OR 320
-#define TK_AND 321
-#define TK_XOR 322
-#define TK_CONC 323
-#define TK_ASSIGN_USHIFT 324
-#define TK_ASSIGN_RSHIFT 325
-#define TK_ASSIGN_LSHIFT 326
-#define TK_ASSIGN_INC 327
-#define TK_ASSIGN_DEC 328
-#define TK_ASSIGN_MUL 329
-#define TK_ASSIGN_MOD 330
-#define TK_ASSIGN_POW 331
-#define TK_ASSIGN_DIV 332
-#define TK_ASSIGN_BOR 333
-#define TK_ASSIGN_BAND 334
-#define TK_ASSIGN_FDIV 335
-#define TK_ASSIGN_BNOT 336
-#define TK_ASSIGN_CONC 337
-#define TK_FLAG_INIT 338
-#define TK_FLAG_LOAD 339
-#define TK_FLAG_MAIN 340
-#define TK_FLAG_ANON 341
-#define TK_FLAG_METHOD 342
-#define TK_FLAG_OUTER 343
-#define TK_FLAG_VTABLE 344
-#define TK_FLAG_LEX 345
-#define TK_FLAG_MULTI 346
-#define TK_FLAG_POSTCOMP 347
-#define TK_FLAG_IMMEDIATE 348
-#define TK_FLAG_SUBID 349
-#define TK_FLAG_INSTANCEOF 350
-#define TK_FLAG_NSENTRY 351
-#define TK_FLAG_UNIQUE_REG 352
-#define TK_FLAG_NAMED 353
-#define TK_FLAG_SLURPY 354
-#define TK_FLAG_FLAT 355
-#define TK_FLAG_OPTIONAL 356
-#define TK_FLAG_OPT_FLAG 357
-#define TK_FLAG_INVOCANT 358
-#define TK_MACRO 359
-#define TK_ENDM 360
-#define TK_MACRO_LOCAL 361
-#define TK_MACRO_LABEL 362
-#define TK_MACRO_CONST 363
-#define TK_MACRO_LABEL_ID 364
-#define TK_MACRO_LOCAL_ID 365
-#define TK_MACRO_IDENT 366
-#define TK_MACRO_ARG_IDENT 367
-#define TK_MACRO_ARG_OTHER 368
-#define TK_MACRO_CONST_VAL 369
-#define TK_PASM_MARKER_START 370
-#define TK_PIR_MARKER_START 371
-#define TK_PCC_SUB 372
-#define TK_PARROT_OP 373
+#define TK_USTRINGC 302
+#define TK_INTC 303
+#define TK_NUMC 304
+#define TK_PREG 305
+#define TK_NREG 306
+#define TK_SREG 307
+#define TK_IREG 308
+#define TK_CONST_VALUE 309
+#define TK_ARROW 310
+#define TK_NE 311
+#define TK_EQ 312
+#define TK_LT 313
+#define TK_LE 314
+#define TK_GT 315
+#define TK_GE 316
+#define TK_USHIFT 317
+#define TK_RSHIFT 318
+#define TK_LSHIFT 319
+#define TK_FDIV 320
+#define TK_OR 321
+#define TK_AND 322
+#define TK_XOR 323
+#define TK_CONC 324
+#define TK_ASSIGN_USHIFT 325
+#define TK_ASSIGN_RSHIFT 326
+#define TK_ASSIGN_LSHIFT 327
+#define TK_ASSIGN_INC 328
+#define TK_ASSIGN_DEC 329
+#define TK_ASSIGN_MUL 330
+#define TK_ASSIGN_MOD 331
+#define TK_ASSIGN_POW 332
+#define TK_ASSIGN_DIV 333
+#define TK_ASSIGN_BOR 334
+#define TK_ASSIGN_BAND 335
+#define TK_ASSIGN_FDIV 336
+#define TK_ASSIGN_BNOT 337
+#define TK_ASSIGN_CONC 338
+#define TK_FLAG_INIT 339
+#define TK_FLAG_LOAD 340
+#define TK_FLAG_MAIN 341
+#define TK_FLAG_ANON 342
+#define TK_FLAG_METHOD 343
+#define TK_FLAG_OUTER 344
+#define TK_FLAG_VTABLE 345
+#define TK_FLAG_LEX 346
+#define TK_FLAG_MULTI 347
+#define TK_FLAG_POSTCOMP 348
+#define TK_FLAG_IMMEDIATE 349
+#define TK_FLAG_SUBID 350
+#define TK_FLAG_INSTANCEOF 351
+#define TK_FLAG_NSENTRY 352
+#define TK_FLAG_UNIQUE_REG 353
+#define TK_FLAG_NAMED 354
+#define TK_FLAG_SLURPY 355
+#define TK_FLAG_FLAT 356
+#define TK_FLAG_OPTIONAL 357
+#define TK_FLAG_OPT_FLAG 358
+#define TK_FLAG_INVOCANT 359
+#define TK_MACRO 360
+#define TK_ENDM 361
+#define TK_MACRO_LOCAL 362
+#define TK_MACRO_LABEL 363
+#define TK_MACRO_CONST 364
+#define TK_MACRO_LABEL_ID 365
+#define TK_MACRO_LOCAL_ID 366
+#define TK_MACRO_IDENT 367
+#define TK_MACRO_ARG_IDENT 368
+#define TK_MACRO_ARG_OTHER 369
+#define TK_MACRO_CONST_VAL 370
+#define TK_PASM_MARKER_START 371
+#define TK_PIR_MARKER_START 372
+#define TK_PCC_SUB 373
+#define TK_PARROT_OP 374
 
 
 
@@ -298,7 +300,7 @@ typedef union YYSTYPE
     struct macro_param *pval;
 }
 /* Line 1489 of yacc.c.  */
-#line 302 "pirparser.h"
+#line 304 "pirparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

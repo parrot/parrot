@@ -127,6 +127,11 @@ DQ_STRING       \"(\\.|[^"\\\n])*\"
 SQ_STRING       \'[^'\n]*\'
 Q_STRING       {SQ_STRING}|{DQ_STRING}
 
+ENCCHAR         {ALPHA}|{DIGIT}|"-"
+ENCCHARS        {ENCCHAR}*
+ENC             {ALPHA}{ENCCHARS}":"
+UNICODE         {ENC}{ENC}?{DQ_STRING}
+
 REGISTER       "$"[SNIP]{DIGITS}
 
 /* make sure yytext is a pointer */
@@ -380,6 +385,10 @@ REGISTER       "$"[SNIP]{DIGITS}
                     return TK_STRINGC;
                   }
 
+{UNICODE}         { /* copy the string completely*/
+                    yylval->sval = dupstr(yyget_extra(yyscanner), yytext);
+                    return TK_USTRINGC;
+                  }
 "$P"{DIGIT}+      { yylval->ival = atoi(yytext + 2); return TK_PREG; }
 "$S"{DIGIT}+      { yylval->ival = atoi(yytext + 2); return TK_SREG; }
 "$N"{DIGIT}+      { yylval->ival = atoi(yytext + 2); return TK_NREG; }

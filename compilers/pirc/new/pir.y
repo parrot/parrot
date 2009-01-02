@@ -300,6 +300,7 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
        <sval> TK_GOTO       "goto"
 
 %token <sval> TK_STRINGC    "string constant"
+       <sval> TK_USTRINGC   "unicode string"
        <ival> TK_INTC       "integer constant"
        <dval> TK_NUMC       "number constant"
        <ival> TK_PREG       "PMC register"
