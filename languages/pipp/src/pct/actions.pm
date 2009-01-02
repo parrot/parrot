@@ -220,7 +220,7 @@ method constructor_call($/) {
     # The object is the first argument
     $cons_call.unshift(
         PAST::Op.new(
-            :inline('.local pmc obj', '%r = new %0', 'obj = %r'),
+            :inline('%r = new %0', 'obj = %r'),
             $class_name
         )
     );
@@ -234,26 +234,24 @@ method constructor_call($/) {
 
     make
         PAST::Stmts.new(
+            PAST::Var.new( :name('obj'),  :scope('register'), :isdecl(1) ),
+            PAST::Var.new( :name('cons'), :scope('register'), :isdecl(1) ),
             PAST::Op.new(                    # check whether there is a constructor
                 :pasttype('if'), 
                 PAST::Op.new(
                     :pirop('isnull'),
                     PAST::Op.new(
-                        :inline("%r = get_global ['" ~ $class_name ~ "'], '__construct'", '.local pmc cons', 'cons = %r # condition')
+                        :inline("%r = get_global ['" ~ $class_name ~ "'], '__construct'", 'cons = %r')  # condition
                     )
                 ),
                 PAST::Op.new(                                 # no constructor call needed
-                    :inline('.local pmc obj',
-                            '%r = new %0',
+                    :inline('%r = new %0',
                             'obj = %r'),
                     $class_name
                 ),
                 $cons_call                                    # call the constructor
             ),
-            PAST::Var.new(                                    # return the created object
-                :name('obj'),
-                :scope('register')
-            )
+            PAST::Var.new( :name('obj'), :scope('register') ) # return the created object
         );
 }
 
