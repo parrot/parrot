@@ -22,7 +22,7 @@ several smaller components to avoid a test file that is far too unwieldy.
 =head1 REQUIREMENTS
 
 This test script requires you to build parrot_debugger, by typing
-"make parrot_debugger" (using a suitable make tool for your platform).
+"make parrot_utils" (using a suitable make tool for your platform).
 If this requirement has not been met, all tests will be skipped.
 
 =cut
@@ -42,7 +42,7 @@ BEGIN {
     $path_to_pdb = File::Spec->catfile( ".", "parrot_debugger" );
     my $exefile = $path_to_pdb . $PConfig{exe};
     unless ( -f $exefile ) {
-        plan skip_all => "parrot_debugger hasn't been built";
+        plan skip_all => "parrot_debugger hasn't been built. Run make parrot_utils";
         exit(0);
     }
 }
@@ -101,6 +101,7 @@ sub pdb_output_like {
     my $output = join( '', <$f> );
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+    unlink ($codefn, $stdinfn, $stdoutfn);
     like( $output, $check, $diag );
 }
 
