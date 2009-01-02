@@ -40,7 +40,6 @@ loop:
     getattribute P2, P3, ".i"
     print P2
     print "\n"
-    typeof I0, P3
     end
 
 .pcc_sub __init:
