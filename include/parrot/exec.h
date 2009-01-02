@@ -149,6 +149,21 @@ int Parrot_exec_add_symbol(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*obj);
 
+#define ASSERT_ARGS_Parrot_exec_add_text_rellocation assert(obj); \
+                                                     assert(nptr); \
+                                                     assert(symbol);
+#define ASSERT_ARGS_Parrot_exec_add_text_rellocation_func assert(obj); \
+                                                          assert(nptr); \
+                                                          assert(func_name);
+#define ASSERT_ARGS_Parrot_exec_add_text_rellocation_reg assert(obj); \
+                                                         assert(nptr); \
+                                                         assert(var);
+#define ASSERT_ARGS_Parrot_exec assert(interp); \
+                                assert(pc); \
+                                assert(code_start); \
+                                assert(code_end);
+#define ASSERT_ARGS_Parrot_exec_add_symbol assert(obj); \
+                                           assert(symbol);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/exec.c */
 

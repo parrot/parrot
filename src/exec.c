@@ -49,6 +49,10 @@ static int symbol_list_find(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_add_data_member assert(obj);
+#define ASSERT_ARGS_exec_init assert(obj);
+#define ASSERT_ARGS_symbol_list_find assert(obj); \
+                                     assert(symbol);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
