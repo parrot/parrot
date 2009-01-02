@@ -33,7 +33,6 @@ F<examples/benchmarks/arriter.pir>.
 =cut
 
 .sub arriter :main
-.include "iterator.pasm"
 
 # declaration of lexicals
     $P20 = new 'Hash'
@@ -68,7 +67,7 @@ for_1_end:
 
 # set up all 5 element permutations of qw( A B C D E F G H I J )
     $P29 = new 'Undef'
-    .lex "e", P29
+    .lex "e", $P29
     $P29 = 0
 for_2_start:
     unless $P29 <= 3 goto for_2_end
@@ -77,8 +76,7 @@ for_2_start:
 for_3_start:
         unless $P30 < 10 goto for_3_end
             find_lex $P31 , "@k"
-            $P32 = new Iterator, $P31
-            $P32 = .ITERATE_FROM_START
+            $P32 = iter $P31
 
             # start of opt: invariant may go out of loop
             $P33 = new 'Undef'
@@ -124,8 +122,7 @@ for_2_end:
 
     # XXX why does this not work ?
     #$P42 = new Iterator, $P41
-    $P42 = new Iterator, $P22
-    $P42 = .ITERATE_FROM_START
+    $P42 = iter $P22
     $P43 = find_lex "%ha"
     $I1 = 0
 iter_2_start:
