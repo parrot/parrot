@@ -300,7 +300,6 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
        <sval> TK_GOTO       "goto"
 
 %token <sval> TK_STRINGC    "string constant"
-       <sval> TK_UCSTRING   "unicode string"
        <ival> TK_INTC       "integer constant"
        <dval> TK_NUMC       "number constant"
        <ival> TK_PREG       "PMC register"
@@ -493,7 +492,6 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
 
 %type <cval> const_tail
              constant
-             stringconst
 
 /* all exported functions start with "yypir", instead of default "yy". */
 %name-prefix="yypir"
@@ -1160,7 +1158,7 @@ assignment        : target '=' TK_INTC
 
                           get_opinfo(yyscanner);
                         }
-                  | target '=' stringconst
+                  | target '=' TK_STRINGC
                         {
                           set_instrf(lexer, "set", "%T%s", $1, $3);
                           get_opinfo(yyscanner);
@@ -2026,14 +2024,10 @@ expression  : target         { $$ = expr_from_target(lexer, $1); }
             ;
 
 
-constant    : stringconst    { $$ = $1; }
+constant    : TK_STRINGC     { $$ = new_const(lexer, STRING_TYPE, $1); }
             | TK_INTC        { $$ = new_const(lexer, INT_TYPE, $1); }
             | TK_NUMC        { $$ = new_const(lexer, NUM_TYPE, $1); }
             | TK_CONST_VALUE { $$ = $1; }
-            ;
-
-stringconst : TK_STRINGC     { $$ = new_const(lexer, STRING_TYPE, $1); }
-            | TK_UCSTRING    { $$ = new_const(lexer, STRING_TYPE, $1); }
             ;
 
 rel_op      : "!="           { $$ = OP_NE; }
@@ -3313,11 +3307,11 @@ get_signature_length(NOTNULL(expression * const e)) {
         case EXPR_KEY: { /* for '_', 'k' */
             int n;
             /* if the key is an integer constant, then signature becomes '_kic', otherwise _kc. */
-        /*    if (e->expr.k->head->expr->type         == EXPR_CONSTANT
+            if (e->expr.k->head->expr->type         == EXPR_CONSTANT
             &&  e->expr.k->head->expr->expr.c->type == INT_TYPE)
                 n = 3;
             else
-        */        n = 2;
+                n = 2;
 
             return n + get_signature_length(e->expr.k->head->expr);
         }
@@ -3377,9 +3371,9 @@ write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
                         break;
                     case EXPR_CONSTANT:
                         /* integer constant key results in '_kic' signature */
-                      /*  if (iter->expr.c->type == INT_TYPE)
+                        if (iter->expr.c->type == INT_TYPE)
                             *instr_writer++ = 'i';
-                      */
+
                         *instr_writer++ = 'c';
                         break;
                     default:

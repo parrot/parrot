@@ -123,14 +123,8 @@ SIGN           [-+]
 BIGINT         {SIGN}?{DIGITS}"L"
 FLOATNUM       {SIGN}?(({DIGITS}{DOT}{DIGIT}*|{DOT}{DIGITS})([eE]{SIGN}?{DIGITS})?|{DIGITS}[eE]{SIGN}?{DIGITS})
 
-DQ_STRING      \"(\\.|[^"\\\n])*\"
-SQ_STRING      \'[^'\n]*\'
-
-ENCCHAR        {ALPHA}|{DIGIT}|"-"
-ENCCHARS       {ENCCHAR}*
-ENC            {ALPHA}{ENCCHARS}":"
-UNICODE        {ENC}{ENC}?{DQ_STRING}
-
+DQ_STRING       \"(\\.|[^"\\\n])*\"
+SQ_STRING       \'[^'\n]*\'
 Q_STRING       {SQ_STRING}|{DQ_STRING}
 
 REGISTER       "$"[SNIP]{DIGITS}
@@ -384,11 +378,6 @@ REGISTER       "$"[SNIP]{DIGITS}
 {Q_STRING}        { /* copy the string, remove the quotes. */
                     yylval->sval = dupstrn(yyget_extra(yyscanner), yytext + 1, yyleng - 2);
                     return TK_STRINGC;
-                  }
-
-{UNICODE}         { /* e.g. iso-8859-1:"hi". the whole yytext, including encoding is copied */
-                    yylval->sval = dupstr(yyget_extra(yyscanner), yytext);
-                    return TK_UCSTRING;
                   }
 
 "$P"{DIGIT}+      { yylval->ival = atoi(yytext + 2); return TK_PREG; }
