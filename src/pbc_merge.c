@@ -233,6 +233,7 @@ pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
     INTVAL program_size, wanted;
     char *program_code;
     PackFile *pf;
+    ASSERT_ARGS(pbc_merge_loadpbc);
     FILE * io = NULL;
     INTVAL is_mapped = 0;
     size_t chunk_size;
@@ -321,9 +322,10 @@ static PackFile_ByteCode*
 pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                    int num_inputs, ARGMOD(PackFile *pf))
 {
+    int i;
+    ASSERT_ARGS(pbc_merge_bytecode);
     opcode_t *bc = mem_allocate_typed(opcode_t);
     opcode_t cursor = 0;
-    int i;
 
     /* Add a bytecode segment. */
     PackFile_ByteCode * const bc_seg =
@@ -385,9 +387,10 @@ static PackFile_ConstTable*
 pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                     int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode *bc))
 {
+    int i, j;
+    ASSERT_ARGS(pbc_merge_constants);
     PackFile_Constant   **constants = mem_allocate_typed(PackFile_Constant *);
     opcode_t cursor = 0;
-    int i, j;
 
     /* Add a constant table segment. */
     PackFile_ConstTable * const const_seg = (PackFile_ConstTable*)PackFile_Segment_new_seg(
@@ -480,10 +483,11 @@ static void
 pbc_merge_fixups(PARROT_INTERP, ARGIN(pbc_merge_input **inputs),
                  int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode *bc))
 {
+    int i, j;
+    ASSERT_ARGS(pbc_merge_fixups);
     PackFile_FixupTable *fixup_seg;
     PackFile_FixupEntry **fixups = mem_allocate_typed(PackFile_FixupEntry *);
     opcode_t cursor = 0;
-    int i, j;
 
     /* Add a fixup table segment. */
     fixup_seg = (PackFile_FixupTable*)PackFile_Segment_new_seg(
@@ -575,13 +579,14 @@ static void
 pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                  int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode *bc))
 {
+    int i, j;
+    ASSERT_ARGS(pbc_merge_debugs);
     PackFile_Debug *debug_seg;
     opcode_t *lines                  = mem_allocate_typed(opcode_t);
     PackFile_DebugMapping **mappings =
         mem_allocate_typed(PackFile_DebugMapping *);
     opcode_t num_mappings = 0;
     opcode_t num_lines    = 0;
-    int i, j;
 
     /* We need to merge both the mappings and the list of line numbers.
        The line numbers can just be concatenated. The mappings must have
@@ -648,6 +653,7 @@ pbc_merge_pic_index(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     int i;
     PackFile_Segment *pic_index;
     size_t size;
+    ASSERT_ARGS(pbc_merge_pic_index);
     opcode_t cursor = 0;
     opcode_t start = 0;
     opcode_t last = 0;
@@ -697,11 +703,12 @@ static void
 pbc_merge_ctpointers(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                      int num_inputs, ARGMOD(PackFile_ByteCode *bc))
 {
+    int        cur_arg;
     opcode_t  *op_ptr;
+    ASSERT_ARGS(pbc_merge_ctpointers);
     opcode_t  *ops       = bc->base.data;
     opcode_t   cur_op    = 0;
     int        cur_input = 0;
-    int        cur_arg;
 
     /* Loop over the ops in the merged bytecode. */
     while (cur_op < (opcode_t)bc->base.size) {
@@ -781,6 +788,7 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
 {
     PackFile_ByteCode   *bc;
     PackFile_ConstTable *ct;
+    ASSERT_ARGS(pbc_merge_begin);
 
     /* Create a new empty packfile. */
     PackFile * const merged = PackFile_new(interp, 0);
@@ -819,6 +827,7 @@ This functions writes out the merged packfile.
 static void
 pbc_merge_write(PARROT_INTERP, ARGMOD(PackFile *pf), ARGIN(const char *filename))
 {
+    ASSERT_ARGS(pbc_merge_write);
     FILE     *fp;
 
     /* Get size of packfile we'll write. */
