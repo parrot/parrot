@@ -656,7 +656,7 @@ location_directive: ".line" TK_INTC
                   ;
 
 annotation        : ".annotate" TK_STRINGC ',' TK_STRINGC
-                        { /* XXX */ }
+                        { annotate(lexer, $2, $4); }
                   ;
 
 /* HLL stuff      */
@@ -3461,8 +3461,6 @@ get_signatured_opname(NOTNULL(lexer_state * const lexer), NOTNULL(instruction * 
         iter = iter->next;
         do {
             int keylength    = get_signature_length(iter);
-            /* printf("keylength of operand was: %d\n", keylength);
-            */
             fullname_length += keylength;
             iter             = iter->next;
             ++num_operands;
@@ -3575,9 +3573,11 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
             symbol *sym = find_symbol(lexer, operand->expr.id);
 
             if (sym) {
-                operand->expr.t        = new_target(lexer);
-                /* operand->expr.t->s.sym = sym;  */ /* target's pointer set to symbol */
+                operand->expr.t        = target_from_symbol(lexer, sym);
+                /*
+                operand->expr.t = new_target(lexer);
                 operand->expr.t->info  = &sym->info;
+                */
                 operand->type          = EXPR_TARGET; /* convert operand node into EXPR_TARGET */
             }
             else { /* it must be a label */

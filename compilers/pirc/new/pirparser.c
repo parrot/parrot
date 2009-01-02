@@ -2663,7 +2663,7 @@ yyreduce:
 
   case 40:
 #line 659 "pir.y"
-    { /* XXX */ ;}
+    { annotate(lexer, (yyvsp[(2) - (4)].sval), (yyvsp[(4) - (4)].sval)); ;}
     break;
 
   case 41:
@@ -6049,7 +6049,7 @@ get_signature_length(NOTNULL(expression * const e)) {
         case EXPR_KEY: { /* for '_', 'k' */
             int n;
             /* if the key is an integer constant, then signature becomes '_kic', otherwise _kc. */
-            if (e->expr.k->head->expr->type    == EXPR_CONSTANT
+            if (e->expr.k->head->expr->type         == EXPR_CONSTANT
             &&  e->expr.k->head->expr->expr.c->type == INT_TYPE)
                 n = 3;
             else
@@ -6203,8 +6203,6 @@ get_signatured_opname(NOTNULL(lexer_state * const lexer), NOTNULL(instruction * 
         iter = iter->next;
         do {
             int keylength    = get_signature_length(iter);
-            /* printf("keylength of operand was: %d\n", keylength);
-            */
             fullname_length += keylength;
             iter             = iter->next;
             ++num_operands;
@@ -6317,9 +6315,11 @@ check_op_args_for_symbols(yyscan_t yyscanner) {
             symbol *sym = find_symbol(lexer, operand->expr.id);
 
             if (sym) {
-                operand->expr.t        = new_target(lexer);
-                /* operand->expr.t->s.sym = sym;  */ /* target's pointer set to symbol */
+                operand->expr.t        = target_from_symbol(lexer, sym);
+                /*
+                operand->expr.t = new_target(lexer);
                 operand->expr.t->info  = &sym->info;
+                */
                 operand->type          = EXPR_TARGET; /* convert operand node into EXPR_TARGET */
             }
             else { /* it must be a label */

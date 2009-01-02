@@ -2302,6 +2302,21 @@ update_sub_register_usage(lexer_state * const lexer, unsigned reg_usage[NUM_PARR
         CURRENT_SUB(lexer)->info.regs_used[i] = reg_usage[i];
 }
 
+/*
+
+=item C<void
+annotate(lexer_state * const lexer, char const * const key, char const * const value)>
+
+Add a new annotation with key C<key> and value C<value>.
+
+=cut
+
+*/
+void
+annotate(lexer_state * const lexer, char const * const key, char const * const value) {
+    /* XXX todo */
+}
+
 
 /*
 

@@ -463,6 +463,8 @@ void update_sub_register_usage(struct lexer_state * const lexer,
 void new_sub_instr(struct lexer_state * const lexer, int opcode, char const * const opname,
               unsigned num_var_args);
 
+void annotate(struct lexer_state * const lexer, char const * const key, char const * const value);
+
 #endif /* PARROT_PIR_PIRCOMPUNIT_H_GUARD */
 
 /*
