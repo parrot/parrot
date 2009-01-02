@@ -35,8 +35,9 @@ typedef struct multi_type {
 
     union multi_union {
         char const     *ident;
-        multi_key_type  key;
-    } u;
+        multi_key_type *key;
+
+    } entry;
 
     multi_entry entry_type;
 

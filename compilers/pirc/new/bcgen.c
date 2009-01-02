@@ -77,6 +77,8 @@ struct bytecode {
 
 static int new_pbc_const(bytecode * const bc);
 
+static STRING *add_string_const_from_cstring(bytecode * const bc, char const * const str);
+
 
 /*
 
@@ -490,13 +492,22 @@ store_key_bytecode(bytecode * const bc, opcode_t * key) {
     return index;
 }
 
-/* XXX remove or update prototype once the XXX below has been resolved. */
-static STRING *add_string_const_from_cstring(bytecode * const bc, char const * const str);
+
+
+
 
 /*
 
-XXX think of better name.
-Add a string constant to the constants list, and return the STRING variant
+=item C<static STRING *
+add_string_const_from_cstring(bytecode * const bc, char const * const str)>
+
+Utility function to add a C-string to the constants table. Before adding
+it to the constants table, the C-string is converted to a Parrot STRING
+first, which is returned. This function is handy if you don't want to
+retrieve the index in the constants table (where the string is stored),
+but you want the STRING representing the string instead.
+
+=cut
 
 */
 static STRING *
@@ -548,7 +559,7 @@ generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned
         switch (iter->entry_type) {
             case MULTI_TYPE_IDENT: {
                 /* add the string to the constant table, retrieve a pointer to the STRING */
-                STRING * typestring = add_string_const_from_cstring(bc, types[i].u.ident);
+                STRING * typestring = add_string_const_from_cstring(bc, types[i].entry.ident);
                 /* create a new String PMC. */
                 sig_pmc = pmc_new(bc->interp, enum_class_String);
                 /* set the STRING in the String PMC */
@@ -671,14 +682,47 @@ find_outer_sub(bytecode * const bc, char const * const outername) {
 
 /*
 
-Get the namespace PMC.
+=item C<static PMC *
+get_namespace_pmc(bytecode * const bc, multi_type * const ns)>
+
+Get a PMC representing the namespace for a sub. The namespace information
+is passed in C<ns>.
+
+=cut
 
 */
 static PMC *
 get_namespace_pmc(bytecode * const bc, multi_type * const ns) {
+    PMC *namespace_pmc = NULL;
 
-    return NULL;
+    switch (ns->entry_type) {
+        case MULTI_TYPE_IDENT:
+            namespace_pmc = constant_pmc_new(bc->interp, enum_class_String);
+            PMC_str_val(namespace_pmc) = add_string_const_from_cstring(bc, ns->entry.ident);
+            break;
+        case MULTI_TYPE_KEYED:
+            break;
+        default:
+            fprintf(stderr, "unknown key type"); /* XXX exception? */
+            break;
+    }
+    return namespace_pmc;
 }
+/*
+    if (ns_const >= 0 && ns_const < ct->const_count) {
+        switch (ct->constants[ns_const]->type) {
+            case PFC_KEY:
+                ns_pmc = ct->constants[ns_const]->u.key;
+                break;
+            case PFC_STRING:
+                ns_pmc = constant_pmc_new(interp, enum_class_String);
+                PMC_str_val(ns_pmc) = ct->constants[ns_const]->u.string;
+                break;
+            default:
+                break;
+        }
+    }
+    */
 
 /*
 
@@ -725,7 +769,10 @@ create_sub_pmc(bytecode * const bc, int iscoroutine, char const * const instance
     /* use a possible type mapping for the Sub PMCs, and create it */
     type = Parrot_get_ctx_HLL_type(bc->interp, type);
 
-    /* TODO create constant - see also src/packfile.c */
+    /* XXX Most of this code comes from IMCC, which also has the TODO:
+     * TODO create constant - see also src/packfile.c
+     * XXX is this (still) necessary?
+     */
     return pmc_new(bc->interp, type);
 }
 
@@ -737,6 +784,9 @@ add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subprag
 
 Add a sub PMC to the constant table. This function initializes the sub PMC.
 The index where the PMC is stored in the constant table is returned.
+If C<needlex> is true, the sub will always get a lexpad; otherwise it will
+only have a lexpad if it has lexicals, or if it's lexically nested.
+The C<subpragmas> parameter encode flags such as C<:immediate> etc.
 
 =cut
 
@@ -756,14 +806,12 @@ add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subprag
     subname_index         = add_string_const(bc, info->subname);
     subname_const         = bc->interp->code->const_table->constants[subname_index];
 
-    /* set start and end offset of this sub in the bytecode. This is calculated during
-     * the parsing phase.
+    /* set start and end offset of this sub in the bytecode.
+     * This is calculated during the parsing phase.
      */
     sub->start_offs       = info->startoffset;
     sub->end_offs         = info->endoffset;
-
     sub->namespace_name   = get_namespace_pmc(bc, info->name_space);
-
     sub->HLL_id           = CONTEXT(bc->interp)->current_HLL;
     sub->lex_info         = create_lexinfo(bc, sub_pmc, info->lexicals, needlex);
     sub->outer_sub        = find_outer_sub(bc, info->outersub);
@@ -772,7 +820,6 @@ add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subprag
      * index was found during the parse; otherwise it's -1.
      */
     sub->vtable_index     = info->vtable_index;
-
     sub->multi_signature  = generate_multi_signature(bc, info->multi_types, info->num_multi_types);
 
     /* copy sub pragma flags such as :immediate etc. */
