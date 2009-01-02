@@ -41,6 +41,7 @@
 .include 'languages/pipp/src/common/php_proc_open.pir'
 .include 'languages/pipp/src/common/php_quot_print.pir'
 .include 'languages/pipp/src/common/php_rand.pir'
+.include 'languages/pipp/src/common/php_reflection.pir'
 .include 'languages/pipp/src/common/php_reg.pir'
 .include 'languages/pipp/src/common/php_sha1.pir'
 .include 'languages/pipp/src/common/php_soundex.pir'

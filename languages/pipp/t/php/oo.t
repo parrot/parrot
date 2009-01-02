@@ -20,7 +20,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'definition of a class' );
 <?php
@@ -269,4 +269,19 @@ $foo = new Foo('what the message is');
 ?>
 CODE
 The message is what the message is.
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'ReflectionClass::getName()' );
+<?php
+
+class Foo {
+}
+
+$refl_1 = new ReflectionClass('Foo');
+echo $refl_1->getName();
+echo "\n";
+
+?>
+CODE
+Foo
 OUT
