@@ -209,17 +209,51 @@ method method_call($/) {
     make $past;
 }
 
+# TODO: simplify
 method constructor_call($/) {
     my $class_name := ~$<CLASS_NAME>;
+    # The constructor needs a list of it's arguments, or an empty list
+    my $cons_call  := +$<argument_list> ??
+                        $( $<argument_list>[0] )
+                        !!
+                        PAST::Op.new( :pasttype('call') );
+    # The object is the first argument
+    $cons_call.unshift(
+        PAST::Op.new(
+            :inline('.local pmc obj', '%r = new %0', 'obj = %r'),
+            $class_name
+        )
+    );
+    # The function comes before the first argument
+    $cons_call.unshift(
+        PAST::Var.new(
+            :name('cons'),
+            :scope('register')
+        )
+    );
 
     make
-        PAST::Op.new(
-            :inline('    %r = new %0',
-                    "    \$P0 = get_global ['" ~ $class_name ~ "'], '__construct'",
-                    '    if null $P0 goto no_constructor',
-                    '    $P0(%r)',
-                    '  no_constructor:'),                                                   
-            $class_name
+        PAST::Stmts.new(
+            PAST::Op.new(                    # check whether there is a constructor
+                :pasttype('if'), 
+                PAST::Op.new(
+                    :pirop('isnull'),
+                    PAST::Op.new(
+                        :inline("%r = get_global ['" ~ $class_name ~ "'], '__construct'", '.local pmc cons', 'cons = %r # condition')
+                    )
+                ),
+                PAST::Op.new(                                 # no constructor call needed
+                    :inline('.local pmc obj',
+                            '%r = new %0',
+                            'obj = %r'),
+                    $class_name
+                ),
+                $cons_call                                    # call the constructor
+            ),
+            PAST::Var.new(                                    # return the created object
+                :name('obj'),
+                :scope('register')
+            )
         );
 }
 

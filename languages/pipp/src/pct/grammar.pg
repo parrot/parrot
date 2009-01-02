@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2009, The Perl Foundation.
 # $Id$
 
 # PHP grammar for Pipp PCT
@@ -21,14 +21,14 @@ token singlelinecomment { [ '#' || '//' ] \N* }    # end of line comment like Un
 token multilinecomment  { '/*' .*?  '*/' }         # C-like multiline comment
 
 token ws_all {
-      <.ws_char>
+    | <.ws_char>
     | <singlelinecomment>
     | <multilinecomment>
 }
 
 # whitespace rule used implicity by rules
 token ws {
-      <!ww> <ws_all>+
+    | <!ww> <ws_all>+
     | <ws_all>*
 }
 
@@ -295,7 +295,7 @@ rule key_value_pair {
 }
 
 rule constructor_call {
-    'new' <CLASS_NAME>
+    'new' <CLASS_NAME> [ '(' <argument_list> ')' ]?
     {*}
 }
 

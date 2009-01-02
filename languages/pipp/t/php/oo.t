@@ -20,7 +20,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'definition of a class' );
 <?php
@@ -253,4 +253,20 @@ $foo = new Foo;
 ?>
 CODE
 method __construct() of class Foo was called.
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'constructor with one arg' );
+<?php
+
+class Foo {
+    function __construct($msg) {
+        echo "The message is $msg.\n";
+    }
+}
+
+$foo = new Foo('what the message is');
+
+?>
+CODE
+The message is what the message is.
 OUT
