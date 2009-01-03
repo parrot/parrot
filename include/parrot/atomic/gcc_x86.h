@@ -33,10 +33,12 @@ PARROT_EXPORT
 long parrot_i386_xadd(ARGIN(volatile long *l), long amount)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_parrot_i386_cmpxchg assert(ptr); \
-                                        assert(expect); \
-                                        assert(update);
-#define ASSERT_ARGS_parrot_i386_xadd assert(l);
+#define ASSERT_ARGS_parrot_i386_cmpxchg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(ptr) \
+    || PARROT_ASSERT_ARG(expect) \
+    || PARROT_ASSERT_ARG(update)
+#define ASSERT_ARGS_parrot_i386_xadd __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(l)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/atomic/gcc_x86.c */
 

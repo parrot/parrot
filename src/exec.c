@@ -49,10 +49,13 @@ static int symbol_list_find(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_add_data_member assert(obj);
-#define ASSERT_ARGS_exec_init assert(obj);
-#define ASSERT_ARGS_symbol_list_find assert(obj); \
-                                     assert(symbol);
+#define ASSERT_ARGS_add_data_member __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(obj)
+#define ASSERT_ARGS_exec_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(obj)
+#define ASSERT_ARGS_symbol_list_find __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(obj) \
+    || PARROT_ASSERT_ARG(symbol)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
