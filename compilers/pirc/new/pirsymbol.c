@@ -271,6 +271,8 @@ check_unused_symbols(NOTNULL(lexer_state * const lexer)) {
     while (subiter != lexer->subs->next); /* iterate over all subs */
 }
 
+
+static const int convert_valuetype_to_pirtype[10] = {0,1,2,3,4,0,1,2,3,1};
 /*
 
 =item C<symbol *
@@ -291,6 +293,8 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
     hashtable    *table    = &CURRENT_SUB(lexer)->symbols;
     unsigned long hashcode = get_hashcode(name, table->size);
     bucket       *buck     = get_bucket(table, hashcode);
+    constant     *c;
+
 
     while (buck) {
         symbol *sym = bucket_symbol(buck);
@@ -315,6 +319,15 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
 
         buck = buck->next;
     }
+
+    /* it's not a symbol; try the constants */
+    c = find_global_constant(lexer, name);
+    if (c) {
+        symbol *sym = new_symbol(lexer, name, convert_valuetype_to_pirtype[c->type]);
+        fprintf(stderr, "symbol type: %d ==> %d\n", c->type, convert_valuetype_to_pirtype[c->type]);
+        return sym;
+    }
+
     return NULL;
 }
 
@@ -604,14 +617,17 @@ that name, then NULL is returned.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 constant *
-find_global_constant(NOTNULL(lexer_state * const lexer), NOTNULL(char * const name)) {
+find_global_constant(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)) {
     hashtable    *table    = &lexer->constants;
     unsigned long hashcode = get_hashcode(name, table->size);
     bucket *b              = get_bucket(table, hashcode);
 
+    fprintf(stderr, "finding global constant '%s'\n", name);
     while (b) {
-        if (STREQ(bucket_constant(b)->name, name))
+        if (STREQ(bucket_constant(b)->name, name)) {
+            fprintf(stderr, "found!\n");
             return bucket_constant(b);
+        }
 
         b = b->next;
     }

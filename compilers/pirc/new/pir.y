@@ -2016,7 +2016,7 @@ const_tail            : "int" identifier '=' TK_INTC
                       | "string" identifier '=' TK_STRINGC
                             { $$ = new_named_const(lexer, STRING_VAL, $2, $4); }
                       | TK_STRINGC identifier '=' constant
-                            { $$ = new_pmc_const($1, $2, $4); }
+                            { $$ = new_pmc_const(lexer, $1, $2, $4); }
                       ;
 
 
@@ -2031,7 +2031,6 @@ expression  : target         { $$ = expr_from_target(lexer, $1); }
 constant    : TK_STRINGC     { $$ = new_const(lexer, STRING_VAL, $1); }
             | TK_INTC        { $$ = new_const(lexer, INT_VAL, $1); }
             | TK_NUMC        { $$ = new_const(lexer, NUM_VAL, $1); }
-            | TK_CONST_VALUE { $$ = $1; }
             | TK_USTRINGC    { $$ = new_const(lexer, USTRING_VAL, $1); }
             ;
 

@@ -100,7 +100,7 @@ global_label *find_global_label(struct lexer_state * const lexer, char const * c
 void store_global_constant(struct lexer_state * const lexer, constant * const c);
 
 /* find a global .const symbol */
-constant *find_global_constant(struct lexer_state * const lexer, char * const name);
+constant *find_global_constant(struct lexer_state * const lexer, char const * const name);
 
 void assign_vanilla_register(struct lexer_state * const lexer, symbol * const sym);
 

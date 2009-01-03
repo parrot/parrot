@@ -1132,7 +1132,6 @@ get_operand(lexer_state * const lexer, short n) {
     /* go to the nth operand and return that one. */
     while (--n > 0) {
         operand = operand->next;
-
     }
 
     PARROT_ASSERT(operand);
@@ -1310,9 +1309,35 @@ XXX if type is "Sub", value must be looked up, as it is the name of a subroutine
 
 */
 constant *
-new_pmc_const(char const * const type, char const * const name, constant * const value) {
-    value->name = name;
-    /* XXX implement this. Not sure yet how to. */
+new_pmc_const(lexer_state * const lexer, char const * const type,
+              char const * const name, constant * const value)
+{
+    /*
+    fprintf(stderr, "new pmc (%s) const (%s) with value %s\n", type, name, value->val.sval);
+    */
+
+    if (STREQ(type, "Sub")) {
+        /* create a symbol representing the constant */
+        symbol *constsym = new_symbol(lexer, name, PMC_TYPE);
+        /* create a target from the symbol */
+        target *consttarg = target_from_symbol(lexer, constsym);
+
+        /* declare it as a local, so that it will get a register assigned. */
+        declare_local(lexer, PMC_TYPE, constsym);
+
+        value->name  = name;
+        value->type  = PMC_VAL;
+
+        new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc", 0);
+        push_operand(lexer, expr_from_target(lexer, consttarg));
+        push_operand(lexer, expr_from_int(lexer, 99)); /* must be index in const table of
+                                                           the sub stored in <value>
+                                                           must be patched back later.
+                                                           How to do this?
+                                                           */
+    }
+
+
     return value;
 }
 
