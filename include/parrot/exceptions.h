@@ -279,10 +279,17 @@ void Parrot_print_backtrace(void);
  * so headerizer can define the ASSERT_ARGS_* macros like:
  * int _ASSERT_ARGS = PARROT_ASSERT_ARG(a) || PARROT_ASSERT_ARG(b) || ...
  */
-static inline int PARROT_ASSERT_ARG(const void *x) {
+static inline int
+_PARROT_ASSERT_ARG(const void *x, const char *name,
+        const char *file, unsigned int line) /* HEADERIZER SKIP */
+{
+#ifndef NDEBUG
+    if(!x) Parrot_confess(name, file, line);
+#endif
     PARROT_ASSERT(x);
     return 0;
 }
+#define PARROT_ASSERT_ARG(x) _PARROT_ASSERT_ARG((x), (#x), __FILE__, __LINE__)
 #define ASSERT_ARGS(a) ASSERT_ARGS_ ## a
 
 
