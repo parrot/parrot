@@ -21,6 +21,9 @@ class Pipp::Grammar::Actions;
 
 method TOP($/, $key) {
     our @?BLOCK; # A stack of PAST::Block
+    our @?SUPER_GLOBALS :=
+          ( '$_GET', '$_POST', '$_SERVER', '$_GLOBALS',
+            '$_FILES', '$_COOKIE', '$_SESSION', '$_REQUEST', '$_ENV' );
 
     if $key eq 'open' {
         my $block := PAST::Block.new(
@@ -28,13 +31,12 @@ method TOP($/, $key) {
                          :hll('pipp')
                      );
 
+        # by default all symbols are lexical
+        $block.symbol_defaults( :scope('lexical') );
 
         # set up scope 'package' for the superglobals
-        $block.symbol_defaults( :scope('lexical') );
-        for ( '$_GET', '$_POST', '$_SERVER', '$_GLOBALS',
-              '$_FILES', '$_COOKIE', '$_SESSION', '$_REQUEST', '$_ENV' ) {
-            $block.symbol( :scope('package'), $_ );
-        }
+        for ( @?SUPER_GLOBALS ) { $block.symbol( :scope('package'), $_ ); }
+
         @?BLOCK.unshift($block);
     }
     else {
@@ -541,6 +543,10 @@ method closure($/, $key) {
         # note that $<param_list> creates a new PAST::Block.
         my $block := $( $<param_list> );
 
+        # set up scope 'package' for the superglobals
+        our @?SUPER_GLOBALS;
+        for ( @?SUPER_GLOBALS ) { $block.symbol( :scope('package'), $_ ); }
+
         # declare the bound vars a lexical
         if +$<bind_list> == 1 {
             for $<bind_list>[0]<VAR_NAME> {
@@ -564,7 +570,13 @@ method function_definition($/, $key) {
 
     if $key eq 'open' {
         # note that $<param_list> creates a new PAST::Block.
-        @?BLOCK.unshift( $( $<param_list> ) );
+        my $block := $( $<param_list> );
+
+        # set up scope 'package' for the superglobals
+        our @?SUPER_GLOBALS;
+        for ( @?SUPER_GLOBALS ) { $block.symbol( :scope('package'), $_ ); }
+
+        @?BLOCK.unshift( $block );
     }
     else {
         my $block := @?BLOCK.shift();
@@ -583,6 +595,11 @@ method class_method_definition($/, $key) {
     if $key eq 'open' {
         # note that $<param_list> creates a new PAST::Block.
         my $block := $( $<param_list> );
+
+        # set up scope 'package' for the superglobals
+        our @?SUPER_GLOBALS;
+        for ( @?SUPER_GLOBALS ) { $block.symbol( :scope('package'), $_ ); }
+
         $block.unshift(
             PAST::Op.new(
                 :pasttype('bind'),
@@ -613,11 +630,7 @@ method class_method_definition($/, $key) {
 }
 
 method param_list($/) {
-    my $block :=
-        PAST::Block.new(
-            :blocktype('declaration'),
-            :node($/)
-        );
+    my $block := PAST::Block.new( :blocktype('declaration'), :node($/) );
     my $arity := 0;
     for $<VAR_NAME> {
         $block.push(
@@ -659,13 +672,17 @@ method class_definition($/, $key) {
     our @?BLOCK; # A stack of PAST::Block
 
     if $key eq 'open' {
-        @?BLOCK.unshift(
-            PAST::Block.new(
+        my $block := PAST::Block.new(
                 :node($/),
                 :blocktype('declaration'),
                 :pirflags( ':init :load' )
-            )
-        );
+            );
+
+        # set up scope 'package' for the superglobals
+        our @?SUPER_GLOBALS;
+        for ( @?SUPER_GLOBALS ) { $block.symbol( :scope('package'), $_ ); }
+
+        @?BLOCK.unshift( $block );
     }
     else {
         my $block := @?BLOCK.shift();

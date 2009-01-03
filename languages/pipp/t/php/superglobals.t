@@ -1,4 +1,4 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -68,7 +68,7 @@ CODE
 outside function: as=df
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', '$_ENV in a function', todo => 'superglobals in function broken' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', '$_GET in a function' );
 <?php
 
 echo 'outside function: ';
