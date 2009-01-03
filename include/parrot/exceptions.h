@@ -267,28 +267,21 @@ void Parrot_print_backtrace(void);
 
 #define PANIC(interp, message) do_panic((interp), (message), __FILE__, __LINE__)
 
-#ifdef NDEBUG
-#  define PARROT_ASSERT(x) ((void)0)
-#else
-#  define PARROT_ASSERT(x) (x) ? ((void)0) : Parrot_confess(#x, __FILE__, __LINE__)
-#endif
-
-/* having a function version of this lets us put ASSERT_ARGS() at the top
- * of the list of local variables.  Thus, we can catch bad pointers before
- * any of the local initialization logic is run.  And it always returns 0,
- * so headerizer can define the ASSERT_ARGS_* macros like:
+/* having a modified version of PARROT_ASSERT which resolves as an integer
+ * rvalue lets us put ASSERT_ARGS() at the top of the list of local variables.
+ * Thus, we can catch bad pointers before any of the local initialization
+ * logic is run.  And it always returns 0, so headerizer can chain them in
+ * ASSERT_ARGS_* macros like:
  * int _ASSERT_ARGS = PARROT_ASSERT_ARG(a) || PARROT_ASSERT_ARG(b) || ...
  */
-static inline int
-_PARROT_ASSERT_ARG(const volatile void *x, const char *name,
-        const char *file, unsigned int line) /* HEADERIZER SKIP */
-{
-#ifndef NDEBUG
-    if (!x) Parrot_confess(name, file, line);
+#ifdef NDEBUG
+#  define PARROT_ASSERT(x) ((void)0)
+#  define PARROT_ASSERT_ARG(x) (0)
+#else
+#  define PARROT_ASSERT(x) (x) ? ((void)0) : Parrot_confess(#x, __FILE__, __LINE__)
+#  define PARROT_ASSERT_ARG(x) ((x) ? (0) : (Parrot_confess(#x, __FILE__, __LINE__), 0))
 #endif
-    return 0;
-}
-#define PARROT_ASSERT_ARG(x) _PARROT_ASSERT_ARG((x), (#x), __FILE__, __LINE__)
+
 #define ASSERT_ARGS(a) ASSERT_ARGS_ ## a
 
 
