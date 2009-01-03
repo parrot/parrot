@@ -1344,6 +1344,20 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
         new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc", 0);
         push_operand(lexer, expr_from_target(lexer, consttarg));
         push_operand(lexer, expr_from_const(lexer, value));
+
+        /* XXXX
+
+        Don't generate that instruction if the constant is never referenced.
+        This is true for all variants (pmc, int, string, num) in this function.
+
+        As the constant is declared as a .local (see above), it will only
+        be assigned a color (register) iff the symbol is referenced (looked up
+        for the first time).
+
+        XXX fix this.
+
+
+        */
     }
 
     else if (value->type == INT_VAL) {

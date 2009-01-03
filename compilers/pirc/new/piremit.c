@@ -464,10 +464,9 @@ and their index in the constant table is emitted into the bytecode.
 */
 static void
 emit_pbc_const_arg(lexer_state * const lexer, constant * const c) {
-    fprintf(stderr, "emit pbc const arg\n");
+
     switch (c->type) {
         case INT_VAL:
-            fprintf(stderr, "INTVAL\n");
             emit_int_arg(lexer->bc, c->val.ival);
             break;
         case NUM_VAL: {
