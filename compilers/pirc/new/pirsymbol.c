@@ -271,8 +271,25 @@ check_unused_symbols(NOTNULL(lexer_state * const lexer)) {
     while (subiter != lexer->subs->next); /* iterate over all subs */
 }
 
+/* Lookup table to convert value_type values into pir_type values.
+ * when indexing with a pir_type value, the pir_type value itself
+ * is returned; when looking up with a value_type, the corresponding
+ * pir_type value is returned. For instance, for both STRING_VAL and
+ * USTRING_VAL, STRING_TYPE is returned.
+ */
+static const int convert_valuetype_to_pirtype[10] = {
+    INT_TYPE,
+    STRING_TYPE,
+    PMC_TYPE,
+    NUM_TYPE,
+    UNKNOWN_TYPE,
+    INT_TYPE,     /* INT_VAL -> INT_TYPE */
+    STRING_TYPE,  /* STRING_VAL -> STRING_TYPE */
+    PMC_TYPE,     /* PMC_VAL -> PMC_TYPE */
+    NUM_TYPE,     /* NUM_VAL -> NUM_TYPE */
+    STRING_TYPE   /* USTRING_VAL -> STRING_TYPE */
+};
 
-static const int convert_valuetype_to_pirtype[10] = {0,1,2,3,4,0,1,2,3,1};
 /*
 
 =item C<symbol *
