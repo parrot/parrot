@@ -410,7 +410,7 @@ PARROT_CAN_RETURN_NULL
 Instruction *
 _delete_ins(ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
 {
-    ASSERT_ARGS(delete_ins);
+    ASSERT_ARGS(_delete_ins);
     Instruction * const next = ins->next;
     Instruction * const prev = ins->prev;
 

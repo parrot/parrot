@@ -115,6 +115,7 @@ PARROT_CANNOT_RETURN_NULL
 static void *
 get_free_buffer(PARROT_INTERP, ARGIN(Small_Object_Pool *pool))
 {
+    ASSERT_ARGS(get_free_buffer);
     PObj * const buffer = (PObj *)pool->get_free_object(interp, pool);
 
     /* don't mess around with flags */
@@ -148,6 +149,7 @@ PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool *
 new_pmc_pool(PARROT_INTERP)
 {
+    ASSERT_ARGS(new_pmc_pool);
     const int num_headers = PMC_HEADERS_PER_ALLOC;
     Small_Object_Pool * const pmc_pool =
         new_small_object_pool(sizeof (PMC), num_headers);
@@ -175,6 +177,7 @@ PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool *
 new_bufferlike_pool(PARROT_INTERP, size_t actual_buffer_size)
 {
+    ASSERT_ARGS(new_bufferlike_pool);
     const int num_headers          = BUFFER_HEADERS_PER_ALLOC;
     const size_t buffer_size       =
             (actual_buffer_size + sizeof (void *) - 1) & ~(sizeof (void *) - 1);
@@ -205,6 +208,7 @@ PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool *
 new_buffer_pool(PARROT_INTERP)
 {
+    ASSERT_ARGS(new_buffer_pool);
     Small_Object_Pool * const pool = make_bufferlike_pool(interp, sizeof (Buffer));
 
 #ifdef GC_IS_MALLOC
@@ -233,6 +237,7 @@ PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool *
 new_string_pool(PARROT_INTERP, INTVAL constant)
 {
+    ASSERT_ARGS(new_string_pool);
     Small_Object_Pool *pool;
     if (constant) {
         pool           = new_bufferlike_pool(interp, sizeof (STRING));
@@ -263,6 +268,7 @@ PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool *
 make_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
 {
+    ASSERT_ARGS(make_bufferlike_pool);
     const UINTVAL num_old = interp->arena_base->num_sized;
     Small_Object_Pool **sized_pools =
             interp->arena_base->sized_header_pools;
@@ -308,6 +314,7 @@ PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool *
 get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
 {
+    ASSERT_ARGS(get_bufferlike_pool);
     Small_Object_Pool ** const sized_pools =
             interp->arena_base->sized_header_pools;
 
@@ -332,6 +339,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 new_pmc_header(PARROT_INTERP, UINTVAL flags)
 {
+    ASSERT_ARGS(new_pmc_header);
     Small_Object_Pool * const pool =
         flags & PObj_constant_FLAG
             ? interp->arena_base->constant_pmc_pool
@@ -377,6 +385,7 @@ PARROT_CANNOT_RETURN_NULL
 static PMC_EXT *
 new_pmc_ext(PARROT_INTERP)
 {
+    ASSERT_ARGS(new_pmc_ext);
     Small_Object_Pool * const pool = interp->arena_base->pmc_ext_pool;
     /* XXX: Should we check here to ensure the PMC_EXT is non-null
             like we do in C<new_pmc>? */
@@ -398,6 +407,7 @@ that the PMC_EXT structure is marked as "alive" by the GC.
 void
 add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
+    ASSERT_ARGS(add_pmc_ext);
     pmc->pmc_ext = new_pmc_ext(interp);
     PObj_is_PMC_EXT_SET(pmc);
 #ifdef PARROT_GC_IMS
@@ -427,6 +437,7 @@ is non-null.
 void
 add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
+    ASSERT_ARGS(add_pmc_sync);
     if (!PObj_is_PMC_EXT_TEST(pmc)) {
         add_pmc_ext(interp, pmc);
     }
@@ -455,6 +466,7 @@ PARROT_WARN_UNUSED_RESULT
 STRING *
 new_string_header(PARROT_INTERP, UINTVAL flags)
 {
+    ASSERT_ARGS(new_string_header);
     STRING * const string = (STRING *)get_free_buffer(interp,
         (flags & PObj_constant_FLAG)
             ? interp->arena_base->constant_string_header_pool
@@ -485,6 +497,7 @@ PARROT_WARN_UNUSED_RESULT
 Buffer *
 new_buffer_header(PARROT_INTERP)
 {
+    ASSERT_ARGS(new_buffer_header);
     return (Buffer *)get_free_buffer(interp,
             interp->arena_base->buffer_header_pool);
 }
@@ -506,6 +519,7 @@ PARROT_WARN_UNUSED_RESULT
 void *
 new_bufferlike_header(PARROT_INTERP, size_t size)
 {
+    ASSERT_ARGS(new_bufferlike_header);
     Small_Object_Pool * const pool = get_bufferlike_pool(interp, size);
 
     return get_free_buffer(interp, pool);
@@ -530,6 +544,7 @@ PARROT_WARN_UNUSED_RESULT
 size_t
 get_max_buffer_address(PARROT_INTERP)
 {
+    ASSERT_ARGS(get_max_buffer_address);
     UINTVAL i;
     size_t max = 0;
     Arenas * const arena_base = interp->arena_base;
@@ -563,6 +578,7 @@ PARROT_WARN_UNUSED_RESULT
 size_t
 get_min_buffer_address(PARROT_INTERP)
 {
+    ASSERT_ARGS(get_min_buffer_address);
     UINTVAL i;
     Arenas * const arena_base = interp->arena_base;
     size_t min = (size_t) -1;
@@ -591,6 +607,7 @@ PARROT_WARN_UNUSED_RESULT
 size_t
 get_max_pmc_address(PARROT_INTERP)
 {
+    ASSERT_ARGS(get_max_pmc_address);
     return interp->arena_base->pmc_pool->end_arena_memory;
 }
 
@@ -611,6 +628,7 @@ PARROT_WARN_UNUSED_RESULT
 size_t
 get_min_pmc_address(PARROT_INTERP)
 {
+    ASSERT_ARGS(get_min_pmc_address);
     return interp->arena_base->pmc_pool->start_arena_memory;
 }
 
@@ -629,6 +647,7 @@ PARROT_WARN_UNUSED_RESULT
 int
 is_buffer_ptr(PARROT_INTERP, ARGIN(const void *ptr))
 {
+    ASSERT_ARGS(is_buffer_ptr);
     UINTVAL i;
     Arenas * const arena_base = interp->arena_base;
 
@@ -656,6 +675,7 @@ PARROT_WARN_UNUSED_RESULT
 int
 is_pmc_ptr(PARROT_INTERP, ARGIN(const void *ptr))
 {
+    ASSERT_ARGS(is_pmc_ptr);
     return contained_in_pool(interp->arena_base->pmc_pool, ptr);
 }
 
@@ -678,6 +698,7 @@ the sized pools, although no other sized pools are created here.
 void
 Parrot_initialize_header_pools(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_initialize_header_pools);
     Arenas * const arena_base = interp->arena_base;
 
     /* Init the constant string header pool */
@@ -769,6 +790,7 @@ int
 Parrot_forall_header_pools(PARROT_INTERP, int flag, ARGIN_NULLOK(void *arg),
         NOTNULL(pool_iter_fn func))
 {
+    ASSERT_ARGS(Parrot_forall_header_pools);
     Arenas * const arena_base = interp->arena_base;
 
     if (flag & POOL_PMC) {
@@ -825,6 +847,7 @@ pool structure itself.
 static void
 free_pool(ARGMOD(Small_Object_Pool *pool))
 {
+    ASSERT_ARGS(free_pool);
     Small_Object_Arena *cur_arena;
 
     for (cur_arena = pool->last_Arena; cur_arena;) {
@@ -907,6 +930,7 @@ of sized header pointers in the C<Arenas> structure too.
 void
 Parrot_destroy_header_pools(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_destroy_header_pools);
     INTVAL pass;
 
     /* const/non const COW strings life in different pools
@@ -950,6 +974,7 @@ transferring their sync values to the destionation interpreter.
 static void
 fix_pmc_syncs(ARGMOD(Interp *dest_interp), ARGIN(Small_Object_Pool *pool))
 {
+    ASSERT_ARGS(fix_pmc_syncs);
     Small_Object_Arena *cur_arena;
     const UINTVAL object_size = pool->object_size;
 
@@ -988,6 +1013,7 @@ Merge the header pools of C<source_interp> into those of C<dest_interp>.
 void
 Parrot_merge_header_pools(ARGMOD(Interp *dest_interp), ARGIN(Interp *source_interp))
 {
+    ASSERT_ARGS(Parrot_merge_header_pools);
     UINTVAL i;
 
     Arenas * const dest_arena = dest_interp->arena_base;
@@ -1043,6 +1069,7 @@ Parrot string structure for the name of the pool.
 void
 Parrot_initialize_header_pool_names(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_initialize_header_pool_names);
     interp->arena_base->string_header_pool->name
             = string_make(interp, "String Pool", strlen("String Pool"),
             0, PObj_constant_FLAG, 0);

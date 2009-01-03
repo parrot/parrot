@@ -40,6 +40,7 @@ PARROT_EXPORT
 void
 Parrot_on_exit(PARROT_INTERP, NOTNULL(exit_handler_f function), ARGIN_NULLOK(void *arg))
 {
+    ASSERT_ARGS(Parrot_on_exit);
     /* RT#46403  we might want locking around the list access.   I'm sure this
      * will be the least of the threading issues. */
 
@@ -66,6 +67,7 @@ PARROT_DOES_NOT_RETURN
 void
 Parrot_exit(PARROT_INTERP, int status)
 {
+    ASSERT_ARGS(Parrot_exit);
     /* call all the exit handlers */
     /* we are well "below" the runloop now, where lo_var_ptr
      * is set usually - exit handlers may run some resource-hungry

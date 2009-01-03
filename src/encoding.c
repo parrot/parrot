@@ -70,6 +70,7 @@ C<all_encodings> array.
 void
 parrot_init_encodings_2(void)
 {
+    ASSERT_ARGS(parrot_init_encodings_2);
     const int n = all_encodings->n_encodings;
     int i;
 
@@ -91,6 +92,7 @@ Deinitialize encodings and free all memory used by them.
 void
 parrot_deinit_encodings(void)
 {
+    ASSERT_ARGS(parrot_deinit_encodings);
     const int n = all_encodings->n_encodings;
     int i;
 
@@ -118,6 +120,7 @@ PARROT_CANNOT_RETURN_NULL
 ENCODING *
 Parrot_new_encoding(SHIM_INTERP)
 {
+    ASSERT_ARGS(Parrot_new_encoding);
     return mem_allocate_typed(ENCODING);
 }
 
@@ -138,6 +141,7 @@ PARROT_CAN_RETURN_NULL
 const ENCODING *
 Parrot_find_encoding(SHIM_INTERP, ARGIN(const char *encodingname))
 {
+    ASSERT_ARGS(Parrot_find_encoding);
     const int n = all_encodings->n_encodings;
     int i;
 
@@ -172,6 +176,7 @@ PARROT_CANNOT_RETURN_NULL
 const ENCODING *
 Parrot_load_encoding(PARROT_INTERP, ARGIN(const char *encodingname))
 {
+    ASSERT_ARGS(Parrot_load_encoding);
     UNUSED(encodingname);
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
         "Can't load encodings yet");
@@ -192,6 +197,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_encoding_number(PARROT_INTERP, ARGIN(const STRING *encodingname))
 {
+    ASSERT_ARGS(Parrot_encoding_number);
     const int n = all_encodings->n_encodings;
     int i;
 
@@ -218,6 +224,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_encoding_number_of_str(SHIM_INTERP, ARGIN(const STRING *src))
 {
+    ASSERT_ARGS(Parrot_encoding_number_of_str);
     const int n = all_encodings->n_encodings;
     int i;
 
@@ -245,6 +252,7 @@ PARROT_CAN_RETURN_NULL
 STRING*
 Parrot_encoding_name(SHIM_INTERP, INTVAL number_of_encoding)
 {
+    ASSERT_ARGS(Parrot_encoding_name);
     if (number_of_encoding >= all_encodings->n_encodings)
         return NULL;
     return all_encodings->enc[number_of_encoding].name;
@@ -266,6 +274,7 @@ PARROT_CAN_RETURN_NULL
 const ENCODING*
 Parrot_get_encoding(SHIM_INTERP, INTVAL number_of_encoding)
 {
+    ASSERT_ARGS(Parrot_get_encoding);
     if (number_of_encoding >= all_encodings->n_encodings)
         return NULL;
     return all_encodings->enc[number_of_encoding].encoding;
@@ -288,6 +297,7 @@ PARROT_CAN_RETURN_NULL
 const char *
 Parrot_encoding_c_name(SHIM_INTERP, INTVAL number_of_encoding)
 {
+    ASSERT_ARGS(Parrot_encoding_c_name);
     if (number_of_encoding >= all_encodings->n_encodings)
         return NULL;
     return all_encodings->enc[number_of_encoding].encoding->name;
@@ -308,6 +318,7 @@ static INTVAL
 register_encoding(PARROT_INTERP, ARGIN(const char *encodingname),
         ARGIN(ENCODING *encoding))
 {
+    ASSERT_ARGS(register_encoding);
     const int n = all_encodings->n_encodings;
     int i;
 
@@ -348,6 +359,7 @@ INTVAL
 Parrot_register_encoding(PARROT_INTERP, ARGIN(const char *encodingname),
         ARGIN(ENCODING *encoding))
 {
+    ASSERT_ARGS(Parrot_register_encoding);
     if (!all_encodings) {
         all_encodings = mem_allocate_typed(All_encodings);
         all_encodings->n_encodings = 0;
@@ -391,6 +403,7 @@ INTVAL
 Parrot_make_default_encoding(SHIM_INTERP, SHIM(const char *encodingname),
         ARGIN(ENCODING *encoding))
 {
+    ASSERT_ARGS(Parrot_make_default_encoding);
     Parrot_default_encoding_ptr = encoding;
     return 1;
 }
@@ -411,6 +424,7 @@ PARROT_CANNOT_RETURN_NULL
 const ENCODING *
 Parrot_default_encoding(SHIM_INTERP)
 {
+    ASSERT_ARGS(Parrot_default_encoding);
     return Parrot_default_encoding_ptr;
 }
 
@@ -430,6 +444,7 @@ PARROT_DOES_NOT_RETURN
 encoding_converter_t
 Parrot_find_encoding_converter(PARROT_INTERP, ARGIN(ENCODING *lhs), ARGIN(ENCODING *rhs))
 {
+    ASSERT_ARGS(Parrot_find_encoding_converter);
     UNUSED(lhs);
     UNUSED(rhs);
 

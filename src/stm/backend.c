@@ -1975,7 +1975,7 @@ for a lock, etc.)
 void
 Parrot_STM_dump_profile(PARROT_INTERP)
 {
-    ASSERT_ARGS(parrot_stm_dump_profile);
+    ASSERT_ARGS(Parrot_STM_dump_profile);
     STM_tx_log       *log;
     STM_profile_data *profile;
     INTVAL            i;
@@ -2029,7 +2029,7 @@ interpreter C<d>.
 void
 Parrot_STM_merge_profile(ARGOUT(Interp *d), ARGOUT(Interp *s))
 {
-    ASSERT_ARGS(parrot_stm_merge_profile);
+    ASSERT_ARGS(Parrot_STM_merge_profile);
     INTVAL i;
 
     const STM_profile_date * const from = &PROFILE(Parrot_STM_tx_log_get(s));

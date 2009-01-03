@@ -1250,6 +1250,7 @@ the given Parrot IO PMC.
 int
 imcc_vfprintf(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const char *format), va_list ap)
 {
+    ASSERT_ARGS(imcc_vfprintf);
     return Parrot_io_putps(interp, io, Parrot_vsprintf_c(interp, format, ap));
 }
 

@@ -79,6 +79,7 @@ PMC *
 Parrot_ex_build_exception(PARROT_INTERP, INTVAL severity,
         long error, ARGIN_NULLOK(STRING *msg))
 {
+    ASSERT_ARGS(Parrot_ex_build_exception);
     PMC *exception = pmc_new(interp, enum_class_Exception);
 
     VTABLE_set_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"), severity);
@@ -103,6 +104,7 @@ PARROT_DOES_NOT_RETURN
 void
 die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
 {
+    ASSERT_ARGS(die_from_exception);
     STRING * const message     = VTABLE_get_string(interp, exception);
     INTVAL         exit_status = 1;
     const INTVAL   severity    = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
@@ -168,6 +170,7 @@ PARROT_EXPORT
 void
 Parrot_ex_add_c_handler(PARROT_INTERP, ARGIN(Parrot_runloop *jp))
 {
+    ASSERT_ARGS(Parrot_ex_add_c_handler);
     PMC * const handler = pmc_new(interp, enum_class_ExceptionHandler);
     /* Flag to mark a C exception handler */
     PObj_get_FLAGS(handler) |= SUB_FLAG_C_HANDLER;
@@ -190,6 +193,7 @@ PARROT_CAN_RETURN_NULL
 opcode_t *
 Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void *dest))
 {
+    ASSERT_ARGS(Parrot_ex_throw_from_op);
     opcode_t   *address;
     PMC * const handler = Parrot_cx_find_handler_local(interp, exception);
     if (PMC_IS_NULL(handler)) {
@@ -237,6 +241,7 @@ static opcode_t *
 pass_exception_args(PARROT_INTERP, ARGIN(const char *sig),
         ARGIN(opcode_t *dest), ARGIN(Parrot_Context * old_ctx), ...)
 {
+    ASSERT_ARGS(pass_exception_args);
     va_list   ap;
     opcode_t *next;
 
@@ -252,6 +257,7 @@ static PMC *
 build_exception_from_args(PARROT_INTERP, int ex_type,
         ARGIN(const char *format), va_list arglist)
 {
+    ASSERT_ARGS(build_exception_from_args);
     /* Make and set exception message. */
     STRING * const msg =
         strchr(format, '%')
@@ -289,6 +295,7 @@ PARROT_DOES_NOT_RETURN
 void
 Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 {
+    ASSERT_ARGS(Parrot_ex_throw_from_c);
     PMC * const handler = Parrot_cx_find_handler_local(interp, exception);
     RunProfile * const profile      = interp->profile;
     Parrot_runloop    *return_point = interp->current_runloop;
@@ -353,6 +360,7 @@ opcode_t *
 Parrot_ex_throw_from_op_args(PARROT_INTERP, ARGIN_NULLOK(void *dest),
         int ex_type, ARGIN(const char *format), ...)
 {
+    ASSERT_ARGS(Parrot_ex_throw_from_op_args);
     PMC *exception;
 
     va_list arglist;
@@ -385,6 +393,7 @@ void
 Parrot_ex_throw_from_c_args(PARROT_INTERP, SHIM(void *ret_addr),
         int exitcode, ARGIN(const char *format), ...)
 {
+    ASSERT_ARGS(Parrot_ex_throw_from_c_args);
     PMC *exception;
 
     va_list arglist;
@@ -411,6 +420,7 @@ PARROT_CAN_RETURN_NULL
 opcode_t *
 Parrot_ex_rethrow_from_op(PARROT_INTERP, ARGIN(PMC *exception))
 {
+    ASSERT_ARGS(Parrot_ex_rethrow_from_op);
     if (exception->vtable->base_type != enum_class_Exception)
         PANIC(interp, "Illegal rethrow");
 
@@ -435,6 +445,7 @@ PARROT_DOES_NOT_RETURN
 void
 Parrot_ex_rethrow_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 {
+    ASSERT_ARGS(Parrot_ex_rethrow_from_c);
     Parrot_ex_mark_unhandled(interp, exception);
 
     Parrot_ex_throw_from_c(interp, exception);
@@ -454,6 +465,7 @@ PARROT_EXPORT
 void
 Parrot_ex_mark_unhandled(PARROT_INTERP, ARGIN(PMC *exception))
 {
+    ASSERT_ARGS(Parrot_ex_mark_unhandled);
     VTABLE_set_integer_keyed_str(interp, exception, CONST_STRING(interp, "handled"), -1);
 }
 
@@ -473,6 +485,7 @@ PARROT_EXPORT
 size_t
 Parrot_ex_calc_handler_offset(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_ex_calc_handler_offset);
     PMC * const exception = VTABLE_pop_pmc(interp, interp->scheduler);
 
     /* now fill rest of exception, locate handler and get
@@ -508,6 +521,7 @@ void
 Parrot_assert(INTVAL condition, ARGIN(const char *condition_string),
         ARGIN(const char *file), unsigned int line)
 {
+    ASSERT_ARGS(Parrot_assert);
     if (!condition)
         Parrot_confess(condition_string, file, line);
 }
@@ -527,6 +541,7 @@ PARROT_DOES_NOT_RETURN
 void
 Parrot_confess(ARGIN(const char *cond), ARGIN(const char *file), unsigned int line)
 {
+    ASSERT_ARGS(Parrot_confess);
     fprintf(stderr, "%s:%u: failed assertion '%s'\n", file, line, cond);
     Parrot_print_backtrace();
     abort();
@@ -546,6 +561,7 @@ abort).  Used by C<Parrot_confess>.
 void
 Parrot_print_backtrace(void)
 {
+    ASSERT_ARGS(Parrot_print_backtrace);
 #ifdef PARROT_HAS_BACKTRACE
 #  define BACKTRACE_DEPTH 32
 /*#  define BACKTRACE_VERBOSE */
@@ -611,6 +627,7 @@ PARROT_DOES_NOT_RETURN
 void
 exit_fatal(int exitcode, ARGIN(const char *format), ...)
 {
+    ASSERT_ARGS(exit_fatal);
     va_list arglist;
     va_start(arglist, format);
     vfprintf(stderr, format, arglist);
@@ -646,6 +663,7 @@ void
 do_panic(NULLOK_INTERP, ARGIN_NULLOK(const char *message),
          ARGIN_NULLOK(const char *file), unsigned int line)
 {
+    ASSERT_ARGS(do_panic);
     /* Note: we can't format any floats in here--Parrot_sprintf
     ** may panic because of floats.
     ** and we don't use Parrot_sprintf or such, because we are

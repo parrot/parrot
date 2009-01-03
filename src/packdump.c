@@ -62,6 +62,7 @@ PARROT_EXPORT
 void
 PackFile_ConstTable_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *self))
 {
+    ASSERT_ARGS(PackFile_ConstTable_dump);
     opcode_t i;
 
     for (i = 0; i < self->const_count; i++) {
@@ -124,6 +125,7 @@ pobj_flag_dump(PARROT_INTERP, ARGIN_NULLOK(long flags))
  * followed by individual bits.
  */
 {
+    ASSERT_ARGS(pobj_flag_dump);
     INTVAL idx = 0;
     int printed_flag_p = 0;
 
@@ -145,6 +147,7 @@ static void
 PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                        ARGIN(const PackFile_Constant *self))
 {
+    ASSERT_ARGS(PackFile_Constant_dump);
     PMC *key;
     size_t i;
 
@@ -366,6 +369,7 @@ PARROT_EXPORT
 void
 PackFile_Fixup_dump(PARROT_INTERP, ARGIN(const PackFile_FixupTable *ft))
 {
+    ASSERT_ARGS(PackFile_Fixup_dump);
     opcode_t i;
 
     for (i = 0; i < ft->fixup_count; i++) {

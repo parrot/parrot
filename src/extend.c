@@ -90,6 +90,7 @@ int
 Parrot_vfprintf(PARROT_INTERP, ARGIN(Parrot_PMC pio),
         ARGIN(const char *s), va_list args)
 {
+    ASSERT_ARGS(Parrot_vfprintf);
     STRING * str;
     INTVAL retval;
 
@@ -106,6 +107,7 @@ int
 Parrot_fprintf(PARROT_INTERP, ARGIN(Parrot_PMC pio),
         ARGIN(const char *s), ...)
 {
+    ASSERT_ARGS(Parrot_fprintf);
     va_list args;
     INTVAL retval;
 
@@ -120,6 +122,7 @@ PARROT_EXPORT
 int
 Parrot_printf(NULLOK_INTERP, ARGIN(const char *s), ...)
 {
+    ASSERT_ARGS(Parrot_printf);
     va_list args;
     INTVAL retval;
     va_start(args, s);
@@ -142,6 +145,7 @@ PARROT_EXPORT
 int
 Parrot_eprintf(NULLOK_INTERP, ARGIN(const char *s), ...)
 {
+    ASSERT_ARGS(Parrot_eprintf);
     va_list args;
     INTVAL retval;
 
@@ -177,6 +181,7 @@ Parrot_String
 Parrot_PMC_get_string_intkey(PARROT_INTERP,
         Parrot_PMC pmc, Parrot_Int key)
 {
+    ASSERT_ARGS(Parrot_PMC_get_string_intkey);
     Parrot_String retval;
     PARROT_CALLIN_START(interp);
     retval = VTABLE_get_string_keyed_int(interp, pmc, key);
@@ -202,6 +207,7 @@ void *
 Parrot_PMC_get_pointer_intkey(PARROT_INTERP,
         Parrot_PMC pmc, Parrot_Int key)
 {
+    ASSERT_ARGS(Parrot_PMC_get_pointer_intkey);
     void *retval;
     PARROT_CALLIN_START(interp);
     retval = VTABLE_get_pointer_keyed_int(interp, pmc, key);
@@ -224,6 +230,7 @@ Parrot_PMC
 Parrot_PMC_get_pmc_intkey(PARROT_INTERP,
         Parrot_PMC pmc, Parrot_Int key)
 {
+    ASSERT_ARGS(Parrot_PMC_get_pmc_intkey);
     Parrot_PMC retval;
     PARROT_CALLIN_START(interp);
     retval = VTABLE_get_pmc_keyed_int(interp, pmc, key);
@@ -245,6 +252,7 @@ PARROT_EXPORT
 Parrot_Int
 Parrot_PMC_get_intval(PARROT_INTERP, Parrot_PMC pmc)
 {
+    ASSERT_ARGS(Parrot_PMC_get_intval);
     Parrot_Int retval;
     PARROT_CALLIN_START(interp);
     retval = VTABLE_get_integer(interp, pmc);
@@ -267,6 +275,7 @@ Parrot_Int
 Parrot_PMC_get_intval_intkey(PARROT_INTERP,
         Parrot_PMC pmc, Parrot_Int key)
 {
+    ASSERT_ARGS(Parrot_PMC_get_intval_intkey);
     Parrot_Int retval;
     PARROT_CALLIN_START(interp);
     retval = VTABLE_get_integer_keyed_int(interp, pmc, key);
@@ -289,6 +298,7 @@ Parrot_Int
 Parrot_PMC_get_intval_pmckey(PARROT_INTERP,
         Parrot_PMC pmc, Parrot_PMC key)
 {
+    ASSERT_ARGS(Parrot_PMC_get_intval_pmckey);
     Parrot_Int retval;
     PARROT_CALLIN_START(interp);
     retval = VTABLE_get_integer_keyed(interp, pmc, key);
@@ -310,6 +320,7 @@ PARROT_EXPORT
 Parrot_Float
 Parrot_PMC_get_numval(PARROT_INTERP, Parrot_PMC pmc)
 {
+    ASSERT_ARGS(Parrot_PMC_get_numval);
     Parrot_Float retval;
     PARROT_CALLIN_START(interp);
     retval = VTABLE_get_number(interp, pmc);
@@ -332,6 +343,7 @@ Parrot_Float
 Parrot_PMC_get_numval_intkey(PARROT_INTERP,
         Parrot_PMC pmc, Parrot_Int key)
 {
+    ASSERT_ARGS(Parrot_PMC_get_numval_intkey);
     Parrot_Float retval;
     PARROT_CALLIN_START(interp);
     retval = VTABLE_get_number_keyed_int(interp, pmc, key);
@@ -358,6 +370,7 @@ char *
 Parrot_PMC_get_cstring_intkey(PARROT_INTERP,
         Parrot_PMC pmc, Parrot_Int key)
 {
+    ASSERT_ARGS(Parrot_PMC_get_cstring_intkey);
     STRING *intermediate;
     char   *retval;
 
@@ -387,6 +400,7 @@ PARROT_CAN_RETURN_NULL
 char *
 Parrot_PMC_get_cstring(PARROT_INTERP, Parrot_PMC pmc)
 {
+    ASSERT_ARGS(Parrot_PMC_get_cstring);
     STRING *intermediate;
     char   *retval;
 
@@ -420,6 +434,7 @@ char *
 Parrot_PMC_get_cstringn(PARROT_INTERP, ARGIN(Parrot_PMC pmc),
         ARGOUT(Parrot_Int *length))
 {
+    ASSERT_ARGS(Parrot_PMC_get_cstringn);
     char *retval;
 
     PARROT_CALLIN_START(interp);
@@ -452,6 +467,7 @@ char *
 Parrot_PMC_get_cstringn_intkey(PARROT_INTERP, ARGIN(Parrot_PMC pmc),
         ARGOUT(Parrot_Int *length), Parrot_Int key)
 {
+    ASSERT_ARGS(Parrot_PMC_get_cstringn_intkey);
     char *retval;
 
     PARROT_CALLIN_START(interp);
@@ -478,6 +494,7 @@ void
 Parrot_PMC_set_string(PARROT_INTERP,
         Parrot_PMC pmc, Parrot_String value)
 {
+    ASSERT_ARGS(Parrot_PMC_set_string);
     PARROT_CALLIN_START(interp);
     VTABLE_set_string_native(interp, pmc, value);
     PARROT_CALLIN_END(interp);
@@ -498,6 +515,7 @@ void
 Parrot_PMC_set_string_intkey(PARROT_INTERP,
         Parrot_PMC pmc, Parrot_Int key, Parrot_String value)
 {
+    ASSERT_ARGS(Parrot_PMC_set_string_intkey);
     PARROT_CALLIN_START(interp);
     VTABLE_set_string_keyed_int(interp, pmc, key, value);
     PARROT_CALLIN_END(interp);
@@ -518,6 +536,7 @@ void
 Parrot_PMC_set_pmc_intkey(PARROT_INTERP,
         Parrot_PMC pmc, Parrot_Int key, Parrot_PMC value)
 {
+    ASSERT_ARGS(Parrot_PMC_set_pmc_intkey);
     PARROT_CALLIN_START(interp);
     VTABLE_set_pmc_keyed_int(interp, pmc, key, value);
     PARROT_CALLIN_END(interp);
@@ -538,6 +557,7 @@ void
 Parrot_PMC_set_pmc_pmckey(PARROT_INTERP,
         Parrot_PMC pmc, Parrot_PMC key, Parrot_PMC value)
 {
+    ASSERT_ARGS(Parrot_PMC_set_pmc_pmckey);
     PARROT_CALLIN_START(interp);
     VTABLE_set_pmc_keyed(interp, pmc, key, value);
     PARROT_CALLIN_END(interp);
@@ -558,6 +578,7 @@ void
 Parrot_PMC_set_pointer_intkey(PARROT_INTERP,
         ARGIN(Parrot_PMC pmc), Parrot_Int key, ARGIN_NULLOK(void *value))
 {
+    ASSERT_ARGS(Parrot_PMC_set_pointer_intkey);
     PARROT_CALLIN_START(interp);
     VTABLE_set_pointer_keyed_int(interp, pmc, key, value);
     PARROT_CALLIN_END(interp);
@@ -577,6 +598,7 @@ PARROT_EXPORT
 void
 Parrot_PMC_set_intval(PARROT_INTERP, Parrot_PMC pmc, Parrot_Int value)
 {
+    ASSERT_ARGS(Parrot_PMC_set_intval);
     PARROT_CALLIN_START(interp);
     VTABLE_set_integer_native(interp, pmc, value);
     PARROT_CALLIN_END(interp);
@@ -597,6 +619,7 @@ void
 Parrot_PMC_set_intval_intkey(PARROT_INTERP,
         Parrot_PMC pmc, Parrot_Int key, Parrot_Int value)
 {
+    ASSERT_ARGS(Parrot_PMC_set_intval_intkey);
     PARROT_CALLIN_START(interp);
     VTABLE_set_integer_keyed_int(interp, pmc, key, value);
     PARROT_CALLIN_END(interp);
@@ -616,6 +639,7 @@ PARROT_EXPORT
 void
 Parrot_PMC_set_numval(PARROT_INTERP, Parrot_PMC pmc, Parrot_Float value)
 {
+    ASSERT_ARGS(Parrot_PMC_set_numval);
     PARROT_CALLIN_START(interp);
     VTABLE_set_number_native(interp, pmc, value);
     PARROT_CALLIN_END(interp);
@@ -636,6 +660,7 @@ void
 Parrot_PMC_set_numval_intkey(PARROT_INTERP,
         Parrot_PMC pmc, Parrot_Int key, Parrot_Float value)
 {
+    ASSERT_ARGS(Parrot_PMC_set_numval_intkey);
     PARROT_CALLIN_START(interp);
     VTABLE_set_number_keyed_int(interp, pmc, key, value);
     PARROT_CALLIN_END(interp);
@@ -655,6 +680,7 @@ PARROT_EXPORT
 void
 Parrot_PMC_set_cstring(PARROT_INTERP, Parrot_PMC pmc, ARGIN_NULLOK(const char *value))
 {
+    ASSERT_ARGS(Parrot_PMC_set_cstring);
     PARROT_CALLIN_START(interp);
     VTABLE_set_string_native(interp, pmc,
                              string_from_cstring(interp, value, 0));
@@ -676,6 +702,7 @@ void
 Parrot_PMC_set_cstring_intkey(PARROT_INTERP,
         Parrot_PMC pmc, Parrot_Int key, ARGIN_NULLOK(const char *value))
 {
+    ASSERT_ARGS(Parrot_PMC_set_cstring_intkey);
     PARROT_CALLIN_START(interp);
     VTABLE_set_string_keyed_int(interp, pmc, key,
                                 string_from_cstring(interp, value, 0));
@@ -697,6 +724,7 @@ void
 Parrot_PMC_set_cstringn(PARROT_INTERP,
         Parrot_PMC pmc, ARGIN_NULLOK(const char *value), Parrot_UInt length)
 {
+    ASSERT_ARGS(Parrot_PMC_set_cstringn);
     PARROT_CALLIN_START(interp);
     VTABLE_set_string_native(interp, pmc,
                              string_from_cstring(interp, value, length));
@@ -718,6 +746,7 @@ void
 Parrot_PMC_push_intval(PARROT_INTERP,
         Parrot_PMC pmc, Parrot_Int value)
 {
+    ASSERT_ARGS(Parrot_PMC_push_intval);
     PARROT_CALLIN_START(interp);
     VTABLE_push_integer(interp, pmc, value);
     PARROT_CALLIN_END(interp);
@@ -737,6 +766,7 @@ PARROT_EXPORT
 void
 Parrot_PMC_push_numval(PARROT_INTERP, Parrot_PMC pmc, Parrot_Float value)
 {
+    ASSERT_ARGS(Parrot_PMC_push_numval);
     PARROT_CALLIN_START(interp);
     VTABLE_push_float(interp, pmc, value);
     PARROT_CALLIN_END(interp);
@@ -756,6 +786,7 @@ PARROT_EXPORT
 void
 Parrot_PMC_delete_pmckey(PARROT_INTERP, Parrot_PMC pmc, Parrot_PMC key)
 {
+    ASSERT_ARGS(Parrot_PMC_delete_pmckey);
     PARROT_CALLIN_START(interp);
     VTABLE_delete_keyed(interp, pmc, key);
     PARROT_CALLIN_END(interp);
@@ -777,6 +808,7 @@ Parrot_PMC_set_cstringn_intkey(PARROT_INTERP,
         Parrot_PMC pmc, Parrot_Int key, ARGIN_NULLOK(const char *value),
         Parrot_UInt length)
 {
+    ASSERT_ARGS(Parrot_PMC_set_cstringn_intkey);
     PARROT_CALLIN_START(interp);
     VTABLE_set_string_keyed_int(interp, pmc, key,
                                 string_from_cstring(interp, value, length));
@@ -797,6 +829,7 @@ PARROT_EXPORT
 Parrot_PMC
 Parrot_PMC_new(PARROT_INTERP, Parrot_Int type)
 {
+    ASSERT_ARGS(Parrot_PMC_new);
     Parrot_PMC newpmc;
     PARROT_CALLIN_START(interp);
     newpmc = pmc_new_noinit(interp, type);
@@ -819,6 +852,7 @@ PARROT_EXPORT
 Parrot_Int
 Parrot_PMC_typenum(PARROT_INTERP, ARGIN_NULLOK(const char *_class))
 {
+    ASSERT_ARGS(Parrot_PMC_typenum);
     Parrot_Int retval;
     PARROT_CALLIN_START(interp);
     retval = pmc_type(interp, string_from_cstring(interp, _class, 0));
@@ -840,6 +874,7 @@ PARROT_EXPORT
 Parrot_PMC
 Parrot_PMC_null(void)
 {
+    ASSERT_ARGS(Parrot_PMC_null);
     return PMCNULL;
 }
 
@@ -857,6 +892,7 @@ PARROT_EXPORT
 void
 Parrot_free_cstring(ARGIN_NULLOK(char *string))
 {
+    ASSERT_ARGS(Parrot_free_cstring);
     string_cstring_free(string);
 }
 
@@ -888,6 +924,7 @@ void*
 Parrot_call_sub(PARROT_INTERP, Parrot_PMC sub,
                  ARGIN(const char *signature), ...)
 {
+    ASSERT_ARGS(Parrot_call_sub);
     va_list ap;
     void *result;
 
@@ -918,6 +955,7 @@ Parrot_Int
 Parrot_call_sub_ret_int(PARROT_INTERP, Parrot_PMC sub,
                  ARGIN(const char *signature), ...)
 {
+    ASSERT_ARGS(Parrot_call_sub_ret_int);
     va_list ap;
     Parrot_Int result;
 
@@ -948,6 +986,7 @@ Parrot_Float
 Parrot_call_sub_ret_float(PARROT_INTERP, Parrot_PMC sub,
                  ARGIN(const char *signature), ...)
 {
+    ASSERT_ARGS(Parrot_call_sub_ret_float);
     va_list      ap;
     Parrot_Float result;
 
@@ -983,6 +1022,7 @@ void *
 Parrot_call_method(PARROT_INTERP, Parrot_PMC sub, Parrot_PMC obj,
                         Parrot_String method, ARGIN(const char *signature), ...)
 {
+    ASSERT_ARGS(Parrot_call_method);
     void    *result;
     va_list ap;
 
@@ -1013,6 +1053,7 @@ Parrot_Int
 Parrot_call_method_ret_int(PARROT_INTERP, Parrot_PMC sub,
         Parrot_PMC obj, Parrot_String method, ARGIN(const char *signature), ...)
 {
+    ASSERT_ARGS(Parrot_call_method_ret_int);
     Parrot_Int result;
     va_list    ap;
 
@@ -1040,6 +1081,7 @@ Parrot_Float
 Parrot_call_method_ret_float(PARROT_INTERP, Parrot_PMC sub,
         Parrot_PMC obj, Parrot_String method, ARGIN(const char *signature), ...)
 {
+    ASSERT_ARGS(Parrot_call_method_ret_float);
     Parrot_Float result;
     va_list      ap;
 
@@ -1066,6 +1108,7 @@ PARROT_EXPORT
 Parrot_Int
 Parrot_get_intreg(PARROT_INTERP, Parrot_Int regnum)
 {
+    ASSERT_ARGS(Parrot_get_intreg);
     return REG_INT(interp, regnum);
 }
 
@@ -1083,6 +1126,7 @@ PARROT_EXPORT
 Parrot_Float
 Parrot_get_numreg(PARROT_INTERP, Parrot_Int regnum)
 {
+    ASSERT_ARGS(Parrot_get_numreg);
     return REG_NUM(interp, regnum);
 }
 
@@ -1100,6 +1144,7 @@ PARROT_EXPORT
 Parrot_String
 Parrot_get_strreg(PARROT_INTERP, Parrot_Int regnum)
 {
+    ASSERT_ARGS(Parrot_get_strreg);
     return REG_STR(interp, regnum);
 }
 
@@ -1117,6 +1162,7 @@ PARROT_EXPORT
 Parrot_PMC
 Parrot_get_pmcreg(PARROT_INTERP, Parrot_Int regnum)
 {
+    ASSERT_ARGS(Parrot_get_pmcreg);
     return REG_PMC(interp, regnum);
 }
 
@@ -1135,6 +1181,7 @@ void
 Parrot_set_intreg(PARROT_INTERP, Parrot_Int regnum,
                   Parrot_Int value)
 {
+    ASSERT_ARGS(Parrot_set_intreg);
     REG_INT(interp, regnum) = value;
 }
 
@@ -1153,6 +1200,7 @@ void
 Parrot_set_numreg(PARROT_INTERP, Parrot_Int regnum,
                   Parrot_Float value)
 {
+    ASSERT_ARGS(Parrot_set_numreg);
     REG_NUM(interp, regnum) = value;
 }
 
@@ -1171,6 +1219,7 @@ void
 Parrot_set_strreg(PARROT_INTERP, Parrot_Int regnum,
                   Parrot_String value)
 {
+    ASSERT_ARGS(Parrot_set_strreg);
     REG_STR(interp, regnum) = value;
 }
 
@@ -1189,6 +1238,7 @@ void
 Parrot_set_pmcreg(PARROT_INTERP, Parrot_Int regnum,
                   Parrot_PMC value)
 {
+    ASSERT_ARGS(Parrot_set_pmcreg);
     REG_PMC(interp, regnum) = value;
 }
 
@@ -1216,6 +1266,7 @@ Parrot_new_string(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
     Parrot_UInt length, ARGIN_NULLOK(const char * const encoding_name),
     Parrot_UInt flags)
 {
+    ASSERT_ARGS(Parrot_new_string);
     Parrot_String retval;
     PARROT_CALLIN_START(interp);
     retval = string_make(interp, buffer, length, encoding_name, flags);
@@ -1238,6 +1289,7 @@ PARROT_WARN_UNUSED_RESULT
 Parrot_Language
 Parrot_find_language(SHIM_INTERP, SHIM(char *language))
 {
+    ASSERT_ARGS(Parrot_find_language);
     return 0;
 }
 
@@ -1257,6 +1309,7 @@ PARROT_EXPORT
 void
 Parrot_register_pmc(PARROT_INTERP, Parrot_PMC pmc)
 {
+    ASSERT_ARGS(Parrot_register_pmc);
     PARROT_CALLIN_START(interp);
     dod_register_pmc(interp, pmc);
     PARROT_CALLIN_END(interp);
@@ -1278,6 +1331,7 @@ PARROT_EXPORT
 void
 Parrot_unregister_pmc(PARROT_INTERP, Parrot_PMC pmc)
 {
+    ASSERT_ARGS(Parrot_unregister_pmc);
     PARROT_CALLIN_START(interp);
     dod_unregister_pmc(interp, pmc);
     PARROT_CALLIN_END(interp);
@@ -1297,6 +1351,7 @@ PARROT_EXPORT
 void
 Parrot_PMC_set_vtable(SHIM_INTERP, Parrot_PMC pmc, Parrot_VTABLE vtable)
 {
+    ASSERT_ARGS(Parrot_PMC_set_vtable);
     pmc->vtable = vtable;
 }
 
@@ -1315,6 +1370,7 @@ PARROT_PURE_FUNCTION
 Parrot_VTABLE
 Parrot_get_vtable(PARROT_INTERP, Parrot_Int id)
 {
+    ASSERT_ARGS(Parrot_get_vtable);
     return interp->vtables[id];
 }
 

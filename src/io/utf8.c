@@ -46,6 +46,7 @@ size_t
 Parrot_io_read_utf8(PARROT_INTERP, ARGMOD(PMC *filehandle),
         ARGMOD(STRING **buf))
 {
+    ASSERT_ARGS(Parrot_io_read_utf8);
     STRING *s, *s2;
     String_iter iter;
 
@@ -110,6 +111,7 @@ size_t
 Parrot_io_write_utf8(PARROT_INTERP, ARGMOD(PMC *filehandle),
         ARGMOD(STRING *s))
 {
+    ASSERT_ARGS(Parrot_io_write_utf8);
     STRING *dest;
 
     if (s->encoding == Parrot_utf8_encoding_ptr)

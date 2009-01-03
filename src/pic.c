@@ -960,6 +960,7 @@ void
 parrot_pic_find_infix_v_pp(PARROT_INTERP, ARGIN(PMC *left), ARGIN(PMC *right),
                 ARGOUT(Parrot_MIC *mic), ARGOUT(opcode_t *cur_opcode))
 {
+    ASSERT_ARGS(parrot_pic_find_infix_v_pp);
     /* unused; deprecated */
 }
 
