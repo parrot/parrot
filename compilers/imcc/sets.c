@@ -51,8 +51,8 @@ PARROT_CANNOT_RETURN_NULL
 Set*
 set_make(unsigned int length)
 {
-    ASSERT_ARGS(set_make);
     Set * const s = mem_allocate_zeroed_typed(Set);
+    ASSERT_ARGS(set_make);
     s->length     = length;
     s->bmp        = mem_allocate_n_zeroed_typed(NUM_BYTES(length),
                         unsigned char);
@@ -76,9 +76,9 @@ PARROT_CANNOT_RETURN_NULL
 Set*
 set_make_full(unsigned int length)
 {
-    ASSERT_ARGS(set_make_full);
     Set * const s      = set_make(length);
     const size_t bytes = NUM_BYTES(length);
+    ASSERT_ARGS(set_make_full);
 
     if (bytes)
         memset(s->bmp, 0xff, bytes);
@@ -141,8 +141,8 @@ PARROT_CANNOT_RETURN_NULL
 Set*
 set_copy(ARGIN(const Set *s))
 {
-    ASSERT_ARGS(set_copy);
     Set * const d = set_make(s->length);
+    ASSERT_ARGS(set_copy);
 
     memcpy(d->bmp, s->bmp, NUM_BYTES(d->length));
     return d;
@@ -166,8 +166,8 @@ int
 set_equal(ARGIN(const Set *s1), ARGIN(const Set *s2))
 {
     int          mask;
-    ASSERT_ARGS(set_equal);
     const size_t bytes = s1->length / 8;
+    ASSERT_ARGS(set_equal);
 
     if (s1->length != s2->length)
         fatal(1, "set_equal", "Sets don't have the same length\n");
@@ -201,9 +201,9 @@ Adds to set C<s> the element C<element>.
 void
 set_add(ARGMOD(Set *s), unsigned int element)
 {
-    ASSERT_ARGS(set_add);
     const int elem_byte_in_set = BYTE_IN_SET(element);
     const int bytes_in_set     = BYTE_IN_SET(s->length);
+    ASSERT_ARGS(set_add);
 
     if (bytes_in_set < elem_byte_in_set) {
         s->bmp = (unsigned char *)mem_sys_realloc_zeroed(s->bmp,
@@ -302,8 +302,8 @@ Set *
 set_union(ARGIN(const Set *s1), ARGIN(const Set *s2))
 {
     unsigned int i;
-    ASSERT_ARGS(set_union);
     Set * const s = set_make(s1->length);
+    ASSERT_ARGS(set_union);
 
     if (s1->length != s2->length)
         fatal(1, "set_union", "Sets don't have the same length\n");
@@ -335,8 +335,8 @@ Set *
 set_intersec(ARGIN(const Set *s1), ARGIN(const Set *s2))
 {
     unsigned int i;
-    ASSERT_ARGS(set_intersec);
     Set * const  s = set_make(s1->length);
+    ASSERT_ARGS(set_intersec);
 
     if (s1->length != s2->length)
         fatal(1, "set_intersec", "Sets don't have the same length\n");

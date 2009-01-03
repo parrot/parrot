@@ -64,11 +64,11 @@ Run parrot ops. Set exception handler and/or resume after exception.
 void
 runops(PARROT_INTERP, size_t offs)
 {
-    ASSERT_ARGS(runops);
     volatile size_t offset            = offs;
     const    int    old_runloop_id    = interp->current_runloop_id;
     const    int    our_runloop_level = ++interp->current_runloop_level;
     const    int    our_runloop_id    = ++runloop_id_counter;
+    ASSERT_ARGS(runops);
 
     /* It is OK if the runloop ID overflows; we only ever test it for equality,
        so the chance of collision is slight. */
@@ -139,10 +139,10 @@ Parrot_runops_fromc(PARROT_INTERP, ARGIN(PMC *sub))
 {
     opcode_t offset, *dest;
     Parrot_Context *ctx;
-    ASSERT_ARGS(Parrot_runops_fromc);
 
     /* we need one return continuation with a NULL offset */
     PMC * const ret_c    = new_ret_continuation_pmc(interp, NULL);
+    ASSERT_ARGS(Parrot_runops_fromc);
     interp->current_cont = ret_c;
 #if defined GC_VERBOSE && GC_VERBOSE
     PObj_report_SET(ret_c);     /* s. also dod.c */
@@ -197,8 +197,8 @@ runops_args(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj),
 
     char new_sig[10];
     const char *sig_p;
-    ASSERT_ARGS(runops_args);
     Parrot_Context * const old_ctx = CONTEXT(interp);
+    ASSERT_ARGS(runops_args);
 
     interp->current_cont  = new_ret_continuation_pmc(interp, NULL);
     interp->current_object = obj;
@@ -340,7 +340,6 @@ Parrot_runops_fromc_args_event(PARROT_INTERP, ARGIN(PMC *sub),
     va_list args;
     Parrot_Context *ctx;
     void *retval;
-    ASSERT_ARGS(Parrot_runops_fromc_args_event);
     /*
      * running code from event handlers isn't fully reentrant due to
      * these interpreter variables - mainly related to calls
@@ -350,6 +349,7 @@ Parrot_runops_fromc_args_event(PARROT_INTERP, ARGIN(PMC *sub),
     opcode_t * const returns = interp->current_returns;
     PMC *      const cont    = interp->current_cont;
     /* what else ? */
+    ASSERT_ARGS(Parrot_runops_fromc_args_event);
 
     va_start(args, sig);
     ctx = runops_args(interp, sub, PMCNULL, NULL, sig, args);
@@ -540,8 +540,8 @@ Parrot_runops_fromc_arglist(PARROT_INTERP, ARGIN(PMC *sub),
         ARGIN(const char *sig), va_list args)
 {
     void* retval;
-    ASSERT_ARGS(Parrot_runops_fromc_arglist);
     Parrot_Context * const ctx = runops_args(interp, sub, PMCNULL, NULL, sig, args);
+    ASSERT_ARGS(Parrot_runops_fromc_arglist);
 
     retval = set_retval(interp, *sig, ctx);
     Parrot_free_context(interp, ctx, 1);
@@ -567,8 +567,8 @@ Parrot_runops_fromc_arglist_reti(PARROT_INTERP, ARGIN(PMC *sub),
         ARGIN(const char *sig), va_list args)
 {
     INTVAL retval;
-    ASSERT_ARGS(Parrot_runops_fromc_arglist_reti);
     Parrot_Context * const ctx = runops_args(interp, sub, PMCNULL, NULL, sig, args);
+    ASSERT_ARGS(Parrot_runops_fromc_arglist_reti);
 
     retval = set_retval_i(interp, *sig, ctx);
     Parrot_free_context(interp, ctx, 1);
@@ -594,8 +594,8 @@ Parrot_runops_fromc_arglist_retf(PARROT_INTERP, ARGIN(PMC *sub),
         ARGIN(const char *sig), va_list args)
 {
     FLOATVAL retval;
-    ASSERT_ARGS(Parrot_runops_fromc_arglist_retf);
     Parrot_Context * const ctx = runops_args(interp, sub, PMCNULL, NULL, sig, args);
+    ASSERT_ARGS(Parrot_runops_fromc_arglist_retf);
 
     retval = set_retval_f(interp, *sig, ctx);
     Parrot_free_context(interp, ctx, 1);
@@ -652,8 +652,8 @@ Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(
         ARGIN(STRING *meth), ARGIN(const char *sig), va_list args)
 {
     INTVAL retval;
-    ASSERT_ARGS(Parrot_run_meth_fromc_arglist_reti);
     Parrot_Context * const ctx = runops_args(interp, sub, obj, meth, sig, args);
+    ASSERT_ARGS(Parrot_run_meth_fromc_arglist_reti);
 
     retval = set_retval_i(interp, *sig, ctx);
     Parrot_free_context(interp, ctx, 1);
@@ -680,8 +680,8 @@ Parrot_run_meth_fromc_arglist_retf(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(
         ARGIN(STRING *meth), ARGIN(const char *sig), va_list args)
 {
     FLOATVAL retval;
-    ASSERT_ARGS(Parrot_run_meth_fromc_arglist_retf);
     Parrot_Context * const ctx = runops_args(interp, sub, obj, meth, sig, args);
+    ASSERT_ARGS(Parrot_run_meth_fromc_arglist_retf);
 
     retval = set_retval_f(interp, *sig, ctx);
     Parrot_free_context(interp, ctx, 1);
@@ -737,8 +737,8 @@ PARROT_EXPORT
 void
 free_runloop_jump_point(PARROT_INTERP)
 {
-    ASSERT_ARGS(free_runloop_jump_point);
     Parrot_runloop * const jump_point = interp->current_runloop;
+    ASSERT_ARGS(free_runloop_jump_point);
     interp->current_runloop           = jump_point->prev;
     jump_point->prev                  = interp->runloop_jmp_free_list;
     interp->runloop_jmp_free_list     = jump_point;

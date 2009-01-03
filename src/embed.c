@@ -836,11 +836,11 @@ set_current_sub(PARROT_INTERP)
 {
     opcode_t i;
     PMC *sub_pmc;
-    ASSERT_ARGS(set_current_sub);
 
     PackFile_ByteCode   * const cur_cs = interp->code;
     PackFile_FixupTable * const ft     = cur_cs->fixups;
     PackFile_ConstTable * const ct     = cur_cs->const_table;
+    ASSERT_ARGS(set_current_sub);
 
     /*
      * Walk the fixup table.  The first Sub-like entry should be our
