@@ -35,7 +35,8 @@ PARROT_CANNOT_RETURN_NULL
 static STRING* trace_class_name(ARGIN(const PMC* pmc))
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_trace_class_name assert(pmc);
+#define ASSERT_ARGS_trace_class_name __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pmc)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

@@ -407,27 +407,40 @@ static int sweep_cb(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*pool);
 
-#define ASSERT_ARGS_collect_cb assert(interp); \
-                               assert(pool); \
-                               assert(arg);
-#define ASSERT_ARGS_gc_ims_add_free_object assert(interp); \
-                                           assert(pool); \
-                                           assert(to_add);
-#define ASSERT_ARGS_gc_ims_alloc_objects assert(interp); \
-                                         assert(pool);
-#define ASSERT_ARGS_gc_ims_get_free_object assert(interp); \
-                                           assert(pool);
-#define ASSERT_ARGS_gc_ims_pool_init assert(pool);
-#define ASSERT_ARGS_parrot_gc_ims_collect assert(interp);
-#define ASSERT_ARGS_parrot_gc_ims_deinit assert(interp);
-#define ASSERT_ARGS_parrot_gc_ims_mark assert(interp);
-#define ASSERT_ARGS_parrot_gc_ims_reinit assert(interp);
-#define ASSERT_ARGS_parrot_gc_ims_run assert(interp);
-#define ASSERT_ARGS_parrot_gc_ims_run_increment assert(interp);
-#define ASSERT_ARGS_parrot_gc_ims_sweep assert(interp);
-#define ASSERT_ARGS_sweep_cb assert(interp); \
-                             assert(pool); \
-                             assert(arg);
+#define ASSERT_ARGS_collect_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(arg)
+#define ASSERT_ARGS_gc_ims_add_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(to_add)
+#define ASSERT_ARGS_gc_ims_alloc_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_ims_get_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_ims_pool_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_parrot_gc_ims_collect __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_parrot_gc_ims_deinit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_parrot_gc_ims_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_parrot_gc_ims_reinit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_parrot_gc_ims_run __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_parrot_gc_ims_run_increment __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_parrot_gc_ims_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_sweep_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(arg)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

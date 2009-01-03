@@ -184,29 +184,43 @@ PARROT_CANNOT_RETURN_NULL
 static const char * skip_command(ARGIN(const char *str))
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_chop_newline assert(buf);
-#define ASSERT_ARGS_close_script_file assert(interp);
-#define ASSERT_ARGS_condition_regtype assert(cmd);
-#define ASSERT_ARGS_current_breakpoint assert(pdb);
-#define ASSERT_ARGS_debugger_cmdline assert(interp);
-#define ASSERT_ARGS_dump_string assert(interp);
-#define ASSERT_ARGS_GDB_B assert(interp); \
-                          assert(s);
-#define ASSERT_ARGS_GDB_P assert(interp); \
-                          assert(s);
-#define ASSERT_ARGS_GDB_print_reg assert(interp);
-#define ASSERT_ARGS_nextarg
-#define ASSERT_ARGS_parse_command assert(command); \
-                                  assert(cmdP);
-#define ASSERT_ARGS_parse_int assert(str); \
-                              assert(intP);
-#define ASSERT_ARGS_parse_key assert(interp); \
-                              assert(str); \
-                              assert(keyP);
-#define ASSERT_ARGS_parse_string assert(interp); \
-                                 assert(str); \
-                                 assert(strP);
-#define ASSERT_ARGS_skip_command assert(str);
+#define ASSERT_ARGS_chop_newline __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(buf)
+#define ASSERT_ARGS_close_script_file __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_condition_regtype __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_current_breakpoint __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb)
+#define ASSERT_ARGS_debugger_cmdline __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_dump_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_GDB_B __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(s)
+#define ASSERT_ARGS_GDB_P __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(s)
+#define ASSERT_ARGS_GDB_print_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_nextarg __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_parse_command __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(command) \
+    || PARROT_ASSERT_ARG(cmdP)
+#define ASSERT_ARGS_parse_int __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(str) \
+    || PARROT_ASSERT_ARG(intP)
+#define ASSERT_ARGS_parse_key __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(str) \
+    || PARROT_ASSERT_ARG(keyP)
+#define ASSERT_ARGS_parse_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(str) \
+    || PARROT_ASSERT_ARG(strP)
+#define ASSERT_ARGS_skip_command __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(str)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

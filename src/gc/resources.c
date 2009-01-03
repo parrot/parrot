@@ -97,24 +97,32 @@ static Memory_Pool * new_memory_pool(
     size_t min_block,
     NULLOK(compact_f compact));
 
-#define ASSERT_ARGS_aligned_mem assert(buffer); \
-                                assert(mem);
-#define ASSERT_ARGS_aligned_size assert(buffer);
-#define ASSERT_ARGS_aligned_string_size
-#define ASSERT_ARGS_alloc_new_block assert(interp); \
-                                    assert(pool); \
-                                    assert(why);
-#define ASSERT_ARGS_buffer_location assert(interp); \
-                                    assert(b);
-#define ASSERT_ARGS_compact_pool assert(interp); \
-                                 assert(pool);
-#define ASSERT_ARGS_debug_print_buf assert(interp); \
-                                    assert(b);
-#define ASSERT_ARGS_mem_allocate assert(interp); \
-                                 assert(pool);
-#define ASSERT_ARGS_merge_pools assert(dest); \
-                                assert(source);
-#define ASSERT_ARGS_new_memory_pool
+#define ASSERT_ARGS_aligned_mem __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(buffer) \
+    || PARROT_ASSERT_ARG(mem)
+#define ASSERT_ARGS_aligned_size __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(buffer)
+#define ASSERT_ARGS_aligned_string_size __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_alloc_new_block __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(why)
+#define ASSERT_ARGS_buffer_location __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_compact_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_debug_print_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_mem_allocate __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_merge_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(dest) \
+    || PARROT_ASSERT_ARG(source)
+#define ASSERT_ARGS_new_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

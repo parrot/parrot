@@ -329,71 +329,105 @@ static int trace_igp_cb(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_end_cycle_cb assert(interp); \
-                                 assert(pool);
-#define ASSERT_ARGS_gc_gms_add_free_object assert(interp);
-#define ASSERT_ARGS_gc_gms_alloc_objects assert(interp); \
-                                         assert(pool);
-#define ASSERT_ARGS_gc_gms_chain_objects assert(interp); \
-                                         assert(pool); \
-                                         assert(new_arena);
-#define ASSERT_ARGS_gc_gms_clear_hdr_list assert(interp); \
-                                          assert(l);
-#define ASSERT_ARGS_gc_gms_clear_igp assert(interp); \
-                                     assert(gen);
-#define ASSERT_ARGS_gc_gms_create_gen assert(interp); \
-                                      assert(pool);
-#define ASSERT_ARGS_gc_gms_end_cycle assert(interp);
-#define ASSERT_ARGS_gc_gms_find_gen assert(interp); \
-                                    assert(h);
-#define ASSERT_ARGS_gc_gms_get_free_object assert(interp); \
-                                           assert(pool);
-#define ASSERT_ARGS_gc_gms_init_gen assert(interp); \
-                                    assert(pool);
-#define ASSERT_ARGS_gc_gms_init_mark assert(interp);
-#define ASSERT_ARGS_gc_gms_merge_gen assert(interp); \
-                                     assert(pool);
-#define ASSERT_ARGS_gc_gms_more_objects assert(interp); \
-                                        assert(pool);
-#define ASSERT_ARGS_gc_gms_pool_init assert(interp); \
-                                     assert(pool);
-#define ASSERT_ARGS_gc_gms_promote assert(interp); \
-                                   assert(h);
-#define ASSERT_ARGS_gc_gms_set_gen assert(interp);
-#define ASSERT_ARGS_gc_gms_setto_black assert(interp); \
-                                       assert(h);
-#define ASSERT_ARGS_gc_gms_setto_gray assert(interp); \
-                                      assert(h);
-#define ASSERT_ARGS_gc_gms_store_hdr_list assert(interp); \
-                                          assert(l); \
-                                          assert(h);
-#define ASSERT_ARGS_gc_gms_store_igp assert(interp); \
-                                     assert(h);
-#define ASSERT_ARGS_gc_gms_sweep assert(interp);
-#define ASSERT_ARGS_gc_gms_trace_children assert(interp);
-#define ASSERT_ARGS_gc_gms_trace_root assert(interp);
-#define ASSERT_ARGS_gc_gms_use_gen assert(interp); \
-                                   assert(pool); \
-                                   assert(plan);
-#define ASSERT_ARGS_gms_debug_verify assert(interp); \
-                                     assert(pool); \
-                                     assert(action);
-#define ASSERT_ARGS_init_mark_cb assert(interp); \
-                                 assert(pool); \
-                                 assert(arg);
-#define ASSERT_ARGS_parrot_gc_gms_deinit assert(interp);
-#define ASSERT_ARGS_parrot_gc_gms_run assert(interp);
-#define ASSERT_ARGS_set_gen_cb assert(interp); \
-                               assert(pool); \
-                               assert(arg);
-#define ASSERT_ARGS_sweep_cb_buf assert(interp); \
-                                 assert(pool);
-#define ASSERT_ARGS_sweep_cb_pmc assert(interp); \
-                                 assert(pool);
-#define ASSERT_ARGS_trace_children_cb assert(interp); \
-                                      assert(pool);
-#define ASSERT_ARGS_trace_igp_cb assert(interp); \
-                                 assert(pool);
+#define ASSERT_ARGS_end_cycle_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_gms_add_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_gc_gms_alloc_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_gms_chain_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(new_arena)
+#define ASSERT_ARGS_gc_gms_clear_hdr_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(l)
+#define ASSERT_ARGS_gc_gms_clear_igp __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(gen)
+#define ASSERT_ARGS_gc_gms_create_gen __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_gms_end_cycle __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_gc_gms_find_gen __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(h)
+#define ASSERT_ARGS_gc_gms_get_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_gms_init_gen __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_gms_init_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_gc_gms_merge_gen __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_gms_more_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_gms_pool_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_gms_promote __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(h)
+#define ASSERT_ARGS_gc_gms_set_gen __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_gc_gms_setto_black __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(h)
+#define ASSERT_ARGS_gc_gms_setto_gray __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(h)
+#define ASSERT_ARGS_gc_gms_store_hdr_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(l) \
+    || PARROT_ASSERT_ARG(h)
+#define ASSERT_ARGS_gc_gms_store_igp __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(h)
+#define ASSERT_ARGS_gc_gms_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_gc_gms_trace_children __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_gc_gms_trace_root __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_gc_gms_use_gen __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(plan)
+#define ASSERT_ARGS_gms_debug_verify __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(action)
+#define ASSERT_ARGS_init_mark_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(arg)
+#define ASSERT_ARGS_parrot_gc_gms_deinit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_parrot_gc_gms_run __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_set_gen_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(arg)
+#define ASSERT_ARGS_sweep_cb_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_sweep_cb_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_trace_children_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_trace_igp_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

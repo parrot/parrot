@@ -221,33 +221,47 @@ void do_panic(
     unsigned int line);
 
 void Parrot_print_backtrace(void);
-#define ASSERT_ARGS_exit_fatal assert(format);
-#define ASSERT_ARGS_Parrot_assert assert(condition_string); \
-                                  assert(file);
-#define ASSERT_ARGS_Parrot_confess assert(cond); \
-                                   assert(file);
-#define ASSERT_ARGS_Parrot_ex_add_c_handler assert(interp); \
-                                            assert(jp);
-#define ASSERT_ARGS_Parrot_ex_build_exception assert(interp);
-#define ASSERT_ARGS_Parrot_ex_calc_handler_offset assert(interp);
-#define ASSERT_ARGS_Parrot_ex_mark_unhandled assert(interp); \
-                                             assert(exception);
-#define ASSERT_ARGS_Parrot_ex_rethrow_from_c assert(interp); \
-                                             assert(exception);
-#define ASSERT_ARGS_Parrot_ex_rethrow_from_op assert(interp); \
-                                              assert(exception);
-#define ASSERT_ARGS_Parrot_ex_throw_from_c assert(interp); \
-                                           assert(exception);
-#define ASSERT_ARGS_Parrot_ex_throw_from_c_args assert(interp); \
-                                                assert(format);
-#define ASSERT_ARGS_Parrot_ex_throw_from_op assert(interp); \
-                                            assert(exception);
-#define ASSERT_ARGS_Parrot_ex_throw_from_op_args assert(interp); \
-                                                 assert(format);
-#define ASSERT_ARGS_die_from_exception assert(interp); \
-                                       assert(exception);
-#define ASSERT_ARGS_do_panic
-#define ASSERT_ARGS_Parrot_print_backtrace
+#define ASSERT_ARGS_exit_fatal __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(format)
+#define ASSERT_ARGS_Parrot_assert __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(condition_string) \
+    || PARROT_ASSERT_ARG(file)
+#define ASSERT_ARGS_Parrot_confess __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(cond) \
+    || PARROT_ASSERT_ARG(file)
+#define ASSERT_ARGS_Parrot_ex_add_c_handler __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(jp)
+#define ASSERT_ARGS_Parrot_ex_build_exception __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_ex_calc_handler_offset __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_ex_mark_unhandled __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(exception)
+#define ASSERT_ARGS_Parrot_ex_rethrow_from_c __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(exception)
+#define ASSERT_ARGS_Parrot_ex_rethrow_from_op __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(exception)
+#define ASSERT_ARGS_Parrot_ex_throw_from_c __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(exception)
+#define ASSERT_ARGS_Parrot_ex_throw_from_c_args __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(format)
+#define ASSERT_ARGS_Parrot_ex_throw_from_op __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(exception)
+#define ASSERT_ARGS_Parrot_ex_throw_from_op_args __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(format)
+#define ASSERT_ARGS_die_from_exception __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(exception)
+#define ASSERT_ARGS_do_panic __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_Parrot_print_backtrace __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/exceptions.c */
 

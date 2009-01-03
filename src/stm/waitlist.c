@@ -83,18 +83,28 @@ static void waitlist_signal_one(ARGMOD(struct waitlist_entry *who))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*who);
 
-#define ASSERT_ARGS_add_entry assert(waitlist); \
-                              assert(entry);
-#define ASSERT_ARGS_alloc_entry assert(interp);
-#define ASSERT_ARGS_get_thread assert(interp);
-#define ASSERT_ARGS_get_thread_noalloc assert(interp);
-#define ASSERT_ARGS_Parrot_STM_tx_log_alloc assert(interp);
-#define ASSERT_ARGS_remove_first assert(waitlist); \
-                                 assert(expect_first);
-#define ASSERT_ARGS_waitlist_remove assert(what);
-#define ASSERT_ARGS_waitlist_remove_check assert(what);
-#define ASSERT_ARGS_waitlist_signal_all assert(list);
-#define ASSERT_ARGS_waitlist_signal_one assert(who);
+#define ASSERT_ARGS_add_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(waitlist) \
+    || PARROT_ASSERT_ARG(entry)
+#define ASSERT_ARGS_alloc_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_thread __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_thread_noalloc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_STM_tx_log_alloc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_remove_first __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(waitlist) \
+    || PARROT_ASSERT_ARG(expect_first)
+#define ASSERT_ARGS_waitlist_remove __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(what)
+#define ASSERT_ARGS_waitlist_remove_check __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(what)
+#define ASSERT_ARGS_waitlist_signal_all __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_waitlist_signal_one __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(who)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

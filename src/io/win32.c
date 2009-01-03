@@ -50,10 +50,11 @@ static INTVAL convert_flags_to_win32(
 PARROT_WARN_UNUSED_RESULT
 static INTVAL io_is_tty_win32(PIOHANDLE fd);
 
-#define ASSERT_ARGS_convert_flags_to_win32 assert(fdwAccess); \
-                                           assert(fdwShareMode); \
-                                           assert(fdwCreate);
-#define ASSERT_ARGS_io_is_tty_win32
+#define ASSERT_ARGS_convert_flags_to_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(fdwAccess) \
+    || PARROT_ASSERT_ARG(fdwShareMode) \
+    || PARROT_ASSERT_ARG(fdwCreate)
+#define ASSERT_ARGS_io_is_tty_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

@@ -161,43 +161,64 @@ static void vanilla_reg_alloc(SHIM_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-#define ASSERT_ARGS_allocate_lexicals assert(interp); \
-                                      assert(unit);
-#define ASSERT_ARGS_allocate_non_volatile assert(interp); \
-                                          assert(unit);
-#define ASSERT_ARGS_allocate_uniq assert(interp); \
-                                  assert(unit);
-#define ASSERT_ARGS_build_interference_graph assert(interp); \
-                                             assert(unit);
-#define ASSERT_ARGS_build_reglist assert(unit);
-#define ASSERT_ARGS_compute_du_chain assert(unit);
-#define ASSERT_ARGS_compute_one_du_chain assert(r); \
-                                         assert(unit);
-#define ASSERT_ARGS_first_avail assert(unit);
-#define ASSERT_ARGS_ig_allocate
-#define ASSERT_ARGS_ig_find_color assert(unit); \
-                                  assert(avail);
-#define ASSERT_ARGS_ig_get_word assert(graph); \
-                                assert(bit_ofs);
-#define ASSERT_ARGS_ig_set assert(graph);
-#define ASSERT_ARGS_imc_stat_init assert(unit);
-#define ASSERT_ARGS_interferes assert(interp); \
-                               assert(unit); \
-                               assert(r0); \
-                               assert(r1);
-#define ASSERT_ARGS_make_stat assert(unit);
-#define ASSERT_ARGS_map_colors assert(unit); \
-                               assert(graph); \
-                               assert(avail);
-#define ASSERT_ARGS_print_stat assert(interp); \
-                               assert(unit);
-#define ASSERT_ARGS_rebuild_reglist assert(unit);
-#define ASSERT_ARGS_reg_sort_f assert(a); \
-                               assert(b);
-#define ASSERT_ARGS_sort_reglist assert(unit);
-#define ASSERT_ARGS_try_allocate assert(interp); \
-                                 assert(unit);
-#define ASSERT_ARGS_vanilla_reg_alloc assert(unit);
+#define ASSERT_ARGS_allocate_lexicals __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_allocate_non_volatile __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_allocate_uniq __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_build_interference_graph __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_build_reglist __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_compute_du_chain __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_compute_one_du_chain __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(r) \
+    || PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_first_avail __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_ig_allocate __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_ig_find_color __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(avail)
+#define ASSERT_ARGS_ig_get_word __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(graph) \
+    || PARROT_ASSERT_ARG(bit_ofs)
+#define ASSERT_ARGS_ig_set __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(graph)
+#define ASSERT_ARGS_imc_stat_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_interferes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(r0) \
+    || PARROT_ASSERT_ARG(r1)
+#define ASSERT_ARGS_make_stat __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_map_colors __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(graph) \
+    || PARROT_ASSERT_ARG(avail)
+#define ASSERT_ARGS_print_stat __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_rebuild_reglist __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_reg_sort_f __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(a) \
+    || PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_sort_reglist __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_try_allocate __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_vanilla_reg_alloc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(unit)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

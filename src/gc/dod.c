@@ -59,14 +59,19 @@ static int sweep_cb(PARROT_INTERP,
 static int trace_active_PMCs(PARROT_INTERP, int trace_stack)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_clear_live_bits assert(pool);
-#define ASSERT_ARGS_find_common_mask assert(interp);
-#define ASSERT_ARGS_mark_special assert(interp); \
-                                 assert(obj);
-#define ASSERT_ARGS_sweep_cb assert(interp); \
-                             assert(pool); \
-                             assert(arg);
-#define ASSERT_ARGS_trace_active_PMCs assert(interp);
+#define ASSERT_ARGS_clear_live_bits __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_find_common_mask __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_mark_special __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(obj)
+#define ASSERT_ARGS_sweep_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(arg)
+#define ASSERT_ARGS_trace_active_PMCs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

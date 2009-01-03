@@ -59,10 +59,11 @@ int longopt_get(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(* info_buf);
 
-#define ASSERT_ARGS_longopt_get assert(interp); \
-                                assert(argv[]); \
-                                assert(options[]); \
-                                assert(info_buf);
+#define ASSERT_ARGS_longopt_get __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(argv[]) \
+    || PARROT_ASSERT_ARG(options[]) \
+    || PARROT_ASSERT_ARG(info_buf)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/longopt.c */
 

@@ -73,10 +73,12 @@ static INTVAL register_charset(PARROT_INTERP,
 static void register_static_converters(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_register_charset assert(interp); \
-                                     assert(charsetname); \
-                                     assert(charset);
-#define ASSERT_ARGS_register_static_converters assert(interp);
+#define ASSERT_ARGS_register_charset __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(charsetname) \
+    || PARROT_ASSERT_ARG(charset)
+#define ASSERT_ARGS_register_static_converters __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

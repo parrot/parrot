@@ -81,19 +81,29 @@ static opcode_t fetch_op_mixed_le(ARGIN(const unsigned char *b))
 static opcode_t fetch_op_test(ARGIN(const unsigned char *b))
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_cvt_num12_num8 assert(dest); \
-                                   assert(src);
-#define ASSERT_ARGS_cvt_num12_num8_be assert(dest); \
-                                      assert(src);
-#define ASSERT_ARGS_cvt_num12_num8_le assert(dest); \
-                                      assert(src);
-#define ASSERT_ARGS_fetch_op_be_4 assert(b);
-#define ASSERT_ARGS_fetch_op_be_8 assert(b);
-#define ASSERT_ARGS_fetch_op_le_4 assert(b);
-#define ASSERT_ARGS_fetch_op_le_8 assert(b);
-#define ASSERT_ARGS_fetch_op_mixed_be assert(b);
-#define ASSERT_ARGS_fetch_op_mixed_le assert(b);
-#define ASSERT_ARGS_fetch_op_test assert(b);
+#define ASSERT_ARGS_cvt_num12_num8 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(dest) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_cvt_num12_num8_be __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(dest) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_cvt_num12_num8_le __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(dest) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_fetch_op_be_4 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_fetch_op_be_8 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_fetch_op_le_4 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_fetch_op_le_8 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_fetch_op_mixed_be __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_fetch_op_mixed_le __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_fetch_op_test __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(b)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

@@ -41,9 +41,10 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
 static IMC_Unit * imc_new_unit(IMC_Unit_Type t);
 
-#define ASSERT_ARGS_imc_free_unit assert(interp); \
-                                  assert(unit);
-#define ASSERT_ARGS_imc_new_unit
+#define ASSERT_ARGS_imc_free_unit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_imc_new_unit __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

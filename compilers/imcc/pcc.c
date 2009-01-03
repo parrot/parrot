@@ -112,32 +112,39 @@ static void unshift_self(ARGIN(SymReg *sub), ARGIN(SymReg *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_insert_tail_call assert(interp); \
-                                     assert(unit); \
-                                     assert(ins); \
-                                     assert(sub);
-#define ASSERT_ARGS_insINS assert(interp); \
-                           assert(unit); \
-                           assert(ins); \
-                           assert(name); \
-                           assert(regs);
-#define ASSERT_ARGS_move_regs assert(interp); \
-                              assert(unit); \
-                              assert(ins); \
-                              assert(dest); \
-                              assert(src);
-#define ASSERT_ARGS_pcc_get_args assert(interp); \
-                                 assert(unit); \
-                                 assert(ins); \
-                                 assert(op_name);
-#define ASSERT_ARGS_pcc_reg_mov assert(interp); \
-                                assert(vinfo);
-#define ASSERT_ARGS_recursive_tail_call assert(interp); \
-                                        assert(unit); \
-                                        assert(ins); \
-                                        assert(sub);
-#define ASSERT_ARGS_unshift_self assert(sub); \
-                                 assert(obj);
+#define ASSERT_ARGS_insert_tail_call __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(ins) \
+    || PARROT_ASSERT_ARG(sub)
+#define ASSERT_ARGS_insINS __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(ins) \
+    || PARROT_ASSERT_ARG(name) \
+    || PARROT_ASSERT_ARG(regs)
+#define ASSERT_ARGS_move_regs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(ins) \
+    || PARROT_ASSERT_ARG(dest) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_pcc_get_args __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(ins) \
+    || PARROT_ASSERT_ARG(op_name)
+#define ASSERT_ARGS_pcc_reg_mov __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(vinfo)
+#define ASSERT_ARGS_recursive_tail_call __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(ins) \
+    || PARROT_ASSERT_ARG(sub)
+#define ASSERT_ARGS_unshift_self __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(obj)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

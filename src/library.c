@@ -91,23 +91,32 @@ static STRING* try_load_path(PARROT_INTERP, ARGMOD(STRING* path))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(* path);
 
-#define ASSERT_ARGS_cnv_to_win32_filesep assert(path);
-#define ASSERT_ARGS_get_search_paths assert(interp);
-#define ASSERT_ARGS_is_abs_path assert(file);
-#define ASSERT_ARGS_path_append assert(interp); \
-                                assert(l_path); \
-                                assert(r_path);
-#define ASSERT_ARGS_path_concat assert(interp); \
-                                assert(l_path); \
-                                assert(r_path);
-#define ASSERT_ARGS_path_finalize assert(interp); \
-                                  assert(path);
-#define ASSERT_ARGS_path_guarantee_trailing_separator assert(interp); \
-                                                      assert(path);
-#define ASSERT_ARGS_try_bytecode_extensions assert(interp); \
-                                            assert(path);
-#define ASSERT_ARGS_try_load_path assert(interp); \
-                                  assert(path);
+#define ASSERT_ARGS_cnv_to_win32_filesep __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(path)
+#define ASSERT_ARGS_get_search_paths __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_is_abs_path __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(file)
+#define ASSERT_ARGS_path_append __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(l_path) \
+    || PARROT_ASSERT_ARG(r_path)
+#define ASSERT_ARGS_path_concat __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(l_path) \
+    || PARROT_ASSERT_ARG(r_path)
+#define ASSERT_ARGS_path_finalize __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(path)
+#define ASSERT_ARGS_path_guarantee_trailing_separator __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(path)
+#define ASSERT_ARGS_try_bytecode_extensions __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(path)
+#define ASSERT_ARGS_try_load_path __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(path)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

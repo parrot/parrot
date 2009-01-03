@@ -333,73 +333,110 @@ PARROT_CANNOT_RETURN_NULL
 char * symreg_to_str(ARGIN(const SymReg *s))
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS__find_sym assert(interp); \
-                              assert(hsh); \
-                              assert(name);
-#define ASSERT_ARGS__get_sym assert(hsh); \
-                             assert(name);
-#define ASSERT_ARGS__mk_address assert(interp); \
-                                assert(hsh); \
-                                assert(name);
-#define ASSERT_ARGS__mk_const assert(hsh); \
-                              assert(name);
-#define ASSERT_ARGS__store_symreg assert(hsh); \
-                                  assert(r);
-#define ASSERT_ARGS_add_namespace assert(interp); \
-                                  assert(unit);
-#define ASSERT_ARGS_add_pcc_arg assert(r); \
-                                assert(arg);
-#define ASSERT_ARGS_add_pcc_cc assert(r); \
-                               assert(arg);
-#define ASSERT_ARGS_add_pcc_multi assert(r);
-#define ASSERT_ARGS_add_pcc_result assert(r); \
-                                   assert(arg);
-#define ASSERT_ARGS_add_pcc_sub assert(r); \
-                                assert(arg);
-#define ASSERT_ARGS_clear_globals assert(interp);
-#define ASSERT_ARGS_clear_locals
-#define ASSERT_ARGS_clear_sym_hash assert(hsh);
-#define ASSERT_ARGS_create_symhash assert(hash);
-#define ASSERT_ARGS_debug_dump_sym_hash assert(hsh);
-#define ASSERT_ARGS_dup_sym assert(r);
-#define ASSERT_ARGS_find_sym assert(interp); \
-                             assert(name);
-#define ASSERT_ARGS_free_sym assert(r);
-#define ASSERT_ARGS_get_sym assert(interp); \
-                            assert(name);
-#define ASSERT_ARGS_hash_str assert(str);
-#define ASSERT_ARGS_link_keys assert(interp); \
-                              assert(keys);
-#define ASSERT_ARGS_mk_const assert(interp); \
-                             assert(name);
-#define ASSERT_ARGS_mk_const_ident assert(interp); \
-                                   assert(name); \
-                                   assert(val);
-#define ASSERT_ARGS_mk_ident assert(interp); \
-                             assert(name);
-#define ASSERT_ARGS_mk_ident_ur assert(interp); \
-                                assert(name);
-#define ASSERT_ARGS_mk_label_address assert(interp); \
-                                     assert(name);
-#define ASSERT_ARGS_mk_local_label assert(interp); \
-                                   assert(name);
-#define ASSERT_ARGS_mk_pasm_reg assert(interp); \
-                                assert(name);
-#define ASSERT_ARGS_mk_pcc_sub assert(interp); \
-                               assert(name);
-#define ASSERT_ARGS_mk_sub_address assert(interp); \
-                                   assert(name);
-#define ASSERT_ARGS_mk_sub_label assert(interp); \
-                                 assert(name);
-#define ASSERT_ARGS_mk_symreg assert(interp); \
-                              assert(name);
-#define ASSERT_ARGS_mk_temp_reg assert(interp);
-#define ASSERT_ARGS_pop_namespace assert(interp); \
-                                  assert(name);
-#define ASSERT_ARGS_push_namespace assert(name);
-#define ASSERT_ARGS_store_symreg assert(interp); \
-                                 assert(r);
-#define ASSERT_ARGS_symreg_to_str assert(s);
+#define ASSERT_ARGS__find_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(hsh) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS__get_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(hsh) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS__mk_address __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(hsh) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS__mk_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(hsh) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS__store_symreg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(hsh) \
+    || PARROT_ASSERT_ARG(r)
+#define ASSERT_ARGS_add_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_add_pcc_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(r) \
+    || PARROT_ASSERT_ARG(arg)
+#define ASSERT_ARGS_add_pcc_cc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(r) \
+    || PARROT_ASSERT_ARG(arg)
+#define ASSERT_ARGS_add_pcc_multi __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(r)
+#define ASSERT_ARGS_add_pcc_result __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(r) \
+    || PARROT_ASSERT_ARG(arg)
+#define ASSERT_ARGS_add_pcc_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(r) \
+    || PARROT_ASSERT_ARG(arg)
+#define ASSERT_ARGS_clear_globals __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_clear_locals __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_clear_sym_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(hsh)
+#define ASSERT_ARGS_create_symhash __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(hash)
+#define ASSERT_ARGS_debug_dump_sym_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(hsh)
+#define ASSERT_ARGS_dup_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(r)
+#define ASSERT_ARGS_find_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_free_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(r)
+#define ASSERT_ARGS_get_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_hash_str __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(str)
+#define ASSERT_ARGS_link_keys __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(keys)
+#define ASSERT_ARGS_mk_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_mk_const_ident __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name) \
+    || PARROT_ASSERT_ARG(val)
+#define ASSERT_ARGS_mk_ident __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_mk_ident_ur __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_mk_label_address __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_mk_local_label __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_mk_pasm_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_mk_pcc_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_mk_sub_address __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_mk_sub_label __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_mk_symreg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_mk_temp_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_pop_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_push_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_store_symreg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(r)
+#define ASSERT_ARGS_symreg_to_str __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(s)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/symreg.c */
 

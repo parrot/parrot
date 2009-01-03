@@ -126,28 +126,41 @@ static void stop_prederef(PARROT_INTERP)
 static void turn_ev_check(PARROT_INTERP, int on)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_dynop_register_switch
-#define ASSERT_ARGS_dynop_register_xx assert(interp);
-#define ASSERT_ARGS_get_core_op_lib_init assert(interp);
-#define ASSERT_ARGS_get_dynamic_op_lib_init assert(lib);
-#define ASSERT_ARGS_init_prederef assert(interp);
-#define ASSERT_ARGS_load_prederef assert(interp);
-#define ASSERT_ARGS_notify_func_table assert(interp); \
-                                      assert(table);
-#define ASSERT_ARGS_prederef_args assert(pc_prederef); \
-                                  assert(interp); \
-                                  assert(pc); \
-                                  assert(opinfo);
-#define ASSERT_ARGS_runops_cgp assert(interp); \
-                               assert(pc);
-#define ASSERT_ARGS_runops_exec assert(interp); \
-                                assert(pc);
-#define ASSERT_ARGS_runops_jit assert(interp); \
-                               assert(pc);
-#define ASSERT_ARGS_runops_switch assert(interp); \
-                                  assert(pc);
-#define ASSERT_ARGS_stop_prederef assert(interp);
-#define ASSERT_ARGS_turn_ev_check assert(interp);
+#define ASSERT_ARGS_dynop_register_switch __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_dynop_register_xx __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_core_op_lib_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_dynamic_op_lib_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(lib)
+#define ASSERT_ARGS_init_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_load_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_notify_func_table __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(table)
+#define ASSERT_ARGS_prederef_args __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pc_prederef) \
+    || PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pc) \
+    || PARROT_ASSERT_ARG(opinfo)
+#define ASSERT_ARGS_runops_cgp __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pc)
+#define ASSERT_ARGS_runops_exec __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pc)
+#define ASSERT_ARGS_runops_jit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pc)
+#define ASSERT_ARGS_runops_switch __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pc)
+#define ASSERT_ARGS_stop_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_turn_ev_check __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

@@ -86,16 +86,23 @@ void Parrot_STM_waitlist_signal(PARROT_INTERP,
 void Parrot_STM_waitlist_wait(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_Parrot_STM_tx_log_get assert(interp);
-#define ASSERT_ARGS_Parrot_STM_waitlist_add_self assert(interp); \
-                                                 assert(waitlist);
-#define ASSERT_ARGS_Parrot_STM_waitlist_destroy_thread assert(interp);
-#define ASSERT_ARGS_Parrot_STM_waitlist_init assert(interp); \
-                                             assert(waitlist);
-#define ASSERT_ARGS_Parrot_STM_waitlist_remove_all assert(interp);
-#define ASSERT_ARGS_Parrot_STM_waitlist_signal assert(interp); \
-                                               assert(waitlist);
-#define ASSERT_ARGS_Parrot_STM_waitlist_wait assert(interp);
+#define ASSERT_ARGS_Parrot_STM_tx_log_get __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_STM_waitlist_add_self __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(waitlist)
+#define ASSERT_ARGS_Parrot_STM_waitlist_destroy_thread __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_STM_waitlist_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(waitlist)
+#define ASSERT_ARGS_Parrot_STM_waitlist_remove_all __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_STM_waitlist_signal __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(waitlist)
+#define ASSERT_ARGS_Parrot_STM_waitlist_wait __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/stm/waitlist.c */
 

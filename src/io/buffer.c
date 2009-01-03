@@ -28,7 +28,8 @@ This file implements a collection of utility functions for I/O buffering.
 static INTVAL io_is_end_of_line(ARGIN(const char *c))
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_io_is_end_of_line assert(c);
+#define ASSERT_ARGS_io_is_end_of_line __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(c)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

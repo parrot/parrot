@@ -304,93 +304,134 @@ static void visit_todo_list_thaw(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_add_pmc_next_for_GC assert(pmc); \
-                                        assert(info);
-#define ASSERT_ARGS_add_pmc_todo_list assert(interp); \
-                                      assert(info);
-#define ASSERT_ARGS_cleanup_next_for_GC assert(interp);
-#define ASSERT_ARGS_cleanup_next_for_GC_pool assert(pool);
-#define ASSERT_ARGS_create_image assert(interp); \
-                                 assert(info);
-#define ASSERT_ARGS_do_action assert(interp); \
-                              assert(info);
-#define ASSERT_ARGS_do_thaw assert(interp); \
-                            assert(info);
-#define ASSERT_ARGS_freeze_pmc assert(interp); \
-                               assert(info);
-#define ASSERT_ARGS_ft_init assert(interp); \
-                            assert(info);
-#define ASSERT_ARGS_id_from_pmc assert(interp); \
-                                assert(pmc);
-#define ASSERT_ARGS_next_for_GC_seen assert(interp); \
-                                     assert(info); \
-                                     assert(id);
-#define ASSERT_ARGS_op_append assert(interp); \
-                              assert(s);
-#define ASSERT_ARGS_op_check_size assert(interp); \
-                                  assert(s);
-#define ASSERT_ARGS_pmc_add_ext assert(interp); \
-                                assert(pmc);
-#define ASSERT_ARGS_push_ascii_integer assert(interp); \
-                                       assert(io);
-#define ASSERT_ARGS_push_ascii_number assert(interp); \
-                                      assert(io);
-#define ASSERT_ARGS_push_ascii_pmc assert(interp); \
-                                   assert(io); \
-                                   assert(v);
-#define ASSERT_ARGS_push_ascii_string assert(interp); \
-                                      assert(io); \
-                                      assert(s);
-#define ASSERT_ARGS_push_opcode_integer assert(interp); \
-                                        assert(io);
-#define ASSERT_ARGS_push_opcode_number assert(interp); \
-                                       assert(io);
-#define ASSERT_ARGS_push_opcode_pmc assert(interp); \
-                                    assert(io); \
-                                    assert(v);
-#define ASSERT_ARGS_push_opcode_string assert(interp); \
-                                       assert(io); \
-                                       assert(v);
-#define ASSERT_ARGS_run_thaw assert(interp); \
-                             assert(image);
-#define ASSERT_ARGS_shift_ascii_integer assert(io);
-#define ASSERT_ARGS_shift_ascii_number assert(io);
-#define ASSERT_ARGS_shift_ascii_pmc assert(io);
-#define ASSERT_ARGS_shift_ascii_string assert(interp); \
-                                       assert(io);
-#define ASSERT_ARGS_shift_opcode_integer assert(io);
-#define ASSERT_ARGS_shift_opcode_number assert(io);
-#define ASSERT_ARGS_shift_opcode_pmc assert(interp); \
-                                     assert(io);
-#define ASSERT_ARGS_shift_opcode_string assert(interp); \
-                                        assert(io);
-#define ASSERT_ARGS_str_append assert(interp); \
-                               assert(s); \
-                               assert(b);
-#define ASSERT_ARGS_thaw_create_pmc assert(interp); \
-                                    assert(info);
-#define ASSERT_ARGS_thaw_pmc assert(interp); \
-                             assert(info); \
-                             assert(id); \
-                             assert(type);
-#define ASSERT_ARGS_todo_list_init assert(interp); \
-                                   assert(info);
-#define ASSERT_ARGS_todo_list_seen assert(interp); \
-                                   assert(pmc); \
-                                   assert(info); \
-                                   assert(id);
-#define ASSERT_ARGS_visit_loop_next_for_GC assert(interp); \
-                                           assert(current); \
-                                           assert(info);
-#define ASSERT_ARGS_visit_loop_todo_list assert(interp); \
-                                         assert(info);
-#define ASSERT_ARGS_visit_next_for_GC assert(interp); \
-                                      assert(pmc); \
-                                      assert(info);
-#define ASSERT_ARGS_visit_todo_list assert(interp); \
-                                    assert(info);
-#define ASSERT_ARGS_visit_todo_list_thaw assert(interp); \
-                                         assert(info);
+#define ASSERT_ARGS_add_pmc_next_for_GC __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pmc) \
+    || PARROT_ASSERT_ARG(info)
+#define ASSERT_ARGS_add_pmc_todo_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(info)
+#define ASSERT_ARGS_cleanup_next_for_GC __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_cleanup_next_for_GC_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_create_image __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(info)
+#define ASSERT_ARGS_do_action __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(info)
+#define ASSERT_ARGS_do_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(info)
+#define ASSERT_ARGS_freeze_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(info)
+#define ASSERT_ARGS_ft_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(info)
+#define ASSERT_ARGS_id_from_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pmc)
+#define ASSERT_ARGS_next_for_GC_seen __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(info) \
+    || PARROT_ASSERT_ARG(id)
+#define ASSERT_ARGS_op_append __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(s)
+#define ASSERT_ARGS_op_check_size __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(s)
+#define ASSERT_ARGS_pmc_add_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pmc)
+#define ASSERT_ARGS_push_ascii_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(io)
+#define ASSERT_ARGS_push_ascii_number __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(io)
+#define ASSERT_ARGS_push_ascii_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(io) \
+    || PARROT_ASSERT_ARG(v)
+#define ASSERT_ARGS_push_ascii_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(io) \
+    || PARROT_ASSERT_ARG(s)
+#define ASSERT_ARGS_push_opcode_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(io)
+#define ASSERT_ARGS_push_opcode_number __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(io)
+#define ASSERT_ARGS_push_opcode_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(io) \
+    || PARROT_ASSERT_ARG(v)
+#define ASSERT_ARGS_push_opcode_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(io) \
+    || PARROT_ASSERT_ARG(v)
+#define ASSERT_ARGS_run_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(image)
+#define ASSERT_ARGS_shift_ascii_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(io)
+#define ASSERT_ARGS_shift_ascii_number __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(io)
+#define ASSERT_ARGS_shift_ascii_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(io)
+#define ASSERT_ARGS_shift_ascii_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(io)
+#define ASSERT_ARGS_shift_opcode_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(io)
+#define ASSERT_ARGS_shift_opcode_number __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(io)
+#define ASSERT_ARGS_shift_opcode_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(io)
+#define ASSERT_ARGS_shift_opcode_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(io)
+#define ASSERT_ARGS_str_append __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(s) \
+    || PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_thaw_create_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(info)
+#define ASSERT_ARGS_thaw_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(info) \
+    || PARROT_ASSERT_ARG(id) \
+    || PARROT_ASSERT_ARG(type)
+#define ASSERT_ARGS_todo_list_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(info)
+#define ASSERT_ARGS_todo_list_seen __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pmc) \
+    || PARROT_ASSERT_ARG(info) \
+    || PARROT_ASSERT_ARG(id)
+#define ASSERT_ARGS_visit_loop_next_for_GC __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(current) \
+    || PARROT_ASSERT_ARG(info)
+#define ASSERT_ARGS_visit_loop_todo_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(info)
+#define ASSERT_ARGS_visit_next_for_GC __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pmc) \
+    || PARROT_ASSERT_ARG(info)
+#define ASSERT_ARGS_visit_todo_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(info)
+#define ASSERT_ARGS_visit_todo_list_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(info)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

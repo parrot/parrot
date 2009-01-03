@@ -100,30 +100,45 @@ static QUEUE_ENTRY * remove_queued_suspend_gc(PARROT_INTERP)
 PARROT_CAN_RETURN_NULL
 static void* thread_func(ARGIN_NULLOK(void *arg));
 
-#define ASSERT_ARGS_detach
-#define ASSERT_ARGS_get_pool assert(interp);
-#define ASSERT_ARGS_is_suspended_for_gc assert(interp);
-#define ASSERT_ARGS_make_local_args_copy assert(interp); \
-                                         assert(old_interp);
-#define ASSERT_ARGS_make_local_copy assert(interp); \
-                                    assert(from); \
-                                    assert(arg);
-#define ASSERT_ARGS_mutex_unlock assert(arg);
-#define ASSERT_ARGS_pt_check_tid assert(from);
-#define ASSERT_ARGS_pt_gc_count_threads assert(interp);
-#define ASSERT_ARGS_pt_gc_wait_for_stage assert(interp);
-#define ASSERT_ARGS_pt_gc_wakeup_check assert(interp);
-#define ASSERT_ARGS_pt_ns_clone assert(d); \
-                                assert(dest_ns); \
-                                assert(s); \
-                                assert(source_ns);
-#define ASSERT_ARGS_pt_suspend_all_for_gc assert(interp);
-#define ASSERT_ARGS_pt_suspend_one_for_gc assert(interp);
-#define ASSERT_ARGS_pt_thread_signal assert(self); \
-                                     assert(interp);
-#define ASSERT_ARGS_pt_thread_wait assert(interp);
-#define ASSERT_ARGS_remove_queued_suspend_gc assert(interp);
-#define ASSERT_ARGS_thread_func
+#define ASSERT_ARGS_detach __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_get_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_is_suspended_for_gc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_make_local_args_copy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(old_interp)
+#define ASSERT_ARGS_make_local_copy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(from) \
+    || PARROT_ASSERT_ARG(arg)
+#define ASSERT_ARGS_mutex_unlock __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(arg)
+#define ASSERT_ARGS_pt_check_tid __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(from)
+#define ASSERT_ARGS_pt_gc_count_threads __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_pt_gc_wait_for_stage __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_pt_gc_wakeup_check __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_pt_ns_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(d) \
+    || PARROT_ASSERT_ARG(dest_ns) \
+    || PARROT_ASSERT_ARG(s) \
+    || PARROT_ASSERT_ARG(source_ns)
+#define ASSERT_ARGS_pt_suspend_all_for_gc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_pt_suspend_one_for_gc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_pt_thread_signal __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(self) \
+    || PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_pt_thread_wait __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_remove_queued_suspend_gc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_thread_func __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

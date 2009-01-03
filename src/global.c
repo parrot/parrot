@@ -76,23 +76,29 @@ static void store_sub_in_multi(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_get_namespace_pmc assert(interp); \
-                                      assert(sub);
-#define ASSERT_ARGS_internal_ns_keyed assert(interp); \
-                                      assert(base_ns); \
-                                      assert(pmc_key);
-#define ASSERT_ARGS_internal_ns_keyed_key assert(interp); \
-                                          assert(ns); \
-                                          assert(key);
-#define ASSERT_ARGS_internal_ns_keyed_str assert(interp); \
-                                          assert(base_ns); \
-                                          assert(key);
-#define ASSERT_ARGS_internal_ns_maybe_create assert(interp); \
-                                             assert(ns); \
-                                             assert(key);
-#define ASSERT_ARGS_store_sub_in_multi assert(interp); \
-                                       assert(sub); \
-                                       assert(ns);
+#define ASSERT_ARGS_get_namespace_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub)
+#define ASSERT_ARGS_internal_ns_keyed __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(base_ns) \
+    || PARROT_ASSERT_ARG(pmc_key)
+#define ASSERT_ARGS_internal_ns_keyed_key __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(ns) \
+    || PARROT_ASSERT_ARG(key)
+#define ASSERT_ARGS_internal_ns_keyed_str __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(base_ns) \
+    || PARROT_ASSERT_ARG(key)
+#define ASSERT_ARGS_internal_ns_maybe_create __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(ns) \
+    || PARROT_ASSERT_ARG(key)
+#define ASSERT_ARGS_store_sub_in_multi __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(ns)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

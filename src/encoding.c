@@ -31,9 +31,10 @@ static INTVAL register_encoding(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_register_encoding assert(interp); \
-                                      assert(encodingname); \
-                                      assert(encoding);
+#define ASSERT_ARGS_register_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(encodingname) \
+    || PARROT_ASSERT_ARG(encoding)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

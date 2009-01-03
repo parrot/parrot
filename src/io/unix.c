@@ -42,8 +42,8 @@ PARROT_CONST_FUNCTION
 static INTVAL convert_flags_to_unix(INTVAL flags);
 
 static INTVAL io_is_tty_unix(PIOHANDLE fd);
-#define ASSERT_ARGS_convert_flags_to_unix
-#define ASSERT_ARGS_io_is_tty_unix
+#define ASSERT_ARGS_convert_flags_to_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_io_is_tty_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

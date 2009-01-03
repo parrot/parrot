@@ -90,15 +90,18 @@ static STRING* str_append_w_flags(PARROT_INTERP,
         FUNC_MODIFIES(*dest)
         FUNC_MODIFIES(*src);
 
-#define ASSERT_ARGS_gen_sprintf_call assert(out); \
-                                     assert(info);
-#define ASSERT_ARGS_handle_flags assert(interp); \
-                                 assert(info); \
-                                 assert(str);
-#define ASSERT_ARGS_str_append_w_flags assert(interp); \
-                                       assert(dest); \
-                                       assert(info); \
-                                       assert(src);
+#define ASSERT_ARGS_gen_sprintf_call __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(out) \
+    || PARROT_ASSERT_ARG(info)
+#define ASSERT_ARGS_handle_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(info) \
+    || PARROT_ASSERT_ARG(str)
+#define ASSERT_ARGS_str_append_w_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(dest) \
+    || PARROT_ASSERT_ARG(info) \
+    || PARROT_ASSERT_ARG(src)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

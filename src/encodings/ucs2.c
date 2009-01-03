@@ -149,35 +149,53 @@ static void ucs2_set_position(SHIM_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*i);
 
-#define ASSERT_ARGS_become_encoding assert(interp);
-#define ASSERT_ARGS_bytes assert(interp); \
-                          assert(src);
-#define ASSERT_ARGS_codepoints assert(interp); \
-                               assert(src);
-#define ASSERT_ARGS_get_byte assert(interp);
-#define ASSERT_ARGS_get_bytes assert(interp);
-#define ASSERT_ARGS_get_bytes_inplace assert(interp);
-#define ASSERT_ARGS_get_codepoint assert(interp); \
-                                  assert(src);
-#define ASSERT_ARGS_get_codepoints assert(interp); \
-                                   assert(src);
-#define ASSERT_ARGS_get_codepoints_inplace assert(interp);
-#define ASSERT_ARGS_iter_init assert(interp); \
-                              assert(src); \
-                              assert(iter);
-#define ASSERT_ARGS_set_byte assert(interp);
-#define ASSERT_ARGS_set_bytes assert(interp);
-#define ASSERT_ARGS_set_codepoint assert(interp); \
-                                  assert(src);
-#define ASSERT_ARGS_set_codepoints assert(interp);
-#define ASSERT_ARGS_to_encoding assert(interp); \
-                                assert(src); \
-                                assert(dest);
-#define ASSERT_ARGS_ucs2_decode_and_advance assert(interp); \
-                                            assert(i);
-#define ASSERT_ARGS_ucs2_encode_and_advance assert(interp); \
-                                            assert(i);
-#define ASSERT_ARGS_ucs2_set_position assert(i);
+#define ASSERT_ARGS_become_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_codepoints __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_get_byte __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_bytes_inplace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_codepoint __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_get_codepoints __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_get_codepoints_inplace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_iter_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(src) \
+    || PARROT_ASSERT_ARG(iter)
+#define ASSERT_ARGS_set_byte __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_set_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_set_codepoint __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_set_codepoints __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_to_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(src) \
+    || PARROT_ASSERT_ARG(dest)
+#define ASSERT_ARGS_ucs2_decode_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(i)
+#define ASSERT_ARGS_ucs2_encode_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(i)
+#define ASSERT_ARGS_ucs2_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(i)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

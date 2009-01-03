@@ -91,19 +91,26 @@ static void resize_symhash(ARGMOD(SymHash *hsh))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*hsh);
 
-#define ASSERT_ARGS__get_sym_typed assert(hsh); \
-                                   assert(name);
-#define ASSERT_ARGS__mk_fullname assert(name);
-#define ASSERT_ARGS__mk_symreg assert(hsh); \
-                               assert(name);
-#define ASSERT_ARGS_add_ns assert(interp); \
-                           assert(name);
-#define ASSERT_ARGS_int_overflows assert(r);
-#define ASSERT_ARGS_mk_pmc_const_2 assert(interp); \
-                                   assert(unit); \
-                                   assert(left); \
-                                   assert(rhs);
-#define ASSERT_ARGS_resize_symhash assert(hsh);
+#define ASSERT_ARGS__get_sym_typed __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(hsh) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS__mk_fullname __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS__mk_symreg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(hsh) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_add_ns __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_int_overflows __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(r)
+#define ASSERT_ARGS_mk_pmc_const_2 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(left) \
+    || PARROT_ASSERT_ARG(rhs)
+#define ASSERT_ARGS_resize_symhash __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(hsh)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

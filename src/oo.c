@@ -64,18 +64,24 @@ static void invalidate_all_caches(PARROT_INTERP)
 static void invalidate_type_caches(PARROT_INTERP, UINTVAL type)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_C3_merge assert(interp); \
-                             assert(merge_list);
-#define ASSERT_ARGS_debug_trace_find_meth assert(interp); \
-                                          assert(_class); \
-                                          assert(name);
-#define ASSERT_ARGS_fail_if_type_exists assert(interp); \
-                                        assert(name);
-#define ASSERT_ARGS_find_method_direct_1 assert(interp); \
-                                         assert(_class); \
-                                         assert(method_name);
-#define ASSERT_ARGS_invalidate_all_caches assert(interp);
-#define ASSERT_ARGS_invalidate_type_caches assert(interp);
+#define ASSERT_ARGS_C3_merge __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(merge_list)
+#define ASSERT_ARGS_debug_trace_find_meth __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(_class) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_fail_if_type_exists __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_find_method_direct_1 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(_class) \
+    || PARROT_ASSERT_ARG(method_name)
+#define ASSERT_ARGS_invalidate_all_caches __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_invalidate_type_caches __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

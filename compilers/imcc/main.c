@@ -98,24 +98,34 @@ static void usage(ARGMOD(FILE *fp))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*fp);
 
-#define ASSERT_ARGS_compile_to_bytecode assert(interp); \
-                                        assert(sourcefile);
-#define ASSERT_ARGS_determine_input_file_type assert(interp); \
-                                              assert(sourcefile);
-#define ASSERT_ARGS_determine_output_file_type assert(interp); \
-                                               assert(obj_file); \
-                                               assert(output_file);
-#define ASSERT_ARGS_do_pre_process assert(interp);
-#define ASSERT_ARGS_help
-#define ASSERT_ARGS_help_debug
-#define ASSERT_ARGS_imcc_get_optimization_description assert(opt_desc);
-#define ASSERT_ARGS_imcc_run_pbc assert(interp); \
-                                 assert(argv);
-#define ASSERT_ARGS_imcc_write_pbc assert(interp); \
-                                   assert(output_file);
-#define ASSERT_ARGS_is_all_hex_digits assert(s);
-#define ASSERT_ARGS_Parrot_version assert(interp);
-#define ASSERT_ARGS_usage assert(fp);
+#define ASSERT_ARGS_compile_to_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sourcefile)
+#define ASSERT_ARGS_determine_input_file_type __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sourcefile)
+#define ASSERT_ARGS_determine_output_file_type __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(obj_file) \
+    || PARROT_ASSERT_ARG(output_file)
+#define ASSERT_ARGS_do_pre_process __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_help_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_imcc_get_optimization_description __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(opt_desc)
+#define ASSERT_ARGS_imcc_run_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(argv)
+#define ASSERT_ARGS_imcc_write_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(output_file)
+#define ASSERT_ARGS_is_all_hex_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(s)
+#define ASSERT_ARGS_Parrot_version __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_usage __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(fp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

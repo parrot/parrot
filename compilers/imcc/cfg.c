@@ -144,40 +144,56 @@ static void sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_analyse_life_block assert(bb); \
-                                       assert(r);
-#define ASSERT_ARGS_analyse_life_symbol assert(unit); \
-                                        assert(r);
-#define ASSERT_ARGS_bb_add_edge assert(unit); \
-                                assert(from); \
-                                assert(to);
-#define ASSERT_ARGS_bb_check_set_addr assert(interp); \
-                                      assert(unit); \
-                                      assert(bb); \
-                                      assert(label);
-#define ASSERT_ARGS_bb_findadd_edge assert(interp); \
-                                    assert(unit); \
-                                    assert(from); \
-                                    assert(label);
-#define ASSERT_ARGS_bb_remove_edge assert(unit); \
-                                   assert(edge);
-#define ASSERT_ARGS_check_invoke_type assert(interp); \
-                                      assert(unit); \
-                                      assert(ins);
-#define ASSERT_ARGS_free_dominance_frontiers assert(unit);
-#define ASSERT_ARGS_free_dominators assert(unit);
-#define ASSERT_ARGS_free_edge assert(unit);
-#define ASSERT_ARGS_free_loops assert(unit);
-#define ASSERT_ARGS_init_basic_blocks assert(unit);
-#define ASSERT_ARGS_make_basic_block assert(unit); \
-                                     assert(ins);
-#define ASSERT_ARGS_mark_loop assert(interp); \
-                              assert(unit); \
-                              assert(e);
-#define ASSERT_ARGS_propagate_need assert(bb); \
-                                   assert(r);
-#define ASSERT_ARGS_sort_loops assert(interp); \
-                               assert(unit);
+#define ASSERT_ARGS_analyse_life_block __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bb) \
+    || PARROT_ASSERT_ARG(r)
+#define ASSERT_ARGS_analyse_life_symbol __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(r)
+#define ASSERT_ARGS_bb_add_edge __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(from) \
+    || PARROT_ASSERT_ARG(to)
+#define ASSERT_ARGS_bb_check_set_addr __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(bb) \
+    || PARROT_ASSERT_ARG(label)
+#define ASSERT_ARGS_bb_findadd_edge __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(from) \
+    || PARROT_ASSERT_ARG(label)
+#define ASSERT_ARGS_bb_remove_edge __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(edge)
+#define ASSERT_ARGS_check_invoke_type __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(ins)
+#define ASSERT_ARGS_free_dominance_frontiers __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_free_dominators __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_free_edge __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_free_loops __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_init_basic_blocks __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_make_basic_block __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(ins)
+#define ASSERT_ARGS_mark_loop __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(e)
+#define ASSERT_ARGS_propagate_need __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bb) \
+    || PARROT_ASSERT_ARG(r)
+#define ASSERT_ARGS_sort_loops __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

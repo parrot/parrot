@@ -188,44 +188,66 @@ static void * wait_for_version(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*log);
 
-#define ASSERT_ARGS_alloc_read assert(interp); \
-                               assert(log);
-#define ASSERT_ARGS_alloc_write assert(interp); \
-                                assert(log);
-#define ASSERT_ARGS_do_partial_abort assert(interp); \
-                                     assert(log); \
-                                     assert(inner);
-#define ASSERT_ARGS_do_real_abort assert(interp); \
-                                  assert(log); \
-                                  assert(inner);
-#define ASSERT_ARGS_do_real_commit assert(interp); \
-                                   assert(log);
-#define ASSERT_ARGS_find_write_record assert(interp);
-#define ASSERT_ARGS_force_sharing assert(interp);
-#define ASSERT_ARGS_get_read assert(log);
-#define ASSERT_ARGS_get_read_valid_depth assert(interp); \
-                                         assert(log);
-#define ASSERT_ARGS_get_sublog assert(log);
-#define ASSERT_ARGS_get_write assert(log);
-#define ASSERT_ARGS_is_aborted assert(log);
-#define ASSERT_ARGS_is_version assert(maybe_version);
-#define ASSERT_ARGS_local_pmc_copy assert(interp);
-#define ASSERT_ARGS_mark_read_record assert(interp); \
-                                     assert(read);
-#define ASSERT_ARGS_mark_write_record assert(interp); \
-                                      assert(write);
-#define ASSERT_ARGS_merge_transactions assert(interp); \
-                                       assert(log); \
-                                       assert(outer); \
-                                       assert(inner);
-#define ASSERT_ARGS_next_version assert(old_version);
-#define ASSERT_ARGS_replay_writes assert(interp); \
-                                  assert(log);
-#define ASSERT_ARGS_safe_to_clone assert(original);
-#define ASSERT_ARGS_setup_wait assert(interp); \
-                               assert(log);
-#define ASSERT_ARGS_wait_for_version assert(interp); \
-                                     assert(log);
+#define ASSERT_ARGS_alloc_read __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(log)
+#define ASSERT_ARGS_alloc_write __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(log)
+#define ASSERT_ARGS_do_partial_abort __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(log) \
+    || PARROT_ASSERT_ARG(inner)
+#define ASSERT_ARGS_do_real_abort __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(log) \
+    || PARROT_ASSERT_ARG(inner)
+#define ASSERT_ARGS_do_real_commit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(log)
+#define ASSERT_ARGS_find_write_record __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_force_sharing __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_read __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(log)
+#define ASSERT_ARGS_get_read_valid_depth __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(log)
+#define ASSERT_ARGS_get_sublog __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(log)
+#define ASSERT_ARGS_get_write __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(log)
+#define ASSERT_ARGS_is_aborted __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(log)
+#define ASSERT_ARGS_is_version __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(maybe_version)
+#define ASSERT_ARGS_local_pmc_copy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_mark_read_record __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(read)
+#define ASSERT_ARGS_mark_write_record __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(write)
+#define ASSERT_ARGS_merge_transactions __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(log) \
+    || PARROT_ASSERT_ARG(outer) \
+    || PARROT_ASSERT_ARG(inner)
+#define ASSERT_ARGS_next_version __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(old_version)
+#define ASSERT_ARGS_replay_writes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(log)
+#define ASSERT_ARGS_safe_to_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(original)
+#define ASSERT_ARGS_setup_wait __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(log)
+#define ASSERT_ARGS_wait_for_version __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(log)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

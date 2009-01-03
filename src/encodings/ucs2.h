@@ -20,7 +20,8 @@ PARROT_CANNOT_RETURN_NULL
 ENCODING * Parrot_encoding_ucs2_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_Parrot_encoding_ucs2_init assert(interp);
+#define ASSERT_ARGS_Parrot_encoding_ucs2_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/encodings/ucs2.c */
 

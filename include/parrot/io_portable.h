@@ -95,31 +95,42 @@ size_t Parrot_io_write_portable(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*s);
 
-#define ASSERT_ARGS_Parrot_io_close_portable assert(interp); \
-                                             assert(filehandle);
-#define ASSERT_ARGS_Parrot_io_fdopen_portable assert(interp); \
-                                              assert(filehandle);
-#define ASSERT_ARGS_Parrot_io_flush_portable
-#define ASSERT_ARGS_Parrot_io_getblksize_portable
-#define ASSERT_ARGS_Parrot_io_init_portable assert(interp);
-#define ASSERT_ARGS_Parrot_io_is_closed_portable assert(interp); \
-                                                 assert(filehandle);
-#define ASSERT_ARGS_Parrot_io_open_pipe_portable assert(interp);
-#define ASSERT_ARGS_Parrot_io_open_portable assert(interp); \
-                                            assert(filehandle); \
-                                            assert(path);
-#define ASSERT_ARGS_Parrot_io_peek_portable assert(interp); \
-                                            assert(filehandle); \
-                                            assert(buf);
-#define ASSERT_ARGS_Parrot_io_read_portable assert(interp); \
-                                            assert(buf);
-#define ASSERT_ARGS_Parrot_io_seek_portable assert(interp); \
-                                            assert(filehandle);
-#define ASSERT_ARGS_Parrot_io_tell_portable assert(interp); \
-                                            assert(filehandle);
-#define ASSERT_ARGS_Parrot_io_write_portable assert(interp); \
-                                             assert(filehandle); \
-                                             assert(s);
+#define ASSERT_ARGS_Parrot_io_close_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(filehandle)
+#define ASSERT_ARGS_Parrot_io_fdopen_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(filehandle)
+#define ASSERT_ARGS_Parrot_io_flush_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_Parrot_io_getblksize_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_Parrot_io_init_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_io_is_closed_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(filehandle)
+#define ASSERT_ARGS_Parrot_io_open_pipe_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_io_open_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(filehandle) \
+    || PARROT_ASSERT_ARG(path)
+#define ASSERT_ARGS_Parrot_io_peek_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(filehandle) \
+    || PARROT_ASSERT_ARG(buf)
+#define ASSERT_ARGS_Parrot_io_read_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(buf)
+#define ASSERT_ARGS_Parrot_io_seek_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(filehandle)
+#define ASSERT_ARGS_Parrot_io_tell_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(filehandle)
+#define ASSERT_ARGS_Parrot_io_write_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(filehandle) \
+    || PARROT_ASSERT_ARG(s)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/portable.c */
 

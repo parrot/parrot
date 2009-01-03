@@ -222,44 +222,62 @@ PARROT_PURE_FUNCTION
 INTVAL list_length(SHIM_INTERP, ARGIN(const List *list))
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_ld
-#define ASSERT_ARGS_list_assign assert(interp); \
-                                assert(list);
-#define ASSERT_ARGS_list_clone assert(interp); \
-                               assert(other);
-#define ASSERT_ARGS_list_delete assert(interp); \
-                                assert(list);
-#define ASSERT_ARGS_list_get assert(interp); \
-                             assert(list);
-#define ASSERT_ARGS_list_insert assert(interp); \
-                                assert(list);
-#define ASSERT_ARGS_list_mark assert(interp); \
-                              assert(list);
-#define ASSERT_ARGS_list_new assert(interp);
-#define ASSERT_ARGS_list_new_init assert(interp); \
-                                  assert(init);
-#define ASSERT_ARGS_list_pmc_new assert(interp); \
-                                 assert(container);
-#define ASSERT_ARGS_list_pmc_new_init assert(interp); \
-                                      assert(container); \
-                                      assert(init);
-#define ASSERT_ARGS_list_pop assert(interp); \
-                             assert(list);
-#define ASSERT_ARGS_list_push assert(interp); \
-                              assert(list);
-#define ASSERT_ARGS_list_set_length assert(interp); \
-                                    assert(list);
-#define ASSERT_ARGS_list_shift assert(interp); \
-                               assert(list);
-#define ASSERT_ARGS_list_splice assert(interp); \
-                                assert(list);
-#define ASSERT_ARGS_list_unshift assert(interp); \
-                                 assert(list); \
-                                 assert(item);
-#define ASSERT_ARGS_list_visit assert(interp); \
-                               assert(list); \
-                               assert(pinfo);
-#define ASSERT_ARGS_list_length assert(list);
+#define ASSERT_ARGS_ld __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_list_assign __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_list_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(other)
+#define ASSERT_ARGS_list_delete __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_list_get __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_list_insert __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_list_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_list_new __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_list_new_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(init)
+#define ASSERT_ARGS_list_pmc_new __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(container)
+#define ASSERT_ARGS_list_pmc_new_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(container) \
+    || PARROT_ASSERT_ARG(init)
+#define ASSERT_ARGS_list_pop __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_list_push __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_list_set_length __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_list_shift __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_list_splice __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_list_unshift __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list) \
+    || PARROT_ASSERT_ARG(item)
+#define ASSERT_ARGS_list_visit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list) \
+    || PARROT_ASSERT_ARG(pinfo)
+#define ASSERT_ARGS_list_length __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(list)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/list.c */
 

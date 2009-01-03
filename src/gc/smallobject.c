@@ -72,19 +72,26 @@ static void more_traceable_objects(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
-#define ASSERT_ARGS_gc_ms_add_free_object assert(pool); \
-                                          assert(to_add);
-#define ASSERT_ARGS_gc_ms_add_free_pmc_ext assert(pool); \
-                                           assert(to_add);
-#define ASSERT_ARGS_gc_ms_alloc_objects assert(interp); \
-                                        assert(pool);
-#define ASSERT_ARGS_gc_ms_get_free_object assert(interp); \
-                                          assert(pool);
-#define ASSERT_ARGS_gc_ms_get_free_pmc_ext assert(interp); \
-                                           assert(pool);
-#define ASSERT_ARGS_gc_ms_pool_init assert(pool);
-#define ASSERT_ARGS_more_traceable_objects assert(interp); \
-                                           assert(pool);
+#define ASSERT_ARGS_gc_ms_add_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(to_add)
+#define ASSERT_ARGS_gc_ms_add_free_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(to_add)
+#define ASSERT_ARGS_gc_ms_alloc_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_ms_get_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_ms_get_free_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_ms_pool_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_more_traceable_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

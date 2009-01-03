@@ -46,11 +46,13 @@ static void verify_CD(ARGIN(char *external_data), ARGMOD(PMC *user_data))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*user_data);
 
-#define ASSERT_ARGS_callback_CD assert(interp); \
-                                assert(external_data); \
-                                assert(user_data);
-#define ASSERT_ARGS_verify_CD assert(external_data); \
-                              assert(user_data);
+#define ASSERT_ARGS_callback_CD __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(external_data) \
+    || PARROT_ASSERT_ARG(user_data)
+#define ASSERT_ARGS_verify_CD __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(external_data) \
+    || PARROT_ASSERT_ARG(user_data)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 

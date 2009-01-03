@@ -289,31 +289,44 @@ static void split_chunk(PARROT_INTERP,
         FUNC_MODIFIES(*list)
         FUNC_MODIFIES(*chunk);
 
-#define ASSERT_ARGS_add_chunk assert(interp); \
-                              assert(list);
-#define ASSERT_ARGS_alloc_next_size assert(interp); \
-                                    assert(list);
-#define ASSERT_ARGS_allocate_chunk assert(interp); \
-                                   assert(list);
-#define ASSERT_ARGS_get_chunk assert(interp); \
-                              assert(list); \
-                              assert(idx);
-#define ASSERT_ARGS_list_append assert(interp); \
-                                assert(list);
-#define ASSERT_ARGS_list_item assert(interp); \
-                              assert(list);
-#define ASSERT_ARGS_list_set assert(interp); \
-                             assert(list);
-#define ASSERT_ARGS_rebuild_chunk_list assert(interp); \
-                                       assert(list);
-#define ASSERT_ARGS_rebuild_chunk_ptrs assert(list);
-#define ASSERT_ARGS_rebuild_fix_ends assert(list);
-#define ASSERT_ARGS_rebuild_other assert(interp); \
-                                  assert(list);
-#define ASSERT_ARGS_rebuild_sparse assert(list);
-#define ASSERT_ARGS_split_chunk assert(interp); \
-                                assert(list); \
-                                assert(chunk);
+#define ASSERT_ARGS_add_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_alloc_next_size __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_allocate_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_get_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list) \
+    || PARROT_ASSERT_ARG(idx)
+#define ASSERT_ARGS_list_append __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_list_item __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_list_set __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_rebuild_chunk_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_rebuild_chunk_ptrs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_rebuild_fix_ends __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_rebuild_other __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_rebuild_sparse __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_split_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list) \
+    || PARROT_ASSERT_ARG(chunk)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
