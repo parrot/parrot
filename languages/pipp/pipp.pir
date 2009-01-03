@@ -303,15 +303,19 @@ NO_REST:
 .sub set_superglobals
 
     # the superglobals _GET and _POST need to be set up
-    .local pmc parse_get_sub
-    parse_get_sub       = get_root_global ['parrot';'CGI'; 'QueryHash'], 'parse_get'
-    ( $P0 ) = parse_get_sub()
-    set_root_global ['pipp'], '$_GET', $P0
+    .local pmc parse_get
+    parse_get   = get_root_global ['parrot';'CGI'; 'QueryHash'], 'parse_get'
+    $P0         = parse_get()
+    $P1         = new 'PhpArray'
+    assign $P1, $P0
+    set_root_global ['pipp'], '$_GET', $P1
 
-    .local pmc parse_post_sub
-    parse_post_sub       = get_root_global ['parrot';'CGI';'QueryHash'], 'parse_post'
-    ( $P0 ) = parse_post_sub()
-    set_root_global ['pipp'], '$_POST', $P0
+    .local pmc parse_post
+    parse_post = get_root_global ['parrot';'CGI';'QueryHash'], 'parse_post'
+    $P0        = parse_post()
+    $P1        = new 'PhpArray'
+    assign $P1, $P0
+    set_root_global ['pipp'], '$_POST', $P1
 
     $P0 = new 'PhpArray'
     set_root_global ['pipp'], '$_SERVER', $P0
