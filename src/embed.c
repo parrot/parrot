@@ -591,10 +591,10 @@ PARROT_CANNOT_RETURN_NULL
 static PMC*
 setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
 {
+    ASSERT_ARGS(setup_argv);
     INTVAL i;
     PMC   *userargv;
 
-    ASSERT_ARGS(setup_argv);
 
     if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
         Parrot_io_eprintf(interp,
@@ -841,13 +841,13 @@ PARROT_CANNOT_RETURN_NULL
 static PMC*
 set_current_sub(PARROT_INTERP)
 {
+    ASSERT_ARGS(set_current_sub);
     opcode_t i;
     PMC *sub_pmc;
 
     PackFile_ByteCode   * const cur_cs = interp->code;
     PackFile_FixupTable * const ft     = cur_cs->fixups;
     PackFile_ConstTable * const ct     = cur_cs->const_table;
-    ASSERT_ARGS(set_current_sub);
 
     /*
      * Walk the fixup table.  The first Sub-like entry should be our

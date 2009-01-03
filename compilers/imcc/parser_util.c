@@ -146,13 +146,13 @@ Instruction *
 iNEW(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg *r0),
         ARGMOD(char *type), ARGIN_NULLOK(SymReg *init), int emit)
 {
+    ASSERT_ARGS(iNEW);
     char fmt[256];
     SymReg *regs[3];
     SymReg *pmc;
     int nargs;
     const int pmc_num = pmc_type(interp,
             string_from_cstring(interp, *type == '.' ? type + 1 : type, 0));
-    ASSERT_ARGS(iNEW);
 
     snprintf(fmt, sizeof (fmt), "%d", pmc_num);
     pmc = mk_const(interp, fmt, 'I');
@@ -202,6 +202,7 @@ void
 op_fullname(ARGOUT(char *dest), ARGIN(const char *name),
     ARGIN(SymReg * const *args), int narg, int keyvec)
 {
+    ASSERT_ARGS(op_fullname);
     int i;
     const size_t namelen = strlen(name);
 
@@ -209,7 +210,6 @@ op_fullname(ARGOUT(char *dest), ARGIN(const char *name),
     const char * const full = dest;
     Parrot_io_eprintf(NULL, "op %s", name);
 #endif
-    ASSERT_ARGS(op_fullname);
 
     memcpy(dest, name, namelen+1);
     dest += namelen;
@@ -319,13 +319,13 @@ static Instruction *
 var_arg_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         ARGMOD(SymReg **r), int n, int emit)
 {
+    ASSERT_ARGS(var_arg_ins);
     int op;
     Instruction *ins;
     char fullname[64];
 
     /* in constant */
     int dirs       = 1;
-    ASSERT_ARGS(var_arg_ins);
 
     r[0]           = mk_const(interp, r[0]->name, 'P');
     r[0]->pmc_type = enum_class_FixedIntegerArray;
@@ -371,12 +371,12 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     ARGIN_NULLOK(const char *fmt), ARGIN(SymReg **r), int n, int keyvec,
     int emit)
 {
+    ASSERT_ARGS(INS);
     int i, op, len;
     int dirs = 0;
     Instruction *ins;
     op_info_t   *op_info;
     char fullname[64], format[128];
-    ASSERT_ARGS(INS);
 
     if ((STREQ(name, "set_args"))
     ||  (STREQ(name, "get_results"))
@@ -573,8 +573,8 @@ PARROT_EXPORT
 int
 do_yylex_init(PARROT_INTERP, ARGOUT(yyscan_t* yyscanner))
 {
-    const int retval = yylex_init(yyscanner);
     ASSERT_ARGS(do_yylex_init);
+    const int retval = yylex_init(yyscanner);
 
     /* This way we can get the interpreter via yyscanner */
     if (!retval)
@@ -745,8 +745,8 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 imcc_compile_pasm(PARROT_INTERP, ARGIN(const char *s))
 {
-    STRING *error_message;
     ASSERT_ARGS(imcc_compile_pasm);
+    STRING *error_message;
     return imcc_compile(interp, s, 1, &error_message);
 }
 
@@ -768,8 +768,8 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 imcc_compile_pir(PARROT_INTERP, ARGIN(const char *s))
 {
-    STRING *error_message;
     ASSERT_ARGS(imcc_compile_pir);
+    STRING *error_message;
     return imcc_compile(interp, s, 0, &error_message);
 }
 
@@ -828,10 +828,10 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 imcc_compile_pasm_ex(PARROT_INTERP, ARGIN(const char *s))
 {
+    ASSERT_ARGS(imcc_compile_pasm_ex);
     STRING *error_message;
 
     PMC * const sub = imcc_compile(interp, s, 1, &error_message);
-    ASSERT_ARGS(imcc_compile_pasm_ex);
 
     if (sub)
         return sub;
@@ -855,10 +855,10 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 imcc_compile_pir_ex(PARROT_INTERP, ARGIN(const char *s))
 {
+    ASSERT_ARGS(imcc_compile_pir_ex);
     STRING *error_message;
 
     PMC * const sub = imcc_compile(interp, s, 0, &error_message);
-    ASSERT_ARGS(imcc_compile_pir_ex);
     if (sub)
         return sub;
 
@@ -995,8 +995,8 @@ PARROT_CANNOT_RETURN_NULL
 void *
 IMCC_compile_file(PARROT_INTERP, ARGIN(const char *s))
 {
-    STRING *error_message;
     ASSERT_ARGS(IMCC_compile_file);
+    STRING *error_message;
     return imcc_compile_file(interp, s, &error_message);
 }
 
@@ -1057,8 +1057,8 @@ PARROT_WARN_UNUSED_RESULT
 static int
 change_op(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg **r), int num, int emit)
 {
-    int changed = 0;
     ASSERT_ARGS(change_op);
+    int changed = 0;
 
     if (r[num]->type & (VTCONST|VT_CONSTP)) {
         /* make a number const */
@@ -1115,9 +1115,9 @@ int
 try_find_op(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         ARGMOD(SymReg **r), int n, int keyvec, int emit)
 {
+    ASSERT_ARGS(try_find_op);
     char fullname[64];
     int changed = 0;
-    ASSERT_ARGS(try_find_op);
     /*
      * eq_str, eq_num => eq
      * ...
@@ -1290,11 +1290,11 @@ A callback for parrot_chash_destroy_values() to free all macro-allocated memory.
 static void
 imcc_destroy_macro_values(ARGMOD(void *value))
 {
+    ASSERT_ARGS(imcc_destroy_macro_values);
     macro_t *  const m      = (macro_t *)value;
     params_t * const params = &m->params;
 
     int i;
-    ASSERT_ARGS(imcc_destroy_macro_values);
 
     for (i = 0; i < params->num_param; ++i) {
         char * const name = params->name[i];
@@ -1321,8 +1321,8 @@ PARROT_EXPORT
 void
 imcc_destroy(PARROT_INTERP)
 {
-    Hash * const macros = IMCC_INFO(interp)->macros;
     ASSERT_ARGS(imcc_destroy);
+    Hash * const macros = IMCC_INFO(interp)->macros;
 
     if (macros)
         parrot_chash_destroy_values(interp, macros, imcc_destroy_macro_values);

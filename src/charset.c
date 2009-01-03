@@ -117,9 +117,9 @@ PARROT_EXPORT
 void
 Parrot_charsets_encodings_deinit(SHIM_INTERP)
 {
+    ASSERT_ARGS(Parrot_charsets_encodings_deinit);
     int i;
     const int n = all_charsets->n_charsets;
-    ASSERT_ARGS(Parrot_charsets_encodings_deinit);
 
     for (i = 0; i < n; ++i) {
         if (all_charsets->set[i].n_converters)
@@ -149,9 +149,9 @@ PARROT_WARN_UNUSED_RESULT
 const CHARSET *
 Parrot_find_charset(SHIM_INTERP, ARGIN(const char *charsetname))
 {
+    ASSERT_ARGS(Parrot_find_charset);
     int i;
     const int n = all_charsets->n_charsets;
-    ASSERT_ARGS(Parrot_find_charset);
 
     for (i = 0; i < n; ++i) {
         if (STREQ(all_charsets->set[i].charset->name, charsetname)) {
@@ -199,9 +199,9 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_charset_number(PARROT_INTERP, ARGIN(const STRING *charsetname))
 {
+    ASSERT_ARGS(Parrot_charset_number);
     int i;
     const int n = all_charsets->n_charsets;
-    ASSERT_ARGS(Parrot_charset_number);
 
     for (i = 0; i < n; ++i) {
         if (!string_equal(interp, all_charsets->set[i].name, charsetname))
@@ -225,9 +225,9 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_charset_number_of_str(SHIM_INTERP, ARGIN(const STRING *src))
 {
+    ASSERT_ARGS(Parrot_charset_number_of_str);
     int i;
     const int n = all_charsets->n_charsets;
-    ASSERT_ARGS(Parrot_charset_number_of_str);
 
     for (i = 0; i < n; ++i) {
         if (src->charset == all_charsets->set[i].charset)
@@ -320,9 +320,9 @@ static INTVAL
 register_charset(PARROT_INTERP, ARGIN(const char *charsetname),
         ARGIN(CHARSET *charset))
 {
+    ASSERT_ARGS(register_charset);
     int i;
     const int n = all_charsets->n_charsets;
-    ASSERT_ARGS(register_charset);
 
     for (i = 0; i < n; ++i) {
         if (STREQ(all_charsets->set[i].charset->name, charsetname))
@@ -529,9 +529,9 @@ charset_converter_t
 Parrot_find_charset_converter(SHIM_INTERP,
         ARGIN(const CHARSET *lhs), ARGIN(const CHARSET *rhs))
 {
+    ASSERT_ARGS(Parrot_find_charset_converter);
     int i;
     const int n = all_charsets->n_charsets;
-    ASSERT_ARGS(Parrot_find_charset_converter);
 
     for (i = 0; i < n; ++i) {
         if (lhs == all_charsets->set[i].charset) {
@@ -564,9 +564,9 @@ Parrot_register_charset_converter(SHIM_INTERP,
         ARGIN(const CHARSET *lhs), ARGIN(CHARSET *rhs),
         ARGIN(charset_converter_t func))
 {
+    ASSERT_ARGS(Parrot_register_charset_converter);
     int i;
     const int n = all_charsets->n_charsets;
-    ASSERT_ARGS(Parrot_register_charset_converter);
 
     for (i = 0; i < n; ++i) {
         if (lhs == all_charsets->set[i].charset) {

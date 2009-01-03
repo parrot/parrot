@@ -97,11 +97,11 @@ Instruction *
 _mk_instruction(ARGIN(const char *op), ARGIN(const char *fmt), int n,
         ARGIN(SymReg * const *r), int flags)
 {
+    ASSERT_ARGS(_mk_instruction);
     const size_t reg_space  = (n > 1) ? (sizeof (SymReg *) * (n - 1)) : 0;
     Instruction * const ins =
         (Instruction*)mem_sys_allocate_zeroed(sizeof (Instruction) + reg_space);
     int i;
-    ASSERT_ARGS(_mk_instruction);
 
     ins->opname       = str_dup(op);
     ins->format       = str_dup(fmt);
@@ -168,8 +168,8 @@ Returns TRUE if instruction ins writes to a register of type t
 int
 ins_writes2(ARGIN(const Instruction *ins), int t)
 {
-    const char *p;
     ASSERT_ARGS(ins_writes2);
+    const char *p;
 
     if (ins->opnum == w_special[0])
         return 1;
@@ -202,8 +202,8 @@ they should be fast
 int
 instruction_reads(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
 {
-    int f, i;
     ASSERT_ARGS(instruction_reads);
+    int f, i;
 
     if (ins->opnum == PARROT_OP_set_args_pc
     ||  ins->opnum == PARROT_OP_set_returns_pc) {
@@ -272,9 +272,9 @@ Returns 1 if it does, 0 if not.
 int
 instruction_writes(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
 {
+    ASSERT_ARGS(instruction_writes);
     const int f = ins->flags;
     int i;
-    ASSERT_ARGS(instruction_writes);
 
     /*
      * a get_results opcode is before the actual sub call
@@ -356,8 +356,8 @@ Get the register number of an address which is a branch target
 int
 get_branch_regno(ARGIN(const Instruction *ins))
 {
-    int j;
     ASSERT_ARGS(get_branch_regno);
+    int j;
 
     for (j = ins->opsize - 2; j >= 0 && ins->symregs[j] ; --j)
         if (ins->type & (1 << j))
@@ -381,8 +381,8 @@ PARROT_CAN_RETURN_NULL
 SymReg *
 get_branch_reg(ARGIN(const Instruction *ins))
 {
-    const int r = get_branch_regno(ins);
     ASSERT_ARGS(get_branch_reg);
+    const int r = get_branch_regno(ins);
 
     if (r >= 0)
         return ins->symregs[r];
@@ -410,9 +410,9 @@ PARROT_CAN_RETURN_NULL
 Instruction *
 _delete_ins(ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
 {
+    ASSERT_ARGS(delete_ins);
     Instruction * const next = ins->next;
     Instruction * const prev = ins->prev;
-    ASSERT_ARGS(delete_ins);
 
     if (prev)
         prev->next = next;
@@ -444,8 +444,8 @@ PARROT_CAN_RETURN_NULL
 Instruction *
 delete_ins(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins))
 {
-    Instruction * next = _delete_ins(unit, ins);
     ASSERT_ARGS(delete_ins);
+    Instruction * next = _delete_ins(unit, ins);
 
 
     free_ins(ins);
@@ -554,8 +554,8 @@ void
 subst_ins(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins),
           ARGMOD(Instruction *tmp), int needs_freeing)
 {
-    Instruction * const prev = ins->prev;
     ASSERT_ARGS(subst_ins);
+    Instruction * const prev = ins->prev;
 
 
     if (prev)
@@ -594,8 +594,8 @@ PARROT_CAN_RETURN_NULL
 Instruction *
 move_ins(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins), ARGMOD(Instruction *to))
 {
-    Instruction * const next = _delete_ins(unit, ins);
     ASSERT_ARGS(move_ins);
+    Instruction * const next = _delete_ins(unit, ins);
     insert_ins(unit, to, ins);
     return next;
 }
@@ -666,12 +666,12 @@ Print details of instruction ins in file fd.
 int
 ins_print(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const Instruction *ins))
 {
+    ASSERT_ARGS(ins_print);
     char regb[IMCC_MAX_FIX_REGS][REGB_SIZE];
     /* only long key constants can overflow */
     char *regstr[IMCC_MAX_FIX_REGS];
     int i;
     int len;
-    ASSERT_ARGS(ins_print);
 
 #if IMC_TRACE
     Parrot_io_eprintf(NULL, "ins_print\n");
@@ -792,8 +792,8 @@ Prints a message to STDOUT.
 static int
 e_file_open(PARROT_INTERP, ARGIN(void *param))
 {
-    char * const file = (char *) param;
     ASSERT_ARGS(e_file_open);
+    char * const file = (char *) param;
 
     if (!STREQ(file, "-")) {
         FILE *newfile = freopen(file, "w", stdout);
@@ -897,9 +897,9 @@ PARROT_EXPORT
 int
 emit_flush(PARROT_INTERP, ARGIN_NULLOK(void *param), ARGIN(IMC_Unit *unit))
 {
+    ASSERT_ARGS(emit_flush);
     Instruction *ins;
     int          emitter = IMCC_INFO(interp)->emitter;
-    ASSERT_ARGS(emit_flush);
 
     if (emitters[emitter].new_sub)
         (emitters[emitter]).new_sub(interp, param, unit);

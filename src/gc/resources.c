@@ -143,11 +143,11 @@ static void
 alloc_new_block(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool),
         ARGIN(const char *why))
 {
+    ASSERT_ARGS(alloc_new_block);
     Memory_Block *new_block;
 
     const size_t alloc_size = (size > pool->minimum_block_size)
             ? size : pool->minimum_block_size;
-    ASSERT_ARGS(alloc_new_block);
 
 #if RESOURCE_DEBUG
     fprintf(stderr, "new_block (%s) size %u -> %u\n",
@@ -228,8 +228,8 @@ PARROT_CANNOT_RETURN_NULL
 static void *
 mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool))
 {
-    void *return_val;
     ASSERT_ARGS(mem_allocate);
+    void *return_val;
 
     /* we always should have one block at least */
     PARROT_ASSERT(pool->top_block);
@@ -305,11 +305,11 @@ PARROT_WARN_UNUSED_RESULT
 static const char*
 buffer_location(PARROT_INTERP, ARGIN(const PObj *b))
 {
+    ASSERT_ARGS(buffer_location);
     int i;
     static char reg[10];
 
     Parrot_Context* const ctx = CONTEXT(interp);
-    ASSERT_ARGS(buffer_location);
 
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
         PObj * const obj = (PObj *) CTX_REG_STR(interp, ctx, i);
@@ -361,6 +361,7 @@ as being alive in any way.
 static void
 compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
 {
+    ASSERT_ARGS(compact_pool);
     INTVAL        j;
     UINTVAL       total_size;
 
@@ -369,7 +370,6 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
 
     Small_Object_Arena *cur_buffer_arena;
     Arenas * const      arena_base = interp->arena_base;
-    ASSERT_ARGS(compact_pool);
 
     /* Bail if we're blocked */
     if (arena_base->GC_block_level)
@@ -697,9 +697,9 @@ PARROT_WARN_UNUSED_RESULT
 int
 Parrot_in_memory_pool(PARROT_INTERP, ARGIN(void *bufstart))
 {
+    ASSERT_ARGS(Parrot_in_memory_pool);
     Memory_Pool * const pool = interp->arena_base->memory_pool;
     Memory_Block * cur_block = pool->top_block;
-    ASSERT_ARGS(Parrot_in_memory_pool);
 
     while (cur_block) {
         if ((char *)bufstart >= cur_block->start &&
@@ -735,11 +735,11 @@ memory is not cleared.
 void
 Parrot_reallocate(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t newsize)
 {
+    ASSERT_ARGS(Parrot_reallocate);
     size_t copysize;
     char  *mem;
     Memory_Pool * const pool = interp->arena_base->memory_pool;
     size_t new_size, needed, old_size;
-    ASSERT_ARGS(Parrot_reallocate);
 
     /*
      * we don't shrink buffers
@@ -805,6 +805,7 @@ new buffer location, C<str-E<gt>bufused> is B<not> changed.
 void
 Parrot_reallocate_string(PARROT_INTERP, ARGMOD(STRING *str), size_t newsize)
 {
+    ASSERT_ARGS(Parrot_reallocate_string);
     size_t copysize;
     char *mem, *oldmem;
     size_t new_size, needed, old_size;
@@ -813,7 +814,6 @@ Parrot_reallocate_string(PARROT_INTERP, ARGMOD(STRING *str), size_t newsize)
         PObj_constant_TEST(str)
             ? interp->arena_base->constant_string_pool
             : interp->arena_base->memory_pool;
-    ASSERT_ARGS(Parrot_reallocate_string);
 
     /* if the requested size is smaller then buflen, we are done */
     if (newsize <= PObj_buflen(str))
@@ -901,9 +901,9 @@ malloc(3) suitable to hold e.g. a C<FLOATVAL> array.
 void
 Parrot_allocate_aligned(PARROT_INTERP, ARGOUT(Buffer *buffer), size_t size)
 {
+    ASSERT_ARGS(Parrot_allocate_aligned);
     size_t new_size;
     char *mem;
-    ASSERT_ARGS(Parrot_allocate_aligned);
 
     PObj_buflen(buffer) = 0;
     PObj_bufstart(buffer) = NULL;
@@ -933,10 +933,10 @@ is B<not> changed.
 void
 Parrot_allocate_string(PARROT_INTERP, ARGOUT(STRING *str), size_t size)
 {
+    ASSERT_ARGS(Parrot_allocate_string);
     size_t       new_size;
     Memory_Pool *pool;
     char        *mem;
-    ASSERT_ARGS(Parrot_allocate_string);
 
     PObj_buflen(str)   = 0;
     PObj_bufstart(str) = NULL;
@@ -976,8 +976,8 @@ PARROT_CANNOT_RETURN_NULL
 static Memory_Pool *
 new_memory_pool(size_t min_block, NULLOK(compact_f compact))
 {
-    Memory_Pool * const pool = mem_internal_allocate_typed(Memory_Pool);
     ASSERT_ARGS(new_memory_pool);
+    Memory_Pool * const pool = mem_internal_allocate_typed(Memory_Pool);
 
     pool->top_block              = NULL;
     pool->compact                = compact;
@@ -1006,8 +1006,8 @@ for both.
 void
 Parrot_initialize_memory_pools(PARROT_INTERP)
 {
-    Arenas * const arena_base = interp->arena_base;
     ASSERT_ARGS(Parrot_initialize_memory_pools);
+    Arenas * const arena_base = interp->arena_base;
 
     arena_base->memory_pool   = new_memory_pool(POOL_SIZE, &compact_pool);
     alloc_new_block(interp, POOL_SIZE, arena_base->memory_pool, "init");
@@ -1033,8 +1033,8 @@ blocks are freed, free the pools themselves.
 void
 Parrot_destroy_memory_pools(PARROT_INTERP)
 {
-    int i;
     ASSERT_ARGS(Parrot_destroy_memory_pools);
+    int i;
 
     for (i = 0; i < 2; i++) {
         Memory_Pool * const pool = i ?
@@ -1069,8 +1069,8 @@ is emptied, but is not destroyed here.
 static void
 merge_pools(ARGMOD(Memory_Pool *dest), ARGMOD(Memory_Pool *source))
 {
-    Memory_Block *cur_block;
     ASSERT_ARGS(merge_pools);
+    Memory_Block *cur_block;
 
     cur_block = source->top_block;
 

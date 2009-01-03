@@ -67,9 +67,9 @@ PARROT_WARN_UNUSED_RESULT
 static int
 is_env_var_set(ARGIN(const char* var))
 {
+    ASSERT_ARGS(is_env_var_set);
     int free_it, retval;
     char* const value = Parrot_getenv(var, &free_it);
-    ASSERT_ARGS(is_env_var_set);
     if (value == NULL)
         retval = 0;
     else if (*value == '\0')
@@ -94,8 +94,8 @@ Setup default compiler for PASM.
 static void
 setup_default_compreg(PARROT_INTERP)
 {
-    STRING * const pasm1 = CONST_STRING(interp, "PASM1");
     ASSERT_ARGS(setup_default_compreg);
+    STRING * const pasm1 = CONST_STRING(interp, "PASM1");
 
     /* register the nci compiler object */
     Parrot_compreg(interp, pasm1, (Parrot_compiler_func_t)PDB_compile);
@@ -116,8 +116,8 @@ PARROT_CANNOT_RETURN_NULL
 Parrot_Interp
 make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 {
-    Interp *interp;
     ASSERT_ARGS(make_interpreter);
+    Interp *interp;
 
     /* Get an empty interpreter from system memory */
 #if EXEC_CAPABLE

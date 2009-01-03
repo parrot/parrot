@@ -237,9 +237,9 @@ static unsigned int*
 ig_get_word(int i, int j, int N, ARGIN(unsigned int *graph),
             ARGMOD(int *bit_ofs))
 {
+    ASSERT_ARGS(ig_get_word);
     unsigned int bit = i * N + j;
     *bit_ofs        = bit % sizeof (*graph);
-    ASSERT_ARGS(ig_get_word);
 
     return &graph[bit / sizeof (*graph)];
 }
@@ -257,9 +257,9 @@ RT #48260: Not yet documented!!!
 static void
 ig_set(int i, int j, int N, ARGIN(unsigned int *graph))
 {
+    ASSERT_ARGS(ig_set);
     int bit_ofs;
     unsigned int *word = ig_get_word(i, j, N, graph, &bit_ofs);
-    ASSERT_ARGS(ig_set);
     *word |= (1 << bit_ofs);
 }
 
@@ -276,9 +276,9 @@ RT #48260: Not yet documented!!!
 unsigned int
 ig_test(int i, int j, int N, ARGIN(unsigned int *graph))
 {
+    ASSERT_ARGS(ig_test);
     int bit_ofs;
     unsigned int* word = ig_get_word(i, j, N, graph, &bit_ofs);
-    ASSERT_ARGS(ig_test);
     return *word & (1 << bit_ofs);
 }
 
@@ -296,12 +296,12 @@ PARROT_CANNOT_RETURN_NULL
 static unsigned int*
 ig_allocate(int N)
 {
+    ASSERT_ARGS(ig_allocate);
     /* size is N*N bits, but we want don't want to allocate a partial
      * word, so round up to the nearest multiple of sizeof (int).
      */
     const int need_bits = N * N;
     const int num_words = (need_bits + sizeof (int) - 1) / sizeof (int);
-    ASSERT_ARGS(ig_allocate);
     return (unsigned int *)mem_sys_allocate_zeroed(num_words * sizeof (int));
 }
 
@@ -319,8 +319,8 @@ on a single compilation unit at a time.
 void
 imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
 {
-    const char *function;
     ASSERT_ARGS(imc_reg_alloc);
+    const char *function;
 
     if (!unit)
         return;
@@ -480,10 +480,10 @@ printed with --verbose --verbose
 static void
 make_stat(ARGMOD(IMC_Unit *unit), ARGMOD_NULLOK(int *sets), ARGMOD_NULLOK(int *cols))
 {
+    ASSERT_ARGS(make_stat);
     /* register usage summary */
     SymHash * const hsh = &unit->hash;
     unsigned int    i;
-    ASSERT_ARGS(make_stat);
 
     for (i = 0; i < hsh->size; i++) {
         SymReg *r;
@@ -534,8 +534,8 @@ registes usage of .pir
 static void
 imc_stat_init(ARGMOD(IMC_Unit *unit))
 {
-    int j;
     ASSERT_ARGS(imc_stat_init);
+    int j;
 
     make_stat(unit, unit->n_vars_used, NULL);
 
@@ -608,9 +608,9 @@ sort list by line  nr
 static int
 reg_sort_f(ARGIN(const void *a), ARGIN(const void *b))
 {
+    ASSERT_ARGS(reg_sort_f);
     const SymReg * const ra = *(SymReg**)a;
     const SymReg * const rb = *(SymReg**)b;
-    ASSERT_ARGS(reg_sort_f);
 
     if (ra->first_ins->index < rb->first_ins->index)
         return -1;
@@ -660,9 +660,9 @@ Run through them and allocate all that don't overlap in one bunch.
 static void
 build_reglist(NULLOK_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(build_reglist);
     SymHash  const *hsh = &unit->hash;
     unsigned int    i, count, unused, n_symbols;
-    ASSERT_ARGS(build_reglist);
 
     IMCC_info(interp, 2, "build_reglist\n");
 
@@ -723,9 +723,9 @@ significantly
 static void
 rebuild_reglist(ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(rebuild_reglist);
     unsigned int i, count, unused;
     static const char types[] = "INSP";
-    ASSERT_ARGS(rebuild_reglist);
 
     for (i = count = unused = 0; i < unit->n_symbols; i++) {
         SymReg * const r = unit->reglist[i];
@@ -775,11 +775,11 @@ Two variables interfere when they are alive at the same time.
 static void
 build_interference_graph(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(build_interference_graph);
     int x;
     unsigned int *interference_graph;
 
     const int n_symbols = unit->n_symbols;
-    ASSERT_ARGS(build_interference_graph);
 
     if (!n_symbols)
         return;
@@ -824,10 +824,10 @@ Compute a DU-chain for each symbolic in a compilation unit
 static void
 compute_du_chain(ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(compute_du_chain);
     Instruction *ins        = unit->instructions;
     Instruction *lastbranch = NULL;
     unsigned int i;
-    ASSERT_ARGS(compute_du_chain);
 
     /* Compute last branch in this procedure, update instruction index */
     for (i = 0; ins; ins = ins->next) {
@@ -863,8 +863,8 @@ RT #48260: Not yet documented!!!
 static void
 compute_one_du_chain(ARGMOD(SymReg *r), ARGIN(IMC_Unit *unit))
 {
-    Instruction * ins;
     ASSERT_ARGS(compute_one_du_chain);
+    Instruction * ins;
 
     /* We cannot rely on computing the value of r->first when parsing,
      * since the situation can be changed at any time by the register
@@ -915,8 +915,8 @@ static int
 interferes(PARROT_INTERP, ARGIN(const IMC_Unit *unit),
         ARGIN(const SymReg *r0), ARGIN(const SymReg *r1))
 {
-    unsigned int i;
     ASSERT_ARGS(interferes);
+    unsigned int i;
 
     /* Registers don't interfere with themselves */
     if (r0 == r1)
@@ -1004,8 +1004,8 @@ find available color for register #x in available colors
 static int
 ig_find_color(ARGIN(const IMC_Unit *unit), ARGIN(const char *avail))
 {
-    unsigned int c;
     ASSERT_ARGS(ig_find_color);
+    unsigned int c;
 
     for (c = 0; c < unit->n_symbols; c++)
         if (avail[c])
@@ -1032,6 +1032,7 @@ If we run out of colors, then we need to spill the top node.
 static int
 try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 {
+    ASSERT_ARGS(try_allocate);
     unsigned int    i;
     char           *avail;
     unsigned int   *graph   = unit->interference_graph;
@@ -1039,7 +1040,6 @@ try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 
     /* unit->n_symbols should be an upper limit of needed colors */
     unsigned int n = unit->n_symbols;
-    ASSERT_ARGS(try_allocate);
 
     if (unit->max_color >= (int)n)
         n = unit->max_color + 1;
@@ -1104,9 +1104,9 @@ static void
 map_colors(ARGIN(const IMC_Unit* unit), int x, ARGIN(unsigned int *graph),
         ARGMOD(char *avail), int typ, int already_allocated)
 {
+    ASSERT_ARGS(map_colors);
     const int n_symbols = unit->n_symbols;
     int       y;
-    ASSERT_ARGS(map_colors);
 
     for (y = 0; y < n_symbols; y++) {
         if (ig_test(x, y, n_symbols, graph)) {
@@ -1134,6 +1134,7 @@ find first available register of the given reg_set
 static int
 first_avail(ARGIN(const IMC_Unit *unit), int reg_set, ARGOUT_NULLOK(Set **avail))
 {
+    ASSERT_ARGS(first_avail);
     int n                     = (int)unit->n_symbols > unit->max_color
                               ? (int)unit->n_symbols
                               : unit->max_color;
@@ -1142,7 +1143,6 @@ first_avail(ARGIN(const IMC_Unit *unit), int reg_set, ARGOUT_NULLOK(Set **avail)
     const SymHash * const hsh = &unit->hash;
 
     unsigned int i, first;
-    ASSERT_ARGS(first_avail);
 
     /* find allocated registers */
     for (i = 0; i < hsh->size; i++) {
@@ -1242,13 +1242,13 @@ RT #48260: Not yet documented!!!
 static void
 vanilla_reg_alloc(SHIM_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(vanilla_reg_alloc);
     char         type[] = "INSP";
     SymHash     *hsh    = &unit->hash;
     Set         *avail;
     SymReg      *r;
     unsigned int i, j;
     int          reg_set, first_reg;
-    ASSERT_ARGS(vanilla_reg_alloc);
 
     /* Clear the pre-assigned colors. */
     for (i = 0; i < hsh->size; i++) {

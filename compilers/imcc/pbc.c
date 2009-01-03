@@ -311,8 +311,8 @@ Frees memory allocated for IMCC globals for one particular compilation unit.
 static void
 imcc_globals_destroy(PARROT_INTERP, SHIM(int ex), SHIM(void *param))
 {
-    code_segment_t *cs = IMCC_INFO(interp)->globals->cs;
     ASSERT_ARGS(imcc_globals_destroy);
+    code_segment_t *cs = IMCC_INFO(interp)->globals->cs;
 
     while (cs) {
         subs_t         *s       = cs->subs;
@@ -347,12 +347,12 @@ Adds an empty item to constant table, returning its position.
 static int
 add_const_table(PARROT_INTERP)
 {
+    ASSERT_ARGS(add_const_table);
     const size_t oldcount = interp->code->const_table->const_count;
     const size_t newcount = oldcount + 1;
 
     /* Allocate a new constant */
     PackFile_Constant *new_constant = PackFile_Constant_new(interp);
-    ASSERT_ARGS(add_const_table);
 
     /* Update the constant count and reallocate */
     if (interp->code->const_table->constants)
@@ -383,8 +383,8 @@ Adds a PMC to the const table, returning its position.
 static int
 add_const_table_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {
-    int newitem = add_const_table(interp);
     ASSERT_ARGS(add_const_table_pmc);
+    int newitem = add_const_table(interp);
 
     interp->code->const_table->constants[newitem]->type  = PFC_PMC;
     interp->code->const_table->constants[newitem]->u.key = pmc;
@@ -406,8 +406,8 @@ Adds a key to the const table, returning its position.
 static int
 add_const_table_key(PARROT_INTERP, ARGIN(PMC *key))
 {
-    int newitem = add_const_table(interp);
     ASSERT_ARGS(add_const_table_key);
+    int newitem = add_const_table(interp);
 
     interp->code->const_table->constants[newitem]->type  = PFC_KEY;
     interp->code->const_table->constants[newitem]->u.key = key;
@@ -429,8 +429,8 @@ Opens a compilation unit to emit PBC.
 int
 e_pbc_open(PARROT_INTERP, SHIM(void *param))
 {
-    code_segment_t *cs = mem_allocate_zeroed_typed(code_segment_t);
     ASSERT_ARGS(e_pbc_open);
+    code_segment_t *cs = mem_allocate_zeroed_typed(code_segment_t);
 
     if (!IMCC_INFO(interp)->globals)
         IMCC_INFO(interp)->globals = mem_allocate_zeroed_typed(imcc_globals);
@@ -496,9 +496,9 @@ PARROT_WARN_UNUSED_RESULT
 static int
 old_blocks(PARROT_INTERP)
 {
+    ASSERT_ARGS(old_blocks);
     const  subs_t *s;
     size_t         size = 0;
-    ASSERT_ARGS(old_blocks);
 
     for (s = IMCC_INFO(interp)->globals->cs->subs; s; s = s->prev) {
         size += s->n_basic_blocks;
@@ -523,9 +523,9 @@ PARROT_CANNOT_RETURN_NULL
 opcode_t *
 make_jit_info(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 {
+    ASSERT_ARGS(make_jit_info);
     const size_t old  = old_blocks(interp);
     const size_t size = unit->n_basic_blocks + old;
-    ASSERT_ARGS(make_jit_info);
 
     if (!IMCC_INFO(interp)->globals->cs->jit_info) {
         const size_t len  =
@@ -571,8 +571,8 @@ Allocates a new globals->cs->subs structure.
 static void
 make_new_sub(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 {
-    subs_t * const s = mem_allocate_zeroed_typed(subs_t);
     ASSERT_ARGS(make_new_sub);
+    subs_t * const s = mem_allocate_zeroed_typed(subs_t);
 
     s->prev          = IMCC_INFO(interp)->globals->cs->subs;
     s->unit          = unit;
@@ -604,8 +604,8 @@ PARROT_WARN_UNUSED_RESULT
 static int
 get_old_size(PARROT_INTERP, ARGOUT(int *ins_line))
 {
-    size_t size = 0;
     ASSERT_ARGS(get_old_size);
+    size_t size = 0;
 
     *ins_line   = 0;
 
@@ -653,9 +653,9 @@ Stores fixup information for the given register, program counter, and offset.
 static void
 store_fixup(PARROT_INTERP, ARGIN(const SymReg *r), int pc, int offset)
 {
+    ASSERT_ARGS(store_fixup);
     SymReg * const fixup = _mk_address(interp,
             &IMCC_INFO(interp)->globals->cs->subs->fixup, r->name, U_add_all);
-    ASSERT_ARGS(store_fixup);
 
     if (r->set == 'p')
         fixup->set = 'p';
@@ -685,9 +685,9 @@ Stores a constant key for the current compilation unit.
 static void
 store_key_const(PARROT_INTERP, ARGIN(const char *str), int idx)
 {
+    ASSERT_ARGS(store_key_const);
     SymReg * const c =
         _mk_const(&IMCC_INFO(interp)->globals->cs->key_consts, str, 0);
-    ASSERT_ARGS(store_key_const);
     c->color = idx;
 }
 
@@ -705,9 +705,9 @@ PARROT_WARN_UNUSED_RESULT
 static size_t
 get_codesize(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(size_t *src_lines))
 {
+    ASSERT_ARGS(get_codesize);
     Instruction *ins = unit->instructions;
     size_t       code_size;
-    ASSERT_ARGS(get_codesize);
 
     /* run through instructions:
      * - sanity check
@@ -767,8 +767,8 @@ static subs_t *
 find_global_label(PARROT_INTERP, ARGIN(const char *name),
     ARGIN(const subs_t *sym), ARGOUT(int *pc))
 {
-    subs_t *s;
     ASSERT_ARGS(find_global_label);
+    subs_t *s;
 
     *pc = 0;
 
@@ -793,8 +793,8 @@ static subs_t *
 find_sub_by_subid(PARROT_INTERP, ARGIN(const char *lookup),
     ARGIN(const subs_t *sym), ARGOUT(int *pc))
 {
-    subs_t *s;
     ASSERT_ARGS(find_sub_by_subid);
+    subs_t *s;
     UNUSED(sym);
 
     *pc = 0;
@@ -824,9 +824,9 @@ Fixes global information -- particularly locations of global symbols.
 static void
 fixup_globals(PARROT_INTERP)
 {
+    ASSERT_ARGS(fixup_globals);
     subs_t *s;
     int     jumppc = 0;
-    ASSERT_ARGS(fixup_globals);
 
     for (s = IMCC_INFO(interp)->globals->cs->first; s; s = s->next) {
         const SymHash * const hsh = &s->fixup;
@@ -935,8 +935,8 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 {
-    const char *buf = r->name;
     ASSERT_ARGS(IMCC_string_from_reg);
+    const char *buf = r->name;
 
     if (r->type & VT_ENCODED) {
         /*
@@ -978,8 +978,8 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 IMCC_string_from__STRINGC(PARROT_INTERP, ARGIN(const char *buf))
 {
-    const int ascii = (*buf == '\'' || *buf == '"');
     ASSERT_ARGS(IMCC_string_from__STRINGC);
+    const int ascii = (*buf == '\'' || *buf == '"');
     if (!ascii) {
         /*
          * the lexer parses:   foo:"string"
@@ -1029,9 +1029,9 @@ PARROT_WARN_UNUSED_RESULT
 static int
 add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))
 {
+    ASSERT_ARGS(add_const_str);
     const int      k = add_const_table(interp);
     STRING * const s = IMCC_string_from_reg(interp, r);
-    ASSERT_ARGS(add_const_str);
 
     interp->code->const_table->constants[k]->type     = PFC_STRING;
     interp->code->const_table->constants[k]->u.string = s;
@@ -1054,9 +1054,9 @@ PARROT_WARN_UNUSED_RESULT
 static int
 add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))
 {
+    ASSERT_ARGS(add_const_num);
     const int      k = add_const_table(interp);
     STRING * const s = string_from_cstring(interp, buf, 0);
-    ASSERT_ARGS(add_const_num);
 
     interp->code->const_table->constants[k]->type     = PFC_NUMBER;
     interp->code->const_table->constants[k]->u.number = string_to_num(interp, s);
@@ -1080,12 +1080,12 @@ PARROT_MALLOC
 static PMC*
 mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
 {
+    ASSERT_ARGS(mk_multi_sig);
     PackFile_ConstTable *ct;
     PMC                 *multi_sig;
     pcc_sub_t * const    pcc_sub = r->pcc_sub;
     const INTVAL         n       = pcc_sub->nmulti;
     INTVAL               i;
-    ASSERT_ARGS(mk_multi_sig);
 
     /* a :multi sub with no arguments */
     if (!pcc_sub->multi[0])
@@ -1145,13 +1145,13 @@ static PMC*
 create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub),
                int need_lex)
 {
+    ASSERT_ARGS(create_lexinfo);
     PMC                *lex_info    = NULL;
     SymHash            *hsh         = &unit->hash;
     PackFile_Constant **constants   = interp->code->const_table->constants;
     const INTVAL        lex_info_id = Parrot_get_ctx_HLL_type(interp,
                                         enum_class_LexInfo);
     unsigned int        i;
-    ASSERT_ARGS(create_lexinfo);
 
     for (i = 0; i < hsh->size; i++) {
         SymReg *r;
@@ -1215,11 +1215,11 @@ PARROT_CAN_RETURN_NULL
 static PMC*
 find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 {
+    ASSERT_ARGS(find_outer);
     subs_t *s;
     PMC    *current;
     STRING *cur_name;
     size_t  len;
-    ASSERT_ARGS(find_outer);
 
     if (!unit->outer)
         return NULL;
@@ -1279,6 +1279,7 @@ end positions.
 static int
 add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
 {
+    ASSERT_ARGS(add_const_pmc_sub);
     PMC                 *ns_pmc;
     PMC                 *sub_pmc;
     Parrot_sub          *sub;
@@ -1295,7 +1296,6 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
 
     int                  i;
     int                  ns_const = -1;
-    ASSERT_ARGS(add_const_pmc_sub);
 
     IMCC_INFO(interp)->globals->cs->subs->pmc_const = k;
 
@@ -1501,12 +1501,12 @@ Adds a constant key to constant_table.
 static int
 add_const_key(PARROT_INTERP, ARGIN(const opcode_t *key), int size, ARGIN(const char *s_key))
 {
+    ASSERT_ARGS(add_const_key);
     const SymReg * const r =
         _get_sym(&IMCC_INFO(interp)->globals->cs->key_consts, s_key);
     const opcode_t      *rc;
     PackFile_Constant   *pfc;
     int                  k;
-    ASSERT_ARGS(add_const_key);
 
     if (r)
         return r->color;
@@ -1590,6 +1590,7 @@ the key, which gets cached in the globals.keys.
 static opcode_t
 build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
 {
+    ASSERT_ARGS(build_key);
 #define KEYLEN 21
     SymReg   *reg;
 
@@ -1607,7 +1608,6 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
 
     *s           = 0;
     reg          = key_reg->set == 'K' ? key_reg->nextkey : key_reg;
-    ASSERT_ARGS(build_key);
 
     for (key_length = 0; reg ; reg = reg->nextkey, key_length++) {
         SymReg *r = reg;
@@ -1718,8 +1718,8 @@ Creates and returns an INTEGER given an integer-like SymReg.
 INTVAL
 IMCC_int_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 {
-    INTVAL i;
     ASSERT_ARGS(IMCC_int_from_reg);
+    INTVAL i;
 
     errno = 0;
 
@@ -1763,10 +1763,10 @@ Creates a constant PMC, given a SymReg.
 static void
 make_pmc_const(PARROT_INTERP, ARGMOD(SymReg *r))
 {
+    ASSERT_ARGS(make_pmc_const);
     PMC    *_class = interp->vtables[r->pmc_type]->pmc_class;
     STRING *s;
     PMC    *p;
-    ASSERT_ARGS(make_pmc_const);
 
     if (*r->name == '"')
         s = string_unescape_cstring(interp, r->name + 1, '"', NULL);
@@ -1854,9 +1854,9 @@ Stores a constant's idx for later reuse.
 static void
 constant_folding(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 {
+    ASSERT_ARGS(constant_folding);
     const SymHash *hsh = &IMCC_INFO(interp)->ghash;
     unsigned int   i;
-    ASSERT_ARGS(constant_folding);
 
     /* go through all consts of current sub */
     for (i = 0; i < hsh->size; i++) {
@@ -1936,9 +1936,9 @@ Finishes the PBC emitting of a given compilation unit.
 int
 e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
 {
+    ASSERT_ARGS(e_pbc_end_sub);
     Instruction *ins;
     int          pragma;
-    ASSERT_ARGS(e_pbc_end_sub);
 
     if (!unit->instructions)
         return 0;
@@ -1992,6 +1992,7 @@ argument types and constants, if missing.
 static void
 verify_signature(PARROT_INTERP, ARGIN(const Instruction *ins), ARGIN(opcode_t *pc))
 {
+    ASSERT_ARGS(verify_signature);
     PMC    *changed_sig    = NULL;
     PMC    * const sig_arr = interp->code->const_table->constants[pc[-1]]->u.key;
     int     needed         = 0;
@@ -1999,7 +2000,6 @@ verify_signature(PARROT_INTERP, ARGIN(const Instruction *ins), ARGIN(opcode_t *p
                            || ins->opnum == PARROT_OP_get_params_pc);
 
     INTVAL  i, n;
-    ASSERT_ARGS(verify_signature);
 
     PARROT_ASSERT(PObj_is_PMC_TEST(sig_arr));
     PARROT_ASSERT(sig_arr->vtable->base_type == enum_class_FixedIntegerArray);
@@ -2070,10 +2070,10 @@ int
 e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
         ARGIN(const Instruction *ins))
 {
+    ASSERT_ARGS(e_pbc_emit);
     op_info_t *op_info;
     int        ok = 0;
     int        op, i;
-    ASSERT_ARGS(e_pbc_emit);
 
 #if IMC_TRACE_HIGH
     Parrot_io_eprintf(NULL, "e_pbc_emit\n");

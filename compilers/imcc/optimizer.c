@@ -317,8 +317,8 @@ Handles optimizations occuring before the construction of the CFG.
 int
 pre_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    int changed = 0;
     ASSERT_ARGS(pre_optimize);
+    int changed = 0;
 
     if (IMCC_INFO(interp)->optimizer_level & OPT_PRE) {
         IMCC_info(interp, 2, "pre_optimize\n");
@@ -379,8 +379,8 @@ RT #48260: Not yet documented!!!
 int
 optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    int any = 0;
     ASSERT_ARGS(optimize);
+    int any = 0;
     if (IMCC_INFO(interp)->optimizer_level & OPT_CFG) {
         IMCC_info(interp, 2, "optimize\n");
         any = constant_propagation(interp, unit);
@@ -455,9 +455,9 @@ to the simpler negated form:
 static int
 if_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(if_branch);
     Instruction *ins, *last;
     int reg, changed = 0;
-    ASSERT_ARGS(if_branch);
 
     last = unit->instructions;
     if (!last->next)
@@ -520,11 +520,11 @@ guaranteed that one operand is non constant if opsize == 4
 static int
 strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(strength_reduce);
     Instruction *ins, *tmp;
     SymReg *r;
     int changes = 0;
     FLOATVAL f;
-    ASSERT_ARGS(strength_reduce);
 
     IMCC_info(interp, 2, "\tstrength_reduce\n");
     for (ins = unit->instructions; ins; ins = ins->next) {
@@ -765,10 +765,10 @@ even though sometimes it may be safe.
 static int
 constant_propagation(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(constant_propagation);
     Instruction *ins;
     SymReg *c, *o;
     int any = 0;
-    ASSERT_ARGS(constant_propagation);
 
     o = c = NULL; /* silence compiler uninit warning, but XXX better to handle flow well */
 
@@ -914,11 +914,11 @@ PARROT_WARN_UNUSED_RESULT
 static int
 eval_ins(PARROT_INTERP, ARGIN(const char *op), size_t ops, ARGIN(SymReg **r))
 {
+    ASSERT_ARGS(eval_ins);
     opcode_t eval[4], *pc;
     int opnum;
     int i;
     op_info_t *op_info;
-    ASSERT_ARGS(eval_ins);
 
     opnum = interp->op_lib->op_code(op, 1);
     if (opnum < 0)
@@ -1191,9 +1191,9 @@ FALSE.
 static int
 branch_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(branch_branch);
     Instruction *ins;
     int changed = 0;
-    ASSERT_ARGS(branch_branch);
 
     IMCC_info(interp, 2, "\tbranch_branch\n");
     /* reset statistic globals */
@@ -1252,9 +1252,9 @@ PARROT_WARN_UNUSED_RESULT
 static int
 branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(branch_reorg);
     unsigned int i;
     int changed = 0;
-    ASSERT_ARGS(branch_reorg);
 
     IMCC_info(interp, 2, "\tbranch_reorg\n");
     for (i = 0; i < unit->n_basic_blocks; i++) {
@@ -1336,10 +1336,10 @@ static int
 branch_cond_loop_swap(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *branch),
         ARGMOD(Instruction *start), ARGMOD(Instruction *cond))
 {
+    ASSERT_ARGS(branch_cond_loop_swap);
     int changed = 0;
     int args;
     const char * const neg_op = get_neg_op(cond->opname, &args);
-    ASSERT_ARGS(branch_cond_loop_swap);
     if (neg_op) {
         const size_t size  = strlen(branch->symregs[0]->name) + 10; /* + '_post999' */
         char * const label = (char *)mem_sys_allocate(size);
@@ -1426,9 +1426,9 @@ FALSE.
 static int
 branch_cond_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(branch_cond_loop);
     Instruction *ins, *cond, *start, *prev;
     int changed = 0, found;
-    ASSERT_ARGS(branch_cond_loop);
 
     IMCC_info(interp, 2, "\tbranch_cond_loop\n");
     /* reset statistic globals */
@@ -1499,10 +1499,10 @@ PARROT_WARN_UNUSED_RESULT
 static int
 unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(unused_label);
     unsigned int i;
     int used;
     int changed = 0;
-    ASSERT_ARGS(unused_label);
 
     IMCC_info(interp, 2, "\tunused_label\n");
     for (i = 1; i < unit->n_basic_blocks; i++) {
@@ -1572,10 +1572,10 @@ RT #48260: Not yet documented!!!
 static int
 dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(dead_code_remove);
     unsigned int i;
     int changed = 0;
     Instruction *ins, *last;
-    ASSERT_ARGS(dead_code_remove);
 
     /* this could be a separate level, now it's done with -O1 */
     if (!(IMCC_INFO(interp)->optimizer_level & OPT_PRE))
@@ -1656,9 +1656,9 @@ RT #48260: Not yet documented!!!
 static int
 used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(used_once);
     Instruction *ins;
     int opt = 0;
-    ASSERT_ARGS(used_once);
 
     for (ins = unit->instructions; ins; ins = ins->next) {
         if (ins->symregs) {
@@ -1702,12 +1702,12 @@ static int
 _is_ins_save(ARGIN(const IMC_Unit *unit), ARGIN(const Instruction *check_ins),
         ARGIN(const SymReg *r), int what)
 {
+    ASSERT_ARGS(_is_ins_save);
     Instruction *ins;
     int bb;
     int use_count, lhs_use_count;
     int i, in_use;
     int new_bl=-1, set_bl=-1;
-    ASSERT_ARGS(_is_ins_save);
 
     /* now check all instructions where r is used */
 
@@ -1805,8 +1805,8 @@ static int
 is_ins_save(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGIN(const Instruction *ins),
         ARGIN(const SymReg *r), int what)
 {
-    int save;
     ASSERT_ARGS(is_ins_save);
+    int save;
 
     reason = 0;
     save = _is_ins_save(unit, ins, r, what);
@@ -1831,9 +1831,9 @@ PARROT_WARN_UNUSED_RESULT
 static int
 max_loop_depth(ARGIN(const IMC_Unit *unit))
 {
+    ASSERT_ARGS(max_loop_depth);
     int i;
     int d = 0;
-    ASSERT_ARGS(max_loop_depth);
 
     for (i = 0; i < unit->n_basic_blocks; i++)
         if (unit->bb_list[i]->loop_depth > d)
@@ -1854,8 +1854,8 @@ RT #48260: Not yet documented!!!
 static int
 is_invariant(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGIN(const Instruction *ins))
 {
-    int what;
     ASSERT_ARGS(is_invariant);
+    int what;
 
     if (STREQ(ins->opname, "new")) {
         what = CHK_INV_NEW;
@@ -1889,11 +1889,11 @@ PARROT_CAN_RETURN_NULL
 Basic_block *
 find_outer(ARGIN(const IMC_Unit *unit), ARGIN(const Basic_block *blk))
 {
+    ASSERT_ARGS(find_outer);
     int i;
     Loop_info ** const loop_info = unit->loop_info;
     const int          bb        = blk->index;
     int                i         = unit->n_loops - 1;
-    ASSERT_ARGS(find_outer);
 
     /* loops are sorted depth last */
     for (; i >= 0; i--) {
@@ -1922,9 +1922,9 @@ int
 move_ins_out(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
         ARGMOD(Instruction **ins), ARGIN(const Basic_block *bb))
 {
+    ASSERT_ARGS(move_ins_out);
     Basic_block *pred;
     Instruction * next, *out;
-    ASSERT_ARGS(move_ins_out);
 
     /* check loop_info, where this loop started
      * actually, this moves instruction to block 0 */
@@ -1975,10 +1975,10 @@ PARROT_WARN_UNUSED_RESULT
 static int
 loop_one(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int bnr)
 {
+    ASSERT_ARGS(loop_one);
     Basic_block * const bb = unit->bb_list[bnr];
     Instruction *ins;
     int changed = 0;
-    ASSERT_ARGS(loop_one);
 
     if (bnr == 0) {
         IMCC_warning(interp, "loop_one", "wrong loop depth in block 0\n");
@@ -2015,12 +2015,12 @@ PARROT_WARN_UNUSED_RESULT
 static int
 loop_optimization(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(loop_optimization);
     int l;
     int changed = 0;
     static int prev_depth;
 
     const int loop_depth = prev_depth ? prev_depth : max_loop_depth(unit);
-    ASSERT_ARGS(loop_optimization);
 
     /* work from inside out */
     IMCC_debug(interp, DEBUG_OPT2, "loop_optimization\n");

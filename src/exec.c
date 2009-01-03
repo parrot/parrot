@@ -365,8 +365,8 @@ Used by C<Parrot_exec_add_symbol()>.
 static int
 symbol_list_find(ARGIN(const Parrot_exec_objfile_t *obj), ARGIN(const char *symbol))
 {
-    int i;
     ASSERT_ARGS(symbol_list_find);
+    int i;
 
     for (i = 0; i < obj->symbol_count; i++)
         if (STREQ(symbol, obj->symbol_table[i].symbol))

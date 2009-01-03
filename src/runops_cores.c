@@ -128,10 +128,10 @@ PARROT_CAN_RETURN_NULL
 static opcode_t *
 runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
+    ASSERT_ARGS(runops_trace_core);
     static size_t dod, gc;
     Arenas * const arena_base = interp->arena_base;
     Interp *debugger;
-    ASSERT_ARGS(runops_trace_core);
 
     dod = arena_base->dod_runs;
     gc = arena_base->collect_runs;
@@ -284,9 +284,9 @@ PARROT_CAN_RETURN_NULL
 opcode_t *
 runops_profile_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
+    ASSERT_ARGS(runops_profile_core);
     RunProfile * const profile = interp->profile;
     const opcode_t     old_op  = profile->cur_op;
-    ASSERT_ARGS(runops_profile_core);
 
     /* if reentering the runloop, remember old op and calc time 'til now */
     if (old_op)

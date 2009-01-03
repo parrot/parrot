@@ -290,8 +290,8 @@ PARROT_WARN_UNUSED_RESULT
 static UINTVAL
 get_byte(PARROT_INTERP, ARGIN(const STRING *source_string), UINTVAL offset)
 {
-    unsigned char *contents = (unsigned char *)source_string->strstart;
     ASSERT_ARGS(get_byte);
+    unsigned char *contents = (unsigned char *)source_string->strstart;
 
     if (offset >= source_string->bufused) {
 /*        Parrot_ex_throw_from_c_args(interp, NULL, 0,
@@ -317,8 +317,8 @@ static void
 set_byte(PARROT_INTERP, ARGIN(const STRING *source_string),
         UINTVAL offset, UINTVAL byte)
 {
-    unsigned char *contents;
     ASSERT_ARGS(set_byte);
+    unsigned char *contents;
 
     if (offset >= source_string->bufused)
         Parrot_ex_throw_from_c_args(interp, NULL, 0,
@@ -345,9 +345,9 @@ static STRING *
 get_codepoints(PARROT_INTERP, ARGIN(STRING *source_string),
         UINTVAL offset, UINTVAL count)
 {
+    ASSERT_ARGS(get_codepoints);
     STRING * const return_string = get_bytes(interp, source_string,
             offset, count);
-    ASSERT_ARGS(get_codepoints);
     return_string->charset = source_string->charset;
     return return_string;
 }
@@ -368,9 +368,9 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 get_bytes(PARROT_INTERP, ARGIN(STRING *source_string), UINTVAL offset, UINTVAL count)
 {
+    ASSERT_ARGS(get_bytes);
     STRING * const return_string = Parrot_make_COW_reference(interp,
             source_string);
-    ASSERT_ARGS(get_bytes);
     return_string->encoding = source_string->encoding;
     return_string->charset = source_string->charset;
 
@@ -541,8 +541,8 @@ Moves the string iterator C<i> to the next codepoint.
 static UINTVAL
 fixed8_get_next(PARROT_INTERP, ARGMOD(String_iter *iter))
 {
-    const UINTVAL c = get_byte(interp, iter->str, iter->charpos++);
     ASSERT_ARGS(fixed8_get_next);
+    const UINTVAL c = get_byte(interp, iter->str, iter->charpos++);
     iter->bytepos++;
     return c;
 }

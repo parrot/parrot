@@ -184,9 +184,9 @@ PARROT_CANNOT_RETURN_NULL
 static STRING*
 to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
 {
+    ASSERT_ARGS(to_charset);
     charset_converter_t conversion_func =
         Parrot_find_charset_converter(interp, src->charset, Parrot_binary_charset_ptr);
-    ASSERT_ARGS(to_charset);
 
     if (conversion_func)
          return conversion_func(interp, src, dest);
@@ -482,9 +482,9 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 {
+    ASSERT_ARGS(string_from_codepoint);
     STRING *return_string;
     char real_codepoint = (char)codepoint;
-    ASSERT_ARGS(string_from_codepoint);
     return_string = string_make(interp, &real_codepoint, 1, "binary", 0);
     return return_string;
 }

@@ -343,13 +343,13 @@ PARROT_CAN_RETURN_NULL
 static Instruction *
 MK_I(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *fmt), int n, ...)
 {
+    ASSERT_ARGS(MK_I);
     char opname[64];
     char *p;
     const char *q;
     va_list ap;
     SymReg *r[IMCC_MAX_FIX_REGS];
     int i;
-    ASSERT_ARGS(MK_I);
 
     for (p = opname, q = fmt; *q && *q != ' ';)
         *p++ = *q++;
@@ -377,12 +377,12 @@ static Instruction*
 mk_pmc_const(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *type),
         ARGMOD(SymReg *left), ARGIN(const char *constant))
 {
+    ASSERT_ARGS(mk_pmc_const);
     const int type_enum = atoi(type);
     const int ascii = (*constant == '\'' || *constant == '"');
     SymReg *rhs;
     SymReg *r[3];
     char   *name;
-    ASSERT_ARGS(mk_pmc_const);
 
     if (left->type == VTADDRESS) {      /* IDENTIFIER */
         if (IMCC_INFO(interp)->state->pasm_file) {
@@ -432,13 +432,13 @@ static Instruction*
 mk_pmc_const_named(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
     ARGIN(const char *name), ARGMOD(SymReg *left), ARGIN(const char *constant))
 {
+    ASSERT_ARGS(mk_pmc_const_named);
     SymReg *rhs;
     SymReg *r[3];
     char   *const_name;
     const int ascii       = (*constant == '\'' || *constant == '"');
     char   *unquoted_name = str_dup(name + 1);
     size_t  name_length   = strlen(unquoted_name) - 1;
-    ASSERT_ARGS(mk_pmc_const_named);
 
     unquoted_name[name_length] = '\0';
 
@@ -490,8 +490,8 @@ static Instruction*
 func_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *lhs), ARGIN(const char *op),
          ARGMOD(SymReg **r), int n, int keyv, int emit)
 {
-    int i;
     ASSERT_ARGS(func_ins);
+    int i;
     /* shift regs up by 1 */
     for (i = n - 1; i >= 0; --i)
         r[i+1] = r[i];
@@ -518,9 +518,9 @@ PARROT_CANNOT_RETURN_NULL
 Instruction *
 INS_LABEL(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGMOD(SymReg *r0), int emit)
 {
+    ASSERT_ARGS(INS_LABEL);
 
     Instruction * const ins = _mk_instruction("", "%s:", 1, &r0, 0);
-    ASSERT_ARGS(INS_LABEL);
     ins->type               = ITLABEL;
     r0->first_ins           = ins;
 
@@ -534,8 +534,8 @@ PARROT_CANNOT_RETURN_NULL
 static Instruction *
 iLABEL(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGMOD(SymReg *r0))
 {
-    Instruction * const i = INS_LABEL(interp, unit, r0, 1);
     ASSERT_ARGS(iLABEL);
+    Instruction * const i = INS_LABEL(interp, unit, r0, 1);
     i->line               = IMCC_INFO(interp)->line;
 
     clear_state(interp);
@@ -546,8 +546,8 @@ PARROT_CANNOT_RETURN_NULL
 static Instruction *
 iSUBROUTINE(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGMOD(SymReg *r))
 {
-    Instruction * const i = iLABEL(interp, unit, r);
     ASSERT_ARGS(iSUBROUTINE);
+    Instruction * const i = iLABEL(interp, unit, r);
 
     r->type    = (r->type & VT_ENCODED) ? VT_PCC_SUB|VT_ENCODED : VT_PCC_SUB;
     r->pcc_sub = mem_allocate_zeroed_typed(pcc_sub_t);
@@ -596,8 +596,8 @@ PARROT_CAN_RETURN_NULL
 static const char *
 inv_op(ARGIN(const char *op))
 {
-    int n;
     ASSERT_ARGS(inv_op);
+    int n;
     return get_neg_op(op, &n);
 }
 
@@ -605,10 +605,10 @@ PARROT_CANNOT_RETURN_NULL
 Instruction *
 IMCC_create_itcall_label(PARROT_INTERP)
 {
+    ASSERT_ARGS(IMCC_create_itcall_label);
     char         name[128];
     SymReg      *r;
     Instruction *i;
-    ASSERT_ARGS(IMCC_create_itcall_label);
 
     snprintf(name, sizeof (name), "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR,
         IMCC_INFO(interp)->cnr++);
@@ -626,10 +626,10 @@ PARROT_CANNOT_RETURN_NULL
 static SymReg *
 mk_sub_address_fromc(PARROT_INTERP, ARGIN(const char *name))
 {
+    ASSERT_ARGS(mk_sub_address_fromc);
     /* name is a quoted sub name */
     SymReg *r;
     char *name_copy                  = str_dup(name + 1);
-    ASSERT_ARGS(mk_sub_address_fromc);
     name_copy[strlen(name_copy) - 1] = '\0';
 
     r = mk_sub_address(interp, name_copy);
@@ -642,8 +642,8 @@ PARROT_CANNOT_RETURN_NULL
 static SymReg *
 mk_sub_address_u(PARROT_INTERP, ARGIN(const char *name))
 {
-    SymReg * const r = mk_sub_address(interp, name);
     ASSERT_ARGS(mk_sub_address_u);
+    SymReg * const r = mk_sub_address(interp, name);
     r->type         |= VT_ENCODED;
 
     return r;
@@ -668,10 +668,10 @@ IMCC_itcall_sub(PARROT_INTERP, ARGIN(SymReg *sub))
 static void
 begin_return_or_yield(PARROT_INTERP, int yield)
 {
+    ASSERT_ARGS(begin_return_or_yield);
     Instruction *i;
     Instruction * const ins = IMCC_INFO(interp)->cur_unit->instructions;
     char                name[128];
-    ASSERT_ARGS(begin_return_or_yield);
 
     if (!ins || !ins->symregs[0] || !(ins->symregs[0]->type & VT_PCC_SUB))
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
@@ -689,8 +689,8 @@ begin_return_or_yield(PARROT_INTERP, int yield)
 static void
 set_lexical(PARROT_INTERP, ARGMOD(SymReg *r), ARGIN(const char *name))
 {
-    SymReg * const n = mk_const(interp, name, 'S');
     ASSERT_ARGS(set_lexical);
+    SymReg * const n = mk_const(interp, name, 'S');
 
     r->usage |= U_LEXICAL;
 
@@ -708,8 +708,8 @@ static void
 add_pcc_named_arg(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *name),
         ARGIN(SymReg *value))
 {
-    SymReg * const r = mk_const(interp, name, 'S');
     ASSERT_ARGS(add_pcc_named_arg);
+    SymReg * const r = mk_const(interp, name, 'S');
 
     r->type  |= VT_NAMED;
 
@@ -721,8 +721,8 @@ static void
 add_pcc_named_result(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *name),
         ARGIN(SymReg *value))
 {
-    SymReg * const r = mk_const(interp, name, 'S');
     ASSERT_ARGS(add_pcc_named_result);
+    SymReg * const r = mk_const(interp, name, 'S');
     r->type         |= VT_NAMED;
 
     add_pcc_result(cur_call, r);
@@ -733,8 +733,8 @@ static void
 add_pcc_named_param(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *name),
         ARGIN(SymReg *value))
 {
-    SymReg * const r = mk_const(interp, name, 'S');
     ASSERT_ARGS(add_pcc_named_param);
+    SymReg * const r = mk_const(interp, name, 'S');
     r->type         |= VT_NAMED;
 
     add_pcc_arg(cur_call, r);
@@ -745,8 +745,8 @@ static void
 add_pcc_named_return(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *name),
         ARGIN(SymReg *value))
 {
-    SymReg * const r = mk_const(interp, name, 'S');
     ASSERT_ARGS(add_pcc_named_return);
+    SymReg * const r = mk_const(interp, name, 'S');
     r->type         |= VT_NAMED;
 
     add_pcc_result(cur_call, r);
@@ -768,9 +768,9 @@ adv_named_set(PARROT_INTERP, ARGIN(char *name))
 static void
 do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 {
+    ASSERT_ARGS(do_loadlib);
     STRING * const s = string_unescape_cstring(interp, lib + 1, '"', NULL);
     PMC    *ignored  = Parrot_load_lib(interp, s, NULL);
-    ASSERT_ARGS(do_loadlib);
     UNUSED(ignored);
     Parrot_register_HLL_lib(interp, s);
 }

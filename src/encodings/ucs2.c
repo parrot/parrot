@@ -225,9 +225,9 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 to_encoding(PARROT_INTERP, ARGIN(STRING *src), ARGMOD(STRING *dest))
 {
+    ASSERT_ARGS(to_encoding);
     STRING * const result =
         Parrot_utf16_encoding_ptr->to_encoding(interp, src, dest);
-    ASSERT_ARGS(to_encoding);
 
     /* conversion to utf16 downgrads to ucs-2 if possible - check result */
     if (result->encoding == Parrot_utf16_encoding_ptr)
@@ -250,11 +250,11 @@ Returns the codepoint in string C<src> at position C<offset>.
 static UINTVAL
 get_codepoint(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
 {
+    ASSERT_ARGS(get_codepoint);
 #if PARROT_HAS_ICU
     UChar * const s = (UChar*) src->strstart;
     return s[offset];
 #else
-    ASSERT_ARGS(get_codepoint);
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
         "no ICU lib loaded");
 #endif
@@ -273,11 +273,11 @@ Sets, in string C<src> at position C<offset>, the codepoint C<codepoint>.
 static void
 set_codepoint(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL codepoint)
 {
+    ASSERT_ARGS(set_codepoint);
 #if PARROT_HAS_ICU
     UChar * const s = (UChar*) src->strstart;
     s[offset] = codepoint;
 #else
-    ASSERT_ARGS(set_codepoint);
     UNUSED(src);
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
         "no ICU lib loaded");
@@ -334,8 +334,8 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 get_codepoints(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
 {
-    STRING * const return_string = Parrot_make_COW_reference(interp, src);
     ASSERT_ARGS(get_codepoints);
+    STRING * const return_string = Parrot_make_COW_reference(interp, src);
 #if PARROT_HAS_ICU
     return_string->strstart = (char*)src->strstart + offset * sizeof (UChar);
     return_string->bufused = count * sizeof (UChar);
@@ -530,6 +530,7 @@ Moves the string iterator C<i> to the next UCS-2 codepoint.
 static UINTVAL
 ucs2_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
 {
+    ASSERT_ARGS(ucs2_decode_and_advance);
     UChar * const s = (UChar*) i->str->strstart;
     size_t pos = i->bytepos / sizeof (UChar);
 
@@ -537,7 +538,6 @@ ucs2_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
      *      iter versions
      */
     const UChar c = s[pos++];
-    ASSERT_ARGS(ucs2_decode_and_advance);
     i->charpos++;
     i->bytepos = pos * sizeof (UChar);
     return c;
@@ -557,9 +557,9 @@ next position in the string.
 static void
 ucs2_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
 {
+    ASSERT_ARGS(ucs2_encode_and_advance);
     UChar * const s = (UChar*) i->str->strstart;
     UINTVAL pos = i->bytepos / sizeof (UChar);
-    ASSERT_ARGS(ucs2_encode_and_advance);
     s[pos++] = (UChar)c;
     i->charpos++;
     i->bytepos = pos * sizeof (UChar);

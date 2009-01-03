@@ -65,9 +65,9 @@ PARROT_EXPORT
 void
 imc_compile_all_units(PARROT_INTERP)
 {
+    ASSERT_ARGS(imc_compile_all_units);
     /* compile all units created during the parse */
     IMC_Unit *unit;
-    ASSERT_ARGS(imc_compile_all_units);
 
 #if ! COMPILE_IMMEDIATE
     for (unit = IMCC_INFO(interp)->imc_units; unit;) {
@@ -161,8 +161,8 @@ PARROT_MALLOC
 static IMC_Unit *
 imc_new_unit(IMC_Unit_Type t)
 {
-    IMC_Unit * const unit = mem_allocate_zeroed_typed(IMC_Unit);
     ASSERT_ARGS(imc_new_unit);
+    IMC_Unit * const unit = mem_allocate_zeroed_typed(IMC_Unit);
     create_symhash(&unit->hash);
     unit->type = t;
     return unit;
@@ -185,9 +185,9 @@ PARROT_CANNOT_RETURN_NULL
 IMC_Unit *
 imc_open_unit(PARROT_INTERP, IMC_Unit_Type t)
 {
+    ASSERT_ARGS(imc_open_unit);
     IMC_Unit   * const unit     = imc_new_unit(t);
     imc_info_t * const imc_info = IMCC_INFO(interp);
-    ASSERT_ARGS(imc_open_unit);
 
     if (!imc_info->imc_units)
         imc_info->imc_units = unit;
@@ -247,8 +247,8 @@ Frees an IMC_Unit and all of its associated memory.
 static void
 imc_free_unit(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
-    imc_info_t * const imc = IMCC_INFO(interp);
     ASSERT_ARGS(imc_free_unit);
+    imc_info_t * const imc = IMCC_INFO(interp);
 
 #if IMC_TRACE_HIGH
     fprintf(stderr, "imc_free_unit()\n");

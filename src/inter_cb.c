@@ -73,6 +73,7 @@ PMC*
 Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
         ARGIN(STRING *cb_signature))
 {
+    ASSERT_ARGS(Parrot_make_cb);
     PMC *cb, *cb_sig;
     int type;
     char * sig_str;
@@ -83,7 +84,6 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
      */
     PMC * const interp_pmc = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
             (INTVAL) IGLOBALS_INTERPRETER);
-    ASSERT_ARGS(Parrot_make_cb);
 
     /* be sure __LINE__ is consistent */
     sc = CONST_STRING(interp, "_interpreter");
@@ -160,9 +160,9 @@ Verify user_data PMC then continue with callback_CD
 static void
 verify_CD(ARGIN(char *external_data), ARGMOD(PMC *user_data))
 {
+    ASSERT_ARGS(verify_CD);
     PARROT_INTERP = NULL;
     size_t i;
-    ASSERT_ARGS(verify_CD);
 
     /*
      * 1.) user_data is from external code so:
@@ -223,13 +223,13 @@ Common callback function handler. See pdd16.
 static void
 callback_CD(PARROT_INTERP, ARGIN(char *external_data), ARGMOD(PMC *user_data))
 {
+    ASSERT_ARGS(callback_CD);
 
     PMC *passed_interp;       /* the interp that originated the CB */
     PMC *passed_synchronous;  /* flagging synchronous execution */
     int synchronous = 0;      /* cb is hitting this sub somewhen
                                * inmidst, or not */
     STRING *sc;
-    ASSERT_ARGS(callback_CD);
     /*
      * 3) check interpreter ...
      */
@@ -286,6 +286,7 @@ void
 Parrot_run_callback(PARROT_INTERP,
         ARGMOD(PMC* user_data), ARGIN(char* external_data))
 {
+    ASSERT_ARGS(Parrot_run_callback);
     PMC     *signature;
     PMC     *sub;
     STRING  *sig_str;
@@ -295,7 +296,6 @@ Parrot_run_callback(PARROT_INTERP,
     PMC     *p_param;
     void    *param = NULL;      /* avoid -Ox warning */
     STRING  *sc;
-    ASSERT_ARGS(Parrot_run_callback);
 
     sc        = CONST_STRING(interp, "_sub");
     sub       = VTABLE_getprop(interp, user_data, sc);
