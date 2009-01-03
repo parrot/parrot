@@ -400,6 +400,7 @@ typedef void (* debugger_func_t)(ARGIN(PDB_t * pdb), ARGIN(const char * cmd));
 static void
 dbg_break(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 {
+    ASSERT_ARGS(dbg_break);
     TRACEDEB_MSG("dbg_break");
 
     PDB_set_break(pdb->debugee, cmd);
@@ -408,6 +409,7 @@ dbg_break(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 static void
 dbg_continue(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 {
+    ASSERT_ARGS(dbg_continue);
     TRACEDEB_MSG("dbg_continue");
 
     PDB_continue(pdb->debugee, cmd);
@@ -416,6 +418,7 @@ dbg_continue(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 static void
 dbg_delete(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 {
+    ASSERT_ARGS(dbg_delete);
     TRACEDEB_MSG("dbg_delete");
 
     PDB_delete_breakpoint(pdb->debugee, cmd);
@@ -424,6 +427,7 @@ dbg_delete(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 static void
 dbg_disable(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 {
+    ASSERT_ARGS(dbg_disable);
     TRACEDEB_MSG("dbg_disable");
 
     PDB_disable_breakpoint(pdb->debugee, cmd);
@@ -432,6 +436,7 @@ dbg_disable(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 static void
 dbg_disassemble(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 {
+    ASSERT_ARGS(dbg_disassemble);
     TRACEDEB_MSG("dbg_disassemble");
 
     PDB_disassemble(pdb->debugee, cmd);
@@ -440,6 +445,7 @@ dbg_disassemble(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 static void
 dbg_echo(ARGMOD(PDB_t * pdb), SHIM(const char * cmd))
 {
+    ASSERT_ARGS(dbg_echo);
     TRACEDEB_MSG("dbg_echo");
 
     if (pdb->state & PDB_ECHO) {
@@ -455,18 +461,21 @@ dbg_echo(ARGMOD(PDB_t * pdb), SHIM(const char * cmd))
 static void
 dbg_enable(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 {
+    ASSERT_ARGS(dbg_enable);
     PDB_enable_breakpoint(pdb->debugee, cmd);
 }
 
 static void
 dbg_eval(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 {
+    ASSERT_ARGS(dbg_eval);
     PDB_eval(pdb->debugee, cmd);
 }
 
 static void
 dbg_gcdebug(ARGMOD(PDB_t * pdb), SHIM(const char * cmd))
 {
+    ASSERT_ARGS(dbg_gcdebug);
     TRACEDEB_MSG("dbg_gcdebug");
 
     if (pdb->state & PDB_GCDEBUG) {
@@ -482,6 +491,7 @@ dbg_gcdebug(ARGMOD(PDB_t * pdb), SHIM(const char * cmd))
 static void
 dbg_help(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 {
+    ASSERT_ARGS(dbg_help);
     TRACEDEB_MSG("dbg_help");
 
     PDB_help(pdb->debugee, cmd);
@@ -490,6 +500,7 @@ dbg_help(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 static void
 dbg_info(ARGIN(PDB_t * pdb), SHIM(const char * cmd))
 {
+    ASSERT_ARGS(dbg_info);
     TRACEDEB_MSG("dbg_info");
 
     PDB_info(pdb->debugger);
@@ -498,6 +509,7 @@ dbg_info(ARGIN(PDB_t * pdb), SHIM(const char * cmd))
 static void
 dbg_list(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 {
+    ASSERT_ARGS(dbg_list);
     TRACEDEB_MSG("dbg_list");
 
     PDB_list(pdb->debugee, cmd);
@@ -506,6 +518,7 @@ dbg_list(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 static void
 dbg_load(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 {
+    ASSERT_ARGS(dbg_load);
     TRACEDEB_MSG("dbg_load");
 
     PDB_load_source(pdb->debugee, cmd);
@@ -514,6 +527,7 @@ dbg_load(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 static void
 dbg_next(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 {
+    ASSERT_ARGS(dbg_next);
     TRACEDEB_MSG("dbg_next");
 
     PDB_next(pdb->debugee, cmd);
@@ -522,6 +536,7 @@ dbg_next(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 static void
 dbg_print(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 {
+    ASSERT_ARGS(dbg_print);
     TRACEDEB_MSG("dbg_print");
 
     PDB_print(pdb->debugee, cmd);
@@ -530,6 +545,7 @@ dbg_print(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 static void
 dbg_quit(ARGMOD(PDB_t * pdb), SHIM(const char * cmd))
 {
+    ASSERT_ARGS(dbg_quit);
     TRACEDEB_MSG("dbg_quit");
 
     pdb->state |= PDB_EXIT;
@@ -539,6 +555,7 @@ dbg_quit(ARGMOD(PDB_t * pdb), SHIM(const char * cmd))
 static void
 dbg_run(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 {
+    ASSERT_ARGS(dbg_run);
     TRACEDEB_MSG("dbg_run");
 
     PDB_init(pdb->debugee, cmd);
@@ -548,6 +565,7 @@ dbg_run(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 static void
 dbg_script(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 {
+    ASSERT_ARGS(dbg_script);
     TRACEDEB_MSG("dbg_script");
 
     PDB_script_file(pdb->debugee, cmd);
@@ -556,6 +574,7 @@ dbg_script(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 static void
 dbg_stack(ARGIN(PDB_t * pdb), SHIM(const char * cmd))
 {
+    ASSERT_ARGS(dbg_stack);
     TRACEDEB_MSG("dbg_stack");
 
     PDB_backtrace(pdb->debugee);
@@ -564,6 +583,7 @@ dbg_stack(ARGIN(PDB_t * pdb), SHIM(const char * cmd))
 static void
 dbg_trace(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 {
+    ASSERT_ARGS(dbg_trace);
     TRACEDEB_MSG("dbg_trace");
 
     PDB_trace(pdb->debugee, cmd);
@@ -572,6 +592,7 @@ dbg_trace(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 static void
 dbg_watch(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
 {
+    ASSERT_ARGS(dbg_watch);
     TRACEDEB_MSG("dbg_watch");
 
     PDB_watchpoint(pdb->debugee, cmd);
@@ -710,6 +731,7 @@ PARROT_CAN_RETURN_NULL
 static const struct DebuggerCmd_t *
 get_command(unsigned long cmdhash)
 {
+    ASSERT_ARGS(get_command);
     switch ((enum DebugCmd)cmdhash) {
         case debug_cmd_break:
             return & cmd_break;
@@ -777,6 +799,7 @@ PARROT_CANNOT_RETURN_NULL
 static const char *
 skip_whitespace(ARGIN(const char *cmd))
 {
+    ASSERT_ARGS(skip_whitespace);
     while (isspace((unsigned char)*cmd))
         ++cmd;
     return cmd;
@@ -786,6 +809,7 @@ PARROT_WARN_UNUSED_RESULT
 static unsigned long
 get_uint(ARGMOD(const char **cmd), unsigned int def)
 {
+    ASSERT_ARGS(get_uint);
     char *cmdnext;
     unsigned int result = strtoul(skip_whitespace(* cmd), & cmdnext, 0);
     if (cmdnext != *cmd)
@@ -799,6 +823,7 @@ PARROT_WARN_UNUSED_RESULT
 static unsigned long
 get_ulong(ARGMOD(const char **cmd), unsigned long def)
 {
+    ASSERT_ARGS(get_ulong);
     char *cmdnext;
     unsigned long result = strtoul(skip_whitespace(* cmd), & cmdnext, 0);
     if (cmdnext != * cmd)
