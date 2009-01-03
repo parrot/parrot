@@ -329,6 +329,7 @@ MK_I(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *fmt), int n, ...)
     va_list ap;
     SymReg *r[IMCC_MAX_FIX_REGS];
     int i;
+    ASSERT_ARGS(MK_I);
 
     for (p = opname, q = fmt; *q && *q != ' ';)
         *p++ = *q++;
@@ -499,6 +500,7 @@ INS_LABEL(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGMOD(SymReg *r0), int 
 {
 
     Instruction * const ins = _mk_instruction("", "%s:", 1, &r0, 0);
+    ASSERT_ARGS(INS_LABEL);
     ins->type               = ITLABEL;
     r0->first_ins           = ins;
 
@@ -513,6 +515,7 @@ static Instruction *
 iLABEL(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGMOD(SymReg *r0))
 {
     Instruction * const i = INS_LABEL(interp, unit, r0, 1);
+    ASSERT_ARGS(iLABEL);
     i->line               = IMCC_INFO(interp)->line;
 
     clear_state(interp);
@@ -524,6 +527,7 @@ static Instruction *
 iSUBROUTINE(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGMOD(SymReg *r))
 {
     Instruction * const i = iLABEL(interp, unit, r);
+    ASSERT_ARGS(iSUBROUTINE);
 
     r->type    = (r->type & VT_ENCODED) ? VT_PCC_SUB|VT_ENCODED : VT_PCC_SUB;
     r->pcc_sub = mem_allocate_zeroed_typed(pcc_sub_t);
@@ -584,6 +588,7 @@ IMCC_create_itcall_label(PARROT_INTERP)
     char         name[128];
     SymReg      *r;
     Instruction *i;
+    ASSERT_ARGS(IMCC_create_itcall_label);
 
     snprintf(name, sizeof (name), "%cpcc_sub_call_%d", IMCC_INTERNAL_CHAR,
         IMCC_INFO(interp)->cnr++);

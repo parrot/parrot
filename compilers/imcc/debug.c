@@ -45,6 +45,7 @@ void
 IMCC_fatal(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
 {
     va_list ap;
+    ASSERT_ARGS(IMCC_fatal);
 
     va_start(ap, fmt);
     IMCC_INFO(interp)->error_message = Parrot_vsprintf_c(interp, fmt, ap);
@@ -68,6 +69,7 @@ void
 IMCC_fataly(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
 {
     va_list ap;
+    ASSERT_ARGS(IMCC_fataly);
 
     va_start(ap, fmt);
     IMCC_INFO(interp)->error_message = Parrot_vsprintf_c(interp, fmt, ap);
@@ -92,6 +94,7 @@ void
 IMCC_fatal_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
 {
     va_list ap;
+    ASSERT_ARGS(IMCC_fatal_standalone);
 
     va_start(ap, fmt);
     imcc_vfprintf(interp, Parrot_io_STDERR(interp), fmt, ap);
@@ -117,6 +120,7 @@ IMCC_fataly_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
 {
 
     va_list ap;
+    ASSERT_ARGS(IMCC_fataly_standalone);
 
     va_start(ap, fmt);
     fprintf(stderr, "error:imcc:");
@@ -142,6 +146,7 @@ void
 IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...)
 {
     va_list ap;
+    ASSERT_ARGS(IMCC_warning);
     if (IMCC_INFO(interp)->imcc_warn)
         return;
 
@@ -166,6 +171,7 @@ void
 IMCC_info(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
 {
     va_list ap;
+    ASSERT_ARGS(IMCC_info);
 
     if (level > IMCC_INFO(interp)->verbose)
         return;
@@ -190,6 +196,7 @@ void
 IMCC_debug(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
 {
     va_list ap;
+    ASSERT_ARGS(IMCC_debug);
 
     if (!(level & IMCC_INFO(interp)->debug))
         return;
@@ -213,6 +220,7 @@ dump_instructions(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 {
     const Instruction *ins;
     int                pc;
+    ASSERT_ARGS(dump_instructions);
 
     Parrot_io_fprintf(interp, Parrot_io_STDERR(interp),
             "\nDumping the instructions status:"
@@ -257,6 +265,7 @@ dump_cfg(ARGIN(const IMC_Unit *unit))
 {
     unsigned int i;
     Edge *e;
+    ASSERT_ARGS(dump_cfg);
 
     fprintf(stderr, "\nDumping the CFG:\n-------------------------------\n");
     for (i = 0; i < unit->n_basic_blocks; i++) {
@@ -296,6 +305,7 @@ dump_loops(ARGIN(const IMC_Unit *unit))
 {
     int i;
     Loop_info ** loop_info = unit->loop_info;
+    ASSERT_ARGS(dump_loops);
 
     fprintf(stderr, "Loop info\n---------\n");
     for (i = 0; i < unit->n_loops; i++) {
@@ -342,6 +352,7 @@ dump_labels(ARGIN(const IMC_Unit *unit))
 {
     const SymHash * const hsh = &unit->hash;
     unsigned int          i;
+    ASSERT_ARGS(dump_labels);
 
     fprintf(stderr, "Labels\n");
     fprintf(stderr, "name\tpos\tlast ref\n"
@@ -375,6 +386,7 @@ dump_symreg(ARGIN(const IMC_Unit *unit))
 {
     unsigned int i;
     SymReg ** const reglist = unit->reglist;
+    ASSERT_ARGS(dump_symreg);
 
     if (!reglist)
         return;
@@ -423,6 +435,7 @@ dump_liveness_status(ARGIN(const IMC_Unit *unit))
 {
     unsigned int i;
     SymReg ** const reglist = unit->reglist;
+    ASSERT_ARGS(dump_liveness_status);
 
     fprintf(stderr, "\nSymbols:\n--------------------------------------\n");
 
@@ -449,6 +462,7 @@ Dumps the state of SymReg C<r> in IMC_Unit C<unit>.
 void
 dump_liveness_status_var(ARGIN(const IMC_Unit *unit), ARGIN(const SymReg* r))
 {
+    ASSERT_ARGS(dump_liveness_status_var);
     fprintf(stderr, "\nSymbol %s:", r->name);
     if (r->life_info) {
         unsigned int i;
@@ -500,6 +514,7 @@ dump_interference_graph(ARGIN(const IMC_Unit *unit))
     int x;
     SymReg** const reglist = unit->reglist;
     const int n_symbols = unit->n_symbols;
+    ASSERT_ARGS(dump_interference_graph);
 
     fprintf(stderr, "\nDumping the Interf. graph:"
             "\n-------------------------------\n");
@@ -537,6 +552,7 @@ void
 dump_dominators(ARGIN(const IMC_Unit *unit))
 {
     unsigned int i;
+    ASSERT_ARGS(dump_dominators);
 
     fprintf(stderr, "\nDumping the Dominators Tree:"
             "\n-------------------------------\n");
@@ -571,6 +587,7 @@ void
 dump_dominance_frontiers(ARGIN(const IMC_Unit *unit))
 {
     unsigned int i;
+    ASSERT_ARGS(dump_dominance_frontiers);
 
     fprintf(stderr, "\nDumping the Dominance Frontiers:"
             "\n-------------------------------\n");

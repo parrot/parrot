@@ -568,9 +568,9 @@ Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name), ARGIN(PMC *namespace))
 {
     INTVAL type;
     const INTVAL typeid_exists = fail_if_type_exists(interp, name);
-    ASSERT_ARGS(Parrot_oo_register_type);
 
     PMC *classobj = VTABLE_get_class(interp, namespace);
+    ASSERT_ARGS(Parrot_oo_register_type);
     if (!PMC_IS_NULL(classobj)) {
         STRING *classname = VTABLE_get_string(interp, namespace);
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
