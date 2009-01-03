@@ -142,19 +142,21 @@ Print the value of constant C<c>.
 void
 print_constant(lexer_state * const lexer, constant * const c) {
     switch (c->type) {
-        case INT_TYPE:
+        case INT_VAL:
             fprintf(out, "%d", c->val.ival);
             break;
-        case NUM_TYPE:
+        case NUM_VAL:
             fprintf(out, "%f", c->val.nval);
             break;
-        case STRING_TYPE:
+        case STRING_VAL:
             fprintf(out, "\"%s\"", c->val.sval);
             break;
-        case PMC_TYPE:
+        case PMC_VAL:
             fprintf(out, "\"%s\"", c->val.pval);
             break;
-        case UNKNOWN_TYPE:
+        case USTRING_VAL:
+            fprintf(out, "\"%s\"", c->val.ustr->contents); /* XXX also encoding? */
+            break;
         default:
             panic(lexer, "Unknown type detected in print_constant()");
             break;
@@ -463,21 +465,21 @@ and their index in the constant table is emitted into the bytecode.
 static void
 emit_pbc_const_arg(lexer_state * const lexer, constant * const c) {
     switch (c->type) {
-        case INT_TYPE:
+        case INT_VAL:
             emit_int_arg(lexer->bc, c->val.ival);
             break;
-        case NUM_TYPE: {
+        case NUM_VAL: {
             int index = add_num_const(lexer->bc, c->val.nval);
             emit_int_arg(lexer->bc, index);
             break;
         }
-        case STRING_TYPE: {
+        case STRING_VAL: {
             int index = add_string_const(lexer->bc, c->val.sval);
             fprintf(stderr, "index of string const: %d\n", index);
             emit_int_arg(lexer->bc, index);
             break;
         }
-        case PMC_TYPE: {
+        case PMC_VAL: {
             /*
 
             int index = add_pmc_const(lexer->bc, c->val.pval);
@@ -490,6 +492,9 @@ emit_pbc_const_arg(lexer_state * const lexer, constant * const c) {
             fprintf(stderr, "emit_pbc_const_arg: pmc type\n");
             break;
         }
+        case USTRING_VAL:
+            /* XXX */
+            break;
         default:
             break;
     }
@@ -558,11 +563,11 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
             case EXPR_CONSTANT: {
                 constant *c = iter->expr->expr.c;
                 switch (c->type) {
-                    case INT_TYPE:
+                    case INT_VAL:
                         *pc++ = PARROT_ARG_IC;
                         *pc++ = c->val.ival;
                         break;
-                    case STRING_TYPE:
+                    case STRING_VAL:
                         *pc++ = PARROT_ARG_SC;
                         *pc++ = add_string_const(lexer->bc, c->val.sval);
                         break;
@@ -735,7 +740,7 @@ optimize_instr(lexer_state * const lexer, instruction * const instr) {
 
             /* replace 2nd operand with the new one. */
             second_operand->expr.c->val.ival = index;
-            second_operand->expr.c->type     = INT_TYPE;
+            second_operand->expr.c->type     = INT_VAL;
 
             break;
         }
@@ -757,7 +762,7 @@ optimize_instr(lexer_state * const lexer, instruction * const instr) {
 
             /* replace 2nd operand with the new one. */
             second_operand->expr.c->val.ival = index;
-            second_operand->expr.c->type     = INT_TYPE;
+            second_operand->expr.c->type     = INT_VAL;
 
             break;
         }

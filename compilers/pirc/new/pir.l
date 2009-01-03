@@ -385,8 +385,28 @@ REGISTER       "$"[SNIP]{DIGITS}
                     return TK_STRINGC;
                   }
 
-{UNICODE}         { /* copy the string completely*/
-                    yylval->sval = dupstr(yyget_extra(yyscanner), yytext);
+{UNICODE}         { /* parse yytext, which contains the encoding, a ':', and the quoted string */
+                    char        *colon = strchr(yytext, ':');
+                    lexer_state *lexer = yyget_extra(yyscanner);
+                    ucstring    *ustr  = (ucstring *)pir_mem_allocate(lexer, sizeof (ucstring));
+                    /* copy the encoding part */
+                    ustr->encoding     = dupstrn(lexer, yytext, colon - yytext);
+                    /* the colon becomes a NULL character to end the encoding string */
+                    *colon = '\0';
+                    /* copy the string contents, strip the quotes. Example:
+                     *   iso-8859-1:"hi there"
+                     *   123456789012345678901
+                     *
+                     * colon points to the colon, add 2 to point to the first character
+                     * in the string ('h'). yyleng is 20 in the example, subtract
+                     * string length of the encoding part (10) and 3 for the quotes and colon.
+                     */
+
+                    ustr->contents = dupstrn(lexer, colon + 2, yyleng - strlen(ustr->encoding) - 3);
+
+                    fprintf(stderr, "ucstring: [%s]:[%s]\n", ustr->encoding, ustr->contents);
+
+                    yylval->ustr = ustr;
                     return TK_USTRINGC;
                   }
 "$P"{DIGIT}+      { yylval->ival = atoi(yytext + 2); return TK_PREG; }

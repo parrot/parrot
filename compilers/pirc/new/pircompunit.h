@@ -119,28 +119,45 @@ typedef enum invoke_types {
 
 #define NOT(X)          !(X)
 
-/* selector for the value union */
+/* selector for the value union. Use explicit values to distinguish them
+ * from the pir_type enumeration, this makes it easier to find bugs, where
+ * a pir_type value is used where a value_type should be used. These
+ * value_types continue where pir_type values end.
+ */
 typedef enum value_types {
-    INT_VAL,
-    NUM_VAL,
-    PMC_VAL,
-    STR_VAL,
+    INT_VAL     = 5,
+    STRING_VAL  = 6,
+    PMC_VAL     = 7,
+    NUM_VAL     = 8,
+    USTRING_VAL = 9
 
 } value_type;
 
+/* structure representing a "unicode" string;
+ * it holds the name of the encoding, the character set
+ * and the string itself.
+ */
+typedef struct ucstring {
+    char const *contents; /* the actual string */
+    char const *charset;
+    char const *encoding;
+} ucstring;
+
 /* for representing constant values */
 typedef union value {
-    char    *sval;
-    double   nval;
-    int      ival;
-    char    *pval;
+    char     *sval;
+    double    nval;
+    int       ival;
+    char     *pval;
+    ucstring *ustr;
 
 } value;
+
 
 /* literal constants, possibly named */
 typedef struct constant {
     char const      *name;     /* name of the constant, if declared as a constant */
-    pir_type         type;     /* type of the constant */
+    value_type       type;     /* type of the constant; see enum value_types */
     value            val;      /* value of the constant */
     struct constant *next;
 
@@ -359,10 +376,10 @@ argument *set_arg_flag(argument * const arg, arg_flag flag);
 argument *set_arg_alias(struct lexer_state * const lexer, char const * const alias);
 
 /* constructors for constant nodes */
-constant *new_named_const(struct lexer_state * const lexer, pir_type type,
+constant *new_named_const(struct lexer_state * const lexer, value_type type,
                           char const * const name, ...);
 
-constant *new_const(struct lexer_state * const lexer, pir_type type, ...);
+constant *new_const(struct lexer_state * const lexer, value_type type, ...);
 
 constant *new_pmc_const(char const * const type, char const * const name, constant * const value);
 

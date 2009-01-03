@@ -289,6 +289,7 @@ typedef union YYSTYPE
     unsigned            uval;
     char   const       *sval;
     struct constant    *cval;
+    struct ucstring    *ustr;
     struct instruction *instr;
     struct expression  *expr;
     struct target      *targ;
@@ -300,7 +301,7 @@ typedef union YYSTYPE
     struct macro_param *pval;
 }
 /* Line 1489 of yacc.c.  */
-#line 304 "pirparser.h"
+#line 305 "pirparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

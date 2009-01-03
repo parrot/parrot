@@ -136,11 +136,11 @@ set_sub_multi_types(lexer_state * const lexer, expression * const multitype) {
 
         switch (multitype->type) {
             case EXPR_CONSTANT:
-                mtype->u.ident    = multitype->expr.c->val.sval;
+                mtype->entry.ident    = multitype->expr.c->val.sval;
                 mtype->entry_type = MULTI_TYPE_IDENT;
                 break;
             case EXPR_IDENT:
-                mtype->u.ident    = multitype->expr.id;
+                mtype->entry.ident    = multitype->expr.id;
                 mtype->entry_type = MULTI_TYPE_IDENT;
                 break;
             case EXPR_KEY:
@@ -477,12 +477,15 @@ PARROT_WARN_UNUSED_RESULT
 int
 targets_equal(target const * const left, target const * const right) {
 
+
     if (TEST_FLAG(left->flags, TARGET_FLAG_IS_REG)) {      /* if left is a reg */
         if (TEST_FLAG(right->flags, TARGET_FLAG_IS_REG)) { /* then right must be a reg */
             if ((left->info->type  == right->info->type)       /* types must match */
             &&  (left->info->id.regno == right->info->id.regno /* PIR regno must match */
-            &&  (left->info->color == right->info->color)))    /* PASM regno must match */
+            &&  (left->info->color == right->info->color))) {   /* PASM regno must match */
+                assert(left->info == right->info);
                 return TRUE;
+            }
         }
         else /* left is a reg, right is not */
             return FALSE;
@@ -492,8 +495,10 @@ targets_equal(target const * const left, target const * const right) {
 
         if (!TEST_FLAG(right->flags, TARGET_FLAG_IS_REG)  /* right must not be a reg */
         && (left->info->id.name && right->info->id.name       /* both must have a name */
-        && STREQ(left->info->id.name, right->info->id.name))) /* and they must be equal */
+        && STREQ(left->info->id.name, right->info->id.name))) { /* and they must be equal */
+            assert(left->info == right->info);
             return TRUE;
+        }
     }
 
     return FALSE;
@@ -902,13 +907,13 @@ update_instr(lexer_state * const lexer, char const * const newop) {
             expr = expr_from_const(lexer, va_arg(arg_ptr, constant *));                            \
             break;                                                                                 \
         case 'i': /* integer */                                                                    \
-            expr = expr_from_const(lexer, new_const(lexer, INT_TYPE, va_arg(arg_ptr, int)));       \
+            expr = expr_from_const(lexer, new_const(lexer, INT_VAL, va_arg(arg_ptr, int)));        \
             break;                                                                                 \
         case 'n': /* number */                                                                     \
-            expr = expr_from_const(lexer, new_const(lexer, NUM_TYPE, va_arg(arg_ptr, double)));    \
+            expr = expr_from_const(lexer, new_const(lexer, NUM_VAL, va_arg(arg_ptr, double)));     \
             break;                                                                                 \
         case 's': /* string */                                                                     \
-            expr = expr_from_const(lexer, new_const(lexer, STRING_TYPE, va_arg(arg_ptr, char *))); \
+            expr = expr_from_const(lexer, new_const(lexer, STRING_VAL, va_arg(arg_ptr, char *)));  \
             break;                                                                                 \
         default:                                                                                   \
             panic(lexer, "unknown format specifier in set_instrf()");                              \
@@ -1227,7 +1232,7 @@ get_operand_count(lexer_state * const lexer) {
 /*
 
 =item C<static constant *
-create_const(lexer_state * const lexer, pir_type type, char * const name, va_list arg_ptr)>
+create_const(lexer_state * const lexer, value_type type, char * const name, va_list arg_ptr)>
 
 Constant constructor; based on C<type>, retrieve a value of the
 appropriate type from C<arg_ptr>.
@@ -1238,7 +1243,7 @@ appropriate type from C<arg_ptr>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static constant *
-create_const(lexer_state * const lexer, pir_type type, char const * const name, va_list arg_ptr) {
+create_const(lexer_state * const lexer, value_type type, char const * const name, va_list arg_ptr) {
     constant *c = pir_mem_allocate_zeroed_typed(lexer, constant);
     c->name     = name;
     c->type     = type;
@@ -1246,19 +1251,21 @@ create_const(lexer_state * const lexer, pir_type type, char const * const name, 
 
     /* based on the indicated type, cast the variable argument to the right type. */
     switch (type) {
-        case INT_TYPE:
+        case INT_VAL:
             c->val.ival = va_arg(arg_ptr, int);
             break;
-        case NUM_TYPE:
+        case NUM_VAL:
             c->val.nval = va_arg(arg_ptr, double);
             break;
-        case PMC_TYPE:
-        case STRING_TYPE:
+        case PMC_VAL:
+        case STRING_VAL:
             c->val.sval = va_arg(arg_ptr, char *);
             break;
-        case UNKNOWN_TYPE:
+        case USTRING_VAL:
+            c->val.ustr = va_arg(arg_ptr, ucstring *);
+            break;
         default:
-            panic(lexer, "unknown data type in create_const()");
+            panic(lexer, "unknown data type in create_const() (%d)", type);
             break;
     }
 
@@ -1268,7 +1275,7 @@ create_const(lexer_state * const lexer, pir_type type, char const * const name, 
 /*
 
 =item C<constant *
-new_named_const(lexer_state * const lexer, pir_type type, char * const name, ...)>
+new_named_const(lexer_state * const lexer, value_type type, char * const name, ...)>
 
 Creates a new constant node of the given type, by the given name.
 Wrapper function for C<create_const>.
@@ -1279,7 +1286,7 @@ Wrapper function for C<create_const>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 constant *
-new_named_const(lexer_state * const lexer, pir_type type, char const * const name, ...) {
+new_named_const(lexer_state * const lexer, value_type type, char const * const name, ...) {
     constant *c;
     va_list arg_ptr;
     va_start(arg_ptr, name);
@@ -1312,7 +1319,7 @@ new_pmc_const(char const * const type, char const * const name, constant * const
 /*
 
 =item C<constant *
-new_const(lexer_state * const lexer, pir_type type, ...)>
+new_const(lexer_state * const lexer, value_type type, ...)>
 
 Creates a new constant node of the given type.
 Wrapper function for C<create_const>
@@ -1323,7 +1330,7 @@ Wrapper function for C<create_const>
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 constant *
-new_const(lexer_state * const lexer, pir_type type, ...) {
+new_const(lexer_state * const lexer, value_type type, ...) {
     constant *c;
     va_list arg_ptr;
     va_start(arg_ptr, type);
@@ -1469,7 +1476,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 expression *
 expr_from_int(lexer_state * const lexer, int ival) {
-    return expr_from_const(lexer, new_const(lexer, INT_TYPE, ival));
+    return expr_from_const(lexer, new_const(lexer, INT_VAL, ival));
 }
 
 /*
@@ -1487,7 +1494,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 expression *
 expr_from_num(lexer_state * const lexer, double nval) {
-    return expr_from_const(lexer, new_const(lexer, NUM_TYPE, nval));
+    return expr_from_const(lexer, new_const(lexer, NUM_VAL, nval));
 }
 
 /*
@@ -1504,7 +1511,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 expression *
 expr_from_string(lexer_state * const lexer, char const * const sval) {
-    return expr_from_const(lexer, new_const(lexer, STRING_TYPE, sval));
+    return expr_from_const(lexer, new_const(lexer, STRING_VAL, sval));
 }
 
 

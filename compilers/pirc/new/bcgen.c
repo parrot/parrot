@@ -131,63 +131,6 @@ new_pbc_const(bytecode * const bc) {
     return oldcount;
 }
 
-/*
-
-=item C<STRING *
-parse_pir_string(bytecode * const bc, char const * const str)>
-
-Parse the PIR string C<str> which is stored as:
-
- <encoding>":"<quoted string>
-
-Encoding can be for instance "iso-8859-1". Example:
-
- iso-8859-1:"hi there".
-
-A Parrot STRING is returned. If no encoding was specified,
-then the default encoding is "ascii".
-
-=cut
-
-*/
-STRING *
-parse_pir_string(bytecode * const bc, char const * const str) {
-    /* normal strings that don't specify an encoding are already
-     * stripped from their quotes.
-     */
-    const size_t len   = strlen(str);
-    fprintf(stderr, "parse pir string() [%s]\n", str);
-
-    /* if str contains the unquoted string 'hello', len is 5.
-     * only encoding-specifying strings store quotes. Check
-     * whether the very last character is a double quote, in
-     * which case we know for sure it's an encoding-specifying
-     * string. If the last character is not a quote, the string
-     * is already stripped, in which case it's a normal string.
-     */
-    if (str[len - 1] == '"') {
-        /* find the location of the colon */
-        char *colon = strchr(str, ':');
-        char const *encoding;
-        char *quotedstring = colon + 1;
-
-        PARROT_ASSERT(colon + 1 == '"'); /* after the ":" there must be the opening quote */
-
-
-        /* change the colon into a NULL character, so that encoding points to the encoding
-         * string. So, [iso-8859-1:"hi there"] becomes [iso-8859-1\0"hi there"].
-         */
-        *colon = '\0';
-        /* the NULL character just added makes sure that encoding only
-         * contains the part before the colon
-         */
-        encoding = str;
-
-        return string_unescape_cstring(bc->interp, quotedstring, '"', encoding);
-    }
-
-    return string_make(bc->interp, str, strlen(str), "ascii", PObj_constant_FLAG);
-}
 
 
 /*
@@ -210,6 +153,7 @@ add_pmc_const(bytecode * const bc, PMC * pmc) {
     constant->u.key             = pmc;
     return index;
 }
+
 
 /*
 
@@ -465,7 +409,14 @@ emit_int_arg(bytecode * const bc, int intval) {
 
 /*
 
-=item C<void()>
+=item C<int
+store_key_bytecode(bytecode * const bc, opcode_t * key)>
+
+Store the bytecode for a key. The bytecode was emitted in an
+array, passed in C<key>. The bytecode is I<unpacked> into the
+current PackFile, pointed to by the interpreter in C<bc>.
+The key PMC is added to the constants table, and the index
+in the constants table is returned.
 
 =cut
 
@@ -710,6 +661,7 @@ get_namespace_pmc(bytecode * const bc, multi_type * const ns) {
             break;
         default:
             fprintf(stderr, "unknown key type"); /* XXX exception? */
+            namespace_pmc = NULL;
             break;
     }
     return namespace_pmc;

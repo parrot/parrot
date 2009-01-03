@@ -177,7 +177,7 @@ emit_sub_epilogue(lexer_state * const lexer) {
         /* default sub epilogue; no return values, hence 0 */
         int array_index = generate_signature_pmc(lexer, 0);
         new_sub_instr(lexer, PARROT_OP_set_returns_pc, "set_returns_pc", 0);
-        push_operand(lexer, expr_from_const(lexer, new_const(lexer, INT_TYPE, array_index)));
+        push_operand(lexer, expr_from_int(lexer, array_index));
 
         new_sub_instr(lexer, PARROT_OP_returncc, "returncc", 0);
     }

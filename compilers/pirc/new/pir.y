@@ -239,6 +239,7 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
     unsigned            uval;
     char   const       *sval;
     struct constant    *cval;
+    struct ucstring    *ustr;
     struct instruction *instr;
     struct expression  *expr;
     struct target      *targ;
@@ -300,7 +301,7 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
        <sval> TK_GOTO       "goto"
 
 %token <sval> TK_STRINGC    "string constant"
-       <sval> TK_USTRINGC   "unicode string"
+       <ustr> TK_USTRINGC   "unicode string"
        <ival> TK_INTC       "integer constant"
        <dval> TK_NUMC       "number constant"
        <ival> TK_PREG       "PMC register"
@@ -493,6 +494,8 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
 
 %type <cval> const_tail
              constant
+             stringconst
+
 
 /* all exported functions start with "yypir", instead of default "yy". */
 %name-prefix="yypir"
@@ -1159,9 +1162,9 @@ assignment        : target '=' TK_INTC
 
                           get_opinfo(yyscanner);
                         }
-                  | target '=' TK_STRINGC
+                  | target '=' stringconst
                         {
-                          set_instrf(lexer, "set", "%T%s", $1, $3);
+                          set_instrf(lexer, "set", "%T%C", $1, $3);
                           get_opinfo(yyscanner);
                         }
                   | target '=' reg
@@ -2007,11 +2010,11 @@ globalconst_decl      : ".globalconst" const_tail
                       ;
 
 const_tail            : "int" identifier '=' TK_INTC
-                            { $$ = new_named_const(lexer, INT_TYPE, $2, $4); }
+                            { $$ = new_named_const(lexer, INT_VAL, $2, $4); }
                       | "num" identifier '=' TK_NUMC
-                            { $$ = new_named_const(lexer, NUM_TYPE, $2, $4); }
+                            { $$ = new_named_const(lexer, NUM_VAL, $2, $4); }
                       | "string" identifier '=' TK_STRINGC
-                            { $$ = new_named_const(lexer, STRING_TYPE, $2, $4); }
+                            { $$ = new_named_const(lexer, STRING_VAL, $2, $4); }
                       | TK_STRINGC identifier '=' constant
                             { $$ = new_pmc_const($1, $2, $4); }
                       ;
@@ -2025,10 +2028,15 @@ expression  : target         { $$ = expr_from_target(lexer, $1); }
             ;
 
 
-constant    : TK_STRINGC     { $$ = new_const(lexer, STRING_TYPE, $1); }
-            | TK_INTC        { $$ = new_const(lexer, INT_TYPE, $1); }
-            | TK_NUMC        { $$ = new_const(lexer, NUM_TYPE, $1); }
+constant    : TK_STRINGC     { $$ = new_const(lexer, STRING_VAL, $1); }
+            | TK_INTC        { $$ = new_const(lexer, INT_VAL, $1); }
+            | TK_NUMC        { $$ = new_const(lexer, NUM_VAL, $1); }
             | TK_CONST_VALUE { $$ = $1; }
+            | TK_USTRINGC    { $$ = new_const(lexer, USTRING_VAL, $1); }
+            ;
+
+stringconst : TK_STRINGC     { $$ = new_const(lexer, STRING_VAL, $1); }
+            | TK_USTRINGC    { $$ = new_const(lexer, USTRING_VAL, $1); }
             ;
 
 rel_op      : "!="           { $$ = OP_NE; }
@@ -2203,8 +2211,12 @@ pasm_instruction          : parrot_op op_args "\n"
 
 /* the order of these letters match with the pir_type enumeration.
  * These are used for generating the full opname (set I0, 10 -> set_i_ic).
+ * The first 5 correspond to the values in the pir_type enumeration,
+ * the last 5 correspond to the values in the value_type enumeration.
+ * Note that the last 's' corresponds to USTRING_VAL, which is a unicode
+ * string, but when used it's still a string.
  */
-static char const type_codes[5] = {'i', 's', 'p', 'n', '?'};
+static char const type_codes[10] = {'i', 's', 'p', 'n', '?', 'i', 's', 'p', 'n', 's'};
 
 
 /*
@@ -2312,7 +2324,7 @@ fold_i_i(yyscan_t yyscanner, int a, pir_math_operator op, int b) {
                   "detected 'inc' or 'dec' in fold_i_i()");
             break;
     }
-    return new_const((lexer_state * const)yypirget_extra(yyscanner), INT_TYPE, result);
+    return new_const((lexer_state * const)yypirget_extra(yyscanner), INT_VAL, result);
 }
 
 /*
@@ -2396,7 +2408,7 @@ fold_n_i(yyscan_t yyscanner, double a, pir_math_operator op, int b) {
                   "detected 'inc' or 'dec' in fold_n_i()");
             break;
     }
-    return new_const((lexer_state * const)yypirget_extra(yyscanner), NUM_TYPE, result);
+    return new_const((lexer_state * const)yypirget_extra(yyscanner), NUM_VAL, result);
 }
 
 /*
@@ -2480,7 +2492,7 @@ fold_i_n(yyscan_t yyscanner, int a, pir_math_operator op, double b) {
                   "detected 'inc' or 'dec' in fold_i_n()");
             break;
     }
-    return new_const((lexer_state * const)yypirget_extra(yyscanner), NUM_TYPE, result);
+    return new_const((lexer_state * const)yypirget_extra(yyscanner), NUM_VAL, result);
 }
 
 /*
@@ -2565,7 +2577,7 @@ fold_n_n(yyscan_t yyscanner, double a, pir_math_operator op, double b) {
         default:
             break;
     }
-    return new_const((lexer_state * const)yypirget_extra(yyscanner), NUM_TYPE, result);
+    return new_const((lexer_state * const)yypirget_extra(yyscanner), NUM_VAL, result);
 }
 
 /*
@@ -2587,7 +2599,7 @@ fold_s_s(yyscan_t yyscanner, NOTNULL(char const *a), pir_math_operator op, NOTNU
     lexer_state *lexer = (lexer_state *)yypirget_extra(yyscanner);
     switch (op) {
         case OP_CONCAT:
-            return new_const(lexer, STRING_TYPE, concat_strings(lexer, a, b));
+            return new_const(lexer, STRING_VAL, concat_strings(lexer, a, b));
 
         case OP_ADD:
         case OP_SUB:
@@ -2607,7 +2619,7 @@ fold_s_s(yyscan_t yyscanner, NOTNULL(char const *a), pir_math_operator op, NOTNU
         case OP_FDIV:
             yypirerror(yyscanner, lexer,
                     "cannot apply binary operator '%s' to arguments of type number", opnames[op]);
-            return new_const(lexer, STRING_TYPE, a);
+            return new_const(lexer, STRING_VAL, a);
 
         case OP_ISEQ:
         case OP_ISLE:
@@ -2615,7 +2627,7 @@ fold_s_s(yyscan_t yyscanner, NOTNULL(char const *a), pir_math_operator op, NOTNU
         case OP_ISGE:
         case OP_ISGT:
         case OP_ISNE:
-            return new_const(lexer, INT_TYPE, (1 == evaluate_s_s(a, op, b)));
+            return new_const(lexer, INT_VAL, (1 == evaluate_s_s(a, op, b)));
 
 
         /* OP_INC and OP_DEC are here only to keep the C compiler happy */
@@ -2795,12 +2807,14 @@ PARROT_WARN_UNUSED_RESULT
 static int
 evaluate_c(NOTNULL(lexer_state * const lexer), NOTNULL(constant * const c)) {
     switch (c->type) {
-        case INT_TYPE:
+        case INT_VAL:
             return (c->val.ival != 0);
-        case NUM_TYPE:
+        case NUM_VAL:
             return (c->val.nval != 0);
-        case STRING_TYPE:
+        case STRING_VAL:
             return evaluate_s(c->val.sval);
+        case USTRING_VAL:
+            return evaluate_s(c->val.ustr->contents);
         default:
             panic(lexer, "impossible constant type in evaluate_c()");
             return 0;
@@ -2890,9 +2904,9 @@ PARROT_WARN_UNUSED_RESULT
 static int
 check_value(NOTNULL(constant * const c), int val) {
     switch(c->type) {
-        case INT_TYPE:
+        case INT_VAL:
             return (c->val.ival == val);
-        case NUM_TYPE:
+        case NUM_VAL:
             return (c->val.nval == val);
         default:
             break;
@@ -3309,7 +3323,7 @@ get_signature_length(NOTNULL(expression * const e)) {
             int n;
             /* if the key is an integer constant, then signature becomes '_kic', otherwise _kc. */
             if (e->expr.k->head->expr->type         == EXPR_CONSTANT
-            &&  e->expr.k->head->expr->expr.c->type == INT_TYPE)
+            &&  e->expr.k->head->expr->expr.c->type == INT_VAL)
                 n = 3;
             else
                 n = 2;
@@ -3372,7 +3386,7 @@ write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
                         break;
                     case EXPR_CONSTANT:
                         /* integer constant key results in '_kic' signature */
-                        if (iter->expr.c->type == INT_TYPE)
+                        if (iter->expr.c->type == INT_VAL)
                             *instr_writer++ = 'i';
 
                         *instr_writer++ = 'c';
