@@ -286,7 +286,6 @@ _PARROT_ASSERT_ARG(const volatile void *x, const char *name,
 #ifndef NDEBUG
     if (!x) Parrot_confess(name, file, line);
 #endif
-    PARROT_ASSERT(x);
     return 0;
 }
 #define PARROT_ASSERT_ARG(x) _PARROT_ASSERT_ARG((x), (#x), __FILE__, __LINE__)
