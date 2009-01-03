@@ -1376,14 +1376,62 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
 
     }
     else if (value->type == NUM_VAL) {
+        STRING *numclassname  = string_from_cstring(lexer->interp, "Float", 5);
+        INTVAL  is_a_num      = VTABLE_isa(lexer->interp, constclass, numclassname);
 
+        if (is_a_num) {
+            symbol *constsym  = new_symbol(lexer, name, PMC_TYPE);
+            target *consttarg = target_from_symbol(lexer, constsym);
+
+            PMC *numconst     = pmc_new(lexer->interp,
+                                        Parrot_get_ctx_HLL_type(lexer->interp, enum_class_Float));
+            int index         = add_pmc_const(lexer->bc, numconst);
+            VTABLE_set_number_native(lexer->interp, numconst, value->val.nval);
+
+            declare_local(lexer, PMC_TYPE, constsym);
+
+            value->name = name;
+
+            new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc", 0);
+            push_operand(lexer, expr_from_target(lexer, consttarg));
+            push_operand(lexer, expr_from_int(lexer, index));
+
+        }
+        else {
+            yypirerror(lexer->yyscanner, lexer,
+                       "cannot assign number value to constant of type %s", type);
+        }
     }
     else if (value->type == STRING_VAL) {
+        STRING *strclassname = string_from_cstring(lexer->interp, "String", 6);
+        INTVAL  is_a_string  = VTABLE_isa(lexer->interp, constclass, strclassname);
 
+        if (is_a_string) {
+            symbol *constsym  = new_symbol(lexer, name, PMC_TYPE);
+            target *consttarg = target_from_symbol(lexer, constsym);
+
+            PMC *strconst = pmc_new(lexer->interp,
+                                    Parrot_get_ctx_HLL_type(lexer->interp, enum_class_String));
+            int index     = add_pmc_const(lexer->bc, strconst);
+            VTABLE_set_string_native(lexer->interp, strconst,
+                                     string_from_cstring(lexer->interp, value->val.sval,
+                                                         strlen(value->val.sval)));
+
+            declare_local(lexer, PMC_TYPE, constsym);
+
+            value->name = name;
+
+            new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc", 0);
+            push_operand(lexer, expr_from_target(lexer, consttarg));
+            push_operand(lexer, expr_from_int(lexer, index));
+
+        }
+        else {
+            yypirerror(lexer->yyscanner, lexer,
+                       "cannot assign string value to constant of type %s", type);
+        }
     }
 
-
-    fprintf(stderr, "done with new pmc const()\n");
     return value;
 }
 
