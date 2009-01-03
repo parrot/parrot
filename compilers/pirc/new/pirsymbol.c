@@ -341,7 +341,9 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
     c = find_global_constant(lexer, name);
     if (c) {
         symbol *sym = new_symbol(lexer, name, convert_valuetype_to_pirtype[c->type]);
+        /*
         fprintf(stderr, "symbol type: %d ==> %d\n", c->type, convert_valuetype_to_pirtype[c->type]);
+        */
         return sym;
     }
 
@@ -639,10 +641,14 @@ find_global_constant(NOTNULL(lexer_state * const lexer), NOTNULL(char const * co
     unsigned long hashcode = get_hashcode(name, table->size);
     bucket *b              = get_bucket(table, hashcode);
 
-    fprintf(stderr, "finding global constant '%s'\n", name);
+    /* fprintf(stderr, "finding global constant '%s'\n", name);
+    */
+
     while (b) {
         if (STREQ(bucket_constant(b)->name, name)) {
+            /*
             fprintf(stderr, "found!\n");
+            */
             return bucket_constant(b);
         }
 
