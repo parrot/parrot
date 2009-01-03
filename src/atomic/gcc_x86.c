@@ -48,8 +48,8 @@ C<expect> to C<update>. Otherwise sets C<update> to C<ptr>.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void *
-parrot_i386_cmpxchg(ARGMOD(void *volatile *ptr), ARGIN(void *expect),
-                                        ARGIN(void *update))
+parrot_i386_cmpxchg(ARGMOD(void *volatile *ptr), ARGIN_NULLOK(void *expect),
+                                        ARGIN_NULLOK(void *update))
 {
     ASSERT_ARGS(parrot_i386_cmpxchg);
 #if defined(PARROT_HAS_X86_64_GCC_CMPXCHG)

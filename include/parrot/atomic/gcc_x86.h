@@ -22,11 +22,9 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void * parrot_i386_cmpxchg(
     ARGMOD(void *volatile *ptr),
-    ARGIN(void *expect),
-    ARGIN(void *update))
+    ARGIN_NULLOK(void *expect),
+    ARGIN_NULLOK(void *update))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         FUNC_MODIFIES(*ptr);
 
 PARROT_EXPORT
@@ -34,9 +32,7 @@ long parrot_i386_xadd(ARGIN(volatile long *l), long amount)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_parrot_i386_cmpxchg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(ptr) \
-    || PARROT_ASSERT_ARG(expect) \
-    || PARROT_ASSERT_ARG(update)
+       PARROT_ASSERT_ARG(ptr)
 #define ASSERT_ARGS_parrot_i386_xadd __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(l)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
