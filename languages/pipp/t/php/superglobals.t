@@ -31,6 +31,21 @@ CODE
 cgi-fcgi
 OUT
 
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'using two superglobals' );
+<?php
+
+echo $_REQUEST['name'];
+echo "\n";
+
+echo $_SESSION['name'];
+echo "\n";
+
+?>
+CODE
+$_REQUEST
+$_SESSION
+OUT
+
 $ENV{REQUEST_TYPE} = 'GET';
 $ENV{QUERY_STRING} = 'as=df';
 
