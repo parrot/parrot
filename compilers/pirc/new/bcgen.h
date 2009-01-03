@@ -106,7 +106,7 @@ int store_key_bytecode(bytecode * const bc, opcode_t *keybytecode);
 
 int add_num_const(bytecode * const bc, double f);
 
-int add_string_const(bytecode * const bc, char const * const str);
+int add_string_const(bytecode * const bc, char const * const str, char const * charset);
 
 int add_pmc_const(bytecode * const bc, PMC * pmc) ;
 

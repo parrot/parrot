@@ -163,19 +163,16 @@ add_string_const(bytecode * const bc, char const * const str)>
 Add the string constant C<str> to the constant table. This function
 returns the index in the constant table where C<str> is stored.
 
-XXX what to do with encoding-thingy "ascii"? Probably should be an extra parameter?
-Or should it be a STRING at this point already?
-
 =cut
 
 */
 int
-add_string_const(bytecode * const bc, char const * const str) {
+add_string_const(bytecode * const bc, char const * const str, char const * charset) {
     int                index    = new_pbc_const(bc);
     PackFile_Constant *constant = bc->interp->code->const_table->constants[index];
 
     constant->type     = PFC_STRING;
-    constant->u.string = string_make(bc->interp, str, strlen(str), "ascii", PObj_constant_FLAG);
+    constant->u.string = string_make(bc->interp, str, strlen(str), charset, PObj_constant_FLAG);
     return index;
 }
 
@@ -463,7 +460,7 @@ but you want the STRING representing the string instead.
 */
 static STRING *
 add_string_const_from_cstring(bytecode * const bc, char const * const str) {
-    int index = add_string_const(bc, str);
+    int index = add_string_const(bc, str, "ascii");
     return bc->interp->code->const_table->constants[index]->u.string;
 }
 
@@ -747,7 +744,7 @@ add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subprag
 
     sub_pmc               = create_sub_pmc(bc, info->iscoroutine, info->instanceof);
     sub                   = PMC_sub(sub_pmc);
-    subname_index         = add_string_const(bc, info->subname);
+    subname_index         = add_string_const(bc, info->subname, "ascii");
     subname_const         = bc->interp->code->const_table->constants[subname_index];
 
     /* set start and end offset of this sub in the bytecode.

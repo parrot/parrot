@@ -409,7 +409,7 @@ REGISTER       "$"[SNIP]{DIGITS}
 
                     ustr->encoding = NULL;
 
-                    fprintf(stderr, "ucstring: [%s]:[%s]\n", ustr->charset, ustr->contents);
+                    /* fprintf(stderr, "ucstring: [%s]:[%s]\n", ustr->charset, ustr->contents); */
 
                     yylval->ustr = ustr;
                     return TK_USTRINGC;
@@ -437,7 +437,7 @@ REGISTER       "$"[SNIP]{DIGITS}
                      *
 
                     /* copy the encoding part */
-                    ustr->encoding     = dupstrn(lexer, yytext, colon1 - yytext);
+                    ustr->encoding = dupstrn(lexer, yytext, colon1 - yytext);
 
                     /* look for the second colon after this one */
                     colon2 = strchr(colon1 + 1, ':');

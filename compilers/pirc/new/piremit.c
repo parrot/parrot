@@ -474,8 +474,7 @@ emit_pbc_const_arg(lexer_state * const lexer, constant * const c) {
             break;
         }
         case STRING_VAL: {
-            int index = add_string_const(lexer->bc, c->val.sval);
-            fprintf(stderr, "index of string const: %d\n", index);
+            int index = add_string_const(lexer->bc, c->val.sval, "ascii");
             emit_int_arg(lexer->bc, index);
             break;
         }
@@ -492,9 +491,11 @@ emit_pbc_const_arg(lexer_state * const lexer, constant * const c) {
             fprintf(stderr, "emit_pbc_const_arg: pmc type\n");
             break;
         }
-        case USTRING_VAL:
-            /* XXX */
+        case USTRING_VAL: {
+            int index = add_string_const(lexer->bc, c->val.ustr->contents, c->val.ustr->charset);
+            emit_int_arg(lexer->bc, index);
             break;
+        }
         default:
             break;
     }
@@ -569,7 +570,7 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
                         break;
                     case STRING_VAL:
                         *pc++ = PARROT_ARG_SC;
-                        *pc++ = add_string_const(lexer->bc, c->val.sval);
+                        *pc++ = add_string_const(lexer->bc, c->val.sval, "ascii");
                         break;
                     default:
                         panic(lexer, "wrong type of key");

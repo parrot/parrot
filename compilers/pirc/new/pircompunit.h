@@ -119,10 +119,12 @@ typedef enum invoke_types {
 
 #define NOT(X)          !(X)
 
-/* selector for the value union. Use explicit values to distinguish them
+/* Selectors for the value union. Use explicit values to distinguish them
  * from the pir_type enumeration, this makes it easier to find bugs, where
  * a pir_type value is used where a value_type should be used. These
- * value_types continue where pir_type values end.
+ * value_types continue where pir_type values end, as value_types are used
+ * for indexing the same array containing signature characters (for
+ * calculating full-signatured ops, such as set_i_ic).
  */
 typedef enum value_types {
     INT_VAL     = 5,
