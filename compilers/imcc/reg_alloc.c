@@ -560,13 +560,13 @@ and final
 static void
 print_stat(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 {
+    ASSERT_ARGS(print_stat);
     int sets[4] = {0, 0, 0, 0};
 
     const char * const function =
         unit->instructions->symreg_count
             ? unit->instructions->symregs[0]->name
             : "(not a function)";
-    ASSERT_ARGS(print_stat);
 
     make_stat(unit, sets, unit->n_regs_used);
     IMCC_info(interp, 1,
@@ -1179,11 +1179,11 @@ allocate lexicals or non-volatile in ascending order
 static void
 allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
 {
+    ASSERT_ARGS(allocate_uniq);
     SymHash     *hsh     = &unit->hash;
     Set         *sets[4] = { NULL, NULL, NULL, NULL };
     SymReg      *r;
     unsigned int i;
-    ASSERT_ARGS(allocate_uniq);
 
     for (i = 0; i < hsh->size; i++) {
         for (r = hsh->data[i]; r; r = r->next) {

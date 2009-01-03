@@ -1468,6 +1468,7 @@ Called from within C<PackFile_new()> register the standard functions.
 static void
 pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
 {
+    ASSERT_ARGS(pf_register_standard_funcs);
     PackFile_funcs dirf = {
         directory_new,
         directory_destroy,
@@ -1521,7 +1522,6 @@ pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
         pf_debug_unpack,
         pf_debug_dump
     };
-    ASSERT_ARGS(pf_register_standard_funcs);
     PackFile_funcs_register(interp, pf, PF_DIR_SEG,     dirf);
     PackFile_funcs_register(interp, pf, PF_UNKNOWN_SEG, defaultf);
     PackFile_funcs_register(interp, pf, PF_FIXUP_SEG,   fixupf);

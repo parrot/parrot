@@ -1070,6 +1070,7 @@ PARROT_CANNOT_RETURN_NULL
 const CHARSET *
 Parrot_charset_unicode_init(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_charset_unicode_init);
     CHARSET * const      return_set = Parrot_new_charset(interp);
     static const CHARSET base_set   = {
         "unicode",
@@ -1096,7 +1097,6 @@ Parrot_charset_unicode_init(PARROT_INTERP)
         compute_hash,
         NULL
     };
-    ASSERT_ARGS(Parrot_charset_unicode_init);
 
     STRUCT_COPY_FROM_STRUCT(return_set, base_set);
 

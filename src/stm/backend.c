@@ -797,11 +797,12 @@ Inner transactions are committed by merge_transaction().
 */
 
 static int
-do_real_commit(PARROT_INTERP, ARGIN(STM_tx_log *log)) {
+do_real_commit(PARROT_INTERP, ARGIN(STM_tx_log *log))
+{
+    ASSERT_ARGS(do_real_commit);
     int i;
     int successp;
     STM_tx_log_sub *inner;
-    ASSERT_ARGS(do_real_commit);
 
     PARROT_ASSERT(log->depth == 1);
 

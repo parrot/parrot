@@ -730,12 +730,12 @@ PARROT_CAN_RETURN_NULL
 static opcode_t *
 runops_jit(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
+    ASSERT_ARGS(runops_jit);
 #if JIT_CAPABLE
 #  ifdef PARROT_EXEC_OS_AIX
     /* AIX calling convention requires that function-call-by-ptr be made
        through the following struct: */
     struct ptrgl_t { jit_f functPtr; void *toc; void *env; } ptrgl_t;
-    ASSERT_ARGS(runops_jit);
 
     ptrgl_t.functPtr = (jit_f) D2FPTR(init_jit(interp, pc));
     ptrgl_t.env      = NULL;

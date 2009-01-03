@@ -240,6 +240,7 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
         ARGIN(const char *op_name), int n,
         ARGIN_NULLOK(SymReg * const *args), ARGIN_NULLOK(const int *arg_flags))
 {
+    ASSERT_ARGS(pcc_get_args);
     /* Notes:
      * The created string is in the format "\"(0x0010,0x0220,0x0010)\"".
      * flags always has exactly 4 hex digits.
@@ -272,7 +273,6 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
     char         *buf     = n < PCC_GET_ARGS_LIMIT ?
         bufcache :
         mem_allocate_n_typed(bufsize, char);
-    ASSERT_ARGS(pcc_get_args);
 
     memcpy(buf, pref, lenpref);
     bufpos += lenpref;

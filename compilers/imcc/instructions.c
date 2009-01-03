@@ -140,10 +140,10 @@ C<w_special>.
 void
 imcc_init_tables(PARROT_INTERP)
 {
+    ASSERT_ARGS(imcc_init_tables);
     const char *writes[] = {
         "cleari", "clearn", "clearp", "clears",
     };
-    ASSERT_ARGS(imcc_init_tables);
     /* init opnums */
     if (!w_special[0]) {
         size_t i;

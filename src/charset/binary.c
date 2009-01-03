@@ -505,6 +505,7 @@ PARROT_CANNOT_RETURN_NULL
 const CHARSET *
 Parrot_charset_binary_init(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_charset_binary_init);
     CHARSET * const return_set = Parrot_new_charset(interp);
     static const CHARSET base_set = {
         "binary",
@@ -531,7 +532,6 @@ Parrot_charset_binary_init(PARROT_INTERP)
         ascii_compute_hash,
         NULL
     };
-    ASSERT_ARGS(Parrot_charset_binary_init);
 
     STRUCT_COPY_FROM_STRUCT(return_set, base_set);
     return_set->preferred_encoding = Parrot_fixed_8_encoding_ptr;

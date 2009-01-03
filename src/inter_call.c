@@ -2079,6 +2079,7 @@ static Parrot_Context *
 count_signature_elements(PARROT_INTERP, ARGIN(const char *signature),
     ARGMOD(PMC *args_sig), ARGMOD(PMC *results_sig), int flag)
 {
+    ASSERT_ARGS(count_signature_elements);
     const char  *x;
     unsigned int seen_arrow  = 0;
 
@@ -2091,7 +2092,6 @@ count_signature_elements(PARROT_INTERP, ARGIN(const char *signature),
 
     /* # of args, # of results */
     int arg_ret_cnt[2]       = { 0, 0 };
-    ASSERT_ARGS(count_signature_elements);
 
     /* Increment these values if we are not calling from a CallSignature
        PMC */
@@ -2552,6 +2552,7 @@ void
 Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
         ARGIN(const char *signature), ...)
 {
+    ASSERT_ARGS(Parrot_PCCINVOKE);
 #define PCC_ARG_MAX 1024
     /* variables from PCCINVOKE impl in PCCMETHOD.pm */
     /* args INSP, returns INSP */
@@ -2588,7 +2589,6 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
     int         cur   =  0;
 
     va_list list;
-    ASSERT_ARGS(Parrot_PCCINVOKE);
     va_start(list, signature);
 
     indexes[0] = arg_indexes;
@@ -2733,6 +2733,7 @@ void
 Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
         ARGIN(PMC *sig_obj))
 {
+    ASSERT_ARGS(Parrot_pcc_invoke_sub_from_sig_object);
 #define PCC_ARG_MAX 1024
     /* variables from PCCINVOKE impl in PCCMETHOD.pm */
     /* args INSP, returns INSP */
@@ -2765,7 +2766,6 @@ Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     PMC *sigs[2];
 
     const char *ret_x  = NULL;
-    ASSERT_ARGS(Parrot_pcc_invoke_sub_from_sig_object);
 
     indexes[0] = arg_indexes;
     indexes[1] = result_indexes;

@@ -620,6 +620,7 @@ PARROT_CANNOT_RETURN_NULL
 ENCODING *
 Parrot_encoding_fixed_8_init(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_encoding_fixed_8_init);
     ENCODING * const return_encoding = Parrot_new_encoding(interp);
 
     ENCODING base_encoding = {
@@ -642,7 +643,6 @@ Parrot_encoding_fixed_8_init(PARROT_INTERP)
         iter_init
 
     };
-    ASSERT_ARGS(Parrot_encoding_fixed_8_init);
     STRUCT_COPY_FROM_STRUCT(return_encoding, base_encoding);
     Parrot_register_encoding(interp, "fixed_8", return_encoding);
     return return_encoding;

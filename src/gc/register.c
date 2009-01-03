@@ -196,9 +196,9 @@ Creates the interpreter's initial context.
 void
 create_initial_context(PARROT_INTERP)
 {
+    ASSERT_ARGS(create_initial_context);
     static INTVAL   num_regs[] = {32, 32, 32, 32};
     Parrot_Context *ignored;
-    ASSERT_ARGS(create_initial_context);
 
     /* Create some initial free_list slots. */
 

@@ -601,6 +601,7 @@ PMC *
 imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
         ARGOUT(STRING **error_message))
 {
+    ASSERT_ARGS(imcc_compile);
     /* imcc always compiles to interp->code
      * save old cs, make new
      */
@@ -613,7 +614,6 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
     Parrot_Context        *ignored;
     INTVAL regs_used[4] = {3, 3, 3, 3};
     INTVAL eval_number;
-    ASSERT_ARGS(imcc_compile);
 
     do_yylex_init(interp, &yyscanner);
 
@@ -881,6 +881,7 @@ static void *
 imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
         ARGOUT(STRING **error_message))
 {
+    ASSERT_ARGS(imcc_compile_file);
     PackFile_ByteCode  * const cs_save  = interp->code;
     PackFile_ByteCode         *cs       = NULL;
     struct _imc_info_t        *imc_info = NULL;
@@ -892,7 +893,6 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
     /* need at least 3 regs for compilation of constant math e.g.
      * add_i_ic_ic - see also IMCC_subst_constants() */
     INTVAL regs_used[4] = {3, 3, 3, 3};
-    ASSERT_ARGS(imcc_compile_file);
 
     if (IMCC_INFO(interp)->last_unit) {
         /* a reentrant compile */
@@ -1202,6 +1202,7 @@ PARROT_CAN_RETURN_NULL
 static const char *
 try_rev_cmp(ARGIN(const char *name), ARGMOD(SymReg **r))
 {
+    ASSERT_ARGS(try_rev_cmp);
     static struct br_pairs {
         ARGIN(const char * const op);
         ARGIN(const char * const nop);
@@ -1214,7 +1215,6 @@ try_rev_cmp(ARGIN(const char *name), ARGMOD(SymReg **r))
     };
 
     unsigned int i;
-    ASSERT_ARGS(try_rev_cmp);
 
     for (i = 0; i < N_ELEMENTS(br_pairs); i++) {
         if (STREQ(name, br_pairs[i].op)) {

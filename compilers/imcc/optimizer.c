@@ -409,6 +409,7 @@ PARROT_CAN_RETURN_NULL
 const char *
 get_neg_op(ARGIN(const char *op), ARGOUT(int *n))
 {
+    ASSERT_ARGS(get_neg_op);
     static const struct br_pairs {
         const char * const op;
         const char * const nop;
@@ -420,7 +421,6 @@ get_neg_op(ARGIN(const char *op), ARGOUT(int *n))
         { "ge", "lt", 3 },
     };
     size_t i;
-    ASSERT_ARGS(get_neg_op);
     for (i = 0; i < N_ELEMENTS(br_pairs); i++) {
         *n = br_pairs[i].n;
         if (STREQ(op, br_pairs[i].op))
@@ -873,13 +873,13 @@ Instruction *
 IMCC_subst_constants_umix(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         ARGMOD(SymReg **r), int n)
 {
+    ASSERT_ARGS(IMCC_subst_constants_umix);
     Instruction *tmp;
     const char * const ops[] = {
         "abs", "add", "div", "mul", "sub", "fdiv"
     };
     size_t i;
     char b[128];
-    ASSERT_ARGS(IMCC_subst_constants_umix);
 
     tmp = NULL;
     for (i = 0; i < N_ELEMENTS(ops); i++) {
@@ -996,6 +996,7 @@ Instruction *
 IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         ARGMOD(SymReg **r), int n, ARGOUT(int *ok))
 {
+    ASSERT_ARGS(IMCC_subst_constants);
     Instruction *tmp;
     const char * const ops[] = {
         "add", "sub", "mul", "div", "fdiv", "pow",
@@ -1025,7 +1026,6 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
     char op[20];
     const char *debug_fmt = NULL;   /* gcc -O uninit warn */
     int found, branched;
-    ASSERT_ARGS(IMCC_subst_constants);
 
     /* construct a FLOATVAL_FMT with needed precision */
 #if NUMVAL_SIZE == 8
