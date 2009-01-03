@@ -121,7 +121,7 @@ rule for3_statement {
 }
 
 rule for4_statement {
-    'for' '(' 'var' <variable_declaration_list>
+    'for' '(' 'var' $<init>=<variable_declaration_list>
     ';' [$<cond>=<expression>]?
     ';' [$<step>=<expression>]? ')'
     <statement>
@@ -169,7 +169,7 @@ token throw_statement {
 }
 
 rule variable_statement {
-    'var' <variable_declaration> [',' <variable_declaration>]* ';'
+    'var' <variable_declaration_list> ';'
     {*}
 }
 
