@@ -130,7 +130,8 @@ Q_STRING       {SQ_STRING}|{DQ_STRING}
 ENCCHAR         {ALPHA}|{DIGIT}|"-"
 ENCCHARS        {ENCCHAR}*
 ENC             {ALPHA}{ENCCHARS}":"
-UNICODE         {ENC}{ENC}?{DQ_STRING}
+CHARSET         {ENC}
+ENCODING        {ENC}
 
 REGISTER       "$"[SNIP]{DIGITS}
 
@@ -385,30 +386,83 @@ REGISTER       "$"[SNIP]{DIGITS}
                     return TK_STRINGC;
                   }
 
-{UNICODE}         { /* parse yytext, which contains the encoding, a ':', and the quoted string */
+{CHARSET}{DQ_STRING}  {
+                    /* parse yytext, which contains the charset, a ':', and the quoted string */
                     char        *colon = strchr(yytext, ':');
                     lexer_state *lexer = yyget_extra(yyscanner);
                     ucstring    *ustr  = (ucstring *)pir_mem_allocate(lexer, sizeof (ucstring));
-                    /* copy the encoding part */
-                    ustr->encoding     = dupstrn(lexer, yytext, colon - yytext);
+                    /* copy the charset part */
+                    ustr->charset      = dupstrn(lexer, yytext, colon - yytext);
                     /* the colon becomes a NULL character to end the encoding string */
                     *colon = '\0';
                     /* copy the string contents, strip the quotes. Example:
                      *   iso-8859-1:"hi there"
                      *   123456789012345678901
-                     *
+                     *             ^
+                     *          (colon)
                      * colon points to the colon, add 2 to point to the first character
                      * in the string ('h'). yyleng is 20 in the example, subtract
-                     * string length of the encoding part (10) and 3 for the quotes and colon.
+                     * string length of the charset part (10) and 3 for the quotes and colon.
                      */
 
-                    ustr->contents = dupstrn(lexer, colon + 2, yyleng - strlen(ustr->encoding) - 3);
+                    ustr->contents = dupstrn(lexer, colon + 2, yyleng - strlen(ustr->charset) - 3);
 
-                    fprintf(stderr, "ucstring: [%s]:[%s]\n", ustr->encoding, ustr->contents);
+                    ustr->encoding = NULL;
+
+                    fprintf(stderr, "ucstring: [%s]:[%s]\n", ustr->charset, ustr->contents);
 
                     yylval->ustr = ustr;
                     return TK_USTRINGC;
                   }
+
+{ENCODING}{CHARSET}{DQ_STRING} {
+                    /* parse yytext, which contains the encoding, a ':', a charset,
+                     * a ':', and the quoted string
+                     */
+                    char        *colon1 = strchr(yytext, ':');
+                    char        *colon2;
+                    lexer_state *lexer = yyget_extra(yyscanner);
+                    ucstring    *ustr  = (ucstring *)pir_mem_allocate(lexer, sizeof (ucstring));
+
+                    /* yytext has the following structure:
+                     *
+                     * <charset><encoding><contents>
+                     *
+                     *   utf:unicode:"hi there"
+                     *   1234567890123456789012
+                     *      ^       ^
+                     *   (colon1) (colon2)
+                     *
+                     * colon1 points to the first colon, colon2 points to the second.
+                     *
+
+                    /* copy the encoding part */
+                    ustr->encoding     = dupstrn(lexer, yytext, colon1 - yytext);
+
+                    /* look for the second colon after this one */
+                    colon2 = strchr(colon1 + 1, ':');
+                    /* the colon becomes a NULL character to end the encoding string */
+                    *colon1 = '\0';
+
+                    ustr->charset  = dupstrn(lexer, colon1 + 1, colon2 - colon1 - 1);
+
+                    /* start copying after the second colon, and skip the quote as well.
+                     * yyleng contains the total length, substract length of encoding,
+                     * length of charset, 2 quotes, and 2 colons (hence -4).
+                     */
+                    ustr->contents = dupstrn(lexer, colon2 + 2,
+                                 yyleng - strlen(ustr->charset) - strlen(ustr->encoding) - 4);
+
+                    /* fprintf(stderr, "ucstring: [%s]:[%s]:[%s]\n", ustr->encoding, ustr->charset,
+                                   ustr->contents);
+                    */
+
+                    yylval->ustr = ustr;
+                    return TK_USTRINGC;
+
+                  }
+
+
 "$P"{DIGIT}+      { yylval->ival = atoi(yytext + 2); return TK_PREG; }
 "$S"{DIGIT}+      { yylval->ival = atoi(yytext + 2); return TK_SREG; }
 "$N"{DIGIT}+      { yylval->ival = atoi(yytext + 2); return TK_NREG; }
