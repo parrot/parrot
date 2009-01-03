@@ -299,7 +299,8 @@ static void too_many(PARROT_INTERP,
     || PARROT_ASSERT_ARG(ctx) \
     || PARROT_ASSERT_ARG(indexes) \
     || PARROT_ASSERT_ARG(result_list)
-#define ASSERT_ARGS_set_context_sig_returns_varargs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_set_context_sig_returns_varargs \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(ctx) \
     || PARROT_ASSERT_ARG(indexes) \

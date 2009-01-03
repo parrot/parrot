@@ -185,10 +185,12 @@ static PMC * Parrot_mmd_sort_candidates(PARROT_INTERP,
     || PARROT_ASSERT_ARG(ns_name) \
     || PARROT_ASSERT_ARG(sub_name) \
     || PARROT_ASSERT_ARG(sub_obj)
-#define ASSERT_ARGS_mmd_build_type_tuple_from_long_sig __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_mmd_build_type_tuple_from_long_sig \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(long_sig)
-#define ASSERT_ARGS_mmd_build_type_tuple_from_type_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_mmd_build_type_tuple_from_type_list \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(type_list)
 #define ASSERT_ARGS_mmd_cache_key_from_types __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -221,7 +223,8 @@ static PMC * Parrot_mmd_sort_candidates(PARROT_INTERP,
     || PARROT_ASSERT_ARG(candidates)
 #define ASSERT_ARGS_Parrot_mmd_arg_tuple_func __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_Parrot_mmd_get_cached_multi_sig __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_mmd_get_cached_multi_sig \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(sub)
 #define ASSERT_ARGS_Parrot_mmd_maybe_candidate __attribute__unused__ int _ASSERT_ARGS_CHECK = \

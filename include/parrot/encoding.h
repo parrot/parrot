@@ -163,7 +163,8 @@ void parrot_init_encodings_2(void);
        PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_Parrot_find_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(encodingname)
-#define ASSERT_ARGS_Parrot_find_encoding_converter __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_find_encoding_converter \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(lhs) \
     || PARROT_ASSERT_ARG(rhs)

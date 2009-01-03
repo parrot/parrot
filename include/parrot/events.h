@@ -187,7 +187,8 @@ void Parrot_schedule_broadcast_qentry(ARGIN(struct QUEUE_ENTRY *entry))
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(cbi) \
     || PARROT_ASSERT_ARG(ext)
-#define ASSERT_ARGS_Parrot_new_suspend_for_gc_event __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_new_suspend_for_gc_event \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_new_terminate_event __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
@@ -201,7 +202,8 @@ void Parrot_schedule_broadcast_qentry(ARGIN(struct QUEUE_ENTRY *entry))
     || PARROT_ASSERT_ARG(entry)
 #define ASSERT_ARGS_Parrot_sleep_on_event __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_Parrot_schedule_broadcast_qentry __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_schedule_broadcast_qentry \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(entry)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/events.c */

@@ -263,7 +263,8 @@ STRING* set_retval_s(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
 #define ASSERT_ARGS_Parrot_fetch_arg_nci __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(st)
-#define ASSERT_ARGS_Parrot_init_arg_indexes_and_sig_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_init_arg_indexes_and_sig_pmc \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(ctx) \
     || PARROT_ASSERT_ARG(sti)
 #define ASSERT_ARGS_Parrot_init_arg_nci __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -286,11 +287,13 @@ STRING* set_retval_s(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(src_ctx) \
     || PARROT_ASSERT_ARG(dest_ctx)
-#define ASSERT_ARGS_Parrot_pcc_invoke_sub_from_c_args __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_pcc_invoke_sub_from_c_args \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(sub_obj) \
     || PARROT_ASSERT_ARG(sig)
-#define ASSERT_ARGS_Parrot_pcc_invoke_sub_from_sig_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_pcc_invoke_sub_from_sig_object \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(sub_obj) \
     || PARROT_ASSERT_ARG(sig_obj)

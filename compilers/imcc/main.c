@@ -112,7 +112,8 @@ static void usage(ARGMOD(FILE *fp))
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_help_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
-#define ASSERT_ARGS_imcc_get_optimization_description __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_imcc_get_optimization_description \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(opt_desc)
 #define ASSERT_ARGS_imcc_run_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \

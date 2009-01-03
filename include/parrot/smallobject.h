@@ -208,7 +208,8 @@ void Parrot_small_object_pool_merge(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_is_const_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc)
-#define ASSERT_ARGS_Parrot_small_object_pool_merge __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_small_object_pool_merge \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(dest) \
     || PARROT_ASSERT_ARG(source)

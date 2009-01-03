@@ -35,7 +35,8 @@ void init_world_once(PARROT_INTERP)
 void parrot_global_setup_2(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_Parrot_set_config_hash_internal __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_set_config_hash_internal \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(parrot_config)
 #define ASSERT_ARGS_init_world __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)

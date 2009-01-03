@@ -192,15 +192,18 @@ void Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub))
 #define ASSERT_ARGS_Parrot_get_namespace_keyed __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(base_ns)
-#define ASSERT_ARGS_Parrot_get_namespace_keyed_str __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_get_namespace_keyed_str \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(base_ns)
-#define ASSERT_ARGS_Parrot_make_namespace_autobase __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_make_namespace_autobase \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_make_namespace_keyed __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(base_ns)
-#define ASSERT_ARGS_Parrot_make_namespace_keyed_str __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_make_namespace_keyed_str \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(base_ns)
 #define ASSERT_ARGS_Parrot_ns_get_name __attribute__unused__ int _ASSERT_ARGS_CHECK = \

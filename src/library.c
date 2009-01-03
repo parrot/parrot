@@ -108,7 +108,8 @@ static STRING* try_load_path(PARROT_INTERP, ARGMOD(STRING* path))
 #define ASSERT_ARGS_path_finalize __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(path)
-#define ASSERT_ARGS_path_guarantee_trailing_separator __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_path_guarantee_trailing_separator \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(path)
 #define ASSERT_ARGS_try_bytecode_extensions __attribute__unused__ int _ASSERT_ARGS_CHECK = \

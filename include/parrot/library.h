@@ -101,7 +101,8 @@ STRING * parrot_split_path_ext(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_locate_runtime_file __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(file_name)
-#define ASSERT_ARGS_Parrot_locate_runtime_file_str __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_locate_runtime_file_str \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(file)
 #define ASSERT_ARGS_parrot_init_library_paths __attribute__unused__ int _ASSERT_ARGS_CHECK = \

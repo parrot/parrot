@@ -284,7 +284,7 @@ _PARROT_ASSERT_ARG(const void *x, const char *name,
         const char *file, unsigned int line) /* HEADERIZER SKIP */
 {
 #ifndef NDEBUG
-    if(!x) Parrot_confess(name, file, line);
+    if (!x) Parrot_confess(name, file, line);
 #endif
     PARROT_ASSERT(x);
     return 0;

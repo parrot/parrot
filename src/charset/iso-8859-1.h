@@ -29,10 +29,12 @@ PARROT_CANNOT_RETURN_NULL
 const CHARSET * Parrot_charset_iso_8859_1_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_charset_cvt_iso_8859_1_to_ascii __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_charset_cvt_iso_8859_1_to_ascii \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(src)
-#define ASSERT_ARGS_Parrot_charset_iso_8859_1_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_charset_iso_8859_1_init \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/charset/iso-8859-1.c */

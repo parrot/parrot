@@ -730,12 +730,14 @@ void runops(PARROT_INTERP, size_t offs)
     || PARROT_ASSERT_ARG(sub) \
     || PARROT_ASSERT_ARG(meth) \
     || PARROT_ASSERT_ARG(sig)
-#define ASSERT_ARGS_Parrot_run_meth_fromc_arglist_retf __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_run_meth_fromc_arglist_retf \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(sub) \
     || PARROT_ASSERT_ARG(meth) \
     || PARROT_ASSERT_ARG(sig)
-#define ASSERT_ARGS_Parrot_run_meth_fromc_arglist_reti __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_run_meth_fromc_arglist_reti \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(sub) \
     || PARROT_ASSERT_ARG(meth) \
@@ -745,12 +747,14 @@ void runops(PARROT_INTERP, size_t offs)
     || PARROT_ASSERT_ARG(sub) \
     || PARROT_ASSERT_ARG(meth) \
     || PARROT_ASSERT_ARG(sig)
-#define ASSERT_ARGS_Parrot_run_meth_fromc_args_retf __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_run_meth_fromc_args_retf \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(sub) \
     || PARROT_ASSERT_ARG(meth) \
     || PARROT_ASSERT_ARG(sig)
-#define ASSERT_ARGS_Parrot_run_meth_fromc_args_reti __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_run_meth_fromc_args_reti \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(sub) \
     || PARROT_ASSERT_ARG(meth) \
@@ -762,11 +766,13 @@ void runops(PARROT_INTERP, size_t offs)
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(sub) \
     || PARROT_ASSERT_ARG(sig)
-#define ASSERT_ARGS_Parrot_runops_fromc_arglist_retf __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_runops_fromc_arglist_retf \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(sub) \
     || PARROT_ASSERT_ARG(sig)
-#define ASSERT_ARGS_Parrot_runops_fromc_arglist_reti __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_runops_fromc_arglist_reti \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(sub) \
     || PARROT_ASSERT_ARG(sig)
@@ -774,7 +780,8 @@ void runops(PARROT_INTERP, size_t offs)
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(sub) \
     || PARROT_ASSERT_ARG(sig)
-#define ASSERT_ARGS_Parrot_runops_fromc_args_event __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_runops_fromc_args_event \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(sub) \
     || PARROT_ASSERT_ARG(sig)
@@ -788,7 +795,8 @@ void runops(PARROT_INTERP, size_t offs)
     || PARROT_ASSERT_ARG(sig)
 #define ASSERT_ARGS_destroy_runloop_jump_points __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_really_destroy_runloop_jump_points __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_really_destroy_runloop_jump_points \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_runops __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

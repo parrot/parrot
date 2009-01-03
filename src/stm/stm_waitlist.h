@@ -91,12 +91,14 @@ void Parrot_STM_waitlist_wait(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_STM_waitlist_add_self __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(waitlist)
-#define ASSERT_ARGS_Parrot_STM_waitlist_destroy_thread __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_STM_waitlist_destroy_thread \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_STM_waitlist_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(waitlist)
-#define ASSERT_ARGS_Parrot_STM_waitlist_remove_all __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_STM_waitlist_remove_all \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_STM_waitlist_signal __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \

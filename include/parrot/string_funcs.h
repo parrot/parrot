@@ -623,7 +623,8 @@ STRING* uint_to_str(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_string_escape_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_string_escape_string_delimited __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_string_escape_string_delimited \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_string_from_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
@@ -663,7 +664,8 @@ STRING* uint_to_str(PARROT_INTERP,
 #define ASSERT_ARGS_string_pin __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(s)
-#define ASSERT_ARGS_string_primary_encoding_for_representation __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_string_primary_encoding_for_representation \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_string_printf __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \

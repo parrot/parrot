@@ -722,7 +722,8 @@ void mark_const_subs(PARROT_INTERP)
 #define ASSERT_ARGS_PackFile_new_dummy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(name)
-#define ASSERT_ARGS_PackFile_remove_segment_by_name __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_PackFile_remove_segment_by_name \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dir) \
     || PARROT_ASSERT_ARG(name)
 #define ASSERT_ARGS_PackFile_Segment_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = \

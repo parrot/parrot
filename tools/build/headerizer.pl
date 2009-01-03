@@ -381,11 +381,15 @@ sub make_function_decls {
         my @asserts = asserts_from_args( @args );
 
         my $assert = "#define ASSERT_ARGS_" . $func->{name};
-            $assert .= " __attribute__unused__ int _ASSERT_ARGS_CHECK = ";
+        if(length($func->{name}) > 29) {
+            $assert .= " \\\n    ";
+        }
+        $assert .= " __attribute__unused__ int _ASSERT_ARGS_CHECK = ";
         if(@asserts) {
             $assert .= "\\\n       ";
             $assert .= join(" \\\n    || ", @asserts);
-        } else {
+        }
+        else {
             $assert .= "0";
         }
         push(@decls, $assert);

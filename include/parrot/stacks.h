@@ -176,7 +176,8 @@ Stack_entry_type get_entry_type(ARGIN(const Stack_Entry_t *entry))
 #define ASSERT_ARGS_new_stack __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(name)
-#define ASSERT_ARGS_Parrot_dump_dynamic_environment __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_dump_dynamic_environment \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(dynamic_env)
 #define ASSERT_ARGS_Parrot_pop_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = \
