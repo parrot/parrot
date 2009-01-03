@@ -203,6 +203,8 @@ add_num_const(bytecode * const bc, double f) {
     return index;
 }
 
+
+
 /*
 
 =item C<int

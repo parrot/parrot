@@ -1325,7 +1325,7 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
     /* type must be a Sub, and value must be a string, holding the name of a sub */
     if (is_a_sub && value->type == STRING_VAL) {
         /* create a symbol representing the constant */
-        symbol *constsym = new_symbol(lexer, name, PMC_TYPE);
+        symbol *constsym  = new_symbol(lexer, name, PMC_TYPE);
         /* create a target from the symbol */
         target *consttarg = target_from_symbol(lexer, constsym);
 
@@ -1336,18 +1336,37 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
         value->type     = PMC_VAL; /* set type of constant node */
         value->val.pval = value->val.sval;
 
+        /* generate set_p_pc instruction, which takes the just-generated
+         * consttarg variable as first operand, and the constant "value"
+         * as second; its type is PMC_VAL, which is processed further in
+         * piremit::emit_pbc_const_arg(), case PMC_VAL.
+         */
         new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc", 0);
         push_operand(lexer, expr_from_target(lexer, consttarg));
         push_operand(lexer, expr_from_const(lexer, value));
     }
-    /*
-    else if (value->type == INT_VAL) {
 
+    else if (value->type == INT_VAL) {
 
         STRING *intclassname = string_from_cstring(lexer->interp, "Integer", 7);
         INTVAL  is_an_int    = VTABLE_isa(lexer->interp, constclass, intclassname);
 
         if (is_an_int) {
+            symbol *constsym  = new_symbol(lexer, name, PMC_TYPE);
+            target *consttarg = target_from_symbol(lexer, constsym);
+
+            PMC *intconst = pmc_new(lexer->interp,
+                                    Parrot_get_ctx_HLL_type(lexer->interp, enum_class_Integer));
+            int index     = add_pmc_const(lexer->bc, intconst);
+            VTABLE_set_integer_native(lexer->interp, intconst, value->val.ival);
+
+            declare_local(lexer, PMC_TYPE, constsym);
+
+            value->name = name;
+
+            new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc", 0);
+            push_operand(lexer, expr_from_target(lexer, consttarg));
+            push_operand(lexer, expr_from_int(lexer, index));
 
         }
         else {
@@ -1362,9 +1381,9 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
     else if (value->type == STRING_VAL) {
 
     }
-    */
 
 
+    fprintf(stderr, "done with new pmc const()\n");
     return value;
 }
 
