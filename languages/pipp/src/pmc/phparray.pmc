@@ -1504,8 +1504,6 @@ PHPArray, just make a clone.
 */
     VTABLE void assign_pmc(PMC *src) {
 
-        PMC           *value_copy;
-        STRING        *key_copy;
         PippHashTable *my_ht;
 
         GET_ATTR_hash_table(INTERP, SELF, my_ht);
@@ -1521,24 +1519,23 @@ PHPArray, just make a clone.
             pipp_hash_resize(INTERP, my_ht, src_ht->elementCount);
 
             for (bkt = src_ht->tableHead; bkt != NULL; bkt = bkt->tableNext) {
-                key_copy   = string_copy(INTERP,  bkt->key);
-                value_copy = VTABLE_clone(INTERP, bkt->value);
+                STRING *key_copy   = string_copy(INTERP,  bkt->key);
+                PMC    *value_copy = VTABLE_clone(INTERP, bkt->value);
                 pipp_hash_put(INTERP, my_ht, key_copy, value_copy);
             }
         }
         else if (VTABLE_does(INTERP, src, CONST_STRING(INTERP, "array")) ||
                  VTABLE_does(INTERP, src, CONST_STRING(INTERP, "hash"))) {
 
-            PMC *key;
-
             PMC *iter = VTABLE_get_iter(INTERP, src);
+
             pipp_hash_empty(INTERP, my_ht);
             pipp_hash_resize(INTERP, my_ht, VTABLE_elements(INTERP, src));
 
             while (VTABLE_get_bool(INTERP, iter)) {
-                key        = VTABLE_shift_pmc(INTERP, iter);
-                value_copy = VTABLE_get_pmc_keyed(INTERP, src, key);
-                key_copy   = VTABLE_get_string(INTERP, key);
+                PMC    *key        = VTABLE_shift_pmc(INTERP, iter);
+                PMC    *value_copy = VTABLE_get_pmc_keyed(INTERP, src, key);
+                STRING *key_copy   = VTABLE_get_string(INTERP, key);
 
                 pipp_hash_put(INTERP, my_ht, key_copy, value_copy);
             }
