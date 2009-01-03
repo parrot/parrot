@@ -1256,7 +1256,7 @@ create_const(lexer_state * const lexer, value_type type, char const * const name
         case NUM_VAL:
             c->val.nval = va_arg(arg_ptr, double);
             break;
-        case PMC_VAL:
+        case PMC_VAL:  /* value of a PMC_VAL constant is also a string */
         case STRING_VAL:
             c->val.sval = va_arg(arg_ptr, char *);
             break;
@@ -1312,11 +1312,8 @@ constant *
 new_pmc_const(lexer_state * const lexer, char const * const type,
               char const * const name, constant * const value)
 {
-    /*
-    fprintf(stderr, "new pmc (%s) const (%s) with value %s\n", type, name, value->val.sval);
-    */
-
-    if (STREQ(type, "Sub")) {
+    /* type must be 'sub', and value must be a string, holding the name of a sub */
+    if (STREQ(type, "Sub") && value->type == STRING_VAL) {
         /* create a symbol representing the constant */
         symbol *constsym = new_symbol(lexer, name, PMC_TYPE);
         /* create a target from the symbol */
@@ -1325,16 +1322,13 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
         /* declare it as a local, so that it will get a register assigned. */
         declare_local(lexer, PMC_TYPE, constsym);
 
-        value->name  = name;
-        value->type  = PMC_VAL;
+        value->name     = name;    /* set name of constant node */
+        value->type     = PMC_VAL; /* set type of constant node */
+        value->val.pval = value->val.sval;
 
         new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc", 0);
         push_operand(lexer, expr_from_target(lexer, consttarg));
-        push_operand(lexer, expr_from_int(lexer, 99)); /* must be index in const table of
-                                                           the sub stored in <value>
-                                                           must be patched back later.
-                                                           How to do this?
-                                                           */
+        push_operand(lexer, expr_from_const(lexer, value));
     }
 
 

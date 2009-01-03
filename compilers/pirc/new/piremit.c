@@ -479,16 +479,16 @@ emit_pbc_const_arg(lexer_state * const lexer, constant * const c) {
             break;
         }
         case PMC_VAL: {
-            /*
+            if (c->name) { /* XXX this check necessary? */
+                /* look up the sub by its name stored in c->val.pval, then
+                 * find out what that sub's PMC_CONST is in the constant table,
+                 * and emit that.
+                 */
 
-            int index = add_pmc_const(lexer->bc, c->val.pval);
-
-            XXX create a new PMC here using the name in c->val.pval?
-
-            emit_int_arg(lexer->bc, index);
-
-            */
-            fprintf(stderr, "emit_pbc_const_arg: pmc type\n");
+                global_label *sub = find_global_label(lexer, c->val.pval);
+                int sub_pmc_index = sub->const_table_index;
+                emit_int_arg(lexer->bc, sub_pmc_index);
+            }
             break;
         }
         case USTRING_VAL: {

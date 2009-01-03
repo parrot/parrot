@@ -308,7 +308,6 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
        <ival> TK_NREG       "number register"
        <ival> TK_SREG       "string register"
        <ival> TK_IREG       "integer register"
-       <cval> TK_CONST_VALUE "constant-value"
 
 %token TK_ARROW             "=>"
        TK_NE                "!="
@@ -2028,10 +2027,9 @@ expression  : target         { $$ = expr_from_target(lexer, $1); }
             ;
 
 
-constant    : TK_STRINGC     { $$ = new_const(lexer, STRING_VAL, $1); }
-            | TK_INTC        { $$ = new_const(lexer, INT_VAL, $1); }
+constant    : TK_INTC        { $$ = new_const(lexer, INT_VAL, $1); }
             | TK_NUMC        { $$ = new_const(lexer, NUM_VAL, $1); }
-            | TK_USTRINGC    { $$ = new_const(lexer, USTRING_VAL, $1); }
+            | stringconst
             ;
 
 stringconst : TK_STRINGC     { $$ = new_const(lexer, STRING_VAL, $1); }
