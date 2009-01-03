@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 1;
+use Test::More tests => 2;
 use Parrot::Distribution;
 
 =head1 NAME
@@ -37,6 +37,7 @@ sub check_asserts {
     my @files = @_;
     my @defines;
     my %usages;
+    my @offsets;
 
     # first, find the definitions and the usages
     diag("finding definitions");
@@ -48,7 +49,12 @@ sub check_asserts {
                 push(@defines, $1);
             }
             if($line =~ /^\s+ASSERT_ARGS\(([_a-zA-Z0-9]+)\);/) {
-                $usages{$1} = 1;
+                my $func = $1;
+                $usages{$func} = 1;
+                my $fulltext = join('',@lines);
+                if($fulltext !~ /\n\{\s*ASSERT_ARGS\($func\);/s) {
+                    push(@offsets, $func);
+                }
             }
         }
     }
@@ -62,6 +68,14 @@ sub check_asserts {
             diag($missing);
         }
         diag(scalar(@missing) . " unused assert macros found in total.");
+    }
+    ok(!scalar @offsets);
+    if(scalar @offsets) {
+        diag("The following macros exist but aren't at the top of their function:");
+        foreach my $offset (sort @offsets) {
+            diag($offset);
+        }
+        diag(scalar(@offsets) . " offset macros found in total.");
     }
 }
 
