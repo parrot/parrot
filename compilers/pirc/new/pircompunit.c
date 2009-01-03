@@ -1300,10 +1300,8 @@ new_named_const(lexer_state * const lexer, value_type type, char const * const n
 new_pmc_const(char const * const type, char const * const name, constant * const value)>
 
 Create a new PMC constant of type C<type>, name C<name> and having a value C<value>.
-The type must be a string indicating a valid type name (e.g. "Sub"). The name will be the name
+The type must be a string indicating a valid type name (e.g. "Sub"). C<name> is the name
 of the constant, and the value of the constant is passed as C<value>.
-
-XXX if type is "Sub", value must be looked up, as it is the name of a subroutine.
 
 =cut
 
@@ -1312,8 +1310,20 @@ constant *
 new_pmc_const(lexer_state * const lexer, char const * const type,
               char const * const name, constant * const value)
 {
-    /* type must be 'sub', and value must be a string, holding the name of a sub */
-    if (STREQ(type, "Sub") && value->type == STRING_VAL) {
+    /* get a STRING representation of the c-string type */
+    STRING *classname    = string_from_cstring(lexer->interp, type, strlen(type));
+    /* get a STRING holding the c-string "Sub" */
+    STRING *subclassname = string_from_cstring(lexer->interp, "Sub", 3);
+    /* get a PMC for the class passed in type */
+    PMC    *constclass   = Parrot_oo_get_class_str(lexer->interp, classname);
+    /* check whether that PMC isa "Sub" */
+    INTVAL is_a_sub      = VTABLE_isa(lexer->interp, constclass, subclassname);
+
+    /* fprintf(stderr, "new_pmc_const: is a sub=%d\n", is_a_sub);
+    */
+
+    /* type must be a Sub, and value must be a string, holding the name of a sub */
+    if (is_a_sub && value->type == STRING_VAL) {
         /* create a symbol representing the constant */
         symbol *constsym = new_symbol(lexer, name, PMC_TYPE);
         /* create a target from the symbol */
@@ -1330,6 +1340,29 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
         push_operand(lexer, expr_from_target(lexer, consttarg));
         push_operand(lexer, expr_from_const(lexer, value));
     }
+    /*
+    else if (value->type == INT_VAL) {
+
+
+        STRING *intclassname = string_from_cstring(lexer->interp, "Integer", 7);
+        INTVAL  is_an_int    = VTABLE_isa(lexer->interp, constclass, intclassname);
+
+        if (is_an_int) {
+
+        }
+        else {
+            yypirerror(lexer->yyscanner, lexer,
+                       "cannot assign integer value to constant of type %s", type);
+        }
+
+    }
+    else if (value->type == NUM_VAL) {
+
+    }
+    else if (value->type == STRING_VAL) {
+
+    }
+    */
 
 
     return value;

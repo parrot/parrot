@@ -486,8 +486,15 @@ emit_pbc_const_arg(lexer_state * const lexer, constant * const c) {
                  */
 
                 global_label *sub = find_global_label(lexer, c->val.pval);
-                int sub_pmc_index = sub->const_table_index;
-                emit_int_arg(lexer->bc, sub_pmc_index);
+
+                if (sub != NULL) {
+                    int sub_pmc_index = sub->const_table_index;
+                    emit_int_arg(lexer->bc, sub_pmc_index);
+                }
+                else {
+                    yypirerror(lexer->yyscanner, lexer,
+                               "cannot find referenced sub '%s'", c->val.pval);
+                }
             }
             break;
         }
