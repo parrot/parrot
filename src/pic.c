@@ -194,41 +194,49 @@ static int pass_str(PARROT_INTERP,
         __attribute__nonnull__(6)
         FUNC_MODIFIES(*dest_base);
 
-#define ASSERT_ARGS_is_pic_func assert(interp); \
-                                assert(pc); \
-                                assert(mic);
-#define ASSERT_ARGS_is_pic_param assert(interp); \
-                                 assert(pc); \
-                                 assert(mic);
-#define ASSERT_ARGS_parrot_pic_move assert(interp); \
-                                    assert(mic);
-#define ASSERT_ARGS_pass_int assert(sig); \
-                             assert(src_base); \
-                             assert(src); \
-                             assert(dest_base); \
-                             assert(dest);
-#define ASSERT_ARGS_pass_mixed assert(interp); \
-                               assert(sig); \
-                               assert(src_base); \
-                               assert(src); \
-                               assert(dest_base); \
-                               assert(dest);
-#define ASSERT_ARGS_pass_num assert(sig); \
-                             assert(src_base); \
-                             assert(src); \
-                             assert(dest_base); \
-                             assert(dest);
-#define ASSERT_ARGS_pass_pmc assert(sig); \
-                             assert(src_base); \
-                             assert(src); \
-                             assert(dest_base); \
-                             assert(dest);
-#define ASSERT_ARGS_pass_str assert(interp); \
-                             assert(sig); \
-                             assert(src_base); \
-                             assert(src); \
-                             assert(dest_base); \
-                             assert(dest);
+#define ASSERT_ARGS_is_pic_func __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pc) \
+    || PARROT_ASSERT_ARG(mic)
+#define ASSERT_ARGS_is_pic_param __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pc) \
+    || PARROT_ASSERT_ARG(mic)
+#define ASSERT_ARGS_parrot_pic_move __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(mic)
+#define ASSERT_ARGS_pass_int __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(sig) \
+    || PARROT_ASSERT_ARG(src_base) \
+    || PARROT_ASSERT_ARG(src) \
+    || PARROT_ASSERT_ARG(dest_base) \
+    || PARROT_ASSERT_ARG(dest)
+#define ASSERT_ARGS_pass_mixed __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sig) \
+    || PARROT_ASSERT_ARG(src_base) \
+    || PARROT_ASSERT_ARG(src) \
+    || PARROT_ASSERT_ARG(dest_base) \
+    || PARROT_ASSERT_ARG(dest)
+#define ASSERT_ARGS_pass_num __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(sig) \
+    || PARROT_ASSERT_ARG(src_base) \
+    || PARROT_ASSERT_ARG(src) \
+    || PARROT_ASSERT_ARG(dest_base) \
+    || PARROT_ASSERT_ARG(dest)
+#define ASSERT_ARGS_pass_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(sig) \
+    || PARROT_ASSERT_ARG(src_base) \
+    || PARROT_ASSERT_ARG(src) \
+    || PARROT_ASSERT_ARG(dest_base) \
+    || PARROT_ASSERT_ARG(dest)
+#define ASSERT_ARGS_pass_str __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sig) \
+    || PARROT_ASSERT_ARG(src_base) \
+    || PARROT_ASSERT_ARG(src) \
+    || PARROT_ASSERT_ARG(dest_base) \
+    || PARROT_ASSERT_ARG(dest)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -249,6 +257,7 @@ of usable memory, PICs from the rear.
 void
 parrot_PIC_alloc_store(ARGOUT(PackFile_ByteCode *cs), size_t n)
 {
+    ASSERT_ARGS(parrot_PIC_alloc_store);
     Parrot_PIC_store *store;
     size_t size;
 
@@ -286,6 +295,7 @@ Free memory for the PIC storage.
 void
 parrot_PIC_destroy(ARGMOD(PackFile_ByteCode *cs))
 {
+    ASSERT_ARGS(parrot_PIC_destroy);
     Parrot_PIC_store *store = cs->pic_store;
 
     while (store) {
@@ -311,6 +321,7 @@ PARROT_CONST_FUNCTION
 int
 parrot_PIC_op_is_cached(int op_code)
 {
+    ASSERT_ARGS(parrot_PIC_op_is_cached);
     switch (op_code) {
         case PARROT_OP_get_params_pc:
         case PARROT_OP_set_returns_pc:
@@ -337,6 +348,7 @@ PARROT_CANNOT_RETURN_NULL
 Parrot_MIC*
 parrot_PIC_alloc_mic(const PARROT_INTERP, size_t n)
 {
+    ASSERT_ARGS(parrot_PIC_alloc_mic);
     Parrot_PIC_store * const store = interp->code->pic_store;
     PARROT_ASSERT(n < store->n_mics);
     return store->mic + n;
@@ -358,6 +370,7 @@ PARROT_CANNOT_RETURN_NULL
 Parrot_PIC*
 parrot_PIC_alloc_pic(PARROT_INTERP)
 {
+    ASSERT_ARGS(parrot_PIC_alloc_pic);
     Parrot_PIC_store *store = interp->code->pic_store;
     Parrot_PIC_store *new_store;
 
@@ -402,6 +415,7 @@ PARROT_CAN_RETURN_NULL
 void *
 parrot_pic_opcode(PARROT_INTERP, INTVAL op)
 {
+    ASSERT_ARGS(parrot_pic_opcode);
 #ifdef HAVE_COMPUTED_GOTO
     op_lib_t *cg_lib;
 #endif
@@ -431,6 +445,7 @@ static int
 pass_int(SHIM_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
         ARGIN(const void **src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
+    ASSERT_ARGS(pass_int);
     int i;
     int n = SIG_ELEMS(sig);
 
@@ -455,6 +470,7 @@ static int
 pass_num(SHIM_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
         ARGIN(const void **src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
+    ASSERT_ARGS(pass_num);
     int i;
     int n = SIG_ELEMS(sig);
 
@@ -479,6 +495,7 @@ static int
 pass_str(PARROT_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
         ARGIN(const void **src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
+    ASSERT_ARGS(pass_str);
     int i;
     int n = SIG_ELEMS(sig);
 
@@ -504,8 +521,9 @@ static int
 pass_pmc(SHIM_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
         ARGIN(const void **src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
-    int n = SIG_ELEMS(sig);
+    ASSERT_ARGS(pass_pmc);
     int i;
+    int n = SIG_ELEMS(sig);
 
     for (i = 2; n; ++i, --n) {
         PMC * const arg = *(PMC* const *)(src_base + ((const opcode_t*)src)[i]);
@@ -528,9 +546,10 @@ static int
 pass_mixed(PARROT_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
         ARGIN(void * const *src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
-    int n = SIG_ELEMS(sig);
+    ASSERT_ARGS(pass_mixed);
     int i;
     INTVAL *bitp;
+    int n = SIG_ELEMS(sig);
 
     ASSERT_SIG_PMC(sig);
     bitp = SIG_ARRAY(sig);
@@ -614,6 +633,7 @@ int
 parrot_pic_check_sig(ARGIN(const PMC *sig1), ARGIN(const PMC *sig2),
         ARGOUT(int *type))
 {
+    ASSERT_ARGS(parrot_pic_check_sig);
     int i, n, t0;
 
     ASSERT_SIG_PMC(sig1);
@@ -680,6 +700,7 @@ RT #48260: Not yet documented!!!
 static int
 is_pic_param(PARROT_INTERP, ARGIN(void **pc), ARGOUT(Parrot_MIC *mic), opcode_t op)
 {
+    ASSERT_ARGS(is_pic_param);
     PMC                           *sig2;
     Parrot_Context                *caller_ctx;
     opcode_t                      *args;
@@ -763,6 +784,7 @@ RT #48260: Not yet documented!!!
 static int
 is_pic_func(PARROT_INTERP, ARGIN(void **pc), ARGOUT(Parrot_MIC *mic), int core_type)
 {
+    ASSERT_ARGS(is_pic_func);
     /*
      * if we have these opcodes
      *
@@ -839,6 +861,7 @@ this opcode function is available. Called from C<do_prederef>.
 void
 parrot_PIC_prederef(PARROT_INTERP, opcode_t op, ARGOUT(void **pc_pred), int core)
 {
+    ASSERT_ARGS(parrot_PIC_prederef);
     op_func_t * const prederef_op_func = interp->op_lib->op_func_table;
     opcode_t  * const cur_opcode       = (opcode_t *)pc_pred;
     Parrot_MIC       *mic              = NULL;
@@ -900,6 +923,7 @@ RT #48260: Not yet documented!!!
 static void
 parrot_pic_move(PARROT_INTERP, ARGMOD(Parrot_MIC *mic))
 {
+    ASSERT_ARGS(parrot_pic_move);
     /* MIC slot is empty - use it */
     if (!mic->lru.u.type)
         return;
@@ -936,6 +960,7 @@ void
 parrot_pic_find_infix_v_pp(PARROT_INTERP, ARGIN(PMC *left), ARGIN(PMC *right),
                 ARGOUT(Parrot_MIC *mic), ARGOUT(opcode_t *cur_opcode))
 {
+    ASSERT_ARGS(parrot_pic_find_infix_v_pp);
     /* unused; deprecated */
 }
 

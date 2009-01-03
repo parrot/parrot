@@ -34,8 +34,8 @@ PARROT_CAN_RETURN_NULL
 QUEUE_ENTRY *
 pop_entry(ARGMOD(QUEUE *queue))
 {
-    QUEUE_ENTRY *returnval;
     ASSERT_ARGS(pop_entry);
+    QUEUE_ENTRY *returnval;
     queue_lock(queue);
     returnval = nosync_pop_entry(queue);
     queue_unlock(queue);
@@ -79,8 +79,8 @@ PARROT_CANNOT_RETURN_NULL
 QUEUE_ENTRY *
 nosync_pop_entry(ARGMOD(QUEUE *queue))
 {
-    QUEUE_ENTRY *returnval;
     ASSERT_ARGS(nosync_pop_entry);
+    QUEUE_ENTRY *returnval;
     if (!queue->head) {
         return NULL;
     }
@@ -111,8 +111,8 @@ PARROT_CAN_RETURN_NULL
 QUEUE_ENTRY *
 wait_for_entry(ARGMOD(QUEUE *queue))
 {
-    QUEUE_ENTRY *returnval;
     ASSERT_ARGS(wait_for_entry);
+    QUEUE_ENTRY *returnval;
 
     queue_lock(queue);
     while (queue->head == NULL) {
@@ -165,8 +165,8 @@ Does a synchronized insertion of C<entry> into the head of the queue.
 void
 unshift_entry(ARGMOD(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
 {
-    QUEUE_ENTRY *cur;
     ASSERT_ARGS(unshift_entry);
+    QUEUE_ENTRY *cur;
 
     queue_lock(queue);
     cur = queue->head;
@@ -197,11 +197,11 @@ queue mutex.
 void
 nosync_insert_entry(ARGMOD(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
 {
+    ASSERT_ARGS(nosync_insert_entry);
     QUEUE_ENTRY *cur = queue->head;
     QUEUE_ENTRY *prev;
     parrot_event *event;
     FLOATVAL abs_time;
-    ASSERT_ARGS(nosync_insert_entry);
 
     PARROT_ASSERT(entry->type == QUEUE_ENTRY_TYPE_TIMED_EVENT);
     /*
@@ -373,8 +373,8 @@ PARROT_MALLOC
 QUEUE*
 queue_init(UINTVAL prio)
 {
-    QUEUE * const queue = mem_allocate_typed(QUEUE);
     ASSERT_ARGS(queue_init);
+    QUEUE * const queue = mem_allocate_typed(QUEUE);
 
     queue->head = queue->tail = NULL;
     queue->max_prio = prio;

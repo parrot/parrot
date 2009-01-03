@@ -81,19 +81,29 @@ static opcode_t fetch_op_mixed_le(ARGIN(const unsigned char *b))
 static opcode_t fetch_op_test(ARGIN(const unsigned char *b))
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_cvt_num12_num8 assert(dest); \
-                                   assert(src);
-#define ASSERT_ARGS_cvt_num12_num8_be assert(dest); \
-                                      assert(src);
-#define ASSERT_ARGS_cvt_num12_num8_le assert(dest); \
-                                      assert(src);
-#define ASSERT_ARGS_fetch_op_be_4 assert(b);
-#define ASSERT_ARGS_fetch_op_be_8 assert(b);
-#define ASSERT_ARGS_fetch_op_le_4 assert(b);
-#define ASSERT_ARGS_fetch_op_le_8 assert(b);
-#define ASSERT_ARGS_fetch_op_mixed_be assert(b);
-#define ASSERT_ARGS_fetch_op_mixed_le assert(b);
-#define ASSERT_ARGS_fetch_op_test assert(b);
+#define ASSERT_ARGS_cvt_num12_num8 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(dest) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_cvt_num12_num8_be __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(dest) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_cvt_num12_num8_le __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(dest) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_fetch_op_be_4 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_fetch_op_be_8 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_fetch_op_le_4 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_fetch_op_le_8 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_fetch_op_mixed_be __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_fetch_op_mixed_le __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_fetch_op_test __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(b)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -129,6 +139,7 @@ Converts i386 LE 12-byte long double to IEEE 754 8 byte double
 static void
 cvt_num12_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
+    ASSERT_ARGS(cvt_num12_num8);
     int expo, i, s;
 #ifdef __LCC__
     int expo2;
@@ -188,6 +199,7 @@ converting to BE not yet implemented (throws internal_exception).
 static void
 cvt_num12_num8_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
+    ASSERT_ARGS(cvt_num12_num8_be);
     cvt_num12_num8(dest, src);
     /* TODO endianize */
     exit_fatal(1, "TODO cvt_num12_num8_be\n");
@@ -207,6 +219,7 @@ Converts a 12-byte i386 long double into a little-endian IEEE 754
 static void
 cvt_num12_num8_le(ARGOUT(unsigned char *dest), ARGIN(unsigned char *src))
 {
+    ASSERT_ARGS(cvt_num12_num8_le);
     unsigned char b[8];
     cvt_num12_num8(b, src);
     fetch_buf_le_8(dest, b);
@@ -225,6 +238,7 @@ Fetches an C<opcode_t> operation in little-endian format.
 static opcode_t
 fetch_op_test(ARGIN(const unsigned char *b))
 {
+    ASSERT_ARGS(fetch_op_test);
     union {
         unsigned char buf[4];
         opcode_t o;
@@ -250,6 +264,7 @@ Fetch an opcode and convert to LE
 static opcode_t
 fetch_op_mixed_le(ARGIN(const unsigned char *b))
 {
+    ASSERT_ARGS(fetch_op_mixed_le);
 #if OPCODE_T_SIZE == 4
     union {
         unsigned char buf[8];
@@ -285,6 +300,7 @@ C<OPCODE_T_SIZE> macro, and proceeds accordingly.
 static opcode_t
 fetch_op_mixed_be(ARGIN(const unsigned char *b))
 {
+    ASSERT_ARGS(fetch_op_mixed_be);
 #if OPCODE_T_SIZE == 4
     union {
         unsigned char buf[8];
@@ -318,6 +334,7 @@ Fetches a 4-byte big-endian opcode.
 static opcode_t
 fetch_op_be_4(ARGIN(const unsigned char *b))
 {
+    ASSERT_ARGS(fetch_op_be_4);
     union {
         unsigned char buf[4];
         opcode_t o;
@@ -351,6 +368,7 @@ Fetches an 8-byte big-endian opcode.
 static opcode_t
 fetch_op_be_8(ARGIN(const unsigned char *b))
 {
+    ASSERT_ARGS(fetch_op_be_8);
     union {
         unsigned char buf[8];
         opcode_t o[2];
@@ -380,6 +398,7 @@ Fetches a 4-byte little-endian opcode
 static opcode_t
 fetch_op_le_4(ARGIN(const unsigned char *b))
 {
+    ASSERT_ARGS(fetch_op_le_4);
     union {
         unsigned char buf[4];
         opcode_t o;
@@ -413,6 +432,7 @@ Fetches an 8-byte little-endian opcode
 static opcode_t
 fetch_op_le_8(ARGIN(const unsigned char *b))
 {
+    ASSERT_ARGS(fetch_op_le_8);
     union {
         unsigned char buf[8];
         opcode_t o[2];
@@ -443,6 +463,7 @@ PARROT_WARN_UNUSED_RESULT
 opcode_t
 PF_fetch_opcode(ARGIN_NULLOK(const PackFile *pf), ARGMOD(const opcode_t **stream))
 {
+    ASSERT_ARGS(PF_fetch_opcode);
     opcode_t o;
     if (!pf || !pf->fetch_op)
         return *(*stream)++;
@@ -469,6 +490,7 @@ PARROT_CANNOT_RETURN_NULL
 opcode_t*
 PF_store_opcode(ARGOUT(opcode_t *cursor), opcode_t val)
 {
+    ASSERT_ARGS(PF_store_opcode);
     *cursor++ = val;
     return cursor;
 }
@@ -488,6 +510,7 @@ PARROT_CONST_FUNCTION
 size_t
 PF_size_opcode(void)
 {
+    ASSERT_ARGS(PF_size_opcode);
     return 1;
 }
 
@@ -508,6 +531,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 PF_fetch_integer(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
 {
+    ASSERT_ARGS(PF_fetch_integer);
     INTVAL i;
     if (!pf || pf->fetch_iv == NULL)
         return *(*stream)++;
@@ -536,6 +560,7 @@ PARROT_CANNOT_RETURN_NULL
 opcode_t*
 PF_store_integer(ARGOUT(opcode_t *cursor), INTVAL val)
 {
+    ASSERT_ARGS(PF_store_integer);
     *cursor++ = (opcode_t)val; /* XXX */
     return cursor;
 }
@@ -554,6 +579,7 @@ PARROT_CONST_FUNCTION
 size_t
 PF_size_integer(void)
 {
+    ASSERT_ARGS(PF_size_integer);
     return sizeof (INTVAL) / sizeof (opcode_t);
 }
 
@@ -572,6 +598,7 @@ PARROT_WARN_UNUSED_RESULT
 FLOATVAL
 PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
 {
+    ASSERT_ARGS(PF_fetch_number);
     /* When we have alignment all squared away we don't need
      * to use memcpy() for native byteorder.
      */
@@ -619,6 +646,7 @@ PARROT_CANNOT_RETURN_NULL
 opcode_t*
 PF_store_number(ARGOUT(opcode_t *cursor), ARGIN(const FLOATVAL *val))
 {
+    ASSERT_ARGS(PF_store_number);
     opcode_t padded_size  = (sizeof (FLOATVAL) + sizeof (opcode_t) - 1) /
         sizeof (opcode_t);
     mem_sys_memcopy(cursor, val, sizeof (FLOATVAL));
@@ -640,6 +668,7 @@ PARROT_CONST_FUNCTION
 size_t
 PF_size_number(void)
 {
+    ASSERT_ARGS(PF_size_number);
     return ROUND_UP(sizeof (FLOATVAL), sizeof (opcode_t));
 }
 
@@ -666,6 +695,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **cursor))
 {
+    ASSERT_ARGS(PF_fetch_string);
     UINTVAL flags;
     opcode_t charset_nr;
     size_t size;
@@ -723,6 +753,7 @@ PARROT_CANNOT_RETURN_NULL
 opcode_t*
 PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
 {
+    ASSERT_ARGS(PF_store_string);
     opcode_t padded_size = s->bufused;
     char *charcursor;
 
@@ -780,6 +811,7 @@ PARROT_PURE_FUNCTION
 size_t
 PF_size_string(ARGIN(const STRING *s))
 {
+    ASSERT_ARGS(PF_size_string);
     opcode_t padded_size = s->bufused;
 
     if (padded_size % sizeof (opcode_t)) {
@@ -805,6 +837,7 @@ PARROT_CANNOT_RETURN_NULL
 char *
 PF_fetch_cstring(ARGIN(PackFile *pf), ARGIN(const opcode_t **cursor))
 {
+    ASSERT_ARGS(PF_fetch_cstring);
     const size_t str_len = strlen((const char *)(*cursor)) + 1;
     char * const p = (char *)mem_sys_allocate(str_len);
 
@@ -831,6 +864,7 @@ PARROT_CANNOT_RETURN_NULL
 opcode_t*
 PF_store_cstring(ARGOUT(opcode_t *cursor), ARGIN(const char *s))
 {
+    ASSERT_ARGS(PF_store_cstring);
     strcpy((char *) cursor, s);
     return cursor + PF_size_cstring(s);
 }
@@ -849,6 +883,7 @@ PARROT_PURE_FUNCTION
 size_t
 PF_size_cstring(ARGIN(const char *s))
 {
+    ASSERT_ARGS(PF_size_cstring);
     size_t str_len;
 
     PARROT_ASSERT(s);
@@ -869,6 +904,7 @@ Assigns transform functions to the vtable.
 void
 PackFile_assign_transforms(ARGMOD(PackFile *pf))
 {
+    ASSERT_ARGS(PackFile_assign_transforms);
     const int need_endianize = pf->header->byteorder != PARROT_BIGENDIAN;
     const int need_wordsize  = pf->header->wordsize  != sizeof (opcode_t);
 

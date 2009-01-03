@@ -130,34 +130,51 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_compose assert(interp); \
-                            assert(src);
-#define ASSERT_ARGS_decompose assert(interp); \
-                              assert(src);
-#define ASSERT_ARGS_downcase assert(source_string);
-#define ASSERT_ARGS_downcase_first assert(source_string);
-#define ASSERT_ARGS_find_cclass assert(interp); \
-                                assert(source_string);
-#define ASSERT_ARGS_find_not_cclass assert(interp); \
-                                    assert(source_string);
-#define ASSERT_ARGS_is_cclass assert(interp); \
-                              assert(source_string);
-#define ASSERT_ARGS_set_graphemes assert(interp); \
-                                  assert(source_string); \
-                                  assert(insert_string);
-#define ASSERT_ARGS_string_from_codepoint assert(interp);
-#define ASSERT_ARGS_titlecase assert(source_string);
-#define ASSERT_ARGS_titlecase_first assert(source_string);
-#define ASSERT_ARGS_to_ascii assert(interp); \
-                             assert(src);
-#define ASSERT_ARGS_to_charset assert(interp); \
-                               assert(src);
-#define ASSERT_ARGS_to_unicode assert(interp); \
-                               assert(src);
-#define ASSERT_ARGS_upcase assert(source_string);
-#define ASSERT_ARGS_upcase_first assert(source_string);
-#define ASSERT_ARGS_validate assert(interp); \
-                             assert(src);
+#define ASSERT_ARGS_compose __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_decompose __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_downcase __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_downcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_find_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_find_not_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_is_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_set_graphemes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string) \
+    || PARROT_ASSERT_ARG(insert_string)
+#define ASSERT_ARGS_string_from_codepoint __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_titlecase __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_titlecase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_to_ascii __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_to_charset __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_to_unicode __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_upcase __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_upcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(src)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -241,11 +258,11 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 to_ascii(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
 {
+    ASSERT_ARGS(to_ascii);
     String_iter iter;
     UINTVAL offs;
     unsigned char *p;
     const UINTVAL len = src->strlen;
-    ASSERT_ARGS(to_ascii);
 
     if (dest) {
         Parrot_reallocate_string(interp, dest, len);
@@ -312,9 +329,9 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
 {
+    ASSERT_ARGS(to_charset);
     const charset_converter_t conversion_func =
         Parrot_find_charset_converter(interp, src->charset, Parrot_ascii_charset_ptr);
-    ASSERT_ARGS(to_charset);
 
     if (conversion_func) {
          return conversion_func(interp, src, dest);
@@ -377,8 +394,8 @@ Converts the STRING C<source_string> to all uppercase.
 static void
 upcase(SHIM_INTERP, ARGIN(STRING *source_string))
 {
-    const UINTVAL n = source_string->strlen;
     ASSERT_ARGS(upcase);
+    const UINTVAL n = source_string->strlen;
 
     if (n) {
         char * const buffer = source_string->strstart;
@@ -403,8 +420,8 @@ Converts the STRING C<source_string> to all lower-case.
 static void
 downcase(SHIM_INTERP, ARGIN(STRING *source_string))
 {
-    const UINTVAL n = source_string->strlen;
     ASSERT_ARGS(downcase);
+    const UINTVAL n = source_string->strlen;
 
     if (n) {
         char * const buffer = source_string->strstart;
@@ -431,8 +448,8 @@ are lower-case.
 static void
 titlecase(SHIM_INTERP, ARGIN(STRING *source_string))
 {
-    const UINTVAL n = source_string->strlen;
     ASSERT_ARGS(titlecase);
+    const UINTVAL n = source_string->strlen;
 
     if (n) {
         char * const buffer = source_string->strstart;
@@ -523,11 +540,11 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 ascii_compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
 {
+    ASSERT_ARGS(ascii_compare);
     const UINTVAL l_len = lhs->strlen;
     const UINTVAL r_len = rhs->strlen;
     const UINTVAL min_len = l_len > r_len ? r_len : l_len;
     String_iter iter;
-    ASSERT_ARGS(ascii_compare);
 
     if (lhs->encoding == Parrot_fixed_8_encoding_ptr &&
             rhs->encoding == Parrot_fixed_8_encoding_ptr) {
@@ -572,10 +589,10 @@ INTVAL
 mixed_cs_index(PARROT_INTERP, ARGIN(STRING *src), ARGIN(STRING *search),
     UINTVAL offs)
 {
+    ASSERT_ARGS(mixed_cs_index);
     String_iter src_iter, search_iter;
     UINTVAL len;
     INTVAL start;
-    ASSERT_ARGS(mixed_cs_index);
 
     ENCODING_ITER_INIT(interp, src, &src_iter);
     src_iter.set_position(interp, &src_iter, offs);
@@ -619,8 +636,8 @@ INTVAL
 ascii_cs_index(PARROT_INTERP, ARGIN(STRING *source_string),
         ARGIN(STRING *search_string), UINTVAL offset)
 {
-    INTVAL retval;
     ASSERT_ARGS(ascii_cs_index);
+    INTVAL retval;
     if (source_string->charset != search_string->charset) {
         return mixed_cs_index(interp, source_string, search_string, offset);
     }
@@ -647,8 +664,8 @@ INTVAL
 ascii_cs_rindex(PARROT_INTERP, ARGIN(STRING *source_string),
         ARGIN(STRING *search_string), UINTVAL offset)
 {
-    INTVAL retval;
     ASSERT_ARGS(ascii_cs_rindex);
+    INTVAL retval;
 
     if (source_string->charset != search_string->charset)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
@@ -675,9 +692,9 @@ PARROT_WARN_UNUSED_RESULT
 static UINTVAL
 validate(PARROT_INTERP, ARGIN(STRING *src))
 {
+    ASSERT_ARGS(validate);
     UINTVAL offset;
     String_iter iter;
-    ASSERT_ARGS(validate);
 
     ENCODING_ITER_INIT(interp, src, &iter);
     for (offset = 0; offset < string_length(interp, src); ++offset) {
@@ -704,9 +721,9 @@ PARROT_WARN_UNUSED_RESULT
 static STRING *
 string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 {
+    ASSERT_ARGS(string_from_codepoint);
     char real_codepoint = (char)codepoint;
     STRING * const return_string = string_make(interp, &real_codepoint, 1, "ascii", 0);
-    ASSERT_ARGS(string_from_codepoint);
     return return_string;
 }
 
@@ -724,8 +741,8 @@ PARROT_WARN_UNUSED_RESULT
 static INTVAL
 is_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *source_string), UINTVAL offset)
 {
-    UINTVAL codepoint;
     ASSERT_ARGS(is_cclass);
+    UINTVAL codepoint;
 
     if (offset >= source_string->strlen)
         return 0;
@@ -753,9 +770,9 @@ static INTVAL
 find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(STRING *source_string),
             UINTVAL offset, UINTVAL count)
 {
+    ASSERT_ARGS(find_cclass);
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
-    ASSERT_ARGS(find_cclass);
 
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
@@ -781,9 +798,9 @@ static INTVAL
 find_not_cclass(PARROT_INTERP, INTVAL flags, ARGIN(STRING *source_string),
                 UINTVAL offset, UINTVAL count)
 {
+    ASSERT_ARGS(find_not_cclass);
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
-    ASSERT_ARGS(find_not_cclass);
 
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
@@ -810,10 +827,10 @@ PARROT_PURE_FUNCTION
 size_t
 ascii_compute_hash(SHIM_INTERP, ARGIN(const STRING *source_string), size_t seed)
 {
+    ASSERT_ARGS(ascii_compute_hash);
     size_t hashval = seed;
     const char *buffptr = (const char *)source_string->strstart;
     UINTVAL len = source_string->strlen;
-    ASSERT_ARGS(ascii_compute_hash);
 
     PARROT_ASSERT(source_string->encoding == Parrot_fixed_8_encoding_ptr);
     while (len--) {
@@ -838,6 +855,7 @@ PARROT_CANNOT_RETURN_NULL
 const CHARSET *
 Parrot_charset_ascii_init(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_charset_ascii_init);
     CHARSET * const return_set = Parrot_new_charset(interp);
     static const CHARSET base_set = {
         "ascii",
@@ -864,7 +882,6 @@ Parrot_charset_ascii_init(PARROT_INTERP)
         ascii_compute_hash,
         NULL
     };
-    ASSERT_ARGS(Parrot_charset_ascii_init);
 
     STRUCT_COPY_FROM_STRUCT(return_set, base_set);
     return_set->preferred_encoding = Parrot_fixed_8_encoding_ptr;

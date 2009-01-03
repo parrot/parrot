@@ -76,23 +76,29 @@ static void store_sub_in_multi(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_get_namespace_pmc assert(interp); \
-                                      assert(sub);
-#define ASSERT_ARGS_internal_ns_keyed assert(interp); \
-                                      assert(base_ns); \
-                                      assert(pmc_key);
-#define ASSERT_ARGS_internal_ns_keyed_key assert(interp); \
-                                          assert(ns); \
-                                          assert(key);
-#define ASSERT_ARGS_internal_ns_keyed_str assert(interp); \
-                                          assert(base_ns); \
-                                          assert(key);
-#define ASSERT_ARGS_internal_ns_maybe_create assert(interp); \
-                                             assert(ns); \
-                                             assert(key);
-#define ASSERT_ARGS_store_sub_in_multi assert(interp); \
-                                       assert(sub); \
-                                       assert(ns);
+#define ASSERT_ARGS_get_namespace_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub)
+#define ASSERT_ARGS_internal_ns_keyed __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(base_ns) \
+    || PARROT_ASSERT_ARG(pmc_key)
+#define ASSERT_ARGS_internal_ns_keyed_key __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(ns) \
+    || PARROT_ASSERT_ARG(key)
+#define ASSERT_ARGS_internal_ns_keyed_str __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(base_ns) \
+    || PARROT_ASSERT_ARG(key)
+#define ASSERT_ARGS_internal_ns_maybe_create __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(ns) \
+    || PARROT_ASSERT_ARG(key)
+#define ASSERT_ARGS_store_sub_in_multi __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(ns)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -118,9 +124,9 @@ PARROT_CAN_RETURN_NULL
 static PMC *
 internal_ns_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc_key), int flags)
 {
+    ASSERT_ARGS(internal_ns_keyed);
     PMC *ns = base_ns;
     INTVAL i, n;
-    ASSERT_ARGS(internal_ns_keyed);
 
     if (pmc_key->vtable->base_type == enum_class_String) {
         STRING *str_key = VTABLE_get_string(interp, pmc_key);
@@ -174,8 +180,8 @@ static PMC *
 internal_ns_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
     ARGIN(STRING *key), int flags)
 {
-    PMC *ns = VTABLE_get_pmc_keyed_str(interp, base_ns, key);
     ASSERT_ARGS(internal_ns_keyed_str);
+    PMC *ns = VTABLE_get_pmc_keyed_str(interp, base_ns, key);
 
     if (!PMC_IS_NULL(ns) && VTABLE_isa(interp, ns, CONST_STRING(interp, "NameSpace")))
         return ns;
@@ -237,8 +243,8 @@ PARROT_CAN_RETURN_NULL
 static PMC *
 internal_ns_maybe_create(PARROT_INTERP, ARGIN(PMC *ns), ARGIN(STRING *key), int flags)
 {
-    PMC *sub_ns;
     ASSERT_ARGS(internal_ns_maybe_create);
+    PMC *sub_ns;
 
     /* RT #46157 - stop depending on typed namespace */
     if (!(flags & INTERN_NS_CREAT))
@@ -367,8 +373,8 @@ PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_make_namespace_autobase(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
 {
-    PMC *base_ns;
     ASSERT_ARGS(Parrot_make_namespace_autobase);
+    PMC *base_ns;
     if (VTABLE_isa(interp, key, CONST_STRING(interp, "String")))
         base_ns = CONTEXT(interp)->current_namespace;
     else
@@ -396,8 +402,8 @@ PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_get_namespace_autobase(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
 {
-    PMC *base_ns;
     ASSERT_ARGS(Parrot_get_namespace_autobase);
+    PMC *base_ns;
     if (VTABLE_isa(interp, key, CONST_STRING(interp, "String")))
         base_ns = CONTEXT(interp)->current_namespace;
     else
@@ -422,8 +428,8 @@ PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_ns_get_name(PARROT_INTERP, ARGIN(PMC *_namespace))
 {
-    PMC *names;
     ASSERT_ARGS(Parrot_ns_get_name);
+    PMC *names;
     Parrot_PCCINVOKE(interp, _namespace, CONST_STRING(interp, "get_name"), "->P", &names);
     return names;
 }
@@ -513,8 +519,8 @@ PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_find_global_n(PARROT_INTERP, ARGIN_NULLOK(PMC *ns), ARGIN_NULLOK(STRING *globalname))
 {
-    PMC *res;
     ASSERT_ARGS(Parrot_find_global_n);
+    PMC *res;
 
 #if DEBUG_GLOBAL
     if (globalname)
@@ -553,8 +559,8 @@ PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_find_global_cur(PARROT_INTERP, ARGIN_NULLOK(STRING *globalname))
 {
-    PMC * const ns = CONTEXT(interp)->current_namespace;
     ASSERT_ARGS(Parrot_find_global_cur);
+    PMC * const ns = CONTEXT(interp)->current_namespace;
     return Parrot_find_global_n(interp, ns, globalname);
 }
 
@@ -579,11 +585,11 @@ PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_find_global_k(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc_key), ARGIN(STRING *globalname))
 {
+    ASSERT_ARGS(Parrot_find_global_k);
     PMC * const ns =
         Parrot_get_namespace_keyed(interp,
                                    Parrot_get_ctx_HLL_namespace(interp),
                                    pmc_key);
-    ASSERT_ARGS(Parrot_find_global_k);
     return Parrot_find_global_n(interp, ns, globalname);
 }
 
@@ -609,11 +615,11 @@ PMC *
 Parrot_find_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key),
         ARGIN_NULLOK(STRING *globalname))
 {
+    ASSERT_ARGS(Parrot_find_global_s);
     PMC *const ns =
         Parrot_get_namespace_keyed_str(interp,
                                        Parrot_get_ctx_HLL_namespace(interp),
                                        str_key);
-    ASSERT_ARGS(Parrot_find_global_s);
     return Parrot_find_global_n(interp, ns, globalname);
 }
 
@@ -687,8 +693,8 @@ void
 Parrot_store_global_k(PARROT_INTERP, ARGIN(PMC *pmc_key),
         ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(PMC *val))
 {
-    PMC *ns;
     ASSERT_ARGS(Parrot_store_global_k);
+    PMC *ns;
 
     /*
      * RT #46167 - temporary hack to notice when key is actually a string, so that
@@ -726,10 +732,10 @@ void
 Parrot_store_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key),
         ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(PMC *val))
 {
+    ASSERT_ARGS(Parrot_store_global_s);
     PMC * const ns = Parrot_make_namespace_keyed_str(interp,
                                          Parrot_get_ctx_HLL_namespace(interp),
                                          str_key);
-    ASSERT_ARGS(Parrot_store_global_s);
 
     Parrot_store_global_n(interp, ns, globalname, val);
 
@@ -756,8 +762,8 @@ PMC *
 Parrot_find_global_op(PARROT_INTERP, ARGIN(PMC *ns),
         ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(void *next))
 {
-    PMC *res;
     ASSERT_ARGS(Parrot_find_global_op);
+    PMC *res;
 
     if (!globalname)
         Parrot_ex_throw_from_c_args(interp, next, EXCEPTION_GLOBAL_NOT_FOUND,
@@ -791,10 +797,10 @@ PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_find_name_op(PARROT_INTERP, ARGIN(STRING *name), SHIM(void *next))
 {
+    ASSERT_ARGS(Parrot_find_name_op);
     Parrot_Context * const ctx = CONTEXT(interp);
     PMC * const lex_pad = Parrot_find_pad(interp, name, ctx);
     PMC *g;
-    ASSERT_ARGS(Parrot_find_name_op);
 
     if (PMC_IS_NULL(lex_pad))
         g = PMCNULL;
@@ -831,9 +837,9 @@ PARROT_CAN_RETURN_NULL
 static PMC *
 get_namespace_pmc(PARROT_INTERP, ARGIN(PMC *sub))
 {
+    ASSERT_ARGS(get_namespace_pmc);
     PMC * const nsname = PMC_sub(sub)->namespace_name;
     PMC * const nsroot = Parrot_get_HLL_namespace(interp, PMC_sub(sub)->HLL_id);
-    ASSERT_ARGS(get_namespace_pmc);
 
     /* If we have a NULL, return the HLL namespace */
     if (PMC_IS_NULL(nsname))
@@ -860,9 +866,9 @@ If no multisub by that name currently exists, we create one.
 static void
 store_sub_in_multi(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(PMC *ns))
 {
+    ASSERT_ARGS(store_sub_in_multi);
     STRING * const ns_entry_name = PMC_sub(sub)->ns_entry_name;
     PMC    *multisub = VTABLE_get_pmc_keyed_str(interp, ns, ns_entry_name);
-    ASSERT_ARGS(store_sub_in_multi);
 
     /* is there an existing MultiSub PMC? or do we need to create one? */
     if (PMC_IS_NULL(multisub)) {
@@ -891,10 +897,10 @@ PARROT_EXPORT
 void
 Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub))
 {
+    ASSERT_ARGS(Parrot_store_sub_in_namespace);
     const INTVAL cur_id = CONTEXT(interp)->current_HLL;
 
     PMC *ns;
-    ASSERT_ARGS(Parrot_store_sub_in_namespace);
     /* PF structures aren't fully constructed yet */
     Parrot_block_GC_mark(interp);
     /* store relative to HLL namespace */

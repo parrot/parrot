@@ -37,8 +37,8 @@ PARROT_CANNOT_RETURN_NULL
 static const char * convert_flags_to_stdio(INTVAL flags);
 
 static INTVAL io_is_tty_portable(PIOHANDLE fptr);
-#define ASSERT_ARGS_convert_flags_to_stdio
-#define ASSERT_ARGS_io_is_tty_portable
+#define ASSERT_ARGS_convert_flags_to_stdio __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_io_is_tty_portable __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -58,6 +58,7 @@ PARROT_CANNOT_RETURN_NULL
 static const char *
 convert_flags_to_stdio(INTVAL flags)
 {
+    ASSERT_ARGS(convert_flags_to_stdio);
     if ((flags & (PIO_F_WRITE | PIO_F_READ | PIO_F_APPEND)) ==
         (PIO_F_WRITE | PIO_F_READ | PIO_F_APPEND)) {
         return "a+b";
@@ -96,6 +97,7 @@ Sets up standard streams, etc.
 INTVAL
 Parrot_io_init_portable(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_io_init_portable);
 #  ifdef PIO_OS_STDIO
     /* Only set standard handles if stdio is the OS IO */
     PIO_STDIN(interp)
@@ -129,6 +131,7 @@ PMC *
 Parrot_io_open_portable(PARROT_INTERP, ARGMOD(PMC *filehandle),
               ARGIN(STRING *path), INTVAL flags)
 {
+    ASSERT_ARGS(Parrot_io_open_portable);
     const char *oflags;
     FILE       *fptr;
 
@@ -187,6 +190,7 @@ PMC *
 Parrot_io_fdopen_portable(PARROT_INTERP, ARGMOD(PMC *filehandle),
         PIOHANDLE fptr, INTVAL flags)
 {
+    ASSERT_ARGS(Parrot_io_fdopen_portable);
     PMC *io;
 
     if (io_is_tty_portable(fptr))
@@ -219,6 +223,7 @@ Closes the underlying filehandle of a given IO PMC.
 INTVAL
 Parrot_io_close_portable(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
+    ASSERT_ARGS(Parrot_io_close_portable);
     FILE * const fptr = (FILE *)Parrot_io_get_os_handle(interp, filehandle);
 
     if (fptr)
@@ -243,6 +248,7 @@ Tests whether the filehandle has been closed.
 INTVAL
 Parrot_io_is_closed_portable(PARROT_INTERP, ARGIN(PMC *filehandle))
 {
+    ASSERT_ARGS(Parrot_io_is_closed_portable);
     if (Parrot_io_get_os_handle(interp, filehandle) == (PIOHANDLE)NULL)
         return 1;
 
@@ -263,6 +269,7 @@ Tests whether the given file descriptor is attached to a tty.
 static INTVAL
 io_is_tty_portable(PIOHANDLE fptr)
 {
+    ASSERT_ARGS(io_is_tty_portable);
     UNUSED(fptr);
 
     /* no obvious way to check for this with STDIO */
@@ -285,6 +292,7 @@ Parrot_io_peek_portable(PARROT_INTERP,
         ARGIN(PMC *filehandle),
         ARGIN(STRING **buf))
 {
+    ASSERT_ARGS(Parrot_io_peek_portable);
     FILE   * const fptr  = (FILE *)Parrot_io_get_os_handle(interp, filehandle);
     STRING * const s     = Parrot_io_make_string(interp, buf, 1);
 
@@ -316,6 +324,7 @@ Returns the block size of the given file descriptor.
 INTVAL
 Parrot_io_getblksize_portable(PIOHANDLE fptr)
 {
+    ASSERT_ARGS(Parrot_io_getblksize_portable);
     UNUSED(fptr);
 
     /* Hard coded for now */
@@ -336,6 +345,7 @@ Flushes the underlying file descriptor of the given IO PMC.
 INTVAL
 Parrot_io_flush_portable(SHIM_INTERP, SHIM(PMC *filehandle))
 {
+    ASSERT_ARGS(Parrot_io_flush_portable);
     return fflush((FILE *)Parrot_io_get_os_handle(interp, filehandle));
 }
 
@@ -355,6 +365,7 @@ size_t
 Parrot_io_read_portable(PARROT_INTERP, SHIM(PMC *filehandle),
               ARGIN(STRING **buf))
 {
+    ASSERT_ARGS(Parrot_io_read_portable);
     FILE   * const fptr   = (FILE *)Parrot_io_get_os_handle(interp, filehandle);
     STRING * const s      = Parrot_io_make_string(interp, buf, 2048);
     void   * const buffer = s->strstart;
@@ -386,6 +397,7 @@ Writes the given STRING to the provided IO PMC.
 size_t
 Parrot_io_write_portable(PARROT_INTERP, ARGIN(PMC *filehandle), ARGMOD(STRING *s))
 {
+    ASSERT_ARGS(Parrot_io_write_portable);
     void * const buffer = s->strstart;
     return fwrite(buffer, 1, s->bufused,
                   (FILE *)Parrot_io_get_os_handle(interp, filehandle));
@@ -406,6 +418,7 @@ PIOOFF_T
 Parrot_io_seek_portable(PARROT_INTERP, ARGMOD(PMC *filehandle),
               PIOOFF_T offset, INTVAL whence)
 {
+    ASSERT_ARGS(Parrot_io_seek_portable);
     PIOOFF_T pos;
     errno = 0;
 
@@ -434,6 +447,7 @@ Returns the current position of the given IO PMC.
 PIOOFF_T
 Parrot_io_tell_portable(PARROT_INTERP, ARGIN(PMC *filehandle))
 {
+    ASSERT_ARGS(Parrot_io_tell_portable);
     return (ftell((FILE *)Parrot_io_get_os_handle(interp, filehandle)));
 }
 
@@ -454,6 +468,7 @@ PMC *
 Parrot_io_open_pipe_portable(PARROT_INTERP, SHIM(PMC *filehandle),
         SHIM(STRING *command), int flags)
 {
+    ASSERT_ARGS(Parrot_io_open_pipe_portable);
     UNUSED(flags);
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
         "pipe() not implemented");

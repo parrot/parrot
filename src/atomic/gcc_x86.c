@@ -51,6 +51,7 @@ void *
 parrot_i386_cmpxchg(ARGMOD(void *volatile *ptr), ARGIN(void *expect),
                                         ARGIN(void *update))
 {
+    ASSERT_ARGS(parrot_i386_cmpxchg);
 #if defined(PARROT_HAS_X86_64_GCC_CMPXCHG)
     __asm__ __volatile__("lock\n"
                          "cmpxchgq %1,%2":"=a"(expect):"q"(update), "m"(*ptr),
@@ -83,6 +84,7 @@ PARROT_EXPORT
 long
 parrot_i386_xadd(ARGIN(volatile long *l), long amount)
 {
+    ASSERT_ARGS(parrot_i386_xadd);
     long result = amount;
 #if defined(PARROT_HAS_X86_64_GCC_CMPXCHG)
     __asm__ __volatile__("lock\n" "xaddq %0, %1" : "=r"(result), "=m"(*l) :

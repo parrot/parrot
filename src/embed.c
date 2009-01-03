@@ -53,15 +53,22 @@ static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_calibrate assert(interp);
-#define ASSERT_ARGS_op_name assert(interp);
-#define ASSERT_ARGS_print_debug assert(interp);
-#define ASSERT_ARGS_print_profile assert(interp);
-#define ASSERT_ARGS_prof_sort_f assert(a); \
-                                assert(b);
-#define ASSERT_ARGS_set_current_sub assert(interp);
-#define ASSERT_ARGS_setup_argv assert(interp); \
-                               assert(argv);
+#define ASSERT_ARGS_calibrate __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_op_name __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_print_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_print_profile __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_prof_sort_f __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(a) \
+    || PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_set_current_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_setup_argv __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(argv)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -584,10 +591,10 @@ PARROT_CANNOT_RETURN_NULL
 static PMC*
 setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
 {
+    ASSERT_ARGS(setup_argv);
     INTVAL i;
     PMC   *userargv;
 
-    ASSERT_ARGS(setup_argv);
 
     if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
         Parrot_io_eprintf(interp,
@@ -632,6 +639,7 @@ Sort function for profile data. Sorts by time.
 static int
 prof_sort_f(ARGIN(const void *a), ARGIN(const void *b))
 {
+    ASSERT_ARGS(prof_sort_f);
     const FLOATVAL timea = ((const ProfData *)a)->time;
     const FLOATVAL timeb = ((const ProfData *)b)->time;
 
@@ -659,6 +667,7 @@ PARROT_CANNOT_RETURN_NULL
 static const char *
 op_name(PARROT_INTERP, int k)
 {
+    ASSERT_ARGS(op_name);
     switch (k) {
         case PARROT_PROF_DOD_p1:
             return "DOD_mark_root";
@@ -694,6 +703,7 @@ measured with time C<parrot -b>.
 static FLOATVAL
 calibrate(PARROT_INTERP)
 {
+    ASSERT_ARGS(calibrate);
     size_t   count  = 1000000;
     size_t   n      = count;
     opcode_t code[] = { 1 };      /* noop */
@@ -724,6 +734,7 @@ Prints out a profile listing.
 static void
 print_profile(PARROT_INTERP, SHIM(int status), SHIM(void *p))
 {
+    ASSERT_ARGS(print_profile);
     RunProfile * const profile = interp->profile;
 
     if (profile) {
@@ -807,6 +818,7 @@ Prints GC info.
 static void
 print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
 {
+    ASSERT_ARGS(print_debug);
     if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {
         /* Give souls brave enough to activate debugging an earful about GC. */
 
@@ -834,6 +846,7 @@ PARROT_CANNOT_RETURN_NULL
 static PMC*
 set_current_sub(PARROT_INTERP)
 {
+    ASSERT_ARGS(set_current_sub);
     opcode_t i;
     PMC *sub_pmc;
 

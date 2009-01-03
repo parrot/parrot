@@ -92,24 +92,30 @@ static int returns_match_results(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_args_match_params assert(sig_args); \
-                                      assert(seg); \
-                                      assert(start);
-#define ASSERT_ARGS_call_is_safe assert(sub); \
-                                 assert(set_args);
-#define ASSERT_ARGS_jit_can_compile_sub assert(interp); \
-                                        assert(sub);
-#define ASSERT_ARGS_ops_jittable assert(interp); \
-                                 assert(sub); \
-                                 assert(sig_results); \
-                                 assert(seg); \
-                                 assert(pc); \
-                                 assert(end); \
-                                 assert(flags);
-#define ASSERT_ARGS_pic_test_func assert(interp); \
-                                  assert(args);
-#define ASSERT_ARGS_returns_match_results assert(sig_ret); \
-                                          assert(sig_result);
+#define ASSERT_ARGS_args_match_params __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(sig_args) \
+    || PARROT_ASSERT_ARG(seg) \
+    || PARROT_ASSERT_ARG(start)
+#define ASSERT_ARGS_call_is_safe __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(set_args)
+#define ASSERT_ARGS_jit_can_compile_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub)
+#define ASSERT_ARGS_ops_jittable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(sig_results) \
+    || PARROT_ASSERT_ARG(seg) \
+    || PARROT_ASSERT_ARG(pc) \
+    || PARROT_ASSERT_ARG(end) \
+    || PARROT_ASSERT_ARG(flags)
+#define ASSERT_ARGS_pic_test_func __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(args)
+#define ASSERT_ARGS_returns_match_results __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(sig_ret) \
+    || PARROT_ASSERT_ARG(sig_result)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -161,6 +167,7 @@ PARROT_CAN_RETURN_NULL
 static opcode_t *
 pic_test_func(PARROT_INTERP, SHIM(INTVAL *sig_bits), ARGOUT(void **args))
 {
+    ASSERT_ARGS(pic_test_func);
     INTVAL * const result = (INTVAL*) args[0];
     INTVAL   const i      = (INTVAL) args[1];
     INTVAL   const j      = (INTVAL) args[2];
@@ -187,6 +194,7 @@ PARROT_WARN_UNUSED_RESULT
 static int
 jit_can_compile_sub(PARROT_INTERP, ARGIN(const PMC *sub))
 {
+    ASSERT_ARGS(jit_can_compile_sub);
     const jit_arch_info * const info = Parrot_jit_init(interp);
     const jit_arch_regs * const regs = info->regs + JIT_CODE_SUB_REGS_ONLY;
     INTVAL * const n_regs_used       = PMC_sub(sub)->n_regs_used;
@@ -230,6 +238,7 @@ static int
 args_match_params(ARGIN(const PMC *sig_args), ARGIN(const PackFile_ByteCode *seg),
     ARGIN(const opcode_t *start))
 {
+    ASSERT_ARGS(args_match_params);
     const PMC *sig_params;
     int n, type;
 
@@ -278,6 +287,7 @@ PARROT_WARN_UNUSED_RESULT
 static int
 returns_match_results(ARGIN(const PMC *sig_ret), ARGIN(const PMC *sig_result))
 {
+    ASSERT_ARGS(returns_match_results);
     int type;
     const int n = parrot_pic_check_sig(sig_ret, sig_result, &type);
 
@@ -316,6 +326,7 @@ PARROT_WARN_UNUSED_RESULT
 static int
 call_is_safe(ARGIN(const PMC *sub), ARGMOD(opcode_t **set_args))
 {
+    ASSERT_ARGS(call_is_safe);
     PMC *called, *sig_results;
 
     opcode_t * pc        = *set_args;
@@ -368,6 +379,7 @@ ops_jittable(PARROT_INTERP, ARGIN(const PMC *sub), ARGIN(const PMC *sig_results)
         ARGIN(const PackFile_ByteCode *seg), ARGIN(opcode_t *pc),
         ARGIN(const opcode_t *end), ARGOUT(int *flags))
 {
+    ASSERT_ARGS(ops_jittable);
     while (pc < end) {
         /* special opcodes which are handled, but not marked as JITtable */
         int i;
@@ -442,6 +454,7 @@ int
 parrot_pic_is_safe_to_jit(PARROT_INTERP, ARGIN(const PMC *sub), ARGIN(const PMC *sig_args),
         ARGIN(const PMC *sig_results), ARGOUT(int *flags))
 {
+    ASSERT_ARGS(parrot_pic_is_safe_to_jit);
 #ifdef HAS_JIT
     opcode_t *base, *start, *end;
 
@@ -504,6 +517,7 @@ RT#48260: Not yet documented!!!
 funcptr_t
 parrot_pic_JIT_sub(PARROT_INTERP, ARGIN(const PMC *sub), int flags)
 {
+    ASSERT_ARGS(parrot_pic_JIT_sub);
 #ifdef HAS_JIT
 #  ifdef PIC_TEST
     UNUSED(interp);

@@ -50,10 +50,11 @@ static INTVAL convert_flags_to_win32(
 PARROT_WARN_UNUSED_RESULT
 static INTVAL io_is_tty_win32(PIOHANDLE fd);
 
-#define ASSERT_ARGS_convert_flags_to_win32 assert(fdwAccess); \
-                                           assert(fdwShareMode); \
-                                           assert(fdwCreate);
-#define ASSERT_ARGS_io_is_tty_win32
+#define ASSERT_ARGS_convert_flags_to_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(fdwAccess) \
+    || PARROT_ASSERT_ARG(fdwShareMode) \
+    || PARROT_ASSERT_ARG(fdwCreate)
+#define ASSERT_ARGS_io_is_tty_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -75,6 +76,7 @@ static INTVAL
 convert_flags_to_win32(INTVAL flags, ARGOUT(DWORD * fdwAccess),
                ARGOUT(DWORD * fdwShareMode), ARGOUT(DWORD * fdwCreate))
 {
+    ASSERT_ARGS(convert_flags_to_win32);
     static DWORD dwDefaultShareMode;
     if (!dwDefaultShareMode) {
         OSVERSIONINFO osvi;
@@ -128,6 +130,7 @@ Sets up the standard C<std*> IO handles.
 INTVAL
 Parrot_io_init_win32(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_io_init_win32);
     HANDLE h;
 #  if PARROT_NET_DEVEL
     struct WSAData sockinfo;
@@ -179,6 +182,7 @@ Returns C<PIO_BLKSIZE>.
 INTVAL
 Parrot_io_getblksize_win32(SHIM(PIOHANDLE fd))
 {
+    ASSERT_ARGS(Parrot_io_getblksize_win32);
     /* Hard coded for now */
     return PIO_BLKSIZE;
 }
@@ -199,6 +203,7 @@ PMC *
 Parrot_io_open_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
                ARGIN(STRING *path), INTVAL flags)
 {
+    ASSERT_ARGS(Parrot_io_open_win32);
     DWORD fAcc, fShare, fCreat;
     PIOHANDLE fd;
 
@@ -262,6 +267,7 @@ PMC *
 Parrot_io_fdopen_win32(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
         PIOHANDLE fd, INTVAL flags)
 {
+    ASSERT_ARGS(Parrot_io_fdopen_win32);
     PMC *io;
 
     if (io_is_tty_win32(fd))
@@ -294,6 +300,7 @@ Calls C<CloseHandle()> to close C<*io>'s file descriptor.
 INTVAL
 Parrot_io_close_win32(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
+    ASSERT_ARGS(Parrot_io_close_win32);
     PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, filehandle);
     if (os_handle != INVALID_HANDLE_VALUE) {
         CloseHandle(os_handle);
@@ -315,6 +322,7 @@ Test whether the filehandle has been closed.
 INTVAL
 Parrot_io_is_closed_win32(PARROT_INTERP, ARGIN(PMC *filehandle))
 {
+    ASSERT_ARGS(Parrot_io_is_closed_win32);
     if (Parrot_io_get_os_handle(interp, filehandle) == INVALID_HANDLE_VALUE)
         return 1;
 
@@ -335,6 +343,7 @@ PARROT_WARN_UNUSED_RESULT
 static INTVAL
 io_is_tty_win32(PIOHANDLE fd)
 {
+    ASSERT_ARGS(io_is_tty_win32);
     const DWORD ftype = GetFileType(fd);
     return (ftype == FILE_TYPE_CHAR);
 }
@@ -352,6 +361,7 @@ Calls C<FlushFileBuffers()> to flush C<*io>'s file descriptor.
 INTVAL
 Parrot_io_flush_win32(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
+    ASSERT_ARGS(Parrot_io_flush_win32);
     /*
      * FlushFileBuffers won't work for console handles. From the MS help file:
      *
@@ -383,6 +393,7 @@ Parrot_io_read_win32(PARROT_INTERP,
         ARGMOD(PMC *filehandle),
         ARGOUT(STRING **buf))
 {
+    ASSERT_ARGS(Parrot_io_read_win32);
     DWORD countread;
     void *buffer;
     size_t len;
@@ -428,6 +439,7 @@ Parrot_io_write_win32(PARROT_INTERP,
         ARGIN(PMC *filehandle),
         ARGIN(STRING *s))
 {
+    ASSERT_ARGS(Parrot_io_write_win32);
     DWORD countwrote = 0;
     void * const buffer = s->strstart;
     size_t len = s->bufused;
@@ -471,6 +483,7 @@ PIOOFF_T
 Parrot_io_seek_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
                PIOOFF_T off, INTVAL whence)
 {
+    ASSERT_ARGS(Parrot_io_seek_win32);
     LARGE_INTEGER offset;
 
     offset.QuadPart = off;
@@ -498,6 +511,7 @@ Returns the current read/write position of C<*io>'s file descriptor.
 PIOOFF_T
 Parrot_io_tell_win32(PARROT_INTERP, ARGIN(PMC *filehandle))
 {
+    ASSERT_ARGS(Parrot_io_tell_win32);
     LARGE_INTEGER p;
 
     p.QuadPart = piooffsetzero;
@@ -525,6 +539,7 @@ Parrot_io_peek_win32(PARROT_INTERP,
         SHIM(PMC *filehandle),
         SHIM(STRING **buf))
 {
+    ASSERT_ARGS(Parrot_io_peek_win32);
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
         "peek() not implemented");
 }
@@ -545,6 +560,7 @@ PMC *
 Parrot_io_open_pipe_win32(PARROT_INTERP, SHIM(PMC *filehandle),
         SHIM(STRING *command), int flags)
 {
+    ASSERT_ARGS(Parrot_io_open_pipe_win32);
     UNUSED(flags);
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
         "pipe() not implemented");

@@ -57,8 +57,8 @@ PARROT_CANNOT_RETURN_NULL
 VTABLE *
 Parrot_clone_vtable(PARROT_INTERP, ARGIN(const VTABLE *base_vtable))
 {
-    VTABLE * const new_vtable = mem_allocate_typed(VTABLE);
     ASSERT_ARGS(Parrot_clone_vtable);
+    VTABLE * const new_vtable = mem_allocate_typed(VTABLE);
 
     STRUCT_COPY(new_vtable, base_vtable);
 
@@ -147,13 +147,13 @@ Reallocate memory for vtables, increasing the number of vtables by 16.
 void
 parrot_realloc_vtables(PARROT_INTERP)
 {
+    ASSERT_ARGS(parrot_realloc_vtables);
     /* 16 bigger seems reasonable, though it's only a pointer
        table and we could get bigger without blowing much memory
        */
     const INTVAL new_max     = interp->n_vtable_alloced + 16;
     const INTVAL new_size    = new_max              * sizeof (VTABLE *);
     const INTVAL old_size    = interp->n_vtable_max * sizeof (VTABLE *);
-    ASSERT_ARGS(parrot_realloc_vtables);
 
     /* arrays start at zero, but we compare type numbers starting at 1 */
     interp->n_vtable_alloced = new_max - 1;
@@ -176,8 +176,8 @@ of pointers to these vtables is freed.
 void
 parrot_free_vtables(PARROT_INTERP)
 {
-    int i;
     ASSERT_ARGS(parrot_free_vtables);
+    int i;
 
     for (i = 1; i < interp->n_vtable_max; i++)
         Parrot_destroy_vtable(interp, interp->vtables[i]);
@@ -198,8 +198,8 @@ Mark all vtables as being alive for the garbage collector.
 void
 mark_vtables(PARROT_INTERP)
 {
-    INTVAL i;
     ASSERT_ARGS(mark_vtables);
+    INTVAL i;
 
     for (i = 1; i < interp->n_vtable_max; i++) {
         const VTABLE * const vtable = interp->vtables[i];

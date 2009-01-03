@@ -59,14 +59,19 @@ static int sweep_cb(PARROT_INTERP,
 static int trace_active_PMCs(PARROT_INTERP, int trace_stack)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_clear_live_bits assert(pool);
-#define ASSERT_ARGS_find_common_mask assert(interp);
-#define ASSERT_ARGS_mark_special assert(interp); \
-                                 assert(obj);
-#define ASSERT_ARGS_sweep_cb assert(interp); \
-                             assert(pool); \
-                             assert(arg);
-#define ASSERT_ARGS_trace_active_PMCs assert(interp);
+#define ASSERT_ARGS_clear_live_bits __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_find_common_mask __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_mark_special __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(obj)
+#define ASSERT_ARGS_sweep_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(arg)
+#define ASSERT_ARGS_trace_active_PMCs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -97,9 +102,9 @@ collection.
 static void
 mark_special(PARROT_INTERP, ARGIN(PMC *obj))
 {
+    ASSERT_ARGS(mark_special);
     int     hi_prio;
     Arenas *arena_base;
-    ASSERT_ARGS(mark_special);
 
     /*
      * If the object is shared, we have to use the arena and dod
@@ -262,10 +267,10 @@ C<trace_stack> can have these values:
 int
 Parrot_dod_trace_root(PARROT_INTERP, int trace_stack)
 {
+    ASSERT_ARGS(Parrot_dod_trace_root);
     Arenas           * const arena_base = interp->arena_base;
     Parrot_Context   *ctx;
     PObj             *obj;
-    ASSERT_ARGS(Parrot_dod_trace_root);
 
     /* note: adding locals here did cause increased DOD runs */
     mark_context_start();
@@ -396,12 +401,12 @@ Returns whether the tracing process has completed.
 int
 Parrot_dod_trace_children(PARROT_INTERP, size_t how_many)
 {
+    ASSERT_ARGS(Parrot_dod_trace_children);
     Arenas * const arena_base = interp->arena_base;
     const int      lazy_dod   = arena_base->lazy_dod;
     PMC           *current    = arena_base->dod_mark_start;
 
     const UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
-    ASSERT_ARGS(Parrot_dod_trace_children);
 
     /*
      * First phase of mark is finished. Now if we are the owner
@@ -485,9 +490,9 @@ C<PObj_data_is_PMC_array_FLAG> flag.
 void
 Parrot_dod_trace_pmc_data(PARROT_INTERP, ARGIN(PMC *p))
 {
+    ASSERT_ARGS(Parrot_dod_trace_pmc_data);
     /* malloced array of PMCs */
     PMC ** const data = PMC_data_typed(p, PMC **);
-    ASSERT_ARGS(Parrot_dod_trace_pmc_data);
 
     if (data) {
         INTVAL i;
@@ -513,9 +518,9 @@ Clears the COW ref count.
 void
 clear_cow(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int cleanup)
 {
+    ASSERT_ARGS(clear_cow);
     const UINTVAL object_size = pool->object_size;
     Small_Object_Arena *cur_arena;
-    ASSERT_ARGS(clear_cow);
 
     /* clear refcount for COWable objects. */
     for (cur_arena = pool->last_Arena;
@@ -559,9 +564,9 @@ Finds other users of COW's C<bufstart>.
 void
 used_cow(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int cleanup)
 {
+    ASSERT_ARGS(used_cow);
     const UINTVAL object_size = pool->object_size;
     Small_Object_Arena *cur_arena;
-    ASSERT_ARGS(used_cow);
 
     for (cur_arena = pool->last_Arena;
             NULL != cur_arena; cur_arena = cur_arena->prev) {
@@ -604,12 +609,12 @@ are immune from collection (i.e. constant).
 void
 Parrot_dod_sweep(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
+    ASSERT_ARGS(Parrot_dod_sweep);
     UINTVAL total_used        = 0;
     const UINTVAL object_size = pool->object_size;
 
     Small_Object_Arena *cur_arena;
     dod_object_fn_type dod_object = pool->dod_object;
-    ASSERT_ARGS(Parrot_dod_sweep);
 
 #if GC_VERBOSE
     if (Interp_trace_TEST(interp, 1)) {
@@ -695,9 +700,9 @@ void
 Parrot_dod_free_pmc(PARROT_INTERP, SHIM(Small_Object_Pool *pool),
         ARGMOD(PObj *p))
 {
+    ASSERT_ARGS(Parrot_dod_free_pmc);
     PMC    * const pmc        = (PMC *)p;
     Arenas * const arena_base = interp->arena_base;
-    ASSERT_ARGS(Parrot_dod_free_pmc);
 
     /* TODO collect objects with finalizers */
     if (PObj_needs_early_DOD_TEST(p))
@@ -732,10 +737,10 @@ Frees the C<PMC_EXT> structure attached to a PMC, if it exists.
 void
 Parrot_free_pmc_ext(PARROT_INTERP, ARGMOD(PMC *p))
 {
+    ASSERT_ARGS(Parrot_free_pmc_ext);
     /* if the PMC has a PMC_EXT structure, return it to the pool/arena */
     Arenas            * const arena_base = interp->arena_base;
     Small_Object_Pool * const ext_pool   = arena_base->pmc_ext_pool;
-    ASSERT_ARGS(Parrot_free_pmc_ext);
 
     if (PObj_is_PMC_shared_TEST(p) && PMC_sync(p)) {
         MUTEX_DESTROY(PMC_sync(p)->pmc_lock);
@@ -824,8 +829,8 @@ reuse later.
 void
 Parrot_dod_free_buffer(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGMOD(PObj *b))
 {
-    Memory_Pool * const mem_pool = (Memory_Pool *)pool->mem_pool;
     ASSERT_ARGS(Parrot_dod_free_buffer);
+    Memory_Pool * const mem_pool = (Memory_Pool *)pool->mem_pool;
 
     /* XXX Jarkko reported that on irix pool->mem_pool was NULL, which really
      * shouldn't happen */
@@ -856,9 +861,9 @@ PARROT_CONST_FUNCTION
 static size_t
 find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
 {
+    ASSERT_ARGS(find_common_mask);
     int       i;
     const int bound = sizeof (size_t) * 8;
-    ASSERT_ARGS(find_common_mask);
 
     /* Shifting a value by its size (in bits) or larger is undefined behaviour.
        So need an explicit check to return 0 if there is no prefix, rather than
@@ -896,6 +901,7 @@ areas.
 void
 trace_mem_block(PARROT_INTERP, size_t lo_var_ptr, size_t hi_var_ptr)
 {
+    ASSERT_ARGS(trace_mem_block);
     size_t    prefix;
     ptrdiff_t cur_var_ptr;
 
@@ -908,7 +914,6 @@ trace_mem_block(PARROT_INTERP, size_t lo_var_ptr, size_t hi_var_ptr)
         find_common_mask(interp,
                          buffer_min < pmc_min ? buffer_min : pmc_min,
                          buffer_max > pmc_max ? buffer_max : pmc_max);
-    ASSERT_ARGS(trace_mem_block);
 
     if (!lo_var_ptr || !hi_var_ptr)
         return;
@@ -967,9 +972,9 @@ the GC system after a full system sweep.
 static void
 clear_live_bits(ARGIN(const Small_Object_Pool *pool))
 {
+    ASSERT_ARGS(clear_live_bits);
     Small_Object_Arena *arena;
     const UINTVAL object_size = pool->object_size;
-    ASSERT_ARGS(clear_live_bits);
 
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
         Buffer *b = (Buffer *)arena->start_objects;
@@ -998,8 +1003,8 @@ next mark phase.
 void
 Parrot_dod_clear_live_bits(PARROT_INTERP)
 {
-    Small_Object_Pool * const pool = interp->arena_base->pmc_pool;
     ASSERT_ARGS(Parrot_dod_clear_live_bits);
+    Small_Object_Pool * const pool = interp->arena_base->pmc_pool;
     clear_live_bits(pool);
 }
 
@@ -1070,8 +1075,8 @@ initializer function for the MS garbage collector.
 void
 Parrot_dod_ms_run_init(PARROT_INTERP)
 {
-    Arenas * const arena_base       = interp->arena_base;
     ASSERT_ARGS(Parrot_dod_ms_run_init);
+    Arenas * const arena_base       = interp->arena_base;
 
     arena_base->dod_trace_ptr       = NULL;
     arena_base->dod_mark_start      = NULL;
@@ -1095,8 +1100,8 @@ static int
 sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag,
     ARGMOD(void *arg))
 {
-    int * const total_free = (int *) arg;
     ASSERT_ARGS(sweep_cb);
+    int * const total_free = (int *) arg;
 
 #ifdef GC_IS_MALLOC
     if (flag & POOL_BUFFER)
@@ -1131,11 +1136,11 @@ Runs the stop-the-world mark & sweep (MS) collector.
 void
 Parrot_dod_ms_run(PARROT_INTERP, UINTVAL flags)
 {
+    ASSERT_ARGS(Parrot_dod_ms_run);
     Arenas * const arena_base = interp->arena_base;
 
     /* XXX these should go into the interpreter */
     int total_free     = 0;
-    ASSERT_ARGS(Parrot_dod_ms_run);
 
     if (arena_base->DOD_block_level)
         return;

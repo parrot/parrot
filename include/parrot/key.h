@@ -167,38 +167,58 @@ STRING * key_string(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_key_append assert(key1); \
-                               assert(key2);
-#define ASSERT_ARGS_key_integer assert(interp); \
-                                assert(key);
-#define ASSERT_ARGS_key_mark assert(interp); \
-                             assert(key);
-#define ASSERT_ARGS_key_new assert(interp);
-#define ASSERT_ARGS_key_new_cstring assert(interp);
-#define ASSERT_ARGS_key_new_integer assert(interp);
-#define ASSERT_ARGS_key_new_number assert(interp);
-#define ASSERT_ARGS_key_new_pmc assert(interp); \
-                                assert(value);
-#define ASSERT_ARGS_key_new_string assert(interp); \
-                                   assert(value);
-#define ASSERT_ARGS_key_next assert(interp); \
-                             assert(key);
-#define ASSERT_ARGS_key_number assert(interp); \
-                               assert(key);
-#define ASSERT_ARGS_key_pmc assert(interp); \
-                            assert(key);
-#define ASSERT_ARGS_key_set_integer assert(key);
-#define ASSERT_ARGS_key_set_number assert(key);
-#define ASSERT_ARGS_key_set_pmc assert(interp); \
-                                assert(key); \
-                                assert(value);
-#define ASSERT_ARGS_key_set_register assert(key);
-#define ASSERT_ARGS_key_set_string assert(key); \
-                                   assert(value);
-#define ASSERT_ARGS_key_set_to_string assert(interp);
-#define ASSERT_ARGS_key_type assert(key);
-#define ASSERT_ARGS_key_string assert(interp); \
-                               assert(key);
+#define ASSERT_ARGS_key_append __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(key1) \
+    || PARROT_ASSERT_ARG(key2)
+#define ASSERT_ARGS_key_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(key)
+#define ASSERT_ARGS_key_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(key)
+#define ASSERT_ARGS_key_new __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_key_new_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_key_new_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_key_new_number __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_key_new_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(value)
+#define ASSERT_ARGS_key_new_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(value)
+#define ASSERT_ARGS_key_next __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(key)
+#define ASSERT_ARGS_key_number __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(key)
+#define ASSERT_ARGS_key_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(key)
+#define ASSERT_ARGS_key_set_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(key)
+#define ASSERT_ARGS_key_set_number __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(key)
+#define ASSERT_ARGS_key_set_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(key) \
+    || PARROT_ASSERT_ARG(value)
+#define ASSERT_ARGS_key_set_register __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(key)
+#define ASSERT_ARGS_key_set_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(key) \
+    || PARROT_ASSERT_ARG(value)
+#define ASSERT_ARGS_key_set_to_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_key_type __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(key)
+#define ASSERT_ARGS_key_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(key)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/key.c */
 

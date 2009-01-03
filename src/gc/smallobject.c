@@ -72,19 +72,26 @@ static void more_traceable_objects(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
-#define ASSERT_ARGS_gc_ms_add_free_object assert(pool); \
-                                          assert(to_add);
-#define ASSERT_ARGS_gc_ms_add_free_pmc_ext assert(pool); \
-                                           assert(to_add);
-#define ASSERT_ARGS_gc_ms_alloc_objects assert(interp); \
-                                        assert(pool);
-#define ASSERT_ARGS_gc_ms_get_free_object assert(interp); \
-                                          assert(pool);
-#define ASSERT_ARGS_gc_ms_get_free_pmc_ext assert(interp); \
-                                           assert(pool);
-#define ASSERT_ARGS_gc_ms_pool_init assert(pool);
-#define ASSERT_ARGS_more_traceable_objects assert(interp); \
-                                           assert(pool);
+#define ASSERT_ARGS_gc_ms_add_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(to_add)
+#define ASSERT_ARGS_gc_ms_add_free_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(to_add)
+#define ASSERT_ARGS_gc_ms_alloc_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_ms_get_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_ms_get_free_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_ms_pool_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_more_traceable_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -112,8 +119,8 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 contained_in_pool(ARGIN(const Small_Object_Pool *pool), ARGIN(const void *ptr))
 {
-    const Small_Object_Arena *arena;
     ASSERT_ARGS(contained_in_pool);
+    const Small_Object_Arena *arena;
 
     ptr = PObj_to_ARENA(ptr);
 
@@ -144,9 +151,9 @@ PMC if it points into the constant PMC pool.
 int
 Parrot_is_const_pmc(PARROT_INTERP, ARGIN(const PMC *pmc))
 {
+    ASSERT_ARGS(Parrot_is_const_pmc);
     Small_Object_Pool * const pool = interp->arena_base->constant_pmc_pool;
     const               int   c    = contained_in_pool(pool, pmc);
-    ASSERT_ARGS(Parrot_is_const_pmc);
 
     /* some paranoia first. */
     /* I wonder if it would save any machine cycles to write
@@ -206,8 +213,8 @@ on the free list can be reused later.
 static void
 gc_ms_add_free_pmc_ext(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void *to_add))
 {
-    PMC_EXT *object        = (PMC_EXT *)to_add;
     ASSERT_ARGS(gc_ms_add_free_pmc_ext);
+    PMC_EXT *object        = (PMC_EXT *)to_add;
     object->_metadata      = NULL;
 
     /* yes, this cast is a hack for now, but a pointer is a pointer */
@@ -229,8 +236,8 @@ the PObj flags to indicate that the item is free.
 static void
 gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void *to_add))
 {
-    PObj *object           = (PObj *)to_add;
     ASSERT_ARGS(gc_ms_add_free_object);
+    PObj *object           = (PObj *)to_add;
 
     PObj_flags_SETTO(object, PObj_on_free_list_FLAG);
 
@@ -258,9 +265,9 @@ PARROT_WARN_UNUSED_RESULT
 static void *
 gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
+    ASSERT_ARGS(gc_ms_get_free_object);
     PObj *ptr;
     PObj *free_list = (PObj *)pool->free_list;
-    ASSERT_ARGS(gc_ms_get_free_object);
 
     /* if we don't have any objects */
     if (!free_list) {
@@ -293,9 +300,9 @@ PARROT_WARN_UNUSED_RESULT
 static void *
 gc_ms_get_free_pmc_ext(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
+    ASSERT_ARGS(gc_ms_get_free_pmc_ext);
     PMC_EXT *ptr;
     PMC_EXT *free_list = (PMC_EXT *)pool->free_list;
-    ASSERT_ARGS(gc_ms_get_free_pmc_ext);
 
     /* if we don't have any objects */
     if (!free_list) {
@@ -327,10 +334,10 @@ Parrot_add_to_free_list(PARROT_INTERP,
         ARGMOD(Small_Object_Pool  *pool),
         ARGMOD(Small_Object_Arena *arena))
 {
+    ASSERT_ARGS(Parrot_add_to_free_list);
     UINTVAL  i;
     void    *object;
     const UINTVAL num_objects = pool->objects_per_alloc;
-    ASSERT_ARGS(Parrot_add_to_free_list);
 
     pool->total_objects += num_objects;
     arena->used          = num_objects;
@@ -400,13 +407,13 @@ objects to the pool's free list for later allocation.
 static void
 gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
+    ASSERT_ARGS(gc_ms_alloc_objects);
     /* Setup memory for the new objects */
     Small_Object_Arena * const new_arena =
         mem_internal_allocate_typed(Small_Object_Arena);
 
     const size_t size = pool->object_size * pool->objects_per_alloc;
     size_t alloc_size;
-    ASSERT_ARGS(gc_ms_alloc_objects);
 
     /* could be mem_internal_allocate too, but calloc is fast */
     new_arena->start_objects = mem_internal_allocate_zeroed(size);
@@ -453,9 +460,9 @@ PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool *
 new_small_object_pool(size_t object_size, size_t objects_per_alloc)
 {
+    ASSERT_ARGS(new_small_object_pool);
     Small_Object_Pool * const pool =
         mem_internal_allocate_zeroed_typed(Small_Object_Pool);
-    ASSERT_ARGS(new_small_object_pool);
 
     pool->last_Arena        = NULL;
     pool->free_list         = NULL;
@@ -525,8 +532,8 @@ C<more_object_fn>.
 void
 Parrot_gc_ms_init(PARROT_INTERP)
 {
-    Arenas * const arena_base     = interp->arena_base;
     ASSERT_ARGS(Parrot_gc_ms_init);
+    Arenas * const arena_base     = interp->arena_base;
 
     arena_base->do_gc_mark         = Parrot_dod_ms_run;
     arena_base->finalize_gc_system = NULL;
@@ -550,9 +557,9 @@ void
 Parrot_small_object_pool_merge(PARROT_INTERP,
         ARGMOD(Small_Object_Pool *dest), ARGMOD(Small_Object_Pool *source))
 {
+    ASSERT_ARGS(Parrot_small_object_pool_merge);
     Small_Object_Arena  *cur_arena;
     void               **free_list_end;
-    ASSERT_ARGS(Parrot_small_object_pool_merge);
 
     /* XXX num_free_objects doesn't seem to be accounted correctly in, e.g.,
      * the PMC_EXT pool.

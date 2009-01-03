@@ -329,71 +329,105 @@ static int trace_igp_cb(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_end_cycle_cb assert(interp); \
-                                 assert(pool);
-#define ASSERT_ARGS_gc_gms_add_free_object assert(interp);
-#define ASSERT_ARGS_gc_gms_alloc_objects assert(interp); \
-                                         assert(pool);
-#define ASSERT_ARGS_gc_gms_chain_objects assert(interp); \
-                                         assert(pool); \
-                                         assert(new_arena);
-#define ASSERT_ARGS_gc_gms_clear_hdr_list assert(interp); \
-                                          assert(l);
-#define ASSERT_ARGS_gc_gms_clear_igp assert(interp); \
-                                     assert(gen);
-#define ASSERT_ARGS_gc_gms_create_gen assert(interp); \
-                                      assert(pool);
-#define ASSERT_ARGS_gc_gms_end_cycle assert(interp);
-#define ASSERT_ARGS_gc_gms_find_gen assert(interp); \
-                                    assert(h);
-#define ASSERT_ARGS_gc_gms_get_free_object assert(interp); \
-                                           assert(pool);
-#define ASSERT_ARGS_gc_gms_init_gen assert(interp); \
-                                    assert(pool);
-#define ASSERT_ARGS_gc_gms_init_mark assert(interp);
-#define ASSERT_ARGS_gc_gms_merge_gen assert(interp); \
-                                     assert(pool);
-#define ASSERT_ARGS_gc_gms_more_objects assert(interp); \
-                                        assert(pool);
-#define ASSERT_ARGS_gc_gms_pool_init assert(interp); \
-                                     assert(pool);
-#define ASSERT_ARGS_gc_gms_promote assert(interp); \
-                                   assert(h);
-#define ASSERT_ARGS_gc_gms_set_gen assert(interp);
-#define ASSERT_ARGS_gc_gms_setto_black assert(interp); \
-                                       assert(h);
-#define ASSERT_ARGS_gc_gms_setto_gray assert(interp); \
-                                      assert(h);
-#define ASSERT_ARGS_gc_gms_store_hdr_list assert(interp); \
-                                          assert(l); \
-                                          assert(h);
-#define ASSERT_ARGS_gc_gms_store_igp assert(interp); \
-                                     assert(h);
-#define ASSERT_ARGS_gc_gms_sweep assert(interp);
-#define ASSERT_ARGS_gc_gms_trace_children assert(interp);
-#define ASSERT_ARGS_gc_gms_trace_root assert(interp);
-#define ASSERT_ARGS_gc_gms_use_gen assert(interp); \
-                                   assert(pool); \
-                                   assert(plan);
-#define ASSERT_ARGS_gms_debug_verify assert(interp); \
-                                     assert(pool); \
-                                     assert(action);
-#define ASSERT_ARGS_init_mark_cb assert(interp); \
-                                 assert(pool); \
-                                 assert(arg);
-#define ASSERT_ARGS_parrot_gc_gms_deinit assert(interp);
-#define ASSERT_ARGS_parrot_gc_gms_run assert(interp);
-#define ASSERT_ARGS_set_gen_cb assert(interp); \
-                               assert(pool); \
-                               assert(arg);
-#define ASSERT_ARGS_sweep_cb_buf assert(interp); \
-                                 assert(pool);
-#define ASSERT_ARGS_sweep_cb_pmc assert(interp); \
-                                 assert(pool);
-#define ASSERT_ARGS_trace_children_cb assert(interp); \
-                                      assert(pool);
-#define ASSERT_ARGS_trace_igp_cb assert(interp); \
-                                 assert(pool);
+#define ASSERT_ARGS_end_cycle_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_gms_add_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_gc_gms_alloc_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_gms_chain_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(new_arena)
+#define ASSERT_ARGS_gc_gms_clear_hdr_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(l)
+#define ASSERT_ARGS_gc_gms_clear_igp __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(gen)
+#define ASSERT_ARGS_gc_gms_create_gen __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_gms_end_cycle __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_gc_gms_find_gen __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(h)
+#define ASSERT_ARGS_gc_gms_get_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_gms_init_gen __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_gms_init_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_gc_gms_merge_gen __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_gms_more_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_gms_pool_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_gms_promote __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(h)
+#define ASSERT_ARGS_gc_gms_set_gen __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_gc_gms_setto_black __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(h)
+#define ASSERT_ARGS_gc_gms_setto_gray __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(h)
+#define ASSERT_ARGS_gc_gms_store_hdr_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(l) \
+    || PARROT_ASSERT_ARG(h)
+#define ASSERT_ARGS_gc_gms_store_igp __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(h)
+#define ASSERT_ARGS_gc_gms_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_gc_gms_trace_children __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_gc_gms_trace_root __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_gc_gms_use_gen __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(plan)
+#define ASSERT_ARGS_gms_debug_verify __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(action)
+#define ASSERT_ARGS_init_mark_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(arg)
+#define ASSERT_ARGS_parrot_gc_gms_deinit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_parrot_gc_gms_run __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_set_gen_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(arg)
+#define ASSERT_ARGS_sweep_cb_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_sweep_cb_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_trace_children_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_trace_igp_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -474,8 +508,8 @@ Free used resources.
 static void
 parrot_gc_gms_deinit(PARROT_INTERP)
 {
-    Arenas * const arena_base = interp->arena_base;
     ASSERT_ARGS(parrot_gc_gms_deinit);
+    Arenas * const arena_base = interp->arena_base;
 
     /*
      * TODO free generations
@@ -527,8 +561,8 @@ PARROT_EXPORT
 void
 Parrot_gc_gms_init(PARROT_INTERP)
 {
-    Arenas * const arena_base = interp->arena_base;
     ASSERT_ARGS(Parrot_gc_gms_init);
+    Arenas * const arena_base = interp->arena_base;
 
     arena_base->gc_private = mem_sys_allocate_zeroed(sizeof (Gc_gms_private));
 
@@ -611,12 +645,12 @@ static void
 gc_gms_chain_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
         ARGIN(Small_Object_Arena *new_arena), size_t real_size)
 {
+    ASSERT_ARGS(gc_gms_chain_objects);
     Gc_gms_hdr *next, *prev;
     size_t i, n;
 
     Gc_gms_hdr *p = new_arena->start_objects;
     Gc_gms_hdr * const marker = &pool->marker;
-    ASSERT_ARGS(gc_gms_chain_objects);
 
     PARROT_ASSERT(pool->free_list == marker);
 
@@ -669,10 +703,10 @@ Allocate new objects for the given pool.
 static void
 gc_gms_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
+    ASSERT_ARGS(gc_gms_alloc_objects);
     const size_t real_size = pool->object_size;
     Small_Object_Arena * const new_arena = mem_internal_allocate(sizeof (Small_Object_Arena));
     const size_t size = real_size * pool->objects_per_alloc;
-    ASSERT_ARGS(gc_gms_alloc_objects);
 
     new_arena->start_objects = mem_internal_allocate(size);
     /* insert arena in list */
@@ -734,9 +768,9 @@ PARROT_CANNOT_RETURN_NULL
 static PObj *
 gc_gms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
+    ASSERT_ARGS(gc_gms_get_free_object);
     PObj *ptr;
     Gc_gms_hdr *hdr;
-    ASSERT_ARGS(gc_gms_get_free_object);
 
     hdr = pool->free_list;
     if (hdr == &pool->marker)
@@ -787,8 +821,8 @@ PARROT_CANNOT_RETURN_NULL
 static Gc_gms_gen *
 gc_gms_create_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), size_t gen_no)
 {
-    Gc_gms_gen * const gen = mem_sys_allocate(sizeof (*gen));
     ASSERT_ARGS(gc_gms_create_gen);
+    Gc_gms_gen * const gen = mem_sys_allocate(sizeof (*gen));
 
     gen->gen_no = gen_no;
     gen->pool = pool;
@@ -816,8 +850,8 @@ Initalize the generation system by creating the first two generations.
 static void
 gc_gms_init_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
-    Gc_gms_private *gmsp;
     ASSERT_ARGS(gc_gms_init_gen);
+    Gc_gms_private *gmsp;
     /*
      * Generations are numbered beginning at zero
      * 0 ... oldest
@@ -848,9 +882,9 @@ PARROT_CANNOT_RETURN_NULL
 static Gc_gms_gen *
 gc_gms_find_gen(PARROT_INTERP, ARGIN(const Gc_gms_hdr *h), UINTVAL gen_no)
 {
+    ASSERT_ARGS(gc_gms_find_gen);
     Gc_gms_gen *gen;
     const Small_Object_Pool * const pool = h->gen->pool;
-    ASSERT_ARGS(gc_gms_find_gen);
 
     PARROT_ASSERT(pool);
 
@@ -884,10 +918,10 @@ RT #48260: Not yet documented!!!
 static void
 gc_gms_promote(PARROT_INTERP, ARGIN(Gc_gms_hdr *h), UINTVAL gen_no)
 {
+    ASSERT_ARGS(gc_gms_promote);
     Gc_gms_gen *gen;
     Gc_gms_hdr *prev, *next;
     Small_Object_Pool * const pool = h->gen->pool;
-    ASSERT_ARGS(gc_gms_promote);
 
     /* unsnap from current generation */
     prev = h->prev;
@@ -932,8 +966,8 @@ RT #48260: Not yet documented!!!
 static void
 gc_gms_store_hdr_list(PARROT_INTERP, ARGMOD(Gc_gms_hdr_list *l), ARGIN(Gc_gms_hdr *h))
 {
-    Gc_gms_hdr_store * const s = l->last;
     ASSERT_ARGS(gc_gms_store_hdr_list);
+    Gc_gms_hdr_store * const s = l->last;
 
     /* if it's not created or if it's full allocate new store */
     if (!s || s->ptr == &s->store[GC_GMS_STORE_SIZE]) {
@@ -966,8 +1000,8 @@ RT #48260: Not yet documented!!!
 static void
 gc_gms_clear_hdr_list(PARROT_INTERP, ARGMOD(Gc_gms_hdr_list *l))
 {
-    Gc_gms_hdr_store *s, *next;
     ASSERT_ARGS(gc_gms_clear_hdr_list);
+    Gc_gms_hdr_store *s, *next;
 
     for (s = l->first; s; s = next) {
         next = s->next;
@@ -989,9 +1023,9 @@ RT #48260: Not yet documented!!!
 static void
 gc_gms_store_igp(PARROT_INTERP, ARGIN(Gc_gms_hdr *h))
 {
+    ASSERT_ARGS(gc_gms_store_igp);
     Gc_gms_gen * const gen = h->gen;
     Gc_gms_hdr_list * const igp = &gen->igp;
-    ASSERT_ARGS(gc_gms_store_igp);
 
     gc_gms_store_hdr_list(interp, igp, h);
 }
@@ -1009,8 +1043,8 @@ RT #48260: Not yet documented!!!
 static void
 gc_gms_clear_igp(PARROT_INTERP, ARGIN(Gc_gms_gen *gen))
 {
-    Gc_gms_hdr_list * const igp = &gen->igp;
     ASSERT_ARGS(gc_gms_clear_igp);
+    Gc_gms_hdr_list * const igp = &gen->igp;
 
     gc_gms_clear_hdr_list(interp, igp);
 }
@@ -1032,9 +1066,9 @@ void
 parrot_gc_gms_wb(PARROT_INTERP, ARGIN(PMC *agg), ARGIN(void *old),
     ARGIN(void *_new))
 {
+    ASSERT_ARGS(parrot_gc_gms_wb);
     Gc_gms_hdr * const nh = PObj_to_GMSH(_new);
     Gc_gms_hdr * const ah = PObj_to_GMSH(agg);
-    ASSERT_ARGS(parrot_gc_gms_wb);
 
     /* if this may be an aggregate store it in IGP list, thus making
      * it a possible root for this generation
@@ -1066,8 +1100,8 @@ void
 parrot_gc_gms_wb_key(PARROT_INTERP, ARGIN(PMC *agg), ARGIN(void *old),
     ARGIN(void *old_key), ARGIN(void *_new), ARGIN(void *new_key))
 {
-    Gc_gms_hdr *nh, *ah;
     ASSERT_ARGS(parrot_gc_gms_wb_key);
+    Gc_gms_hdr *nh, *ah;
 
     /* handle hash values */
     parrot_gc_gms_wb(interp, agg, old, _new);
@@ -1102,6 +1136,7 @@ static void
 gc_gms_merge_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
         int flag, SHIM(Gc_gms_plan *plan))
 {
+    ASSERT_ARGS(gc_gms_merge_gen);
     Gc_gms_hdr *h;
 
     /* run through the blacks and set their generation pointer
@@ -1109,7 +1144,6 @@ gc_gms_merge_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
      */
     Gc_gms_gen * const gen = pool->last_gen;
     Gc_gms_gen * const prev = gen->prev;
-    ASSERT_ARGS(gc_gms_merge_gen);
 
     for (h = pool->black; h != pool->free_list; h = h->next) {
         h->gen = prev;
@@ -1137,9 +1171,9 @@ static void
 gc_gms_use_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
         int flag, ARGIN(const Gc_gms_plan *plan))
 {
+    ASSERT_ARGS(gc_gms_use_gen);
     Gc_gms_gen *gen, *prev;
     UINTVAL next_gen;
-    ASSERT_ARGS(gc_gms_use_gen);
 
     /* set hdr pointers in last generation */
     gen        = pool->last_gen;
@@ -1173,8 +1207,8 @@ PARROT_WARN_UNUSED_RESULT
 static int
 set_gen_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, ARGIN(void *arg))
 {
-    Gc_gms_plan * const plan = (Gc_gms_plan *)arg;
     ASSERT_ARGS(set_gen_cb);
+    Gc_gms_plan * const plan = (Gc_gms_plan *)arg;
 
     if (plan->merge_gen)
         gc_gms_merge_gen(interp, pool, flag, plan);
@@ -1196,9 +1230,9 @@ RT #48260: Not yet documented!!!
 static void
 gc_gms_set_gen(PARROT_INTERP)
 {
+    ASSERT_ARGS(gc_gms_set_gen);
     Gc_gms_plan plan;
     Gc_gms_private *gmsp;
-    ASSERT_ARGS(gc_gms_set_gen);
     /*
      * there are these basic plans
      * 1) Use the black as the next old generation
@@ -1313,8 +1347,8 @@ Set the white header C<h> to gray.
 static void
 gc_gms_setto_gray(PARROT_INTERP, ARGIN(Gc_gms_hdr *h), int priority)
 {
-    Small_Object_Pool * const pool = h->gen->pool;
     ASSERT_ARGS(gc_gms_setto_gray);
+    Small_Object_Pool * const pool = h->gen->pool;
     /*
      * TODO high_priority like in src/dod.c
      */
@@ -1376,8 +1410,8 @@ Set the white header C<h> to black.
 static void
 gc_gms_setto_black(PARROT_INTERP, ARGMOD(Gc_gms_hdr *h), int priority)
 {
-    Small_Object_Pool * const pool = h->gen->pool;
     ASSERT_ARGS(gc_gms_setto_black);
+    Small_Object_Pool * const pool = h->gen->pool;
 
     /*
      * TODO high_priority like src/dod.c
@@ -1437,9 +1471,9 @@ PARROT_EXPORT
 void
 parrot_gc_gms_pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
 {
+    ASSERT_ARGS(parrot_gc_gms_pobject_lives);
     Gc_gms_hdr *h;
     int priority;
-    ASSERT_ARGS(parrot_gc_gms_pobject_lives);
 
     PObj_live_SET(obj);
     priority =  PObj_needs_early_DOD_TEST(obj);
@@ -1487,8 +1521,8 @@ Initialize the mark phase of GC.
 static void
 gc_gms_init_mark(PARROT_INTERP)
 {
-    Arenas * const arena_base = interp->arena_base;
     ASSERT_ARGS(gc_gms_init_mark);
+    Arenas * const arena_base = interp->arena_base;
 
     arena_base->dod_trace_ptr = NULL;
     arena_base->dod_mark_start = NULL;
@@ -1511,10 +1545,10 @@ RT #48260: Not yet documented!!!
 static int
 trace_igp_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(void *arg))
 {
+    ASSERT_ARGS(trace_igp_cb);
     Gc_gms_hdr_store *s;
     Gc_gms_gen * const gen = pool->last_gen;
     Gc_gms_hdr_list * const igp = &gen->igp;
-    ASSERT_ARGS(trace_igp_cb);
 
     for (s = igp->first; s; s = s->next) {
         const Gc_gms_hdr **p;
@@ -1539,8 +1573,8 @@ Trace the root set. If C<trace_stack> is true, trace system areas.
 static int
 gc_gms_trace_root(PARROT_INTERP, int trace_stack)
 {
-    const int ret = Parrot_dod_trace_root(interp, trace_stack);
     ASSERT_ARGS(gc_gms_trace_root);
+    const int ret = Parrot_dod_trace_root(interp, trace_stack);
 
     if (ret == 0)
         return 0;
@@ -1561,11 +1595,11 @@ RT #48260: Not yet documented!!!
 static int
 trace_children_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(void *arg))
 {
+    ASSERT_ARGS(trace_children_cb);
     Arenas * const arena_base = interp->arena_base;
     const int lazy_dod = arena_base->lazy_dod;
     const UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
     Gc_gms_hdr *h;
-    ASSERT_ARGS(trace_children_cb);
 
     for (h = pool->gray; h != pool->white;) {
         PMC * const current = (PMC*)GMSH_to_PObj(h);
@@ -1646,9 +1680,9 @@ TODO put these in front of the pool at pool->white_fin
 static int
 sweep_cb_pmc(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(void *arg))
 {
+    ASSERT_ARGS(sweep_cb_pmc);
     Gc_gms_hdr *h;
     Arenas * const arena_base = interp->arena_base;
-    ASSERT_ARGS(sweep_cb_pmc);
 
     /* TODO object stats */
 
@@ -1684,8 +1718,8 @@ RT #48260: Not yet documented!!!
 static int
 sweep_cb_buf(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, SHIM(void *arg))
 {
-    Gc_gms_hdr *h;
     ASSERT_ARGS(sweep_cb_buf);
+    Gc_gms_hdr *h;
 
     /* TODO object stats */
 
@@ -1770,8 +1804,8 @@ RT #48260: Not yet documented!!!
 static int
 end_cycle_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, SHIM(void *arg))
 {
-    Gc_gms_hdr *h;
     ASSERT_ARGS(end_cycle_cb);
+    Gc_gms_hdr *h;
     /*
      * clear live flags
      * TODO just swap black and white
@@ -1824,9 +1858,9 @@ Interface to C<Parrot_do_dod_run>. C<flags> is one of:
 static void
 parrot_gc_gms_run(PARROT_INTERP, UINTVAL flags)
 {
+    ASSERT_ARGS(parrot_gc_gms_run);
     Arenas * const arena_base = interp->arena_base;
     Gc_gms_private *g_gms;
-    ASSERT_ARGS(parrot_gc_gms_run);
 
     if (arena_base->DOD_block_level) {
         return;
@@ -1877,12 +1911,12 @@ RT #48260: Not yet documented!!!
 static void
 gms_debug_verify(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(const char *action))
 {
+    ASSERT_ARGS(gms_debug_verify);
     Gc_gms_hdr *h;
     int bf, gf, wf, ff;
     size_t i;
 
     const size_t n = pool->total_objects;
-    ASSERT_ARGS(gms_debug_verify);
 
     bf = gf = wf = ff = 0;
 

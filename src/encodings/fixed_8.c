@@ -156,42 +156,60 @@ static STRING * to_encoding(PARROT_INTERP,
     SHIM(STRING *dest))
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_become_encoding assert(interp);
-#define ASSERT_ARGS_bytes assert(source_string);
-#define ASSERT_ARGS_codepoints assert(interp); \
-                               assert(source_string);
-#define ASSERT_ARGS_fixed8_get_next assert(interp); \
-                                    assert(iter);
-#define ASSERT_ARGS_fixed8_set_next assert(interp); \
-                                    assert(iter);
-#define ASSERT_ARGS_fixed8_set_position assert(iter);
-#define ASSERT_ARGS_get_byte assert(interp); \
-                             assert(source_string);
-#define ASSERT_ARGS_get_bytes assert(interp); \
-                              assert(source_string);
-#define ASSERT_ARGS_get_bytes_inplace assert(interp); \
-                                      assert(source_string); \
-                                      assert(return_string);
-#define ASSERT_ARGS_get_codepoint assert(interp); \
-                                  assert(source_string);
-#define ASSERT_ARGS_get_codepoints assert(interp); \
-                                   assert(source_string);
-#define ASSERT_ARGS_get_codepoints_inplace assert(interp); \
-                                           assert(source_string); \
-                                           assert(dest_string);
-#define ASSERT_ARGS_iter_init assert(src); \
-                              assert(iter);
-#define ASSERT_ARGS_set_byte assert(interp); \
-                             assert(source_string);
-#define ASSERT_ARGS_set_bytes assert(interp); \
-                              assert(source_string); \
-                              assert(new_bytes);
-#define ASSERT_ARGS_set_codepoint assert(interp); \
-                                  assert(source_string);
-#define ASSERT_ARGS_set_codepoints assert(interp); \
-                                   assert(source_string); \
-                                   assert(new_codepoints);
-#define ASSERT_ARGS_to_encoding assert(interp);
+#define ASSERT_ARGS_become_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_codepoints __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_fixed8_get_next __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(iter)
+#define ASSERT_ARGS_fixed8_set_next __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(iter)
+#define ASSERT_ARGS_fixed8_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(iter)
+#define ASSERT_ARGS_get_byte __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_get_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_get_bytes_inplace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string) \
+    || PARROT_ASSERT_ARG(return_string)
+#define ASSERT_ARGS_get_codepoint __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_get_codepoints __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_get_codepoints_inplace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string) \
+    || PARROT_ASSERT_ARG(dest_string)
+#define ASSERT_ARGS_iter_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(src) \
+    || PARROT_ASSERT_ARG(iter)
+#define ASSERT_ARGS_set_byte __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_set_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string) \
+    || PARROT_ASSERT_ARG(new_bytes)
+#define ASSERT_ARGS_set_codepoint __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_set_codepoints __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string) \
+    || PARROT_ASSERT_ARG(new_codepoints)
+#define ASSERT_ARGS_to_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -272,8 +290,8 @@ PARROT_WARN_UNUSED_RESULT
 static UINTVAL
 get_byte(PARROT_INTERP, ARGIN(const STRING *source_string), UINTVAL offset)
 {
-    unsigned char *contents = (unsigned char *)source_string->strstart;
     ASSERT_ARGS(get_byte);
+    unsigned char *contents = (unsigned char *)source_string->strstart;
 
     if (offset >= source_string->bufused) {
 /*        Parrot_ex_throw_from_c_args(interp, NULL, 0,
@@ -299,8 +317,8 @@ static void
 set_byte(PARROT_INTERP, ARGIN(const STRING *source_string),
         UINTVAL offset, UINTVAL byte)
 {
-    unsigned char *contents;
     ASSERT_ARGS(set_byte);
+    unsigned char *contents;
 
     if (offset >= source_string->bufused)
         Parrot_ex_throw_from_c_args(interp, NULL, 0,
@@ -327,9 +345,9 @@ static STRING *
 get_codepoints(PARROT_INTERP, ARGIN(STRING *source_string),
         UINTVAL offset, UINTVAL count)
 {
+    ASSERT_ARGS(get_codepoints);
     STRING * const return_string = get_bytes(interp, source_string,
             offset, count);
-    ASSERT_ARGS(get_codepoints);
     return_string->charset = source_string->charset;
     return return_string;
 }
@@ -350,9 +368,9 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 get_bytes(PARROT_INTERP, ARGIN(STRING *source_string), UINTVAL offset, UINTVAL count)
 {
+    ASSERT_ARGS(get_bytes);
     STRING * const return_string = Parrot_make_COW_reference(interp,
             source_string);
-    ASSERT_ARGS(get_bytes);
     return_string->encoding = source_string->encoding;
     return_string->charset = source_string->charset;
 
@@ -523,8 +541,8 @@ Moves the string iterator C<i> to the next codepoint.
 static UINTVAL
 fixed8_get_next(PARROT_INTERP, ARGMOD(String_iter *iter))
 {
-    const UINTVAL c = get_byte(interp, iter->str, iter->charpos++);
     ASSERT_ARGS(fixed8_get_next);
+    const UINTVAL c = get_byte(interp, iter->str, iter->charpos++);
     iter->bytepos++;
     return c;
 }
@@ -602,6 +620,7 @@ PARROT_CANNOT_RETURN_NULL
 ENCODING *
 Parrot_encoding_fixed_8_init(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_encoding_fixed_8_init);
     ENCODING * const return_encoding = Parrot_new_encoding(interp);
 
     ENCODING base_encoding = {
@@ -624,7 +643,6 @@ Parrot_encoding_fixed_8_init(PARROT_INTERP)
         iter_init
 
     };
-    ASSERT_ARGS(Parrot_encoding_fixed_8_init);
     STRUCT_COPY_FROM_STRUCT(return_encoding, base_encoding);
     Parrot_register_encoding(interp, "fixed_8", return_encoding);
     return return_encoding;

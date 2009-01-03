@@ -129,22 +129,29 @@ void parrot_PIC_prederef(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pc_pred);
 
-#define ASSERT_ARGS_parrot_PIC_alloc_mic
-#define ASSERT_ARGS_parrot_PIC_alloc_pic assert(interp);
-#define ASSERT_ARGS_parrot_PIC_alloc_store assert(cs);
-#define ASSERT_ARGS_parrot_pic_check_sig assert(sig1); \
-                                         assert(sig2); \
-                                         assert(type);
-#define ASSERT_ARGS_parrot_PIC_destroy assert(cs);
-#define ASSERT_ARGS_parrot_pic_find_infix_v_pp assert(interp); \
-                                               assert(left); \
-                                               assert(right); \
-                                               assert(mic); \
-                                               assert(cur_opcode);
-#define ASSERT_ARGS_parrot_PIC_op_is_cached
-#define ASSERT_ARGS_parrot_pic_opcode assert(interp);
-#define ASSERT_ARGS_parrot_PIC_prederef assert(interp); \
-                                        assert(pc_pred);
+#define ASSERT_ARGS_parrot_PIC_alloc_mic __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_parrot_PIC_alloc_pic __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_parrot_PIC_alloc_store __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(cs)
+#define ASSERT_ARGS_parrot_pic_check_sig __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(sig1) \
+    || PARROT_ASSERT_ARG(sig2) \
+    || PARROT_ASSERT_ARG(type)
+#define ASSERT_ARGS_parrot_PIC_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(cs)
+#define ASSERT_ARGS_parrot_pic_find_infix_v_pp __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(left) \
+    || PARROT_ASSERT_ARG(right) \
+    || PARROT_ASSERT_ARG(mic) \
+    || PARROT_ASSERT_ARG(cur_opcode)
+#define ASSERT_ARGS_parrot_PIC_op_is_cached __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_parrot_pic_opcode __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_parrot_PIC_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pc_pred)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pic.c */
 
@@ -171,13 +178,15 @@ funcptr_t parrot_pic_JIT_sub(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_parrot_pic_is_safe_to_jit assert(interp); \
-                                              assert(sub); \
-                                              assert(sig_args); \
-                                              assert(sig_results); \
-                                              assert(flags);
-#define ASSERT_ARGS_parrot_pic_JIT_sub assert(interp); \
-                                       assert(sub);
+#define ASSERT_ARGS_parrot_pic_is_safe_to_jit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(sig_args) \
+    || PARROT_ASSERT_ARG(sig_results) \
+    || PARROT_ASSERT_ARG(flags)
+#define ASSERT_ARGS_parrot_pic_JIT_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pic_jit.c */
 

@@ -29,7 +29,8 @@ messages.
 static INTVAL print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_print_warning assert(interp);
+#define ASSERT_ARGS_print_warning __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -47,8 +48,8 @@ PARROT_EXPORT
 void
 print_pbc_location(PARROT_INTERP)
 {
-    Interp * const tracer = interp->debugger ? interp->debugger : interp;
     ASSERT_ARGS(print_pbc_location);
+    Interp * const tracer = interp->debugger ? interp->debugger : interp;
     Parrot_io_eprintf(tracer, "%Ss\n",
             Parrot_Context_infostr(interp,
                 CONTEXT(interp)));

@@ -69,20 +69,23 @@ static void rec_climb_back_and_mark(
     ARGIN(parrot_prm_context* c))
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS__drand48
-#define ASSERT_ARGS__erand48
-#define ASSERT_ARGS__jrand48
-#define ASSERT_ARGS__lrand48
-#define ASSERT_ARGS__mrand48
-#define ASSERT_ARGS__nrand48
-#define ASSERT_ARGS__srand48
-#define ASSERT_ARGS_COMPARE assert(interp); \
-                            assert(a); \
-                            assert(b); \
-                            assert(cmp);
-#define ASSERT_ARGS_next_rand
-#define ASSERT_ARGS_process_cycle_without_exit assert(c);
-#define ASSERT_ARGS_rec_climb_back_and_mark assert(c);
+#define ASSERT_ARGS__drand48 __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS__erand48 __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS__jrand48 __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS__lrand48 __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS__mrand48 __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS__nrand48 __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS__srand48 __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_COMPARE __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(a) \
+    || PARROT_ASSERT_ARG(b) \
+    || PARROT_ASSERT_ARG(cmp)
+#define ASSERT_ARGS_next_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_process_cycle_without_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(c)
+#define ASSERT_ARGS_rec_climb_back_and_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(c)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -119,8 +122,8 @@ PARROT_CONST_FUNCTION
 INTVAL
 intval_mod(INTVAL i2, INTVAL i3)
 {
-    INTVAL z = i3;
     ASSERT_ARGS(intval_mod);
+    INTVAL z = i3;
 
     if (z == 0)
         return i2;
@@ -166,13 +169,13 @@ PARROT_CONST_FUNCTION
 FLOATVAL
 floatval_mod(FLOATVAL n2, FLOATVAL n3)
 {
+    ASSERT_ARGS(floatval_mod);
 #ifdef __LCC__
 
     /* Another workaround for buggy code generation in the lcc compiler-
      * adding a temporary variable makes it pass the test.
      */
     const FLOATVAL temp = n3 * floor(n2 / n3);
-    ASSERT_ARGS(floatval_mod);
 
     return !FLOAT_IS_ZERO(n3)
       ? (n2 - temp)
@@ -233,9 +236,9 @@ Returns the next random number in C<X>.
 static void
 next_rand(_rand_buf X)
 {
+    ASSERT_ARGS(next_rand);
     unsigned short lo, mid, hi;
     unsigned int t;
-    ASSERT_ARGS(next_rand);
 
     /* 48 bit mul, one short at a time */
     t = X[0] * a[0] + c;
@@ -266,8 +269,8 @@ Returns a C<double> in the interval C<[0.0, 1.0)>.
 static FLOATVAL
 _erand48(_rand_buf buf)
 {
-    FLOATVAL r;
     ASSERT_ARGS(_erand48);
+    FLOATVAL r;
     next_rand(buf);
     r = ((buf[0] / 65536.0 + buf[1]) / 65536.0 + buf[2]) / 65536.0;
     return r;
@@ -303,8 +306,8 @@ Returns a C<long> in the interval C<[-2^31, 2^31)>.
 static long
 _jrand48(_rand_buf buf)
 {
-    long ret;
     ASSERT_ARGS(_jrand48);
+    long ret;
     next_rand(buf);
     ret = buf[2] << 16 | buf[1];
     return ret;
@@ -539,8 +542,8 @@ PARROT_CANNOT_RETURN_NULL
 PMC*
 tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
 {
-    PMC * const Array = pmc_new(interp, enum_class_Array);
     ASSERT_ARGS(tm_to_array);
+    PMC * const Array = pmc_new(interp, enum_class_Array);
 
     VTABLE_set_integer_native(interp, Array, 9);
     VTABLE_set_integer_keyed_int(interp, Array, 0, tm->tm_sec);
@@ -575,6 +578,7 @@ INTVAL
 Parrot_byte_index(SHIM_INTERP, ARGIN(const STRING *base),
         ARGIN(const STRING *search), UINTVAL start_offset)
 {
+    ASSERT_ARGS(Parrot_byte_index);
     const char * const str_start  = base->strstart;
     const INTVAL       str_len    = base->strlen;
     const char * const search_str = search->strstart;
@@ -582,7 +586,6 @@ Parrot_byte_index(SHIM_INTERP, ARGIN(const STRING *base),
     const char        *str_pos    = str_start + start_offset;
     INTVAL             len_remain = str_len   - start_offset;
     const char        *search_pos;
-    ASSERT_ARGS(Parrot_byte_index);
 
     /* find the next position of the first character in the search string
      * Parrot strings can have NULLs, so strchr() won't work here */
@@ -623,11 +626,11 @@ INTVAL
 Parrot_byte_rindex(SHIM_INTERP, ARGIN(const STRING *base),
         ARGIN(const STRING *search), UINTVAL start_offset)
 {
+    ASSERT_ARGS(Parrot_byte_rindex);
     const INTVAL searchlen          = search->strlen;
     const char * const search_start = search->strstart;
     UINTVAL max_possible_offset     = (base->strlen - search->strlen);
     INTVAL current_offset;
-    ASSERT_ARGS(Parrot_byte_rindex);
 
     if (start_offset && start_offset < max_possible_offset)
         max_possible_offset = start_offset;
@@ -671,10 +674,10 @@ case marks it, and set node_index as its backup.
 static void
 rec_climb_back_and_mark(int node_index, ARGIN(parrot_prm_context* c))
 {
+    ASSERT_ARGS(rec_climb_back_and_mark);
     const int node = c->dest_regs[node_index];
     const int pred = c->src_regs[node_index];
     const int pred_index = c->reg_to_index[pred];
-    ASSERT_ARGS(rec_climb_back_and_mark);
 
     if (pred_index < 0) { /* pred has no predecessor */
         move_reg(pred, node, c);
@@ -713,6 +716,7 @@ For instance: 1-->2, 2-->3, 3-->1
 static void
 process_cycle_without_exit(int node_index, ARGIN(parrot_prm_context* c))
 {
+    ASSERT_ARGS(process_cycle_without_exit);
     const int pred = c->src_regs[node_index];
 
     /* let's try the alternate move function*/
@@ -720,7 +724,6 @@ process_cycle_without_exit(int node_index, ARGIN(parrot_prm_context* c))
         c->mov_alt
             ? c->mov_alt(c->interp, c->dest_regs[node_index], pred, c->info)
             : 0;
-    ASSERT_ARGS(process_cycle_without_exit);
 
     if (0 == alt) { /* use temp reg */
         move_reg(c->dest_regs[node_index], c->temp_reg, c);
@@ -796,13 +799,13 @@ Parrot_register_move(PARROT_INTERP,
         reg_move_func mov_alt,
         ARGIN(void *info))
 {
+    ASSERT_ARGS(Parrot_register_move);
     int i;
     int max_reg       = 0;
     int* nb_succ      = NULL;
     int* backup       = NULL;
     int* reg_to_index = NULL;
     parrot_prm_context c;
-    ASSERT_ARGS(Parrot_register_move);
 
     if (n_regs == 0)
         return;

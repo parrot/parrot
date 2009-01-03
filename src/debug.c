@@ -285,70 +285,108 @@ PARROT_CANNOT_RETURN_NULL
 static const char * skip_whitespace(ARGIN(const char *cmd))
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_chop_newline assert(buf);
-#define ASSERT_ARGS_close_script_file assert(interp);
-#define ASSERT_ARGS_condition_regtype assert(cmd);
-#define ASSERT_ARGS_current_breakpoint assert(pdb);
-#define ASSERT_ARGS_dbg_break assert(pdb); \
-                              assert(cmd);
-#define ASSERT_ARGS_dbg_continue assert(pdb); \
-                                 assert(cmd);
-#define ASSERT_ARGS_dbg_delete assert(pdb); \
-                               assert(cmd);
-#define ASSERT_ARGS_dbg_disable assert(pdb); \
-                                assert(cmd);
-#define ASSERT_ARGS_dbg_disassemble assert(pdb); \
-                                    assert(cmd);
-#define ASSERT_ARGS_dbg_echo assert(pdb);
-#define ASSERT_ARGS_dbg_enable assert(pdb); \
-                               assert(cmd);
-#define ASSERT_ARGS_dbg_eval assert(pdb); \
-                             assert(cmd);
-#define ASSERT_ARGS_dbg_gcdebug assert(pdb);
-#define ASSERT_ARGS_dbg_help assert(pdb); \
-                             assert(cmd);
-#define ASSERT_ARGS_dbg_info assert(pdb);
-#define ASSERT_ARGS_dbg_list assert(pdb); \
-                             assert(cmd);
-#define ASSERT_ARGS_dbg_load assert(pdb); \
-                             assert(cmd);
-#define ASSERT_ARGS_dbg_next assert(pdb); \
-                             assert(cmd);
-#define ASSERT_ARGS_dbg_print assert(pdb); \
-                              assert(cmd);
-#define ASSERT_ARGS_dbg_quit assert(pdb);
-#define ASSERT_ARGS_dbg_run assert(pdb); \
-                            assert(cmd);
-#define ASSERT_ARGS_dbg_script assert(pdb); \
-                               assert(cmd);
-#define ASSERT_ARGS_dbg_stack assert(pdb);
-#define ASSERT_ARGS_dbg_trace assert(pdb); \
-                              assert(cmd);
-#define ASSERT_ARGS_dbg_watch assert(pdb); \
-                              assert(cmd);
-#define ASSERT_ARGS_debugger_cmdline assert(interp);
-#define ASSERT_ARGS_dump_string assert(interp);
-#define ASSERT_ARGS_GDB_B assert(interp); \
-                          assert(s);
-#define ASSERT_ARGS_GDB_P assert(interp); \
-                          assert(s);
-#define ASSERT_ARGS_GDB_print_reg assert(interp);
-#define ASSERT_ARGS_get_command
-#define ASSERT_ARGS_get_uint assert(cmd);
-#define ASSERT_ARGS_get_ulong assert(cmd);
-#define ASSERT_ARGS_nextarg
-#define ASSERT_ARGS_parse_command assert(command); \
-                                  assert(cmdP);
-#define ASSERT_ARGS_parse_int assert(str); \
-                              assert(intP);
-#define ASSERT_ARGS_parse_key assert(interp); \
-                              assert(str); \
-                              assert(keyP);
-#define ASSERT_ARGS_parse_string assert(interp); \
-                                 assert(str); \
-                                 assert(strP);
-#define ASSERT_ARGS_skip_command assert(str);
-#define ASSERT_ARGS_skip_whitespace assert(cmd);
+#define ASSERT_ARGS_chop_newline __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(buf)
+#define ASSERT_ARGS_close_script_file __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_condition_regtype __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_current_breakpoint __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb)
+#define ASSERT_ARGS_dbg_break __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb) \
+    || PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_dbg_continue __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb) \
+    || PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_dbg_delete __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb) \
+    || PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_dbg_disable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb) \
+    || PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_dbg_disassemble __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb) \
+    || PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_dbg_echo __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb)
+#define ASSERT_ARGS_dbg_enable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb) \
+    || PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_dbg_eval __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb) \
+    || PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_dbg_gcdebug __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb)
+#define ASSERT_ARGS_dbg_help __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb) \
+    || PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_dbg_info __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb)
+#define ASSERT_ARGS_dbg_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb) \
+    || PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_dbg_load __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb) \
+    || PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_dbg_next __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb) \
+    || PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_dbg_print __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb) \
+    || PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_dbg_quit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb)
+#define ASSERT_ARGS_dbg_run __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb) \
+    || PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_dbg_script __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb) \
+    || PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_dbg_stack __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb)
+#define ASSERT_ARGS_dbg_trace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb) \
+    || PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_dbg_watch __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pdb) \
+    || PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_debugger_cmdline __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_dump_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_GDB_B __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(s)
+#define ASSERT_ARGS_GDB_P __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(s)
+#define ASSERT_ARGS_GDB_print_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_command __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_get_uint __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_get_ulong __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_nextarg __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_parse_command __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(command) \
+    || PARROT_ASSERT_ARG(cmdP)
+#define ASSERT_ARGS_parse_int __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(str) \
+    || PARROT_ASSERT_ARG(intP)
+#define ASSERT_ARGS_parse_key __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(str) \
+    || PARROT_ASSERT_ARG(keyP)
+#define ASSERT_ARGS_parse_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(str) \
+    || PARROT_ASSERT_ARG(strP)
+#define ASSERT_ARGS_skip_command __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(str)
+#define ASSERT_ARGS_skip_whitespace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(cmd)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -783,8 +821,8 @@ If the C string argument end with a newline, delete it.
 static void
 chop_newline(ARGMOD(char * buf))
 {
-    size_t l;
     ASSERT_ARGS(chop_newline);
+    size_t l;
     l = strlen(buf);
     if (l > 0 && buf [l - 1] == '\n')
         buf [l - 1] = '\0';
@@ -865,8 +903,8 @@ PARROT_WARN_UNUSED_RESULT
 static const char *
 parse_int(ARGIN(const char *str), ARGOUT(int *intP))
 {
-    char *end;
     ASSERT_ARGS(parse_int);
+    char *end;
 
     *intP = strtol(str, &end, 0);
 
@@ -890,8 +928,8 @@ PARROT_WARN_UNUSED_RESULT
 static const char *
 parse_string(PARROT_INTERP, ARGIN(const char *str), ARGOUT(STRING **strP))
 {
-    const char *string_start;
     ASSERT_ARGS(parse_string);
+    const char *string_start;
 
     /* if this is not a quoted string, there's nothing to parse */
     if (*str != '"')
@@ -991,9 +1029,9 @@ PARROT_IGNORABLE_RESULT
 static const char *
 parse_command(ARGIN(const char *command), ARGOUT(unsigned long *cmdP))
 {
+    ASSERT_ARGS(parse_command);
     int           i;
     unsigned long c = 0;
-    ASSERT_ARGS(parse_command);
 
     /* Skip leading whitespace. */
     command = skip_whitespace(command);
@@ -1121,11 +1159,11 @@ PARROT_EXPORT
 void
 Parrot_debugger_destroy(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_debugger_destroy);
     /* Unfinished.
        Free all debugger allocated resources.
      */
     PDB_t *pdb = interp->pdb;
-    ASSERT_ARGS(Parrot_debugger_destroy);
 
     TRACEDEB_MSG("Parrot_debugger_destroy");
 
@@ -1153,8 +1191,8 @@ PARROT_EXPORT
 void
 Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(STRING *filename))
 {
-    char *file;
     ASSERT_ARGS(Parrot_debugger_load);
+    char *file;
 
     TRACEDEB_MSG("Parrot_debugger_load");
 
@@ -1284,11 +1322,11 @@ The input is saved in C<< pdb->cur_command >>.
 void
 PDB_get_command(PARROT_INTERP)
 {
+    ASSERT_ARGS(PDB_get_command);
     unsigned int  i;
     int           ch;
     char         *c;
     PDB_t        * const pdb = interp->pdb;
-    ASSERT_ARGS(PDB_get_command);
 
     /* flush the buffered data */
     fflush(stdout);
@@ -1373,8 +1411,8 @@ PARROT_EXPORT
 void
 PDB_script_file(PARROT_INTERP, ARGIN(const char *command))
 {
-    FILE *fd;
     ASSERT_ARGS(PDB_script_file);
+    FILE *fd;
 
     TRACEDEB_MSG("PDB_script_file");
 
@@ -1411,6 +1449,7 @@ PARROT_IGNORABLE_RESULT
 int
 PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
 {
+    ASSERT_ARGS(PDB_run_command);
     unsigned long c;
     PDB_t        * const pdb = interp->pdb;
     const DebuggerCmd *cmd;
@@ -1418,7 +1457,6 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
     /* keep a pointer to the command, in case we need to report an error */
     /* get a number from what the user typed */
     const char * cmdline = parse_command(command, &c);
-    ASSERT_ARGS(PDB_run_command);
 
     TRACEDEB_MSG("PDB_run_command");
 
@@ -1466,10 +1504,10 @@ Inits the program if needed, runs the next N >= 1 operations and stops.
 void
 PDB_next(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 {
+    ASSERT_ARGS(PDB_next);
     unsigned long  n;
     PDB_t  * const pdb = interp->pdb;
     Interp *debugee;
-    ASSERT_ARGS(PDB_next);
 
     TRACEDEB_MSG("PDB_next");
 
@@ -1529,10 +1567,10 @@ Execute the next N operations; if no number is specified, it defaults to 1.
 void
 PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 {
+    ASSERT_ARGS(PDB_trace);
     unsigned long  n;
     PDB_t *  const pdb = interp->pdb;
     Interp        *debugee;
-    ASSERT_ARGS(PDB_trace);
 
     TRACEDEB_MSG("PDB_trace");
 
@@ -1610,6 +1648,7 @@ PARROT_CAN_RETURN_NULL
 PDB_condition_t *
 PDB_cond(PARROT_INTERP, ARGIN(const char *command))
 {
+    ASSERT_ARGS(PDB_cond);
     PDB_condition_t *condition;
     const char      *auxcmd;
     char             str[DEBUG_CMD_BUFFER_LENGTH + 1];
@@ -1617,7 +1656,6 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
     unsigned short   cond_type;
     unsigned char    regleft;
     int              i, reg_number;
-    ASSERT_ARGS(PDB_cond);
 
     /* Return if no more arguments */
     if (!(command && *command)) {
@@ -1779,9 +1817,9 @@ Set a watchpoint.
 void
 PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
 {
+    ASSERT_ARGS(PDB_watchpoint);
     PDB_t           * const pdb = interp->pdb;
     PDB_condition_t * const condition = PDB_cond(interp, command);
-    ASSERT_ARGS(PDB_watchpoint);
 
     if (!condition)
         return;
@@ -1806,6 +1844,7 @@ Set a break point, the source code file must be loaded.
 void
 PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 {
+    ASSERT_ARGS(PDB_set_break);
     PDB_t            * const pdb      = interp->pdb;
     PDB_breakpoint_t *newbreak;
     PDB_breakpoint_t **lbreak;
@@ -1814,7 +1853,6 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     opcode_t         *breakpos = NULL;
 
     unsigned long ln = get_ulong(& command, 0);
-    ASSERT_ARGS(PDB_set_break);
 
     TRACEDEB_MSG("PDB_set_break");
 
@@ -1930,8 +1968,8 @@ Init the program.
 void
 PDB_init(PARROT_INTERP, SHIM(const char *command))
 {
-    PDB_t * const pdb = interp->pdb;
     ASSERT_ARGS(PDB_init);
+    PDB_t * const pdb = interp->pdb;
 
     /* Restart if we are already running */
     if (pdb->state & PDB_RUNNING)
@@ -1955,9 +1993,9 @@ breakpoints.
 void
 PDB_continue(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 {
+    ASSERT_ARGS(PDB_continue);
     PDB_t * const pdb = interp->pdb;
     unsigned long ln = 0;
-    ASSERT_ARGS(PDB_continue);
 
     TRACEDEB_MSG("PDB_continue");
 
@@ -2014,9 +2052,9 @@ PARROT_WARN_UNUSED_RESULT
 PDB_breakpoint_t *
 PDB_find_breakpoint(PARROT_INTERP, ARGIN(const char *command))
 {
+    ASSERT_ARGS(PDB_find_breakpoint);
     const char *oldcmd = command;
     const unsigned long n = get_ulong(&command, 0);
-    ASSERT_ARGS(PDB_find_breakpoint);
     if (command != oldcmd) {
         PDB_breakpoint_t *breakpoint = interp->pdb->breakpoint;
 
@@ -2054,8 +2092,8 @@ Disable a breakpoint; it can be reenabled with the enable command.
 void
 PDB_disable_breakpoint(PARROT_INTERP, ARGIN(const char *command))
 {
-    PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
     ASSERT_ARGS(PDB_disable_breakpoint);
+    PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
 
     /* if the breakpoint exists, disable it. */
     if (breakpoint)
@@ -2076,8 +2114,8 @@ no effect.
 void
 PDB_enable_breakpoint(PARROT_INTERP, ARGIN(const char *command))
 {
-    PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
     ASSERT_ARGS(PDB_enable_breakpoint);
+    PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
 
     /* if the breakpoint exists, and it was disabled, enable it. */
     if (breakpoint && breakpoint->skip == -1)
@@ -2097,8 +2135,8 @@ Delete a breakpoint.
 void
 PDB_delete_breakpoint(PARROT_INTERP, ARGIN(const char *command))
 {
-    PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
     ASSERT_ARGS(PDB_delete_breakpoint);
+    PDB_breakpoint_t * const breakpoint = PDB_find_breakpoint(interp, command);
 
     if (breakpoint) {
         const PDB_line_t *line = interp->pdb->file->line;
@@ -2200,8 +2238,8 @@ End the program.
 char
 PDB_program_end(PARROT_INTERP)
 {
-    PDB_t * const pdb = interp->pdb;
     ASSERT_ARGS(PDB_program_end);
+    PDB_t * const pdb = interp->pdb;
 
     TRACEDEB_MSG("PDB_program_end");
 
@@ -2226,8 +2264,8 @@ PARROT_WARN_UNUSED_RESULT
 char
 PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
 {
-    Parrot_Context *ctx = CONTEXT(interp);
     ASSERT_ARGS(PDB_check_condition);
+    Parrot_Context *ctx = CONTEXT(interp);
 
     TRACEDEB_MSG("PDB_check_condition");
 
@@ -2337,8 +2375,8 @@ PARROT_CAN_RETURN_NULL
 static PDB_breakpoint_t *
 current_breakpoint(ARGIN(PDB_t * pdb))
 {
-    PDB_breakpoint_t *breakpoint = pdb->breakpoint;
     ASSERT_ARGS(current_breakpoint);
+    PDB_breakpoint_t *breakpoint = pdb->breakpoint;
     while (breakpoint) {
         if (pdb->cur_opcode == breakpoint->pc)
             break;
@@ -2361,10 +2399,10 @@ PARROT_WARN_UNUSED_RESULT
 char
 PDB_break(PARROT_INTERP)
 {
+    ASSERT_ARGS(PDB_break);
     PDB_t            * const pdb = interp->pdb;
     PDB_condition_t  *watchpoint = pdb->watchpoint;
     PDB_breakpoint_t *breakpoint;
-    ASSERT_ARGS(PDB_break);
 
     TRACEDEB_MSG("PDB_break");
 
@@ -2433,9 +2471,9 @@ PARROT_MALLOC
 char *
 PDB_escape(ARGIN(const char *string), UINTVAL length)
 {
+    ASSERT_ARGS(PDB_escape);
     const char *end;
     char       *_new, *fill;
-    ASSERT_ARGS(PDB_escape);
 
     length = length > 20 ? 20 : length;
     end    = string + length;
@@ -2500,8 +2538,8 @@ Do inplace unescape of C<\r>, C<\n>, C<\t>, C<\a> and C<\\>.
 int
 PDB_unescape(ARGMOD(char *string))
 {
-    int l = 0;
     ASSERT_ARGS(PDB_unescape);
+    int l = 0;
 
     for (; *string; string++) {
         l++;
@@ -2558,13 +2596,13 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
         ARGMOD_NULLOK(PDB_file_t *file), ARGIN_NULLOK(const opcode_t *code_start),
         int full_name)
 {
+    ASSERT_ARGS(PDB_disassemble_op);
     int         j;
     size_t     size = 0;
     int        specialop = 0;
 
     /* Write the opcode name */
     const char * p = full_name ? info->full_name : info->name;
-    ASSERT_ARGS(PDB_disassemble_op);
 
     TRACEDEB_MSG("PDB_disassemble_op");
 
@@ -2865,6 +2903,7 @@ Disassemble the bytecode.
 void
 PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
 {
+    ASSERT_ARGS(PDB_disassemble);
     PDB_t    * const pdb = interp->pdb;
     opcode_t * pc        = interp->code->base.data;
 
@@ -2876,7 +2915,6 @@ PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
     const unsigned int default_size = 32768;
     size_t space;  /* How much space do we have? */
     size_t size, alloced, n;
-    ASSERT_ARGS(PDB_disassemble);
 
     TRACEDEB_MSG("PDB_disassemble");
 
@@ -2968,9 +3006,9 @@ long
 PDB_add_label(ARGMOD(PDB_file_t *file), ARGIN(const opcode_t *cur_opcode),
         opcode_t offset)
 {
+    ASSERT_ARGS(PDB_add_label);
     PDB_label_t *_new;
     PDB_label_t *label = file->label;
-    ASSERT_ARGS(PDB_add_label);
 
     /* See if there is already a label at this line */
     while (label) {
@@ -3063,6 +3101,7 @@ PARROT_EXPORT
 void
 PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
 {
+    ASSERT_ARGS(PDB_load_source);
     FILE          *file;
     char           f[DEBUG_CMD_BUFFER_LENGTH + 1];
     int            i, j, c;
@@ -3072,7 +3111,6 @@ PDB_load_source(PARROT_INTERP, ARGIN(const char *command))
     opcode_t      *pc         = interp->code->base.data;
 
     unsigned long  size = 0;
-    ASSERT_ARGS(PDB_load_source);
 
     TRACEDEB_MSG("PDB_load_source");
 
@@ -3180,8 +3218,8 @@ PARROT_PURE_FUNCTION
 char
 PDB_hasinstruction(ARGIN(const char *c))
 {
-    char h = 0;
     ASSERT_ARGS(PDB_hasinstruction);
+    char h = 0;
 
     /* as long as c is not NULL, we're not looking at a comment (#...) or a '\n'... */
     while (*c && *c != '#' && *c != '\n') {
@@ -3214,13 +3252,13 @@ Show lines from the source code file.
 void
 PDB_list(PARROT_INTERP, ARGIN(const char *command))
 {
+    ASSERT_ARGS(PDB_list);
     char          *c;
     unsigned long  line_number;
     unsigned long  i;
     PDB_line_t    *line;
     PDB_t         *pdb = interp->pdb;
     unsigned long  n   = 10;
-    ASSERT_ARGS(PDB_list);
 
     if (!pdb->file) {
         Parrot_io_eprintf(pdb->debugger, "No source file loaded\n");
@@ -3282,9 +3320,9 @@ C<eval>s an instruction.
 void
 PDB_eval(PARROT_INTERP, ARGIN(const char *command))
 {
+    ASSERT_ARGS(PDB_eval);
     /* This code is almost certainly wrong. The Parrot debugger needs love. */
     opcode_t *run = PDB_compile(interp, command);
-    ASSERT_ARGS(PDB_eval);
 
     if (run)
         DO_OP(run, interp);
@@ -3309,13 +3347,13 @@ PARROT_CAN_RETURN_NULL
 opcode_t *
 PDB_compile(PARROT_INTERP, ARGIN(const char *command))
 {
+    ASSERT_ARGS(PDB_compile);
     STRING     *buf;
     const char *end      = "\nend\n";
     STRING     *key      = CONST_STRING(interp, "PASM");
     PMC *compreg_hash    = VTABLE_get_pmc_keyed_int(interp,
             interp->iglobals, IGLOBALS_COMPREG_HASH);
     PMC        *compiler = VTABLE_get_pmc_keyed_str(interp, compreg_hash, key);
-    ASSERT_ARGS(PDB_compile);
 
     if (!VTABLE_defined(interp, compiler)) {
         fprintf(stderr, "Couldn't find PASM compiler");
@@ -3367,8 +3405,8 @@ Print interp registers.
 void
 PDB_print(PARROT_INTERP, ARGIN(const char *command))
 {
-    const char * const s = GDB_P(interp->pdb->debugee, command);
     ASSERT_ARGS(PDB_print);
+    const char * const s = GDB_P(interp->pdb->debugee, command);
     Parrot_io_eprintf(interp, "%s\n", s);
 }
 
@@ -3429,12 +3467,12 @@ Print the help text. "Help" with no arguments prints a list of commands.
 void
 PDB_help(PARROT_INTERP, ARGIN(const char *command))
 {
+    ASSERT_ARGS(PDB_help);
     unsigned long c;
     const DebuggerCmd *cmd;
 
     /* Extract the command after leading whitespace (for error messages). */
     const char * cmdline = skip_whitespace(command);
-    ASSERT_ARGS(PDB_help);
     parse_command(cmdline, &c);
 
     cmd = get_command(c);
@@ -3490,6 +3528,7 @@ Prints a backtrace of the interp's call chain.
 void
 PDB_backtrace(PARROT_INTERP)
 {
+    ASSERT_ARGS(PDB_backtrace);
     STRING           *str;
     PMC              *old       = PMCNULL;
     int               rec_level = 0;
@@ -3497,7 +3536,6 @@ PDB_backtrace(PARROT_INTERP)
     /* information about the current sub */
     PMC              *sub = interpinfo_p(interp, CURRENT_SUB);
     Parrot_Context   *ctx = CONTEXT(interp);
-    ASSERT_ARGS(PDB_backtrace);
 
     if (!PMC_IS_NULL(sub)) {
         str = Parrot_Context_infostr(interp, ctx);
@@ -3618,9 +3656,9 @@ PARROT_CANNOT_RETURN_NULL
 static const char*
 GDB_P(PARROT_INTERP, ARGIN(const char *s))
 {
+    ASSERT_ARGS(GDB_P);
     int t;
     char reg_type;
-    ASSERT_ARGS(GDB_P);
 
     /* Skip leading whitespace. */
     while (isspace((unsigned char)*s))

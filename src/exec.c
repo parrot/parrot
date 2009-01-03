@@ -49,6 +49,10 @@ static int symbol_list_find(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_add_data_member assert(obj);
+#define ASSERT_ARGS_exec_init assert(obj);
+#define ASSERT_ARGS_symbol_list_find assert(obj); \
+                                     assert(symbol);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -79,6 +83,7 @@ void
 Parrot_exec(PARROT_INTERP, ARGIN(opcode_t *pc),
         ARGIN(opcode_t *code_start), ARGIN(opcode_t *code_end))
 {
+    ASSERT_ARGS(Parrot_exec);
 #ifdef JIT_CGP
     int i, j *k;
 #endif
@@ -148,6 +153,7 @@ static void
 add_data_member(ARGMOD(Parrot_exec_objfile_t *obj),
         ARGIN_NULLOK(const void *src), size_t len)
 {
+    ASSERT_ARGS(add_data_member);
     char *cp;
 
     if (obj->data.size == 0) {
@@ -185,6 +191,7 @@ Initialize the obj structure.
 static void
 exec_init(ARGIN(Parrot_exec_objfile_t *obj))
 {
+    ASSERT_ARGS(exec_init);
     obj->text_rellocation_table = (Parrot_exec_rellocation_t *)
         mem_sys_allocate_zeroed(sizeof (Parrot_exec_rellocation_t));
     obj->data_rellocation_table = (Parrot_exec_rellocation_t *)
@@ -224,6 +231,7 @@ int
 Parrot_exec_add_symbol(ARGMOD(Parrot_exec_objfile_t *obj),
         ARGIN(const char *symbol), int stype)
 {
+    ASSERT_ARGS(Parrot_exec_add_symbol);
 
     int symbol_number = symbol_list_find(obj, symbol);
     if (symbol_number == -1) {
@@ -275,6 +283,7 @@ int *
 Parrot_exec_add_text_rellocation_reg(ARGIN(Parrot_exec_objfile_t *obj),
         ARGIN(char *nptr), ARGIN(const char *var), int offset, int disp)
 {
+    ASSERT_ARGS(Parrot_exec_add_text_rellocation_reg);
     Parrot_exec_add_text_rellocation(obj, nptr, RTYPE_COM, var, disp);
     return (int *)offset;
 }
@@ -295,6 +304,7 @@ void
 Parrot_exec_add_text_rellocation_func(ARGIN(Parrot_exec_objfile_t *obj),
         ARGIN(char *nptr), ARGIN(const char *func_name))
 {
+    ASSERT_ARGS(Parrot_exec_add_text_rellocation_func);
     Parrot_exec_add_text_rellocation(obj, nptr, RTYPE_FUNC, func_name, 1);
 }
 
@@ -313,6 +323,7 @@ void
 Parrot_exec_add_text_rellocation(ARGIN(Parrot_exec_objfile_t *obj), ARGIN(char *nptr),
     int type, ARGIN(const char *symbol), int disp)
 {
+    ASSERT_ARGS(Parrot_exec_add_text_rellocation);
     int symbol_number;
     char *addr;
     Parrot_exec_rellocation_t * new_relloc = (Parrot_exec_rellocation_t *)
@@ -361,6 +372,7 @@ Used by C<Parrot_exec_add_symbol()>.
 static int
 symbol_list_find(ARGIN(const Parrot_exec_objfile_t *obj), ARGIN(const char *symbol))
 {
+    ASSERT_ARGS(symbol_list_find);
     int i;
 
     for (i = 0; i < obj->symbol_count; i++)

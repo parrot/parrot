@@ -289,31 +289,44 @@ static void split_chunk(PARROT_INTERP,
         FUNC_MODIFIES(*list)
         FUNC_MODIFIES(*chunk);
 
-#define ASSERT_ARGS_add_chunk assert(interp); \
-                              assert(list);
-#define ASSERT_ARGS_alloc_next_size assert(interp); \
-                                    assert(list);
-#define ASSERT_ARGS_allocate_chunk assert(interp); \
-                                   assert(list);
-#define ASSERT_ARGS_get_chunk assert(interp); \
-                              assert(list); \
-                              assert(idx);
-#define ASSERT_ARGS_list_append assert(interp); \
-                                assert(list);
-#define ASSERT_ARGS_list_item assert(interp); \
-                              assert(list);
-#define ASSERT_ARGS_list_set assert(interp); \
-                             assert(list);
-#define ASSERT_ARGS_rebuild_chunk_list assert(interp); \
-                                       assert(list);
-#define ASSERT_ARGS_rebuild_chunk_ptrs assert(list);
-#define ASSERT_ARGS_rebuild_fix_ends assert(list);
-#define ASSERT_ARGS_rebuild_other assert(interp); \
-                                  assert(list);
-#define ASSERT_ARGS_rebuild_sparse assert(list);
-#define ASSERT_ARGS_split_chunk assert(interp); \
-                                assert(list); \
-                                assert(chunk);
+#define ASSERT_ARGS_add_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_alloc_next_size __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_allocate_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_get_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list) \
+    || PARROT_ASSERT_ARG(idx)
+#define ASSERT_ARGS_list_append __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_list_item __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_list_set __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_rebuild_chunk_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_rebuild_chunk_ptrs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_rebuild_fix_ends __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_rebuild_other __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_rebuild_sparse __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(list)
+#define ASSERT_ARGS_split_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(list) \
+    || PARROT_ASSERT_ARG(chunk)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -342,8 +355,8 @@ PARROT_WARN_UNUSED_RESULT
 static List_chunk *
 allocate_chunk(PARROT_INTERP, ARGIN(List *list), UINTVAL items, UINTVAL size)
 {
-    List_chunk *chunk;
     ASSERT_ARGS(allocate_chunk);
+    List_chunk *chunk;
 
     Parrot_block_GC_mark(interp);
     /*Parrot_block_GC_sweep(interp); - why */
@@ -378,10 +391,10 @@ counts chunks and fixes C<prev> pointers.
 static void
 rebuild_chunk_ptrs(ARGMOD(List *list), int cut)
 {
+    ASSERT_ARGS(rebuild_chunk_ptrs);
     List_chunk *chunk, *prev;
     UINTVAL len = 0, start = list->start;
     UINTVAL cap;
-    ASSERT_ARGS(rebuild_chunk_ptrs);
 
     cap = 0;
     for (prev = 0, chunk = list->first; chunk; chunk = chunk->next) {
@@ -428,10 +441,10 @@ Combines together adjacent sparse chunks in C<list>.
 static void
 rebuild_sparse(ARGMOD(List *list))
 {
+    ASSERT_ARGS(rebuild_sparse);
     List_chunk *chunk = list->first;
     List_chunk *prev = NULL;
     int changes = 0;
-    ASSERT_ARGS(rebuild_sparse);
 
     for (; chunk; chunk = chunk->next) {
         if (prev && (prev->flags & sparse) &&
@@ -460,10 +473,10 @@ Combines together adjacent irregular chunks in C<list>.
 static void
 rebuild_other(PARROT_INTERP, ARGMOD(List *list))
 {
+    ASSERT_ARGS(rebuild_other);
     List_chunk *chunk = list->first;
     List_chunk *prev = NULL;
     int changes = 0;
-    ASSERT_ARGS(rebuild_other);
 
     for (; chunk; chunk = chunk->next) {
         /* two adjacent irregular chunks */
@@ -529,8 +542,8 @@ Called by C<rebuild_chunk_list()>.
 static void
 rebuild_fix_ends(ARGMOD(List *list))
 {
-    List_chunk * const chunk = list->first;
     ASSERT_ARGS(rebuild_fix_ends);
+    List_chunk * const chunk = list->first;
 
     /* first is irregular, next is empty */
     if (list->n_chunks <= 2 && (chunk->flags & no_power_2) &&
@@ -560,9 +573,9 @@ and computes list statistics.
 static UINTVAL
 rebuild_chunk_list(PARROT_INTERP, ARGMOD(List *list))
 {
+    ASSERT_ARGS(rebuild_chunk_list);
     List_chunk *chunk, *prev, *first;
     UINTVAL len;
-    ASSERT_ARGS(rebuild_chunk_list);
 
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);
@@ -676,11 +689,11 @@ PARROT_CANNOT_RETURN_NULL
 static List_chunk *
 alloc_next_size(PARROT_INTERP, ARGMOD(List *list), int where, UINTVAL idx)
 {
+    ASSERT_ARGS(alloc_next_size);
     UINTVAL items, size;
     List_chunk *new_chunk;
     const int much = idx - list->cap >= MIN_ITEMS;
     int do_sparse = (INTVAL)idx - (INTVAL)list->cap >= 10 * MAX_ITEMS;
-    ASSERT_ARGS(alloc_next_size);
 
     if (list->item_type == enum_type_sized) {
         do_sparse = 0;
@@ -780,9 +793,9 @@ PARROT_CANNOT_RETURN_NULL
 static List_chunk *
 add_chunk(PARROT_INTERP, ARGMOD(List *list), int where, UINTVAL idx)
 {
+    ASSERT_ARGS(add_chunk);
     List_chunk * const chunk = where ? list->last : list->first;
     List_chunk * const new_chunk = alloc_next_size(interp, list, where, idx);
-    ASSERT_ARGS(add_chunk);
 
     if (where) {                /* at end */
         if (chunk)
@@ -819,8 +832,8 @@ PARROT_WARN_UNUSED_RESULT
 UINTVAL
 ld(UINTVAL x)
 {
-    UINTVAL m;                  /* bit position of highest set bit of m */
     ASSERT_ARGS(ld);
+    UINTVAL m;                  /* bit position of highest set bit of m */
 
     /* On intel, use BSRL instruction to find highest bit */
 #if defined(__GNUC__) && defined(i386)
@@ -913,9 +926,9 @@ PARROT_CANNOT_RETURN_NULL
 static List_chunk *
 get_chunk(PARROT_INTERP, ARGMOD(List *list), ARGMOD(UINTVAL *idx))
 {
+    ASSERT_ARGS(get_chunk);
     List_chunk *chunk;
     UINTVAL i;
-    ASSERT_ARGS(get_chunk);
 
 #ifndef GC_IS_MALLOC
     if (list->collect_runs != interp->arena_base->collect_runs)
@@ -1099,9 +1112,9 @@ static void
 list_set(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(void *item),
         INTVAL type, INTVAL idx)
 {
+    ASSERT_ARGS(list_set);
     const INTVAL oidx = idx;
     List_chunk *chunk = get_chunk(interp, list, (UINTVAL *)&idx);
-    ASSERT_ARGS(list_set);
 
     PARROT_ASSERT(chunk);
     /* if this is a sparse chunk: split in possibly 2 sparse parts before and
@@ -1168,8 +1181,8 @@ PARROT_CANNOT_RETURN_NULL
 static void *
 list_item(PARROT_INTERP, ARGMOD(List *list), int type, INTVAL idx)
 {
-    List_chunk * const chunk = get_chunk(interp, list, (UINTVAL *)&idx);
     ASSERT_ARGS(list_item);
+    List_chunk * const chunk = get_chunk(interp, list, (UINTVAL *)&idx);
     /* if this is a sparse chunk return -1, the caller may decide to return 0
      * or undef or whatever */
     if (chunk->flags & sparse) {
@@ -1250,8 +1263,8 @@ PARROT_CANNOT_RETURN_NULL
 List *
 list_new(PARROT_INTERP, PARROT_DATA_TYPE type)
 {
-    List * const list = (List *)new_bufferlike_header(interp, sizeof (*list));
     ASSERT_ARGS(list_new);
+    List * const list = (List *)new_bufferlike_header(interp, sizeof (*list));
 
     list->item_type = type;
     switch (type) {
@@ -1298,8 +1311,8 @@ PARROT_EXPORT
 void
 list_pmc_new(PARROT_INTERP, ARGMOD(PMC *container))
 {
-    List * const l = list_new(interp, enum_type_PMC);
     ASSERT_ARGS(list_pmc_new);
+    List * const l = list_new(interp, enum_type_PMC);
     l->container = container;
     PMC_data(container) = l;
 }
@@ -1329,6 +1342,7 @@ PARROT_CANNOT_RETURN_NULL
 List *
 list_new_init(PARROT_INTERP, PARROT_DATA_TYPE type, ARGIN(PMC *init))
 {
+    ASSERT_ARGS(list_new_init);
     List  *list;
     PMC   *user_array;
     PMC   *multi_key       = NULL;
@@ -1337,7 +1351,6 @@ list_new_init(PARROT_INTERP, PARROT_DATA_TYPE type, ARGIN(PMC *init))
     INTVAL items_per_chunk = 0;
 
     INTVAL i, len;
-    ASSERT_ARGS(list_new_init);
 
     if (!init->vtable)
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -1417,8 +1430,8 @@ PARROT_EXPORT
 void
 list_pmc_new_init(PARROT_INTERP, ARGMOD(PMC *container), ARGIN(PMC *init))
 {
-    List * const l = list_new_init(interp, enum_type_PMC, init);
     ASSERT_ARGS(list_pmc_new_init);
+    List * const l = list_new_init(interp, enum_type_PMC, init);
     l->container = container;
     PMC_data(container) = l;
     /*
@@ -1445,12 +1458,12 @@ PARROT_CANNOT_RETURN_NULL
 List *
 list_clone(PARROT_INTERP, ARGIN(const List *other))
 {
+    ASSERT_ARGS(list_clone);
     List *l;
     List_chunk *chunk, *prev;
     UINTVAL i;
     PMC *op;
     STRING *s;
-    ASSERT_ARGS(list_clone);
 
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);
@@ -1520,8 +1533,8 @@ PARROT_EXPORT
 void
 list_mark(PARROT_INTERP, ARGMOD(List *list))
 {
-    List_chunk *chunk;
     ASSERT_ARGS(list_mark);
+    List_chunk *chunk;
 
     for (chunk = list->first; chunk; chunk = chunk->next) {
         pobject_lives(interp, (PObj *)chunk);
@@ -1560,12 +1573,12 @@ PARROT_EXPORT
 void
 list_visit(PARROT_INTERP, ARGIN(List *list), ARGMOD(void *pinfo))
 {
+    ASSERT_ARGS(list_visit);
     List_chunk *chunk;
     visit_info * const info = (visit_info*) pinfo;
     UINTVAL idx;
 
     const UINTVAL n = list_length(interp, list);
-    ASSERT_ARGS(list_visit);
     PARROT_ASSERT(list->item_type == enum_type_PMC);
     /* TODO intlist ... */
     for (idx = 0, chunk = list->first; chunk; chunk = chunk->next) {
@@ -1657,8 +1670,8 @@ PARROT_EXPORT
 void
 list_insert(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, INTVAL n_items)
 {
-    List_chunk *chunk;
     ASSERT_ARGS(list_insert);
+    List_chunk *chunk;
 
     PARROT_ASSERT(idx >= 0);
     idx += list->start;
@@ -1731,8 +1744,8 @@ PARROT_EXPORT
 void
 list_delete(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, INTVAL n_items)
 {
-    List_chunk *chunk;
     ASSERT_ARGS(list_delete);
+    List_chunk *chunk;
 
     PARROT_ASSERT(idx >= 0);
     PARROT_ASSERT(n_items >= 0);
@@ -1814,8 +1827,8 @@ PARROT_EXPORT
 void
 list_push(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(void *item), int type)
 {
-    const INTVAL idx = list->start + list->length++;
     ASSERT_ARGS(list_push);
+    const INTVAL idx = list->start + list->length++;
 
     list_append(interp, list, item, type, idx);
 }
@@ -1834,8 +1847,8 @@ PARROT_EXPORT
 void
 list_unshift(PARROT_INTERP, ARGMOD(List *list), ARGIN(void *item), int type)
 {
-    List_chunk *chunk;
     ASSERT_ARGS(list_unshift);
+    List_chunk *chunk;
 
     if (list->start == 0) {
         chunk = add_chunk(interp, list, enum_add_at_start, 0);
@@ -1862,10 +1875,10 @@ PARROT_CAN_RETURN_NULL
 void *
 list_pop(PARROT_INTERP, ARGMOD(List *list), int type)
 {
+    ASSERT_ARGS(list_pop);
     UINTVAL idx;
     void *ret;
     List_chunk *chunk = list->last;
-    ASSERT_ARGS(list_pop);
 
     if (list->length == 0)
         return NULL;
@@ -1901,10 +1914,10 @@ PARROT_CAN_RETURN_NULL
 void *
 list_shift(PARROT_INTERP, ARGMOD(List *list), int type)
 {
+    ASSERT_ARGS(list_shift);
     void *ret;
     UINTVAL idx;
     List_chunk *chunk = list->first;
-    ASSERT_ARGS(list_shift);
 
     if (list->length == 0)
         return NULL;
@@ -1940,8 +1953,8 @@ PARROT_EXPORT
 void
 list_assign(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, ARGIN_NULLOK(void *item), int type)
 {
-    const INTVAL length = list->length;
     ASSERT_ARGS(list_assign);
+    const INTVAL length = list->length;
 
     if (idx < -length)
         idx = -idx - length - 1;
@@ -1972,8 +1985,8 @@ PARROT_WARN_UNUSED_RESULT
 void *
 list_get(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, int type)
 {
-    const INTVAL length = list->length;
     ASSERT_ARGS(list_get);
+    const INTVAL length = list->length;
 
     if (idx >= length || -idx > length) {
         return NULL;
@@ -2002,11 +2015,11 @@ void
 list_splice(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(List *value_list),
         INTVAL offset, INTVAL count)
 {
+    ASSERT_ARGS(list_splice);
     const INTVAL value_length = value_list ? value_list->length : 0;
     const INTVAL length = list->length;
     const int type = list->item_type;
     INTVAL i, j;
-    ASSERT_ARGS(list_splice);
 
     if (value_list && type != value_list->item_type)
         Parrot_ex_throw_from_c_args(interp, NULL, 1,

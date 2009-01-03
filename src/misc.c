@@ -62,6 +62,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
 {
+    ASSERT_ARGS(Parrot_vsprintf_s);
     SPRINTF_OBJ obj = va_core;
     obj.data = PARROT_VA_TO_VAPTR(args);
 
@@ -83,6 +84,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_vsprintf_c(PARROT_INTERP, ARGIN(const char *pat), va_list args)
 {
+    ASSERT_ARGS(Parrot_vsprintf_c);
     STRING * const realpat = string_make(interp, pat, strlen(pat),
                                   NULL, PObj_external_FLAG);
 
@@ -107,6 +109,7 @@ void
 Parrot_vsnprintf(PARROT_INTERP, ARGOUT(char *targ),
                  size_t len, ARGIN(const char *pat), va_list args)
 {
+    ASSERT_ARGS(Parrot_vsnprintf);
     if (len == 0)
         return;
     len--;
@@ -140,6 +143,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_sprintf_s(PARROT_INTERP, ARGIN(STRING *pat), ...)
 {
+    ASSERT_ARGS(Parrot_sprintf_s);
     STRING *ret;
     va_list args;
 
@@ -168,6 +172,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_sprintf_c(PARROT_INTERP, ARGIN(const char *pat), ...)
 {
+    ASSERT_ARGS(Parrot_sprintf_c);
     STRING *ret;
     va_list args;
 
@@ -196,6 +201,7 @@ void
 Parrot_snprintf(PARROT_INTERP, ARGOUT(char *targ), size_t len,
                 ARGIN(const char *pat), ...)
 {
+    ASSERT_ARGS(Parrot_snprintf);
     va_list args;
 
     va_start(args, pat);
@@ -222,6 +228,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_psprintf(PARROT_INTERP, ARGIN(STRING *pat), ARGOUT(PMC *ary))
 {
+    ASSERT_ARGS(Parrot_psprintf);
     SPRINTF_OBJ obj = pmc_core;
     obj.data = ary;
 
@@ -243,6 +250,7 @@ PARROT_EXPORT
 int
 Parrot_secret_snprintf(ARGOUT(char *buffer), const size_t len, ARGIN(const char *format), ...)
 {
+    ASSERT_ARGS(Parrot_secret_snprintf);
     int retval;
     va_list ap;
     va_start(ap, format);

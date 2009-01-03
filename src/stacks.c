@@ -32,8 +32,9 @@ static void run_cleanup_action(PARROT_INTERP, ARGIN(Stack_Entry_t *e))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_run_cleanup_action assert(interp); \
-                                       assert(e);
+#define ASSERT_ARGS_run_cleanup_action __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(e)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -71,9 +72,9 @@ PARROT_CANNOT_RETURN_NULL
 Stack_Chunk_t *
 cst_new_stack_chunk(PARROT_INTERP, ARGIN(const Stack_Chunk_t *chunk))
 {
+    ASSERT_ARGS(cst_new_stack_chunk);
     Small_Object_Pool * const pool = chunk->pool;
     Stack_Chunk_t * const new_chunk = (Stack_Chunk_t *)pool->get_free_object(interp, pool);
-    ASSERT_ARGS(cst_new_stack_chunk);
 
     PObj_bufstart(new_chunk) = NULL;
     PObj_buflen(new_chunk)   = 0;
@@ -101,9 +102,9 @@ PARROT_WARN_UNUSED_RESULT
 Stack_Chunk_t *
 new_stack(PARROT_INTERP, ARGIN(const char *name))
 {
+    ASSERT_ARGS(new_stack);
     Small_Object_Pool * const pool = make_bufferlike_pool(interp, sizeof (Stack_Chunk_t));
     Stack_Chunk_t     * const chunk = (Stack_Chunk_t *)(pool->get_free_object)(interp, pool);
-    ASSERT_ARGS(new_stack);
 
     chunk->prev = chunk;        /* mark the top of the stack */
     chunk->name = name;
@@ -176,8 +177,8 @@ PARROT_WARN_UNUSED_RESULT
 size_t
 stack_height(SHIM_INTERP, ARGIN(const Stack_Chunk_t *chunk))
 {
-    size_t height = 0;
     ASSERT_ARGS(stack_height);
+    size_t height = 0;
 
     for (; ; chunk = chunk->prev) {
         if (chunk == chunk->prev)
@@ -208,9 +209,9 @@ PARROT_WARN_UNUSED_RESULT
 Stack_Entry_t *
 stack_entry(SHIM_INTERP, ARGIN(Stack_Chunk_t *stack), INTVAL depth)
 {
+    ASSERT_ARGS(stack_entry);
     Stack_Chunk_t *chunk;
     size_t         offset = (size_t)depth;
-    ASSERT_ARGS(stack_entry);
 
     if (depth < 0)
         return NULL;
@@ -247,9 +248,9 @@ PARROT_CANNOT_RETURN_NULL
 Stack_Entry_t*
 stack_prepare_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
 {
+    ASSERT_ARGS(stack_prepare_push);
     Stack_Chunk_t * const chunk     = *stack_p;
     Stack_Chunk_t * const new_chunk = cst_new_stack_chunk(interp, chunk);
-    ASSERT_ARGS(stack_prepare_push);
 
     new_chunk->prev = chunk;
     *stack_p        = new_chunk;
@@ -277,8 +278,8 @@ void
 stack_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
            ARGIN(void *thing), Stack_entry_type type, NULLOK(Stack_cleanup_method cleanup))
 {
-    Stack_Entry_t * const entry = (Stack_Entry_t *)stack_prepare_push(interp, stack_p);
     ASSERT_ARGS(stack_push);
+    Stack_Entry_t * const entry = (Stack_Entry_t *)stack_prepare_push(interp, stack_p);
 
     /* Remember the type */
     entry->entry_type = type;
@@ -320,8 +321,8 @@ PARROT_CANNOT_RETURN_NULL
 Stack_Entry_t*
 stack_prepare_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
 {
-    Stack_Chunk_t * const chunk = *stack_p;
     ASSERT_ARGS(stack_prepare_pop);
+    Stack_Chunk_t * const chunk = *stack_p;
 
     /* the first entry (initial top) refers to itself */
     if (chunk == chunk->prev)
@@ -347,10 +348,10 @@ void *
 stack_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
           ARGOUT_NULLOK(void *where), Stack_entry_type type)
 {
+    ASSERT_ARGS(stack_pop);
     Stack_Chunk_t     *cur_chunk   = *stack_p;
     Stack_Entry_t * const entry    =
         (Stack_Entry_t *)stack_prepare_pop(interp, stack_p);
-    ASSERT_ARGS(stack_pop);
 
     /* Types of 0 mean we don't care */
     if (type && entry->entry_type != type)
@@ -408,10 +409,10 @@ PARROT_CANNOT_RETURN_NULL
 void *
 pop_dest(PARROT_INTERP)
 {
+    ASSERT_ARGS(pop_dest);
     /* We don't mind the extra call, so we do this: (previous comment
      * said we *do* mind, but I say let the compiler decide) */
     void *dest;
-    ASSERT_ARGS(pop_dest);
     (void)stack_pop(interp, &interp->dynamic_env,
                     &dest, STACK_ENTRY_DESTINATION);
     return dest;
@@ -434,8 +435,8 @@ void *
 stack_peek(PARROT_INTERP, ARGIN(Stack_Chunk_t *stack_base),
            ARGMOD_NULLOK(Stack_entry_type *type))
 {
-    const Stack_Entry_t * const entry = stack_entry(interp, stack_base, 0);
     ASSERT_ARGS(stack_peek);
+    const Stack_Entry_t * const entry = stack_entry(interp, stack_base, 0);
     if (entry == NULL)
         return NULL;
 
@@ -482,8 +483,8 @@ PARROT_EXPORT
 void
 Parrot_dump_dynamic_environment(PARROT_INTERP, ARGIN(Stack_Chunk_t *dynamic_env))
 {
-    int height = (int) stack_height(interp, dynamic_env);
     ASSERT_ARGS(Parrot_dump_dynamic_environment);
+    int height = (int) stack_height(interp, dynamic_env);
 
     while (dynamic_env->prev != dynamic_env) {
         const Stack_Entry_t * const e = stack_entry(interp, dynamic_env, 0);
@@ -529,12 +530,12 @@ in C<Parrot_push_action>.
 static void
 run_cleanup_action(PARROT_INTERP, ARGIN(Stack_Entry_t *e))
 {
+    ASSERT_ARGS(run_cleanup_action);
     /*
      * this is called during normal stack_pop of the control
      * stack - run the action subroutine with an INTVAL arg of 0
      */
     PMC * const sub = UVal_pmc(e->entry);
-    ASSERT_ARGS(run_cleanup_action);
     Parrot_runops_fromc_args(interp, sub, "vI", 0);
 }
 

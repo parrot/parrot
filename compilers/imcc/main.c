@@ -98,24 +98,34 @@ static void usage(ARGMOD(FILE *fp))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*fp);
 
-#define ASSERT_ARGS_compile_to_bytecode assert(interp); \
-                                        assert(sourcefile);
-#define ASSERT_ARGS_determine_input_file_type assert(interp); \
-                                              assert(sourcefile);
-#define ASSERT_ARGS_determine_output_file_type assert(interp); \
-                                               assert(obj_file); \
-                                               assert(output_file);
-#define ASSERT_ARGS_do_pre_process assert(interp);
-#define ASSERT_ARGS_help
-#define ASSERT_ARGS_help_debug
-#define ASSERT_ARGS_imcc_get_optimization_description assert(opt_desc);
-#define ASSERT_ARGS_imcc_run_pbc assert(interp); \
-                                 assert(argv);
-#define ASSERT_ARGS_imcc_write_pbc assert(interp); \
-                                   assert(output_file);
-#define ASSERT_ARGS_is_all_hex_digits assert(s);
-#define ASSERT_ARGS_Parrot_version assert(interp);
-#define ASSERT_ARGS_usage assert(fp);
+#define ASSERT_ARGS_compile_to_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sourcefile)
+#define ASSERT_ARGS_determine_input_file_type __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sourcefile)
+#define ASSERT_ARGS_determine_output_file_type __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(obj_file) \
+    || PARROT_ASSERT_ARG(output_file)
+#define ASSERT_ARGS_do_pre_process __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_help_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_imcc_get_optimization_description __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(opt_desc)
+#define ASSERT_ARGS_imcc_run_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(argv)
+#define ASSERT_ARGS_imcc_write_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(output_file)
+#define ASSERT_ARGS_is_all_hex_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(s)
+#define ASSERT_ARGS_Parrot_version __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_usage __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(fp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -594,11 +604,11 @@ Pre-processor step.  Turn parser's output codes into Parrot instructions.
 static void
 do_pre_process(PARROT_INTERP)
 {
+    ASSERT_ARGS(do_pre_process);
     int       c;
     YYSTYPE   val;
 
     const yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
-    ASSERT_ARGS(do_pre_process);
 
     IMCC_push_parser_state(interp);
     c = yylex(&val, yyscanner, interp); /* is reset at end of while loop */
@@ -716,8 +726,8 @@ Create list (opt_desc[]) describing optimisation flags.
 static void
 imcc_get_optimization_description(const PARROT_INTERP, int opt_level, ARGMOD(char *opt_desc))
 {
-    int i = 0;
     ASSERT_ARGS(imcc_get_optimization_description);
+    int i = 0;
 
     if (opt_level & (OPT_PRE | OPT_CFG))
             opt_desc[i++] = '2';
@@ -826,10 +836,10 @@ Output packed bytecode file.
 static void
 imcc_write_pbc(PARROT_INTERP, ARGIN(const char *output_file))
 {
+    ASSERT_ARGS(imcc_write_pbc);
     size_t    size;
     opcode_t *packed;
     FILE     *fp;
-    ASSERT_ARGS(imcc_write_pbc);
 
     IMCC_info(interp, 1, "Writing %s\n", output_file);
 
@@ -865,8 +875,8 @@ Read in the source and determine whether it's Parrot bytecode or PASM
 static void
 determine_input_file_type(PARROT_INTERP, ARGIN(const char * const sourcefile))
 {
-    yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
     ASSERT_ARGS(determine_input_file_type);
+    yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
 
     /* Read in the source and check the file extension for the input type;
        a file extension .pbc means it's parrot bytecode;
@@ -910,8 +920,8 @@ static void
 determine_output_file_type(PARROT_INTERP,
     ARGMOD(int *obj_file), ARGIN(const char *output_file))
 {
-    const char * const ext = strrchr(output_file, '.');
     ASSERT_ARGS(determine_output_file_type);
+    const char * const ext = strrchr(output_file, '.');
 
     if (ext) {
         if (STREQ(ext, ".pbc"))
@@ -946,6 +956,7 @@ compile_to_bytecode(PARROT_INTERP,
                     ARGIN(const char * const sourcefile),
                     ARGIN_NULLOK(const char * const output_file))
 {
+    ASSERT_ARGS(compile_to_bytecode);
     PackFile *pf;
     yyscan_t  yyscanner = IMCC_INFO(interp)->yyscanner;
     const int per_pbc   = (STATE_WRITE_PBC(interp) | STATE_RUN_PBC(interp)) !=0;
@@ -953,7 +964,6 @@ compile_to_bytecode(PARROT_INTERP,
 
     /* Shouldn't be more than five, but five extra is cheap */
     char opt_desc[10];
-    ASSERT_ARGS(compile_to_bytecode);
 
     imcc_get_optimization_description(interp, opt_level, opt_desc);
 

@@ -66,8 +66,8 @@ no memory available.
 static PARROT_INLINE void*
 xmalloc(size_t size)
 {
-    void *p = malloc(size);
     ASSERT_ARGS(xmalloc);
+    void *p = malloc(size);
     if (!p)
         do_panic(NULL, "malloc: out of mem", __FILE__, __LINE__);
     return p;
@@ -87,8 +87,8 @@ no memory available.
 static PARROT_INLINE void*
 xcalloc(size_t n, size_t size)
 {
-    void * const p = calloc(n, size);
     ASSERT_ARGS(xcalloc);
+    void * const p = calloc(n, size);
     if (!p)
         do_panic(NULL, "calloc: out of mem", __FILE__, __LINE__);
     return p;
@@ -108,8 +108,8 @@ is no memory available.
 static PARROT_INLINE void*
 xrealloc(void *p, size_t size)
 {
-    void * const n = realloc(p, size);
     ASSERT_ARGS(xrealloc);
+    void * const n = realloc(p, size);
     if (!n)
         do_panic(NULL, "realloc: out of mem", __FILE__, __LINE__);
     return n;
@@ -129,9 +129,9 @@ refcounting in DOD.
 void
 Parrot_reallocate(PARROT_INTERP, Buffer *buffer, size_t newsize)
 {
+    ASSERT_ARGS(parrot_reallocate);
     const size_t oldlen = PObj_buflen(buffer);
     Buffer_alloc_unit *p;
-    ASSERT_ARGS(parrot_reallocate);
 
     if (!PObj_bufstart(buffer)) {
         Parrot_allocate_aligned(interp, buffer, newsize);
@@ -177,8 +177,8 @@ suitably aligned for holding anything contained in UnionVal
 void
 Parrot_allocate_aligned(PARROT_INTERP, Buffer *buffer, size_t size)
 {
-    Buffer_alloc_unit *p;
     ASSERT_ARGS(parrot_allocate_aligned);
+    Buffer_alloc_unit *p;
     p = (Buffer_alloc_unit *) xmalloc(Buffer_alloc_offset + size);
     p->ref_count = 0;
     PObj_bufstart(buffer) = p->buffer;
@@ -199,8 +199,8 @@ number of bytes memory required.
 void
 Parrot_reallocate_string(PARROT_INTERP, STRING *str, size_t newsize)
 {
-    Buffer_alloc_unit *p;
     ASSERT_ARGS(parrot_reallocate_string);
+    Buffer_alloc_unit *p;
 
     if (!PObj_bufstart(str)) {
         Parrot_allocate_string(interp, str, newsize);
@@ -227,8 +227,8 @@ number bytes of memory required.
 void
 Parrot_allocate_string(PARROT_INTERP, STRING *str, size_t size)
 {
-    Buffer_alloc_unit *p;
     ASSERT_ARGS(parrot_allocate_string);
+    Buffer_alloc_unit *p;
     p = (Buffer_alloc_unit *) xcalloc(Buffer_alloc_offset + size, 1);
     p->ref_count = 0;
     PObj_bufstart(str) = str->strstart = (char *) p->buffer;

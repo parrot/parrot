@@ -77,19 +77,30 @@ void Parrot_register_HLL_type(PARROT_INTERP,
 void Parrot_init_HLL(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_Parrot_get_ctx_HLL_namespace assert(interp);
-#define ASSERT_ARGS_Parrot_get_ctx_HLL_type assert(interp);
-#define ASSERT_ARGS_Parrot_get_HLL_id assert(interp);
-#define ASSERT_ARGS_Parrot_get_HLL_name assert(interp);
-#define ASSERT_ARGS_Parrot_get_HLL_namespace assert(interp);
-#define ASSERT_ARGS_Parrot_get_HLL_type assert(interp);
-#define ASSERT_ARGS_Parrot_regenerate_HLL_namespaces assert(interp);
-#define ASSERT_ARGS_Parrot_register_HLL assert(interp); \
-                                        assert(hll_name);
-#define ASSERT_ARGS_Parrot_register_HLL_lib assert(interp); \
-                                            assert(hll_lib);
-#define ASSERT_ARGS_Parrot_register_HLL_type assert(interp);
-#define ASSERT_ARGS_Parrot_init_HLL assert(interp);
+#define ASSERT_ARGS_Parrot_get_ctx_HLL_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_get_ctx_HLL_type __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_get_HLL_id __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_get_HLL_name __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_get_HLL_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_get_HLL_type __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_regenerate_HLL_namespaces __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_register_HLL __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(hll_name)
+#define ASSERT_ARGS_Parrot_register_HLL_lib __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(hll_lib)
+#define ASSERT_ARGS_Parrot_register_HLL_type __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_init_HLL __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/hll.c */
 

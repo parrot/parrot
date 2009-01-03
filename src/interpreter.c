@@ -126,28 +126,41 @@ static void stop_prederef(PARROT_INTERP)
 static void turn_ev_check(PARROT_INTERP, int on)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_dynop_register_switch
-#define ASSERT_ARGS_dynop_register_xx assert(interp);
-#define ASSERT_ARGS_get_core_op_lib_init assert(interp);
-#define ASSERT_ARGS_get_dynamic_op_lib_init assert(lib);
-#define ASSERT_ARGS_init_prederef assert(interp);
-#define ASSERT_ARGS_load_prederef assert(interp);
-#define ASSERT_ARGS_notify_func_table assert(interp); \
-                                      assert(table);
-#define ASSERT_ARGS_prederef_args assert(pc_prederef); \
-                                  assert(interp); \
-                                  assert(pc); \
-                                  assert(opinfo);
-#define ASSERT_ARGS_runops_cgp assert(interp); \
-                               assert(pc);
-#define ASSERT_ARGS_runops_exec assert(interp); \
-                                assert(pc);
-#define ASSERT_ARGS_runops_jit assert(interp); \
-                               assert(pc);
-#define ASSERT_ARGS_runops_switch assert(interp); \
-                                  assert(pc);
-#define ASSERT_ARGS_stop_prederef assert(interp);
-#define ASSERT_ARGS_turn_ev_check assert(interp);
+#define ASSERT_ARGS_dynop_register_switch __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_dynop_register_xx __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_core_op_lib_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_dynamic_op_lib_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(lib)
+#define ASSERT_ARGS_init_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_load_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_notify_func_table __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(table)
+#define ASSERT_ARGS_prederef_args __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pc_prederef) \
+    || PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pc) \
+    || PARROT_ASSERT_ARG(opinfo)
+#define ASSERT_ARGS_runops_cgp __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pc)
+#define ASSERT_ARGS_runops_exec __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pc)
+#define ASSERT_ARGS_runops_jit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pc)
+#define ASSERT_ARGS_runops_switch __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pc)
+#define ASSERT_ARGS_stop_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_turn_ev_check __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -171,6 +184,7 @@ static void
 prederef_args(ARGMOD(void **pc_prederef), PARROT_INTERP,
         ARGIN(opcode_t *pc), ARGIN(const op_info_t *opinfo))
 {
+    ASSERT_ARGS(prederef_args);
     const PackFile_ConstTable * const const_table = interp->code->const_table;
 
     const int regs_n = CONTEXT(interp)->n_regs_used[REGNO_NUM];
@@ -182,7 +196,6 @@ prederef_args(ARGMOD(void **pc_prederef), PARROT_INTERP,
     const int m = opinfo->op_count;
     int       n = opinfo->op_count;
     int       i;
-    ASSERT_ARGS(prederef_args);
 
     ADD_OP_VAR_PART(interp, interp->code, pc, n);
     for (i = 1; i < n; i++) {
@@ -369,9 +382,9 @@ handler thread.
 static void
 turn_ev_check(PARROT_INTERP, int on)
 {
+    ASSERT_ARGS(turn_ev_check);
     const Prederef * const pi = &interp->code->prederef;
     size_t i;
-    ASSERT_ARGS(turn_ev_check);
 
     if (!pi->branches)
         return;
@@ -405,8 +418,8 @@ PARROT_CANNOT_RETURN_NULL
 static oplib_init_f
 get_core_op_lib_init(PARROT_INTERP, int which)
 {
-    oplib_init_f init_func;
     ASSERT_ARGS(get_core_op_lib_init);
+    oplib_init_f init_func;
     switch (which) {
         case PARROT_SWITCH_CORE:
         case PARROT_SWITCH_JIT_CORE:
@@ -474,10 +487,10 @@ C<< interp->op_lib >> = prederefed oplib.
 static void
 load_prederef(PARROT_INTERP, int which)
 {
+    ASSERT_ARGS(load_prederef);
     const oplib_init_f init_func = get_core_op_lib_init(interp, which);
 
     int (*get_op)(const char * name, int full);
-    ASSERT_ARGS(load_prederef);
 
     get_op          = interp->op_lib->op_code;
     interp->op_lib  = init_func(1);
@@ -717,12 +730,12 @@ PARROT_CAN_RETURN_NULL
 static opcode_t *
 runops_jit(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
+    ASSERT_ARGS(runops_jit);
 #if JIT_CAPABLE
 #  ifdef PARROT_EXEC_OS_AIX
     /* AIX calling convention requires that function-call-by-ptr be made
        through the following struct: */
     struct ptrgl_t { jit_f functPtr; void *toc; void *env; } ptrgl_t;
-    ASSERT_ARGS(runops_jit);
 
     ptrgl_t.functPtr = (jit_f) D2FPTR(init_jit(interp, pc));
     ptrgl_t.env      = NULL;
@@ -759,11 +772,11 @@ PARROT_CAN_RETURN_NULL
 static opcode_t *
 runops_exec(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
+    ASSERT_ARGS(runops_exec);
 #if EXEC_CAPABLE
     opcode_t *code_start;
     UINTVAL   code_size;          /* in opcodes */
     opcode_t *code_end;
-    ASSERT_ARGS(runops_exec);
 
     code_start = interp->code->base.data;
     code_size = interp->code->base.size;
@@ -814,10 +827,10 @@ PARROT_CANNOT_RETURN_NULL
 static opcode_t *
 runops_cgp(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
+    ASSERT_ARGS(runops_cgp);
 #ifdef HAVE_COMPUTED_GOTO
     opcode_t * const code_start = (opcode_t *)interp->code->base.data;
     opcode_t        *pc_prederef;
-    ASSERT_ARGS(runops_cgp);
 
     init_prederef(interp, PARROT_CGP_CORE);
 
@@ -849,9 +862,9 @@ PARROT_CANNOT_RETURN_NULL
 static opcode_t *
 runops_switch(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
+    ASSERT_ARGS(runops_switch);
     opcode_t * const code_start = (opcode_t *)interp->code->base.data;
     opcode_t        *pc_prederef;
-    ASSERT_ARGS(runops_switch);
 
     init_prederef(interp, PARROT_SWITCH_CORE);
     pc_prederef = (opcode_t*)interp->code->prederef.code + (pc - code_start);
@@ -1160,6 +1173,7 @@ static void
 dynop_register_xx(PARROT_INTERP,
         size_t n_old, size_t n_new, oplib_init_f init_func)
 {
+    ASSERT_ARGS(dynop_register_xx);
     const size_t n_tot    = n_old + n_new;
     op_func_t   *ops_addr = NULL;
     op_lib_t    *cg_lib   = init_func(1);
@@ -1172,7 +1186,6 @@ dynop_register_xx(PARROT_INTERP,
 
     oplib_init_f new_init_func;
     PMC *lib_variant;
-    ASSERT_ARGS(dynop_register_xx);
 
     if (cg_lib->flags & OP_FUNC_IS_ALLOCATED) {
         ops_addr = (op_func_t *)mem_sys_realloc(cg_lib->op_func_table,
@@ -1273,8 +1286,8 @@ object.
 static void
 dynop_register_switch(size_t n_old, size_t n_new)
 {
-    op_lib_t * const lib = PARROT_CORE_SWITCH_OPLIB_INIT(1);
     ASSERT_ARGS(dynop_register_switch);
+    op_lib_t * const lib = PARROT_CORE_SWITCH_OPLIB_INIT(1);
     lib->op_count        = n_old + n_new;
 }
 
@@ -1292,8 +1305,8 @@ Tell the interpreter's running core about the new function table.
 static void
 notify_func_table(PARROT_INTERP, ARGIN(op_func_t* table), int on)
 {
-    const oplib_init_f init_func = get_core_op_lib_init(interp, interp->run_core);
     ASSERT_ARGS(notify_func_table);
+    const oplib_init_f init_func = get_core_op_lib_init(interp, interp->run_core);
 
     init_func((long) table);
     switch (interp->run_core) {

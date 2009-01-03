@@ -141,9 +141,11 @@ PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_get_datatype_name(PARROT_INTERP, INTVAL type)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_Parrot_get_datatype_enum assert(interp); \
-                                             assert(type_name);
-#define ASSERT_ARGS_Parrot_get_datatype_name assert(interp);
+#define ASSERT_ARGS_Parrot_get_datatype_enum __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(type_name)
+#define ASSERT_ARGS_Parrot_get_datatype_name __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/datatypes.c */
 

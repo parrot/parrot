@@ -106,27 +106,38 @@ static void upcase_first(PARROT_INTERP, SHIM(STRING *source_string))
         __attribute__nonnull__(1);
 
 static UINTVAL validate(SHIM_INTERP, SHIM(STRING *source_string));
-#define ASSERT_ARGS_compare
-#define ASSERT_ARGS_compose assert(interp);
-#define ASSERT_ARGS_cs_index
-#define ASSERT_ARGS_cs_rindex
-#define ASSERT_ARGS_decompose assert(interp);
-#define ASSERT_ARGS_downcase assert(interp);
-#define ASSERT_ARGS_downcase_first assert(interp);
-#define ASSERT_ARGS_find_cclass
-#define ASSERT_ARGS_find_not_cclass
-#define ASSERT_ARGS_is_cclass
-#define ASSERT_ARGS_set_graphemes assert(interp); \
-                                  assert(source_string); \
-                                  assert(insert_string);
-#define ASSERT_ARGS_string_from_codepoint assert(interp);
-#define ASSERT_ARGS_titlecase assert(interp);
-#define ASSERT_ARGS_titlecase_first assert(interp);
-#define ASSERT_ARGS_to_charset assert(interp); \
-                               assert(src);
-#define ASSERT_ARGS_upcase assert(interp);
-#define ASSERT_ARGS_upcase_first assert(interp);
-#define ASSERT_ARGS_validate
+#define ASSERT_ARGS_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_compose __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_cs_index __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_cs_rindex __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_decompose __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_downcase __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_downcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_find_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_find_not_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_is_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_set_graphemes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string) \
+    || PARROT_ASSERT_ARG(insert_string)
+#define ASSERT_ARGS_string_from_codepoint __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_titlecase __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_titlecase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_to_charset __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_upcase __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_upcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -173,9 +184,9 @@ PARROT_CANNOT_RETURN_NULL
 static STRING*
 to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
 {
+    ASSERT_ARGS(to_charset);
     charset_converter_t conversion_func =
         Parrot_find_charset_converter(interp, src->charset, Parrot_binary_charset_ptr);
-    ASSERT_ARGS(to_charset);
 
     if (conversion_func)
          return conversion_func(interp, src, dest);
@@ -471,9 +482,9 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 {
+    ASSERT_ARGS(string_from_codepoint);
     STRING *return_string;
     char real_codepoint = (char)codepoint;
-    ASSERT_ARGS(string_from_codepoint);
     return_string = string_make(interp, &real_codepoint, 1, "binary", 0);
     return return_string;
 }
@@ -494,6 +505,7 @@ PARROT_CANNOT_RETURN_NULL
 const CHARSET *
 Parrot_charset_binary_init(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_charset_binary_init);
     CHARSET * const return_set = Parrot_new_charset(interp);
     static const CHARSET base_set = {
         "binary",
@@ -520,7 +532,6 @@ Parrot_charset_binary_init(PARROT_INTERP)
         ascii_compute_hash,
         NULL
     };
-    ASSERT_ARGS(Parrot_charset_binary_init);
 
     STRUCT_COPY_FROM_STRUCT(return_set, base_set);
     return_set->preferred_encoding = Parrot_fixed_8_encoding_ptr;

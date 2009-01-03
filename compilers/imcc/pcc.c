@@ -112,32 +112,39 @@ static void unshift_self(ARGIN(SymReg *sub), ARGIN(SymReg *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_insert_tail_call assert(interp); \
-                                     assert(unit); \
-                                     assert(ins); \
-                                     assert(sub);
-#define ASSERT_ARGS_insINS assert(interp); \
-                           assert(unit); \
-                           assert(ins); \
-                           assert(name); \
-                           assert(regs);
-#define ASSERT_ARGS_move_regs assert(interp); \
-                              assert(unit); \
-                              assert(ins); \
-                              assert(dest); \
-                              assert(src);
-#define ASSERT_ARGS_pcc_get_args assert(interp); \
-                                 assert(unit); \
-                                 assert(ins); \
-                                 assert(op_name);
-#define ASSERT_ARGS_pcc_reg_mov assert(interp); \
-                                assert(vinfo);
-#define ASSERT_ARGS_recursive_tail_call assert(interp); \
-                                        assert(unit); \
-                                        assert(ins); \
-                                        assert(sub);
-#define ASSERT_ARGS_unshift_self assert(sub); \
-                                 assert(obj);
+#define ASSERT_ARGS_insert_tail_call __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(ins) \
+    || PARROT_ASSERT_ARG(sub)
+#define ASSERT_ARGS_insINS __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(ins) \
+    || PARROT_ASSERT_ARG(name) \
+    || PARROT_ASSERT_ARG(regs)
+#define ASSERT_ARGS_move_regs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(ins) \
+    || PARROT_ASSERT_ARG(dest) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_pcc_get_args __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(ins) \
+    || PARROT_ASSERT_ARG(op_name)
+#define ASSERT_ARGS_pcc_reg_mov __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(vinfo)
+#define ASSERT_ARGS_recursive_tail_call __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit) \
+    || PARROT_ASSERT_ARG(ins) \
+    || PARROT_ASSERT_ARG(sub)
+#define ASSERT_ARGS_unshift_self __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(obj)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -158,9 +165,9 @@ static Instruction *
 insINS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
         ARGIN(const char *name), ARGIN(SymReg **regs), int n)
 {
+    ASSERT_ARGS(insINS);
     /* INS can return NULL, but insert_ins() cannot take one */
     Instruction * const tmp = INS(interp, unit, name, NULL, regs, n, 0, 0);
-    ASSERT_ARGS(insINS);
     if (tmp)
         insert_ins(unit, ins, tmp);
     return tmp;
@@ -181,8 +188,8 @@ PARROT_CANNOT_RETURN_NULL
 SymReg*
 get_pasm_reg(PARROT_INTERP, ARGIN(const char *name))
 {
-    SymReg * const r = _get_sym(&IMCC_INFO(interp)->cur_unit->hash, name);
     ASSERT_ARGS(get_pasm_reg);
+    SymReg * const r = _get_sym(&IMCC_INFO(interp)->cur_unit->hash, name);
 
     if (r)
         return r;
@@ -205,8 +212,8 @@ PARROT_CANNOT_RETURN_NULL
 SymReg*
 get_const(PARROT_INTERP, ARGIN(const char *name), int type)
 {
-    SymReg * const r = _get_sym(&IMCC_INFO(interp)->ghash, name);
     ASSERT_ARGS(get_const);
+    SymReg * const r = _get_sym(&IMCC_INFO(interp)->ghash, name);
 
     if (r && r->set == type)
         return r;
@@ -233,6 +240,7 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
         ARGIN(const char *op_name), int n,
         ARGIN_NULLOK(SymReg * const *args), ARGIN_NULLOK(const int *arg_flags))
 {
+    ASSERT_ARGS(pcc_get_args);
     /* Notes:
      * The created string is in the format "\"(0x0010,0x0220,0x0010)\"".
      * flags always has exactly 4 hex digits.
@@ -265,7 +273,6 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
     char         *buf     = n < PCC_GET_ARGS_LIMIT ?
         bufcache :
         mem_allocate_n_typed(bufsize, char);
-    ASSERT_ARGS(pcc_get_args);
 
     memcpy(buf, pref, lenpref);
     bufpos += lenpref;
@@ -341,10 +348,10 @@ prepend the object to args or self to params
 static void
 unshift_self(ARGIN(SymReg *sub), ARGIN(SymReg *obj))
 {
+    ASSERT_ARGS(unshift_self);
     struct pcc_sub_t * const pcc_sub = sub->pcc_sub;
     const int                n       = pcc_sub->nargs;
     int                      i;
-    ASSERT_ARGS(unshift_self);
 
     mem_realloc_n_typed(pcc_sub->args,      n + 1, SymReg *);
     mem_realloc_n_typed(pcc_sub->arg_flags, n + 1, int);
@@ -374,10 +381,10 @@ for parameter passing/returning.
 void
 expand_pcc_sub(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
 {
+    ASSERT_ARGS(expand_pcc_sub);
     int          nargs;
     SymReg      *sub = ins->symregs[0];
     SymReg      *regs[2];
-    ASSERT_ARGS(expand_pcc_sub);
 
     /* if this sub is a method, unshift 'self' as first param */
     if ((unit->type & IMC_HAS_SELF) || (sub->pcc_sub->pragma & P_METHOD)) {
@@ -452,10 +459,10 @@ Expand a PCC sub return directive into its PASM instructions
 void
 expand_pcc_sub_ret(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
 {
+    ASSERT_ARGS(expand_pcc_sub_ret);
     const int is_yield = ins->type & ITPCCYIELD;
     SymReg * const sub = ins->symregs[0];
     const int n        = sub->pcc_sub->nret;
-    ASSERT_ARGS(expand_pcc_sub_ret);
 
     /* TODO implement return conventions */
     ins = pcc_get_args(interp, unit, ins, "set_returns", n,
@@ -496,13 +503,13 @@ RT #48260: Not yet documented!!!
 static int
 pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, ARGMOD(void *vinfo))
 {
+    ASSERT_ARGS(pcc_reg_mov);
     static const char types[] = "INSP";
     static SymReg    *temps[4];
     move_info_t      *info    = (move_info_t *)vinfo;
     SymReg           *src     = NULL;
     SymReg           *dest    = NULL;
     SymReg           *regs[3];
-    ASSERT_ARGS(pcc_reg_mov);
 
     if (d == 255) {
         int t;
@@ -571,10 +578,10 @@ static Instruction *
 move_regs(PARROT_INTERP, ARGIN(IMC_Unit *unit), ARGIN(Instruction *ins),
         size_t n, ARGIN(SymReg **dest), ARGIN(SymReg **src))
 {
+    ASSERT_ARGS(move_regs);
     unsigned char *move_list;
     move_info_t    move_info;
     unsigned int   i;
-    ASSERT_ARGS(move_regs);
 
     if (!n)
         return ins;
@@ -627,11 +634,11 @@ static int
 recursive_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit),
         ARGIN(Instruction *ins), ARGIN(SymReg *sub))
 {
+    ASSERT_ARGS(recursive_tail_call);
     SymReg *called_sub, *this_sub, *label;
     SymReg *regs[2];
     Instruction *get_params, *tmp_ins, *unused_ins;
     char *buf;
-    ASSERT_ARGS(recursive_tail_call);
 
     if (!(unit->instructions->type & ITLABEL))
         return 0;
@@ -691,8 +698,8 @@ static void
 insert_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit), ARGMOD(Instruction *ins),
         ARGMOD(SymReg *sub), ARGIN_NULLOK(SymReg *meth))
 {
-    SymReg *regs[3];
     ASSERT_ARGS(insert_tail_call);
+    SymReg *regs[3];
 
     if (meth) {
         regs[0] = sub->pcc_sub->object;
@@ -723,6 +730,7 @@ This is the nuts and bolts of pdd03 routine call style
 void
 expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins))
 {
+    ASSERT_ARGS(expand_pcc_sub_call);
     SymReg *arg, *reg, *regs[3];
     int          n;
     int          tail_call;
@@ -731,7 +739,6 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
     Instruction *get_name;
 
     SymReg * const sub = ins->symregs[0];
-    ASSERT_ARGS(expand_pcc_sub_call);
 
     if (ins->type & ITRESULT) {
         const int n = sub->pcc_sub->nret;

@@ -159,35 +159,58 @@ void Parrot_merge_header_pools(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest_interp);
 
-#define ASSERT_ARGS_add_pmc_ext assert(interp); \
-                                assert(pmc);
-#define ASSERT_ARGS_add_pmc_sync assert(interp); \
-                                 assert(pmc);
-#define ASSERT_ARGS_get_bufferlike_pool assert(interp);
-#define ASSERT_ARGS_get_max_buffer_address assert(interp);
-#define ASSERT_ARGS_get_max_pmc_address assert(interp);
-#define ASSERT_ARGS_get_min_buffer_address assert(interp);
-#define ASSERT_ARGS_get_min_pmc_address assert(interp);
-#define ASSERT_ARGS_is_buffer_ptr assert(interp); \
-                                  assert(ptr);
-#define ASSERT_ARGS_is_pmc_ptr assert(interp); \
-                               assert(ptr);
-#define ASSERT_ARGS_make_bufferlike_pool assert(interp);
-#define ASSERT_ARGS_new_buffer_header assert(interp);
-#define ASSERT_ARGS_new_buffer_pool assert(interp);
-#define ASSERT_ARGS_new_bufferlike_header assert(interp);
-#define ASSERT_ARGS_new_bufferlike_pool assert(interp);
-#define ASSERT_ARGS_new_pmc_header assert(interp);
-#define ASSERT_ARGS_new_pmc_pool assert(interp);
-#define ASSERT_ARGS_new_string_header assert(interp);
-#define ASSERT_ARGS_new_string_pool assert(interp);
-#define ASSERT_ARGS_Parrot_destroy_header_pools assert(interp);
-#define ASSERT_ARGS_Parrot_forall_header_pools assert(interp); \
-                                               assert(func);
-#define ASSERT_ARGS_Parrot_initialize_header_pool_names assert(interp);
-#define ASSERT_ARGS_Parrot_initialize_header_pools assert(interp);
-#define ASSERT_ARGS_Parrot_merge_header_pools assert(dest_interp); \
-                                              assert(source_interp);
+#define ASSERT_ARGS_add_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pmc)
+#define ASSERT_ARGS_add_pmc_sync __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pmc)
+#define ASSERT_ARGS_get_bufferlike_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_max_buffer_address __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_max_pmc_address __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_min_buffer_address __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_min_pmc_address __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_is_buffer_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(ptr)
+#define ASSERT_ARGS_is_pmc_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(ptr)
+#define ASSERT_ARGS_make_bufferlike_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_new_buffer_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_new_buffer_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_new_bufferlike_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_new_bufferlike_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_new_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_new_pmc_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_new_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_new_string_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_destroy_header_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_forall_header_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(func)
+#define ASSERT_ARGS_Parrot_initialize_header_pool_names __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_initialize_header_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_merge_header_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(dest_interp) \
+    || PARROT_ASSERT_ARG(source_interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/headers.c */
 

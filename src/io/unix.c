@@ -42,8 +42,8 @@ PARROT_CONST_FUNCTION
 static INTVAL convert_flags_to_unix(INTVAL flags);
 
 static INTVAL io_is_tty_unix(PIOHANDLE fd);
-#define ASSERT_ARGS_convert_flags_to_unix
-#define ASSERT_ARGS_io_is_tty_unix
+#define ASSERT_ARGS_convert_flags_to_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_io_is_tty_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -64,6 +64,7 @@ PARROT_CONST_FUNCTION
 static INTVAL
 convert_flags_to_unix(INTVAL flags)
 {
+    ASSERT_ARGS(convert_flags_to_unix);
     INTVAL oflags = 0;
 
     if ((flags & (PIO_F_WRITE | PIO_F_READ)) == (PIO_F_WRITE | PIO_F_READ)) {
@@ -99,6 +100,7 @@ success and C<-1> on error.
 INTVAL
 Parrot_io_init_unix(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_io_init_unix);
     ParrotIOData * const d = interp->piodata;
     if (d != NULL && d->table != NULL) {
         PMC *filehandle;
@@ -141,6 +143,7 @@ PMC *
 Parrot_io_open_unix(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
               ARGIN(STRING *path), INTVAL flags)
 {
+    ASSERT_ARGS(Parrot_io_open_unix);
     INTVAL oflags;
     PIOHANDLE fd;
     char *spath;
@@ -259,6 +262,7 @@ Toggles the C<O_ASYNC> flag on the IO file descriptor.
 INTVAL
 Parrot_io_async_unix(PARROT_INTERP, ARGMOD(PMC *filehandle), INTVAL b)
 {
+    ASSERT_ARGS(Parrot_io_async_unix);
     int rflags;
 #    if defined(linux)
     PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
@@ -294,6 +298,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_io_fdopen_unix(PARROT_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE fd, INTVAL flags)
 {
+    ASSERT_ARGS(Parrot_io_fdopen_unix);
     if (io_is_tty_unix(fd))
         flags |= PIO_F_CONSOLE;
 
@@ -327,6 +332,7 @@ Closes C<*io>'s file descriptor.
 INTVAL
 Parrot_io_close_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
+    ASSERT_ARGS(Parrot_io_close_unix);
     PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
     /* BSD and Solaris need explicit fsync() */
     if (file_descriptor >= 0) {
@@ -350,6 +356,7 @@ Test whether the filehandle has been closed.
 INTVAL
 Parrot_io_is_closed_unix(PARROT_INTERP, ARGIN(PMC *filehandle))
 {
+    ASSERT_ARGS(Parrot_io_is_closed_unix);
     if (Parrot_io_get_os_handle(interp, filehandle) == -1)
         return 1;
 
@@ -369,6 +376,7 @@ Returns a boolean value indicating whether C<fd> is a console/tty.
 static INTVAL
 io_is_tty_unix(PIOHANDLE fd)
 {
+    ASSERT_ARGS(io_is_tty_unix);
     return isatty(fd);
 }
 
@@ -391,6 +399,7 @@ if it was available at compile time, otherwise C<PIO_BLKSIZE> is returned.
 INTVAL
 Parrot_io_getblksize_unix(PIOHANDLE fd)
 {
+    ASSERT_ARGS(Parrot_io_getblksize_unix);
     if (fd >= 0) {
         /* Try to get the block size of a regular file */
 #  if 0
@@ -433,6 +442,7 @@ XXX: Is it necessary to C<sync()> here?
 INTVAL
 Parrot_io_flush_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
+    ASSERT_ARGS(Parrot_io_flush_unix);
     PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
     return fsync(file_descriptor);
 }
@@ -452,6 +462,7 @@ size_t
 Parrot_io_read_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
               ARGIN(STRING **buf))
 {
+    ASSERT_ARGS(Parrot_io_read_unix);
     PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
     INTVAL file_flags = Parrot_io_get_flags(interp, filehandle);
     STRING * const s = Parrot_io_make_string(interp, buf, 2048);
@@ -498,6 +509,7 @@ C<buffer> to the file descriptor in C<*io>.
 size_t
 Parrot_io_write_unix(PARROT_INTERP, ARGIN(PMC *filehandle), ARGMOD(STRING *s))
 {
+    ASSERT_ARGS(Parrot_io_write_unix);
     PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
     const char * const buffer = s->strstart;
     const char * ptr          = buffer;
@@ -546,6 +558,7 @@ PIOOFF_T
 Parrot_io_seek_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
               PIOOFF_T offset, INTVAL whence)
 {
+    ASSERT_ARGS(Parrot_io_seek_unix);
     PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
     const PIOOFF_T pos        = lseek(file_descriptor, offset, whence);
 
@@ -592,6 +605,7 @@ Returns the current read/write position on C<*io>'s file discriptor.
 PIOOFF_T
 Parrot_io_tell_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
+    ASSERT_ARGS(Parrot_io_tell_unix);
     PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
     const PIOOFF_T pos = lseek(file_descriptor, (PIOOFF_T)0, SEEK_CUR);
 
@@ -614,6 +628,7 @@ PMC *
 Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
         ARGIN(STRING *command), int flags)
 {
+    ASSERT_ARGS(Parrot_io_open_pipe_unix);
     /*
      * pipe(), fork() should be defined, if this header is present
      *        if that's not true, we need a test
@@ -724,6 +739,7 @@ Parrot_io_peek_unix(PARROT_INTERP,
         SHIM(PMC *filehandle),
         SHIM(STRING **buf))
 {
+    ASSERT_ARGS(Parrot_io_peek_unix);
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
         "peek() not implemented");
 }

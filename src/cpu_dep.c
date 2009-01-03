@@ -34,7 +34,8 @@ between two boundaries is located in C<src/gc/dod.c:trace_mem_block>.
 static void trace_system_stack(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_trace_system_stack assert(interp);
+#define ASSERT_ARGS_trace_system_stack __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -151,12 +152,12 @@ variable in this function, which should be at the "top" of the stack.
 static void
 trace_system_stack(PARROT_INTERP)
 {
+    ASSERT_ARGS(trace_system_stack);
     /* Create a local variable on the system stack. This represents the
        "top" of the stack. A value stored in interp->lo_var_ptr represents
        the "bottom" of the stack. We must trace the entire area between the
        top and bottom. */
     const size_t lo_var_ptr = (size_t)interp->lo_var_ptr;
-    ASSERT_ARGS(trace_system_stack);
 
     trace_mem_block(interp, (size_t)lo_var_ptr,
             (size_t)&lo_var_ptr);

@@ -169,26 +169,40 @@ opcode_t * Parrot_sleep_on_event(PARROT_INTERP,
 void Parrot_schedule_broadcast_qentry(ARGIN(struct QUEUE_ENTRY *entry))
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_Parrot_del_timer_event assert(interp); \
-                                           assert(timer);
-#define ASSERT_ARGS_Parrot_do_check_events assert(interp);
-#define ASSERT_ARGS_Parrot_do_handle_events assert(interp);
-#define ASSERT_ARGS_Parrot_event_add_io_event assert(interp);
-#define ASSERT_ARGS_Parrot_init_events assert(interp);
-#define ASSERT_ARGS_Parrot_init_signals
-#define ASSERT_ARGS_Parrot_kill_event_loop assert(interp);
-#define ASSERT_ARGS_Parrot_new_cb_event assert(interp); \
-                                        assert(cbi); \
-                                        assert(ext);
-#define ASSERT_ARGS_Parrot_new_suspend_for_gc_event assert(interp);
-#define ASSERT_ARGS_Parrot_new_terminate_event assert(interp);
-#define ASSERT_ARGS_Parrot_new_timer_event assert(interp);
-#define ASSERT_ARGS_Parrot_schedule_event assert(interp); \
-                                          assert(ev);
-#define ASSERT_ARGS_Parrot_schedule_interp_qentry assert(interp); \
-                                                  assert(entry);
-#define ASSERT_ARGS_Parrot_sleep_on_event assert(interp);
-#define ASSERT_ARGS_Parrot_schedule_broadcast_qentry assert(entry);
+#define ASSERT_ARGS_Parrot_del_timer_event __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(timer)
+#define ASSERT_ARGS_Parrot_do_check_events __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_do_handle_events __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_event_add_io_event __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_init_events __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_init_signals __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_Parrot_kill_event_loop __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_new_cb_event __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(cbi) \
+    || PARROT_ASSERT_ARG(ext)
+#define ASSERT_ARGS_Parrot_new_suspend_for_gc_event __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_new_terminate_event __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_new_timer_event __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_schedule_event __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(ev)
+#define ASSERT_ARGS_Parrot_schedule_interp_qentry __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(entry)
+#define ASSERT_ARGS_Parrot_sleep_on_event __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_schedule_broadcast_qentry __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(entry)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/events.c */
 

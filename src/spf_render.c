@@ -90,15 +90,18 @@ static STRING* str_append_w_flags(PARROT_INTERP,
         FUNC_MODIFIES(*dest)
         FUNC_MODIFIES(*src);
 
-#define ASSERT_ARGS_gen_sprintf_call assert(out); \
-                                     assert(info);
-#define ASSERT_ARGS_handle_flags assert(interp); \
-                                 assert(info); \
-                                 assert(str);
-#define ASSERT_ARGS_str_append_w_flags assert(interp); \
-                                       assert(dest); \
-                                       assert(info); \
-                                       assert(src);
+#define ASSERT_ARGS_gen_sprintf_call __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(out) \
+    || PARROT_ASSERT_ARG(info)
+#define ASSERT_ARGS_handle_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(info) \
+    || PARROT_ASSERT_ARG(str)
+#define ASSERT_ARGS_str_append_w_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(dest) \
+    || PARROT_ASSERT_ARG(info) \
+    || PARROT_ASSERT_ARG(src)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -125,8 +128,8 @@ static STRING *
 handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGMOD(STRING *str),
         INTVAL is_int_type, ARGIN_NULLOK(STRING* prefix))
 {
-    UINTVAL len = string_length(interp, str);
     ASSERT_ARGS(handle_flags);
+    UINTVAL len = string_length(interp, str);
 
     if (is_int_type) {
         if (info->flags & FLAG_PREC && info->prec == 0 &&
@@ -253,8 +256,8 @@ a float.
 static void
 gen_sprintf_call(ARGOUT(char *out), ARGMOD(SpfInfo *info), int thingy)
 {
-    int i    = 0;
     ASSERT_ARGS(gen_sprintf_call);
+    int i    = 0;
     out[i++] = '%';
 
     if (info->flags) {
@@ -318,6 +321,7 @@ STRING *
 Parrot_sprintf_format(PARROT_INTERP,
         ARGIN(STRING *pat), ARGIN(SPRINTF_OBJ *obj))
 {
+    ASSERT_ARGS(Parrot_sprintf_format);
     INTVAL i;
     INTVAL len     = 0;
     INTVAL old     = 0;
@@ -333,7 +337,6 @@ Parrot_sprintf_format(PARROT_INTERP,
      */
     STRING *substr = NULL;
     char tc[PARROT_SPRINTF_BUFFER_SIZE];
-    ASSERT_ARGS(Parrot_sprintf_format);
 
     for (i = 0; i < pat_len; i++) {
         if (string_ord(interp, pat, i) == '%') {        /* % */

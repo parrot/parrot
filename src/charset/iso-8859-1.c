@@ -124,39 +124,56 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_compose assert(interp); \
-                            assert(src);
-#define ASSERT_ARGS_decompose assert(interp);
-#define ASSERT_ARGS_downcase assert(interp); \
-                             assert(source_string);
-#define ASSERT_ARGS_downcase_first assert(interp); \
-                                   assert(source_string);
-#define ASSERT_ARGS_find_cclass assert(interp); \
-                                assert(source_string);
-#define ASSERT_ARGS_find_not_cclass assert(interp); \
-                                    assert(source_string);
-#define ASSERT_ARGS_is_cclass assert(interp); \
-                              assert(source_string);
-#define ASSERT_ARGS_set_graphemes assert(interp); \
-                                  assert(source_string); \
-                                  assert(insert_string);
-#define ASSERT_ARGS_string_from_codepoint assert(interp);
-#define ASSERT_ARGS_titlecase assert(interp); \
-                              assert(source_string);
-#define ASSERT_ARGS_titlecase_first assert(interp); \
-                                    assert(source_string);
-#define ASSERT_ARGS_to_charset assert(interp); \
-                               assert(src);
-#define ASSERT_ARGS_to_latin1 assert(interp); \
-                              assert(src);
-#define ASSERT_ARGS_to_unicode assert(interp); \
-                               assert(src);
-#define ASSERT_ARGS_upcase assert(interp); \
-                           assert(source_string);
-#define ASSERT_ARGS_upcase_first assert(interp); \
-                                 assert(source_string);
-#define ASSERT_ARGS_validate assert(interp); \
-                             assert(src);
+#define ASSERT_ARGS_compose __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_decompose __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_downcase __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_downcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_find_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_find_not_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_is_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_set_graphemes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string) \
+    || PARROT_ASSERT_ARG(insert_string)
+#define ASSERT_ARGS_string_from_codepoint __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_titlecase __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_titlecase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_to_charset __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_to_latin1 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_to_unicode __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_upcase __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_upcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(src)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -196,9 +213,9 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 to_latin1(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
 {
+    ASSERT_ARGS(to_latin1);
     UINTVAL offs, src_len;
     String_iter iter;
-    ASSERT_ARGS(to_latin1);
 
     ENCODING_ITER_INIT(interp, src, &iter);
     src_len = src->strlen;
@@ -282,9 +299,9 @@ PARROT_WARN_UNUSED_RESULT
 static STRING *
 to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
 {
+    ASSERT_ARGS(to_charset);
     const charset_converter_t conversion_func =
         Parrot_find_charset_converter(interp, src->charset, Parrot_iso_8859_1_charset_ptr);
-    ASSERT_ARGS(to_charset);
 
     if (conversion_func)
         return conversion_func(interp, src, dest);
@@ -347,9 +364,9 @@ graphemes that support cases.
 static void
 upcase(PARROT_INTERP, ARGIN(STRING *source_string))
 {
+    ASSERT_ARGS(upcase);
     unsigned char *buffer;
     UINTVAL offset = 0;
-    ASSERT_ARGS(upcase);
 
     if (!source_string->strlen)
         return;
@@ -412,10 +429,10 @@ that support cases.
 static void
 titlecase(PARROT_INTERP, ARGIN(STRING *source_string))
 {
+    ASSERT_ARGS(titlecase);
     unsigned char *buffer;
     unsigned int c;
     UINTVAL offset;
-    ASSERT_ARGS(titlecase);
 
     if (!source_string->strlen)
         return;
@@ -531,8 +548,8 @@ Returns 1 if the STRING C<src> is a valid ISO-8859-1 STRING. Returns 0 otherwise
 static UINTVAL
 validate(PARROT_INTERP, ARGIN(STRING *src))
 {
-    UINTVAL offset;
     ASSERT_ARGS(validate);
+    UINTVAL offset;
 
     for (offset = 0; offset < string_length(interp, src); ++offset) {
         const UINTVAL codepoint = ENCODING_GET_CODEPOINT(interp, src, offset);
@@ -556,8 +573,8 @@ static INTVAL
 is_cclass(PARROT_INTERP, INTVAL flags,
           ARGIN(const STRING *source_string), UINTVAL offset)
 {
-    UINTVAL codepoint;
     ASSERT_ARGS(is_cclass);
+    UINTVAL codepoint;
 
     if (offset >= source_string->strlen) return 0;
     codepoint = ENCODING_GET_CODEPOINT(interp, source_string, offset);
@@ -583,10 +600,10 @@ static INTVAL
 find_cclass(PARROT_INTERP, INTVAL flags,
             ARGIN(STRING *source_string), UINTVAL offset, UINTVAL count)
 {
+    ASSERT_ARGS(find_cclass);
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
     UINTVAL codepoint;
-    ASSERT_ARGS(find_cclass);
 
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
@@ -612,9 +629,9 @@ static INTVAL
 find_not_cclass(PARROT_INTERP, INTVAL flags,
                 ARGIN(STRING *source_string), UINTVAL offset, UINTVAL count)
 {
+    ASSERT_ARGS(find_not_cclass);
     UINTVAL pos = offset;
     UINTVAL end = offset + count;
-    ASSERT_ARGS(find_not_cclass);
 
     end = source_string->strlen < end ? source_string->strlen : end;
     for (; pos < end; ++pos) {
@@ -641,10 +658,10 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 {
+    ASSERT_ARGS(string_from_codepoint);
     char real_codepoint = (char)codepoint;
     STRING * const return_string = string_make(interp, &real_codepoint, 1,
             "iso-8859-1", 0);
-    ASSERT_ARGS(string_from_codepoint);
     return return_string;
 }
 
@@ -662,6 +679,7 @@ PARROT_CANNOT_RETURN_NULL
 const CHARSET *
 Parrot_charset_iso_8859_1_init(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_charset_iso_8859_1_init);
     CHARSET * const return_set = Parrot_new_charset(interp);
     static const CHARSET base_set = {
         "iso-8859-1",
@@ -688,7 +706,6 @@ Parrot_charset_iso_8859_1_init(PARROT_INTERP)
         ascii_compute_hash,
         NULL
     };
-    ASSERT_ARGS(Parrot_charset_iso_8859_1_init);
 
     STRUCT_COPY_FROM_STRUCT(return_set, base_set);
     return_set->preferred_encoding = Parrot_fixed_8_encoding_ptr;
@@ -712,8 +729,8 @@ STRING *
 charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, ARGIN(STRING *src),
         ARGMOD_NULLOK(STRING *dest))
 {
-    UINTVAL offs;
     ASSERT_ARGS(charset_cvt_iso_8859_1_to_ascii);
+    UINTVAL offs;
     if (dest) {
         Parrot_reallocate_string(interp, dest, src->strlen);
         dest->bufused = src->bufused;

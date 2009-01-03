@@ -123,16 +123,21 @@ PMC* Parrot_thaw_constants(PARROT_INTERP, ARGIN(STRING* image))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_Parrot_clone assert(interp); \
-                                 assert(pmc);
-#define ASSERT_ARGS_Parrot_freeze assert(interp); \
-                                  assert(pmc);
-#define ASSERT_ARGS_Parrot_freeze_at_destruct assert(interp); \
-                                              assert(pmc);
-#define ASSERT_ARGS_Parrot_thaw assert(interp); \
-                                assert(image);
-#define ASSERT_ARGS_Parrot_thaw_constants assert(interp); \
-                                          assert(image);
+#define ASSERT_ARGS_Parrot_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pmc)
+#define ASSERT_ARGS_Parrot_freeze __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pmc)
+#define ASSERT_ARGS_Parrot_freeze_at_destruct __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pmc)
+#define ASSERT_ARGS_Parrot_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(image)
+#define ASSERT_ARGS_Parrot_thaw_constants __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(image)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pmc_freeze.c */
 

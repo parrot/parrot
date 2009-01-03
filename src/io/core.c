@@ -48,6 +48,7 @@ PARROT_EXPORT
 void
 Parrot_io_init(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_io_init);
     /* Has interp been initialized already? */
     if (interp->piodata) {
         /* memsub system is up and running: */
@@ -90,6 +91,7 @@ PARROT_EXPORT
 void
 Parrot_io_finish(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_io_finish);
     /*
      * TODO free IO of std-handles
      */
@@ -115,6 +117,7 @@ PARROT_EXPORT
 void
 Parrot_IOData_mark(PARROT_INTERP, ARGIN(ParrotIOData *piodata))
 {
+    ASSERT_ARGS(Parrot_IOData_mark);
     INTVAL i;
     ParrotIOTable table = piodata->table;
 

@@ -125,32 +125,44 @@ static int STRING_compare(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_create_hash assert(interp); \
-                                assert(compare); \
-                                assert(keyhash);
-#define ASSERT_ARGS_cstring_compare assert(a); \
-                                    assert(b);
-#define ASSERT_ARGS_expand_hash assert(interp); \
-                                assert(hash);
-#define ASSERT_ARGS_hash_freeze assert(interp); \
-                                assert(hash); \
-                                assert(info);
-#define ASSERT_ARGS_hash_thaw assert(interp); \
-                              assert(hash); \
-                              assert(info);
-#define ASSERT_ARGS_key_hash_cstring assert(value);
-#define ASSERT_ARGS_key_hash_pointer assert(value);
-#define ASSERT_ARGS_key_hash_STRING assert(interp); \
-                                    assert(s);
-#define ASSERT_ARGS_parrot_mark_hash_both assert(interp); \
-                                          assert(hash);
-#define ASSERT_ARGS_parrot_mark_hash_keys assert(interp); \
-                                          assert(hash);
-#define ASSERT_ARGS_parrot_mark_hash_values assert(interp); \
-                                            assert(hash);
-#define ASSERT_ARGS_pointer_compare
-#define ASSERT_ARGS_STRING_compare assert(interp); \
-                                   assert(search_key);
+#define ASSERT_ARGS_create_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(compare) \
+    || PARROT_ASSERT_ARG(keyhash)
+#define ASSERT_ARGS_cstring_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(a) \
+    || PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_expand_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(hash)
+#define ASSERT_ARGS_hash_freeze __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(hash) \
+    || PARROT_ASSERT_ARG(info)
+#define ASSERT_ARGS_hash_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(hash) \
+    || PARROT_ASSERT_ARG(info)
+#define ASSERT_ARGS_key_hash_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(value)
+#define ASSERT_ARGS_key_hash_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(value)
+#define ASSERT_ARGS_key_hash_STRING __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(s)
+#define ASSERT_ARGS_parrot_mark_hash_both __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(hash)
+#define ASSERT_ARGS_parrot_mark_hash_keys __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(hash)
+#define ASSERT_ARGS_parrot_mark_hash_values __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(hash)
+#define ASSERT_ARGS_pointer_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_STRING_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(search_key)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -193,9 +205,9 @@ PARROT_WARN_UNUSED_RESULT
 static int
 STRING_compare(PARROT_INTERP, ARGIN(const void *search_key), ARGIN_NULLOK(const void *bucket_key))
 {
+    ASSERT_ARGS(STRING_compare);
     STRING const *s1 = (STRING const *)search_key;
     STRING const *s2 = (STRING const *)bucket_key;
-    ASSERT_ARGS(STRING_compare);
 
     if (!s2)
         return 1;
@@ -268,9 +280,9 @@ PARROT_PURE_FUNCTION
 static size_t
 key_hash_cstring(SHIM_INTERP, ARGIN(const void *value), size_t seed)
 {
+    ASSERT_ARGS(key_hash_cstring);
     register size_t h = seed;
     const unsigned char * p = (const unsigned char *) value;
-    ASSERT_ARGS(key_hash_cstring);
 
     while (*p) {
         h += h << 5;
@@ -369,9 +381,9 @@ PARROT_EXPORT
 void
 parrot_mark_hash(PARROT_INTERP, ARGIN(Hash *hash))
 {
+    ASSERT_ARGS(parrot_mark_hash);
     int mark_key   = 0;
     int mark_value = 0;
-    ASSERT_ARGS(parrot_mark_hash);
 
     if (hash->entry_type == (PARROT_DATA_TYPE) enum_hash_string
     ||  hash->entry_type == (PARROT_DATA_TYPE) enum_hash_pmc)
@@ -396,10 +408,10 @@ parrot_mark_hash(PARROT_INTERP, ARGIN(Hash *hash))
 static void
 parrot_mark_hash_keys(PARROT_INTERP, ARGIN(Hash *hash))
 {
+    ASSERT_ARGS(parrot_mark_hash_keys);
     UINTVAL entries = hash->entries;
     UINTVAL found   = 0;
     INTVAL  i;
-    ASSERT_ARGS(parrot_mark_hash_keys);
 
     for (i = hash->mask; i >= 0; --i) {
         HashBucket *bucket = hash->bi[i];
@@ -421,10 +433,10 @@ parrot_mark_hash_keys(PARROT_INTERP, ARGIN(Hash *hash))
 static void
 parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 {
+    ASSERT_ARGS(parrot_mark_hash_values);
     UINTVAL entries = hash->entries;
     UINTVAL found   = 0;
     INTVAL  i;
-    ASSERT_ARGS(parrot_mark_hash_values);
 
     for (i = hash->mask; i >= 0; --i) {
         HashBucket *bucket = hash->bi[i];
@@ -446,10 +458,10 @@ parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 static void
 parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *hash))
 {
+    ASSERT_ARGS(parrot_mark_hash_both);
     UINTVAL entries = hash->entries;
     UINTVAL found   = 0;
     INTVAL  i;
-    ASSERT_ARGS(parrot_mark_hash_both);
 
     for (i = hash->mask; i >= 0; --i) {
         HashBucket *bucket = hash->bi[i];
@@ -486,12 +498,12 @@ C<pinfo> is the visit info, (see include/parrot/pmc_freeze.h>).
 static void
 hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(visit_info *info))
 {
+    ASSERT_ARGS(hash_thaw);
     size_t           entry_index;
     IMAGE_IO * const io = info->image_io;
 
     /* during thaw info->extra is the key/value count */
     const size_t num_entries = (size_t) hash->entries;
-    ASSERT_ARGS(hash_thaw);
 
     hash->entries = 0;
 
@@ -558,9 +570,9 @@ Use by parrot_hash_visit.
 static void
 hash_freeze(PARROT_INTERP, ARGIN(const Hash * const hash), ARGMOD(visit_info* info))
 {
+    ASSERT_ARGS(hash_freeze);
     size_t i;
     IMAGE_IO * const io = info->image_io;
-    ASSERT_ARGS(hash_freeze);
 
     for (i = 0; i <= hash->mask; i++) {
         HashBucket *b = hash->bi[i];
@@ -611,8 +623,8 @@ PARROT_EXPORT
 void
 parrot_hash_visit(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(void *pinfo))
 {
-    visit_info* const info = (visit_info*) pinfo;
     ASSERT_ARGS(parrot_hash_visit);
+    visit_info* const info = (visit_info*) pinfo;
 
     switch (info->what) {
         case VISIT_THAW_NORMAL:
@@ -662,6 +674,7 @@ pointers, and they'll be all over memory.)
 static void
 expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
 {
+    ASSERT_ARGS(expand_hash);
     const UINTVAL old_size = hash->mask + 1;
     const UINTVAL new_size = old_size << 1;
     HashBucket **old_bi, **new_bi;
@@ -685,7 +698,6 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
      */
     HashBucket * const new_mem =
         (HashBucket *)mem_sys_realloc(old_mem, HASH_ALLOC_SIZE(new_size));
-    ASSERT_ARGS(expand_hash);
     /*
          +---+---+---+---+---+---+-+-+-+-+-+-+-+-+
          |  bs       | old_bi    |  new_bi       |
@@ -847,11 +859,11 @@ static Hash *
 create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_type,
         ARGIN(hash_comp_fn compare), ARGIN(hash_hash_key_fn keyhash))
 {
+    ASSERT_ARGS(create_hash);
     size_t      i;
     HashBucket *bp;
 
     Hash * const hash = mem_allocate_zeroed_typed(Hash);
-    ASSERT_ARGS(create_hash);
 
     hash->compare    = compare;
     hash->hash_val   = keyhash;
@@ -930,8 +942,8 @@ the key-value pairs, and finally the hash itself.
 void
 parrot_chash_destroy(PARROT_INTERP, ARGMOD(Hash *hash))
 {
-    UINTVAL i;
     ASSERT_ARGS(parrot_chash_destroy);
+    UINTVAL i;
 
     for (i = 0; i <= hash->mask; i++) {
         HashBucket *bucket = hash->bi[i];
@@ -964,8 +976,8 @@ void
 parrot_chash_destroy_values(PARROT_INTERP, ARGMOD(Hash *hash),
     ARGIN(value_free func))
 {
-    UINTVAL i;
     ASSERT_ARGS(parrot_chash_destroy_values);
+    UINTVAL i;
 
     for (i = 0; i <= hash->mask; i++) {
         HashBucket *bucket = hash->bi[i];
@@ -1031,8 +1043,8 @@ parrot_new_pmc_hash_x(PARROT_INTERP,
         NOTNULL(hash_comp_fn compare),
         NOTNULL(hash_hash_key_fn keyhash))
 {
-    Hash * const hash = create_hash(interp, val_type, hkey_type, compare, keyhash);
     ASSERT_ARGS(parrot_new_pmc_hash_x);
+    Hash * const hash = create_hash(interp, val_type, hkey_type, compare, keyhash);
     PMC_struct_val(container) = hash;
     hash->container = container;
 }
@@ -1073,11 +1085,11 @@ PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_new_INTVAL_hash(PARROT_INTERP, UINTVAL flags)
 {
+    ASSERT_ARGS(Parrot_new_INTVAL_hash);
     PMC * const h =
         (flags & PObj_constant_FLAG)
             ? constant_pmc_new_noinit(interp, enum_class_Hash)
             : pmc_new_noinit(interp, enum_class_Hash);
-    ASSERT_ARGS(Parrot_new_INTVAL_hash);
 
     parrot_new_pmc_hash_x(interp, h, enum_type_INTVAL, Hash_key_type_int,
             int_compare, key_hash_int);
@@ -1124,6 +1136,7 @@ PARROT_CAN_RETURN_NULL
 void *
 parrot_hash_get_idx(SHIM_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *key))
 {
+    ASSERT_ARGS(parrot_hash_get_idx);
     INTVAL i = PMC_int_val(key);
     const BucketIndex bi = (BucketIndex)PMC_data(key);
     HashBucket *b;
@@ -1134,7 +1147,6 @@ parrot_hash_get_idx(SHIM_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *key))
      */
     /* locate initial */
     const INTVAL size = (INTVAL)N_BUCKETS(hash->mask + 1);
-    ASSERT_ARGS(parrot_hash_get_idx);
 
     if (bi == INITBucketIndex) {
         i = 0;
@@ -1211,8 +1223,8 @@ PARROT_CAN_RETURN_NULL
 void *
 parrot_hash_get(PARROT_INTERP, ARGIN(Hash *hash), ARGIN(const void *key))
 {
-    const HashBucket * const bucket = parrot_hash_get_bucket(interp, hash, key);
     ASSERT_ARGS(parrot_hash_get);
+    const HashBucket * const bucket = parrot_hash_get_bucket(interp, hash, key);
     return bucket ? bucket->value : NULL;
 }
 
@@ -1231,8 +1243,8 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 parrot_hash_exists(PARROT_INTERP, ARGIN(Hash *hash), ARGIN(void *key))
 {
-    const HashBucket * const bucket = parrot_hash_get_bucket(interp, hash, key);
     ASSERT_ARGS(parrot_hash_exists);
+    const HashBucket * const bucket = parrot_hash_get_bucket(interp, hash, key);
     return bucket ? 1 : 0;
 }
 
@@ -1253,9 +1265,9 @@ PARROT_CANNOT_RETURN_NULL
 HashBucket*
 parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key), ARGIN_NULLOK(void *value))
 {
+    ASSERT_ARGS(parrot_hash_put);
     const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
     HashBucket   *bucket  = hash->bi[hashval & hash->mask];
-    ASSERT_ARGS(parrot_hash_put);
 
     while (bucket) {
         /* store hash_val or not */
@@ -1309,11 +1321,11 @@ PARROT_EXPORT
 void
 parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
 {
+    ASSERT_ARGS(parrot_hash_delete);
     HashBucket *bucket;
     HashBucket *prev = NULL;
 
     const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed) & hash->mask;
-    ASSERT_ARGS(parrot_hash_delete);
 
     for (bucket = hash->bi[hashval]; bucket; bucket = bucket->next) {
         if ((hash->compare)(interp, key, bucket->key) == 0) {
@@ -1349,8 +1361,8 @@ PARROT_EXPORT
 void
 parrot_hash_clone(PARROT_INTERP, ARGIN(const Hash *hash), ARGOUT(Hash *dest))
 {
-    UINTVAL i;
     ASSERT_ARGS(parrot_hash_clone);
+    UINTVAL i;
 
     for (i = 0; i <= hash->mask; i++) {
         HashBucket *b = hash->bi[i];

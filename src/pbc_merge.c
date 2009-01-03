@@ -160,36 +160,46 @@ static void pbc_merge_write(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pf);
 
-#define ASSERT_ARGS_help assert(interp);
-#define ASSERT_ARGS_pbc_merge_begin assert(interp); \
-                                    assert(inputs);
-#define ASSERT_ARGS_pbc_merge_bytecode assert(interp); \
-                                       assert(inputs); \
-                                       assert(pf);
-#define ASSERT_ARGS_pbc_merge_constants assert(interp); \
-                                        assert(inputs); \
-                                        assert(pf); \
-                                        assert(bc);
-#define ASSERT_ARGS_pbc_merge_ctpointers assert(interp); \
-                                         assert(inputs); \
-                                         assert(bc);
-#define ASSERT_ARGS_pbc_merge_debugs assert(interp); \
-                                     assert(inputs); \
-                                     assert(pf); \
-                                     assert(bc);
-#define ASSERT_ARGS_pbc_merge_fixups assert(interp); \
-                                     assert(inputs); \
-                                     assert(pf); \
-                                     assert(bc);
-#define ASSERT_ARGS_pbc_merge_loadpbc assert(interp); \
-                                      assert(fullname);
-#define ASSERT_ARGS_pbc_merge_pic_index assert(interp); \
-                                        assert(inputs); \
-                                        assert(pf); \
-                                        assert(bc);
-#define ASSERT_ARGS_pbc_merge_write assert(interp); \
-                                    assert(pf); \
-                                    assert(filename);
+#define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_pbc_merge_begin __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(inputs)
+#define ASSERT_ARGS_pbc_merge_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(inputs) \
+    || PARROT_ASSERT_ARG(pf)
+#define ASSERT_ARGS_pbc_merge_constants __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(inputs) \
+    || PARROT_ASSERT_ARG(pf) \
+    || PARROT_ASSERT_ARG(bc)
+#define ASSERT_ARGS_pbc_merge_ctpointers __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(inputs) \
+    || PARROT_ASSERT_ARG(bc)
+#define ASSERT_ARGS_pbc_merge_debugs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(inputs) \
+    || PARROT_ASSERT_ARG(pf) \
+    || PARROT_ASSERT_ARG(bc)
+#define ASSERT_ARGS_pbc_merge_fixups __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(inputs) \
+    || PARROT_ASSERT_ARG(pf) \
+    || PARROT_ASSERT_ARG(bc)
+#define ASSERT_ARGS_pbc_merge_loadpbc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(fullname)
+#define ASSERT_ARGS_pbc_merge_pic_index __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(inputs) \
+    || PARROT_ASSERT_ARG(pf) \
+    || PARROT_ASSERT_ARG(bc)
+#define ASSERT_ARGS_pbc_merge_write __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pf) \
+    || PARROT_ASSERT_ARG(filename)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -230,6 +240,7 @@ PARROT_CANNOT_RETURN_NULL
 static PackFile*
 pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
 {
+    ASSERT_ARGS(pbc_merge_loadpbc);
     INTVAL program_size, wanted;
     char *program_code;
     PackFile *pf;
@@ -321,9 +332,10 @@ static PackFile_ByteCode*
 pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                    int num_inputs, ARGMOD(PackFile *pf))
 {
+    ASSERT_ARGS(pbc_merge_bytecode);
+    int i;
     opcode_t *bc = mem_allocate_typed(opcode_t);
     opcode_t cursor = 0;
-    int i;
 
     /* Add a bytecode segment. */
     PackFile_ByteCode * const bc_seg =
@@ -385,9 +397,10 @@ static PackFile_ConstTable*
 pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                     int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode *bc))
 {
+    ASSERT_ARGS(pbc_merge_constants);
+    int i, j;
     PackFile_Constant   **constants = mem_allocate_typed(PackFile_Constant *);
     opcode_t cursor = 0;
-    int i, j;
 
     /* Add a constant table segment. */
     PackFile_ConstTable * const const_seg = (PackFile_ConstTable*)PackFile_Segment_new_seg(
@@ -480,10 +493,11 @@ static void
 pbc_merge_fixups(PARROT_INTERP, ARGIN(pbc_merge_input **inputs),
                  int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode *bc))
 {
+    ASSERT_ARGS(pbc_merge_fixups);
+    int i, j;
     PackFile_FixupTable *fixup_seg;
     PackFile_FixupEntry **fixups = mem_allocate_typed(PackFile_FixupEntry *);
     opcode_t cursor = 0;
-    int i, j;
 
     /* Add a fixup table segment. */
     fixup_seg = (PackFile_FixupTable*)PackFile_Segment_new_seg(
@@ -575,13 +589,14 @@ static void
 pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                  int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode *bc))
 {
+    ASSERT_ARGS(pbc_merge_debugs);
+    int i, j;
     PackFile_Debug *debug_seg;
     opcode_t *lines                  = mem_allocate_typed(opcode_t);
     PackFile_DebugMapping **mappings =
         mem_allocate_typed(PackFile_DebugMapping *);
     opcode_t num_mappings = 0;
     opcode_t num_lines    = 0;
-    int i, j;
 
     /* We need to merge both the mappings and the list of line numbers.
        The line numbers can just be concatenated. The mappings must have
@@ -645,6 +660,7 @@ static void
 pbc_merge_pic_index(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                  int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode *bc))
 {
+    ASSERT_ARGS(pbc_merge_pic_index);
     int i;
     PackFile_Segment *pic_index;
     size_t size;
@@ -697,11 +713,12 @@ static void
 pbc_merge_ctpointers(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                      int num_inputs, ARGMOD(PackFile_ByteCode *bc))
 {
+    ASSERT_ARGS(pbc_merge_ctpointers);
+    int        cur_arg;
     opcode_t  *op_ptr;
     opcode_t  *ops       = bc->base.data;
     opcode_t   cur_op    = 0;
     int        cur_input = 0;
-    int        cur_arg;
 
     /* Loop over the ops in the merged bytecode. */
     while (cur_op < (opcode_t)bc->base.size) {
@@ -779,6 +796,7 @@ PARROT_CANNOT_RETURN_NULL
 static PackFile*
 pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
 {
+    ASSERT_ARGS(pbc_merge_begin);
     PackFile_ByteCode   *bc;
     PackFile_ConstTable *ct;
 
@@ -819,6 +837,7 @@ This functions writes out the merged packfile.
 static void
 pbc_merge_write(PARROT_INTERP, ARGMOD(PackFile *pf), ARGIN(const char *filename))
 {
+    ASSERT_ARGS(pbc_merge_write);
     FILE     *fp;
 
     /* Get size of packfile we'll write. */

@@ -41,7 +41,8 @@ static unsigned int parrot_config_size_stored = 0;
 static void parrot_set_config_hash_interpreter(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_parrot_set_config_hash_interpreter assert(interp);
+#define ASSERT_ARGS_parrot_set_config_hash_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -62,6 +63,7 @@ void
 Parrot_set_config_hash_internal(ARGIN(const unsigned char* parrot_config),
                                  unsigned int parrot_config_size)
 {
+    ASSERT_ARGS(Parrot_set_config_hash_internal);
     parrot_config_stored      = parrot_config;
     parrot_config_size_stored = parrot_config_size;
 }
@@ -80,6 +82,7 @@ using the last registered config data.
 static void
 parrot_set_config_hash_interpreter(PARROT_INTERP)
 {
+    ASSERT_ARGS(parrot_set_config_hash_interpreter);
     PMC *iglobals = interp->iglobals;
 
     PMC *config_hash = NULL;
@@ -116,6 +119,7 @@ C<interp> should be the root interpreter created in C<Parrot_new(NULL)>.
 void
 init_world_once(PARROT_INTERP)
 {
+    ASSERT_ARGS(init_world_once);
     if (!interp->world_inited) {
         /* init_world() sets up some vtable stuff.
          * It must only be called once.
@@ -146,6 +150,7 @@ C<interp> should be the root interpreter created in C<Parrot_new(NULL)>.
 void
 init_world(PARROT_INTERP)
 {
+    ASSERT_ARGS(init_world);
     PMC *iglobals, *self, *pmc;
 
 #ifdef PARROT_HAS_PLATFORM_INIT_CODE
@@ -193,6 +198,7 @@ called from inmidst of PMC bootstrapping between pass 0 and 1
 void
 parrot_global_setup_2(PARROT_INTERP)
 {
+    ASSERT_ARGS(parrot_global_setup_2);
     PMC *classname_hash, *iglobals;
     int  i;
 

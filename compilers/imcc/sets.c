@@ -51,6 +51,7 @@ PARROT_CANNOT_RETURN_NULL
 Set*
 set_make(unsigned int length)
 {
+    ASSERT_ARGS(set_make);
     Set * const s = mem_allocate_zeroed_typed(Set);
     s->length     = length;
     s->bmp        = mem_allocate_n_zeroed_typed(NUM_BYTES(length),
@@ -75,6 +76,7 @@ PARROT_CANNOT_RETURN_NULL
 Set*
 set_make_full(unsigned int length)
 {
+    ASSERT_ARGS(set_make_full);
     Set * const s      = set_make(length);
     const size_t bytes = NUM_BYTES(length);
 
@@ -98,6 +100,7 @@ Frees the given Set and its allocated memory.
 void
 set_free(ARGMOD(Set *s))
 {
+    ASSERT_ARGS(set_free);
     if (s->bmp)
         mem_sys_free(s->bmp);
 
@@ -118,6 +121,7 @@ Clears all bits in the Set.
 void
 set_clear(ARGMOD(Set *s))
 {
+    ASSERT_ARGS(set_clear);
     memset(s->bmp, 0, NUM_BYTES(s->length));
 }
 
@@ -137,6 +141,7 @@ PARROT_CANNOT_RETURN_NULL
 Set*
 set_copy(ARGIN(const Set *s))
 {
+    ASSERT_ARGS(set_copy);
     Set * const d = set_make(s->length);
 
     memcpy(d->bmp, s->bmp, NUM_BYTES(d->length));
@@ -160,6 +165,7 @@ Raises a fatal error if the two Sets have different lengths.
 int
 set_equal(ARGIN(const Set *s1), ARGIN(const Set *s2))
 {
+    ASSERT_ARGS(set_equal);
     int          mask;
     const size_t bytes = s1->length / 8;
 
@@ -195,6 +201,7 @@ Adds to set C<s> the element C<element>.
 void
 set_add(ARGMOD(Set *s), unsigned int element)
 {
+    ASSERT_ARGS(set_add);
     const int elem_byte_in_set = BYTE_IN_SET(element);
     const int bytes_in_set     = BYTE_IN_SET(s->length);
 
@@ -223,9 +230,9 @@ PARROT_PURE_FUNCTION
 unsigned int
 set_first_zero(ARGIN(const Set *s))
 {
+    ASSERT_ARGS(set_first_zero);
     unsigned int i;
 
-    ASSERT_ARGS(set_first_zero);
 
     for (i = 0; i < NUM_BYTES(s->length); ++i) {
         const int set_byte = s->bmp[i];
@@ -294,6 +301,7 @@ PARROT_CANNOT_RETURN_NULL
 Set *
 set_union(ARGIN(const Set *s1), ARGIN(const Set *s2))
 {
+    ASSERT_ARGS(set_union);
     unsigned int i;
     Set * const s = set_make(s1->length);
 
@@ -326,8 +334,9 @@ PARROT_CANNOT_RETURN_NULL
 Set *
 set_intersec(ARGIN(const Set *s1), ARGIN(const Set *s2))
 {
-    Set * const  s = set_make(s1->length);
+    ASSERT_ARGS(set_intersec);
     unsigned int i;
+    Set * const  s = set_make(s1->length);
 
     if (s1->length != s2->length)
         fatal(1, "set_intersec", "Sets don't have the same length\n");
@@ -354,6 +363,7 @@ contain the result.
 void
 set_intersec_inplace(ARGMOD(Set *s1), ARGIN(const Set *s2))
 {
+    ASSERT_ARGS(set_intersec_inplace);
     unsigned int i;
 
     if (s1->length != s2->length)
