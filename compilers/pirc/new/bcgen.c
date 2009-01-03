@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2008, The Perl Foundation.
+ * Copyright (C) 2008-2009, The Perl Foundation.
  */
 #include <stdio.h>
 #include <assert.h>
@@ -158,10 +158,14 @@ add_pmc_const(bytecode * const bc, PMC * pmc) {
 /*
 
 =item C<int
-add_string_const(bytecode * const bc, char const * const str)>
+add_string_const(bytecode * const bc, char const * const str, char const * charset)>
 
 Add the string constant C<str> to the constant table. This function
 returns the index in the constant table where C<str> is stored.
+C<str> is assumed to be a C-string; it is converted to a Parrot STRING
+object, using the character set passed in C<charset>.
+
+XXX what to do with "encoding"?
 
 =cut
 
@@ -734,13 +738,12 @@ The C<subpragmas> parameter encode flags such as C<:immediate> etc.
 */
 int
 add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subpragmas) {
-    PMC                   *sub_pmc;
+    PMC                   *sub_pmc;        /* the "Sub" pmc, or a variant, such as "Coroutine" */
     Parrot_sub            *sub;
-    int                    subconst_index;
+    int                    subconst_index; /* index in const table for the sub pmc */
     int                    subname_index;
-    int                    i;
+    int                    i;              /* for loop iterator */
     PackFile_Constant     *subname_const;
-    INTVAL                 type;
 
     sub_pmc               = create_sub_pmc(bc, info->iscoroutine, info->instanceof);
     sub                   = PMC_sub(sub_pmc);
