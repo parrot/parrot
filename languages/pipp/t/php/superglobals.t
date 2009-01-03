@@ -15,16 +15,12 @@ Test PHP superglobal variables.
 
 =cut
 
-# pragmata
 use strict;
 use warnings;
-
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Config ();
-use Parrot::Test;
-use Test::More     tests => 3;
+use Parrot::Test tests => 5;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'php_sapi_name' );
 <?php
@@ -60,3 +56,35 @@ array(1) {
 
 OUT
 
+language_output_is( 'Pipp', <<'CODE', <<'OUT', q{$_ENV['QUERY_STRING']}, todo => '$_ENV not set yet' );
+<?php
+
+echo 'outside function: ';
+echo $_ENV['QUERY_STRING'];
+echo "\n";
+
+?>
+CODE
+outside function: as=df
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', '$_ENV in a function', todo => 'superglobals in function broken' );
+<?php
+
+echo 'outside function: ';
+echo $_GET['as'];
+echo "\n";
+
+function echo_as () {
+    echo 'inside function: ';
+    echo $_GET['as'];
+    echo "\n";
+}
+
+echo_as();
+
+?>
+CODE
+outside function: df
+inside function: df
+OUT
