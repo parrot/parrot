@@ -1,5 +1,6 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
+
 class JS::Grammar::Actions;
 
 method TOP($/, $key) {
@@ -146,7 +147,8 @@ sub c_style_for($/,$var_decl) {
     my $init;
     if $var_decl {
         $init := $( $<init> );
-    } else {
+    }
+    else {
         if $<init> { $init := $( $<init>[0] ); }
     }
 
