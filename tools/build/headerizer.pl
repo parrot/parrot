@@ -311,10 +311,10 @@ sub asserts_from_args {
                 # strip off everything before the final space or asterisk.
                 $var =~ s[.+[* ]([^* ]+)$][$1];
             }
-            push( @asserts, "assert($var);" );
+            push( @asserts, "PARROT_ASSERT_ARG($var)" );
         }
         if( $arg eq 'PARROT_INTERP' ) {
-            push( @asserts, "assert(interp);" );
+            push( @asserts, "PARROT_ASSERT_ARG(interp)" );
         }
     }
 
@@ -379,9 +379,12 @@ sub make_function_decls {
         my @asserts = asserts_from_args( @args );
 
         my $assert = "#define ASSERT_ARGS_" . $func->{name};
+            $assert .= " __attribute__unused__ int _ASSERT_ARGS_CHECK = ";
         if(@asserts) {
-            $assert .= ' ';
-            $assert .= join(" \\\n" . ' ' x length($assert), @asserts);
+            $assert .= "\\\n       ";
+            $assert .= join(" \\\n    || ", @asserts);
+        } else {
+            $assert .= "0";
         }
         push(@decls, $assert);
     }

@@ -259,6 +259,16 @@ void Parrot_print_backtrace(void);
 #  define PARROT_ASSERT(x) (x) ? ((void)0) : Parrot_confess(#x, __FILE__, __LINE__)
 #endif
 
+/* having a function version of this lets us put ASSERT_ARGS() at the top
+ * of the list of local variables.  Thus, we can catch bad pointers before
+ * any of the local initialization logic is run.  And it always returns 0,
+ * so headerizer can define the ASSERT_ARGS_* macros like:
+ * int _ASSERT_ARGS = PARROT_ASSERT_ARG(a) || PARROT_ASSERT_ARG(b) || ...
+ */
+static inline int PARROT_ASSERT_ARG(const void *x) {
+    PARROT_ASSERT(x);
+    return 0;
+}
 #define ASSERT_ARGS(a) ASSERT_ARGS_ ## a
 
 
