@@ -548,8 +548,8 @@ sub main {
             for my $cfile ( sort keys %{$cfiles} ) {
                 my @funcs = @{ $cfiles->{$cfile} };
                 @funcs = grep { not $_->{is_static} } @funcs;    # skip statics
-                $header = replace_headerized_declarations( $header, $cfile, $hfile, @funcs )
-                    unless $cfile =~ /\.y$/;
+
+                $header = replace_headerized_declarations( $header, $cfile, $hfile, @funcs );
             }
 
             write_file( $hfile, $header );
