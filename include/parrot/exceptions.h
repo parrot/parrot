@@ -280,7 +280,7 @@ void Parrot_print_backtrace(void);
  * int _ASSERT_ARGS = PARROT_ASSERT_ARG(a) || PARROT_ASSERT_ARG(b) || ...
  */
 static inline int
-_PARROT_ASSERT_ARG(const void *x, const char *name,
+_PARROT_ASSERT_ARG(const volatile void *x, const char *name,
         const char *file, unsigned int line) /* HEADERIZER SKIP */
 {
 #ifndef NDEBUG
