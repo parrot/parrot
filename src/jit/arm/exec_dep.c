@@ -26,6 +26,7 @@
 void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_exec_normal_op);
 }
 
 #else /* JIT_CGP */
@@ -70,6 +71,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 void
 Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_exec_cpcf_op);
     Parrot_exec_normal_op(jit_info, interp);
     Parrot_jump_to_op_in_reg(jit_info, interp, r0);
 }
@@ -77,12 +79,14 @@ Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 void
 Parrot_exec_restart_op(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_exec_restart_op);
 }
 
 /* Assign the offset of the progra_code */
 void
 offset_fixup(Parrot_exec_objfile_t *obj)
 {
+    ASSERT_ARGS(offset_fixup);
     int i, j;
 
     for (i = 0; i < obj->data_count; i++) {

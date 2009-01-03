@@ -28,6 +28,7 @@
 void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_exec_normal_op);
     Parrot_jit_optimizer_section_ptr cur_section =
         jit_info->optimizer->cur_section;
     int i, j, last_is_branch = 0;
@@ -113,6 +114,7 @@ void
 Parrot_exec_normal_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_exec_normal_op);
     emitm_pushl_i(jit_info->native_ptr,
         jit_info->objfile->bytecode_header_size +
             jit_info->op_i * sizeof (opcode_t));
@@ -132,6 +134,7 @@ void
 Parrot_exec_cpcf_op(Parrot_jit_info_t *jit_info,
                    PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_exec_cpcf_op);
     Parrot_exec_normal_op(jit_info, interp);
     Parrot_emit_jump_to_eax(jit_info, interp);
 }
@@ -140,6 +143,7 @@ void
 Parrot_exec_restart_op(Parrot_jit_info_t *jit_info,
                    PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_exec_restart_op);
     char *jmp_ptr, *sav_ptr;
 
     Parrot_exec_normal_op(jit_info, interp);
@@ -169,6 +173,7 @@ Parrot_exec_restart_op(Parrot_jit_info_t *jit_info,
 void
 offset_fixup(Parrot_exec_objfile_t *obj)
 {
+    ASSERT_ARGS(offset_fixup);
     int i;
 
     for (i = 0; i < obj->data_count; i++) {
