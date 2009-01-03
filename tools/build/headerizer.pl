@@ -310,6 +310,8 @@ sub asserts_from_args {
                 # try to isolate the variable's name;
                 # strip off everything before the final space or asterisk.
                 $var =~ s[.+[* ]([^* ]+)$][$1];
+                # strip off a trailing "[]", if any.
+                $var =~ s/\[\]$//;
             }
             push( @asserts, "PARROT_ASSERT_ARG($var)" );
         }
