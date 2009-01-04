@@ -9,6 +9,17 @@
 #include "pirop.h"
 #include "pirerr.h"
 
+/*
+
+=head1 DESCRIPTION
+
+=head1 FUNCTIONS
+
+=over 4
+
+=cut
+
+*/
 
 /* the order of these letters match with the pir_type enumeration.
  * These are used for generating the full opname (set I0, 10 -> set_i_ic).
@@ -275,6 +286,13 @@ get_opinfo(lexer_state * const lexer) {
 
 }
 
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
