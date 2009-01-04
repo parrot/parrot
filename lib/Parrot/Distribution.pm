@@ -34,6 +34,8 @@ use warnings;
 
 use ExtUtils::Manifest;
 use File::Spec;
+use lib qw( lib );
+use Parrot::BuildUtil ();
 
 use base 'Parrot::Docs::Directory';
 
@@ -780,6 +782,23 @@ sub generated_files {
         map { File::Spec->catfile( $path, $_ ) => $generated->{$_} }
             keys %$generated
     };
+}
+
+sub slurp {
+    my $self = shift;
+    my $path = shift;
+    my $buf;
+
+    # slurp in the file
+    open( my $fh, '<', $path )
+        or die "Cannot open '$path' for reading: $!\n";
+    {
+        local $/;
+        $buf = <$fh>;
+    }
+    close $fh;
+
+    return $buf;
 }
 
 1;
