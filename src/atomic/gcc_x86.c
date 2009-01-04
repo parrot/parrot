@@ -34,11 +34,11 @@ assembly suppport.
  */
 /*
 
-=item C<void * parrot_i386_cmpxchg>
+=item C<void * parrot_i386_cmpxchg (ptr, expect, update)>
 
 The CMPXCHG assembly instruction is a single cycle x86 instruction
-that compares C<expect> and C<update>. If they are equal, sets
-C<expect> to C<update>. Otherwise sets C<update> to C<ptr>.
+that compares C<expect> and C<*ptr>. If they are equal, sets
+C<*ptr> to C<update>. Otherwise sets C<expect> to C<*ptr>.
 
 =cut
 
