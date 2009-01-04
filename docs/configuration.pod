@@ -62,8 +62,8 @@ Makefiles and configuration headers. A step containing generations is a
 I<generation step>. Generation steps should be in the F<config/gen> folder.
 
 Templates for files to be generated usually have the extension F<.in>.  There
-are variable substitutes and funny macros like 'CONDITIONED_LINE' and
-'INVERSE_CONDITIONED_LINE'.
+are variable substitutes and funny macros like C<#IF> and C<#UNLESS>
+(conditional lines).
 
 =head2 Prompt or Probe?
 
