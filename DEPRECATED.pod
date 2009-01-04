@@ -129,7 +129,7 @@ to happen.  See RT #60586 and RT #53302.
 
 =over 4
 
-=item P6protoobject stringification [post 0.8.3]
+=item P6protoobject stringification [post 0.9.0]
 
 Stringification of protoobjects will return the full name of the type
 and parentheses, per Synopsis 12.
