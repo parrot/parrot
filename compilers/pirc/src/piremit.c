@@ -481,7 +481,7 @@ emit_pbc_const_arg(lexer_state * const lexer, constant * const c) {
             break;
         }
         case PMC_VAL: {
-            if (c->name) { /* XXX this check necessary? */
+
                 /* look up the sub by its name stored in c->val.pval, then
                  * find out what that sub's PMC_CONST is in the constant table,
                  * and emit that.
@@ -497,7 +497,7 @@ emit_pbc_const_arg(lexer_state * const lexer, constant * const c) {
                     yypirerror(lexer->yyscanner, lexer,
                                "cannot find referenced sub '%s'", c->val.pval);
                 }
-            }
+
             break;
         }
         case USTRING_VAL: {

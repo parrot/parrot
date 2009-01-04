@@ -239,6 +239,7 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
     unsigned            uval;
     char   const       *sval;
     struct constant    *cval;
+    struct constdecl   *cdec;
     struct ucstring    *ustr;
     struct instruction *instr;
     struct expression  *expr;
@@ -491,9 +492,13 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
              short_invocation
              return_instr
 
-%type <cval> const_tail
-             constant
+%type <cval> constant
              stringconst
+
+%type <cdec> const_tail
+             const_decl
+             globalconst_decl
+             const_stat
 
 
 /* all exported functions start with "yypir", instead of default "yy". */
@@ -1994,6 +1999,7 @@ paren_string          : '(' TK_STRINGC ')'
                       ;
 
 const_decl_stat       : const_stat "\n"
+
                       ;
 
 const_stat            : const_decl

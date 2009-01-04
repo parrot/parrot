@@ -1242,9 +1242,8 @@ appropriate type from C<arg_ptr>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static constant *
-create_const(lexer_state * const lexer, value_type type, char const * const name, va_list arg_ptr) {
+create_const(lexer_state * const lexer, value_type type, va_list arg_ptr) {
     constant *c = pir_mem_allocate_zeroed_typed(lexer, constant);
-    c->name     = name;
     c->type     = type;
     c->next     = NULL;
 
@@ -1274,6 +1273,29 @@ create_const(lexer_state * const lexer, value_type type, char const * const name
 /*
 
 =item C<constant *
+new_const(lexer_state * const lexer, value_type type, ...)>
+
+Creates a new constant node of the given type.
+Wrapper function for C<create_const>
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+constant *
+new_const(lexer_state * const lexer, value_type type, ...) {
+    constant *c;
+    va_list arg_ptr;
+    va_start(arg_ptr, type);
+    c = create_const(lexer, type, arg_ptr);
+    va_end(arg_ptr);
+    return c;
+}
+
+/*
+
+=item C<constant *
 new_named_const(lexer_state * const lexer, value_type type, char * const name, ...)>
 
 Creates a new constant node of the given type, by the given name.
@@ -1284,12 +1306,34 @@ Wrapper function for C<create_const>.
 */
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-constant *
+constdecl *
 new_named_const(lexer_state * const lexer, value_type type, char const * const name, ...) {
-    constant *c;
+    constdecl *c = pir_mem_allocate(lexer, sizeof (constdecl));
     va_list arg_ptr;
     va_start(arg_ptr, name);
-    c = create_const(lexer, type, name, arg_ptr);
+
+       /* based on the indicated type, cast the variable argument to the right type. */
+    switch (type) {
+        case INT_VAL:
+            c->val.ival = va_arg(arg_ptr, int);
+            break;
+        case NUM_VAL:
+            c->val.nval = va_arg(arg_ptr, double);
+            break;
+        case PMC_VAL:  /* value of a PMC_VAL constant is also a string */
+        case STRING_VAL:
+            c->val.sval = va_arg(arg_ptr, char *);
+            break;
+        case USTRING_VAL:
+            c->val.ustr = va_arg(arg_ptr, ucstring *);
+            break;
+        default:
+            panic(lexer, "unknown data type in create_const() (%d)", type);
+            break;
+    }
+
+    c->name = name;
+    c->type = type;
     va_end(arg_ptr);
     return c;
 }
@@ -1306,7 +1350,7 @@ of the constant, and the value of the constant is passed as C<value>.
 =cut
 
 */
-constant *
+constdecl *
 new_pmc_const(lexer_state * const lexer, char const * const type,
               char const * const name, constant * const value)
 {
@@ -1319,6 +1363,7 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
     /* check whether that PMC isa "Sub" */
     INTVAL is_a_sub      = VTABLE_isa(lexer->interp, constclass, subclassname);
 
+    constdecl *decl      = (constdecl *)pir_mem_allocate(lexer, sizeof (constdecl));
     /* fprintf(stderr, "new_pmc_const: is a sub=%d\n", is_a_sub);
     */
 
@@ -1333,7 +1378,6 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
         declare_local(lexer, PMC_TYPE, constsym);
         assign_vanilla_register(lexer, constsym);
 
-        value->name     = name;    /* set name of constant node */
         value->type     = PMC_VAL; /* set type of constant node */
         value->val.pval = value->val.sval;
 
@@ -1346,6 +1390,9 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
         push_operand(lexer, expr_from_target(lexer, consttarg));
         push_operand(lexer, expr_from_const(lexer, value));
 
+        decl->name     = name;
+        decl->type     = PMC_VAL;
+        decl->val.pval = value->val.sval;
     }
 
     else if (value->type == INT_VAL) {
@@ -1365,7 +1412,6 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
             declare_local(lexer, PMC_TYPE, constsym);
             assign_vanilla_register(lexer, constsym);
 
-            value->name = name;
 
             new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc", 0);
             push_operand(lexer, expr_from_target(lexer, consttarg));
@@ -1393,8 +1439,6 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
 
             declare_local(lexer, PMC_TYPE, constsym);
             assign_vanilla_register(lexer, constsym);
-
-            value->name = name;
 
             new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc", 0);
             push_operand(lexer, expr_from_target(lexer, consttarg));
@@ -1424,8 +1468,6 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
             declare_local(lexer, PMC_TYPE, constsym);
             assign_vanilla_register(lexer, constsym);
 
-            value->name = name;
-
             new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc", 0);
             push_operand(lexer, expr_from_target(lexer, consttarg));
             push_operand(lexer, expr_from_int(lexer, index));
@@ -1437,31 +1479,10 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
         }
     }
 
-    return value;
+    return decl;
 }
 
-/*
 
-=item C<constant *
-new_const(lexer_state * const lexer, value_type type, ...)>
-
-Creates a new constant node of the given type.
-Wrapper function for C<create_const>
-
-=cut
-
-*/
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-constant *
-new_const(lexer_state * const lexer, value_type type, ...) {
-    constant *c;
-    va_list arg_ptr;
-    va_start(arg_ptr, type);
-    c = create_const(lexer, type, NULL, arg_ptr);
-    va_end(arg_ptr);
-    return c;
-}
 
 /*
 

@@ -118,12 +118,12 @@ new_pbc_const(bytecode * const bc) {
 
     /* Update the constant count and reallocate */
     if (interp->code->const_table->constants)
-        interp->code->const_table->constants =
-            mem_realloc_n_typed(interp->code->const_table->constants,
+        interp->code->const_table->constants
+            = mem_realloc_n_typed(interp->code->const_table->constants,
                 newcount, PackFile_Constant *);
     else
-        interp->code->const_table->constants =
-            mem_allocate_n_typed(newcount, PackFile_Constant *);
+        interp->code->const_table->constants
+            = mem_allocate_n_typed(newcount, PackFile_Constant *);
 
     interp->code->const_table->constants[oldcount] = new_pbc_constant;
     interp->code->const_table->const_count         = newcount;

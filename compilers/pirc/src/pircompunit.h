@@ -155,10 +155,18 @@ typedef union value {
 
 } value;
 
+/* represent a .const or .globalconst declaration */
+typedef struct constdecl {
+    char const   *name;
+    int           global;
+    value_type    type;
+    value         val;
+
+} constdecl;
+
 
 /* literal constants, possibly named */
 typedef struct constant {
-    char const      *name;     /* name of the constant, if declared as a constant */
     value_type       type;     /* type of the constant; see enum value_types */
     value            val;      /* value of the constant */
     struct constant *next;
@@ -299,7 +307,7 @@ typedef struct bucket {
         struct symbol       *sym;
         struct local_label  *loc;
         struct global_label *glob;
-        struct constant     *cons;
+        struct constdecl    *cons;
     } u;
 
     struct bucket *next; /* link to next bucket, in case of hash clash */
@@ -378,12 +386,12 @@ argument *set_arg_flag(argument * const arg, arg_flag flag);
 argument *set_arg_alias(struct lexer_state * const lexer, char const * const alias);
 
 /* constructors for constant nodes */
-constant *new_named_const(struct lexer_state * const lexer, value_type type,
+constdecl *new_named_const(struct lexer_state * const lexer, value_type type,
                           char const * const name, ...);
 
 constant *new_const(struct lexer_state * const lexer, value_type type, ...);
 
-constant *new_pmc_const(struct lexer_state * const lexer, char const * const type,
+constdecl *new_pmc_const(struct lexer_state * const lexer, char const * const type,
                         char const * const name, constant * const value);
 
 /* conversion functions, each wrapping its argument in an expression node */

@@ -97,10 +97,10 @@ void store_global_label(struct lexer_state * const lexer, char const * const nam
 global_label *find_global_label(struct lexer_state * const lexer, char const * const name);
 
 /* store a global .const symbol */
-void store_global_constant(struct lexer_state * const lexer, constant * const c);
+void store_global_constant(struct lexer_state * const lexer, constdecl * const c);
 
 /* find a global .const symbol */
-constant *find_global_constant(struct lexer_state * const lexer, char const * const name);
+constdecl *find_global_constant(struct lexer_state * const lexer, char const * const name);
 
 void assign_vanilla_register(struct lexer_state * const lexer, symbol * const sym);
 

@@ -310,7 +310,7 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
     hashtable    *table    = &CURRENT_SUB(lexer)->symbols;
     unsigned long hashcode = get_hashcode(name, table->size);
     bucket       *buck     = get_bucket(table, hashcode);
-    constant     *c;
+    constdecl    *c;
 
 
     while (buck) {
@@ -613,13 +613,13 @@ Store the globally defined constant C<c> in the constant table.
 
 */
 void
-store_global_constant(NOTNULL(lexer_state * const lexer), NOTNULL(constant * const c)) {
+store_global_constant(NOTNULL(lexer_state * const lexer), NOTNULL(constdecl * const c)) {
     hashtable    *table  = &lexer->constants;
     unsigned long hash   = get_hashcode(c->name, table->size);
     bucket *b            = new_bucket(lexer);
     bucket_constant(b)   = c;
     store_bucket(table, b, hash);
-
+    fprintf(stderr, "store global constant\n");
 }
 
 /*
@@ -635,7 +635,7 @@ that name, then NULL is returned.
 */
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-constant *
+constdecl *
 find_global_constant(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)) {
     hashtable    *table    = &lexer->constants;
     unsigned long hashcode = get_hashcode(name, table->size);
