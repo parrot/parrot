@@ -26,35 +26,35 @@ LINKFLAGS     = @linkflags@ @link_debug@ @ld_debug@
 LD            = @ld@
 LDFLAGS       = @ldflags@ @ld_debug@
 
-SOURCES       = new/main.c \
-new/pirparser.c \
-new/pirlexer.c \
-new/pircompunit.c \
-new/pircompiler.c \
-new/pirsymbol.c \
-new/piremit.c \
-new/hdocprep.c \
-new/pirmacro.c \
-new/pirregalloc.c \
-new/bcgen.c \
-new/pirerr.c \
-new/pircapi.c 
+SOURCES       = src/main.c \
+src/pirparser.c \
+src/pirlexer.c \
+src/pircompunit.c \
+src/pircompiler.c \
+src/pirsymbol.c \
+src/piremit.c \
+src/hdocprep.c \
+src/pirmacro.c \
+src/pirregalloc.c \
+src/bcgen.c \
+src/pirerr.c \
+src/pircapi.c 
 
 OBJS          = \
-new/main$(O) \
-new/pirparser$(O) \
-new/pirlexer$(O) \
-new/pircompunit$(O) \
-new/pircompiler$(O) \
-new/pirsymbol$(O) \
-new/piremit$(O) \
-new/hdocprep$(O) \
-new/pirmacro$(O) \
-new/pirregalloc$(O) \
-new/bcgen$(O) \
-new/pirpcc$(O) \
-new/pirerr$(O) \
-new/pircapi$(O)
+src/main$(O) \
+src/pirparser$(O) \
+src/pirlexer$(O) \
+src/pircompunit$(O) \
+src/pircompiler$(O) \
+src/pirsymbol$(O) \
+src/piremit$(O) \
+src/hdocprep$(O) \
+src/pirmacro$(O) \
+src/pirregalloc$(O) \
+src/bcgen$(O) \
+src/pirpcc$(O) \
+src/pirerr$(O) \
+src/pircapi$(O)
 
 .c$(O) :
 	@$(PERL) ../../tools/dev/cc_flags.pl -v ../../CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
@@ -69,19 +69,19 @@ pirc$(EXE): $(OBJS)
   $(OBJS) \
 	@rpath_blib@ @libparrot_ldflags@ $(C_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 
-new/pirparser$(O): new/pirparser.c new/pirparser.h
-new/pirlexer$(O): new/pirlexer.c new/pirlexer.h
-new/pircompunit$(O): new/pircompunit.c new/pircompunit.h
-new/pircompiler$(O): new/pircompiler.c new/pircompiler.h
-new/pirsymbol$(O): new/pirsymbol.c new/pirsymbol.h
-new/piremit$(O): new/piremit.c new/piremit.h
-new/hdocprep$(O): new/hdocprep.c new/hdocprep.l
-new/pirmacro$(O): new/pirmacro.c new/pirmacro.h
-new/pirregalloc$(O): new/pirregalloc.c new/pirregalloc.h
-new/bcgen$(O): new/bcgen.c new/bcgen.h
-new/pirpcc$(O): new/pirpcc.c new/pirpcc.h
-new/pirerr$(O): new/pirerr.c new/pirerr.h
-new/pircapi$(O): new/pircapi.c new/pircapi.h
+src/pirparser$(O): src/pirparser.c src/pirparser.h
+src/pirlexer$(O): src/pirlexer.c src/pirlexer.h
+src/pircompunit$(O): src/pircompunit.c src/pircompunit.h
+src/pircompiler$(O): src/pircompiler.c src/pircompiler.h
+src/pirsymbol$(O): src/pirsymbol.c src/pirsymbol.h
+src/piremit$(O): src/piremit.c src/piremit.h
+src/hdocprep$(O): src/hdocprep.c src/hdocprep.l
+src/pirmacro$(O): src/pirmacro.c src/pirmacro.h
+src/pirregalloc$(O): src/pirregalloc.c src/pirregalloc.h
+src/bcgen$(O): src/bcgen.c src/bcgen.h
+src/pirpcc$(O): src/pirpcc.c src/pirpcc.h
+src/pirerr$(O): src/pirerr.c src/pirerr.h
+src/pircapi$(O): src/pircapi.c src/pircapi.h
 
 test: all
 	podchecker $(SOURCES) README.pod

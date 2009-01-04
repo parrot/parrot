@@ -16,7 +16,7 @@
 
 =head1 NAME
 
-compilers/pirc/new/pirsymbol.c
+compilers/pirc/src/pirsymbol.c
 
 =head1 DESCRIPTION
 

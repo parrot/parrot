@@ -371,20 +371,20 @@ This is to exclude automatically generated C-language files Parrot might have.
             compilers/imcc/imclexer.c
             compilers/imcc/imcparser.c
             compilers/imcc/imcparser.h
-            compilers/pirc/new/main.c
-            compilers/pirc/new/pir.l
-            compilers/pirc/new/pir.y
-            compilers/pirc/new/pasm.l
-            compilers/pirc/new/pasm.y
-            compilers/pirc/new/pircompiler.h
-            compilers/pirc/new/pirlexer.c
-            compilers/pirc/new/pirlexer.h
-            compilers/pirc/new/pirparser.c
-            compilers/pirc/new/pirparser.h
-            compilers/pirc/new/pircompunit.c
-            compilers/pirc/new/pircompunit.h
-            compilers/pirc/new/hdocprep.l
-            compilers/pirc/new/hdocprep.c
+            compilers/pirc/src/main.c
+            compilers/pirc/src/pir.l
+            compilers/pirc/src/pir.y
+            compilers/pirc/src/pasm.l
+            compilers/pirc/src/pasm.y
+            compilers/pirc/src/pircompiler.h
+            compilers/pirc/src/pirlexer.c
+            compilers/pirc/src/pirlexer.h
+            compilers/pirc/src/pirparser.c
+            compilers/pirc/src/pirparser.h
+            compilers/pirc/src/pircompunit.c
+            compilers/pirc/src/pircompunit.h
+            compilers/pirc/src/hdocprep.l
+            compilers/pirc/src/hdocprep.c
             compilers/pirc/macro/lexer.h
             compilers/pirc/macro/macro.h
             compilers/pirc/macro/macro.l

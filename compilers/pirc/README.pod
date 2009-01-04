@@ -35,7 +35,7 @@ To compile PIRC on windows using MSVC:
    nmake
 
 When running PIRC, it needs the shared library C<libparrot>; an easy way to do
-this is copy C<libparrot.dll> in the Parrot root directory to C<compilers/pirc/new>.
+this is copy C<libparrot.dll> in the Parrot root directory to C<compilers/pirc/src>.
 
 Running PIRC is as easy as:
 
@@ -357,19 +357,19 @@ whether they're any good. I use Cygwin's tools.
 The heredoc preprocessor is implemented in C<hdocprep.l>, and can be regenerated
 using:
 
-   cd compilers/pirc/new
+   cd compilers/pirc/src
    flex hdocprep.l
 
 PIRC's normal lexer is implemented in C<pir.l>, and can be regenerated using:
 
-   cd compilers/pirc/new
+   cd compilers/pirc/src
    flex pir.l
 
 =head2 Updating the parser
 
 The parser is implemented in C<pir.y>, and can be regenerated using:
 
-   cd compilers/pirc/new
+   cd compilers/pirc/src
    bison pir.y
 
 =head1 NOTES

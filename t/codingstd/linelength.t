@@ -130,20 +130,20 @@ __DATA__
 # Lex and Bison generated
 compilers/imcc/imclexer.c
 compilers/imcc/imcparser.c
-compilers/pirc/new/main.c
-compilers/pirc/new/pirlexer.c
-compilers/pirc/new/pirlexer.h
-compilers/pirc/new/pirparser.c
-compilers/pirc/new/pircompunit.h
-compilers/pirc/new/pircompunit.c
-compilers/pirc/new/pasm.l
-compilers/pirc/new/pasm.y
+compilers/pirc/src/main.c
+compilers/pirc/src/pirlexer.c
+compilers/pirc/src/pirlexer.h
+compilers/pirc/src/pirparser.c
+compilers/pirc/src/pircompunit.h
+compilers/pirc/src/pircompunit.c
+compilers/pirc/src/pasm.l
+compilers/pirc/src/pasm.y
 compilers/pirc/macro/macro.h
 compilers/pirc/macro/macrolexer.c
 compilers/pirc/macro/macrolexer.h
 compilers/pirc/macro/macroparser.c
 compilers/pirc/macro/macroparser.h
-compilers/pirc/new/hdocprep.l
-compilers/pirc/new/hdocprep.c
+compilers/pirc/src/hdocprep.l
+compilers/pirc/src/hdocprep.c
 # these ones include long POD
 docs/embed.pod
