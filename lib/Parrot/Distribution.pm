@@ -784,6 +784,12 @@ sub generated_files {
     };
 }
 
+=item C<slurp>
+
+Returns the text of the file at the given path
+
+=cut
+
 sub slurp {
     my $self = shift;
     my $path = shift;
