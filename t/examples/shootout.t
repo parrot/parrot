@@ -45,7 +45,7 @@ http://shootout.alioth.debian.org/sandbox/
 
 =head1 SEE ALSO
 
-#40064: [TODO] shootout example testing in Parrot RT
+#40064: shootout example testing in Parrot RT
 
 L<"https://rt.perl.org/rt3/Public/Bug/Display.html?id=40064">
 
