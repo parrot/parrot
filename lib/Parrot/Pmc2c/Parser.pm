@@ -10,7 +10,7 @@ use base qw( Exporter );
 
 our @EXPORT_OK = qw( parse_pmc extract_balanced );
 use Parrot::Pmc2c::PMC ();
-use Parrot::Pmc2c::Attribute;
+use Parrot::Pmc2c::Attribute ();
 use Parrot::Pmc2c::Method ();
 use Parrot::Pmc2c::Emitter ();
 use Parrot::Pmc2c::UtilFunctions qw(count_newlines filename slurp);
