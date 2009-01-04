@@ -125,4 +125,15 @@ to happen.  See RT #60586 and RT #53302.
 
 =back
 
+=head1 Compiler tools
+
+=over 4
+
+=item P6protoobject stringification [post 0.8.3]
+
+Stringification of protoobjects will return the full name of the type
+and parentheses, per Synopsis 12.
+
+=back
+
 =cut
