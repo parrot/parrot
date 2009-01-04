@@ -779,29 +779,6 @@ sub generated_files {
     };
 }
 
-=item C<slurp>
-
-Returns the text of the file at the given path
-
-=cut
-
-sub slurp {
-    my $self = shift;
-    my $path = shift;
-    my $buf;
-
-    # slurp in the file
-    open( my $fh, '<', $path )
-        or die "Cannot open '$path' for reading: $!\n";
-    {
-        local $/;
-        $buf = <$fh>;
-    }
-    close $fh;
-
-    return $buf;
-}
-
 1;
 
 # Local Variables:
